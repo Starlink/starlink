@@ -21,6 +21,18 @@
  *                                     line. Work based on the
  *                                     tkCanvSeg patch by Scott Schwartz
  *                                     <schwartz@cs.psu.edu>.
+ *                     27 April  1999: 
+ *                                     Further modifications to
+ *                                     improve efficiency when
+ *                                     plotting large numbers of
+ *                                     segments. RtdSegmentSetCoords
+ *                                     allows direct access to pass in
+ *                                     coordinates. Note a call to
+ *                                     this must immediately follow
+ *                                     the creation command, or a call
+ *                                     of the command "coords null" to
+ *                                     establish the canvas and
+ *                                     itemPtr.
  */
 
 #include <stdio.h>
@@ -238,6 +250,15 @@ static Tk_Uid bothUid = NULL;
 
 #define MAX_STATIC_POINTS 200
 
+/*  Definitions etc. for backdoor command which allows coordinates to
+    be passed without conversion to string */
+
+void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
+                          const double *x, const double *y, 
+                          int numPoints );
+static Tk_Canvas lastCanvas_;
+static Tk_Item *lastItem_ = NULL;
+
 /*
  *--------------------------------------------------------------
  * Segment_Init --
@@ -393,6 +414,10 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
     int argcLocal;
     int adding = 0;
 
+    /*  Record canvas and item for backdoor updates to coordinates. */
+    lastCanvas_ = canvas;
+    lastItem_ = itemPtr;
+
     if (argc == 0) {
 
       /* Return list of current line segments. */
@@ -416,6 +441,13 @@ LineCoords(interp, canvas, itemPtr, argc, argv)
 	    Tcl_AppendElement(interp, buffer);
 	}
         return TCL_OK;
+    }
+    
+    /*  Check if first word is null, if so do nothing, this is just to 
+        make sure the lastCanvas_ and lastItem_ variables are correct
+        for the coordinates that will use RtdSegmentSetCoords */
+    if ( *argv[0] == 'n' ) {
+      return TCL_OK;
     }
 
     /*  Check if first word is add. If so record this and move the
@@ -1713,3 +1745,88 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
     return TCL_OK;
 }
 
+/*
+ *--------------------------------------------------------------
+ *
+ * RtdSegmentSetCoords --
+ *
+ *	This procedure is called to reset the item coordinates,
+ *      without the need to parse a string.
+ *
+ * Side effects:
+ *	The coordinates for the given item will be changed.
+ *
+ * Notes:
+ *      This procedure is non-standard. It provides a speedy way to
+ *      set the coordinates of this item. The problems are that the
+ *      canvas name and item are not available and are recorded from
+ *      the last create command, so this should be called immediately
+ *      after the create command and at no other time.
+ *
+ *--------------------------------------------------------------
+ */
+
+void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
+                          const double *x, const double *y,  
+                          int numPoints )
+{
+  SegmentItem *linePtr = (SegmentItem *) lastItem_;
+  Tk_Canvas canvas = lastCanvas_;
+  int i, j;
+  int npoints;
+
+  if ( ! append ) {
+
+    /*  Use positions to replace the existing coodinates */
+    if (linePtr->numPoints != numPoints) {
+      if (linePtr->coordPtr != NULL) {
+        ckfree((char *) linePtr->coordPtr);
+      }
+      linePtr->coordPtr = (double *)
+        ckalloc((unsigned)(sizeof(double) * numPoints * 2));
+    }
+    for ( i = 0, j = 0; j < numPoints; j++, i+=2 ) {
+      linePtr->coordPtr[i]   = x[j];
+      linePtr->coordPtr[i+1] = y[j];
+    }
+    linePtr->numPoints = numPoints;
+
+  } else {
+    
+    /*  Append coordinates to existing ones. */
+    npoints = numPoints + linePtr->numPoints;
+    linePtr->coordPtr = (double *) 
+      ckrealloc( linePtr->coordPtr, (unsigned)(sizeof(double) * npoints * 2 ));
+
+    fflush( stdout );
+    for ( i =  linePtr->numPoints * 2, j = 0; j < numPoints; j++, i+=2 ) {
+      linePtr->coordPtr[i]   = x[j];
+      linePtr->coordPtr[i+1] = y[j];
+    }
+    linePtr->numPoints = npoints;
+  }
+
+  /*
+   * Update arrowheads by throwing away any existing arrow-head
+   * information and calling ConfigureArrows to recompute it.
+   */
+
+  if (linePtr->firstArrowPtr != NULL) {
+    ckfree((char *) linePtr->firstArrowPtr);
+    linePtr->firstArrowPtr = NULL;
+  }
+  if (linePtr->lastArrowPtr != NULL) {
+    ckfree((char *) linePtr->lastArrowPtr);
+    linePtr->lastArrowPtr = NULL;
+  }
+  if (linePtr->arrow != noneUid) {
+    ConfigureArrows(canvas, linePtr);
+  }
+  ComputeLineBbox(canvas, linePtr);
+
+  /* Request canvas redraw */
+  Tk_CanvasEventuallyRedraw( canvas, linePtr->header.x1, 
+                             linePtr->header.y1, linePtr->header.x2, 
+                             linePtr->header.y2 );
+  /*Tcl_Eval( interp, "update idletasks" );*/
+}

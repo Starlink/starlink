@@ -24,7 +24,7 @@
  *
  *     - You can control the canvas items created by this module
  *       by using the astTk_Tag routine. This allows you to set a new
- *       tag to associate with any elements created after your call. 
+ *       tag to associate with any elements created after your call.
  *       A default tag "ast_element" is always also associated with
  *       any graphics (allowing global control of all items).
  *       Note that the tag cannot be greater than 32 characters and
@@ -44,7 +44,7 @@
  *        Updated module for AST version 0.9.
  *     20-JUL-1998 (PDRAPER):
  *        Changed to use a global tag as well as the one set by
- *        astTk_Tag. 
+ *        astTk_Tag.
  *     {enter_changes_here}
  *-
  */
@@ -78,8 +78,8 @@
 #define CMDLEN 512               /* Maximum length of Tcl message string */
 #define TAGLEN 32                /* Maximum length of a canvas tag */
 #define WIDLEN 132               /* Maximum length of widget name */
-#define MAXSEG 8                 /* Maximum number of segments in one
-                                    canvas item */ 
+#define MAXSEG 132               /* Maximum number of segments in one
+                                    canvas item */
 
 /* Local Macros */
 /* ============ */
@@ -88,13 +88,16 @@
 
 /* Function Prototypes. */
 /* ==================== */
-static int textBBox( double x, double y, const char *text, 
+static int textBBox( double x, double y, const char *text,
                      const char *anchor, double angle, float *xb,
-                     float *yb ); 
+                     float *yb );
 
 static int textAnchor( const char *just, char *anchor );
 
 void RtdWordLastBBox( double *xb, double *yp );
+void RtdSegmentSetCoords( Tcl_Interp *interp, int append, 
+                          const double *x, const double *y,
+                          int numPoints );
 
 /* Static variables. */
 /* ================= */
@@ -270,7 +273,7 @@ void astTk_Tag( const char *newtag ) {
  *     astGrid) so that they can be subsequently modified (or deleted
  *     as a whole). It is therefore important that the tag is reset at
  *     appropriate times (by setting the tag to NULL) so that further
- *     canvas items are not mis-identified. 
+ *     canvas items are not mis-identified.
  *
  *     Note that in addition to this tag a default tag "ast_element"
  *     is always available.
@@ -355,7 +358,8 @@ int astGLine( int n, const float *x, const float *y ) {
  *     For efficiency all lines are created as part of the same canvas
  *     "rtd_segment" item (including lines from subsequent calls,
  *     until either the graphics configuration or canvas tag is
- *     changed). This is so that when global canvas orientation
+ *     changed, or a limit for the number of segmenrs per item is
+ *     exceeded). This is so that when global canvas orientation
  *     changes are necessary (such as when tracking image rescaling,
  *     flipping etc.) as many of the lines as possible are dealt with
  *     as one item, so much of the work is performed in C, rather than
@@ -380,14 +384,17 @@ int astGLine( int n, const float *x, const float *y ) {
  *- */
 
   /* Local variables. */
-  char *coords = NULL;
+  char coords[] = "0.0 0.0 0.0 0.0";  /*  Dummy coords for creation command */
   char buffer[CMDLEN];
+  double *xlines;
+  double *ylines;
+  int npoints;
   int have;
   int i;
   int j;
   int need;
   int used;
-  
+
   if ( Interp == NULL ) {
     astError( AST__GRFER, "astGLine: Tk graphics system not initialised\n");
     return 0;
@@ -396,22 +403,16 @@ int astGLine( int n, const float *x, const float *y ) {
   /*  If we have some data points. */
   if( n > 1 && x && y ) {
 
-    /*  Create a string for storing the eventual segment creation command.
-        This may become very long as all the coordinates will be stored
-        in it, so we will need to increase it as necessary. */
-    coords = (char *) malloc( CMDLEN );
-    coords[0] = '\0';
-    have = CMDLEN;
-    used = 0;
-    for ( i = 0, j = 1; i < n - 1; i++, j++ ) {
-      need = sprintf( buffer, " %f %f %f %f", (double) x[i],
-                      (double) y[i], (double) x[j], (double) y[j] );
-      if ( ( need + used + 2 ) > have ) {
-        have = have + CMDLEN;
-        coords = (char *) realloc( (void *) coords, (size_t) have );
-      }
-      (void) strcat( coords, buffer );
-      used += need + 1;
+    /*  Convert input coordinates into a line-segment based format for 
+        passing to RtdSegmentSetCoords. */
+    npoints = ( 2 * n ) - 2;
+    xlines = malloc( sizeof( double ) * npoints );
+    ylines = malloc( sizeof( double ) * npoints );
+    for ( i = 0, j = 0; i < n - 1; i++, j += 2 ) {
+      xlines[j]   = x[i];
+      xlines[j+1] = x[i+1];
+      ylines[j]   = y[i];
+      ylines[j+1] = y[i+1];
     }
 
     /*  If using an existing segment then add these new values,
@@ -419,7 +420,7 @@ int astGLine( int n, const float *x, const float *y ) {
     if ( NewSegment ) {
       Plotted = 0;
 
-      /*  Finish the command by adding the canvas name and all the
+      /*  Configure the command by adding the canvas name and all the
           required options. */
       (void) sprintf( buffer, " -fill %s -width %f -tag {%s} \n",
                       Colours[ConfigInfo.colour], ConfigInfo.width,
@@ -428,15 +429,21 @@ int astGLine( int n, const float *x, const float *y ) {
                         (char *) NULL ) != TCL_OK ) {
 
         /*  Failed in creation attempt, so issue an error, release the
-            workspace and make sure that a new segment item is
-            created next time. */
+            workspace and make sure that a new segment item is created
+            next time. */
         astError( AST__GRFER, "astGLine: failed to create line (%s)",
                   Interp->result );
-        free( (void *) coords );
+        free( xlines );
+        free( ylines );
         NewSegment = 1;
         return 0;
 
       } else {
+        
+        /*  Now send coordinates (which may be a very long list making
+            it worth avoiding the conversion to a string and back
+            again) */
+        RtdSegmentSetCoords( Interp, 0, xlines, ylines, npoints );
 
         /*  Record the name of the item we have just created. */
         (void) strncpy( Segment, Interp->result, TAGLEN - 1 );
@@ -444,8 +451,9 @@ int astGLine( int n, const float *x, const float *y ) {
       }
     } else {
 
-      /* Use the existing segment. */
-      if ( Tcl_VarEval( Interp, Canvas, " coords ", Segment, " add ",
+      /*  Use the existing segment. Do a dummy command to make sure
+          context for new positions is correct */
+      if ( Tcl_VarEval( Interp, Canvas, " coords ", Segment, " null ",
                         coords, (char *) NULL ) != TCL_OK ) {
 
         /*  Failed in creation attempt, so issue an error, release the
@@ -453,20 +461,25 @@ int astGLine( int n, const float *x, const float *y ) {
             created next time. */
         astError( AST__GRFER, "astGLine: failed to append line segments (%s)",
                   Interp->result );
-        free( (void *) coords );
+        free( xlines );
+        free( ylines );
         NewSegment = 1;
         return 0;
+      } else {
+
+        /*  Append new coordinates */
+        RtdSegmentSetCoords( Interp, 1, xlines, ylines, npoints );
       }
-
     }
-    free( (void *) coords );
-  }
+    free( xlines );
+    free( ylines );
 
-  /*  If number of segments exceeds the maximum number allowed per
-      item, then start a new Segment next time */
-  Plotted += n;
-  if ( Plotted > MAXSEG ) {
-    NewSegment = 1;
+    /*  If number of segments exceeds the maximum number allowed per
+        item, then start a new Segment next time */
+    Plotted += n;
+    if ( Plotted > MAXSEG ) {
+      NewSegment = 1;
+    }
   }
   return 1;
 }
@@ -569,7 +582,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
                       Canvas, (double) x[i], (double) y[i], shape,
                       (int) ConfigInfo.size, (int) ConfigInfo.width,
                       Colours[ConfigInfo.colour],
-                      Colours[ConfigInfo.colour], 
+                      Colours[ConfigInfo.colour],
                       ConfigInfo.tag );
       if ( Tcl_Eval( Interp, buffer ) != TCL_OK ) {
         astError( AST__GRFER, "astGLine: failed to create mark (%s)",
@@ -655,7 +668,7 @@ int astGText( const char *text, float x, float y, const char *just,
     astError( AST__GRFER, "astGText: Tk graphics system not initialised\n");
     return 0;
   }
-  
+
 
   /* Check that there is something to draw. */
   if( text && text[ 0 ] != 0 ){
@@ -1051,8 +1064,8 @@ int astGAxScale( float *alpha, float *beta ){
 
 /*  Local functions. */
 /*  ================ */
-static int textBBox( double x, double y, const char *text, 
-                     const char *anchor, double angle, float *xb, 
+static int textBBox( double x, double y, const char *text,
+                     const char *anchor, double angle, float *xb,
                      float *yb ) {
 /*
  *+
@@ -1102,7 +1115,7 @@ static int textBBox( double x, double y, const char *text,
 
   /*  First display the text using the current configuration
       options, as well as the position and angle. Note we use an
-      unlikely canvas tag to arrange control of the item. */ 
+      unlikely canvas tag to arrange control of the item. */
   (void) sprintf ( buffer, "%s create rtd_word %f %f -word {%s} -angle %f \
 -anchor %s -scale %f -font %s -tag grf_word_temp \n",
             Canvas, x, y, text, angle, anchor, ConfigInfo.size,
