@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {211.10}
+\newcommand{\stardocnumber}    {211.11}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {1th September 2001}
+\newcommand{\stardocdate}      {23rd October 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -20127,6 +20127,30 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
+   DefB1950\sstlabel{DefB1950}
+}{
+   Use FK4 B1950 as defaults?
+}{
+   \sstdescription{
+      This attribute is a boolean value which specifies a default equinox
+      and reference frame to use when reading a \htmlref{FrameSet}{FrameSet} from a \htmlref{FitsChan}{FitsChan}
+      with a foreign (i.e. non-native) encoding. It is only used if the FITS
+      header contains no information about the reference frame or equinox. If
+      this is the case, then values of FK4 and B1950 are assumed if the DefB1950
+      attribute has a non-zero value, and FK5 J2000 is assumed if DefB1950 is zero.
+   }
+   \sstattributetype{
+      Integer (boolean).
+   }
+   \sstapplicability{
+      \sstsubsection{
+         FitsChan
+      }{
+         All FitsChans have this attribute.
+      }
+   }
+}
+\sstroutine{
    Digits/Digits(axis)\sstlabel{DigitsDigitsaxis}
 }{
    Number of digits of precision
@@ -24248,6 +24272,9 @@ Object            - Base class for all AST Objects
          \htmlref{AllWarnings}{AllWarnings}: A list of the available conditions
 
          \sstitem
+         \htmlref{DefB1950}{DefB1950}: Use FK4 B1950 as default equatorial coordinates?
+
+         \sstitem
          Card: Index of current FITS card in a FitsChan
 
          \sstitem
@@ -26422,14 +26449,10 @@ astBear function has been replaced by astAxAngle.
 
 \end{enumerate}
 
+\subsection{Changes Introduced in V1.8-3}
 
-
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-3}
-
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-2 and V1.8-3 (the
-current version):
+The following describes the most significant changes which
+occurred in the AST library between versions V1.8-2 and V1.8-3:
 
 \begin{enumerate}
 
@@ -26440,6 +26463,31 @@ which enables pointers to be obtained to the component parts of \htmlref{CmpMap}
 \item Functions within proj.c and wcstrig.c have been renamed to avoid name 
 clashes with functions in more recent versions of Mark Calabretta's wcslib 
 library.
+
+\end{enumerate}
+
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.8-4}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-3 and V1.8-4 (the
+current version):
+
+\begin{enumerate}
+
+\item The \htmlref{FitsChan}{FitsChan} class has a new attribute called \htmlref{DefB1950}{DefB1950} which can be 
+used to select the default reference frame and equinox to be used if
+a FitsChan with foreign encoding contains no indication of the
+reference frame or equinox.
+
+\item A bug has been fixed in the FitsChan class which could prevent
+\htmlref{astWrite}{astWrite} from creating a set of FITS headers from an otherwise valid
+\htmlref{FrameSet}{FrameSet}, when when using FITS-AIPS encoding.
+
+\item A bug has been fixed in the FitsChan class which could cause
+\htmlref{astRead}{astRead} to mis-interpret the FITS CROTA keyword when using FITS-AIPS 
+encoding.
 
 \end{enumerate}
 
