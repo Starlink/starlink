@@ -147,7 +147,7 @@ class DviFileEvent {
 		      page, preamble, postamble };
     DviFileEvent(eventTypes t, DviFile *dp=0)
 	: dviFile_(dp), type_(t) { }
-    //virtual ~DviFileEvent () { };
+    virtual ~DviFileEvent () { };
     virtual void debug() const;
     eventTypes type() const { return type_; }
     unsigned char opcode;
