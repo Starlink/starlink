@@ -109,8 +109,19 @@ PkFont::~PkFont()
 {
 }
 
-// Find a font.  Basic method uses the environment variable and is very
-// cruddy.  Alternative uses KPSE.
+void PkFont::verbosity (int level)
+{
+    verbosity_ = level;
+#ifdef ENABLE_KPATHSEA
+    kpathsea::verbosity (level);
+#endif
+}
+
+// Find a font.  Basic method uses the environment variable and is somewhat
+// cruddy.  If ENABLE_KPATHSEA is defined and the first method doesn't 
+// produce anything (which will be true if the environment variable wasn't
+// set and the -f option wasn't given) then fall through to an call to
+// the kpathsea library.
 //
 // Return true if we found a file to open, and return the path in the
 // argument.  Return false on error.  Success doesn't guarantee
@@ -171,8 +182,6 @@ bool PkFont::find_font (string& path)
 
     if (kpse_file != 0)
     {
-	if (verbosity_ > 0)
-	    cerr << "KPSE found " << kpse_file << '\n';
 	path = kpse_file;
 	return true;
     }

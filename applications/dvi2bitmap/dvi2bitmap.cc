@@ -27,9 +27,6 @@ using std::exit;
 #include "Bitmap.h"
 #include "version.h"
 
-#ifdef ENABLE_KPATHSEA
-#include "kpathsea.h"
-#endif
 
 typedef vector<string> string_list;
 
@@ -70,9 +67,6 @@ main (int argc, char **argv)
     //Bitmap::verbosity(2);
 
     progname = argv[0];
-#ifdef ENABLE_KPATHSEA
-    kpathsea::init (argv[0], "dvi2bitmap");
-#endif
 
     for (argc--, argv++; argc>0; argc--, argv++)
 	if (**argv == '-')
@@ -117,11 +111,6 @@ main (int argc, char **argv)
 			  case 'm': // debug main program
 			    verbosity = debuglevel;
 			    break;
-#ifdef ENABLE_KPATHSEA
-			  case 'k':
-			    kpathsea::verbosity(debuglevel);
-			    break;
-#endif
 			  case 'g':
 			    debuglevel++;
 			    break;
@@ -135,7 +124,6 @@ main (int argc, char **argv)
 		PkFont::verbosity(0);
 		PkRasterdata::verbosity(0);
 		Bitmap::verbosity(0);
-		kpathsea::verbosity(0);
 		verbosity = 0;
 		break;
 	      case 'l':		// show missing fonts

@@ -107,7 +107,7 @@ class PkFont {
 	else
 	    return glyphs_[0];	// dummy glyph
     }
-    static void verbosity (int level) { verbosity_ = level; }
+    static void verbosity (int level);
     static void setFontPath(string fp) { fontpath_ = fp; }
     static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
