@@ -384,6 +384,26 @@ The directory used by the indexer program to store temporary files.
 If undefined at build time and run time, SCB\_INDEXER\_TMP defaults to
 {\tt /usr/tmp/scb}.
 \end{description}
+The following should also be set to locally sensible values,
+although the program will still work if they are not set properly:
+\begin{description}
+\item[HTX\_SERVER]
+The URL of an HTTP server which will provide HTX versions of the Starlink
+documents (see \xref{SUN/188}{sun188}{remote_document_servers}).
+In fact this does not have to be a proper HTX server; as long as it
+can serve the documents it will not need to resolve {\tt xref\_}-type 
+cross-references.
+Thus if the {\tt /star/docs} directory is being served, the URL of
+the top of that tree will do.
+If undefined at build time, HTX\_SERVER defaults to 
+{\tt http://star-www.rl.ac.uk/cgi-bin/htxserver/}.
+\item[MIMETYPES\_FILE]
+This should give the location of a MIME type mapping file,
+which can probably be found named {\tt mime.types}
+as part of the HTTP server installation.
+It is used to serve some non-text documents as their proper MIME types,
+but not much functionality is lost if it does not point to a suitable file.
+\end{description}
 
 An example site installation might go as follows:
 \begin{quote}
@@ -393,6 +413,7 @@ An example site installation might go as follows:
 % setenv SCB_BROWSER_TMP /scratch/scb/browser
 % setenv SCB_INDEXER_TMP /scratch/scb/indexer
 % setenv INSTALL /star
+% setenv MIMETYPES_FILE /usr/local/etc/httpd/conf/mime.types
 % mk build
     ...
 % mk install
