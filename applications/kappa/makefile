@@ -921,7 +921,7 @@ ramps_lut.sdf spectrum_lut.sdf zebra_lut.sdf grey_lut.sdf logo_lut.sdf
 
 TEST_FILES = ccdframec.sdf comwest.sdf spectrum.sdf m31.sdf iras.sdf \
 m31_issa_100.sdf m31_issa_60.sdf m31_issa_25.sdf m31_issa_12.sdf m57.sdf \
-logo.sdf scupol_i.sdf scupol_p.sdf scupol_ang.sdf
+logo.sdf scupol_i.sdf scupol_p.sdf scupol_ang.sdf \
 m31_issa_12a.sdf cobe.sdf 
 
 #  Define the plotting style files.
