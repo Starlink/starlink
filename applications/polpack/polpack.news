@@ -6,7 +6,7 @@
  
    o  Full support for single-beam data.
 
-   o  POLPACK can now be run from the ICL command language.
+   o  POLPACK can now be run from the ICL and IRAF cl command languages.
 
    o  A new command POLIMAGE for creating a 1 or 2-dimensional NDF from
    the values in a column of a catalogue.
