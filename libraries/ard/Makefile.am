@@ -19,7 +19,8 @@ BUILT_SOURCES = ARD_ERR
 TESTS = test1
 check_PROGRAMS = test1
 test1_SOURCES = ard_test.f
-test1_LDADD = libard.la `$(srcdir)/ard_link`
+test1_LDADD = libard.la `ast_link` `sla_link` `grp_link` `chr_link` \
+	`err_link`  `psx_link`
 
 PUBLIC_INCLUDES = ARD_ERR
 
