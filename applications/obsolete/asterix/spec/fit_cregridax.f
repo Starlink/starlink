@@ -1,3 +1,57 @@
+*+  FIT_TCREGRIDAX - Create a dataset axis structure from grid axis blocks
+      SUBROUTINE FIT_TCREGRIDAX( LOC, NAX, GAX, STATUS )
+*
+*    Description :
+*
+*    Authors :
+*
+*     David J. Allan (BHVAD::DJA)
+*
+*    History :
+*
+*      2 Jul 92 : Original (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'FIT_PAR'
+*
+*    Structure definitions :
+*
+      INCLUDE 'FIT_STRUC'
+*
+*    Import :
+*
+      CHARACTER*(DAT__SZLOC)   LOC                     ! Output dataset
+      INTEGER                  NAX                     ! Number of grid axes
+      RECORD /GRID_AXIS/       GAX(NAX)                ! Grid axis block
+*
+*    Status :
+*
+      INTEGER STATUS
+*-
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Get locator
+      CALL ADI1_GETLOC( ID, LOC, STATUS )
+
+      CALL FIT_CREGRIDAX( LOC, NAX, GAX, STATUS )
+
+*    Tidy up
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'FIT_CREGRIDAX', STATUS )
+      END IF
+
+      END
+
+
 *+  FIT_CREGRIDAX - Create a dataset axis structure from grid axis blocks
       SUBROUTINE FIT_CREGRIDAX( LOC, NAX, GAX, STATUS )
 *

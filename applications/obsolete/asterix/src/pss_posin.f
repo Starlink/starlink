@@ -215,7 +215,7 @@
         CALL SSI_RELEASE( SID, STATUS )
 
 *      Close results file
-        CALL AIO_FCLOSE( SID, STATUS )
+        CALL ADI_FCLOSE( SID, STATUS )
 
       ELSE IF ( TERMINAL ) THEN
 
