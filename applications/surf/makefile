@@ -34,7 +34,14 @@ misc/ipfile.dat \
 misc/polimp.scuba \
 surf_kap/ctm_com \
 surf_kap/ctm_par \
-surf_kap/hlpcmd
+surf_kap/hlpcmd \
+surf_kap/kpg_ast \
+surf_kap/kpg_par \
+surf_kap/lpg_com \
+surf_kap/lpg_const \
+surf_kap/ndg_err \
+surf_kap/ndg_const \
+surf_kap/grf.h
 
 # This is a list of tar files created by other makefiles
 # I make it the responsibility of this makefile to copy them
