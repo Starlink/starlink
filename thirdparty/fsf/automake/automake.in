@@ -5343,7 +5343,7 @@ sub scan_autoconf_traces ($)
         {
           if (defined $starlink_seen_features{latexdocs})
             {
-              $starlink_seen_features{latexdocs} += ' '.$args[1];
+              $starlink_seen_features{latexdocs} .= ' '.$args[1];
             }
           else
             {
