@@ -154,7 +154,7 @@ all: $(demo_wish) $(demo_tcl) $(ardstat) $(autocrop) $(cat2tab) $(tab2cat) \
 $(demo_wish): normallib tkAppInit.o FORCE
 	@echo "linking \"$(demo_wish)\"..."
 	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
-$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
+	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(demo_wish)  \
 	       proj.o wcstrig.o $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB) \
 	       $(ADDLIBS) $(AST_LIBS) \
 	       $(RTD_LIB) $(ASTROTCL_LIB) \

@@ -138,7 +138,7 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	ar x $(STARLINK)/lib/libast_wcslib.a proj.o wcstrig.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	       $(AST_LIBS) $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(CAT_LIB)  \
-               $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
+	       $(AST_LIBS) $(RTD_LIB) $(ASTROTCL_LIB) \
 	       $(TCLUTIL_LIB) $(LOCAL_LIBRARY) \
 	       $(AST_LIBS) $(TCLUTIL_LIB) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(X_LIB) $(EXTRA_LIBS)
