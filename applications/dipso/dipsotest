@@ -1,2 +1,3 @@
-./dipsosetup
+#! /bin/csh
+source dipsosetup
 ./dipso < exercise.cmd
