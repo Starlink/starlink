@@ -12,7 +12,7 @@
       programmers to make use of operating system facilities in a
       machine independent way.</p></abstract> 
   <dependencies >
-    <build>sae</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
+    <build>sae</build><build>mers</build><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
   <developers>
     <person>
