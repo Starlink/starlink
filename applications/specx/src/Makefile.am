@@ -5,9 +5,9 @@ bin_PROGRAMS = specx specx_help
 AM_FCFLAGS = -I../inc
 
 specx_SOURCES = run_specx.c scl_main.f TITLE
-specx_help_SOURCES = helpm.c helpc.c
+specx_help_SOURCES = helpm.c
 
-specx_help_LDADD = `$(srcdir)/specx_help_link`
+specx_help_LDADD = `shl_link`
 
 FIG_LIBS = \
 /home/timj/data/tmp/star/cvs/applications/figaro/fit/libfit.la \
