@@ -24,6 +24,8 @@
 #        Add RLB parameter
 #     1998 April 7 (TIMJ)
 #        Add METHOD. Change max size of CHOP to 600. RLB defaults to TRUE
+#     1999 May 24 (TIMJ)
+#        Add SECTION
 #     {enter_further_changes_here}
 
  
@@ -84,5 +86,13 @@
         HELPKEY '*'
       ENDPARAMETER
 
+      PARAMETER 'SECTION'
+         TYPE '_CHAR'
+         ACCESS 'READ'
+         VPATH 'PROMPT'
+         PPATH 'Current'
+         PROMPT 'Please enter a section (including {})'
+         HELPKEY '*'
+      ENDPARAMETER
 
    ENDINTERFACE
