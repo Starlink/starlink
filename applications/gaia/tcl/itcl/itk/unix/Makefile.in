@@ -221,7 +221,7 @@ all: itkwish$(EXEEXT)
 	$(RANLIB) $(ITK_LIB_FILE)
 
 itkwish$(EXEEXT): tkAppInit.o $(ITK_LIB_FILE)
-	$(CC) @LD_FLAGS@ tkAppInit.o @ITK_BUILD_LIB_SPEC@ \
+	$(CC) @LD_FLAGS@ ${CFLAGS} tkAppInit.o @ITK_BUILD_LIB_SPEC@ \
 		$(LIBS) $(LD_SEARCH_FLAGS) -o itkwish
 
 # Note, in the target below TCL_LIBRARY needs to be set or else

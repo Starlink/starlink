@@ -187,7 +187,7 @@ all: $(ITCL_LIB_FILE) itclsh$(EXEEXT)
 	$(RANLIB) $(ITCL_LIB_FILE)
 
 itclsh$(EXEEXT): tclAppInit.o $(ITCL_LIB_FILE)
-	$(CC) @LD_FLAGS@ tclAppInit.o @ITCL_BUILD_LIB_SPEC@ \
+	$(CC) @LD_FLAGS@ ${CFLAGS} tclAppInit.o @ITCL_BUILD_LIB_SPEC@ \
 		$(LIBS) $(LD_SEARCH_FLAGS) -o itclsh
 
 test: itclsh$(EXEEXT)
