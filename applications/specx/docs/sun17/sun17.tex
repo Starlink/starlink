@@ -37,13 +37,13 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {17.7}
+\newcommand{\stardocnumber}    {17.8}
 \newcommand{\stardocauthors}   {R.\,M.\,Prestage, H.\,Meyerdierks,
 J.\,F.\,Lightfoot, \\ T.\,Jenness, R.\,P.\,J.\,Tilanus, R.\,Padman}
-\newcommand{\stardocdate}      {9 January 2000}
+\newcommand{\stardocdate}      {11 July 2000}
 \newcommand{\stardoctitle}     {SPECX --- A Millimetre Wave Spectral Reduction 
 Package}
-\newcommand{\stardocversion}   {6.7-6}
+\newcommand{\stardocversion}   {6.7-7}
 \newcommand{\stardocmanual}    {Users' Manual}
 \newcommand{\stardocabstract}  {SPECX is a general purpose mm and submm
 spectral line data reduction system. This document provides an overview
@@ -309,19 +309,19 @@ SPECX.}
 
 SPECX is a general mm and sub-mm wavelength data reduction system written by
 Rachael Padman at \htmladdnormallink{MRAO}{http://www.mrao.cam.ac.uk}. At the
-time of writing the latest formally released version on the VAX is
-6.2. However, pre-release copies of version 6.3 are widely used. Branching off
-from the 6.3 VMS version, SPECX was ported to Unix by Horst Meyerdierks of the
+time of writing the latest formally released version on the VAX is 6.2.
+However, pre-release copies of version 6.3 are widely used. Branching off from
+the 6.3 VMS version, SPECX was ported to Unix by Horst Meyerdierks of the
 \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk} and Rachael
 Padman. Remo Tilanus at JACH supplied the core routines to read GSD files and
 Tim Jenness at the JAC took over development for version 6.7. The software
 version count on Unix increased rather rapidly. 6.4 was the initial Unix port
 of 6.3, but it existed only in beta-test versions. The first released version
-was 6.5, but it lacked the commands to read GSD files.  Version 6.6 added
-support for GSD files. The current version on Unix is 6.7 which added support
-for a new \xref{HDS}{sun92}{} map format (v4.2) and routines to aid the
-reduction of raster maps. Version 6.7 is currently supported by the Joint
-Astronomy Centre and distributed by Starlink..
+was 6.5, but it lacked the commands to read \xref{GSD}{sun229}{} files.
+Version 6.6 added support for \xref{GSD}{sun229}{} files. The current version
+on Unix is 6.7 which added support for a new \xref{HDS}{sun92}{} map format
+(v4.2) and routines to aid the reduction of raster maps. Version 6.7 is
+currently supported by the Joint Astronomy Centre and distributed by Starlink.
 
 Although SPECX may be used to process spectra obtained from many different
 instruments, Starlink users will find it particularly useful for the reduction
@@ -378,7 +378,7 @@ version, and the document on 6.3 is the closest approximation for Unix
 users.
 
 SPECX is intended primarily for the analysis of JCMT data and can read such
-data directly from the GSD files produced at the telescope.  In the VMS
+data directly from the \xref{GSD}{sun229}{} files produced at the telescope.  In the VMS
 version there are also facilities for reading data from a range of other
 important mm-wave telescopes, {\em e.g.} Onsala, FCRAO, UMASS CO survey,
 IRAM-FITS, JCMT RxG, NRAO 8-beam (see the SPECX user manual for details).
@@ -449,16 +449,13 @@ inverted commas, {\em e.g.}
 \end{myquote}
 % $
 
-\emph{Control-C cannot be used to interrupt commands in progress.
-Control-C typed at any time will abort the program. Open files may be
-corrupted.}
-
 The {\tt exit} or \texttt{quit} commands are the normal method of returning to
 the shell.  SPECX can also be suspended in the usual way with Control-Z and
 later resumed with the shell command {\tt fg}.
 
 In some situations SPECX has to be given an end-of-file character. On
-VMS this was Control-Z. On Unix it is Control-D.
+VMS this was Control-Z. On Unix it is Control-D. As of V6.7-1 Control-C
+can be used to abort a command in progress.
 
 
 \section {SPECX files and directories}
@@ -560,7 +557,7 @@ and {\tt /star/figaro/lib/libfit.a}.
 
 Unix SPECX introduced yet another version of data formats (4.1 and 4.2) for
 spectra and for maps. It can read and write disk-FITS. From version 6.6
-onwards it can also read GSD files.
+onwards it can also read \xref{GSD}{sun229}{} files.
 
 Version 4.1 spectral format is based on Starlink's Hierarchical Data
 Structures (HDS), a binary format that is portable between different
@@ -575,7 +572,7 @@ as detailed below. Note that the way back may not be possible, or at
 least difficult.
 \begin{itemize}
 \item {\bf GSD files:}
-    Data in GSD format can be copied binary. One way is the
+    Data in \xref{GSD}{sun229}{} format can be copied binary. One way is the
     Unix {\tt cp} command if both disks are mounted by the Unix machine.
     Another way is {\tt ftp} in binary mode. Then use {\tt
     READ-GSD-DATA} in the usual way.
@@ -673,6 +670,17 @@ This section includes the release notes for the more recent versions
 of specx. This is especially important for the unix versions since
 the main Specx user manual does not include any of the new features
 that were not part of SPECX v6.3.
+
+\subsection{V6.7-7}
+
+Minor patches:
+
+\begin{itemize}
+\item Add wideband support to DAS-MERGE command
+\item FITS DATE header is now Y2K compliant
+\item Fix problem translating some dates from the GSD header value due to a loss of  precision.
+\item Fix problem reading old GSD files that did not know about rastering.
+\end{itemize}
 
 \subsection{V6.7-6}
 
@@ -841,6 +849,18 @@ New commands:
          read with this command.
 
 \end{itemize}
+
+\subsection{V6.6}
+
+Added support for \xref{GSD}{sun229}{} files.
+
+\subsection{V6.5}
+
+First released version. No \xref{GSD}{sun229}{} support.
+
+\subsection{V6.4}
+
+First unix beta release. A port of the VMS SPECX version 6.3.
 
 \subsection{V6.1 -- VMS}
 
