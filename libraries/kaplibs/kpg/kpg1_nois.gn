@@ -1,7 +1,7 @@
-      SUBROUTINE KPG_$NOIS<T>( BAD, EL, VARNCE, ARRAY, STATUS )
+      SUBROUTINE KPG1_NOIS<T>( BAD, EL, VARNCE, ARRAY, STATUS )
 *+
 *  Name:
-*     KPG_$NOISx
+*     KPG1_NOISx
 
 *  Purpose:
 *     Adds random Normal noise to a 1-d array.
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$NOISx( BAD, EL, VARNCE, ARRAY, STATUS )
+*     CALL KPG1_NOISx( BAD, EL, VARNCE, ARRAY, STATUS )
 
 *  Description:
 *     This routine takes a 1-d array and adds noise randomly to each
