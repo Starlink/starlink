@@ -261,6 +261,8 @@
 #        Added SWITCH-DATE (still v6.8)
 #     11-JUN-2003 (AJC):
 #        Version 6.8-1
+#     16-APR-2004 (TIMJ):
+#        Version 6.8-4
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -453,7 +455,7 @@ PKG_LINK = SPECX
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 6.8-3
+PKG_VERS = 6.8-4
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the

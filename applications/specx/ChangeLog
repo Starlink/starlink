@@ -1,7 +1,19 @@
+2004-04-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	RELEASE VERSION 6.8-4
+
+2004-04-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* util/dasmerge.f (dasmerge): Make sure that we do not suffer from
+	the problem whereby an identical variable can be supplied as an
+	argument for ADJQUAD and WIDEBAND.
+
 2004-04-12  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* term/velencode.f (VELENCODE): Now use first 3 characters of
 	frame such that HELI and HEL both match HELIOCENTRIC.
+
+	* term/veldecode.f (VELDECODE): Make sure we trap a bad decode.
 
 	* command/do_command.f (DO_COMMAND): Fix DAS-MERGE calling
 	arguments (which were causing ADJQUAD and WIDEBAND to refer to the
