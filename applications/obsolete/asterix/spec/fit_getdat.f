@@ -702,8 +702,13 @@
 *          Set grouping flag
 	      OBDAT(NDS).GFLAG = .TRUE.
 
+*        In the absence of grouping make the group data pointers point
+*        to the input data
             ELSE
 	      OBDAT(NDS).GFLAG = .FALSE.
+              OBDAT(NDS).GDPTR = OBDAT(NDS).DPTR
+              OBDAT(NDS).GVPTR = OBDAT(NDS).VPTR
+              OBDAT(NDS).GQPTR = OBDAT(NDS).QPTR
 
             END IF
 
@@ -960,7 +965,7 @@
 *    Type Definitions :
 	IMPLICIT NONE
 *    Import :
-      INTEGER			NDAT, G(*)
+      INTEGER			NDAT, G(*), STATUS
 *    Export :
       INTEGER			MAXG
 *    Local variables :

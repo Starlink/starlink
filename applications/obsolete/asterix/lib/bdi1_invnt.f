@@ -197,7 +197,7 @@
      :          (ITEM(8:).EQ.'Width') ) THEN
 
 *    Locate the data
-        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data', .FALSE.,
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
@@ -238,11 +238,11 @@
         CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
 *    Locate quality object
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC,
+        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., .FALSE., QLOC,
      :                   TNDIM, TDIMS, STATUS )
 
 *    And the mask
-        CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE.,
+        CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE., .FALSE.,
      :                   MLOC, TNDIM, TDIMS, STATUS )
 
 *    Map logical quality array
@@ -309,11 +309,11 @@
         CALL ADI_NEW( 'UBYTE', NDIM, DIMS, ITID, STATUS )
 
 *    Locate quality object
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC,
+        CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., .FALSE., QLOC,
      :                   TNDIM, TDIMS, STATUS )
 
 *    And the mask
-        CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE.,
+        CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .FALSE., .FALSE.,
      :                   MLOC, TNDIM, TDIMS, STATUS )
 
 *    Map logical quality array
@@ -357,7 +357,7 @@
       ELSE IF ( ITEM .EQ. 'Variance' ) THEN
 
 *    Locate primary data
-        CALL BDI1_CFIND( BDID, HFID, 'Data', .FALSE., CLOC,
+        CALL BDI1_CFIND( BDID, HFID, 'Data', .FALSE., .FALSE., CLOC,
      :                   NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
@@ -404,7 +404,7 @@
       ELSE IF ( ITEM .EQ. 'Error' ) THEN
 
 *    Locate variance, creating if necessary
-        CALL BDI1_CFIND( BDID, HFID, 'Variance', WMODE, CLOC,
+        CALL BDI1_CFIND( BDID, HFID, 'Variance', WMODE, .FALSE., CLOC,
      :                   NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
@@ -455,7 +455,7 @@
      :          (ITEM(8:).EQ.'Bounds') ) THEN
 
 *    Locate the data
-        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data', .FALSE.,
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 59
 
@@ -468,7 +468,7 @@
      :                    PSID, PTR, NELM, STATUS )
 
 *    Widths present?
-        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width', .FALSE.,
      :                   .FALSE., WLOC, TNDIM, TDIMS, STATUS )
         IF ( WLOC .NE. DAT__NOLOC ) THEN
 
@@ -514,7 +514,7 @@
      :             (ITEM(8:).EQ.'HiWidth')) ) THEN
 
 *    Real widths present?
-        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width', .FALSE.,
      :                   .FALSE., CLOC, NDIM, DIMS, STATUS )
         IF ( CLOC .NE. DAT__NOLOC ) THEN
 
@@ -542,7 +542,7 @@
           IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
 
 *      Locate the main axis data
-          CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
+          CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data', .FALSE.,
      :                     .FALSE., CLOC, NDIM, DIMS, STATUS )
           IF ( CLOC .NE. DAT__NOLOC ) THEN
 

@@ -114,8 +114,7 @@
       CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
 
 *  Locate the file component
-      CALL BDI1_CFIND( BDID, HFID, ITEM, .TRUE., LOC, NDIM, DIMS,
-     :                 STATUS )
+      CALL BDI1_CREAT( BDID, HFID, ITEM, LOC, NDIM, DIMS, STATUS )
 
 *  Write array back to file
       CALL DAT_PUT( LOC, '_'//TYPE, NDIM, DIMS, %VAL(PTR), STATUS )

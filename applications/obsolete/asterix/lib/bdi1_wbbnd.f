@@ -119,9 +119,9 @@
       CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
 
 *  Locate the data and width components
-      CALL BDI1_CFIND( BDID, HFID, ITEM(:7)//'Data', .TRUE., DLOC,
+      CALL BDI1_CREAT( BDID, HFID, ITEM(:7)//'Data', DLOC,
      :                 NDIM, DIMS, STATUS )
-      CALL BDI1_CFIND( BDID, HFID, ITEM(:7)//'Width', .TRUE., WLOC,
+      CALL BDI1_CREAT( BDID, HFID, ITEM(:7)//'Width', WLOC,
      :                 NDIM, DIMS, STATUS )
 
 *  Map the data and width for write access in the same type as the

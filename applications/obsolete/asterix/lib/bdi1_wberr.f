@@ -122,7 +122,7 @@
       END IF
 
 *  Locate the VARIANCE component
-      CALL BDI1_CFIND( BDID, HFID, 'Variance', .TRUE., VLOC,
+      CALL BDI1_CREAT( BDID, HFID, 'Variance', VLOC,
      :                 NDIM, DIMS, STATUS )
 
 *  Write array back to VARIANCE

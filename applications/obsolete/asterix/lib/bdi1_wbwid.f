@@ -116,8 +116,7 @@
       CALL ADI_CGET0I( PSID, 'Nelm', N, STATUS )
 
 *  Locate the width component
-      CALL BDI1_CFIND( BDID, HFID, ITEM, .TRUE., WLOC, NDIM, DIMS,
-     :                 STATUS )
+      CALL BDI1_CREAT( BDID, HFID, ITEM, WLOC, NDIM, DIMS, STATUS )
 
 *  Write array back to file
       CALL DAT_PUT( WLOC, '_'//TYPE, NDIM, DIMS, %VAL(PTR), STATUS )

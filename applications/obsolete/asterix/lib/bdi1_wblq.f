@@ -119,12 +119,12 @@
 
 *  Locate the Quality item. If it doesn't already exist create and
 *  initialise to good quality.
-      CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., QLOC,
+      CALL BDI1_CFIND( BDID, HFID, 'Quality', .FALSE., .FALSE., QLOC,
      :                 NDIM, DIMS, STATUS )
       IF ( QLOC .EQ. DAT__NOLOC ) THEN
 
 *    Create new quality array
-        CALL BDI1_CFIND( BDID, HFID, 'Quality', .TRUE., QLOC,
+        CALL BDI1_CREAT( BDID, HFID, 'Quality', QLOC,
      :                   NDIM, DIMS, STATUS )
         CALL DAT_MAP( QLOC, '_UBYTE', 'WRITE', NDIM, DIMS, QPTR,
      :                STATUS )
@@ -139,7 +139,7 @@
       END IF
 
 *  Get the quality mask, creating if not already there
-      CALL BDI1_CFIND( BDID, HFID, 'QualityMask', .TRUE., MLOC,
+      CALL BDI1_CREAT( BDID, HFID, 'QualityMask', MLOC,
      :                 NDIM, DIMS, STATUS )
       CALL DAT_STATE( MLOC, OK, STATUS )
       IF ( .NOT. OK ) THEN
