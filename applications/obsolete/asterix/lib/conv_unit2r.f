@@ -111,23 +111,25 @@
       CONV = 1.0
 
 *  Degrees
-      IF ( STR_ABBREV( UNITS, 'DEG' ) ) THEN
+      IF ( STR_ABBREV( UNITS, 'DEGREES' ) ) THEN
         CONV = MATH__DTOR
 
 *  Arcminutes
-      ELSE IF ( STR_ABBREV( UNITS, 'ARCMIN' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNITS, 'ARCMINUTES' ) .OR.
+     :          STR_ABBREV( UNITS, 'ARCMINS' ) ) THEN
         CONV = MATH__DTOR / 60.0
 
 *  Arcseconds
-      ELSE IF ( STR_ABBREV( UNITS, 'ARCSEC' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNITS, 'ARCSECONDS' ) .OR.
+     :          STR_ABBREV( UNITS, 'ARCSECS' ) ) THEN
         CONV = MATH__DTOR / 3600.0
 
 *  Radians
-      ELSE IF ( STR_ABBREV( UNITS, 'RAD') ) THEN
+      ELSE IF ( STR_ABBREV( UNITS, 'RADIANS') ) THEN
         CONV = 1.0
 
 *  Pixels!
-      ELSE IF ( STR_ABBREV( UNITS, 'PIX') ) THEN
+      ELSE IF ( STR_ABBREV( UNITS, 'PIXELS') ) THEN
         CONV = 1.0
 
 *  Otherwise duff

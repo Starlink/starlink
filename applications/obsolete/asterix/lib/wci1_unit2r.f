@@ -110,19 +110,21 @@
 *  Always return a default
       FACTOR = 1D0
 
-      IF ( STR_ABBREV( UNIT, 'DEG' ) ) THEN
+      IF ( STR_ABBREV( UNIT, 'DEGREES' ) ) THEN
         FACTOR = MATH__DDTOR
 
-      ELSE IF ( STR_ABBREV( UNIT, 'ARCMIN' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'ARCMINUTES' ) .OR.
+     :          STR_ABBREV( UNIT, 'ARCMINS' ) ) THEN
         FACTOR = MATH__DDTOR / 60D0
 
-      ELSE IF ( STR_ABBREV( UNIT, 'ARCSEC' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'ARCSECONDS' ) .OR.
+     :          STR_ABBREV( UNIT, 'ARCSECS' ) ) THEN
         FACTOR = MATH__DDTOR / 3600D0
 
-      ELSE IF ( STR_ABBREV( UNIT, 'RAD') ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'RADIANS') ) THEN
         FACTOR = 1D0
 
-      ELSE IF ( STR_ABBREV( UNIT, 'PIX' ) ) THEN
+      ELSE IF ( STR_ABBREV( UNIT, 'PIXELS' ) ) THEN
         FACTOR = 1D0
 
       ELSE
