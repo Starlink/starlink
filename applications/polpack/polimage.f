@@ -137,13 +137,13 @@
 *        in the catalogue.
 
 *  Notes:
-*     - If the output NDF is 2 or 3-dimensional, it will have an AXIS 
+*     - If parameter SHAPE is set TRUE, the output NDF will have an AXIS 
 *     component representing the COLX, COLY and COLZ values. It will also 
 *     inherit any WCS information from the catalogue so long as the Base
 *     Frame of the WCS information is spanned by axes with symbols equal
 *     to the names of the columns given by COLX, COLY and COLZ.
-*     - If the output NDF is 1-dimensional, it will contain no AXIS or
-*     WCS components.
+*     - If parameter SHAPE is set FALSE, the output NDF will contain no AXIS 
+*     or WCS components.
 
 *  Copyright:
 *     Copyright (C) 2001 Central Laboratory of the Research Councils
