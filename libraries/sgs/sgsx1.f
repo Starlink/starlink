@@ -1,0 +1,40 @@
+      PROGRAM SGSX1
+
+*-
+*
+*     - - - - - - - -
+*        S G S X 1
+*     - - - - - - - -
+*
+*     USES SGS PACKAGE TO DRAW BOX WITH 'STARLINK' WRITTEN IN IT
+*
+*-
+
+      CHARACTER*20 WKSTN
+
+
+
+*  GET WORKSTATION TYPE & NUMBER
+      PRINT *, 'WORKSTATION?'
+      READ (*,'(A)') WKSTN
+
+*  OPEN
+      CALL SGS_OPEN(WKSTN,IZONID,J)
+
+*  DECLARE A SQUARE ZONE
+      CALL SGS_ZSHAP(1.0,'BL',IZ,J)
+
+*  BOX
+      CALL SGS_BOX(0.1,0.9,0.4,0.6)
+
+*  MESSAGE
+      CALL SGS_SHTX(0.1)
+      CALL SGS_STXJ('CC')
+      CALL SGS_SFONT(106)
+      CALL SGS_BTEXT(0.5,0.5)
+      CALL SGS_ATEXT('STARLINK')
+
+*  WRAP UP
+      CALL SGS_CLOSE
+
+      END

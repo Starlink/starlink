@@ -1,0 +1,39 @@
+FACILITY SGS
+100,TOOZD,No more available zone descriptors
+101,ILLZD,Unused error code
+102,TOMNY,Unused error code
+103,ILLAC,Illegal access mode
+104,UNKPA,Parameter not found
+105,NTACT,Unused error code
+106,ISACT,Parameter currently active
+107,EXCPA,Unused error code
+108,ERACT,Unused error code
+109,EREXH,Unused error code
+110,BADWK,Bad Workstation name
+111,ZNOUT,New zone not inside current zone
+112,WRKEX,Too many Workstations
+113,GKSER,GKS error
+114,ZNZEX,Too many zones
+115,UNOPN,Workstation could not be opened
+116,ZONTB,Requested zone bigger than current zone
+117,INVZN,Invalid zone id
+118,ZONNF,Specified zone does not exist
+119,ZEREX,Zero extent
+120,ZONNB,Specified zone is not a base zone
+121,SVCRP,Save data is corrupt
+122,UNRES,Unused error code
+123,LCERR,Unused error code
+124,CRERR,Unused error code
+125,CNERR,Unused error code
+126,WRERR,Unused error code
+127,RDERR,Unused error code
+128,DVERR,Unused error code
+129,BADWT,Bad Workstation type
+130,INQER,Error returned by GKS inquiry routine
+131,GNSER,Error returned by GNS routine
+132,PENER,SGS pen does not exist
+133,SURFN,Display surface is not empty
+134,SGSER,Unspecified SGS Error
+135,OZEWK,Other zone on workstation
+136,FLSWN,Failed to set window
+137,UCRNZ,Unable to create new zone

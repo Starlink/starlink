@@ -1,0 +1,107 @@
+*-
+*
+*  COMMON SOURCE CODE FOR SIMPLE GRAPHICS SYSTEM
+*
+*-
+
+*  Status handling option (0=normal, else = inherited status mode)
+      INTEGER JSOPT
+
+*  Maximum number of workstations that may be opened
+      INTEGER MXWK
+      PARAMETER (MXWK=8)
+
+*  Workstation table:
+*   GKS workstation id
+      INTEGER IWTID(0:MXWK)
+*   type
+      INTEGER IWTTY(0:MXWK)
+*   connection id
+      INTEGER IWTCO(0:MXWK)
+*   catagory
+      INTEGER IWTCA(0:MXWK)
+
+*  Maximum number of zones
+      INTEGER MXZ
+      PARAMETER (MXZ=32)
+
+*  ID of zone last selected
+      INTEGER ISZID
+
+*  Zone table (one item in each array per zone)
+*   Workstation ID ( 0 = zone not allocated, -ve = base zone)
+      INTEGER IZTW(0:MXZ)
+*   Window (WC)
+      REAL ZTW(4,0:MXZ)
+*   Viewport (NDC)
+      REAL ZTV(4,0:MXZ)
+
+*  Workstation description table (One entry per open workstation)
+*    Approximate resolution in metres (for WS without GKS size in metres)
+      REAL XRES(0:MXWK),YRES(0:MXWK)
+*    Block clear mechanism (0=none,1=polygon fill)
+      INTEGER IBLKCL(0:MXWK)
+*    Device is spooled
+      INTEGER ISPOOL(0:MXWK)
+*    Device has no clear open implemented
+      LOGICAL NSCLOP(0:MXWK)
+
+*  SGS pen number
+      INTEGER IPEN
+
+*  Marker height
+      REAL HMK
+
+*  Text font, precision, height, aspect ratio, up vector, spacing
+      INTEGER IFONT,IPREC
+      REAL HTX,ARTX,XUPTX,YUPTX,STX
+*  (N.B. up vector is unit length)
+
+*  Text justification
+      CHARACTER CTXJ*2
+
+*  Text buffer
+      INTEGER LTEXT
+      PARAMETER (LTEXT=200)
+      CHARACTER*(LTEXT) CTEXT
+
+*  Length of current string
+      INTEGER NTEXT
+
+*  Plotting position for current string
+      REAL XTEXT,YTEXT
+
+*  Current polyline
+      INTEGER LPOLY
+      PARAMETER (LPOLY=1000)
+      REAL XPOLY(LPOLY),YPOLY(LPOLY)
+
+*  Length of current polyline
+      INTEGER NPOLY
+
+*  Current choice device
+      INTEGER NCHODV
+
+*  Valid choice string and length
+      INTEGER MAXCHO, LCHOST
+      PARAMETER (MAXCHO = 49)
+      CHARACTER*(MAXCHO) CHOIST
+
+*  No clear open requested flag
+      LOGICAL NCLORQ
+
+*  Workstation not really clear flags
+      LOGICAL WSNRCL(0:MXWK)
+
+      COMMON /SGS_COMN/ JSOPT,
+     :                  IWTID,IWTTY,IWTCO,IWTCA,ISZID,IZTW,ZTW,ZTV,
+     :                  IPEN,HMK,IFONT,IPREC,
+     :                  HTX,ARTX,XUPTX,YUPTX,STX,
+     :                  NTEXT,XTEXT,YTEXT,XPOLY,YPOLY,NPOLY,
+     :                  NCHODV,LCHOST,
+     :                  XRES,YRES,ISPOOL,NSCLOP,IBLKCL,
+     :                  NCLORQ,WSNRCL
+      COMMON /SGS_COMC/ CTXJ,CTEXT,CHOIST
+
+
+      SAVE /SGS_COMN/, /SGS_COMC/
