@@ -23,6 +23,10 @@ dnl    it's allowed to play there, too.
     ./configure --prefix=$prefix --cache-file=config.cache
 )
 
+STAR_SPECIAL_INSTALL_COMMAND([
+    cd unix;
+    $(MAKE) INSTALL_ROOT=$$DESTDIR install])
+
 AC_CONFIG_FILES([Makefile component.xml])
 
 AC_OUTPUT

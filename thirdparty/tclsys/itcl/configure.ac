@@ -41,6 +41,12 @@ dnl    To configure iTcl, run ./configure in the subdirectories.
          $cmd; ) \
     done
 )
+           
+STAR_SPECIAL_INSTALL_COMMAND([
+        for d in @itcl_subdirs@;
+        do
+           ( cd $$d; $(MAKE) INSTALL_ROOT=$$DESTDIR install );
+        done])
 
 AC_CONFIG_FILES([Makefile component.xml])
 
