@@ -44,6 +44,8 @@
 
 *  Authors:
 *     AALLAN: Alasdair Allan (STARLINK, Keele University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *     04-SEP-2000 (AALLAN):
@@ -52,6 +54,9 @@
 *        AST routines wrapped using GENERIC.
 *     20-NOV-2000 (AALLAN):
 *       Incorporated changes made to source at ADASS
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -68,6 +73,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_PAR'
       INCLUDE 'CUB1_PAR'                    ! Package constants
+      INCLUDE 'CNF_PAR'                     ! For CNF_PVAL function
       
 *  General charater variables
       CHARACTER*(120) TEXT                  ! Temporary str for message output
@@ -220,31 +226,31 @@
 *  byte array.
          IF ( ATYPE .EQ. '_BYTE' ) THEN
             CALL CUG1_FILLAB( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  double-precision array.
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
             CALL CUG1_FILLAD( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)               
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  integer array.
          ELSE IF ( ATYPE .EQ. '_INTEGER' ) THEN
             CALL CUG1_FILLAI( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)                  
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  single-precision array.
          ELSE IF ( ATYPE .EQ. '_REAL' ) THEN
             CALL CUG1_FILLAR( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)    
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  unsigned-byte array.
          ELSE IF ( ATYPE .EQ. '_UBYTE' ) THEN
             CALL CUG1_FILLAUB( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)   
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  unsigned-word array.
          ELSE IF ( ATYPE .EQ. '_UWORD' ) THEN
             CALL CUG1_FILLAUW( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS) 
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
 *  word array.
          ELSE IF ( ATYPE .EQ. '_WORD' ) THEN
             CALL CUG1_FILLAW( MAPC, IDIM, AEL, NVIN, NVOUT, 
-     :                       %VAL(AXPNT), STATUS)    
+     :                       %VAL(CNF_PVAL(AXPNT)), STATUS)
          END IF  
          
          CALL NDF_AUNMP(INDF, 'Centre', IDIM, STATUS)            

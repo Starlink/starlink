@@ -85,6 +85,7 @@
 *  Authors:
 *     NG: Norman Gray (Starlink, Glasgow University)
 *     DSB: David S. Berry (Starlink, UCLan)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -97,6 +98,8 @@
 *        Remove restriction on lower NDF bounds being equal to 1. Remove
 *        all restrictions on OUTCOLS indices and expand the output NDF to
 *        accomodate the extreme values.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -113,6 +116,7 @@
       INCLUDE 'NDF_PAR'         ! NDF constants
       INCLUDE 'AST_PAR'         ! AST constants and function declarations
       INCLUDE 'PAR_ERR'         ! PAR errors
+      INCLUDE 'CNF_PAR'         ! For CNF_PVAL function
 
 *  External references
       EXTERNAL AST_ISAMAPPING
@@ -348,17 +352,20 @@
 
 *  Copy the input positions from the input NDF to the first work array.
       CALL ATL1_CPCOL( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
-     :                 NAXIN, INCOL, .TRUE., %VAL( IPIN ), %VAL( IPW1 ), 
+     :                 NAXIN, INCOL, .TRUE., %VAL( CNF_PVAL( IPIN ) ), 
+     :                 %VAL( CNF_PVAL( IPW1 ) ),
      :                 STATUS )
 
 *  Transform the positions.
-      CALL AST_TRANN( THIS, NROW, NAXIN, NROW, %VAL( IPW1 ), FORWRD,
-     :                NAXOUT, NROW, %VAL( IPW2 ), STATUS )
+      CALL AST_TRANN( THIS, NROW, NAXIN, NROW, %VAL( CNF_PVAL( IPW1 ) ), 
+     :                FORWRD,
+     :                NAXOUT, NROW, %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Copy the output positions from the second work array to the output NDF.
       CALL ATL1_CPCOL( LBNDO( 1 ), UBNDO( 1 ), LBNDO( 2 ), UBNDO( 2 ), 
-     :                 NAXOUT, OUTCOL, .FALSE., %VAL( IPOUT ), 
-     :                 %VAL( IPW2 ), STATUS )
+     :                 NAXOUT, OUTCOL, .FALSE., 
+     :                 %VAL( CNF_PVAL( IPOUT ) ),
+     :                 %VAL( CNF_PVAL( IPW2 ) ), STATUS )
 
 *  Arrive here if an error occurs.
  999  CONTINUE

@@ -52,11 +52,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     19-AUG-2004 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,6 +74,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  External References:
       EXTERNAL AST_ISAMAPPING
@@ -126,14 +130,14 @@
       CALL PSX_CALLOC( NP, '_DOUBLE', IPXOUT, STATUS )
 
 *  Read the values from the group into the memory.
-      CALL ATL1_GTOFL( IGRP1, NP, %VAL( IPXIN ), STATUS )
+      CALL ATL1_GTOFL( IGRP1, NP, %VAL( CNF_PVAL( IPXIN ) ), STATUS )
 
 * Transform the positions.
-      CALL AST_TRAN1( THIS, NP, %VAL( IPXIN ), FORWRD, 
-     :                %VAL( IPXOUT ), STATUS )
+      CALL AST_TRAN1( THIS, NP, %VAL( CNF_PVAL( IPXIN ) ), FORWRD,
+     :                %VAL( CNF_PVAL( IPXOUT ) ), STATUS )
 
 *  Output the results.
-      CALL ATL1_PRNT1( NP, %VAL( IPXOUT ), 'XOUT', STATUS )
+      CALL ATL1_PRNT1( NP, %VAL( CNF_PVAL( IPXOUT ) ), 'XOUT', STATUS )
 
 *  Free resources.
       CALL GRP_DELET( IGRP1, STATUS )

@@ -79,11 +79,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     28-SEP-2003(DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,6 +102,7 @@
       INCLUDE 'GRP_PAR'          ! GRP constants
       INCLUDE 'PAR_ERR'          ! PAR error constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -152,7 +156,8 @@
          CALL PSX_CALLOC( SIZE, '_DOUBLE', IPCOF, STATUS )
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( IPCOF ), STATUS )
+         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( CNF_PVAL( IPCOF ) ), 
+     :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
 *  parameter and go round to get a new group. Otherwise, indicate that we
@@ -201,7 +206,8 @@
          CALL PSX_CALLOC( SIZE, '_DOUBLE', IPCOI, STATUS )
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( IPCOI ), STATUS )
+         CALL ATL1_GTOFL( IGRP, SIZE, %VAL( CNF_PVAL( IPCOI ) ), 
+     :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
 *  parameter and go round to get a new group. Otherwise, indicate that we
@@ -226,8 +232,9 @@
       END DO
 
 *  Create the required PolyMap.
-      RESULT = AST_POLYMAP( NIN, NOUT, NCOF, %VAL( IPCOF ), 
-     :                      NCOI, %VAL( IPCOI ), ' ', STATUS )
+      RESULT = AST_POLYMAP( NIN, NOUT, NCOF, %VAL( CNF_PVAL( IPCOF ) ),
+     :                      NCOI, %VAL( CNF_PVAL( IPCOI ) ), 
+     :                      ' ', STATUS )
 
 *  Store the required attribute values.
       CALL ATL1_SETOP( 'OPTIONS', RESULT, STATUS )

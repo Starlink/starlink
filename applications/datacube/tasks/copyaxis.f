@@ -41,12 +41,17 @@
 
 *  Authors:
 *     AALLAN: Alasdair Allan (STARLINK, Keele University)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
+*     {enter_new_authors_here}
 
 *  History:
 *      19-SEP-2000 (AALLAN):
 *        Original version.
 *     20-NOV-2000 (AALLAN):
 *       Incorporated changes made to source at ADASS
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -62,6 +67,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_PAR'
       INCLUDE 'CUB1_PAR'                    ! Package constants
+      INCLUDE 'CNF_PAR'                     ! For CNF_PVAL function
       
 *  General charater variables
       CHARACTER*(120) TEXT                  ! Temporary str for message output
@@ -218,22 +224,28 @@
             CALL CUG1_CPYAB( STATUS)
 *  double-precision array.
          ELSE IF ( ATYPE .EQ. '_DOUBLE' ) THEN
-            CALL CUG1_CPYAD( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS)   
+            CALL CUG1_CPYAD( %VAL(CNF_PVAL(LAXP)), %VAL(CNF_PVAL(IAXP)), 
+     :                       IAEL, STATUS)
 *  integer array.
          ELSE IF ( ATYPE .EQ. '_INTEGER' ) THEN
-            CALL CUG1_CPYAI( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS)      
+            CALL CUG1_CPYAI( %VAL(CNF_PVAL(LAXP)), %VAL(CNF_PVAL(IAXP)), 
+     :                       IAEL, STATUS)
 *  single-precision array.
          ELSE IF ( ATYPE .EQ. '_REAL' ) THEN
-            CALL CUG1_CPYAR( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS)    
+            CALL CUG1_CPYAR( %VAL(CNF_PVAL(LAXP)), %VAL(CNF_PVAL(IAXP)), 
+     :                       IAEL, STATUS)
 *  unsigned-byte array.
          ELSE IF ( ATYPE .EQ. '_UBYTE' ) THEN
-            CALL CUG1_CPYAUB( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS)   
+            CALL CUG1_CPYAUB( %VAL(CNF_PVAL(LAXP)), 
+     :                        %VAL(CNF_PVAL(IAXP)), IAEL, STATUS)
 *  unsigned-word array.
          ELSE IF ( ATYPE .EQ. '_UWORD' ) THEN
-            CALL CUG1_CPYAUW( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS) 
+            CALL CUG1_CPYAUW( %VAL(CNF_PVAL(LAXP)), 
+     :                        %VAL(CNF_PVAL(IAXP)), IAEL, STATUS)
 *  word array.
          ELSE IF ( ATYPE .EQ. '_WORD' ) THEN
-            CALL CUG1_CPYAW( %VAL(LAXP), %VAL(IAXP), IAEL, STATUS)    
+            CALL CUG1_CPYAW( %VAL(CNF_PVAL(LAXP)), %VAL(CNF_PVAL(IAXP)), 
+     :                       IAEL, STATUS)
          END IF  
 
 *  Unmap the arrays

@@ -66,11 +66,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     14-FEB-2001 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -84,6 +87,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Status:
       INTEGER STATUS
@@ -119,7 +123,8 @@
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Read the values from the group into the memory.
-         CALL ATL1_GTOFL( IGRP, NLUT, %VAL( IPLUT ), STATUS )
+         CALL ATL1_GTOFL( IGRP, NLUT, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                    STATUS )
 
 *  If an error occurred reading the group, annull the error, cancel the
 *  parameter and go round to get a new group. Otherwise, indicate that we
@@ -156,7 +161,8 @@
       END DO
 
 *  Create the required LutMap.
-      RESULT = AST_LUTMAP( NLUT, %VAL( IPLUT ), START, INC, ' ', 
+      RESULT = AST_LUTMAP( NLUT, %VAL( CNF_PVAL( IPLUT ) ), 
+     :                     START, INC, ' ',
      :                     STATUS )
 
 *  Store the required attribute values.

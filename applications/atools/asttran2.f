@@ -63,11 +63,14 @@
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     6-JUN-2003 (DSB):
 *        Original version.
+*     2004 September 1 (TIMJ):
+*        Use CNF_PVAL
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -82,6 +85,7 @@
       INCLUDE 'NDF_PAR'          ! NDF constants
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
       INCLUDE 'GRP_PAR'          ! GRP constants 
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  External References:
       EXTERNAL AST_ISAMAPPING
@@ -149,15 +153,18 @@
       CALL PSX_CALLOC( NP, '_DOUBLE', IPYOUT, STATUS )
 
 *  Read the values from the group into the memory.
-      CALL ATL1_GTOFL( IGRP1, NP, %VAL( IPXIN ), STATUS )
-      CALL ATL1_GTOFL( IGRP2, NP, %VAL( IPYIN ), STATUS )
+      CALL ATL1_GTOFL( IGRP1, NP, %VAL( CNF_PVAL( IPXIN ) ), STATUS )
+      CALL ATL1_GTOFL( IGRP2, NP, %VAL( CNF_PVAL( IPYIN ) ), STATUS )
 
 * Transform the positions.
-      CALL AST_TRAN2( THIS, NP, %VAL( IPXIN ), %VAL( IPYIN ), FORWRD, 
-     :                %VAL( IPXOUT ), %VAL( IPYOUT ), STATUS )
+      CALL AST_TRAN2( THIS, NP, %VAL( CNF_PVAL( IPXIN ) ), 
+     :                %VAL( CNF_PVAL( IPYIN ) ), FORWRD,
+     :                %VAL( CNF_PVAL( IPXOUT ) ), 
+     :                %VAL( CNF_PVAL( IPYOUT ) ), STATUS )
 
 *  Output the results.
-      CALL ATL1_PRNT2( NP, %VAL( IPXOUT ), %VAL( IPYOUT ), 'XOUT', 
+      CALL ATL1_PRNT2( NP, %VAL( CNF_PVAL( IPXOUT ) ), 
+     :                 %VAL( CNF_PVAL( IPYOUT ) ), 'XOUT',
      :                 'YOUT', STATUS )
 
 *  Free resources.
