@@ -231,7 +231,7 @@
 
 *     Miscellaneous
 
-      ORIGIN   = 'Unix Specx V6.7'
+      ORIGIN   = 'Unix Specx V6.8'
       LINE     = '*'
 *     ITITLE was changed to accommodate for subscanno > 999
 *     assume old format if ititle(12) not blank.
