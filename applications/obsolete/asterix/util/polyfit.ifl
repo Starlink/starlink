@@ -43,4 +43,11 @@ Interface POLYFIT
       default   FALSE
       help      'Allows input file/object to be overwritten'
    EndParameter
+   Parameter SUPER
+      type '_LOGICAL'
+      vpath 'DEFAULT'
+      default F
+      prompt 'Superimpose fit'
+      help 'Cause subsequent plotting program to superimpose fit on data'
+   EndParameter
 EndInterface
