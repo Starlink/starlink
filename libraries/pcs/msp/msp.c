@@ -11,6 +11,8 @@
       14Sep 1999: Remove (with #if 0) declaration of exit handler.
                   It must now be done at a higher level. (DLT)
       2 Jul 2004: Now use mkfifo if available. Fix bug in mknod call (TIMJ)
+      26Jul 2004: Use plain file instead of FIFO when mknod and mkfifo
+                  not available  (PWD)
 */
 
 #include <sys/time.h>
@@ -297,6 +299,67 @@ struct stat statb;
    }
    return status;
 }
+
+/*
+ *+
+ *  Name:
+ *     msp1_mkrvous
+
+ *  Purpose:
+ *     To create a rendezvous file using a plain file.
+
+ *  Language:
+ *     C
+
+ *  Invocation:
+ *     int msp1_mkrvous( char *fname )
+
+ *  Description:
+ *     Creates the given file which should be the name of a rendezvous
+ *     file that advertizes the relationship between a task and the 
+ *     port number that should be used to communicate with it. Normally
+ *     a rendezvous file is created as a FIFO using mknod or mkfifo, but
+ *     a plain file will also do. The file is created and its permissions 
+ *     are set as if a FIFO (for consistency, no other reason I know).
+ *     If succesful 0 is returned, otherwise a -1 is returned.
+
+ *  Arguments:
+ *     fname = *char (Given)
+ *        String containing the full file name.
+
+ *  Returned value:
+ *     0 on success
+ *     -1 on failure
+
+
+ *  Authors:
+ *     PWD: Peter W. Draper (Starlink, Durham University)
+ *     {enter_new_authors_here}
+
+ *  History:
+ *     29-JUL-2004 (PWD):
+ *        Original version. Maybe this could replace all rendezvous creation.
+ *     {enter_changes_here}
+
+ *-
+ */
+int msp1_mkrvous( const char *fname )
+{
+   FILE* fd;
+
+   if ( fname == NULL ) {
+      return -1;
+   }
+   fd = fopen( fname, "a" );
+   if ( fd == NULL ) {
+      return -1;
+   }
+   fclose( fd );
+   chmod( fname, S_IRWXU );
+   return 0;
+}
+
+
 
 /*=  MSP_ACCEPT - accept an incoming connection request */
 
@@ -697,6 +760,7 @@ int *status              /* global status (given and returned) */
    char *tempstr;                    /* temporary pointer */
    char string[80];                  /* error messages */
    int portno;                       /* this task's port number */
+   FILE *fd;                         /* Rendezvous file fd, if used */
 
 
    if ( *status != SAI__OK ) return;
@@ -793,12 +857,16 @@ int *status              /* global status (given and returned) */
 
    sprintf ( rendezvous, "%s/%s_%d", adam_user, task_name, portno );
 
-#if HAVE_MKFIFO
+#if __CYGWIN32__
+   /* mknod and mkfifo are dummies, so test works, but cannot be used */
+   istat = msp1_mkrvous( rendezvous );
+#elif HAVE_MKFIFO
    istat = mkfifo ( rendezvous, S_IRWXU );
 #elif HAVE_MKNOD
    istat = mknod ( rendezvous, S_IFIFO | S_IRWXU, 0 );
 #else
-#  error "Do not know how to create a FIFO"
+   /* Actually this can be just a plain file */
+   istat = msp1_mkrvous( rendezvous );
 #endif
 
    if ( istat < 0 ) 
