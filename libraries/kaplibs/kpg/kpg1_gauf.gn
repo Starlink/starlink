@@ -138,6 +138,7 @@
      :  DEV2,                    ! Squared deviation
      :  DEVMAX,                  ! Maximum squared deviation for
                                  ! clipping
+     :  DV,                      ! Data value
      :  EX,                      ! Gaussian value at the current data
                                  ! element
      :  OLDVAR,                  ! Previous variance
@@ -334,7 +335,8 @@
 
 *             Find the deviation of the fit from the data.
 
-               DELTA = X( 1 ) * EX + X( 4 ) - DATA( I )
+               DV = NUM_<T>TOR( DATA( I ) )
+               DELTA = X( 1 ) * EX + X( 4 ) - DV
 
 *             Form the sums for the normal equations to solve
 *             Ax = R.
