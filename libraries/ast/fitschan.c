@@ -582,6 +582,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        Correct GetFiducialNSC so that the stored values for longitude
 *        parameters 1 and 2 are ignored unless the value of parameter 0 is 
 *        not zero.
+*     19-AUG-2004 (DSB):
+*        Modify SpecTrans to ignore any CDELT values if the header
+*        includes some CDi_j values.
 *class--
 */
 
@@ -21903,9 +21906,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                   if( GetValue2( ret, this, keyname, AST__FLOAT, (void *) &dval, 0, 
                                 method, class ) ){
 
-/* If found, save it with name PCj_i */
+/* If found, save it with name PCj_i, and ensure the default value of 1.0
+   is used for CDELT. */
                      if( encoding == FITSIRAF_ENCODING ){
                         SetValue( ret, FormatKey( "PC", j + 1, i + 1, ' ' ),
+                                  (void *) &dval, AST__FLOAT, NULL );
+                        dval = 1.0;
+                        SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
                                   (void *) &dval, AST__FLOAT, NULL );
                      }
                   }
@@ -21935,9 +21942,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
                      dval = 0.0;
                   }
 
-/* Save it with name PCj_i. Default values of 1.0 for CDELT is ok so we
-   do not add CDELT values.  */
+/* Save it with name PCj_i, and ensure a CDELT of 1.0 (the default) is
+   used. This will over-ride any extraneous CDELT value which may be 
+   included in the header. */
                   SetValue( ret, FormatKey( "PC", j + 1, i + 1, s ),
+                            (void *) &dval, AST__FLOAT, NULL );
+                  dval = 1.0;
+                  SetValue( ret, FormatKey( "CDELT", j + 1, -1, s ),
                             (void *) &dval, AST__FLOAT, NULL );
                }
             }
