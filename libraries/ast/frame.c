@@ -32,7 +32,9 @@ f     AST_FRAME
 
 *  Attributes:
 *     In addition to those attributes common to all Mappings, every
-*     Frame also has the following attributes:
+*     Frame also has the following attributes (if the Frame has only one
+*     axis, the axis specifier can be omited from the following attribute 
+*     names):
 *
 *     - AlignSystem: Coordinate system used to align Frames
 *     - Bottom(axis): Lowest axis value to display
@@ -171,6 +173,9 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *     8-SEP-2004 (DSB):
 *        - Added astResolvePoints.
 *        - Override astEqual.
+*     29-NOV-2004 (DSB):
+*        - Set/Get/Test/ClearAttrib: Allow axis specifier to be omitted from 
+*        axis attribute names if the Frame only has one axis.
 *class--
 */
 
@@ -1580,8 +1585,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_attrib;            /* Pointer to axis attribute name */
+   const char *old_attrib;       /* Pointer to supplied attribute name string */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
+   int free_axis_attrib;         /* Should axis_attrib be freed? */
+   int has_axis;                 /* Does attrib name include axis specifier? */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
    int oldrep;                   /* Original error reporting state */
@@ -1593,6 +1601,21 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain a pointer to the Frame structure. */
    this = (AstFrame *) this_object;
+
+/* Set a flag indicating if the attribute name includes an axis
+   specifier. */
+   has_axis = ( strchr( attrib, '(' ) != NULL );
+
+/* A flag indicating that we do not need to free the axis_attrib memory. */
+   free_axis_attrib = 0;
+
+/* Initialise things to avoid compiler warnings. */   
+   axis_attrib = NULL;
+   old_attrib = NULL;
+
+/* Jump back to here if we are trying the same attribute but with an explicit 
+   axis "(1)" added to the end of the name. */
+L1:
 
 /* Obtain the length of the "attrib" string. */
    len = strlen( attrib );
@@ -1731,10 +1754,10 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute was not identified above, but appears to refer to
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
-   } else if ( nc = 0,
-               ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
-                                      &axis_nc, &axis, &nc ) )
-               && ( nc >= len ) ) {
+   } else if( !free_axis_attrib && ( nc = 0,
+                 ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
+                                      &axis_nc, &axis, &nc ) ) 
+               && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
       (void) astValidateAxis( this, axis - 1, "astClear" );
@@ -1795,9 +1818,41 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Not recognised. */
 /* --------------- */
-/* If the attribute is still not recognised, pass it on to the parent
-   method for further interpretation. */
+/* If the attribute is still not recognised, and the Frame has only 1 axis,
+   and the attribute name does not already include an axis specifier, try 
+   again after appending "(1)" to the end of the attribute name. */
+   } else if( !has_axis && astGetNaxes( this ) == 1 ) {
+
+/* Take a copy of the supplied name, allowing 3 extra characters for the
+   axis specifier "(1)". */
+      axis_attrib = astStore( NULL, attrib, len + 4 );
+
+/* Indicate we should free the axis_attrib memory. */
+      free_axis_attrib = 1;
+
+/* Add in the axis specifier. */
+      strcpy( axis_attrib + len, "(1)" );
+
+/* Use the new attribute name instead of the supplied name. */
+      old_attrib = attrib;
+      attrib = axis_attrib;
+
+/* Indicate the attribute name now has an axis specifier. */
+      has_axis = 1;
+
+/* Jump back to try interpreting the new attribute name. */
+      goto L1;
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute name is still not recognised, pass it on to the parent
+   method for further interpretation. First re-instate the original attrib 
+   name string if it was changed above. */
    } else {
+      if( free_axis_attrib ) {
+         attrib = old_attrib;
+         axis_attrib = astFree( axis_attrib );
+      }
       (*parent_clearattrib)( this_object, attrib );
    }
 }
@@ -3763,6 +3818,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system;         /* System code */
    char *axis_attrib;            /* Pointer to axis attribute name */
+   const char *old_attrib;       /* Pointer to supplied attribute name string */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attibute value */
    double epoch;                 /* Epoch attribute value (as MJD) */
@@ -3770,6 +3826,8 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    int axis_nc;                  /* No. characters in axis attribute name */
    int digits;                   /* Digits attribute value */
    int direction;                /* Direction attribute value */
+   int free_axis_attrib;         /* Should axis_attrib be freed? */
+   int has_axis;                 /* Does attrib name include axis specifier? */
    int len;                      /* Length of attrib string */
    int match_end;                /* MatchEnd attribute value */
    int max_axes;                 /* MaxAxes attribute value */
@@ -3791,6 +3849,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain a pointer to the Frame structure. */
    this = (AstFrame *) this_object;
+
+/* Set a flag indicating if the attribute name includes an axis
+   specifier. */
+   has_axis = ( strchr( attrib, '(' ) != NULL );
+
+/* A flag indicating that we do not need to free the axis_attrib memory. */
+   free_axis_attrib = 0;
+
+/* Initialise things to avoid compiler warnings. */   
+   axis_attrib = NULL;
+   old_attrib = NULL;
+
+/* Jump back to here if we are trying the same attribute but with an explicit 
+   axis "(1)" added to the end of the name. */
+L1:
 
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
@@ -4009,10 +4082,10 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute was not identified above, but appears to refer to
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
-   } else if ( nc = 0,
+   } else if ( !free_axis_attrib && ( nc = 0,
                ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
                                       &axis_nc, &axis, &nc ) )
-               && ( nc >= len ) ) {
+               && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
       (void) astValidateAxis( this, axis - 1, "astGet" );
@@ -4073,9 +4146,41 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Not recognised. */
 /* --------------- */
-/* If the attribute name was not recognised, pass it on to the parent
-   method for further interpretation. */
+/* If the attribute is still not recognised, and the Frame has only 1 axis,
+   and the attribute name does not already include an axis specifier, try 
+   again after appending "(1)" to the end of the attribute name. */
+   } else if( !has_axis && astGetNaxes( this ) == 1 ) {
+
+/* Take a copy of the supplied name, allowing 3 extra characters for the
+   axis specifier "(1)". */
+      axis_attrib = astStore( NULL, attrib, len + 4 );
+
+/* Indicate we should free the axis_attrib memory. */
+      free_axis_attrib = 1;
+
+/* Add in the axis specifier. */
+      strcpy( axis_attrib + len, "(1)" );
+
+/* Use the new attribute name instead of the supplied name. */
+      old_attrib = attrib;
+      attrib = axis_attrib;
+
+/* Indicate the attribute name now has an axis specifier. */
+      has_axis = 1;
+
+/* Jump back to try interpreting the new attribute name. */
+      goto L1;
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute name is still not recognised, pass it on to the parent
+   method for further interpretation. First re-instate the original attrib 
+   name string if it was changed above. */
    } else {
+      if( free_axis_attrib ) {
+         attrib = old_attrib;
+         axis_attrib = astFree( axis_attrib );
+      }
       result = (*parent_getattrib)( this_object, attrib );
    }
 
@@ -6862,6 +6967,9 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    AstFrame *this;               /* Pointer to the Frame structure */
    AstSystemType system_code;    /* System code */
    char *axis_setting;           /* Pointer to axis attribute setting string */
+   const char *equals;           /* Pointer to equals sign */
+   const char *old_setting;      /* Pointer to supplied setting string */
+   const char *op;               /* Pointer to opening parenthesis */
    double dval;                  /* Double attibute value */
    double mjd;                   /* Epoch as a Modified Julian Date */
    int axis;                     /* Index for the Frame axis */
@@ -6872,6 +6980,8 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int domain;                   /* Offset of Domain string */
    int epoch;                    /* Offset of Epoch string */
    int format;                   /* Offset of axis Format string */
+   int free_axis_setting;        /* Should axis_setting be freed? */
+   int has_axis;                 /* Does setting include an axis specifier? */
    int label;                    /* Offset of axis Label string */
    int len;                      /* Length of setting string */
    int match_end;                /* Match final axes of target? */
@@ -6893,6 +7003,25 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Obtain a pointer to the Frame structure. */
    this = (AstFrame *) this_object;
+
+/* Find the offset to the first equal sign in the setting string. */
+   equals = strchr( setting, '=' );
+
+/* Set a flag indicating if the attribute name includes an axis
+   specifier. */
+   op = strchr( setting, '(' );
+   has_axis = ( !op || op > equals ) ? 0 : 1;
+
+/* A flag indicating that we do not need to free the axis_setting memory. */
+   free_axis_setting = 0;
+
+/* Initialise things to avoid compiler warnings. */   
+   axis_setting = NULL;
+   old_setting = NULL;
+
+/* Jump back to here if we are trying the same attribute setting but with
+   an explicit axis "(1)" added to the attribute name. */
+L1:
 
 /* Obtain the length of the setting string. */
    len = strlen( setting );
@@ -7106,10 +7235,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* If the attribute was not identified above, but appears to refer to
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
-   } else if ( nc = 0,
+   } else if ( !free_axis_setting && ( nc = 0,
                ( 1 == astSscanf( setting, "%*[^()]%n(%d)%n=%*[^\n]%n",
                                        &axis_nc, &axis, &axis_value, &nc ) )
-               && ( nc >= len ) ) {
+               && ( nc >= len ) ) ) {
 
 /* Validate the axis index and copy the attribute setting string. */
       (void) astValidateAxis( this, axis - 1, "astSet" );
@@ -7177,9 +7306,44 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Not recognised. */
 /* --------------- */
+/* If the attribute is still not recognised, and the Frame has only 1 axis,
+   and the attribute name does not already include an axis specifier, try 
+   again after appending "(1)" to the end of the attribute name. */
+   } else if( !has_axis && astGetNaxes( this ) == 1 && equals ) {
+
+/* Take a copy of the supplied setting, allowing 3 extra characters for the
+   axis specifier "(1)". */
+      axis_setting = astStore( NULL, setting, len + 4 );
+
+/* Indicate we should free the axis_setting memory. */
+      free_axis_setting = 1;
+
+/* Add in the axis specifier. */
+      strcpy( axis_setting + ( equals - setting ), "(1)" );
+
+/* Add in the equals sign and attribute value. */
+      strcpy( axis_setting + ( equals - setting ) + 3, equals );
+
+/* Use the new setting instead of the supplied setting. */
+      old_setting = setting;
+      setting = axis_setting;
+
+/* Indicate the setting now has an axis specifier. */
+      has_axis = 1;
+
+/* Jump back to try interpreting the new setting string. */
+      goto L1;
+
+/* Not recognised. */
+/* --------------- */
 /* If the attribute is still not recognised, pass it on to the parent
-   method for further interpretation. */
+   method for further interpretation. First re-instate the original setting 
+   string if it was changed above. */
    } else {
+      if( free_axis_setting ) {
+         setting = old_setting;
+         axis_setting = astFree( axis_setting );
+      }
       (*parent_setattrib)( this_object, setting );
    }
 
@@ -7870,8 +8034,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    AstFrame *pfrm;               /* Pointer to primary Frame containing axis */
    AstFrame *this;               /* Pointer to the Frame structure */
    char *axis_attrib;            /* Pointer to axis attribute name */
+   const char *old_attrib;       /* Pointer to supplied attribute name string */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
+   int free_axis_attrib;         /* Should axis_attrib be freed? */
+   int has_axis;                 /* Does attrib name include axis specifier? */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by astSscanf */
    int oldrep;                   /* Original error reporting state */
@@ -7887,6 +8054,21 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain a pointer to the Frame structure. */
    this = (AstFrame *) this_object;
+
+/* Set a flag indicating if the attribute name includes an axis
+   specifier. */
+   has_axis = ( strchr( attrib, '(' ) != NULL );
+
+/* A flag indicating that we do not need to free the axis_attrib memory. */
+   free_axis_attrib = 0;
+
+/* Initialise things to avoid compiler warnings. */   
+   axis_attrib = NULL;
+   old_attrib = NULL;
+
+/* Jump back to here if we are trying the same attribute but with an explicit 
+   axis "(1)" added to the end of the name. */
+L1:
 
 /* Obtain the length of the attrib string. */
    len = strlen( attrib );
@@ -8023,10 +8205,10 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* If the attribute was not identified above, but appears to refer to
    a Frame axis, then it may refer to an Axis object of a derived type
    (which has additional attributes not recognised here). */
-   } else if ( nc = 0,
+   } else if ( !free_axis_attrib && ( nc = 0,
                ( 1 == astSscanf( attrib, "%*[^()]%n(%d)%n",
                                       &axis_nc, &axis, &nc ) )
-               && ( nc >= len ) ) {
+               && ( nc >= len ) ) ) {
 
 /* Validate the axis index and extract the attribute name. */
       (void) astValidateAxis( this, axis - 1, "astTest" );
@@ -8087,9 +8269,41 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Not recognised. */
 /* --------------- */
-/* If the attribute is still not recognised, pass it on to the parent
-   method for further interpretation. */
+/* If the attribute is still not recognised, and the Frame has only 1 axis,
+   and the attribute name does not already include an axis specifier, try 
+   again after appending "(1)" to the end of the attribute name. */
+   } else if( !has_axis && astGetNaxes( this ) == 1 ) {
+
+/* Take a copy of the supplied name, allowing 3 extra characters for the
+   axis specifier "(1)". */
+      axis_attrib = astStore( NULL, attrib, len + 4 );
+
+/* Indicate we should free the axis_attrib memory. */
+      free_axis_attrib = 1;
+
+/* Add in the axis specifier. */
+      strcpy( axis_attrib + len, "(1)" );
+
+/* Use the new attribute name instead of the supplied name. */
+      old_attrib = attrib;
+      attrib = axis_attrib;
+
+/* Indicate the attribute name now has an axis specifier. */
+      has_axis = 1;
+
+/* Jump back to try interpreting the new attribute name. */
+      goto L1;
+
+/* Not recognised. */
+/* --------------- */
+/* If the attribute name is still not recognised, pass it on to the parent
+   method for further interpretation. First re-instate the original attrib 
+   name string if it was changed above. */
    } else {
+      if( free_axis_attrib ) {
+         attrib = old_attrib;
+         axis_attrib = astFree( axis_attrib );
+      }
       result = (*parent_testattrib)( this_object, attrib );
    }
 
