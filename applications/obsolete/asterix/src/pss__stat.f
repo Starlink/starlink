@@ -1554,6 +1554,7 @@ c     REAL                     FLUX                    ! Optimum flux
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Unused variables
+      FLUX = 0.0
       PSS_PPIX = 0
       PSS_CONVERGED = .FALSE.
       NITER = 0

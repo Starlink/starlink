@@ -264,8 +264,8 @@
 
 *  Import/export:
       DOUBLE PRECISION		ALPHA(NPAMAX,NPAMAX)
-      DOUBLE PRECISION		INV(N,N)
       INTEGER			N
+      DOUBLE PRECISION		INV(N,N)
       INTEGER			STATUS
 
 *  Local variables:

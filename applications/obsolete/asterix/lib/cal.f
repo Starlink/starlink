@@ -743,7 +743,10 @@ C Evalutate function over grid
        REAL D,T,TXS,TXYS,TYD,X,Y,PARTX,PARTY,PY
        INTEGER NX,NY,IX,IY
 C
-	IF(ISTAT.NE.0) RETURN
+       IF(ISTAT.NE.0) THEN
+         CAL_PSFT=0.0
+         RETURN
+       ENDIF
 C
 C      Define some values.
 C
