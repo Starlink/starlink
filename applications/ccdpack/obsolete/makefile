@@ -426,7 +426,7 @@ PKG_LINK = CCD1
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.3-1
+PKG_VERS = 2.4-0b
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -712,7 +712,7 @@ CIRGSRC = irg1_wild.c
 
 REDTASKS = makebias debias makecal calcor makeflat flatcor
 REGTASKS = findcent idicurs findobj register tranlist plotlist findoff \
- pairndf ccdedit makemos tranndf astimp astexp wcsreg
+ pairndf ccdedit makemos tranndf astimp astexp wcsreg wcsedit
 RESTASKS = ccdsetup ccdclear ccdnote ccdshow ccdndfac ccdgenerate \
  picinfo import present schedule ccdimp ccdexp
 SCRTASKS = reduce ccdalign xreduce
@@ -769,7 +769,7 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
    debias.hlp schedule.hlp findcent.hlp tranlist.hlp findobj.hlp \
    tranndf.hlp findoff.hlp typical_initial_reduction.hlp flatcor.hlp \
    use_globals.hlp idicurs.hlp xreduce.hlp import.hlp \
-   astimp.hlp astexp.hlp wcsreg.hlp
+   astimp.hlp astexp.hlp wcsreg.hlp wcsedit.hlp
 
 #  Name of the help task.
 
@@ -2137,7 +2137,7 @@ irg_fac: IRG_ERR IRG_PAR IRH_ERR IRH_PAR
 aif_antmp.o: DAT_PAR SAE_PAR
 aif_asfio.o: PAR_ERR SAE_PAR
 aif_temp.o: DAT_PAR SAE_PAR
-astimp.o: AST_PAR FIO_PAR PAR_ERR SAE_PAR
+astimp.o: AST_PAR CCD1_PAR FIO_PAR PAR_ERR SAE_PAR
 astexp.o: AST_PAR CCD1_PAR FIO_PAR PAR_ERR SAE_PAR
 calcor.o: CCD1_PAR DAT_PAR IRG_FAC NDF_PAR SAE_PAR
 ccd1_achan.o: AST_PAR CCD1_FDCM SAE_PAR
@@ -2608,6 +2608,7 @@ schedule.o: CCD1_PAR FIO_PAR SAE_PAR
 tranlist.o: CCD1_PAR DAT_PAR FIO_PAR SAE_PAR
 tranndf.o: CCD1_PAR DAT_PAR MSG_PAR NDF_PAR PRM_PAR SAE_PAR TRN_PAR
 wcsreg.o: AST_PAR CCD1_PAR FIO_PAR SAE_PAR
+wcsedit.o: AST_PAR IRH_PAR SAE_PAR
 ccd1_setex.o: SAE_PAR PSX_ERR
 ccg1_smd1.o: NUM_CMN NUM_DEC_CVT NUM_DEF_CVT PRM_PAR SAE_PAR
 ccg1_wtm4.o:NUM_DEC_CVT NUM_DEF_CVT SAE_PAR
