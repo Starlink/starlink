@@ -128,8 +128,10 @@
 *           latitude of second centre in PLANET coord system (radians)
 *     MAP_X                  = DOUBLE PRECISION (Given)
 *           x tangent plane offset of point from centre (radians)
+*           The offset must be in the same coordinate as COORD_TYPE
 *     MAP_Y                  = DOUBLE PRECISION (Given)
 *           y tangent plane offset of point from centre (radians)
+*           The offset must be in the same coordinate as COORD_TYPE
 *     COORD_TYPE             = CHARACTER*(*) (Given)
 *           Coord system of input centre, RD, RB, RJ, GA, EQ, PLANET
 *     LST                    = DOUBLE PRECISION (Given)
@@ -154,7 +156,7 @@
 
 *  Deficiencies:
 *     Does not handle LOCAL_COORDS for MAP_X and MAP_Y
-*     Does not deal with MAP_X or MAP_Y at all!
+*     (see SCULIB_APARRENT_2_MP for information on how to do this)
 
 *  Bugs:
 
@@ -169,14 +171,15 @@
 *      4-MAR-1993: Added GA, EQ, HA coords
 *     14-AUG-1993: Moved to SCULIB library
 *     $Log$
+*     Revision 1.6  1997/11/04 20:40:43  timj
+*     Add MAP_X and MAP_Y offsets.
+*
 *     Revision 1.5  1997/10/30 20:49:29  timj
 *     Modernise header.
 *
 *    endhistory
 
 *-
-
-
 
 *  Type Definitions:
       IMPLICIT NONE
@@ -226,10 +229,13 @@
       DOUBLE PRECISION RA_N_APP, DEC_N_APP    ! apparent RA, Dec of N pole of
                                               !   input coord system
       DOUBLE PRECISION DRA                    ! 
+      DOUBLE PRECISION MYLAT                  ! Internal LAT variable
+      DOUBLE PRECISION MYLONG                 ! Internal LONG variable
       DOUBLE PRECISION SIN_DEC                ! Sine of apparent dec
       DOUBLE PRECISION SIN_HA                 ! Sine of hour angle
       DOUBLE PRECISION SIN_ROT, COS_ROT       ! sin and cos of ROTATION, 
-*                                             !   multiplied by cos (lat)
+                                              !   multiplied by cos (lat)
+
 *  Internal References:
 
 *  Local data:
@@ -240,6 +246,15 @@
 
       CALL CHR_UCASE (COORD_TYPE)
 
+*     Setup scratch variables.
+      MYLONG = LONG
+      MYLAT  = LAT
+
+*     Shift map centre by MAP_X and MAP_Y (if non-zero)
+      IF (MAP_X .NE. 0.0D0 .OR. MAP_Y .NE. 0.0D0) THEN
+         CALL SLA_DTP2S(MAP_X, MAP_Y, LONG, LAT, MYLONG, MYLAT)
+      END IF
+         
 *  handle each coord type in turn
 
       IF ((COORD_TYPE .EQ. 'RB') .OR. 
@@ -250,8 +265,10 @@
          IF (COORD_TYPE .EQ. 'RB') THEN
 
 *  convert map centre and N pole 
+*     Convert to J2000
+            CALL SLA_FK45Z (MYLONG, MYLAT, 1950.0D0, RA_2000, DEC_2000)
 
-            CALL SLA_FK45Z (LONG, LAT, 1950.0D0, RA_2000, DEC_2000)
+*     Convert to apparent RA,DEC
             CALL SLA_MAP (RA_2000, DEC_2000, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
@@ -261,13 +278,15 @@
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'RJ') THEN
-            CALL SLA_MAP (LONG, LAT, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
+
+*     Convert J2000 to apparent
+            CALL SLA_MAP (MYLONG, MYLAT, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
             CALL SLA_MAP (0.0D0, DPI2, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'GA') THEN
-            CALL SLA_GALEQ (LONG, LAT, RA_2000, DEC_2000)
+            CALL SLA_GALEQ (MYLONG, MYLAT, RA_2000, DEC_2000)
             CALL SLA_MAP (RA_2000, DEC_2000, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
@@ -276,7 +295,7 @@
      :         0.0D0, 2000.0D0, MJD, RA_N_APP, DEC_N_APP)
 
          ELSE IF (COORD_TYPE .EQ. 'EQ') THEN
-            CALL SLA_ECLEQ (LONG, LAT, MJD, RA_2000, DEC_2000)
+            CALL SLA_ECLEQ (MYLONG, MYLAT, MJD, RA_2000, DEC_2000)
             CALL SLA_MAP (RA_2000, DEC_2000, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
      :         2000.0D0, MJD, RA_APP, DEC_APP)
 
@@ -299,47 +318,49 @@
 *  general case
 
             SIN_ROT = COS (DEC_N_APP) * SIN (DRA)
-            COS_ROT = (SIN (DEC_N_APP) - SIN (DEC_APP) * SIN (LAT)) /
+            COS_ROT = (SIN (DEC_N_APP) - SIN (DEC_APP) * SIN (MYLAT)) /
      :        COS (DEC_APP)
             ROTATION = ATAN2 (SIN_ROT, COS_ROT)
          END IF
 
       ELSE IF (COORD_TYPE .EQ. 'AZ') THEN
-         SIN_DEC = SIN(LAT_OBS_RAD) * SIN(LAT) +
-     :        COS(LAT_OBS_RAD) * COS(LAT) * COS(LONG)
+         SIN_DEC = SIN(LAT_OBS_RAD) * SIN(MYLAT) +
+     :        COS(LAT_OBS_RAD) * COS(MYLAT) * COS(MYLONG)
          DEC_APP = ASIN(SIN_DEC)
 
-         SIN_HA = -SIN(LONG) * COS(LAT)
-         COS_HA = (SIN(LAT) - SIN(DEC_APP) * SIN(LAT_OBS_RAD)) /
+         SIN_HA = -SIN(MYLONG) * COS(MYLAT)
+         COS_HA = (SIN(MYLAT) - SIN(DEC_APP) * SIN(LAT_OBS_RAD)) /
      :        COS(LAT_OBS_RAD)
 
          HA = ATAN2( SIN_HA, COS_HA)
          RA_APP = LST - HA
          
-         SIN_ROT = SIN(LONG) * COS(LAT_OBS_RAD)
-         COS_ROT = (SIN(LAT_OBS_RAD) - SIN(DEC_APP) * SIN(LAT)) /
-     :        COS(LAT)
+         SIN_ROT = SIN(MYLONG) * COS(LAT_OBS_RAD)
+         COS_ROT = (SIN(LAT_OBS_RAD) - SIN(DEC_APP) * SIN(MYLAT)) /
+     :        COS(MYLAT)
          
          ROTATION = ATAN2(SIN_ROT, COS_ROT)
 
       ELSE IF (COORD_TYPE .EQ. 'HA') THEN
-         RA_APP = LST - LONG
-         DEC_APP = LAT
+         RA_APP = LST - MYLONG
+         DEC_APP = MYLAT
          ROTATION = 0.0D0
 
       ELSE IF (COORD_TYPE .EQ. 'RD') THEN
-         RA_APP = LONG
-         DEC_APP = LAT
+         RA_APP = MYLONG
+         DEC_APP = MYLAT
          ROTATION = 0.0D0
 
       ELSE IF (COORD_TYPE .EQ. 'PLANET') THEN
          IF (MJD2 .EQ. MJD1) THEN
-            RA_APP = LONG
-            DEC_APP = LAT
+            RA_APP = MYLONG
+            DEC_APP = MYLAT
             ROTATION = 0.0D0
          ELSE
-            RA_APP = LONG + (LONG2 - LONG) * (MJD - MJD1)/ (MJD2 - MJD1)
-            DEC_APP = LAT + (LAT2 - LAT) * (MJD - MJD1) / (MJD2 - MJD1)
+            RA_APP = MYLONG + (LONG2 - MYLONG) * (MJD - MJD1)/ 
+     :           (MJD2 - MJD1)
+            DEC_APP = MYLAT + (LAT2 - MYLAT) * (MJD - MJD1) / 
+     :           (MJD2 - MJD1)
             ROTATION = 0.0D0
          END IF
 
