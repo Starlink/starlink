@@ -126,6 +126,9 @@
 *                        all the output NDFs. (See the LBOUND and UBOUND
 *                        parameters.)
 *        [AUTO]  
+*     TITLE = LITERAL (Read)
+*        Title for the output images.
+*        [Output from TRANNDF]
 *     TRANSFORM = TRN (Read)
 *        If INEXT is FALSE then this parameter specifies the
 *        transformation structure.  This includes the file name and the
@@ -1163,6 +1166,9 @@
 *  Tidy the NDF context.
   960 CONTINUE  
       CALL NDF_END( STATUS )
+
+*  Close down IRH/IRG.
+      CALL IRH_CLOSE( STATUS )
          
 *  Free any remaining transformation resources.
       CALL TRN_CLOSE( STATUS )
