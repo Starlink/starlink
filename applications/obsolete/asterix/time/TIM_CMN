@@ -3,7 +3,7 @@
       INTEGER T_MAXSECT
       PARAMETER (T_MAXSECT=100)
 
-      COMMON /TIM_CMN/ T_NSECT,T_SECTPIX,T_SECTNDC,T_SECTXAX,
+      COMMON /TIM_CMN/ T_FID, T_NSECT,T_SECTPIX,T_SECTNDC,T_SECTXAX,
      :                 T_SCALE,T_NVAL,T_YMIN,T_YMAX,
      :                 T_DPTR,T_VPTR,T_APTR,T_WPTR,T_QPTR,
      :                 T_AAPTR,T_WAPTR,
@@ -17,7 +17,7 @@
      :                 T_MASK
 
       COMMON /TIM_CMN_C/ T_TITLE,T_LABEL,T_UNITS,T_ALABEL,T_AUNITS,
-     :                   T_DEV,T_LOC
+     :                   T_DEV
 
       COMMON /TIM_CMN_D/ T_BASEMJD
 
@@ -44,6 +44,6 @@
       REAL T_ABASE,T_ASCALE,T_AWIDTH
       BYTE T_MASK
       CHARACTER*80 T_TITLE,T_LABEL,T_UNITS,T_ALABEL,T_AUNITS
-      CHARACTER*(DAT__SZLOC) T_LOC
+      INTEGER			T_FID
       CHARACTER*30 T_DEV
 *-
