@@ -6,7 +6,7 @@ INCLUDES = $(INCLTDL)
 
 EXTRA_DIST = acinclude.m4
 
-lib_LTLIBRARIES = libsub.la foo1.la libfoo2.la
+lib_LTLIBRARIES = libsub.la foo1.la libfoo2.la libmlib.la
 
 foo1_la_SOURCES = foo1.c
 foo1_la_LIBADD = $(LIBM) libsub.la
@@ -18,6 +18,11 @@ libfoo2_la_LDFLAGS = -no-undefined -module -export-symbols-regex "libfoo2.*"
 
 libsub_la_SOURCES = sub.c
 libsub_la_LDFLAGS = -no-undefined
+
+libmlib_la_SOURCES = mlib.c
+libmlib_la_LIBADD = @LIBLTDL@ "-dlopen" foo1.la "-dlopen" libfoo2.la
+libmlib_la_LDFLAGS = -no-undefined
+libmlib_la_DEPENDENCIES = @LIBLTDL@ libsub.la foo1.la libfoo2.la
 
 noinst_HEADERS = foo.h
 

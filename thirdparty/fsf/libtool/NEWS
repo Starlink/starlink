@@ -1,6 +1,29 @@
 NEWS - list of user-visible changes between releases of GNU Libtool
 
-New in 1.5: 2002-04-14; CVS version 1.4e, Libtool team:
+New in 1.5.6: 2004-04-11; CVS version 1.5.5a, Libtool team:
+* Installs libltdl files properly in $prefix/share/libtool/libltdl. 1.5.4
+  did not install them at all.
+* libltdl correctly guesses the extension for loadable modules again.
+
+New in 1.5.4: 2004-04-03; CVS version 1.5.3a, Libtool team:
+* Bug fixes.
+
+New in 1.5.2: 2004-01-25; CVS version 1.5.0a, Libtool team:
+* lt_dlrealloc is an official part of the libltdl API.
+* --tag, --silent and --debug options are preserved and reused when libtool
+  calls itself for relinking etc.
+* `-pthread' and similar options are honoured when linking shared libraries.
+* -no-suppress in compile mode shows compiler output for both PIC and non-PIC
+  object compilation.
+* New link mode option `-precious-files-regex' to prevent accidental removal
+  of files you want to keep, such as test coverage data, from the temporary
+  output directory.
+* Directories specified in /etc/ld.so.conf are no longer hardcoded on Linux.
+* Recognises the 'R' symbol type on Solaris so read-only symbols can be
+  exported.
+* Bug fixes.
+
+New in 1.5: 2003-04-14; CVS version 1.4e, Libtool team:
 * First stable release of multi-language architecture.
 * libtool and libltdl support for Mac OS/X.
 * libltdl will now use cygwins dlopen API instead of always forcing
@@ -8,6 +31,13 @@ New in 1.5: 2002-04-14; CVS version 1.4e, Libtool team:
 * Support auto-import patch to binutils on cygwin for much improved dll
   support.
 * Bug fixes.
+
+New in 1.4.3: 2002-10-13; CVS version 1.4.2a, Robert Boehne:
+* The libltdl subdirectory now bootstraps correctly with Automake 1.5.
+* srcdir != builddir builds with Automake 1.5 work correctly.
+* Support for mips-compaq-nonstopux.
+* New command line argument, --preserve-dup-deps prevents removal of
+  duplicate dependent libraries.
 
 New in 1.4d: 2002-01-07; CVS version 1.4c, Libtool team:
 * Help strings display correctly again.
@@ -25,6 +55,22 @@ New in 1.4d: 2002-01-07; CVS version 1.4c, Libtool team:
 * Bug fixes to the OpenBSD port.
 * Bug fixes.
 
+New in 1.4.2: 2001-09-11; CVS version 1.4.1a, Gary V. Vaughan:
+* libltdl now builds on solaris again
+* diagnose and warn about not-quite-working combinations of gcc and
+  ld on solaris.
+* Improved OpenBSD support.
+* Improved cygwin support.
+* Bugfixes.
+
+New in 1.4.1: 2001-09-03; CVS version 1.4.0a, Libtool team:
+* Better error messages from libltdl when loading fails.
+* Don't leave here-doc files behind.
+* Improved support for OpenBSD.
+* Libtool will build with autoconf-2.50 and higher.
+* Plug memory management bugs in libltdl.
+* Prefer shl_load to dlopen for better operation on HP-UX.
+
 New in 1.4b: 2001-07-09; CVS version 1.4a, Libtool team:
 * Now bootstraps with autoconf-2.50 and automake-1.4-p4.
 * Always try to build at least a static lib, even if both static and
@@ -37,9 +83,6 @@ New in 1.4b: 2001-07-09; CVS version 1.4a, Libtool team:
 * Internal mutex handling no longer has namespace clashes on NCR MP-RAS.
 * New pdemo and tagdemo tests.
 * Bug fixes.
-
-New in 1.4.1: 2001-??-??; CVS version 1.4.0a, Libtool team:
-* Don't leave here-doc files behind.
 
 New in 1.4: 2001-04-25; CVS version 1.3e, Libtool team:
 * Support for aix5*.

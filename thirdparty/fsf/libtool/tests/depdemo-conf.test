@@ -25,7 +25,7 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../depdemo (prefix=$prefix)"
-${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix --build=$host || exit 1
 
 if grep '^build_old_libs=yes' libtool > /dev/null &&
    grep '^build_libtool_libs=yes' libtool > /dev/null; then :

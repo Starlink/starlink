@@ -25,7 +25,7 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../depdemo (prefix=$prefix) with --disable-shared"
-${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix --disable-shared || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix --build=$host --disable-shared || exit 1
 
 if grep '^build_old_libs=yes' libtool > /dev/null &&
    grep '^build_libtool_libs=no' libtool > /dev/null; then :

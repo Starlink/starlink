@@ -25,7 +25,7 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../depdemo (prefix=$prefix) with --disable-static"
-${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix --disable-static || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../depdemo/configure --srcdir=$srcdir/../depdemo --prefix=$prefix --build=$host --disable-static || exit 1
 
 if grep '^build_old_libs=no' libtool > /dev/null &&
    grep '^build_libtool_libs=yes' libtool > /dev/null; then :

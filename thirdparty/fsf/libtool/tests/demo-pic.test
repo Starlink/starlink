@@ -25,6 +25,6 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../demo (prefix=$prefix) with --with-pic"
-${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --with-pic=yes || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --build=$host --with-pic=yes || exit 1
 
 exit 0

@@ -10,6 +10,14 @@ if test -z "$srcdir"; then
 fi
 . $srcdir/defs || exit 1
 
+# This doesn't work on hppa
+HOST=`../config.guess`
+case "$HOST" in
+hppa*)
+        echo "Not running on hppa, it doesn't like non-PIC shared libs" 2>&1
+        exit 77
+esac
+
 # Maybe we have a VPATH build, in which case, create a new subdir.
 test -d ../demo || mkdir ../demo
 
@@ -25,6 +33,6 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../demo (prefix=$prefix) with --without-pic"
-${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --with-pic=no || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --build=$host --with-pic=no || exit 1
 
 exit 0

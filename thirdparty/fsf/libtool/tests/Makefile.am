@@ -43,7 +43,10 @@ COMMON_TESTS = \
 	mdemo-inst.test mdemo-unst.test \
 	assign.test link.test link-2.test nomode.test \
 	quote.test sh.test suffix.test pdemo-conf.test \
-	pdemo-make.test pdemo-exec.test pdemo-inst.test
+	pdemo-make.test pdemo-exec.test pdemo-inst.test \
+	mdemo-conf.test mdemo-make.test mdemo2-conf.test \
+	mdemo2-make.test mdemo2-exec.test
+
 
 if HAVE_CXX
 if HAVE_F77

@@ -25,7 +25,7 @@ rm -f config.cache
 
 # Configure the demonstration.
 echo "= Configuring in ../demo (prefix=$prefix)"
-${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --enable-fast-install=no || exit 1
+${CONFIG_SHELL-/bin/sh} $srcdir/../demo/configure --srcdir=$srcdir/../demo --prefix=$prefix --build=$host --enable-fast-install=no || exit 1
 
 if grep '^hardcode_action=relink' libtool > /dev/null; then
   rm -f Makefile && exit 77

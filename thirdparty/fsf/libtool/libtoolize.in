@@ -330,6 +330,7 @@ fi
 # Change to the auxiliary directory.
 if test "$auxdir" != .; then
   test -z "$automake" && echo "Putting files in AC_CONFIG_AUX_DIR, \`$auxdir'."
+  test "x$dry_run" = x"yes" && echo "cd $auxdir"
   cd $auxdir || exit 1
 fi
 

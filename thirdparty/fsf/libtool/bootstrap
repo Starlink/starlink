@@ -3,7 +3,7 @@
 # helps bootstrapping libtool, when checked out from CVS
 # requires at least GNU autoconf 2.50 and GNU automake1.4-p5
 
-find . \( -name autom4te.cache -o -name libtool \) -exec rm -r {} \;
+rm -rf `find . -path './{arch}' -prune -o \( -name autom4te.cache -o -name libtool \) -print`
 
 : ${ACLOCAL=aclocal}
 : ${AUTOMAKE=automake}
@@ -15,7 +15,7 @@ touch ltmain.sh
 touch libtoolize
 (cd libltdl && touch ltmain.sh)
 
-for sub in . libltdl cdemo demo depdemo mdemo pdemo tagdemo f77demo; do
+for sub in . libltdl cdemo demo depdemo mdemo mdemo2 pdemo tagdemo f77demo; do
   case $sub in
   .) 
     top_srcdir=.

@@ -47,27 +47,27 @@ mv $objdir/libtool.new libtool
 $make main.$OBJEXT || exit 1
 
 echo "= Making object files in ../mdemo (dry run)"
-ls -l . $objdir > $before
+ls -l . $objdir | grep -v total > $before
 force_dry_run=yes $make foo1.lo foo2.lo sub.lo || exit $?
-ls -l . $objdir > $after
+ls -l . $objdir | grep -v total > $after
 cmp $before $after > /dev/null || exit 1
 # Now really make them
 echo "= Making object files in ../mdemo"
 $make foo1.lo foo2.lo libsub.la || exit 1
 
 echo "= Making libraries in ../mdemo (dry run)"
-ls -l . $objdir > $before
+ls -l . $objdir | grep -v total > $before
 force_dry_run=yes $make foo1.la libfoo2.la || exit $?
-ls -l . $objdir > $after
+ls -l . $objdir | grep -v total > $after
 cmp $before $after > /dev/null || exit 1
 # Now really make them
 echo "= Making libraries in ../mdemo"
 $make foo1.la libfoo2.la || exit 1
 
 echo "= Making programs in ../mdemo (dry run)"
-ls -l . $objdir > $before
+ls -l . $objdir | grep -v total > $before
 force_dry_run=yes $make mdemo$EXEEXT mdemo_static$EXEEXT 1>&2 || exit $?
-ls -l . $objdir > $after
+ls -l . $objdir | grep -v total > $after
 cmp $before $after > /dev/null || exit 1
 # Now really make them
 echo "= Making programs in ../mdemo"
@@ -77,11 +77,11 @@ echo "= Running $make install in ../mdemo (dry run)"
 # Libtool does not create these directories
 mkdir $prefix/bin
 mkdir $prefix/lib
-ls -l . $objdir > $before
-ls -lR $prefix >> $before
+ls -l . $objdir | grep -v total > $before
+ls -lR $prefix | grep -v total >> $before
 force_dry_run=yes $make install 1>&2 || exit 1
-ls -l . $objdir > $after
-ls -lR $prefix >> $after
+ls -l . $objdir | grep -v total > $after
+ls -lR $prefix | grep -v total >> $after
 cmp $before $after > /dev/null || exit 1
 # Now really run it
 echo "= Running $make install in ../mdemo"
@@ -90,11 +90,11 @@ $make install || exit 1
 echo "= Running $make uninstall in ../mdemo (dry run)"
 # Libtool does not uninstall the programs, remove them first
 rm -f $prefix/bin/mdemo$EXEEXT $prefix/bin/mdemo_static$EXEEXT
-ls -l . $objdir > $before
-ls -lR $prefix >> $before
+ls -l . $objdir | grep -v total > $before
+ls -lR $prefix | grep -v total >> $before
 force_dry_run=yes $make uninstall 1>&2 || exit $?
-ls -l . $objdir > $after
-ls -lR $prefix >> $after
+ls -l . $objdir | grep -v total > $after
+ls -lR $prefix | grep -v total >> $after
 cmp $before $after > /dev/null || exit 1
 # Now really run it
 echo "= Running $make uninstall in ../mdemo"

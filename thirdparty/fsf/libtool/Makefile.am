@@ -21,9 +21,10 @@ EXTRA_DIST = $(aclocal_macros) bootstrap libtoolize.in ltmain.in \
 	mkstamp ChangeLog.0 ChangeLog.1
 CLEANFILES = libtool libtoolize ltmain.shT
 
-# These are required by libtoolize.
-pkgdata_SCRIPTS = config.guess config.sub
-pkgdata_DATA = ltmain.sh
+# These are required by libtoolize and must be executable when installed.
+# Since _SCRIPTS gets the program transform applied we make them
+# executable by hand
+pkgdata_DATA = config.guess config.sub ltmain.sh
 
 # This macro file should be visible to Automake's aclocal.
 aclocal_DATA = $(aclocal_macros)
@@ -47,18 +48,6 @@ $(srcdir)/ltmain.sh: $(srcdir)/ltmain.in $(TSDEPS)
 	mv -f ltmain.shT $@ || \
 	(rm -f $@ && cp ltmain.shT $@ && rm -f ltmain.shT)
 	cp $@ $(srcdir)/libltdl/
-
-# TSDEPS will be defined to TSDEPS_DIST at `make dist' time
-TSDEPS =
-TSDEPS_DIST = ChangeLog libtool.m4
-CVS = cvs # set it to `:' to avoid CVS operations
-
-.PHONY: timestamps update-timestamps
-timestamps distdir: update-timestamps
-update-timestamps:
-	@if (cd $(srcdir) && test -d CVS && \
-	    $(CVS) -n update $(TSDEPS_DIST) | grep '^M'); then \
-		echo "Cannot make dist before commit"; exit 1; else :; fi
 
 # All our rules should depend on these demo files.
 all-recursive: $(srcdir)/libltdl/acinclude.m4 $(ACINCLUDE_M4_LIST)
@@ -84,34 +73,200 @@ configure-subdirs distdir: $(DIST_MAKEFILE_LIST)
 # Create and install libltdl
 install-data-hook:
 	cd libltdl && $(MAKE) local-install-files
+	chmod +x $(DESTDIR)$(pkgdatadir)/config.guess
+	chmod +x $(DESTDIR)$(pkgdatadir)/config.sub
 
 # Uninstall libltdl
 uninstall-local:
 	-rm -rf $(DESTDIR)$(pkgdatadir)/libltdl
 
-################################################################
-##
-## Everything past here is useful to the maintainer, but probably not
-## to anybody else (snarfed from automake/Makefile.am).
-##
 
-# Tag before making distribution.  Also, don't make a distribution if
-# checks fail.  Also, make sure the NEWS file is up-to-date.
-cvs-dist: distcheck
-	@if sed '1,2d;3q' $(srcdir)/NEWS | grep -e "$(VERSION)" > /dev/null; then :; else \
+## ---------------------------------------------------------------- ##
+##  Everything past here is useful to the maintainer, but probably  ##
+##  not to anybody else (inspiration from automake/Makefile.am).    ##
+## ---------------------------------------------------------------- ##
+
+TEXI2HTML = texi2html
+
+.PHONY: cvs-release
+cvs-release: version-check prev-tarball cvs-news fetch cvs-commit cvs-dist deltas web-manual
+	@tarname="$(PACKAGE)-$(VERSION).tar.gz"; \
+	diffname="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).diff.gz"; \
+	xdeltaname="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).xdelta"; \
+	echo " *** Upload $$tarname, $$tarname.sig,";\
+	echo " *** $$tarname.directive.asc, $$diffname,"; \
+	echo " *** $$diffname.sig, $$diffname.directive.asc,"; \
+	echo " *** $$xdeltaname, $$xdeltaname.sig and";\
+	echo " *** $$xdeltaname.directive.asc to either"
+	echo " *** /incoming/alpha or /incoming/ftp on ftp-upload.gnu.org."
+	echo " *** You might need to upload manual.html to webcvs/libtool."
+
+.PHONY: version-check
+version-check:
+	@case $(VERSION) in \
+	*[acegikmoqsuwy]) \
+	  echo "Version \`$(VERSION)' is not a releasable version, please read:"; \
+	  echo "    http://www.gnu.org/software/libtool/contribute.html"; \
+	  exit 1; \
+	  ;; \
+	esac
+
+.PHONY: prev-tarball
+prev-tarball:
+## Make sure we have the previous release tarball in the tree.
+	@if test -z "$(LASTRELEASE)"; \
+		then echo "LASTRELEASE is not set"; exit 1; fi
+	@ofile="$(PACKAGE)-$(LASTRELEASE).tar.gz"; \
+	if test -f $$ofile; then :; \
+	else echo "Cannot make deltas without $$ofile"; exit 1; fi
+
+# TSDEPS will be defined to TSDEPS_DIST at `make dist' time
+TSDEPS =
+TSDEPS_DIST = ChangeLog libtool.m4
+CVS = cvs # set it to `:' to avoid CVS operations
+
+.PHONY: timestamps update-timestamps
+timestamps: update-timestamps
+update-timestamps:
+	@if (cd $(srcdir) && test -d CVS && \
+	    $(CVS) -n update $(TSDEPS_DIST) | grep '^M'); then \
+		echo "Cannot make cvs-dist before commit"; exit 1; else :; fi
+
+
+.PHONY: cvs-news
+cvs-news:
+## Make sure the NEWS file is up-to-date:
+	@if sed '1,2d;3q' $(srcdir)/NEWS | grep -e "$(VERSION)" >/dev/null; \
+	then :; \
+	else \
 	  echo "NEWS not updated; not releasing" 1>&2; \
-	  exit 1;				\
+	  exit 1; \
 	fi
-	cd $(srcdir) && \
-	 $(CVS) -q tag `echo "release-$(VERSION)" | sed 's/\./-/g'`
-	$(MAKE) dist
 
-cvs-diff:
-	thisver=`echo "release-$(VERSION)" | sed 's/\./-/g'`; \
-	if test -z "$$OLDVERSION"; then \
-	  prevno=`echo "$(VERSION)" - 0.01 | bc | sed 's/^\./0./'`; \
-	else prevno="$$OLDVERSION"; fi; \
-	prevver=release-`echo $$prevno | sed 's/\./-/g'`; \
-	$(CVS) -f rdiff -c -r $$prevver -r $$thisver $(PACKAGE) \
-	    | GZIP=$(GZIP_ENV) gzip -c \
-	    > $(PACKAGE)-$$prevno-$(VERSION).diff.gz
+## Program to use to fetch files.
+WGET = wget
+WGETSGO = $(WGET) http://savannah.gnu.org/cgi-bin/viewcvs/~checkout~
+
+## Files that we fetch and which we compare against.
+## FIXME should be a lot more here
+FETCHFILES = \
+./INSTALL \
+./config.guess \
+libltdl/config.guess \
+./config.sub \
+libltdl/config.sub \
+doc/texinfo.tex
+
+## Fetch the latest versions of files we care about.
+.PHONY: fetch
+fetch:
+	rm -rf Fetchdir > /dev/null 2>&1
+	mkdir Fetchdir
+## If a get fails then that is a problem.
+	(cd Fetchdir && \
+	$(WGETSGO)/autoconf/autoconf/INSTALL; \
+	$(WGETSGO)/config/config/config.guess; \
+	$(WGETSGO)/config/config/config.sub; \
+	$(WGETSGO)/texinfo/texinfo/doc/texinfo.tex )
+## Don't exit after test because we want to give as many errors as
+## possible.
+	@stat=0; for file in $(FETCHFILES); do \
+	  fetchedfile=Fetchdir/`echo $$file | sed 's,.*/,,g'`; \
+	  if diff -u $(srcdir)/$$file $$fetchedfile \
+	    >>Fetchdir/update.patch 2>/dev/null; then :; \
+	  else \
+	    stat=1; \
+	    echo "Updating $(srcdir)/$$file..."; \
+	    cp $$fetchedfile $(srcdir)/$$file; \
+	  fi; \
+	done; \
+	test $$stat = 1 && \
+	  echo "See Fetchdir/update.patch for a log of the changes."; \
+	exit $$stat
+
+
+GPG = gpg # set it to `:' to avoid gpg operations
+
+.PHONY: cvs-commit
+cvs-commit: cvs-news
+	cd $(srcdir) && $(SHELL) ./commit
+
+.PHONY: cvs-dist
+cvs-dist: cvs-news timestamps
+## Build the distribution:
+	$(MAKE) distcheck
+## Finally, if everything was successful, tag the release
+	cd $(srcdir) \
+	  && $(CVS) -q tag -c `echo "release-$(VERSION)" | sed 's/\./-/g'`
+## Generate signatures and directives for FSF ftp-upload:
+	ofile="$(PACKAGE)-$(VERSION).tar.gz"; \
+	$(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+
+.PHONY: new-tarball
+new-tarball:
+## Make sure we have the new release tarball in the tree.
+	@ofile="$(PACKAGE)-$(VERSION).tar.gz"; \
+	if test -f $$ofile; then :; \
+	else echo "Cannot make deltas without $$ofile"; exit 1; fi
+
+.PHONY: got-xdelta
+got-xdelta:
+## Make sure xdelta exists;
+	@if ($(XDELTA) --version 2>&1 | grep version)>/dev/null 2>/dev/null; \
+	then :;\
+	else \
+	  echo "Get xdelta from http://sourceforge.net/projects/xdelta."; \
+	  exit 1; \
+	fi
+
+.PHONY: deltas
+deltas: delta-diff delta-xdelta
+
+DIFF = diff
+DIFF_OPTIONS = -ruNp
+
+.PHONY: delta-diff
+delta-diff: prev-tarball new-tarball
+## Unpack the tarballs somewhere to diff them
+	rm -rf delta-diff
+	mkdir delta-diff
+	ofile="../$(PACKAGE)-$(LASTRELEASE)-$(VERSION).diff.gz"; \
+	cd delta-diff \
+	&& tar xzf "../$(PACKAGE)-$(LASTRELEASE).tar.gz" \
+	&& tar xzf "../$(PACKAGE)-$(VERSION).tar.gz" \
+	&& $(DIFF) $(DIFF_OPTIONS) \
+		$(PACKAGE)-$(LASTRELEASE) $(PACKAGE)-$(VERSION) \
+		| GZIP=$(GZIP_ENV) gzip -c > $$ofile \
+	&& $(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+	rm -rf delta-diff
+
+XDELTA = xdelta
+XDELTA_OPTIONS = --pristine -9
+
+.PHONY: delta-xdelta
+delta-xdelta: prev-tarball new-tarball got-xdelta
+## Generate the delta file (xdelta has wierd exit statuses, so we need to
+## add some shell code to keep make happy), and then generate the signatures
+## for FSF ftp-upload:
+	ofile="$(PACKAGE)-$(LASTRELEASE)-$(VERSION).xdelta"; \
+	( test -z `$(XDELTA) delta $(XDELTA_OPTIONS) \
+	    $(PACKAGE)-$(LASTRELEASE).tar.gz $(PACKAGE)-$(VERSION).tar.gz \
+	    $$ofile 2>&1` \
+	  && : ) \
+	&& $(GPG) --detach-sign $$ofile \
+	&& echo "directory: libtool" > $$ofile.directive \
+	&& $(GPG) --clearsign $$ofile.directive \
+	&& rm -f $$ofile.directive
+
+.PHONY: web-manual
+web-manual:
+	@$(LN_S) $(top_srcdir)/doc/libtool.texi doc/manual.texi
+	$(TEXI2HTML) -I doc -monolithic -number -verbose doc/manual.texi
+	@mv doc/manual.html manual.html
+	@rm -f doc/manual.texi
