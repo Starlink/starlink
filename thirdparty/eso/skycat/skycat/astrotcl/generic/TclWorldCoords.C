@@ -18,7 +18,7 @@ static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.2 1998/01/29 22:2
 #include <stdio.h>
 #include <iostream.h>
 #include <stdlib.h>
-#include <strstream.h>
+#include <strstream>
 #include "WorldCoords.h"
 #include "TclWorldCoords.h"
 
@@ -107,7 +107,7 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
     if (wcs.status() != 0)
 	return TCL_ERROR;
     char buf[32];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << wcs << ends;
     return set_result(buf);
 }
@@ -119,7 +119,7 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
 int TclWorldCoords::set_hms_result(const HMS& hms)
 {
     char buf[32];
-    ostrstream os(buf, sizeof(buf));
+    std::ostrstream os(buf, sizeof(buf));
     os << hms << ends;
     return set_result(buf);
 }
