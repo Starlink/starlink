@@ -618,48 +618,57 @@
          IF( GOTANA ) ANA = ANLANG
          IF( GOTSTO ) STO = STOKES 
 
-*  Store the values in the NDF. First do Stokes vector cubes.
-         IF( STO .NE. ' ' ) THEN
-            CALL POL1_PTANG( ANG, IWCS, STATUS )
-
-            IF( FILT .NE. ' ' ) THEN
-               CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
-            END IF
-
-            CALL NDF_XPT0C( STO( : CHR_LEN( STO ) ), INDF, 'POLPACK', 
-     :                      'STOKES', STATUS )
+*  If any changes are to made, store the values in the NDF. First do 
+*  Stokes vector cubes.
+         IF( .NOT. RDONLY ) THEN 
+            IF( STO .NE. ' ' ) THEN
+               CALL POL1_PTANG( ANG, IWCS, STATUS )
+   
+               IF( FILT .NE. ' ' ) THEN
+                  CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', 
+     :                            STATUS )
+               END IF
+   
+               CALL NDF_XPT0C( STO( : CHR_LEN( STO ) ), INDF, 'POLPACK', 
+     :                         'STOKES', STATUS )
 
 *  Now do intensity images. 
-         ELSE
+            ELSE
+   
+               CALL POL1_PTANG( ANG, IWCS, STATUS )
+   
+               IF( FILT .NE. ' ' ) THEN
+                  CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', 
+     :                            STATUS )
+               END IF
+   
+               IF( IMG .NE. ' ' ) THEN
+                  CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', 
+     :                            STATUS )
+               END IF
+   
+               IF( WPL .NE. VAL__BADR ) THEN
+                  CALL NDF_XPT0R( WPL, INDF, 'POLPACK', 'WPLATE', 
+     :                            STATUS )
+               END IF
+   
+               IF( RY .NE. ' ' ) THEN
+                  CALL NDF_XPT0C( RY, INDF, 'POLPACK', 'RAY', STATUS )
+               END IF
+   
+               IF( ANA .NE. VAL__BADR ) THEN
+                  CALL NDF_XPT0R( ANA, INDF, 'POLPACK', 'ANLANG', 
+     :                            STATUS )
+               END IF
+   
+               IF( T0 .NE. VAL__BADR ) THEN
+                  CALL NDF_XPT0R( T0, INDF, 'POLPACK', 'T', STATUS )
+               END IF
+   
+               IF( EPS0 .NE. VAL__BADR ) THEN
+                  CALL NDF_XPT0R( EPS0, INDF, 'POLPACK', 'EPS', STATUS )
+               END IF
 
-            CALL POL1_PTANG( ANG, IWCS, STATUS )
-
-            IF( FILT .NE. ' ' ) THEN
-               CALL NDF_XPT0C( FILT, INDF, 'POLPACK', 'FILTER', STATUS )
-            END IF
-
-            IF( IMG .NE. ' ' ) THEN
-               CALL NDF_XPT0C( IMG, INDF, 'POLPACK', 'IMGID', STATUS )
-            END IF
-
-            IF( WPL .NE. VAL__BADR ) THEN
-               CALL NDF_XPT0R( WPL, INDF, 'POLPACK', 'WPLATE', STATUS )
-            END IF
-
-            IF( RY .NE. ' ' ) THEN
-               CALL NDF_XPT0C( RY, INDF, 'POLPACK', 'RAY', STATUS )
-            END IF
-
-            IF( ANA .NE. VAL__BADR ) THEN
-               CALL NDF_XPT0R( ANA, INDF, 'POLPACK', 'ANLANG', STATUS )
-            END IF
-
-            IF( T0 .NE. VAL__BADR ) THEN
-               CALL NDF_XPT0R( T0, INDF, 'POLPACK', 'T', STATUS )
-            END IF
-
-            IF( EPS0 .NE. VAL__BADR ) THEN
-               CALL NDF_XPT0R( EPS0, INDF, 'POLPACK', 'EPS', STATUS )
             END IF
 
          END IF
@@ -684,7 +693,8 @@
          CALL NDF_XLOC( INDF, 'POLPACK', 'READ', POLLOC, STATUS )
 
 *  Check the values in the POLPACK extension are usable.
-         CALL POL1_CHKEX( INDF, POLLOC, IGRP4, .TRUE., STATUS )
+         IF( .NOT. RDONLY) CALL POL1_CHKEX( INDF, POLLOC, IGRP4, 
+     :                                      .TRUE., STATUS )
 
 *  If required, display the contents of the POLPACK extension. 
          IF( .NOT. QUIET ) THEN
@@ -758,7 +768,7 @@
          CALL DAT_ANNUL( POLLOC, STATUS )
 
 *  Store the new WCS FrameSet.
-         CALL NDF_PTWCS( IWCS, INDF, STATUS )
+         IF( .NOT. RDONLY ) CALL NDF_PTWCS( IWCS, INDF, STATUS )
 
 *  Annul the pointer to the WCS FrameSet.
          CALL AST_ANNUL( IWCS, STATUS )
@@ -767,10 +777,14 @@
 *  created, flush the error, and continue to process the next NDF.
          IF ( STATUS .NE. SAI__OK ) THEN
 
-            CALL ERR_BEGIN( STATUS )
-            IF( .NOT. GOTPOL ) CALL NDF_XDEL( INDF, 'POLPACK', STATUS )
-            IF( .NOT. GOTCCD ) CALL NDF_XDEL( INDF, 'CCDPACK', STATUS )
-            CALL ERR_END( STATUS )
+            IF( .NOT. RDONLY ) THEN
+               CALL ERR_BEGIN( STATUS )
+               IF( .NOT. GOTPOL ) CALL NDF_XDEL( INDF, 'POLPACK', 
+     :                                           STATUS )
+               IF( .NOT. GOTCCD ) CALL NDF_XDEL( INDF, 'CCDPACK', 
+     :                                           STATUS )
+               CALL ERR_END( STATUS )
+            END IF
 
             CALL ERR_FLUSH( STATUS )
 
