@@ -31,7 +31,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER                 STATUS

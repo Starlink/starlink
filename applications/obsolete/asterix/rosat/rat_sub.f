@@ -2271,7 +2271,7 @@ C - CONVERT TIME FORMATS
 *    Status :
       INTEGER STATUS
 *    Structures :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
@@ -2559,7 +2559,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *    Structure definitions :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD            ! HEADER values
@@ -2886,7 +2886,7 @@ C      ENDIF
 *    Status :
       INTEGER STATUS
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_SCFDEF/ SRT,BSRT                ! Sort control structures
@@ -3055,7 +3055,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_XRTSRT)'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /XRT_HEAD/ HEAD                      ! Header values
