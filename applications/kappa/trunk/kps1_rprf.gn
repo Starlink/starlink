@@ -1,10 +1,12 @@
-      SUBROUTINE KPS_$RDPRF<T>( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA,
-     :                          RANGE, POS, NXY, WT, PNCLER, PNDEV,
-     :                          PNXSIZ, PNYSIZ, PNMINT, PNMAJT, PNOUTT,
-     :                          COMMNT, FWHM, GAMMA, STATUS )
+      SUBROUTINE KPS_$RPRF<T>( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA,
+     :                         RANGE, POS, NXY, WT, RSCALE, RSCL2,
+     :                         NBIN1, NBIN2, BINPTS, DMODE, R, LSTART,
+     :                         NPTS, DATA, IADR, NXTADR, PROFIL,
+     :                         PROFR, PROFWT, FWHM, AMP, BACK, SIGMA,
+     :                         GAMMA, STATUS )
 *+
 *  Name:
-*     KPS_$RDPRFx
+*     KPS_$RPRFx
 
 *  Purpose:
 *     Fits a radial profile to a set of star images.
@@ -13,20 +15,17 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS_$RDPRFx( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA, RANGE,
-*    :                  POS, NXY, WT, PNCLER, PNDEV, PNXSIZ, PNYSIZ,
-*    :                  PNMINT, PNMAJT, PNOUTT, COMMNT, FWHM, GAMMA,
-*    :                  STATUS )
+*     CALL KPS_$RPRFx( ARRAY, DIM1, DIM2, SIG0, AXISR, THETA, RANGE,
+*                      POS, NXY, WT, RSCALE, RSCL2, NBIN1, NBIN2,
+*                      BINPTS, DMODE, R, LSTART, NPTS, DATA, IADR,
+*                      NXTADR, PROFIL, PROFR, PROFWT, FWHM, AMP, BACK,
+*                      SIGMA, GAMMA, STATUS )
 
 *  Description:
 *     This routine combines the profiles of a number of stars whose
 *     individual centroids are known, as well as the mean shape, sigma
 *     and orientation for the entire sample.  It derives the two
 *     parameters that define a Gaussian fit to the set of star images.
-
-*     Optionally, the results can be displayed graphically.  This 
-*     comprises the mean profile at each bin with its associated error
-*     bar, and the smooth fit to those data.
 
 *  Arguments:
 *     ARRAY( DIM1, DIM2 ) = ? (Given)
@@ -52,50 +51,61 @@
 *        The number of stars to be fitted.
 *     WT( NXY ) = REAL (Given)
 *        The accurate star-centre y positions.
-*     SIG( NXY ) = REAL (Given)
-*        Star-present flag; positive for the stars to be used, and zero
-*        for those to be omitted.
-*     PNCLER = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to see if the
-*        user wishes the display to be cleared.
-*     PNDEV = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be associated with
-*        a graphics workstation.
-*     PNXSIZ = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
-*        required x extent of the FRAME picture in metres.
-*     PNYSIZ = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
-*        required y extent of the FRAME picture in metres.
-*     PNMINT = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
-*        numbers of minor tick marks per major tick. 
-*     PNMAJT = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to get the 
-*        numbers of major tick marks.
-*     PNOUTT = CHARACTER * ( * ) (Given)
-*        The name of an ADAM parameter which will be used to determine
-*        whether the ticks should appear inside or outside the grid
-*        region of the plot.
-*     COMMNT = CHARACTER * ( * ) (Given)
-*        A comment to store in the AGI database with the FRAME and
-*        DATA pictures.
+*     RSCALE = REAL (Given)
+*        The scale factor for converting radial distance into bins
+*        for individual point-spread functions.
+*     RSCL2 = REAL (Given)
+*        The scale factor for converting radial distance into bins
+*        for the mean point-spread functions.
+*     NBIN1 = INTEGER (Given)
+*        The number of bins for an individual point-spread function.
+*     NBIN2 = INTEGER (Given)
+*        The number of bins for the mean point-spread function.
+*     BINPTS = INTEGER (Given)
+*        The number of pixels in the outermost radial bin.
+*     DMODE( NBIN1 ) = REAL (Returned)
+*        Workspace for the mode for each radial bin.
+*     R( NBIN1 ) = REAL (Returned)
+*        Workspace for the mean radii for each bin.
+*     LSTART( NBIN1 ) = INTEGER (Returned)
+*        Workspace for the linked-list starts for each bin.
+*     NPTS( NBIN1 ) = INTEGER (Returned)
+*        Workspace for the number of pixels in each bin.
+*     DATA( BINPTS ) = ? (Returned)
+*        Work array to hold the pixels of a radial bin.
+*     IADR( BINPTS ) = INTEGER (Returned)
+*        Work array to hold a link-list of pixel indices.
+*     NXTADR( BINPTS ) = INTEGER (Returned)
+*        Work array to hold a next pixel indices in a linked list.
+*     PROFIL( NBIN2 ) = REAL (Returned)
+*        The mean-profile value in each bin.
+*     PROFR( NBIN2 ) = REAL (Returned)
+*        The mean-profile radius in each bin
+*     PROFWT( NBIN2 ) = REAL (Returned)
+*        The weights of the mean profile in each bin.
 *     FWHM = REAL (Returned)
 *        An estimate of the full width at half maximum across the minor
 *        axis of a star image.
+*     AMP = REAL (Returned)
+*        The Gaussian amplitude of the fitted mean point-spread
+*        function.
+*     BACK = REAL (Returned)
+*        The background level of the mean point-spread function.
+*     SIGMA = REAL (Returned)
+*        The Gaussian width (sigma) of the fitted mean point-spread
+*        function across the minor axis.
 *     GAMMA = REAL (Returned)
-*        Star radial-profile parameter.
+*        Star radial-profile parameter, gamma, of the fitted mean
+*        point-spread function.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
 *  Notes:
 *     -  There is a routine for each numeric data type: replace "x" in
 *     the routine name by D, R, I, W, UW, B, UB as appropriate.  The
-*     array supplied to the routine must have the data type specified.
-*     -  If graphics are selected two pictures are stored in the 
-*     graphics database: a FRAME picture of the requested size, and a
-*     DATA picture for the grid, with radius and profile world
-*     co-ordinates.
+*     arrays ARRAY and DATA supplied to the routine must have the data
+*     type specified.
+*     -  This is a server routine for PSF via KPS_$SPARMx.
 
 *  Algorithm:
 *     -  For each star, put the data into bins representing isophotal
@@ -104,14 +114,9 @@
 *     the contents of each zone using the mode to reject erroneous data.
 *     -  Fit a Gaussian to each binned star and normalise the data to
 *     unit central amplitude.
-*     -  Put the normalised data into a set of bins filled
-*     with data for all stars.  Fit a radial profile to these combined
-*     data.
-*     -  Print the results.  If required, plot the mean profile and the 
-*     fitted function.
-
-*  Notes:
-*     -  This is a server routine for PSF via KPS_$SPARMx.
+*     -  Put the normalised data into a set of bins filled with data
+*     for all stars.  Fit a radial profile to these combined data.
+*     -  Print the results.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
@@ -126,6 +131,11 @@
 *        passed extra arguments for the plotting and graphics database,
 *        a log file, combined x and y positions into a single array,
 *        commented the variables, and converted the prologue.
+*     1991 July 5 (MJC):
+*        Passed arrays from calling routine.  Removed plotting facility,
+*        but returned extra parameters: the mean-profile values,
+*        weights, and radii; the amplitude; Gaussian width; and the
+*        background.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,7 +154,10 @@
 *  Arguments Given:
       INTEGER
      :  DIM1, DIM2,
-     :  NXY
+     :  NXY,
+     :  NBIN1,
+     :  NBIN2,
+     :  BINPTS
 
       <TYPE>
      :  ARRAY( DIM1 * DIM2 )
@@ -157,43 +170,34 @@
      :  POS( 2, NXY ),
      :  WT( NXY )
 
-      CHARACTER * ( * )
-     :  COMMNT,
-     :  PNCLER,
-     :  PNDEV,
-     :  PNXSIZ,
-     :  PNYSIZ,
-     :  PNMINT,
-     :  PNMAJT,
-     :  PNOUTT
-
 *  Arguments Returned:
+      <TYPE>
+     :  DATA( BINPTS )
+
       REAL
+     :  DMODE( 0:NBIN1-1 ),
+     :  R( 0:NBIN1-1 ),
+     :  AMP,
+     :  BACK,
      :  FWHM,
-     :  GAMMA
+     :  GAMMA,
+     :  PROFIL( 0:NBIN2-1 ),
+     :  PROFR( 0:NBIN2-1 ),
+     :  PROFWT( 0:NBIN2-1 ),
+     :  RSCALE,
+     :  RSCL2,
+     :  SIGMA
+
+      INTEGER
+     :  IADR( BINPTS ),
+     :  LSTART( 0:NBIN1-1 ),
+     :  NXTADR( BINPTS ),
+     :  NPTS( 0:NBIN1-1 )
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER MAXRAD             ! Maximum radius in pixels of the
-                                 ! radial profile
-      PARAMETER ( MAXRAD = 50 )
-      INTEGER MAXPTS             ! Maximum number of pixels to be
-                                 ! considered for the radial profile
-      PARAMETER ( MAXPTS = (2 * MAXRAD + 1) ** 2 )
-      REAL RESOL1                ! Resolution (no. of bins per pixel
-                                 ! spacing) for binning the radial
-                                 ! profiles of each star
-      PARAMETER ( RESOL1 = 2.5 )
-      REAL RESOL2                ! Resolution (no. of bins per pixel
-                                 ! spacing) for binning the mean radial
-                                 ! profile
-      PARAMETER ( RESOL2 = 10.0 )
-      INTEGER NBIN1              ! Number of bins for each star
-      PARAMETER ( NBIN1 = MAXRAD * RESOL1 + 1 )
-      INTEGER NBIN2              ! Number of bins for the mean star
-      PARAMETER ( NBIN2 = MAXRAD * RESOL2 + 1 )
       REAL PBAD                  ! Probability that a pixel is corrupt
       PARAMETER ( PBAD = 0.01 )
       INTEGER NITER              ! Maximum number of iterations during
@@ -207,12 +211,7 @@
 
 *  Local Variables:
 
-      <LTYPE>
-     :  DATA( MAXPTS )           ! The pixels of a radial bin
-
       REAL
-     :  AMP,                     ! Gaussian amplitude
-     :  BACK,                    ! Background level
      :  C,                       ! Cosine of the orientation
      :  CONSTA,                  ! Constant for relating distance in
                                  ! elliptical star image to effective
@@ -224,7 +223,6 @@
                                  ! elliptical star image to effective
                                  ! distance along the minor axis
      :  DET,                     ! Determinant
-     :  DMODE( 0:NBIN1 ),        ! The mode of a radial bin
      :  DSIG,                    ! The sigma of a radial bin
      :  DX,                      ! Pixel displacement in x from the star
                                  ! centre
@@ -234,41 +232,24 @@
      :  DXY,                     ! x * y displacement
      :  DY,                      ! Pixel displacement in y from the star
                                  ! centre
-     :  DY2,                     ! y pixel displacement squared
-     :  FUNCT,                   ! Gaussian function at a bin
-     :  FW                       ! Weighted Gaussian function at a bin
+     :  DY2                      ! y pixel displacement squared
 
       REAL
-     :  MAJTIC( 2 ),             ! Parameters controlling the numbers of
-                                 ! major tick marks along x and y axes
-                                 ! respectively
-     :  MINTIC( 2 ),             ! Numbers of minor tick marks along x
-                                 ! and y axes respectively
-     :  PROFIL( 0:NBIN2 ),       ! Mean profile values
-     :  PROFWT( 0:NBIN2 ),       ! Weight of mean profile
-     :  PROFR( 0:NBIN2 ),        ! Mean profile radii
-     :  R( 0:NBIN1 ),            ! Mean radii for each bin
+     :  FUNCT,                   ! Gaussian function at a bin
+     :  FW,                      ! Weighted Gaussian function at a bin
      :  RADIUS,                  ! Current mean profile radius
      :  RAXISR,                  ! Reciprocal minor-axis squared
      :  RDASH,                   ! Effective radius
      :  RLIMIT,                  ! Radius limit in the minor axis
      :  RMAX,                    ! Maximum radius mean profile
-     :  RSCALE,                  ! Scale factor for converting radial
-                                 ! distance into bins (per star)
-     :  RSCL2,                   ! Scale factor for converting radial
-                                 ! distance into bins (mean star)
      :  RSIG,                    ! Reciprocal sigma
-     :  S,                       ! Sine of the orientation
-     :  SIGMA,                   ! Gaussian sigma
-     :  XMAX, YMAX,              ! Maximum x-y values for the plot
-     :  XMIN, YMIN               ! Minimum x-y values for the plot
+     :  S                        ! Sine of the orientation
 
       INTEGER
      :  BIN,                     ! Bin counter for a star
      :  BIN2,                    ! Bin counter for the mean star
      :  I, J,                    ! Loop counters for pixels in the box
                                  ! around a star
-     :  IADR( MAXPTS ),          ! Linked-list pixel indices
      :  ICOUNT,                  ! Number of bin values in DATA
      :  IMIN, IMAX,              ! x pixel indices of region around a
                                  ! star
@@ -279,19 +260,7 @@
      :  I0, J0,                  ! Pixel nearest the star centre
      :  JMIN, JMAX,              ! y pixel indices of region around a
                                  ! star
-     :  LSTART( 0:NBIN1 ),       ! Linked list starts of all pixels in a
-                                 ! given radial bin
-     :  MXBIN1,                  ! Number of bins for each star
-     :  MXBIN2,                  ! Number of bins for mean star
-     :  NDATA,                   ! Number points to plot in the mean
-                                 ! profile
-     :  NXTADR( MAXPTS ),        ! Next pixel indices in the linked list
-     :  NPTS( 0:NBIN1 ),         ! Number of pixels in each bin
-     :  PICID,                   ! Input picture identifier
-     :  PICIDD,                  ! Data-picture identifier
-     :  STAR,                    ! Number of the star
-     :  ZONE                     ! SGS zone associated with the frame
-                                 ! picture
+     :  STAR                     ! Number of the star
 
       DOUBLE PRECISION 
      :  SUMD,                    ! Sum of weighted data values
@@ -302,10 +271,6 @@
 
       CHARACTER
      :  BUFFER * 80              ! Buffer to write results
-
-      LOGICAL                    ! True if:
-     :  OUTTIC                   ! Axis tick marks are to be placed
-                                 ! outside the box instead of inside
 
 *.
 
@@ -326,8 +291,6 @@
 *    Calculate scale factors for converting radial distance to bins.
 
       RSIG = 1.0 / SIG0
-      RSCALE = RESOL1 * 2.0 / MIN( 2.0, SIG0 )
-      RSCL2 = RESOL2 * 2.0 / MIN( 2.0, SIG0 )
 
 *    Find the radius limit in the minor axis direction imposed by
 *    the fitting limit 'range'.
@@ -337,17 +300,11 @@
 *    Find the size of square to be scanned around each star to
 *    accommodate the radial fitting range.
 
-      ISHIFT = MIN( MAX( 1, NINT( RLIMIT * AXISR ) ), MAXRAD )
-
-*    Find the number of bins to be used in binning the radial profiles
-*    of each star and of the mean profile.
-
-      MXBIN1 = MIN( NBIN1, INT( RLIMIT * RSCALE ) )
-      MXBIN2 = MIN( NBIN2, INT( RLIMIT * RSCL2 ) )
+      ISHIFT = MAX( 1, NINT( RLIMIT * AXISR ) )
 
 *    Initialise the arrays to hold the mean radial profile.
 
-      DO BIN = 0, NBIN2
+      DO BIN = 0, NBIN2 - 1
          PROFR( BIN ) = 0.0
          PROFIL( BIN ) = 0.0
          PROFWT( BIN ) = 0.0
@@ -372,7 +329,7 @@
 *          of all the pixels in a given radial bin and to form the mean
 *          radius for each bin.
 
-            DO BIN = 0, MXBIN1
+            DO BIN = 0, NBIN1 - 1
                R( BIN ) = 0.0
                NPTS( BIN ) = 0
                LSTART( BIN ) = 0
@@ -408,7 +365,7 @@
 
                      BIN = RDASH * RSCALE
 
-                     IF ( BIN .LE. MXBIN1 .AND. RDASH .LE. RLIMIT ) THEN
+                     IF ( BIN .LT. NBIN1 .AND. RDASH .LE. RLIMIT ) THEN
 
 *                      Form sums for the effective mean radius.
 
@@ -441,7 +398,7 @@
 
 *          Consider each bin with one or more points in it.
 
-            DO BIN = 0, MXBIN1
+            DO BIN = 0, NBIN1 - 1
 
                IF ( LSTART( BIN ) .GT. 0 ) THEN
 
@@ -500,12 +457,12 @@
 
 *             Insert the star profile into the mean-profile bins.
 
-               DO BIN = 0, MXBIN1
+               DO BIN = 0, NBIN1 - 1
 
                   IF ( LSTART( BIN ) .GT. 0 ) THEN
                      BIN2 = R( BIN ) * RSCL2
 
-                     IF ( BIN2 .LE. MXBIN2 ) THEN
+                     IF ( BIN2 .LE. NBIN2 - 1 ) THEN
 
 *                     Use the number of points and the star amplitude
 *                     as weights during the summations.
@@ -540,7 +497,7 @@
 *    Calculate the mean radial profile and associated radii from the
 *    binned data.
 
-      DO BIN = 0, MXBIN2
+      DO BIN = 0, NBIN2 - 1
 
          IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
             PROFIL( BIN ) = PROFIL( BIN ) / PROFWT( BIN )
@@ -556,8 +513,8 @@
       BACK = 0.0
       GAMMA = 2.0
       SIGMA = SIG0
-      CALL KPS_$PRGFTR( PROFIL, PROFWT, PROFR, MXBIN2 + 1, NITFIT,
-     :                  TOLFIT, AMP, BACK, SIGMA, GAMMA, STATUS )
+      CALL KPS_$PGFTR( PROFIL, PROFWT, PROFR, NBIN2, NITFIT,
+     :                 TOLFIT, AMP, BACK, SIGMA, GAMMA, STATUS )
 
       FWHM = VAL__BADR
 
@@ -568,109 +525,6 @@
 *       Calculate full-width-half-maximum seeing.
 
          FWHM = 2.0 * SIGMA * ( 1.38629 ** ( 1.0 / GAMMA ) )
-
-*       Plotting
-*       ========
-
-*       Start a new error context.
-
-         CALL ERR_MARK
-
-*       Plot an error-bar graph of the data using the NCAR graphics
-*       package.
-
-         CALL NCROPN( PNCLER, PNDEV, PNXSIZ, PNYSIZ, COMMNT,
-     :                PICID, PICIDD, ZONE, STATUS )
-
-*       Get the number of minor ticks.
-
-         CALL AIF_GET1R( 'MINTIC', -1., VAL__MAXR, 2, MINTIC, STATUS )
-
-*       Get the parameter controlling the number of major ticks per
-*       axis.
-
-         CALL AIF_GET1R( 'MAJTIC', -1., VAL__MAXR, 2, MAJTIC, STATUS )
-
-*       Are the tick marks on the outside of the axes?
-
-         CALL AIF_GTDLG( 'OUTTIC', .TRUE., OUTTIC, STATUS )
-
-*       A null return can prevent graphical output.
-
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*           Compress the data arrays to remove empty bins and also find
-*           maximum and minimum values to be plotted in x and y.
-
-            NDATA = -1
-
-            XMAX = VAL__MINR
-            XMIN = VAL__MAXR
-            YMAX = VAL__MINR
-            YMIN = VAL__MAXR
-
-            DO BIN = 0, MXBIN2
-
-               IF ( PROFWT( BIN ) .GT. 0.0 ) THEN
-                  NDATA = NDATA + 1
-                  PROFIL( NDATA ) = PROFIL( BIN ) - BACK
-                  PROFR( NDATA ) = PROFR( BIN )
-                  PROFWT( NDATA ) = 0.0
-
-                  XMAX = MAX( XMAX, PROFR( NDATA ) )
-                  XMIN = MIN( XMIN, PROFR( NDATA ) )
-                  YMAX = MAX( YMAX, PROFIL( NDATA ) + PROFWT( NDATA ) )
-                  YMIN = MIN( YMIN, PROFIL( NDATA ) - PROFWT( NDATA ) )
-               END IF
-
-            END DO
-
-*          Plot the results.
-*          =================
-
-*          First the annotated axes and records the DATA picture.  There
-*          will be major tick marks at the ends of each axis.
-
-            CALL NCRBCK( XMIN, XMAX, YMIN, YMAX, 'Mean Star Profile',
-     :                   'Radial Distance', 'Intensity', MINTIC, MAJTIC,
-     :                   OUTTIC, .TRUE., COMMNT, PICID, PICIDD, STATUS )
-
-*          Plot the profile points and error bars.
-
-            CALL DREBAR( PROFR, PROFIL, PROFWT, NDATA + 1, STATUS )
-
-*          Calculate the fitted profile over the data range.
-
-            RMAX = PROFR( NDATA )
-
-            DO BIN = 0, MXBIN2
-               RADIUS = ( RMAX * BIN ) / MXBIN2
-               PROFR( BIN ) = RADIUS
-               PROFIL( BIN ) = AMP * EXP( - 0.5 * ( ( RADIUS /
-     :                         MAX( 0.001, SIGMA ) ) *  * GAMMA ) )
-            END DO
-
-*          Plot the fitted function.
-
-            CALL AGCURV( PROFR, 1, PROFIL, 1, MXBIN2 + 1, 1 )
-
-*          Close down the database.
-
-
-            CALL AGS_DEACT( STATUS )
-            CALL AGI_ANNUL( PICID, STATUS )
-
-*       Clean up after a null response (meaning no plotting).  We do not
-*       want ! to become the current device.
-
-         ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
-            CALL ERR_ANNUL( STATUS )
-            CALL AGI_CANCL( PNDEV, STATUS )      
-         END IF
-
-*       Release the error context.
-
-         CALL ERR_RLSE
 
       END IF
 
