@@ -96,29 +96,25 @@
           GOTO 999
       ENDIF
 *
-	print *,'getting cal dir...'
 * Set the default for the detector response file
       CALL XRT_CALDEF(CALDIR, STATUS)
-	print *,'got cal dir!'
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Warning: XRT cal directory not found')
          CALL ERR_ANNUL(STATUS)
       ENDIF
 
-	print *,caldir
-	print *,'constructing filename...'
       IF (HRI) THEN
-        RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'hri_drm'
+        CALDIR = CALDIR(1:CHR_LEN(CALDIR)) // 'hri_drm'
       ELSE
-        RFILE = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
+        CALDIR = CALDIR(1:CHR_LEN(CALDIR)) // 'drmpspc'
       ENDIF
-	print *,'done!'
-      CALL USI_DEF0C('RESPFILE', RFILE, STATUS)
-	print *,'prompting...'
+      CALL USI_DEF0C('RESPFILE', CALDIR, STATUS)
 *
+	print *,'getting response file...'
 *   Get detector response matrix name
       CALL USI_GET0C('RESPFILE', RFILE, STATUS)
+	print *,'got it!'
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
