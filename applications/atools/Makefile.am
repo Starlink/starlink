@@ -51,7 +51,7 @@ history.help: atools.news
 	@HLIB@ $<
 
 # Rule for creating various components from the ifd file.
-atools.csh atools.icl atools_mon.ifl $(atools_mon_TASKS:=.ifl): atools.ifd
+atools.csh atools.icl $(atools_mon_TASKS:=.ifl): atools.ifd
 	@IFD2STAR@ atools
 
 ##  Any misc PISA files that have no where else.
@@ -61,7 +61,7 @@ dist_pkgdata_DATA = atools.news
 EXTRA_DIST = $(HELP_SOURCES)
 
 ##  Need to add generated files as BUILT_SOURCES.
-BUILT_SOURCES = atools.csh atools.icl atools_mon.ifl $(atools_mon_TASKS:=.ifl)
+BUILT_SOURCES = atools.csh atools.icl
 
 ##  Simple check.
 TESTS = asttest.sh
