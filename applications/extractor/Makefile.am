@@ -29,9 +29,12 @@ sex_SOURCES =
 BUILT_SOURCES = libextractor.a libfits.a sex extractor.ifl
 
 #  Data for share/extractor. Currently this is any misc docs (news file) 
-#  and configuration information (in this case the SExtractor config
-#  directory, keep this upto date). 
-dist_pkgdata_DATA = extractor.news \
+dist_pkgdata_DATA = extractor.news
+
+#  Configuration information (in this case the SExtractor config
+#  directory, keep this upto date).
+extractorsupportdir = $(bindir)/config
+extractorsupport_DATA = \
  extract/src/config/block_3x3.conv extract/src/config/gauss_3.0_5x5.conv\
  extract/src/config/mexhat_5.0_11x11.conv extract/src/config/default.conv\
  extract/src/config/gauss_3.0_7x7.conv extract/src/config/README\
