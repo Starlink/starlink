@@ -1,15 +1,23 @@
 <!--
   The DTD for the document spat out by img-eqlist.pl.  See that
   program, and .../slmaths.dsl for details.
+
+  This is an XML DTD.
 -->
-<!element img-eqlist - - (img-eq)+>
-<!element img-eq     - o EMPTY>
-<!attlist img-eq
+<!ELEMENT img-eqlist (img-eq)+>
+<!ELEMENT img-eq     EMPTY>
+<!ATTLIST img-eq
 	label		-- label for this image --
-		id
-		#required
+		ID
+		#REQUIRED
 	sysid		-- system-id of the file which contains the
 			   image's equation --
-		cdata
-		#required
+		CDATA
+		#REQUIRED
+	width		-- width of the image in pixels --
+		CDATA
+		#IMPLIED
+	height		-- height of the image in pixels --
+		CDATA
+		#IMPLIED
 	>

@@ -94,8 +94,10 @@ defined ($infile) || Usage();
 
 open (EQIN, "$infile")
     || die "Can't open $infile to read";
-open (SGMLOUT, ">$filenameroot.imgeq.sgml")
-    || die "Can't open $filenameroot.imgeq-sgml to write";
+#open (SGMLOUT, ">$filenameroot.imgeq.sgml")
+#    || die "Can't open $filenameroot.imgeq-sgml to write";
+open (LABELOUT, ">$filenameroot.imgeq.labelmap")
+    || die "Can't open $filenameroot.imgeq.labelmap to write";
 open (LATEXOUT, ">$filenameroot.imgeq.tex")
     || die "Can't open $filenameroot.imgeq.tex to write";
 
@@ -103,7 +105,7 @@ open (LATEXOUT, ">$filenameroot.imgeq.tex")
 LaTeXHeader (\*LATEXOUT);
 print LATEXOUT "\\special{dvi2bitmap default imageformat $imgformat}\n";
 
-print SGMLOUT "<!DOCTYPE img-eqlist SYSTEM 'img-eqlist'>\n<img-eqlist>\n";
+#print SGMLOUT "<!DOCTYPE img-eqlist SYSTEM 'img-eqlist'>\n<img-eqlist>\n";
 
 $eqn = '';
 while (defined($line = <EQIN>)) {
@@ -117,15 +119,18 @@ while (defined($line = <EQIN>)) {
 	$checksum = simple_checksum($checkeqn);
 	if (defined($checklist{$checksum})) {
 	    # already seen this equation
-	    print SGMLOUT "<img-eq label='$label' sysid='" .
-		$checklist{$checksum} . "'>\n";
+	    #print SGMLOUT "<img-eq label='$label' sysid='" .
+		#$checklist{$checksum} . "'>\n";
+	    print LABELOUT "label $label " .
+		$checklist{$checksum} . "\n";
 	} else {
 	    $eqn =~ s/\s+$//s;
 	    print LATEXOUT $eqtypes{'start-'.$eqtype} .
 		$eqn . 
 		$eqtypes{'end-'.$eqtype} .
 		"\n\\special{dvi2bitmap outputfile $outfilename}\n\\newpage\n";
-	    print SGMLOUT "<img-eq label='$label' sysid='$outfilename'>\n";
+	    #print SGMLOUT "<img-eq label='$label' sysid='$outfilename'>\n";
+	    print LABELOUT "label $label $outfilename\n";
 	    $checklist{$checksum} = $outfilename;
 	    $eqcount++;
 	}
@@ -149,9 +154,10 @@ while (defined($line = <EQIN>)) {
     }
 }
 print LATEXOUT "\\end{document}\n";
-print SGMLOUT "</img-eqlist>\n";
+#print SGMLOUT "</img-eqlist>\n";
 
-close (SGMLOUT);
+#close (SGMLOUT);
+close (LABELOUT);
 close (LATEXOUT);
 close (EQIN);
 
