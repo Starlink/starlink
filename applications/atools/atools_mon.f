@@ -117,6 +117,9 @@
       ELSE IF ( NAME .EQ. 'MATRIXMAP' ) THEN
          CALL MATRIXMAP( STATUS )
 
+      ELSE IF ( NAME .EQ. 'CONVERT' ) THEN
+         CALL CONVERT( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

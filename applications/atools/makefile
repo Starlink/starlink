@@ -460,7 +460,7 @@ F_SUB1 = addframe.f astclear.f astget.f astset.f asttest.f \
 atl1_assoc.f atl1_creat.f atl1_gtfrm.f atl1_gtobj.f atl1_ptobj.f \
 atl1_setop.f cmpframe.f cmpmap.f frame.f getframe.f skyframe.f \
 getmapping.f unitmap.f atlhelp.f frameset.f permmap.f removeframe.f \
-remapframe.f matrixmap.f
+remapframe.f matrixmap.f convert.f
 
 F_SUB2 = 
 
@@ -496,7 +496,7 @@ C_SUB2 =
 
 TASKS = addframe astclear astget astset asttest cmpframe \
 cmpmap frame getframe getmapping unitmap atlhelp skyframe \
-frameset permmap removeframe remapframe matrixmap
+frameset permmap removeframe remapframe matrixmap convert
 
 #  Monolith routine source name.
 
@@ -1369,6 +1369,7 @@ frameset.o  : SAE_PAR AST_PAR
 skyframe.o  : SAE_PAR AST_PAR
 getframe.o  : SAE_PAR AST_PAR       
 getmapping.o: SAE_PAR AST_PAR     
+convert.o   : SAE_PAR AST_PAR PAR_ERR
 matrixmap.o : SAE_PAR NDF_PAR AST_PAR
 unitmap.o   : SAE_PAR NDF_PAR AST_PAR
 permmap.o   : SAE_PAR NDF_PAR PAR_ERR AST_PAR

@@ -119,7 +119,7 @@
 
 *  IF a null value was supplied, annul the error and use a blank domain
 *  list.
-      IF( STAUS .EQ. PAR__NULL ) THEN 
+      IF( STATUS .EQ. PAR__NULL ) THEN 
          CALL ERR_ANNUL( STATUS )
          DOMLST = ' '
       END IF
@@ -138,6 +138,8 @@
       ELSE
          CALL ATL1_PTOBJ( 'RESULT', ' ', RESULT, STATUS )
       END IF
+
+ 999  CONTINUE
 
 *  End the AST context.
       CALL AST_END( STATUS )

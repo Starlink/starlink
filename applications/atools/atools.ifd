@@ -318,6 +318,46 @@ iraf! {
           }
 
       }
+      action convert {
+
+         helplib {$ATOOLS_HELP}
+
+         parameter domainlist {
+            position 3
+            type LITERAL
+            prompt {A comma-separated search list of domains}
+            ppath DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter from {
+            position 1
+            type LITERAL
+            prompt {The source Frame or FrameSet}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter result {
+            position 4
+            type LITERAL
+            prompt {Name of file in which to store the FrameSet}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
+            helpkey *
+          }
+
+         parameter to {
+            position 2
+            type LITERAL
+            prompt {The destination Frame or FrameSet}
+            ppath CURRENT
+            helpkey *
+          }
+
+      }
       action frame {
          helplib {$ATOOLS_HELP}
 

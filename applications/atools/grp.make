@@ -18,26 +18,26 @@ frame.f frame.ifl getframe.f getframe.ifl getmapping.ifl getmapping.f \
 kpg1_gtgrp.f unitmap.f unitmap.ifl atlhelp.f atlhelp.ifl frameset.f \
 frameset.ifl skyframe.f skyframe.ifl permmap.f permmap.ifl \
 removeframe.ifl removeframe.f remapframe.ifl remapframe.f matrixmap.f \
-matrixmap.ifl
+matrixmap.ifl convert.f convert.ifl
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc addframe.par astclear.par astget.par astset.par \
 asttest.par cmpframe.par cmpmap.par frame.par getframe.par getmapping.par \
 unitmap.par skyframe.par frameset.par permmap.par removeframe.par \
-remapframe.par matrixmap.par
+remapframe.par matrixmap.par convert.par
 
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = addframe.f astclear.f astget.f astset.f atlhelp.f \
 asttest.f cmpframe.f cmpmap.f frame.f getframe.f getmapping.f \
 unitmap.f skyframe.f frameset.f permmap.f removeframe.f remapframe.f \
-matrixmap.f
+matrixmap.f convert.f
 
 #  Contents of the doc/ directory in atools_iraf.tar
 IRAF_DOCS = addframe.hlp astclear.hlp astget.hlp astset.hlp \
 asttest.hlp cmpframe.hlp cmpmap.hlp frame.hlp getframe.hlp getmapping.hlp \
 unitmap.hlp skyframe.hlp frameset.hlp permmap.hlp removeframe.hlp \
-remapframe.hlp matrixmap.hlp
+remapframe.hlp matrixmap.hlp convert.hlp
 
 # The other files which need to be extracted from the source code
 # repository and which end up in atools.tar.

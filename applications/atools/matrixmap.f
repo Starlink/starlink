@@ -29,7 +29,7 @@
 *     the inverse transformation may also be performed.
 
 *  Usage:
-*     matrixmap ncoord options result
+*     matrixmap nin nout form matrix options result
 
 *  ADAM Parameters:
 *     FORM = INTEGER (Read)
