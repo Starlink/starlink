@@ -152,10 +152,10 @@ nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
 kpg1_trmsz.c ctm_xcols.f
 
 # The contents of the kappa_data_alpha_OSF1.tar file:
-KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf/alpha_OSF1 cont_lut.sdf/alpha_OSF1 \
-fc_lut.sdf/alpha_OSF1 heat_lut.sdf/alpha_OSF1 ikon_lut.sdf/alpha_OSF1 \
-ramps_lut.sdf/alpha_OSF1 spectrum_lut.sdf/alpha_OSF1 zebra_lut.sdf/alpha_OSF1 \
-ccdframec.sdf/alpha_OSF1 comwest.sdf/alpha_OSF1 spectrum.sdf/alpha_OSF1
+KAPPA_DATA_ALPHA_OSF1 = bgyrw_lut.sdf.alpha_OSF1 cont_lut.sdf.alpha_OSF1 \
+fc_lut.sdf.alpha_OSF1 heat_lut.sdf.alpha_OSF1 ikon_lut.sdf.alpha_OSF1 \
+ramps_lut.sdf.alpha_OSF1 spectrum_lut.sdf.alpha_OSF1 zebra_lut.sdf.alpha_OSF1 \
+ccdframec.sdf.alpha_OSF1 comwest.sdf.alpha_OSF1 spectrum.sdf.alpha_OSF1
 
 # The contents of the kappa_data_ix86_Linux.tar file:
 KAPPA_DATA_IX86_LINUX = bgyrw_lut.sdf.ix86_Linux ccdframec.sdf.ix86_Linux \
