@@ -96,7 +96,7 @@
 *     pixel index bounds of the output NDF are chosen accordingly.
 
 *  Related Applications:
-*     KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, TRANSFORMER;
+*     KAPPA: BLOCK, COMPADD, COMPAVE, PIXDUPE, SQORST, RESAMPLE;
 *     Figaro: ISTRETCH.
 
 *  Implementation Status:

@@ -180,7 +180,7 @@
 *     are summed and always normalised for bad values.
 
 *  Related Applications:
-*     KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, TRANSFORMER;
+*     KAPPA: BLOCK, COMPAVE, COMPICK, PIXDUPE, SQORST, RESAMPLE;
 *     Figaro: ISTRETCH, YSTRACT.
 
 *  Implementation Status:

@@ -175,7 +175,7 @@
 *     are summed and always normalised for bad values.
 
 *  Related Applications:
-*     KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, TRANSFORMER;
+*     KAPPA: BLOCK, COMPADD, COMPICK, PIXDUPE, SQORST, RESAMPLE;
 *     Figaro: ISTRETCH.
 
 *  Implementation Status:

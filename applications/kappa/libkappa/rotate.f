@@ -96,7 +96,7 @@
 *        title of the output NDF is "Reoriented features map".
 
 *  Related Applications:
-*     KAPPA: FLIP, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+*     KAPPA: FLIP, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
 
 *  Implementation Status:
 *     The propagation rules depend on parameters ANGLE and NNMETH.

@@ -67,7 +67,7 @@
 *     The pixel-index bounds of the NDF are unchanged by this routine.
 
 *  Related Applications:
-*     KAPPA: ROTATE, TRANSFORMER; Figaro: IREVX, IREVY, IROT90.
+*     KAPPA: ROTATE, RESAMPLE; Figaro: IREVX, IREVY, IROT90.
 
 *  Implementation Status:
 *     -  This routine correctly processes the AXIS, DATA, QUALITY,
