@@ -22,7 +22,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'ADI_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
@@ -378,7 +377,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER	FID
 *    Import-Export :
@@ -537,7 +535,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Import :
       INTEGER			FID

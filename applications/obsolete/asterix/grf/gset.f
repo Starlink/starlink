@@ -16,7 +16,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GMD_PAR'
 *    Import :
 *    Import-export :
@@ -4498,7 +4497,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       LOGICAL LIVE
       INTEGER ISEL,NDFS(*)
@@ -4552,7 +4550,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       LOGICAL SAVE,LIVE
       INTEGER                   GFID

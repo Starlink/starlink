@@ -10,7 +10,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'GFX_CMN'

@@ -48,7 +48,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Status :
       INTEGER STATUS
 *    Functions :
@@ -176,7 +175,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                   ID
 *    Import-export :
@@ -242,7 +240,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -298,7 +295,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                           ID
       REAL X1,X2,Y1,Y2
@@ -562,7 +558,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'GFX_CMN'
 *    Structure definitions :
@@ -837,7 +832,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
 *    Export :
@@ -889,7 +883,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
       INTEGER                   ID
       REAL X1,X2,Y1,Y2
@@ -1492,7 +1485,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Import :
 *    Import-export :
 *    Export :
