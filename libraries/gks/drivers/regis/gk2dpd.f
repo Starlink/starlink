@@ -74,7 +74,7 @@
       ILEFT =INT(REALA(KIPEXL)/KWKDAT(CHARWI,KWKIX))
       ITOP  =INT(REALA(KIPEYB)/KWKDAT(CHARHI,KWKIX))
       WRITE(*,200)CHAR(27),ITOP,ILEFT,CHAR(27)
-  200 FORMAT(1H+,A,'[',I2.2,';',I3.3,'H',A,'[?7l'$)
+  200 FORMAT(1H+,A,'[',I2.2,';',I3.3,'H',A,'[?7l',$)
 *
 *   Output prompt if required
 *

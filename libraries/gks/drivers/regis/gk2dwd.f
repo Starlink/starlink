@@ -842,7 +842,7 @@
       ITOP  =INT(REALA(KIPEYB)/KWKDAT(CHARHI,KWKIX))
 *
       WRITE(*,744)CHAR(27)
-  744 FORMAT(1H+,A,'[?7h'$) 
+  744 FORMAT(1H+,A,'[?7h',$) 
 *
       WRITE(*,745)CHAR(27),ITOP,ILEFT,CHAR(27)
   745 FORMAT(1H+,A,'[',I2.2,';',I3.3,'H',A,'[K')
