@@ -128,6 +128,9 @@
 *        is at least one point within the plot.
 *     17-JUN-1999 (DSB):
 *        Call to PGEBUF added to end the PGPLOT buffering context.
+*     1-MAR-2001 (DSB):
+*        Change mode 1 so that vertical lines are drawn at the boundaries
+*        of bad cells
 *     {enter_changes_here}
 
 *  Bugs:
@@ -314,7 +317,11 @@
             IF( GOODX ) RX = REAL( X( I ) )
 
             GOODY = ( Y( I ) .NE. AST__BAD )
-            IF( GOODY ) RY = REAL( Y( I ) )
+            IF( GOODY ) THEN
+               RY = REAL( Y( I ) )
+            ELSE
+               RY = WY1
+            END IF
 
 *  See if the mid X position between this point and the previous point is
 *  defined. If so, store it.
@@ -344,8 +351,20 @@
 *  Draw to the mid position.
                CALL PGDRAW( RXC, RY0 )
 
-*  If it is also possible to draw line C, then we can draw line B) now. 
-               IF( DRAWC ) CALL PGDRAW( RXC, RY )
+            END IF
+
+*  Draw line B) so long as the mid X position is know. Bad Y values are
+*  considered to be coincident with the bottom axis.
+            IF( MIDX ) THEN 
+
+*  If the pen is now down, put it down at the mid x position.
+               IF( .NOT. DOWN ) THEN
+                  CALL PGMOVE( RXC, RY0 )
+                  DOWN = .TRUE.
+               END IF
+
+*  Draw line B.
+               CALL PGDRAW( RXC, RY )
 
             END IF
 

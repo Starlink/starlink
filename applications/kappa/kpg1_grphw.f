@@ -230,6 +230,8 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     1-MAR-2001 (DSB):
+*        Retain good axis values if the value on the other axis is bad.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -385,14 +387,18 @@
             XX = X( I )
             YY = Y( I )
 
-            IF( XX .NE. VAL__BADR .AND. YY .NE. VAL__BADR ) THEN
+            IF( XX .NE. VAL__BADR ) THEN
                DX( I ) = DBLE( XX )
+               IF( YY .NE. VAL__BADR ) NGOOD = NGOOD + 1
+            ELSE
+               DX( I ) = AST__BAD
+            END IF
+
+            IF( YY .NE. VAL__BADR ) THEN
                DY( I ) = DBLE( YY )
                DBAR( I, 1 ) = DBLE( YY - NSIGMA*YSIGMA( I ) )
                DBAR( I, 2 ) = DBLE( YY + NSIGMA*YSIGMA( I ) )
-               NGOOD = NGOOD + 1
             ELSE
-               DX( I ) = AST__BAD
                DY( I ) = AST__BAD
                DBAR( I, 1 ) = AST__BAD
                DBAR( I, 2 ) = AST__BAD
@@ -406,12 +412,16 @@
             XX = X( I )
             YY = Y( I )
 
-            IF( XX .NE. VAL__BADR .AND. YY .NE. VAL__BADR ) THEN
+            IF( XX .NE. VAL__BADR ) THEN
                DX( I ) = DBLE( XX )
-               DY( I ) = DBLE( YY )
-               NGOOD = NGOOD + 1
+               IF( YY .NE. VAL__BADR ) NGOOD = NGOOD + 1
             ELSE
                DX( I ) = AST__BAD
+            END IF
+
+            IF( YY .NE. VAL__BADR ) THEN
+               DY( I ) = DBLE( YY )
+            ELSE
                DY( I ) = AST__BAD
             END IF
 
