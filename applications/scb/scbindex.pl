@@ -306,8 +306,11 @@ sub index_pack {
    print "\nPACKAGE: $package\n";
 
 #  Check specified file can be indexed (i.e. is a tar file or directory).
+#  It's a good idea to skip symlinks (at least in the case of directories)
+#  in case there's a link to the file . or a parent of it, which would
+#  lead to a vicious loop.
 
-   unless ($tarext || -d $pack_file) {
+   if ((!$tarext && !-d $pack_file) || -l $pack_file) {
       print "*** Skipping '$fqpack_file' (not tar file or directory) ***\n";
       return;
    }
