@@ -39,11 +39,14 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1996 January 25 (MJC):
 *        Original version.
+*     7-MAR-2000 (DSB):
+*        Set STATUS to SAI__ERROR when reporting new errors.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -98,6 +101,7 @@
          GOTO 999
 
       ELSE IF ( INEL .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'CON_GEXRM_EMPTY',
      :     'Group for modification contains no elements (probable '/
      :     /'programming error)', STATUS )

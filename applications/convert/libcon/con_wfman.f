@@ -36,6 +36,7 @@
 *  Authors:
 *     RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -44,6 +45,8 @@
 *     1997 November 23 (MJC):
 *        Some tidying.  Removed obsolete CHR_MOVE code and used standard
 *        CON_FKEYx routines to create the FITS headers.
+*     1998 August 4 (AJC):
+*        Write DIMS(n) not n for NAXISn value.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,7 +81,7 @@
       CHARACTER * ( 1 ) BUFDIM   ! Buffer for dimension number
       CHARACTER * ( 11) BUFFER   ! Buffer for text manipulation
       INTEGER IDIM               ! Loop counter
-      CHARACTER * ( 8 ) KEYWORD  ! FITS keyword
+      CHARACTER * ( 8 ) KEYWRD   ! FITS keyword
       INTEGER LINENO             ! Line number
       INTEGER NCHARS             ! Dummy to absorb unwanted number
 *.
@@ -142,8 +145,8 @@
          BUFFER = 'Dimension '//BUFDIM
 
 *  Write the NAXISn header.
-         CALL CON_FKEYI( KEYWRD, IDIM, '/', BUFFER, FITSAR( LINENO ),
-     :                   STATUS )
+         CALL CON_FKEYI( KEYWRD, DIMS( IDIM ), '/', BUFFER, 
+     :                   FITSAR( LINENO ), STATUS )
 
 *  Report the value in verbose mode.
          CALL MSG_OUTIF( MSG__VERB, ' ', FITSAR( LINENO ), STATUS )

@@ -43,11 +43,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1992 September 17 (MJC):
 *        Original version based on FTS1_NDFCM. 
+*     2001 August 30 (AJC):
+*        Correct CON_GKEYC arguments
 *     {enter_changes_here}
 
 *  Bugs:
@@ -86,6 +89,7 @@
       LOGICAL THERE            ! True if named keyword is present in
                                ! the header
 
+      CHARACTER * ( 80 ) COM   ! Header Comment
       CHARACTER * ( 70 ) LABEL ! NDF label
       CHARACTER * ( 70 ) TITLE ! NDF title
       CHARACTER * ( 70 ) UNITS ! NDF units
@@ -102,8 +106,8 @@
 *  ==================================
 *
 *  First obtain the title from the TITLE keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'TITLE', THERE, TITLE,
-     :                NKC, STATUS )
+      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'TITLE', 1, THERE, TITLE,
+     :                COM, NKC, STATUS )
 
 *  If it is present set the NDF title, truncating unnecessary blanks.
       IF ( THERE .AND. TITLE .NE. ' ' ) THEN
@@ -112,8 +116,8 @@
       END IF
 
 *  Second obtain the units from the BUNIT keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'BUNIT', THERE, UNITS, NKC,
-     :                STATUS )
+      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'BUNIT', 1, THERE, UNITS,
+     :                COM,  NKC, STATUS )
 
 *  If it is present set the NDF units, truncating unnecessary blanks.
       IF ( THERE .AND. UNITS .NE. ' ' ) THEN
@@ -122,8 +126,8 @@
       END IF
 
 *  Third obtain the label from the LABEL keyword in the header.
-      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'LABEL', THERE, LABEL, NKC,
-     :                STATUS )
+      CALL CON_GKEYC( NCARD, HEADER, SCARD, 'LABEL', 1, THERE, LABEL,
+     :                COM, NKC, STATUS )
 
 *  If it is present set the NDF units, truncating unnecessary blanks.
       IF ( THERE .AND. LABEL .NE. ' ' ) THEN

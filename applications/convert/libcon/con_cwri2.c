@@ -4,7 +4,7 @@
 
 FILE *fd;   /*  A pointer to the FILE structure identifying the open file */
 
-F77_INTEGER_FUNCTION(con_cwri2)( CHARACTER(data) TRAIL(data) ){
+F77_INTEGER_FUNCTION(con_cwri2)( BYTE_ARRAY(data), INTEGER(data_length) ){
 /*
  *  Name:
  *    con_cwri2
@@ -24,32 +24,21 @@ F77_INTEGER_FUNCTION(con_cwri2)( CHARACTER(data) TRAIL(data) ){
  *    ISTAT = INTEGER (Returned)
  *        Status: 0 = failure, 1 = success
 
+ *  History:
+ *    19-DEC-2000 (AJC):
+ *       Use a byte array as argument
  */   
-      GENPTR_CHARACTER(data)
 
-      unsigned int n=0;
+      GENPTR_BYTE_ARRAY(data)
+      GENPTR_INTEGER(data_length)
+
       int ret=0;
-      char *c_data;
 
-
-/*  Convert the supplied Fortran "DATA" string to a C-style string.  First
- *  get sufficient storage to hold the C string (including a trailing
- *  null). */
-
-      c_data = (char *) malloc( sizeof( char )*( data_length ) );
-
-      if( c_data )
-         {
-/*     Get the string. */
-         cnf_imprt( data, data_length, c_data );
 
 /*     Write out the C string. */
-         if( fwrite( c_data, sizeof( char ), data_length, fd ) ==
-                    data_length ) ret = 1;
+       if( fwrite( data, sizeof(char), *data_length, fd ) ==
+                    *data_length ) ret = 1;
 
-/*     Free the storage used to hold the copy of the DATA string. */
-         free( c_data );
-      }
 
       return( ret );
 

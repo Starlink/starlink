@@ -44,6 +44,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -51,6 +52,8 @@
 *        Original version.
 *     1995 November 23 (MJC):
 *        Removes the UNIX directory path.
+*     7-MAR-2000 (DSB):
+*        Set STATUS to SAI__ERROR when reporting new errors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +109,7 @@
          GOTO 999
 
       ELSE IF ( INEL .EQ. 0 ) THEN
+         STATUS = SAI__ERROR
          CALL ERR_REP( 'CON_GEXCH_EMPTY',
      :     'Group for modification contains no elements (probable '/
      :     /'programming error)', STATUS )

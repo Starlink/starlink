@@ -47,6 +47,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -63,6 +64,8 @@
 *     1996 September 16 (MJC):
 *        Modern style commenting and declarations.  Added support for
 *        CUNITn and axis units.
+*     2001 August 30 (AJC):
+*        Correct CON_GKEYD arguments
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -122,6 +125,7 @@
                                  ! in the header?
       LOGICAL UTHERE             ! The CUNITn keyword is present
                                  ! in the header?
+      CHARACTER * (80 ) COM      ! Header comment
       CHARACTER * ( 70 ) UNITS   ! Axis units
 
 *.
@@ -150,7 +154,7 @@
 
 *  Obtain the value of the physical co-ordinate at the reference pixel.
          CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CRVAL'//CNDIM( :NC ),
-     :                   THERE, REFV, NKC, STATUS )
+     :                   1, THERE, REFV, COM, NKC, STATUS )
 
 *  The co-ordinate must be present to make any sense of an axis
 *  structure.
@@ -158,7 +162,8 @@
 
 *  Obtain the value of the element number of the reference pixel.
             CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CRPIX'/
-     :                      /CNDIM( :NC ), THERE, REFP, NKC, STATUS )
+     :                      /CNDIM( :NC ), 1, THERE, REFP, COM, NKC,
+     :                      STATUS )
 
 *  If the keyword is not present assume the reference pixel is the
 *  first along the axis.
@@ -167,7 +172,8 @@
 *  Obtain the increment of physical co-ordinate between adjacent
 *  pixels.
             CALL CON_GKEYD( NCARD, HEADER, SCARD, 'CDELT'/
-     :                      /CNDIM( :NC ), THERE, DELT, NKC, STATUS )
+     :                      /CNDIM( :NC ), 1, THERE, DELT, COM, NKC,
+     :                      STATUS )
 
 *  If the keyword is not present assume unit increments.
             IF ( .NOT. THERE ) DELT = 1.0D0

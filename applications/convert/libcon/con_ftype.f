@@ -60,11 +60,14 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     1992 September 17 (MJC):
 *        Original version based on FTS1_DTYPE.
+*     2001 August 30 (AJC):
+*        Correct CON_GKEYx arguments
 *     {enter_changes_here}
 
 *  Bugs:
@@ -107,7 +110,7 @@
       LOGICAL IEEE               ! True if the data type is floating
       LOGICAL THERE              ! True if the selected keyword is
                                  ! present in the FITS header
-
+      CHARACTER * ( 80 ) COM     ! Header card comment
 *.
 
 *  Check the inherited global status.
@@ -120,18 +123,18 @@
       IF ( BITPIX .GT. 0 ) THEN
 
 *  Get the UNSIGNED flag.
-         CALL CON_GKEYL( NCARD, HEADER, SCARD, 'UNSIGNED', THERE,
-     :                   BSCALE, NKC, STATUS )
+         CALL CON_GKEYL( NCARD, HEADER, SCARD, 'UNSIGNED', 1, THERE,
+     :                   BSCALE, COM, NKC, STATUS )
          IF ( .NOT. THERE ) UNSIGN = .FALSE.
 
 *  Get the BSCALE scale factor.
-         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BSCALE', THERE,
-     :                   BSCALE, NKC, STATUS )
+         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BSCALE', 1, THERE,
+     :                   BSCALE, COM, NKC, STATUS )
          IF ( .NOT. THERE ) BSCALE = 1.0
 
 *  Next the BZERO offset.
-         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BZERO', THERE,
-     :                   BZERO, NKC, STATUS )
+         CALL CON_GKEYR( NCARD, HEADER, SCARD, 'BZERO', 1, THERE,
+     :                   BZERO, COM, NKC, STATUS )
          IF ( .NOT. THERE ) BZERO = 0.0
       ELSE
 
@@ -151,8 +154,8 @@
          CALL ERR_MARK
 
 *  Now get the undefined pixel value, BLANK.
-         CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BLANK', BADPIX,
-     :                   BLANK, NKC, STATUS )
+         CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BLANK', 1, BADPIX,
+     :                   BLANK, COM, NKC, STATUS )
 
 *  Look for the non-standard case where the BLANK value has been given
 *  its original floating-point value rather than the integer value
@@ -169,8 +172,8 @@
                DCARD = NKC
 
 *  Read BLANK as floating-point value.
-               CALL CON_GKEYR( NCARD, HEADER, DCARD, 'BLANK',
-     :                         BADPIX, RBLANK, NKC, STATUS )
+               CALL CON_GKEYR( NCARD, HEADER, DCARD, 'BLANK', 1,
+     :                         BADPIX, RBLANK, COM, NKC, STATUS )
 
 *  If no problem this time apply scale and zero to derive the true
 *  integer value in the FITS file.

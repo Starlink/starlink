@@ -95,6 +95,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -119,7 +120,8 @@
 *     1992 September 18 (MJC):
 *        Renamed from FTS1_MANDH for CONVERT.  All FTS1_ calls replaced
 *        by CON_ equivalents.
-
+*     2001 August 29 (DSB):
+*        Correct CON-GKEYI arguments
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -166,6 +168,7 @@
                                ! keyword in the header
 
       CHARACTER
+     :  COM*80,                ! Card comment
      :  CNDIM*3,               ! Axis number
      :  NAXNAM*8               ! NAXISn keyword name
 
@@ -213,8 +216,8 @@
 *    Continue checking the mandatory descriptors... BITPIX is
 *    number of bits per pixel.
 
-      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BITPIX', THERE, BITPIX,
-     :                NKC, STATUS )
+      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'BITPIX', 1, THERE, BITPIX,
+     :                COM, NKC, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CON_MANDH_FBITPI',
@@ -245,8 +248,8 @@
 
 *    Now obtain the number of dimensions.
 
-      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'NAXIS', THERE, NDIM, NKC,
-     :                STATUS )
+      CALL CON_GKEYI( NCARD, HEADER, SCARD, 'NAXIS', 1, THERE, NDIM, 
+     :                COM, NKC, STATUS )
 
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CON_MANDH_INAXIS',
@@ -295,8 +298,8 @@
 
 *          Get value of NAXISn.
 
-            CALL CON_GKEYI( NCARD, HEADER, SCARD, NAXNAM, THERE,
-     :                      AXIS( N ), NKC, STATUS )
+            CALL CON_GKEYI( NCARD, HEADER, SCARD, NAXNAM, 1, THERE,
+     :                      AXIS( N ), COM, NKC, STATUS )
 
             IF ( STATUS .NE. SAI__OK ) THEN
                CALL MSG_SETI( 'AXN', N )

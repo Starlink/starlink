@@ -1,5 +1,5 @@
-      SUBROUTINE CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, OIMAGE,
-     :                      STATUS )
+      SUBROUTINE CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI, 
+     :                      OIMAGE, STATUS )
 *+ 
 *  Name:
 *     CON_WRTIF
@@ -11,15 +11,18 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, OIMAGE, STATUS )
+*     CALL CON_WRTIF( EL, IMAGE, DIMS, FLEN, FIOD, MINI, MAXI,
+*                     OIMAGE, STATUS )
  
 *  Description:
-*     This routine writes a TIFF file for NDF2TIFF.  It first checks to
-*     find the range of the data and generates a value to scale the
-*     data to the 0--255 range required.  Then it writes out the file
-*     header information.  This includes stuff like the image size and
-*     the number of bits per pixel.  Finally it writes out the image.
- 
+*     This routine writes a TIFF file for NDF2TIFF.  Given the range
+*     of the data it generates a value to scale the data to the 0--255 
+*     range required.  Then it writes out the file header information.
+*     This includes stuff like the image size and the number of bits
+*     per pixel.  Pixel values outside the range are set to the
+*     appropriate TIFF value (0 or 255).  Finally it writes out the image.
+*     If MAXI is less than MINI, a negative image will be produced. 
+
 *  Arguments:
 *     EL = INTEGER (Given)
 *        The number of pixels in the array to be written to the TIFF
@@ -36,12 +39,19 @@
 *        The FIO file descriptor for the TIFF file.
 *     OIMAGE( FLEN ) = BYTE (Returned)
 *        Space for the output image and header.
+*     MINI = DOUBLE PRECISION (Given)
+*        Lower scaling limit. If this is greater than MAXI, the image will
+*        be negated.
+*     MAXI = DOUBLE PRECISION (Given)
+*        Upper scaling limit. If this is less than MINI, the image will be
+*        negated.
 *     STATUS = INTEGER ( Given and Returned )
 *        The global status.
 
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -50,6 +60,9 @@
 *     1996 February 12 (MJC):
 *        Tidied to standard style.  Renamed from NDF2TIFF_WRITE.
 *        Fixed bug with dimensions.
+*     04-JAN-1999 (AJC):
+*        Add scaling limits and possible image negation.
+*        Use 256 not 255 in calculating scale factor
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +86,8 @@
       DOUBLE PRECISION IMAGE( EL ) ! The image data
       INTEGER DIMS( 2 )          ! Image dimensions
       INTEGER FIOD               ! FIO identifier
+      DOUBLE PRECISION MAXI      ! High scaling limit
+      DOUBLE PRECISION MINI      ! Low scaling limit
 
 *  Arguments Returned:
       BYTE OIMAGE( FLEN )        ! Output image data
@@ -91,11 +106,13 @@
       INTEGER B3                 ! Temorary storage
       INTEGER B4                 ! Temorary storage
       BYTE HD( 122 )             ! The file-header contents
+      INTEGER HITIF              ! TIF value for 'high' image values
+      INTEGER LOTIF              ! TIF value for 'low' or bad image values
+      DOUBLE PRECISION HIVAL     ! 'high' image value
+      DOUBLE PRECISION LOVAL     ! 'low' image value
       INTEGER I                  ! Loop variable
       INTEGER INDEX1             ! Pointer to row start
       INTEGER INDEX2             ! pointer to row start
-      DOUBLE PRECISION MAXI      ! Biggest pixels value
-      DOUBLE PRECISION MINI      ! Smallest pixels value
       DOUBLE PRECISION SCFACT    ! Pixel value range
       BYTE TEMP( 33000 )         ! Temporary storage
       INTEGER X                  ! Row number
@@ -143,25 +160,22 @@
          OIMAGE( I ) = HD( I )
     5 CONTINUE
 
-*  Find the brightest/faintest non-bad pixels.
-      MAXI = VAL__MIND
-      MINI = VAL__MAXD
-      DO 10 I = 1, EL
+*  Calculate the scale factor
+      SCFACT = ( MAXI - MINI ) / 256.0D0
 
-*  Ignore bad pixels.
-         IF ( IMAGE( I ) .NE. VAL__BADD ) THEN
+*  Calculate the TIF values corresponding with HIGH and LOW image values
+      IF ( MAXI .GT. MINI ) THEN
+         HIVAL = MAXI
+         LOVAL = MINI
+         HITIF = 255
+         LOTIF = 0
+      ELSE
+         HIVAL = MINI
+         LOVAL = MAXI
+         HITIF = 0
+         LOTIF = 255
+      ENDIF
 
-*  Check for brightest.
-            IF ( IMAGE( I ) .GT. MAXI ) MAXI = IMAGE( I )
-
-*  Check for faintest.
-            IF ( IMAGE( I ) .LT. MINI ) MINI = IMAGE( I )
-
-         END IF
-
-   10 CONTINUE
-      SCFACT = ( MAXI - MINI ) / 255.0D0
-   
 *  Calculate the strip size data.
       B1 = EL / TP24
       B2 = ( EL - B1 * TP24 ) / TP16
@@ -184,14 +198,18 @@
       DO 20 I = 1, EL
 
 *  Check for bad pixels.
-         IF ( IMAGE( I ) .EQ. VAL__BADD ) THEN
+         IF ( ( IMAGE( I ) .EQ. VAL__BADD ) .OR.
+     :        ( IMAGE( I ) .LT. LOVAL ) ) THEN
 
-*  Fudge bad pixels to zero.
-            OIMAGE( I + 122 ) = 0
+*  Set bad and low pixels to min.
+            OIMAGE( I + 122 ) = LOTIF
+
+         ELSE IF ( IMAGE( I ) .GE. HIVAL ) THEN
+*  Set high pixels to max.
+            OIMAGE( I + 122 ) = HITIF
 
          ELSE
-
-*  Scale the pixel appropriately.
+*  Scale normal pixels appropriately.
             OIMAGE( I + 122 ) = INT( ( IMAGE( I ) - MINI ) / SCFACT )
 
          END IF

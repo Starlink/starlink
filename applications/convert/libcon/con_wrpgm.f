@@ -36,6 +36,7 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     AJC: Alan J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -43,6 +44,9 @@
 *        Original version.
 *     1996 February 12 (MJC):
 *        Tidied to standard style.  Renamed from NDF2PGM_WRITE.
+*     18-DEC-2000 (AJC):
+*        Ensure only one char follows maxval in header
+*        Scale evenly over 255 values
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -81,7 +85,6 @@
       DOUBLE PRECISION MINI      ! Smallest pixels value
       INTEGER NC                 ! String length
       DOUBLE PRECISION SCFACT    ! Pixel value range
-      CHARACTER * ( 1 ) SMALL    ! Single character
       INTEGER STATC              ! C routine status
       CHARACTER * ( 255 ) STRING ! Output header string
       CHARACTER * ( 255 ) TEMP   ! Output header string
@@ -111,19 +114,23 @@
          END IF
 
    10 CONTINUE
-      SCFACT = ( MAXI - MINI ) / 255.0D0
-   
+
+      SCFACT = ( MAXI - MINI ) / 256.0D0
+
 *  Read the image and convert the values for the output image.
       DO 20 I = 1, EL
 
 *  Check for bad pixels.
          IF ( IMAGE( I ) .EQ. VAL__BADD ) THEN
 
-*  Fudge bad pixels to the minimum value found.
+*  Fudge bad pixels to the minimum pgm value.
             OIMAGE( I ) = 0
 
-         ELSE
+         ELSE IF ( IMAGE( I ) .GE. MAXI ) THEN
+*  Fudge high pixels to the maximum pgm value 
+            OIMAGE( I ) = 255
 
+         ELSE
 *  Scale the pixel appropriately.
             OIMAGE( I ) = INT( ( IMAGE( I ) - MINI ) / SCFACT )
             
@@ -131,7 +138,7 @@
    20 CONTINUE
 
 *  Write out the header/image data.
-      TEMP = 'P5 ^X ^Y 255'
+      TEMP = 'P5 ^X ^Y    255'
       CALL MSG_FMTI( 'X', 'I6', DIMS( 1 ) )
       CALL MSG_FMTI( 'Y', 'I6', DIMS( 2 ) )
       CALL MSG_LOAD( ' ', TEMP, STRING, NC, STATUS )
@@ -152,12 +159,13 @@
          DO 200 X = 1, DIMS( 1 )
             TEMPB( X ) = OIMAGE( INDEX1 + X )
   200    CONTINUE
- 
+
 *  Copy the row ymax - y to row y.
          INDEX2 = EL - Y * DIMS( 1 )
          DO 300 X = 1, DIMS( 1 )
             OIMAGE( INDEX1 + X ) = OIMAGE( INDEX2 + X )
   300    CONTINUE
+
  
 *  Copy the stored version of row y to row ymax - y.
          DO 400 X = 1, DIMS( 1 )
@@ -167,9 +175,9 @@
   100 CONTINUE
  
 *  Write out the image.
-      DO 500 I = 1, EL
-         SMALL = CHAR( OIMAGE( I ) )
-         STATC = CON_CWRI2( SMALL )
+      DO 500 Y = 1, DIMS(2)
+         INDEX1 = ( Y - 1 ) * DIMS( 1 ) + 1
+         STATC = CON_CWRI2( OIMAGE( INDEX1 ), DIMS(1) )
   500 CONTINUE
 
       IF ( STATC .EQ. 0 ) THEN 
