@@ -1,0 +1,65 @@
+# RE_PSS <image_list> <filter_no>
+#
+# Use bsub to create background models for use in PSS
+#
+# Create background models for all images
+set ppix=$_RE_SCI_PSS_PSFPIX
+set smin=$_RE_SCI_PSS_SIGMIN
+set domap=$_RE_SCI_SIGMAPS
+
+#if ( `ls im$1_f$2.sdf* | head -1 | grep 'Z'` != "" ) then
+if ( `ls im??????_f$2.sdf* | head -1 | grep 'Z'` != "" ) then
+#  foreach i (im$1_f$2.sdf.Z)
+  foreach i (im??????_f$2.sdf.Z)
+    uncompress $i:r
+    set nums=`echo $i:r:r | awk '{print substr($1,3,6)}'`
+    set img=im$nums:r_f$2
+    set ssds=ipsr$nums:r_f$2
+    set bgnd=bg$nums:r_f$2
+    set smap=ims$nums:r_f$2
+    set spots=sen$nums:r_f$2.lis
+    if ( ! -e $ssds.sdf ) then
+      $SDA_DIR/re_bsub $img $bgnd $2 $spots
+      pss $img $bgnd out=$ssds psf=tabular notry_again map=$smap expert psfpix=$ppix sigmin=$smin mask="$SDA_DIR/re_psf_f$2" slice='"65:-65,-65:65"' accept
+      if ( "$domap" != "YES" ) then
+        rm -f $smap.sdf
+      endif
+    endif
+    compress $i:r
+  end
+
+else
+
+# Create background models for all images
+  foreach i (im$1_f$2.sdf)
+    set nums=`echo $i:r | awk '{print substr($1,3,6)}'`
+    set img=im$nums:r_f$2
+    set ssds=ipsr$nums:r_f$2
+    set bgnd=bg$nums:r_f$2
+    set smap=ims$nums:r_f$2
+    set spots=sen$nums:r_f$2.lis
+    if ( ! -e $ssds.sdf ) then
+      $SDA_DIR/re_bsub $img $bgnd $2 $spots
+      pss $img $bgnd out=$ssds psf=tabular notry_again map=$smap expert psfpix=$ppix sigmin=$smin mask="$SDA_DIR/re_psf_f$2" slice='"65:-65,-65:65"' accept
+      if ( "$domap" != "YES" ) then
+        rm -f $smap.sdf
+      endif
+    endif
+  end
+
+endif
+
+#
+merge:
+if ( $3 == "" ) then
+  if ($2 == 1 ) then
+    ls ipsr??????_f1.sdf | sort >! f1_files
+    ssmerge '"@f1_files"' ipsr_f$2 \\
+    rm -f f1_files
+  else
+    ls ipsr??????_f2.sdf | sort >! f2_files
+    ssmerge '"@f2_files"' ipsr_f$2 \\
+    rm -f f2_files
+  endif
+endif
+

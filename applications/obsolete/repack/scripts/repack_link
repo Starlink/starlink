@@ -1,0 +1,2 @@
+echo "-L. -lxra -lpar -lsys -lreadline -ltermcap -lrosat `ast_link`"
+

@@ -1,0 +1,231 @@
+#!/usr/local/bin/tcsh
+#
+# RE_SPEC <EVEF> <RA> <DEC> <SNAME> <RADIUS> <OFFSET> <BRADIUS> 
+#
+#
+# Author : P. McGale (pam@star.le.ac.uk)
+# 1st Ver: 11th May 95
+
+
+echo " "
+echo "   RE_SPEC -- Version 110595"
+echo " "
+echo "Please note that this version does not work with "
+echo "background derived from an annulus!   Background is got"
+echo "from a circle offset along s/c scan path.  Recommended "
+echo "radii are 3am for source and 9am for background. "
+echo "A typical offset value maybe 20am. "
+echo "Moon times rejected. High background times NOT rejected."
+echo " "
+
+
+unsetenv PARLOG
+
+
+# Check got all the input parameters.
+if ($1 == "") then
+  echo " "
+  echo -n "   Give event file (eg mrgd_ev.fit): "
+  set evf = $<
+else
+  set evf = $1
+endif
+
+if ($2 == "") then
+  echo " "
+  echo -n "   Give source RA (deg\hms): "
+  set s_ra = $<
+else
+  set s_ra = $2
+endif
+
+if ($3 == "") then
+  echo " "
+  echo -n "   Give source Dec (deg\hms): "
+  set s_dec = $<
+else
+  set s_dec = $3
+endif
+
+if ($4 == "") then
+  echo " "
+  echo -n "   Give source name : "
+  set s_nme = $<
+else
+  set s_nme = $4
+endif
+
+if ($5 == "") then
+  echo " "
+  echo -n "   Give source box radius (arcmin): "
+  set s_bx = $<
+else
+  set s_bx = $5
+endif
+
+if ($6 == "") then
+  echo " "
+  echo -n "   Give bgnd offset (arcmin): "
+  set b_off = $<
+else
+  set b_off = $6
+endif
+
+if ($7 == "") then
+  echo " "
+  echo -n "   Give bgnd box radius (arcmin): "
+  set b_bx = $<
+else
+  set b_bx = $7
+endif
+
+#
+# Generate coords of background, and get ratio of areas.
+"$re_progs"re_eoffset s_ra=$s_ra s_dec=$s_dec offset=$b_off  >! ~/ra_dec.offset
+set rec=`sed -n "/./p" ~/ra_dec.offset`
+set o_ra=`echo "$rec" | awk '{print $1}'`
+set o_dec=`echo "$rec" | awk '{print $2}'`
+rm -f ~/ra_dec.offset
+
+set a_ratio=`echo "$s_bx $b_bx" | awk '{print ($2/$1)**2}'`
+
+#
+# Set up some convenient names
+setenv srce    "$s_nme"_1sp
+setenv srce_c  "$srce"_c
+setenv bkgd    "$srce"_b
+setenv bkgd_c  "$srce"_bc
+setenv bkgd_cd "$srce"_bcd
+setenv srce_st  "$srce"_tmp
+setenv srce_s  "$s_nme"_1_sp
+
+echo " "
+echo "The following will be created in the default directory"
+echo " "
+echo "   $srce_s     - Background subtracted source spectrum"
+echo "   $srce_s.pha - XSPEC (sf format) pha file"
+echo "   $srce_s.rsp - XSPEC (sf format) rsp file"
+echo " "
+echo "Files as above but for the S2A filter"
+
+
+echo " "
+echo "   Sorting On source for S1A"
+echo " "
+
+"$re_progs"re_sort evefil=$evf show=n dtype=t ra=$s_ra dec=$s_dec inrad=0 outrad=$s_bx brej=n mrej=y filter="s1a" nbins=1 irad=2.5 output=$srce \\
+
+# Save start and end times to use below.
+set rec=`sed -n "/./p" ~/strt_end.lcurve`
+set strt_t=`echo "$rec" | awk '{print $1}'`
+set end_t=`echo "$rec" | awk '{print $2}'`
+
+
+#
+# Exposure correct the time-bin of the source
+#
+
+"$re_progs"re_timexp inp=$srce src=y out=$srce_c \\
+
+#
+# Set defaults for re_sort of time-bin of the background
+#
+#
+echo " "
+echo "   Sorting Background for S1A"
+echo " "
+
+"$re_progs"re_sort evefil=$evf show=n dtype=t ra=$o_ra dec=$o_dec inrad=0 outrad=$b_bx brej=n mrej=y filter="s1a" tlo=$strt_t thi=$end_t nbins=1 irad=2.5 output=$bkgd \\
+
+
+#
+# Exposure correct the time-bin of the background
+#
+
+"$re_progs"re_timexp inp=$bkgd src=n out=$bkgd_c \\
+
+#
+# Subtract the background from source+background (normalised by area).
+#
+echo " "
+echo "   Subtracting Background from source "
+echo " "
+
+arithmetic inp1=$bkgd_c inp2=$a_ratio out=$bkgd_cd oper=/ \\
+arithmetic inp1=$srce_c inp2=$bkgd_cd  out=$srce_st  oper=- \\ 
+
+
+echo " "
+echo "   Producing spectrum for S1A"
+echo " "
+
+wfcspec inp=$srce_st out=$srce_s \\
+ast2xsp inp=$srce_s \\
+
+# S2a
+
+echo " "
+echo "   Sorting On source for S2A"
+echo " "
+
+# Set up some convenient names
+setenv srce    "$s_nme"_2sp
+setenv srce_c  "$srce"_c
+setenv bkgd    "$srce"_b
+setenv bkgd_c  "$srce"_bc
+setenv bkgd_cd "$srce"_bcd
+setenv srce_st  "$srce"_tmp
+setenv srce_s  "$s_nme"_2_sp
+
+
+# Uses same start and end times as for S1a
+"$re_progs"re_sort evefil=$evf show=n dtype=t ra=$s_ra dec=$s_dec inrad=0 outrad=$s_bx brej=n mrej=y filter="s2a" tlo=$strt_t thi=$end_t nbins=1 irad=2.5 output=$srce \\
+
+#
+# Exposure correct the time-bin of the source
+#
+
+"$re_progs"re_timexp inp=$srce src=y out=$srce_c \\
+
+#
+# Set defaults for re_sort of time-bin of the background
+#
+#
+echo " "
+echo "   Sorting Background for S2A"
+echo " "
+
+"$re_progs"re_sort evefil=$evf show=n dtype=t ra=$o_ra dec=$o_dec inrad=0 outrad=$b_bx brej=n mrej=y filter="s2a" tlo=$strt_t thi=$end_t nbins=1 irad=2.5 output=$bkgd \\
+
+
+#
+# Exposure correct the time-bin of the background
+#
+
+"$re_progs"re_timexp inp=$bkgd src=n out=$bkgd_c \\
+
+#
+# Subtract the background from source+background (normalised by area).
+#
+echo " "
+echo "   Subtracting Background from source "
+echo " "
+
+arithmetic inp1=$bkgd_c inp2=$a_ratio out=$bkgd_cd oper=/ \\
+arithmetic inp1=$srce_c inp2=$bkgd_cd  out=$srce_st  oper=- \\ 
+
+
+echo " "
+echo "   Producing spectrum for S2A"
+echo " "
+
+wfcspec inp=$srce_st out=$srce_s \\
+ast2xsp inp=$srce_s \\
+
+
+# Tidy up and Leave script
+exit:
+rm -f  ~/strt_end.lcurve
+rm -f  "$s_nme"_1sp*.sdf
+rm -f  "$s_nme"_2sp*.sdf
+

@@ -1,0 +1,9 @@
+#!/bin/csh
+# RE_EXP <sky_exposure_map> <raw_SSDS_list> <corrected_SSDS_list>
+#
+# Exposure correct a SSDS list.
+#
+
+$SDA_DIR/re_expos ximag=$1 slist=$2 clist=$3 \\
+
+

@@ -1,0 +1,1229 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun208.1}
+\newcommand{\stardocnumber}    {208.1}
+\newcommand{\stardocauthors}   {P.\, McGale, Richard West}
+\newcommand{\stardocdate}      {18 March 1996}
+\newcommand{\stardoctitle}     {REPACK \\[1.5ex]
+                           Handle {\sl ROSAT} Wide Field Camera survey data}
+\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocmanual}    {User's Manual}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\setcounter{tocdepth}{2}
+\newcommand{\etal}{et~al.\ }
+\newcommand{\ro}{{\sl ROSAT }}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+
+During 1990 Jul to 1991 Jan, the \ro Wide Field Camera (WFC) performed
+the first all--sky survey at extreme--ultraviolet (EUV) wavelengths.
+The whole sky, or $\approx 96$\% of it, was imaged in two passbands, S1
+and S2, covering the ranges 60--140\AA~and 110--200\AA~respectively.
+An initial bright source catalogue (BSC) of 383 sources was produced by
+Pounds \etal (1993, MNRAS, 260, 77).  A new list, the 2RE~Catalogue
+(Pye \etal 1995, MNRAS, 274, 1165), of 479 sources has recently been
+published.  The survey data \emph{i.e.}, images and `raw' photon event files
+are now in the public domain.  The REPACK software package has been
+developed to fully exploit these data.  This document describes the
+REPACK programs.
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\label{se_introduction}\xlabel{introduction}Introduction}
+
+The survey data, as produced for the 2RE processing, is available to
+the public through the Leicester Data Archive Service (LEDAS). Images
+were sorted from the event files and screened for `high background' and
+'moon in WFC field-of-view' and named after the ecliptic latitude and
+longitude of the region of sky that they covered \emph{e.g.}, {\tt
+im012014\_f1} and {\tt im012014\_f2} --- one for each survey passband.
+They are $\approx 2.7^{\circ} \times 2.7^{\circ}$ in extent with a
+resolution of $1 \times 1$ arcmin$^{2}$ per pixel.  The photon event
+files are overlaid on a similar ecliptic grid system.  Some 13~000
+image pairs and 13~000 event files were produced by this scheme,
+covering almost the whole sky.
+
+Images can be retrieved in various formats; HDS, FITS and GIF. The
+REPACK software only operates on HDS format images. Event files,
+available just in FITS format, can be sorted to ASTERIX (HDS) datasets
+such as images and light-curves.
+
+REPACK is supported under UNIX (Digital Unix, Solaris 2).
+
+\section{\label{se_retrieving_images}\xlabel{retrieving_images}Retrieving Images and Photon Event Files}
+
+The recommended  way of retrieving [\ro WFC survey] images and photon event 
+files is to first go to the LEDAS page on the World Wide Web via the URL:
+
+\begin{quote}{\tt
+\htmladdnormallink{http://ledas-www.star.le.ac.uk/}%
+{http://ledas-www.star.le.ac.uk/}}
+\end{quote}
+
+The database tables held by the LEDAS can be accessed either via the
+BROWSE database system, or via the WWW-based ARNIE interface. Users
+should endeavour to locate the \ro WFC survey tables 1) ROSWFCSI for
+the images, 2) ROSWFCSE for the raw photon event files, and 3)
+ROSWFC2RE for the 2RE source list.  If the BROWSE route is taken,
+supplying some search cone and then using the {\tt xp} command, image
+pairs (one per waveband) can be selected and retrieved.  A similar
+technique can be used to obtain photon event files.  If extraction
+completes successfully users should find image and event files, of the
+form {\tt im{\it nnnnnn}\_f{\it n}.sdf} and/or {\tt x{\it nnn}y{\it
+nn}.fit}, in their current directory.
+
+The LEDAS also provides easy-to-use access to the WFC survey image
+database via the WFC Survey Image Browser: 
+
+\begin{quote}{\tt
+\htmladdnormallink{http://ledas-www.star.le.ac.uk/WFCimage}%
+{http://ledas-www.star.le.ac.uk/WFCimage}}
+\end{quote}
+
+\section{\label{se_repack_programs}\xlabel{repack_programs}The REPACK Programs}
+
+Having obtained some \ro WFC survey data, it would be useful to have some
+software to help analyse it.  The REPACK package aims to fulfill this
+task.  Some of its features, such as locating images \emph{etc.}, are
+adequately covered by the LEDAS-BROWSE interface (see
+Section~\ref{se_retrieving_images}), but it is nonetheless important to
+have a self consistent set of programs.
+
+All REPACK programs have a {\tt `re'} prefix.  Some of them have been
+wrapped up into {\tt csh} scripts, described in
+Section~\ref{se_shell_scripts}, to minimise user interaction for some
+of the more common operations.  The REPACK programs, presented in the
+order in which they would normally be used in a data analysis session,
+are as follows:
+
+\begin{verbatim}
+
+     re_imsrch     Names image whose centre is closest to input co-ordinates.
+     re_evsrch     Names event files touched by input search cone.
+     re_fitmrg     Merges a set of (FITS) event files.
+     re_expos      Returns survey exposure, in seconds, at input co-ordinates.
+     re_sort       Sorts (FITS) event files to images, time-series etc.
+     re_imexp      Exposure corrects an (HDS) image.
+     re_timexp     Exposure corrects a time-series.
+
+\end{verbatim}
+
+If REPACK has been properly installed at the users site then all of the
+above programs will be accessible after the startup commands have been
+executed:
+
+\begin{verbatim}
+    % aststart
+    % re_start
+\end{verbatim}
+
+All programs are started by simply typing their name on the command line.
+On-line parameters can also be specified, \emph{e.g.}: 
+
+\begin{verbatim} 
+    % re_sort evefil=mrgd_ev \\
+\end{verbatim}  
+
+Where possible some of the program parameters supply the user with a
+sensible default value.  The next section describes each of the
+programs and their parameters.  Some hints are also given as to
+parameter values.
+
+\subsection{\label{ss_re_imsrch}\xlabel{re_imsrch}re\_imsrch}
+
+This program is useful for locating the image that surveyed the
+position of some source.  It returns the name of the image whose centre
+is closest to the specified RA \& Dec.  The total number of counts in
+each filter passband is also shown as is the RA \& Dec of the image
+centre and the separation between the desired and present positions.
+
+A similar feature is also available in BROWSE using the ROSWFCSI table
+(see Section \ref{se_retrieving_images}).  Further, the appropriate
+image can be retrieved.
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[GET (Y/N)  ]
+Yes if RA and DEC co-ordinates are to be input from a file.
+No if from the command line.
+\item[FILENAME  ] file containing one or more co-ordinate pairs.
+\item[SRA  ] 
+The RA co-ordinate to be searched.  It may be specified in
+decimal or sexagesimal degrees.
+\item[SDEC  ] 
+The Dec co-ordinate to be searched.  It may be specified in
+decimal or sexagesimal degrees.
+\item[WRITE (Y/N)  ]
+Yes to Write the results into a file.
+\item[OUTPUT  ]
+File to contain results.
+\end{description}
+
+\subsection{\label{ss_re_evsrch}\xlabel{re_evsrch}re\_evsrch}
+
+This program is useful for locating the event files required to form an
+image centred on some location.  Given a search cone it returns the
+name(s) of the survey event files wholly or partially enclosed.  For
+convenience these names are written to the file {\tt re\_evmrg.list}
+which can be used as input to the event file merging program
+\htmlref{{\tt re\_fitmrg}}{ss_re_fitmrg} (see Section~\ref{ss_re_fitmrg}).
+
+A similar feature is also available in BROWSE using the ROSWFCSE table.  
+Further, the appropriate event files can be retrieved.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[SRA  ] 
+The RA of the search cone.  It may be specified in
+decimal or sexagesimal degrees.
+\item[SDEC  ] 
+The Dec of the search cone.  It may be specified in
+decimal or sexagesimal degrees.
+\item[RAD  ] 
+The radius of the search cone.  It may be specified in only decimal
+degrees. A typical radius, if a time-series is to be the sorted product
+for example, may be $1^{\circ}$.
+\end{description}
+
+\subsection{\label{ss_re_fitmrg}\xlabel{re_fitmrg}re\_fitmrg}	
+
+Event files need to merged before they can be sorted into images
+\emph{etc.}, if it is shown by \htmlref{{\tt re\_evsrch}}{ss_re_evsrch}
+that several event files are needed to map some chosen region of sky.
+The program makes a copy of the first input event file and them appends
+the rest updating appropriate keywords along the way.  Certain file
+consistency checks such as on data format revision numbers, are also
+performed.
+
+The {\tt csh} script file \htmlref{{\tt re\_fitmrgsh}}{se_shell_scripts}
+makes merging even easier --- see Section~\ref{se_shell_scripts}.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[LIST  ] 
+The list of event files to be merged.  A text file containing file
+names can be used as input.  If {\tt TERMINAL} is the supplied response
+then the names can be entered from the keyboard and the list terminated
+with a {\tt Ctrl-D}.  The default file extension is {\tt .fit} and need
+not be supplied by the user.
+\item[OUT  ] 
+The name to be given to the new merged event file.  The default extension is 
+{\tt .fit}.
+\item[DELFIL ] 
+If an output file of the same name already exists the option is given of
+either overwriting it or aborting the program.
+\end{description}
+
+\subsection{\label{ss_re_expos}\xlabel{re_expos}re\_expos}
+
+Using the \ro WFC survey sky exposure images {\tt reskyexp\_f1.fit} and
+{\tt reskyexp\_f2.fit}, this program exposure corrects a source search
+dataset (SSDS) produced from the ASTERIX point source searching program
+PSS, or gives the exposure, in seconds, at locations specified by the
+user. Both instrument vignetting and dead-time are accounted for.
+
+\subsubsection{Parameters}
+
+\begin{description}
+
+\item[FILT  ] 
+Survey filter, S1a or S2a, for which exposure is required.  Each passband has 
+its own exposure map ({\tt reskyexp\_f1.fit} for S1 and {\tt reskyexp\_f2.fit}
+for S2).
+\item[EFFCOR  ]
+ Allows a correction for degradation of detector efficiency.  Can be used
+to give `at launch' values.  Count rates given in the 2RE catalogue have
+had this correction applied.
+\item[SLIST  ]    
+Name of the PSS SSDS file (default extension {\tt .sdf}).  A text file of 
+decimal RAs and Decs, comma   separated, can also be supplied.  If this input 
+file has the name {\tt posns.dat} for example, the exposure information will 
+be placed  in a file called {\tt posns.exp}.  If {\tt TERMINAL} is the supplied
+response then RAs and Decs, in decimals, can be input directly from the 
+keyboard. The program then returns exposure times when it receives 
+a {\tt Ctrl-D}.
+\item[CLIST   ]
+ If a SSDS file is being processed, then an output file containing the
+ newly corrected source counts can be specified.  A name is suggested by
+the program.  The default extension is {\tt .sdf}.
+\end{description}
+
+\subsection{\label{ss_re_imexp}\xlabel{re_imexp}re\_imexp}	
+
+Using the sky survey exposure maps {\tt reskyexp\_f1.fit} and {\tt
+reskyexp\_f2.fit}, and WFC configuration file {\tt re\_slots.fit},
+this program exposure corrects a (HDS) survey image.  It automatically
+figures out which passband the image is in (S1 or S2).  Instrument
+vignetting and dead-time are allowed for.
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[INP   ]
+Name of (HDS) image to be exposure corrected.  The default file extension
+is {\tt .sdf} and need not be supplied by the user.
+\item[EFFCOR  ]
+Allows a correction for degradation of detector efficiency.  Can be used
+to give `at launch' values.  Count rates given in the 2RE catalogue have
+had this correction applied.
+\item[OUT   ]
+Name of (HDS) corrected image.  An output name is suggested by the
+program. The default file extension is {\tt .sdf}.
+\end{description}
+
+\subsection{\label{ss_re_sort}\xlabel{re_sort}re\_sort}	
+
+This program `sorts' (FITS) survey event files into ASTERIX (HDS)
+datasets such as images and time-series.  If events from a range of
+files are too be sorted to the same output file then they should first
+be merged using \htmlref{{\tt re\_fitmrg}}{ss_re_fitmrg} (see
+Section~\ref{ss_re_fitmrg}).
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[EVEFIL   ]
+Name of (FITS) event file to be sorted.  The default file extension is 
+{\tt .fit} and need not be supplied by the user.
+\item[SHOW   ]
+If {\tt Y} is the reply to the prompt, then some summary information on the
+event file being sorted is displayed.
+\item[DTYPE   ]
+ Type of ASTERIX (HDS) dataset to be produced.  Options are:
+
+\begin{verbatim}
+     (I)mage   to create an ASTERIX sky coord image dataset.
+     (L)in     to create a linearised detector coord image.
+     (T)ime    to create a time series dataset.
+     (E)vent   to create an event dataset.
+\end{verbatim}
+
+Uses of images and time-series are self evident.  Event sets can be
+useful for accurate timing work.  Linear images are for specialist
+technical/instrument investigations.
+\item[RA]
+The Right Ascension of the sort field centre. This can be entered as
+decimal or sexagesimal degrees.
+\item[DEC]
+The Declination of the sort field centre. This can be entered as
+decimal or sexagesimal degrees.
+\item[DAZ]
+The half azimuthal extent of the field to be sorted (degs).  For example the 
+survey images in the BROWSE table ROSWFCSI were created with DAZ \& DEL set to 
+80/60 and NXPIX \& NYPIX set to 160.  These values give images of dimension 
+$160 \times 160$ arcminutes with a resolution of 1 pixel per arcmin$^{2}$.
+\item[DEL]
+The half elevation extent of the field to be sorted (degs).
+\item[NXPIX]
+The number of pixels along azimuthal side of the image. 
+\item[NYPIX]
+The number of pixels along elevation side of the image. 
+\item[INRAD]
+In time series mode INRAD specifies the inner radius of an annulus
+from which to select events. The radius should be specified in arcminutes
+and may be set to zero in order to select from a circular region.
+\item[OUTRAD]
+In time series mode OUTRAD specifies the outer radius of an annulus
+from which to select events. The radius should be specified in
+arcminutes.  Typical values are 3 arcminutes for sources and 9 arcminutes
+for local background estimates if INRAD is set to zero.
+\item[BREJ ]
+A background mask was created during the survey processing to
+maximise signal-to-noise for images.  It is recommended to use this
+option -- it needn't be used for time-series.
+\item[MREJ ]
+During the survey, the moon would occasionally appear in the WFC
+filed-of-view.  This option allows the user to reject such lunar events.
+\item[FILTER]
+A text string definition of the filter to use. This is selected from
+the second column of the following table
+
+\begin{verbatim}
+      MCF #        Filter        Material
+
+      6             S2A          Le/Be
+      8             S1A          Le/C/B4C
+ 
+      (MCF = Master Calibration File)
+\end{verbatim}
+
+\item[TLO  ]
+The time from which to start event sorting.   The units are absolute
+MJD.  (When performing background subtraction of two concentric
+time-series it is important that the two time-series be co-binned and
+so TLO should be chosen to be the same for both. It is recommended to
+use the {\tt csh} script \htmlref{{\tt re\_light}}{se_shell_scripts}, see
+Section~\ref{se_shell_scripts}, to perform this task).
+\item[THI ]
+The time to end event sorting.   The units are absolute MJD.
+\item[NBINS]
+The number of bins into which the time extent of the sort 
+is to be divided. If a value '0' is given the program prompts for the
+time duration for each bin (see TBIN).
+\item[TBIN]
+If NBIN is specified as 0 then TBIN should be set to the required
+time duration of a bin (in seconds).  It is common to bin survey time-series on
+the \ro spacecraft orbit of 5760 seconds --- a source could only be
+observed for a maximum of $\sim 80$secs once per orbit.
+\item[IRAD]
+This gives the option of `stopping down' the radius of the WFC
+field-of-view.  The units are degrees, the default is the full field
+($\approx 5^{\circ}$ in diameter).
+\item[OUTPUT]
+The name of the output dataset. The default extension for the file is 
+{\tt .sdf } and need not be supplied by the user.
+\end{description}
+
+\subsection{\label{ss_re_timexp}\xlabel{re_timexp}re\_timexp}  
+
+This program exposure corrects a survey (HDS) time-series for
+vignetting, dead-time, and point spread function as well as raw
+exposure.  Essentially `on-axis' count rates are returned.   It expects
+to find two files that contain information on spacecraft attitude and
+instrument house-keeping rates ({\tt re\_ateres.fit} and {\tt
+re\_hkrres.fit} respectively).
+
+\subsubsection{Parameters}
+
+\begin{description}
+\item[INP   ]
+Name of (HDS) time-series to be exposure corrected. The default extension is 
+{\tt .sdf } and need not be supplied by the user.
+\item[SRC   ]
+If the input time-series is for a source, rather than a background
+region, then answer {\tt Y} so that a point-spread-function correction
+can be applied.
+\item[OUT   ]
+Name of (HDS) corrected time-series. The program suggests a file name.
+The default extension is {\tt .sdf}. Note that the {\tt csh} script
+\htmlref{{\tt re\_light}}{se_shell_scripts}, see
+Section~\ref{se_shell_scripts}, produces an exposure profile of the
+corrected time-series which is useful for masking out time-bins below a
+certain threshold.  Light-curves for 2RE Catalogue sources did not use
+data points calculated from exposures of less than 30 seconds (see
+McGale \etal, MNRAS, in press).
+\end{description}
+
+\section{\label{se_shell_scripts}\xlabel{shell_scripts}{\tt csh} Scripts}
+
+Some of the REPACK programs have been incorporated into {\tt csh}
+scripts to perform some typical procedures and so minimise user interaction. 
+These scripts are listed in the table below.
+
+\begin{verbatim}
+   Name        Description
+   ----------------------------------------------------------------
+   re_light    Produces exposure correct background subtracted time-series.
+   re_spec     Produces exposure correct background subtracted spectra.
+   re_fitmrgsh Merge all event files, or a selection, in the current directory.
+   re_menu     Menu driven ROSAT WFC survey data analysis.
+\end{verbatim}
+
+\section{\label{se_ancilliary_files}\xlabel{ancilliary_files}Ancillary Survey Files}
+
+In order for the REPACK software to function properly,  access to various
+reservoir files is required.  These are listed in the table below.
+
+\begin{verbatim}
+File             Typ*   Description
+---------------- ---    --------------------------------------------------
+reskyexp_f1.fit   F     Sky exposure map for survey passband S1.
+reskyexp_f2.fit   F     Sky exposure map for survey passband S2.
+reexp_eff.fit     F     Sky maps to allow for change in dectector efficiency.
+re_slots.fit      F     WFC configuration during survey.
+re_ateres.fit     F     WFC attitude solution during survey.
+re_hkrres.fit     F     WFC housekeeping rates during survey.
+re_psf_f1.sdf     H     Survey point spread function for passband S1.
+re_psf_f2.sdf     H     Survey point spread function for passband S2.
+re_imge.dat       A     Survey image list.
+
+* F=FITS, H=HDS, A=ASCII
+\end{verbatim}
+
+The software startup procedure should define an environment variable
+{\tt re\_res} that points to the location of these files.  ASTERIX
+should also have been installed at the users site if the REPACK package
+is to be used --- this gives access to the \ro WFC master calibration
+file.  The user is never asked by the REPACK programs to supply any of
+the above filenames as they work out for themselves which ones are
+required.
+
+\section{\label{se_contact_points}\xlabel{contact_points}Points of Contact}
+
+The REPACK package was based on software written mostly by Mike Denby
+to analyse \ro WFC survey data on VAXes.  The present software was
+written by Paul McGale.  Points of contact are John Pye ({\tt
+pye@star.le.ac.uk}) and Jeremy Ashley ({\tt jka@star.le.ac.uk}).
+
+\newpage
+
+\section{\label{se_example_session}\xlabel{example_session}Example Session}
+
+The following example shows how many of the REPACK programs and
+procedures may be used.  It assumes that the user has already retrieved
+survey event files from LEDAS (see Section~\ref{se_retrieving_images}) .
+
+\begin{small}
+\begin{verbatim}
+% aststart                                        ! Startup ASTERIX and REPACK
+% re_start
+
+% re_evsrch                                     ! Names of relevant event files
+
+    RE_EVSRCH, version 010595
+
+SRA search RA (deg/hms) <REAL>=8.2
+SDEC search Dec (deg/dms) <REAL>=-62.8
+RAD  radius (deg) <REAL>=2.5
+
+  # event files partially or totally enclosed:     9
+
+  List:
+  x174y16
+  x175y16
+  x176y16
+  x174y17
+  x175y17
+  x176y17
+  x174y18
+  x175y18
+  x176y18
+
+List also stored in file re_evmrg.list.
+
+% re_fitmrgsh                                      ! Merge present event files 
+ 
+  RE_FITMRGSH -- Version 010595
+ 
+    Merging all x*y*.fit files in current directory.
+ 
+ls: No match.
+ 
+ RE_FITMRG Version 010595 
+
+    Merging            9 event files.
+ 
+    Merged file is mrgd_ev.fit.
+ 
+% ls                                                         ! See what we have
+mrgd_ev.fit     x174y16.fit     x175y16.fit     x176y16.fit
+re_evmrg.list   x174y17.fit     x175y17.fit     x176y17.fit
+x174y18.fit     x175y18.fit     x176y18.fit
+
+% re_sort                                                    ! Sort to an image
+
+ RE_SORT Version 110595   
+
+EVEFIL Event File <CHAR>=mrgd_ev
+SHOW header records = No =y
+
+ Mode                    : S
+ MDR Sequence #          : mrgd_ev   
+ # Azim maps             :   0
+ # Elev maps             :  0
+ Asc Node Ra             :    0.0
+ Asc Node Dec            :    0.0
+ Target                  : SURVEY                                  
+ Observer                : ROS-UKSC                                
+ Instrument              : WFC                                     
+ Ref MJD                 : 47892.0000
+ Base date               : 
+ Base MJD                : 48198.1993
+ End MJD                 : 48212.3455
+ Total Events            :    63722
+ Active maps             :     9
+ File Creation           : 27/04/95 
+ File Revision           : 1   
+
+DTYPE I,T,E or L <CHAR>=i
+RA of Field centre (deg/hms) <REAL>=8.2
+DEC of Field centre (deg/hms) <REAL>=-62.8
+DAZ Field 1/2 width (degs) <REAL>=1.333333
+DEL Field 1/2 Height (degs) <REAL>=1.333333
+NXPIX Azimuth Pixels <INTEGER>=160
+NYPIX Elevation Pixels <INTEGER>=160
+BREJ Background rejection = Yes =
+MREJ Moon in field rejection = Yes =
+FILTER eg S1A <CHAR>=s1
+    BASE_MJD is    48198.1993359375     
+TLO Start MJD = 48198.199335937 =
+THI End MJD = 48212.345531322 =
+IRAD Iris Radius (degs) = 2.378898 =
+OUTPUT dataset <CHAR>=im_s1
+    Events in image :         9000
+
+% icl                                                    ! Display image in ICL
+
+ICL (UNIX) Version 3.0 27/03/95
+
+ICL> asterix
+
+----------------------------------------------------------------------
+ ASTERIX Version 1.7-0           - type ASTHELP for more information
+ 
+ICL> iload im_s1 xw GCB=no
+ILOAD Version 1.7-3
+ICL> idisp
+IDISPLAY Version 1.7-0
+ICL> exit
+
+	
+% bsub                                    ! Create a background model for image
+BSUB Version 1.3-18
+INP - Input file /@twd_2_sp/ > im_s1
+OUT - Background subtracted image > imb
+BGND - Output background model dataset /!/ > bg_s1
+PSF system options :
+
+  ANAL           ASCA           EXOLE          PWFC           RADIAL
+  RESPFILE       TABULAR        WFC            XRT_HRI        XRT_PSPC
+
+  CSPEC(psf/model,spec[,nbin])
+  POLAR(psf,rbin[,abin])        RECT(psf,xbin[,ybin])
+
+PSF - Choose PSF to use for search /'WFC'/ > tabular
+MASK - Name of a 2D dataset containing psf > $re_res/re_psf_f1
+PSF read in from file $re_res/re_psf_f1
+
+68% radius of PSF is    3.4 pixels
+80% radius of PSF is    5.5 pixels
+90% radius of PSF is    9.6 pixels
+95% radius of PSF is   14.9 pixels
+
+Image is 160 x 160
+
+SURVEY image
+
+SOURCE_THRESH - Source detection threshold /4/ > 
+
+BOX_DIM - Trial small box size /11/ > 
+
+ NON-ZERO image limits are    1 :  160 (in X) and    1 :  160 (in Y)
+SLOPING_EDGES - Identify sloping edges in data /NO/ > yes
+
+ Detected    1 sources
+ source at    99.71    43.78 : Approx cts =      428.1
+
+SM_FILT - Choose Gaussian (G) or top hat (H) smoothing function /'H'/ > g
+SM_FWHM - Enter FWHM (pixels) for smoothing function /15/ > 
+
+ For background subtracted image, minimum=    -0.45 : maximum=    38.65 cts
+ Mean of image=     0.335  Mean of smoothed image =     0.327
+ Mean difference over image=   0.0078 : RMS=   0.5770
+ Worst % deviation (data-smooth) in a box is   -88.5 % in box 212
+ Average of box (data-smooth) variations =    0.34 % RMS =   16.8 %
+
+% icl                                                ! Look at background model
+
+ICL> asterix
+ICL> iload bg_s1 xw GCB=NO
+ILOAD Version 1.7-3
+ICL> idisp
+IDISPLAY Version 1.7-0
+ICL> exit
+
+% pss                                                     ! Source search image
+PSS Version 1.7-5
+INP - Dataset to be searched/tested for sources /@im_s1/ > 
+EXPERT - Expert mode /TRUE/ > 
+PSF system options :
+
+  ANAL           ASCA           EXOLE          PWFC           RADIAL
+  RESPFILE       TABULAR        WFC            XRT_HRI        XRT_PSPC
+
+  CSPEC(psf/model,spec[,nbin])
+  POLAR(psf,rbin[,abin])        RECT(psf,xbin[,ybin])
+
+PSF - Choose PSF to use for source model /'WFC'/ > tabular
+MASK - Name of a 2D dataset containing psf >  $re_res/re_psf_f1
+PSF read in from file  $re_res/re_psf_f1
+PSFCON - Assume constant PSF across field /YES/ > 
+
+Energy fraction    Radius
+
+      50%         2.0   pixels
+      68%         3.4   pixels
+      90%         9.6   pixels
+      95%        14.9   pixels
+
+PSFPIX - Radius of PSF box in pixels /3/ > 5
+X_CORR axis range is from 79.49998 to -79.49998 arcmin
+Y_CORR axis range is from -79.49998 to 79.49998 arcmin
+SLICE - Section of dataset to search /'*:*,*:*'/ > '65:-65,-65:65'
+SOPT - Statistic option (CASH,GAUSSIAN) /'CASH'/ > 
+BGND - Background model /@bg_s1/ > 
+RESCALE - Re-scale background estimate /NO/ > 
+EXTEN - Fit for extension measure /NO/ > 
+SAMPLE - Oversampling factor for first pass /1/ > 
+First pass - grid spacing 1 pixels
+MAP - Significance map /!/ > ims_s1
+Significance varies from 0 to 41.05927
+SIGMIN - Significance threshold /5/ > 4
+ Src    X        Y     Signif
+
+   1  63.65    64.87    3.351
+   2 -28.63    50.58    4.083
+   3 -64.04   -29.38    3.727
+   4  -6.38    -1.86    3.416
+   5 -18.44     9.43    3.274
+   6 -58.56   -56.41    4.523
+   7 -47.61   -64.72    3.238
+   8  36.94    11.69    3.453
+   9  36.49    24.09    3.579
+  10 -19.46   -36.52   41.059
+  11 -19.55   -48.27    4.024
+  12 -43.19    -1.87    3.315
+  13 -39.94    -2.41    3.237
+Second pass
+ASYMMETRIC - Asymmetric source parameter errors /NO/ > 
+FERL - Flux error confidence level /'1 sigma'/ > 
+PERL - Positional error confidence levels /'90%'/ > 
+ Src      RA         DEC         X        Y     Signif    Flux
+
+   1  00 23 55.6  -63 43 12   -58.93   -56.22    4.662    18.954
+   2  00 28 44.6  -61 57 16   -28.61    50.50    4.090    17.619
+   3  00 29 55.3  -63 24 37   -19.33   -36.73   41.213   449.014
+OUT - Source search results file (! for none) /@srclist/ > s1_src
+SSUB - Source subtracted dataset /!/ > 
+
+% re_expos                                 ! Exposure correct source raw fluxes
+ RE_EXPOS version 230595
+FILT S1a or S2a <CHAR>=s1
+    Using sky exposure map: /rosat/soft/reskyexp_f1.fit
+SLIST Source list <CHAR>=s1_src
+CLIST Corrected SSDS file = s1_srcc =
+    Correcting            3 source locations
+
+% ssdump hms=no                                                  ! List sources
+SSDUMP Version 1.7-3
+INP - Source dataset /@s1_src/ > s1_srcc
+DEV - Output to /'TERMINAL'/ > 
+-------------------------------------------------------------------------------
+-----------------------------------------------
+Results file /rosat/soft/scratch/s1_srcc.sdf contains data from one source sear
+ch
+     N   Searched Dataset At 24-May-95 11:27:57
+     1   /rosat/soft/scratch/im_s1.sdf
+          
+   Dataset was searched by PSS Version 1.7-5
+
+ Equatorial coordinates, equinox 2000.0, units DEGREES
+
+Positional errors are at 90% confidence, units arcmin
+Flux units are count, errors are at 68.26895% confidence
+Bgnd units are count/pix
+-------------------------------------------------------------------------------
+-----------------------------------------------
+
+   X_CORR     Y_CORR        RA           DEC            Raw Flux          ENCPS
+F      Bgnd      Perr    Signif    Cor_Flux
+1  -58.9288   -56.2228     5.981595   -63.720122    19.0    +-  6.3       0.82
+     0.163       1.403     4.662  1.9890E-02
+2  -28.6110    50.5005     7.185864   -61.954565    17.6    +-  6.3       0.82
+     0.344       0.993     4.090  2.1980E-02
+3  -19.3276   -36.7263     7.480349   -63.410301    449.    +-  25.       0.82
+     0.352       0.190    41.213  5.4387E-01
+
+
+% pss mode=uplim                          ! Get an upper limit at some position
+PSS Version 1.7-5
+INP - Dataset to be searched/tested for sources /@mysrc_2_sp/ >im_s1
+EXPERT - Expert mode /TRUE/ > 
+PSF system options :
+
+  ANAL           ASCA           EXOLE          PWFC           RADIAL
+  RESPFILE       TABULAR        WFC            XRT_HRI        XRT_PSPC
+
+  CSPEC(psf/model,spec[,nbin])
+  POLAR(psf,rbin[,abin])        RECT(psf,xbin[,ybin])
+
+PSF - Choose PSF to use for source model /'WFC'/ > tabular
+MASK - Name of a 2D dataset containing psf >  $re_res/re_psf_f1
+PSF read in from file  $re_res/re_psf_f1
+PSFCON - Assume constant PSF across field /YES/ > 
+
+Energy fraction    Radius
+
+      50%         2.0   pixels
+      68%         3.4   pixels
+      90%         9.6   pixels
+      95%        14.9   pixels
+
+PSFPIX - Radius of PSF box in pixels /3/ > 5
+BGND - Background model /@bg_s1/ > 
+RESCALE - Re-scale background estimate /NO/ > 
+PLIST - Source of RA and DECs > TERMINAL
+Enter RA and DEC at prompts, ! to terminate
+RA - Right ascension /!/ > 8.2
+DEC - Declination > -62.8
+RA - Right ascension /!/ > 
+1 positions read from TERMINAL
+FERL - Upper limit confidence level /'1 sigma'/ > 90
+ Src      RA         DEC         X        Y      Flux
+
+   1  00 32 48.0  -62 48 00     0.00     0.00  <   11.938
+OUT - Source search results file (! for none) /@srclist/ > uplim_s1
+
+
+% re_light                                   ! Produce S1a and S2a light curves
+ 
+   RE_LIGHT -- Version 090595
+ 
+Please note that this version does not work with 
+background derived from an annulus!   Background is got
+from a circle offset along s/c scan path.  Recommended 
+radii are 3am for source and 9am for background. 
+A typical offset value maybe 20am. 
+Moon times rejected. High background times NOT rejected.
+
+   Give event file (eg mrgd_ev.fit): mrgd_ev
+   Give source RA (deg\hms): 7.48
+   Give source Dec (deg\hms): -63.41
+   Give source name : mysrc
+   Give source box radius (arcmin): 3
+   Give bgnd offset (arcmin): 20
+   Give bgnd box radius (arcmin): 9
+   Give time bin width in secs (eg 5760): 5760
+ 
+The following will be created in the default directory
+ 
+mysrc_1     - Raw source time series in S1a
+mysrc_1_c   - Exp corrected source
+mysrc_1_b   - Raw background time series
+mysrc_1_bc  - Exp corrected Background
+mysrc_1_bcd - Exp corrected Background, area corrected
+mysrc_1_s   - Background subtracted source flux
+mysrc_1_x   - Exposure profile at the source
+mysrc_1_bx  - Exposure profile at background
+ 
+Files as above but for the S2a filter
+ 
+   Sorting On source for S1A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          279
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    2.000000     secs         2880 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Sorting Background for S1A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :           90
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    2.000000     secs         2880 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Subtracting Background from source 
+ 
+ARITHMETIC Version 1.7-1
+WARNING : 191 points ignored due to bad quality
+          Data copied from first input object for these points
+ARITHMETIC Version 1.7-1
+WARNING : 191 points ignored due to bad quality
+          Data copied from first input object for these points
+ 
+   Produce exposure Profile for S1a
+ 
+    RE_EXPROF Version 090595
+    RE_EXPROF Version 090595
+ 
+   Sorting On source for S2A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          587
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    2.000000     secs         2880 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Sorting Background for S2A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          132
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    2.000000     secs         2880 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Subtracting Background from source 
+ 
+ARITHMETIC Version 1.7-1
+WARNING : 193 points ignored due to bad quality
+          Data copied from first input object for these points
+ARITHMETIC Version 1.7-1
+WARNING : 196 points ignored due to bad quality
+          Data copied from first input object for these points
+ 
+   Produce exposure Profile for S2a
+ 
+    RE_EXPROF Version 090595
+    RE_EXPROF Version 090595
+
+% grdraw inp=mysrc_1_s  dev=xw                        ! Look at S1a light curve
+GDRAW Version 1.7-5
+
+Dataset: /rosat/soft/scratch/mysrc_1_s
+
+% re_spec                                         ! Produce S1a and S2a spectra
+ 
+   RE_SPEC -- Version 110595
+ 
+Please note that this version does not work with 
+background derived from an annulus!   Background is got
+from a circle offset along s/c scan path.  Recommended 
+radii are 3am for source and 9am for background. 
+A typical offset value maybe 20am. 
+Moon times rejected. High background times NOT rejected.
+ 
+ 
+   Give event file (eg mrgd_ev.fit): mrgd_ev
+   Give source RA (deg\hms): 7.48
+   Give source Dec (deg\hms): -63.41
+   Give source name : mysrc
+   Give source box radius (arcmin): 3
+   Give bgnd offset (arcmin): 20
+   Give bgnd box radius (arcmin): 9
+ 
+The following will be created in the default directory
+ 
+   mysrc_1_sp     - Background subtracted source spectrum
+   mysrc_1_sp.pha - XSPEC (sf format) pha file
+   mysrc_1_sp.rsp - XSPEC (sf format) rsp file
+ 
+Files as above but for the S2A filter
+ 
+   Sorting On source for S1A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          279
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    1.999999     secs       611116 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Sorting Background for S1A
+ 
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :           90
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    1.999999     secs       611116 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Subtracting Background from source 
+ 
+ARITHMETIC Version 1.7-1
+ARITHMETIC Version 1.7-1
+ 
+   Producing spectrum for S1A
+ 
+WFCSPEC Version 1.7-0
+
+Filter: Lexan/C/B4C
+        Response centred at 124 eV
+AST2XSP version 1.6-3
+ 
+   Sorting On source for S2A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          587
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    1.999999     secs       611116 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Sorting Background for S2A
+
+ RE_SORT Version 110595   
+    BASE_MJD is    48198.1993359375     
+    Events in time-series :          132
+
+ RE_TIMEXP Version 090595      
+    Tstep set to    1.999999     secs       611116 steps/bin
+    Using /rosat/soft/re_hkrres.fit
+    Using /rosat/soft/re_ateres.fit
+    Calculating the exposure array
+    Correcting raw data array
+ 
+   Subtracting Background from source 
+ 
+ARITHMETIC Version 1.7-1
+ARITHMETIC Version 1.7-1
+ 
+   Producing spectrum for S2A
+ 
+WFCSPEC Version 1.7-0
+
+Filter: Lexan/Be
+        Response centred at 90 eV
+AST2XSP version 1.6-3
+
+\end{verbatim}
+\end{small}
+
+The above shows one way of tackling \ro WFC survey data.  Another
+approach, to cut down the number of processing steps, could have been to check 
+the ROSWFCSI database for the image that surveyed the sky region of interest.  
+This could then be retrieved instead of recreating it from the event files.  
+Further, the 2RE catalogue could also have been searched to see if the desired
+source had already been detected and if its light-curve existed.
+
+\end{document}

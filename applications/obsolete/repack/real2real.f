@@ -1,0 +1,12 @@
+*+REAL2REAL	Copies REAL array to another one
+	SUBROUTINE REAL2REAL(NPTS, RDATA, ODATA)
+	INTEGER NPTS		!input
+	REAL RDATA(NPTS)	!input
+	REAL ODATA(NPTS)	!output
+*-Author	Clive Page	1990-NOV-9
+	INTEGER J
+*
+	DO J = 1,NPTS
+	    ODATA(J) = RDATA(J)
+	END DO
+	END

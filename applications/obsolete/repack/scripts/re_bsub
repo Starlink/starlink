@@ -1,0 +1,25 @@
+# RE_BSUB $1=<raw_image> $2=<bgnd_model> $3=<filter_number> $4=<spots_file>
+#
+# Use bsub to create background models for use in PSS
+echo "Creating background for $1"
+#
+# Create background models for all images
+#
+set bdim=$_RE_SCI_BSUB_BDIM
+set sbox=$_RE_SCI_BSUB_SMBOX
+set sensig=$_RE_SCI_PSS_SIGMIN
+set ppix=$_RE_SCI_PSS_PSFPIX
+#
+# Run BSUB
+#
+bsub inp=$1 out=imb bgnd=$2 box_dim=$bdim smooth_size=$sbox sm_filt=G sm_fwhm=$sbox psf=tabular mask="$SDA_DIR/re_psf_f$3" source_thresh=4.0 \\
+#
+# Run spot sensitivity
+#
+# $SDA_DIR/spotsens $2 psf=tabular mask="$SDA_DIR/re_psf_f$3" spacing=8 border=10 psfpix=$ppix sensig=$sensig \\ >$4
+#
+# Don't need background subtracted image
+#
+rm -f imb.sdf
+
+

@@ -1,0 +1,120 @@
+# re_uplims inp1 inp2 out1 out2
+#
+set mconfid=$_RE_SCI_FM_CONF  
+set cohatt=$_RE_SCI_FM_CATT  
+set ncohatt=$_RE_SCI_FM_NCATT 
+set weakerr=$_RE_SCI_FM_WKRAD 
+set ppix=$_RE_SCI_PSS_PSFPIX
+#
+s2filtsplit $1 $2 s1only s2only mconfid=$mconfid cohatt=$cohatt ncohatt=$ncohatt weakerr=$weakerr accept
+mv s1only.dat s1.dat; tr '*' '#' <s1.dat >s1only.dat
+mv s2only.dat s2.dat; tr '*' '#' <s2.dat >s2only.dat
+#
+set f=1
+begin_filter_loop:
+
+  if ($f == 1 ) then
+    set cf=2
+  else
+    set cf=1
+  endif
+
+  set nfile=0
+  set line=1
+  set txt=" "
+  set tnsrc=0
+
+  begin_img_loop:
+
+#  Read line'th line from file
+    set txt=`sed -n "$line,$line:rp" s$f:ronly.dat`
+    @ line++
+    if ( `echo $txt | grep 'END'` != "" ) then
+      goto end_img_loop
+    endif
+
+#  Extract small map id
+    set nums=`echo "$txt" | awk '{print $2}'`
+    @ nfile++
+
+#  Construct image name in complementary filter
+    set img="im$nums:r_f$cf"
+    set bg="bg$nums:r_f$cf"
+    set ulss="ul$nums:r_f$cf"
+
+#  Write RA/DEC pairs to file until the EOI marker is met
+    set nsrc=0
+    begin_src_loop:
+      set txt=`sed -n "$line,$line:rp" s$f:ronly.dat`
+      @ line++
+      if ( `echo $txt | grep 'I'` == "" ) then
+        @ nsrc++
+        @ tnsrc++
+        if ( $nsrc == 1 ) then
+          echo $txt >spots.lis
+        else
+          echo $txt >temp.lis
+          mv spots.lis spots.old
+          cat spots.old temp.lis >spots.lis
+          rm -f spots.old temp.lis
+        endif
+        goto begin_src_loop
+      endif        
+     
+#    Report 
+      echo "Getting upper limits of $nsrc sources in $img"
+
+#    Does image need decompressing
+      if ( -e $img.sdf.Z ) then
+
+        uncompress $img.sdf
+
+#      Create background if not present
+        if ( ! -e $bg.sdf ) then
+          $SDA_DIR/re_bsub $img $bg $cf
+        endif
+
+#      Run PSS
+        pss $img $bg mode=uplim out=$ulss ferl=90 plist=spots.lis expert psf=tabular mask=$SDA_DIR/re_psf_f$cf psfpix=$ppix accept
+
+        compress $img.sdf
+
+      else
+
+#      Create background if not present
+        if ( ! -e $bg.sdf ) then
+          $SDA_DIR/re_bsub $img $bg $cf
+        endif
+
+        pss $img $bg mode=uplim out=$ulss ferl=90 plist=spots.lis expert psf=tabular mask=$SDA_DIR/re_psf_f$cf psfpix=$ppix accept
+      endif
+      rm -f spots.lis
+
+      goto begin_img_loop
+      
+    end_img_loop:
+
+#  Merge results for this filter
+    if ( $nfile > 0 ) then 
+      if ( $f == 1 ) then
+        ls ul??????_f2.sdf | sort >! f2ul_files
+        ssmerge '"@f2ul_files"' "upl_f2" \\
+	rm -f f2ul_files
+      else
+        ls ul??????_f1.sdf | sort >! f1ul_files
+        ssmerge '"@f1ul_files"' "upl_f1" \\
+	rm -f f1ul_files
+      endif
+    endif
+
+  endif
+
+  @ f++
+  if ( $f < 3 ) then
+    goto begin_filter_loop
+  endif
+
+end_filter_loop:
+
+rm -f s?only.dat s?.dat
+

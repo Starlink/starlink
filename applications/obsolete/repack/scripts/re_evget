@@ -1,0 +1,80 @@
+#!/usr/local/bin/tcsh
+#
+# re_evget  <s_ra> <s_dec> <rad>
+#
+# Given an RA, Dec (sex/dec degs) and RAD (degs), script works out
+# which re events files are encompassed, partially or wholly, by the
+# specified search cone and retrieves them.
+#
+# Author : P. McGale (pam@star.le.ac.uk)
+# 1st Ver: 1st May. 95
+
+echo " "
+echo "  RE_EVGET -- Version 040595"
+echo " "
+
+# Set up some environment variables
+set evpath=/rosat/s3/events/y
+set extn=".fit.gz"
+set extn2=".fit"
+unsetenv PARLOG
+
+# Check got all the input parameters.
+if ($1 == "") then
+  echo " "
+  echo -n "   Give search RA (deg\hms): "
+  set s_ra = $<
+else
+  set s_ra = $1
+endif
+
+if ($2 == "") then
+  echo " "
+  echo -n "   Give search Dec (deg\dms): "
+  set s_dec = $<
+else
+  set s_dec = $2
+endif
+
+if ($3 == "") then
+  echo " "
+  echo -n "   Give search radius (deg): "
+  set s_rad = $<
+else
+  set s_rad = $3
+endif
+
+
+# Find event files affected by search cone.
+"$re_progs"re_evsrch sra=$s_ra sdec=$s_dec rad=$s_rad \\
+#re_evsrch sra=$s_ra sdec=$s_dec rad=$s_rad \\
+
+
+# Retrieve event files.
+set line=1
+set txt=""
+set nevfs=`wc re_evmrg.list | awk '{print $1}'`
+echo " "
+echo "   Retrieving $nevfs event files."
+
+if ($nevfs == 0) then
+  echo " "
+  echo "  No event files selected.  Aborting."
+  goto exit
+endif
+
+
+ev_loop:
+  set txt=`sed -n "$line,$line:rp" re_evmrg.list`
+  set evf=`echo "$txt" | awk '{print $1}'`	
+  set subdir=`echo "$evf" | awk '{print substr($1,6,2)}'`	
+  cp -f $evpath$subdir"/"$evf$extn .
+  gunzip $evf$extn
+
+  @ line++
+  if ($line <= $nevfs) goto ev_loop
+
+end_ev_loop:
+
+# Leave script
+exit:

@@ -1,0 +1,26 @@
+#+  RE_SCI_PAR - RE science parameters definition. 
+#
+#     20 Oct 92 : V1.0-0  Original (BHVAD::DJA)
+#-
+echo "RE_SCI_PAR Version 1.0-0"
+#
+#Background subtraction
+setenv _RE_SCI_BSUB_BDIM     11
+setenv _RE_SCI_BSUB_SMBOX    15
+#
+#Filter S1/2 searching
+setenv _RE_SCI_PSS_PSFPIX    5
+setenv _RE_SCI_PSS_SIGMIN    3.5
+setenv _RE_SCI_SIGMAPS       YES
+#
+#Combined filter searching
+setenv _RE_SCI_COMBINED      NO
+setenv _RE_SCI_PSS_CSIGMIN   4.15
+#
+# List merging
+#
+setenv _RE_SCI_FM_CONF       99
+setenv _RE_SCI_FM_CATT       0.0
+setenv _RE_SCI_FM_NCATT      0.5 
+setenv _RE_SCI_FM_WKRAD      3.0
+#

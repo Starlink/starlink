@@ -1,0 +1,25 @@
+#+  RE_SCIENCE - Process images in RE_OUT
+#-
+#
+echo "RE_SCIENCE Version 1.0-0"
+#
+$SDA_DIR/re_pss "??????" 1
+$SDA_DIR/re_pss "??????" 2
+#
+# Upper limits in complimentary filters. Generates upl_f1 and upl_f2 files
+#
+$SDA_DIR/re_uplims ipsr_f1 ipsr_f2
+
+#
+# Exposure correct SSDS.
+#
+$SDA_DIR/re_exp $SDA_DIR/reskyexp_f1 ipsr_f1 ipsr_f1e
+$SDA_DIR/re_exp $SDA_DIR/reskyexp_f2 ipsr_f2 ipsr_f2e
+$SDA_DIR/re_exp $SDA_DIR/reskyexp_f1 upl_f1 upl_f1e
+$SDA_DIR/re_exp $SDA_DIR/reskyexp_f2 upl_f2 upl_f2e
+
+#
+
+
+
+

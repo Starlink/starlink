@@ -1,0 +1,237 @@
+#!/usr/local/bin/tcsh
+#
+# re_menu <option>
+#
+# Menu for ROSAT WFC survey data retrieval and sorting.
+#
+# Author : P. McGale (pam@star.le.ac.uk)
+# 1st Ver: 1st May. 95
+
+
+# Set up some environment variables
+setenv re_res /rosat/soft/
+setenv re_progs /rosat/soft/
+
+# Set program names
+alias re_menu   '"$re_progs"re_menu'
+alias re_imsrch '"$re_progs"re_imsrch'
+alias re_evsrch  '"$re_progs"re_evsrch'
+alias re_evget  '"$re_progs"re_evget'
+alias re_evmrg  '"$re_progs"re_evmrg'
+alias re_fitmrg '"$re_progs"re_fitmrg'
+alias re_fitmrgsh '"$re_progs"re_fitmrgsh'
+alias re_expos  '"$re_progs"re_expos'
+alias re_imexp  '"$re_progs"re_imexp'
+alias re_sort   '"$re_progs"re_sort'
+alias re_eoffset '"$re_progs"re_eoffset'
+alias re_exprof '"$re_progs"re_exprof'
+alias re_light  '"$re_progs"re_light'
+alias re_timexp '"$re_progs"re_timexp'
+alias re_spec   '"$re_progs"re_spec'
+
+start:
+unsetenv PARLOG
+
+# Clear the screen.
+clear
+
+echo " "
+echo "  RE_MENU -- Version 230595"
+echo " "
+
+# Present menu.
+echo "      1. Search for an image."
+echo " "
+echo "      2. Search for and retrieve event files."
+echo "      3. Merge all event files in current directory."
+echo "      4. Merge a selection of event files in current directory."
+echo " "
+echo "      5. Sort an event file to an image."
+echo "      6. Source search (or get upper limits from) an image."
+echo "      7. Exposure correct an image."
+echo "      8. Survey exposure at some aribitary position (or correct a SSDS)."
+echo " "
+echo "      9. Sort an event file to a time series."
+echo "     10. Exposure correct a time series."
+echo "     11. Sort an event file to an S1 and S2 light curve set."
+echo " "
+echo "     12. Sort an event file to a linear image."
+echo " "
+echo "     13. Sort an event file to an event set."
+echo " "
+echo "     14. Sort an event file to S1 and S2 spectra."
+
+# Got an input parameter?
+if ($1 == "") then
+  echo " "
+  echo -n "  Option (99 to exit):  "
+  set option = $< 
+endif
+
+
+switch ($option)
+
+
+# Search for an image.
+case 1:
+  clear
+  re_imsrch
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Search and retrieve event files.
+case 2:
+  clear
+  re_evget
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Merge all event files.
+case 3:
+  clear
+  re_fitmrgsh
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Merge slection of event files.
+case 4:
+  clear
+  re_fitmrgsh n
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Sort an event file to an image.
+case 5:
+  clear
+  re_sort dtype=i 
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Source search an image
+case 6:
+  clear
+   echo -n "  Do you require a background model (y/n): "
+   set bgnd = $< 
+   set bgnd = `echo $bgnd | tr A-Z a-z`
+   if ($bgnd == 'y') then
+     echo " "
+     echo "For psf model, use tabular option and mask "$re_res"re_psf_f(1 or 2)"
+     echo " "
+     bsub 
+     echo " "
+     echo " "
+   endif
+
+   echo -n "  Are you going to source search (y/n): "
+   set ss = $< 
+   set ss = `echo $ss | tr A-Z a-z`
+   if ($ss == 'y') then
+     echo " "
+     echo "For psf model, use tabular option and mask "$re_res"re_psf_f(1 or 2)"
+     echo " "
+     pss
+     echo " "
+   else
+     echo " "
+     echo "For psf model, use tabular option and mask "$re_res"re_psf_f(1 or 2)"
+     echo "Going to do upper limits. "
+     echo " "
+     pss mode=uplim
+     echo " "
+   endif
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Exposure correct an image
+case 7:
+  clear
+  re_imexp
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Survey exposure at some arbitary position or exposure correct an SSDS.
+case 8:
+  clear
+  re_expos
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Sort an event file to a time series
+case 9:
+  clear
+  re_sort dtype=t 
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Exposure correct a time series
+case 10:
+  clear
+  re_timexp 
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Produce a light curve set.
+case 11:
+  clear
+  re_light
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Sort to a linear image.
+case 12:
+  clear
+  re_sort dtype=l 
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Sort to an event dataset.
+case 13:
+  clear
+  re_sort dtype=e
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Sort event file to a spectrum
+case 14:
+  clear
+  re_spec
+  echo " "
+  echo -n "Press any key to return to menu....."
+  set option = $<
+breaksw
+
+# Exit menu
+case 99:
+  clear
+  goto exit
+breaksw
+
+endsw
+
+set option = ""
+goto start
+
+# Leave script
+exit:

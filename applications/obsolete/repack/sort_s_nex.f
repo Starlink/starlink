@@ -1,0 +1,56 @@
+*+SORT_S_NEX Locate next active map in an EVE file
+	SUBROUTINE SORT_S_NEX (MLO, MLA, STATUS)
+	IMPLICIT	NONE
+	INCLUDE		'SMAPDEF.INC'
+	INCLUDE		'SLIST.INC'
+* Output
+	INTEGER		MLO, MLA
+	INTEGER		STATUS			! Status return
+* M. Denby May-89
+* P McGale Apr 95
+*-
+* Local
+	LOGICAL		FOUND
+	INTEGER		IN, ILO, ILA
+	INTEGER		IND_SAV
+	DATA 		IND_SAV /1/
+	SAVE		IND_SAV
+ 
+	IF (STATUS .NE. 0) RETURN
+ 
+* Loop from where we left off last call
+	FOUND = .FALSE.
+	CALL PAR_GET0I ('INDSAV', IND_SAV, STATUS)
+	IND_SAV = MAX(1, IND_SAV)
+ 
+	DO IN = IND_SAV, NLON*NLAT
+	  ILO = IN - INT((IN-1)/NLON) * NLON
+	  ILA = INT((IN-1)/NLON) + 1
+	  IF (ILIST(ILO,ILA).NBLOC .NE. 0) THEN
+	    IND_SAV = IN + 1
+	    IF(IND_SAV .EQ. NLON*NLAT+1) IND_SAV = 1
+	    FOUND = .TRUE.
+	    GOTO 888
+	  ENDIF
+	ENDDO
+ 
+	DO IN = 1, IND_SAV-1
+	  ILO = IN - INT((IN-1)/NLON) * NLON
+	  ILA = INT((IN-1)/NLON) + 1
+	  IF (ILIST(ILO,ILA).NBLOC .NE. 0) THEN
+	    IND_SAV = IN + 1
+	    FOUND = .TRUE.
+	    GOTO 888
+	  ENDIF
+	ENDDO
+ 
+888	IF (FOUND) THEN
+	  MLO = ILO
+	  MLA = ILA
+	ELSE
+	  MLO = -999
+	  MLA = -999
+	ENDIF
+	CALL PAR_PUT0I ('INDSAV', IND_SAV, STATUS)
+ 
+	END

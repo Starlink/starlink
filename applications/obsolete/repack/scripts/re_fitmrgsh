@@ -1,0 +1,108 @@
+#!/usr/local/bin/tcsh
+#
+# re_fitmrgsh <all>
+#
+# Merges all of the FITS format event files in the current directory.
+# Optionally can chose which files are to be merged.
+#
+# Author : P. McGale (pam@star.le.ac.uk)
+# 1st Ver: 1st May. 95
+
+echo " "
+echo "  RE_FITMRGSH -- Version 010595"
+echo " "
+
+
+# Got an input parameter?
+if ($1 == "") then
+  set all = y
+else
+  set all = n
+endif
+
+
+# Create text file of event files to be merged. 
+switch ($all)
+
+
+# Merge selected event files
+case n:
+
+echo " "
+echo " Merging selected x*y*.fit files in current directory."
+echo " "
+
+  set j = 0
+  foreach i (x???y??.fit*)
+    if ($j == 0) then
+      echo -n "  Merge $i (y/n): "
+    else
+      echo -n "  Merge $i : "
+    endif
+    set mrg = $< 
+    set mrg=`echo $mrg | tr A-Z a-z`
+    if ($mrg == 'y') then
+      if (`echo $i | grep '.gz'` != "") then       # ZIPped ?
+        gunzip $i
+        if ($j == 0) then
+          echo $i:r >! re_evmrg.list
+        else
+          echo $i:r >> re_evmrg.list
+        endif
+	@ j++
+      else
+        if ($j == 0) then
+          echo $i >! re_evmrg.list
+        else
+          echo $i >> re_evmrg.list
+        endif
+	@ j++
+      endif
+    endif
+  end
+
+breaksw
+
+# Merge all event files
+default:
+
+echo " "
+echo " Merging all x*y*.fit files in current directory."
+echo " "
+
+# Unzip any ZIPped files.
+  if ( `ls x???y??.fit.gz | head -1 | grep 'gz'` != "" ) then
+    foreach i (x???y??.fit.gz)
+      gunzip $i
+    end
+  endif
+
+# Dump out list of event files to be merged.
+   set j = 0
+   foreach i (x???y??.fit)
+     @ j++
+     if ($j == 1) then
+       echo $i >! re_evmrg.list
+     else
+       echo $i >> re_evmrg.list
+     endif
+   end
+
+echo " "
+echo " List of event files to be merged in re_evmrg.list"
+echo " "
+
+endsw
+
+
+
+# Merge the event files together.
+
+"$re_progs"re_fitmrg \\
+
+echo " "
+echo "   Merged file is mrgd_ev.fit."
+echo " "
+
+# Leave script
+exit:
