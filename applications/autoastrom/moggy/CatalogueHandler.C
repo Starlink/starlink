@@ -44,7 +44,7 @@ extern "C" int setenv(const char *name, const char *value, int overwrite);
 
 #include "stringstream.h"
 
-#include "fitshead.h"
+#include "cat/fitshead.h"
 
 #include "CatalogueHandler.h"
 #include "util.h"
