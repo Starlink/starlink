@@ -39,6 +39,8 @@
 *     routine APM original.
 
 *  Arguments:
+*     DTYPE = CHARACTER * ( * )
+*        Data type of FRAME.
 *     FRAME( 1 ) = unknown (Returned)
 *        The output array containing the generated objects.
 *     XDIM, YDIM = INTEGER (Given)
@@ -151,22 +153,22 @@
 
 *  Call appropriate routine according to data type.
       IF      ( DTYPE .EQ. '_WORD'    ) THEN
-         CALL BGG1_OBJSW( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSW( FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
-         CALL BGG1_OBJSI( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSI( FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_REAL'    ) THEN
-         CALL BGG1_OBJSR( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSR( FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
       ELSE IF ( DTYPE .EQ. '_DOUBLE'  ) THEN
-         CALL BGG1_OBJSD( DTYPE, FRAME, XDIM, YDIM, XORIG, YORIG,
+         CALL BGG1_OBJSD( FRAME, XDIM, YDIM, XORIG, YORIG,
      :                    XPOS, YPOS, INTENS, NOBJ, GSIGM, CROSS,
      :                    COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA,
      :                    EXPAND, SCALE, STATUS )
@@ -179,4 +181,4 @@
 
 *  All done
       END
-* $Id: big1_objst.f,v 1.1 1998/07/03 14:05:16 mbt Exp $
+* $Id: big1_objst.f,v 1.2 1998/07/03 15:37:54 mbt Exp $
