@@ -129,8 +129,8 @@
             STATUS = SAI__ERROR
             CALL MSG_SETR( 'VALUE', VALUE( I ) )
             CALL MSG_SETI( 'I', I )
-            CALL MSG_SETI( 'AXMIN', AXMIN )
-            CALL MSG_SETI( 'AXMAX', AXMAX )
+            CALL MSG_SETR( 'AXMIN', AXMIN )
+            CALL MSG_SETR( 'AXMAX', AXMAX )
  
             CALL ERR_REP( 'KPG1_AXCOx_OUTBOUND',
      :        'The co-ordinate number ^I has a value ^VALUE that lies '/
