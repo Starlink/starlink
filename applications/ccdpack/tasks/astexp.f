@@ -28,20 +28,22 @@
 *     which can be derived from other NDFs to which similar framesets 
 *     ought to apply.  The key should be generated in the same way when 
 *     the AST file is used for importing the mapping information by
-*     ASTIMP.  Currently the only way these keys can be generated is
-*     by use of the FITSID parameter.
+*     ASTIMP.  Currently these keys can be generated according to a
+*     FITS header card or the order in which the NDFs are presented.
+*     Additional information may be written describing what use to 
+*     make of FITS headers in the NDFs.
 *
 *     Used together, the framesets written out to an AST file can thus
-*     contain information about the relative positioning of different
-*     images in a set of related NDFs
+*     contain information about the positioning of images in a set of
+*     related NDFs.
 *
 *     AST files written out by this application can be applied to
 *     other NDFs of similar origin using the ASTIMP application, so 
 *     that registration information present in the WCS components of 
-*     one set of NDFs (put there for instance by the REGISTER application)
-*     can be transferred using ASTIMP and ASTEXP to another similar set.  
-*     This "similar set" will typically be one from chips in the same 
-*     mosaic camera instrument.
+*     one set of NDFs (put there for instance by the REGISTER or WCSEDIT
+*     applications) can be transferred using ASTIMP and ASTEXP to 
+*     another similar set.  This "similar set" will typically be one 
+*     from chips in the same mosaic camera instrument.
 *
 *     A 2-frame frameset is output for each NDF.  The Base frame is one
 *     selected by the BASEFRAME parameter, and is identical in the 
@@ -57,12 +59,11 @@
 *     identifiers are not all unique.
 
 *  Usage:
-*     ASTEXP in astfile outdomain baseframe fitsid
+*     ASTEXP in astfile outdomain baseframe
 
 *  ADAM Parameters:
 *     ASTFILE = LITERAL (Read)
-*        The name of the file to be written containing the sequence
-*        of framesets.
+*        The name of the AST file to be written.
 *     BASEEPOCH = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using
 *        parameter BASEFRAME) for a celestial co-ordinate system, then
@@ -80,7 +81,7 @@
 *        expected to occur in any NDF to which the AST file will 
 *        later be applied using ASTIMP.  AXIS is a good choice since
 *        this may be applicable to frames which have been modified,
-*        for instance by a WCS-aware application like KAPPA's COMPAVE.
+*        for instance by an application like KAPPA's COMPAVE.
 *
 *        The value of the parameter can be one of the following:
 *        - A domain name such as SKY, AXIS, PIXEL, etc.
@@ -94,6 +95,24 @@
 *        parameter is copied to the AST file unmodified; in particular
 *        it retains the same Domain name.
 *        [AXIS]
+*     FITSID = LITERAL (Read)
+*        If the IDTYPE parameter has the value FITSID, this parameter
+*        gives the FITS header keyword whose value distinguishes
+*        frames with different coordinate system information.
+*        If any lower case characters are given, they are converted 
+*        to upper case.  This may be a compound name to handle 
+*        hierarchical keywords, in which case it has the form 
+*        keyword1.keyword2 etc.  Each keyword must be no longer than 
+*        8 characters.
+*     FITSROT = LITERAL (Read)
+*        This parameter gives the name of a FITS header keyword whose
+*        value will be used to rotate the frames when they are imported.
+*        If any lower case characters are given, they are converted 
+*        to upper case.  This may be a compound name to handle 
+*        hierarchical keywords, in which case it has the form 
+*        keyword1.keyword2 etc.  Each keyword must be no longer than 
+*        8 characters.
+*        [!]
 *     IDTYPE = LITERAL (Read)
 *        This parameter destermines the form of the ID value which 
 *        distinguishes the framesets from each other in the exported
@@ -116,22 +135,12 @@
 *        If IDTYPE is set to INDEX, then this parameter is a list of 
 *        integers with as many elements as there are NDFs accessed by 
 *        the IN parameter.  It gives the sequence of indices N to be 
-*        used for generating the ID values.  Its default value is a 
-*        list with the appropriate number of elements starting 
-*        1,2,3,...  This default will normally be appropriate unless 
-*        the NDFs are being presented in an unusual order, or an order
-*        different from that in which they are likely to be presented
-*        to ASTIMP.
-*        [Dynamic: 1,2,3...]
-*     FITSID = FILENAME (Read)
-*        If the IDTYPE parameter has the value FITSID, this parameter
-*        gives the FITS header keyword whose value distinguishes
-*        frames with different coordinate system information.
-*        If any lower case characters are given, they are converted 
-*        to upper case.  This may be a compound name to handle 
-*        hierarchical keywords, in which case it has the form 
-*        keyword1.keyword2 etc.  Each keyword must be no longer than 
-*        8 characters.
+*        used for generating the ID values.   If set null (!) the 
+*        NDFs will be considered in the order 1,2,3,... which will 
+*        normally be appropriate unless the NDFs are being presented 
+*        in an order different from that in which they are likely to 
+*        be presented to ASTIMP.
+*        [!]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -159,14 +168,11 @@
 *        [BOTH]
 *     OUTDOMAIN = LITERAL (Read)
 *        This parameter gives the name of the new alignment domain for
-*        the frames written out to the AST file.  Its value is
-*        usually not important, but care should be taken that it does
-*        not clash with other useful domains which already exist in
-*        the WCS components of the NDFs to which ASTFILE will be applied
-*        (by the ASTIMP application).  For this reason it is often not a
-*        good idea to use the same name as the Current domain of the 
-*        NDFs listed in the IN parameter.  A suitable value might be the
-*        name of the instrument from which the NDFs are derived.
+*        the frames written out to the AST file.  It is a good idea
+*        to choose a value which is not likely to exist previously
+*        in the WCS components of the NDFs to which ASTFILE will be
+*        applied.  A suitable value might be the name of the 
+*        instrument from which the NDFs are obtained.
 *
 *        Note that the frames which are written to the AST file are the
 *        Current frames of the NDFs supplied; this parameter only gives
@@ -192,6 +198,7 @@
 *        (presumably present in the unreduced data).  The mappings 
 *        between the frame in the 'AXIS' domain of the input NDFs and 
 *        their Current frames are recorded.
+*
 *     astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL 
 *            title="Focal plane alignment" accept
 *        In this case the OUTDOMAIN parameter takes its default value
@@ -206,6 +213,14 @@
 *        the NDFs from the three different chips must be listed in the 
 *        same order as when this command was invoked.  The title of the
 *        output Current frame will be as given.
+*
+*     astexp r10595[2,3,4,5] wfc.ast outdomain=WFC 
+*            idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
+*        This exports the alignment information from the four named
+*        NDFs to a file wfc.ast.  The CHIPNAME FITS header identifies
+*        the source CCD for each, and the ROTSKYPA FITS header gives
+*        a number of degrees to rotate each frame additional to the
+*        relative alignment information.
 
 *  Notes:
 *     AST file format:
@@ -218,30 +233,71 @@
 *        are to be undertaken.  The format of the file is explained 
 *        here.
 *
-*        The AST file consists of a sequence of framesets.  Each 
-*        frameset has an ID, and contains two frames (a Base frame and 
-*        a Current frame) and a mapping between them.  The domains of
-*        all the Base frames should normally be the same, and likewise
-*        for all the Current frames.  For the NDFs to which the file
-*        will be applied by ASTIMP, their WCS components should contain 
-*        frames in the same domain as the AST file's Base frame.
+*        The AST file consists of the following, in order:
 *
-*        The ID of each frameset is used to determine, for each NDF,
-*        which of the framesets in the file should be applied to it.
-*        This ID is a string which can assume one of the followin forms:
+*           <global modifiers>
+*           (blank line)
+*           <frameset 1>
+*           <frameset 1 modifiers>
+*           (blank line)
+*           <frameset 1>
+*           <frameset 2 modifiers>
+*           (blank line)
+*             ...
+*           (end of file)
 *
-*        -  "FITSID KEY VALUE"
-*              This will match an NDF if the first FITS header card
-*              with the keyword KEY has the value VALUE.  If the value
-*              is of type CHARACTER it must be in single quotes. KEY
-*              may be compound (of the form keyword1.keyword2 etc) to 
-*              permit reading of hierarchical keywords.
+*        Characters after a '#' character are normally ignored.  The 
+*        constituent parts are composed as follows:
 *
-*        -  "INDEX N"
-*              This associates a frameset with an integer N.  Usually
-*              N will take the values 1,2,3,... for the framesets
-*              in the file.  Typically the N'th NDF in a list will
-*              match the one with an ID of "INDEX N".
+*        Blank line: 
+*           A single blank line, which may contain spaces but no comments.
+*
+*        Frameset:
+*           The framesets are written in AST native format, as explained
+*           in SUN/210.
+*
+*           Each frameset has an ID, and contains two frames (a Base 
+*           frame and a Current frame) and a mapping between them.  
+*           The domains of all the Base frames should normally be the 
+*           same, and likewise for all the Current frames.  For the 
+*           NDFs to which the file will be applied by ASTIMP, their 
+*           WCS components should contain frames in the same domain 
+*           as the AST file's Base frame.
+*
+*           The ID of each frameset is used to determine, for each NDF,
+*           which of the framesets in the file should be applied to it.
+*           This ID is a string which can assume one of the following 
+*           forms:
+*
+*           -  "FITSID KEY VALUE"
+*                 This will match an NDF if the first FITS header card
+*                 with the keyword KEY has the value VALUE.  If the 
+*                 value is of type CHARACTER it must be in single 
+*                 quotes. KEY may be compound (of the form 
+*                 keyword1.keyword2 etc) to permit reading of 
+*                 hierarchical keywords.
+*
+*           -  "INDEX N"
+*                 This associates a frameset with an integer N.  
+*                 Usually N will take the values 1,2,3,... for the 
+*                 framesets in the file.  Typically the N'th NDF in a 
+*                 list will match the one with an ID of "INDEX N".
+*
+*        Modifiers:
+*           Modifiers describe additional modifications to be made
+*           to the framesets on import.  They are of the form 
+*
+*              USE keyword arguments
+*
+*           Currently the only modifier defined is FITSROT, which 
+*           defines the name of a FITS header which specifies how
+*           many degrees to rotate the image before use.  This 
+*           rotation is carried out after the mapping defined by
+*           the frameset itself.
+*
+*           Global modifiers affect all NDFs processed with the AST 
+*           file.  Frameset modifiers affect only those NDFs which 
+*           correspond to their frameset.
 *
 *        Rigorous error checking of the AST file is not performed, so
 *        that unhelpful modifications to the WCS components of the 
@@ -318,6 +374,7 @@
       CHARACTER * ( AST__SZCHR ) TITLE ! Title of frame
       CHARACTER * ( CCD1__BLEN ) BUF ! Buffer for output
       CHARACTER * ( CCD1__BLEN ) FITSID ! FITS keyword to identify frameset
+      CHARACTER * ( CCD1__BLEN ) FITROT ! FITS keyword for rotation
       CHARACTER * ( CCD1__BLEN ) LABEL ! Identifier label for frameset
       CHARACTER * ( FIO__SZFNM ) ASTFIL ! Name of frameset file
       INTEGER CHEXP              ! AST pointer to export channel
@@ -408,9 +465,13 @@
 
 *  IDTYPE of INDEX: set dynamic default to 1,2,3,... and get a vector
 *  of values.
+*  IDTYPE of INDEX: get list of NDF indices.  If null set to 1,2,3,...
          CALL CCD1_GISEQ( 1, 1, NNDF, INDXS, STATUS )
-         CALL PAR_DEF1I( 'INDICES', NNDF, INDXS, STATUS )
          CALL PAR_EXACI( 'INDICES', NNDF, INDXS, STATUS )
+         IF ( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+            CALL CCD1_GISEQ( 1, 1, NNDF, INDXS, STATUS )
+         END IF
       ELSE IF ( IDTYPE .EQ. 'FITSID' ) THEN
 
 *  IDTYPE of FITSID: get parameter value and fold to upper case.
@@ -427,6 +488,19 @@
 
 *  Get BASEFRAME parameter.
       CALL PAR_GET0C( 'BASEFRAME', BASEFR, STATUS )
+
+*  Write any global modifiers.
+      CALL PAR_GET0C( 'FITSROT', FITROT, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+      ELSE
+         CALL CHR_UCASE( FITROT )
+         CALL FIO_WRITE( FDAST, ' USE FITSROT ' //
+     :                   FITROT( 1:CHR_LEN( FITROT ) ), STATUS )
+      END IF
+
+*  Write a blank line to terminate global section.
+      CALL FIO_WRITE( FDAST, ' ', STATUS )
 
 *  Output message about the domain names which will be written in the
 *  export framesets.
@@ -528,6 +602,7 @@
 *  Get the frames themselves, their domain names, and the mapping between 
 *  them from the given NDF.
          MAP = AST_GETMAPPING( IWCS, JBAS, JCUR, STATUS )
+         MAP = AST_SIMPLIFY( MAP, STATUS )
          FRBAS = AST_GETFRAME( IWCS, JBAS, STATUS )
          FRCUR = AST_GETFRAME( IWCS, JCUR, STATUS )
          DMBAS = AST_GETC( FRBAS, 'Domain', STATUS )
@@ -580,6 +655,9 @@
 
 *  Write the frameset to the file.
          NEXP = AST_WRITE( CHEXP, FSEXP, STATUS )
+
+*  Write a blank line to terminate this section of the AST file.
+         CALL FIO_WRITE( FDAST, ' ', STATUS )
 
 *  End AST context.
          CALL AST_END( STATUS )
