@@ -108,6 +108,8 @@ namespace Util
 string Util::runCommandPipe (string cmd, string envs, int *statusp)
     throw (DviError)
 {
+    string rval = "";
+
 #ifdef HAVE_PIPE
     /*
      * Can't use popen, because we want to control the environment
@@ -263,12 +265,15 @@ string Util::runCommandPipe (string cmd, string envs, int *statusp)
 	    DviError("Impossible status from child");
 	}
 
-	return SS_STRING(resp);
+	//return SS_STRING(resp);
+        rval = SS_STRING(resp);
     }
 
 #else  /* HAVE_PIPE */
     throw new DviError("Have no pipe() function");
 #endif /* HAVE_PIPE */
+
+    return rval;
 }
 
 
