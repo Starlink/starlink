@@ -134,7 +134,7 @@
 *        Four values may be given, in the order - bottom, right, top, left. 
 *        If less than four values are given, extra values are used equal to 
 *        the first supplied value. If these margins are too narrow any axis 
-*        annotation may be clipped. If a null (!) value is upplied, the
+*        annotation may be clipped. If a null (!) value is supplied, the
 *        value used is 0.15 (for all edges) if either annotated axes or a 
 *        key are produced, and zero otherwise. [current value]
 *     MARKER = INTEGER (Read)

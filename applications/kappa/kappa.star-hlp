@@ -25914,6 +25914,10 @@ Description:
    for later use.
 2 Parameters
 For information on individual parameters, select from the list below:
+3 AMP1
+AMP1 = _REAL (Write)
+   The fitted peak amplitude of the first usable star, in the data
+   units of the input NDF.
 3 AXES
 AXES = _LOGICAL (Read)
    TRUE if labelled and annotated axes are to be drawn around the
@@ -26003,11 +26007,11 @@ LOGFILE = FILENAME (Read)
 3 MARGIN
 MARGIN( 4 ) = _REAL (Read)
    The widths of the margins to leave for axis annotation, given
-   as fractions of the corresponding dimension of the current picture.
+   as fractions of the corresponding dimension of the current  picture.
    Four values may be given, in the order - bottom, right, top, left.
    If less than four values are given, extra values are used equal to
    the first supplied value. If these margins are too narrow any axis
-   annotation may be clipped. If a null (!) value is upplied, the
+   annotation may be clipped. If a null (!) value is supplied, the
    value used is 0.15 (for all edges) if either annotated axes or a
    key are produced, and zero otherwise. [current value]
 3 MARKER
@@ -26019,6 +26023,12 @@ MINOR = _LOGICAL (Read)
    If MINOR is TRUE the horizontal axis of the plot is annotated
    with distance along the minor axis from the centre of the PSF. If
    MINOR is FALSE, the distance along the major axis is used.  [TRUE]
+3 NORM
+NORM = _LOGICAL (Read)
+   If TRUE, the model PSF is normalized so that it has a peak value
+   of unity. Otherwise, its peak value is equal to the peak
+   value of the first usable star, in the data units of the input
+   NDF. [TRUE]
 3 ORIENT
 ORIENT = _REAL (Write)
    The orientation of the major axis of the star images, in degrees.
@@ -26196,6 +26206,7 @@ OUT = NDF (Write)
    Authors:
       MJC: Malcolm J. Currie (STARLINK)
       TDCA: Tim Ash (STARLINK)
+      DSB: David S. Berry (STARLINK)
 
    History:
       1990 Sep 25 (MJC):
@@ -26235,6 +26246,11 @@ OUT = NDF (Write)
          Modified to expect input positions in the current WCS Frame of
          the NDF. Removed parameter COSYS, RADUNITS, SCALE. Added INCAT.
          USEAXIS.
+      26-OCT-1999 (DSB):
+         Made MARGIN a fraction of the current picture, not the DATA
+         picture.
+      2-MAY-2000 (DSB):
+         Added parameters AMP1 and NORM.
 
    Bugs:
 1 QUILT
