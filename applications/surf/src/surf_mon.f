@@ -1,26 +1,43 @@
-*+  REDS - main routine for SCUBA offline data reduction package
       SUBROUTINE REDS (STATUS)
-*    Description :
+*+
+*  Name:
+*     REDS
+
+*  Purpose:
+*     main routine for SCUBA offline data reduction package
+
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description:
 *     This is the main routine for the SCUBA reduction A-task.
-*    Invocation :
-*     CALL REDS (STATUS)
-*    Parameters :
-*     STATUS        = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
+
+*  Notes:
+*     This routine is not seen by the user
+
 *    Authors :
-*     J.Lightfoot (REVAD::JFL)
-*     Tim Jenness (timj@JACH)
+*     JFL: J.Lightfoot (ROE)
+*     TIMJ: Tim Jenness (JACH)
+
 *    History :
 *     $Id$
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.6  1996/10/15 01:44:29  timj
-*     Add DRAWSIG
+*     Revision 1.7  1996/11/01 21:18:13  timj
+*     Add SCUHELP
+*     Update header.
 *
+c Revision 1.6  1996/10/15  01:44:29  timj
+c Add DRAWSIG
+c
 c Revision 1.5  1996/09/18  19:13:19  timj
 c Add KSTEST, change CONCAT to SCUCAT
 c
@@ -33,25 +50,26 @@ c
 c Revision 1.2  1996/07/31  18:53:16  timj
 c Add skydip option
 c
-*    endhistory
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *    Type Definitions :
       IMPLICIT NONE
+
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'PAR_PAR'
-*    Import :
-*    Import-Export :
-*    Export :
+
 *    Status :
       INTEGER STATUS
-*    External references :
-*    Global variables :
-*    Local Constants :
+
 *    Local variables :
       CHARACTER*(PAR__SZNAM) NAME        ! name of action
-*    Internal References :
-*    Local data :
-*-
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -104,6 +122,10 @@ c
       ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
          CALL REDS_SCUCAT (STATUS)
+
+      ELSE IF (NAME .EQ. 'SCUHELP') THEN
+
+         CALL SCUHELP (STATUS)
 
       ELSE IF (NAME .EQ. 'KSTEST') THEN
 
