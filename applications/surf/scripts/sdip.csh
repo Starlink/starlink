@@ -54,12 +54,12 @@ if (-e ${out}.sdf) then
    
 
     # Now we can setup a postscript plot if needed
-    linplot $out mode=2 symcol=black device='epsfcol_l;sdip_p1.eps'
+    linplot $out cosys=data mode=2 symcol=black device='epsfcol_l;sdip_p1.eps'
 
     # If we have a fit then plot the model
     if (-e ${out}_m.sdf) then
 
-	linplot ${out}_m mode=line lincol=red device='epsfcol_l;sdip_p2.eps' noclear ordlab="''" pltitl="''"
+	linplot ${out}_m cosys=data mode=line lincol=red device='epsfcol_l;sdip_p2.eps' noclear ordlab="''" pltitl="''"
 
         # And merge them
 	if (-e sdip_p1.eps.1 && -e sdip_p2.eps) psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
@@ -82,12 +82,12 @@ if (-e ${out}.sdf) then
    #  XWINDOWS
 
    # Display the data first
-   linplot $out mode=2 symcol=white device=xwindows
+   linplot $out cosys=data mode=2 symcol=white device=xwindows
 
    # Now overlay the model if necessary
 
    if (-e ${out}_m.sdf) then
-     linplot ${out}_m mode=line lincol=red device=xwindows noclear ordlab="''" pltitl="''"
+     linplot ${out}_m cosys=data mode=line lincol=red device=xwindows noclear ordlab="''" pltitl="''"
    endif
 
 endif
