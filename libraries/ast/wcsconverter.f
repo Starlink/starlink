@@ -1,7 +1,7 @@
       PROGRAM WCSCONVERTER
 
 *  Usage:
-*     WCSCONVERTER <in file> <encoding> <out file>
+*     WCSCONVERTER <in file> <encoding> <out file> <attrs>
 
 *  Description:
 *     Reads a FrameSet from "in file" (as a FITS header if possible, 
@@ -17,6 +17,9 @@
 *     out file
 *        The output file. Contains an AST dump of the FrameSet if
 *        "encoding" is "AST", or a set of FITS header cards otherwise.
+*     attrs
+*        A list of attribute settings to apply to the FitsChan before
+*        reading the input headers.
 
 
       IMPLICIT NONE
@@ -25,13 +28,14 @@
 
       INTEGER STATUS, FC, OBJECT, IARGC, CHAN, CHR_LEN
       CHARACTER FILE*80, OFILE*80, LINE*255, TEXT*80, ENCODING*50
+      CHARACTER ATTRS*200
 
 *
 * Check command line arguments have been supplied.
 *
       IF( IARGC() .LT. 3 ) THEN
          WRITE(*,*) 'Usage: wcsconverter <in file> <encoding> '//
-     :              '<out file>'
+     :              '<out file> <attrs>'
          RETURN
       END IF
 
@@ -40,6 +44,14 @@
 *
       STATUS = 0
       FC = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+
+*
+* Apply any attribute settings to the FitsChan.
+*
+      IF( IARGC() .EQ. 4 ) THEN
+         CALL GETARG( 4, ATTRS )
+         CALL AST_SET( FC, ATTRS, STATUS )
+      END IF
 
 *
 * Open the input text file.
@@ -58,13 +70,15 @@
       END DO
 
  10   CLOSE( 10 )
-
-
+	
 * 
-* Set the value of CDMatrix 
-*
-      CALL AST_SETL( FC, 'CDMATRIX', AST_GETL( FC, 'CDMATRIX', STATUS ),
+* Set the value of CDMatrix, unless it has already been set.
+* 
+      IF( .NOT. AST_TEST( CD, 'CDMATRIX', STATUS ) ) THEN
+         CALL AST_SETL( FC, 'CDMATRIX', AST_GETL( FC, 'CDMATRIX', 
+     :                                            STATUS ),
      :               STATUS )     
+      END IF
 
 *
 * Attempt to read an Object form the FIitsChan.
