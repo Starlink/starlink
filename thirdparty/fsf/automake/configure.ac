@@ -24,7 +24,18 @@ dnl (abs_top_builddir is used in tests/automake.in).  Note that
 dnl this is a requirement for the Automake package itself.
 dnl Automake users can still use Autoconf 2.58.
 AC_PREREQ(2.58a)
-AC_INIT([GNU Automake], [1.8.2-starlink], [bug-automake@gnu.org])
+
+dnl  Since this is a Starlink-customised version of automake, change the
+dnl  package name and bug-reporting address.  Unlike autoconf, automake
+dnl  version numbers can include a fork element in the version number,
+dnl  so include one.
+dnl
+dnl  Include the TARNAME field, not because we want to distribute
+dnl  this package, but so that autoconf uses this when building some
+dnl  installation locations rather than the "starlink-automake" it
+dnl  would otherwise construct.
+AC_INIT([Starlink Automake], [1.8.2-starlink], [ussc@star.rl.ac.uk], automake)
+dnl AC_INIT([GNU Automake], [1.8.2-starlink], [bug-automake@gnu.org])
 
 AC_CONFIG_SRCDIR(automake.in)
 AC_CONFIG_AUX_DIR(lib)
@@ -165,6 +176,7 @@ AC_CONFIG_FILES([
 AC_CONFIG_FILES([tests/aclocal-${APIVERSION}:tests/aclocal.in],
                 [chmod +x tests/aclocal-${APIVERSION}],
 	        [APIVERSION=$APIVERSION])
+AC_CONFIG_FILES([component.xml])
 AC_CONFIG_FILES([tests/automake-${APIVERSION}:tests/automake.in],
                 [chmod +x tests/automake-${APIVERSION}])
 
