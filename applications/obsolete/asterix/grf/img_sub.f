@@ -2784,7 +2784,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 	REAL PI, DTOR
 	PARAMETER (PI = 3.141592, DTOR = PI/180.0)
 *  Local variables :
-      REAL A
+      REAL ANG
       REAL SA,CA
       REAL SANG,CANG
       INTEGER IA
@@ -2800,9 +2800,9 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         DO IA=1,360
 
 
-          A=REAL(IA)*DTOR
-          CA=COS(A)
-          SA=SIN(A)
+          ANG=REAL(IA)*DTOR
+          CA=COS(ANG)
+          SA=SIN(ANG)
 
           CALL PGMOVE(XC+A*CA*CANG-B*SA*SANG,YC+A*CA*SANG+B*SA*CANG)
 
