@@ -91,26 +91,21 @@
       INCLUDE 'GCB_CMN'                                 ! GCB globals
 *        G_MEMPTR = INTEGER (given)
 *           Active GCB data area
-*        G_VERSION = REAL (given)
-*           GCB version number
 
 *  Arguments Given:
-      INTEGER                   NARG                    ! # arguments
-      INTEGER                   ARGS(*)                 ! Method arguments
+      INTEGER                   NARG, ARGS(*)
 
 *  Arguments Returned:
-      INTEGER                   OARG                    ! Returned data
+      INTEGER                   OARG
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      INTEGER			GCBHDU			! GCB hdu identifier
       INTEGER			GCBPTR
       INTEGER			NBYTE
       INTEGER			NSCAL
       INTEGER			NSTRUC
-      INTEGER			OLDSIZ			! Existing GCB size
 *.
 
 *  Check inherited global status.
@@ -125,6 +120,127 @@
 *  Copy semi-compressed GCB to workspace
       CALL GCB_SAVE_SUB( NSCAL, NSTRUC, %VAL(G_MEMPTR), %VAL(GCBPTR),
      :                                                       STATUS )
+
+*  Save the GCB
+      CALL GCB2_SAVE_INT( ARGS(1), NBYTE, GCBPTR, STATUS )
+
+*  Free the workspace
+      CALL DYN_UNMAP( GCBPTR, STATUS )
+
+*  Report any errors
+      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB2_SAVE', STATUS )
+
+      END
+
+
+
+      SUBROUTINE GCB2_SAVE_INT( FID, NBYTE, GCBPTR, STATUS )
+*+
+*  Name:
+*     GCB2_SAVE_INT
+
+*  Purpose:
+*     Saves mapped compressedf GCB to FITS file
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL GCB2_SAVE_INT( FID, NBYTE, GCBPTR, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     NARG = INTEGER (given)
+*        Number of method arguments
+*     ARGS(*) = INTEGER (given)
+*        ADI identifier of method arguments
+*     OARG = INTEGER (returned)
+*        Output data
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     GCB Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/gcb.html
+
+*  Keywords:
+*     package:gcb, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     19 Jul 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'GCB_PAR'
+
+*  Global Variables:
+      INCLUDE 'GCB_CMN'                                 ! GCB globals
+*        G_VERSION = REAL (given)
+*           GCB version number
+
+*  Arguments Given:
+      INTEGER                   FID, NBYTE, GCBPTR
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      INTEGER			GCBHDU			! GCB hdu identifier
+      INTEGER			OLDSIZ			! Existing GCB size
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Does GCB extension already exist?
       CALL ADI2_FNDHDU( ARGS(1), 'GCB', GCBHDU, STATUS )
@@ -161,10 +277,9 @@
 *  Release the GCB hdu
       CALL ADI_ERASE( GCBHDU, STATUS )
 
-*  Free the workspace
-      CALL DYN_UNMAP( GCBPTR, STATUS )
-
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB2_SAVE', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'GCB2_SAVE_INT', STATUS )
+      END IF
 
       END

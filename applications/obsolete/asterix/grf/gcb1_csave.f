@@ -101,10 +101,8 @@
       CHARACTER*(DAT__SZLOC)	GCBLOC			! Locator to GCB
 
       INTEGER			CACHE			! Cache address
-      INTEGER			DISP			!
       INTEGER			GCBPTR			! Mapped file GCB
       INTEGER			NBYTE			! Bytes to store GCB
-      INTEGER			NSCAL, NSTRUC		! # cmps in GCB
 *.
 
 *  Check inherited global status.
@@ -114,13 +112,7 @@
       CALL ADI_GET0I( ARGS(1), CACHE, STATUS )
 
 *  Find size required
-      DISP = GCB__SZPTR + 1
-      CALL GCB_GETI_SUB( %VAL(CACHE), DISP, GCB__SZPTR, GCB__PTRFMT,
-     :                                               NSCAL, STATUS )
-      DISP = DISP + GCB__SZPTR
-      CALL GCB_GETI_SUB( %VAL(CACHE), DISP, GCB__SZPTR, GCB__PTRFMT,
-     :                                              NSTRUC, STATUS )
-      NBYTE = GCB__NHDBLK * GCB__SZPTR + NSCAL + NSTRUC
+      CALL GCB0_CASIZE( CACHE, NBYTE, STATUS )
 
 *  Locate and map the file GCB
       CALL GCB1_SAVE_MAPGCB( ARGS(2), NBYTE, GCBLOC, GCBPTR, STATUS )

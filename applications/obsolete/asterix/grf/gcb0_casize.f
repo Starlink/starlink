@@ -102,9 +102,6 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract cache address
-      CALL ADI_GET0I( ARGS(1), CACHE, STATUS )
-
 *  Find size required
       DISP = GCB__SZPTR + 1
       CALL GCB_GETI_SUB( %VAL(CACHE), DISP, GCB__SZPTR, GCB__PTRFMT,

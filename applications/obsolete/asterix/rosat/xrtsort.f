@@ -1643,8 +1643,11 @@ C              WRITE(*,*)MAP,NINMAP,MAXLIM
       IF (STATUS .NE. SAI__OK) RETURN
 
 
-*  get ID for ARD description of sort region
+*  get ID for ARD description of sort regions
       CALL ARX_OPEN('WRITE',SRT.ARDID,STATUS)
+      IF (SRT.BCKGND) THEN
+        CALL ARX_OPEN('WRITE',BSRT.ARDID,STATUS)
+      ENDIF
 
 * Set a factor for dealing with different orientations of y-axes in raw data
       IF (HEAD.ORIGIN.EQ.'MPE') THEN
