@@ -316,7 +316,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
-    [javac] Compiling 165 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 166 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
      [copy] Copying 68 files to /apps/cvsbuild/java/source/splat/build/classes
@@ -467,4 +467,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 3 seconds
+Total time: 1 minute 5 seconds

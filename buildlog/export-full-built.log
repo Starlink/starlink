@@ -651,6 +651,7 @@ prepare:
 check_packages:
 
 build:
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
 
 execute_mk_script:
      [echo] java.home=/apps/j2sdk1.4.1_06/jre
@@ -876,4 +877,4 @@ export-full-built:
       [tar] Building tar: /apps/cvsbuild/export/starjava-i386.tar.gz
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 55 seconds
+Total time: 4 minutes 3 seconds

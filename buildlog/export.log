@@ -134,11 +134,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/util-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/util/util-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/util-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/util-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/util/util-0.1.tar
+      [zip] Building zip: /apps/cvsbuild/export/util-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/util/util-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/util-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/util-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/util/util-1.0.tar
      [echo] Executing Task target: export
 
 export:
@@ -240,11 +240,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/diva-0.3.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/diva/diva-0.3.tar
-     [gzip] Building: /apps/cvsbuild/export/diva-0.3.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/diva-0.3.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/diva/diva-0.3.tar
+      [zip] Building zip: /apps/cvsbuild/export/diva-1.0.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/diva/diva-1.0.tar
+     [gzip] Building: /apps/cvsbuild/export/diva-1.0.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/diva-1.0.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/diva/diva-1.0.tar
      [echo] Executing HELP target: export
 
 export:
@@ -296,11 +296,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/astgui-1.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/astgui/astgui-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/astgui-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/astgui-1.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/astgui/astgui-1.0.tar
+      [zip] Building zip: /apps/cvsbuild/export/astgui-1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/astgui/astgui-1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/astgui-1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/astgui-1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/astgui/astgui-1.1.tar
      [echo] Executing JNIHDS target: export
 
 export:
@@ -664,11 +664,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
-     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.0.tar
+      [zip] Building zip: /apps/cvsbuild/export/jaiutil-1.1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
+     [gzip] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/jaiutil-1.1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/jaiutil/jaiutil-1.1.tar
      [echo] Executing SOAPSERVER target: export
 
 export:
@@ -692,11 +692,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/soapserver-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.1.tar
+      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/soapserver-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.2.tar
      [echo] Executing JPCS target: export
 
 export:
@@ -756,11 +756,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/sog-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/sog-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/sog-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.1.tar
+      [zip] Building zip: /apps/cvsbuild/export/sog-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/sog/sog-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/sog-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/sog-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/sog/sog-0.2.tar
      [echo] Executing SPLAT target: export
 
 export:
@@ -770,6 +770,7 @@ prepare:
 check_packages:
 
 build:
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
 
 execute_mk_script:
      [echo] java.home=/apps/j2sdk1.4.1_06/jre
@@ -798,11 +799,11 @@ dist:
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/splat-2.0.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.0.tar
-     [gzip] Building: /apps/cvsbuild/export/splat-2.0.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/splat-2.0.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.0.tar
+      [zip] Building zip: /apps/cvsbuild/export/splat-2.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/splat/splat-2.2.tar
+     [gzip] Building: /apps/cvsbuild/export/splat-2.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/splat-2.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/splat/splat-2.2.tar
      [echo] Executing Mirage target: export
 
 export:
@@ -1014,4 +1015,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 22 minutes 34 seconds
+Total time: 22 minutes 35 seconds

@@ -90,6 +90,7 @@ javadoc-sources:
      [echo] Executing SPLAT target: javadoc-sources
 
 javadoc-sources:
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -2118,6 +2119,7 @@ prepare:
 check_packages:
 
 build:
+    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
 
 execute_mk_script:
      [echo] java.home=/apps/j2sdk1.4.1_06/jre
@@ -2341,4 +2343,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 13 seconds
+Total time: 5 minutes 12 seconds
