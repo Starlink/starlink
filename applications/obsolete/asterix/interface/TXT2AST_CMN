@@ -5,6 +5,7 @@
       LOGICAL             USE_DATA
       LOGICAL             USE_VAR
       LOGICAL             USE_QUAL
+      LOGICAL             USE_GRP
       LOGICAL             USE_LOERR
       LOGICAL             USE_UPERR
       LOGICAL             USE_AX_DATA(ADI__MXDIM)
@@ -16,6 +17,7 @@
       INTEGER             POS_DATA
       INTEGER             POS_VAR
       INTEGER             POS_QUAL
+      INTEGER             POS_GRP
       INTEGER             POS_LOERR
       INTEGER             POS_UPERR
       INTEGER             POS_AX_DATA(ADI__MXDIM)
@@ -27,6 +29,7 @@
       INTEGER             PTR_DATA
       INTEGER             PTR_VAR
       INTEGER             PTR_QUAL
+      INTEGER             PTR_GRP
       INTEGER             PTR_LOERR
       INTEGER             PTR_UPERR
       INTEGER             PTR_AX_DATA(ADI__MXDIM)
@@ -60,10 +63,10 @@
      :                    CMT_BUF, CMT_N,
      :                    USE_DATA, USE_VAR, USE_QUAL, USE_LOERR,
      :                      USE_UPERR, USE_AX_DATA, USE_AX_WID,
-     :                      USE_AX_AWIDLO, USE_AX_AWIDHI,
+     :                      USE_AX_AWIDLO, USE_AX_AWIDHI, USE_GRP,
      :                    POS_DATA, POS_VAR, POS_QUAL, POS_LOERR,
      :                      POS_UPERR, POS_AX_DATA, POS_AX_WID,
-     :                      POS_AX_AWIDLO, POS_AX_AWIDHI,
+     :                      POS_AX_AWIDLO, POS_AX_AWIDHI, POS_GRP,
      :                    PTR_DATA, PTR_VAR, PTR_QUAL, PTR_LOERR,
      :                      PTR_UPERR, PTR_AX_DATA, PTR_AX_WID,
-     :                      PTR_AX_AWIDLO, PTR_AX_AWIDHI
+     :                      PTR_AX_AWIDLO, PTR_AX_AWIDHI, PTR_GRP
