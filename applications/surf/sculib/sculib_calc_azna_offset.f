@@ -241,10 +241,15 @@
                Y_BOL(BOL) = U4_OFF
 
             ELSE IF (OUT_COORDS.EQ.'AZ') THEN
-               X_BOL(BOL) =  (U3_OFF * COS_E) + (U4_OFF * SIN_E)
-     :              + P_DAZ
                Y_BOL(BOL) = -(U3_OFF * SIN_E) + (U4_OFF * COS_E)
-     :              + P_DEL
+               X_BOL(BOL) =  (U3_OFF * COS_E) + (U4_OFF * SIN_E)
+
+*     Add AZ pointing offsets
+               IF (N_POINT .GT. 0 ) THEN
+                  X_BOL(BOL) = X_BOL(BOL) +
+     :                 (P_DAZ * COS(Y_BOL(BOL)) * ARCSEC2RAD)
+                  Y_BOL(BOL) = Y_BOL(BOL) + (P_DEL * ARCSEC2RAD)
+               END IF
 
             END IF
 
