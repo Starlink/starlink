@@ -33,6 +33,8 @@
 *        Added AST__BLOCKAVE interpolation scheme.
 *     22-JUN-2001 (DSB):
 *        Added AST_OFFSET2 and AST_ANGLE to Frame class.
+*     6-SEP-2001 (DSB):
+*        Added AST_AXDISTANCE and AST_AXOFFSET to Frame class.
 *-
 
 *  Length of character string returned by a character function.
@@ -137,6 +139,8 @@ c      PARAMETER ( AST__UKERNN = 2 )
       LOGICAL AST_ISAFRAME
       DOUBLE PRECISION AST_ANGLE
       DOUBLE PRECISION AST_OFFSET2
+      DOUBLE PRECISION AST_AXDISTANCE
+      DOUBLE PRECISION AST_AXOFFSET
 
 *  CmpFrame class.
       INTEGER AST_CMPFRAME
