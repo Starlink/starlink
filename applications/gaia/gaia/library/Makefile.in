@@ -51,7 +51,6 @@ FILES        = \
 
 PROGRAMS     = gaia.sh gaiadisp.sh gaiaremote.sh adamMessageRelay \
                displaycat tabbedgaia.sh
-srcdir	     = @srcdir@
 
 all:
 
@@ -63,10 +62,10 @@ install-top:
 	(cd $(GAIA_LIBRARY); rm -rf library; ln -s . library)
 
 install-files: install-top
-	@set -x; for i in $(srcdir)/$(FILES) ; do \
+	@set -x; for i in $(FILES) ; do \
 	    $(INSTALL_DATA) $$i $(GAIA_LIBRARY) ; \
 	done
-	for f in $(srcdir)/$(PROGRAMS); do \
+	for f in $(PROGRAMS); do \
 	    $(INSTALL) $$f $(GAIA_LIBRARY) ;\
 	done
 
