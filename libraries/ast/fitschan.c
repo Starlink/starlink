@@ -648,7 +648,7 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 #define LATAX              1
 #define NDESC              9
 #define MXCTYPELEN        81
-#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype"
+#define ALLWARNINGS       " distortion noequinox noradesys nomjd-obs nolonpole nolatpole tnx zpx badcel noctype badlat badmat badval badctype "
 #define NPFIT             10
 
 #define FL  1.0/298.257  /*  Reference spheroid flattening factor */
