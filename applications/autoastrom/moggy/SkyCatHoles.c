@@ -2,31 +2,66 @@
    of SkyCat libcat which this program uses.
 
    SkyCat's libcat (confusingly distinct from Starlink's libcat!) includes
-   both some of Mark Calabretta's WCS code and some of Pat's SLALIB code,
-   however these conflict with code included in Starlink libast_wcslib
-   and libast_slalib.
+   both some of Mark Calabretta's WCS code (wcslib) and some of Pat Wallace's
+   SLALIB code, however these conflict with code included in Starlink
+   libast_wcslib and libast_slalib.
 
    No problem: I can create a custom SkyCat libcat without the problematic
    code and link against that.  That fails, however, because of the way
    that wcslib and slalib have been integrated into these particular AST
    glue libraries.
 
-   Code within SkyCat refers to a function slaDeuler, which presumably
-   maps to sla_deuler, but that function is omitted from AST's sla.c.
-   Also, the SkyCat code refers to functions glsfwd and glsrev, which, as
-   I see from AST's wcsmap.c, have been renamed sflfwd and sflrev in
-   newer versions.
+   The code in this module addresses two issues:
 
-   $Id$
+   (1) The SkyCat library libcat.a (which I rename libskycat.a in my
+   filleted version) includes modules proj.o and cel.o, which are from
+   some oldish version of wcslib.  The latter refers to functions
+   glsfwd and glsrev, which, as I see from AST's wcsmap.c, have been
+   renamed sflfwd and sflrev in newer versions (it's changed in AST
+   1.8-1, but isn't in the version of AST with ast.h dated
+   2000-02-08), so if we are to use such newer versions, we must
+   provide a translation routine.  So that we can continue to use this
+   route with older versions of AST, include these translations only
+   if NEEDGLSFUNCS is defined true.
 
-*/
+   Note (not a propos of very much) that wcslib functions azpfwd,
+   azprev, etc, have been renamed astAzpfwd, astAzprev, etc, in later
+   versions of AST (post-1.8-1), and these AST versions (using a
+   slightly different context struct -- AstPrjPrm instead of wcslib's
+   prjprm) can be deemed to have diverged from the wcslib routines.
+   This case is easy, and we don't need to do anything special,
+   because the proj.o modules within libskycat can be used (ie, it
+   appears that we do not need to link against specifically
+   libwcslib.a).
+
+   (2) Code within SkyCat refers to a function slaDeuler, which
+   presumably maps to sla_deuler, but that function is omitted from
+   AST's sla.c.  We define void slaDeuler here, patterned after the
+   functions in AST's sla.c.  The prototype of slaDeuler is from
+   catlib/astrotcl/wcslib/src/slasubs.c.  The only difference is that
+   AST:sla.c declares the rotation matrices as `double rmat[3][3]',
+   whereas catlib:slasubs.c declares them as `double (*rmat)[3]'.
+   These are equivalent, since the first is equivalent to `rmat[][3]',
+   which is in turn equivalent to the second form (cf. K&R Sect.5.7).
+
+   $Id$ */
 
 /* struct prjprm is defined textually in SkyCat's
    catlib-3.7/astrotcl/wcslib/src/proj.c, and a prototype is in
    catlib-3.7/astrotcl/wcslib/include/wcslib.h.  */
 #include <astrotcl/wcslib.h>
 
-/* Remap glsfwd and glsref to newer sflfwd and sflrev */
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifndef NEEDGLSFUNCS
+#define NEEDGLSFUNCS 0
+#endif
+#define NEEDGLSFUNCS 0
+
+#if NEEDGLSFUNCS
+/* (1) Remap glsfwd and glsref to newer sflfwd and sflrev */
 /* See WCS/AST proj.c */
 int sflfwd (double phi, double theta,
 	    struct prjprm *prj,
@@ -47,15 +82,11 @@ int glsrev (double x, double y,
 {
     return sflrev (x, y, prj, phi, theta);
 }
+#endif /* NEEDGLSFUNCS */
 
 
-/* slaDeuler is missing from AST's sla.c.  The entry here is patterned
-   after the functions in that file.  The prototype of slaDeuler is
-   from catlib/astrotcl/wcslib/src/slasubs.c.  The only difference is that
-   AST:sla.c declares the rotation matrices as `double rmat[3][3]',
-   whereas catlib:slasubs.c declares them as `double (*rmat)[3]'.
-   These are equivalent, since the first is equivalent to `rmat[][3]', 
-   which is in turn equivalent to the second form (cf. K&R Sect.5.7) */
+
+/* (2) slaDeuler is missing from AST's sla.c.   */
 #include <f77.h>
 
 F77_SUBROUTINE(sla_deuler) ( CHARACTER(ORDER),
