@@ -24,6 +24,8 @@
 ##DEFAULT (echo ""; id; echo %s; date; cat) >> $CVSROOT/CVSROOT/commitlog
 # or
 ##DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
+# Commits to the top-level directory should be notified to stardev
+^[^/]*$			mail -s %s stardev@jiscmail.ac.uk
 ^java/source/hdx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
 ^java/source/ndx	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
 ^java/source/hds	mail -s %s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
