@@ -161,6 +161,16 @@ while (defined($line = <EQIN>)) {
 	    $eqcount++;
 	}
 	$eqn = '';
+    } elsif ($line =~ /^%%startmdefs/) {
+	print LATEXOUT "%%% mdefs...\n";
+	while (defined($line = <EQIN>)) {
+	    if ($line =~ /^%%endmdefs/) {
+		last;
+	    } else {
+		print LATEXOUT $line;
+	    }
+	}
+	print LATEXOUT "%%% ...mdefs\n";
     } elsif ($line =~ /^%%eqno/) {
 	chop ($line);
 	($dummy,$eqno) = split (/ /, $line);

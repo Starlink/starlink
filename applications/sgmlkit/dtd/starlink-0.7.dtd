@@ -762,9 +762,9 @@
 
 <!--========== Document body ==========-->
 <![ %Feature.Routinelist; [
-  <!ENTITY % body.content '(routinelist | (p | table | figure)*)'>
+  <!ENTITY % body.content '(routinelist | (p | table | figure | mdefs)*)'>
 ]]>
-<!ENTITY % body.content '(p | table | figure)*'>
+<!ENTITY % body.content '(p | table | figure | mdefs)*'>
 
 <!ENTITY % appendix.content "sect+">
 
@@ -897,6 +897,22 @@
 ]]>	<!-- %Feature.Versioning; -->
 
 <!ELEMENT abstract %MXX; (px)+>
+
+<!--========== Maths definitions ==========-->
+<!-- The contents of the mdefs element are processed as maths, in the
+     sense that they are included in the same output stream as the
+     other maths elements.  It is intended to contain
+     definitions/newcommands to help with the writing of maths
+     elements elsewhere in the document.  It's obviously possible to
+     put other LaTeX in here (ie, it's impossible to stop folk from
+     doing this), but they should be heavily discouraged from this, as
+     it could wreak havoc with different down-converters.
+     -->
+<!ELEMENT mdefs			%MXX; (#PCDATA)>
+<!ATTLIST mdefs
+	notation
+	NOTATION(latexmaths) #FIXED latexmaths
+	>
 
 <!--========== Routine list ==========-->
 <![ %Feature.Routinelist; [

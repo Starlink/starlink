@@ -863,8 +863,38 @@ elsewhere.</p>
 <p>A single line of a <elemref gi="meqnarray"/> element.  It consists of
 a line of a LaTeX 
 <code>\\begin{eqnarray}...\\end{eqnarray}</code> environment, and
-must, therefore, have two ampersands within it.
+must, therefore, have two ampersands within it.  It is not terminated
+by <code>\\\\</code>
 </p>
+</element>
+
+
+<element gi="mdefs" status="beta">
+<p>This element allows you to make definitions which are global to the
+maths elements in your document.  That is, you may put in these
+elements <code>\\def</code> and <code>\\newcommand</code> commands which will
+be in effect for all the <elemref gi="m"/>, <elemref gi="mequation"/>,
+<elemref gi="meqnarray"/> and <elemref gi="mline"/> elements which
+follow it.</p>
+
+<p>In different versions of the down-converters, it may or may not be
+true that definitions in one maths element remain valid in later
+ones.  Do not rely on this, as it is unsupported behaviour, and may
+change without warning.</p>
+
+<p>The contents of this element are processed as arbitrary LaTeX.
+However, you should not include anything other than definition
+commands and possibly other parameters to do with the layout of maths,
+and specifically you should write nothing which creates any output.
+Although this element is processed fairly straightforwardly when
+generating LaTeX output, the content is moved around quite a lot when
+producing HTML output, and hacky fiddling here has the potential to
+mess up your document in the present and, what is much worse,
+<em>become wrong</em> when processed by a later version of the
+down-converter, which <em>will</em> assume you have done nothing hacky
+here.</p>
+
+<p>That is <em>Do Not Hack This!</em></p>
 </element>
 
 
@@ -1331,6 +1361,6 @@ used as the link text.  See also the <elemref gi="url"/> element.</p>
 
 <!--
 Local Variables:
-mode: sgml
+mode: xml
 End:
 -->

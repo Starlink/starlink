@@ -81,24 +81,35 @@ make things too complicated (could I simply mimic BibTeX?).
 </p>
 </defect>
 
-<defect status="closed" date="15-Sep-1999" originator="Mark">
+<defect status="open" date="15-Sep-1999" originator="Mark">
 <title>Cross-references to CODECOLLECTIONs</title>
 <p>Mark pointed out that this is OK from within the document
 which references them, but it's not necessarily easy from
 within another document.  This is potentially rather knotty, I
-think, but it'll be quite interesting to solve.
-</p>
-<resolution status="fixed" author="Norman" date="10-May-2000"
+think, but it'll be quite interesting to solve.</p>
+<p>Also (Mark):
+I'm not sure this is closed - you need to be able to reference, e.g.,
+the KAPPA DISPLAY documentation from documents other than SUN/95.  
+I think it is undesirable that the authors of other documents should
+need to know the name and location of the SGML document which
+constitutes the list of KAPPA routines.  Hence inserting the KAPPA 
+codecollection element which is required for coderef elements to work 
+is problematic in documents other than SUN/95.</p>
+<p>Bother -- of course.  I'll think further on this.</p>
+
+<resolution status="deferred" author="Norman" date="10-May-2000"
 note="starlink-0.7.dtd, rev 1.2">
-<p>I think this is fixed (if I've recalled the details of the problem
-accurately).  Alongside the REF and DOCXREF elements is now a CODEREF
+<p>This is fixed in the simple case where a document wants to
+reference routines in its own CODECOLLECTION.  Alongside the REF and
+DOCXREF elements is now a CODEREF 
 element, which refers to IDs within programcode documents by
 indirection via the CODECOLLECTION element which references the
 programcode.</p>
+<p>The `codexref' problem is still open.</p>
 </resolution>
 </defect>
 
-<defect status="open" originator="Mark" date="04-Apr-2000"
+<defect status="closed" originator="Mark" date="04-Apr-2000"
 	note="Commentary on m element in starlink-0.7">
 <title>Maths in help files.</title>
 <p>Quoth Mark:</p>
@@ -120,7 +131,14 @@ be a problem for programcode not main document text, since only
 programcode gets converted to an ascii-like format (unless we envisage
 people reading SUNs with lynx??).  But if we make a modification,
 it's probably best to programcode and main DTDs alike.</p>
-
+<resolution status="fixed" author="Mark" date="5-Jun-2000">
+<p>Quoth Mark, again:</p>
+<p>I think this can be considered closed, since the
+<code>&lt;span&gt;</code> element is the 
+proper way of dealing with this sort of thing.  That's not completely
+resolved, but further discussion should be under the span heading,
+not here.</p>
+</resolution>
 </defect>
 
 </defectgroup>
@@ -272,7 +290,7 @@ anything....</p>
 DC does better.</p>
 </defect>
 
-<defect status="open" originator="Mark" date="15-Sep-1999">
+<defect status="closed" originator="Mark" date="15-Sep-1999">
 <title>LaTeX: global declarations</title>
 <p>A collection of \newcommands at the head of the document.</p>
 <p>Mmm, I've now forgotten what this means.  I can't remember if we
@@ -281,6 +299,17 @@ support for something like this in the data content attributes for the
 latexgraphics notation (see notations.text), but this might be too
 arcane for the future, and in any case isn't implemented (not least
 because it's arcane).</p>
+<p>Quoth Mark:</p>
+<p>if the mathematics in a document relies
+on user-defined macros then you have to define them in each math element,
+since there is no persistence of LaTeX definitions between math elements
+in the SGML (is there?)</p>
+<p>Discussed in email to norman of 15 Sep 1999</p>
+<p>Ah yes..., I remember</p>
+<resolution status="fixed" author="Norman" date="5-Jun-2000"
+	note="starlink-0.7.dtd, rev 1.3; programcode-0.7.dtd, rev 1.12">
+<p>Added mdefs element, which sits between paragraphs.</p>
+</resolution>
 </defect>
 
 <defect status="closed" originator="Mark" date="15-Sep-1999">

@@ -234,7 +234,8 @@
 <!ELEMENT docblock	O O (title, description?,
  			     authorlist?,
 			     userkeywords?, softwarekeywords?,
-			     copyright?, history?)
+			     copyright?, history?,
+			     mdefs?)
 	>
 
 <!ELEMENT routine	O O (codeopener?, routineprologue, codebody)
@@ -592,6 +593,24 @@
 	>
 
 ]]>
+
+<!--========== Maths definitions ==========-->
+<!-- The contents of the mdefs element are processed as maths, in the
+     sense that they are included in the same output stream as the
+     other maths elements.  It is intended to contain
+     definitions/newcommands to help with the writing of maths
+     elements elsewhere in the document.  It's obviously possible to
+     put other LaTeX in here (ie, it's impossible to stop folk from
+     doing this), but they should be heavily discouraged from this, as
+     it could wreak havoc with different down-converters.
+     -->
+<!ELEMENT mdefs			%MXX; (#PCDATA)>
+<!ATTLIST mdefs
+	notation
+	NOTATION(latexmaths) #FIXED latexmaths
+	>
+
+
 
 <!--========== Tables ==========-->
 <!-- Use the OASIS Exchange Table Model subset of the CALS table model.

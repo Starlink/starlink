@@ -320,28 +320,27 @@ here).
 </element>
 
 <element gi="m" status="beta">
-<p>See <elemxref gi="m" dtd="sundtd"/>
-</p>
+<p>See <elemxref gi="m" dtd="sundtd"/></p>
 </element>
 
 <element gi="meqnarray" status="beta">
-<p>See <elemxref gi="meqnarray" dtd="sundtd"/>
-</p>
+<p>See <elemxref gi="meqnarray" dtd="sundtd"/></p>
 </element>
 
 <element gi="mequation" status="beta">
-<p>See <elemxref gi="mequation" dtd="sundtd"/>
-</p>
+<p>See <elemxref gi="mequation" dtd="sundtd"/></p>
 </element>
 
 <element gi="mlabel" status="beta">
-<p>See <elemxref gi="mlabel" dtd="sundtd"/>
-</p>
+<p>See <elemxref gi="mlabel" dtd="sundtd"/></p>
 </element>
 
 <element gi="mline" status="beta">
-<p>See <elemxref gi="mline" dtd="sundtd"/>
-</p>
+<p>See <elemxref gi="mline" dtd="sundtd"/></p>
+</element>
+
+<element gi="mdefs" status="beta">
+<p>See <elemxref gi="mdefs" dtd="sundtd"/></p>
 </element>
 
 <element gi="moduletype" status="beta">

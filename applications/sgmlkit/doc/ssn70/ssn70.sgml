@@ -1097,7 +1097,14 @@ document by including as much element and attribute detail as you can.
 <ref id='el.sun.meqnarray' >meqnarray</ref>,
 <ref id='el.sun.mequation' >mequation</ref>,
 <ref id='el.sun.mlabel' >mlabel</ref>,
-<ref id='el.sun.mline' >mline</ref>
+<ref id='el.sun.mline' >mline</ref>,
+<ref id='el.sun.mdefs' >mdefs</ref>.
+
+<row>
+<entry>
+<ref id=str.span/>
+<entry>
+<ref id='el.sun.span' >span</ref>
 
 </tbody>
 </tgroup>
@@ -1741,7 +1748,8 @@ elements</update>
 <ref id='el.sun.mequation' >mequation</ref>,
 <ref id='el.sun.meqnarray' >meqnarray</ref>,
 <ref id='el.sun.mlabel' >mlabel</ref>,
-<ref id='el.sun.mline' >mline</ref>.
+<ref id='el.sun.mline' >mline</ref>,
+<ref id='el.sun.mdefs' >mdefs</ref>.
 
 <p>All the maths in Starlink documents uses &latex;
 notation.<note>MathML was considered, but is neither well-supported in
@@ -1785,6 +1793,24 @@ elements is to reflexively put a space after all occurrences of
 <code/&amp;> and <code/&lt;>: this will keep the SGML parser from
 interfering, and make no difference to &latex, which ignores all
 spaces in maths mode anyway.
+
+<p>If you need or wish to make some definitions which are to be
+effective in all sucessive maths elements -- for example you want to
+write the abbreviation
+<code>\\def\\degs{^\\circ}</code> -- you can put them in an
+<ref id=el.sun.mdefs>mdefs</ref> element.  This sits between or before paragraphs.
+
+<p>The contents of the <code/mdefs> element are processed as arbitrary LaTeX.
+However, you should not include anything other than definition
+commands and possibly other parameters to do with the layout of maths,
+and specifically you should write nothing which creates any output.
+Although this element is processed fairly straightforwardly when
+generating LaTeX output, the content is moved around quite a lot when
+producing HTML output, and hacky fiddling here has the potential to
+mess up your document in the present and, what is much worse,
+<em>become wrong</em> when processed by a later version of the
+down-converter.  In other words: <em>Do Not Hack This!</em></p>
+
 
 <subsect id=str.span export>Output depending on media type
 <update versionid="v0-7-2">Added this section</px>

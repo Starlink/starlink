@@ -54,6 +54,15 @@ raw LaTeX within the environments isn't escaped.
   (make sequence
     (process-children)
     (literal (if (last-sibling?) "" "\\\\"))))
+(element mdefs
+  (make sequence
+    (make environment brackets: '("
+%% mdefs...
+" "
+%% ...mdefs
+")
+	  escape-tex?: #f
+	  (process-children))))
 (element mlabel
   (make empty-command name: "SetEqnNum"
 	parameters: (list (get-equation-number))))

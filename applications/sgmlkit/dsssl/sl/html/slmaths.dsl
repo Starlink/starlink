@@ -75,13 +75,23 @@ appropriate arguments
 (define (maths-element-list)
   (list (normalize "m")
 	(normalize "mequation")
-	(normalize "meqnarray")))
+	(normalize "meqnarray")
+	(normalize "mdefs")))
 
 (mode get-maths-mode
   (element m
     (img-equation "inline"))
   (element mequation
     (img-equation "equation" (get-equation-number)))
+  (element mdefs
+    (make sequence
+      (make formatting-instruction data: (string-append "
+%%startmdefs
+"))
+      (process-children)
+      (make formatting-instruction data: (string-append "
+%%endmdefs
+"))))
   (element mline
     (let ((eqno (get-equation-number)))
       (make sequence
@@ -108,8 +118,8 @@ appropriate arguments
 <argumentlist>
 <parameter>eqn-type
   <type>string
-  <description>The type of equation, `inline', `equation' or
-  `eqnarray'.
+  <description>The type of equation, `inline', `equation',
+  `eqnarray', or `mdefs'.
 <codebody>
 (define (img-equation eqn-type #!optional (eqno #f))
   (make sequence
