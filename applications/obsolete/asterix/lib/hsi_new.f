@@ -83,6 +83,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
+*  Global Variables:
+      INCLUDE 'HSI_CMN'                                 ! HSI common block
+*       HSI_INIT = LOGICAL (given)
+*         HSI class definitions loaded?
+
 *  Arguments Given:
       INTEGER			IFID			! Input dataset
 
@@ -95,6 +100,9 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Check initialised
+      IF ( .NOT. HSI_INIT ) CALL HSI0_INIT( STATUS )
 
 *  Invoke method
       CALL ADI_EXEC( 'NewHistory', 1, IFID, OARG, STATUS )
