@@ -261,6 +261,12 @@
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I2','_INTEGER',0,VAL__NBI,
      :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I3','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I4','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_I5','_INTEGER',0,VAL__NBI,
+     :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_D1','_DOUBLE',0,VAL__NBD,
      :                                                   SID,STATUS)
         CALL NBS_DEFINE_PRIMITIVE(ID,'PAR_D2','_DOUBLE',0,VAL__NBD,
@@ -378,6 +384,9 @@
         CALL NBS_PUT_VALUE(ITEMID,0,VAL__NBR,0.0,STATUS)
         CALL IMG_NBPUT0I('PAR_I1',0,STATUS)
         CALL IMG_NBPUT0I('PAR_I2',0,STATUS)
+        CALL IMG_NBPUT0I('PAR_I3',0,STATUS)
+        CALL IMG_NBPUT0I('PAR_I4',0,STATUS)
+        CALL IMG_NBPUT0I('PAR_I5',0,STATUS)
         CALL IMG_NBPUT0I('PAR_D1',0.0d0,STATUS)
         CALL IMG_NBPUT0I('PAR_D2',0.0d0,STATUS)
         CALL IMG_NBPUT0C('PAR_C1',' ',STATUS)
@@ -482,31 +491,12 @@
 
         IF (NAME.EQ.'TITLE') THEN
 
-*  get number of title lines and pass to GUI
           CALL GCB_GETI('TITLE_N',OK,N,STATUS)
           IF (.NOT.OK) THEN
             N=0
           ENDIF
-	print *,n,' lines'
-	call flush(6)
-*  put temp block on reading by GUI
-          CALL IMG_NBPUT0I('FLAG',-1,STATUS)
-          CALL IMG_NBPUT0I('PAR_I1',N,STATUS)
-*  take block off reading
-          CALL IMG_NBPUT0I('FLAG',0,STATUS)
-	print *,'sent 0'
-	call flush(6)
-          FLAG=0
-*  wait 'til GUI flags that values have been read
-          DO WHILE (FLAG.EQ.0)
-            CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
-          ENDDO
-	print *,flag,' received'
-	call flush(6)
           I=1
           DO WHILE (I.LE.N)
-	print *,'line ',i
-	call flush(6)
 *  put block on reading by GUI
             CALL IMG_NBPUT0I('FLAG',-1,STATUS)
 *  write parameters to noticeboard
@@ -543,8 +533,6 @@
 *  take block off reading
             CALL IMG_NBPUT0I('FLAG',0,STATUS)
             FLAG=0
-	print *,'sent 0'
-	call flush(6)
 *  wait 'til GUI flags that values have been read
             DO WHILE (FLAG.EQ.0)
               CALL IMG_NBGET0I('FLAG',FLAG,STATUS)
