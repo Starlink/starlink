@@ -231,12 +231,14 @@ PkFont::~PkFont()
 {
 }
 
-void PkFont::verbosity (const verbosities level)
+verbosities PkFont::verbosity (const verbosities level)
 {
+    enum verbosities oldv = verbosity_;
     verbosity_ = level;
 #ifdef ENABLE_KPATHSEA
     kpathsea::verbosity (level);
 #endif
+    return oldv;
 }
 
 /**
@@ -917,7 +919,23 @@ void PkFont::setFontSearchStrategy_(unsigned int strat, bool useit)
 
 
 /**
- * Represents a single glyph in a font.
+ * Represents a single glyph in a font.  The parameters here
+ * correspond to the parameters of the same names which are read from
+ * the PK file.
+ *
+ * @param cc the character code of this glyph
+ * @param tfmwidth the width of the character, in DVI units
+ * @param dm the horizontal escapement, in pixels; this is the number
+ * of pixels rightwards (towards increasing <em>x</em>) that the
+ * reference should move after this glyph is set; the vertical
+ * escapement is taken to be zero
+ * @param w width of the bitmap in pixels
+ * @param h height of the bitmap in pixels
+ * @param hoff <em>(hoff,voff)</em> is the position of the glyph
+ * reference point, as an offset from the top-left pixel, in units of pixels, and with right and down being positive
+ * @param voff see parameter <code>hoff</code>
+ * @param rasterdata the raster information for this glyph
+ * @param f the font which this glyph belongs to
  */
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
@@ -937,6 +955,25 @@ PkGlyph::PkGlyph(unsigned int cc,
     dy_ = 0;
 }
 
+/**
+ * Represents a single glyph in a font.  The parameters here
+ * correspond to the parameters of the same names which are read from
+ * the PK file.
+ *
+ * @param cc the character code of this glyph
+ * @param tfmwidth the width of the character, in DVI units
+ * @param dx the horizontal escapement, in pixels; this is the number
+ * of pixels rightwards (towards increasing <em>x</em>) that the
+ * reference should move after this glyph is set
+ * @param dy the vertical escapement, in pixels
+ * @param w width of the bitmap in pixels
+ * @param h height of the bitmap in pixels
+ * @param hoff <em>(hoff,voff)</em> is the position of the glyph
+ * reference point, as an offset from the top-left pixel, in units of pixels, and with right and down being positive
+ * @param voff see parameter <code>hoff</code>
+ * @param rasterdata the raster information for this glyph
+ * @param f the font which this glyph belongs to
+ */
 PkGlyph::PkGlyph(unsigned int cc,
 		 unsigned int tfmwidth,
 		 unsigned int dx,
@@ -956,6 +993,12 @@ PkGlyph::PkGlyph(unsigned int cc,
     dy_ = static_cast<int>(floor(dy / (double)two16_ + 0.5));
 }
 
+/**
+ * Constructs a dummy glyph for a font.
+ *
+ * @param resolution the resolution which this glyph corresponds to
+ * @param f the font which this glyph is a member of
+ */
 PkGlyph::PkGlyph(int resolution, PkFont *f)
     : font_(f)
 {
@@ -968,6 +1011,12 @@ PkGlyph::PkGlyph(int resolution, PkFont *f)
     hoff_ = voff_ = 0;
 }
 
+/**
+ * Returns the bitmap which represents this glyph.  This runs from
+ * the top-left of the character, with the width and height as given
+ * by methods <code>w()</code> and <code>h()</code>.
+ * @return the bitmap for this glyph
+ */
 const Byte *PkGlyph::bitmap()
 {
     if (bitmap_ == 0 && w_ != 0 && h_ != 0)
@@ -975,6 +1024,18 @@ const Byte *PkGlyph::bitmap()
     return bitmap_;
 }
 
+/**
+ * Creates a Rasterdata object representing the provided data.  The
+ * raster data read from the PK file needs to be decoded into a
+ * bitmap, and this is the function of this class.
+ *
+ * @param opcode the character code of this glyph
+ * @param rasterdata the rastered glyph, in the format described in
+ * the PK file documentation
+ * @param len the number of bytes in the rasterdata stream
+ * @param w the width of the resulting bitmap
+ * @param h the number of rows in the resulting bitmap
+ */
 PkRasterdata::PkRasterdata(Byte opcode,
 			   const Byte *rasterdata, unsigned int len,
 			   unsigned int w, unsigned int h)
@@ -988,6 +1049,14 @@ PkRasterdata::PkRasterdata(Byte opcode,
     eob_ = rasterdata_+len_;
 }
 
+/**
+ * Unpacks a PK number.  Numbers in the PK file are stored in a
+ * compressed form.  This method consumes as many nybbles as necessary
+ * from the input stream and converts them to an unpacked number.
+ *
+ * @return the unsigned integer corresponding to the next number read
+ * from the input stream
+ */
 unsigned int PkRasterdata::unpackpk ()
 {
     unsigned int res = 0;
@@ -1025,6 +1094,10 @@ unsigned int PkRasterdata::unpackpk ()
     return res;
 }
 
+/**
+ * Returns the next nybble from the input stream
+ * @return the value of the next nybble [0..15], as a Byte
+ */
 Byte PkRasterdata::nybble() {
     highnybble_ = !highnybble_;
     Byte res;
@@ -1041,8 +1114,10 @@ Byte PkRasterdata::nybble() {
     return res;
 }
 
-// Construct a bitmap from the provided rasterinfo, which has come from
-// the PK file.  Place the resulting bitmap in bitmap_
+/**
+ * Constructs a bitmap from the provided rasterinfo, which has come from
+ * the PK file.  Place the resulting bitmap in <code>bitmap_</code>
+ */
 void PkRasterdata::construct_bitmap()
 {
     bitmap_ = new Byte[w_ * h_];
@@ -1131,7 +1206,11 @@ void PkRasterdata::construct_bitmap()
 }
 
 
-// Utility function: break path at colons, and return list.
+/**
+ * Utility function: break path at colons, and return list.
+ * @param path a colon-separated string
+ * @return a List of strings
+ */
 string_list break_path (string path)
 {
     string_list l;
@@ -1148,10 +1227,13 @@ string_list break_path (string path)
     return l;
 }
 
-// Return a command which can be used to generate fonts.  The command
-// should return a single line containing the path to the generated
-// font file.  Return an empty string on errors, or if such a command
-// is not supported on a particular platform.
+/**
+ * Returns a command which can be used to generate fonts.  The command
+ * should return a single line containing the path to the generated
+ * font file.  Return an empty string on errors, or if such a command
+ * is not supported on a particular platform.
+ * @return a font file path
+ */
 string PkFont::fontgenCommand (void)
     const
 {

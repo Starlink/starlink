@@ -34,7 +34,10 @@ regression: $(TESTS)
 	    fi; \
 	done
 
+# Test 5 depends on its DVI file
 t5.test: t5.dvi
+# All the tests depend on the library
+$(TESTS): ../libdvi2bitmap.la
 
 .SUFFIXES: .o .cc .test .dvi .dtl
 .cc.o:

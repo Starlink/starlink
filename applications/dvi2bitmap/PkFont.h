@@ -50,9 +50,23 @@ class PkRasterdata {
     PkRasterdata(Byte opcode,
 		 const Byte *rasterdata, unsigned int len,
 		 unsigned int w, unsigned int h);
+    /**
+     * Returns the bitmap corresponding to the input rasterdata
+     *
+     * @return the bitmap, as an array of size <code>[0..w-1][0..h-1]</code>
+     */
     const Byte *bitmap()
 	{ if (bitmap_ == 0) construct_bitmap(); return bitmap_; }
-    static void verbosity (const verbosities level) { verbosity_ = level; }
+    /**
+     * Sets the verbosity of this module.
+     * @param level the required verbosity
+     * @return the previous verbosity level
+     */
+    static verbosities verbosity (const verbosities level) {
+	enum verbosities oldv;
+	verbosity_ = level;
+	return oldv;
+    }
  private:
     Byte *rasterdata_, *eob_;
     const unsigned int len_, w_, h_;
@@ -79,33 +93,82 @@ class PkGlyph {
 	    unsigned int w, unsigned int h,
 	    int hoff, int voff,
 	    PkRasterdata *rasterdata, PkFont *f);
-    // Final constructor is for the single dummy glyph
     PkGlyph(int resolution, PkFont *f);
+    /**
+     * The character code for this glyph
+     */
     inline unsigned int characterCode() const { return cc_; }
+    /**
+     * The character which this glyph represents.
+     * @return the (ASCII) printable character which this glyph
+     * purports to represent
+     */
     inline char characterChar() const
 	{ return (cc_ >= ' ' && cc_ < 127 
 		  ? static_cast<char>(cc_) : '?'); }
 
-    // bitmap() returns the character's bitmap.  This runs from the 
-    // top-left of the character.
     const Byte *bitmap();
-    // w() and h() are the width and height of this character in
-    // device units.  That is, they are the size of the character's bitmap.
+    /**
+     * Width of this character.  This is the row-length of the bitmap
+     * returned by method <code>bitmap()</code>
+     * @return width in device units (ie, pixels)
+     */
     inline unsigned int w() const { return w_; }
+    /**
+     * Height of this character.  This is the number of columns in the bitmap
+     * returned by method <code>bitmap()</code>
+     * @return height in device units (ie, pixels)
+     */
     inline unsigned int h() const { return h_; }
-    // hoff() and voff() are the offset (in pixels, with right and down
-    // being positive) of the first
-    // pixel of the bitmap from the `current position' in the DVI file.
+    /**
+     * Obtains the horizontal offset of the first
+     * pixel of the bitmap from the reference point for this glyph,
+     * with positive numbers indicating a rightward offset.  This is
+     * the negative of the horizontal offset of the
+     * reference point from the bitmap, as discussed in {@link
+     * #PkGlyph the constructor}.
+     *
+     * @return the offset (in pixels, with right being positive)
+     */
     inline int hoff() const { return -hoff_; }
+    /**
+     * Obtains the vertical offset of the first
+     * pixel of the bitmap from the reference point for this glyph,
+     * with positive numbers indicating a downward offset (which is
+     * rather rare, since the reference point is generally near the
+     * lower-left corner of the glyph).
+     * This is the negative of the vertical offset of the
+     * reference point from the bitmap, as discussed in {@link
+     * #PkGlyph the constructor}.
+     *
+     * @return the offset (in pixels, with down being positive)
+     */
     inline int voff() const { return -voff_; }
-    // tfmWidth() is the character's width, in points, as obtaind
-    // from the character's `tfm width'.
+    /**
+     * The glyph's width.
+     * @return the glyph's width in points
+     */
     double tfmWidth() const { return tfmwidth_; }
-    // h/vEscapement() are the character's horizontal and vertical
-    // escapements in pixels
+    /**
+     * The glyph's horizontal escapement
+     * @return the escapement in pixels
+     */
     int hEscapement() const { return dx_; }
+    /**
+     * The glyph's vertical escapement
+     * @return the escapement in pixels
+     */
     int vEscapement() const { return dy_; }
-    static void verbosity (const verbosities level) { verbosity_ = level; }
+    /**
+     * Sets the verbosity of this module.
+     * @param level the required verbosity
+     * @return the previous verbosity level
+     */
+    static verbosities verbosity (const verbosities level) {
+	enum verbosities oldv = verbosity_;
+	verbosity_ = level; 
+	return oldv;
+    }
 
  private:
     unsigned int cc_, dx_, dy_, w_, h_;
@@ -138,7 +201,7 @@ class PkFont {
 	else
 	    return glyphs_[0];	// dummy glyph
     }
-    static void verbosity (const verbosities level);
+    static verbosities verbosity (const verbosities level);
     // setFontPath: specify path to search for fonts.  If argument is
     // null or zero length, simple enable this.
     static void setFontSearchPath(string fp);

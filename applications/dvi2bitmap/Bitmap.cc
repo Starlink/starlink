@@ -62,7 +62,7 @@ Bitmap::BitmapColour Bitmap::def_bg_ = {255, 255, 255};
 bool Bitmap::def_customRGB_ = false;
 bool Bitmap::logBitmapInfo_ = false;
 
-Bitmap::iterator Bitmap::endIterator_;
+Bitmap::const_iterator Bitmap::endIterator_;
 
 // Indecision: Within scaleDown, it seems sensible to average the
 // pixel values over the complete factor*factor square, even when
@@ -81,13 +81,106 @@ Bitmap::iterator Bitmap::endIterator_;
  * @param w the width of the bitmap, in pixels
  * @param h the height of the bitmap, in pixels
  * @param bpp the number of bits-per-pixel
+ * @param expandable if true, the bitmap is expandable
+ * @param maxwidth if <code>expandable</code> is true, and this is
+ * greater than or equal to <code>w</code>, this is the maximum horizontal size
+ * the bitmap will expand to; if it is less than <code>w</code>
+ * (which includes negative, the default), it is set to a default
+ * multiplier of the width <code>w</code>
+ * @param maxheight if <code>expandable</code> is true, and this is
+ * greater than or equal to <code>h</code>, this is the maximum vertical size
+ * the bitmap will expand to; if it is less than <code>h</code> (which
+ * includes negative, the default), the maximum vertical size will be
+ * such that <code>maxheight/h==maxwidth/w</code>
  */
-Bitmap::Bitmap (const int w, const int h, const int bpp)
-    : W(w), H(h), frozen_(false), transparent_(false),
+Bitmap::Bitmap (const int w, const int h, const int bpp,
+		bool expandable,
+		const int maxwidth, const int maxheight)
+    : W(w), H(h), isExpandable_(expandable),
+      frozen_(false), transparent_(false),
       customRGB_(false), bpp_(bpp)
 {
     B = new Byte[W*H];
+    //    memset ((void*)B, 0, W*H);
+
+    reset();
+    
+    if (isExpandable_) {
+	if (maxwidth >= w)
+	    maxW_ = maxwidth;
+	else
+	    maxW_ = 4*W;	// default upper limit on expansion
+	if (maxheight >= h)
+	    maxH_ = maxheight;
+	else
+	    maxH_ = h*maxwidth/w + 1; // round up
+    }
+
+//     bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
+//     bbR = bbB = INT_MIN;	// numeric_limits<int>::min();
+
+//     cropL = 0;
+//     cropR = W;
+//     cropT = 0;
+//     cropB = H;
+
+//     cropMargin[Left]      = cropMarginDefault[Left];
+//     cropMargin[Right]     = cropMarginDefault[Right];
+//     cropMargin[Top]       = cropMarginDefault[Top];
+//     cropMargin[Bottom]    = cropMarginDefault[Bottom];
+//     cropMarginAbs[Left]   = cropMarginAbsDefault[Left];
+//     cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
+//     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
+//     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
+
+    if (def_customRGB_)
+    {
+	fg_.red   = def_fg_.red;
+	fg_.green = def_fg_.green;
+	fg_.blue  = def_fg_.blue;
+	bg_.red   = def_bg_.red;
+	bg_.green = def_bg_.green;
+	bg_.blue  = def_bg_.blue;
+	if (verbosity_ > normal)
+	    cerr << "Bitmap::Bitmap: Custom RGB:"
+		 << static_cast<int>(fg_.red) << ','
+		 << static_cast<int>(fg_.green) << ','
+		 << static_cast<int>(fg_.blue) << '/'
+		 << static_cast<int>(bg_.red) << ','
+		 << static_cast<int>(bg_.green) << ','
+		 << static_cast<int>(bg_.blue) << endl;
+	customRGB_ = true;
+    }
+
+//     cropped_ = false;
+
+    if (bpp_ > 8)
+	// too big for a Byte...
+	bpp_ = 8;
+    max_colour_ = static_cast<Byte>((1<<bpp_) - 1);
+
+    if (verbosity_ > normal)
+	cerr << "Bitmap::new Bitmap("
+	     << W << ',' << H << ',' << bpp_ << ")" << endl;
+}
+
+Bitmap::~Bitmap()
+{
+    delete[] B;
+}
+
+/**
+ * Resets the bitmap to its initial state.  This clears the bitmap by
+ * setting all the pixels to white, unfreezing it, and resetting the
+ * bounding box and crops to their initial states.  It does not
+ * deallocate any memory, however, so if the bitmap has expanded in
+ * the past, the reset bitmap is the same size.  Also, it does not
+ * reset the transparency flag or adjust the colour settings.
+ */
+void Bitmap::reset()
+{
     memset ((void*)B, 0, W*H);
+    
     bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
     bbR = bbB = INT_MIN;	// numeric_limits<int>::min();
 
@@ -105,39 +198,77 @@ Bitmap::Bitmap (const int w, const int h, const int bpp)
     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
 
-    if (def_customRGB_)
-    {
-	fg_.red   = def_fg_.red;
-	fg_.green = def_fg_.green;
-	fg_.blue  = def_fg_.blue;
-	bg_.red   = def_bg_.red;
-	bg_.green = def_bg_.green;
-	bg_.blue  = def_bg_.blue;
-	if (verbosity_ > normal)
-	    cerr << "Bitmap constructor: Custom RGB:"
-		 << static_cast<int>(fg_.red) << ','
-		 << static_cast<int>(fg_.green) << ','
-		 << static_cast<int>(fg_.blue) << '/'
-		 << static_cast<int>(bg_.red) << ','
-		 << static_cast<int>(bg_.green) << ','
-		 << static_cast<int>(bg_.blue) << endl;
-	customRGB_ = true;
-    }
-
     cropped_ = false;
-    if (bpp_ > 8)
-	// too big for a Byte...
-	bpp_ = 8;
-    max_colour_ = static_cast<Byte>((1<<bpp_) - 1);
+
+    frozen_ = false;
+    // but don't reset transparent_ or customRGB_
 
     if (verbosity_ > normal)
-	cerr << "new Bitmap(" << W << ',' << H << ',' << bpp_ << ")" << endl;
+	cerr << "Bitmap::reset" << endl;
 }
 
-Bitmap::~Bitmap()
+/**
+ * Declares that a routine is about to draw in the rectangle with
+ * corners <em>(ulx, uly)</em> to <em>(lrx, lry)</em> (inclusive).  If
+ * the bitmap is expandable, this should do any reallocations which
+ * are necessary or possible, and adjust W and H accordingly.
+ *
+ * <p>This does not (currently) allow any expansion towards negative
+ * coordinates.
+ */
+void Bitmap::usesBitmapArea_(const int ulx, const int uly,
+			     const int lrx, const int lry)
 {
-    delete[] B;
+    if (!isExpandable_)
+	return;			// nothing to do
+    
+    const float magfactor = 1.5;
+    
+    int tW = W;
+    if (lrx > W) {
+	float tWf = tW;
+	while (tWf<lrx && tWf<maxW_)
+	    tWf *= magfactor;
+	tW = static_cast<int>(ceil(tWf));
+	if (tW > maxW_)
+	    tW = maxW_;
+    }
+
+    int tH = H;
+    if (lry > H) {
+	float tHf = tH;
+	while (tHf<lry && tHf<maxH_)
+	    tHf *= magfactor;
+	tH = static_cast<int>(ceil(tHf));
+	if (tH > maxH_)
+	    tH = maxH_;
+    }
+
+    if (tW == maxW_ && tH == maxH_) {
+	// the bitmap can't be expanded any more after this
+	isExpandable_ = false;
+    }
+
+    if (tW != W || tH != H) {
+	// We're expanding...
+	// There are a variety of ways to make this more efficient.
+	// But there's absolutely no need to bother with them yet.
+	Byte* oldB = B;
+	B = new Byte[tW*tH];
+	memset((void*)B, 0, tW*tH);
+	for (int row=0; row<H; row++)
+	    memcpy((void*)&B[row*tW], (void*)&oldB[row*W], W);
+	if (verbosity_ > normal) {
+	    cerr << "Bitmap:: expanded from (" << W << ',' << H << ") to ("
+		 << tW << ',' << tH << "): max (" 
+		 << maxW_ << ',' << maxH_ << ")" << endl;
+	}
+	W = tW;
+	H = tH;
+	delete[] oldB;
+    }
 }
+
 
 /**
  * Paint a bitmap onto the master bitmap.  The bitmap to be added is
@@ -148,23 +279,24 @@ Bitmap::~Bitmap()
  *
  * <p>The pixel at position <em>(x,y)</em> on the new bitmap is at position
  * <code>b[y*w+x]</code> in the input bitmap array.  This new bitmap is
- * painted onto the master bitmap with its bottom left corner pixel
+ * painted onto the master bitmap with its top left corner pixel
  * (namely position <em>(0,0)</em>) occupying pixel <em>(x,y)</em> on
- * the master bitmap.
+ * the master bitmap, and pixel <em>(a,b)</em> occupying pixel
+ * <em>(x+a,y+b)</em> unless this would be off the master bitmap.
  *
  * <p>Any parts of the new bitmap falling outside the boundary of the
  * master are cropped.
  *
  * @param x the pixel in the top-left corner of the new bitmap (coordinate
  * <em>(0,0)</em>) is located at position <em>(x,y)</em> of the master
- * bitmap
+ * bitmap XXX NO, should be the reference point!!!
  * @param y (see parameter <em>x</em>)
  * @param w the width of the new bitmap, in pixels
  * @param h the height of the new bitmap, in pixels
  * @param b the new bitmap, as a one-dimensional array
  * @throws BitmapError if this is called after method <code>freeze()</code>
  */
-void Bitmap::paint (const int x, const int y, const int w, const int h,
+void Bitmap::paint(const int x, const int y, const int w, const int h,
 		    const Byte *b)
     throw (BitmapError)
 {
@@ -175,10 +307,16 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     if (frozen_)
 	throw BitmapError ("paint() called after freeze()");
 
-    // Put [row1,row2-1] and [col1,col2-1] of the new bitmap
-    // at position (x+col1,y+row1) of the master bitmap.
-    // If the new bitmap is entirely within the master, then 
-    // row1=0, row2=h, col1=0, col2=w.
+    usesBitmapArea_(x, y, x+w, y+h);
+
+    // Paint [row1,row2-1] and [col1,col2-1] of the new bitmap into
+    // the master bitmap;
+    // if the new bitmap is entirely within the master, then 
+    // row1=0, row2=H, col1=0, col2=W.  The new bitmap is placed so
+    // that pixel (a,b) of the new bitmap
+    // is placed on pixel (x+a,y+b) of the master bitmap, unless this
+    // would place that pixel outside the boundary of the master.
+    //
     // Note that this does the correct thing when x>W or y>H
     // (ie, it makes col2<0, so loop is never started; same for row2).
     int col1 = (x>=0   ? 0 :  -x);
@@ -204,7 +342,7 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
     if (y+h > bbB) bbB = y+h;
 
     if (verbosity_ > normal)
-	cerr << "Bitmap @ (" << x << ',' << y << "): (0:"
+	cerr << "Bitmap::paint @ (" << x << ',' << y << "): (0:"
 	     << w << ",0:" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
 	     << "). BB now [" << bbL << ':' << bbR << "), ["
@@ -224,7 +362,7 @@ void Bitmap::paint (const int x, const int y, const int w, const int h,
  * @param h the height of the new rule, in pixels
  * @throws BitmapError if this is called after method <code>freeze()</code>
  */
-void Bitmap::rule (const int x, const int y, const int w, const int h)
+void Bitmap::rule(const int x, const int y, const int w, const int h)
     throw (BitmapError)
 {
     // Update bb? as a side-effect.
@@ -232,6 +370,9 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
     // falling outside the boundary of the master
     if (frozen_)
 	throw BitmapError ("rule() called after freeze()");
+
+    //usesBitmapArea_(x, y, x+w, y+h);
+    usesBitmapArea_(x, y-h+1, x+w-1, y+h-1);
 
     // OR everything in a block between [row1,row2-1] and [col1,col2-1]
     int row2 = y+1;   if (row2 > H) row2 = H;
@@ -243,13 +384,17 @@ void Bitmap::rule (const int x, const int y, const int w, const int h)
 	for (int col=col1; col<col2; col++)
 	    B[row*W+col] = max_colour_;
 
-    if (x   < bbL) bbL = x;
-    if (x+w > bbR) bbR = x+w;
-    if (y   < bbT) bbT = y;
-    if (y+h > bbB) bbB = y+h;
+//     if (x   < bbL) bbL = x;
+//     if (x+w > bbR) bbR = x+w;
+//     if (y   < bbT) bbT = y;
+//     if (y+h > bbB) bbB = y+h;
+    if (col1 < bbL) bbL = col1;
+    if (col2 > bbR) bbR = col2;
+    if (row1 < bbT) bbT = row1;
+    if (row2 > bbB) bbB = row2;
 
     if (verbosity_ > normal)
-	cerr << "Rule @ (" << x << ',' << y << "): ("
+	cerr << "Bitmap::rule @ (" << x << ',' << y << "): ("
 	     << w << "x" << h << ") -> ("
 	     << col1 << ':' << col2 << ',' << row1 << ':' << row2
 	     << "). BB now [" << bbL << ':' << bbR << "), ["
@@ -285,8 +430,10 @@ void Bitmap::strut (const int x, const int y,
 	throw BitmapError
 		("Bitmap::strut all of l, r, t, b must be non-negative");
 
+    usesBitmapArea_(x-l, y-t, x+r, y+b);
+
     if (verbosity_ > normal)
-	cerr << "Strut @ (" << x << ',' << y << "): (x-"
+	cerr << "Bitmap::strut @ (" << x << ',' << y << "): (x-"
 	     << l << ",x+" << r << ")/(y-"
 	     << r << ",y+" << b << "):"
 	     << "BB was [" << bbL << ':' << bbR << "), ["
@@ -301,7 +448,7 @@ void Bitmap::strut (const int x, const int y,
     if (y+b > bbB) bbB = y+b;
 
     if (verbosity_ > normal)
-	cerr << "BB now [" << bbL << ':' << bbR << "), ["
+	cerr << "Bitmap:: ...BB now [" << bbL << ':' << bbR << "), ["
 	     << bbT << ':' << bbB << ")" << endl;
 }
 
@@ -383,6 +530,12 @@ void Bitmap::crop()
 
     // Ensure that the cropping hasn't pushed the margins out of the bitmap
     normalizeBB_(cropL, cropR, cropT, cropB);
+
+    if (verbosity_ > normal) {
+	cerr << "Bitmap::crop to width [" << cropL << ',' << cropR
+	     << "), height ["
+	     << cropT << ',' << cropB << ")" << endl;
+    }
     
     cropped_ = true;
 }
@@ -414,7 +567,7 @@ void Bitmap::crop()
  * @throws BitmapError if <code>spec=All</code> when
  * <code>absolute</code> is true
  */
-void Bitmap::crop (Margin spec, int pixels, bool absolute)
+void Bitmap::crop(Margin spec, int pixels, bool absolute)
     throw (BitmapError)
 {
     if (spec == All)
@@ -497,19 +650,31 @@ bool Bitmap::overlaps ()
 
 /**
  * Obtain a bounding box for the current bitmap.  This returns a
- * four-element array consisting of the coordinate of the
- * leftmost blackened pixel, the topmost pixel, the rightmost
- * pixel and the bottommost pixel.  If the bitmap has been cropped,
- * this bounding box reflects the crop margins.
+ * four-element array consisting of, in order,
+ * <ul>
+ * <li>[0] = the coordinate of the leftmost blackened pixel, 
+ * <li>[1] = the coordinate of the topmost blackened pixel,
+ * <li>[2] = one more than the coordinate of the rightmost blackened pixel, and
+ * <li>[3] = one more than the coordinate of the bottommost blackened pixel.
+ * </ul>
+ * Thus <code>[2]-[0]</code> is the number of pixels which the
+ * blackened area occupies.  Note that `blackened pixels' here
+ * includes those notionally blackened by the <code>strut()</code>
+ * method.  If the bitmap has been cropped, this bounding box reflects
+ * the crop margins.
  *
  * <p>The returned array occupies
  * static storage, and is always current as of the last time this
  * method was called.
  *
- * <p>It is possible for this to be bigger than the bitmap, if rules
- * or bitmaps have been painted on the bitmap in such a way that they
- * overlap the boundaries of the bitmap, <em>and</em> if it is
- * called before an explicit or implicit call to
+ * <p>The methods <code>getWidth()</code> and <code>getHeight()</code>
+ * return the size of the bitmap irrespective of the bounding box and
+ * any cropping.
+ *
+ * <p>It is possible for the bounding-box to be bigger than the
+ * bitmap, if rules or bitmaps have been painted on the bitmap in such
+ * a way that they overlap the boundaries of the bitmap, <em>and</em>
+ * if it is called before an explicit or implicit call to
  * <code>freeze()</code>.  This can also be detected by a call to
  * <code>overlaps()</code> before any call to <code>freeze()</code>.
  * It is never bigger than the bitmap after the bitmap is frozen.
@@ -523,7 +688,7 @@ bool Bitmap::overlaps ()
  * @return the position of the bitmap bounding-box, in the order
  * (ulx, uly, lrx, lry)
  */
-int *Bitmap::boundingBox ()
+int *Bitmap::boundingBox()
 {
     if (cropped_) {
 	BB[0] = cropL;
@@ -731,7 +896,7 @@ void Bitmap::scaleDown (const int factor)
  * default format
  * @see BitmapImage
  */
-void Bitmap::write (const string filename, const string format)
+void Bitmap::write(const string filename, const string format)
     throw (BitmapError)
 {
     if (!frozen_)
@@ -777,8 +942,10 @@ void Bitmap::write (const string filename, const string format)
 	// bust the bounds of B[] when writing out.
 	assert (cropT>=0 && cropB<=H && cropL>=0 && cropL<W);
 
-	for (int row=cropT; row<cropB; row++)
-	    bi->setBitmapRow(&B[row*W+cropL]);
+	for (const_iterator it = begin(); it != end(); ++it)
+	    bi->setBitmapRow(*it);
+// 	for (int row=cropT; row<cropB; row++)
+// 	    bi->setBitmapRow(&B[row*W+cropL]);
     }
     else
 	bi->setBitmap (B);
@@ -824,7 +991,7 @@ void Bitmap::write (const string filename, const string format)
  */
 void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
     if (verbosity_ > normal)
-	cerr << "setRGB: "
+	cerr << "Bitmap::setRGB: "
 	     << " fg=" << fg
 	     << " RGB="
 	     << static_cast<int>(rgb->red) << ','
@@ -853,7 +1020,7 @@ void Bitmap::setRGB (const bool fg, const BitmapColour* rgb) {
  */
 void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
     if (verbosity_ > normal)
-	cerr << "setDefaultRGB: "
+	cerr << "Bitmap::setDefaultRGB: "
 	     << " fg=" << fg
 	     << " RGB="
 	     << static_cast<int>(rgb->red) << ','
@@ -877,7 +1044,7 @@ void Bitmap::setDefaultRGB (const bool fg, const BitmapColour* rgb) {
  * Returns the beginning of a sequence of bitmap rows.
  * <p>Freezes the bitmap as a side-effect.
  */
-Bitmap::iterator Bitmap::begin()
+Bitmap::const_iterator Bitmap::begin()
 {
     if (!frozen_)
 	freeze();
@@ -885,82 +1052,87 @@ Bitmap::iterator Bitmap::begin()
 			  (cropped_ ? cropL : 0),
 			  (cropped_ ? cropT : 0),
 			  W,
-			  //(cropped_ ? cropR-cropL : W),
 			  (cropped_ ? cropB-cropT : H));
-//     rowLength_ = (cropped_ ? cropR-cropL : width);
-//     lastRow_ =   (cropped_ ? cropB-cropT : height);
-//     rowNumber_ = (cropped_ ? cropT : 0);
-//    runningIterator_.init(B,H,W);
     return runningIterator_;
 }
 /**
  * Returns the end of a sequence of bitmap rows.
  */
-Bitmap::iterator Bitmap::end()
+Bitmap::const_iterator Bitmap::end()
     const
 {
     if (Bitmap::endIterator_.rowNumber_ == 0) // initialisation
 	Bitmap::endIterator_.rowNumber_ = -1;
     return Bitmap::endIterator_;
 }
-Bitmap::iterator::iterator()
+Bitmap::const_iterator::const_iterator()
 {
     // empty
 }
-Bitmap::iterator::~iterator()
+Bitmap::const_iterator::~const_iterator()
 {
     // empty
 }
-void Bitmap::iterator::init(Byte* b,
+void Bitmap::const_iterator::init(Byte* b,
 			    int startx, int starty,
 			    int width, int nrows)
 {
     b_ = b;
-    rowLength_ = width;
-    lastRow_ = startx + nrows;
     rowNumber_ = starty;
+    lastRow_ = starty + nrows;
+    rowLength_ = width;
     startColumn_ = startx;
-//     rowLength_ = (cropped_ ? cropR-cropL : width);
-//     lastRow_ =   (cropped_ ? cropB-cropT : height);
-//     rowNumber_ = (cropped_ ? cropT : 0);
 }
 /**
  * Returns the current member of the set of rows returned by the
  * iterator.  This returns a pointer to an array of
  * <code>Byte</code>, with elements <code>[0..W-1]</code> being
  * guaranteed to be valid, where <code>W</code> is the width of the
- * bitmap.  This width is the difference of the [2] and [0] elements
- * (or equivalently the [3] and [1] elements) of the array returned by
- * {@link #boundingBox}.
+ * bitmap.  If the bitmap is uncropped, this is the total width of the
+ * bitmap as returned by method {@link #getWidth}; if cropped, the
+ * width is the difference of the [2] and [0] elements of the array
+ * returned by {@link #boundingBox}.
  *
  * @return pointer to an array of <code>Byte</code>
+ * @throws DviError if the iterator is dereferenced after it has come
+ * to the end
  */
-Byte* Bitmap::iterator::operator*()
+Byte* Bitmap::const_iterator::operator*()
     throw (DviError)
 {
     if (rowNumber_ < 0 || rowNumber_ >= lastRow_) {
-	throw new DviError("Out-of-range dereference of iterator");
+	throw new DviError("Out-of-range dereference of const_iterator");
     }
     return &b_[rowNumber_ * rowLength_ + startColumn_];
-    //return &b_[rowNumber_ * rowLength_];
 }
-Bitmap::iterator& Bitmap::iterator::operator++()
+/**
+ * Increments the iterator.  If the bitmap is uncropped, all the rows
+ * in the bitmap will eventually be iterator over, namely the number
+ * of rows returned by method {@link #getHeight}; if it is cropped,
+ * the number of rows returned will be the difference between the [3]
+ * and [1] elements of the {@link #boundingBox} array.
+ *
+ * @return the iterator
+ * @throws DviError if the iterator is incremented after it has come
+ * to the end
+ */
+Bitmap::const_iterator& Bitmap::const_iterator::operator++()
     throw (DviError)
 {
     if (rowNumber_ < 0 || rowNumber_ >= lastRow_) {
-	throw new DviError("Out-of-range increment of iterator");
+	throw new DviError("Out-of-range increment of const_iterator");
     }
     ++rowNumber_;
     if (rowNumber_ == lastRow_)
 	rowNumber_ = -1;	// matches endIterator_
     return *this;
 }
-bool Bitmap::iterator::operator==(const Bitmap::iterator& it)
+bool Bitmap::const_iterator::operator==(const Bitmap::const_iterator& it)
     const
 {
     return (rowNumber_ == it.rowNumber_);
 }
-bool Bitmap::iterator::operator!=(const Bitmap::iterator& it)
+bool Bitmap::const_iterator::operator!=(const Bitmap::const_iterator& it)
     const
 {
     return rowNumber_ != it.rowNumber_;

@@ -39,7 +39,9 @@ class BitmapError : public DviError {
 
 class Bitmap {
  public:
-    Bitmap (const int width, const int height, const int bpp=1);
+    Bitmap (const int width, const int height, const int bpp=1,
+	    bool expandable=false,
+	    const int maxwidth=-1, const int maxheight=-1);
     ~Bitmap();
 
     // make sure Left..Bottom are 0..3 (I should use an iterator, I know...)
@@ -63,6 +65,7 @@ class Bitmap {
     void crop (Margin spec, int pixels, bool absolute=false)
 	    throw (BitmapError);
     void blur ();
+    void reset();
     /**
      * Sets the current bitmap to be transparent, if possible.
      * @param sw if true, the current bitmap is set to be transparent
@@ -87,6 +90,18 @@ class Bitmap {
     bool overlaps() const;
     int* boundingBox();
     /**
+     * Returns the total width of the bitmap.  This may not the the
+     * initial size of the bitmap, if it has expanded since then.
+     * @return width of bitmap
+     */
+    int getWidth() const { return W; }
+    /**
+     * Returns the total height of the bitmap.  This may not the the
+     * initial size of the bitmap, if it has expanded since then.
+     * @return height of bitmap
+     */
+    int getHeight() const { return H; }
+    /**
      * Sets the verbosity of the current class.
      * @param level the required verbosity
      * @return the previous verbosity level
@@ -105,16 +120,16 @@ class Bitmap {
      */
     static void logBitmapInfo (bool b) { logBitmapInfo_ = b; };
 
-    class iterator 
+    class const_iterator 
     {
     public:
 	Byte* operator*() throw (DviError);
-	iterator& operator++() throw (DviError);
-	bool operator==(const iterator& it) const;
-	bool operator!=(const iterator& it) const;
-	~iterator();
+	const_iterator& operator++() throw (DviError);
+	bool operator==(const const_iterator& it) const;
+	bool operator!=(const const_iterator& it) const;
+	~const_iterator();
     private:
-	iterator();
+	const_iterator();
 	void init(Byte* b, int startx, int starty, int width, int nrows);
 	Byte* b_;
 	int rowLength_;
@@ -123,17 +138,23 @@ class Bitmap {
 	int lastRow_;
 	friend class Bitmap;
     };
-    iterator runningIterator_;
-    static iterator endIterator_;
-    iterator begin();
-    iterator end() const;
+    const_iterator runningIterator_;
+    static const_iterator endIterator_;
+    const_iterator begin();
+    const_iterator end() const;
 
  private:
     void normalizeBB_(int& l, int& r, int& t, int& b);
+    void usesBitmapArea_(const int ulx, const int uly,
+			 const int lrx, const int lry);
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
     Byte *B;
     // width and height of bitmap
     int W, H;
+    // Maximum height and width
+    int maxW_, maxH_;
+    // is the bitmap to be expandable?
+    bool isExpandable_;
     // bounding box - bbL and bbT are the leftmost and topmost
     // blackened pixels, bbR and bbB are one more than the rightmost
     // and lowest blackened pixels.  Until a call to freeze(), bb? may
