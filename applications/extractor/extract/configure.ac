@@ -1,6 +1,6 @@
 # Modified for EXTRACTOR by PWD 15/03/2004.
 
-# configure.in for EXTRACTOR
+# configure.ac for EXTRACTOR
 # (C) E.Bertin 2002,2003
 # Process this file with autoconf to produce a configure script.
 # First, disable the annoying config.cache
@@ -13,7 +13,12 @@ AC_CONFIG_AUX_DIR(autoconf)
 AM_CONFIG_HEADER(config.h)
 AM_INIT_AUTOMAKE
 date=`date +%Y-%m-%d`
+date2=`date +"%a %b %d %Y"`
+date3=`date +"%B %Y"`
 AC_DEFINE_UNQUOTED(DATE, "$date", [Archive creation date])
+AC_SUBST(PACKAGER, "Peter W. Draper")
+AC_SUBST(DATE2, "$date2")
+AC_SUBST(DATE3, "$date3")
 
 # Include macros
 sinclude(acx_prog_cc_optim.m4)
@@ -76,6 +81,28 @@ AC_ARG_ENABLE(efence,
         use_efence="no"
 	AC_MSG_RESULT([no]))
 
+# Provide special option for gprof profiling
+AC_MSG_CHECKING([for gprof profiler mode])
+AC_ARG_ENABLE(gprof,
+	[AC_HELP_STRING([--enable-gprof],
+	[Enable special mode for compilation with the gprof profiler \
+(off by default)])],
+        use_gprof="yes"
+	AC_MSG_RESULT([yes]),
+        use_gprof="no"
+	AC_MSG_RESULT([no]))
+
+# Enable static linking
+AC_MSG_CHECKING([static linking])
+AC_ARG_ENABLE(static,
+	[AC_HELP_STRING([--enable-static],
+	[Enable static linking \
+(off by default)])],
+        use_static="yes"
+	AC_MSG_RESULT([yes]),
+        use_static="no"
+	AC_MSG_RESULT([no]))
+
 # Checks for programs.
 # GCC is chosen last because it is likely to yield less optimized code
 AC_PROG_CC([$cclist])
@@ -114,6 +141,12 @@ AC_CHECK_FUNCS([atexit memcpy memmove memset mkdir munmap strstr])
 AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
+# Special options for the Insure++ debugger
+if test $use_insure = "yes" -a $CC = "insure"; then
+  CFLAGS="$CFLAGS -g"
+  use_static="no"
+fi
+
 # Special optimization options for the INTEL C compiler
 if test $use_icc = "yes" -a $CC = "icc"; then
   CFLAGS="$CFLAGS -O3 -axiMKW -ipo -ipo_obj -unroll"
@@ -131,20 +164,26 @@ if test "$use_efence" = "yes"; then
   LIBS="-lefence $LIBS"
 fi
 
+# Link with gprof option
+if test "$use_gprof" = "yes"; then
+  if test "$use_icc" = "yes"; then
+    CFLAGS="$CFLAGS -pq"
+  else
+    CFLAGS="$CFLAGS -pg"
+fi
+  use_static="no"
+fi
+
+if test "$use_static" = "yes"; then
+LDFLAGS="$LDFLAGS -static"
+fi
+
 # Override automatic CFLAGS and LDFLAGS with those of user
 if test -n "$mycflags"; then
 CFLAGS="$mycflags"
 fi
 if test -n "$myldflags"; then
 LDFLAGS="$myldflags"
-fi
-
-# Special options for the Insure++ debugger
-if test $use_insure = "yes"; then
-  CC="insure"
-  CFLAGS="-g"
-else
-LDFLAGS="$LDFLAGS -static"
 fi
 
 # Starlink.
