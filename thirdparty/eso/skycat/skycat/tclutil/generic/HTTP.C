@@ -1101,7 +1101,7 @@ void HTTP::checkProxy( const char *host )
             //  host. Note need a copy of variable as strtok modifies it.
             char *ptr = getenv( "http_noproxy" );
             if ( ptr != NULL ) {
-                const char *hostdomain = strchr(host, '.');
+                char *hostdomain = (char *) strchr(host, '.');
                 if (hostdomain != NULL) {
                     hostdomain++;
 		    // make a copy of the http_noproxy string for strtok
