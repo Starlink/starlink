@@ -1,5 +1,6 @@
 # Test area search on local catalogue
 test -n "$MOGGY" || MOGGY=../moggy
+pwd=`pwd`
 
 # coord1  17 26 0    74 19  0
 # coord2  17 28 0    74 21  0
@@ -9,7 +10,7 @@ test -n "$MOGGY" || MOGGY=../moggy
 
 
 $MOGGY <<EOD
-catconfig file://$PWD/local.config
+catconfig file://$pwd/local.config
 coord1 261.5  74.31666
 coord2 262.0  74.35
 type box

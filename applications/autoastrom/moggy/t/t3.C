@@ -2,7 +2,14 @@
 #include "config.h"
 #endif
 
+#if 0
+#if HAVE_CSTD_INCLUDE
 #include <cstdio>
+#else
+#include <stdio.h>
+#endif
+#endif
+#include <iostream>		// for cerr, endl
 #include <vector>
 #include <string>
 
@@ -14,7 +21,8 @@ using std::cerr;
 using std::endl;
 #endif
 
-#include "../util.h"
+// Use command-line -I to indicate the path to util.h
+#include <util.h>
 
 int main (int argc, char **argv)
 {

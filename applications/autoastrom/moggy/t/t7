@@ -1,5 +1,6 @@
 # Test AST functionality
 test -n "$MOGGY" || MOGGY=../moggy
+pwd=`pwd`
 
 $MOGGY <<EOD
 ast frameset pixel
@@ -198,7 +199,7 @@ ast convert 261.713 74.4153 fromsky
 ast convert 261.712 74.4152 fromsky
 coord1 1 1
 coord2 2048 4097
-catconfig file://$PWD/local.config
+catconfig file://$pwd/local.config
 type box
 nrow 10
 name dummy@home

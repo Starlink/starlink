@@ -11,7 +11,7 @@ test -n "$PERLBIN" || exit 1
 # I don't understand this one tiny bit.
 
 AUTOASTROM_DIR=`cd ../..; pwd`;	export AUTOASTROM_DIR
-TESTDIR=$PWD;				export TESTDIR
+TESTDIR=`pwd`;				export TESTDIR
 # Name the report file t<number>*.tmp, so it's deleted by the driver at the end
 REPORTFILE=t6.report.tmp;		export REPORTFILE
 
