@@ -288,7 +288,8 @@ void Bitmap::write (const string filename, const string format)
     if (fileext.length() != 0)
     {
 	int extlen = fileext.length();
-	if (outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
+	if (extlen > outfilename.length() ||
+	    outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;
 	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
     }
