@@ -1061,23 +1061,28 @@
          set PNTLBL($image,$object) ""
       }
 
-# Make a copy of the supplied image (ensuring it is in NDF format).
+# Prepare this image. This involves:
+#   - Making a copy of the supplied image (ensuring it is in NDF format).
+#   - Checking it has a POLPACK extension containing either WPLATE or ANLANG.
+#   - Saving the current WCS Frame in the NDF so that it can be re-instated
+#     when the output images are saved.
+#   - Setting the current WCS Frame in the NDF explicitly to pixel 
+#     co-ordinates.
+
       set copy [UniqueFile]
-      Obey ndfpack ndfcopy "in=$imsec out=$copy" 1
-
-# Check it has a POLPACK extension containing either WPLATE or ANLANG.
-      if { !$ref } { CheckNDF $copy $image }
-
-# Save the current WCS Frame in the NDF so that it can be re-instated
-# when the output images are saved.
-      if { [Obey ndfpack wcsattrib "$copy get domain" 1] } {
-         set WCSDOMAIN($image) [GetParam ndfpack wcsattrib:value]
+      
+      if { $ref } {
+         set refpar T
       } {
-         set WCSDOMAIN($image) "PIXEL"
+         set refpar F
       }
-
-# Now set the current WCS Frame in the NDF explicitly to pixel co-ordinates.
-      Obey ndfpack wcsframe "ndf=$copy frame=pixel" 1
+     
+      Obey polpack polprep "in=$imsec ref=$refpar out=$copy" 1
+      set WCSDOMAIN($image) [GetParam polpack polprep:frame]
+      if { $WCSDOMAIN($image) == "BADPOL" } {
+         Message "$image does not contain either an ANLANG or a WPLATE value. Make sure you have run POLIMP on this image."
+         exit 1
+      }
 
 # Push the name of the NDF copy onto the image's IMAGE_STACK. 
       set IMAGE_STACK($image) $copy

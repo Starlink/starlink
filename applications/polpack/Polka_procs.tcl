@@ -768,36 +768,6 @@ proc CheckMsg {action val} {
    }
 }
 
-proc CheckNDF {ndf image} {
-#+
-#  Name:
-#     CheckNDF
-#
-#  Purpose:
-#     Check if the supplied NDF can be used. An error is reported and
-#     Polka aborts if it has not got either an ANLANG or WPLATE value. 
-#
-#  Arguments:
-#     ndf
-#        The ndf structure to be checked.
-#     image
-#        The name of the data file to be used in the report.
-#-
-   set ok 0
-   if { [Extension $ndf ANLANG _REAL "" anlang] &&
-        [Extension $ndf WPLATE _REAL "" wplate] } {
-      if { $anlang != "" || $wplate != "" } {
-         set ok 1
-      }      
-   }
-
-   if { !$ok } {
-      Message "$image does not contain either an ANLANG or a WPLATE value. Make sure you have run POLIMP on this image."
-      exit 1
-   }
-
-}
-
 proc CheckRef {} {
 #+
 #  Name:
