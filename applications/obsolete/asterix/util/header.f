@@ -19,6 +19,7 @@
 *     30 Mar 92 : V1.6-0  Use ERR_ANNUL to clear PAR__NULL (DJA)
 *      4 May 94 : V1.7-0  Use AIO for output (DJA)
 *     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
+*     25 Apr 95 : V1.8-1  Updated data interfaces (DJA)
 *
 *    Type definitions :
 *
@@ -46,9 +47,10 @@
       CHARACTER              LINE*80, NAME*132
       CHARACTER*80           STRING             ! FIX - DELETE WHEN FIX REMOVED
 
-      INTEGER                L
-      INTEGER                OCH                ! Output channel
-      INTEGER                WIDTH              ! Output width
+      INTEGER			FID			! Dataset id
+      INTEGER                	L
+      INTEGER                	OCH                	! Output channel
+      INTEGER                	WIDTH              	! Output width
 
       LOGICAL                ASTOK              ! ASTERIX struc OK?
       LOGICAL                HOK                ! HEADER struc OK?
@@ -59,7 +61,7 @@
 *    Version :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'HEADER Version 1.8-0')
+        PARAMETER           (VERSION = 'HEADER Version 1.8-1')
 *-
 
 *    Check status
@@ -74,9 +76,9 @@
 
 *    Get dataset
       IF (EDIT) THEN
-        CALL USI_ASSOCI ('INP', 'UPDATE', LOC, PRIM, STATUS)
+        CALL USI_TASSOCI('INP', '*', 'UPDATE', FID, STATUS )
       ELSE
-        CALL USI_ASSOCI ('INP', 'READ', LOC, PRIM, STATUS)
+        CALL USI_TASSOCI('INP', '*', 'READ', FID, STATUS )
       ENDIF
 
 *    Get output channel
@@ -87,7 +89,8 @@
 
 *  do editing if required
           IF (EDIT) THEN
-            CALL HEADER_EDIT(LOC,STATUS)
+            CALL AST1_LOCHEAD( FID, .TRUE., HLOC, STATUS )
+            CALL HEADER_EDIT(HLOC,STATUS)
           ENDIF
 
           CALL CHR_FILL ('-', LINE)
@@ -99,41 +102,21 @@
           CALL AIO_IWRITE( OCH, 1, NAME(:L), STATUS )
           CALL AIO_BLNK( OCH, STATUS )
 
-          CALL BDA_CHKHEAD(LOC,HOK,STATUS)
+          CALL ADI1_LOCHEAD( FID, .FALSE., HLOC, STATUS )
 
-          IF (HOK) THEN
-            CALL BDA_LOCHEAD (LOC, HLOC, STATUS)
+          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL AIO_WRITE( OCH, ' HEADER values:', STATUS )
             CALL AIO_BLNK( OCH, STATUS )
             CALL HEADER_OUT( HLOC, OCH, STATUS )
 
           ELSE
+            CALL ERR_ANNUL( STATUS )
             CALL AIO_WRITE( OCH, 'No HEADER present', STATUS )
 
           END IF
 
-          CALL BDA_CHKAST( LOC, ASTOK, STATUS )
-
-          IF ( ASTOK ) THEN
-            CALL BDA_LOCAST(LOC, ASTLOC,STATUS)
-
-* ******   FIX UNTILL FILTER IS A HEADER COMPONENT  ******
-            CALL DAT_THERE (ASTLOC, 'INSTRUMENT', POK, STATUS)     ! FIX
-                                                                   ! FIX
-            IF (POK) THEN                                          ! FIX
-              CALL DAT_FIND (ASTLOC, 'INSTRUMENT', PLOC, STATUS)   ! FIX
-              CALL HDX_OK   (PLOC, 'FILTER', POK,        STATUS)   ! FIX
-                                                                   ! FIX
-              IF (POK) THEN                                        ! FIX
-                CALL CMP_GET0C (PLOC, 'FILTER', STRING, STATUS)    ! FIX
-                CALL AIO_WRITE( OCH, ' FILTER              '//
-     :                               STRING(:CHR_LEN(STRING)), STATUS )
-              END IF                                               ! FIX
-              CALL DAT_ANNUL (PLOC, STATUS)                        ! FIX
-                                                                   ! FIX
-            END IF                                                 ! FIX
-*  ******  END OF FIX  ******
-
+          CALL ADI1_LOCAST( FID, .FALSE., ASTLOC, STATUS )
+          IF ( STATUS .EQ. SAI__OK ) THEN
             CALL DAT_THERE(ASTLOC, 'PROCESSING', POK, STATUS)
 
             IF ( POK ) THEN
@@ -143,6 +126,8 @@
               CALL AIO_BLNK( OCH, STATUS )
               CALL HEADER_OUT( PLOC, OCH, STATUS )
             END IF
+          ELSE
+            CALL ERR_ANNUL( STATUS )
           END IF
           CALL AIO_WRITE( OCH, LINE, STATUS )
 
@@ -257,354 +242,94 @@
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC) LOC               ! Locator to dataset
+      CHARACTER*(DAT__SZLOC) HLOC               ! Locator to dataset HEADER
 *
 *    Status :
 *
       INTEGER                STATUS
 *
+*    Local constants :
+*
+      INTEGER			NITEM
+        PARAMETER		( NITEM = 16 )
+*
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC) HLOC               ! Locator to HEADER
       CHARACTER*(DAT__SZLOC) CLOC               ! Locator to HEADER component
+      CHARACTER*(DAT__SZNAM)	ITEM
+      CHARACTER*(DAT__SZNAM+2)	ITEMS(NITEM)
+      CHARACTER*1		TITEM
       CHARACTER*40 CVAL
       DOUBLE PRECISION DVAL
       REAL RVAL
-      INTEGER IVAL
+      INTEGER IVAL,I
       LOGICAL HOK
       LOGICAL THERE
       LOGICAL SET
+
+*  Local data:
+      DATA	ITEMS/'C TARGET',	 'C OBSERVER',
+     :                'C OBSERVATORY',	 'C INSTRUMENT',
+     :                'D AXIS_RA',	 'D AXIS_DEC',
+     :                'D FIELD_RA',	 'D FIELD_DEC',
+     :                'D POSITION_ANGLE','I EQUINOX',
+     :                'C BASE_DATE',	 'I BASE_MJD',
+     :                'D BASE_UTC',	 'D BASE_TAI',
+     :		      'R OBS_LENGTH',	 'R EXPOSURE_TIME'
 *-
 
 *    Check status
       IF (STATUS .NE. SAI__OK) RETURN
 
-      CALL BDA_CHKHEAD(LOC,HOK,STATUS)
-      IF (.NOT.HOK) THEN
-        CALL BDA_CREHEAD(LOC,STATUS)
-      ENDIF
-      CALL BDA_LOCHEAD(LOC,HLOC,STATUS)
+*  Loop over editable items
+      DO I = 1, NITEM
 
+        TITEM = ITEMS(I)(1:1)
+        ITEM = ITEMS(I)(3:)
 
-      CALL DAT_THERE(HLOC,'TARGET',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'TARGET',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0C(CLOC,CVAL,STATUS)
-          CALL USI_DEF0C('TARGET',CVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0C('TARGET',CVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0C(HLOC,'TARGET',40,STATUS)
-        ENDIF
-        CALL CMP_PUT0C(HLOC,'TARGET',CVAL,STATUS)
-      ENDIF
+*    Does it exist?
+        CALL DAT_THERE( HLOC, ITEM, THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL DAT_FIND( HLOC, ITEM, CLOC,STATUS)
+          CALL DAT_STATE( CLOC, SET, STATUS )
+          IF ( SET ) THEN
+C            IF ( TITEM .EQ. 'C' ) THEN
+              CALL DAT_GET0C( CLOC, CVAL, STATUS )
+              CALL USI_DEF0C( ITEM, CVAL, STATUS )
+C            END IF
+          END IF
+          CALL DAT_ANNUL( CLOC, STATUS )
+        END IF
 
-      CALL DAT_THERE(HLOC,'OBSERVER',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'OBSERVER',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0C(CLOC,CVAL,STATUS)
-          CALL USI_DEF0C('OBSERVER',CVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0C('OBSERVER',CVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0C(HLOC,'OBSERVER',40,STATUS)
-        ENDIF
-        CALL CMP_PUT0C(HLOC,'OBSERVER',CVAL,STATUS)
-      ENDIF
+*    Get new value
+        IF ( TITEM .EQ. 'C' ) CALL USI_GET0C( ITEM, CVAL, STATUS )
+        IF ( TITEM .EQ. 'I' ) CALL USI_GET0I( ITEM, IVAL, STATUS )
+        IF ( TITEM .EQ. 'R' ) CALL USI_GET0R( ITEM, RVAL, STATUS )
+        IF ( TITEM .EQ. 'D' ) CALL USI_GET0D( ITEM, DVAL, STATUS )
 
-      CALL DAT_THERE(HLOC,'OBSERVATORY',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'OBSERVATORY',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0C(CLOC,CVAL,STATUS)
-          CALL USI_DEF0C('OBSERVATORY',CVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0C('OBSERVATORY',CVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0C(HLOC,'OBSERVATORY',40,STATUS)
-        ENDIF
-        CALL CMP_PUT0C(HLOC,'OBSERVATORY',CVAL,STATUS)
-      ENDIF
+*    No user response?
+        IF ( STATUS .EQ. PAR__NULL ) THEN
+          CALL ERR_ANNUL( STATUS )
+        ELSE
 
-      CALL DAT_THERE(HLOC,'INSTRUMENT',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'INSTRUMENT',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0C(CLOC,CVAL,STATUS)
-          CALL USI_DEF0C('INSTRUMENT',CVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0C('INSTRUMENT',CVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0C(HLOC,'INSTRUMENT',40,STATUS)
-        ENDIF
-        CALL CMP_PUT0C(HLOC,'INSTRUMENT',CVAL,STATUS)
-      ENDIF
+*      Create if it doesn't exist
+          IF ( .NOT. THERE ) THEN
+            IF ( TITEM .EQ. 'C' ) CALL DAT_NEW0C(HLOC,ITEM,LEN(CVAL),
+     :                                           STATUS)
+            IF ( TITEM .EQ. 'I' ) CALL DAT_NEW0I(HLOC,ITEM,STATUS)
+            IF ( TITEM .EQ. 'R' ) CALL DAT_NEW0R(HLOC,ITEM,STATUS)
+            IF ( TITEM .EQ. 'D' ) CALL DAT_NEW0D(HLOC,ITEM,STATUS)
+          END IF
 
-      CALL DAT_THERE(HLOC,'AXIS_RA',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'AXIS_RA',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('AXIS_RA',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('AXIS_RA',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'AXIS_RA',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'AXIS_RA',DVAL,STATUS)
-      ENDIF
+*      Write the data
+          IF ( TITEM .EQ. 'C' ) CALL CMP_PUT0C(HLOC,ITEM,CVAL,STATUS)
+          IF ( TITEM .EQ. 'I' ) CALL CMP_PUT0I(HLOC,ITEM,IVAL,STATUS)
+          IF ( TITEM .EQ. 'R' ) CALL CMP_PUT0R(HLOC,ITEM,RVAL,STATUS)
+          IF ( TITEM .EQ. 'D' ) CALL CMP_PUT0D(HLOC,ITEM,DVAL,STATUS)
 
-      CALL DAT_THERE(HLOC,'AXIS_DEC',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'AXIS_DEC',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('AXIS_DEC',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('AXIS_DEC',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'AXIS_DEC',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'AXIS_DEC',DVAL,STATUS)
-      ENDIF
+        END IF
 
-      CALL DAT_THERE(HLOC,'FIELD_RA',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'FIELD_RA',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('FIELD_RA',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('FIELD_RA',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'FIELD_RA',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'FIELD_RA',DVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'FIELD_DEC',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'FIELD_DEC',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('FIELD_DEC',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('FIELD_DEC',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'FIELD_DEC',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'FIELD_DEC',DVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'POSITION_ANGLE',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'POSITION_ANGLE',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('POSITION_ANGLE',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('POSITION_ANGLE',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'POSITION_ANGLE',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'POSITION_ANGLE',DVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'EQUINOX',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'EQUINOX',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0I(CLOC,IVAL,STATUS)
-          CALL USI_DEF0I('EQUINOX',IVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0I('EQUINOX',IVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0I(HLOC,'EQUINOX',STATUS)
-        ENDIF
-        CALL CMP_PUT0I(HLOC,'EQUINOX',IVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'BASE_DATE',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'BASE_DATE',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0C(CLOC,CVAL,STATUS)
-          CALL USI_DEF0C('BASE_DATE',CVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0C('BASE_DATE',CVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0C(HLOC,'BASE_DATE',11,STATUS)
-        ENDIF
-        CALL CMP_PUT0C(HLOC,'BASE_DATE',CVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'BASE_MJD',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'BASE_MJD',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0I(CLOC,IVAL,STATUS)
-          CALL USI_DEF0I('BASE_MJD',IVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0I('BASE_MJD',IVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0I(HLOC,'BASE_MJD',STATUS)
-        ENDIF
-        CALL CMP_PUT0I(HLOC,'BASE_MJD',IVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'BASE_UTC',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'BASE_UTC',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('BASE_UTC',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('BASE_UTC',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'BASE_UTC',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'BASE_UTC',DVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'BASE_TAI',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'BASE_TAI',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0D(CLOC,DVAL,STATUS)
-          CALL USI_DEF0D('BASE_TAI',DVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0D('BASE_TAI',DVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0D(HLOC,'BASE_TAI',STATUS)
-        ENDIF
-        CALL CMP_PUT0D(HLOC,'BASE_TAI',DVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'OBS_LENGTH',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'OBS_LENGTH',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0R(CLOC,RVAL,STATUS)
-          CALL USI_DEF0R('OBS_LENGTH',RVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0R('OBS_LENGTH',RVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0R(HLOC,'OBS_LENGTH',STATUS)
-        ENDIF
-        CALL CMP_PUT0R(HLOC,'OBS_LENGTH',RVAL,STATUS)
-      ENDIF
-
-      CALL DAT_THERE(HLOC,'EXPOSURE_TIME',THERE,STATUS)
-      IF (THERE) THEN
-        CALL DAT_FIND(HLOC,'EXPOSURE_TIME',CLOC,STATUS)
-        CALL DAT_STATE(CLOC,SET,STATUS)
-        IF (SET) THEN
-          CALL DAT_GET0R(CLOC,RVAL,STATUS)
-          CALL USI_DEF0R('EXPOSURE_TIME',RVAL,STATUS)
-        ENDIF
-        CALL DAT_ANNUL(CLOC,STATUS)
-      ENDIF
-      CALL USI_GET0R('EXPOSURE_TIME',RVAL,STATUS)
-      IF (STATUS.EQ.PAR__NULL) THEN
-        CALL ERR_ANNUL( STATUS )
-      ELSE
-        IF (.NOT.THERE) THEN
-          CALL DAT_NEW0R(HLOC,'EXPOSURE_TIME',STATUS)
-        ENDIF
-        CALL CMP_PUT0R(HLOC,'EXPOSURE_TIME',RVAL,STATUS)
-      ENDIF
+      END DO
 
       IF (STATUS .NE. SAI__OK) THEN
         CALL AST_REXIT( 'HEADER_EDIT', STATUS )
