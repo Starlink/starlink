@@ -114,8 +114,10 @@ $!
 $!  Fetch the source files.
 $!  =======================
 $!
+$!  To be independent of KAPPA fetch the AIF routines too.
+$!
 $    CMS FETCH'CF' CON_C_ROUTINES,CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES
-$    CMS FETCH'CF' APPLIC,IRAF_SPP_FOR
+$    CMS FETCH'CF' APPLIC,IRAF_SPP_FOR,AIF_FORTRAN_ROUTINES
 $!
 $!  Make the CONVERT source library.
 $!  ================================
@@ -152,12 +154,14 @@ $!
 $    LIBCRE CONLIB
 $!
 $!  Create a list of the application source code with the library-insertion
-$!  command.
+$!  command.  Place the AIF modules in here too for convenience (same on
+$!  UNIX).
 $!
-$    CMS SHOW GENERATION'CF' CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES,CON_C_ROUTINES -
+$    CMS SHOW GENERATION'CF' -
+          CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES,CON_C_ROUTINES,AIF_FORTRAN_ROUTINES -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
 $!
-$!  Execute the procedure to insert all the modules into the CONVERT
+$!  Execute the procedure to insert all the modules into the CONLIB
 $!  source library.  The source code modules are deleted as they are
 $!  inserted in the library.
 $!
@@ -184,7 +188,7 @@ $!
 $    CMS SHOW GENERATION'CF' IRAF_SPP_FOR -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
 $!
-$!  Execute the procedure to insert all the modules into the CONVERT
+$!  Execute the procedure to insert all the modules into the CONSPP
 $!  source library.  The source code modules are deleted as they are
 $!  inserted in the library.
 $!
