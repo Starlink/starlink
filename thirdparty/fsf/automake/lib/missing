@@ -44,20 +44,33 @@ fi
 
 msg="missing on your system"
 
+# If MISSING_SUPPRESS_RUN is true, then ignore any --run option.
+# Allow MISSING_SUPPRESS_RUN to be defaulted in the environment, but default
+# it to false, giving original behaviour.
+if test -z "$MISSING_SUPPRESS_RUN"; then
+    MISSING_SUPPRESS_RUN=false
+fi
+
 case "$1" in
 --run)
-  # Try to run requested program, and just exit if it succeeds.
-  run=
-  shift
-  "$@" && exit 0
-  # Exit code 63 means version mismatch.  This often happens
-  # when the user try to use an ancient version of a tool on
-  # a file that requires a minimum version.  In this case we
-  # we should proceed has if the program had been absent, or
-  # if --run hadn't been passed.
-  if test $? = 63; then
-    run=:
-    msg="probably too old"
+  if $MISSING_SUPPRESS_RUN; then
+    # Merely shift the --run option off the list: do not run the command,
+    # and do not set $run to be null.
+    shift
+  else
+    # Try to run requested program, and just exit if it succeeds.
+    run=
+    shift
+    "$@" && exit 0
+    # Exit code 63 means version mismatch.  This often happens
+    # when the user tries to use an ancient version of a tool on
+    # a file that requires a minimum version.  In this case
+    # we should proceed as if the program had been absent, or
+    # if --run hadn't been passed.
+    if test $? = 63; then
+      run=:
+      msg="probably too old"
+    fi
   fi
   ;;
 esac
@@ -336,6 +349,14 @@ WARNING: I can't seem to be able to run \`tar' with the given arguments.
          You may want to install GNU tar or Free paxutils, or check the
          command line arguments."
     exit 1
+    ;;
+
+  true)
+    # Very easy to emulate!  We are almost certainly here because
+    # (i) ./configure is testing us by running `.../missing --run true'
+    # _and_ (ii) RUN_LOCAL_AUTOTOOLS is false, so that we didn't run
+    # `true' at the top.
+    exit 0
     ;;
 
   *)
