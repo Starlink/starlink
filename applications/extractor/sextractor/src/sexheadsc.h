@@ -10,6 +10,9 @@
 *	Contents:	header structure and templates for SkyCat output.
 *
 *	Last modify:	02/09/97
+*                       30/11/98 (PWD):
+*                          Changed to remove static header list and 
+*                          non-existent id column name.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -19,9 +22,8 @@ char	skycathead[] = "QueryResult\n\n"
 	"serv_type: catalog\n"
 	"long_name: SExtractor catalog\n"
 	"short_name: SExCat\n"
-	"symbol: id diamond %4.1f\n"
-	"# End config entry\n\n"
-	"id\tra\tdec\tmag";
+	"symbol: {} diamond %4.1f\n"
+	"# End config entry\n\n";
 
 char	skycattail[] = "[EOD]";
 
