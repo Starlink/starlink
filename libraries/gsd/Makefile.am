@@ -1,6 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 bin_SCRIPTS = gsd_link gsd_link_adam
+bin_PROGRAMS = gsd_print
+
+gsd_print_SOURCES = gsd_print.c
+gsd_print_LDADD = `$(srcdir)/gsd_link` -lm
+
 include_HEADERS = GSD_PAR gsd.h
 
 lib_LTLIBRARIES = libgsd.la
@@ -18,11 +23,7 @@ gsd1_rdfildsc.c  gsd2_nativx.c  gsdFind.c   gsdInqSize.c
 # Testing. Just build gsd_print although we can not really test
 # it unless we ask it to default to the test GSD file
 
-TESTS = gsd_print
-check_PROGRAMS = gsd_print
-
-gsd_print_SOURCES = gsd_print.c
-gsd_print: $(gsd_print_OBJECTS)
-	$(LIBTOOL) --mode=link $(CC) -o gsd_print \
-	       $(gsd_print_OBJECTS) -lgsd -lm `cnf_link`
+TESTS = gsd_test
+check_PROGRAMS = gsd_test
+gsd_test_SOURCES = gsd_test.f
 

@@ -17,7 +17,8 @@
 
 
 
-SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
+
+SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES) $(gsd_test_SOURCES)
 
 srcdir = @srcdir@
 top_srcdir = @top_srcdir@
@@ -40,7 +41,8 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 host_triplet = @host@
-check_PROGRAMS = gsd_print$(EXEEXT)
+bin_PROGRAMS = gsd_print$(EXEEXT)
+check_PROGRAMS = gsd_test$(EXEEXT)
 DIST_COMMON = README $(am__configure_deps) $(include_HEADERS) \
 	$(srcdir)/../config.guess $(srcdir)/../config.sub \
 	$(srcdir)/../depcomp $(srcdir)/../install-sh \
@@ -59,7 +61,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
 mkinstalldirs = $(mkdir_p)
 CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = component.xml
-am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(includedir)
+am__installdirs = $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(includedir)
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libgsd_la_LIBADD =
@@ -69,9 +71,14 @@ am__objects_1 = gsd1_getval.lo gsd1_rdhead.lo gsdClose.lo gsdGet0x.lo \
 	gsdInqSize.lo
 am_libgsd_la_OBJECTS = $(am__objects_1)
 libgsd_la_OBJECTS = $(am_libgsd_la_OBJECTS)
+binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
+PROGRAMS = $(bin_PROGRAMS)
 am_gsd_print_OBJECTS = gsd_print.$(OBJEXT)
 gsd_print_OBJECTS = $(am_gsd_print_OBJECTS)
-gsd_print_LDADD = $(LDADD)
+gsd_print_DEPENDENCIES =
+am_gsd_test_OBJECTS = gsd_test.$(OBJEXT)
+gsd_test_OBJECTS = $(am_gsd_test_OBJECTS)
+gsd_test_LDADD = $(LDADD)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir) -I.
@@ -96,8 +103,15 @@ LTCOMPILE = $(LIBTOOL) --mode=compile $(CC) $(DEFS) \
 CCLD = $(CC)
 LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
-DIST_SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES)
+FCCOMPILE = $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+LTFCCOMPILE = $(LIBTOOL) --mode=compile $(FC) $(AM_FCFLAGS) $(FCFLAGS)
+FCLD = $(FC)
+FCLINK = $(LIBTOOL) --mode=link $(FCLD) $(AM_FCFLAGS) $(FCFLAGS) \
+	$(AM_LDFLAGS) $(LDFLAGS) -o $@
+SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES) \
+	$(gsd_test_SOURCES)
+DIST_SOURCES = $(libgsd_la_SOURCES) $(gsd_print_SOURCES) \
+	$(gsd_test_SOURCES)
 stardocsDATA_INSTALL = $(INSTALL_DATA)
 DATA = $(stardocs_DATA)
 includeHEADERS_INSTALL = $(INSTALL_HEADER)
@@ -231,6 +245,8 @@ starhelpdir = @starhelpdir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 bin_SCRIPTS = gsd_link gsd_link_adam
+gsd_print_SOURCES = gsd_print.c
+gsd_print_LDADD = `$(srcdir)/gsd_link` -lm
 include_HEADERS = GSD_PAR gsd.h
 lib_LTLIBRARIES = libgsd.la
 libgsd_la_SOURCES = \
@@ -246,13 +262,13 @@ gsd1_rdfildsc.c  gsd2_nativx.c  gsdFind.c   gsdInqSize.c
 
 # Testing. Just build gsd_print although we can not really test
 # it unless we ask it to default to the test GSD file
-TESTS = gsd_print
-gsd_print_SOURCES = gsd_print.c
+TESTS = gsd_test
+gsd_test_SOURCES = gsd_test.f
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .tex .dvi .ps .htx_tar .c .lo .o .obj
+.SUFFIXES: .tex .dvi .ps .htx_tar .c .f .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -349,6 +365,37 @@ clean-libLTLIBRARIES:
 	done
 libgsd.la: $(libgsd_la_OBJECTS) $(libgsd_la_DEPENDENCIES) 
 	$(LINK) -rpath $(libdir) $(libgsd_la_LDFLAGS) $(libgsd_la_OBJECTS) $(libgsd_la_LIBADD) $(LIBS)
+install-binPROGRAMS: $(bin_PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkdir_p) $(DESTDIR)$(bindir)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  p1=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  if test -f $$p \
+	     || test -f $$p1 \
+	  ; then \
+	    f=`echo "$$p1" | sed 's,^.*/,,;$(transform);s/$$/$(EXEEXT)/'`; \
+	   echo " $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f"; \
+	   $(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(binPROGRAMS_INSTALL) $$p $(DESTDIR)$(bindir)/$$f || exit 1; \
+	    if test -n "$$MANIFEST_FILE"; then \
+		echo "$(DESTDIR)$(bindir)/$$f" >>$$MANIFEST_FILE; \
+	    else :; fi; \
+	  else :; fi; \
+	done
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo "$$p" | sed 's,^.*/,,;s/$(EXEEXT)$$//;$(transform);s/$$/$(EXEEXT)/'`; \
+	  echo " rm -f $(DESTDIR)$(bindir)/$$f"; \
+	  rm -f $(DESTDIR)$(bindir)/$$f; \
+	done
+
+clean-binPROGRAMS:
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  f=`echo $$p|sed 's/$(EXEEXT)$$//'`; \
+	  echo " rm -f $$p $$f"; \
+	  rm -f $$p $$f ; \
+	done
 
 clean-checkPROGRAMS:
 	@list='$(check_PROGRAMS)'; for p in $$list; do \
@@ -356,6 +403,12 @@ clean-checkPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
+gsd_print$(EXEEXT): $(gsd_print_OBJECTS) $(gsd_print_DEPENDENCIES) 
+	@rm -f gsd_print$(EXEEXT)
+	$(LINK) $(gsd_print_LDFLAGS) $(gsd_print_OBJECTS) $(gsd_print_LDADD) $(LIBS)
+gsd_test$(EXEEXT): $(gsd_test_OBJECTS) $(gsd_test_DEPENDENCIES) 
+	@rm -f gsd_test$(EXEEXT)
+	$(FCLINK) $(gsd_test_LDFLAGS) $(gsd_test_OBJECTS) $(gsd_test_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	$(mkdir_p) $(DESTDIR)$(bindir)
@@ -424,6 +477,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	depfile='$(DEPDIR)/$*.Plo' tmpdepfile='$(DEPDIR)/$*.TPlo' @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LTCOMPILE) -c -o $@ $<
+
+.f.o:
+	$(FCCOMPILE) -c -o $@ $<
+
+.f.obj:
+	$(FCCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.f.lo:
+	$(LTFCCOMPILE) -c -o $@ $<
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -760,9 +822,12 @@ check-am: all-am
 	$(MAKE) $(AM_MAKEFLAGS) $(check_PROGRAMS)
 	$(MAKE) $(AM_MAKEFLAGS) check-TESTS
 check: check-am
-all-am: Makefile $(LTLIBRARIES) $(SCRIPTS) $(DATA) $(HEADERS) config.h
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(SCRIPTS) $(DATA) \
+		$(HEADERS) config.h
+install-binPROGRAMS: install-libLTLIBRARIES
+
 installdirs:
-	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(includedir)
+	$(mkdir_p) $(DESTDIR)$(libdir) $(DESTDIR)$(bindir) $(DESTDIR)$(bindir) $(DESTDIR)$(stardocsdir) $(DESTDIR)$(includedir)
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -789,8 +854,8 @@ maintainer-clean-generic:
 	@echo "it deletes files that may require special tools to rebuild."
 clean: clean-am
 
-clean-am: clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool mostlyclean-am
+clean-am: clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
+	clean-libLTLIBRARIES clean-libtool mostlyclean-am
 
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
@@ -811,7 +876,8 @@ info-am:
 
 install-data-am: install-includeHEADERS install-stardocsDATA
 
-install-exec-am: install-binSCRIPTS install-libLTLIBRARIES
+install-exec-am: install-binPROGRAMS install-binSCRIPTS \
+	install-libLTLIBRARIES
 
 install-info: install-info-am
 
@@ -839,32 +905,29 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-binSCRIPTS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-stardocsDATA
+uninstall-am: uninstall-binPROGRAMS uninstall-binSCRIPTS \
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-stardocsDATA
 
 .PHONY: CTAGS GTAGS all all-am am--refresh check check-TESTS check-am \
-	clean clean-checkPROGRAMS clean-generic clean-libLTLIBRARIES \
-	clean-libtool ctags dist dist-all dist-bzip2 dist-gzip \
-	dist-shar dist-tarZ dist-zip distcheck distclean \
-	distclean-compile distclean-generic distclean-hdr \
+	clean clean-binPROGRAMS clean-checkPROGRAMS clean-generic \
+	clean-libLTLIBRARIES clean-libtool ctags dist dist-all \
+	dist-bzip2 dist-gzip dist-shar dist-tarZ dist-zip distcheck \
+	distclean distclean-compile distclean-generic distclean-hdr \
 	distclean-libtool distclean-tags distcleancheck distdir \
 	distuninstallcheck dvi dvi-am html html-am info info-am \
-	install install-am install-binSCRIPTS install-data \
-	install-data-am install-exec install-exec-am \
+	install install-am install-binPROGRAMS install-binSCRIPTS \
+	install-data install-data-am install-exec install-exec-am \
 	install-includeHEADERS install-info install-info-am \
 	install-libLTLIBRARIES install-man install-stardocsDATA \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
 	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
 	pdf pdf-am ps ps-am tags uninstall uninstall-am \
-	uninstall-binSCRIPTS uninstall-includeHEADERS \
-	uninstall-info-am uninstall-libLTLIBRARIES \
-	uninstall-stardocsDATA
+	uninstall-binPROGRAMS uninstall-binSCRIPTS \
+	uninstall-includeHEADERS uninstall-info-am \
+	uninstall-libLTLIBRARIES uninstall-stardocsDATA
 
-gsd_print: $(gsd_print_OBJECTS)
-	$(LIBTOOL) --mode=link $(CC) -o gsd_print \
-	       $(gsd_print_OBJECTS) -lgsd -lm `cnf_link`
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
