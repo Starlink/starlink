@@ -25,7 +25,6 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'MATH_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    Function declarations :
@@ -1126,8 +1125,9 @@ C           ENDIF
  110       CONTINUE
  99     RETURN
         END
-*
-********************************************************************
+
+
+*+
        SUBROUTINE CLEANPOW_SMOMENTS(X, W, N, DEG, MOM, CENFLG, CENTER)
 
 *      Subroutine MOMENTS calculates the moments of the distribution
@@ -1315,84 +1315,10 @@ D             print *,xmax,xmin,ymax,ymin,zmax,zmin
                 CALL MSG_PRNT('Z NOT PLOTTED. ZMIN=ZMAX= ^Z')
              ENDIF
 
-         RETURN
          END
 
-          SUBROUTINE PLTCRS(N,XMI,XMA,X,YMI,YMA,Y,XTITLE,YTITLE,TITLE)
 
-          INTEGER N
-
-          REAL XMI(N), XMA(N),X(N), YMI(N), YMA(N), Y(N)
-
-          CHARACTER*72 XTITLE, YTITLE, TITLE*80
-
-*         Plot your results with PGPLOT
-           IF (SCLFLG.EQ.0) THEN
-              XMAX = -1.E20
-              XMIN = 1.E20
-              YMAX = -1.E20
-              YMIN = 1.E20
-           ENDIF
-              AXMAX = 1E20
-              AXMIN = -1E20
-              AYMAX = 1E20
-              AYMIN = -1E15
-              DO 40 I = 1,N
-                  IF(XMA(I).LT.AXMAX) XMAX = AMAX1(XMA(I),XMAX)
-                  IF(XMI(I).GT.AXMIN) XMIN = AMIN1(XMI(I),XMIN)
-                  IF(YMA(I).LT.AYMAX) YMAX = AMAX1(YMA(I),YMAX)
-                  IF(YMI(I).GT.AYMIN) YMIN = AMIN1(YMI(I),YMIN)
- 40           CONTINUE
-              AXMAX = AMIN1(XMAX,AXMAX)
-              AXMIN = AMAX1(XMIN,AXMIN)
-              AYMAX = AMIN1(YMAX,AYMAX)
-              AYMIN = AMAX1(YMIN,AYMIN)
-
-           XMAX = AXMAX+(AXMAX-AXMIX)*.005+0.5*(ABS(X(2)-X(1)))
-           XMIN = AXMIN-(AXMAX-AXMIN)*.005-0.5*(ABS(X(2)-X(1)))
-           YMAX = AYMAX+(AYMAX-AYMIN)*.005
-           YMIN = AYMIN-(AYMAX-AYMIN)*.005
-           SCALEC=(XMAX-XMIN)/1.4860
-           IF (SCALEC.GT.(YMAX-YMIN)) THEN
-                 YCOR=(SCALEC-(YMAX-YMIN))/2.
-                 YMAX=YMAX+YCOR
-                 YMIN=YMIN-YCOR
-           ELSE
-                 XCOR=((YMAX-YMIN)*1.4860-(XMAX-XMIN))/2.
-                 XMAX=XMAX+XCOR
-                 XMIN=XMIN-XCOR
-           ENDIF
-
-D             print *,xmax,xmin,ymax,ymin
-
-           CALL PGBEGIN(0,'?',1,1)
-           CALL PGPAPER(10,1.4142)
-           CALL PGVPORT(0.1,0.9,.515,.9)
-           IF((XMIN.NE.XMAX).AND.(YMIN.NE.YMAX)) THEN
-              CALL PGWINDOW (XMIN, XMAX, YMIN, YMAX)
-              CALL PGBOX('BCNST', 0.0, 0, 'BCNST', 0.0, 0)
-              CALL PGLABEL(XTITLE,YTITLE,TITLE)
-              CALL PGERRX(N,XMI,XMA,Y,0)
-              CALL PGERRY(N,X,YMA,YMI,0)
-          ELSE
-              CALL PGLABEL(' ',' ',XTITLE)
-           ENDIF
-           CALL PGEND
-
-             IF (XMIN.EQ.XMAX) THEN
-                CALL MSG_SETR('X',XMIN)
-                CALL MSG_PRNT('X NOT PLOTTED. XMIN=XMAX= ^X')
-             ENDIF
-             IF (YMIN.EQ.YMAX) THEN
-                CALL MSG_SETR('Y',YMIN)
-                CALL MSG_PRNT('Y NOT PLOTTED. YMIN=YMAX= ^Y')
-             ENDIF
-
-         RETURN
-         END
-*
-*******************************************************************
-*+CLEANPOW_WEIGHTS  -  Calculates weights for clean prog.
+*+  CLEANPOW_WEIGHTS - Calculates weights for clean prog.
       SUBROUTINE CLEANPOW_WEIGHTS(NGOOD, VAR, VAR0, WEIGHT)
 *    Description :
 *     Calculates a weight for each data point using the recipe:
@@ -1446,8 +1372,8 @@ D             print *,xmax,xmin,ymax,ymin
 *
       END
 
-*************************************************************************
-*+CLEANPOW_REWRITE  -  Copies douvble prec. arrays into single precision arays
+
+*+  CLEANPOW_REWRITE - Copies douvble prec. arrays into single precision arays
       SUBROUTINE CLEANPOW_REWRITE(N, D1, D2, D3, S1, S2, S3)
 *    Description :
 *     <description of what the subroutine does>
@@ -1475,3 +1401,76 @@ D             print *,xmax,xmin,ymax,ymin
       ENDDO
 *
       END
+
+
+C          SUBROUTINE PLTCRS(N,XMI,XMA,X,YMI,YMA,Y,XTITLE,YTITLE,TITLE)
+C
+C          INTEGER N
+C
+C          REAL XMI(N), XMA(N),X(N), YMI(N), YMA(N), Y(N)
+C
+C          CHARACTER*72 XTITLE, YTITLE, TITLE*80
+C
+C*         Plot your results with PGPLOT
+C           IF (SCLFLG.EQ.0) THEN
+C              XMAX = -1.E20
+C              XMIN = 1.E20
+C              YMAX = -1.E20
+C              YMIN = 1.E20
+C           ENDIF
+C              AXMAX = 1E20
+C              AXMIN = -1E20
+C              AYMAX = 1E20
+C              AYMIN = -1E15
+C              DO 40 I = 1,N
+C                  IF(XMA(I).LT.AXMAX) XMAX = AMAX1(XMA(I),XMAX)
+C                  IF(XMI(I).GT.AXMIN) XMIN = AMIN1(XMI(I),XMIN)
+C                  IF(YMA(I).LT.AYMAX) YMAX = AMAX1(YMA(I),YMAX)
+C                  IF(YMI(I).GT.AYMIN) YMIN = AMIN1(YMI(I),YMIN)
+C 40           CONTINUE
+C              AXMAX = AMIN1(XMAX,AXMAX)
+C              AXMIN = AMAX1(XMIN,AXMIN)
+C              AYMAX = AMIN1(YMAX,AYMAX)
+C              AYMIN = AMAX1(YMIN,AYMIN)
+C
+C           XMAX = AXMAX+(AXMAX-AXMIX)*.005+0.5*(ABS(X(2)-X(1)))
+C           XMIN = AXMIN-(AXMAX-AXMIN)*.005-0.5*(ABS(X(2)-X(1)))
+C           YMAX = AYMAX+(AYMAX-AYMIN)*.005
+C           YMIN = AYMIN-(AYMAX-AYMIN)*.005
+C           SCALEC=(XMAX-XMIN)/1.4860
+C           IF (SCALEC.GT.(YMAX-YMIN)) THEN
+C                 YCOR=(SCALEC-(YMAX-YMIN))/2.
+C                 YMAX=YMAX+YCOR
+C                 YMIN=YMIN-YCOR
+C           ELSE
+C                 XCOR=((YMAX-YMIN)*1.4860-(XMAX-XMIN))/2.
+C                 XMAX=XMAX+XCOR
+C                 XMIN=XMIN-XCOR
+C           ENDIF
+C
+CD             print *,xmax,xmin,ymax,ymin
+C
+C           CALL PGBEGIN(0,'?',1,1)
+C           CALL PGPAPER(10,1.4142)
+C           CALL PGVPORT(0.1,0.9,.515,.9)
+C           IF((XMIN.NE.XMAX).AND.(YMIN.NE.YMAX)) THEN
+C              CALL PGWINDOW (XMIN, XMAX, YMIN, YMAX)
+C              CALL PGBOX('BCNST', 0.0, 0, 'BCNST', 0.0, 0)
+C              CALL PGLABEL(XTITLE,YTITLE,TITLE)
+C              CALL PGERRX(N,XMI,XMA,Y,0)
+C              CALL PGERRY(N,X,YMA,YMI,0)
+C          ELSE
+C              CALL PGLABEL(' ',' ',XTITLE)
+C           ENDIF
+C           CALL PGEND
+C
+C             IF (XMIN.EQ.XMAX) THEN
+C                CALL MSG_SETR('X',XMIN)
+C                CALL MSG_PRNT('X NOT PLOTTED. XMIN=XMAX= ^X')
+C             ENDIF
+C             IF (YMIN.EQ.YMAX) THEN
+C                CALL MSG_SETR('Y',YMIN)
+C                CALL MSG_PRNT('Y NOT PLOTTED. YMIN=YMAX= ^Y')
+C             ENDIF
+C
+C         END
