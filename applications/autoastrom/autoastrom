@@ -22,9 +22,14 @@
 
 use strict;
 
-my $Usage = "$0 [--[no]keep] [--temp=dir] [--timeout=n] [--[no]messages] <NDF>";
+my $VERSION = '0.0';		# %%VERSION%%
+my $RCSInfo = '$Revision$ $Date$ ';
+
+my $Usage = "$0 [OPTIONS] <NDF> or $0 --help";
 my $progpath;			# Path to program.
 ($progpath = $0) =~ s+/[^/]*$++;
+my $progname;			# Name of program
+($progname = $0) =~ s+^.*/++;
 
 my $NDF = undef;		# Name of the NDF to be processed
                                 # (with or without the .sdf
@@ -70,10 +75,22 @@ my $skycatconfig = undef;	# SkyCat configuration file.
 
 my $verbose = 0;		# Chatter to STDERR.
 
-# Global variables
-my @TEMPFILES = ( );		# List of the temporary files which
-                                # are created.
+my $dumpstatefile = undef;	# If defined, then after all
+                                # command-line parsing is completed,
+                                # and before starting any actual work,
+                                # dump state to this file.
 
+my $cmdlineobsdata = undef;	# Source for WCS information.  Can be
+                                # undef (meaning default), 'AST'
+                                # (meaning NDF AST information),
+                                # 'FITS' (indicating that it should be
+                                # taken from any FITS extension in the
+                                # NDF), or ... explicit coordinates.
+
+# Global variables
+#XXX delete TEMPFILES
+#my @TEMPFILES = ( );		# List of the temporary files which
+                                # are created.
 
 
 # Check that all the required environment variables have values.
@@ -99,7 +116,7 @@ $ENV{CONVERT_DIR} = "$ENV{STARLINK}/bin/convert"
 
 # Library inclusions
 # Perl standard libraries
-use File::Copy;
+use File::Copy;			# For copy() function
 
 # Include the ADAM interface modules, and version-checking module
 use Starlink::AMS::Init;
@@ -112,12 +129,12 @@ use NDF;
 use Getopt::Long;
 
 
+
 # The following requires that the variable AUTOASTROM_DIR be defined
 # at _compile_ time (so that the setting of it above will never
 # actually happen).
 use lib "$ENV{AUTOASTROM_DIR}";
 use Moggy;
-
 
 # Include the subroutines
 use autoastrom;
@@ -127,13 +144,13 @@ use autoastrom;
 # CCDPACK version 4.0.1 or better, to get the propagation of extra
 # columns.
 if (Starlink::Versions::starversion_lt('ccdpack', '4.0-1')) {
-    die "We have CCDPack version "
+    wmessage 'fatal', "We have CCDPack version "
       .Starlink::Versions::starversion_string('ccdpack')
       .", but we need 4.0-1 or better\n";
 }
 # And we need ATOOLS 1.3 or better, to get asttrann
 if (Starlink::Versions::starversion_lt('atools', '1.3')) {
-    die "We have ATOOLS version "
+    wmessage 'fatal', "We have ATOOLS version "
       .Starlink::Versions::starversion_string('atools')
       .", but we need 1.3 or better\n";
 }
@@ -142,89 +159,143 @@ if (Starlink::Versions::starversion_lt('atools', '1.3')) {
 my $d2r = 57.295779513082320876798155; # degrees to radians (quite accurately)
 
 
+# Log who we are.
+wmessage ('info', "$progname, v$VERSION");
 
-# Examine the argument list and options (man Getopt::Long)
+# Copy the argument list XXX permanent?
+my @arglist2 = ($0);
+foreach (@ARGV) { push (@arglist2, $_); }
+
+
+# Examine the argument list and options (man Getopt::Long).  Option(s)
+# test-* are for testing and debugging only.
 my %optionset = ();
 GetOptions (\%optionset,
-	    "catalogue=s",	# SkyCat name of online catalogue to use 
-	    "extractorcat=s",	# SExtractor catalogue
+	    "catalogue=s",	# SkyCat name of online catalogue to use
+	    "dump=s",		# Dump state after parsing cmdline, and stop
 	    "help!",		# Print usage information
 	    "insert!",		# insert WCS info into NDF at end?
-	    "keep!",		# keep temporary files?
+	    "keepfits=s",	# retain FITS-WCS in this file
+	    "keeptemps!",	# keep temporary files?
 	    "maxobj=i",		# maximum number of objects to process
 	    "messages!",	# show messages from monoliths?
+	    "obsdata=s",	# source of WCS info (AST/FITS)
 	    "skycatconfig=s",	# SkyCat configuration file
 	    "temp=s",		# name of temporary directory
+	    "testccdcat=s",	# catalogue of objects on CCD
 	    "timeout=i",	# monolith timeout
 	    "verbose!",		# verbosity
-	    "wcs:s",		# retain WCS in this file (default if empty)
+	    "version!",		# display version number
 	    )
-  || die "Can't parse options\n";
+  || wmessage 'fatal', "Can't parse options\n";
 
 if (defined($optionset{help}) && $optionset{help}) {
     print "Usage: $0 [options] NDF-file\n";
     print "Options: [and defaults; if no default, value is generated]\n";
     print "\tcatalogue     SkyCat name of online catalogue to use [$esocatname]\n";
-    print "\textractorcat  SExtractor catalogue\n";
-    print "\thelp          Print usage information\n";
+    #print "\ttest-ccdcat   CCD catalogue\n";
+    print "\thelp          Print this help\n";
     print "\tinsert        Insert WCS info into NDF at end? [", ($insertwcs ? "true" : "false"), "]\n";
-    print "\tkeep          Keep temporary files? [", ($keeptemps ? "true" : "false"), "]\n";
+    print "\tkeepfits      Retain WCS in specified file (default if empty) ['']\n";
+    print "\tkeeptemps     Keep temporary files? [", ($keeptemps ? "true" : "false"), "]\n";
     print "\tmaxobj        Maximum number of objects to process [$maxobj]\n";
     print "\tmessages      Show messages from monoliths? [", ($monolithMessages ? "true" : "false"), "]\n";
+    print "\tobsdata       WCS info=AST/FITS/[kwd-list] ['']\n";
     print "\tskycatconfig  SkyCat configuration file [$skycatconfig]\n" if defined($skycatconfig);
     print "\ttemp          Name of temporary directory\n";
     print "\ttimeout       Monolith timeout [$monolithTimeout]\n";
     print "\tverbose       Verbosity [", ($verbose ? "true" : "false"), "]\n";
-    print "\twcs           Retain WCS in specified file (default if empty) ['']\n";
-
     exit 0;
 }
 
-$esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
-$CCDcat = $optionset{extractorcat}	if defined ($optionset{extractorcat});
-$insertwcs = $optionset{insert}		if defined ($optionset{insert});
-$keeptemps = $optionset{keep}		if defined ($optionset{keep});
-$maxobj = $optionset{maxobj}		if defined ($optionset{maxobj});
-$monolithMessages = $optionset{messages} if defined ($optionset{messages});
-$skycatconfig = $optionset{skycatconfig} if defined($optionset{skycatconfig});
-$tempDir = $optionset{temp}		if defined ($optionset{temp});
-$monolithTimeout = $optionset{timeout}	if defined ($optionset{timeout});
-$verbose = $optionset{verbose}		if defined($optionset{verbose});
-$retainwcs = $optionset{wcs}		if defined($optionset{wcs});
+if (defined($optionset{version}) && $optionset{version}) {
+    print "$progname v$VERSION ($RCSInfo)\n";
+    exit 0;
+}
 
-($#ARGV == 0) || die "Must have exactly one NDF argument\n";
-
+($#ARGV == 0) || wmessage 'fatal', "Must have exactly one NDF argument";
 $NDF = $ARGV[0];
-
-defined($NDF) || die "Usage: $Usage\n";
+defined($NDF) || wmessage 'fatal', "Usage: $Usage";
 $NDF =~ s/\.sdf$//;		# remove any .sdf extension
 
+$esocatname = $optionset{catalogue}	if defined ($optionset{catalogue});
+$CCDcat = $optionset{testccdcat}	if defined ($optionset{testccdcat});
+$insertwcs = $optionset{insert}		if defined ($optionset{insert});
+$retainwcs = $optionset{keepfits}	if defined ($optionset{keepfits});
+$keeptemps = $optionset{keeptemps}	if defined ($optionset{keeptemps});
+$maxobj = $optionset{maxobj}		if defined ($optionset{maxobj});
+$monolithMessages = $optionset{messages} if defined ($optionset{messages});
+$cmdlineobsdata = $optionset{obsdata}	if defined ($optionset{obsdata});
+$skycatconfig = $optionset{skycatconfig} if defined ($optionset{skycatconfig});
+$tempDir = $optionset{temp}		if defined ($optionset{temp});
+$monolithTimeout = $optionset{timeout}	if defined ($optionset{timeout});
+$verbose = $optionset{verbose}		if defined ($optionset{verbose});
+$dumpstatefile = $optionset{dump}	if defined ($optionset{dump});#-=stdout
 
-# Do some processing and defaulting of options.
 
-# Pass the setting of $verbose to the library functions.
+# Do some processing, defaulting, and checking of options.
+
+(defined($retainwcs) || $insertwcs)
+  || wmessage 'fatal', "You must have either --fits or --insert specified (otherwise you won't get any results at all)";
+
+# Pass the setting of $verbose to the autoastrom library functions.
 verbosity ($verbose);
 
 # --temp implicitly causes reuse of files.
 reuse_files() if $tempDir;
 
 # Generate a temporary file name, if it wasn't set
-unless (defined ($tempDir)) {
-    $tempDir = "$ENV{AUTOASTROM_TEMPDIR}/autoastrom-$$";
-    mkdir ($tempDir, 0755) 
-      || die "Can't create directory $tempDir, for some reason. Giving up!\n";
+defined($tempDir) || ($tempDir = "$ENV{AUTOASTROM_TEMPDIR}/autoastrom-$$");
+(-d $tempDir)
+  || mkdir ($tempDir, 0755) 
+  || wmessage 'fatal', "Can't create directory $tempDir, for some reason. Giving up!";
+
+
+
+# Log the argument list
+open (AL, ">$tempDir/argument-list")
+  || wmessage 'fatal', "Can't open file $tempDir/argument-list to write";
+print AL "@arglist2\n";
+close (AL);
+
+
+
+
+# Examine the value of the --obsdata option.
+#
+# The content of $cmdlineobsdata is a sequence of keyword=value pairs,
+# separated by commas.
+defined ($cmdlineobsdata) || ($cmdlineobsdata = 'source=AST:FITS'); # default
+my %obsdata;
+foreach my $p (split (/ *, */, $cmdlineobsdata)) {
+    if (my ($k,$v) = ($p =~ /^ *([A-Za-z]+) *= *(\S+) *$/)) {
+	$obsdata{$k} = $v;
+    } else {
+	print STDERR "obsdata keyword <$p> malformed (ignored)\n";
+    }
 }
-
-# If $retainwcs is true, but has no value, then default it
-$retainwcs = $NDF . ".fits"
-  if (defined($retainwcs) && $retainwcs eq "");
-
-
+my $kwcheck = check_kwd_list (\%obsdata,
+			      {
+			       'ra' => '[0-9:.]*',
+			       'dec' => '[0-9:.]*',
+			       'scale' => '[0-9.]*',
+			       'invert' => '[01]',
+			       'pa' => '[0-9.]*',
+			       'source' => '(AST|FITS|AST:FITS|FITS:AST)',
+			       'time' => '\s*(\d+\.\d+|\d{4}([: ]+\d{1,2}){4}(\.\d+)?|\d{1,2}[: ]+\d{1,2}(\.\d+)?)\s*',
+			       'obs' => '\s*(\w+|([: ]*-?\d+[: ]+\d+(\.\d*)?){2}([: ]*\d*(\.\d*)?)?)\s*',
+			       'met' => '\s*\d+(\.\d+)?([: ]*\d+(\.\d+)?)\s*',
+			       'col' => '\s*\d+\s*'
+			      });
+if (defined($kwcheck)) {
+    wmessage ('fatal', "obsdata keyword $kwcheck unrecognised or malformed");
+}
 
 
 
 # Start things up, set the timeout to be 30 seconds, and turn off all
 # but error messages by setting $ams->messages(0) (don't do this yet).
+wmessage ('info', "Starting monoliths...");
 my $ams = new Starlink::AMS::Init(1);
 $ams->timeout($monolithTimeout);
 $ams->messages($monolithMessages);
@@ -257,19 +328,19 @@ my %helpers = ();
 # Start up KAPPA
 my $Kappa = new Starlink::AMS::Task
   ("kappa_mon_$$", "$ENV{KAPPA_DIR}/kappa_mon");
-$Kappa->contactw || die "Error launching Kappa - timeout";
+$Kappa->contactw || wmessage 'fatal', "Error launching Kappa - timeout";
 $helpers{kappa} = $Kappa;
 
 # ... and KAPPA's NDFPACK
 my $NDFPack = new Starlink::AMS::Task
   ("ndfpack_mon_$$", "$ENV{KAPPA_DIR}/ndfpack_mon");
-$NDFPack->contactw || die "Error launching NDFPack - timeout";
+$NDFPack->contactw || wmessage 'fatal', "Error launching NDFPack - timeout";
 $helpers{ndfpack} = $NDFPack;
 
 # ... and CCDPack
 my $CCDPack = new Starlink::AMS::Task
   ("ccd_mon_$$", "$ENV{CCDPACK_DIR}/ccdpack_reg");
-$CCDPack->contactw || die "Error launching CCDPack - timeout";
+$CCDPack->contactw || wmessage 'fatal', "Error launching CCDPack - timeout";
 $helpers{ccdpack} = $CCDPack;
 
 # ... and SExtractor
@@ -278,34 +349,107 @@ $helpers{ccdpack} = $CCDPack;
 # put output in the place pointed to by the AUTOASTROMTEMPCATALOGUE
 # environment variable.
 $ENV{AUTOASTROMTEMPCATALOGUE} = "$tempDir/extractor-temp";
-push (@TEMPFILES, $ENV{AUTOASTROMTEMPCATALOGUE});
+#push (@TEMPFILES, $ENV{AUTOASTROMTEMPCATALOGUE});
 my $extractor = new Starlink::AMS::Task
   ("extractor_mon_$$", "$ENV{EXTRACTOR_DIR}/extractor");
-$extractor->contactw  || die "Error launching extractor -- timeout";
+$extractor->contactw  || wmessage 'fatal', "Error launching extractor -- timeout";
 $helpers{extractor} = $extractor;
 
 # ... and ATOOLS
 my $atools = new Starlink::AMS::Task
   ("atools_mon_$$", "$ENV{ATOOLS_DIR}/atools_mon");
-$atools->contactw || die "Error launching atools -- timeout";
+$atools->contactw || wmessage 'fatal', "Error launching atools -- timeout";
 $helpers{atools} = $atools;
+
+wmessage ('info', "Monoliths OK");
+
+
+
+
+
+# Now, finally start processing.
+
+# Begin with confirmation of who we are, and what we plan to do
+wmessage ('info', "Processing NDF <$NDF>");
+if ($ENV{http_proxy}) {
+    wmessage ('info', "HTTP proxy: ".$ENV{http_proxy});
+} else {
+    wmessage ('info', "No HTTP proxy");
+}
 
 
 
 # Obtain the PIXEL coordinates of the corners of the NDF image, and
 # the WCS information from the WCS component of the NDF.  Returns a
-# hash with {date}, {x0}, {y0}, {x1}, {y1}, {wcs}, {hassky})
-my $NDFinfo = ndf_info ($NDF, \%helpers, $tempDir);
+# hash with {date}, {dim1}, {dim2}, {ast}, {fits}, {hassky})
+my $NDFinfo = ndf_info ($NDF, \%helpers, \%obsdata, $tempDir);
+wmessage ('info', "NDF <$NDF> examined OK");
 
-if (! defined($NDFinfo->{wcs})) {
-    print STDERR "Unable to find any WCS information in NDF $NDF.  Giving up!\n";
-    exit 1;
-}
-if (! $NDFinfo->{hassky}) {
-    print STDERR "The NDF $NDF does not appear to have a SKY domain.\nYou need to do at least an approximate calibration first\n";
-    exit 1;
-}
 
+
+# Now select a source for the WCS information, and add this to the
+# NDFinfo hash, with the keyword {wcs}.
+#
+# The default source of wcs data is first AST, then FITS.
+defined($obsdata{source}) || ($obsdata{source} = 'AST:FITS');
+
+if ($obsdata{source} eq 'AST:FITS') {
+    $NDFinfo->{wcs} = (defined($NDFinfo->{ast}) ?
+		               $NDFinfo->{ast} :
+			       $NDFinfo->{fits});
+} elsif ($obsdata{source} eq 'FITS:AST') {
+    $NDFinfo->{wcs} = (defined($NDFinfo->{fits}) ?
+		               $NDFinfo->{fits} :
+			       $NDFinfo->{ast});
+} elsif ($obsdata{source} eq 'AST') {
+    if (defined($NDFinfo->{ast})) {
+	$NDFinfo->{wcs} = $NDFinfo->{ast};
+	wmessage ('info', "WCS information from AST");
+	print STDERR "WCS information from AST\n"
+	  if $verbose;
+    } else {
+	wmessage ('fatal', "Requested AST-WCS, but no AST information in NDF $NDF");
+    }
+} elsif ($obsdata{source} eq 'FITS') {
+    if (defined($NDFinfo->{fits})) {
+	$NDFinfo->{wcs} = $NDFinfo->{fits};
+	wmessage ('info', "WCS information from FITS extension");
+	print STDERR "WCS information from FITS extension\n"
+	  if $verbose;
+    } else {
+	wmessage ('fatal',
+		  "Requested FITS-WCS, but no FITS information in NDF $NDF");
+    }
+} else {
+    # %obsdata is a hash of keyword/value pairs.  Use values to
+    # construct a FITS file giving the rough astrometry.  The keywords
+    # are (ra, dec, pa, scale, invert): see documentation for
+    # make_pseudo_fits for details.
+    $NDFinfo->{wcs} = make_pseudo_fits (%obsdata, %{$NDFinfo});
+    if ($verbose) {
+	open (PF,">$tempDir/pseudo.fits")
+	  || wmessage ('fatal', "Can't open $tempDir/pseudo.fits to write");
+	foreach my $c (@{$NDFinfo->{wcs}}) {
+	    print PF "$c\n";
+	}
+	close (PF);
+	wmessage ('info', "WCS information from command line");
+	print STDERR "WCS information from --wcs commandline\n";
+    }
+}
+    
+
+
+defined($NDFinfo->{wcs})
+    || wmessage ('fatal', "No WCS information available in NDF $NDF");
+
+
+# The following test would be irrelvant or wrong if the calibration is
+# being taken from a FITS file.  Is it necessary?  Omit it for the moment.
+#if (! $NDFinfo->{hassky}) {
+#    print STDERR "The NDF $NDF does not appear to have a SKY domain.\nYou need to do at least an approximate calibration first\n";
+#    exit 1;
+#}
 
 
 # Find the moggy program.  Searching for it like this gives us a
@@ -319,7 +463,68 @@ foreach my $loc ("$ENV{AUTOASTROM_DIR}/moggy",
 	last;
     }
 }
-defined ($moggylocation) || die "Can't locate moggy program\n";
+defined ($moggylocation) || wmessage ('fatal', "Can't locate moggy program");
+
+
+# Debugging/testing: if --dump=filename has been specified, then dump the
+# current state to the specified file, and exit.
+if ($dumpstatefile) {
+    wmessage ('info', "Dumping state, and exiting...");
+    open (D, ">$dumpstatefile")
+      || wmessage ('fatal', "Can't open file $dumpstatefile to write");
+
+    # Print state variables (can't use array plus symbolic refs, since
+    # these are lexical variables (my...) which aren't visible to
+    # symbolic references).
+    printf D ("NDF=%s\n",
+	      (defined($NDF) ? $NDF : "<UNDEF>"));
+    printf D ("keeptemps=%s\n",
+	      (defined($keeptemps) ? $keeptemps : "<UNDEF>"));
+    printf D ("tempDir=%s\n",
+	      (defined($tempDir) ? $tempDir : "<UNDEF>"));
+    printf D ("insertwcs=%s\n",
+	      (defined($insertwcs) ? $insertwcs : "<UNDEF>"));
+    printf D ("retainwcs=%s\n",
+	      (defined($retainwcs) ? $retainwcs : "<UNDEF>"));
+    printf D ("CCDcat=%s\n",
+	      (defined($CCDcat) ? $CCDcat : "<UNDEF>"));
+    printf D ("monolithTimeout=%s\n",
+	      (defined($monolithTimeout) ? $monolithTimeout : "<UNDEF>"));
+    printf D ("monolithMessages=%s\n",
+	      (defined($monolithMessages) ? $monolithMessages : "<UNDEF>"));
+    printf D ("maxobj=%s\n",
+	      (defined($maxobj) ? $maxobj : "<UNDEF>"));
+    printf D ("esocatname=%s\n",
+	      (defined($esocatname) ? $esocatname : "<UNDEF>"));
+    printf D ("skycatconfig=%s\n",
+	      (defined($skycatconfig) ? $skycatconfig : "<UNDEF>"));
+    printf D ("verbose=%s\n",
+	      (defined($verbose) ? $verbose : "<UNDEF>"));
+    printf D ("dumpstatefile=%s\n",
+	      (defined($dumpstatefile) ? $dumpstatefile : "<UNDEF>"));
+    printf D ("obsdata:\n");
+    foreach my $k (sort(keys(%obsdata))) {
+	printf D ("    %s=%s\n", $k, $obsdata{$k});
+    }
+    #printf D ("moggylocation=%s\n", $moggylocation);
+    print D "NDFinfo hash:\n";
+    foreach my $k (sort(keys(%$NDFinfo))) {
+	my $reftype = ref($NDFinfo->{$k});
+	if ($reftype eq '') {
+	    print D "\$NDFinfo->{$k}=$NDFinfo->{$k}\n";
+	} else {
+	    print D "\$NDFinfo->{$k}: ref to $reftype:\n";
+	    if ($reftype eq 'ARRAY') {
+		foreach my $kv (@{$NDFinfo->{$k}}) {
+		    printf D ("    %s\n", $kv);
+		}
+	    }
+	}
+    }
+    exit 0;
+}
+
+
 
 
 
@@ -328,12 +533,13 @@ my $moggy = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 $helpers{moggy} = $moggy;
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
-
+$moggy->debug('asthandler cataloguehandler');
 
 
 # Obtain a catalogue covering the same part of the sky as the NDF.  We
 # don't have to assume here that the projection pole is in the centre
 # of the image, since ASTROM isn't fazed if it it's elsewhere.
+wmessage ('info', "Obtaining catalogue from $esocatname...");
 my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 
 # ...and write an NDF which has the columns (number, ra/rad, dec/rad, ra,
@@ -341,24 +547,65 @@ my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
 # into columns (1,2) and converting them to radians (required for asttrann).
 my @catdata = txt2arr ($CAT);
 ($#catdata >= 0)
-  || die "Catalogue between corners (".$NDFinfo->{x0}.','.$NDFinfo->{y0}.") and (".$NDFinfo->{x1}.','.$NDFinfo->{y1}.") has no entries!\n";
+  || wmessage ('fatal',
+	       "Catalogue search: I can't find any objects corresponding to that image!");
 my $r;
 foreach $r (@catdata) {
     $r->[1] = $r->[3]/$d2r;
     $r->[2] = $r->[4]/$d2r;
 }
 my $CATNDF = twodarray2ndf (@catdata, $CAT)
-  || die "Can't create NDF $CAT\n";
-push (@TEMPFILES, "$CATNDF.sdf");
+  || wmessage ('fatal', "Can't create NDF $CAT");
+#push (@TEMPFILES, "$CATNDF.sdf");
 print STDERR "CAT=$CAT  CATNDF=$CATNDF\n" if $verbose;
 
+wmessage ('info', sprintf ("Obtained catalogue, %d entries, from %s",
+			   $#catdata+1, $esocatname));
 
 
+my $CCDcathash = undef;
 # Extract a catalogue of objects from the NDF (unless this was
 # previously set by a command-line argument).
-$CCDcat = extract_objects (\%helpers, $NDF, $maxobj, $tempDir)
-  unless defined($CCDcat);
+if (defined($CCDcat)) {
+    # This is primarily a testing/debugging feature.
+    wmessage ('info', "Using pre-existing CCD catalogue $CCDcat");
 
+    print STDERR "Reusing $CCDcat...\n" if $verbose;
+    # The specified file is a re-used output of this subroutine.
+    # It starts with a log of the keywords which are to be
+    # returned in the hash.  Extract these, fill the hash, and
+    # return. 
+    my $openok = open (OLDCAT, "$CCDcat");
+    my $line;
+    my %anonhash = ();
+    if ($openok) {
+	while (defined($line = <OLDCAT>)) {
+	    last if ($line !~ /^\#/);
+	    if ($line =~ /^\#\#\s*(\S*)\s*(\S*)/) {
+		$anonhash{$1} = $2;
+	    }
+	}
+	close (OLDCAT);
+	# Override the filename, in case it's different (usually true)
+	$anonhash{filename} = $CCDcat;
+	$CCDcathash = \%anonhash;
+    } else {
+	print STDERR "Ooops, can't open $CCDcat.  Regenerating...\n";
+    }
+}
+unless (defined($CCDcathash)) {
+    $CCDcathash = extract_objects (\%helpers, $NDF, $maxobj, $tempDir);
+    defined ($CCDcathash)
+      || wmessage ('fatal', "Failed to extract objects from NDF <$NDF>");
+    if ($verbose) {
+	print STDERR "EXTRACTOR returned:\n";
+	foreach my $k (keys (%$CCDcathash)) {
+	    print STDERR "\t$k = ", $CCDcathash->{$k}, "\n";
+	}
+    }
+    $CCDcat = $CCDcathash->{filename};
+    wmessage ('info', "Object extraction successful");
+}
 
 
 # We run ASTROM $iterationsleft times.  We may stop the loop from
@@ -371,7 +618,20 @@ $CCDcat = extract_objects (\%helpers, $NDF, $maxobj, $tempDir)
 my $iterationsleft = 7;
 
 # The following hold the state between iterations.
-my $findofferrs =     7.0;	# Size of the FINDOFF error parameter
+#
+# Set findofferrs and findoffminsep based on the object size
+# statistics returned from extract_objects.  Be generous in the
+# multipliers here -- the poserr returned from extract_objects is a
+# measure of only statistical error, whereas FINDOFF's error parameter
+# must try to take into account the distortion effects, too; the
+# returned objsize is something like a third of the visual extent of
+# the object (see the EXTRACTOR documentation), so multiply that up
+# generously, too.  There's no need to worry over-much about the
+# details here: pragmatism rules.
+my $findofferrs =     10*$CCDcathash->{poserr};
+my $findoffminsep =   5*$CCDcathash->{objsize};
+($findoffminsep > 5*$findofferrs) || ($findoffminsep = 5*$findofferrs);
+# Other parameters
 my $lastfindofferrs = 0;	# ...and the value it had last time.
 my $findoffnmatches = 0;
 my $findoffndf =      'X';	# Ref. star pixel coordinates...
@@ -406,42 +666,50 @@ my $findofffits =     'X';	# WCS information obtained by ASTROM.
 # actual number of parameters is to be lowered to 6, that'll be done
 # within generate_astrom.
 my @astromnterms = (7, 9);
-my $ntermidx = $#astromnterms;	# Index into @astromnterms
+my $ntermidx = 0;	# Index into @astromnterms
+#my $ntermidx = $#astromnterms;	# Index into @astromnterms
 
 my %lastastrom;			# Hash holding the results of the last
                                 # (successful) ASTROM run.
 
 # Set the maximum displacement we allow FINDOFF to suggest.  Make
-# $findoffmaxdisp a quarter of the shorter side of the image.  This
+# $findoffmaxdisp initially the length of the shorter side of the image.  This
 # doesn't have to be exact, but it's better than not specifying it at
 # all.  Successive iterations decrease this, reasonably carefully.
-my $findoffmaxdisp;
-if (  abs($NDFinfo->{x1} - $NDFinfo->{x0})
-    < abs($NDFinfo->{y1} - $NDFinfo->{y0})) {
-    $findoffmaxdisp = abs($NDFinfo->{x1} - $NDFinfo->{x0});
-} else {
-    $findoffmaxdisp = abs($NDFinfo->{y1} - $NDFinfo->{y0});
-}
+#my $findoffmaxdisp = (($NDFinfo->{dim1} < $NDFinfo->{dim2})
+#		      ? $NDFinfo->{dim1}
+#		      : $NDFinfo->{dim2});
+my $findoffmaxdisp = 2*(($NDFinfo->{dim1} > $NDFinfo->{dim2})
+			? $NDFinfo->{dim1}
+			: $NDFinfo->{dim2});
 
 my $iterno = 0;
 while ($iterno < $iterationsleft) {
+    wmessage ('info', "Iteration $iterno...");
     print STDERR "-------------------------\nStarting iteration $iterno...\n"
       if $verbose;
 
     my $tfile = sprintf ("%s/%02d", $tempDir, $iterno);
 
     # Invoke FINDOFF, returning the names of the two output files
+    wmessage ('info', "Matching position lists...");
     my ($ccdlist, $catlist, $matchworked)
       = match_positions ($CCDPack,
 			 $CCDcat, $findoffinfile,
 			 {error => $findofferrs,
-			  maxdisp => $findoffmaxdisp},
+			  minsep => $findoffminsep,
+			  maxdisp => $findoffmaxdisp,
+			  complete => 0.3,
+			 },
 			 $tfile);
 
     if (! $matchworked) {
 	# The match didn't work.  That's most commonly because the
 	# value of error that we estimated was too low.  Try it again,
 	# using the last value which worked, if any.
+	wmessage ('info',
+		 "That match didn't work.  Trying again, with a larger error");
+	print STDERR "--- That match didn't work.  Trying again, with a larger error\n" if $verbose;
 	if ($iterno == 0) {
 	    # No previous one.
 	    $findofferrs *= 1.5; # guess
@@ -453,13 +721,17 @@ while ($iterno < $iterationsleft) {
 	  = match_positions ($CCDPack,
 			     $CCDcat, $findoffinfile,
 			     {error => $findofferrs,
-			      maxdisp => $findoffmaxdisp},
+			      minsep => $findoffminsep,
+			      maxdisp => $findoffmaxdisp,
+			      complete => 0.3,
+			     },
 			     $tfile);
     }
 
     if (! $matchworked) {
 	# Nahhh, something more substantial is wrong.  Give up.
-	print "I can't match position lists.  Giving up.\n";
+	wmessage ('warning', "I can't match position lists.  Giving up.");
+	print STDERR "I can't match position lists.  Giving up.\n" if $verbose;
 	$iterationsleft = 0;	# Redundant (given `last' below), but neat.
 	last;			# JUMP OUT of the loop
     }
@@ -471,7 +743,7 @@ while ($iterno < $iterationsleft) {
 
 
     # Generate the ASTROM input file.  Returns hash with keys
-    # {filename}, {nmatches}, {quality} and {findofferror}.
+    # {filename}, {nmatches} and {findofferror}.
     my $astromparams = generate_astrom ({CCDin => $ccdlist,
 					 catalogue => $catlist,
 					 findofferror => $findofferrs,
@@ -480,7 +752,7 @@ while ($iterno < $iterationsleft) {
 					 astrom => \%lastastrom,
 					 maxnterms => $astromnterms[$ntermidx],
 					 tempfn => $tfile});
-    defined($astromparams) || die "generate_astrom failed\n";
+    defined($astromparams) || wmessage ('fatal', "generate_astrom failed");
 
     # Display the return from generate_astrom.
     if ($verbose) {
@@ -493,21 +765,26 @@ while ($iterno < $iterationsleft) {
 	print STDERR "run_astrom (",$astromparams->{filename},", $tfile)...\n";
     }
 
+    wmessage ('info', "Fitting astrometry");
     my @fitdetails = run_astrom ($astromparams->{filename}, $tfile);
-    @fitdetails || die "run_astrom failed\n";
+    @fitdetails || wmessage ('fatal', "run_astrom failed");
 
     # Summarise the fits we obtained.
     if ($verbose) {
-	print STDERR "ASTROM fits, round $iterno:\n\tn nterms         centre            FITS-WCS\n";
+	printf STDERR ("%9s %6s %9s %22s %s\n",
+		       "n", "nterms", "centre", "q", "FITS-WCS");
 	foreach my $k (0..$#fitdetails) {
 	    if ($fitdetails[$k]->{STATUS}) {
-		printf STDERR ("\t%d   %2d  %.12s %.13s %s\n",
+		printf STDERR ("%9d %3d %12.12s %13.13s %7.7s %s\n",
 			       $k,
 			       $fitdetails[$k]->{nterms},
 			       $fitdetails[$k]->{rasex},
 			       $fitdetails[$k]->{decsex},
-			       (length($fitdetails[$k]->{wcs}) > 35)
-			       ? "...".substr($fitdetails[$k]->{wcs},-32)
+			       (defined($fitdetails[$k]->{q})
+				? $fitdetails[$k]->{q}
+				: "--"),
+			       (length($fitdetails[$k]->{wcs}) > 32)
+			       ? "...".substr($fitdetails[$k]->{wcs},-29)
 			       : $fitdetails[$k]);
 	    } else {
 		printf STDERR "\t%d    NO FIT\n", $k;
@@ -549,12 +826,14 @@ while ($iterno < $iterationsleft) {
     }
 
     # At least one of the fits worked, didn't it?
-    $lastastrom{STATUS} || croak "ASTROM failed to make any fits at all!\n";
+    $lastastrom{STATUS} || wmessage ('fatal',
+				     "ASTROM failed to make any fits at all!");
 
     $findoffnmatches = $astromparams->{nmatches};
 
     # Store the (best of the) WCS information obtained by ASTROM.
     $findofffits = $lastastrom{wcs};
+    wmessage ('info', "ASTROM found a ".$lastastrom{nterms}."-parameter fit");
 
     # Generate the name of an NDF to receive the output from the
     # coordinate transformation.  This is to be the coordinates of the
@@ -578,18 +857,22 @@ while ($iterno < $iterationsleft) {
     }
     my $status = $atools->obeyw ("asttrann", $asttrannarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-      || die "Error getting atools/asttrann";
+      || wmessage ('fatal', "Error getting atools/asttrann");
 
-    push (@TEMPFILES, "$findoffndf.sdf");
+    #push (@TEMPFILES, "$findoffndf.sdf");
 
     # Now turn $findoffndf (the best-so-far pixel coordinates
     # of the reference stars) into a text input file for FINDOFF.
     $findoffinfile = ndf2txt ($findoffndf);
-    push (@TEMPFILES, $findoffinfile);
+    #push (@TEMPFILES, $findoffinfile);
 
     # We want to estimate the best value of findoff:error for the next
     # round.  Use the value returned from generate_astrom.
     $findofferrs = $astromparams->{findofferror};
+    # However, the procedure which makes these suggestions is, I
+    # think, fundamentally flawed, so we're best ignoring any
+    # suggestions below, say, 5 pixels.
+    #($findofferrs >= 5) || ($findofferrs = 5);
 
     # What sort of ASTROM fit do we want to try next time?
     if ($bestfitfailed) {
@@ -613,28 +896,44 @@ while ($iterno < $iterationsleft) {
 # $findofffits.
 if ($insertwcs) {
     my $astcopyarg = sprintf ('this=%s result=%s', $lastastrom{wcs}, $NDF);
+    wmessaage ('info',
+	       "Inserting derived WCS information into WCS component of $NDF");
     printf STDERR ("Inserting WCS information from %s into %s\n\tastcopyarg=%s\n",
 		   $lastastrom{wcs}, $NDF, $astcopyarg)
       if ($verbose);
     my $status = $atools->obeyw("astcopy", $astcopyarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
-      || die "insertwcs: error calling ATOOLS";
+      || wmessage ('fatal', "insertwcs: error calling ATOOLS");
+} else {
+    wmessage ('warning', "Not inserting WCS information into NDF <$NDF>");
 }
 
 if (defined($retainwcs)) {
-    ($retainwcs ne '') || die "Assertion failed: retainwcs is blank";
-    copy ($lastastrom{wcs}, $retainwcs);
-    printf STDERR "Retained WCS information in $retainwcs\n" if ($verbose);
+    ($retainwcs ne '') || wmessage ('fatal',
+				    "Assertion failed: retainwcs is blank");
+    if (defined($lastastrom{wcs}) && $lastastrom{wcs} ne '') {
+	copy ($lastastrom{wcs}, $retainwcs);
+	wmessage ('info', "Retaining WCS information in $retainwcs");
+	print STDERR "Retained WCS information in $retainwcs\n" if ($verbose);
+    } else {
+	wmessage ('warning',
+		  "I can't find any WCS information to save in file $retainwcs");
+	print STDERR "Ooo-err, I can't find any WCS information to save in $retainwcs\n";
+    }
 }
 
 
 # Get rid of all the temporary files we've accumulated.
 if ($keeptemps) {
-    print STDERR "Retaining temporary files\n" if $verbose;
+    wmessage ('info', "Retaining temporary files in directory $tempDir");
+    print STDERR "Retaining temporary files in directory $tempDir\n"
+      if $verbose;
 } else {
-    push (@TEMPFILES, get_temp_files());
-    print STDERR "Deleting temporary files... @TEMPFILES\n" if ($verbose);
-    unlink (@TEMPFILES);
+    #push (@TEMPFILES, get_temp_files());
+    #print STDERR "Deleting temporary files... @TEMPFILES\n" if ($verbose);
+    #unlink (@TEMPFILES);
+    print STDERR "Deleting temporary directory $tempDir\n" if $verbose;
+    system "rm -Rf $tempDir";
 }
 
 
