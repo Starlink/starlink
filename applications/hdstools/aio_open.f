@@ -32,6 +32,7 @@
 *     David J. Allan (JET-X, University of Birmingham)
 *     Richard Beard (University of Birmingham)
 *     Alan J Chipperfield (Starlink, RAL)
+*     Tim Jenness (JAC, Hawaii)
 *
 *    History :
 *      4 May 94 : Original. Derived from old UTIL_SELOUT routine (DJA)
@@ -39,6 +40,7 @@
 *      7 Apr 98 : Try to get full width screens (RB)
 *      6 Dec 01 : Correct getting unused filename for PRINTER
 *                 Use MSG_OUTIF (AJC)
+*     12 Oct 04 : Use PSX_REMOVE rather than UTIL_DELETE
 *
 *    Type definitions :
       IMPLICIT NONE
@@ -332,7 +334,7 @@
 
 *        If so, delete it
           IF ( THERE ) THEN
-            CALL UTIL_DELETE( LFILE(:FLEN+1), STATUS )
+            CALL PSX_REMOVE( LFILE(:FLEN+1), STATUS ) 
           END IF
 
 *        Rename old file
