@@ -248,7 +248,7 @@ install:
 prepare:
 
 check_packages:
-[available] Sep 30, 2003 4:17:10 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Oct 2, 2003 4:18:48 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -682,6 +682,7 @@ javadocs:
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/bin/splat
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/docs/splat
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 24 files to /apps/cvsbuild/java/source/splat/bin/splat
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
@@ -696,7 +697,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
 [loggedcopy] Copying 24 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 9 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 488 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 211 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 224 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/star/etc
@@ -889,4 +890,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 1 minute 26 seconds
+Total time: 3 minutes 9 seconds
