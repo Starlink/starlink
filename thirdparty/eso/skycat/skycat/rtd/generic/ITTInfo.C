@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ITTInfo.C,v 1.6 1998/03/04 18:05:12 abrighto Exp $"
+ * "@(#) $Id: ITTInfo.C,v 1.5 1997/11/19 21:48:44 abrighto Exp $"
  *
  * ITTInfo.C - member routines for class ITTInfo
  * 
@@ -9,8 +9,10 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 14/07/98  Modified interpolate to use last value 
+ *                           (makes last colour pure).
  */
-static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.6 1998/03/04 18:05:12 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ITTInfo.C,v 1.5 1997/11/19 21:48:44 abrighto Exp $";
 
 
 #include <string.h>
@@ -128,11 +130,13 @@ void ITTInfo::list(ostream& os)
  */
 void ITTInfo::interpolate(XColor* src, XColor* dest, int colorCount) 
 {
+    int c = colorCount - 1;
     int index, value;
     
     for (int i=0; i<colorCount; i++) {
-	index = (i * (MAX_ITT - 1))/colorCount;
-	value = (unsigned char)((value_[index]*colorCount)+0.5);
+	index = (i * (MAX_ITT - 1))/(colorCount-1);
+        // PWD: modify to pick up last value.
+	value = (unsigned char)((value_[index]*c)+0.5);
 	dest[i].red = src[value].red;
 	dest[i].green = src[value].green;
 	dest[i].blue = src[value].blue;

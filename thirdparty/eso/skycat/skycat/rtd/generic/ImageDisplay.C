@@ -11,7 +11,10 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
- */
+ * Peter W. Draper 04/03/98  Added putpixel member. Fixed allocation
+ *                           of data to bytes_per_line*width when not
+ *                           using shared memory. 
+  */
 static const char* const rcsId="@(#) $Id: ImageDisplay.C,v 1.7 1998/09/23 19:14:53 abrighto Exp $";
 
 
@@ -232,18 +235,22 @@ int ImageDisplay::update(int width, int height)
      }
      
      // fallback: create a normal XImage
-     char* data = (char*)malloc(width * height * bytesPerPixel_);
-     if (data == NULL) {
+     xImage_ = XCreateImage(display_, visual_, depth_,
+			    ZPixmap, 0, (char *) NULL, width, height,
+                            BitmapPad(display_), 0); 
+
+     // now allocate the image data (which must use the appropriate padding).
+     xImage_->data = (char *)malloc(xImage_->bytes_per_line * height);
+     if (xImage_->data == NULL) {
 #ifdef DEBUG
 	 if (verbose_) 
 	     cout << "out of memory for XImage\n";
 #endif
+
+         XDestroyImage(xImage_);
 	 return error("not enough memory for an image this size");
      }
      
-     // create the X image
-     xImage_ = XCreateImage(display_, visual_, depth_,
-			    ZPixmap, 0, data, width, height, bitsPerPixel(), 0); 
 #ifdef XXXDEBUG
      if (verbose_)
 	 cout << "Not Sharing memory\n";
@@ -261,3 +268,12 @@ void ImageDisplay::clear(unsigned char val)
 	 memset(xImage_->data, val, xImage_->bytes_per_line * xImage_->height);
 }
 
+/*
+ * Assign a value to a pixel, this is the "safe" method for non-byte 
+ * XImages.
+ */
+int ImageDisplay::putpixel(int x, int y, unsigned long value)
+{
+  if (xImage_)
+    return XPutPixel(xImage_, x, y, value );
+}

@@ -48,6 +48,8 @@
  *                 30/03/98  Fixed the -shm_data and -shm_header options to 
  *                           work again (they were lost in previous changes at
  *                           some point).
+ *
+ * Peter W. Draper 13/01/99  Changed to use non 8 bit visuals.
  */
 static const char* const rcsId="@(#) $Id: RtdImage.C,v 1.65 1998/11/16 21:25:10 abrighto Exp $";
 
@@ -421,17 +423,19 @@ int Rtd_Init(Tcl_Interp* interp)
     if (RtdImage::initColors(interp) != TCL_OK)
 	return TCL_ERROR;
 
+    // PWD: Remove this as now supports other visuals.
     // need 8 bit color for now, but can only force it through wish option -visual
-    if (Tk_Depth(Tk_MainWindow(interp)) != 8) {
-	int depth;
-	Colormap colormap;
-	if (Tk_GetVisual(interp, Tk_MainWindow(interp), "pseudocolor 8", &depth, &colormap)) 
-	    return fmt_error("Unsupported X visual depth: %d: %s", 
-			     Tk_Depth(Tk_MainWindow(interp)),
-			     "please use the \"-visual pseudocolor\" command line option.");
-	else
-	    return fmt_error("Unsupported X visual depth: %d", Tk_Depth(Tk_MainWindow(interp)));
-    }
+    //
+    //    if (Tk_Depth(Tk_MainWindow(interp)) != 8) {
+    //	int depth;
+    //	Colormap colormap;
+    //	if (Tk_GetVisual(interp, Tk_MainWindow(interp), "pseudocolor 8", &depth, &colormap)) 
+    //	    return fmt_error("Unsupported X visual depth: %d: %s", 
+    //			     Tk_Depth(Tk_MainWindow(interp)),
+    //			     "please use the \"-visual pseudocolor\" command line option.");
+    //	else
+    //	    return fmt_error("Unsupported X visual depth: %d", Tk_Depth(Tk_MainWindow(interp)));
+    //    }
 
     // set up Rtd Tcl package
     if (Tcl_PkgProvide (interp, "Rtd", RTD_VERSION) != TCL_OK) {
@@ -807,28 +811,30 @@ int RtdImage::initColors(Tcl_Interp* interp)
 
     int depth = 8;  // default, will be set by Tk_GetVisual below
     Colormap colormap;
+
+    // make sure the window exists now before setting the colormap
     Tk_Window tkwin = Tk_MainWindow(interp);
     
-    // XXX these should be options: min and max number of colors to allocate.
+    //  XXX these should be options: min and max number of colors to allocate.
     // If this many are not available, use private colormap.
     int min_colors = 30, max_colors = 60;
-
+    
     // Use the default visual for now...
     Visual* visual = Tk_GetVisual(interp, tkwin, "default", &depth, &colormap);
     if (! visual)
-	return TCL_ERROR;
+      return TCL_ERROR;
+    
+    //  PWD: remove to support non-8 bit displays
+    //     // if its 8-bit color, make sure it is pseudocolor. 
+    //     // XXX Is this too much of a restriction?
+    //     if (depth <= 8) {
+    // 	visual = Tk_GetVisual(interp, tkwin, "pseudocolor 8", &depth, &colormap);
+    // 	if (! visual)
+    // 	    return TCL_ERROR;
+    //     }
 
-    // if its 8-bit color, make sure it is pseudocolor. 
-    // XXX Is this too much of a restriction?
-    if (depth <= 8) {
-	visual = Tk_GetVisual(interp, tkwin, "pseudocolor 8", &depth, &colormap);
-	if (! visual)
-	    return TCL_ERROR;
-    }
-
-    // make sure the window exists now before setting the colormap
     Tk_MakeWindowExist(tkwin);
-    colors_ = new ImageColor(Tk_Display(tkwin), visual, depth, colormap, max_colors);
+    colors_ = new ImageColor(Tk_Display(tkwin), visual, depth, max_colors);
     if (colors_->status() != 0) {
 	return TCL_ERROR;
     }
@@ -2255,7 +2261,7 @@ int RtdImage::resetImage()
     }
 
     // tell that class that manages the image data about the new xImage data
-    image_->setXImageData(xImage_->data(), xImage_->bytesPerLine(), xImage_->height());
+    image_->setXImage( xImage_ );
 
     // always set Tk's idea of the image size to the full size,
     // even though the pixmap and XImage may be smaller
@@ -2425,7 +2431,7 @@ int RtdImage::deleteXImage()
     
     // also reset the pointer in the class that manages the XImage data
     if (image_) 
-	image_->setXImageData(NULL, 0, 0);
+	image_->setXImage( NULL );
 
     return 0;
 }
@@ -3249,35 +3255,53 @@ int RtdImage::cameraCmd(int argc, char* argv[])
  */
 int RtdImage::cmapCmd(int argc, char* argv[])
 {
+    int ret = TCL_OK;
     if (argc == 2) {
 	if (strcmp(argv[0], "file") == 0) {
-	    return colors_->loadColorMap(argv[1]);
+            ret = colors_->loadColorMap(argv[1]);
 	}
 	if (strcmp(argv[0], "rotate") == 0) {
-	    int amount;
-	    if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) 
-		return TCL_ERROR;
-	    return colors_->rotateColorMap(amount);
-	} 
+            int amount;
+            if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) {
+                ret = TCL_ERROR;
+            } else {
+                ret = colors_->rotateColorMap(amount);
+            }
+	}
 	if (strcmp(argv[0], "shift") == 0) {
 	    int amount;
-	    if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) 
-		return TCL_ERROR;
-	    return colors_->shiftColorMap(amount);
-	} 
+	    if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) {
+                ret = TCL_ERROR;
+            } else {
+                ret = colors_->shiftColorMap(amount);
+            }
+	}
 	if (strcmp(argv[0], "set") == 0) {
-	    Tk_Window w = Tk_NameToWindow(interp_, argv[1], tkwin_);
-	    if (w == NULL) 
-		return TCL_ERROR;
-	    return colors_->setColormap(w);
-	} 
-    } 
-
-    if (strcmp(argv[0], "file") == 0) {
-	return set_result(colors_->cmap()->name());
+            Tk_Window w = Tk_NameToWindow(interp_, argv[1], tkwin_);
+	    if (w == NULL) {
+              ret = TCL_ERROR;
+            } else {
+              ret = colors_->setColormap(w);
+            }
+	}
+        //  Force image update if colour changes do not transfer
+        //  automatically (i.e. non-pseudocolor visual).
+        if ( ret == TCL_OK && colors_->readOnly() ) {
+            return colorUpdate();
+        } else {
+            return ret;
+        }
     }
+
     if (strcmp(argv[0], "reset") == 0) {
-	return colors_->reset();
+	ret = colors_->reset();
+        if ( ret == TCL_OK ) {
+            return colorUpdate();
+        } else {
+            return ret;
+        }
+
+
     }
     if (strcmp(argv[0], "pixels") == 0) {
 	int n = colors_->colorCount();
@@ -3326,15 +3350,25 @@ int RtdImage::ittCmd(int argc, char* argv[])
 {
 
     if (argc == 2) {
-	if (strcmp(argv[0], "file") == 0) {
-	    return colors_->loadITT(argv[1]);
+        int ret = TCL_OK;
+        if (strcmp(argv[0], "file") == 0) {
+	    ret = colors_->loadITT(argv[1]);
 	}
 	else if (strcmp(argv[0], "scale") == 0) {
 	    int amount;
-	    if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) 
-		return TCL_ERROR;
-	    return colors_->scaleITT(amount);
-	} 
+	    if (Tcl_GetInt(interp_, argv[1], &amount) != TCL_OK) {
+                ret = TCL_ERROR;
+            } else {
+              ret = colors_->scaleITT(amount);
+            }
+	}
+        //  Force image update if colour changes do not transfer
+        //  automatically (i.e. non-pseudocolor visual).
+        if ( ret == TCL_OK ) {
+            return colorUpdate();
+        } else {
+            return ret;
+        }
     }
 
     if (strcmp(argv[0], "file") == 0) {
@@ -5900,6 +5934,30 @@ int RtdImage::wcsshiftCmd(int argc, char* argv[])
     return image_->wcs().shift(ra, dec, equinox);
 }
 
+/*
+ *  This method is called to update with new colors if needed. A
+ *  forced color update will be necessary when using X visuals which do
+ *  not support read-write colour cells.
+ */
+int RtdImage::colorUpdate( int force )
+{
+    if ( colors_->readOnly() || force ) {
+        if (image_) {
+            image_->colorScale(colors_->colorCount(), colors_->pixelval());
+
+            //  Make sure new lookup table is propagated.
+            LookupTable lookup = image_->lookup();
+            for(int i = 0; i < MAX_VIEWS; i++) {
+                if (view_[i] && view_[i]->image_ && !view_[i]->isSeparateRapidFrame())
+                  view_[i]->image_->lookup(lookup);
+            }
+        }
+        return updateViews(1) || updateImage();
+    }
+    return TCL_OK;
+}
+    
+
 // RtdImage signal handler
 
 void RtdImage_cleanup(int sig) 
@@ -5907,3 +5965,5 @@ void RtdImage_cleanup(int sig)
     Mem_RPTcleanup();    // cleanup shm of Rtd Recorder/Playback tool
     Mem_cleanup(sig);    // cleanup shm of RtdImage and exit
 }
+
+

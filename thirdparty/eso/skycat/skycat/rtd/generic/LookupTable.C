@@ -92,7 +92,7 @@ LookupTable& LookupTable::operator=(const LookupTable& im)
  * constructor - internal rep
  */
 LookupTableRep::LookupTableRep(int size) 
-    : lookup_(new byte[size]),
+    : lookup_(new unsigned long[size]),
       size_(size),
       refcnt_(1),
       status_(0)

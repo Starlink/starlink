@@ -14,6 +14,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  * T. Herlin       06/12/95  Casted NULL return from  ImageDisplay::data
+ * P.W. Draper     04/03/98  Added putpixel member.
  */
 
 #include <X11/Xlib.h>
@@ -67,6 +68,9 @@ public:
 
     // clear out the image by setting all pixels to the given value
     void clear(unsigned char val);
+
+    // set the value of a data pixel (wrapper to XPutPixel).
+    int putpixel( int x, int y, unsigned long value );
 
     // other info
     int width() {return xImage_ ? xImage_->width : 0;}

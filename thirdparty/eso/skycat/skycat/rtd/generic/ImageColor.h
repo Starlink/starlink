@@ -12,6 +12,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 02/03/98  Added code to deal with none-pseudocolor
+ *                           visuals.
  */
 
 #include <sys/types.h>
@@ -75,7 +77,7 @@ private:
 
 public:
     // constructor
-    ImageColor(Display*, Visual*, int depth, Colormap colormap, int numColors);
+    ImageColor(Display*, Visual*, int depth, int numColors);
     
     // member functions
     int numFreeColors();
@@ -120,7 +122,11 @@ public:
     const ColorMapInfo* cmap() const {return cmap_;}
     const ITTInfo* itt() const {return itt_;}
     int status() const {return status_;}
-};
+    int readOnly() const {return readOnly_;}
+
+    // set the background color
+    void setBackground( unsigned long pixval ) { pixelval_[0] = pixval ;}
+};    
 
 
 #endif /* _ImageColor_h_ */

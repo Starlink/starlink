@@ -9,6 +9,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 05/03/98  Added full support for X visuals in addition
+ *                           to pseudocolor (merged my changes from GAIA).
  */
 static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.8 1998/09/23 19:14:52 abrighto Exp $";
 
@@ -19,22 +21,22 @@ static const char* const rcsId="@(#) $Id: ImageColor.C,v 1.8 1998/09/23 19:14:52
 #include "ErrorHandler.h"
 #include "ImageColor.h"
 #include "error.h"
+#include "define.h"
 
 
 /*
  * constructor: passed the X Display handle and the number of
  * colors to allocate initially.
  */
-ImageColor::ImageColor(Display* display, Visual* visual, int depth, 
-		       Colormap colormap, int numColors)
+ImageColor::ImageColor(Display* display, Visual* visual, 
+                       int depth, int numColors)
 : display_(display),
   visual_(visual),
   screen_(DefaultScreen(display_)),
   depth_(depth),
-  readOnly_(depth>8),
   cmapSize_(XCellsOfScreen(DefaultScreenOfDisplay(display_))),
-  defaultCmap_(colormap),
-  colormap_(colormap),
+  defaultCmap_(DefaultColormap(display_, DefaultScreen(display_))),
+  colormap_(DefaultColormap(display_, DefaultScreen(display_))),
   colorCount_(0),
   freeCount_(0),
   cmap_(NULL),
@@ -43,10 +45,30 @@ ImageColor::ImageColor(Display* display, Visual* visual, int depth,
   itts_(NULL),
   status_(0)
 {
-    memset(colorCells_, '\0', sizeof(colorCells_));
-    memset(windowList_, '\0', sizeof(windowList_));
 
-    allocate(numColors);
+  //  Check if the visual we're dealing with is readonly, or if it
+  //  can be modified (XXX need to deal with DirectColor).
+  if ( visual_->c_class == PseudoColor || visual_->c_class == DirectColor ||
+       visual_->c_class == GrayScale ) {
+    readOnly_ = 0;
+  } else {
+    readOnly_ = 1;
+  }
+
+  //  If default visual isn't the same then create a local colormap.
+  Visual *defvis = DefaultVisual(display_, screen_);
+  if ( defvis->c_class != visual_->c_class ) {
+    colormap_ = XCreateColormap(display_,
+                                XRootWindow(display_, screen_),
+                                visual_,
+                                AllocNone);
+  }
+
+  //  Initialisations.
+  memset(colorCells_, '\0', sizeof(colorCells_));
+  memset(windowList_, '\0', sizeof(windowList_));
+  
+  allocate(numColors);
 }
 
 
@@ -56,13 +78,18 @@ ImageColor::ImageColor(Display* display, Visual* visual, int depth,
 int ImageColor::numFreeColors()
 {
     ErrorHandler errorHandler(display_); // catch X errors
-    int i;
-    for (i = cmapSize_-1; i > 0; i--) {
-	if (XAllocColorCells(display_, colormap_, False, 0, 0, pixelval_, i)) {
-	    // (note: here 0 return means error, 1 is OK)
-	    XFreeColors(display_, colormap_, pixelval_, i, 0);  
-	    return i;
+    if ( ! readOnly_ ) {
+      int i;
+      for (i = MAX_COLOR-1; i > 0; i--) {
+	if (XAllocColorCells(display_, colormap_, False, 0, 0, pixelval_, i) != 0) {
+          XFreeColors(display_, colormap_, pixelval_, i, 0);  // (note: here 0 return means error)
+          return i;
 	}
+      }
+    } else {
+
+      //  Readonly so all colors are free.
+      return min(MAX_COLOR,int(pow( 2.0, depth_))- 1);
     }
     return 0;
 }
@@ -294,8 +321,8 @@ int ImageColor::loadColorMap(ColorMapInfo* m)
 	XWhitePixelOfScreen(DefaultScreenOfDisplay(display_));
 
     // re-install the ITT if necessary
-    if (itt_) 
-	return loadITT(itt_);
+    if (itt_)
+      return loadITT(itt_);
 
     return storeColors(colorCells_);
 }

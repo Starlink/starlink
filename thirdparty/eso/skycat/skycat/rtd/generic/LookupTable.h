@@ -13,6 +13,8 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Aug 96  Created
+ * Peter W. Draper 03 Mar 98  Converted to use unsigned long values
+ *                            (need this to support visuals & depths)
  */
 
 #include <sys/types.h>
@@ -30,7 +32,7 @@ typedef unsigned char byte;
 class LookupTableRep {
 friend class LookupTable;
 protected:
-    byte* lookup_;		// lookup table
+    unsigned long* lookup_;	// lookup table
     int size_;			// size of lookup table
     int refcnt_;		// reference count
     int status_;		// status after constructor
@@ -65,7 +67,7 @@ public:
 
     // reset to given color
     void reset(int color) {
-	if (lookup_) memset(lookup_, color, size_);
+	if (lookup_) memset(lookup_, color, sizeof(unsigned long) * size_);
     }
     
     // set the color value for a specific pixel value (blank pixel, for example)
@@ -136,7 +138,7 @@ public:
 
     // look up and return a value (this should be a fast, inline operation)
     // no check, for speed, not needed if using default lookup size
-    byte operator[](ushort i) {
+    unsigned long operator[](ushort i) {
 #ifdef DEBUG
 	assert(rep_ && i<rep_->size_);
 #endif       

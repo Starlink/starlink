@@ -39,6 +39,7 @@ BUILD_INCLUDES  = @TCLUTIL_BUILD_INCLUDES@ \
 
 # note: we only include rtdimg below for error.h
 INCLUDES	= -I../include \
+		  -I../../rtdimg/include \
 		  $(BUILD_INCLUDES) \
 		  -I$(TOPDIR)/include/astrotcl \
 		  -I$(TOPDIR)/include/tclutil

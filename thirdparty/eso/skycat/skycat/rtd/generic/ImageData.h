@@ -24,6 +24,10 @@
  *                           change the public interface). This makes it easier 
  *                           to derive new image types or replace the WCS
  *                           implementation in a derived class of ImageIORep.
+ * P.W. Draper     03/03/98  Added changes for display depths > 8 bits.
+ *                 14/07/98  Added LOOKUP_BLANK to use last bin for
+ *                           blank pixel (otherwise comes out at
+ *                           scaled colour). 
  */
 
 
@@ -31,8 +35,9 @@
 #include "WCS.h"
 #include "LookupTable.h"
 #include "ImageIO.h"
+#include "ImageDisplay.h"
 
-typedef unsigned char byte;	// type of XImage data
+typedef unsigned char byte;	// type of XImage data (no longer ...)
 struct ImageDataParams;		// forward ref
 struct ImageDataHistogram;      // forward ref
 
@@ -55,15 +60,17 @@ public:
 	LOOKUP_WIDTH = 65534,	// range of image values allowed in histogram
 	LOOKUP_MIN = -32767,	// minimum image value allowed
 	LOOKUP_MAX = 32767,	// maximum image value allowed
-	LOOKUP_OFF = 32768	// offset from allocated array to zero (0x8000)
+	LOOKUP_OFF = 32768,	// offset from allocated array to zero (0x8000)
+        LOOKUP_BLANK = 32768    // end bin for blank pixel
     };
     
 protected:
     // arbitrary name of this image, used to identify the image in messages
     char name_[32];
 
-    // pointer to the caller's XImage->data, which this class writes to
-    byte* xImage_;
+    // pointers to the caller's XImage and data, which this class writes to
+    ImageDisplay* xImage_;
+    byte* xImageData_;
 
     // this represents the contents of the image file or other source
     // (uses reference counting so we can share this with other views)
@@ -92,7 +99,9 @@ protected:
     // below) and kept here for reference.
     int xImageWidth_;
     int xImageHeight_;
-    int xImageSize_;  // width*height
+    int xImageSize_;   // width*height*nbytes
+    int xImageBytes_;  // Number of bytes per pixel in xImage (1 for 8
+                       // bit displays).
 
     // max x image x,y coords scaled to image coords
     int xImageMaxX_, xImageMaxY_;
@@ -268,7 +277,7 @@ public:
     int getIndex(double x, double y, int& ix, int& iy);
 
     // set the destination X image buffer, dimensions and raw image offset
-    void setXImageData(byte* xImage, int width, int height);
+    void setXImage(ImageDisplay* xImage);
 
     // set the scaling factor
     void setScale(int xScale, int yScale);
@@ -360,7 +369,7 @@ public:
     // access the world coordinate info object for the image
     WCS& wcs() {return image_.wcs();}
 
-    byte* xImage() {return xImage_;}
+    ImageDisplay* xImage() {return xImage_;}
     const ImageIO& image() {return image_;}
     void colorScaleType(ImageColorScaleType t) {colorScaleType_ = t;}
     ImageColorScaleType colorScaleType() {return colorScaleType_;}

@@ -99,4 +99,4 @@ then
   exec $WISH $file
 fi
 
-exec $WISH $file "$@" -visual pseudocolor
+exec $WISH $file "$@"

@@ -12,6 +12,8 @@ static char SccsId[] = "%W%  %G%";
  *		software for any purpose.  It is provided "as is" without
  *		express or implied warranty.
  * Modified:	{0} Michael VanHilst	initial version		  30 May 1989
+ *              {1} Peter W. Draper     converted to use unsigned 20 Jan 1999
+ *                                      long for scalemap
  *		{n} <who> -- <does what> -- <when>
  */
 
@@ -26,7 +28,7 @@ static char SccsId[] = "%W%  %G%";
  */
 void histogram_equalize ( scalemap, histogram, area, pmin, pmax,
 			  color_levels, pixels )
-     unsigned char *scalemap;	/* i/o: scalemap (for signed indexing) */
+     unsigned long *scalemap;	/* i/o: scalemap (for signed indexing) */
      int *histogram;		/* i: histogram (for signed indexing) */
      int area;			/* i: area in pixels when histogram was made */
      int pmin, pmax;		/* i: min and max values in histogram */

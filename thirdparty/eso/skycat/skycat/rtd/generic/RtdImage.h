@@ -20,6 +20,8 @@
  *                           loadFile now virtual to aid subclassing.
  * Allan Brighton  13/03/98  Define RTD_OPTIONS as a macro, so that derived
  *                           classes can add new options more easily.
+ * Peter W. Draper 13/01/99  Added changes to support non 8 bit
+ *                           colors (colorUpdate).
  */
 
 #include "TkImage.h"
@@ -313,6 +315,9 @@ protected:
 
     // get fraction of zoomed pixel at point
     void getOffsetInXImage(double px, double py, int& x, int& y);
+
+    // propagate color change
+    int colorUpdate( int force = 0);
 
     // Increment a performance test variable.
     void timeInc(double *);

@@ -56,6 +56,9 @@ private:
     byte lookup(FITS_LONG l) {
 	return lookup_[convertToUshort(l)];
     }
+    unsigned long llookup(FITS_LONG l) {
+        return lookup_[convertToUshort(l)];
+    }
 
 protected:
 

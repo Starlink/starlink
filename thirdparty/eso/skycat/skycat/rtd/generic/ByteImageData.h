@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project 
  *
- * "@(#) $Id: ByteImageData.h,v 1.9 1998/07/23 23:37:55 abrighto Exp $" 
+ * "@(#) $Id: ByteImageData.h,v 1.8 1998/02/02 20:20:02 abrighto Exp $" 
  *
  * ByteImageData.h - class definitions for class ByteImageData
  *
@@ -14,6 +14,8 @@
  * who             when      what
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
+ * Peter W. Draper 05/03/98  Added llookup
+ *                 14/07/98  Added check for blanks in lookup.
  */
 
 #include <sys/types.h>
@@ -34,8 +36,16 @@ private:
     }
 
     // return X image pixel value for raw image value
-    byte lookup(byte b) {return	lookup_[(ushort)b];} 
-
+    byte lookup(byte b) {
+        if ( !haveBlank_ ) return lookup_[(ushort)b];
+        if ( b != blank_ ) return lookup_[(ushort)b];
+        return lookup_[128];
+    } 
+    unsigned long llookup(byte b) {
+        if ( !haveBlank_ ) return lookup_[(ushort)b];
+        if ( b != blank_ ) return lookup_[(ushort)b];
+        return lookup_[128];
+    }
 protected:
     // convert cut values to short range
     void initShortConversion();
@@ -43,8 +53,8 @@ protected:
 public:
     // constructor
     ByteImageData(const char* name, const ImageIO& imio, int verbose)
-	: ImageData(name, imio, verbose),
-	  blank_(0) { }
+	: ImageData(name, imio, verbose, 256 /* use a smaller lookup table */),
+	  blank_(128) { }
 
     // return the data type of the raw data
     int dataType() {return BYTE_IMAGE;}

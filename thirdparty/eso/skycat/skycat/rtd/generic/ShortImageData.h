@@ -16,7 +16,9 @@
  * Allan Brighton  05/10/95  Created
  * T. Herlin       08/12/95  Added color scale functions to avoid sign problem
  * Allan Brighton  14/12/95  reversed above and fixed the real problem 
- */
+ * Peter W. Draper 04/03/98  Added llookup
+ *                 14/07/98  Added blank checks in lookup.
+*/
 
 #include <sys/types.h>
 #include "ImageData.h"
@@ -36,7 +38,17 @@ private:
     }
 
     // return X image pixel value for raw image value
-    byte lookup(short s) {return lookup_[(ushort)s];}
+    byte lookup(short s) {
+        if ( !haveBlank_ ) return lookup_[(ushort)s];
+        if ( s != blank_ ) return lookup_[(ushort)s];
+        return lookup_[(ushort)LOOKUP_BLANK];
+    }
+    unsigned long llookup(short s) {
+        if ( !haveBlank_ ) return lookup_[(ushort)s];
+        if ( s != blank_ ) return lookup_[(ushort)s];
+        return lookup_[(ushort)LOOKUP_BLANK];
+    }
+
 
 protected:
 

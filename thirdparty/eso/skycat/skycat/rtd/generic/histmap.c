@@ -11,6 +11,8 @@ static char SccsId[] = "%W%  %G%";
  *		software for any purpose.  It is provided "as is" without
  *		express or implied warranty.
  * Modified:	{0} Michael VanHilst	initial version		  30 May 1989
+ *              {1} Peter W. Draper     converted to use unsigned 20 Jan 1999
+ *                                      long for scalemap
  *		{n} <who> -- <does what> -- <when>
  */
 
@@ -31,7 +33,7 @@ static char SccsId[] = "%W%  %G%";
 void generate_scalemap ( hist, subrange, scalemap, pixels )
      int *hist;				/* i: histogram (for signed offsets) */
      SubrangeLink *subrange;	/* i: linklist of subranges */
-     unsigned char *scalemap;		/* i: scalemap (for signed indexing) */
+     unsigned long *scalemap;		/* i: scalemap (for signed indexing) */
      unsigned long *pixels;		/* i: map to hardware entries */
 {
   int baselevel;
@@ -58,13 +60,13 @@ static void
   make_subrange_scalemap ( histogram, subrange, scalemap, baselevel, pixels )
      int *histogram;
      SubrangeLink *subrange;
-     unsigned char *scalemap;		/* scalemap (for signed indexing) */
+     unsigned long *scalemap;		/* scalemap (for signed indexing) */
      int baselevel;
      unsigned long *pixels;		/* i: map to hardware entries */
 {
   int i, color_levels;
   SubrangeList *list;
-  unsigned char dispval;
+  unsigned long dispval;
   char *calloc_errchk();
   void make_equalized_list();
   static void make_gapped_list(), list_to_map();
@@ -109,14 +111,14 @@ static void
  * Called by:	make_subrange_scalemap() above
  */
 static void list_to_map ( scalemap, histlist, baselevel, levels, pixels )
-     unsigned char *scalemap;		/* scalemap (for signed indexing) */
+     unsigned long *scalemap;		/* scalemap (for signed indexing) */
      SubrangeList *histlist;
      int baselevel, levels;
      unsigned long *pixels;		/* i: map to hardware entries */
 {
   int i, level;
   int first, last, imageval;
-  unsigned char dispval;
+  unsigned long dispval;
 
   level = baselevel;
   for( i = 0; i < levels; i++ ) {

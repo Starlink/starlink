@@ -14,6 +14,9 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  11 Jun 96  Created
+ * Peter W. Draper 21 Sep 98  Modified private data members to be
+ *                            protected. Need these for derived
+ *                            classes. 
  */
 
 #include "AstroCatalog.h"
@@ -37,7 +40,8 @@
  * where the table name and variable assignments are optional. 
  */
 class LocalCatalog : public AstroCatalog {
-private:
+  //private:
+protected:  // PWD: change here
     char* filename_;		// file name for local catalog
     time_t timestamp_;		// last update time of file, for caching
 

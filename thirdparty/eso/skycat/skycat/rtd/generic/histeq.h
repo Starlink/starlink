@@ -13,6 +13,8 @@ static char SccsHistEqId[] = "%W%  %G%";
 /* Module:	HistEq.h
  * Purpose:	Define the structs for histogram equalization
  * Modified:	{0} Michael VanHilst	initial version		  30 May 1989
+ *              {1} Peter W. Draper     converted to use unsigned 20 Jan 1999
+ *                                      long for scalemap
  *		{n} <who> -- <does what> -- <when>
  */
 
@@ -46,7 +48,7 @@ typedef struct histogramList {
 
 /* allan: added prototype */
 void histogram_equalize (
-     unsigned char *scalemap,	/* i/o: scalemap (for signed indexing) */
+     unsigned long *scalemap,	/* i/o: scalemap (for signed indexing) */
      int *histogram,		/* i: histogram (for signed indexing) */
      int area,			/* i: area in pixels when histogram was made */
      int pmin, int pmax,	/* i: min and max values in histogram */
