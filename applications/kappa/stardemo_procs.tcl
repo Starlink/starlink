@@ -346,7 +346,6 @@ proc exit {args} {
    global LOGFILE_ID
    global OLD_ADAM_USER
    global OLD_AGI_USER
-   global OLDKAPPA
    global STARDEMO_SCRATCH
 
 # Re-instate the original exit command in case anything goes wrong in
@@ -370,27 +369,9 @@ proc exit {args} {
 # Delete the STARDEMO_SCRATCH directory created at the start.
    catch "exec rm -rf $STARDEMO_SCRATCH"
 
-# Trap pids for all current KAPPA processes.
-   if { ![catch {exec ps | grep kappa | grep -v grep | \
-                 awk {{print $1}}} newkappa] } {
-      set newkappa {}
-   }
-
 # Kill any new processes (i.e ones which are not in the list of KAPPA
 # processes which were active when stardemo started).
-   foreach newpid $newkappa {
-      set dokill 1
-
-      foreach oldpid $OLDKAPPA {
-         if { $newpid == $oldpid } {
-            set dokill 0
-         }
-      }
-
-      if { $dokill } {
-         catch "exec kill -SYS $newpid"
-      }
-    }
+   killNew 
 
 # Re-instate the original ADAM_USER and AGI_USER environment variables.
    if { $OLD_ADAM_USER != "" } {
@@ -2650,23 +2631,6 @@ proc Run {} {
          set RUNNING_DEMO $name
          Demo $name $DEMO($name)
 
-# In order to ensure that the next demo starts with a clean set of
-# defaults, delete all parameter files from the ADAM_USER directory, and
-# re-load all adam tasks.
-         foreach file [glob -nocomplain "$ADAM_USER/*.sdf"] {
-            catch {exec rm -f $file}
-         }
-
-         foreach task $ADAM_TASKS {
-            catch {$task kill}
-            LoadTask $task $TASK_FILE($task)
-         }
-
-#  Re-establish the graphics devices.
-         Obey kapview gdset "device=$DEVICE" 1
-         Obey kapview idset "device=$DEVICE" 1
-         Obey kapview gdclear ""
-
          set RUNNING_DEMO "<idle>"
          set DOING ""
 
@@ -2868,7 +2832,6 @@ proc AdamReset {} {
    global ADAM_USER
    global DEVICE
    global TASK_FILE
-   global OLDKAPPA
 
    if { !$CHECK_DEMO } {
 
@@ -2886,9 +2849,13 @@ proc AdamReset {} {
       upvar #0 adamtask_priv priv
       fileevent $priv(PIPE) readable ""
       adam_reply $priv(RELAY_PATH) $priv(RELAY_MESSID) SYNC "" exit
+      close $priv(PIPE)
       unset priv 
       rename exit {}
       rename adamtask.realExit exit
+
+#  Kill all processes created by this script so far.
+      killNew
 
 #  Delete the temporary ADAM_USER directory created at the start, and
 #  create a new one.
@@ -3705,4 +3672,75 @@ proc GetEnv {varnam} {
       return $ret
    }
 
+#  Kill all process created by this script.
+#  ----------------------------------------
+   proc killNew {} {
+      global OLDKAPPA
+      global env
 
+      set re {([0-9]+) .+ .*}
+
+#  Get information about all processes owned by the current user.
+      catch {exec ps -eo "pid ruser comm" | grep $env(USER)} procs
+
+#  Process each line of this info. Each line has a pid, a user id, and a
+#  command name.
+      foreach line [split $procs "\n"] {
+         set fields [split $line]
+
+#  Do each process to be killed in turn.
+         foreach process [list kappa kapview ndfpack adamMessa] {
+
+#  If the command (index 2 in the line) contains the process name...
+            if { [regexp $re$process $line match pid] } {
+
+#  Check if the process was active when this script started.
+               set dokill 1
+               foreach oldpid $OLDKAPPA {
+                  if { $pid == $oldpid } {
+                     set dokill 0
+                  }
+               }
+
+#  If not, kill the process
+               if { $dokill } {
+                  catch "exec kill $pid" 
+               }
+
+#  Creak out of the process name loop.
+               break
+            }
+         }
+      }
+   }
+
+   proc printPid {label} {
+      global OLDKAPPA
+      global env
+
+      set re {([0-9]+) .+ .*}
+
+      puts "\n$label"
+
+#  Get information about all processes owned by the current user.
+      catch {exec ps -eo "pid ruser comm" | grep $env(USER)} procs
+
+#  Process each line of this info. Each line has a pid, a user id, and a
+#  command name.
+      foreach line [split $procs "\n"] {
+
+#  Do each process in turn.
+         foreach process [list kappa kapview ndfpack adamMess] {
+
+#  If the command (index 2 in the line) contains the process name...
+            if { [regexp $re$process $line match pid] } {
+
+#  Add this line to the returned value.
+               puts $line
+
+#  Creak out of the process name loop.
+               break
+            }
+         }
+      }
+   }
