@@ -1,32 +1,34 @@
-2 CONVERT
+1 CONVERT
  The CONVERT package contains some of the numerous format-conversion
  routines which are necessary to translate data files to and from the
  Starlink standard n-Dimensional-data format--the NDF---described in
- SUN/33 and SGP/38.
+ SUN/33 and SGP/38.  CONVERT commands are available from ICL and UNIX
+ shell.
 
  The commands available are:
 
      ASCII2NDF -- Converts an ASCII file to an NDF.
-     BDF2NDF   -- Converts a Starlink Interim BDF file to an NDF.
-     DIPSO2NDF -- Converts a DIPSO file to an NDF.
      DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
      GASP2NDF  -- Converts an image in GASP format to an NDF.
+     GIF2NDF   -- Converts a GIF file to an NDF.
      IRAF2NDF  -- Converts an IRAF image to an NDF.
      IRCAM2NDF -- Converts an IRCAM data file to a series of NDFs.
      NDF2ASCII -- Converts an NDF to an ASCII file.
-     NDF2BDF   -- Converts an NDF to a Starlink Interim BDF file.
-     NDF2DIPSO -- Converts an NDF to a DIPSO-format file.
      NDF2DST   -- Converts an NDF to a Figaro (Version 2) DST file.
+     NDF2FITS  -- Converts an NDF to a FITS file.
      NDF2GASP  -- Converts a two-dimensional NDF into a GASP image.
-     NDF2IRAF  -- Converts an NDF to an IRAF image.
+     NDF2GIF   -- Converts a two-dimensional NDF into a GIF file.
+     NDF2IRAF  -- Converts an NDF to an IRAF (OIF) image.
+     NDF2PGM   -- Converts a two-dimensional NDF into a PGM file.
+     NDF2TIFF  -- Converts a two-dimensional NDF into a TIFF file.
      NDF2UNF   -- Converts an NDF to a sequential unformatted file.
+     TIFF2NDF  -- Converts a TIFF file to an NDF.
      UNF2NDF   -- Converts a sequential unformatted file to an NDF.
 
  Full details can be found in SUN/55.
 
- To make all the format-conversion routines available, type:
+ To make all the format-conversion routines available, type
 
-     ICL> CONVERT
+     ICL> convert
 
  Then type the appropriate command.
-
