@@ -714,7 +714,7 @@
                   CALL MSG_SETC( 'EXTFUN', EXTFUN( : LENFUN ) )
                   CALL MSG_SETC( 'EXTNAM', EXTNAM( : LENNAM ) )
                   CALL ERR_REP( ' ', '  Cannot interpret:"^EXTFUN"'//
-     :', as a valid transform for any known FIT-keywords '//
+     :', as a valid transform for any known FITS-keywords '//
      : '(extension item ^EXTNAM).', STATUS )
                   CALL ERR_RLSE
                   GO TO 99
