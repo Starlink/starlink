@@ -135,8 +135,9 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
-      CHARACTER*(DAT__SZLOC)	QLOC			! Quality array
+      CHARACTER*(DAT__SZTYP)	LTYPE			! Local object type
       CHARACTER*(DAT__SZLOC)	MLOC			! Quality mask
+      CHARACTER*(DAT__SZLOC)	QLOC			! Quality array
       CHARACTER*(DAT__SZLOC)	WLOC			! Widths locator
 
       REAL			ASCALE			! Axis scale
@@ -553,9 +554,9 @@
             CALL BDI0_LOCPST( BDID, ITEM, .TRUE., PSID, STATUS )
 
 *        Is width defined by array type?
-            CALL DAT_TYPE( CLOC, TYPE, STATUS )
+            CALL DAT_TYPE( CLOC, LTYPE, STATUS )
             STHERE = .FALSE.
-            IF ( TYPE .EQ. 'ARRAY' ) THEN
+            IF ( LTYPE .EQ. 'ARRAY' ) THEN
               CALL DAT_THERE( CLOC, 'SCALE', STHERE, STATUS )
               IF ( STHERE ) THEN
                 CALL CMP_GET0R( CLOC, 'SCALE', ASCALE, STATUS )
