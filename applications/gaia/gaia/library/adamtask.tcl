@@ -210,7 +210,7 @@ proc adamtask {taskname {execfile ""}} {
 	if {[info exists env(ADAM_TASK_TYPE)]} {
 	    set adam_task_type $env(ADAM_TASK_TYPE)
 	    set adam_task_type_set 1
-	} {
+	} else {
 	    set adam_task_type_set 0
 	}
 	set env(ADAM_TASK_TYPE) I
@@ -219,7 +219,7 @@ proc adamtask {taskname {execfile ""}} {
 	if {[info exists env(ICL_TASK_NAME)]} {
 	    set icl_task_name $env(ICL_TASK_NAME)
 	    set icl_task_name_set 1
-	} {
+	} else {
 	    set icl_task_name_set 0
 	}
 	set env(ICL_TASK_NAME) $taskname
@@ -230,15 +230,15 @@ proc adamtask {taskname {execfile ""}} {
 #     Restore state of environment variables.
 	if {$adam_task_type_set} {
 	    set env(ADAM_TASK_TYPE) $adam_task_type
-	} {
+	} else {
 	    unset env(ADAM_TASK_TYPE)
 	}
 	if {$icl_task_name_set} {
 	    set env(ICL_TASK_NAME) $icl_task_name
-	} {
+	} else {
 	    unset env(ICL_TASK_NAME)
 	}
-    } {
+    } else {
 	set priv(PID,$taskname) ""
     }
 
@@ -258,7 +258,7 @@ proc adamtask.send {command} {
     set message [adam_getreply 10000 $priv(RELAY_PATH) $priv(RELAY_MESSID)]
     if {[lindex $message 2] == "TCL_OK"} {
 	return [lindex $message 6]
-    } {
+    } else {
 	error "Error in message relay: [lindex $message 6]"
     }
 }
@@ -343,7 +343,7 @@ proc adamtask.kill {task arglist} {
     upvar #0 adamtask_priv priv
     if { "$priv(PID,$task)" != ""} {
 	set result [adamtask.send [list exec kill -TERM $priv(PID,$task)]]
-    } {
+    } else {
 	error "attached tasks cannot be killed"
     }
     unset priv(PID,$task)
@@ -478,7 +478,7 @@ proc adamtask.subst {string subst} {
 	if {[string compare "%" $next] == 0} {
 	    incr i
 	    catch {set output $output[list $sub([string index $string $i])]}
-	} {
+	} else {
 	    set output $output$next
 	}
     }

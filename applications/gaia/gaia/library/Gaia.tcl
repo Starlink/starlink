@@ -1011,7 +1011,7 @@ itcl::class gaia::Gaia {
       if { $name == "" } {
 	 set name "$prefix_[expr $clone_cnt_+1]"
 	 while { [winfo exists $name] } {
-	    set name "$prefix_[incr $clone_cnt_]"
+	    set name "$prefix_[incr clone_cnt_]"
 	 }
       }
 
@@ -1202,7 +1202,7 @@ itcl::class gaia::Gaia {
       }
 
       if {! [file isdirectory $gaia_dir]} {
-         set $gaia_library $gaia_dir
+         set gaia_library $gaia_dir
       }
 
       # Check if using local Starlink binaries

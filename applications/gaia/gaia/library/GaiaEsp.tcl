@@ -316,8 +316,9 @@ itcl::class gaia::GaiaEsp {
 			"outputndffile" {
 			    set fname "GaiaEspResults.sdf"
 			}
-			"ardfile"
-			set fname "GaiaEspArd.txt"
+                        "ardfile" {
+                            set fname "GaiaEspArd.txt"
+                        }
 			"sourcefile" {
 			    set fname "GaiaEspSources.txt"
 			}

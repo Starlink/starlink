@@ -469,7 +469,7 @@ itcl::class util::FileSelect {
        }
        
        cd $seldir
-       set $seldir [pwd]
+       set seldir [pwd]
        _setfilter $seldir
        configure -dir $seldir
        configure -filter "[file tail [$fs(filter) get]]"
@@ -569,8 +569,6 @@ itcl::class util::FileSelect {
 	    $fs(btnf).okf configure -relief flat
 	    $fs(btnf).ff configure -relief flat
 	    $fs(btnf).cf configure -relief sunken
-
-	    catch {focus none}
 	}
     }
 
