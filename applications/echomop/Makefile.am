@@ -18,7 +18,7 @@ echmono_TASKS = \
     ech_mulmrg
 echmono_SOURCES = echmono.f
 echmono_LDADD = libechomop.la \
-	 `pda_link_adam` `pgp_link` `sla_link_adam` \
+	 `pda_link_adam` `pgp_link` `sla_link_adam` `one_link_adam` \
 	 `hlp_link` `fio_link_adam` `ndf_link_adam` \
 	 `kaplibs_link_adam`
 
@@ -27,13 +27,13 @@ bin_PROGRAMS = echhelp
 ## This was pgplot_link -- better as pgp_link?
 ech_ftrdb_SOURCES = ech_ftrdb.f
 ech_ftrdb_LDADD = libechomop.la \
-	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` \
+	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
 	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
 	  `kaplibs_link_adam`
 
 ech_scrn2d_SOURCES = ech_scrn2d.f
 ech_scrn2d_LDADD = libechomop.la \
-	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` \
+	  `hlp_link` `pgp_link` `sla_link_adam` `pda_link` `one_link_adam` \
 	  `psx_link_adam` `fio_link_adam` `ndf_link_adam` \
 	  `kaplibs_link_adam`
 
@@ -133,7 +133,7 @@ F_ROUTINES = aaa_indexing.f ech_2dext_opt.f ech_access_data_file.f \
 
 FIGARO_SUBSTITUTIONS = ech_figsubs.f
 
-C_ROUTINES = ech_system.c ech_zero_init2.c ech_mean_median.c ech_parse_option.c
+C_ROUTINES = ech_zero_init2.c ech_mean_median.c ech_parse_option.c
 
 
 # special installation directories

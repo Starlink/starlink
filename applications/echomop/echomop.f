@@ -37,7 +37,15 @@
 *     sharing of intermediate results (eg order traces) amongst a large
 *     number of similar reductions thus saving CPU time.
 
-*     Created:        04 Apr 1990 DJM / UCL
+*  Authors:
+*     Dave Mills STARLINK (ZUVAD::DMILLS)
+*     Tim Jenness (JAC, Hawaii)
+
+*  History:
+*     1990 Apr 4 (DMILLS):
+*       Initial release
+*     2004 Sept 29 (TIMJ):
+*       Use ONE_SYSTEM rather than ECH_SYSTEM
 
 *-
 
@@ -687,7 +695,7 @@
             REPORT_STRING = '---------------------------------------' //
      :           '-----------------------------------------'
             CALL ECH_REPORT( 0, REPORT_STRING )
-            CALL ECH_SYSTEM( SYS_COMMAND, STATUS )
+            CALL ONE_EXEC( SYS_COMMAND, STATUS )
             REPORT_STRING = '---------------------------------------' //
      :            '-----------------------------------------'
             CALL ECH_REPORT( 0, REPORT_STRING )
@@ -827,7 +835,7 @@
             IF ( HYPER ) THEN
                XLATE = 'ECHOMOP_HYPER:'
                CALL ECH_PARSE_ENV( XLATE, XLEN )
-               CALL ECH_SYSTEM( XLATE, STATUS )
+               CALL ONE_EXEC( XLATE, STATUS )
                HYPER = .FALSE.
 
             ELSE

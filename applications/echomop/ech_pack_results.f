@@ -42,9 +42,13 @@
 
 *  Authors:
 *     Dave Mills STARLINK (ZUVAD::DMILLS)
+*     Tim Jenness (JAC, Hawaii)
 
 *  History:
-*     1992 Sept 1 : Initial release
+*     1992 Sept 1 (DMILLS):
+*       Initial release
+*     2004 Sept 29 (TIMJ):
+*       Use ONE_SYSTEM rather than ECH_SYSTEM
 
 *-
 
@@ -234,7 +238,7 @@
       ENDIF
 
 *  Pass procedure invocation to SYSTEM hook routine to do the work.
-      CALL ECH_SYSTEM( msg_string, status )
+      CALL ONE_EXEC( msg_string, status )
       CALL ECH_REPORT( 0,
      :       ' An archiving request has now been created.' )
 
