@@ -15,21 +15,12 @@
       REAL			AS_GPIX
       REAL			AS_SPIX
 
-      LOGICAL                 AS_INIT 			! System initialised
-      REAL                    AS_ENERGY(PSF_NMAX)	!
-      INTEGER                 AS_PHALO(PSF_NMAX)        !
-      INTEGER                 AS_PHAHI(PSF_NMAX)        ! Channel bounds
-      LOGICAL                 AS_PHA_DEF(PSF_NMAX)      ! Channel bounds defined
-      REAL                    AS_CHAN_SCALE(PSF_NMAX)
+      LOGICAL                   AS_INIT 		! System initialised
 
-      CHARACTER*3	      AS_INSTR(PSF_NMAX)	! ASCA detector
       CHARACTER*200		AS_CALDB
       INTEGER			AS_CALDBL
 
-      COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
-     :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF,
-     :                        AS_GPTR,AS_SPTR, AS_GPIX,
-     :                        AS_SPIX, AS_CALDBL,
-     :                        AS_CHAN_SCALE
+      COMMON /PSF_ASCA_CMN/    	AS_INIT, AS_GPTR,AS_SPTR, AS_GPIX,
+     :                          AS_SPIX, AS_CALDBL
 
-      COMMON /PSF_ASCA_CMNC/   AS_INSTR, AS_CALDB
+      COMMON /PSF_ASCA_CMNC/    AS_CALDB
