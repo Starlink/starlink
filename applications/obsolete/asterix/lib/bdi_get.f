@@ -303,6 +303,7 @@
 
       INTEGER			ARGS(3)			! Function args
       INTEGER			AXNO			! Axis number
+      INTEGER			AXPTR			! Ptr to axis data
       INTEGER			NDIM, DIMS(ADI__MXDIM)	! Dataset shape
       INTEGER			LITL			! Used length of LITEM
 
