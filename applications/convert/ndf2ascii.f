@@ -454,6 +454,12 @@
                      FITSTR = ' '
                      FITSTR( 1:9 ) = 'SIMPLE  ='
                      FITSTR( 30: ) = 'T / File is simple'
+
+*  Ensure that the value is valid, i.e. true or false.  Assume that it
+*  is just a simple file.
+                  ELSE IF ( FITSTR( 30:30 ) .NE. 'T' .AND.
+     :                      FITSTR( 30:30 ) .NE. 'F' ) THEN
+                     FITSTR( 30:30 ) = 'T'
                   END IF
 
 *  Write the SIMPLE card header to the unformatted file.
