@@ -53,6 +53,8 @@ BASIC_F_ROUTINES = \
   ard1_fplot.f ard1_ceil.f \
   ard1_cntdr.fpp 
 
+ard1_cntdr.f: ard1_cntdr.fpp
+
 STANDALONE_F_ROUTINES =
 
 ADAM_F_ROUTINES = ard_group.f
