@@ -28,9 +28,10 @@
 *     should be fairly self-explanatory.  The image can be scrolled
 *     using the scrollbars, the window can be resized, and there are 
 *     controls for zooming the image in or out, changing the style of 
-*     display, and altering the percentile cutoff limits.  The position 
+*     display, and altering the percentile cutoff limits which control
+*     the mapping of pixel value to displayed colour.  The position 
 *     of the cursor is reported below the display using the coordinates 
-*     of the Current coordinate frame for information, but the position 
+*     of the selected coordinate frame for information, but the position 
 *     list written out is always written in Pixel coordinates, since 
 *     that is how all CCDPACK applications expect to find it written.
 *     Points are marked on the image by clicking mouse button 1 
@@ -47,6 +48,18 @@
 *        If multiple NDFs are using wildcards or separating their names
 *        with commas, you will be invited to mark points on each one
 *        in turn.
+*     INEXT = _LOGICAL (Read)
+*        If the READLIST parameter is set true, then this parameter 
+*        determines where the input position list comes from.  If set
+*        true, then the position list currently associated with the
+*        NDF will be used.  If set false, then the input position list
+*        names will be obtained from the INLIST parameter.
+*        [FALSE]
+*     INLIST = FILENAME (Read)
+*        If the READLIST parameter is set true, and the INEXT parameter
+*        is set false, then this parameter gives the name of the file
+*        in which the input position list is stored.  This parameter
+*        may use modifications of the input NDF name.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -72,7 +85,7 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
-*     MAXCANV = INTEGER (Read and Write)
+*     MAXCANV = _INTEGER (Read and Write)
 *        A dimension in pixels for the maximum X or Y dimension of the
 *        region in which the NDF is displayed.  Note this is the 
 *        scrolled region, and may be much bigger than the sizes given
@@ -85,42 +98,51 @@
 *        the program attempting to display an enormous viewing region.
 *        If set to zero, then no limit is in effect.
 *        [1280]
+*     READLIST = _LOGICAL (Read)
+*        If set true, then the program will start up with a set of points
+*        displayed, read from the list specified by the INLIST parameter.
+*        If set false, the program will start up with no points initially
+*        plotted.
+*        [FALSE]
 *     OUTLIST = FILENAME (Write)
 *        The name of the file which is to contain the selected
 *        positions. The positions are written using the standard 
 *        format in CCDPACK which is described in the notes section.
 *        This list will become associated with the named NDF, and
-*        may use modifications of the input NDF name.
+*        may use modifications of the input NDF name.  If set null (!),
+*        no output list will be written.  This parameter is allowed
+*        to take the same value as INLIST, in which case the list will
+*        be overwritten.
 *        [*.lis]
-*     PERCENTILES( 2 ) = DOUBLE (Read and Write)
+*     PERCENTILES( 2 ) = _DOUBLE (Read and Write)
 *        The low and high percentiles of the data range to use when 
 *        displaying the images; any pixels with a value lower than 
 *        the first value will have the same colour, and any with a value
 *        higher than the second will have the same colour.  Must be in
 *        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
-*     SHOWIND = LOGICAL (Read)
+*     SHOWIND = _LOGICAL (Read)
 *        If true, then the index numbers will be displayed on the image
 *        for each point marked, and it will be possible to choose 
 *        the index number for each point.  If false, points will not
 *        be numbered on the display, and will be written to the 
 *        position list in (roughly) the order in which they are entered.
 *        [FALSE]
-*     WINX = INTEGER (Read and Write)
+*     WINX = _INTEGER (Read and Write)
 *        The width in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
 *        allocated for display, it can be scrolled around within the 
 *        window.  The window can be resized in the normal way using 
 *        the window manager while the program is running.
 *        [600]
-*     WINY = INTEGER (Read and Write)
+*     WINY = _INTEGER (Read and Write)
 *        The height in pixels of the window to display the image and
 *        associated controls in.  If the image is larger than the area
 *        allocated for display, it can be scrolled around within the
 *        window.  The window can be resized in the normal way using
 *        the window manager while the program is running.
 *        [600]
-*     ZOOM = INTEGER (Read and Write)
+*     ZOOM = _INTEGER (Read and Write)
 *        A factor giving the initial level to zoom in to the image 
 *        displayed, that is the number of screen pixels to use for one
 *        image pixel.  It will be rounded to one of the values 
@@ -130,6 +152,28 @@
 *        [1]
 
 *  Examples:
+*     idicurs mosaic mos.lis
+*        This starts up the graphical user interface, allowing you to 
+*        select a number of points which will be written to the 
+*        position list file 'mos.lis', which will be associated with
+*        the image file.
+*
+*     idicurs in=* out=*.pts percentiles=[10,90]
+*        Each of the NDFs in the current directory will be displayed, 
+*        and the positions marked on it written to a list with the same
+*        name as the image but the extension '.pts', which will be 
+*        associated with the image in question.  The display will
+*        initially be scaled so that pixels with a value higher than
+*        the 90th percentile will all be displayed as the brightest
+*        colour and those with a value lower than the 10th percentile
+*        as the dimmest colour, but this may be changed interactively
+*        while the program is running.
+*
+*    idicurs in=gc6253 showind readlist inlist=found.lis outlist=out.lis
+*       The image gc6253 will be displayed, with the points stored in the
+*       position list 'found.lis' already plotted on it.  These may be
+*       added to and/or deleted, and the resulting list will be written
+*       to the file out.lis.
 
 *  Notes:
 *     - Output position list format.
@@ -172,10 +216,6 @@
 *     global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
-*
-*     The DEVICE parameter also has a global association. This is not
-*     controlled by the usual CCDPACK mechanisms, instead it works in
-*     co-operation with KAPPA (SUN/95) image display/control routines.
       
 *  Authors:
 *     MBT: Mark Taylor (STARLINK)
@@ -202,7 +242,7 @@
 
 *  Local Constants:
       INTEGER MAXPOS             ! Maximum positions in the list
-      PARAMETER ( MAXPOS = 99 )
+      PARAMETER ( MAXPOS = 999 )
                      
 *  Status:           
       INTEGER STATUS             ! Global status
@@ -212,18 +252,26 @@
       INTEGER CHR_LEN            ! Length of string excluding trailing spaces
                      
 *  Local Variables:  
+      INTEGER DUMGR              ! Dummy GRP identifier
       INTEGER FD                 ! FIO identifier of output file
       INTEGER ID( MAXPOS )       ! Identifiers for position list
+      INTEGER ILSTGR             ! GRP identifier for input position list files
       INTEGER INDEX              ! Index in list of NDFs
       INTEGER INDF               ! NDF identifier
-      INTEGER LISTGR             ! GRP identifier for group of output files
+      INTEGER IPDAT              ! Pointer to input position list coordinates
+      INTEGER IPIND              ! Pointer to input position list indices
       INTEGER MAXCNV             ! Initial maximum canvas dimension
       INTEGER NDFGR              ! NDG identifier of group of NDFs
+      INTEGER NF                 ! Number of fields per line of input list
+      INTEGER NFIELD             ! Number of fields in first line of input file
       INTEGER NPOS               ! Number of positions in list
       INTEGER NRET               ! Number of returns
       INTEGER NNDF               ! Number of NDFs in group
+      INTEGER OLSTGR             ! GRP identifier for output position list files
       INTEGER WINDIM( 2 )        ! Dimensions of display window
+      LOGICAL INEXT              ! True if input position list is in extension
       LOGICAL LOPEN              ! True if output file is open
+      LOGICAL RDLIST             ! True if using initial position lists
       LOGICAL SHOIND             ! True if index numbers are to be plotted
       DOUBLE PRECISION PERCNT( 2 ) ! Low and high percentiles for display
       DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
@@ -244,6 +292,43 @@
 
 *  Begin NDF context.
       CALL NDF_BEGIN
+      NDFGR = GRP__NOID
+
+*  Determine if we will be using initial position lists.
+      CALL PAR_GET0L( 'READLIST', RDLIST, STATUS )
+
+*  If so, get a group of NDFs and a group of input position lists 
+*  from the parameter system.
+      IF ( RDLIST ) THEN
+
+*  See if the input list is to be determined from the NDF extension.
+         CALL PAR_GET0L( 'INEXT', INEXT, STATUS )
+
+*  Get the NDFs and input position lists.
+         IF ( INEXT ) THEN
+            CALL CCD1_GTLIG( .TRUE., 'CURRENT_LIST', 'IN', 1, 
+     :                    CCD1__MXNDF, NNDF, ILSTGR, NDFGR, STATUS )
+         ELSE
+            CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
+            CALL CCD1_GTLIG( .FALSE., ' ', 'INLIST', NNDF, NNDF, NRET,
+     :                       ILSTGR, DUMGR, STATUS )
+            CALL CCD1_GRDEL( DUMGR, STATUS )
+         END IF
+
+*  Otherwise, just get a group of NDFs.
+      ELSE
+         CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+*  Get a group of output lists from the parameter system.
+      CALL CCD1_STRGR( 'OUTLIST', NDFGR, NNDF, NNDF, OLSTGR, NRET,
+     :                 STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL CCD1_MSG( ' ', ' Output lists will not be written', 
+     :                  STATUS )
+      END IF
 
 *  Get display preference parameters from the parameter system.
       CALL PAR_GET0L( 'SHOWIND', SHOIND, STATUS )
@@ -252,19 +337,7 @@
       CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
       CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
       CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
-
-*  Get a group of NDFs from the parameter system.
-      CALL CCD1_NDFGL( 'IN', 1, CCD1__MXNDF, NDFGR, NNDF, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-*  Get a group of output lists from the parameter system.
-      CALL CCD1_STRGR( 'OUTLIST', NDFGR, NNDF, NNDF, LISTGR, NRET,
-     :                 STATUS )
-      IF ( STATUS .EQ. PAR__NULL ) THEN
-         CALL ERR_ANNUL( STATUS )
-         CALL CCD1_MSG( ' ', ' Output lists will not be written', 
-     :                  STATUS )
-      END IF
 
 *  Issue instructions about how to interact with the GUI.
       CALL MSG_BLANK( STATUS )
@@ -282,15 +355,80 @@
          CALL GRP_GET( NDFGR, INDEX, 1, NDFNAM, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  Log to user.
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL MSG_SETC( 'NDF', NDFNAM )
+         CALL CCD1_MSG( ' ', '  Displaying NDF ^NDF', STATUS )
+
+*  Unless we read some in, there will be no positions in the initial 
+*  position list.
+         NPOS = 0
+
+*  If we are using an initial position list, we will have to read the 
+*  positions in.
+         IF ( RDLIST ) THEN
+
+*  Open the input file and test the number of entries.
+            CALL GRP_GET( ILSTGR, INDEX, 1, FNAME, STATUS )
+            CALL CCD1_OPFIO( FNAME, 'READ', 'LIST', 0, FD, STATUS )
+            CALL CCD1_LTEST( FD, LINE, CCD1__BLEN, 2, 0, NFIELD, 
+     :                       STATUS )
+
+*  Map in X and Y positions only (non-standard file).
+            IF ( NFIELD .EQ. 2 ) THEN
+               CALL CCD1_NLMAP( FD, LINE, CCD1__BLEN, IPDAT, NPOS,
+     :                          NF, STATUS )
+
+*  Standard file format map these in.
+            ELSE
+               CALL CCD1_LMAP( FD, LINE, CCD1__BLEN, IPIND, IPDAT,
+     :                         NPOS, NF, STATUS )
+            END IF
+
+*  Close the input file.
+            CALL FIO_CLOSE( FD, STATUS )
+
+*  Log to user.
+            CALL MSG_SETI( 'NPOS', NPOS )
+            CALL MSG_SETC( 'ILIST', FNAME )
+            CALL CCD1_MSG( ' ', 
+     :      '     Read ^NPOS positions from file ^ILIST.', STATUS )
+
+*  If there are too many points in the input position list then prepare
+*  to truncate it.
+            IF ( NPOS .GT. MAXPOS ) THEN
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL CCD1_MSG( ' ', 
+     :         '     Warning - too many points in input list,', STATUS )
+               CALL MSG_SETI( 'NPOS', NPOS )
+               CALL MSG_SETI( 'MAX', MAXPOS )
+               CALL CCD1_MSG( ' ',
+     :        '               using only the first ^NPOS/^MAX', STATUS )
+               NPOS = MAXPOS
+            END IF
+
+*  Copy the points so they can be read by the GUI routine, and free the 
+*  temporarily allocated memory.
+            IF ( NFIELD .EQ. 2 ) THEN
+               CALL CCD1_GISEQ( 1, 1, NPOS, ID, STATUS )
+            ELSE
+               CALL CCG1_COPAI( NPOS, %VAL( IPIND ), ID, STATUS )
+               CALL CCD1_MFREE( IPIND, STATUS )
+            END IF
+            CALL CCD1_LEXT( %VAL( IPDAT ), NPOS, NF, 1, XPOS, STATUS )
+            CALL CCD1_LEXT( %VAL( IPDAT ), NPOS, NF, 2, YPOS, STATUS )
+            CALL CCD1_MFREE( IPDAT, STATUS )
+         END IF
+         
+
 *  Invoke the Tcl code to do the work.
          CALL CCD1_TCURS( NDFNAM( 1:CHR_LEN( NDFNAM ) ), MAXPOS, SHOIND, 
      :                    PERCNT, ZOOM, MAXCNV, WINDIM, ID, XPOS, YPOS,
      :                    NPOS, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Access the output file in which to store the positions.  The name
-*  of this file is stored in the LISTGR list of names.
-         CALL GRP_GET( LISTGR, INDEX, 1, FNAME, STATUS )
+*  of this file is stored in the OLSTGR list of names.
+         CALL GRP_GET( OLSTGR, INDEX, 1, FNAME, STATUS )
          CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
          IF ( STATUS .NE. SAI__OK ) GO TO 99
          LOPEN = .TRUE.
@@ -303,12 +441,11 @@
      :                    STATUS )
 
 *  Report file used and number of entries.
-         CALL CCD1_MSG( ' ', ' ', STATUS )
          CALL FIO_FNAME( FD, FNAME, STATUS )
          CALL MSG_SETC( 'FNAME', FNAME )
          CALL MSG_SETI( 'NPOS', NPOS )
          CALL CCD1_MSG( ' ', 
-     :                  '  ^NPOS entries written to file ^FNAME',
+     :                  '     Wrote ^NPOS positions to file ^FNAME.',
      :                  STATUS )
 
          IF ( NPOS .GT. 0 .AND. STATUS .EQ. SAI__OK ) THEN
@@ -352,8 +489,13 @@
 *  End NDF context.
       CALL NDF_END( STATUS )
 
-*  Delete NDG group.
-      CALL GRP_DELET( NDFGR, STATUS )
+*  Release group resources.
+      CALL CCD1_GRDEL( NDFGR, STATUS )
+      CALL CCD1_GRDEL( ILSTGR, STATUS )
+      CALL CCD1_GRDEL( OLSTGR, STATUS )
+
+*  Ensure allocated memory is freed.
+      CALL CCD1_MFREE( -1, STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
