@@ -1326,9 +1326,14 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
           <p>You can pass options to the compiler using the
             <code>CFLAGS</code> variable, for example in the form
-            <code>CFLAGS=-g</code>.</p>
+            <code>CFLAGS=-g</code>.  The variables <code>CFLAGS</code>
+            and <code>LDFLAGS</code> are examples of variables you
+            might usefully set and export in the environment, for
+            example to point <code>./configure</code> to software
+            installed in non-standard places, such as
+            <code>/opt</code> or <code>/sw</code>.</p>
 
-          <p>The down-side of this is that these environment variables
+          <p>The important point of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
               behaviour of <code>./configure</code></em>.  You should
             not have them set in your environment if you don't want
@@ -2194,6 +2199,14 @@ autoconf (GNU Autoconf) 2.59
           directory and recurses into the children named in
           <code>AC_CONFIG_SUBDIRS</code> in this
           <code>configure.ac</code> and those below it.</p>
+
+        <p>If you will need to give <code>./configure</code> some help
+          to find include files and libraries (for example, you are on a
+          Mac and have installed Fink in <code>/sw</code> or OpenDarwin
+          in <code>/opt/local</code>, or are on a Sun and have extra
+          software in <code>/opt</code>), then do so by setting (for
+          example) <code>CFLAGS=-I/opt/local/include</code> and
+          <code>LDFLAGS=-L/opt/local/lib</code> in the environment.</p>
 
         <p>Line 9: build the entire tree, using the <kbd>make
             world</kbd> target described in <ref
