@@ -1,7 +1,7 @@
-      INTEGER FUNCTION HLPS_GTHLPI( STRING, PROMPT, LINCH )
+      INTEGER FUNCTION SHL_GTHLPI( STRING, PROMPT, LINCH )
 *+
 *  Name:
-*     HLPS_GTHLPI
+*     SHL_GTHLPI
 
 *  Purpose:
 *     Gets one line input during an help session.
@@ -30,7 +30,7 @@
 *        The global status.
 
 *  Returned Value:
-*     HLPS_GTHLPI = INTEGER
+*     SHL_GTHLPI = INTEGER
 *        The status.  If the line was inpput correctly a value of 1 is
 *        returned.
 
@@ -48,7 +48,7 @@
 *     1992 June 22 (MJC):
 *        Converted to SST prologue and documented global parameters.
 *     2004 July 15 (TIMJ):
-*        Move to HLPS library
+*        Move to SHL library
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -63,7 +63,7 @@
       INCLUDE 'SAE_PAR'        ! SSE global definitions
 
 *  Global Variables:
-      INCLUDE 'HLPS_HLPCMD'    ! HLPS help I/O
+      INCLUDE 'SHL_HLPCMD'    ! SHL help I/O
 *        CMD = CHARACTER * ( 80 ) (Write)
 *           The command line.
 *        HELPN = LOGICAL (Read)
@@ -114,7 +114,7 @@
      :        WRITE ( LUTERM, '(1X,A,$)' ) PROMPT
 
 *  Get a line of uppercase input.
-            CALL HLPS_SREAD ( LUCMD, BUFA, BUFB, STRING, J )
+            CALL SHL_SREAD ( LUCMD, BUFA, BUFB, STRING, J )
 
 *  Treat comment or EOF as blank input.
             IF ( J .GT. 0 ) STRING = ' '
@@ -148,6 +148,6 @@
 
 *  Set the status and exit.
  9900 CONTINUE
-      HLPS_GTHLPI = 1
+      SHL_GTHLPI = 1
 
       END

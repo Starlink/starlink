@@ -1,7 +1,7 @@
-      SUBROUTINE HLPS_ADAM( LIBNAM, ISENV, STATUS )
+      SUBROUTINE SHL_ADAM( LIBNAM, ISENV, STATUS )
 *+
 *  Name:
-*     HLPS_ADAM
+*     SHL_ADAM
 
 *  Purpose:
 *     Gives help about specified application
@@ -13,7 +13,7 @@
 *     Subroutine
 
 *  Invocation:
-*     CALL HLPS_ADAM( LIBNAM, STATUS )
+*     CALL SHL_ADAM( LIBNAM, STATUS )
 
 *  Arguments:
 *     LIBNAM = CHARACTER (Given)
@@ -142,7 +142,7 @@
 *     1995 November 9 (MJC):
 *        Modified for UNIX and added the Topic on Navigation.
 *     2004 July 25 (TIMJ):
-*        Make standalone from KAPPA. Now in HLPS. Additional argument.
+*        Make standalone from KAPPA. Now in SHL. Additional argument.
 *        Allow for optional .shl, optional _HELP and explicit filename.
 *     {enter_further_changes_here}
 
@@ -152,7 +152,7 @@
 *
 *      1. Have an IFL file matching the correct parameters for the
 *      name of the action as specified in the above section. testhelp.ifl
-*      in the HLPS distribution can be used as a template. (Copy it and
+*      in the SHL distribution can be used as a template. (Copy it and
 *      change the name)
 *
 *      2. The A-task/monolith subroutine can be very thin. The following
@@ -160,7 +160,7 @@
 *      code required for the help library:
 *
 *          SUBROUTINE MYHELP( STATUS )
-*          CALL HLPS_ADAM( 'MYHELP', .TRUE., STATUS )
+*          CALL SHL_ADAM( 'MYHELP', .TRUE., STATUS )
 *          END
 *
 *      which will read the environment variable call MYHELP_HELP.
@@ -281,7 +281,7 @@
          END IF
 
 *  Get help text.
-         CALL HLPS_GETHLP( LIBRAY, HLPTXT, STATUS )
+         CALL SHL_GETHLP( LIBRAY, HLPTXT, STATUS )
       END IF
 
       END

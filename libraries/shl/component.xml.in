@@ -4,8 +4,8 @@
 
 <component id="@PACKAGE@">
   <version>@PACKAGE_VERSION@</version>
-  <path>libraries/hlps</path>
-  <description>HLPS -- High level support library for HLP</description>
+  <path>libraries/shl</path>
+  <description>SHL -- Support for HLP Library access</description>
   <abstract><p>The Starlink HLP system allows an application program
       to retrieve named items from a hierarchically-arranged library
       of text.  The facility resembles VAX/VMS HELP.  It consists of a
@@ -17,10 +17,10 @@
      standard KAPPA help application code. Implemented by copying
      the kappa files to each application in turn. Now that all the
      applications are in a single location, the kappa help infrastructure
-     has been factored out into the HLPS library.</p>
+     has been factored out into the SHL library.</p>
      <p>In addition to the KAPPA fortran infrastructure, a C implementation
      of a help browser has also been integrated (from figaro) into
-     HLPS.</p>
+     SHL.</p>
   </abstract>
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@

@@ -1,41 +1,41 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = hlps_link hlps_link_adam
+bin_SCRIPTS = shl_link shl_link_adam
 
 bin_PROGRAMS = browsehlp
-include_HEADERS = hlps.h
+include_HEADERS = shl.h
 
 browsehlp_SOURCES = browsehlp.c
 browsehlp_LDADD = `hlp_link` `fio_link` `err_link` `one_link` \
-	libhlps.la @FCLIBS@
-browsehlp_DEPENDENCIES = hlps.h
+	libshl.la @FCLIBS@
+browsehlp_DEPENDENCIES = shl.h
 
-lib_LTLIBRARIES = libhlps.la libhlps_adam.la
+lib_LTLIBRARIES = libshl.la libshl_adam.la
 
-libhlps_la_SOURCES = \
+libshl_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
-libhlps_adam_la_SOURCES = $(ADAM_F_ROUTINES)
+libshl_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
-PRIVATE_INCLUDES = HLPS_HLPCMD
+PRIVATE_INCLUDES = SHL_HLPCMD
 
 # These are the standard KAPPA help routines renamed to
-# enter the HLPS namespace
-F_ROUTINES = hlps_gethlp.f hlps_gthlpi.f hlps_pthlpo.f hlps_sread.f
+# enter the SHL namespace
+F_ROUTINES = shl_gethlp.f shl_gthlpi.f shl_pthlpo.f shl_sread.f
 
 # This is a modification of a standard A-task help application
 # subroutine re-written to be callable with the help environment
 # variable name. It makes calls to PAR etc so is kept separate.
-ADAM_F_ROUTINES = hlps_adam.f
+ADAM_F_ROUTINES = shl_adam.f
 
 # This is the standard Figaro C browser. Does not require the 
 # fortran routines but does require the HLP library. Included
-# in the standard libhlps library since there is no gain
+# in the standard libshl library since there is no gain
 # in having it separate (since F77 libraries are still required for
 # the link).
-C_ROUTINES = hlps_standalone.c
+C_ROUTINES = shl_standalone.c
 
 # Testing
 TESTS = testhelp
@@ -43,7 +43,7 @@ TESTS = testhelp
 check_MONOLITHS = testhelp
 testhelp_TASKS = 
 testhelp_SOURCES = testhelp.f
-testhelp_LDADD = libhlps.la libhlps_adam.la \
+testhelp_LDADD = libshl.la libshl_adam.la \
 	`hlp_link_adam` `one_link` `fio_link_adam`
 
 testhelp_DEPENDENCIES = demo.shl

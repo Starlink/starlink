@@ -1,9 +1,9 @@
 /*
  * Name:
- *    hlps.h
+ *    shl.h
  *
  * Purpose:
- *    Header file for defining HLPS C function prototypes
+ *    Header file for defining SHL C function prototypes
  *
  * Language:
  *    ANSI C
@@ -19,5 +19,5 @@
  *
  */
 
-void hlps_standalone( char * hlp_library, int argc, char ** argv );
+void shl_standalone( char * hlp_library, int argc, char ** argv );
 

@@ -1,6 +1,6 @@
 /*+
  * Name:
- *    hlps_standalone
+ *    shl_standalone
 
  * Purpose:
  *    Browse through a Starlink help library.
@@ -12,7 +12,7 @@
  *    Library function
 
  * Invocation:
- *    hlps_standalone( helplb, argc, argv );
+ *    shl_standalone( helplb, argc, argv );
  
  * Arguments:
  *    helplb = char * (Given)
@@ -82,10 +82,10 @@
  *    routine, the main has to be provided by the programmer. It should
  *    look something like this:
  *
- *    #include "hlps.h"
+ *    #include "shl.h"
  *    void main( int argc, char **argv )
  *    { 
- *       (void) hlps_standalone( "KAPPA", argc, argv );
+ *       (void) shl_standalone( "KAPPA", argc, argv );
  *    }
  *
  *    Where the first argument is the name of the application help
@@ -94,12 +94,12 @@
  *    contains the location of a help file.
  *
  *    The main routine can be compiled as normal but need to be linked
- *    against the hlps library and the Fortran runtime libraries. Outside
+ *    against the shl library and the Fortran runtime libraries. Outside
  *    of autoconf, the easiest way to do this is to compile the
  *    main routine without linking, and then link using the fortran compiler:
  *
  *    cc  -I/star/include -c helpm.c
- *    f77 -o helpc helpm.o `hlps_link`
+ *    f77 -o helpc helpm.o `shl_link`
  *
  *    gcc or cc cannot be used as linker, since they do not link with the
  *    Fortran libraries that FIO and HLP require. f77 seems to link C code only
@@ -118,7 +118,7 @@
  *    10 Feb 1998 (ajc):
  *       Mod to use termios
  *    24 Jul 2004 (timj):
- *       Incorporate into HLPS library. Now standalone.
+ *       Incorporate into SHL library. Now standalone.
  *       Uses one_scrsz. Allows for envvar to have optional _HELP
  *       in supplied value, and optional .shl
 
@@ -197,7 +197,7 @@ int line;   /* Lines written   */
 /*:
  */
 
-void hlps_standalone( char * help_library, int argc, char **argv )
+void shl_standalone( char * help_library, int argc, char **argv )
 {
    extern int width;
    extern int page;

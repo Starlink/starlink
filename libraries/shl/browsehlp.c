@@ -1,11 +1,11 @@
 
 
 #include <stdlib.h>
-#include "hlps.h"
+#include "shl.h"
 
 int main( int argc, char **argv )
 {
   /* Really need to prompt for a library if -l has not been specified */
-  (void) hlps_standalone( NULL, argc, argv );
+  (void) shl_standalone( NULL, argc, argv );
   return EXIT_SUCCESS;
 }

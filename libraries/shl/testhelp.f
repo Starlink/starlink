@@ -110,7 +110,7 @@
 
 *  History:
 *     25 July 2004 (TIMJ):
-*        Simple template for new HLPS system.
+*        Simple template for new SHL system.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -121,15 +121,15 @@
 *.
 
 *     The test reads a known help file
-      CALL HLPS_ADAM( './demo', .FALSE., STATUS )
+      CALL SHL_ADAM( './demo', .FALSE., STATUS )
 
 *  In general, an environment variable would be used.
 *  $DEMO_HELP in these (commented out) examples
-C      CALL HLPS_ADAM( 'DEMO', .TRUE., STATUS )
-C      CALL HLPS_ADAM( 'DEMO_HELP', .TRUE., STATUS )
+C      CALL SHL_ADAM( 'DEMO', .TRUE., STATUS )
+C      CALL SHL_ADAM( 'DEMO_HELP', .TRUE., STATUS )
 
 C  Obviously nothing stops you adding an extra parameter
 C  that could be used to request the help system prior to calling
-C  HLPS_ADAM
+C  SHL_ADAM
 
       END
