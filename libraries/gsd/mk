@@ -110,6 +110,11 @@
 #	    require a C compiler.
 #        CFLAGS (-O)
 #	    The C compiler options to use.
+#        COMPRESS (compress -v)
+#           Program to use to compress the tar archives
+#        COMPSUFFIX (.Z)
+#           Suffix appropriate to COMPRESS routine. Should be .Z for
+#           compress and .gz for gzip.
 #        FC (f77)
 #	    The Fortran compiler command to use. CCDPACK requires a Fortran
 #	    77 compiler that supports the common "permitted" Starlink
@@ -172,7 +177,7 @@
 #     29-JUN-1994 (HME):
 #        Added the TAR_ADD environment variable.
 #     15-Dec-1999 (TIMJ):
-#        Added Linux
+#        Added Linux. Added $COMPRESS
 #     {enter_changes_here}
 
 #  Bugs:
@@ -186,6 +191,8 @@
       export BLD_SHR
       export CC
       export CFLAGS
+      export COMPRESS
+      export COMPSUFFIX
       export FC
       export FFLAGS
       export LINK
@@ -212,6 +219,8 @@
                FC='f77'
                FFLAGS='-O -w'
                CC='cc'
+               COMPRESS='compress -v'
+               COMPSUFFIX='.Z'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -227,6 +236,8 @@
                FC='f77'
                FFLAGS='-O -w'
                CC='c89'
+               COMPRESS='compress -v'
+               COMPSUFFIX='.Z'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -243,6 +254,8 @@
                FC='f77'
                FFLAGS='-O -w -temp=.'
                CC='gcc'
+               COMPRESS='compress -v'
+               COMPSUFFIX='.Z'
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -257,6 +270,8 @@
                FC='f77'
                FFLAGS='-O -w -temp=.'
                CC='cc'
+               COMPRESS='gzip -v'
+               COMPSUFFIX='.gz'
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xmf'
@@ -272,6 +287,8 @@
                AR_IN='ar r'
                CC='gcc'
                CFLAGS='-I$(STAR_INC) -O'
+               COMPRESS='gzip -v'
+               COMPSUFFIX='.gz'
                FC='g77'
                FFLAGS='-fno-second-underscore -O'
                LINK='ln -s'

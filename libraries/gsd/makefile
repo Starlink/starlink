@@ -233,6 +233,7 @@
 #        Added licence
 #     15-Dec-1999 (TIMJ):
 #        Adapted for use with GSD system.
+#        Add $COMPRESS
 #        PKG Version 1.0
 #     {enter_further_changes_here}
 #
@@ -369,6 +370,11 @@ TAR_OUT = pax -r -f
 #  Command for adding a file to an object archive (.a).
 
 AR_IN = ar -r
+
+#  Command to compress a tar file
+
+COMPRESS = compress -v
+COMPSUFFIX = .Z
 
 #  Default file type extension for a shareable library and command for
 #  building a shareable library (the default acts as a null command).
@@ -535,12 +541,12 @@ TEST_FILES = gsd_test.f gsd_print.f gsd_print.c
 # List of files that need to be in the tar file (gsd_source.tar)
 # but don't have any additional purpose
 
-MISC_FILES = gsd2_copya.out gsd2_nativx.out
+MISC_FILES = gsd2_copya.out gsd2_nativx.out README
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = 
-HYPERTEXT_DOCS = 
+LATEX_DOCS = sun229.tex
+HYPERTEXT_DOCS = sun229.htx_tar
 
 #  List of documentation files.
 
@@ -1187,19 +1193,20 @@ do_test: $(EXTERNAL_INCLUDES)
 #  The export target depends on the resulting compressed tar file being
 #  up to date.
 
-export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+export: $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX)
 	@ echo
 	@ echo \
 '*** Export copy of the built $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX): $(SOURCE_FILES) \
+	$(DATE_STAMP) archive
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1209,10 +1216,10 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) $(BUILT_FILES) $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar$(COMPSUFFIX)
 
 #  export_run: Export the built system (without source).
 #  -----------------------------------------------------
@@ -1222,19 +1229,19 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM).tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  The export_run target depends on the resulting compressed tar file being
 #  up to date.
 
-export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX)
 	@ echo
 	@ echo \
 '*** Export copy of the "runtime" $(PACK_NAME) package is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
 
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX): $(SOURCE_FILES) $(DATE_STAMP) archive
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1244,11 +1251,11 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
         else :; fi
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX); then \
+           rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX); else :; fi
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
            $(DATE_STAMP) .BUILT \
-           | compress -v > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar$(COMPSUFFIX)
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1258,24 +1265,24 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
 #  This target depends on the resulting compressed tar file being up to
 #  date.
 
-export_source: $(EXPORT)/$(PKG_NAME).tar.Z
+export_source: $(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX)
 	@ echo
 	@ echo \
 '*** Export copy of the $(PACK_NAME) package source is in the compressed'
 	@ echo \
-'    tar file $(EXPORT)/$(PKG_NAME).tar.Z'
+'    tar file $(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX)'
 	@ echo
 
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files.
 
-$(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
+$(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX): $(SOURCE_FILES) archive
 #
 #  Remove any pre-existing tar files before creating new ones.
-	if test -f $(EXPORT)/$(PKG_NAME).tar.Z; then \
-           rm -f $(EXPORT)/$(PKG_NAME).tar.Z; else :; fi
+	if test -f $(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX); then \
+           rm -f $(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX); else :; fi
 	$(TAR_IN) - $(SOURCE_FILES) \
-           | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
+           | $(COMPRESS) > $(EXPORT)/$(PKG_NAME).tar$(COMPSUFFIX)
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -1308,13 +1315,21 @@ unbuild: clean
 #  archive: Create the source tar file
 #  -----------------------------------
 
-archive: $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
+archive:  $(PKG_NAME)_source.tar
+	@ echo
+	@ echo '*** Source files written to $(PKG_NAME)_source.tar '
+	@ echo '    source archive'
+	@ echo
+
+
+$(PKG_NAME)_source.tar: $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) \
+         $(PRIVATE_INCLUDES) \
          $(F_ROUTINES) $(PLATFORM_F_VARIANTS) $(F_ROUTINES_SED) \
          $(BLOCK_DATA) \
          $(C_ROUTINES) $(PLATFORM_C_VARIANTS) \
          $(STARTUP_SCRIPT) $(FAC_ERRS) \
-         $(TEST_FILES)
-	rm -f $(PKG_NAME)_source.tar
+         $(TEST_FILES) $(MISC_FILES)
+	rm -f $(PKG_NAME)_source.tar 1>/dev/null 2>/dev/null
 	$(TAR_IN) $(PKG_NAME)_source.tar \
          $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
          $(F_ROUTINES) $(PLATFORM_F_VARIANTS) $(F_ROUTINES_SED) \

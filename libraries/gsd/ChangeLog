@@ -1,3 +1,9 @@
+1999-12-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* mk: Add $(COMPRESS) and $(COMPSUFFIX)
+
+	* makefile: Set $(DOCUMENTATION). Add $(COMPRESS) and $(COMPSUFFIX)
+
 1999-12-16  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* gsd_test.f (GSD_PRINT): Fix format statement errors for 'X' on linux
