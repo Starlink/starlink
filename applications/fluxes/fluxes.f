@@ -1586,14 +1586,16 @@ C  GET UT in an array
      
 *     Data arrays:
 *     TB1AR  - array of 100 TB'S for MJD's 46040 - 50000 in steps of 40 days
-*     TBWRIGHT - array of 232 TB's from simplified Wright model; step 40 days
+*     TBWRIGHT - array of 327 TB's from simplified Wright model; step 40 days
 *     Input:
 *     RJD    - J.D. for which M.350.TB. is calculated by interpolation
 *     Output:
 *     TBAR   - M.350.TB. calculated by interpolation for RJD
 *     IERR   - Error condition (0 = OK; 1 = MJD out of valid range)
      
-*     On error TBAR is set to 
+*     IERR is not returned. STARLINK status is returned instead but is
+*     not actually set in this routine. Routine returns immediately if
+*     STATUS is bad on entry.
 
 ************************************************************************
      
