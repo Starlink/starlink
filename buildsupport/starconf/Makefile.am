@@ -14,7 +14,6 @@ pkgdata_DATA = \
 # True?
 # CLEANFILES=starconf
 
-## AUTOCONF_MACRO_DIR = @AUTOCONF_MACRO_DIR@
 aclocal_DATA = starconf.m4
 
 # The edits of replacement variables (prefix and co) in
@@ -36,9 +35,9 @@ edit = @PERL@ -p \
 	-e 's,\@STARCONF_DEFAULT_PREFIX\@,@STARCONF_DEFAULT_PREFIX@,g;' \
 	-e 's,\@PACKAGE_VERSION\@,@PACKAGE_VERSION@,g;' \
 	-e 's,\@PACKAGE_VERSIONINT\@,@PACKAGE_VERSIONINT@,g;'\
-	-e 's,\@AUTOCONF_MACRO_DIR\@,$(AUTOCONF_MACRO_DIR),g;' \
+	-e 's,\@aclocaldir\@,$(aclocaldir),g;' \
 	-e '/^XXXINCLUDE *(\S*)/ && do { open (F, "<$$1") || die "Unable to open $$1"; while(<F>) { print; } close (F); };'
-starconf: starconf.in bootstrap.installed
+starconf: starconf.in bootstrap.installed config.status
 	rm -f starconf starconf.tmp
 	$(edit) $(srcdir)/starconf.in >starconf.tmp
 	mv starconf.tmp starconf

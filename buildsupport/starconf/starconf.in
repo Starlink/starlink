@@ -144,7 +144,7 @@ test -f componentinfo.dtd || {
 }
 
 # Find aclocal, and confirm that "aclocal --print-ac-dir" is the same
-# directory in which starconf.m4 was installed (@AUTOCONF_MACRO_DIR@).
+# directory in which starconf.m4 was installed (@aclocaldir@).
 #
 # The user can still subvert this, by changing their aclocal path
 # afterwards, but we can check that nothing is outrageously wrong here.
@@ -162,11 +162,12 @@ done
 if test -z "$aclocalpath"; then
     echo "Error: I can't find aclocal in the path!" >&2
     exit 1
-elif test "`$aclocalpath --print-ac-dir`" != "@AUTOCONF_MACRO_DIR@"; then
+elif test "`$aclocalpath --print-ac-dir`" != "@aclocaldir@"; then
     echo "Error: The \$PATH aclocal ($aclocalpath)" >&2
-    echo "  looks for extension macros in" `$aclocalpath --print-ac-dir` >&2
-    echo "  but starconf extension were installed in" >&2
-    echo "  @AUTOCONF_MACRO_DIR@." >&2
+    echo "  looks for extension macros in" >&2
+    echo "  "`$aclocalpath --print-ac-dir` >&2
+    echo "  but the starconf extensions were installed in" >&2
+    echo "  @aclocaldir@" >&2
     echo "  You need to fix your path and rerun starconf" >&2
     exit 1
 fi
