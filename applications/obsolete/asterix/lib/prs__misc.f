@@ -82,8 +82,8 @@
       LEN      = 0
 
       DO WHILE (CONTINUE)
-        CALL PAR_GET0C (PAR, INPUT, STATUS)
-        CALL PAR_CANCL (PAR,        STATUS)
+        CALL USI_GET0C (PAR, INPUT, STATUS)
+        CALL USI_CANCL (PAR,        STATUS)
 
 *      Check status
         IF (STATUS .NE. SAI__OK) GOTO 999
@@ -91,7 +91,7 @@
         MORE = INDEX(INPUT, '&') - 1
 
         IF (MORE .GT. -1) THEN
-          CALL PAR_PROMT (PAR, 'Continuation', STATUS)
+          CALL USI_PROMT (PAR, 'Continuation', STATUS)
 
           IF (LEN .GT. 0) THEN
             STRING = STRING(1:LEN)//INPUT(1:MORE)

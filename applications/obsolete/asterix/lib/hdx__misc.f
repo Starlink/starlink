@@ -39,7 +39,7 @@
 *
 100	CONTINUE
 *
-	CALL PAR_GET0C(PAR_NAME, FNAME, STATUS)
+	CALL USI_GET0C(PAR_NAME, FNAME, STATUS)
 *
 	CALL HDS_NEW(FNAME, 'DATASET', TYPE, 0, 0, LOC, STATUS)
 *
@@ -50,7 +50,7 @@
 		CALL ERR_REP(' ','OPENHDS_NEW error: cannot open file',
      &                                                    STATUS)
                 CALL ERR_FLUSH(STATUS)
-		CALL PAR_CANCL(PAR_NAME,STATUS)
+		CALL USI_CANCL(PAR_NAME,STATUS)
 *
 		GO TO 100
 *
@@ -93,7 +93,7 @@
 *
 100	CONTINUE
 *
-	CALL PAR_GET0C(PAR_NAME, FNAME, STATUS)
+	CALL USI_GET0C(PAR_NAME, FNAME, STATUS)
 *
 	CALL HDS_OPEN(FNAME, 'UPDATE', LOC, STATUS)
 *
@@ -104,7 +104,7 @@
 		CALL ERR_REP(' ','HDX_OPEN error: cannot open file',
      &                                                    STATUS)
                 CALL ERR_FLUSH(STATUS)
-		CALL PAR_CANCL(PAR_NAME,STATUS)
+		CALL USI_CANCL(PAR_NAME,STATUS)
 *
 		GO TO 100
 *

@@ -66,22 +66,22 @@
 
 *    Set the default if required
       IF ( USEDEFAULT ) THEN
-	CALL PAR_DEF0C( PAR, DEFAULT, STATUS )
+	CALL USI_DEF0C( PAR, DEFAULT, STATUS )
 	STATUS = SAI__OK
       ELSE
-	CALL PAR_DEF0C( PAR, 'ANALYTIC', STATUS )
+	CALL USI_DEF0C( PAR, 'ANALYTIC', STATUS )
       END IF
 
 *    Display PSFs first time through
-      CALL PAR_STATE( PAR, STATE, STATUS )
+      CALL USI_STATE( PAR, STATE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( STATE .NE. PAR__ACTIVE ) THEN
         CALL PSF_DISPLAY( STATUS )
       END IF
 
 *    Ask user to choose a PSF
- 59   CALL PAR_GET0C( PAR, UPSF, STATUS )
-      CALL PAR_CANCL( PAR, STATUS )
+ 59   CALL USI_GET0C( PAR, UPSF, STATUS )
+      CALL USI_CANCL( PAR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Locate interesting bit of string

@@ -67,7 +67,7 @@
       END DO
 
 *    Ask for the axis upon which the application is going to work.
-      CALL PAR_GET0I('APP_DIM',APP_DIM,STATUS)
+      CALL USI_GET0I('APP_DIM',APP_DIM,STATUS)
 
 *    Check status
       IF (STATUS .NE. SAI__OK) GOTO 999
@@ -100,9 +100,9 @@
           INPUT = .TRUE.
 
           DO WHILE (INPUT)
-            CALL PAR_DEF0R ('LOWER', START(LP), STATUS)
-            CALL PAR_GET0R ('LOWER', RMIN,      STATUS)
-            CALL PAR_CANCL ('LOWER',            STATUS)
+            CALL USI_DEF0R ('LOWER', START(LP), STATUS)
+            CALL USI_GET0R ('LOWER', RMIN,      STATUS)
+            CALL USI_CANCL ('LOWER',            STATUS)
 
 *          Check status
             IF (STATUS .NE. SAI__OK) GOTO 999
@@ -122,9 +122,9 @@
           INPUT = .TRUE.
 
           DO WHILE (INPUT)
-            CALL PAR_DEF0R ('UPPER', STOP(LP), STATUS)
-            CALL PAR_GET0R ('UPPER', RMAX,     STATUS)
-            CALL PAR_CANCL ('UPPER',           STATUS)
+            CALL USI_DEF0R ('UPPER', STOP(LP), STATUS)
+            CALL USI_GET0R ('UPPER', RMAX,     STATUS)
+            CALL USI_CANCL ('UPPER',           STATUS)
 
 *          Check status
             IF (STATUS .NE. SAI__OK) GOTO 999
