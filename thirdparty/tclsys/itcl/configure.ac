@@ -16,6 +16,10 @@ AC_CONFIG_SRCDIR([tcl.m4])
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
+dnl    Locate a suitable Tcl/Tk
+STAR_CHECK_PROGS(tcl,Tcl_AppInit)
+STAR_CHECK_PROGS(tk,Tk_Init)
+
 dnl    We may want to invoke make recursively
 AC_PROG_MAKE_SET
 
