@@ -74,6 +74,7 @@
 
 *  Local Variables:
       CHARACTER NAME * ( 15 )     ! Task name from the command
+      LOGICAL REPL                ! Replace input NDFs?
       LOGICAL DISAB               ! Disable looping?
       LOGICAL VERB                ! Run in verbose mode?
       REAL DELAY                  ! Delay between loops in seconds

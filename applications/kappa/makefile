@@ -895,21 +895,21 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES) ME_COM CCD1_PAR C1_COM SFT_COM
 #  Rules to set up links to locate each of the above include files.
 #
 AGI_ERR:	$(STAR_INC)/agi_err;	$(LINK) $? $@
-AST_PAR:	$(INSTALL)/include/ast_par;	$(LINK) $? $@
+AST_PAR:	$(STAR_INC)/ast_par;	$(LINK) $? $@
 C1_COM:	     	c1_com;           	$(LINK) $? $@
 CCD1_PAR:	ccd1_par;           	$(LINK) $? $@
 CHR_ERR:	$(STAR_INC)/chr_err;	$(LINK) $? $@
-CTM_PAR:	$(INSTALL)/include/ctm_par;	$(LINK) $? $@
+CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
 DAT_ERR:	$(STAR_INC)/dat_err;	$(LINK) $? $@
 DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
 FIO_ERR:	$(STAR_INC)/fio_err;	$(LINK) $? $@
 FIO_PAR:	$(STAR_INC)/fio_par;	$(LINK) $? $@
 GRP_PAR:	$(STAR_INC)/grp_par;	$(LINK) $? $@
-HLPCMD:		$(INSTALL)/include/hlpcmd;	$(LINK) $? $@
-IRA_PAR:	$(INSTALL)/include/ira_par;	$(LINK) $? $@
-IRQ_ERR:	$(INSTALL)/include/irq_err;	$(LINK) $? $@
-IRQ_PAR:	$(INSTALL)/include/irq_par;	$(LINK) $? $@
-KPG_AST:	$(INSTALL)/include/kpg_ast;	$(LINK) $? $@
+HLPCMD:		$(STAR_INC)/hlpcmd;	$(LINK) $? $@
+IRA_PAR:	$(STAR_INC)/ira_par;	$(LINK) $? $@
+IRQ_ERR:	$(STAR_INC)/irq_err;	$(LINK) $? $@
+IRQ_PAR:	$(STAR_INC)/irq_par;	$(LINK) $? $@
+KPG_AST:	$(STAR_INC)/kpg_ast;	$(LINK) $? $@
 MAG_ERR:	$(STAR_INC)/mag_err;	$(LINK) $? $@
 ME_COM:	     	me_com;           	$(LINK) $? $@
 MSG_PAR:	$(STAR_INC)/msg_par;	$(LINK) $? $@
