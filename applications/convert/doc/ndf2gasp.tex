@@ -1,0 +1,99 @@
+\newpage
+\sstroutine{
+   NDF2GASP
+}{
+   Converts a two-dimensional NDF into a GASP image
+}{
+   \sstdescription{
+      This application converts a two-dimensional NDF into the GAlaxy
+      Surface Photometry (GASP) package's format.  See the Notes for the
+      details of the conversion.
+   }
+   \sstusage{
+      ndf2gasp in out [fillbad]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         The input NDF data structure. The suggested default is the
+         current NDF if one exists, otherwise it is the current value.
+      }
+      \sstsubsection{
+         FILLBAD = \_INTEGER (Read)
+      }{
+         The value used to replace bad pixels in the NDF's data array
+         before it is copied to the GASP file.  The value must be in the
+         range of signed words (-32768 to 32767).  A null value ({\tt !})
+         means no replacements are to be made.  This parameter is
+         ignored if there are no bad values.  {\tt [!]}
+      }
+      \sstsubsection{
+         OUT = LITERAL (Write)
+      }{
+         The name of the output GASP image.  Two files are produced
+         with the same name but different extensions.  The {\tt "}.dat{\tt "} file
+         contains the data array, and {\tt "}.hdr{\tt "} is the associated header
+         file that specifies the dimensions of the image.  The
+         suggested default is the current value.
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         ndf2gasp abell1367 a1367
+      }{
+         Converts an NDF called abell1367 into the GASP image comprising
+         the pixel file a1367.dat and the header file a1367.hdr.  If
+         there are any bad values present they are copied verbatim to
+         the IRAF image.
+      }
+      \sstexamplesubsection{
+         ndf2gasp ngc253 ngc253 fillbad=-1
+      }{
+         Converts the NDF called ngc253 to a GASP image comprising the
+         pixel file ngc253.dat and the header file ngc253.hdr.  Any bad
+         values in the data array are replaced by minus one.
+      }
+   }
+   \sstnotes{
+      The rules for the conversion are as follows:
+      \sstitemlist{
+
+         \sstitem
+         The NDF data array is copied to the {\tt "}.dat{\tt "} file.
+
+         \sstitem
+         The dimensions of the NDF data array is written to the {\tt "}.hdr{\tt "}
+         header file.
+
+         \sstitem
+         All other NDF components are ignored.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      GASP2NDF
+   }
+   \sstdiytopic{
+      References
+   }{
+      GASP documentation (MUD/66).
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         The GASP image produced has by definition type SIGNED WORD.
+         There is type conversion of the data array to this type.
+
+         \sstitem
+         Bad values may arise due to type conversion.  These too are
+         substituted by the (non-null) value of FILLBAD.
+
+         \sstitem
+         For an NDF with an odd number of columns, the last column from
+         the GASP image is trimmed.
+      }
+   }
+}
