@@ -36,15 +36,42 @@ Support back-matter elements.  Changes here might need matching changes
 in mode make-manifest-mode in sl.dsl
 <codebody>
 (element backmatter
-  (if (or (hasnotes?) (hasbibliography?) (hashistory?))
-      (html-document (with-mode section-reference
-		       (process-node-list (current-node)))
+  (empty-sosofo))
+
+(define (hasbackmatter?)
+  (or (hasnotes?) (hasbibliography?) (hashistory?)))
+
+;; Do NOT call this within the context of the document-element.  It
+;; messes up big-time if (current-node) is the document-element.
+(define (process-backmatter)
+  (if (hasbackmatter?)
+      (html-document (literal "Backmatter")
 		     (make sequence
 		       (make-contents-backmatter)
 		       (make-notecontents)
 		       (make-bibliography)
-		       (make-updatelist)))
+		       (make-updatelist))
+		     system-id: (backmatter-sys-id))
       (empty-sosofo)))
+
+(define (make-manifest-backmatter)
+  (make sequence
+    (if (hasbackmatter?)
+	(make fi data: (string-append (backmatter-sys-id) "
+"))
+	(empty-sosofo))
+    (if (hasnotes?)
+	(make fi data: (string-append (notes-sys-id) "
+"))
+	(empty-sosofo))
+    (if (hasbibliography?)
+	(make fi data: (string-append (bibliography-sys-id) "
+"))
+	(empty-sosofo))
+    (if (hashistory?)
+	(make fi data: (string-append (updatelist-sys-id) "
+"))
+	(empty-sosofo))))
 
 ;; This function caters for the possibility that _no_ backmatter 
 ;; needs to be generated.  Generally, the history
@@ -55,22 +82,30 @@ in mode make-manifest-mode in sl.dsl
 	  (if (hasnotes?)
 	      (make element gi: "li"
 		    (make element gi: "a"
-			  attributes: (list (list "href" (notes-sys-id)))
+			  attributes:
+			  (list (list "href" (string-append
+					      (notes-sys-id)
+					      "#" (notes-frag-id))))
 			  (literal "Notes")))
 	      #f))
 	 (biblist
 	  (if (get-bibliography-name)
 	      (make element gi: "li"
 		    (make element gi: "a"
-			  attributes: (list (list "href"
-						  (bibliography-sys-id)))
+			  attributes:
+			  (list (list "href" (string-append
+					      (bibliography-sys-id)
+					      "#" (bibliography-frag-id))))
 			  (literal "Bibliography")))
 	      #f))
 	 (updateslist
 	  (if (hashistory?) ;(get-updates)
 	      (make element gi: "li"
 		    (make element gi: "a"
-			  attributes: (list (list "href" (updatelist-sys-id)))
+			  attributes:
+			  (list (list "href" (string-append
+					      (updatelist-sys-id)
+					      "#" (updatelist-frag-id))))
 			  (literal "Changes")))
 	      #f
 	      ))
@@ -86,33 +121,27 @@ in mode make-manifest-mode in sl.dsl
 		    contentslist))
 	(empty-sosofo))))
 
-;(define (make-contents-backmatter)
-;  (let ((contentslist
-;	 (sosofo-append
-;	   (if (node-list-empty? (get-notelist))
-;	       (empty-sosofo)
-;	       (make element gi: "li"
-;		     (make element gi: "a"
-;			   attributes: (list (list "href" (notes-sys-id)))
-;			   (literal "Notes"))))
-;	   (if (get-bibliography-name)
-;	       (make element gi: "li"
-;		     (make element gi: "a"
-;			   attributes: (list (list "href"
-;						   (bibliography-sys-id)))
-;			   (literal "Bibliography")))
-;	       (empty-sosofo))
-;	   (if (get-updates)
-;	       (make element gi: "li"
-;		     (make element gi: "a"
-;			   attributes: (list (list "href" (updatelist-sys-id)))
-;			   (literal "Changes")))
-;	       (empty-sosofo))
-;	   )))
-;    (make element gi: "li"
-;	  (literal "Backmatter")
-;	  (make element gi: "ul"
-;		contentslist))))
+(define (backmatter-sys-id)
+  (if (chunking?)
+      (html-file uniq: "backmatter")
+      (html-file target_nd: (document-element))))
+(define (notes-sys-id)
+  (if (chunking?)
+      (html-file uniq: "notes")
+      (html-file target_nd: (document-element))
+      ))
+(define (bibliography-sys-id)
+  (if (chunking?)
+      (html-file uniq: "bibliography")
+      (html-file target_nd: (document-element))))
+(define (updatelist-sys-id)
+  (if (chunking?)
+      (html-file uniq: "updates")
+      (html-file target_nd: (document-element))))
+
+(define (notes-frag-id) "xref__NOTES")
+(define (bibliography-frag-id) "xref__BIBLIOGRAPHY")
+(define (updatelist-frag-id) "xref__UPDATELIST")
 
 (mode section-reference
   (element backmatter
@@ -124,11 +153,6 @@ Support notes as endnotes.
 <codebody>
 (define (hasnotes?)
   (not (node-list-empty? (get-notelist))))
-
-(define (notes-sys-id)
-  (if (chunking?)
-      (html-file uniq: "notes")
-      ""))
 
 ;(mode section-reference
 ;  (element notecontents
@@ -170,8 +194,11 @@ Support notes as endnotes.
 	(empty-sosofo)
 	(html-document (literal "Notes")
 		       (make sequence
-			 (make element gi: "h1"
-			       (literal "Notes"))
+			 (make element gi: "h2"
+			       (make element gi: "a"
+				     attributes: (list (list "name"
+							     (notes-frag-id)))
+				     (literal "Notes")))
 			 (make element gi: "dl"
 			       (with-mode extract-notecontents
 				 (process-node-list notelist))))
@@ -185,11 +212,6 @@ the data of the CITATION element.
 <codebody>
 (define (hasbibliography?)
   (get-bibliography-name))
-
-(define (bibliography-sys-id)
-  (if (chunking?)
-      (html-file uniq: "bibliography")
-      ""))
 
 (define (get-bibliography-name)
   (attribute-string (normalize "bibliography")
@@ -216,8 +238,11 @@ the data of the CITATION element.
     (if bibcontents
 	(html-document (literal "Bibliography")
 		       (make sequence
-			 (make element gi: "h1"
-			       (literal "Bibliography"))
+			 (make element gi: "h2"
+			       (make element gi: "a"
+				     attributes: (list (list "name"
+							     (bibliography-frag-id)))
+				     (literal "Bibliography")))
 			 (make fi data: bibcontents))
 		       system-id: (bibliography-sys-id))
 	(empty-sosofo))))
@@ -232,17 +257,15 @@ update elements which refer to them.
   (or (getdocinfo 'history)
       (get-updates)))
 
-(define (updatelist-sys-id)
-  (if (chunking?)
-      (html-file uniq: "updates")
-      ""))
-
 (define (make-updatelist)
   (if (hashistory?)
       (html-document (literal "Change history")
 		     (make sequence
-		       (make element gi: "h1"
-			     (literal "Change history"))
+		       (make element gi: "h2"
+			     (make element gi: "a"
+				   attributes: (list (list "name"
+							   (updatelist-frag-id)))
+				   (literal "Change history")))
 		       (with-mode extract-updatelist
 			 (process-node-list (getdocinfo 'history))))
 		     system-id: (updatelist-sys-id))

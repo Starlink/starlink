@@ -214,7 +214,8 @@ are shown at the top of the document.
 							      (cdr l)))
 				      (literal (cdr l)))))
 			    %link-extension-list%)))
-	  (empty-sosofo)))))
+	  (empty-sosofo))
+      (process-backmatter))))
 
 (element abstract
   (make sequence

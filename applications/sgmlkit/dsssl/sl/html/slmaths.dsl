@@ -265,8 +265,7 @@ browser can't print the results at all.
 					  (maths-element-list))))
     (if (node-list-empty? mathels)
 	(empty-sosofo)
-	(make entity
-	  system-id: ($maths-extfile$ #t)
+	(make entity system-id: ($maths-extfile$ #t)
 	  (make formatting-instruction data: 
 "\\documentclass{article}
 \\setcounter{secnumdepth}{0}

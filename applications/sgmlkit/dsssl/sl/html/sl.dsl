@@ -157,7 +157,7 @@ attributes with ENTITY declared values.  Should I worry about those?
       (let ((element-list (append (chunk-element-list)
 				  (list (normalize "figure")
 					(normalize "coverimage")
-					(normalize "backmatter")
+					;(normalize "backmatter")
 					(normalize "m")
 					(normalize "mequation")
 					(normalize "meqnarray"))))
@@ -169,32 +169,36 @@ attributes with ENTITY declared values.  Should I worry about those?
 			    (node-list-filter-by-gi
 			     (select-by-class (descendants rde)
 					      'element)
-			     element-list))))))
+			     element-list))))
+	      (make-manifest-backmatter)))
       (empty-sosofo)))
 
 (mode make-manifest-mode
   (default 
-    (if (chunk?)
+    (if (or (chunk?)
+	    (node-list=? (current-node) (document-element)))
 	(make formatting-instruction data: (string-append (html-file) "
 "))
 	(empty-sosofo)))
 
-  (element backmatter
-    (make sequence
-      (make fi data: (string-append (html-file) "
-"))					; that one's easy
-      (if (hasnotes?)
-	  (make fi data: (string-append (notes-sys-id) "
-"))
-	  (empty-sosofo))
-      (if (hasbibliography?)
-	  (make fi data: (string-append (bibliography-sys-id) "
-"))
-	  (empty-sosofo))
-      (if (hashistory?)
-	  (make fi data: (string-append (updatelist-sys-id) "
-"))
-	  (empty-sosofo))))
+;  (element backmatter
+;    (make sequence
+;      (if (hasbackmatter?)
+;	  (make fi data: (string-append (html-file) "
+;"))					; that one's easy
+;	  (empty-sosofo))
+;      (if (hasnotes?)
+;	  (make fi data: (string-append (notes-sys-id) "
+;"))
+;	  (empty-sosofo))
+;      (if (hasbibliography?)
+;	  (make fi data: (string-append (bibliography-sys-id) "
+;"))
+;	  (empty-sosofo))
+;      (if (hashistory?)
+;	  (make fi data: (string-append (updatelist-sys-id) "
+;"))
+;	  (empty-sosofo))))
 
   ;; The selection here should match the processing in slmisc.dsl
   (element figure

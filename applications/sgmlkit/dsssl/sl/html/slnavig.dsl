@@ -45,7 +45,7 @@ must be a subset of the return value of <funcname/section-element-list/.
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")
-	(normalize "backmatter")
+	;(normalize "backmatter")
 	;(normalize "notecontents")
 	;(normalize "bibliography")
 	))
@@ -69,7 +69,9 @@ chunking has been turned off.
 Given that chunking is on, this simply tests whether the
 node is a member of <funcname/chunk-element-list/.
 <returnvalue type=boolean>True if the node is a chunk
-<p>Note that the document element is <em/always/ deemed to be a chunk.
+<p>Do <em/not/ modify this so that the document element is deemed to
+be a chunk.  This may seem like a good idea, but it's important that
+<funcname/chunk?/ <em/always/ returns false if chunking is off.
 <argumentlist>
 <parameter optional default='(current-node)'>
   nd
@@ -77,9 +79,8 @@ node is a member of <funcname/chunk-element-list/.
   <description>The node to test
 <codebody>
 (define (chunk? #!optional (nd (current-node)))
-  (or (node-list=? nd (document-element))
-      (and (chunking?)
-	   (member (gi nd) (chunk-element-list)))))
+  (and (chunking?)
+       (member (gi nd) (chunk-element-list))))
 
 <routine>
 <routinename>chunk-path
@@ -201,7 +202,7 @@ of a particular chunk
   (let loop ((p (chunk-level-parent nd)))
     (if (or (node-list-empty? p) (chunk? p))
 	p
-	(chunk-level-parent (parent p)))))
+	(loop (chunk-level-parent (parent p))))))
 
 <routine>
 <routinename>chunk-level-parent

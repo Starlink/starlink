@@ -46,9 +46,10 @@ depending on whether the element is to be chunked.
   <description>If present, this gives the name of the system-id which is too 
   be used for the output file (if a file is in fact output), overriding the
   name obtained from <funcname/html-file/.  This is need in the case of those
-  files (such as the notes) which have no associated element.  If this is
-  present, then the document <em/will/ be chunked, because it wouldn't make
-  much sense otherwise.
+  files (such as the notes) which have no associated element.
+  <p>If this is present, and chunking has not been turned off
+  completely, then the document <em/will/ be chunked, because it
+  wouldn't make much sense otherwise.
 <codebody>
 (define (html-document title-sosofo body-sosofo #!key (system-id #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
@@ -73,11 +74,13 @@ depending on whether the element is to be chunked.
 		public-id: %html-pubid%)
 	      (empty-sosofo))
 	  doc-sosofo)
-	(if (or (chunk?)
-		(node-list=? (current-node) (document-element))
-		system-id)
-	    (make entity
-	      system-id: (or system-id (html-file))
+	(if (or (chunk?)		;if this is a chunk
+		is-de?			;or this is the document-element
+		(and (chunking?) system-id) ;or we've specified a
+					    ;sysid (and we haven't
+					    ;turned off chunking)
+		)
+	    (make entity system-id: (or system-id (html-file))
 	      (make document-type
 		name: "HTML"
 		public-id: %html-pubid%)
