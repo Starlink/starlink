@@ -60,6 +60,9 @@ dist_pkgdata_DATA = atools.news
 ##  Things for distribution that are not picked up otherwise.
 EXTRA_DIST = $(HELP_SOURCES)
 
+##  Need to add generated files as BUILT_SOURCES.
+BUILT_SOURCES = atools.csh atools.icl atools_mon.ifl $(atools_mon_TASKS:=.ifl)
+
 ##  Simple check.
 TESTS = asttest.sh
 
