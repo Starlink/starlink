@@ -81,7 +81,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 120 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 123 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -152,12 +152,12 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 109 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 110 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 114 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 115 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
@@ -948,6 +948,10 @@ javadoc-sources:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Decode (i.e. restore) the internal state of this object from an
   [javadoc]  XML Element."
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
+  [javadoc] /apps/cvsbuild/java/source/table/build/java/uk/ac/starlink/table/gui/StarTableChooser.java:254: warning - Tag @link: missing #: "showTableDialog(java.awt.Component)"
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
   [javadoc] /apps/cvsbuild/java/source/hdx/build/java/uk/ac/starlink/hdx/HdxFacade.java:179: warning - Tag @link: can't find getDOM in uk.ac.starlink.hdx.HdxFacade
@@ -1538,7 +1542,7 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleDocument.java:33: warning - Tag @link: reference not found: Plot
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstDoubleField.java:29: warning - Tag @link: reference not found: Frame
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/stylesheet.css...
-  [javadoc] 577 warnings
+  [javadoc] 581 warnings
 
 BUILD SUCCESSFUL
 Total time: 1 minute 7 seconds

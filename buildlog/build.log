@@ -186,7 +186,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 115 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 118 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 2 files to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -329,149 +329,21 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
     [javac] Compiling 178 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
+    [javac] symbol  : class PointTypeBox 
+    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
+    [javac]     protected PointTypeBox pointType = new PointTypeBox();
+    [javac]               ^
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
+    [javac] symbol  : class PointTypeBox 
+    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
+    [javac]     protected PointTypeBox pointType = new PointTypeBox();
+    [javac]                                            ^
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 71 files to /apps/cvsbuild/java/source/splat/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
-     [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
+    [javac] 2 errors
 
-execute_mk_script:
-     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
-    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/i386
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../splat_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing /apps/cvsbuild/star/lib/libndf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libary.a
-     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
-     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
-     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
-     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
-     [exec] Processing /apps/cvsbuild/star/lib/libprm.a
-     [exec] Processing /apps/cvsbuild/star/lib/libprm_a.a
-     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
-     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
-     [exec] Processing /apps/cvsbuild/star/lib/libems.a
-     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
-     [exec] rm -r -f temp
-     [echo] Executing Mirage target: build
+BUILD FAILED
+file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
 
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/mirage/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/mirage/build/classes
-     [echo] Executing TOPCAT target: build
-
-prepare:
-
-check_packages:
-
-build_demo:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
-     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
-      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
-
-build:
-    [javac] Compiling 108 source files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 65 files to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/topcat/build/classes
-     [copy] Copying 29 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat
-    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
-     [copy] Copying 4 files to /apps/cvsbuild/java/source/topcat/lib/topcat
-     [echo] Executing Treeview target: build
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/etc/demo
-     [gzip] Building: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz
-    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar
-      [tar] Building tar: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
-    [javac] Compiling 113 source files to /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
-     [copy] Copying 67 files to /apps/cvsbuild/java/source/treeview/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
-     [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
-     [echo] Executing Coco target: build
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/coco/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/lib/coco
-     [echo] Executing RV target: build
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/build/classes
-    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/rv/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/lib/rv
-     [echo] Executing FROG target: build
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/classes
-    [javac] Compiling 99 source files to /apps/cvsbuild/java/source/frog/build/classes
-    [javac] Note: Some input files use or override a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 13 files to /apps/cvsbuild/java/source/frog/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/lib/frog
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/frog/lib/frog
-
-execute_mk_script:
-     [copy] Copying 5 files to /apps/cvsbuild/java/source/frog/build/jni
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Dummy.c
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
-
-BUILD SUCCESSFUL
-Total time: 1 minute 10 seconds
+Total time: 50 seconds

@@ -393,7 +393,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 143 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 146 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -670,232 +670,22 @@ prepare:
 check_packages:
 
 build:
-    [javac] Compiling 1 source file to /apps/cvsbuild/java/source/splat/build/classes
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] make: Nothing to be done for `build'.
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jargs.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_colt.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jdom.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_wavelet.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/jsci_core.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/bsh-1.2b7.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/splat/lib/splat/splat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
-
-install:
-[loggedcopy] Copying 26 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 11 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 251 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 262 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 55 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Mirage target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/mirage/lib/mirage/mirage.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing TOPCAT target: install
-
-prepare:
-
-check_packages:
-
-build_demo:
-   [delete] Deleting: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
-
-build:
-
-docs_check:
-
-docs:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/ivoafits-notamfits-0.2.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/epsgraphics_classes.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/acme_encoding.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 7 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 229 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 94 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing Treeview target: install
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Coco target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing RV target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing FROG target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 151 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
-
-export-full-built:
-      [tar] Building tar: /apps/cvsbuild/export/starjava.tar.gz
-      [zip] Building zip: /apps/cvsbuild/export/starjava.zip
-
-BUILD SUCCESSFUL
-Total time: 5 minutes 0 seconds
+    [javac] Compiling 178 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
+    [javac] symbol  : class PointTypeBox 
+    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
+    [javac]     protected PointTypeBox pointType = new PointTypeBox();
+    [javac]               ^
+    [javac] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:83: cannot resolve symbol
+    [javac] symbol  : class PointTypeBox 
+    [javac] location: class uk.ac.starlink.splat.iface.SplatSelectedProperties
+    [javac]     protected PointTypeBox pointType = new PointTypeBox();
+    [javac]                                            ^
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+    [javac] 2 errors
+
+BUILD FAILED
+file:/apps/cvsbuild/java/source/splat/build.xml:427: Compile failed; see the compiler error output for details.
+
+Total time: 2 minutes 45 seconds

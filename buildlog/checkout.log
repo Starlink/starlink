@@ -9258,8 +9258,10 @@ U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
+U java/source/table/src/main/uk/ac/starlink/table/gui/BasicTableConsumer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/FileChooserLoader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/LoadWorker.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MapGroupTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/MultilineJTable.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/NodeLoader.java
@@ -9274,6 +9276,7 @@ U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableNodeChooser.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/StarTableSaver.java
+U java/source/table/src/main/uk/ac/starlink/table/gui/TableConsumer.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableLoadDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/TableRowHeader.java
 U java/source/table/src/main/uk/ac/starlink/table/gui/UCDSelector.java
@@ -9568,6 +9571,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/ConcatWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ControlWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CutoutSelector.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/DemoLoadDialog.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ImageWindow.java
@@ -9818,6 +9822,7 @@ U java/source/treeview/src/main/uk/ac/starlink/treeview/DocumentDataNodeBuilder.
 U java/source/treeview/src/main/uk/ac/starlink/treeview/Draggable.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/Driver.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/DuplicateDataNode.java
+U java/source/treeview/src/main/uk/ac/starlink/treeview/EmptyDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/ErrorDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSDataNode.java
 U java/source/treeview/src/main/uk/ac/starlink/treeview/FITSFileDataNode.java

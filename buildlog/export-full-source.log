@@ -358,7 +358,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 120 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 123 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -429,12 +429,12 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 109 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 110 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
-     [copy] Copying 114 files to /apps/cvsbuild/java/source/treeview/build/java
+     [copy] Copying 115 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/treeview/build/java
      [echo] Executing Coco target: javadoc-sources
 
@@ -450,11 +450,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 2256 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 2266 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 5 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 34 seconds
+Total time: 29 seconds
