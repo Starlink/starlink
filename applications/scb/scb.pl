@@ -84,9 +84,12 @@ use Directory;
 
 #  Declarations.
 
+sub parse_args;
 sub get_module;
 sub query_form;
 sub extract_file;
+sub search_keys;
+sub package_list;
 sub output;
 sub error;
 sub header;
@@ -94,131 +97,170 @@ sub footer;
 sub hprint;
 sub quasialph;
 
-#  Determine operating environment.
+#  Determine whether we are being run as a CGI script, and take appropriate
+#  action if so.
 
-$cgi = defined $ENV{'SERVER_PROTOCOL'};
-print "Content-Type: text/html\n\n" if ($cgi);
-$html = $cgi;
-
-#  Parse arguments.
-
-#  Get argument list from command line or CGI environment variable.
-
-@args = $cgi ? split ('&', $ENV{'QUERY_STRING'})
-             : @ARGV;
-
-#  Add blank elements so we don't get warned about undefined variables later.
-
-push @args, '', '';
-
-#  Extract named arguments (of format arg=value).
-
-if (@args) {
-   for ($i = $#args; $i>=0; $i--) {
-      if ($args[$i] =~ /(.*)=(.*)/) {
-         $arg{$1} = $2;
-         splice (@args, $i, 1);
-      }
-   }
-}
-my $fmode = exists $arg{'file'};
-
-#  If chosen variables still have no value pick them up by order on 
-#  command line.
-
-while ($args[0] =~ /^-/) {
-   $flag = shift @args;
-   if ($flag eq '-html') {
-      $html = 1;
-   }
-   elsif ($flag =~ /^-f(ile(mode)?)?/) {
-      $fmode = 1;
-   }
-   else {
-      error $usage;
-   }
+if (exists $ENV{'SERVER_PROTOCOL'}) {
+   $cgi = 1;
+   print "Content-Type: text/html\n\n";
+   @ARGV = split '&', $ENV{'QUERY_STRING'};
 }
 
-my $firstarg = $fmode ? 'file' : 'module';
-$arg{$firstarg}  ||= shift (@args);
-$arg{'package'} ||= shift (@args);
+#  Parse command line arguments.
 
-#  Decode hex encoded characters.
+($rarg, $rflag) = parse_args \@ARGV, qw/name package/;
 
-foreach $key (keys %arg) {
-   $arg{$key} =~ s/%(..)/pack("c",hex($1))/ge;
-}
+#  Process flags.
 
-#  Substitute for '<' and '>' to match encoding in index.
+$html = defined (delete ($rflag->{'html'})) || $cgi;
+$exact = defined (delete ($rflag->{'exact'}));
+error $usage if (%$rflag);
 
-if (exists $arg{'module'}) {
-   $arg{'module'} =~ s/</&lt;/g;
-   $arg{'module'} =~ s/>/&gt;/g;
-}
+#  Process arguments.
+
+$name = $rarg->{'name'} || '';
+$package = $rarg->{'package'} || '';
+$type = $rarg->{'type'} || '';
 
 #  Initialise index objects containing locations of functions and files.
 
 $func_index = Directory->new($func_indexfile, O_RDONLY);
 $file_index = Directory->new($file_indexfile, O_RDONLY);
 
+#  Read list of packages and tasks if it will be required.
+
+if (!$name || $type eq 'regex') {
+   my $pack;
+   open TASKS, $taskfile or error "Couldn't open $taskfile";
+   while (<TASKS>) {
+      ($pack, @tasks) = split;
+      $pack =~ s/:?$//;
+      @{$tasks{$pack}} = @tasks;
+   }
+   close TASKS;
+   @packages = sort keys %tasks;
+}
+
 #  Main processing.
 
-if ($arg{'module'}) {
+if ($name && $type ne 'regex') {
 
-#  Try to retrieve requested function.
-#  Check if module exists in index; try appending an underscore if the 
-#  initial try fails (and doesn't have one already).
+#  Name argument has been supplied, so try to retrieve the requested file.
+#  If a type ('file' or 'func') has been given, then try to match it in the 
+#  appropriate index.  Otherwise try to match it in either index
+#  (if the name contains a '.' try file first, else try func first).
+#  For each type of match, try it exact first, but look for variants if
+#  that fails - specifically, try appending an underscore to function 
+#  names, and try lowercasing something which looks like a Fortran include.
+#  By using the '||=' operator, once get_module has completed successfully,
+#  no further calls are attempted.  If all attempts fail, exit with an
+#  error.
 
-   if ($arg{'module'} !~ /_$/ && !$func_index->get($arg{'module'})) {
-      $arg{'module'} .= "_" 
+   my $success = 0;
+   my ($t, $n);
+   my @types = $type ? ($type) 
+                     : ($name =~ /\./ ? qw/file func/
+                                      : qw/func file/);
+   foreach $t (@types) {
+      my @names = ($name);
+      unless ($exact) {
+         push @names, lc ($name) if ($t eq 'file' && $name =~ /^[A-Z0-9_]*$/);
+         push @names, $name . "_" if ($t eq 'func' && $name !~ /_$/);
+      }
+      foreach $n (@names) {
+         $success ||= get_module ($t, $n, $package);
+      }
    }
-   unless ($func_index->get($arg{'module'})) {
-      error "Failed to find module $arg{'module'}",
+   unless ($success) {
+      error "Failed to find item $name",
          "This may be a result of a deficiency in the source
           code indexing program, or because the module you
           requested doesn't exist, or because the index 
           database <code>$func_indexfile</code> has become out of date.";
    }
-   get_module 'func', $arg{'module'}, $arg{'package'};
 }
-elsif ($arg{'file'}) {
+elsif ($name && $type eq 'regex') {
 
-#  Try to retrieve requested file.
-#  Check if file exists in index; try uppercasing it if it looks like
-#  a fortran include file.
+#  Name has been supplied as a search term.
 
-   if ($arg{'file'} =~ /^[A-Z0-9_]*$/ && !$file_index->get($arg{'file'})) {
-      $arg{'file'} =~ tr/A-Z/a-z/;
+   if ($html) {
+      query_form $package;
+      search_keys $name, $package;
+      footer;
    }
-   unless ($file_index->get($arg{'file'})) {
-      error "Failed to find file $arg{'file'}",
-         "This may be a result of a deficiency in the source
-          code indexing program, or because the module you
-          requested doesn't exist, or because the index 
-          database <code>$file_indexfile</code> has become out of date.";
+   else {
+      search_keys $name, $package;
    }
-   get_module 'file', $arg{'file'}, $arg{'package'};
+
 }
-else {
+elsif (!$name) {
 
-#  No module argument - either present a form (CGI mode) or exit with 
-#  usage message (command-line mode).
+#  No name argument has been supplied.  Either present a form (HTML mode) 
+#  or exit with a usage message (command-line mode).
 
-   if ($cgi) {
-      query_form $arg{'package'};
+   if ($html) {
+      query_form $package;
+      package_list $package;
+      footer;
    }
    else {
       die $usage;
    }
+}
+else {
+   error "Internal: program logic is wrong";
 }
 
 #  End
 
 exit;
 
+
+
 ########################################################################
 # Subroutines.
 ########################################################################
+
+
+########################################################################
+sub parse_args {
+
+   my $rargv = shift;
+   @default = @_;
+
+   my (%arg, %flag);
+
+#  Extract named arguments (format arg=value) and flags (format -flag).
+
+   if (@$rargv) {
+      for ($i = @$rargv - 1; $i>=0; $i--) {
+         if ($rargv->[$i] =~ /(.*)=(.*)/) {
+            $arg{$1} = $2;
+            splice (@$rargv, $i, 1);
+         }
+         elsif ($rargv->[$i] =~ /^-(.*)/) {
+            $flag{$1} = 1;
+            splice (@$rargv, $i, 1);
+         }
+      }
+   }
+
+   while ($default = shift @default) {
+      $arg{$default} ||= shift (@$rargv) || '';
+   }
+
+#  Decode HTTP-style hex encoded characters and spaces, and encode SGML 
+#  metacharacters.
+
+   foreach $key (keys %arg) {
+      $arg{$key} =~ tr/+/ /;
+      $arg{$key} =~ s/%(..)/pack("c",hex($1))/ge;
+      $arg{$key} =~ s/</&lt;/g;
+      $arg{$key} =~ s/>/&gt;/g;
+   }
+
+   return (\%arg, \%flag);
+}
 
 
 ########################################################################
@@ -229,18 +271,6 @@ sub query_form {
 #  Arguments.
 
    $package = shift;
-
-#  Read file listing packages and (probably) tasks.
-
-   my $pack;
-   open TASKS, $taskfile or error "Couldn't open $taskfile";
-   while (<TASKS>) {
-      ($pack, @tasks) = split;
-      $pack =~ s/:?$//;
-      @{$tasks{$pack}} = @tasks;
-   }
-   close TASKS;
-   @packages = sort keys %tasks;
 
 #  Print form header.
 
@@ -253,8 +283,25 @@ sub query_form {
 #  Print query box for module.
 
    hprint "
-      Name of source module:
-      <input name=module size=24 value=''>
+      Name of item:
+      <input name=name size=40 value=''>
+      <br>
+   ";
+
+#  Print query box for type.
+
+   my %radio;
+   $radio{'func'}  = "<input type=radio name=type value='func'>";
+   $radio{'file'}  = "<input type=radio name=type value='file'>";
+   $radio{''}      = "<input type=radio name=type value=''>";
+   $radio{'regex'} = "<input type=radio name=type value='regex'>";
+   $radio{$type} =~ s/>/ checked>/;
+   hprint "
+      Type of item (optional):
+         $radio{'func'}&nbsp;Routine
+         $radio{'file'}&nbsp;File
+         $radio{''}&nbsp;Either
+         $radio{'regex'}&nbsp;Search&nbsp;term
       <br>
    ";
 
@@ -265,7 +312,7 @@ sub query_form {
       Name of package (optional):
       <font size=-1>
       <select name=package>
-      <option value=''$selected> Any
+      <option value=''$selected>Any
    ";
    for $pack (@packages) {
       $selected = $pack eq $package ? ' selected' : '';
@@ -281,6 +328,14 @@ sub query_form {
       </form>
       <hr>
    ";
+}
+
+
+########################################################################
+sub package_list {
+
+   my $package = shift;
+
 
    if ($package) {
 
@@ -305,57 +360,84 @@ sub query_form {
          foreach $module (sort @tasks) {
             $task = $module;
             $task =~ s/_$//;
-            print "$sep<a href='$scb?$module&$package#$module'>$task</a>\n";
+            print "$sep<a href='$scb?$module&amp;$package#$module'>$task</a>\n";
          }
          print "</dl>\n<hr>\n";
       }
 
-#     Go through list of modules from the selected package, grouping 
-#     by prefix.
+      if ($type =~ /^(func|regex|)$/) {
 
-      my (%modules, $mod, $loc, $prefix);
-      while (($mod, $loc) = $func_index->each($package)) {
-         $prefix = '';
-         $prefix = $1 if ($mod =~ /^([^_]*_)./);
-         push @{$modules{$prefix}}, $mod;
-      }
+#        Go through list of modules from the selected package, grouping 
+#        by prefix.
 
-      if (%modules) {
-
-#        Print list of all modules in package.
-
-         hprint "
-            <h3>Modules</h3>
-            The following modules (C and Fortran functions and subroutines)
-            from the package $package are indexed:<br>
-         ";
-         print "<dl>\n";
-         my ($prefix, $r_mods, $ignore);
-         foreach $prefix (sort quasialph keys %modules) {
-            print "<dt> $prefix <br>\n<dd>\n";
-            foreach $mod (sort @{$modules{$prefix}}) {
-               if ($mod =~ /^(.*)&lt;t&gt;(.*)$/i) {
-                  $ignore = "$1(" . join ('|', qw/i r d l c b ub w uw/) . ")$2";
-               }
-               if ($ignore) {
-                  next if ($mod =~ $ignore);
-               }
-               else {
-                  $ignore = undef;
-               }
-               print "$sep<a href='$scb?$mod&$package#$mod'>$mod</a>\n";
-            }
+         my $loc;
+         my (%modules, $mod, $prefix);
+         while (($mod, $loc) = $func_index->each($package)) {
+            $prefix = '';
+            $prefix = $1 if ($mod =~ /^([^_]*_)./);
+            push @{$modules{$prefix}}, $mod;
          }
-         print "\n</dl>\n<hr>\n";
+
+         if (%modules) {
+
+#           Print list of all modules in package.
+
+            hprint "
+               <h3>Routines</h3>
+               The following routines (C and Fortran functions and subroutines)
+               from the package $package are indexed:<br>
+            ";
+            print "<dl>\n";
+            my ($prefix, $r_mods, $ignore);
+            foreach $prefix (sort quasialph keys %modules) {
+               print "<dt> $prefix <br>\n<dd>\n";
+               foreach $mod (sort @{$modules{$prefix}}) {
+                  if ($mod =~ /^(.*)&lt;t&gt;(.*)$/i) {
+                     $ignore = "$1(" . join ('|', qw/i r d l c b ub w uw/) 
+                               . ")$2";
+                  }
+                  if ($ignore) {
+                     next if ($mod =~ $ignore);
+                  }
+                  else {
+                     $ignore = undef;
+                  }
+                  print "$sep<a href='$scb?$mod&amp;$package#$mod'>$mod</a>\n";
+               }
+            }
+            print "\n</dl>\n<hr>\n";
+         }
       }
-            
-      unless (%modules || @tasks) {
 
-#        This shouldn't really happen.
+      if ($type =~ /^(file|regex|)$/) {
 
-         hprint "
-            Apparently there are no indexed modules for the package $package.
-         "; 
+         my (%files, $file, $tarfile, $suffix);
+         while (($file, $loc) = $file_index->each($package)) {
+            $suffix = $tarfile = '';
+            $tarfile = $1 if ($loc =~ m%([^/>#]+.tar)(?:\.[^/>#]*)?>[^/>#]+$%);
+            $suffix = $1 if ($file =~ m%(\.[^/>#]+)$%);
+            push @{$files{$suffix}}, $file;     #  Group by suffix.
+            # push @{$files{$tarfile}}, $file;  #  Group by containing tar file.
+         }
+   
+         if (%files) {
+
+#           Print list of all files in package.
+
+            hprint "
+               <h3>Files</h3>
+               The following files from the package are indexed:<br>
+            ";
+            print "<dl>\n";
+            foreach $key (sort quasialph keys %files) {
+               print "<dt> $key <br>\n<dd>\n";
+               foreach $file (sort @{$files{$key}}) {
+                  print 
+                     "$sep<a href='$scb?file=$file&amp;$package'>$file</a>\n";
+               }
+            }
+            print "\n</dl>\n<hr>\n";
+         }
       }
 
    }
@@ -367,16 +449,82 @@ sub query_form {
          <h2>Packages</h2>
          <dir compact>
       ";
+      my $typesel = $type ? "type='$type'" : '';
       foreach $pack (@packages) {
          print "<li> ";
-         print "<a href='$scb?module=&package=$pack'>$pack</a>\n";
+         print "<a href='$scb?package=$pack&$typesel'>$pack</a>\n";
       }
       print "</dir>\n";
    }
-   footer;
 
 }
    
+
+########################################################################
+sub search_keys {
+
+   my ($regex, $package) = @_;
+
+   my (%match);
+   my ($name, $loc, $pack, $index);
+
+   foreach $index (qw/file func/) {
+      while (($name, $loc) = ${$index . '_index'}->each($package)) {
+         if ($name =~ /$regex/o) {
+            $pack = starpack $loc;
+            $match{$index}{$pack}{$name} = $loc;
+         }
+      }
+   }
+
+   print "\n<h2>Search results: $regex</h2>\n";
+
+   if (%match) {
+      foreach $index (sort keys %match) {
+         $indtext = {func => 'Routines', file => 'Files'}->{$index};
+         if ($html) {
+            print "\n<h3>$indtext:</h3>\n";
+         }
+         else {
+            print "$indtext:\n";
+         }
+         foreach $pack (sort keys %{$match{$index}}) {
+            print "<h4>$pack</h4>\n" if ($html && !$package);
+            foreach $name (sort keys %{$match{$index}{$pack}}) {
+               $loc = $match{$index}{$pack}{$name};
+               if ($html) {
+                  if ($index eq 'file') {
+                     print
+                        "<a href='$scb?$name&$package&$type=file'>",
+                        "$name</a>",
+                        "<br>\n";
+                  }
+                  elsif ($index eq 'func') {
+                     print
+                        "<a href='$scb?$name&$package&$type=func#$name'>",
+                        "$name</a>",
+                        "<br>\n";
+                  }
+               }
+               else {
+                  printf "%-20s => %s\n", $name, $loc;
+               }
+            }
+         }
+      }
+   }
+   else {
+      print "No matches were found for the regular expression '$regex'";
+      print " in package <b>$package</b>" if $package;
+      print ".<p>\n";
+   }
+      
+}
+
+
+
+
+
 ########################################################################
 sub quasialph {
 
@@ -403,13 +551,9 @@ sub get_module {
    my $module = shift;        #  Name of (checked) key in index file.
    my $package = shift;       #  Hint about which package contains module.
 
-#  Set up scratch directory.
-
-   mkdir "$tmpdir", 0777;
-   chdir "$tmpdir"  or error "Failed to enter $tmpdir";
-
 #  Get logical path name from database.  $locname is a global variable.
 
+   $locname = undef;
    if ($type eq 'func') {
       $locname = $func_index->get($module, packpref => $package);
    }
@@ -417,11 +561,14 @@ sub get_module {
       $locname = $file_index->get($module, packpref => $package);
    }
 
-#  Generate an error if no module of the requested name is indexed.
-#  This ought not to happen, since $module should have been checked 
-#  before calling this routine.
+#  Return with error status if no module of the requested name is indexed.
 
-   error "Failed to find module $module" unless ($locname);
+   return (0) unless ($locname);
+
+#  Set up scratch directory.
+
+   mkdir "$tmpdir", 0777;
+   chdir "$tmpdir"  or error "Failed to enter $tmpdir";
 
 #  Interpret the first element of the location as a package or symbolic
 #  directory name.  Either way, change it for a logical path name.
@@ -459,6 +606,10 @@ sub get_module {
 #  Tidy up.
 
    rmrf $tmpdir;
+
+#  Return successful exit code.
+
+   return 1;
 
 }
 
@@ -624,7 +775,7 @@ sub output {
                         $file =~ tr/A-Z/a-z/;
                      }
                      if ($file_index->get($file)) {
-                        $href = "$scb?file=$file&$package";
+                        $href = "$scb?file=$file&amp;$package";
                      }
                   }
                   else {
@@ -634,7 +785,7 @@ sub output {
                            $href = "#$name";
                         }
                         else {
-                           $href = "$scb?$name&$package#$name";
+                           $href = "$scb?$name&amp;$package#$name";
                         }
                      }
                   }
@@ -731,6 +882,10 @@ sub header {
    my $title = shift;
 
    if ($html) {
+      $title =~ s/&/&amp;/g;
+      $title =~ s/>/&gt;/g;
+      $title =~ s/</&lt;/g;
+
       print "<html>\n";
       print "<head><title>$title</title></head>\n";
       print "<body>\n";
