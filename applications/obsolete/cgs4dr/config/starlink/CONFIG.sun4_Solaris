@@ -1,12 +1,15 @@
 # Compiler and utility invocation (supply path to compiler here)
 CC           = /opt/SUNWspro/bin/cc
 FC           = /opt/SUNWspro/bin/f77
-AR_IN	     = ar -r
-LINK	     = ln -s
+AR_IN	     = /usr/ccs/bin/ar -r
+LINK	     = /usr/bin/ln -s
 RANLIB       = 
-TAR_IN	     = tar -cvhf
-TAR_OUT	     = tar -xf
+TAR_IN	     = /usr/local/bin/tar -cvhf
+TAR_OUT	     = /usr/local/bin/tar -xf
 INSTALL      = /usr/ucb/install
+STRIP        = /usr/ccs/bin/strip
+MV           = /usr/bin/mv
+RMDIR        = /usr/bin/rmdir
 
 # Compiler and linker flags
 FEXTEND_FLAG = -e
