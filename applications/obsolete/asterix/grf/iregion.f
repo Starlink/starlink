@@ -551,8 +551,8 @@
 
 *  write each vertex allowing for line continuation
           NPAIR=NPAIR+1
-          CALL MSG_SETR( 'X', X)
-          CALL MSG_SETR( 'Y', Y)
+          CALL MSG_SETR( 'X', XV(I))
+          CALL MSG_SETR( 'Y', YV(I))
           CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
           IF (NPAIR.EQ.3.AND.I.LT.NV) THEN
             CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
