@@ -302,6 +302,9 @@
 #        Version 1.4-1: patched surf_rebin.f added to surf_sub.tar.
 #      02-JUL-1999 (TIMJ):
 #        Remove sculib_linux.c
+#      25-JUN-2000 (TIMJ):
+#        - Add new files for V1.6-0
+#        - Add creation/removal of version.dat file during install/deinstall
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -680,7 +683,7 @@ sculib_wtfn_regrid_1.f sculib_wtfn_regrid_2.f sculib_wtfn_regrid_3.f \
 sculib_scan_2_rd.f sculib_add_chop.f sculib_mulcad.f \
 sculib_gauss_wtinit.f sculib_skydip_var.f \
 sculib_fix_scan_v10.f sculib_noise_mean.f sculib_find_int.f \
-sculib_calc_clockerr.f sculib_rad2string.f
+sculib_calc_clockerr.f sculib_rad2string.f sculib_mjd_to_dateobs.f
 
 
 #  List of Fortran BLOCK DATA routines.
@@ -1247,6 +1250,9 @@ install:
            else :; fi;\
         done
 #
+#  Write the package version to a file in the installation directory.
+	echo $(PKG_VERS) 1>$(INSTALL_BIN)/version.dat
+#
 #  Install the package startup script.  The package version number,
 #  the name of the directory containing the installed binaries and 
 #  interface files, and the name of the directory containing the help
@@ -1436,6 +1442,11 @@ do_deinstall:
                 rm -f $(INSTALL_BIN)/$$f ;\
            else :; fi;\
         done
+#
+#  Remove the package version file in the installation directory.
+	- if test -n "version.dat"; then \
+             rm -f $(INSTALL_BIN)/version.dat ;\
+           else :; 
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
@@ -1901,6 +1912,8 @@ sculib_wtfn_regrid_3.o: PRM_PAR SAE_PAR
 sculib_bessel_wtinit.o: SAE_PAR
 sculib_skydip_temperatures.o: SAE_PAR
 sculib_find_int.o: SAE_PAR
+sculib_mjd_to_dateobs.o: SAE_PAR
+
 surflib_2dft_chop.o: SAE_PAR
 surflib_calc_gridij.o: PRM_PAR SAE_PAR
 surflib_calc_ijpos.o: PRM_PAR SAE_PAR
