@@ -34,6 +34,8 @@
 
        IF( STATUS .NE. SAI__OK ) RETURN
 
+       REVIEW = .FALSE.
+
 *    If wavelength not passed inquire user
 
        OK = .TRUE.
