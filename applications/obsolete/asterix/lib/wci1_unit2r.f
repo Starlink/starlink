@@ -7,7 +7,7 @@
 *     Return conversion factor from units supplied to radians
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI1_UNIT2R( UNIT, FACTOR, STATUS )
@@ -57,17 +57,11 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:private
 
 *  Copyright:
 *     {routine_copyright}

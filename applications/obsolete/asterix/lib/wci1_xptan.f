@@ -7,7 +7,7 @@
 *     Perform projection operations for Tan/Gnomonic (TAN) projection
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI1_XPTAN( OP, UNPROJ, NPAR, PARAM, PROJ, STATUS )
@@ -67,18 +67,11 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     WCI Subroutine Guide : http://www.star.sr.bham.ac.uk:8080/asterix-docs/prog/wci.html
-*     Representation of Celestial Coordinates in FITS : http://.../
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
-*     {routine_keywords}...
+*     package:wci, usage:private
 
 *  Copyright:
 *     {routine_copyright}

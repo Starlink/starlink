@@ -67,15 +67,8 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     WCI Subroutine Guide : http://www.star.sr.bham.ac.uk:8080/asterix-docs/prog/wci.html
-*     Representation of Celestial Coordinates in FITS : http://.../
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
 *     package:wci, usage:private, projections, orthographic, perspective

@@ -7,7 +7,7 @@
 *     Convert position in standard system to axis units
 
 *  Language:
-*     Starlink Fortran 77
+*     Starlink Fortran
 
 *  Invocation:
 *     CALL WCI_CNS2A( SPOS, PIXID, PRJID, APOS, STATUS )
@@ -59,14 +59,8 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
-*     {routine_references}...
+*     WCI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/wci.html
 
 *  Keywords:
 *     package:wci, usage:public
