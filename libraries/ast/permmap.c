@@ -121,7 +121,7 @@ static double *GetConstants( AstPermMap *this ){
 /*
 *+
 *  Name:
-*     astGetInConstants
+*     astGetConstants
 
 *  Purpose:
 *     Return a pointer to the constants array of a PermMap.
@@ -140,6 +140,12 @@ static double *GetConstants( AstPermMap *this ){
 *     This function returns a pointer to a dynamically allocated array 
 *     holding a copy of the constants array supplied when the PermMap was 
 *     created.
+*
+*     Negative values in the arrays returned by the astGetInPerm and
+*     astGetOutPerm methods can be used as indices into the constants
+*     array returned by this method, if they are first negated and then
+*     decrement by one. Thus an inperm value of -3 refers to element 2 of 
+*     the constants array.
 
 *  Parameters:
 *     this
@@ -149,7 +155,7 @@ static double *GetConstants( AstPermMap *this ){
 *     A pointer to a dynamically allocated array holding a copy of the 
 *     constants array. The pointer should be freed using astFree when it is
 *     no longer needed. NULL will be returned if the PermMap has no
-*     constants.
+*     constants. 
 
 *  Notes:
 *     - A value of NULL will be returned if this function is invoked
@@ -205,7 +211,17 @@ static int *GetInPerm( AstPermMap *this ){
 *     A pointer to a dynamically allocated array holding a copy of the 
 *     InPerm array. The pointer should be freed using astFree when it is
 *     no longer needed. The number of elements in the array will be given
-*     by the value of the Nin attribute.
+*     by the value of the Nin attribute. The value in element "i" is the
+*     zero-based index of the output axis which provides values for input
+*     "i" when the inverse transformation is used. If the value in element 
+*     "i" is less than zero, then input "i" is fed a constant value. This
+*     constant value is stored in the "constants" array (see astGetConstants)
+*     at an index equal to the absolute value of inperm[i], minus 1. Thus
+*     if element 3 of the array returned by this function has value -2,
+*     then input axis 3 is fed the value held in constants[1]. If the
+*     value of element "i" of the returned inperm array is greater than
+*     or equal to the number of output axes, then input "i" will be fed 
+*     the constant AST__BAD.
 
 *  Notes:
 *     - A value of NULL will be returned if this function is invoked
@@ -261,7 +277,17 @@ static int *GetOutPerm( AstPermMap *this ){
 *     A pointer to a dynamically allocated array holding a copy of the 
 *     OutPerm array. The pointer should be freed using astFree when it is
 *     no longer needed. The number of elements in the array will be given
-*     by the value of the Nout attribute.
+*     by the value of the Nout attribute. The value in element "i" is the
+*     zero-based index of the input axis which provides values for output
+*     "i" when the forward transformation is used. If the value in element 
+*     "i" is less than zero, then output "i" is fed a constant value. This
+*     constant value is stored in the "constants" array (see astGetConstants)
+*     at an index equal to the absolute value of outperm[i], minus 1. Thus
+*     if element 3 of the array returned by this function has value -2,
+*     then output axis 3 is fed the value held in constants[1]. If the 
+*     value of element "i" of the returned outperm array is greater than
+*     or equal to the number of input axes, then output "i" will be fed 
+*     the constant AST__BAD.
 
 *  Notes:
 *     - A value of NULL will be returned if this function is invoked
@@ -1294,7 +1320,7 @@ static AstPointSet *Transform( AstMapping *map, AstPointSet *in,
 
 /* If the permuted coordinate index is negative, use it to index the "constant"
    array to obtain a constant value to assign. If this array is NULL, use
-   AST__BADas the constant. */
+   AST__BAD as the constant. */
 	 } else if ( p < 0 ) {
             constant = this->constant ? this->constant[ (-p) - 1 ] : AST__BAD;
 
