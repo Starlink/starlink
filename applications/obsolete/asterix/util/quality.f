@@ -154,8 +154,6 @@
       INTEGER                	NLINES                 	! Number of TEXT lines
       INTEGER			OFID			! Output dataset id
       INTEGER                	PIXRNG(2,MX_BNDS,ADI__MXDIM)    ! Pixel ranges
-      INTEGER                	QDIMS(ADI__MXDIM)      	! Length of each dimension
-      INTEGER                	QNDIM                  	! Number of dimensions
       INTEGER                	QPTR                   	! Pointer to mapped
 							!   QUALITY
       INTEGER                	TCPTR                   ! Dynamic array
