@@ -24,8 +24,10 @@ using std::endl;
 
 
 int nfails = 0;
+char *progname;
 
 void compare_string_list(string_list& expected, string_list& actual);
+void Usage(void);
 
 void compare_string_list(string_list& expected, string_list& actual)
 {
@@ -82,7 +84,20 @@ void compare_string_array(string_list& expected, char** actual)
 
 int main (int argc, char **argv)
 {
-    Util::verbosity (debug);
+    progname = argv[0];
+    
+    for (argc--, argv++; argc>0; argc--, argv++)
+        if (**argv == '-') {
+            switch (*++*argv) {
+              case 'v':         // verbose
+                Util::verbosity (debug);
+                break;
+              default:
+                Usage();
+            }
+        } else {
+            Usage();
+        }
 
     int i;
     
@@ -107,4 +122,10 @@ int main (int argc, char **argv)
     Util::delete_string_array(sa);
 
     exit (nfails);
+}
+
+void Usage(void)
+{
+    cerr << "Usage: " << progname << " [-v]" << endl;
+    exit (1);
 }

@@ -21,6 +21,8 @@ using std::string;
 
 #include "PkFont.h"
 
+void Usage(void);
+
 struct {
     string fmt;
     string mode;
@@ -41,9 +43,25 @@ struct {
 };
 int ntests = sizeof(tests)/sizeof(tests[0]);
 
+char *progname;
+
 int main (int argc, char **argv)
 {
-    PkFont::verbosity(debug);
+    progname = argv[0];
+
+    for (argc--, argv++; argc>0; argc--, argv++)
+        if (**argv == '-') {
+            switch (*++*argv) {
+              case 'v':         // verbose
+                PkFont::verbosity (debug);
+                break;
+              default:
+                Usage();
+            }
+        } else {
+            Usage();
+        }
+
     int i;
     int nfails = 0;
 
@@ -74,4 +92,11 @@ int main (int argc, char **argv)
     }
 
     exit (nfails);
+}
+
+
+void Usage(void)
+{
+    cerr << "Usage: " << progname << " [-v]" << endl;
+    exit (1);
 }
