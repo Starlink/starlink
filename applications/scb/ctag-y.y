@@ -372,14 +372,14 @@ identifier
 *     intercept this and discards all the associated state, we cannot
 *     use yylval as usual.  Instead, we use the ucontent() routine which
 *     gets a string consisting of all the text the lexer has encountered
-*     since the last uclear() was called.  Note that because of this 
+*     since the last uclear() was called.  Note that because of this
 *     interrelation between uclear() calls and handle_error() calls,
 *     it is not OK to put an error token just anywhere in the grammar.
 *
-*     This routine also takes it upon itself to advance the lexer's 
+*     This routine also takes it upon itself to advance the lexer's
 *     input stream to somewhere suitable to start parsing again.
 *     We take the questionable course of skipping until the next blank
-*     line.  In practice (because of human habits not C syntax) this is 
+*     line.  In practice (because of human habits not C syntax) this is
 *     likely to be a good choice.  We can't get yacc to do the skipping
 *     forward itself because the lexer does not recognise and return
 *     blanks of any kind.
@@ -387,18 +387,7 @@ identifier
 */
 
 /* Local variables. */
-      char c;
       char *text;
-      int done;
-      extern int preleng, prealloc;
-      extern char *preval;
-
-/* Add preval to the unprocessed text. */
-      if ( prealloc > 0 ) {
-         uadd( preval );
-         preleng = 0;
-         prealloc = 0;
-      }
 
 /* Get the unprocessed text. */
       text = ucontent();
@@ -406,21 +395,22 @@ identifier
 /* Do something appropriate with it. */
       if ( strict ) {
          fflush( stdout );
-         fprintf( stderr, 
+         fprintf( stderr,
                   "\n\nError in the following:\n%s\n\nTerminated with error\n",
                   text );
          exit( 1 );
       }
       else {
          printf( "%s", text );
+         yyerrok;
          yyclearin;
-         uclear();
       }
 
 /* Release memory allocated by ucontent. */
       free( text );
    }
-      
+
+
 
    
 /* $Id$ */
