@@ -8263,6 +8263,7 @@ U java/source/splat/src/script/setcolour
 U java/source/splat/src/script/setproperty
 U java/source/splat/src/script/splat
 U java/source/splat/src/script/splat.csh
+U java/source/splat/src/script/splat_standalone
 U java/source/splat/src/script/splatdisp
 U java/source/splat/src/script/splatdispmany
 U java/source/splat/src/script/splatsetup.csh
