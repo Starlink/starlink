@@ -1,3 +1,11 @@
+<subsect id=rn-0.11 export>Release 0.11
+
+<p>Bugfixes: correct semantics of DviFile::getEndOfPage, so that
+skipping the last page now works; and Bitmap::scaleDown, so that
+creating multiple bitmaps now works again.
+
+<p>Reorder checks in configure, for robustness
+
 <subsect id=rn-0.11b1 export>Release 0.11b1
 
 <p>Major developments:

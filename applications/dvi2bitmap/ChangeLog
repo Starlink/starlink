@@ -7,6 +7,8 @@
 	* configure.ac: reorder check for getopt and co. -- should be
 	after other library checks
 
+	* all: Version 0.11 released
+
 2003-08-12  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* DviFile.cc getEndOfPage corrected; would have failed
