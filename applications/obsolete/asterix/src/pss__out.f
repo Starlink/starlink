@@ -156,6 +156,9 @@ c      END IF
       CALL SSI_PUTPAR0C( SID, 1, 'SEARCHED', 132, IM_FILE(:
      :                           CHR_LEN(IM_FILE)), STATUS )
 
+*    History entry
+      CALL HSI_ADD( SID, VERSION, STATUS )
+
       END
 *+  PSS_OUT_SSUB -  Create source subtracted image
       SUBROUTINE PSS_OUT_SSUB( STATUS )
