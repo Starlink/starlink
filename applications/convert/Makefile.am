@@ -22,6 +22,9 @@ convert_mon_TASKS = $(TASKS) $(FPP_TASKS)
 
 FPP_TASKS = ndf2iraf iraf2ndf
 
+ndf2iraf.f: ndf2iraf.fpp
+iraf2ndf.f: iraf2ndf.fpp
+
 TASKS = ascii2ndf ast2ndf conhelp da2ndf dst2ndf fits2ndf \
  gasp2ndf ircam2ndf ndf2ascii ndf2da ndf2dst ndf2fits ndf2gasp \
  ndf2pgm ndf2tiff ndf2unf specx2ndf unf2ndf
