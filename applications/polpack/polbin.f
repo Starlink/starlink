@@ -68,6 +68,12 @@
 *     OUT = LITERAL (Read)
 *        The name of the output catalogue. A file type of .FIT is assumed
 *        if none is provided.
+*     RADEC = _LOGICAL (Read)
+*        If TRUE, columns holding the RA and DEC (FK5, J2000) are added
+*        to the output catalogue, if the input catalogue contains the 
+*        necessary WCS information. If FALSE, no RA and DEC columns are 
+*        written. For large catalogues, creating RA and DEC columns can 
+*        cause a significant delay. [current value]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]
@@ -176,6 +182,7 @@
       INTEGER CIOUT              ! CAT identifier for output catalogue
       INTEGER GI( 8 )            ! CAT identifiers for columns to be read
       INTEGER GTTL               ! CAT identifier for TITLE parameter
+      INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping
       INTEGER IP                 ! Pointers to arrays to be filled
       INTEGER IPBIN              ! Pointer to binned Stokes parameters
       INTEGER IPCOV              ! Pointer to workspace
@@ -210,6 +217,8 @@
       INTEGER IPVVBN             ! Pointer to binned V variances
       INTEGER IPVVST             ! Pointer to stacked i/p V variances
       INTEGER IPW1               ! Pointer to workspace
+      INTEGER IPW2               ! Pointer to second work array
+      INTEGER IPW3               ! Pointer to third work array
       INTEGER IPWRK1             ! Pointer to workspace
       INTEGER IPWRK2             ! Pointer to workspace
       INTEGER IPX                ! Pointer to i/p X values
@@ -238,6 +247,7 @@
       LOGICAL NULL1              ! Null value flag
       LOGICAL NULL2              ! Null value flag
       LOGICAL NULL3              ! Null value flag
+      LOGICAL RADEC              ! Are RA/DEC columns required?
       LOGICAL VAR                ! Producing variances?
       LOGICAL VERB               ! Verose errors required?
       REAL ANG                   ! Stored angle in input catalogue
@@ -741,9 +751,12 @@
          CALL ERR_ANNUL( STATUS )
       END IF
 
+*  See if RA/DEC columns are to be created if possible.
+      CALL PAR_GET0L( 'RADEC', RADEC, STATUS )
+
 *  Create the output catalogue.
       CALL POL1_MKCAT( 'OUT', IWCS, CIRC, UNITS, VAR, ANGRT, TITLE,
-     :                 CIOUT, STATUS )
+     :                 RADEC, CIOUT, EQMAP, STATUS )
 
 *  Abort if an error has occured.
       IF ( STATUS .NE. SAI__OK ) GO TO 999
@@ -758,11 +771,20 @@
       TR2( 3 ) = Y0 - 0.5*BOX( 2 )
       TR2( 4 ) = BOX( 2 )
 
+*  Allocate work arrays.
+      IF( EQMAP .NE. AST__NULL ) THEN
+         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
+         CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW3, STATUS )
+      ELSE 
+         IPW2 = IPI
+         IPW3 = IPI
+      END IF
+
 *  Calculate the polarization vectors. POL1_PLVEC has the cabability to
 *  produce output images containing the polarization parameters, These
 *  are not wanted here, but pointers still have to be given even though
 *  they are ignored. Use IPI as a safe pointer.
-      CALL POL1_PLVEC( TR2, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
+      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, NSTOKE, %VAL( IPBIN ), 
      :                 %VAL( IPVBIN ), STOKES, DEBIAS, VAR, ANGROT, 
      :                 ANGRT, .FALSE., .FALSE., .FALSE., .FALSE.,
      :                  .FALSE., .FALSE., .FALSE., .TRUE., CIOUT, 
@@ -770,7 +792,14 @@
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
      :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPI ), 
-     :                 %VAL( IPI ), %VAL( IPI ), STATUS )
+     :                 %VAL( IPI ), %VAL( IPI ), %VAL( IPW2 ),
+     :                 %VAL( IPW3 ), STATUS )
+
+*  Free the work space.
+      IF( EQMAP .NE. AST__NULL ) THEN
+         CALL PSX_FREE( IPW2, STATUS )   
+         CALL PSX_FREE( IPW3, STATUS )   
+      END IF
 
 *  Closedown sequence.
 *  ===================

@@ -131,7 +131,7 @@
 *        to the output catalogue, if the input cube contains the necessary 
 *        WCS information. If FALSE, no RA and DEC columns are written. For
 *        large catalogues, creating RA and DEC columns can cause a
-*        significant delay. For this reason, the default value is NO. [NO]
+*        significant delay. [current value]
 *     SIGMAS = _REAL (Read)
 *        Number of standard deviations to reject data at. Only used if
 *        METHOD is set to "SIGMA". [4.0]

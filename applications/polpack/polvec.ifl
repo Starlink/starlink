@@ -128,7 +128,7 @@ interface POLVEC
 
    parameter      RADEC
       type        _LOGICAL
-      vpath       'DEFAULT '
+      vpath       'CURRENT,DEFAULT '
       ppath       'CURRENT,DEFAULT '
       default     NO
       prompt      'Produce RA & DEC columns, if possible?'
