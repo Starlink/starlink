@@ -599,6 +599,10 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *     27-SEP-2004 (DSB):
 *        In SpecTrans, before creating new PCi_j values,  check that no 
 *        PCi_j values have been created via an earlier translation.
+*     28-SEP-2004 (DSB):
+*        In AIPSPPFromStore only get projection parameters values if there
+*        are some celestialaxes. Also allow CROTA to describe rotation of
+*        non-celestial axes (same for AIPSFromSTore).
 *class--
 */
 
@@ -1882,6 +1886,8 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
    double val;         /* General purpose value */
    int axlat;          /* Index of latitude FITS WCS axis */
    int axlon;          /* Index of longitude FITS WCS axis */
+   int axrot1;         /* Index of first CROTA rotation axis */
+   int axrot2;         /* Index of second CROTA rotation axis */
    int axspec;         /* Index of spectral FITS WCS axis */
    int i;              /* Axis index */
    int ihmsf[ 4 ];     /* Hour, minute, second, fractional second */
@@ -2091,7 +2097,22 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
    }
 
 /* Check that rotation is restricted to the celestial plane, and extract
-   the CDELT (diagonal) terms, etc. */
+   the CDELT (diagonal) terms, etc. If there are no celestial
+   axes, restrict rotation to the first two non-spectral axes. */
+   if( axlat < 0 && axlon < 0 ) {
+      if( axspec >= 0 && naxis > 2 ) {
+         axrot2 = ( axspec == 0 ) ? 1 : 0;
+         axrot1 = axrot2 + 1;
+         if( axrot1 == axspec ) axrot1++;
+      } else if( naxis > 1 ){
+         axrot2 = 0;
+         axrot1 = 1; 
+      }
+   } else {
+      axrot1 = axlon;
+      axrot2 = axlat; 
+   }
+
    cdlat_lon = 0.0;
    cdlon_lat = 0.0;
    for( i = 0; i < naxis && ok; i++ ){
@@ -2106,10 +2127,10 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
           if( i == j ){
              cdelt[ i ] = val;
 
-          } else if( i == axlat && j == axlon ){
+          } else if( i == axrot2 && j == axrot1 ){
              cdlat_lon = val;
 
-          } else if( i == axlon && j == axlat ){
+          } else if( i == axrot1 && j == axrot2 ){
              cdlon_lat = val;
 
           } else if( val != 0.0 ){
@@ -2119,22 +2140,22 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
    }
 
 /* Find the CROTA and CDELT values for the celestial axes. */
-   if( ok && axlon >= 0 && axlat >= 0 ) {
+   if( ok && axrot1 >= 0 && axrot2 >= 0 ) {
 
       if( cdlat_lon > 0.0 ) {
-         rho_a = atan2( cdlat_lon, cdelt[ axlon ] );
+         rho_a = atan2( cdlat_lon, cdelt[ axrot1 ] );
       } else if( cdlat_lon == 0.0 ) {
          rho_a = 0.0;
       } else {
-         rho_a = atan2( -cdlat_lon, -cdelt[ axlon ] );
+         rho_a = atan2( -cdlat_lon, -cdelt[ axrot1 ] );
       }
 
       if( cdlon_lat > 0.0 ) {
-         rho_b = atan2( cdlon_lat, -cdelt[ axlat ] );
+         rho_b = atan2( cdlon_lat, -cdelt[ axrot2 ] );
       } else if( cdlon_lat == 0.0 ) {
          rho_b = 0.0;
       } else {
-         rho_b = atan2( -cdlon_lat, cdelt[ axlat ] );
+         rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
 
       if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
@@ -2143,11 +2164,11 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
          sincro = sin( crota );
 
          if( fabs( coscro ) > fabs( sincro ) ){
-            cdelt[ axlat ] /= coscro;
-            cdelt[ axlon ] /= coscro;
+            cdelt[ axrot2 ] /= coscro;
+            cdelt[ axrot1 ] /= coscro;
          } else {
-            cdelt[ axlat ] = -cdlon_lat/sincro;
-            cdelt[ axlon ] = cdlat_lon/sincro;
+            cdelt[ axrot2 ] = -cdlon_lat/sincro;
+            cdelt[ axrot1 ] = cdlat_lon/sincro;
          }      
          crota *= AST__DR2D;
 
@@ -2269,8 +2290,8 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
       }
 
 /* CROTA */
-      if( axlat != -1 ){
-         SetValue( this, FormatKey( "CROTA", axlat + 1, -1, s ), &crota, 
+      if( axrot2 != -1 ){
+         SetValue( this, FormatKey( "CROTA", axrot2 + 1, -1, s ), &crota, 
                    AST__FLOAT, "Axis rotation" );
       } else if( ( axspec == -1 && naxis > 1 ) || 
                   ( axspec != -1 && naxis > 2 ) )  {
@@ -2419,6 +2440,8 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
    double val;         /* General purpose value */
    int axlat;          /* Index of latitude FITS WCS axis */
    int axlon;          /* Index of longitude FITS WCS axis */
+   int axrot1;         /* Index of first CROTA rotation axis */
+   int axrot2;         /* Index of second CROTA rotation axis */
    int axspec;         /* Index of spectral FITS WCS axis */
    int i;              /* Axis index */
    int ihmsf[ 4 ];     /* Hour, minute, second, fractional second */
@@ -2584,7 +2607,23 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
    }
 
 /* Check that rotation is restricted to the celestial plane, and extract
-   the CDELT (diagonal) terms, etc. */
+   the CDELT (diagonal) terms, etc. If there are no celestial
+   axes, restrict rotation to the first two non-spectral axes. */
+   if( axlat < 0 && axlon < 0 ) {
+      if( axspec >= 0 && naxis > 2 ) {
+         axrot2 = ( axspec == 0 ) ? 1 : 0;
+         axrot1 = axrot2 + 1;
+         if( axrot1 == axspec ) axrot1++;
+      } else if( naxis > 1 ){
+         axrot2 = 0;
+         axrot1 = 1; 
+      }
+   } else {
+      axrot1 = axlon;
+      axrot2 = axlat; 
+   }
+ 
+
    cdlat_lon = 0.0;
    cdlon_lat = 0.0;
    for( i = 0; i < naxis && ok; i++ ){
@@ -2599,10 +2638,10 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
           if( i == j ){
              cdelt[ i ] = val;
 
-          } else if( i == axlat && j == axlon ){
+          } else if( i == axrot2 && j == axrot1 ){
              cdlat_lon = val;
 
-          } else if( i == axlon && j == axlat ){
+          } else if( i == axrot1 && j == axrot2 ){
              cdlon_lat = val;
 
           } else if( val != 0.0 ){
@@ -2612,22 +2651,22 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
    }
 
 /* Find the CROTA and CDELT values for the celestial axes. */
-   if( ok && axlon >= 0 && axlat >= 0 ) {
+   if( ok && axrot1 >= 0 && axrot2 >= 0 ) {
 
       if( cdlat_lon > 0.0 ) {
-         rho_a = atan2( cdlat_lon, cdelt[ axlon ] );
+         rho_a = atan2( cdlat_lon, cdelt[ axrot1 ] );
       } else if( cdlat_lon == 0.0 ) {
          rho_a = 0.0;
       } else {
-         rho_a = atan2( -cdlat_lon, -cdelt[ axlon ] );
+         rho_a = atan2( -cdlat_lon, -cdelt[ axrot1 ] );
       }
 
       if( cdlon_lat > 0.0 ) {
-         rho_b = atan2( cdlon_lat, -cdelt[ axlat ] );
+         rho_b = atan2( cdlon_lat, -cdelt[ axrot2 ] );
       } else if( cdlon_lat == 0.0 ) {
          rho_b = 0.0;
       } else {
-         rho_b = atan2( -cdlon_lat, cdelt[ axlat ] );
+         rho_b = atan2( -cdlon_lat, cdelt[ axrot2 ] );
       }
 
       if( fabs( slaDrange( rho_a - rho_b ) ) < 1.0E-2 ){
@@ -2636,16 +2675,16 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          sincro = sin( crota );
 
          if( fabs( coscro ) > fabs( sincro ) ){
-            cdelt[ axlat ] /= coscro;
-            cdelt[ axlon ] /= coscro;
+            cdelt[ axrot2 ] /= coscro;
+            cdelt[ axrot1 ] /= coscro;
          } else {
-            cdelt[ axlat ] = -cdlon_lat/sincro;
-            cdelt[ axlon ] = cdlat_lon/sincro;
+            cdelt[ axrot2 ] = -cdlon_lat/sincro;
+            cdelt[ axrot1 ] = cdlat_lon/sincro;
          }      
          crota *= AST__DR2D;
 
-/* Use AST__BAD to indicate that CDi_j values shou;ld be produced
-   instead of CROAT/CDELT. (I am told AIPS++ can understand CD matrices) */
+/* Use AST__BAD to indicate that CDi_j values should be produced
+   instead of CROTA/CDELT. (I am told AIPS++ can understand CD matrices) */
       } else {
          crota = AST__BAD;
       }
@@ -2784,8 +2823,8 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
 
 /* CROTA */
       } else if( crota != 0.0 ) {
-         if( axlat != -1 ){
-            SetValue( this, FormatKey( "CROTA", axlat + 1, -1, s ), &crota, 
+         if( axrot2 != -1 ){
+            SetValue( this, FormatKey( "CROTA", axrot2 + 1, -1, s ), &crota, 
                       AST__FLOAT, "Axis rotation" );
          } else if( ( axspec == -1 && naxis > 1 ) || 
                     ( axspec != -1 && naxis > 2 ) ) {
@@ -2834,10 +2873,12 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
       }
 
 /* Projection parameters. */
-      for( m = 0; m <= maxm; m++ ){
-         val = GetItem( &(store->pv), axlat, m, s, NULL, method, class );
-         if( val != AST__BAD ) SetValue( this, FormatKey( "PROJP", m, -1, ' ' ), 
-                                         &val, AST__FLOAT, "Projection parameter" );
+      if( axlat >= 0 && axlon >= 0 ) {
+         for( m = 0; m <= maxm; m++ ){
+            val = GetItem( &(store->pv), axlat, m, s, NULL, method, class );
+            if( val != AST__BAD ) SetValue( this, FormatKey( "PROJP", m, -1, ' ' ), 
+                                            &val, AST__FLOAT, "Projection parameter" );
+         }
       }
 
 /* Spectral stuff.. */
