@@ -5,7 +5,7 @@
 *
 *	Part of:	SExtractor
 *
-*	Author:		E.BERTIN, IAP & Leiden observatory
+*	Author:		E.BERTIN (IAP)
 *                       P.W.DRAPER, Starlink & Durham University
 *
 *	Contents:	Astrometrical computations.
@@ -21,14 +21,23 @@
 *                       astTran2s.
 *                       Added R2D and D2R as these have been lost from
 *                       AST (2.0).
+*	Last modify:	03/04/2003
+*                       (EB): 2.3.
 *
-*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+*%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+*/
+
+#ifdef HAVE_CONFIG_H
+#include        "config.h"
+#endif
+
 #include	<math.h>
 #include	<stdlib.h>
 #include        <string.h>
 
 #include	"define.h"
 #include	"globals.h"
+#include	"prefs.h"
 #include	"astrom.h"
 
 #ifndef PI 

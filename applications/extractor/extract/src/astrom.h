@@ -15,6 +15,8 @@
 *                          Removed unused parts of structures
 *                       04/01/99 (PWD):
 *                          Added cvt component for precession AstFrameSet.
+*	Last modify:	24/01/2003
+*                          (EB): 2.3.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
