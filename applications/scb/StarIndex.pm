@@ -1,6 +1,41 @@
 #!/usr/local/bin/perl -w
 
-package Directory;
+package StarIndex;
+
+#+
+#  Name:
+#     StarIndex.pm
+
+#  Purpose:
+#     Object class for database of names in Starlink packages.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+
+#  Description:
+
+#  Arguments:
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
 
 use Scb;
 use NDBM_File;
