@@ -19,7 +19,7 @@
   file or in response to parameter prompts. Output positions are written
   to the screen and optionally to an output text file.
 
-  - New commands astformat. Formats one or more axis values using the
+  - New command astformat. Formats one or more axis values using the
   attributes of a supplied Frame.
 
   - The informational messages which say where the output data has been
