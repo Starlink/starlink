@@ -20,12 +20,13 @@
 *        The global status.
 
 *  Description:
-*     This application converts an NDF to a text file.  Only one of
-*     the array components may be copied to the output file.  Preceding
-*     the data there is an optional header consisting of either the
-*     FITS extension with the values of certain keywords replaced by
-*     information derived from the NDF, or a minimal FITS header also
-*     derived from the NDF.  The output file uses LIST carriagecontrol.
+*     This application converts an NDF to a Fortran formatted text
+*     file.  Only one of the array components may be copied to the
+*     output file.  Preceding the data there is an optional header
+*     consisting of either the FITS extension with the values of
+*     certain keywords replaced by information derived from the NDF, or
+*     a minimal FITS header also derived from the NDF.  The output file
+*     uses LIST carriagecontrol.
 
 *  Usage:
 *     ndf2ascii in out [comp] [reclen] noperec=?
@@ -50,9 +51,9 @@
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file, when
-*        FIXED is TRUE.  It should be in the range 1 to 16383.
-*        The suggested default is the current value, or 8 when there
-*        is not one.
+*        FIXED is TRUE.  It should be positive on UNIX platforms, and
+*        in the range 1 to 16383 on VMS.  The suggested default is the
+*        current value, or 8 when there is not one.
 *     OUT = FILENAME (Write)
 *        Name of the output formatted Fortran file.  The file will
 *        normally have variable-length records when there is a header,
@@ -61,13 +62,14 @@
 *        when parameter OUT contains no file extension.
 *     RECLEN = _INTEGER (Read)
 *        The maximum record length in bytes of the output file.  This
-*        must be between 32 and 32766.  The lower limit is further
-*        increased to 80 when there is a FITS header to be copied.  It
-*        is only used when FIXED is FALSE and will default to the
-*        current value, or 512 if there is no current value.  When
-*        FIXED is TRUE the application creates data records whose
-*        length is the product of the number of bytes per value plus
-*        one (for the space), times the number of values per record. []
+*        must be between 32 and 32766 on VMS and greater than 31 on
+*        UNIX systems.  The lower limit is further increased to 80 when
+*        there is a FITS header to be copied.  It is only used when
+*        FIXED is FALSE and will default to the current value, or 512
+*        if there is no current value.  When FIXED is TRUE the
+*        application creates data records whose length is the product
+*        of the number of bytes per value plus one (for the space),
+*        times the number of values per record. []
 
 *  Examples:
 *     ndf2ascii cluster cluster.dat
@@ -228,22 +230,28 @@
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Implementation type for
                                  ! integer array
       LOGICAL LABFND             ! True if NDF LABEL found
+      CHARACTER MACHIN * ( 24 )  ! Machine name
       INTEGER NCARD              ! Number of cards in FITS extension
       INTEGER NCPVAL             ! Number of characters required to
                                  ! format a data value without loss of
                                  ! precision
       INTEGER NDF                ! Identifier for NDF
+      CHARACTER NODE * ( 20 )    ! Node name
       INTEGER NUMPRE             ! Number of data values per record
       INTEGER PNTR( 1 )          ! Pointer to NDF mapped array
       INTEGER RECL               ! Maximum recordlength of text file
                                  ! in bytes
       INTEGER RECMIN             ! Minimum record length of the text
                                  ! file
+      CHARACTER RELEAS * ( 10 )  ! Release of operating system
+      CHARACTER SYSNAM * ( 10 )  ! Operating system
       LOGICAL THERE              ! FITS extension is present
       LOGICAL TITFND             ! True if NDF TITLE found
       CHARACTER * ( NDF__SZTYP ) TYPE ! Data type for processing
       LOGICAL UNTFND             ! True if NDF UNITS found
       CHARACTER VALUE * ( SZVAL ) ! Accommodates descriptor value
+      CHARACTER VERSIO * ( 10 )  ! Sub-version of operating system
+      LOGICAL VMS                ! True if running on a VAX/VMS system
 
 *.
 
@@ -307,6 +315,14 @@
       CPFITS = HEADER .AND. THERE
       IF ( CPFITS ) RECMIN = 80
 
+*  Determine whether or not the operating system is VMS.
+*  =====================================================
+*
+*  This assumes that the system is either VMS or UNIX.  It is needed
+*  to specify the path of the file containing the global parameters.
+      CALL PSX_UNAME( SYSNAM, NODE, RELEAS, VERSIO, MACHIN, STATUS )
+      VMS = INDEX( SYSNAM, 'VMS' ) .NE. 0
+
 *  Find the formatting arrangement for the output file.
 *  ====================================================
 
@@ -316,8 +332,13 @@
 
 *  Obtain the number of values per record.
       IF ( FIXED ) THEN
-         CALL PAR_GDR0I( 'NOPEREC', 8, 1, 16383, .FALSE., NUMPRE,
-     :                   STATUS )
+         IF ( VMS ) THEN
+            CALL PAR_GDR0I( 'NOPEREC', 8, 1, 16383, .FALSE., NUMPRE,
+     :                      STATUS )
+         ELSE
+            CALL PAR_GDR0I( 'NOPEREC', 8, 1, VAL__MAXI, .FALSE., NUMPRE,
+     :                      STATUS )
+         END IF
 
 *  Derive the number characters needed to store this without loss
 *  of precision depending on the data type.
@@ -351,8 +372,13 @@
 
 *  Obtain the maximum recordlength in bytes of the output (free-format)
 *  file.
-         CALL PAR_GDR0I( 'RECLEN', 512, RECMIN, 32766, .FALSE., RECL,
-     :                   STATUS )
+         IF ( VMS ) THEN
+            CALL PAR_GDR0I( 'RECLEN', 512, RECMIN, 32766, .FALSE.,
+     :                      RECL, STATUS )
+         ELSE
+            CALL PAR_GDR0I( 'RECLEN', 512, RECMIN, VAL__MAXI, .FALSE.,
+     :                      RECL, STATUS )
+         END IF
       END IF
 
 *  Open the text file.

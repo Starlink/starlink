@@ -7,12 +7,13 @@ Usage:
 
 Description:
 
-   This application converts an NDF to a text file.  Only one of
-   the array components may be copied to the output file.  Preceding
-   the data there is an optional header consisting of either the
-   FITS extension with the values of certain keywords replaced by
-   information derived from the NDF, or a minimal FITS header also
-   derived from the NDF.  The output file uses LIST carriagecontrol.
+   This application converts an NDF to a Fortran formatted text
+   file.  Only one of the array components may be copied to the
+   output file.  Preceding the data there is an optional header
+   consisting of either the FITS extension with the values of
+   certain keywords replaced by information derived from the NDF, or
+   a minimal FITS header also derived from the NDF.  The output file
+   uses LIST carriagecontrol.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMP
@@ -39,9 +40,9 @@ IN = NDF (Read)
 3 NOPEREC
 NOPEREC = _INTEGER (Read)
    The number of data values per record of the output file, when
-   FIXED is TRUE.  It should be in the range 1 to 16383.
-   The suggested default is the current value, or 8 when there
-   is not one.
+   FIXED is TRUE.  It should be positive on UNIX platforms, and
+   in the range 1 to 16383 on VMS.  The suggested default is the
+   current value, or 8 when there is not one.
 3 OUT
 OUT = FILENAME (Write)
    Name of the output formatted Fortran file.  The file will
@@ -52,13 +53,14 @@ OUT = FILENAME (Write)
 3 RECLEN
 RECLEN = _INTEGER (Read)
    The maximum record length in bytes of the output file.  This
-   must be between 32 and 32766.  The lower limit is further
-   increased to 80 when there is a FITS header to be copied.  It
-   is only used when FIXED is FALSE and will default to the
-   current value, or 512 if there is no current value.  When
-   FIXED is TRUE the application creates data records whose
-   length is the product of the number of bytes per value plus
-   one (for the space), times the number of values per record. []
+   must be between 32 and 32766 on VMS and greater than 31 on
+   UNIX systems.  The lower limit is further increased to 80 when
+   there is a FITS header to be copied.  It is only used when
+   FIXED is FALSE and will default to the current value, or 512
+   if there is no current value.  When FIXED is TRUE the
+   application creates data records whose length is the product
+   of the number of bytes per value plus one (for the space),
+   times the number of values per record. []
 2 Examples
 ndf2ascii cluster cluster.dat
    This copies the data array of the NDF called cluster to a text
