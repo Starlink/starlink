@@ -1,4 +1,5 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
+<!-- $Id$ -->
 
 <docblock>
 <title>HTML navigation
@@ -30,12 +31,12 @@ of elements.  Ie, ("sect" "subsubsect") would be bad, since
 
 <p>There are two constraints on the elements in this list.  (1) no
 elements appear which are in the documentsummary DTD but not in the
-General DTD, since (main-html-base) relies on this to be able to
+General DTD, since <funcname/main-html-base/ relies on this to be able to
 generate the same HTML file name in both cases.  It doesn't matter
 if there are elements here which don't appear in the summary DTD,
 since elements with those names will necessarily never be found
 when processing an instance of the summary DTD.  (2) the list
-must be a subset of the return value of (section-element-list).
+must be a subset of the return value of <funcname/section-element-list/.
 <codebody>
 (define (chunk-element-list)
   (list (normalize "sect")
@@ -43,6 +44,9 @@ must be a subset of the return value of (section-element-list).
 	(normalize "appendices")
 	(normalize "routinelist")
 	(normalize "codecollection")
+	(normalize "backmatter")
+	(normalize "notecontents")
+	(normalize "bibliography")
 	))
 
 <func>
@@ -61,8 +65,9 @@ but could be more general in future.
 <routinename>chunk?
 <description>
 Return <code/#t/ if the given node is a chunk, taking account of whether
-chunking has been turned off (that is, it's not enough for the node
-to have a GI which is in (chunk-element-list)).
+chunking has been turned off.
+Given that chunking is on, this simply tests whether the
+node is a member of <funcname/chunk-element-list/.
 <returnvalue type=boolean>True if the node is a chunk
 <argumentlist>
 <parameter optional default='(current-node)'>
@@ -102,9 +107,12 @@ elements on the way to the current chunk
 <description>
 Return a string containing the name of the file which will hold the
 given node.  Since this must work both for the general DTD and the
-documentsummary DTD, we can't use <funcname/all-element-number/, and can use
-only elements which exist within both DTDs.  Assume that all the
-elements in <funcname/chunk-element-list/ appear in both DTDs.
+documentsummary DTD, we can't use <funcname/all-element-number/.  Since 
+this current version uses <funcname/chunk-path/, it will break (in the sense
+that different filenames will be generated for the same element when it
+appears in the general and in the documentsummary DTD) if the elements in
+<funcname/chunk-element-list/ (which <funcname/chunk-path/ uses) produce
+different hierarchies in the two DTDs.
 <returnvalue type=string>Base of filename
 <argumentlist>
 <parameter>nd<type>node-list<description>We want the basename of the file
@@ -125,25 +133,23 @@ which will hold this node
 <func>
 <routinename>html-file
 <description>
-Returns the filename of the html file that contains elemnode
+Returns the filename of the html file that contains given node
 <returnvalue type=string>Complete filename
 <argumentlist>
 <parameter optional default='(current-node)'>
-  input_nd<type>node-list<description>Complete filename of the chunk which
-  contains this node
+  input_nd<type>node-list<description>Node whose file we want
 <codebody>
 (define (html-file #!optional (input_nd (current-node)))
   (let* ((nd (chunk-parent input_nd))
 	 (base (cond ((member (gi nd) (section-element-list))
 		      (main-html-base nd))
 		     ((node-list-empty? nd)
-				; if the node-list nd is
-				; empty, then this is because
-				; chunk-parent couldn't find a
-				; parent chunk.  This means
-				; either that we're not
-				; chunking, or else that this
-				; is the root chunk.
+				; if the node-list nd is empty, then
+				; this is because chunk-parent
+				; couldn't find a parent chunk.  This
+				; means either that we're not
+				; chunking, or else that this is the
+				; root chunk.
 		      (root-file-name input_nd)
 				; give input_nd as argument - this is
 				; a singleton-node-list (required
@@ -206,6 +212,45 @@ there are none.
 <codebody>
 (define (chunk-children #!optional (nd (current-node)))
   (node-list-filter-by-gi (children nd) (chunk-element-list)))
+
+<func>
+<routinename>make-contents
+<description>
+Make a table of contents of the node argument, down to the specified depth.
+This works by listing children of the current node which are
+members of <funcname/section-element-list/, and possibly recursing to
+list their children.  It does not supply any header.
+<returnvalue type=sosofo>TOC, currently formatted as a UL
+<parameter optional default='(current-node)'>start-element
+  <type>singleton-node-list
+  <description>Node we want the contents of.  All the children of this
+  node which are members of <funcname/section-element-list/ will be
+  listed.
+<parameter optional default=1>depth
+  <type>integer
+  <description>Maximum number of levels of TOC we want.  Zero means
+  return immediately.
+<codebody>
+(define (make-contents #!optional (start-element (current-node)) (depth 1))
+  (let ((subsects (node-list-filter-by-gi (children start-element)
+					  (section-element-list))))
+    (if (or (node-list-empty? subsects)
+	    (<= depth 0))
+	(empty-sosofo)
+	(make element gi: "ul"
+	      (node-list-reduce
+	       subsects
+	       (lambda (last el)
+		 (sosofo-append last
+				(make element gi: "li"
+				      (make element gi: "a"
+					    attributes: (list (list "href"
+								    (href-to el)))
+					    (with-mode section-reference
+					      (process-node-list el)))
+				      (make-contents el (- depth 1)))))
+	       (empty-sosofo))))))
+
 
 <misccode>
 <description>
@@ -288,26 +333,6 @@ generated HTML documents.
 			      (make element gi: "EM"
 				    (literal "Next"))))))))))
 
-(define (make-subcontents nl)
-  (if (node-list-empty? nl)
-      (empty-sosofo)
-      (make sequence
-	;(make empty-element gi: "HR")
-	(make element gi: "H3"
-	      (literal "Contents"))
-	(make element gi: "UL"
-	      (node-list-reduce
-	       nl
-	       (lambda (last el)
-		 (sosofo-append last
-				(make element gi: "LI"
-				      (make element gi: "A"
-					    attributes: (list (list "HREF"
-								    (href-to el)))
-					    (with-mode section-reference
-					      (process-node-list el))))))
-	       (empty-sosofo))))))
-
 
 ;; We're producing the footer for the root element (SUN or MUD, or
 ;; whatever).  This doesn't have any element of (chunk-element-list)
@@ -319,10 +344,10 @@ generated HTML documents.
 ;; we're chunking.
 (define (root-footer-navigation elemnode)
   (if (chunking?)
-      (let ((subsects (chunk-children (select-elements
-				       (children elemnode)
-				       (normalize "docbody")))))
-	(make-subcontents subsects))
+      (make sequence
+	(make element gi: "h3"
+	      (literal "Contents"))
+	(make-contents (getdocbody) 4))
       (empty-sosofo)))
 
 ;(define (section-footer-navigation elemnode)
@@ -380,7 +405,11 @@ generated HTML documents.
 		  (empty-sosofo)
 		  (make element gi: "TR"
 			(make element gi: "TD"
-			      (make-subcontents subsects))))
+			      (make sequence
+				(make element gi: "h4"
+				      (literal "Contents"))
+				(make-contents))
+			      )))
 	      (make element gi: "TR"
 		    (make element gi: "TD" attributes: '(("ALIGN"
 							  "RIGHT"))
