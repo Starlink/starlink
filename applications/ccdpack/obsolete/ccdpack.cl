@@ -66,5 +66,15 @@ print ""
 print "   CCDPACK commands are now available -- (Version PKG_VERS)"
 print ""
 
+#  For IRAF data we really do need to keep hold of the bad pixels
+#  so make sure of this, unless the NDF_TO_IRAF_PARS variable
+#  is already set. In this case we assume that the user knows what
+#  they are doing.
+s1 = "NONE"
+show | match ("NDF_TO_IRAF_PARS=", stop=no ) | scan (s1)
+if ( s1 == "NONE") { 
+   set NDF_TO_IRAF_PARS="FILLBAD=!"
+   print "Warning -- bad pixel values will be retained."
+}
 
 clbye()

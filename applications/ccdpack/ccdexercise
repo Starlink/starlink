@@ -1,4 +1,4 @@
-#!/bin/csh 
+#!/bin/csh
 #+
 #  Name:
 #     CCDEXERCISE
@@ -67,6 +67,13 @@
          if ( "$device" == "\!" ) then
             set device = "NONE"
          endif
+      endif
+
+#  Set a file extension for generating data.
+      if ( $?CCDPACK_EXT ) then 
+         set exten =  $CCDPACK_EXT
+      else 
+         set exten = ".sdf"
       endif
 
 #  If we're going to use a device we need KAPPA.
@@ -151,6 +158,7 @@
 	 file=ccdtest_obj.dat \
          ubnds='[128,128,166,128,128,201,166,201]' \
 	 lbnds='[1,1,39,1,1,74,39,74]' \
+         type=$exten \
 	 accept
 #     end ccdgenerate
 

@@ -172,6 +172,15 @@
       echo " "
       echo "   For help use the commands ccdhelp or ccdwww"
       echo " "
+
+#   For IRAF data we really do need to keep hold of the bad pixels
+#   so make sure of this, unless the NDF_TO_IRAF_PARS variable
+#   is already set. In this case we assume that the user knows what
+#   they are doing.
+      if ( ! $?NDF_TO_IRAF_PARS ) then
+         setenv NDF_TO_IRAF_PARS "FILLBAD=!"
+         echo "Warning -- bad pixel values will be retained in IRAF data."
+      endif
 #
 # end
 # $Id$

@@ -99,6 +99,7 @@
       INTEGER CHR_LEN            ! Significant length of a string
 
 *  Local Variables:
+      CHARACTER * ( 1 ) C       ! Single number
       CHARACTER * ( 1 ) TOK( 3 ) ! Buffer for parsing lines
       CHARACTER * ( 132 ) LINE  ! Buffer for file reading
       CHARACTER * ( 16 ) KEYWRD ! FITS keyword
@@ -108,6 +109,7 @@
       CHARACTER * ( DAT__SZLOC ) LOC ! FITS extension locator
       DOUBLE PRECISION DVAL     ! Double precision FITS value
       INTEGER CARD              ! Fits header element (card) found
+      INTEGER DOCVT             ! Current NDF foreign conversion status
       INTEGER EL                ! Number of FITS header records mapped
       INTEGER FIRST             ! First value of range
       INTEGER HIC               ! Position of comment character
@@ -121,13 +123,15 @@
       INTEGER ITMP              ! Dummy integer
       INTEGER IVAL              ! Integer FITS value
       INTEGER LAST              ! Last value of range
+      INTEGER LBND( NDF__MXDIM ) ! Lower bounds of NDF
       INTEGER LENGTH            ! Length of a character being mapped
       INTEGER LSTAT             ! Local status variable
       INTEGER NC                ! Number of characters
+      INTEGER NDIM              ! Number of NDF dimensions
       INTEGER NTOK              ! Number of tokens on line
       INTEGER PNTR( 1 )         ! Pointer to mapped FITS headers
       INTEGER TRNI( 2 )         ! TRANSFORM workspace
-      INTEGER DOCVT             ! Current NDF foreign conversion status
+      INTEGER UBND( NDF__MXDIM ) ! Upper bounds of NDF
       LOGICAL FOUND             ! Was a value found?
       LOGICAL LVAL              ! Logical FITS value
       LOGICAL SEETRN            ! TRANSFORM keywords are located 
@@ -393,6 +397,34 @@
          CALL CCD1_ENTRN( CCDLOC, .FALSE., LINE, CVAL, 
      :                    TRNI, TRNC, TRNL, STATUS )
       END IF
+
+*  See if the LBOUND1 and LBOUND2 keywords are present. If so use these
+*  to set the NDF origin information --- hack as IRAF2NDF does not do
+*  this 13-11-1997 (FITS does this correctly).
+      CALL ERR_MARK
+      CALL NDF_BOUND( IDIN, NDF__MXDIM, LBND, UBND, NDIM, STATUS )
+      DO 6 I = 1, NDIM
+         KEYWRD = ' '
+         CALL CHR_ITOC( I, C, NC )
+         KEYWRD = 'LBOUND'//C( 1 : NC )
+         CALL FTS1_GKEYI( EL, %VAL( PNTR( 1 ) ), 1,
+     :                    KEYWRD, FOUND, IVAL, CARD, STATUS,
+     :                    %VAL( LENGTH ) )
+         IF ( STATUS .NE. SAI__OK ) THEN 
+            CALL ERR_ANNUL( STATUS )
+            GO TO 7
+         END IF
+         IF ( FOUND ) THEN 
+            LBND( I ) = IVAL - LBND( I )
+         ELSE 
+            GO TO 7
+         END IF
+ 6    CONTINUE
+      CALL NDF_SHIFT( NDIM, LBND, IDIN, STATUS )
+
+*  Exit from above loop when in error.
+ 7    CONTINUE
+      CALL ERR_RLSE
       
 *  Annul (thereby unmapping) the FITS extension locator and the NDF
 *  identifier.

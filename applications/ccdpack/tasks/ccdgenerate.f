@@ -117,6 +117,9 @@
 *     21-APR-1997 (PDRAPER):
 *        Added TYPE parameter to control the output of foreign 
 *        data formats.
+*     13-NOV-1997 (PDRAPER):
+*        Removed calls to NDF_HCRE. History component exceeds IRAFs
+*        ability to store headers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -307,7 +310,7 @@
          CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
      :                  'WRITE', 'NEW', IDB, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
-         CALL NDF_HCRE( IDB, STATUS )
+C         CALL NDF_HCRE( IDB, STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
@@ -323,7 +326,7 @@
          CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
-         CALL NDF_HCRE( IDO, STATUS )
+C         CALL NDF_HCRE( IDO, STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
@@ -346,7 +349,7 @@
          CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                  'WRITE', 'NEW', IDF, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
-         CALL NDF_HCRE( IDF, STATUS )
+C         CALL NDF_HCRE( IDF, STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,

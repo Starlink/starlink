@@ -100,3 +100,15 @@ print " "
 print "   For help use the commands help ccdpack or ccdwww"
 print " "
 
+{   For IRAF data we really do need to keep hold of the bad pixels
+{   so make sure of this, unless the NDF_TO_IRAF_PARS variable
+{   is already set. In this case we assume that the user knows what
+{   they are doing.
+hidden proc ccdpack_iraf_pars_set
+   pars = getenv("NDF_TO_IRAF_PARS")
+   if pars = ""
+      setenv NDF_TO_IRAF_PARS "FILLBAD=!"
+      print "Warning -- bad pixel values will be retained in IRAF data."
+   end if
+end proc
+ccdpack_iraf_pars_set
