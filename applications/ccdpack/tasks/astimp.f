@@ -4,7 +4,7 @@
 *     ASTIMP
 
 *  Purpose:
-*     Imports coordinate system information into NDFs from AST files.
+*     Imports coordinate system information into NDFs.
 
 *  Language:
 *     Starlink Fortran 77

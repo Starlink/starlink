@@ -4,7 +4,7 @@
 *     DRIZZLE
 
 *  Purpose:
-*     Mosaics images using the drizzling algorithm.
+*     Resamples and mosaics using the drizzling algorithm.
 
 *  Language:
 *     Starlink Fortran 77

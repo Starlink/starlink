@@ -4,7 +4,7 @@
 *     WCSREG
 
 *  Purpose:
-*     Aligns NDFs using multiple attached coordinate systems
+*     Aligns NDFs using multiple coordinate systems.
 
 *  Language:
 *     Starlink Fortran 77

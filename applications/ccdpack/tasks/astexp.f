@@ -4,7 +4,7 @@
 *     ASTEXP
 
 *  Purpose:
-*     Exports coordinate system information from NDFs to an AST file
+*     Exports coordinate system information from images.
 
 *  Language:
 *     Starlink Fortran 77

@@ -4,7 +4,7 @@
 *     WCSEDIT
 
 *  Purpose:
-*     Modifies or examines WCS components of a set of NDFs.
+*     Modifies or examines image coordinate system information.
 
 *  Language:
 *     Starlink Fortran 77
