@@ -198,6 +198,7 @@ problems_problems -
                   rift-valley defects.
  role_of_kappa - 
         rotate - Rotate a 2-d NDF about its centre through any angle.
+       scatter - Displays a scatter plot between data in two NDFs.
        segment - Copy polygonal segments from one NDF to another.
 selecting_graphics_devices - 
        setaxis - Sets values for an axis array component within an NDF data

@@ -55,7 +55,7 @@ set DynParList(luttweak) {device}
 set OutputParList(lutview) {}
 set DynParList(lutview) {device high low}
 set OutputParList(mlinplot) {}
-set DynParList(mlinplot) {cosys device}
+set DynParList(mlinplot) {axes key margin useaxis xleft xright ytop ybot device}
 set OutputParList(ovclear) {}
 set DynParList(ovclear) {device}
 set OutputParList(ovset) {}
@@ -88,6 +88,8 @@ set OutputParList(pictrans) {bound outx outy}
 set DynParList(pictrans) {cosys device}
 set OutputParList(picvis) {}
 set DynParList(picvis) {device}
+set OutputParList(scatter) {}
+set DynParList(scatter) {margin useaxis xleft xright ytop ybot device}
 set OutputParList(snapshot) {}
 set DynParList(snapshot) {device}
 set OutputParList(turbocont) {}

@@ -47,6 +47,8 @@
 *     13-MAY-1999 (DSB):
 *        Changed history application name to incorporate the current version
 *        of KAPPA.
+*     23-AUG-1999 (DSB):
+*        V0.14 - Added SCATTER.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -270,6 +272,10 @@
 *  Finds the first unobscured FRAME picture in the graphics database.
       ELSE IF ( NAME .EQ. 'PICVIS' ) THEN
          CALL PICVIS( STATUS )
+
+*  Produces a scatter plot between 2 N-d NDFs.
+      ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
+         CALL SCATTER( STATUS )
 
 *  Dumps an image-display memory to a graphics hardcopy and optionally
 *  to an NDF.

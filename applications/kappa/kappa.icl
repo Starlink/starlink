@@ -47,6 +47,8 @@
 {     7-OCT-1998 (DSB):
 {        Added PROFILE, LISTSHOW, LISTMAKE, WCSALIGN, WCSADD, WCSATTRIB, 
 {        WCSCOPY, WCSFRAME, WCSSHOW, WCSTRAN, COPYBAD and WCSREMOVE for V0.13.
+{     23-AUG-1999 (DSB):
+{        V0.14 -- added SCATTER.
 {     {enter_further_changes_here}
 {
 {  Bugs:
@@ -204,6 +206,7 @@ define   picli(st)  $KAPPA_DIR/kapview_mon
 define   pics(el)   $KAPPA_DIR/kapview_mon
 define   pict(rans) $KAPPA_DIR/kapview_mon
 define   picv(is)   $KAPPA_DIR/kapview_mon
+define   scat(ter)  $KAPPA_DIR/kapview_mon
 define   shod(ev)   $KAPPA_DIR/kapview_mon gdnames
 define   snap(shot) $KAPPA_DIR/kapview_mon
 define   turb(ocont) $KAPPA_DIR/kapview_mon
@@ -430,6 +433,7 @@ defhelp  quilt      $KAPPA_HELP
 defhelp  reshape    $KAPPA_HELP
 defhelp  rift       $KAPPA_HELP
 defhelp  rotate     $KAPPA_HELP
+defhelp  scatter    $KAPPA_HELP
 defhelp  segment    $KAPPA_HELP
 defhelp  setaxis    $KAPPA_HELP
 defhelp  setbad     $KAPPA_HELP
@@ -638,6 +642,7 @@ define   kap_picli(st)  $KAPPA_DIR/kapview_mon piclist
 define   kap_pics(el)   $KAPPA_DIR/kapview_mon picsel
 define   kap_pict(rans) $KAPPA_DIR/kapview_mon pictrans
 define   kap_picv(is)   $KAPPA_DIR/kapview_mon picvis
+define   kap_scat(ter)  $KAPPA_DIR/kapview_mon scatter
 define   kap_shod(ev)   $KAPPA_DIR/kapview_mon gdnames
 define   kap_snap(shot) $KAPPA_DIR/kapview_mon snapshot
 define   kap_turb(ocont) $KAPPA_DIR/kapview_mon turbocont
@@ -866,6 +871,7 @@ defhelp  kap_quilt      $KAPPA_HELP quilt
 defhelp  kap_reshape    $KAPPA_HELP reshape
 defhelp  kap_rift       $KAPPA_HELP rift
 defhelp  kap_rotate     $KAPPA_HELP rotate
+defhelp  kap_scatter    $KAPPA_HELP scatter
 defhelp  kap_segment    $KAPPA_HELP segment
 defhelp  kap_setaxis    $KAPPA_HELP setaxis
 defhelp  kap_setbad     $KAPPA_HELP setbad

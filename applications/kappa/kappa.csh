@@ -238,6 +238,7 @@ alias quilt     $KAPPA_DIR/quilt
 alias reshape   $KAPPA_DIR/reshape
 alias rift      $KAPPA_DIR/rift
 alias rotate    $KAPPA_DIR/rotate
+alias scatter   $KAPPA_DIR/scatter
 alias segment   $KAPPA_DIR/segment
 alias setaxis   $KAPPA_DIR/setaxis
 alias setbad    $KAPPA_DIR/setbad
@@ -449,6 +450,7 @@ alias kap_quilt     $KAPPA_DIR/quilt
 alias kap_reshape   $KAPPA_DIR/reshape
 alias kap_rift      $KAPPA_DIR/rift
 alias kap_rotate    $KAPPA_DIR/rotate
+alias kap_scatter   $KAPPA_DIR/scatter
 alias kap_segment   $KAPPA_DIR/segment
 alias kap_setaxis   $KAPPA_DIR/setaxis
 alias kap_setbad    $KAPPA_DIR/setbad
