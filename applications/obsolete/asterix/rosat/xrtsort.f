@@ -197,7 +197,7 @@
          IF (SRT.BCKGND) THEN
            CALL DYN_UNMAP(BMPTR,STATUS)
            IF (BSRT.IMAGE) THEN
-             CALL DYN_UNMAP(B2MASK,STATUS)
+             CALL DYN_UNMAP(B2MPTR,STATUS)
            ENDIF
          ENDIF
          CALL DYN_UNMAP(WPNTR1,STATUS)
