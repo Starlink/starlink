@@ -147,9 +147,9 @@
      :                  STATUS )
         END IF
 
-*    Locate the CREC'th record
+*    Locate the IREC'th record
         CALL DAT_FIND( HLOC, 'RECORDS', RLOC, STATUS )
-        CALL DAT_CELL( RLOC, 1, CREC, CRLOC, STATUS )
+        CALL DAT_CELL( RLOC, 1, IREC, CRLOC, STATUS )
 
 *    Construct return data
         CALL ADI_NEW0( 'HistoryRecord', OARG, STATUS )
