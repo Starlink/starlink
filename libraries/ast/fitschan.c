@@ -16285,7 +16285,7 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     currently employed by the IRAF data analysis facility, so its
 *     use will facilitate data exchange with IRAF. Its main advantages
 *     are that it is a stable convention which approximates to a
-*     sub-set of the propsed FITS-WCS encoding (above). This makes it
+*     subset of the propsed FITS-WCS encoding (above). This makes it
 *     suitable as an interim method for storing coordinate system
 *     information in FITS headers until the FITS-WCS encoding becomes
 *     stable. Since many datasets currently use the FITS-IRAF
