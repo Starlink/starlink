@@ -53,7 +53,7 @@
       REAL ADU
 
 *  Arguments Given and Returned:
-      REAL IMAGE( NPIX )
+      <TYPE> IMAGE( NPIX )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -75,10 +75,10 @@
 
 *  Doing pseudo-poissonian noise, do each pixel
       DO 2  I = 1, NPIX
-         IF( IMAGE( I ) .NE. VAL__BADR ) THEN
+         IF( IMAGE( I ) .NE. VAL__BAD<T> ) THEN
 
 *  Scale image value to estimate the real mean.
-            VALUE = IMAGE( I ) * ADU
+            VALUE = DCV_<T>TOR( IMAGE( I ) * ADU )
 
 *  Find the noise value for this means standard deviation.
             NOISE = CCD1_RNORM( 0.0, SQRT( ABS( VALUE)  ), STATUS )
@@ -92,4 +92,4 @@
  2    CONTINUE
 
       END
-* $Id: bgg1_anoi.gen,v 1.2 1998/07/03 15:38:25 mbt Exp $
+* $Id: bgg1_anoi.gen,v 1.3 1998/07/03 15:57:20 mbt Exp $
