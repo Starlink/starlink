@@ -1,0 +1,55 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     pgp_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam Starlink-PGPLOT.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use Starlink-PGPLOT in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a compiler command line,
+#     such as:
+#
+#        alink program.f -L/star/lib `pgp_link_adam`
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     DLT:  D.L. Terrett (Starlink, RAL)
+#     BKM:  B.K. McIlwrath (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     19-JUL-1995 (DLT):
+#        Original version created from template.
+#     23-SEP-1998 (BLY):
+#        Changed reference to -lpgplot to -lpgp for Starlink-PGPLOT.
+#     08-OCT-1999 (BKM);
+#        Version for Starlink "native" PGPLOT.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo -lpgppar_adam  -lpgplot `gwm_link_adam` `psx_link_adam` \
+           `chr_link_adam`   \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
