@@ -1932,7 +1932,7 @@ sub make_pseudo_fits (\%\%) {
     # LONPOLE -- following is default (see C&G)
     push (@pfitsarray, sprintf ("%-8s= %20f", 'LONPOLE',($decdeg==90?0:180)));
     my $logstring='';
-    foreach my $testkw (keys(%$kv)) {
+    foreach my $testkw (sort(keys(%$kv))) {
 	$logstring .= ' '.$testkw.'='.$kv->{$testkw};
     }
     print STDERR "logstring=$logstring\n";
