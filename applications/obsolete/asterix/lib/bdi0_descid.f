@@ -105,7 +105,6 @@
 
       INTEGER			CLEN, PLEN		! Lengths of strings
       INTEGER			FID			! File identifier
-      INTEGER			TSTAT			! Temporary status
 
       LOGICAL			THERE			! Object exists?
 *.
@@ -146,7 +145,7 @@
           PLEN = CHR_LEN( PAR )
           FILE = FILE(:CLEN)//' (associated with parameter '/
      :                /PAR(:PLEN)//')'
-          FLEN = CHR_LEN( FILE )
+          CLEN = CHR_LEN( FILE )
         END IF
 
       END IF
