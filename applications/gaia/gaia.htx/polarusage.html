@@ -30,10 +30,12 @@ are qualified by EPOCH and EQUINOX parameters supplied with the
 catalogue, but these both default to J2000 if not supplied.
 
 <p>If an image is displayed in the main image window, an attempt will
-be made to align the vectors with the image. If both image and
-catalogue contain RA and DEC values, then alignment will be in RA and
-DEC.  Otherwise alignment will be in pixel coordinates (based on the X
-and Y columns in the catalogue).
+be made to align the vectors with the image. If the image is
+displaying celestial coordinates and the catalogue contains 
+RA and DEC values, then alignment will be in RA and DEC.  
+Otherwise alignment will be in pixel coordinates (based on the X
+and Y columns in the catalogue). No other type of coordinate system is
+supported.
 
 <p>If no image is displayed in the main window, a blank image will be
 created covering the area of the catalogue. The colour of this image
