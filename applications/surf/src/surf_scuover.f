@@ -169,7 +169,6 @@
       INTEGER          COLI            ! Original colour index of current pen
       LOGICAL          DEVCAN          ! The device parameter is to be cancelled?
       INTEGER          DIM (MAX_DIM)   ! array dimensions
-      DOUBLE PRECISION ELEVATION       ! Elevation of observation
       INTEGER          END_EXP         ! Last exposure
       INTEGER          END_INT         ! Last integration
       INTEGER          END_MEAS        ! Last measurement
@@ -246,6 +245,7 @@
       INTEGER          LNTYPI          ! Initial line type for current SGS pen
       CHARACTER * ( DAT__SZLOC ) LOCI  ! Locator for input data structure
       REAL             LWIDTH          ! The width of the current SGS pen
+      CHARACTER*(15)   LOCAL_COORDS    ! Coordinate system of MAP_X and MAP_Y
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
@@ -286,7 +286,6 @@
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
-      DOUBLE PRECISION PAR_ANGLE       ! Parallactic angle
       INTEGER PEN                      ! Current SGS pen
       INTEGER PICID                    ! Input picture identifier
       INTEGER PICIDI                   ! Data image picture identifier 
@@ -609,6 +608,21 @@
      :     'MAP_Y', MAP_Y, STATUS)
       MAP_Y = MAP_Y / REAL (R2AS)
 
+*     and the coordinate frame of these offsets
+*     not sure whether old files have this parameter so test for status
+*     If it is not available then assume it is CENTRE_COORDS
+
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'LOCL_CRD', LOCAL_COORDS, STATUS)
+
+         IF (STATUS .NE. SAI__OK) THEN
+            CALL ERR_ANNUL(STATUS)
+            LOCAL_COORDS = IN_CENTRE_COORDS
+         END IF
+      END IF
+
+
 *     the UT of the observation expressed as modified Julian day
 
       CALL SCULIB_GET_MJD(N_FITS, FITS, IN_UT1, RTEMP, STATUS)
@@ -682,9 +696,15 @@
 
 
 *     calculate the apparent RA and Dec of the map centre at IN_UT1
+*     Cannot add MAP_X and MAP_Y here since 
+*       1. This routine does not support LOCAL_COORDS
+*       2. The tracking centre moves if LOCAL_COORDS is AZ for 
+*          a fixed RA,Dec centre.
+*     The reference centre will always be the map centre and not the
+*     offset map centre.
 
       CALL SCULIB_CALC_APPARENT (IN_LONG_RAD, IN_LAT_RAD,
-     :     IN_LONG2_RAD, IN_LAT2_RAD, DBLE(MAP_X), DBLE(MAP_Y), 
+     :     IN_LONG2_RAD, IN_LAT2_RAD, 0.0D0, 0.0D0,
      :     IN_CENTRE_COORDS, %VAL(IN_LST_STRT_PTR), IN_UT1,
      :     IN_MJD1, IN_MJD2, IN_RA_CEN, IN_DEC_CEN, IN_ROTATION,
      :     STATUS)
@@ -768,12 +788,6 @@
       CALL SCULIB_MALLOC (N_BOL * VAL__NBD,
      :     BOL_DEC_PTR, BOL_DEC_END, STATUS)
 
-*     Dont need to get array for elevation and parallactic angle since
-*     I only need the parallactic angle for one exposure.
-
-      ELEVATION = VAL__BADD
-      PAR_ANGLE = VAL__BADD
-
 *     Only want position for first exposure, integration and measurement
 *     calculate position of each bolometer at first measurement
 
@@ -790,6 +804,7 @@
      :     %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), MJD_STANDARD,
      :     IN_UT1,IN_MJD1, IN_LONG_RAD, IN_LAT_RAD, IN_MJD2, 
      :     IN_LONG2_RAD, IN_LAT2_RAD, 
+     :     LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :     N_POINT, POINT_LST, POINT_DAZ, POINT_DEL,
      :     SCUBA__NUM_CHAN, SCUBA__NUM_ADC, BOL_ADC, BOL_CHAN,
      :     BOL_DU3, BOL_DU4, .FALSE., 0.0, 0.0, 0.0, 0.0,
