@@ -15,6 +15,17 @@
       appear in the "Browse Catalog Directories..." item under the
       "Data-Servers" menu).
 
+    - A new configuration option "-focus_follows_mouse" has been
+      added. This follows complaints from users of Solaris CDE that
+      the window manager default configuration allows pop-up windows
+      to disappear (behind the main window) and sometime flash
+      uncontrollably. To stop this happening by default means that
+      everyone will now need to point at a text entry field and click
+      in it before changing the text and also click in the main window
+      before scrolling using the arrow keys. To restore the old
+      behaviour see the section in SUN/214 about configuration options
+      ("%showme sun214 configuration_options").
+
     - A percentiles option has been added to automatic contour
       generation.
 
@@ -47,10 +58,6 @@
 
     - The on-line help for the photometry toolbox is available
       again.
-
-    - A new configuration option "-focus_follows_mouse" has been added
-      to stop problems with "autoraise" and "click-to-focus" when
-      using the CDE window manager. Set this option to 0 (false).
 
     - The ability to zoom around an object in the main display has
       been added (this is controlled using Shift-1 and Shift-2 mouse

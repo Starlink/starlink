@@ -635,7 +635,7 @@ able to convert these files into NDFs, using the on-the-fly
 facility, so if you define your own conversion facilities make sure
 that you include a FITS converter.
 
-\section{\xlabel{configuration_options}Configuration options}
+\section{\xlabel{configuration_options}\label{configuration_options}Configuration options}
 
 GAIA has many options that can be defined when starting it up. These
 are set on the command line in \mytt{-option value} pairs.  Among the
@@ -654,7 +654,7 @@ more interesting are:
  -transient\_tools   &  Make toolboxes transient \\
  -demo\_mode         &  Make the demo toolbox available \\
  -component          &  The NDF component (data, variance or quality) \\
- -focus\_follows\_mouse & Focus for entry areas follows mouse \\
+ -focus\_follows\_mouse & Image and entry focus follows mouse pointer
 \end{tabular}
 }
 
@@ -696,15 +696,22 @@ These define the upper and lower limits for zooming the main
 image. These are normally set to \mytt{20} and \mytt{-6}
 respectively.
 
-The CDE window manager has some problems with the
-\mytt{focus\_follows\_mouse} property (seen when the focus policy is
-`click-to-focus' with `autoraise'). In this case try the command:
+If you prefer to point at the image and text entry fields before using
+the keyboard, rather than having to click in them first (versions of
+GAIA pre-2.4 used this behaviour by default), then use the command:
 \begin{quote}
 \begin{verbatim}
-% gaia image_name -focus_follows_mouse 0
+% gaia image_name -focus_follows_mouse 1
 \end{verbatim}
 \end{quote}
-Add this to your X preferences if you always want this behaviour.
+Add this to your X preferences if you want this behaviour to be
+permanent:
+\begin{quote}
+\begin{verbatim}
+*focus_follows_mouse: 1
+\end{verbatim}
+\end{quote}
+
 
 \subsection{\xlabel{proxy_servers}Proxy servers}
 Access to the World Wide Web may be restricted (by a firewall or maybe
@@ -1001,6 +1008,17 @@ This is a minor update to GAIA with the following fixes:
       release (these will appear in the ``Browse Catalog
       Directories...'' item under the ``Data-Servers'' menu).
 
+\item A new configuration option \mytt{-focus\_follows\_mouse} has been
+      added. This follows complaints from users of Solaris CDE that
+      the window manager default configuration allows pop-up windows
+      to disappear (behind the main window) and sometime flash
+      uncontrollably. To stop this happening by default means that
+      everyone will now need to point at a text entry field and click
+      in it before changing the text and also click in the main window
+      before scrolling using the arrow keys. To restore the old
+      behaviour see
+      \hyperref{configuration options}{\S}{}{configuration_options}.
+
 \item A percentiles option has been added to automatic contour
       generation.
 
@@ -1033,10 +1051,6 @@ This is a minor update to GAIA with the following fixes:
 
 \item The on-line help for the photometry toolbox is available
       again.
-
-\item A new configuration option \mytt{-focus\_follows\_mouse} has been added
-      to stop problems with ``autoraise'' and ``click-to-focus'' when
-      using the CDE window manager. Set this option to 0 (false).
 
 \item The ability to zoom around an object in the main display has
       been added (this is controlled using Shift-1 and Shift-2 mouse
