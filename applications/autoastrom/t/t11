@@ -1,0 +1,69 @@
+##testing run_command_pipe
+
+test -n "$AUTOASTROM_DIR" || AUTOASTROM_DIR=..
+test -n "$PERLBIN" || PERLBIN=/star/Perl/bin/perl
+
+export AUTOASTROM_DIR;
+exec $PERLBIN <<'EOD';
+
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(run_command_pipe);
+
+print "=== test 1\n";
+@a1 = ('ls', 't11', 't10', );
+$r1ref = run_command_pipe(@a1);
+if (defined($r1ref)) {
+    my @r = @$r1ref;
+    for ($i=0; $i<=$#r; $i++) {
+        printf STDOUT ("%d: <%s>\n", $i, $r[$i]);
+    }
+} else {
+    print "failed\n";
+}
+
+print "=== test 2\n";
+# Write a few bytes to a file and have them catted back into the pipe.
+# This should test whether STDOUT in the pipe and in this process are
+# indeed disconnected, or whether flushes in the two processes get in
+# each other's way.  16*64 bytes too much/too little?
+open (T2, ">t11.test") || die ("Can't open t11.test to write");
+$testline = "012345678901234567890123456789012345678901234567890123456789012\n";
+for ($i=0; $i<16; $i++) {
+    print T2 $testline;
+}
+close(T2);
+@a2 = ('cat', 't11.test');
+
+print "stdout...";
+$r2ref = run_command_pipe(@a2);
+@r2 = @$r2ref;
+print "connected\n";
+$nfails = 0;
+for ($i=0; $i<=$#r2; $i++) {
+    if ($r2[$i] != $testline) {
+        $nfails++;
+        printf STDOUT "%d: <%s> != <%s>\n", $i, $r2[$i], $testline;
+    }
+}
+print "Failures: $nfails\n";
+
+unlink('t11.test');
+
+# print "=== test 3\n";
+# @a3 = ('/tmp/norman/aa/match',
+#        '/tmp/autoastrom-19922/00-match-in-1', '1', '2', '3',
+#        '/tmp/autoastrom-19922/00-match-in-2', '1', '2', '3',
+#        'id1=0', 'id2=0',
+#        'outfile=/tmp/autoastrom-19922/00-match-out',
+#        'linear');
+# print "stdout...";
+# $r3ref = run_command_pipe(@a3);
+# print "connected\n";
+# @r3 = @$r3ref;
+# for ($i=0; $i<=$#r3; $i++) {
+#     printf STDOUT "%d: <%s>\n", $i, $r3[$i];
+# }
+
+
+exit 0;
+EOD;
