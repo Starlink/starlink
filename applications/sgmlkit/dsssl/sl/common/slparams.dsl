@@ -58,11 +58,9 @@ Jade command line).
 <routine>
 <routinename>%starlink-decl-entity%
 <description>
-<p>Public-id of the Starlink declaration.
-<p>I <em/think/ that a public text class of `SYNTAX' is correct here,
-     as described in 8879 clause 10.2.2.1, and clause 13, but I'm not
-     convinced.
-<returnvalue type=string>public-id, which will be resolved to a
+<p>Entity name which refers to the Starlink declaration.  This has to
+be declared <em/somewhere/: the default is declared in the General DTD.
+<returnvalue type=string>Entity name, which will be resolved to a
      system-id elsewhere.
 <codebody>
 (define %starlink-decl-entity% "starlink.decl")
