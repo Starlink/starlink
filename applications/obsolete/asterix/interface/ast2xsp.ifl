@@ -1,6 +1,6 @@
 interface AST2XSP
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     prompt 'Input dataset'
     help 'Dataset to be converted - without the .SDF extension'
