@@ -65,6 +65,8 @@
         BYTE                    PARVPATH(5,USI__MXACTPAR)
         BYTE                    PARPPATH(5,USI__MXACTPAR)
         INTEGER                 PARTYPE(USI__MXACTPAR)	! Par types
+        INTEGER                 PARVAL(USI__MXACTPAR)	! Par values
+        INTEGER			PARDYN(USI__MXACTPAR)	! Par dynamic defaults
         CHARACTER*(DAT__SZLOC)  PSTORE			! Parameter values
       END STRUCTURE
 
