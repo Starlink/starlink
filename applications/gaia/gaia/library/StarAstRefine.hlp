@@ -126,6 +126,9 @@ the correct position on the sky.
    highlighted. Double clicking the marker also shows the values
    associated with the object.
 
+   Pressing mouse button 2 over a selected row in the table attempts
+   to centre the image about the associated marker.
+
 
    --- Accurately centering all the markers on stars.
 

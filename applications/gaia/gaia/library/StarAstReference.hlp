@@ -125,7 +125,10 @@ the correct position on the sky.
    Just place your cursor over the marker you're interested in and
    the appropriate row in the reference table will be
    highlighted. Double clicking the marker also shows the values
-   associated with the object.
+   associated with the object. 
+
+   Pressing mouse button 2 over a selected row in the table attempts
+   to centre the image about the associated marker.
 
 
    --- Accurately centering all the markers on stars.

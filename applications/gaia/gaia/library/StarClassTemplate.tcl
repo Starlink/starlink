@@ -45,7 +45,7 @@
 
 #.
 
-class <scope>::<StarClass> {
+itcl::class <scope>::<StarClass> {
    
    #  Inheritances:
    #  -------------

@@ -70,6 +70,8 @@
 #  History:
 #     6-JAN-1998 (PDRAPER):
 #        Original version.
+#     5-MAR-1999 (PDRAPER):
+#        Now centers on selected row using <2>.
 #     {enter_further_changes_here}
 
 #-
@@ -158,9 +160,13 @@ itcl::class gaia::StarAstTable {
        add_short_help $itk_component(delete) \
           {Remove the selected rows from the table}
 
-       #  Set bindings for the table to edit the entries.
+       #  Set table binding edit the entries.
        bind $itk_component(table).listbox <Double-1> \
           [code $this edit_selected_object]
+
+       #  Set table binding to centre on the current object.
+       bind $itk_component(table).listbox <2> \
+          [code $this centre_selected_object_]
 
        #  Add a button to grab the catalogues entries from an
        #  AstroCatalog window (which must already exist).
@@ -1095,6 +1101,30 @@ itcl::class gaia::StarAstTable {
          }
          $itk_component(table) new_info
          redraw
+      }
+   }
+
+   #  Centre the image display on the "selected" object.
+   protected method centre_selected_object_ {} {
+      set id [lindex [lindex [$itk_component(table) get_selected] 0] 0]
+      set canvas $itk_option(-canvas)
+      set image $itk_option(-rtdimage)
+      if {"$id" == "" || $canvas == "" || $image == ""} {
+         return
+      }
+      if { [llength [set box [$canvas bbox $tags_($id)]]] } {
+         lassign $box x0 y0 x1 y1
+         set x [expr ($x1+$x0)/2.0] 
+         set y [expr ($y1+$y0)/2.0]
+
+         set dw [$image dispwidth]
+         set dh [$image dispheight]
+         set cw [winfo width $canvas]
+         set ch [winfo height $canvas]
+         if {$cw != 1 && $dw && $dh} {
+            $canvas xview moveto [expr (($x-$cw/2.0)/$dw)]
+            $canvas yview moveto [expr (($y-$ch/2.0)/$dh)]
+         } 
       }
    }
 
