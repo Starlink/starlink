@@ -192,11 +192,12 @@ else
 	    echo ""
 	    echo "Aha!"
 	    echo "I think that your texmf.cnf file ($texmfcnf) may be broken."
-	    echo "See the section on `Not finding fonts' in the manual."
 	    echo "You may have to use the --enable-fake-progname"
 	    echo "configuration option, as described in the manual."
 	fi
     fi
+    echo ""
+    echo "See the section on `Not finding fonts' in the manual."
 
 fi
 
