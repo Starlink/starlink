@@ -1,0 +1,26 @@
+*  PARAMETERS
+*  ----------
+*     FILELN     File length of input file name.
+*     FNTLEN     Maximum Font name length.
+*     CHRMAX     Maximum number of characters in a font description.
+*     CHRTOT     Maximum number of pointers to the font description.
+*     MPOINT     Maximum pointer size for coordinate data
+*     BEGIN      Subtraction value to obtain real char no.
+*
+      INTEGER    FILELN,    FNTLEN,    CHRTOT,    CHRMAX
+      PARAMETER (FILELN=50, FNTLEN=30, CHRTOT=95, CHRMAX=96)
+      INTEGER    BEGIN,    MPOINT
+      PARAMETER (BEGIN=31, MPOINT=5000)
+
+*     HERLST     hershey list of variables.
+*     DIRECT     Original unsorted order list.
+*     POINT      pointer to the array of vector coordinates.
+*     ORDER      order of the hershey variables.
+*     XARRAY     X coordinate data.
+*     YARRAY     Y coordinate data.
+
+      INTEGER HERLST(CHRTOT), DIRECT(CHRTOT), POINT(CHRMAX),
+     :        ORDER(CHRTOT), XARRAY(MPOINT), YARRAY(MPOINT)
+
+      COMMON  /FONTPT/HERLST,DIRECT,POINT,ORDER,XARRAY,YARRAY
+

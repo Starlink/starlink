@@ -1,0 +1,95 @@
+00000  32 20 sp Hershey Maths Font, GKS font 115
+02214  33 21 ! Exclamation
+02217  34 22 " Double quote
+02270  35 23 # Infinity
+02279  36 24 $ There exists (backward capital 'E')
+02271  37 25 % Percent
+02272  38 26 & And
+02216  39 27 ' Single Quote
+02221  40 28 ( Open bracket
+02222  41 29 ) Close bracket
+02235  42 2A *  Maths times (Diagonal cross)
+02232  43 2B + Plus
+02211  44 2C , Comma
+02231  45 2D -  Minus
+02236  46 2E . Centred Point
+02237  47 2F /  Maths Divide (Two dots with line between)
+02200  48 30 0 Zero
+02201  49 31 1 One
+02202  50 32 2   .
+02203  51 33 3   .
+02204  52 34 4   .
+02205  53 35 5   .
+02206  54 36 6   .
+02207  55 37 7   .
+02208  56 38 8   .
+02209  57 39 9  Nine
+02212  58 3A :  Colon
+02213  59 3B ;  Semi colon
+02241  60 3C < Less Than
+02238  61 3D = Equals
+02242  62 3E > Greater Than
+02215  63 3F ? Question mark
+02273  64 40 @ At
+02257  65 41 A  Union                                            }
+02256  66 42 B  contained as a subset/is implied                 }
+04322  67 43 C  contained as a subset within                     } Set
+02260  68 44 D  Is an element of                                 } Notation
+04320  69 45 E  Empty Set                                        }
+04409  70 46 F  Product of two sets (Upside down V)/ Logical AND }
+02281  71 47 G ?? (Circle enclosing a centred dot) ??
+02233  72 48 H Plus/Minus
+02243  73 49 I Less than or equal to
+02240  74 4A J Equivalent to
+04305  75 4B K Approximately equal to
+02245  76 4C L Proportional to
+02013  77 4D M
+02218  78 4E N Degrees
+02262  79 4F O Up arrow
+02263  80 50 P Left arrow
+01412  81 51 Q Integral sign
+01411  82 52 R Tall thin square root
+02255  83 53 S short thin square root
+02267  84 54 T tall wide square root
+02042  85 55 U Capital Pi
+02185  86 56 V Theta
+02049  87 57 W Capital Psi
+02044  88 58 X Sigma (Sum of)
+02266  89 59 Y  Nabla (Upside down delta)
+02220  90 5A Z Divide (/)
+02223  91 5B [ Square bracket
+04406  92 5C \ Back slash \
+02224  93 5D ] square bracket
+04318  94 5E ^ Power
+04103  95 5F _ Underscore
+02249  96 60 ` Grave
+02259  97 61 a Intersection
+02258  98 62 b contains as a subset /implies
+04303  99 63 c contains as a subset over a line
+02284 100 64 d Direct sum (plus within a circle)
+02186 101 65 e Bold empty set
+04410 102 66 f Sum of two sets / logical OR
+02107 103 67 g
+02234 104 68 h minus or plus
+02244 105 69 i greater than or equal
+04403 106 6A j not equivalent to
+02239 107 6B k not equal to
+02230 108 6C l Parallel to (Two upright parallel lines)
+04324 109 6D m Large infinity
+02729 110 6E n Bold Degrees
+02264 111 6F o Down arrow
+02261 112 70 p Right arrow
+02269 113 71 q Contour integral (integral sign With a circle over it)
+02190 114 72 r Weierstrass elliptic function
+02187 115 73 s Alternative sigma
+02077 116 74 t Aleph (Hebrew)
+02142 117 75 u Pi
+02130 118 76 v Delta
+02137 119 77 w Lambda
+02150 120 78 x Omega
+02265 121 79 y  Partial Differentiation
+02210 122 7A z Full stop
+02225 123 7B { Curly Bracket
+02229 124 7C | |
+02226 125 7D } Curly Bracket
+02246 126 7E ~ ~
