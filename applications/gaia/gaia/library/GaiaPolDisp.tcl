@@ -272,8 +272,8 @@ itcl::class gaia::GaiaPolDisp {
 #  Set up lists of canvas options for selected and unselected vectors.
 #  These include the "pretend" option -flash, which is implemented by this
 #  class.
-            set usty "-fill [$style getUclr] -width [$style getUwid] -flash [$style getUflash]"
-            set ssty "-fill [$style getSclr] -width [$style getSwidd] -flash [$style getSflash]"
+            set usty "-fill \"[$style getUclr]\" -width [$style getUwid] -flash [$style getUflash]"
+            set ssty "-fill \"[$style getSclr]\" -width [$style getSwidd] -flash [$style getSflash]"
 
 #  If we do not need to draw every vector again, get a list of the rows
 #  which need changing and the corresponding states. ALso get lists of
@@ -285,8 +285,8 @@ itcl::class gaia::GaiaPolDisp {
                set usty [lindex $stych 0]
                set ssty [lindex $stych 1]
             } else {
-               set usty "-fill [$style getUclr] -width [$style getUwid] -flash [$style getUflash]"
-               set ssty "-fill [$style getSclr] -width [$style getSwidd] -flash [$style getSflash]"
+               set usty "-fill \"[$style getUclr]\" -width [$style getUwid] -flash [$style getUflash]"
+               set ssty "-fill \"[$style getSclr]\" -width [$style getSwidd] -flash [$style getSflash]"
             }
          }
 #  Create or reconfigure the required vectors. The number of new vectors
@@ -904,9 +904,9 @@ itcl::class gaia::GaiaPolDisp {
 
       if { $on || !$more } {
          if { $sel } {
-            set c $flashscol_
+            set c "$flashscol_"
          } else {
-            set c $flashucol_
+            set c "$flashucol_"
          }
          set on 0
       } else {
