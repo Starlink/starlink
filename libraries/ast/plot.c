@@ -7960,6 +7960,7 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    int ed;                /* Doing a secondary edge? */
    int edge;              /* Index of edge being ticked */
    int first;             /* Is this the first tick to be drawn? */
+   int gelid;             /* ID for next graphical element to be drawn */
    int i;                 /* Minor tick mark index */
    int major;             /* Are major tick marks required? */
    int minhi;             /* Highest minor tick mark index */
@@ -7976,10 +7977,6 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
 
-/* Establish the correct graphical attributes as defined by attributes
-   with the supplied Plot. */
-   GrfAttrs( this, TICKS_ID, 1, GRF__LINE, method, class );
-
 /* If ticks are to be put round the edges of the plotting area... */
 /* ============================================================== */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
@@ -7990,8 +7987,15 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Do each required edge. */
       for( ed = 0; ed < nedge; ed++ ){
 
+/* Initialize the id value for graphical element being drawn. */
+         gelid = TICKS1_ID;
+
 /* Do each axis. */
          for( axis = 0; axis < 2; axis++ ){
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+            GrfAttrs( this, gelid, 1, GRF__LINE, method, class );
 
 /* Store the length in graphics coordinates of major tick marks for this
    axis. Use a default of zero if a grid has been drawn. */
@@ -8071,6 +8075,12 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 
             }
 
+/* Re-establish the original graphical attributes. */
+            GrfAttrs( this, gelid, 0, GRF__LINE, method, class );
+
+/* Set up the id for the next graphical element to be drawn. */
+            gelid = TICKS2_ID;
+
          } 
 
       }
@@ -8090,8 +8100,15 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
 /* Get the current Frame from the Plot. */
       frame = astGetFrame( this, AST__CURRENT );
 
+/* Initialize the id value for graphical element being drawn. */
+      gelid = TICKS1_ID;
+
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+         GrfAttrs( this, gelid, 1, GRF__LINE, method, class );
 
 /* Store the length in graphics coordinates of major tick marks for this
    axis. Use a default of zero if a grid has been drawn. */
@@ -8385,6 +8402,11 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
          pset1 = astAnnul( pset1 );
          pset2 = astAnnul( pset2 );
 
+/* Re-establish the original graphical attributes. */
+         GrfAttrs( this, gelid, 0, GRF__LINE, method, class );
+
+/* Set up the id for the next graphical element to be drawn. */
+         gelid = TICKS2_ID;
       }
 
 /* Annul the pointers to the Mapping and Frame. */
@@ -8392,9 +8414,6 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
       frame = astAnnul( frame );
 
    }
-
-/* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TICKS_ID, 0, GRF__LINE, method, class );
 
 /* Return. */
    return;
@@ -8493,6 +8512,7 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    int edge;              /* The edge to be labelled */
    int edgeax;            /* Index of axis parallel to the labelled edge */
    int edgelabs;          /* Can edge labels be produced? */
+   int gelid;             /* ID for next graphical element to be drawn */
    int naxlab;            /* Number of edge labels */
    int near;              /* Draw a label on the near edge? */
    int nedge[2];          /* No. of edge labels for each axis */
@@ -8757,11 +8777,27 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
 /* Get a pointer to the current Frame in the Plot. */
       frame = astGetFrame( this, AST__CURRENT );
 
+/* Initialize the id value for graphical element being drawn. */
+      gelid = NUMLABS1_ID;
+
 /* If required, draw the labels for each axis in turn. */
       for( axis = 0; axis < 2 && ink; axis++ ){
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+         GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
+
+/* Plot them. */
          info = grid[ axis ];
          PlotLabels( this, frame, axis, llist[ axis ], info->fmt, 
                      nedge[ axis ], &box, method, class );
+
+/* Re-establish the original graphical attributes. */
+         GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+
+/* Set up the id for the next graphical element to be drawn. */
+         gelid = NUMLABS2_ID;
+
       }
 
 /* Free the memory used to hold the bounding boxes. */
@@ -15088,16 +15124,13 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    int tick;              /* Current tick index */
    int tinc;              /* Increment between ticks */
    int upfree;            /* Are we free to change the up-vector? */
+   int gelid;             /* ID for next graphical element to be drawn */
 
 /* Check the global status. */
    if( !astOK ) return;
 
 /* Get the minimum dimension of the plotting ares. */
    mindim = MIN( this->xhi - this->xlo, this->yhi - this->ylo );
-
-/* Establish the correct graphical attributes as defined by attributes
-   with the supplied Plot. */
-   GrfAttrs( this, NUMLABS_ID, 1, GRF__TEXT, method, class );
 
 /* If required, draw the labels around the edges of the plotting area. */
    if( labelat[ 0 ] == AST__BAD || labelat[ 1 ] == AST__BAD ){
@@ -15120,8 +15153,15 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    the Plot. */
       mapping = astGetMapping( this, AST__BASE, AST__CURRENT );
 
+/* Initialize the id value for graphical element being drawn. */
+      gelid = NUMLABS1_ID;
+
 /* Do each axis. */
       for( axis = 0; axis < 2; axis++ ){
+
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+         GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
 
 /* Get a pointer to the structure containing information describing the 
    positions of the major tick marks along this axis. */  
@@ -15346,6 +15386,13 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
 /* Annul the PointSets (if used). */
             if( pset1 ) pset1 = astAnnul( pset1 );
             if( pset2 ) pset2 = astAnnul( pset2 );
+
+/* Re-establish the original graphical attributes. */
+            GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+
+/* Set up the id for the next graphical element to be drawn. */
+            gelid = NUMLABS2_ID;
+
          }
       }
 
@@ -15357,9 +15404,6 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
       frame = astAnnul( frame );
 
    }
-
-/* Re-establish the original graphical attributes. */
-   GrfAttrs( this, NUMLABS_ID, 0, GRF__TEXT, method, class );
 
 /* Return. */
    return;
@@ -18604,6 +18648,7 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    int draw;               /* Should label be drawn? */
    int edge;               /* Edge to be labelled */
    int esc;                /* Interpret escape sequences? */
+   int gelid;              /* ID for next graphical element to be drawn */
    int i;                  /* Corner index */
    int tlen;               /* No. of characetsr in label */
    int ulen;               /* No. of characetsr in units */
@@ -18616,10 +18661,6 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    yrange = this->yhi - this->ylo;
    mindim = MIN( xrange, yrange );
 
-/* Establish the correct graphical attributes as defined by attributes
-   with the supplied Plot. */
-   GrfAttrs( this, TEXTLABS_ID, 1, GRF__TEXT, method, class );
-   
 /* Take a copy of the bounding box which encloses all other parts of the
    annotated grid. If nothing has been plotted, use an area 20 % smaller
    than the plotting area. */   
@@ -18638,9 +18679,16 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
 /* See if escape sequences are to be interpreted within the labels. */
    esc = astGetEscape( this );
 
+/* Initialize the id value for graphical element being drawn. */
+   gelid = TEXTLAB1_ID;
+
 /* Now write a label for each physical axis. */
    for( axis = 0; axis < 2 && astOK; axis++ ){
 
+/* Establish the correct graphical attributes as defined by attributes
+   with the supplied Plot. */
+      GrfAttrs( this, gelid, 1, GRF__TEXT, method, class );
+   
 /* See if the label is to be drawn. If an explicit value has not been set
    for the TextLab attribute, the default is to draw the label if tick
    marks were draw round the edge of the plotting area, and not to
@@ -18806,10 +18854,14 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
          text = NULL;
 
       }
-   }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, TEXTLABS_ID, 0, GRF__TEXT, method, class );
+      GrfAttrs( this, gelid, 0, GRF__TEXT, method, class );
+
+/* Set up the id for the next graphical element to be drawn. */
+      gelid = TEXTLAB2_ID;
+
+   }
 
 /* See if the title is to be drawn. */
    if( astOK && astGetDrawTitle( this ) ){
