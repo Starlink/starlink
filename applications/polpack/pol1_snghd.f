@@ -1,5 +1,5 @@
       SUBROUTINE POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, T, EPS, 
-     :                       IGRP2, LBNDO, UBNDO, ANGRT, STATUS )
+     :                       IGRP2, LBNDO, UBNDO, NDIMO, ANGRT, STATUS )
 *+
 *  Name:
 *     POL1_SNGHD
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGHD( IGRP1, NNDF, VAR, PHI, ANLIND, EPS, IGRP2, 
-*                      LBNDO, UBNDO, ANGRT, STATUS )
+*                      LBNDO, UBNDO, NDIMO, ANGRT, STATUS )
 
 *  Description:
 *     This routine gets the POLPACK extension items required to calculate
@@ -48,12 +48,20 @@
 *        string "DEFAULT" is used if no analyser identifier is supplied for
 *        an NDF. Each unique identifier is included only once in the
 *        returned group.
-*     LBNDO( 3 ) = INTEGER (Returned)
+*     LBNDO( 4 ) = INTEGER (Returned)
 *        The lower bounds required for the output NDF so that it encompasses 
 *        the entire area of all input images (i.e. padded, not trimmmed)
-*     UBNDO( 3 ) = INTEGER (Returned)
+*     UBNDO( 4 ) = INTEGER (Returned)
 *        The upper bounds required for the output NDF so that it encompasses 
 *        the entire area of all input images (i.e. padded, not trimmmed)
+*     NDIMO = INTEGER (Returned)
+*        The number of axes required for the output NDF.
+*        If the input NDFs are 2D sections from a 3D cube, they will have
+*        a 3rd pixel axis with equal upper and lower bounds. All input
+*        NDFs must have the same 3rd axis value. In this case the output 
+*        "cube" will be 4D with the bounds for the 3rd axis equal to the
+*        3rd axis bounds in the input NDF. If the input NDFs are not
+*        slices from a 3D cube, then the output cube will be 3D.
 *     ANGRT = REAL (Returned)
 *        The anti-clockwise angle from the +ve X axis to the reference
 *        direction required for the Stokes vectors, in degrees.
@@ -73,6 +81,9 @@
 *     19-MAR-1999 (DSB):
 *        Modified to return output bounds which encompass the union of all
 *        input images, instead of the intersection.
+*     18-JAN-2001 (DSB):
+*        Added argument NDIMO, and made LBNDO and UBNDO 4 elements long
+*        instead of 3.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,8 +109,9 @@
       REAL T( NNDF )
       REAL EPS( NNDF )
       INTEGER IGRP2
-      INTEGER LBNDO( 3 )
-      INTEGER UBNDO( 3 )
+      INTEGER LBNDO( 4 )
+      INTEGER UBNDO( 4 )
+      INTEGER NDIMO
       REAL ANGRT
 
 *  Status:
@@ -117,14 +129,15 @@
       INTEGER IANAL              ! Index of analyser id within current group
       INTEGER INDF               ! NDF identifier for the current input NDF
       INTEGER IWCS               ! AST pointer to a WCS FrameSet
-      INTEGER LBND( 2 )          ! Lower bounds of input NDF
-      INTEGER UBND( 2 )          ! Upper bounds of input NDF
+      INTEGER LBND( 3 )          ! Lower bounds of input NDF
+      INTEGER UBND( 3 )          ! Upper bounds of input NDF
       INTEGER NDIM               ! No. of axes in input NDF
       INTEGER NANAL              ! No. of different analysers found
       LOGICAL THERE              ! Does item exists?
       REAL ALPHA                 ! Angle from analyser to PRD
       REAL ANGROT                ! Angle from first image axis to the SRD
       REAL H                     ! Angle from ref.direction to half-wave plate
+      INTEGER NDIMR              ! No. of dimensions in 1st input NDF
 
 *.
 
@@ -146,21 +159,48 @@
 *  Get the current NDF identifier.
          CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
 
-*  Get the NDF bounds and check it is 2-dimensional.
-         CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM, STATUS )
+*  Get the NDF bounds and check it is 2-dimensional, or 3-dimensional.
+         CALL NDF_BOUND( INDF, 3, LBND, UBND, NDIM, STATUS )
 
-*  Update the bounds of axes 1 and 2 of the output NDF so that it covers
+*  The first NDF defines the required shape for all further NDFs. All
+*  subsequent NDFs must have the same number of axes as the first. If
+*  the first is 3D then the upper and lower bounds on the third axis of
+*  all NDFs both be equal.
+         IF( I .EQ. 1 ) NDIMR = NDIM
+
+*  Check this NDF has the correct number of dimensions.
+         IF( NDIM .NE. NDIMR .AND. STATUS .EQ. SAI__OK ) THEN 
+            STATUS = SAI__ERROR
+            CALL NDF_MSG( 'NDF', INDF )
+            CALL MSG_SETI( 'ND', NDIM )
+            CALL MSG_SETI( 'NR', NDIMR )
+            IF( NDIM .EQ. 2 ) THEN
+               CALL MSG_SETC( 'W', 'image' )
+            ELSE
+               CALL MSG_SETC( 'W', 'cube' )
+            END IF       
+            CALL ERR_REP( 'POL1_SNGHD_ERR5', 'Input ^W ''^NDF'' '//
+     :                    'is ^ND dimensional, but the first input '//
+     :                    '^W is ^NR dimensional.', STATUS )
+            GO TO 999
+         END IF
+
+*  Update the bounds of axes 1, 2 and of the output NDF so that it covers 
 *  the union of the areas spanned by all the input NDFs.
          IF( I .EQ. 1 ) THEN
             LBNDO( 1 ) = LBND( 1 )
             UBNDO( 1 ) = UBND( 1 )
             LBNDO( 2 ) = LBND( 2 )
             UBNDO( 2 ) = UBND( 2 )
+            LBNDO( 3 ) = LBND( 3 )
+            UBNDO( 3 ) = UBND( 3 )
          ELSE
             LBNDO( 1 ) = MIN( LBND( 1 ), LBNDO( 1 ) )
             UBNDO( 1 ) = MAX( UBND( 1 ), UBNDO( 1 ) )
             LBNDO( 2 ) = MIN( LBND( 2 ), LBNDO( 2 ) )
             UBNDO( 2 ) = MAX( UBND( 2 ), UBNDO( 2 ) )
+            LBNDO( 3 ) = MIN( LBND( 3 ), LBNDO( 3 ) )
+            UBNDO( 3 ) = MAX( UBND( 3 ), UBNDO( 3 ) )
          END IF
 
 *  If all the previous NDFs had defined VARIANCE components, see if the 
@@ -184,7 +224,12 @@
          IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
             STATUS = SAI__ERROR
             CALL NDF_MSG( 'NDF', INDF )
-            CALL ERR_REP( 'POL1_SNGHD_ERR1', 'Input image ''^NDF'' '//
+            IF( NDIM .EQ. 2 ) THEN
+               CALL MSG_SETC( 'W', 'image' )
+            ELSE
+               CALL MSG_SETC( 'W', 'cube' )
+            END IF       
+            CALL ERR_REP( 'POL1_SNGHD_ERR1', 'Input ^W ''^NDF'' '//
      :                    'does not contain a POLPACK extension.',
      :                    STATUS )
             GO TO 999
@@ -216,8 +261,13 @@
             IF( .NOT. THERE .AND. STATUS .EQ. SAI__OK ) THEN
                STATUS = SAI__ERROR
                CALL NDF_MSG( 'NDF', INDF )
+               IF( NDIM .EQ. 2 ) THEN
+                  CALL MSG_SETC( 'W', 'image' )
+               ELSE
+                  CALL MSG_SETC( 'W', 'cube' )
+               END IF       
                CALL ERR_REP( 'POL1_SNGHD_ERR3', 'The POLPACK '//
-     :                       'extension in the input image ''^NDF'' '//
+     :                       'extension in the input ^W ''^NDF'' '//
      :                       'does not contain a WPLATE or ANLANG '//
      :                       'value.', STATUS )
                GO TO 999
@@ -302,18 +352,31 @@
 *  Check the output NDF will contain at least one pixel. Report an error if
 *  not.
       IF( ( LBNDO( 1 ) .GT. UBNDO( 1 ) .OR.
-     :      LBNDO( 1 ) .GT. UBNDO( 1 ) ) .AND. 
+     :      LBNDO( 2 ) .GT. UBNDO( 2 ) .OR. 
+     :      LBNDO( 3 ) .GT. UBNDO( 3 ) ) .AND. 
      :      STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'POL1_SNGHD_ERR4', 'The input intensity images'//
+         IF( NDIM .EQ. 2 ) THEN
+            CALL MSG_SETC( 'W', 'images' )
+         ELSE
+            CALL MSG_SETC( 'W', 'cubes' )
+         END IF       
+         CALL ERR_REP( 'POL1_SNGHD_ERR4', 'The input intensity ^W'//
      :                 ' have no pixels in common.', STATUS )
          GO TO 999
       END IF
 
-*  Set up the bounds of the third axis in the output NDF. The three planes
+*  Set up the bounds of the other axis in the output NDF. The three "planes"
 *  hold I, Q and U values.
-      LBNDO( 3 ) = 1
-      UBNDO( 3 ) = 3
+      IF( NDIMR .EQ. 3 ) THEN
+         NDIMO = 4
+         LBNDO( 4 ) = 1
+         UBNDO( 4 ) = 3
+      ELSE
+         NDIMO = 3
+         LBNDO( 3 ) = 1
+         UBNDO( 3 ) = 3
+      END IF
 
  999  CONTINUE
 

@@ -119,6 +119,9 @@
 *        the Stokes axis.
 *     16-AUG-2000 (DSB):
 *        The TRIMBAD parameter added.
+*     22-JAN-2001 (DSB):
+*        Modified to support spectro-polarimetry data, which has an extra
+*        axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,38 +147,49 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER NDFNM*255        ! NDF section specifier
       CHARACTER XLOC*(DAT__SZLOC)! POLPACK extension locator
       INTEGER I                  ! Index of current input NDF
       INTEGER IGRP2              ! GRP group containing analyser identifiers
-      INTEGER INDF               ! NDF identifier for the current input NDF
-      INTEGER INDF1              ! NDF identifier for the first input NDF
+      INTEGER IGRP3              ! GRP group containing NDF sections
+      INTEGER INDF               ! NDF identifier for current input NDF
+      INTEGER INDF1              ! NDF identifier for first input NDF
       INTEGER INDFC              ! Identifier for co-variance NDF
+      INTEGER INDFCS             ! NDF identifier for covariance NDF section
       INTEGER INDFO              ! NDF identifier for the output NDF
+      INTEGER INDFOS             ! NDF identifier for output NDF section
+      INTEGER INDFS              ! NDF identifier for current input NDF section
       INTEGER IPAID              ! Pointer to analyser indices
       INTEGER IPEPS              ! Pointer to analyser efficiency factors
+      INTEGER IPNREJ             ! Pointer to no. of rejected pixels storage
       INTEGER IPPHI              ! Pointer to effective analyser angles
       INTEGER IPT                ! Pointer to analyser transmission factors
-      INTEGER IPNREJ             ! Pointer to no. of rejected pixels storage
       INTEGER IPTVAR             ! Pointer to input mean variance estimates
       INTEGER IPZERO             ! Pointer to input NDF zero points
       INTEGER IWCS               ! Pointer to output WCS FramSet
-      INTEGER LBNDO( 3 )         ! Lower bounds of output NDF
+      INTEGER LBND( 3 )          ! Lower bounds of input NDF
+      INTEGER LBNDO( 4 )         ! Lower bounds of output NDF
       INTEGER MAXIT              ! Max. no. of rejection iterations to perform
+      INTEGER NC                 ! No. of characters in string
+      INTEGER NDIM               ! No. of dimensions in input NDF
+      INTEGER NDIMO              ! No. of dimensions for output NDF
       INTEGER NNDF               ! No. of input NDFs
       INTEGER PLACE              ! Place holder for co-variances NDF
       INTEGER SMBOX              ! Full size of smoothign box in pixels
       INTEGER TOL                ! Convergence criterion
-      INTEGER UBNDO( 3 )         ! Upper bounds of output NDF
+      INTEGER UBND( 3 )          ! Upper bounds of input NDF
+      INTEGER UBNDO( 4 )         ! Upper bounds of output NDF
       INTEGER WEIGHT             ! Weighting scheme to use
       INTEGER WSCH               ! Weighting scheme to use
+      INTEGER Z                  ! Current Z plane index
       LOGICAL DEZERO             ! Perform zero point corrections?
       LOGICAL INVAR              ! Use input variances?
       LOGICAL OUTVAR             ! Create output variances?
       LOGICAL SETVAR             ! Store input variance estimates?
       LOGICAL TRIM               ! Trim bad margins from output cube?
       REAL ANGROT                ! ACW angle from +X to o/p ref. direction
-      REAL NSIGMA                ! Rejection threshold
       REAL MNFRAC                ! Fraction of good input values required
+      REAL NSIGMA                ! Rejection threshold
 *.
 
 *  Check the inherited global status.
@@ -260,7 +274,7 @@
 *  direction for the Stokes parameters.
       CALL POL1_SNGHD( IGRP1, NNDF, INVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), IGRP2, 
-     :                 LBNDO, UBNDO, ANGROT, STATUS )
+     :                 LBNDO, UBNDO, NDIMO, ANGROT, STATUS )
 
 *  Choose the weighting scheme to use, taking account of the
 *  availability of input variances. Also, estimates of input variances
@@ -321,8 +335,8 @@
       CALL NDG_NDFAS( IGRP1, 1, 'READ', INDF1, STATUS )
 
 *  Initially create the output NDF by propagation from the first input
-*  NDF. This will create a 2D NDF. We will convert it into a 3D NDF later.
-*  Propagation from the input NDF ensures that WCS and AXIS  (etc)
+*  NDF. This will create a 2/3D NDF. We will convert it into a 3/4D NDF 
+*  later. Propagation from the input NDF ensures that WCS and AXIS  (etc)
 *  information is copied from input to output. The HISTORY, LABEL and 
 *  TITLE components (but no extensions) are also propagated.
       CALL NDF_PROP( INDF1, 'WCS,AXIS,NOEXT(FITS,CCDPACK,POLPACK)', 
@@ -338,8 +352,8 @@
      :               'TITLE', STATUS )
       CALL NDF_CINP( 'TITLE', INDFO, 'TITLE', STATUS )
 
-*  Make the output NDF 3 dimensional and set the required bounds.
-      CALL NDF_SBND( 3, LBNDO, UBNDO, INDFO, STATUS ) 
+*  Make the output NDF 3/4 dimensional and set the required bounds.
+      CALL NDF_SBND( NDIMO, LBNDO, UBNDO, INDFO, STATUS ) 
 
 *  Remove the existing POLPACK extension in the output NDF and create a 
 *  new one.
@@ -357,26 +371,26 @@
 *  the reference direction.
       CALL POL1_PTANG( ANGROT, IWCS, STATUS )
 
-*  Add a third axis to all 2D Frames in the WCS FrameSet. The extra axis
+*  Add a 3rd/4th axis to all 2/3D Frames in the WCS FrameSet. The extra axis
 *  represents the "conventional" Stokes axis.
-      CALL POL1_3DWCS( IWCS, STATUS )
+      CALL POL1_3DWCS( IWCS, NDIMO, STATUS )
 
 *  Store the modified FrameSet back in the NDF, and annul the pointer.
       CALL NDF_PTWCS( IWCS, INDFO, STATUS )
 
-*  Store the STOKES value which indicates what each plane of the cube
+*  Store the STOKES value which indicates what each "plane" of the "cube"
 *  contains.
       CALL NDF_XPT0C( 'IQU', INDFO, 'POLPACK', 'STOKES', STATUS ) 
 
-*  If VARIANCES are being produced, create a 2D NDF within the POLPACK 
+*  If VARIANCES are being produced, create a 2/3D NDF within the POLPACK 
 *  extension to hold the QU co-variance. This NDF has the same shape, size
-*  and type as the base NDF (except that it is 2D instead of 3D). 
+*  and type as the base NDF (except that it is 2/3D instead of 3/4D). 
       IF( OUTVAR ) THEN
 
-*  Create a _REAL 2D NDF with the bounds of a plane in the 3D NDF.
+*  Create a _REAL 2/3D NDF with the bounds of a plane in the 3/4D NDF.
          CALL NDF_PLACE( XLOC, 'COVAR', PLACE, STATUS ) 
-         CALL NDF_NEW( '_REAL', 2, LBNDO, UBNDO, PLACE, INDFC, STATUS )
-
+         CALL NDF_NEW( '_REAL', NDIMO - 1, LBNDO, UBNDO, PLACE, INDFC, 
+     :                 STATUS )
       ELSE
          INDFC = NDF__NOID
       END IF
@@ -423,13 +437,77 @@
 *  See if we should trim any bad margins from the output NDF.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
 
-*  Calcualte the I,Q,U values.        
-      CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
+*  If the input NDFs are 2D (i.e. number of output axes is 3), calculate 
+*  the I,Q,U values.        
+      IF( NDIMO .EQ. 3 ) THEN
+         CALL POL1_SNGSV( IGRP1, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
      :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
      :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
      :                 TRIM, INDFO, INDFC, MAXIT, NSIGMA, ILEVEL, 
      :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
      :                 STATUS )
+
+*  If the input NDFs are 3, process each plane separately.
+      ELSE
+
+*  Create a group to hold 2D NDF section strings.
+         CALL GRP_NEW( '2D NDF sections', IGRP3, STATUS ) 
+
+*  Loop round each frequency channel.
+         DO Z = LBNDO( 3 ), UBNDO( 3 )
+
+*  First create a group holding strings describing sections of the input
+*  NDFs for the current plane. For each NDF, an NDF identifiers is
+*  obtained, and then a section is obtained for the required plane, and
+*  the full specification of this slice is then found and appeneded to
+*  the end of the group.
+            CALL GRP_SETSZ( IGRP3, 0, STATUS ) 
+            DO I = 1, NNDF
+               CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
+               CALL NDF_BOUND( INDF, 3, LBND, UBND, NDIM, STATUS )
+               LBND( 3 ) = Z
+               UBND( 3 ) = Z
+               CALL NDF_SECT( INDF, NDIM, LBND, UBND, INDFS, STATUS ) 
+               CALL NDF_MSG( 'NDF', INDFS )
+               CALL MSG_LOAD( ' ', '^NDF', NDFNM, NC, STATUS )
+               CALL GRP_PUT( IGRP3, 1, NDFNM( : NC ), 0, STATUS ) 
+               CALL NDF_ANNUL( INDF, STATUS )
+               CALL NDF_ANNUL( INDFS, STATUS )
+            END DO
+
+*  Obtain a section of the output NDF to receive the results of
+*  processing this Z plane.
+            LBNDO( 3 ) = Z
+            UBNDO( 3 ) = Z
+            CALL NDF_SECT( INDFO, NDIMO, LBNDO, UBNDO, INDFOS, STATUS ) 
+
+*  Obtain a section of the output covariance NDF to receive the results of
+*  processing this Z plane.
+            IF( INDFC .NE. NDF__NOID ) THEN 
+               CALL NDF_SECT( INDFC, NDIMO - 1, LBNDO, UBNDO, INDFCS, 
+     :                        STATUS ) 
+            ELSE
+               INDFCS = NDF__NOID
+            END IF
+
+*  Calculate the I,Q,U values.        
+            CALL POL1_SNGSV( IGRP3, NNDF, WSCH, OUTVAR, %VAL( IPPHI ), 
+     :                 %VAL( IPAID ), %VAL( IPT ), %VAL( IPEPS ), 
+     :                 %VAL( IPTVAR ), %VAL( IPNREJ ), IGRP2, TOL,
+     :                 TRIM, INDFOS, INDFCS, MAXIT, NSIGMA, ILEVEL, 
+     :                 SMBOX/2, SETVAR, MNFRAC, DEZERO, %VAL( IPZERO ), 
+     :                 STATUS )
+
+*  Annull the NDF sections.
+            CALL NDF_ANNUL( INDFOS, STATUS )
+            IF( INDFCS .NE. NDF__NOID ) CALL NDF_ANNUL( INDFCS, STATUS )
+
+         END DO
+
+*  Delete the group.
+         CALL GRP_DELET( IGRP3, STATUS )
+
+      END IF
 
 *  Tidy up.
 *  ========

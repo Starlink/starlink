@@ -95,8 +95,8 @@
 *     INDFC = INTEGER (Given)
 *        An NDF identifier for the output NDF in which to store the 
 *        QU co-variances associated with the Stokes vectors stored in INDFO.
-*        The NDF should be 2D with the same bounds as INDFO. This argument is 
-*        ignored if VAR is .FALSE. 
+*        The NDF should be 2/3D with the same bounds as INDFO. This argument 
+*        is ignored if VAR is .FALSE. 
 *     MAXIT = INTEGER (Given)
 *        The maximum number of rejection iterations to perform. If this is zero
 *        then no rejection iterations are performed.
@@ -190,7 +190,7 @@
 *  Local Variables:
       INTEGER DIM1               ! Dimension of output cube on axis 1
       INTEGER DIM2               ! Dimension of output cube on axis 2
-      INTEGER DIM3               ! Dimension of output cube on axis 3
+      INTEGER DIMST              ! Dimension of output cube on the Stokes axis
       INTEGER EL                 ! No. of elements in a plane of the output NDF
       INTEGER I                  ! Index of current input NDF
       INTEGER IERR               ! Index of first numerical error
@@ -222,13 +222,16 @@
       INTEGER IPXY2              ! Pointer to work array     
       INTEGER IPXY3              ! Pointer to work array     
       INTEGER ITER               ! Number of rejection iterations completed
-      INTEGER LBND( 3 )          ! Lower bounds of output NDF
+      INTEGER LBND( 4 )          ! Lower bounds of output NDF
+      INTEGER LBNDI( 3 )         ! Lower bounds of input NDF
       INTEGER NDIM               ! No. of axes in output NDF
+      INTEGER NDIMI              ! No. of axes in input NDF
       INTEGER NEL                ! No. of elements in whole output NDF
       INTEGER NERR               ! Number of numerical errors
       INTEGER NW                 ! No. of elements in work array
       INTEGER TOTREJ             ! Total number of input pixels rejected
-      INTEGER UBND( 3 )          ! Upper bounds of output NDF
+      INTEGER UBND( 4 )          ! Upper bounds of output NDF
+      INTEGER UBNDI( 3 )         ! Upper bounds of input NDF
       LOGICAL CANDO              ! Is write access available?
       LOGICAL CONV               ! Has variance estimation converged?
 *.
@@ -240,16 +243,26 @@
       IPNIN = 0
 
 *  Get the bounds and dimensions of the output NDF.
-      CALL NDF_BOUND( INDFO, 3, LBND, UBND, NDIM, STATUS )
+      CALL NDF_BOUND( INDFO, 4, LBND, UBND, NDIM, STATUS )
       DIM1 = UBND( 1 ) - LBND( 1 ) + 1
       DIM2 = UBND( 2 ) - LBND( 2 ) + 1
-      DIM3 = UBND( 3 ) - LBND( 3 ) + 1
+      DIMST = UBND( NDIM ) - LBND( NDIM ) + 1
+
+*  Find the number of axes in each input NDF by decrementing the number
+*  of axes in the output NDF.
+      NDIMI = NDIM - 1
+
+*  Store the bounds for the sections of the input NDF to be used.
+      DO I = 1, NDIMI
+         LBNDI( I ) = LBND( I )
+         UBNDI( I ) = UBND( I )
+      END DO
 
 *  Store the number of elements in a single plane of the output NDF.
       EL = DIM1*DIM2
 
 *  Map the output DATA array in which to store the IQU values. NEL gets
-*  set to the number of elements in the entire 3D output cube.
+*  set to the number of elements in the entire output cube.
       CALL NDF_MAP( INDFO, 'DATA', '_REAL', 'WRITE', IPDOUT, NEL, 
      :              STATUS )   
 
@@ -329,7 +342,7 @@
 *  fitting a least squares quadratic surface to the data within a small 
 *  fitting box.
       IF( ITER .GT. 0 ) THEN 
-         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIM3, 
+         CALL POL1_SNGSM( ILEVEL, HW, DIM1, DIM2, DIMST, 
      :                    %VAL( IPVOUT ), %VAL( IPDOUT ), 
      :                    %VAL( IPCOUT ), %VAL( IPIE1 ),
      :                    %VAL( IPX4 ), %VAL( IPX3Y ), 
@@ -343,9 +356,10 @@
 *  as temporary work space.
          IF( WSCH .EQ. 2 ) THEN 
             CALL POL1_SNGVN( NNDF, IGRP1, ILEVEL, T, PHI, EPS, EL, HW,
-     :                       DEZERO, DIM3, %VAL( IPDOUT ), LBND, UBND, 
-     :                       %VAL( IPIE1 ), TVAR, %VAL( IPVEST ), 
-     :                       %VAL( IPIE2 ), ZERO, STATUS )
+     :                       DEZERO, DIMST, %VAL( IPDOUT ), NDIMI, 
+     :                       LBNDI, UBNDI, %VAL( IPIE1 ), TVAR, 
+     :                       %VAL( IPVEST ), %VAL( IPIE2 ), ZERO, 
+     :                       STATUS )
          END IF
 
 *  Display the iteration number of required.
@@ -394,7 +408,7 @@
          CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
 
 *  Get a section from it which matches the output NDF.
-         CALL NDF_SECT( INDF, 2, LBND, UBND, INDFS, STATUS ) 
+         CALL NDF_SECT( INDF, NDIMI, LBNDI, UBNDI, INDFS, STATUS ) 
 
 *  Map the data array.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', IPDIN, EL, 
@@ -419,9 +433,9 @@
 *  intensity values are accepted.
          CALL POL1_SNGCT( INDF, ILEVEL, ITER, EL, %VAL( IPDIN ), 
      :                    %VAL( IPVIN ), T( I ), PHI( I ), EPS( I ), 
-     :                    ZERO( I ), DIM3, %VAL( IPDOUT ), NSIGMA, 
-     :                    TVAR( I ), TOL, DEZERO, CONV, NREJ( I ), 
-     :                    %VAL( IPDCUT ), STATUS )
+     :                    ZERO( I ), DIMST, %VAL( IPDOUT ), 
+     :                    NSIGMA, TVAR( I ), TOL, DEZERO, CONV, 
+     :                    NREJ( I ), %VAL( IPDCUT ), STATUS )
 
 *  Update the total number of pixels rejected from all images.
          TOTREJ = TOTREJ + NREJ( I )
@@ -543,16 +557,17 @@
       IF( TRIM ) THEN
 
 *  Find the new bounds.
-         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
-     :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), 
+     :                    UBND( 2 ), LBND( 3 ), UBND( 3 ), LBND( 4 ),
+     :                    UBND( 4 ), %VAL( IPDOUT ), STATUS )
 
 *  Unmap the output NDFs so that the calls to NDF_SBND below work.
          CALL NDF_UNMAP( INDFO, '*', STATUS )
          IF( OUTVAR ) CALL NDF_UNMAP( INDFC, '*', STATUS )
 
 *  Set the new bounds.
-         CALL NDF_SBND( 3, LBND, UBND, INDFO, STATUS ) 
-         IF( OUTVAR ) CALL NDF_SBND( 2, LBND, UBND, INDFC, STATUS ) 
+         CALL NDF_SBND( NDIM, LBND, UBND, INDFO, STATUS ) 
+         IF( OUTVAR ) CALL NDF_SBND( NDIM, LBND, UBND, INDFC, STATUS ) 
 
       END IF
 

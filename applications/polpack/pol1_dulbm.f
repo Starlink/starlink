@@ -118,6 +118,9 @@
 *        the Stokes axis.
 *     15-AUG-2000 (DSB):
 *        Added parameter TRIMBAD.
+*     22-JAN-2001 (DSB):
+*        Modified to allow the input images to be planes from a 3D x/y/freq
+*        cube.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -168,13 +171,14 @@
       INTEGER NIM, NVAL, NSET    ! Number of input images, validated
                                  ! input images and resulting
                                  ! polarisation data sets.
-      INTEGER LBND( 3 ), UBND( 3) ! image bounds
-      INTEGER NDIM               ! image dimensionality
+      INTEGER LBND( 4 ), UBND( 4 ) ! image bounds
+      INTEGER NDIM               ! Image dimensionality
       INTEGER NPOS               ! Number of waveplate positions (2 for
                                  ! circular and 4 for linear).
       INTEGER I, J, IVAL, IPOS,
      :     PVAL, ISET            ! Loop counters
       INTEGER NDFVAL( MAXIN )    ! Validated NDF identifiers
+      INTEGER SECVAL( MAXIN )    ! Validated NDF sections
       INTEGER IPAIR( MAXIN )     ! List of pairs
       INTEGER NSTATE( 4 )        ! Number of valid images at each
                                  ! waveplate position
@@ -190,7 +194,7 @@
       INTEGER IPDCOR( 8, MAXSET ), IPVCOR( 8, MAXSET )
                                  ! pointers to mapped data corrected
                                  ! with E and F factors
-      INTEGER NDFOUT             ! output NDF identifer.
+      INTEGER NDFOUT, SECOUT     ! output NDF identifer.
       INTEGER IPDOUT, IPVOUT     ! pointers to output data and variance
       INTEGER NEL, NOUT          ! number of mapped elements.
       INTEGER MAXIT              ! maximum number of iterations for
@@ -211,6 +215,7 @@
                                  ! workspace for variances on estimates
                                  ! of I, Q and U
       INTEGER IWCS               ! Identifier for the WCS information
+      INTEGER Z, ZHI, ZLO
        
       REAL ANGROT( MAXIN )       ! Orientation of input ref directions
       REAL ANGRT                 ! Orientation of output ref direction
@@ -267,6 +272,14 @@
 *  Start an NDF context.
       CALL NDF_BEGIN
 
+*  Find out whether we are doing linear or circular polarimetry. In
+*  circular polarimetry mode there are 2 waveplate positions and in
+*  linear polarimetry mode 4 waveplate positions.
+      CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
+     :                PMODE, STATUS )
+      NPOS = 4
+      IF ( PMODE .EQ. 'CIRCULAR' ) NPOS = 2
+      
 *  Get the number of NDFs supplied.
       CALL GRP_GRPSZ( IGRP, NIM, STATUS )
       IF( NIM .GT. MAXIN .AND. STATUS .EQ. SAI__OK ) THEN
@@ -282,14 +295,6 @@
          CALL NDG_NDFAS( IGRP, I, 'READ', NDFIN( I ), STATUS )
       END DO
 
-*  Find out whether we are doing linear or circular polarimetry. In
-*  circular polarimetry mode there are 2 waveplate positions and in
-*  linear polarimetry mode 4 waveplate positions.
-      CALL PAR_CHOIC( 'PMODE', 'LINEAR', 'LINEAR,CIRCULAR', .TRUE.,
-     :                PMODE, STATUS )
-      NPOS = 4
-      IF ( PMODE .EQ. 'CIRCULAR' ) NPOS = 2
-      
 *  Replace the identifiers to the supplied NDFs with identifiers for
 *  sections of the supplied NDFs which have equal bounds. Abort if there
 *  is an error since this means that some of the images do not overlap.
@@ -297,9 +302,23 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       
 *  Get the image dimensions and data type by looking at the first mapped
-*  NDF.
-      CALL NDF_BOUND( NDFIN( 1 ), 2, LBND, UBND, NDIM, STATUS )
+*  NDF. Note, accept 3 dimensions since each input image may be a slice
+*  out of a 3D X/Y/frequency cube.
+      CALL NDF_BOUND( NDFIN( 1 ), 3, LBND, UBND, NDIM, STATUS )
       CALL NDF_TYPE( NDFIN( 1 ), 'DATA', TYPE, STATUS )
+
+*  Store the bounds of the Z planes.
+      IF( NDIM .EQ. 2 ) THEN
+         ZLO = 1
+         ZHI = 1
+      ELSE
+         ZLO = LBND( 3 )
+         ZHI = UBND( 3 )
+      END IF
+
+*  Modify NDIM so that it describes the number of dimensions in the
+*  output NDF, rather than the input NDFs.
+      NDIM = NDIM + 1
 
 *  Obtain the required descriptor information from the images. The
 *  descriptors should have been inserted into a polarimetry extension by
@@ -635,135 +654,16 @@
          GO TO 99
 
       ENDIF
-         
-*  Loop to map the input data and variances (if required). Loop through
-*  the polarisation data sets including partially complete ones.
-      DO ISET = 1, NSET
 
-*  Map the data arrays of each NDF section, and if all NDFs have
-*  VARIANCE components, also map the VARIANCE components. If variances
-*  are not required then assign the pointers to mapped variance arrays
-*  to the data arrays, since they will not be used.
-         DO IPOS = 1, NPOS
-            IF ( NSTATE( IPOS ) .GE. ISET ) THEN
-               IVAL_L = PSET( 2 * IPOS -1, ISET )
-               IVAL_R = PSET( 2 * IPOS, ISET )
-               CALL NDF_MAP( NDFVAL( IVAL_L ), 'DATA', TYPE, 'READ',
-     :              IPDIN( 2 * IPOS - 1, ISET ), NEL, STATUS )
-               CALL NDF_MAP( NDFVAL( IVAL_R ), 'DATA', TYPE, 'READ',
-     :              IPDIN( 2 * IPOS, ISET ), NEL, STATUS )
-               IF( VAR ) THEN
-                  CALL NDF_MAP( NDFVAL( IVAL_L ), 'VARIANCE', TYPE,
-     :                 'READ', IPVIN( 2 * IPOS - 1, ISET ), NEL,
-     :                 STATUS )
-                  CALL NDF_MAP( NDFVAL( IVAL_R ), 'VARIANCE', TYPE,
-     :                 'READ', IPVIN( 2 * IPOS, ISET ), NEL, STATUS )
-               ELSE
-                  IPVIN( 2 * IPOS - 1, ISET ) = IPDIN( 2 * IPOS - 1,
-     :                   ISET )
-                  IPVIN( 2 * IPOS, ISET ) = IPDIN( 2 * IPOS, ISET ) 
-               ENDIF
-
-*  Allocate workspace to hold the images that have been corrected for E
-*  and F factors. If variance information is required then allocate space
-*  for the corrected variance arrays as well (otherwise point the
-*  variance arrays at the data).
-               CALL PSX_CALLOC( NEL, '_REAL',
-     :              IPDCOR( 2 * IPOS - 1, ISET ), STATUS )
-               CALL PSX_CALLOC( NEL, '_REAL', IPDCOR( 2 * IPOS, ISET ),
-     :                          STATUS )
-               IF ( VAR ) THEN
-                  CALL PSX_CALLOC( NEL, '_REAL',
-     :              IPVCOR( 2 * IPOS - 1, ISET ), STATUS )
-                  CALL PSX_CALLOC( NEL, '_REAL',
-     :                 IPVCOR( 2 * IPOS, ISET ), STATUS )
-               ELSE
-                  IPVCOR( 2 * IPOS - 1, ISET ) =
-     :                 IPDCOR( 2 * IPOS - 1, ISET )
-                  IPVCOR( 2 * IPOS, ISET ) = IPDCOR( 2 * IPOS, ISET )
-               ENDIF
-            ENDIF
-         ENDDO
-      ENDDO
-
-*  Abort if an error has occured.
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
-* Allocate some workspace to hold estimates of the F factor and its
-* variance.
-      CALL PSX_CALLOC( 2 * NSET, '_REAL', IPFEST, STATUS )
-      CALL PSX_CALLOC( 2 * NSET, '_REAL', IPVFEST, STATUS )
-      
-*  Calculate the polarisation-dependent instrumental efficiency (F
-*  factor). This gives the relative efficiency of the right hand
-*  polarimeter channel relative to the left hand channel.
-      CALL POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR, TOLS,
-     :               TOLZ, MAXIT, SKYSUP, ID, ILEVEL, %VAL( IPFEST ),
-     :               %VAL( IPVFEST ), F, VF, STATUS )
-
-* Release unwanted workspace. Abort if an error has occurred.
-      CALL PSX_FREE( IPFEST, STATUS )
-      CALL PSX_FREE( IPVFEST, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
-*  Allocate workspace to hold total intensity image pairs when
-*  calculating the E factors. 
-      CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI1, STATUS )
-      CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI2, STATUS )
-
-* Allocate space for scale factor and zero shift estimate, used during
-* image intercomparisons when calculating the E factor. If variances are
-* required then allocate space for the variances on these quantities as
-* well. If variances are not required then allocate an array to hold
-* weighting factors used instead of the variances when forming median
-* images.
-      CALL PSX_CALLOC( NPAIR, '_REAL', IPEEST, STATUS )
-      CALL PSX_CALLOC( NPAIR, '_REAL', IPZEST, STATUS )
-      CALL PSX_CALLOC( NPAIR, '_REAL', IPDE, STATUS )
-      CALL PSX_CALLOC( NPAIR, '_DOUBLE', IPWEIGHT, STATUS )
-      IF ( VAR ) THEN
-         CALL PSX_CALLOC( NPAIR, '_REAL', IPVEEST, STATUS )
-         CALL PSX_CALLOC( NPAIR, '_REAL', IPVZEST, STATUS )
-      ELSE
-         IPVEEST = IPEEST
-         IPVZEST = IPZEST
-      ENDIF
-
-* Allocate Space to hold a character identifer for each pair.
-      CALL PSX_CALLOC( IDLEN*NPAIR, '_CHAR', IPID, STATUS )
-      
-*  Calculate the time-dependent instrumental efficiency (E factor). This
-*  gives the relative efficiency of the instrument between exposures.
-*  This routine also produces E and F factor corrected output images.
-      CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
-     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, %VAL( IPID ), ID, 
-     :               ILEVEL, F,
-     :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
-     :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
-     :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
-     :               %VAL( IPTI2 ), STATUS, %VAL( IDLEN ) )
-
-*   Release unwanted workspace. Keep the weight array (if defined) for
-*   use when calculating the stokes parameters.
-
-      CALL PSX_FREE( IPEEST, STATUS )
-      CALL PSX_FREE( IPZEST, STATUS )
-      CALL PSX_FREE( IPDE, STATUS )
-      CALL PSX_FREE( IPID, STATUS )
-      IF ( VAR ) THEN
-         CALL PSX_FREE( IPVEEST, STATUS )
-         CALL PSX_FREE( IPVZEST, STATUS )
-      ENDIF
-      
 *  Get an AST identifier for the FrameSet held in the WCS component 
 *  of the first input NDF. This will be propagated to the output NDF.
-*  First create a 3D super-set from the input 2D image. This needs
-*  to be done because the WCS information will be stored with the 3D 
-*  output NDF and so needs to have a 3D base Frame. Then get the WCS info
-*  from this 3D NDF.
-      LBND( 3 ) = 1
-      UBND( 3 ) = 1
-      CALL NDF_SECT( NDFVAL( 1 ), 3, LBND, UBND, INDFT, STATUS ) 
+*  First create a 3/4D super-set from the input 2/3D image. This needs
+*  to be done because the WCS information will be stored with the 3/4D 
+*  output NDF and so needs to have a 3/4D base Frame. Then get the WCS info
+*  from this 3/4D NDF.
+      LBND( NDIM ) = 1
+      UBND( NDIM ) = 1
+      CALL NDF_SECT( NDFVAL( 1 ), NDIM, LBND, UBND, INDFT, STATUS ) 
       CALL KPG1_GTWCS( INDFT, IWCS, STATUS )
 
 *  Decide on the orientation of the reference direction in the output
@@ -772,69 +672,30 @@
      :                 0.5*REAL( LBND( 2 ) + UBND( 2 ) - 1 ), ANGRT, 
      :                 STATUS )
 
-*  At this point we can release the input images since we now have
-*  versions corrected with the efficiency factors. Do this by ending the
-*  current NDF context.
-      CALL NDF_END( STATUS )
-
-*  Release the workspace that was used to hold the total intensity image
-*  pairs. Abort on error.
-      CALL PSX_FREE( IPTI1, STATUS )
-      CALL PSX_FREE( IPTI2, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-      
-*  Alloacate space for the I and Q and U estimates. If no U estimates are
-*  possible ( circular mode) then assign a dummy pointer.
-      CALL PSX_CALLOC( NEL * NI, '_REAL', IPIEST, STATUS )
-      CALL PSX_CALLOC( NEL * NI, '_REAL', IPQEST, STATUS )
-      IF ( NU .GT. 0 ) THEN
-         CALL PSX_CALLOC( NEL * NI, '_REAL', IPUEST, STATUS )
-      ELSE
-         IPUEST = IPQEST
-      ENDIF
-        
-*  If variance information is required then allocate space for the
-*  variance estimates on each of the stokes parameters. These will be
-*  used to form the weighted median images. Again, only allocate space
-*  for the U variance if we can calculate U.
-      IF ( VAR ) THEN
-         CALL PSX_CALLOC( NEL * NI, '_REAL', IPVIEST, STATUS )
-         CALL PSX_CALLOC( NEL * NI, '_REAL', IPVQEST, STATUS )
-         IF ( NU .GT. 0 ) THEN
-            CALL PSX_CALLOC( NEL * NI, '_REAL', IPVUEST, STATUS )
-         ELSE
-            IPVUEST = IPVQEST
-         ENDIF
- 
-*  If variance information is not to be calculated then assign dummy
-*  pointers.
-      ELSE
-         IPVIEST = IPIEST
-         IPVQEST = IPQEST
-         IF ( NU .GT. 0 ) THEN
-            IPVUEST = IPUEST
-         ENDIF
-      ENDIF
-
 * Obtain an output data cube to hold the polarisation images. In linear
 * mode the output cube will contain I, Q, U. In circular mode it will
 * contain I, V. If variances have been calculated then the variance
 * information will be propagated to the output. Begin another NDF
 * context.
-      CALL NDF_BEGIN
-      LBND( 3 ) = 1
+      LBND( NDIM ) = 1
       IF ( PMODE .EQ. 'LINEAR' ) THEN
-         UBND( 3 ) = 3
+         UBND( NDIM ) = 3
          TITLE = 'Output from POLPACK: Linear polarimetry'
          LABEL = 'Stokes parameters (I, Q, U)'
          PLANES = 'IQU'
       ELSE
-         UBND( 3 ) = 2
+         UBND( NDIM ) = 2
          TITLE = 'Output from POLPACK: Circular polarimetry'
          LABEL = 'Stokes parameters (I, V)'
          PLANES = 'IV'
       ENDIF
-      CALL NDF_CREAT( 'OUT', '_REAL', 3, LBND, UBND, NDFOUT, STATUS )
+
+      IF( NDIM .EQ. 3 ) THEN
+         LBND( 4 ) = 1
+         UBND( 4 ) = 1
+      END IF
+
+      CALL NDF_CREAT( 'OUT', '_REAL', NDIM, LBND, UBND, NDFOUT, STATUS )
 
 *  Set the default TITLE component for the output, and then ask the user for a
 *  new title.
@@ -847,17 +708,17 @@
 *  Create a POLPACK extension containing a character array identifying the
 *  quantities stored in each plane of the DATA array.
       CALL NDF_XNEW( NDFOUT, 'POLPACK', 'POLPACK', 0, 0, XLOC, STATUS )
-      CALL NDF_XPT0C( PLANES( : UBND( 3 ) - LBND( 3 ) + 1 ), NDFOUT, 
-     :                'POLPACK', 'STOKES', STATUS ) 
+      CALL NDF_XPT0C( PLANES( : UBND( NDIM ) - LBND( NDIM ) + 1 ), 
+     :                NDFOUT, 'POLPACK', 'STOKES', STATUS ) 
       CALL DAT_ANNUL( XLOC, STATUS )         
 
 *  Add a POLANAL Frame to the WCS FrameSet. The first axis in this Frame 
 *  defines the reference direction in the output cube. 
       CALL POL1_PTANG( ANGRT, IWCS, STATUS )
 
-*  Add a third axis to all 2D Frames in the WCS FrameSet. The extra axis
+*  Add another axis to all 2/3D Frames in the WCS FrameSet. The extra axis
 *  represents the "conventional" Stokes axis.
-      CALL POL1_3DWCS( IWCS, STATUS )
+      CALL POL1_3DWCS( IWCS, NDIM, STATUS )
 
 *  Store the WCS FrameSet in the output NDF. All the input NDFs are assumed 
 *  to be aligned with each other, and with the output NDF. So just copy the 
@@ -866,40 +727,254 @@
       CALL NDF_PTWCS( IWCS, NDFOUT, STATUS )
       CALL AST_ANNUL( IWCS, STATUS )
 
+*  Now process each Z plane.
+      DO Z = ZLO, ZHI
+
+*  Start a new NDF context.
+         CALL NDF_BEGIN
+
+*  If the inputs are 2D, use the input NDF identifiers obtained above.
+         IF( NDIM .EQ. 3 ) THEN
+            DO IVAL = 1, NVAL
+               CALL NDF_CLONE( NDFVAL( IVAL ), SECVAL( IVAL ), STATUS )
+            END DO
+
+*  If the inputs are 3D, use sections taken from the input NDFs obtained 
+*  above corresponding to this Z plane.
+         ELSE
+
+            IF( ILEVEL .GT. 0 ) THEN 
+               CALL MSG_SETI( 'Z', Z )
+               CALL MSG_OUT( ' ', 'Doing frequency plane ^Z', STATUS )
+            END IF
+
+            LBND( 3 ) = Z
+            UBND( 3 ) = Z
+
+            DO IVAL = 1, NVAL
+               CALL NDF_SECT( NDFVAL( IVAL ), NDIM - 1, LBND, UBND,
+     :                        SECVAL( IVAL ), STATUS ) 
+            END DO
+
+         END IF
+
+*  Loop to map the input data and variances (if required). Loop through
+*  the polarisation data sets including partially complete ones.
+         DO ISET = 1, NSET
+
+*  Map the data arrays of each NDF section, and if all NDFs have
+*  VARIANCE components, also map the VARIANCE components. If variances
+*  are not required then assign the pointers to mapped variance arrays
+*  to the data arrays, since they will not be used.
+            DO IPOS = 1, NPOS
+               IF ( NSTATE( IPOS ) .GE. ISET ) THEN
+                  IVAL_L = PSET( 2 * IPOS -1, ISET )
+                  IVAL_R = PSET( 2 * IPOS, ISET )
+                  CALL NDF_MAP( SECVAL( IVAL_L ), 'DATA', TYPE, 'READ',
+     :                 IPDIN( 2 * IPOS - 1, ISET ), NEL, STATUS )
+                  CALL NDF_MAP( SECVAL( IVAL_R ), 'DATA', TYPE, 'READ',
+     :                 IPDIN( 2 * IPOS, ISET ), NEL, STATUS )
+                  IF( VAR ) THEN
+                     CALL NDF_MAP( SECVAL( IVAL_L ), 'VARIANCE', TYPE,
+     :                    'READ', IPVIN( 2 * IPOS - 1, ISET ), NEL,
+     :                    STATUS )
+                     CALL NDF_MAP( SECVAL( IVAL_R ), 'VARIANCE', TYPE,
+     :                    'READ', IPVIN( 2 * IPOS, ISET ), NEL, STATUS )
+                  ELSE
+                     IPVIN( 2 * IPOS - 1, ISET ) = IPDIN( 2 * IPOS - 1,
+     :                      ISET )
+                     IPVIN( 2 * IPOS, ISET ) = IPDIN( 2 * IPOS, ISET ) 
+                  ENDIF
+
+*  Allocate workspace to hold the images that have been corrected for E
+*  and F factors. If variance information is required then allocate space
+*  for the corrected variance arrays as well (otherwise point the
+*  variance arrays at the data).
+                  CALL PSX_CALLOC( NEL, '_REAL',
+     :                 IPDCOR( 2 * IPOS - 1, ISET ), STATUS )
+                  CALL PSX_CALLOC( NEL, '_REAL', 
+     :                             IPDCOR( 2 * IPOS, ISET ), STATUS )
+                  IF ( VAR ) THEN
+                     CALL PSX_CALLOC( NEL, '_REAL',
+     :                    IPVCOR( 2 * IPOS - 1, ISET ), STATUS )
+                     CALL PSX_CALLOC( NEL, '_REAL',
+     :                    IPVCOR( 2 * IPOS, ISET ), STATUS )
+                  ELSE
+                     IPVCOR( 2 * IPOS - 1, ISET ) =
+     :                    IPDCOR( 2 * IPOS - 1, ISET )
+                     IPVCOR( 2 * IPOS, ISET ) = IPDCOR( 2 * IPOS, ISET )
+                  ENDIF
+               ENDIF
+            ENDDO
+         ENDDO
+
+*  Abort if an error has occured.
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+
+* Allocate some workspace to hold estimates of the F factor and its
+* variance.
+         CALL PSX_CALLOC( 2 * NSET, '_REAL', IPFEST, STATUS )
+         CALL PSX_CALLOC( 2 * NSET, '_REAL', IPVFEST, STATUS )
+      
+*  Calculate the polarisation-dependent instrumental efficiency (F
+*  factor). This gives the relative efficiency of the right hand
+*  polarimeter channel relative to the left hand channel.
+         CALL POL_CALF( NEL, NSET, NPOS, IPDIN, IPVIN, NSTATE, VAR, 
+     :                  TOLS, TOLZ, MAXIT, SKYSUP, ID, ILEVEL, 
+     :                  %VAL( IPFEST ), %VAL( IPVFEST ), F, VF, 
+     :                  STATUS )
+
+* Release unwanted workspace. Abort if an error has occurred.
+         CALL PSX_FREE( IPFEST, STATUS )
+         CALL PSX_FREE( IPVFEST, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+      
+*  Allocate workspace to hold total intensity image pairs when
+*  calculating the E factors. 
+         CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI1, STATUS )
+         CALL PSX_CALLOC( NEL * NPAIR, '_REAL', IPTI2, STATUS )
+
+* Allocate space for scale factor and zero shift estimate, used during
+* image intercomparisons when calculating the E factor. If variances are
+* required then allocate space for the variances on these quantities as
+* well. If variances are not required then allocate an array to hold
+* weighting factors used instead of the variances when forming median
+* images.
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPEEST, STATUS )
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPZEST, STATUS )
+         CALL PSX_CALLOC( NPAIR, '_REAL', IPDE, STATUS )
+         CALL PSX_CALLOC( NPAIR, '_DOUBLE', IPWEIGHT, STATUS )
+         IF ( VAR ) THEN
+            CALL PSX_CALLOC( NPAIR, '_REAL', IPVEEST, STATUS )
+            CALL PSX_CALLOC( NPAIR, '_REAL', IPVZEST, STATUS )
+         ELSE
+            IPVEEST = IPEEST
+            IPVZEST = IPZEST
+         ENDIF
+
+* Allocate Space to hold a character identifer for each pair.
+         CALL PSX_CALLOC( IDLEN*NPAIR, '_CHAR', IPID, STATUS )
+      
+*  Calculate the time-dependent instrumental efficiency (E factor). This
+*  gives the relative efficiency of the instrument between exposures.
+*  This routine also produces E and F factor corrected output images.
+         CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
+     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, %VAL( IPID ), ID, 
+     :               ILEVEL, F,
+     :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
+     :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
+     :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
+     :               %VAL( IPTI2 ), STATUS, %VAL( IDLEN ) )
+
+*   Release unwanted workspace. Keep the weight array (if defined) for
+*   use when calculating the stokes parameters.
+         CALL PSX_FREE( IPEEST, STATUS )
+         CALL PSX_FREE( IPZEST, STATUS )
+         CALL PSX_FREE( IPDE, STATUS )
+         CALL PSX_FREE( IPID, STATUS )
+         IF ( VAR ) THEN
+            CALL PSX_FREE( IPVEEST, STATUS )
+            CALL PSX_FREE( IPVZEST, STATUS )
+         ENDIF
+
+*  At this point we can release the input sections since we now have
+*  versions corrected with the efficiency factors. Do this by ending the
+*  current NDF context.
+         CALL NDF_END( STATUS )
+
+*  Release the workspace that was used to hold the total intensity image
+*  pairs. Abort on error.
+         CALL PSX_FREE( IPTI1, STATUS )
+         CALL PSX_FREE( IPTI2, STATUS )
+         IF ( STATUS .NE. SAI__OK ) GO TO 99
+      
+*  Allocate space for the I and Q and U estimates. If no U estimates are
+*  possible ( circular mode) then assign a dummy pointer.
+         CALL PSX_CALLOC( NEL * NI, '_REAL', IPIEST, STATUS )
+         CALL PSX_CALLOC( NEL * NI, '_REAL', IPQEST, STATUS )
+         IF ( NU .GT. 0 ) THEN
+            CALL PSX_CALLOC( NEL * NI, '_REAL', IPUEST, STATUS )
+         ELSE
+            IPUEST = IPQEST
+         ENDIF
+        
+*  If variance information is required then allocate space for the
+*  variance estimates on each of the stokes parameters. These will be
+*  used to form the weighted median images. Again, only allocate space
+*  for the U variance if we can calculate U.
+         IF ( VAR ) THEN
+            CALL PSX_CALLOC( NEL * NI, '_REAL', IPVIEST, STATUS )
+            CALL PSX_CALLOC( NEL * NI, '_REAL', IPVQEST, STATUS )
+            IF ( NU .GT. 0 ) THEN
+               CALL PSX_CALLOC( NEL * NI, '_REAL', IPVUEST, STATUS )
+            ELSE
+               IPVUEST = IPVQEST
+            ENDIF
+ 
+*  If variance information is not to be calculated then assign dummy
+*  pointers.
+         ELSE
+            IPVIEST = IPIEST
+            IPVQEST = IPQEST
+            IF ( NU .GT. 0 ) THEN
+               IPVUEST = IPUEST
+            ENDIF
+         ENDIF
+
+*  Begin an NDF context
+         CALL NDF_BEGIN
+
+*  If the output is 3D, use the output NDF identifier obtained above.
+*  Otherwise, use a section from the output NDFs obtained above 
+*  corresponding to this Z plane.
+         IF( NDIM .EQ. 3 ) THEN
+            CALL NDF_CLONE( NDFOUT, SECOUT, STATUS )
+         ELSE
+            LBND( 3 ) = Z
+            UBND( 3 ) = Z
+            CALL NDF_SECT( NDFOUT, NDIM, LBND, UBND, SECOUT, STATUS ) 
+         END IF
+
 * Map the output DATA array and if necessary, the VARIANCE array.
-      CALL NDF_MAP( NDFOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, NOUT,
-     :              STATUS )
-      IF( VAR ) THEN
-         CALL NDF_MAP( NDFOUT, 'VARIANCE', '_REAL', 'WRITE/BAD',
-     :                        IPVOUT, NOUT, STATUS )
-      ELSE
-         IPVOUT = IPDOUT
-      ENDIF
+         CALL NDF_MAP( SECOUT, 'DATA', '_REAL', 'WRITE/BAD', IPDOUT, 
+     :                 NOUT, STATUS )
+         IF( VAR ) THEN
+            CALL NDF_MAP( SECOUT, 'VARIANCE', '_REAL', 'WRITE/BAD',
+     :                    IPVOUT, NOUT, STATUS )
+         ELSE
+            IPVOUT = IPDOUT
+         ENDIF
 
 * Pass the images and parameters to the routine that calculates the
 * polarisation. Put the results directly into the output array. The
 * reference direction for the Stokes parameters is rotated to the angle
 * specified by ANGRT.
-      CALL POL_CALP( NEL, NSET, NPOS, NI,  IPDCOR, IPVCOR, NSTATE,
+         CALL POL_CALP( NEL, NSET, NPOS, NI,  IPDCOR, IPVCOR, NSTATE,
      :               VAR, %VAL( IPIEST ), %VAL( IPVIEST ),
      :               %VAL( IPQEST ), %VAL( IPVQEST ), %VAL( IPUEST ),
      :               %VAL( IPVUEST ), %VAL( IPWEIGHT ), %VAL( IPDOUT ),
      :               %VAL( IPVOUT ), DTOR*( ANGRT - ANGROT( 1 ) ), 
      :               STATUS )
 
+*  End the current NDF context
+         CALL NDF_END( STATUS )
+
+      END DO
+
 *  If required, trim the output NDF to exclude any margins of bad pixels.
       CALL PAR_GET0L( 'TRIMBAD', TRIM, STATUS )
       IF( TRIM ) THEN
 
 *  Find the new bounds.
-         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), UBND( 2 ), 
-     :                    LBND( 3 ), UBND( 3 ), %VAL( IPDOUT ), STATUS )
+         CALL POL1_FBBOX( LBND( 1 ), UBND( 1 ), LBND( 2 ), 
+     :                    UBND( 2 ), LBND( 3 ), UBND( 3 ), LBND( 4 ), 
+     :                    UBND( 4 ), %VAL( IPDOUT ), STATUS )
 
 *  Unmap the output NDF so that the call to NDF_SBND below works.
          CALL NDF_UNMAP( NDFOUT, '*', STATUS )
 
 *  Set the new bounds.
-         CALL NDF_SBND( 3, LBND, UBND, NDFOUT, STATUS ) 
+         CALL NDF_SBND( NDIM, LBND, UBND, NDFOUT, STATUS ) 
       END IF
 
 * Release unwanted workspace.
@@ -923,11 +998,5 @@
       
 *  End the NDF context.
       CALL NDF_END( STATUS )
-
-*  If an error occurred, then report a contextual message.
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'POLCAL_ERROR', 'POLCAL: Error producing '//
-     :                 'Stokes parameters.', STATUS )
-      END IF
 
       END
