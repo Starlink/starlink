@@ -1,1 +1,0 @@
-alink io2ro.o -o io2ro reduce.o roname.o -L/star/lib `fio_link`

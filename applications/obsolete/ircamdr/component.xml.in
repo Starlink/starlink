@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>applications/obsolete/iras90</path>
+  <description>IRCAMDR - IRCAM3 Data Reduction Software</description>
+  <abstract><p>
+The IRCAM3 data reduction and analysis software package,
+IRCAMDR (the old ircam\_clred updated to work under Unix
+and renamed) will analyse and display any 2D data image with a .sdf
+file extension stored in the standard Starlink NDF data format.
+  </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Colin Aspin</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Sandy Leggett</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
