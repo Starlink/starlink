@@ -26,6 +26,14 @@
 *     ccdgenerate
 
 *  ADAM Parameters:
+*     ANGLES( * ) = _DOUBLE (Read)
+*        For each output sequence the angle at which the Pixel frame 
+*        is to be placed on to the frame represented by the coordinates 
+*        given in the FILE.  Angles are anticlockwise in degrees.  The 
+*        position of this frame is given by the ORIGINS parameter.  
+*        If the values for any or all of the sequences are missing they 
+*        are assumed to be zero. 
+*        [0]
 *     FILE = LITERAL (Read)
 *        Name of a text file which contains the object identifiers,
 *        X and Y positions (pixel coordinates), total intensities
@@ -37,15 +45,6 @@
 *            3     58.693     9.092      3924.      0.227
 *            4     39.359    10.288       198.      0.157
 *            5     17.080    25.503      4256.      0.074
-*     NSEQ = _INTEGER (Read)
-*        Number of observing sequences to produce, may take any value
-*        from 1 to 26. An observing sequence consists of a target frame
-*        a bias frame and a flatfield.
-*        [5]
-*     LBNDS( * ) = _INTEGER (Read)
-*        Lower bounds of the output NDFs. They should be two values for
-*        each sequence. Modifying these values for each sequence mimics
-*        moving the telescope on the sky between observations.
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter, then no logfile will be written, regardless of
@@ -71,15 +70,22 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is "BOTH".
 *        [BOTH]
+*     NSEQ = _INTEGER (Read)
+*        Number of observing sequences to produce, may take any value
+*        from 1 to 26. An observing sequence consists of a target frame
+*        a bias frame and a flatfield.
+*        [5]
+*     ORIGINS( * ) = _DOUBLE (Read)
+*        X and Y coordinates for the origin of each frame to be output.
+*        There must be two values for each sequence.  They are in
+*        the frame of the objects in the FILE.
+*     PIXELS( 2 ) = _INTEGER (Read)
+*        X and Y dimensions n pixels of each frame to be output.
 *     TYPE = LITERAL (Read)
 *        The type of the output data. This should be set to the
 *        file extension used to identify any output foreign data
 *        types, if you want the results in a foreign format.
 *        [".sdf"]
-*     UBNDS( * ) = _INTEGER (Read)
-*        Upper bounds of the output NDFs. They should be two values for
-*        each sequence. Modifying these values for each sequence mimics
-*        moving the telescope on the sky between observations.
 
 *  Notes:
 *     -  The log file information is very restricted from this
@@ -95,6 +101,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -120,6 +127,9 @@
 *     13-NOV-1997 (PDRAPER):
 *        Removed calls to NDF_HCRE. History component exceeds IRAFs
 *        ability to store headers.
+*     16-FEB-1998 (MBT):
+*        Modified to write frames at different orientations and include
+*        WCS component in output data frames.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -134,6 +144,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'DAT_PAR'         ! HDS/DAT constants
       INCLUDE 'CCD1_PAR'        ! CCDPACK parameters
+      INCLUDE 'AST_PAR'         ! AST parameters
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -146,12 +157,13 @@
       CHARACTER * ( 10 ) TYPE   ! Foreign data type
       CHARACTER * ( 3 ) COUNT   ! Current frame no.
       CHARACTER * ( 32 ) FNAME  ! Name of output NDF
-      CHARACTER * ( 80 ) BLOCK( 15 ) ! FITS block.
+      CHARACTER * ( 80 ) BLOCK( 16 ) ! FITS block.
       CHARACTER * ( CCD1__BLEN ) LINE ! Read input data.
       CHARACTER * ( DAT__SZLOC ) LOCEXT ! Locators to NDF extensions
       INTEGER DIMS( 2 )         ! Dimensions of NDF
       INTEGER EL                ! Number of data elements
       INTEGER FDIN              ! Input file identifier
+      INTEGER FRGEN             ! AST pointer to CCD_GEN domain frame
       INTEGER I                 ! Loop variable
       INTEGER IAT               ! Position in string
       INTEGER IDB               ! Bias identifier
@@ -168,21 +180,36 @@
       INTEGER IPOBJ             ! Pointer to object data
       INTEGER IPWRK             ! Pointer to workspace data
       INTEGER IPX               ! X positions
+      INTEGER IPXT              ! Pointer to transformed X positions
       INTEGER IPY               ! Y positions
-      INTEGER LBND( 2, CCD1__MXNDF ) ! Bounds of NDF
+      INTEGER IPYT              ! Pointer to transformed Y positions
+      INTEGER IWCS              ! AST pointer to WCS component
+      INTEGER JPIX              ! Index of PIXEL domain frame in frameset
+      INTEGER MAPMX             ! AST pointer to matrix mapping
+      INTEGER MAPTR             ! AST pointer to translation mapping
+      INTEGER MAPTFM            ! AST pointer to mapping between domains
       INTEGER NCHAR             ! Number of characters returned
       INTEGER NERR              ! Number of numeric errors
       INTEGER NLOOP             ! Number of frame generating loops
       INTEGER NOBJ              ! Number of objects to generate
+      INTEGER NPIX( 2 )         ! Dimensions of output all frames.
       INTEGER NRET              ! Number of returns
       INTEGER NVAL              ! Number of values per record
       INTEGER PLACE             ! Place to hold NDF
-      INTEGER UBND( 2, CCD1__MXNDF ) ! Bounds of NDF
       INTEGER WID1              ! Width of bias strip
       INTEGER WID2              ! Width of bias strip
-      LOGICAL BOK               ! Bounds ok
       LOGICAL FOPEN             ! Input file is open
-      
+      DOUBLE PRECISION ANGLE( CCD1__MXNDF ) ! Orientation of output frames
+      DOUBLE PRECISION ANGLR    ! Orientation of current frame in radians
+      DOUBLE PRECISION DEGRA    ! Degrees - Radians conversion factor
+      DOUBLE PRECISION MATRIX( 4 ) ! Transformation matrix
+      DOUBLE PRECISION ORG( 2 * CCD1__MXNDF ) ! Origin coords for output frames
+      DOUBLE PRECISION PIA( 2 ) ! First point initial position for WinMap defn
+      DOUBLE PRECISION PIB( 2 ) ! Second point initial position for WinMap defn
+      DOUBLE PRECISION POA( 2 ) ! First point final position for WinMap defn
+      DOUBLE PRECISION POB( 2 ) ! Second point final position for WinMap defn
+      DOUBLE PRECISION PI       ! Pi
+
 *  Local data. This names follow the ING/WHT convention.
 
       DATA  BLOCK / 
@@ -200,12 +227,17 @@
      :'PFMFNAME= ''B                 '' /',
      :'OBSTYPE =                      /',
      :'TELESCOP= ''CCDPACK SPECIAL   '' /',
+     :'ISEQ    =                      /',
      :'END' /
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Set up some useful constants
+      PI = 4D0 * ATAN( 1D0 )
+      DEGRA = PI / 180D0
 
 *  Pre-error initialisations.
       FOPEN = .FALSE.
@@ -215,6 +247,9 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
+
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Say what we're about.
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -246,6 +281,8 @@
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPY, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPINT, STATUS )
       CALL CCD1_MALL( NOBJ, '_DOUBLE', IPELL, STATUS )
+      CALL CCD1_MALL( NOBJ, '_DOUBLE', IPXT, STATUS )
+      CALL CCD1_MALL( NOBJ, '_DOUBLE', IPYT, STATUS )
       CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 1, %VAL( IPX ),
      :                STATUS )
       CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 2, %VAL( IPY ),
@@ -255,32 +292,39 @@
       CALL CCD1_LEXT( %VAL( IPDAT ), NOBJ, NVAL, 4, %VAL( IPELL ),
      :                STATUS )
 
-*  Size of output images.
+*  Get dimensions of output images.
  10   CONTINUE
-      BOK = .TRUE.
-      CALL PAR_GET1I( 'UBNDS', NLOOP * 2, UBND, NRET, STATUS )
-      IF ( NRET .EQ. NLOOP * 2 ) THEN
-         CALL PAR_GET1I( 'LBNDS', NLOOP * 2, LBND, NRET, STATUS )
-         IF ( NRET .NE. NLOOP * 2 ) THEN
-            BOK = .FALSE.
-            CALL PAR_CANCL( 'LBNDS', STATUS )
-         END IF
-      ELSE
-         BOK = .FALSE.
-         CALL PAR_CANCL( 'UBNDS', STATUS )
-      END IF
-      IF ( .NOT. BOK ) THEN
-         CALL MSG_SETI( 'NEED', NLOOP * 2 )
-         CALL MSG_OUT( ' ', '  You must supply enough bounds'//
-     :   ' for every output NDF (^NEED values)', STATUS )
+      CALL PAR_GET1I( 'PIXELS', 2, NPIX, NRET, STATUS )
+      IF ( NRET .NE. 2 ) THEN
+         CALL PAR_CANCL( 'PIXELS', STATUS )
+         CALL MSG_OUT( ' ', '  You must supply X and Y dimensions'//
+     :   ' for the images in pixels', STATUS )
          GO TO 10
       END IF
 
+*  Get positions of output images.
+ 11   CONTINUE
+      CALL PAR_GET1D( 'ORIGINS', NLOOP * 2, ORG, NRET, STATUS )
+      IF ( NRET .NE. NLOOP * 2 ) THEN
+         CALL PAR_CANCL( 'ORIGINS', STATUS )
+         CALL MSG_SETI( 'NEED', NLOOP * 2 )
+         CALL MSG_OUT( ' ', '  You must supply two origin '//
+     :   'coordinates for every output image to be generated', STATUS )
+         GO TO 11
+      END IF
+
+*  Get orientations (in degrees) of output images.
+ 12   CONTINUE
+      CALL PAR_GET1D( 'ANGLES', NLOOP, ANGLE, NRET, STATUS )
+
+*  Zero any angles not explicitly set.
+      DO I = 1, NLOOP
+         IF ( I .GT. NRET ) ANGLE( I ) = 0D0
+      END DO
+
 *  Set width of bias strips.
-      WID1 = MAX( 3,
-     :       NINT( REAL( UBND( 1, 1 ) - LBND( 1, 1 ) + 1 ) * 0.05 ) )
-      WID2 = MAX( 5,
-     :       NINT( REAL( UBND( 1, 1 ) - LBND( 1, 1 ) + 1 ) * 0.06 ) )
+      WID1 = MAX( 3, NINT( DBLE( NPIX( 1 ) ) * 0.05D0 ) )
+      WID2 = MAX( 5, NINT( DBLE( NPIX( 2 ) ) * 0.06D0 ) )
 
 *  Get the foreign file type for the data (if needed).
       CALL PAR_GET0C( 'TYPE', TYPE, STATUS )
@@ -295,8 +339,8 @@
          CALL CCD1_MSG( ' ', '   Producing sequence ^I ...', STATUS )
 
 *  Get dimensions of NDF.
-         DIMS( 1 ) = UBND( 1, I ) - LBND( 1, I ) + 1
-         DIMS( 2 ) = UBND( 2, I ) - LBND( 2, I ) + 1
+         DIMS( 1 ) = NPIX( 1 )
+         DIMS( 2 ) = NPIX( 2 )
 
 *  Workspace array.
          CALL NDF_TEMP( PLACE, STATUS )
@@ -310,7 +354,6 @@
          CALL NDF_OPEN( DAT__ROOT, FNAME( :CHR_LEN( FNAME ) ),
      :                  'WRITE', 'NEW', IDB, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDB, STATUS )
-C         CALL NDF_HCRE( IDB, STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDB, 'DATA', '_REAL', 'WRITE', IPBIA, EL,
@@ -326,19 +369,49 @@ C         CALL NDF_HCRE( IDB, STATUS )
          CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                  'WRITE', 'NEW', IDO, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDO, STATUS )
-C         CALL NDF_HCRE( IDO, STATUS )
+
+*  Modify WCS component.
+         CALL CCD1_GTWCS( IDO, IWCS, STATUS )
+         ANGLR = DEGRA * ANGLE( I )
+         MATRIX( 1 ) = COS( ANGLR )
+         MATRIX( 2 ) = SIN( ANGLR )
+         MATRIX( 3 ) = - SIN( ANGLR )
+         MATRIX( 4 ) = COS( ANGLR )
+         MAPMX = AST_MATRIXMAP( 2, 2, 0, MATRIX, ' ', STATUS )
+
+         PIA( 1 ) = 0D0
+         PIA( 2 ) = 0D0
+         PIB( 1 ) = 1D0
+         PIB( 2 ) = 1D0
+         POA( 1 ) = ORG( 2 * I - 1 )
+         POA( 2 ) = ORG( 2 * I )
+         POB( 1 ) = ORG( 2 * I - 1 ) + 1D0
+         POB( 2 ) = ORG( 2 * I ) + 1D0
+         MAPTR = AST_WINMAP( 2, PIA, PIB, POA, POB, ' ', STATUS )
+
+         MAPTFM = AST_CMPMAP( MAPMX, MAPTR, .TRUE., ' ', STATUS )
+         FRGEN = AST_FRAME( 2, 'Domain=CCD_GEN', STATUS )
+         CALL CCD1_FRDM( IWCS, 'Pixel', JPIX, STATUS )
+         CALL AST_ADDFRAME( IWCS, JPIX, MAPTFM, FRGEN, STATUS )
+
+*  Write the frameset back to the WCS component of the NDF.  The Current
+*  frame will the in the CCD_GEN domain.
+         CALL NDF_PTWCS( IWCS, IDO, STATUS )
+
+*  Convert objects from CCD_GEN frame to current PIXEL frame.
+         CALL AST_TRAN2( MAPTFM, NOBJ, %VAL( IPX ), %VAL( IPY ),
+     :                   .FALSE., %VAL( IPXT ), %VAL( IPYT ), STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDO, 'DATA', '_REAL', 'WRITE', IPOBJ, EL,
      :                 STATUS )
 
 *  Create the objects.
-         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ),
-     :                   LBND( 1, I ), LBND( 2, I ),
-     :                   %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ), NOBJ,
-     :                   3.0, 0.75, 0.8, %VAL( IPELL ),
-     :                   0.0, 500.0, 100000.0, 15.0, .FALSE., 1,
-     :                   STATUS )
+         CALL CCD1_OBJS( %VAL( IPOBJ ), DIMS( 1 ), DIMS( 2 ), 1, 1,
+     :                   %VAL( IPXT ), %VAL( IPYT ), %VAL( IPINT ), 
+     :                   NOBJ, 3.0, 0.75, 0.8, %VAL( IPELL ),
+     :                   REAL( ANGLE( I ) ), 500.0, 100000.0, 15.0,
+     :                   .FALSE., 1, STATUS )
 
 *  Add noise to it.
          CALL CCD1_ANOI( %VAL( IPOBJ ), EL, 8.0, STATUS )
@@ -349,7 +422,6 @@ C         CALL NDF_HCRE( IDO, STATUS )
          CALL NDF_OPEN( DAT__ROOT, FNAME(:CHR_LEN(FNAME)),
      :                  'WRITE', 'NEW', IDF, PLACE, STATUS )
          CALL NDF_NEWP( '_REAL', 2, DIMS, PLACE, IDF, STATUS )
-C         CALL NDF_HCRE( IDF, STATUS )
 
 *  Map the data in.
          CALL NDF_MAP( IDF, 'DATA', '_REAL', 'WRITE', IPFF, EL,
@@ -375,7 +447,6 @@ C         CALL NDF_HCRE( IDF, STATUS )
          CALL CCD1_ADDS( %VAL( IPWRK ), %VAL( IPBIA ), %VAL( IPFF ),
      :                   DIMS( 1 ), DIMS( 2 ), WID1, WID2, STATUS )
 
-
 *  Set the FITS information.
          IAT = 10
          CALL CHR_PUTI( DIMS( 1 ), BLOCK( 2 ), IAT )
@@ -392,22 +463,24 @@ C         CALL NDF_HCRE( IDF, STATUS )
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 7 ), IAT )
          IAT = 10
          CALL CHR_PUTI( DIMS( 2 ), BLOCK( 9 ), IAT )
-         CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+         IAT = 10
+         CALL CHR_PUTI( I, BLOCK( 15 ), IAT )
+         CALL NDF_XNEW( IDB, 'FITS', '_CHAR*80', 1, 16, LOCEXT, 
      :                  STATUS )
          BLOCK( 13 ) = 'OBSTYPE = ''BIAS'''
-         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
+         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 16, BLOCK, STATUS )
          CALL DAT_ANNUL( LOCEXT, STATUS )
 
-         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+         CALL NDF_XNEW( IDO, 'FITS', '_CHAR*80', 1, 16, LOCEXT, 
      :                  STATUS )
          BLOCK(13 ) = 'OBSTYPE = ''TARGET            '''
-         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
+         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 16, BLOCK, STATUS )
          CALL DAT_ANNUL( LOCEXT, STATUS )
 
-         CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 15, LOCEXT, 
+         CALL NDF_XNEW( IDF, 'FITS', '_CHAR*80', 1, 16, LOCEXT, 
      :                  STATUS )
          BLOCK(13 ) = 'OBSTYPE = ''FLAT              '''
-         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 15, BLOCK, STATUS )
+         CALL DAT_PUT( LOCEXT, '_CHAR*80', 1, 16, BLOCK, STATUS )
          CALL DAT_ANNUL( LOCEXT, STATUS )
 
 *  Release all NDFs - this pass.
@@ -419,6 +492,9 @@ C         CALL NDF_HCRE( IDF, STATUS )
 
 *  Close position files.
       IF ( FOPEN ) CALL FIO_CLOSE( FDIN, STATUS )
+
+*  Release AST context.
+      CALL AST_END( STATUS )
 
 *  Release NDF context.
       CALL NDF_END( STATUS )
