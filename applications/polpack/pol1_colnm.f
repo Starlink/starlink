@@ -222,7 +222,7 @@
             IF( STATUS .NE. FIO__EOF ) CALL ERR_ANNUL( STATUS )
 
 *  Close the config file.
-            CALL FIO_CLOSE( FD )
+            CALL FIO_CLOSE( FD, STATUS )
 
          END IF
 
