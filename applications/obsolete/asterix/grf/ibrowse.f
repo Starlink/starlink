@@ -546,24 +546,28 @@
       INTEGER STATUS
 *    Functions :
 *    Local Constants :
+      INTEGER NX,NY
+      PARAMETER (NX=9,NY=9)
 *    Local variables :
       REAL XP,YP
       CHARACTER*8 NAME
       CHARACTER*8 STRING
       CHARACTER*10 FMT
       CHARACTER*12 OPTIONS
+      BYTE Q
       INTEGER IXP,IYP,IXPMAX,IYPMAX
       INTEGER IX,IY,I,J
       INTEGER I1,I2,J1,J2
       INTEGER ISTAT
-      INTEGER XPID,YPID,XPMID,YPMID,DID(9,9),FID,OID
+      INTEGER XPID,YPID,XPMID,YPMID,DID(NX,NY),FID,OID,XID,YID
       INTEGER FLAG
       INTEGER ISCALE
       REAL XP1,XP2,YP1,YP2
       REAL XW,YW
       REAL XW1,XW2,YW1,YW2
-      REAL SCVAL,VAL2
+      REAL SCVAL,VAL
       REAL XC,YC,DX,DY
+      REAL XSCALE,YSCALE
       DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
       LOGICAL VAR,ERR,SIGNIF,QUAL
 *    Global Variables :
@@ -579,15 +583,25 @@
         ISCALE=0
 
 *  locate noticeboard items
+        CALL NBS_FIND_ITEM(I_NBID,'X',XID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'Y',YID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
         CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
         NAME='DATA'
-        DO I=1,9
-          DO J=1,9
-            WRITE(NAME(5:5),'(I1)') I
-            WRITE(NAME(6:6),'(I1)') J
+        DO I=1,NX
+          DO J=1,NY
+            IF (I.LT.10) THEN
+              WRITE(NAME(5:5),'(I1)') I
+            ELSE
+              WRITE(NAME(5:6),'(I2)') I
+            ENDIF
+            IF (J.LT.10) THEN
+              WRITE(NAME(6:6),'(I1)') J
+            ELSE
+              WRITE(NAME(6:7),'(I2)') J
+            ENDIF
             CALL NBS_FIND_ITEM(I_NBID,NAME,DID(I,J),STATUS)
           ENDDO
         ENDDO
