@@ -103,7 +103,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local variables:
       CHARACTER*( 15 ) ATRB      ! Attribute to set

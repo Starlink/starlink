@@ -68,7 +68,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
       INTEGER SZFSC              ! Size of a style 2 formatted sky 

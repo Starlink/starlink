@@ -318,7 +318,6 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INTEGER CHR_LEN            ! Used length of a string
 
 *  Local Constants:
       INTEGER MXNTXT             ! Max. number of texts can be written
@@ -345,7 +344,6 @@
       LOGICAL LOOP               ! True if looping required.
       CHARACTER*( 16 ) OPTION    ! Action to take in a loop
       CHARACTER*( 10 ) MODE      ! Working mode
-      INTEGER NDF                ! ID of NDF file of the image
       INTEGER NTXT               ! Number of texts having been written
       CHARACTER*( 40 ) OPTMOD    ! Option list for MODE
       CHARACTER*( 45 ) OPTLOP    ! Option list for OPTION
