@@ -103,6 +103,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
+      INCLUDE 'PRM_PAR'          ! VAL__BAD
 
 *  External references
       INTEGER  CHR_LEN           ! Length of string
@@ -278,8 +279,19 @@
          ENDIF
       END DO
 
+*     Fill the output array with bad values before filling it with good!
+*     Do this so that we have a set of data stored in case this was
+*     an aborted observation and the output data would then be garbage
 
-*Now we can read in the data and average it all together
+      DO BOL = 1, N_BOLS
+         DO I = 1, N_POS
+            OUT_DATA(BOL,I) = VAL__BADR
+            OUT_VAR(BOL,I) = VAL__BADR
+            OUT_QUAL(BOL,I)  = 1
+         END DO
+      END DO 
+
+*     Now we can read in the data and average it all together
 
       IF (STATUS .EQ. SAI__OK) THEN
 
@@ -293,39 +305,66 @@
      :        N_POS, 1, 1, 1, MEASUREMENT,
      :        EXP_START, EXP_END, STATUS)
 
+*     Check for aborted/incomplete DEM_PNTR
+
+         IF ((EXP_START .EQ. VAL__BADI) .OR.
+     :        (EXP_START .EQ. 0) .OR.
+     :        (EXP_END .EQ. 0)) THEN
+
+            CALL MSG_SETI ('M', MEASUREMENT)
+            CALL MSG_OUT (' ', 'SCULIB_CALC_SKYDIP_TEMPS: no data '//
+     :           'in measurement ^M', STATUS)
+
+*     Since there is no data set the quality to bad for all bolometers
+            
+            DO BOL = 1, N_BOLS
+               
+               OUT_DATA_AV(BOL, MEASUREMENT) = VAL__BADR
+               OUT_VAR_AV(BOL, MEASUREMENT) = VAL__BADR
+               OUT_QUAL_AV(BOL, MEASUREMENT) = 1
+
+            END DO
+            
+
+         ELSE
+
+
+
 *  cycle through the measurements in the exposure
 
-         N_SAMP_IN = EXP_END - EXP_START + 1
+            N_SAMP_IN = EXP_END - EXP_START + 1
 
-         DO LOAD = 1, N_TEMPS
-            DO BOL = 1, N_BOLS
-               DO INTEGRATION = EXP_START, EXP_END
-                  COUNT = INTEGRATION - EXP_START + 1
-                  SCRATCH(LOAD, BOL, COUNT) = IN_DATA(LOAD, BOL, 
-     :                 INTEGRATION)
+            DO LOAD = 1, N_TEMPS
+               DO BOL = 1, N_BOLS
+                  DO INTEGRATION = EXP_START, EXP_END
+                     COUNT = INTEGRATION - EXP_START + 1
+                     SCRATCH(LOAD, BOL, COUNT) = IN_DATA(LOAD, BOL, 
+     :                    INTEGRATION)
+                  END DO
                END DO
             END DO
-         END DO
 
-         POS = EXP_START
+            POS = EXP_START
 
-         CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, 
-     :        N_SUB, SUB_INSTRUMENT, SUB_WAVE, NUM_CHAN,
-     :        NUM_ADC, BOL_TYPE, N_BOLS, 
-     :        BOL_CHAN, BOL_ADC, N_SAMP_IN, SCRATCH,
-     :        N_INTEGRATIONS, OUT_DATA(1,POS), OUT_VAR(1,POS),
-     :        OUT_QUAL(1,POS), J_SKY_AV,
-     :        J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
+            CALL SCULIB_SKYDIP_TEMPERATURES(T_COLD, T_HOT, 
+     :           N_SUB, SUB_INSTRUMENT, SUB_WAVE, NUM_CHAN,
+     :           NUM_ADC, BOL_TYPE, N_BOLS, 
+     :           BOL_CHAN, BOL_ADC, N_SAMP_IN, SCRATCH,
+     :           N_INTEGRATIONS, OUT_DATA(1,POS), OUT_VAR(1,POS),
+     :           OUT_QUAL(1,POS), J_SKY_AV,
+     :           J_SKY_AV_VARIANCE, J_SKY_AV_QUALITY, STATUS)
 
 *     Extract the average data values
 
-         DO BOL = 1, N_BOLS
+            DO BOL = 1, N_BOLS
 
-            OUT_DATA_AV(BOL, MEASUREMENT) = J_SKY_AV(BOL)
-            OUT_VAR_AV(BOL, MEASUREMENT) = J_SKY_AV_VARIANCE(BOL)
-            OUT_QUAL_AV(BOL, MEASUREMENT) = J_SKY_AV_QUALITY(BOL)
+               OUT_DATA_AV(BOL, MEASUREMENT) = J_SKY_AV(BOL)
+               OUT_VAR_AV(BOL, MEASUREMENT) = J_SKY_AV_VARIANCE(BOL)
+               OUT_QUAL_AV(BOL, MEASUREMENT) = J_SKY_AV_QUALITY(BOL)
 
-         END DO
+            END DO
+
+         END IF
 
       END DO
 
