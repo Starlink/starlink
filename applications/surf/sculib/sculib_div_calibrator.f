@@ -1,6 +1,6 @@
 *+  SCULIB_DIV_CALIBRATOR - divides the calibrator signal into the chop signal
       SUBROUTINE SCULIB_DIV_CALIBRATOR (NELM, DATA, VARIANCE, 
-     :  CALIBRATOR, QUALITY)
+     :  CALIBRATOR, QUALITY,STATUS)
 *    Description :
 *     This routine divides the calibrator signal into the chop signal and
 *     variance over an array of measurements. No division will occur if the 
@@ -19,6 +19,8 @@
 *              Calibration array
 *     QUALITY (NELM)      = BYTE (Given)
 *              Quality on DATA
+*     STATUS = INTEGER (Given & Returned)
+*              inherited status
 *    Method :
 *    Deficiencies :
 *    Bugs :
@@ -41,6 +43,7 @@
       REAL     VARIANCE (NELM)
 *    Export :
 *    Status :
+      INTEGER STATUS
 *    External references :
       BYTE SCULIB_BITON
 *    Global variables :
@@ -50,6 +53,8 @@
 *    Internal References :
 *    Local data :
 *-
+
+      IF (STATUS .NE. SAI__OK) RETURN
 
       DO I = 1, NELM
 
