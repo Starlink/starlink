@@ -1,31 +1,5 @@
 *+
-*  BSUB_SMOOTH - Create background subtracted image from raw image
-*
-	SUBROUTINE BSUB(STATUS)
-
-	INCLUDE 'SAE_PAR'
-	INCLUDE 'DAT_PAR'
-
-	INTEGER STATUS
-	INTEGER BSUB_INT
-	INTEGER ISTATUS
-	INTEGER   ICPU
-	REAL   CPU
-*-
-
-*
-	ISTATUS = BSUB_INT( STATUS )
-
-	IF(.NOT.ISTATUS)THEN
-	  CALL MSG_PRNT('ERROR: Failure in BSUB top level (see
-     &    PSF Access routines)')
-	ENDIF
-
-	END
-*
-*+
-*
-      INTEGER FUNCTION BSUB_INT(STATUS)
+      SUBROUTINE BSUB_INT(STATUS)
 *
 *    Description :
 *
@@ -68,10 +42,6 @@
       INTEGER STATUS
       INTEGER OLDSTATUS
 *
-*    Local constants :
-*
-      INTEGER			MAXLINES   ! Maximum amount of hist text
-*
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)    BLOC             ! Background model
@@ -85,7 +55,6 @@
 
 	INTEGER 		DIM		 ! axis attribute
 
-	REAL			MEAN, SDEV       ! Mean and std. deviation
 	INTEGER                 DIMS(DAT__MXDIM) ! Input dimensions
 	INTEGER                 TDIMS(DAT__MXDIM)!
 	INTEGER                 PSFDIMS(DAT__MXDIM)!
@@ -94,7 +63,6 @@
 
 	INTEGER			NDIM             ! Input dimensionality
 	INTEGER                 NELM             ! Total number of data items
-	INTEGER                 NREC             ! Amount of TEXT used
         INTEGER                 DATA_PTR         ! Output data
 	INTEGER                 VAR_PTR
 	INTEGER                 BDATA_PTR
@@ -116,9 +84,8 @@
 *    Version :
 *
 	CHARACTER*30   		VERSION
-	PARAMETER               (VERSION = 'BSUB Version 1.8-0')
+	PARAMETER               (VERSION = 'BSUB Version 1.8-1')
 
-	CHARACTER*3		  SC_UN		!comparison unit type
 	CHARACTER*80		  UNITS		!units of axis
 
 	INTEGER   		  X_S_PTR	!locator to X source pos
@@ -128,11 +95,9 @@
 	INTEGER   		  SDIM		!dim of above arrays
 	INTEGER   		  BSUB_SUBTRACT_BACKGROUND
 	INTEGER   		  ISTATUS
-	INTEGER   		  BSUB_ERROR_HANDLER
 	INTEGER   		  NEXPAND	!for UIS_TEXT
 	INTEGER  		  I		!counter
 
-	CHARACTER*26 		  CRASH_ID(30)		!crash identifier array
 	CHARACTER*132		  TEXT			!text string
 	CHARACTER*132		  OUT_HISTORY(100)	!history string
 	CHARACTER*132		  EXPAND_TEXT(5)	!for UIS_TEXT
@@ -146,23 +111,6 @@
 	INTEGER   SRCMAP_PTR			!
 
 	INTEGER   COMPX_PTR, COMPY_PTR
-
-	DATA CRASH_ID/
-     &  'BSUB_SUBTRACT_BACKGROUND  ','BSUB_GET_SMOOTHED_IMAGE   ',
-     &  'BSUB_COMPUTE_FACTORIALS   ','BSUB_GET_BOX_LIMITS       ',
-     &  'BSUB_GET_HISTOGRAM        ','BSUB_WRITE_BACK           ',
-     &  'BSUB_FAST_SMOOTH          ','BSUB_UPDATE               ',
-     &  'BSUB_BINOMIAL_ERROR       ','BSUB_FILL_FUNC            ',
-     &  'BSUB_FIT_HISTOGRAM        ','BSUB_GAUSS_ELIM           ',
-     &  'BSUB_GET_HEADER_INFO      ','BSUB_GET_PSF_GRID         ',
-     &  'BSUB_MARQ_COEF            ','BSUB_MIN_FUNC             ',
-     &  'BSUB_POISSON              ','BSUB_SORT_COVAR           ',
-     &  'BSUB_FIT_PSF_TEMPLATE     ','BSUB_UPDATE_SOURCE_MAP    ',
-     &  'BSUB_UNRELIABLE           ','BSUB_IMAGE_LIMITS         ',
-     &  '                          ','                          ',
-     &  '                          ','                          ',
-     &  '                          ','                          ',
-     &  '                          ','                          '/
 *-
 
 *
@@ -185,9 +133,7 @@
       IF(STATUS.NE.SAI__OK)RETURN
 
 *    Initialise
-      CALL AST_INIT( STATUS )
-
-      CALL PSF_INIT( STATUS )
+      CALL AST_INIT()
 
 *    Associate the input and output objects (files)
       CALL USI_ASSOCI( 'INP', 'READ', ILOC, IN_PRIM, STATUS )
@@ -465,12 +411,7 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
      &	%VAL(R_S_PTR),%VAL(SRCMAP_PTR),N_REMOVED,OLOC,%VAL(QUAL_PTR),
      &  STATUS)
 
-	IF(.NOT.ISTATUS)THEN
-
-	   CALL MSG_SETC('ROUTINE',CRASH_ID(ROUTINE_ID))
-	   CALL MSG_PRNT(' Fortran error in lower subroutine ^ROUTINE ')
-
-	ELSE
+	IF(ISTATUS)THEN
 
 *         Create background model
            IF ( CREBACK ) THEN
@@ -665,17 +606,9 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   I, J			!loop variables
 
-	INTEGER   IFAIL			!NAG routine fail check
-
 	INTEGER   IMAX, IMAXP10		!max count in image, imax+10
 
 	INTEGER   IMIN
-
-	INTEGER   XS, YS		!LH lower corner of image box region
-
-	INTEGER   XE, YE		!RH upper corner of image box region
-
-	INTEGER   NSOURCES		!number of detected sources
 
 	REAL   IMAGE_MEAN 		!mean count level of image
 
@@ -685,13 +618,9 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   MIN_YPOS, MAX_YPOS	!Y          "
 
-	INTEGER   XPOS, YPOS, SIG	!for DIAG_EDGE
-
 	INTEGER   NSQ			!Dimension of compression array
 
 	INTEGER   HIST_PTR		!pointer to histogram array
-
-	INTEGER   NHIST			!dimension of histogram array
 
 	INTEGER   NBOXES		!maps for GET_MEANS
 
@@ -703,13 +632,9 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	LOGICAL POINTED			!pointed phase image?
 
-	REAL   OCHISQ
-
 	INTEGER   INT_DIMS(2), INT_PTR  !dims + pointer for intermediate image
 
 	INTEGER   SMOOTHED_PTR		!pointer to smoothed image
-
-	INTEGER   GET_SMOOTHED_IMAGE	!function name
 
 	INTEGER   MAXCT_PTR		!pointer to max ct array
 
@@ -737,11 +662,8 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   IMETH				!temporary option
 
-	LOGICAL FOUND_MINX, FOUND_MINY		!flags for non-zero image limits
         LOGICAL  EDGES                   ! Find sloping edges?
 	LOGICAL ALL_ZEROS			!All pixels zero
-
-	INTEGER   BSUB_ERROR_HANDLER
 
 	INTEGER MAX_DIMS(2)
 
@@ -1078,31 +1000,17 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	REAL   WEIGHTS(NBOX_SIZE)	!weight (not used)
 
-	INTEGER   NPIXELS		!no of pixels
-
 	INTEGER   DIM, DIMX, DIMY	!image dimesions
-
-	INTEGER   IFAIL			!fail test
 
 	INTEGER   CTS			!counts
 
-	INTEGER   IBIN			!bin counter
-
 	INTEGER   NPIX_USED		!no of pixels used
-
-	INTEGER   ICPU1, ICPU2, ICPU3	!cpu counters
 
 	INTEGER   K, KL			!counters
 
 	INTEGER   SM_SIZE		!smoothing box size
 
 	INTEGER   HSIZE			!half smoothing box size
-
-	INTEGER   XSTART, XEND		!start and end values in X
-
-	INTEGER   YSTART, YEND		!              "         Y
-
-	INTEGER   IS, JS		!counters
 
 	INTEGER   LISTA(3)		!parameter list
 
@@ -1116,33 +1024,21 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   NXBOX, NYBOX		!no of boxes in X and Y directions
 
-	INTEGER   NX_LEFT, NY_LEFT	!no of unboxed pixels left over
-
 	INTEGER   NHIST_LAST		!no of pts in last histogram
 
 	INTEGER   IWORST		!box id for worst fit
 
-	INTEGER   IROW, ICOL		!row and column counters
-
-	INTEGER   IOS, IDD		!error id and device ID
-
-	INTEGER   NCOEFS		!no of coefs in fit of PSF
-
 	INTEGER   MAXCT(NBOX_SIZE)	!max ct in each box
 
-	INTEGER   I, J, II, JJ		!counters
+	INTEGER   I, J			!counters
 
-	INTEGER   M, L			!more counters
+	INTEGER   M			!more counters
 
 	REAL   X(1001), Y(1001), E(1001)	!data arrays for fitting
-
-	REAL   COVAR(2,2), ALPHA(2,2)		!internal arrays
 
 	REAL   ALAMDA, CHISQ			!lambda and chisqr values
 
 	REAL   A(2)				!parameter value array
-
-	REAL   BOX_MEANS(1000)			!array of mean in each box
 
 	REAL   SMOOTH_MEAN, IMAGE_MEAN		!means for smooth and input image
 
@@ -1162,15 +1058,11 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	REAL   RMS_IMAGE			!RMS of whole image
 
-	REAL   MEAN_BOX_DIFF			!mean diff of data-smooth
-
 	REAL   WORST_BOX_DIFF 			!worst case diff of data-smooth
 
 	REAL   MEAN_IMAGE_DIFF			!mean diff (data-smooth) over image
 
 	REAL   LOG_FACTORIALS(0:100)		!array of log(N!)
-
-	LOGICAL OUTPUT				!output info (for testing)
 
 	INTEGER   N_AZIM, N_ELEV		!dimensions of PSF grid
 
@@ -1194,15 +1086,13 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   MAX_RADIUS			!max radius of any source
 
-	INTEGER   NUMBER_BOXES      		!number of boxes
-
 	INTEGER   NBOXES			!number of boxes - 2
 
 	LOGICAL ALL_INT				!are all pixels integer?
 
 	LOGICAL	ENOUGH_PIXELS			!enough pixels for fit?
 
-	INTEGER   IERR, itf			!type of error and mean to use
+	INTEGER   IERR			!type of error
 
 	REAL   SUM_PQ(IMAXP10), SUM_P(IMAXP10)	!P and P*Q sums for each ct
 
@@ -1230,8 +1120,6 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 	INTEGER   N_EXTEND			!no of zero bins added to hist
 
-	INTEGER   OLD_ROUTINE			!old routine ID store
-
 	LOGICAL SM_BORDER			!use a border on smoothing box?
 
 	LOGICAL ALL_ZEROS			!zero image
@@ -1252,9 +1140,6 @@ d	    SCF=2.908882E-4		!temporary fix arcmins to radians
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=2
 
 	DIM=MIN(NX,NY)
 	DIMX=NX
@@ -1708,7 +1593,9 @@ d		  E(M+1)=1.D0
 
 	END IF
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_GET_SMOOTHED_IMAGE', STATUS )
+        END IF
 
 	END
 *
@@ -1733,8 +1620,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   IMAX 				!max factorial to evaluate
 *
-	INTEGER   OLD_ROUTINE			!old routine ID store
-
 	INTEGER   STATUS
 
 	INCLUDE 'BSUB_CMN'
@@ -1748,9 +1633,6 @@ d		  E(M+1)=1.D0
 *  Here, for J<30, use simple J!=1*1*2*... *J. For J>=30, use Stirlings approx
 *
 	IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=3
 
 	FACTORIAL=1.0			!(factorial of zero)
 
@@ -1791,9 +1673,10 @@ d		  E(M+1)=1.D0
 
 	END DO
 *
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_COMPUTE_FACTORIALS', STATUS )
+        END IF
 
-	RETURN
 	END
 
 *
@@ -1828,19 +1711,13 @@ d		  E(M+1)=1.D0
 
 	INTEGER   NBOXES
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE	!routine ID monitors
-
 	INTEGER   STATUS
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=4
-*
 *  determine how many boxes are required to fill image
-*
 	NXBOX=(MAX_XPOS-MIN_XPOS+0.1)/BOX_SIZE
 	NXBOX=NXBOX-1
 	IF(NXBOX.LT.0)NXBOX=0
@@ -1895,11 +1772,13 @@ d		  E(M+1)=1.D0
 
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'GET_BOX_LIMITS', STATUS )
+        END IF
 
-	RETURN
 	END
-*
+
+
 *+
 *
 *  subroutine to bin up histogram
@@ -1930,8 +1809,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   NPIX_USED			!no of pixels used
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE
-
 	LOGICAL ALL_INT				!all integer pixels monitor
 
 	BYTE QUALITY(DIMX,DIMY)
@@ -1942,10 +1819,6 @@ d		  E(M+1)=1.D0
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  initialise parameters
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=5
 
 	ALL_INT=.TRUE.
 
@@ -1993,11 +1866,13 @@ d		  E(M+1)=1.D0
 
 	NHIST=NMAX
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'GET_HISTOGRAM', STATUS )
+        END IF
 
-	RETURN
 	END
-*
+
+
 *+
 *
 *  subroutine to write back fitted mean value to the appropriate pixels
@@ -2031,8 +1906,6 @@ d		  E(M+1)=1.D0
 
 	LOGICAL ENOUGH_PIXELS		!enough pixels control
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE
-
 	INTEGER   STATUS
 *
 *-
@@ -2040,9 +1913,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=6
-*
 *  not same element order as for get_histogram
 *
 	DO I=BOX_LIMS(1,IBOX),BOX_LIMS(2,IBOX)		!X loop
@@ -2063,9 +1933,10 @@ d		  E(M+1)=1.D0
 
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'WRITE_BACK', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+
@@ -2117,17 +1988,12 @@ d		  E(M+1)=1.D0
 
 	INTEGER   IEDGE				!border width
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE
-
 	INTEGER   STATUS
 *
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=7
 
 	MAX_CTS=0.
 	MIN_CTS=1.E8
@@ -2345,9 +2211,10 @@ d		  E(M+1)=1.D0
 
 	END DO		!over i
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_FAST_SMOOTH', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+
@@ -2379,8 +2246,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   IS, JS
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE
-
 	INTEGER   STATUS
 *
 *-
@@ -2388,9 +2253,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=8
-*
 	DO IS=YS,YE
 
 	  DO JS=XS,XE	!loop in y direction
@@ -2406,9 +2268,10 @@ d		  E(M+1)=1.D0
 	  END DO
 	END DO
 *
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_UPDATE', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+
@@ -2432,9 +2295,7 @@ d		  E(M+1)=1.D0
 
 	REAL   YV			!expected Poisson value
 
-	INTEGER   I, J			!local variables
-
-	REAL   FACTORIAL		!factorial value
+	INTEGER   J			!local variables
 
 	REAL   PI			!pi
 
@@ -2443,8 +2304,6 @@ d		  E(M+1)=1.D0
 	REAL   RJ			!real variable = x
 
 	REAL   LOG_FACTORIALS(0:100)	!log (N!) array
-
-	INTEGER   OLD_ROUTINE
 
 	INTEGER   STATUS
 *
@@ -2456,9 +2315,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=9
-*
 *  calclate J factorial (uses simple calculation if J < 30 and uses
 *  Stirlings approximation if J > 30).
 *
@@ -2518,12 +2374,12 @@ d		  E(M+1)=1.D0
 
 	END IF
 *
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BINOMIAL_ERROR', STATUS )
+        END IF
 
 	END
-*
-*
-*****************************************************************
+
 *
 *  Subroutine BSUB_FILL_FUNC transfers the PSF data in ARR_2D to PSF_FUNC
 *
@@ -2540,8 +2396,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   I, J				!local variables
 
-	INTEGER   OLD_ROUTINE			!routine ID store
-
 	INTEGER   STATUS
 
 	INCLUDE 'BSUB_CMN'
@@ -2551,19 +2405,14 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=10
-*
 	DO I=1,N_ELEV
 	  DO J=1,N_AZIM
 	     PSF_FUNC(J,I)=ARR_2D(J,I)
 	  END DO
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
-
 	END
-*
+
 *+  BSUB_FIT_HISTOGRAM - Fits the histogram to a poission distrn
 *
 	SUBROUTINE BSUB_FIT_HISTOGRAM(X,Y,E,N,A,MA,MFIT,LISTA,
@@ -2608,13 +2457,11 @@ d		  E(M+1)=1.D0
 
 	REAL A(MA)			!fit parameters
 
-	INTEGER STATUS, STATUSE		!status values
-
-	INTEGER   IDIR, NSTEP		!error direction and no of steps
+	INTEGER STATUS		!status values
 
 	INTEGER   LISTA(2)		!parameter IDs used in fitting
 
-	INTEGER   MFIT, MFIT_E		!no of fitted pars for fit + error calcs
+	INTEGER   MFIT		!no of fitted pars for fit
 
 	LOGICAL CONVERGED		!overall convergence test
 
@@ -2638,21 +2485,9 @@ d		  E(M+1)=1.D0
 
 	REAL CHISQ			!chisqr
 
-	REAL DEL_CHI, CHI_REQ		!chisqr components for error analysis
-
-	REAL   DIR(2)			!error direction
-
 	REAL   A_BEST(2)		!best fit pars
 
-	REAL   DA2, CHI_DIFF		!step size in A(2) and chisqr change
-
-	REAL DELTA_A2			!actual val of delta(a(2)) (inc dirn)
-
-	REAL   YV, DYDA(2)		!func value and derivatives
-
 	INTEGER I, J, K			!local variables
-
-	INTEGER OLD_ROUTINE
 
 	INCLUDE 'BSUB_CMN'
 *
@@ -2661,9 +2496,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=11
-*
 	TOL=0.0001
 
 *	set up old arrays
@@ -2752,9 +2584,10 @@ d		  E(M+1)=1.D0
 	A_BEST(1)=A(1)
 	A_BEST(2)=A(2)
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_FIT_HISTOGRAM', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+  subroutine to do gaussian elimination
@@ -2786,8 +2619,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   STATUS
 
-	INTEGER   OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 
 	BSUB_GAUSS_ELIM=.TRUE.
@@ -2797,9 +2628,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=12
-*
 	DO J=1,N
 	  IPIV(J)=0
 	END DO
@@ -2898,9 +2726,10 @@ d		  E(M+1)=1.D0
 	  END IF
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_GAUS_ELIM', STATUS )
+        END IF
 
-	RETURN
 	END
 
 *
@@ -2964,8 +2793,6 @@ d		  E(M+1)=1.D0
 
 	DOUBLE PRECISION CTOS(3,3)
 
-	INTEGER OLD_ROUTINE
-
 	LOGICAL FLAG				!removed any?
 	LOGICAL HEAD_THERE
 	LOGICAL TARGET_THERE
@@ -2980,9 +2807,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=13
-*
 * set up constants
 *
 	PI=4.0D0*ATAN(1.0D0)
@@ -3185,7 +3009,9 @@ d		  E(M+1)=1.D0
           CALL MSG_PRNT( 'Instrument is ^INS' )
 	ENDIF
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_GET_HEADER_INFO', STATUS )
+        END IF
 
 *      Annul locators even if bad status by declaring new error context
  99     CALL ERR_BEGIN( STATUS )
@@ -3211,25 +3037,15 @@ d		  E(M+1)=1.D0
 
 	REAL   XOFF, YOFF		!offsets from pixel centre
 
-	INTEGER   IMCP			!detector
-
 	INTEGER   N_AZIM, N_ELEV 	!No of grid pts in Az and Elev
 
 	INTEGER   MAX
 
-	INTEGER   I, J, K		!local counters
-
-	INTEGER   ARR_PTR, ARR_DIM	!pointers to arrays
+	INTEGER   I, J			!local counters
 
 	REAL   PSF_FUNC(N_AZIM,N_ELEV)  !PSF function
 
 	REAL   SIZE			!pixel size in arc secs
-
-	REAL   SCF			! factor to normalise peak to 1.0
-
-	DOUBLE PRECISION MJD		!modified Julian data
-
-	REAL   ENERGY			!energy to evaluate PSf at
 
 	REAL   AZIM, D_AZIM		!central Azimuth and step size
 
@@ -3239,18 +3055,8 @@ d		  E(M+1)=1.D0
 
 	REAL   PIX_SIZ			!pixel size in required units
 
-	REAL   SUM			!integrated PSF value
-
-	CHARACTER*(DAT__SZLOC) PLOC	!locator
-
 	INTEGER   DIMS(2), PTR		!dims and pointer to internal PSF array
-
-	INTEGER NDIMS			!no of dims
-
-	LOGICAL DATA_OK			!data ok flag
 *
-	INTEGER   OLD_ROUTINE
-
 	INTEGER   STATUS
 
 	INCLUDE 'BSUB_CMN'
@@ -3259,9 +3065,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=14
-*
 *  set up parameters for PSF evaluation
 *
 	DIMS(1)=N_AZIM
@@ -3321,10 +3124,13 @@ d		  E(M+1)=1.D0
 	  END DO
 	END DO
 *
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_GET_PSF_GRID', STATUS )
+        END IF
 
 	END
-*
+
+
 *+  BSUB_MARQ_COEF
 *
 	SUBROUTINE BSUB_MARQ_COEF(X,Y,EY,NDATA,A,MA,LISTA,MFIT,ALPHA,
@@ -3355,8 +3161,6 @@ d		  E(M+1)=1.D0
 	INTEGER NALP				! array dimensions
 
 	INTEGER   STATUS
-
-	INTEGER   OLD_ROUTINE
 
 	INTEGER I, J, K				!local counters
 
@@ -3389,11 +3193,7 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=15
-
 *	zero everything
-
 	DO J=1,MFIT
 	  DO K=1,J
 	    ALPHA(J,K)=0.0
@@ -3435,7 +3235,9 @@ d		  E(M+1)=1.D0
 	  END DO
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_MARQ_COEF', STATUS )
+        END IF
 
 	END
 *
@@ -3516,17 +3318,12 @@ d		  E(M+1)=1.D0
 
 	INTEGER BSUB_GAUSS_ELIM
 
-	INTEGER OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 *
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=16
 
 *  	to set everything up use alamda lt 0
 
@@ -3651,7 +3448,9 @@ d		  E(M+1)=1.D0
 
 	END IF
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_MIN_FUNC', STATUS )
+        END IF
 
 	END
 *
@@ -3679,10 +3478,6 @@ d		  E(M+1)=1.D0
 
 	INTEGER   J		!integer x value
 
-	INTEGER   I		!counter
-
-	REAL   FACTORIAL	!factorial value
-
 	REAL   PI		!pi
 
 	REAL   LN_FAC, LN_YV	!ln(factorial),   ln(yv)
@@ -3690,8 +3485,6 @@ d		  E(M+1)=1.D0
 	REAL   RJ		!real variable = x
 
 	REAL   LOG_FACTORIALS(0:100)	!log(N!) array
-
-	INTEGER   OLD_ROUTINE
 
 	COMMON/FACTORIALS/LOG_FACTORIALS
 *
@@ -3702,9 +3495,6 @@ d		  E(M+1)=1.D0
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=17
-*
 *  If J is <= 50, read log(J!) from array, else, compute directly
 *  using Stirlings approx. Note the setup computation for the array
 *  only goes up to 50, using simple J! and Stirlings approx where
@@ -3764,8 +3554,10 @@ d		  E(M+1)=1.D0
 *
 	DYDA(1)=YV/A(1)
 	DYDA(2)=YV * ((RJ/A(2)) -1.D0)
-*
-	ROUTINE_ID=OLD_ROUTINE
+
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_POISSON', STATUS )
+        END IF
 
 	END
 *
@@ -3796,17 +3588,12 @@ d		  E(M+1)=1.D0
 
 	INTEGER   STATUS
 
-	INTEGER OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 *
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=18
 
 	DO J=1,MA-1
 	  DO I=J+1,MA
@@ -3841,11 +3628,13 @@ d		  E(M+1)=1.D0
 	  END DO
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_SORT_COVAR', STATUS )
+        END IF
 
 	END
-*
-**************************
+
+
 *+
 *  routine to perform a linear least squares fit of the PSF template
 *  + a background to the data around a source
@@ -3912,13 +3701,9 @@ D	IMPLICIT NONE
 	DOUBLE PRECISION R, S, T, U, V, W	!          "
 	DOUBLE PRECISION XX, YY			!          "
 
-	INTEGER   NUSED 			!pixels used in computations
-
 	LOGICAL FOUND_LIMIT			!radial limit logical
 
 	LOGICAL FOUND_4SIG			!4 sigma radius logical
-
-	INTEGER   OLD_ROUTINE
 
 	INCLUDE 'BSUB_CMN'
 *
@@ -3927,9 +3712,6 @@ D	IMPLICIT NONE
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=19
-*
 *  Routine will fit a function of the form f(x,y)=A + B*x + C*y + D*t(x,y)
 *  where t(x,y) if the normalised PSF template
 *  First, must store the appropriate summation values for computing fit
@@ -4147,9 +3929,10 @@ C     &  (bcoef(ii),ii=1,4)
 	RMAX=II				!maximum radius of source
 	IF(.NOT.FOUND_4SIG)R_4SIG=RMAX	!set to outer limit if not reached
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_FIT_PSF_TEMPLATE', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+
@@ -4192,8 +3975,6 @@ C     &  (bcoef(ii),ii=1,4)
 
 	INTEGER   IX_ST, IY_ST, IX_END, IY_END	!grid limits on image
 
-	INTEGER   OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 *
 *-
@@ -4201,9 +3982,6 @@ C     &  (bcoef(ii),ii=1,4)
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=20
-*
 *  set up limits of PSF grid on image
 *
 	IX_ST=INT(XPOS+1)-INT(N_AZIM/2.)
@@ -4254,10 +4032,12 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	  END DO	!over y dim
 	END DO		!over x dim
-*
-	ROUTINE_ID=OLD_ROUTINE
 
-	RETURN
+
+        IF ( STATUS.NE.SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_UPDATE_SOURCE_MAP', STATUS )
+        END IF
+
 	END
 *
 *+
@@ -4281,17 +4061,12 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	INTEGER   IBOX, BOX_LIMS(4,1000)	!box id and box limits array
 
-	INTEGER   OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=21
-*
 *  go through box and set all pixels in it to -1000000
 *
 	DO II=BOX_LIMS(1,IBOX),BOX_LIMS(2,IBOX)
@@ -4306,10 +4081,7 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	  END DO	!over y dim
 	END DO		!over x dim
-*
-	ROUTINE_ID=OLD_ROUTINE
 
-	RETURN
 	END
 
 *
@@ -4345,17 +4117,12 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	INTEGER   I, J				!loop variables
 
-	INTEGER   OLD_ROUTINE
-
 	INCLUDE 'BSUB_CMN'
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=22
-*
 *  initialise arrays and imax
 *
 	IMAX=-100000000
@@ -4418,9 +4185,10 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 	CALL MSG_PRNT(' NON-ZERO image limits are ^XLOW : ^XHI
      + (in X) and ^YLOW : ^YHI (in Y) ')
 *
-	ROUTINE_ID=OLD_ROUTINE
 
-	RETURN
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_IMAGE_LIMITS', STATUS )
+        END IF
 
 	END
 
@@ -4446,33 +4214,17 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	REAL   MIN_CTS, MAX_CTS			!min/max cts in smoothed image
 
-	REAL   FRONT_STRIP(2), BACK_STRIP(2)	!add/subtract strips
-
-	REAL   TOP_STRIP(2), BOTTOM_STRIP(2)	!add/subtract strips
-
-	REAL   WT_SUM, WT_CT_SUM		!wt and ct*wt summation vars
-
-	REAL   LAST_WT_CT_SUM, LAST_WT_SUM	!old values
-
-	REAL   LAST_ROW_WT_SUM, LAST_ROW_WT_CT_SUM	!for last row
-
-	REAL   BORDER(2), WFX, WFY		!border cts and weight factor
-
 	INTEGER   MIN_XPOS, MAX_XPOS		!non-zero image limits in X
 
 	INTEGER   MIN_YPOS, MAX_YPOS		!       "                 Y
 
-	INTEGER   I, J, IS, JS			!loop variables
+	INTEGER   I, J				!loop variables
 
 	INTEGER   XSTART, XEND			!X box limits on image
 
 	INTEGER   YSTART, YEND			!Y box limits on image
 
-	INTEGER   HSIZE				!half smoothing box size
-
 	LOGICAL SM_BORDER			!use weighted border
-
-	INTEGER   IEDGE				!border width
 
 	REAL   WORK1(DIMX,DIMY)
 
@@ -4490,16 +4242,11 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	INTEGER   K
 
-	INTEGER   ROUTINE_ID, OLD_ROUTINE
-
 	INTEGER   STATUS
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-	OLD_ROUTINE=ROUTINE_ID
-	ROUTINE_ID=23
 
 	MAX_CTS=0.
 	MIN_CTS=1.E8
@@ -4584,9 +4331,10 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	END DO
 
-	ROUTINE_ID=OLD_ROUTINE
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL AST_REXIT( 'BSUB_GAUSS_SMOOTH', STATUS )
+        END IF
 
-	RETURN
 	END
 *
 *+
@@ -4699,10 +4447,11 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 	  END DO
 
 	END DO
-*
-	RETURN
+
 	END
 *
+
+
 *+
 *  routine to compute slope parameters for fit to edge of image
 *
@@ -4785,5 +4534,4 @@ dd	        SCALED_PSF=PSF_COEFS(4)*PSF_FUNC(II-IX_ST+1,JJ-IY_ST+1) !func
 
 	END IF
 
-	RETURN
 	END
