@@ -1062,10 +1062,10 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                             RTOP(IAX)=TOBND7(2,IBIN)
                           ENDIF
 
-                          IF((DBOT(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
-     :                                                           .AND.
-     :                       (RTOP(IAX)-DBOT(IAX))*DIR(IAX).GT.0.0)
-     :                                                             THEN
+                          IF((DBOT(IAX)-RBOT(IAX))*DIR(IAX).GE.
+     :                                            -0.000001.AND.
+     :                       (RTOP(IAX)-DBOT(IAX))*DIR(IAX).GT.
+     :                                            -0.000001) THEN
                             RIL(IAX)=IBIN
                             LOFOUND=.TRUE.
                           ELSE
@@ -1104,10 +1104,10 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
 	print *,'hi',ibin,tobnd1(1,ibin),tobnd1(2,ibin)
 
-                          IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.0.0
-     :                                                            .AND.
-     :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GE.0.0)
-     :                                                            THEN
+                          IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.
+     :                                            -0.000001 .AND.
+     :                       (RTOP(IAX)-DTOP(IAX))*DIR(IAX).GE.
+     :                                            -0.000001) THEN
                             RIH(IAX)=IBIN
                             HIFOUND=.TRUE.
                           ELSE
