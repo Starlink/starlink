@@ -27,6 +27,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      CHARACTER*20 MODE
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IPATCH Version 1.8-0')
@@ -433,6 +434,8 @@
                 IF (I_VOK) THEN
                   V(II,JJ)=V(I,J)
                 ENDIF
+
+              ENDIF
 
             ENDDO
           ENDDO
