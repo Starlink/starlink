@@ -1812,7 +1812,7 @@ javadocs:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:639: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/index-all.html...
   [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
   [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
@@ -1842,7 +1842,7 @@ javadocs:
   [javadoc]  components."
   [javadoc] Building index for all classes...
   [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:63: warning - @created is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:626: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/SOG.java:639: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/sog/docs/sog/javadocs/uk/ac/starlink/sog/SOG.html...
   [javadoc] "Usage: java [-Djsky.catalog.skycat.config=$SKYCAT_CONFIG]
   [javadoc]              [-Djsky.util.logger.config=$LOG_CONFIG]
@@ -2770,4 +2770,4 @@ javadocs:
   [javadoc] 206 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 9 seconds
+Total time: 3 minutes 7 seconds
