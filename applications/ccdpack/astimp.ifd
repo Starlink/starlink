@@ -59,10 +59,10 @@
             type _INTEGER
             access READ
             vpath PROMPT
-            ppath DYNAMIC
+            ppath CURRENT DEFAULT
+            default !
             prompt {List of sequence values for INDEX frameset identifiers}
             size *
-            dynamic yes
             helpkey *
           }
 

@@ -70,12 +70,11 @@
 *        each NDF, what its index number is.  Thus if only one NDF is
 *        given in the IN list, and the value of INDICES is [3], then
 *        the frameset with the identifier 'INDEX 3' will be chosen. 
-*        Its default value is a list with the appropriate number of 
-*        elements starting 1,2,3,...  This default will normally be
-*        appropriate unless the NDFs are being presented in an unusual
-*        order, i.e. different from that in which they were presented
-*        to ASTEXP when generating the AST file.
-*        [Dynamic: 1,2,3,...]
+*        If set null (!) a the NDFs will be considered in the order
+*        1,2,3,... which will be appropriate unless the NDFs are being 
+*        presented in a different order from that in which they were 
+*        presented to ASTEXP when generating the AST file.
+*        [!]
 *     INDOMAIN = LITERAL (Read)
 *        The Domain name to be used for the Current frames of the 
 *        framesets which are imported.  If a null (!) value is given, 
@@ -411,6 +410,7 @@
 
 *  Get group of NDFs to operate on.  If a null value is given, there
 *  is no more processing to do.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
       NNDF = 0
       CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
@@ -426,18 +426,19 @@
       END IF
 
 *  Get list of NDF indexes for use if the frameset identifiers are of
-*  type 'INDEX'.  We first set the dynamic default to 1,2,3,...
+*  type 'INDEX'.  If null set to 1,2,3,...
       CALL CCD1_GISEQ( 1, 1, NNDF, INDXS, STATUS )
-      CALL PAR_DEF1I( 'INDICES', NNDF, INDXS, STATUS )
       CALL PAR_EXACI( 'INDICES', NNDF, INDXS, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL CCD1_GISEQ( 1, 1, NNDF, INDXS, STATUS )
+      END IF
 
 *  Get angle for additional rotations.
       CALL PAR_GET0D( 'ROT', ROT, STATUS )
 
-*  Exit if anything is wrong.
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
-
 *  Get FITS header for additional rotations.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
       CALL PAR_GET0C( 'FITSROT', FITROT, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
          FITROT = ' '
