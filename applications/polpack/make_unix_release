@@ -79,6 +79,7 @@
 
 #  Tar up the source files and then remove them.
       chmod 644 `grp unix_source`
+      chmod 755 `find . -type d`
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
       rm -f `grp unix_source` 
       mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}
@@ -95,6 +96,7 @@
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
       chmod 644 `grp unix_total`
+      chmod 755 `find . -type d`
       chmod 755 mk
       tar -cvh -f ${TEMPDIR}/polpack.tar `grp unix_total` 
       rm -rf `grp unix_total` 
