@@ -984,10 +984,10 @@ with a non-existent file.
 	(node-property 'document-element node default: #f))))
 
 <routine>
-<routinename>document-element-from-entity
+<routinename>document-element-from-fsi
 <description>
   <p>Return the document element of the document referred to by the
-  entity string passed as argument.  
+  FOSI passed as argument.  
   Uses <funcname>sgml-parse</>: see 10179, 10.1.7.
   <p>This is <em>complicated</>!  When <funcname>sgml-parse</> is called, it
   is a completely different parse from the main one.  That means that
@@ -1005,40 +1005,77 @@ with a non-existent file.
   consist of several <em>storage object identifiers</>, which are
   concatenated.  A simple filename, lacking the SOS start-tag, is an
   `informal system identifier'.
+  <p>This will most often be used via
+  <funcname>document-element-from-entity</> or
+  <funcname>document-elememt-from-sysid</>.
 <returnvalue type="node-list">Document element, or <code>#f</> on error.
 <argumentlist>
-<parameter>ent-name
+<parameter>fsi
   <type>string
-  <description>String containing entity declared in current context
+  <description>String containing FSI.
 <parameter keyword default='%starlink-decl-entity%'>prepend-decl
   <type>string
   <description>If true, prepend the given SGML declaration
 <codebody>
-(define (document-element-from-entity str #!key (prepend-decl %starlink-decl-entity%))
-  (let* (;(pubid (entity-public-id str))
-	 (fsi (if prepend-decl
-		  (string-append (entity-generated-system-id prepend-decl)
-				 (entity-generated-system-id str))
-		  (entity-generated-system-id str))))
-    (if fsi
-	(document-element (sgml-parse fsi))
-	(error (string-append "Can't generate file from entity " str)))))
+(define (document-element-from-fsi fsi
+				   #!key
+				   (prepend-decl %starlink-decl-entity%))
+  (let* ((decl-sysid (and prepend-decl
+			  (entity-generated-system-id prepend-decl)))
+	 (full-fsi (if decl-sysid
+		       (string-append decl-sysid fsi)
+		       (if prepend-decl ;should have been able to get sysid
+			   (error (string-append
+				   "Can't get sysid from entity "
+				    prepend-decl))
+			    fsi))))
+    (if full-fsi
+	(document-element (sgml-parse full-fsi))
+	(error (string-append "Can't generate file from system-id " fsi)))))
 
-<routine>
-<routinename>document-element-from-sysid
-<purpose>Parse the given system-id, returning document-element.
-<description>As for <funcname>document-element-from-entity</>.
-<codebody>
+(define (document-element-from-entity entname
+				      #!key
+				      (prepend-decl %starlink-decl-entity%))
+  (document-element-from-fsi (entity-generated-system-id entname)
+			      prepend-decl: prepend-decl))
+
 (define (document-element-from-sysid str
 				     #!key
 				     (prepend-decl %starlink-decl-entity%))
-  (let* ((fsi (if prepend-decl
-		  (string-append (entity-generated-system-id prepend-decl)
-				 (string-append "<" "OSFILE>" str))
-		  (entity-generated-system-id str))))
-    (if fsi
-	(document-element (sgml-parse fsi))
-	(error (string-append "Can't generate file from system-id " str)))))
+  (document-element-from-fsi (string-append "<" "OSFILE>" str)
+			      prepend-decl: prepend-decl))
+
+
+; (define (x-document-element-from-entity str #!key (prepend-decl %starlink-decl-entity%))
+;   (let* ((decl-sysid (and prepend-decl
+; 			  (entity-generated-system-id prepend-decl)))
+; 	 (fsi (if decl-sysid
+; 		  (string-append decl-sysid
+; 				 (entity-generated-system-id str))
+; 		  (if prepend-decl	;should have been able to get sysid
+; 		      (error (string-append "Can't get sysid from entity "
+; 					    prepend-decl))
+; 		      (entity-generated-system-id str)))))
+;     (if fsi
+; 	(document-element (sgml-parse fsi))
+; 	(error (string-append "Can't generate file from entity " str)))))
+; (define (x-document-element-from-sysid str
+; 				     #!key
+; 				     (prepend-decl %starlink-decl-entity%))
+;   (let* ((decl-sysid (and prepend-decl
+; 			  (entity-generated-system-id prepend-decl)))
+; 	 (fsi (if decl-sysid
+; 		  (string-append decl-sysid
+; 				 (string-append "<" "OSFILE>" str))
+; 		  (if prepend-decl	;should have been able to get sysid
+; 		      (error (string-append "Can't get sysid from entity "
+; 					    prepend-decl))
+; 		      (string-append "<" "OSFILE>" str)))))
+;     (if fsi
+; 	(document-element (sgml-parse fsi))
+; 	(error (string-append "Can't generate file from system-id " str)))))
+
+
 
 <routine>
 <routinename>isspace?
