@@ -84,14 +84,14 @@ StarWCS::StarWCS( const char* header )
     warnings_(NULL)
 {
    equinoxStr_[0] = '\0';
-   
+
    // If any errors from previous states are active then cancel them.
    if ( ! astOK ) astClearStatus;
-   
+
    if ( header ) {
       int lheader = strlen( header );
       if ( lheader > 1 ) {
-         
+
          // Have a character buffer which can be read in as a AST object.
          // This should be a FITS header which we need to read it in
          // through a FITS channel.
@@ -103,13 +103,13 @@ StarWCS::StarWCS( const char* header )
          for ( int i = 0 ; i < ncard; i++, ptr += 80 ) {
             memcpy( card, (void *)ptr, (size_t) 80 );
             card[80] = '\0';
-            
+
             //  Read all cards up to, but not including, the END card.
             if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
                      && ( card[3] == '\0' || card[3] == ' ' ) ) ) {
                astPutFits( fitschan, card, 0 );
                if ( !astOK ) {
-                  
+
                   //  If an error occurs with a card, just continue, it's
                   //  almost certainly something trivial like a formatting
                   //  probelm.
@@ -119,7 +119,7 @@ StarWCS::StarWCS( const char* header )
                break;
             }
          }
-         
+
          // Look for the image dimensions and store these if found. We
          // need these for calculating the size of the image in world
          // coordinates and AST doesn't retain this information.
@@ -137,7 +137,7 @@ StarWCS::StarWCS( const char* header )
                sscanf( ++ptr, "%d", &nypix_ );
             }
          }
-         
+
          // Record axis rotation.
          rotate_ = 0.0;
          astClear( fitschan, "Card" );
@@ -148,12 +148,12 @@ StarWCS::StarWCS( const char* header )
                rotate_ = (double) value;
             }
          }
-         
+
          //  Establish which error conditions we'd like to see mentioned
          //  in the ASTWARN cards. These should be shown to the user when
          //  convenient.
          astSet( fitschan, "Warnings=Tnx Zpx BadCel NoEquinox NoRadesys" );
-         
+
          // Now try to read in the FITS headers to create a frameset
          // (this contains frames for the image pixels and how to map
          // to the world coordinate systems available).
@@ -162,7 +162,7 @@ StarWCS::StarWCS( const char* header )
          if ( fitsset == AST__NULL ) {
             astClearStatus;
          } else {
-            
+
             // FITS headers may have more than two dimensions. In this
             // case we need to select out. If this fails then use
             // nothing.
@@ -172,16 +172,16 @@ StarWCS::StarWCS( const char* header )
                wcs_ = (AstFrameSet *) astAnnul( wcs_ );
                print_error( "Failed to read a 2D World Coordinate System from FITS headers");
             } else {
-               
+
                // See if WCS is a celestial system.
                setCelestial();
                if ( issky_ ) {
-                  
+
                   // Set the equinox value and string. Note this may
                   // be reset later if any warnings about the equinox
                   // are given.
                   setEquinox();
-                  
+
                   // Finally work out which axes are longitude and which are
                   // latitude (might be a better way to do this, note we leave
                   // at defaults if neither is a time axis).
@@ -190,21 +190,21 @@ StarWCS::StarWCS( const char* header )
                      raIndex_  = 2;
                      decIndex_ = 1;
                   }
-                  
+
                   // Note the number of arcsecs per pixel for later access.
                   setSecPix();
                }
             }
          }
-         
+
          //  Check for any warning cards.
          astClear( fitschan, "Card" );
          if ( astFindFits( fitschan, "ASTWARN", card, 1) ) {
-            
+
             //  Need to make these warnings available.
             constructWarning( fitschan );
          }
-         
+
          //  Release the fitschan.
          fitschan = (AstFitsChan *) astAnnul( fitschan );
       }
@@ -468,10 +468,10 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
    if ( !isWcs() ) {
       return error("image does not support world coords");
    }
-   
+
    //    if (x <= 0 || y <= 0 || x > nxpix_ || y > nypix_)
    //	return error("coordinates out of range");
-   
+
    // note: start at origin = (1,1) rather than (0,0)
    ra = dec = 0.0;
    double newx[1], newy[1], oldx[1], oldy[1];
@@ -486,7 +486,7 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
       astClearStatus;
       return error("can't convert world coordinates: out of range");
    } else {
-      
+
       // Return values are in degrees and swapped if necessary.
       if ( raIndex_ == 1 ) {
          ra = point[0] * R2D;
@@ -507,11 +507,11 @@ int StarWCS::pix2wcs(double x, double y, double& ra, double& dec) const
 int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 {
    x = y = 0.0;
-   
+
    if ( !isWcs() ) {
       return error("image does not support world coords");
    }
-   
+
    double oldx[1], oldy[1], newx[1], newy[1];
    if ( raIndex_ == 1 ) {
       oldx[0] = ra * D2R;  // Convert into radians.
@@ -527,7 +527,7 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
    } else {
       x = newx[0];
       y = newy[0];
-      
+
       // Check return values are not "offscale" (this is an emulation
       // of the previous behaviour of this method and may not exactly
       // correspond). -- switched off PWD 9/1/98
@@ -658,17 +658,17 @@ double StarWCS::width() const
    double point1[2], point2[2];
    double xin[2], yin[2], xout[2], yout[2];
    double dist;
-   
+
    // Compute the image width as a distance 1.0 -> nxpix_ about the
    // centre of the image, so first set up image coordinates
    // describing this position.
    xin[0] = 1.0;
    xin[1] = (double) nxpix_;
    yin[0] = yin[1] = 0.5 * (double) nypix_;
-   
+
    // Transform these image positions into sky coordinates.
    astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-   
+
    // And now get the distance between these positions in degrees.
    if ( raIndex_ == 1 ) {
       point1[0] = xout[0];
@@ -686,7 +686,7 @@ double StarWCS::width() const
    if ( dist == AST__BAD ) {
       return 0.0;
    }
-   
+
    //  Check that distance isn't 0 or very small, this indicates that
    //  edge of image is same coordinate. If so use arcsec per pixel
    //  estimate.
@@ -706,21 +706,21 @@ double StarWCS::height() const
    if ( !isWcs() ) {
       return 0.0;
    }
-   
+
    double point1[2], point2[2];
    double xin[2], yin[2], xout[2], yout[2];
    double dist;
-   
+
    // Compute the image height as a distance 1.0 -> nypix_ about the
    // centre of the image, so first set up image coordinates
    // describing this position.
    xin[0] = xin[1] = 0.5 * (double) nxpix_;
    yin[0] = 1.0;
    yin[1] = (double) nypix_;
-   
+
    // Transform these image positions into sky coordinates.
    astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-   
+
    // And now get the distance between these positions in radians.
    if ( raIndex_ == 1 ) {
       point1[0] = xout[0];
@@ -738,7 +738,7 @@ double StarWCS::height() const
    if ( dist == AST__BAD ) {
       return 0.0;
    }
-   
+
    //  Check that distance isn't 0, this indicates that edge of image
    //  is same coordinate. If so use arcsec per pixel estimate.
    if ( dist == 0.0 || dist < DBL_EPSILON ) {
@@ -763,15 +763,15 @@ double StarWCS::radius() const
    double point1[2], point2[2];
    double xin[2], yin[2], xout[2], yout[2];
    double dist;
-   
+
    xin[0] = 0.0;
    xin[1] = 0.5 * (double) nxpix_;
    yin[0] = 0.0;
    yin[1] = 0.5 * (double) nypix_;
-   
+
    // Transform these image positions into sky coordinates.
    astTran2( wcs_, 2, xin, yin, 1, xout, yout );
-   
+
    // And now get the distance between these positions in radians.
    if ( raIndex_ == 1 ) {
       point1[0] = xout[0];
@@ -789,14 +789,14 @@ double StarWCS::radius() const
    if ( dist == AST__BAD ) {
       return 0.0;
    }
-   
+
    //  Check that distance isn't 0, this indicates that edge of image
    //  is same coordinate as centre! If so use arcsec per pixel
    //  estimates.
    if ( dist == 0.0 || dist < DBL_EPSILON ) {
       dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
                     + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
-      
+
    } else {
       dist *= 60.0 * R2D;
    }
@@ -831,7 +831,7 @@ int StarWCS::set( double ra, double dec,
    if ( wcs_ ) {
       wcs_ = (AstFrameSet *) astAnnul( wcs_ );
    }
-   
+
    //  Create a FITS channel to which we will send our header cards.
    AstFitsChan *fitschan = astFitsChan( NULL, NULL, "" );
    char card[80];
@@ -863,7 +863,7 @@ int StarWCS::set( double ra, double dec,
    astPutFits( fitschan, card, 0 );
    sprintf( card, "CTYPE1   = %s", proj );
    astPutFits( fitschan, card, 0 );
-   
+
    //  Now read the headers back as a suitable frameset.
    AstFrameSet *fitsset = (AstFrameSet *) astRead( fitschan );
    if ( fitsset != AST__NULL ) {
@@ -939,7 +939,7 @@ int StarWCS::make2D()
      skyframe = (AstFrame *) astAnnul( skyframe );
      return 1;
   } else if ( nbase < 2 || nsky < 2 ) {
-     
+
      // Only one dimension. Cannot process this.
      baseframe = (AstFrame *) astAnnul( baseframe );
      skyframe = (AstFrame *) astAnnul( skyframe );
@@ -951,18 +951,18 @@ int StarWCS::make2D()
      error( "Input WCS has two many dimensions" );
      return 0;
   }
-  
+
   // Record the indices of the current and base frames.
   int ibase = astGetI( wcs_, "Base" );
   int isky = astGetI( wcs_, "Current" );
-  
+
   // Add the necessary frames to make the base frame 2D.
   int outperm[MAXDIM];
   outperm[0] = 1;
   outperm[1] = 2;
   AstFrame *newframe = (AstFrame *) astPickAxes( baseframe, 2,
                                                  outperm, NULL );
-  
+
   // Create a mapping for this permutation that doesn't have <bad>
   // values as the result.
   int inperm[MAXDIM];
@@ -972,7 +972,7 @@ int StarWCS::make2D()
   for( i = 2; i < nsky; i++ ) inperm[i] = -1;
   double zero = 0.0;
   AstMapping *map = (AstMapping *)astPermMap( nsky, inperm, 2, outperm, &zero, "" );
-  
+
   // Now add this frame to the FrameSet and make it the base
   // one. Also reinstate the skyframe as the current frame.
   astAddFrame( wcs_, ibase, map, newframe );
@@ -1056,12 +1056,12 @@ int StarWCS::make2D()
      }
   }
   newframe = (AstFrame *) astPickAxes( skyframe, 2, outperm, NULL );
-  
+
   // Create a mapping for this permutation that doesn't have <bad>
   // values as the result.
   zero = 0.0;
   map = (AstMapping *)astPermMap( nsky, inperm, 2, outperm, &zero, "" );
-  
+
   // Now add this frame to the FrameSet.
   astAddFrame( wcs_, isky, map, newframe );
   newframe = (AstFrame *) astAnnul( newframe );
@@ -1137,18 +1137,18 @@ void StarWCS::setCelestial() {
 //
 //  Construct a single warning message from a fitschan. This may be
 //  used to report any problem with the FITS headers that AST has
-//  identified. It also checks if one of the cards reports the absence 
+//  identified. It also checks if one of the cards reports the absence
 //  of equinox and resets the equinox to blank.
 //
-void StarWCS::constructWarning( AstFitsChan *fitschan ) 
+void StarWCS::constructWarning( AstFitsChan *fitschan )
 {
 
    //  Release previous warnings.
-   if ( warnings_ ) { 
+   if ( warnings_ ) {
       delete warnings_;
       warnings_ = NULL;
    }
-   
+
    //  Construct new message (if any). Format of warning cards is:
    //     ASTWARN = 'The message'
    //  or
@@ -1209,5 +1209,3 @@ extern "C" {
       return sflrev( x, y, prj, phi, theta );
    }
 }
-
-
