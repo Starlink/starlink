@@ -132,6 +132,7 @@
       INTEGER			ENELM			! Expected # elements
       INTEGER			FPTR			! Mapped file object
       INTEGER			NDIM			! Array dimensionality
+      INTEGER			SSIZE			! Scalar size
 
       LOGICAL			PRIM			! Object is primitive?
 *.
@@ -359,7 +360,7 @@
 *  Make copies of input
       J = 1
       DO I = 1, N
-        DO K = 1, SSIZE
+        DO K = 1, SIZE
           OUT(J) = IN(K)
           J = J + 1
         END DO
