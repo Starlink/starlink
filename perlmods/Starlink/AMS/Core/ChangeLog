@@ -1,0 +1,5 @@
+1998-07-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Core.pm (adamtask_control): Protect from -w warnings when
+	sending par_reset
+
