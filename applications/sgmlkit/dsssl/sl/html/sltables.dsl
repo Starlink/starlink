@@ -21,7 +21,7 @@ a required CAPTION; add implied ID and EXPORT attributes to the TABLE.
 
 <codegroup id=code.tables>
 <title>Tables
-<description>I've aimed to support all of the <em/structure/ of this table
+<description>I've aimed to support all of the <em>structure</> of this table
 model below, but not necessarily to support all of the attributes at
 first.
 -->

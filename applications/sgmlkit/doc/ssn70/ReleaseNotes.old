@@ -36,7 +36,7 @@ substantially restructured, to extract the paragraph-content elements
 into a separate DTD fragment, which the two DTDs share.
 
 <dt>The changes are implemented in the down-converters
-<dd>&ellip; though not very prettily.  They <em/should/ be robust
+<dd>&ellip; though not very prettily.  They <em/should> be robust
 enough that trial documents conforming to the updated DTDs should be
 testable.
 
@@ -67,7 +67,7 @@ distribution.  However, I still haven't managed to get Jade to build
 on Suns or Alphas.  This might change, as work has started -- by the
 community rather than James Clark alone -- on an open-source version
 of Jade called <webref url='http://jade-cvs.avionitek.com/'
->OpenJade</webref>.  This <em/might/ include work on getting Jade to
+>OpenJade</webref>.  This <em/might> include work on getting Jade to
 build on other platforms.
 
 <dt>Use of FPI: should we use <code>-//Starlink//...</code> or
@@ -134,7 +134,7 @@ like BLOCKQUOTE and lists, so it can appear within paragraphs.
 <dt>Cross references
 <dd>The DOCXREF element now has a title attribute, allowing you to
 override the generation of the link text.  Also, I've added a
-<code/%short-crossrefs%/ parameter to the DSSSL stylesheets (set true
+<code/%short-crossrefs%> parameter to the DSSSL stylesheets (set true
 buy default), which allows you to control whether you get short or
 long generated text.
 
@@ -167,7 +167,7 @@ distribution.  However, I still haven't managed to get Jade to build
 on Suns or Alphas.  This might change, as work has started -- by the
 community rather than James Clark alone -- on an open-source version
 of Jade called <webref url='http://jade-cvs.avionitek.com/'
->OpenJade</webref>.  This <em/might/ include work on getting Jade to
+>OpenJade</webref>.  This <em/might> include work on getting Jade to
 build on other platforms.
 
 <dt>Use of FPI: should we use <code>-//Starlink//...</code> or
@@ -208,7 +208,7 @@ distribution.
 <p>This is developers' release 0.3.
 
 <p>The system relies on the DSSSL engine Jade, but
-it does <em/not/ contain a pre-built version of Jade.  See <ref
+it does <em/not> contain a pre-built version of Jade.  See <ref
 id=install> for further details of obtaining and building Jade.
 
 <subsubsect>New in this release
@@ -250,13 +250,13 @@ yourself: any files included in an SGML document must be declared as
 entities in the Declaration Subset, you you can construct a BOS by hand
 perfectly reliably.
 <p>The stylesheets now generate a manifest of generated files, in
-<code/HTML.manifest/ and <code/LaTeX.manifest/ (configurable).
+<code/HTML.manifest> and <code/LaTeX.manifest> (configurable).
 
 <dt>Dealing with exported labels: emit a TOC of
 exported IDs at end, with links both ways
 <dd>The `link policy' is expressed in DTD.  The exported-id list has
 been catered for by adding a customisation variable
-<code/show-element-ids/ (see <ref id=appx.system.paramdsssl>) so that
+<code/show-element-ids> (see <ref id=appx.system.paramdsssl>) so that
 you can prepare a version of the document which displays these IDs.
 This isn't quite the same thing, but the other can be added if anyone
 feels strongly about it.
@@ -270,7 +270,7 @@ ROUTINECODE elements come out with the wrong numbers.
 
 <dt>Updated Jade patches
 <dd>I've fixed a couple of buglets in the Jade back-end I produced.
-The stylesheets now need version <code/1.2.1-starlink-1.0b2/.
+The stylesheets now need version <code/1.2.1-starlink-1.0b2>.
 
 </dl>
 
@@ -344,7 +344,7 @@ hand right now.  The only available workaround is to avoid using any
 of the entities in <ref id=table.entities> within `DT' elements (which
 is the only place the stylesheet uses the feature which triggers the
 bug).  If you fall victim to the bug, the only effect would be a
-<code/&amp;#65533/ or <code/\\char65533/ in the output, which might
+<code/&amp;#65533> or <code/\\char65533> in the output, which might
 confuse a browser or &latex, but do nothing worse.
 
 <dt>Bugs in the mk script
@@ -363,7 +363,7 @@ confuse a browser or &latex, but do nothing worse.
 miscellaneous software.
 
 <p>The system relies on the DSSSL engine Jade, but
-it does <em/not/ contain a pre-built version of Jade.  Jade turns out
+it does <em/not> contain a pre-built version of Jade.  Jade turns out
 to be a real hassle to build with a compiler other than gcc.  The
 author, James Clark, is a fine programmer, but apparently a bit of a
 standards purist (he was involved with writing the DSSSL standard, and
@@ -374,7 +374,7 @@ high on his priority list.  Jade builds
 perfectly happily on gcc, but I've been struggling away for ages
 trying to get it to build using Sun's and Digital's C++ compilers.  I
 will distribute a runnable version of Jade eventually, but for the
-moment, you'll have to build Jade yourself.  If <em/you/ manage to
+moment, you'll have to build Jade yourself.  If <em/you> manage to
 build it using one of those, could you tell me what you had to do....
 
 <p>Get Jade from Clark's <webref

@@ -12,9 +12,9 @@
 aspects of the generation of HTML.  All the things documented as
 `functions' below are really parameters.
 
-<p>Note that a feature of Jade is that if the argument <code/-V
-variable/ is given on the command line, then that variable is set to
-<code/#t/, overriding any setting within the stylesheet.  The
+<p>Note that a feature of Jade is that if the argument <code>-V
+variable</> is given on the command line, then that variable is set to
+<code>#t</>, overriding any setting within the stylesheet.  The
 parameters which are described as `boolean' below can be set in this
 way.
 
@@ -22,7 +22,7 @@ way.
 copy of the appropriate parameters file in <code
 fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slparams.dsl</code> (or the
 corresponding <code>.../latex</code> file), call it, say
-<code/my-params.dsl/, and change what parameters 
+<code>my-params.dsl</>, and change what parameters 
 you like.  The stylesheets refer to the parameters files by the public
 identifiers <code>PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"</code>,
 <code>PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"</code>
@@ -30,7 +30,7 @@ and <code>PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"</code>,
 and these are mapped to the real files by the catalogue file in <code
 fspath>$STARLINK_SGML_DIR/dtd/CATALOG.starlink</code>.  To direct the system to
 your own parameter file instead, create a catalogue file of your own
-(conventionally given the name <code/CATALOG/), and include the
+(conventionally given the name <code>CATALOG</>), and include the
 appropriate line like
 <verbatim>
 PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN" my-params.dsl
@@ -38,11 +38,11 @@ PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN" my-params.dsl
 (you can give a path relative to the location of the catalogue, and
 it's best if you quote the entry exactly as here).  To direct the SGML
 system to this catalogue, you must include the file at the beginning
-of the <code/SGML_CATALOG_FILES/ environment variable:
+of the <code>SGML_CATALOG_FILES</> environment variable:
 <verbatim>
 SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 </verbatim>
-(or use the corresponding <code/setenv/ command).
+(or use the corresponding <code>setenv</> command).
 
 <authorlist>
 <author id=ng affiliation='Starlink, Glasgow'>Norman Gray

@@ -9,7 +9,7 @@
 
      Note that a feature of Jade is that if the argument <code/-V
      variable/ is given on the command line, then that variable is set to
-     <code/#t/, overriding any setting within the stylesheet.  The
+     <code>#t</>, overriding any setting within the stylesheet.  The
      parameters which are described as `boolean' below can be set in this
      way.
 
@@ -48,8 +48,8 @@ link texts for cross-references.
 <routinename>suppress-manifest
 <description>
 If true, this will suppress the generation of a manifest, even if the variable 
-<funcname/%latex-manifest%/ or <funcname/%html-manifest/ is given.
-(This option can conveniently be set with <code/-V suppress-manifest/ on the 
+<funcname>%latex-manifest%</> or <funcname>%html-manifest</> is given.
+(This option can conveniently be set with <code>-V suppress-manifest</> on the 
 Jade command line).
 <returnvalue type=boolean>True if the manifest is to be suppressed
 <codebody>
@@ -59,7 +59,7 @@ Jade command line).
 <routinename>%starlink-decl-entity%
 <description>
 <p>Entity name which refers to the Starlink declaration.  This has to
-be declared <em/somewhere/: the default is declared in the General DTD.
+be declared <em>somewhere</>: the default is declared in the General DTD.
 <returnvalue type=string>Entity name, which will be resolved to a
      system-id elsewhere.
 <codebody>

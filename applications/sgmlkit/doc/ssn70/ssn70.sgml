@@ -147,7 +147,7 @@ somewhat arcane note needs to be here.  The terms `SGML system' and
 `SGML application' have precise meanings in the SGML world.  An SGML
 system is a program such as Jade or SP which parses SGML.  An SGML
 application is a collection of DTDs and other supporting documents
-(see the standard <citation/iso8879/, clause~4.279).  This package is
+(see the standard <citation/iso8879>, clause~4.279).  This package is
 therefore properly referred to as an SGML application, but since this
 term could be confusing, I will refer to this package instead
 as the (Starlink) SGML Set.</note> It consists of a definition of a
@@ -157,33 +157,33 @@ these source documents to reader-friendly form.  At present, these
 and PDF formats).
 
 <p>The SGML set scores over previous solutions to Starlink's
-documentation needs, such as <code/runoff/ or &latex, because it is a
+documentation needs, such as <code/runoff> or &latex, because it is a
 well-defined system, so that there is excellent support for it in
 tools, and it is designed to be converted into whichever presentation
 format is most convenient.
 The DTD is designed to be flexible, rather than imposing a
 particularly tight document structure.  At the same time it has
-<em/enough/ structure that it can be indexed and stored effectively.
+<em/enough> structure that it can be indexed and stored effectively.
 
 <p>Although this system can help with many of the tasks involved in
 document creation, it cannot write the document for you (shame!).  For
 advice on that, documents such as <docxref doc=sgp28> are still vital.
 
-<p>This document is organised as follows.  In <ref id=sgml></>, I
+<p>This document is organised as follows.  In <ref id=sgml/>, I
 discuss SGML in general terms, describing its general structure and
 aims, describing how to read a Document Type Definition (DTD), and
-pointing to sources of information.  In <ref id=markup></>, I describe
+pointing to sources of information.  In <ref id=markup/>, I describe
 how you would go about actually writing a document, describing the
 structure of Starlink documents which is crystallised in the
-specification of this set.  In <ref id=structure></>, I describe the
+specification of this set.  In <ref id=structure/>, I describe the
 structure of the document DTD, and the categories of elements you will use.
-In <ref id=doccode></>, I describe the
+In <ref id=doccode/>, I describe the
 support which exists to support documentation of source code, allowing
 you to maintain detailed routine documentation along with the routine
-source code.  In <ref id=processing></>, I describe the details of how
+source code.  In <ref id=processing/>, I describe the details of how
 you transform your document from SGML to an output format.  In 
-<ref id=upconvert></> we describe how to transform a document from
-<code/star2html/ format to an SGML document.
+<ref id=upconvert/> we describe how to transform a document from
+<code/star2html> format to an SGML document.
 Finally,
 the appendices give the detailed descriptions of the elements in the
 two DTDs described here, a more detailed description of SGML than is
@@ -191,9 +191,9 @@ necessary for simple use of the set, and documentation for
 maintainers of the set.
 
 <!--
-In <ref id=future></>, I describe
+In <ref id=future/>, I describe
 some possible further improvements in the set (suggestions and
-comments are most welcome).  Finally, in <ref id=faq></>, I
+comments are most welcome).  Finally, in <ref id=faq/>, I
 answer (I hope) some frequently asked questions about SGML in general
 and this set in particular.
 -->
@@ -212,10 +212,10 @@ displaying them, transforming them, storing them, searching them -- we
 have to give the computer some help.  
 
 <p>A common way of providing this
-help is through markup systems such as <code/runoff/ (or its
+help is through markup systems such as <code/runoff> (or its
 variants), or &tex, or &latex;.  The last of these three has served
 Starlink very well, and even survived the conversion of Starlink's
-document set to hypertext, through the tool <code/Star2HTML/ (see <docxref
+document set to hypertext, through the tool <code/Star2HTML> (see <docxref
 doc=sun199>), but the problems of the &latex system illustrate the
 advantages of the SGML approach quite well.
 <dl>
@@ -254,12 +254,12 @@ indirectly.  This really just pushes the hack elsewhere.</note>) is
 asking for trouble.
 
 <dt>Authors have to know too much.
-<dd>When you are writing a <code/Star2HTML/ document, you are
+<dd>When you are writing a <code/Star2HTML> document, you are
 riding two horses at once; you must write in that subset of &latex
-which <code/Star2HTML/ knows about.  Authors must frequently be
+which <code/Star2HTML> knows about.  Authors must frequently be
 sensitive to the treatment of their document by two separate systems.
 
-<dt>Authors <em/can/ know too much!
+<dt>Authors <em/can> know too much!
 <dd>Part of the strength of &tex and &latex is their flexibility, and
 it is easy for authors, especially programmer authors, to exploit this
 when writing documentation, and a burst of &tex macro
@@ -267,17 +267,17 @@ magic can be an effective antidote to demotivation during the longeurs
 of preparing documentation.  However much this flexibility may assist
 (or even amuse) authors, it inflicts parsing hell on anyone else who
 wants to do something unforseen with the document.
-If you restrict what an author <em/can/ do, then you limit what a
-parser <em/has/ to do to repurpose the document.
+If you restrict what an author <em/can> do, then you limit what a
+parser <em/has> to do to repurpose the document.
 
 <dt>Not future-proof
 <dd>&latex is not precisely defined; on the contrary, it is
 continually being developed, and a completely new version, <webref
 url="http://www.oasis-open.org/cover/latex3-9804.html" >&latex;3</webref> is
 eagerly anticipated (which will, incidentally, be heavily influenced
-by SGML).  Similarly, the <code/LaTeX2HTML/ package is continually
-being upgraded, causing a <code/Star2HTML/ (based on
-<code/LaTeX2HTML/) maintenance headache.
+by SGML).  Similarly, the <code/LaTeX2HTML> package is continually
+being upgraded, causing a <code/Star2HTML> (based on
+<code/LaTeX2HTML>) maintenance headache.
 </dl>
 
 <p>None of these problems is fatal -- all of them have manifestly been
@@ -315,11 +315,11 @@ that any documents which claim to be of that type must have a certain
 syntactic structure.
 
 <p>HTML is a well known example of an SGML DTD, whose rules are well
-known.  An HTML document consists of precisely one <code/head/ and one
-<code/body/ element.  The <code/head/ must have precisely one
-<code/title/ element, and may have zero or more <code/link/ elements.
-The <code/title/ element has simple characters as content.  The
-<code/link/ element has no content, but has four optional
+known.  An HTML document consists of precisely one <code/head> and one
+<code/body> element.  The <code/head> must have precisely one
+<code/title> element, and may have zero or more <code/link> elements.
+The <code/title> element has simple characters as content.  The
+<code/link> element has no content, but has four optional
 attributes&ellip, and so on.
 
 <p>Given a document marked up in some specific DTD it will be parsed
@@ -329,34 +329,34 @@ to a formatter, which in turn produces output in some form which may,
 of course, be further processed to a final document.  The SGML parser
 and whichever editor you use are both quite generic, but the formatter
 is tied to a particular DTD.  There is a diagram of this system in
-<ref id=fig.sgml></>.
+<ref id=fig.sgml/>.
 <figure id=fig.sgml float alt="An SGML system">
 <caption>An SGML system
 <figurecontent image="sgmlsystem.eps">
 <figurecontent image="sgmlsystem.gif">
 </figure>
 
-<p>For further information on SGML, see <ref id=appx.sgml></>.  For other
+<p>For further information on SGML, see <ref id=appx.sgml/>.  For other
 texts, see the well-known
-<cite>Gentle Introduction to SGML</cite><citation/gentle/.
+<cite>Gentle Introduction to SGML</cite><citation/gentle>.
 For more detailed information,
-see the useful but compressed <citation/bradley/; and for an
+see the useful but compressed <citation/bradley>; and for an
 authoritative account see 
-<citation/goldfarb/, which is an exegesis of the standard,
-<citation/iso8879/. 
+<citation/goldfarb>, which is an exegesis of the standard,
+<citation/iso8879>. 
 
 <subsect id=faq export>Frequently Asked Questions
 
 <subsubsect id=faq.html>What's wrong with HTML?
 
 <p>HTML was designed as a flexible and generic markup language.
-Unfortunately, it is a little <em/too/ flexible and generic to be
+Unfortunately, it is a little <em/too> flexible and generic to be
 really useful.  The power of SGML comes from its ability to represent
 the structure of a document faithfully, and HTML cannot do this in
-most cases - it has a <code/&lt;title>/ element, and some structural
-markup <code/&lt;Hn>/, but apart from that, it's little better than
+most cases - it has a <code/&lt;title&gt;> element, and some structural
+markup <code/&lt;Hn&gt;>, but apart from that, it's little better than
 simple ASCII text.  As well, it suffers from some of the same diseases
-as &latex;, as described above in <ref id=why.sgml></>, in that the
+as &latex;, as described above in <ref id=why.sgml/>, in that the
 effective definition of a `good' HTML document is `viewable by
 netscape', and that means that you're even less well-assured of the
 content and structure of a document than you are if you use &latex;
@@ -365,7 +365,7 @@ you might as well go the whole hog and do it properly).
 
 <subsubsect id=faq.latex>What about &latex;?
 
-<p>See the discussion in <ref id=why.sgml></>, as
+<p>See the discussion in <ref id=why.sgml/>, as
 that describes SGML's advantages by comparing them to the problems
 with the current &latex; system.  &latex; is marvellous -- this system
 uses it as a back-end print formatter -- but it's not ideal for a
@@ -375,9 +375,9 @@ large and various document set.
 
 <p>XML is a cut-down version of SGML, omitting rarely-used or
 dispensable features, but preserving many of its strengths (
-<ref id=final.xml></>).  I have, however, used several of these omitted
+<ref id=final.xml/>).  I have, however, used several of these omitted
 features in this application.  Some of these features, such as markup
-minimisation (<ref id=markup.min></>) are not vital, and would simply be
+minimisation (<ref id=markup.min/>) are not vital, and would simply be
 inconvenient to lose, but others such as SGML's support for
 subdocuments would radically change (for the worse) the nature of the
 application's support for complicated documents.
@@ -392,14 +392,14 @@ of writing a document marked up using the particular set of SGML
 element types this application defines.  There are many 
 features of SGML which I will not describe, for simplicity and
 brevity, but if you wish to find out more about the possibilities of
-SGML, then see the more detailed documentation in <ref id=appx.sgml></>
+SGML, then see the more detailed documentation in <ref id=appx.sgml/>
 or, for the most authoritative (but admittedly largely
 incomprehensible) documentation, the SGML standard
-<citation/iso8879/.
+<citation/iso8879>.
 
 <subsect id=markup.intro export>Sample document, and overview
 
-<p>A sample SUN is illustrated in <ref id=fig.simplesun></>.
+<p>A sample SUN is illustrated in <ref id=fig.simplesun/>.
 <figure id=fig.simplesun export float alt="Simple SUN document">
 <caption>A simple sample SUN</caption>
 <px>
@@ -427,14 +427,14 @@ incomprehensible) documentation, the SGML standard
 <ul>
 <li>The document starts off with a `document type declaration',
 <code>&lt;!DOCTYPE sun PUBLIC &quot;-//Starlink//DTD Starlink
-SUN//EN&quot;></code>, which states which DTD this document claims to be
+SUN//EN&quot;&gt;</code>, which states which DTD this document claims to be
 conformant to, in this case the Starlink SUN document type.
 
 <li>The document is structured in terms of `element types' such as
-<code/author/ or <code/sect/, and these in turn contain further data,
+<code/author> or <code/sect>, and these in turn contain further data,
 such as a sequence of characters (`Norman Gray') in the case of the
-<code/author/ element, or further elements (the <code/version/ element)
-in the case of the <code/history/ element.  Elements are delimited by
+<code/author> element, or further elements (the <code/version> element)
+in the case of the <code/history> element.  Elements are delimited by
 `opening tags' like <code>&lt;abstract&gt;</code> and `closing tags'
 like <code>&lt;/abstract&gt;</code>.<note>There is a difference
 between `elements' and `element types': the former are things which
@@ -444,38 +444,38 @@ important outside of a DTD, however, so I will not continue to make it
 in the description of the element types below.  It will always be
 possible to make the distinction from the context anyway.</note>
 
-<li>Elements have both <em/content/ and <em/attributes/.  For example,
-the <code/author/ element has the characters `Norman Gray' as its
+<li>Elements have both <em/content> and <em/attributes>.  For example,
+the <code/author> element has the characters `Norman Gray' as its
 content and a list of strings such as an email address as its
 attributes.
 
-<li>Some of the elements (the <code/abstract/ element for example)
+<li>Some of the elements (the <code/abstract> element for example)
 are closed (ie, have closing tags to match their opening tags), but
 the majority are not.  This is because the DTD tells 
-the parser that a <code/title/ element cannot contain an <code/author/
+the parser that a <code/title> element cannot contain an <code/author>
 element, so the appearance of the latter implicitly finishes the
 former.
 
 <li>Some elements and attributes are required, others optional.  This
 document is close to being a minimal SUN.  It is not quite minimal
-because the <code/copyright/ element is optional, and it turns out
-that the only <em/required/ content of a document 
+because the <code/copyright> element is optional, and it turns out
+that the only <em/required> content of a document 
 body is the abstract!  Also, the only required attribute of the
-<code/author/ element is the <code/id/ attribute.
+<code/author> element is the <code/id> attribute.
 
-<li>Starlink SGML documents are <em/case-sensitive/ (unlike most SGML
+<li>Starlink SGML documents are <em/case-sensitive> (unlike most SGML
 documents).  The element names must all be lowercase, and SGML
 reserved words uppercase, as in this example.
 
 <li>There are actually more elements present here than are apparent to
 the eye.  As well as allowing some closing tags to be omitted, a DTD
-can be allow certain <em/opening/ tags to be omitted, too.  In fact,
+can be allow certain <em/opening> tags to be omitted, too.  In fact,
 the full structure of this document is as seen in 
-<ref id=fig.simplesun2></>.
+<ref id=fig.simplesun2/>.
 </ul>
 <figure float id="fig.simplesun2" export alt="Normalised SUN document">
 <caption>A SUN document with all tags in place, the normalised version
-of the document in <ref id=fig.simplesun></>.</caption>
+of the document in <ref id=fig.simplesun/>.</caption>
 <px>
 <verbatim><![ CDATA [
 <sun>
@@ -506,13 +506,13 @@ of the document in <ref id=fig.simplesun></>.</caption>
 ]]></verbatim>
 </figure>
 
-<p>In <ref id=fig.simplesun2></>, note that the actual content of
-the <code/abstract/ element is one or more <code/px/ elements (a
-slightly restricted variant of the standard <code/p/ paragraph
-element), and that the <code/sect/ element contains a <code/subhead/
-element, and <em/contains/ the paragraphs which constitute it (note
+<p>In <ref id=fig.simplesun2/>, note that the actual content of
+the <code/abstract> element is one or more <code/px> elements (a
+slightly restricted variant of the standard <code/p> paragraph
+element), and that the <code/sect> element contains a <code/subhead>
+element, and <em/contains> the paragraphs which constitute it (note
 that this is a significant difference from HTML, where the heading
-elements <code/hn/ contain only a section title).  You will rarely
+elements <code/hn> contain only a section title).  You will rarely
 have to be aware of these `hidden' tags when you are creating a
 document, but it will occasionally be
 useful to know that these tags are there somewhere, and that you're
@@ -525,20 +525,20 @@ introduced to SGML to make typing less onerous.  Personally, I like
 this, since it seems to make the document look less cluttered, and so
 I have designed the DTD to support this quite extensively.  The
 minimisation is completely optional, however, and you may insert all
-the tags if you prefer.  SGML-aware editors (see <ref id=editors></>)
-typically insert all tags.  See also <ref id=markup.min></>.
+the tags if you prefer.  SGML-aware editors (see <ref id=editors/>)
+typically insert all tags.  See also <ref id=markup.min/>.
 
-<p>You can see from <ref id=fig.simplesun2></> that the `top-level'
-element of this document is <code/sun/.  The top-level element of SSN
-documents is <code/ssn/, and similarly for the other Starlink document
-types (see <ref id=str.structure></>).  These different document types
+<p>You can see from <ref id=fig.simplesun2/> that the `top-level'
+element of this document is <code/sun>.  The top-level element of SSN
+documents is <code/ssn>, and similarly for the other Starlink document
+types (see <ref id=str.structure/>).  These different document types
 are broadly the same, but the 
 SSN document type does not include elements for documenting
-programming code, and the MUD document type has a <code/docdate/
-element instead of a <code/docnumber/ and a <code/history/.  The SUN
-document type is the most general.  The top-level <code/sun/ element
-has only two `children', <code/docinfo/, which contains the document
-information such as its author, number, and so on, and <code/docbody/,
+programming code, and the MUD document type has a <code/docdate>
+element instead of a <code/docnumber> and a <code/history>.  The SUN
+document type is the most general.  The top-level <code/sun> element
+has only two `children', <code/docinfo>, which contains the document
+information such as its author, number, and so on, and <code/docbody>,
 which contains the actual content of the document.
 
 <subsect id=markup.entities export>Entity references
@@ -548,12 +548,12 @@ longer pieces of text, which you cannot type on your keyboard, which
 must be escaped from the parser, or which you simply want to
 abbreviate.
 
-<p>A reference to an entity <code/amp/ is of the form
-<code/&amp;amp;/.  It is prefixed by the character <code/&amp/ and
+<p>A reference to an entity <code/amp> is of the form
+<code/&amp;amp;>.  It is prefixed by the character <code/&amp> and
 suffixed by a semicolon.
 
 <p>The list of entities predefined by the Starlink general DTD is
-given in <ref id=table.entities></>.
+given in <ref id=table.entities/>.
 
 <table id="table.entities">
 <caption>Entities predefined in the Starlink general DTD.</caption>
@@ -589,19 +589,19 @@ given in <ref id=table.entities></>.
 </table>
 
 <p>Certain of these entities are used sufficiently often that there
-are `short references' declared for them: you can type `<code/_/'
-instead of <code/&amp;underscore;/ (unsurprisingly), `<code/&ddash/' for
-a punctuation dash (this is currently set to <code/&amp;endash;/, but
-could conceivably change to <code/&amp;emdash;/ if we make a
-typographic decision on that score), and `<code/&tilde/' instead of
-<code/&amp;nbsp;/.  These short references work within paragraphs, but
+are `short references' declared for them: you can type `<code/_>'
+instead of <code/&amp;underscore;> (unsurprisingly), `<code/&ddash>' for
+a punctuation dash (this is currently set to <code/&amp;endash;>, but
+could conceivably change to <code/&amp;emdash;> if we make a
+typographic decision on that score), and `<code/&tilde>' instead of
+<code/&amp;nbsp;>.  These short references work within paragraphs, but
 not within maths or verbatim elements within them.
 
-<p>For more details on entities, see <ref id=sgml.entities></>.
+<p>For more details on entities, see <ref id=sgml.entities/>.
 
 <subsect id=markup.dtdsubset export>Defining entities
 
-<p>As explained in section <ref id=markup.entities></>, there are a
+<p>As explained in section <ref id=markup.entities/>, there are a
 number of predefined entities which you can refer to in your
 documents.  These are defined either for general convenience or
 because, as in the case of <code>&lt</code> and <code>&amp</code>,
@@ -622,7 +622,7 @@ partial rewrite of the DTD (this is generally felt to be A Bad Thing
 -- do try to resist the temptation), but the main function of the DTD
 subset in normal documents is to define a variety of types of
 entities.  For more details about the DTD subset, see 
-<ref id=sgml.dtdsubset></>.
+<ref id=sgml.dtdsubset/>.
 
 <p>The DTD subset is the only place you can define entities -- the
 <code>&lt;!ENTITY...></code> declaration is forbidden in the body of
@@ -652,8 +652,8 @@ When the document is parsed, the text for the entity
 
 <p>A feature of SGML's portability is that it abstracts the notion of
 files: there are no `files' and `filenames' in the SGML world, only
-<em/external entities/ which have <em/public identifiers/ or <em/system
-identifiers/.  You can refer to these external entities as follows:
+<em/external entities> which have <em/public identifiers> or <em/system
+identifiers>.  You can refer to these external entities as follows:
 <verbatim><![CDATA[
 <!DOCTYPE sun PUBLIC "-//Starlink//DTD Starlink SUN//EN" [
   <!ENTITY chapter1 SYSTEM 'chaptext/chapter1.text'>
@@ -671,7 +671,7 @@ identifier <code>chaptext/chapter1.text</code>.  A system identifier
 can refer to an object in a wide variety of ways -- it could be a
 database query, or system command -- but in the present system, a
 system identifier is just a filename.  When you refer to this entity
-by making the reference <code/&amp;chapter1;/ where you might
+by making the reference <code/&amp;chapter1;> where you might
 otherwise type text, the SGML system would insert the contents of the
 specified file in the document at that point.  This is a way of
 breaking your document up into a collection of smaller documents.
@@ -679,24 +679,24 @@ breaking your document up into a collection of smaller documents.
 <p>The two entities `fig1.eps' and `fig1.gif' are also references to
 the two files `figure1.eps' and `figure1.gif' -- note the distinction
 between the entity name and the file name.  These entity declarations
-have extra information, however, indicating that their <em/notation/
-is <code/eps/ and <code/gif87a/ respectively.  The system currently
+have extra information, however, indicating that their <em/notation>
+is <code/eps> and <code/gif87a> respectively.  The system currently
 recognises these notations, plus `jpeg'.  You would refer to these
-entities in an attribute of a <code/figurecontent/ element.  For more
-details on how to refer to figure files, see <ref id=str.figures></>, and
-for the list of allowable notations, see the <code/figurecontent/
-documetation in <ref id=el.sun.figurecontent></>.
+entities in an attribute of a <code/figurecontent> element.  For more
+details on how to refer to figure files, see <ref id=str.figures/>, and
+for the list of allowable notations, see the <code/figurecontent>
+documetation in <ref id=el.sun.figurecontent/>.
 
 <p>The last entity is different in two ways.  Firstly, it does not refer
-to a system identifier, but to a <em/public identifier/.  The SGML
+to a system identifier, but to a <em/public identifier>.  The SGML
 system maps this identifier into a file using some internal database.
 Note that the reference to the DTD, <code>"-//Starlink//DTD Starlink
 SUN//EN"</code> is also a public identifier.  Secondly, the keyword
-<code/subdoc/ indicates that this entity is a <em/subdocument/ entity
+<code/subdoc> indicates that this entity is a <em/subdocument> entity
 -- a complete SGML document which the SGML system will have to parse
-at some point.  In this case, the entity <code/sun199/ has been
+at some point.  In this case, the entity <code/sun199> has been
 declared so that it can be cross-referenced at some point.  See 
-<ref id=str.xrefs></> for details.
+<ref id=str.xrefs/> for details.
 
 <subsect id=markup.min export>Markup minimisation
 
@@ -704,7 +704,7 @@ declared so that it can be cross-referenced at some point.  See
 designed to be written by humans<note>This is unlike XML, which is
 likely to be written largely by authoring programs</note>.  It
 therefore has several features -- collectively referred to as
-<em/markup minimisation/ -- designed to cut down the amount of
+<em/markup minimisation> -- designed to cut down the amount of
 markup you have to write.
 
 <p>The first such minimisation feature is tag omission: in certain
@@ -714,8 +714,8 @@ of the omitted tags, and when the DTD author has permitted this.  For
 example, the content of the <ref id=el.sun.sect>sect</ref>
 element is a subhead element, followed by zero or more paragraphs (or
 figures or tables), followed by zero or more subsect elements.  That
-is, the sect element <em/contains/ the section, rather than containing
-just the title (as is the case for HTML's <code/H1/ element, for
+is, the sect element <em/contains> the section, rather than containing
+just the title (as is the case for HTML's <code/H1> element, for
 example).  The <ref id=el.sun.subhead>subhead</ref> element
 contains a <ref id=el.sun.title>title</ref> element, which
 finally contains the text of the section heading.  In other words, the
@@ -734,7 +734,7 @@ structure of a section is
 end of the section and paragraph elements (from the start of the next
 section and the end of the current section respectively), so those
 closing tags can be omitted; and since the section
-<em/must/ start with a subhead, which <em/must/ start with a title,
+<em/must> start with a subhead, which <em/must> start with a title,
 those tags are redundant, too.  That means that this can be compressed
 to just
 <verbatim><![CDATA[
@@ -753,15 +753,19 @@ text clearer in some cases), and if you omit them erroneously, the
 SGML parser will quickly tell you.
 
 <p>In cases where tags cannot be omitted, you can still cut down the
-amount you have to type.  Instead of typing <code>&lt;em>emphasised
+amount you have to type.  Instead of typing <code>&lt;em&gt;emphasised
 text&lt;/em></code>, you can type just <code>&lt;em/emphasised
-text/</code>.<note>This much is a convenient shortcut. SGML defines
+text&gt;</code>.<note>Note that this is different from the default
+SGML minimisation, which would have <code>&lt;em/emphasised
+text/</code> -- in order to be able to write <code>&lt;ref/&gt;</code>
+for empty elements, we had to change the form of this particular
+minimisation option.  This much is a convenient shortcut. SGML defines
 other tag minimisation locutions, so that
 <code>&lt;p&lt;em/emph/&lt;/></code> is legal.  This rarely improves
 readability, can get you into terrible messes, and is part of the
 `parser hell' which XML was designed to avoid.  I mention it purely
-for completeness; these rather more extreme minimisation functions
-have been disabled in this SGML application.</note>
+for completeness; some of these rather more extreme minimisation
+functions have been disabled in this SGML application.</note>
 
 <p><update versionid="post-0.2">Added note to the effect that
 attribute names can be minimised when the value is from a set</update>
@@ -777,9 +781,9 @@ the `export' attribute associated with exported IDs.
 
 <p>SGML also has single-character entity references.  The character
 <code><![CDATA[~]]></code> in normal text turns into the entity
-<code/&amp;nbsp;/, and <code><![CDATA[--]]></code> (two hyphens) turns
-into <code/&amp;endash;/.  Such `short reference' characters are used
-a little more in the programcode DTD (see <ref id=doccode></>).
+<code/&amp;nbsp;>, and <code><![CDATA[--]]></code> (two hyphens) turns
+into <code/&amp;endash;>.  Such `short reference' characters are used
+a little more in the programcode DTD (see <ref id=doccode/>).
 
 <subsect id=markup.ms export>Marked sections
 
@@ -788,7 +792,7 @@ relocated from appendix.
 
 <p>A feature you will occasionally use in documents is the `marked
 section'.  As an author, you will most likely only ever use the
-<code/CDATA/ marked section, but the <code/IGNORE/ and <code/INCLUDE/
+<code/CDATA> marked section, but the <code/IGNORE> and <code/INCLUDE>
 marked sections might also be useful, as well as being common within DTDs.
 
 <p>A marked section is a construction such as
@@ -799,44 +803,44 @@ and
 <verbatim>
 Here is some text &lt;![ IGNORE [ and here is some ignored text &rsqbrack;]>
 </verbatim>
-Along with <code/IGNORE/ there is <code/INCLUDE/.
+Along with <code/IGNORE> there is <code/INCLUDE>.
 
 <p>The marked section ends at the sequence of characters
-<code/&rsqbrack;&rsqbrack;&gt;/, which is therefore the one sequence
+<code/&rsqbrack;&rsqbrack;&gt;>, which is therefore the one sequence
 which cannot appear within the marked section.
 
-<p>There are some further technical details in <ref id=sgml.ms></>.
+<p>There are some further technical details in <ref id=sgml.ms/>.
 
 <subsubsect id=markup.ms.cdata>CDATA marked sections
 
-<p>Within the <code/cdata/ marked section, parsing is switched off, so
-that angle brackets, <code/&lt/, and ampersands, <code/&amp/, are no
+<p>Within the <code/cdata> marked section, parsing is switched off, so
+that angle brackets, <code/&lt>, and ampersands, <code/&amp>, are no
 longer recognised as introducing markup and entity references.
 
-<p>You will typically use a <code/CDATA/ marked section to delimit
-verbatim text.  The <code/code/ and <code/verbatim/ elements (see 
-<ref id=el.sun.code></> and <ref id=el.sun.verbatim/>) do not make any
+<p>You will typically use a <code/CDATA> marked section to delimit
+verbatim text.  The <code/code> and <code/verbatim> elements (see 
+<ref id=el.sun.code/> and <ref id=el.sun.verbatim/>) do not make any
 provision to switch off parsing of the text within them.  If the text
 would be significant to the parser -- that is, if it contains angle
 brackets or ampersands -- you must either escape those characters by
-giving them as entity references <code/&amp;lt;/ or <code/&amp;amp;/,
-or else enclose the contents in a <code/CDATA/ marked section as
+giving them as entity references <code/&amp;lt;> or <code/&amp;amp;>,
+or else enclose the contents in a <code/CDATA> marked section as
 follows.
 <verbatim>
 &lt;verbatim>&lt;![ CDATA [
 Here is some &lt;em>marked-up&lt/em> text
 which will be skipped &amp; ignored
-&rsqbrack;&rsqbrack>&lt;/verbatim>
+&rsqbrack;&rsqbrack&gt;&lt;/verbatim>
 </verbatim>
 Within a CDATA marked section, no markup is recognised except the
-<code/&rsqbrack;]>/ which closes the marked section; thus element
+<code/&rsqbrack;&rsqbrack;&gt;> which closes the marked section; thus element
 start- and end-tags are not parsed, and entity references not expanded.
 
 <subsubsect id=markup.ms.variants>Paper-only and web-only variants
 
-<p>Text within <code/INCLUDE/ and <code/IGNORE/ marked sections is
-parsed or skipped by the parser, as appropriate.  They are <em/not/
-often used outside of DTDs, but the <code/IGNORE/ marked section
+<p>Text within <code/INCLUDE> and <code/IGNORE> marked sections is
+parsed or skipped by the parser, as appropriate.  They are <em/not>
+often used outside of DTDs, but the <code/IGNORE> marked section
 is occasionally useful as a way of `commenting out' large sections of
 text which might itself include SGML comments <code><![CDATA[<!--
 ... -->]]></code>.
@@ -844,11 +848,11 @@ text which might itself include SGML comments <code><![CDATA[<!--
 <p>Sometimes, it is necessary to have parts of your document which
 vary depending on whether the document is to be viewed on paper or
 online.  The Starlink general DTD defines two parameter entities
-<code/&percent;Only.paper/ and <code/&percent;Only.web/, which you can
+<code/&percent;Only.paper> and <code/&percent;Only.web>, which you can
 use to include or ignore text in a marked section.  By default, both
 of these are set to the string 
-`IGNORE', but when you use the <code/sgml2docs/ script (see 
-<ref id=proc.sgml2docs></>), one or the other of these will be set to `INCLUDE', as
+`IGNORE', but when you use the <code/sgml2docs> script (see 
+<ref id=proc.sgml2docs/>), one or the other of these will be set to `INCLUDE', as
 appropriate for the type of file being generated.
 
 <p>You would use this facility as follows:
@@ -861,22 +865,22 @@ only in webpages. &rsqbrack;&rsqbrack;>
 <p>It is, I hope, clear that you could get yourself in a terrible mess
 here, and create a document which is only valid for some settings of
 the entities.  Take care that your document remains valid for all
-settings, <em/including/ the case where both entities are set to `IGNORE'.
+settings, <em/including> the case where both entities are set to `IGNORE'.
 
 
 <subsect id=markup.try export>Try it yourself -- running the SGML parser
 
-<p>Type the document given in <ref id=fig.simplesun></> into a file, and
+<p>Type the document given in <ref id=fig.simplesun/> into a file, and
 check it with the distributed SGML parser, as follows.  If the
-document is in a file <code/sun1234.sgml/, then give the command
-<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls/
-parser, and, with the <code/-s/ option, suppresses all output except
+document is in a file <code/sun1234.sgml>, then give the command
+<kbd>nsgmls -s sun1234.sgml</kbd>.  This invokes the <code/nsgmls>
+parser, and, with the <code/-s> option, suppresses all output except
 warnings and error messages.  This means that for a valid document,
 you should see precisely no output from this command.  If you want to
-see output, leave off the <code/-s/ option and the parser will produce
+see output, leave off the <code/-s> option and the parser will produce
 a version of your document in a form which is easy for a downstream
 application to parse.  There are, for example, Perl libraries (for
-example <code/SGMLSpm/, which should be on CPAN) which
+example <code/SGMLSpm>, which should be on CPAN) which
 will parse this output format and allow you to process SGML documents
 using Perl.  The crucial thing in this case is the final line in
 the output, which should be a single `C' command, indicating that the
@@ -887,14 +891,14 @@ document conforms to its DTD.
 an equivalent one with all omitted elements reinserted.
 
 <p>Finally, and most importantly, try converting your document to
-HTML.  This uses the script <code/sgml2docs/.  Give the command
-<kbd/sgml2docs sun1234.sgml/, which will transform your document into
+HTML.  This uses the script <code/sgml2docs>.  Give the command
+<kbd/sgml2docs sun1234.sgml>, which will transform your document into
 a collection of HTML files, and package them up into a tar-file by the
-name of <code/sun1234.tar-htx/.  Alternatively, give the command
-<kbd/sgml2docs --latex sun1234.sgml/, which will transform your
+name of <code/sun1234.tar-htx>.  Alternatively, give the command
+<kbd/sgml2docs --latex sun1234.sgml>, which will transform your
 document into a &latex; file, and place it, and any figures required
-for processing into a file <code/sun1234.tar-latex/.
-See <ref id=proc.sgml2docs></> for further details.  
+for processing into a file <code/sun1234.tar-latex>.
+See <ref id=proc.sgml2docs/> for further details.  
 
 <!--
 <p>Finally, try converting your document to HTML.  This uses the
@@ -903,11 +907,11 @@ language.  Give the command
 <kbd>jade -t sgml -d
 $STARLINK_SGML_DIR/dsssl/sl/html/sl.dsl#html sun1234.sgml</kbd>.  This
 will parse your document, and convert it to a collection of HTML
-files, with the master file named <code/SUN-1234.html/ (this name is based
+files, with the master file named <code/SUN-1234.html> (this name is based
 on the information in the document, and is independent of what your
 source file is actually called).  The command actually spits out a
 line of text to the standard output; this is because the SGML set is
-designed to be used from within a Makefile (see <ref id=proc.makefile></>) rather
+designed to be used from within a Makefile (see <ref id=proc.makefile/>) rather
 than directly from the command line.
 
 <p>You can also convert your document to &latex;, with the command 
@@ -916,16 +920,16 @@ sun1234.sgml</kbd>.
 -->
 
 <p>Try making parts of your document invalid, and comparing the error
-with the error message <code/nsgmls/ produces.
+with the error message <code/nsgmls> produces.
 
 
 <sect id=structure export>The structure of the document
 
 <p>In this section I will describe all of the elements of the General DTD,
 grouping them by type.  There is an alternative description of the
-elements, listed alphabetically, in <ref id=appx.general.dtd></>.
+elements, listed alphabetically, in <ref id=appx.general.dtd/>.
 
-<p>The elements are thematically grouped in <ref id=table.elements></>,
+<p>The elements are thematically grouped in <ref id=table.elements/>,
 and each of these groups is discussed in the indicated section.  Note
 that the discussion there is intended to provide an overview of the
 possibilities provided by the group, and it does not necessarily
@@ -949,7 +953,7 @@ document by including as much element and attribute detail as you can.
 <tbody>
 <row>
 <entry>
-<ref id=str.structure></>
+<ref id=str.structure/>
 <entry>
 <ref id='el.sun.abstract' >abstract</ref>,
 <ref id='el.sun.appendices' >appendices</ref>,
@@ -970,7 +974,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.sect></>
+<ref id=str.sect/>
 <entry>
 <ref id='el.sun.sect' >sect</ref>,
 <ref id='el.sun.subhead' >subhead</ref>,
@@ -981,7 +985,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.backmatter></>
+<ref id=str.backmatter/>
 <entry>
 <ref id='el.sun.backmatter' >backmatter</ref>,
 <ref id='el.sun.citation' >citation</ref>,
@@ -995,14 +999,14 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.code></>
+<ref id=str.code/>
 <entry>
 <ref id='el.sun.codecollection' >codecollection</ref>,
 <ref id='el.sun.routinelist' >routinelist</ref>
 
 <row>
 <entry>
-<ref id=str.history></>
+<ref id=str.history/>
 <entry>
 <ref id='el.sun.change' >change</ref>,
 <ref id='el.sun.distribution' >distribution</ref>,
@@ -1013,7 +1017,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.xrefs></>
+<ref id=str.xrefs/>
 <entry>
 <ref id='el.sun.docxref' >docxref</ref>,
 <ref id='el.sun.ref' >ref</ref>,
@@ -1022,7 +1026,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.figures></>
+<ref id=str.figures/>
 <entry>
 <ref id='el.sun.caption' >caption</ref>,
 <ref id='el.sun.figure' >figure</ref>,
@@ -1030,7 +1034,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.tables></>
+<ref id=str.tables/>
 <entry>
 <ref id='el.sun.caption' >caption</ref>,
 <ref id='el.sun.colspec' >colspec</ref>,
@@ -1044,7 +1048,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.text></>
+<ref id=str.text/>
 <entry>
 <ref id='el.sun.angle' >angle</ref>,
 <ref id='el.sun.attribution' >attribution</ref>,
@@ -1070,7 +1074,7 @@ document by including as much element and attribute detail as you can.
 
 <row>
 <entry>
-<ref id=str.maths></>
+<ref id=str.maths/>
 <entry>
 <ref id='el.sun.m' >m</ref>,
 <ref id='el.sun.meqnarray' >meqnarray</ref>,
@@ -1123,7 +1127,7 @@ notes, system notes, general papers, cookbooks, and guides, and
 Miscellaneous User Documents.  These document types are broadly the
 same (there is a single DTD underlying them all), but the different
 types have different features, summarised in 
-<ref id=table.dtdfeatures></>.
+<ref id=table.dtdfeatures/>.
 
 <table id=table.dtdfeatures>
 <caption>
@@ -1162,21 +1166,21 @@ Starlink DTD feature summary
 </tabular>
 </table>
 
-<p>The table headings in <ref id=table.dtdfeatures></> are as follows:
+<p>The table headings in <ref id=table.dtdfeatures/> are as follows:
 <dl>
 <dt>Abstract
 <dd>Is an abstract required or optional.
 <dt>Versioning
-<dd>Is the history mechanism, described in <ref id=str.history></>
+<dd>Is the history mechanism, described in <ref id=str.history/>
 required?  If not, the <ref id=el.sun.docdate>docdate</ref>
 element is required.
 <dt>Docnumber
 <dd>Is a document number required?
 <dt>Routinelist
 <dd>Are the code-documentation elements, described in 
-<ref id=str.code></> available?
+<ref id=str.code/> available?
 <dt>EnforceLinkPolicy
-<dd>Is the link policy enforced?  See <ref id=str.xrefs></>.
+<dd>Is the link policy enforced?  See <ref id=str.xrefs/>.
 </dl>
 
 <p>These defaults are generally appropriate for the type of document.
@@ -1199,7 +1203,7 @@ the first all the `meta-information' -- the author, title, keywords,
 and so on, which are important for identifying and indexing the
 document.  The docinfo elements should be self-explanatory, with the
 exception of the history element, which is discussed in 
-<ref id=str.history></>.
+<ref id=str.history/>.
 
 <p>The docbody element contains all the text of the document,
 optionally preceded by paragraphs and tables.  Any document appendices
@@ -1207,11 +1211,11 @@ are gathered together in a single
 <ref id=el.sun.appendices>appendices</ref> element, with each appendix in a
 <ref id=el.sun.sect>sect</ref> element, optionally preceded by a 
 <ref id=el.sun.routinelist>routinelist</ref> element (see
-<ref id=str.code></>), if the specific DTD allows that.
+<ref id=str.code/>), if the specific DTD allows that.
 
 <p>Material such as a bibliography and endnotes do not go in an
 appendix, but in a separate backmatter element (see 
-<ref id=str.backmatter></>).
+<ref id=str.backmatter/>).
 
 <subsect id=str.sect export>Sectioning
 
@@ -1234,7 +1238,7 @@ which the sectioning commands enclose only the section heading).
 turn contains a <ref id=el.sun.title>title</ref> element, and the
 two are followed by the section 
 content. Note, however, that since the subhead and title start and end
-tags are both omissable (see <ref id=markup.min></>), you may omit both,
+tags are both omissable (see <ref id=markup.min/>), you may omit both,
 and follow the sect start 
 tag immediately with the section title.
 That is, the structure is formally
@@ -1253,7 +1257,7 @@ but this may be abbreviated to just
 specify a unique label with which you can refer to the section.  For
 both the sect and subsect elements, this ID attribute is required by
 the DTD (when the <code>EnforceLinkPolicy</code> feature is enabled --
-see <ref id=str.structure></>).  See also <ref id=str.xrefs/> for more
+see <ref id=str.structure/>).  See also <ref id=str.xrefs/> for more
 detail on cross-referencing.
 
 <subsect id=str.backmatter export>Backmatter -- notes and bibliography
@@ -1282,16 +1286,16 @@ citation element, and these are collected together in the backmatter
 element.  The DTD is quite generic, but in this application, the
 bibliography is implemented as a Bib&tex database, so that the
 backmatter element's `bibliography' attribute names a Bib&tex
-<code>.bib</code> file (without the <code/.bib/ extension), and the
+<code>.bib</code> file (without the <code/.bib> extension), and the
 citation element's content is a Bib&tex entry key.  Note that the
 Bib&tex; processing of your document is done within the context of a
-temporary work directory (see <ref id=proc.sgml2docs></>), so you might have
-to specify Bib&tex;'s <code/BIBINPUTS/ environment variable if
+temporary work directory (see <ref id=proc.sgml2docs/>), so you might have
+to specify Bib&tex;'s <code/BIBINPUTS> environment variable if
 Bib&tex; is to find your bibliography database.  There is no way (at
 present) to specify the bibliography formatting style -- the SGML set
 uses a customised bibliography style which, incidentally, supports a
 URL field in bibliography entries.  See the Bib&tex documentation in,
-for example, <citation/lamport/ for further details.
+for example, <citation/lamport> for further details.
 
 <p>You can include notes in your document with the note element.
 At present, the notes are presented as footnotes in
@@ -1299,13 +1303,13 @@ the paper version of your document and collected together as endnotes
 in the online version.
 <!--
 Note that since the notes are collected within
-the backmatter element, the notes <em/will not be printed/ unless
+the backmatter element, the notes <em/will not be printed> unless
 a backmatter element is present.
 -->
 
 <p>Although the indexing support is defined in the DTD, there is not
 yet any application support for it.  It is likely to use the
-<code/makeindex/ system associated with &latex;.
+<code/makeindex> system associated with &latex;.
 
 <subsect id=str.code export>Documenting code
 
@@ -1319,10 +1323,10 @@ elements.
 <ref id=el.sun.appendices>appendices</ref> element, and contains one or
 more codecollection elements, each of which makes a link between the
 general documentation and a specific file marked up using the
-<code/programcode/ DTD.  See <ref id=doccode></> for details.
+<code/programcode> DTD.  See <ref id=doccode/> for details.
 
 <p>These elements are available only if the document type has the
-`Routinelist' feature enabled.  See <ref id=str.structure></>.
+`Routinelist' feature enabled.  See <ref id=str.structure/>.
 
 <subsect id=str.history export>History
 
@@ -1340,14 +1344,14 @@ can check which version of a document, and find what features of it
 have changed since the last version they are familiar with.
 
 <p>The history element, within in the docinfo element (see 
-<ref id=str.structure></>), records the history of the document.  It is
+<ref id=str.structure/>), records the history of the document.  It is
 available in most of the Starlink DTDs, but not all, and when it is
 omitted, the <ref id=el.sun.docdate>docdate</ref> element is
 required instead.
 
 <p>The history of a document is composed of a sequence of versions,
 changes, and distributions.  A document has a version number of the
-form <code/docnumber.docversion-release/.  The document number is the
+form <code/docnumber.docversion-release>.  The document number is the
 number declared in the <ref id=el.sun.docnumber>docnumber</ref>
 element, as assigned by the Starlink librarian.  The document version
 indicates which edit of the document this is -- a significant update
@@ -1367,7 +1371,7 @@ document.
 <p>A distribution of a document (marked by a 
 <ref id=el.sun.distribution>distribution</ref> element in the history) is
 a less significant update to a document, perhaps for distribution to
-readers for comments.  The <code/string/ attribute is a label for the
+readers for comments.  The <code/string> attribute is a label for the
 distribution, and could be something like `draft1' or `comments-13'.
 
 <p>Other changes to the document are labelled by a 
@@ -1376,10 +1380,10 @@ document without a corresponding change to an version number.
 
 <p>The <ref id=el.sun.distribution>distribution</ref> and 
 <ref id=el.sun.change>change</ref> elements have an optional
-<code/versionid/ attribute.  This allows you to specify a label for
+<code/versionid> attribute.  This allows you to specify a label for
 this edit.  Any <ref id=el.sun.update>update</ref> elements
 elsewhere in the text must attach themselves to one of these elements,
-using the <code/versionid/ attribute.
+using the <code/versionid> attribute.
 
 <p>For example:
 <verbatim><![ CDATA [
@@ -1433,7 +1437,7 @@ link text will be generated, as something like `Section xxx'.
 For example,
 the above link to the ref element's documentation was specified as
 <code>&lt;ref id=el.sun.ref>ref&lt;/ref></code>, but I could have
-written just <code>&lt;ref id=el.sun.ref>&lt;/></code> to get <ref id=el.sun.ref></>.
+written just <code>&lt;ref id=el.sun.ref>&lt;/></code> to get <ref id=el.sun.ref/>.
 
 <p>The <ref id=el.sun.docxref>docxref</ref> element refers to all or
 part of another Starlink document.  To use this, you must declare an
@@ -1457,10 +1461,10 @@ SGML system to effectively query the target document.  At present,
 however (release DR-0.6), it has been decided to distribute the kit
 with these document summaries missing, and so the down-converters have
 been written so that they fail gracefully and silently in this case,
-and generate a link to the Starlink documents available at RAL <em/if/
-the FPI is declared in this correct format.  Jade will <em/warn/ you
+and generate a link to the Starlink documents available at RAL <em/if>
+the FPI is declared in this correct format.  Jade will <em/warn> you
 about its inability to resolve the FPI, but this can be ignored. See
-<ref id=appx.system.summaries></> for maintainer-level discussion of
+<ref id=appx.system.summaries/> for maintainer-level discussion of
 document summaries.
 
 <p>When linking to other Starlink documents, you may only link to IDs
@@ -1471,7 +1475,7 @@ the `id' attribute.  To ensure that there is a rich field of targets
 for other documents (see also <docxref doc=sun188
 loc=establishing_cross_references>), most of the Starlink document
 types enforce a `link policy' (see the `EnforceLinkPolicy' feature in
-<ref id=str.structure></>), requiring that <em/all/ sect and subsect
+<ref id=str.structure/>), requiring that <em/all> sect and subsect
 elements (at least) have both the `id' and `export' attributes
 present.  Note that the export attribute must be explicitly present --
 it is not automatically inserted or assumed -- even though it is
@@ -1483,16 +1487,16 @@ ID.
 
 <p>The <ref id=el.sun.webref>webref</ref> and 
 <ref id=el.sun.url>url</ref> elements are straightforward: they both refer to a
-resource on the web.  The webref element is much like HTML's <code/a/
+resource on the web.  The webref element is much like HTML's <code/a>
 element, providing link text and a URL for the target; the url element
 quotes the URL directly.
 
 <p>As rather a special case, these cross-reference elements are
 allowable in the <ref id=el.sun.verbatim>verbatim</ref> element,
 which is occasionally quite useful.  For example, the contents of 
-<ref id=figure.programcode></> makes extensive use of this, to link from the
+<ref id=figure.programcode/> makes extensive use of this, to link from the
 element names to their documentation in 
-<ref id=appx.programcode.dtd></>.  This application uses the ref element's
+<ref id=appx.programcode.dtd/>.  This application uses the ref element's
 text attribute, and the result is that the link disappears in the
 paper version of the document.  I don't imagine that the docxref
 element would often be useful here, but url and webref might be.
@@ -1517,7 +1521,7 @@ format, if you can.
 <p>You can provide paragraphs of text (perhaps containing a 
 <ref id=el.sun.verbatim>verbatim</ref> element) as figure content.
 
-<p>For details, and an example, see <ref id=el.sun.figurecontent></>.
+<p>For details, and an example, see <ref id=el.sun.figurecontent/>.
 
 <subsect id=str.tables export>Tables
 <update versionid="v0-4">Include description of new tabular element</update>
@@ -1563,7 +1567,7 @@ use in your documents all of the elements and attributes in the Oasis
 model, but some of the lesser-used attributes are not recognised.
 
 <p>The support for Oasis table attributes is as shown in 
-<ref id=table.oasis></>.
+<ref id=table.oasis/>.
 <table id=table.oasis>
 <caption>
 Support for Oasis table attributes in Starlink DTDs
@@ -1614,8 +1618,8 @@ given priority.
 <thead>
 <row><entry>Entity reference<entry>Replacement<entry>Description
 <tbody>
-<row><entry><code/&amp;copy;/<entry>&copy<entry>Copyright symbol
-<row><entry><code/&amp;amp;/<entry><code/&amp/<entry>ampersand
+<row><entry><code/&amp;copy;><entry>&copy<entry>Copyright symbol
+<row><entry><code/&amp;amp;><entry><code/&amp><entry>ampersand
 </tabular>
 </table>
 ]]></verbatim>
@@ -1643,7 +1647,7 @@ that there are a few elements (index, note and draftnote) which may
 not appear.
 
 <p>The paragraph elements have an `id' attribute, which allows you to
-refer to them using a REF element (see <ref id=el.sun.ref></>).  This
+refer to them using a REF element (see <ref id=el.sun.ref/>).  This
 reference will, however, typically be a reference to the section which
 contains the paragraph rather than to the paragraph specifically.
 This is an instance of the more general warning that you should 
@@ -1671,11 +1675,11 @@ displayed in some way which indicated that it is text a user should
 type.  Verbatim content is displayed in a fixed-width font, respecting
 line-breaks.  Note that none of these elements perform any escaping of
 their contents -- if there are any characters in the content which
-would be of significance to the SGML parser (such as <code/&amp/ or
-<code/&lt/), they should either be escaped with entity references
-(<code/&amp;amp;/ or <code/&amp;lt;/) or else the content should be
+would be of significance to the SGML parser (such as <code/&amp> or
+<code/&lt>), they should either be escaped with entity references
+(<code/&amp;amp;> or <code/&amp;lt;>) or else the content should be
 enclosed in a CDATA marked section as follows (see also 
-<ref id=markup.ms.cdata></>).
+<ref id=markup.ms.cdata/>).
 <verbatim>
 &lt;verbatim>&lt;![ CDATA [
 Here is some &lt;em>marked-up&lt/em> text
@@ -1725,7 +1729,7 @@ elements</update>
 <p>All the maths in Starlink documents uses &latex;
 notation.<note>MathML was considered, but is neither well-supported in
 browsers, nor designed to be easily written by hand</note>  The `m'
-element is equivalent to <code/&dollar;...&dollar/, `mequation' is
+element is equivalent to <code/&dollar;...&dollar>, `mequation' is
 equivalent to <code>\begin{equation} ... \end{equation}</code> and
 `meqnarray' is equivalent
 to <code>\begin{eqnarray} ... \end{eqnarray}</code>,
@@ -1746,8 +1750,8 @@ entity references to parameterise or abbreviate mathematical
 expressions.
 
 <p>When you are typing an eqnarray, you might want to escape all
-occurrences of <code/&amp/ and <code/&lt/ with the corresponding
-entity references <code/&amp;amp;/ and <code/&amp;lt;/.  This is not
+occurrences of <code/&amp> and <code/&lt> with the corresponding
+entity references <code/&amp;amp;> and <code/&amp;lt;>.  This is not
 wrong, but it can become tedious and could obscure what you are
 writing, so you may prefer to take advantage of the fact that SGML
 recognises these bits of markup only in context: only if an ampersand
@@ -1761,7 +1765,7 @@ correctly formed (with <code>&lt!ENTITY dec "\delta"></code>):
 I do, however, advise you against typing anything so wilfully obscure.
 The best practice when typing meqnarray
 elements is to reflexively put a space after all occurrences of
-<code/&amp;/ and <code/&lt;/: this will keep the SGML parser from
+<code/&amp;> and <code/&lt;>: this will keep the SGML parser from
 interfering, and make no difference to &latex, which ignores all
 spaces in maths mode anyway.
 
@@ -1776,7 +1780,7 @@ code itself.  The Starlink DTDs have facilities to do precisely this,
 associating documentation directly with program code, and associating
 that detailed documentation with user documents.
 
-<p>As described in <ref id=str.code></>, the Starlink General DTD has an
+<p>As described in <ref id=str.code/>, the Starlink General DTD has an
 appendix element <ref id=el.sun.routinelist>routinelist</ref>,
 containing one or more 
 <ref id=el.sun.codecollection>codecollection</ref> elements.  Each of these latter elements makes
@@ -1784,10 +1788,10 @@ a link between the documentation and a document marked up using the
 programcode DTD, which I will now describe.
 
 <p>If you wish to refer to some element within the codecollection, say
-a function to which you gave the ID <code/myfunc/ by specifying an
+a function to which you gave the ID <code/myfunc> by specifying an
 `id' attribute to a <ref id=el.programcode.routine>routine</ref> or
 <ref id=el.programcode.routinename>routinename</ref> programcode
-element, you do so <foreign/via/ the `codecollection' element.  You
+element, you do so <foreign/via> the `codecollection' element.  You
 make the reference using the <ref id=el.sun.coderef>coderef</ref>
 element, which takes two (required) attributes: an ID for the
 `codecollection' which contains the programcode file, and name of the
@@ -1825,15 +1829,15 @@ and what, markup to allow into their code comments.
 <p>There are distinct document type declarations for the different
 supported languages, although they use the same underlying markup.
 This is so that the generic programcode DTD can be slightly customised
-as appropriate for different languages.  See <ref id=doccode.languages></>.
+as appropriate for different languages.  See <ref id=doccode.languages/>.
 
-<p>The programcode DTD is more elaborate than it <em/could/ have
+<p>The programcode DTD is more elaborate than it <em/could> have
 been.  Different people have different coding and documenting styles,
 and are firmly wedded to them, so I felt that flexibility was more
 important than simplicity.  As a result, there is sometimes more than
 one place where information can reasonably be placed.  Also, the DTD
 makes it possible to exploit tag-omission quite heavily (see 
-<ref id=markup.min></>) -- the aim was to indicate an adequate level of
+<ref id=markup.min/>) -- the aim was to indicate an adequate level of
 structure using as little markup as possible.
 
 <p>The programcode DTD is designed to document code; there is no
@@ -1875,7 +1879,7 @@ program:
 <p>This is, obviously, not a compilable Fortran program, but it is a
 good example, firstly because it displays the structure (which will
 be a little obscured when we come to consider Fortran programs in 
-<ref id=doccode.fortran></>), and secondly because it could plausibly be the
+<ref id=doccode.fortran/>), and secondly because it could plausibly be the
 output of some script which extracts documentation from compilable
 source code files.
 
@@ -1904,12 +1908,12 @@ element could be represented as:
 that returnvalue and argumentlist have optional `none'
 attributes.
 <update versionid=v0-6-1>Returnvalue is now omissable</update>
-When there is <em/no/ return value, in the case of a subroutine, you
+When there is <em/no> return value, in the case of a subroutine, you
 can either omit the returnvalue element, or give it the attribute
-<code/none/.  The <ref id=el.programcode.argumentlist>argumentlist</ref>
+<code/none>.  The <ref id=el.programcode.argumentlist>argumentlist</ref>
 element is not omissable, however (since if the SGML parser finds a
 parameter element, it can't know whether it's part of an argumentlist
-or a parameterlist element), and this also takes an attribute <code/none/.
+or a parameterlist element), and this also takes an attribute <code/none>.
 
 <subsubsect id=doccode.elements>The programcode element structure
 <update versionid="v0.6">
@@ -1917,12 +1921,12 @@ Substantially redone, to match significant changes to programcode DTD
 </update>
 
 <p>In the case of the Starlink General DTD, described in 
-<ref id=structure></>, the important features were the meanings of the element
+<ref id=structure/>, the important features were the meanings of the element
 types.  In the case of the programcode DTD, however, the meanings of
 the element types are fairly straightforward, and the detail is in the
-<em/structure/ of the DTD.  It therefore seems best to focus on the
+<em/structure> of the DTD.  It therefore seems best to focus on the
 structure of the DTD here, leaving the detailed descriptions of the
-elements, and their attributes, to <ref id=appx.programcode.dtd></>.
+elements, and their attributes, to <ref id=appx.programcode.dtd/>.
 
 <p>The programcode DTD includes essentially all of the paragraph-level
 elements in the Starlink General DTD, that is, everything that may be
@@ -1930,8 +1934,8 @@ included in a paragraph in that DTD may also be included in a
 paragraph in the programcode DTD (except `docxref' and `ref', but with
 the addition of the `funcname' element).
 
-<p><ref id=figure.programcode></> displays the element structure of the
-programcode DTD.  The syntax is that of a DTD -- see <ref id=sgml.dtd></>
+<p><ref id=figure.programcode/> displays the element structure of the
+programcode DTD.  The syntax is that of a DTD -- see <ref id=sgml.dtd/>
 for brief notes on this.
 
 <figure id=figure.programcode alt="programcode DTD element structure">
@@ -1940,7 +1944,7 @@ for brief notes on this.
 <!-- This was extracted from the dtd with the sed script
   sed -n '/^<!ELEMENT/{:again;/> *$/b nextel;p;n;b again;:nextel;p;}' \
 	programcode-0.6.dtd 
-  ...then reordered for documentation purposes, and the <ref></> elements
+  ...then reordered for documentation purposes, and the <ref/> elements
   put in.
 -->
 <verbatim>
@@ -2060,7 +2064,7 @@ for brief notes on this.
 concentrates on the structure of the DTD and the relationships between
 the elements -- I have not described the details of the elements or
 their attributes where these can be found in the detailed element
-listing in <ref id=appx.programcode.dtd></>.
+listing in <ref id=appx.programcode.dtd/>.
 
 <p><verbatim>
 &lt;!ELEMENT <ref id=el.programcode.programcode>programcode</ref>   O O (docblock, (codegroup | codereference)+)>
@@ -2070,19 +2074,19 @@ listing in <ref id=appx.programcode.dtd></>.
                              userkeywords?, softwarekeywords?,
                              authorlist?, copyright?, history?)>
 </verbatim>
-The <code/programcode/ top-level element, like the
-<code/codegroup/ and <code/codereference/ elements which it contains,
-starts off with a <code/docblock/ element.  This may provide
+The <code/programcode> top-level element, like the
+<code/codegroup> and <code/codereference> elements which it contains,
+starts off with a <code/docblock> element.  This may provide
 discussion, author, copyright, change history information, or it may
 give as little as a title.  Where this information is provided is up
 to the author of the documentation.  The elements in the
-<code/docblock/ must be present in the order specified here.
+<code/docblock> must be present in the order specified here.
 
-<p>A <code/codegroup/ element simply
+<p>A <code/codegroup> element simply
 gathers together several related functions (this is deliberately
 vague); it might therefore represent all the functions defined in one
 source file, or in one directory of a source tree.  
-A <code/codereference/ is even vaguer: it documents a relationship
+A <code/codereference> is even vaguer: it documents a relationship
 between the current programcode document and another one.  In the case
 of the DSSSL DTD, this is mapped to the structure in that language which
 included one source file in 
@@ -2109,13 +2113,13 @@ dependence of a source file on an `include' file.
                                 (bugs,          diytopic*)?
                                 )>
 </verbatim>
-A <code/routine/ element documents a function, with arguments, a return
+A <code/routine> element documents a function, with arguments, a return
 value, and the like.
 
 <p><update versionid="post-0.2">
 Paragraph rewritten to suggest using a CDATA marked section, instead
 of code edits.</update>
-The <code/codebody/ element is ignored by the processing system,
+The <code/codebody> element is ignored by the processing system,
 but is still scanned by the parser.  This could cause you a problem if
 there's anything in there which looks like something the parser would
 be interested in, namely an element start-tag, an entity reference, or
@@ -2131,7 +2135,7 @@ will always be enough), to stop things looking like markup:
 <code>&lt;a</code> is the beginning of an element start-tag, but
 <code>&lt; a</code>, with an interpolated space, is not.
 Alternatively, you can bracket the code in a CDATA marked section
-(<ref id=markup.ms.cdata></>) as follows
+(<ref id=markup.ms.cdata/>) as follows
 <verbatim>
 * ... end of code prologue
 *-&lt;![CDATA[
@@ -2151,7 +2155,7 @@ seem a little disappointing that none of SGML's various escaping
 mechanisms could help here, but the fact that the code text has to
 remain pretty much inviolate (apart from the possibility of a few
 spaces here and there) is rather restrictive.  Another possibility I
-considered was making the <code/codebody/ element have CDATA content,
+considered was making the <code/codebody> element have CDATA content,
 even though that's generally deprecated in the most lurid terms.  Far from
 solving the problem, this would make things worse, however: the
 <code>&lt;/</code> which ends the element would still be magic, you'd
@@ -2161,20 +2165,20 @@ element (no entities recognised), and you'd have to have an explicit
 <code>*-</code> short reference doesn't seem to permit the element to
 be ended with the <code>&lt;/codebody></code> end-tag.</note>
 
-<p>Note: If the <code/codebody/ element actually contains no code at all
+<p>Note: If the <code/codebody> element actually contains no code at all
 (perhaps because the document has been generated by a preprocessor
 stage), then you should include the attribute `empty' in the
 start-tag; this has no effect at present, but could become significant
 if the documents are repurposed in future versions of this set.
 
-<p>The <code/routineprologue/ element contains all the `meta-information'
+<p>The <code/routineprologue> element contains all the `meta-information'
 for the routine, such as authorship, argument list, return value and
 the like.  The declaration here looks particularly complicated, but
 that is largely due to an unwieldiness in SGML's DTD syntax.  This
-declaration simply states that each of the <code/routinename/,
-<code/purpose/, etc., elements may appear at most once, but that each
-of these elements may be freely interspersed with <code/diytopic/
-elements.  Only the <code/description/ element <em/must/ appear.
+declaration simply states that each of the <code/routinename>,
+<code/purpose>, etc., elements may appear at most once, but that each
+of these elements may be freely interspersed with <code/diytopic>
+elements.  Only the <code/description> element <em/must> appear.
 
 <p>
 <verbatim>
@@ -2183,12 +2187,12 @@ elements.  Only the <code/description/ element <em/must/ appear.
 &lt;!ELEMENT <ref id=el.programcode.name>name</ref>          O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.othernames>othernames</ref>    - O (name+)>
 </verbatim>
-The <code/routinename/ element has structure, though in the usual case
-(<code/&lt;routinename>helloworld/) you wouldn't notice this.  The
-<code/othernames/ element is useful when a function has some generic
-name, say <code/allocarray/, plus some specific names, say
-<code/allocarray_int/ and <code/allocarray_float/.  The
-<code/moduletype/ element allows you to document that a particular
+The <code/routinename> element has structure, though in the usual case
+(<code/&lt;routinename>helloworld>) you wouldn't notice this.  The
+<code/othernames> element is useful when a function has some generic
+name, say <code/allocarray>, plus some specific names, say
+<code/allocarray_int> and <code/allocarray_float>.  The
+<code/moduletype> element allows you to document that a particular
 module is a <code>&lt;moduletype>Perl script</code>, for example.
 
 <p>
@@ -2212,34 +2216,34 @@ id=el.programcode.invocation >invocation</ref> | <ref id=el.programcode.implemen
 &lt;!ELEMENT <ref id=el.programcode.copyright>copyright</ref>     - O (%paralist;)>
 
 </verbatim>
-The distinction between <code/purpose/ and <code/description/ is that
-<code/purpose/ is intended for a brief, perhaps one-line, summary
-of the function, whereas <code/description/ is intended for a longer
+The distinction between <code/purpose> and <code/description> is that
+<code/purpose> is intended for a brief, perhaps one-line, summary
+of the function, whereas <code/description> is intended for a longer
 discussion.
 
-<p>The <code/description/ element is used in the <code/docblock/,
-<code/codeprologue/, <code/miscprologue/ and <code/parameter/
-elements, <code/authorlist/ is used in both <code/codeprologue/ and
-<code/docblock/ elements, and <code/name/ is used in the <code/author/,
-<code/othernames/, <code/parameter/ and <code/routinename/ elements.
+<p>The <code/description> element is used in the <code/docblock>,
+<code/codeprologue>, <code/miscprologue> and <code/parameter>
+elements, <code/authorlist> is used in both <code/codeprologue> and
+<code/docblock> elements, and <code/name> is used in the <code/author>,
+<code/othernames>, <code/parameter> and <code/routinename> elements.
 
-<p>The <code/diytopic/ element is for other notes which aren't
+<p>The <code/diytopic> element is for other notes which aren't
 otherwise covered by the element types listed here.  It has a very
 simple structure: a title followed by paragraphs of text.
 
-<p>The distinction between the <code/userkeywords/ and
-<code/softwarekeywords/ elements is that the former is intended to
+<p>The distinction between the <code/userkeywords> and
+<code/softwarekeywords> elements is that the former is intended to
 supply keywords to help the final user of the software, whereas the
 latter is intended to be a home for keywords concerned with the
 categorisation of the software within the Starlink project.
 
-<p>The text <code/%p.model;/ indicates that at this point, any of the
+<p>The text <code/%p.model;> indicates that at this point, any of the
 paragraph-level elements from the Starlink General DTD may be used,
 with the exception of the `docxref' and `ref' elements, and the
 addition of the `funcname' element.
 
-<p>The text <code/%paralist;/ is shorthand for <code/p, (p |
-tabular)*/, or in other words, a sequence of paragraphs and tabular elements.
+<p>The text <code/%paralist;> is shorthand for <code/p, (p |
+tabular)*>, or in other words, a sequence of paragraphs and tabular elements.
 
 <p>
 <verbatim>
@@ -2250,17 +2254,17 @@ tabular)*/, or in other words, a sequence of paragraphs and tabular elements.
 &lt;!ELEMENT <ref id=el.programcode.authorref>authorref</ref>     - O EMPTY>
 </verbatim>
 
-The distinction between the <code/author/ and <code/authorref/
-elements is important.  The <code/author/ element has a required ID
+The distinction between the <code/author> and <code/authorref>
+elements is important.  The <code/author> element has a required ID
 attribute which can be used to refer to this author, and the
 associated metadata of URL and email address.  Since IDs must be
-unique in an SGML document, it follows that there can be only <em/one/
-<code/author/ element per author per document: there cannot be an
+unique in an SGML document, it follows that there can be only <em/one>
+<code/author> element per author per document: there cannot be an
 author element in each function.  It is usual, however, to give
 authorship information in each function, and this is done with the
-<code/authorref/ element, which has a required ID attribute linking
-back to the <code/author/ element presumably located in the document's
-initial <code/docblock/ (see the example in <ref id=doccode.example></>).
+<code/authorref> element, which has a required ID attribute linking
+back to the <code/author> element presumably located in the document's
+initial <code/docblock> (see the example in <ref id=doccode.example/>).
 
 <p>
 <verbatim>
@@ -2270,10 +2274,10 @@ initial <code/docblock/ (see the example in <ref id=doccode.example></>).
 The history mechanism in programcode documents is intentionally
 simple, as it merely emulates the list-of-changes style in the
 majority of the Starlink code-base.  Specifically, it is simpler than
-the history mechanism in the General DTD (see <ref id=str.history></>).
-The <code/change/ element has a
+the history mechanism in the General DTD (see <ref id=str.history/>).
+The <code/change> element has a
 required date, and a required `author' attribute, which links back to
-a previous <code/author/ element.
+a previous <code/author> element.
 
 <p>
 <verbatim>
@@ -2281,17 +2285,17 @@ a previous <code/author/ element.
 &lt;!ELEMENT <ref id=el.programcode.webref>webref</ref> - - (%simpletext)+>
 &lt;!ELEMENT <ref id=el.programcode.url>url</ref> - - (#PCDATA)>
 </verbatim>
-The only unusual element is <code/funcname/, which
+The only unusual element is <code/funcname>, which
 is intended to indicate other functions within the same `world'
 (vagueness again): these could be language primitives, or other
 documented functions.  At present, this simply functions as a variant
-of the <code/code/ element, but the system could be extended in future
+of the <code/code> element, but the system could be extended in future
 to generate cross-references for these.
 
 <subsect id=doccode.languages export>Specific language variants
 
 <p>As I mentioned above, the programcode DTD is not invoked directly,
-but instead <em/via/ a document type declaration specific to the
+but instead <em/via> a document type declaration specific to the
 language of the program being documented, allowing for
 language-specific customisation of the generic DTD.
 
@@ -2307,17 +2311,17 @@ languages as guided by demand.
 the definition of `short references' for certain tags, to help you
 `hide' SGML within Fortran comments.
 
-<p>The string <code/*+/ coming at the beginning of the line, is
-equivalent to the <code/func/ start-tag, and <code/*-/ at the
-beginning of the line is recognised as the <code/codebody/ start-tag.
-Within the <code/func/ element, a <code/*/ at the beginning of the
-line is ignored.  Further, within the <code/parameter/ element, an
-equals sign, <code/=/, is recognised as a <code/type/ start-tag, and
-within that element, end-of-line and <code/:/ are recognised as a
-<code/description/ start-tag.
+<p>The string <code/*+> coming at the beginning of the line, is
+equivalent to the <code/func> start-tag, and <code/*-> at the
+beginning of the line is recognised as the <code/codebody> start-tag.
+Within the <code/func> element, a <code/*> at the beginning of the
+line is ignored.  Further, within the <code/parameter> element, an
+equals sign, <code/=>, is recognised as a <code/type> start-tag, and
+within that element, end-of-line and <code/:> are recognised as a
+<code/description> start-tag.
 
 <p>All together, this means that, as trailed in 
-<ref id=doccode.example></>, the code fragment
+<ref id=doccode.example/>, the code fragment
 <verbatim><![CDATA[
 *+
 * <routinename>helloworld
@@ -2362,17 +2366,17 @@ extracts (rather nicely) an instance of the `DSSSL' architecture,
 which must be declared in the DTD the document conforms to.  The DTD
 referred to by <code>-//Starlink//DTD DSSSL Source Code 0.2//EN</code>
 declares such an architecture.  It maps the programcode
-<code/codegroup/ element to the DSSSL <code/style-specification/
-architectural form, <code/codereference/ to
-<code/external-specification/ (with attribute name remapping) and
-<code/codebody/ to <code/style-specification-body/. This follows a
-discussion of this technique in <code/comp.text.sgml/ by Eliot
+<code/codegroup> element to the DSSSL <code/style-specification>
+architectural form, <code/codereference> to
+<code/external-specification> (with attribute name remapping) and
+<code/codebody> to <code/style-specification-body>. This follows a
+discussion of this technique in <code/comp.text.sgml> by Eliot
 Kimber~<citation>kimber97a</citation>.
 
-<p>Also it defines the entity <code/%direction.attr/ to be simply
+<p>Also it defines the entity <code/%direction.attr> to be simply
 `given', since arguments to DSSSL functions are only passed in.
 
-<p>See <ref id=appx.system></> for further discussion of the DSSSL
+<p>See <ref id=appx.system/> for further discussion of the DSSSL
 code base.
 
 <subsect id=doccode.org export>Organising files
@@ -2381,16 +2385,16 @@ code base.
 you to mix program source code and SGML markup.  A Fortran source file
 cannot be a complete SGML document on its own, however, even though it
 can be a fragment of a valid document, since there is no way to hide
-the required <code/&lt;!DOCTYPE ...>/ declaration from the compiler.
+the required <code/&lt;!DOCTYPE ...&gt;> declaration from the compiler.
 The source file must therefore be part of a composite document.
 
 <p>Although the object that is pointed to by the General DTD's
-<code/codecollection/ element is a single SGML document marked up
+<code/codecollection> element is a single SGML document marked up
 using the programcode DTD, it need not be a single file.  A suitable
 way to manage a collection of source code files, for documentation
 purposes, might be as follows.
 
-<p>We can return to the example in <ref id=doccode.example></>, and split
+<p>We can return to the example in <ref id=doccode.example/>, and split
 our `hello world' example into two files, a skeleton file holding the
 general structure, and including an entity which refers to the source
 code:
@@ -2407,7 +2411,7 @@ code:
 
 &ptest-source;
 ]]></verbatim>
-and a separate file, <code/ptest.for/, containing just the source code:
+and a separate file, <code/ptest.for>, containing just the source code:
 <verbatim><![CDATA[
 *+
 * <routinename>helloworld
@@ -2429,8 +2433,8 @@ element and its associated author metadata in the main file.
 <subsect id=doccode.devel export>Development of the programcode DTD
 
 <p>As you can see from the programcode structure in 
-<ref id=figure.programcode></>, the DTD recognised only two structures,
-<code/func/ (which includes subroutines since the returnvalue element
+<ref id=figure.programcode/>, the DTD recognised only two structures,
+<code/func> (which includes subroutines since the returnvalue element
 can be given the `none' attribute) and miscellaneous-code.  Also, the
 structure of the code prologue is quite strict, with routinename,
 description, returnvalue and argument list all required, and these and
@@ -2442,7 +2446,7 @@ on this at this stage of the project.
 hand, it seemed important to make as much as possible required here,
 to encourage folk to include all the important bits of documentation.
 On the other hand, I didn't want to fall into the trap of `all the
-world is Fortran'.  On the third hand, quite a lot of the world <em/is/
+world is Fortran'.  On the third hand, quite a lot of the world <em/is>
 Fortran (or C or IDL or something pretty like them in terms of code
 structures), so that's obviously a class of documentable objects I
 should map quite faithfully into documentation support.
@@ -2450,7 +2454,7 @@ should map quite faithfully into documentation support.
 <p>When I support C++, I'll have to add support in programcode for the
 notion of a class which contains methods.  Probably this'll be
 something at the same level as `codegroup' (perhaps it should simply
-<em/be/ `codegroup', with the `func' element documenting individual methods).
+<em/be> `codegroup', with the `func' element documenting individual methods).
 I think that'll be just about all the major code structures --
 anything else can be bundled in the guards van under `misccode'
 without much loss.
@@ -2525,7 +2529,7 @@ transformation.
 
 <p>Along with Jade is the <webref url="http://www.jclark.com/sp/"
 >SP</webref> toolkit.  This consists of a standalone parser,
-<code/nsgmls/, and various markup editing tools.
+<code/nsgmls>, and various markup editing tools.
 
 <subsect id=proc.setup export>Setting up
 
@@ -2537,8 +2541,8 @@ or
 <verbatim>
 % source /star/bin/sgml/sgml_set.csh
 </verbatim>
-depending on whether you are using a Bourne-like shell (<code/sh/,
-<code/bash/) or a C-shell (<code/csh/, <code/tcsh/ or
+depending on whether you are using a Bourne-like shell (<code/sh>,
+<code/bash>) or a C-shell (<code/csh>, <code/tcsh> or
 other variants).  This will set up a couple of environment variables,
 and add a binaries directory to your path.
 
@@ -2548,7 +2552,7 @@ and add a binaries directory to your path.
 discussion of very simple processing.</update>
 <update versionid="v0.6">Significant change to sgml2docs commands</update>
 
-<p>You should use the command <code/sgml2docs/ to process your SGML
+<p>You should use the command <code/sgml2docs> to process your SGML
 documents.  See <coderef collection=supportprogs
 id=sgml2docs>sgml2docs</coderef> for detailed documentation.
 
@@ -2560,51 +2564,51 @@ places them in a subdirectory named after the source file, and
 then creates a tarball in the source directory holding the
 generated files.
 
-<p>It requires that the environment variable <code/STARLINK_SGML_DIR/ is
+<p>It requires that the environment variable <code/STARLINK_SGML_DIR> is
 properly set, pointing to the root of the Starlink SGML kit.  It
-also requires that dvi2bitmap is in the <code/PATH/.
+also requires that dvi2bitmap is in the <code/PATH>.
 The script creates a work directory and does its processing
 there.  If it is necessary to run Bib&tex;, it will be done with
 that temporary directory as the current directory, so that it
-might be necessary to set <code/BIBINPUTS/ (for example) to let the
+might be necessary to set <code/BIBINPUTS> (for example) to let the
 system find the bibliography database.
 
 <p>The program takes a single argument, the SGML file to be processed.
 
 There are several script options:
 <dl compact>
-<dt><code/--html/
+<dt><code/--html>
 <dd>Generate HTML (the default).
-<dt><code/--htmlsingle/
+<dt><code/--htmlsingle>
 <dd>Generate HTML, but in a single file rather than a collection.
-<dt><code/--latex/
+<dt><code/--latex>
 <dd>Generate &latex;.
-<dt><code/--packagedir my-dir/
+<dt><code/--packagedir my-dir>
 <dd>Package up the generated files into a directory called `my-dir'.
-<dt><code/--tarball my.tar/
+<dt><code/--tarball my.tar>
 <dd>Bundle the package-dir into a tarball named `my.tar'.  If you do
 not give an absolute pathname, it will be located relative to the
 current directory.
-<dt><code/--jadeflags flags/
+<dt><code/--jadeflags flags>
 <dd>Pass the given flags to Jade.
-<dt><code/--options opt,opt,.../
+<dt><code/--options opt,opt,...>
 <dd>Set options (see below).
-<dt><code/--help/
+<dt><code/--help>
 <dd>Show brief usage instructions.
-<dt><code/--version/
+<dt><code/--version>
 <dd>Display the version of the script, and exit.
-<dt><code/--debug/
+<dt><code/--debug>
 <dd>Don't delete the working directory at the end (allows you to explore).
 </dl>
 ]]>
 
-<p>The final option, <code/--jadeflags/, allows you to do some limited
-customisation of the output.  See <ref id=appx.system.paramdsssl></>.
+<p>The final option, <code/--jadeflags>, allows you to do some limited
+customisation of the output.  See <ref id=appx.system.paramdsssl/>.
 Jade flags can most conveniently be set using options, using the
-<code/--options/ argument.  There are no options (yet) for the HTML
-output, but the &latex; output has options <code/cts-sect/ (do not
-start a new page with each new section), <code/cts-appx/ (same, for
-appendices), and <code/onepass/ (produce output which needs
+<code/--options> argument.  There are no options (yet) for the HTML
+output, but the &latex; output has options <code/cts-sect> (do not
+start a new page with each new section), <code/cts-appx> (same, for
+appendices), and <code/onepass> (produce output which needs
 only a single pass through &latex;, which means that the
 table-of-contents ends up printed last, requiring trivial
 rearrangement).
@@ -2614,12 +2618,12 @@ rearrangement).
 <update versionid="v0-6-1">Added section on HELP files</update>
 
 
-<p>The command <code/sgml2hlp/ can be used to process an SGML document
+<p>The command <code/sgml2hlp> can be used to process an SGML document
 conforming to the <ref id=appx.programcode.dtd >programcode</ref> DTD,
 which will typically contain the marked up prologues of a set of
 user-level tasks in a package,
-into a <code/.hlp/ file, which can be processed into a Starlink help library
-using the <code/HLIB/ program documented in
+into a <code/.hlp> file, which can be processed into a Starlink help library
+using the <code/HLIB> program documented in
 <docxref doc="sun124" text="SUN/124">.
 
 <p>The program takes as arguments the name of any file(s) consituting
@@ -2644,12 +2648,12 @@ url='http://www.w3.org/TR/NOTE-sgml-xml' >differences between SGML and
 XML</webref>, and Norm Walsh's notes on <webref
 url='http://www.xml.com/xml/pub/98/07/dtd/index.html' >converting an
 SGML DTD to XML</webref>, which covers some of the same issues).
-However, you can get help with this using the program <code/sgml2xml/,
+However, you can get help with this using the program <code/sgml2xml>,
 which converts the body of a document to XML without difficulty, and
 additionally attempts to convert the declaration subset (see 
-<ref id=markup.dtdsubset></>) by rewriting entities to conform to XML's more
-straightened syntax, and rewriting <code/SUBDOC/ entities as
-<code/NDATA XML/ ones.  It can't do everything, however, and so spits
+<ref id=markup.dtdsubset/>) by rewriting entities to conform to XML's more
+straightened syntax, and rewriting <code/SUBDOC> entities as
+<code/NDATA XML> ones.  It can't do everything, however, and so spits
 out warnings whenever it finds anything in the least problematic.
 
 <p>Use is simple:
@@ -2675,9 +2679,9 @@ documents -- those including maths or bibliographies, for example --
 require more or less elaborate preprocessing for some formats.  In
 some circumstances the names of output files are significant to the
 system.  It is for all these reasons that the system is designed to be
-used primarily <em/via/ makefiles.  See however, the description of
-the <code/sgml2html/ and <code/sgml2latex/ commands in 
-<ref id=proc.sgml2docs></>.
+used primarily <em/via> makefiles.  See however, the description of
+the <code/sgml2html> and <code/sgml2latex> commands in 
+<ref id=proc.sgml2docs/>.
 
 <p>The distribution contains a Makefile,
 <code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, which contains
@@ -2690,7 +2694,7 @@ makefile's template targets.
 <p>If your document is relatively simply, you may not actually need to
 have a makefile in the documentation 
 directory in order to use the setup.  Imagine that you want to process
-file <code/mydoc.sgml/.  If it has no backmatter or maths, then you
+file <code/mydoc.sgml>.  If it has no backmatter or maths, then you
 can process this with the command
 <kbd>make -f $(STARLINK_SGML_DIR)/lib/Makefile.common
 mydoc.html.stamp</kbd>, which will read the set of rules from the
@@ -2701,11 +2705,11 @@ the sake of clarity, it need contain nothing more than the line
 <verbatim>
 include $(STARLINK_SGML_DIR)/lib/Makefile.common
 </verbatim>
-(assuming that your version of <code/make/ supports the `include'
+(assuming that your version of <code/make> supports the `include'
 command), and you could build the documentation using the command
-<kbd/make mydoc.html.stamp/.  If your document is simple enough to
+<kbd/make mydoc.html.stamp>.  If your document is simple enough to
 need no more than this, then you will be able to use the
-<code/sgml2html/ command described in <ref id=proc.sgml2docs></>.
+<code/sgml2html> command described in <ref id=proc.sgml2docs/>.
 
 <p>If your document includes backmatter (bibliography or notes) or
 maths, then they will need 
@@ -2717,9 +2721,9 @@ include $(STARLINK_SGML_DIR)/lib/Makefile.common
 mydoc.html.stamp:   mydoc.sgml   mydoc.htmlback.stamp
 mydoc.latex.stamp:  mydoc.sgml   mydoc.latexback.stamp
 </verbatim>
-Then the command <kbd/make mydoc.html.stamp/ would first process the
+Then the command <kbd/make mydoc.html.stamp> would first process the
 backmatter, then generate the main HTML document.  The command
-<kbd/make mydoc.latex.stamp/ is broadly the same.
+<kbd/make mydoc.latex.stamp> is broadly the same.
 
 <p>If your document contains some maths, then the generation of HTML
 requires another preprocessing step, and you declare the need for this
@@ -2738,8 +2742,8 @@ no-one has been monkeying with filenames.
 
 <p>The HTML `front page' includes links to printable versions of the
 file.  The files which are linked to are controlled by the
-parameterisation variable <code/%link-extension-list%/ (see 
-<ref id=appx.system.paramdsssl></>).
+parameterisation variable <code/%link-extension-list%> (see 
+<ref id=appx.system.paramdsssl/>).
 The stylesheet and makefile neither generate these files nor check
 that they are there -- that is left to you.  
 
@@ -2752,7 +2756,7 @@ The root may therefore be extracted with a command like:
 awk -F: '{print $1}' mydoc.html.stamp
 </verbatim>
 You might, for example, wish to finish off your processing of a
-document by giving a command like <kbd/ln -s SUN-123.html index.html/,
+document by giving a command like <kbd/ln -s SUN-123.html index.html>,
 which could be automated as
 <verbatim>
 ln -s `awk -F: '{print $1}' mydoc.html.stamp` index.html
@@ -2765,52 +2769,52 @@ that targets in the makefile that are not mentioned here should not be
 used, since they are internal (ie, could disappear without warning),
 unstable, or otherwise deprecated.
 <dl>
-<dt><code/%.html.stamp: %.sgml/
+<dt><code/%.html.stamp: %.sgml>
 <dd>The main target for generating collections of HTML files.
 
-<dt><code/%.single.html: %.sgml/
+<dt><code/%.single.html: %.sgml>
 <dd>A target for generating HTML using the same stylesheet as above,
 but with the entire document in a single file.
 
-<dt><code/%.summary: %.sgml/
+<dt><code/%.summary: %.sgml>
 <dd>Generate a document-summary for the source file.
 
-<dt><code/%.htmlback.stamp: %.sgml/
+<dt><code/%.htmlback.stamp: %.sgml>
 <dd>Preprocess a document to generate backmatter in HTML format.  Use
-this as a dependency of the <code/%.html.stamp/ target, when a document has
+this as a dependency of the <code/%.html.stamp> target, when a document has
 backmatter, as in the example above.
 
-<dt><code/%.imgeq.list.stamp: %.sgml/
+<dt><code/%.imgeq.list.stamp: %.sgml>
 <dd>Preprocesses a document, producing GIF images of the equations within
-it.  Use as with <code/%.htmlback.stamp/
+it.  Use as with <code/%.htmlback.stamp>
 
-<dt><code/%.latex.stamp: %.sgml/
+<dt><code/%.latex.stamp: %.sgml>
 <dd>Produce a &latex file suitable for subsequent processing.  The
 generated &latex document is not particularly readable, but it does
 not depend on any external classes or packages other than those which
 should be in a standard &latex distribution; it should therefore be
 generally portable.
 
-<dt><code/%.latexback.stamp: %.sgml/
+<dt><code/%.latexback.stamp: %.sgml>
 <dd>Proprocess a document, producing backmatter in &latex format.  Use
-this as a dependency of the <code/%.latex.stamp/ target, when a
+this as a dependency of the <code/%.latex.stamp> target, when a
 document has backmatter.
 
-<dt><code/%.parse: %.sgml/ 
-<dd>The <code/%.parse/ target is the SGML parser's view of the
+<dt><code/%.parse: %.sgml> 
+<dd>The <code/%.parse> target is the SGML parser's view of the
 document.  The format is <webref
 url="http://www.jclark.com/sp/sgmlsout.htm" >standard</webref>, though
 not formally defined, and
 can be parsed by Perl libraries such as <webref
 url="http://www.cpan.org/modules/by-module/SGMLS/" >SGMLSpm</webref>.
 
-<dt><code/%.data: %.sgml/
-<dd>The <code/%.data/ target contains all the character data content
+<dt><code/%.data: %.sgml>
+<dd>The <code/%.data> target contains all the character data content
 of the document.  It's not obvious what use this is, but it's there if
 you can think of one.
 
 <dt>Miscellaneous
-<dd>The Makefile also defines targets <code/%.ps/, <code/%.dvi/.
+<dd>The Makefile also defines targets <code/%.ps>, <code/%.dvi>.
 There's nothing clever involved in these -- they're present for
 convenience.
 
@@ -2819,7 +2823,7 @@ convenience.
 <p>To help you when packaging up your document, the stylesheets write
 a manifest of the files which make a complete set.  The names of the
 manifest files can be configured as parameters (see 
-<ref id=appx.system.paramdsssl></>).
+<ref id=appx.system.paramdsssl/>).
 
 <subsect id=editors export>Editors
 
@@ -2828,7 +2832,7 @@ whichever editor you prefer.
 
 <p>If you use emacs, you can benefit from an emacs SGML mode called
 <webref url='http://www.lysator.liu.se/projects/about_psgml.html'
-/psgml/.  This can help with simple things such as automatically
+>psgml</>.  This can help with simple things such as automatically
 inserting appropriate closing tags, all the way up to validating your
 document.
 
@@ -2867,8 +2871,8 @@ and then either tidy the SGML by hand or make further changes to
 the &latex;, and repeat the cycle.
 Some documents require relatively little manual adjustment,
 and others more.  Since the upconverter makes use of the
-<code/latex2html/ program, if the document cannnot be successfully
-processed by <code/star2html/ then it's unlikely that the upconverter
+<code/latex2html> program, if the document cannnot be successfully
+processed by <code/star2html> then it's unlikely that the upconverter
 will make a good job of it.
 
 <p>At its simplest, a document can be converted using a command like:
@@ -2965,7 +2969,7 @@ conversion is not perfect, since they may be of use for debugging etc.
 You may wish to delete them by hand if you're not going to use them.
 
 <p>There is a detailed description of the script's internals in 
-<ref id=appx.system.latex2sgml></>, which <em/may/ be of use if you're having
+<ref id=appx.system.latex2sgml/>, which <em/may> be of use if you're having
 difficulties. 
 
 
@@ -3116,14 +3120,14 @@ appear verbatim in the output SGML document.
 
 <subsect id=upconvert.sourcecode export>Upconversion from source code
 
-<p>The &latex; upconverter described in <ref id=upconvert.latex></>
+<p>The &latex; upconverter described in <ref id=upconvert.latex/>
 will turn subroutine or command descriptions within a normal
 SUN into 
 SGML like the rest of the text in them, but does not make
 an especially pretty job of it; the proper way is to 
 mark these up using the <ref id=appx.programcode.dtd >programcode</ref> DTD 
 referenced via a <ref id=el.sun.codecollection >codecollection</ref> 
-element, as described in <ref id=doccode></>.
+element, as described in <ref id=doccode/>.
 
 <p>If the corresponding source files are written with prologues 
 in the normal Starlink style, then an upconverter is provided which
@@ -3164,7 +3168,7 @@ This container document can be generated
 by running <code>fortran2sgml.pl</code>
 with the <code>-d</code> flag, listing the files to which it should refer.
 So if the files containing the prologues which are to be documented
-are <code/x.f/, <code/y.f/ and <code/z.f/, you can do the following:
+are <code/x.f>, <code/y.f> and <code/z.f>, you can do the following:
 <verbatim>
 fortran2sgml.pl x.f > converted/x.f
 fortran2sgml.pl y.f > converted/y.f
@@ -3192,7 +3196,7 @@ the document:
 <verbatim>
 &lt;!ENTITY prologues SYSTEM 'routinedoc.sgml' SUBDOC>
 </verbatim>
-and referring to it later using a <ref id=el.sun.codecollection></> element:
+and referring to it later using a <ref id=el.sun.codecollection/> element:
 and in the proper place the entity reference
 <verbatim>
 &lt;routinelist>
@@ -3232,7 +3236,7 @@ expected utility.
 
 <dl>
 <dt>XML
-<dd>I'd like to support XML (see <ref id=final.xml></>).  This requires
+<dd>I'd like to support XML (see <ref id=final.xml/>).  This requires
 a little development of the DTD but, more substantially, also requires
 investigating what level of support we can reasonably expect from
 users' browsers.  There is a great deal of work being done on XML at
@@ -3253,7 +3257,7 @@ client.
 
 <dt>Table support
 <dd>I'd like to support more of the Oasis table subset (see 
-<ref id=str.tables></>).  I can add support incrementally, as folk suggest
+<ref id=str.tables/>).  I can add support incrementally, as folk suggest
 priorities.
 
 <dt>CSS stylesheets
@@ -3279,9 +3283,9 @@ not sure how necessary it is to support these so explicitly.
 <dt>Link colouring
 <dd>Output, for example, a little coloured dot (4x2 pixels) before all or some
 links, indicating what type of link this is.  For example, unadorned
-links are to other parts of the same document (ie, <code/&lt;ref>/), a
+links are to other parts of the same document (ie, <code/&lt;ref&gt;>), a
 red dot indicates a reference to another Starlink document (ie,
-<code/&lt;docxref>/), a blue one to a miscellaneous URL.  I've
+<code/&lt;docxref&gt;>), a blue one to a miscellaneous URL.  I've
 implemented a similar thing on another system, and it's both
 unobtrusive and rather helpful.
 
@@ -3349,7 +3353,7 @@ XML is fully legit as SGML.
 <subsubsect>XML is not HTML++
 
 <p><ul>
-<li>XML is a real standard (well, there <em/are/ HTML standards, but
+<li>XML is a real standard (well, there <em/are> HTML standards, but
 noone pays any attention to them).
 <li>HTML has a fixed element set, and associates fixed semantics with
 those elements.  XML has neither restriction.
@@ -3399,8 +3403,8 @@ above.
 <li>SGML technology will work with XML (as long as it conforms to the
 minor technical corrigenda mentioned above)
 
-<li>Because XML is <em/much/ easier to parse than fully general SGML,
-it is <em/much/ easier to produce parsers for it.  It is therefore
+<li>Because XML is <em/much> easier to parse than fully general SGML,
+it is <em/much> easier to produce parsers for it.  It is therefore
 very likely that we will soon see many XML editors and XML-aware
 browsers in the months to come.
 
@@ -3417,7 +3421,7 @@ maths on the internet
 <subsect id=final.ack export>Acknowledgements
 
 <p>I've benefited greatly from various contributers to the usenet
-newsgroup <code/comp.text.sgml/, from the Oasis SGML pages at
+newsgroup <code/comp.text.sgml>, from the Oasis SGML pages at
 <url>http://www.oasis-open.org/cover/</url> and references there, and
 specifically from the various papers made available by Eliot Kimber
 and co.~at <webref url='http://www.isogen.com' >Isogen International
@@ -3441,7 +3445,7 @@ necessary if you simply want to write Starlink documents.  It should
 give you enough understanding to allow you to read most DTDs.
 
 <p>This section is for extra, or more detailed, information than it
-was necessary to include in <ref id=markup></>.  It will not, therefore,
+was necessary to include in <ref id=markup/>.  It will not, therefore,
 repeat information presented there.
 
 <subsect id=sgml.std export>Standard identification
@@ -3452,8 +3456,8 @@ An SGML Application Conforming to International Standard ISO 8879 --
 Standard Generalized Markup Language
 </blockquote>
 SGML has many features not described in this document.
-For further details, see the standard, <citation/iso8879/ or
-<citation/goldfarb/ (better, since it contains all the standard text
+For further details, see the standard, <citation/iso8879> or
+<citation/goldfarb> (better, since it contains all the standard text
 plus commentary).
 
 <p>The HyTime Standard Identification:
@@ -3462,12 +3466,12 @@ A HyTime application conforming to International Standard ISO/IEC
 10744 -- Hypermedia/Time-based Structuring Language
 </blockquote>
 For further details of the possibilities available via HyTime, see
-<ref id=appx.system.hytime></>, or the HyTime
-standard,~<citation/iso10744/.
+<ref id=appx.system.hytime/>, or the HyTime
+standard,~<citation/iso10744>.
 
 <subsect id=sgml.dtd export>Reading DTDs
 
-<p>The discussion in <ref id=markup></> should be enough to let you
+<p>The discussion in <ref id=markup/> should be enough to let you
 produce your own documents but, now or in the future, you may find it
 useful to be able to read the DTD directly.<note>Note for pedants:
 there is a distinction between document type declaration and
@@ -3482,8 +3486,8 @@ are familiar with the underlying ideas, the expression of them in the
 DTD turns out to be agreeably compact and reasonably readable.
 
 <p>My account of the DTD syntax will be rather compressed -- see
-<citation/gentle/, or the other references in 
-<ref id=what.sgml></> for alternatives.
+<citation/gentle>, or the other references in 
+<ref id=what.sgml/> for alternatives.
 
 <p>A simple HTML-like DTD could be declared as follows:
 <verbatim><![ CDATA [
@@ -3527,78 +3531,78 @@ features you need to make some sense of most DTDs.
 <!ELEMENT html    O O (head, body, copyright?)>
 ]]></verbatim>
 This `element declaration'
-declares the <code/html/ element.  The element type name is followed
+declares the <code/html> element.  The element type name is followed
 by a statement of whether the start and end tags may be omitted if the
 parser can infer their presence.  The minimisation specifications may
 be either `-' (minus), indicating that the corresponding tag is
 required, or `O' (letter~O), indicating that it may be omitted.
 Following this is the `content model' which, in this case, states that
-the <code/html/ element must consist of one <code/head/, one
-<code/body/, and an optional <code/copyright/, in that order -- the
+the <code/html> element must consist of one <code/head>, one
+<code/body>, and an optional <code/copyright>, in that order -- the
 comma connecting the element 
 names specifies that they must be in order, and the question mark
 following the copyright element indicates that it may occur zero or
 one times. 
 The omission of the start element is possible in this case, since the
-first element in the <code/html/ element must be a <code/head/
-element, so whenever the parser finds a <code/head/ element, it can
-know that the <code/html/ element has begun.
+first element in the <code/html> element must be a <code/head>
+element, so whenever the parser finds a <code/head> element, it can
+know that the <code/html> element has begun.
 
-<p>So what is in the <code/head/ element?
+<p>So what is in the <code/head> element?
 <verbatim><![ CDATA [
 <!ELEMENT head    O O (title & link*)>
 ]]></verbatim>
-The <code/head/ element consists of precisely one title, and zero or
-more <code/link/ elements, in either order.  The <code/head/ tags
+The <code/head> element consists of precisely one title, and zero or
+more <code/link> elements, in either order.  The <code/head> tags
 can be inferred from the presence of
-the <code/title/ and <code/link/ elements, and so it is feasible for
+the <code/title> and <code/link> elements, and so it is feasible for
 us to declare that they may be omitted.  The star following the
-<code/link/ token in the content model indicates that this element may
+<code/link> token in the content model indicates that this element may
 appear zero or more times, and the ampersand declares that the
 elements on either side of it must both appear, but can do so in
-either order.  Note that this content model allows `<code/title/',
-`<code/title link link.../' and `<code/link link...title/', but not
-`<code/link/' or `<code/link title link/'.
+either order.  Note that this content model allows `<code/title>',
+`<code/title link link...>' and `<code/link link...title>', but not
+`<code/link>' or `<code/link title link>'.
 
 <p>Finally we have some text:
 <verbatim><![ CDATA [
 <!ELEMENT title   - - (#PCDATA)>
 ]]></verbatim>
 The title element is very simple: neither the start not the end tag
-may be omitted, and it may contain only characters (<code/#PCDATA/
+may be omitted, and it may contain only characters (<code/#PCDATA>
 stands for `parseable character data') and entity references such as
-<code/&amp;amp;/.
+<code/&amp;amp;>.
 
 <p><verbatim><![ CDATA [
 <!ELEMENT link    - O EMPTY>
 ]]></verbatim>
-The <code/link/ element has no actual content, so it is given a
-content model consisting of the reserved word <code/EMPTY/.  The tag
-omission for empty elements is always `<code/- O/'.  The point of the
-<code/link/ element is to hold its attributes, which we will come to
+The <code/link> element has no actual content, so it is given a
+content model consisting of the reserved word <code/EMPTY>.  The tag
+omission for empty elements is always `<code/- O>'.  The point of the
+<code/link> element is to hold its attributes, which we will come to
 shortly.
 
 <p><verbatim><![ CDATA [
 <!ELEMENT body    O O (p | dl)+>
 ]]></verbatim>
 The document body consists of paragraph elements, or `delimited
-lists'.  The `or' connector, `<code/|/', indicates that either of the
-<code/p/ or <code/dl/ elements may appear, and the `plus' occurrence
-indicator asserts that the group <code/(p|dl)/ must appear one or more
-times.  In other words, the body consists of a sequence of <code/p/
-and <code/dl/ elements in arbitrary order.
+lists'.  The `or' connector, `<code/|>', indicates that either of the
+<code/p> or <code/dl> elements may appear, and the `plus' occurrence
+indicator asserts that the group <code/(p|dl)> must appear one or more
+times.  In other words, the body consists of a sequence of <code/p>
+and <code/dl> elements in arbitrary order.
 
 <p>Finally, we start to specify the `interesting' content of the document.
 <verbatim><![ CDATA [
 <!ELEMENT dl      - - (dt, dd)+>
 ]]></verbatim>
-Like the <code/body/ itself, the <code/dl/ element consists of a
-sequence of one or more structures.  Unlike the <code/body/ element,
+Like the <code/body> itself, the <code/dl> element consists of a
+sequence of one or more structures.  Unlike the <code/body> element,
 however, the structure is not a list of alternatives, but a sequence.
-Where the <code/body/ element would allow `<code/p p dl p/' for example, the
-<code/dl/ element requires that the <code/dt/ and <code/dd/ elements
-alternate -- the repeatable element is the <em/ordered pair/ of
-elements `<code/dt, dd/'.
+Where the <code/body> element would allow `<code/p p dl p>' for example, the
+<code/dl> element requires that the <code/dt> and <code/dd> elements
+alternate -- the repeatable element is the <em/ordered pair> of
+elements `<code/dt, dd>'.
 
 <p><verbatim><![ CDATA [
 <!ELEMENT (dt|dd) - O (#PCDATA)>
@@ -3609,7 +3613,7 @@ The paragraph, list and copyright elements have simple content
 models.  Note that we can specify the structure of more than one
 element in the same declaration.
 
-<p>Prior to specifying the attributes for the <code/link/ element, we
+<p>Prior to specifying the attributes for the <code/link> element, we
 may declare an abbreviation.
 <verbatim><![ CDATA [
 <!ENTITY % URL "CDATA"
@@ -3618,56 +3622,56 @@ may declare an abbreviation.
            See RFC1808 (June 95) and RFC1738 (Dec 94).
         -->
 ]]></verbatim>
-This declares <code/URL/ to be a `parameter entity', usable only
-within this DTD.  The entity reference `<code/%URL/' will be
-substituted by the string `<code/CDATA/' (unparsed character data)
+This declares <code/URL> to be a `parameter entity', usable only
+within this DTD.  The entity reference `<code/%URL>' will be
+substituted by the string `<code/CDATA>' (unparsed character data)
 when it is encountered.  A DTD may declare an entity more than once,
 but any declarations after the first are silently ignored.
 
 <p>Note the structure of the comment in this last declaration: in SGML,
 comments may appear only within markup declarations (that is within
-`<code/&lt;! ... >/'), they start and end with the string
-`<code/&#45;&#45;/', and there may be more than one in a row.  Thus you
-may legally find `<code/&lt;!>/' within an SGML file -- this is a
+`<code/&lt;! ... &gt;>'), they start and end with the string
+`<code/&#45;&#45;>', and there may be more than one in a row.  Thus you
+may legally find `<code/&lt;!&gt;>' within an SGML file -- this is a
 completely empty markup declaration.  Such a declaration may have a
 single comment within it, as in `<code><![ CDATA [<!-- this is a comment
 -->]]></code>', or it may have several, as in
 <code><![ CDATA [<!-- here -- -- is a comment ------>]]></code>, which
-has <em/three/ comments within it, the third of which is empty. 
+has <em/three> comments within it, the third of which is empty. 
 
-<p>Now we declare the attributes for the <code/link/ element.
+<p>Now we declare the attributes for the <code/link> element.
 <verbatim><![ CDATA [
 <!ATTLIST link
     href  %URL          #REQUIRED  -- URL for linked resource --
 ]]></verbatim>
-This declares an <code/href/ attribute.  After expansion of the
-<code/%URL/ entity reference, this attribute is seen to have a
-`declared value' of <code/CDATA/ (unparsed character data), and this
+This declares an <code/href> attribute.  After expansion of the
+<code/%URL> entity reference, this attribute is seen to have a
+`declared value' of <code/CDATA> (unparsed character data), and this
 attribute is required to be present, so that the SGML parser will
-object if it finds a <code/link/ element in a document without an
-<code/href/ attribute.
+object if it finds a <code/link> element in a document without an
+<code/href> attribute.
 
-<p>The <code/rel/ attribute can take only two values:
+<p>The <code/rel> attribute can take only two values:
 <verbatim><![ CDATA [
     rel   (next | prev) #IMPLIED   -- reverse link types --
     >
 ]]></verbatim>
-The <code/link/ element may have the attribute `<code/rel=next/' or
-`<code/rel=prev/', but no other strings.  Since this attribute is
-`<code/#IMPLIED/', it is also permitted to omit it entirely.  A
+The <code/link> element may have the attribute `<code/rel=next>' or
+`<code/rel=prev>', but no other strings.  Since this attribute is
+`<code/#IMPLIED>', it is also permitted to omit it entirely.  A
 document may even specify this as simply `<code/&lt;link
-href=&quot;here.html&quot; next>/' and the parser will infer that the value
-`<code/next/' is associated with the attribute name `<code/rel/'.
+href=&quot;here.html&quot; next>>' and the parser will infer that the value
+`<code/next>' is associated with the attribute name `<code/rel>'.
 
 <p><verbatim><![ CDATA [
 <!ENTITY amp "&">
 ]]></verbatim>
 Entity references (other than parameter entities, which are internal
 to a DTD) are made using a
-construction such as `<code/&amp;entname;/.  This presents a problem
+construction such as `<code/&amp;entname;>.  This presents a problem
 if you want to include the ampersand in your text, but this
 declaration sets up an entity called `amp', which can be used to
-include an ampersand in text by typing `<code/&amp;amp;/'.  You can
+include an ampersand in text by typing `<code/&amp;amp;>'.  You can
 use this in your own documents to create shorthand forms for bits of
 text you don't want to retype.
 
@@ -3683,14 +3687,14 @@ declarations within the DTD, and this is done within the `document
 type declaration subset'.
 
 <p>The DTD subset is typically used to declare entities of one type or
-another, as described in <ref id=markup.dtdsubset></>.
+another, as described in <ref id=markup.dtdsubset/>.
 
-<p>The subset is a DTD fragment which is processed <em/before/ the
+<p>The subset is a DTD fragment which is processed <em/before> the
 declaration refers to.  Thus, any (parameter) entity declarations
 there override corresponding ones in the DTD, so it is possible for a
 document author to do some limited rewriting of the DTD on the fly.
 This will be most common when a DTD is modular, as the Starlink DTD
-is.  As described in <ref id=str.structure></>, you can enable features
+is.  As described in <ref id=str.structure/>, you can enable features
 within your DTD by setting a suitable entity.
 
 <p>This get-out-of-jail-free card is obviously eminently abusable, and
@@ -3698,7 +3702,7 @@ you should avoid doing anything clever here.
 
 <subsect id=sgml.entities export>SGML entities
 
-<p>As described in <ref id=markup.entities></>, entity references are a
+<p>As described in <ref id=markup.entities/>, entity references are a
 mechanism for referring to characters, or 
 longer pieces of text, which you cannot type on your keyboard, which
 must be escaped from the parser, or which you simply want to
@@ -3708,13 +3712,13 @@ abbreviate.
 can be referenced only within markup declarations, and hence are
 effectively restricted to the DTD.  The only time you'd use them in a
 document instance would be within a marked section (
-<ref id=markup.ms.variants></>).  The point of parameter entities is that a document
+<ref id=markup.ms.variants/>).  The point of parameter entities is that a document
 author can define any entities they want in the declaration subset,
 without having to worry that they might conflict with declarations in
 the DTD.
 
-<p>A reference to an entity <code/amp/ is of the form
-<code/&amp;amp;/.  It is prefixed by the character <code/&amp/ and
+<p>A reference to an entity <code/amp> is of the form
+<code/&amp;amp;>.  It is prefixed by the character <code/&amp> and
 suffixed by a semicolon.  In fact, you can omit the trailing semicolon
 if the character following the entity name is not a name character --
 not a letter, number, hyphen or dot.  Similarly, an ampersand not
@@ -3725,13 +3729,13 @@ references, but you might need to be aware that these features both
 exist and are legal.
 
 <p>The list of entities predefined by the Starlink general DTD is
-given in <ref id=table.entities></>.
+given in <ref id=table.entities/>.
 
 <p>It is not an error to define an entity twice.  In this case, the
 second definition is silently ignored.
 
 <p>You can define entities, including parameter entities, in the
-document's `declaration subset' (see <ref id=markup.dtdsubset></>), since
+document's `declaration subset' (see <ref id=markup.dtdsubset/>), since
 these conceptually come before, and hence have priority over,
 definitions in the DTD.  Also, SGML parsers usually allow 
 on-the-fly definitions on the command line.  However, resist resist
@@ -3744,16 +3748,16 @@ make your document unreadable and, a much more heinous crime, invalid.
 discussion of the `author-visible' uses of MSs moved to the `Marking
 up...' section.
 
-<p>As described in <ref id=markup.ms></>, SGML includes the notion of a
+<p>As described in <ref id=markup.ms/>, SGML includes the notion of a
 `marked section'.  These are used only rather occasionally by authors,
 but are very frequently used within DTDs, particularly the
-<code/IGNORE/ and <code/INCLUDE/ marked sections.
+<code/IGNORE> and <code/INCLUDE> marked sections.
 
 <subsubsect>IGNORE and INCLUDE marked sections
 
-<p>About the only use of the <code/IGNORE/ and <code/INCLUDE/ marked
+<p>About the only use of the <code/IGNORE> and <code/INCLUDE> marked
 sections in documents is to delimit variant sections of text (see 
-<ref id=markup.ms.variants></>).  They are, however, very common within DTDs.
+<ref id=markup.ms.variants/>).  They are, however, very common within DTDs.
 
 <p>Why on earth would you want to include or exclude text in DTDs?
 Because the IGNORE/INCLUDE 
@@ -3771,31 +3775,31 @@ HTML-like document type as follows:
 </verbatim>
 This looks very strange, but it is a common idiom.  
 
-<p>The entity reference <code/&percent;allow.copyright;/ is a
-`parameter entity reference' (see section <ref id=sgml.entities></>),
+<p>The entity reference <code/&percent;allow.copyright;> is a
+`parameter entity reference' (see section <ref id=sgml.entities/>),
 which is distinct from a general entity 
-reference such as <code/&amp;amp;/, and can occur only within markup
+reference such as <code/&amp;amp;>, and can occur only within markup
 (ie, within DTDs).
 
-<p>The parameter entity <code/%allow.copyright/ is defined to be
-<code/IGNORE/.  That means that when the parser finds the marked
+<p>The parameter entity <code/%allow.copyright> is defined to be
+<code/IGNORE>.  That means that when the parser finds the marked
 section it ignores it, so that the first definition it finds of the parameter
-entity <code/%html.model/ is the one which sets it to be
-`<code/head,body/', so that is what is used as the content model
-in the declaration of the <code/html/ element in the last line.
+entity <code/%html.model> is the one which sets it to be
+`<code/head,body>', so that is what is used as the content model
+in the declaration of the <code/html> element in the last line.
 
 <p>Nothing appears to have been achieved here.  However, if the
-<code/%allow.copyright/ entity had <em/earlier/ been set to
-<code/INCLUDE/, then the redefinition of it here would have been
+<code/%allow.copyright> entity had <em/earlier> been set to
+<code/INCLUDE>, then the redefinition of it here would have been
 ignored, the marked section would have been included, the
-<code/%html.model/ entity would have been defined as
-`<code/head,body,copyright?/' with the (now) second one ignored, and
-the <code/html/ element would have been defined to allow all three
+<code/%html.model> entity would have been defined as
+`<code/head,body,copyright?>' with the (now) second one ignored, and
+the <code/html> element would have been defined to allow all three
 elements.  That is, marked sections used internally in this way can be
 a useful way of parameterising DTDs.
 
 <p>The entity could be declared earlier in the same DTD, in a
-particular document's DTD-subset (see <ref id=markup.dtdsubset></>), or
+particular document's DTD-subset (see <ref id=markup.dtdsubset/>), or
 completely externally to the document in a command-line option to the
 parser.
 
@@ -3815,9 +3819,9 @@ benefit of those maintaining the set, and for any others who are interested.
 
 <subsubsect id=appx.system.sgmldoc export>The SGML status of this project
 
-<p>The SGML application conforms to the SGML~<citation/iso8879/ and
-HyTime~<citation/iso10744/ standards.  The processing system uses
-DSSSL (see <ref id=appx.system.dsssl></> and~<citation/iso10179/), which
+<p>The SGML application conforms to the SGML~<citation/iso8879> and
+HyTime~<citation/iso10744> standards.  The processing system uses
+DSSSL (see <ref id=appx.system.dsssl/> and~<citation/iso10179>), which
 is a standard, but generates HTML using DSSSL extensions specific to
 Jade, and generates LaTeX using DSSSL extensions specific to a patched
 version of Jade.
@@ -3830,10 +3834,10 @@ nebulous notions of `best practice' for SGML applications.
 
 <subsubsect id=appx.system.hytime export>HyTime, architectures and groves
 
-<p>As noted above, in <ref id=appx.system.sgmldoc></>, this DTD is an
+<p>As noted above, in <ref id=appx.system.sgmldoc/>, this DTD is an
 application of the HyTime standard.
 
-<p>The HyTime standard <citation/iso10744/ specifies three things,
+<p>The HyTime standard <citation/iso10744> specifies three things,
 which are distinct, but easily confused (the standards document is not
 an easy read -- not because it is unclear, but because it is so very
 abstract; there are unfortunately few accessible alternatives).  It
@@ -3859,8 +3863,8 @@ url="http://www.ornl.gov/sgml/wg8/document/n1920/html/clause-A.4.html"
 tutorials on the relevant Oasis <webref
 url='http://www.oasis-open.org/cover/topics.html#groves' >special
 topic</webref> list, of which Paul Prescod's tutorial
-<citation/prescod99/ is particularly good, and Kimber has written
-variously on this <citation/kimber97c/.
+<citation/prescod99> is particularly good, and Kimber has written
+variously on this <citation/kimber97c>.
 
 <p>An `architecture' is a skeleton DTD (the HyTime first edition name
 for it was `meta-DTD').  An individual DTD may declare itself to be a
@@ -3873,13 +3877,13 @@ of the DocumentSummary DTD (which is easy, because the elements
 defined in the latter are a subset of the elements defined in the
 former), and the DSSSL programcode DTD declares itself to be a client
 of the DSSSL architecture, with suitable remappings of element and
-attribute names (see <ref id=doccode.dsssl></> for discussion, and see
+attribute names (see <ref id=doccode.dsssl/> for discussion, and see
 the reference cited there).  For formal details see the HyTime
 standard, particularly clause~A.3, <cite/Architectural forms
-declaration requirement/.  The relevant Oasis
+declaration requirement>.  The relevant Oasis
 <webref url='http://www.oasis-open.org/cover/topics.html#archForms'
 >special topic</webref> has an overwhelming number of references on
-this, of which Kimber's article <citation/kimber97b/ is very good.
+this, of which Kimber's article <citation/kimber97b> is very good.
 
 <p>Finally, the HyTime standard defines a particular architecture --
 the so-called HyTime Architecture.  This architecture defines forms
@@ -3907,14 +3911,14 @@ the Panorama SGML viewer is an application, which is also available as
 a Netscape plug-in, which will display SGML.  When it displays SGML,
 it formats it appropriately, guided by a style-sheet which expresses
 things like what font to display headings in.  It also, however, has
-built-in knowledge about the HyTime <code/clink/ element (`contextual
+built-in knowledge about the HyTime <code/clink> element (`contextual
 link'), and knows what to do with it.  If the viewer is given a
 document and DTD which has properly declared itself as a HyTime
 client, such as the Starlink General DTD, then Panorama can format and
 follow <code>&lt;ref></code> elements (for example) immediately.
 
 <p>The <ref id=el.sun.webref>webref</ref> element in the Starlink
-General DTD is declared much as follows (compare <citation/iso10744/,
+General DTD is declared much as follows (compare <citation/iso10744>,
 clause~7.8)
 <verbatim>
 &lt;!ELEMENT WEBREF - - (#PCDATA)>
@@ -3946,7 +3950,7 @@ loctype="url QUERYLOC URL">&lt;/clink></code>.
 <!-- FIXME: is this right, or should it be loctype="linkend queryloc url"?-->
 
 <p>If you're curious, you can obtain the HyTime view of a document
-with the command <kbd/sgmlnorm -A hytime ssn70.sgml/.<note>Note that
+with the command <kbd/sgmlnorm -A hytime ssn70.sgml>.<note>Note that
 this currently doesn't work fully -- there's some defect in the HyTime
 declaration of the docxref element type which I haven't been able to
 identify.</note>
@@ -3959,12 +3963,12 @@ such as Panorama.  I will claim this as a full implementation,
 however: I have no access to a HyTime engine, and so I cannot test
 that the HyTime declarations here are in fact correct.
 
-<p>See <ref id=appx.system.online></> for online resources.
+<p>See <ref id=appx.system.online/> for online resources.
 
 <subsubsect id=appx.system.dsssl export>DSSSL
 
 <p>The SGML processing part of this package is implemented in DSSSL,
-which is a standard <citation/iso10179/ for device independent
+which is a standard <citation/iso10179> for device independent
 formatting of SGML documents.  DSSSL includes both a style language
 and a (DTD to DTD) transformation language.  
 
@@ -3987,9 +3991,9 @@ needs a little justification.
 
 <ul>
 <li>There are not too many alternative ways of producing HTML.  Perl
-is a contender, since the <code/SGMLSpm/ package (see <webref
+is a contender, since the <code/SGMLSpm> package (see <webref
 url='http://www.cpan.org' >CPAN</webref>) can parse the output of
-<code/nsgmls/.  This is perfectly legitimate, but I know from
+<code/nsgmls>.  This is perfectly legitimate, but I know from
 experience that it can become rather messy.<note>It's a matter of
 taste whether you prefer Perl or DSSSL.  DSSSL, based on Scheme Lisp,
 is undeniably odd, but I've grown to rather like it.  A language with
@@ -4015,9 +4019,9 @@ rest of the SGML set -- the various DTDs and the HyTime support --
 since the processing of documents is by design completely independent
 of the standards which define their markup.
 
-<p>See <ref id=appx.system.online></> for online resources.
+<p>See <ref id=appx.system.online/> for online resources.
 
-<p><ref id=appx.system.dssslcode></> includes documentation for some of
+<p><ref id=appx.system.dssslcode/> includes documentation for some of
 the important DSSSL stylesheets.
 
 <p>Notes on the code:
@@ -4028,12 +4032,12 @@ sense in general, as the HTML stylesheet has to do much more elaborate
 formatting and rearrangement, whereas &latex can do much of the
 simple information-shuffling itself.  It does, however, mean
 that some fragments of code are duplicated in the two stylesheets,
-even although the <code/slcommon.dsl/ stylesheet is supposed to cover
+even although the <code/slcommon.dsl> stylesheet is supposed to cover
 all of that -- when it happens, this is typically an error, rather
 than some great subtlety.
 
 <li>The code started off as adaptations to Norman Walsh's DocBook stylesheets.
-In some modules -- primarily the <code/slnavig.dsl/ code which was the
+In some modules -- primarily the <code/slnavig.dsl> code which was the
 section I began development with -- there are still relics of this
 here and there.  There isn't a lint for Jade, so it's not trivial to
 find and remove these.
@@ -4069,16 +4073,16 @@ code.
 
 <p>The DSSSL source code which produces the HTML and &latex; output
 has been parameterised to a limited extent.  As described in 
-<ref id=appx.system.dssslcode></>, it can therefore be customised either on the
+<ref id=appx.system.dssslcode/>, it can therefore be customised either on the
 Jade command line, or by providing Jade with an alternative DSSSL
 parameters file.
 
-<p>Jade has a <code/-V/ option which takes a DSSSL variable name as
-argument; this variable is then given the value <code/#t/ (true),
+<p>Jade has a <code/-V> option which takes a DSSSL variable name as
+argument; this variable is then given the value <code/#t> (true),
 overriding any other definition in a stylesheet.  Several of the
 stylesheets' parameters are designed to be settable this way.  You can
 either give this option explicitly on a Jade command line, or pass it
-to Jade via the <code/sgml2docs/ command line (see <ref id=proc.sgml2docs></>):
+to Jade via the <code/sgml2docs> command line (see <ref id=proc.sgml2docs/>):
 <verbatim>
 sgml2docs --jadeflags '-V show-element-ids' ...
 </verbatim>
@@ -4087,7 +4091,7 @@ sgml2docs --jadeflags '-V show-element-ids' ...
 copy of the appropriate parameters file in <code
 fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slparams.dsl</code> (or the
 corresponding <code>.../latex</code> file), call it, say
-<code/my-params.dsl/, and change what parameters 
+<code/my-params.dsl>, and change what parameters 
 you like.  The stylesheets refer to the parameters files by the public
 identifiers <code>PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"</code>,
 <code>PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"</code>
@@ -4095,7 +4099,7 @@ and <code>PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"</code>,
 and these are mapped to the real files by the catalogue file in <code
 fspath>$STARLINK_SGML_DIR/dtd/CATALOG.starlink</code>.  To direct the system to
 your own parameter file instead, create a catalogue file of your own
-(conventionally given the name <code/CATALOG/), and include the
+(conventionally given the name <code/CATALOG>), and include the
 appropriate line like
 <verbatim>
 PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN" my-params.dsl
@@ -4103,11 +4107,11 @@ PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN" my-params.dsl
 (you can give a path relative to the location of the catalogue, and
 it's best if you quote the entry exactly as here).  To direct the SGML
 system to this catalogue, you must include the file at the beginning
-of the <code/SGML_CATALOG_FILES/ environment variable:
+of the <code/SGML_CATALOG_FILES> environment variable:
 <verbatim>
 SGML_CATALOG_FILES=./CATALOG:$SGML_CATALOG_FILES
 </verbatim>
-(or use the corresponding <code/setenv/ command).
+(or use the corresponding <code/setenv> command).
 
 <subsect id=appx.supportprogs export>Support utilities
 <update versionid=v0-7-1>Added codecollections for bin and lib
@@ -4125,8 +4129,8 @@ the SGML kit.
 <p>This distribution primarily consists of SGML materials --
 that is, the DTDs and associated DSSSL stylesheets.  It also relies on
 the Jade DSSSL engine, suitably patched, and the
-<code/dvi2bitmap/ package (to help generate the GIFs used when
-displaying maths on the web.   See <ref id=install></> for further
+<code/dvi2bitmap> package (to help generate the GIFs used when
+displaying maths on the web.   See <ref id=install/> for further
 details of obtaining and building these.
 
 <p>As well as these supporting applications, which must be obtained
@@ -4135,35 +4139,35 @@ with the package itself.  This is located in <code
 fspath>$STARLINK_SGML_DIR/lib</code>.
 
 <dl>
-<dt><code/abstract-star2html.pl/
+<dt><code/abstract-star2html.pl>
 <dd>A Perl script which does a simple but robust parse of &latex;
 files suitable for the Star2HTML system, generating DocumentSummary
-documents.  See <ref id=appx.system.summaries></>.
+documents.  See <ref id=appx.system.summaries/>.
 
-<dt><code/img-eqlist.pl/
-<dd>This post-processes the file produced by the <code/img.maths/ mode
+<dt><code/img-eqlist.pl>
+<dd>This post-processes the file produced by the <code/img.maths> mode
 of <code fspath>$STARLINK_SGML_DIR/dsssl/sl/html/slmaths.dsl</code>.
 It produces two files, based on the filename root of the argument.
 The SGML one conforms to a very simple DTD (with system id
-<code/img-eqlist/) which maps equation labels to filenames, the the &latex;
+<code/img-eqlist>) which maps equation labels to filenames, the the &latex;
 one consists of a &latex; document with one equation per page.  The
 latter should be processed by &latex; plus whatever dvi to gif magic
 you need, making sure that the resulting GIF filenames match those
 in the img-eqlist document.  See <coderef collection=supportlibs
 id=img-eqlist>the file header</coderef> for further documentation.
 
-<dt><code/plainhtml.bst/ and <code/plainlatex.bst/
+<dt><code/plainhtml.bst> and <code/plainlatex.bst>
 <dd>These are Bib&tex; style files used by the Bib&tex; step in the
 common makefile.
 
-<dt><code/postprocess-bbl.sed/
+<dt><code/postprocess-bbl.sed>
 <dd>This postprocesses the bibliography file produced by
-<code/plainhtml.bst/, rejoining the long lines which Bib&tex;
+<code/plainhtml.bst>, rejoining the long lines which Bib&tex;
 erroneously splits.
 
 </dl>
 
-<p><ref id=appx.system.dssslcode></> includes a selection of the more important
+<p><ref id=appx.system.dssslcode/> includes a selection of the more important
 DSSSL code modules.
 
 <subsubsect id=appx.system.latex2sgml>What latex2sgml does
@@ -4175,8 +4179,8 @@ Mark's upconverter documentation to the maintainers' section</update>
     -->
 
 <p>The upconversion process is described in detail in 
-<ref id=upconvert></>.  This section describes the internals of one of the
-tools included in the upconversion package, <code/latex2sgml/.
+<ref id=upconvert/>.  This section describes the internals of one of the
+tools included in the upconversion package, <code/latex2sgml>.
 
 <p>It's not necessary to understand the details of the upconversion
 process, but if you're having several goes at converting a 
@@ -4237,28 +4241,28 @@ documents marked up ready for processing by Star2HTML.  This script
 does not currently do a very neat job -- it's primarily designed to be
 robust enough to be used in an unattended installation procedure, so its
 &latex; parsing is somewhat simpleminded.  As noted in 
-<ref id=appx.system.htx></>, the installation makefile invokes this script in
+<ref id=appx.system.htx/>, the installation makefile invokes this script in
 a precise way, to make generated HTML output conform to the
 requirements of HTX.
 ]]>
 
 <p>Since the Starlink General DTD declares itself as a client of the
-Document Summary DTD (see <ref id=appx.system.hytime></> for a discussion
+Document Summary DTD (see <ref id=appx.system.hytime/> for a discussion
 of architectures), the processing of cross-referenced documents could
 be done by having the `doc' attribute point to the main SGML source of
 the target document and extracting the DocumentSummary architectural
-instance.  DSSSL's <code/(sgml-parse)/ function does not, however,
+instance.  DSSSL's <code/(sgml-parse)> function does not, however,
 support the extraction of architectural instances.  There is a Jade
 patch at <webref url='http://www.isogen.com' >Isogen</webref> which
 adds this as a Jade extension; this has been incorporated into the
-OpenJade distribution (see <ref id=appx.system.jade></>), but not (yet)
+OpenJade distribution (see <ref id=appx.system.jade/>), but not (yet)
 into the Starlink version of Jade which accompanies this
 set.  Note, however, that this is almost entirely an implementation
 issue: if this feature were to be added to Jade, as it might be if it
 conforms to any updated DSSSL standard which includes this feature,
 the only changes necessary would be a possible adjustment of that
 element's HyTime declaration, some adjustment of the call of the
-relevant <code/(sgml-parse)/ function, and corresponding changes in
+relevant <code/(sgml-parse)> function, and corresponding changes in
 the package's installation script so that the document summary
 catalogue points to the original documents rather than a
 freshly-generated set of summaries.  There would be no need for
@@ -4305,7 +4309,7 @@ loc=referring_to_targets>.  Note two points, however.
 
 <ul>
 <li>The generated
-document set is compatible as <em/input/ to HTX, and does not attempt
+document set is compatible as <em/input> to HTX, and does not attempt
 to emulate it to the extent of generating HTX index, catalogue and log
 files.  This would not, however, be terribly difficult, and might
 appear in a future version of this set.  There is therefore at
@@ -4318,13 +4322,13 @@ disjoint processing steps.  The DSSSL style sheets generate
 appropriate internal labels, and the HTML parameters style sheet
 contains a variable which sets the `document server' which is used
 when generating URLs.  The document-summary DTD (see 
-<ref id=appx.system.summaries></>) includes a <code/urlpath/ attribute in its
+<ref id=appx.system.summaries/>) includes a <code/urlpath> attribute in its
 section and label elements which specifies the tail of the URL where a
 particular section lives, relative to an (unspecified) document
-server.  The <code/abstract-star2html.pl/ script includes a
-<code/&ddash;prefix/ option to control the start of this attribute,
+server.  The <code/abstract-star2html.pl> script includes a
+<code/&ddash;prefix> option to control the start of this attribute,
 and this option is used when this script is invoked during the
-installation stage of the package makefile, so that the <code/urlpath/
+installation stage of the package makefile, so that the <code/urlpath>
 attribute starts with the string <code>sunNNN.htx/</code> (as
 appropriate), ready to be recognised by HTX.  This separation may seem
 complicated, but it separates, as much as possible, features which are
@@ -4404,7 +4408,7 @@ excellently concise.
 <subsect id=install export>Installation
 
 <p>The installation procedure should be standard.  When you have
-unpacked the distribution, define the <code/SYSTEM/ and <code/INSTALL/
+unpacked the distribution, define the <code/SYSTEM> and <code/INSTALL>
 environment variables as usual, and type
 <verbatim>
 % ./mk build
@@ -4420,11 +4424,11 @@ anything clever with &latex; markup in the documents they are
 abstracting; however the script which generates them should not
 collapse during the installation).
 -->
-As noted in <ref id=proc.setup></>, you prepare the set for use by
+As noted in <ref id=proc.setup/>, you prepare the set for use by
 sourcing one of two scripts.
 
-<p>This will also install a patched version of <code/Jade/, and an
-appropriate copy of the <code/dvi2bitmap/ package.
+<p>This will also install a patched version of <code/Jade>, and an
+appropriate copy of the <code/dvi2bitmap> package.
 
 <!-- Keep old Jade build instructions for the moment -->
 <![ IGNORE [
@@ -4440,12 +4444,12 @@ with the development of XML/XSL): he seems to take the position that a
 standards document is an adequate C++ user manual, and doesn't appear
 to believe that porting software to non-conforming compilers should be
 high on his priority list.  Now, I greatly approve of this attitude,
-<em/but/ I'd rather I had the attitude alone, rather than sharing it
+<em/but> I'd rather I had the attitude alone, rather than sharing it
 with Clark.  Jade builds
 perfectly happily on gcc, but I've been struggling away for ages
 trying to get it to build using Sun's and Digital's C++ compilers.  I
 will distribute a runnable version of Jade eventually, but for the
-moment, you'll have to build Jade yourself.  If <em/you/ manage to
+moment, you'll have to build Jade yourself.  If <em/you> manage to
 build it using one of those, could you tell me what you had to do&ellip;.
 
 <p>Get Jade from Clark's <webref
@@ -4461,7 +4465,7 @@ The configuration you'll need is:
 % make install
 </verbatim>
 The stylesheets need Jade patched to version
-<code/1.2.1-starlink-1.0b2/ (you can check Jade's version with
+<code/1.2.1-starlink-1.0b2> (you can check Jade's version with
 <kbd>jade -v &lt;/dev/null</kbd>).  Don't install Jade in the same
 place as this package installs its binaries -- the installation script
 for the SGML set assumes it has complete control over that
@@ -4469,7 +4473,7 @@ subdirectory, and will squash anything else it finds there.
 ]]>
 
 <![ IGNORE [
-<p>The application <code/dvi2bitmap/ is also required.  This is
+<p>The application <code/dvi2bitmap> is also required.  This is
 distributed separately.  Until it finds its way onto the Starlink CD,
 however, you can obtain a copy on <webref
 url="http://www.astro.gla.ac.uk/users/norman/star/dvi2bitmap/" >my
@@ -4480,37 +4484,37 @@ dvi2bitmap page</webref>.
 
 <p>This section includes a list of all the elements in the Starlink
 General DTD.  For a thematic treatment of the elements, see 
-<ref id=structure></>, and the groups in <ref id=table.elements/>.
+<ref id=structure/>, and the groups in <ref id=table.elements/>.
 
 <p>The elements listed here are shown as children of the top-level
 element <code>&lt;sun></code>, because this is the most general of the
-document types described in <ref id=str.structure></>.  However, the
-listing here does not <em/quite/ document the SUN DTD, since it
+document types described in <ref id=str.structure/>.  However, the
+listing here does not <em/quite> document the SUN DTD, since it
 includes the <ref id=el.sun.docdate>docdate</ref> element which is
-only available in those document types which do <em/not/ have the
-`Versioning' feature (see <ref id=str.structure></> and 
-<ref id=str.history></>).
+only available in those document types which do <em/not> have the
+`Versioning' feature (see <ref id=str.structure/> and 
+<ref id=str.history/>).
 
 <subsect id=appx.general.elementlist export>Element listing
 
 <p>The following element listing includes all the elements and
 attributes defined in the Starlink General DTD.  This includes a
-number of attributes with a <em/fixed/ value (indicated by a default
-keyword of <code/#FIXED/).  These are for internal use by the DTD and
+number of attributes with a <em/fixed> value (indicated by a default
+keyword of <code/#FIXED>).  These are for internal use by the DTD and
 the applications which process it, and are not documented further.
 
 &starlinkdtddoc;
 
 <sect id=appx.programcode.dtd export>The Programcode DTD
 
-<p>See <ref id=doccode></> for an overview of documenting code.
+<p>See <ref id=doccode/> for an overview of documenting code.
 
 <p>The programcode DTD described here is the same for all languages.
 When you invoke it, however, you do so using a document type
 declaration specific to the language of the program being documented.
-See <ref id=doccode.languages></> for details.
+See <ref id=doccode.languages/> for details.
 
-<p>As noted above, in <ref id=doccode.elements></>, the programcode
+<p>As noted above, in <ref id=doccode.elements/>, the programcode
 includes the same paragraph model as the Starlink General DTD.  In the
 element listing below, therefore, these are not duplicated separately,
 but instead consist of a reference to the appropriate part of the

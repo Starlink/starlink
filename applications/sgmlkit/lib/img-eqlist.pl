@@ -20,8 +20,8 @@
 #    </verbatim>
 #    <p>We spit out two files, based on the filename root of the argument.
 #    The SGML one conforms to a very simple DTD (with system id
-#    'img-eqlist') which maps equation labels to filenames, the the LaTeX
-#    one consists of a LaTeX document with one equation per page.  The
+#    <code>img-eqlist</>) which maps equation labels to filenames, the the
+#    LaTeX one consists of a LaTeX document with one equation per page.  The
 #    latter should be processed by LaTeX plus whatever dvi to bitmap magic
 #    you need, making sure that the resulting image filenames match those
 #    in the img-eqlist document.
@@ -34,8 +34,8 @@
 #    no problem since this allows this script to control the output filenames,
 #    so that they're guaranteed to be consistent.
 #    The output in fact is designed to work
-#    with <code/dvi2bitmap/ (version 0.7 or later), and inserts specials to
-#    control that.  See the <code/dvi2bitmap/ documentation for details.
+#    with <code>dvi2bitmap</> (version 0.7 or later), and inserts specials to
+#    control that.  See the <code>dvi2bitmap</> documentation for details.
 #
 #  <argumentlist>
 #    <parameter>infile

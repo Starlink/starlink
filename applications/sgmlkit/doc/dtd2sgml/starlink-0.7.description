@@ -1278,6 +1278,63 @@ Physics and Astronomy, University of Glasgow, UK     norman@astro.gla.ac.uk
 
 </body>
 </commentary>
+<commentary>
+<from>Mark Taylor</from>
+<email>mbt@ast.cam.ac.uk</email>
+<date>Mon, 15 May 2000 15:09:20 +0100 (BST)</date>
+<subject>ref content</subject>
+<otherheader name='From '>mbt@ast.cam.ac.uk Mon May 15 15:09:27 2000</otherheader>
+<otherheader name='Return-path'>&lt;mbt@ast.cam.ac.uk&gt;</otherheader>
+<otherheader name='Envelope-to'>sgml-starlink-0.7+ref@astro.gla.ac.uk</otherheader>
+<otherheader name='Delivery-date'>Mon, 15 May 2000 15:09:27 +0100</otherheader>
+<otherheader name='Received'>from othello.physics.gla.ac.uk ([130.209.204.200] ident=exim) by hermes.astro.gla.ac.uk with esmtp (Exim 3.02 #4) id 12rLYk-0001zT-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:26 +0100</otherheader>
+<otherheader name='Received'>from navy.csi.cam.ac.uk ([131.111.8.49] ident=exim) by othello.physics.gla.ac.uk with esmtp (Exim 3.13 #1) id 12rLYm-0005ax-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:28 +0100</otherheader>
+<otherheader name='Received'>from cass41.ast.cam.ac.uk ([131.111.69.186]) by navy.csi.cam.ac.uk with esmtp (Exim 3.13 #1) id 12rLYh-00049w-00 for sgml-starlink-0.7+ref@astro.gla.ac.uk; Mon, 15 May 2000 15:09:23 +0100</otherheader>
+<otherheader name='Received'>from cass29.ast.cam.ac.uk (cass29 [131.111.68.168]) by cass41.ast.cam.ac.uk (8.9.3+Sun/8.9.3) with ESMTP id PAA19400 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Mon, 15 May 2000 15:09:22 +0100 (BST)</otherheader>
+<otherheader name='Received'>from localhost (mbt@localhost) by cass29.ast.cam.ac.uk (8.9.3+Sun/8.9.1) with ESMTP id PAA11098 for &lt;sgml-starlink-0.7+ref@astro.gla.ac.uk&gt;; Mon, 15 May 2000 15:09:21 +0100 (BST)</otherheader>
+<otherheader name='X-Authentication-Warning'>cass29.ast.cam.ac.uk: mbt owned process doing -bs</otherheader>
+<otherheader name='X-Sender'>mbt@cass29</otherheader>
+<otherheader name='Message-ID'>&lt;Pine.GSO.4.10.10005151458120.11010-100000@cass29&gt;</otherheader>
+<otherheader name='MIME-Version'>1.0</otherheader>
+<otherheader name='Content-Type'>TEXT/PLAIN; charset=US-ASCII</otherheader>
+<body>
+I think I agree, option 3 is the best way to go.
+
+Although &lt;ref&gt; elements may be the most common time that alternate 
+text is required for different output media, it is not the only time,
+and so providing a general mechanism for this is necessary.
+Given that, incorporating such a mechanism into the &lt;ref&gt; element 
+would seem like unnecessary complication.
+
+I don't much like the form of the &lt;refinfo&gt; element in the above examples,
+it looks like 'secnum' is literal text to get output; wouldn't 
+
+   See &lt;ref id=x&gt;section &lt;refinfo secnum&gt;&lt;/ref&gt;
+
+or (equivalently?)
+
+   See &lt;ref id=x&gt;section &lt;refinfo type=secnum&gt;&lt;/ref&gt;
+
+or
+
+   See &lt;ref id=x&gt;section &lt;refsecnum&gt;&lt;/ref&gt;
+   
+be preferable?
+
+Some discussion of the form of the details of the &lt;span&gt; element, 
+if that's what it's going to be called, will be in order, but not 
+just here.
+
+
+---------------------------------------------------------------------------
+| Mark Taylor  Starlink Programmer  Institute of Astronomy, Cambridge, UK |
+| mbt@ast.cam.ac.uk    <url>http://www.ast.cam.ac.uk/~mbt/</url>        01223 337535 |
+---------------------------------------------------------------------------
+
+
+
+</body>
+</commentary>
 <!--splice:ref-->
 </element>
 

@@ -17,6 +17,8 @@ ssn70.tar-htx: ssn70.sgml ReleaseNotes
 
 ssn70.tar-tex: ssn70.sgml ReleaseNotes
 	cd ../dtd2sgml; $(MAKE) sgmltext.stamp
+	cd ../../bin; $(MAKE) sgmlbin.sgml
+	cd ../../lib; $(MAKE) sgmllib.sgml
 	SGML_CATALOG_FILES=$$PWD/../documents/CATALOG:$(STARLINK_SGML_DIR)/dtd/CATALOG \
 	BIBINPUTS=$$PWD \
 		$(SGML2DOCS) --latex --tarball $@ ssn70.sgml

@@ -104,11 +104,14 @@ $Id$
 					(attribute-string (normalize
 							   "email")))))))
       (make element gi: "li"
-	    (make element gi: "a"
-		  attributes: `(("name" ,(string-append "AUTHOR_"
-								id))
-				,(if link `("href" ,link) #f))
-		  (process-node-list (node-list-first kids)))
+	    (let ((attlist
+		   (if link
+		       (list (list "name" (string-append "AUTHOR_" id))
+			     (list "href" link))
+		       (list (list "name" (string-append "AUTHOR_" id))))))
+	      (make element gi: "a"
+		    attributes: attlist
+		    (process-node-list (node-list-first kids))))
 	    (process-node-list (node-list-rest kids))
 	    (if affil
 		(literal (string-append " (" affil ")"))

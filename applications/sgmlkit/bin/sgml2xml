@@ -16,7 +16,7 @@ RCSID="$Id$"
 #
 #  <description>
 #
-#    <p>Essentially a wrapper for <code/sx/, but since that doesn't
+#    <p>Essentially a wrapper for <code>sx</code>, but since that doesn't
 #    rewrite the DTD subset, this script does that, trying to find
 #    XML-compatible ways of rewriting what it finds, and spitting out
 #    warnings whenever it sees anything it thinks is dodgy.
@@ -48,7 +48,7 @@ RCSID="$Id$"
 #    * Entities which can't be easily translated are discarded with warnings.
 #
 #    * It's not clear what one should do with SUBDOC entities.  This
-#    translates them to <code/NDATA XML/ entities, and warns that it's done
+#    translates them to <code>NDATA XML</> entities, and warns that it's done
 #    this, but the referenced document might well be SGML rather than
 #    XML.
 #
@@ -86,8 +86,9 @@ RCSID="$Id$"
 #    </dl>
 #
 #  <diytopic>Environment
-#    <p>If the environment variable <code/SX/ is defined, then this is used as
-#    the command to invoke sx, otherwise a default value is used.
+#    <p>If the environment variable <code>SX</> is defined, then this is
+#    used as the command to invoke <code>sx</>, otherwise a default value
+#    is used.
 #
 #  <authorlist>
 #  <authorref id=ng>

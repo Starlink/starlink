@@ -54,7 +54,7 @@ stdout, then generates an entity which contains the entire LaTeX file.
 
 <routine>
 <description>Flow-object constructors for the document head
-<p>See the documentation of <funcname/%latex-document-preamble%/ for the 
+<p>See the documentation of <funcname>%latex-document-preamble%</> for the 
 interface with the `style file' defined there.
 <codebody>
 (element docinfo

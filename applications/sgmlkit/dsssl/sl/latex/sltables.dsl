@@ -22,7 +22,7 @@ extend the table entry model to include phrase markup.
 
 <codegroup id=code.tables>
 <title>Tables
-<description>I've aimed to support all of the <em/structure/ of this table
+<description>I've aimed to support all of the <em>structure</> of this table
 model below, but not necessarily to support all of the attributes at
 first.
 -->

@@ -33,12 +33,12 @@ of elements.  Ie, ("sect" "subsubsect") would be bad, since
 
 <p>There are two constraints on the elements in this list.  (1) no
 elements appear which are in the documentsummary DTD but not in the
-General DTD, since <funcname/main-html-base/ relies on this to be able to
+General DTD, since <funcname>main-html-base</> relies on this to be able to
 generate the same HTML file name in both cases.  It doesn't matter
 if there are elements here which don't appear in the summary DTD,
 since elements with those names will necessarily never be found
 when processing an instance of the summary DTD.  (2) the list
-must be a subset of the return value of <funcname/section-element-list/.
+must be a subset of the return value of <funcname>section-element-list</>.
 <codebody>
 (define (chunk-element-list)
   (list (normalize "abstract")
@@ -55,7 +55,7 @@ must be a subset of the return value of <funcname/section-element-list/.
 <routinename>chunking?
 <description>
 Returns true if chunking is enabled.
-<p>Currently, this simply returns <code/(not (or nochunks stream-output))/,
+<p>Currently, this simply returns <code>(not (or nochunks stream-output))</>,
 but could be more general in future.
 <returnvalue type=boolean>True if chunking is enabled.
 <codebody>
@@ -65,14 +65,14 @@ but could be more general in future.
 <routine>
 <routinename>chunk?
 <description>
-Return <code/#t/ if the given node is a chunk, taking account of whether
+Return <code>#t</> if the given node is a chunk, taking account of whether
 chunking has been turned off.
 Given that chunking is on, this simply tests whether the
-node is a member of <funcname/chunk-element-list/.
+node is a member of <funcname>chunk-element-list</>.
 <returnvalue type=boolean>True if the node is a chunk
-<p>Do <em/not/ modify this so that the document element is deemed to
+<p>Do <em>not</> modify this so that the document element is deemed to
 be a chunk.  This may seem like a good idea, but it's important that
-<funcname/chunk?/ <em/always/ returns false if chunking is off.
+<funcname>chunk?</> <em>always</> returns false if chunking is off.
 <argumentlist>
 <parameter optional default='(current-node)'>
   nd
@@ -87,10 +87,10 @@ be a chunk.  This may seem like a good idea, but it's important that
 <routinename>chunk-path
 <description>
 Return a string which describes the path to the given node through
-nodes which are members of <funcname/chunk-element-list/.  Returns an empty
-string if the <funcname/chunk-level-parent/ of the given node is empty.
-Note that <funcname/chunk-level-parent nd/ returns nd if nd is a member of
-<funcname/chunk-element-list/. 
+nodes which are members of <funcname>chunk-element-list</>.  Returns an empty
+string if the <funcname>chunk-level-parent</> of the given node is empty.
+Note that <funcname>chunk-level-parent nd</> returns nd if nd is a member of
+<funcname>chunk-element-list</>. 
 <returnvalue type=string>String without spaces, listing the chunk-type
 elements on the way to the current chunk
 <argumentlist>
@@ -123,11 +123,11 @@ elements on the way to the current chunk
 <description>
 Return a string containing the name of the file which will hold the
 given node.  Since this must work both for the general DTD and the
-documentsummary DTD, we can't use <funcname/all-element-number/.  Since 
-this current version uses <funcname/chunk-path/, it will break (in the sense
+documentsummary DTD, we can't use <funcname>all-element-number</>.  Since 
+this current version uses <funcname>chunk-path</>, it will break (in the sense
 that different filenames will be generated for the same element when it
 appears in the general and in the documentsummary DTD) if the elements in
-<funcname/chunk-element-list/ (which <funcname/chunk-path/ uses) produce
+<funcname>chunk-element-list</> (which <funcname>chunk-path</> uses) produce
 different hierarchies in the two DTDs.
 <returnvalue type=string>Base of filename
 <argumentlist>
@@ -214,11 +214,11 @@ of a particular chunk
 <routinename>chunk-level-parent
 <description>
 Return (a node-list containing) the nearest ancestor which is a
-member of <funcname/chunk-element-list/.  The difference between this and
-<funcname/chunk-parent/ is that <funcname/chunk-parent/ tests whether the 
+member of <funcname>chunk-element-list</>.  The difference between this and
+<funcname>chunk-parent</> is that <funcname>chunk-parent</> tests whether the 
 node is 
-actually chunked (ie, it also uses <funcname/chunk?/), whereas this one just
-tests for membership of <funcname/chunk-element-list/.
+actually chunked (ie, it also uses <funcname>chunk?</>), whereas this one just
+tests for membership of <funcname>chunk-element-list</>.
 <returnvalue type=singleton-node-list>`Top level' of the current chunk.
 <argumentlist>
 <parameter optional default='(current-node)'>
@@ -247,14 +247,14 @@ there are none.
 <routine>
 <routinename>html-contents
 <purpose>Processing mode for html-contents lines
-<description>The <funcname/section-reference/ processing mode is not
+<description>The <funcname>section-reference</> processing mode is not
 quite appropriate for HTML contents lines, since we don't want all
 the numbers in that case.  This mode is based on that mode however,
 and passes control explicitly to that mode for those elements which
 it processes suitably for our purposes.  For the others it lets
-<funcname/make-html-contents-line/ do the hard work.
+<funcname>make-html-contents-line</> do the hard work.
 <p>This mode should contain construction rules for all the elements 
-in <funcname/section-element-list/.
+in <funcname>section-element-list</>.
 <codebody>
 (mode html-contents
   (element abstract
@@ -336,14 +336,14 @@ element.
 <description>
 Make a table of contents of the node argument, down to the specified depth.
 This works by listing children of the current node which are
-members of <funcname/section-element-list/, and possibly recursing to
+members of <funcname>section-element-list</>, and possibly recursing to
 list their children.  It does not supply any header.
 <returnvalue type=sosofo>TOC, currently formatted as a UL
 <argumentlist>
 <parameter optional default='(current-node)'>start-element
   <type>singleton-node-list
   <description>Node we want the contents of.  All the children of this
-  node which are members of <funcname/section-element-list/ will be
+  node which are members of <funcname>section-element-list</> will be
   listed.
 <parameter optional default=1>depth
   <type>integer
@@ -380,14 +380,14 @@ list their children.  It does not supply any header.
 <routine>
 <routinename>has-contents?
 <description>Finds out whether the contents which would be made by
-the <funcname/make-contents/ routine is non-empty.
-<returnvalue type=boolean>#f if <funcname/make-contents/ would 
+the <funcname>make-contents</> routine is non-empty.
+<returnvalue type=boolean>#f if <funcname>make-contents</> would 
 return an empty sosofo, and #t otherwise.
 <argumentlist>
 <parameter optional default='(current-node)'>start-element
   <type>singleton-node-list
   <description>Node we want the contents of.  All the children of this
-  node which are members of <funcname/section-element-list/ will be
+  node which are members of <funcname>section-element-list</> will be
   listed.
 <parameter optional default=1>depth
   <type>integer
@@ -433,7 +433,7 @@ are chunks, and #t otherwise.
    <type>string
    <description>The name of the relation which target bears to the current 
    node.  This is used as the text of a text link, or as the key for 
-   finding an image using the <funcname/file-href/ routine.
+   finding an image using the <funcname>file-href</> routine.
 <parameter>link-type
    <type>string
    <description>Either "title" or "gif" according to the kind of link 

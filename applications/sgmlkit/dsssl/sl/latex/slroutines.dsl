@@ -242,7 +242,7 @@ $Id$
 	  (process-children)))
   (element moduletype
     (make command name: "sstdiytopic"
-	  parameters: ("Type of Module")
+	  parameters: '("Type of Module")
 	  (process-children)))
   (element userkeywords
     (make command name: "sstdiytopic"

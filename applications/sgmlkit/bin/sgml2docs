@@ -22,14 +22,14 @@ RCSID='$Id$'
 #     generated files.
 #
 #  <diytopic>Environment
-#     <p>Requires that the environment variable STARLINK_SGML_DIR is
+#     <p>Requires that the environment variable <code>STARLINK_SGML_DIR</> is
 #     properly set, pointing to the root of the Starlink SGML kit.  It
-#     also requires that dvi2bitmap is in the PATH.
+#     also requires that dvi2bitmap is in the <code>PATH</>.
 #
 #     <p>The script creates a work directory and does its processing
 #     there.  If it is necessary to run BibTeX, it will be done with
 #     that temporary directory as the current directory, so that it
-#     might be necessary to set BIBINPUTS (for example) to let the
+#     might be necessary to set <code>BIBINPUTS</> (for example) to let the
 #     system find the bibliography database.
 #
 #  <argumentlist>
