@@ -62,7 +62,7 @@ bool Bitmap::cropMarginAbsDefault[4] = {false, false, false, false };
 Bitmap::BitmapColour Bitmap::def_fg_ = {  0,   0,   0};
 Bitmap::BitmapColour Bitmap::def_bg_ = {255, 255, 255};
 bool Bitmap::def_customRGB_ = false;
-bool Bitmap::logBitmapInfo_ = false;
+const char* Bitmap::logBitmapPrefix_ = 0;
 
 Bitmap::const_iterator Bitmap::endIterator_;
 
@@ -109,7 +109,7 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 		const int maxwidth, const int maxheight)
     : W(w), H(h), isExpandable_(expandable),
       frozen_(false), transparent_(false),
-      customRGB_(false), bpp_(bpp)
+      customRGB_(false), bpp_(bpp), mark_(0)
 {
     B = new Byte[W*H];
 
@@ -158,6 +158,8 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 Bitmap::~Bitmap()
 {
     delete[] B;
+    if (mark_ != 0)
+        delete mark_;
 }
 
 /**
@@ -196,6 +198,11 @@ void Bitmap::clear()
 
     frozen_ = false;
     // but don't reset transparent_ or customRGB_
+
+    if (mark_ != 0) {
+        delete mark_;
+        mark_ = 0;
+    }
 
     if (verbosity_ > normal)
 	cerr << "Bitmap::clear" << endl;
@@ -442,6 +449,49 @@ void Bitmap::strut (const int x, const int y,
     if (verbosity_ > normal)
 	cerr << "Bitmap:: ...BB now [" << bbL << ':' << bbR << "), ["
 	     << bbT << ':' << bbB << ")" << endl;
+}
+
+/**
+ * Marks a particular spot in the bitmap.  This spot can be retrieved
+ * later using {@link #getMark}.  The top-left pixel in the bitmap has
+ * mark coordinates (0,0).  The input coordinates are not restricted
+ * to be on the bitmap.
+ *
+ * @param x the x-coordinate of the mark, increasing to the right
+ * @param y the y-coordinate of the mark, increasing downwards
+ * @see BitmapMark
+ */
+void Bitmap::mark(const double x, const double y)
+{
+    // We need to care where the origin of coordinates is, since that
+    // affects how we scale them in scaleDown().
+    if (mark_ == 0)
+        mark_ = new BitmapMark();
+    mark_->x = x;
+    mark_->y = y;
+    if (verbosity_ > normal)
+        cerr << "Bitmap::mark " << x << "," << y << endl;
+    return;
+}
+
+/**
+ * Obtains the mark for this bitmap.
+ *
+ * @return a pointer to the mark information, or 0 if no mark has been
+ * registered.  This points to static storage, which should not be
+ * deleted, and which may be overwritten.
+ * @see #mark
+ */
+Bitmap::BitmapMark* Bitmap::getMark()
+{
+    static BitmapMark reportMark;
+    if (mark_ == 0)
+        return 0;
+
+    // Report the mark position taking cropping into account
+    reportMark.x = mark_->x - cropL;
+    reportMark.y = mark_->y - cropT;
+    return &reportMark;
 }
 
 /**
@@ -867,6 +917,13 @@ void Bitmap::scaleDown (const int factor)
     bpp_ = newbpp;
     max_colour_ = new_max_colour;
 
+    if (mark_ != 0) {
+        // scale the mark position, too.  This is easy, since we've
+        // documented that the top-left pixel has coordinates (0,0)
+        mark_->x /= factor;
+        mark_->y /= factor;
+    }
+
     if (verbosity_ > normal)
 	cerr << "Bitmap::scaleDown: factor=" << factor
 	     << ". BB now [" << bbL << ':' << bbR << "), ["
@@ -971,8 +1028,14 @@ void Bitmap::write(const string filename, const string format)
     }
     bi->write (outfilename);
 
-    if (logBitmapInfo_)
-	cout << "Qbitmaps " << outfilename << ' ' << hsize << ' ' << vsize << endl;
+    if (logBitmapPrefix_ != 0) {
+	cout << logBitmapPrefix_ << outfilename << ' ' << hsize << ' ' << vsize;
+        if (mark_ != 0) {
+            BitmapMark *m = getMark();
+            cout << ' ' << m->x << ' ' << m->y;
+        }
+        cout << endl;
+    }
 
     delete bi;
 }
