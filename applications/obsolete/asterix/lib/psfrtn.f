@@ -3927,7 +3927,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
       END IF
 
-      CALL XMM_INTGAU2D( NORM(LP), SIGMA(LP), SIGMA(LP), X01,
+      CALL XMM_INTGAU2D( NORM(LP), SIGMA(LP), SIGMA(LP), LP, X01,
      :           Y01, QX1, QY1, DX1, DY1, NX, NY, ARRAY, STATUS )
 
       END DO !(LP)
@@ -4024,7 +4024,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 
 
 *+  XMM_INTGAU2D - Return array of integrated 2D gaussian distribution
-      SUBROUTINE XMM_INTGAU2D( MY_NORM, XSIG, YSIG,
+      SUBROUTINE XMM_INTGAU2D( MY_NORM, XSIG, YSIG, LP,
      :                  X0, Y0, QX, QY, DX, DY, NX, NY, ARRAY, STATUS )
 *
 *    Description :
@@ -4062,6 +4062,9 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *    History :
 *
 *     09 Jun 99 : Original (::DGED)
+*     27 Jan 00 : Ammended the third gaussian component (divided by 2) in
+*                 accordance with an error in the original technical note
+*                 SSC-AIP-TN-0002
 *
 *    Type definitions :
 *
@@ -4079,6 +4082,7 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
       REAL                      R
       REAL                      XSIG, YSIG             ! The gaussian params
       REAL                      DX, DY, X0, Y0,QX,QY
+      INTEGER                   LP                     ! Gaussian component
       INTEGER                   NX,NY
 *
 *    Export :
@@ -4207,8 +4211,12 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
           END DO
 
 *        Set ARRAY value
-          ARRAY(I,J) = ARRAY(I,J) + (SUM * NORM)
-
+          IF (LP .EQ. 3) THEN
+*           See ammendment to the technical note.
+             ARRAY(I,J) = ARRAY(I,J) + (SUM *NORM)/2
+          ELSE
+             ARRAY(I,J) = ARRAY(I,J) + (SUM * NORM)
+          ENDIF
         END DO
 
       END DO
