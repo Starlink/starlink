@@ -853,7 +853,7 @@ C         ENDIF
      &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
 *
 * Get locator to the instrument box
-        CALL ADI1_LOCHEAD( IFID, .FALSE., ILOC, STATUS )
+        CALL ADI1_LOCHEAD( IFID, .FALSE., HLOC, STATUS )
 
          CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
 *
