@@ -1046,7 +1046,7 @@
       INTEGER FLAG
       INTEGER CID,RID,GID,BID,FID
       INTEGER NB
-      INTEGER CI
+      INTEGER CI,CJ
       INTEGER J,K,J1,J2
       INTEGER ICOL
 *-
@@ -1083,6 +1083,9 @@
 *  monitor noticeboard until flag goes non-zero
         FLAG=0
         DO WHILE (FLAG.EQ.0)
+          CJ=CI
+
+*  get current colours from noticeboard
           CALL NBS_GET_VALUE(RID,0,VAL__NBR,RED,NB,STATUS)
           COL(1,ICOL)=RED
           CALL NBS_GET_VALUE(GID,0,VAL__NBR,GREEN,NB,STATUS)
@@ -1098,20 +1101,20 @@
             GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
             BLUE=COL(3,J)
             BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
-            CALL PGSCR(CI,RED,GREEN,BLUE)
+            CALL PGSCR(CJ,RED,GREEN,BLUE)
             DO K=1,NSHADE
-              CI=CI+1
+              CJ=CJ+1
               RED=RED+REDHUE
               GREEN=GREEN+GREENHUE
               BLUE=BLUE+BLUEHUE
-              CALL PGSCR(CI,RED,GREEN,BLUE)
+              CALL PGSCR(CJ,RED,GREEN,BLUE)
             ENDDO
-            CI=CI+1
+            CJ=CJ+1
           ENDDO
           RED=COL(1,J2)
           GREEN=COL(2,J2)
           BLUE=COL(3,J2)
-          CALL PGSCR(CI,RED,GREEN,BLUE)
+          CALL PGSCR(CJ,RED,GREEN,BLUE)
 
           CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
 
