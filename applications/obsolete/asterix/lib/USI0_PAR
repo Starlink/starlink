@@ -112,5 +112,5 @@
         PARAMETER               ( USI__F_PARSE = USI__F_REST+6 )
       INTEGER			USI__F_DELET
         PARAMETER               ( USI__F_DELET = USI__F_REST+7 )
-      INTEGER			USI__F_EXIST
-        PARAMETER               ( USI__F_EXIST = USI__F_REST+8 )
+      INTEGER			USI__F_DEXIST
+        PARAMETER               ( USI__F_DEXIST = USI__F_REST+8 )
