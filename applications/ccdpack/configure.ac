@@ -14,9 +14,13 @@ STAR_CHECK_PROGS(hlib)
 STAR_CHECK_PROGS(ifd2star)
 AC_CHECK_LIB(tcl,Tcl_AppInit)
 AC_CHECK_LIB(tk,Tk_Init)
+
+# Note that the starlink Tcl, Tk and ITcl are required, since we need
+# some somewhat-private include files.  I'm not sure how naughty 
+# this is.
 STAR_DECLARE_DEPENDENCIES([build], 
                           [chr agi ard ast chr fio ndf pgplot prm \
-                           psx trn pda ndg tclsys startcl])
+                           psx trn pda ndg tcl tk itcl startcl])
 # STAR_LATEX_DOCUMENTATION(sun139)
 # STAR_LATEX_DOCUMENTATION(ccdpack)
 AC_CONFIG_SUBDIRS([tasks gen help main])
