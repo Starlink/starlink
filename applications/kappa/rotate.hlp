@@ -1,14 +1,10 @@
 .help rotate Starlink kappa
 .nf
 Rotates a 2-dimensional NDF about its centre through any angle.
-
-Usage:
-
-   rotate in out angle
-
-Description:
-
-   This rotates a 2-dimensional array stored in an NDF data
+ Usage:
+    rotate in out angle
+ Description:
+    This rotates a 2-dimensional array stored in an NDF data
    structure by an arbitrary angle.  The origin of the rotation is
    the centre of the array.  The output array dimensions just
    accommodate the rotated array.  Output pixels can be generated
@@ -83,20 +79,17 @@ rotate ns ew 90
    ew.  The former x axis becomes the new y axis, and the former
    y axis becomes the new x axis.  The former y-axis arrays are
    also reversed in the process.
-
-rotate angle=180 out=sn in=ns
+ rotate angle=180 out=sn in=ns
    This rotates the array components in the NDF called ns by 180
    degrees clockwise, and stores the result in the NDF called
    sn.  The axis arrays are flipped in the output NDF.
-
-rotate f1 f1r 37.2 novariance
+ rotate f1 f1r 37.2 novariance
    This rotates the array components in the NDF called f1 by 37.2
    degrees clockwise, and stores the result in the NDF called
    f1r.  The original axis information is lost.  Bi-linear
    interpolation is used without variance information.  No
    quality or variance information is propagated.
-
-rotate f1 f1r 106 nnmeth title="Reoriented features map"
+ rotate f1 f1r 106 nnmeth title="Reoriented features map"
    This rotates the array components in the NDF called f1 by 106
    degrees clockwise, and stores the result in the NDF called
    f1r.  The original axis information is lost.  The resultant
@@ -116,43 +109,35 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1995 May 14 (MJC):
     Original NDF version.
-
- 12-JUN-1998 (DSB):
+  12-JUN-1998 (DSB):
     Added propagation of the NDF WCS component.
-
- {enter_any_changes_here}
+  {enter_any_changes_here}
 
 Implementation_Status
 
    The propagation rules depend on parameters ANGLE and NNMETH.
-
-   -  For rotations that are multiples of 90-degrees, VARIANCE,
+    -  For rotations that are multiples of 90-degrees, VARIANCE,
    QUALITY, AXIS, HISTORY, LABEL WCS and UNITS components of the input
    NDF are propagated to the output NDF.  The axis and WCS components
    are switched and flipped as appropriate.
-
-   -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
+    -  For the nearest-neighbour method VARIANCE, QUALITY, HISTORY,
    LABEL, WCS and UNITS components of the input NDF are propagated to
    the output NDF.
-
-   -  For the linear interpolation method HISTORY, LABEL, WCS and
+    -  For the linear interpolation method HISTORY, LABEL, WCS and
    UNITS components of the input NDF are propagated to the output
    NDF.  In addition if parameter VARIANCE is TRUE, variance
    information is derived from the input variance; and if parameter
    QUALITY is TRUE, QUALITY is propagated using the nearest
    neighbour.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric types are supported, though for linear
+    -  All non-complex numeric types are supported, though for linear
    interpolation the arithmetic is performed using single- or
    double-precision floating point as appropriate; and for 90 and
    270-degree rotations _INTEGER is used for all integer types.

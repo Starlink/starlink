@@ -1,21 +1,16 @@
 .help segment Starlink kappa
 .nf
 Copies polygonal segments from one NDF to another.
-
-Usage:
-
-   segment in1 in2 out
-
-Description:
-
-   This routine extracts polygonal segments from an NDF, and
+ Usage:
+    segment in1 in2 out
+ Description:
+    This routine extracts polygonal segments from an NDF, and
    optionally pastes them into the corresponding positions within
    another NDF.  The application is intended to allow regions of an
    NDF to be removed to another for separate processing.  It may
    also be used to copy bad pixels into a NDF in order to delete a
    region which is not required.
-
-   The vertices of polygonal segments are defined by lists of
+    The vertices of polygonal segments are defined by lists of
    co-ordinate pairs.  [For convenience these positions are denoted
    x-y positions although they may not be literally x and y, for
    example planes in a cube or hypercube.  See the "Notes" for more
@@ -29,20 +24,15 @@ Description:
    polygonal segment will be filled with bad values, and if IN2 is
    given a null value the region outside the polygonal segments will
    be filled with bad values.
-
-   The x-y positions may be specified in three ways:
-
-   1) from the parameter system, usually in response to prompting;
-
-   2) within text files (one for each polygon), where the files are
+    The x-y positions may be specified in three ways:
+    1) from the parameter system, usually in response to prompting;
+    2) within text files (one for each polygon), where the files are
    free format with x co-ordinates in column one and y co-ordinates
    in column two (this is the format produced by other KAPPA
    applications such as CURSOR); and
-
-   3) using a graphics cursor of a nominated device, for which an NDF
+    3) using a graphics cursor of a nominated device, for which an NDF
    must already have been displayed on the device.
-
-   The x-y co-ordinates may be given as either data or pixel
+    The x-y co-ordinates may be given as either data or pixel
    (`world') co-ordinates.  If data co-ordinates are given, the input
    NDFs must contain appropriate AXIS structures to allow the
    corresponding pixel co-ordinates to be found.
@@ -70,8 +60,7 @@ COLOUR
 COLOUR = LITERAL (Read)
    The colour in which to draw any graphics specified by
    parameter PLOT.  The options are described below.
-
-     "MAX"          - The maximum colour index used for the
+      "MAX"          - The maximum colour index used for the
                       display of the image.
      "MIN"          - The minimum colour index used for the
                       display of the image.
@@ -81,12 +70,10 @@ COLOUR = LITERAL (Read)
      A named colour - Uses the named colour from the palette, and
                       if it is not present, the nearest colour
                       from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
+    If the colour is to remain unaltered as the lookup table is
    manipulated choose an integer between 0 and 15, or a named
    colour.  The suggested default is the current value.
-
-   This parameter is ignored on window overlays, where the
+    This parameter is ignored on window overlays, where the
    overlay colour is used.  (Use the PALENTRY command to change
    this colour.)  An overlay has the advantage that the crosses
    or polygon can be erased using OVCLEAR once this task is
@@ -185,16 +172,12 @@ PLOT = LITERAL (Read)
    The type of graphics to be used to mark the position of each
    selected vertex.  It is only used if parameter MODE is given
    the value "Cursor".  PLOT can take any of the following values.
-
-     "Poly"  - Causes each vertex to be joined by a straight line
+      "Poly"  - Causes each vertex to be joined by a straight line
                to the previous vertex.  The last vertex is joined
                to the first vertex.
-
-     "Cross" - Each vertex is marked by a cross.
-
-     "None"  - No graphics are produced.
-
-   The initial default is "Poly", then subsequently it is the
+      "Cross" - Each vertex is marked by a cross.
+      "None"  - No graphics are produced.
+    The initial default is "Poly", then subsequently it is the
    current value.  []
 
 POLY1-POLY20
@@ -241,8 +224,7 @@ segment in1=m51a in2=m51b out=m51_comp poly1=co-ords.lis mode=file
    of vertex co-ordinates held in text file co-ords.lis.  All
    pixels in the output NDF which fall outside this region are
    given the corresponding pixel values from NDF m51b.
-
-segment in1=m51a out=m51_cut mode=cursor plot=poly accept
+ segment in1=m51a out=m51_cut mode=cursor plot=poly accept
    Copies a region of the NDF m51a to the corresponding position
    in the output NDF m51_cut.  The region is defined by selecting
    vertices using a graphics cursor.  The image m51a should
@@ -264,11 +246,9 @@ first two axes of the NDF), but this can be changed by assigning
 appropriate values to parameter AXES so that for instance the
 polygon lies in the y-z plane (i.e. the plane spanned by axes 2
 and 3).
-
--  The output NDF bounds are defined by the overlap region of the
+ -  The output NDF bounds are defined by the overlap region of the
 input NDFs.
-
--  The log file has a comment line indicating whether the
+ -  The log file has a comment line indicating whether the
 co-ordinates are World or Data.
 
 Related_Applications
@@ -279,16 +259,14 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  9-NOV-1993 (DSB):
     Original NDF version, based on MJC's IMAGE-format KAPPA
     implementation.
-
- 1995 April 11 (MJC):
+  1995 April 11 (MJC):
     Added Notes and Related Applications, and more examples.
     Moved old Notes to Implementation Status.  Made Examples and
     Usage lowercase.  Various tidying and stylistic changes, and
@@ -298,13 +276,11 @@ History
     Added headings to the commentary.  Made the non-warning
     messages conditional.  Used AGI_BEGIN/END to delimit picture
     processing.
-
- 1997 July 11 (MJC):
+  1997 July 11 (MJC):
     When POLY1 is given on the command line in file mode, it is
     now possible to supply additional polygons through parameters
     POLY2-POLY20 also given on the command line.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -312,16 +288,13 @@ Implementation_Status
    -  This routine will propagate VARIANCE component values so long
    as all supplied input NDFs have defined VARIANCE components, and
    parameter VARIANCE is not FALSE.
-
-   -  This routine will propagate QUALITY component values so long
+    -  This routine will propagate QUALITY component values so long
    as all supplied input NDFs have defined QUALITY components, and
    parameter QUALITY is not FALSE.
-
-   -  The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
+    -  The UNITS, AXIS, LABEL, TITLE, WCS and HISTORY components are
    propagated from the first supplied input NDF, together with all
    extensions.
-
-   -  All non-complex numeric types are supported.  The following
+    -  All non-complex numeric types are supported.  The following
    data types are processed directly: _WORD, _INTEGER, _REAL,
    _DOUBLE.
 .endhelp

@@ -1,6 +1,6 @@
 .help getting_data_into_k Starlink kappa
 .nf
-KAPPA utilises general data structures within an HDS container file,
+ KAPPA utilises general data structures within an HDS container file,
 with file extension .sdf.  Elsewhere in this help, processing was
 performed on data in this format generated from within KAPPA.
 Generally, you will already have data in `foreign' formats, that is
@@ -8,31 +8,22 @@ formats other than the Starlink standard, particularly in the FITS
 (Flexible Image Transport System), IRAF, and Figaro DST formats.
 The topic "Automatic_Data_Conversion" describes how you can make
 these work `directly' with KAPPA.
-
-You can run CONVERT (cf. SUN/55) directly to perform conversions.
+ You can run CONVERT (cf. SUN/55) directly to perform conversions.
 There is also TRANDAT, which will read a text file of data values,
 or co-ordinates and data values into an NDF, and ASCIN in the
 SPECDRE package (SUN/140).
-
-
-FITS_Readers
-
+ 2 FITS_Readers
 Automatic conversion does not allow you the full control of the
 conversion that direct use of a FITS reader offers and it does not
 deal with the special properties of tape.  FITSIN will read, amongst
 others, simple FITS files including blocked or group format and
 floating-point data from tape.  FITSDIN is its counterpart for disc
 files.  The sub-topics show the FITS readers in action. 
-
-
-Tape
-
-
-FITSIN reads FITS files stored on tape.  For efficiency, you should
+ 2 Tape
+ FITSIN reads FITS files stored on tape.  For efficiency, you should
 select the ``no-rewind'' device for the particular tape drive, for
 example /dev/nrmt0h on OSF and /dev/rmt/1n on Solaris.
-
-We ask for the second file on the tape, and the headers are
+ We ask for the second file on the tape, and the headers are
 displayed so we can decide whether this is the file we want.  It is
 so we supply a name of an NDF to receive the FITS file.  If it
 wasn't we would enter ! to the OUT prompt.  The FMTCNV parameter
@@ -40,8 +31,7 @@ asks whether the data are to be converted to _REAL, using the FITS
 keywords BSCALE and BZERO, if present.  If you are wondering why
 there is (1) after the file number, that's present because FITS
 files can have sub-files, stored as FITS extensions. 
-
-     % fitsin
+      % fitsin
      MT - Tape deck /@/dev/nrmt0h/ >
      The tape is currently positioned at file 1.
      FILES - Give a list of the numbers of the files to be processed > 2
@@ -69,14 +59,12 @@ files can have sub-files, stored as FITS extensions.
      OUT - Output image > ff1
      Completed processing of tape file 2 to ff1.
      MORE - Any more files? /NO/ >
-
-We can trace the structure to reveal the 2-byte integer CCD image.
+ We can trace the structure to reveal the 2-byte integer CCD image.
 Notice that the FITS headers are stored verbatim in a component
 .MORE.FITS. This is the FITS extension.  The extension contents can
 be listed with FITSLIST.  There is more on this NDF extension and
 its purpose in sub-topic "FITS_Airlock". 
-
-     % hdstrace ff1
+      % hdstrace ff1
      FF1  <NDF>
  
         DATA_ARRAY(400,590)  <_WORD>   216,204,220,221,202,222,220,206,218,221,
@@ -88,8 +76,7 @@ its purpose in sub-topic "FITS_Airlock".
                                           ... '   ...','         ING PACKEND','END'
    
      End of Trace.
-
-If you have many FITS files to read there is a quick method for
+ If you have many FITS files to read there is a quick method for
 extracting all files or a selection.  In automatic mode the output
 files are generated without manual intervention and the headers
 aren't reported for efficiency.  Should you want to see the headers,
@@ -97,12 +84,10 @@ write them to a text file via the LOGFILE parameter.  The cost of
 automation is a restriction on the names of the output files, but
 if you have over a hundred files on a tape are you really going to
 name them individually?
-
-The following example extracts the fourth to sixth, and eighth files.
+ The following example extracts the fourth to sixth, and eighth files.
 Note that the [] are needed because the value for parameter FILES is
 a character array. 
-
-     % fitsin auto
+      % fitsin auto
      MT - Tape deck /@/dev/nrmt0h/ >
      FMTCNV - Convert data? /NO/ > y
      PREFIX - Prefix for the NDF file names? /'FITS'/ > JKT
@@ -112,28 +97,21 @@ a character array.
      Completed processing of tape file 6 to JKT6.
      Completed processing of tape file 8 to JKT8.
      MORE - Any more files? /NO/ >
-
-You can list selected FITS headers from a FITS tape without
+ You can list selected FITS headers from a FITS tape without
 attempting to read in the data into NDFs by using FITSHEAD.  You can
 redirect its output to a file to browse at your leisure, and
 identify the files you want to convert.  So for instance, 
-
-     % fitshead /dev/nrmt1h > headers.lis
-
-lists all the FITS headers from a FITS tape on device /dev/nrmt1h
+      % fitshead /dev/nrmt1h > headers.lis
+ lists all the FITS headers from a FITS tape on device /dev/nrmt1h
 to file headers.lis.
-
-After running FITSIN you may notice a file USRDEVDATASET.sdf in
+ After running FITSIN you may notice a file USRDEVDATASET.sdf in
 the current directory.  This HDS file records the current position
 of the tape, so you can use FITSIN to read a few files, and then run
 it again a little later, and FITSIN can carry on from where you left
 off.  In other words FITSIN does not have to rewind to the beginning
 of the tape to count files.  When you're finished you should delete
 this file.
-
-
-Disc
-
+ 3 Disc
 Until comparatively recently there was officially no such thing as
 disc FITS.  However, for many years ad hoc implementations have
 existed.  Of these, FITSDIN will handle files adhering to the FITS
@@ -146,21 +124,16 @@ files as may be produced with Figaro's WDFITS.  FITSDIN will accept
 a list of files with wildcards.  However, a comma-separated list
 must be enclosed in quotation marks.  Also wildcards must be
 protected. Here are some examples so you get the idea. 
-
-     % fitsdin '*.fit'
+      % fitsdin '*.fit'
      % fitsdin \*.fit
      ICL> fitsdin *.fit
      % fitsdin '"i*.fit,abc123.fts"'
      ICL> fitsdin "i*.fit,abc123.fts"
-
-In the following example a floating-point file is read (BITPIX=-32)
+ In the following example a floating-point file is read (BITPIX=-32)
 and so FMTCNV is not required.
-
-     % fitsdin '*.fits'
-
-        2 files to be processed...
-
-     Processing file number 1: /home/scratch/dro/gr.fits.
+      % fitsdin '*.fits'
+         2 files to be processed...
+      Processing file number 1: /home/scratch/dro/gr.fits.
      File /scratch/dro/gr.fits(1)  Descriptors follow:
      SIMPLE  =                    T / Standard FITS format
      BITPIX  =                  -32 / No. of bits per pixel
@@ -210,12 +183,10 @@ and so FMTCNV is not required.
      END
      OUT - Output image > iraf
      Completed processing of disk file /home/scratch/dro/indef.fits to iraf.
-
-NDFTRACE shows that the object name is written to the NDF's title,
+ NDFTRACE shows that the object name is written to the NDF's title,
 that axes derived from the FITS headers are present, and that gr is
 a _REAL NDF.
-
-     % ndftrace gr
+      % ndftrace gr
  
         NDF structure /home/scratch/dro/iraf:
            Title:  artificial image
@@ -251,14 +222,8 @@ called FITS within your NDF.  The extension is a literal copy of all
 the 80-character `card images' in order.  These can be inspected or
 written to a file via the command FITSLIST.  There is more on this
 NDF extension and its purpose in topic "FITS_Airlock".
-
-
-FITS_Airlock
-
-
-
-NDF_Extensions
-
+ 2 FITS_Airlock
+ 3 NDF_Extensions
 An important feature of the NDF is that it is designed to be
 extensible.  The NDF has components whose meanings are well defined
 and universal, and so they can be accessed by general-purpose
@@ -272,8 +237,7 @@ An extension is only processed by software that understands the
 meanings obeys the processing rules of the various components of
 the extension. Other programmes propagate the extension information
 unaltered.
-
-The existence of extensions makes it straightforward to write
+ The existence of extensions makes it straightforward to write
 general utilities for converting an arbitrary format into an NDF.
 The idea being that every specialist package should not have to
 have its own conversion tools such as a FITS reader.  However, this
@@ -282,8 +246,7 @@ to move it into the appropriate extension components.  The aim is to
 make the conversions themselves extensible, with add-on operations
 to move the specialist information to and from the extensions.  This
 is where the FITS `airlock' comes in.
-
-The FITS data format comprises a header followed by the data array
+ The FITS data format comprises a header followed by the data array
 or table.  The header contains a series of 80-character lines each
 of which contains the keyword name, a value and an optional comment.
 There are also some special keywords for commentary.  The meanings
@@ -293,12 +256,8 @@ There is a special NDF extension called FITS, which mirrors this
 functionality, and may be added to an NDF.  It therefore can act as
 an airlock between the general-purpose conversion tools and
 specialist packages.
-
-
-Importing_and_Exporting_from_and_to_the_FITS_Extension
-
-
-The FITS extension comprises a 1-dimensional array of 80-character
+ 3 Importing_and_Exporting_from_and_to_the_FITS_Extension
+ The FITS extension comprises a 1-dimensional array of 80-character
 strings that follow FITS-header formatting rules.  In the case of
 FITSIN and FITSDIN, each FITS extension is a verbatim copy of the
 FITS header of the input file.  Other conversion tools like
@@ -308,49 +267,40 @@ the FITS extension to any FITS headers or equivalent in the foreign
 format.  However, information which is derivable from the standard
 NDF components, such as the array dimensions, data units, and
 linear axes, replaces any equivalent headers from FITS extension.
-
-You use your knowledge, or the writer of the specialist package
+ You use your knowledge, or the writer of the specialist package
 provides import tools, to recognise certain FITS keywords and to
 attribute meaning to them, and then to move or process their values
 to make the specialist extensions.  One such is the PREPARE task in
 IRAS90.  Similarly, the reverse operation---exporting the extension
 information---can occur too, prior to converting the NDF into
 another data format.
-
-KAPPA offers two simple tools for the importing and exporting
+ KAPPA offers two simple tools for the importing and exporting
 of extension information: FITSIMP and FITSEXP.  They both use a text
 file which acts as a translation table between the FITS keyword and
 extension components.  Starting with FITSIMP, its translation table
 might look like this.
-
-     ORDER_NUMBER _INTEGER  ORDNUM 
+      ORDER_NUMBER _INTEGER  ORDNUM 
      PLATE_SCALE  _REAL SCALE         ! The plate scale in arcsec/mm
      SMOOTHED  _LOGICAL FILTERED 
-
-It consists of three fields: the first is the name of the component
+ It consists of three fields: the first is the name of the component
 in the chosen extension, the second is the HDS data type of that
 component, and the third is the FITS keyword.  Optional comments can
 appear following an exclamation mark.  So if we placed these lines
 in file imptable, we could create an extension called MYEXT of data
 type MJC_EXT (if it did not already exist) containing components
 ORDER_NUMBER, PLATE_SCALE, and SMOOTHED.
-
-     % fitsimp mydata imptable myext mjc_ext
-
-Should any of the keywords not exist in the FITS extension, you'll
+      % fitsimp mydata imptable myext mjc_ext
+ Should any of the keywords not exist in the FITS extension, you'll
 be warned.  If the extension already exists, you don't need to
 specify the extension data type.  FITSIMP will even handle
 hierarchical keywords and those much-loved ING packets from La
 Palma.
-
-Going in the opposite direction, the text translation file could look
+ Going in the opposite direction, the text translation file could look
 like this
-
-     MYEXT.ORDER_NUMBER  ORDNUM(LAST) The spectral order number
+      MYEXT.ORDER_NUMBER  ORDNUM(LAST) The spectral order number
      MYEXT.PLATE_SCALE   SCALE   The plate scale in arcsec/mm
      MYEXT.SMOOTHED  FILTERED 
-
-where the first column is the `name' of the extension component to
+ where the first column is the `name' of the extension component to
 be copied to the FITS extension.  The `name' includes the extension
 name and substructures.  The second column gives the FITS keyword to
 which to write the value.  A further keyword in parentheses
@@ -361,57 +311,41 @@ appears immediately before the END header line in the FITS
 extension.  Thus the value of ORDER_NUMBER in extension MYEXT,
 creates a new keyword in the FITS extension called ORDNUM, and it is
 located immediately prior the keyword LAST.
-
-
-Listing_the_FITS_extension_and_keywords
-
-
-If you don't want to be bothered with NDF extensions, you might just
+ 3 Listing_the_FITS_extension_and_keywords
+ If you don't want to be bothered with NDF extensions, you might just
 want to know the value of some FITS keyword, say the exposure time,
 as part of your data processing.  FITSLIST lists the contents of the
 FITS extension of an NDF or file.  You can even search for keywords
 with grep.
-
-     % fitslist myndf | grep "ELAPSED ="
-
-This would find the keyword ELAPSED in the FITS extension of NDF
+      % fitslist myndf | grep "ELAPSED ="
+ This would find the keyword ELAPSED in the FITS extension of NDF
 myndf.  (Keywords are 8 characters long and those with values are
 immediately followed by an equals sign.)  However, the recommended
 way is to use the FITSVAL command.  Since this command only reports
 the value, it is particularly useful in scripts that need
 ancillary-data values during processing.  The following obtains the
 value of keyword ELAPSED.
-
-     % fitsval myndf ELAPSED
-
-In a script you may need to know whether the keyword exists and take
+      % fitsval myndf ELAPSED
+ In a script you may need to know whether the keyword exists and take
 appropriate action.
-
-     filterpre = `fitsexist myndf filter`
+      filterpre = `fitsexist myndf filter`
      if ( $filterpre == "TRUE" ) then
         filter = `fitsval myndf filter`
      else
         prompt -n "Filter > "
         set filter = $<
      endif
-
-Shell variable filterpres would be assigned "TRUE" when the FILTER
+ Shell variable filterpres would be assigned "TRUE" when the FILTER
 card is present, and "FALSE" otherwise.  (The ` ` quotes cause the
 enclosed command to be executed.)  So the user of the script would
 be prompted for a filter name whenever the NDF did not contain that
 information.
-
-
-Creating_and_Editing_the_FITS_Extension
-
-
-Besides the conversion utilities, you can import your own FITS
+ 3 Creating_and_Editing_the_FITS_Extension
+ Besides the conversion utilities, you can import your own FITS
 extension using FITSTEXT.  You first prepare a FITS-like header in
 a text file.  For example,
-
-     % fitstext myndf myfile
-
-places the contents of myfile in the NDF called myndf.  This is not
+      % fitstext myndf myfile
+ places the contents of myfile in the NDF called myndf.  This is not
 advised unless you are familiar with the rules for writing FITS
 headers.  See the NOST "A User's Guide to FITS".  You find this and
 other useful FITS documents, test files, and software at the FITS
@@ -420,61 +354,228 @@ http://www.gsfc.nasa.gov/astro/fits/fits_home.html).  FITSTEXT does
 perform some limited validation of the FITS headers, and informs you
 of any problems it detects.  See the "FITSHEAD Notes" topic for
 details. 
-
-A safer bet for a hand-crafted FITS extension is to edit an existing
+ A safer bet for a hand-crafted FITS extension is to edit an existing
 FITS extension to change a value, or use existing lines as templates
 for any new keywords you wish to add.  FITSEDIT lets you do this
 with your favourite text editor.  Define the environment variable
 EDITOR to your editor, say
-
-     % setenv EDITOR jed
-
-to choose jed.  If you don't do this, and EDITOR is unassigned,
+      % setenv EDITOR jed
+ to choose jed.  If you don't do this, and EDITOR is unassigned,
 FITSEDIT selects the vi editor.  Then to edit the NDF extension
 is simple.
-
-     % fitsedit myndf
-
-This edits the FITS extension of the NDF called myndf.  FITSEDIT
+      % fitsedit myndf
+ This edits the FITS extension of the NDF called myndf.  FITSEDIT
 extracts the file into a temporary file (zzfitsedit.tmp) which you
 edit, and then uses FITSTEXT to restore the FITS extension.  It
 therefore has the same parsing of the edited FITS headers as
 FITSTEXT provides.
-
-
-Easy Easy_way_to_create_and_edit_the_FITS_Extension
-
-
-Should you wish to write a new value without knowing about FITS,
+ 3 Easy Easy_way_to_create_and_edit_the_FITS_Extension
+ Should you wish to write a new value without knowing about FITS,
 or in a script where manual editing is undesirable, the FITSWRITE
 command does the job.  So for example,
-
-     % fitswrite myndf filter value=K
-
-will create a keyword FILTER with value K in the FITS extension
+      % fitswrite myndf filter value=K
+ will create a keyword FILTER with value K in the FITS extension
 of the NDF called myndf.  If the extension does not exist, this
 command will first create it.
-
-The FITSMOD command has several editing options including the
+ The FITSMOD command has several editing options including the
 ability to delete a keyword:
-
-    % fitsmod myndf airmass edit=delete
-
-here it removes the AIRMASS header; or rename a keyword:
-
-     % fitsmod myndf band rename newkey=filter
-
-as in this example, where keyword BAND becomes keyword FILTER; or
+     % fitsmod myndf airmass edit=delete
+ here it removes the AIRMASS header; or rename a keyword:
+      % fitsmod myndf band rename newkey=filter
+ as in this example, where keyword BAND becomes keyword FILTER; or
 update an existing keyword:
-
-     % fitsmod myndf filter edit=u value=\$V \
+      % fitsmod myndf filter edit=u value=\$V \
        comment='"Standard filter name"'
-
-this example modifies the comment string associated with the FILTER
+ this example modifies the comment string associated with the FILTER
 keyword, leaving the value unchanged.
-
-For routine operations requiring many operations on a dataset,
+ For routine operations requiring many operations on a dataset,
 FITSMOD lets you specify the editing instructions in a text file.
+  1 Getting_Started
+Look at help topic "Hints", and the sub-topics and references
+therein.
+ 1 GLITCH
+    Replaces bad pixels in a 2-d data array with the local median.
+ 
+   This application removes bad pixels from a 2-d data array, stored
+   in the input IMAGE structure, and replaces them with the local
+   median of the eight (or less at the edges) neighbouring pixels.
+   At least three defined pixels must be in the neighbourhood,
+   otherwise the resultant pixel becomes bad.
+ 
+   There are three modes of use:
+ 
+   1. The application can be used interactively until the user is
+      finished cleaning his array. The user specifies the position of
+      `glitches' or bad pixels by their x and y pixel indices.
+   2. The user can give the name of a file which contains a free-
+      format list giving the x and y positions of the pixels to be
+      deglitched. The glitch list file should look like the following
+      example:
+ 
+     Glitch list for SBRC FPA#005
+     22  45
+     19  56
+     2   30
+     .   .
+     .   .
+     .   .
+     <EOF>
+ 
+      i.e. a header string that is output to the user, followed by
+      integer x-y pixel position pairs, terminated just by the
+      end-of-file marker. The header string is output to the user.
+   3. The bad (undefined/magic) pixels are automatically deglitched.
+      (Edge, especially corner pixels will need checking if the
+      density of bad pixels is high, because of the constraints
+      mentioned above. Such conditions may require a repeat dose of
+      this application, probably with option 1 or 2.)
+ 
+   The magic-value method is used for processing bad data.
 
+AUTHORS
 
+   Mark McCaughrean UoE (REVA::MJM)
+   Malcolm Currie  STARLINK (RAL::CUR)
+
+HISTORY
+
+   07-06-1985 : Started A-task implementation (REVA::MJM)
+   28-06-1985 : Changed to continually update the input array
+              : until no more deglitching done, then followed
+              : by request for output array, and copying over.
+              : (REVA::MJM)
+   09-12-1985 : Fixed error checking bug and implemented AIF
+              : dynamic defaulting/checking calls (UKTH::MARK)
+   11-12-1985 : Fixed bug caused by continuous updating of read
+              : only array - changed program order (UKTH::MARK)
+   11-04-1986 : Tidied up and increased error checking (REVA::MJM)
+   24-06-1986 : Included option to deglitch from a free-format list
+              : in a file (REVA::MJM)
+   1986 Aug 5 : Renamed algorithm subroutines (GLTCLT and GLTCSB).
+                Correctly ordered arguments in GLTCLT (2nd to 3rd)
+                and GLTCSB (2nd to 4th) (RAL::CUR).
+   1986 Aug 29: Added arguments section to the prologue, nearly
+                conformed to Starlink standards (RAL::CUR).
+   1987 Oct 15: Reordered tidying and extra status check
+                (RAL::CUR).
+   1988 Mar 17: Referred to `array' rather than `image'. Added
+                automatic removal of bad pixels (RAL::CUR).
+   1988 Jun 6 : More reporting of error context (RAL::CUR)
+   1988 Jun 30: Obtain filename in GLTCLT (RAL::CUR).
+   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
+   1989 Jul 27: Passed array dimensions as separate variables
+                to COPY2D, GLTBSB, GLTCLT and GLTCSB (RAL::CUR).
+   1991 Oct 25: Propagates AXIS, HISTORY, LABEL, and UNITS
+                (RAL::CUR).
+   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
+   1992 Mar  3: Replaced AIF parameter-system calls by the extended
+                PAR library (RAL::CUR).
+
+PARAMETERS
+
+   INPIC  =  IMAGE( READ )
+       IMAGE structure containing the 2-d data array to be
+         deglitched.
+   OUTPIC  =  IMAGE( WRITE )
+       Output IMAGE structure containing the deglitched version of
+         the data array.
+   OTITLE  =  CHAR( READ )
+       Title for the output IMAGE structure.
+   WHERE  =  CHAR( READ )
+       Source of glitch positions: 'Interface' or 'File' or 'Bad'.
+   FILENAME  =  CHAR( READ )
+       File containing the free-format glitch list.
+   XCOORD  =  INTEGER( READ )
+       x pixel index of the pixel to be deglitched.
+   YCOORD  =  INTEGER( READ )
+       y pixel index of the pixel to be deglitched.
+   AGAIN  =  LOGICAL( READ )
+       Whether or not user is prompted for another pixel.
+
+INPIC
+
+  position    1
+  keyword     'INPIC'
+  type        'IMAGE'
+  access      'READ'
+  vpath       'PROMPT'
+  ppath       'GLOBAL'
+  association '<-GLOBAL.DATA_ARRAY'
+  prompt      'Image to be deglitched'
+  help        'Name of the IMAGE structure containing the 2-d data 
+              array to be deglitched.'
+
+OUTPIC
+
+  position    2
+  keyword     'OUTPIC'
+  type        'IMAGE'
+  access      'WRITE'
+  vpath       'PROMPT'
+  association '->GLOBAL.DATA_ARRAY'
+  prompt      'Image after being deglitched'
+  help        'Name given to the IMAGE structure to hold the data 
+              array after being deglitched.'
+
+OTITLE
+
+  position    3
+  keyword     'OTITLE'
+  type        'LITERAL'
+  vpath       'DEFAULT'
+  prompt      'Title for output image'
+  default     'KAPPA - Glitch'
+  help        'Character string used as a title for the output IMAGE 
+              structure.'
+
+WHERE
+
+  keyword     'WHERE'
+  type        'LITERAL'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'Source of glitch positions'
+  help        'File for free-format file list, Interface for input
+              from environment, Bad for automatic removal of bad
+              (magic) pixels.'
+ #in          'File', 'Interface', 'Bad'
+
+FILENAME
+
+  keyword     'FILENAME'
+  type        'FILENAME'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  prompt      'Glitch list file name'
+  default     GLITCH.LIS
+  help        'Give the name of the free-format file containing x,y 
+              positions of pixels.'
+
+XCOORD
+
+  keyword     'XCOORD'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'x pixel index of pixel to be replaced'
+  help        'Give the x pixel index of the pixel to be deglitched.'
+
+YCOORD
+
+  keyword     'YCOORD'
+  type        '_INTEGER'
+  vpath       'PROMPT'
+  ppath       'CURRENT,DYNAMIC'
+  prompt      'y pixel index of pixel to be replaced'
+  help        'Give the y pixel index of the pixel to be deglitched.'
+
+AGAIN
+
+  keyword     'AGAIN'
+  type        '_LOGICAL'
+  vpath       'PROMPT'
+  ppath       'DEFAULT'
+  prompt      'Another pixel ?'
+  default     YES
+  help        'Whether or not another pixel is to be deglitched.'
 .endhelp

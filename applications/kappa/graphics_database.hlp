@@ -12,15 +12,13 @@ A picture's position and extent are added to the database
 immediately after the plot is created.  The latter technique is
 incorporated in AGI (cf. SUN/48)--the graphics database---which
 can store information about plots on any graphics device.
-
-AGI also stores a name and a comment for each picture.  Optionally,
+ AGI also stores a name and a comment for each picture.  Optionally,
 a label may be added. `Name' is something of a misnomer---`type'
 would give a clearer indication of its purpose.  In the same way
 `label' would have been called `name', but for the fact that `name'
 was in use.  Confused?  Don't worry.  It will become clear in a
 moment. 
-
-Currently, the name can take one of four values: "BASE" or "FRAME"
+ Currently, the name can take one of four values: "BASE" or "FRAME"
 or  "DATA" or  "KEY".  "BASE" is reserved for the base picture; this
 is the picture that extends over the whole of the plotting area.
 "DATA" indicates that the picture contains a representation of data
@@ -37,17 +35,12 @@ KAPPA commentary might be under your control via a parameter
 in each graphics application, and that defaults to the application
 name as above.  What you can control now is the label.  This is a
 name you assign to a picture for easy reference and selection. 
-
-All KAPPA graphics applications use AGI, where new plots are being
+ All KAPPA graphics applications use AGI, where new plots are being
 drawn or co-ordinates are required. The best way to demonstrate
 KAPPA and AGI in harness is to see some illustrated examples. 
 See Section 9.1 of SUN/95.
-
-
-AGI_and_KAPPA_in_action
-
-
-This has been lifted from SUN/95 with slight modifications, and
+ 2 AGI_and_KAPPA_in_action
+ This has been lifted from SUN/95 with slight modifications, and
 probably ought to be re-written and re-structured for help library
 use, particularly because the figures cannot be reproduced here. You
 are recommended to consult SUN/95 Section 9.1.  However, if you
@@ -56,37 +49,28 @@ follow this tutorial you will see the effects more clearly on the
 terminal screen than in the high-contrast photocopies.  It's
 probably best seen in the hypertext form of this topic, as the
 figures there are in glorious colour. 
-
-Assuming that KAPPA is loaded and the graphics device---an
+ Assuming that KAPPA is loaded and the graphics device---an
 X-window of geometry 1024 by 780 pixels in the following
 examples---is available.  To create such a window use the xmake
 SUN/130) command
-
-     % xmake xwindows -geom 1024x780 -overlay -colours 64
-
-selecting an overlay and not too many colours.
-
-First of all we make the X-window the current graphics device and
+      % xmake xwindows -geom 1024x780 -overlay -colours 64
+ selecting an overlay and not too many colours.
+ First of all we make the X-window the current graphics device and
 image display, and the X-window overlay the image-display overlay
 (as described in topic "Selecting_Graphics_Devices").  These will
 remain in force until changed.  The following commands would not be
 necessary if the global parameters already had these values.
-
-     ICL> gdset xwindows
+      ICL> gdset xwindows
      ICL> idset xwindows
      ICL> ovset xoverlay
-
-Next we shall clear the X-window, and purge the database of xwindows
+ Next we shall clear the X-window, and purge the database of xwindows
 and xoverlay pictures.  Note it does not clear the overlay, just the
 database entries, because AGI knows that the two graphics devices
 use the same screen, but GKS does not.
-
-     ICL> gdclear
-
-One picture remains in the database---the BASE---because AGI must
+      ICL> gdclear
+ One picture remains in the database---the BASE---because AGI must
 always have a current picture into which further plots are drawn.
-
-Next we display a CCD frame scaled between defined limits.  (The NDF
+ Next we display a CCD frame scaled between defined limits.  (The NDF
 used in this demonstration is $KAPPA_DIR/ccdframec).  Details of
 the displayed image are recorded in the graphics database, but the
 current picture continues to be the BASE.  In other words the
@@ -100,13 +84,11 @@ distance, since new pictures cannot be drawn outside the current
 picture.  DISPLAY, in keeping with other graphics applications,
 does not write a label.  We'll see later how to annotate a picture
 with a label.
-
-     ICL> display $KAPPA_DIR/ccdframec centre=[390,300]
+      ICL> display $KAPPA_DIR/ccdframec centre=[390,300]
      MODE - Method to define scaling limits /'FLASH'/ > SC
      LOW - Low value for display /2250/ > 2300
      HIGH - High value for display /30790.99/ > 4700
-
-Unlike the earlier example where the image was plotted in the
+ Unlike the earlier example where the image was plotted in the
 centre of the screen, here it is shifted down and to the left. 
 CENTRE=[390,300] means position the pixel (390,300) in the array
 at the centre of the current picture.  As you can see the pixel can
@@ -114,18 +96,15 @@ lie outside the bounds of the array.  By default DISPLAY places the
 central pixel at the centre of the current picture.  When the
 current picture is the BASE, this location is therefore at the
 centre of the screen as we have here.
-
-To illustrate this point and introduce a new command we shall plot
+ To illustrate this point and introduce a new command we shall plot
 the same data array in a picture at the top right of the screen
-
-     ICL> picdef mode=tr
+      ICL> picdef mode=tr
      ICL> display
      IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
      MODE - Method to define scaling limits /'SCALE'/ >
      LOW - Low value for display /2250/ > 2300
      HIGH - High value for display /30790.99/ > 4700
-
-PICDEF creates a new FRAME picture in the database.  It is half the
+ PICDEF creates a new FRAME picture in the database.  It is half the
 linear size of the BASE picture, and is located in the top-right
 corner (hence MODE=TR).  The picture is empty, but it still becomes
 the new current picture.  Therefore when DISPLAY comes along and
@@ -141,24 +120,18 @@ an enlarged portion of the image within the current picture.
 processing a rectangular portion of an NDF.)  Only the part of the
 magnified image that is located within the current picture will be
 visible; there is no spillage into other pictures.
-
-     ICL> display xmagn=2.5 ymagn=2.5
+      ICL> display xmagn=2.5 ymagn=2.5
      IN - NDF to be displayed /@$KAPPA_DIR/ccdframec/ >
      MODE - Method to define scaling limits /'SCALE'/ >
      LOW - Low value for display /2250/ > 2300
      HIGH - High value for display /30790.99/ > 4700
-
-Before we plot any more pictures we can give the current
+ Before we plot any more pictures we can give the current
 picture---still the frame created by PICDEF---a label.
-
-     ICL> piclabel eric
-
-If we move to or create a new current picture, and then want to
+      ICL> piclabel eric
+ If we move to or create a new current picture, and then want to
 return to ERIC all we have to enter is
-
-     ICL> picsel eric
-
-The graphics database is not restricted to images.  To show this we
+      ICL> picsel eric
+ The graphics database is not restricted to images.  To show this we
 shall draw a contour plot in the bottom-right corner of the BASE
 picture.  The new picture has the aspect ratio of the BASE picture.
 Its dimension is measured as a fraction of the linear size of the
@@ -166,69 +139,55 @@ BASE picture, which is controlled by the parameter FRACTION.  The
 current picture is not cleared before plotting so you can see
 through the contour plot to the galaxy image behind.  The
 NOOUTLINE prevents an outline from being drawn around the picture.
-
-     ICL> picdef mode=br fraction=0.65 nooutline
+      ICL> picdef mode=br fraction=0.65 nooutline
      ICL> turbocont $KAPPA_DIR/ccdframec(51:250,141:330) noclear ~
      pltitl="AGI demonstration"
      MODE - Method for selecting contour heights /'FREE'/ > ar
      NCONT - Give the number of contour heights /6/ > 5
      Contour heights used:
      2478.022,   2560,958,   2697.029,   3042.488,   4050.937.
-
-The PICDEF command allows you to define new pictures with any
+ The PICDEF command allows you to define new pictures with any
 aspect ratio.  To do this you can supply a value for the ASPECT
 parameter, or define explicit limits (mode=xy) or use the cursor
 (mode=cursor)---the default.  Also, you may constrain the new
 picture to lie within the current picture with parameter CURRENT.
 In this case the fractional size and aspect ratio relate to the
 current picture.
-
-     ICL> picdef current
+      ICL> picdef current
      To select a point press the left button on the mouse or trackerball.
      To exit press the right button.
      Use the cursor to select 2 distinct points.
-
-If you try to select a point outside the current picture you will
+ If you try to select a point outside the current picture you will
 be told and the cursor position is reset.
-
-     Point lies outside the allowed region.
+      Point lies outside the allowed region.
      Co-ordinates are ( 0.5160462, 1.0269577E-02 ) and ( 0.8908858, 0.6046214 )
-
-Notice there is an outline of the region selected, as it is drawn
+ Notice there is an outline of the region selected, as it is drawn
 by default.
-
-Now draw a greyscale plot and its key within the region.  The extent
+ Now draw a greyscale plot and its key within the region.  The extent
 of the new current picture can be seen in silhouette against the
 earlier pictures.
-
-     ICL> greyplot $KAPPA_DIR/ccdframec pltitl="AGI demonstration"
+      ICL> greyplot $KAPPA_DIR/ccdframec pltitl="AGI demonstration"
      KEY - Do you want a key of the grey levels and a title ? /TRUE/ >
      MODE - Method to define scaling limits /'SCALE'/ >
      BLACK - Value to be black in the plot? /30790.99/ > 4700
      WHITE - Value to be white in the plot? /2250/ > 2300
-
-PICDEF has one further mode---Array.  This enables you to create an
+ PICDEF has one further mode---Array.  This enables you to create an
 n x m grid of new FRAME pictures.  It also has a mechanism for
 labelling all the pictures, so you can easily switch between the
 elements of the picture array.  You might use the following command
 in an ICL procedure to display a series of up to twelve spectra.
-
-     ICL> picdef mode=a prefix=spec xpic=3 ypic=4
-
-The bottom-left picture would be labelled SPEC1 and the rest are
+      ICL> picdef mode=a prefix=spec xpic=3 ypic=4
+ The bottom-left picture would be labelled SPEC1 and the rest are
 numbered in sequence from left to right to SPEC12---the top-right
 picture.  You'd call PICSEL to select each picture in turn via
 the ICL SNAME function (see topic "Procedures ICL" or the ICL help),
 or use a while loop in a C-shell script (see topic "Procedures
 C_Shell").  Since this is a common operation a shorthand command,
 PICGRID, is available.  For instance,
-
-     ICL> picgrid 3 4
-
-is equivalent to the previous example, except that the pictures are
+      ICL> picgrid 3 4
+ is equivalent to the previous example, except that the pictures are
 labelled 1 to 12.
-
-You can see that montages of pictures can rapidly be built.
+ You can see that montages of pictures can rapidly be built.
 Occasionally, you will want some earlier picture to become the
 current picture.  As we've seen labelled picture can be recalled
 via PICSEL, but not all pictures will be labelled, especially ones
@@ -249,8 +208,7 @@ PICCUR reports the name, comment and the label (if it there is one)
 of the picture in which the cursor is located to assist you.  It is
 usually quite obvious where pictures begin and end, so in practice
 it is easier than described here.
-
-There is another way of selecting a new current picture, and is
+ There is another way of selecting a new current picture, and is
 essential for accessing `obscured' pictures---PICLIST.  Besides
 listing all the pictures with a specified name for the current
 graphics device, PICLIST offers a means of making any of the listed
@@ -258,8 +216,7 @@ pictures the current picture.  There are a number of synonym
 commands derived from PICLIST; these let you select the
 last-created picture (PICLAST) or the BASE picture (PICBASE),
 amongst others.
-
-Sometimes you will want to know where you can place another picture
+ Sometimes you will want to know where you can place another picture
 without it hiding or overwriting an existing plot.  There are three
 tasks for selecting suitable FRAME pictures: PICEMPTY, PICENTIRE,
 and PICVIS.  Suppose, for instance, you have created a substantial
@@ -268,15 +225,13 @@ Fabry-Perot data cube.  Now you could select each FRAME picture by
 remembering or computing its label and passing it to PICSEL.
 A quicker approach is to run PICEMPTY, to select the next empty
 FRAME picture before plotting each spectrum.
-
-If you do get lost or forget what and where the current picture is,
+ If you do get lost or forget what and where the current picture is,
 the GDSTATE command will come to your rescue.  You can even plot an
 outline with the OUTLINE keyword if you can't visualise the device
 co-ordinates.  The current picture does not have a label.  If it did
 this too would be listed by GDSTATE.  PICLIST also flags the current
 picture with a C to the left of the picture numbers.
-
-     ICL> gdstate
+      ICL> gdstate
  
      Status of the xwindows window graphics device...
         Physical device: 
@@ -290,8 +245,7 @@ picture with a C to the left of the picture numbers.
                     X = 0.3930821 to 0.6786044
                     Y = 7.822529E-03 to 0.4605515
  
-
-Let us select the first picture that we displayed (the image to the
+ Let us select the first picture that we displayed (the image to the
 bottom left).  Having done so we can then inspect some of the data
 in that picture.  INSPECT looks for the topmost data picture within
 the current picture.  This may be the current picture itself.  Using
@@ -304,23 +258,17 @@ override the NDF stored in AGI by specifying the NDF you want on the
 command line.  Sometimes you might obtain the wrong array; see topic
 "Problems_Problems" on what to do.  In the example below a slice
 through the CCD frame is plotted on the overlay plane.
-
-     ICL> piccur
-
-     Use the graphics cursor to define the next point or picture...
+      ICL> piccur
+      Use the graphics cursor to define the next point or picture...
         Press left button on mouse/trackerball to select a point.
         Press right button on mouse/trackerball to end input.
-
-      X = 183.4733, Y = 264.575 in KAPPA_DISPLAY ( DATA )
-
-     ICL> inspect
-
-     For certain options, boxes will appear...
+       X = 183.4733, Y = 264.575 in KAPPA_DISPLAY ( DATA )
+      ICL> inspect
+      For certain options, boxes will appear...
         Press keyboard "1" or the space bar to select the operation shown to the left
         Press keyboard "2" to select the operation shown in the middle box.
         Press keyboard "." to select the operation shown in the right box.
-
-     Current picture has name: DATA, comment: KAPPA_DISPLAY
+      Current picture has name: DATA, comment: KAPPA_DISPLAY
      Using /star/bin/kappa/ccdframec as the input NDF.
      GDEVICE - Graphics device is to be used for line plots > xov
      OPTION - Option required /'Region'/ > SL
@@ -328,15 +276,13 @@ through the CCD frame is plotted on the overlay plane.
      Type the null character, !, if the slice is not to be saved.
      SLNAME - Name of file to save slice /!/ >
      OPTION - Option required /'Region'/ > E
-
-A word of warning about the device for GDEVICE.  Don't use the base
+ A word of warning about the device for GDEVICE.  Don't use the base
 plane of the image display, in this case xwindows.  Otherwise your
 underlying images will be erased when a line plot is drawn.  The
 current-graphics-device scheme breaks down here.  Both options: no
 default or occasionally a harmful default, are undesirable.  Anyway
 you've been warned!
-
-Using the same picture we can now demonstrate the contour-overlay
+ Using the same picture we can now demonstrate the contour-overlay
 application, CONTOVER.  The data array we have employed so far is
 smoothed with GAUSMOOTH; the origin is shifted with SETORIGIN,
 (moving the image ten pixels left and twenty down); and then all
@@ -350,16 +296,14 @@ reports the name of the NDF used for the underlying image, so if
 for some reason it is not the one you intended, just abort (!!) at
 the prompt for parameter OFFSET.  (You can check what the reference
 object will be with the PICIN command.)
-
-     ICL> contover
+      ICL> contover
      NDF - Image to be contoured /@$KAPPA_DIR/ccdframec/ > ccdcircle
      Current picture has name: DATA, comment: KAPPA_DISPLAY
         Reference data object: /star/bin/kappa/ccdframec.
      OFFSET - x-y displacement in pixels /0,0/ > 10,20
      MODE - Method for selecting contour heights /'Free'/ >
      HEIGHTS - Give the heights of the contours > [2400,2500,2650,2900,3300,3900]
-
-Application PICCUR has a dual role.  It also provides a means of
+ Application PICCUR has a dual role.  It also provides a means of
 determining the co-ordinates of points in pictures selected with the
 cursor.  Again only the topmost picture at a given cursor location
 is accessible.  Each time the left-hand button is pressed the
@@ -368,16 +312,13 @@ presented.  This is the dynamic mode ("Dynamic").  The other options
 let you obtain co-ordinates in the reference frames of the current
 picture ("Current") or anchored ("Anchor") to the picture at the
 first cursor position selected.
-
-     ICL> piccur
-
-     Use the graphics cursor to define the next point or picture...
+      ICL> piccur
+      Use the graphics cursor to define the next point or picture...
         Press left button on mouse/trackerball to select a point.
          Press right button on mouse/trackerball to end input.
      To select a point press the left button on the mouse or trackerball.
      To exit press the right button.
-
-      X = 245.6915, Y = 400.4704 in KAPPA_GREYPLOT ( DATA )
+       X = 245.6915, Y = 400.4704 in KAPPA_GREYPLOT ( DATA )
       X = 0.8398062, Y = 1.04369 in KAPPA_GREYPLOT ( FRAME )
       X = 239.562, Y = 279.4127 in KAPPA_CONTOUR ( DATA )
       X = 241.1404, Y = 298.2021
@@ -389,10 +330,8 @@ first cursor position selected.
       X = -7.8452587E-02, Y = 0.838221 in KAPPA_CONTOUR ( KEY )
       X = 0.7147477, Y = 0.5338036
       X = 0.7361856, Y = 0.5252284
-
-You can record the co-ordinates in a text file.
-
-If you don't want to affect the graphics database, but still obtain
+ You can record the co-ordinates in a text file.
+ If you don't want to affect the graphics database, but still obtain
 co-ordinates of features in an image, use the closely related
 CURSOR, which also allows selected points to marked or joined. It
 also permits you to remove previous points if you make a mistake.
@@ -400,10 +339,7 @@ CURSOR has output parameters so that you can pass the co-ordinates
 of the selected points to a script or other applications.  There is
 also the XYcur option in INSPECT; it marks the points selected, and
 allows updating of lists of x-y positions stored in text files. 
-
-
-Tidying
-
+ 2 Tidying
 The contents of the graphics database are ephemeral.  Therefore you
 should regularly purge the database entries with GDCLEAR (or
 optionally via IDCLEAR for the current image display), or delete
@@ -421,15 +357,13 @@ a printer device.
 
 Co-ordinate_system
 
-
-Programmers who wish to have their own graphics applications
+ Programmers who wish to have their own graphics applications
 co-operating with KAPPA will need to use the same co-ordinate
 systems and convention for storing them in the graphics database.
 See topic: "Co-ordinate_systems".  For clarity, the Starlink
 convention described in the aforementioned topic, is re-iterated
 in the database context. 
-
-KAPPA uses the Starlink standard co-ordinate system for data arrays
+ KAPPA uses the Starlink standard co-ordinate system for data arrays
 as described in SSN/22.  Thus the picture extent of greyscales and
 contour plots of an image is LOW-1 to HIGH in each axis, where LOW
 and HIGH are the pixel indices defining the lower and upper limits

@@ -1,33 +1,26 @@
 .help display Starlink kappa
 .nf
 Displays a 1-d or 2-d NDF.
-
-Usage:
-
-   display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
+ Usage:
+    display in [comp] clear [device] mode [centre] [xmagn] [ymagn]
       [out] { low=? high=?
             { percentiles=?
             { sigmas=?
             mode
-
-Description:
-
-   This application displays a 1- or 2-dimensional NDF as an image
+ Description:
+    This application displays a 1- or 2-dimensional NDF as an image
    on the current image-display device. The minimum and maximum data
    values to be displayed can be selected in several ways (see
    parameter MODE). Data values outside these limits are displayed
    with the colour of the nearest limit.
-
-   Annotated axes or a simple border can be drawn around the image (see
+    Annotated axes or a simple border can be drawn around the image (see
    parameters AXES and BORDER). The appearance of these may be controlled
    in detail (see parameters STYLE and BORSTYLE).
-
-   A specified colour lookup table may optionally be loaded prior to
+    A specified colour lookup table may optionally be loaded prior to
    displaying the image (see parameter LUT). For devices which reset
    the colour table when opened (such as postscript files), this may
    be the only way of controlling the colour table.
-
-   The image is produced within the current graphics database picture
+    The image is produced within the current graphics database picture
    The co-ordinates at the centre of the image, and the scale of the
    image can be controlled using parameters CENTRE, XMAGN and YMAGN. Only
    the parts of the image that lie within the current picture are visible;
@@ -53,18 +46,13 @@ BADCOL
 BADCOL = LITERAL (Read)
    The colour with which to mark any bad (i.e. missing) pixels in the
    display.  There are a number of options described below:
-
-   - "MAX" -- The maximum colour index used for the display of the image.
-
-   - "MIN" -- The minimum colour index used for the display of the image.
-
-   - An integer -- The actual colour index.  It is constrained between
+    - "MAX" -- The maximum colour index used for the display of the image.
+    - "MIN" -- The minimum colour index used for the display of the image.
+    - An integer -- The actual colour index.  It is constrained between
    0 and the maximum colour index available on the device.
-
-   - A named colour -- Uses the named colour from the palette, and if it
+    - A named colour -- Uses the named colour from the palette, and if it
    is not present, the nearest colour from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
+    If the colour is to remain unaltered as the lookup table is
    manipulated choose an integer between 0 and 15, or a named
    colour.  The suggested default is the current value. [current value]
 
@@ -89,20 +77,16 @@ BORSTYLE
 BORSTYLE = GROUP (Read)
    A group of attribute settings describing the plotting style to use
    for the border (see parameter BORDER).
-
-   A comma-separated list of strings should be given in which each
+    A comma-separated list of strings should be given in which each
    string is either an attribute setting, or the name of a text file
    preceded by an up-arrow character "^". Such text files should
    contain further comma-separated lists which will be read and
    interpreted in the same manner. Attribute settings are applied in
    the order in which they occur within the list, with later settings
    over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
+    Each individual attribute setting should be of the form:
+       <name>=<value>
+    where <name> is the name of a plotting attribute, and <value> is
    the value to assign to the attribute. Default values will be
    used for any unspecified attributes. All attributes will be
    defaulted if a null value (!) is supplied. See section "Plotting
@@ -194,8 +178,7 @@ LUT = NDF (Read)
    the new colour table remains after this application has
    completed. A null value (! ) causes the existing colour table to
    be used.
-
-   The LUT must be 2-dimensional, the dimension of the first axis
+    The LUT must be 2-dimensional, the dimension of the first axis
    being 3, and the second being arbitrary.  The method used to
    compress or expand the colour table if the second dimension is
    different from the number of unreserved colour indices is
@@ -221,28 +204,22 @@ MODE
 MODE = LITERAL (Read)
    The method by which the maximum and minimum data values to be
    displayed are chosen. The options are:
-
-   - "Faint" -- The image is scaled between the mean data value minus
+    - "Faint" -- The image is scaled between the mean data value minus
    one standard deviation and the mean data value plus seven standard
    deviations. The scaling values are reported so that the faster
    Scale mode may be utilised later.
-
-   - "Flash" -- The image is flashed onto the screen without any
+    - "Flash" -- The image is flashed onto the screen without any
    scaling at all.  This is the fastest option.
-
-   - "Percentiles" -- The image is scaled between the data values
+    - "Percentiles" -- The image is scaled between the data values
    corresponding to two percentiles.  The scaling values are reported
    so that the faster Scale mode may be utilised later.
-
-   - "Range" -- The image is scaled between the minimum and maximum
+    - "Range" -- The image is scaled between the minimum and maximum
    data values.
-
-   - "Scale" -- You define the upper and lower limits between which
+    - "Scale" -- You define the upper and lower limits between which
    the image is to be scaled.  The application reports the maximum
    and the minimum data values for reference and makes these the
    suggested defaults.
-
-   - "Sigmas" -- The image is scaled between two standard-deviation
+    - "Sigmas" -- The image is scaled between two standard-deviation
    limits.  The scaling values used are reported so that the faster
    Scale mode may be utilised later.
 
@@ -322,20 +299,16 @@ STYLE
 STYLE = GROUP (Read)
    A group of attribute settings describing the plotting style to use
    for the annotated axes (see parameter AXES).
-
-   A comma-separated list of strings should be given in which each
+    A comma-separated list of strings should be given in which each
    string is either an attribute setting, or the name of a text file
    preceded by an up-arrow character "^". Such text files should
    contain further comma-separated lists which will be read and
    interpreted in the same manner. Attribute settings are applied in
    the order in which they occur within the list, with later settings
    over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
+    Each individual attribute setting should be of the form:
+       <name>=<value>
+    where <name> is the name of a plotting attribute, and <value> is
    the value to assign to the attribute. Default values will be
    used for any unspecified attributes. All attributes will be
    defaulted if a null value (!) is supplied. See section "Plotting
@@ -385,16 +358,14 @@ display ngc6872 mode=p percentiles=[10,90] noaxes
    Displays the NDF called ngc6872 on the current image-display
    device.  The scaling is between the 10 and 90 per cent
    percentiles of the image. No annotated axes are produced.
-
-display vv256 mode=flash noaxes border borstyle="colour=blue,style=2"
+ display vv256 mode=flash noaxes border borstyle="colour=blue,style=2"
    Displays the NDF called vv256 on the current image-display
    device.  There is no scaling of the data; instead the modulus
    of each pixel with respect to the number of colour-table
    indices is shown.  No annotated axes are drawn, but a blue border
    is drawn around the image using PGPLOT line style number 2 (i.e.
    dashed lines).
-
-display mode=fa axes style="^sty,grid=1" margin=0.2 clear out=video \
+ display mode=fa axes style="^sty,grid=1" margin=0.2 clear out=video \
    Displays the current NDF data component with annotated axes
    after clearing the current picture on the current image-display
    device. The appearance of the axes is specified in the text
@@ -404,17 +375,14 @@ display mode=fa axes style="^sty,grid=1" margin=0.2 clear out=video \
    wider than normal. The scaling is between the -1 and +7 standard
    deviations of the image around its mean. The scaled data are
    stored in an NDF called video.
-
-display video noscale \
+ display video noscale \
    Displays the data component of the NDF called video (created
    in the previous example) without scaling within the current
    picture on the current image-display device.
-
-display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
+ display in=cgs4a comp=v mode=sc low=1 high=5.2 device=xwindows
    Displays the variance component of NDF cgs4a on the xwindows
    device, scaling between 1 and 5.2.
-
-display mydata centre="12:23:34 -22:12:23" xmagn=2 badcol="red" \
+ display mydata centre="12:23:34 -22:12:23" xmagn=2 badcol="red" \
    Displays the NDF called mydata centred on the position RA=12:23:34,
    DEC=-22:12:23. This assumes that the current co-ordinate Frame in the
    NDF is an equatorial (RA/DEC) Frame. The image is displayed with
@@ -423,8 +391,7 @@ display mydata centre="12:23:34 -22:12:23" xmagn=2 badcol="red" \
    to ensure the image fits within the available space in the current
    picture. The current scaling is used, and bad pixels are shown
    in red.
-
-display ngc6872 mode=ra device=lj250 lut=pizza
+ display ngc6872 mode=ra device=lj250 lut=pizza
    Displays the NDF called ngc6872 on the LJ250 device. The
    lookup table in the NDF called pizza is mapped on the LJ250's
    colour table.  The scaling is between the minimum and maximum
@@ -440,14 +407,12 @@ time scaling the data and transmitting them to the image display.
 Note that the default values for parameters LOW and HIGH are
 the minimum and maximum values in the compressed floating-point
 data.
-
--  The Title component in the NDF is used as the default title for
+ -  The Title component in the NDF is used as the default title for
 the annotated axes. If the NDF does not have a Title component, then
 the default title is taken from current co-ordinate Frame in the NDF. This
 default may be over-ridden by specifying a value for the Title
 attribute using the STYLE parameter.
-
--  The application stores a number of pictures in the graphics
+ -  The application stores a number of pictures in the graphics
 database in the following order: a FRAME picture containing the
 annotated axes, the image area, and the border; a DATA picture
 containing just the image area. Note, the FRAME picture is only
@@ -457,8 +422,7 @@ in the DATA picture will be pixel co-ordinates. A reference to the
 supplied NDF, together with a copy of the WCS information in the NDF
 are stored in the DATA picture. On exit the current database picture
 for the chosen device reverts to the input picture.
-
--  The data type of the output NDF depends on the number of colour
+ -  The data type of the output NDF depends on the number of colour
 indices: _UBYTE for no more than 256, _UWORD for 257 to 65535,
 and _INTEGER otherwise.   The output NDF will not contain any
 extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, WCS and
@@ -475,94 +439,70 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1990 July 12 (MJC):
     Original version based on the pre-V0.7 DISPLAY.
-
- 1990 August 19 (MJC):
+  1990 August 19 (MJC):
     Only the visible portion is scaled and displayed.  Redefined
     CENTRE (ex XCENTR and YCENTR) in terms of image pixels.
-
- 1990 November 9 (MJC):
+  1990 November 9 (MJC):
     Block averaging added.
-
- 1991 February 7 (MJC):
+  1991 February 7 (MJC):
     Added NDF reference into the database, AGI context control and
     removed fuzzy-picture fudge.
-
- 1991 March 19 (MJC):
+  1991 March 19 (MJC):
     Added output parameters for the scaling limits.
-
- 1991 April 4 (MJC):
+  1991 April 4 (MJC):
     Added data co-ordinate transformation.
-
- 1991 May 7 (MJC):
+  1991 May 7 (MJC):
     Added the input and output of NDFs containing scaled data.
-
- 1991 May 14 (MJC):
+  1991 May 14 (MJC):
     Added direct processing of _BYTE and _WORD data.
-
- 1991 July 22 (MJC):
+  1991 July 22 (MJC):
     Added coloured-border option, and user-controlled colouring of
     bad pixels.
-
- 1991 July 31 (MJC):
+  1991 July 31 (MJC):
     No longer redefines first SGS pen to white if workstation has
     dynamic colour representation, now there is palette control.
-
- 1991 August 20 (MJC):
+  1991 August 20 (MJC):
     Added FONT parameter.
-
- 1991 August 22 (MJC):
+  1991 August 22 (MJC):
     Added input lookup-table facility via LUT and NN parameters,
     and an illustrative example of same.
-
- 1992 January 22 (MJC):
+  1992 January 22 (MJC):
     Fixed a bug that could cause the NOSCALE option to scale.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 March 30 (MJC):
+  1992 March 30 (MJC):
     Revised defaulting behaviour of BADCOL and BCOLOUR, and
     corrected the notes.  Added an example of their use.  Handles
     arbitrary user-defined 2-d sections.
-
- 1992 November 27 (MJC):
+  1992 November 27 (MJC):
     Does not use non-monotonic axis centres.
-
- 1992 December 17 (MJC):
+  1992 December 17 (MJC):
     Added the FILL option.
-
- 1995 October 19 (MJC):
+  1995 October 19 (MJC):
     Supports Error component.
-
- 1997 May 28 (MJC):
+  1997 May 28 (MJC):
     QUALITY and HISTORY no longer propagated to the OUT NDF.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
-
- 14-JUL-1998 (DSB):
+  14-JUL-1998 (DSB):
     Use '_DOUBLE' instead of 'DOUBLE' in call to NDF_MTYPE.
-
- 26-AUG-1998 (DSB)
+  26-AUG-1998 (DSB)
     Radical changes to use AST and PGPLOT.
 
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  This application will handle data in all numeric types, though
+    -  This application will handle data in all numeric types, though
    type conversion to integer will occur for unsigned byte and word
    images.  However, when there is no scaling only integer data will
    not be type converted, but this is not expensive for the expected

@@ -1,14 +1,10 @@
 .help fitsexp Starlink kappa
 .nf
 Exports NDF-extension information into an NDF FITS extension.
-
-Usage:
-
-   fitsexp ndf table
-
-Description:
-
-   This application places the values of components of an NDF
+ Usage:
+    fitsexp ndf table
+ Description:
+    This application places the values of components of an NDF
    extension into the FITS extension within the same NDF.  This
    operation is needed if auxiliary data are to appear in the header
    of a FITS file converted from the NDF.  The list of extension
@@ -48,20 +44,15 @@ Notes
 -  Requests to assign values to the following reserved keywords
 in the FITS extension are ignored: SIMPLE, BITPIX, NAXIS, NAXISn,
 EXTEND, PCOUNT, GCOUNT, XTENSION, BLOCKED, and END.
-
--  Only scalar or one-element vector components may be
+ -  Only scalar or one-element vector components may be
 transferred to the FITS extension.
-
--  The data type of the component selects the type of the FITS
+ -  The data type of the component selects the type of the FITS
 value.
-
--  If the destination keyword exists, the existing value and
+ -  If the destination keyword exists, the existing value and
 comment are replaced with the new values.
-
--  If an error is found within a line, processing continues
+ -  If an error is found within a line, processing continues
 to the next line and the error reported.
-
--  To be sure that the resultant FITS extension is what you
+ -  To be sure that the resultant FITS extension is what you
 desired, you should inspect it using the command fitslist before
 exporting the data.  If there is something wrong, you may find it
 convenient to use command FITSEDIT to make minor corrections.
@@ -77,8 +68,7 @@ Table_Format
    one extension component specified per line.  Each line should
    contain two or three fields, separated by spaces and/or tabs, as
    follows.
-
-   -  Field 1:
+    -  Field 1:
       The name of the input extension component whose value is to be
       copied to the FITS extension.  For example, CCDPACK.FILTER
       would copy the value of the component called FILTER in the
@@ -86,8 +76,7 @@ Table_Format
       copy the value of component EQUINOX in the structure
       ASTROMETRY in the extension IRAS90.  The extension may not be
       FITS.
-
-   -  Field 2:
+    -  Field 2:
       The name of the FITS keyword to which the value is to be
       copied.  Hierarchical keywords are not permissible.  The
       keyword name may be followed by a further keyword name in
@@ -107,14 +96,12 @@ Table_Format
       substituting the values, and so only the last value inserted
       appears in the final FITS extension.  (See "Implementation
       Status".)
-
-   -  Field 3:
+    -  Field 3:
       The comment to appear in the FITS header card for the chosen
       keyword.  This field is optional.  As much of the comment will
       appear in the header card as the value permits up to a maximum
       of 47 characters.
-
-   Comments may appear at any point in the table and should begin
+    Comments may appear at any point in the table and should begin
    with an exclamation mark.  The remainder of the line will then be
    ignored.
 
@@ -135,18 +122,14 @@ History
 
  1994 July 15 (MJC):
     Original version.
-
-
-Implementation_Status
-
+ 2 Implementation_Status
    -  The replacements are made in blocks of 32 to reduce the number
    of time-consuming shuffles of the FITS extension.  Thus it is
    possible to locate a new keyword before another keyword, provided
    the latter keyword appears in an earlier block, though reliance
    on this feature is discouraged; instead run the application
    twice.
-
-   -  For each block the application inserts new cards or relocates
+    -  For each block the application inserts new cards or relocates
    old ones, marking each with different tokens, and then sorts the
    FITS extension into the requested order, removing the relocated
    cards.  It then inserts the new values.  If there are multiple

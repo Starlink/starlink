@@ -1,21 +1,16 @@
 .help luthilite Starlink kappa
 .nf
 Highlights a colour table of an image-display device.
-
-Usage:
-
-   luthilite colour [device] [plane] [view]
-
-Description:
-
-   This routine adjusts the colour table of a nominated plane of
+ Usage:
+    luthilite colour [device] [plane] [view]
+ Description:
+    This routine adjusts the colour table of a nominated plane of
    an IDI-supported image display, such as X-windows.  The adjustment
    is like a highlight pen, only here it can traverse the colour
    table, widen or thin is under mouse, joystick or trackerball
    button control; and the colour of the highlight is arbitrary.
    Thus particular features in an image may readily become visible.
-
-   For an Ikon or X-windows, moving the mouse left or right shifts
+    For an Ikon or X-windows, moving the mouse left or right shifts
    the highlight in the colour table towards lower and higher colour
    indices respectively.  The highlight does not rotate around the
    colour table.  Pressing the left button of the mouse reduces the
@@ -23,8 +18,7 @@ Description:
    button increases the width of the highlight by one colour index.
    Hitting the right-hand button ends the modification of the colour
    table.
-
-   The colour table may be viewed during its manipulation without
+    The colour table may be viewed during its manipulation without
    permanently altering the display memory.  The colour-table
    display is situated via the cursor, and will disappear once the
    highlighting is complete.
@@ -38,13 +32,11 @@ COLOUR
 COLOUR() = LITERAL (Read)
    The colour to be used as a highlight.  It is either of these
    alternatives.
-
-     o  A named colour from the standard colour set, which may
+      o  A named colour from the standard colour set, which may
      be abbreviated.  If the abbreviated name is ambiguous the
      first match is selected.  The case of the name is ignored.
      Some examples are "Seagreen", "Violet", and "Orchid".
-
-     o  Normalised red, green, and blue intensities separated by
+      o  Normalised red, green, and blue intensities separated by
      commas or spaces.  Each value must lie in the range 0.0--1.0.
      For example, "1.0,1.0,0.5" would give a pale yellow.
 
@@ -85,20 +77,16 @@ Examples
 luthilite red
    Highlights the colour table on the current image-display
    device with a red marker.
-
-luthilite red full
+ luthilite red full
    Highlights the colour table and palette on the current
    image-display device with a red marker.
-
-luthilite skyblue xwindows
+ luthilite skyblue xwindows
    Highlights the colour table on the xwindows device with a
    sky-blue marker.
-
-luthilite [1.0,1.0,0.3] ikon 1
+ luthilite [1.0,1.0,0.3] ikon 1
    Highlights the colour table on the Ikon overlay plane in a
    pale yellow.
-
-luthilite red view
+ luthilite red view
    Highlights the colour table on the current image-display
    device with a red marker.  The colour table is displayed
    during the highlighting.
@@ -106,15 +94,13 @@ luthilite red view
 Notes
 
 -  Only Ikons and X-windows are supported.
-
--  Initially, the highlight has a width of two colour indices,
+ -  Initially, the highlight has a width of two colour indices,
 and it is located at the second lowest colour index.  The maximum
 width of the highlight is the larger of six and a quarter of the
 colour table, but may be narrower when there are less than 12
 colour indices.  Should the highlight prove to be unsuitable, it
 may be made invisible by reducing the width to zero.
-
--  The rate of motion of the highlight is a function of the
+ -  The rate of motion of the highlight is a function of the
 speed of cursor movement in addition to the cursor position.
 For a given cursor displacement slow motion moves the highlight
 more slowly, and faster motion moves it more rapidly.  This
@@ -133,44 +119,34 @@ History
 
  1991 April 30 (MJC):
     Original version.
-
- 1991 June 5 (MJC):
+  1991 June 5 (MJC):
     Altered for new, X-windows, IDI.  Capability 14 is 2**n rather
     than n.
-
- 1991 July 22 (MJC):
+  1991 July 22 (MJC):
     Converted RGB parameter to the more-sophisticated COLOUR.
-
- 1991 November 15 (MJC):
+  1991 November 15 (MJC):
     Made exit trigger number 2.  Inceased maximum number of
     triggers to 64.
-
- 1991 November 21 (MJC):
+  1991 November 21 (MJC):
     Fixed bug so that highlight may appear in but one colour index.
-
- 1992 February 10 (MJC):
+  1992 February 10 (MJC):
     Permit the highlight width to be zero.  Normalised the
     highlight displacement by the effective number of colour
     indices.
-
- 1992 February 29 (MJC):
+  1992 February 29 (MJC):
     Added fine tuning using the cursor speed, and computed the
     displacements in floating point to give a smoother feel.
-
- 1992 March 26 (MJC):
+  1992 March 26 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 August 5 (MJC):
+  1992 August 5 (MJC):
     Used new capability 18 to obtain the true number of
     colour-table entries, which may not be a power of 2, as
     returned by capability 14.
-
- 1992 November 24 (MJC):
+  1992 November 24 (MJC):
     Reinstated the one-to-one correspondence between the lookup
     table and the intensity transformation table, lost by an
     undocumented change to X-windows driver.
-
- 1994 April 29 (MJC):
+  1994 April 29 (MJC):
     Added FULL parameter.
 .endhelp

@@ -1,25 +1,17 @@
 .help picxy Starlink kappa
 .nf
    Creates a new FRAME picture defined by co-ordinate bounds
-
-Usage:
-
-   picxy lbound ubound
-
-Description:
-
-   This command creates a new FRAME picture in the graphics database.
+ Usage:
+    picxy lbound ubound
+ Description:
+    This command creates a new FRAME picture in the graphics database.
    The bounds of the new picture are defined through two parameters.
    The new picture is formed within either the current or BASE
    picture, and it adopts the world co-ordinate system of that
    reference picture.  On completion the new picture becomes the
    current picture.
-
-   This command is a synonym for {\tt picdef xy 1.0}.
-
-
-Parameters
-
+    This command is a synonym for {\tt picdef xy 1.0}.
+ 2 Parameters
 For information on individual parameters, select from the list below:
 
 CURRENT
@@ -59,15 +51,11 @@ picxy [0.1,0.2] [0.9,0.6]
    This creates a new FRAME picture in the base picture extending
    from (0.1,0.2) to (0.9,0.6), which becomes the new current
    picture.  An outline is drawn around the picture.
-
-picxy ubound=[1.1,0.9] lbound=[0.1,0.2] current nooutline
+ picxy ubound=[1.1,0.9] lbound=[0.1,0.2] current nooutline
    This creates a new FRAME picture in the current picture
    extending from (0.1,0.2) to (1.1,0.9), which becomes the new
    current picture.  No outline is drawn.
-
-
-Related_Applications
-
+ 2 Related_Applications
    KAPPA: PICCUR, PICDEF, PICSEL.
 
 Authors
@@ -78,5 +66,87 @@ History
 
  1995 August 23 (MJC):
     Original version.
+ 1 PIXDUPE
+Expands an NDF by pixel duplication.
+ Usage:
+    pixdupe in out expand
+ Description:
+    This routine expands the size of an NDF structure by duplicating
+   each input pixel a specified number of times along each
+   dimension, to create a new NDF structure.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+EXPAND
+
+EXPAND() = _INTEGER (Read)
+   Linear expansion factors to be used to create the new data
+   array.  The number of factors should equal the number of
+   dimensions in the input NDF.  If fewer are supplied the last
+   value in the list of expansion factors is given to the
+   remaining dimensions.  Thus if a uniform expansion is required
+   in all dimensions, just one value need be entered.  If the net
+   expansion is one, an error results.  The suggested default is
+   the current value.
+
+IN
+
+IN  = NDF (Read)
+   Input NDF structure to be expanded.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF structure.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the input NDF to the output NDF. [!]
+
+Examples
+
+pixdupe aa bb 2
+   This expands the NDF called aa duplicating pixels along each
+   dimension, and stores the enlarged data in the NDF called bb.
+   Thus if aa is 2-dimensional, this command would result in a
+   four-fold increase in the array components.
+ pixdupe cosmos galaxy [2,1]
+   This expands the NDF called cosmos by duplicating along the
+   first axis, and stores the enlarged data in the NDF called
+   galaxy.
+ pixdupe cube1 cube2 [3,1,2]  title="Reconfigured cube"
+   This expands the NDF called cube1 by having three pixels for
+   each pixel along the first axis and duplicating along the
+   third axis, and stores the enlarged data in the NDF called
+   cube2.  The title of cube2 is {\tt "Reconfigured cube"}.
+
+Related_Applications
+
+   KAPPA: COMPADD, COMPAVE, COMPICK.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 1995 April 28 (MJC):
+    Original NDF version.
+  11-JUN-1998 (DSB):
+    Added propagation of the NDF WCS component.
+  {enter_any_changes_here}
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Origin information
+   becomes undefined by the duplication and so is not propagated.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

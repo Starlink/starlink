@@ -1,26 +1,21 @@
 .help setext Starlink kappa
 .nf
 Manipulates the contents of a specified NDF extension.
-
-Usage:
-
-   setext ndf xname option cname { ok
+ Usage:
+    setext ndf xname option cname { ok
                                  { ctype=? shape=? ok
                                  { newname=?
                                  { xtype=?
                                option
-
-Description:
-
-   This task enables the contents of a specified NDF extension to be
+ Description:
+    This task enables the contents of a specified NDF extension to be
    edited.  It can create a new extension or delete an existing one,
    can create new scalar components within an extension, or modify
    or display the values of existing scalar components within the
    extension.  The task operates on only one extension at a
    time, and must be closed down and restarted to work on a new
    extension.
-
-   The task may operate in one of two modes, according to the
+    The task may operate in one of two modes, according to the
    LOOP parameter.  When LOOP=FALSE only a single option is
    executed at a time, making the task suitable for use from
    an ICL procedure.  When LOOP=TRUE several options may be
@@ -105,8 +100,7 @@ OPTION = LITERAL (Read)
       "Select"   - Selects another extension.  If the extension
                    does not exist a new one is created.  This
                    option is not allowed when LOOP=FALSE.
-
-   The suggested default is the current value, except for the
+    The suggested default is the current value, except for the
    first option where there is no default.
 
 SHAPE
@@ -133,27 +127,21 @@ Examples
 
 setext hh50 fits delete noloop
    This deletes the FITS extension in the NDF called hh50.
-
-setext myndf select xtype=mytype noloop
+ setext myndf select xtype=mytype noloop
    This creates the extension MYEXT of data type MYTYPE in the
    NDF called myndf.
-
-setext xname=ccdpack ndf=abc erase cname=filter noloop
+ setext xname=ccdpack ndf=abc erase cname=filter noloop
    This deletes the FILTER component of the CCDPACK extension in
    the NDF called abc.
-
-setext abc ccdpack put cname=filter cvalue=B ctype=_char noloop
+ setext abc ccdpack put cname=filter cvalue=B ctype=_char noloop
    This assigns the character value "B" to the FILTER component
    of the CCDPACK extension a the NDF called abc.
-
-setext virgo plate put cname=pitch shape=2 cvalue=[32,16]
-
-ctype=_byte noloop
+ setext virgo plate put cname=pitch shape=2 cvalue=[32,16]
+ ctype=_byte noloop
    This sets the byte 2-element vector of component PITCH
    of the PLATE extension in the NDF called virgo.  The first
    element of PITCH is set to 32 and the second to 16.
-
-setext virgo plate rename cname=filter newname=waveband noloop
+ setext virgo plate rename cname=filter newname=waveband noloop
    This renames the FILTER component of the PLATE extension in
    the NDF called virgo to WAVEBAND.
 
@@ -161,8 +149,7 @@ Notes
 
 -  The "PUT" option allows the creation of extension
 components with any of the primitive data types.
-
--  The task creates the extension automatically if it does not
+ -  The task creates the extension automatically if it does not
 exist and only allows one extension to be modified at a time.
 
 Related_Applications
@@ -173,21 +160,17 @@ Related_Applications
 Authors
 
 SMB: Steven M Beard (ROE)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  19-Mar-1993: (SMB):
     Original version.
-
- 11-May-1993 (SMB):
+  11-May-1993 (SMB):
     Included DAT_PAR.
-
- 07-Dec-1993 (SMB):
+  07-Dec-1993 (SMB):
     Comments tidied up.
-
- 1995 May 9 (MJC):
+  1995 May 9 (MJC):
     Rewrote and rearranged the prologue.  Wrote the description of
     the parameters, Examples, Related Applications, Notes and
     Usage.  Allowed access to arrays and all integer data types.

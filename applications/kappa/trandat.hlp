@@ -1,23 +1,17 @@
 .help trandat Starlink kappa
 .nf
 Converts free-format text data into an NDF.
-
-Usage:
-
-   trandat freename out [poscols] [valcol] [pscale] [dtype] [title]
-
-Description:
-
-   This application takes grid data contained in a free-format text
+ Usage:
+    trandat freename out [poscols] [valcol] [pscale] [dtype] [title]
+ Description:
+    This application takes grid data contained in a free-format text
    file and stores them in the data array of an NDF.  The data file
    could contain, for example, mapping data  or results from
    simulations which are to be converted into an image for analysis.
-
-   There are two modes of operation which depend on whether the
+    There are two modes of operation which depend on whether the
    text file contains co-ordinate information, or solely data
    values (determined by parameter AUTO).
-
-   a) AUTO=FALSE   If the file contains co-ordinate information the
+    a) AUTO=FALSE   If the file contains co-ordinate information the
    format of the data is tabular; the positions and values are
    arranged in columns and a record may contain information for only
    a single point.  Where data points are duplicated only the last
@@ -25,8 +19,7 @@ Description:
    indicated by a hash or exclamation mark in the first column.
    Here is an example file (the vertical ellipses indicate missing
    lines in the file):
-
-       # Model 5, phi = 0.25,  eta = 1.7
+        # Model 5, phi = 0.25,  eta = 1.7
        1 -40.0   40.0   1121.9
        2  0.0   30.0     56.3
        3 100.0   20.0   2983.2
@@ -35,8 +28,7 @@ Description:
        .    .      .       .
        .    .      .       .
        <EOF>
-
-   The records do not need to be ordered (but see the warning in the
+    The records do not need to be ordered (but see the warning in the
    Notes), as the application searches for the maximum and minimum
    co-ordinates in each dimension so that it can define the size of
    the output image.  Also, each record may contain other data
@@ -44,19 +36,15 @@ Description:
    the same data type.  In the example above only columns 2, 3 and 4
    are required.  There are parameters (POSCOLS, VALCOL) which
    select the co-ordinate and value columns.
-
-   The distance between adjacent pixels (given by parameter PSCALE)
+    The distance between adjacent pixels (given by parameter PSCALE)
    defaults to 1, and is in the same units as the read-in
    co-ordinates.  The pixel index of a data value is calculated
    using the expression
-
-      index = IFIX( ( x - xmin ) / scale ) + 1
-
-   where x is the supplied co-ordinate and xmin is the minimum
+       index = IFIX( ( x - xmin ) / scale ) + 1
+    where x is the supplied co-ordinate and xmin is the minimum
    supplied co-ordinate along an axis, scale is the value of
    parameter PSCALE, and IFIX converts from real to integer.
-
-   You are informed of the number of points found and the maximum
+    You are informed of the number of points found and the maximum
    and minimum co-ordinate values for each dimension.  There is no
    limit imposed by the application on the number of points or the
    maximum output array size, though there may be external
@@ -64,8 +52,7 @@ Description:
    made a typing error in the text file.  If you realise that this
    has indeed occurred just abort (!!) when prompted for the output
    NDF.
-
-   b) AUTO=TRUE   If the text file contains no co-ordinates, the
+    b) AUTO=TRUE   If the text file contains no co-ordinates, the
    format is quite flexible, however, the data are read into the
    data array in Fortran order, i.e. the first dimension is the most
    rapidly varying, followed by the second dimension and so on.  The
@@ -75,15 +62,13 @@ Description:
    record may have trailing comments designated by a hash or
    exclamation mark.  Here is an example file, though a more regular
    format would be clearer for the human reader.
-
-       # test for the new TRANDAT
+        # test for the new TRANDAT
        23 45.3 ! a comment
        50.7,47.5 120. 46.67  47.89 42.4567
        .1 23.3 45.2 43.2  56.0 30.9 29. 27. 26. 22.4 20. 18. -12. 8.
         9.2 11.
        <EOF>
-
-   Notice that the shape of the NDF is defined by a parameter rather
+    Notice that the shape of the NDF is defined by a parameter rather
    than explicitly in the file.
 
 Parameters
@@ -147,8 +132,7 @@ QUANTUM
 QUANTUM = _INTEGER (Read)
    You can safely ignore this parameter.  It is used for fine-
    tuning performance in the co-ordinate mode.
-
-   The application obtains work space to store the position-value
+    The application obtains work space to store the position-value
    data before they can be copied into the output NDF so that the
    array bounds can be computed.  Since the number of lines in
    the text file is unknown, the application obtains chunks of
@@ -199,25 +183,21 @@ trandat simdata.dat model
    input file should have the co-ordinates and real values
    arranged in columns, with the x-y positions in columns 1 and 2
    respectively, and the real data in column 3.
-
-trandat freename=simdata out=model auto shape=[50,40,9]
+ trandat freename=simdata out=model auto shape=[50,40,9]
    Reads the text file simdata and stores the data into the data
    array of a three-dimensional, _REAL NDF called model.  Its x
    dimension is 50, y is 40 and z is 9.  The input file only
    contains real values and comments.
-
-trandat freename=simdata out=model auto shape=[50,40,9] dtype=_i
+ trandat freename=simdata out=model auto shape=[50,40,9] dtype=_i
    As the previous example except an _INTEGER NDF is created, and
    the text file must contain integer data.
-
-trandat simdata.dat model [6,3,4] 2
+ trandat simdata.dat model [6,3,4] 2
    Reads the text file simdata.dat and stores the data into the
    data array of a three-dimensional, _REAL NDF called model.  The
    input file should have the co-ordinates and real values
    arranged in columns, with the x-y-z positions in columns 6, 3
    and 4 respectively, and the real data in column 2.
-
-trandat spectrum.dat lacertid noauto poscols=2 valcol=4 pscale=2.3
+ trandat spectrum.dat lacertid noauto poscols=2 valcol=4 pscale=2.3
    Reads the text file spectrum.dat and stores the data into the
    data array of a one-dimensional, _REAL NDF called lacertid.
    The input file should have the co-ordinate and real values
@@ -231,8 +211,7 @@ Notes
 byte, unsigned byte, word and unsigned word require data
 conversion, and therefore involve additional processing.
 to a vector element (for n-d generality).
-
--  WARNING: In non-automatic mode it is strongly advisable for
+ -  WARNING: In non-automatic mode it is strongly advisable for
 large output NDFs to place the data in Fortran order, i.e. the
 first dimension is the most rapidly varying, followed by the
 second dimension and so on.  This gives optimum performance.  The
@@ -241,16 +220,13 @@ system, but a few megabytes gives an idea.  If you jump randomly
 backwards and forwards, or worse, have a text file in reverse-
 Fortran order, this can have disastrous performance consequences
 for you and other users.
-
--  In non-automatic mode, the co-ordinates for each dimension are
+ -  In non-automatic mode, the co-ordinates for each dimension are
 stored in the NDF axis structure.  The first centre is at the
 minimum value found in the list of positions for the dimension
 plus half of the scale factor.  Subsequent centres are
 incremented by the scale factor.
-
--  The output NDF may have between one and seven dimensions.
-
--  In automatic mode, an error is reported if the shape does not
+ -  The output NDF may have between one and seven dimensions.
+ -  In automatic mode, an error is reported if the shape does not
 use all the data points in the file.
 
 Related_Applications
@@ -267,22 +243,17 @@ History
     Original NDF version, derived from the previous non-NDF
     routine of the same number, featuring generic data processing
     and n-d arrays.
-
- 1991 May 27 (MJC):
+  1991 May 27 (MJC):
     Writes axis centres to the NDF in co-ordinate mode.
-
- 1991 July 25 (MJC):
+  1991 July 25 (MJC):
     Output NDF parameter now called NDF for consistency with other
     applications.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1995 November 16 (MJC):
+  1995 November 16 (MJC):
     Added LBOUND parameter, and creates simple rather than
     primitive NDFs.
-
- 1996 November 14 (MJC):
+  1996 November 14 (MJC):
     Added a final error report, and improved the documentation.
 .endhelp

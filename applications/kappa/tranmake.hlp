@@ -1,24 +1,19 @@
 .help tranmake Starlink kappa
 .nf
 Makes a transformation structure given its co-ordinate mappings.
-
-Usage:
-
-   tranmake transform trtype comment
+ Usage:
+    tranmake transform trtype comment
       { nvin=? nvout=? class=? for1=? inv1=? ... for7=? inv7=?
         fa-fz=? pa-pz=?
       { tr
       trtype
-
-Description:
-
-   This application creates a transformation data structure from
+ Description:
+    This application creates a transformation data structure from
    forward and inverse mappings that you supply.  The TRANSFORMER
    application uses such a structure to transform an NDF by
    resampling.  The structure can have classification qualifiers and
    a comment.
-
-   For convenience, TRANMAKE can create a two-dimensional linear
+    For convenience, TRANMAKE can create a two-dimensional linear
    transformation merely from the six coefficients, or
    two-dimensional Cartesian-to-polar transformation given the
    origin position and angle.
@@ -43,8 +38,7 @@ CLASS( ) = LITERAL (Read)
       "Negative_det" --- a component of reflection is present,
       "Constant_det" --- the scale factor is constant,
       "Unit_det"     --- areas (or volumes etc.) are preserved.
-
-   See SUN/61 Appendix B for more details of transformation
+    See SUN/61 Appendix B for more details of transformation
    classification and a table of the classifications of common
    mappings.  The suggested default is null (!) meaning unknown,
    and no classification is written to the transformation
@@ -91,8 +85,7 @@ FITTYPE = _INTEGER (Read)
       4 -- shift of origin, rotation, and magnification
            (solid body), and
       5 -- a full six-parameter fit.
-
-   The value of this parameter is used to classify the
+    The value of this parameter is used to classify the
    transformation (see the CLASS parameter).  This parameter is
    ignored unless TRTYPE="Bilinear".  [5]
 
@@ -109,13 +102,11 @@ FOR1-FOR7 = LITERAL (Read)
    evaluation.  The expression may contain constants and the
    built-in functions (LOG10, SQRT, SIN, TAND etc.) described in
    SUN/61 Appendix A.
-
-   For a null forward transformation there must still be NVOUT
+    For a null forward transformation there must still be NVOUT
    expressions, each just containing the name of the output
    variable, for example, "X".  An example expression is
    "Z=PA*(NINT(ZP)+0.5)".
-
-   This parameter is ignored unless TRTYPE="Expres".
+    This parameter is ignored unless TRTYPE="Expres".
 
 INV1-INV7
 
@@ -129,14 +120,12 @@ INV1-INV7 = LITERAL (Read)
    explicitly define the order of expression evaluation.  The
    expression may contain constants and the built-in functions
    (LOG10, SQRT, SIN, TAND etc.) described in SUN/61 Appendix A.
-
-   For a null inverse mapping there must still be NVIN
+    For a null inverse mapping there must still be NVIN
    expressions, each just containing the name of the input
    variable, for example, "XX".  Generally, it is the inverse
    mapping that is required.  An example expression is
    "X=MOD(10*SQRT((XX+YY)*ZZ),360)"
-
-   This parameter is ignored unless TRTYPE="Expres".
+    This parameter is ignored unless TRTYPE="Expres".
 
 NVIN
 
@@ -203,15 +192,13 @@ TR( 6 ) = _DOUBLE (Read)
          Y' = TR(4) + TR(5)*X + TR(6)*Y
    The initial suggested default is the identity transformation.
    ([0,1,0,0,0,1]).
-
-   If TRTYPE="Polar", only three values are needed.  TR(1) and
+    If TRTYPE="Polar", only three values are needed.  TR(1) and
    TR(2) are the x-y co-ordinates of the origin of the centre of
    the polar co-ordinate system.  An optional third value is
    the angular origin measured in degrees starting from the
    x-axis in an anticlockwise direction.  If this is omitted, it
    defaults to 0.  The initial suggested default is [0,0,0].
-
-   This parameter is ignored unless TRTYPE="Bilinear" or "Polar".
+    This parameter is ignored unless TRTYPE="Bilinear" or "Polar".
 
 TRANSFORM
 
@@ -231,23 +218,20 @@ TRANSFORM = TRN (Write)
    The structure name is limited to 15 printing characters.  Note
    that in either case the structure must not already exist.  If
    it does, an error condition results.
-
-   This has parameter no suggested default.
+    This has parameter no suggested default.
 
 TRTYPE
 
 TRTYPE = LITERAL (Read)
    The type of transform which will be supplied.  Valid values are
    "Bilinear", "Expres", and "Polar".
-
-   "Bilinear" requests that the transform will be generated from
+    "Bilinear" requests that the transform will be generated from
    the six coefficients specified by parameter TR in the
    equations:
       X' = TR(1) + TR(2)*X + TR(3)*Y
       Y' = TR(4) + TR(5)*X + TR(6)*Y
    that define a linear two-dimensional transformation.
-
-   "Expres" lets an arbitrary transformation be specified using
+    "Expres" lets an arbitrary transformation be specified using
    algebraic-like statements of the type:
       FOR1 > "XX=PA+PC*X"
       FOR2 > "YY=PD+PE*Y"
@@ -258,12 +242,10 @@ TRTYPE = LITERAL (Read)
    (FA-FZ are also reserved for repeated expressions).  This
    example allows independent offsets and scales in x and y.  The
    inverse mapping must be supplied.
-
-   "Polar" makes a 2-dimensional Cartesian-to-polar
+    "Polar" makes a 2-dimensional Cartesian-to-polar
    transformation, where the origin in Cartesian co-ordinates, and
    polar angle are specified by parameter TR.
-
-   ["Expres"]
+    ["Expres"]
 
 Examples
 
@@ -273,15 +255,13 @@ tranmake xyz nvin=1 nvout=1 for1="xd=1.01*x-0.34"
     file called xyz.sdf.  It specifies mappings between one input
     and one output variable.  The output variable is 1.01 the
     output variable less 0.34.
-
-tranmake xyz nvin=1 nvout=1 for1="xd=1.01*x-0.34" class=linear
+ tranmake xyz nvin=1 nvout=1 for1="xd=1.01*x-0.34" class=linear
    inv1="x=(xd+0.34)/1.01" comment="Copier correction"
     As above, except that because the transformation is linear
     (it is a magnification and translation), the classification is
     set to "Linear".  "Copier correction" is written as the comment
     in the structure.
-
-tranmake transform=turn.more.rot45 nvin=2 nvout=2
+ tranmake transform=turn.more.rot45 nvin=2 nvout=2
    class=["linear","isotropic","unit_det"] pa=45
    for1="xo=cosd(pa)*xi-sind(pa)*yi"
    for2="yo=sind(pa)*xi+cosd(pa)*yi"
@@ -293,8 +273,7 @@ tranmake transform=turn.more.rot45 nvin=2 nvout=2
     isotropic, unit determinant---are assigned for this
     transformation.  (As it is a rotation, positive and constant
     determinants are also applicable.)
-
-tranmake shiftim trtype=lin tr=[8.73,1,0,-64.6,0,1] fittype=1 \
+ tranmake shiftim trtype=lin tr=[8.73,1,0,-64.6,0,1] fittype=1 \
    This creates an HDS file called raw_origin.sdf containing a
    transformation structure called TRANSFORM at the top-level.
    This transformation defines a shift of 8.73 of the first
@@ -303,10 +282,8 @@ tranmake shiftim trtype=lin tr=[8.73,1,0,-64.6,0,1] fittype=1 \
    using the appropriate linear-transformation coefficients
    [XSHIFT,1,0,YSHIFT,0,1] and is correctly classified as a
    fit type of 1.  There is no comment.
-
-tranmake my_ndf.more.my_extension.tran1 bilinear "15-deg rotation"
-
-[0,0.965926,-0.258819,0,0.258819,0.965926] fittype=2
+ tranmake my_ndf.more.my_extension.tran1 bilinear "15-deg rotation"
+ [0,0.965926,-0.258819,0,0.258819,0.965926] fittype=2
    This creates a transformation structure called TRAN1
    in the extension MY_EXTENSION of the NDF called my_ndf.  The
    structure defines a rotation by 15 degrees in about the (0,0)
@@ -314,8 +291,7 @@ tranmake my_ndf.more.my_extension.tran1 bilinear "15-deg rotation"
    is specified using the appropriate linear transformation
    coefficients [0,COS,-SIN,0,SIN,COS].  The comment stored in the
    structure is "15-deg rotation".
-
-tranmake polish.origin1 trtype=p tr=[100.0,21.3] \
+ tranmake polish.origin1 trtype=p tr=[100.0,21.3] \
    This creates an HDS file called polish.sdf containing a
    transformation structure called ORIGIN1 at the top-level.
    This structure defines a Cartesian-to-polar transformation
@@ -326,8 +302,7 @@ Notes
 
 -  This routine does not check that the forward and inverse
 expressions actually define a pair of complementary mappings.
-
--  On completion, the destination structure for the
+ -  On completion, the destination structure for the
 transformation information equates to the current transformation
 global parameter.
 
@@ -344,8 +319,7 @@ History
 
  1993 March 22 (MJC):
     Original version.
-
- 1995 February (MJC):
+  1995 February (MJC):
     Included tokens for constants and expressions, and the
     two-dimensional linear fit.
 .endhelp

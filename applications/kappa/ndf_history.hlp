@@ -1,6 +1,6 @@
 .help ndf_history Starlink kappa
 .nf
-During a spring clean of directories to free some space, most of us
+ During a spring clean of directories to free some space, most of us
 will have encountered data files whose purpose and worth are long
 forgotten.  We're reluctant to remove them in case they contain
 irreplaceable data.  Some people are very good and make copious
@@ -8,14 +8,12 @@ notes...  Even then the result of a casual experiment might not be
 recorded.  For those who are lazy, such files can be a frequent
 dilemma.  Even a quick look at a plot of the data is often little
 assistance.  As you've probably surmised, the NDF offers a solution.
-
-Within an NDF you may record history information.  This is usually a
+ Within an NDF you may record history information.  This is usually a
 chronicle of the processing stages used to form the NDF, including
 the parameter values of the applications invoked; but it may also
 include commentary you provide, for example, the rationale for doing
 certain operations.
-
-History is associated with individual NDFs; it is not some global
+ History is associated with individual NDFs; it is not some global
 attribute of a data-processing session.  An NDF has a history
 update mode, which remains with the NDF and any descendant NDF,
 until the update mode is altered or the history erased.  By default,
@@ -23,16 +21,11 @@ the update mode is "Disabled", meaning that no history recording
 occurs.  To permit history recording you must first switch it on,
 selecting from three update modes---"Quiet", "Normal", and 
 "Verbose"---which give increasingly more detailed information.
-
-
-Control_and_Content_of_History_Recording
-
+ 2 Control_and_Content_of_History_Recording
 Task HISSET lets you set the history update mode.  The default is
 "Normal", thus here the command
-
-     % hisset hr1068
-
-switches normal history recording on for NDF hr1068.  Thereafter
+      % hisset hr1068
+ switches normal history recording on for NDF hr1068.  Thereafter
 whenever you alter this NDF, or create another NDF from it, the
 task automatically records the name of the application which was
 run, the date and time, a reference name that identifies the NDF,
@@ -42,110 +35,70 @@ package  name and version is appended to the application name.
 This default history recording facility will gradually become
 available in other Starlink packages as they are rebuilt.  Some of
 these packages may provide task-dependent additional text. 
-
-If disc space is not a concern, you might prefer the verbose level.
-
-     % hisset hr1068 verbose
-
-the supplementary information being the machine type, and its
+ If disc space is not a concern, you might prefer the verbose level.
+      % hisset hr1068 verbose
+ the supplementary information being the machine type, and its
 operating system name and version.
-
-For small datasets, such as spectra, the history can amount to a
+ For small datasets, such as spectra, the history can amount to a
 significant part of the NDF's size, so for these you might prefer
 the quiet level.  This does not record the command line.
-
-HISSET lets you switch off history recording, if you want to do
+ HISSET lets you switch off history recording, if you want to do
 something `off the record', or erase the history altogether.
-
-     % hisset hr1068 disabled
+      % hisset hr1068 disabled
      % hisset hr1068 erase
-
-
-
-Adding_Commentary_to_History_Recording
-
+  2 Adding_Commentary_to_History_Recording
 Once history recording is enabled, you can add commentary to an NDF
 using HISCOM.
-
-     % hiscom hr1068 i "There may have been cloud during the integration."
-
-You aren't limited to single lines if you respond to the prompt for 
+      % hiscom hr1068 i "There may have been cloud during the integration."
+ You aren't limited to single lines if you respond to the prompt for 
 the comment.  You can give a series of lines, terminated by supplying
 !.
-
-     % hiscom hr1068
+      % hiscom hr1068
      COMMENT - Comment line > The dome may have been obstructing the telescope 
      COMMENT - Comment line > during the integration.  We are not sure that the
      COMMENT - Comment line > filter is correct either.
      COMMENT - Comment line > !
-
-If you prefer, you may edit some text into a file and append its
+ If you prefer, you may edit some text into a file and append its
 contents to the history records.  Thus
-
-     % hiscom hr1068 f file=comments.lis
-
-appends the text contained in comments.lis to the history
+      % hiscom hr1068 f file=comments.lis
+ appends the text contained in comments.lis to the history
 records of NDF hr1068.
-
-
-Listing_History_Records
-
+ 2 Listing_History_Records
 At some point you will want to refer back to the history records.
 The HISLIST task does this.
-
-     % hislist hr1068
-
-        History listing for NDF structure /home/scratch/dro/hr1068:
-
-        History structure created 1995 Sep 24 11:16:15.000
-
-     1: 1995 Sep 24 11:16:15.000 - HISSET          (NDFPACK V1.0)
-
-        Parameters: MODE='Normal' NDF=@hr1068
+      % hislist hr1068
+         History listing for NDF structure /home/scratch/dro/hr1068:
+         History structure created 1995 Sep 24 11:16:15.000
+      1: 1995 Sep 24 11:16:15.000 - HISSET          (NDFPACK V1.0)
+         Parameters: MODE='Normal' NDF=@hr1068
         Software: /star/bin/kappa/hisset
-
-Before you ask... at present there are no parameters for selecting a
+ Before you ask... at present there are no parameters for selecting a
 time interval and there is no output of the machine and username,
 but they're not forgotten.
-
-Here is another example showing a series of history records.
-
-     % hislist hr1068 \\
-
-        History listing for NDF structure /home/scratch/dro/hr1068sm2:
-
-        History structure created 1995 Nov 24 11:16:15.000
-
-     1: 1995 Sep 24 11:16:15.000 - HISSET          (NDFPACK V1.0)
-
-        Parameters: MODE='Normal' NDF=@hr1068
+ Here is another example showing a series of history records.
+      % hislist hr1068 \\
+         History listing for NDF structure /home/scratch/dro/hr1068sm2:
+         History structure created 1995 Nov 24 11:16:15.000
+      1: 1995 Sep 24 11:16:15.000 - HISSET          (NDFPACK V1.0)
+         Parameters: MODE='Normal' NDF=@hr1068
         Software: /star/bin/kappa/hisset
-
-     2: 1995 Sep 24 11:19:53.000 - GAUSMOOTH       (KAPPA V0.9)
-
-        Parameters: BOX=13 FWHM=5 IN=@hr1068 OUT=@hr1068sm TITLE=! WLIM=!
+      2: 1995 Sep 24 11:19:53.000 - GAUSMOOTH       (KAPPA V0.9)
+         Parameters: BOX=13 FWHM=5 IN=@hr1068 OUT=@hr1068sm TITLE=! WLIM=!
         Software: /star/bin/kappa/gausmooth
-
-     3: 1995 Sep 24 11:20:15.000 - HISSET          (NDFPACK V1.0)
-
-        History update mode changed from NORMAL to VERBOSE.
+      3: 1995 Sep 24 11:20:15.000 - HISSET          (NDFPACK V1.0)
+         History update mode changed from NORMAL to VERBOSE.
         Parameters: MODE='Normal' NDF=@hr1068sm
         Software: /star/bin/kappa/hisset
-
-     4: 1995 Sep 24 11:20:49.000 - GAUSMOOTH       (KAPPA V0.9)
-
-        Parameters: BOX=9 FWHM=3 IN=@hr1068sm OUT=@hr1068sm2 TITLE=! WLIM=!
+      4: 1995 Sep 24 11:20:49.000 - GAUSMOOTH       (KAPPA V0.9)
+         Parameters: BOX=9 FWHM=3 IN=@hr1068sm OUT=@hr1068sm2 TITLE=! WLIM=!
         Software: /star/bin/kappa/gausmooth
         Machine: alpha, System: OSF1 214 (release V3.2)
-
-     5: 1995 Sep 24 11:22:32.000 - HISCOM          (NDFPACK V1.0)
-
-        Parameters: MODE='Interface' NDF=@hr1068sm2 WRAP=TRUE
+      5: 1995 Sep 24 11:22:32.000 - HISCOM          (NDFPACK V1.0)
+         Parameters: MODE='Interface' NDF=@hr1068sm2 WRAP=TRUE
         Software: /star/bin/kappa/hiscom
         The dome may have been obstructing the telescope during the
         integration.  We are not sure that the filter is correct either.
-
-The first history item HISSET enabling history.  This was followed by
+ The first history item HISSET enabling history.  This was followed by
 a smooth of the data with GAUSMOOTH.  Then the recording level was set
 to verbose.  The fourth record recalls another smooth, and this time
 you can see the machine details.  Finally, some commentary is added

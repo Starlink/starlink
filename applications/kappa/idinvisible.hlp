@@ -1,14 +1,10 @@
 .help idinvisible Starlink kappa
 .nf
 Makes memory planes of an image-display device invisible.
-
-Usage:
-
-   idinvisible [planes] [device]
-
-Description:
-
-   This routine makes invisible nominated planes of an IDI-supported
+ Usage:
+    idinvisible [planes] [device]
+ Description:
+    This routine makes invisible nominated planes of an IDI-supported
    image display, such as X-windows.
 
 Parameters
@@ -38,19 +34,16 @@ Examples
 idinvisible [0,1]
    Makes only planes 0 and 1 invisible on the current image
    display device.
-
-idinvisible device=xwindows
+ idinvisible device=xwindows
    Makes the base plane invisible on the xwindows device.
-
-idinvisible 1 ikon
+ idinvisible 1 ikon
    Makes the first overlay plane invisible on the Ikon device.
 
 Notes
 
 -  On some devices making a memory invisible may have the effect
 of making other memories visible.
-
--  On the Ikon the visibilities are set to visible on start up,
+ -  On the Ikon the visibilities are set to visible on start up,
 so that any set up change introduced by an application calling
 GKS are not lost, therefore all planes to be made invisible must
 be given in one invocation.
@@ -67,12 +60,10 @@ History
 
  1990 July 23 (MJC):
     Original version.
-
- 1992 February 21 (MJC):
+  1992 February 21 (MJC):
     Made all the memories visible first to cope with the changed
     behaviour of the IDI implementation.
-
- 1992 March 26 (MJC):
+  1992 March 26 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
 .endhelp

@@ -1,14 +1,10 @@
 .help lutzebra Starlink kappa
 .nf
 Loads a pseudo-contour lookup table.
-
-Usage:
-
-   lutzebra
-
-Description:
-
-   This procedure loads a pseudo-contour lookup table with linear
+ Usage:
+    lutzebra
+ Description:
+    This procedure loads a pseudo-contour lookup table with linear
    scaling into the current image-display device. The lookup table
    is mainly black with a set of white stripes.
 
@@ -37,7 +33,6 @@ History
 
  1990 Apr 10 (MJC):
     Original version.
-
- 1991 April 24 (MJC):
+  1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
 .endhelp

@@ -2,14 +2,8 @@
 .nf
 KAPPA applications may be classified in terms of their functions as 
 follows:
-
-
-Data_import_&_export
-
-
-
-Image_generation_and_input
-
+ 2 Data_import_&_export
+ 3 Image_generation_and_input
 CREFRAME    - Generates a test 2-d data array from a selection of
               several types.
 FITSDIN     - Reads a FITS disc file composed of simple, group or table
@@ -21,24 +15,15 @@ FITSIN      - Reads a FITS tape composed of simple, group or table
 MATHS       - Evaluates mathematical expressions applied to NDF data
               structures.
 TRANDAT     - Converts free-format data into an NDF.
-
-
-Preparation_for_output
-
+ 3 Preparation_for_output
 FITSEDIT    - Edits the FITS extension of an NDF.
 FITSEXP     - Exports NDF-extension information into an NDF FITS
               extension.
 FITSMOD     - Edits an NDF FITS extension via a text file or parameters.
 FITSTEXT    - Creates an NDF FITS extension from a text file.
 FITSWRITE   - Writes a new keyword to the FITS extension.
-
-
-Data_display
-
-
-
-Detail_enhancement
-
+ 2 Data_display
+ 3 Detail_enhancement
 HISTEQ      - Performs an histogram equalisation on an NDF.
 LAPLACE     - Performs a Laplacian convolution as an edge detector in a
               2-d data array.
@@ -46,18 +31,12 @@ SHADOW      - Enhances edges in a 2-dimensional NDF using a shadow
               effect.
 THRESH      - Edits an NDF such that array values below and above two
               thresholds take constant values.
-
-
-Device_selection
-
+ 3 Device_selection
 GDNAMES     - Shows which graphics devices are available.
 GDSET       - Selects a current graphics device.
 IDSET       - Selects a current image-display device.
 OVSET       - Selects a current image-display overlay.
-
-
-Display_control
-
+ 3 Display_control
 CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
 GDCLEAR     - Clears a graphics device and purges its database entries.
@@ -67,10 +46,7 @@ IDINVISIBLE - Makes memory planes of an image-display device invisible.
 IDPAZO      - Pans and zooms an image-display device.
 IDSTATE     - Shows the current status of an image display.
 OVCLEAR     - Clears an image-display overlay.
-
-
-Graphics_database
-
+ 3 Graphics_database
 PICBASE     - Selects the BASE picture from the graphics database.
 PICCUR      - Uses a cursor to select the current picture and to report
               the co-ordinates of points.
@@ -94,10 +70,7 @@ PICTRANS    - Transforms co-ordinates between the current and BASE
 PICVIS      - Finds the first unobscured FRAME picture in the graphics
               database.
 PICXY       - Creates a new picture defined by co-ordinate bounds.
-
-
-Lookup/colour_tables
-
+ 3 Lookup/colour_tables
 CRELUT      - Creates or manipulates an image-display lookup table using
               a palette.
 LUTABLE     - Manipulates an image-display colour table.
@@ -121,10 +94,7 @@ LUTSPEC     - Loads a spectrum-like lookup table.
 LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
-
-
-Output
-
+ 3 Output
 CONTOUR     - Contours a 2-d NDF.
 CONTOVER    - Contours a 2-d data array overlaid on an image displayed
               previously.
@@ -144,22 +114,13 @@ SNAPSHOT    - Dumps an image-display memory to a graphics hardcopy and
               optionally to an NDF.
 TURBOCONT   - Contours a 2-d NDF quickly.
 VECPLOT     - Plots a 2-dimensional vector map.
-
-
-Palette
-
+ 3 Palette
 PALDEF      - Loads the default palette to a colour table.
 PALENTRY    - Enters a colour into an image display's palette.
 PALREAD     - Fills the palette of a colour table from an NDF.
 PALSAVE     - Saves the current palette of a colour table to an NDF.
-
-
-Data_manipulation
-
-
-
-Arithmetic
-
+ 2 Data_manipulation
+ 3 Arithmetic
 ADD         - Adds two NDF data structures.
 CADD        - Adds a scalar to an NDF data structure.
 CDIV        - Divides an NDF by a scalar.
@@ -182,10 +143,7 @@ MULT        - Multiplies two NDF data structures.
 POW         - Takes the specified power of each pixel of a data array.
 SUB         - Subtracts one NDF data structure from another.
 TRIG        - Performs a trigonometric transformation on a data array.
-
-
-Combination
-
+ 3 Combination
 CALPOL      - Calculates polarisation parameters.
 KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
 MOSAIC      - Merges several non-congruent 2-d data arrays into one
@@ -194,10 +152,7 @@ NORMALIZE   - Normalises one NDF to a similar NDF by calculating a scale
               factor and zero difference.
 QUILT       - Generates a mosaic from equally sized 2-d data arrays,
               optionally specified from an ASCII file.
-
-
-Compression_and_expansion
-
+ 3 Compression_and_expansion
 COMPADD     - Reduces the size of an NDF by adding values in rectangular
               boxes.
 COMPAVE     - Reduces the size of an NDF by averaging values in
@@ -208,10 +163,7 @@ PIXDUPE     - Expands an NDF by pixel duplication.
 SQORST      - Squashes or stretches a 2-d data array in either or both
               axes.
 TRANSFORMER - Applies a transformation to an NDF.
-
-
-Configuration_change
-
+ 3 Configuration_change
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
 MANIC       - Converts all or part of a data array from one
@@ -221,10 +173,7 @@ ROTATE      - Rotates a 2-dimensional NDF about its centre through any
               angle.
 SETBOUND    - Sets new bounds for an NDF.
 SLIDE       - Realigns a 2-d data array via an x-y shift.
-
-
-Filtering
-
+ 3 Filtering
 BLOCK       - Smooths a 1- or 2-dimensional image using a square or
               rectangular box filter.
 CONVOLVE    - Convolves a pair of 1- or 2-dimensional NDFs together.
@@ -241,17 +190,11 @@ MEDIAN      - Smooths a 2-dimensional data array using a weighted median
 MEM2D       - Performs a Maximum-Entropy deconvolution of a
               2-dimensional NDF.
 WIENER      - Applies a Wiener filter to a 1- or 2-dimensional array.
-
-
-HDS_components
-
+ 3 HDS_components
 ERASE       - Erases an HDS object.
 NATIVE      - Converts an HDS object to native machine data
               representation.
-
-
-NDF_array_components
-
+ 3 NDF_array_components
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
 SETBAD      - Sets new bad-pixel flag values for an NDF.
 SETBB       - Sets a new value for the quality bad-bits mask of an NDF.
@@ -260,10 +203,7 @@ SETTYPE     - Sets a new numeric type for the data and variance
               components of an NDF.
 SETVAR      - Sets new values for the variance component of an NDF data
               structure.
-
-
-NDF_axis_components
-
+ 3 NDF_axis_components
 AXCONV      - Expands spaced axes in an NDF into the primitive form.
 AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
@@ -273,17 +213,11 @@ SETAXIS     - Sets values for an axis array component within an NDF data
               structure.
 SETNORM     - Sets a new value for one or all of an NDF's
               axis-normalisation flags.
-
-
-NDF_character_components
-
+ 3 NDF_character_components
 SETLABEL    - Sets a new label for an NDF data structure.
 SETTITLE    - Sets a new title for an NDF data structure.
 SETUNITS    - Sets a new units value for an NDF data structure.
-
-
-NDF_extensions
-
+ 3 NDF_extensions
 FITSEDIT    - Edits the FITS extension of an NDF.
 FITSEXIST   - Inquires whether or not a keyword exists in a FITS
               extension.
@@ -296,17 +230,11 @@ FITSVAL     - Reports the value of a keyword in the FITS extension.
 FITSWRITE   - Writes a new keyword to the FITS extension.
 SETEXT      - Manipulates the contents of a specified NDF extension.
 SETSKY      - Makes an IRAS astrometry extension.
-
-
-NDF_history
-
+ 3 NDF_history
 HISCOM      - Adds commentary to the history of an NDF.
 HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
-
-
-Pixel_editing_and_masking
-
+ 3 Pixel_editing_and_masking
 ARDGEN      - Creates a text file describing selected regions of an
               image.
 ARDMASK     - Uses an ARD file to set some pixels of an NDF to be bad.
@@ -331,38 +259,23 @@ SUBSTITUTE  - Replaces all occurrences of a given value in an NDF array
               with another value.
 ZAPLIN      - Replaces regions in a 2-d NDF by bad values or by linear
               interpolation.
-
-
-Polarimetry
-
+ 3 Polarimetry
 CALPOL      - Calculates polarisation parameters.
-
-
-Resampling_and_transformations
-
+ 3 Resampling_and_transformations
 TRANINVERT  - Inverts a transformation.
 TRANJOIN    - Joins two transformations.
 TRANMAKE    - Makes a transformation structure given its co-ordinate
               mappings.
 TRANSFORMER - Applies a transformation to an NDF.
 TRANTRACE   - Lists the contents of a transformation structure.
-
-
-Surface_fitting
-
+ 3 Surface_fitting
 FITSURFACE  - FITS a polynomial surface to 2-dimensional data array.
 MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of a
               polynomial surface.
 SURFIT      - FITS a polynomial or spline surface to a 2-d data array
               using blocking.
-
-
-Data_analysis
-
-
-
-Statistics
-
+ 2 Data_analysis
+ 3 Statistics
 APERADD     - Derives statistics of pixels within a specified circle of
               a 2-d data array.
 HISTAT      - Computes ordered statistics for an NDF's pixels using an
@@ -374,26 +287,17 @@ MSTATS      - Does cumulative statistics on a 2-d sub-array over a
 NUMB        - Counts the number of elements of an NDF with values or
               absolute values above or below a threshold.
 STATS       - Computes simple statistics for an NDF's pixels.
-
-
-Other
-
+ 3 Other
 CENTROID    - Finds the centroids of star-like features in an NDF.
 NORMALIZE   - Normalises one NDF to a similar NDF by calculating a scale
               factor and zero-point difference.
 PSF         - Determines the parameters of a model star profile by
               fitting star images in a two-dimensional NDF.
 SURFIT      - FITS a polynomial or spline surface to a 2-d data array.
-
-
-Scripting_tools
-
+ 2 Scripting_tools
 CALC        - Evaluates a mathematical expression.
 PARGET      - Obtains the value or values of an application parameter.
-
-
-Inquiries_&_status
-
+ 2 Inquiries_&_status
 GLOBALS     - Displays the values of the KAPPA global parameters.
 FITSEXIST   - Inquires whether or not a keyword exists in a FITS
               extension.
@@ -401,10 +305,83 @@ FITSLIST    - Lists the FITS extension of an NDF.
 FITSVAL     - Reports the value of a keyword in the FITS extension.
 NDFTRACE    - Displays the attributes of an NDF data structure.
 NOGLOBALS   - Resets the KAPPA global parameters.
-
-
-Miscellaneous
-
+ 2 Miscellaneous
 KAPHELP     - Gives help about KAPPA.
+ 1 CMULT
+Multiplies an NDF by a scalar.
+ Usage:
+    cmult in scalar out
+ Description:
+    This application multiplies each pixel of an NDF by a scalar
+   (constant) value to produce a new NDF.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
+
+IN = NDF (Read)
+   Input NDF structure whose pixels are to be multiplied by a
+   scalar.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF structure.
+
+SCALAR
+
+SCALAR = _DOUBLE (Read)
+   The value by which the NDF's pixels are to be multiplied.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   A title for the output NDF.  A null value will cause the title
+   of the NDF supplied for parameter IN to be used instead.
+   [!]
+
+Examples
+
+cmult a 12.5 b
+   Multiplies all the pixels in the NDF called a by the constant
+   value 12.5 to produce a new NDF called b.
+ cmult in=rawdata out=newdata scalar=-19
+   Multiplies all the pixels in the NDF called rawdata by -19 to
+   give newdata.
+
+Related_Applications
+
+   KAPPA: ADD, CADD, CDIV, CSUB, DIV, MATHS, MULT, SUB.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 17-APR-1990 (RFWS):
+    Original version.
+  11-MAR-1991 (RFWS):
+    Finished writing the new prologue and fixed a minor typo in
+    the code.
+  1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+  5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
+   data structure and propagates all extensions.
+    -  Processing of bad pixels and automatic quality masking are
+   supported.
+    -  All non-complex numeric data types can be handled.  Arithmetic
+   is carried out using the appropriate floating-point type, but the
+   numeric type of the input pixels is preserved in the output NDF.
 .endhelp

@@ -1,28 +1,19 @@
 .help trantrace Starlink kappa
 .nf
 Lists the contents of a transformation structure.
-
-Usage:
-
-   trantrace transform [logfile]
-
-Description:
-
-   This application reports or write to a text file the contents of
+ Usage:
+    trantrace transform [logfile]
+ Description:
+    This application reports or write to a text file the contents of
    a TRANSFORM structure.  Items listed include:
-
-      - the structure's name;
-
-      - the version of the TRANSFORM software used to write the
+       - the structure's name;
+       - the version of the TRANSFORM software used to write the
         structure;
-
-      - the number of input and output variables for the nett
+       - the number of input and output variables for the nett
       transformation and for each transformation where the structure
       contains more than one;
-
-      - the classification of the forward and inverse mappings; and
-
-      - for each transformation its precision, comment, forward and
+       - the classification of the forward and inverse mappings; and
+       - for each transformation its precision, comment, forward and
       inverse functions.
 
 Parameters
@@ -43,8 +34,7 @@ CLASSFOR = LITERAL (Write)
       "Negative_det" --- a component of reflection is present,
       "Constant_det" --- the scale factor is constant,
       "Unit_det"     --- areas (or volumes etc.) are preserved.
-
-   See SUN/61 Appendix B for more details of transformation
+    See SUN/61 Appendix B for more details of transformation
    classification and a table of the classifications of common
    mappings.
 
@@ -108,19 +98,15 @@ Examples
 trantrace rot45.transform
    This reports the contents of the transformation structure
    within the HDS container file rot45.sdf, component TRANSFORM.
-
-trantrace rot45
+ trantrace rot45
    This has the same affect as the previous example.
-
-trantrace \
+ trantrace \
    This reports the contents of the current TRANSFORM structure.
-
-trantrace jkt256.more.ccdpack.transform trn.lis
+ trantrace jkt256.more.ccdpack.transform trn.lis
    This lists to the text file trn.lis the contents of the
    transformation structure located within the HDS file
    jkt256.sdf, as component MORE.CCDPACK.TRANSFORM.
-
-trantrace stretch.limit nvin=(nvi) comment=(trncom)
+ trantrace stretch.limit nvin=(nvi) comment=(trncom)
    This reports the contents of the transformation structure
    within the HDS container file stretch.sdf, component LIMIT.
    The number of input transformation variables is written to the
@@ -131,12 +117,10 @@ Notes
 
 -  Where a value is not optional but is absent, "<undefined>" appears
 in the listing.
-
--  TRANTRACE attempts to compile the forward and inverse mappings
+ -  TRANTRACE attempts to compile the forward and inverse mappings
 to check that it is a TRANSFORM structure, and will exit with an
 error if both of these compilations fail.
-
--  On completion, the current transformation global parameter
+ -  On completion, the current transformation global parameter
 takes the value of parameter TRANSFORM.
 
 Authors

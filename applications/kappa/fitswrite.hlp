@@ -1,19 +1,14 @@
 .help fitswrite Starlink kappa
 .nf
 Writes a new keyword to the FITS extension.
-
-Usage:
-
-   fitswrite ndf keyword value=? comment=?
-
-Description:
-
-   This application writes a new keyword in an NDF's FITS extension
+ Usage:
+    fitswrite ndf keyword value=? comment=?
+ Description:
+    This application writes a new keyword in an NDF's FITS extension
    given a value and an optional inline comment.  It allows the
    location of the new keyword to be specified.  The FITS extension
    is created if it does not exist.
-
-   It is a synonym for "fitsmod edit=write mode=interface position=!".
+    It is a synonym for "fitsmod edit=write mode=interface position=!".
 
 Parameters
 
@@ -40,11 +35,9 @@ KEYWORD = LITERAL (Read)
    alphanumeric characters, hyphen, and underscore.  Any lowercase
    letters are converted to uppercase and blanks are removed before
    comparison with the existing keywords.
-
-   Note that it is not normal to have multiple occurrences of a
+    Note that it is not normal to have multiple occurrences of a
    keyword in a FITS header, unless it is blank, COMMENT or HISTORY.
-
-   The suggested value is the current value.
+    The suggested value is the current value.
 
 NDF
 
@@ -62,8 +55,7 @@ POSITION = LITERAL (Read)
    characters.  When locating the position card, comparisons are
    made in uppercase and with the blanks removed.  An occurrence
    may be specified (see parameter KEYWORD for details).
-
-   The new keywords are inserted immediately before each
+    The new keywords are inserted immediately before each
    corresponding position keyword.  If any name in it does not
    exist in FITS array, or the null value (!) is supplied, the
    KEYWORD keyword will be inserted just before the END card
@@ -96,30 +88,25 @@ fitswrite abc bscale value=1.234
    This writes the FITS keyword BSCALE just before the end of the
    FITS extension, which is located within the NDF called abc.  It
    assigns BSCALE a value of 1.234.  There is no inline comment.
-
-fitswrite @100 airmass value=1.456 comment="Airmass at mid-observation"
+ fitswrite @100 airmass value=1.456 comment="Airmass at mid-observation"
    This creates the keyword AIRMASS in the FITS extension of the
    NDF called 100, assigning the keyword the real value 1.456 and
    comment "Airmass at mid-observation".  The header is located just
    before the end.
-
-fitswrite @100 airmass value=1.456 "Airmass at mid-observation"
+ fitswrite @100 airmass value=1.456 "Airmass at mid-observation"
   position=phase
     As the previous example except that the new keyword is written
     immediately before keyword PHASE.
-
-fitswrite afcyg observer value="O'Leary" comment=$C(prininv)
+ fitswrite afcyg observer value="O'Leary" comment=$C(prininv)
    This writes the keyword OBSERVER with value "O'Leary", and its
    comment is copied from keyword PRININV.  The modified FITS
    extension lies within the NDF called afcyg.
-
-fitswrite test filter position=end value=27 comment=! string
+ fitswrite test filter position=end value=27 comment=! string
    This creates the keyword FILTER in the FITS extension of the
    NDF called test, assigning the keyword the string value "27".
    There is no comment.  The keyword is located at the end of the
    headers, but before any END card.
-
-fitswrite ndf=test keyword=detector comment="    Detector name"
+ fitswrite ndf=test keyword=detector comment="    Detector name"
   value=$V(ing.dethead) accept
    This creates the keyword DETECTOR in the FITS extension of the
    NDF called test, assigning the keyword the value of the
@@ -130,16 +117,13 @@ fitswrite ndf=test keyword=detector comment="    Detector name"
 Value_Data_Type
 
    The data type of a value is determined as follows:
-
-      -  For the text-file, values enclosed in quotes (') or doubled
+       -  For the text-file, values enclosed in quotes (') or doubled
       quotes (") are strings.  Note that numeric or logical string
       values must be quoted to prevent them being converted to a
       numeric or logical value in the FITS extension.
-
-      -  For prompting the value is a string when parameter STRING
+       -  For prompting the value is a string when parameter STRING
       is TRUE.
-
-      -  Otherwise type conversions of the first word after the
+       -  Otherwise type conversions of the first word after the
       keywords are made to integer, double precision, and logical
       types in turn.  If a conversion is successful, that becomes the
       data type.  In the case of double precision, the type is set

@@ -2,20 +2,15 @@
 .nf
 Sets a new value for one or all of an NDF's axis-normalisation
 flags.
-
-Usage:
-
-   setnorm ndf dim
-
-Description:
-
-   This routine sets a new value for one or all the normalisation
+ Usage:
+    setnorm ndf dim
+ Description:
+    This routine sets a new value for one or all the normalisation
    flags in an NDF AXIS data structure.  The NDF is accessed in
    update mode.  This flag determines how the NDF's data and
    variance arrays behave when the associated axis information is
    modified.
-
-   If an AXIS structure does not exist, a new one whose centres are
+    If an AXIS structure does not exist, a new one whose centres are
    pixel co-ordinates is created.
 
 Parameters
@@ -30,8 +25,7 @@ ANORM = _LOGICAL (Read)
    pixel width values for the chosen axis so that the product
    of data value and width, and variance and the squared width
    are constant if the width is altered.
-
-   A FALSE value means that the data and variance need not alter
+    A FALSE value means that the data and variance need not alter
    as the pixel widths are varied.  This is the default for an
    axis.  The suggested default is the current value.
 
@@ -56,12 +50,10 @@ Examples
 setnorm hd23568 0 anorm
    This sets the normalisation flags along all axes of the
    NDF structure hd23568 to be true.
-
-setnorm ndf=spect noanorm
+ setnorm ndf=spect noanorm
    This sets the normalisation flag of the 1-dimensional NDF
    structure spect to be false.
-
-setnorm borg 3 anorm
+ setnorm borg 3 anorm
    This sets the normalisation flag for the third dimension
    in the NDF structure borg.
 

@@ -1,32 +1,25 @@
 .help kstest Starlink kappa
 .nf
 Compares data sets using the Kolmogorov-Smirnov test.
-
-Usage:
-
-   kstest in out [limit]
-
-Description:
-
-   This routine reads in a data array and performs a two sided
+ Usage:
+    kstest in out [limit]
+ Description:
+    This routine reads in a data array and performs a two sided
    Kolmogorov-Smirnov test on the vectorised data.  It does this in
    two ways:
-
-     1) If only one dataset is to be tested the data array is
+      1) If only one dataset is to be tested the data array is
         divided into subsamples.  First it compares subsample 1 with
         subsample 2, if they are thought to be from the same sample
         they are concatenated.  This enlarged sample is then
         compared with subsample 3 etc., concatenating if consistent,
         until no more subsamples remain.
-
-     2) If more than one dataset is specified, the datasets are
+      2) If more than one dataset is specified, the datasets are
         compared to the reference dataset in turn.  If the
         probability the two are from the same sample is greater than
         the specified confidence level, the datasets are
         concatenated, and the next sample is tested against this
         enlarged reference dataset.
-
-   The probability and maximum separation of the cumulative
+    The probability and maximum separation of the cumulative
    distribution function is displayed for each comparison (at the
    normal reporting level).  The mean value of the consistent data
    and its error are also reported.  In all cases the consistent
@@ -80,8 +73,7 @@ IN = LITERAL (Read)
    (see parameter NSAMPLE).  When more than one dataset is
    provided, the first becomes the reference dataset to which all
    the remainder are compared.
-
-   It may be a list of NDF names or direction specifications
+    It may be a list of NDF names or direction specifications
    separated by commas.  If a list is supplied on the command
    line, the list must be enclosed in double quotes.  NDF names
    may include the regular expressions ("*", "?", "[a-z]" etc.).
@@ -133,27 +125,23 @@ kstest arlac accept
    This tests the NDF called arlac for self-consistency at the 95%
    confidence level using three subsamples.  No output dataset is
    created.
-
-   The following applies to all the examples.  If the reference
+    The following applies to all the examples.  If the reference
    dataset and a comparison subsample are consistent, the two
    merge to form an expanded reference dataset, which is then
    used for the next comparison.  Details of the comparisons are
    presented.
-
-kstest arlac arlac_filt 0.10 nsample=10
+ kstest arlac arlac_filt 0.10 nsample=10
    As above except data are retained if they exceed the 90%
    probability level, the comparisons are made with ten
    subsamples, and the consistent data are written to the
    one-dimensional NDF called arlac_filt.
-
-kstest in="ref,obs*" comp=v out=master
+ kstest in="ref,obs*" comp=v out=master
    This compares the variance in the NDF called ref with that in
    a series of other NDFs whose names begin "obs".  The variance
    consistent with the reference dataset are written to the data
    array in the NDF called master.  To be consistent, they must be
    the same at 95% probability.
-
-kstest "ref,^96lc.lis,obs*" master comp=v
+ kstest "ref,^96lc.lis,obs*" master comp=v
    As the previous example, except the comparison files include
    those listed in the text file 96lc.lis.
 
@@ -163,30 +151,24 @@ Notes
 COMP array becomes the data array in the output dataset.  When
 COMP="Data", the variance values corresponding to consistent data
 are propagated to the output dataset.
-
-- Pixel bounds are ignored for the comparisons.
-
-- The internal comparison of a single dataset follows the method
+ - Pixel bounds are ignored for the comparisons.
+ - The internal comparison of a single dataset follows the method
 outlined in Hughes D., 1993, JCMT-UKIRT Newsletter, #4, p32.
-
-- The maximum number of files is 20.
+ - The maximum number of files is 20.
 
 Authors
 
 TIMJ: T. Jenness (JACH)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1996 September (TIMJ):
     Original version.
-
- 1996 September 19 (MJC):
+  1996 September 19 (MJC):
     Completed the prologue and modified for consistency within
     KAPPA.
-
- 1997 May 12 (MJC):
+  1997 May 12 (MJC):
     Redesigned to use GRP and NDF chunks, thus removing the REF
     parameter and renaming NDF to IN.  Better propagation of NDF
     components.  Improved the table formatting.  Made efficiency
@@ -197,10 +179,8 @@ Implementation_Status
    - This routine correctly processes DATA, VARIANCE, HISTORY, LABEL,
    TITLE, and UNITS components, and propagates all extensions.  AXIS
    information is lost.  Propagation is from the reference dataset.
-
-   - Processing of bad pixels and automatic quality masking are
+    - Processing of bad pixels and automatic quality masking are
    supported.
-
-   - All numeric data types are supported, however, processing uses
+    - All numeric data types are supported, however, processing uses
    the _REAL data type, and the output dataset has this type.
 .endhelp

@@ -1,14 +1,10 @@
 .help fitstext Starlink kappa
 .nf
 Creates an NDF FITS extension from a text file.
-
-Usage:
-
-   fitstext ndf file
-
-Description:
-
-   This application takes a version of a FITS header stored in a
+ Usage:
+    fitstext ndf file
+ Description:
+    This application takes a version of a FITS header stored in a
    text file, and inserts it into the FITS extension of an NDF.  The
    header is not copied verbatim as some validation of the headers
    as legal FITS occurs.  An existing FITS extension is removed.
@@ -62,11 +58,9 @@ header `card':
   by a space; and
   j) comments begin at least two columns after the end of the
   comment delimiter.
-
-- The validation issues warning messages at the normal reporting
+ - The validation issues warning messages at the normal reporting
 level for violations a), b), c), d), and i).
-
--  The validation can only go so far.  If any of your header lines
+ -  The validation can only go so far.  If any of your header lines
 are ambiguous, the resulting entry in the FITS extension may not
 be what you intended.  Therefore, you should inspect the
 resulting FITS extension using the command FITSLIST before
@@ -85,7 +79,6 @@ History
 
  1994 September 8 (MJC):
     Original version.
-
- 1996 July 26 (MJC):
+  1996 July 26 (MJC):
     Uses improved validation routine.
 .endhelp

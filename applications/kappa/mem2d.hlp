@@ -1,16 +1,12 @@
 .help mem2d Starlink kappa
 .nf
 Performs a Maximum-Entropy deconvolution of a 2-dimensional NDF.
-
-Usage:
-
-   mem2d in out mask=? { fwhmpsf=?
+ Usage:
+    mem2d in out mask=? { fwhmpsf=?
                        { psf=?
                        psftype
-
-Description:
-
-   MEM2D is based on the Gull and Skilling Maximum-Entropy package
+ Description:
+    MEM2D is based on the Gull and Skilling Maximum-Entropy package
    MEMSYS3.  It takes an image and a Point-Spread Function as input
    and produces an equal-sized image as output with higher
    resolution.  Facilities are provided to `analyse' the resulting
@@ -18,8 +14,7 @@ Description:
    area of the deconvolved image and also an estimate of the
    uncertainty in the integrated flux.  This allows the significance
    of structure visible in the deconvolution to be checked.
-
-   For a detailed description of the algorithm, and further
+    For a detailed description of the algorithm, and further
    references, see the MEMSYS Users' Manual, and SUN/117.
 
 Parameters
@@ -302,8 +297,7 @@ mem2d m51 m51_hires psftype=gaussian fwhmpsf=3
    putting the resulting image in the data array of the NDF called
    m51_hires.  A circular Gaussian Point-Spread Function is used
    with a Full Width at Half Maximum of 3 pixels.
-
-mem2d m51 m51_hires psf=star xcentre=20 ycentre=20
+ mem2d m51 m51_hires psf=star xcentre=20 ycentre=20
    This example performs the same function as the previous
    example, but the PSF is defined by the data array of the NDF
    called star, instead of being defined to be Gaussian.  This
@@ -313,8 +307,7 @@ mem2d m51 m51_hires psf=star xcentre=20 ycentre=20
    the pixel indices of the centre of the beam defined by the PSF
    in star.  The PSF is truncated to one sixteenth of its peak
    amplitude.
-
-mem2d m51_hires m51_hires niter=70 psf=star
+ mem2d m51_hires m51_hires niter=70 psf=star
    If the previous example failed to converge within the default
    50 iterations, the deconvolution can be started again from
    its current state, rather than having to start again from
@@ -326,8 +319,7 @@ mem2d m51_hires m51_hires niter=70 psf=star
    computer going down, or a batch-queue CPU limit being reached.
    To use this facility the parameters EXTEND and UPDATE should
    have the default values of TRUE.
-
-mem2d m51_hires mask=nucleus
+ mem2d m51_hires mask=nucleus
    Once a deconvolved image has been produced, the significance
    of features seen in the deconvolution can be assessed.  This
    example takes in the NDF m51_hires produced by a previous run
@@ -362,16 +354,14 @@ the rest of KAPPA.  In order for the KAPPA monolith to load
 without you having to increase your memory or datasize resources,
 and because MEM2D is batch oriented (see Timing) it is only
 available as a separate application.
-
--  Memory is required to store several intermediate images while
+ -  Memory is required to store several intermediate images while
 the deconvolution is in progress.  If the input image is small
 enough, these images are stored in a statically declared, internal
 array.  Otherwise, they are stored in dynamically mapped external
 arrays.  There is no limit on the size of image which can be
 processed by MEM2D (other than those imposed by limited resources
 on the host computer).
-
--  It is sometimes desirable for the pixels in the output image
+ -  It is sometimes desirable for the pixels in the output image
 to be smaller than those in the input image.  For instance, if
 the input data are critically sampled (two samples per PSF), the
 output image may not be a very good deconvolution.  In such cases
@@ -401,44 +391,34 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  24-SEP-1990 (DSB):
     Original version.
-
- 26-FEB-1991 (DSB):
+  26-FEB-1991 (DSB):
     MODEL and MODELOUT parameters added.
-
- 27-FEB-1991 (DSB):
+  27-FEB-1991 (DSB):
     KAPPA subroutine prefixes added (KPS_ and KPG_)
-
- 1991 July 4 (MJC):
+  1991 July 4 (MJC):
     Propagated AXIS and UNITS.  Added Usage and Implementation
     Status to the documentation.  Made error reports more helpful
     and added a missing bad status assignment.
-
- 1991 July 18 (MJC):
+  1991 July 18 (MJC):
     Called renamed routines---KPS1_MEM*.
-
- 1991 October 18 (MJC):
+  1991 October 18 (MJC):
     Added the THRESH parameter.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 13 (MJC):
+  1992 April 13 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-
- 1992 October 15 (MJC):
+  1992 October 15 (MJC):
     Increased the permitted length of the image name stored in the
     MEM2D extension from 40 to 132.
-
- 22-FEB-1995 (DSB):
+  22-FEB-1995 (DSB):
     Comments re-formatted to edstar style.  Replace AIF VM routines
     with PSX.  Replaced calls to NDF_ASSOC, KPG1_SGDIM, etc. with a
     single call to KPG1_GTNDF.  "Usage" and "Examples" commands
@@ -446,18 +426,15 @@ History
     FTSIZE since the FFTPACK routines can handled images of any
     size.  Increased the size of each image until one image will
     provide enough workspace for the FFT routines.
-
- 20-MAR-1995 (DSB):
+  20-MAR-1995 (DSB):
     Modified to allow use of external storage for intermediate
     files.  This removes the restriction on the size of image
     which can be deconvolved using MEM2D.
-
- 1995 April 10 (MJC):
+  1995 April 10 (MJC):
     Corrected typo's, and made minor stylistic changes and
     improvements to the documentation including a Related
     Applications section.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -465,10 +442,8 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported, though only to remove them by the DEF value.
-
-   -  All non-complex numeric data types can be handled.  Arithmetic is
+    -  All non-complex numeric data types can be handled.  Arithmetic is
    performed using single-precision floating point.
 .endhelp

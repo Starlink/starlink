@@ -2,23 +2,17 @@
 .nf
 Creates a 2-dimensional NDF from the coefficients of a polynomial
 surface
-
-Usage:
-
-   makesurface in out [like] type=? lbound=? ubound=? xlimit=?
+ Usage:
+    makesurface in out [like] type=? lbound=? ubound=? xlimit=?
       ylimit=?
-
-Description:
-
-   The coefficients describing a 2-dimensional polynomial surface
+ Description:
+    The coefficients describing a 2-dimensional polynomial surface
    are read from a SURFACEFIT extension in an NDF (written by
    FITSURFACE), and are used to create a 2-dimensional surface of
    specified size and extent.  The surface is written to a new NDF.
-
-   The size and extent of the surface may be obtained from a template
+    The size and extent of the surface may be obtained from a template
    NDF or given explicitly.
-
-   Elements in the new NDF outside the defined range of the
+    Elements in the new NDF outside the defined range of the
    polynomial will be set to bad values.
 
 Parameters
@@ -100,20 +94,17 @@ makesurface flatin flatout \
    using the surface fit stored in the 2-dimensional NDF flatin.
    The created image has the same data type, bounds, and
    co-ordinate limits as the data array of flatin.
-
-makesurface flatin flatout type=_wo lbound=[1,1] ubound=[320,512]
+ makesurface flatin flatout type=_wo lbound=[1,1] ubound=[320,512]
    As the previous example, except that the data array in flatout
    has data type _WORD, and the bounds of flatout are 1:320,
    1:512.
-
-makesurface flatin flatout like=flatin
+ makesurface flatin flatout like=flatin
    This has the same effect as the first example, except it has
    an advantage.  If the current co-ordinate system is "Data" and
    either or both of the axes are inverted (values decrease with
    increasing pixel index), the output image will be correctly
    oriented.
-
-makesurface flatin flatout template title="Surface fit"
+ makesurface flatin flatout template title="Surface fit"
    This generates a 2-dimensional image in the NDF called flatout
    using the surface fit stored in the 2-dimensional NDF flatin.
    The created image inherits the attributes of the NDF called
@@ -125,8 +116,7 @@ Notes
 component FIT of type POLYNOMIAL, variant CHEBYSHEV.  This
 extension is created by FITSURFACE.    Also read from the
 SURFACEFIT extension is the co-ordinate system (component COSYS).
-
--  When LIKE=!, COSYS="Data" and the original NDF had an axis that
+ -  When LIKE=!, COSYS="Data" and the original NDF had an axis that
 decreased with increasing pixel index, you may want to flip the
 co-ordinate limits (via parameters XLIMIT or YLIMIT) to match
 the original sense of the axis, otherwise the created surface will
@@ -139,23 +129,18 @@ Related_Applications
 Authors
 
 SMB: Steven M. Beard (ROE)
-
-MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  11-May-1993 (SMB):
     Original version.
-
- 03-Jun-1993 (SMB):
+  03-Jun-1993 (SMB):
     Modified to read the new data structure produced by FITSURFACE.
-
- 07-Dec-1993 (SMB):
+  07-Dec-1993 (SMB):
     Comments tidied up.
-
- 1995 August 8 (MJC):
+  1995 August 8 (MJC):
     Used a modern prologue and completed it.  Corrected the
     description of LIKE and some data types.  Merged XMIN and XMAX
     into parameter XLIMIT, and YMIN and YMAX into YLIMIT.  Renamed
@@ -164,12 +149,10 @@ History
     FITSURFACE.  Restructured for clarity and efficiency.  Removed
     PAR_GETs for labels and units when LIKE=!.  Insisted on two
     significant dimensions in IN and LIKE.
-
- 1997 May 10 (MJC):
+  1997 May 10 (MJC):
     Added support for creating a variance array.  Obtained
     workspace by PSX for efficiency.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -179,8 +162,7 @@ Implementation_Status
    data structure and propagates all extensions.  However, neither
    QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
    null.
-
-   -  All non-complex numeric data types can be handled.  Processing
+    -  All non-complex numeric data types can be handled.  Processing
    is performed in single- or double-precision floating point, as
    appropriate.
 .endhelp

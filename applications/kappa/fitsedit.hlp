@@ -1,14 +1,10 @@
 .help fitsedit Starlink kappa
 .nf
 Edits the FITS extension of an NDF.
-
-Usage:
-
-   fitsedit ndf
-
-Description:
-
-   This procedure allows you to use your favourite editor to
+ Usage:
+    fitsedit ndf
+ Description:
+    This procedure allows you to use your favourite editor to
    modify the FITS headers stored in an NDF's FITS extension.
    There is limited validation of the FITS headers after editing.
    A FITS extension is created if the NDF does not already have 
@@ -32,8 +28,7 @@ Notes
 
 -  This uses the environmental variable, EDITOR, to select
 the editor.  If this variable is undefined vi is assumed.
-
--  The script lists the headers to a temporary file; allows text
+ -  The script lists the headers to a temporary file; allows text
 editing; and then replaces the former FITS extension with the
 modified version, performing some validation at this stage.
 
@@ -50,15 +45,12 @@ History
 
  1994 September 28 (MJC):
     Original version.
-
- 1994 November 4 (MJC):
+  1994 November 4 (MJC):
     Added ADAM-like help and abort facility for the parameter.
-
- 1996 January 16 (MJC):
+  1996 January 16 (MJC):
     Added suggested default and search path for foreign data
     formats.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added facility to create a new FITS extension if there is no 
     existing FITS extension in the NDF.
 .endhelp

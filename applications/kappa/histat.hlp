@@ -2,35 +2,22 @@
 .nf
 Computes ordered statistics for an NDF's pixels using an
 histogram.
-
-Usage:
-
-   histat ndf [comp] [percentiles] [logfile] [numbin]
-
-Description:
-
-   This application computes and displays simple ordered statistics
+ Usage:
+    histat ndf [comp] [percentiles] [logfile] [numbin]
+ Description:
+    This application computes and displays simple ordered statistics
    for the pixels in an NDF's data, quality, error, or variance
    array.  The statistics available are:
-
-   -  the pixel sum,
-
-   -  the pixel mean,
-
-   -  the pixel median,
-
-   -  the pixel mode,
-
-   -  the pixel value at selected percentiles,
-
-   -  the value and position of the minimum- and maximum-valued
+    -  the pixel sum,
+    -  the pixel mean,
+    -  the pixel median,
+    -  the pixel mode,
+    -  the pixel value at selected percentiles,
+    -  the value and position of the minimum- and maximum-valued
    pixels,
-
-   -  the total number of pixels in the NDF,
-
-   -  the number of pixels used in the statistics, and
-
-   -  the number of pixels omitted.
+    -  the total number of pixels in the NDF,
+    -  the number of pixels used in the statistics, and
+    -  the number of pixels omitted.
 
 Parameters
 
@@ -135,14 +122,12 @@ NUMBIN = _INTEGER (Read)
    bias is in the same sense as the skewness, so generally it
    will add positive bias.  The default value of NUMBIN is a
    compromise and generally will give satisfactory results.
-
-   It is hard to quantify the tradeoff precisely; testing with a
+    It is hard to quantify the tradeoff precisely; testing with a
    typical CCD image of stars and galaxies the increase in time
    went approximately as log of the number of bins, and the
    accuracy of the pixel sum for some values of NUMBIN were: 100,
    2.8%; 1000, 0.1% 10000, 0.03%; and 100000, 0.002%.
-
-   NUMBIN must be in the range 100 to 100000. [2048]
+    NUMBIN must be in the range 100 to 100000. [2048]
 
 NUMGOOD
 
@@ -179,22 +164,18 @@ Examples
 histat image
    Computes and displays simple ordered statistics for the data
    array in the NDF called image.
-
-histat ndf=spectrum variance
+ histat ndf=spectrum variance
    Computes and displays simple ordered statistics for the
    variance array in the NDF called spectrum.
-
-histat spectrum error
+ histat spectrum error
    Computes and displays ordered statistics for the variance
    array in the NDF called spectrum, but takes the square root of
    the variance values before doing so.
-
-histat halley logfile=stats.dat
+ histat halley logfile=stats.dat
    Computes ordered statistics for the data array in the NDF
    called halley, and writes the results to a logfile called
    stats.dat.
-
-histat ngc1333 percentiles=[0.25,0.75] numbin=100000
+ histat ngc1333 percentiles=[0.25,0.75] numbin=100000
    Computes ordered statistics for the data array in the NDF
    called ngc1333, including the quartile values.  The highest
    accuracy is used.
@@ -204,8 +185,7 @@ Notes
 -  If the array has a few extreme outliers this can bias the
 statistics unless the number of bins in the histogram is large,
 or the outliers are removed (flagged) via application THRESH.
-
--  There is quantisation bias in the statistics.  See parameter
+ -  There is quantisation bias in the statistics.  See parameter
 NUMBIN.
 
 Related_Applications
@@ -221,8 +201,7 @@ History
 
  1991 November 13 (MJC):
     Original NDF version.
-
- 1994 September 27 (MJC):
+  1994 September 27 (MJC):
     Replaced AIF calls with PAR, FIO, and PSX.  Made messages
     conditional and used modern names for subroutines (_$ to 1_).
 
@@ -230,13 +209,10 @@ Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
    QUALITY, TITLE, and HISTORY components of the NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.  Arithmetic
+    -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single- or double-precision floating point,
    as appropriate.
-
-   -  Any number of NDF dimensions is supported.
+    -  Any number of NDF dimensions is supported.
 .endhelp

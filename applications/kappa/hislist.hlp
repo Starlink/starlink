@@ -1,14 +1,10 @@
 .help hislist Starlink kappa
 .nf
 Lists NDF history records.
-
-Usage:
-
-   hislist ndf
-
-Description:
-
-   This lists all the history records in an NDF.  The reported
+ Usage:
+    hislist ndf
+ Description:
+    This lists all the history records in an NDF.  The reported
    information comprises the date, time, and application name,
    and optionally the history text.
 
@@ -37,8 +33,7 @@ hislist vcc953
    vcc935.  The information comprises the names of the
    applications and the times they were used, and the associated
    history text.
-
-hislist vcc953 brief
+ hislist vcc953 brief
    This gives a summary of the history information for the NDF
    called vcc935.  It comprises the names of the applications
    and the times they were used.
@@ -50,14 +45,12 @@ Related_Applications
 Authors
 
 RFWS: R.F.Warren-Smith (STARLINK, RAL)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1993 June 2 (RFWS):
     Original version.
-
- 1995 June 24 (MJC):
+  1995 June 24 (MJC):
     Added the documentation.
 .endhelp

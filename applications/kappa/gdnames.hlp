@@ -1,28 +1,22 @@
 .help gdnames Starlink kappa
 .nf
 Shows which graphics devices are available.
-
-Usage:
-
-   gdnames
-
-Description:
-
-   The routine displays a list of the graphics devices available and
+ Usage:
+    gdnames
+ Description:
+    The routine displays a list of the graphics devices available and
    the names which identify them.  Each name is accompanied by a
    brief descriptive comment.
 
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  4-MAY-1989 (RFWS):
     Original version (RFWS).
-
- 1990 Mar 31 (MJC):
+  1990 Mar 31 (MJC):
     Renamed from SHODEV to GDNAMES for consistency (MJC).
 .endhelp

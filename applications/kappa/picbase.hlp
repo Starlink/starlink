@@ -1,23 +1,15 @@
 .help picbase Starlink kappa
 .nf
 Selects the BASE picture from the graphics database.
-
-Usage:
-
-   picbase
-
-Description:
-
-   This command selects the BASE picture.  Subsequent plotting for
+ Usage:
+    picbase
+ Description:
+    This command selects the BASE picture.  Subsequent plotting for
    the chosen device will be in this new current picture.  The BASE
    picture is the largest picture available, and encompasses all
    other pictures.  By default the chosen device is the current one.
-
-   This command is a synonym for "piclist picnum=1".
-
-
-Parameters
-
+    This command is a synonym for "piclist picnum=1".
+ 2 Parameters
 For information on individual parameters, select from the list below:
 
 DEVICE
@@ -29,8 +21,7 @@ Examples
 
 picbase
    This selects the BASE picture for the current graphics device.
-
-picbase device=x2w
+ picbase device=x2w
    This selects the BASE picture for the x2w device.
 
 Related_Applications
@@ -45,5 +36,472 @@ History
 
  1995 August 23 (MJC):
     Original version.
+ 1 PICCUR
+Uses a cursor to select the current picture and to report the
+co-ordinates of points.
+ Usage:
+    piccur [mode] [name] [logfile] [device]
+ Description:
+    This application allows you to select a new current picture in
+   the graphics database using the cursor.  The picture associated
+   with the last-selected point becomes the new current picture.
+    This task also uses the cursor to read Cartesian co-ordinates
+   from the chosen graphics device and displays them on your
+   terminal.  In addition if the co-ordinate frame changes between
+   selected positions, the comment, name, and any label associated
+   with the new picture are appended to the message.  There is an
+   option to let you store the co-ordinates, and their picture names
+   and labels in a text file.
+    There are three modes of operation to define which co-ordinate
+   system/picture is to be used.  These are ANCHOR, CURRENT and
+   DYNAMIC.  See the parameter MODE for details.
+    In ANCHOR or DYNAMIC modes there is an option to select only
+   pictures of a certain name in the database.  This is most useful
+   when DATA pictures are covered by transparent FRAME pictures.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes the world co-ordinates of the cursor
+   position to be reported.  World co-ordinates that relate to a
+   location in a data array will be in array pixels.  If COSYS =
+   "Data" the graphics database is examined for data co-ordinates
+   stored via a transformation.  Data co-ordinates are arbitrary
+   but most often they will be a linear or logarithmic
+   transformation of the world co-ordinates.  For example, the x
+   co-ordinate of a spectrum would be given in pixels if COSYS =
+   "World", but if COSYS = "Data" the x co-ordinate could be in
+   wavelength units, such as Angstroms.  If the database does not
+   have a world-to-data transformation for a given picture, the
+   value of this parameter is irrelevant and world co-ordinates
+   will be reported for that picture. [Current co-ordinate system]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+DOUBLE
+
+DOUBLE = _LOGICAL (Read)
+   If TRUE, co-ordinates will be reported, written to the output
+   parameters, and stored in the text file in double precision,
+   otherwise single precision is used.  [FALSE]
+
+LOGFILE
+
+LOGFILE = FILENAME (Write)
+   The name of the text file in which the co-ordinates of points
+   selected with the cursor may be stored.  A null string (!)
+   means that no file is created.  The suggested default is the
+   current value. [!]
+
+MODE
+
+MODE = LITERAL (Read)
+   The mode defining the co-ordinate system/picture in which
+   cursor positions are returned.  There are three options.
+       "Current" selects the current picture in the AGI
+      database and reports the position of a point selected by
+      the cursor.  If the point does not lie within the picture,
+      an extrapolated position is reported.
+       "Dynamic" selects the topmost picture in the AGI
+      database which encompasses that position selected.  Thus
+      the second and subsequent cursor hits may result in the
+      selection of a new picture.  On exit the last picture
+      selected becomes the current picture.
+       "Anchor" lets the first cursor hit select a
+      picture which remains current throughout the running of
+      the application.  If subsequent cursor hits fall outside
+      the extent of this picture, a position extrapolated from
+      the picture's co-ordinate system is reported.  On exit the
+      anchor picture becomes the current picture.
+   ["Dynamic"]
+
+NAME
+
+NAME = LITERAL (Read)
+   Only pictures of this name are to be selected.  A null string
+   (!) or blanks means that pictures of all names may be selected.
+   [!]
+
+XC
+
+XC = _DOUBLE (Write)
+   The x co-ordinate of the last point selected with the cursor.
+
+YC
+
+YC = _DOUBLE (Write)
+   The y co-ordinate of the last point selected with the cursor.
+
+Examples
+
+piccur
+   This obtains the co-ordinates of any visible picture for the
+   current graphics device by use of the cursor.  In this and all
+   the examples, the picture containing the last-selected point
+   becomes the new picture.
+ piccur cosys=w
+   This obtains the world co-ordinates of any visible picture for
+   the current graphics device by use of the cursor.
+ piccur current device=graphon
+   This obtains the co-ordinates of any visible picture in the
+   reference frame of the current picture of the Graphon device.
+ piccur logfile=stars.dat name=data
+   This obtains the co-ordinates of any visible DATA picture for
+   the current graphics device.  The x-y co-ordinates, and their
+   picture names and labels are stored in the text file called
+   stars.dat.
+
+Notes
+
+-  Should an error occur trying to obtain the base picture for
+ANCHOR or DYNAMIC modes, the current picture is unchanged.
+ -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
+point where there are no pictures of the selected name, the
+co-ordinates in the base picture are reported.
+
+Related_Applications
+
+   KAPPA: CURSOR, PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME,
+   PICLIST, PICSEL, PICVIS.
+
+Authors
+
+JM: Jo Murray  (STARLINK)
+ MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1995 August 25 (MJC):
+    Original version based on CURSOR by MJC and JM.
+ 1 PICDATA
+Selects the last DATA picture from the graphics database.
+ Usage:
+    picdata
+ Description:
+    This command selects the last-created DATA picture.  Subsequent
+   plotting for the chosen device will be in this new current
+   picture.  By default the chosen device is the current one.
+    This command is a synonym for "piclist name=data picnum=last".
+ 2 Parameters
+For information on individual parameters, select from the list below:
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics workstation. [The current graphics device]
+
+Examples
+
+picdata
+   This selects the last DATA picture for the current graphics
+   device.
+ picdata device=xw
+   This selects the last DATA picture for the xw device.
+
+Related_Applications
+
+   KAPPA: PICCUR, PICBASE, PICFRAME, PICLAST, PICLIST, PICSEL.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 August 23 (MJC):
+    Original version.
+ 1 PICDEF
+Defines a new graphics-database FRAME picture or an array of
+FRAME pictures.
+ Usage:
+    picdef [mode] [fraction]
+      { xpic ypic prefix=?
+      { lbound ubound
+     mode
+ Description:
+    This application creates either one new graphics-database FRAME
+   picture or a grid of new FRAME pictures.  It offers a variety of
+   ways by which you can define a new picture's location and extent.
+   You may constrain a new picture to lie within either the current
+   or the BASE picture, and the new picture adopts the world
+   co-ordinate system of that reference picture.
+    You may specify a single new picture using one of three methods:
+     1.  moving a cursor to define the lower and upper bounds via
+         pressing choice number 1 (the application will instruct what
+         to do for the specific graphics device), provided a cursor
+         is available on the chosen graphics workstation;
+     2.  obtaining the bounds from the environment (in world
+         co-ordinates of the reference picture);
+     3.  or by giving a position and size for the new picture. The
+         position is specified by a two-character code. The first
+         controls the vertical location, and may be "T", "B", or "C"
+         to create the new picture at the top, bottom, or in the
+         centre respectively.  The second defines the horizontal
+         situation, and may be "L", "R", or "C" to define a new
+         picture to the left, right, or in the centre respectively.
+         Thus a code of "BR" will make a new picture in the
+         bottom-right corner. The size of the new picture along each
+         axis may be specified either in centimetres, or as a fraction
+         of the corresponding axis of the reference picture. The picture
+         may also be forced to have a specified aspect ratio.
+    The picture created becomes the current picture on exit.
+    Alternatively, you can create an array of n-by-m equal-sized
+   pictures by giving the number of pictures in the horizontal and
+   vertical directions.  These may or may not be abutted.  For easy
+   reference in later processing the pictures may be labelled
+   automatically.  The label consists of a prefix you define,
+   followed by the number of the picture.  The numbering starts at a
+   defined value, usually one, and increments by one for each new
+   picture starting from the bottom-left corner and moving from left
+   to right to the end of the line.  This is repeated in each line
+   until the top-right picture.  Thus if the prefix were "GALAXY",
+   the start number is one and the array comprises three pictures
+   horizontally and two vertically, the top-left picture would have
+   the label "GALAXY4".  On completion the bottom-left picture in
+   the array becomes the current picture.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ASPECT
+
+ASPECT = _REAL (Read)
+   The aspect ratio (x/y) of the picture to be created in modes
+   other than Cursor, Array, and XY.  The new picture is the
+   largest possible with the chosen aspect ratio that will fit
+   within the part of the reference picture defined by the
+   fractional sizes (see parameter FRACTION).  The justification
+   comes from the value of MODE.  Thus to obtain the largest
+   picture parameter set FRACTION=1.0.  A null value (!) does not
+   apply an aspect-ratio constraint, and therefore the new
+   picture fills the part of the reference picture defined by the
+   fractional sizes. [!]
+
+CURRENT
+
+CURRENT = _LOGICAL (Read)
+   TRUE if the new picture is to lie within the current picture,
+   otherwise the new picture can lie anywhere within the BASE
+   picture.  In other words, when it is TRUE the current picture
+   is the reference picture, and when FALSE the base is the
+   reference picture. [FALSE]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device. [Current graphics device]
+
+FILL
+
+FILL = _REAL (Read)
+   The linear filling factor for the Array mode.  In other words
+   the fractional size (applied to both co-ordinates) of the new
+   picture within each of the XPIC * YPIC abutted sections of
+   the picture being sub-divided.  Each new picture is located
+   centrally within the section.  A filling factor of 1.0 means
+   that the pictures in the array abut.  Smaller factors permit a
+   gap between the pictures.  For example, FILL = 0.9 would give
+   a gap between the created pictures of 10 per cent of the
+   height and width of each picture, with exterior borders of 5
+   per cent.  FILL must lie between 0.1 and 1.0. [1.0]
+
+FRACTION
+
+FRACTION( ) = _REAL (Read)
+   The fractional size of the new picture along each axis,
+   applicable for modes other than Array, Cursor, and XY.  Thus
+   FRACTION controls the relative shape as well as the size of
+   the new picture.  If only a single value is given then it is
+   applied to both x and y axes, whereupon the new picture has
+   the shape of the reference picture.  So a value of 0.5 would
+   create a picture 0.25 the area of the current or BASE picture.
+   The default is 0.5, unless parameter ASPECT is not null, when
+   the default is 1.0. This parameter is not used if the picture
+   size is specified in centimetres using parameter SIZE. []
+
+LABELNO
+
+LABELNO = _INTEGER (Read)
+   The number used to form the label for the first (bottom-left)
+   picture in Array mode.  It cannot be negative. [1]
+
+LBOUND
+
+LBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the lower bound that defines the new picture.
+   The suggested default is the bottom-left of the current
+   picture.  (XY mode)
+
+MODE
+
+MODE = LITERAL (Read)
+   Method for selecting the new picture. The options are "Cursor"
+   for cursor mode (provided the graphics device has one), "XY"
+   to select x-y limits, and "Array" to create a grid of
+   equal-sized FRAME pictures.  The remainder are locations specified
+   by two characters, the first corresponding to the vertical
+   position and the second the horizontal.  For the vertical,
+   valid positions are T(op), B(ottom), or C(entre); and for the
+   horizontal the options are L(eft), R(ight), or C(entre). ["Cursor"]
+
+OUTLINE
+
+OUTLINE = _LOGICAL (Read)
+   If TRUE, a box that delimits the new picture is drawn. [TRUE]
+
+PREFIX
+
+PREFIX = LITERAL (Read)
+   The prefix to be given to the labels of picture created in
+   Array mode.  It should contain no more than twelve characters.
+   If the empty string "" is given, the pictures will have
+   enumerated labels.  Note that the database can contain only
+   one picture with a given label, and so merely numbering labels
+   increases the chance of losing existing labels.  A ! response
+   means no labelling is required.  The suggested default is the
+   last-used prefix.
+
+SIZE
+
+SIZE( 2 ) = _REAL (Read)
+   The size of the new picture along both axes, in centimetres,
+   applicable for modes other than Array, Cursor, and XY. If a
+   single value is given, it is used for both axes. If a null
+   value (!) is given, then the size of the picture is determined
+   by parameter FRACTION. [!]
+
+UBOUND
+
+UBOUND( 2 ) = _REAL (Read)
+   Co-ordinates of the upper bound that defines the new picture.
+   The suggested default is the top-right of the current picture.
+   (XY mode)
+
+XPIC
+
+XPIC = _INTEGER (Read)
+   The number of new pictures to be formed horizontally in the
+   BASE or current picture in Array mode.  The total number of
+   new pictures is XPIC * YPIC.    The value must lie in the
+   range 1--20.  The suggested default is 2.
+
+YPIC
+
+YPIC = _INTEGER (Read)
+   The number of new pictures to be formed vertically in the BASE
+   or current picture in Array mode.  The value must lie in the
+   range 1--20.  The suggested default is the value of parameter
+   XPIC.
+
+Examples
+
+picdef tr
+   Creates a new FRAME picture in the top-right quarter of the
+   full display area on the current graphics device, and an
+   outline is drawn around the new picture.  This picture becomes
+   the current picture.
+ picdef bl aspect=1.0
+   Creates a new FRAME picture within the full display area on
+   the current graphics device, and an outline is drawn around
+   the new picture.  This picture is the largest square possible,
+   and it is justified to the bottom-left corner.  It becomes the
+   current picture.
+ picdef bl size=[15,10]
+   Creates a new FRAME picture within the full display area on
+   the current graphics device, and an outline is drawn around
+   the new picture.  This picture is 15 by 10 centimetres in size
+   and it is justified to the bottom-left corner.  It becomes the
+   current picture.
+ picdef cc 0.7 current nooutline
+   Creates a new FRAME picture situated in the centre of the
+   current picture on the current graphics device.  The new
+   picture has the same shape as the current one, but it is
+   linearly reduced by a factor of 0.7.  No outline is drawn
+   around it.  The new picture becomes the current picture.
+ picdef cc [0.8,0.5] current nooutline
+   As above except that its height is half that of the current
+   picture, and its width is 0.8 of the current picture.
+ picdef cu device=graphon
+   Creates a new FRAME picture within the full display area of
+   the Graphon device.  The bounds of the new picture are defined
+   by cursor interaction.  An outline is drawn around the new
+   picture which becomes the current picture.
+ picdef mode=a prefix=M xpic=3 ypic=2
+   Creates six new equally sized and abutting FRAME pictures
+   within the full display area of the current graphics device.
+   All are outlined.  They have labels M1, M2, M3, M4, M5, and
+   M6.  The bottom-left picture (M1) becomes the current picture.
+ picdef mode=a prefix="" xpic=3 ypic=2 fill=0.8
+   As above except that the pictures do not abut since each is
+   0.8 times smaller in both dimensions, and the labels are 1,
+   2, 3, 4, 5, and 6.
+
+Related_Applications
+
+   KAPPA: PICBASE, PICCUR, PICDATA, PICFRAME, PICGRID, PICLABEL,
+          PICLIST, PICSEL, PICXY.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 1989 April 30 (MJC):
+    Original.
+  1989 June 26 (MJC):
+    Added positional code and fraction.
+  1989 July 11 (MJC):
+    Reordered code so as to get a zone once the reference picture
+    is known to avoid "SGS zone too small" problem, and cursor
+    only checked if cursor mode is selected.
+  1989 November 10 (MJC):
+    Added box option, and commentary for both terminals and image
+    displays.
+  1990 January 9 (MJC):
+    Corrected SGS status.
+  1990 January 14 (MJC):
+    Added array option.
+  1990 April 30 (MJC):
+    Improved the cursor mode.
+  1990 August 6 (MJC):
+    Used parameters for upper and lower bounds rather than x-y
+    limits.
+  1991 March 19 (MJC):
+    Converted to SST prologue.
+  1991 April 9 (MJC):
+    Added AGI begin-and-end block.
+  1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+  1992 March 24 (MJC):
+    Added FILL parameter for Array mode.
+  1992 July 30 (MJC):
+    Changed parameter CURPIC to CURRENT for consistency.
+  1993 August 18 (MJC):
+    Added ASPECT parameter, and permitted FRACTION to have
+    different values for x and y.
+  1994 February 8 (MJC):
+    Annulled SGS zone in array mode that prevented large arrays
+    from being created.
+  1995 August 21 (MJC):
+    Made usage and examples lowercase.  Removed DEVICE as a
+    positional parameter, and made XPIC and YPIC positional; this
+    is to enable PICGRID to operate.  Added Related Applications.
+  1995 August 23 (MJC):
+    Removed CURRENT as a positional parameter, and made LBOUND and
+    UBOUND positional; this is to enable PICXY to operate and to
+    allow both PICGRID and PICXY to inherit the CURRENT option.
+  21-AUG-1998 (DSB):
+    Converted to use PGPLOT. Re-formatted code. Added parameter SIZE.
 .endhelp

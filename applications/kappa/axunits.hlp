@@ -1,14 +1,10 @@
 .help axunits Starlink kappa
 .nf
 Sets a new units value for an axis within an NDF data structure.
-
-Usage:
-
-   axunits ndf units dim
-
-Description:
-
-   This routine sets a new value for a units component of an
+ Usage:
+    axunits ndf units dim
+ Description:
+    This routine sets a new value for a units component of an
    existing NDF AXIS data structure.  The NDF is accessed in update
    mode and any pre-existing units component is over-written with a
    new value.  Alternatively, if a `null' value (!) is given for the
@@ -50,12 +46,10 @@ Examples
 axunits ngc253 "arcsec" 2
    Sets the units component of the second axis dimension of the
    NDF structure ngc253 to have the value "arcsec".
-
-axunits ndf=spect units=Angstrom
+ axunits ndf=spect units=Angstrom
    Sets the axis units component of the 1-dimensional NDF
    structure spect to have the value "Angstrom".
-
-axunits datafile units=! dim=3
+ axunits datafile units=! dim=3
    By specifying a null value (!), this example erases any
    previous value of the units component for the third dimension
    in the NDF structure datafile.

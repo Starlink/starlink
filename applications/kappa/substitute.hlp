@@ -2,14 +2,10 @@
 .nf
 Replaces all occurrences of a given value in an NDF array with
 another value.
-
-Usage:
-
-   substitute in out oldval newval [comp]
-
-Description:
-
-   This application changes all pixels that have a defined value in
+ Usage:
+    substitute in out oldval newval [comp]
+ Description:
+    This application changes all pixels that have a defined value in
    an NDF with an alternate value.  Other values are unchanged.  The
    number of replacements is reported.
 
@@ -71,12 +67,10 @@ substitute aa bb 1 0
    This copies the NDF called aa to the NDF bb, except
    that any pixels with value 1 in aa are altered to have value
    0 in bb.
-
-substitute aa bb oldval=1 newval=0 comp=v
+ substitute aa bb oldval=1 newval=0 comp=v
    As above except the substitution occurs to the variance
    values.
-
-substitute in=saturn out=saturn5 oldval=2.5 newval=5 comp=All
+ substitute in=saturn out=saturn5 oldval=2.5 newval=5 comp=All
    This copies the NDF called saturn to the NDF saturn5, except
    that any elements in the data and variance arrays that have
    value 2.5 are altered to have value 5 in saturn5.
@@ -95,15 +89,13 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie  (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1997 May 23 (MJC):
     Original version.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -111,8 +103,6 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  Any number of NDF dimensions is supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

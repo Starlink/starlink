@@ -1,14 +1,10 @@
 .help gdstate Starlink kappa
 .nf
 Shows the current status of a graphics device.
-
-Usage:
-
-   gdstate [device]
-
-Description:
-
-   This application displays the current status of a graphics
+ Usage:
+    gdstate [device]
+ Description:
+    This application displays the current status of a graphics
    device, including details of the current graphics-database
    picture (e.g. its co-ordinate system and position on the display
    surface).
@@ -108,20 +104,16 @@ Examples
 
 gdstate
    Shows the status of the current graphics device.
-
-gdstate ps_l
+ gdstate ps_l
    Shows the status of the ps_l device.
-
-gdstate outline
+ gdstate outline
    Shows the status of the current graphics device and draws an
    outline around the current database picture.
-
-gdstate refnam=(ndfname)
+ gdstate refnam=(ndfname)
    Shows the status of the current graphics device.  If there
    is a reference data object, its name is written to the ICL
    variable NDFNAME.
-
-gdstate ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
+ gdstate ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
    Shows the status of the current graphics device.  The bounds
    of the current picture in normalised device co-ordinates
    are written to the ICL variables: X1, X2, Y1, Y2.
@@ -140,28 +132,22 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1-DEC-1989 (RFWS):
     Original version.
-
- 13-DEC-1989 (RFWS):
+  13-DEC-1989 (RFWS):
     Added call to MSG_SYNC to synchonise message system and
     graphical output.
-
- 1990 Jan 16 (MJC):
+  1990 Jan 16 (MJC):
     Added output of the current picture's label, if it exists.
-
- 1991 February 8 (MJC):
+  1991 February 8 (MJC):
     Added output of the current picture's reference object, if it
     exists.
-
- 1991 March 24 (MJC):
+  1991 March 24 (MJC):
     Converted to SST prologue.
-
- 1991 August 20 (MJC):
+  1991 August 20 (MJC):
     Added output parameters and REPORT parameter.
 .endhelp

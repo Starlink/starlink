@@ -1,14 +1,10 @@
 .help chain Starlink kappa
 .nf
 Concatenates a series of vectorized NDFs.
-
-Usage:
-
-   chain in c1 [c2] [c3] ... [c25] out=?
-
-Description:
-
-   This application concatenates a series of NDFs, in the order
+ Usage:
+    chain in c1 [c2] [c3] ... [c25] out=?
+ Description:
+    This application concatenates a series of NDFs, in the order
    supplied and treated as vectors, to form a 1-dimensional output
    NDF.  The dimensions of the NDFs may be different, and indeed so
    may their dimensionalities.
@@ -50,8 +46,7 @@ Examples
 chain obs1 obs2 out=stream
    This concatenates the NDF called obs2 on to the arrays in the
    NDF called obs1 to produce the 1-dimensional NDF stream.
-
-chain c1=obs2 c2=obs1 in=obs3 out=stream
+ chain c1=obs2 c2=obs1 in=obs3 out=stream
    This concatenates the NDF called obs2 on to the arrays in the
    NDF called obs3, and then concatenates the arrays from obs1
    to them to produce the 1-dimensional NDF stream.
@@ -75,8 +70,6 @@ Implementation_Status
    VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
    data structure and propagates all extensions.  Propagation is from
    the base NDF.  WCS and AXIS information is lost.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  Any number of NDF dimensions is supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

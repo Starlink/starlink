@@ -1,17 +1,12 @@
 .help fitsval Starlink kappa
 .nf
 Reports the value of a keyword in the FITS extension.
-
-Usage:
-
-   fitsval ndf keyword
-
-Description:
-
-   This application reports the value of a keyword in an NDF's FITS
+ Usage:
+    fitsval ndf keyword
+ Description:
+    This application reports the value of a keyword in an NDF's FITS
    extension.
-
-   It is a synonym for "fitsmod edit=print mode=interface".
+    It is a synonym for "fitsmod edit=print mode=interface".
 
 Parameters
 
@@ -20,8 +15,7 @@ For information on individual parameters, select from the list below:
 KEYWORD
 
 KEYWORD = LITERAL (Read)
-
-   The name of an existing keyword in the FITS extension whose value
+    The name of an existing keyword in the FITS extension whose value
    is to be reported.  A name may be compound to handle hierarchical
    keywords, and it has the form keyword1.keyword2.keyword3 etc.  The
    maximum number of keywords per FITS card is 20.  Each keyword must
@@ -29,15 +23,13 @@ KEYWORD = LITERAL (Read)
    comprising only alphanumeric characters, hyphen, and underscore.
    Any lowercase letters are converted to uppercase and blanks are
    removed before comparison with the existing keywords.
-
-   KEYWORD may have an occurrence specified in brackets [] following
+    KEYWORD may have an occurrence specified in brackets [] following
    the name.  This enables the values to be obtained for keywords that
    appear more than once.  Note that it is not normal to have multiple
    occurrences of a keyword in a FITS header, unless it is blank,
    COMMENT or HISTORY.  Any text between the brackets other than a
    positive integer is interpreted as the first occurrence.
-
-   The suggested value is the current value.
+    The suggested value is the current value.
 
 NDF
 
@@ -49,14 +41,10 @@ Examples
 fitsval abc bscale
    This reports the value of the FITS keyword BSCALE, which is
    located within the FITS extension of the NDF called abc.
-
-fitsval ndf=abc keyword=date[2]
+ fitsval ndf=abc keyword=date[2]
    This reports the value of the second occurrence FITS keyword DATE,
    which is located within the FITS extension of the NDF called abc.
-
-
-Related_Applications
-
+ 2 Related_Applications
    KAPPA: FITSEDIT, FITSEXIST, FITSHEAD, FITSLIST, FITSMOD.
 
 Authors

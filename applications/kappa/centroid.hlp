@@ -1,14 +1,10 @@
 .help centroid Starlink kappa
 .nf
 Finds the centroids of star-like features in an NDF.
-
-Usage:
-
-   centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
-
-Description:
-
-   This routine takes an NDF and returns the co-ordinates of the
+ Usage:
+    centroid ndf [mode] init [search] [maxiter] [maxshift] [toler]
+ Description:
+    This routine takes an NDF and returns the co-ordinates of the
    centroids of features in its data array given approximate initial
    co-ordinates.  A feature is a set of connected pixels which are
    above or below the surrounding background region.  For example, a
@@ -24,11 +20,9 @@ Description:
    data variance to generate realisations of the data about the
    feature.  Each realisation is processed identically to the actual
    data, and statistics are formed to derive the standard deviations.
-
-   Positions may be expressed in either pixel or data co-ordinates.
+    Positions may be expressed in either pixel or data co-ordinates.
    Three methods are available for obtaining the initial positions.
-
-   1. From the parameter system, usually in response to prompting.
+    1. From the parameter system, usually in response to prompting.
    2. By a placing a graphics cursor of a nominated device on the
       feature.  To do this the data array must already be
       displayed as an image, or a contour or line plot, and the
@@ -36,15 +30,13 @@ Description:
    3. By reading a text file containing a list of co-ordinates
       in free format, one object per record.  There may be
       commentary lines in the file beginning with '#' or '!'.
-
-   In the first two modes the application loops asking for new
+    In the first two modes the application loops asking for new
    feature co-ordinates until told to quit or encounters an error.
    Features within NDFs of dimension 1 to 7 may be located, except
    in the second method, where the graphics interface limits
    constrain the NDF to be one- or two-dimensional---the most common
    cases.
-
-   The results may optionally be written to a log file that includes
+    The results may optionally be written to a log file that includes
    details of the input parameters.  This is intended for the human
    reader.  If the centroid positions are to be fed into another
    application requiring a list of co-ordinates, e.g. for photometry,
@@ -210,40 +202,33 @@ Examples
 centroid cluster cu
    This finds the centroids in the NDF called cluster via the
    graphics cursor on the current graphics device.
-
-centroid cluster cu search=21
+ centroid cluster cu search=21
    This finds the centroids in the NDF called cluster via the
    graphics cursor on the current graphics device.  The search
    box for the centroid is 21 pixels in each dimension.
-
-centroid cluster i [21.7,5007.1] cosys=d
+ centroid cluster i [21.7,5007.1] cosys=d
    This finds the centroid of the object in the 2-dimensional NDF
    called cluster around the data co-ordinate (21.7,5007.1).
-
-centroid arp244(6,,) i [40,30] cosys=w toler=0.01
+ centroid arp244(6,,) i [40,30] cosys=w toler=0.01
    This finds the 2-dimensional centroid of the feature near
    pixel (6,40,30) in the 3-dimensional NDF called arp244 via the
    graphics cursor on the current graphics device.  The centroid
    must be found to 0.01 pixels.
-
-centroid cluster i [40,30] cosys=w xcen=(xp) ycen=(yp)
+ centroid cluster i [40,30] cosys=w xcen=(xp) ycen=(yp)
    This finds the centroid of the object in the 2-dimensional NDF
    called cluster around the pixel co-ordinate (40.0,30.0).  The
    centroid co-ordinates are written to ICL variables XP and YP
    for use in other applications.
-
-centroid cluster mode=xy coin=objects.dat logfile=centroids.log
+ centroid cluster mode=xy coin=objects.dat logfile=centroids.log
    This finds the centroids in the NDF called cluster.  The
    initial positions are given in the text file objects.dat in
    the current co-ordinate system.  A log of the input parameter
    values, initial and centroid positions is written to the text
    file centroids.log.
-
-centroid cluster mode=xy coin=objects.dat coout=centres.dat
+ centroid cluster mode=xy coin=objects.dat coout=centres.dat
    As above, except there is no logfile; instead a co-ordinate
    file called centres.dat is generated.
-
-centroid cluster i [40,30] cosys=w nopositive
+ centroid cluster i [40,30] cosys=w nopositive
    This finds the centroid of the object in the 2-dimensional NDF
    called cluster around the pixel co-ordinate (40.0,30.0).  The
    feature must have values below that of the surrounding
@@ -261,33 +246,27 @@ History
 
  1991 March 24 (MJC):
     Original NDF version based on the pre-0.8 version.
-
- 1991 July 12 (MJC):
+  1991 July 12 (MJC):
     Added COOUT file.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 14 (MJC):
+  1992 April 14 (MJC):
     Handles arbitrary user-defined sections.
-
- 1992 November 30 (MJC):
+  1992 November 30 (MJC):
     Does not use non-monotonic axis centres.
 
 Implementation_Status
 
    -  The processing of bad pixels and all non-complex numeric types
    is supported.
-
-   -  Data co-ordinates are processed in double precision.  When data
+    -  Data co-ordinates are processed in double precision.  When data
    co-ordinates are being used, and the cursor mode is selected or
    the NDF contains axis information, the results appear in double
    precision.  Double precision arithmetic is needed to prevent
    a loss of precision for certain co-ordinate transformations stored
    within the graphics database or for double-precision axis centres.
-
-   -  The format of the logfile is different for 2-d from other
+    -  The format of the logfile is different for 2-d from other
    dimensions for historical reasons.  The 2-d has a tabular layout
    with headings.  Logging awaits a proper table system to make this
    consistent.

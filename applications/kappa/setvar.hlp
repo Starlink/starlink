@@ -2,14 +2,10 @@
 .nf
 Set new values for the variance component of an NDF data
 structure.
-
-Usage:
-
-   ndf variance
-
-Description:
-
-   This routine sets new values for the variance component of an NDF
+ Usage:
+    ndf variance
+ Description:
+    This routine sets new values for the variance component of an NDF
    data structure. The data structure is accessed in `update' mode,
    and new variance values are generated from the NDF's data array
    by means of a Fortran-like arithmetic expression.  Any previous
@@ -37,8 +33,7 @@ VARIANCE = LITERAL (Read)
    error estimates, whereas VARIANCE="DATA + 50.7" might be used
    if a sky background of 50.7 units had previously been
    subtracted.
-
-   If a `null' value (!) is given for this parameter, then no new
+    If a `null' value (!) is given for this parameter, then no new
    variance component will be created and any pre-existing
    variance values will be erased.
 
@@ -47,13 +42,11 @@ Examples
 setvar ngc4709 data
    This sets the variance component within the NDF structure
    ngc4709 to equal its corresponding data-array component.
-
-setvar ndf=arcspec "data - 0.31"
+ setvar ndf=arcspec "data - 0.31"
    This sets the variance component within the NDF structure
    arcspec to be its corresponding data-array component less a
    constant 0.31.
-
-setvar cube4 variance=!
+ setvar cube4 variance=!
    This erases the values of the variance component within
    the NDF structure cube4, if it exists.
 
@@ -62,11 +55,9 @@ Notes
 -  All of the standard Fortran 77 intrinsic functions are
 available for use in the variance expression, plus a few others
 (see SUN/61 for details and an up-to-date list).
-
--  Calculations are performed using real arithmetic (or double
+ -  Calculations are performed using real arithmetic (or double
 precision if appropriate) and are constrained to be non-negative.
-
--  The data type of the variance component is set to match that of
+ -  The data type of the variance component is set to match that of
 the data component.
 
 Related_Applications
@@ -76,20 +67,16 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  19-DEC-1989 (RFWS):
     Original version.
-
- 9-APR-1990 (RFWS):
+  9-APR-1990 (RFWS):
     Changed name.
-
- 1992 January 22 (MJC):
+  1992 January 22 (MJC):
     Added Usage and Examples items.
-
- 1995 April 24 (MJC):
+  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 .endhelp

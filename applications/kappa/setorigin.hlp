@@ -1,14 +1,10 @@
 .help setorigin Starlink kappa
 .nf
 Sets a new pixel origin for an NDF.
-
-Usage:
-
-   setorigin ndf origin
-
-Description:
-
-   This application sets a new pixel origin value for an NDF data
+ Usage:
+    setorigin ndf origin
+ Description:
+    This application sets a new pixel origin value for an NDF data
    structure.  The NDF is accessed in update mode and the indices of
    the first pixel (the NDF's lower pixel-index bounds) are set to
    specified integer values, which may be positive or negative.  No
@@ -46,19 +42,16 @@ Examples
 setorigin image_2d [1,1]
    Sets the indices of the first pixel in the 2-dimensional image
    image_2d to be (1,1).  The image pixel values are unaltered.
-
-setorigin ndf=starfield
+ setorigin ndf=starfield
    A new pixel origin is set for the NDF structure called
    starfield.  SETORIGIN will prompt for the new origin values,
    supplying the existing values as defaults.
-
-setorigin ndf=cube origin=[-128,-128]
+ setorigin ndf=cube origin=[-128,-128]
    Sets the pixel origin values for the first two dimensions of
    the 3-dimensional NDF called cube to be (-128,-128).  A value
    for the third dimension is not specified, so the origin of
    this dimension will remain unchanged.
-
-setorigin betapic like=alphapic
+ setorigin betapic like=alphapic
    Sets the pixel origin of the NDF called betapic to be equal to
    that of the NDF called alphapic.
 
@@ -81,24 +74,19 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  3-JUL-1990 (RFWS):
     Original version.
-
- 4-JUL-1990 (RFWS):
+  4-JUL-1990 (RFWS):
     Changed to allow dimensions whose new origin is not specified
     to retain their original lower pixel-index bounds.
-
- 3-AUG-1990 (RFWS):
+  3-AUG-1990 (RFWS):
     Corrected error in routine name in error message.
-
- 13-MAR-1991 (RFWS):
+  13-MAR-1991 (RFWS):
     Added the LIKE parameter to permit the use of a template NDF.
-
- 1995 April 24 (MJC):
+  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 .endhelp

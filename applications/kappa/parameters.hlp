@@ -3,76 +3,55 @@
 KAPPA is a command-driven package.  Commands have parameters by
 which you can qualify their behaviour.  Parameters are obtained in
 response to prompts or supplied on a command line.
-
-For convenience, the main aspects of the ADAM parameter system as
+ For convenience, the main aspects of the ADAM parameter system as
 seen by a user of KAPPA are described below, but note that most of
 what follows is applicable to any Starlink application.
-
-
-Summary
-
+ 2 Summary
 For your convenience, here is a summary of how to use parameters.
 If you want more information, go to the appropriate sub-topic
 of "Parameters".
-
-  o  Command-line values
-
-    On the command line you can supply values by keyword or by
+   o  Command-line values
+     On the command line you can supply values by keyword or by
     position.  Sub-topic
     "Specifying_Parameter_Values_on_Command_Lines" has more
     details including abbreviated keywords.
-
-  o  ACCEPT, PROMPT, RESET command-line special keywords
-
-    ACCEPT accepts all the suggested defaults that would otherwise
+   o  ACCEPT, PROMPT, RESET command-line special keywords
+     ACCEPT accepts all the suggested defaults that would otherwise
     be prompted.  PROMPT prompts for all the parameters not given
     on the command line, and RESET resets all the suggested
     defaults to their initial values.  You can find more details
     and examples in sub-topic
     "Special_Keywords:_ACCEPT,_PROMPT,_RESET".
-
-  o  NAME - Prompt string /Suggested default/ >
-
-    This is a schematic of a prompt.  NAME is the parameter's name.
+   o  NAME - Prompt string /Suggested default/ >
+     This is a schematic of a prompt.  NAME is the parameter's name.
     You normally respond with the value for the parameter, but
     there are special responses available (see below).  If you just
     hit the return key, the suggested default becomes the parameter
     value.  Many parameters are defaulted without prompting.
     Sub-topics "Defaults" and "Globals" have more details.
-
-Here is a list of some example parameter values to illustrate the
+ Here is a list of some example parameter values to illustrate the
 possible ways you can respond to a prompt.  Where there are
 command-line differences, they are noted.
-
-  o  5409.12
-
-    This is a scalar.  Numerical values can be integer, real, or
+   o  5409.12
+     This is a scalar.  Numerical values can be integer, real, or
     double precision.
-
-  o  12,34,56,78
-
-    This is a vector.  They must be enclosed in [] if the array is
+   o  12,34,56,78
+     This is a vector.  They must be enclosed in [] if the array is
     supplied on the command line, or for character arrays.
-
-  o  [[11,21,31],[12,22,32]]
-
-    This is a 3x2 array.  Arrays of dimension greater than 2 should
+   o  [[11,21,31],[12,22,32]]
+     This is a 3x2 array.  Arrays of dimension greater than 2 should
     appear in nested brackets.  See sub-topic "Arrays" for more
     about array values. 
-
-  o  T
+   o  T
   o  no
-
-   This is a TRUE value for a logical parameter.  Acceptable values
+    This is a TRUE value for a logical parameter.  Acceptable values
    are TRUE, FALSE, YES, NO, T, F, Y, N and their lowercase
    equivalents.  On the command line, the parameter name as a
    keyword means TRUE.  If the name is prefixed with NO, the value is
    set to FALSE.
-
-  o  a string
+   o  a string
   o  "a string"
-
-    This is a string.  Strings need not be quoted at prompts.
+     This is a string.  Strings need not be quoted at prompts.
     Quotes are required on the command line if the string includes
     spaces or wildcards, or is a comma-separated array of strings.
     There is more in sub-topic "Strings".  Some parameters offer a
@@ -80,44 +59,34 @@ command-line differences, they are noted.
     abbreviation to select an option.  Other parameters can be
     numerical or a string.  See sub-topic "Menus" for more
     information.
-
-  o  filename
+   o  filename
   o  @123
-
-    This enters a filename (or tape drive).  You give a text
+     This enters a filename (or tape drive).  You give a text
     filename verbatim, and NDFs without the file extension.
     Foreign formats will  usually have the file extension.  Should
     the filename be a numerical value, it must be preceded by an @.
     There is more in sub-topic "Strings".
-
-  o  min
+   o  min
   o  max
-
-    This selects the minimum- or maximum-allowed value, but not all
+     This selects the minimum- or maximum-allowed value, but not all
     parameters have a defined a range of permitted values.  See
     sub-topic "MIN_MAX".
-
-  o  !
-
-    Enters the null value.  This has a variety of special meanings;
+   o  !
+     Enters the null value.  This has a variety of special meanings;
     which one will depend on the particular parameter.  For example,
     null might indicate that an output file is not to be created, or
     a loop is to be ended.  There are more examples in sub-topic
     "Abort_and_Null".
-
-  o  !!
+   o  !!
     This aborts the application cleanly.
-
-  o  ?
+   o  ?
   o  ??
-
-    A single question mark presents the online help for the
+     A single question mark presents the online help for the
     parameter, and then reprompts.  A double question mark leaves
     you in the help system to explore other help information.  See
     sub-topic "Help" for examples.   These special values are not
     supported from the command line.
-
-  o  \
+   o  \
     This accepts the suggested default for the prompted parameter
     and the respective suggested defaults for all subsequent
     parameters for which prompting would otherwise occur.  On the
@@ -125,11 +94,7 @@ command-line differences, they are noted.
     applies to all parameters that would otherwise be prompted.
     Note that from the shell you write \\, as \ is a shell
     metacharacter.
-
-
-
-Defaults
-
+  2 Defaults
 Command-line values are used mostly for those parameters that are
 normally defaulted by the application.  Defaulted parameters enable
 applications to have many options, say for controlling the
@@ -155,8 +120,7 @@ suitable default, usually depending on the values of other
 parameters or the dimensions of your data array.  If you want to
 override one of these defaults, then you must specify the
 parameter's value on the command line.)
-
-When you are prompted you will usually be given a suggested default
+ When you are prompted you will usually be given a suggested default
 value in / / delimiters.  You can choose to accept the default by
 pressing carriage return.  For example, 64 is the suggested value
 below.
@@ -180,8 +144,7 @@ you do not have to prefix your value with an @, e.g.
 There are rare cases when the syntax is ambiguous, and it is then
 that you need to include the @.  The sub-topic "Strings" describes
 when the @ is needed.
-
-From ICL the default value can be edited to save typing by first
+ From ICL the default value can be edited to save typing by first
 pressing the <TAB> key.  The editor behaves like the shell
 command-line editor.  Defaults may change as data are processed by
 KAPPA.  Often the current (last) value of the parameter will be
@@ -193,45 +156,37 @@ within an application.
      Title = KAPPA - Gauss 
      Array is 109 by 64 pixels 
      CHOICE - Peep, Examine or List /'P'/ >
-
-     XCEN - x centre pixel index of 7x7 box /55/ > 60 
+      XCEN - x centre pixel index of 7x7 box /55/ > 60 
      YCEN - y centre pixel index of 7x7 box /32/ > 28
         .              .               .              .
         .              .               .              .
         .              .               .              .
      ANOTHER - Another inspection ? /YES/ >
      CHOICE - Peep, Examine or List /'P'/ >
-
-     XCEN - x centre co-ordinate of 7x7 box /60/ > 66 
+      XCEN - x centre co-ordinate of 7x7 box /60/ > 66 
      YCEN - y centre co-ordinate of 7x7 box /28/ > 
  
 and so on.  Notice that the current values of the centres are the
 suggested values at the second pair of prompts.
-
-Current values of parameters are stored in a parameter file, and
+ Current values of parameters are stored in a parameter file, and
 so they persist between sessions.  For tasks run from the shell,
 this is an HDS file $ADAM_USER/<application>.sdf, where
 <application> is the name of the application.  (If the environment
 variable $ADAM_USER is not defined the parameter file is situated
 in $HOME/adam).
-
-Unfortunately, tasks invoked from ICL use a monolith parameter
+ Unfortunately, tasks invoked from ICL use a monolith parameter
 file, which contains the individual application parameter files for
 the members.  So for example, KAPPA has kappa_mon.sdf,
 kapview_mon.sdf, and ndfpack_mon.sdf stored in same directory as
 the individual files.  This duality means that there are two
 independent sets of current values for each task depending on
 where you ran it from.
-
-The parameter file should not be deleted unless the parameters
+ The parameter file should not be deleted unless the parameters
 values are to be completely reset, or the file has been corrupted
 in some way.  If you suspect the latter case, say after
 interrupting a task, run HDSTRACE (SUN/102) on the file to check
 its integrity.
-
-
-Globals
-
+ 2 Globals
 KAPPA stores a number of global parameters that are used as
 defaults to reduce typing in response to prompts.  Global means
 that they are shared between applications.  The most common is the
@@ -240,12 +195,10 @@ in the "Defaults" sub-topic, this was horsehead.sdf.  If you just
 press <CR> to the prompt, the global value is unchanged.  Only when
 you modify the parameter and the application completes without error
 is the global value updated.
-
-All global parameters are stored in HDS file $ADAM_USER/GLOBAL.sdf,
+ All global parameters are stored in HDS file $ADAM_USER/GLOBAL.sdf,
 or $HOME/adam/GLOBAL.sdf if the $ADAM_USER environment variable is not
 defined.  The full list is given below.
-
-GLOBAL.COORD_SYSTEM     Current co-ordinate system.
+ GLOBAL.COORD_SYSTEM     Current co-ordinate system.
 GLOBAL.DATA_ARRAY       Last NDF/foreign dataset accessed or written.
 GLOBAL.GRAPHICS_DEVICE  Current GKS workstation.
 GLOBAL.IMAGE_DISPLAY    Current image display (base).
@@ -253,8 +206,7 @@ GLOBAL.IMAGE_OVERLAY    Current image-display overlay.
 GLOBAL.INTERACTIONMODE  Current interaction mode. 
 GLOBAL.LUT              Last lookup table file accessed or written. 
 GLOBAL.TRANSFORM        Current transformation structure.
-
-KAPPA uses the last DATA_ARRAY written or accessed as the suggested
+ KAPPA uses the last DATA_ARRAY written or accessed as the suggested
 default value for the next prompt for an NDF structure or foreign
 data format.  The same applies to the current lookup table and
 transformation structure.  However, the remaining, including the
@@ -264,11 +216,9 @@ various topics:
    "Selecting_Graphics_Devices" for the graphics devices,
    "Interaction_Mode" for the interaction mode, and
    "Co-ordinate_Systems" for the co-ordinate systems.
-
-The values of all global parameters may be inspected with the 
+ The values of all global parameters may be inspected with the 
 GLOBALS task.  You can make them undefined using NOGLOBALS.
-
-     ICL> globals
+      ICL> globals
      The current data file                : @/home/dro/jkt/ccdpic
      The current graphics device is       : @ps_l
      The current image-display device is  : @xwindows
@@ -276,83 +226,58 @@ GLOBALS task.  You can make them undefined using NOGLOBALS.
      The current transformation is        : @/home/dro/deform/warpit
      The current interaction mode is      : <undefined>
      The current co-ordinate system is    : WORLD
-
-In the above example no interaction mode is defined.  The next time
+ In the above example no interaction mode is defined.  The next time
 you call an application which uses the interaction mode you would be
 prompted for a value.   Likewise for the image-display overlay. 
 (Under normal circumstances you will not have to enter the @ prefix
 yourself.) 
-
-
-Strings
-
+ 2 Strings
 Notice that the single or double quotes around strings given in
 response to prompts for a character parameter can be omitted.  However,
 on the command line these delimiters are needed if the string
 contains spaces, otherwise the second and subsequent words could be
 treated as separate positional parameters.
-
-From the shell the quotes must be escaped.  For example,
-
-     % settitle myndf \"A new title\"
-
-would assign the title "A new title" to the NDF called myndf.
-
-To indicate that the parameter should come from a data-structure
+ From the shell the quotes must be escaped.  For example,
+      % settitle myndf \"A new title\"
+ would assign the title "A new title" to the NDF called myndf.
+ To indicate that the parameter should come from a data-structure
 object, prefix the name with an @ to tell the parameter system that
 it is a file name, and not a literal value.
-
-     PLTITL - Plot title /' '/ @$ADAM_USER/galaxy.mytitle
-
-In this example PLTITL has the value of object MYTITLE in
+      PLTITL - Plot title /' '/ @$ADAM_USER/galaxy.mytitle
+ In this example PLTITL has the value of object MYTITLE in
 galaxy.sdf.  If the @ were omitted PLTITL would be
 "$ADAM_USER/galaxy.mytitle".  You will need the @ prefix if your
 file name is a number.  Note that the file extension should not be
 included when giving the name of an HDS data file, including NDFs.
 Otherwise HDS will look for an object called SDF nested within the
 file.
-
-Responses to prompts are case insensitive for comparison purposes.
+ Responses to prompts are case insensitive for comparison purposes.
 Strings for character components in NDFs, plot captions and labels
 are treated literally.
-
-
-Arrays
-
+ 2 Arrays
 If a parameter requires an array of values, the series should be in
 brackets separated by commas or spaces.  For example,
-
-     PERCENTILES - List of percentiles > [25,95.5,75]
-
-would input three values: 25, 95.5, and 75 into the real parameter
+      PERCENTILES - List of percentiles > [25,95.5,75]
+ would input three values: 25, 95.5, and 75 into the real parameter
 PERCENTILES.  If the application is expecting an exact number of
 values you will be reprompted, either for all the values if you
 give too many, or the remaining values if you supply too few.
 There is one exception where you can omit the brackets---a fairly
 common one---and that is in response to a prompt for a
 one-dimensional numeric array as above.
-
-From the shell you must escape the brackets.
-
-     % greyplot mode=pe percentiles=\[95,5\]
+ From the shell you must escape the brackets.
+      % greyplot mode=pe percentiles=\[95,5\]
      % greyplot mode=pe percentiles='[95,5]'
      % greyplot mode=pe percentiles="[95,5]"
-
-All the above do this.  Single quotes have the advantage that you
+ All the above do this.  Single quotes have the advantage that you
 can protect all the metacharacters that lie between the quotes, so
 you don't need to escape each metacharacter.
-
-Arrays of parameter values should appear in nested brackets.  For
+ Arrays of parameter values should appear in nested brackets.  For
 example,
-
-     CVALUE - Component values > [[2,3],[5,4],[7,1]]
-
-supplies the values for a 2x3-element parameter array, where
+      CVALUE - Component values > [[2,3],[5,4],[7,1]]
+ supplies the values for a 2x3-element parameter array, where
 element (1,3) has value 7.
-
-
-Abort_and_Null
-
+ 2 Abort_and_Null
 Responding to a prompt with a null value ! will not necessarily
 cause the application to abort, but it can force a suitable default
 to be used, where this is the most-sensible action.  A further use
@@ -361,26 +286,18 @@ is when an optional file may be created, such as a lookup table; a
 file is to be output.  Many tasks use null as a default for
 optional files.  In some applications, CRELUT, a null ends an
 interactive loop.
-
-Responding to a prompt with !! will abort the application.  This
+ Responding to a prompt with !! will abort the application.  This
 process includes the various tidying operations such as the
 unmapping and closing of files.  Any other method of stopping an
 application prematurely can leave files mapped or corrupted.
-
-
-Help
-
+ 2 Help
 To get help about a parameter enter ?.  Usually, this will give
 access to the help-library information for that parameter, for
 example,
-
-     BOX - Smoothing box size /3,3/ > ?
-
-     BLOCK
-
-       Parameters
-
-         BOX(2) = _INTEGER (Read)
+      BOX - Smoothing box size /3,3/ > ?
+      BLOCK
+        Parameters
+          BOX(2) = _INTEGER (Read)
             The x and y sizes (in pixels) of the rectangular box to be
             applied to smooth the image. If only a single value is given,
             then it will be duplicated so that a square filter is used,
@@ -388,40 +305,30 @@ example,
             size along the insignificant dimension is set to 1.  The
             values given will be rounded up to positive odd integers,
             if necessary.
-
-     BOX - Smoothing box size /3,3/ >
-
-and then immediately reprompt you for the parameter.  There are
+      BOX - Smoothing box size /3,3/ >
+ and then immediately reprompt you for the parameter.  There are
 occasions when information about the parameter is insufficient; you
 may require to examine the examples or the description of related
 parameters.  This can be achieved by entering ?? to the prompt.
 You can then delve anywhere in the help information.  When you exit
 the help system you're reprompted for the parameter.
-
-For the old, IMAGE-format applications, the ? does not enter
+ For the old, IMAGE-format applications, the ? does not enter
 the help system, and so the help is limited to an unsatisfactory
 and miserly 120 characters:
-
-     DIRN - Direction of ramping > ?
+      DIRN - Direction of ramping > ?
        1 = L-R : 2 = R-L : 3 = B-T : 4 = T-B, where L is left, R is
      right, B is bottom and T is top
      DIRN - Direction of ramping > ?
-
-Fortunately, this form of parameter help is virtually phased out.
-
-
-Menus
-
+ Fortunately, this form of parameter help is virtually phased out.
+ 2 Menus
 Some parameters offer menus from which you select an option.  You do
 not have to enter the full option string, but merely a string that
 selects a choice unambiguously.  In many cases this can be as little
 as a single character.  Here is an example,
-
-     MODE - Method for selecting contour heights /'Free'/ > ?
+      MODE - Method for selecting contour heights /'Free'/ > ?
          The method used to select the contour levels.  The options are
          described below.
-
-           "Area"      - The contours enclose areas of the array for
+            "Area"      - The contours enclose areas of the array for
                          which the equivalent radius increases by equal
                          increments.  You specify the number of levels.
            "Automatic" - The contour levels are equally spaced between
@@ -437,28 +344,19 @@ as a single character.  Here is an example,
                          step size is in magnitudes so the nth contour
                          is dex(-0.4*(n-1)*step) times the start contour
                          level.
-
-where a F would be sufficient to select the "Free" option, but at
+ where a F would be sufficient to select the "Free" option, but at
 least two characters would be needed if you wanted "Area" or
 "Automatic".
-
-Some parameters permit a mixture---a choice from a menu, or a
+ Some parameters permit a mixture---a choice from a menu, or a
 numerical value within a range.  The options are described in full
 in the help for the specific parameter.
-
-
-Environment_Variables
-
+ 2 Environment_Variables
 Environment variables operate both on the command line and prompts,
 and both from the shell and ICL.  Thus if IMAGEDIR is an environment
 variable pointing to a directory containing the NDF called ngc1365,
 you could access it at a prompt as shown below.
-
-     IN - Input image /@starfield/ > $IMAGEDIR/ngc1365
-
-
-Specifying_Parameter_Values_on_Command_Lines
-
+      IN - Input image /@starfield/ > $IMAGEDIR/ngc1365
+ 2 Specifying_Parameter_Values_on_Command_Lines
 Parameters may be assigned values on the command line.  This is
 useful for running tasks in batch mode and in procedures, and for
 specifying the values of parameters that would otherwise be
@@ -466,73 +364,50 @@ defaulted.  A command-line parameter will prevent prompting for
 that parameter unless there is an error with the given value, say
 giving an alphabetic character string where a floating-point value
 is demanded.
-
-There are two ways in which parameter values may be given on the
+ There are two ways in which parameter values may be given on the
 command line: by keyword and by position.  The two forms may be
 mixed with care.  The parser looks for positional parameters then
 keywords, so you can have some positional values followed by keyword
 values.  See some of the examples presented in the help about
 specific tasks.
-
-
-Keyword
-
+ 3 Keyword
 Keywords may appear in any order. Here is an example of command-line
 defaults using keywords.
-
-     ICL> picdef current fraction=0.4
-
-FRACTION is a real parameter.  CURRENT is a logical parameter; by
+      ICL> picdef current fraction=0.4
+ FRACTION is a real parameter.  CURRENT is a logical parameter; by
 giving just its name it is assigned the value TRUE.  CURRENT=T would
 have the same effect.  To obtain a FALSE value for a logical
 parameter you add a NO prefix to keyword, for example,
-
-     icl> picdef nocurrent
-
-would be equivalent to the following.
-
-     icl> picdef current=false
-
-
-Abbreviations
-
+      icl> picdef nocurrent
+ would be equivalent to the following.
+      icl> picdef current=false
+ 3 Abbreviations
 There is an experimental system that allows you to abbreviate
 parameter keywords to the minimum unambiguous length.  To use it,
 you must first create an environment variable called ADAM_ABBRV
 with an arbitrary value.
-
-So for example
-
-     % setenv ADAM_ABBRV true
+ So for example
+      % setenv ADAM_ABBRV true
      % display mo=pe pe=\[5,95\] ba=blue
-
-would display an NDF between the 5 and 95 percentiles, and marking bad
+ would display an NDF between the 5 and 95 percentiles, and marking bad
 pixels in blue.
-
-If you give an ambiguous keyword, the parameter system will present
+ If you give an ambiguous keyword, the parameter system will present
 the list of possible keywords and ask you to select the one you
 intended.  Suppose you want to display an image surrounded by axes
 annotated using the NCAR fount, and you think that there is only one
 parameter starting with F.
-
-     % display axes f=ncar
+      % display axes f=ncar
      !! Ambiguous keyword F used on the command line
      !  Matches with FILL
      !           and FONT
        - Specify the keyword unambiguously > fo
-
-When reprompted you just give an unambiguous abbreviation for the
+ When reprompted you just give an unambiguous abbreviation for the
 desired parameter, that being FONT in this example.
-
-
-Position
-
+ 3 Position
 Alternatively, you can specify command-line values by position.
 Here is an example.
-
-     % thresh raw clipped 0 255
-
-This applies thresholds to the NDF called raw to form a new NDF
+      % thresh raw clipped 0 255
+ This applies thresholds to the NDF called raw to form a new NDF
 called clipped.  The values between 0 and 255 are unchanged.  Note
 that trailing parameters may be omitted---NEWLO and NEWHI in the
 above example---but intermediate ones may not.  The position of a
@@ -540,10 +415,7 @@ parameter can be found in the Usage in the help for the application.
 (Aside: for IMAGE-format applications look in the help topic of the
 same name at the level beneath the topic "Parameters" in a given
 application.)
-
-
-Keyword_versus_Positional_Parameters
-
+ 3 Keyword_versus_Positional_Parameters
 For tasks with a few parameters, using position is quick and
 convenient.  However, in complex programmes with many parameters it
 would be tedious not only to enter all the intermediate values
@@ -555,49 +427,35 @@ technique is recommended for most parameters, especially in
 scripts and procedures.  Unabbreviated keywords insulate scripts
 against new keywords and positional changes that are sometimes
 needed.
-
-See topic "Custom_KAPPA" if you want to learn how further to
+ See topic "Custom_KAPPA" if you want to learn how further to
 abbreviate command strings to reduce typing for manual operation.
-
-
-Special_Behaviour
-
+ 3 Special_Behaviour
 Sometimes specifying a parameter on the command line induces
 different behaviour, usually to inhibit a loop for procedures, or
 to eliminate unnecessary processing.  For instance,
-
-     ICL> centroid blob init=[51,42] mode=i
-
-will determine the centroid near the point (51,42) in the NDF called
+      ICL> centroid blob init=[51,42] mode=i
+ will determine the centroid near the point (51,42) in the NDF called
 blob, and then it exits, whereas without the INIT value you would be
 re-prompted for a further initial position; and
-
-     % display galaxy mode=sc high=3000 low=1000
-
-prevents the calculation of the extreme values of the NDF called
+      % display galaxy mode=sc high=3000 low=1000
+ prevents the calculation of the extreme values of the NDF called
 galaxy that are normally given as suggested defaults for parameters
 HIGH and LOW, because HIGH and LOW are already known.
-
-
-Special_Keywords:_ACCEPT,_PROMPT,_RESET
-
+ 2 Special_Keywords:_ACCEPT,_PROMPT,_RESET
 Another way in which prompts and default values can be controlled is
 by use of the keywords ACCEPT, PROMPT and RESET.
-
-The RESET keyword causes the suggested default value of all
+ The RESET keyword causes the suggested default value of all
 parameters (apart from those already specified before it on the
 command line) to be set to the original values specified by the
 application or its interface file.  In other words global and
 current values are ignored.
-
-The PROMPT keyword forces a prompt to appear for every application
+ The PROMPT keyword forces a prompt to appear for every application
 parameter.  This can be useful if you cannot remember the name of a
 defaulted parameter or there would be too much to type on the
 command line.  However, it may prove tedious for certain
 applications that have tens of parameters, most of which you
 normally never see.  You can abort if it becomes too boring.
-
-The ACCEPT keyword forces the parameter system to accept the
+ The ACCEPT keyword forces the parameter system to accept the
 suggested default values either for every application parameter if
 the keyword appears on the command line, or all subsequent
 parameters if it is supplied to a prompt.  In other words, those
@@ -609,42 +467,31 @@ parameter has a default, and therefore must be given on the command
 line for the application to work properly.  For example, CREFRAME
 must have a value specified for parameter OUTPIC, the name of the
 output data object.  If we run the application like this:
-
-     ICL> creframe accept
-
-it would fail in the sense that it would still have to prompt for a
+      ICL> creframe accept
+ it would fail in the sense that it would still have to prompt for a
 value---it does not know where to write the output IMAGE
 data file.  However, if we run CREFRAME like this:
-
-     ICL> creframe outpic=stars accept
-
-it would generate an output image using default values for all the
+      ICL> creframe outpic=stars accept
+ it would generate an output image using default values for all the
 parameters except OUTPIC, and write the output to file stars.sdf.
 Another point to be wary of is that some applications have loops,
 INSPECT, LOOK, LUTABLE, and if you use the ACCEPT keyword it will
 only operate the first time the application gets a parameter value.
-
-Sometimes the keyword ACCEPT can be used without any parameter value
+ Sometimes the keyword ACCEPT can be used without any parameter value
 specifications on the command line.  For example, we could follow
 the above command by the command:
-
-     ICL> look accept
-
-and the central 7x7 array of the image created by CREFRAME would
+      ICL> look accept
+ and the central 7x7 array of the image created by CREFRAME would
 be displayed on your terminal without any parameter values being
 prompted.  The symbol \ has the same effect as ACCEPT when used on
 the command line or at prompts, thus:
-
-     ICL> look \
-
-would have the same effect as the previous example---and is quicker
+      ICL> look \
+ would have the same effect as the previous example---and is quicker
 to type.  In command lines from the shell, the backslash is a
 metacharacter and has to be escaped.  The easiest way to do that is
 to double the backslash.
-
-     % look \\
-
-How do you find out which parameters have suggested defaults, as
+      % look \\
+ How do you find out which parameters have suggested defaults, as
 opposed to those that are normally defaulted?  Well, a good rule of
 thumb is that parameters for output files (images, lookup tables
 and text) will not have a default, but the remainder will.  There
@@ -660,45 +507,30 @@ or a default line.)  If you want to use ACCEPT for an automatic
 procedure or batch job you could do some tests to find which
 parameters get prompted and then put them on the command line in
 your procedure. 
-
-The RESET and ACCEPT keywords will work in tandem.  So for instance,
-
-     ICL> look reset accept
-
-will reset the suggested defaults of LOOK to their original, preset
+ The RESET and ACCEPT keywords will work in tandem.  So for instance,
+      ICL> look reset accept
+ will reset the suggested defaults of LOOK to their original, preset
 values, and accept these as the parameter values.
-
-These special keywords may be abbreviated to no fewer than
+ These special keywords may be abbreviated to no fewer than
 two characters, if you have enabled keyword-abbreviation.
-
-
-MIN_MAX
-
+ 2 MIN_MAX
 Many parameters have well-defined ranges of allowed values.  In some
 cases it is useful to assign the maximum or minimum value to the
 parameter.  Rather than give some numerical value, you can instead
 supply MIN to select the minimum-allowed value, and MAX to select
 the maximum.  This applies both on the command line and at prompts.
 In the example,
-
-     % block wlim=max
-
-parameter WLIM takes its maximum (1.0) meaning that if any of the
+      % block wlim=max
+ parameter WLIM takes its maximum (1.0) meaning that if any of the
 input pixels in the smoothing box is bad, the corresponding output
 pixel is set bad.
-
-Consult the reference section or the online help to see if a given
+ Consult the reference section or the online help to see if a given
 parameter has such a range.  If you attempt to use MIN and
 MAX where there is no range defined, you'll see an error
 message like
-
-    !! SUBPAR_MNMX: Parameter FONT - no upper limit set
-
-and you'll be invited to give another value.
-
-
-Output_Parameters
-
+     !! SUBPAR_MNMX: Parameter FONT - no upper limit set
+ and you'll be invited to give another value.
+ 2 Output_Parameters
 Not only can programmes have parameters to which you supply values,
 but they can also write out the results of their calculations to 
 output or results parameters.  This makes the results accessible to
@@ -708,39 +540,203 @@ point-spread function, the co-ordinates of points selected by a
 cursor, or the attributes of an NDF.  They are not data files
 created by the application.  In the application specifications they
 are listed separately from other parameters.
-
-From the shell you can access these output parameters using the
+ From the shell you can access these output parameters using the
 KAPPA tool PARGET.  Suppose that you want to subtract the mean of
 an NDF called myndf to make an a new NDF called outndf.
-
-    % stats myndf > /dev/null
+     % stats myndf > /dev/null
     % set mean = `parget mean stats`
     % csub myndf $mean outndf
-
-STATS calculates the statistics of myndf, the displayed output being
+ STATS calculates the statistics of myndf, the displayed output being
 discarded.  PARGET reports the mean value which is assigned to shell
 variable mean.  Thereafter the mean value is accessible as $mean in
 that process.  Thus the final command subtracts the mean value from
 myndf.
-
-You can obtain vector values too.  There is more on this in
+ You can obtain vector values too.  There is more on this in
 in the section of SUN/95 on Arithmetic in C-shell scripts.
-
-At the time of writing, ICL only permits scalar variables.  To do
+ At the time of writing, ICL only permits scalar variables.  To do
 the above from ICL, you would enter something like this.
-
-    ICL> stats myndf mean=(vmean)
+     ICL> stats myndf mean=(vmean)
     ICL> csub myndf (vmean) outndf
-
-vmean is an ICL variable.  The parentheses have the same effect
+ vmean is an ICL variable.  The parentheses have the same effect
 as the $ in the C-shell example, meaning "the value of" the
 variable.  Note that you can't redirect the output to /dev/null.
-
-If you use the PROMPT keyword (see sub-topic "Special_Keywords") for
+ If you use the PROMPT keyword (see sub-topic "Special_Keywords") for
 an application with output parameters, the programme will bizarrely
 prompt you for these.  It is not asking for a value, but a location
 where to store the value.  It is strongly recommended that you just
 accept the default (normally zero) so that the values are written to
 their parameter file, and hence permits PARGET to work.
+ 1 PARGET
+Obtains the value or values of an application parameter.
+ Usage:
+    parget parname applic
+ Description:
+    This application reports the value or values of a parameter from
+   a named task.  It does this by searching the parameter file of
+   the task.  The purpose is to offer an easier-to-use interface for
+   passing values (especially output parameters) between tasks in
+   shell scripts.  The values are formatted in lines with as many
+   values as can be accommodated across the screen up to a maximum of
+   132 characters; values are space separated.  However, in scripts
+   the values are likely to be written to a script variable.  Thus
+   for example in the C-shell:
+       set med = `parget histat median`
+    would redirect the output to shell variable med, and thus a
+   reference to $med would substitute the median value obtained the
+   last time application HISTAT was invoked.  If the parameter
+   comprises a vector of values these can be stored in a C-shell
+   array.  For instance,
+       set perval = `parget histat perval`
+    would assign elements of the shell array perval[1], perval[2],
+   etc. to the last-computed percentile values of HISTAT.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+APPLIC
+
+APPLIC = LITERAL (Read)
+   The name of the application from which the parameter comes.
+
+PARNAME
+
+PARNAME = LITERAL (Read)
+   The parameter whose value or values are to be reported.
+
+Examples
+
+parget mean stats
+   Report the value of parameter MEAN for the application STATS.
+ parget mincoord \
+   This reports the values of parameter MINCOORD of the current
+   application, in this case STATS.
+
+Notes
+
+-  The parameter file is located in the $ADAM_USER directory, if
+defined, otherwise in the adam subdirectory of $HOME.  If it
+cannot be located there, the task reports an error.
+ -  The parameter must exist in the selected application parameter
+file and not be a structure, except one of type ADAM_PARNAME.
+ -  This task is not designed for use with ICL, where passing
+parameter values is quite straightforward.  It does not operate
+with monolith parameter files.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+
+History
+
+ 1995 August 15 (MJC):
+    Original version.
+ 1 PASTE
+Pastes a series of NDFs upon each other.
+ Usage:
+    paste in p1 [p2] ... [p25] out=?
+ Description:
+    This application copies a series of NDFs, in the order supplied
+   and taking account of origin information, on to a `base' NDF to
+   produce an output NDF.  The output NDF is therefore a copy of the
+   base NDF obscured wholly or partially by the other input NDFs.
+   This operation is analogous to pasting in publishing.  It is
+   intended for image editing and the creation of insets.
+    The dimensions of the NDFs may be different, and indeed so may
+   their dimensionalities.  The output NDF can be constrained to
+   have the dimensions of the base NDF, so the pasted NDFs are
+   clipped.  Normally, the output NDF will have dimensions such
+   that all the input NDFs are accommodated in full.
+    Bad values in the pasted NDFs are by default transparent, so the
+   underlying data are not replaced during the copying.
+
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CONFINE
+
+CONFINE = _LOGICAL (Read)
+   This parameter controls the dimensions of the output NDF.  If
+   CONFINE is FALSE the output NDF just accommodates all the input
+   NDFs.  If CONFINE is TRUE, the output NDF's dimensions matches
+   those of the base NDF. [FALSE]
+
+IN
+
+IN = NDF (Read)
+   The base NDF on to which the other input NDFs will be pasted.
+
+OUT
+
+OUT = NDF (Write)
+   The NDF resulting from pasting of the input NDFs onto the base
+   NDF.  Its dimensions may be different from the base NDF.  See
+   parameter CONFINE.
+
+P1-P25
+
+P1-P25 = NDF (Read)
+   The NDFs to be pasted on to the base NDF.  The NDFs are pasted
+   in the order P1, P2, ... P25.  There can be no missing NDFs,
+   e.g. in order for P3 to be processed there must be a P2 given
+   as well.  A null value (!) indicates that there is no NDF.
+   NDFs P2 to P25 are defaulted to !.  At least one NDF must be
+   pasted, therefore P1 may not be null.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output NDF structure.  A null value (!)
+   propagates the title from the base NDF to the output NDF. [!]
+
+TRANSP
+
+TRANSP = _LOGICAL (Read)
+   If TRANSP is TRUE, bad values within the pasted NDFs are not
+   copied to the output NDF as the bad values were transparent.
+   If TRANSP is FALSE, all values are copied during the paste
+   and a bad value will obscured an underlying value.  [TRUE]
+
+Examples
+
+paste aa inset out=bb
+   This pastes the NDF called inset on to the arrays in the NDF
+   called aa to produce the NDF bb.  Bad values are transparent.
+   The bounds and dimensionality of bb may be larger than those of
+   aa.
+ paste aa inset out=bb notransp
+   As above except that bad values are copied from the NDF inset
+   to NDF bb.
+ paste aa inset out=bb confine
+   As the first example except that the bounds of NDF bb match
+   those of NDF aa.
+ paste ccd fudge inset out=ccdc
+   This pastes the NDF called fudge, followed by NDF inset on to
+   the arrays in the NDF called ccd to produce the NDF ccdc.  Bad
+   values are transparent.  The bounds and dimensionality of ccd
+   may be larger than those of ccdc.
+
+Authors
+
+MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 1991 November 15 (MJC):
+    Original version.
+  5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY, components of an NDF
+   data structure and propagates all extensions.  Propagation is from
+   the base NDF.
+    -  Processing of bad pixels and automatic quality masking are
+   supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

@@ -1,14 +1,10 @@
 .help maths Starlink kappa
 .nf
 Evaluates mathematical expressions applied to NDF data structures.
-
-Usage:
-
-   maths exp out ia-iz=? va-vz=? fa-fz=? pa-pz=? lbound=? ubound=?
-
-Description:
-
-   This application allows arithmetic and mathematical functions to
+ Usage:
+    maths exp out ia-iz=? va-vz=? fa-fz=? pa-pz=? lbound=? ubound=?
+ Description:
+    This application allows arithmetic and mathematical functions to
    be applied pixel-by-pixel to a number of NDF data structures and
    constants so as to produce a new NDF.  The operations to be
    performed are specified using a Fortran-like mathematical
@@ -32,8 +28,7 @@ EXP = LITERAL (Read)
    PB, ...  PZ.  Values for those NDFs and constants which appear
    in the expression will be requested via the application's
    parameter of the same name.
-
-   Fortran-77 syntax is used for specifying the expression, which
+    Fortran-77 syntax is used for specifying the expression, which
    may contain the usual intrinsic functions, plus a few extra
    ones. An appendix in SUN/61 gives a full description of the
    syntax used and an up to date list of the functions available.
@@ -103,8 +98,7 @@ PA-PZ = _DOUBLE (Read)
    parameters PS and PT (in this order) would be used to obtain
    numerical values for substitution into the expression at the
    appropriate points.
-
-   These parameters are particularly useful for supplying the
+    These parameters are particularly useful for supplying the
    values of constants when writing procedures, where the
    constant may be determined by a command-language variable, or
    when the constant is stored in a data structure such as a
@@ -203,8 +197,7 @@ maths "ia-1" dat2 ia=dat1
    pixel of the input NDF referred to as IA, whose values reside
    in the data structure dat1.  The result is written to the NDF
    structure dat2.
-
-maths "(ia-ib)/ic" ia=data ib=back ic=flat out=result units
+ maths "(ia-ib)/ic" ia=data ib=back ic=flat out=result units
    The expression "(ia-ib)/ic" is evaluated to remove a
    background from an image and to divide it by a flat-field.
    All the images are held in NDF data structures, the input
@@ -212,8 +205,7 @@ maths "(ia-ib)/ic" ia=data ib=back ic=flat out=result units
    background image from back and the flat-field from flat.  The
    result is written to the NDF structure result.  The data units
    are unchanged and are therefore propagated to the output NDF.
-
-maths "-2.5*log10(ii)+25.7" ii=file1 out=file2
+ maths "-2.5*log10(ii)+25.7" ii=file1 out=file2
    The expression "-2.5*log10(ii)+25.7" is evaluated to convert
    intensity measurements into magnitudes, including a zero
    point.  Token II represents the input measurements held in the
@@ -221,31 +213,27 @@ maths "-2.5*log10(ii)+25.7" ii=file1 out=file2
    structure file2.  If file1 contains variance values, then
    corresponding variance values will also be calculated for
    file2.
-
-maths exp="pa*exp(ia+pb)" out=outfile pb=13.7 novariance
+ maths exp="pa*exp(ia+pb)" out=outfile pb=13.7 novariance
    The expression "pa*exp(ia+pb)" is evaluated with a value of
    13.7 for the constant PB, and output is written to the NDF
    structure outfile.  The input NDF structure to be used for
    token IA and the value of the other numerical constant PA will
    be prompted for.  NOVARIANCE has been specified so that output
    variance values will not be calculated.
-
-maths exp="mod(XA,32)+mod(XB,64)" out=outfile like=comwest
+ maths exp="mod(XA,32)+mod(XB,64)" out=outfile like=comwest
    The expression "mod(XA,32)+mod(XB,64)" is evaluated, and
    output is written to the NDF structure outfile.  The output
    NDF inherits the shape, bounds, and other properties (except the
    variance) of the NDF called comwest.  The data type of outfile
    is _REAL unless comwest has type _DOUBLE.  XA and XB represent
    the pixel co-ordinates along the x and y axes respectively.
-
-maths "xf*xf+0*xa" ord2 lbound=[-20,10] ubound=[20,50]
+ maths "xf*xf+0*xa" ord2 lbound=[-20,10] ubound=[20,50]
    The expression "xf*xf+0*xa" is evaluated, and output is
    written to the NDF structure ord2.  The output NDF has data
    type _REAL, is two-dimensional with bounds -20:20, 10:50.  The
    XA is needed to indicate that XF represents pixel co-ordinates
    along the y axis.
-
-maths "xa/max(1,xb)+sqrt(va)" ord2 va=fuzz title="Fuzz correction"
+ maths "xa/max(1,xb)+sqrt(va)" ord2 va=fuzz title="Fuzz correction"
    The expression "xa/max(1,xb)+sqrt(va)" is evaluated, and output
    is written to the NDF structure ord2.  Token VA represents the
    input variance array held in the NDF structure fuzz.  The
@@ -263,10 +251,8 @@ this application will be propagated from this NDF to the output.
 The same propagation rules apply to the LIKE template NDF,
 except that the output NDF does have inherit any variance
 information.
-
--  There are additional tokens which can appear in the expression.
-
-The set of 7 tokens named CA, CB, ... CG is used to obtain the
+ -  There are additional tokens which can appear in the expression.
+ The set of 7 tokens named CA, CB, ... CG is used to obtain the
 data co-ordinates from the primary input NDF data structure.  Any
 of the 7 parameters may appear in the expression.  The order
 defines which axis is which, so for example, "2*CF+CB*CB" means
@@ -274,8 +260,7 @@ the first-axis data co-ordinates squared, plus twice the
 co-ordinates along the second axis.  There must be at least one
 input NDF in the expression to use the CA-CG tokens, and it must
 have dimensionality of at least the number of CA-CG tokens given.
-
-The set of 7 tokens named XA, XB, ... XG is used to obtain the
+ The set of 7 tokens named XA, XB, ... XG is used to obtain the
 pixel co-ordinates from the primary input NDF data structure.  Any
 of the 7 parameters may appear in the expression.  The order
 defines which axis is which, so for example, "SQRT(XE)+XC" means
@@ -286,14 +271,12 @@ number of XA-XG tokens in the expression.  However, if there is at
 least one NDF in the expression, there should not be more XA-XG
 tokens than the dimensionality of the output NDF (given as the
 intersection of the bounds of the input NDFs).
-
--  If illegal arithmetic operations (e.g. division by zero, or
+ -  If illegal arithmetic operations (e.g. division by zero, or
 square root of a negative number) are attempted, then a bad pixel
 will be generated as a result.  (However, the infrastructure
 software that detects this currently does not work on OSF/1
 systems, and therefore MATHS will crash in this circumstance.)
-
--  All arithmetic performed by this application is floating
+ -  All arithmetic performed by this application is floating
 point.  Single-precision will normally be used, but
 double-precision will be employed if any of the input NDF arrays
 has a numeric type of _DOUBLE.
@@ -309,15 +292,13 @@ Calculating_Variance
    advance.  For simple operations (addition, subtraction, etc.) the
    use of other applications (ADD, SUB, etc.) is therefore
    recommended, particularly if variance calculations are required.
-
-   The main value of the variance estimation algorithm used here
+    The main value of the variance estimation algorithm used here
    arises when the expression to be evaluated is too complicated, or
    too infrequently used, to justify the work of deriving a direct
    formula for the variance.  It is also of value when the data
    errors are especially large, so that the linear approximation
    normally used in error analysis breaks down.
-
-   There is no variance processing when there are no tokens for
+    There is no variance processing when there are no tokens for
    input NDF structures.
 
 Timing
@@ -332,8 +313,7 @@ Timing
    then execution time may be minimised by placing these operations
    near the beginning of the expression, so that later parts may not
    need to be evaluated.
-
-   If output variance values are being calculated and the QUICK
+    If output variance values are being calculated and the QUICK
    parameter is set to TRUE, then the execution time will be
    multiplied by an approximate factor (N+1), where N is the number
    of input NDFs which contain a variance component.  If QUICK is set
@@ -348,33 +328,26 @@ Related_Applications
 Authors
 
 MJC: Malcolm Currie (STARLINK)
-
-RFWS: R.F. Warren-Smith (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ RFWS: R.F. Warren-Smith (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1989 August 20 (MJC):
     First implementation.
-
- 1989 December 21 (MJC):
+  1989 December 21 (MJC):
     Workspace managed by AIF_TEMP.
-
- 1990 June 28 (RFWS):
+  1990 June 28 (RFWS):
     Substantial re-write to use the NDF_ access routines and to
     calculate output variance values.
-
- 1990 August 7 (RFWS):
+  1990 August 7 (RFWS):
     Fixed bug in data type of the PARVAL variable.
-
- 1995 September 18 (MJC):
+  1995 September 18 (MJC):
     Added FA-FZ, LBOUND, LIKE, PA-PZ, TYPE, UBOUND, VA-VZ
     parameters, Usage, Related Applications, and additional
     examples.  Enabled use of variance and co-ordinates in the
     expression.  Examples changed to lowercase.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -383,12 +356,9 @@ Implementation_Status
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDFs.  HISTORY and extensions are propagated from both the
    primary NDF and template NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  NDFs with any number of dimensions can be processed.  The NDFs
+    -  All non-complex numeric data types can be handled.
+    -  NDFs with any number of dimensions can be processed.  The NDFs
    supplied as input need not all be the same shape.
 .endhelp

@@ -1,14 +1,10 @@
 .help palsave Starlink kappa
 .nf
 Saves the current palette of a colour table to an NDF.
-
-Usage:
-
-   palsave palette [device] [title]
-
-Description:
-
-   This application reads the palette portion of the current image
+ Usage:
+    palsave palette [device] [title]
+ Description:
+    This application reads the palette portion of the current image
    display's colour table and saves it in an NDF.  The palette
    comprises 16 colours and is intended to provide coloured
    annotations, borders, axes, graphs etc. that are unaffected by
@@ -48,8 +44,7 @@ Examples
 palsave rustic
    This saves the palette of the colour table of the current
    image display into the NDF called RUSTIC.
-
-palsave hitec xwindows title="Hi-tech-look palette"
+ palsave hitec xwindows title="Hi-tech-look palette"
    This saves the palette of the colour table of the xwindows
    device in the NDF called hitec.  The NDF has a title called
    "Hi-tech-look palette".

@@ -1,14 +1,10 @@
 .help axlabel Starlink kappa
 .nf
 Sets a new label value for an axis within an NDF data structure.
-
-Usage:
-
-   axlabel ndf label dim
-
-Description:
-
-   This routine sets a new value for a label component of an
+ Usage:
+    axlabel ndf label dim
+ Description:
+    This routine sets a new value for a label component of an
    existing NDF AXIS data structure.  The NDF is accessed in update
    mode and any pre-existing label component is over-written with a
    new value.  Alternatively, if a `null' value (!) is given for the
@@ -50,12 +46,10 @@ Examples
 axlabel ngc253 "Offset from nucleus" 2
    Sets the label component of the second axis dimension of the
    NDF structure ngc253 to have the value "Offset from nucleus".
-
-axlabel ndf=spect label=Wavelength
+ axlabel ndf=spect label=Wavelength
    Sets the axis label component of the 1-dimensional NDF
    structure spect to have the value "Wavelength".
-
-axlabel datafile label=! dim=3
+ axlabel datafile label=! dim=3
    By specifying a null value (!), this example erases any
    previous value of the label component for the third dimension
    in the NDF structure datafile.

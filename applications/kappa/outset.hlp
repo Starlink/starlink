@@ -137,5 +137,50 @@ NEWVAL
   default     0.0
   help        'This will become the new value for all pixels outside 
               the circle.  BAD gives the bad-pixel value.'
+ 1 OVCLEAR
+Clears an image-display overlay.
+ Usage:
+    ovclear [device] [current]
+ Description:
+    This application clears an overlay device, but without purging
+   the graphics-database entries for the device.  Optionally, only
+   the current picture is cleared.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CURRENT
+
+CURRENT = _LOGICAL (Read)
+   If TRUE, then only the current picture is cleared. [FALSE]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The graphics device to be cleared.  It must be in GNS classes
+   IMAGE_OVERLAY or WINDOW_OVERLAY. [Current image-display-overlay
+   device]
+
+Examples
+
+ovclear
+   Clears the current image-overlay device.
+ ovclear current
+   Clears the current picture on the current image-overlay device.
+ ovclear xoverlay
+   Clears the xoverlay device.
+
+Related_Applications
+
+   KAPPA: GDCLEAR, IDCLEAR, OVSET.
+
+Authors
+
+MJC: Malcolm J. Currie  (STARLINK)
+
+History
+
+ 1992 November 30 (MJC):
+    Original version.
 .endhelp

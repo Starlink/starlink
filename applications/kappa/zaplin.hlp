@@ -2,31 +2,24 @@
 .nf
 Replaces regions in a 2-d NDF by bad values or by linear
 interpolation.
-
-Usage:
-
-   zaplin in out [title] colin=? lincol=? columns=? lines=?
-
-Description:
-
-   This routine allows you to mask or clean whole columns or lines,
+ Usage:
+    zaplin in out [title] colin=? lincol=? columns=? lines=?
+ Description:
+    This routine allows you to mask or clean whole columns or lines,
    or regions from a 2-dimensional data and variance arrays in an
    NDF structure.  The cleaned arrays are written to an output NDF.
    At present the cleaning process is one of the following selection.
-
-   1. Flagging by substitution of the bad value.
+    1. Flagging by substitution of the bad value.
    2. Bi-linear interpolation across a region, using the nearest
       non-bad pixels on each of the four sides.
    3. Linear interpolation across whole lines or columns, using
       the nearest non-bad pixels to either side.
    The magic value is also substituted in processes 2. and 3. where
    interpolation is not possible, such as at the edge of the array.
-
-   Co-ordinates may either be in pixels or in data co-ordinates.
+    Co-ordinates may either be in pixels or in data co-ordinates.
    Three methods are available for obtaining the lines or columns
    or the region:
-
-   1. From the parameter system, usually in response to prompting.
+    1. From the parameter system, usually in response to prompting.
    2. By a placing a graphics cursor of a nominated device either
       side of the defect.  If columns are being zapped then the
       line position of the cursor is ignored, and vice versa.  To
@@ -41,17 +34,14 @@ Description:
       a region (i.e. a pair of x-y positions.)  There may be
       commentary lines in the file beginning with "#" or "!".  For
       example,
-
-         # University of Madrugada  CCD Mark III  defects
+          # University of Madrugada  CCD Mark III  defects
          23  23  L
          157 158 C
          40 23 45 25
          <EOF>
-
-     would zap line 23, columns 157 and 158, and a region from
+      would zap line 23, columns 157 and 158, and a region from
      (40,23) to (45,25).
-
-   In the first two modes the application loops asking for new
+    In the first two modes the application loops asking for new
    columns, lines or regions to zap, until told to quit or it
    encounters an error.  An output co-ordinate-list file may also be
    produced; it may be recycled in later processing as the input to
@@ -195,24 +185,20 @@ zaplin out=cleaned colout=fudge.dat
    graphics device.  The cleaning is via linear interpolation.
    A record of the areas cleaned will be stored in the text file
    named fudge.dat.
-
-zaplin grubby cleaned i cosys=w lincol=r columns=[188,190]
+ zaplin grubby cleaned i cosys=w lincol=r columns=[188,190]
    lines=[15,16]
     This zaps a region from pixel (188,15) to (190,16) within the
     NDF called grubby and stores the result in the NDF called
     cleaned.  The zapping is via linear interpolation.
-
-zaplin grubby(6,,) cleaned i cosys=w lincol=r columns=[188,190]
+ zaplin grubby(6,,) cleaned i cosys=w lincol=r columns=[188,190]
    This zaps columns 188 to 190 in the 6th y-z plane region
    within the NDF called grubby and stores the result in the NDF
    called cleaned.  The zapping is via linear interpolation.
-
-zaplin m42 m42c f colin=aaoccd1.dat zaptype=b
+ zaplin m42 m42c f colin=aaoccd1.dat zaptype=b
    This flags with the bad pixel value the regions in the NDF
    called m42 defined in the text file called aaoccd1.dat, and
    stores the result in an NDF called m42c.
-
-zaplin m42 m42c f colin=aaoccd1.dat noise
+ zaplin m42 m42c f colin=aaoccd1.dat noise
    As above except that linear interpolation plus cosmetic noise
    are used to replace the areas to be cleaned rather than bad
    pixels.
@@ -222,16 +208,13 @@ Notes
 -  If there is no variance array in the NDF, the absolute data
 value is used instead to apply noise.  This variance is not
 written to the output NDF.
-
--  When using input files care should be taken to ensure that
+ -  When using input files care should be taken to ensure that
 the co-ordinate system used in the file matches that of the NDF
 in the current co-ordinate system.
-
--  Data co-ordinates are stored and output in single precision
+ -  Data co-ordinates are stored and output in single precision
 except when the axis array is type _DOUBLE or _INTEGER, or
 in cursor mode when there is no axis information in the NDF.
-
--  If the input NDF is a section of an NDF with a higher
+ -  If the input NDF is a section of an NDF with a higher
 dimensionality, the "lines" and "columns" are with respect to the
 2-dimensional section, and do not necessarily refer to the first
 and second dimensions of the NDF as a whole.  See the "Examples".
@@ -244,10 +227,8 @@ Related_Applications
 Authors
 
 MJM: Mark McCaughrean (UoE)
-
-MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
@@ -255,71 +236,52 @@ History
     First implementation, using line/column co-ordinates read from
     the user directly, rather than by use of an interactive cursor
     on a display screen.
-
- 09-12-1985 (MJM):
+  09-12-1985 (MJM):
     Added Poisson noise option and corrected error checking bug.
-
- 11-12-1985 (MJM):
+  11-12-1985 (MJM):
     Fixed bug caused by continuous updating of read only data -
     changed program order.
-
- 06-07-1986 (MJM):
+  06-07-1986 (MJM):
     Tidied and more error checking.
-
- 1986 Aug 8 (MJC):
+  1986 Aug 8 (MJC):
     Added invocation. Renamed ZAPLINSUB to ZPLNSB.  Reordered
     arguments in ZPLNSB (2nd to 6th). Added status check for
     the output DATA_ARRAY component and associated indentation.
-
- 1986 Sep 1 (MJC):
+  1986 Sep 1 (MJC):
     Added arguments and deficiencies section to the prologue and
     tidied. Used CHR_UCASE rather than UPCASE. Referred to lines
     rather than rows hence some parameter names were changed.
-
- 1987 Oct 15 (MJC):
+  1987 Oct 15 (MJC):
     Reordered tidying and corrected method.
-
- 1988 Mar 17 (MJC):
+  1988 Mar 17 (MJC):
     Referred to `array' rather than `image'.
-
- 1988 Jun 5 (MJC):
+  1988 Jun 5 (MJC):
     More reporting of error context.
-
- 1989 Jun 13 (MJC):
+  1989 Jun 13 (MJC):
     Allow for processing primitive NDFs.
-
- 1989 Aug  7 (MJC):
+  1989 Aug  7 (MJC):
     Passed array dimensions as separate variables to COPY2D and
     ZPLNSB.
-
- 1990 Mar 31 (MJC):
+  1990 Mar 31 (MJC):
     Added cursor and file modes.
-
- 1990 Apr 8 (MJC):
+  1990 Apr 8 (MJC):
     Added zapping type (i.e. bad option) and the region zapping.
-
- 1991 May 26 (MJC):
+  1991 May 26 (MJC):
     NDF version featuring co-ordinate systems.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 13 (MJC):
+  1992 April 13 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-
- 1992 November 30 (MJC):
+  1992 November 30 (MJC):
     Does not use non-monotonic axis centres.
-
- 1993 December 13 (MJC):
+  1993 December 13 (MJC):
     Fixed bug in cursor mode where the region bounds were half a
     pixel too small, i.e. in co-ordinates not pixel indices.
-
- 1995 September 20 (MJC):
+  1995 September 20 (MJC):
     Changed default of TITLE to null.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -327,13 +289,10 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  There could be a false precision in the data co-ordinates
+    -  All non-complex numeric data types can be handled.
+    -  There could be a false precision in the data co-ordinates
    when the transformation is obtained from the AGI database.  This
    only occurs when there is no axis information in the NDF.
 .endhelp

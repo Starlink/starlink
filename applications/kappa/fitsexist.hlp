@@ -1,17 +1,12 @@
 .help fitsexist Starlink kappa
 .nf
 Inquires whether or not a keyword exists in a FITS extension.
-
-Usage:
-
-   fitsexist ndf keyword
-
-Description:
-
-   This application reports whether or not a keyword exists in an
+ Usage:
+    fitsexist ndf keyword
+ Description:
+    This application reports whether or not a keyword exists in an
    NDF's FITS extension.
-
-   It is a synonym for "fitsmod edit=exist mode=interface".
+    It is a synonym for "fitsmod edit=exist mode=interface".
 
 Parameters
 
@@ -20,8 +15,7 @@ For information on individual parameters, select from the list below:
 KEYWORD
 
 KEYWORD = LITERAL (Read)
-
-   The name of the keyword whose existence in the FITS extension is
+    The name of the keyword whose existence in the FITS extension is
    to be tested.  A name may be compound to handle hierarchical
    keywords, and it has the form keyword1.keyword2.keyword3 etc.  The
    maximum number of keywords per FITS card is 20.  Each keyword must
@@ -29,16 +23,14 @@ KEYWORD = LITERAL (Read)
    comprising only alphanumeric characters, hyphen, and underscore.
    Any lowercase letters are converted to uppercase and blanks are
    removed before comparison with the existing keywords.
-
-   KEYWORD may have an occurrence specified in brackets []
+    KEYWORD may have an occurrence specified in brackets []
    following the name.  This enables testing for the existence of
    multiple occurrences.  Note that it is not normal to have
    multiple occurrences of a keyword in a FITS header, unless it
    is blank, COMMENT or HISTORY.  Any text between the brackets
    other than a positive integer is interpreted as the first
    occurrence.
-
-   The suggested value is the current value.
+    The suggested value is the current value.
 
 NDF
 
@@ -51,14 +43,10 @@ fitsexist abc bscale
    This reports TRUE or FALSE depending on whether or not the
    FITS keyword BSCALE exists in the FITS extension of the NDF
    called abc.
-
-fitsexist ndf=abc keyword=date[2]
+ fitsexist ndf=abc keyword=date[2]
    This reports TRUE or FALSEdepending on whether or not the
    FITS there are at least two occurrences of the keyword DATE.
-
-
-Related_Applications
-
+ 2 Related_Applications
    KAPPA: FITSEDIT, FITSHEAD, FITSLIST, FITSMOD, FITSVAL.
 
 Authors

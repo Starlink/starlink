@@ -1,6 +1,6 @@
 .help image_display_inter Starlink kappa
 .nf
-KAPPA utilises IDI (Image-display Interface) for some interactions
+ KAPPA utilises IDI (Image-display Interface) for some interactions
 with images.  However, GKS is still called to display images, plot
 line graphics, and perform cursor interactions.  IDI is much faster
 for some interactions, such as manipulating the colour table, and
@@ -8,8 +8,7 @@ provides functionality that is excluded from GKS, such as pan and
 zoom.  The two graphics packages share windows through the
 Graphics Window Manager (GWM, SUN/130) so that you need not know
 which KAPPA command calls which package.
-
-Not all IDI functionality is available in the Starlink X-windows
+ Not all IDI functionality is available in the Starlink X-windows
 implementation.  For instance, there is no blinking capability on
 X-windows.  IDUNZOOM is ineffective, since once a window is panned
 and/or zoomed, the original data are lost due to a not unreasonable
@@ -18,11 +17,535 @@ IDVISIBLE is unable to restore the window.  This is actually not
 serious since images cannot be displayed on the X-windows overlay.
 You will probably want IDINVISIBLE to erase only the overlay plane
 of an X-window.
-
-IDI and GKS were selected for device independence, but since this
+ IDI and GKS were selected for device independence, but since this
 is less important today as X-windows and PostScript have become de
 facto standards.  By relaxing the GKS straightjacket, GUI-based
 image-processing and display tools dedicated to X-windows, will
 offer much-improved interaction and performance.
+ 1 INSPECT
+Inspects a 2-d NDF in a variety of ways.
+ Usage:
+    inspect in [mode] gdevice option [overlay]
+      { numbin=? hirep=? histogram=? hititle=?
+      { filename=?
+      { peind=?
+      { lbound=? ubound=?
+      { out=?
+      { slstart=? slend=? slice=? sltitle=?
+      { vaind=?
+      { xycont=? xyfile=? xytitle=?
+      option
+ Description:
+    This application provides an interactive facility to inspect the
+   details of whole or part of the 2-dimensional data array in an
+   input NDF.  Briefly, the inspection options permit: a region to
+   be selected for which statistics may be calculated, its values
+   written to a text file, or an histogram be plotted and saved in
+   an NDF; the region itself may be saved in an NDF; the value of a
+   pixel or a region of pixels to be viewed; a slice between two
+   pixels may be calculated, plotted and saved in an NDF; text
+   files containing x-y-value of selected pixels may be created and
+   extended, and chosen pixels marked.
+    The application has two modes of interaction: cursor and
+   interface.  In cursor mode the selection of pixels, and the
+   definition of the region are made by moving a graphics cursor
+   over a previously displayed image or contour plot.  Since
+   instructional text showing the function of the mouse or
+   trackerball buttons is shown, the graphics device providing the
+   cursor must be an image-display overlay.  Also the name of the
+   NDF used to display the image or contour plot is known and need
+   not be entered.  This is the recommended interaction mode.  The
+   alternative, interface, means that the pixel indices of pixels
+   and regions to be inspected are specified in response to prompts.
+    The application is composed of two parts.  First the preliminaries
+   obtains the mode, the input NDF and graphics devices.  In cursor
+   mode this usually amounts to a single prompt, and but two in
+   interface mode.  The second stage is a loop where the inspection
+   option is selected and performed.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB  =  LITERAL (Read)
+   Label for the line-plot abscissa, in which NCAR fancy founts
+   may be embedded when FONT = "NCAR".  Note Slice and Histogram
+   have different defaults and these are stored separately.
+    For a slice plot the suggested default is the current value,
+   which is initially "Pixels".  If an error occurs obtaining the
+   label the default is "Pixels".
+    If axis information is present the suggested default for a
+   plot of an histogram is the NDF's axis label followed by the
+   units, in parentheses.  If an error occurs obtaining the label
+   or there is no axis information, the label takes its current
+   value, which initially is "Values".
+    For the first plot ABSLAB is defaulted to the suggested value
+   unless PLOTSTYLE is included on the command line, and
+   subsequently will only be obtained whenever PLOTSTYLE is TRUE.
+   []
+
+FILENAME
+
+FILENAME = FILENAME (Write)
+   Name of the text file to contain the Listing of image values.
+   The suggested default is inspect_list.lis.  This is only
+   required for the "List" option.
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.   The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots. The
+   suggested default is the current value. ["GKS"]
+    For the first plot FONT is defaulted to "GKS", and
+   subsequently will only be obtained whenever PLOTSTYLE is TRUE.
+   []
+
+GDEVICE
+
+GDEVICE = DEVICE (Read)
+   The name of the graphics device for line plots produced by the
+   "Histogram" and "Slice" options.  The device should not be the
+   image display, but it may be the image-display overlay plane
+   used in the cursor-interaction mode, i.e. the same value as
+   parameter OVERLAY (though this is not advisable for
+   X-windows).  In the latter case plotting occurs in the same
+   picture as the overlay annotations, namely the current
+   picture.  If the existing plot on the base plane of the image
+   display has text, e.g. annotated axes, a mess can of confused
+   lines can appear.  To avoid this the current picture should be
+   made the DATA picture rather than the FRAME around it.  If
+   null, !, is given no line plots will be drawn unless the
+   "Device" option is selected.
+
+HIREP
+
+HIREP = _LOGICAL (Read)
+   TRUE if the full Histogram is to be reported to you.  A large
+   number of bins may be required for the plot but need not be
+   listed in full.  This parameter provides a way of preventing
+   unwanted, tedious and long output.  The suggested default is
+   FALSE.  HIREP is only required for the "Histogram" option.
+
+HISTOGRAM
+
+HISTOGRAM = NDF (Read)
+   Name of the NDF structure to save the Histogram in its data
+   array.  If null, !, is entered, the histogram NDF is not
+   created.  This parameter is only required for the "Histogram"
+   option.  The suggested default is !.
+
+HITITLE
+
+HITITLE = LITERAL (Read)
+   Title for the output NDF containing the Histogram.  For the
+   first histogram saved this defaults to
+   "KAPPA - Inspect_Histogram", and subsequently this becomes
+   the suggested default.   This parameter is only required for
+   the "Histogram" option. []
+
+IN
+
+IN = NDF (Read)
+   NDF structure containing the 2-dimensional data array to be
+   inspected.
+
+LBOUND
+
+LBOUND( 2 ) = _INTEGER (Read)
+   Lower bounds in pixel indices of the Region.  The chosen pixel
+   must be different from that at the lower bound.  It is only
+   used in Interface mode with the "Region" option.
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes in the slice or histogram plot.
+   (The number used is between MAJTIC+2 and 5*MAJTIC/2+4.).
+    By default, it is [4.,4.].  For the first plot MAJTIC is
+   defaulted, and subsequently will only be obtained whenever
+   PLOTSTYLE is TRUE.  []
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for linear x and y axes in the slice or histogram plot.  A
+   negative value forces the graphics package to compute
+   appropriate values.  The number of minor tick marks per major
+   tick is fixed (8) for a logarithmic axis.
+    By default, it is [-1.,-1.].  For the first plot MINTIC is
+   defaulted, and subsequently will only be obtained whenever
+   PLOTSTYLE is TRUE.  []
+
+MODE
+
+MODE = LITERAL (Read)
+   The interaction mode.  The options are "Cursor" to use a
+   graphics cursor to select regions and pixels to inspect,
+   or "Interface" where prompted ADAM parameters are used to
+   define those parts of the image to inspect. [Current
+   interaction mode]
+
+NUMBIN
+
+NUMBIN = _INTEGER (Read)
+   Number of bins needed for the Histogram.  The suggested default
+   is the current value, which is 100 initially.  A value is the
+   range 2--5000 is required.  This parameter is only required
+   for the "Histogram" option.
+
+OPTION
+
+OPTION = LITERAL (Read)
+   Current inspection mode.  The options are:
+     "Device"     - This allows the selection and opening of a new
+                   line-plot graphics device, at the same time
+                   closing down the old one, whose last plot is
+                   stored in the graphics database.
+    "Exit"       - Exit the application.
+    "Histogram"  - This calculates the histogram of the current
+                   region. A summary and plot (if there is a
+                   graphics device available) of the histogram
+                   is produced.  The style of the plot may be
+                   adjusted via several parameters.  The full
+                   histogram may also be reported. The histogram
+                   data can be stored in a 1-d NDF.
+    "List"       - This produces a formatted and headed listing
+                   of the chosen region to a text file.
+    "Peep"       - Obtain a formatted listing of the 7x7 section
+                   of the array data, centred on a pixel
+                   specified using the cursor or via prompting.
+    "Region"     - To define the region of the array to be used
+                   by other options. If the image display
+                   is available, then the cursor is used to
+                   define the area, otherwise, the pixel bounds
+                   of the region come from the environment. Using
+                   the cursor, the functions of the choice-device
+                   buttons are drawn on the overlay.
+    "Save"       - Writes the current region to a new NDF,
+                   propagating all the components.
+    "Slice"      - Two points are defined via the cursor or from
+                   parameter prompting between which a slice (i.e.
+                   cross-section) is calculated.  Using the
+                   cursor, the functions of the trackerball or
+                   mouse buttons are drawn on the overlay. A plot
+                   is made to the graphics device if available.
+                   The style of the plot may be adjusted via
+                   several parameters.  The slice can be stored
+                   in a 1-d NDF.  The slice abscissa has units in
+                   true pixels (assuming pixels are square), thus
+                   a 45-degree slice would have a length root 2
+                   times its projected length in x or y.
+    "Statistics" - The key statistical parameters of the current
+                   region are determined and reported.
+    "Value"      - Obtain the value of a pixel at a point selected
+                   via the cursor or via prompting.
+    "XYcur"      - A list of the co-ordinates and values of pixels
+                   selected by the image-display cursor are
+                   written to a text file with Fortran carriage
+                   control. The functions of the trackerball or
+                   mouse buttons are displayed.  Optionally, an
+                   existing file in the same format as produced
+                   by XYcur can be appended to, for example, when
+                   a session has been interrupted.  These stored
+                   pixels are displayed on the overlay plane as
+                   if there had been no interruption.  XYcur
+                   requires cursor mode.
+    The suggested default is "Region".
+    If the option is specified on the command line a single
+   inspection may be undertaken, i.e.  there is no looping.  This
+   feature is intended for command procedures.
+
+ORDLAB
+
+ORDLAB  =  LITERAL (Read)
+   Label for the line-plot ordinate, in which NCAR fancy founts
+   may be embedded.  Note Slice and Histogram have different
+   defaults and these are stored separately.
+    For an histogram plot the suggested default is the current
+   value, which is initially "Number".  If an error occurs
+   obtaining the label the default is "Number".
+    If axis information is present the suggested default for a
+   plot of a slice is the NDF's axis label followed by the
+   units, in parentheses.  If an error occurs obtaining the label
+   or there is no axis information, the label takes its current
+   value, which initially is "Data values".
+    For the first plot ORDLAB is defaulted to the suggested value
+   unless PLOTSTYLE is included on the command line, and
+   subsequently will only be obtained whenever PLOTSTYLE is TRUE.
+   []
+
+OUT
+
+OUT = NDF (Read)
+   Name of the NDF structure to contain the Saved Region.  This
+   is only used in the "Save" option.
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside in the slice or histogram plots.
+   This eliminates intersections of ticks with the data locus.
+    By default, the tick marks are drawn inside the plot region.
+   For the first plot OUTTIC is defaulted, and subsequently will
+   only be obtained whenever PLOTSTYLE is TRUE.  []
+
+OVERLAY
+
+OVERLAY = DEVICE (Read)
+   Name of the overlay-plane device used in the cursor interaction
+   mode.  It must have class IMAGE_OVERLAY or WINDOW_OVERLAY and
+   support colour.  It is ignored when MODE is not "Cursor".
+   [Current image-display-overlay device]
+
+PEIND
+
+PEIND( 2 ) = _INTEGER (Read)
+   x-y pixel index of the pixel about which the Peep is required.
+   The values must lie within their respective bounds of the
+   input image.  The suggested default is the image centre.  It
+   is only used in Interface mode with the "Peep" option.
+
+PLOTSTYLE
+
+PLOTSTYLE = _LOGICAL (Read)
+   If TRUE, the plotting style of line plots is to be altered from
+   the default for the first plot, or the existing values for
+   subsequent graphs.  Initially, it is defaulted to FALSE, then
+   the suggested value is the current value.  Therefore to
+   override the plotting-style parameters on the first plot, new
+   values should be given on the command line, and along with the
+   PLOTSTYLE keyword for ABSLAB, ORDLAB and PLTITL.
+   Subsequently, the plotting style may be retained or modified
+   via prompts.  []
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of a line plot, in which NCAR fancy founts may be
+   embedded.  Note Slice and Histogram have different defaults
+   and these are stored separately.  Both attempt to use the NDF's
+   title if present and no error occurs, otherwise the current
+   value becomes the suggested default.  For the histogram plot
+   this is initially "Histogram of current region" and for the
+   slice plot it is initially "Slice plot".
+    For the first plot PLTITL is defaulted to the suggested value
+   unless PLOTSTYLE is included on the command line, and
+   subsequently will only be obtained whenever PLOTSTYLE is TRUE.
+   []
+
+SLEND
+
+SLEND( 2 ) = _INTEGER (Read)
+   The x-y pixel index defining the end of the Slice.  It
+   must lie within the bounds of the array and be distinct from
+   the start of the slice.  The suggested default is the upper
+   bound of the input NDF.  It is only used in Interface mode
+   with the "Slice" option.
+
+SLICE
+
+SLICE = NDF (Read)
+   Name of the NDF structure to save the Slice in its data array.
+   If null, !, is entered, the slice NDF is not created.  It is
+   only required in the "Slice" option.  The suggested default is
+   !.
+
+SLSTART
+
+SLSTART( 2 ) = _INTEGER (Read)
+   The x-y pixel index defining the start of the Slice.  It must
+   lie within the bounds of the array.  The suggested default is
+   the lower bound of the input NDF.  It is only used in
+   Interface mode with the "Slice" option.
+
+SLTITLE
+
+SLTITLE = LITERAL (Read)
+   Title for the Slice NDF.  Title for the Region NDF.  For the
+   first region saved this defaults to "KAPPA - Inspect_Slice",
+   and subsequently this becomes the suggested default.  It is
+   only required in the "Slice" option. []
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the axes and annotations in the histogram and
+   line plots, where 1.0 is the normal thickness.  Currently,
+   this is only available on a few devices.  It must take a value
+   in the range 0.5--5.0.
+    By default the line thickness is 1.0.  For the first plot
+   THICK is defaulted to the suggested value, and subsequently
+   will only be obtained whenever PLOTSTYLE is TRUE.  []
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the Region NDF.  For the first region saved this
+   defaults to "KAPPA - Inspect", and subsequently this becomes
+   the suggested default.  It is only used in the "Save" option.
+   []
+
+UBOUND
+
+UBOUND( 2 ) = _INTEGER (Read)
+   Upper bounds in pixel indices of the Region.  The chosen pixel
+   must be different from that at the lower bound.  It is only
+   used in Interface mode with the "Region" option.
+
+VAIND
+
+VAIND( 2 ) = _INTEGER (Read)
+   x-y pixel index of pixel whose Value is required.  The values
+   must lie within their respective bounds of the input image.
+   The suggested default is the image centre.  It is only used in
+   Interface mode with the "Value" option.
+
+XLOG
+
+XLOG = _LOGICAL (Read)
+   TRUE if the line-plot abscissa is to be logarithmic.  Note, for
+   Slice and Histogram options each has its own independent
+   switch.  It is unlikely that you would want to do this.  By
+   default, the abscissa is linear.  For the first plot XLOG is
+   defaulted, and subsequently will only be obtained whenever
+   PLOTSTYLE is TRUE.  []
+
+YLOG
+
+YLOG = _LOGICAL (Read)
+   TRUE if the line-plot ordinate is to be logarithmic. Note, for
+   Slice and Histogram options each has its own independent
+   switch.  By default, the ordinate is linear.  For the first
+   plot YLOG is defaulted, and subsequently will only be obtained
+   whenever PLOTSTYLE is TRUE.  []
+
+XYCONT
+
+XYCONT = _LOGICAL (Read)
+   If TRUE, an existing file is appended to in the XYcur option.
+   The suggested default is FALSE.  It is only available in
+   cursor mode with the "XYcur" option.
+
+XYFILE
+
+XYFILE = FILENAME (Update)
+   Name of the text file to which pixel data are written by
+   XYcur option.  The suggested default is xylist.lis.  It is
+   only available in cursor mode with the "XYcur" option.
+
+XYTITLE
+
+XYTITLE = LITERAL (Read)
+   Title for the text file in XYcur option.  For the first file
+   created this defaults to "# KAPPA - Inspect_XYcur", and
+   subsequently this becomes the suggested default. It is not
+   accessed if XYCONT is TRUE.   It is only available in cursor
+   mode with the "XYcur" option. []
+
+Examples
+
+Notes:
+   Since INSPECT is an interacting, graphical and self-contained
+   monolith of applications it is not straightforward to give
+   command-line examples.  Generally, the best way to run INSPECT
+   is in cursor mode after having displayed an image.  The
+   following examples use the prompting mode.
+ inspect rulupi i canon_l sl slstart=[3,10] slend=[9,42] slice=!
+   Plots a slice from pixel (3,10) to (9,42) of the NDF called
+   rulupi to the CANON_L graphics device.
+ inspect rulupi i gdevice=x2w option=hi numbin=100 histogram=ru_hg
+   Calculates the histogram of the NDF called rulupi, reporting
+   a summary to you, and plots the histogram to the x2w device.
+   The histogram has one hundred bins and is stored in an NDF
+   called ru_hg.
+ inspect rulupi i ! option=hi numbin=100 hirep \
+   As above except no plot is made, no NDF is created, and
+   the full one hundred histogram values are reported.  In this
+   particular example the second parameter could equally well be
+   C for cursor mode since no co-ordinate information is
+   obtained.
+
+Notes
+
+-  In cursor mode there must be an existing DATA picture for the
+chosen image display stored in the graphics database.  Valid
+cursor positions are bounded by the DATA picture.
+ -  On exit the input picture, if there was one, is made the
+current picture on the overlay; and the last graphics plot is
+stored in the database as a FRAME picture.  Also, if the "Device"
+option is used a FRAME picture is stored for that device.
+ -  The Histogram NDF has an AXIS component whose the LABEL and
+UNITS are those of the input NDF's data array; its centres are
+in data value of the bin centre.  The NDF LABEL is "Number".
+ -  The Slice NDF has an AXIS component whose LABEL is "Pixel" and
+centres are pixel co-ordinates from 0.5; its LABEL and UNITS are
+propagated from the input NDF.
+ -  The current palette entries 1 to 4 associated with the OVERLAY
+are used as follows in the cursor mode for IMAGE_OVERLAY devices.
+A sample slice or region, and the associated button, are drawn
+with palette index 1.  Similarly, index 3 is used to indicate an
+accepted slice or region.  The exit button is drawn in the colour
+of index 2.  Index 4 is used to draw the boxes representing the
+mouse or trackerball buttons.  Use the PAL* commands to select
+suitable complementary colours for the image's colour table,
+especially for palette indices 1 and 3.
+ For WINDOW_OVERLAY devices, all the above are drawn with the
+colour of palette index 1, but the various colours are replaced
+by different dashed-line patterns.  Use PALENTRY to change the
+colour of the lines.
+
+Authors
+
+MJC: Malcolm Currie  (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 1991 June 11 (MJC)
+    Original NDF version, based on the pre-V0.8 version.
+  1991 July 5 (MJC):
+    Passed a section to the histogram routine.
+  1991 August 20 (MJC):
+    Added FONT parameter.
+  1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+  1992 April 21 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+  1992 June 16 (MJC):
+    Cursor mode made to work with WINDOW_OVERLAY class.  Since
+    these devices only have one colour, the normal coloured
+    lines appear as dashed lines.
+  1992 December 4 (MJC):
+    Leaves the palette of the overlay device unchanged.  Added
+    a note describing the roles of the palette colours used.
+    Inserted the "Save" option into the description of OPTION.
+  5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+Implementation_Status
+
+   -  Only real data can be processed directly.  Other data types
+   will undergo a type conversion before processing occurs.
+    -  The routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
+   and propagates all extensions to the output Region NDF.
+    -  Processing of bad pixels and automatic quality masking are
+   supported.  Bad pixels are are excluded from statistics and are
+   indicated in reports of data values by the word INVALID.  In the
+   slice plot they appear as gaps, and they do not affect the limits
+   of the ordinate.  The same applies to zero or negative data
+   values if the plot is to have a logarithmic ordinate.  Similarly,
+   for the histogram abscissa.
 .endhelp

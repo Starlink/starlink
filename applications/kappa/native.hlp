@@ -1,14 +1,10 @@
 .help native Starlink kappa
 .nf
 Converts an HDS object to native machine data representation.
-
-Usage:
-
-   native object
-
-Description:
-
-   This application converts an HDS object (or structure) so that
+ Usage:
+    native object
+ Description:
+    This application converts an HDS object (or structure) so that
    all primitive data values within it are represented using the
    appropriate native data representation for the machine in use
    (this includes the appropriate number format and byte ordering).
@@ -18,8 +14,12 @@ Description:
    machine.  Conversion is performed by modifying the data in situ.
    No separate output file is produced.
 
-Parameters
-
+   This application can also be used to replace any IEEE floating point 
+   NaN or Inf values in an HDS object with the appropriate Starlink 
+   bad value. This conversion is performed even if the data values
+   within the object are already represented using the appropriate
+   native data representation for the machine in use.
+ 2 Parameters
 For information on individual parameters, select from the list below:
 
 OBJECT
@@ -36,8 +36,7 @@ native myfile
    Converts all the primitive data in the HDS container file
    myfile to be held using the appropriate native machine
    representation for faster subsequent access.
-
-native yourfile.data_array
+ native yourfile.data_array
    Converts just the DATA_ARRAY component (and its contents, if a
    structure) in the container file yourfile to the appropriate
    native machine data representation.  Other file contents remain
@@ -46,15 +45,13 @@ native yourfile.data_array
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  5-MAY-1992 (RFWS):
     Original version.
-
- 1995 April 24 (MJC):
+  1995 April 24 (MJC):
     Made usage and examples lowercase.  Sorted the variable
     declarations.
 .endhelp

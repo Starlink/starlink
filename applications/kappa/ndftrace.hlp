@@ -1,47 +1,32 @@
 .help ndftrace Starlink kappa
 .nf
 Displays the attributes of an NDF data structure.
-
-Usage:
-
-   ndftrace ndf
-
-Description:
-
-   This routine displays the attributes of an NDF data structure
+ Usage:
+    ndftrace ndf
+ Description:
+    This routine displays the attributes of an NDF data structure
    including:
-
-   -  its name;
-
-   -  the values of its character components (title, label and
+    -  its name;
+    -  the values of its character components (title, label and
    units);
-
-   -  its shape (pixel bounds, dimension sizes, number of dimensions
+    -  its shape (pixel bounds, dimension sizes, number of dimensions
    and total number of pixels);
-
-   -  axis co-ordinate information (axis labels, units and extents);
-
-   -  optionally, axis array attributes (type and storage form) and
+    -  axis co-ordinate information (axis labels, units and extents);
+    -  optionally, axis array attributes (type and storage form) and
    the values of the axis normalisation flags;
-
-   -  attributes of the main data array and any other array
+    -  attributes of the main data array and any other array
    components present (including the type and storage form and an
    indication of whether `bad' pixels may be present);
-
-   -  attributes of the current co-ordinate Frame in the WCS component
+    -  attributes of the current co-ordinate Frame in the WCS component
    (title, domain, and ,optionally, axis labels and axis units, plus the
    system epoch and projection for sky co-ordinate Frames).
-
-   -  optionally, attributes of all other co-ordinate Frames in the WCS
+    -  optionally, attributes of all other co-ordinate Frames in the WCS
    component.
-
-   -  a list of any NDF extensions present, together with their data
+    -  a list of any NDF extensions present, together with their data
    types; and
-
-   -  history information (creation and last-updated dates, the
+    -  history information (creation and last-updated dates, the
    update mode and the number of history records).
-
-   Most of this information is output to parameters.
+    Most of this information is output to parameters.
 
 Parameters
 
@@ -285,12 +270,10 @@ Examples
 ndftrace mydata
    Displays information about the attributes of the NDF structure
    called mydata.
-
-ndftrace ndf=r106 fullaxis
+ ndftrace ndf=r106 fullaxis
    Displays information about the NDF structure r106, including
    full details of any axis arrays present.
-
-ndftrace mydata quiet ndim=(mdim)
+ ndftrace mydata quiet ndim=(mdim)
    Passes the number of dimensions of the NDF called mydata
    into the ICL variable mdim.  No information is displayed.
 
@@ -311,39 +294,30 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1990 April 6 (RFWS):
     Original version.
-
- 1991 April 29 (RFWS):
+  1991 April 29 (RFWS):
     Added support for axis components and added the usage and
     examples sections to the prologue.
-
- 1992 November 30 (MJC):
+  1992 November 30 (MJC):
     Reports non-monotonic axis centres.
-
- 1993 February 4 (MJC):
+  1993 February 4 (MJC):
     Fixed bug that caused incorrect axis extents to be reported
     when there were no axis-width arrays and the axis centres did
     not increment by one.
-
- 1994 July 29 (RFWS):
+  1994 July 29 (RFWS):
     Adapted to handle history information.
-
- 1995 April 24 (MJC):
+  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
     Added History to the Description.  Sorted the variable
     declarations and other tidying.
-
- 1995 June 18 (MJC):
+  1995 June 18 (MJC):
     Added QUIET option and the output parameters.
-
- 1997 November 27 (DSB):
+  1997 November 27 (DSB):
     Added support for WCS component.
 .endhelp

@@ -1,14 +1,10 @@
 .help histogram Starlink kappa
 .nf
 Computes an histogram of an NDF's values.
-
-Usage:
-
-   histogram in numbin range [comp] [logfile]
-
-Description:
-
-   This application derives histogram information for an NDF array
+ Usage:
+    histogram in numbin range [comp] [logfile]
+ Description:
+    This application derives histogram information for an NDF array
    between specified limits.  The histogram is reported, and may
    optionally be written to a text log file, and/or plotted
    graphically.
@@ -178,32 +174,27 @@ histogram image 100 ! device=!
    Computes and reports the histogram for the data array in the
    NDF called image.  The histogram has 100 bins and spans the
    full range of data values.
-
-histogram ndf=spectrum comp=variance range=[100,200] numbin=20
+ histogram ndf=spectrum comp=variance range=[100,200] numbin=20
    Computes and reports the histogram for the variance array in
    the NDF called spectrum.  The histogram has 20 bins and spans
    the values between 100 and 200.  A plot is made to the current
    graphics device.
-
-histogram cube(3,4,) 10 ! out=c3_4_hist device=!
+ histogram cube(3,4,) 10 ! out=c3_4_hist device=!
    Computes and reports the histogram for the z-vector at (x,y)
    element (3,4) of the data array in the 3-dimensional NDF called
    cube.  The histogram has 10 bins and spans the full range of
    data values.  The histogram is written to a one-dimensional
    NDF called c3_4_hist.
-
-histogram cube numbin=32 ! device=xwindows
+ histogram cube numbin=32 ! device=xwindows
    Computes and reports the histogram for the data array in
    the NDF called cube.  The histogram has 32 bins and spans the
    full range of data values.  A plot of the histogram is made to
    the XWINDOWS device.
-
-histogram cube numbin=32 ! device=xwindows ylog pltitl="Taurus 2"
+ histogram cube numbin=32 ! device=xwindows ylog pltitl="Taurus 2"
    As in the previous example except the logarithm of the number
    in each histogram bin is plotted, and the plot title is
    "Taurus 2".
-
-histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
+ histogram halley(~200,~300) range=[-1000,1000] logfile=hist.dat \
    Computes the histogram for the central 200 by 300 elements of
    the data array in the NDF called halley, and writes the
    results to a logfile called hist.dat.  The histogram uses the
@@ -222,8 +213,7 @@ History
 
  1992 March 9 (MJC):
     Original NDF version.
-
- 1995 May 1 (MJC):
+  1995 May 1 (MJC):
     Made examples and usage lowercase.  Moved position of COMP
     parameter.  Added Related Applications.  Shortened the section
     getting the range values.  Used PSX for workspace.  Fixed a
@@ -235,11 +225,8 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, VARIANCE,
    QUALITY, LABEL, TITLE, UNITS, and HISTORY components of the input
    NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  Any number of NDF dimensions is supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

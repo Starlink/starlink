@@ -2,19 +2,14 @@
 .nf
 Dumps an image-display memory to a graphics hardcopy and
 optionally to an NDF.
-
-Usage:
-
-   snapshot odevice [out] [whole] [scale] [negativ] [title] [planes]
-
-Description:
-
-   This routine captures the data in the memory of an image-display
+ Usage:
+    snapshot odevice [out] [whole] [scale] [negativ] [title] [planes]
+ Description:
+    This routine captures the data in the memory of an image-display
    device, and writes these data to a different GKS device.  For
    example, the contents of an X-windows memory might be captured and
    sent to a PostScript laser printer.
-
-   Various options are available:
+    Various options are available:
       o you may choose to capture a whole or part of what is visible
         on the screen, or the entire contents of the memory.  For the
         former you adjust a rubber-band region until the desired
@@ -98,18 +93,15 @@ snapshot whole odevice=canon_l
    memories to the canon_l device.  The plot will occupy half
    of the maximum area available on the device, i.e. half of
    root 2 magnification.
-
-snapshot scale=1.0 \
+ snapshot scale=1.0 \
    This will capture a whole or part of what is visible on the
    screen of the current image display, and dump it to the current
    snapshot device at the largest magnification.
-
-snapshot postscript views device=xw whole
+ snapshot postscript views device=xw whole
    This dumps the whole of the xw device's memories to the
    postscript device, and also to a NDF called views.  The
    magnification is a half of root 2.
-
-snapshot ps_l device=xw whole planes=0 title="Hardcopy Base"
+ snapshot ps_l device=xw whole planes=0 title="Hardcopy Base"
    This dumps the whole of the xw device's base memory to the
    ps_l device.  The plot is entitled "Hardcopy Base".  The
    entire output plot occupies half of the maximum area available
@@ -119,8 +111,7 @@ Notes
 
 -  The whole of the screen and the whole of the memory may be
 different, for example, the image may have been zoomed or panned.
-
--  Files are not spooled to laserprinters.  They must be printed
+ -  Files are not spooled to laserprinters.  They must be printed
 outside this application.
 
 Related_Applications
@@ -130,36 +121,29 @@ Related_Applications
 Authors
 
 JM: Jo Murray (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  August 1989 (JM):
     Original version.
-
- March  1990 (JM):
+  March  1990 (JM):
     Option added to write snapshot array to an NDF.
-
- 1990 May 2 (MJC):
+  1990 May 2 (MJC):
     Fixed bugs in obtaining depth capability, obtaining a null
     title and ordering of closedown operations, corrected and
     expanded the ADAM Parameters section, added a default title
     for the output NDF and tidied.
-
- 1991 March 18 (MJC):
+  1991 March 18 (MJC):
     Region of interest added to obtain subsets.
-
- 1991 July 31 (MJC):
+  1991 July 31 (MJC):
     No longer redefines colours of SGS pens to predefined state if
     workstation has dynamic colour representation, now there is
     palette control.
-
- 1992 March 26 (MJC):
+  1992 March 26 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 October 12 (MJC):
+  1992 October 12 (MJC):
     Added calls to make the memories visible on the Ikon.  To
     enable planes not to be output, a new parameter, PLANES, has
     been added.

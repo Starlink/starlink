@@ -2,14 +2,10 @@
 .nf
 Edits an NDF such that array values below and above two thresholds
 take constant values.
-
-Usage:
-
-   thresh in out thrlo thrhi newlo newhi [comp]
-
-Description:
-
-   This application creates from an input NDF structure an NDF with
+ Usage:
+    thresh in out thrlo thrhi newlo newhi [comp]
+ Description:
+    This application creates from an input NDF structure an NDF with
    an array component whose values are edited as follows.  Array
    values between and including the upper and lower thresholds are
    copied from the input to output array.  Any values in the input
@@ -95,18 +91,15 @@ thresh zzcam zzcam2 100 500 0 0
    This copies the data array in the NDF called zzcam to the NDF
    called zzcam2.  Any data value less than 100 and greater than
    500 in zzcam is set to 0 in zzcam2.
-
-thresh zzcam zzcam2 100 500 0 0 comp=Variance
+ thresh zzcam zzcam2 100 500 0 0 comp=Variance
    As above except that the data array is copied unchanged and the
    thresholds apply to the variance array.
-
-thresh n253 n253cl thrlo=-0.5 thrhi=10.1 \
+ thresh n253 n253cl thrlo=-0.5 thrhi=10.1 \
    This copies the data array in the NDF called n253 to the NDF
    called n253cl.  Any data value less than -0.5 in n253 is set
    to -0.5 in n253cl, and any value greater than 10.1 in n253
    becomes 10.1 in n253cl.
-
-thresh pavo pavosky -0.02 0.02 bad bad
+ thresh pavo pavosky -0.02 0.02 bad bad
    All data values outside the range -0.02 to 0.02 in the NDF
    called pavo become bad in the NDF called pavosky.  All values
    within this range are copied from pavo to pavosky.
@@ -118,22 +111,18 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie  (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1991 November 6 (MJC):
     Original NDF_ version.
-
- 1994 September 26 (MJC):
+  1994 September 26 (MJC):
     TITLE propagated from input NDF by default.  Lowercase examples
     and usage.
-
- 1996 April 11 (MJC):
+  1996 April 11 (MJC):
     Use the bad-pixel flag.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -141,11 +130,8 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  Any number of NDF dimensions is supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp

@@ -1,16 +1,12 @@
 .help transformer Starlink kappa
 .nf
 Applies a transformation to an NDF.
-
-Usage:
-
-   transformer in transform out [method] [shape] { lcoord=? ucoord=?
+ Usage:
+    transformer in transform out [method] [shape] { lcoord=? ucoord=?
                                                  { lbound=? ubound=?
                                                shape
-
-Description:
-
-   This application performs an arbitrary transformation on an NDF to
+ Description:
+    This application performs an arbitrary transformation on an NDF to
    create an output NDF.  There is full control of the shape, origin,
    and co-ordinate limits of the output NDF.  The output NDF is
    calculated by resampling within the input NDF.  Output array
@@ -114,8 +110,7 @@ SHAPE = LITERAL (Read)
                  of the input NDF.
    The first three also cause the co-ordinate limits to be
    reported before obtaining the limits and/or bounds.
-
-   Not all of these are permitted simultaneously.  "Same" is not
+    Not all of these are permitted simultaneously.  "Same" is not
    allowed when the number of input and output transformation
    variables are not equal.  Otherwise it is the value of
    COSYS that controls the options.  When COSYS = "Data" all but
@@ -124,8 +119,7 @@ SHAPE = LITERAL (Read)
    "Bounds".  This is when the number of output variables exceeds
    the number of input variables, and that in turn equals the
    number of dimensions in the input NDF.
-
-   SHAPE defaults to the dynamic default.  When COSYS = "Data"
+    SHAPE defaults to the dynamic default.  When COSYS = "Data"
    this is "Bounds", and when COSYS = "World" the default is
    "Match".  The suggested default is current value, or the
    dynamic default if there is not one.  []
@@ -149,8 +143,7 @@ TRANSFORM = TRN (Read)
    object TRANSFORM within the HDS file aifoff.sdf.  Normally the
    object name is TRANSFORM.  The structure must contain both the
    forward and inverse mappings.
-
-   Structures can be made using CCDEDIT in CCDPACK or TRANMAKE.
+    Structures can be made using CCDEDIT in CCDPACK or TRANMAKE.
 
 UBOUND
 
@@ -180,23 +173,18 @@ transformer curved sdist straight
    Assuming the current co-ordinate system is world, the
    transformation is performed in pixel co-ordinates, setting the
    bounds to just enclose the transformed input array.
-
-transformer curved sdist.transform straight linint same
+ transformer curved sdist.transform straight linint same
    As above, except linear interpolation is used, and the array
    of NDF straight array uses the bounds of NDF curved.
-
-transformer a119 proj.merc a119s shape=bounds lbound=[1,-20]
-
-ubound=[256,172]
+ transformer a119 proj.merc a119s shape=bounds lbound=[1,-20]
+ ubound=[256,172]
    This transforms the NDF called a119, using the transformation
    MERC in the HDS file called proj.sdf, into an NDF called
    a119s.  It uses nearest-neighbour resampling.  a119s just
    encloses the transformed arrays from a119, and has 256 x 192
    pixels from origin (1,-20).
-
-transformer spec2d scrunch.trn full method=l out=spec2d_l
-
-shape=limits lcoord=5000 ucoord=6500
+ transformer spec2d scrunch.trn full method=l out=spec2d_l
+ shape=limits lcoord=5000 ucoord=6500
    This transforms the 2-dimensional NDF called spec2d, using
    the 1-dimensional transformation TRN in the HDS file called
    scrunch.sdf, into an NDF called spec2d_l.  (NDF spec2d might
@@ -215,8 +203,7 @@ pixels there are 80 (10*8) test points.  For linear
 transformations there is a smaller set of test points for
 improved efficiency.  These are the corners of each axis and the
 midpoints between them.
-
--  On completion, the current transformation global parameter
+ -  On completion, the current transformation global parameter
 takes the value of parameter TRANSFORM.
 
 Co-ordinate_Limits_and_Bounds
@@ -227,8 +214,7 @@ Co-ordinate_Limits_and_Bounds
    NDF's pixel centres by linear interpolation.  Therefore, the
    co-ordinate limits define the region of the input NDF that will
    appear in the output.
-
-   The bounds of the output NDF define its shape and origin.  So
+    The bounds of the output NDF define its shape and origin.  So
    an additional linear scaling transformation can be applied along
    each axis by adjusting the shape independently of the co-ordinate
    limits.
@@ -246,8 +232,7 @@ History
 
  1993 March 16 (MJC):
     Original version.
-
- 1995 August 17 (MJC):
+  1995 August 17 (MJC):
     Used PSX for workspace.  Introduced an improved determination
     of the extreme co-ordinates using the pixel vertices as test
     points.
@@ -256,8 +241,7 @@ Implementation_Status
 
    -  Flux conservation can only be applied to constant-determinant
    or linear transformations.
-
-   -  The NDF components are processed by this application as
+    -  The NDF components are processed by this application as
    follows.
       o  LABEL, UNITS, HISTORY, and extensions are propagated.
       o  TITLE is controlled by the TITLE parameter.
@@ -265,11 +249,8 @@ Implementation_Status
       interpolated NDF.  The DATA and VARIANCE arrays are resampled.
       o  Axis centre arrays are created using the co-ordinate
       limits for COSYS = "Data".
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  There can be an arbitrary number of NDF dimensions.
+    -  All non-complex numeric data types can be handled.
+    -  There can be an arbitrary number of NDF dimensions.
 .endhelp

@@ -1,22 +1,17 @@
 .help contover Starlink kappa
 .nf
 Contours a 2-d NDF overlaid on an image displayed previously.
-
-Usage:
-
-   contover ndf [comp] offset mode ncont [device]
+ Usage:
+    contover ndf [comp] offset mode ncont [device]
       { firstcnt=? stepcnt=?
       { heights=?
       { percentiles=?
       mode
-
-Description:
-
-   This application draws a contour plot of a 2-dimensional NDF
+ Description:
+    This application draws a contour plot of a 2-dimensional NDF
    using an efficient algorithm.  The array may be part or whole of
    the data array, but also the variance or quality can be shown.
-
-   The contour plot is drawn over an existing image that is
+    The contour plot is drawn over an existing image that is
    displayed on the chosen graphics workstation or its overlay,
    provided the displayed image has been recorded in the graphics
    database.  (This will be the case for other display routines in
@@ -29,12 +24,10 @@ Description:
    contour plot with the image, provided some contouring will be
    visible.  These displacements are in the sense image co-ordinate
    minus the data-array co-ordinate for an arbitrary fiducial point.
-
-   The contouring algorithm has only pixel resolution, and
+    The contouring algorithm has only pixel resolution, and
    so the contours are not smooth, but this makes the processing
    much faster.  There are seven methods for selecting contours.
-
-   The best way to use this application is to first display an image
+    The best way to use this application is to first display an image
    on the base plane of an image display, make this the current
    picture, and then plot contours on the overlay plane, clearing
    the overlay picture each time. This enables more than one attempt
@@ -70,8 +63,7 @@ CONCOL
 CONCOL = LITERAL (Read)
    The colour of the contour lines on devices that support colour.
    The options are described below.
-
-     "MAX"          - The maximum colour index in the image
+      "MAX"          - The maximum colour index in the image
                       display colour lookup table.
      "MIN"          - The minimum (non-reserved) colour index in
                       the image-display colour lookup table.
@@ -81,8 +73,7 @@ CONCOL = LITERAL (Read)
      A named colour - Uses the named colour from the palette, and
                       if it is not present, the nearest colour
                       from the palette is selected.
-
-   If the colour is to remain unaltered as the lookup table is
+    If the colour is to remain unaltered as the lookup table is
    manipulated choose an integer between 0 and 15, or a named
    colour.  This parameter will be ignored if PENROT = TRUE.
    [The current value, but equals "1" (the foreground colour) if
@@ -139,8 +130,7 @@ MODE = LITERAL (Read)
                      is dex(-0.4*(n-1)*step) times the start
                      contour level.
      "Percentiles" - You specify a series of percentiles.
-
-   The suggested default is the current value, which is initially
+    The suggested default is the current value, which is initially
    "Free".
 
 NCONT
@@ -205,40 +195,34 @@ contover myfile d [-20,7] \
    example the current method for determining heights is used,
    and as much of myfile will be contoured that fits into the
    current picture.
-
-contover ndf=ngc6872 mode=au ncont=5 offset=[0,0]
+ contover ndf=ngc6872 mode=au ncont=5 offset=[0,0]
    Contours the data array in the NDF called ngc6872 on the
    current image-display overlay device.  Five equally spaced
    contours between the maximum and minimum data values are
    drawn.  There is no offset between the contour plot and the
    displayed image; this can be useful for comparing an NDF
    before and after some processing, e.g. smoothing.
-
-contover iras60(200:300,100:350) comp=d offset=[3,5] \
+ contover iras60(200:300,100:350) comp=d offset=[3,5] \
    Contours the portion of the data array in the NDF called iras60
    on the current image-display overlay using the current method
    for height selection.  The maximum portion of the data array
    that can be contoured goes from pixel (200,100) to (300,350).
    The overlay is displaced such that pixel (i,j) in the data
    array corresponds to pixel (i+3,j+5) in the displayed image.
-
-contover comp=v mode=fr heights=[10,20,40,80] device=xov \
+ contover comp=v mode=fr heights=[10,20,40,80] device=xov \
    Contours the variance array in the current NDF on the xov
    device.  Contours at 10, 20, 40 and 80 are drawn.  There is no
    displacement between the variance contour plot and the
    displayed image.
-
-contover mode=eq ncont=5 dashed=15 pencol=blue ndf=skyflux
+ contover mode=eq ncont=5 dashed=15 pencol=blue ndf=skyflux
    Contours the data array in the NDF called skyflux on the
    current image-overlay device.  Contours at heights
    corresponding to the 10, 30, 50, 70 and 90 percentiles are
    drawn in blue (if available).  Those contours whose values
    less than 15 will appear as dashed lines.  There is no
    displacement between the contour plot and the displayed image.
-
-contover xx1 mode=pe percentiles=[90,95,98,99] pencol=white
-
-noclear device=epsf_l
+ contover xx1 mode=pe percentiles=[90,95,98,99] pencol=white
+ noclear device=epsf_l
    Contours the data array in the NDF called xx1 on the epsf_l
    device.  White contours at heights corresponding to the 90, 95,
    98, and 99 percentiles are drawn.  The display is not cleared.
@@ -257,15 +241,13 @@ co-ordinates are stored via a linear transformation.  The NDF
 associated with the plot is stored by reference with the DATA
 picture.  On exit the current database picture for the chosen
 device reverts to the input picture.
-
--  There are some options for setting the characteristics of the
+ -  There are some options for setting the characteristics of the
 contour lines.  By default, solid lines are drawn with the same
 colour as the axes and key, namely the foreground colour.  The
 colour will depend on the graphics device chosen, but it is often
 black for printers or white for terminals.  The alternatives to
 override this default behaviour are listed below.
-
-   1. Set a colour for all contours using parameter CONCOL.
+    1. Set a colour for all contours using parameter CONCOL.
       The choices may be quite restrictive on certain devices,
       for example a window overlay only has one colour.  Use
       the PALENTRY command to change this colour.
@@ -286,8 +268,7 @@ override this default behaviour are listed below.
       There may be some confusion on devices that already use
       dashed lines, so this is only suitable for devices
       supporting at least three colours simultaneously.
-
-Pen rotation takes precedence over colour control through CONCOL.
+ Pen rotation takes precedence over colour control through CONCOL.
 
 Related_Applications
 
@@ -301,60 +282,45 @@ History
 
  1989 Jun 21 (MJC):
     Original version.
-
- 1989 Aug  8 (MJC):
+  1989 Aug  8 (MJC):
     Passed array dimensions as separate variables
     to CNTDRW and CNTSEL.
-
- 1989 Sep  1 (MJC):
+  1989 Sep  1 (MJC):
     Converted to use turbo-contouring.
-
- 1989 Dec 21 (MJC):
+  1989 Dec 21 (MJC):
     Workspace managed by AIF_TEMP.
-
- 1990 Jan 9 (MJC):
+  1990 Jan 9 (MJC):
     Corrected SGS status.
-
- 1990 Mar 30:
+  1990 Mar 30:
     Reports the chosen contour heights to the user.
-
- 1991 April 13 (MJC):
+  1991 April 13 (MJC):
     First NDF version supporting variance and quality.  Added data
     co-ordinate transformation, NDF reference into the database,
     and AGI context control.  Re-organised world co-ordinates so
     that CNTTUR no longer handles the full array, merely the
     section.
-
- 1991 May 1 (MJC):
+  1991 May 1 (MJC):
     Renamed IN parameter to NDF for consistency.
-
- 1991 July 31 (MJC):
+  1991 July 31 (MJC):
     No longer redefines colours of SGS pens to predefined state if
     workstation has dynamic colour representation, now there is
     palette control.
-
- 1991 October 17 (MJC):
+  1991 October 17 (MJC):
     Fixed typo' in calculation of allowed shifts.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 4 (MJC):
+  1992 April 4 (MJC):
     Made to handle significant dimensions for user-defined
     sections.  Bounds parameters removed.
-
- 1992 June 16 (MJC):
+  1992 June 16 (MJC):
     Made to work with WINDOW_OVERLAY class.  The restriction on the
     number of colour indices has therefore been been relaxed.
-
- 1992 November 30 (MJC):
+  1992 November 30 (MJC):
     Does not use non-monotonic axis centres.
-
- 1995 October 19 (MJC):
+  1995 October 19 (MJC):
     Supports Error component.
-
- 1997 May 21 (MJC):
+  1997 May 21 (MJC):
     Added percentiles and equalised options for the MODE.  New
     parameter PERCENTILES.  Increased tessellation cell to 512
     pixels square.  Added CONCOL, DASHED, and THICK parameters,
@@ -366,7 +332,6 @@ Implementation_Status
 
    -  Only real data can be processed directly.  Other data types
    will undergo a type conversion before the contour plot is drawn.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
 .endhelp

@@ -1,18 +1,13 @@
 .help wcsattrib Starlink kappa
 .nf
 Manages attribute values associated with the WCS component of an NDF.
-
-Usage:
-
-   wcsattrib ndf mode name newval
-
-Description:
-
-   This application can be used to manage the values of attributes
+ Usage:
+    wcsattrib ndf mode name newval
+ Description:
+    This application can be used to manage the values of attributes
    associated with the current co-ordinate Frame of an NDF (title, axis
    labels, axis units, etc).
-
-   Each attribute has a name, a value, and a state. This application
+    Each attribute has a name, a value, and a state. This application
    accesses all attribute values as character strings, converting to
    and from other data types as necessary. The attribute state is a
    Boolean flag (i.e. TRUE or FALSE) indicating whether or not a value
@@ -20,17 +15,12 @@ Description:
    an attribute, then it adopts a default value until an explicit value
    is assigned to it. An attribute value can be cleared, causing the
    attribute to revert to its default value.
-
-   The operation performed by this application is controlled by
+    The operation performed by this application is controlled by
    parameter MODE, and can be:
-
-   -  display the value of an attribute.
-
-   -  set a new value for an attribute.
-
-   -  clear an attribute value.
-
-   -  test the state of an attribute.
+    -  display the value of an attribute.
+    -  set a new value for an attribute.
+    -  clear an attribute value.
+    -  test the state of an attribute.
 
 Parameters
 
@@ -51,21 +41,17 @@ MODE
 MODE = LITERAL (Read)
    The operation to be performed on the attribute specified by
    parameter NAME: It can be one of:
-
-   - "Get" -- The current value of the attribute is displayed on the
+    - "Get" -- The current value of the attribute is displayed on the
    screen and written to output parameter VALUE. If the attribute
    has not yet been assigned a value (or has been cleared), then the
    default value will be displayed.
-
-   - "Set" -- Assigns a new value, given by parameter NEWVAL, to the
+    - "Set" -- Assigns a new value, given by parameter NEWVAL, to the
    attribute.
-
-   - "Test" -- Displays "TRUE" if the attribute has been assigned a
+    - "Test" -- Displays "TRUE" if the attribute has been assigned a
    value, and "FALSE" otherwise (in which case the attribute will
    adopt its default value). This flag is written to the output
    parameter STATE.
-
-   - "Clear" -- Clears the current attribute value, causing it to
+    - "Clear" -- Clears the current attribute value, causing it to
    revert to its default value.
 
 NEWVAL
@@ -90,36 +76,30 @@ Examples
 wcsattrib ngc5128 set title "Polarization map of Centaurus-A"
    This sets the Title attribute of the current co-ordinate Frame in
    the NDF called ngc5128 to the string "Polarization map of Centaurus-A".
-
-wcsattrib my_data set domain saved_pixel
+ wcsattrib my_data set domain saved_pixel
    This sets the Domain attribute of the current co-ordinate Frame in
    the NDF called my_data to the string SAVED_PIXEL.
-
-wcsattrib my_data set format(1) "%10.5G"
+ wcsattrib my_data set format(1) "%10.5G"
    This sets the Format attribute for axis 1 in the current co-ordinate
    Frame in the NDF called my_data, so that axis values are
    formated as floating point values using a minimum field width of
    10 characters, and displaying 5 significant figures. An exponent is
    used if necessary.
-
-wcsattrib ngc5128 set format(2) bdms.2
+ wcsattrib ngc5128 set format(2) bdms.2
    This sets the Format attribute for axis 2 in the current co-ordinate
    Frame in the NDF called ngc5128, so that axis values are formated as
    separate degrees, minutes and seconds field, separated by blanks.
    The seconds field has 2 decimal places. This assumes the current
    co-ordinate Frame in the NDF is a celestial co-ordinate Frame.
-
-wcsattrib my_data get label(1)
+ wcsattrib my_data get label(1)
    This displays the label associated with the first axis of the
    current co-ordinate Frame in the NDF called my_data. A default
    label is displayed if no value has been set for this attribute.
-
-wcsattrib my_data test label(1)
+ wcsattrib my_data test label(1)
    This displays "TRUE" if a value has been set for the Label
    attribute for the first axis of the current co-ordinate Frame in
    the NDF called my_data, and "FALSE" otherwise.
-
-wcsattrib my_data clear label(1)
+ wcsattrib my_data clear label(1)
    This clears the Label attribute for the first axis of the current
    co-ordinate Frame in the NDF called my_data. It reverts to its
    default value.

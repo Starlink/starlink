@@ -1,27 +1,20 @@
 .help cursor Starlink kappa
 .nf
 Reports the co-ordinates of positions selected using the cursor.
-
-Usage:
-
-   cursor [mode] [name] [outlist] [device]
-
-Description:
-
-   This application reads co-ordinates from the chosen graphics device
+ Usage:
+    cursor [mode] [name] [outlist] [device]
+ Description:
+    This application reads co-ordinates from the chosen graphics device
    using a cursor and displays them on your terminal. The selected
    positions may be marked in various ways on the device (see parameter
    PLOT), and can be written to an output positions list so that subsequent
    applications can make use of them (see parameter OUTLIST). The format
    of the displayed positions may be controlled using parameter STYLE.
-
-   Positions may be reported in several different co-ordinate Frames
+    Positions may be reported in several different co-ordinate Frames
    (see parameter FRAME).
-
-   The picture or pictures within which positions are required can be
+    The picture or pictures within which positions are required can be
    selected in several ways (see parameters MODE and NAME).
-
-   Restrictions can be made on the number of positions to be given (see
+    Restrictions can be made on the number of positions to be given (see
    parameters MAXPOS and MINPOS), and screen output can be suppressed
    (see parameter QUIET).
 
@@ -70,19 +63,15 @@ FRAME = LITERAL (Read)
    in the graphics database. This application can report positions in
    any of the co-ordinate Frames stored with each picture. The
    string supplied for FRAME can be one of the following:
-
-   - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
+    - A domain name such as SKY, AXIS, PIXEL, etc. The special domains
    AGI_WORLD and AGI_DATA are used to refer to the world and data
    co-ordinate system stored in the AGI graphics database. They can
    be useful if no WCS information was store with the picture when
    it was created.
-
-   - An integer value giving the index of the required Frame.
-
-   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+    - An integer value giving the index of the required Frame.
+    - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
    section "Sky Co-ordinate Systems" in SUN/95).
-
-   If a null value (!) is supplied, positions are reported in the
+    If a null value (!) is supplied, positions are reported in the
    co-ordinate Frame which was current when the picture was created.
    [!]
 
@@ -157,21 +146,17 @@ MODE
 MODE = LITERAL (Read)
    The method used to select the pictures in which cursor positions are
    to be reported. There are three options:
-
-   - "Current" -- reports positions within the current picture in the
+    - "Current" -- reports positions within the current picture in the
    AGI database. If a position does not lie within the current picture,
    an extrapolated position is reported, if possible.
-
-   - "Dynamic" -- reports positions within the top-most picture
+    - "Dynamic" -- reports positions within the top-most picture
    under the cursor in the AGI  database.  Thus the second and
    subsequent cursor hits may result in the selection of a new picture.
-
-   - "Anchor" -- lets the first cursor hit select the picture in
+    - "Anchor" -- lets the first cursor hit select the picture in
    which all positions are to be reported. If a subsequent cursor hit
    falls outside this picture, an extrapolated position is reported if
    possible.
-
-   ["Dynamic"]
+    ["Dynamic"]
 
 NAME
 
@@ -207,24 +192,19 @@ PLOT = LITERAL (Read)
    which have valid co-ordinates.  The appearance of these graphics
    (colour, size, etc ) is controlled by the STYLE parameter. PLOT
    can take any of the following values:
-
-   - "None" -- No graphics are produced.
-
-   - "Mark" -- Each position is marked by the symbol specified
+    - "None" -- No graphics are produced.
+    - "Mark" -- Each position is marked by the symbol specified
    by parameter MARKER.
-
-   - "Poly" -- Causes each position to be joined by a line to the
+    - "Poly" -- Causes each position to be joined by a line to the
    previous position.  These lines may be simple straight lines or
    geodesic curves (see parameter GEODESIC). The polygons may
    optionally be closed by joining the last position to the first (see
    parameter CLOSE).
-
-   - "Chain" -- This is a combination of "Mark" and "Poly". Each
+    - "Chain" -- This is a combination of "Mark" and "Poly". Each
    position is marked by a symbol and joined by a line to the previous
    position. Parameters MARKER, GEODESIC and CLOSE are used to
    specify the symbols and lines to use.
-
-   [current value]
+    [current value]
 
 QUIET
 
@@ -240,28 +220,23 @@ STYLE = LITERAL (Read)
    A group of attribute settings describing the plotting style to use
    when drawing the graphics specified by parameter PLOT. The format
    of the positions reported on the screen may also be controlled.
-
-   A comma-separated list of strings should be given in which each
+    A comma-separated list of strings should be given in which each
    string is either an attribute setting, or the name of a text file
    preceded by an up-arrow character "^". Such text files should
    contain further comma-separated lists which will be read and
    interpreted in the same manner. Attribute settings are applied in
    the order in which they occur within the list, with later settings
    over-riding any earlier settings given for the same attribute.
-
-   Each individual attribute setting should be of the form:
-
-      <name>=<value>
-
-   where <name> is the name of a plotting attribute, and <value> is
+    Each individual attribute setting should be of the form:
+       <name>=<value>
+    where <name> is the name of a plotting attribute, and <value> is
    the value to assign to the attribute. Default values will be
    used for any unspecified attributes. All attributes will be
    defaulted if a null value (!) is supplied. See section "Plotting
    Attributes" in SUN/95 for a description of the available
    attributes. Any unrecognised attributes are ignored (no error is
    reported). [current value]
-
-   In addition to the attributes which control the appearance of
+    In addition to the attributes which control the appearance of
    the graphics (Colour, Font, etc), the following attributes may
    be set in order to control the appearance of the formatted axis
    values reported on the screen: Format, Digits, Symbol, Unit. These
@@ -275,29 +250,25 @@ cursor frame=pixel
    current graphics device by use of the cursor. Positions are
    reported in pixel co-ordinates if available, and in the current
    co-ordinate Frame of the picture otherwise.
-
-cursor frame=equat(J2010)
+ cursor frame=equat(J2010)
    This obtains co-ordinates within any visible picture for the
    current graphics device by use of the cursor. Positions are
    reported in equatorial RA/DEC co-ordinates (referenced to the
    J2010 equinox) if available, and in the current co-ordinate Frame
    of the picture otherwise.
-
-cursor describe plot=mark marker=3 style="colour=red,size=2"
+ cursor describe plot=mark marker=3 style="colour=red,size=2"
    As above except, positions are always reported in the current
    co-ordinate Frame of each picture. The details of these co-ordinate
    Frames are described as they are used. Each selected point is
    marked with PGPLOT marker 3 (an asterisk). The markers are
    red and are twice the default size.
-
-cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
+ cursor current maxpos=2 minpos=2 plot=poly quiet outlist=slice
    Exactly two positions are obtained within the current picture,
    and are joined with a straight line. The positions are written to
    a text file called slice but are not displayed on the screen. The
    text file may be used to communicate the positions to later
    applications.
-
-cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
+ cursor name=data style="^mystyle,digits(1)=5,digits(2)=7"
    This obtains co-ordinates within any visible DATA picture on
    the current graphics device.  The style to use is read from
    text file mystyle, but is then modified so that 5 digits are used
@@ -309,14 +280,11 @@ Notes
 may not be in the same units as the formatted values shown on
 the screen and logged to the log file. For instance, unformatted
 celestial co-ordinate values are stored in radians.
-
--  The current picture is unchanged by this application.
-
--  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
+ -  The current picture is unchanged by this application.
+ -  In DYNAMIC and ANCHOR modes, if the cursor is situated at a
 position where there are no pictures of the selected name, the
 co-ordinates in the BASE picture are reported.
-
--  Positions can be removed (the instructions state how), starting
+ -  Positions can be removed (the instructions state how), starting
 from the most-recent one.  Such positions are excluded from the
 output positions list and log file (if applicable). If graphics
 are being used to mark the positions, then removed positions will
@@ -330,89 +298,67 @@ Related_Applications
 Authors
 
 JM: Jo Murray  (STARLINK)
-
-MJC: Malcolm J. Currie  (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ MJC: Malcolm J. Currie  (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  22-MAY-1989 (JM):
     Original version.
-
- 1989 Jun 28 (MJC):
+  1989 Jun 28 (MJC):
     Added error checking, some tidying, fixed several bugs, only
     reports the picture name and comment when it changes.
-
- 1989 Jul 10 (MJC):
+  1989 Jul 10 (MJC):
     Fixed "SGS zone too small" bug by reordering the code so that
     the MODE is obtained before the device; extended the prologue.
-
- 1989 Oct 19 (MJC):
+  1989 Oct 19 (MJC):
     Fixed the synchronisation for terminals, and added commentary
     for both terminals and image displays.
-
- 1989 Oct 24 (MJC):
+  1989 Oct 24 (MJC):
     Added the log file and name options, and redesigned the
     description.
-
- 1989 Nov 10 (MJC):
+  1989 Nov 10 (MJC):
     Calls a subroutine to prepare the cursor.
-
- 1990 Jan 9 (MJC):
+  1990 Jan 9 (MJC):
     Corrected SGS status.
-
- 1990 Apr 20:
+  1990 Apr 20:
     Added output of the current picture's label, if it exists.
-
- 1991 February 8 (MJC):
+  1991 February 8 (MJC):
     Added AGI context control, and tidied unwanted picture
     identifiers.
-
- 1991 March 19 (MJC):
+  1991 March 19 (MJC):
     Converted to SST prologue.
-
- 1991 April 9 (MJC):
+  1991 April 9 (MJC):
     Added AGI begin-and-end block.  Obtains data co-ordinates if
     present.
-
- 1991 May 14 (MJC):
+  1991 May 14 (MJC):
     Added COSYS parameter.
-
- 1992 January 29 (MJC):
+  1992 January 29 (MJC):
     Fixed bug in list of options for MODE.
-
- 1992 February 19 (MJC):
+  1992 February 19 (MJC):
     AGI behaviour has changed, so call new AGI routine to test
     whether or not the picture has changed between cursor
     selections.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1993 May 24 (MJC):
+  1993 May 24 (MJC):
     Added XC and YC output parameters.
-
- 1995 August 24 (MJC):
+  1995 August 24 (MJC):
     Added the COLOUR and PLOT parameters and example of their use.
     No longer selects a new current picture (use PICCUR instead).
     Made usage and examples lowercase.  Added Related Applications.
-
- 1995 December 16 (MJC):
+  1995 December 16 (MJC):
     Added NUMBER, XP, and YP output parameters.  Allowed erasure
     of previous position.
-
- 1996 May 31 (MJC):
+  1996 May 31 (MJC):
     Improved and simplified the graphics, so the marker has a
     uniform size, and plotting can occur outside the current
     SGS picture in ANCHOR and CURRENT modes.
-
- 1997 March 11 (MJC):
+  1997 March 11 (MJC):
     Fixed initialisation bug for parameter NUMBER, and hence XP and
     YP.  Fixed bug where SGS pen was being set when PLOT="None".
-
- 28-AUG-1998 (DSB):
+  28-AUG-1998 (DSB):
     Radical changes to use PGPLOT and AST for graphics and
     co-ordinate handling.
 .endhelp

@@ -1,28 +1,22 @@
 .help calpol Starlink kappa
 .nf
 Calculates polarisation parameters.
-
-Usage:
-
-   calpol in1 in2 in3 in4 p theta i
-
-Description:
-
-   This routine calculates various parameters describing the
+ Usage:
+    calpol in1 in2 in3 in4 p theta i
+ Description:
+    This routine calculates various parameters describing the
    polarisation described by four intensity arrays analysed at 0, 45,
    90, and 135 degrees to a reference direction.  Variance values are
    stored in the output NDFs if all the input NDFs have variances and
    you give a true value for parameter VARIANCE.
-
-   By default, three output NDFs are created holding percentage
+    By default, three output NDFs are created holding percentage
    polarisation, polarisation angle and total intensity. However,
    NDFs holding other quantities, such as the Stokes parameters, can
    also be produced by over-riding the default null values
    associated with the corresponding parameters.  The creation of any
    output NDF can be suppressed by supplying a null value for the
    corresponding parameter.
-
-   There is an option to correct the calculated values of percentage
+    There is an option to correct the calculated values of percentage
    polarisation and polarised intensity to take account of the
    statistical bias introduced by the asymmetric distribution of
    percentage polarisation (see parameter DEBIAS).  This correction
@@ -129,19 +123,15 @@ calpol m51_0 m51_45 m51_90 m51_135 m51_p m51_t m51_i ip=m51_ip
    This example produces NDFs holding percentage polarisation,
    polarisation angle, total intensity and polarised intensity,
    based on the four NDFs M51_0, m51_45, m51_90 and m51_135.
-
-calpol m51_0 m51_45 m51_90 m51_135 m51_p m51_t m51_i ip=m51_ip
-
-novariance
+ calpol m51_0 m51_45 m51_90 m51_135 m51_p m51_t m51_i ip=m51_ip
+ novariance
    As above except that variance arrays are not computed.
-
-calpol m51_0 m51_45 m51_90 m51_135 m51_p m51_t m51_i ip=m51_ip
+ calpol m51_0 m51_45 m51_90 m51_135 m51_p m51_t m51_i ip=m51_ip
    As the first example except that there is a correction for
    statistical bias in the percentage polarisation and polarised
    intensity, assuming that all the input NDFs have a VARIANCE
    array.
-
-calpol m51_0 m51_45 m51_90 m51_135 q=m51_q p=m51_p
+ calpol m51_0 m51_45 m51_90 m51_135 q=m51_q p=m51_p
    This example produces NDFs holding the Stokes Q and U
    parameters, again based on the four NDFs M51_0, m51_45, m51_90
    and m51_135.
@@ -154,15 +144,12 @@ intensity in the pixel is not positive.  The output variance
 values are also undefined when any of the four input variances is
 bad or negative, or any computed variance is not positive, or
 the percentage polarisation is not positive.
-
--  If the four input NDFs have different pixel-index bounds, then
+ -  If the four input NDFs have different pixel-index bounds, then
 they will be trimmed to match before being added.  An error will
 result if they have no pixels in common.
-
--  The output NDFs are deleted if there is an error during the
+ -  The output NDFs are deleted if there is an error during the
 formation of the polarisation parameters.
-
--  The output NDFs obtain their QUALITY, AXIS information, and
+ -  The output NDFs obtain their QUALITY, AXIS information, and
 TITLE from the IN1 NDF.  The following labels and units are also
 assigned:
    I       "Total Intensity"            UNITS of IN1
@@ -182,22 +169,19 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  23-SEP-1993 (DSB):
     Original version.
-
- 1995 April 10 (MJC):
+  1995 April 10 (MJC):
     Added Notes, Related Applications, Implementation Status,
     three examples, and headings in the commentary.  Corrected
     spelling, and other errors.  Used a modern-style variable
     declaration.  Usage and Examples to lowercase.  Made the
     parameter names consistent.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -205,10 +189,8 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.  Arithmetic
+    -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single-precision floating point.
 .endhelp

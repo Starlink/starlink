@@ -1,14 +1,10 @@
 .help lutheat Starlink kappa
 .nf
 Loads the heat lookup table.
-
-Usage:
-
-   lutheat
-
-Description:
-
-   This procedure loads the "heat" lookup table with linear scaling
+ Usage:
+    lutheat
+ Description:
+    This procedure loads the "heat" lookup table with linear scaling
    into the current image-display device.
 
 Parameters
@@ -36,7 +32,6 @@ History
 
  1990 Apr 10 (MJC):
     Original version.
-
- 1991 April 24 (MJC):
+  1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
 .endhelp

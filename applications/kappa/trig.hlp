@@ -104,5 +104,506 @@ OTITLE
   default     'KAPPA - Trig'
   help        'Character string used as a title for the output IMAGE 
               structure.'
+ 1 TURBOCONT
+Contours a 2-d NDF quickly.
+ Usage:
+    turbocont ndf [comp] mode ncont [key] [device]
+      { firstcnt=? stepcnt=?
+      { heights=?
+      { percentiles=?
+      mode
+ Description:
+    This application draws a contour plot of a 2-dimensional NDF on
+   the current graphics device via an efficient algorithm.  The
+   image may be part or whole of the data array, but also the
+   variance or quality can be shown.  The plot is situated within
+   the current graphics-database picture.
+    The contour plot resides within optional, annotated and enumerated
+   axes.  An optional, but recommended, key may be drawn to the
+   right of the contour plot.  It reports the NDF's units if there
+   are any, and only contour heights actually plotted are included.
+   There are seven methods for selecting contours.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ABSLAB
+
+ABSLAB  =  LITERAL (Read)
+   Label for the plot abscissa, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   the suggested default is the NDF's axis label followed by the
+   units, in parentheses.  If an error occurs obtaining the label
+   the suggested default is "X". []
+
+ANNOTA
+
+ANNOTA = _LOGICAL (Read)
+   If TRUE the contour lines will be annotated with a contour
+   number corresponding to the key entry.  It is ignored and there
+   are no annotations when KEY = FALSE.  [FALSE]
+
+AXES
+
+AXES = _LOGICAL (Read)
+   TRUE if labelled and annotated axes are to be drawn around the
+   contour plot.  The annotations are either the data
+   co-ordinates from the NDF axis components, provided these are
+   present and linear and COSYS = "Data"; otherwise pixel
+   co-ordinates are used.  [TRUE]
+
+BORDER
+
+BORDER = _LOGICAL (Read)
+   BORDER is TRUE if a box is to be drawn about the contour plot.
+   This is only accessed when there are no axes required. [TRUE]
+
+CLEAR
+
+CLEAR = _LOGICAL (Read)
+   TRUE if the graphics device is to be cleared before display
+   of the array. [TRUE]
+
+COMP
+
+COMP = LITERAL (Read)
+   The NDF component to be contoured.  It may be "Data",
+   "Quality", "Variance", or "Error" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be taken before plotting contours).  If
+   "Quality" is specified, then the quality values are treated as
+   numerical values (in the range 0 to 255). ["Data"]
+
+CONCOL
+
+CONCOL = LITERAL (Read)
+   The colour of the contour lines on devices that support colour.
+   The options are described below.
+      "MAX"          - The maximum colour index in the image
+                      display colour lookup table.
+     "MIN"          - The minimum (non-reserved) colour index in
+                      the image-display colour lookup table.
+     An integer     - The actual colour index.  It is constrained
+                      between 0 and the maximum colour index
+                      available on the device.
+     A named colour - Uses the named colour from the palette, and
+                      if it is not present, the nearest colour
+                      from the palette is selected.
+    If the colour is to remain unaltered as the lookup table is
+   manipulated choose an integer between 0 and 15, or a named
+   colour.  This parameter will be ignored if PENROT = TRUE.
+   [The current value, but equals "1" (the foreground colour) if
+   there is no current value.]
+
+COSYS
+
+COSYS = LITERAL (Read)
+   The co-ordinate system to be used.  This can be either "World"
+   or "Data".  "World" makes pixel co-ordinates to appear on axes.
+   If COSYS = "Data" the NDF's axis information is used to
+   annotate axes.  [Current co-ordinate system]
+
+DASHED
+
+DASHED = _REAL (Read)
+   The height below which the contours will be drawn with dashed
+   lines.  A null value (!) means all contours are drawn with
+   solid lines.  This facility is only available when ANNOTA =
+   FALSE. [!]
+
+DEVICE
+
+DEVICE = DEVICE (Read)
+   The plotting device. [Current image-display device]
+
+FILL
+
+FILL = _LOGICAL (Read)
+   The contour plot normally has square pixels, in other words
+   a length along each axis corresponds to the same number of
+   pixels.  However, for images with markedly different
+   dimensions this default behaviour may not be suitable or give
+   the clearest plot.  When FILL is TRUE, the square-pixel
+   constraint is relaxed and the contour plot is the largest
+   possible within the current picture.  When FILL is FALSE, the
+   pixels are square.  The suggested default is the current value.
+   [FALSE]
+
+FIRSTCNT
+
+FIRSTCNT = _REAL (Read)
+   Height of the first contour (Linear and Magnitude modes).
+   The suggested value is the current value.
+
+FONT
+
+FONT = LITERAL (Read)
+   The fount to be used for the line graphics.  It can be either
+   "NCAR" for the NCAR fancy characters and "GKS" for the standard
+   GKS san-serif fount.  The former is intended for hardcopy
+   publication-quality plots, since it is relatively slow; the
+   latter is intended for normal interactive graphics requiring
+   rapid plotting, and it is clearer on small plots.  The
+   suggested default is the current value. ["GKS"]
+
+HEIGHTS
+
+HEIGHTS() = _REAL (Read)
+   Contour levels (Free mode).  The suggested default is the
+   current value.
+
+KEY
+
+KEY = _LOGICAL (Read)
+   When KEY is TRUE, a key of the contour level versus pixel
+   value is to be produced. [TRUE]
+
+LABELFREQ
+
+LABELFREQ = _INTEGER (Read)
+   The frequency with which contour levels are annotated.  1
+   means every level will be labelled.  This may be excessive in
+   plots where the contours are closely packed.  This parameter
+   is ignored unless contour annotation has been selected.  It
+   must be between one and the number of contour heights. [1]
+
+MAJTIC
+
+MAJTIC( 2 ) = _REAL (Read)
+   The parameter controlling the numbers of major tick marks
+   for the x and y axes.  (Number used is between MAJTIC+2 and
+   5*MAJTIC/2+4.) [3.,3.]
+
+MAXRES
+
+MAXRES = _LOGICAL (Read)
+   If TRUE the contours are interpolated to the resolution of the
+   plotting device, i.e. provides sub-pixel resolution, otherwise
+   straight-line segments at pixel resolution are drawn.  The
+   latter does not give smooth contours, but this makes the
+   processing much faster.  The former draws smoother contours to
+   the resolution of the graphics workstation, but they still
+   have vertices.  If you require smooth well-rounded contours try
+   the slower CONTOUR. [FALSE]
+
+MINTIC
+
+MINTIC( 2 ) = _REAL (Read)
+   The number of minor tick marks between each major tick mark
+   for the x and y axes.  A negative value forces the graphics
+   package to compute appropriate values. [-1.,-1.]
+
+MODE
+
+MODE = LITERAL (Read)
+   The method used to select the contour levels.  The options are
+   described below.
+      "Area"        - The contours enclose areas of the array for
+                     which the equivalent radius increases by
+                     equal increments.  You specify the number of
+                     levels.
+     "Automatic"   - The contour levels are equally spaced between
+                     the maximum and minimum pixel values in the
+                     array.  You supply the number of contour
+                     levels.
+     "Equalised"   - You define the number of equally spaced
+                     percentiles.
+     "Free"        - You specify a series of contour values
+                     explicitly.
+     "Linear"      - You define the number of contours, the start
+                     contour level and linear step between
+                     contours.
+     "Magnitude"   - You define the number of contours, the start
+                     contour level and step between contours.  The
+                     step size is in magnitudes so the nth contour
+                     is dex(-0.4*(n-1)*step) times the start
+                     contour level.
+     "Percentiles" - You specify a series of percentiles.
+    The suggested default is the current value, which is initially
+   "Free".
+
+NCONT
+
+NCONT = _INTEGER (Read)
+   The number of contours required (all modes except Free and
+   Percentiles).  It must be between 1 and 50.  If the number is
+   large, the plot may be cluttered and take longer to produce.
+   6, the initial suggested default, gives reasonable results.
+   The current value becomes the suggested default.
+
+NDF
+
+NDF = NDF (Read)
+   NDF structure containing the 2-dimensional image to be
+   contoured.
+
+NOISY
+
+NOISY = _LOGICAL (Read)
+   If TRUE the contour lines will alternately be annotated with
+   a contour number corresponding to the key entry, but at
+   twice the frequency.  It is ignored unless annotated contours
+   have been selected. [FALSE]
+
+ORDLAB
+
+ORDLAB  =  LITERAL (Read)
+   Label for the plot ordinate, in which NCAR fancy founts may be
+   embedded when FONT = "NCAR".  If axis information is present
+   the suggested default is the NDF's axis label followed by the
+   units, in parentheses.  If an error occurs obtaining the label
+   the suggested default is "Y". []
+
+OUTTIC
+
+OUTTIC = _LOGICAL (Read)
+   TRUE if the axis tick marks are to appear on the outside of
+   the axes instead of inside.  By default, the tick marks are
+   drawn outside the contouring region to eliminate
+   intersections of ticks with the contours. [TRUE]
+
+PENROT
+
+PENROT = _LOGICAL (Read)
+   If TRUE, the plotting pens are cycled through the contours to
+   aid identification of the contour heights.  It is ignored
+   when annotation is selected. [FALSE]
+
+PERCENTILES
+
+PERCENTILES() = _REAL (Read)
+   Contour levels given as percentiles.  The values must lie
+   between 0.0 and 100.0. (Percentiles mode).  The suggested
+   default is the current value.
+
+PLTITL
+
+PLTITL = LITERAL (Read)
+   The title of the plot.  Up to about 40 characters can be
+   accommodated, and NCAR fancy founts may be embedded when FONT =
+   "NCAR".  If an error occurs obtaining the title, it is
+   defaulted to "Contour plot".  [The NDF title]
+
+PXSIZE
+
+PXSIZE = _REAL (Read)
+   The length (x axis) of the plot in metres.  There is an upper
+   limit given by the x size of the current picture. [Maximum that
+   can fit in the current picture whilst preserving square pixels]
+
+PYSIZE
+
+PYSIZE = _REAL (Read)
+   The length (y axis) of the plot in metres.  There is an upper
+   limit given by the y size of the current picture. [Maximum that
+   can fit in the current picture whilst preserving square pixels]
+
+RESOLUTION
+
+RESOLUTION = _REAL (Read)
+   The resolution factor.  The actual plotting resolution is this
+   times the x and y theoretical resolutions in world
+   co-ordinates.  In GKS, whether or not a given "lamp" is
+   illuminated or pen position is marked with ink cannot be
+   determined, so a factor of unity is too small for the most
+   efficient processing.  It must lie between 2.0 and 10.0. [2.0]
+
+STEPCNT
+
+STEPCNT = _REAL (Read)
+   Separation between contour levels, linear for Linear mode
+   and in magnitudes for Magnitude mode.  The suggested value is
+   the current value.
+
+THICK
+
+THICK = _REAL (Read)
+   The thickness of the lines and NCAR-fount characters in the
+   plot, where 1.0 is the normal thickness.  Currently, this is
+   only available on a few devices.  It must take a value in the
+   range 0.5--10.0.  [1.0]
+
+Examples
+
+turbocont myfile d \
+   Contours the data array in the NDF called myfile on the current
+   graphics device.  All other settings are defaulted, so for
+   example the current method for determining heights is used, and
+   a key is plotted.
+ turbocont taurus1(100:199,150:269,4) \
+   Contours a 2-dimensional portion of current array component in
+   the NDF cube called taurus1 on the current graphics device.
+   The portion extends from pixel (100,150,4) to pixel
+   (199,269,4).  All other settings are defaulted, so for example
+   coarse contours are drawn, using the current mode for
+   determining heights, and a key is plotted.
+ turbocont ndf=ngc6872 mode=au ncont=5 device=ps_l concol=white
+   Contours the data array in the NDF called ngc6872 on the
+   ps_l graphics device.  Five equally spaced contours between
+   the maximum and minimum data values are drawn in white.  The
+   NDF's title adorns the plot.  A key is plotted.
+ turbocont ngc6872 mode=au ncont=5 annota labelfreq=2 cosys=w
+ device=ps_l concol=white
+   As above.  In addition the contours are annotated at
+   alternate heights.  The axes are annotated with pixel
+   co-ordinates.
+ turbocont ngc6872 mode=li firstcnt=10 stepcnt=2 ncont=4 noaxes
+   Contours the data array in the NDF called ngc6872 on the
+   current graphics device.  Four contours at heights 10, 12, 14,
+   and 16 are drawn.  A key is plotted, but no axes surround the
+   contour plot.
+ turbocont ss443 mode=pe percentiles=[80,90,95,98,99,99.9] annota
+   Contours the data array in the NDF called ss443 on the
+   current graphics device.  Annotated contours at heights
+   corresponding to the 80, 90, 95, 98, 99, and 99.9 percentiles
+   are drawn.  A key is plotted.
+ turbocont mode=eq ncont=5 dashed=0 pencol=red ndf=skyflux
+   Contours the data array in the NDF called skyflux on the
+   current graphics device.  Contours at heights corresponding to
+   the 10, 30, 50, 70 and 90 percentiles are drawn in red.  Those
+   contours whose values are negative will appear as dashed
+   lines.  A key is plotted.
+ turbocont comp=d nokey penrot \
+   Contours the portion of the data array in the current NDF on
+   the current graphics device using the current method for height
+   selection.  The NDF's title adorns the plot.  No key is drawn.
+   The appearance of the contours cycles every third contour.
+ turbocont comp=v mode=fr heights=[10,20,40,80] title=Variance
+   Contours the variance array in the current NDF on the
+   current graphics device.  Contours at 10, 20, 40 and 80 are
+   drawn.  "Variance" is the title of the plot.
+
+Notes
+
+-  The application stores a number of pictures in the graphics
+database in the following order: a FRAME of the specified size
+containing the title, annotated axes, contours and key; a DATA
+picture which is stored with world co-ordinates in units of data
+pixels; and a KEY picture to store the key if present.  The DATA
+picture also may have double-precision data co-ordinates derived
+from the NDF axis components provided these are linear and
+different from pixel co-ordinates; the data co-ordinates are
+stored via a linear transformation.  The NDF associated with the
+plot is stored by reference with the DATA picture.  On exit the
+current database picture for the chosen device reverts to the
+input picture.
+ -  There are some options for setting the characteristics of the
+contour lines.  By default, solid lines are drawn with the same
+colour as the axes and key, namely the foreground colour.  The
+colour will depend on the graphics device chosen, but it is often
+black for printers or white for terminals.  The alternatives to
+override this default behaviour are listed below.
+    1. Set a colour for all contours using parameter CONCOL.
+   2. Request dashed contours below some threshold given by
+      parameter DASHED and solid lines for other heights.  All
+      contours have either the foreground colour or that
+      prescribed by parameter CONCOL.
+   3. Cycle the pens modulo 3 for each contour height actually
+      plotted by setting PENROT = TRUE.  The characteristics of
+      the second and third line styles will depend on the chosen
+      graphics device.  An image display or pen plotter will draw
+      coloured lines using palette entries 1 to 3; whereas a
+      window overlay, or monochrome laser printer or terminal
+      will draw a variety of dashed or thicker lines.
+   4. Combine options 2 and 3.  However, palette colours 1 to 3
+      will always be used and CONCOL ignored.  The contours below
+      the threshold continue the cycle through the three colours.
+      There may be some confusion on devices that already use
+      dashed lines, so this is only suitable for devices
+      supporting at least three colours simultaneously.
+   5. Annotate the contours using the number of the contour height
+      corresponding to the key entries rather than the values
+      themselves.  (Set parameter ANNOTA = TRUE.)  The frequency
+      of labelling may be defined (LABELFREQ).  The key option
+      must be chosen (KEY = TRUE) in conjunction with annotated
+      contours.  Annotation is not recommended should the data
+      array have a large number of bad pixels, or if the contours
+      are closely packed.  There is an additional parameter
+      (NOISY) to select double annotations for short or noisy
+      contours in option 2.
+ Annotation takes precedence over pen rotation, which in turn
+overrides colour control through CONCOL.
+
+Related_Applications
+
+   KAPPA: CONTOUR, CONTOVER; Figaro: ICONT; SPECDRE: SPECCONT.
+
+Authors
+
+MJC: Malcolm J. Currie  STARLINK
+
+History
+
+ 1989 Aug 25 (MJC):
+    Original based on CONTOUR.
+  1989 Oct 17 (MJC):
+    Revised the world co-ordinates of the contour picture to the
+    Starlink standard instead of pixel number, and corrected the
+    application name in database pictures and error messages.
+  1989 Oct 27 (MJC):
+    Improved positioning of the top of the key.
+  1989 Dec 21 (MJC):
+    Workspace managed by AIF_TEMP.
+  1990 Jan 9  (MJC):
+    Corrected SGS status.
+  1990 Mar 30 (MJC):
+    Added axis annotation parameters and reports the chosen
+    contour heights to the user.
+  1990 May 22 (MJC):
+    Corrected aspect ratio of the contour region to give the same
+    scale factor in x and y.
+  1990 Aug 29 (MJC):
+    NDF version supporting variance and quality, bad-pixel checks,
+    units and title to annotate the plot.
+  1991 February 7 (MJC):
+    Added NDF reference into the database, AGI context control and
+    removed fuzzy-picture fudge.
+  1991 April 9 (MJC):
+    Added data co-ordinate transformation and optional axes.
+    Re-organised world co-ordinates so that CNTTUR no longer
+    handles the full array, merely the section.
+  1991 May 1 (MJC):
+    Renamed IN parameter to NDF for consistency.
+  1991 July 31 (MJC):
+    No longer redefines colours of SGS pens to predefined state if
+    workstation has dynamic colour representation, now there is
+    palette control.
+  1991 August 20 (MJC):
+    Added FONT parameter.
+  1991 October 22 (MJC):
+    Fixed a bug so that when annotating and using data co-ordinates
+    the contours now appear at the correct locations.
+  1992 March 3 (MJC):
+    Replaced AIF parameter-system calls by the extended PAR
+    library.
+  1992 April 4 (MJC):
+    Made to handle significant dimensions for user-defined
+    sections.
+  1992 November 30 (MJC):
+    Does not use non-monotonic axis centres.
+  1992 December 17 (MJC):
+    Added the FILL option.
+  1993 January 19 (MJC):
+    Added the BORDER option.
+  1995 October 19 (MJC):
+    Supports Error component.
+  1996 August 29 (MJC):
+    Increased tessellation cell to 256 pixels square.
+  1997 May 12 (MJC):
+    Added percentiles and equalised options for the MODE.  New
+    parameter PERCENTILES.  Increased tessellation cell to 512
+    pixels square.
+  1997 May 19 (MJC):
+    Added CONCOL and DASHED parameters, and further examples.
+    Improved efficiency by using PSX to obtain workspace.
+    Increased the maximum thickness from 5 to 10.  Rewrote the
+    Notes on contour colour and line style.
+
+Implementation_Status
+
+   -  Only real data can be processed directly.  Other non-complex
+   numeric data types will undergo a type conversion before the
+   contour plot is drawn.
+    -  Bad pixels and automatic quality masking are supported.
 .endhelp

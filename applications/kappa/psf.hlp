@@ -2,19 +2,14 @@
 .nf
 Determines the parameters of a model star profile by fitting star
 images in a two-dimensional NDF.
-
-Usage:
-
-   psf in cofile device out [cut] [range] [isize] [poscols] [clear]
-
-Description:
-
-   This application finds a set of parameters to describe a model
+ Usage:
+    psf in cofile device out [cut] [range] [isize] [poscols] [clear]
+ Description:
+    This application finds a set of parameters to describe a model
    Gaussian star image.  It can be used for profile-fitting stellar
    photometry, to evaluate correction terms to aperture
    photometry, or for filtering.
-
-   The model has a radial profile:
+    The model has a radial profile:
       D =  A exp(-0.5 * (r/sigma) ** gamma )
    where r is calculated from the true radial distance from the star
    centre allowing for image ellipticity, sigma is the Gaussian
@@ -22,15 +17,13 @@ Description:
    number of star images you specify and determines a mean
    seeing-disc size, radial fall-off parameter (gamma), axis ratio,
    and orientation of a model star image.
-
-   A table, giving details of the seeing and ellipticity of each
+    A table, giving details of the seeing and ellipticity of each
    star image used can be reported to an output text file.  This
    table indicates if any star could not be used.  Reasons for
    rejecting stars are too-many bad pixels present in the image,
    the star is too close to the edge of the data array, the
    `star' is a poor fit to model or it could not be located.
-
-   An optional plot of the mean profile and the fitted function may
+    An optional plot of the mean profile and the fitted function may
    be produced.  The point-spread function may be stored in an NDF
    for later use.
 
@@ -265,24 +258,19 @@ psf ngc6405i starlist.dat \
    co-ordinates given in the first two columns of file starlist.
    A plot of the profile is drawn on the current graphics device.
    The results are stored in the parameter file psf.sdf.
-
-psf ngc6405i starlist device=!
+ psf ngc6405i starlist device=!
    As above but there is no graphical output.
-
-psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) \
+ psf cofile=starlist in=ngc6405i logfile=fit.log fwhm=(seeing) \
    As the first example, but the results, including the fits to
    each star, are written to the text file fit.log.  The
    full-width half-maximum is written to the ICL variable SEEING
    rather than the parameter file.
-
-psf ngc6405i starlist isize=31 \
+ psf ngc6405i starlist isize=31 \
    As the first example, but the area including a star image is
    31 pixels square, say because the seeing is poor or the pixels
    are smaller than normal.
-
-psf ngc6405i starlist out=starpsf cut=1.0e-3 scale=0.52
-
-radunits="arcseconds"
+ psf ngc6405i starlist out=starpsf cut=1.0e-3 scale=0.52
+ radunits="arcseconds"
    As the first example, but the resultant point-spread function
    is stored in the NDF called starpsf, and will contain signals
    as low as 1.0E-3.  The FWHM and plot abscissa are scaled to
@@ -295,8 +283,7 @@ be chosen to represent those whose magnitudes are to be found
 using a stellar photometry application, and to be sufficiently
 bright, uncrowded, and noise-free to allow an accurate fit to be
 made.
-
--  The method to calculate the fit is as follows.
+ -  The method to calculate the fit is as follows.
    o   Marginal profiles of each star image are formed in four
    directions, inclined at 45-degree intervals.  A Gaussian curve
    and background is fitted to each profile.  Using the resulting
@@ -318,8 +305,7 @@ made.
    image ellipticity removed.  Finally a radial profile is fitted
    to these data, giving the radial profile parameter gamma and a
    final re-estimate of the seeing-disc size.
-
--  If a plot was requested the application stores two pictures in
+ -  If a plot was requested the application stores two pictures in
 the graphics database in the following order: a FRAME of the
 specified size containing the title, annotated axes, and line
 plot; and a DATA picture, which has world co-ordinates measured
@@ -346,33 +332,25 @@ History
  1990 Sep 25 (MJC):
     Original version with commentary from Rodney Warren-Smith's
     EDRS documentation.
-
- 1991 July 6 (MJC):
+  1991 July 6 (MJC):
     Added Usage, Notes on graphics pictures stored in the database,
     and more on the Implementation Status in the documentation.
-
- 1991 July 9 (MJC):
+  1991 July 9 (MJC):
     An output NDF containing the PSF may now be created.  There are
     three new parameters: CUT, OUT and TITLE.
-
- 1991 July 12 (MJC):
+  1991 July 12 (MJC):
     Support for data co-ordinates added via new parameter COSYS.
-
- 1991 August 20 (MJC):
+  1991 August 20 (MJC):
     Added FONT parameter.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 21 (MJC):
+  1992 April 21 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-
- 1992 November 30 (MJC):
+  1992 November 30 (MJC):
     Does not use non-monotonic axis centres.
-
- 1993 August 27 (MJC):
+  1993 August 27 (MJC):
     Added ABSLAB, ORDLAB, PLTITL, RADUNITS, SCALE, and MINOR
     parameters for adjustment of the plotting style, for scaling
     from pixels to physical units, and for minor-axis profiles.
@@ -381,10 +359,8 @@ Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    LABEL, and TITLE components of an NDF data structure.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.  The output
+    -  All non-complex numeric data types can be handled.  The output
    point-spread-function NDF has type _REAL.
 .endhelp

@@ -324,5 +324,89 @@ STITLE
   default     'KAPPA - Mstats - Stddevs'
   help        'Character string used as title for the IMAGE structure 
               holding standard-deviation array.'
+ 1 MULT
+Multiplies two NDF data structures.
+ Usage:
+    mult in1 in2 out
+ Description:
+    The routine multiplies two NDF data structures pixel-by-pixel to
+   produce a new NDF.
 
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN1
+
+IN1 = NDF (Read)
+   First NDF to be multiplied.
+
+IN2
+
+IN2 = NDF (Read)
+   Second NDF to be multiplied.
+
+OUT
+
+OUT = NDF (Write)
+   Output NDF to contain the product of the two input NDFs.
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Value for the title of the output NDF.  A null value will cause
+   the title of the NDF supplied for parameter IN1 to be used
+   instead. [!]
+
+Examples
+
+mult a b c
+   This multiplies the NDF called a by the NDF called b, to make
+   the NDF called c.  NDF c inherits its title from a.
+ mult out=c in1=a in2=b title="Normalised spectrum"
+   This multiplies the NDF called a by the NDF called b, to make
+   the NDF called c.  NDF c has the title "Normalised spectrum".
+
+Notes
+
+If the two input NDFs have different pixel-index bounds, then
+they will be trimmed to match before being multiplied.  An error
+will result if they have no pixels in common.
+
+Related_Applications
+
+   KAPPA: ADD, CADD, CDIV, CMULT, CSUB, DIV, MATHS, SUB.
+
+Authors
+
+RFWS: R.F. Warren-Smith (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
+
+History
+
+ 9-APR-1990 (RFWS):
+    Original version.
+  1992 January 15 (MJC):
+    Added Usage and Examples items.
+  1995 September 12 (MJC):
+    Title inherited by default.  Usage and examples to lowercase.
+    Added Related Applications.
+  5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+Implementation_Status
+
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
+   structure and propagates all extensions.
+    -  Units processing is not supported at present and therefore the
+   UNITS component is not propagated.
+    -  Processing of bad pixels and automatic quality masking are
+   supported.
+    -  All non-complex numeric data types can be handled.
+   Calculations will be performed using either real or double
+   precision arithmetic, whichever is more appropriate.  If the
+   input NDF structures contain values with other data types, then
+   conversion will be performed as necessary.
 .endhelp

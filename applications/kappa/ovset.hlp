@@ -1,14 +1,10 @@
 .help ovset Starlink kappa
 .nf
 Selects a current image-display overlay.
-
-Usage:
-
-   ovset device
-
-Description:
-
-   This application selects a current image-display overlay. This
+ Usage:
+    ovset device
+ Description:
+    This application selects a current image-display overlay. This
    device will be used for all applications requiring an
    image-display overlay until changed explicitly.
 
@@ -36,8 +32,7 @@ History
 
  1991 June 27 (MJC):
     Original version.
-
- 1992 June 16 (MJC):
+  1992 June 16 (MJC):
     Made to work with WINDOW_OVERLAY class.  The restriction on the
     number of colour indices has therefore been been relaxed.
 .endhelp

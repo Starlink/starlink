@@ -1,14 +1,10 @@
 .help lutfc Starlink kappa
 .nf
 Loads the standard false-colour lookup table.
-
-Usage:
-
-   lutfc
-
-Description:
-
-   This procedure loads the standard false-colour lookup table with
+ Usage:
+    lutfc
+ Description:
+    This procedure loads the standard false-colour lookup table with
    linear scaling into the current image-display device.
 
 Parameters

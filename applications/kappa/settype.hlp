@@ -2,14 +2,10 @@
 .nf
 Sets a new numeric type for the data and variance components of
 an NDF.
-
-Usage:
-
-   settype ndf type
-
-Description:
-
-   This application allows the numeric type of the data and variance
+ Usage:
+    settype ndf type
+ Description:
+    This application allows the numeric type of the data and variance
    components of an NDF to be changed.  The NDF is accessed in update
    mode and the values stored in these components are converted
    in situ to the new type.  No other attributes of the NDF are
@@ -68,13 +64,11 @@ settype rawdata _real
    Converts the data and variance values held in the NDF data
    structure rawdata to have a numeric type of _REAL (i.e. to be
    stored as single-precision floating-point numbers).
-
-settype inst.run1 _word novariance
+ settype inst.run1 _word novariance
    Converts the data array in the NDF structure inst.run1 to be
    stored as word (i.e. Fortran INTEGER*2) values.  No change is
    made to the variance component.
-
-settype hd26571 _double complex
+ settype hd26571 _double complex
    Causes the data and variance components of the NDF structure
    hd26571 to be altered so as to hold complex values using
    double precision numbers.  The existing pixel values are
@@ -92,21 +86,17 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie  (STARLINK)
+ MJC: Malcolm J. Currie  (STARLINK)
 
 History
 
  9-AUG-1990 (RFWS):
     Original version.
-
- 25-SEP-1990 (RFWS):
+  25-SEP-1990 (RFWS):
     Completed initial implementation.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1995 April 24 (MJC):
+  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 .endhelp

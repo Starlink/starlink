@@ -2,14 +2,10 @@
 .nf
 Normalises one NDF to a similar NDF by calculating a scale factor
 and zero-point difference.
-
-Usage:
-
-   normalize in1 in2 out
-
-Description:
-
-   This application compares the data values in one NDF against the
+ Usage:
+    normalize in1 in2 out
+ Description:
+    This application compares the data values in one NDF against the
    corresponding values in the other NDF.  A least-squares
    straight-line is then fitted to the relationship between the two
    sets of data values in order to determine the relative scale
@@ -18,8 +14,7 @@ Description:
    data value in the first NDF.  The mean data value within each bin
    is used to find the fit and weights are applied according to the
    number of pixels which contribute to each bin.
-
-   To guard against erroneous data values, which can corrupt the fit
+    To guard against erroneous data values, which can corrupt the fit
    obtained, the application then performs a number of iterations.
    It calculates a noise estimate for each bin according to the rms
    deviation of data values in the bin from the straight-line fit
@@ -28,13 +23,11 @@ Description:
    from the expected value in each bin.  The straight-line fit is
    then re-calculated.  You can specify the number of standard
    deviations and the number of iterations used.
-
-   A plot is produced after the final iteration showing the bin
+    A plot is produced after the final iteration showing the bin
    centres, with error bars representing the spread of values in each
    bin.  This plot is produced within the current AGI picture and is
    of a size you specify.
-
-   Optionally, an output NDF can be created containing a normalised
+    Optionally, an output NDF can be created containing a normalised
    version of the data array from the first input NDF.
 
 Parameters
@@ -213,26 +206,22 @@ normalize cl123a cl123b cl123c
    normalize.sdf parameter file (as in the all the examples below
    except where noted).  The NDF cl123c is the normalised version
    of the input cl123a.
-
-normalize cl123a cl123b cl123c title="Gain calibration"
+ normalize cl123a cl123b cl123c title="Gain calibration"
    This normalises NDF cl123a to the NDF cl123b.  A plot of the
    fit is made on the current graphics device with the title
    "Gain calibration".  The NDF cl123c is the normalised version
    of the input cl123a.
-
-normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
+ normalize cl123a cl123b cl123c offset=(shift) slope=(scale)
    This normalises NDF cl123a to the NDF cl123b.  A plot of the
    fit is made on the current graphics device.  The resulting
    normalisation scale and offset are written to the ICL
    variables SCALE and SHIFT respectively, where they could be
    passed to another application via an ICL procedure.  The NDF
    cl123c is the normalised version of the input cl123a.
-
-normalize in2=old in1=new out=! device=xwindows
+ normalize in2=old in1=new out=! device=xwindows
    This normalises NDF new to the NDF old.  A plot of the fit is
    made on the xwindows device.  No output NDF is produced.
-
-normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
+ normalize in1=new in2=old out=young niter=5 pcrange=[3,98.5]
    This normalises NDF new to the NDF old.  It has five iterations
    to reject outliers from the linear regression, and forms the
    regression using pixels in old whose data values lie between
@@ -257,36 +246,29 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1-JUN-1990 (DSB):
     Original version.
-
- 22-JUN-1990 (DSB):
+  22-JUN-1990 (DSB):
     Graphics added.
-
- 1990 October 4 (MJC):
+  1990 October 4 (MJC):
     Added standard KAPPA axis-style parameters, removed tabs,
     extended and reformatted the prologue, added some contextual
     error messages, passed pointers as arrays, and added unmapping
     calls to prevent the output NDF from being deleted.
-
- 1991 August 20 (MJC):
+  1991 August 20 (MJC):
     Added FONT parameter.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1995 May 2 (MJC):
+  1995 May 2 (MJC):
     Sets the bad-pixel flags.  Removed old histogram subroutine
     calls.  Used PSX for workspace.  Made the Usage and Examples
     lowercase.  Added Related Applications.  Title propagated.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -295,21 +277,17 @@ Implementation_Status
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
    and propagates all extensions to the output NDF.  All propagated
    components come from the NDF to be normalised.
-
-   -  At the moment, variance values are not used in the fitting
+    -  At the moment, variance values are not used in the fitting
    algorithm but are modified in the output NDF to take account of
    the scaling introduced by the normalisation.  (A later version may
    take account of variances in the fitting algorithm.)
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  Only _REAL data can be processed directly.  Other non-complex
+    -  Only _REAL data can be processed directly.  Other non-complex
    numeric data types will undergo a type conversion before
    processing occurs.  _DOUBLE data cannot be processed due to a
    loss of precision.
-
-   -  The pixel bounds of the two input NDFs are matched by trimming
+    -  The pixel bounds of the two input NDFs are matched by trimming
    before calculating the normalisation constants, and are mapped as
    vectors to allow processing of NDFs of any dimensionality.  An
    output NDF may optionally be produced which is based on the

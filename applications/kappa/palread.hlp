@@ -1,14 +1,10 @@
 .help palread Starlink kappa
 .nf
 Fills the palette of a colour table from an NDF.
-
-Usage:
-
-   palread palette [device]
-
-Description:
-
-   This application reads a palette of colours from an NDF, stored as
+ Usage:
+    palread palette [device]
+ Description:
+    This application reads a palette of colours from an NDF, stored as
    red, green and blue intensities, to fill the portion of
    the current image display's colour table which is reserved for
    the palette.  The palette comprises 16 colours and is intended
@@ -46,8 +42,7 @@ palread rustic
    This loads the palette stored in the NDF called rustic into
    the reserved portion of the colour table of the current
    image display.
-
-palread rustic xwindows
+ palread rustic xwindows
    This loads the palette stored in the NDF called rustic into
    the reserved portion of the colour table of the xwindows
    device.

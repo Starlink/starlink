@@ -1,30 +1,24 @@
 .help greyplot Starlink kappa
 .nf
 Produces a greyscale plot of a 1-d or 2-d NDF.
-
-Usage:
-
-   greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
+ Usage:
+    greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
       { white=? black=?
       { percentiles=?
       { sigmas=?
       mode
-
-Description:
-
-   This application produce a greyscale plot of a 1- or
+ Description:
+    This application produce a greyscale plot of a 1- or
    2-dimensional NDF, especially for a hardcopy device.  The image
    is usually the data array, but may also be the variance or
    quality.  The plot appears in the current graphics-database
    picture.
-
-   The greyscale plot resides within optional, annotated and
+    The greyscale plot resides within optional, annotated and
    enumerated axes. An optional key may be drawn to the right of the
    greyscale plot comprising a title and grey blocks annotated with
    the corresponding array value.  There are a number of scaling
    methods to map array values to grey levels in the plot.
-
-   The time to output to hardcopy devices can be quite lengthy
+    The time to output to hardcopy devices can be quite lengthy
    and generally depends on the size of the greyscale plot.
    Therefore, there are parameters for controlling the size of
    the plot.
@@ -57,8 +51,7 @@ BADCOL
 BADCOL = LITERAL (Read)
    The grey level to give a bad pixel in the display.  There are
    a number of options described below.
-
-     "MAX"       - Black
+      "MAX"       - Black
      "MIN"       - White
      An integer  - The actual 'colour' index.  It is constrained
                    to be between 0 and the maximum colour index
@@ -69,8 +62,7 @@ BADCOL = LITERAL (Read)
                    the palette is selected.  The palette contains
                    grey levels at percentages from black to white,
                    e.g. GREY50 is midway between black and white.
-
-   If this application is run on a device that supports colour
+    If this application is run on a device that supports colour
    it is possible to mark the bad pixels in colour on the
    greyscale provided BADCOL is an integer between 0 and 15, or
    a named colour.  The bad pixels will remain unaltered if the
@@ -157,8 +149,7 @@ FULL = _LOGICAL (Read)
    completes if the reserved pens are stored and reinstated on
    completion, or earlier plots drawn by other applications would
    be altered.)
-
-   If FULL = FALSE, only non-reserved intensities will form the
+    If FULL = FALSE, only non-reserved intensities will form the
    greyscale.  The default is TRUE when the non-reserved pens
    is less than 32, and FALSE otherwise.  (This figure was chosen
    because it is roughly the number of grey levels at which the
@@ -366,27 +357,23 @@ greyplot sdor key mode=sc black=1 white=5.2
    white.  Intermediate values will a grey level determined by
    linear interpolation.  A key is drawn to the right of the
    greyscale.
-
-greyplot in=sdor nokey mode=p percentiles=[10,90] badcol="Black"
+ greyplot in=sdor nokey mode=p percentiles=[10,90] badcol="Black"
    This makes a greyscale plot of the NDF called sdor on the
    current image-display device. The scaling is between the 10 and
    90 per cent percentiles of the image.  No key is drawn.  Bad
    data appear black in the plot.
-
-greyplot mode=fa axes out=video cosys=d \
+ greyplot mode=fa axes out=video cosys=d \
    Displays a greyscale of the current NDF data component with
    annotated axes on the current image-display device.  The axes
    take the axis labels and title from the NDF, and are annotated
    in data co-ordinates.  The scaling is between the -1 and +7
    standard deviations of the image around its mean.  A key is
    drawn.  The scaled data are stored in an NDF called video.
-
-greyplot video noscale \
+ greyplot video noscale \
    Displays the data component of the NDF called video (created
    in the previous example) without scaling within the current
    picture on the current image-display device.
-
-greyplot cgs4k v key mode=ra device=canon_l
+ greyplot cgs4k v key mode=ra device=canon_l
    Makes a greyscale display of the variance component of NDF
    cgs4k on the Canon_l device, scaling between the minimum and
    maximum variance values.
@@ -405,12 +392,10 @@ co-ordinates are stored via a linear transformation.  The NDF
 associated with the plot is stored by reference with the DATA
 picture.  On exit the current database picture for the chosen
 device reverts to the input picture.
-
--  When axes are requested the axis annotations are defined by
+ -  When axes are requested the axis annotations are defined by
 their lower and upper bounds, i.e. a regular array is assumed.
 The bounds are in pixel or data co-ordinates.
-
--  The data type of the output NDF depends on the number of colour
+ -  The data type of the output NDF depends on the number of colour
 indices: _UBYTE for no more than 256, _UWORD for 257 to 65535,
 and _INTEGER otherwise.   The output NDF will not contain any
 extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
@@ -427,71 +412,53 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  1991 February 7 (MJC):
     NDF version based on the pre-0.8 version.
-
- 1991 March 19 (MJC):
+  1991 March 19 (MJC):
     Added output parameters for the scaling limits.
-
- 1991 April 5 (MJC):
+  1991 April 5 (MJC):
     Added data co-ordinate transformation and optional axes.
-
- 1991 May 7 (MJC):
+  1991 May 7 (MJC):
     Added the input and output of NDFs containing scaled data.
-
- 1991 May 14 (MJC):
+  1991 May 14 (MJC):
     Added direct processing of _BYTE and _WORD data.
-
- 1991 July 22 (MJC):
+  1991 July 22 (MJC):
     Added user-controlled appearance of bad pixels.
-
- 1991 August 20 (MJC):
+  1991 August 20 (MJC):
     Added FONT parameter.
-
- 1992 January 29 (MJC):
+  1992 January 29 (MJC):
     Removed line that resets the background to black.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 March 30 (MJC):
+  1992 March 30 (MJC):
     Revised defaulting behaviour of BADCOL and corrected the notes.
     Included BADCOL in one of the examples.
-
- 1992 April 13 (MJC):
+  1992 April 13 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-
- 1992 November 28 (MJC):
+  1992 November 28 (MJC):
     Does not use non-monotonic axis centres.
-
- 1992 December 17 (MJC):
+  1992 December 17 (MJC):
     Added the FILL option.
-
- 1995 October 19 (MJC):
+  1995 October 19 (MJC):
     Supports Error component.
-
- 1997 May 28 (MJC):
+  1997 May 28 (MJC):
     QUALITY and HISTORY no longer propagated to the OUT NDF.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  This application will handle data in all numeric types, though
+    -  This application will handle data in all numeric types, though
    type conversion to integer will occur for unsigned byte and word
    images.  However, when there is no scaling only integer data will
    not be type converted, but this is not expensive for the expected

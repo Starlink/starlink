@@ -2,14 +2,10 @@
 .nf
 Smooths a 1- or 2-dimensional image using a square or rectangular
 box filter.
-
-Usage:
-
-   block in out box [estimator]
-
-Description:
-
-   This application applies a square or rectangular box filter to a
+ Usage:
+    block in out box [estimator]
+ Description:
+    This application applies a square or rectangular box filter to a
    1- or 2-dimensional image so as to smooth it.  Each output pixel
    is either the mean or the median of the input pixels within the
    filter box.  The mean estimator provides one of the fastest
@@ -66,14 +62,12 @@ WLIM = _REAL (Read)
    output pixels from being generated in regions where there are
    relatively few good pixels to contribute to the smoothed
    result.
-
-   By default, a null (!) value is used for WLIM, which causes
+    By default, a null (!) value is used for WLIM, which causes
    the pattern of bad pixels to be propagated from the input
    image to the output image unchanged. In this case, smoothed
    output values are only calculated for those pixels which are
    not bad in the input image.
-
-   If a numerical value is given for WLIM, then it specifies the
+    If a numerical value is given for WLIM, then it specifies the
    minimum fraction of good pixels which must be present in the
    smoothing box in order to generate a good output pixel.  If
    this specified minimum fraction of good input pixels is not
@@ -92,8 +86,7 @@ block aa bb 9
    then the corresponding pixels in the output image will also be
    bad.  Each output pixel is the mean of the corresponding input
    pixels.
-
-block spectrum spectrums 5 median title="Smoothed spectrum"
+ block spectrum spectrums 5 median title="Smoothed spectrum"
    Smooths the 1-dimensional data in the NDF called spectrum
    using a box size of 5 pixels, and stores the result in the NDF
    structure spectrums.  Each output pixel is the median of the
@@ -101,21 +94,18 @@ block spectrum spectrums 5 median title="Smoothed spectrum"
    are bad, then the corresponding pixels in the output image
    will also be bad.  The output NDF has the title "Smoothed
    spectrum".
-
-block ccdin(123,) ccdcol [1,9]
+ block ccdin(123,) ccdcol [1,9]
    Smooths the 123rd column in the 2-dimensional NDF called ccdin
    using a box size of 9 pixels, and stores the result in the NDF
    structure ccdcol.  The first value of the smoothing box is
    ignored as the first dimension has only one element.  Each
    output pixel is the mean of the corresponding input pixels.
-
-block in=image1 out=image2 box=[5,7] estimator=median
+ block in=image1 out=image2 box=[5,7] estimator=median
    Smooths the 2-dimensional image held in the NDF structure
    image1 using a rectangular box of size 5x7 pixels.  The
    smoothed image is written to the structure image2.  Each
    output pixel is the median of the corresponding input pixels.
-
-block etacar etacars box=[7,1] wlim=0.6
+ block etacar etacars box=[7,1] wlim=0.6
    Smooths the specified image data using a rectangular box 7x1
    pixels in size.  Smoothed output values are generated only if
    at least 60% of the pixels in the smoothing box are good,
@@ -130,8 +120,7 @@ Timing
    heavy smoothing to an image.  Execution time will be
    approximately doubled if a variance array is present in the input
    NDF.
-
-   The median estimator is much slower than the mean estimator, and is
+    The median estimator is much slower than the mean estimator, and is
    heavily dependent on the smoothing box size.
 
 Related_Applications
@@ -142,41 +131,33 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
-
-MJC: Malcolm J. Currie (STARLINK)
-
-DSB: David S. Berry (STARLINK)
+ MJC: Malcolm J. Currie (STARLINK)
+ DSB: David S. Berry (STARLINK)
 
 History
 
  18-SEP-1990 (RFWS):
     Original version.
-
- 1990 November 28 (MJC):
+  1990 November 28 (MJC):
     Corrected call to generic routine for double-precision
     variance.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1992 April 4 (MJC):
+  1992 April 4 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-
- 16-DEC-1994 (DSB):
+  16-DEC-1994 (DSB):
     Title propagated by default from input to output NDF.
     Introduced ESTIMATOR parameter.  Replaced AIF VM calls with PSX
     calls.
-
- 1995 March 16 (MJC):
+  1995 March 16 (MJC):
     Made to operate on 1-dimensional arrays.  Enabled the writing
     of the bad-pixel flags.  Usage and examples to lowercase.
     Added a "Related Applications" section.  Fixed bug that
     attempted to create an output variance array when the median
     estimator was selected.
-
- 5-JUN-1998 (DSB):
+  5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -188,12 +169,10 @@ Implementation_Status
    estimator is used, then the output NDF will have no VARIANCE
    component, even if there is a VARIANCE component in the input
    NDF.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.  The bad-pixel flag is also written for the data and
    variance arrays.
-
-   -  All non-complex numeric data types can be handled.  Arithmetic
+    -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single-precision floating point, or double
    precision, if appropriate.
 .endhelp

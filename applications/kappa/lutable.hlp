@@ -1,31 +1,24 @@
 .help lutable Starlink kappa
 .nf
 Manipulates an image-display colour table.
-
-Usage:
-
-   lutable mapping coltab lut [device] ndf percentiles shade
-
-Description:
-
-   This application allows manipulation of the colour table of an
+ Usage:
+    lutable mapping coltab lut [device] ndf percentiles shade
+ Description:
+    This application allows manipulation of the colour table of an
    image-display device provided some data are, according to the
    graphics database, already displayed upon the device.  A
    2-dimensional data array, stored in the input NDF structure, may
    be nominated to assist in defining the colour table via an
    histogram equalisation.  There are two stages to the running of
    this application.
-
-   1. The way in which the lookup table (LUT) is to distributed
+    1. The way in which the lookup table (LUT) is to distributed
    amongst the pens (colour indices) of the colour table is
    required.  Some pens are reserved by KAPPA as a palette,
    particularly for annotation.  This application only modifies the
    unreserved portion of the colour table.
-
-   2. The lookup table is now chosen from a programmed selection or
+    2. The lookup table is now chosen from a programmed selection or
    read from an NDF.
-
-   The two stages may be repeated cyclically if desired.  To exit the
+    The two stages may be repeated cyclically if desired.  To exit the
    loop give the null response, !, to a prompt.  Looping will not
    occur if the lookup table and the distribution method are supplied
    on the command line.
@@ -86,8 +79,7 @@ MAPPING = LITERAL (Read)
    The way in which the colours are to be distributed among
    the pens.  If NINTS is the number of unreserved colour indices
    the mapping options are described below.
-
-     "Histogram"   - The colours are fitted to the pens using
+      "Histogram"   - The colours are fitted to the pens using
                      histogram equalisation of an NDF, given by
                      parameter IN, so that the colours
                      approximately have an even distribution. In
@@ -150,18 +142,15 @@ lutable lo co
    Changes the colour table on the current image-display device
    to a series of coloured blocks whose size increase
    logarithmically with the table index number.
-
-lutable li ex rococo
+ lutable li ex rococo
    This maps the lookup table stored in the NDF called rococo
    linearly to the colour table on the current image-display
    device.
-
-lutable li ex rococo full
+ lutable li ex rococo full
    This maps the lookup table stored in the NDF called rococo
    linearly to the full colour table on the current image-display
    device, i.e. ignoring the reserved pens.
-
-lutable hi gr in=nebula shade=0 percentiles=[5,90]
+ lutable hi gr in=nebula shade=0 percentiles=[5,90]
    This maps the greyscale lookup table via histogram
    equalisation between the 5 and 90 percentiles of an NDF called
    nebula to the colour table on the current image-display
@@ -180,19 +169,15 @@ History
 
  1991 Apr 14:
     NDF version based on the pre-V0.8 KAPPA version.
-
- 1991 May 1 (MJC):
+  1991 May 1 (MJC):
     Renamed IN parameter to NDF for consistency.
-
- 1992 March 3 (MJC):
+  1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-
- 1994 April 29 (MJC):
+  1994 April 29 (MJC):
     Allowed to work with only 8 pens when FULL is TRUE and 24 pens
     when FULL is FALSE.
-
- 1995 May 1 (MJC):
+  1995 May 1 (MJC):
     Works directly on double-precision NDFs.  Replaced old
     subroutines.  Use PSX for workspace.  Used modern-style
     commenting and variable declarations.
@@ -201,8 +186,7 @@ Implementation_Status
 
    -  Processing of bad pixels and automatic quality masking are
    supported for the image NDF
-
-   -  All non-complex numeric data types can be handled.  Processing
+    -  All non-complex numeric data types can be handled.  Processing
    is performed using single- or double-precision floating point,
    as appropriate.
 .endhelp

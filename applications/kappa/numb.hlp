@@ -2,14 +2,10 @@
 .nf
 Counts the number of elements of an NDF with values or absolute
 values above or below a threshold.
-
-Usage:
-
-   numb in value [comp]
-
-Description:
-
-   This routine counts and reports the number of elements of an
+ Usage:
+    numb in value [comp]
+ Description:
+    This routine counts and reports the number of elements of an
    array within an input NDF structure that have a value or absolute
    value greater or less than a specified threshold.  This statistic
    is also shown as a percentage of the total number of array
@@ -68,21 +64,17 @@ Examples
 numb image 100
    This counts the number of elements in the data array of the NDF
    called image that exceed 100.
-
-numb spectrum 100 noabove
+ numb spectrum 100 noabove
    This counts the number of elements in the data array of the NDF
    called spectrum that are less than 100.
-
-numb cube 100 abs
+ numb cube 100 abs
    This counts the number of elements in the data array of the NDF
    called cube whose absolute values exceed 100.
-
-numb image -100 number=(count)
+ numb image -100 number=(count)
    This counts the number of elements in the data array of the NDF
    called image that exceed -100 and write the number to ICL
    variable COUNT.
-
-numb image 200 v
+ numb image 200 v
    This counts the number of elements in the variance array of
    the NDF called image that exceed 200.
 
@@ -94,19 +86,15 @@ History
 
  1991 November 11 (MJC):
     Original NDF version.
-
- 1995 January 16 (MJC):
+  1995 January 16 (MJC):
     Replaced AIF by PAR.  Added ERROR option to parameter COMP.
 
 Implementation_Status
 
    -  This routine correctly processes the DATA, QUALITY,
    TITLE, and VARIANCE components of an NDF data structure.
-
-   -  Processing of bad pixels and automatic quality masking are
+    -  Processing of bad pixels and automatic quality masking are
    supported.
-
-   -  All non-complex numeric data types can be handled.
-
-   -  Any number of NDF dimensions is supported.
+    -  All non-complex numeric data types can be handled.
+    -  Any number of NDF dimensions is supported.
 .endhelp
