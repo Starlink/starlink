@@ -164,11 +164,12 @@
       CHARACTER*40              ORUNIT           ! Output radial unit
       CHARACTER*80              TEXT             ! Temporary text string
 
-      REAL                      ABINSIZE         ! Azimuthal bin size
+      REAL                      ABINSZ         ! Azimuthal bin size
       REAL                      LOX,HIX,LOY,HIY  ! Field min and max values
       REAL                      MAXR             ! Maximum radial distance
       REAL                      RANGE(MXRANGE)   ! Irregular bin ranges.
       REAL                      RBINSZ         		! Radial bin size
+      REAL			SPARR(2)		! Spaced array data
       REAL                      X0, Y0           ! Centre of polar distribution
 
       INTEGER                   BADQUAL          ! Exclude events with quality
@@ -318,9 +319,9 @@ C        END IF
      :                                     %VAL(WPTR), MAXR, STATUS )
 
 *  Get azimuthal bin size
-      CALL USI_GET0R( 'ABINSIZE', ABINSIZE, STATUS )
+      CALL USI_GET0R( 'ABINSIZE', ABINSZ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
-      NAZ = 360.0 / ABINSIZE
+      NAZ = 360.0 / ABINSZ
       CALL MSG_SETI( 'NAZ', NAZ )
       CALL MSG_PRNT( 'There will be ^NAZ azimuthal bins in the output' )
 
@@ -386,10 +387,10 @@ C        END IF
         CALL BDI_AXPUT0C( OFID, 1, 'Units', ORUNIT, STATUS )
       END IF
       IF ( NDIM .EQ. 2 ) THEN
-        SPARR(1) = 0.5*ABINSIZE
-        SPARR(2) = ABINSIZE
+        SPARR(1) = 0.5*ABINSZ
+        SPARR(2) = ABINSZ
         CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
-        CALL BDI_AXPUT0R( OFID, 2, 'ScalarWidth', ABINSIZE, STATUS )
+        CALL BDI_AXPUT0R( OFID, 2, 'ScalarWidth', ABINSZ, STATUS )
         CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Azimuth', STATUS )
         CALL BDI_AXPUT0C( OFID, 2, 'Units', 'degree', STATUS )
       END IF
@@ -616,7 +617,7 @@ C        END IF
 *
 *    Local variables :
 *
-      REAL                             ABINSIZE       ! Azimuthal binsize
+      REAL                             ABINSZ       ! Azimuthal binsize
 
       INTEGER                          ABIN           ! Azimuthal bin
       INTEGER                          I              ! Loop over events
@@ -656,14 +657,14 @@ C        END IF
         ELSE
 
 *        Need radial and azimuthal bins. Azimuth bin value is always valid
-          ABINSIZE = 360.0 / REAL(NAZ)
+          ABINSZ = 360.0 / REAL(NAZ)
           IF ( GOTQUAL ) THEN
             DO I = 1, NEV
               RBIN = INT( POL(1,I) / RBINSZ ) + 1
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
-                ABIN = INT( POL(2,I)/ ABINSIZE ) + 1
+                ABIN = INT( POL(2,I)/ ABINSZ ) + 1
                 IF ( IQUAL(I) .LE. BADQUAL ) THEN
                   DATA(RBIN,ABIN) = DATA(RBIN,ABIN) + 1.0
                   IF ( QUAL(RBIN,ABIN) .NE. QUAL__BAD )
@@ -680,7 +681,7 @@ C        END IF
               IF ( RBIN .GT. NRAD ) THEN
                 NREJ = NREJ + 1
               ELSE
-                ABIN = INT( POL(2,I)/ ABINSIZE ) + 1
+                ABIN = INT( POL(2,I)/ ABINSZ ) + 1
                 DATA(RBIN,ABIN) = DATA(RBIN,ABIN) + 1.0
               END IF
             END DO
@@ -754,7 +755,7 @@ C        END IF
 *
 *    Local variables :
 *
-      REAL                             ABINSIZE       ! Azimuthal binsize
+      REAL                             ABINSZ       ! Azimuthal binsize
 
       INTEGER                          ABIN           ! Azimuthal bin
       INTEGER                          I              ! Loop over events
@@ -796,12 +797,12 @@ C        END IF
         ELSE
 
 *        Need radial and azimuthal bins. Azimuth bin value is always valid
-          ABINSIZE = 360.0 / REAL(NAZ)
+          ABINSZ = 360.0 / REAL(NAZ)
           IF ( GOTQUAL ) THEN
             DO I = 1, NEV
               CALL AXIS_RNGIDX( NRAD, RANGE,.FALSE.,POL(1,I), RBIN, OK )
               IF ( OK ) THEN
-                ABIN = INT( POL(2,I)/ ABINSIZE ) + 1
+                ABIN = INT( POL(2,I)/ ABINSZ ) + 1
                 IF ( IQUAL(I) .LE. BADQUAL ) THEN
                   DATA(RBIN,ABIN) = DATA(RBIN,ABIN) + 1.0
                   IF ( QUAL(RBIN,ABIN) .NE. QUAL__BAD )
@@ -818,7 +819,7 @@ C        END IF
             DO I = 1, NEV
               CALL AXIS_RNGIDX( NRAD, RANGE,.FALSE.,POL(1,I), RBIN, OK )
               IF ( OK ) THEN
-                ABIN = INT( POL(2,I)/ ABINSIZE ) + 1
+                ABIN = INT( POL(2,I)/ ABINSZ ) + 1
                 DATA(RBIN,ABIN) = DATA(RBIN,ABIN) + 1.0
               ELSE
                 NREJ = NREJ + 1
