@@ -39,6 +39,8 @@
 *        Added AST_BEAR to Frame class.
 *     21-SEP-2001 (DSB):
 *        Replaced AST_BEAR by AST_AXANGLE.
+*     28-JAN-2003 (DSB):
+*        Added AST_GETACTIVEUNIT.
 *-
 
 *  Length of character string returned by a character function.
@@ -141,6 +143,7 @@ c      PARAMETER ( AST__UKERNN = 2 )
       INTEGER AST_PICKAXES
       INTEGER AST_UNFORMAT
       LOGICAL AST_ISAFRAME
+      LOGICAL AST_GETACTIVEUNIT
       DOUBLE PRECISION AST_ANGLE
       DOUBLE PRECISION AST_OFFSET2
       DOUBLE PRECISION AST_AXDISTANCE
