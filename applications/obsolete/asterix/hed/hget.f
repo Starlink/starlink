@@ -194,8 +194,9 @@ c     CALL MSG_PRNT( VERSION )
           IF ( STATUS .EQ. SAI__OK ) THEN
 
 *          Get the min and max values and pixel indices
-            CALL ARR_MINMAXPXR( NELM, %VAL(PTR), MINVAL, MAXVAL,
-     :                          INDMIN, INDMAX )
+            CALL ARR_PRANG1R( NELM, %VAL(PTR), INDMIN, MINVAL,
+     :                        INDMAX, MAXVAL, STATUS )
+
 *
             IF ( ITEM(1:3) .EQ. 'MIN' ) THEN
               RVALUE = MINVAL
