@@ -422,7 +422,7 @@ I_SUB1 = hlpcmd ccd1_par ccd1_memcm
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR AST_PAR \
 PAR_PAR PRM_PAR FIO_ERR FIO_PAR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
 NUM_DEC_CVT NUM_CMN NUM_DEC_R NUM_DEF_R TRN_ERR CHR_ERR CAT_PAR AST_ERR \
-AGI_PAR CAT_ERR DAT_ERR ast.h
+AGI_PAR CAT_ERR DAT_ERR ast.h 
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -458,7 +458,8 @@ polsim.f pol1_simcl.f pol1_ptvrs.f pol1_gtvrs.f pol1_prsvr.f \
 pol1_ptvrc.f pol1_gtvrc.f pol1_ptang.f pol1_gtang.f pol1_stftr.f \
 polimage.f pol1_axset.f pol1_xeval.f pol1_imprt.f pol1_dftab.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f \
-polversion.f pol1_3dwcs.f pol1_fbbox.f
+polversion.f pol1_3dwcs.f pol1_fbbox.f polwrtcl.f pol1_wrtcl.f \
+pol1_gcolr.f pol1_gcold.f pol1_fioer.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = 
@@ -498,7 +499,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 TASKS = polhelp polka datapic polcent polcal polimp polimpx polext \
 polexpx polexp polvec polplot polbin polsim polimage polstack polprep \
-polversion
+polversion polwrtcl
 
 #  Monolith routine source name.
 
@@ -517,7 +518,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl polimage.ifl \
 polbin.ifl polsim.ifl polimpx.ifl polexpx.ifl polstack.ifl polprep.ifl \
-polversion.ifl
+polversion.ifl polwrtcl.ifl
 
 #  List of help library sources.
 
@@ -641,9 +642,10 @@ $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) $(IRAF_DEMO) $(IRAF_DATA)
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
 #  files whose names do not exactly match the names used in the source
-#  code.
+#  code. CAT include files are needed until such time as CAT is improved
+#  (see pol1_gcolr.f).
 
-INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
+INCLUDE_LINKS = $(EXTERNAL_INCLUDES) CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN \
 CCD1_PAR CCD1_MEMCM HLPCMD CTG_ERR CTG_CONST 
 
 #  Rules to set up links to locate each of the above include files.
@@ -653,6 +655,9 @@ CCD1_PAR:    ccd1_par;                $(LINK) $? $@
 CCD1_MEMCM:  ccd1_memcm;              $(LINK) $? $@
 CTG_CONST:   ctg_const;               $(LINK) $? $@
 CTG_ERR:     ctg_err;                 $(LINK) $? $@
+CAT1_PAR:       cat1_par              $(LINK) $? $@
+CAT3_FIT_CMN:   cat3_fit_cmn          $(LINK) $? $@
+CAT1_CATS_CMN:  cat1_cats_cmn         $(LINK) $? $@
 
 ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
@@ -1855,6 +1860,12 @@ pthlpo.o:	 SAE_PAR HLPCMD
 rdndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 wrndf.o:	 SAE_PAR PAR_ERR MSG_PAR GRP_PAR NDG_ERR
 polversion.o:	 SAE_PAR PAR_ERR
+polwrtcl.o:	 SAE_PAR AST_PAR CAT_PAR PRM_PAR CAT_ERR
+pol1_fioer.o:	 SAE_PAR 
+pol1_wrtcl.o:	 SAE_PAR PRM_PAR 
+pol1_gcolr.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
+pol1_gcold.o:    SAE_PAR PRM_PAR CAT_PAR CAT1_PAR CAT3_FIT_CMN CAT1_CATS_CMN
+
 
 #-------------------------------------------------------------------------------
 #

@@ -58,6 +58,8 @@ pol1_sngsm.f polsim.f pol1_simcl.f polsim.ifl pol1_gtvrs.f pol1_sngmn.f \
 pol1_prsvr.f pol1_gtvrc.f polimage.f polimage.ifl pol1_axset.f pol1_gtang.f \
 pol1_ptang.f pol1_stftr.f pol1_blocr.f pol1_sngva.f pol1_sngct.f pol1_sngvn.f \
 pol1_srtim.f pol1_stkim.f pol1_stknm.f pol1_stksm.f polstack.f polstack.ifl \
+polwrtcl.f polwrtcl.ifl pol1_wrtcl.f pol1_gcolr.f pol1_gcold.f pol1_fioer.f \
+cat1_cats_cmn cat1_par cat3_fit_cmn \
 $(KAPFIX) $(DATA)
 
 # The other files which need to be extracted from the source code
