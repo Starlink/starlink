@@ -3,6 +3,14 @@
    A new release of KAPPA (V.18) has been made. The changes are
    described fully in sun95.
 
+   - The following commands have been converted to use the WCS component
+   of the NDF structure:
+
+   ARDMASK
+
+   COSYS parameters for the above commands have been removed.
+
+
    - The following obsolete commands have been removed from KAPPA -
    alternatives are indicate in SUN/95:
 

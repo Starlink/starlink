@@ -31,17 +31,18 @@
 *  ADAM Parameters:
 *     ARDFILE = FILENAME (Read)
 *        The name of the ARD file containing a description of the parts
-*        of the image to be masked out, i.e. set to bad. The suggested 
-*        default is the current value or ardfile.dat if there is no current 
-*        value. The co-ordinate system in which positions within this file 
-*        are given should be indicated by including suitable COFRAME or WCS 
-*        statements within the file (see SUN/183). For instance, starting the 
-*        file with a line containing the text "COFRAME(PIXEL)" will indicate 
-*        that positions are specified in pixel coordinates. The statement 
-*        "COFRAME(SKY,System=FK5)" would indicate that positions are
-*        specified in RA/DEC (FK5,J2000). If no such statements are included, 
-*        then it is assumed that positions are given within the current 
-*        co-ordinate system of the input NDF. 
+*        of the image to be masked out, i.e. set to bad. The suggested
+*        default is the current value or ardfile.dat if there is no
+*        current value. The co-ordinate system in which positions within
+*        this file are given should be indicated by including suitable
+*        COFRAME or WCS statements within the file (see SUN/183). For
+*        instance, starting the file with a line containing the text
+*        "COFRAME(PIXEL)" will indicate that positions are specified in
+*        pixel co-ordinates. The statement "COFRAME(SKY,System=FK5)" would
+*        indicate that positions are specified in RA/DEC (FK5,J2000). If
+*        no such statements are included, then it is assumed that
+*        positions are given within the current co-ordinate system of the
+*        input NDF.
 *     IN = NDF (Read)
 *        The name of the source NDF.
 *     OUT = NDF (Write)
@@ -119,7 +120,7 @@
 *-
 
 *  Type Definitions:
-      IMPLICIT NONE              ! No implicit typing
+      IMPLICIT NONE*             ! No implicit typing
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
