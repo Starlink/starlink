@@ -434,11 +434,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/ndx-0.1.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/ndx/ndx-0.1.tar
-     [gzip] Building: /apps/cvsbuild/export/ndx-0.1.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/ndx-0.1.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/ndx/ndx-0.1.tar
+      [zip] Building zip: /apps/cvsbuild/export/ndx-0.2.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/ndx/ndx-0.2.tar
+     [gzip] Building: /apps/cvsbuild/export/ndx-0.2.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/ndx-0.2.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/ndx/ndx-0.2.tar
      [echo] Executing Table target: export
 
 export:
@@ -901,11 +901,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/treeview-2.2.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/treeview/treeview-2.2.tar
-     [gzip] Building: /apps/cvsbuild/export/treeview-2.2.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/treeview-2.2.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/treeview/treeview-2.2.tar
+      [zip] Building zip: /apps/cvsbuild/export/treeview-2.2-1.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/treeview/treeview-2.2-1.tar
+     [gzip] Building: /apps/cvsbuild/export/treeview-2.2-1.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/treeview-2.2-1.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/treeview/treeview-2.2-1.tar
      [echo] Executing Coco target: export
 
 export:
@@ -1014,4 +1014,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.6.0.tar
 
 BUILD SUCCESSFUL
-Total time: 14 minutes 36 seconds
+Total time: 14 minutes 34 seconds
