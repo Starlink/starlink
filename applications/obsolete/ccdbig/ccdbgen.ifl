@@ -88,5 +88,25 @@ interface CCDGENERATE
       helpkey     '*'
    endparameter
 
+   parameter      FLAT            # Do we generate flat fields?
+      type        _LOGICAL
+      access      READ
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Generate flatfields'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
+   parameter      BIAS            # Do we generate bias frames?
+      type        _LOGICAL
+      access      READ
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Generate bias frames'
+      default     TRUE
+      helpkey     '*'
+   endparameter
+
 endinterface
-# $Id: ccdgenerate.ifl,v 1.1 1997/06/27 09:01:41 pwd Exp $
+# $Id: ccdgenerate.ifl,v 1.1 1998/06/08 09:17:58 mbt Exp mbt $
