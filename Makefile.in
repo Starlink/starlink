@@ -28,6 +28,7 @@ ALL_TARGETS = \
         $(MANIFEST)/ccdpack \
 	$(MANIFEST)/chr \
 	$(MANIFEST)/cnf \
+	$(MANIFEST)/coco \
 	$(MANIFEST)/dtask \
 	$(MANIFEST)/ems \
 	$(MANIFEST)/fio \
@@ -78,7 +79,8 @@ ALL_TARGETS = \
 	$(MANIFEST)/task \
         $(MANIFEST)/tcl \
         $(MANIFEST)/tk \
-	$(MANIFEST)/trn
+	$(MANIFEST)/trn \
+	$(MANIFEST)/xdisplay
 
 
 # Targets present in tree, but excluded from list
