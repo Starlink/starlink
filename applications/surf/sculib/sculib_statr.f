@@ -13,13 +13,16 @@
 
 *  Description:
 *     This routine calculates the mean and standard deviation of
-*     a real array.
+*     a real array. If a positive value of CLIP is given, the data
+*     set will be clipped at CLIP sigma repeatedly until all
+*     points are within CLIP sigma. Mean and standard deviation are those
+*     values derived after iterative clipping.
 
 *  Arguments:
 *     N_POS = _INTEGER (Given)
 *        Number of jiggle positions in data set
-*     CLIP = _INTEGER (Given)
-*        Number of points to clip from mean
+*     CLIP = _REAL (Given)
+*        Number of sigma to clip iteratively
 *     SCUDATA(N_POS) = _REAL (Given)
 *        The data
 *     SCUQUAL(N_POS) = _BYTE (Given)
@@ -70,7 +73,7 @@
 
 *  Arguments Given:
       INTEGER N_POS
-      INTEGER CLIP
+      REAL    CLIP
       BYTE    BADBIT
       REAL    SCUDATA(N_POS)
       BYTE    SCUQUAL(N_POS)
@@ -88,8 +91,13 @@
       INTEGER STATUS                 ! Global status
 
 *  Local Variables:
+      LOGICAL CLIPPING             ! Are we still clipping?
       INTEGER I                    ! Loop counter
+      REAL    LLIMIT               ! Lower limit of clip
       INTEGER MIDPOINT             ! Middle of Good data
+      INTEGER NKEPT                ! Number of good points per iteration
+      INTEGER NREM                 ! Number of points clipped per iteration
+      REAL    ULIMIT               ! Upper limit of clip
       DOUBLE PRECISION VALUE       ! Value of data point
 
 *    External functions:
@@ -99,8 +107,6 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
       NGOOD = 0
-      SUM = 0.0D0
-      SUMSQ = 0.0D0
 
 *     Loop over all data and remove bad points
       DO I = 1, N_POS
@@ -113,13 +119,11 @@
 
 
 * Set defaults
-      SUM = 0.0D0
-      SUMSQ = 0.0D0
-      MEAN = VAL__BADD
-      STDEV = VAL__BADD
       MEDIAN = VAL__BADD
+      CLIPPING = .TRUE.
 
-*     Find Standard deviation and mean and median
+
+*     Find Standard deviation and mean and median if there is some good data
       IF (NGOOD .GT. 0) THEN
 
 *     Sort good data (with Kappa routine)
@@ -134,28 +138,68 @@
             MEDIAN = DBLE(QSORT(MIDPOINT+1))
          END IF
 
-         NGOOD = NGOOD - 2 * CLIP
+*     Loop until CLIP okay
+         DO WHILE (CLIPPING)
 
-         IF (NGOOD .GT. 0) THEN
-            DO I = CLIP + 1, CLIP + NGOOD
-               VALUE = DBLE(QSORT(I))
-               SUM = SUM + VALUE
-               SUMSQ = SUMSQ + ( VALUE * VALUE )
+*     Go through all data, initialise values
+            NKEPT = 0
+            SUM = 0.0
+            SUMSQ = 0.0
+            STDEV = VAL__BADD
+
+            DO I = 1, NGOOD
+               IF (QSORT(I) .NE. VAL__BADR) THEN
+                  VALUE = DBLE(QSORT(I))
+                  SUM = SUM + VALUE
+                  SUMSQ = SUMSQ + ( VALUE * VALUE )
+                  NKEPT = NKEPT + 1
+               END IF
             END DO
 
 *     Mean and STDEV
-            MEAN = SUM / DBLE( NGOOD )
-            STDEV = SUMSQ - ( MEAN * MEAN * DBLE( NGOOD ) )
-            IF ( ( NGOOD .EQ. 1 ) .OR.
-     :           ( STDEV .LT. 0.0D0 ) ) THEN
-               STDEV = 0.0D0
+
+            IF (NKEPT .GT. 0) THEN
+
+               MEAN = SUM / DBLE( NKEPT )
+               STDEV = SUMSQ - ( MEAN * MEAN * DBLE( NKEPT ) )
+               IF ( ( NKEPT .EQ. 1 ) .OR.
+     :              ( STDEV .LT. 0.0D0 ) ) THEN
+                  STDEV = 0.0D0
  
 *     Otherwise, calculate the standard deviation normally.
+               ELSE
+                  STDEV = SQRT( STDEV / DBLE( NKEPT - 1 ) )
+               END IF
+
+*     Now loop through and clip points above CLIP level
+               IF (CLIP.GT.0.0 .AND. MEAN.NE.VAL__BADD .AND.
+     :              STDEV.GT.0.0) THEN
+
+                  NREM = 0
+                  ULIMIT =  REAL(MEAN + (DBLE(CLIP) * STDEV))
+                  LLIMIT =  REAL(MEAN - (DBLE(CLIP) * STDEV))
+
+                  DO I = 1, NGOOD
+                     IF (QSORT(I) .NE. VAL__BADR .AND.
+     :                    (QSORT(I) .GT. ULIMIT .OR.
+     :                    QSORT(I) .LT. LLIMIT )) THEN
+                        QSORT(I) = VAL__BADR
+                        NREM = NREM + 1 ! Number removed
+                     END IF
+                  END DO
+*     Stop clipping if didnt remove any points
+                  IF (NREM.EQ.0) CLIPPING = .FALSE.
+               
+               ELSE
+                  CLIPPING = .FALSE.
+               END IF
             ELSE
-               STDEV = SQRT( STDEV / DBLE( NGOOD - 1 ) )
+               CLIPPING = .FALSE.
             END IF
-         
-         END IF
+
+         END DO
+
+         NGOOD = NKEPT   ! Update NGOOD
 
       END IF
 
