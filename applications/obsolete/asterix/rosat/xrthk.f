@@ -13,11 +13,13 @@
 *    Authors :
 *     Richard Saxton (LTVAD::RDS)
 *    History :
-*     24-FEB-1992  original
+*     24-Feb-1992  original
 *     21-Feb-1994  (1.6-3) RDF file names and column names (LTVAD::JKA)
 *     24-Apr-1994  (1.7-0) for new release of asterix
 *     27-May-1994  Opens output textfile with STATUS="UNKNOWN"
-*      6 Apr 98 V 2.2-1 Structures removed (rjv)
+*      6-Apr-1998  V 2.2-1 Structures removed (rjv)
+*      9-Feb-1999  V 2.3-0 FITS file input (DGED)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -35,28 +37,20 @@
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
-      CHARACTER*20 EXT                          ! filename extension
       CHARACTER*20 COL                          ! HDS column/array name
 *
       CHARACTER*7 PARAM                         ! Name of ADAM HK parameter
       CHARACTER*6 PARMIN,PARMAX                 ! Name of ADAM min,max params
       CHARACTER*23 CSTRING1,CSTRING2            ! MJD strings
-      CHARACTER*132 ERFILE                       ! Name of eventrate file
-      CHARACTER*132 ATTFIL                       ! Name of attitude file
-
-      CHARACTER*(DAT__SZLOC) ERLOC               ! Locator to EVR file
-      CHARACTER*(DAT__SZLOC) ATTLOC              ! Locator to ATT file
-      CHARACTER*(DAT__SZLOC) EVTLOC              ! Locator to times in EVR file
-      CHARACTER*(DAT__SZLOC) AFTLOC              ! Locator to times in ATT file
-      CHARACTER*(DAT__SZLOC) FLOC                ! Generic file locator
+*
       CHARACTER*2  CPLP                         ! Parameter number as a char.
       CHARACTER*30 HKNAME                       ! Name of HK parameter
       CHARACTER*40 FNAME                        ! Name for output file
-
+*
       REAL RMIN,RMAX                            ! Min and max array values
       REAL HKMIN,HKMAX                          ! User selected min and max
 *                                               ! values for this HK parameter.
-      DOUBLE PRECISION EXPO_TIM                             ! Total exposure time
+      DOUBLE PRECISION EXPO_TIM                 ! Total exposure time
       REAL INTERVAL                             ! Minimum length of GOOD window
       DOUBLE PRECISION TBAD(MAXRAN*2)           ! Times of BAD windows (S/C TIM)
       DOUBLE PRECISION TGOOD(MAXRAN*2)          ! Times of GOOD windows (MJD)
@@ -73,15 +67,46 @@
       INTEGER AT_TPNTR                          ! Pointer to ATTITUDE times
       INTEGER OPNTR                             ! Pointer to ONOFF TIM_SEL vals
       INTEGER WPNTR                             ! Workspace array
-      INTEGER W2PNTR                             ! Workspace array
+      INTEGER W2PNTR                            ! Workspace array
 
       INTEGER NBAD                              ! Number of bad time windows
       INTEGER NGOOD                             ! Number of good time windows
       INTEGER NTIM                              ! Number of values in HK array
       INTEGER MUNIT                             ! Logical unit of output file
       INTEGER IND1A,IND1B,IND2A,IND2B
-      INTEGER PLP,LP,NCHAR,NELS
-      LOGICAL LMPE
+      INTEGER PLP,LP,NCHAR
+*
+      INTEGER                 IUNIT,IUNIT1      ! Logical I/O unit
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
+      INTEGER                 NFILES            ! Number of files
+*
+      CHARACTER*100           FILES(MAXRAW)     ! File name aray
+      CHARACTER*132           FILENAME
+      CHARACTER*132           FITSDIR           ! Directory for FITS
+      CHARACTER*132           FROOT             ! Root of FITS filename
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER ATNHDU             ! Postion of attitude in FITS file
+      INTEGER COLNO                                ! Fits table, column no
+      INTEGER FEOF               ! Marks end of FITS file
+      INTEGER EVNHDU             ! Position of eventrate in FITS file
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS            ! Fits header, no fields per rows
+      INTEGER BLOCK
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+*
 *    Local data :
 *    Version :
       CHARACTER*30 VERSION
@@ -89,82 +114,192 @@
 *-
       CALL AST_INIT(STATUS)
       CALL MSG_PRNT(VERSION)
-*
-*     Get directory name from user and display the available observations.
-*     Get rootname of file wanted.
-      CALL XRTSORT_FILESELECT( STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-
-      CALL RAT_GETXRTHEAD(SRT_ROOTNAME,  STATUS)
-      LMPE = .FALSE.
+      CALL MSG_PRNT('XRTHK : FOR FITS/RDF FILES')
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Attempt to open the eventrate file
-      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
+*  Get input file details
+*  Get the current working directory
+      CALL UTIL_GETCWD(FITSDIR, STATUS )
+      CALL USI_DEF0C('RAWDIR', FITSDIR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
-      CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
+      CALL USI_GET0C('RAWDIR', FITSDIR, STATUS )
+*  Any FITS files?
+      CALL UTIL_FINDFILE(FITSDIR, '*.fits', MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+*  If no files - exit
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTHK : ERROR - No FITS file found')
+         CALL MSG_PRNT ('XRTHK : Uses RDF FITS files only.')
+         CALL MSG_PRNT ('XRTHK : Please use VERSION V2.2-1 for SDF'
+     :                                                //' file input')
+         GOTO 999
+      END IF
 *
-* If file coundn't be opened set logical false - else set logical
-* true and read in the times array
+*  Get root name of FITS file
+      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append extension of FITS extension containing header
+      FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+*  Does file exist?
+      CALL UTIL_FINDFILE(FITSDIR, FILENAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTHK : ERROR - Header file not found')
+         GOTO 999
+      END IF
+*
+      CALL MSG_PRNT('XRTHK : Using RDF/FITS file : '// FILENAME)
+*
+*  Open a FITS file
+      CALL FIO_GUNIT(IUNIT1,STATUS)
+      CALL FTOPEN(IUNIT1,FILENAME,0,BLOCK,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
-*
-         CALL MSG_PRNT('Warning: failed to open EVENTRATE file')
-         LEVR = .FALSE.
-         CALL ERR_ANNUL(STATUS)
-*
-      ELSE
-*
-         LEVR = .TRUE.
-*
-*   Read eventrates times
-         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, EVTLOC, STATUS)
-         CALL DAT_SIZE(EVTLOC, ENTIM, STATUS)
-*
-*   Map the time array
-         CALL DAT_MAPD(EVTLOC, 'READ', 1, ENTIM, EV_TPNTR, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping eventrate TIME array')
-            GOTO 999
-         ENDIF
-*
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTHK : ERROR - Opening file ^FNAM ')
+         GOTO 999
+      ENDIF
+*  FITS RDF files only
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C( 'ORIGIN', ORIGIN, STATUS )
+*  Read header
+      CALL RAT_RDHEAD(IUNIT1, ORIGIN, STATUS)
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL MSG_PRNT('XRTHK : ERROR - Reading FITS file to header')
+         GOTO 999
+      ENDIF
+*   Close file
+      CALL FTCLOS(IUNIT1,STATUS)
+      CALL FIO_PUNIT(IUNIT1,STATUS)
+
+*  Open housekeeping files
+*  Both the EVRATE and ASPECT tables are in _ANC.FITS
+      FILENAME = FROOT(1:CHR_LEN(FROOT))//'_anc.fits'
+
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+      IF (STATUS .NE. SAI__OK) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTHK : ERROR - opening file ^FNAM **')
+         GOTO 999
       ENDIF
 *
-* Attempt to open the attitude file
-      CALL RAT_HDLOOKUP('ASPECT','EXTNAME',EXT,STATUS)
-      ATTFIL = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT
-*
-      CALL HDS_OPEN(ATTFIL, 'READ', ATTLOC, STATUS)
+*  Locate eventrate data
+*  Move to FITS header.
+      NHDU = 1
+      FEOF = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate EVRATE table in FITS file.
+      DO WHILE (EXTNAME .NE. 'EVRATE' .AND. FEOF .NE. NHDU)
+         FEOF = NHDU
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*         Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+      ENDDO
+      EVNHDU = NHDU
 *
 * If file coundn't be opened set logical false - else set logical
 * true and read in the times array
-      IF (STATUS .NE. SAI__OK) THEN
-*
-         CALL MSG_PRNT('Warning: failed to open ATTITUDE file')
-         LATT = .FALSE.
+      IF (NHDU .EQ. FEOF) THEN
          CALL ERR_ANNUL(STATUS)
-*
+         CALL MSG_PRNT('XRTHK : Warning - failed to find '//
+     :   'EVRATE extension in FITS file')
+         LEVR = .FALSE.
       ELSE
+         LEVR = .TRUE.
 *
+*  Find the 'TIME'column position in the EVRATE extension.
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS+1)
+           IF ( TTYPE(LP) .EQ. 'TIME') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
+*
+*  Create array and read in selected column details
+         IF (COLNO .NE. 0) THEN
+            FBEG = 1
+            CALL DYN_MAPD(1,NROWS,EV_TPNTR,STATUS)
+            CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(EV_TPNTR),ANYF,STATUS)
+            ENTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTHK : ERROR - array creation error')
+               GOTO 999
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTHK : Warning - column TIME not found in '
+     :      // ' EVENTRATE COLUMN')
+            LEVR = .FALSE.
+         ENDIF
+      ENDIF
+*
+*  Attempt to open the attitude file
+*  Move to FITS header.
+      NHDU = 1
+      FEOF = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate ASPECT table in FITS file.
+      DO WHILE (EXTNAME .NE. 'ASPECT' .AND. FEOF .NE. NHDU)
+         FEOF = NHDU
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*        Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+      ENDDO
+      ATNHDU = NHDU
+*
+      IF (NHDU .EQ. FEOF) THEN
+        CALL ERR_ANNUL(STATUS)
+        CALL MSG_PRNT('XRTHK : Warning - failed to open ASPECT'
+     :   // ' extension.')
+         LATT = .FALSE.
+      ELSE
          LATT = .TRUE.
 *
-*   Read attitude times
-         CALL RAT_HDLOOKUP('ASPECT','TIME',COL,STATUS)
-         CALL DAT_FIND(ATTLOC, COL, AFTLOC, STATUS)
-         CALL DAT_SIZE(AFTLOC, ANTIM, STATUS)
+         COLNO = 0
+         LP = 1
+         DO WHILE (LP .NE. TFIELDS + 1)
+            IF ( TTYPE(LP) .EQ. 'TIME') THEN
+               COLNO = LP
+               LP = TFIELDS
+            END IF
+            LP = LP + 1
+         END DO
 *
-*   Map the time array
-         CALL DAT_MAPD(AFTLOC, 'READ', 1, ANTIM, AT_TPNTR, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping ATTITUDE TIME array')
-            GOTO 999
-         ENDIF
-*
+*  Create array and read in selected column details
+         IF (COLNO .NE. 0) THEN
+            FBEG = 1
+            CALL DYN_MAPD(1,NROWS,AT_TPNTR,STATUS)
+            CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :      %VAL(AT_TPNTR),ANYF,STATUS)
+            ANTIM = NROWS
+            IF (STATUS .NE. SAI__OK) THEN
+               CALL MSG_PRNT('XRTHK : ERROR - array creation error')
+               GOTO 999
+            ENDIF
+         ELSE
+            CALL MSG_PRNT( 'XRTHK : Warning - TIME column not found in'
+     :      // ' FITS ASPECT extension')
+            LATT = .FALSE.
+         END IF
       ENDIF
 *
 *   Get the minimum interval allowed for a good time window
@@ -179,7 +314,7 @@
       CALL DYN_MAPD(1,MAXRAN*2,W2PNTR,STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error obtaining dynamic memory')
+         CALL MSG_PRNT('XRTHK - ERROR obtaining dynamic memory')
          GOTO 999
       ENDIF
 *
@@ -198,28 +333,11 @@
       NBAD = 0
       NGOOD = 0
 *
-*   Give user some info. on the typical parameters to select on
-      CALL MSG_PRNT('  ')
-      CALL MSG_PRNT('Typical parameters to sort on :')
-      CALL MSG_PRNT('  ')
-      CALL RAT_HDLOOKUP('EVRATE','MVRATE',COL,STATUS)
-      CALL MSG_SETC('MVR',COL)
-      CALL MSG_PRNT('   Master veto rate : ^MVR')
-      CALL RAT_HDLOOKUP('ASPECT','ASPERR',COL,STATUS)
-      CALL MSG_SETC('ASP',COL)
-      CALL MSG_PRNT('   Aspect error : ^ASP')
-      CALL RAT_HDLOOKUP('EVRATE','XACC',COL,STATUS)
-      CALL MSG_SETC('AXE',COL)
-      CALL MSG_PRNT('   Accepted event rate : ^AXE')
-      CALL MSG_PRNT('  ')
-*
-*     set the default to "MASTER VETO" else "ASPECT ERROR" (this is
-*     arbitrary, but ASPECT ERROR does appear in both PSPC and HRI datasets)
-      CALL RAT_HDLOOKUP('EVRATE','MVRATE',COL,STATUS)
-      IF (COL.EQ.' ')
-     &    CALL RAT_HDLOOKUP('ASPECT','ASPERR',COL,STATUS)
+*  Suggest RDF Master veto rate.
+      COL = 'MV_ACO'
       CALL USI_DEF0C('HKPAR1',COL,STATUS)
-*   Loop over parameter selection
+
+*  Loop over parameter selection
       DO PLP = 1,10
 *
 *      Loop until array is found
@@ -232,8 +350,10 @@
 *
 *         Get house keeping parameter name
             CALL USI_GET0C(PARAM(1:5+NCHAR), HKNAME, STATUS)
+
+            CALL CHR_UCASE(HKNAME)
 *
-*         Check if PAR_NULL has been entered indicating a break out of the loop
+*         Check if PAR_NULL /!/ has been entered indicating a break out of the loop
             IF (STATUS .EQ. PAR__NULL) THEN
                CALL ERR_ANNUL(STATUS)
                GOTO 100
@@ -247,67 +367,108 @@
 *         QUALITY_limits file has been opened. The quality file seems to be
 *         pretty useless in practise - so we'll not bother.
 *
-*
 *         Map the input array - initially try the EVENTRATE file, if this
 *         fails try the ATTITUDE file
-            CALL CMP_MAPV(ERLOC, HKNAME(1:CHR_LEN(HKNAME)), '_REAL',
-     &           'READ', PNTR, NELS, STATUS)
 *
-            FLOC = ERLOC
+            IF ( LEVR .EQ. .FALSE. .AND. LATT .EQ. .FALSE.) THEN
+              CALL MSG_PRNT('XRTHK : ERROR - cannot find EVRATE or'
+     :        // ' ASPECT extension')
+              GOTO 999
+            END IF
 
-            IF (STATUS .NE. SAI__OK) THEN
+            COLNO = 0
+            IF ( LEVR .EQ. .TRUE.) THEN
 *
-               CALL ERR_ANNUL(STATUS)
+*  Move to the correct position in FITS file
+               CALL FTMAHD(IUNIT, EVNHDU, TTYPE, STATUS)
+*  Renew EVENTRATE header information
+               CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
 *
-               CALL CMP_MAPV(ATTLOC, HKNAME(1:CHR_LEN(HKNAME)), '_REAL',
-     &                                      'READ', PNTR, NELS, STATUS)
+*  Locate column
+               LP = 1
+               DO WHILE (LP .NE. TFIELDS + 1)
+                  IF ( TTYPE(LP) .EQ. HKNAME(1:CHR_LEN(HKNAME)) ) THEN
+                     COLNO = LP
+                     LP = TFIELDS
+                  END IF
+               LP = LP + 1
+               END DO
+*  Read column
+               FBEG = 1
+               IF ( COLNO .NE. 0 ) THEN   ! Column found
+                  CALL DYN_MAPR( 1, NROWS, PNTR, STATUS)
+*  Data typecast into REAL by FITSIO
+                  CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :            %VAL(PNTR),ANYF,STATUS)
+                  IF (STATUS .NE. SAI__OK) THEN
+                    CALL MSG_PRNT('XRTHK : ERROR - Array creation'
+     :              // 'error ')
+                    GOTO 999
+                  END IF
 *
-               FLOC = ATTLOC
-*
-*         If still can't map array - output an error message
-               IF (STATUS .NE. SAI__OK) THEN
-*
-                  CALL MSG_SETC('HK', HKNAME)
-                  CALL MSG_PRNT('Error: ^HK not found in HK files')
-*
-*          Annul the status value and try again
-                  CALL ERR_ANNUL(STATUS)
-*
-               ELSE
                   JUMPOUT = .TRUE.
-*
-*        Set the number of times value
-                  IF (NELS .EQ. ANTIM) THEN
-                     NTIM = ANTIM
-                     TPNTR = AT_TPNTR
+*  Set the number of times value
+                  IF ( NROWS .EQ. ENTIM ) THEN
+                     NTIM = ENTIM
+                     TPNTR = EV_TPNTR
                   ELSE
-                     CALL MSG_PRNT('*Mismatch between the number of '/
-     &                  /'times in the ATTITUDE file and the HK array')
+                     CALL MSG_PRNT('XRTHK : Mismatch between the number'
+     :                //' of times in the EVENTRATE file and the HK '
+     :                // 'array')
                      STATUS = SAI__ERROR
                      GOTO 999
                   ENDIF
+               END IF
+            END IF
 *
-               ENDIF
+            IF ( LATT .EQ. .TRUE. .AND. COLNO .EQ. 0) THEN
+*  Move to the correct position in FITS file
+               CALL FTMAHD(IUNIT, ATNHDU, TTYPE, STATUS)
+*  Renew header information
+               CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
 *
-            ELSE
-               JUMPOUT = .TRUE.
+*  Locate column
+               LP = 1
+               DO WHILE (LP .NE. TFIELDS + 1)
+                  IF ( TTYPE(LP) .EQ. HKNAME(1:CHR_LEN(HKNAME))) THEN
+                     COLNO = LP
+                     LP = TFIELDS
+                  END IF
+                  LP = LP + 1
+               END DO
+*  Read column
+               FBEG = 1
+               IF ( COLNO .NE. 0 ) THEN  !If zero - no suitable column found
+                  CALL DYN_MAPR( 1, NROWS, PNTR, STATUS)
+                  CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :            %VAL(PNTR),ANYF,STATUS)
+                  IF (STATUS .NE. SAI__OK) THEN
+                    CALL MSG_PRNT('XRTHK : ERROR - Array creation'
+     :              // ' error.')
+                    GOTO 999
+                  END IF
+*
+                  JUMPOUT = .TRUE.
 *
 *        Set the number of times value
-               IF (NELS .EQ. ENTIM) THEN
-                  NTIM = ENTIM
-                  TPNTR = EV_TPNTR
-               ELSE
-                  CALL MSG_PRNT('*Mismatch between the number of '/
-     &                /'times in the EVENTRATE file and the HK array')
-                  STATUS = SAI__ERROR
-                  GOTO 999
+                  IF (NROWS .EQ. ANTIM) THEN
+                     NTIM = ANTIM
+                     TPNTR = AT_TPNTR
+                  ELSE
+                     CALL MSG_PRNT('XRTHK : Mismatch between the'
+     :               //' number of times in the ATTITUDE file and'
+     :               //' the HK array')
+                     STATUS = SAI__ERROR
+                     GOTO 999
+                  ENDIF
                ENDIF
-*
             ENDIF
          ENDDO
 *
 *      Find the array range
-         CALL ARR_RANG1R(NELS, %val(PNTR), RMIN, RMAX, STATUS)
+         CALL ARR_RANG1R(NROWS, %val(PNTR), RMIN, RMAX, STATUS)
 *
 *      Tell user the range
          CALL MSG_SETC('HK', HKNAME(1:CHR_LEN(HKNAME)))
@@ -351,8 +512,9 @@
          ENDIF
 *
 *      Unmap the array
-         CALL CMP_UNMAP(FLOC, HKNAME(1:CHR_LEN(HKNAME)), STATUS)
+*         CALL CMP_UNMAP(FLOC, HKNAME(1:CHR_LEN(HKNAME)), STATUS)
 *
+         CALL DYN_UNMAP(PNTR,STATUS)
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
       ENDDO
@@ -374,7 +536,7 @@
 * Get a filename from the parameter system
       CALL USI_GET0C('FNAME', FNAME, STATUS)
 *
-* Get logical unit for the output times file
+* Get logical unit for the output times file ~ [*.lis]
       CALL FIO_GUNIT(MUNIT, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
@@ -407,14 +569,19 @@
       CLOSE(MUNIT)
 *
 999   CONTINUE
-*
-* Close the HDS files
-      IF (LEVR) CALL HDS_CLOSE(ERLOC, STATUS)
-      IF (LATT) CALL HDS_CLOSE(ATTLOC, STATUS)
-*
+
+      IF (STATUS .NE. SAI__OK) THEN
+         CALL ERR_REP(' ','from XRT_SORT_BIN',STATUS)
+      END IF
+
+*  Close FITS file
+      CALL FTCLOS(IUNIT,STATUS)
+      CALL FIO_PUNIT(IUNIT,STATUS)
+
       CALL AST_CLOSE(STATUS)
 
       END
+
 ***********************************************************************
 *+XRTHK_BADTIMES  -  calculates the good time windows from HK params.
       SUBROUTINE XRTHK_BADTIMES( EXPO_TIM, OARR, NTIM, TIME,

@@ -36,13 +36,14 @@
 *  29 Nov 93 V1.6-7            Now sorts rational FITS files(JKA).
 *  18 Feb 94 V1.6-8            Now uses EXTNAME convention (INC_RDF)
 *   8 Apr 94 V1.6-9            Bug fix in image orientation for MPE-sdf
-*  24 Apr 94 (v1.7-0) for new asterix release
+*  24 Apr 94 (v1.7-0) For new asterix release
 *  25 May 94 (v1.7-1) PSF structure added in HDS output files
 *  25 Aug 95 V1.8-0   Bug fix for event datasets (RJV)
 *  11 Sep 95 V1.8-1   OMD support removed (RJV)
-*  20 Dec 1995 V2.0-0 ADI port (DJA)
-*   5 Apr 98 V2.2-1 structures removed (rjv)
-*
+*  20 Dec 95 V2.0-0   ADI port (DJA)
+*   5 Apr 98 V2.2-1   Structures removed (RJV)
+*  24 Jan 99 V2.3-0   FITS file input (DGED)
+
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -84,157 +85,140 @@
       INTEGER                 SMPTR             ! Pointer to src image mask
       INTEGER                 BMPTR             ! Pointer to bckgnd image mask
       INTEGER                 S2MPTR,B2MPTR     ! Secondary masks
-      INTEGER                 SEVPTR(7)         ! Pointers to source lists
-      INTEGER                 BEVPTR(7)         ! Pointers to bckgnd lists
       INTEGER                 WPNTR1,WPNTR2     ! Pointer to workspace arrays
-      INTEGER		      MAPLIM		! Current mapping extent of EVDS lists
-
-      INTEGER                 LP                ! Loop variable
-      INTEGER                 TOTEV_SRC         ! Number of events in source box
-      INTEGER                 TOTEV_BCK         ! Number of events in bckgnd box
 
       REAL                    MRES		! Resolution of spatial mask
+
+      INTEGER                 BLOCK
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
+      INTEGER                 NFILES            ! Number of files
+*
+      CHARACTER*100           FILES(MAXRAW)     ! File name aray
+      CHARACTER*132           FITSDIR           ! Directory for FITS
+      CHARACTER*132           FROOT             ! Root of FITS filename
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+
 *-
-
       CALL MSG_PRNT(VERSION)
-
+      CALL MSG_PRNT( 'XRTSORT : For FITS/RDF files."' )
+*
       CALL AST_INIT()
+*
+*  Get input file details
+*  Get the current working directory
+      CALL UTIL_GETCWD( FITSDIR, STATUS )
+      CALL USI_DEF0C( 'RAWDIR', FITSDIR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Get directory name from user and display the available observations.
-*  Get rootname of file wanted.
-      CALL XRTSORT_FILESELECT(STATUS)
+      CALL USI_GET0C( 'RAWDIR', FITSDIR, STATUS )
+*  Any FITS files?
+      CALL UTIL_FINDFILE(FITSDIR, '*.fits', MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+*  If no files - exit
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTSORT : Error - No FITS file found')
+         CALL MSG_PRNT ('XRTSORT : Uses RDF FITS files only.')
+         CALL MSG_PRNT ('XRTSORT : Please use VERSION V2.2-1 for SDF'
+     :                                                //'file input')
+         GOTO 999
+      END IF
+*
+*  Get root name of FITS file
+      CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append extension of FITS extension containing header
+      SRT_ROOTNAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+*  Does file exist?
+      CALL UTIL_FINDFILE(FITSDIR, SRT_ROOTNAME, MAXRAW, FILES, NFILES,
+     :                                                       STATUS)
+      IF (NFILES .LE. 0) THEN
+         STATUS = SAI__ERROR
+         CALL MSG_PRNT ('XRTSORT : Error - Header file not found')
+         GOTO 999
+      END IF
 
-*  Read header info from the corresponding _HDR.SDF file
-      CALL RAT_GETXRTHEAD(SRT_ROOTNAME,  STATUS)
+      CALL MSG_PRNT('XRTSORT : Using FITS file : '// SRT_ROOTNAME)
 
-* Get type of output dataset - binned or event?
-      CALL USI_GET0C('TYPE', SRT_DTYPE, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 999
-
-* Check if response made sense
-      CALL CHR_UCASE(SRT_DTYPE)
-      IF (SRT_DTYPE(1:1).EQ.'B') THEN
-        SRT_DTYPE='BinDS'
-      ELSEIF (SRT_DTYPE(1:1).EQ.'E') THEN
-        SRT_DTYPE='EventDS'
-      ELSE
-        CALL MSG_PRNT('AST_ERR: invalid data type')
-        GOTO 999
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, SRT_ROOTNAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
+         CALL MSG_PRNT('XRTSORT : Error - opening file ^FNAM **')
+         GOTO 999
       ENDIF
-
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
+*  Establish DTYPE (required for range selection). Using 'BinDS' only
+      SRT_DTYPE='BinDS'
+*
 *  Get the sort control information from the user
       CALL XRTSORT_RANGESELECT(SDIM,BDIM,NRBIN,NAZBIN,
      :                       MDIM,MRES,SMPTR,BMPTR,STATUS)
-
+*
 *  Create output files
       CALL USI_CREAT( 'OUT', ADI__NULLID, SID, STATUS )
-      IF (SRT_BCKGND) THEN
+      IF ( SRT_BCKGND ) THEN
         CALL USI_CREAT( 'BOUT', ADI__NULLID, BID, STATUS )
       ENDIF
       IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*  Sorting to a binned data set ?
-      IF ( SRT_DTYPE .EQ. 'BinDS') THEN
-
-*    Create the output data set and get a pointer to mapped data array.
-        CALL XRTSORT_CRE_BINNED(  1, SID, SDIM, NRBIN,
-     :                           SRCPTR, SQPTR, S2MPTR, STATUS )
+*
+*  Create the output data set and get a pointer to mapped data array.
+      CALL XRTSORT_CRE_BINNED(  1, SID, SDIM, NRBIN,
+     :                          SRCPTR, SQPTR, S2MPTR, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Create a background dataset if required
+      IF ( SRT_BCKGND ) THEN
+        CALL XRTSORT_CRE_BINNED(  2, BID, BDIM, 1,
+     :                            BCKPTR, BQPTR, B2MPTR, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*    Create a background dataset if required
-        IF ( SRT_BCKGND ) THEN
-          CALL XRTSORT_CRE_BINNED(  2, BID, BDIM, 1,
-     :                             BCKPTR, BQPTR, B2MPTR, STATUS )
-          IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-        ELSE
-
-*     Dummy up a couple of arrays.
-          CALL DYN_MAPR(7,BDIM,BCKPTR,STATUS)
-          CALL DYN_MAPB(7,BDIM,BQPTR,STATUS)
-          IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping dynamic arrays')
-            GOTO 999
-          ENDIF
-        ENDIF
-
-*    Map a couple of workspace arrays
+      ELSE
+*
+*  Dummy up a couple of arrays.
+         CALL DYN_MAPR(7,BDIM,BCKPTR,STATUS)
+         CALL DYN_MAPB(7,BDIM,BQPTR,STATUS)
+         IF (STATUS .NE. SAI__OK) THEN
+           CALL MSG_PRNT('XRTSORT : Error - mapping dynamic arrays')
+           GOTO 999
+         ENDIF
+       ENDIF
+*
+*     Map a couple of workspace arrays
         CALL DYN_MAPR(1, NRBIN, WPNTR1, STATUS)
         CALL DYN_MAPR(1, NRBIN, WPNTR2, STATUS)
         IF (STATUS .NE. SAI__OK) THEN
-          CALL MSG_PRNT('Error mapping dynamic arrays')
+          CALL MSG_PRNT('XRTSORT : Error - mapping dynamic arrays')
           GOTO 999
         ENDIF
-
+*
 *    Sort the data
-        CALL XRTSORT_SORT_BIN(SDIM(1), SDIM(2),
-     :          SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
-     :          BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
-     :          BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
-     :          MRES,%val(SMPTR),%val(BMPTR),%val(S2MPTR),%val(B2MPTR),
-     :          %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
-     :          %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
-
-*    Release workspace
-        CALL DYN_UNMAP(WPNTR1,STATUS)
-        CALL DYN_UNMAP(WPNTR2,STATUS)
-        IF (STATUS .NE. SAI__OK) GOTO 999
-
-*  Sorting to an event dataset
-      ELSE IF (SRT_DTYPE .EQ. 'EventDS') THEN
-
-*    Calculate the maximum number of photons which may be put into
-*    the event lists.
-        CALL XRTSORT_PHOTONCNT(MAPLIM, STATUS)
-
-*   Create and map the output Event data set.
-        CALL XRTSORT_CRE_EVENT( 1, MAPLIM, SID, SEVPTR, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*   Create background file if wanted
-        IF (SRT_BCKGND) THEN
-          CALL XRTSORT_CRE_EVENT( 2, MAPLIM, BID,
-     :                                     BEVPTR, STATUS )
-
-*     Otherwise create dummy arrays
-        ELSE
-          DO LP=1,7
-            CALL DYN_MAPR(1, MAPLIM, BEVPTR(LP), STATUS)
-          END DO
-
-        END IF
-        IF ( STATUS .NE. SAI__OK ) GOTO 999
-
-*   Do the sort
-        CALL XRTSORT_SORT_EVE( MAPLIM,
-     :          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
-     :          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
-     :          %val(SEVPTR(7)), %val(BEVPTR(1)), %val(BEVPTR(2)),
-     :          %val(BEVPTR(3)), %val(BEVPTR(4)), %val(BEVPTR(5)),
-     :          %val(BEVPTR(6)), %val(BEVPTR(7)),
-     :          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
-     :          TOTEV_SRC,TOTEV_BCK, STATUS )
-
-        IF (STATUS .NE. SAI__OK) GOTO 999
-
-*    Unmap lists
-        CALL EDI_UNMAP( SID, ELISTS, STATUS )
-        IF ( SRT_BCKGND ) THEN
-          CALL EDI_UNMAP( BID, ELISTS, STATUS )
-        END IF
-
-*    Shrink lists to number of events recorded
-        CALL EDI_ALTLEN( SID, TOTEV_SRC, STATUS )
-        IF ( SRT_BCKGND ) THEN
-          CALL EDI_ALTLEN( BID, TOTEV_BCK, STATUS )
-        ELSE
-          DO LP=1,7
-            CALL DYN_UNMAP(BEVPTR(LP),STATUS)
-          ENDDO
-        END IF
-
-      END IF
-
+      CALL XRTSORT_SORT_BIN(SDIM(1), SDIM(2),
+     :        SDIM(3), SDIM(4), SDIM(5), SDIM(6), SDIM(7),
+     :        BDIM(1), BDIM(2), BDIM(3), BDIM(4), BDIM(5), BDIM(6),
+     :        BDIM(7), NRBIN, NAZBIN, MDIM(1), MDIM(2),
+     :        MRES,%val(SMPTR),%val(BMPTR),%val(S2MPTR),%val(B2MPTR),
+     :        %val(WPNTR1), %val(WPNTR2), %val(SRCPTR),
+     :        %val(BCKPTR), %val(SQPTR), %val(BQPTR), STATUS)
+*
+*  Release workspace
+      CALL DYN_UNMAP(WPNTR1,STATUS)
+      CALL DYN_UNMAP(WPNTR2,STATUS)
+      IF (STATUS .NE. SAI__OK) GOTO 999
+*
 *  Put SORT box into output files
       CALL XRTSORT_WRISORT( SID, 1, STATUS )
 
@@ -876,182 +860,6 @@ c      ENDIF
       END IF
 
       END
-
-*+XRTSORT_GETQLIM    Get quality limits from file and user
-      SUBROUTINE XRTSORT_GETQLIM(STATUS)
-*    Description :
-*     Reads the file containing the quality limits imposed by the preprocessing
-*     system at GSOC. Displays these limits to the user and asks if
-*     these are adequate. If not, the user can select quality ranges to use
-*     in the subsequent sorting.
-*    Environment parameters :
-*    Method :
-*     <description of how the subroutine works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     Richard Saxton
-*    History :
-*     25-Apr-1990        original  (LTVAD::RDS)
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*    Structure definitions :
-      INCLUDE 'XRTSRT_CMN'
-      INCLUDE 'XRTHEAD_CMN'
-*    Import :
-*    Import-Export :
-*    Export :
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-      INTEGER CHR_LEN
-        EXTERNAL CHR_LEN
-*    Local constants :
-*     <local constants defined by PARAMETER>
-*    Local variables :
-      CHARACTER*(DAT__SZLOC) QLOC               ! Locator to quality file
-      LOGICAL QCHANGE                           ! Change quality limits ?
-      CHARACTER*80 QNAME                        ! Name of quality file
-      CHARACTER*20 CPROP                        ! Properties to change
-      INTEGER TEMP_MIN,TEMP_MAX                 ! Min and max temperature quals
-      INTEGER GAIN_MIN,GAIN_MAX                 ! Min and max gain qualities
-*    Local data :
-*     <any DATA initialisations for local variables>
-*-
-      IF (STATUS .NE. SAI__OK) RETURN
-*
-* Set quality logicals false
-      SRT_QUAL_LESS=.FALSE.
-      SRT_QUAL_MORE=.FALSE.
-*
-* See if user wants to change quality limits at all
-      CALL USI_GET0L('QCHANGE', QCHANGE, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-* Is a quality change wanted ?
-      IF (.NOT. QCHANGE) GOTO 999
-*
-* Get the quality limits used in the pre-processing phase at GSOC.
-*    Create the filename for the quality limits file
-      QNAME = SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//'_000.QLIM'
-*
-*    Open the file
-      CALL HDS_OPEN(QNAME, 'READ', QLOC, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error opening quality limits file')
-         STATUS=SAI__ERROR
-         GOTO 999
-      ENDIF
-*
-*    Read the various quality limits from the file
-      CALL CMP_GET0I(QLOC, 'TEMP_MIN', TEMP_MIN, STATUS)
-      CALL CMP_GET0I(QLOC, 'TEMP_MAX', TEMP_MAX, STATUS)
-      CALL CMP_GET0I(QLOC, 'GAIN_MIN', GAIN_MIN, STATUS)
-      CALL CMP_GET0I(QLOC, 'GAIN_MAX', GAIN_MAX, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error reading quality limits from file')
-         STATUS=SAI__ERROR
-         GOTO 999
-      ENDIF
-*
-*    Close the file
-      CALL HDS_CLOSE(QLOC, STATUS)
-      CALL DAT_ANNUL(QLOC, STATUS)
-*
-*    Show the user the current ranges
-      CALL MSG_PRNT('    Quality ranges')
-      CALL MSG_PRNT('   ****************')
-      CALL MSG_SETI('QTEMPMIN', TEMP_MIN)
-      CALL MSG_SETI('QTEMPMAX', TEMP_MAX)
-      CALL MSG_PRNT(' 1. Temperature: ^QTEMPMIN : ^QTEMPMAX')
-      CALL MSG_SETI('QGAINMIN', GAIN_MIN)
-      CALL MSG_SETI('QGAINMAX', GAIN_MAX)
-      CALL MSG_PRNT(' 2. Gain       : ^QGAINMIN : ^QGAINMAX')
-*
-*    Ask the user which ranges to change
-      CALL USI_GET0C('PROPERTY', CPROP, STATUS)
-*
-*    Check for a par_null and jump to the end if received
-      IF (STATUS .EQ. PAR__NULL) THEN
-         CALL ERR_ANNUL(STATUS)
-         GOTO 999
-      ENDIF
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*    Get user ranges
-      IF (INDEX (CPROP, '1') .NE. 0) THEN
-*
-         CALL USI_DEF0I('TEMPMIN', TEMP_MIN, STATUS)
-         CALL USI_DEF0I('TEMPMAX', TEMP_MAX, STATUS)
-         CALL USI_GET0I('TEMPMIN', SRT_TEMP_MIN, STATUS)
-         CALL USI_GET0I('TEMPMAX', SRT_TEMP_MAX, STATUS)
-*
-*      Check if acceptable temperature range has been made more stringent
-         IF (SRT_TEMP_MIN .GT. TEMP_MIN .OR.
-     &                   SRT_TEMP_MAX .LT. TEMP_MAX) THEN
-            SRT_QUAL_MORE=.TRUE.
-         ENDIF
-*
-*      Check if acceptable temperature range has been made less stringent
-         IF (SRT_TEMP_MIN .LT. TEMP_MIN .OR.
-     &                   SRT_TEMP_MAX .GT. TEMP_MAX) THEN
-            SRT_QUAL_LESS=.TRUE.
-         ENDIF
-*
-      ELSE
-*
-*      Set the sort range to the pre-processing range
-         SRT_TEMP_MIN=TEMP_MIN
-         SRT_TEMP_MAX=TEMP_MAX
-*
-      ENDIF
-*
-      IF (INDEX (CPROP, '2') .NE. 0) THEN
-*
-         CALL USI_DEF0I('GAINMIN', GAIN_MIN, STATUS)
-         CALL USI_DEF0I('GAINMAX', GAIN_MAX, STATUS)
-         CALL USI_GET0I('GAINMIN', SRT_GAIN_MIN, STATUS)
-         CALL USI_GET0I('GAINMAX', SRT_GAIN_MAX, STATUS)
-*
-*      Check if acceptable GAIN range has been made more stringent
-         IF (SRT_GAIN_MIN .GT. GAIN_MIN .OR.
-     &                   SRT_GAIN_MAX .LT. GAIN_MAX) THEN
-            SRT_QUAL_MORE=.TRUE.
-         ENDIF
-*
-*      Check if acceptable GAIN range has been made less stringent
-         IF (SRT_GAIN_MIN .LT. GAIN_MIN .OR.
-     &                   SRT_GAIN_MAX .GT. GAIN_MAX) THEN
-            SRT_QUAL_LESS=.TRUE.
-         ENDIF
-*
-      ELSE
-*
-*      Set the sort range to the pre-processing range
-         SRT_GAIN_MIN=GAIN_MIN
-         SRT_GAIN_MAX=GAIN_MAX
-*
-      ENDIF
-*
-999   CONTINUE
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','From XRTSORT_GETQLIM',STATUS)
-      ENDIF
-*
-      END
-
 
 *+XRTSORT_CRE_MASK - Create spatial mask
       SUBROUTINE XRTSORT_CRE_MASK(ARDID,RESFACT,MDIM,MRES,MPTR,
@@ -1894,11 +1702,6 @@ c        SRT.ELBMAX=Y_HWIDTH
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-* Display the default quality limits and get new ones if these aren't ok
-      CALL XRTSORT_GETQLIM(STATUS)
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
 * Select bin widths for axes properties
 * Calculate X and Y extremes
       IF ( INDEX(BIN_AXES,'1') .NE. 0) THEN
@@ -2600,10 +2403,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
       SRT_IMAGE(2)=(SRT_DTYPE.EQ.'BinDS'.AND.
      &              BDIM(1).GT.1.AND.BDIM(2).GT.1)
-
-
-
-
 *
 999   CONTINUE
 *
@@ -2621,7 +2420,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
      &           BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
      &           NRBIN, NAZBIN, MDIM1,MDIM2,MRES,SMASK, BMASK,
      &           S2MASK,B2MASK,ELIPA2,ELIPB2,SDATA,BDATA,SQUAL,BQUAL,
-     &                                                        STATUS)
+     &                                                         STATUS)
 *    Description :
 *        Sorts events from an XRT hds event datafile into a temporary
 *       array of 7 dimensions.
@@ -2653,6 +2452,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       INTEGER BMASK(MDIM1,MDIM2)                  ! Bckgnd spatial mask
       INTEGER S2MASK(SDIM1,SDIM2)
       INTEGER B2MASK(BDIM1,BDIM2)
+      INTEGER IUNIT
 *
 *    Import-Export :
       REAL ELIPA2(NRBIN)                          ! Square of elliptical
@@ -2670,29 +2470,45 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       INTEGER MAXBAD
          PARAMETER (MAXBAD=1000)                  ! Max no. of bad time periods
 *    Local variables :
-      CHARACTER*20 EXT                            ! File extension name
-      CHARACTER*80 DNAME                    ! Names of files
       REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
-      REAL XWIDTH,YWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      REAL XWIDTH,YWIDTH,EWIDTH,PWIDTH            ! Binwidth of each axis
       DOUBLE PRECISION TWIDTH
       REAL BXWIDTH,BYWIDTH                        ! Binwidth in backgnd box
       REAL XDWID,YDWID                            ! Width of detector axes
       REAL ELAWID,ELBWID                          ! Binwidth of elliptic axes
-      DOUBLE PRECISION T1,T2                                  ! Lower and upper limits of
+      DOUBLE PRECISION T1,T2                      ! Lower and upper limits of
 *                                                 ! a time bin
       INTEGER NBAD                                ! Number of bad time ranges
       INTEGER TLP,LP1,LP2,LP3,LP4,LP6,LP7,INLP,LP
       INTEGER BADEV                               ! No of events in hotspots
       LOGICAL QVAL
-      CHARACTER*(DAT__SZLOC) ELOC,DLOC          ! Locators to datafiles
-      CHARACTER*(DAT__SZLOC) LOCA(7),SLOCA(7)   ! Locators to data arrays
-      INTEGER PTRA(7),NELEMS     ! Pointer to mapped arrays and item count
-      INTEGER IX,UPPER,LOWER     ! number of indexes and ranges
-*-
+      INTEGER PTRA(7)            ! Pointer to mapped arrays and item count
+      INTEGER LOWER              ! number of indexes and ranges
+*
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER COL                                  ! Fits table, column no
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER FEOF                                 ! Flag EOF
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS            ! Fits header, no fields per rows
+      INTEGER BLOCK, N1
 
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*100 INSTRUMENT,COMMENT              ! Instrument name
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+
+      LOGICAL       PI                              ! Flags the PI column
+*-
       IF (STATUS.NE.SAI__OK) RETURN
 
-* Set events in hotspots counter to zero
+* Set events in hotspots counter to zero.
       BADEV = 0
 *
 * Calculate bin widths for each axis. NB: SDIM1 can refer to the no. of
@@ -2733,116 +2549,121 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
          ENDDO
       ENDIF
 *
-*    Open observation event file STDEVT
-      CALL RAT_HDLOOKUP('STDEVT','EXTNAME',EXT,STATUS)
-      CALL HDS_OPEN(SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT,
-     &              'READONLY',ELOC,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 999
-
-
-
-***   Have the quality constraints been relaxed ?
-      IF (SRT_QUAL_LESS) THEN
-
-***      Open observation diff evenfile
-         CALL RAT_HDLOOKUP('REJEVT','EXTNAME',EXT,STATUS)
-         CALL USI_DEF0C('DOUT',SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))
-     &                  //EXT,STATUS)
-         CALL USI_GET0C('DOUT',DNAME,STATUS)
-         CALL HDS_OPEN(DNAME,'READONLY',DLOC,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
+*  Open the FITS fIle
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,SRT_ROOTNAME,0,BLOCK,STATUS)
+      IF (STATUS.NE.0) THEN
+	 CALL MSG_SETC('FNAM',SRT_ROOTNAME)
+         CALL MSG_PRNT('XRTSORT : Error - opening file ^FNAM **')
+         GOTO 999
       ENDIF
-
-***   Locate the various data arrays
-      CALL RAT_FINDEVE(HEAD_ORIGIN,HEAD_DETECTOR,ELOC,LOCA,STATUS)
+*
+*  Locate event data
+*  Move to FITS header.
+      NHDU = 0
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*     Locate STDEVT table in FITS file.
+      DO WHILE (EXTNAME .NE. 'STDEVT')
+*        Flag EOF
+         FEOF = NHDU
+*        Get the current hdu values
+         CALL FTGHDN(IUNIT,NHDU)
+*        Move to the next data unit.
+         CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*        If type is binary table get table details
+         IF (HTYPE .EQ. 2) THEN
+            CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :      TUNIT, EXTNAME, VARIDAT, STATUS)
+         END IF
+         IF ( NHDU .EQ. FEOF) THEN
+            CALL MSG_PRNT('XRTSORT : Error - finding STDEVT extension'/
+     :      /' in FITS file.')
+            STATUS = SAI__ERROR
+            GOTO 999
+         END IF
+      ENDDO
       IF (STATUS.NE.SAI__OK) GOTO 999
 
-***   For each index entry
-      DO IX = 1,1
-         LOWER = 1
-         UPPER = HEAD_IEVTNU
-
-***      map the event data arrays into memory
-         CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
-     &      NELEMS,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-
-
-***      Check them against the sort parameters
-         CALL XRTSORT_DOIT_BIN(%val(PTRA(1)),
-     &      %val(PTRA(2)),%val(PTRA(3)), %val(PTRA(4)),
-     &      %val(PTRA(5)), %val(PTRA(6)),%val(PTRA(7)),
-     &      NELEMS, SDATA, SDIM1, SDIM2,
-     &      SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
-     &      BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
-     &      MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &      SRT_QUAL_MORE, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
-     &      XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
-     &      BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
-
-
-***      unmap the arrays & memory
-         CALL RAT_UNMAPEVE(SLOCA, STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
+*  Create dynamic arrays and read event data
+      PI    = .FALSE.
+      FBEG  = 1
+      DO N1 = 1,7
+         COL = N1
+         IF (TTYPE(N1) .EQ. 'TIME') THEN
+            CALL DYN_MAPD(1,NROWS,PTRA(1),STATUS)
+            CALL FTGCVD(IUNIT,COL,FBEG,1,NROWS,0.D0,%VAL(PTRA(1)),
+     :      ANYF,STATUS)
+         ELSE IF (TTYPE(N1) .EQ. 'X') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(2),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(2)),
+     :      ANYF,STATUS)
+         ELSE IF (TTYPE(N1) .EQ. 'Y') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(3),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(3)),
+     :      ANYF,STATUS)
+*        RAWX for HSI or DETX for PSPS
+         ELSE IF (TTYPE(N1) .EQ. 'RAWX' .OR. TTYPE(N1) .EQ. 'DETX') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(4),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(4)),
+     :      ANYF,STATUS)
+*        RAWX for HSI or DETX for PSPS
+         ELSE IF (TTYPE(N1) .EQ. 'RAWY'.OR. TTYPE(N1) .EQ. 'DETY') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(5),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(5)),
+     :      ANYF,STATUS)
+         ELSE IF (TTYPE(N1) .EQ. 'PHA') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(6),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(6)),
+     :      ANYF,STATUS)
+         ELSE IF (TTYPE(N1) .EQ. 'PI') THEN
+            CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
+            CALL FTGCVJ(IUNIT,COL,FBEG,1,NROWS,0,%VAL(PTRA(7)),
+     :      ANYF,STATUS)
+            PI = .TRUE.
+         ENDIF
+        IF (STATUS.NE.SAI__OK) GOTO 999
       ENDDO
 
-***   annul the array locators
-      CALL RAT_ANNULEVE(LOCA, STATUS)
+*     A special case for HRI. If it can't find a PI channel then it
+*     maps to the PHA channel.
+      IF ( PI .EQ. .FALSE. ) THEN
+          CALL DYN_MAPI(1,NROWS,PTRA(7),STATUS)
+          CALL FTGCVJ(IUNIT,6,FBEG,1,NROWS,0,%VAL(PTRA(7)),
+     :    ANYF,STATUS)
+      END IF
+*
+      LOWER = 1
+*
+      CALL XRTSORT_DOIT_BIN(%val(PTRA(1)),
+     &   %val(PTRA(2)),%val(PTRA(3)), %val(PTRA(4)),
+     &   %val(PTRA(5)), %val(PTRA(6)),%val(PTRA(7)),
+     &   NROWS, SDATA, SDIM1, SDIM2,
+     &   SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
+     &   BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
+     &   MDIM1,MDIM2,MRES,SMASK,BMASK,
+     &   SRT_QUAL_MORE, MAXBAD, NBAD, STBAD, ENBAD, XWIDTH, YWIDTH,
+     &   XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
+     &   BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
+*
+      CALL DYN_UNMAP(PTRA,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 999
-
-***   Same for the diff data?
-      IF (SRT_QUAL_LESS) THEN
-***      Locate the various data arrays
-         CALL RAT_FINDEVE(HEAD_ORIGIN,HEAD_DETECTOR,DLOC,LOCA,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-
-***      Find the size of the diff events
-         CALL CMP_SIZE(DLOC,'TIME',UPPER,STATUS)
-         DO IX = 1,1
-            LOWER = 1
-
-***         map the diff event data arrays into memory
-            CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
-     &         NELEMS,STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 999
-
-***         Check them against the sort parameters
-            CALL XRTSORT_DOIT_BIN(%val(PTRA(1)),
-     &         %val(PTRA(2)),
-     &         %val(PTRA(3)),%val(PTRA(4)),%val(PTRA(5)), %val(PTRA(6)),
-     &         %val(PTRA(7)), NELEMS, SDATA, SDIM1, SDIM2,
-     &         SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDATA, BDIM1,
-     &         BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
-     &         MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &         SRT_QUAL_MORE, MAXBAD, NBAD,STBAD, ENBAD, XWIDTH, YWIDTH,
-     &         XDWID, YDWID, TWIDTH, PWIDTH, EWIDTH, BXWIDTH,
-     &         BYWIDTH, NRBIN, NAZBIN, ELIPA2, ELIPB2, BADEV)
-
-***         unmap the arrays & memory
-            CALL RAT_UNMAPEVE(SLOCA, STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 999
-         ENDDO
-
-***      annul the array locators
-         CALL RAT_ANNULEVE(LOCA, STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-      ENDIF
-
-      IF ( INDEX(HEAD_DETECTOR, 'HRI') .NE. 0) THEN
+*
+      CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+      CALL FTGKYS(IUNIT,'INSTRUMENT',INSTRUMENT,COMMENT,STATUS)
+      IF(INSTRUMENT .EQ. 'HRI') THEN
          CALL MSG_SETI('BAD', BADEV)
-         CALL MSG_PRNT('Rejected ^BAD events found in '/
-     &                                /'hotspots/deadspots')
+         CALL MSG_PRNT('XRTSORT : Rejected ^BAD events found in '
+     &   //'hotspots/deadspots')
       ENDIF
-
-***  Set quality values for each pixel
-***   Loop over each time bin
+*
+*     Loop over each time bin
       DO TLP=1,SDIM5
-***      Calculate lower and upper times of this bin
+*        Calculate lower and upper times of this bin
          T1=SRT_MIN_T(1,1) + TWIDTH * (TLP-1.0)
          T2=SRT_MIN_T(1,1) + TWIDTH * TLP
 
-***      Test if this bin was within any of the on times of the instrument
-***      Set the quality value to 0 if the bin is good or 1 if it is bad.
+*        Test if this bin was within any of the on times of the instrument
+*        Set the quality value to 0 if the bin is good or 1 if it is bad.
          QVAL=.FALSE.
          DO INLP=1,HEAD_NTRANGE
             IF (HEAD_TSTART(INLP).LT.T2.AND.
@@ -2854,8 +2675,8 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 100      CONTINUE
 
-***      If the time is within the pre-selection windows - check if it
-***      is within the windows selected in XSORT
+*        If the time is within the pre-selection windows - check if it
+*       is within the windows selected in XSORT
          IF (QVAL) THEN
 *
             QVAL=.FALSE.
@@ -2896,7 +2717,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
                     ENDDO
                  ENDDO
                ENDIF
-***            Background quality
+*              Background quality
                IF (SRT_BCKGND) THEN
                  IF (BDIM1.GT.1.AND.BDIM2.GT.1.AND.NRBIN.EQ.1) THEN
                    DO LP2=1,BDIM2
@@ -2925,9 +2746,9 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
          ENDDO
       ENDDO
 
-***   Close any opened files
-      CALL HDS_CLOSE(ELOC, STATUS)
-      IF (SRT_QUAL_LESS) CALL HDS_CLOSE(DLOC, STATUS)
+* Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
 *
 999   CONTINUE
 *
@@ -2936,7 +2757,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       ENDIF
 *
       END
-
 
 *+XRTSORT_DOIT_BIN     checks mapped events against sort parameters
       SUBROUTINE XRTSORT_DOIT_BIN( TIME, XPIX, YPIX,
@@ -3024,7 +2844,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       SAVE_YMAX = SRT_MAX_Y(1)
 
       YMAX = HEAD_YEND
-
 
 ***   Test if this is an HRI file
       LHRI = (INDEX(HEAD_DETECTOR, 'HRI') .NE. 0)
@@ -3302,456 +3121,6 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       SRT_MAX_Y(1) = SAVE_YMAX
 *
       END
-
-*+XRTSORT_SORT_EVE - Sorts XRT data into a binned data array
-      SUBROUTINE XRTSORT_SORT_EVE(MAXLIM, EVE_X, EVE_Y,
-     &                 EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X,
-     &                 BEVE_Y,BEVE_XD,BEVE_YD,BEVE_T,BEVE_P,BEVE_E,
-     &                 MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &                 TOTEV_SRC, TOTEV_BCK, STATUS)
-*    Description :
-*        Sorts raw events from an XRT event datafile into event lists
-*    History :
-*    Type Definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Status :
-      INTEGER STATUS
-*    Structure definitions :
-      INCLUDE 'XRTSRT_CMN'
-      INCLUDE 'XRTHEAD_CMN'
-*    Import :
-      INTEGER MAXLIM                              ! Maximum number of events
-      INTEGER MDIM1,MDIM2
-      REAL MRES
-      INTEGER SMASK(MDIM1,MDIM2)
-      INTEGER BMASK(MDIM1,MDIM2)
-*    Import-Export :
-      REAL EVE_X(MAXLIM)
-      REAL EVE_Y(MAXLIM)
-      INTEGER EVE_XD(MAXLIM)
-      INTEGER EVE_YD(MAXLIM)
-      DOUBLE PRECISION EVE_T(MAXLIM)
-      INTEGER EVE_P(MAXLIM)
-      INTEGER EVE_E(MAXLIM)
-      REAL BEVE_X(MAXLIM)
-      REAL BEVE_Y(MAXLIM)
-      INTEGER BEVE_XD(MAXLIM)
-      INTEGER BEVE_YD(MAXLIM)
-      DOUBLE PRECISION BEVE_T(MAXLIM)
-      INTEGER BEVE_P(MAXLIM)
-      INTEGER BEVE_E(MAXLIM)
-*    Export :
-      INTEGER TOTEV_SRC, TOTEV_BCK                ! Number of events put into
-*                                                 ! source and bckgnd lists.
-*    Functions :
-      INTEGER CHR_LEN
-         EXTERNAL CHR_LEN
-*    Local constants :
-      INTEGER MAXBAD
-         PARAMETER (MAXBAD=1000)                  ! Max no. of bad time periods
-*    Local variables :
-      CHARACTER*20 EXT
-      REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
-      INTEGER NBAD                                ! Number of bad time periods
-      INTEGER BADEV                               ! Number of pixels in hotspots
-      CHARACTER*80 DNAME                    ! Names of files
-      CHARACTER*(DAT__SZLOC) ELOC,DLOC          ! Locators to datafiles
-      CHARACTER*(DAT__SZLOC) LOCA(7),SLOCA(7)   ! Locators to data arrays
-      INTEGER PTRA(7),NELEMS     ! Pointer to mapped arrays and item count
-      INTEGER IX,UPPER,LOWER     ! number of indexes and ranges
-*
-*-
-***   Initialise hotspot counter
-      BADEV = 0
-*
-*    Open observation event file STDEVT from INC_RDF
-      CALL RAT_HDLOOKUP('STDEVT','EXTNAME',EXT,STATUS)
-      CALL HDS_OPEN(SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))//EXT,
-     &              'READONLY',ELOC,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 999
-
-
-***   Have the quality constraints been relaxed ?
-      IF (SRT_QUAL_LESS) THEN
-
-***      Open observation diff evenfile
-         CALL RAT_HDLOOKUP('REJEVT','EXTNAME',EXT,STATUS)
-         CALL USI_DEF0C('DIFFILE',SRT_ROOTNAME(1:CHR_LEN(SRT_ROOTNAME))
-     &                  //EXT,STATUS)
-         CALL USI_GET0C('DIFFILE',DNAME,STATUS)
-         CALL HDS_OPEN(DNAME,'READONLY',DLOC,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-      ENDIF
-
-***   Locate the various data arrays
-      CALL RAT_FINDEVE(HEAD_ORIGIN,HEAD_DETECTOR,ELOC,LOCA,STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 999
-
-***   For each index entry
-      DO IX = 1,1
-         LOWER = 1
-         UPPER = HEAD_IEVTNU
-
-***      map the event data arrays into memory
-         CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
-     &      NELEMS,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-
-***      Check them against the sort parameters
-         CALL XRTSORT_DOIT_EVE(%val(PTRA(1)),
-     &      %val(PTRA(2)),
-     &      %val(PTRA(3)), %val(PTRA(4)), %val(PTRA(5)), %val(PTRA(6)),
-     &      %val(PTRA(7)), NELEMS, MAXLIM, EVE_X, EVE_Y, EVE_XD, EVE_YD,
-     &      EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
-     &      BEVE_T, BEVE_P, BEVE_E, MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &      TOTEV_SRC, TOTEV_BCK, SRT_QUAL_MORE,
-     &      MAXBAD, NBAD, STBAD, ENBAD, BADEV)
-
-***      unmap the arrays & memory
-         CALL RAT_UNMAPEVE(SLOCA, STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-      ENDDO
-
-***   annul the array locators
-      CALL RAT_ANNULEVE(LOCA, STATUS)
-      IF (STATUS.NE.SAI__OK) GOTO 999
-
-***   Same for the diff data
-      IF (SRT_QUAL_LESS) THEN
-
-***      Locate the various data arrays
-         CALL RAT_FINDEVE(HEAD_ORIGIN,HEAD_DETECTOR,DLOC,LOCA,STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-
-***      Find the size of the diff events
-         CALL CMP_SIZE(DLOC,'TIME',UPPER,STATUS)
-         DO IX = 1,1
-            LOWER = 1
-
-***         map the diff event data arrays into memory
-            CALL RAT_MAPEVE(LOCA,'READ',LOWER,UPPER,SLOCA,PTRA,
-     &         NELEMS,STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 999
-
-***         Check them against the sort parameters
-            CALL XRTSORT_DOIT_EVE(%val(PTRA(1)),
-     &         %val(PTRA(2)),
-     &         %val(PTRA(3)),%val(PTRA(4)),%val(PTRA(5)), %val(PTRA(6)),
-     &         %val(PTRA(7)),NELEMS,MAXLIM,EVE_X, EVE_Y, EVE_XD, EVE_YD,
-     &         EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y, BEVE_XD, BEVE_YD,
-     &         BEVE_T, BEVE_P,BEVE_E,MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &         TOTEV_SRC,TOTEV_BCK, SRT_QUAL_MORE,
-     &         MAXBAD, NBAD, STBAD, ENBAD, BADEV)
-
-***         unmap the arrays & memory
-            CALL RAT_UNMAPEVE(SLOCA, STATUS)
-            IF (STATUS.NE.SAI__OK) GOTO 999
-         ENDDO
-
-***      annul the array locators
-         CALL RAT_ANNULEVE(LOCA, STATUS)
-         IF (STATUS.NE.SAI__OK) GOTO 999
-      ENDIF
-
-      IF (INDEX(HEAD_DETECTOR, 'HRI') .NE. 0) THEN
-         CALL MSG_SETI('BAD', BADEV)
-         CALL MSG_PRNT('Rejected ^BAD events found in '/
-     &                             /'hotspots/deadspots')
-      ENDIF
-
-*  Close the files
-      CALL HDS_CLOSE(ELOC, STATUS)
-      IF (SRT_QUAL_LESS) CALL HDS_CLOSE(DLOC, STATUS)
-
-*  Tidy up
- 999  IF (STATUS .NE. SAI__OK) THEN
-        CALL AST_REXIT( 'XRTSORT_SORT_EVE',STATUS)
-      END IF
-
-      END
-
-*+XRTSORT_DOIT_EVE    Sorts XRT events into event lists
-      SUBROUTINE XRTSORT_DOIT_EVE(TIME,XPIX,YPIX,XDET,
-     &              YDET, AMPL, CAMPL, NELEMS, MAXLIM, EVE_X, EVE_Y,
-     &              EVE_XD, EVE_YD, EVE_T, EVE_P, EVE_E, BEVE_X, BEVE_Y,
-     &              BEVE_XD, BEVE_YD, BEVE_T, BEVE_P, BEVE_E,
-     &              MDIM1,MDIM2,MRES,SMASK,BMASK,
-     &              TOTEV_SRC,TOTEV_BCK,QCHECK,MAXBAD,NBAD,STBAD,ENBAD,
-     &              BADEV)
-*    Description :
-*    History :
-*    Type definitions :
-      IMPLICIT NONE
-*    Structure definitions :
-      INCLUDE 'XRTSRT_CMN'
-      INCLUDE 'XRTHEAD_CMN'
-*    Import :
-      INTEGER NELEMS			  ! Number of array elements
-      DOUBLE PRECISION TIME(NELEMS)       ! Event times
-      INTEGER XPIX(NELEMS), YPIX(NELEMS)  ! Array of coordinates
-      INTEGER XDET(NELEMS), YDET(NELEMS)  ! Array of detector coords
-      INTEGER AMPL(NELEMS), CAMPL(NELEMS) ! Array of photon events
-      LOGICAL QCHECK                              ! Check quality values ?
-      INTEGER MAXBAD                              ! Dimension of bad arrays
-      INTEGER NBAD
-      REAL STBAD(MAXBAD)                          ! Start of bad period
-      REAL ENBAD(MAXBAD)                          ! End of bad period
-      INTEGER MAXLIM                              ! Event list max extent
-      INTEGER MDIM1,MDIM2
-      REAL MRES
-      INTEGER SMASK(MDIM1,MDIM2)
-      INTEGER BMASK(MDIM1,MDIM2)
-*    Import-Export :
-      REAL EVE_X(MAXLIM),EVE_Y(MAXLIM)
-      INTEGER EVE_XD(MAXLIM),EVE_YD(MAXLIM)
-      INTEGER EVE_P(MAXLIM),EVE_E(MAXLIM)         ! Source lists
-      DOUBLE PRECISION EVE_T(MAXLIM)
-      REAL BEVE_X(MAXLIM),BEVE_Y(MAXLIM)
-      INTEGER BEVE_XD(MAXLIM),BEVE_YD(MAXLIM)
-      INTEGER BEVE_P(MAXLIM),BEVE_E(MAXLIM)       ! Bckgnd event lists
-      DOUBLE PRECISION BEVE_T(MAXLIM)             ! Bckgnd event lists
-*
-      INTEGER TOTEV_SRC                           ! Number of source events
-      INTEGER TOTEV_BCK                           ! Number of bckgnd events
-      INTEGER BADEV                               ! Number of events in hotspots
-*    Functions :
-      LOGICAL XRT_HSPOT
-         EXTERNAL XRT_HSPOT
-*    Local constants :
-*     <local constants defined by PARAMETER>
-*    Local variables :
-      INTEGER BLP,TLP
-      INTEGER XEV,YEV,XDEV,YDEV,AEV,CEV
-      DOUBLE PRECISION TEV
-      INTEGER SCEN_X,SCEN_Y                        ! Pixel centre of src box
-      INTEGER BCEN_X,BCEN_Y                        ! Pixel centre of src box
-      REAL SAMIN2,SAMAX2,SBMIN2,SBMAX2       ! Squares of the min. and max.
-*                                            ! values for the source ellip axes.
-      REAL BAMIN2,BAMAX2,BBMIN2,BBMAX2       !    Same for the background.
-      REAL SA2B2I,SA2B2O                     ! Product of the squares of the
-*                                            ! inner and outer source axes
-      REAL BA2B2I,BA2B2O                     ! Product of the squares of the
-*                                            ! inner and outer background axes
-      REAL SDIFFX,SDIFFY                     ! X,Y offset from box centre (pix)
-      REAL BDIFFX,BDIFFY                     !    Same for the background
-      REAL SELPX2,SELPY2                     ! Square of the photon X,Y pos.
-*                                            ! in source box elliptical coords
-      REAL BELPX2,BELPY2                     ! Square of the photon X,Y pos.
-*                                            ! in bckgnd box elliptical coords
-      REAL SCPHI,SSPHI                       ! Cos and Sine of src orientation
-      REAL BCPHI,BSPHI                       ! Cos and Sine of bck orientation
-      REAL HPIX60                            ! Pixel size in arcmins
-*
-      LOGICAL LHRI                           ! Is detector the HRI ?
-      LOGICAL OK,SOK,BOK
-      INTEGER IX
-      INTEGER MEL1,MEL2
-*-
-      IF (INDEX(HEAD_DETECTOR, 'HRI') .NE. 0) THEN
-         LHRI = .TRUE.
-      ELSE
-         LHRI = .FALSE.
-      ENDIF
-
-*  Calculate the box pixel centres
-      SCEN_X = (SRT_MIN_X(1) + SRT_MAX_X(1)) / 2.0
-      SCEN_Y = (SRT_MIN_Y(1) + SRT_MAX_Y(1)) / 2.0
-      BCEN_X = (SRT_MIN_X(2) + SRT_MAX_X(2)) / 2.0
-      BCEN_Y = (SRT_MIN_Y(2) + SRT_MAX_Y(2)) / 2.0
-
-*  Calculate pixel size in arcmins
-      HPIX60 = HEAD_PIXEL / 60.0
-
-*  Calculate the squares of the elliptical axis - if any
-      IF (INDEX('CAE', SRT_SHAPE(1)) .NE. 0) THEN
-        SAMIN2 = SRT_ELAMIN(1) **2
-        SAMAX2 = SRT_ELAMAX(1) **2
-        SBMIN2 = SRT_ELBMIN(1) **2
-        SBMAX2 = SRT_ELBMAX(1) **2
-        BAMIN2 = SRT_ELAMIN(2) **2
-        BAMAX2 = SRT_ELAMAX(2) **2
-        BBMIN2 = SRT_ELBMIN(2) **2
-        BBMAX2 = SRT_ELBMAX(2) **2
-
-*  Calculate the product of the squares of the two elliptical axes
-        SA2B2I = SAMIN2 * SBMIN2
-        SA2B2O = SAMAX2 * SBMAX2
-        BA2B2I = BAMIN2 * BBMIN2
-        BA2B2O = BAMAX2 * BBMAX2
-*  Set a local cos and sin of the orientation angle for speed
-        SCPHI = SRT_COSPHI(1)
-        SSPHI = SRT_SINPHI(1)
-        BCPHI = SRT_COSPHI(2)
-        BSPHI = SRT_SINPHI(2)
-      ENDIF
-
-*  Loop over each input record
-      DO IX = 1, NELEMS
-
-*  Copy event to simpler variables
-        TEV=TIME(IX) - HEAD_BASE_SCTIME
-        XEV=XPIX(IX)
-        YEV=YPIX(IX)
-        XDEV=XDET(IX)
-        YDEV=YDET(IX)
-        AEV=AMPL(IX)
-        CEV=CAMPL(IX)
-*  Fix for HRI no corrected events. set to value '1'
-        IF (LHRI) CEV = 1
-
-*  Test if this is from an HRI hotspot or deadspot
-        IF (LHRI .AND..NOT. XRT_HSPOT( XEV, YEV)) THEN
-
-          BADEV = BADEV + 1
-
-        ELSE
-
-*  If the source box is circular, annular or elliptical, calculate
-*  various numbers.
-          IF (INDEX('CAE', SRT_SHAPE(1)) .NE. 0) THEN
-
-*  calculate the offset in X and Y celestial pixels from the
-*  source box centre
-            SDIFFX = XEV - SCEN_X
-            SDIFFY = YEV - SCEN_Y
-
-*  calculate the offset in X and Y celestial pixels from the
-*  background box centre
-            BDIFFX = XEV - BCEN_X
-            BDIFFY = YEV - BCEN_Y
-
-*  calculate the position in elliptical coordinates - source box
-*  NB: This also handles circles
-            SELPX2 = (SDIFFX * SCPHI + SDIFFY * SSPHI) ** 2
-            SELPY2 = (SDIFFX * SSPHI + SDIFFY * SCPHI) ** 2
-
-*  calculate the position in elliptical coordinates - backgnd box
-            BELPX2 = (BDIFFX * BCPHI + BDIFFY * BSPHI) ** 2
-            BELPY2 = (BDIFFX * BSPHI + BDIFFY * BCPHI) ** 2
-
-          ENDIF
-
-*  Check if each event is within the  selected time range:
-          OK = .FALSE.
-          TLP=1
-          DO WHILE (.NOT.OK.AND.TLP.LE.SRT_NTIME(1))
-            OK=(SRT_MIN_T(TLP,1).LE.TEV.AND.SRT_MAX_T(TLP,1)
-     :                                              .GE. TEV)
-            TLP=TLP+1
-          ENDDO
-
-          IF (OK) THEN
-
-*  Check various other limits
-            OK=((SRT_MIN_PH(1).LE.AEV.AND.SRT_MAX_PH(1).GE.AEV)
-     :       .AND.
-     :          (SRT_MIN_EN(1).LE.CEV.AND.SRT_MAX_EN(1).GE.CEV)
-     :       .AND.
-     :          (SRT_MIN_XD(1).LE.XDEV.AND.SRT_MAX_XD(1).GE.XDEV)
-     :       .AND.
-     :          (SRT_MIN_YD(1).LE.YDEV.AND.SRT_MAX_YD(1).GE.YDEV))
-          ENDIF
-
-*  If quality limits have been made more strict then check quality
-          IF (QCHECK) THEN
-*  See if this time is within one of the bad times
-            BLP=1
-            DO WHILE (OK.AND.BLP.LE.NBAD)
-              IF (TEV.GE.STBAD(BLP).AND.TEV.LE.ENBAD(BLP)) THEN
-                OK=.FALSE.
-              ENDIF
-            ENDDO
-
-          ENDIF
-
-          SOK=OK
-          BOK=OK
-          IF (OK) THEN
-
-*  Check if event is within the selected spatial region
-
-*  Rectangle
-            IF ( SRT_SHAPE(1) .EQ. 'R' ) THEN
-              SOK=((SRT_MIN_X(1) .LE. XEV .AND. SRT_MAX_X(1) .GE. XEV)
-     &                                  .AND.
-     &            (SRT_MIN_Y(1) .LE. YEV .AND. SRT_MAX_Y(1) .GE. YEV))
-              IF (SRT_BCKGND) THEN
-                BOK=((SRT_MIN_X(2).LE.XEV .AND. SRT_MAX_X(2).GE.XEV)
-     &                                  .AND.
-     &             (SRT_MIN_Y(2).LE.YEV .AND. SRT_MAX_Y(2).GE.YEV))
-              ENDIF
-
-*  Circle, annulus or ellipse (all treated as ellipse)
-            ELSEIF (INDEX( 'CAE', SRT_SHAPE(1) ) .NE. 0 ) THEN
-              SOK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
-     &                                  .AND.
-     &            (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
-              IF (SRT_BCKGND) THEN
-                BOK=((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I
-     &                                  .AND.
-     &             (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O)
-              ENDIF
-
-*  ARD description
-            ELSEIF (SRT_SHAPE(1) .EQ. 'I') THEN
-              MEL1=INT((XEV-HEAD_XSTART)/MRES)+1
-              IF (HEAD_ORIGIN.EQ.'MPE') THEN
-                MEL2=INT((-YEV-HEAD_YSTART)/MRES)+1
-              ELSE
-                MEL2=INT((YEV-HEAD_YSTART)/MRES)+1
-              ENDIF
-              SOK=(SMASK(MEL1,MEL2).NE.0)
-              IF (SRT_BCKGND) THEN
-                OK=(BMASK(MEL1,MEL2).NE.0)
-              ENDIF
-            ENDIF
-
-          ENDIF
-
-*  Add to source event list
-          IF (SOK) THEN
-
-            TOTEV_SRC=TOTEV_SRC+1
-
-            EVE_X(TOTEV_SRC)=-(XEV - HEAD_SKYCX)*HPIX60
-            EVE_Y(TOTEV_SRC)=-(YEV - HEAD_SKYCY)*HPIX60
-            EVE_XD(TOTEV_SRC)=XDEV
-            EVE_YD(TOTEV_SRC)=YDEV
-            EVE_T(TOTEV_SRC)=TEV
-            EVE_P(TOTEV_SRC)=AEV
-            EVE_E(TOTEV_SRC)=CEV
-
-          ENDIF
-
-*  Add to background event list
-          IF ( SRT_BCKGND.AND.BOK ) THEN
-
-            TOTEV_BCK=TOTEV_BCK+1
-            BEVE_X(TOTEV_BCK)=-XEV*HPIX60
-            BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
-            BEVE_XD(TOTEV_BCK)=XDEV
-            BEVE_YD(TOTEV_BCK)=YDEV
-            BEVE_T(TOTEV_BCK)=TEV
-            BEVE_P(TOTEV_BCK)=AEV
-            BEVE_E(TOTEV_BCK)=CEV
-
-          ENDIF
-
-        ENDIF
-
-      ENDDO
-
-999   CONTINUE
-
-      END
-
-
-
-
 
 *+XRTSORT_WRISORT    Writes the sorting conditions into a SORT box.
       SUBROUTINE XRTSORT_WRISORT( FID, IDS, STATUS)
@@ -4060,3 +3429,40 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       DEC=ASIN(V(3))*RTOD
 
       END
+
+**********************************************************************
+
+*         PRINT *,'NELEMS',NELEMS
+*         PRINT *,'SDATA(1)',SDATA(1,1,1,1,1,1,1)
+*         PRINT *,'SDIM1',SDIM1
+*         PRINT *,'SDIM2',SDIM2
+*         PRINT *,'SDIM3',SDIM3
+*         PRINT *,'SDIM4',SDIM4
+*         PRINT *,'SDIM5',SDIM5
+*         PRINT *,'SDIM6',SDIM6
+*         PRINT *,'SDIM7',SDIM7
+*         PRINT *,'BDATA(1)',BDATA(1,1,1,1,1,1,1)
+*         PRINT *,'MDIM1',MDIM1
+*         PRINT *,'MDIM2',MDIM2
+*         PRINT *,'MRES',MRES
+*         PRINT *,'SMASK',SMASK
+*         PRINT *,'BMASK',BMASK
+*         PRINT *,'SRT_QUAL_MORE',SRT_QUAL_MORE
+*         PRINT *,'MAXBAD',MAXBAD
+*         PRINT *,'NBAD',NBAD
+*         PRINT *,'STBAD',STBAD(1)
+*         PRINT *,'ENBAD',ENBAD(1)
+*         PRINT *,'XWIDTH',XWIDTH
+*         PRINT *,'YWIDTH',YWIDTH
+*         PRINT *,'XDWID',XDWID
+*         PRINT *,'YDWID',YDWID
+*         PRINT *,'TWIDTH',TWIDTH
+*         PRINT *,'PWIDTH',PWIDTH
+*         PRINT *,'EWIDTH',EWIDTH
+*         PRINT *,'BXWIDTH',BXWIDTH
+*         PRINT *,'BYWIDTH',BYWIDTH
+*         PRINT *,'NRBIN',NRBIN
+*         PRINT *,'NAZBIN',NAZBIN
+*         PRINT *,'ELIPA2',ELIPA2
+*         PRINT *,'ELIPB2',ELIPB2
+*         PRINT *,'BADEV',BADEV,

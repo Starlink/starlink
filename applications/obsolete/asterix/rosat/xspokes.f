@@ -24,11 +24,13 @@
 *      24 Apr 94: (V1.7-0) for new asterix release
 *      03 May 94: (v1.7-1) takes correct action if image system not active
 *      27-May-94: Opens output textfile with STATUS="UNKNOWN"
-*      15-Jun-94: (v1.7-2)Takes a list (or file) of times to select the mean
+*      15-Jun-94: (v1.7-2)takes a list (or file) of times to select the mean
 *                 roll angle on. 0 roll is now valid.
 *      20-Jun-94: (v1.7-3)workaround for bug in CHR_RTOC (uses DTOC)
 *       2 Feb 95: v1.8-0  upgrade to new ARD (RJV)
 *       7 Apr 98: v2.2-1  removed structures (rjv)
+*       9 Feb 99: v2.3-0  FITS file input (DGED)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -49,12 +51,6 @@
       CHARACTER MODE                    ! Operation mode C or I
       CHARACTER*80 TEXT
       CHARACTER*132 SFILE
-      CHARACTER*132 ATTFIL               ! Attitude file
-      CHARACTER*132 ROOTNAME            ! rootname of datafiles
-      CHARACTER*20 EXT                  ! Extension name
-      CHARACTER*20 ROLL                 ! column name
-      CHARACTER*20 TIME                 ! column name
-      CHARACTER*(DAT__SZLOC) ALOC       ! Locator to attitude file
       LOGICAL LOUT                      ! include the region outside the image ?
       LOGICAL LNEW                      ! create a new ARD file or update ?
       LOGICAL LPLOT                     ! display the spokes pattern ?
@@ -74,11 +70,36 @@
       REAL EXTRA                        ! additional width of ribs (degs)
       INTEGER RPNTR                     ! pointer to the roll angle array
       INTEGER TPNTR                     ! pointer to the time array
-      INTEGER NVALS                     ! number of time/roll values
       INTEGER SUNIT                     ! Logical unit of ARD file
       INTEGER LP
       INTEGER L
       INTEGER ARDID
+
+
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER COLNO,CTR
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS                              ! Fits header, no fields per rows
+      INTEGER BLOCK
+      INTEGER IUNIT                                ! Logical I/O unit
+      INTEGER MAXRAW                               ! Max value
+        PARAMETER (MAXRAW = 500)
+*
+      CHARACTER*132 FROOT                           ! Root of FITS filename
+      CHARACTER*132 FILENAME
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*5   ORIGIN
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'XSPOKES Version 2.2-2')
@@ -95,8 +116,6 @@
       CALL USI_GET0C('ARDFILE', SFILE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
-*
-*
 *     Open the spatial file - get filename from the user
       IF (LNEW) THEN
          CALL FIO_OPEN(SFILE,'WRITE','LIST',0,SUNIT,STATUS)
@@ -109,8 +128,7 @@
          GOTO 999
       ENDIF
 *
-*
-*     see if user wants to define the pixels interactively
+*     See if user wants to define the pixels interactively
       CALL USI_GET0C('MODE', MODE, STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -157,51 +175,109 @@
 *     Use the cal. files ?
       IF (MODE .EQ. 'C') THEN
 *
-*        find the name for the attitude file
-         CALL USI_GET0C('ROOTNAME', ROOTNAME, STATUS)
+*  Get root name of FITS file
+         CALL USI_GET0C ('FITSROOT', FROOT, STATUS )
+*  Append filename extension of FITS file containing header information
+         FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_bas.fits'
+*
+         CALL MSG_PRNT('XSPOKES : Using FITS file : '// FILENAME)
+*
+*  Open the FITS file
+         CALL FIO_GUNIT(IUNIT, STATUS)
+         CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+         IF ( STATUS .NE. SAI__OK ) THEN
+	    CALL MSG_SETC('FNAM', FILENAME)
+            CALL MSG_PRNT('XSPOKES : Error - opening file ^FNAM **')
+            GOTO 999
+         ENDIF
+*
+*  Read in FITS header
+         ORIGIN = 'RDF'
+         CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+         CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+         CALL FTCLOS(IUNIT, STATUS)
+         CALL FIO_PUNIT(IUNIT, STATUS)
+*
+*  Append filename extension of FITS file containing attitude data
+         FILENAME = FROOT(1:CHR_LEN(FROOT)) // '_anc.fits'
+*
+         CALL MSG_PRNT('XSPOKES : Using FITS file : '// FILENAME)
+*
+*  Open the FITS fIle
+         CALL FIO_GUNIT(IUNIT,STATUS)
+         CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
+         IF (STATUS .NE. SAI__OK ) THEN
+	    CALL MSG_SETC('FNAM',FILENAME)
+            CALL MSG_PRNT('XSPOKES : Error - opening file ^FNAM')
+            CALL MSG_PRNT('Try defining the spokes with the cursor')
+            GOTO 999
+         ENDIF
+*
+*  Locate attitude data
+*  Move to FITS header.
+         NHDU = 0
+         CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*        Locate STDEVT table in FITS file.
+         DO WHILE (EXTNAME .NE. 'ASPECT')
+*           Check for EOF
+            CTR = NHDU
+*           Get the current hdu values
+            CALL FTGHDN(IUNIT, NHDU)
+*           Move to the next data unit.
+            CALL FTMRHD(IUNIT, 1, HTYPE, STATUS)
+*           If type is binary table get table details
+            IF (HTYPE .EQ. 2) THEN
+               CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
+            END IF
+            IF ( NHDU .EQ. CTR) THEN
+               CALL MSG_PRNT('XSPOKES : Error - not finding ASPECT'
+     :         //' extension')
+               CALL MSG_PRNT('Try defining the spokes with the cursor')
+               STATUS = SAI__ERROR
+               GOTO 999
+            END IF
+         ENDDO
          IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*        Open the header file to get the origins of the data
-         CALL RAT_GETXRTHEAD(ROOTNAME,STATUS)
-*
-*        build the attitude file name
-         CALL RAT_HDLOOKUP('ASPDATA','EXTNAME',EXT,STATUS)
-         ATTFIL = ROOTNAME(1:CHR_LEN(ROOTNAME))//EXT
-*
-*        set the default filename
-         CALL USI_DEF0C('ATTFIL', ATTFIL, STATUS)
-         CALL USI_GET0C('ATTFIL', ATTFIL, STATUS)
-         IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*
-         CALL HDS_OPEN(ATTFIL, 'READ', ALOC, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error opening attitude file - try defining '/
-     &                   /'the spokes with the cursor')
+
+*  Create dynamic arrays and read attitude data
+         FBEG  = 1
+         CTR = 0
+         DO COLNO = 1,TFIELDS
+            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+               CALL DYN_MAPD(1, NROWS, TPNTR, STATUS)
+               CALL FTGCVD(IUNIT,COLNO,FBEG,1,NROWS,0.D0,%VAL(TPNTR),
+     :         ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'ROAN_CAS') THEN
+               CALL DYN_MAPR(1, NROWS, RPNTR, STATUS)
+               CALL FTGCVE(IUNIT,COLNO,FBEG,1,NROWS,0,%VAL(RPNTR),
+     :         ANYF,STATUS)
+            CTR = CTR + 1
+            END IF
+            IF (STATUS .NE. SAI__OK) GOTO 999
+         ENDDO
+
+*  Check that both columns have been read
+         IF ( CTR .NE. 2 ) THEN
+            CALL MSG_PRNT('XSPOKES : Error opening attitude file - try'
+     :                   //'defining the spokes with the cursor')
             GOTO 999
          ENDIF
-*
-*  get the mean roll angle and times from the system
-         CALL RAT_HDLOOKUP('ASPDATA','ROLL',ROLL,STATUS)
-         CALL CMP_MAPV(ALOC,ROLL,'_REAL','READ',RPNTR,NVALS,STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_SETC('ARR',ROLL)
-            CALL MSG_PRNT('** Error accessing ROLL angle array ^ARR **')
-            GOTO 999
-         ENDIF
-         CALL RAT_HDLOOKUP('ASPDATA','TIME',TIME,STATUS)
-         CALL CMP_MAPV(ALOC,TIME,'_DOUBLE','READ',TPNTR,NVALS,STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_SETC('ARR',TIME)
-            CALL MSG_PRNT('** Error accessing TIME array ^ARR **')
-            GOTO 999
-         ENDIF
+
+*  Close FITS files
+         CALL FTCLOS(IUNIT, STATUS)
+         CALL FIO_PUNIT(IUNIT, STATUS)
 *
 *  find the mean roll angle - file is often corrupted so need to
 *  ignore zeroes in the file (this could of course bias the result if
 *  the roll angle is actually close to zero).
-         CALL XSPOKES_MEANROLL( NVALS, %val(TPNTR), %val(RPNTR),
+         CALL XSPOKES_MEANROLL( NROWS, %val(TPNTR), %val(RPNTR),
      &                                                   RMEAN, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
@@ -359,9 +435,7 @@
       CALL ARX_WRITEF(ARDID,SUNIT,STATUS)
       CALL ARX_CLOSE(ARDID,STATUS)
       CALL FIO_CLOSE(SUNIT,STATUS)
-
-      IF (MODE .EQ. 'C') CALL HDS_CLOSE(ALOC, STATUS)
-
+*
 *  Tidy up
  999  CALL AST_CLOSE()
       CALL AST_ERR( STATUS )

@@ -38,7 +38,7 @@
 *    Authors :
 *     Richard Saxton    (LTVAD::RDS)
 *    History :
-*     26-6-1990   original
+*    26-6-1990    Original
 *     1-5-1991    Version 1.4-3 with exposure corrections for
 *                 time series fixed
 *     3-5-1991    Version 1.4-4 - uses quality array to generate useful
@@ -48,10 +48,10 @@
 *     1-7-1991    No longer performs the wire correction for spectra as this is
 *                 included in the effective area correction. The
 *                 correction for time series is reduced to 1/0.79 - V1.4-6.
-*     25-2-1992   Cocked up the previous wire correction. V1.4-7 includes
+*    25-2-1992    Cocked up the previous wire correction. V1.4-7 includes
 *                 the wcorr of 1.0/0.79 1.4-6 gave 1.0/0.72
-*     24-6-1992   Various minor additions V1.4-8
-*    30-11-1992   Does vignetting corrections to images and spectral
+*    24-6-1992    Various minor additions V1.4-8
+*   30-11-1992    Does vignetting corrections to images and spectral
 *                 images by default. V1.4-9
 *     7-1-1993    Allows user to override the of-axis angles for vignetting
 *                 correction V1.6-0
@@ -60,13 +60,14 @@
 *     6-1-1994    Handles Rationalised data format and writes the
 *                 livetime structure V1.6-4
 *    21-2-1994    Uses RDF filenaming convention V1.6-5
-*    24-Apr-1994  (v1.7-0) for new release of asterix
+*    24-Apr-94    (v1.7-0) for new release of asterix
 *     4 Jul 94    V1.7-1  HRI quantum efficiency and vignetting (RJV)
 *    20 Nov 94    V1.7-2  HRI deadtime (RJV)
 *    15 Feb 95    V1.8-0  Option not to do exposure correction (RJV)
 *     9 Oct 95    V1.8-1  Fixed cock-up with effective exposure (RJV)
-*    11 Jan 1996 V1.8-2 Some ADI connversion (DJA)
-*    25 Mar 1998 V2.2-1 removed structures (rjv)
+*    11 Jan 96    V1.8-2  Some ADI connversion (DJA)
+*    25 Mar 98    V2.2-1  Removed structures (RJV)
+*     9 Feb 99    V2.3-0  FITS file input. (DGED)
 *
 *    Type Definitions :
       IMPLICIT NONE
@@ -255,7 +256,6 @@
         ENDIF
 
       ENDIF
-*
 *
 *    Get rootname of calibration files
       CALL USI_GET0C('RTNAME', CHEAD_RTNAME, STATUS)
@@ -519,8 +519,7 @@
         CALL ARR_INIT1D(1.0D0,NT,%val(DXPNTR),STATUS)
 
       ENDIF
-
-
+*
 * correct data array, variance and set quality bad if no
 * exposure in a given bin.
       CALL XRTCORR_DOIT( OFID,  NX, NY, NT, NP, NR, NWIRE,
@@ -641,8 +640,9 @@
 *     <declarations and descriptions for exported arguments>
 *    Status :
       INTEGER STATUS
-*    Function declarations :
-*     <declarations for function references>
+*    Functions :
+      INTEGER CHR_LEN
+         EXTERNAL CHR_LEN
 *    Local constants :
 *     <local constants defined by PARAMETER>
 *    Local variables :
@@ -652,6 +652,16 @@
       INTEGER SPTR,UPTR                  !Pointers to time arrays
       INTEGER NRAW
       DOUBLE PRECISION OVRLAP
+
+      CHARACTER*132 FILENAME              ! FITS file
+
+      INTEGER BLOCK
+      INTEGER IUNIT                       ! Logical I/O unit
+      INTEGER MAXRAW                      ! Max value
+        PARAMETER (MAXRAW = 500)
+*
+      CHARACTER*5 ORIGIN                  ! Origin of FITS file
+
 *    Local data :
 *     <any DATA initialisations for local variables>
 *-
@@ -664,8 +674,29 @@
 *
       ELSE
 *
-*          Read header infor from rationalised fits data
-         CALL RAT_GETXRTHEAD(CHEAD_RTNAME, STATUS)
+*  Append extension of FITS extension containing header
+         FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
+         CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
+*
+*  Open the FITS file
+         CALL FIO_GUNIT(IUNIT, STATUS)
+         CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+         IF ( STATUS .NE. SAI__OK ) THEN
+	    CALL MSG_SETC('FNAM',FILENAME)
+            CALL MSG_PRNT('XRTCORR : Error - opening file ^FNAM **')
+            GOTO 999
+         ENDIF
+*
+         ORIGIN = 'RDF'
+         CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+         CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+         IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+         CALL FTCLOS(IUNIT, STATUS)
+         CALL FIO_PUNIT(IUNIT, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -678,8 +709,8 @@
          CALL DYN_MAPD(1, CHEAD_NTRANGE(1)*2, UPTR, STATUS)
 *
          IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping dynamic memory')
-            GOTO 999
+              CALL MSG_PRNT('Error mapping dynamic memory')
+              GOTO 999
          ENDIF
 *
 *     Put SASS selection times into one array
@@ -758,70 +789,149 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER CHR_LEN
          EXTERNAL CHR_LEN
 *    Local variables :
-      CHARACTER*20 EXT              ! filename extension
-      CHARACTER*20 COL              ! HDS column/array name
-      CHARACTER*132 ERFILE          ! Eventrate HDS file
-      CHARACTER*(DAT__SZLOC) ERLOC,TLOC
-      CHARACTER*(DAT__SZLOC) ALOC1,ALOC2,ALOC3
-      INTEGER NTIMES                         !Number of els. in eventrate file
+      CHARACTER*132 FILENAME        ! FITS file
       INTEGER EV_TPNTR                       !Eventrate time array
       INTEGER EV1_PNTR,EV2_PNTR,EV3_PNTR     !Eventrate arrays
       INTEGER W1PNTR,W2PNTR,W3PNTR,W4PNTR    !Workspace pointers
-*-
 
-* Get data origin
-      CALL RAT_GETXRTHEAD(CHEAD_RTNAME,STATUS)
-* Open eventrate file
-      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME))//EXT
+      INTEGER                 BLOCK
+      INTEGER                 CTR               ! Counter
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
 *
-      CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+
+
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER COLNO                                ! Fits table, column no
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER FEOF                                 ! FITS end of file
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS            ! Fits header, no fields per rows
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+
+*-
+*  Append extension of FITS extension containing header
+      FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
 *
-* If file coundnt be opened set dead time correction to 1.0
+      CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTCORR : Error - opening file ^FNAM **')
+         GOTO 999
+      END IF
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
+*  Open housekeeping files
+*  Both the EVRATE and ASPECT tables are in _ANC.FITS
+      FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) //'_anc.fits'
+*
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
-*
-         CALL MSG_SETC('ERFILE', ERFILE)
-         CALL MSG_PRNT('Error opening eventrate file ^ERFILE ')
-*
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTCORR: Warning - cannot open file ^FNAM **')
+*  Don't exit
+*  If _anc file cannot be found set dead time correction to 1.0
       ELSE
 *
-*   Read eventrates as a function of time
-         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, TLOC, STATUS)
-         CALL DAT_SIZE(TLOC, NTIMES, STATUS)
+*  Locate eventrate data
+*  Move to FITS header.
+         NHDU = 1
+         FEOF = 0
+         CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*        Locate EVRATE table in FITS file.
+         DO WHILE (EXTNAME .NE. 'EVRATE' .AND. NHDU .NE. FEOF)
+            FEOF = NHDU
+*           Move to the next data unit.
+            CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*            Get the current hdu values
+            CALL FTGHDN(IUNIT,NHDU)
+*           If type is binary table get table details
+            IF (HTYPE .EQ. 2) THEN
+               CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
+            END IF
+         ENDDO
 *
-*   Map the time array
-         CALL DAT_MAPD(TLOC, 'READ', 1, NTIMES, EV_TPNTR, STATUS)
+         IF (NHDU .EQ. FEOF) THEN
+            CALL MSG_PRNT('XRTCORR : ERROR - failed to find '//
+     :      'EVRATE extension in FITS file')
+            STATUS = SAI__ERROR
+            GOTO 999
+         END IF
 *
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping eventrate TIME array')
+*  Find the NAMED column position in the EVRATE extension.
+*  Create array and read in selected column details
+         FBEG = 1
+         CTR = 0
+         DO COLNO = 1,TFIELDS
+            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+               CALL DYN_MAPD(1,NROWS,EV_TPNTR,STATUS)
+               CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :         %VAL(EV_TPNTR),ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'A2_AL') THEN
+               CALL DYN_MAPR(1,NROWS,EV1_PNTR,STATUS)
+               CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :         %VAL(EV1_PNTR),ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'XACC') THEN
+               CALL DYN_MAPR(1,NROWS,EV2_PNTR,STATUS)
+               CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :         %VAL(EV2_PNTR),ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'XTRANSM') THEN
+               CALL DYN_MAPR(1,NROWS,EV3_PNTR,STATUS)
+               CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :         %VAL(EV3_PNTR),ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+         END DO
+*
+*  Check that all the columns have been read
+         IF (CTR .NE. 4) THEN
+            CALL MSG_PRNT( 'XRTCORR : Error - reading eventrate file'
+     :      // ' columns')
+            GOTO 999
          ENDIF
 *
-*   Map the eventrates
-         CALL RAT_HDLOOKUP('EVRATE','A2_AL',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, ALOC1, STATUS)
-         CALL DAT_MAPR(ALOC1, 'READ', 1, NTIMES, EV1_PNTR, STATUS)
-*
-         CALL RAT_HDLOOKUP('EVRATE','XACC',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, ALOC2, STATUS)
-         CALL DAT_MAPR(ALOC2, 'READ', 1, NTIMES, EV2_PNTR, STATUS)
-*
-         CALL RAT_HDLOOKUP('EVRATE','XTRANSM',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, ALOC3, STATUS)
-         CALL DAT_MAPR(ALOC3, 'READ', 1, NTIMES, EV3_PNTR, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping eventrate AC_EV_RATE array')
-         ENDIF
-*
-*  Map two work arrays
+*  Map four work arrays
          CALL DYN_MAPR(1, NT, W1PNTR, STATUS)
          CALL DYN_MAPR(1, NT, W2PNTR, STATUS)
          CALL DYN_MAPR(1, NT, W3PNTR, STATUS)
          CALL DYN_MAPI(1, NT, W4PNTR, STATUS)
 *
 *  Calculate the correction for each time bin
-         CALL XRTCORR_DTIME_PSPC_DOIT( NTIMES, %val(EV_TPNTR),
+         CALL XRTCORR_DTIME_PSPC_DOIT( NROWS, %val(EV_TPNTR),
      &         %val(EV1_PNTR), %val(EV2_PNTR), %val(EV3_PNTR), NT,
      &         QUAL, %val(W1PNTR), %val(W2PNTR), %val(W3PNTR),
      &                                 %val(W4PNTR), DCORR, STATUS)
@@ -831,7 +941,7 @@ D            WRITE(3,*)EXPOS(TLP)
          CALL DYN_UNMAP(W3PNTR,STATUS)
          CALL DYN_UNMAP(W4PNTR,STATUS)
 
-      ENDIF
+      END IF
 *
       IF (STATUS .NE. SAI__OK) THEN
 *
@@ -839,7 +949,7 @@ D            WRITE(3,*)EXPOS(TLP)
 
          CALL ARR_INIT1R( 1.0, NT, DCORR, STATUS )
 *
-         CALL MSG_PRNT('not performing dead time correction')
+         CALL MSG_PRNT('Not performing dead time correction')
 *
          DFLAG=.FALSE.
 *
@@ -852,7 +962,8 @@ D            WRITE(3,*)EXPOS(TLP)
       ENDIF
 *
       END
-
+*
+*
 *+  XRTCORR_DTIME_PSPC_DOIT - Calcs. dead time correction for each time bin
       SUBROUTINE XRTCORR_DTIME_PSPC_DOIT(NTIMES,EVTIM,A1LL,AXE,
      &                                   AEXE,NT,QUAL,TOTA1LL,TOTAXE,
@@ -1042,74 +1153,159 @@ D            WRITE(3,*)EXPOS(TLP)
       INTEGER CHR_LEN
          EXTERNAL CHR_LEN
 *    Local variables :
-      CHARACTER*20 EXT              ! filename extension
-      CHARACTER*20 COL              ! HDS column/array name
-      CHARACTER*132 ERFILE          ! Eventrate HDS file
-      CHARACTER*(DAT__SZLOC) ERLOC,TLOC,PSLOC
-      INTEGER NTIMES                         !Number of els. in eventrate file
       INTEGER T_PNTR                         !Eventrate time array
       INTEGER PS_PNTR                        !Primary eventrate array
       INTEGER W1PNTR,W2PNTR                  !Workspace pointers
-*-
 
-* Get data origin
-      CALL RAT_GETXRTHEAD(CHEAD_RTNAME,STATUS)
-* Open eventrate file
-      CALL RAT_HDLOOKUP('EVRATE','EXTNAME',EXT,STATUS)
-      ERFILE = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME))//EXT
+      INTEGER                 BLOCK
+      INTEGER                 CTR               ! Counter
+      INTEGER                 IUNIT             ! Logical I/O unit
+      INTEGER                 MAXRAW            ! Max value
+        PARAMETER (MAXRAW = 500)
 *
-      CALL HDS_OPEN(ERFILE, 'READ', ERLOC, STATUS)
+      CHARACTER*5             ORIGIN            ! Origin of FITS file
+
+      INTEGER CN                 ! Notes column number in table
+      INTEGER ANYF               ! Notes undefined array elements
+      INTEGER COLNO                                ! Fits table, column no
+      INTEGER FBEG                                 ! Fits table, start
+      INTEGER FEOF                                 ! FITS end of file
+      INTEGER HTYPE                                ! Fits header, style
+      INTEGER MXCOL                                ! Max number of columns
+        PARAMETER (MXCOL = 512)
+      INTEGER NROWS                                ! Fits table, no of rows
+      INTEGER NHDU                                 ! Fits header, unit
+      INTEGER VARIDAT                              ! Fitsio variable
+      INTEGER TFIELDS            ! Fits header, no fields per rows
+
+      CHARACTER*20  EXTNAME                         ! File extension name
+      CHARACTER*132 FILENAME
+      CHARACTER*12  TTYPE(MXCOL)                    ! Fits header, col name
+      CHARACTER*40  TFORM(MXCOL)                    ! Fits header, var type
+      CHARACTER*40  TUNIT(MXCOL)  ! Fits header, unit of measurement
+
+*-
+*  Append extension of FITS extension containing header
+      FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) // '_bas.fits'
 *
-* If file coundnt be opened set dead time correction to 1.0
+      CALL MSG_PRNT('XRTCORR : Using FITS file : '// FILENAME)
+*
+*  Open the FITS header file
+      CALL FIO_GUNIT(IUNIT, STATUS)
+      CALL FTOPEN(IUNIT, FILENAME, 0, BLOCK, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTCORR : Error - opening file ^FNAM **')
+*  File must exist
+         GOTO 999
+      END IF
+*
+      ORIGIN = 'RDF'
+      CALL USI_PUT0C('ORIGIN', ORIGIN, STATUS)
+*  Read in FITS header
+      CALL RAT_RDHEAD(IUNIT, ORIGIN, STATUS)
+*
+      IF ( STATUS .NE. SAI__OK ) GOTO 999
+*
+*  Close FITS files
+      CALL FTCLOS(IUNIT, STATUS)
+      CALL FIO_PUNIT(IUNIT, STATUS)
+*
+*  Open housekeeping tables
+*  Both the EVRATE and ASPECT tables are in _ANC.FITS
+      FILENAME = CHEAD_RTNAME(1:CHR_LEN(CHEAD_RTNAME)) //'_anc.fits'
+
+*  Open the FITS file
+      CALL FIO_GUNIT(IUNIT,STATUS)
+      CALL FTOPEN(IUNIT,FILENAME,0,BLOCK,STATUS)
       IF (STATUS .NE. SAI__OK) THEN
-*
-         CALL MSG_SETC('ERFILE', ERFILE)
-         CALL MSG_PRNT('Error opening eventrate file ^ERFILE ')
-*
+	 CALL MSG_SETC('FNAM',FILENAME)
+         CALL MSG_PRNT('XRTCORR: Warning - cannot open file ^FNAM **')
+*  Don't exit
+*  If _anc file cannot be found set dead time correction to 1.0
       ELSE
 *
-*   Read eventrates as a function of time
-         CALL RAT_HDLOOKUP('EVRATE','TIME',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, TLOC, STATUS)
-         CALL DAT_SIZE(TLOC, NTIMES, STATUS)
+*  Locate eventrate data
+*  Move to FITS header.
+         NHDU = 1
+         FEOF = 0
+         CALL FTMAHD(IUNIT, 1, HTYPE, STATUS)
+*        Locate EVRATE table in FITS file.
+         DO WHILE (EXTNAME .NE. 'EVRATE' .AND. NHDU .NE. FEOF)
+            FEOF = NHDU
+*           Move to the next data unit.
+            CALL FTMRHD(IUNIT,1,HTYPE,STATUS)
+*           Get the current hdu values
+            CALL FTGHDN(IUNIT,NHDU)
+*           If type is binary table get table details
+            IF (HTYPE .EQ. 2) THEN
+               CALL FTGBNH(IUNIT, NROWS, TFIELDS, TTYPE, TFORM,
+     :         TUNIT, EXTNAME, VARIDAT, STATUS)
+            END IF
+         ENDDO
 *
-*   Map the time array
-         CALL DAT_MAPD(TLOC, 'READ', 1, NTIMES, T_PNTR, STATUS)
-*
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping eventrate TIME array')
-         ENDIF
-*
-*   Map the eventrates
-         CALL RAT_HDLOOKUP('EVRATE','PS_VALID',COL,STATUS)
-         CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-           STATUS = SAI__OK
-           CALL RAT_HDLOOKUP('EVRATE','ACCEPTED',COL,STATUS)
-           CALL DAT_FIND(ERLOC, COL, PSLOC, STATUS)
+         IF (NHDU .EQ. FEOF) THEN
+            CALL MSG_PRNT('XRTCORR : Error - failed to find '//
+     :      'EVRATE extension in FITS file')
+            STATUS = SAI__ERROR
+            GOTO 999
          END IF
-         CALL DAT_MAPR(PSLOC, 'READ', 1, NTIMES, PS_PNTR, STATUS)
 *
+*  Find the NAMED column position in the EVRATE extension.
+*  Create array and read in selected column details.
+         FBEG = 1
+         CTR = 0
+         CN = 0
+         DO COLNO = 1,TFIELDS
+            IF (TTYPE(COLNO) .EQ. 'TIME') THEN
+               CALL DYN_MAPD(1,NROWS,T_PNTR,STATUS)
+               CALL FTGCVD(IUNIT, COLNO, FBEG, 1, NROWS, 0.D0,
+     :         %VAL(T_PNTR),ANYF,STATUS)
+               CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'SECONDARY') THEN
+               CALL DYN_MAPR(1,NROWS,PS_PNTR,STATUS)
+               CALL FTGCVE(IUNIT, COLNO, FBEG, 1, NROWS, 0,
+     :         %VAL(PS_PNTR),ANYF,STATUS)
+                CTR = CTR + 1
+            END IF
+            IF (TTYPE(COLNO) .EQ. 'ACCEPTED') CN = COLNO
+         END DO
 *
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL MSG_PRNT('Error mapping eventrate  array')
+* Use 'ACCEPTED' parameter where 'SECONDARY' parameter not found
+         IF ( CTR .EQ. 1 .AND. CN .GT. 0)  THEN
+            CALL DYN_MAPR(1,NROWS,PS_PNTR,STATUS)
+            CALL FTGCVE(IUNIT, CN, FBEG, 1, NROWS, 0,
+     :      %VAL(PS_PNTR),ANYF,STATUS)
+            CTR = CTR + 1
+         END IF
+*
+*  Check that both the columns have been read
+         IF (CTR .NE. 2) THEN
+            CALL MSG_PRNT( 'XRTCORR : Error - reading eventrate file'
+     :      // ' column')
+            GOTO 999
          ENDIF
 *
 *  Map two work arrays
          CALL DYN_MAPR(1, NT, W1PNTR, STATUS)
          CALL DYN_MAPI(1, NT, W2PNTR, STATUS)
 *
-*
 *  Calculate the correction for each time bin
-         CALL XRTCORR_DTIME_HRI_DOIT( NTIMES, %val(T_PNTR),
-     &         %val(PS_PNTR), NT,QUAL,%val(W1PNTR),%val(W2PNTR),
+         CALL XRTCORR_DTIME_HRI_DOIT( NROWS, %val(T_PNTR),
+     &   %val(PS_PNTR), NT,QUAL,%val(W1PNTR),%val(W2PNTR),
      &                                              DCORR,STATUS)
 *
          CALL DYN_UNMAP(W1PNTR,STATUS)
          CALL DYN_UNMAP(W2PNTR,STATUS)
 
-      ENDIF
+*  Close FITS files
+         CALL FTCLOS(IUNIT, STATUS)
+         CALL FIO_PUNIT(IUNIT, STATUS)
 *
+      END IF
+*
+*  If _anc file cannot be found set dead time correction to 1.0
       IF (STATUS .NE. SAI__OK) THEN
 *
          STATUS=SAI__OK
@@ -1129,9 +1325,8 @@ D            WRITE(3,*)EXPOS(TLP)
       ENDIF
 *
       END
-
-
-
+*
+*
 *+  XRTCORR_DTIME_HRI_DOIT - Calcs. dead time correction for each time bin
       SUBROUTINE XRTCORR_DTIME_HRI_DOIT(NTIMES,EVTIM,RATE,
      &                                      NT,QUAL,TOTAL,COUNT,
@@ -1261,10 +1456,8 @@ D            WRITE(3,*)EXPOS(TLP)
       ENDIF
 *
       END
-
-
-
-
+*
+*
 *+ XRTCORR_ENCORR - Writes energy dependent correction factors into file
       SUBROUTINE XRTCORR_ENCORR( OFID, NENERGY, NR, RVCORR, PCORR,
      &                                               TOT_EN, STATUS)
