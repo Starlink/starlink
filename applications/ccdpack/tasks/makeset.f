@@ -651,11 +651,11 @@
                   CALL CHR_RMBLK( SECTS( I ) )
                END IF
                SECTS( I ) = '(' // SECTS( I )( 1:CHR_LEN( SECTS( I ) ) )
-     :                      // ')'
+     :                   // ')'
             END DO
 
 *  If the SECTIONS parameter has not been supplied, construct NDF
-*  section specifiers from the conventence XSTART and YSTART
+*  section specifiers from the convenience XSTART and YSTART
 *  parameters instead.
          ELSE IF ( STATUS .EQ. PAR__NULL ) THEN
 
@@ -911,14 +911,14 @@
       LINE( 2: ) = 'Set name'
       LINE( 12: ) = 'Set index'
       LINE( 24: ) = 'NDF name'
-      IF ( ADDWCS ) THEN
+      IF ( ADDWCS .OR. MODE .EQ. 'SPLIT' ) THEN
          LINE( 60: ) = 'CCD_SET domain'
       END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
       LINE( 2: ) = '--------'
       LINE( 12: ) = '---------'
       LINE( 24: ) = '--------'
-      IF ( ADDWCS ) THEN
+      IF ( ADDWCS .OR. MODE .EQ. 'SPLIT' ) THEN
          LINE( 60: ) = '--------------'
       END IF
       CALL CCD1_MSG( ' ', LINE, STATUS )
