@@ -85,4 +85,5 @@ gurec.f guwk.f gwitm.f
 # require CPP processing and configure checks
 
 FPP_ROUTINES = gkdate.fpp gkdfop.fpp gkiobi.fpp gkiobo.fpp \
-	gkioci.fpp gkioco.fpp gkiofo.fpp gklor.fpp gkland.fpp
+	gkioci.fpp gkioco.fpp gkiofo.fpp gklor.fpp gkland.fpp \
+	gktime.fpp

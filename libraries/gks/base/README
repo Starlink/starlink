@@ -77,3 +77,6 @@ Files also added from the machine specific system directories:
   gkna1.f    - no system specific code
   ggkntoa.f  - no system specific code
   lnblnk.f   - no system specific code
+
+  gktime.fpp - Use ITIME built in. RS6000 does not allow this.
+               Cray uses CLOCK builtin
