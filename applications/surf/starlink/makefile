@@ -447,7 +447,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.0-0
+PKG_VERS = 1.0-1
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -473,7 +473,7 @@ PUBLIC_SCRIPTS = scuquick qdraw sigclip sdip.csh scupa.csh $(SCULOG)
 # out what to do. This is better than duplicating code.
 
 
-SCULOG_SCRIPTS = photsum mapsum pointsum
+SCULOG_SCRIPTS = photsum mapsum pointsum skysum
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 
