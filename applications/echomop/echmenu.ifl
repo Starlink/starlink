@@ -1514,4 +1514,10 @@
         help        '%ECHOMOP_HELP: USER_PAR W_NPOLY'
     endparameter
 
+    parameter VERSION
+        type        '_LOGICAL'
+	default     NO
+	vpath       'default'
+    endparameter
+
   endinterface
