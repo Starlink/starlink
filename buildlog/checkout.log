@@ -5109,6 +5109,7 @@ U java/source/fits/src/main/uk/ac/starlink/fits/FitsConstants.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsNdxHandler.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsStarTable.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsTableBuilder.java
+U java/source/fits/src/main/uk/ac/starlink/fits/FitsTableWriter.java
 U java/source/fits/src/main/uk/ac/starlink/fits/FitsURL.java
 U java/source/fits/src/main/uk/ac/starlink/fits/MappedFile.java
 U java/source/fits/src/main/uk/ac/starlink/fits/ReadableFitsArrayImpl.java
@@ -5329,8 +5330,7 @@ cvs checkout: Updating java/source/hdx/src/main/uk
 cvs checkout: Updating java/source/hdx/src/main/uk/ac
 cvs checkout: Updating java/source/hdx/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/hdx/src/main/uk/ac/starlink/hdx
-U java/source/hdx/src/main/uk/ac/starlink/hdx/AbstractDOMFacade.java
-U java/source/hdx/src/main/uk/ac/starlink/hdx/DOMFacade.java
+U java/source/hdx/src/main/uk/ac/starlink/hdx/AbstractHdxFacade.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/DomHdxContainer.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/ElementValidator.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxContainer.java
@@ -5339,6 +5339,7 @@ U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocument.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxDocumentFactory.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxElement.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxException.java
+U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFacade.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxFactory.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxNode.java
 U java/source/hdx/src/main/uk/ac/starlink/hdx/HdxProperties.java
@@ -5375,6 +5376,12 @@ cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx
 U java/source/hdx/src/testcases/uk/ac/starlink/hdx/HdxTest.java
 U java/source/hdx/src/testcases/uk/ac/starlink/hdx/ResourceTypeTest.java
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/embedded.xml
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/embedded.xml-correct
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/no-ns.xml
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/no-ns.xml-correct
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/redefining.xml
+U java/source/hdx/src/testcases/uk/ac/starlink/hdx/redefining.xml-correct
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/extension
 U java/source/hdx/src/testcases/uk/ac/starlink/hdx/extension/SimpleWeather.java
 cvs checkout: Updating java/source/hdx/src/testcases/uk/ac/starlink/hdx/jai
@@ -7362,6 +7369,7 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/SwingAuthenticator.java
 U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/BasicAction.java
 U java/source/table/src/main/uk/ac/starlink/table/view/BitsRowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnDialog.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
@@ -7381,7 +7389,6 @@ U java/source/table/src/main/uk/ac/starlink/table/view/SyntheticRowSubset.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableColumnModelAdapter.java
 U java/source/table/src/main/uk/ac/starlink/table/view/TableViewer.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ViewerTableModel.java
-U java/source/table/src/main/uk/ac/starlink/table/view/WindowTracker.java
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk
 cvs checkout: Updating java/source/table/src/resources/uk/ac
@@ -7749,6 +7756,7 @@ U java/source/util/src/main/uk/ac/starlink/util/FileDataSource.java
 U java/source/util/src/main/uk/ac/starlink/util/GenericNioBuffer.java
 U java/source/util/src/main/uk/ac/starlink/util/Loader.java
 U java/source/util/src/main/uk/ac/starlink/util/MapGroup.java
+U java/source/util/src/main/uk/ac/starlink/util/NodeDescendants.java
 U java/source/util/src/main/uk/ac/starlink/util/PrimitiveXMLEncodeAndDecode.java
 U java/source/util/src/main/uk/ac/starlink/util/SourceReader.java
 U java/source/util/src/main/uk/ac/starlink/util/TestCase.java
@@ -7766,6 +7774,7 @@ cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink
 cvs checkout: Updating java/source/util/src/testcases/uk/ac/starlink/util
 U java/source/util/src/testcases/uk/ac/starlink/util/DOMUtilsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/DataSourceTest.java
+U java/source/util/src/testcases/uk/ac/starlink/util/NodeDescendantsTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/SourceReaderTest.java
 U java/source/util/src/testcases/uk/ac/starlink/util/XMLUtilTest.java
 cvs checkout: Updating java/source/votable
