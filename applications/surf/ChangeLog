@@ -1,3 +1,20 @@
+
+2004-08-31  Tim Jenness  <timj@jach.hawaii.edu>
+	
+	* Use CNF_PVAL throughout. Needed for 64bit.
+
+2004-07-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* src/surf_scuhelp.f: Switch to using SHL library
+	
+2004-07-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf.ifd: Switch to using IFD files for build
+	
+2004-07-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Start autoconf work
+	
 2003-04-07  Tim Jenness  <timj@jach.hawaii.edu>
 
 	************* V1.6-11 ****************
