@@ -91,7 +91,6 @@ itcl::class gaia::GaiaPhotomDetails {
       #  Create the widgets for display the values of the type of
       #  photometry object that we have.
       add_controls_
-
    }
 
    #  Destructor:
@@ -142,7 +141,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 0.25 \
             -to $itk_option(-maxsemimajor) \
             -increment 1 \
-            -resolution 0.25 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -anchor w \
             -command [code $this configure -semimajor]
@@ -190,7 +189,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -to 20.0 \
             -increment 0.1 \
             -show_arrows 1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -value $itk_option(-innerscale) \
             -anchor w \
             -command [code $this configure -innerscale]
@@ -205,7 +204,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 1.5 \
             -to 20.5 \
             -increment 0.1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -value $itk_option(-outerscale) \
             -anchor w \
@@ -309,7 +308,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -to 20.0 \
             -increment 0.1 \
             -show_arrows 1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -value $itk_option(-innerscale) \
             -anchor w \
             -command [code $this configure -innerscale]
@@ -324,7 +323,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 1.5 \
             -to 20.5 \
             -increment 0.1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -value $itk_option(-outerscale) \
             -anchor w \
@@ -419,7 +418,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 0.25 \
             -to $itk_option(-maxsemimajor) \
             -increment 0.1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -anchor w \
             -command [code $this configure -semimajor]
@@ -435,7 +434,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 0.1 \
             -to [expr $itk_option(-maxsemimajor)*0.1] \
             -increment 0.1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -anchor w \
             -command [code $this configure -seeing]
@@ -451,7 +450,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -to 20.0 \
             -increment 0.1 \
             -show_arrows 1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -value $itk_option(-innerscale) \
             -anchor w \
             -command [code $this configure -innerscale]
@@ -466,7 +465,7 @@ itcl::class gaia::GaiaPhotomDetails {
             -from 1.5 \
             -to 20.5 \
             -increment 0.1 \
-            -resolution 0.1 \
+            -resolution 0.01 \
             -show_arrows 1 \
             -value $itk_option(-outerscale) \
             -anchor w \
