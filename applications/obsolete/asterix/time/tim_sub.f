@@ -170,10 +170,9 @@
 *  QUALITY
         CALL DYN_MAPB(1,T_NVAL,T_QPTR,STATUS)
         IF ( T_QOK ) THEN
-          CALL BDI_GET( FID, 'Quality', 'UBYTE', 1, T_NVAL,
-     :                  %VAL(T_QPTR), NVAL, STATUS )
-          CALL BDI_GET( FID, 'QualityMask', 'UBYTE', 0, 0, T_MASK,
-     :                  NVAL, STATUS )
+          CALL BDI_GET1UB( FID, 'Quality', T_NVAL,
+     :                     %VAL(T_QPTR), NVAL, STATUS )
+          CALL BDI_GET0UB( FID, 'QualityMask', T_MASK, STATUS )
         ELSE
           CALL ARR_INIT1B(QUAL__GOOD,T_NVAL,%VAL(T_QPTR),STATUS)
           T_MASK=QUAL__MASK
@@ -791,9 +790,8 @@
 
 *  quality
       IF (T_QOK) THEN
-        CALL BDI_PUT( FID, 'Quality', 'UBYTE', 1, T_NVAL,
-     :                %VAL(T_QPTR), STATUS )
-        CALL BDI_PUT( FID, 'QualityMask', 0, 0, T_MASK, STATUS )
+        CALL BDI_PUT1UB( FID, 'Quality', T_NVAL, %VAL(T_QPTR), STATUS )
+        CALL BDI_PUT0UB( FID, 'QualityMask', T_MASK, STATUS )
       ENDIF
 
 *  axis values
@@ -877,8 +875,8 @@
 
 *  quality
       IF (T_QOK) THEN
-        CALL BDI_MAP( FID, 'Quality', 'UBYTE', 'WRITE', QPTR, STATUS )
-        CALL BDI_PUT( FID, 'QualityMask', 0, 0, T_MASK, STATUS )
+        CALL BDI_MAPUB( FID, 'Quality', 'WRITE', QPTR, STATUS )
+        CALL BDI_PUT0UB( FID, 'QualityMask', T_MASK, STATUS )
       ENDIF
 
 *  axis values

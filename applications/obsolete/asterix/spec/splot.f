@@ -207,7 +207,6 @@
       REAL 			Z			! Redshift [ Eobs/Esource=1/(1+z) ]
 
       INTEGER			IERR			! First VEC_ error
-      INTEGER			IDUM			! Dummy from BDI_GET
       INTEGER			IFID			! Input dataset id
       INTEGER 			IG			! Current graph number
       INTEGER 			IP			! Current plot number
@@ -508,13 +507,11 @@
 
 *      Copy data quality if present
           IF ( QOK ) THEN
-            CALL BDI_MAP( DSID, 'Quality', 'UBYTE', 'READ', QPTR,
-     :                    STATUS )
+            CALL BDI_MAPUB( DSID, 'Quality', 'READ', QPTR, STATUS )
             CALL DYN_MAPB( 1, NEL, DQPTR, STATUS )
             CALL ARR_SLCOPB( OBDAT(N).NDIM, OBDAT(N).IDIM, %VAL(QPTR),
      :                       LDIM, UDIM, %VAL(DQPTR), STATUS )
-            CALL BDI_GET( DSID, 'QualityMask', 'UBYTE', 0, 0, MASK,
-     :                    IDUM, STATUS )
+            CALL BDI_GET0UB( DSID, 'QualityMask', MASK, STATUS )
           ELSE
             DQPTR = 0
           END IF
@@ -2707,9 +2704,8 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
 
 *  Graph quality
       IF ( QPTR .NE. 0 ) THEN
-        CALL BDI_PUT( GFID, 'Quality', 'UBYTE', 1, NDAT, %VAL(QPTR),
-     :                STATUS )
-        CALL BDI_PUT( GFID, 'QualityMask', 'UBYTE', 0, 0, MASK, STATUS )
+        CALL BDI_PUT1UB( GFID, 'Quality', NDAT, %VAL(QPTR), STATUS )
+        CALL BDI_PUT0UB( GFID, 'QualityMask', MASK, STATUS )
       END IF
 
 *  Axis info

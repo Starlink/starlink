@@ -45,7 +45,7 @@
       INTEGER DPTRO	              ! data
       INTEGER QPTRO	              ! quality
       INTEGER VPTRO	              ! data VARIANCE
-      INTEGER I,J,IMASK
+      INTEGER I,J
 
       INTEGER			BID			! New binned object
       INTEGER			IFID			! Input dataset id
@@ -107,9 +107,8 @@
 *  Map QUALITY if present
       CALL BDI_CHK(IFID,'Quality',QOK,STATUS)
       IF (QOK) THEN
-        CALL BDI_MAP(IFID,'Quality','UBYTE','READ',QPTR,STATUS)
-        CALL BDI_GET0I(IFID,'QualityMask',IMASK,STATUS)
-        MASK=IMASK
+        CALL BDI_MAPUB(IFID,'Quality','READ',QPTR,STATUS)
+        CALL BDI_GET0UB(IFID,'QualityMask',MASK,STATUS)
       ENDIF
 
 *  Map VARIANCE if present
@@ -142,8 +141,8 @@
 
 * QUALITY
       IF ( QOK ) THEN
-        CALL BDI_MAP( OFID,'Quality','UBYTE','WRITE',QPTRO,STATUS)
-        CALL BDI_PUT( OFID,'QualityMask','UBYTE',0,0,MASK,STATUS)
+        CALL BDI_MAPUB( OFID,'Quality','WRITE',QPTRO,STATUS)
+        CALL BDI_PUT0UB( OFID,'QualityMask',MASK,STATUS)
       ENDIF
 
 *  Variance if required

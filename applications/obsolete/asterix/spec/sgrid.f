@@ -690,10 +690,9 @@
 
 *    Write quality to each grid
         DO I = 1, NGRID
-          CALL BDI_PUT( GFID(I), 'Quality', 'UBYTE', NGRIDAX, GDIMS,
-     :                %VAL(GQPTR), STATUS )
-          CALL BDI_PUT( GFID(I), 'QualityMask', 'UBYTE', 0, 0, GQMASK,
-     :                STATUS )
+          CALL BDI_PUTUB( GFID(I), 'Quality', NGRIDAX, GDIMS,
+     :                    %VAL(GQPTR), STATUS )
+          CALL BDI_PUT0UB( GFID(I), 'QualityMask', GQMASK, STATUS )
         END DO
 
       END IF

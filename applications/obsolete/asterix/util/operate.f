@@ -161,7 +161,6 @@
 
       INTEGER                	DPTR                  ! Output data array
       INTEGER			IFID		      ! Input dataset id
-      INTEGER			IMASK			! Quality mask
       INTEGER                   LEVELS                ! Levels of input
       INTEGER                   LEVELSO               ! Levels of Output
       INTEGER			NBAD			! New bad points
@@ -204,8 +203,7 @@
       CALL USI_NAMEI( LEVELS, FILE, STATUS )
 
 *  Is input a structured data object?
-      CALL ADI_DERVD( OFID, 'BinDS', PRIM, STATUS )
-      PRIM = (.NOT. PRIM)
+      CALL ADI_DERVD( OFID, 'Array', PRIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Map the data
@@ -244,16 +242,12 @@
 *    And quality
         CALL BDI_CHK( OFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'UPDATE', QPTR,
-     :                  STATUS )
-          CALL BDI_GET0I( OFID, 'QualityMask', IMASK, STATUS )
-          MASK = IMASK
-
+          CALL BDI_MAPUB( OFID, 'Quality', 'UPDATE', QPTR, STATUS )
+          CALL BDI_GET0UB( OFID, 'QualityMask', MASK, STATUS )
         ELSE
           CALL DYN_MAPB( 1, NELM, QPTR, STATUS )
           CALL ARR_INIT1B( QUAL__GOOD, NELM, %VAL(QPTR), STATUS )
           MASK = QUAL__MASK
-          IMASK = MASK
         END IF
 
       END IF
@@ -326,9 +320,9 @@
 
 *  Write quality if new bad points, and it didn't exist in input
       IF ( (NBAD.GT.0) .AND. .NOT. QOK ) THEN
-        CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
+        CALL BDI_MAPUB( OFID, 'Quality', 'WRITE', OQPTR, STATUS )
         CALL ARR_COP1B( NELM, %VAL(QPTR), %VAL(OQPTR), STATUS )
-        CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, MASK, STATUS )
+        CALL BDI_PUT0UB( OFID, 'QualityMask', MASK, STATUS )
       END IF
 
 *  Amend data label if present

@@ -126,7 +126,6 @@
       REAL 			SUM			! Data sum
       REAL 			MINVAL			! Min bin value
 
-      INTEGER			IDUM			! Dummy to BDI_GET
       INTEGER			IFID			! Input dataset id
       INTEGER 			NDIM,DIMS(ADI__MXDIM)	! I/p dimensions
       INTEGER 			INVAL,ONVAL		! I/p & o/p sizes
@@ -173,9 +172,8 @@
 *    Get total counts taking account of any QUALITY
         CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
         IF ( QOK ) THEN
-          CALL BDI_MAP( IFID, 'Data', 'UBYTE', 'READ', IQPTR, STATUS )
-          CALL BDI_GET( IFID, 'QualityMask', 'UBYTE', 0, 0, MASK,
-     :                  IDUM, STATUS )
+          CALL BDI_MAPUB( IFID, 'Data', 'READ', IQPTR, STATUS )
+          CALL BDI_GET0UB( IFID, 'QualityMask', MASK, STATUS )
           CALL ARR_SUM1RQ( INVAL, %VAL(IDPTR), %VAL(IQPTR), MASK, SUM,
      :                     STATUS )
         ELSE
