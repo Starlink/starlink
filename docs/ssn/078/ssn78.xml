@@ -4551,7 +4551,7 @@ file.f: file.$(FPP_SRC_EXT)
             results in the symbols restFP and saveFP being undefined
             at link time.  There's a shortage of authoritative
             explanations, but
-            <webref>http://www.ccp4.ac.uk/problems/mac_4_2.html#29</webref>
+            <webref url="http://www.ccp4.ac.uk/problems/mac_4_2.html#29"/>
             gives at least one resolution.  It's not clear (to Norman)
             what the real cause of this is, but it apparently doesn't
             affect OSX versions before 10.3, and will presumably be
