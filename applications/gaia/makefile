@@ -720,7 +720,7 @@ $(SKYCAT_FILES): .skycat.built
 	cp -p ./built/bin/rtdCubeDisplay .
 	cp -p ./built/include/rtd/config.h rtdConfig.h
 	cp -p ./built/include/rtd/rtdImageEvent.h .
-	cp -p ./built/lib/rtdImgEvt.a .
+	cp -p ./built/lib/librtdImgEvt.a .
 	touch .skycat.built
 
 #  Names of any object libraries that are required for using the
