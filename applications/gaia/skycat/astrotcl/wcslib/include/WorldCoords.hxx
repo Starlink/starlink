@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: WorldCoords.h,v 1.1 1997/11/28 01:32:54 abrighto Exp $
+ * $Id$
  *
  * WorldCoords.h - class representing world coordinates 
  *                 (right-ascension, declination, stored as J2000 internally)
