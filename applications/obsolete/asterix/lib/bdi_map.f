@@ -114,6 +114,7 @@
 
 *  Local Variables:
       CHARACTER*20		LITEM			! Local item name
+      CHARACTER*6               LMODE			! Local copy of mode
       CHARACTER*7 		LTYPE			! Local copy of type
 
       INTEGER			ARGS(5)			! Function args
@@ -142,7 +143,9 @@
       CALL ADI_NEWV0C( LTYPE, ARGS(4), STATUS )
 
 *  Fifth is the mapping mode
-      CALL ADI_NEWV0C( MODE, ARGS(5), STATUS )
+      LMODE = MODE
+      CALL CHR_UCASE( LMODE )
+      CALL ADI_NEWV0C( LMODE, ARGS(5), STATUS )
 
 *  Loop over items while more of them and status is ok
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )

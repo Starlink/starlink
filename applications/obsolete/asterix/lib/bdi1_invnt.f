@@ -379,14 +379,14 @@
      :                    NELM, STATUS )
 
 *    Widths present?
-        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Data',
-     :                   .FALSE., WLOC, NDIM, DIMS, STATUS )
+        CALL BDI1_CFIND( BDID, HFID, ITEM(1:7)//'Width',
+     :                   .FALSE., WLOC, TNDIM, TDIMS, STATUS )
         IF ( WLOC .NE. DAT__NOLOC ) THEN
 
           CALL BDI0_LOCPST( BDID, ITEM(1:7)//'Width', .TRUE., WPSID,
      :                      STATUS )
 
-          CALL BDI1_ARYMAP( CLOC, 'REAL', 'READ', NDIM, DIMS, WPSID,
+          CALL BDI1_ARYMAP( WLOC, 'REAL', 'READ', NDIM, DIMS, WPSID,
      :                      PTR2, NELM, STATUS )
 
         ELSE
@@ -403,7 +403,7 @@
         CALL ADI_MAPR( ITID, 'WRITE', WPTR, STATUS )
 
 *    Convert to bounds
-        CALL BDI1_INVNT_VW2B( DIMS(1), %VAL(PTR), (PTR2.NE.0),
+        CALL BDI1_INVNT_VW2B( DIMS(2), %VAL(PTR), (PTR2.NE.0),
      :                        %VAL(PTR2), %VAL(WPTR), STATUS )
 
 *    Free mapped file data and mapped item
@@ -580,6 +580,7 @@
 
 *  Local Variables:
       REAL			DIR			! Sign of axis increase
+      REAL			HWID			! Bin half width
 
       INTEGER			I			! Loop over values
 *.
