@@ -1506,7 +1506,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
      :                     %VAL(QPTR), STATUS )
           CALL BDI_UNMAP(ID,'Quality',QPTR,STATUS)
           IMASK = I_MASK
-          CALL BDI_PUT0I( OFID, 'QualityMask', IMASK, STATUS )
+          CALL BDI_PUT0I( ID, 'QualityMask', IMASK, STATUS )
         ENDIF
 
 *  axis values
@@ -1598,7 +1598,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         CALL BDI_PUT( ID, 'Quality', 'UBYTE', 1, NVAL,
      :                         %VAL(I_QPTR_1D), STATUS)
         IMASK = I_MASK
-        CALL BDI_PUT0I( OFID, 'QualityMask', IMASK, STATUS )
+        CALL BDI_PUT0I( ID, 'QualityMask', IMASK, STATUS )
 
 *  axis values
         SPARR(1) = I_XBASE_1D
