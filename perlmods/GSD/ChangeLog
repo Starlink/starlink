@@ -1,0 +1,9 @@
+2000-05-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* GSD.pm: Add perl level gsdClose
+
+	* GSD.xs: - Now use T_PTROBJ so that file_dsc, item_dsc and
+	data_ptr are type checked in each command.
+	- gsdInqSize now tidied up to avoid mallocs
+        - now use PREINIT blocks rather than static
+        - use gsd_data type for data_ptr.
