@@ -160,6 +160,8 @@
 *        unnecessary digits being displayed by programs such as GDSTATE.
 *     4-DEC-2001 (DSB):
 *        Added NDC Frame.
+*     21-FEB-2002 (DSB):
+*        Always replace any existing fixed Frames with new ones.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -346,62 +348,60 @@
 *  has a length of 1.0. This Frame is given the Domain BASEPIC.
 *  ====================================================================
 
-*  See if the Plot already contains a BASEPIC Frame.
+*  See if the Plot already contains a BASEPIC Frame. If so, delete it.
       CALL KPG1_ASFFR( IPLOT, 'BASEPIC', IBPIC, STATUS )
-
-*  If not, add one into the Plot now.
-      IF( IBPIC .EQ. AST__NOFRAME ) THEN
-
+      IF( IBPIC .NE. AST__NOFRAME ) CALL AST_REMOVEFRAME( IPLOT, IBPIC,
+     :                                                    STATUS )
+ 
+*  Now add a new one into the Plot now.
 *  Get the bounds of the entire view surface in millimetres.
-         CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+      CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
 
 *  Store these as the GRAPHICS co-ordinates.
-         INA( 1 ) = DBLE( BX( 1 ) )
-         INA( 2 ) = DBLE( BX( 2 ) )
-         INB( 1 ) = DBLE( BX( 3 ) )
-         INB( 2 ) = DBLE( BX( 4 ) )
+      INA( 1 ) = DBLE( BX( 1 ) )
+      INA( 2 ) = DBLE( BX( 2 ) )
+      INB( 1 ) = DBLE( BX( 3 ) )
+      INB( 2 ) = DBLE( BX( 4 ) )
 
 *  We now find the bounds of the view surface in BASEPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
-     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
-            OUTA( 1 ) = 0.0D0
-            OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
-     :                        ABS( BX( 4 ) - BX( 2 ) ) )
-            OUTB( 2 ) = 1.0D0
-         ELSE
-            OUTA( 1 ) = 0.0D0
-            OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
-     :                        ABS( BX( 3 ) - BX( 1 ) ) )
-         END IF
+      IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :    ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+         OUTA( 1 ) = 0.0D0
+         OUTA( 2 ) = 0.0D0
+         OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                     ABS( BX( 4 ) - BX( 2 ) ) )
+         OUTB( 2 ) = 1.0D0
+      ELSE
+         OUTA( 1 ) = 0.0D0
+         OUTA( 2 ) = 0.0D0
+         OUTB( 1 ) = 1.0D0
+         OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                     ABS( BX( 3 ) - BX( 1 ) ) )
+      END IF
 
 *  Create a WinMap which scales millimetres into BASE_WORLD co-ordinates.
-         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+      WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Create the BASEPIC Frame.
-         BPIC = AST_FRAME( 2, 'DOMAIN=BASEPIC,TITLE=Normalised world '//
-     :                     'co-ordinates in the AGI BASE picture.,'//
-     :                     'Symbol(1)=X,Symbol(2)=Y,'//
-     :                     'Label(1)=Horizontal offset,'//
-     :                     'Label(2)=Vertical offset,'//
-     :                     'Format(1)=%.3f,Format(2)=%.3f',
-     :                     STATUS )
+      BPIC = AST_FRAME( 2, 'DOMAIN=BASEPIC,TITLE=Normalised world '//
+     :                  'co-ordinates in the AGI BASE picture.,'//
+     :                  'Symbol(1)=X,Symbol(2)=Y,'//
+     :                  'Label(1)=Horizontal offset,'//
+     :                  'Label(2)=Vertical offset,'//
+     :                  'Format(1)=%.3f,Format(2)=%.3f',
+     :                  STATUS )
 
 *  Save the original current Frame index.
-         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
 *  Add the BASEPIC Frame into the Plot.      
-         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
+      CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, BPIC, STATUS )
 
 *  If the picture is a DATA picture, re-instate the original current Frame 
 *  index. Otherwise, leave the BASEPIC Frame as the current Frame.
-         IF( NAME .EQ. 'DATA' ) THEN
-            CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-         END IF
-
+      IF( NAME .EQ. 'DATA' ) THEN
+         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
       END IF
 
 *  Add a Frame representing normalized device co-ordinates. This picture 
@@ -409,32 +409,32 @@
 *  is (0,0) and the top right is (1,1). This Frame is given the Domain NDC.
 *  ====================================================================
 
-*  See if the Plot already contains an NDC Frame.
+*  See if the Plot already contains an NDC Frame. If so, remove it.
       CALL KPG1_ASFFR( IPLOT, 'NDC', INPIC, STATUS )
+      IF( INPIC .NE. AST__NOFRAME ) CALL AST_REMOVEFRAME( IPLOT, INPIC,
+     :                                                    STATUS )
 
-*  If not, add one into the Plot now.
-      IF( INPIC .EQ. AST__NOFRAME ) THEN
-
-*  Get the bounds of the entire view surface in millimetres.
-         CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+*  Add an NDC Frame into the Plot now. First, get the bounds of the entire 
+*  view surface in millimetres.
+      CALL PGQVSZ( 2, BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
 
 *  Store these as the GRAPHICS co-ordinates.
-         INA( 1 ) = DBLE( BX( 1 ) )
-         INA( 2 ) = DBLE( BX( 2 ) )
-         INB( 1 ) = DBLE( BX( 3 ) )
-         INB( 2 ) = DBLE( BX( 4 ) )
+      INA( 1 ) = DBLE( BX( 1 ) )
+      INA( 2 ) = DBLE( BX( 2 ) )
+      INB( 1 ) = DBLE( BX( 3 ) )
+      INB( 2 ) = DBLE( BX( 4 ) )
 
 *  Store the bounds of the view surface in NDC co-ordinates.
-         OUTA( 1 ) = 0.0D0
-         OUTA( 2 ) = 0.0D0
-         OUTB( 1 ) = 1.0D0
-         OUTB( 2 ) = 1.0D0
+      OUTA( 1 ) = 0.0D0
+      OUTA( 2 ) = 0.0D0
+      OUTB( 1 ) = 1.0D0
+      OUTB( 2 ) = 1.0D0
 
 *  Create a WinMap which scales millimetres into NDC co-ordinates.
-         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+      WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Create the NDC Frame.
-         NPIC = AST_FRAME( 2, 'DOMAIN=NDC,TITLE=Normalised device '//
+      NPIC = AST_FRAME( 2, 'DOMAIN=NDC,TITLE=Normalised device '//
      :                     'co-ordinates.,'//
      :                     'Symbol(1)=X,Symbol(2)=Y,'//
      :                     'Label(1)=Horizontal offset,'//
@@ -443,75 +443,71 @@
      :                     STATUS )
 
 *  Save the original current Frame index.
-         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
 *  Add the NDC Frame into the Plot.      
-         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, NPIC, STATUS )
+      CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, NPIC, STATUS )
 
 *  Re-instate the original current Frame index. 
-         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-
-      END IF
+      CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
 *  Add a Frame representing a normalised co-ordinate system in the current
 *  picture. This Frame has equals scales on both axes, and the shorter axis
 *  has a length of 1.0. This Frame is given the Domain CURPIC.
 *  ====================================================================
 
-*  See if the Plot already contains a CURPIC Frame.
+*  See if the Plot already contains a CURPIC Frame. If so, delete it.
       CALL KPG1_ASFFR( IPLOT, 'CURPIC', ICPIC, STATUS )
+      IF( ICPIC .NE. AST__NOFRAME ) CALL AST_REMOVEFRAME( IPLOT, ICPIC,
+     :                                                    STATUS )
 
-*  If not, add one into the Plot now.
-      IF( ICPIC .EQ. AST__NOFRAME ) THEN
-
+*  Add a new one into the Plot now.
 *  Get the bounds of the current window (in millimetres).
-         CALL PGQWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
+      CALL PGQWIN( BX( 1 ), BX( 3 ), BX( 2 ), BX( 4 ) )
 
 *  Store these as the GRAPHICS co-ordinates.
-         INA( 1 ) = DBLE( BX( 1 ) )
-         INA( 2 ) = DBLE( BX( 2 ) )
-         INB( 1 ) = DBLE( BX( 3 ) )
-         INB( 2 ) = DBLE( BX( 4 ) )
+      INA( 1 ) = DBLE( BX( 1 ) )
+      INA( 2 ) = DBLE( BX( 2 ) )
+      INB( 1 ) = DBLE( BX( 3 ) )
+      INB( 2 ) = DBLE( BX( 4 ) )
 
 *  We now find the bounds of the current window in CURPIC co-ordinates (i.e.
 *  co-ordinates normalised so that the shorter axis has length 1.0).
-         IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
-     :       ABS( BX( 4 ) - BX( 2 ) ) ) THEN
-            OUTA( 1 ) = 0.0D0
-            OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
-     :                        ABS( BX( 4 ) - BX( 2 ) ) )
-            OUTB( 2 ) = 1.0D0
-         ELSE
-            OUTA( 1 ) = 0.0D0
-            OUTA( 2 ) = 0.0D0
-            OUTB( 1 ) = 1.0D0
-            OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
-     :                        ABS( BX( 3 ) - BX( 1 ) ) )
-         END IF
+      IF( ABS( BX( 3 ) - BX( 1 ) ) .GT. 
+     :    ABS( BX( 4 ) - BX( 2 ) ) ) THEN
+         OUTA( 1 ) = 0.0D0
+         OUTA( 2 ) = 0.0D0
+         OUTB( 1 ) = DBLE( ABS( BX( 3 ) - BX( 1 ) ) / 
+     :                     ABS( BX( 4 ) - BX( 2 ) ) )
+         OUTB( 2 ) = 1.0D0
+      ELSE
+         OUTA( 1 ) = 0.0D0
+         OUTA( 2 ) = 0.0D0
+         OUTB( 1 ) = 1.0D0
+         OUTB( 2 ) = DBLE( ABS( BX( 4 ) - BX( 2 ) ) / 
+     :                     ABS( BX( 3 ) - BX( 1 ) ) )
+      END IF
 
 *  Create a WinMap which scales millimetres into CURPIC co-ordinates.
-         WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
+      WMAP = AST_WINMAP( 2, INA, INB, OUTA, OUTB, ' ', STATUS )
 
 *  Create the CURPIC Frame.
-         CPIC = AST_FRAME( 2, 'DOMAIN=CURPIC,TITLE=Normalised world '//
-     :                     'co-ordinates in the current AGI picture.,'//
-     :                     'Symbol(1)=X,Symbol(2)=Y,'//
-     :                     'Label(1)=Horizontal offset,'//
-     :                     'Label(2)=Vertical offset,'//
-     :                     'Format(1)=%.3f,Format(2)=%.3f',
-     :                     STATUS )
+      CPIC = AST_FRAME( 2, 'DOMAIN=CURPIC,TITLE=Normalised world '//
+     :                  'co-ordinates in the current AGI picture.,'//
+     :                  'Symbol(1)=X,Symbol(2)=Y,'//
+     :                  'Label(1)=Horizontal offset,'//
+     :                  'Label(2)=Vertical offset,'//
+     :                  'Format(1)=%.3f,Format(2)=%.3f',
+     :                  STATUS )
 
 *  Save the original current Frame index.
-         ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
+      ICURR = AST_GETI( IPLOT, 'CURRENT', STATUS )
 
 *  Add the CURPIC Frame into the Plot.      
-         CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, CPIC, STATUS )
+      CALL AST_ADDFRAME( IPLOT, AST__BASE, WMAP, CPIC, STATUS )
 
 *  Re-instate the original current Frame index. 
-         CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
-
-      END IF
+      CALL AST_SETI( IPLOT, 'CURRENT', ICURR, STATUS )
 
 *  Export the Plot pointer from the current AST context. This will 
 *  prevent it being annulled by the following call to AST_END. If
