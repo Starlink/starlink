@@ -25,7 +25,7 @@ dnl    Setup for creating a monolith.
 STAR_MONOLITHS
 
 dnl    Build dependencies for this package.
-STAR_DECLARE_DEPENDENCIES([build], [hds fio mers par prm sae shl])
+STAR_DECLARE_DEPENDENCIES([build], [hds fio mers par prm sae shl ifd])
 STAR_DECLARE_DEPENDENCIES(sourceset, sst)
 
 dnl    Need "hlib" command to build the help library.

@@ -29,7 +29,7 @@ dnl    Look for tck/tk system
 STAR_PATH_TCLTK(8.2, [tcl])
 
 dnl POLPACK source files depend on include files from the following components  
-STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae trn])
+STAR_DECLARE_DEPENDENCIES([build], [ast cat chr cnf hds fio grp mers ndf ndg par prm sae trn ifd])
 
 dnl The POLPACK link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [sla nbs kaplibs shl], [link])

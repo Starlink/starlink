@@ -25,7 +25,7 @@ STAR_CHECK_PROGS([ifd2star hlib fgeneric])
 STAR_CHECK_PROGS(prohlp,sst)
 
 dnl KAPRH source files depend on include files from the following components  
-STAR_DECLARE_DEPENDENCIES([build], [ast fio gks gns hds idi kaplibs mers ndf par pcs prm sae trn])
+STAR_DECLARE_DEPENDENCIES([build], [ast fio gks gns hds idi kaplibs mers ndf par pcs prm sae trn ifd generic])
 
 dnl The KAPRH link script links against the following components
 STAR_DECLARE_DEPENDENCIES([build], [agi ard cat fio gks gns grp gwm idi kaplibs mag ncar ndf ndg pda prm psx ref sgs shl sla snx trn], [link])
