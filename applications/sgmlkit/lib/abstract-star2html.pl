@@ -12,6 +12,13 @@
 # sub*section structure, the cross-references, and most of the header.
 # It emits a suitable CATALOG line on STDOUT.
 #
+# <p>The aim of this tool is only secondarily to produce an accurate,
+# or complete, summary of the target document.  It is primarily
+# required simply to complete whilst running unattended (within the
+# package's installation script), producing a valid SGML document,
+# which can be used as a cross-reference target in the General DTD's
+# DOCXREF element without being grossly misleading.
+#
 # <p>Usage:
 # <verbatim>
 #    abstract-star2html.pl \
