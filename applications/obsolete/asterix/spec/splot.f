@@ -1322,7 +1322,6 @@
       REAL YDEC				! No of decades allowed in range of
       PARAMETER (YDEC=3.1)		! data
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ESLOC
       INTEGER CBPTR,ESPTR
       INTEGER NACT
       LOGICAL CBOUNDS
@@ -1338,20 +1337,20 @@
       CALL SPLOT_DIVWID(NVAL,%val(DWPTR),%val(DFDPTR),STATUS)
 
 *  get fit data
-      CALL INSR_FIND(INSTR.ELOC,'ENERGY_SPEC',ESLOC,STATUS)
-      CALL DAT_MAPV(ESLOC,'_REAL','READ',ESPTR,NACT,STATUS)
-      CALL ARR_COP1R(NFIT,%val(ESPTR),%val(PFXPTR),STATUS)
-      CALL SPLOT_NORM(NFIT,%val(PREDDAT.MPTR),
+      CALL ADI_CMAPR( INSTR.R_ID, 'Energy', 'READ', ESPTR, STATUS )
+      CALL ARR_COP1R( NFIT, %val(ESPTR), %val(PFXPTR), STATUS )
+      CALL SPLOT_NORM( NFIT, %val(PREDDAT.MPTR),
      :      %val(PREDDAT.MLBNDPTR),%val(PREDDAT.MUBNDPTR),Z,
      :                                     %val(PFDPTR),STATUS)
-      CALL DAT_ANNUL(ESLOC,STATUS)
+      CALL ADI_CUNMAP( INSTR.R_ID, 'Energy', ESPTR, STATUS )
 
 *     determine channel energies & widths
 
 
 *     look for channel bound information
-      CALL INSR_MAP(INSTR.ELOC,'CHANNEL_BOUNDS','_REAL',
-     :                              'READ',CBPTR,NACT,STATUS)
+      CALL ADI_CSIZE( INSTR.R_ID, 'Channels', NACT, STATUS )
+      CALL ADI_CMAPR( INSTR.R_ID, 'Channels', 'READ', CBPTR, STATUS )
+
       IF(STATUS.NE.SAI__OK)THEN
         CALL ERR_ANNUL(STATUS)
         CBOUNDS=.FALSE.
@@ -1365,8 +1364,8 @@
 *     derive centres and widths from bounds
         CALL SPLOT_CHEN(NVAL,%val(CBPTR),%val(PXPTR),
      :                                     %val(PWPTR),STATUS)
-      ENDIF
 
+      ENDIF
 
 *     no bounds available, so derive them by interpoln from response matrix
       IF(.NOT.CBOUNDS)THEN
@@ -1378,23 +1377,17 @@
      :                                          %val(PWPTR),STATUS)
       ENDIF
 
-*     interpolate to give predicted model space fluxes at channel energies
+*   Interpolate to give predicted model space fluxes at channel energies
       CALL MATH_LINTERP(NFIT,%val(PFXPTR),%val(PFDPTR),
      :                NVAL,%val(PXPTR),%val(PIDPTR),STATUS)
 
-
-
-*     safeguard against bad (undefined) model space values (from MATH_LINTERP)
+*   Safeguard against bad (undefined) model space values (from MATH_LINTERP)
       CALL SPLOT_ZERO(NVAL,%val(PIDPTR),STATUS)
-
 
 *   Model space data (i.e. transformed back using fitted model)
       CALL SPLOT_TRANSFM(NVAL,%val(IDPTR),%val(IFPTR),
      :                          .TRUE.,%val(IVPTR),%val(PIDPTR),
      :                            %val(PDPTR),%val(PVPTR),STATUS)
-
-
-
 
       END
 
