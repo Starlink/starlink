@@ -1,5 +1,9 @@
 2000-05-12  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* gsdprint: Update to use GSD objects
+
+	* GSD.pm (new): Strip trailing spaces from the label
+
 	* Makefile.PL: Try to make it a bit cleverer
 
 	* t/tie.t: Add test
