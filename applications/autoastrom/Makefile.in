@@ -9,18 +9,29 @@ PKG_NAME=autoastrom
 PKG_DIR=$(PKG_NAME)-$(PKG_VERS)
 
 SOURCE_FILES=README Makefile.in configure
-SOURCE_DIRS=config moggy
+SOURCE_DIRS=config moggy astrom
 
+
+
+# There's nothing to be built, as such, in this directory, so instead
+# build the contents of the moggy and astrom subdirectories.  Astrom
+# is slightly complicated, as for some reason which I can't fathom,
+# `./mk build' fails, as the SYSTEM environment variable seems not to
+# be propagated to the sub-make if the ./mk script is called from
+# within a makefile (weird).  We don't have to worry about setting the 
+# SYSTEM variable.  It should be set when the system is built.
 all:
 	cd moggy; $(MAKE)
+	cd astrom; ./mk .BUILT
 
 test:
 	cd moggy; $(MAKE) test
+	cd t; $(MAKE) test
 
 
 # Distribution and maintenance targets
 
-astrom.tar: README configure moggy/configure
+autoastrom.tar: README configure moggy/configure
 	mkdir $(PKG_DIR)
 	for f in $(SOURCE_FILES) $(SOURCE_DIRS); do \
 		find $$f \( -type d -exec mkdir $(PKG_DIR)/{} \; \) -o -exec ln {} $(PKG_DIR)/{} \; ; \
