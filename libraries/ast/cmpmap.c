@@ -92,6 +92,7 @@ f     The CmpMap class does not define any new routines beyond those
 /* --------------- */
 #include <stdarg.h>
 #include <stddef.h>
+#include <string.h>
 
 /* Module Variables. */
 /* ================= */
