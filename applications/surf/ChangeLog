@@ -1,5 +1,55 @@
+2000-05-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* docs/hlp/surf.hlp (SFACTOR): Add SFACTOR to docs
+
+	* src/surf_rebin.f (SURF_REBIN): Add SFACTOR to header
+
+2000-04-25  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS):
+	Allow for array read of T_COLD (using TARRAY parameter). Add
+	knowledge of 'correct' T_COLD and T_HOT adjustments.
+
+2000-04-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_skydip_temperatures.F
+	(SCULIB_SKYDIP_TEMPERATURES): Convert T_HOT to an array
+
+	* src/surf_reduce_switch.f (SURF_REDUCE_SWITCH): Add T_ARRAY,
+	T_COLD and T_HOT to header documentation.
+
+	* src/reduce_switch.ifl: Add TARRAY
+
+	* sculib/sculib_get_mjd.f (SCULIB_GET_MJD): Correct documentation
+	in header.
+
+2000-04-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scunoise: Update with File::Spec so that it works on WinNT
+
+	* src/surf_skydip.f: Add RESIDUAL parameter
+
+	* sculib/sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Add RESIDUAL
+
+	* sculib/sculib_skydip_var.f (SCULIB_SKYDIP_VAR): Calculate residual
+
+2000-02-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+        * SURF V1.5-1 released to Starlink
+	
+	* scripts/scuplot.csh: Fix problems with $< in linux. Add "press
+	return" message for CURSOR use. Fix problem with $phsec not
+	recognising PHOTOM observations when the 'photom' string appears twice.
+
+2000-01-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scusetenv.csh: Fix Y2K error when semester calculate
+	from January 00
+
 1999-11-03  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* SURF V1.5-0 released to Starlink
+	
 	* scripts/scuplot.csh: Update for new mlinplot.
 
 	* scripts/sdip.csh: Recognise kappa 0.14
