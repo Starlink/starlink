@@ -52,8 +52,9 @@
       cp ${POLPACK_DEV}/../polka.htx_tar ${REL_DIR}
       cp ${POLPACK_DEV}/../sun223.htx_tar ${REL_DIR}
 
-#  Make the ndg source tar file.
+#  Make the ndg and ctg source tar files.
       ${NDG_SYS}/dev/bin/make_source.csh
+      ${CTG_SYS}/dev/bin/make_source.csh
 
 #  Ensure all files are accessable.
       chmod 777 *
@@ -100,10 +101,6 @@
 #  Create the tar file holding the IRAF files.
 #      source ${POLPACK_DEV}/.sdtrc
 #      make_iraf
-
-#  Make the ndg and ctg source tar files.
-      ${NDG_SYS}/dev/bin/make_source.csh
-      ${CTG_SYS}/dev/bin/make_source.csh
 
 #  Tar up all the release files (source and non-source), and then remove
 #  them.
