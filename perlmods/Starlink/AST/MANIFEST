@@ -10,6 +10,10 @@ PGPLOT/PGPLOT.pm
 PGPLOT/Makefile.PL
 PGPLOT/t/pgplot.t
 PGPLOT/t/plot_pg.t
+PLplot/PLplot.pm
+PLplot/Makefile.PL
+PLplot/t/plplot.pl
+PLplot/t/plot_pl.t
 Tk/Tk.pm
 Tk/Makefile.PL
 Tk/t/tk.t
