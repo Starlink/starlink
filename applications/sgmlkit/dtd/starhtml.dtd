@@ -10,7 +10,12 @@
      better spent producing output which conforms to _something_.  The
      conformance issue doesn't really matter on the Wild Wild Web,
      since most browsers will take anything you give them (which means
-     it's OK to give out HTML which conforms to a private HTML-based DTD).
+     it's OK to give out HTML which conforms to a private HTML-based
+     DTD).
+
+     I've make all the elements here lowercase, to match the other
+     DTDs in this set.  This DTD now works with the case-sensitive
+     Starlink SGML declaration.
 
      Issues:
 
@@ -95,21 +100,21 @@
 
 <!-- Parameter Entities -->
 
-<!ENTITY % head.misc "SCRIPT|STYLE|META|LINK" -- repeatable head elements -->
+<!ENTITY % head.misc "script|style|meta|link" -- repeatable head elements -->
 
-<!ENTITY % heading "H1|H2|H3|H4|H5|H6">
+<!ENTITY % heading "h1|h2|h3|h4|h5|h6">
 
 <!-- Starlink: -->
 <![ IGNORE [
 <!ENTITY % list "UL | OL |  DIR | MENU">
 ]]>
-<!ENTITY % list "UL | OL">
+<!ENTITY % list "ul | ol">
 
 <![ %HTML.Deprecated [
-    <!ENTITY % preformatted "PRE | XMP | LISTING">
+    <!ENTITY % preformatted "pre | xmp | listing">
 ]]>
 
-<!ENTITY % preformatted "PRE">
+<!ENTITY % preformatted "pre">
 
 <!--================ Character mnemonic entities ==========================-->
 
@@ -132,19 +137,19 @@
 
 <!--=================== Text Markup =======================================-->
 
-<!ENTITY % font "TT | I | B  | U | STRIKE | BIG | SMALL | SUB | SUP">
+<!ENTITY % font "tt | i | b  | u | strike | big | small | sub | sup">
 
-<!ENTITY % phrase "EM | STRONG | DFN | CODE | SAMP | KBD | VAR | CITE">
+<!ENTITY % phrase "em | strong | dfn | code | samp | kbd | var | cite">
 
-<!ENTITY % special "A | IMG | APPLET | FONT | BASEFONT | BR | SCRIPT | MAP">
+<!ENTITY % special "a | img | applet | font | basefont | br | script | map">
 
-<!ENTITY % form "INPUT | SELECT | TEXTAREA">
+<!ENTITY % form "input | select | textarea">
 
 <![ IGNORE [
 <!ENTITY % text "#PCDATA | %font | %phrase | %special | %form">
 ]]>
 <!-- Starlink: -->
-<!ENTITY % moved.down "%preformatted | %list | DL | BLOCKQUOTE">
+<!ENTITY % moved.down "%preformatted | %list | dl | blockquote">
 <!ENTITY % text "#PCDATA | %font | %phrase | %special | %form | %moved.down">
 
 <!ELEMENT (%font|%phrase) - - (%text)*>
@@ -159,19 +164,19 @@
  16 colors supported with the Windows VGA palette.
  -->
 
-<!ELEMENT FONT - - (%text)*     -- local change to font -->
-<!ATTLIST FONT
+<!ELEMENT font - - (%text)*     -- local change to font -->
+<!ATTLIST font
     size    CDATA   #IMPLIED    -- [+]nn e.g. size="+1", size=4 --
     color   CDATA   #IMPLIED    -- #RRGGBB in hex, e.g. red: color="#FF0000" --
     >
 
-<!ELEMENT BASEFONT - O EMPTY    -- base font size (1 to 7)-->
-<!ATTLIST BASEFONT
+<!ELEMENT basefont - O EMPTY    -- base font size (1 to 7)-->
+<!ATTLIST basefont
     size    CDATA   #IMPLIED    -- e.g. size=3 --
     >
 
-<!ELEMENT BR    - O EMPTY    -- forced line break -->
-<!ATTLIST BR
+<!ELEMENT br    - O EMPTY    -- forced line break -->
+<!ATTLIST br
         clear (left|all|right|none) none -- control of text flow --
         >
 
@@ -186,13 +191,13 @@
 
 <![ IGNORE [
 <!ENTITY % block
-     "P | %list | %preformatted | DL | DIV | CENTER |
-      BLOCKQUOTE | FORM | ISINDEX | HR | TABLE">
+     "p | %list | %preformatted | dl | div | center |
+      blockquote | form | isindex | hr | table">
 ]]>
 <!-- Starlink: -->
 <!ENTITY % block
-     "P | DIV | CENTER |
-      FORM | ISINDEX | HR | TABLE">
+     "p | div | center |
+      form | isindex | hr | table">
 
 <!-- %flow is used for DD and LI -->
 
@@ -200,7 +205,7 @@
 
 <!--=================== Document Body =====================================-->
 
-<!ENTITY % body.content "(%heading | %text | %block | ADDRESS)*">
+<!ENTITY % body.content "(%heading | %text | %block | address)*">
 
 <!ENTITY % color "CDATA" -- a color specification: #HHHHHH @@ details? -->
 
@@ -212,18 +217,18 @@
         alink %color #IMPLIED
         ">
 
-<!ELEMENT BODY O O  %body.content>
-<!ATTLIST BODY
+<!ELEMENT body O O  %body.content>
+<!ATTLIST body
         background %URL #IMPLIED  -- texture tile for document background --
         %body-color-attrs;  -- bgcolor, text, link, vlink, alink --
         >
 
 <!ENTITY % address.content "((%text;) | P)*">
 
-<!ELEMENT ADDRESS - - %address.content>
+<!ELEMENT address - - %address.content>
 
-<!ELEMENT DIV - - %body.content>
-<!ATTLIST DIV
+<!ELEMENT div - - %body.content>
+<!ATTLIST div
 	class	CDATA	#IMPLIED	-- div class.  Starlink: --
         align   (left|center|right) #IMPLIED -- alignment of following text --
         >
@@ -233,8 +238,8 @@
 
 <!--================== The Anchor Element =================================-->
 
-<!ELEMENT A - - (%text)* -(A)>
-<!ATTLIST A
+<!ELEMENT a - - (%text)* -(A)>
+<!ATTLIST a
         name    CDATA   #IMPLIED    -- named link end --
         href    %URL    #IMPLIED    -- URL for linked resource --
         rel     CDATA   #IMPLIED    -- forward link types --
@@ -250,13 +255,13 @@
 <!ENTITY % SHAPE "(rect|circle|poly)">
 <!ENTITY % COORDS "CDATA" -- comma separated list of numbers -->
 
-<!ELEMENT MAP - - (AREA)*>
-<!ATTLIST MAP
+<!ELEMENT map - - (AREA)*>
+<!ATTLIST map
     name    CDATA   #IMPLIED
     >
 
-<!ELEMENT AREA - O EMPTY>
-<!ATTLIST AREA
+<!ELEMENT area - O EMPTY>
+<!ATTLIST area
     shape   %SHAPE  rect
     coords  %COORDS #IMPLIED  -- defines coordinates for shape --
     href    %URL    #IMPLIED  -- this region acts as hypertext link --
@@ -283,8 +288,8 @@
                    e.g. a postscript or pdf version
 -->
 
-<!ELEMENT LINK - O EMPTY>
-<!ATTLIST LINK
+<!ELEMENT link - O EMPTY>
+<!ATTLIST link
         href    %URL    #IMPLIED    -- URL for linked resource --
         rel     %Types  #IMPLIED    -- forward link types --
         rev     %Types  #IMPLIED    -- reverse link types --
@@ -303,8 +308,8 @@
 
 <!ENTITY % IAlign "(top|middle|bottom|left|right)">
 
-<!ELEMENT IMG    - O EMPTY --  Embedded image -->
-<!ATTLIST IMG
+<!ELEMENT img    - O EMPTY --  Embedded image -->
+<!ATTLIST img
         src     %URL     #REQUIRED  -- URL of image to embed --
         alt     CDATA    #IMPLIED   -- for display in place of image --
         align   %IAlign  #IMPLIED   -- vertical or horizontal alignment --
@@ -332,8 +337,8 @@
   When the codebase attribute is relative, then it is relative to the
   document URL (or <BASE> tag if defined).
 -->
-<!ELEMENT APPLET - - (PARAM | %text)*>
-<!ATTLIST APPLET
+<!ELEMENT applet - - (PARAM | %text)*>
+<!ATTLIST applet
         codebase %URL     #IMPLIED   -- code base --
         code     CDATA    #REQUIRED  -- class file --
         alt      CDATA    #IMPLIED   -- for display in place of applet --
@@ -345,8 +350,8 @@
         vspace   %Pixels  #IMPLIED   -- suggested vertical gutter --
         >
 
-<!ELEMENT PARAM - O EMPTY>
-<!ATTLIST PARAM
+<!ELEMENT param - O EMPTY>
+<!ATTLIST param
         name    NMTOKEN   #REQUIRED  -- The name of the parameter --
         value   CDATA     #IMPLIED   -- The value of the parameter --
         >
@@ -365,8 +370,8 @@ Here is an example:
 
 <!--=================== Horizontal Rule ===================================-->
 
-<!ELEMENT HR    - O EMPTY>
-<!ATTLIST HR
+<!ELEMENT hr    - O EMPTY>
+<!ATTLIST hr
         align (left|right|center) #IMPLIED
         noshade (noshade) #IMPLIED
         size  %Pixels #IMPLIED
@@ -374,8 +379,8 @@ Here is an example:
         >
 <!--=================== Paragraphs=========================================-->
 
-<!ELEMENT P     - O (%text)*>
-<!ATTLIST P
+<!ELEMENT p     - O (%text)*>
+<!ATTLIST p
         align  (left|center|right) #IMPLIED
         >
 
@@ -395,11 +400,11 @@ Here is an example:
 
 <!-- excludes images and changes in font size -->
 
-<!ENTITY % pre.exclusion "IMG|BIG|SMALL|SUB|SUP|FONT">
+<!ENTITY % pre.exclusion "img|big|small|sub|sup|font">
 
-<!ELEMENT PRE - - (%text)* -(%pre.exclusion)>
-<!ATTLIST PRE
-        width NUMBER #implied -- is this widely supported? --
+<!ELEMENT pre - - (%text)* -(%pre.exclusion)>
+<!ATTLIST pre
+        width NUMBER #IMPLIED -- is this widely supported? --
         >
 
 <![ %HTML.Deprecated [
@@ -410,14 +415,14 @@ Here is an example:
            in full
         -->
 
-<!ELEMENT (XMP|LISTING) - -  %literal>
-<!ELEMENT PLAINTEXT - O %literal>
+<!ELEMENT (xmp|listing) - -  %literal>
+<!ELEMENT plaintext - O %literal>
 
 ]]>
 
 <!--=================== Block-like Quotes =================================-->
 
-<!ELEMENT BLOCKQUOTE - - %body.content>
+<!ELEMENT blockquote - - %body.content>
 
 <!--=================== Lists =============================================-->
 
@@ -430,16 +435,16 @@ Here is an example:
 
 <!-- definition lists - DT for term, DD for its definition -->
 
-<!ELEMENT DL    - -  (DT|DD)+>
-<!ATTLIST DL
+<!ELEMENT dl    - -  (dt|dd)+>
+<!ATTLIST dl
         compact (compact) #IMPLIED -- more compact style --
         >
 
-<!ELEMENT DT - O  (%text)*>
-<!ELEMENT DD - O  %flow;>
+<!ELEMENT dt - O  (%text)*>
+<!ELEMENT dd - O  %flow;>
 
 <!-- Ordered lists OL, and unordered lists UL -->
-<!ELEMENT (OL|UL) - -  (LI)+>
+<!ELEMENT (ol|ul) - -  (li)+>
 
 <!--
        Numbering style
@@ -457,7 +462,7 @@ Here is an example:
 
 <!ENTITY % OLStyle "CDATA" -- constrained to: [1|a|A|i|I] -->
 
-<!ATTLIST OL -- ordered lists --
+<!ATTLIST ol -- ordered lists --
         type      %OLStyle   #IMPLIED   -- numbering style --
         start     NUMBER     #IMPLIED   -- starting sequence number --
         compact  (compact)   #IMPLIED   -- reduced interitem spacing --
@@ -467,16 +472,16 @@ Here is an example:
 
 <!ENTITY % ULStyle "disc|square|circle">
 
-<!ATTLIST UL -- unordered lists --
+<!ATTLIST ul -- unordered lists --
         type    (%ULStyle)   #IMPLIED   -- bullet style --
         compact (compact)    #IMPLIED   -- reduced interitem spacing --
         >
 
-<!ELEMENT (DIR|MENU) - -  (LI)+ -(%block)>
-<!ATTLIST DIR
+<!ELEMENT (dir|menu) - -  (LI)+ -(%block)>
+<!ATTLIST dir
         compact (compact) #IMPLIED
         >
-<!ATTLIST MENU
+<!ATTLIST menu
         compact (compact) #IMPLIED
         >
 
@@ -490,28 +495,28 @@ Here is an example:
 
 <!ENTITY % LIStyle "CDATA" -- constrained to: "(%ULStyle|%OLStyle)" -->
 
-<!ELEMENT LI - O %flow -- list item -->
-<!ATTLIST LI
+<!ELEMENT li - O %flow -- list item -->
+<!ATTLIST li
         type    %LIStyle     #IMPLIED   -- list item style --
         value    NUMBER      #IMPLIED   -- reset sequence number --
         >
 
 <!--================ Forms ===============================================-->
 
-<!ELEMENT FORM - - %body.content -(FORM)>
-<!ATTLIST FORM
+<!ELEMENT form - - %body.content -(FORM)>
+<!ATTLIST form
         action %URL #IMPLIED  -- server-side form handler --
         method (%HTTP-Method) GET -- see HTTP specification --
         enctype %Content-Type; "application/x-www-form-urlencoded"
         >
 
 <!ENTITY % InputType
-        "(TEXT | PASSWORD | CHECKBOX | RADIO | SUBMIT
-            | RESET | FILE | HIDDEN | IMAGE)">
+        "(text | password | checkbox | radio | submit
+            | reset | file | hidden | image)">
 
-<!ELEMENT INPUT - O EMPTY>
-<!ATTLIST INPUT
-        type %InputType TEXT     -- what kind of widget is needed --
+<!ELEMENT input - O EMPTY>
+<!ATTLIST input
+        type %InputType text     -- what kind of widget is needed --
         name  CDATA #IMPLIED     -- required for all but submit and reset --
         value CDATA #IMPLIED     -- required for radio and checkboxes --
         checked (checked) #IMPLIED -- for radio buttons and check boxes --
@@ -521,23 +526,23 @@ Here is an example:
         align  (top|middle|bottom|left|right) top -- image alignment --
         >
 
-<!ELEMENT SELECT - - (OPTION+)>
-<!ATTLIST SELECT
+<!ELEMENT select - - (OPTION+)>
+<!ATTLIST select
         name CDATA #REQUIRED
         size NUMBER #IMPLIED
         multiple (multiple) #IMPLIED
         >
 
-<!ELEMENT OPTION - O (#PCDATA)*>
-<!ATTLIST OPTION
+<!ELEMENT option - O (#PCDATA)*>
+<!ATTLIST option
         selected (selected) #IMPLIED
         value  CDATA  #IMPLIED -- defaults to element content --
         >
 
 <!-- Multi-line text input field. -->
 
-<!ELEMENT TEXTAREA - - (#PCDATA)*>
-<!ATTLIST TEXTAREA
+<!ELEMENT textarea - - (#PCDATA)*>
+<!ATTLIST textarea
         name CDATA #REQUIRED
         rows NUMBER #REQUIRED
         cols NUMBER #REQUIRED
@@ -573,8 +578,8 @@ Here is an example:
         cellpadding %Pixels #IMPLIED  -- spacing within cells --
         >
 
-<!ELEMENT CAPTION - - (%text;)* -- table or figure caption -->
-<!ATTLIST CAPTION
+<!ELEMENT caption - - (%text;)* -- table or figure caption -->
+<!ATTLIST caption
         align (top|bottom) #IMPLIED
         >
 
@@ -598,18 +603,18 @@ Here is an example:
 
 <!-- %head.misc defined earlier on as "SCRIPT|STYLE|META|LINK" -->
 
-<!ENTITY % head.content "TITLE & ISINDEX? & BASE?">
+<!ENTITY % head.content "title & isindex? & base?">
 
-<!ELEMENT HEAD O O  (%head.content) +(%head.misc)>
+<!ELEMENT head O O  (%head.content) +(%head.misc)>
 
-<!ELEMENT TITLE - -  (#PCDATA)* -(%head.misc)
+<!ELEMENT title - -  (#PCDATA)* -(%head.misc)
           -- The TITLE element is not considered part of the flow of text.
              It should be displayed, for example as the page header or
              window title.
           -->
 
-<!ELEMENT ISINDEX - O EMPTY>
-<!ATTLIST ISINDEX
+<!ELEMENT isindex - O EMPTY>
+<!ATTLIST isindex
         prompt CDATA #IMPLIED -- prompt message -->
 
 <!--
@@ -630,13 +635,13 @@ Here is an example:
    header accompanying the document.
 -->
 
-<!ELEMENT BASE - O EMPTY>
-<!ATTLIST BASE
+<!ELEMENT base - O EMPTY>
+<!ATTLIST base
         href %URL  #REQUIRED
         >
 
-<!ELEMENT META - O EMPTY -- Generic Metainformation -->
-<!ATTLIST META
+<!ELEMENT meta - O EMPTY -- Generic Metainformation -->
+<!ATTLIST meta
         http-equiv  NAME    #IMPLIED  -- HTTP response header name  --
         name        NAME    #IMPLIED  -- metainformation name       --
         content     CDATA   #REQUIRED -- associated information     --
@@ -644,21 +649,21 @@ Here is an example:
 
 <!-- SCRIPT/STYLE are place holders for transition to next version of HTML -->
 
-<!ELEMENT STYLE  - - (#PCDATA)*  -(%head.misc) -- style info -->
-<!ELEMENT SCRIPT - - (#PCDATA)*  -(%head.misc) -- script statements -->
+<!ELEMENT style  - - (#PCDATA)*  -(%head.misc) -- style info -->
+<!ELEMENT script - - (#PCDATA)*  -(%head.misc) -- script statements -->
 
 <!--================ Document Structure ===================================-->
 
 <!ENTITY % version.attr "VERSION CDATA #FIXED '%HTML.Version;'">
 
 <![ %HTML.Deprecated [
-    <!ENTITY % html.content "HEAD, BODY, PLAINTEXT?">
+    <!ENTITY % html.content "head, body, plaintext?">
 ]]>
 
-<!ENTITY % html.content "HEAD, BODY">
+<!ENTITY % html.content "head, body">
 
-<!ELEMENT HTML O O  (%html.content)>
-<!ATTLIST HTML
+<!ELEMENT html O O  (%html.content)>
+<!ATTLIST html
         %version.attr;
         >
 
