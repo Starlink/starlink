@@ -1,0 +1,126 @@
+      SUBROUTINE ARD1_TWWCS( NDIM, PAR, UWCS, STATUS )
+*+
+*  Name:
+*     ARD1_TWWCS
+
+*  Purpose:
+*     Create a new user FrameSet from a TWIST statement.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL ARD1_TWWCS( NDIM, PAR, UWCS, STATUS )
+
+*  Description:
+*     This routine creates a new user FrameSet (UWCS) from the 
+*     supplied parameters.
+
+*  Arguments:
+*     NDIM = INTEGER (Given)
+*        The number of axes.
+*     PAR( * ) = DOUBLE PRECISION (Given)
+*        The statement parameters.
+*     UWCS = INTEGER (Given)
+*        An AST pointer to the User FrameSet. The Current Frame
+*        in this FrameSet is user coords.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     12-JUL-2001 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PAR'          ! AST constants and function declarations
+      INCLUDE 'ARD_CONST'        ! ARD private constants
+
+*  Arguments Given:
+      INTEGER NDIM
+      DOUBLE PRECISION PAR( * )
+
+*  Arguments Returned:
+      INTEGER UWCS
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      CHARACTER DOM*30           ! Frame Domain
+      DOUBLE PRECISION COST      ! Cosine of twist angle
+      DOUBLE PRECISION MAT( ARD__MXDIM*ARD__MXDIM )! Matrix elements
+      DOUBLE PRECISION SINT      ! Sine of twist angle
+      DOUBLE PRECISION T         ! Twist angle in radians
+      INTEGER FR                 ! Pointer to a Frame
+      INTEGER I                  ! Loop count
+      INTEGER IFRM               ! Index of ARDAPP Frame
+      INTEGER M1                 ! MatrixMap
+*.
+
+*  Check the inherited status. 
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Locate a Frame in the current User FrameSet with Domain ARDAPP.
+      IFRM = AST__NOFRAME
+      DO I = 1, AST_GETI( UWCS, 'NFRAME', STATUS )
+         FR = AST_GETFRAME( UWCS, I, STATUS )
+         DOM = AST_GETC( FR, 'DOMAIN', STATUS ) 
+         CALL AST_ANNUL( FR, STATUS )
+         IF( DOM .EQ. 'ARDAPP' ) THEN
+            IFRM = I
+            GO TO 10
+         END IF
+      END DO
+ 10   CONTINUE
+
+*  If no Frame with Domain ARDAPP was found, annull the existing User
+*  FrameSet and create a new one containing user and application coordinate
+*  Frames connected by a UnitMap.
+      IF( IFRM .EQ. AST__NOFRAME ) THEN
+         CALL AST_ANNUL( UWCS, STATUS )
+         CALL ARD1_COWCS( NDIM, AST__BAD, UWCS, STATUS )
+         IFRM = AST_GETI( UWCS, 'BASE', STATUS )
+      END IF 
+
+*  Initialize the elements of the matrix to hold a unit matrix.
+      DO I = 1, NDIM 
+         MAT( I ) = 0.0
+      END DO
+
+      DO I = 1, NDIM 
+         MAT( I + ( I - 1 )*NDIM ) = 1.
+      END DO
+
+*  Store the trig terms to rotate the first two axes.
+      T = PAR( 1 ) * ARD__DTOR
+      SINT = SIN( T )
+      COST = COS( T )
+      MAT( 1 ) = COST
+      MAT( 2 ) = -SINT
+      MAT( NDIM + 1 ) = SINT
+      MAT( NDIM + 2 ) = COST
+
+*  Create a MatrixMap from these matrix elements.
+      M1 = AST_MATRIXMAP( NDIM, NDIM, 0, MAT, ' ', STATUS ) 
+
+*  Remap the application coords Frame 
+      CALL AST_REMAPFRAME( UWCS, IFRM, M1, STATUS )
+
+*  Annull AST objects.
+      CALL AST_ANNUL( M1, STATUS )
+
+      END
