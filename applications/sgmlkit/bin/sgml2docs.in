@@ -162,8 +162,8 @@ DEBUGGING=false
 # generated manifest; if false, then everything in the work directory
 # is scooped up, junk and all.  Since the jade manifest is now reliable,
 # this option is almost completely redundant.
-USEMANIFEST=true
-VERBOSE=true
+USEMANIFEST=:
+VERBOSE=:
 NORMTYPE=simplenorm  # simple normalisation by default
 run=
 runn=
@@ -256,7 +256,7 @@ while [ $# -gt 0 ]; do
 	--quiet) VERBOSE=false
             DVI2BITMAP="$DVI2BITMAP --verbose=quiet"
        	    ;;
-	--debug) DEBUGGING=true ;;
+	--debug) DEBUGGING=: ;;
 	--help) echo $USAGE; exit 0;;
 	--version) echo "$PROGNAME:I:" $ident_string; echo "$PROGNAME:I:" $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
@@ -413,7 +413,7 @@ if [ $TARGETFORMAT -eq 0 ]; then
     fi
 #    test -f tmp.stamp && ROOT=`awk -F: '{print $1}' tmp.stamp`
     cp $tempdest TEMPDEST
-    echo "ROOT=$ROOT"
+    $DEBUGGING && echo "ROOT=$ROOT"
 
     # If there are no maths-mode elements, there's no list file generated.
     # Test if the file is of non-zero size, since <codecollection> is
