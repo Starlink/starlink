@@ -765,8 +765,8 @@
               CALL MSG_SETR( 'X', X)
               CALL MSG_SETR( 'Y', Y)
               CALL MSG_MAKE( TEXT(:L)//' ^X , ^Y ,', TEXT, L )
-              IF ( L .GT. 65)) THEN
-                CALL ARX_PUT(GRPID,0,TEXT(:L),STATUS)
+              IF ( L .GT. 65) THEN
+                CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
                 TEXT = ' '
                 L = 1
               ENDIF
