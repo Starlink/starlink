@@ -25,3 +25,5 @@ fig_wfilld.f fig_wxyfit.f fig_xtract.f fig_xvalue.f \
 fig_xyfit.f fig_ytract.f fig_zaprays.f fig_zaprow.f
 
 FPP_ROUTINES = fig_dfits.fpp
+
+fig_dfits.f: fig_dfits.fpp

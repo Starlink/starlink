@@ -67,3 +67,6 @@ dsa_wruser.f dsa_xcstr.f dsa_zfill.f \
 dsaz_fname.f dsaz_inq_nam.f
 
 FPP_ROUTINES = dsaz_tfopen.fpp
+
+dsaz_tfopen.f: dsaz_tfopen.fpp
+

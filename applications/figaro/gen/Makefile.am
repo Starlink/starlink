@@ -31,3 +31,6 @@ gen_xop21.f gen_yop21.f
 
 FPP_ROUTINES =  gen_bswap.fpp gen_wbswap.fpp
        
+
+gen_bswap.lo: gen_bswap.f
+gen_wbswap.lo: gen_wbswap.f
