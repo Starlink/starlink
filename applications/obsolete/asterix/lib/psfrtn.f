@@ -1369,7 +1369,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INTEGER                 N			! No. of profile bins
       REAL                    AX(*)             ! Profile axis values
-      REAL                    WID(*)            ! Profile axis widths
+      REAL                    WID(*) ! Profile axis widths
       REAL                    TOR               ! Conversion to radians
 *
 *    Import-Export :
@@ -2993,7 +2993,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
-
+C stop at "psfrtn.f":2997
 *  Defined energy band?
       CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
       IF ( PHADEF ) THEN
@@ -3133,6 +3133,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
             IF ( OPT .EQ. 'VRP' ) THEN
               LNORM = ABS(SDX*SDY*RTOM*RTOM)
             ELSE IF ( OPT .EQ. 'ON3' ) THEN
+C DGED
+              XSUB = SPIX( YP0 + DX*REAL(I-1), DX )
+              SDX = DX / XSUB
               LNORM = ABS(SDX*SDY*RTOS*RTOS)/NORM/408.7386
             ELSE
               LNORM = ABS(SDX*SDY*RTOS*RTOS)/NORM
@@ -3742,6 +3745,489 @@ C          CALL PSX_GETENV( 'AST_XRT_PSF_CUBE', FNAME, STATUS )
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_XRT_PSPC_INIT', STATUS )
+      END IF
+
+      END
+
+*+  PSF_XMM_ANAL_INIT - XMM ANAL PSF initialisation
+      SUBROUTINE PSF_XMM_ANAL_INIT( PSID, STATUS )
+*
+*    Description : Hints for the 'Hasinger Epic Simulation' XMM PSF
+*
+*    Environment parameters :
+*
+*     MASK = CHAR(R)
+*     AUX = ...
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David Geddes (::DGED)
+*
+*    History :
+*
+*    12 May 99 : Original (DGED)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
+      INCLUDE 'DAT_PAR'
+*
+*    Import :
+*
+      INTEGER			PSID
+*
+*    Status :
+*
+      INTEGER                   STATUS
+*
+*    Function declarations :
+*
+      EXTERNAL			PSF_XMM_ANAL
+      EXTERNAL                  PSF_XMM_ANAL_HINT
+*
+*    Local variables :
+*
+       CHARACTER*3	        OPT			! Profile option
+*-
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Store option
+      CALL PSF0_SETID0C( PSID, 'Form', OPT, STATUS )
+
+*    Set methods
+      CALL PSF0_SETRTN( PSID, 'Data', PSF_XMM_ANAL, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_XMM_ANAL_HINT, STATUS)
+*    Tidy up
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'PSF_XMM_ANAL_INIT', STATUS )
+      END IF
+
+      END
+
+
+*+  PSF_XMM_ANAL - XMM ANALYTICAL PSF
+      SUBROUTINE PSF_XMM_ANAL( PSID, X0, Y0, QX, QY, DX, DY, INTEG,
+     :                                           NX, NY, ARRAY, STATUS )
+
+*    Description :
+*     The PSF system routines are accessed through this interface.
+*     This subroutines takes the required PSF routine values and
+*     adds values for NORM and SIGMA before calling a subroutine
+*     to calculate the gaussian
+
+*     The Gaussian parameters are taken from 'XMM EPIC Simulations
+*     qualitative notes. Version 1.0 SSC-AIP-TN-002' - by Hasinger
+*     and Brunner.
+
+*     The on-axis PSF is given as :
+
+*     PSF(r) = norm * e**(-r**2/(2sigma**2))
+*
+*     Off-axis values are taken from :
+*
+*     sigma_blur = 0.06467 * offaxis**2  [arcsec]
+*
+*     sigma_total(i)**2 = sigma(i)**2 + sigma_blur**2
+
+*     Gaussian parameters are :
+*
+*     Component   Sigma   Norm
+*                [arcsec]
+*         1       4.150   0.4169
+*         2       8.6218  0.3470
+*         3       22.372  0.1279
+*         4       66.698  0.1082
+
+*     Note - This is a pre launch first approximation to the XMM PSF
+*     which is known NOT to be accurate.
+
+*    Method :
+*    Deficiences : This PSF is KNOWN not to be accurate.
+*    Bugs :
+
+*    Authors :
+*     David Geddes ( ::DGED)
+
+*    History :
+*     13 May 99 : Original (DGED)
+
+*    Type definitions :
+      IMPLICIT NONE
+
+*    Global Constants :
+      INCLUDE 'MATH_PAR'                           ! For MATH__RTOD
+
+*    Import :
+
+      INTEGER PSID
+
+      LOGICAL INTEG
+
+      REAL X0, Y0, QX, QY
+      REAL DX, DY
+
+*     Local Variables
+      INTEGER I,J                                  ! Loop variable
+      INTEGER LP                                   ! Loop variable
+      INTEGER NX,NY                                ! Array size
+
+      REAL OFF_AXIS
+      REAL SIGMA_BLUR
+      REAL TOTAL                                   ! Counter
+
+      REAL  X01,Y01,DX1,DY1,QX1,QY1
+
+*    Export :
+       REAL ARRAY(NX,NY)
+*    Status :
+      INTEGER STATUS
+
+*    Local Constants :
+      REAL NORM(4)
+         DATA NORM  /0.4169, 0.3470, 0.1279, 0.1082/
+      REAL SIGMA(4)
+         DATA SIGMA /4.1450, 8.6218, 22.372, 66.698/
+
+*    Pixel sizes required in seconds
+      X01 = X0 * MATH__RTOD * 3600
+      Y01 = Y0 * MATH__RTOD * 3600
+      DX1 = DX * MATH__RTOD * 3600
+      DY1 = DY * MATH__RTOD * 3600
+      QX1 = QX * MATH__RTOD * 3600
+      QY1 = QY * MATH__RTOD * 3600
+
+*    Initialise the array
+      DO I = 1, NX
+        DO J = 1,NY
+           ARRAY(I,J) = 0
+        END DO
+      END DO
+
+*    The offaxis angle is given in ARCMIN
+
+      OFF_AXIS = SQRT((X0**2)+(Y0**2))
+      OFF_AXIS = OFF_AXIS * MATH__RTOD * 60
+
+      DO LP = 1,4
+
+      IF (OFF_AXIS .GT. 0.0) THEN
+
+         SIGMA_BLUR = 0.0647 * (OFF_AXIS**2)
+         SIGMA(LP)  = SQRT((SIGMA_BLUR**2)+(SIGMA(LP)**2))
+         TOTAL = SIGMA_BLUR
+
+      END IF
+
+      CALL XMM_INTGAU2D( NORM(LP), SIGMA(LP), SIGMA(LP), X01,
+     :           Y01, QX1, QY1, DX1, DY1, NX, NY, ARRAY, STATUS )
+
+      END DO !(LP)
+
+      END
+
+
+*+  PSF_XMM_ANAL_HINT - XRT PSPC psf hint handler
+      SUBROUTINE PSF_XMM_ANAL_HINT( PSID, HINT, DATA, STATUS )
+*
+*    Description :
+*
+*     Return hints about the XRT PSPC psf.
+*
+*    Method :
+*    Deficiencies :
+*    Authors :
+*
+*     David J. Allan (ROSAT, University of Birmingham)
+*
+*    History :
+*
+*     23 Dec 93 : Original (DJA)
+*      3 Mar 94 : POSDEP hint added (DJA)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PSF_PAR'
+      INCLUDE 'MATH_PAR'
+*
+*    Import :
+*
+      INTEGER                 	PSID
+      CHARACTER*(*)           	HINT		 	! Hint name
+*
+*    Export :
+*
+      BYTE			DATA(*)			! Hint data
+*
+*    Status :
+*
+      INTEGER                   STATUS
+*
+*    Local variables:
+*
+      CHARACTER*3		OPT			! Psf form
+*-
+
+*    Check inherited global status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Radial symmetry?
+      IF ( HINT .EQ. PSF_H_RADSYM ) THEN
+
+*    All our models are radially symmetric about on-axis direction
+        CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
+        CALL MSG_PRNT('Using symmetry hint')
+
+*    Position dependent?
+      ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
+
+*    Get the psf form
+        CALL PSF0_GETID0C( PSID, 'Form', OPT, STATUS )
+        CALL MSG_PRNT('Using form hint')
+
+*    Energy dependent?
+      ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
+
+*    They all vary with energy
+        CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
+        CALL MSG_PRNT('Using energy hint')
+
+*  Field size?
+      ELSE IF ( HINT .EQ. PSF_H_FLDSIZ ) THEN
+
+*    Write value
+*    XMM FOV ~ 30 arcmin
+        CALL ARR_COP1R( 1, 0.5*MATH__DTOR, DATA, STATUS )
+        CALL MSG_PRNT('Using FOV hint')
+
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'H', HINT )
+        CALL ERR_REP( ' ', 'Unknown psf hint /^H/', STATUS )
+
+      END IF
+
+      END
+
+
+*+  XMM_INTGAU2D - Return array of integrated 2D gaussian distribution
+      SUBROUTINE XMM_INTGAU2D( MY_NORM, XSIG, YSIG,
+     :                  X0, Y0, QX, QY, DX, DY, NX, NY, ARRAY, STATUS )
+*
+*    Description :
+*
+*     This routine is a rewrite of MATHS_INTGAU2D.F specifically for
+*     the XMM PSF.
+*
+*     The value of the integrated unit normalised gaussian distribution
+*     described by XSIG,YSIG ( the sigmas in the two axes ) is found for
+*     each element of ARRAY.
+*
+*    Method :
+*
+*     Each pixel of ARRAY is subdivided in X and Y depending on the
+*     distance in sigma in each axis at that point. The formula use
+*     coded in the function SPIX1. The sub-pixelling is given by 10
+*     times the binsize / sigma, modified by SQRT(offset/sigma) to
+*     tend to unity for large offsets. This combines high accuracy
+*     where the gradient is highest, with fast operation in large
+*     areas at large sigma values.
+*
+*     The spot value of the gaussian is found in each sub-pixel, the
+*     sum of the sub-pixels contributing to each major (ARRAY) pixel.
+*
+*     The case where the array centre coincides with the centre of
+*     the gaussian is handled separately as there is 4-fold symmetry
+*     about X and Y axes.
+*
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*
+*     David Geddes (::DGED)
+*
+*    History :
+*
+*     09 Jun 99 : Original (::DGED)
+*
+*    Type definitions :
+*
+      IMPLICIT NONE
+*
+*    Global constants :
+*
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
+*
+*    Import :
+*
+      REAL                      MY_NORM
+      REAL                      TEMP
+      REAL                      R
+      REAL                      XSIG, YSIG             ! The gaussian params
+      REAL                      DX, DY, X0, Y0,QX,QY
+      INTEGER                   NX,NY
+*
+*    Export :
+*
+      REAL                      ARRAY(NX,NY)            ! Gaussian int surface
+*
+*    Status :
+*
+      INTEGER                   STATUS                  ! Run-time error
+*
+*    Functions :
+*
+      REAL			MATH_EXPR
+      INTEGER			SPIX1
+*
+*    Local variables :
+*
+      REAL                      CNST,CNST1              ! Constant part of equation
+      REAL                      NORM               	! Normalisation constant
+      REAL                      SDX, SDY                ! Sub-pixel bin sizes
+      REAL                      SUM                     ! Cumulative value
+      REAL                      XNOR, YNOR              ! X,Y bits to NORM
+      REAL                      XP0, YP0                ! Major pixel centre
+      REAL                      XPA0,YPA0               ! Corner of pixel array
+      REAL                      XPS, YPS                ! Sub-pixel pixel centre
+
+      INTEGER                   I, J                    ! Major pixel loops
+      INTEGER                   II, JJ                  ! Sub-pixel loops
+      INTEGER                   MNX, MNY                ! Local calc bounds
+      INTEGER                   XSUB, YSUB              ! Sub-pixel factors
+
+      LOGICAL                   SYMMETRIC               ! Symmetric about centre?
+
+*-
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Pixel array base coordinates
+      XPA0 = ( - REAL(NX)/2.0 ) * DX
+      YPA0 = ( - REAL(NY)/2.0 ) * DY
+
+*    Base coordinates
+      XP0 = ( - REAL(NX)/2.0 ) * DX + X0 + QX
+      YP0 = ( - REAL(NY)/2.0 ) * DY + Y0 + QY
+
+*    Symmetric?
+      SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
+     :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
+
+*    Bounds for calculation
+      IF ( SYMMETRIC ) THEN
+
+*      The "lower left corner" of the array. The +1 guarantees that the
+*      centre pixel gets done for odd values of NX/Y
+        MNX = (NX+1)/2
+        MNY = (NY+1)/2
+
+      ELSE
+
+*      The whole array
+        MNX = NX
+        MNY = NY
+
+      END IF
+
+*    Constants in the equation
+      CNST =  MY_NORM/(2 * MATH__PI * (XSIG**2))
+      CNST1 = 2 * (XSIG**2)
+      CNST1 = CNST1 - (2*CNST1)
+
+*    For each point requiring calculation
+      DO J = 1, MNY
+
+*      Find Y sub-pixelling
+*      Change made here
+        YSUB = SPIX1( YPA0 + DY*REAL(J-1) + 0.5*DY, YSIG, DY )
+        SDY = DY / YSUB
+
+*      Y contribution to normalisation
+        YNOR = SDY
+
+        DO I = 1, MNX
+
+*        Zero
+          SUM = 0.0
+
+*        Find X sub-pixelling
+          XSUB = SPIX1( XPA0 + DX*REAL(I-1) + 0.5*DX, XSIG, DX )
+          SDX = DX / XSUB
+
+*        X contribution to normalisation - hence total normalisation
+          XNOR = SDX
+
+*        Absolute value required.
+          NORM = ABS(XNOR*YNOR)
+
+*        Y position of first sub-pixel centre
+          YPS = YP0 + DY*(J-1) + 0.5*SDY
+
+*        For each sub-pixel row
+          DO JJ = 0, YSUB-1
+
+*          X position of first sub-pixel centre
+            XPS = XP0 + DX*(I-1) + 0.5*SDX
+
+*          For each sub-pixel
+            DO II = 0, XSUB-1
+
+*              Value of gaussian
+                R = SQRT(YPS**2 + XPS**2)
+*              Testing for area rather than origin
+                IF (R) THEN
+                   TEMP = R**2/CNST1
+                   SUM = SUM + (CNST * MATH_EXPR(TEMP))
+                END IF
+
+*            Next sub-pixel
+              XPS = XPS + SDX
+
+            END DO
+
+*          Next row of sub-pixels
+            YPS = YPS + SDY
+
+          END DO
+
+*        Set ARRAY value
+          ARRAY(I,J) = ARRAY(I,J) + (SUM * NORM)
+
+        END DO
+
+      END DO
+
+*    Copy array around if symmetrical
+      IF ( SYMMETRIC ) THEN
+*      Transfer data to other 3 quadrants
+        JJ = NY
+        DO J = 1, MNY
+          II = NX
+          DO I = 1, MNX
+            ARRAY(II,J) = ARRAY(I,J)
+            ARRAY(II,JJ) = ARRAY(I,J)
+            ARRAY(I,JJ) = ARRAY(I,J)
+            II = II - 1
+          END DO
+          JJ = JJ - 1
+        END DO
+
       END IF
 
       END
