@@ -1,3 +1,15 @@
+/* MAX_PATH added by Starlink for portability reasons. If new export.h
+   imported from modern IDL, this porting option may be required
+   again */
+
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
+#if HAVE_LIMITS_H
+# include <limits.h>
+#endif
+
 /* export.h */
 
 
@@ -226,7 +238,9 @@
 typedef long IDL_PTR_INT;
 
 /**** Longest allowed file path specification ****/
-#ifdef MAC
+#if HAVE_DECL_PATH_MAX && defined PATH_MAX
+#define IDL_MAXPATH PATH_MAX
+#elif defined(MAC)
 #define IDL_MAXPATH 255
 #elif defined(unix)
 #define IDL_MAXPATH    1024		/* That's what BSD allows */
