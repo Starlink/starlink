@@ -688,7 +688,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
        [dnl non-empty second argument -- just add to variable
         if $_star_build_docs; then
             STAR@&t@_LATEX_DOCUMENTATION="$2"
-            : ${LATEX2DVI='$$LATEX $<; $$LATEX $<'}
+            : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
             AC_SUBST(LATEX2DVI)
         else
             AC_MSG_WARN([not installing docs $1])
@@ -702,7 +702,7 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
                 _star_tmp="$_star_tmp $d.tex $d.ps $d.htx_tar"
             done
             STAR@&t@_LATEX_DOCUMENTATION="$_star_tmp"
-            : ${LATEX2DVI='$$LATEX $<; $$LATEX $<'}
+            : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
             AC_SUBST(LATEX2DVI)
         else
             AC_MSG_WARN([not installing docs $1])
@@ -759,7 +759,7 @@ AC_DEFUN([STAR_XML_DOCUMENTATION],
                 STAR_CHECK_PROGS([sgml2docs sgmlnorm])
                 SGMLKIT_HOME=$prefix/lib/sgmlkit
                 AC_SUBST(SGMLKIT_HOME)
-                : ${LATEX2DVI='$$LATEX $$[]1; $$LATEX $$[]1'}
+                : ${LATEX2DVI='$$LATEX "\\batchmode\\input $$[]1" && $$LATEX "\\batchmode\\input $$[]1"'}
                 AC_SUBST(LATEX2DVI)
             fi
         else
