@@ -11,7 +11,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'TIM_CMN'
 *    Status :
@@ -24,7 +23,7 @@
       LOGICAL ACTIVE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TCLOSE Version 1.4-0')
+      PARAMETER (VERSION = 'TCLOSE Version 2.0-0')
 *-
       CALL MSG_PRNT(VERSION)
 
@@ -54,8 +53,8 @@
         ENDIF
 
         T_OPEN=.FALSE.
+        CALL ADI_CLOSE(T_FID,STATUS)
         CALL AST_CLOSE()
-        CALL HDS_CLOSE(T_LOC,STATUS)
 
       ENDIF
 

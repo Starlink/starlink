@@ -138,7 +138,8 @@
 
 *  data
         CALL DYN_MAPR(1,T_NVAL,T_DPTR,STATUS)
-        CALL BDI_GET1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), NVAL, STATUS )
+        CALL BDI_GET1R( FID, 'Data', T_NVAL, %VAL(T_DPTR), NVAL,
+     :                  STATUS )
         CALL BDI_GET0C( FID, 'Title', T_TITLE,STATUS)
         CALL BDI_GET0C( FID ,'Label',T_LABEL,STATUS)
         CALL BDI_GET0C( FID,'Units',T_UNITS,STATUS)
@@ -171,8 +172,8 @@
 *  QUALITY
         CALL DYN_MAPB(1,T_NVAL,T_QPTR,STATUS)
         IF ( T_QOK ) THEN
-          CALL BDI_GET( FID, 'Quality', 'UBYTE', 1, T_NVAL, %VAL(T_QPTR),
-     :                    NVAL, STATUS )
+          CALL BDI_GET( FID, 'Quality', 'UBYTE', 1, T_NVAL,
+     :                  %VAL(T_QPTR), NVAL, STATUS )
           CALL BDI_GET( FID, 'QualityMask', 'UBYTE', 0, 0, T_MASK,
      :                  NVAL, STATUS )
         ELSE
