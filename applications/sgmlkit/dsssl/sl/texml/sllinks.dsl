@@ -136,6 +136,10 @@ it produces an <funcname>error</>.
     (cond
      ((not xrefent)
       (error "DOCXREF: missing DOC attribute"))
+
+     ((not (entity-type xrefent))
+      (literal xrefent))                ; just add literal
+                                        ; -- no need to create dummy text 
      
      ((or (equal? (entity-type xrefent)
                   'subdocument)
