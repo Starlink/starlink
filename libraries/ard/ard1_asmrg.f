@@ -123,7 +123,7 @@
          CALL CHR_APPND( ',', DOMLST, IAT )
       END IF
 
-      CALL CHR_APPND( 'SKY,', DOMLST, IAT )
+      IF( DOM .NE. 'SKY' ) CALL CHR_APPND( 'SKY,', DOMLST, IAT )
 
       IF( PDOM .NE. ' ' .AND. PDOM .NE. 'PIXEL' ) THEN
          CALL CHR_APPND( PDOM, DOMLST, IAT )

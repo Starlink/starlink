@@ -1651,8 +1651,10 @@ can only be used in 2-dimensional ARD descriptions.
 should contain 5 values; the first pair give the user coordinates of
 the centre of the ellipse, the second pair give the half-lengths of the
 two axes of the ellipse (in user coordinates), and the fifth value gives
-the position angle (in degrees) of the first of the two ellipse axes. 
-This keyword can only be used in 2-dimensional ARD descriptions.
+the angle (in degrees) from the first axis of the user coordinate system
+to the first axis of the ellipse (positive rotation is from the first to
+the second user axis). This keyword can only be used in 2-dimensional ARD 
+descriptions.
 
 \item [\label{KEY:FRA}FRAME] - The entire mask excluding a border of given 
 width. The argument list should contain a single value giving the width
@@ -1699,8 +1701,10 @@ dimensions.
 \item [\label{KEY:ROT}ROTBOX] - A rotated box. The argument list should 
 contain 5 values; the first pair give the coordinates of the box centre,
 the second pair give the lengths of the two sides, and the fifth value
-gives the position angle (in degrees) of the first side of the box. 
-This keyword can only be used in 2-dimensional ARD descriptions. Note, the
+gives the angle (in degrees) from the first axis of the user coordinate system
+to the first side of the box (positive rotation is from the first to
+the second user axis). This keyword can only be used in 2-dimensional ARD 
+Note, the
 edges of a rotated box are {\em geodesics} within the user coordinate
 Frame. So, for instance, if user coordinates are RA and DEC then the
 edges of a rotated box will correspond to great circles on the sky.
