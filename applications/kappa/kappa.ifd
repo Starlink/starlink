@@ -5882,6 +5882,15 @@ package kappa {
             helpkey *
           }
 
+         parameter describe {
+            type _LOGICAL
+            prompt {Is the co-ordinate Frame to be described?}
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+         }
+
          parameter device {
             access READ
             position 2
@@ -5890,6 +5899,31 @@ package kappa {
             vpath GLOBAL CURRENT
             ptype DEVICE
             association <-GLOBAL.GRAPHICS_DEVICE
+          }
+
+          parameter domain {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            default 0.0D0
+            helpkey *
+          }
+
+          parameter epoch {
+            type _DOUBLE
+            prompt {Epoch of observation}
+            ppath DYNAMIC CURRENT
+            helpkey *
+          }
+
+         parameter frame {
+            position 3
+            type LITERAL
+            vpath DEFAULT
+            prompt {Co-ordinate Frame to be displayed}
+            ppath DEFAULT
+            default !
+            helpkey *
           }
 
          parameter label {
@@ -5911,72 +5945,8 @@ package kappa {
             helpkey *
           }
 
-         parameter ncx1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncx2 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncy1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter ncy2 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
          parameter pname {
             type LITERAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter rcx1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter rcx2 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter rcy1 {
-            type _REAL
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
-            helpkey *
-          }
-
-         parameter rcy2 {
-            type _REAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
@@ -6001,38 +5971,37 @@ package kappa {
             helpkey *
           }
 
-         parameter wcx1 {
-            type _REAL
+         parameter x1 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcx2 {
-            type _REAL
+         parameter x2 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcy1 {
-            type _REAL
+         parameter y1 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
 
-         parameter wcy2 {
-            type _REAL
+         parameter y2 {
+            type LITERAL
             access WRITE
             vpath DEFAULT
             default 0.0D0
             helpkey *
           }
-
       }
 
       action piclabel {
@@ -6141,70 +6110,80 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter bound {
-				 # bounds?
-            position 4
             type _LOGICAL
             access WRITE
             vpath DEFAULT
             default TRUE
             helpkey *
-          }
-
-         parameter cosys {
-            type LITERAL
-            vpath GLOBAL DEFAULT
-            ppath GLOBAL DYNAMIC
-            prompt {Co-ordinate system}
-            association <->GLOBAL.COORD_SYSTEM
-            helpkey *
-            default Data
-          }
+         }
 
          parameter device {
             ptype DEVICE
+            position 4
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
             association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of graphics device}
             helpkey *
-          }
+         }
 
-         parameter inxy {
-            size *
-            position 1
+         parameter epochin {
             type _DOUBLE
-            vpath PROMPT
-            ppath CURRENT
-            prompt {Co-ordinates to be converted}
+            ppath DYNAMIC CURRENT
+            prompt {Epoch of input position}
             helpkey *
-          }
+         }
 
-         parameter outx {
+         parameter epochout {
+            type _DOUBLE
+            ppath DYNAMIC CURRENT
+            prompt {Epoch of output position}
+            helpkey *
+         }
+
+         parameter framein {
             position 2
-            type _DOUBLE
-            access WRITE
-            vpath DEFAULT
-            default 0.0D0
+            type LITERAL
+            ppath CURRENT DEFAULT
+            prompt {Input co-ordinate Frame}
             helpkey *
-          }
+            default PIXEL
+         }
 
-         parameter outy {
+         parameter frameout {
             position 3
-            type _DOUBLE
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Output co-ordinate Frame}
+            helpkey *
+            default !
+         }
+
+         parameter posin {
+            position 1
+            type LITERAL
+            prompt {Position to be transformed}
+            ppath CURRENT
+            helpkey *
+         }
+
+         parameter posout {
+            type LITERAL
             access WRITE
             vpath DEFAULT
-            default 0.0D0
+            default { }
             helpkey *
-          }
+         }
 
-         parameter tobase {
+         parameter quiet {
             type _LOGICAL
             vpath DEFAULT
-            ppath CURRENT
-            prompt {Convert to BASE-picture co-ordinates?}
-            default TRUE
+            ppath DEFAULT
+            default FALSE
+            prompt {Suppress screen output?}
             helpkey *
-          }
+         }
 
       }
 

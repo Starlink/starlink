@@ -23330,7 +23330,7 @@ Finds the attributes of a picture interior to the current picture.
 
 Usage:
 
-   picin [name] [device]
+   picin [name] [device] [frame]
 
 Description:
 
@@ -23341,102 +23341,103 @@ Description:
    whereupon the current picture is tested first.
 
    The attributes reported are the name, comment, label, name of the
-   reference data object, the bounds in world, raster, and normalised
-   device co-ordinates.
+   reference data object, the bounds in the co-ordinate Frame selected
+   by parameter FRAME.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 COMMENT
 COMMENT = LITERAL (Write)
-   The comment of the current picture.  Up to 132 characters
-   will be written.
+   The comment of the picture.  Up to 132 characters will be written.
 3 CURRENT
 CURRENT = _LOGICAL (Read)
-   If this is TRUE, the current picture is compared against the
+   If this is {\tt TRUE}, the current picture is compared against the
    chosen name before searching from the most-recent picture
    within the current picture. [FALSE]
 3 DEVICE
 DEVICE = DEVICE (Read)
    Name of the graphics device about which information is
    required. [Current graphics device]
+3 DOMAIN
+DOMAIN = LITERAL (Write)
+   The Domain name of the current co-ordinate Frame for the picture.
+3 EPOCH
+EPOCH = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAME) for a celestial co-ordinate system, then an
+   epoch value is needed to qualify it. This is the epoch at
+   which the displayed sky co-ordinates were determined. It should
+   be given as a decimal years value, with or without decimal places
+   ("1996.8" for example). Such values are interpreted as a Besselian
+   epoch if less than 1984.0 and as a Julian epoch otherwise.
+3 FRAME
+FRAME = LITERAL (Read)
+   A string determining the co-ordinate Frame in which the bounds
+   of the picture are to be reported. When a picture is
+   created by an application such as PICDEF, DISPLAY, etc, WCS
+   information describing the available co-ordinate systems are stored
+   with the picture in the graphics database. This application can
+   report bounds in any of the co-ordinate Frames stored with the
+   current picture. The string supplied for FRAME can be one of the
+   following:
+
+   - A domain name such as SKY, AXIS, PIXEL, BASEPIC, CURPIC, etc. The
+   special domain AGI_WORLD is used to refer to the world co-ordinate
+   system stored in the AGI graphics database. This can be useful if
+   no WCS information was store with the picture when it was created.
+
+   - An integer value giving the index of the required Frame.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null value (!) is supplied, bounds are reported in the
+   co-ordinate Frame which was current when the picture was created.
+   [!]
 3 LABEL
 LABEL = LITERAL (Write)
-   The label of the current picture.  It is blank if there is no
-   label.
+   The label of the picture.  It is blank if there is no label.
 3 NAME
 NAME = LITERAL (Read)
    The name of the picture to be found within the current picture.
    If it is null (!), the first interior picture is selected.
    ["DATA"]
-3 NCX1
-NCX1 = _REAL (Write)
-   The lower x normalised device co-ordinate of the current
-   picture.
-3 NCX2
-NCX2 = _REAL (Write)
-   The upper x normalised device co-ordinate of the current
-   picture.
-3 NCY1
-NCY1 = _REAL (Write)
-   The lower y normalised device co-ordinate of the current
-   picture.
-3 NCY2
-NCY2 = _REAL (Write)
-   The upper y normalised device co-ordinate of the current
-   picture.
 3 PNAME
 PNAME = LITERAL (Write)
-   The name of the current picture.
-3 RCX1
-RCX1 = _REAL (Write)
-   The lower x raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-3 RCX2
-RCX2 = _REAL (Write)
-   The upper x raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-3 RCY1
-RCY1 = _REAL (Write)
-   The lower y raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-   picture.
-3 RCY2
-RCY2 = _REAL (Write)
-   The upper y raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
+   The name of the picture.
 3 REFNAM
 REFNAM = LITERAL (Write)
-   The reference object associated with the current picture.  It
-   is blank if there is no reference object.  Up to 132 characters
-   will be written.
+   The reference object associated with the picture.  It is blank if
+   there is no reference object.  Up to 132 characters will be written.
 3 REPORT
 REPORT = _LOGICAL (Read)
-   If this is FALSE details of the interior picture are not
-   reported, merely the results are written to the output
-   parameters.  It is intended for use within procedures. [TRUE]
-3 WCX1
-WCX1 = _REAL (Write)
-   The lower x world co-ordinate of the current picture.
-3 WCX2
-WCX2 = _REAL (Write)
-   The upper x world co-ordinate of the current picture.
-3 WCY1
-WCY1 = _REAL (Write)
-   The lower y world co-ordinate of the current picture.
-3 WCY2
-WCY2 = _REAL (Write)
-   The upper y world co-ordinate of the current picture.
+   If this is FALSE details of the picture are not reported, merely the
+   results are written to the output parameters.  It is intended for
+   use within procedures. [TRUE]
+3 X1
+X1 = LITERAL (Write)
+   The lowest value found within the  picture for axis 1 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 X2
+X2 = LITERAL (Write)
+   The highest value found within the  picture for axis 1 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 Y1
+Y1 = LITERAL (Write)
+   The lowest value found within the  picture for axis 2 of the
+   requested co-ordinate Frame (see parameter FRAME).
+3 Y2
+Y2 = LITERAL (Write)
+   The highest value found within the  picture for axis 2 of the
+   requested co-ordinate Frame (see parameter FRAME).
 2 Examples
 picin
    This reports the attributes of the last DATA picture within
-   the current picture for the current graphics device.
+   the current picture for the current graphics device. The bounds
+   of the picture in its current co-ordinate Frame are reported.
 
-picin frame graphon
-   This reports the attributes of the last FRAME picture within
-   the current picture for the Graphon device.
+picin frame=pixel
+   As above but the bounds of the picture in the PIXEL Frame are
+   reported.
 
 picin refnam=(object) current
    This reports the attributes of the last data picture within
@@ -23444,11 +23445,11 @@ picin refnam=(object) current
    is a reference data object, its name is written to the ICL
    variable OBJECT.  The search includes the current picture.
 
-picin ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
+picin x1=(x1) x2=(x2) y1=(y1) y2=(y2)
    This reports the attributes of the last DATA picture within
    the current picture for the current graphics device.  The
-   bounds of the current picture in normalised device
-   co-ordinates are written to the ICL variables: X1, X2, Y1, Y2.
+   bounds of the current picture are written to the ICL
+   variables: X1, X2, Y1, Y2.
 2 Notes
 This application is intended for use within procedures.  Also if
 a DATA picture is selected and the current picture is included in
@@ -23460,6 +23461,8 @@ accessed.
    KAPPA: GDSTATE, PICDEF, PICLIST, PICTRANS, PICXY.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 2 History
  1991 August 20 (MJC):
     Original version.
@@ -23467,6 +23470,8 @@ MJC: Malcolm J. Currie (STARLINK)
  1993 August 19 (MJC):
     Added raster co-ordinates.
 
+ 24-SEP-2001 (DSB):
+    Converted to AST/PGPLOT.
 1 PICLABEL
 Labels the current graphics-database picture.
 
@@ -23719,97 +23724,143 @@ MJC: Malcolm J. Currie  (STARLINK)
     Added AGI begin-and-end block.
 
 1 PICTRANS
-Transforms co-ordinates between the current and BASE pictures.
+Transform a graphics position from one picture co-ordinate Frame to
+another.
 
 Usage:
 
-   pictrans inxy [outx] [outy] [bound]
+   pictrans posin framein [frameout] [device]
 
 Description:
 
-   This application converts a position's co-ordinates from the
-   current picture to their equivalent in the BASE picture, or
-   vice versa.
+   This application transforms a position on a graphics device from one
+   co-ordinate Frame to another. The input and output Frames may be chosen
+   freely from the Frames available in the WCS information stored with
+   the current picture in the AGI graphics database. The transformed
+   position is formatted for display and written to the screen and
+   also to an output parameter.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 BOUND
 BOUND = _LOGICAL (Write)
-   BOUND is TRUE when the transformed co-ordinates lie within the
-   bounds of their associated picture.
-3 COSYS
-COSYS = LITERAL (Read)
-   The co-ordinate system to be used.  This can be either "World"
-   or "Data".  "World" makes the application convert between the
-   world co-ordinates of the position in the two pictures.  World
-   co-ordinates that relate to a location in a data array will be
-   in array pixels.  For COSYS = "Data" the conversion is between
-   data co-ordinates, stored via a transformation.  The BASE
-   picture will not normally have data co-ordinates, so the value
-   of COSYS usually selects in which co-ordinate system positions
-   in the current picture are specified.
-
-   Data co-ordinates are arbitrary but most often they will be a
-   linear or logarithmic transformation of the world
-   co-ordinates.  For example, the x co-ordinate of a spectrum
-   would be given in pixels if COSYS = "World", but if COSYS =
-   "Data" the x co-ordinate could be in wavelength units, such as
-   Angstroms.  If the database does not have a world-to-data
-   transformation for a given picture, the value of this
-   parameter is ignored for that picture, and supplied or
-   computed positions in that picture will be in world
-   co-ordinates.  [Current co-ordinate system]
+   BOUND is TRUE when the supplied point lies within the bounds of
+   the current picture.
 3 DEVICE
 DEVICE = DEVICE (Read)
    The graphics workstation. [The current graphics device]
-3 INXY
-INXY( 2 ) = _DOUBLE (Read)
-   The x-y co-ordinates to be transformed.  These need not lie
-   within the physical bounds of their associated picture.  The
-   suggested value is the current value.
-3 OUTX
-OUTX = _DOUBLE (Write)
-   The transformed x co-ordinate.
-3 OUTY
-OUTY = _DOUBLE (Write)
-   The transformed y co-ordinate.
-3 TOBASE
-TOBASE = _LOGICAL (Read)
-   This decides the direction of the transformation.  If TOBASE
-   is TRUE, the conversion is from the current to the BASE
-   picture.  If TOBASE is FALSE, BASE-picture co-ordinates are
-   converted to a position within the current picture.
-   The suggested value is the current value.  [TRUE]
+3 EPOCHIN
+EPOCHIN = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAMEIN) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   supplied sky position was determined. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+3 EPOCHOUT
+EPOCHOUT = _DOUBLE (Read)
+   If a "Sky Co-ordinate System" specification is supplied (using
+   parameter FRAMEOUT) for a celestial co-ordinate system, then an epoch
+   value is needed to qualify it. This is the epoch at which the
+   transformed sky position is required. It should be given as a
+   decimal years value, with or without decimal places  ("1996.8" for
+   example). Such values are interpreted as a Besselian epoch if less
+   than 1984.0 and as a Julian epoch otherwise.
+3 FRAMEIN
+FRAMEIN = LITERAL (Read)
+   A string specifying the co-ordinate Frame in which the input
+   position is supplied (see parameter POSIN). The string can be
+   one of the following:
+
+   - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC,
+   BASEPIC, etc.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null parameter value is supplied, then the current Frame in
+   the current picture is used. [!]
+3 FRAMEOUT
+FRAMEOUT = LITERAL (Read)
+   A string specifying the co-ordinate Frame in which the transformed
+   position is required. If a null parameter value is supplied, then
+   the current Frame in the picture is used. The string can be one of the
+   following:
+
+   - A domain name such as SKY, AXIS, PIXEL, GRAPHICS, CURPIC,
+   BASEPIC, etc.
+
+   - An integer value giving the index of the required Frame within
+   the WCS component.
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+   section "Sky Co-ordinate Systems" in SUN/95).
+
+   If a null parameter value is supplied, then the BASEPIC Frame is
+   used. ["BASEPIC"]
+3 POSIN
+POSIN = LITERAL (Read)
+   The co-ordinates of the position to be transformed, in the
+   co-ordinate Frame specified by parameter FRAMEIN (supplying
+   a colon ":" will display details of the required co-ordinate Frame).
+   The position should be supplied as a list of formatted axis values
+   separated by spaces or commas.
+3 POSOUT
+POSOUT = LITERAL (Write)
+   The formatted co-ordinates of the transformed position, in the
+   co-ordinate Frame specified by parameter FRAMEOUT. The position
+   will be stored as a list of formatted axis values separated by
+   spaces.
+3 QUIET
+QUIET = _LOGICAL (Read)
+   If TRUE, the transformed position is not written to the screen
+   (it is still written to the output parameter OUTPOS). [FALSE]
 2 Examples
-pictrans [100.3,-20.1] outx=(dx) outy=(dy) cosys=w
-   This converts the position (100.3,-20.1), in world co-ordinates
-   of the current picture of the current graphics device, to the
-   world co-ordinates of that point in the BASE picture.  The base
-   co-ordinates are written to ICL variables DX and DY (as well as
-   the application's parameter file).
+pictrans "100.3,-20.1" framein=pixel
+   This converts the position (100.3,-20.1), in pixel co-ordinates
+   within the current picture of the current graphics device, to the
+   BASEPIC co-ordinates of that point in the BASE picture.
 
-pictrans [-1.e4,2.56] outy=(dy) device=xwindows
-   This converts the position (-10000.0,2.56), in the current
-   picture of the xwindows device, to the co-ordinates of that
-   point in the BASE picture.  All positions use the current
-   co-ordinate system.  The base y co-ordinate is written to ICL
-   variable DY.
+pictrans "100.3,-20.1" framein=pixel frameout=graphics
+   This converts the position (100.3,-20.1), in pixel co-ordinates
+   within the current picture of the current graphics device, to the
+   GRAPHICS co-ordinates of that point (i.e. millimetres from the
+   bottom left corner of the graphics device).
 
-pictrans [0.314,0.137] (dx) (dy) (within) cosys=d notobase
-   This converts the position (0.314,0.137), in the data
-   co-ordinates of the BASE picture of the current graphics
-   device, to the data co-ordinates of that point in the current
-   picture.  The transformed co-ordinates are written to ICL
-   variables DX and DY.  ICL variable WITHIN contains a flag
-   to indicate whether or not the point lies within the current
-   picture.
+pictrans "10 10" framein=graphics frameout=basepic
+   This converts the position (10 10), in graphics co-ordinates
+   (i.e. the point which is 10mm above and to the right of the
+   lower left corner of the graphics device), into BASEPIC
+   co-ordinates.
+
+Notes:
+   -  BASEPIC co-ordinates locate a position within the entire graphics
+   device. The bottom left corner of the device screen has BASEPIC
+   co-ordinates of (0,0). The shorter dimension of the screen has
+   length 1.0, and the other axis has a length greater than 1.0.
+
+   -  GRAPHICS co-ordinates also span the entire graphics device but
+   are measured in millimetres from the bottom left corner.
+
+   -  CURPIC co-ordinates locate a point within the current picture. The
+   bottom left corner of the current picture has CURPIC co-ordinates of
+   (0,0). The shorter dimension of the current picture has length 1.0, and
+   the other axis has a length greater than 1.0.
 2 Related_Applications
    KAPPA: GDSTATE, PICIN, PICXY.
 2 Authors
 MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David Berry (STARLINK)
 2 History
  1993 August 19 (MJC):
     Original version.
 
+ 24-SEP-2001 (DSB):
+    Converted to AST/PGPLOT.
 1 PICVIS
 Finds the first unobscured FRAME picture in the graphics database.
 
