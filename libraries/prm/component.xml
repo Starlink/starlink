@@ -5,8 +5,9 @@
 <component id="prm" support="S">
   <version>1.4-1</version>
   <path>libraries/prm</path>
-  <description>PRIMDAT --- Processing of Primitive Numerical Data</description>
-  <abstract><p>This document describes the PRIMDAT package, which
+  <description>PRM --- Processing of Primitive Numerical Data</description>
+  <abstract><p>This document describes the PRM package (once called
+      PRIMDAT), which 
       is a collection of Fortran functions and subroutines providing
       support for ``primitive data processing''.  Routines from this
       package may be used to perform arithmetic, mathematical
@@ -34,7 +35,7 @@
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <copyright>
-    <year>1987, 1988, 1991, 1992, 1995, 2004</year>
+    <year>1987, 1988, 1991, 1992, 1995, 2004, 2005</year>
     <name>Council for the Central Laboratory of the Research Councils</name>
   </copyright>
   <!-- <notes><p></p></notes> -->
