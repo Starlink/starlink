@@ -7839,7 +7839,7 @@ U java/source/table/src/main/uk/ac/starlink/table/ArrayColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnData.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnPermutedStarTable.java
-U java/source/table/src/main/uk/ac/starlink/table/ColumnScratchTable.java
+U java/source/table/src/main/uk/ac/starlink/table/ColumnRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ColumnStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/DefaultValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/DescribedValue.java
@@ -7847,8 +7847,9 @@ U java/source/table/src/main/uk/ac/starlink/table/EditableColumn.java
 U java/source/table/src/main/uk/ac/starlink/table/IteratorRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/RandomStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/RandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/ReaderRowSequence.java
-U java/source/table/src/main/uk/ac/starlink/table/RowScratchTable.java
+U java/source/table/src/main/uk/ac/starlink/table/RowRandomWrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/RowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java
@@ -7857,7 +7858,6 @@ U java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/TableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/TableCopy.java
 U java/source/table/src/main/uk/ac/starlink/table/Tables.java
-U java/source/table/src/main/uk/ac/starlink/table/TextTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
@@ -7867,6 +7867,8 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
+U java/source/table/src/main/uk/ac/starlink/table/formats/LatexTableWriter.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCReader.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCTableBuilder.java
@@ -8106,6 +8108,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/io.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jel.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/latex-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/mirage.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
@@ -8137,6 +8140,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Print24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Redo24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Save24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/TopCat2.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/ab3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/blank24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/browser1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/burst.gif
