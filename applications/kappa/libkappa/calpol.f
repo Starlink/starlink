@@ -300,7 +300,7 @@
 
 *  Attempt to get an output NDF to hold total intensity.
       CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY,UNITS', 'I', NDFI, 
-     :               STATUS )
+     :                STATUS )
 
 *  If successful, set a flag indicating that a total-intensity NDF is to
 *  be produced.
@@ -331,7 +331,8 @@
 
 *  Attempt to get an output NDF to hold the normalised Q Stokes
 *  parameter.
-      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'Q', NDFQ, 
+     :                STATUS )
 
 *  If successful, set a flag indicating that a
 *  normalised-Q-Stokes-parameter NDF is to be produced.
@@ -362,7 +363,8 @@
 
 *  Attempt to get an output NDF to hold the normalised U Stokes
 *  parameter.
-      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'U', NDFU, 
+     :                STATUS )
 
 *  If successful, set a flag indicating that a U NDF is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -391,7 +393,8 @@
 *  ===========================================
 
 *  Attempt to get an output NDF to hold percentage polarisation.
-      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, STATUS )
+      CALL NDG_PROPL( NDFIN( 1 ), 'WCS,AXIS,QUALITY', 'P', NDFP, 
+     :                STATUS )
 
 *  If successful, set a flag indicating that a percent-polarisation NDF
 *  is to be produced.

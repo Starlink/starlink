@@ -977,8 +977,8 @@
 *  NDF is based on the input NDF.
       CALL ERR_MARK
 
-      CALL NDG_PROPL( INDF, 'WCS,AXIS,QUALITY,UNITS', 'MODELOUT', NMDNDF,
-     :               STATUS )
+      CALL NDG_PROPL( INDF, 'WCS,AXIS,QUALITY,UNITS', 'MODELOUT', 
+     :               NMDNDF, STATUS )
 
 *  If an NDF was given, store the new model in it.
       IF ( STATUS .EQ. PAR__NULL ) THEN
