@@ -528,11 +528,8 @@
 *  Use the path through the graph to find the mapping.
             CALL CCD1_PTHMP( IWCS, PATH, NSTEP( I ), DMNS, MAP, STATUS )
 
-*  Prepare a copy of the old WCS frameset of the NDF and ensure it has
-*  a Base frame in the GRID domain (otherwise the NDF system will
-*  complain).
+*  Prepare a copy of the old WCS frameset of the NDF.
             WCSOUT = AST_COPY( IWCS( I ), STATUS )
-            CALL AST_SETI( WCSOUT, 'Base', 1, STATUS )
 
 *  Add the new frame to the WCS frameset.
             CALL AST_ADDFRAME( WCSOUT, AST__CURRENT, MAP, OUTFR,
@@ -565,6 +562,10 @@
 
 *  Purge the frameset of any pre-existing frames in the output domain.
          CALL CCD1_DMPRG( WCSOUT, OUTDM, .TRUE., JNEW, STATUS )
+
+*  Ensure the output frameset has a Base frame in the GRID domain 
+*  (otherwise the NDF system will complain).
+         CALL AST_SETI( WCSOUT, 'Base', 1, STATUS )
 
 *  Write out the modified WCS frameset to the NDF.
          CALL NDF_PTWCS( WCSOUT, INDF( I ), STATUS )
