@@ -4047,7 +4047,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 c     :                           S2 = 4.0419,
      :	                         S3 = 31.69 )
       REAL                     NORM                    ! Normalisation
-        PARAMETER              ( NORM = 54.848581 )
+        PARAMETER              ( NORM = 1.0 )
       REAL                     RTOS                    ! Radian to arcsec
         PARAMETER              ( RTOS = MATH__RTOD*3600.0 )
 *
@@ -4252,7 +4252,7 @@ c     :                           S2 = 4.0419,
       ELSE IF ( HINT .EQ. PSF_H_POSDEP ) THEN
 
 *    It is position dependent
-        CALL ARR_COP1L( 1, .FALSE., DATA, STATUS )
+        CALL ARR_COP1L( 1, .TRUE., DATA, STATUS )
 
 *  Energy dependent
       ELSE IF ( HINT .EQ. PSF_H_ENDEP ) THEN
