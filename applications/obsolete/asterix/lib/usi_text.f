@@ -61,6 +61,7 @@
       INTEGER             RBRACKPOS           ! Position of a "}"
       INTEGER             USE                 ! Current line
       INTEGER             SLEN, WLEN          ! String lengths
+      INTEGER		L1, L2
 
       LOGICAL             PVALID              ! Valid parameter found?
 *-
@@ -97,13 +98,19 @@
 
 *          Is it valid?
             CODE = 0
-            DO IP = 1, USI__NMAX
+            L1 = CHR_LEN(PARNAME)
+            IP = 1
+            DO WHILE ( (IP.LE.USI__NMAX) .AND. (CODE.EQ.0) )
               IF ( DS(IP).USED ) THEN
-                IF ( CHR_SIMLR(PARNAME,DS(IP).PAR) ) THEN
+                L2 = CHR_LEN(DS(IP).PAR)
+                IF ( CHR_SIMLR(PARNAME(:L1),DS(IP).PAR(:L2)) ) THEN
                   CODE = IP
+                  PVALID = .TRUE.
                 END IF
               END IF
+              IP = IP + 1
             END DO
+
             IF ( CODE .NE. 0 ) THEN
 
 *            Parameter name is ok - get locator
