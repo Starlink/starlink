@@ -79,11 +79,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			SLN0_ERASE
       EXTERNAL			SLN1_GETREC
       EXTERNAL			SLN1_NREC
@@ -97,20 +100,28 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Load the selections package
-      CALL ADI_REQPKG( 'select', STATUS )
+*  Already loaded?
+      IF ( .NOT. AST_QPKGI( SLN__PKG ) ) THEN
 
-*  Define the methods
-      CALL ADI_DEFMTH( 'GetSelNrec(_HDSfile)',
+*    Load the selections package
+        CALL ADI_REQPKG( 'select', STATUS )
+
+*    Define the methods
+        CALL ADI_DEFMTH( 'GetSelNrec(_HDSfile)',
      :                 SLN1_NREC, DID, STATUS )
-      CALL ADI_DEFMTH( 'GetSelRec(_HDSfile,_CHAR,_INTEGER)',
+        CALL ADI_DEFMTH( 'GetSelRec(_HDSfile,_CHAR,_INTEGER)',
      :                 SLN1_GETREC, DID, STATUS )
-      CALL ADI_DEFMTH( 'PutSelRec(_HDSfile,_SelectionRecord)',
+        CALL ADI_DEFMTH( 'PutSelRec(_HDSfile,_SelectionRecord)',
      :                 SLN1_PUTREC, DID, STATUS )
 
-*  Add selection record destructor
-      CALL ADI_LOCCLS( 'SelectionRecord', CLSID, STATUS )
-      CALL ADI_DEFDES( CLSID, SLN0_ERASE, STATUS )
+*    Add selection record destructor
+        CALL ADI_LOCCLS( 'SelectionRecord', CLSID, STATUS )
+        CALL ADI_DEFDES( CLSID, SLN0_ERASE, STATUS )
+
+*    Mark as loaded
+        CALL AST_SPKGI( SLN__PKG )
+
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'SLN0_INIT', STATUS )

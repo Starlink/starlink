@@ -113,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. AST_QPKGI( SLN_PKG ) ) CALL SLN0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( SLN__PKG ) ) CALL SLN0_INIT( STATUS )
 
 *  Locate file identifier
       CALL ADI_GETFILE( ID, IARG(1), STATUS )
