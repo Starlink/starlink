@@ -396,7 +396,7 @@
       CALL CCD1_MALL( NNDF * NNDF * 4, '_INTEGER', IPGRA, STATUS )
       CALL CCD1_MALL( NNDF * NNDF * 4, '_INTEGER', IPSUB, STATUS )
       CALL CCD1_MALL( NNDF * NNDF, '_INTEGER', IPQUE, STATUS )
-      CALL CCD1_MALL( NNDF * NNDF, '_LOGICAL', IPBEEN, STATUS )
+      CALL CCD1_MALL( NNDF, '_LOGICAL', IPBEEN, STATUS )
 
 *  Use a graph of all the connections given by the user. The first stage
 *  is to change the format into one which is a recognisable graph with
@@ -411,7 +411,7 @@
       CALL CCD1_GRAPC( %VAL( IPGRA ), NEDGES, 1, %VAL( IPQUE ),
      :                 %VAL( IPBEEN ), COMPL, CYCLIC, %VAL( IPSUB ),
      :                 NEWED, TOTNOD, STATUS )
-      IF ( COMPL ) THEN    
+      IF ( COMPL .AND. TOTNOD .EQ. NNDF ) THEN    
                            
 *  Graph is complete -- all nodes connected.  Determine the `complete'
 *  solution.  Find the offsets of all positions to the `reference' set
