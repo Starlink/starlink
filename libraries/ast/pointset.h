@@ -159,7 +159,6 @@
 #    define isnan(x) ((x) != (x))
 #  endif
 #endif
-
 #endif
 
 /* Macros. */
@@ -174,7 +173,6 @@
 
 *  Purpose:
 *     Bad value flag for coordinate data.
-
 *  Synopsis:
 *     #include "pointset.h"
 *     const double AST__BAD

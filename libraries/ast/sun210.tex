@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {210.14}
+\newcommand{\stardocnumber}    {210.15}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th March 2004}
+\newcommand{\stardocdate}      {23rd April 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -22163,6 +22163,12 @@ Object             - Base class for all AST Objects
          system is specified by the CTYPE keywords.
 
          \sstitem
+         {\tt{"}}BadCTYPE{\tt{"}}: This condition arises when reading a FrameSet from a
+         non-Native encoded FitsChan if an illegal algorithm code is specified
+         by a CTYPE keyword, and the illegal code can be converted to an
+         equivalent legal code.
+
+         \sstitem
          {\tt{"}}BadLat{\tt{"}}: This condition arises when reading a FrameSet from a
          non-Native encoded FitsChan if the latitude of the reference point
          has an absolute value greater than 90 degrees. The actual absolute
@@ -27494,7 +27500,7 @@ Object             - Base class for all AST Objects
       space separated list of condition names (see the \htmlref{AllWarnings}{AllWarnings}
       attribute for a list of the currently defined names). Each name
       indicates a condition which should be reported. The default
-      value for Warnings is the string {\tt{"}}Tnx Zpx BadCel BadMat{\tt{"}}.
+      value for Warnings is the string {\tt{"}}Tnx Zpx BadCel BadMat BadCTYPE{\tt{"}}.
 
       The text of any warning will be stored within the FitsChan in the
       form of one or more new header cards with keyword ASTWARN. If
@@ -30584,7 +30590,7 @@ possible only if the projection is azimuthal).
 \item If the projection represented by the WcsMap is azimuthal but no
 values have been set for the ``PV\emph{i}\_3'' and ``PV\emph{i}\_4''
 attributes within the WcsMap, then the default LONPOLE and LATPOLE values
-are used. This results in no LONPOLE or lATPOLE keywords being stored in
+are used. This results in no LONPOLE or LATPOLE keywords being stored in
 the header since default values are never stored. Any extra rotation of
 the sky is absorbed into the CD\emph{i\_j} or PC\emph{i\_j} matrix (this
 is possible only if the projection is azimuthal).
@@ -30763,6 +30769,17 @@ vacuum) to one of the supported spectral systems.
 
 If none of the above conditions hold, the write operation will be
 unsuccessful.
+
+\subsubsection{Common Non-Standard Features}
+The following non-standard features are supported when reading spectral
+axes from a \htmlref{FitsChan}{FitsChan}:
+
+\begin{itemize}
+\item Conversion of ``-WAV'', ``-FRQ'' and ``-VEL'' algorithm codes
+(specified in early drafts of paper III) to the corresponding 
+``-X2P'' form.
+\item Conversion of ``RESTFREQ'' to ``RESTFRQ''
+\end{itemize}
 
 \subsection{Paper IV - Coordinate Distortions}
 
@@ -31885,6 +31902,16 @@ cards to be stored in a FitsChan in a single call, providing an alternative to
 the existing
 AST\_PUTCARDS routine.
 
+\item Some signficant changes have been made to the simplification of Mappings
+ which should resultin a greater degree of simplication taking place.Some
+ bugs have also been fixed which could result in an infinite loop being
+ entered when attempting to simplify certain Mappings.
+
+\item The FitsChan class now translates the spectral algorithm codes 
+``-WAV'', ``-FRQ'' and ``-VEL'' (specified in early drafts of paper III) to 
+the corresponding ``-X2P'' form when reading a spectral axis description
+from a set of FITS header cards.
+
 \item A bug has been fixed in the FitsChan class which could cause 
 keywords associated with alternate axis descriptions to be mis-interpreted.
 
@@ -31935,7 +31962,6 @@ function, whilst included in verb+grf.h+ in pervious versions of AST, was
 not actually called. As of this version of AST, calls are made to the 
 astGQch function, and so any bugs in the implementation of astGQch may
 cause spurious behaviour when plotting text strings.
-
 
 \item A new 'static' method called astEscapes has been added which is used 
 to control and enquire whether astGetC and astFormat will strip any graphical 
