@@ -147,6 +147,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
+      INCLUDE 'MATH_PAR'
 *
 *    Import :
 *
@@ -175,15 +176,21 @@
 *
       REAL			GLIMIT
         PARAMETER		( GLIMIT = 200.0 )
+      REAL			GTOL
+        PARAMETER		( GTOL = 1.0E-5 )
+      REAL			PTOL
+        PARAMETER		( PTOL = 1.0E-9 )
 *
 *    Local variables :
 *
+      DOUBLE PRECISION		DPRED
       DOUBLE PRECISION		ELPF			! < log d! >
       DOUBLE PRECISION		ELPF2			! < log d! ^ 2 >
       DOUBLE PRECISION		EPLPF			! < d log d! >
       DOUBLE PRECISION		LP			! Log predicted data
-
+	REAL*8 LFPM2
       INTEGER			I			! Loop over data
+      INTEGER			NGOOD
 
       LOGICAL			GOOD			! Is this point good?
 *-
@@ -193,62 +200,68 @@
 
 *    Initialise for case of no quality
       GOOD = .TRUE.
+      LFPM2 = 0.0D0
+      NGOOD = 0
 
 *    Loop over data values
       DO I = 1, NDAT
 
 *      Good point?
         IF ( QOK ) GOOD = QUAL(I)
-	if ( i.le.10 ) then
-	print *,'Point ',i,' good = ',good,
-     :               ' data = ',data(i), ', pred = ',pred(i)
-	end if
 
         IF ( GOOD .AND. (PRED(I).GT.0.0) .AND. (DATA(I).GT.0.0) ) THEN
 
 *        Get log of predicted data, and the 3 expectation values. In the
 *        Gaussian limit we need only the
-          LP = LOG(PRED(I))
+          DPRED = DBLE(PRED(I))
+          LP = LOG(DPRED)
           IF ( PRED(I) .GT. GLIMIT ) THEN
 
-*          Expectation values <log d!>
-            CALL FIT_MPROB_EX3( DBLE(PRED(I)), .FALSE., ELPF,
-     :                          ELPF2, EPLPF )
+*          Use Gaussian approximation
+	    LFPM2 = LFPM2 + LOG(MATH__DPI*2.0D0*DPRED)
+            NGOOD = NGOOD + 1
 
-            LFPDV = 0.5D0
+*          Variance is easy...
+            LFPDV = LFPDV + 0.5D0
 
           ELSE
 
 *          Expectation values <log d!>, <(log d!)^2> and <d log d!>
-            CALL FIT_MPROB_EX3( DBLE(PRED(I)), .TRUE., ELPF,
-     :                          ELPF2, EPLPF )
+            CALL FIT_MPROB_EX3( DPRED, PTOL, ELPF, ELPF2, EPLPF )
+
+*        Accumulate log probability for model
+            LFPM = LFPM + PRED(I)*LP - DPRED - ELPF
 
 *          and its variance
-            LFPDV = LFPDV + PRED(I)*LP*LP + ELPF2
-     :                - ELPF*ELPF - 2.0*LP*(EPLPF-PRED(I)*ELPF)
+            LFPDV = LFPDV + DPRED*LP*LP + ELPF2
+     :                - ELPF*ELPF - 2.0D0*LP*(EPLPF-DPRED*ELPF)
 
           END IF
 
 *        Accumulate log probability for data
-          LFPD = LFPD + DATA(I)*LP - PRED(I) -
+          LFPD = LFPD + DATA(I)*LP - DPRED -
      :                           FIT_MPROB_LDF(NINT(DATA(I)))
 
 *        Accumulate log probability for model
-          LFPT = LFPT + PRED(I)*LP - PRED(I) -
+          LFPT = LFPT + PRED(I)*LP - DPRED -
      :                           FIT_MPROB_LDF(NINT(PRED(I)))
 
-*        Accumulate log probability for model
-          LFPM = LFPM + PRED(I)*LP - PRED(I) - ELPF
 
         END IF
 
       END DO
 
+*  Adjust expected log probability if any Gaussian points
+      IF ( NGOOD .GT. 0 ) THEN
+	LFPM2 = - 0.5D0 * LFPM2 - DBLE(NGOOD)/2.0D0
+        LFPM = LFPM + LFPM2
+      END IF
+
       END
 
 
 *+  FIT_MPROB_EX3AC - Accumulate <log(d!)>, <log(d!) ^ 2> and <d log(d!)>
-      SUBROUTINE FIT_MPROB_EX3AC( MEAN, LOB, HIB, DO2, EXLDF, EXLDF2,
+      SUBROUTINE FIT_MPROB_EX3AC( MEAN, LOB, HIB, EXLDF, EXLDF2,
      :                            EXDLDF )
 *
 *    Description :
@@ -294,7 +307,6 @@
       DOUBLE PRECISION		MEAN			! Mean of Poisson
 							! distribution
       INTEGER			LOB, HIB		! Interval to accumulate
-      LOGICAL			DO2
 *
 *    Export :
 *
@@ -330,43 +342,35 @@
         LFAC = FIT_MPROB_LDF( L )
         PPROB = EXP( LMEAN*DBLE(L) - MEAN - LFAC )
         BIT1 = LFAC * PPROB
-        IF ( DO2 ) THEN
-          BIT2 = LFAC * LFAC * PPROB
-          BIT3 = LFAC * DBLE(L) * PPROB
-        END IF
+        BIT2 = LFAC * LFAC * PPROB
+        BIT3 = LFAC * DBLE(L) * PPROB
 
         IF ( L .LT. H ) THEN
           LFAC = FIT_MPROB_LDF( H )
           PPROB = EXP( LMEAN*DBLE(H) - MEAN - LFAC )
           BIT1 = BIT1 + LFAC * PPROB
-          IF ( DO2 ) THEN
-            BIT2 = BIT2 + LFAC * LFAC * PPROB
-            BIT3 = BIT3 + LFAC * DBLE(H) * PPROB
-          END IF
+          BIT2 = BIT2 + LFAC * LFAC * PPROB
+          BIT3 = BIT3 + LFAC * DBLE(H) * PPROB
         END IF
 
         SUM1 = SUM1 + BIT1
-        IF ( DO2 ) THEN
-          SUM2 = SUM2 + BIT2
-          SUM3 = SUM3 + BIT3
-        END IF
+        SUM2 = SUM2 + BIT2
+        SUM3 = SUM3 + BIT3
         L = L + 1
         H = H - 1
 
       IF ( L .LE. H ) GOTO 10
 
       EXLDF = EXLDF + SUM1
-      IF ( DO2 ) THEN
-        EXLDF2 = EXLDF2 + SUM2
-        EXDLDF = EXDLDF + SUM3
-      END IF
+      EXLDF2 = EXLDF2 + SUM2
+      EXDLDF = EXDLDF + SUM3
 
       END
 
 
 
-*+  FIT_MPROB_EX3 - Find <log(d!)> and optionally <log(d!) ^ 2>,<d log(d!)>
-      SUBROUTINE FIT_MPROB_EX3( MEAN, EXLDF, DO2, EXLDF2, EXDLDF )
+*+  FIT_MPROB_EX3 - Find <log(d!)>, <log(d!) ^ 2> and <d log(d!)>
+      SUBROUTINE FIT_MPROB_EX3( MEAN, TOLNCE, EXLDF, EXLDF2, EXDLDF )
 *
 *    Description :
 *
@@ -406,7 +410,7 @@
 *
       DOUBLE PRECISION		MEAN			! Mean of Poisson
 							! distribution
-      LOGICAL			DO2
+      REAL			TOLNCE			! Convergence tolerance
 *
 *    Export :
 *
@@ -416,8 +420,6 @@
 *
 *    Local constants :
 *
-      REAL			TOLNCE			! Convergence tolerance
-	PARAMETER		( TOLNCE = 1.0E-9 )
       INTEGER			PTHRESH
 	PARAMETER 		( PTHRESH = 512 )
 *
@@ -446,10 +448,8 @@
 
 *      Initialise outputs
         EXLDF = 0.0D0
-        IF ( DO2 ) THEN
-          EXLDF2 = 0.0D0
-          EXDLDF = 0.0D0
-        END IF
+        EXLDF2 = 0.0D0
+        EXDLDF = 0.0D0
 
 *      Initial bounds for accumulation
         IF ( MEAN .GT. PTHRESH ) THEN
@@ -466,63 +466,50 @@
         ISTEP = MAX( 5, INT(SQRT(MEAN)) )
 
 *      First accumulation
-        CALL FIT_MPROB_EX3AC( MEAN, LOB, HIB, DO2,
-     :                        EXLDF, EXLDF2, EXDLDF )
+        CALL FIT_MPROB_EX3AC( MEAN, LOB, HIB, EXLDF, EXLDF2, EXDLDF )
 
 *      Loop until convergence achieved
  10     CONTINUE
 
 *        Store old values
           L_LDF = EXLDF
-          IF ( DO2 ) THEN
-            L_LDF2 = EXLDF2
-            L_DLDF = EXDLDF
-          END IF
+          L_LDF2 = EXLDF2
+          L_DLDF = EXDLDF
 
 *        More on lower bound
           IF ( LOB .GT. 0 ) THEN
             NEWLO = MAX( 0, LOB - ISTEP )
-            CALL FIT_MPROB_EX3AC( MEAN, NEWLO, LOB-1, DO2, EXLDF,
+            CALL FIT_MPROB_EX3AC( MEAN, NEWLO, LOB-1, EXLDF,
      :                            EXLDF2, EXDLDF )
             LOB = NEWLO
           END IF
 
 *        More on upper bound
           NEWHI = HIB + ISTEP
-          CALL FIT_MPROB_EX3AC( MEAN, HIB+1, NEWHI, DO2, EXLDF,
+          CALL FIT_MPROB_EX3AC( MEAN, HIB+1, NEWHI, EXLDF,
      :                          EXLDF2, EXDLDF )
           HIB = NEWHI
 
 *        Convergence tests
           C_LDF = ( (EXLDF-L_LDF) .LT. TOLNCE*EXLDF )
-          IF ( DO2 ) THEN
-            C_LDF2 = ( (EXLDF2-L_LDF2) .LT. TOLNCE*EXLDF2 )
-            C_DLDF = ( (EXDLDF-L_DLDF) .LT. TOLNCE*EXDLDF )
-          END IF
+          C_LDF2 = ( (EXLDF2-L_LDF2) .LT. TOLNCE*EXLDF2 )
+          C_DLDF = ( (EXDLDF-L_DLDF) .LT. TOLNCE*EXDLDF )
 
 *      Convergence
-        IF ( DO2 ) THEN
           IF ( .NOT. (C_LDF.AND.C_LDF2.AND.C_DLDF) ) GOTO 10
-        ELSE
-          IF ( .NOT. C_LDF ) GOTO 10
-        END IF
 
 *      Update old values
         LASTMEAN = MEAN
         L_LDF = EXLDF
-        IF ( DO2 ) THEN
-          L_LDF2 = EXLDF2
-          L_DLDF = EXDLDF
-        END IF
+        L_LDF2 = EXLDF2
+        L_DLDF = EXDLDF
 
       END IF
 
 *    Set return value
       EXLDF = L_LDF
-      IF ( DO2 ) THEN
-        EXLDF2 = L_LDF2
-        EXDLDF = L_DLDF
-      END IF
+      EXLDF2 = L_LDF2
+      EXDLDF = L_DLDF
 
       END
 
@@ -564,7 +551,7 @@
       INTEGER			LOFAC          		! Max D to calculate
 	PARAMETER		( LOFAC = 35 )		! directly
       INTEGER			MAXFAC          	! Max D to calculate
-	PARAMETER		( MAXFAC = 2048 )
+	PARAMETER		( MAXFAC = 4096 )
 *
 *    Local variables :
 *

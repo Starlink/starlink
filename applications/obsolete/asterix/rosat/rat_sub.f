@@ -367,13 +367,15 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC)   LOC                   ! Start locator
-
+      integer dummy
 
       IF (STATUS.NE.SAI__OK) RETURN
 
 	print *,'opening header file',rtname(1:chr_len(rtname))//'_hdr'
+	read(*,*) dummy
       CALL HDS_OPEN(RTNAME(1:CHR_LEN(RTNAME))//'_hdr','READ',LOC,STATUS)
 	print *,'getting header',status
+	read(*,*) dummy
       CALL RAT_GETHEAD(LOC, 'HEAD', HEAD, STATUS)
       CALL HDS_CLOSE(LOC, STATUS)
 
@@ -517,15 +519,22 @@
       INTEGER DUMMY			! Value not used
       character*(DAT__SZNAM) name
       logical valid
+      integer dummy
 *
       IF (STATUS.NE.SAI__OK) RETURN
 
         call dat_valid(loc,valid,status)
         print *,valid
+	read(*,*) dummy
 
 	print *,'finding ',object
+	read(*,*) dummy
         call dat_name(loc,name,status)
         print *,name
+	read(*,*) dummy
+        call dat_struc(loc,valid,status)
+        print *,valid
+	read(*,*) dummy
         call dat_there(loc,'head',valid,status)
         print *,valid
         call dat_find(loc,'head',aloc,status)
