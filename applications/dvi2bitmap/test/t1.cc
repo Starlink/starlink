@@ -10,11 +10,9 @@
 #include <stdlib.h>
 #endif
 
-#if HAVE_STD_NAMESPACE
-using std::cout;
-using std::cerr;
-using std::endl;
-#endif
+using STD::cout;
+using STD::cerr;
+using STD::endl;
 
 #include <string>
 

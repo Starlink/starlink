@@ -7,12 +7,9 @@
 #include <DviFile.h>
 
 #include <iostream>
-#if HAVE_STD_NAMESPACE
-//using std::cout;
-using std::cerr;
-using std::endl;
-//using std::ends;
-#endif
+
+using STD::cerr;
+using STD::endl;
 
 #if HAVE_CSTD_INCLUDE
 #include <cmath>

@@ -24,12 +24,10 @@
 #include <sys/stat.h>		// for mkfifo
 
 
-#if HAVE_STD_NAMESPACE
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::ends;
-#endif
+using STD::cout;
+using STD::cerr;
+using STD::endl;
+using STD::ends;
 
 #include <string>
 

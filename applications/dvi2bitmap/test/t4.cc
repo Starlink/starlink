@@ -11,12 +11,10 @@
 #endif
 #endif
 
-#if HAVE_STD_NAMESPACE
-using std::cerr;
-using std::cout;
-using std::exit;
-using std::endl;
-#endif
+using STD::cerr;
+using STD::cout;
+using STD::exit;
+using STD::endl;
 
 struct {
     const char* testcase;
