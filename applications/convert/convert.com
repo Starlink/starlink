@@ -48,7 +48,7 @@ $!  ====================================
 $!
 $ ASCII2*NDF  :== $CONVERT_DIR:ASCII2NDF
 $ BDF2*NDF    :== $CONVERT_DIR:BDF2NDF
-$ CONH*ELP    :== HELP @CONVERT HELP
+$ CONH*ELP    :== HELP/NOLIBL @CONVERT HELP
 $ DIPSO2*NDF  :== $CONVERT_DIR:DIPSO2NDF
 $ DST2*NDF    :== $CONVERT_DIR:DST2NDF
 $ UNF2*NDF    :== $CONVERT_DIR:UNF2NDF
@@ -71,7 +71,7 @@ $ WRITE SYS$OUTPUT  " "
 $ WRITE SYS$OUTPUT  " --    Initialised for CONVERT    -- "
 $ WRITE SYS$OUTPUT  " --  Version 0.4, 1992 September  -- "
 $ WRITE SYS$OUTPUT  " "
-$ WRITE SYS$OUTPUT  " Type HELP CONVERT for CONVERT help   "
+$ WRITE SYS$OUTPUT  "    Type CONHELP for CONVERT help"
 $ WRITE SYS$OUTPUT  " "
 $!
 $!  Exit the procedure.
