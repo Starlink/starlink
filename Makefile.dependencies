@@ -576,6 +576,7 @@ $(MANIFEST)/extractor: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/prm \
@@ -1304,6 +1305,7 @@ $(MANIFEST)/pcs: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
