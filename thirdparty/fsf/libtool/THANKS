@@ -1,0 +1,58 @@
+Libtool would not be what it is today without the invaluable help of
+these people:
+
+Everybody who was kind enough to spend time testing libtool, use it in
+their packages and report bugs, who are too numerous to mention here.
+Many people who have kindly submitted bug reports and small patches
+are credited for their contributions in the ChangeLogs.
+
+The following people made especially gracious contributions of their
+time and energy in helping to track down bugs, port to new systems,
+and generally assist in the libtool maintainership process:
+
+Akim Demaille                   akim@epita.fr
+Albert Chin-A-Young             china@thewrittenword.com
+Andreas Schwab                  schwab@suse.de
+Andrey Slepuhin                 pooh@msu.ru
+Aneesh Kumar K.V                kvaneesh@hotmail.com
+Brad Smith                      brad@comstyle.com
+Bruno Haible                    haible@ilog.fr
+Carl D. Roth                    roth@cse.ucsc.edu
+Charles S. Wilson               cwilson@ece.gatech.edu
+Chris P. Ross                   cross@eng.us.uu.net
+DJ Delorie                      dj@delorie.com
+Edouard G. Parmelan             Edouard.Parmelan@France.NCR.COM
+Erez Zadok                      ezk@shekel.mcl.cs.columbia.edu
+Eric Estievenart                eric@via.ecp.fr
+Frank Ch. Eigler                fche@cygnus.com
+H.J. Lu                         hjl@gnu.org
+Ian Lance Taylor                ian@cygnus.com
+Joel N. Weber II                devnull@gnu.org
+Joseph Beckenbach III           jrb3@best.com
+Kenneth Albanowski              kjahds@kjahds.com
+Kevin Ryde                      user42@zip.com.au
+Kurt D. Zeilenga                Kurt@OpenLDAP.Org
+Manfred Weichel                 Manfred.Weichel@pdb.siemens.de
+Marc J. Fraioli                 fraioli@dg-rtp.dg.com
+Mark Kettenis                   kettenis@phys.uva.nl
+Nick Hudson                     skrll@netbsd.org
+Olly Betts                      olly@muscat.co.uk
+Ossama Othman                   othman@cs.wustl.edu
+Paul Eggert                     eggert@twinsun.com
+Peter Eisentraut                peter_e@gmx.net
+Peter O'Gorman                  peter@pogma.com
+Benjamin Reed                   ranger@befunk.com
+Pavel Roskin                    pavel_roskin@geocities.com
+Rainer Orth                     ro@TechFak.Uni-Bielefeld.DE
+Ralph Schleicher                rs@nunatak.allgaeu.org
+Robert Collins                  robert.collins@itdomain.com.au
+Sebastian Wilhelmi              wilhelmi@ira.uka.de
+Stephan Kulow                   coolo@kde.org
+Steven M. Schultz               sms@wlv.iipo.gtegsc.com
+Tim Mooney                      mooney@dogbert.cc.ndsu.NoDak.edu
+Tim Van Holder                  tim.van.holder@pandora.be
+Todd Vierling                   tv@pobox.com
+Tom Tromey                      tromey@cygnus.com
+Tor Lillqvist                   tml@iki.fi
+Ulrich Drepper                  drepper@ipd.info.uni-karlsruhe.de
+Xavier Pianet                   xavier@xingo.com

@@ -1,0 +1,53 @@
+#! /bin/sh
+# Copyright (C) 2003  Free Software Foundation, Inc.
+#
+# This file is part of GNU Automake.
+#
+# GNU Automake is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# GNU Automake is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Automake; see the file COPYING.  If not, write to
+# the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+# Boston, MA 02111-1307, USA.
+
+# Test missing with version mismatches.
+
+. ./defs || exit 1
+
+required=GNUmake
+set -e
+
+cat >>configure.in <<'EOF'
+AC_OUTPUT
+EOF
+
+: > Makefile.am
+
+$ACLOCAL
+$AUTOCONF
+$AUTOMAKE --add-missing
+./configure
+$MAKE
+$sleep
+# Hopefully the install version of Autoconf cannot compete with this one...
+echo 'AC_PREREQ(9999)' >> aclocal.m4
+$MAKE distdir
+
+# Run again, but without missing, to ensure that timestamps were updated.
+export AUTOMAKE ACLOCAL
+./configure
+$MAKE
+
+# Make sure $MAKE fail when timestamps aren't updated and missing is not used.
+$sleep
+touch aclocal.m4
+$MAKE && exit 1
+:
