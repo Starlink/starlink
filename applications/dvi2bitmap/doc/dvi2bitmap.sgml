@@ -360,23 +360,87 @@ font files.
 examples.</update>
 <update versionid="upd3">Described new functionality for environment
 variable.</update>
+<update versionid="post-upd5">Added a discussion of the foibles of the
+texmf.cnf configuration file when it comes to finding fonts.
+</update>
+
+<subsubsect>Finding fonts
 
 <p>The program searches in up to three places for fonts.
 
-<p>The <code/DVI2BITMAP_PK_PATH/ environment variable, if defined,
-specifies a colon-separated list of directories which are to be
-searched for PK files.  If you give the <code/-f/ option, it overrides
-the value in <code/DVI2BITMAP_PK_PATH/.
+<ol>
+<li>The <code/-f/ option specifies a colon-separated list of
+directories which should be searched for font PK files.  If this is given on
+the command line, it overrides&ellip
 
-<p>If the program cannot find fonts using the environment variable,
+<li>The <code/DVI2BITMAP_PK_PATH/ environment variable, if defined,
+specifies a colon-separated list of directories which are to be
+searched for PK files.  If this variable is found in the environment,
+it overrides&ellip
+
+<li>If the program cannot find fonts using the environment variable,
 and if it was configured with support for the Kpathsearch
 library (see <ref id=install.nonstarlink>), then it should find PK
-files using the same mechanism other DVI processors use.  If you did
-not install dvi2bitmap along with other &tex;ware, or if the the
-program was not told where they live at configuration time, then you might
-additionally have to specify the <code/TEXMFCNF/ environment variable:
-set it to the directory which contains the main &tex; configuration
-file, which you can find using the command <kbd/kpsewhich cnf texmf.cnf/.
+files using the same mechanism other DVI processors use.  
+
+</ol>
+
+<p>There are one or two possible wrinkles with the last method.  The
+path-searching library is very powerful and flexible, but it is
+possible to be tripped up by its configuration file.
+
+<p>Firstly, the program has to <em/find/ the configuration file.  The
+program should sort this out for itself at configuration time, but it
+is possible that you might have to give it some help.  If you specify the
+<code/TEXMFCNF/ environment variable, setting it to the directory
+which contains your &tex; installation's <code/texmf.cnf/ file, then
+this overrides the program's notion of where the configuration should
+be.  You can find this file using the command <kbd/kpsewhich cnf
+texmf.cnf/.
+
+<p>It can sometimes happen that <code/dvi2bitmap/ fails to find fonts,
+successfully calls <code/mktexpk/ to build them, but then <em/still/
+fails to find them, even though <code/mktexpk/ has put them where they
+should be.  The reason for this is as follows:
+
+<p>Some <code/texmf.cnf/ files declare the location of the
+user-writable font directory though a setting like
+<verbatim>
+VARTEXFONTS=$SELFAUTOPARENT/var/lib/texmf
+</verbatim>
+whereas others have something like
+<verbatim>
+VARTEXFONTS=$TEXMFLOCAL/fonts
+</verbatim>
+Now, <code/$SELFAUTOPARENT/ is a variable which is set
+by the kpathsea library to be the grandparent directory of the executable
+which uses the library.  So, for <code>/usr/bin/{tex,latex,mktexpk,...}</code>,
+it's <code>/</code>, but if your <code/dvi2bitmap/ binary doesn't live
+with the other &tex;ware then its <code/$SELFAUTOPARENT/ will be
+different, so that <code/dvi2bitmap/ will look for fonts in a
+<em/different/ place from the place where <code/mktexpk/ put them when
+it successfully generated them.
+
+<p>I would argue fairly strongly that having the <code/VARTEXFONTS/
+directory depend on the location of the &tex;ware <em/executables/ is
+a very silly thing to do, but unfortunately it's true in at least one
+common &tex; distribution.  If you've fallen foul of this, then you
+can either
+<ul>
+<li>change your <code/texmf.cnf/ file to something more like the
+second example above; or
+<li>install <code/dvi2bitmap/ along with the other &tex;ware.
+</ul>
+I'd prefer the first alternative, myself.
+
+
+<subsubsect>Generating fonts
+
+<p>If you didn't enable automatic font-generation, or if you did and
+something went wrong, you might have to generate fonts by hand.  You
+need to look at the documentation for your &tex; system, specifically
+the <code/mktexpk/ and <code/MakeTeXPK/ scripts (one of which might be
+just an interface to the other).
 
 <p>Since dvi2bitmap's default resolution is 72~dpi, as opposed to the
 usual printer resolution of 300 or 600~dpi, you are unlikely to have
@@ -388,7 +452,7 @@ fails, you might need to generate the fonts by hand.
 
 <p>How you generate fonts depends on your &tex; distribution.  As explained
 in <ref id=usage.examples>, you can determine which fonts you need using the 
-<code/-l/ option.  The teTeX and TeXLive &tex; distributions include scripts to
+<code/-L/ option.  The teTeX and TeXLive &tex; distributions include scripts to
 generate fonts for you; if you have a different distribution, there
 might be a similar script for you to use, or you might have to do it
 by hand.  In the case of teTeX, the command you'd use in the
