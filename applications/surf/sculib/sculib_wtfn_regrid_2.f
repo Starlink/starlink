@@ -229,20 +229,22 @@
                         IF (RPIX .LT. RAD_OV_SCAL) THEN
                            ICPIX = NINT(RES_SCAL * RPIX)
                            WT = WTFN(ICPIX+1)
-                        END IF
 
 * Change INEAR,JNEAR to IOUT,JOUT for TOTAL_WEIGHT?
-                        WWEIGHT = WT * WEIGHT / 
-     :                       TOTAL_WEIGHT (INEAR,JNEAR)
+                           WWEIGHT = WT * WEIGHT / 
+     :                          TOTAL_WEIGHT (INEAR,JNEAR)
 
-                        CONV_WEIGHT (IOUT,JOUT) = CONV_WEIGHT(IOUT,JOUT)
-     :                       + WWEIGHT
-                        CONV_DATA_SUM (IOUT,JOUT) = 
-     :                       CONV_DATA_SUM (IOUT,JOUT) + 
-     :                       WWEIGHT * IN_DATA(PIX)
-                        CONV_VARIANCE_SUM (IOUT,JOUT) =
-     :                       CONV_VARIANCE_SUM (IOUT,JOUT) +
-     :                       (WWEIGHT)**2 * IN_VARIANCE (PIX)
+                           CONV_WEIGHT (IOUT,JOUT) = 
+     :                          CONV_WEIGHT(IOUT,JOUT)
+     :                          + WWEIGHT
+                           CONV_DATA_SUM (IOUT,JOUT) = 
+     :                          CONV_DATA_SUM (IOUT,JOUT) + 
+     :                          WWEIGHT * IN_DATA(PIX)
+                           CONV_VARIANCE_SUM (IOUT,JOUT) =
+     :                          CONV_VARIANCE_SUM (IOUT,JOUT) +
+     :                          (WWEIGHT)**2 * IN_VARIANCE (PIX)
+
+                        END IF
                         
                      END IF
 
