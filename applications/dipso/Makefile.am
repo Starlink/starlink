@@ -5,7 +5,7 @@ bin_PROGRAMS = dipso
 dipso_SOURCES = run_dipso.c
 
 # C main so we need FCLIBS
-dipso_LDADD = .libs/libdipso.a `$(srcdir)/dipso_link` @FCLIBS@
+dipso_LDADD = libdipso.la `$(srcdir)/dipso_link` @FCLIBS@
 dipso_LDFLAGS =
 
 dist_bin_SCRIPTS = dipsosetup dipsotest dipso_link my_dipso
