@@ -383,7 +383,7 @@
 
 *  Find the available number of colour indices and a useful expression
 *  needed during the calculations.
-      ANINTS = NINTS - CIOFF
+      ANINTS = MIN( NINTS - CIOFF, CTM__MXPEN )
       RNINTS = REAL( ANINTS - 1 )
 
 *  Initialise some flags.
