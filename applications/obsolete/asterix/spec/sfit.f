@@ -193,6 +193,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'FIT_PAR'
 
 *  Structure Definitions:
@@ -289,7 +290,8 @@
 *  Get observed data (setting up data weights) and response
       CALL USI_ASSOC( 'INP', 'FileSet|BinDS', 'READ', IFID, STATUS )
       WORKSPACE = .TRUE.
-      CALL FIT_GETDAT( IFID, 'SPEC', FSTAT, WORKSPACE, CHISTAT, NDS,
+      CALL FIT_GETDAT( ADI__NULLID, IFID, 'SPEC', FSTAT, WORKSPACE,
+     :                 CHISTAT, NDS,
      :                 OBDAT, NGOOD, SSCALE, PREDDAT, INSTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 

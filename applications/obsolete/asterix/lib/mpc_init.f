@@ -119,7 +119,7 @@
       CALL ADI_CPUT0I( ID, 'MYCPU', MYCPU, STATUS )
 
 *  Announce version
-      SLAVE = (MYCPU.EQ.0)
+      SLAVE = (MYCPU.GT.0)
       IF ( SLAVE ) THEN
         CALL MSG_SETI( 'N', MYCPU )
         CALL MSG_SETC( 'P', VERSION(:INDEX(VERSION,' ')-1) )

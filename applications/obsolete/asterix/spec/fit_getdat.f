@@ -1,6 +1,6 @@
-      SUBROUTINE FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE, WEIGHTS,
-     :                       NDS, OBDAT, NGOOD, SSCALE, PREDDAT,
-     :                       INSTR, STATUS )
+      SUBROUTINE FIT_GETDAT( MPCID, ID, GENUS, FSTAT, WORKSPACE,
+     :                       WEIGHTS, NDS, OBDAT, NGOOD, SSCALE,
+     :                       PREDDAT, INSTR, STATUS )
 *+
 *  Name:
 *     FIT_GETDAT
