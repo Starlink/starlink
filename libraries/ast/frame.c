@@ -7479,9 +7479,10 @@ f     .TRUE.,
 *     same unknown units - thus "flops" can be transformed to "Mflops"
 *     even though "flops" is not a standard FITS unit symbol).
 *
-*     Some common variations of unit names are allowed, such as adding an
-*     "s" to the end of Angstrom, using a lower case "a" at the start of
-*     "angstrom", "micron" instead of "um", etc.
+*     A range of common non-standard variations of unit names and multiplier 
+*     prefixes are also allowed, such as adding an "s" to the end of Angstrom, 
+*     using a lower case "a" at the start of "angstrom", "micron" instead of 
+*     "um", "sec" instead of "s", etc.
 *
 c     If the ActiveUnit flag is non-zero, setting a new Unit value for an
 f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an

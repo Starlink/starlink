@@ -133,6 +133,7 @@ typedef struct Multiplier {
    const char *label;       /* Multipler label string (null terminated) */
    const char *sym;         /* Multipler symbol string (null terminated) */
    int symlen;              /* Length of symbol (without trailing null ) */
+   int lablen;              /* Length of label (without trailing null ) */
    double scale;            /* The scale factor associated with the prefix */
    struct Multiplier *next; /* Next Multiplier in linked list */
 } Multiplier;
@@ -158,6 +159,7 @@ typedef struct KnownUnit {
    int lablen;              /* Length of label (without trailing null ) */
    struct UnitNode *head;   /* Head of definition tree (NULL for basic units) */
    struct KnownUnit *next;  /* Next KnownUnit in linked list */
+   struct KnownUnit *use;   /* KnownUnit to be used in place of this one */
 } KnownUnit;
 
 /* Module Variables. */
@@ -197,6 +199,7 @@ static void InvertConstants( UnitNode ** );
 static UnitNode *InvertTree( UnitNode *, UnitNode * );
 static void LocateUnits( UnitNode *, UnitNode ***, int * );
 static void MakeKnownUnit( const char *, const char *, const char * );
+static void MakeUnitAlias( const char *, const char * );
 static void RemakeTree( UnitNode ** );
 static int SimplifyTree( UnitNode **, int );
 static int ComplicateTree( UnitNode ** );
@@ -205,8 +208,8 @@ static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
 static int DimAnal( UnitNode *, double[NQUANT], double * );
 static int Ustrncmp( const char *, const char *, size_t );
-static int Ustrcmp( const char *, const char * );
 static int SplitUnit( const char *, int, const char *, int, Multiplier **, int * );
+static UnitNode *ModifyPrefix( UnitNode * );
 
 /*  Debug functions... 
 static const char *DisplayTree( UnitNode *, int );
@@ -214,7 +217,6 @@ static const char *OpSym( UnitNode * );
 static const char *OpName( Oper );
 static const char *TreeExp( UnitNode * );
 */
-
 
 /* Function implementations. */
 /* ========================= */
@@ -268,10 +270,10 @@ static const char *CleanExp( const char *exp ) {
    char *p;
    char *r;
    char *result;
+   char *s;
    char *t;
    char *w;
    const char *start;
-   int changed;
    int i;
    int l;
    int len;
@@ -325,83 +327,77 @@ static const char *CleanExp( const char *exp ) {
    tok = astGrow( tok, ntok + 1, sizeof( char * ) );
    if( tok ) tok[ ntok++ ] = t;
 
-/* Check the tokens for known non-standard unit names, and replace with the 
-   equivalent standard names. Starlink SPLAT has a class called UnitUtilities 
+/* Check the tokens for known non-standard unit syntax, and replace with the 
+   equivalent standard syntax. Starlink SPLAT has a class called UnitUtilities 
    which has more of these common units mistakes. AST has to be a bit
    more conservative than SPLAT though because of its wider remit. */
    len = 0;
-   changed = 1;
    tt = NULL;
-   while( tok && changed ) {
-      changed = 0;
-      for( i = 0; i < ntok; i++ ) {
-         t = tok[ i ];
-         l = strlen( t );
-         tt = astStore( tt, t, l + 1 );
-
-/* "A" is strictly Ampere, but is more likely to mean Angstrom. */
-         if( strstr( t, "Ang" ) == t ||
-             strstr( t, "ang" ) == t ||
-             !strcmp( t, "A" ) ) {
-            tok[ i ] = astStore( t, "Angstrom", 9 ) ;
+   for( i = 0; i < ntok; i++ ) {
+      t = tok[ i ];
+      l = strlen( t );
+      tt = astStore( tt, t, l + 1 );
 
 /* Any word followed by a digit is taken as <word>^<digit> */
-         } else if( l > 1 && isdigit( t[ l - 1 ] ) && 
-                    !isdigit( t[ l - 2 ] ) && t[ l - 2 ] != '^' ) {
-            tok[ i ] = astMalloc( l + 2 );
-            if( tok[ i ] ) {
-               strcpy( tok[ i ], t );
-               tok[ i ][ l + 1 ] = 0;
-               tok[ i ][ l ] = t[ l - 1 ];
-               tok[ i ][ l - 1 ] = '^';
-               t = astFree( t );
-            }
-
-         } else if( !strcmp( t, "M" ) ) {
-            t[ 0 ] = 'm';
-
-         } else if( !strcmp( t, "CM" ) ) {
-            tok[ i ] = astStore( t, "cm", 3 ) ;
-
-         } else if( !Ustrcmp( t, "ct" ) ) {
-            tok[ i ] = astStore( t, "count", 6 ) ;
-
-         } else if( !Ustrcmp( t, "ph" ) ) {
-            tok[ i ] = astStore( t, "photon", 7 ) ;
-
-         } else if( !Ustrcmp( t, "pix" ) ) {
-            tok[ i ] = astStore( t, "pixel", 6 ) ;
-
-         } else if( strstr( t, "jans" ) == t ||
-                    strstr( t, "Jans" ) == t ||
-                    !strcmp( t, "jy" ) ) {
-            tok[ i ] = astStore( t, "Jy", 3 ) ;
-
-         } else if( !strcmp( t, "sec" ) ) {
-            tok[ i ] = astStore( t, "s", 2 ) ;
-
-         } else if( !strcmp( t, "ev" ) ) {
-            t[ 1 ] = 'V';
-
-         } else if( strstr( t, "ev" ) == t + 1 ) {
-            t[ 2 ] = 'V';
-
-         } else if( !strcmp( t, "micron" ) ) {
-            tok[ i ] = astStore( t, "um", 2 ) ;
-
-         } else if( !strcmp( t, "Watt" ) ||
-                    !strcmp( t, "watt" ) ) {
-            tok[ i ] = astStore( t, "W", 2 ) ;
-
+      if( l > 1 && isdigit( t[ l - 1 ] ) && 
+                 isalpha( t[ l - 2 ] ) ) {
+         tok[ i ] = astMalloc( l + 2 );
+         if( tok[ i ] ) {
+            strcpy( tok[ i ], t );
+            tok[ i ][ l + 1 ] = 0;
+            tok[ i ][ l ] = t[ l - 1 ];
+            tok[ i ][ l - 1 ] = '^';
+            t = astFree( t );
          }
+         l++;
+
+/* Any word followed by a minus or plus followed by a digit is taken as 
+   <word>^+/-<digit> */
+      } else if( l > 2 && isdigit( t[ l - 1 ] ) && 
+                 ( t[ l - 2 ] == '+' || t[ l - 2 ] == '-' ) &&
+                 isalpha( t[ l - 3 ] ) ) {
+         tok[ i ] = astMalloc( l + 2 );
+         if( tok[ i ] ) {
+            strcpy( tok[ i ], t );
+            tok[ i ][ l + 1 ] = 0;
+            tok[ i ][ l ] = t[ l - 1 ];
+            tok[ i ][ l - 1 ] = t[ l - 2 ];
+            tok[ i ][ l - 2 ] = '^';
+            t = astFree( t );
+         }
+         l++;
+
+/* If the word ends with "micron" change to "(<start>m*1.0E-6)". Should be OK 
+   for things like "Kmicron". */
+      } else if( ( s = strstr( t, "micron" ) ) ) {
+         tok[ i ] = astMalloc( s - t + 11 );
+         if( tok[ i ] ) {
+            w = tok[ i ];
+            *(w++) = '(';
+            if( s > t ) {
+               strncpy( w, t, s - t );
+               w += s - t;
+            }
+            strcpy( w, "m*1.0E-6)" );
+            t = astFree( t );
+         }
+         l = s - t + 11;
+
+/* If the word begins with "nano" (case-insensitive) change "nano" to
+   "n". Such changes are usually handled by SplitUnit, but we need to
+   handle this as a special case here since scanf seems to read "nan" as 
+   a string representation of NaN. */
+      } else if( !Ustrncmp( t, "nano", 4 ) ) {
+         tok[ i ] = astStore( NULL, t + 3, l - 2 );
+         if( tok[ i ] ) {
+            *(tok[ i ]) = 'n';
+            t = astFree( t );
+         }
+         l -= 3;
+      }
 
 /* Update the total length of the string. */
-         len += strlen( tok[ i ] );
-
-/* Note if a change has been made to the token. */
-         if( strcmp( tt, tok[ i ] ) ) changed = 1;
-
-      }
+      len += l;
    }
    tt = astFree( tt );
 
@@ -2074,7 +2070,6 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "min", "minute", "60 s" );
       MakeKnownUnit( "h", "hour", "3600 s" );
       MakeKnownUnit( "d", "day", "86400 s" );
-      MakeKnownUnit( "a", "year", "31557600 s" );
       MakeKnownUnit( "yr", "year", "31557600 s" );
       MakeKnownUnit( "eV", "electron-Volt", "1.60217733E-19 J" );
       MakeKnownUnit( "erg", "erg", "1.0E-7 J" );
@@ -2083,23 +2078,21 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "u", "unified atomic mass unit", "1.6605387E-27 kg" );
       MakeKnownUnit( "solLum", "solar luminosity", "3.8268E26 W" );
       MakeKnownUnit( "Angstrom", "Angstrom", "1.0E-10 m" );
+      MakeKnownUnit( "micron", "micron", "1.0E-6 m" );
       MakeKnownUnit( "solRad", "solar radius", "6.9599E8 m" );
       MakeKnownUnit( "AU", "astronomical unit", "1.49598E11 m" );
       MakeKnownUnit( "lyr", "light year", "9.460730E15 m" );
       MakeKnownUnit( "pc", "parsec", "3.0867E16 m" );
       MakeKnownUnit( "count", "count", NULL );
       quant_units[ iq++ ] = known_units;
-      MakeKnownUnit( "ct", "count", NULL );
       MakeKnownUnit( "photon", "photon", NULL );
       quant_units[ iq++ ] = known_units;
-      MakeKnownUnit( "ph", "photon", NULL );
       MakeKnownUnit( "Jy", "Jansky", "1.0E-26 W /m**2 /Hz" );
       MakeKnownUnit( "mag", "magnitude", NULL );
       quant_units[ iq++ ] = known_units;
       MakeKnownUnit( "G", "Gauss", "1.0E-4 T" );
       MakeKnownUnit( "pixel", "pixel", NULL );
       quant_units[ iq++ ] = known_units;
-      MakeKnownUnit( "pix", "pixel", NULL );
       MakeKnownUnit( "barn", "barn", "1.0E-28 m**2" );
       MakeKnownUnit( "D", "Debye", "(1.0E-29/3) C.m" );
 
@@ -2109,6 +2102,15 @@ static KnownUnit *GetKnownUnits() {
                    "error).", iq, NQUANT );
       }
 
+/* Unit aliases... */
+      MakeUnitAlias( "Angstrom", "A" );
+      MakeUnitAlias( "Angstrom", "Ang" );
+      MakeUnitAlias( "count", "ct" );
+      MakeUnitAlias( "photon", "ph" );
+      MakeUnitAlias( "Jy", "Jan" );
+      MakeUnitAlias( "pixel", "pix" );
+      MakeUnitAlias( "s", "sec" );
+      MakeUnitAlias( "m", "meter" );
    }
 
 /* If succesful, return the pointer to the head of the list. */
@@ -2166,11 +2168,12 @@ static Multiplier *GetMultipliers() {
 
 /* Define a macro to create a multiplier struncture and add it to the
    linked list of multiplier structures. */
-#define MAKEMULT(s,sl,sc,lab) \
+#define MAKEMULT(s,sl,sc,lab,ll) \
       mult = astMalloc( sizeof( Multiplier ) ); \
       if( astOK ) { \
          mult->sym = s; \
          mult->symlen = sl; \
+         mult->lablen = ll; \
          mult->scale = sc; \
          mult->label = lab; \
          mult->next = multipliers; \
@@ -2179,26 +2182,26 @@ static Multiplier *GetMultipliers() {
 
 /* Use the above macro to create all the standard multipliers listed in the
    FITS WCS paper I. */   
-      MAKEMULT("d",1,1.0E-1,"deci")
-      MAKEMULT("c",1,1.0E-2,"centi")
-      MAKEMULT("m",1,1.0E-3,"milli")
-      MAKEMULT("u",1,1.0E-6,"micro")
-      MAKEMULT("n",1,1.0E-9,"nano")
-      MAKEMULT("p",1,1.0E-12,"pico")
-      MAKEMULT("f",1,1.0E-15,"femto")
-      MAKEMULT("a",1,1.0E-18,"atto")
-      MAKEMULT("z",1,1.0E-21,"zepto")
-      MAKEMULT("y",1,1.0E-24,"yocto")
-      MAKEMULT("da",2,1.0E1,"deca")
-      MAKEMULT("h",1,1.0E2,"hecto")
-      MAKEMULT("k",1,1.0E3,"kilo")
-      MAKEMULT("M",1,1.0E6,"mega")
-      MAKEMULT("G",1,1.0E9,"giga")
-      MAKEMULT("T",1,1.0E12,"tera")
-      MAKEMULT("P",1,1.0E15,"peta")
-      MAKEMULT("E",1,1.0E18,"exa")
-      MAKEMULT("Z",1,1.0E21,"zetta")
-      MAKEMULT("Y",1,1.0E24,"yotta")
+      MAKEMULT("d",1,1.0E-1,"deci",4)
+      MAKEMULT("c",1,1.0E-2,"centi",5)
+      MAKEMULT("m",1,1.0E-3,"milli",5)
+      MAKEMULT("u",1,1.0E-6,"micro",5)
+      MAKEMULT("n",1,1.0E-9,"nano",4)
+      MAKEMULT("p",1,1.0E-12,"pico",4)
+      MAKEMULT("f",1,1.0E-15,"femto",5)
+      MAKEMULT("a",1,1.0E-18,"atto",4)
+      MAKEMULT("z",1,1.0E-21,"zepto",5)
+      MAKEMULT("y",1,1.0E-24,"yocto",5)
+      MAKEMULT("da",2,1.0E1,"deca",4)
+      MAKEMULT("h",1,1.0E2,"hecto",5)
+      MAKEMULT("k",1,1.0E3,"kilo",4)
+      MAKEMULT("M",1,1.0E6,"mega",4)
+      MAKEMULT("G",1,1.0E9,"giga",4)
+      MAKEMULT("T",1,1.0E12,"tera",4)
+      MAKEMULT("P",1,1.0E15,"peta",4)
+      MAKEMULT("E",1,1.0E18,"exa",3)
+      MAKEMULT("Z",1,1.0E21,"zetta",5)
+      MAKEMULT("Y",1,1.0E24,"yotta",5)
 
 /* Undefine the macro. */
 #undef MAKEMULT
@@ -2619,6 +2622,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
 
 /* Local Variables: */
    UnitNode *newtree;
+   UnitNode *sunit;
    char *a;
    char *result;
    char buff[200];
@@ -2660,6 +2664,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
       while( SimplifyTree( &newtree, 0 ) ) {
          FixConstants( &newtree, 1 );
       }
+
    }
 
 /* Produce a string describing the action performed by the UnitNode at
@@ -2774,6 +2779,7 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    have spaces before and after them which would look odd if not encloses
    in parentheses). */
    } else if( newtree->opcode ==  OP_POW ) {  
+
       arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
       larg0 = strlen( arg0 );
 
@@ -2810,86 +2816,102 @@ static const char *MakeExp( UnitNode *tree, int mathmap, int top ) {
    The second argument (denominator) only needs to be placed in parentheses 
    if it is a MULT node. */
    } else if( newtree->opcode ==  OP_DIV ) {  
-      arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
-      larg0 = strlen( arg0 );
 
-      arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0 );
-      larg1 = strlen( arg1 );
+      if( mathmap == 2 && ( sunit = ModifyPrefix( newtree ) ) ) {
+         result = (char *) MakeExp( sunit, mathmap, 0 );
+         sunit = FreeTree( sunit );
 
-      if( newtree->arg[ 1 ]->opcode == OP_MULT ) {
-         par = 1;
-         result = astMalloc( larg0 + larg1 + 4 );
-      } else {
-         par = 0;
-         result = astMalloc( larg0 + larg1 + 2 );
-      }
-
-      if( result ) {
-         memcpy( result, arg0, larg0 );
-         a = result + larg0;
-         *(a++) = '/';
-         if( par ) *(a++) = '(';
-         memcpy( a, arg1, larg1 );
-         a += larg1;
-         if( par ) *(a++) = ')';
-         *a = 0;
-      }
-
-      arg0 = astFree( (void *) arg0 );
-      arg1 = astFree( (void *) arg1 );
-
-/* MULT... the second argument never needs to be in parentheses. The first 
-   argument only needs to be placed in parentheses if it is a DIV or POW 
-   node. */
-   } else if( newtree->opcode ==  OP_MULT ) { 
-      arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
-      larg0 = strlen( arg0 );
-
-      arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0 );
-      larg1 = strlen( arg1 );
-
-/* If this is a top-level entry and we are producing an axis label, do
-   not include any constant multiplicative terms. */
-      if( top && !mathmap ) {
-         if( newtree->arg[ 0 ]->con != AST__BAD ) arg0 = astFree( (void *) arg0 );
-         if( newtree->arg[ 1 ]->con != AST__BAD ) arg1 = astFree( (void *) arg1 );
-      }
-
-/* If we have two arguments, concatentate them, placing the operands in 
-   parentheses if necessary. */
-      if( arg0 && arg1 ) {
-
-         if( newtree->arg[ 0 ]->opcode == OP_DIV ||
-             newtree->arg[ 0 ]->opcode == OP_POW ) {
+      } else {         
+         arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
+         larg0 = strlen( arg0 );
+   
+         arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0 );
+         larg1 = strlen( arg1 );
+   
+         if( newtree->arg[ 1 ]->opcode == OP_MULT &&
+             strchr( arg1, '*' ) ) {
             par = 1;
             result = astMalloc( larg0 + larg1 + 4 );
-            if( result ) result[ 0 ] = '(';
-            a = result + 1;
          } else {
             par = 0;
             result = astMalloc( larg0 + larg1 + 2 );
-            a = result;
          }
    
          if( result ) {
-            memcpy( a, arg0, larg0 );
-            a += larg0;
-            if( par ) *(a++) = ')';
-            *(a++) = '*';
+            memcpy( result, arg0, larg0 );
+            a = result + larg0;
+            *(a++) = '/';
+            if( par ) *(a++) = '(';
             memcpy( a, arg1, larg1 );
             a += larg1;
+            if( par ) *(a++) = ')';
             *a = 0;
          }
    
          arg0 = astFree( (void *) arg0 );
          arg1 = astFree( (void *) arg1 );
+      }
 
-/* If we do not have two arguments, just return the one we do have. */
-      } else if( arg0 ){
-         result = (char *) arg0;
+/* MULT... the second argument never needs to be in parentheses. The first 
+   argument only needs to be placed in parentheses if it is a DIV or POW 
+   node. */
+   } else if( newtree->opcode ==  OP_MULT ) { 
+      if( mathmap == 2 && ( sunit = ModifyPrefix( newtree ) ) ) {
+         result = (char *) MakeExp( sunit, mathmap, 0 );
+         sunit = FreeTree( sunit );
 
       } else {
-         result = (char *) arg1;
+         arg0 = MakeExp( newtree->arg[ 0 ], mathmap, 0 );
+         larg0 = strlen( arg0 );
+   
+         arg1 = MakeExp( newtree->arg[ 1 ], mathmap, 0 );
+         larg1 = strlen( arg1 );
+
+/* If this is a top-level entry and we are producing an axis label, do
+   not include any constant multiplicative terms. */
+         if( top && !mathmap ) {
+            if( newtree->arg[ 0 ]->con != AST__BAD ) arg0 = astFree( (void *) arg0 );
+            if( newtree->arg[ 1 ]->con != AST__BAD ) arg1 = astFree( (void *) arg1 );
+         }
+
+/* If we have two arguments, concatentate them, placing the operands in 
+   parentheses if necessary. */
+         if( arg0 && arg1 ) {
+   
+            if( ( newtree->arg[ 0 ]->opcode == OP_DIV && 
+                  strchr( arg0, '/' ) ) ||
+                ( newtree->arg[ 0 ]->opcode == OP_POW &&
+                  strstr( arg0, "**" ) ) ) {
+               par = 1;
+               result = astMalloc( larg0 + larg1 + 4 );
+               if( result ) result[ 0 ] = '(';
+               a = result + 1;
+            } else {
+               par = 0;
+               result = astMalloc( larg0 + larg1 + 2 );
+               a = result;
+            }
+      
+            if( result ) {
+               memcpy( a, arg0, larg0 );
+               a += larg0;
+               if( par ) *(a++) = ')';
+               *(a++) = '*';
+               memcpy( a, arg1, larg1 );
+               a += larg1;
+               *a = 0;
+            }
+      
+            arg0 = astFree( (void *) arg0 );
+            arg1 = astFree( (void *) arg1 );
+
+/* If we do not have two arguments, just return the one we do have. */
+         } else if( arg0 ){
+            result = (char *) arg0;
+   
+         } else {
+            result = (char *) arg1;
+         }
       }
    }
 
@@ -2990,6 +3012,11 @@ static void MakeKnownUnit( const char *sym, const char *label, const char *exp )
 /* Create a tree of UnitNodes describing the unit if an expression was
    supplied. */
       result->head = exp ? CreateTree( exp, 1 ) : NULL;
+
+/* Unit aliases are replaced in use by the KnownUnit pointed to by the
+   "use" component of the structure. Indicate this KnownUnitis not an
+    alias by setting its "use" component NULL. */
+      result->use = NULL; 
    }
 
 #ifdef DEBUG
@@ -3439,6 +3466,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
    int maxlen;
    int n;           
    int oplen;
+   int plural;
 
 /* Initialise */
    result = NULL;
@@ -3733,63 +3761,82 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 /* See if the string ends with the symbol for any of the known basic
    units. If it matches more than one basic unit, choose the longest. 
    First ensure descriptions of the known units are  available. */
-            unit = GetKnownUnits();
+            plural = 0;
+            while( 1 ) {
+               unit = GetKnownUnits();
 
-            maxlen = -1;
-            munit = NULL;
-            while( unit ) {
-               if( SplitUnit( exp, nc, unit->sym, 1, &mult, &l ) ) {
-                  if( l > maxlen ) {
-                     maxlen = l;
-                     munit = unit;
-                     mmult = mult;
-                  }
-               } 
-               unit = unit->next;
-            }
+               maxlen = -1;
+               munit = NULL;
+               while( unit ) {
+                  if( SplitUnit( exp, nc, unit->sym, 1, &mult, &l ) ) {
+                     if( l > maxlen ) {
+                        maxlen = l;
+                        munit = unit;
+                        mmult = mult;
+                     }
+                  } 
+                  unit = unit->next;
+               }
 
 /* If the above did not produce a match, try matching the unit symbol
    case insensitive. */
-            if( !munit ) {
-               unit = GetKnownUnits();
-               while( unit ) {
-                  if( SplitUnit( exp, nc, unit->sym, 0, &mult, &l ) ) {
-                     if( l > maxlen ) {
-                        maxlen = l;
-                        munit = unit;
-                        mmult = mult;
-                     }
-                  } 
-                  unit = unit->next;
+               if( !munit ) {
+                  unit = GetKnownUnits();
+                  while( unit ) {
+                     if( SplitUnit( exp, nc, unit->sym, 0, &mult, &l ) ) {
+                        if( l > maxlen ) {
+                           maxlen = l;
+                           munit = unit;
+                           mmult = mult;
+                        }
+                     } 
+                     unit = unit->next;
+                  }
                }
-            }
 
 /* If the above did not produce a match, try matching the unit label
    case insensitive. */
-            if( !munit ) {
-               unit = GetKnownUnits();
-               while( unit ) {
-                  if( SplitUnit( exp, nc, unit->label, 0, &mult, &l ) ) {
-                     if( l > maxlen ) {
-                        maxlen = l;
-                        munit = unit;
-                        mmult = mult;
-                     }
-                  } 
-                  unit = unit->next;
+               if( !munit ) {
+                  unit = GetKnownUnits();
+                  while( unit ) {
+                     if( SplitUnit( exp, nc, unit->label, 0, &mult, &l ) ) {
+                        if( l > maxlen ) {
+                           maxlen = l;
+                           munit = unit;
+                           mmult = mult;
+                        }
+                     } 
+                     unit = unit->next;
+                  }
+               }
+
+/* If we still do not have a match, and if the string ends with "s", try
+   removing the "s" (which could be a plural as in "Angstroms") and
+   trying again. */
+               if( !munit && nc > 1 && !plural && 
+                   ( exp[ nc - 1 ] == 's' || exp[ nc - 1 ] == 'S' ) ) {
+                  plural = 1;
+                  nc--;
+               } else {
+                  break;
                }
             }
+            if( plural ) nc++;
 
 /* If a known unit and multiplier combination was found, create an
    OP_LDVAR node from it. */
             unit = munit;
             mult = mmult;
             if( unit ) {
+
+/* If the unit is an alias for another unit, it will have a non-NULL
+   value for its "use" component.In this case, use the unit for which the 
+   identified unit is an alias. */
                result = NewNode( NULL, OP_LDVAR );
                if( astOK ) {
-                  result->unit = unit;
+                  result->unit = unit->use ? unit->use : unit;
                   result->mult = mult;
-                  result->name = astStore( NULL, unit->sym, unit->symlen + 1 );
+                  result->name = astStore( NULL, result->unit->sym, result->unit->symlen + 1 );
                }
 
 /* If no known unit and multiplier combination was found, we assume the
@@ -3839,6 +3886,269 @@ static UnitNode *MakeTree( const char *exp, int nc ){
 /* Return the result. */
    return result;
 }
+
+static void MakeUnitAlias( const char *sym, const char *alias ){
+/*
+*  Name:
+*     MakeUnitAlias
+
+*  Purpose:
+*     Create a KnownUnit structure describing an alias for a known unit.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     void MakeUnitAlias( const char *sym, const char *alias )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function creates a KnownUnit structure decribing an alias for a
+*     known unit, and adds it to the head of the linked list of known units 
+*     stored in a module variable. An alias is a KnownUnit which is
+*     identical to an existing known but which has a different symbol.
+
+*  Parameters:
+*     sym
+*        A pointer to the symbol string of an existing KnwonUnit. The string 
+*        should not include any multiplier prefix.
+*     alias
+*        A pointer to the symbol string to use as the alasi for the existing 
+*        KnownUnit. The string should not include any multiplier prefix.
+
+*  Notes:
+*     -  The supplied symbol and label strings are not copied. The
+*     supplied pointers are simply stored in the returned structure.
+*     Therefore the strings to which the pointers point should not be
+*     modified after this function returned (in fact this function is
+*     always called with literal strings for these arguments).
+*/
+
+/* Local Variables: */
+   KnownUnit *unit;
+
+/* Check the global error status. */
+   if( !astOK ) return;
+
+/* Search the existing list of KnownUnits for the specified symbol. */
+   unit = known_units;
+   while( unit ) {
+      if( !strcmp( sym, unit->sym ) ) {
+
+/* Create a new KnownUnit for the alias. It will becomes the head of the
+   known units chain. */
+         MakeKnownUnit( alias, unit->label, NULL );
+
+/* Store a pointer to the KnownUnit which is to be used in place of the
+   alias. */
+         known_units->use = unit;
+
+/* Leave the loop. */         
+         break;
+      }
+
+/* Move on to check the next existing KnownUnit. */
+      unit = unit->next;
+   }
+
+/* Report an error if the supplied unit was not found. */
+   if( !unit ) {
+      astError( AST__INTER, "MakeUnitAlias(Unit): Cannot find existing "
+                "units \"%\" to associate with the alias \"%s\" (AST "
+                "internal programming error).", sym, alias );
+   }
+}
+
+static UnitNode *ModifyPrefix( UnitNode *old ) {
+/*
+*  Name:
+*     ModifyPrefix
+
+*  Purpose:
+*     Replace a MULT or DIV node with a LDVAR and suitable multiplier.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     UnitNode *ModifyPrefix( UnitNode *old )
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function checks the supplied node. If it is a DIV or MULT node
+*     in which one argument is an LDVAR and the other is a constant, then
+*     its checks to see if the constant can be absorbed into the LDVAR by
+*     changing the multiplier in the LDVAR node. If so, it returns a new 
+*     node which is an LDVAR with the modified multiplier. Otherwise it
+*     returns NULL.
+
+*  Parameters:
+*     old
+*        Pointer to an existing UnitNode to be checked.
+
+*  Returned Value:
+*     A pointer to the new UnitNode.
+
+*  Notes:
+*     - A value of NULL will be returned if this function is invoked with 
+*     the global error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   Multiplier *mult;
+   Multiplier *mmult;
+   UnitNode *ldcon;
+   UnitNode *ldvar;
+   UnitNode *newtree;
+   UnitNode *result;
+   double con;
+   double cmult;
+   double r;
+   double rmin;
+   int recip;              
+   int changed;
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the inherited status. */
+   if( !astOK ) return result;
+
+/* Indicate that we have not yet found any reason to return a changed
+   node. */
+   changed = 0;
+
+/* Check the supplied node is a DIV or MULT node. */
+   if( old->opcode == OP_DIV || old->opcode == OP_MULT ) {
+
+/* Get a copy of the supplied tree which we can modify safely. */
+      newtree = CopyTree( old );
+
+/* Identify the LDVAR argument (if any). */
+      if( newtree->arg[ 0 ]->opcode == OP_LDVAR ) { 
+         ldvar = newtree->arg[ 0 ];
+
+      } else if( newtree->arg[ 1 ]->opcode == OP_LDVAR ) { 
+         ldvar = newtree->arg[ 1 ];
+
+      } else {
+         ldvar = NULL;
+      }
+
+/* Identify the LDCON argument (if any). */
+      if( newtree->arg[ 0 ]->opcode == OP_LDCON ) { 
+         ldcon = newtree->arg[ 0 ];
+
+      } else if( newtree->arg[ 1 ]->opcode == OP_LDCON ) { 
+         ldcon = newtree->arg[ 1 ];
+
+      } else {
+         ldcon = NULL;
+      }
+
+/* If either was not found, return NULL. */
+      if( !ldvar || !ldcon ) {
+         newtree = FreeTree( newtree );
+
+/* Otherwise, extract the multiplier constant. If there is no multiplier, the
+   constant is 1.0. */
+      } else {      
+         cmult = ldvar->mult ? ldvar->mult->scale: 1.0;
+
+/* Extract the constant. */
+         con = ldcon->con;
+
+/* Combine the multiplier and the constant. The resulting constant is a
+   factor which is used to multiply the LDVAR quantity. If the original 
+   node is a DIV node in which the LDVAR is in the denominator, then
+   flag that we need to reciprocate the new MULT node which represents
+   "constant*LDVAR" before returning. */
+         if( newtree->opcode == OP_MULT ) {
+            con = con*cmult;
+            recip = 0;
+         } else {
+            con = cmult/con;
+            recip = ( ldvar == newtree->arg[ 1 ] );
+         }
+
+/* Find the closest known multiplier to the new constant. */
+         rmin = ( con > 1 ) ? con : 1.0/con;
+         mmult = NULL;
+         mult = GetMultipliers();
+         while( mult ) {
+            r = ( con > mult->scale) ? con/mult->scale : mult->scale/con;
+            if( r < rmin ) {
+               mmult = mult;
+               rmin = r;
+            }
+            mult = mult->next;
+         }
+
+/* Modify the constant to take account of the new multiplier chosen
+   above. "mmult" will be NULL if the best multiplier is unity. */
+         if( mmult ) con = con/mmult->scale;
+
+/* If they have changed, associate the chosen multiplier with the LDVAR node, 
+   and the constant with the LDCON node. */
+         if( ldvar->mult != mmult ) {
+            ldvar->mult = mmult;
+            changed = 1;
+         }         
+
+         if( ldcon->con != con ) {
+            ldcon->con = con;
+            changed = 1;
+         }
+
+/* Unless the node is proportional to the reciprocal of the variable, the
+   new node should be a MULT node (it may originally have been a DIV). */
+         if( !recip ) {
+            if( newtree->opcode != OP_MULT ){
+               newtree->opcode = OP_MULT;
+               changed = 1;
+            }
+            
+/* If the constant is 1.0 we can just return the LDVAR node by itself. */
+            if( fabs( con - 1.0 ) < 1.0E-6 ) {
+               result = CopyTree( ldvar );
+               newtree = FreeTree( newtree );
+               changed = 1;
+
+/* Otherwise return the modified tree containing both LDVAR and LDCON nodes. */
+            } else {
+               result = newtree;
+            }
+
+/* If the node is proportional to the reciprocal of the variable, the
+   new node will already be a DIV node and will have an LDCON as the first
+   argument (numerator) and an LDVAR as the second argument (denominator). */
+         } else {
+            
+/* The first argument (the numerator) should be the reciprocal of the constant 
+   found above. */
+            ldcon->con = 1.0/ldcon->con;
+            if( !EQUAL( ldcon->con, old->arg[0]->con ) ) changed = 1;
+
+/* Return the modified tree containing both LDVAR and LDCON nodes. */
+            result = newtree;
+         }
+      }
+   }
+
+/* If the new and old trees are equivalent, then we do not need to return
+   it. */
+   if( !changed && result ) result = FreeTree( result );
+
+/* Return the answer. */
+   return result;
+}
+
 
 static UnitNode *NewNode( UnitNode *old, Oper code ) {
 /*
@@ -4473,7 +4783,7 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
 *        The string to test, typically containing a multiplier and a unit
 *        symbol or label.
 *     ls
-*        Number of characters to use from "str".
+*        Number of characters to use from "str" (not including trailing null)
 *     u
 *        Pointer to the unit label or symbol string to be searched for.
 *     cs 
@@ -4529,6 +4839,32 @@ static int SplitUnit( const char *str, int ls, const char *u, int cs,
                }
                *mult = (*mult)->next;
             }
+
+/* If not, try again using case-insensitive matching. */
+            if( !ret ) {
+               *mult = GetMultipliers();
+               while( *mult ) {
+                  if( (*mult)->symlen == lm && !Ustrncmp( str, (*mult)->sym, lm ) ) {
+                     ret = 1;
+                     break;
+                  }
+                  *mult = (*mult)->next;
+               }
+            }
+
+/* If not, try again using case-insensitive matching against the
+   multiplier label. */
+            if( !ret ) {
+               *mult = GetMultipliers();
+               while( *mult ) {
+                  if( (*mult)->lablen == lm && !Ustrncmp( str, (*mult)->label, lm ) ) {
+                     ret = 1;
+                     break;
+                  }
+                  *mult = (*mult)->next;
+               }
+            }
+
          }
       }
    }
@@ -4763,7 +5099,9 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "/": division. 
 *     - "**": exponentiation. The exponent (i.e. the operand following the
 *       exponentiation operator) must be a constant. The symbol "^" is also
-*       interpreted as an exponentiation operator.
+*       interpreted as an exponentiation operator. Exponentiation is also
+*       implied by an integer following a unit name without any separator
+*       (e.g. "cm2" is "cm^2").
 *     - log(): Common logarithm.
 *     - ln(): Natural logarithm.
 *     - sqrt(): Square root.
@@ -4791,13 +5129,13 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "rad":  radian.
 *     - "sr":  steradian.
 *     - "K":  Kelvin.
-*     - "A":  Ampere.
 *     - "mol":  mole.
 *     - "cd":  candela.
 *
 *     The following symbols for units derived fro the above basic units are 
 *     recognised:
 *
+*     - "sec":  second (1 s)
 *     - "Hz":  Hertz  (1/s).
 *     - "N":  Newton  (kg m/s**2).
 *     - "J":  Joule  (N m).
@@ -4820,7 +5158,6 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "min":  minute  (60 s).
 *     - "h":  hour  (3600 s).
 *     - "d":  day  (86400 s).
-*     - "a":  year  (31557600 s).
 *     - "yr":  year  (31557600 s).
 *     - "eV":  electron-Volt  (1.60217733E-19 J).
 *     - "erg":  erg  (1.0E-7 J).
@@ -4829,6 +5166,9 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "u":  unified atomic mass unit  (1.6605387E-27 kg).
 *     - "solLum":  solar luminosity  (3.8268E26 W).
 *     - "Angstrom":  Angstrom  (1.0E-10 m).
+*     - "Ang":  Angstrom
+*     - "A":  Angstrom
+*     - "micron":  micron (1.0E-6 m).
 *     - "solRad":  solar radius  (6.9599E8 m).
 *     - "AU":  astronomical unit  (1.49598E11 m).
 *     - "lyr":  light year  (9.460730E15 m).
@@ -4838,12 +5178,17 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 *     - "photon":  photon.
 *     - "ph":  photon.
 *     - "Jy":  Jansky  (1.0E-26 W /m**2 /Hz).
+*     - "Jan":  Jansky  
 *     - "mag":  magnitude.
 *     - "G":  Gauss  (1.0E-4 T).
 *     - "pixel":  pixel.
 *     - "pix":  pixel.
 *     - "barn":  barn  (1.0E-28 m**2).
 *     - "D":  Debye  (1.0E-29/3 C.m).
+*
+*     Note, AST follows the widespread practice within astronomy of using 
+*     "A" and/or "a" as an alias for "Angstrom". This replaces the association 
+*     of "A" with Ampere and "a" with year included in the FITS-WCS standard.
 *
 *     In addition, any other unknown unit symbol may be used (but of course 
 *     no mapping will be possible between unknown units).
@@ -5253,6 +5598,12 @@ const char *astUnitNormaliser_( const char *in ){
    in_tree = CreateTree( in, 0 );
    if( in_tree ) {
 
+/* Invert literal constant unit multipliers. This is because a constant of 
+   say 1000 for a unit of "m" means "multiply the value in metres by 1000", 
+   but a unit string of "1000 m" means "value in units of 1000 m" (i.e. 
+   *divide* the value in metres by 1000). */
+      InvertConstants( &in_tree );
+
 /* Convert the tree into string form. */
       result = MakeExp( in_tree, 2, 1 );
 
@@ -5266,89 +5617,6 @@ const char *astUnitNormaliser_( const char *in ){
 
 /* Return the result */
    return result;
-}
-
-static int Ustrcmp( const char *a, const char *b ){
-/*
-*  Name:
-*     Ustrcmp
-
-*  Purpose:
-*     A case blind version of strcmp.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "fitschan.h"
-*     static int Ustrcmp( const char *a, const char *b )
-
-*  Class Membership:
-*     FitsChan member function.
-
-*  Description:
-*     Returns 0 if there are no differences between the two strings, and 1 
-*     otherwise. Comparisons are case blind.
-
-*  Parameters:
-*     a
-*        Pointer to first string.
-*     b
-*        Pointer to second string.
-
-*  Returned Value:
-*     Zero if the strings match, otherwise one.
-
-*  Notes:
-*     -  This function does not consider the sign of the difference between
-*     the two strings, whereas "strcmp" does.
-*     -  This function attempts to execute even if an error has occurred. 
-
-*/
-
-/* Local Variables: */
-   const char *aa;         /* Pointer to next "a" character */
-   const char *bb;         /* Pointer to next "b" character */
-   int ret;                /* Returned value */
-
-/* Initialise the returned value to indicate that the strings match. */
-   ret = 0;
-
-/* Initialise pointers to the start of each string. */
-   aa = a;
-   bb = b;
-
-/* Loop round each character. */
-   while( 1 ){
-
-/* We leave the loop if either of the strings has been exhausted. */
-      if( !(*aa ) || !(*bb) ){
-
-/* If one of the strings has not been exhausted, indicate that the
-   strings are different. */
-         if( *aa || *bb ) ret = 1;
-
-/* Break out of the loop. */
-         break;
-
-/* If neither string has been exhausted, convert the next characters to
-   upper case and compare them, incrementing the pointers to the next
-   characters at the same time. If they are different, break out of the
-   loop. */
-      } else {
-
-         if( toupper( (int) *(aa++) ) != toupper( (int) *(bb++) ) ){
-            ret = 1;
-            break;
-         }
-
-      }
-
-   }
-
-/* Return the result. */
-   return ret;
-
 }
 
 static int Ustrncmp( const char *a, const char *b, size_t n ){
@@ -5455,7 +5723,6 @@ static int Ustrncmp( const char *a, const char *b, size_t n ){
 
 /* The rest of this file contains functions which are of use for debugging 
    this module. They are usually commented out. 
-
 
 static const char *DisplayTree( UnitNode *node, int ind ) {
    int i;
@@ -5625,7 +5892,6 @@ static const char *TreeExp( UnitNode *node ) {
 
    return astStore( NULL, buff, strlen( buff ) + 1 );
 }
-
 
 */
 
