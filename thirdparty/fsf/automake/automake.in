@@ -4692,9 +4692,30 @@ sub handle_starlink
         register_suffix_rule (INTERNAL, '.ifl', '.ifc');
       }
 
+    my $starlink_manifest_install_command
+      = var ('STAR_MANIFEST_INSTALL_COMMAND');
+    my $standard_manifest = 1;
+    my $make_cmd = '';
+    if ($starlink_manifest_install_command)
+      {
+        $make_cmd = $starlink_manifest_install_command->variable_value;
+        if ($make_cmd =~ s{STAGINGPREFIX}{\$\$STG}g) 
+          {
+            $make_cmd =~ s/\s*\n\s*/ /g;
+            $standard_manifest = 0;
+          }
+        else
+          {
+            err_am ("STAR_MANIFEST_INSTALL_COMMAND doesn't include STAGINGPREFIX");
+            $make_cmd = '';
+          }
+      }
+
     $output_rules .= &file_contents ('starlink',
                                      new Automake::Location,
                                      INSTALLMANIFEST => $manifestdir,
+                                     STANDARDMANIFEST => $standard_manifest,
+                                     MANIFESTMAKEINSTALL => $make_cmd,
                                      LATEXDOCS => $havelatex,
                                      COMPIFL => $want_compifl
                                     );
