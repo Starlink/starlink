@@ -1665,6 +1665,10 @@ install:
            else :; fi;\
         done
 
+#
+#  Write the package version to a file in the installation directory.
+	echo $PKG_VERS 1>$(INSTALL_BIN)/version
+
 #  Install the package startup script.  The package version number,
 #  the name of the directory containing the installed binaries and
 #  interface files, and the name of the directory containing the help
@@ -1976,6 +1980,11 @@ do_deinstall:
                 rm -f $(INSTALL_BIN)/$$f ;\
            else :; fi;\
         done
+#
+#  Remove the package version file in the installation directory.
+        - if test -n "version"; then \
+             rm -f $(INSTALL_BIN)/version ;\
+           else :; 
 #
 #  Deinstall the package startup file.  Since it will have been edited
 #  during installation, we remove the installed copy, if present, and
