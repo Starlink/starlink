@@ -67,11 +67,14 @@ all: $(ALL_TARGETS)
 # we're using this file unconfigured during bootstrap (see ./bootstrap
 # for the relevant gymnastics).
 #
-# At the same time, create a set of dependencies for componentset.xml.
-# These won't _necessarily_ be up-to-date, but they'll only be
-# inaccurate if we (rarely) add a new component, so they're good
-# enough for their purpose.  componentset.xml doesn't really depend on
-# configure.ac, but it's a useful and plausible dummy to end the list with.
+# It might seem like a good idea to create a set of dependencies for
+# componentset.xml at the same time, saying that it depends on all the
+# component.xml files beneath it in the tree.  It's a bad idea,
+# however, since it means that the Makefile can be used only if the
+# entire tree is checked out.  If we only check out part of the tree,
+# because we only want to build one component, then any make at the
+# top level will fail because one or other of the dependencies of
+# componentset.xml is missing.
 #
 # The test of whether $(JAVA) is zero-length is important.  An edited
 # version of this file is used by the ./bootstrap script, in which the
@@ -85,15 +88,17 @@ Makefile.dependencies: componentset.xml
 	        && $(MAKE) GenerateDependencies.class) \
 	    && $(JAVA) -classpath buildsupport/starconf/java \
 		GenerateDependencies componentset.xml >$@ \
-	    && echo "componentset.xml: \\" >>$@ \
-	    && find . -name component.xml | sed 's/\(.*\)/		\1 \\/' >>$@ \
-	    && echo "		configure.ac" >>$@; \
 	else :; fi
 
 # Make a componentset.xml by concatenating all the component.xml files
-# we can find.  Sort the list of files, not because this matters, but
-# to make this deterministic.  The removal of the DOCTYPE lines and
-# PIs is admittedly lame, but good enough for the moment.
+# we can find.  Sort the list of files to make the order
+# deterministic.  The removal of the DOCTYPE lines and PIs is
+# admittedly lame, but good enough for the moment.
+#
+# componentset.xml `really' depends on all the component.xml files
+# below it, but don't state this, for the reason explained above
+# Makefile.dependencies.  If you add a component, then delete
+# componentset.xml here and remake it.
 componentset.xml: componentinfo.dtd
 	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
 	echo '<componentset>' >>$@
