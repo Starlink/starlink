@@ -107,6 +107,21 @@ int main (int argc, char **argv)
     //PkRasterdata::verbosity(2);
     //Bitmap::verbosity(2);
 
+#define MM oneInch * 0.03937
+    struct {
+	char *name; double w; double h;
+    } papersizes[] = {
+	// Do these calculations in terms of the unit oneInch
+	// Defn of inch: 1m=39.37in => 1mm=0.03937in
+	{ "a4",		210 * MM,	297 * MM 	}, // 210x297mm
+	{ "a4l",	297 * MM,	210 * MM,	}, // 297x210mm
+	{ "a5",		148 * MM,	210 * MM,	}, // 148x210mm
+	{ "a5l",	210 * MM,	148 * MM,	}, // 210x148mm
+	{ "usletter",	8.5*oneInch,	8.5*oneInch,	}, // 8.5x11in
+    };
+    int npapersizes = sizeof(papersizes)/sizeof(papersizes[0]);
+	
+
     progname = argv[0];
 
 #if ENABLE_KPATHSEA
@@ -135,6 +150,27 @@ int main (int argc, char **argv)
 		    argc--, argv++; if (argc <= 0) Usage();
 		    bitmapW = atoi (*argv);
 		    break;
+		  case 'p':
+		    argc--, argv++; if (argc <= 0) Usage();
+		    int i;
+		    for (i = 0; i<npapersizes; i++)
+			if (strcmp (*argv, papersizes[i].name) == 0)
+			{
+			    bitmapH = static_cast<int>(papersizes[i].h+0.5);
+			    bitmapW = static_cast<int>(papersizes[i].w+0.5);
+			    break;
+			}
+		    if (i == npapersizes)
+			cerr << "-bs " << *argv
+			     << " not recognised.  See -Qp\n";
+		    else
+			if (verbosity > normal)
+			    cerr << "Papersize " << *argv
+				 << ": H=" << bitmapH
+				 << " W=" << bitmapW
+				 << '\n';
+		    break;
+		    
 		  default:
 		    Usage();
 		    break;
@@ -146,37 +182,52 @@ int main (int argc, char **argv)
 	      case 'c':		// crop
 	      {
 		  char c = *++*argv;
-		  argc--, argv++; if (argc <= 0) Usage();
-		  // get dimension, and convert points to pixels.
-		  // Note that the functionality here will vary depending on
-		  // whether the magmag is set before or after this option,
-		  // and it'll take no account of variations of the
-		  // magnification within the DVI file.
-		  int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
-		  switch (c)
+		  if (c == 'x')
 		  {
-		    case 'l':
-		      Bitmap::cropDefault(Bitmap::Left,   cropmargin, absCrop);
-		      break;
-		    case 'r':
-		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, absCrop);
-		      break;
-		    case 't':
-		      Bitmap::cropDefault(Bitmap::Top,    cropmargin, absCrop);
-		      break;
-		    case 'b':
-		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, absCrop);
-		      break;
-		    case '\0':
-		      if (absCrop) // don't want this!
+		      // turn off cropping
+		      Bitmap::cropDefault(Bitmap::None, 0, false);
+		  }
+		  else
+		  {
+		      argc--, argv++; if (argc <= 0) Usage();
+		      // get dimension, and convert points to pixels.
+		      // Note that the functionality here will vary
+		      // depending on whether the magmag is set before
+		      // or after this option, and it'll take no
+		      // account of variations of the magnification
+		      // within the DVI file.
+		      int cropmargin = static_cast<int>(magmag*atof(*argv)/72.0*resolution);
+		      switch (c)
+		      {
+			case 'l':
+			  Bitmap::cropDefault(Bitmap::Left,
+					      cropmargin, absCrop);
+			  break;
+			case 'r':
+			  Bitmap::cropDefault(Bitmap::Right,
+					      cropmargin, absCrop);
+			  break;
+			case 't':
+			  Bitmap::cropDefault(Bitmap::Top,
+					      cropmargin, absCrop);
+			  break;
+			case 'b':
+			  Bitmap::cropDefault(Bitmap::Bottom,
+					      cropmargin, absCrop);
+			  break;
+			case '\0':
+			  if (absCrop) // don't want this!
+			      Usage();
+			  Bitmap::cropDefault(Bitmap::All,
+					      cropmargin, false);
+			  //Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
+			  //Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
+			  //Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
+			  //Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
+			  break;
+			default:
 			  Usage();
-		      Bitmap::cropDefault(Bitmap::Left,   cropmargin, false);
-		      Bitmap::cropDefault(Bitmap::Right,  cropmargin, false);
-		      Bitmap::cropDefault(Bitmap::Top,    cropmargin, false);
-		      Bitmap::cropDefault(Bitmap::Bottom, cropmargin, false);
-		      break;
-		    default:
-		      Usage();
+		      }
 		  }
 		  break;
 	      }
@@ -349,6 +400,13 @@ int main (int argc, char **argv)
 
 		      case 'b':	// show bitmap info
 			Bitmap::logBitmapInfo (true);
+			break;
+
+		      case 'p':	// show `paper sizes'
+			cout << "Qp";
+			for (int i=0; i<npapersizes; i++)
+			    cout << ' ' << papersizes[i].name;
+			cout << '\n';
 			break;
 
 		      default:
@@ -1140,10 +1198,11 @@ bool parseRGB (Bitmap::BitmapColour& rgb, char* s)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-qV] [-Q[Fft]] [-b(h|w) size]\n\
+    cerr << "Usage: " << progname << " [-qV] [-Q[FfGgtbp]] \n\
+        [-b(h|w) size] [-bp a4|a4l|usletter...]\n\
 	[-fp PKpath ] [-fm mfmode] [-fg] [-fG]\n\
 	[-r resolution] [-P[bBtT]] [-s scale-factor] [-o outfile-pattern]\n\
-	[-m magmag ] [-[Cc][lrtb]] [-n]\n\
+	[-m magmag ] [-[Cc][lrtb] size] [-cx] [-n]\n\
 	[-R[fb] int,int,int]\n\
 	[-p num] [-l num] [-pp ranges] [-t xbm"
 #if ENABLE_GIF
