@@ -463,11 +463,11 @@
 *  Find the spatial bounds of the data in pixel coordinates.
 *  =========================================================
 *  Find the maximum and minimum X value.
-      CALL KPG1_MXMND( ( NGX < NVEC ), NVEC, %VAL( IPX ), NBAD, SXHI,
+      CALL KPG1_MXMND( ( NGX .LT. NVEC ), NVEC, %VAL( IPX ), NBAD, SXHI,
      :                  SXLO, MAXPOS, MINPOS, STATUS )
 
 *  Find the maximum and minimum Y value.
-      CALL KPG1_MXMND( ( NGY < NVEC ), NVEC, %VAL( IPY ), NBAD, SYHI,
+      CALL KPG1_MXMND( ( NGY .LT. NVEC ), NVEC, %VAL( IPY ), NBAD, SYHI,
      :                  SYLO, MAXPOS, MINPOS, STATUS )
 
 *  Extend these values slightly at each border.
