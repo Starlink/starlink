@@ -215,7 +215,7 @@
 
 <!--========== Parameter entities for configuration ==========-->
 <!ENTITY % DocClass "SUN">
-<!ENTITY % DocClassString "'%DocClass'">
+<!ENTITY % DocClassString "'%DocClass;'">
 
 <!--=========== Feature Switches ==========-->
 
