@@ -221,9 +221,9 @@
 
 *    Form mean and standard deviation.
 
-      X( 2 ) = SUM2 / SUM1
-      X( 3 ) = SQRT( MAX( DBLE( VARMIN ),
-     :               ( SUM3 - SUM2 * X( 2 ) ) / SUM1 ) )
+      X( 2 ) = REAL( SUM2 / SUM1 )
+      X( 3 ) = REAL( SQRT( MAX( DBLE( VARMIN ),
+     :               ( SUM3 - SUM2 * X( 2 ) ) / SUM1 ) ) )
 
 *    Initialise sums for forming an initial estimate of the Gaussian
 *    amplitude.
@@ -274,14 +274,14 @@
 
 *    Form estimates of the Gaussian height and mean.
 
-      X( 1 ) = SUM1 / SUM0
-      X( 2 ) = X( 2 ) + SUM2 / SUM1
+      X( 1 ) = REAL( SUM1 / SUM0 )
+      X( 2 ) = X( 2 ) + REAL( SUM2 / SUM1 )
 
 *    Estimate the variance, then make an approximate correction
 *    for the fact that the data points were weighted with a Gaussian
 *    using the old value for the variance.
 
-      VAR = ( SUM3 - ( SUM2 * SUM2 ) / SUM1 ) / SUM1
+      VAR = REAL( ( SUM3 - ( SUM2 * SUM2 ) / SUM1 ) / SUM1 )
       OLDVAR = X( 3 ) * X( 3 )
       VAR = ( OLDVAR * VAR ) / MAX( OLDVAR - VAR, 1.0E-10 )
       X( 3 ) = SQRT( MAX( VARMIN, VAR ) )
