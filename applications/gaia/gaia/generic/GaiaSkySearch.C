@@ -31,6 +31,9 @@
  *        Original version.
  *     21-AUG-2000 (PWD):
  *        Added changes to support NDF origins.
+ *     22-AUG-2000 (PWD):
+ *        Override "info" command to stop foreign files from being
+ *        ignored (all files in /tmp not saved).
  *     {enter_new_authors_here}
  *
  */
@@ -62,9 +65,10 @@ public:
   {"check",  &GaiaSkySearch::checkCmd,        1,  1},
   {"csize",  &GaiaSkySearch::csizeCmd,        1,  1},
   {"entry",  &GaiaSkySearch::entryCmd,        1,  4},
+  {"info",   &GaiaSkySearch::infoCmd,         1,  2},
   {"open",   &GaiaSkySearch::openCmd,         1,  1},
-  {"save",   &GaiaSkySearch::saveCmd,         1,  5},
-  {"origin", &GaiaSkySearch::originCmd,       0,  2}
+  {"origin", &GaiaSkySearch::originCmd,       0,  2},
+  {"save",   &GaiaSkySearch::saveCmd,         1,  5}
 };
 
 /**
@@ -85,6 +89,13 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
     //  (SkySearch inherits TclAstroCat this way). So use this following
     //  code, which seems to fix things. Recheck when newer version of
     //  egcs are produced.
+    
+    if ( strcmp( name, "info" ) == 0 ) {
+        if ( check_args( name, argc, 1, 2 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return infoCmd( argc, argv );
+    }
     
     if ( strcmp( name, "check" ) == 0 ) {
         if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
@@ -625,4 +636,75 @@ GaiaSkySearch::originCmd( int argc, char *argv[] )
         xOrigin_ = xo;
         yOrigin_ = yo;
     }
+}
+
+/**
+ * catalog "info" subcommand:
+ *
+ * usage: $cat info $serv_type ?$directory?
+ *
+ * This command returns a list of catalogs from the catalog config file.
+ * The "serv_type" argument determines which catalogs are listed (one of:
+ * catalog, namesvr, imagesvr, directory, local...).
+ *
+ * If $serv_type is an empty string, all entries are returned.
+ *
+ * If $directory is specified, the return list will be from the given
+ * catalog directory entry, retrieved via HTTP if needed. The default, if
+ * no $directory is given, is the top level list read from the default
+ * config file at startup.
+ *
+ * This method overrides the TclAstroCat version to make sure that our 
+ * temporary files are not excluded from the configuration file.
+ */
+int GaiaSkySearch::infoCmd(int argc, char* argv[])
+{
+    Tcl_ResetResult(interp_);
+
+    CatalogInfoEntry* e;
+    if (argc == 2) {
+        e = CatalogInfo::lookup(argv[1]);
+        if (!e)
+            return TCL_ERROR;
+        if (strcmp(e->servType(), "directory") != 0)
+            return error("expected a catalog directory entry");
+        if (! e->link()) {
+            if (CatalogInfo::load(e) != 0)  // follow catalog dir link
+                return TCL_ERROR;
+        }
+    }
+    else {
+        e = CatalogInfo::root();
+    }
+        
+    if (!e || !e->link()) 
+        return error("can't find catalog info");
+    e = e->link();  // get pointer to first catalog in directory
+    
+    // get the serv_type
+    Tcl_ResetResult(interp_);
+    int n = strlen(argv[0]);
+    for (; e != NULL; e = e->next()) {
+        if (strncmp(argv[0], e->servType(), n) == 0) {
+            // ignore local catalogs in /tmp, since they will be
+            // deleted later, unless they are foreign catalogues, that
+            // are not stored in a FITS extension!
+            int save = 1;
+            if ( strcmp(e->servType(), "local") == 0 ) {
+                if ( strncmp(e->url(), "/tmp/", 5) == 0 ) {
+                    if ( GaiaLocalCatalog::is_foreign( e->longName() ) ) {
+                        if ( strstr( e->longName(), "}" ) ) {
+                            save = 0;
+                        }
+                    } else {
+                        save = 0;
+                    }
+                }
+            }
+            if ( save ) {
+                Tcl_AppendElement(interp_, (char*)e->longName());
+            }
+        }
+    }
+    return TCL_OK;
 }
