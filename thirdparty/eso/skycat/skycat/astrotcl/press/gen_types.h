@@ -35,9 +35,7 @@
  *  Data structures
  */
 
-/* allan: 6.8.96: conflicting name: boolean, also in sys/types.h for GNU on solaris? */
-#define boolean xboolean
-typedef	char		boolean;
+typedef	int		boolean;
 
 typedef	unsigned char	byte;
 typedef boolean		(*pfb)();
