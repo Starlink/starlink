@@ -144,7 +144,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/build/classes
-    [javac] Compiling 14 source files to /apps/cvsbuild/java/source/util/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/util/build/classes
 
 jars:
     [mkdir] Created dir: /apps/cvsbuild/java/source/util/lib/util
@@ -225,7 +225,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/etc
-[loggedcopy] Copying 29 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -450,7 +450,7 @@ install:
 prepare:
 
 check_packages:
-[available] Apr 3, 2003 4:27:20 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Apr 4, 2003 4:28:01 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -908,7 +908,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/classes
-    [javac] Compiling 47 source files to /apps/cvsbuild/java/source/table/build/classes
+    [javac] Compiling 52 source files to /apps/cvsbuild/java/source/table/build/classes
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/lib/table
      [copy] Copying 1 file to /apps/cvsbuild/java/source/table/lib/table
@@ -951,7 +951,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/table
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
-[loggedcopy] Copying 69 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 74 files to /apps/cvsbuild/star/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -2454,10 +2454,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
+     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
