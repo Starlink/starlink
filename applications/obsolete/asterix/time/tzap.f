@@ -56,7 +56,7 @@
 
         ENDDO
 
-        CALL USI_CLOSE()
+c        CALL USI_CLOSE()
 
       ENDIF
 

@@ -53,7 +53,8 @@
         ENDIF
 
         T_OPEN=.FALSE.
-        CALL ADI_FCLOSE(T_FID,STATUS)
+        CALL USI_CLOSE()
+c        CALL ADI_FCLOSE(T_FID,STATUS)
         CALL AST_CLOSE()
 
       ENDIF
