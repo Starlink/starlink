@@ -12,6 +12,7 @@
 *      22 Feb 94 : V1.7-1  variance calculation corrected (RJV)
 *      24 Feb 94 : V1.7-2  uses BIT_* (RJV)
 *      16 Sep 94 : V1.7-3  updates data min/max (RJV)
+*      14 Dec 94 : V1.8-0  only patches within current region (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -27,7 +28,7 @@
 *    Local variables :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPATCH Version 1.7-3')
+      PARAMETER (VERSION = 'IPATCH Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -244,24 +245,30 @@
 
 
                 IF (NX.GT.0.AND.NY.GT.0) THEN
-                  DI=AX*REAL(II)+BX
-                  DJ=AY*REAL(J)+BY
-                  D(II,J)=(DI+DJ)/2.0
-                  Q(II,J)=QUAL__PATCHED
-                  IF (I_VOK) THEN
-                    V(II,J)=(XSIGSQ+YSIGSQ)/4.0
+                  IF (IMG_INREG(II,J)) THEN
+                    DI=AX*REAL(II)+BX
+                    DJ=AY*REAL(J)+BY
+                    D(II,J)=(DI+DJ)/2.0
+                    Q(II,J)=QUAL__PATCHED
+                    IF (I_VOK) THEN
+                      V(II,J)=(XSIGSQ+YSIGSQ)/4.0
+                    ENDIF
                   ENDIF
                 ELSEIF (NX.GT.0) THEN
-                  D(II,J)=AX*REAL(II)+BX
-                  Q(II,J)=QUAL__PATCHED
-                  IF (I_VOK) THEN
-                    V(II,J)=XSIGSQ
+                  IF (IMG_INREG(II,J)) THEN
+                    D(II,J)=AX*REAL(II)+BX
+                    Q(II,J)=QUAL__PATCHED
+                    IF (I_VOK) THEN
+                      V(II,J)=XSIGSQ
+                    ENDIF
                   ENDIF
                 ELSEIF (NY.GT.0) THEN
-                  D(II,J)=AY*REAL(J)+BY
-                  Q(II,J)=QUAL__PATCHED
-                  IF (I_VOK) THEN
-                    V(II,J)=YSIGSQ
+                  IF (IMG_INREG(II,J)) THEN
+                    D(II,J)=AY*REAL(J)+BY
+                    Q(II,J)=QUAL__PATCHED
+                    IF (I_VOK) THEN
+                      V(II,J)=YSIGSQ
+                    ENDIF
                   ENDIF
                 ELSE
                   CALL MSG_SETI('I',II)
