@@ -18,11 +18,15 @@ setenv ADAM_USER $cwd
 if (! $?ECHOMOP_DIR) then
     setenv ECHOMOP_DIR $STARLINK/bin/echomop
 endif
-
-# Check that ECHOMOP is in the path, and source the startup file if it 
-# isn't.
-if ( `expr $ECHOMOP_DIR : $PATH` == 0 ) then
+# Check that ECHOMOP_BASE is defined, and if it isn't source the startup file
+# (we don't need this variable below, but it serves as a marker that
+# the startup file has been sourced)
+if (! $?ECHOMOP_BASE) then
     source $ECHOMOP_DIR/echomop.csh
+endif
+# Check that ECHOMOP is in the path, and add it if it isn't.
+if ( `expr $ECHOMOP_DIR : $PATH` == 0 ) then
+    setenv PATH ${ECHOMOP_DIR}:$PATH
 endif
 
 # Call echmenu with the `version' parameter.  This produces the
