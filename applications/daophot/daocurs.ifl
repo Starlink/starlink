@@ -1,0 +1,22 @@
+interface DAOCURS
+
+   parameter RFILE
+      position 1
+      keyword  'RFILE'
+      type  'FILENAME'
+      vpath 'PROMPT'
+      prompt 'File for results '
+   endparameter
+
+   parameter DEVICE
+      position 2
+      keyword  'DEVICE'
+      ptype    'DEVICE'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  IKON
+      prompt   'Display device '
+   endparameter
+
+endinterface

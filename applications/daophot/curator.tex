@@ -1,0 +1,227 @@
+\def\hi{\noindent \hangindent=20 pt}
+\def\etal{{\it et~al.}}
+\def\ie{{\it i.e.} }
+\def\eg{{\it e.g.}}
+\def\cf{{\it cf.}}
+\def\ni{\noindent}
+\def\Item{\item {$\bullet$}}
+\def\kms{~km\thinspace s$^{-1}$}
+\def\cl{\centerline}
+\def\Mag{${}^{\rm m}$\llap{.}}
+\def\Deg{${}^\circ$\llap{.}}
+\def\Arcsec{${}^{\prime\prime}$\llap{.}}
+\def\today{\number\year\space \ifcase\month\or
+  January\or February\or March\or April\or May\or June\or
+  July\or August\or September\or October\or November\or December\fi
+  \space\number\day}
+\magnification = 1000
+\baselineskip = 0.58 true cm
+\pretolerance=3000
+\tolerance=5000
+\vsize=8.25 true in
+\hsize=6 true in
+\hoffset=1 true cm
+\tenrm
+\centerline{Notes for people called upon to maintain DAOPHOT:}
+\bigskip
+     When run, DAOPHOT looks for a file named DAO:DAOPHOT.MSG containing
+messages from the local curator for users of DAOPHOT.  This file allows
+the curator to notify users of changes in the code or of other items of 
+interest.  THEREFORE, I suggest that .EITHER. the directory or 
+subdirectory where DAOPHOT-related material resides be given the 
+system-wide logical name DAO: (on VMS; set an an environment variable 
+dao equal to the directory name in Unix --- DAOPHOT knows how to 
+convert ``dao:'' to ``\$dao/''), .OR. all potential users be advised to 
+define that logical name in their own LOGIN.COM (or .cshrc) files.
+
+     To the extent possible, I have tried to write DAOPHOT using the
+most basic FORTRAN which could perform the job neatly and
+comprehensibly.  To those of you without VMS VAXen or Unix Suns:  most
+of the changes you have to make will be related to file handling and
+will be in the subroutines in VAXSUBS.FOR (sunsubs.f and irasubs.f). I
+believe that if you just try to compile everything as is and then
+change the cause of each of your error messages to something your
+compiler likes, you will get a working copy of DAOPHOT.  I suggest that
+you devote a notebook to the recording of all changes that you have to
+make to the code, so that if you get a later release of the source
+code, you'll already know nearly all of the changes you'll have to make
+to arrive at a working copy of the new version.
+
+     For VMS users, I am sending along software which can read a FITS
+tape and produce a disk file in the Shortridge/Caltech data-structure
+format--  this comprises the files FITS, FITIN, TAPOS, and MTPCKG.  I
+am not responsible for this software.  In principle, if you have a VMS
+VAX, you should be able to run FITS.EXE.  For FITS to work, the tape
+must be positioned at the beginning of a FITS tape file when you
+attempt to read the file.  The first thing the program must read from
+the tape is ``SIMPLE = T" or it will refuse to read the file.  Issuing
+to FITS the command TAPOS will allow you to run another part of the
+program which permits fast-forwarding over files, examining the
+contents of files record by record, and the like.  The TAPOS part
+accepts the command HELP and will then tell you something about what it
+does.  When attempting to write pictures to disk in the FITS part of
+the program, you must type in the disk filename with no filename
+extension; FITS will attach the filename extension ``.DST''.
+
+For Unix users:  DAOPHOT uses IRAF images and libraries.  If you don't
+have IRAF, you'll have to do something else.
+\vfill
+\eject
+\noindent This copy of DAOPHOT is being provided to you with the following
+understandings:
+
+\item{**}  I don't particularly care whom you allow to use the
+executable version of the code at your institution-- it is up to
+you to ensure that such people are given enough instruction in the
+proper use of the code to avoid wasting your CPU cycles. 
+
+\item{**}  If anyone should ask for a copy of the code, please refer
+that person to me.  Do not pass along a copy of the source code, in 
+either machine-readable or hard-copy form.  (If a brief examination
+of the printout is desired to answer some question which is not
+covered in the manual and which you cannot answer off the top of 
+your head, that is at your discretion.  What I wish to avoid is for
+someone to have a copy of the code for long enough to have any
+significant portion of it typed into the computer, or to have it 
+photocopied.)  I don't want people modifying the code, passing it along
+to other people, who further modify it, and then publish complaints 
+about bugs in ``DAOPHOT.''
+
+\item{**}  For obvious reasons, please keep the source code of DAOPHOT
+.EITHER. only in a read-protected directory .OR. only on a tape
+somewhere. 
+
+\item{**}  If you feel that some changes must be made in the code, 
+please label your modifications clearly with C comment statements 
+and/or with     ! comments.  This will simplify subsequent bug-hunts
+for you and for me.  You probably z    should keep an archival copy of 
+the source code exactly as I send it to you.  If you find a bug, or 
+think of a better way to do something, please let me know (preferably 
+in electronic or hard-copy form) so that I incorporate the improvements
+in my copy.
+
+\noindent I am making these requests to avoid having various modified
+and remodified versions of the code floating around the astronomical
+community, and being used by people who don't really know what it's
+doing.  We all know that this sort of thing can and does happen every
+day, and it does all of us more harm than good.  Thank you for your
+help and understanding.
+
+\vfill
+\indent \today
+\vfill
+\indent Peter B. Stetson 
+
+\indent (604)363--0029$\qquad\qquad$stetson@dao.nrc.ca
+
+\indent Dominion Astrophysical Observatory
+
+\indent 5071 West Saanich Road
+
+\indent Victoria, British Columbia V8X 4M6 
+\vfill
+\eject
+\noindent DAOPHOT and ALLSTAR source code (may be compiled under 
+VMS, or may be renamed to $<${\it lower~case\/}$>$.f and compiled under
+Unix):
+
+DAOPHOT.FOR
+
+FIND.FOR
+
+FOTOMETRY.FOR
+
+PSF.FOR
+
+PEAK.FOR
+
+NSTAR.FOR
+
+ADDSTAR.FOR
+
+SUBSTAR.FOR
+
+FUDGE.FOR
+
+GROUP.FOR
+
+SORT.FOR
+
+MATHSUBS.FOR
+
+IOSUBS.FOR
+\bigskip
+
+ALLSTAR.FOR
+
+ALLSTUBS.FOR
+
+\noindent Subroutines and object libraries for VMS only:
+
+VMSSUBS.FOR
+
+DTA.OLB
+
+ICH.OLB
+
+MTPCKG.OLB
+
+\noindent Subroutines and object libraries for Unix only:
+
+irasubs.f
+
+sunsubs.f
+
+(You will also need the IRAF libraries libimfort, libsys, libvops, and
+libos)
+
+\noindent FITS tape reader source code (VMS only):
+
+FITS.FOR
+
+FITIN.FOR
+
+TAPOS.FOR
+
+\noindent VMS executables:
+
+DAOPHOT.EXE
+
+ALLSTAR.EXE
+
+FITS.EXE
+\vfill
+\eject
+\noindent Parameter tables (convert filenames to lower case for Unix):
+
+DAOPHOT.OPT
+
+PHOTO.OPT
+
+ALLSTAR.OPT
+
+\noindent Sample message file:
+
+DAOPHOT.MSG
+
+\noindent Files for making the executables:
+
+DAOLINK.COM  (VMS)
+
+ALLSTLINK.COM (VMS)
+
+FITLINK.COM (VMS)
+
+Makefile (Unix)
+
+\noindent Manuals and other documentation:
+
+CURATOR.TEX (This document.)
+
+DAOPHOTII.TEX
+
+DTA.MEM (VMS only)
+
+MTPCKG.DOC (VMS only)
+
+\end

@@ -1,0 +1,20 @@
+1 DAOPHOT - DAO photometry package
+                                                            Expires: **.**.**
+
+ This is DAOPHOT v1.2-1.
+
+ Changes at v1.2-1:
+
+   o MUD/9 added to documentation (DAOPHOT II User's Manual). Note that 
+     mud9.tex is a TeX file, not LaTeX, so no hypertext is available.
+
+   o 'curator.tex' added to daophot_source.tar for information.
+
+ Changes at v1.2:
+
+   o Linux variant.  Various internal recodings to pass Linux compiler.
+
+ Changes at V1.0-1:
+
+   o Makefile and mk script updated.
+	

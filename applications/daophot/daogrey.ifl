@@ -1,0 +1,57 @@
+interface DAOGREY
+   parameter IN
+      position 1
+      keyword  'IN'
+      type     'NDF'
+      vpath    'PROMPT'
+      ppath    'GLOBAL,CURRENT'
+      association '<->GLOBAL.DATA_ARRAY'
+      prompt   'NDF containing input image'
+   endparameter
+   parameter XSTART
+      position 2
+      type '_INTEGER'
+      vpath 'PROMPT'
+      prompt 'Xstart - first index of subarray '
+   endparameter
+   parameter XEND
+      position 3
+      type '_INTEGER'
+      vpath 'PROMPT'
+      prompt 'Xend   - second index of subarray '
+   endparameter
+   parameter YSTART
+      position 4
+      type '_INTEGER'
+      vpath 'PROMPT'
+      prompt 'Ystart - first index of subarray '
+   endparameter
+   parameter YEND
+      position 5
+      type '_INTEGER'
+      vpath 'PROMPT'
+      prompt 'Yend   - second index of subarray '
+   endparameter
+   parameter LOW
+      position 6
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'Low    - lowest data value to plot '
+   endparameter
+   parameter HIGH
+      position 7
+      type '_REAL'
+      vpath 'PROMPT'
+      prompt 'High   - highest data value to plot '
+   endparameter
+   parameter DEVICE
+      position 8
+      keyword  'DEVICE'
+      ptype    'DEVICE'
+      association '<->GLOBAL.GRAPHICS_DEVICE'
+      vpath    'PROMPT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  IKON
+      prompt   'Display device'
+   endparameter
+endinterface

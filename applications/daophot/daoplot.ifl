@@ -1,0 +1,22 @@
+interface DAOPLOT
+
+   parameter PFILE
+      position 1
+      keyword  'PFILE'
+      type  '_CHAR'
+      vpath 'PROMPT'
+      prompt 'File with object positions '
+   endparameter
+
+   parameter DEVICE
+      position 2
+      keyword  'DEVICE'
+      ptype    'DEVICE'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      vpath    'GLOBAL,PROMPT'
+      ppath    'GLOBAL,CURRENT,DEFAULT'
+      default  IKON
+      prompt   'Display device'
+   endparameter
+
+endinterface
