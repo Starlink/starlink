@@ -211,7 +211,7 @@
         IF ( OK ) THEN
           CALL BDI_MAPL( IFID(I), 'LogicalQuality', 'READ', QPTR,
      :      STATUS )
-          CALL ARR_NBAD( NELM(I), %VAL(QPTR), NBAD, STATUS )
+          CALL ARR_CNT1L( NELM(I), %VAL(QPTR), .FALSE., NBAD, STATUS )
           IF ( NBAD .GT. 0 ) THEN
             CALL MSG_SETI( 'NB', NBAD )
             CALL MSG_SETI( 'NF', I )

@@ -239,7 +239,7 @@
           CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
 
 *        Check for no bad quality events
-          CALL ARR_NBAD( NELM, %VAL(IQPTR), NBAD, STATUS )
+          CALL ARR_CNT1L( NELM, %VAL(IQPTR), .FALSE., NBAD, STATUS )
           IF ( NBAD .GT. 0 ) THEN
             CALL MSG_SETI( 'NBAD', NBAD )
             CALL MSG_PRNT( 'There are ^NBAD bad quality points' )
