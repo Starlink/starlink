@@ -62,12 +62,10 @@
 *
 *    Functions :
 *
-      INTEGER                	CHR_LEN
       LOGICAL			CHR_SIMLR
 *
 *    Local variables :
 *
-      CHARACTER*200          	FILE, PATH       	! HDS_TRACE info
       CHARACTER*(DAT__SZLOC) 	FLOC             	! Locator to fit_model object
       CHARACTER*20           	NAME             	! Name of input file
       CHARACTER*(MAXKEYLEN)  	OPTION           	! Option character
@@ -739,7 +737,6 @@
 	 CALL DAT_ANNUL(MIPLOC,STATUS)
 
       END DO
-      NLINE = IL
 
 *    Exit
  99   IF ( STATUS .NE. SAI__OK ) THEN
