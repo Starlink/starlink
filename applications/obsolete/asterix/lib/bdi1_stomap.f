@@ -1,5 +1,5 @@
       SUBROUTINE BDI1_STOMAP( PSID, MSYS, LOC, FPTR, PTR,
-     :                        NELM, WBPTR, TYPE, MODE, STATUS )
+     :                        NDIM, DIMS, WBPTR, TYPE, MODE, STATUS )
 *+
 *  Name:
 *     BDI1_STOMAP
@@ -11,7 +11,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_STOMAP( PSID, MSYS, LOC, FPTR, PTR, NELM, WBPTR,
+*     CALL BDI1_STOMAP( PSID, MSYS, LOC, FPTR, PTR, NDIM, DIMS, WBPTR,
 *                       TYPE, MODE, STATUS )
 
 *  Description:
@@ -28,8 +28,10 @@
 *        Address of mapped file object, or identifier of invented object
 *     PTR = INTEGER (given)
 *        Address of item mapped memory
-*     NELM = INTEGER (given)
-*        Number of elements mapped
+*     NDIM = INTEGER (given)
+*        Dimensionality of mapped data
+*     DIMS[] = INTEGER (given)
+*        Dimensions of mapped data
 *     WBPTR = INTEGER (given)
 *        WriteBack procedure address
 *     TYPE = CHARACTER*(*) (given)
@@ -102,7 +104,7 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			PSID, FPTR, PTR, NELM, WBPTR
+      INTEGER			PSID, FPTR, PTR, NDIM, DIMS(*), WBPTR
       CHARACTER*(DAT__SZLOC)	LOC
       CHARACTER*(*)		TYPE, MODE, MSYS
 
@@ -112,6 +114,9 @@
 *  External References:
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
+
+*  Local Variables:
+      INTEGER			NELM			! # mapped elements
 *.
 
 *  Check inherited global status.
@@ -120,7 +125,6 @@
 *  Store the various items in the storage block
       CALL ADI_CNEWV0C( PSID, 'Locator', LOC, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
-      CALL ADI_CNEWV0I( PSID, 'Nelm', NELM, STATUS )
       IF ( WBPTR .NE. 0 ) THEN
         CALL ADI_CNEWV0I( PSID, 'WriteBack', WBPTR, STATUS )
       END IF
@@ -132,6 +136,11 @@
       END IF
       CALL ADI_CPUT0C( PSID, 'Type', TYPE(:CHR_LEN(TYPE)), STATUS )
       CALL ADI_CPUT0C( PSID, 'Mode', MODE(:CHR_LEN(MODE)), STATUS )
+
+*  Write shape
+      CALL ADI_CPUT1I( PSID, 'SHAPE', NDIM, DIMS, STATUS )
+      CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+      CALL ADI_CNEWV0I( PSID, 'Nelm', NELM, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_STOMAP', STATUS )

@@ -156,12 +156,12 @@
           CALL DAT_NAME( LOC, NAME, STATUS )
           CALL DAT_ANNUL( LOC, STATUS )
           CALL DAT_ERASE( PLOC, NAME, STATUS )
-          CALL DAT_NEW( PLOC, NAME, MTYPE, NDIM, DIMS, STATUS )
+          CALL DAT_NEW( PLOC, NAME, '_'//MTYPE, NDIM, DIMS, STATUS )
           CALL DAT_FIND( PLOC, NAME, LOC, STATUS )
           CALL DAT_ANNUL( PLOC, STATUS )
 
 *      Write the data
-          CALL DAT_PUT( LOC, MTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
+          CALL DAT_PUT( LOC, '_'//MTYPE, NDIM, DIMS, %VAL(PTR), STATUS )
 
         ELSE
 

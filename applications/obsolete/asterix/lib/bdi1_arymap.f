@@ -177,6 +177,9 @@
 *    Fill mapped array with copies of scalar data
         CALL BDI1_ARYMAP_REP( SSIZE, DBUF, ENELM, %VAL(PTR), STATUS )
 
+*    Clone a copy of the locator for mapping
+        CALL DAT_CLONE( LOC, SLOC, STATUS )
+
 *  Otherwise if number of elements differ we report an error
       ELSE IF ( ENELM .NE. NELM ) THEN
         STATUS = SAI__ERROR
@@ -264,9 +267,8 @@
       END IF
 
 *  Store details in private store
-      CALL BDI1_STOMAP( PSID, MSYS, SLOC, FPTR, PTR, ENELM,
-     :                  UTIL_PLOC( BDI1_ARYWB ), TYPE,
-     :                  MODE, STATUS )
+      CALL BDI1_STOMAP( PSID, MSYS, SLOC, FPTR, PTR, ENDIM, EDIMS,
+     :                  UTIL_PLOC( BDI1_ARYWB ), TYPE, MODE, STATUS )
 
 *  Always return expected number of elements
       NELM = ENELM
