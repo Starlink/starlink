@@ -10,7 +10,7 @@
 *     Fortran-77
 
 *  Invocation:
-*     CALL RTD_WRNDF( ID, IP, COMP, STATUS )
+*     CALL RTD_CPDAT( ID, IP, COMP, STATUS )
 
 *  Description:
 *      This routine copies a given NDF's component into another
@@ -40,6 +40,8 @@
 *        Original version.
 *     03-DEC-1997 (PWD):
 *        Now copies a named component rather than 'DATA'.
+*     02-SEP-2004 (PWD):
+*        Converted to use CNF_PVAL for pointers.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -54,6 +56,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'NDF_PAR'         ! NDF parameters
       INCLUDE 'PRM_PAR'         ! Primitive data constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Arguments Given:
       INTEGER ID
@@ -65,13 +68,14 @@
 
 *  Local constants:
       INTEGER MXPIX
-      PARAMETER ( MXPIX = 250000 )
+      PARAMETER ( MXPIX = 500000 )
 
 *  Local Variables:
       CHARACTER * ( NDF__SZTYP ) DTYPE ! Type of NDF data array
       INTEGER NPIX              ! Number of pixels in NDF
-      INTEGER IPDAT             ! Pointer to NDF data array
-      INTEGER IPNOW             ! Pointer to current position in output array
+      INTEGER IPDAT             ! CNF Pointer to NDF data array
+      INTEGER * 8 IPNOW         ! Actual pointer to current position 
+                                ! in output array. Big enough for 64 bit...
       INTEGER NERR, IERR        ! Unused
       INTEGER I                 ! Loop variable
       LOGICAL VALID             ! NDF validity flag
@@ -97,7 +101,8 @@
          CALL NDF_NCHNK( ID, MXPIX, NCHUNK, STATUS )
 
 *  Loop for all chunks copying the data into the new memory.
-         IPNOW = IP
+         IPNOW = CNF_PVAL( IP )
+
          DO 1 I = 1, NCHUNK
 
 *  Access the chunk and map it in.
@@ -107,32 +112,42 @@
 
 *  And copy the data.
             IF ( DTYPE .EQ. '_REAL' ) THEN
-               CALL VEC_RTOR( .FALSE., NPIX, %VAL( IPDAT ),
-     :                        %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_RTOR( .FALSE., NPIX, %VAL( CNF_PVAL( IPDAT ) ),
+     :                        %VAL( IPNOW ), IERR, NERR, 
+     :                        STATUS )
                IPNOW = IPNOW + VAL__NBR * NPIX
             ELSE IF ( DTYPE .EQ. '_DOUBLE' ) THEN
-               CALL VEC_DTOD( .FALSE., NPIX, %VAL( IPDAT ),
-     :                        %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_DTOD( .FALSE., NPIX, %VAL( CNF_PVAL( IPDAT ) ),
+     :                        %VAL( IPNOW ), IERR, NERR, 
+     :                        STATUS )
                IPNOW = IPNOW + VAL__NBR * NPIX
             ELSE IF ( DTYPE .EQ. '_INTEGER' ) THEN
-               CALL VEC_ITOI( .FALSE., NPIX, %VAL( IPDAT ),
-     :                     %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_ITOI( .FALSE., NPIX, %VAL( CNF_PVAL( IPDAT ) ),
+     :                        %VAL( IPNOW ), IERR, NERR, 
+     :                        STATUS )
                IPNOW = IPNOW + VAL__NBI * NPIX
             ELSE IF ( DTYPE .EQ. '_WORD' )THEN
-               CALL VEC_WTOW( .FALSE., NPIX, %VAL( IPDAT ),
-     :                        %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_WTOW( .FALSE., NPIX, %VAL( CNF_PVAL ( IPDAT ) ),
+     :                        %VAL( IPNOW ), IERR, NERR, 
+     :                        STATUS )
                IPNOW = IPNOW + VAL__NBW * NPIX
             ELSE IF ( DTYPE .EQ. '_UWORD' ) THEN
-               CALL VEC_UWTOUW( .FALSE., NPIX, %VAL( IPDAT ),
-     :                          %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_UWTOUW( .FALSE., NPIX, 
+     :                          %VAL( CNF_PVAL( IPDAT ) ),
+     :                          %VAL( IPNOW ), IERR, NERR, 
+     :                          STATUS )
                IPNOW = IPNOW + VAL__NBUW * NPIX
             ELSE IF ( DTYPE .EQ. '_BYTE' ) THEN
-               CALL VEC_BTOB( .FALSE., NPIX, %VAL( IPDAT ),
-     :                        %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_BTOB( .FALSE., NPIX, 
+     :                        %VAL( CNF_PVAL( IPDAT ) ),
+     :                        %VAL( IPNOW ), IERR, NERR, 
+     :                        STATUS )
                IPNOW = IPNOW + VAL__NBB * NPIX
             ELSE IF ( DTYPE .EQ. '_UBYTE' ) THEN
-               CALL VEC_UBTOUB( .FALSE., NPIX, %VAL( IPDAT ),
-     :                          %VAL( IPNOW ), IERR, NERR, STATUS )
+               CALL VEC_UBTOUB( .FALSE., NPIX, 
+     :                          %VAL( CNF_PVAL( IPDAT ) ),
+     :                          %VAL( IPNOW ), IERR, NERR, 
+     :                          STATUS )
                IPNOW = IPNOW + VAL__NBUB * NPIX
             END IF
 
