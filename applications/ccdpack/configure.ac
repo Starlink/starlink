@@ -50,6 +50,7 @@ AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 # itcl uses the same ones).
 # Dependencies must be on one line
 STAR_DECLARE_DEPENDENCIES([build],[chr agi ard ast chr fio ndf pgplot prm psx trn pda ndg tcl tk itcl startcl ifd  img generic sla shl ref graphpar])
+STAR_DECLARE_DEPENDENCIES(configure, [tcl tk itcl])
 
 STAR_LATEX_DOCUMENTATION(sun139)
 STAR_DOCS_FILES([sun139geo.eps sun139reg.eps sun139red.eps sun139mos.eps sun139driz.eps sun139outsky.eps sun139outclear.eps sun139outim.eps])
