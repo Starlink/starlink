@@ -133,20 +133,20 @@
      :                                                        STATUS)
         CALL IMG_PIXTOWORLD(REAL(I_IX2)+0.5,REAL(I_IY2)+0.5,XMAX,YMAX,
      :                                                        STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'REGXMIN',ID,STATUS)
-        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMIN,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'REGXMAX',ID,STATUS)
-        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMAX,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'REGYMIN',ID,STATUS)
-        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMIN,STATUS)
-        CALL NBS_FIND_ITEM(I_NBID,'REGYMAX',ID,STATUS)
-        CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMAX,STATUS)
 
 
 *  if running from GUI - save region type to noticeboard
         IF (I_GUI) THEN
           CALL NBS_FIND_ITEM(I_NBID,'REGION',ID,STATUS)
           CALL NBS_PUT_CVALUE(ID,0,I_REG_TYPE,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGXMIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMIN,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGXMAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,XMAX,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGYMIN',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMIN,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGYMAX',ID,STATUS)
+          CALL NBS_PUT_VALUE(ID,0,VAL__NBR,YMAX,STATUS)
         ENDIF
 
 
@@ -400,6 +400,38 @@
         CALL IMG_GETELLIPSE('XC','YC','MAJOR','MINOR','ANGLE',
      :                           XC,YC,MAJOR,MINOR,ANGLE,STATUS)
         CALL IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,ANGLE,EXCLUDE,STATUS)
+
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (ELLIPSE( '
+        ELSE
+          TEXT(L:)=' ELLIPSE( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('MAJ',MAJOR)
+        CALL MSG_SETR('MIN',MINOR)
+        ANGLE=ANGLE*RTOD*I_XSCALE/ABS(I_XSCALE)*I_YSCALE/ABS(I_YSCALE)
+        CALL MSG_SETR('AN',ANGLE)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^MAJ , ^MIN , ^AN ',
+     :                                                    TEXT,L)
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -1699,8 +1731,6 @@
         CALL MSG_PRNT(PTEXT(ILINE))
       ENDDO
 
-      CALL MSG_BLNK()
-      CALL MSG_PRNT('*** WARNING - ellipse doesn''t work yet!!')
-      CALL MSG_BLNK()
 
       END
+
