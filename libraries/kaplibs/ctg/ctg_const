@@ -16,5 +16,6 @@
      :            CTG__WILD2 = '*',
      :            CTG__FMTIN =  'FITS(.FIT ),FITS(.fit),FITS(.FITS),'//
      :                       'FITS(.fits),FITS(.GSC),FITS(.gsc),'//
-     :                       'STL(.TXT),STL(.txt),STL(.Txt),HDS(.sdf)',
+     :                       'STL(.TXT),STL(.txt),STL(.Txt),'//
+     :                       'HDS(.sdf),TST(.tab),TST(.TAB),TST(.Tab)',
      :            CTG__FMTOUT =  '*,FITS(.FIT )' )
