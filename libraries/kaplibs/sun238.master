@@ -525,7 +525,7 @@ GKS version of the PGPLOT graphics library. If you wish to link with the
 This will include native PGPLOT in the link list, and cause all GKS and IDI 
 related items to be removed.
 
-\section{Changes in Version 1.1}
+\section{Changes in Version 2.0}
 \begin{itemize}
 \item The ``-nogks'' switch has been added to the
 \verb#kaplibs_link_adam# command, allowing applications to be linked with
@@ -539,6 +539,8 @@ definitions for these two parameters to their IFL files.
 \item The routine KPG1_RDLST can now read positions from catalogues which
 do not contain a WCS FrameSet, in certain special cases. That is, if the
 catalogue contains columsn called RA and DEC, or X and Y. 
+\item The IRAS90 IRQ library has been included. IRQ is used to manage
+textual representations of NDF Quality bits.
 \end{itemize}
 
 
