@@ -20,20 +20,17 @@
 *        The global status.
 
 *  Description:
-*     This task performs a set of miscellaneous modifications to the
-*     WCS (World Coordinate System) components of a list of NDFs.
-*     According to the MODE parameter it can:
+*     This task performs one of a set of modifications to the WCS
+*     (World Coordinate System) components of a list of NDFs.  
+*     According to the value of the MODE parameter it will: 
 *        -  Set the Current frame
 *        -  Add a new frame
 *        -  Remove a frame
+*        -  Set an attribute for a frame
 *
 *     The routine does not fail if some of the requested edits cannot
 *     be performed, but an output parameter MODIFIED records which 
 *     NDFs were successfully modified.
-*
-*     If a new frame is added it becomes the Current frame.  If a frame
-*     is removed, the Current frame is not changed (unless the Current
-*     frame itself is removed).
 
 *  Usage:
 *     WCSEDIT in mode frame
@@ -51,14 +48,15 @@
 *                X' = C1 + C2 * X + C3 * Y
 *                Y' = C4 + C5 * X + C6 * Y
 *           -  PINCUSHION -- Three values C1-C3 are required:
-*                X' = X * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
-*                Y' = Y * ( 1 + C1 * ( (X - C2)**2 + (Y - C3)**2 ) )
+*                X' = X + C1 * (X - C2) * ( (X - C2)**2 + (Y - C3)**2 ) )
+*                Y' = Y + C1 * (Y - C3) * ( (X - C2)**2 + (Y - C3)**2 ) )
 *     DOMAIN = LITERAL (Read)
 *        If MODE is ADD this gives the domain name to be used for the
 *        new frame.  Spaces in the name are ignored and letters are
 *        folded to upper case.  If the new frame is successfully added
 *        and any frame with the same domain name already exists, it
 *        will be removed, and a message will be printed to that effect.
+*        [CCD_WCSEDIT]
 *     EPOCH = _DOUBLE (Read)
 *        If a "Sky Co-ordinate System" specification is supplied (using
 *        parameter BASEFRAME) for a celestial co-ordinate system, then
@@ -76,8 +74,10 @@
 *                                name (see below) then all frames with
 *                                that domain will be removed.
 *           -  MODE = ADD     -- The new frame will be a copy of the 
-*                                basis frame, and will be mapped from it
-*                                using the mapping given.
+*                                basis frame (though Domain and Title
+*                                will be changed), and will be mapped 
+*                                from it using the mapping given.
+*           -  MODE = SET     -- The frame whose attributes are to be set
 *
 *        The value of this parameter can be one of the following:
 *           -  A domain name such as SKY, AXIS, PIXEL, etc.
@@ -85,11 +85,17 @@
 *              within the WCS component.
 *           -  A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000)
 *              (see section "Sky Co-ordinate Systems" in SUN/95).
-*        A domain name is usually the most suitable choice.
+*           - The Null (!) value; in this case the Current frame is used.
+*        A domain name, or !, is usually the most suitable choice.
+*        [!]
 *     IN = LITERAL (Read)
 *        A list specifying the names of the NDFs whose WCS components
 *        are to be modified.  The NDF names should be separated by 
 *        commas and may include wildcards.
+*     INVERT = _LOGICAL (Read)
+*        If set TRUE the mapping defined by COEFFS will be applied in 
+*        the reverse direction.
+*        [FALSE]
 *     LOGFILE = FILENAME (Read)
 *        Name of the CCDPACK logfile.  If a null (!) value is given for
 *        this parameter then no logfile will be written, regardless of
@@ -128,13 +134,20 @@
 *        values:
 *           -  ADD      -- Add a new frame (which becomes Current)
 *           -  CURRENT  -- Set the Current frame
-*           -  REMOVE   -- Remove a frame
+*           -  REMOVE   -- Remove a frame (Current frame is not changed
+*                          unless the Current one is removed)
+*           -  SET      -- Set frame attributes (Current frame is not
+*                          changed)
 *        [CURRENT]
 *     MODIFIED = LITERAL (Write)
 *        On exit, this parameter gives a comma-separated list of all the
 *        NDFs which were successfully modified.  In particular, if MODE
 *        is CURRENT, this list will include all the NDFs which contained
 *        the specified frame, but exclude any which did not.
+*     SET = LITERAL (Read)
+*        If MODE is SET, then this gives a string of the form 
+*        "attribute=value" which is to be applied to the frame.  The 
+*        string is passed straight to the AST_SET routine (see SUN/210).
 
 *  Examples:
 *     wcsedit * current ccd_reg
@@ -155,6 +168,11 @@
 *        origin with a distortion coefficient of -6.8e-10.  If any 
 *        frames with domain NEW already exist in those NDFs they are
 *        removed.
+*
+*     wcsedit ndf1 set ! set="domain=NEW,title=New frame" 
+*        This changes the value of the Domain attribute of the current 
+*        frame in the WCS component of NDF1 to the name "NEW" and 
+*        sets the Title attribute of the frame to "New frame".
 
 *  Notes:
 *     This routine provides similar functionality to that provided by
@@ -182,6 +200,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! Standard AST constants
       INCLUDE 'IRH_PAR'          ! Standard IRH constants
+      INCLUDE 'PAR_ERR'          ! PAR system error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -202,6 +221,7 @@
       CHARACTER * ( AST__SZCHR ) DMRMV ! Domain to remove
       CHARACTER * ( AST__SZCHR ) DOMAIN ! Domain of new frame
       CHARACTER * ( AST__SZCHR ) FRAME ! Basis frame as specified
+      CHARACTER * ( AST__SZCHR ) SET ! String pass to AST_SET
       CHARACTER * ( MXMDLN ) MODIF ! List of modified NDFs
       DOUBLE PRECISION COEFFS( 6 ) ! Coefficients of mapping
       INTEGER FRBASI             ! AST pointer to basis frame
@@ -216,6 +236,7 @@
       INTEGER MAP                ! AST pointer to mapping
       INTEGER NFRAME             ! Number of frames in unedited WCS component
       INTEGER NNDF               ! Number of NDFs
+      LOGICAL INVERT             ! Is mapping to be applied backwards
       LOGICAL SUCCES             ! Whether WCS has been successfully modified
 
 *.
@@ -236,11 +257,15 @@
       CALL CCD1_NDFGR( 'IN', 'UPDATE', INGRP, NNDF, STATUS )
 
 *  Get mode.
-      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE', .FALSE.,
-     :                MODE, STATUS )
+      CALL PAR_CHOIC( 'MODE', 'CURRENT', 'CURRENT,ADD,REMOVE,SET', 
+     :                .FALSE., MODE, STATUS )
 
 *  Get frame specification.
       CALL PAR_GET0C( 'FRAME', FRAME, STATUS )
+      IF ( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         FRAME = ' '
+      END IF
 
 *  Get ready to loop over NDFs.
       MODIF = ' '
@@ -266,10 +291,12 @@
 
 *  Get the index of the Basis frame, that is the one specified by the
 *  FRAME (and possibly EPOCH) parameter, without disturbing the Current
-*  frame.
+*  frame.  If FRAME is null, then use the Current frame.
          IF ( STATUS .NE. SAI__OK ) GO TO 99
-         CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, ' ', ' ', .FALSE.,
-     :                    STATUS )
+         IF ( FRAME .NE. ' ' ) THEN
+            CALL KPG1_ASFRM( 'FRAME', 'EPOCH', IWCS, ' ', ' ', .FALSE.,
+     :                       STATUS )
+         END IF
          JBASIS = AST_GETI( IWCS, 'Current', STATUS )
          DMBASI = AST_GETC( IWCS, 'Domain', STATUS )
          CALL AST_SETI( IWCS, 'Current', JCUR, STATUS )
@@ -292,6 +319,17 @@
      :                        STATUS )
                SUCCES = .TRUE.
 
+*  Set frame attributes.
+            ELSE IF ( MODE .EQ. 'SET' ) THEN
+               FRBASI = AST_GETFRAME( IWCS, JBASIS, STATUS )
+               CALL PAR_GET0C( 'SET', SET, STATUS )
+               CALL AST_SET( FRBASI, SET, STATUS )
+               CALL MSG_SETC( 'DOM', DMBASI )
+               CALL MSG_SETC( 'SET', SET )
+               CALL CCD1_MSG( ' ',  '      Setting "^SET"' //
+     :                        ' applied to domain ^DOM', STATUS )
+               SUCCES = .TRUE.
+               
 *  Remove a frame.
             ELSE IF ( MODE .EQ. 'REMOVE' ) THEN
 
@@ -348,12 +386,20 @@
      :                              STATUS )
                END IF
 
-*  Copy the basis frame, and add the new domain name, to create the 
-*  new frame.
+*  Use inverse mapping if required.
+               IF ( MAPTYP .NE. 'UNIT' ) THEN
+                  CALL PAR_GET0L( 'INVERT', INVERT, STATUS )
+                  IF ( INVERT ) CALL AST_INVERT( MAP, STATUS )
+               END IF
+
+*  Copy the basis frame, and add the new domain name and title, to 
+*  create the new frame.
                FRBASI = AST_GETFRAME( IWCS, JBASIS, STATUS )
                FRNEW = AST_COPY( FRBASI, STATUS )
                CALL AST_SETC( FRNEW, 'Domain', 
      :                        DOMAIN( : CHR_LEN( DOMAIN ) ), STATUS )
+               CALL AST_SETC( FRNEW, 'Title', 'Added by WCSEDIT', 
+     :                        STATUS )
 
 *  Add the new frame to the WCS frameset.
                CALL AST_ADDFRAME( IWCS, JBASIS, MAP, FRNEW, STATUS )
