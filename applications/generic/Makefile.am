@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-dist_bin_SCRIPTS = dcv_link dcv_link_adam generic
+dist_bin_SCRIPTS = dcv_link dcv_link_adam generic fgeneric
 
 lib_LTLIBRARIES = libdcv.la
 nodist_libdcv_la_SOURCES = dcv_ttoub.f dcv_ttouw.f
@@ -33,3 +33,8 @@ DCV_FUN: DCV_FUN.fpp
 	$(FPP) $(FPPFLAGS) $(CPPFLAGS) -I. DCV_FUN.fpp $(FPP_OUTPUT)
 
 BUILT_SOURCES = DCV_FUN
+
+# fgeneric needs to be made as a soft link.
+fgeneric: generic
+	  $(LN_S) generic fgeneric
+        
