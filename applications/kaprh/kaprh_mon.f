@@ -118,6 +118,9 @@
          ELSE IF ( NAME .EQ. 'SNAPSHOT' ) THEN
             CALL SNAPSHOT ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
+            CALL TURBOCONT ( STATUS )
+
          ELSE
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'CMD', NAME )

@@ -300,10 +300,6 @@
          ELSE IF ( NAME .EQ. 'SCATTER' ) THEN
             CALL SCATTER( STATUS )
 
-*  Contours a 2-d NDF quickly.
-         ELSE IF ( NAME .EQ. 'TURBOCONT' ) THEN
-            CALL TURBOCONT ( STATUS )
-
 *  Plots a 2-dimensional vector map.
          ELSE IF ( NAME .EQ. 'VECPLOT' ) THEN
             CALL VECPLOT ( STATUS )

@@ -386,7 +386,7 @@
 *     input picture.
 
 *  Related Applications:
-*     KAPPA: WCSFRAME, TURBOCONT, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
+*     KAPPA: WCSFRAME, PICDEF; Figaro: ICONT; SPECDRE: SPECCONT.
 
 *  Implementation Status:
 *     -  Only real data can be processed directly.  Other non-complex
