@@ -82,11 +82,11 @@
          set initial [ getvec ]
          $this buttonconfigure Cancel \
             -command [ code "$this setvec { $initial } ; $this deactivate" ]
-         ::iwidgets::Shell::activate
+         return [ chain ]
       }
       public method deactivate { args } {
          set list [ getvec ]
-         eval ::iwidgets::Shell::deactivate $list
+         return [ eval chain $list ]
       }
 
       private variable controls {}
@@ -150,4 +150,3 @@
    
 
 # $Id$
-
