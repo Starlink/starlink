@@ -90,6 +90,7 @@
       INCLUDE 'DAT_PAR'                 ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                 ! for VAL__xxxx
       INCLUDE 'REDS_SYS'                ! REDS constants
+      INCLUDE 'MSG_PAR'                 ! MSG__ constants
 
 *  Status :
       INTEGER STATUS
@@ -201,6 +202,10 @@
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 *  start up the NDF system and read in the demodulated data file
 
       CALL NDF_BEGIN
@@ -244,8 +249,9 @@
       CALL MSG_SETC ('SAMPLE', SAMPLE_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
       CALL MSG_SETC ('PKG',PACKAGE)
-      CALL MSG_OUT (' ', '^PKG: run ^RUN was a ^MODE observation '//
-     :  'with ^SAMPLE sampling of object ^OBJECT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation '//
+     :     'with ^SAMPLE sampling of object ^OBJECT', STATUS)
 
 *  get the number of history records present in the file
 
@@ -439,7 +445,8 @@
                   CALL ERR_ANNUL (STATUS)
                   CALL MSG_SETC('BOL', SKYBOLC(B))
                   CALL MSG_SETC('PKG', PACKAGE)
-                  CALL MSG_OUT(' ','^PKG: Bolometer ^BOL not found', 
+                  CALL MSG_OUTIF (MSG__QUIET, ' ',
+     :                 '^PKG: Bolometer ^BOL not found', 
      :                 STATUS)
                END IF
             END IF
