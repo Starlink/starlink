@@ -140,6 +140,9 @@
 *        non-linear case, due to the conditioning imposed by the median
 *        scale and zero points constraint proved too much for all the
 *        global minimization routines I found).
+*     01-JUL-1999 (PDRAPER):
+*        Added initialization of ORIG values. These where not set if 
+*        GETS or GETZ only where true (Linux random values).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -288,6 +291,12 @@
       WTSUM2 = 0.0D0
       MXWT = 1
       IF ( GETS .AND. GETZ ) MXWT = 2
+
+*  Origins are zero for GETZ and GETS only.
+      DO 16 I = 1, 16
+         ORIG( I ) = 0.0D0
+ 16   CONTINUE
+
 
 *  Loop to determine normalisation factors to be used to generate
 *  weights for the logarithmic scale factor and zero point differences
