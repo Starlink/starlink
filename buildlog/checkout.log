@@ -8311,6 +8311,7 @@ U java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java
 U java/source/table/src/main/uk/ac/starlink/table/StarTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/TableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/TableCopy.java
+U java/source/table/src/main/uk/ac/starlink/table/TableFormatException.java
 U java/source/table/src/main/uk/ac/starlink/table/Tables.java
 U java/source/table/src/main/uk/ac/starlink/table/UCD.java
 U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.java
@@ -8322,6 +8323,8 @@ U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/formats
 U java/source/table/src/main/uk/ac/starlink/table/formats/LatexTableWriter.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/TextStarTable.java
+U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableBuilder.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/TextTableWriter.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCReader.java
 U java/source/table/src/main/uk/ac/starlink/table/formats/WDCStarTable.java
@@ -8615,6 +8618,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/synthetic.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/tablecopy.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/template.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/topcat.css
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/viewers.html
