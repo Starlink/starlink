@@ -53,15 +53,13 @@ prepare:
 build:
 
 jars:
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-core.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.4.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/tt-bytecode.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
 
 webstart:
@@ -69,8 +67,8 @@ webstart:
 dist:
 
 install:
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1551 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 16 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 1921 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Jetty target: install
 
 prepare:
@@ -900,4 +898,4 @@ export-full-built:
       [zip] Building zip: /apps/cvsbuild/export/starjava.zip
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 36 seconds
+Total time: 4 minutes 55 seconds

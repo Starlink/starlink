@@ -61,15 +61,13 @@ build:
 
 jars:
       [jar] Updating jar: /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-core.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.4.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/tt-bytecode.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
 
 webstart:
@@ -79,8 +77,8 @@ dist:
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/lib/axis
     [mkdir] Created dir: /apps/cvsbuild/starjava/docs/axis
-[loggedcopy] Copying 17 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 1551 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 16 files to /apps/cvsbuild/starjava/lib
+[loggedcopy] Copying 1921 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Jetty target: install
 
 prepare:
@@ -887,7 +885,7 @@ docs:
   [javadoc] Javadoc execution
   [javadoc] Loading source files for package uk.ac.starlink.topcat.func...
   [javadoc] Constructing Javadoc information...
-  [javadoc] Nov 25, 2004 5:17:12 AM uk.ac.starlink.ast.AstPackage isAvailable
+  [javadoc] Nov 26, 2004 5:18:03 AM uk.ac.starlink.ast.AstPackage isAvailable
   [javadoc] WARNING: JNIAST native library not on java.library.path - no WCS processing
   [javadoc] Generating Javadoc
   [javadoc] Javadoc execution
@@ -1084,4 +1082,4 @@ install:
 [loggedcopy] Copying 24 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 4 minutes 57 seconds
+Total time: 5 minutes 32 seconds

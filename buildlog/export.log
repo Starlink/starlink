@@ -65,15 +65,13 @@ prepare:
 build:
 
 jars:
+  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.8.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/jaxrpc.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-core.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/axis-ant.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/wsdl4j.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/log4j-1.2.4.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-discovery.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/saaj.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/tt-bytecode.jar
   [signjar] Signing Jar : /apps/cvsbuild/java/source/axis/lib/axis/commons-logging.jar
 
 webstart:
@@ -692,11 +690,11 @@ webstart:
 dist:
 
 create_archives:
-      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.3.zip
-      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.3.tar
-     [gzip] Building: /apps/cvsbuild/export/soapserver-0.3.tar.gz
-    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.3.tar.bz2
-   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.3.tar
+      [zip] Building zip: /apps/cvsbuild/export/soapserver-0.4.zip
+      [tar] Building tar: /apps/cvsbuild/java/source/soapserver/soapserver-0.4.tar
+     [gzip] Building: /apps/cvsbuild/export/soapserver-0.4.tar.gz
+    [bzip2] Building: /apps/cvsbuild/export/soapserver-0.4.tar.bz2
+   [delete] Deleting: /apps/cvsbuild/java/source/soapserver/soapserver-0.4.tar
      [echo] Executing JPCS target: export
 
 export:
@@ -1041,4 +1039,4 @@ create_archives:
    [delete] Deleting: /apps/cvsbuild/java/source/frog/frog-0.7.0.tar
 
 BUILD SUCCESSFUL
-Total time: 24 minutes 23 seconds
+Total time: 25 minutes 17 seconds
