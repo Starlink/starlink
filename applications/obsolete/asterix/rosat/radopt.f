@@ -131,10 +131,8 @@
       REAL SNR             ! S/N at a given radius
       REAL SNRMAX          ! Max S/N
       REAL FRAC            ! Fraction of counts within given radius
-      REAL RAZ,REL
-      REAL DAZL,DAZH
-      REAL DELL,DELH
 *-
+
 * Initialise variable
       SNRMAX=0.0
 *
