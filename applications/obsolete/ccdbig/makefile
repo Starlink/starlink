@@ -428,7 +428,6 @@ SOURCE_CONTENTS = $(TASKSRC) $(SUBSRC) $(IFL_FILES) $(DATA_FILES) \
 #  Rules for building source files.
 
 $(PKG_NAME)_source.tar: check_uptodate
-	co $(SOURCE_CONTENTS)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(SOURCE_CONTENTS)
 
 #  Suffix rules.
