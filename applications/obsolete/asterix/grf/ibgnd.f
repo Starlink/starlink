@@ -1963,7 +1963,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Region definition exists?
-      REGEX = (I_REG_TYPE .EQ. 'WHOLE')
+      REGEX = (I_REG_TYPE .NE. 'WHOLE')
 
 *  If no region defined, and no data quality present
       IF ( (.NOT. REGEX) .AND. .NOT. (I_QOK.AND.I_BAD) ) THEN
