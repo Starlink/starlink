@@ -139,10 +139,14 @@ comments from others.</px></change>
 <px>Minor edits -- typos and enhancements spotted now and again.</px>
 </distribution>
 
+<distribution string="2-4" date="22-Jul-2002" author="ng" versionid="v2-4">
+<px>Minor edits for clarity, and to restore missing references.</px>
+</distribution>
+
 </history>
 
 <copyright>
-<p>Copyright 1999, 2001, Central Laboratories for the Research Councils</p>
+<p>Copyright 1999, 2001, 2002, Central Laboratories for the Research Councils</p>
 </copyright>
 
 <docbody>
@@ -485,20 +489,29 @@ excellent and detailed introduction in chapter~2 of Sun's
 of the same book claims to be `What every computer scientist should
 know about floating point arithmetic', and is an edited reprint of
 <citation/goldberg91>.  It makes interesting reading, but it's
-probably more than many scientists need to know).  My account here is
+probably more than many natural scientists need to know).  My account here is
 not intended to supplant either of these sources.  Below, I'll talk
 exclusively of IEEE base-2 floating point numbers, as defined in
 IEEE standard <webref url='http://grouper.ieee.org/groups/754/'
 >IEEE-754</webref>; there are other
 standards, but they're now of historical interest only, as just about
 all modern machines other than VAXes and older Crays use IEEE.  Most
-of what I say will be about single precision; exactly the same issues
-arise with double precision, but you can sweep them under the carpet
-for longer.
+of what I say concerning accuracy will be about single precision;
+exactly the same issues arise with double precision, but you can sweep
+them under the carpet for longer.</p>
+
+<subsubsubsect id="s.endianness">
+<subhead>
+<title>Endianness of floating-point numbers</title>
+<update versionid="v2-4">
+<px>Paragraph transformed into section</px>
+</update>
+</subhead>
 
 <p>The IEEE standard leaves it open to chip manufacturers to decide
 the order in memory of the four or eight bytes of a floating point
-number.  This is denoted by the endian-ness (or `bytesex') of the
+number (the same is true of integers, though they're not part of the
+IEEE spec).  This is denoted by the endian-ness (or `bytesex') of the
 machine.  Alpha and Intel chips are little-endian; Sparcs, the
 Motorola 68k family used in Macs, and Motorola PowerPC chips, are
 big-endian (there's also a `PGP-endian' ordering, but that really
@@ -506,7 +519,11 @@ isn't likely to trouble anyone any more).  This generally does not
 matter if you stick to a single platform (other than in the context of
 programs such as those described in <ref id="a.islittleendian.c"/> and
 <ref id=a.fpp.c/>), but it makes a difference if you want to share raw
-data files (see <ref id=ss.io/>) between architectures.
+data files (see <ref id=ss.io/>) between architectures.</p>
+
+<!-- XXX Add swap-bytesex.c to distribution? -->
+
+</subsubsubsect>
 
 <subsubsubsect id='s.accuracy'>
 <subhead>
@@ -3080,11 +3097,11 @@ the US, and mirrored worldwide; all &tex; is there).</p>
 <p>All this, of course, assumes that you're already a &latex; user.
 If you're just starting with &latex;, then the canonical place to
 start is with Leslie Lamport's <cite>&latex;: a Document Preparation
-System, 2nd edition</cite> <cite/lamport>.  I think this is a good
+System, 2nd edition</cite> <citation/lamport>.  I think this is a good
 introduction, because it concentrates on the basics, and leaves the
 elaborate details to others.  The bulk of the book is an accessible
-introduction to &latex; (and note that you are forbidden from asking
-&latex; questions unless you've already read chapter~2); appendix~C is
+introduction to &latex; (and note that you really ought to avoid asking
+&latex; questions until you've read chapter~2); appendix~C is
 a reference manual.</p>
 
 <p>If it's the elaborate details you
@@ -3141,8 +3158,9 @@ in <code>.../tex/latex/base/small2e.tex</code> (try <code>echo
 $TEXINPUTS</code> or <code>kpsepath tex</code> to help locate the &tex;
 distribution on your local machine).</p>
 
-<p><em>The</em> book on &tex; is Knuth's original, <cite>The &tex;book</cite> knuth.  As well as describing the underlying &tex;
-engine, this also 
+<p><em>The</em> book on &tex; is Knuth's original, <cite>The
+&tex;book</cite> <citation>knuth</citation>.  As well as describing
+the underlying &tex; engine, this also 
 describes Knuth's very basic macro package, <code>plain</code>.  You need
 the &tex;book if you're writing a &latex; macro package, if you
 demand complete control over positioning (tricky in &tex;, but an
