@@ -894,12 +894,13 @@ unbuild: clean
 # work unless either it is installed with the other dvi-ware, or the
 # TEXMFCNF environment variable is set appropriately.
 dvi2bitmap: version.h
-	which kpsewhich >/dev/null && \
+	-@ type kpsewhich >/dev/null 2>&1 && \
 		grep 'FONTS.*AUTO' `kpsewhich cnf texmf.cnf` > /dev/null && \
 		TEXMFCNFTEST=--enable-fake-progname ;\
 	test -n "$$TEXMFCNFTEST" && \
 		echo "*** Warning: faking dvi2bitmap program name" ; \
-	CXX=$(CXX) ./configure --enable-gif --with-kpathsea $$TEXMFCNFTEST
+	echo "Configuring dvi2bitmap..."; \
+	CXX=$(CXX) ./configure --enable-gif --enable-png --with-kpathsea $$TEXMFCNFTEST
 	$(MAKE) -f Makefile dvi2bitmap
 
 # Don't have this depending dvi2bitmap_source.tar - the latter will usually
