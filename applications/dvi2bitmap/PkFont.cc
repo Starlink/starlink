@@ -35,14 +35,17 @@ PkFont::PkFont(unsigned int dvimag,
     //name_.replace(strpos, 2, name);
     // Fontpath stuff rudimentary -- eventually replace with KPSE
     char fnbuf[200];
-    int scaled_res = static_cast<int>(resolution_ * (double)s/(double)d);
+    int scaled_res = static_cast<int>(resolution_
+				      * ((double)s * (double)dvimag)
+				      / ((double)d * 1000.0));
     sprintf (fnbuf, "%s/%s.%dpk",
 	     fontpath_.c_str(), name.c_str(), scaled_res);
     path_ = fnbuf;
     if (debug_ > 1)
 	cerr << "Font file: " << path_
 	     << ", checksum=" << c
-	     << ", scaled " << s << '/' << d << '=' << (double)s/(double)d
+	     << ", scaled " << s << '/' << d 
+	     << " (mag " << dvimag << ") = " << scaled_res
 	     << '\n';
     try
     {
@@ -55,12 +58,12 @@ PkFont::PkFont(unsigned int dvimag,
 	if (debug_ > 1)
 	    cerr << "Opened font " << path_ << " successfully\n";
 
-	fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
-	if (debug_ > 1)
-	    cerr << "PkFont: font scaling: "
-		 << dvimag << "/1000 * (" << s << '/' << d
-		 << ")=" << fontscale_
-		 << ": DVI font checksum=" << c << '\n';
+	//fontscale_ = ((double)dvimag/1000.0) * ((double)s/(double)d);
+	//if (debug_ > 1)
+	//    cerr << "PkFont: font scaling: "
+	//	 << dvimag << "/1000 * (" << s << '/' << d
+	//	 << ")=" << fontscale_
+	//	 << ": DVI font checksum=" << c << '\n';
 
 	if (preamble_.cs != c)
 	    cerr << "Font " << name_
@@ -73,7 +76,8 @@ PkFont::PkFont(unsigned int dvimag,
     catch (InputByteStreamError& e)
     {
 	cerr << "Font " << name << " at "
-	     << dpiScaled() << "dpi not found\n";
+	     << dpiScaled() << "dpi ("
+	     << path_ << ") not found\n";
 	preamble_.cs = 0;
 	glyphs_[0] = new PkGlyph(resolution_, this); // dummy glyph
     }

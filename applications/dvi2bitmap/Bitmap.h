@@ -1,20 +1,22 @@
 // $Id$
 
+#ifndef BITMAP_HEADER_READ
+#define BITMAP_HEADER_READ 1
+
 #include "dvi2bitmap.h"
 
 class Bitmap {
  public:
-    Bitmap (int width, int height, int bpp=1);
+    Bitmap (const int width, const int height, int bpp=1);
     ~Bitmap();
     void paint (const int x, const int y, const int w, const int h,
 		const Byte* b);
     void rule (const int x, const int y, const int w, const int h);
-    enum imageFormats { gif, debugbitmap };
-    void write (string filename, imageFormats format=gif);
+    void write (const string filename, const string format);
     void crop ();
     void blur ();
-    void setTransparent() { transparent_ = true; }
-    static debug (int level) { debug_ = level; }
+    void setTransparent(const bool sw) { transparent_ = sw; }
+    static debug (const int level) { debug_ = level; }
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
@@ -33,11 +35,12 @@ class Bitmap {
     int max_colour_;		// ==> max colour index
     static int debug_;
 
-    void write_debugbitmap (string filename);
-    void write_gif (string filename);
+    //void write_debugbitmap (string filename);
+    //void write_gif (string filename);
 };
 
 class BitmapError : public DviError {
  public:
     BitmapError(string s) : DviError(s) { };
 };
+#endif //#ifndef BITMAP_HEADER_READ

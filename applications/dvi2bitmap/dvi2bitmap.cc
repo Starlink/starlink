@@ -20,7 +20,7 @@
 typedef vector<string> string_list;
 
 string_list *tokenise_string (string s);
-string *get_ofn_pattern (string dviname);
+string get_ofn_pattern (string dviname);
 void Usage (void);
 char *progname;
 
@@ -28,10 +28,12 @@ main (int argc, char **argv)
 {
     string dviname;
     int resolution = 72;	// in pixels-per-inch
+    double magmag = 1.0;	// magnification of file magnification factor
     int show_font_list = 0;
     bool blur_bitmap = false;
     bool make_transparent = true;
-    const char *ofn_pattern = 0;
+    string ofile_pattern = "";
+    string ofile_type = "";
 
     bool debug_ = false;
     DviFile::debug(1);
@@ -61,6 +63,12 @@ main (int argc, char **argv)
 		    Usage();
 		resolution = atoi (*argv);
 		break;
+	      case 'm':
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		magmag = atof (*argv);
+		break;
 	      case 'g':		// debugging
 		for (++*argv; **argv != '\0'; ++*argv)
 		    switch (**argv)
@@ -81,17 +89,32 @@ main (int argc, char **argv)
 	      case 'L':		// show all fonts
 		show_font_list = 2;
 		break;
-	      case 'b':
-		blur_bitmap = !blur_bitmap;
+	      case 'P':		// process the bitmap
+		while (*++*argv != '\0')
+		    switch (**argv)
+		    {
+		      case 'b':
+			blur_bitmap = !blur_bitmap;
+			break;
+		      case 't':
+			make_transparent = !make_transparent;
+			break;
+		      default:
+			Usage();
+			break;
+		    }
 		break;
 	      case 't':
-		make_transparent = !make_transparent;
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		ofile_type = *argv;
 		break;
 	      case 'o':
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
-		ofn_pattern = *argv;
+		ofile_pattern = *argv;
 		break;
 	      case 'v':		// version
 		cout << version_string << '\n';
@@ -109,19 +132,19 @@ main (int argc, char **argv)
     if (dviname.length() == 0)
 	Usage();
 
-    if (ofn_pattern == 0)
-	ofn_pattern = get_ofn_pattern (dviname)->c_str();
-    if (ofn_pattern == 0)
+    if (ofile_pattern.length() == 0)
+	ofile_pattern = get_ofn_pattern (dviname);
+    if (ofile_pattern.length() == 0)
     {
 	cout << "Can't make output filename pattern from " << dviname << '\n';
 	std::exit(0);
     }
     else
-	cout << "ofn_pattern="<<ofn_pattern<<'\n';
+	cout << "ofile_pattern="<<ofile_pattern<<'\n';
 
     try
     {
-	DviFile *dvif = new DviFile(dviname, resolution);
+	DviFile *dvif = new DviFile(dviname, resolution, magmag);
 	if (dvif->eof())
 	{
 	    cout << "Can't open file " << dviname << " to read\n";
@@ -164,18 +187,16 @@ main (int argc, char **argv)
 		    if (blur_bitmap)
 			bitmap->blur();
 		    if (make_transparent)
-			bitmap->setTransparent();
-		    if (output_filename.length() > 0)
-		    {
-			bitmap->write (output_filename);
-			output_filename = "";
-		    }
-		    else
+			bitmap->setTransparent(true);
+		    if (output_filename.length() == 0)
 		    {
 			char fn[100];
-			sprintf (fn, ofn_pattern, pagenum);
-			bitmap->write(fn);
+			sprintf (fn, ofile_pattern.c_str(), pagenum);
+			output_filename = fn;
 		    }
+		    bitmap->write (output_filename, ofile_type);
+		    output_filename = "";
+
 		    delete bitmap;
 		    bitmap = 0;
 		}
@@ -260,7 +281,7 @@ DviBug::DviBug(char *fmt,...)
     delete[] p;
 }
 
-string *get_ofn_pattern (string dviname)
+string get_ofn_pattern (string dviname)
 {
     // strip path and extension from filename
     int string_index = dviname.rfind(path_separator);
@@ -273,8 +294,7 @@ string *get_ofn_pattern (string dviname)
     if (string_index >= 0) // it's there
 	dvirootname = dvirootname.substr(0,string_index);
 
-    string *patt = new string(dvirootname + "-page%d.gif");
-    return patt;
+    return dvirootname + "-page%d";
 }
 
 // Tokenise string at whitespace.  There's a more C++-ish way of doing
@@ -305,6 +325,6 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]] [-lLvbt] [-o outfile-pattern] dvifile" << '\n';
+    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]]\n\t[-lLv] [-P[bt]] [-o outfile-pattern] [-m magmag ]\n\t\n\t[-t gif]\n\tdvifile" << '\n';
     exit (1);
 }

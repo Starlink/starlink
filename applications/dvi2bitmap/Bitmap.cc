@@ -2,7 +2,7 @@
 
 #include "dvi2bitmap.h"
 #include "Bitmap.h"
-#include "GIFBitmap.h"
+#include "BitmapImage.h"
 #include <cstdarg>
 #include <cstdio>
 #include <cstring>
@@ -153,23 +153,34 @@ void Bitmap::blur ()
     B = newB;
 }
 
-void Bitmap::write (string filename, imageFormats format)
+void Bitmap::write (const string filename, const string format)
 {
     if (bbL >= bbR || bbT >= bbB)
 	throw BitmapError ("attempt to write empty bitmap");
-    switch (format)
+    int hsize = (cropped_ ? cropR-cropL : W);
+    int vsize = (cropped_ ? cropB-cropT : H);
+    BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
+    cerr << "format.."<<bi->fileExtension()<<'\n';
+    if (cropped_)
+	for (int row=cropT; row<cropB; row++)
+	    bi->setBitmapRow(&B[row*W+cropL]);
+    else
+	bi->setBitmap (B);
+    bi->setTransparent (transparent_);
+    string fileext = bi->fileExtension();
+    string outfilename = filename;
+    if (fileext.length() != 0)
     {
-      case debugbitmap:
-	write_debugbitmap (filename);
-	break;
-      case gif:
-	write_gif (filename);
-	break;
-      default:
-	throw BitmapError ("Unrecognised write format");
+	int extlen = fileext.length();
+	if (outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
+	    outfilename += '.' + fileext;
+	cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
     }
+    bi->write (outfilename);
+    delete bi;
 }
 
+/*
 void Bitmap::write_debugbitmap (string filename)
 {
     FILE *F = fopen (filename.c_str(), "wb");
@@ -203,17 +214,18 @@ void Bitmap::write_gif (string filename)
     {
 	GIFBitmap gif(cropR-cropL, cropB-cropT, bpp_);
 	for (int row=cropT; row<cropB; row++)
-	    gif.addRow(&B[row*W+cropL]);
+	    gif.setBitmapRow(&B[row*W+cropL]);
 	if (transparent_)
-	    gif.setTransparent();
+	    gif.setTransparent(true);
 	gif.write (filename);
     }
     else
     {
 	GIFBitmap gif(W, H, B, bpp_);
 	if (transparent_)
-	    gif.setTransparent();
+	    gif.setTransparent(true);
 	gif.write (filename);
     }
 }
 
+*/

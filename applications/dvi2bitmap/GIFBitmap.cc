@@ -39,44 +39,57 @@
 #include "GIFBitmap.h"
 
 
-
+/*
 // Construct a GIFBitmap from a ready-made bitmap, of size w x h
-GIFBitmap::GIFBitmap (int w, int h, Byte *b, int bpp=1)
+GIFBitmap::GIFBitmap (const int w, const int h, const Byte *b, const int bpp=1)
     : w_(w), h_(h), bitmap_(b), bitmapRows_(h), bpp_(bpp),
       myBitmap_(false), transparent_(false)
 { 
 }
+*/
 
 // This constructor is for the case where we build up the GIF's
 // bitmap by rows, using method bitmapRow().  We'll be send the rows
 // of the bitmap shortly - for now, initialise the bitmap to receive
 // them, and set myBitmap_ to true, indicating that the bitmap should be
 // deleted in the destructor
-GIFBitmap::GIFBitmap (int w, int h, int bpp=1)
+GIFBitmap::GIFBitmap (const int w, const int h, const int bpp=1)
     : w_(w), h_(h), bitmapRows_(0), bpp_(bpp),
-      myBitmap_(true), transparent_(false)
+      myBitmap_(false), transparent_(false)
 {
-    bitmap_ = new Byte[w_ * h_];
-    bitmapRows_ = 0;
 }
 
 GIFBitmap::~GIFBitmap ()
 {
     if (myBitmap_)
-	delete[] bitmap_;
+	delete[] allocBitmap_;
 }
 
-void GIFBitmap::addRow (Byte *b)
+void GIFBitmap::setBitmap (const Byte *b)
 {
+    if (bitmapRows_ != 0)
+	throw DviBug ("setBitmap: bitmap not empty");
+    bitmap_ = b;
+    bitmapRows_ = h_;
+}
+
+void GIFBitmap::setBitmapRow (const Byte *b)
+{
+    if (bitmapRows_ == 0)
+    {
+	allocBitmap_ = new Byte[w_ * h_];
+	bitmap_ = allocBitmap_;
+	myBitmap_ = true;
+    }
     if (bitmapRows_ == h_)
-	throw DviBug ("too many rows received by GIFBitmap::addRow");
-    Byte *p = &bitmap_[bitmapRows_ * w_];
+	throw DviBug ("too many rows received by GIFBitmap::setBitmapRow");
+    Byte *p = &allocBitmap_[bitmapRows_ * w_];
     for (int i=0; i<w_; i++)
 	*p++ = *b++;
     bitmapRows_ ++;
 }
 
-void GIFBitmap::write (string filename)
+void GIFBitmap::write (const string filename)
 {
     if (bitmapRows_ != h_)
 	throw DviBug ("attempt to GIFBitmap::write with incomplete bitmap");

@@ -11,8 +11,8 @@
 // Static debug switch
 int DviFile::debug_;
 
-DviFile::DviFile (string s, int res)
-    : fileName_(s), resolution_(res)
+DviFile::DviFile (string s, int res, double magmag=1.0)
+    : fileName_(s), resolution_(res), magmag_(magmag)
 {
     PkFont::setResolution(res);
 
@@ -658,6 +658,9 @@ void DviFile::read_postamble()
     int4 = dvif_->getUIU(4);	// numerator
     int4 = dvif_->getUIU(4);	// denominator
     unsigned int dvimag = dvif_->getUIU(4);	// mag
+    // immediately multiply it by magmag
+    if (magmag_ != 1.0)
+	dvimag = static_cast<unsigned int>(dvimag*magmag_);
     postamble_.mag = dvimag;
     postamble_.l = dvif_->getUIU(4);    
     postamble_.u = dvif_->getUIU(4);    
@@ -782,7 +785,7 @@ void DviFile::process_preamble(DviFilePreamble* p)
     preamble_.mag = p->mag;
     preamble_.comment = p->comment;
     true_dviu_per_pt_ = ((double)p->den/(double)p->num) * (2.54e7/7227e0);
-    dviu_per_pt_ = true_dviu_per_pt_ * (double)p->mag/1000.0;
+    dviu_per_pt_ = true_dviu_per_pt_ * (double)p->mag/1000.0 * magmag_;
     px_per_dviu_ = ((double)p->num/(double)p->den) * (resolution_/254000e0);
     if (debug_ > 1)
 	cerr << "Preamble: dviu_per_pt_ = " << dviu_per_pt_

@@ -17,10 +17,12 @@ class DviFilePreamble;
 
 class DviFile {
 public:
+    // magmag is a factor by which the file's internal
+    // magnification should be increased.
+    DviFile (string s, int resolution, double magmag=1.0);
+    ~DviFile();
     bool eof();
     DviFileEvent *getEvent();
-    DviFile (string s, int resolution);
-    ~DviFile();
     static debug (int level) { debug_ = level; }
     // currH and currY are current horiz and vert positions in pixel
     // units, including possible drift corrections
@@ -38,7 +40,7 @@ public:
     PkFont *nextFont();
 
 private:
-    string fileName_;
+    const string fileName_;
     // all dimensions within this class are in DVI units, except where stated.
     int h_, v_, w_, x_, y_, z_;
     int pending_hupdate_;	// in DVIUnits
@@ -53,22 +55,15 @@ private:
     double dviu_per_pt_;	// ...including magnification
     double px_per_dviu_;	// 1px = px_per_dviu_ * 1dviu
     // resolution is in pixels-per-inch
-    int resolution_;
-
-    // DVI units must be multiplied by
-    // this factor to convert them to device (ie, pixel) units.
-    // true_dvi_to_device_ is dvi_to_device_ without the magnification
-    //double dvi_to_device_;
-    //double true_dvi_to_device_;
+    const int resolution_;
+    // magmag is a factor by which the file's internal magnification
+    // should be increased
+    const double magmag_;
 
     // device units are 1pt=1/2.54 mm, so set max_drift_ to 0
     // This might change in future, if the effective device units of the output
     // change (for example if we produce oversize gifs, ready for shrinking).
     const int max_drift_ = 0;
-    // tfm_conv_ is the multiplier to convert TFM widths, found in the
-    // PK files, to DVI units.  The only account of this I can find is
-    // somewhat implicitly within Knuth's DVIType program
-    //double tfm_conv_;
 
     Byte getByte();
     signed int getSIU(int), getSIS(int);

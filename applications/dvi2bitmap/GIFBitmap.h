@@ -1,6 +1,10 @@
 // $Id$
 
+#ifndef GIFBITMAP_HEADER_READ
+#define GIFBITMAP_HEADER_READ 1
+
 #include "dvi2bitmap.h"
+#include "BitmapImage.h"
 #include <cstdio>
 
 typedef int             code_int;
@@ -11,21 +15,24 @@ typedef unsigned short int count_short;
 typedef long int          count_int;
 #endif /*SIGNED_COMPARE_SLOW*/
 
-class GIFBitmap {
+class GIFBitmap : public BitmapImage {
  public:
-    GIFBitmap (int w, int h, Byte *b, int bpp=1);
-    GIFBitmap (int w, int h, int bpp=1);
+    //GIFBitmap (int w, int h, Byte *b, int bpp=1);
+    GIFBitmap (const int w, const int h, const int bpp=1);
     ~GIFBitmap ();
-    void write (string filename);
-    void addRow (Byte *b);
-    void setTransparent () { transparent_ = true; }
+    void setBitmap (const Byte *b);
+    void setBitmapRow (const Byte *b);
+    void setTransparent (const bool sw) { transparent_ = sw; }
+    void write (const string filename);
+    string fileExtension() const { return "gif"; }
 
  private:
-    Byte *bitmap_;
+    const Byte *bitmap_;
+    Byte *allocBitmap_;
     const int w_, h_, bpp_;
     int bitmapRows_;
     bool transparent_;
-    const bool myBitmap_;
+    bool myBitmap_;
     void GIFEncode(FILE* fp,
 		  int GWidth, int GHeight,
 		  int GInterlace,
@@ -44,3 +51,4 @@ class GIFBitmap {
     void char_out( int c );
     void flush_char();
 };
+#endif // #ifndef GIFBITMAP_HEADER_READ

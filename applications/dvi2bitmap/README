@@ -10,5 +10,7 @@ for teTeX:
 
   MakeTeXPK cmr10 110 110 1 ibmvga
   --> /var/lib/texmf/fonts/pk/ibmvga/public/cm/cmr10.110pk
+  MakeTeXPK cmr10 220 110 2 ibmvga
+  --> /var/lib/texmf/fonts/pk/ibmvga/public/cm/cmr10.220pk
 
 use `kpsewhich pk cmr10.110pk' to find the file.

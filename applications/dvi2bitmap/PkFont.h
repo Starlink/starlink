@@ -151,8 +151,7 @@ class PkFont {
 	double designSize, hppp, vppp;
 	string comment;
     } preamble_;
-    // 
-    double fontscale_;
+    //double fontscale_;
     // following are in DVI units
     double quad_, word_space_, back_space_;
     const int nglyphs_ = 256;
