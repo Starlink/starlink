@@ -115,6 +115,8 @@
       INTEGER			NLIST			! Number of lists
 
       LOGICAL			PRIM			! Is object primitive?
+      LOGICAL			QTHERE			! Quantum exists?
+      LOGICAL			QVEC			! Quantum is vector
 *.
 
 *  Check inherited global status.
@@ -200,12 +202,23 @@
 *      Release array locator
           CALL DAT_ANNUL( DLOC, STATUS )
 
+*      Get shape of quantum
+          CALL DAT_THERE( CLOC, 'QUANTUM', QTHERE, STATUS )
+          IF ( QTHERE ) THEN
+            CALL CMP_SHAPE( CLOC, 'QUANTUM', DAT__MXDIM, DIMS,
+     :                      NDIM, STATUS )
+            QVEC = (NDIM.GT.1)
+            CALL ADI_CPUT0L( LID, 'VectorQuantum', QVEC, STATUS )
+          END IF
+
 *      Conditional copy of other stuff
           CALL ADI1_CCH2AL( CLOC, 'DECREASING',
      :                      LID, 'Decreasing', STATUS )
           CALL ADI1_CCH2AT( CLOC, 'FIELD_MIN', LID, 'Min', STATUS )
           CALL ADI1_CCH2AT( CLOC, 'FIELD_MAX', LID, 'Max', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'QUANTUM', LID, 'Quantum', STATUS )
+          IF ( QTHERE .AND. .NOT. QVEC ) THEN
+            CALL ADI1_CCH2AT( CLOC, 'QUANTUM', LID, 'Quantum', STATUS )
+          END IF
           CALL ADI1_CCH2AC( CLOC, 'LABEL', LID, 'Label', STATUS )
           CALL ADI1_CCH2AC( CLOC, 'UNITS', LID, 'Units', STATUS )
 

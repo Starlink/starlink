@@ -125,6 +125,12 @@
           CALL EDI1_UNMAP_INT( LID, STATUS )
         END IF
 
+*    Is the quantum mapped?
+        CALL ADI_THERE( LID, '.MappedComponentQ', THERE, STATUS )
+        IF ( THERE ) THEN
+          CALL EDI1_QUNMAP_INT( LID, STATUS )
+        END IF
+
 *    Free the list
         CALL ADI_ERASE( LID, STATUS )
 

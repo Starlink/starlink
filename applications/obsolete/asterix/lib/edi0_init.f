@@ -93,6 +93,8 @@
       EXTERNAL			EDI1_CREAT
       EXTERNAL			EDI1_LUPDT
       EXTERNAL			EDI1_MAP
+      EXTERNAL			EDI1_QMAP
+      EXTERNAL			EDI1_QUNMAP
       EXTERNAL			EDI1_UNMAP
 
 *  Local Variables:
@@ -111,8 +113,12 @@
 *    Define EDI interface
         CALL ADI_DEFFUN( 'ListMap(_EventDS,_HDSfile,_CHAR,'/
      :      /'_CHAR,_CHAR,_INTEGER,_INTEGER)', EDI1_MAP, DID, STATUS )
+        CALL ADI_DEFFUN( 'ListMapQuantum(_EventDS,_HDSfile,_CHAR,'/
+     :      /'_CHAR,_CHAR,_INTEGER,_INTEGER)', EDI1_QMAP, DID, STATUS )
         CALL ADI_DEFFUN( 'ListUnmap(_EventDS,_HDSfile,_CHAR)',
      :                               EDI1_UNMAP, DID, STATUS )
+        CALL ADI_DEFFUN( 'ListUnmapQuantum(_EventDS,_HDSfile,_CHAR)',
+     :                               EDI1_QUNMAP, DID, STATUS )
         CALL ADI_DEFFUN( 'ListCreate(_EventDS,_HDSfile,_EventList)',
      :                               EDI1_CREAT, DID, STATUS )
         CALL ADI_DEFFUN( 'ListAlterLength(_EventDS,_HDSfile,_INTEGER)',
