@@ -10,7 +10,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global Variables :
 *    Import :
       INTEGER GRPID
@@ -28,7 +27,6 @@
       INTEGER L
       INTEGER I
       INTEGER SIZE
-      LOGICAL THERE
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 

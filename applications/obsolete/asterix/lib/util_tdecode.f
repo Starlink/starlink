@@ -65,7 +65,7 @@
       CHARACTER FCHAR1,FCHAR2
       CHARACTER*80 FNAME                   ! Name of file containing times
       CHARACTER*80 DUMSTRING               ! Dummy string variable
-      INTEGER NTOT,NWRD
+      INTEGER NWRD
       INTEGER IDUM1(100),IDUM2(100)
       CHARACTER*30 WORDS(100)
       INTEGER ISTAT,K1,K2,WTOT
