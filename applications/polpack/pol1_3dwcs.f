@@ -55,8 +55,10 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      CHARACTER DOM*80   
       INTEGER CMPFRM
       INTEGER FRM
+      INTEGER IAT
       INTEGER INPRM(2)
       INTEGER J
       INTEGER MAP1
@@ -104,6 +106,16 @@
 *  Create a compound Frame in which axes 1 and 2 are copied from the 2D
 *  Frame in the FrameSet, and axis 3 is the new Stokes axis.
             CMPFRM = AST_CMPFRAME( FRM, STFRM, ' ', STATUS )
+
+*  Set the Domain for the new Frame.
+            DOM = ' '
+            IAT = 0
+            CALL CHR_APPND( AST_GETC( FRM, 'DOMAIN', STATUS ), DOM, 
+     :                      IAT )
+            CALL CHR_APPND( '-', DOM, IAT )
+            CALL CHR_APPND( AST_GETC( STFRM, 'DOMAIN', STATUS ), DOM, 
+     :                      IAT )
+            CALL AST_SETC( CMPFRM, 'DOMAIN', DOM( : IAT ) )
 
 *  We now need the Mapping which connects this new 3D CmpFrame to the 3D Base
 *  Frame in the FrameSet. This is based on the Mapping from the Base
