@@ -834,7 +834,7 @@ C         ENDIF
       IF (STATUS .NE. SAI__OK) RETURN
 
 * Get locator to the instrument box
-      CALL ADI1_LOCINSTR( IFID, .FALSE,. ILOC, STATUS )
+      CALL ADI1_LOCINSTR( IFID, .FALSE., ILOC, STATUS )
 
 * Get detector type i.e. PSPC or HRI
       CALL CMP_GET0C(ILOC, 'DETECTOR', HEAD.DET, STATUS)
@@ -853,7 +853,7 @@ C         ENDIF
      &           (INDEX(HEAD.DET, 'PSPCC') .EQ. 0) ) THEN
 *
 * Get locator to the instrument box
-        CALL ADI1_LOCHEAD( IFID, .FALSE,. ILOC, STATUS )
+        CALL ADI1_LOCHEAD( IFID, .FALSE., ILOC, STATUS )
 
          CALL CMP_GET0I(HLOC, 'BASE_MJD', MDATE, STATUS)
 *
