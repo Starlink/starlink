@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_COUNT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_COUNT</H1><HR>
+<P>
+<H2>Function</H2>
+To count the orders present in a data frame.
+<P>
+<H2>Summary</H2>
+ This routine counts the number of orders in an echellogram.  The
+ method used is to first collapse or median filter the central 20
+ columns of the input frame into a 1-D array, and then apply a
+ triangle filter to this array.  The autocorrelation function is
+ then calculated and the peak (corresponding to average order
+ separation) is located.  The central columns are then resampled
+ using a box scaled according to the expected order size.  A
+ triangle function of appropriate dimension is then convolved
+ with the array and the resluting array is smoothed.  A search is
+ then made for the local peak values representing the approximate
+ order centres.
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_COUNT_hints.html">Hints</A></H3>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

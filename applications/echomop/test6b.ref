@@ -1,0 +1,47 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model sky.                          (ECH_SKY)
+
+ TUNE_SKYPOLY is set to non-default value: 3.
+ Processing order 1...
+ At X=200 sky=0.539, RMS=0.946, 0 rejects=0% of total.
+ At X=400 sky=2.113, RMS=0.957, 0 rejects=0% of total.
+ At X=600 sky=1.077, RMS=0.879, 0 rejects=0% of total.
+ At X=800 sky=0.847, RMS=0.637, 0 rejects=0% of total.
+ At X=1000 sky=1.431, RMS=0.935, 0 rejects=0% of total.
+ At X=1200 sky=1.193, RMS=0.99, 0 rejects=0% of total.
+ At X=1400 sky=1.005, RMS=1, 0 rejects=0% of total.
+ At X=1600 sky=0.903, RMS=0.768, 0 rejects=0% of total.
+ At X=1800 sky=0.28, RMS=0.866, 0 rejects=0% of total.
+ At X=2000 sky=1.144, RMS=0.99, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.88, 0 rejects=0% of total.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ Processing order 2...
+ At X=200 sky=1.142, RMS=0.884, 0 rejects=0% of total.
+ At X=400 sky=1.974, RMS=0.946, 0 rejects=0% of total.
+ At X=600 sky=1.861, RMS=0.987, 0 rejects=0% of total.
+ At X=800 sky=1.236, RMS=0.895, 0 rejects=0% of total.
+ At X=1000 sky=0.939, RMS=0.587, 0 rejects=0% of total.
+ At X=1200 sky=2.434, RMS=0.978, 0 rejects=0% of total.
+ At X=1400 sky=1.122, RMS=0.894, 0 rejects=0% of total.
+ At X=1600 sky=2.011, RMS=0.948, 0 rejects=0% of total.
+ At X=1800 sky=1.199, RMS=0.97, 0 rejects=0% of total.
+ At X=2000 sky=0.949, RMS=0.778, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.885, 0 rejects=0% of total.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ Processing order 3...
+ At X=200 sky=1.434, RMS=0.859, 0 rejects=0% of total.
+ At X=400 sky=0.968, RMS=0.989, 0 rejects=0% of total.
+ At X=600 sky=2.148, RMS=0.931, 0 rejects=0% of total.
+ At X=800 sky=2.903, RMS=0.988, 0 rejects=0% of total.
+ At X=1000 sky=1.049, RMS=0.798, 0 rejects=0% of total.
+ At X=1200 sky=1.894, RMS=0.979, 0 rejects=0% of total.
+ At X=1400 sky=1.01, RMS=0.82, 0 rejects=0% of total.
+ At X=1600 sky=1.738, RMS=0.623, 0 rejects=0% of total.
+ At X=1800 sky=1.024, RMS=0.98, 0 rejects=0% of total.
+ At X=2000 sky=0.579, RMS=0.837, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.89, 0 rejects=0% of total.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,70 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Cannot_create_object.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Cannot_create_object</H2><HR>
+<P>
+ The program is attempting to create an object in a reduction
+ structure file and the underlying file access routines have
+ reported a problem.
+<P>
+ The most probable causes of this are:
+<P>
+<PRE WIDTH=72>
+    - the target directory is protected against write access
+<P>
+    - you have run out of disk space (disk full)
+<P>
+    - you have filled your allocation of disk space
+</PRE>
+<P>
+ Use "ls" to see what access rights you have to the structure:
+<P>
+<PRE WIDTH=72>
+    % ls -alF /name/of/directory/reduction-file
+</PRE>
+<P>
+ Use "df" to check how much of the target disk is unused:
+<P>
+<PRE WIDTH=72>
+    % df
+</PRE>
+<P>
+ and "quota" to check that you have not used up your allocation
+<P>
+<PRE WIDTH=72>
+    % quota
+</PRE>
+<P>
+ You may find that the "quota" command is not available in your path:
+ ask your system manager if you are uncertain how to check your own
+ disk quotas.
+<P>
+ The most likely cause of this problem is lack of disk space.  In
+ particular, the sky and flat field models create very large array
+ objects.
+<P>
+<P>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,45 @@
+This is ECHOMOP Version 3.3-0.
+ TUNE_AUTOMATE is set to non-default value: '1,EXIT'.
+ TUNE_CLONE is set to non-default value: 'ech_temp'.
+ Creating file: ech_copy.
+ Cloned SO_FAR from file ech_temp.
+ TUNE_CLONE is set to non-default value: 'ech_temp'.
+ TUNE_AUTOMATE is set to non-default value: '1,EXIT'.
+ Auto-running: Option 1.
+ ---------------------------------------------------------------------------
+ Copying results of:     Start a reduction.               (ECH_LOCATE)
+
+ Cloned NX_PIXELS from file ech_temp.
+ Cloned NO_OF_ARCS from file ech_temp.
+ Cloned NY_PIXELS from file ech_temp.
+ TUNE_FCHECK is set to non-default value: YES.
+ Cloned ORDER_SLOPE from file ech_temp.
+ Cloned NO_OF_ORDERS from file ech_temp.
+ Cloned TRACE_WIDTH from file ech_temp.
+ TUNE_AUTLOC is set to non-default value: YES.
+ Cloned ORDER_YPOS[1] from file ech_temp.
+ TUNE_AUTLOC is set to non-default value: YES.
+ ---------------------------------------------------------------------------
+
+ Auto-running: Option EXIT.
+
+ECH_COPY.MORE.ECHELLE  <ECH_RDCTN>
+
+   SO_FAR         <_INTEGER>      1
+   NX_PIXELS      <_INTEGER>      2040
+   NO_OF_ARCS     <_INTEGER>      1
+   NY_PIXELS      <_INTEGER>      76
+   ORDER_SLOPE    <_REAL>         0
+   NO_OF_ORDERS   <_INTEGER>      3
+   TRACE_WIDTH    <_INTEGER>      12
+   ORDER_YPOS(3)  <_INTEGER>      15,38,61
+   ARC            <_CHAR*80>      'UNINITIALISED'
+   FFIELD         <_CHAR*80>      'UNINITIALISED'
+   INPTIM         <_CHAR*80>      'UNINITIALISED'
+   OBJECT         <_CHAR*80>      'UNINITIALISED'
+   SLITIM         <_CHAR*80>      'UNINITIALISED'
+   STAR           <_CHAR*80>      'UNINITIALISED'
+   TRACIM         <_CHAR*80>      'UNINITIALISED'
+
+End of Trace.
+

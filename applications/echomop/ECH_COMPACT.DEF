@@ -1,0 +1,274 @@
+*+
+*  Name:
+*     ECH_RDCTN.DEF
+
+*  Description:
+*	This file is used as input to data structure creation routines and 
+*	defines the format of the Echelle reduction specific data structure. 
+*
+*	The actual container file created is different depending upon the 
+*	environment being used. The following environments are currently 
+*	supported.
+*
+*		FIGARO  -  container file type is .DST
+*			   this file read by DSA_READ_STRUCT_DEF
+*			   data structure creation by DSA_CREATE_STRUCTURE
+*			   structure parameter setup by DSA_SET_STRUCT_VAR
+*
+*       This file is also read by ECH_INIT_OBJ_PATHS to determine the
+*       pathways to each primitive object in the reduction data structure.
+*
+*	Author	:	Dave Mills (UCL)
+*
+*	Date	:	07-June-1989
+*
+*	Version	:	1.0	7-JUN-89
+*                               Created prototype 
+*
+*			1.1     Temporary change to avoid as yet unsupported
+*                               structure arrays
+*
+*                       1.3     Added registered paths
+*                                  
+*
+*	Updates	:	1.1	24-JUN-89
+*				Structure arrays with dimensions of
+*				'num_objects' reduced to dimension 1.
+*				Structure arrays with dimensions of
+*				'num_orders' reduced to dimension one, and
+*				all contined primitives extended to have
+*				additional dimension of 'num_orders'. The
+*				original structure will be restored when
+*				DSA support is available for structure arrays
+*
+*                       1.2     5-JUL-89
+*                               Added **REGISTERED... comments to be processed
+*                               by ECH_INIT_OBJ_PATHS routine. Added array of
+*                               initial order y-positions , and a dimension
+*                               variable to force access to full array even
+*                               when num_orders is indicating a specific order.
+*
+*                       1.3     30-AUG-89
+*                               Added **REGISTERED... comments for pathway
+*                               definitions. Processed by ECH_INIT_OBJ_PATHS
+*                               routine, allow greater flexibility in assigning
+*                               pathnames.
+*
+*-------------------------------------------------------------------------------
+*
+*	Structure parameters
+*       --------------------
+*
+*	These parameters must be set up by the environment specific subroutines
+*	when performing data structure creation. They are used to specify 
+*	the maximum dimensions of the data structures, and also to allow
+*	selective enabling/disabling of optional structure elements.
+*
+*		NX		(Integer) X dimension of input images. REQUIRED.
+*		tune_maxbin		(Integer) Twice X dimension of input images. REQUIRED.
+*
+*		NY		(Integer) Y dimension of input images. REQUIRED.
+*
+*		MAX_LINES	(Integer) Maximum number of arc lines per order
+*                                         Defaults to NX / 4.
+*  
+*		NUM_ORDERS	(Integer) Number of echelle orders. REQUIRED
+*
+*		NUM_OBJECTS	(Integer) Number of object spectra. Defaults to 1.
+*
+*		OUTPUT_SIZE	(Integer) Maximum number of bins in output spectra
+*					  Defaults to NX * NUM_ORDERS * 2.
+*
+*		DISTORTION	(Logical) TRUE if a 2D distortion fitting is
+*					  to be performed. Defaults to FALSE.
+*
+*		DATA_QUALITY	(Logical) TRUE if a data quality 'image' is
+*					  to be produced. Defaults to FALSE.
+*
+*		SKY_INFO	(Logical) TRUE is data on the 'sky' is to be included
+*					  Default is TRUE.
+*
+*		COSMIC_INFO	(Logical) TRUE if data on the cosmic rays are to be
+*					  included. Default is TRUE.
+*
+*		CHAR_DEFAULT    (Integer) Size of character fields. Default is 80.
+*
+*	!	HIST_BINS	(Integer) No of bins in histograms of raw objects
+*
+*	!	MAX_SKY_LINES	(Integer) Maximum number of sky lines per echellogram
+*
+*	!	tune_pfsamp	(Integer) Max number of elements used to sample
+*                                            profiles (spatial direction)
+*
+*	!	tune_maxpoly	(Integer) Maximum order used when doing polynomial
+*					  fitting.
+*
+*	!	tune_max2dply	(Integer) Maximum coefficients used when doing 2Dpolynomial
+*					  fitting.
+*
+*	!	tune_max2dpnts	(Integer) Maximum number of 2D points used to do the
+*					  2D chebyshev distortion fitting
+*
+*
+*
+*	For parameters marked with a ! , the default values are defined at compile
+*	time. It is unlikely that these values will need to be changed very often.
+*	To change them edit the ECH_DIMEN_PARS.INC file and recompile
+*	the ECH package. 
+*
+*       Associated with these parameters are the following set of comment
+*       lines which are recognised by ECH_INIT_OBJ_PATHS. The lines have
+*       a rigid format which must be adhered to if any parameters are added.
+*       Any parameters specified will NOT be evaluated at runtime when 
+*       the reduction package is accessing the reduction data structure.
+*       In general ECH_ will attempt to translate any array/structure index
+*       contained in a path
+*
+*	EG.       MAIN.ORDER_YPOS[num_objects,num_orders] 
+*                                             would cause the parameters
+*                                             'num_orders' and 'num_objects'
+*                                             to be evaluated
+*                                             and then the relevent element
+*                                             of the array would be mapped.
+*
+*       To prevent the evaluation , a parameter is 'registered' as shown
+*       below. Whenever such parameters appear in a path , they are
+*       replaced with the value 1.
+*
+**REGISTERED INDEX VARIABLE => nx
+**REGISTERED INDEX VARIABLE => ny
+**REGISTERED INDEX VARIABLE => tune_maxrfln
+**REGISTERED INDEX VARIABLE => no_of_bins
+**REGISTERED INDEX VARIABLE => nx_rebin
+**REGISTERED INDEX VARIABLE => tune_maxpoly
+**REGISTERED INDEX VARIABLE => tune_max2dply
+**REGISTERED INDEX VARIABLE => tune_max2dpnts
+
+*       The following comment lines are also recognised by ECH_INIT_OBJ_PATHS
+*       and cause the relevant path-ways to be associated with reference names.
+*       The format is 
+* 
+*         **REGISTERED PATH => ref-name path-way
+
+**REGISTERED PATH => ENVIR ENVIR
+**REGISTERED PATH => DATA_QUALITY  DATA_QUALITY[NX,NY] 
+**REGISTERED PATH => COMMENT  INSTRUMENT.COMMENT
+**REGISTERED PATH => ARC  ARC[NREF_FRAME] 
+**REGISTERED PATH => CR_HIST  COSMIC_RAY.CR_HIST[HIST_BINS] 
+**REGISTERED PATH => CR_HIST_SCALE  COSMIC_RAY.CR_HIST_SCALE[HIST_BINS] 
+**REGISTERED PATH => SSKY_SPECTRUM  SKY.SSKY_SPECTRUM[NX_REBIN,NUM_ORDERS] 
+**REGISTERED PATH => SSKY_VARIANCE  SKY.SSKY_VARIANCE[NX_REBIN,NUM_ORDERS] 
+**REGISTERED PATH => SKY_SPECTRUM  SKY.SKY_SPECTRUM[NX,NUM_ORDERS] 
+**REGISTERED PATH => SKY_VARIANCE  SKY.SKY_VARIANCE[NX,NUM_ORDERS] 
+**REGISTERED PATH => SKY_LINES  SKY.SKY_LINES[tune_mxrfln] 
+**REGISTERED PATH => SKY_MASK  SKY.SKY_MASK[tune_mxskypix,NUM_ORDERS] 
+**REGISTERED PATH => FITTED_PFL  MAIN.FIT_PFL[tune_maxpoly,tune_pflssamp,NUM_ORDERS] 
+**REGISTERED PATH => FITTED_SKY  SKY.FIT_SKY[nx,tune_mxskypix,NUM_ORDERS] 
+**REGISTERED PATH => FSKY_ERRORS  SKY.FIT_ERR[nx,tune_mxskypix] 
+**REGISTERED PATH => FITTED_SSKY  SKY.FIT_SSKY[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => FSSKY_ERRORS  SKY.FIT_SERR[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => OBJ_MASK  MAIN.OBJ_MASK[tune_mxskypix,NUM_ORDERS] 
+**REGISTERED PATH => CALSKY_MASK  SKY.CALSKY_MASK[tune_mxskypix,NUM_ORDERS] 
+**REGISTERED PATH => CALOBJ_MASK  MAIN.CALOBJ_MASK[tune_mxskypix,NUM_ORDERS] 
+**REGISTERED PATH => NX_PIXELS  MAIN.NX_PIXELS 
+**REGISTERED PATH => NY_PIXELS  MAIN.NY_PIXELS 
+**REGISTERED PATH => NO_OF_BINS  MAIN.NO_OF_BINS 
+**REGISTERED PATH => NREF_FRAME  MAIN.NO_OF_ARCS
+**REGISTERED PATH => NX_REBIN  MAIN.NX_REBIN
+**REGISTERED PATH => ORDER_SLOPE  MAIN.ORDER_SLOPE
+**REGISTERED PATH => NO_OF_ORDERS  MAIN.NO_OF_ORDERS 
+**REGISTERED PATH => TRACE_WIDTH  MAIN.TRACE_WIDTH 
+**REGISTERED PATH => CENTRAL_ORDNUM  MAIN.CENTRAL_ORDNUM 
+**REGISTERED PATH => ORDER_YPOS  MAIN.ORDER_YPOS[NUM_ORDERS] 
+**REGISTERED PATH => DEK_BELOW  MAIN.DEK_BELOW[NUM_ORDERS] 
+**REGISTERED PATH => DEK_ABOVE  MAIN.DEK_ABOVE[NUM_ORDERS]
+**REGISTERED PATH => CONTIN_PROFILE  MAIN.CONTIN_PROFILE[tune_pflssamp,NUM_ORDERS] 
+**REGISTERED PATH => MODEL_PROFILE  MAIN.MODEL_PROFILE[tune_pflssamp,NUM_ORDERS] 
+**REGISTERED PATH => STAR_BELOW  MAIN.STAR_BELOW 
+**REGISTERED PATH => STAR_ABOVE  MAIN.STAR_ABOVE 
+**REGISTERED PATH => STAR_PROFILE  MAIN.STAR_PROFILE[tune_pflssamp,NUM_ORDERS] 
+**REGISTERED PATH => OBJ_BELOW  MAIN.OBJ_BELOW 
+**REGISTERED PATH => OBJ_ABOVE  MAIN.OBJ_ABOVE 
+**REGISTERED PATH => OBJECT_PROFILE  MAIN.OBJECT_PROFILE[tune_pflssamp,NUM_ORDERS] 
+**REGISTERED PATH => OBJ_SKY_GAP  MAIN.OBJ_SKY_GAP 
+**REGISTERED PATH => EXTRACTION_TYPE  MAIN.EXTRACTION_TYPE 
+**REGISTERED PATH => EXTRACTED_ARC  MAIN.EXTRACTED_ARC[NX,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => EXTR_ARC_VAR  MAIN.EXTR_ARC_VAR[NX,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => EXTRACTED_STAR  MAIN.EXTRACTED_STAR[NX,NUM_ORDERS] 
+**REGISTERED PATH => BLAZE_SPECT  MAIN.BLAZE_SPECT[NX,NUM_ORDERS] 
+**REGISTERED PATH => BLAZE_MEDIANS  MAIN.BLAZE_MEDIANS[NUM_ORDERS] 
+**REGISTERED PATH => EXTR_STAR_VAR  MAIN.EXTR_STAR_VAR[NX,NUM_ORDERS] 
+**REGISTERED PATH => EXTRACTED_OBJ  MAIN.EXTRACTED_OBJ[NX,NUM_ORDERS] 
+**REGISTERED PATH => EXTR_OBJ_VAR  MAIN.EXTR_OBJ_VAR[NX,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_WAVES  MAIN.SCRNCHD_WAVES[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_ARC  MAIN.SCRNCHD_ARC[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_STAR  MAIN.SCRNCHD_STAR[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_OBJ  MAIN.SCRNCHD_OBJ[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_ARCV  MAIN.SCRNCHD_ARCV[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_STRV  MAIN.SCRNCHD_STRV[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => SCRNCHD_OBJV  MAIN.SCRNCHD_OBJV[nx_rebin,NUM_ORDERS] 
+**REGISTERED PATH => FLUX_TABLE  MAIN.FLUX_TABLE
+**REGISTERED PATH => STAR_EXPOSURE  MAIN.STAR_EXPOSURE 
+**REGISTERED PATH => OBJECT_EXPOSURE  MAIN.OBJECT_EXPOSURE 
+**REGISTERED PATH => CALIBRATION  MAIN.CALIBRATION[NX,NUM_ORDERS] 
+**REGISTERED PATH => CALIBRATED  MAIN.CALIBRATED[NX,NUM_ORDERS] 
+**REGISTERED PATH => 1D_SPECTRUM  MAIN.1D_SPECTRUM[NO_OF_BINS] 
+**REGISTERED PATH => ERR_SPECTRUM  MAIN.ERR_SPECTRUM[NO_OF_BINS] 
+**REGISTERED PATH => STD_SPECTRUM  MAIN.ERR_STDSPECTRUM[NO_OF_BINS] 
+**REGISTERED PATH => ERR_STDSPECTRUM  MAIN.STD_SPECTRUM[NO_OF_BINS] 
+**REGISTERED PATH => WAVELENGTH  MAIN.WAVELENGTH[NO_OF_BINS] 
+**REGISTERED PATH => HISTORY  MAIN.HISTORY
+**REGISTERED PATH => TRACE  MAIN.TRACE_FIT.TRACE[NX,NUM_ORDERS] 
+**REGISTERED PATH => TRC_IN_DEV  MAIN.TRACE_FIT.TRC_IN_DEV[NX,NUM_ORDERS] 
+**REGISTERED PATH => TRC_OUT_DEV  MAIN.TRACE_FIT.TRC_OUT_DEV[NX,NUM_ORDERS] 
+**REGISTERED PATH => TRC_CLIPPED  MAIN.TRACE_FIT.TRC_CLIPPED[NUM_ORDERS] 
+**REGISTERED PATH => TRC_POLY  MAIN.TRACE_FIT.TRC_POLY[tune_maxpoly,NUM_ORDERS] 
+**REGISTERED PATH => ARC_LINE_FWHM  MAIN.WAVE_FIT_1D.ARC_LINE_FWHM 
+*!!!**REGISTERED PATH => REF_LINE_FWHM  MAIN.WAVE_FIT_1D.REF_LINE_FWHM 
+**REGISTERED PATH => MIN_DISPERSION  MAIN.WAVE_FIT_1D.MIN_DISPERSION[NUM_ORDERS] 
+**REGISTERED PATH => MAX_DISPERSION  MAIN.WAVE_FIT_1D.MAX_DISPERSION[NUM_ORDERS] 
+**REGISTERED PATH => LOW_SCH_LAMBDA  MAIN.WAVE_FIT_1D.LOW_SCH_LAMBDA[NUM_ORDERS] 
+**REGISTERED PATH => HI_SCH_LAMBDA  MAIN.WAVE_FIT_1D.HI_SCH_LAMBDA[NUM_ORDERS] 
+**REGISTERED PATH => FITTED_WAVES  MAIN.WAVE_FIT_1D.FITTED_WAVES[NX,NUM_ORDERS] 
+**REGISTERED PATH => W_NPOLY  MAIN.WAVE_FIT_1D.W_NPOLY 
+**REGISTERED PATH => ORDER_IDNUM  MAIN.WAVE_FIT_1D.ORDER_IDNUM[NUM_ORDERS] 
+**REGISTERED PATH => WSEAR_START  MAIN.WAVE_FIT_1D.WSEAR_START[NUM_ORDERS] 
+**REGISTERED PATH => WSEAR_END  MAIN.WAVE_FIT_1D.WSEAR_END[NUM_ORDERS] 
+*
+**REGISTERED PATH => REF_LINE_FWHM  MAIN.WAVE_FIT_1D.REF_LINE_FWHM[NREF_FRAME] 
+**REGISTERED PATH => OBS_LINES  MAIN.WAVE_FIT_1D.OBS_LINES[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => OBS_INTEN  MAIN.WAVE_FIT_1D.OBS_INTEN[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => W_IN_DEV  MAIN.WAVE_FIT_1D.W_IN_DEV[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => W_OUT_DEV  MAIN.WAVE_FIT_1D.W_OUT_DEV[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => RMS_ERROR  MAIN.WAVE_FIT_1D.RMS_ERROR[NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => W_POLY  MAIN.WAVE_FIT_1D.W_POLY[tune_maxpoly,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => WID_POLY  MAIN.WAVE_FIT_1D.WID_POLY[tune_maxpoly,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => ID_COUNT  MAIN.WAVE_FIT_1D.ID_COUNT[NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => ID_LINES  MAIN.WAVE_FIT_1D.ID_LINES[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => ID_WIDTHS  MAIN.WAVE_FIT_1D.ID_WIDTHS[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => ID_STATUS  MAIN.WAVE_FIT_1D.ID_STATUS[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+**REGISTERED PATH => ID_WAVES  MAIN.WAVE_FIT_1D.ID_WAVES[tune_maxrfln,NUM_ORDERS,NREF_FRAME] 
+*
+**REGISTERED PATH => W2_NX_POLY  MAIN.WAVE_FIT_2D.W2_NX_POLY 
+**REGISTERED PATH => W2_NY_POLY  MAIN.WAVE_FIT_2D.W2_NY_POLY 
+**REGISTERED PATH => IN_USE  MAIN.WAVE_FIT_2D.IN_USE[NUM_ORDERS] 
+**REGISTERED PATH => W2_IN_DEV  MAIN.WAVE_FIT_2D.W2_IN_DEV[tune_max2dpnts,NUM_ORDERS] 
+**REGISTERED PATH => W2_OUT_DEV MAIN.WAVE_FIT_2D.W2_OUT_DEV[tune_max2dpnts,NUM_ORDERS] 
+**REGISTERED PATH => W2_CLIPPED  MAIN.WAVE_FIT_2D.W2_CLIPPED[NUM_ORDERS] 
+**REGISTERED PATH => W_POLY_2D  MAIN.WAVE_FIT_2D.W_POLY_2D[tune_maxpoly,tune_maxpoly,NUM_ORDERS] 
+**REGISTERED PATH => FITTED_FLAT  FFLD.FF_SPECS[nx,tune_mxskypix] 
+**REGISTERED PATH => FLAT_ERRORS  FFLD.FF_ERR[nx,tune_mxskypix] 
+**REGISTERED PATH => REBIN_ORDER  MAIN.WAVE_FIT_2D.RBN_OBJ[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => REBIN_QUALITY  MAIN.WAVE_FIT_2D.RBN_QTY[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => REBIN_ARC  MAIN.WAVE_FIT_2D.RBN_ARC[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => REBIN_EORDER  MAIN.WAVE_FIT_2D.RBN_EOBJ[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => REBIN_EARC  MAIN.WAVE_FIT_2D.RBN_EARC[nx_rebin,tune_mxskypix]
+**REGISTERED PATH => SO_FAR  MAIN.SO_FAR
+**REGISTERED PATH => RDCTN_TRACIM  RAW_FRAMES.TRACIM
+**REGISTERED PATH => RDCTN_INPTIM  RAW_FRAMES.INPTIM
+**REGISTERED PATH => RDCTN_SLITIM  RAW_FRAMES.SLITIM
+**REGISTERED PATH => RDCTN_FFIELD  RAW_FRAMES.FFIELD
+**REGISTERED PATH => RDCTN_ARC  RAW_FRAMES.ARC
+**REGISTERED PATH => RDCTN_STAR  RAW_FRAMES.STAR
+**REGISTERED PATH => RDCTN_OBJECT  RAW_FRAMES.OBJECT
+

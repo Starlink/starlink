@@ -1,0 +1,76 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_2DEXT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_2DEXT</H1><HR>
+<H2>Summary</H2>
+<P>
+ This option is used to perform a full 2-D distortion-corrected
+ extraction and is provided for cases where the distortion
+ of the frame is significant.
+<P>
+ The option consists of four steps as follows:
+<P>
+<PRE WIDTH=72>
+    13.1  Calculate wavelength scale.
+<P>
+    13.2  Fit 2D polynomials to the distortion.
+          A typical interactive plot appears below.
+<P>
+          <IMG SRC=fit2d.gif>
+<P>
+    13.3  Re-bin the order into a corrected 2-D form.
+<P>
+    13.4  Extract from the re-binned form.
+</PRE>
+<P>
+ Distortion correction is done on a per-order basis, each order
+ having it's own distortions mapped independently.  The distortion
+ is modelled by using a tie-point data set composed of the
+ positions and wavelength of all identified arc lines in the order.
+<P>
+ Thus, a wavelength calibration is a pre-requisite to the
+ distortion corrected extraction operation.  A 2-D Chebyshev
+ polynomial is then fitted to the wavelength deviations of each
+ arc line pixel, relative to the wavelength at the trace/arc line
+ intersection.  The polynomial is used to generate delta-wavelength
+ values at pairs of (X,Y-offset) coordinates:
+<P>
+<PRE WIDTH=72>
+    delta-wavelength = 2dPoly( X-pixel, Y-offset from trace )
+</PRE>
+<P>
+ for all X- and all Y-offsets within the dekker.
+<P>
+ This map of wavelength delta values is then used to drive a
+ 2-D scrunch of the order into a form where each column (X=nn)
+ corresponds to consistent wavelength increment.
+<P>
+ The final step is to extract the data from this re-binned form.
+ The extraction algorithm used is identical to the 1-D case from
+ this point on (See 1-D extraction option for more information).
+<P>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

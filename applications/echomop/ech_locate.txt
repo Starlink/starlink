@@ -1,0 +1,33 @@
++---------------------------------------------------------------------------
+|
+|  Frame checking & order location: ech_locate/echmenu option 1
+|  ------------------------------------------------------------
+|
+|  A substantial menu of items has now been displayed.
+|  Fortunately the task attempts to be as helpful as possible
+|  in guiding the user through the selections.  As this is
+|  the beginning of a new reduction, the suggested menu option
+|  is Option 1 - Start a reduction.  The program offers this
+|  as a default, which can be accepted by simply typing Y<return>.
+|
+|  NOTE: The demonstration drives the package and provides
+|  all the its input directly, you cannot respond to the prompts
+|  yourself.
+|
+|  When Option 1 runs it prompts for the names of two data
+|  frames: the frame to be used to trace the paths of the orders
+|  across the frame, and the object frame from which to extract the
+|  spectrum.  The use of either a bright `star' data frame, or a
+|  flat-field frame (through a narrow dekker), for order tracing is
+|  recommended.
+|
+|  The task then checks the two data frames to ensure that they
+|  have consistent X and Y dimensions.  It may optionally check for
+|  saturated pixels, bad rows/columns, and cosmic rays in the trace
+|  frame, these features being enabled via the use of tuning
+|  parameters.
+|
+|  The task then proceeds to estimate the slope of the orders and
+|  their positions (in Y) at the central column of the frame.
+|
++---------------------------------------------------------------------------

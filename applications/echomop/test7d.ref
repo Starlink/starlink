@@ -1,0 +1,13 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model object profile.           (ECH_PROFILE)
+
+ TUNE_USE_NXF is set to non-default value: 1.
+ Using 6 subsamples per pixel to sample profile.
+ Deriving independent profile for order 1.
+ Average Object-pixel fraction at trace centre: 2.71%
+ Deriving independent profile for order 2.
+ Average Object-pixel fraction at trace centre: 2.81%
+ Deriving independent profile for order 3.
+ Average Object-pixel fraction at trace centre: 2.87%
+ ---------------------------------------------------------------------------
+

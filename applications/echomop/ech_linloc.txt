@@ -1,0 +1,18 @@
++---------------------------------------------------------------------------
+|
+|  Locate arc-line features: ech_linloc/echmenu option 9
+|  -----------------------------------------------------
+|
+|  The extracted spectrum now needs to be wavelength calibrated.
+|  To do this we first locate all potentially identifiable spectral
+|  features in the arc frame orders, and determine the positions
+|  (in X) of the line centers.  The next option carries out this
+|  task.  The program first evaluates the average line profile and
+|  then estimates the FWHM; this is used to fit gaussians to all
+|  located line candidates.  The criteria for selection of `potential
+|  features' are set very lax at this stage to ensure that all
+|  possible features are accepted for later identification.  This
+|  helps the identification when there are very few bright features
+|  in an order.
+|
++---------------------------------------------------------------------------

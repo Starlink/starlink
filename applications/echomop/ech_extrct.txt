@@ -1,0 +1,15 @@
++---------------------------------------------------------------------------
+|
+|  Extract the orders: ech_extrct/echmenu option 8
+|  -----------------------------------------------
+|
+|  We now have all the information needed to extract the orders
+|  (assuming constant wavelength in an order-column of pixels).
+|  Several methods of extraction are available including simple summed
+|  and optimal.  The corresponding `arc' frame will be extracted at the
+|  same time as the `object'.  The program prompts for the type of
+|  extraction to use (Simple, Profile, Optimal).  The orders are then
+|  extracted one at a time, with a report on the number of `bad' pixels
+|  which were, for whatever reason, not used in each order.
+|
++---------------------------------------------------------------------------

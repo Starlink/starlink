@@ -1,0 +1,13 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Determine dekker/object extent. (ECH_SPATIAL)
+
+ Averaging samples from all orders to get spatial behaviour.
+ (Use TUNE_USE_NXF>=1 to select individual order sampling.)
+ Lower dekker-limit set to 9 pixels below trace.
+ Upper dekker-limit set to 9 pixels above trace.
+ Averaging samples from all orders to get spatial behaviour.
+ (Use TUNE_USE_NXF>=1 to select individual order sampling.)
+ Lower object-limit set to 8 pixels below trace.
+ Upper object-limit set to 2 pixels above trace.
+ ---------------------------------------------------------------------------
+

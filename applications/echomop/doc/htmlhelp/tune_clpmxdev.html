@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_clpmxdev.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_CLPMXDEV</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_CLPMXDEV=_REAL</H3>
+<H2>Description</H2>
+<P>
+ The maximum deviation used when automatically clipping traced
+ points to fit order tracing polynomials.
+<P>
+ It is expressed in units of pixels and will usually be a fraction
+ of a pixel.
+<P>
+ Any traced point which is further than this limit from the fitted
+ polynomial (for that X-coordinate) is liable to be clipped.  Automatic
+ clipping only stops when either all points have deviations of less than
+ TUNE_CLPMXDEV from the polynomial; or when so many points have been
+ clipped that a meaningful fit can no longer be attempted.  In this
+ latter case, the order will be automatically disabled.  The user may
+ re-fit manually if the order is still to be processed.
+<P>
+ The default value is 0.5.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:45 1996
+</ADDRESS>
+</BODY>
+</HTML>

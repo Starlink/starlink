@@ -1,0 +1,23 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model sky.                          (ECH_SKY)
+
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYSIM is set to non-default value: YES.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 1...
+ Sky fit coefficient count is negative.
+ Sky estimates set to 0 everywhere.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYSIM is set to non-default value: YES.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 2...
+ Sky fit coefficient count is negative.
+ Sky estimates set to 0 everywhere.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYSIM is set to non-default value: YES.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 3...
+ Sky fit coefficient count is negative.
+ Sky estimates set to 0 everywhere.
+ ---------------------------------------------------------------------------
+

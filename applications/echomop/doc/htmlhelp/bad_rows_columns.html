@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Bad_rows_columns.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Bad Rows/columns</H2><HR>
+<P>
+ Some CCD detectors suffer from bad rows or columns.
+<P>
+ These typically present anomalously high counts (usually identical
+ for each pixel in the row/column).  A facility is provided to check
+ frames for this problem, any such pixels are then flagged as having
+ bad data quality and omitted from consideration in the subsequent
+ processesing.
+<P>
+ As the presence of bad rows/columns is normally a static process
+ (i.e. all images from a particular chip exhibit the same bad
+ row/column), the package only examines one frame at the start of
+ the reduction.  This should be the object frame, as the check will
+ append a data quality array to the frame, and it needs to be
+ attached to the object frame to be 'seen' by subsequent processing.
+<P>
+ Checking for bad row/columns is disabled by default and may be
+ selected using the parameter TUNE_FCHECK.
+<P>
+ An additional parameter allows for 'saturated' pixels to also be
+ flagged as bad, by setting the parameter TUNE_SATRTN to the
+ threshold saturated pixel value.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

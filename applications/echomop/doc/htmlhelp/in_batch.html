@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: In_batch.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>In Batch</H2><HR>
+<P>
+ Batch procedures may be created in two ways.  Create an ICL
+ procedure to perform the required sequence, or edit a text
+ file containing the sequence.  ECHMENU provides an assisted
+ mode of operation which allows you to submit a set of ECHOMOP
+ commands using a single task invocation.  To use this the
+ TUNE_AUTOMATE parameter is set to an ASCII string holding
+ the numbers of the echmenu options required.
+<P>
+ For example;
+<P>
+<PRE WIDTH=72>
+    ECHMENU TUNE_AUTOMATE="1,2,3,4,5"  -other parameters</PRE>
+<P>
+ would start ECHOMOP and run the first five steps of the 'normal'
+ reduction sequence.  Note that any parameters required by the
+ steps chosen must be supplied on the command line.
+<P>
+ If you wish to use this strategy to submit batch procedures
+ then it is essential to ensure that all the prerequisites
+ for unattended processing are met:
+<P>
+<PRE WIDTH=72>
+    - all required parameters have values set
+    - the correct directory is set up as the current directory
+    - all data files are present and unprotected
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

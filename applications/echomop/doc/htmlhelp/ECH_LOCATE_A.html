@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_LOCATE_A.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_LOCATE</H1><HR>
+<P>
+<H2>Function</H2>
+Locate order positions at frame central column.
+<P>
+<H2>Summary</H2>
+ This routine locates the centres of the orders in an echellogram.
+ The central xbox columns are then sampled using a box
+ scaled according to the expected order size.  A triangle function
+ of appropriate dimension is then convolved with the array and
+ the resluting array is smoothed.  A search is then made for the
+ local peak values representing the approximate order centres.
+<P>
+ The central three columns of each order are examined and assumed
+ to be local peak intensities, the program then steps out above/below
+ each order until it reaches either: the next order, or a pixel
+ whose intensity falls below the threshold * peak intensity.
+ The 'threshold' being a tunable parameter (default 0.90 = 90%)
+<P>
+<H2>Available Topics</H2>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

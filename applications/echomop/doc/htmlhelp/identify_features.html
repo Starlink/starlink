@@ -1,0 +1,498 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Identify_features.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="guided_tour.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>10: Identify Features</H2><HR>
+<P>
+ Details for Order 2 have been removed to reduce the length of this
+ page!
+<P>
+<PRE WIDTH=72>
+ --------------------------------------------------------------------------- 
+ Starting processing task:     Identify features                (ECH_IDWAVE)
+<P>
+ARC_TYPE - Type of arc lamp used /'THAR'/ >
+ECH_FTRDB - Reference line list database /'THAR'/ >
+ Reading lines from /star/bin/echomop/arc/THAR.ARC
+WAVFIT - Specifies the wavelength fitting function to use /'POLY'/ >
+AUTO_ID - YES for fully automatic identification /TRUE/ >
+MIN_DISPERSION - Min dispersion (Units per pixel)to allow /2.E-02/ >
+MAX_DISPERSION - Max dispersion (Units per pixel)to allow /0.1/ >
+W_NPOLY - Number of coeffs of wavelength fitting function /7/ >
+LOW_WAVE - Lowest wavelength to search for arc lines /4200/ >
+HI_WAVE - Highest wavelength to search for arc lines /4500/ >
+CENTRAL_WAVE /0/ >
+CENTRAL_ONUM /0/ >
+<P>
+ Processing reference frame 1...
+ Wavelength search window limits set at 4200.0 to 4500.0.
+ --------------------------------------------------------------------------- 
+ Constraints for order    3
+ Searches set to use the strongest  16 features
+ Wavelength range from          4190.0 to          4510.0
+ Neighbours to be considered :   +/-  3
+ --------------------------------------------------------------------------- 
+ Checking for normal arc
+ Calculated    96 line-group component ratios
+ Candidate count for feature   3 is     0
+ Candidate count for feature   4 is     0
+ Candidate count for feature   5 is     5
+ Candidate count for feature   6 is     6
+ Candidate count for feature   7 is     3
+ Candidate count for feature   8 is     5
+ Candidate count for feature   9 is     8
+ Candidate count for feature  10 is     0
+ Candidate count for feature  11 is     2
+ Candidate count for feature  12 is     2
+ Candidate count for feature  13 is     0
+ Candidate count for feature  14 is     0
+ Best solution so far has   2 members
+                           Deviation from ideal = .845E-01
+                           Wavelengths around  4439.88
+ Best solution so far has   2 members
+                           Deviation from ideal = .791E-01
+                           Wavelengths around  4337.28
+ No solutions found, increasing active features
+ --------------------------------------------------------------------------- 
+ Constraints for order    3
+ Searches set to use the strongest  26 features
+ Wavelength range from          4190.0 to          4510.0
+ Neighbours to be considered :   +/-  3
+ --------------------------------------------------------------------------- 
+ Checking for normal arc
+ Calculated   186 line-group component ratios
+ Candidate count for feature   3 is     0
+ Candidate count for feature   4 is     0
+ Candidate count for feature   5 is     4
+ Candidate count for feature   6 is     7
+ Candidate count for feature   7 is    10
+ Candidate count for feature   8 is    23
+ Candidate count for feature   9 is     6
+ Candidate count for feature  10 is     5
+ Candidate count for feature  11 is     6
+ Candidate count for feature  12 is     7
+ Candidate count for feature  13 is    19
+ Candidate count for feature  14 is    15
+ Candidate count for feature  15 is    11
+ Candidate count for feature  16 is    12
+ Candidate count for feature  17 is     9
+ Candidate count for feature  18 is    17
+ Candidate count for feature  19 is     7
+ Candidate count for feature  20 is     6
+ Candidate count for feature  21 is     3
+ Candidate count for feature  22 is    13
+ Candidate count for feature  23 is     5
+ Candidate count for feature  24 is     0
+ Best solution so far has  14 members
+                           Deviation from ideal = .755E-01
+                           Wavelengths around  4400.99
+ Best solution so far has  14 members
+                           Deviation from ideal = .664E-01
+                           Wavelengths around  4401.58
+ Dispersion=        28.14149 from W=   4385.70 to    4458.19
+ RMS acceptable error level estimated at 0.3553E-01
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.38656E+03  2.68114E-02  2.83838E-05
+ -4.07036E-08  3.00273E-11 -1.12972E-14
+  1.72034E-18
+<P>
+ Mean dispersion    =  0.353564E-01 Angstroms/channel
+ Start wavelength   =  0.438659E+04 Angstroms
+ End wavelength     =  0.445871E+04 Angstroms
+ Central wavelength =  0.442221E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1     405.688    4400.097    4400.088      -0.009     0.00674
+   2     430.643    4400.986    4400.996       0.010     0.00719
+   3     446.847    4401.581    4401.586       0.005     0.00752
+   4     483.490    4402.927    4402.922      -0.004     0.00753
+   5     647.102    4408.883    4408.875      -0.007     0.00727
+   6     802.951    4414.486    4414.489       0.003     0.00770
+   7     869.173    4416.845    4416.855       0.010     0.00713
+   8    1015.314    4422.048    4422.044      -0.003     0.00769
+   9    1062.396    4423.720    4423.709      -0.011     0.00711
+  10    1246.504    4430.189    4430.197       0.008     0.00736
+  11    1269.364    4430.996    4431.001       0.005     0.00765
+  12    1304.823    4432.252    4432.247      -0.006     0.00751
+  13    1325.198    4432.963    4432.961      -0.001     0.00772
+  14    1511.036    4439.461    4439.474       0.013     0.00671
+  15    1535.858    4440.354    4440.342      -0.011     0.00690
+  16    1694.073    4445.901    4445.895      -0.006     0.00746
+  17    1778.367    4448.879    4448.885       0.006     0.00737
+  18    1879.919    4452.565    4452.563      -0.001     0.00737
+<P>
+ RMS error:  0.75539E-02
+<P>
+ Initial low degree fit > No. of lines =  18 Rms = 0.7554E-02
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.38679E+03  2.53791E-02  3.18683E-05
+ -4.49088E-08  3.26953E-11 -1.21480E-14
+  1.82806E-18
+<P>
+ Mean dispersion    =  0.352532E-01 Angstroms/channel
+ Start wavelength   =  0.438681E+04 Angstroms
+ End wavelength     =  0.445873E+04 Angstroms
+ Central wavelength =  0.442221E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1     405.688    4400.097    4400.090      -0.007     0.01002
+   2     430.643    4400.986    4400.996       0.010     0.01002
+   3     446.847    4401.581    4401.585       0.004     0.01023
+   4     483.490    4402.927    4402.920      -0.006     0.01013
+   5     636.394    4408.482    4408.486       0.003     0.01022
+   6     647.102    4408.883    4408.874      -0.009     0.01003
+   7     802.951    4414.486    4414.489       0.003     0.01024
+   8     869.173    4416.845    4416.854       0.010     0.00999
+   9    1015.314    4422.048    4422.042      -0.005     0.01019
+  10    1062.396    4423.720    4423.707      -0.014     0.00984
+  11    1094.365    4424.837    4424.835      -0.002     0.01024
+  12    1127.795    4426.001    4426.014       0.013     0.00983
+  13    1246.504    4430.189    4430.192       0.003     0.01025
+  14    1269.364    4430.996    4430.996       0.000     0.01026
+  15    1304.823    4432.252    4432.242      -0.011     0.01002
+  16    1325.198    4432.963    4432.957      -0.006     0.01018
+  17    1350.551    4433.838    4433.847       0.009     0.01007
+  18    1511.036    4439.461    4439.472       0.011     0.00994
+  19    1535.858    4440.354    4440.342      -0.012     0.00997
+  20    1551.218    4440.866    4440.880       0.014     0.00978
+  21    1630.930    4443.666    4443.676       0.010     0.00998
+  22    1668.744    4445.034    4445.006      -0.028     0.00831
+  23    1694.073    4445.901    4445.899      -0.002     0.01023
+  24    1778.367    4448.879    4448.892       0.013     0.00985
+  25    1831.221    4450.804    4450.794      -0.010     0.00992
+  26    1879.919    4452.565    4452.573       0.008     0.01004
+  27    2021.888    4458.001    4458.000      -0.001     0.01012
+<P>
+ RMS error:  0.10065E-01
+<P>
+ Full nth degree fit > No. of lines =  27 Rms = 0.1006E-01
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.38679E+03  2.53791E-02  3.18683E-05
+ -4.49088E-08  3.26953E-11 -1.21480E-14
+  1.82806E-18            5
+<P>
+ Mean dispersion    =  0.352532E-01 Angstroms/channel
+ Start wavelength   =  0.438681E+04 Angstroms
+ End wavelength     =  0.445873E+04 Angstroms
+ Central wavelength =  0.442221E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1     405.688    4400.097    4400.090      -0.007     0.01002
+   2     430.643    4400.986    4400.996       0.010     0.01002
+   3     446.847    4401.581    4401.585       0.004     0.01023
+   4     483.490    4402.927    4402.920      -0.006     0.01013
+   5     636.394    4408.482    4408.486       0.003     0.01022
+   6     647.102    4408.883    4408.874      -0.009     0.01003
+   7     802.951    4414.486    4414.489       0.003     0.01024
+   8     869.173    4416.845    4416.854       0.010     0.00999
+   9    1015.314    4422.048    4422.042      -0.005     0.01019
+  10    1062.396    4423.720    4423.707      -0.014     0.00984
+  11    1094.365    4424.837    4424.835      -0.002     0.01024
+  12    1127.795    4426.001    4426.014       0.013     0.00983
+  13    1246.504    4430.189    4430.192       0.003     0.01025
+  14    1269.364    4430.996    4430.996       0.000     0.01026
+  15    1304.823    4432.252    4432.242      -0.011     0.01002
+  16    1325.198    4432.963    4432.957      -0.006     0.01018
+  17    1350.551    4433.838    4433.847       0.009     0.01007
+  18    1511.036    4439.461    4439.472       0.011     0.00994
+  19    1535.858    4440.354    4440.342      -0.012     0.00997
+  20    1551.218    4440.866    4440.880       0.014     0.00978
+  21    1630.930    4443.666    4443.676       0.010     0.00998
+  22    1668.744    4445.034    4445.006      -0.028     0.00831
+  23    1694.073    4445.901    4445.899      -0.002     0.01023
+  24    1778.367    4448.879    4448.892       0.013     0.00985
+  25    1831.221    4450.804    4450.794      -0.010     0.00992
+  26    1879.919    4452.565    4452.573       0.008     0.01004
+  27    2021.888    4458.001    4458.000      -0.001     0.01012
+<P>
+ RMS error:  0.10065E-01
+<P>
+ Dispersion=         0.03525 from W=   4386.81 to    4458.73
+ RMS deviations (target : actual) 0.8884E-02 : 0.1006E-01
+ Probably a GOOD identification
+ Wavelength fit accepted
+ --------------------------------------------------------------------------- 
+ Constraints for order    1
+ Searches set to use the strongest  16 features
+ Wavelength range from          4190.0 to          4510.0
+ Neighbours to be considered :   +/-  3
+ --------------------------------------------------------------------------- 
+ Checking for normal arc
+ Calculated    96 line-group component ratios
+ Candidate count for feature   3 is     1
+ Candidate count for feature   4 is     3
+ Candidate count for feature   5 is     0
+ Candidate count for feature   6 is    10
+ Candidate count for feature   7 is    23
+ Candidate count for feature   8 is     8
+ Candidate count for feature   9 is    16
+ Candidate count for feature  10 is    30
+ Candidate count for feature  11 is    18
+ Candidate count for feature  12 is    33
+ Candidate count for feature  13 is     8
+ Candidate count for feature  14 is     5
+ Best solution so far has   8 members
+                           Deviation from ideal = .579E-01
+                           Wavelengths around  4250.31
+ Dispersion=        29.49652 from W=   4221.15 to    4290.31
+ RMS acceptable error level estimated at 0.3390E-01
+<P>
+  5th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.22304E+03  2.06798E-02  2.77626E-05
+ -2.50898E-08  1.03266E-11 -1.59598E-15
+<P>
+ Mean dispersion    =  0.329204E-01 Angstroms/channel
+ Start wavelength   =  0.422306E+04 Angstroms
+ End wavelength     =  0.429022E+04 Angstroms
+ Central wavelength =  0.425581E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1     259.114    4229.870    4229.868      -0.002     0.00511
+   2     483.940    4237.220    4237.228       0.007     0.00579
+   3     860.128    4250.314    4250.299      -0.015     0.01350
+   4     885.286    4251.185    4251.170      -0.015     0.01375
+   5    1033.430    4256.254    4256.265       0.011     0.01431
+   6    1069.973    4257.496    4257.511       0.015     0.01381
+   7    1124.998    4259.362    4259.381       0.019     0.01324
+   8    1329.422    4266.286    4266.274      -0.012     0.01414
+   9    1336.578    4266.527    4266.515      -0.012     0.01417
+  10    1539.801    4273.357    4273.343      -0.014     0.01371
+  11    1664.642    4277.528    4277.554       0.026     0.00898
+  12    1796.950    4282.041    4282.032      -0.009     0.00557
+<P>
+ RMS error:  0.14189E-01
+<P>
+ Initial low degree fit > No. of lines =  12 Rms = 0.1419E-01
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.22306E+03  2.00932E-02  3.06622E-05
+ -3.06201E-08  1.52718E-11 -3.69146E-15
+  3.40420E-19
+<P>
+ Mean dispersion    =  0.329537E-01 Angstroms/channel
+ Start wavelength   =  0.422308E+04 Angstroms
+ End wavelength     =  0.429031E+04 Angstroms
+ Central wavelength =  0.425580E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1      25.528    4223.593    4223.595       0.002     0.00907
+   2     259.114    4229.870    4229.860      -0.010     0.00893
+   3     483.940    4237.220    4237.241       0.021     0.00886
+   4     804.687    4248.391    4248.381      -0.009     0.01146
+   5     860.128    4250.314    4250.304      -0.011     0.01144
+   6     873.323    4250.775    4250.760      -0.015     0.01119
+   7     885.286    4251.185    4251.174      -0.011     0.01141
+   8     954.063    4253.538    4253.543       0.005     0.01162
+   9    1003.965    4255.237    4255.254       0.017     0.01104
+  10    1019.508    4255.797    4255.786      -0.011     0.01142
+  11    1033.430    4256.254    4256.261       0.007     0.01158
+  12    1069.973    4257.496    4257.507       0.011     0.01139
+  13    1099.970    4258.520    4258.527       0.007     0.01150
+  14    1124.998    4259.362    4259.377       0.015     0.01119
+  15    1153.242    4260.333    4260.334       0.001     0.01166
+  16    1329.422    4266.286    4266.275      -0.011     0.01141
+  17    1336.578    4266.527    4266.516      -0.011     0.01142
+  18    1504.882    4272.169    4272.173       0.004     0.01161
+  19    1525.509    4272.874    4272.867      -0.007     0.01155
+  20    1539.801    4273.357    4273.348      -0.009     0.01149
+  21    1664.642    4277.528    4277.558       0.030     0.00929
+  22    1687.107    4278.323    4278.317      -0.006     0.01158
+  23    1753.429    4280.568    4280.563      -0.005     0.01161
+  24    1768.199    4281.068    4281.064      -0.004     0.01157
+  25    1796.950    4282.041    4282.040      -0.001     0.01165
+  26    1822.269    4282.898    4282.899       0.001     0.01160
+<P>
+ RMS error:  0.11425E-01
+<P>
+ Re-evaluating after a clip
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.22306E+03  2.02404E-02  2.97560E-05
+ -2.85196E-08  1.30176E-11 -2.56129E-15
+  1.26785E-19
+<P>
+ Mean dispersion    =  0.328810E-01 Angstroms/channel
+ Start wavelength   =  0.422308E+04 Angstroms
+ End wavelength     =  0.429016E+04 Angstroms
+ Central wavelength =  0.425580E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1      25.528    4223.593    4223.595       0.001     0.00695
+   2     259.114    4229.870    4229.861      -0.009     0.00680
+   3     483.940    4237.220    4237.238       0.018     0.00663
+   4     804.687    4248.391    4248.382      -0.009     0.00932
+   5     860.128    4250.314    4250.305      -0.010     0.00929
+   6     873.323    4250.775    4250.761      -0.014     0.00911
+   7     885.286    4251.185    4251.175      -0.010     0.00920
+   8     954.063    4253.538    4253.544       0.006     0.00940
+   9    1003.965    4255.237    4255.254       0.017     0.00876
+  10    1019.508    4255.797    4255.786      -0.011     0.00924
+  11    1033.430    4256.254    4256.261       0.007     0.00943
+  12    1069.973    4257.496    4257.507       0.011     0.00927
+  13    1099.970    4258.520    4258.526       0.006     0.00941
+  14    1124.998    4259.362    4259.375       0.014     0.00900
+  15    1153.242    4260.333    4260.333       0.000     0.00946
+  16    1329.422    4266.286    4266.273      -0.013     0.00899
+  17    1336.578    4266.527    4266.514      -0.013     0.00903
+  18    1504.882    4272.169    4272.177       0.008     0.00933
+  19    1525.509    4272.874    4272.873      -0.001     0.00955
+  20    1539.801    4273.357    4273.354      -0.003     0.00953
+  21    1687.107    4278.323    4278.328       0.004     0.00945
+  22    1753.429    4280.568    4280.570       0.002     0.00950
+  23    1768.199    4281.068    4281.069       0.001     0.00953
+  24    1796.950    4282.041    4282.040      -0.001     0.00948
+  25    1822.269    4282.898    4282.895      -0.003     0.00940
+<P>
+ RMS error:  0.92912E-02
+<P>
+ Re-evaluating after a clip
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.22307E+03  1.96479E-02  3.38292E-05
+ -3.75815E-08  2.19643E-11 -6.64714E-15
+  8.32260E-19
+<P>
+ Mean dispersion    =  0.330028E-01 Angstroms/channel
+ Start wavelength   =  0.422309E+04 Angstroms
+ End wavelength     =  0.429042E+04 Angstroms
+ Central wavelength =  0.425580E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1      25.528    4223.593    4223.593       0.000     0.00674
+   2     259.114    4229.870    4229.870       0.000     0.00678
+   3     804.687    4248.391    4248.396       0.006     0.00664
+   4     860.128    4250.314    4250.313      -0.002     0.00680
+   5     873.323    4250.775    4250.768      -0.007     0.00654
+   6     885.286    4251.185    4251.180      -0.005     0.00671
+   7     954.063    4253.538    4253.543       0.005     0.00673
+   8    1003.965    4255.237    4255.250       0.013     0.00614
+   9    1019.508    4255.797    4255.782      -0.016     0.00585
+  10    1033.430    4256.254    4256.256       0.002     0.00678
+  11    1069.973    4257.496    4257.501       0.005     0.00673
+  12    1099.970    4258.520    4258.521       0.001     0.00679
+  13    1124.998    4259.362    4259.371       0.009     0.00652
+  14    1153.242    4260.333    4260.329      -0.004     0.00677
+  15    1329.422    4266.286    4266.277      -0.009     0.00650
+  16    1336.578    4266.527    4266.519      -0.008     0.00650
+  17    1504.882    4272.169    4272.182       0.013     0.00610
+  18    1525.509    4272.874    4272.876       0.002     0.00680
+  19    1539.801    4273.357    4273.357       0.000     0.00682
+  20    1687.107    4278.323    4278.321      -0.002     0.00680
+  21    1753.429    4280.568    4280.564      -0.003     0.00678
+  22    1768.199    4281.068    4281.065      -0.003     0.00677
+  23    1796.950    4282.041    4282.041       0.000     0.00677
+  24    1822.269    4282.898    4282.902       0.004     0.00664
+<P>
+ RMS error:  0.66309E-02
+<P>
+ Full nth degree fit > No. of lines =  24 Rms = 0.6631E-02
+<P>
+  6th order polynomial fit
+<P>
+ Coefficients of fit are <P>
+  4.22307E+03  1.96479E-02  3.38292E-05
+ -3.75815E-08  2.19643E-11 -6.64714E-15
+  8.32260E-19
+<P>
+ Mean dispersion    =  0.330028E-01 Angstroms/channel
+ Start wavelength   =  0.422309E+04 Angstroms
+ End wavelength     =  0.429042E+04 Angstroms
+ Central wavelength =  0.425580E+04 Angstroms
+<P>
+           Line    Wavelength  Calculated Discrepancy    RMS if
+                               Wavelength                omitted
+<P>
+   1      25.528    4223.593    4223.593       0.000     0.00674
+   2     259.114    4229.870    4229.870       0.000     0.00678
+   3     804.687    4248.391    4248.396       0.006     0.00664
+   4     860.128    4250.314    4250.313      -0.002     0.00680 B
+   5     873.323    4250.775    4250.768      -0.007     0.00654
+   6     885.286    4251.185    4251.180      -0.005     0.00671
+   7     954.063    4253.538    4253.543       0.005     0.00673
+   8    1003.965    4255.237    4255.250       0.013     0.00614
+   9    1019.508    4255.797    4255.782      -0.016     0.00585
+  10    1033.430    4256.254    4256.256       0.002     0.00678
+  11    1069.973    4257.496    4257.501       0.005     0.00673
+  12    1099.970    4258.520    4258.521       0.001     0.00679
+  13    1124.998    4259.362    4259.371       0.009     0.00652
+  14    1153.242    4260.333    4260.329      -0.004     0.00677
+  15    1329.422    4266.286    4266.277      -0.009     0.00650
+  16    1336.578    4266.527    4266.519      -0.008     0.00650
+  17    1504.882    4272.169    4272.182       0.013     0.00610
+  18    1525.509    4272.874    4272.876       0.002     0.00680
+  19    1539.801    4273.357    4273.357       0.000     0.00682
+  20    1687.107    4278.323    4278.321      -0.002     0.00680
+  21    1753.429    4280.568    4280.564      -0.003     0.00678
+  22    1768.199    4281.068    4281.065      -0.003     0.00677
+  23    1796.950    4282.041    4282.041       0.000     0.00677
+  24    1822.269    4282.898    4282.902       0.004     0.00664
+<P>
+ RMS error:  0.66309E-02
+<P>
+ Dispersion=         0.03300 from W=   4223.09 to    4290.42
+ RMS deviations (target : actual) 0.8476E-02 : 0.6631E-02
+ Probably a GOOD identification
+ Wavelength fit accepted
+ Wavelength calibration image is upside-down
+ Calculated order search range specifications :
+ Order  1 is  53 : Search range   4207.4 to   4304.3 Angstroms
+ Order  2 is  52 : Search range   4288.3 to   4387.1 Angstroms
+ Order  3 is  51 : Search range   4372.4 to   4473.1 Angstroms
+ --------------------------------------------------------------------------- 
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="guided_tour.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:36 1996
+</ADDRESS>
+</BODY>
+</HTML>

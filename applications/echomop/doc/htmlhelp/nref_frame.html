@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Nref_frame.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>NREF_FRAME</H2><HR>
+<H2>Usage</H2>
+<H3>NREF_FRAME=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ The number of wavelength reference frames to be used.
+<P>
+ These will usually be arc spectra.  The default is a single frame,
+ but it is possible to use two frames which bracket the object
+ exposure in time.  In this case it is assumed that the shift
+ between exposures has been due to smooth variation, an assumption
+ which it is usually not possible to verify.
+<P>
+ Note: the names of all frames must be supplied in response to the
+ arc prompt when locating the reference features.  For example:
+<P>
+<PRE WIDTH=72>
+    ARC=<frame1>,<frame2>
+</PRE>
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:43 1996
+</ADDRESS>
+</BODY>
+</HTML>

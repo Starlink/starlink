@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_maxpoly.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_MAXPOLY</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_MAXPOLY=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ The maximum number of polynomial coefficients to be allowed for the
+ duration of this reduction.
+<P>
+ For POLY trace fits, the order of the polynomials used for each fit 
+ may be varied up to this limit, but may not be set to higher values.
+<P>
+ For SPLINE trace fits this is the maximum number of fit parameters
+ which can be used.  A high vale may be needed.  The number of 
+ parameters required is (knots+7)*2.
+<P>
+ The default value is 32, which should be acceptable in most cases.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:46 1996
+</ADDRESS>
+</BODY>
+</HTML>

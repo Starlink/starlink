@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Echarc_import_export.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>ECHARC import/export</H2><HR>
+<P>
+ In order to provide backward compatibility with the extensive
+ line fitting FIGARO ECHARC software, ECHOMOP has the ability to
+ import and export sets of line positions/identifications between
+ itself and ECHARC.
+<P>
+ These facilities are provided from the main menu of the ech_idwave
+ option/task.  The exchange of information takes place on two levels:
+<P>
+<UL>
+<LI>ECHARC requires an arc spectrum array organised on an
+     NX by number-of-orders basis, plus a set of order numbers
+     (1...n) in another array.
+<P>
+<LI>ECHARC requires an ASCII file listing the order number,
+     positions and wavelengths of all identified features.
+</UL>
+<P>
+ The first file is created by ECHOMOP ech_idwave, option XP.  The
+ name of the file should be given in response to the ECH_ECHAR prompt.
+ The second file has the name ECHARC.LIS and is placed in the
+ current directory automatically by XP.
+<P>
+ When starting ECHARC, give the first file name in response to the
+ IMAGE prompt.  You should respond YES to the PREVIOUS prompt and
+ the second file name should be given inreponse to the ARFILE
+ prompt.
+<P>
+ ECHARC also uses the arc line reference lists (i.e. /arctype/.ARC)
+ as ECHOMOP and the same file should of course be used with both
+ programs.
+<P>
+ Note that the ECHOMOP ECHARC export option must be used first in
+ order to create the sdf file required to use ECHARC, this must
+ be done even if no lines are identified before ECHARC is run.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

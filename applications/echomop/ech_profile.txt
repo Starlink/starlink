@@ -1,0 +1,15 @@
++---------------------------------------------------------------------------
+|
+|  Model object profile: ech_profile/echmenu option 7
+|  --------------------------------------------------
+|
+|  The program is now ready to model the object profile and generate
+|  extraction weights (for profile or optimal extractions).
+|
+|  The default profile model used is an all-order average and is assumed
+|  to be constant over the frame.  An optional wavelength-dependent
+|  polynomial fit is also available for cases were the profile varies
+|  from order to order, or within an order.  This may also be useful
+|  for cases were the order traces are imperfect.
+|
++---------------------------------------------------------------------------

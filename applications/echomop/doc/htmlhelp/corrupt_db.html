@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Corrupt_db.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Corrupt_db</H2><HR>
+<P>
+ A 'read' operation on the arc line database has failed.  The most
+ likely cause is that an inadvertent database creation has been
+ performed which has resulted in an incomplete copy of the database.
+ Check the database files using
+<P>
+<PRE WIDTH=72>
+    hdstrace -arc-list-type</PRE>
+<P>
+ and delete any files which produce errors.  You may have to
+ regenerate the database or copy it from the $ARCDIRS directory.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

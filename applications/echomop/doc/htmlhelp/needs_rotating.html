@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Needs_rotating.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Needs_rotating</H2><HR>
+<P>
+ A data frame has been specified whose dimensions are orthogonal to
+ those of an already processed frame for this reduction.
+<P>
+ The most likely cause is that one of the frames has been rotated and
+ the other not.  The required frame geometry for the package is to
+ have the orders long axis aligned with the horizontal (X-axis).  The
+ solution is to ensure that all frames are consistent and then
+ re-start the reduction.  In the case that the first frame specified
+ needs to be rotated then the reduction process must be re-started
+ from the beginning using a new reduction file (delete the current
+ reduction file).  In the case that that the first frame specified
+ was OK, then simply correcting the other frame and continuing with
+ the reduction will suffice.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

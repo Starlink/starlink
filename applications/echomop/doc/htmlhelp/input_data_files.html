@@ -1,0 +1,67 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Input_data_files.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echomop.html">Previous topic</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>Input Data Files</H1><HR>
+<H2>Summary</H2>
+<P>
+ ECHOMOP performs most of its data access via Starlink subroutine
+ libraries.  All data frames are assumed to be contained in Starlink
+ sdf files.  The data themselves being stored in a 2-dimensional
+ array accessible via the path
+<P>
+<PRE WIDTH=72>
+    /filename/.NDF.DATA_ARRAY
+</PRE>
+<P>
+ A few ASCII format files are also read by the package:
+<P>
+<UL>
+<LI>/arctype/.ARC - Line list files are stored in ASCII format
+      for ease of maintenance.  ECHOMOP reads the line list(s) and
+      creates its own proprietary file format.
+<P>
+<LI>ECHARC.LIS - A list of identified features and their
+      properties.  Used for data exchange with the ECHARC program.
+<P>
+</UL>
+ A few container files are also read by the package:
+<P>
+<UL>
+<LI>/name/.sdf - These Feature databases are created by ECHOMOP
+      using the arc line lists as input.  A feature database
+      describes the relationship of each feature (arc line) to its
+      nearest neighbours and is used in automatic identification.
+</UL>
+<H2>Available Topics</H2>
+<A HREF="arc_line_lists.html">Arc_line_lists</A> * 
+<A HREF="calibration_tables.html">Calibration_tables</A> * 
+<A HREF="data_frame_format.html">Data_frame_format</A> * 
+<A HREF="definition_file.html">Definition_file</A> * 
+<A HREF="flux_calibration_frames.html">Flux_calibration_frames</A> * 
+<A HREF="multiple_arc_frames.html">Multiple_arc_frames</A> * 
+<A HREF="multiple_object_frames.html">Multiple_object_frames</A> * 
+<A HREF="reduction_file.html">Reduction_file</A> * 
+<A HREF="saving_disk_space.html">Saving_disk_space</A></H3>
+<P>
+<HR>
+<B><A HREF="echomop.html">Previous topic</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

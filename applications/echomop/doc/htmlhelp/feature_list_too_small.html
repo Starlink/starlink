@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Feature_list_too_small.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Feature_list_too_small</H2><HR>
+<P>
+ The package uses a special arc line information database to
+ optimise its search algorithm.  This algorithm requires sets of
+ about 12 lines with which to work.  The database consists of lines
+ and their 10 nearest neighbours on each side (left and right).
+<P>
+ The arc line list supplied (.ARC file) does not contain sufficient
+ lines for the database to be useful.  Either more lines must be
+ added to the list, or another program (such as ECHARC) must be used
+ for the line identification phase.  It is permissible to add dummy
+ entries to the line list just to overcome this limitation, however,
+ in this case it is unlikely that automatic identification will work
+ and the program will probably need to be run interactively.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,71 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model flat field.                (ECH_FFIELD)
+
+ Processing order 1...
+ Using 10-pixel local medians at 9 pixels below trace.
+ Using 10-pixel local medians at 8 pixels below trace.
+ Using 10-pixel local medians at 7 pixels below trace.
+ Using 10-pixel local medians at 6 pixels below trace.
+ Using 10-pixel local medians at 5 pixels below trace.
+ Using 10-pixel local medians at 4 pixels below trace.
+ Using 10-pixel local medians at 3 pixels below trace.
+ Using 10-pixel local medians at 2 pixels below trace.
+ Using 10-pixel local medians at 1 pixel below trace.
+ Using 10-pixel local medians at centre of trace.
+ Using 10-pixel local medians at 1 pixel above trace.
+ Using 10-pixel local medians at 2 pixels above trace.
+ Using 10-pixel local medians at 3 pixels above trace.
+ Using 10-pixel local medians at 4 pixels above trace.
+ Using 10-pixel local medians at 5 pixels above trace.
+ Using 10-pixel local medians at 6 pixels above trace.
+ Using 10-pixel local medians at 7 pixels above trace.
+ Using 10-pixel local medians at 8 pixels above trace.
+ Using 10-pixel local medians at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ Processing order 2...
+ Using 10-pixel local medians at 9 pixels below trace.
+ Using 10-pixel local medians at 8 pixels below trace.
+ Using 10-pixel local medians at 7 pixels below trace.
+ Using 10-pixel local medians at 6 pixels below trace.
+ Using 10-pixel local medians at 5 pixels below trace.
+ Using 10-pixel local medians at 4 pixels below trace.
+ Using 10-pixel local medians at 3 pixels below trace.
+ Using 10-pixel local medians at 2 pixels below trace.
+ Using 10-pixel local medians at 1 pixel below trace.
+ Using 10-pixel local medians at centre of trace.
+ Using 10-pixel local medians at 1 pixel above trace.
+ Using 10-pixel local medians at 2 pixels above trace.
+ Using 10-pixel local medians at 3 pixels above trace.
+ Using 10-pixel local medians at 4 pixels above trace.
+ Using 10-pixel local medians at 5 pixels above trace.
+ Using 10-pixel local medians at 6 pixels above trace.
+ Using 10-pixel local medians at 7 pixels above trace.
+ Using 10-pixel local medians at 8 pixels above trace.
+ Using 10-pixel local medians at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ Processing order 3...
+ Using 10-pixel local medians at 9 pixels below trace.
+ Using 10-pixel local medians at 8 pixels below trace.
+ Using 10-pixel local medians at 7 pixels below trace.
+ Using 10-pixel local medians at 6 pixels below trace.
+ Using 10-pixel local medians at 5 pixels below trace.
+ Using 10-pixel local medians at 4 pixels below trace.
+ Using 10-pixel local medians at 3 pixels below trace.
+ Using 10-pixel local medians at 2 pixels below trace.
+ Using 10-pixel local medians at 1 pixel below trace.
+ Using 10-pixel local medians at centre of trace.
+ Using 10-pixel local medians at 1 pixel above trace.
+ Using 10-pixel local medians at 2 pixels above trace.
+ Using 10-pixel local medians at 3 pixels above trace.
+ Using 10-pixel local medians at 4 pixels above trace.
+ Using 10-pixel local medians at 5 pixels above trace.
+ Using 10-pixel local medians at 6 pixels above trace.
+ Using 10-pixel local medians at 7 pixels above trace.
+ Using 10-pixel local medians at 8 pixels above trace.
+ Using 10-pixel local medians at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: No_cloneable_object.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>No_cloneable_object</H2><HR>
+<P>
+ The program is unable to copy reduction structure objects from the
+ specified reduction structure file.
+<P>
+ The possible causes are that the object in question does not exist
+ in the reduction file specified (either using TUNE_CLONE or the '<'
+ indirection operator in echmenu), or that the object is dimensioned
+ differently from the corresponding object in the primary reduction
+ structure file.  Objects can only be copied when their
+ dimensionalities are identical (i.e., they have the same number of
+ X-pixels, number of orders etc.)
+<P>
+ To check the dimensions of the object you are trying to clone from,
+ use the hdstrace command and the object path as reported by the
+ program.  If the only dimensions which differ are controlled by
+ TUNE_??? parameters, then you may adjust the relevant parameter to
+ allow the object to be successfully copied (Note that this in turn
+ may necessitate re-running parts of the reduction to re-generate
+ other objects also dimensioned using the same TUNE_??? parameter).
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

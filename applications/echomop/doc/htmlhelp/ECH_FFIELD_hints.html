@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FFIELD_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_FFIELD.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ A special mode of operation is triggered by setting the parameter
+ TUNE_FFNXPLY.  If the parameter is set to zero then no modelling in
+ the X-direction will be performed.  If the parameter is set to 1,
+ then no polynomials are used (would be constant), but the balance
+ factors are calculated using the local mean value based on a 5 pixel sample.  This will normally be used when the flat field at the
+ dekker limits cannot be modelled because its intensity changes too
+ rapidly on a scale of 1 pixel due to undersampling of the profile.
+<P>
+ In the situation where an independently produced balance factor
+ fram is used, this may be fed to ECHOMOP as the flat-field frame.
+ The parameter TUNE_PREBAL should then be set to YES.  In this
+ case the modelling will not take place and the balance factors will
+ simply be copied from the supplied frame.  This should be used for
+ special cases where the polynomial model cannot generate
+ appropriate values.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

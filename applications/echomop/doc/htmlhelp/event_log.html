@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Event_log.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="output_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Event Log</H2><HR>
+<P>
+ NOT IMPLEMENTED (except diagnostics).
+<P>
+ Although the major characteristics of a reduction are recorded in
+ the reduction file, it may also be useful to have an ASCII record
+ of the detailed sequence of events.  The event log file serves this
+ purpose.  The level of detail with which events are logged can be
+ adjusted to taste using the following parameters.  The available
+ classes being as follows:
+<P>
+<PRE WIDTH=72>
+    - TUNE_DIAGNOSE, used when a bug is suspected to log information
+      of potential use to the maintainer of the package.
+<P>
+    - FULL, comprehensive event/problem/tuning/result/parameter
+      logging.  All categories except DIAGNOSTIC.
+<P>
+    - INTERACTIVE, all user input and task (to screen) output.
+<P>
+    - PROBLEM, all problem reports and the users choices.
+<P>
+    - TUNING, all performance/parameter tuning information.
+<P>
+    - PARAMETERS, values of all active parameters.
+<P>
+    - BRIEF, only major information such as data frame file
+      names are logged.
+<P>
+    - NONE, no logging file is produced. This option should not
+      be used in normal circumstances.
+</PRE>
+<P>
+ Logged messages consist of type tags followed by a variable length
+ message text.  They may be examined using any standard editor.
+<P>
+<P>
+<HR>
+<B><A HREF="output_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

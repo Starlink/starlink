@@ -1,0 +1,29 @@
+*+
+*  ECH_ECHAR.DEF
+*
+*	This file is used as input to data structure creation routines and 
+*	defines the format of the Echelle reduction specific data structure. 
+*
+*	The actual container file created is different depending upon the 
+*	environment being used. The following environments are currently 
+*	supported.
+*
+*		FIGARO  -  container file type is .DST
+*			   this file read by DSA_READ_STRUCT_DEF
+*			   data structure creation by DSA_CREATE_STRUCTURE
+*			   structure parameter setup by DSA_SET_STRUCT_VAR
+*
+*	Author	:	Dave Mills (UCL)
+*
+*	Date	:	27-Feb-1990
+*
+*	Version	:	1.0	27-FEB-90
+*                               Created prototype 
+*
+**REGISTERED PATH => ECHARC_REFFTR  FEATURE[nx,num_orders]
+**REGISTERED PATH => ECHARC_REFWAV  FEATWAVE[nx,num_orders]
+**REGISTERED PATH => ECHARC_ORDNUM  FEATORD[num_orders]
+**REGISTERED PATH => ECHARC_LABELX  XLABEL
+**REGISTERED PATH => ECHARC_LABELY  YLABEL
+**REGISTERED PATH => ECHARC_LABELZ  ZLABEL
+

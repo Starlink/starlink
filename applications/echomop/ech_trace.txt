@@ -1,0 +1,51 @@
++---------------------------------------------------------------------------
+|
+|  Order validation: ech_ordloc/echmenu option 1.1
+|  -----------------------------------------------
+|
+|  The program has now produced a graph of the variation of intensity
+|  up the central column of the trace frame. It also indicates where
+|  it has located any orders. The user normally has the opportunity to
+|  correct any bad identifications by using the graphics cursor
+|  and the commands  A (to add an order), D (to delete an order).
+|
+|  Once the displayed order positions are validated, then typing
+|  E will cause the program to accept them. (For situations where
+|  the user is confident that the programs identifications will be
+|  reliable (and for BATCH/DEMO use), this graphics interaction has been
+|  disabled by using the parameter TUNE_AUTLOC=YES.)
+|  The positions (rows) of the orders are then listed and an
+|  estimate of the width of the orders is made.
+|
++---------------------------------------------------------------------------
+|
+|  The program then displayed an abbreviated version of
+|  the main menu. This abbreviated form is used from now on, EXCEPT
+|  when a full menu is explicitly requested by the user, or after
+|  detailed HELP has been given on a menu topic. The abbreviated
+|  menu consists of the previous/current/next suggested options,
+|  along with any closely related options (which will typically
+|  provide additional functionality/diagnostics), plus general utilities.
+|  The program has also altered its suggested next option to
+|  number 2 - Trace the orders, and to accept this choice we
+|  need only to hit Y<return>.
+|
+|  The tracing option prompts for parameters which control the
+|  process. The second prompt is for the number of polynomial
+|  coefficients to use in fitting the order traces.
+|
++---------------------------------------------------------------------------
+|
+|  Order tracing: ech_trace/echmenu option 2
+|  -----------------------------------------
+|
+|  The program then prompts for values for other tracing control
+|  parameters.  The demo accepts the default values as these will
+|  normally produce decent traces.  A large number of different
+|  methods for tracing orders are supported.
+|
+|  Once the necessary parameters have been supplied the program
+|  traces each order in turn (starting at lowest Y value) and
+|  reports on the sucess of each trace.
+|
++---------------------------------------------------------------------------

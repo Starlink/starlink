@@ -1,0 +1,25 @@
+#!bin/sh
+#   This command procedure packages an output .SDF file created by ECH_RESULT.
+#   It adds the instrument specific header info from the raw data file,
+#   and some info from the reduction structure, and then mails an archive
+#   request to the ECH_SUPPORT_SITE (Environment variable).
+# 
+#   Invoked by ECHMENU/ECH_RESULT with parameters
+# 
+# 	P1	Name of reduction structure file
+# 	P2	Name of ECH_RESULT output file (.SDF)
+# 	P3	Name of Object .SDF file
+# 	P4      AA Abstracts category code (Eg. 120=Spectroscopic Binaries)
+# 
+# 
+#   Use Object as basis to make sure all header info is included
+# 
+cp $2.sdf ${4}_${USER}_EAFSPEC.sdf
+cp $3.sdf ${4}_${USER}_EAFOBJ.sdf
+# 
+compress ${4}_${USER}_EAFSPEC.sdf
+compress ${4}_${USER}_EAFOBJ.sdf
+# 
+uucp -ndmills ${4}_${USER}_EAFSPEC.sdf zuaxp1.star.ucl.ac.uk\!~/archive/${4}_${USER}_EAFSPEC.sdf
+uucp -ndmills ${4}_${USER}_EAFOBJ.sdf zuaxp1.star.ucl.ac.uk\!~/archive/${4}_${USER}_EAFOBJ.sdf
+#

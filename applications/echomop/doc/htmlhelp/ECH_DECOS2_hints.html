@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_DECOS2_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_DECOS2.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ The algorithm used relies on the input frame being in the
+ following state (the standard for all ECHOMOP processes).
+<P>
+<UL>
+<LI>No pre-processing has been performed which
+    impacts on pixel intensities.
+<LI>The Bias has been subtracted.
+<LI>The readout-noise is known.
+<LI>The ADU-to-electron conversion ratio is known.
+</UL>
+<P>
+ If the above conditions can not be satisfied then the algorithm
+ will probably be unable to reliably detect the faintest cosmic
+ ray pixels and the acceptance of final fit probability will have
+ to be set very low, however, the majority of cosmic ray pixels
+ will still be detected and flagged correctly.
+<P>
+ If you have many `identical' object frames then these may
+ be processed together to provide a more reliable cosmic-ray
+ rejection.  The script
+<P>
+<PRE WIDTH=72>
+    $ECHOMOP_SOURCE/decos_many
+</PRE>
+<P>
+ provides this facility and should be the preferred method when
+ multiple frames are available.
+<P>
+ The procedure calculates a median image and then rejects pixels
+ which deviate by more than n sigma from the median value (note
+ that this means that all the frames must be of equal exposure
+ time).  Bad pixels are flagged by placing values in the quality
+ array of the frame concerned.
+<P>
+<P>
+<HR>
+<B><A HREF="ECH_DECOS2.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

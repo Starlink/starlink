@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_skvrcorr.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_SKVRCORR</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_SKVRCORR=_LOGICAL</H3>
+<H2>Description</H2>
+<P>
+ When this parameter is set to YES then weights are modified to
+ include uncertainty in sky fit optimal variances equivalent to
+ maximising:
+<P>
+<PRE WIDTH=72>
+    sum over I [W(I)**2 * V(I)] + sum over I,J [W(I)*W(J)*V(I,J)]
+    ------------------------------------------------------------                         ( sum W(I) * F(I) )**2
+</PRE>
+<P>
+ where:
+<P>
+<PRE WIDTH=72>
+    W(I) is the weight on pixel I
+    V(I) is the variance on the value of pixel I
+    V(I,J) is the covariance of the skyfit between pixels I and J
+    F(I) is the normalised profile at pixel I
+</PRE>
+<P>
+ This reduces to solving:
+<P>
+<PRE WIDTH=72>
+    A(I,J) W(J) = F(I)
+</PRE>
+<P>
+ where:
+<P>
+<PRE WIDTH=72>
+    A(I,J) = V(I,J) I not equal to J and
+    A(I,I) = V(I) + V(I,J)
+</PRE>
+<P>
+ This option is slow as it is computationally intensive.
+<P>
+<P>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

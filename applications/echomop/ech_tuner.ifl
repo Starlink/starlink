@@ -1,0 +1,720 @@
+  interface ECH_TUNER
+    parameter ANYLOGICAL
+        keyword     ' '
+        type        '_LOGICAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYSTRING
+        keyword     ' '
+        type        '_CHAR'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYNUMBER
+        keyword     ' '
+        type        '_REAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter IDX_NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of arc reference images'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NREF_FRAME'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NREF_FRAME'
+    endparameter
+
+    parameter IDX_NUM_ORDERS
+        type        '_INTEGER'
+        prompt      'Number of orders in echellogram'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NUM_ORDERS'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NUM_ORDERS'
+    endparameter
+
+    parameter TUNE_CLONE
+        type        '_CHAR'
+        prompt      'Reduction data file to copy from'
+        default     'NULL'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.TUNE_CLONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLONE'
+    endparameter
+
+    parameter TUNE_YZONE
+        type        '_INTEGER'
+        prompt      'Number of vertical image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_YZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_YZONE'
+    endparameter
+
+    parameter TUNE_XZONE
+        type        '_INTEGER'
+        prompt      'Number of horizontal image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_XZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XZONE'
+    endparameter
+
+    parameter TUNE_REPORT
+        type        '_CHAR'
+        prompt      'Specifies reporting modes'
+        default     ' '
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_REPORT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_REPORT'
+    endparameter
+
+    parameter TUNE_AUTOMATE
+        type        '_CHAR'
+        prompt      'Specifies automated processing sequence'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_AUTOMATE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTOMATE'
+    endparameter
+
+    parameter TUNE_QUICK
+        type        '_LOGICAL'
+        prompt      'YES for Quick-look operation'
+        default     NO
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_QUICK'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUICK'
+    endparameter
+
+    parameter TUNE_BATCH
+        type        '_LOGICAL'
+        prompt      'YES for batch-mode operation'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,global,noprompt'
+        association '<->echmenu.TUNE_BATCH'
+        help        '%ECHOMOP_HELP: TUNING TUNE_BATCH'
+    endparameter
+
+    parameter TUNE_PAGE
+        type        '_INTEGER'
+        prompt      'Number of lines per page of output'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_PAGE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PAGE'
+    endparameter
+
+    parameter DISPLAY
+        type        '_LOGICAL'
+        prompt      'YES to overlay plots on images'
+        default     NO
+        ppath       'current,default,global'
+        vpath       'current,global'
+        association '<->echmenu.DISPLAY'
+        help        '%ECHOMOP_HELP: USER_PAR DISPLAY'
+    endparameter
+
+    parameter HARD
+        type        '_CHAR'
+        prompt      'Produce plot files for hardcopy output'
+        default     'NONE'
+        ppath       'current,default,global'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.HARD'
+        help        '%ECHOMOP_HELP: USER_PAR HARD'
+    endparameter
+
+    parameter SOFT
+        type        '_CHAR'
+        prompt      'Produce plots on screen'
+        ppath       'current'
+        vpath       'current,prompt'
+        association '<->echmenu.SOFT'
+        help        '%ECHOMOP_HELP: USER_PAR SOFT'
+    endparameter
+
+    parameter ECH_RDCTN
+        type        '_CHAR'
+        prompt      'Reduction database'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.ECH_RDCTN'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_RDCTN'
+    endparameter
+
+    parameter TUNE_AUTLOC
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES for automatic location of orders'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_AUTLOC'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTLOC'
+    endparameter
+
+    parameter TUNE_CLPBY
+        type        '_INTEGER'
+        prompt      'Number of points autoclip before re-fit'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CLPBY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPBY'
+    endparameter
+
+    parameter TUNE_CLPMXDEV
+        type        '_REAL'
+        prompt      'Maximum deviation from polynomial'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CLPMXDEV'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPMXDEV'
+    endparameter
+
+    parameter TUNE_CMWVDEV
+        type        '_REAL'
+        prompt      ''
+        default     1.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CMWVDEV'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CMWVDEV'
+    endparameter
+
+    parameter TUNE_CNSDEV
+        type        '_REAL'
+        prompt      'Maximum consistent deviation'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CNSDEV'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CNSDEV'
+    endparameter
+
+    parameter TUNE_DPRBTHR
+        type        '_REAL'
+        prompt      'Maximum probability for K-S test'
+        default     .9
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_DPRBTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DPRBTHR'
+    endparameter
+
+    parameter TUNE_CRCLEAN
+        type        '_LOGICAL'
+        prompt      'YES if Cosmic-Ray clean needed'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CRCLEAN'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRCLEAN'
+    endparameter
+
+    parameter TUNE_CRMAX
+        type        '_INTEGER'
+        prompt      'Maximum number of cosmic ray pixels'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CRMAX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRMAX'
+    endparameter
+
+    parameter TUNE_CRXBOX
+        type        '_INTEGER'
+        prompt      'X-size of box for median calculations'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CRXBOX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRXBOX'
+    endparameter
+
+    parameter TUNE_CRYBOX
+        type        '_INTEGER'
+        default     5
+        prompt      'Y-size of box for median calculations'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CRYBOX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRYBOX'
+    endparameter
+
+    parameter TUNE_CRINTER
+        type        '_LOGICAL'
+        prompt      'YES if interpolation is required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CRINTER'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRINTER'
+    endparameter
+
+    parameter TUNE_DEKTHR
+        type        '_REAL'
+        prompt      'Threshold for dekker location'
+        default     0.8
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_DEKTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DEKTHR'
+    endparameter
+
+    parameter TUNE_DIAGNOSE
+        type        '_LOGICAL'
+        prompt      'YES to log activity to debugging file'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.TUNE_DIAGNOSE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DIAGNOSE'
+    endparameter
+
+    parameter TUNE_DSGMTHR
+        type        '_REAL'
+        prompt      'Sigma threshold for clip'
+        default     2.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_DSGMTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DSGMTHR'
+    endparameter
+
+    parameter TUNE_FFINTER
+        type        '_LOGICAL'
+        prompt      'YES for interaction with flat field'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFINTER'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFINTER'
+    endparameter
+
+    parameter TUNE_FFNXPLY
+        type        '_INTEGER'
+        prompt      'Number of X coefficients'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFNXPLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNXPLY'
+    endparameter
+
+    parameter TUNE_FFNXREJ
+        type        '_INTEGER'
+        prompt      'Reject cycles for X fits'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFNXREJ'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNXREJ'
+    endparameter
+
+    parameter TUNE_FFNYPLY
+        type        '_INTEGER'
+        prompt      'Number of Y coefficients'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFNYPLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNYPLY'
+    endparameter
+
+    parameter TUNE_FFNYREJ
+        type        '_INTEGER'
+        prompt      'Reject cycles for Y fits'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFNYREJ'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNYREJ'
+    endparameter
+
+    parameter TUNE_FFTHRESH
+        type        '_REAL'
+        prompt      'Reject threshold in sigma'
+        default     10.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FFTHRESH'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFTHRESH'
+    endparameter
+
+    parameter TUNE_FINCPLY
+        type        '_INTEGER'
+        prompt      'Number of coefficients'
+        default     3
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FINCPLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FINCPLY'
+    endparameter
+
+    parameter TUNE_FLUX
+        type        '_LOGICAL'
+        prompt      'YES if flux is to be conserved'
+        default     YES
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_FLUX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FLUX'
+    endparameter
+
+    parameter TUNE_IDINMX
+        type        '_INTEGER'
+        prompt      'Maximum number of features used'
+        default     30
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IDINMX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDINMX'
+    endparameter
+
+    parameter TUNE_IDMDLT
+        type        '_INTEGER'
+        prompt      'Maximum neighbours to check'
+        default     6
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IDMDLT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDMDLT'
+    endparameter
+
+    parameter TUNE_IDMXDIF
+        type        '_REAL'
+        default     0.03
+        prompt      'Maximum ratio difference'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IDMXDIF'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDMXDIF'
+    endparameter
+
+    parameter TUNE_IDSDLT
+        type        '_INTEGER'
+        prompt      'Starting number of neighbours to check'
+        default     3
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IDSDLT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDSDLT'
+    endparameter
+
+    parameter TUNE_IDSTRNG
+        type        '_REAL'
+        prompt      'Minimum strength of identified lines'
+        default     15.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IDSTRNG'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDSTRNG'
+    endparameter
+
+    parameter TUNE_INSTR
+        type        '_CHAR'
+        prompt      'Instrument name'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_INSTR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_INSTR'
+    endparameter
+
+    parameter TUNE_INTR
+        type        '_LOGICAL'
+        prompt      'YES if linear interpolation required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_INTR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_INTR'
+    endparameter
+
+    parameter TUNE_LOG
+        type        '_LOGICAL'
+        prompt      'YES if output scale logarithmic'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_LOG'
+        help        '%ECHOMOP_HELP: TUNING TUNE_LOG'
+    endparameter
+
+    parameter TUNE_MAXPOLY
+        type        '_INTEGER'
+        prompt      'Maximum coefficients for fits'
+        default     50
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        association '<->echmenu.TUNE_MAXPOLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXPOLY'
+    endparameter
+
+    parameter TUNE_MAXRFLN
+        type        '_INTEGER'
+        prompt      'Maximum number of reference lines'
+        default     200
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MAXRFLN'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXRFLN'
+    endparameter
+
+    parameter TUNE_MXBADSMP
+        type        '_INTEGER'
+        prompt      'Maximum consecutive number of bad samples'
+        default     10
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MXBADSMP'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXBADSMP'
+    endparameter
+
+    parameter TUNE_MXSKYPIX
+        type        '_INTEGER'
+        prompt      'Maximum number of sky pixels'
+        default     21
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MXSKYPIX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXSKYPIX'
+    endparameter
+
+    parameter TUNE_MXSMP
+        type        '_INTEGER'
+        prompt      'Maximum number of X samples to trace'
+        default     500
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MXSMP'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXSMP'
+    endparameter
+
+    parameter TUNE_OBJPOLY
+        type        '_INTEGER'
+        prompt      'Degree of polynomial to use for object'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_OBJPOLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJPOLY'
+    endparameter
+
+    parameter TUNE_PFLSSAMP
+        type        '_INTEGER'
+        prompt      'Maximum number of subsamples in profile'
+        default     301
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_PFLSSAMP'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PFLSSAMP'
+    endparameter
+
+    parameter TUNE_QUAD
+        type        '_LOGICAL'
+        prompt      'YES if quadratic interpolation required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_QUAD'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUAD'
+    endparameter
+
+    parameter TUNE_RFLNTHR
+        type        '_REAL'
+        prompt      'Reference line lower threshold'
+        default     1.25
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_RFLNTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_RFLNTHR'
+    endparameter
+
+    parameter TUNE_SCFRACT
+        type        '_REAL'
+        prompt      'Fractional ratio for twin scales'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SCFRACT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SCFRACT'
+    endparameter
+
+    parameter TUNE_SCRADD
+        type        '_INTEGER'
+        prompt      'Number of bins to add together'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SCRADD'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SCRADD'
+    endparameter
+
+    parameter TUNE_SKEW
+        type        '_REAL'
+        prompt      'Skew shift in bins'
+        default     0.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKEW'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKEW'
+    endparameter
+
+    parameter TUNE_SKVRCORR
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES to apply sky variance correction'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKVRCORR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKVRCORR'
+    endparameter
+
+    parameter TUNE_SKYHILIM
+        type        '_REAL'
+        prompt      'Upper threshold for sky intensity'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYHILIM'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYHILIM'
+    endparameter
+
+    parameter TUNE_SKYPOLY
+        type        '_INTEGER'
+        prompt      'Degree of polynomial to use for sky'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYPOLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYPOLY'
+    endparameter
+
+    parameter TUNE_SKYREJ
+        type        '_INTEGER'
+        prompt      'Number of reject cycles'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYREJ'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYREJ'
+    endparameter
+
+    parameter TUNE_SKYRTHR
+        type        '_REAL'
+        prompt      'Reject threshold in sigma'
+        default     5.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYRTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYRTHR'
+    endparameter
+
+    parameter TUNE_SKYSIM
+        type        '_LOGICAL'
+        prompt      'YES for sky simulation to be used'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYSIM'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYSIM'
+    endparameter
+
+    parameter TUNE_SKYXPLY
+        type        '_INTEGER'
+        prompt      'Degree of X-polyonmial to use for sky'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYXPLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYXPLY'
+    endparameter
+
+    parameter TUNE_SKYLINW
+        type        '_INTEGER'
+        prompt      'Maximum expected sky line width'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYLINW'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYLINW'
+    endparameter
+
+    parameter TUNE_SKYLTHR
+        type        '_REAL'
+        prompt      'Sigma threshold for sky lines'
+        default     3.0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        association '<->echmenu.TUNE_SKYLTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYLTHR'
+    endparameter
+
+    parameter TUNE_TRCNS
+        type        '_REAL'
+        prompt      'Consistency requirement'
+        default     0.1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_TRCNS'
+        help        '%ECHOMOP_HELP: TUNING TUNE_TRCNS'
+    endparameter
+
+    parameter TUNE_TWTHR
+        type        '_REAL'
+        prompt      'Trace width threshold'
+        default     0.95
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_TWTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_TWTHR'
+    endparameter
+
+    parameter TUNE_USE_NXF
+        type        '_REAL'
+        prompt      'Fraction of X-samples to use in profile'
+        default     0.2
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_USE_NXF'
+        help        '%ECHOMOP_HELP: TUNING TUNE_USE_NXF'
+    endparameter
+
+    parameter TUNE_WVCNS
+        type        '_REAL'
+        prompt      'Fraction of inconsistency allowed'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_WVCNS'
+        help        '%ECHOMOP_HELP: TUNING TUNE_WVCNS'
+    endparameter
+
+    parameter TUNE_XBOX
+        type        '_INTEGER'
+        prompt      'Size of X-sampling box for order location'
+        default     20
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_XBOX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XBOX'
+    endparameter
+
+  endinterface

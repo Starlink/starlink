@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_automate.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_AUTOMATE</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_AUTOMATE=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ This hidden parameter allows multiple options to be automatically
+ invoked upon startup of the monolithic task.
+<P>
+ Any options required must be supplied on the command line or
+ the user will be prompted as usual.  For example:
+<P>
+<PRE WIDTH=72>
+    TUNE_AUTOMATE=1,2,3,EXIT
+</PRE>
+<P>
+ would run the first 3 processing options and then exit.
+<P>
+ If EXIT is not given as an option, ECHOMOP will start the menu task
+ ech_menu when the list of options specified by TUNE_AUTOMATE has
+ been exhausted.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:44 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,1517 @@
+  interface ECHMENU
+    parameter ANYLOGICAL
+        keyword     ' '
+        type        '_LOGICAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYSTRING
+        keyword     ' '
+        type        '_CHAR'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYNUMBER
+        keyword     ' '
+        type        '_REAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter IDX_NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of arc reference images'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NREF_FRAME'
+    endparameter
+
+    parameter IDX_NUM_ORDERS
+        type        '_INTEGER'
+        prompt      'Number of orders in echellogram'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NUM_ORDERS'
+    endparameter
+
+    parameter TUNE_CLONE
+        type        '_CHAR'
+        prompt      'Reduction data file to copy from'
+        default     'NULL'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLONE'
+    endparameter
+
+    parameter TUNE_YZONE
+        type        '_INTEGER'
+        prompt      'Number of vertical image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_YZONE'
+    endparameter
+
+    parameter TUNE_XZONE
+        type        '_INTEGER'
+        prompt      'Number of horizontal image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XZONE'
+    endparameter
+
+    parameter TUNE_REPORT
+        type        '_CHAR'
+        prompt      'Specifies reporting modes'
+        default     ' '
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_REPORT'
+    endparameter
+
+    parameter TUNE_AUTOMATE
+        type        '_CHAR'
+        prompt      'Specifies automated processing sequence'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTOMATE'
+    endparameter
+
+    parameter TUNE_QUICK
+        type        '_LOGICAL'
+        prompt      'YES for Quick-look operation'
+        default     NO
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUICK'
+    endparameter
+
+    parameter TUNE_BATCH
+        type        '_LOGICAL'
+        prompt      'YES for batch-mode operation'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_BATCH'
+    endparameter
+
+    parameter TUNE_PAGE
+        type        '_INTEGER'
+        prompt      'Number of lines per page of output'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PAGE'
+    endparameter
+
+    parameter DISPLAY
+        type        '_LOGICAL'
+        prompt      'YES to overlay plots on images'
+        default     NO
+        ppath       'current,default,global'
+        vpath       'current,global'
+        help        '%ECHOMOP_HELP: USER_PAR DISPLAY'
+    endparameter
+
+    parameter HARD
+        type        '_CHAR'
+        prompt      'Produce plot files for hardcopy output'
+        default     'NONE'
+        ppath       'current,default,global'
+        vpath       'current,default,global,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR HARD'
+    endparameter
+
+    parameter SOFT
+        type        '_CHAR'
+        prompt      'Produce plots on screen'
+        ppath       'current'
+        vpath       'current,prompt'
+        help        '%ECHOMOP_HELP: USER_PAR SOFT'
+    endparameter
+
+    parameter 2D_INTERACT
+        type        '_LOGICAL'
+        prompt      'YES for interactive 2-D polynomial fitting'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR 2D_INTERACT'
+    endparameter
+    parameter ARC
+        type        '_CHAR'
+        prompt      'Name(s) of reference (arc) lamp image(s)'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ARC'
+    endparameter
+
+    parameter ARC_TYPE
+        type        '_CHAR'
+        prompt      'Type of arc lamp used'
+        default     '$ARCDIRS/THAR.ARC'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ARC_TYPE'
+    endparameter
+
+    parameter ASCII_FILE
+        type        '_CHAR'
+        prompt      'Output ASCII file name'
+        ppath       'current,default'
+        vpath       'prompt'
+        default     'echomop_output.txt'
+        help        '%ECHOMOP_HELP: USER_PAR ASCII_FILE'
+    endparameter    
+
+    parameter BAD_ORDER
+        type        '_INTEGER'
+        prompt      'Number of order to disable'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR BAD_ORDER'
+    endparameter
+
+    parameter BIN_SIZE
+        type        '_REAL'
+        prompt      'Bin size for global scrunch'
+        default     0.0
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR BIN_SIZE'
+    endparameter
+
+    parameter BLZ_INTERACT
+        type        '_LOGICAL'
+        prompt      'YES for interactive blaze-fitting'
+        default     NO
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR BLZ_INTERACT'
+    endparameter
+
+    parameter BLZ_NPOLY
+        type        '_INTEGER'
+        prompt      'Number of coeffs of blaze fitting function'
+        default     7
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR BLZ_NPOLY'
+    endparameter
+
+    parameter BLZFIT
+        type        '_CHAR'
+        prompt      'Function for blaze fitting'
+        default     'POLY'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR BLZFIT'
+    endparameter
+
+    parameter CENTRAL_WAVE
+        type        '_REAL'
+        prompt      'Central wavelength'
+        default     0
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR CENTRAL_WAVE'
+    endparameter
+
+    parameter CENTRAL_ONUM
+        type        '_INTEGER'
+        prompt      'Central order number'
+        default     0
+        ppath       'current,default'
+        vpath       'current,default,prompt'
+        help        '%ECHOMOP_HELP: USER_PAR CENTRAL_ONUM'
+    endparameter
+
+    parameter DECIMG
+        type        '_CHAR'
+        prompt      'Name of image to be cleaned'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR DECIMG'
+    endparameter
+
+    parameter ECH_ECHAR
+        type        '_CHAR'
+        prompt      'ECHARC data file'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_ECHAR'
+    endparameter
+
+    parameter ECH_FTRDB
+        type        '_CHAR'
+        prompt      'Reference line list database'
+        default     '$ARCDIRS/THAR'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_FTRDB'
+    endparameter
+
+    parameter ECH_RDCTN
+        type        '_CHAR'
+        prompt      'Reduction database'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_RDCTN'
+    endparameter
+
+    parameter ECH_RDUCD
+        type        '_CHAR'
+        prompt      'Output spectrum data file'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_RDUCD'
+    endparameter    
+
+    parameter ECH_STRUCT
+        type        '_CHAR'
+        prompt      'Reduction structure definition file'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_STRUCT'
+    endparameter
+
+    parameter EXTRACT_MODE
+        type        '_CHAR'
+        prompt      'Extraction mode'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR EXTRACT_MODE'
+    endparameter
+
+    parameter FFIELD
+        type        '_CHAR'
+        prompt      'Name of flat-field image'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR FFIELD'
+    endparameter
+
+    parameter FLAG
+        type        '_REAL'
+        prompt      'Value to be used to flag pixels'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR FLAG'
+    endparameter
+
+    parameter FLTFIT
+        type        '_CHAR'
+        prompt      'Fitter for flat-field'
+        default     'MEAN'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR FLTFIT'
+    endparameter
+
+    parameter TUNE_FCHECK
+        type        '_LOGICAL'
+        prompt      'YES for frame checking enabled'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FCHECK'
+    endparameter
+
+    parameter HARDCOPY
+        type        '_LOGICAL'
+        prompt      'YES to produce plot as a hard copy'
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR HARDCOPY'
+    endparameter
+
+    parameter HELIO_COR
+        type        '_REAL'
+        prompt      'Heliocentric correction in Km/sec'
+        default     0.0
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR HELIO_COR'
+    endparameter
+
+    parameter HI_WAVE
+        type        '_REAL'
+        prompt      'Longest wavelength to search for arc lines'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR HI_WAVE'
+    endparameter
+
+    parameter AUTO_ID
+        type        '_LOGICAL'
+        prompt      'YES for fully automatic identification'
+        ppath       'current,default'
+        default     FALSE
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR AUTO_ID'
+    endparameter
+
+    parameter INPTIM
+        type        '_CHAR'
+        prompt      'Frame to extract data from'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR INPTIM'
+    endparameter
+
+    parameter LOW_WAVE
+        type        '_REAL'
+        prompt      'Shortest wavelength to search for arc lines'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR LOW_WAVE'
+    endparameter
+
+    parameter MAX_DISPERSION
+        type        '_REAL'
+        prompt      'Max dispersion (Units per pixel) allowed'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR MAX_DISPERSION'
+    endparameter
+
+    parameter MIN_DISPERSION
+        type        '_REAL'
+        prompt      'Min dispersion (Units per pixel) allowed'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR MIN_DISPERSION'
+    endparameter
+
+    parameter NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of wavelength reference frames'
+        default     1
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR NREF_FRAME'
+    endparameter
+
+    parameter NXBAD
+        type        '_INTEGER'
+        prompt      'Number of bad image columns'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING NXBAD'
+    endparameter
+
+    parameter NYBAD
+        type        '_INTEGER'
+        prompt      'Number of bad image rows'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING NYBAD'
+    endparameter
+
+    parameter NUM_ORDERS
+        type        '_INTEGER'
+        prompt      'Number of orders in echellogram'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR NUM_ORDERS'
+    endparameter
+
+    parameter OBJ_SKY_GAP
+        type        '_INTEGER'
+        prompt      'Gap between object and sky'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR OBJ_SKY_GAP'
+    endparameter
+
+    parameter OUTPUT_IMAGE
+        type        '_CHAR'
+        prompt      'Output image frame'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR OUTPUT_IMAGE'
+    endparameter
+
+    parameter OBJFIT
+        type        '_CHAR'
+        prompt      'Function for X-profile fit'
+        default     'POLY'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR OBJFIT'
+    endparameter
+
+    parameter PFL_INTERACT
+        type        '_LOGICAL'
+        prompt      'YES for interactive profiling'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR PFL_INTERACT'
+    endparameter
+
+    parameter PFL_MODE
+        type        '_CHAR'
+        prompt      'Profiling mode (D, S, O, A)'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR PFL_MODE'
+    endparameter
+
+    parameter PHOTON_TO_ADU
+        type        '_REAL'
+        prompt      'Conversion factor for photons'
+        default     1.0
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR PHOTON_TO_ADU'
+    endparameter
+
+    parameter READOUT_NOISE
+        type        '_REAL'
+        prompt      'Detector readout noise in counts'
+        default     0.0
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR READOUT_NOISE'
+    endparameter
+
+    parameter RESULT_FORMAT
+        type        '_CHAR'
+        prompt      'Output format required'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR RESULT_FORMAT'
+    endparameter
+
+    parameter RESULT_TYPE
+        type        '_CHAR'
+        prompt      'Type of result output required'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR RESULT_TYPE'
+    endparameter
+
+    parameter SCRUNCH_TYPE
+        type        '_CHAR'
+        prompt      'Type of spectrum to scrunch'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR SCRUNCH_TYPE'
+    endparameter
+
+    parameter SET_WSCALE
+        type        '_LOGICAL'
+        prompt      'YES to scrunch to a global bin size'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR SET_WSCALE'
+    endparameter
+
+    parameter SKYFIT
+        type        '_CHAR'
+        prompt      'Function for sky fitting'
+        default     'MEAN'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR SKYFIT'
+    endparameter
+
+    parameter SLITIM
+        type        '_CHAR'
+        prompt      'Frame for dekker measurement'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR SLITIM'
+    endparameter
+
+    parameter STACK
+        type        '_CHAR'
+        prompt      'Output DIPSO stack name'
+        ppath       'current,default'
+        vpath       'prompt'
+        default     'ECHOMOP'
+        help        '%ECHOMOP_HELP: USER_PAR STACK'
+    endparameter    
+
+    parameter STAR
+        type        '_CHAR'
+        prompt      'Name of calibration star image'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR STAR'
+    endparameter
+
+    parameter START_WAVE
+        type        '_REAL'
+        prompt      'Start wavelength for rebinned scale'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR START_WAVE'
+    endparameter
+
+    parameter TRACE_MODE
+        type        '_CHAR'
+        prompt      'Type of order tracing to use'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRACE_MODE'
+    endparameter
+
+    parameter TRACIM
+        type        '_CHAR'
+        prompt      'Frame for order tracing'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRACIM'
+    endparameter
+
+    parameter TRC_INTERACT
+        type        '_LOGICAL'
+        prompt      'YES for interactive order-fitting'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRC_INTERACT'
+    endparameter
+
+    parameter TRC_NPOLY
+        type        '_INTEGER'
+        prompt      'Number of coeffs of trace-fit function'
+        default     4
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRC_NPOLY'
+    endparameter
+
+    parameter TRC_VETO
+        type        '_LOGICAL'
+        prompt      'YES for interactive veto'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRC_VETO'
+    endparameter
+
+    parameter TRCFIT
+        type        '_CHAR'
+        prompt      'Function for trace fitting'
+        default     'POLY'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR TRCFIT'
+    endparameter
+
+    parameter TUNE_AAACODE
+        type        '_INTEGER'
+        prompt      'AAA category code'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AAACODE'
+    endparameter
+
+    parameter TUNE_AIRTOVAC
+        type        '_LOGICAL'
+        prompt      'YES to correct wavelengths'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AIRTOVAC'
+    endparameter
+
+    parameter TUNE_ARCHIVE
+        type        '_LOGICAL'
+        prompt      'YES to enable automatic archiving'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_ARCHIVE'
+    endparameter
+
+    parameter TUNE_AUTLOC
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES for automatic location of orders'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTLOC'
+    endparameter
+
+    parameter TUNE_BLZRSET
+        type        '_LOGICAL'
+        prompt      'YES if blaze function to be reset after use'
+        default     YES
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_BLZRSET'
+    endparameter
+
+    parameter TUNE_CLPBY
+        type        '_INTEGER'
+        prompt      'Number of points autoclip before re-fit'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPBY'
+    endparameter
+
+    parameter TUNE_CLPMXDEV
+        type        '_REAL'
+        prompt      'Maximum deviation from polynomial'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPMXDEV'
+    endparameter
+
+    parameter TUNE_CMWVDEV
+        type        '_REAL'
+        prompt      ''
+        default     1.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CMWVDEV'
+    endparameter
+
+    parameter TUNE_CNSDEV
+        type        '_REAL'
+        prompt      'Maximum consistent deviation'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CNSDEV'
+    endparameter
+
+    parameter TUNE_CRTRC
+        type        '_LOGICAL'
+        prompt      'YES for trace frame cosmic ray checking'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRTRC'
+    endparameter
+
+    parameter TUNE_DB_SCOPE
+        type        '_INTEGER'
+        prompt      'Scope of database neighbour scanning'
+        default     10
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DB_SCOPE'
+    endparameter
+
+    parameter TUNE_DIAGNOSE
+        type        '_LOGICAL'
+        prompt      'YES to log activity to debugging file'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DIAGNOSE'
+    endparameter
+
+    parameter TUNE_DPRBTHR
+        type        '_REAL'
+        prompt      'Maximum probability for K-S test'
+        default     .9
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DPRBTHR'
+    endparameter
+
+    parameter TUNE_CRCLEAN
+        type        '_LOGICAL'
+        prompt      'YES if Cosmic-Ray clean needed'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRCLEAN'
+    endparameter
+
+    parameter TUNE_CRMAX
+        type        '_INTEGER'
+        prompt      'Maximum number of cosmic ray pixels'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRMAX'
+    endparameter
+
+    parameter TUNE_CRXBOX
+        type        '_INTEGER'
+        prompt      'X-size of box for median calculations'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRXBOX'
+    endparameter
+
+    parameter TUNE_CRYBOX
+        type        '_INTEGER'
+        default     5
+        prompt      'Y-size of box for median calculations'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRYBOX'
+    endparameter
+
+    parameter TUNE_CRINTER
+        type        '_LOGICAL'
+        prompt      'YES if interpolation is required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CRINTER'
+    endparameter
+
+    parameter TUNE_DEKTHR
+        type        '_REAL'
+        prompt      'Threshold for dekker location'
+        default     0.8
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DEKTHR'
+    endparameter
+
+    parameter TUNE_DEKBLW
+        type        '_INTEGER'
+        prompt      'Dekker edge in pixels below trace'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DEKBLW'
+    endparameter
+
+    parameter TUNE_DEKABV
+        type        '_INTEGER'
+        prompt      'Dekker extent in pixels above trace'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DEKABV'
+    endparameter
+
+    parameter TUNE_DSGMTHR
+        type        '_REAL'
+        prompt      'Sigma threshold for clip'
+        default     2.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DSGMTHR'
+    endparameter
+
+    parameter TUNE_FFINTER
+        type        '_LOGICAL'
+        prompt      'YES for interaction with flat field'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFINTER'
+    endparameter
+
+    parameter TUNE_FFNXPLY
+        type        '_INTEGER'
+        prompt      'Number of X coefficients'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNXPLY'
+    endparameter
+
+    parameter TUNE_FFNXREJ
+        type        '_INTEGER'
+        prompt      'Reject cycles for X fits'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNXREJ'
+    endparameter
+
+    parameter TUNE_FFNYPLY
+        type        '_INTEGER'
+        prompt      'Number of Y coefficients'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNYPLY'
+    endparameter
+
+    parameter TUNE_FFNYREJ
+        type        '_INTEGER'
+        prompt      'Reject cycles for Y fits'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFNYREJ'
+    endparameter
+
+    parameter TUNE_FFSUBSMP
+        type        '_LOGICAL'
+        prompt      'YES for subsampling'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFSUBSMP'
+    endparameter
+
+    parameter TUNE_FFTHRESH
+        type        '_REAL'
+        prompt      'Reject threshold in sigma'
+        default     10.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFTHRESH'
+    endparameter
+
+    parameter TUNE_FFLMED
+        type        '_LOGICAL'
+        prompt      'YES for local median, NO for mean'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFLMED'
+    endparameter
+
+    parameter TUNE_FFLSMP
+        type        '_INTEGER'
+        prompt      'Number of local pixels to median/mean'
+        default     10
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FFLSMP'
+    endparameter
+
+    parameter TUNE_FIBRES
+        type        '_LOGICAL'
+        prompt      'YES if multi-fibre object frame'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FIBRES'
+    endparameter
+
+    parameter TUNE_FINCPLY
+        type        '_INTEGER'
+        prompt      'Number of coefficients'
+        default     3
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FINCPLY'
+    endparameter
+
+    parameter TUNE_FLUX
+        type        '_LOGICAL'
+        prompt      'YES if flux is to be conserved'
+        default     YES
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_FLUX'
+    endparameter
+
+    parameter TUNE_HELIO
+        type        '_INTEGER'
+        prompt      'Unknown'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_HELIO'
+    endparameter
+
+    parameter TUNE_IDINMN
+        type        '_INTEGER'
+        prompt      'Minimum number of features used'
+        default     8
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDINMN'
+    endparameter
+
+    parameter TUNE_IDINMX
+        type        '_INTEGER'
+        prompt      'Maximum number of features used'
+        default     30
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDINMX'
+    endparameter
+
+    parameter TUNE_IDMDLT
+        type        '_INTEGER'
+        prompt      'Maximum neighbours to check'
+        default     6
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDMDLT'
+    endparameter
+
+    parameter TUNE_IDMXDIF
+        type        '_REAL'
+        default     0.03
+        prompt      'Maximum ratio difference'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDMXDIF'
+    endparameter
+
+    parameter TUNE_IDSDLT
+        type        '_INTEGER'
+        prompt      'Starting number of neighbours to check'
+        default     3
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDSDLT'
+    endparameter
+
+    parameter TUNE_IDSTRNG
+        type        '_REAL'
+        prompt      'Minimum strength of identified lines'
+        default     15.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IDSTRNG'
+    endparameter
+
+    parameter TUNE_INSTR
+        type        '_CHAR'
+        prompt      'Instrument name'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_INSTR'
+    endparameter
+
+    parameter TUNE_INTR
+        type        '_LOGICAL'
+        prompt      'YES if linear interpolation required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_INTR'
+    endparameter
+
+    parameter TUNE_IUE
+        type        '_INTEGER'
+        prompt      'Non-zero if IUE type data frame'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IUE'
+    endparameter
+
+    parameter TUNE_LOG
+        type        '_LOGICAL'
+        prompt      'YES if output scale logarithmic'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_LOG'
+    endparameter
+
+    parameter TUNE_MAX2DPLY
+        type        '_INTEGER'
+        prompt      'Maximum coefficients for fits'
+        default     30
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAX2DPLY'
+    endparameter
+
+    parameter TUNE_MAX2DPNTS
+        type        '_INTEGER'
+        prompt      'Maximum 2-D points'
+        default     1000
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAX2DPNTS'
+    endparameter
+
+    parameter TUNE_MAXLINES
+        type        '_INTEGER'
+        prompt      'Maximum line slots'
+        default     100
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXLINES'
+    endparameter
+
+    parameter TUNE_MAXPOLY
+        type        '_INTEGER'
+        prompt      'Maximum coefficients for fits'
+        default     50
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXPOLY'
+    endparameter
+
+    parameter TUNE_MAXRFLN
+        type        '_INTEGER'
+        prompt      'Maximum number of reference lines'
+        default     200
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXRFLN'
+    endparameter
+
+    parameter TUNE_MAXWPLY
+        type        '_INTEGER'
+        prompt      'Maximum wavelength coeffs'
+        default     10
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXWPLY'
+    endparameter
+
+    parameter TUNE_MINCR
+        type        '_REAL'
+        prompt      'Minimum Cosmic-Ray intensity'
+        default     0.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MINCR'
+    endparameter
+
+    parameter TUNE_MXBADSMP
+        type        '_INTEGER'
+        prompt      'Maximum consecutive number of bad samples'
+        default     10
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXBADSMP'
+    endparameter
+
+    parameter TUNE_MXSKYPIX
+        type        '_INTEGER'
+        prompt      'Maximum number of sky pixels'
+        default     21
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXSKYPIX'
+    endparameter
+
+    parameter TUNE_MXSMP
+        type        '_INTEGER'
+        prompt      'Maximum number of X samples to trace'
+        default     500
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXSMP'
+    endparameter
+
+    parameter TUNE_NOARC
+        type        '_LOGICAL'
+        prompt      'YES if no arc frame is available'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_NOARC'
+    endparameter
+
+    parameter TUNE_NOFLAT
+        type        '_LOGICAL'
+        prompt      'YES if no flat-field frame is available'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_NOFLAT'
+    endparameter
+
+    parameter TUNE_MERGE
+        type        '_LOGICAL'
+        prompt      'YES for merging multiple frame data'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MERGE'
+    endparameter
+
+    parameter TUNE_MRGMINX
+        type        '_INTEGER'
+        prompt      'Number of lhs pixels to ignore'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MRGMINX'
+    endparameter
+
+    parameter TUNE_MRGMAXX
+        type        '_INTEGER'
+        prompt      'Number of rhs pixels to ignore'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MRGMAXX'
+    endparameter
+
+    parameter TUNE_MRGWGHT
+        type        '_CHAR'
+        prompt      'Type of weighting to apply'
+        default     'SN'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MRGWGHT'
+    endparameter
+
+    parameter TUNE_OBJPOLY
+        type        '_INTEGER'
+        prompt      'Degree of polynomial to use for object'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJPOLY'
+    endparameter
+
+    parameter TUNE_OBJBLW
+        type        '_INTEGER'
+        prompt      'Number of object pixels below trace'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJBLW'
+    endparameter
+
+    parameter TUNE_OBJABV
+        type        '_INTEGER'
+        prompt      'Number of object pixels above trace'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJABV'
+    endparameter
+
+    parameter TUNE_PARTORD
+        type        '_LOGICAL'
+        prompt      'YES if checking for partial orders'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PARTORD'
+    endparameter
+
+    parameter TUNE_PFLSSAMP
+        type        '_INTEGER'
+        prompt      'Maximum number of subsamples in profile'
+        default     301
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PFLSSAMP'
+    endparameter
+
+    parameter TUNE_PFSAMP
+        type        '_INTEGER'
+        prompt      'Maximum number of profile subsamples'
+        default     101
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PFSAMP'
+    endparameter
+
+    parameter TUNE_PREBAL
+        type        '_LOGICAL'
+        prompt      'YES for pre-balanced flat field'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PREBAL'
+    endparameter
+
+    parameter TUNE_QUAD
+        type        '_LOGICAL'
+        prompt      'YES if quadratic interpolation required'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUAD'
+    endparameter
+
+    parameter TUNE_RFLNTHR
+        type        '_REAL'
+        prompt      'Reference line lower threshold'
+        default     1.25
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_RFLNTHR'
+    endparameter
+
+    parameter TUNE_REVCHK
+        type        '_LOGICAL'
+        prompt      ''
+        ppath       'current,default'
+        default     'NO'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_REVCHK'
+    endparameter
+
+    parameter TUNE_SCFRACT
+        type        '_REAL'
+        prompt      'Fractional ratio for twin scales'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SCFRACT'
+    endparameter
+
+    parameter TUNE_SCRADD
+        type        '_INTEGER'
+        prompt      'Number of bins to add together'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SCRADD'
+    endparameter
+
+    parameter TUNE_SCRMODE
+        type        '_INTEGER'
+        prompt      'Scrunching mode control'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SCRMODE'
+    endparameter
+
+    parameter TUNE_SKEW
+        type        '_REAL'
+        prompt      'Skew shift in bins'
+        default     0.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKEW'
+    endparameter
+
+    parameter TUNE_OBJREJ
+        type        '_INTEGER'
+        prompt      'Number of reject cycles'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJREJ'
+    endparameter
+
+    parameter TUNE_OBJRTHR
+        type        '_REAL'
+        prompt      'Reject threshold in sigma'
+        default     5.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_OBJRTHR'
+    endparameter
+
+    parameter TUNE_SATRTN
+        type        '_REAL'
+        prompt      'Saturated pixel intensity'
+        default     1.0e20
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SATRTN'
+    endparameter
+
+    parameter TUNE_SKVRCORR
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES to apply sky variance correction'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKVRCORR'
+    endparameter
+
+    parameter TUNE_SKYHILIM
+        type        '_REAL'
+        prompt      'Upper threshold for sky intensity'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYHILIM'
+    endparameter
+
+    parameter TUNE_SKYINTER
+        type        '_LOGICAL'
+        prompt      'YES if interactive sky modelling'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYINTER'
+    endparameter
+
+    parameter TUNE_SKYPOLY
+        type        '_INTEGER'
+        prompt      'Degree of polynomial to use for sky'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYPOLY'
+    endparameter
+
+    parameter TUNE_SKYREJ
+        type        '_INTEGER'
+        prompt      'Number of reject cycles'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYREJ'
+    endparameter
+
+    parameter TUNE_SKYRTHR
+        type        '_REAL'
+        prompt      'Reject threshold in sigma'
+        default     5.0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYRTHR'
+    endparameter
+
+    parameter TUNE_SKYSIM
+        type        '_LOGICAL'
+        prompt      'YES for sky simulation to be used'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYSIM'
+    endparameter
+
+    parameter TUNE_SKYXPLY
+        type        '_INTEGER'
+        prompt      'Degree of X-polyonmial to use for sky'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYXPLY'
+    endparameter
+
+    parameter TUNE_SKYLINW
+        type        '_INTEGER'
+        prompt      'Maximum expected sky line width'
+        default     5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYLINW'
+    endparameter
+
+    parameter TUNE_SKYLTHR
+        type        '_REAL'
+        prompt      'Sigma threshold for sky lines'
+        default     3.0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_SKYLTHR'
+    endparameter
+
+    parameter TUNE_TRCNS
+        type        '_REAL'
+        prompt      'Consistency requirement'
+        default     0.1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_TRCNS'
+    endparameter
+
+    parameter TUNE_TWTHR
+        type        '_REAL'
+        prompt      'Trace width threshold'
+        default     0.95
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_TWTHR'
+    endparameter
+
+    parameter TUNE_UHRF
+        type        '_LOGICAL'
+        prompt      'TRUE if UHRF data frame'
+        default     FALSE
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_UHRF'
+    endparameter
+
+    parameter TUNE_USE_NXF
+        type        '_REAL'
+        prompt      'Fraction of X-samples to use in profile'
+        default     0.2
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_USE_NXF'
+    endparameter
+
+    parameter TUNE_USEAAA
+        type        '_LOGICAL'
+        prompt      'YES if Abstracts object category codes used'
+        default     YES
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_USEAAA'
+    endparameter
+
+    parameter TUNE_WVCNS
+        type        '_REAL'
+        prompt      'Fraction of inconsistency allowed'
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_WVCNS'
+    endparameter
+
+    parameter TUNE_XBOX
+        type        '_INTEGER'
+        prompt      'Size of X-sampling box for order location'
+        default     20
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XBOX'
+    endparameter
+
+    parameter TUNE_YBLAZE
+        type        '_LOGICAL'
+        prompt      'YES for Y-blaze correction'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        help        '%ECHOMOP_HELP: TUNING TUNE_YBLAZE'
+    endparameter
+
+    parameter USE_MEDIAN
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES if median is to be used'
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        help        '%ECHOMOP_HELP: USER_PAR USE_MEDIAN'
+    endparameter
+
+    parameter WAVFIT
+        type        '_CHAR'
+        prompt      'Function for wavelength fitting'
+        default     'POLY'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR WAVFIT'
+    endparameter
+
+    parameter W2_NX_POLY
+        type        '_INTEGER'
+        default     10
+        prompt      'Maximum order of 2-D X-axis polynomial'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR W2_NX_POLY'
+    endparameter
+
+    parameter W2_NY_POLY
+        type        '_INTEGER'
+        default     10
+        prompt      'Maximum order of 2-D Y-axis polynomial'
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR W2_NY_POLY'
+    endparameter
+
+    parameter W_NPOLY
+        type        '_INTEGER'
+        prompt      'Number of coeffs of wavelength fitting function'
+        default     7
+        ppath       'current,default'
+        vpath       'prompt'
+        help        '%ECHOMOP_HELP: USER_PAR W_NPOLY'
+    endparameter
+
+  endinterface

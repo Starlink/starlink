@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: No_orders.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>No_orders</H2><HR>
+<P>
+ The task has been unable to find any orders in the frame supplied.
+<P>
+ The most likely cause is that the frame has been incorrectly
+ specified and contains no orders.  Another possibility is that the
+ frame has the wrong orientation (orders long axis not horizontal)
+ although at least one order would usually be 'found' in such a
+ case.  If the frame is correctly specified and orientated then
+ possible causes are as follows:
+<P>
+<UL>
+<LI>Cosmic ray noise;
+   use the ech_decos1 option to clean the cosmic rays before
+   re-trying order location.
+<P>
+<LI>Very poor S/N data;
+   set the parameter TUNE_AUTLOC=Y to specify the positions of
+   the orders manually using a graphics cursor.
+</UL>
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

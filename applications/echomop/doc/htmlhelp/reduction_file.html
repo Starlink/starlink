@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Reduction_file.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Reduction File</H2><HR>
+<P>
+ The reduction file is a Starlink sdf file used to contain objects
+ produced during the various stages of the reduction.  For example,
+ a list of order locations, wavelength polynomial fits, etc.
+<P>
+ The file is created at the start of a reduction cycle with a user- 
+ provided name, and grows in size until the reduction is complete.
+ At this point it contains a fairly complete record of any
+ intermediate results, thus allowing particular sections of a
+ reduction to be tuned and repeated as required.
+<P>
+ Usually it will not be necessary to access the file except via
+ ECHOMOP commands.  The package provides facilities for examining
+ and plotting data from all the objects in the file.
+<P>
+ The reduction file also contains a HISTORY object which provides a
+ record of all significant processing decisions taken, and the data
+ frames involved.  Options are provided to trim the size of
+ reduction files once a reduction is complete.  They should, however,
+ be saved alongside the resulting data file (spectrum) to assist any
+ future analysis.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,16 @@
+*+
+*  Name:
+*     ECHOMOP - ECH_PLOT_PARS.INC
+*-
+
+      CHARACTER*8 COLOURS( MAX_COLOURS )
+      CHARACTER*8 LINE_STYLES( MAX_LINESTYLES )
+      CHARACTER*8 FONTS( MAX_FONTS )
+
+      DATA COLOURS
+     :     / 'BLACK', 'RED', 'GREEN', 'BLUE',
+     :       'CYAN', 'MAGENTA', 'YELLOW', 'ORANGE' /
+      DATA LINE_STYLES
+     :     / 'FULL', 'DASH', 'DOTDASH', 'DOT', 'DASHDDD' /
+      DATA FONTS
+     :     / 'MODERN', 'ROMAN', 'ITALIC', 'SCRIPT' /

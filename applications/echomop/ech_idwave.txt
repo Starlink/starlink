@@ -1,0 +1,17 @@
++---------------------------------------------------------------------------
+|
+|  Automatic arc-line identification: ech_idwave:echmenu option 10
+|  ---------------------------------------------------------------
+|
+|  This task demonstrates the fully automatic wavelength calibration
+|  in action.  You will usually want to verify the fitted wavelengths
+|  manually at some stage, but the automatic mode is useful to obtain
+|  first estimates, particularly when the you are uncertain of the
+|  exact wavelengths range covered in any order.
+|
+|  The automatic identifier steps through each order in turn and
+|  attempts to locate known arc line patterns.  Once patterns are
+|  found, a polynomial is fitted to the wavelengths and the
+|  wavelength of any remaining lines predicted.
+|
++---------------------------------------------------------------------------

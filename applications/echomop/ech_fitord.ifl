@@ -1,0 +1,298 @@
+  interface ECH_FITORD
+    parameter ANYLOGICAL
+        keyword     ' '
+        type        '_LOGICAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYSTRING
+        keyword     ' '
+        type        '_CHAR'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYNUMBER
+        keyword     ' '
+        type        '_REAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter IDX_NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of arc reference images'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NREF_FRAME'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NREF_FRAME'
+    endparameter
+
+    parameter IDX_NUM_ORDERS
+        type        '_INTEGER'
+        prompt      'Number of orders in echellogram'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NUM_ORDERS'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NUM_ORDERS'
+    endparameter
+
+    parameter TUNE_CLONE
+        type        '_CHAR'
+        prompt      'Reduction data file to copy from'
+        default     'NULL'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.TUNE_CLONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLONE'
+    endparameter
+
+    parameter TUNE_YZONE
+        type        '_INTEGER'
+        prompt      'Number of vertical image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_YZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_YZONE'
+    endparameter
+
+    parameter TUNE_XZONE
+        type        '_INTEGER'
+        prompt      'Number of horizontal image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_XZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XZONE'
+    endparameter
+
+    parameter TUNE_REPORT
+        type        '_CHAR'
+        prompt      'Specifies reporting modes'
+        default     ' '
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_REPORT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_REPORT'
+    endparameter
+
+    parameter TUNE_AUTOMATE
+        type        '_CHAR'
+        prompt      'Specifies automated processing sequence'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_AUTOMATE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTOMATE'
+    endparameter
+
+    parameter TUNE_QUICK
+        type        '_LOGICAL'
+        prompt      'YES for Quick-look operation'
+        default     NO
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_QUICK'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUICK'
+    endparameter
+
+    parameter TUNE_BATCH
+        type        '_LOGICAL'
+        prompt      'YES for batch-mode operation'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,global,noprompt'
+        association '<->echmenu.TUNE_BATCH'
+        help        '%ECHOMOP_HELP: TUNING TUNE_BATCH'
+    endparameter
+
+    parameter TUNE_PAGE
+        type        '_INTEGER'
+        prompt      'Number of lines per page of output'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_PAGE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PAGE'
+    endparameter
+
+    parameter DISPLAY
+        type        '_LOGICAL'
+        prompt      'YES to overlay plots on images'
+        default     NO
+        ppath       'current,default,global'
+        vpath       'current,global'
+        association '<->echmenu.DISPLAY'
+        help        '%ECHOMOP_HELP: USER_PAR DISPLAY'
+    endparameter
+
+    parameter HARD
+        type        '_CHAR'
+        prompt      'Produce plot files for hardcopy output'
+        default     'NONE'
+        ppath       'current,default,global'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.HARD'
+        help        '%ECHOMOP_HELP: USER_PAR HARD'
+    endparameter
+
+    parameter SOFT
+        type        '_CHAR'
+        prompt      'Produce plots on screen'
+        ppath       'current'
+        vpath       'current,prompt'
+        association '<->echmenu.SOFT'
+        help        '%ECHOMOP_HELP: USER_PAR SOFT'
+    endparameter
+
+    parameter ECH_RDCTN
+        type        '_CHAR'
+        prompt      'Reduction database'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.ECH_RDCTN'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_RDCTN'
+    endparameter
+
+    parameter TRCFIT
+        type        '_CHAR'
+        prompt      'Function for trace fitting'
+        default     'POLY'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.TRCFIT'
+        help        '%ECHOMOP_HELP: USER_PAR TRCFIT'
+    endparameter
+
+    parameter TRC_NPOLY
+        type        '_INTEGER'
+        prompt      'Number of coeffs of trace-fit function'
+        default     4
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.TRC_NPOLY'
+        help        '%ECHOMOP_HELP: USER_PAR TRC_NPOLY'
+    endparameter
+
+    parameter HARDCOPY
+        type        '_LOGICAL'
+        prompt      'YES to produce plot as a hard copy'
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.HARDCOPY'
+        help        '%ECHOMOP_HELP: USER_PAR HARDCOPY'
+    endparameter
+
+    parameter USE_MEDIAN
+        type        '_LOGICAL'
+        default     NO
+        prompt      'YES if median is to be used'
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.USE_MEDIAN'
+        help        '%ECHOMOP_HELP: USER_PAR USE_MEDIAN'
+    endparameter
+
+    parameter TUNE_XBOX
+        type        '_INTEGER'
+        prompt      'Size of X-sampling box for order location'
+        default     20
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_XBOX'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XBOX'
+    endparameter
+
+    parameter TUNE_DIAGNOSE
+        type        '_LOGICAL'
+        prompt      'YES to log activity to debugging file'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.TUNE_DIAGNOSE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DIAGNOSE'
+    endparameter
+
+    parameter TUNE_IUE
+        type        '_INTEGER'
+        prompt      'Non-zero if IUE type data frame'
+        default     0
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_IUE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_IUE'
+    endparameter
+
+    parameter TUNE_MAXPOLY
+        type        '_INTEGER'
+        prompt      'Maximum coefficients for fits'
+        default     50
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        association '<->echmenu.TUNE_MAXPOLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXPOLY'
+    endparameter
+
+    parameter TUNE_MXSMP
+        type        '_INTEGER'
+        prompt      'Maximum number of X samples to trace'
+        default     500
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MXSMP'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXSMP'
+    endparameter
+
+    parameter TUNE_MXBADSMP
+        type        '_INTEGER'
+        prompt      'Maximum consecutive number of bad samples'
+        default     10
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MXBADSMP'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MXBADSMP'
+    endparameter
+
+    parameter TRACE_MODE
+        type        '_CHAR'
+        prompt      'Type of order tracing to use'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.TRACE_MODE'
+        help        '%ECHOMOP_HELP: USER_PAR TRACE_MODE'
+    endparameter
+
+    parameter TRC_INTERACT
+        type        '_LOGICAL'
+        prompt      'YES for interactive order-fitting'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.TRC_INTERACT'
+        help        '%ECHOMOP_HELP: USER_PAR TRC_INTERACT'
+    endparameter
+
+    parameter TUNE_CLPMXDEV
+        type        '_REAL'
+        prompt      'Maximum deviation from polynomial'
+        default     0.5
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CLPMXDEV'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPMXDEV'
+    endparameter
+
+    parameter TUNE_CLPBY
+        type        '_INTEGER'
+        prompt      'Number of points autoclip before re-fit'
+        default     1
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_CLPBY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLPBY'
+    endparameter
+
+  endinterface

@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Read-only_RDCTN_file.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Read-Only_RDCTN_file</H2><HR>
+<P>
+ The program is unable to obtain update access to an object in the
+ reduction structure file.
+<P>
+ This is probably because the file is protected against write access.
+ Do an
+<P>
+<PRE WIDTH=72>
+    % ls -alF -reduction-structure-file-.sdf
+</PRE>
+<P>
+ to check the file protection mask.
+<P>
+ The program will continue but please note that it will be unable to
+ write the results of the current step back into the reduction
+ structure.  You are therefore strongly recommended to copy the file
+ to a location to which you have full access before proceeding.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

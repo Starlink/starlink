@@ -1,0 +1,38 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_twthr.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_TWTHR</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_TWTHR=_REAL</H3>
+<H2>Description</H2>
+<P>
+ The 'trace-width-threshold' is provided for cases when the S/N of
+ the frame being examined to locate the orders is very low.
+<P>
+ The threshold is the degree to which off-trace pixels must fall below
+ the pixel at trace centre (in the spatial direction) in order to be
+ considered as 'off-order'.  I.e., the trace width is estimated
+ by stepping pixel-by-pixel above and below the trace until the
+ intensity falls below (1.0 - TUNE_TWTHR) * intensity-at-trace-centre.
+<P>
+ The default value is 0.95 (95%). 
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

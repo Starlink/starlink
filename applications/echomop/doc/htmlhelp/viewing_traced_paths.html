@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Viewing_traced_paths.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Viewing Traced Paths</H2><HR>
+<P>
+ The tracing of the echelle order paths is central to the entire
+ extraction process and care should be taken to ensure the best
+ traces possible.  ECHOMOP provides a large number of processing
+ alternatives to help ensure this can be done.  Most of these
+ provide information such as RMS deviations etc. when run.
+<P>
+ In general however, the best way of evaluating the success or
+ failure of the tracing process is to visually examine the paths
+ of the trace fitted polynomials.  Three methods of viewing the
+ traced paths are provided.
+<P>
+<PRE WIDTH=72>
+  -  Viewing the fitted paths overlaid on an image of the
+     trace frame as tracing is done (Set parameter DISPLAY=YES).
+<P>
+      A typical interactive plot appears below.
+      <IMG SRC=traces.gif>
+<P>
+  -  Using a graphics device to plot the paths of all orders
+     (ech_trplt task/option).
+</PRE>
+<P>
+ For a single order, more detailed examination of the relation
+ of a trace polynomial to the points it fits, can be obtained
+ using the V(view) command in the ech_fitord task/option.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=trcclpv.gif>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

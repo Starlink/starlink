@@ -1,0 +1,14 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Trace orders.                     (ECH_TRACE)
+
+ Processing order 1...
+ Triangle filtering enabled.
+ Order 1 traced from X=3 to 2040, with a sample success rate of 100%
+ Processing order 2...
+ Triangle filtering enabled.
+ Order 2 traced from X=3 to 2040, with a sample success rate of 100%
+ Processing order 3...
+ Triangle filtering enabled.
+ Order 3 traced from X=3 to 2040, with a sample success rate of 100%
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_DECOS1.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_DECOS1</H1><HR>
+<P>
+<H2>Function</H2>
+Locate and flag cosmic-ray contaminated pixels.
+<P>
+<H2>Summary</H2>
+ This routine uses two orthogonal median filters (whose dimensions
+ are controlled using TUNE_CRXBOX and TUNE_CRYBOX) to calculate
+ smoothed copies of the image.  These are then divided into the
+ original and the resulting array is histogrammed.  The histogram is
+ then presented for selection of the point above which to clip points.
+ This method works well when there are lots of cosmic-ray events as
+ the clip point is easy to see.  The ech_decos2 option/task provides
+ a more CPU-intensive method which may work better when there are
+ fewer cosmic-ray events.
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_DECOS1_hints.html">Hints</A></H3>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

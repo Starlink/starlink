@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_report.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_REPORT</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_REPORT=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ This parameter is used to control the variety of reporting output
+ by the program.
+<P>
+ It will usually be left blank to indicate default reporting to
+ the terminal/batch log file.  Options include:
+<P>
+<PRE WIDTH=72>
+    F  - Specifies full reporting of task/module entry.
+<P>
+    L  - Specifies duplicate log of reports to disk file
+         (ECH_REPORT.LOG in the current directory).
+<P>
+    B  - Brief reporting, task starts only.
+<P>
+    S  - Silent, no terminal reports at all.
+<P>
+    E  - Error reports to override other setting (BS).
+<P>
+    P  - Print log file on completion (only with L).
+</PRE>
+<P>
+ Specifiers may be concatenated in any order, thus
+<P>
+<PRE WIDTH=72>
+     BELP
+</PRE>
+<P>
+ would specify minimal reporting, except for task startup and error
+ reports.  Reports to be copied to a log file and printed upon
+ completion.
+<P>
+ INITIAL SUGGESTED VALUE: ' '.
+<P>
+<P>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,35 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FWHM_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_FWHM.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ When many similar frames are being processed it may be wasteful to
+ estimate the FWHM independently for each arc frame.  In this case
+ it may be set manually using FIGARO SETOBJ
+<P>
+<PRE WIDTH=72>
+    SETOBJ object=/rdn-fil/MORE.ECHELLE.WAVE_FIT_1D.LINE_WIDTH value=/nn.n/
+</PRE>
+<P>
+ at the system command prompt, where /nn.n/ is expressed in pixels
+ and is twice the required FWHM.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,23 @@
++---------------------------------------------------------------------------
+|
+|  Determining dekker and object limits: ech_spatial/echmenu option 4
+|  ------------------------------------------------------------------
+|
+|  The package now has a set of polynomials which specify the path of
+|  each order across the frame.  The next step is to determine the
+|  extraction limits to be used in the spatial (Y) direction.
+|
+|  It prompts for a frame to use to determine the dekker extent
+|  (SLITIM), this would normally be either an arc or a flat-field
+|  frame in which the entire slit was illuminated.  The program then
+|  asks if interactive profiling is required, i.e., do we want to be
+|  able to edit the limits as determined by the program.
+|  The demonstration runs this function in automatic mode as the
+|  calculated limits are adequate for the extraction.
+|
+|  After displaying a graph of the profile, showing the positions of
+|  the dekker, the program repeats the process using the OBJECT frame.
+|  This time is attempts to determine the limits of the object within
+|  the slit.  The object profile is then plotted in similar fashion.
+|
++---------------------------------------------------------------------------

@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Starting_up.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echomop.html">Previous topic</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>Starting Up</H1><HR>
+<H2>Summary</H2>
+<P>
+   To start the menu-driven task type
+<P>
+<PRE WIDTH=72>
+      % echmenu ...any other parameters...
+</PRE>
+<P>
+   at the command line prompt.
+<P>
+   This starts the fully-interactive version of ECHOMOP.
+   All subsequent operations are carried out by selecting
+   items from a menu, and providing various parameters.
+<P>
+   To start the package in automatic mode type
+<P>
+<PRE WIDTH=72>
+      % echmenu TUNE_AUTOMATE="a,b,c...,EXIT" ...any other parameters...
+</PRE>
+<P>
+   where a,b,c etc. are the numbers of the processing steps which
+   should be performed.  Any required parameters must have their
+   values supplied and the last step requested should be EXIT (or 99)
+   to ensure that the program terminates correctly after processing.
+<P>
+   This starts the automatic version of the package running at a
+   terminal.  In this mode graphics may still be produced and
+   all processes will report on their progress on the terminal.
+<P>
+   In the event of serious problems with the reduction you may be 
+   prompted for assistance.  The automatic nature of this mode
+   is confined to those situations where an option of automatic
+   or interactive is available.  The programs will still prompt
+   for the values of parameters they need, however supplying a
+   single backslash (or using the NOPROMPT keyword) in response to
+   any prompt will cause defaults to be used thereafter.
+<H2>Available Topics</H2>
+<A HREF="guided_tour.html">Guided_tour</A></H3>
+<P>
+<HR>
+<B><A HREF="echomop.html">Previous topic</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,17 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Clip fitted traces.              (ECH_FITORD)
+
+ TUNE_CLPMXDEV is set to non-default value: 0.1.
+ Processing order 1...
+ Order 1 trace fit residuals: max=0.099 RMS=0.053.
+ Order 1 67.1% samples clipped.
+ TUNE_CLPMXDEV is set to non-default value: 0.1.
+ Processing order 2...
+ Order 2 trace fit residuals: max=0.097 RMS=0.049.
+ Order 2 70.6% samples clipped.
+ TUNE_CLPMXDEV is set to non-default value: 0.1.
+ Processing order 3...
+ Order 3 trace fit residuals: max=0.099 RMS=0.056.
+ Order 3 69% samples clipped.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Iue_data.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>IUE Data</H2><HR>
+<P>
+ ECHOMOP can be used process IUE data presented in the form of
+ a SIHI file.  These files contain HIRES spectra which have been
+ photometrically corrected, rotated and de-splayed.
+<P>
+ Some algorithmic optimisations are available specifically for IUE
+ data.  These are activated by using the hidden parameter TUNE_IUE.
+<P>
+ This parameter should be supplied on the command line thus:
+<P>
+<PRE WIDTH=72>
+    ECH_TRACE TUNE_IUE=1
+</PRE>
+<P>
+ Currently only TUNE_IUE=1 is supported, but other values may be
+ provided in the future to optimise the extraction algorithm
+ depending upon the object type.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

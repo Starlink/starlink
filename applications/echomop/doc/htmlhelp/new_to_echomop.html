@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: New_to_echomop.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="intro.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>New to ECHOMOP</H2><HR>
+<P>
+ ECHOMOP may be used in a variety of ways depending upon your
+ expertise.
+<P>
+ The most convenient method for the first-time user is to start
+ ECHOMOP with a menu interface (command echmenu).  This provides a
+ guided path through the processes in a standard reduction.
+<P>
+ echmenu is the monolith program which drives all the other programs
+ in the package.  echmenu will always provide a default for the next 
+ task to be performed, and this will usually be the correct one for 
+ a 'standard' reduction.  To accept the recommended next step,
+ it is only necessary to hit Y/return/.
+<P>
+ The package uses a disk-based 'reduction file' to pass objects
+ between its various component tasks.  You will be asked to provide 
+ a name for this file, which will be created in the current directory. 
+ This file is  permanently associated with a particular set of data 
+ frames (object, arc, flat etc.) thereby providing the ability to 
+ replay any aspect of the reduction at a later date.  Reduction files 
+ can occupy a large amount of disk space however, and you may wish to 
+ delete them as soon as the reduced spectrum has been obtained.
+<P>
+ To start ECHOMOP using a guided menu type:
+<P>
+<PRE WIDTH=72>
+    % echmenu/return/
+</PRE>
+<P>
+ at the command-line prompt.
+<P>
+ To run any particular ECHOMOP command just type its name at the
+ command line prompt.
+<P>
+ For example:
+<P>
+<PRE WIDTH=72>
+    % ech_locate/return/
+</PRE>
+<P>
+ would run the order location task ech_locate.
+<P>
+<P>
+<HR>
+<B><A HREF="intro.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:33 1996
+</ADDRESS>
+</BODY>
+</HTML>

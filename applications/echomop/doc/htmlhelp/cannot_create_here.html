@@ -1,0 +1,71 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Cannot_create_here.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Cannot_create_here</H2><HR>
+<P>
+ The program is unable to create a reduction file as specified.
+<P>
+ The most probable causes of this are that the target directory does
+ not exist or that the target directory is protected against write
+ access.
+<P>
+ Use "ls" to check for each of these conditions:
+<P>
+<PRE WIDTH=72>
+    % ls
+</PRE>
+<P>
+ to verify that the target directory exists, and
+<P>
+<PRE WIDTH=72>
+    % ls -alF ../name-of-directory
+</PRE>
+<P>
+ to see what access rights you have.
+<P>
+ If you own the directory in which file creation was attempted and
+ have the required access rights then the most probable causes are
+ either that you have run out of disk space or filled your allocation
+ of disk space.
+<P>
+ Use "df" to check how much of the target disk is unused:
+<P>
+<PRE WIDTH=72>
+    % df
+</PRE>
+<P>
+ and "quota" to check that you have not used up your allocation
+<P>
+<PRE WIDTH=72>
+    % quota
+</PRE>
+<P>
+ You may find that the "quota" command is not available in your path:
+ ask your system manager if you are uncertain how to check your own
+ disk quotas.
+<P>
+<P>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

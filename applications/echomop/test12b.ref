@@ -1,0 +1,48 @@
+ TUNE_CLONE is set to non-default value: 'ech_temp'.
+ Cloned SO_FAR from file ech_temp.
+ TUNE_CLONE is set to non-default value: 'ech_temp'.
+ ---------------------------------------------------------------------------
+ Copying results of:     Trace orders.                     (ECH_TRACE)
+
+ TUNE_CLONE is set to non-default value: 'ech_temp'.
+ Cloned TRC_POLY[1,1] from file ech_temp.
+ Cloned TRACE[1,1] from file ech_temp.
+ Cloned TRC_IN_DEV[1,1] from file ech_temp.
+ ---------------------------------------------------------------------------
+
+
+ECH_COPY.MORE.ECHELLE  <ECH_RDCTN>
+
+   SO_FAR         <_INTEGER>      2
+   NX_PIXELS      <_INTEGER>      2040
+   NO_OF_ARCS     <_INTEGER>      1
+   NY_PIXELS      <_INTEGER>      76
+   ORDER_SLOPE    <_REAL>         0
+   NO_OF_ORDERS   <_INTEGER>      3
+   TRACE_WIDTH    <_INTEGER>      12
+   ORDER_YPOS(3)  <_INTEGER>      15,38,61
+   ARC            <_CHAR*80>      'UNINITIALISED'
+   FFIELD         <_CHAR*80>      'UNINITIALISED'
+   INPTIM         <_CHAR*80>      'UNINITIALISED'
+   OBJECT         <_CHAR*80>      'UNINITIALISED'
+   SLITIM         <_CHAR*80>      'UNINITIALISED'
+   STAR           <_CHAR*80>      'UNINITIALISED'
+   TRACIM         <_CHAR*80>      'UNINITIALISED'
+   TRC_POLY(50,3)  <_DOUBLE>      11.0535391091726,0.02754377153363,
+    -0.00006505103194,0.00000006928949,-0.0000000000311,
+    2.36977244156453D-15,1.27572986359982D-18,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+    ... 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+   TRACE(2040,3)  <_REAL>         *,*,*,*,*,*,*,*,11.16466,*,*,*,*,*,*,*,
+    *,*,11.24156,*,*,*,*,*,*,*,*,*,12.07201,*,*,*,*,*,*,*,*,*,12.08419,*,
+    *,*,*,*,*,*,*,*,12.09949,*,*,*,*,*,*,*,*,*,12.17414,*,*,*,*,*,*,*,*,*,
+    12.46658,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,*,13.48711,*,*,*,*,*,*,*,
+    *,*,*,*,*,*,*,*,64.29067,*,*,*,*,*,*,*,*,*,64.3588,*,*,*,*,*,*,*,*,*,*
+   TRC_IN_DEV(2040,3)  <_REAL>    *,*,*,*,*,*,*,*,-0.131154,*,*,*,*,*,*,*,
+    *,*,-0.299965,*,*,*,*,*,*,*,*,*,0.29589,*,*,*,*,*,*,*,*,*,0.08423,*,*,
+    *,*,*,*,*,*,*,-0.113883,*,*,*,*,*,*,*,*,*,-0.242551,*,*,*,*,*,*,*,*,*,
+    -0.143661,*,*,*,*,*,*,*,*,*,-0.471996,*,*,*,*,*,*,*,*,*,0.517773,*,*,
+    *,*,*,*,*,*,*,0.319633,*,*,*,*,*,*,*,*,*,0.041298,*,*,*,*,*,*,*,*,*,*
+
+End of Trace.
+

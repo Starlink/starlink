@@ -1,0 +1,32 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Scrunch to linear scale.        (ECH_SCRUNCH)
+
+ Processing order 1...
+ 27 lines in order.
+ Processing order 2...
+ 26 lines in order.
+ Processing order 3...
+ 27 lines in order.
+ SET_WSCALE is set to non-default value: YES.
+ Processing reference frame 1...
+ Global scrunch to wavelengths from 4219.515 to 4458.727.
+ Bin size set to user-supplied value of 1.
+ Start wavelength set to user-supplied value of 4200.
+ Scrunch bin size set to 1 for a total of 258 bins.
+ Maximum number of bins in any order is 2040.
+ Deleting and re-creating newly dimensioned object: ECH_RDCTN.ERR_SPECTRUM.
+ Deleting and re-creating newly dimensioned object: ECH_RDCTN.WAVELENGTH.
+ Deleting and re-creating newly dimensioned object: ECH_RDCTN.1D_SPECTRUM.
+ Generating wavelengths for scrunch.
+ Scrunching OBJ spectrum, order 1.
+ Merging order into 1-D spectrum.
+ Scrunching OBJ spectrum, order 2.
+ Merging order into 1-D spectrum.
+ Scrunching OBJ spectrum, order 3.
+ Merging order into 1-D spectrum.
+ Generating wavelengths for scrunch.
+ Scrunching ARC spectrum, order 1.
+ Scrunching ARC spectrum, order 2.
+ Scrunching ARC spectrum, order 3.
+ ---------------------------------------------------------------------------
+

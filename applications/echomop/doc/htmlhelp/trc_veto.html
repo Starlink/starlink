@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Trc_veto.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TRC_VETO</H2><HR>
+<H2>Usage</H2>
+<H3>TRC_VETO=_LOGICAL</H3>
+<H2>Description</H2>
+<P>
+ Set to YES if the order consistency is to be checked interactively.
+ Automatic checking is performed otherwise.
+<P>
+ When automatic checking is engaged there are two parameters which
+ may be adjusted to optimise the performance of the program.
+<P>
+ These are TUNE_CLPMXDEV which defines the clipping point, and
+ TUNE_CLPBY which is the number of points to clip in each iteration.
+<P>
+ When TRC_VETO is set, the option to reject a re-fitted order at
+ each iteration is available.
+<P>
+ It is strongly recommended that this option is not used until you
+ have a clear understanding of the algorithm used by the consistency
+ checker, as it is possible to 'drive' the fit off by injudicious
+ rejection of the re-fits proposed by the program.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:44 1996
+</ADDRESS>
+</BODY>
+</HTML>

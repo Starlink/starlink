@@ -1,0 +1,86 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model flat field.                (ECH_FFIELD)
+
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 18.
+ TUNE_FFNYPLY is set to non-default value: 16.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 1...
+ Fitting (coeffs=16) SPLINE to flat-field spatial dependence.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel below trace.
+ Fitting (coeffs=18) SPLINE to flat field at centre of trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 18.
+ TUNE_FFNYPLY is set to non-default value: 16.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 2...
+ Fitting (coeffs=16) SPLINE to flat-field spatial dependence.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel below trace.
+ Fitting (coeffs=18) SPLINE to flat field at centre of trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 18.
+ TUNE_FFNYPLY is set to non-default value: 16.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 3...
+ Fitting (coeffs=16) SPLINE to flat-field spatial dependence.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels below trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel below trace.
+ Fitting (coeffs=18) SPLINE to flat field at centre of trace.
+ Fitting (coeffs=18) SPLINE to flat field at 1 pixel above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 2 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 3 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 4 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 5 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 6 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 7 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 8 pixels above trace.
+ Fitting (coeffs=18) SPLINE to flat field at 9 pixels above trace.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Scattered_light.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Scattered Light</H2><HR>
+<P>
+ In some cases the user will want to subtract the contribution of
+ scattered light from the object instead of using the sky pixels
+ (which implicitly also contain scattered light information).
+<P>
+ The task ech_mdlbck performs this scattered light background
+ fitting and places the resulting fitted values in the `sky fit'
+ arrays used by the extraction routines.  The background fitter uses
+ a similar set of parameters to the the normal sky modeller but
+ applies its fits to the sets of inter-order pixels at each X- 
+ position in the frame.  Note that this involves a lot of I/O and can
+ be quite a slow operation for large frames.
+<P>
+ The degree of function to fit and its associated parameters are
+ specified using the same parameters as for `sky' fitting.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,14 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Clip fitted traces.              (ECH_FITORD)
+
+ Processing order 1...
+ Order 1 trace fit residuals: max=0.495 RMS=0.216.
+ Order 1 13.9% samples clipped.
+ Processing order 2...
+ Order 2 trace fit residuals: max=0.499 RMS=0.224.
+ Order 2 10.4% samples clipped.
+ Processing order 3...
+ Order 3 trace fit residuals: max=0.496 RMS=0.22.
+ Order 3 7.5% samples clipped.
+ ---------------------------------------------------------------------------
+

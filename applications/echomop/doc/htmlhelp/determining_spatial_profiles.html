@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Determining_spatial_profiles.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Determining Spatial Profiles</H2><HR>
+<P>
+ The determination of the position of the object data within the
+ slit proceeds by first locating the slit jaws.  To do this either
+ an arc frame or (ideally) a flat-field frame may be used.
+<P>
+ The profile is calculated along the slit and the edges are then
+ located by determining the points where the profile intensity drops
+ below a tunable threshold.  For problem cases the dekker positions
+ may also be indicated manually on a graph of the arc/Flat-field
+ profile.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=dekker.gif>
+ Once the dekker limits have been determined, the object profile
+ is measured.  The object is sampled by averaging the profile
+ over all orders (using the central columns of the frame only).
+<P>
+ The median intensity of the profile inside the dekker limits
+ is then calculated and used to set an expected sky threshold.
+<P>
+ The profile is then examined by stepping outwards from its peak
+ until the profile intensity falls to the expected sky threshold.
+<P>
+ Masks are then created in which each pixel along the slit is
+ flagged as sky or object.  These masks may be interactively
+ edited and particular sections of the profile flagged as sky
+ or object.  Only pixels flagged as 'object' will contribute
+ to an extraction.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=object.gif>
+ Therefore, profile editing provides a simple (though tedious)
+ mechanism for producing spatially resolved spectra (each spatial
+ increment in turn is flagged as the only object pixel in the
+ profile, and extracted).
+<P>
+ The default behaviour is to average all the orders together thus
+ generating a composite profile.  In certain circumstances it may be
+ necessary to derive a separate profile for each order (for instance
+ for multi-fibre spectra).  To select this option set TUNE_USE_NXF=1.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

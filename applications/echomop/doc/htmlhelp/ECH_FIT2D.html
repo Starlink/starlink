@@ -1,0 +1,72 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FIT2D.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_FIT2D</H1><HR>
+<P>
+<H2>Function</H2>
+Model 2-D distortion using an arc frame.
+<P>
+<H2>Summary</H2>
+ This routine fits a 2-D polynomial surface to the distortion present
+ in an echelle order.  The order trace is used as an origin and axis,
+ the X-distance running along it, and Y-offset below/above, are the
+ coordinates of the fitted points.  The fitted quantity is the
+ delta-wavelength of an identified arc line.  The identified line
+ centres are located at all offsets above and below the trace.  These
+ centres are all assigned the identified wavelength for the line,
+ and then their offset (in wavelength) relative to the same lines
+ position on the origin axis calculated.  This provides the following
+ dataset for input in the surface fit:
+<P>
+<PRE WIDTH=72>
+  X - coord of a line centre
+  Y - Offset from trace of the line centre
+  Difference in wavelength from 1-D fit prediction for coord X.
+</PRE>
+<P>
+ Thus if no 2-D correction were necessary, all the differences would
+ be zero.  Formulating the fit in this way allows maximum significance
+ of the quantity of interest.
+<P>
+ Once a fit has been obtained, deviations from the fit of all sample
+ points (line-centres) are calculated.  Theses are then either
+ interactively or automatically clipped until an acceptable fit is
+ obtained.
+A typical interactive plot appears below.
+<P>
+<IMG SRC=fit2d.gif>
+<P>
+ In addition it is possible to request a plot showing an exaggerated
+ view of the modelled arc lines.  This make is easy to see if there
+ is any systematic 2-D distortion present.
+A typical interactive plot appears below.
+<P>
+<IMG SRC=fit2dv.gif>
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_FIT2D_hints.html">Hints</A></H3>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

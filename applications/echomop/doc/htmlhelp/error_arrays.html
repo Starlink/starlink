@@ -1,0 +1,75 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Error_arrays.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Error Arrays</H2><HR>
+<P>
+ The ECHOMOP package can deal with errors from the following
+ variety of sources:
+<P>
+<UL>
+<LI>Errors on the flat field frame which should be provided in
+     the flat-field frame error array.   If no error array is
+     provided then ECHOMOP will estimate the error using root-n
+     statistics.
+<P>
+<LI>Errors due to the readout-noise on CCD type detectors.
+     The readout noise value is supplied as a parameter and
+     is applied to the whole frame when calculating the variances
+     on extracted pixels.
+<P>
+<LI>Linear error sources determined manually may be treated
+     by providing an error array associated with the object data
+     frame. The values should represent an error source that does
+     not vary with the intensity of the particular pixel involved.
+<P>
+     An example of this type of error source would be the bias
+     subtraction.  If many bias frames are available then error could
+     be determined for each detector pixel.  Supplying these errors
+     as the object error array would then cause them to be correctly
+     included in variance calculations during extraction.
+<P>
+<LI>Multiplicative errors such as those due to errors on the
+     balance factors (from the flat field) may be taken into
+     account by incorporating the appropriate values in the
+     error array supplied with the flat-field frame.  You must
+     ensure that these variances correctly represent the combined
+     effect of both the flat-field noise and any additional
+     multiplicative error sources.
+<P>
+<LI>Errors due to sky modelling and subtraction are calculated and
+     processed internally by the extraction task.
+<P>
+<LI>Errors due to detected cosmic-ray hits are treated by
+     ignoring the contaminated pixel and rescaling the variance
+     on the remaining pixels in that wavelength increment.
+<P>
+<LI>All output spectra have an error array associated with them,
+     these error arrays always contain the variance for the
+     parallel entry in the data arrays.
+</UL>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Multiple_arc_frames.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Multiple Arc Frames</H2><HR>
+<P>
+ Multiple arc lamp images are usually taken to monitor any
+ possible shift in the object spectrum which may have occurred
+ during the exposure.
+<P>
+ When no shift is evident then the simplest course is to add the
+ two arc frames together and provide the result to the ECHOMOP
+ package whenever it prompts for the arc frame name.
+<P>
+ When a shift can be discerned you must decide whether meaningful
+ wavelength calibration can still be applied.  If so, then there
+ are two courses of action available:
+<P>
+<UL>
+<LI>Add the two frames together as usual, providing a single
+    image for calibration, albeit with degraded resolution.
+    This permits an estimate of the resolution in the final
+    spectrum because the arc frame is extracted in an
+    identical manner to the object, and the resolution
+    observed directly.
+<P>
+<LI>Calibrate each arc frame separately and interpolate
+    between the wavelengths (possibly taking into account
+    time elapsed between arc1 - object - arc2).  This
+    technique allows the calibration to proceed even when
+    a gross shift has taken place, but you should be cautious
+    about the resulting wavelength scale unless independent
+    confirmation can be obtained from features in the object
+    spectrum itself.
+</UL>
+<P>
+<P>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,24 @@
++---------------------------------------------------------------------------
+|
+|  Flat field: ech_ffield/echmenu option 5
+|  ---------------------------------------
+|
+|  The next step in the default sequence is to model the flat-field
+|  frame to derive per-pixel balance factors.  These factors, which
+|  have close-to-unity values, are multiplied into the object-frame
+|  pixels to normalise their values with respect to their near
+|  neighbours.  This process only corrects for `local' effects at
+|  the pixel scale.  Removing the `blaze' function is a separate task
+|  (ech_blaze/option 11) which is performed on the extracted orders.
+|
+|  The program determines the mean flat-field behaviour in both the
+|  spatial and (optionally) the wavelength directions.  Per-pixel
+|  balance factors are then found by reference to the fitted values.
+|  The derived balance factors are used during the extraction by
+|  multiplying each object-frame pixel by its balance factor.
+|
+|  Interactive flat-field modelling is also available; this permits
+|  user-control of the fit functions, order of fit and so on.
+|  Interctive fitting is enabled by setting TUNE_FFINTERACT=YES.
+|
++---------------------------------------------------------------------------

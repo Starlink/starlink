@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Sloping_orders.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Sloping Orders</H2><HR>
+<P>
+ A common problem when extracting echelle orders is that they are
+ significantly sloped with respect to the pixel rows/ columns.
+<P>
+ ECHOMOP can cope with highly sloping orders because it works by
+ first locating a single point in each order and then using this as
+ the start point for tracing the order path.
+<P>
+ ECHOMOP also calculates the approximate slope of the orders prior
+ to tracing, and uses this information to predict the order position
+ when tracing fails (usually due to cosmic-ray contaminated pixels).
+<P>
+ The slope is estimated by taking averaged samples of the frame
+ along two lines.  One running from top-left to bottom-right and the
+ other from top-right to bottom-left of the frame.
+<P>
+ These diagonals are then searched for peaks, starting from the
+ frame centre outwards towards the corners.  This convoluted method
+ is immune from problems due to partial orders which affect other
+ algorithms, as each must be identified twice to allow its slope to
+ be estimated.  Partial orders which are only sampled once by the
+ diagonals will not confuse the estimate.
+<P>
+ The estimate obtained by this method is however, an average value
+ over all orders.  It is therefore not applicable when the orders are
+ highly distorted, or when each order has a different slope.
+<P>
+ The slope as calculated by the program may be overridden manually
+ using the FIGARO command SETOBJ:
+<P>
+<PRE WIDTH=72>
+    SETOBJ object=/rdctn-file/.MORE.ECHELLE.ORDER_SLOPE value=n.nnnn
+</PRE>
+<P>
+ where n.nnnn= the X/Y pixel ratio.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

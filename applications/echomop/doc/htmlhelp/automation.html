@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: AUTOMATION.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Automation</H2><HR>
+<P>
+ ECHOMOP provides automation to many aspects of echelle data
+ reduction which have traditionally required substantial interactive
+ assistance:
+<P>
+<UL>
+<LI>Order location
+<LI>Cosmic ray pixel identification
+<LI>Object/Sky pixel classification
+<LI>Arc line identification
+</UL>
+<P>
+ The provision of these features permits complete automatic reduction
+ of echelle data frames.  To help ensure the success of automatic
+ reduction runs, special attention should be made to ensure that the
+ following conditions are satisfied:
+<P>
+<UL>
+<LI>A bright continuous spectrum image is provided
+      for order tracing.
+
+<LI>The trace/arc/object images supplied are the
+      correct ones.  For instance, supplying the wrong
+      arc image will cause problems if the orders
+      are in different places on the detector.
+
+<LI>Constraints placed on expected range of wavelength
+      and dispersion are wide enough. For example, if in doubt
+      about the dispersion being 6 or 7 pixels per angstrom,
+      provide a limits of MIN_DISPERSION=5, MAX_DISPERSION=10.
+</UL>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

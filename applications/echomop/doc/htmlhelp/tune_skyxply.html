@@ -1,0 +1,41 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_skyxply.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_SKYXPLY</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_SKYXPLY=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ Specifies the degree of polynomial to use when trying to fit to the
+ sky intensity over the whole order at a spatial increment.
+<P>
+ This facility will be most useful when the sky is very uniform, or
+ possibly when trying to model the scattered light in the inter-order
+ region.  The intensities predicted by the wavelength-dependent model
+ are used as input to the spatial model only when they fall within a
+ user-defined distance from the observed value, and when they are not
+ possible sky-line features.
+<P>
+ (See also TUNE_SKYLINW and TUNE_SKYLTHR).
+<P>
+ The default value is 0.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,71 @@
++---------------------------------------------------------------------------
+|
+|  ECH_DEMO: Version 3.0  28-AUG-1996
+|  ==================================
+|
+|  Welcome to the ECHOMOP echelle data reduction demonstration.
+|  This demonstration will lead you step-by-step through a simple
+|  reduction.
+|
+|  The demonstration is arranged in sections consisting of:
+|
+|   - A brief description of the function about to be performed.
+|
+|   - Demonstration of the function.  All input to the package is
+|     provided automatically by this demonstration, so you do not
+|     need to respond to the package directly, all you need to
+|     do is hit the <SPACE> key now and then.
+|
++---------------------------------------------------------------------------
+|
+|  Initializing the reduction environment
+|  --------------------------------------
+|
+|  To initialise for using ECHOMOP, type:
+|
+|    echomopsetup
+|
+|  at the UNIX shell prompt.
+|
++---------------------------------------------------------------------------
+|
+|  Preparation: BEFORE starting the data reduction monolith task
+|  -------------------------------------------------------------
+|
+|  Any frames to be processed with ECHOMOP should have been `bias'
+|  subtracted before use.  This may be done using the KAPPA commands:
+|
+|     CSUB <frame> <bias-value> <frame>     if bias is global
+|
+|     SUB <frame> <bias-frame> <frame>      if bias is per pixel
+|
+|  No other preprocessing is expected or required.  In particular
+|  flat-fielding is available within the package.
+|
+|  The frames used in the demo have been pre-processed already, so
+|  we may proceed directly to the reduction.
+|
++---------------------------------------------------------------------------
+|
+|  Starting the data reduction monolith task
+|  -----------------------------------------
+|
+|  To start the monolith type:
+|
+|     echmenu
+|
+|  at the shell prompt.  Parameters may be included:
+|
+|     echmenu SOFT=xwindows
+|
+|  would specify that the `SOFT' device for plotting be the
+|  "xwindows" device.  The package has many parameters covering
+|  all phases of its operation, and will prompt for their values
+|  when required.  Specifying parameters on the command line can be
+|  used as a short-cut when the you are familiar with the system.
+|
+|  Before the demonstration runs, we need to know which device to plot
+|  graphs to.  If you are using xwindows then supply a value of "xw" when
+|  prompted.
+|
++---------------------------------------------------------------------------

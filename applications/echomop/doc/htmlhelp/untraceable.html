@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: UNTRACEABLE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>Untraceable</H1><HR>
+<H2>Summary</H2>
+<P>
+ The program could not trace the order at all.
+<P>
+ Check that:
+<P>
+<UL>
+
+<LI> the correct frame is being traced.
+
+<LI>the frame is oriented so that the orders run with the dispersion
+    direction parallel to the X-axis of the frame.
+</UL>
+<P>
+ If tracing is being attempted using a cosmic-ray-contaminated frame
+ then try using the option/task ech_decos1 to clean the frame prior
+ to tracing.
+<P>
+ The parameter TUNE_MXSMP determines the number of sampled increments
+ across the frame and thus their separation.  In general, increasing
+ TUNE_MXSMP will assist the program in tracing difficult orders.
+ It is worth experimenting with the various modes of tracing (set by
+ the TRACE_MODE parameter).  Usually, at least one of the available
+ options will handle difficult or unusual cases.
+<P>
+ As a last resort a manual-trace mode, in which points specified using
+ a graphics cursor are used as the basis for the tracing process,
+ is available.
+<P>
+<P>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

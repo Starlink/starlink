@@ -1,0 +1,41 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model sky.                          (ECH_SKY)
+
+ Processing order 1...
+ Sky calculation using average at each column.
+ At X=200 sky=0.668.
+ At X=400 sky=2.147.
+ At X=600 sky=1.427.
+ At X=800 sky=1.216.
+ At X=1000 sky=2.412.
+ At X=1200 sky=1.327.
+ At X=1400 sky=1.449.
+ At X=1600 sky=0.895.
+ At X=1800 sky=0.446.
+ At X=2000 sky=1.343.
+ Processing order 2...
+ Sky calculation using average at each column.
+ At X=200 sky=1.124.
+ At X=400 sky=2.395.
+ At X=600 sky=1.694.
+ At X=800 sky=1.664.
+ At X=1000 sky=0.898.
+ At X=1200 sky=2.154.
+ At X=1400 sky=1.819.
+ At X=1600 sky=2.044.
+ At X=1800 sky=0.989.
+ At X=2000 sky=0.667.
+ Processing order 3...
+ Sky calculation using average at each column.
+ At X=200 sky=1.43.
+ At X=400 sky=1.094.
+ At X=600 sky=1.781.
+ At X=800 sky=2.402.
+ At X=1000 sky=1.46.
+ At X=1200 sky=1.688.
+ At X=1400 sky=1.109.
+ At X=1600 sky=1.692.
+ At X=1800 sky=0.999.
+ At X=2000 sky=0.562.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Set_wscale.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>SET_WSCALE</H2><HR>
+<H2>Usage</H2>
+<H3>SET_WSCALE=_LOGICAL</H3>
+<H2>Description</H2>
+<P>
+ This parameter determines the overall type of scrunching to use when
+ scrunching extracted orders.
+<P>
+ Set TRUE if the current frame wavelength range is to be used (all
+ orders) to generate a full range wavelength scale to scrunch into;
+ i.e., all orders are scrunched into the same bin size, but the
+ number of X-axis bins in each order will vary.
+<P>
+ Set FALSE if each order is to be scrunched to its own scale.
+ This retains the X-dimension of the orders, but each order will be
+ scrunched into a slightly different bin size.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:44 1996
+</ADDRESS>
+</BODY>
+</HTML>

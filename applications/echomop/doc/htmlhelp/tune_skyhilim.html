@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_skyhilim.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_SKYHILIM</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_SKYHILIM=_REAL</H3>
+<H2>Description</H2>
+<P>
+ Specifies the upper threshold used when automatically determining
+ the location of 'sky' pixels in the object spatial profile.
+<P>
+ The algorithm used is:
+<P>
+<PRE WIDTH=72>
+    - Median filter profile and multiply by 1.05
+    - Calculate the threshold point:
+<P>
+       Min + (Max-Min)*TUNE_SKYHILIM
+<P>
+    - Take the minimum of the two quantities
+</PRE>
+<P>
+ This minimum is used as the maximum sky intensity allowed along
+ the spatial profile.
+<P>
+ The default value is 0.5 (i.e. 50%).
+<P>
+<P>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

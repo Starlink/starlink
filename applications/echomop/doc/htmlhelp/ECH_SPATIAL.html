@@ -1,0 +1,64 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_SPATIAL.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_SPATIAL</H1><HR>
+<H2>Summary</H2>
+<P>
+ This option must be used before any extraction of the orders can
+ take place.
+<P>
+ It consists of two steps:
+<P>
+<PRE WIDTH=72>
+    4.1  Analyse the Arc/Flat-field frame to determine the positions
+         of the edges of the dekker.
+<P>
+         A typical interactive plot appears below.
+<P>
+         <IMG SRC=dekker.gif>
+<P>
+    4.2  Analyse the Object frame to determine the position of the
+         object within the slit, and its extent above and below the
+         traced order.
+<P>
+         A typical interactive plot appears below.
+<P>
+         <IMG SRC=object.gif>
+</PRE>
+<P>
+ In each case a plot is produced on the graphics device (specified
+ by the SOFT parameter), showing the status of pixels in relation
+ to their position relative to the path of the order across the
+ frame.  The status of the pixels as set by this option, determine
+ what part they play when the extraction takes place, i.e., is a
+ pixel sky, object, outside the slit, or to be ignored completely by
+ the extraction routine?
+<P>
+ If PFL_INTERACT=YES is set then these quantities  can be
+ interactively edited on a profile plot.
+<P>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Multi-object_spectra.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Multi-object Spectra</H2><HR>
+<P>
+ Although ECHOMOP was produced for the reduction of data taken with
+ the UCLES Echelle Spectrograph, it is in no way limited to processing
+ data from this particular instrument, or even, to data from echelle
+ spectrographs.  The package can equally well be used on multi-object
+ spectra obtained, for example, using the popular fibre based
+ instruments.  If you are processing this type of data the following
+ points need to be remembered.
+<P>
+ Each spectrum will need to be independently wavelength calibrated
+ as the expected inter-order relationship checked for by completely
+ automatic calibration will not be valid.  Automatic identification
+ of lines will however, still be possible on an object-by-object
+ basis and if all the spectra have the same range (in wavelength),
+ then the wavelength limits obtained on successfully calibrating
+ the first object can be used as constraints for the others.
+ In this instance the ech_idwave option/task would be run
+ interactively for the first object, and then via a command such
+ as the example below (for object 2), for all the remaining objects.
+<P>
+<PRE WIDTH=72>
+    % ech_idwave IDX_NUM_ORDERS=2 \
+                 ARC=THAR ECH_FTRDB=ARCDIRS:THAR \
+                 ID_INTERACT=NO \
+                 ...other parameter settings...\
+                 MIN_WAVE=3250. \
+                 MAX_WAVE=3295. \
+                 NOPROMPT
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

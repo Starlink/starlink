@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_clpby.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_CLPBY</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_CLPBY=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ This parameter sets the number of points automatically clipped 
+ per order-trace fit/clip iteration.
+<P>
+ The TUNE_CLPBY most-deviant points are clipped before a re-fit is 
+ attempted, this process is then repeated until either:
+<P>
+  - all points have deviations of less than TUNE_CLPMXDEV from the 
+    polynomial,
+<P>
+ or 
+ 
+  - so many points have been clipped that a meaningful fit can no 
+    longer be attempted.
+<P>
+ In the latter case the order will be automatically disabled.
+ The user may manually re-fit the trace if the order is still
+ to be processed.
+<P>
+ The default value is 1.
+<P>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:45 1996
+</ADDRESS>
+</BODY>
+</HTML>

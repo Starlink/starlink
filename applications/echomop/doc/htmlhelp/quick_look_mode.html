@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Quick_look_mode.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Quick Look Mode</H2><HR>
+<P>
+ Invoking ECHOMOP tasks with the TUNE_QUICK=Y parameter will cause the
+ automatic setting of parameters to values to minimise CPU usage.
+<P>
+ The following algorithmic optimisation will be used:
+<P>
+<UL>
+<LI>order tracing will use centre-of-gravity to locate the centre
+     of the order.
+<P>
+<LI>maximum of 200 trace sample points per order will be measured.
+<P>
+<LI>criteria for clipping points from the trace fit will be set
+     at 1 pixel maximum deviation, and up to 5 pixels may be clipped
+     per iteration.
+<P>
+<LI>extraction will use the linear version of the 1-D algorithm
+     which is faster than optimal/weighted extraction.
+<P>
+<LI>arc line identification will assume the data is arranged
+     with wavelength increasing with X-pixel address.
+<P>
+<LI>no scrunching will be performed.
+</UL>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,23 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Determine dekker/object extent. (ECH_SPATIAL)
+
+ TUNE_DEKABV is set to non-default value: 9.
+ TUNE_DEKBLW is set to non-default value: -9.
+ TUNE_DEKTHR is set to non-default value: 0.2.
+ TUNE_SKYHILIM is set to non-default value: 1.05.
+ Averaging samples from all orders to get spatial behaviour.
+ (Use TUNE_USE_NXF>=1 to select individual order sampling.)
+ Setting dekker limits to user-supplied values.
+ Lower dekker-limit set to -9 pixels below trace.
+ Upper dekker-limit set to 9 pixels above trace.
+ TUNE_DEKTHR is set to non-default value: 0.2.
+ TUNE_OBJABV is set to non-default value: 3.
+ TUNE_OBJBLW is set to non-default value: -7.
+ TUNE_SKYHILIM is set to non-default value: 1.05.
+ Averaging samples from all orders to get spatial behaviour.
+ (Use TUNE_USE_NXF>=1 to select individual order sampling.)
+ Setting object limits to user-supplied values.
+ Lower object-limit set to -7 pixels below trace.
+ Upper object-limit set to 4 pixels above trace.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,31 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model flat field.                (ECH_FFIELD)
+
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 0.
+ TUNE_FFNYPLY is set to non-default value: 3.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 1...
+ Fitting (coeffs=3) SPLINE to flat-field spatial dependence.
+ Insufficient number of coefficients for spline fit.
+ Increasing number of coefficients to 16.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 0.
+ TUNE_FFNYPLY is set to non-default value: 3.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 2...
+ Fitting (coeffs=16) SPLINE to flat-field spatial dependence.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ TUNE_FFNXPLY is set to non-default value: 0.
+ TUNE_FFNYPLY is set to non-default value: 3.
+ TUNE_FFSUBSMP is set to non-default value: YES.
+ Processing order 3...
+ Fitting (coeffs=16) SPLINE to flat-field spatial dependence.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ ---------------------------------------------------------------------------
+

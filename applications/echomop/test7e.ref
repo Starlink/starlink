@@ -1,0 +1,50 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model object profile.           (ECH_PROFILE)
+
+ TUNE_OBJPOLY is set to non-default value: 5.
+ TUNE_OBJPOLY is set to non-default value: 5.
+ TUNE_USE_NXF is set to non-default value: 1.
+ Deriving profile polyomials for order 1.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel above trace.
+ Calculating object pixel fractions at 2 pixels above trace.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel below trace.
+ Calculating object pixel fractions at 2 pixels below trace.
+ Calculating object pixel fractions at 3 pixels below trace.
+ Calculating object pixel fractions at 4 pixels below trace.
+ Calculating object pixel fractions at 5 pixels below trace.
+ Calculating object pixel fractions at 6 pixels below trace.
+ Calculating object pixel fractions at 7 pixels below trace.
+ Calculating object pixel fractions at 8 pixels below trace.
+ Calculating object pixel fractions at 9 pixels below trace.
+ Deriving profile polyomials for order 2.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel above trace.
+ Calculating object pixel fractions at 2 pixels above trace.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel below trace.
+ Calculating object pixel fractions at 2 pixels below trace.
+ Calculating object pixel fractions at 3 pixels below trace.
+ Calculating object pixel fractions at 4 pixels below trace.
+ Calculating object pixel fractions at 5 pixels below trace.
+ Calculating object pixel fractions at 6 pixels below trace.
+ Calculating object pixel fractions at 7 pixels below trace.
+ Calculating object pixel fractions at 8 pixels below trace.
+ Calculating object pixel fractions at 9 pixels below trace.
+ Deriving profile polyomials for order 3.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel above trace.
+ Calculating object pixel fractions at 2 pixels above trace.
+ Calculating object pixel fractions at trace centre.
+ Calculating object pixel fractions at 1 pixel below trace.
+ Calculating object pixel fractions at 2 pixels below trace.
+ Calculating object pixel fractions at 3 pixels below trace.
+ Calculating object pixel fractions at 4 pixels below trace.
+ Calculating object pixel fractions at 5 pixels below trace.
+ Calculating object pixel fractions at 6 pixels below trace.
+ Calculating object pixel fractions at 7 pixels below trace.
+ Calculating object pixel fractions at 8 pixels below trace.
+ Calculating object pixel fractions at 9 pixels below trace.
+ ---------------------------------------------------------------------------
+

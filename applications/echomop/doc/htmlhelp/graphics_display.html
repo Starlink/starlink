@@ -1,0 +1,63 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Graphics_display.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Graphics Display</H2><HR>
+<P>
+ Graphics display may be controlled by specifying the SOFT parameter
+ on the command line of any ECHOMOP task.  For example:
+<P>
+<PRE WIDTH=72>
+    % ech_trace SOFT=device
+</PRE>
+<P>
+ (Note the CaSe is important on UNIX machines)
+<P>
+ ECHOMOP also supports SOFT=NONE which disables all interactive
+ graphics facilities and saves CPU time when such facilities are not
+ required.  The SOFT parameter should be set using
+<P>
+<PRE WIDTH=72>
+    SOFT=NONE or SOFT=NULL
+</PRE>
+<P>
+ to disable ECHOMOP graphics.
+<P>
+ Hard copy graphics is directed to /device/ using the parameter
+<P>
+<PRE WIDTH=72>
+    HARD=device
+</PRE>
+<P>
+ The ech_plot task also provides the ability to re-direct the
+ graphics output to any device during a run of the program.  Typing
+ &gt;device at the ech_plot menu will direct future output to that
+ device.  Additionally, ech_plot can make one-off hard copies of the
+ last plotted graph by typing ^ at the ech_plot menu prompt.  Such
+ plots will be output to the device specified using the hard
+ parameter.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

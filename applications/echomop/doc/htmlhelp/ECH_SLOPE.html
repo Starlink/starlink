@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_SLOPE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_SLOPE</H1><HR>
+<P>
+<H2>Function</H2>
+Estimate the slope of the orders across the frame.
+<P>
+<H2>Summary</H2>
+ Slope estimation is only performed when frame checking is enabled
+ (set TUNE_FCHECK=YES).
+<P>
+ This routine determines the slope of the orders in an echellogram.
+ The method used is to first collapse or median filter samples of
+ 20 columns lying across the corner-corner diagonals of the input
+ frame, into a 1-D array, and then applies a triangle filter to
+ this array.
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_SLOPE_hints.html">Hints</A></H3>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

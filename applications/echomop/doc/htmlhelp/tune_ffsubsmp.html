@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_ffsubsmp.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_FFSUBSMP</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_FFSUBSMP=_LOGICAL</H3>
+<H2>Description</H2>
+<P>
+ Whether subsampling is to be used when doing X-polynomial fits.
+<P>
+ Set to TRUE if subsampling is to be done.
+<P>
+ This parameter is only used when polynomial fitting in the
+ X-direction is enabled (TUNE_FFNXPLY &gt; 1) and causes the program to
+ subsample (10 samples per pixel) the spatial profile during
+ fitting.  This is useful when the balance factors `outside' the dekker,
+ or at the very edge of the dekker (where the intensity changes 
+ quickly from pixel-to-pixel) are needed.
+<P>
+ INTIIAL SUGGESTED VALUE: NO.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:45 1996
+</ADDRESS>
+</BODY>
+</HTML>

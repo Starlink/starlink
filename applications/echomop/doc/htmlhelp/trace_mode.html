@@ -1,0 +1,77 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Trace_mode.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TRACE_MODE</H2><HR>
+<H2>Usage</H2>
+<H3>TRACE_MODE=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ The type of tracing method to be used.
+<P>
+ The following options are available:
+<P>
+<PRE WIDTH=72>
+  U - indicates user (ICUR) coords are supplied.
+  R - selects re-tracing using old trace as baseline.
+  T - indicates that a triangle filter is to be applied
+      before centre location.
+  A - indicates that in cases of failure, the program is to
+      automatically fall-back to the next-least demanding
+      centering mode.
+</PRE>
+<P>
+ Plus one of the following mandatory selections:
+<P>
+<PRE WIDTH=72>
+  B - basic, simple-minded centre of gravity.
+  E - locate profile edges and interpolate.
+  C - find centroid of profile.
+  G - fit a Gaussian across profile.
+</PRE>
+<P>
+ For example:
+<P>
+<PRE WIDTH=72>
+  TAG  would fit Gaussians to triangle-filtered data and
+       automatically fall-back to try centroiding for problem
+       samples.
+<P>
+  B    would do simple centre-of-gravity calculations on the raw
+       profile, with no automatic fallback being used.
+</PRE>
+<P>
+ The default mode is C which provides a reasonable balance of
+ probability-of-a-good-trace vs. time-taken.  The order of
+ specification is significant and must obey the following rules:
+<P>
+<PRE WIDTH=72>
+  - Optional U or R followed by
+  - Optional T and/or A followed by
+  - One of B, E, C or G.
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:44 1996
+</ADDRESS>
+</BODY>
+</HTML>

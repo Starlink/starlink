@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Wave-fit_devs.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Wave-fit Deviations</H2><HR>
+<P>
+ The fitted polynomial has been rejected due to an excessive RMS
+ deviation measure.
+<P>
+ Usually the rejection will be valid and the program will proceed
+ to locate a better set of identifications.  However, if looking at
+ the other orders it is determined that this identifications was
+ likely to be correct for the order, then ech_idwave should be used
+ in manual mode.  Specifying an appropriate search range for the
+ order and using the AI option will let the program relocate the set
+ of identifications it rejected when running automatically.  The set
+ can then be accepted and interactively improved by adding or
+ removing individual line identifications.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

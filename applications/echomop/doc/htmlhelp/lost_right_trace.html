@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Lost_right_trace.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Lost_right_trace</H2><HR>
+<P>
+ The program has failed to trace the order outwards from the centre
+ of the frame towards the right-hand side (increasing X).
+<P>
+ If tracing is being attempted using a cosmic-ray-contaminated frame
+ then the ech_decos1 option/task should be used to clean the frame
+ prior to tracing.
+<P>
+ The parameter TUNE_MXBADSMP sets the maximum number of failed
+ samples allowed before the trace is deemed 'lost'.
+<P>
+ The parameter TUNE_MXSMP determines the number of samples across
+ the frame and thus their separation.  In general, increasing
+ TUNE_MXSMP will assist the program in tracing difficult orders.
+<P>
+ Experimenting with the various modes of tracing set by the parameter
+ TRACE_MODE should allow most cases to be traced.
+<P>
+ As a last resort, the program also provides a manual trace mode in
+ which points specified using a graphics cursor can be used as the
+ basis for the tracing process.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

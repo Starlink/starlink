@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: READOUT-NOISE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Readout Noise</H2><HR>
+<P>
+ The signals from CCD detectors are subject to an uncertainty due to
+ the charge-to-voltage conversion on the chip.
+<P>
+ This is called readout noise.  Most modern CCDs are run to not
+ under-sample the noise signal, so the noise level is a couple to
+ a few counts in each pixel.  Older chips with higher readout noise
+ levels are still in  use.
+<P>
+ ECHOMOP expects the value for readout noise to be specified in
+ the data frame itself (for CCD frames).  You should check that
+ the correct value has been obtained.
+<P>
+ Some CCDs use multiple on-chip amplifiers to provide a more rapid
+ readout facility.  Each of these will have its own readout noise
+ value.  The best procedure for processing such frames is to split
+ the image in to two sub-frames (or four for quad-amplifier chips).
+ Each sub-frame should be separaetly processed in the normal way.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

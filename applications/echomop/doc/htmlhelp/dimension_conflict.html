@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Dimension_conflict.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Dimension_conflict</H2><HR>
+<P>
+ An attempt has been made to access a reduction object using
+ dimensions different from those operative at the time of its
+ creation.
+<P>
+ This will usually be due to the changing of a parameter TUNE_???
+ which is used to specify the dimension, or due to a change in
+ wavelength scale during scrunching (which changes dimensioning
+ objects NX_REBIN and NO_OF_BINS).  The name of the parameter is
+ shown along with its 'old' and current value.
+<P>
+ If a TUNE_??? parameter is involved then there are two courses of
+ action available.  The first option is to reset the parameter to its
+ previous value and continue with the reduction.  The second option
+ is to delete from the reduction file the object which has been
+ created using the 'old' value.  Such objects must then be re-created
+ using the new parameter value by invoking the relevant processing
+ options.  The program will prompt asking which course of action is
+ required.  It should be noted that in some cases deleting an object
+ may necessitate the re-running of an earlier option in order to
+ re-create it, and re-calculate its contents.  In this case, ECHOMOP
+ will inform you which step needs repeating.
+<P>
+<P>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,239 @@
+  interface ECH_LINLOC
+    parameter ANYLOGICAL
+        keyword     ' '
+        type        '_LOGICAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYSTRING
+        keyword     ' '
+        type        '_CHAR'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter ANYNUMBER
+        keyword     ' '
+        type        '_REAL'
+        ppath       'dynamic,current,default'
+        vpath       'prompt'
+    endparameter
+
+    parameter IDX_NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of arc reference images'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NREF_FRAME'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NREF_FRAME'
+    endparameter
+
+    parameter IDX_NUM_ORDERS
+        type        '_INTEGER'
+        prompt      'Number of orders in echellogram'
+        default     0
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.IDX_NUM_ORDERS'
+        help        '%ECHOMOP_HELP: USER_PAR IDX_NUM_ORDERS'
+    endparameter
+
+    parameter TUNE_CLONE
+        type        '_CHAR'
+        prompt      'Reduction data file to copy from'
+        default     'NULL'
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,default,global,noprompt'
+        association '<->echmenu.TUNE_CLONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_CLONE'
+    endparameter
+
+    parameter TUNE_YZONE
+        type        '_INTEGER'
+        prompt      'Number of vertical image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_YZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_YZONE'
+    endparameter
+
+    parameter TUNE_XZONE
+        type        '_INTEGER'
+        prompt      'Number of horizontal image zones'
+        default     1
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_XZONE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_XZONE'
+    endparameter
+
+    parameter TUNE_REPORT
+        type        '_CHAR'
+        prompt      'Specifies reporting modes'
+        default     ' '
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_REPORT'
+        help        '%ECHOMOP_HELP: TUNING TUNE_REPORT'
+    endparameter
+
+    parameter TUNE_AUTOMATE
+        type        '_CHAR'
+        prompt      'Specifies automated processing sequence'
+        default     ' '
+        ppath       'current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_AUTOMATE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_AUTOMATE'
+    endparameter
+
+    parameter TUNE_QUICK
+        type        '_LOGICAL'
+        prompt      'YES for Quick-look operation'
+        default     NO
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_QUICK'
+        help        '%ECHOMOP_HELP: TUNING TUNE_QUICK'
+    endparameter
+
+    parameter TUNE_BATCH
+        type        '_LOGICAL'
+        prompt      'YES for batch-mode operation'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,global,noprompt'
+        association '<->echmenu.TUNE_BATCH'
+        help        '%ECHOMOP_HELP: TUNING TUNE_BATCH'
+    endparameter
+
+    parameter TUNE_PAGE
+        type        '_INTEGER'
+        prompt      'Number of lines per page of output'
+        default     0
+        ppath       'default,current,default'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.TUNE_PAGE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_PAGE'
+    endparameter
+
+    parameter DISPLAY
+        type        '_LOGICAL'
+        prompt      'YES to overlay plots on images'
+        default     NO
+        ppath       'current,default,global'
+        vpath       'current,global'
+        association '<->echmenu.DISPLAY'
+        help        '%ECHOMOP_HELP: USER_PAR DISPLAY'
+    endparameter
+
+    parameter HARD
+        type        '_CHAR'
+        prompt      'Produce plot files for hardcopy output'
+        default     'NONE'
+        ppath       'current,default,global'
+        vpath       'current,default,global,noprompt'
+        association '<->echmenu.HARD'
+        help        '%ECHOMOP_HELP: USER_PAR HARD'
+    endparameter
+
+    parameter SOFT
+        type        '_CHAR'
+        prompt      'Produce plots on screen'
+        ppath       'current'
+        vpath       'current,prompt'
+        association '<->echmenu.SOFT'
+        help        '%ECHOMOP_HELP: USER_PAR SOFT'
+    endparameter
+
+    parameter ECH_RDCTN
+        type        '_CHAR'
+        prompt      'Reduction database'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.ECH_RDCTN'
+        help        '%ECHOMOP_HELP: USER_PAR ECH_RDCTN'
+    endparameter
+
+    parameter HARDCOPY
+        type        '_LOGICAL'
+        prompt      'YES to produce plot as a hard copy'
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.HARDCOPY'
+        help        '%ECHOMOP_HELP: USER_PAR HARDCOPY'
+    endparameter
+
+    parameter ARC
+        type        '_CHAR'
+        prompt      'Name(s) of reference (arc) lamp image(s)'
+        ppath       'current,default'
+        vpath       'prompt'
+        association '<->echmenu.ARC'
+        help        '%ECHOMOP_HELP: USER_PAR ARC'
+    endparameter
+
+    parameter TUNE_MAXPOLY
+        type        '_INTEGER'
+        prompt      'Maximum coefficients for fits'
+        default     50
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,global,default,noprompt'
+        association '<->echmenu.TUNE_MAXPOLY'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXPOLY'
+    endparameter
+
+    parameter NREF_FRAME
+        type        '_INTEGER'
+        prompt      'Number of wavelength reference frames'
+        default     1
+        ppath       'dynamic,current,default'
+        vpath       'dynamic,current,noprompt'
+        association '<->echmenu.NREF_FRAME'
+        help        '%ECHOMOP_HELP: USER_PAR NREF_FRAME'
+    endparameter
+
+    parameter TUNE_DIAGNOSE
+        type        '_LOGICAL'
+        prompt      'YES to log activity to debugging file'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,default,noprompt'
+        association '<->echmenu.TUNE_DIAGNOSE'
+        help        '%ECHOMOP_HELP: TUNING TUNE_DIAGNOSE'
+    endparameter
+
+    parameter TUNE_MAXRFLN
+        type        '_INTEGER'
+        prompt      'Maximum number of reference lines'
+        default     200
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_MAXRFLN'
+        help        '%ECHOMOP_HELP: TUNING TUNE_MAXRFLN'
+    endparameter
+
+    parameter TUNE_RFLNTHR
+        type        '_REAL'
+        prompt      'Reference line lower threshold'
+        default     1.25
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_RFLNTHR'
+        help        '%ECHOMOP_HELP: TUNING TUNE_RFLNTHR'
+    endparameter
+
+    parameter TUNE_NOARC
+        type        '_LOGICAL'
+        prompt      'YES if no arc frame is available'
+        default     NO
+        ppath       'current,default'
+        vpath       'current,global,default,noprompt'
+        association '<->echmenu.TUNE_NOARC'
+        help        '%ECHOMOP_HELP: TUNING TUNE_NOARC'
+    endparameter
+
+  endinterface

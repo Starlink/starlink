@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_LOCATE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_LOCATE</H1><HR>
+<H2>Summary</H2>
+<P>
+ This will usually be the first option selected and will cause
+ the following operations to be performed:
+<P>
+<PRE WIDTH=72>
+    1.1  Check frame dimensions, and possibly bad row/columns.
+<P>
+    1.2  Optionally check the 'trace' frame for cosmic rays.
+<P>
+    1.3  Determine approximate slope of orders across the frame.
+<P>
+    1.4  Count the order and record their positions in y at the
+         centre (x=nx/2) of the frame.
+</PRE>
+<P>
+ In many cases the location of the orders (at the frame centre)
+ can be completed automatically.  Cosmic ray cleaning of the
+ trace frame can be enabled using TUNE_CRTRC=YES, and bad
+ row/column checking by using TUNE_FCHECK=YES.
+<P>
+ The located orders are plotted on the graphics device (specified
+ by the SOFT parameter), and may be edited using the graphics
+ cursor.  If completely automatic operation is required then the
+ parameter TUNE_AUTLOC=YES should be specified.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=locate.gif>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

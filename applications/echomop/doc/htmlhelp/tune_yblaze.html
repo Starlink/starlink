@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_yblaze.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_YBLAZE</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_YBLAZE=_LOGICAL</H3>
+<H2>Description</H2>
+<P>
+ Set TRUE if automatic Y-blaze correction is to be used.
+<P>
+ This correction proceeds by examining the scrunched orders and
+ re-scaling them so that the extremes of adjacent orders match up.
+<P>
+ This should only be used when no flux calibration is available and
+ there is a real need for it.  It requires that the blaze fit be
+ scrunched before being applied, and therefore necessitates a
+ blaze-fit followed by a scrunch.  The blaze correction is only
+ applied to scrunched (and merged) orders in this case.
+<P>
+ When TUNE_YBLAZE=FALSE, the blaze fit is applied to the extracted
+ orders directly and these may be later scrunched.
+<P>
+ INITIAL SUGGESTED VALUE: NO.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:48 1996
+</ADDRESS>
+</BODY>
+</HTML>

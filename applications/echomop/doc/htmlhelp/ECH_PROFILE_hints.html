@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_PROFILE_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_PROFILE.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ Most data will extract well using a single profile determined using
+ the average over all orders.  If per-order profiles are required
+ then set TUNE_USE_NXF=1.
+<P>
+ Profiles are normally determined by calculating the average
+ behaviour at each point in the spatial direction (subsampled, to
+ change the subsampling set TUNE_PFLSSAMP to the number of
+ subsamples in the entire spatial profile, i.e., within the dekker
+ limits).
+<P>
+ Profiles may optionally be determined by fitting polynomial/spline
+ functions at each subsampled spatial position.  To select this (CPU
+ intensive) method use the parameter TUNE_OBJPOLY to specify the
+ degree of the fitting function to be used).
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=pflpoly.gif>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

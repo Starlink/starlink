@@ -1,0 +1,11 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Trace orders.                     (ECH_TRACE)
+
+ Processing order 1...
+ Order 1 traced from X=3 to 2036, with a sample success rate of 97%
+ Processing order 2...
+ Order 2 traced from X=3 to 2036, with a sample success rate of 99%
+ Processing order 3...
+ Order 3 traced from X=3 to 2036, with a sample success rate of 100%
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,87 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_DEKKER.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_DEKKER</H1><HR>
+<P>
+<H2>Function</H2>
+This routine performs the determination of dekker extent
+           (using arc or flat field).
+<P>
+<H2>Summary</H2>
+ Profiles are currently averaged over all orders.  The routine will
+ automatically determine both the dekker limits and for decent data
+ these automatically set values will be correct.  If they are not, or
+ if a particular Dekker configuration is needed; options are
+ provided to interactively edit the allocation of lower/upper limits
+ (order-by-order).
+<P>
+ Options are selected from a menu by striking single characters, the
+ carriage return is not required.  The following options are available
+<P>
+<UL>
+<LI>
+ E(Exit), leaves the profiling routine.
+<P>
+<LI>
+ L(Lower dekker), sets the lower dekker-limit to the current X-position
+ of the graphics cursor.
+<P>
+<LI>
+ U(Upper dekker), sets the upper dekker-limit to the current X-position
+ of the graphics cursor.
+<P>
+<LI>
+ R(Replot mode toggle), toggles the way in which re-plots are performed
+ after a pixels status has been edited.  For some devices it is
+ necessary to replot the entire graph, as graphics can not be switched
+ back on once they have been erased.  Other devices may support changing
+ a display pixel state without re-plotting the whole screen.  In this
+ case, it is much quicker to replot only the part of the graph which
+ has actually changed.  Typing R toggles between these two modes of
+ operation.
+<P>
+<LI>
+ +(Plus key), changes the selected order.  The default is to edit all
+ orders at once, thus all orders will have the same sky/object pixel
+ allocations (in spatial dimension).  But, in some cases it may be
+ advantageous to specify object pixels on an order-by-order basis.
+<P>
+ Typing Plus from the All order situation will cause the first order
+ only to be selected.  In single order editing, the Plus key selects
+ the next order, except when the highest numbered order is the current
+ one, in which case it causes processing to revert to all order editing.
+<P>
+<LI>
+ -(Minus key), changes the selected order.  As above except that the
+ order currently selected is decremented.  Using the Minus key when
+ order 1 is selected  will revert to the all order editing situation.
+</UL>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=dekker.gif>
+<P>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

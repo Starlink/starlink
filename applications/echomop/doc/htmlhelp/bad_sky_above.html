@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Bad_sky_above.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Bad_sky_above</H2><HR>
+<P>
+ The program was unable to obtain a satisfactory estimate of the
+ position of the 'sky' in the region above the object.
+<P>
+ The algorithm for determining the sky extent uses the median
+ intensity across the profile, and the relative peak intensity.
+ The relative peak intensity is multiplied by a the value of the
+ parameter TUNE_SKYHILIM and compared with 1.05 times the median
+ intensity.  The lower of the two values is used as a threshold.
+ When the intensity falls below this threshold, the program denotes
+ the pixels from the current pixel to the edge of the dekker as 'sky'.
+<P>
+ TUNE_SKYHILIM may be varied to adjust the threshold.  It is  also 
+ possible to manually adjust the status of each pixel in the profile 
+ by setting PFL_INTERACT=Y.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

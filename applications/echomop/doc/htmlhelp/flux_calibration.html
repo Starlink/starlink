@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Flux_calibration.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Flux Calibration</H2><HR>
+<P>
+ This release of ECHOMOP provides no special support for flux
+ calibration of the extracted spectra.  FIGARO provides extensive
+ support for this procedure, including many standard star data
+ tables.
+<P>
+ It should be noted that due to the extremely high resolution of
+ the spectra produced by UCLES, there are unlikely to be sufficiently
+ high resolution data available for the flux standards.
+<P>
+ A common situation is that the FIGARO table for the standard
+ contains (at most) one sample (flux) point per order, and that such
+ points are often 40 Angstrom averages.  In such cases it is
+ difficult to ascribe much confidence to the resulting fluxes.
+<P>
+ A program of high-resolution observations (of commonly used flux
+ standards) to combat this problem is being planned.
+<P>
+ Output ECHOMOP data files (generated using ech_result) may be read
+ into the appropriate FIGARO tasks.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

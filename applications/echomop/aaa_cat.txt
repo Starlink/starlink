@@ -1,0 +1,88 @@
+000 Stars
+111 Parallaxes, Proper Motions, Radial Velocities, Space Motions, Distances
+112 Stellar Environments
+113 Photometric Properties
+114 Spectra, Temperatures, Chemical Composition
+115 Luminosities, Masses, Diameters, HR and other diagrams
+116 Rotation, Magnetic Fields, Activity, Polarisation, Radio Radiation
+117 Close Binaries
+118 Visual Binaries, Multiple Stars, Astrometric Binaries
+119 Eclipsing Binaries
+120 Spectroscopic Binaries
+121 Early-stage Stars (T Tauri,Herbig-Haro Objects etc.)
+122 Intrinsic Variables
+123 Variable Stars
+124 Novae
+125 Supernovae, Supernovae Remnants
+126 Degenerate Stars, White Dwarfs, Pulsars
+000 Interstellar Matter, Nebulae
+131 Interstellar Matter, Star formation
+132 H II regions, Emmision Nebulae
+133 Infra-Red sources
+134 Planetary Nebulae
+000 Radio Sources, X-ray Sources, Cosmic Rays
+141 Radio Sources
+142 UV Sources, X-Ray Sources, X-Ray background
+143 Gamma-Ray Sources, Gamma Ray Background
+144 Cosmic Rays
+000 Stellar Systems, Galaxy, Extragalactic Objects, Cosmology
+151 Stellar Systems (Kinematics, Dynamics)
+152 Stellar Associations
+153 Open Clusters
+154 Globular Clusters
+155 Galaxy
+156 Magellanic Clouds
+157 Normal Galaxies (Structure, Evolution, Pairs etc.)
+158 Active Galaxies (Seyferts, BL Lacertae Objects, Radio Galaxies)
+159 Quasi-stellar Objects
+160 Galaxy Groups, Clusters of Galaxies, Superclusters, Intergalactic Matter
+161 Universe, Cosmology, Background Radiation.
+144 =PHYS-9440
+144 =PHYS-9640
+111 =PHYS-9710
+112 =PHYS-9710
+113 =PHYS-9710
+114 =PHYS-9710
+115 =PHYS-9710
+116 =PHYS-9710
+131 =PHYS-9710
+113 =PHYS-9720
+114 =PHYS-9720
+115 =PHYS-9720
+116 =PHYS-9720
+121 =PHYS-9720
+126 =PHYS-9720
+112 =PHYS-9730
+116 =PHYS-9730
+117 =PHYS-9730
+122 =PHYS-9730
+123 =PHYS-9730
+124 =PHYS-9730
+125 =PHYS-9760
+126 =PHYS-9760
+117 =PHYS-9780
+118 =PHYS-9780
+119 =PHYS-9780
+120 =PHYS-9780
+151 =PHYS-9810
+152 =PHYS-9820
+153 =PHYS-9820
+154 =PHYS-9820
+125 =PHYS-9840
+131 =PHYS-9840
+132 =PHYS-9840
+133 =PHYS-9840
+134 =PHYS-9840
+155 =PHYS-9850
+156 =PHYS-9850
+157 =PHYS-9850
+158 =PHYS-9850
+159 =PHYS-9850
+160 =PHYS-9850
+133 =PHYS-9870
+141 =PHYS-9870
+142 =PHYS-9870
+143 =PHYS-9870
+144 =PHYS-9870
+161 =PHYS-9870
+161 =PHYS-9880

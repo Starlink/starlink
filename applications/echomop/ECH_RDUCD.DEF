@@ -1,0 +1,84 @@
+*+
+*  ECH_RDUCD.DEF
+*
+*	This file is used as input to data structure creation routines and 
+*	defines the format of the Echelle reduction result data structure. 
+*
+*	The actual container file created is different depending upon the 
+*	environment being used. The following environments are currently 
+*	supported.
+*
+*		FIGARO  -  container file type is .DST
+*			   this file read by DSA_READ_STRUCT_DEF
+*			   data structure creation by DSA_CREATE_STRUCTURE
+*			   structure parameter setup by DSA_SET_STRUCT_VAR
+*
+*	Author	:	Dave Mills (UCL)
+*
+*	Date	:	27-Feb-1990
+*
+*	Version	:	1.0	27-FEB-90
+*                               Created prototype 
+*
+* The following path is used to define the location of created objects
+* output by the cosmic ray imaging routine
+*
+**REGISTERED PATH => RESULT_IMAGE  DATA_ARRAY[nx,ny]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine when the type OSPECT or CSPECT is used
+*
+**REGISTERED PATH => RESULT_SPECTRUM  DATA_ARRAY[no_of_bins]
+**REGISTERED PATH => RESULT_SPECTERR  VARIANCE[no_of_bins]
+**REGISTERED PATH => RESULT_WAVESCALE XAXIS[no_of_bins]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine when the type EXTOBJ or EXTARC is used
+* in single order mode
+*
+**REGISTERED PATH => RESULT_ORDER  DATA_ARRAY[nx]
+**REGISTERED PATH => RESULT_ERROR  VARIANCE[nx]
+**REGISTERED PATH => RESULT_OYPIXELS  YAXIS[num_orders]
+**REGISTERED PATH => RESULT_ONUM  ECH_ORDERS
+**REGISTERED PATH => RESULT_FITWAVE  XAXIS[nx]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine when the type SCROBJ or SCRARC is used
+* in single order mode
+*
+**REGISTERED PATH => RESULT_SCRORDER  DATA_ARRAY[nx_rebin]
+**REGISTERED PATH => RESULT_SCRERR  VARIANCE[nx_rebin]
+**REGISTERED PATH => RESULT_SCRWAVE XAXIS[nx_rebin]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine when the type EXTOBJ or EXTARC is used
+* in ALL order mode
+*
+**REGISTERED PATH => RESULT_ORDERS  DATA_ARRAY[nx,num_orders]
+**REGISTERED PATH => RESULT_ERRORS  VARIANCE[nx,num_orders]
+**REGISTERED PATH => RESULT_ONUMS  YAXIS[num_orders]
+**REGISTERED PATH => RESULT_FITWAVES  ECH_2DWAVES[nx,num_orders]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine when the type SCROBJ or SCRARC is used
+* in ALL order mode
+*
+**REGISTERED PATH => RESULT_SCRORDERS  DATA_ARRAY[nx_rebin,num_orders]
+**REGISTERED PATH => RESULT_SCRERROR  VARIANCE[nx_rebin,num_orders]
+**REGISTERED PATH => RESULT_SCRWAVES  ECH_2DWAVES[nx_rebin,num_orders]
+*
+* The following paths are used to define the location of created objects
+* output by the results routine generally
+*
+**REGISTERED PATH => RESULT_LABELX  XLABEL
+**REGISTERED PATH => RESULT_LABELY  YLABEL
+**REGISTERED PATH => RESULT_LABELZ  ZLABEL
+**REGISTERED PATH => RESULT_UNITSX  XUNITS
+**REGISTERED PATH => RESULT_UNITSY  YUNITS
+**REGISTERED PATH => RESULT_UNITSZ  ZUNITS
+*
+* These are paths for writing the balance factor frame.
+*
+**REGISTERED PATH => RESULT_DATAZ  DATA_ARRAY[nx,ny]
+**REGISTERED PATH => RESULT_ERRORS  VARIANCE[nx,ny]
+

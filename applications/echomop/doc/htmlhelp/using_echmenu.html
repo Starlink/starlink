@@ -1,0 +1,70 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Using_echmenu.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<H2>Using ECHMENU</H2>
+<P>
+ When using the ECHMENU task a number of tasks offer optional subtasks.
+ These are invoked by using the syntax
+<P>
+<PRE WIDTH=72>
+    n.m
+</PRE>
+<P>
+ where n is the option number and m the suboption.  Selecting just an
+ option number causes all the suboptions to be run in sequence
+ automatically.
+<P>
+ Help on the current default option may be obtained by typing 0 or
+ HELP.
+<P>
+ To edit/view the parameters used by an option/suboption the number
+ should be prefixed by a `-' sign.  For example,
+<P>
+<PRE WIDTH=72>
+    -1.3
+</PRE>
+<P>
+ would invoke parameter edit/view for suboption 3 of option 1.
+<P>
+ When processing many similar frames it may be useful to `clone'
+ results from previous reduction structure files.  In order to do
+ this the following syntax is used:
+<P>
+<PRE WIDTH=72>
+    n&lt;reduction_file
+</PRE>
+<P>
+ e.g.,
+<P>
+<PRE WIDTH=72>
+    5&lt;reduction7
+</PRE>
+<P>
+ would copy the flat-fielding results from reduction structure file
+ `reduction7' into the current file, instead of calculating them again.
+ Cloning is available for all processing options.
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

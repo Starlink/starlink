@@ -1,0 +1,37 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Extended_objects.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Extended Objects</H2><HR>
+<P>
+ Although explicit support for extraction of extended objects is not
+ provided in this release, it is possible to use the package to
+ extract an increment at a time.  To do this normal extraction
+ should first be performed to obtain a reliable sky model.
+<P>
+ Then the ech_spatial option/task should be used to mask out all
+ object increments except one.  The extraction should then be re-done
+ and the resulting spectrum copied into a section of a user-created
+ data array using KAPPA image processing facilities.
+<P>
+ This procedure needs repeating for each increment required and
+ could be automated using a command file.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

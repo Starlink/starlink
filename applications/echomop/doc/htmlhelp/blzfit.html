@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: BLZFIT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>BLZFIT</H2><HR>
+<H2>Usage</H2>
+<H3>BLZFIT=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ This parameter selects the type of line fit for blaze function
+ fitting.
+<P>
+ The available functions are POLY (the default), MEDIAN and SPLINE.
+<P>
+ Note that the required maximum number of coefficients is different
+ in each case.  For POLY the maximum number of coefficients corres ponds to the number of degrees plus one, so for a cubic use coeffs=4.
+ For a SPLINE the maximum number of coefficients corresponds to
+ (knots+7)*2, so for 3 knots use coeffs=20.  If you are using SPLINE
+ fits then you should ensure that the value of TUNE_MAXPOLY is set
+ accordingly, as well as using an appropriate value for BLZ_NPOLY.
+<P>
+ When MEDIAN is selected local medians of X-extent BLZ_NPOLY
+ pixels are used as the blaze function.
+<P>
+ INITIAL SUGGESTED VALUE: POLY.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

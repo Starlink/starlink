@@ -1,0 +1,111 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_IDWAVE.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_IDWAVE</H1><HR>
+<P>
+<H2>Function</H2>
+Identify arc line wavelengths.
+<P>
+<H2>Summary</H2>
+ This routine performs wavelength calibration using a reference
+ feature list, usually provided by an arc-lamp exposure.  The routine
+ expects the candidate features to be identified and used as
+ 'knowns' for the calibration (as position/intensity pairs).  It then
+ attempts to match using a reference database; and finally generates
+ polynomials to fit the observed positions of features.
+<P>
+ The routine allows selection of the major optional operations
+ during wavelength calibration.  Options are presented in a menu
+ form and selected by typing a one- or two-character string, followed
+ by carriage return.  The following options are supported:
+<P>
+<UL>
+<LI>
+ AI (automatic identification), initiates a search and match of the
+ feature database.  Any preset limitations on the wavelength and
+ dispersion range will be taken into account.  When a solution is
+ found, a report of probable status is made and the options to
+ investigate the solution further (I), or search
+ for further solutions by re-selecting (AI) are available.
+<P>
+<LI>
+ AF (automatic polynomial fitting), performs a cycle of fitting
+ polynomials to identified lines, then clipping away any badly-deviant
+ lines, and re-fitting, etc.  Fitting ceases when a stable set of
+ identified features remains.
+<P>
+<LI>
+ E (exit), leaves the line-identification menu and updates the
+ reduction structure copy of the wavelength polynomial to reflect the
+ latest calculated fit.
+<P>
+<LI>
+ F (fit), does a single-shot polynomial fit to the currently
+ identified lines.  A report of deviations is generated but no
+ automatic clipping of deviant lines is performed.
+<P>
+<LI>
+ H (help), provides interactive browsing of the relevant sections
+ of the help library for line identification.
+<P>
+<LI>
+ I (interactive identification), enters the interactive line
+ specification/examination section.  This section provides features
+ for addition/deletion/re-fitting/listing etc of identified lines.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=idlines.gif>
+<P>
+<LI>
+ IM (import ECHARC data), is used to provide an interface to the
+ ECHARC arc line identification program.  In general the XP option
+ would first be used to export data for ECHARC processing.  ECHARC
+ would then be run, and finally the data IMported back into this
+ package.
+<P>
+<LI>
+ O (order selection), is used to change the currently selected order
+ when operating manually.  The order number to be selected is prompted
+ for.
+<P>
+<LI>
+ P (polynomial degree), is used to alter the degree of polynomial
+ to be used for the wavelength fitting.  This may vary up to the
+ maximum specified by the parameter TUNE_MAXPOLY.
+<P>
+<LI>
+ XP (export data for ECHARC), is used to provide an interface to the
+ ECHARC arc line identification program.  In general the XP option
+ would first be used to export data for ECHARC processing.  ECHARC
+ would then be run, and finally the data IMported back into this
+ package.
+</UL>
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_IDWAVE_hints.html">Hints</A></H3>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

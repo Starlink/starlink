@@ -1,0 +1,58 @@
+!-*-Mode: Text; -*-
+
+
+Things it would be nice to do
+-----------------------------
+
+Make a bash version of the initialisation and demo scripts
+(echomop.csh and echomop_demo.tar).
+
+Some conflicts between documentation and actual files.  For
+example, ech_demo.txt doesn't exist.
+
+Demo uses more, but this should be changed to `more -w', so that the
+demo doesn't fly through the demo when the displayed text is less than
+a pageful.
+
+In the demo, the ech_idwave demonstration produces an error: 
+
+  !! SUBPAR: Keyword TUNE_WCAL_INDEX is not defined in the interface file
+  !  Application exit status SUBPAR__CMDSYER, syntax error in command line
+
+
+---------------------------------------------------------------------------
+Problem: Alison Ford <af@astro.keele.ac.uk>, 16 December.
+False claim of no more disk space
+---------------------------------------------------------------------------
+
+Echomop is wierd.  I'm having great difficulty understanding how the
+menu works.
+
+When you start up, echmono.f gets the `action' and passes it to
+echomop.f.  This goes through a dirty great big IF, and sets
+AUTO_OPTIONS to some sequence of menu selections, such as '6,EXIT' for
+ech_sky and '14,EXIT' for ech_result.  This turns auto_options into a
+numeric OPTION, by a very convoluted route, and then (about line 685)
+starts testing the value of the string option_module(option).  After
+that (around 814), it calls CALL ECH_ECHOMOP_OPTION
+(OPTION_MODULE(OPTION), ORDER_NUMBER, STATUS).  Thus option_module()
+maps numbers to strings, and is initialised in ech_initialise.f.
+ech_echomop_option then has _another_ big IF, and calls routines from
+there.
+
+I looked through ech_write_results.f, which was one of the two
+routines implicated, but couldn't find anything obviously amiss.  Not
+entirely surprising, since there seems to be a panoply of different
+ways to save files, any one of which could have a wrinkle.
+
+---------------------------------------------------------------------------
+Problem: Michael Albrow <phys170@cantua.canterbury.ac.nz>, 1 Feb 1999.
+ech_dekker and ech_object apparently yoked together
+---------------------------------------------------------------------------
+
+Should be easy to fix.
+
+---------------------------------------------------------------------------
+Problem: Ignacio Negueruela <ignacio@tocai.sdc.asi.it>, 4 May 1999.
+Seems to be a ripple superimposed on the continuum (sounds nasty...)
+---------------------------------------------------------------------------

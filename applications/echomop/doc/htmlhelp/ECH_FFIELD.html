@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FFIELD.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H1>ECH_FFIELD</H1><HR>
+<P>
+<H2>Function</H2>
+Model flat-field derived per-pixel photometric corrections.
+<P>
+<UL><LI>Adapted from the PAMELA routine MAKEBAL.</UL>
+<P>
+<H2>Summary</H2>
+ Creates a balance factor frame from flat-field frame.  This is done
+ by fitting polynomials to the one-D profiles of the frame in both X and Y- and then dividing these by the frame itself.  Negative or zero
+ pixels and those outside the region specified are set to unity.  The
+ result, when multiplied into a data frame corrects for short-scale
+ sensitivity variations.  Large scale variation can be removed using
+ either a flux-calibration frame, or if unavailable, the ech_fitblz
+ option will model the large scale variations.
+<P>
+ This version adds the calculation of variances on the balance factors
+ and also alternatively allows a frame of pre-calculated balance
+ factors  (prebalanced=YES) to be used.
+<P>
+ It also allows separate activation of both types of polynomial
+ fits, interactive fitting, and the calculation of variances.
+A typical interactive plot appears below.
+<P>
+<IMG SRC=ffinter.gif>
+<P>
+<H2>Available Topics</H2>
+<A HREF="ECH_FFIELD_hints.html">Hints</A></H3>
+<P>
+<HR>
+<B><A HREF="echmenu_options.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

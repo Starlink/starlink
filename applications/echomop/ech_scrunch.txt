@@ -1,0 +1,16 @@
++---------------------------------------------------------------------------
+|
+|  Scrunch to linear wavelength scale: ech_scrunch/echmenu option 12
+|  -----------------------------------------------------------------
+|
+|  In the normal reduction process you would now want to examine
+|  the fitted wavelength scales in detail to ensure that they are
+|  correct.  For the purposes of this demonstration we will assume
+|  that the fitted scales are OK.
+|
+|  The demonstration now scrunches the extracted orders into linear
+|  wavelength scales.  This procedure gives us a constant bin size
+|  (in wavelength) over each order (options are available for
+|  scrunching to a global bin size if required).
+|
++---------------------------------------------------------------------------

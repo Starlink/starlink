@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Locating_the_orders.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Locating the Orders</H2><HR>
+<P>
+ Orders can usually be located completely automatically by ECHOMOP.
+ The algorithm takes the central few columns of a the frame and
+ cross-correlates them to provide an estimate of the average order
+ separation.
+<P>
+ It then uses this estimate to size a sampling box.  The central
+ columns are then re-sampled using averaging and a triangle filter
+ to enhance the central peaks.  The resulting data is then searched
+ to find the peaks representing the centre of each order.
+<P>
+ This technique can be severely affected by cosmic rays and other
+ high-energy contaminants in the image.  It is recommended that only
+ flat-field (or bright object) frames are used to perform order
+ location and tracing.
+<P>
+ In cases where the algorithm cannot locate all the orders which are
+ apparent by visual inspection, the orders may be located manually.
+ To control this TUNE_AUTLOC=NO  should be set.  In this case ECHOMOP
+ will display a graph of the central portion of the frame and wait for
+ interactive verification of, or correction to, the located order
+ positions.  For cases where the user is confident that the located
+ orders will be correct, TUNE_AUTLOC=YES can be specified.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=locate.gif>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

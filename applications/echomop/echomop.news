@@ -1,0 +1,101 @@
+1 ECHOMOP_v3.3-0_release
+
+ This item describes the release of ECHOMOP V3.3-0, in particular,
+ changes from ECHOMOP V3.2-0.
+
+ This is an interim release of ECHOMOP with some bug fixes.
+
+2 Changes
+
+ o The parameter ARC_TYPE is now ignored by the wavelength-calibration
+   (Option 10) and wavelength-scale consistency checking (Option 20)
+   tasks.  The parameter should be removed from any scripts which use
+   these tasks before the next release of ECHOMOP, at which point the
+   parameter will be withdrawn.
+ o The central order number and central wavelength of an
+   echellogram can be used to constrain the automatic wavelength
+   calibration process.  See the HELP text for CENTRAL_ONUM
+   and CENTRAL_WAVE for more details.
+ o The output option (Option 14) can now produce DIPSO stacks of
+   echelle data.  For example, to output a stack called
+   'ECHOMOP_STK.sdf' containing the extracted object orders:
+
+      % ech_result result_format=stack result_type=extobj \
+        stack=ECHOMOP
+
+   See the on-line HELP for more details.
+ o When writing an ASCII file in Option 14 the name of the file can
+   now be changed by setting the parameter ASCII_FILE.
+ o The Thorium-Argon arc-line list and database have been expanded.
+ o A line list and database for Thorium-Neon arcs has been added.
+   The relevant files are THNE.ARC and THNE.sdf.
+ o An extra line has been added to the Copper-Argon line list and
+   database.
+ o Non-standard PGPLOT calls have been removed from the source code.
+   This will lead to a minor performance improvement.
+ o In the plotter, the ASCII-dump option now produces a files which
+   DIPSO SP2RD can read.  The output filename is no longer fixed.
+ o Deferred PGPLOT errors (which would be reported on exit from
+   ECHOMOP) have been removed.
+ o The value "none" is now acceptable to indicate that no flat
+   field (FFIELD parameter) or no arc (ARC parameter) is to be used.
+   Previously only the upper-case "NONE" could be used.  Note that
+   only these two values indicate no available frame; a value of
+   "None" or "NoNe" will be assumed to be the name of a frame.
+ o In Option 1 (Locate orders) the criterion for detecting an order
+   has been slightly changed.  Previously, a candidate order would
+   have to have at least 1% of the intensity of the brightest order
+   found minus the median value of the central column in the image.
+   This does not allow for automatic detection of all orders if the
+   brightness of orders and the inter-order background level vary
+   significantly across the frame.  The criterion has been changed
+   to simply: "intensity at least 1% of the brightest order".
+
+ o HELP is now available within the plotter task.
+
+2 Documentation_notes
+
+ o The database files used to store information about a specific
+   reduction have been retitled "reduction databases".  Previously
+   these were known as "reduction structure files".  This change is
+   reflected in all documentation and source code comments.
+
+2 Bug_Fixes
+
+ o When changing between arc-line databases there is no longer
+   a prompt to choose between old and new values of TUNE_WCAL_INDEX.
+   This was a bug which would cause the program to crash if the user
+   guessed "new" as the response to the prompt.
+ o A memory management problem causing a crash if the abort "!"
+   option was used in Options 3, 6, or 11 had been removed.
+ o The parameter CENTRAL_ONUM can now be used, previously the
+   value was forced to zero within the program.
+ o In Option 4, the slit setup can now be edited.  Previously,
+   each invocation of Option 4 would recalculate the settings.
+   The settings can now be edited without this "reset" by setting
+   PFL_MODE to the value 'E' before starting the option.
+ o The program now reports an error when unable to successfully
+   access an input file.  The program reprompts the user.
+   Previously the program would crash when trying to use "unaccessed"
+   data.
+ o The "Path syntax" in the plotter is now correctly displayed.
+ o In browse mode in the plotter SPLINE traces are now supported.
+   Previously POLY was assumed with unpredictable side-effects.
+ o Limits in plotter browse mode are now correctly enforced, avoiding
+   common crashes.
+ o All advertised style options in the plotter now work.
+ o A bug in Option 3 (Trace clip), which would decrease the number of
+   knots for a SPLINE fit by 2 on each invocation, has been removed.
+ o In Option 14 (Output results) the OSPECT output product can now
+   be used without causing a crash.
+ o The conversion from air to vacuum wavelengths enabled by
+   TUNE_AIRTOVAC is applied to the output data file when requested.
+   Previously, the correction was applied to the reduction database
+   wavelengths, not to the output file.
+ o A possible divide-by-zero error in Option 5 (Flat field) has been
+   removed.
+ o A missing range check in Option 9.2, which might give rise to
+   segmentation faults, has been removed.
+
+ Please report bugs to ussc@star.rl.ac.uk and to mjc@star.ucl.ac.uk
+

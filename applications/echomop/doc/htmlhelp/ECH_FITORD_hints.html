@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_FITORD_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_FITORD.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ This routine should be used manually on single orders when they are
+ clearly not correctly fitted.  This will usually be seen by viewing
+ the paths of the fitted order traces using ech_trplt.  In many cases
+ it will be possible to get a good trace fit by clipping a set of
+ obviously bad samples, and re-fitting (perhaps with a lower degree
+ of polynomial).
+<P>
+ The other main option for coping with such problems is to rely on
+ the trace consistency checking routine.  This will produce a good
+ set of consistent trace fits in most cases.
+<P>
+ If a particular order is beyond recovery and you do not wish to
+ extract it at all, then it may be disabled by clipping away all of
+ its trace samples with this routine.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:35 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_use_nxf.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_USE_NXF</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_USE_NXF=_REAL</H3>
+<H2>Description</H2>
+<P>
+ Specifies the fraction of the X-dimension of the frame to be used
+ for determining the profiles.
+<P>
+ This is set low (0.2 = 20%) by default for speed.
+<P>
+ Very poor data may benefit from an increase in this parameter,
+ which provides a more accurate sampling of the object profile, and thus
+ more accurate extraction weights.  The central fraction from each order
+ is sampled and the average profile over all orders is calculated.
+<P>
+ A special mode is selected by setting TUNE_USE_NXF=1, which makes the
+ sampling independent for each order.
+<P>
+ The default value is 0.2. (i.e. 20%).
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

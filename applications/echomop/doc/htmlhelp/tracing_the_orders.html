@@ -1,0 +1,122 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tracing_the_orders.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Tracing the Orders</H2><HR>
+<P>
+ The tracing of the paths of the orders across the data frame is
+ often a source of difficulty as it is fairly easy for blemishes in
+ the frame to fatally deflect order tracing algorithms from the
+ actual path of the order.  ECHOMOP provides a variety of options to
+ help combat these problems.
+<P>
+ ECHOMOP order tracing first locates the positions of the orders at
+ the centre of the frame, and estimates the average order slope.
+<P>
+ It uses this information to predict the existence of any partial
+ orders at the top/bottom of the frame which may have been missed by
+ the examination of the central columns during order location.
+ Tracing then proceeds outwards from the centre of each order.
+<P>
+ At each step outwards a variable size sampling box is used to
+ gather a set of averages for the rows near the expected order
+ centre.  The centre of this data is then evaluated by one of the
+ following methods:
+<P>
+<DL>
+<DT><B>Gaussian</B> <DD>Attempts to fit a Gaussian profile
+             Works well for bright object frames.
+<P>
+<DT><B>Centroid</B> <DD>Calculates the centroid of the data.
+             Most generally applicable method.
+<P>
+<DT><B>Edge</B> <DD>Detects the upper and lower 'edge's
+             and interpolates.  Is less accurate but works well
+             for difficult flat fields  (e.g. saturated).
+<P>
+<DT><B>Balance</B> <DD>Calculates the centre of gravity
+             Works well for difficult data when G and C methods
+             are having problems.
+<P>
+<DT><B>Retrace</B> <DD>Uses a previous trace as a template
+             the trace whenever it cannot be centred.  Will
+             normally be used in conjunction with automatic
+             trace consistency checking to improve poorly
+             traced orders.
+<P>
+ <DT><B>User</B> <DD>The last resort allows the user to
+             of points close to the order centre.  Then functions
+             as for Retrace by using a polynomial through the
+             supplied points to predict order position whenever
+             it is lost.
+</DL>
+<P>
+ The trace algorithm will loop increasing its sampling box size
+ when it fails to find an explicit centre.  The sample box can
+ increase up to a size governed by the measured average order
+ separation.
+<P>
+ When a set of centres have been obtained for an order, a polynomial
+ is fitted to their coordinates.  The polymonial degree being is
+ selectable.  For ideal data, these polynomials will represent an
+ accurate reflection of the path of the order across the frame.
+<P>
+ For real data it is usually helpful to refine these polynomials by
+ clipping the most deviant points, and re-fitting.  Options are
+ provided to do this automatically or manually.
+<P>
+ When dealing with distorted data it is often necessary to use a
+ high degree polynomial to accurately fit the order traces.
+<P>
+ This in turn can lead to problems at the edges of the frame when
+ the order is often faint. Typically the polynomial will 'run away'
+ from the required path.  The simplest solution is, of course, to
+ re-fit with a lower order polynomial, however, this may not be
+ satisfactory if the high degree is necessary to obtain a good fit
+ over the rest of the order.
+<P>
+ In these circumstances, and others where one or more orders
+ polynomials have 'run away', ECHOMOP provides an automatic
+ consistency checker.  The consistency checking task works by fitting
+ polynomials to order-number/Y-coordinate at a selection of positions
+ across the frame.
+<P>
+ The predicted order centres from both sets of polynomials are then
+ compared with each other and then mean and sigma differences
+ calculated.  The 'worst' order is then corrected by re-calculating
+ its trace polynomial using the remaining orders (but excluding its
+ own contribution).  This process is repeated until the mean
+ deviation between the polynomials falls below a tunable threshold
+ value.
+<P>
+ The consistency checker will also cope with the 'bad' polynomials
+ which can result when partial orders have been automatically
+ fitted.
+<P>
+ The order traces may also be viewed overlaid on the trace frame if
+ DISPLAY=YES is used.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

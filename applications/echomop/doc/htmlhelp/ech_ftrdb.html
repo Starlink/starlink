@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Ech_ftrdb.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>ECH_FTRDB</H2><HR>
+<H2>Usage</H2>
+<H3>ECH_FTRDB=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ The name of the file containing the reference line list database.
+<P>
+ The database is built from a .ARC file using the task ech_ftrdb.
+<P>
+ The database should have the same file name as the .ARC file used
+ for its creation.  The default is to use $ARCDIRS/THAR.  Note the use
+ of the $ARCDIRS environment variable to specify the search path for
+ arc databases.  This should normally be used as it searches in the
+ normal FIGARO order.  If you wish to specify a private database then
+ the full pathname may be provided, e.g., /mydisk/mydir/sub/ANARC.
+<P>
+ If no arc database exists for the .ARC list you want to use then
+ use the ech_ftrdb task to create a copy.  You might like to check
+ to see if anyone local already has the database you need.
+<P>
+ INITIAL SUGGESTED VALUE: '$ARCDIRS/THAR'.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:43 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,58 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Blz_npoly.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>BLZ_NPOLY</H2><HR>
+<H2>Usage</H2>
+<H3>BLZ_NPOLY=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ The default number of coefficients to be used when fitting functions
+ to the order blaze.
+<P>
+ The type of function to be used is set using the parameter BLZFIT
+ (default is POLY for polynomial).
+<P>
+ When BLZFIT=POLY then the number of coefficients should be set to
+ degree of polynomial + 1.
+<P>
+ When BLZFIT=SPLINE the number of coefficients should be set to
+ (number of knots + 7) * 2.
+<P>
+ When BLZFIT=MEDIAN the number of coefficients should be set to the
+ number of pixels over which a local median value of the blaze function
+ is to be found.
+<P>
+ For example, setting BLZ_NPOLY to 4 would permit the fitting of
+ polynomials of the form:
+<P>
+<PRE WIDTH=72>
+    constant + a.x + b.x-squared + c.x-cubed
+</PRE>
+<P>
+ INITIAL SUGGESTED VALUE: 7.
+<P>
+<P>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

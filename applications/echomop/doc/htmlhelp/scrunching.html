@@ -1,0 +1,56 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: SCRUNCHING.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Scrunching</H2><HR>
+<P>
+ The scrunching of spectra into a (usually) linear wavelength scale
+ provides exactly the same facilities available using the FIGARO
+ SCRUNCH program, except that it works on an order-by-order basis.
+<P>
+ See the SCRUNCH documentation for details.
+<P>
+ The package provides both global (bin size constant for all orders)
+ and per-order scrunching options.  The global option would normally
+ be used when it is necessary to co-add the extracted orders from
+ multiple data frames, and a standard bin-size is required.
+<P>
+ Your own linear wavelength scale may be defined by supplying start
+ wavelength and bin size, or the defaults calculated by the program
+ may be used.  In addition, there are options available to allow
+ multiple spectra to be scrunched to the same output scale and
+ the results to be merged together.
+<P>
+ The scruncher automatically merges multiple orders using the local
+ median intensities as weighting factors.  In addition each order may
+ either be scrunched to a global scale (i.e. all orders have the same
+ bin size), or to its own optimal bin size (i.e. that which gives an
+ equal number of bins to the original).
+<P>
+ To merge multiple spectra to the same output scale use the
+ ech_mulmrg option/task.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,43 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_scfract.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_SCFRACT</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_SCFRACT=_REAL</H3>
+<H2>Description</H2>
+<P>
+ Specifies the mixing fraction for two wavelength ranges (fitted).
+<P>
+ This is only required when there are arc exposures bracketing the
+ science data and there is a significant difference between the two.
+<P>
+ The fraction is used as follows:
+<P>
+<PRE WIDTH=72>
+    Lambda = Lambda1 + (Lambda2 - Lambda1) * Fraction
+</PRE>
+<P>
+ No facility is provided for calculating the appropriate fraction,
+ but it will usually be estimated as the the ratio of elapsed times
+ between the object frame, and the before/after arc frames (assumes
+ a constant 'drift' of the wavelength scales.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:47 1996
+</ADDRESS>
+</BODY>
+</HTML>

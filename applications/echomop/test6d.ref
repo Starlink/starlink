@@ -1,0 +1,107 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model sky.                          (ECH_SKY)
+
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 1...
+ Wavelength-dependent modelling of sky at 9 pixels below trace.
+ Cycle 0: RMS=0.8765175, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 2 pixels above trace.
+ Cycle 0: RMS=1.332814, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 3 pixels above trace.
+ Cycle 0: RMS=1.348595, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 4 pixels above trace.
+ Cycle 0: RMS=1.344486, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 5 pixels above trace.
+ Cycle 0: RMS=1.357984, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 6 pixels above trace.
+ Cycle 0: RMS=1.204093, (sigma) rejects: 1.
+ Cycle 1: RMS=1.203746, (sigma) rejects: 1.
+ Wavelength-dependent modelling of sky at 7 pixels above trace.
+ Cycle 0: RMS=1.301782, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 8 pixels above trace.
+ Cycle 0: RMS=1.375803, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 9 pixels above trace.
+ Cycle 0: RMS=1.040042, (sigma) rejects: 1.
+ Cycle 1: RMS=1.039735, (sigma) rejects: 1.
+ At X=200 sky=0.975, RMS=0.406, 0 rejects=0% of total.
+ At X=400 sky=2.162, RMS=0.989, 0 rejects=0% of total.
+ At X=600 sky=1.18, RMS=0.82, 0 rejects=0% of total.
+ At X=800 sky=1.614, RMS=0.999, 0 rejects=0% of total.
+ At X=1000 sky=1.892, RMS=0.326, 0 rejects=0% of total.
+ At X=1200 sky=1.193, RMS=0.99, 0 rejects=0% of total.
+ At X=1400 sky=0.951, RMS=1, 0 rejects=0% of total.
+ At X=1600 sky=1.125, RMS=0.512, 0 rejects=0% of total.
+ At X=1800 sky=1.069, RMS=0.981, 0 rejects=0% of total.
+ At X=2000 sky=1.105, RMS=0.969, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.778, 0 rejects=0% of total.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 2...
+ Wavelength-dependent modelling of sky at 9 pixels below trace.
+ Cycle 0: RMS=0.9318292, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 2 pixels above trace.
+ Cycle 0: RMS=1.385956, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 3 pixels above trace.
+ Cycle 0: RMS=1.289985, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 4 pixels above trace.
+ Cycle 0: RMS=1.247053, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 5 pixels above trace.
+ Cycle 0: RMS=1.4096, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 6 pixels above trace.
+ Cycle 0: RMS=1.299166, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 7 pixels above trace.
+ Cycle 0: RMS=1.441147, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 8 pixels above trace.
+ Cycle 0: RMS=1.307635, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 9 pixels above trace.
+ Cycle 0: RMS=1.065765, (sigma) rejects: 0.
+ At X=200 sky=1.107, RMS=0.896, 0 rejects=0% of total.
+ At X=400 sky=2.121, RMS=0.896, 0 rejects=0% of total.
+ At X=600 sky=1.698, RMS=0.817, 0 rejects=0% of total.
+ At X=800 sky=1.175, RMS=1.527, 0 rejects=0% of total.
+ At X=1000 sky=1.054, RMS=0.761, 0 rejects=0% of total.
+ At X=1200 sky=2.279, RMS=0.978, 0 rejects=0% of total.
+ At X=1400 sky=1.221, RMS=0.909, 0 rejects=0% of total.
+ At X=1600 sky=1.36, RMS=1, 0 rejects=0% of total.
+ At X=1800 sky=1.437, RMS=0.385, 0 rejects=0% of total.
+ At X=2000 sky=1.251, RMS=0.994, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.785, 0 rejects=0% of total.
+ TUNE_SKYPOLY is set to non-default value: 3.
+ TUNE_SKYXPLY is set to non-default value: 5.
+ Processing order 3...
+ Wavelength-dependent modelling of sky at 9 pixels below trace.
+ Cycle 0: RMS=0.9662561, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 2 pixels above trace.
+ Cycle 0: RMS=1.396876, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 3 pixels above trace.
+ Cycle 0: RMS=1.37044, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 4 pixels above trace.
+ Cycle 0: RMS=1.42405, (sigma) rejects: 1.
+ Cycle 1: RMS=1.423424, (sigma) rejects: 1.
+ Wavelength-dependent modelling of sky at 5 pixels above trace.
+ Cycle 0: RMS=1.332415, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 6 pixels above trace.
+ Cycle 0: RMS=1.344095, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 7 pixels above trace.
+ Cycle 0: RMS=1.336812, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 8 pixels above trace.
+ Cycle 0: RMS=1.322923, (sigma) rejects: 0.
+ Wavelength-dependent modelling of sky at 9 pixels above trace.
+ Cycle 0: RMS=1.113229, (sigma) rejects: 0.
+ At X=200 sky=1.452, RMS=0.652, 0 rejects=0% of total.
+ At X=400 sky=1.637, RMS=1.075, 0 rejects=0% of total.
+ At X=600 sky=2.105, RMS=0.928, 0 rejects=0% of total.
+ At X=800 sky=2.012, RMS=0.521, 0 rejects=0% of total.
+ At X=1000 sky=1.518, RMS=0.996, 0 rejects=0% of total.
+ At X=1200 sky=1.728, RMS=0.484, 0 rejects=0% of total.
+ At X=1400 sky=1.563, RMS=0.328, 0 rejects=0% of total.
+ At X=1600 sky=1.273, RMS=0.668, 0 rejects=0% of total.
+ At X=1800 sky=1.277, RMS=0.985, 0 rejects=0% of total.
+ At X=2000 sky=0.56, RMS=0.999, 0 rejects=0% of total.
+ Mean fits/Col: 2.
+ Average RMS=0.804, 0 rejects=0% of total.
+ ---------------------------------------------------------------------------
+

@@ -1,0 +1,20 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model flat field.                (ECH_FFIELD)
+
+ TUNE_FFLSMP is set to non-default value: 31.
+ Processing order 1...
+ Balance factors calculated from local smoothing.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ Processing order 2...
+ Balance factors calculated from local smoothing.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ TUNE_FFLSMP is set to non-default value: 31.
+ Processing order 3...
+ Balance factors calculated from local smoothing.
+ Balance model contained no non-positive pixels.
+ Balance model contained no very deviant pixels.
+ ---------------------------------------------------------------------------
+

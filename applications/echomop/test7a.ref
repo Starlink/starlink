@@ -1,0 +1,19 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model object profile.           (ECH_PROFILE)
+
+ Using 6 subsamples per pixel to sample profile.
+ Using all order information to derive profile.
+ Average Object-pixel fraction at 9 pixels below trace: 1.02%
+ Average Object-pixel fraction at 8 pixels below trace: 1.68%
+ Average Object-pixel fraction at 7 pixels below trace: 3.26%
+ Average Object-pixel fraction at 6 pixels below trace: 7.94%
+ Average Object-pixel fraction at 5 pixels below trace: 18.23%
+ Average Object-pixel fraction at 4 pixels below trace: 27.36%
+ Average Object-pixel fraction at 3 pixels below trace: 21.96%
+ Average Object-pixel fraction at 2 pixels below trace: 10.96%
+ Average Object-pixel fraction at 1 pixel below trace: 4.73%
+ Average Object-pixel fraction at trace centre: 2.71%
+ Average Object-pixel fraction at 1 pixel above trace: 2.23%
+ Average Object-pixel fraction at 2 pixels above trace: 1.76%
+ ---------------------------------------------------------------------------
+

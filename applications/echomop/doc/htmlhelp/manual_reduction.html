@@ -1,0 +1,98 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Manual_reduction.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Manual Reduction</H2><HR>
+<P>
+ Manual reduction using ECHOMOP is available at two levels:
+<P>
+ A menu driven, guided reduction.
+<P>
+<PRE WIDTH=72>
+    - ECHMENU     provides menu of all tasks
+</PRE>
+<P>
+ A completely manual selection of processing steps one after another
+ when required.  The set of tasks available to the user at this
+ level consists of the following ECHOMOP specifics:
+<P>
+<PRE WIDTH=72>
+    - ECH_DECOS1  detects and flags cosmic ray pixels
+<P>
+    - ECH_DECOS2  detects and flags cosmic ray pixels
+<P>
+    - ECH_LOCATE  locates orders in a frame
+<P>
+    - ECH_SLOPE   measure average order slope
+<P>
+    - ECH_TRACE   traces orders already located
+<P>
+    - ECH_TRCSIS  does trace consistency checking
+<P>
+    - ECH_TRPLT   plots order traces graphically
+<P>
+    - ECH_SPATIAL calculates the profiles (spatial)
+<P>
+    - ECH_LINLOC  locates arc lines
+<P>
+    - ECH_IDWAVE  identifies and wavelength calibrates
+<P>
+    - ECH_WVCSIS  does wavelength scale consistency checking
+<P>
+    - ECH_EXTRCT  extracts orders
+<P>
+    - ECH_2DFIT   distortion fitting for an order
+<P>
+    - ECH_2DEXT   extracts distorted orders
+<P>
+    - ECH_MDLBCK  models global scattered light background
+<P>
+    - ECH_FFIELD  calculates flat field balance model
+<P>
+    - ECH_PROFILE calculates object profiles
+<P>
+    - ECH_SKY     calculates sky background
+<P>
+    - ECH_SCRUNCH scrunches extracted orders
+<P>
+    - ECH_TUNER   interactively sets tuning parameters
+<P>
+    - ECH_PLOT    plots/prints all stages of reduction
+<P>
+    - ECH_RESULT  handles flexible output of resulting reduced
+                  spectra etc. to .sdf, ASCII format files.
+<P>
+    - ECH_ONE     set single order operations (ICL usage only)
+<P>
+    - ECH_ALL     set all order operations (ICL usage only)
+<P>
+    - ECH_FTRDB   generate a database file using a .ARC line list
+</PRE>
+<P>
+ These commands may generally be used from an ICL command prompt or
+ from the system shell prompt.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

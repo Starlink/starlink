@@ -1,0 +1,77 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: PRE-PROCESSING.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Pre-processing</H2><HR>
+<P>
+ All raw data should be pre-processed in the following ways before
+ processing with ECHOMOP:
+<P>
+<PRE WIDTH=72>
+  -  Ensure that the frame is stored in a Starlink-standard
+     sdf file in an NDF array .DATA_ARRAY (the CONVERT suite
+     of tasks provides image format conversion facilities).
+<P>
+  -  Rotate the data frame 90 deg. if necessary to achieve an
+     orientation where the long axis of each order is
+     in the X-pixel (horizontal) direction.
+<P>
+  -  Subtract the bias current value from all raw frames using
+     the appropriate KAPPA or FIGARO command.
+<P>
+  -  Do not multiply CCD frames by the prevailing ADU-to     electron conversion factor prior to reduction.  ECHOMOP
+     tasks prompt for this value and use it to generate resulting
+     spectra with counts in photons.
+</PRE>
+<P>
+ If a cosmic ray contaminated frame is to be used for tracing
+ the paths of the orders across the frame then
+<P>
+<PRE WIDTH=72>
+  -  Use ech_decos1 to clean cosmic rays from the trace frame.
+     Note: this task flags cosmic rays in a quality array and
+     does not actually alter any of the data frame values.
+     This is the recommended approach in this situation.  The
+     ech_decos1 task may be used stand alone, or it may be
+     invoked from the main task by setting TUNE_CRTRC=YES at
+     the start of a reduction.
+<P>
+  -  If you have many `identical' object frames then these may
+     be processed together to provide a more reliable cosmic
+     ray rejection.  The command procedure
+<P>
+        $ECHOMOP_SOURCE/decos_many
+<P>
+     provides this facility and should be the preferred method when
+     multiple frames are available.  The procedure calculates a
+     median image and then rejects pixels which deviate by more than
+     n sigma from the median value (note that this means that all
+     the frames must be of equal exposure time).  Bad pixels are
+     flagged by placing values in the quality array of the frame
+     concerned.
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,17 @@
++---------------------------------------------------------------------------
+|
+|  Write results file: ech_result/echmenu option 14
+|  ------------------------------------------------
+|
+|  We now have a scrunched set of orders, and their associated
+|  wavelength scales.  At this stage we can output these results
+|  to a standard NDF file for detailed analysis and/or modelling.
+|  The package provides additional functions for blaze-profile
+|  removal, scrunching, 2-D distortion-corrected extraction etc.
+|  Please read the documentation for information on these features.
+|
+|  The demo will now instruct the program to create an NDF-format
+|  result file containing the scrunched orders and their wavelength
+|  scales.
+|
++---------------------------------------------------------------------------

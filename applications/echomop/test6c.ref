@@ -1,0 +1,14 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Model sky.                          (ECH_SKY)
+
+ TUNE_SKYPOLY is set to non-default value: 20.
+ Processing order 1...
+ Not enough sky pixels for fit.
+ TUNE_SKYPOLY is set to non-default value: 20.
+ Processing order 2...
+ Not enough sky pixels for fit.
+ TUNE_SKYPOLY is set to non-default value: 20.
+ Processing order 3...
+ Not enough sky pixels for fit.
+ ---------------------------------------------------------------------------
+

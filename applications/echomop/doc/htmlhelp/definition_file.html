@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Definition_file.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Definition File</H2><HR>
+<P>
+ Definition files are used by ECHOMOP to specify the structure
+ of the sdfs used to store objects produced during the reduction.
+<P>
+ Each of these objects is referred to internally by the package using
+ a reference name.  The definition file also contains translations of
+ these reference names into actual path specifications within sdfs.
+<P>
+ For instance; the object referred to as OBS_LINES internally is
+ actually stored in the reduction file in the following object
+<P>
+<PRE WIDTH=72>
+    MORE.ECHELLE.WAVE_FIT_1D.OBS_LINES[TUNE_MXRFLN,NUM_ORDERS]
+</PRE>
+<P>
+ All such objects can be freely moved around the reduction file
+ merely by altering their specified paths.
+<P>
+ The default definitions are likely to be adequate for most
+ circumstances.
+<P>
+ For more information see 'Redefining Object paths'.
+<P>
+<P>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:41 1996
+</ADDRESS>
+</BODY>
+</HTML>

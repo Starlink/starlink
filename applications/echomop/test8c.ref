@@ -1,0 +1,12 @@
+ ---------------------------------------------------------------------------
+ Starting processing task:     Locate arc line candidates.      (ECH_LINLOC)
+
+ Processing reference frame 1...
+ Reference line FWHM estimated at 5.6 pixels.
+ TUNE_RFLNTHR is set to non-default value: 5.
+ Processing reference frame 1...
+ Order 1: located 47 line candidates.
+ Order 2: located 54 line candidates.
+ Order 3: located 53 line candidates.
+ ---------------------------------------------------------------------------
+

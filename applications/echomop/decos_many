@@ -1,0 +1,25 @@
+#
+#	This command file requires the following arguments
+#
+#	P1  -  name of file containing a list of raw data frame names
+#
+#        P2  -  dimensions of images eg [1024,300]
+#
+#	P3  -  optional n for n-sigma 
+#
+#	It will then median filter the stack of frames and use the
+#	median image to calculate a median+n-sigma image.
+#
+figaro
+medsky FILE='p1' OUT=MEDIAN-OF-STACK SCA=NO LOG=NO
+!$	OPEN/READ list 'p1'
+!$	LOOP:
+!$		READ/END=DONE list record
+!$		name = F$EDIT ( record,"COLLAPSE" )
+$		IDIV   'record'     MEDIAN-OF-STACK TEMP-QUALITY
+$		ICMULT TEMP-QUALITY 1000000         TEMP-QUALITY
+$		ICSUB  TEMP-QUALITY  999996         TEMP-QUALITY
+$		CLIP   TEMP-QUALITY    LO=0  HI=4   TEMP-QUALITY
+$		CORBJ  'name'.Z.QUALITY'p2'  Byte
+$		LET    'name'.Z.QUALITY=TEMP-QUALITY.Z.DATA
+!$	GOTO LOOP

@@ -1,0 +1,17 @@
+*
+*   Table file for flux standard HD based on data from
+*   Hamuy et. al., 1992. PASP, July,92
+*
+*   The values in the table are monochromatic magnitudes,
+*
+*    m= -2.5 log (Fnu) -48.590.
+*
+*   The paper is by Hamuy,M., Walker,A.R., Suntzeff,N.B., Gigoux,P.,
+*   Heathcote,S.R., and Phillips,M.M.
+*
+*   This file is designed for use with the Figaro routine GSPIKE.
+*
+SET .Z.UNITS = "Monochromatic Magnitude"
+SET .Z.LABEL = "Flux"
+SET .TABLE.BANDWIDTH =  16
+*

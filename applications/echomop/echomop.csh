@@ -1,0 +1,153 @@
+#+
+#  Name:
+#     echomop.csh
+#
+#  Purpose:
+#     Start the ECHOMOP package from the C shell.
+#
+#  Type of Module:
+#     C shell command list
+#
+#  Invocation:
+#     source $ECHOMOP_DIR/echomop.csh
+#
+#  Description:
+#     This procedure starts the ECHOMOP package for use from the C shell by 
+#     defining the aliases needed to execute each application.
+#
+#  Authors:
+#     hme: Horst Meyerdierks (UoE, Starlink)
+#     mjc: Martin Clayton (UCL, Starlink)
+#     {enter_new_authors_here}
+#
+#  History:
+#     18 Aug 1992 (hme):
+#        Original Version
+#     30 Nov 1995 (mjc):
+#        Stole some parts of Horst's FIGARO setup.     
+#     {enter_changes_here}
+#
+#-
+#.
+#  Announce name now, version etc. below.
+#
+echo " "
+echo " ----------- Initialising for ECHOMOP ------------"
+#
+#Set environment variables for ECHOMOP.
+#
+setenv ECHOMOP_BASE INSTALL_BIN
+setenv ECHOMOP_EXEC INSTALL_BIN
+setenv ECHOMOP_HELP ${ECHOMOP_BASE}/echomop
+setenv ECHOMOP_DEMO ${ECHOMOP_BASE}/demo
+setenv ECHOMOP_DATA ${ECHOMOP_BASE}/data
+setenv ECHOMOP_TEST ${ECHOMOP_BASE}/test
+setenv ECHOMOP_HYPERDIR ${ECHOMOP_BASE}/hyper
+setenv ECHOMOP_HYPER "Mosaic $ECHOMOP_HYPERDIR/echomop.html"
+
+setenv ARCDIRS ${ECHOMOP_BASE}/arc
+setenv AAA_CATEGORIES ${ECHOMOP_BASE}/data/aaa_cat.txt
+setenv AAA_KEYWORDS ${ECHOMOP_BASE}/data/aaa_key.txt
+
+alias echmenu ${ECHOMOP_EXEC}/echmenu
+
+alias echomopsetup "source ${ECHOMOP_EXEC}/echomop.csh"
+
+#
+#  Define aliases for each application.
+#
+alias echhelp ${ECHOMOP_EXEC}/echhelp
+alias ech_demo "source ${ECHOMOP_DEMO}/ech_demo.csh"
+alias ech_locate ${ECHOMOP_EXEC}/ech_ftrdb
+alias ech_locate ${ECHOMOP_EXEC}/ech_locate
+alias ech_trace ${ECHOMOP_EXEC}/ech_trace
+alias ech_decos1 ${ECHOMOP_EXEC}/ech_decos1
+alias ech_fcheck ${ECHOMOP_EXEC}/ech_fcheck
+alias ech_fitord ${ECHOMOP_EXEC}/ech_fitord
+alias ech_dekker ${ECHOMOP_EXEC}/ech_dekker
+alias ech_object ${ECHOMOP_EXEC}/ech_object
+alias ech_spatial ${ECHOMOP_EXEC}/ech_spatial
+alias ech_ffield ${ECHOMOP_EXEC}/ech_ffield
+alias ech_genflat ${ECHOMOP_EXEC}/ech_genflat
+alias ech_sky ${ECHOMOP_EXEC}/ech_sky
+alias ech_mdlbck ${ECHOMOP_EXEC}/ech_mdlbck
+alias ech_profile ${ECHOMOP_EXEC}/ech_profile
+alias ech_extrct ${ECHOMOP_EXEC}/ech_extrct
+alias ech_qextr ${ECHOMOP_EXEC}/ech_qextr
+alias ech_linloc ${ECHOMOP_EXEC}/ech_linloc
+alias ech_fwhm ${ECHOMOP_EXEC}/ech_fwhm
+alias ech_idwave ${ECHOMOP_EXEC}/ech_idwave
+alias ech_blaze ${ECHOMOP_EXEC}/ech_blaze
+alias ech_fitblz ${ECHOMOP_EXEC}/ech_fitblz
+alias ech_doblz ${ECHOMOP_EXEC}/ech_doblz
+alias ech_scrunch ${ECHOMOP_EXEC}/ech_scrunch
+alias ech_scrn2d ${ECHOMOP_EXEC}/ech_scrn2d
+alias ech_wscale ${ECHOMOP_EXEC}/ech_wscale
+alias ech_scrobj ${ECHOMOP_EXEC}/ech_scrobj
+alias ech_scrarc ${ECHOMOP_EXEC}/ech_scrarc
+alias ech_result ${ECHOMOP_EXEC}/ech_result
+alias ech_ext2d ${ECHOMOP_EXEC}/ech_ext2d
+alias ech_2dfit ${ECHOMOP_EXEC}/ech_2dfit
+alias ech_trcsis ${ECHOMOP_EXEC}/ech_trcsis
+alias ech_wvcsis ${ECHOMOP_EXEC}/ech_wvcsis
+alias ech_trplt ${ECHOMOP_EXEC}/ech_trplt
+alias ech_plot ${ECHOMOP_EXEC}/ech_plot
+alias ech_mulmrg ${ECHOMOP_EXEC}/ech_mulmrg
+alias ech_decos2 ${ECHOMOP_EXEC}/ech_decos2
+alias ech_decimg ${ECHOMOP_EXEC}/ech_decimg
+alias echbrowse "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"
+alias echwww "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"
+alias ECHMENU ${ECHOMOP_EXEC}/echmenu
+alias ECH_DEMO "source ${ECHOMOP_DEMO}/ech_demo.csh"
+alias ECH_LOCATE ${ECHOMOP_EXEC}/ech_locate
+alias ECH_FTRDB ${ECHOMOP_EXEC}/ech_ftrdb
+alias ECH_TRACE ${ECHOMOP_EXEC}/ech_trace
+alias ECH_DECOS1 ${ECHOMOP_EXEC}/ech_decos1
+alias ECH_FCHECK ${ECHOMOP_EXEC}/ech_fcheck
+alias ECH_FITORD ${ECHOMOP_EXEC}/ech_fitord
+alias ECH_DEKKER ${ECHOMOP_EXEC}/ech_dekker
+alias ECH_OBJECT ${ECHOMOP_EXEC}/ech_object
+alias ECH_SPATIAL ${ECHOMOP_EXEC}/ech_spatial
+alias ECH_FFIELD ${ECHOMOP_EXEC}/ech_ffield
+alias ECH_GENFLAT ${ECHOMOP_EXEC}/ech_genflat
+alias ECH_SKY  ${ECHOMOP_EXEC}/ech_sky
+alias ECH_MDLBCK ${ECHOMOP_EXEC}/ech_mdlbck
+alias ECH_PROFILE ${ECHOMOP_EXEC}/ech_profile
+alias ECH_EXTRCT ${ECHOMOP_EXEC}/ech_extrct
+alias ECH_QEXTR ${ECHOMOP_EXEC}/ech_qextr
+alias ECH_LINLOC ${ECHOMOP_EXEC}/ech_linloc
+alias ECH_FWHM ${ECHOMOP_EXEC}/ech_fwhm
+alias ECH_IDWAVE ${ECHOMOP_EXEC}/ech_idwave
+alias ECH_BLAZE ${ECHOMOP_EXEC}/ech_blaze
+alias ECH_FITBLZ ${ECHOMOP_EXEC}/ech_fitblz
+alias ECH_DOBLZ ${ECHOMOP_EXEC}/ech_doblz
+alias ECH_SCRUNCH ${ECHOMOP_EXEC}/ech_scrunch
+alias ECH_SCRN2D ${ECHOMOP_EXEC}/ech_scrn2d
+alias ECH_WSCALE ${ECHOMOP_EXEC}/ech_wscale
+alias ECH_SCROBJ ${ECHOMOP_EXEC}/ech_scrobj
+alias ECH_SCRARC ${ECHOMOP_EXEC}/ech_scrarc
+alias ECH_RESULT ${ECHOMOP_EXEC}/ech_result
+alias ECH_EXT2D ${ECHOMOP_EXEC}/ech_ext2d
+alias ECH_2DFIT ${ECHOMOP_EXEC}/ech_2dfit
+alias ECH_TRCSIS ${ECHOMOP_EXEC}/ech_trcsis
+alias ECH_WVCSIS ${ECHOMOP_EXEC}/ech_wvcsis
+alias ECH_TRPLT ${ECHOMOP_EXEC}/ech_trplt
+alias ECH_PLOT ${ECHOMOP_EXEC}/ech_plot
+alias ECH_MULMRG ${ECHOMOP_EXEC}/ech_mulmrg
+alias ECH_DECOS2 ${ECHOMOP_EXEC}/ech_decos2
+alias ECH_DECIMG ${ECHOMOP_EXEC}/ech_decimg
+alias ECHBROWSE "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"
+alias ECHWWW "Mosaic ${ECHOMOP_HYPERDIR}/echomop.html &"
+#
+# Show that the ECHOMOP commands are now available.
+#
+echo "              Echelle data reduction"
+echo "          Version PKG_VERS  13th June 1997"
+echo " "
+echo "          Type" \"echhelp echomop\" for help
+echo "    or" \"echhelp news\" for news on changes
+echo " "
+echo " Type" \"echwww\" to start Mosaic documentation browser.
+echo " "
+echo " Type" \"echmenu\" to start the monolith.
+echo " "

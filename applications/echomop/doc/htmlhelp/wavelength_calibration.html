@@ -1,0 +1,80 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Wavelength_calibration.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Wavelength Calibration</H2><HR>
+<P>
+ The wavelength calibration is done using a reference feature list,
+ usually provided by an arc-lamp exposure.  The routine allows any
+ candidate features to be identified and used as 'knowns' for the
+ calibration (as position/intensity pairs).
+<P>
+ These features may then be manually identified using a reference
+ lamp atlas.  Facilities are provided for adding/deleting lines and
+ altering the degree of polynomial fit performed.
+A typical interactive plot appears below.
+<P>
+<IMG SRC=idlines.gif>
+<P>
+ An automatic line identifier is included which works by searching
+ the suppled line list for multi-line 'features'.  This search can
+ be optimised by constraining the space to be searched in terms of
+ permissible wavelength and/or dispersions (in pixels/Angstrom).  In
+ addition, the program will automatically constrain the search range
+ further if it can determine the central order number and wavelength
+ (by looking in the data frame header).
+<P>
+ As soon as two orders have been successfully calibrated, the search
+ range for the remaining orders is re-evaluated to take this into
+ account.  In general the automatic method will be most useful when
+ you are unsure of the exact wavelength range covered.
+<P>
+ When the level of doubt is such that the wavelength scale may
+ decrease from left to right across the frame, then the software may
+ be instructed to automatically check for this 'reversed' condition.
+ The parameter TUNE_REVCHK controls this process and defaults to NO
+ to avoid wasting CPU time.
+<P>
+ Finally, the software is flexible as to the vertical orientation of
+ the orders, i.e., higher wavelength orders may be at the top or
+ bottom of the frame (for echelle data).
+<P>
+ Calibration may be performed using either 1 or 2 (before and after)
+ arc frames at present.  See ARC_FRAMES for details.
+<P>
+ Options are presented in a menu form and selected by typing a one or two-character string, followed by carriage return.  The following
+ options are supported:
+<P>
+<H3>Options</H3>
+<A HREF="Automatic_identification.html">Automatic_identification</A> * 
+<A HREF="Exit.html">Exit</A> * 
+<A HREF="Help.html">HELP</A> * 
+<A HREF="Interactive_identification.html">Interactive_identification</A> * 
+<A HREF="Import_ECHARC_data.html">Import_ECHARC_data</A> * 
+<A HREF="Order_selection.html">Order_selection</A> * 
+<A HREF="Polynomial_degree.html">Polynomial_degree</A> * 
+<A HREF="Export_ECHARC_data.html">Export_ECHARC_data</A></H3>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:39 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,52 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Blaze_function.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Blaze Function</H2><HR>
+<P>
+ If flux calibration is not being performed it is sometimes
+ desirable to remove the blaze function from the extracted
+ spectrum to assist in fitting line profiles etc. during data
+ analysis.
+<P>
+ A task is provided for this purpose which operates by fitting
+ polynomials to the flat-field orders.  The fits may be
+ automatically or interactively clipped and the resulting blaze
+ spectrum is normalised such that its median intensity is unity.
+ The normalised blaze is then divided into the extracted spectrum.
+<P>
+ It is important to remember that this operation must be performed
+ upon the extracted spectrum before any scrunching takes place.
+ After a blaze function has been applied to the extracted order,
+ the function is reset to unity to ensure that the order(s) cannot
+ be re-flattened in error.  If the blaze is to be re-applied then
+ the correct procedure is to first re-extract the order(s)
+ concerned and then re-fit the blaze.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=blzfit.gif>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

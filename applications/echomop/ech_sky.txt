@@ -1,0 +1,21 @@
++---------------------------------------------------------------------------
+|
+|  Model the sky: ech_sky/echmenu option 6
+|  ---------------------------------------
+|
+|  This task models the sky, or background intensity.
+|
+|  Only the pixels marked as `sky' by the ech_spatial/echmenu option 4
+|  task are used by this task.  Fitting in both spatial and wavelength
+|  directions is possible using a variety of methods.  The default is
+|  to fit only in the spatial direction using a simple mean (SKYFIT=MEAN).
+|
+|  Additional information required for sky fitting are the values of
+|  the Readout-noise and the ADU to electron conversion factor.  These
+|  are prompted for by the program.
+|
+|  For POLY fits an iterative loop is used to reject possible
+|  sky-line features from the fits.  The  program reports on the
+|  fitting process every few hundred pixels along each order.
+|
++---------------------------------------------------------------------------

@@ -1,0 +1,29 @@
+This is ECHOMOP Version 3.3-0.
+ TUNE_AUTOMATE is set to non-default value: '1,EXIT'.
+ TUNE_AUTOMATE is set to non-default value: '1,EXIT'.
+ Auto-running: Option 1.
+ ---------------------------------------------------------------------------
+ Starting processing task:     Start a reduction.               (ECH_LOCATE)
+
+ Unable to obtain object BAD_COLS from either input data frame or
+ a user-supplied array.  Values may be supplied in variable array BAD_COLS
+ with number of elements specified using NXBAD.
+ Unable to obtain object BAD_ROWS from either input data frame or
+ a user-supplied array.  Values may be supplied in variable array BAD_ROWS
+ with number of elements specified using NYBAD.
+ Data frame X-dimension is 2040 pixels.
+ Data frame Y-dimension is 76 pixels.
+ Frame checking for bad row/columns is disabled.
+ Set parameter TUNE_FCHECK=YES to enable.
+ Order slope assumed to be close to 0.
+ Set TUNE_FCHECK=YES to enable order slope estimation.
+ TUNE_AUTLOC is set to non-default value: YES.
+ Counted 3 orders.
+ TUNE_AUTLOC is set to non-default value: YES.
+ Order 1, centre at row 15.
+ Order 2, centre at row 38.
+ Order 3, centre at row 61.
+ Trace width estimated at 12 pixels.
+ ---------------------------------------------------------------------------
+
+ Auto-running: Option EXIT.

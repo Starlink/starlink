@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: 2d_distortion.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>2D Distortion</H2><HR>
+<P>
+ Detectors such as the IPCS often cause major geometric distortions
+ in images created using them.  ECHOMOP provides a mechanism for
+ modelling such distortion, and using the model to provide
+ corrections during the extraction process. It is also possible
+ to generate a 'corrected' version of each order for visual
+ examination, or processing by other software.
+<P>
+ The distortion modelling uses a coordinate system based on
+ X = calibrated wavelength at trace, Y = pixel offset from trace,
+ and is thus performed independently for each order in turn.
+<P>
+ The arc frame is used to locate the position of each identified
+ arc line at a variety of offsets from the trace centre.  The
+ difference between the identified wavelength and that predicted
+ by the wavelength polynomial is then calculated.  These
+ differences are fitted using Chebyshev polynomials.
+<P>
+ Once a 2-D fit has been obtained, it is refined by either manual
+ or automatic clipping of deviant points.  When done manually
+ the positions of all the points being fitted (i.e. arc line centres)
+ may be plotted in a highly exaggerated form, in which systematic
+ distortions of sub-pixel magnitude are readily apparent.
+<P>
+ As the wavelength scale produced by the distortion fitting leads
+ inevitably to some re-binning when the extraction takes place,
+ it is normal to extract into a scrunched wavelength scale (e.g.
+ constant bin size) and this is the default behavior of the 2-D
+ extraction task/option.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

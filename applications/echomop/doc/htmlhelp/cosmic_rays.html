@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Cosmic_rays.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Cosmic Rays</H2><HR>
+<P>
+ The package provides three major methods of cosmic ray identification:
+<P>
+<UL>
+<LI>The first approach is to apply two median filters to the
+   data frame.  One in the X direction (along rows) and the other
+   in the Y direction (along columns).  Both of these median
+   images are then divided into the original and the resulting
+   image histogrammed.  A threshold point on the displayed
+   histogram is then selected.  All pixels generating samples
+   above the clip threshold are flagged as cosmic rays.  This
+   method does not rely on the echelle nature of the image and may
+   be used on data frames of non-spectral type with some success.
+<P>
+<LI>The second cosmic ray removal routine, is more sophisticated
+   in its approach and requires that the order traces are already
+   known.  It works by examining the variations from expected
+   intensity (calculated from the average profile) and then
+   calculating the probability that such variations are due to
+   chance.
+<P>
+   Significant pixels are then rejected and the whole order is
+   re-processed.  Iterations continue until the overall significance
+   of all outliers in the order is below a user-supplied threshold.
+   Each order is processed independently in two parts, first the
+   sky pixels, and then the object pixels.
+<P>
+   The significance of a fit is calculated by assuming a Gaussian
+   distribution of deviations from expected intensities and using
+   the Kolmogorov-Smirnov statistic.
+<P>
+   A post processor is used to counteract the tendency of cosmic
+   ray identifiers to be fooled by sky line pixels.  This task
+   examines the geometry of all 'connected' cosmic ray pixels
+   and restores any which it adjudges are actually due to bright
+   sky emission lines.
+<P>
+<LI>If you have many `identical' object frames then these may
+   be processed all together to provide a more reliable cosmic
+   ray rejection.  The command
+<P>
+<PRE WIDTH=72>
+      $ECHOMOP_SOURCE/decos_many
+</PRE>
+<P>
+   provides this facility and should be the preferred method when
+   multiple frames are available.  The procedure calculates a
+   median image and then rejects pixels which deviate by more than
+   n sigma from the median value (note that this means that all
+   the frames must be of equal exposure time).  Bad pixels are
+   flagged by placing values in the quality array of the frame
+   concerned.
+</UL>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

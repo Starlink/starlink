@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Image_display.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Image Display</H2><HR>
+<P>
+ During some stages of processing (e.g. tracing) ECHOMOP will output
+ images on the graphics display device.  The current graphics device
+ is used and must therefore be capable of grayscale output. (GKS
+ devices will simulate this by dithering).  If you want ECHOMOP to
+ use this capability (which is CPU intensive) when plotting graphs
+ during processing then set DISPLAY=YES.
+<P>
+ The imaging capability is used in the following situations:
+<P>
+<PRE WIDTH=72>
+    - overlay order traces on traced image
+    - overlay dekker and object limits on extracted image
+</PRE>
+<P>
+ The ech_plot task also uses imaging capabilities when operated in
+ `BROWSE' and `GRAYSCALE' modes of operation (See ECH_PLOT).  These
+ modes are not effected by the DISPLAY parameter.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

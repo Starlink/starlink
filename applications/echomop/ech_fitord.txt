@@ -1,0 +1,18 @@
++---------------------------------------------------------------------------
+|
+|  Order trace fit refinement: ech_fitord/echmenu option 3
+|  -------------------------------------------------------
+|
+|  The polynomial fits performed by the order-tracer do not reject
+|  any bad points and therefore it is usually prudent to go through
+|  a cycle of rejecting bad samples and re-fitting the trace until
+|  an optimum fit is obtained.  The next task performs this function.
+|  Both fully automatic and interactive modes are available, both
+|  equipped with a selection of criteria for the clipping of bad
+|  samples from the set to be fitted.
+|
+|  The demonstration runs the clipping and fitting in automatic mode
+|  using default parameter settings.  The program then plots a graph
+|  of the deviations from the final fit for each order.
+|
++---------------------------------------------------------------------------

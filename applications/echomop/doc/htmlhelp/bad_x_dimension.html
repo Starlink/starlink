@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Bad_x_dimension.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Bad_X_dimension</H2><HR>
+<P>
+ A data frame has been specified whose X-dimension is different from
+ that of the first frame specified during the reduction.
+<P>
+ All frames must have the same X- and Y-dimensions.  The most likely
+ cause is that the frames are from different datasets.  If you really
+ want to use this combination of data frames then you must use the
+ facilities of FIGARO to 'grow' one of the data frames up to the
+ dimensions of the other.  You must ensure that any image registration
+ problems are taken care of before reduction is attempted.  In general,
+ it will be necessary to re-start the reduction with a new reduction
+ file after any such adjustments have been made.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Saving_disk_space.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Saving Disk Space</H2><HR>
+<P>
+ ECHOMOP makes substantial use of disk space throughout the
+ reduction process.  This is due to the intermediate storage of
+ information in the reduction file.  Much of the information
+ stored is on a per-order basis.  For data frames with many orders
+ the disk usage may be substantially reduced by the following:
+<P>
+<PRE WIDTH=72>
+    % cp $ECHOMOP_SOURCE/ECH_COMPACT.DEF $ADAM_USER/ECH_RDCTN.DEF
+<P>
+    % source $ECHOMOP_SOURCE/echomop_setup
+</PRE>
+<P>
+ this must be done before any reductions are embarked upon as it
+ will not save any space retroactively on work already in progress.
+<P>
+ NOTE: When this procedure is used, it is essential to ensure that
+ the per-order mode of operation is used and that the orders are
+ fully processed one-by-one, i.e., flat-field, model sky, extract,
+ and save result for order 1, then for order 2 etc.  This is because
+ the compact version only stores reduction arrays for the last
+ processed order.  Thus flat-field modelling order 3 and then order 4
+ would cause the calculated model for order 3 to be overwritten by
+ the one for order 4.
+<P>
+<P>
+<HR>
+<B><A HREF="input_data_files.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:42 1996
+</ADDRESS>
+</BODY>
+</HTML>

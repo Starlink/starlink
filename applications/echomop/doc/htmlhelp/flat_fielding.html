@@ -1,0 +1,99 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Flat_fielding.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Flat Fielding</H2><HR>
+<P>
+ ECHOMOP will use a flat-field frame if one is available.  The
+ flat-field frame should be produced using a continuum lamp exposure
+ with the instrument in an identical configuration to that used for
+ the object exposure (to ensure that any wavelength-dependent
+ behaviour of pixel response is taken into account).  The exposure
+ should be of sufficient duration to attain high counts in the
+ brightest parts of the image.
+<P>
+ ECHOMOP fits polynomials/splines in two directions; along the traces,
+ and along the image columns.  The degree of function fitted can be
+ changed, but the default (low) degree will normally be perfectly
+ reasonable.  Each flat-field pixel in an order is then used to
+ calculate a 'balance' factor.  This is a number close to unity which
+ represents the factor by which a given pixel exceeds its expected
+ value (predicted by the function).
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=ffinter.gif>
+ Note that this technique requires that the flat-field orders vary
+ slowly and smoothly both along and across each order.
+<P>
+ If required, many flat-field frames (with identical instrument
+ configuration) may be co-added to produce a single high
+ signal-to-noise flat-field frame prior to using ECHOMOP.
+<P>
+ At present no special facilities are provided for calculating the
+ actual error on such a co-added flat field; the expected error (derived
+ from root N statistics) is what is used to calculate the error on the
+ balance factors unless appropriate variances are provided in the
+ flat-field frame error array.
+<P>
+ A special mode of operation is selected by setting the parameter
+ FLTFIT=MEAN.  In this case the balance factors are calculated using the
+ local mean value based on a 5-pixel sample.  This will normally be used
+ when the flat field at the dekker limits cannot be modelled because its
+ intensity changes too rapidly on a single-pixel scale due to
+ under-sampling of the profile.
+<P>
+A typical interactive plot appears below.
+<P>
+<IMG SRC=ffmean.gif>
+ Other special modes are available to help model difficult data,
+ and the type of fit used is primarily selected using the FLTFIT
+ parameter:
+<P>
+<UL>
+<LI>FLTFIT=POLY, normal polynomial fitting.
+<LI>FLTFIT=SPLINE, bi-cubic spline fits.
+<LI>FLTFIT=MEAN, local means.
+<LI>FLTFIT=MEDIAN, local medians.
+<LI>FLTFIT=SMOOTH, Gaussian smoothing.
+<LI>FLTFIT=SLOPE, local slope.
+</UL>
+<P>
+ In the situation where a balance factor frame is independently
+ produced, this may be fed to ECHOMOP as the flat-field frame.
+ The parameter TUNE_PREBAL should then be set to YES.
+<P>
+ In this case the modelling will not take place and the balance factors
+ will simply be copied from the supplied frame.  This should be used for
+ special cases where the polynomial model cannot generate appropriate
+ values.
+<P>
+ In cases where no flat-field frame is available then the parameter
+ TUNE_NOFLAT=YES can be specified; or alternatively FFIELD=NONE
+ set when prompted for the name of the flat-field frame.  In
+ either case, all balance factors will be taken to be unity.
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:37 1996
+</ADDRESS>
+</BODY>
+</HTML>

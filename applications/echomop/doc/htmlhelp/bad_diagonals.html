@@ -1,0 +1,44 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Bad_diagonals.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Bad_diagonals</H2><HR>
+<P>
+ The program is unable to determine the slope of the orders across
+ the frame.
+<P>
+ In this situation the slope is assumed to be 0.  The most likely
+ cause of this problem is cosmic-ray contamination.  This can be
+ avoided by using the ech_decos1 option/task to clean the frame
+ prior to slope determination.
+<P>
+ The order slope is only used when tracing very poor data and
+ can usually be left at the default value of zero.
+<P>
+ In extreme cases you can set the slope manually using the FIGARO
+ command SETOBJ:
+<P>
+<PRE WIDTH=72>
+    SETOBJ object=/reduction-file/.MORE.ECHELLE.ORDER_SLOPE value=nn.nn
+</PRE>
+<P>
+ where nn.nn is the increase in Y-coordinate per X-pixel increment.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

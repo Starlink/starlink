@@ -1,0 +1,40 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Min_dispersion.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>MIN_DISPERSION</H2><HR>
+<H2>Usage</H2>
+<H3>MIN_DISPERSION=_REAL</H3>
+<H2>Description</H2>
+<P>
+ The minimum dispersion to be searched by the automatic line
+ identifier.  Specified in unit-per-pixel.
+<P>
+ Care should be taken to ensure that the specified dispersion range 
+ is sufficiently wide.  If in doubt use a wider range than is probably 
+ needed.  For example, if the actual dispersion is expected to be about 
+ 0.5, then a range specified by MIN_DISPERSION=0.2, MAX_DISPERSION=0.8 
+ would be appropriate, whereas a range of 0.4 to 0.6 could possibly be 
+ too restrictive.
+<P>
+ The normal wavelength units will be Angstroms, but alternative units may 
+ be used by providing an appropriate .ARC line list.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:43 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: ECH_COUNT_hints.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="ECH_COUNT.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Hints</H2><HR>
+<P>
+ It is fairly important that the initial counting of the orders
+ yields the correct result as it is used to size the sampling
+ box when doing the order location.  Problems may be caused by bad
+ pixels (See TUNE_FCHECK) or by cosmic rays (See ECH_DECOSMIC_1,
+ although tracing should usually be done using a flat-field frame).
+<P>
+ In the event that there are still problems, it is possible to
+ manually specify the number of orders present using FIGARO SETOBJ:
+<P>
+<PRE WIDTH=72>
+    SETOBJ object=/rdctn-file-name/.MORE.ECHELLE.NO_OF_ORDERS value=/nn/
+</PRE>
+<P>
+ at the system shell prompt.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:34 1996
+</ADDRESS>
+</BODY>
+</HTML>

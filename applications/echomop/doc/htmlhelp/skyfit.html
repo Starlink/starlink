@@ -1,0 +1,42 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: SKYFIT.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="user_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>SKYFIT</H2><HR>
+<H2>Usage</H2>
+<H3>SKYFIT=_CHAR</H3>
+<H2>Description</H2>
+<P>
+ The type of fit to be used for sky-background modelling.
+<P>
+ The available functions are MEAN (the default), POLY and SPLINE.
+<P>
+ Note that the required maximum number of coefficients for POLY and
+ SPLINE are different.  For POLY, the maximum number of coefficients
+ corresponds to the number of degrees plus one, so for a cubic use
+ coeffs=4.  For a SPLINE the maximum number of coefficients corresponds
+ to (knots+7)*2, so for 3 knots use coeffs=20.  If you are using SPLINE
+ fits then you should ensure that the value of TUNE_MAXPOLY is set
+ accordingly, as well as using an appropriate value for TUNE_SKYPOLY
+ and/or TUNE_SKYXPLY.
+<P>
+ INITIAL SUGGESTED VALUE: MEAN.
+<P>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:44 1996
+</ADDRESS>
+</BODY>
+</HTML>

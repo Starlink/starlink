@@ -1,0 +1,59 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Cannot_create_ECH_FTRDB.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Cannot_create_ECH_FTRDB</H2><HR>
+<P>
+ The specified file cannot be found and its automatic creation is
+ illegal using the selected option.
+<P>
+ Please use the special task ech_ftrdb to perform arc line database
+ creation.  This process should normally be left to the node manager
+ who should place the database files in a commonly accessible
+ directory (usually the same place as the .ARC files).
+<P>
+ If you wish to create a private database for your personally
+ specified line list then use task ech_ftrdb to do so.  If you are
+ not trying to create a private database then the most likely
+ problem is that the environment variable $ARCDIRS has not been used
+ to prefix the arc database name (e.g. $ARCDIRS/THAR), or that the
+ named arc database does not exist (ask the system manager).
+<P>
+ If you wish to include a set of personally specified line list
+ databases in the default search paths used by ECHOMOP, then their
+ location should be added to the list held in $ARCDIRS.  The list of
+ locations is searched in order of their appearance in the
+ environent variable.  The default search path is:
+<P>
+<PRE WIDTH=72>
+    .                the current directory
+<P>
+    ADAM_USER        users ADAM specific directory
+<P>
+    ECHOMOP_EXEC     ECHOMOP base directory
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="problem_hints.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:40 1996
+</ADDRESS>
+</BODY>
+</HTML>

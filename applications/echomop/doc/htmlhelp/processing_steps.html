@@ -1,0 +1,57 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Processing_steps.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>Processing Steps</H2><HR>
+<P>
+ The reduction cycle has been split into a set of steps, most
+ of which perform some form of image analysis.  The results of
+ these analysis steps provide various models describing the
+ features of the image.
+<P>
+ All these steps take place before any extraction of data from
+ the raw image.  The extraction is performed in a single step
+ taking into account the previously established data characteristics.
+<P>
+ This provides for the efficient processing of multiple data frames
+ where the same object has been observed, as many of the processing
+ steps need only be done once for the first frame of the series.
+<P>
+ All the discrete processing steps are available as both individual
+ tasks (providing efficient execution of single steps), and as
+ options from a menu driven control task (providing automatic
+ processing and context sensitive assistance).
+<P>
+ To execute a particular step you can either:
+<P>
+<PRE WIDTH=72>
+  - select the appropriate option from the main echmenu menu.
+  - type its name at the command line.  For example:
+<P>
+    % ech_linloc
+</PRE>
+<P>
+<P>
+<HR>
+<B><A HREF="general_advice.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:38 1996
+</ADDRESS>
+</BODY>
+</HTML>

@@ -1,0 +1,60 @@
+<HTML>
+<HEAD>
+<TITLE>
+ECHOMOP Help: Tune_page.
+</TITLE>
+</HEAD>
+
+<BODY>
+<I>ECHOMOP-Online HELP</I>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<HR><H2>TUNE_PAGE</H2><HR>
+<H2>Usage</H2>
+<H3>TUNE_PAGE=_INTEGER</H3>
+<H2>Description</H2>
+<P>
+ This parameter specifies the number of lines on the terminal screen.
+<P>
+ When set to a non-zero value, after each TUNE_PAGE lines of non-menu
+ output the program will pause and wait for a key to be hit before
+ continuing.  A variety of options are available at this point:
+<P>
+<PRE WIDTH=72>
+    D,d,uparrow,KP8,p,P,b,B    - Scroll back one line.
+<P>
+    U,u,downarrow,KP2,f,F,n,N  - Scroll forward a line.
+<P>
+    space                      - Resume output.
+<P>
+    return                     - Output next line only.
+<P>
+    pageup                     - Previous full screen.
+<P>
+    pagedown                   - Next full screen.
+</PRE>
+<P>
+ The program maintains a buffer of lines output to the screen and
+ the user may move around using the keys mentioned above.  Only the
+ space or return keys will resume regular program output.  If the
+ parameter value is not positive then no paging is done.
+<P>
+ INITIAL SUGGESTED VALUE: 0.
+<P>
+<P>
+<HR>
+<B><A HREF="tuning_parameters.html">Previous topic</A></B>
+ | <B><A HREF="echomop.html">ECHOMOP HELP page</A></B>
+ | <B><A HREF="http://www.star.ucl.ac.uk/~mjc/echelle/">Starlink EDR home</A></B>
+ | <B><A HREF="http://star-www.rl.ac.uk/documentation.html">Starlink Docs</A></B>
+<P>
+<ADDRESS>
+Martin Clayton<BR>
+<A HREF="mailto:mjc@star.ucl.ac.uk">mjc@star.ucl.ac.uk</A><BR>
+Mon Dec  9 17:09:46 1996
+</ADDRESS>
+</BODY>
+</HTML>
