@@ -315,7 +315,8 @@ setbad.ifl setbb.ifl setbound.ifl setext.ifl setlabel.ifl setnorm.ifl \
 setorigin.ifl setsky.ifl settitle.ifl settype.ifl setunits.ifl setvar.ifl \
 mem2d.ifl wcsframe.ifl wcsremove.ifl listshow.ifl listmake.ifl wcscopy.ifl \
 wcsadd.ifl wcsattrib.ifl wcsalign.ifl profile.ifl wcsshow.ifl chain.ifl \
-reshape.ifl copybad.ifl wcstran.ifl scatter.ifl
+reshape.ifl copybad.ifl wcstran.ifl scatter.ifl kappa_mon.ifl \
+kapview_mon.ifl ndfpack_mon.ifl 
 
 # The contents of the kappa_sub.tar file:
 KAPPA_SUB = add.f aperadd.f ardgen.f ardmask.f block.f cadd.f calc.f  \
@@ -329,7 +330,7 @@ numb.f outset.f parget.f paste.f pixdupe.f kap_pow.f psf.f quilt.f rift.f \
 rotate.f segment.f setmagic.f shadow.f slide.f sqorst.f stats.f sub.f \
 substitute.f surfit.f thresh.f trandat.f traninvert.f tranjoin.f \
 tranmake.f transformer.f trantrace.f trig.f wiener.f zaplin.f mem2d.f \
-listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f scatter.f
+listmake.f listshow.f profile.f wcsalign.f wcstran.f copybad.f 
 
 # The contents of the kapsub_sub.tar file:
 KAPSUB_SUB = apadsb.f cnthlt.f cntkey.f cntsbp.f crfrsb.f curre.f \
@@ -418,7 +419,7 @@ idinvisible.f idpazo.f idset.f idstate.f inspect.f linplot.f lutable.f \
 lutflip.f luthilite.f lutrot.f lutsave.f luttweak.f lutview.f mlinplot.f \
 ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
-pictrans.f picvis.f snapshot.f turbocont.f vecplot.f 
+pictrans.f picvis.f scatter.f snapshot.f turbocont.f vecplot.f 
 
 # The contents of the ndfpack_sub.tar file:
 NDFPACK_SUB = axconv.f axlabel.f axunits.f erase.f fitsdin.f fitsexp.f \
