@@ -29,7 +29,7 @@ STAR_CHECK_PROGS(csh)
 dnl    Build dependencies for this package.
 dnl    Includes: fio, par, sae; 
 dnl    links to: chr, mers, fio, psx, task.
-STAR_DECLARE_DEPENDENCIES([build], [chr err sgs gks])
+STAR_DECLARE_DEPENDENCIES([build], [chr mers sgs gks])
 dnl    No use dependencies
 
 STAR_LATEX_DOCUMENTATION(sun32)
