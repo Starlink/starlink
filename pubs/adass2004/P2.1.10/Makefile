@@ -16,7 +16,7 @@ script-little.eps: script.eps.in Makefile
 	  sed "s/@MODULE@/$$x/;s/@BB@/$$bb/;s/@COLOUR@/0.8 0.0 0.2 setrgbcolor/" $< >$@
 script-big.eps: script.eps.in Makefile
 	x=200; bb=`echo $$x | awk '{printf "0 0 %d %d", $$1*12, $$1*8}'`; \
-	  sed "s/@MODULE@/$$x/;s/@BB@/$$bb/;s/@COLOUR@/0.8 0.8 1 setrgbcolor/" $< >$@
+	  sed "s/@MODULE@/$$x/;s/@BB@/$$bb/;s/@COLOUR@/0.9 0.9 1 setrgbcolor/" $< >$@
 
 clean:
 	rm -f *.pdf *.eps
