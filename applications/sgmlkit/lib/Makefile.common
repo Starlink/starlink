@@ -42,7 +42,7 @@ DVI2BITMAP=dvi2bitmap
 
 %.single.html: %.sgml
 	$(JADE) -t sgml -isingle.file -iHTML.entities -iOnly.web \
-		-V stream-output $(JADEFLAGS) \
+		-V stream-output -V suppress-manifest $(JADEFLAGS) \
 		-d $(STYLESHEET)/html/sl.dsl#html $< > $@
 
 %.parse: %.sgml
@@ -163,6 +163,8 @@ all: index.html
 tidy:
 	rm -f *.parse *~
 
+# If the makefile which invokes this has a localclean target, make that too.
+# Don't fail if that target isn't there.
 clean:	tidy
 	if ls *.html.stamp >/dev/null 2>&1 ; then \
 		for f in *.html.stamp; do \
@@ -174,7 +176,8 @@ clean:	tidy
 			rm -f `awk -F: '{print $$1}' $$f`* ; \
 		done ; \
 	fi
-	rm -f *.stamp *.manifest *.tth-eqlist *.tth-html
+	rm -f *.stamp *.single.html *.manifest
+	- $(MAKE) localclean
 
 checkhtml:
 	for i in *.html; do echo $$i; $(SGMLPARSE) -s $(DECL) $$i; done
