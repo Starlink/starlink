@@ -92,7 +92,7 @@
 #  Attempt to make browser goto the required page. If this fails then the 
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
-	    if { [catch {exec $CCDbrowser -remote openFILE($filename)}] } {
+	    if { [catch {exec $CCDbrowser -remote openURL(file://localhost/$filename)}] } {
 	       set netscapepid 0
 	    }
             if { $netscapepid == 0 } { 
