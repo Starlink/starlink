@@ -104,6 +104,10 @@
 
 *  Locate the FITS file representation object
       CALL ADI_LOCREP( 'FITS', RID, STATUS )
+      IF (STATUS.NE.SAI__OK) THEN
+	CALL ERR_ANNUL(STATUS)
+        RETURN
+      END IF
 
       CALL ADI_DEFRCB( RID, 'CreatRtn', ADI2_FCREAT, STATUS )
       CALL ADI_DEFRCB( RID, 'OpenRtn', ADI2_OPEN, STATUS )

@@ -509,3 +509,176 @@
       ENDIF
 
       END
+
+
+
+
+
+
+*+  IBROWSE_GUI
+      SUBROUTINE IBROWSE_GUI(FIRST,KEYB,DWIN,NROWS,NX,NY,VAR,ERR,
+     :                          SIGNIF,QUAL,ISCALE,XW,YW,VAL,Q,STATUS)
+*    Description :
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*    History :
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      LOGICAL KEYB
+      LOGICAL FIRST
+      INTEGER DWIN
+      INTEGER NROWS
+      INTEGER NX,NY
+      INTEGER ISCALE
+      LOGICAL VAR,QUAL,ERR,SIGNIF
+      REAL XW,YW
+*    Import-Export :
+*    Export :
+      REAL VAL
+      BYTE Q
+*    Status :
+      INTEGER STATUS
+*    Functions :
+*    Local Constants :
+*    Local variables :
+      REAL XP,YP
+      CHARACTER*8 NAME
+      CHARACTER*8 STRING
+      CHARACTER*10 FMT
+      CHARACTER*12 OPTIONS
+      INTEGER IXP,IYP,IXPMAX,IYPMAX
+      INTEGER IX,IY,I,J
+      INTEGER I1,I2,J1,J2
+      INTEGER IC1,IC2
+      INTEGER ROW,CPOS
+      INTEGER IPIX(2)
+      INTEGER ISTAT
+      INTEGER XPID,YPID,XPMID,YPMID,DID(9,9),FID,OID
+      INTEGER FLAG
+      REAL SCVAL,VAL2
+      REAL XC,YC,DX,DY
+      DOUBLE PRECISION RA,DEC,ELON,ELAT,GLON,GLAT
+*    Global Variables :
+      INCLUDE 'IMG_CMN'
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+
+*  locate noticeboard items
+        CALL NBS_FIND_ITEM(I_NBID,'XP',XPID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YP',YPID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'XPMAX',XPMID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'YPMAX',YPMID,STATUS)
+        NAME='DATA'
+        DO I=1,9
+          DO J=1,9
+            WRITE(NAME(5:5),'(I1)') I
+            WRITE(NAME(6:6),'(I1)') J
+            CALL NBS_FIND_ITEM(I_NBID,NAME,DID(I,J),STATUS)
+          ENDDO
+        ENDDO
+        CALL NBS_FIND_ITEM(I_NBID,'FLAG',FID,STATUS)
+        CALL NBS_FIND_ITEM(I_NBID,'OPTIONS',OID,STATUS)
+
+*  get device size
+        CALL NBS_GET_VALUE(XPMID,0,VAL__NBI,IXPMAX,STATUS)
+        CALL NBS_GET_VALUE(YPMID,0,VAL__NBI,IYPMAX,STATUS)
+
+*  get plot window parameters
+        CALL PGQVP(3,XP1,XP2,YP1,YP2)
+        CALL PGQWIN(XW1,XW2,YW1,YW2)
+
+        FLAG=0
+        DO WHILE (FLAG.EQ.0)
+
+*  get current cursor position in device coords
+          CALL NBS_GET_VALUE(XPID,0,VAL__NBI,IXP,STATUS)
+          CALL NBS_GET_VALUE(YPID,0,VAL__NBI,IYP,STATUS)
+
+*  convert to other frames
+          CALL IMG_WORLDTOPIX(XW,YW,XP,YP,STATUS)
+          CALL IMG_WORLDTOCEL(XW,YW,RA,DEC,STATUS)
+          CALL IMG_WORLDTOECL(XW,YW,ELON,ELAT,STATUS)
+          CALL IMG_WORLDTOGAL(XW,YW,GLON,GLAT,STATUS)
+
+*  get pixel number
+          IX=INT(XP+0.5)
+          IY=INT(YP+0.5)
+
+*  get centre and size of box in world coords and pixels
+          CALL IMG_PIXTOWORLD(REAL(IX),REAL(IY),XC,YC,STATUS)
+          DX=REAL(NX)*ABS(I_XSCALE)/2.0
+          DY=REAL(NY)*ABS(I_YSCALE)/2.0
+          I1=MAX(I_IX1,IX-NX/2)
+          I2=MIN(I_IX2,IX+NX/2)
+          J1=MAX(I_IY1,IY-NY/2)
+          J2=MIN(I_IY2,IY+NY/2)
+
+*  write data values to noticeboard
+          STRING=' '
+
+          DO J=J2,J1,-1
+
+            DO I=I1,I2
+
+              IF (J.LT.I_IY1.OR.J.GT.I_IY2.OR.
+     :                      I.LT.I_IX1.OR.I.GT.I_IX2) THEN
+                STRING=' '
+              ELSE
+                IF (VAR) THEN
+                  CALL IMG_GETVAR(I,J,VAL,STATUS)
+                  SCVAL=VAL*10.0**ISCALE
+                  CALL IBROWSE_FMT(SCVAL,FMT)
+                  WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
+                ELSEIF (ERR) THEN
+                  CALL IMG_GETVAR(I,J,VAL,STATUS)
+                  IF (VAL.GT.0.0) THEN
+                    VAL=SQRT(VAL)
+                  ELSE
+                    VAL=0.0
+                  ENDIF
+                  SCVAL=VAL*10.0**ISCALE
+                  CALL IBROWSE_FMT(SCVAL,FMT)
+                  WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
+                ELSEIF (SIGNIF) THEN
+                  CALL IMG_GETVAL(I,J,VAL,STATUS)
+                  CALL IMG_GETVAR(I,J,VAL2,STATUS)
+                  IF (VAL2.GT.0.0) THEN
+                    VAL=VAL/SQRT(VAL2)
+                  ELSE
+                    VAL=0.0
+                  ENDIF
+                  SCVAL=VAL*10.0**ISCALE
+                  CALL IBROWSE_FMT(SCVAL,FMT)
+                  WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
+                ELSEIF (QUAL) THEN
+                  CALL IMG_GETQUAL(I,J,Q,STATUS)
+                  CALL STR_BTOC(Q,STRING,STATUS)
+                ELSE
+                  CALL IMG_GETVAL(I,J,VAL,STATUS)
+                  SCVAL=VAL*10.0**ISCALE
+                  CALL IBROWSE_FMT(SCVAL,FMT)
+                  WRITE(STRING,FMT,IOSTAT=ISTAT) SCVAL
+                ENDIF
+              ENDIF
+
+              CALL NBS_PUT_CVALUE(DID(I,J),0,STRING,STATUS)
+
+            ENDDO
+
+          ENDDO
+
+        ENDDO
+
+
+      ENDIF
+
+      END
