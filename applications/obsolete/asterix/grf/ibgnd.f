@@ -1979,7 +1979,7 @@
 *        Default
             IDX(I,J) = 1
             IF ( REGEX ) THEN
-              IF ( IMG_INREG(I,J) ) IDX(I,J) = -1
+              IF ( .NOT. IMG_INREG(I,J) ) IDX(I,J) = -1
             END IF
 
 *        Still ok?
