@@ -16,7 +16,7 @@ require AutoLoader;
 
 # Version derived from CVS repository:  '$Revision$ '
 
-$VERSION = '1.42';
+$VERSION = '1.43';
 
 # Add the following to the 'ndf'=> associative array if you want to
 # use ADAM PARAMETERS. Remove the comment field from the entries in the XS
@@ -558,7 +558,7 @@ sub fits_read_header ($) {
 }
 
 
- 
+
 # Routine to extract nth FITS value and keyword from FITS array
 #
 #  Input:   Array reference to FITS array
@@ -597,56 +597,209 @@ sub fits_get_item (\@$) {
 }
 
 # Routine to extract a value and keyword from a FITS-like string
+# Fits standard specifies
+# Characters 1:8  KEYWORD (trailing spaces)  COMMENT is special
+#            9:10 "= "  for a valid value (unless COMMENT keyword)
+#            11:80 The Value   "/" used to indicate a comment
+
+# The value can contain:
+#  STRINGS:
+#      '  starting at position 12
+#      A single quote represented as ''
+#      Closing quote must be at position 20 or greater (max 80)
+#      Trailing blanks are removed. Leading spaces in the quotes
+#      are significant
+#  LOGICAL
+#      T or F in column 30. Translated to 1 or 0
+#  Numbers
+#      D is an allowed exponent as well as E
+
+# This all means that a quick pattern match is not good enough
 
 sub fits_extract_key_val ($) {
 
-  # Extract the value
-  my ($keyword, $value, $comment) = split(/=|\s\//,$_[0]);
+  # Value is only present if an = is found in position 9
+  my ($value, $comment) = ('', '');
+  my $keyword = substr($_[0], 0, 8);
+  $keyword =~ s/\s+$//;
 
-  # Return if no value
-  return ($keyword, '', '') unless defined $value;
+  # Check for comment or HISTORY
+  if ($keyword eq 'COMMENT' || $keyword eq 'HISTORY' ||
+      substr($_[0],8,2) ne "= ") {
+    # We have comments
+    $comment = substr($_[0],8);
+    $comment =~ s/\s+$//;  # Trailing spaces
+    $comment =~ s/^\s+\///; # Leading spaces and slashes
+    $comment =~ s/^\s+//;  # Leading space
+    return ($keyword, undef, $comment);
+  }
 
-  # Tidy up the keyword
-  $keyword =~ s/\s//g;    # Remove white space
+  # We must have a value after '= '
+  my $rest = substr($_[0],10);
 
-  # Tidy up value
-  $value =~ s/'//g;    # Remove quotes(') from strings;
-  $value =~ s/^\s+//;  # Remove leading whitespace
-  $value =~ s/\s+$//;  # Remove trailing whitespace
+  # Remove leading spaces
+  $rest =~ s/^\s+//;
+
+  # Check to see if we have a string
+  if (substr($rest,0,1) eq "'") {
+
+    # Check for empty (null) string ''
+    if (substr($rest,1,1) eq "'") {
+      $value = '';
+      $comment = substr($rest,2);
+      $comment =~ s/^\s+\///;  # Delete everything before the first slash
+
+    } else {
+      # '' needs to be treated as an escaped ' when inside the string
+      # Use index to search for an isolated single quote
+      my $pos = 1;
+      my $end = -1;
+      while ($pos = index $rest, "'", $pos) {
+	last if $pos == -1; # could not find a close quote
+
+	# Check for the position after this and if it is a '
+	# increment and loop again
+	if (substr($rest, $pos+1, 1) eq "'") {
+	  $pos += 2; # Skip past next one
+	  next;
+	}
+
+	# Isolated ' so this is the end of the string
+	$end = $pos;
+	last;
+
+      }
+
+      # At this point we should have the end of the string or the
+      # position of the last quote
+      if ($end != -1) {
+
+	# Value
+	$value = substr($rest,1, $pos-1);
+
+	# Replace '' with '
+	$value =~ s/''/'/; #;
+
+	# Special case a blank string
+	if ($value =~ /^\s+$/) {
+	  $value = " ";
+	} else {
+	  # Trim
+	  $value =~ s/\s+$//;
+	}
+
+	# Comment
+	$comment = substr($rest,$pos+1); # Extract post string
+	$comment =~ s/^\s+\///;  # Delete everything before the first slash
+
+      } else {
+	# Never found the end so include all of it
+	$value = substr($rest,1);
+	# Trim
+	$value =~ s/\s+$//;
+
+	$comment = '';
+      }
+
+    }
+
+  } else {
+    # Non string - simply read the first thing before a slash
+    my $pos = index($rest, "/");
+    if ($pos == 0) {
+      # No value at all
+      $value  = undef;
+      $comment = substr($rest, $pos+2);
+    } elsif ($pos != -1) {
+      # Found value and comment
+      $value = substr($rest, 0, $pos-1);
+      $comment = substr($rest, $pos+2);
+      $comment =~ s/\s+$//;
+      print "$pos, $value\n";
+    } else {
+      # Only found a value
+      $value = $rest;
+      $comment = '';
+    }
+
+    # Replace D or E with and e - D is not allowed as an exponent in perl
+    $value =~ tr/DE/ee/;
+
+    # Check for a Logical
+    $value = 1 if $value eq 'T';
+    $value = 0 if $value eq 'F';
+
+    # Remove trailing spaces
+    $value =~ s/\s+$//;
+
+  }
+
+  # Tidy up comment
+  $comment =~ s/\s+$//;
+  $comment =~ s/^\s+//;
 
   $value = '' unless length($value);
   $keyword = "NONE" unless length($keyword);
+  print "$keyword || $value || $comment ||\n";
 
+  # Value is allowed to be ''
   return($keyword, $value, $comment);
 }
 
 # Routine to construct a FITS-like string from a keyword, value and comment
 # Packed string is returned
 
+# Special cases the COMMENT and HISTORY keywords
+# Single quotes are escaped as ''
+
 sub fits_construct_string ($$$) {
   my ($keyword, $value, $comment) = @_;
 
   my ($fitsent);
 
-  $fitsent = substr($keyword,0,8); # Key must be <= 8 characters
-  $fitsent .= (' 'x(8-length($fitsent)))."= ";
-
-  # Check whether we have a number or character string
-  if ($value =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
-    # Number (chop to 67 characters)
-    $value = substr($value,0,67);
-    $value = (' 'x(20-length($value))).$value;
+  if ($keyword eq 'COMMENT' || $keyword eq 'HISTORY') {
+    $fitsent = $keyword . " $comment";
 
   } else {
-    # Character (chop to 65 characters)
-    $value = substr($value,0, 65);
-    $value = "'$value'";
-    $value = $value.(' 'x(20-length($value)));
-  }
 
-  # Add comment
-  $comment = '' unless defined $comment;
-  $fitsent .= $value.' / '.$comment;
+    $fitsent = substr($keyword,0,8); # Key must be <= 8 characters
+    $fitsent .= (' 'x(8-length($fitsent)));
+
+    # Chedk that a value is there
+    if (defined $value) {
+
+      # Can add the equals sign
+      $fitsent .= "= " if defined $value;
+
+      # Check whether we have a number or character string or nothing
+      if ($value =~ /^(-?)(\d*)(\.?)(\d*)([Ee][-\+]?\d+)?$/) {
+	# Number (chop to 67 characters)
+	$value = substr($value,0,67);
+	$value = (' 'x(20-length($value))).$value;
+
+      } else {
+	# Character
+	# Escape single quotes
+	$value =~ s/'/''/g;  #';
+
+	# chop to 65 characters
+	$value = substr($value,0, 65);
+	$value = "'$value'";
+	$value = $value.(' 'x(20-length($value)));
+      }
+
+    } else {
+      $value = " " x 20;
+    }
+
+    # Add optional comment
+    if (defined $comment && length($comment) > 0) {
+      $fitsent .= $value . ' / ' . $comment;
+    } else {
+      $fitsent .= $value;
+    }
+
+  }
 
   # Fix at 80 characters
   $fitsent = substr($fitsent,0,80);
@@ -655,7 +808,6 @@ sub fits_construct_string ($$$) {
   return $fitsent;
 }
 
-  
 1;
 __END__
 # This is the documentation
