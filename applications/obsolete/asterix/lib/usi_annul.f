@@ -95,9 +95,6 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			USI0_BLK		! Ensures inclusion
-
 *  Local Constants:
       CHARACTER*1		BLANK
         PARAMETER		( BLANK = ' ' )
