@@ -68,6 +68,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER ARD1_CEIL          ! Returns smallest int <= a given value
+
 *  Local Variables:
       INTEGER
      :        I,                 ! Loop count
@@ -96,7 +99,7 @@
          ELSE
 
 *  Store the Cartesion index for this axis.
-            IND = NINT( GR( I ) + 0.5 )
+            IND = ARD1_CEIL( GR( I ) )
 
 *  If it is within the array bounds, increment the vector address.
             IF( IND .GE. LBND( I ) .AND. IND .LE. UBND( I ) ) THEN

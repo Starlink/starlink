@@ -114,6 +114,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      INTEGER ARD1_CEIL          ! Smallest integer <= a given floating value
+
 *  Local Variables:
       INTEGER
      :        I,                 ! Loop count
@@ -143,7 +146,7 @@
 
 *  Convert the pixel coords to pixel indices.
       DO IPAR = 1, NPAR
-         PAR( IPAR ) = DBLE( NINT( PAR( IPAR ) + 0.5D0 ) )
+         PAR( IPAR ) = DBLE( ARD1_CEIL( PAR( IPAR ) ) )
       END DO
 
 *  Loop round each set of co-ordinates.

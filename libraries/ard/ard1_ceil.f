@@ -57,7 +57,7 @@
 
       ELSE
          ARD1_CEIL = INT( VALUE )
-         IF( DBLE( KPG1_CEIL ) .LT. VALUE ) KPG1_CEIL = KPG1_CEIL + 1
+         IF( DBLE( ARD1_CEIL ) .LT. VALUE ) ARD1_CEIL = ARD1_CEIL + 1
       END IF
 
       END
