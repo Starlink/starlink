@@ -281,11 +281,11 @@ c	From INTEGER to improve exposure time evaluation
 
 *    Switch on detector
       IF ( IDET .EQ. 1 ) THEN
-	INSMAP = DETDIR(1:CHR_LEN(DETDIR))//INSTMP1(IFILE)
+	INSMAP = DETDIR(1:CHR_LEN(DETDIR))//'/'//INSTMP1(IFILE)
      :                  (:CHR_LEN(INSTMP1(IFILE)))//'.fits'
         CALL MSG_SETC( 'MAP', INSTMP2(IFILE) )
       ELSE IF ( IDET .EQ. 2 ) THEN
-	INSMAP = DETDIR(1:CHR_LEN(DETDIR))//INSTMP2(IFILE)
+	INSMAP = DETDIR(1:CHR_LEN(DETDIR))//'/'//INSTMP2(IFILE)
      :                  (:CHR_LEN(INSTMP2(IFILE)))//'.fits'
         CALL MSG_SETC( 'MAP', INSTMP2(IFILE) )
       END IF
