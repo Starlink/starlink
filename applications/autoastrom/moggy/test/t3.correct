@@ -1,5 +1,7 @@
 <hello there>  2:hello|there|
-<      one  	  two   three    >  3:one|two|three|
+<      one  	  two
+   three
+    >  3:one|two|three|
 <>  0:
 <  one>  1:one|
 <one:two:three><:>  3:one|two|three|

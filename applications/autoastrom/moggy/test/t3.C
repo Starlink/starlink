@@ -22,11 +22,11 @@ int main (int argc, char **argv)
     	nonDefaultSep = true;
     	seps = argv[2];
     }
-    else
-    	seps = " \t";
 
 
-    vector<string> toks = Util::tokeniseString (str, seps);
+    vector<string> toks = (nonDefaultSep
+			   ? Util::tokeniseString (str, seps)
+			   : Util::tokeniseString (str));
 
     cout << '<' << str << '>';
     if (nonDefaultSep)
