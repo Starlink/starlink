@@ -17,6 +17,7 @@
 #
 #  Authors:
 #     HME: Horst Meyerdierks (UoE, Starlink)
+#     TIMJ: Tim Jenness (JAC, Hilo)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -28,6 +29,8 @@
 #        Use $SPECDRE_DIR.
 #     23 Mar 1994 (hme):
 #        Copy from Specdre to JCMTDR.
+#     20 Mar 2003 (TIMJ):
+#        Release Linux version
 #     {enter_changes_here}
 #
 #-
@@ -55,18 +58,17 @@ alias      restore  $JCMTDR_DIR/restore
 alias jcmt_restore  $JCMTDR_DIR/restore
 alias      ts2map   $JCMTDR_DIR/ts2map
 alias jcmt_ts2map   $JCMTDR_DIR/ts2map
-alias gsd_print     $JCMTDR_DIR/gsd_print
+alias gsd_print     echo "Not part of JCMT-DR. Please use /star/Perl/bin/gsdprint'
 alias jcmt_help     $JCMTDR_DIR/jcmt_help
-alias jcmt_xhelp    "Mosaic $JCMTDR_HTML/index.html &"
 #
 # Show that the JCMTDR commands are now available.
 #
 echo " "
 echo " ------------ Initialised for JCMTDR ------------"
-echo "           Version 1.2  10 January 1995"
+echo "           Version 1.2-2  20 March 2003"
 echo " "
 echo '         Type "jcmt_help jcmtdr" for help'
-echo '      or "jcmt_xhelp" to start the Web browser'
+echo '      or "showme sc1" or "showme sun192" for web documentation'
 echo " "
 #
 # end
