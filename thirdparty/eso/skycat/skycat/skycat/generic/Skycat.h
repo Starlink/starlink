@@ -18,6 +18,8 @@
  *
  *                 10/03/98  Added optional args to constructor to allow derived
  *                           class to specify its own configuration options.
+ * Peter W. Draper 28/04/98  Made plotting methods virtual to allow
+ *                           these to be redefined in derived classes.
  */
 
 
@@ -76,14 +78,14 @@ public:
 
 
     // Return the canvas coordinates of the 3 points: center, north and east
-    int get_compass(double x, double y, const char* xy_units, 
-		    double radius, const char* radius_units, 
-		    double ratio, double angle,
-		    double& cx, double& cy, double& nx, double& ny, 
-		    double& ex, double& ey);
-
+    virtual int get_compass(double x, double y, const char* xy_units, 
+                            double radius, const char* radius_units, 
+                            double ratio, double angle,
+                            double& cx, double& cy, double& nx, double& ny, 
+                            double& ex, double& ey);
+   
     // rotate the point x,y around the center point cx,cy by the given angle in deg.
-    int rotate_point(double& x, double& y, double cx, double cy, double angle);
+    virtual int rotate_point(double& x, double& y, double cx, double cy, double angle);
 
     // Write a Tcl canvas command to the given stream to add a label
     int make_label(ostream& os, const char* label, double x, double y, 
@@ -91,85 +93,85 @@ public:
 		   const char* font = "-*-courier-medium-r-*-*-*-120-*-*-*-*-*-*");
 
     // draw a symbol with the given shape, etc., in the image
-    int draw_symbol(const char* shape, 
-		    double x, double y, const char* xy_units, 
-		    double radius, const char* radius_units, 
-		    const char* bg, const char* fg, 
-		    const char* symbol_tags, 
-		    double ratio = 1., double angle = 0.,
-		    const char* label = NULL, const char* label_tags = NULL);
-
+    virtual int draw_symbol(const char* shape, 
+                            double x, double y, const char* xy_units, 
+                            double radius, const char* radius_units, 
+                            const char* bg, const char* fg, 
+                            const char* symbol_tags, 
+                            double ratio = 1., double angle = 0.,
+                            const char* label = NULL, const char* label_tags = NULL);
+  
     // draw a symbol at the give coordinates, units, etc...
-    int draw_circle(double x, double y, const char* xy_units, 
-		    double radius, const char* radius_units, 
-		    const char* bg, const char* fg, 
-		    const char* symbol_tags, 
-		    double ratio = 1., double angle = 0.,
-		    const char* label = NULL, const char* label_tags = NULL);
+    virtual int draw_circle(double x, double y, const char* xy_units, 
+                            double radius, const char* radius_units, 
+                            const char* bg, const char* fg, 
+                            const char* symbol_tags, 
+                            double ratio = 1., double angle = 0.,
+                            const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_square(double x, double y, const char* xy_units, 
+                            double radius, const char* radius_units, 
+                            const char* bg, const char* fg, 
+                            const char* symbol_tags, 
+                            double ratio = 1., double angle = 0.,
+                            const char* label = NULL, const char* label_tags = NULL);
 
-    int draw_square(double x, double y, const char* xy_units, 
-		    double radius, const char* radius_units, 
-		    const char* bg, const char* fg, 
-		    const char* symbol_tags, 
-		    double ratio = 1., double angle = 0.,
-		    const char* label = NULL, const char* label_tags = NULL);
+    virtual int draw_plus(double x, double y, const char* xy_units, 
+                          double radius, const char* radius_units, 
+                          const char* bg, const char* fg, 
+                          const char* symbol_tags, 
+                          double ratio = 1., double angle = 0.,
+                          const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_cross(double x, double y, const char* xy_units, 
+                           double radius, const char* radius_units, 
+                           const char* bg, const char* fg, 
+                           const char* symbol_tags, 
+                           double ratio = 1., double angle = 0.,
+                           const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_triangle(double x, double y, const char* xy_units, 
+                              double radius, const char* radius_units, 
+                              const char* bg, const char* fg, 
+                              const char* symbol_tags, 
+                              double ratio = 1., double angle = 0.,
+                              const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_diamond(double x, double y, const char* xy_units, 
+                             double radius, const char* radius_units, 
+                             const char* bg, const char* fg, 
+                             const char* symbol_tags, 
+                             double ratio = 1., double angle = 0.,
+                             const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_ellipse(double x, double y, const char* xy_units, 
+                             double radius, const char* radius_units, 
+                             const char* bg, const char* fg, 
+                             const char* symbol_tags, 
+                             double ratio = 1., double angle = 0.,
+                             const char* label = NULL, const char* label_tags = NULL);
 
-    int draw_plus(double x, double y, const char* xy_units, 
-		  double radius, const char* radius_units, 
-		  const char* bg, const char* fg, 
-		  const char* symbol_tags, 
-		  double ratio = 1., double angle = 0.,
-		  const char* label = NULL, const char* label_tags = NULL);
+    virtual int draw_compass(double x, double y, const char* xy_units, 
+                             double radius, const char* radius_units, 
+                             const char* bg, const char* fg, 
+                             const char* symbol_tags, 
+                             double ratio = 1., double angle = 0.,
+                             const char* label = NULL, const char* label_tags = NULL);
+  
+    virtual int draw_line(double x, double y, const char* xy_units, 
+                          double radius, const char* radius_units, 
+                          const char* bg, const char* fg, 
+                          const char* symbol_tags, 
+                          double ratio = 1., double angle = 0.,
+                          const char* label = NULL, const char* label_tags = NULL);
 
-    int draw_cross(double x, double y, const char* xy_units, 
-		   double radius, const char* radius_units, 
-		   const char* bg, const char* fg, 
-		   const char* symbol_tags, 
-		   double ratio = 1., double angle = 0.,
-		   const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_triangle(double x, double y, const char* xy_units, 
-		      double radius, const char* radius_units, 
-		      const char* bg, const char* fg, 
-		      const char* symbol_tags, 
-		      double ratio = 1., double angle = 0.,
-		      const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_diamond(double x, double y, const char* xy_units, 
-		     double radius, const char* radius_units, 
-		     const char* bg, const char* fg, 
-		     const char* symbol_tags, 
-		     double ratio = 1., double angle = 0.,
-		     const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_ellipse(double x, double y, const char* xy_units, 
-		     double radius, const char* radius_units, 
-		     const char* bg, const char* fg, 
-		     const char* symbol_tags, 
-		     double ratio = 1., double angle = 0.,
-		     const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_compass(double x, double y, const char* xy_units, 
-		     double radius, const char* radius_units, 
-		     const char* bg, const char* fg, 
-		     const char* symbol_tags, 
-		     double ratio = 1., double angle = 0.,
-		     const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_line(double x, double y, const char* xy_units, 
-		  double radius, const char* radius_units, 
-		  const char* bg, const char* fg, 
-		  const char* symbol_tags, 
-		  double ratio = 1., double angle = 0.,
-		  const char* label = NULL, const char* label_tags = NULL);
-
-    int draw_arrow(double x, double y, const char* xy_units, 
-		   double radius, const char* radius_units, 
-		   const char* bg, const char* fg, 
-		   const char* symbol_tags, 
-		   double ratio = 1., double angle = 0.,
-		   const char* label = NULL, const char* label_tags = NULL);
-   
+    virtual int draw_arrow(double x, double y, const char* xy_units, 
+                           double radius, const char* radius_units, 
+                           const char* bg, const char* fg, 
+                           const char* symbol_tags, 
+                           double ratio = 1., double angle = 0.,
+                           const char* label = NULL, const char* label_tags = NULL);
+  
     // -- skycat image subcommand methods --
     
     int hduCmd(int argc, char* argv[]);

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: Skycat.h,v 1.5 1998/11/16 21:26:31 abrighto Exp $"
+ * "@(#) $Id: Skycat.h,v 1.6 1998/11/26 22:38:49 abrighto Exp $"
  *
  * Skycat.h - class definitions for class Skycat, which extends the
  *            RtdImage class to add methods for drawing symbols in
@@ -24,6 +24,7 @@
 
 
 #include "RtdImage.h"
+#include "FitsIO.h"
 
 /*
  * Class Skycat
@@ -38,6 +39,21 @@ private:
     Skycat(const Skycat&);
     
 protected:
+    // these are part of the implementation of the hdu subcommand (see hduCmd())
+    int hduCmdHeadings(int argc, char** argv, FitsIO* fits);
+    int hduCmdGet(int argc, char** argv, FitsIO* fits);
+    int hduCmdCreate(int argc, char** argv, FitsIO* fits);
+    int hduCmdDelete(int argc, char** argv, FitsIO* fits);
+    int hduCmdList(int argc, char** argv, FitsIO* fits);
+    int hduCmdSet(int argc, char** argv, FitsIO* fits);
+    int hduCmdType(int argc, char** argv, FitsIO* fits);
+
+    // Write the contents of the current HDU (FITS table) to a catalog file
+    // or return it as a Tcl list, if filename is NULL.
+    int getHDU(FitsIO* fits, const char* filename, const char* entry);
+
+    // Return the column headings for the current FITS table
+    int getHDUHeadings(FitsIO* fits);
 
 public:
     // Create a new skycat image object

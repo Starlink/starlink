@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ImageData.C,v 1.32 1998/11/16 21:26:02 abrighto Exp $" 
+ * "@(#) $Id: ImageData.C,v 1.33 1998/12/03 22:11:15 abrighto Exp $" 
  *
  * ImageData.C - member functions for class ImageData
  *
@@ -40,7 +40,7 @@
  *
  * Peter W. Draper 13/01/99  Merged my changes into SkyCat 2.2.
  */
-static const char* const rcsId="@(#) $Id: ImageData.C,v 1.32 1998/11/16 21:26:02 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageData.C,v 1.33 1998/12/03 22:11:15 abrighto Exp $";
 
 
 #include <string.h>
@@ -52,6 +52,7 @@ static const char* const rcsId="@(#) $Id: ImageData.C,v 1.32 1998/11/16 21:26:02
 #include "error.h"
 #include "define.h"
 #include "FitsIO.h"
+#include "fitshead.h"
 #include "NativeImageData.h"
 #include "ByteImageData.h"
 #include "XImageData.h"
@@ -294,42 +295,54 @@ int ImageData::write(const char* filename, double rx0, double ry0, double rx1, d
     Mem header(origHeaderSize, 0);
     if (header.status() != 0)
 	return 1;		// error
-    memcpy((char*)header.ptr(), origHeaderPtr, origHeaderSize);
+    char* head = (char*)header.ptr();
+    memcpy(head, origHeaderPtr, origHeaderSize);
 
-    // get and copy data for the specified image area
-    Mem data(w*h*image_.pixelSize(), 0);
-    if (data.status() != 0)
-	return 1;		// error
-
-    copyImageArea(data.ptr(), x0, y0, w, h);
-
-    FitsIO newImage(w, h, image_.bitpix(), image_.bzero(), image_.bscale(), 
-		    header, data);
-    if (newImage.status() != 0)
-	return 1;		// error
-
-    // update the FITS keywords for the new image size
-    if (newImage.put("NAXIS1", w, "Length X axis") != 0
-	|| newImage.put("NAXIS2", h, "Length Y axis") != 0) 
-	return 1;		// error
+    // Update the FITS keywords for the new image size.
+    // Note: we can't use FitsIO for this, since we already have the header,
+    // but the NAXIS keyword are wrong still, so fall back on wcssubs hget()
+    hlength(head, origHeaderSize);
+    hputi4(head, "NAXIS1", w);
+    hputcom(head, "NAXIS1", "Length X axis");
+    hputi4(head, "NAXIS2", h);
+    hputcom(head, "NAXIS2", "Length Y axis");
 
     // update WCS keywords if needed
     if (wcs().isWcs()) {
 	double cx = w/2.0, cy = h/2.0;
-	if (newImage.put("CRPIX1", cx, "Refpix of first axis") != 0
-	    || newImage.put("CRPIX2", cy, "Refpix of second axis") != 0)
-	    return 1;		// error
+	hputr8(head, "CRPIX1", cx);
+	hputcom(head, "CRPIX1", "Refpix of first axis");
+	hputr8(head, "CRPIX2", cy);
+	hputcom(head, "CRPIX2", "Refpix of second axis");
 
 	double ra, dec;
 	if (wcs().pix2wcs(ix0+cx, iy0+cy, ra, dec) != 0)
 	    return 1;
-	if (newImage.put("CRVAL1", ra, "RA at Ref pix in decimal degrees") != 0
-	    || newImage.put("CRVAL2", dec, "DEC at Ref pix in decimal degrees") != 0)
-	    return 1;		// error
+
+	hputr8(head, "CRVAL1", ra);
+	hputcom(head, "CRVAL1", "RA at Ref pix in decimal degrees");
+	hputr8(head, "CRVAL2", dec);
+	hputcom(head, "CRVAL2", "DEC at Ref pix in decimal degrees");
     }
     
-    // write the new image file
-    return newImage.write(filename);
+    // get and copy data for the specified image area
+    int newDataSize = w*h*image_.pixelSize();
+    Mem data(newDataSize, 0);
+    if (data.status() != 0)
+	return 1;		// error
+
+    // copy the selected area
+    copyImageArea(data.ptr(), x0, y0, w, h);
+
+    // write the file so that FitsIO can edit it (keywords are incorrect still)
+    // XXX Note: this is a bit tricky since class FitsIO is using the cfitsio
+    // library and will complain if not editing a FITS file.
+    FitsIO fits(w, h, image_.bitpix(), image_.bzero(), image_.bscale(), 
+		header, data);
+    if (fits.status() != 0 || fits.write(filename) != 0)
+	return 1;		// error
+
+    return 0;
 }
 
 
