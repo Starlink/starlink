@@ -180,8 +180,8 @@
 
 *  If this is the best path so far, save it.
                BEST =     ( .NOT. DONE )
-                     .OR. ( STEP .LT. NSTEP )
-                     .OR. ( STEP .EQ. NSTEP .AND. WEIGHT .LT. BESTWT )
+     :               .OR. ( STEP .LT. NSTEP )
+     :               .OR. ( STEP .EQ. NSTEP .AND. WEIGHT .LT. BESTWT )
                IF ( BEST ) THEN
                   DONE = .TRUE.
                   BESTWT = WEIGHT
