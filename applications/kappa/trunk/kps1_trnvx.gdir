@@ -1,4 +1,3 @@
-
       SUBROUTINE KPS1_TRNV<T> ( NDIMS, ODIMS, NPTS, CODATA, VADATA,
      :                         PSCALE, COMIN, OUTARR, STATUS )
 *+
@@ -88,7 +87,8 @@
       IMPLICIT  NONE              ! no default typing allowed
 
 *  Global Constants:
-      INCLUDE  'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'SAE_PAR'           ! SSE global definitions
+      INCLUDE 'DAT_PAR'           ! Data-system constants
 
 *  Arguments Given:
       INTEGER
