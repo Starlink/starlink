@@ -68,9 +68,7 @@
 *        true if NDFS is true.
 *     USESET = LOGICAL (Given and Returned)
 *        Whether Set-related information is being used.  May only be
-*        true if NDFS is true.  If it is initially set true but all
-*        the lists turn out to be effectively members of distinct sets
-*        then USESET will be set to false on exit.
+*        true if NDFS is true.
 *     FRMS( NLIST ) = INTEGER (Returned)
 *        The Current frame of the WCS component of each NDF.  Only 
 *        returned if USEWCS is true.
@@ -128,6 +126,11 @@
 *  History:
 *     22-FEB-2001 (MBT):
 *        Original version.
+*     27-NOV-2001 (MBT):
+*        Stopped it setting USESET false if there was only one list per
+*        Set.  Although the list processing is done correctly in this
+*        case, the original value of USESET may be needed by the calling
+*        routine for other processing.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -401,9 +404,7 @@
 *  Record the number of superlists.  If it is the same as the original
 *  number of lists, then we don't need to do any further Set-specific
 *  processing and will set USESET false.
-      IF ( USESET ) THEN
-         IF ( NSUP .EQ. NLIST ) USESET = .FALSE.
-      ELSE
+      IF ( .NOT. USESET ) THEN
          NSUP = NLIST
       END IF
 
