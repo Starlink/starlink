@@ -306,7 +306,7 @@
          }
 
 #  Post a busy window.
-         set waitwin [ waiter $canvas.wait -text "Drawing image $ndfname" ]
+         waitpush "Drawing image $ndfname"
 
 #  If the NDF has not been displayed before (but not if only its display
 #  attributes have changed) then update the title bar and info panel.
@@ -363,7 +363,7 @@
          chain
 
 #  Return control to the user.
-         destroy $waitwin
+         waitpop
       }
 
 

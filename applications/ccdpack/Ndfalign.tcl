@@ -433,7 +433,7 @@
          }
 
 #  This may be time-consuming.  Post a waiting message.
-         set waitwin [ waiter $itk_interior.wait -text "Drawing images" ]
+         waitpush "Drawing images"
 
 #  If this pair of NDFs has not been displayed before (but not if only
 #  the display characteristics have changed) then update the title bar.
@@ -513,7 +513,7 @@
          }
 
 #  Remove the waiting message.
-         destroy $waitwin
+         waitpop
       }
 
 
