@@ -51,6 +51,7 @@ extern "C" {
 }
 #endif
 
+#include "astTypemap.h"
 #include "arrays.h"
 
 /* Have one global hash that contains the SV* reference to the CV */
@@ -72,17 +73,7 @@ void Perl_clearGrfObject() {
   CurrentPlot = NULL;
 }
 
-/* An internal hash object attribute accessor return the relevant
-   SV. Uses the global static object stored when the object was
-   registered during the PLOTCALL macro. Returns NULL if no value is
-   stored.
-
-   Does not set astError.
-*/
-
-SV* Perl_getHashAttr ( char * attr ) {
-  SV** elem;
-
+SV * Perl_getPlotAttr ( char * attr ) {
   if (!astOK) return NULL;
 
   if (CurrentPlot == NULL ) {
@@ -90,17 +81,8 @@ SV* Perl_getHashAttr ( char * attr ) {
 	      "Massive internal inconsistency in AstPlot Grf infrastructure");
     return NULL;
   }
- 
-  /* we know this is already a hash ref */
-  HV * hash_object = (HV*) SvRV( CurrentPlot );
 
-  elem = hv_fetch( hash_object, attr, strlen(attr), 0);
-
-  if (elem == NULL || !SvOK(*elem) ) {
-    return NULL;
-  } else {
-    return *elem;
-  }
+  return getPerlObjectAttr( CurrentPlot, attr );
 }
 
 int astGFlush( void ){
@@ -115,7 +97,7 @@ int astGFlush( void ){
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gflush" );
+  cb = Perl_getPlotAttr( "_gflush" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -125,7 +107,7 @@ int astGFlush( void ){
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }
@@ -179,7 +161,7 @@ int astGLine( int n, const float *x, const float *y ){
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gline" );
+  cb = Perl_getPlotAttr( "_gline" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -191,7 +173,7 @@ int astGLine( int n, const float *x, const float *y ){
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }
@@ -260,7 +242,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gmark" );
+  cb = Perl_getPlotAttr( "_gmark" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -272,7 +254,7 @@ int astGMark( int n, const float *x, const float *y, int type ){
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }
@@ -335,7 +317,7 @@ int astGText( const char *text, float x, float y, const char *just,
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gtext" );
+  cb = Perl_getPlotAttr( "_gtext" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -347,7 +329,7 @@ int astGText( const char *text, float x, float y, const char *just,
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }
@@ -412,7 +394,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gtxext" );
+  cb = Perl_getPlotAttr( "_gtxext" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -424,7 +406,7 @@ int astGTxExt( const char *text, float x, float y, const char *just,
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }
@@ -549,7 +531,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
     return 0;
   }
 
-  cb = Perl_getHashAttr( "_gattr" );
+  cb = Perl_getPlotAttr( "_gattr" );
  
   if (astOK) {
     if ( cb != NULL ) {
@@ -561,7 +543,7 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
 
       /* If we have a registered external object, push that on as
 	 a first argument. */
-      external = Perl_getHashAttr( "_gexternal" );
+      external = Perl_getPlotAttr( "_gexternal" );
       if ( external != NULL ) {
 	XPUSHs( external );
       }

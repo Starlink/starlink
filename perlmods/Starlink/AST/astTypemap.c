@@ -2,7 +2,7 @@
 *     astTypemap.c
  
 *  Purpose:
-*     Helper code for AST object typemap processing
+*     Helper code for AST object typemap processing and object handling
  
 *  Description:
 *     This file implements functions useful for converting AST C structs
@@ -170,4 +170,38 @@ char * ntypeToClass ( char * ntype ) {
 
   /* now return the pointer */
   return SvPVX( buffer );
+}
+
+/* An internal hash object attribute accessor return the relevant SV given
+   a reference to the object and a attribute name.
+
+   Returns NULL if no value is stored or if the supplied SV is not a reference.
+
+   Does not set astError. Croaks if the SV is defined but is not of the
+   correct type.
+*/
+
+SV* getPerlObjectAttr ( SV * myobject, char * attr ) {
+  SV** elem;
+  HV * hash_object;
+
+  if (myobject == NULL || !SvOK(myobject) ) {
+    return NULL;
+  }
+ 
+  /* Make sure we have a reference to a hash */
+  if (SvROK(myobject) && SvTYPE(SvRV(myobject))==SVt_PVHV)
+    hash_object = (HV*)SvRV(myobject);
+  else
+    Perl_croak(aTHX_ "Ast object must be a reference to a hash");
+
+  /* retrieve the element */
+  elem = hv_fetch( hash_object, attr, strlen(attr), 0);
+
+  /* trap for undef */
+  if (elem == NULL || !SvOK(*elem) ) {
+    return NULL;
+  } else {
+    return *elem;
+  }
 }
