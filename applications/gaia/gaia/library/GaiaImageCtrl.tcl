@@ -603,7 +603,16 @@ itcl::class gaia::GaiaImageCtrl {
          }
 
       } else {
-         error_dialog "'$itk_option(-file)' does not exist" $w_
+
+         #  File cannot be open for display in GAIA. This could be
+         #  because of a bad name (such as too many periods), so check
+         #  for file existence to qualify the error message.
+         if { [file exists [$namer_ ndfname]] } { 
+            error_dialog \
+               "Cannot open the file [$namer_ ndfname] (bad filename format)" $w_
+         } else {
+            error_dialog "[$namer_ fullname] does not exist" $w_
+         }
          set file ""
          clear
       }
