@@ -32,13 +32,14 @@
       INTEGER NDIM,DIMSO(DAT__MXDIM)	! old dimensions
       INTEGER NVAL			! number of values read
       INTEGER DIMSN(DAT__MXDIM)		! new dimensions
-
+      INTEGER ID
 *-
       CALL MSG_PRNT(VERSION)
 
       CALL AST_INIT()
 
-      CALL USI_DASSOC('INP','UPDATE',LOC,STATUS)
+      CALL USI_ASSOC('INP','*','UPDATE',ID,STATUS)
+      CALL ADI1_GETLOC(ID,LOC,STATUS)
 
 *  get existing shape of object
       CALL DAT_SHAPE(LOC,DAT__MXDIM,DIMSO,NDIM,STATUS)

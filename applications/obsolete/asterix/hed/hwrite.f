@@ -32,6 +32,7 @@
 	INTEGER IERR			! I/O error code
         INTEGER PTR
         INTEGER NVAL
+        INTEGER ID
 
         LOGICAL BINARY
         LOGICAL PRIM
@@ -44,7 +45,8 @@
       CALL AST_INIT()
 
 *    Obtain object name
-      CALL USI_DASSOC('INP','READ',LOC,STATUS)
+      CALL USI_ASSOC('INP','*','READ',ID,STATUS)
+      CALL ADI1_GETLOC(ID,LOC,STATUS)
 
 *    Obtain filename
       CALL USI_GET0C('FILE', FILNAM, status)

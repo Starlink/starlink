@@ -30,11 +30,11 @@
 	CHARACTER*(DAT__SZTYP) type	! type descriptor
 	CHARACTER*(DAT__SZLOC) loc	! locator to
 
-
 	INTEGER LUN			! I/O channel number
 	INTEGER IERR			! I/O error code
         INTEGER PTR
         INTEGER NVAL
+        INTEGER ID
 
         LOGICAL PRIM
         LOGICAL BINARY
@@ -51,7 +51,8 @@
       CALL USI_GET0L('BINARY',BINARY,STATUS)
 
 * Obtain object name
-      CALL USI_DASSOC('OUT','UPDATE',LOC,STATUS)
+      CALL USI_ASSOC('OUT','*','UPDATE',ID,STATUS)
+      CALL ADI1_GETLOC(ID,OBJ,STATUS)
 
 * Open file
       CALL FIO_GUNIT(LUN,STATUS)

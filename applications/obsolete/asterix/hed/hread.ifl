@@ -1,6 +1,5 @@
 INTERFACE HREAD
 
-
    parameter FILE
       position 1
       type '_CHAR'
@@ -18,7 +17,7 @@ INTERFACE HREAD
 
    parameter OUT
       position 2
-      type 'UNIV'
+      type 'LITERAL'
       ppath 'GLOBAL'
       association '<->GLOBAL.HDSOBJ'
       prompt 'Object name'
