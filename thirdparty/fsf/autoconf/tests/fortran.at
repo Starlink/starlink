@@ -65,13 +65,41 @@ AC_LANG_COMPILER
 # No Fortran compiler is known not to support "*.f".
 AC_FC_SRCEXT([f])
 
-# GNU Fortran is known to support freeform.
-AC_FC_FREEFORM([],
-               [AC_MSG_WARN([Fortran does not accept free-form source])])
+# All Fortrans surely have the sin() and cos() intrinsics, so if we fail to
+# find these, it means the macro's wrong.
+AC_FC_CHECK_INTRINSICS(sin cos wibble^(oops))
+if test "$ac_cv_fc_has_SIN" != yes -o "$ac_cv_fc_has_COS" != yes; then
+  AC_MSG_ERROR([CHECK_INTRINSICS has failed to find SIN])
+fi
+if test "$ac_cv_fc_has_WIBBLE__OOPS_" != no; then
+  AC_MSG_ERROR([CHECK_INTRINSICS has managed to find intrinsic WIBBLE__OOPS_!])
+fi
+
+# Following tests can only be done because we know the behaviour of the
+# GNU Fortran compiler.
 if test "$ac_compiler_gnu" = yes; then
+
+  # GNU Fortran does not have the OPEN READONLY keyword.
+  AC_F77_HAVE_OPEN_READONLY
+  if test "$ac_cv_f77_have_open_readonly" != no; then
+    AC_MSG_ERROR([OPEN_READONLY did not produce 'no'])
+  fi
+
+  # GNU Fortran has an OPEN RECL of 1.
+  AC_FC_RECL_UNIT
+  if test "$ac_cv_fc_recl_unit" -ne 1; then
+    AC_MSG_ERROR([GNU Fortran's RECL should be 1, not $ac_cv_fc_recl_unit])
+  fi
+
+  # GNU Fortran is known to support freeform.
+  # This test should remain last, since it modifies FCFLAGS in a way which
+  # could cause subsequent tests to fail to compile.
+  AC_FC_FREEFORM([],
+                 [AC_MSG_WARN([Fortran does not accept free-form source])])
   case $FCFLAGS in
    *-ffree-form*) ;;
    *) AC_MSG_ERROR([failed to recognize GNU Fortran's -ffree-form option.]);;
   esac
+
 fi
 ]])
