@@ -42,6 +42,7 @@
 /* C header files. */
 /* --------------- */
 #include <stdio.h>
+#include <string.h>
 
 /* Static variables. */
 /* ----------------- */
@@ -146,18 +147,28 @@ void astPutErr_( int status, const char *message ) {
  *-
  */
   
-  /*  If available then return the message through the Tcl
-      interpreter, otherwise just act like the null implementation of
-      this routine. */
-  if ( Interp != NULL ) {
-    Tcl_AppendResult( Interp, (char *) message, "\n", (char *)NULL );
+    /* By default we pass any AST related to FITS back through the Tcl
+     * interpreter and through standard error. These are important and
+     * resolve many issues with bad WCS calibrations, other errors are
+     * only delivered through standard error if DEBUG is set. If no
+     * interpreter is available then all messages are delivered through
+     * standard error. 
+     */
+    if ( Interp != NULL ) {
+        Tcl_AppendResult( Interp, (char *) message, "\n", (char *)NULL );
+        
 #ifdef DEBUG 
-    (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ", message);
+        (void) fprintf( stderr, "DEBUG: %s%s\n", astOK ? "!! " : "!  ", message);
+        (void) fflush(stderr);
+#else 
+        if ( strstr( message, "FITS" ) != NULL ||
+             strstr( message, "Fits" ) != NULL ) {
+            (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
+            (void) fflush(stderr);
+        }
 #endif
-  } else {
-    (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
-  }
-#ifdef DEBUG 
-  (void) fflush(stderr);
-#endif
+    } else {
+        (void) fprintf( stderr, "%s%s\n", astOK ? "!! " : "!  ", message );
+        (void) fflush(stderr);
+    }
 }

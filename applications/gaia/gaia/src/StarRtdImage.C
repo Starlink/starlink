@@ -692,18 +692,25 @@ int StarRtdImage::isCelestial() {
 //   encode the WCS is made if a suitable encoding form passed as an
 //   optional argument (normally this will be FITS-WCS or DSS).
 //
+//   The return from this function is either TCL_OK for success 
+//   or TCL_ERROR for failure. Either way the return may have
+//   diagnostic messages that should be shown to the user.
+//
 //-
 int StarRtdImage::dumpCmd( int argc, char *argv[] )
 {
 #ifdef _DEBUG_
     cout << "Called StarRtdImage::dumpCmd (" << argv[0] << ")" << endl;
 #endif
-
     int native = 1;
     int saved = 1;
     int nwrite = 0;
     int nextra = 0;
+
     if ( image_ ) {
+
+        //  Create a stream for any messages about the saving process.
+        ostrstream message;
         if ( origset_ ) {
 
             //  WCS has been played with. Attempt to write the current
@@ -721,9 +728,10 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             int oldsize = oldhead.size();
             char card[FITSCARD+1];
             int ncard = oldsize / FITSCARD;
+
             for ( int i = 0 ; i < ncard; i++, oldptr += FITSCARD ) {
                 memcpy( card, (void *)oldptr, (size_t)FITSCARD );
-                card[FITSCARD] = '\0';
+                card[FITSCARD] = '\0';  // Always NULL terminated,
 
                 //  Read all cards up to, but not including, the END card.
                 if ( ! ( card[0] == 'E' && card[1] == 'N' && card[2] == 'D'
@@ -744,65 +752,59 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  Read a WCS system from the channel to simulate the initial
             //  read (which removed an object).
             astClear( chan, "Card" );
+            const char *default_encoding = astGetC( chan, "Encoding" );
             AstFrameSet *tmpset = (AstFrameSet *) astRead( chan );
             if ( !astOK ) {
                 astClearStatus;
             }
             if ( tmpset != AST__NULL && astIsAFrameSet( tmpset ) ) {
                 tmpset = (AstFrameSet *) astAnnul( tmpset );
+
+                // A successful initial default encoding is the
+                // permanent default for writing back.
+                astSet( chan, "Encoding=%s", default_encoding );
             }
 
-            //  If the card position is at the beginning then
-            //  we should move it past the standard headers, these are
-            //  those up to the last NAXIS card.
+            //  If the card position is still at the beginning for any
+            //  reason then we should move it past the standard
+            //  headers, these are those up to the last NAXIS card.
             int startCard = astGetI( chan, "card" );
-#if 0
-            if ( astGetI( chan, "Card" ) == 1 ) {
+            if ( astGetI( chan, "Card" ) <= 1 ) {
                 while( astFindFits( chan, "NAXIS%d", card, 1 ) ) {
                     startCard = astGetI( chan, "card" );
                 }
+                astSetI( chan, "Card", startCard );
             }
-#endif
-            //  XXX write at end of headers until AST stops splitting
-            //  native objects. Then use the above.
-            startCard = astGetI( chan, "Ncard" );
 
             //  Now we can try to add the WCS encoding. The encoding
-            //  type of the channel is either set to "Native" or
-            //  (sometimes!) the type of the WCS object just read. The
-            //  first attempt to update will use whatever this is set
-            //  to. If this fails then an attempt to write a native
-            //  encoding will be made, if the type wasn't native.
+            //  type of the channel is set to the type of the WCS
+            //  object just read (or native). The first attempt to
+            //  update will use whatever this is set to. If this fails
+            //  then an attempt to write a native encoding will be
+            //  made, if the default type wasn't native already.
             StarWCS* wcsp = getStarWCSPtr();
             if ( !wcsp ) {
                 return TCL_ERROR;
             }
             AstFrameSet *newwcs = wcsp->astWCSClone();
-            astSetI( chan, "Card", startCard );
             nwrite = astWrite( chan, newwcs );
-            const char *encod = astGetC( chan, "Encoding" );
-#if 0
-            cout << "MERGED CARDS" << endl;
-            ncard = astGetI( chan, "Ncard" );
-            astClear( chan, "Card" );
-            for ( int i = 0; i < ncard; i++ ) {
-                astFindFits( chan, "%f", card, 1 );
-                cout << card << endl;
-            }
-#endif
             if ( !astOK || nwrite == 0 ) {
+                message << "WCS: failed to save WCS using the "
+                        << "default encoding: " << default_encoding << endl;
 
-                //  Failed to write WCS using default encoding. Try native.
+                //  Failed to write WCS using default encoding. Try NATIVE.
                 if ( ! astOK ) astClearStatus;
-                if ( strcmp( "NATIVE", encod ) != 0 ) {
+                if ( strcmp( "NATIVE", default_encoding ) != 0 ) {
                     astSet( chan, "Encoding=Native" );
-                    astSetI( chan, "Card", startCard );
                     nwrite = astWrite( chan, newwcs );
                     if ( astOK && nwrite != 0 ) {
+                        message << "WCS: saved WCS as AST native "
+                                << "encoding" << endl;
                         native = 1;
                         saved = 1;
                     } else {
-
+                        message << "WCS: failed to save WCS "
+                                << "using an AST native encoding" << endl;
                         //  Failed this time too.
                         native = 0;
                         saved = 0;
@@ -813,9 +815,11 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
                 }
             } else {
 
-                //  Succeeded write using default encoding.
+                //  Write succeeded using default encoding.
+                message << "WCS: saved WCS using default encoding: " 
+                        << default_encoding << endl;
                 saved = 1;
-                if ( strcmp( "NATIVE", encod ) == 0 ) {
+                if ( strcmp( "NATIVE", default_encoding ) == 0 ) {
                     native = 1;
                 } else {
                     native = 0;
@@ -828,11 +832,16 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
             //  except native will only have one representations).
             if ( argc == 2 ) {
                 astSet( chan, "Encoding=%s", argv[1] );
-                astSetI( chan, "Card", startCard );
                 nextra = astWrite( chan, newwcs );
 
                 if ( astOK && nextra != 0 ) {
                     saved = 1;
+                    message << "WCS: saved WCS using additional encoding: " 
+                            << argv[1] << endl;
+                } 
+                else {
+                    message << "WCS: failed to save WCS using "
+                            << "additional encoding: " << argv[1] << endl;
                 }
                 if ( !astOK ) astClearStatus;
             }
@@ -861,16 +870,31 @@ int StarRtdImage::dumpCmd( int argc, char *argv[] )
         if ( result == TCL_OK ) {
             if ( origset_ ) {
                 if ( saved && native && ( nextra == 0 ) ) {
-                    return error( "information: WCS could only be saved"
-                                  " as an AST native representation");
+                    message << "WCS: warning, your modified WCS "
+                            << "could only be saved as an AST native "
+                            << "encoding, this will limit its "
+                            << "usefulness to AST compatible programs "
+                            << "(GAIA, KAPPA, EXTRACTOR etc.)" 
+                            << endl;
+                    result = TCL_ERROR;
                 } else if ( !saved ) {
-                    return error( "failed to save WCS information");
+                    message << "WCS: error, failed to save your modified WCS "
+                            << endl;
+                    result = TCL_ERROR;
+                } 
+                else {
+                    message << "WCS: your modified WCS was "
+                            << "successfully saved" << endl;
                 }
             }
-            return TCL_OK;
-        } else {
-            return TCL_ERROR;
+            else {
+                message << "Image saved" << endl;
+            }
+            message << ends;
+            set_result( message.str() );
+            delete message.str();
         }
+        return result;
     } else {
         return TCL_OK;
     }

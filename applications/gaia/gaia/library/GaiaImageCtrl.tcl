@@ -508,7 +508,7 @@ itcl::class gaia::GaiaImageCtrl {
             catch { $image_ dump $file FITS-WCS } msg
 	 }
          if { $msg != "" } {
-            warning_dialog $msg
+            info_dialog $msg
          }
       }
    }
