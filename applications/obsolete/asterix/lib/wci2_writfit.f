@@ -222,35 +222,35 @@
         DOUBLE PRECISION	SLA_EPJ2D
 
 *  Local Variables:
-      CHARACTER*80		LABEL			! X,Y axis labels
-      CHARACTER*3		PRJ			! Projection name
+c     CHARACTER*80		LABEL			! X,Y axis labels
+c     CHARACTER*3		PRJ			! Projection name
       CHARACTER*3		SYS			! Coord system name
-      CHARACTER*40		UNITS(2)		! X,Y axis units
+c     CHARACTER*40		UNITS(2)		! X,Y axis units
 
       DOUBLE PRECISION		BTAI			! Value of BASE_TAI
       DOUBLE PRECISION		EPOCH			! Epoch
-      DOUBLE PRECISION		MJD			! Observation time
-      DOUBLE PRECISION		PA			! Position angle
-      DOUBLE PRECISION		SPOINT(2)		! RA, DEC
+c     DOUBLE PRECISION		MJD			! Observation time
+c     DOUBLE PRECISION		PA			! Position angle
+c     DOUBLE PRECISION		SPOINT(2)		! RA, DEC
 
-      REAL			BASE(2), SCALE(2)	! Axis values
+c     REAL			BASE(2), SCALE(2)	! Axis values
       REAL			EQNX			! Equinox
-      REAL			TOR			! Radian conversion
+c     REAL			TOR			! Radian conversion
 
-      INTEGER			DIMS(2)			! Axis dimensions
+c     INTEGER			DIMS(2)			! Axis dimensions
       INTEGER			HDUID			! HDU id
-      INTEGER			IMJD			! Value of BASE_MJD
-      INTEGER			IPSF			! Psf system handle
-      INTEGER			PTR(2)			! Axis data pointers
-      INTEGER			X_AX,Y_AX,E_AX,T_AX	! Axis numbers
+c     INTEGER			IMJD			! Value of BASE_MJD
+c     INTEGER			IPSF			! Psf system handle
+c     INTEGER			PTR(2)			! Axis data pointers
+c     INTEGER			X_AX,Y_AX,E_AX,T_AX	! Axis numbers
 
-      LOGICAL			EQOK, EPOK		! Equinox & epoch ok?
-      LOGICAL			HASPIX			! Spatial axes exist?
-      LOGICAL			IPSFOK			! Psf id exists?
-      LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
-      LOGICAL			REG(2)			! Axes regular
-      LOGICAL			PRJOK, SYSOK		! Projection/system ok?
-      LOGICAL			TAIOK			! BASE_TAI found?
+c     LOGICAL			EQOK, EPOK		! Equinox & epoch ok?
+c     LOGICAL			HASPIX			! Spatial axes exist?
+c     LOGICAL			IPSFOK			! Psf id exists?
+c     LOGICAL			RAOK, DECOK, PAOK       ! Found ok flags
+c     LOGICAL			REG(2)			! Axes regular
+c     LOGICAL			PRJOK, SYSOK		! Projection/system ok?
+c     LOGICAL			TAIOK			! BASE_TAI found?
 *.
 
 *  Check inherited global status.
