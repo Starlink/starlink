@@ -68,14 +68,18 @@ protected:
   int nxpix_;
   int nypix_;
 
+  //  Maximum number of dimensions we can process.
+  enum {MAXDIM = 12};
+
+  //  All the dimensions of the supplied data.
+  int ndims_;
+  int dims_[MAXDIM];
+
   //  Rotation of angle
   double rotate_;
 
   //  Make WCS 2D from sky to image.
   int make2D();
-
-  //  Maximum number of dimensions we can process.
-  enum {MAXDIM = 12};
 
   //  The indices of the RA and Dec axes.
   int raIndex_;
