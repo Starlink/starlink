@@ -1562,7 +1562,7 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  Local variables :
       REAL	SPARR(2)
       INTEGER ID
-      INTEGER NVAL,BID
+      INTEGER NVAL
       LOGICAL AUX
 *-
       IF (STATUS.EQ.SAI__OK) THEN
@@ -1571,10 +1571,8 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
         AUX=(I_N_AUX.NE.0)
         IF (AUX) THEN
           CALL GMI_CREMULT(FID,2,STATUS)
-          CALL BDI_NEW( 'BinDS', 1, I_N_AUX, 'REAL', BID, STATUS )
           CALL GMI_LOCNDF(FID,1,'*',ID,STATUS)
-          CALL ADI_SETLNK( BID, ID, STATUS )
-          ID = BID
+          CALL BDI_LINK( 'BinDS', 1, I_N_AUX, 'REAL', ID, STATUS )
         ELSE
           CALL ADI_CLONE(FID,ID,STATUS)
         ENDIF
@@ -1620,10 +1618,8 @@ c     :           I_X1_1D,I_X2_1D,I_Y1_1D,I_Y2_1D,SCALED,STATUS)
 *  copy ancilliary data if present
         IF (AUX) THEN
 
-          CALL BDI_NEW( 'BinDS', 1, NVAL, 'REAL', BID, STATUS )
           CALL GMI_LOCNDF(FID,2,'*',ID,STATUS)
-          CALL ADI_SETLNK( BID, ID, STATUS )
-          ID = BID
+          CALL BDI_LINK( 'BinDS', 1, NVAL, 'REAL', ID, STATUS )
 
           CALL BDI_AXPUT1R( ID, 1, 'SpacedData', 2, SPARR, STATUS )
           CALL BDI_PUT1R( ID, 'Data', NVAL, %VAL(I_DPTR_AUX) ,STATUS)
@@ -5167,7 +5163,6 @@ c      REAL HWID
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PRM_PAR'
 *    Import :
 *    Import-Export :

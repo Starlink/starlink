@@ -764,16 +764,13 @@
 *  Local constants :
 *  Local variables :
       REAL	SPARR(2)
-      INTEGER TID
 *-
 
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Create interface object
-      CALL BDI_NEW( 'TimeSeries', 1, T_NVAL, 'REAL', TID, STATUS )
-      CALL ADI_SETLNK( TID, FID, STATUS )
-      FID = TID
+      CALL BDI_LINK( 'TimeSeries', 1, T_NVAL, 'REAL', FID, STATUS )
 
 *  text
       CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
@@ -843,7 +840,7 @@
 *  Local constants :
 *  Local variables :
       REAL	SPARR(2)
-      INTEGER DPTR,VPTR,QPTR,APTR,WPTR,TID
+      INTEGER DPTR,VPTR,QPTR,APTR,WPTR
       INTEGER NVAL
       INTEGER I1,I2
 *-
@@ -856,11 +853,9 @@
       NVAL = I2-I1+1
 
 *  Create interface object
-      CALL BDI_NEW( 'TimeSeries', 1, NVAL, 'REAL', TID, STATUS )
-      CALL ADI_SETLNK( TID, FID, STATUS )
-      FID = TID
+      CALL BDI_LINK( 'TimeSeries', 1, NVAL, 'REAL', FID, STATUS )
 
-*  text
+*  Text
       CALL BDI_PUT0C( FID, 'Title', T_TITLE,STATUS)
       CALL BDI_PUT0C( FID, 'Label', T_LABEL,STATUS)
       CALL BDI_PUT0C( FID, 'Units', T_UNITS,STATUS)

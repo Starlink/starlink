@@ -47,7 +47,6 @@
       INTEGER VPTRO	              ! data VARIANCE
       INTEGER I,J
 
-      INTEGER			BID			! New binned object
       INTEGER			IFID			! Input dataset id
       INTEGER			OFID			! Output dataset id
 
@@ -129,9 +128,7 @@
       ONDIM=NDIM-1
 
 * create output data components
-      CALL BDI_NEW( 'BinDS', ONDIM, ODIMS, 'REAL', BID, STATUS )
-      CALL ADI_SETLNK( BID, OFID, STATUS )
-      OFID = BID
+      CALL BDI_LINK( 'BinDS', ONDIM, ODIMS, 'REAL', OFID, STATUS )
 
 * textual lables
       CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )

@@ -2672,7 +2672,6 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      INTEGER			NID
 *-
 
 *  Check inherited global status.
@@ -2685,11 +2684,10 @@ c          CALL GCB_SET1R('NOTE_Y',I+1,1,YT,STATUS)
       END IF
 
 *  Locate the graph file object
-      CALL GMI_LOCNDF( MGID, N, '*', NID, STATUS )
+      CALL GMI_LOCNDF( MGID, N, '*', GFID, STATUS )
 
 *  Create binned data object and link it to the graph
-      CALL BDI_NEW( 'Spectrum', 1, NDAT, 'REAL', GFID, STATUS )
-      CALL ADI_SETLNK( GFID, NID, STATUS )
+      CALL BDI_LINK( 'Spectrum', 1, NDAT, 'REAL', GFID, STATUS )
 
 *  Write the index entry
       CALL GMI_PUTINDEX( MGID, N, NAME, STATUS )

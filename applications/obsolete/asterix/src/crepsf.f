@@ -65,7 +65,6 @@
       REAL              	TOR                    	! Units to radian conversion
       REAL              	X0, Y0                 	! Image position
 
-      INTEGER			BID			! Binned dataset object
       INTEGER           	DIMS(2)                	! Image dimensions
       INTEGER           	DPTR                   	! Pointer to data
       INTEGER			OFID			! Output dataset id
@@ -108,15 +107,14 @@
       CALL USI_GET0R( 'PIXSIZE', SCALE, STATUS )
 
 *    Create data object
-      CALL BDI_NEW( 'XYimage', 2, DIMS, 'REAL', BID, STATUS )
-      CALL ADI_SETLNK( BID, OFID, STATUS )
+      CALL BDI_LINK( 'XYimage', 2, DIMS, 'REAL', OFID, STATUS )
 
 *    Create axes
-      CALL BDI_AXPUT0C( BID, 1, 'Label', 'X position', STATUS )
-      CALL BDI_AXPUT0C( BID, 2, 'Label', 'Y position', STATUS )
-      CALL BDI_AXPUT0C( BID, 1, 'Units', UNITS, STATUS )
-      CALL BDI_AXPUT0C( BID, 2, 'Units', UNITS, STATUS )
-      CALL BDI_PUT0C( BID, 'Units', 'Probability/pixel', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'X position', STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Label', 'Y position', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Units', UNITS, STATUS )
+      CALL BDI_AXPUT0C( OFID, 2, 'Units', UNITS, STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', 'Probability/pixel', STATUS )
 
 *    Image position
       CALL USI_GET0R( 'X0', X0, STATUS )
@@ -142,22 +140,22 @@
         CALL TCI0_INIT( STATUS )
         CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
         CALL ADI_CPUT0D( TIMID, 'MJDObs', MJD, STATUS )
-        CALL TCI_PUTID( BID, TIMID, STATUS )
+        CALL TCI_PUTID( OFID, TIMID, STATUS )
       END IF
 
 *    Create axis values
       SPARR(1) = RADIUS*SCALE
       SPARR(2) = -SCALE
-      CALL BDI_AXPUT1R( BID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
       SPARR(1) = RADIUS*SCALE
       SPARR(2) = SCALE
-      CALL BDI_AXPUT1R( BID, 2, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT1R( OFID, 2, 'SpacedData', 2, SPARR, STATUS )
 
 *    Create PSF structure and associate with PSF system
-      CALL PSF_ASSOCO( BID, PSLOT, STATUS )
+      CALL PSF_ASSOCO( OFID, PSLOT, STATUS )
 
 *    Map data
-      CALL BDI_MAPR( BID, 'Data', 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTR, STATUS )
 
 *    Get psf <-> grid offsets
       CALL USI_GET0R( 'DX', DX, STATUS )

@@ -199,7 +199,6 @@
       INTEGER       		AXLP                	! Loop over input axes
       INTEGER			AXPTR(2)		! Mapped axis data
       INTEGER       		AZAX, RAX           	! Output axis id's
-      INTEGER			BINID			! O/p BinDS object
       INTEGER       		DIMS(3)    		! Input dimensions
       INTEGER       		IDPTR               	! Input data
       INTEGER			IFID			! Input dataset id
@@ -425,14 +424,12 @@
       END IF
 
 *  Create o/p BinDS object and link to output file
-      CALL BDI_NEW( 'BinDS', ONDIM, ODIM, 'REAL', BINID, STATUS )
+      CALL BDI_LINK( 'BinDS', ONDIM, ODIM, 'REAL', OFID, STATUS )
       IF ( CUBE ) THEN
-        CALL BDI_SETDST( BINID, 'PROFILE_SET', STATUS )
+        CALL BDI_SETDST( OFID, 'PROFILE_SET', STATUS )
       ELSE
-        CALL BDI_SETDST( BINID, 'RADIAL_PROFILE', STATUS )
+        CALL BDI_SETDST( OFID, 'RADIAL_PROFILE', STATUS )
       END IF
-      CALL ADI_SETLNK( BINID, OFID, STATUS )
-      OFID = BINID
 
 *  Create and map output arrays
       CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
