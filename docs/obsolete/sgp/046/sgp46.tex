@@ -1,0 +1,772 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp46.2}
+\newcommand{\stardocnumber}    {46.2}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith}
+\newcommand{\stardocdate}      {9th April 1997}
+\newcommand{\stardoctitle}     {Starlink's Software Work During 1996}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+This paper presents a summary of the software work carried out by
+Starlink during 1996.  It is based on the software plan approved by
+the Starlink Panel in November 1995.\footnote {In fact, there was a
+delay (because of on-going reviews of Starlink) in establishing the
+subsequent software plan at the end of 1996 that would normally have
+followed on from the 1995 plan. This paper therefore covers a slightly
+longer period than originally intended, from mid-November 1995 to the
+end of January 1997. Because of staff shortages during this period,
+however, the actual work completed still falls a little short of that
+originally planned.}
+
+With some exceptions (marked with an asterisk in the table of
+contents), most of the planned work has been completed and the
+resulting products have either been distributed or are queued for
+distribution shortly ({\em{i.e.}}\ early in 1997).
+
+Note that this paper concentrates on the work of Starlink's
+Applications Programmers, software staff at RAL and those Site
+Managers with specific software responsibilities. It does not cover
+related work carried out ({\em{e.g.}}) by other Site Managers, nor
+does it describe routine ``baseline support'' of established software
+packages ({\em{e.g.}}\ minor bug fixes) unless this has resulted in
+significant new features.
+
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+% \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+\section{\xlabel{SPECTROSCOPY}SPECTROSCOPY}
+
+\subsection{\label{spec:figaro}Transparent Foreign Data Access for Figaro}
+
+The routines which Figaro (\xref{SUN/86}{sun86}{}) uses to access data
+have been completely replaced this year by a new internal Figaro
+library (FDA) which, in turn, calls the Starlink NDF data access
+library (\xref{SUN/33}{sun33}{}). The main advantage of this change is
+that Figaro now has access to the NDF library's facilities for
+transparently accessing a \xref{range of ``foreign'' data
+formats}{sun55}{sect_auto}, including FITS and IRAF files (in addition
+to the NDF and Figaro formats that were previously used). Automatic
+data compression/decompression is also possible.
+
+This was an essential step before the project to integrate Figaro with
+the IRAF command language (see \S\ref{infra:IRAF}) could be
+undertaken.
+
+This move also gives Figaro applications access to several other
+services provided by the NDF library (and already used by packages
+such as \xref{KAPPA}{sun95}{}), including automatic \xref{recording of
+data processing history}{sun95}{se_ndfhistory} and the ability to
+operate on \xref{sub-sets of spectra and images}{sun95}{se_ndfsect}.
+
+Details of the changes and new features were described by an article
+in the \htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/96sep/a16.html} (September
+1996).
+
+\subsection{Echelle Data Reduction}
+
+The \xref{ECHOMOP}{sun152}{} Echelle reduction package has undergone a
+period of ``enhanced support'' this year, as recommended by the
+Spectroscopy Software Strategy Group in its 1995 input to
+Starlink. This has involved a period of extensive bug fixing and
+testing, resulting in a new version (V3.2) which runs approximately
+twice as fast as the previous version. (For Digital Unix users, this
+represents a factor 16 improvement in speed over the last two years.)
+
+Calls to the NAG library have been removed from ECHOMOP in preparation
+for distribution via the Starlink \htmladdnormallinkfoot{Software
+Store}{http://star-www.rl.ac.uk/cgi-store/storetop} and on CDROM.
+
+The Starlink Guide ``Introduction to Echelle Spectroscopy''
+(\xref{SG/9}{sg9}{}) has been updated and some extra illustrations
+added.
+
+\subsection{IUE Final Archive Access}
+
+A new FITS reader (\xref{FITS2NDF}{sun55}{FITS2NDF}) has been added to
+the CONVERT package (\xref{SUN/55}{sun55}{}). Amongst the various
+flavours of FITS format that it can read are the IUE Final Archive
+MXLO, LILO, LIHI, RILO, RIHI, SILO and SIHI products.
+
+A consequence of this will be that in future most Starlink
+applications will be able to read these file formats transparently.
+
+\section{\xlabel{IMAGE_PROCESSING}IMAGE PROCESSING}
+
+\subsection{ISO Data Access}
+
+The new \xref{FITS2NDF}{sun55}{FITS2NDF} FITS reader in the CONVERT
+package (\xref{SUN/55}{sun55}{}) is now able to read the ISO
+auto-analysis datasets for SWS, LWS, CAM and some PHOT products.
+
+A consequence of this will be that in future most Starlink
+applications will be able to read these file formats transparently.
+Other products can be accessed using CURSA (\xref{SUN/190}{sun190}{}).
+
+\subsection{Handling Large Datasets}
+
+A study has been conducted into the software and system administration
+implications of handling extremely large image datasets, such as
+images from CCD mosaic cameras. A report on this is being prepared to
+guide future technical developments.
+
+\subsection{\label{ip:GAIA}Graphical Image Manipulation Tool (GAIA)}
+
+Work has been conducted to adapt a graphical Real Time Display tool
+(RTD), developed at ESO, for use as a toolbox for performing
+astronomical manipulation of images.
+
+RTD comes with interactive image display facilities broadly similar to
+(but more extensive than) those of SAOIMAGE, and it also provides
+graphical annotation facilities suitable for publication or
+presentation work.  Our work has concentrated, however, not on image
+display, but on extending these capabilities so that interactive
+processing of astronomical images becomes possible.\footnote{Various
+other display tools were also considered, but did not prove suitable
+at the time because they stored only a scaled version of the data
+internally.} The resulting software is called GAIA (Graphical
+Astronomy and Image Analysis) and is described in
+\xref{SUN/214}{sun214}{}.
+
+The facilities that we have added to RTD include:
+
+\begin{itemize}
+\item Selection of arbitrary image regions (boxes, circles, rotating
+ellipses, {\em etc.}) with output in a format compatible with other
+applications.
+
+\item Highly interactive aperture photometry, including measurement of
+more than one object at a time with annular (or detached) sky
+regions. Apertures may be placed and resized individually and results
+saved and restored, {\em etc.} Full handling of statistical error
+information is included.
+
+\item Interactive editing of image features such as defects, cosmic
+ray hits, stars, {\em etc.}, with replacement with an interpolated
+background. This facility is an enhanced form of the very popular
+PATCH application originally provided on the old ARGS image displays,
+but unavailable since their demise.
+
+\item Blinking between multiple images.
+\end{itemize}
+
+An article on GAIA has recently appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a03.html} (March
+1997).
+
+\section{\xlabel{THEORY_AND_STATISTICAL_ANALYSIS}THEORY AND STATISTICAL ANALYSIS}
+
+\subsection{Advertise Computer Algebra Software}
+
+A new document ``Computer Algebra Software'' (\xref{SGP/47}{sgp47}{})
+has been produced, outlining the major features of the two leading
+packages in this area -- Maple and Mathematica -- and comparing
+them. It includes a list of other packages available and pointers to
+related information.
+
+\subsection{Enhanced User Support For Visualisation Software}
+
+As planned, we have provided some special support this year to assist
+users with visualising multi-dimensional data (in particular, there is
+interest in visualising spectral data from the JCMT). Overall,
+however, the demand has been much lower than expected. This is due to
+problems with the supplier of IBM's Data Explorer software which has
+substantially delayed the release of the related products developed by
+Starlink during 1995 ({\em e.g.}\ see \xref{SUN/203}{sun203}{}). Most
+of these problems have now been resolved.
+
+\subsection{Ease the Transition to Fortran~90}
+
+Fortran~90 compilers have been made available to sites requesting
+them.  There have, as yet, been no significant Fortran~90 related
+requests for software support.
+
+\section{\xlabel{INFORMATION_SERVICES_AND_DATABASES}INFORMATION SERVICES AND DATABASES}
+
+\subsection{A UK Astronomy ftp Archive}
+
+The Starlink UK IRAF
+\htmladdnormallinkfoot{mirror}{http://star-www.rl.ac.uk/iraf/} has
+been set up and a poster paper was presented on this at the 1996 ADASS
+meeting in Charlottesville. In the first 5 months of operation, the
+mirror had distributed more than 4300 files to 120 different nodes in
+more than 10 countries.
+
+\subsection{A Gripe Command*}
+
+No significant progress has been made this year towards developing a
+``gripe'' command to permit users to submit complaints and suggestions
+about software in a more automated way.
+
+\subsection{Observing Preparation Software}
+
+A new Starlink guide ``Preparing to Observe'' (\xref{SG/10}{sg10}{})
+has been prepared to offer advice on choice of software to those
+making preparations to apply for (or take up) observing time on a
+variety of instruments.
+
+\subsection{Upgrades to Catalogue Access Software}
+
+A number of enhancements have been made to the CURSA package
+(\xref{SUN/190}{sun190}{}) to improve its ability to handle
+astronomical tables and catalogues.
+
+These include a ``Small Text List'' catalogue format that may be used
+to access normal ASCII text files as tables, compatibility with
+\xref{KAPPA}{sun95}{} tables, and a new {\tt catselect} application
+which can generate more sophisticated selections from catalogues.
+
+An article giving further details has recently appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a05.html} (March
+1997).
+
+\section{\xlabel{GRAPHICS_AND_INFRASTRUCTURE}GRAPHICS AND INFRASTRUCTURE}
+
+\subsection{\label{infra:astrom}Astrometric Coordinate Systems}
+
+A new library has been developed to support the representation of
+World Coordinate System (WCS) information, for example celestial
+coordinate systems, in data reduction software. It is written in C and
+supports most of the concepts in the proposed FITS WCS
+standard.\footnote{The FITS proposal is still evolving, so some of its
+latest ideas have yet to be included.} For example, it supports a wide
+range of sky projections and astronomical coordinate systems.
+
+The library caters for the storage and retrieval of WCS data from a
+variety of sources ({\em i.e.}\ it is not tied to any particular data
+system or environment) and for its manipulation within programs, using
+a high-level model of inter-related coordinate systems. It also
+provides graphics facilities which allow applications to draw ({\em
+e.g.}) arbitrary sky coordinate grids with a single call.
+
+At present the library will be of limited interest to most users, but
+is being made available to software developers so that its facilities
+can start to be included in applications (which we expect will happen
+during 1997). We expect to make a general release of the library once
+the FITS standard has stabilised a little more and any feedback from
+developers has been included.
+
+\subsection{\label{infra:IRAF}Integration with IRAF}
+
+We have pursued the integration of Starlink software with IRAF this
+year primarily through enhancements to the Figaro package. We see this
+as the forerunner of similar work on other packages in future.
+
+As an initial part of this work, the data access system used by Figaro
+has been completely replaced (see \S\ref{spec:figaro}). A prototype
+IRAF interface, produced during 1995, has also been upgraded ready for
+general release. As part of this, we have developed a high-level
+language to describe packages, from which the interface to IRAF (and
+possibly other environments or command languages in future) can be
+generated automatically.
+
+The resulting IRAF interface for Figaro means that Figaro is now
+available as an ``IRAF package'' which runs from the IRAF {\tt cl} and
+has full access to the IRAF parameter system. It can also exchange
+data transparently with other IRAF tasks (although some Figaro
+facilities, such as error and quality handling, are not then available
+because of the limitations of the IRAF data format).
+
+The product of this work has been available for test purposes for
+several months and we are now preparing a full release. This will
+include both the IRAF interface software (which can be used by other
+packages in future) and of Figaro -- with added IRAF
+compatibility. The same version of Figaro will continue to function as
+normal outside IRAF.
+
+\subsection{Removal of NAG dependence}
+
+Our programme to remove calls to the NAG library
+(\xref{SUN/28}{sun28}{}) from Starlink-supported applications packages
+is now essentially complete. This was the second year of a long-term
+development aimed at allowing these packages to be distributed freely
+({\em e.g.}\ on CDROM and \htmladdnormallink{{\em via} the
+WWW}{http://star-www.rl.ac.uk/cgi-store/storetop}) without license
+restrictions. There are still a very small number of NAG calls
+remaining in Starlink software, but these fall into the following
+categories:
+
+\begin{itemize}
+\item Software which is supported primarily outside of Starlink. In
+these cases we have provided replacements for many of the NAG routines
+{\em via}\ the PDA library (\xref{SUN/194}{sun194}{}) and are awaiting
+updated versions of the applications.
+
+\item NAG routines where no replacement could be found. These are all
+graphics routines and we have simply omitted the (very few) affected
+applications from distributions made to non-Starlink sites.
+\end{itemize}
+
+For most purposes, Starlink software is therefore now free of license
+restrictions associated with the NAG library, but note that we have no
+plans to withdraw NAG as a valuable tool for users writing their own
+software.
+
+\subsection{Investigate New Command Language Possibilities}
+
+We have not been able to conduct as wide a survey of possible future
+command language options as we would have liked this year, but have
+studied the possibilities of running Starlink software using IDL as a
+``command language'' in a little detail. This is an important example
+to examine, both because of IDL's intrinsic attractiveness, and
+because it illustrates the sort of problems that might arise when
+considering other command languages.
+
+The main problems that have been identified are:
+
+\begin{itemize}
+\item IDL is basically a ``single tasking'' environment. Although it
+has facilities for running other tasks, it is not designed with the
+intention that multiple tasks should be running simultaneously, and
+that it might need to respond to them. Its inter-process communication
+mechanisms are therefore fairly limited.
+
+\item Because IDL primarily stores data in memory, there is a problem
+of interfacing transparently to any data reduction applications that
+store data in files (this is likely to be true of many command
+languages). While explicit read/write operations can easily be
+performed to transfer the data, it is more difficult to make these
+happen automatically when they are needed.  The solution is fairly
+straightforward in concept, but ideally would use inter-process
+communication facilities which IDL lacks.
+\end{itemize}
+
+In conclusion, integrating Starlink applications into IDL seems to be
+possible, and probably remains an attractive option for the future,
+but would involve rather more work than was initially hoped. Other
+command languages with better inter-process communication might prove
+rather easier.
+
+\subsection{\label{infra:IMG}Simplified Interface to N-Dimensional Data}
+
+We have completed and released a library (IMG, described in
+\xref{SUN/160}{sun160}{}) which provides a simplified high-level
+programming interface to astronomical data with between 1 and 3
+dimensions ({\em i.e.}\ spectra, images and ``cubes''). It also
+provides a simple interface to attached header information. It is
+possible to call the new library from both Fortran and C.
+
+Because of Starlink's automatic format conversion facilities (see
+\xref{SUN/55}{sun55}{sect_auto}), this single interface also gives
+programmers straightforward access to a wide range of astronomical
+data formats, including FITS and IRAF files as well as Starlink NDF
+data.
+
+An article about the IMG library has appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/96sep/a20.html} (September
+1996).
+
+\subsection{Port of Starlink Software to Linux}
+
+We have now essentially completed the port of Starlink-supported
+applications to run on PC hardware under the Linux operating
+system. The resulting Linux software collection is being distributed
+on CDROM.
+
+Because of the timing of the latest (2nd) release of this CDROM, not
+all the ported applications have yet been included on it. However, all
+those which have been ported can be obtained from the
+\htmladdnormallinkfoot{Starlink Software
+Store}{http://star-www.rl.ac.uk/cgi-store/storetop} on the WWW, and a
+new release of the CDROM which will contain these is planned for April
+1997.
+
+There remain a few applications packages that have not yet been ported
+in the following categories:
+
+\begin{itemize}
+\item Packages that we know are currently undergoing active
+development outside Starlink have not been ported. We are instead
+waiting for the new versions of the software to avoid having to repeat
+any of the porting work.
+
+\item In some cases, support staff outside Starlink are carrying out
+the port. We are still waiting for several packages in this category.
+\end{itemize}
+
+An article giving further details has recently appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a01.html} (March
+1997).
+
+\subsection{Library Interfaces for the C Language*}
+
+We have developed a preliminary tool which allows C interfaces to
+Fortran libraries to be generated semi-automatically, starting from a
+description of the library interface. Some manual intervention is
+still required, but far less than would otherwise be the case.
+
+We have used this technique to produce a C interface to the new IMG
+library (\xref{SUN/160}{sun160}{} -- see \S\ref{infra:IMG}) which has
+now been released. An article describing this has appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/96sep/a20.html} (September
+1996).
+
+Unfortunately, due to lack of time, we have not yet been able to apply
+the same technique to any other libraries, although it has been tested
+on several others.
+
+\section{\xlabel{RADIO_AND_MM_ASTRONOMY}RADIO AND MM ASTRONOMY}
+
+\subsection{Fix Problems with SPECX}
+
+Problems affecting the reliability of HDS (\xref{SUN/92}{sun92}{})
+file usage by SPECX (\xref{SUN/17}{sun17}{}) and slowness in the use
+of large data cubes have now been fixed. We are grateful to staff at
+JACH who performed most of the work on this once the causes of the
+problems had been identified.
+
+\subsection{Importing Datasets into IRAS90}
+
+We have verified that the reported problems with importing astrometric
+data into the IRAS90 package (\xref{SUN/163}{sun163}{}) can be
+overcome by using recently-added facilities
+({\em e.g.}\ \xref{SETSKY}{sun95}{SETSKY}) in KAPPA
+(\xref{SUN/95}{sun95}{}). We have not attempted any upgrades to IRAS90
+itself because of (a) the probable short life of this package now that
+ISO data are becoming available and (b) new parallel developments in
+the area of astrometric coordinate handling (see
+\S\ref{infra:astrom}).
+
+\subsection{2-D Gaussian Fitting Program}
+
+We have upgraded the ESP package (\xref{SUN/180}{sun180}{}) to provide
+a very flexible application for fitting multiple 2-dimensional
+Gaussian profiles to imaging data.
+
+An article on this has recently appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a02.html} (March
+1997).
+
+\subsection{Export Copies of SPECX and JCMTDR}
+
+SPECX (\xref{SUN/17}{sun17}{}) is now available for worldwide
+distribution from the \htmladdnormallinkfoot{Starlink Software
+Store}{http://star-www.rl.ac.uk/cgi-store/storetop}. JCMTDR
+(\xref{SUN/132}{sun132}{}) will also be distributed in this way once a
+new version is received (JCMTDR is supported outside Starlink and we
+cannot distribute the current version as it is still covered by the
+license terms of the NAG library).
+
+\subsection{Distribution of the DIFMAP Package*}
+
+We have not made any progress with this project this year, although an
+article on DIFMAP has recently appeared in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a07.html} (March
+1997).
+
+\subsection{UNIX Version of the FLUXES Program}
+
+The FLUXES program, which calculates infrared fluxes and positions of
+the planets, for use in calibrating JCMT data, has been ported to
+Starlink operating systems, upgraded to use the JPL ephemeris, and
+fully documented. During this process some problems with the choice of
+time system came to light and have been corrected. FLUXES is
+documented in \xref{SUN/213}{sun213}{}.
+
+\subsection{AIPS Cookbook On-Line}
+
+An HTML version of the \htmladdnormallinkfoot{AIPS
+cookbook}{http://axp2.ast.man.ac.uk:8000/\~{}jwp/COOKBOOK/cook.html}
+has been produced (from the original Latex) and is now maintained
+on-line by Starlink's AIPS support contact, John Palmer.\footnote{John
+Palmer, who was also the part-time Starlink site manager at
+Manchester, has recently left. A replacement is being recruited.}
+
+\subsection{Fix Figaro/KAPPA Parameter Problem}
+
+Some minor parameter system problems with Figaro
+(\xref{SUN/86}{sun86}{}) and KAPPA (\xref{SUN/95}{sun95}{}),
+identified by the Radio/(sub)mm Software Strategy Group, have been
+fixed.
+
+\section{\xlabel{X-RAY_ASTRONOMY}X-RAY ASTRONOMY}
+
+\subsection{Maintaining FTOOLS/XSELECT Software}
+
+A \htmladdnormallinkfoot{UK
+copy}{http://www.astro.cf.ac.uk/pub/Grant.Privett/ftools.html} of the
+FTOOLS software and related documentation is now maintained by Grant
+Privett in Cardiff, who has recently published an article in the
+\htmladdnormallinkfoot{Starlink
+Bulletin}{http://star-www.rl.ac.uk/bulletin/97mar/a19.html} to
+announce this service. Grant also acts as a support contact for UK
+users.\footnote{Grant Privett has recently left. A replacement is
+being recruited, although this may not necessarily be at Cardiff.}
+
+\subsection{\label{xray:catalogue}Sky Map/Catalogue Plotting Software*}
+
+As part of a project to provide facilities for plotting data from
+remote astronomical catalogues, we have developed software to perform
+the following functions:
+
+\begin{enumerate}
+\item Locate a range of remote astronomical catalogues on the WWW and
+allow object selections to be made ({\em e.g.}\ by specifying position
+criteria) in a standard way. The data for the selected objects are
+then returned.
+
+\item Browse the returned data and make further selections, {\em
+etc.}\ -- for example, select by object brightness or size. The data
+can also be combined with data from local catalogues.
+
+\item Convert the selected data into plotting information (for
+example, to allow it to be plotted over a related image with circles
+whose colour and size is dictated by the attributes of each
+object). The way in which object attributes are converted into a plot
+can be changed very easily.
+\end{enumerate}
+
+We had expected to make this software available through a new
+graphical interface to the ASTERIX package (\xref{SUN/98}{sun98}{})
+during 1996, but unfortunately (due to the departure of David Allan
+who was supporting ASTERIX at Birmingham), this has not been possible.
+
+We are still pursuing this possibility for a future ASTERIX release,
+but may also attempt to provide these capabilities through another
+route during 1997. The GAIA graphical image analysis tool
+(see \S\ref{ip:GAIA}) is a possibility.
+
+\section{\xlabel{DOCUMENTATION}\label{sect:documentation}DOCUMENTATION}
+
+\subsection{Cookbooks}
+
+We have completed four new Starlink Cookbooks this year, covering the
+following topics:
+
+\begin{itemize}
+\item \xref{SC/4}{sc4}{} -- Writing C shell scripts. 
+
+\item \xref{SC/5}{sc5}{} -- Introduction to CCD reductions.
+
+\item \xref{SC/6}{sc6}{} -- CCD photometric calibration.
+
+\item \xref{SC/7}{sc7}{} -- Introduction to spectroscopic reductions.
+\end{itemize}
+
+These are undergoing final editorial review and will be released shortly.
+
+\end{document}

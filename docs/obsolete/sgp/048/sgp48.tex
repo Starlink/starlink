@@ -1,0 +1,2971 @@
+\documentstyle[11pt]{article}
+\pagestyle{headings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink General Paper}
+\newcommand{\stardocinitials}  {SGP}
+\newcommand{\stardocsource}    {sgp48.1}
+\newcommand{\stardocnumber}    {48.1}
+\newcommand{\stardocauthors}   {R.F. Warren-Smith}
+\newcommand{\stardocdate}      {4th April 1996}
+\newcommand{\stardoctitle}     {Starlink Software Priorities for 1996}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+
+\newcommand{\proj}[4]{\subsubsection{\label{#2:#3}#1}#4}
+
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Large\bf \stardoctitle}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+This document presents an overview of Starlink's software priorities
+for 1996. As background, it also gives details of all the software
+projects that were proposed and considered, including the written
+proposals provided by the seven Starlink Software Strategy Groups.
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \vspace{30mm}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\newpage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+\section{\xlabel{introduction}INTRODUCTION}
+
+This document gives details of Starlink's software priorities for
+1996, together with supporting background information. It is based
+closely on a paper approved by the Starlink Panel at its meeting in
+November 1995.
+
+For an overview, readers should consult \S\ref{priorities} which gives
+a prioritised list of the software projects that were considered for
+attention during 1996. This list takes into account the expected rate
+of progress during 1996 (based on current manpower estimates) and
+splits the projects into those likely, and those not likely, to be
+tackled during the year.
+
+The priority list also makes reference to the project descriptions,
+which appear in \S\ref{details}. These (generally one-paragraph)
+descriptions are intended to outline the likely scope of each project.
+
+As further background, the Appendices to this document contain copies
+of the written input received from the seven Starlink Software
+Strategy Groups (SSGs) who were invited, amongst others, to propose
+projects for consideration. The SSGs also serve a more general role in
+identifying a coherent longer-term software strategy within their
+subject areas. The interested reader is referred to their input for
+information about the trends and requirements that have affected the
+detailed choice of software projects for 1996.
+
+\section{\xlabel{priority_list}\label{priorities}OVERALL PRIORITY LIST FOR 1996}
+
+The software projects which have been identified for possible
+attention by Starlink during 1996 are listed below, where they are
+shown in priority order within each of the broad subject areas covered
+in the Appendices to this document.
+
+\begin{itemize}
+\item Those projects marhed ``yes'' are those which we would expect to
+complete within the year.
+
+\item Projects marked ``?'' are those whose completion (or even
+commencement) is uncertain within the year. Such projects are likely
+to yield results only if progress on earlier projects is more rapid
+than anticipated.
+
+\item Projects marked ``no'' are those which we expect not to be able to
+carry out this year.
+\end{itemize}
+
+Note that these expectations are based on anticipated levels of
+manpower as of November 1995. Should unexpectedly good progress be
+made, we would continue to tackle new projects according to their
+priority order within this list. Alternatively, should unexpected
+delays occur or manpower shortages be experienced, the lower priority
+projects would be the first to be omitted, although we would hope to
+avoid abandoning any projects that had already been started.
+
+\newcommand{\pry}[3]{{\bf #1 (\ref{#2:#3})} & {\bf yes} \\}
+\newcommand{\prq}[3]{#1 (\ref{#2:#3}) & ? \\}
+\newcommand{\prn}[3]{#1 (\ref{#2:#3}) & no \\}
+
+\begin{htmlonly}
+\renewcommand{\pry}[3]{\item (yes) #1 (see \ref{#2:#3})}
+\renewcommand{\prq}[3]{\item (?) #1 (see \ref{#2:#3}) \\}
+\renewcommand{\prn}[3]{\item (no) #1 (see \ref{#2:#3}) \\}
+\begin{center}
+\begin{description}
+\item[Spectroscopy:]
+\begin{itemize}
+\pry{Transparent Foreign Data Access for Figaro}{spec}{figaro}
+\pry{Echelle Data Reduction}{spec}{echelle}
+\pry{IUE Final Archive Access}{spec}{IUE}
+\prq{WWW Communication}{spec}{WWW}
+\prq{Documentation Improvements}{spec}{docs}
+\prn{Fibre Spectroscopy Data Reduction}{spec}{fibre}
+\end{itemize}
+
+\item[Image Processing:]
+\begin{itemize}
+\pry{ISO Data Access}{ip}{ISO}
+\pry{Handling Large Datasets}{ip}{largedata}
+\pry{Graphical Image Manipulation Tool}{ip}{GUI}
+\prq{Imaging Polarimetry Data Reduction}{ip}{polar}
+\prn{Advice on Format Conversion Implications}{ip}{convert}
+\prn{Upgrades to PISA}{ip}{pisa}
+\end{itemize}
+
+\item[Theory \& Statistical Analysis:]
+\begin{itemize}
+\pry{Advertise Computer Algebra Software}{theory}{algebra}
+\pry{Enhanced User Support For Visualisation Software}{theory}{visual}
+\pry{Ease the Transition to Fortran~90}{theory}{F90}
+\end{itemize}
+
+\item[Information Services \& Databases:]
+\begin{itemize}
+\pry{A UK Astronomy ftp Archive}{info}{archive}
+\pry{A Gripe Command}{info}{gripe}
+\pry{Observing Preparation Software}{info}{prepare}
+\prq{Makefiles}{info}{makefiles}
+\prn{Automatic Recording of Software Usage}{info}{usage}
+\prn{Enhancement of Catalogue Handling Applications}{info}{CURSA}
+\prn{Conversion of VMS/SCAR Catalogues}{info}{catalogues}
+\prn{Upgrades to HTML Facilities}{info}{HTML}
+\prn{Update CHART Documentation}{info}{chart}
+\end{itemize}
+
+\item[Graphics \& Infrastructure:]
+\begin{itemize}
+\pry{Astrometric Coordinate Systems}{infra}{astrom}
+\pry{Integration with IRAF}{ip}{IRAF}
+\pry{Removal of NAG dependence}{infra}{NAG}
+\pry{Investigate New Command Language Possibilities}{infra}{cl}
+\pry{Simplified Interface to N-Dimensional Data}{infra}{IMG}
+\pry{Port of Starlink Software to Linux}{infra}{PC}
+\pry{Library Interfaces for the C Language}{infra}{C}
+\prq{ADAM Message System Upgrades}{infra}{ADAM}
+\prn{Graphics Evaluation}{infra}{graphics}
+\prn{Assist with SCUBA Software}{infra}{SCUBA}
+\prn{Facilitate Modification of Standard Applications}{infra}{modify}
+\prn{Experimental Port to Non-SPARC Solaris}{infra}{solaris}
+\end{itemize}
+
+\item[Radio, Mm \& Sub-Mm Astronomy:]
+\begin{itemize}
+\pry{Fix Problems with SPECX}{radio}{SPECX}
+\pry{Importing Datasets into IRAS90}{radio}{IRAS90}
+\pry{2-D Gaussian Fitting Program}{radio}{gauss}
+\pry{Export Copies of SPECX and JCMTDR}{radio}{export}
+\pry{Distribution of the DIFMAP Package}{radio}{difmap}
+\pry{UNIX Version of the FLUXES Program}{radio}{FLUXES}
+\pry{AIPS Cookbook On-Line}{radio}{AIPScook}
+\pry{Fix Figaro/KAPPA Parameter Problem}{radio}{param}
+\prq{Export SPECX Data to Visualisation Software}{radio}{visual}
+\prn{UNIX Port of IRAS MEM Software}{radio}{MEM}
+\prn{RA, Dec Pointing Corrections in JCMTDR}{radio}{pointing}
+\end{itemize}
+
+\item[X-Ray Astronomy:]
+\begin{itemize}
+\pry{Maintaining FTOOLS/XSELECT Software}{xray}{FTOOLS}
+\pry{Sky Map/Catalogue Plotting Software}{xray}{skymap}
+\prq{Improvements to GUI Tools}{xray}{GUI}
+\end{itemize}
+
+\item[Documentation:]
+\begin{itemize}
+\pry{Cookbooks}{docs}{cookbooks}
+\end{itemize}
+\end{description}
+\end{center}
+\end{htmlonly}
+
+Because of unavoidable delays in distributing items of software, the
+results of some of these projects will inevitably not become available
+before early 1997, although the software work itself is scheduled for
+completion by mid-November 1996 and many items should be available
+before then. Users with a need for a particular item are invited to
+contact Starlink Software Support (ussc@star.rl.ac.uk) in the first
+instance, as it is often possible to make ``pre-release'' versions of
+software available to users who are willing to report back on their
+experiences with it.
+
+\begin{latexonly}
+{\scriptsize
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+{\normalsize \bf Project} & {\normalsize \bf This Year?} \\
+\hline\hline
+\pry{Transparent Foreign Data Access for Figaro}{spec}{figaro}
+\pry{Echelle Data Reduction}{spec}{echelle}
+\pry{IUE Final Archive Access}{spec}{IUE}
+\prq{WWW Communication}{spec}{WWW}
+\prq{Documentation Improvements}{spec}{docs}
+\prn{Fibre Spectroscopy Data Reduction}{spec}{fibre}
+\hline
+\pry{ISO Data Access}{ip}{ISO}
+\pry{Handling Large Datasets}{ip}{largedata}
+\pry{Graphical Image Manipulation Tool}{ip}{GUI}
+\prq{Imaging Polarimetry Data Reduction}{ip}{polar}
+\prn{Advice on Format Conversion Implications}{ip}{convert}
+\prn{Upgrades to PISA}{ip}{pisa}
+\hline
+\pry{Advertise Computer Algebra Software}{theory}{algebra}
+\pry{Enhanced User Support For Visualisation Software}{theory}{visual}
+\pry{Ease the Transition to Fortran~90}{theory}{F90}
+\hline
+\pry{A UK Astronomy ftp Archive}{info}{archive}
+\pry{A Gripe Command}{info}{gripe}
+\pry{Observing Preparation Software}{info}{prepare}
+\prq{Makefiles}{info}{makefiles}
+\prn{Automatic Recording of Software Usage}{info}{usage}
+\prn{Enhancement of Catalogue Handling Applications}{info}{CURSA}
+\prn{Conversion of VMS/SCAR Catalogues}{info}{catalogues}
+\prn{Upgrades to HTML Facilities}{info}{HTML}
+\prn{Update CHART Documentation}{info}{chart}
+\hline
+\pry{Astrometric Coordinate Systems}{infra}{astrom}
+\pry{Integration with IRAF}{ip}{IRAF}
+\pry{Removal of NAG dependence}{infra}{NAG}
+\pry{Investigate New Command Language Possibilities}{infra}{cl}
+\pry{Simplified Interface to N-Dimensional Data}{infra}{IMG}
+\pry{Port of Starlink Software to Linux}{infra}{PC}
+\pry{Library Interfaces for the C Language}{infra}{C}
+\prq{ADAM Message System Upgrades}{infra}{ADAM}
+\prn{Graphics Evaluation}{infra}{graphics}
+\prn{Assist with SCUBA Software}{infra}{SCUBA}
+\prn{Facilitate Modification of Standard Applications}{infra}{modify}
+\prn{Experimental Port to Non-SPARC Solaris}{infra}{solaris}
+\hline
+\pry{Fix Problems with SPECX}{radio}{SPECX}
+\pry{Importing Datasets into IRAS90}{radio}{IRAS90}
+\pry{2-D Gaussian Fitting Program}{radio}{gauss}
+\pry{Export Copies of SPECX and JCMTDR}{radio}{export}
+\pry{Distribution of the DIFMAP Package}{radio}{difmap}
+\pry{UNIX Version of the FLUXES Program}{radio}{FLUXES}
+\pry{AIPS Cookbook On-Line}{radio}{AIPScook}
+\pry{Fix Figaro/KAPPA Parameter Problem}{radio}{param}
+\prq{Export SPECX Data to Visualisation Software}{radio}{visual}
+\prn{UNIX Port of IRAS MEM Software}{radio}{MEM}
+\prn{RA, Dec Pointing Corrections in JCMTDR}{radio}{pointing}
+\hline
+\pry{Maintaining FTOOLS/XSELECT Software}{xray}{FTOOLS}
+\pry{Sky Map/Catalogue Plotting Software}{xray}{skymap}
+\prq{Improvements to GUI Tools}{xray}{GUI}
+\hline
+\pry{Cookbooks}{docs}{cookbooks}
+\hline
+\end{tabular}
+\end{center}}
+\end{latexonly}
+
+\section{\xlabel{brief_details_of_projects}\label{details}BRIEF DETAILS OF PROJECTS PROPOSED}
+
+This section give details of the software projects which were
+identified and considered as possible candidates for attention by
+Starlink's software staff during 1996. The information on which these
+proposals are based draws on discussions with users (and points raised
+at site visits, {\em etc.}), the Software Strategy Group proposals (to
+be found in the Appendices to this document), requests received from
+users and active developers, recommendations from the ADAM Review
+(\xref{SGP/45}{sgp45}{}), the Software Survey Results and the Starlink
+Project's own knowledge and expertise.
+
+For each project, a short description is given of the extent of the
+work that would be carried out, together with a brief rationale where
+necessary. Note that inclusion of a project in this section does not
+imply that it will receive attention, but merely that it has been
+considered. The list of projects prioritised for completion during
+1996 is given in \S\ref{priorities}.
+
+Projects are described here in no particular order. In many cases,
+more complete descriptions can be found in the accompanying Software
+Strategy Group input (see the Appendices).
+
+\subsection{SPECTROSCOPY}
+
+\proj{Transparent Foreign Data Access for Figaro}{spec}{figaro}
+{We would adapt the Figaro package to allow it to use the facilities
+recently introduced as part of the NDF library for accessing a range
+of foreign format data files ``on-the-fly''. This change is also a
+prerequisite if Figaro users are to benefit from improved
+interoperability with other software systems such as IRAF
+(\S\ref{infra:IRAF}).
+
+The work would involve adding an alternative data access layer within
+the software and modifying some applications. As a side effect this
+would also improve data format compatibility with other Starlink
+software. An outline plan has been agreed with the package's author
+(Keith Shortridge, AAO).}
+
+\proj{Echelle Data Reduction}{spec}{echelle}
+{We would conduct a ``bug blitz'' on the Echomop Echelle reduction
+package (initiated by a mail-shot to users) and place the package on
+an elevated level of maintenance for one year to eliminate outstanding
+problems and improve its ease of use. This work would complement
+improvements to documentation and efficiency that have already been
+implemented.}
+
+\proj{IUE Final Archive Access}{spec}{IUE}
+{We would investigate the problems associated with making IUE final
+archive data accessible to Starlink users. This would probably involve
+at least the provision of a utility for reading FITS binary tables
+holding Final Archive data. If it turns out that further reduction of
+the data is also required, then we would carry out a study to identify
+suitable data reduction paths and publicise the results (we would not
+expect to develop further software as part of this project but may
+identify new work for discussion).}
+
+\proj{Spectropolarimetry Data Reduction}{spec}{polar}
+{We would release the POLMAP data reduction package. Further
+development of spectropolarimetry data reduction might then be best
+incorporated into the similar proposal for imaging work
+(\S\ref{ip:polar}). We would therefore address these as a single
+project.}
+
+\proj{ISO Data Access}{spec}{ISO}
+{We would complete work on providing software for accessing
+spectroscopic data from ISO as soon as the required data format
+specification becomes available.  This work would be addressed as part
+of the similar project for handling ISO imaging data
+(\S\ref{ip:ISO}).}
+
+\proj{Release of Portable CGS4DR}{spec}{CGS4DR}
+{The release of portable CGS4DR with a graphical user interface has
+been completed as part of the 1995 programme of work. We believe that
+the problems with the interim (command line) version
+\htmlref{identified by the Spectroscopy SSG}{specSSG:CGS4DR} have also
+been fixed.}
+
+\proj{Fibre Spectroscopy Data Reduction}{spec}{fibre}
+{We would carry out a survey to identify requirements, preferences and
+available software for reducing fibre spectroscopy data and make
+suitable recommendations to guide users -- perhaps in the form of a
+cookbook if that seems appropriate.}
+
+\proj{Interoperability with Other Software}{spec}{IRAF}
+{This is addressed by projects listed under other headings (see
+\S\S\ref{spec:figaro}, \ref{ip:IDL}, \ref{infra:IRAF}, and
+\ref{infra:cl}), for which we note the \htmlref{Spectroscopy SSG's 
+support}{specSSG:IRAF}.}
+
+\proj{Documentation Improvements}{spec}{docs}
+{We would investigate the feasibility of including trial data and
+demonstration software into documentation by means of a suitable pilot
+project. We note the suggestion that the Echomop package might provide
+a suitable example.}
+
+\proj{WWW Communication}{spec}{WWW}
+{We would set up appropriate links from the Starlink home page to
+encourage communication with the Spectroscopy SSG pages. This would
+probably be done as part of a wider development of WWW information
+related to software.}
+
+\proj{Port of Starlink Software to Linux}{spec}{PC}
+{We note the \htmlref{spectroscopy SSG's strong
+encouragement}{specSSG:PC} for the Starlink Software Collection to be
+made available on PCs running the Linux operating system. This project
+is described elsewhere (see \S\ref{infra:PC}).}
+
+
+\subsection{IMAGE PROCESSING}
+
+\proj{Astrometric Support for Applications}{ip}{astrom}
+{We note the \htmlref{Image Processing SSG's high priority
+request}{ipSSG:astrom} for facilities that allow applications software
+to handle accurate astrometric information associated with images, and
+their proposal that a suitable library be developed to support this. A
+project to address this is described elsewhere (see
+\S\ref{infra:astrom}).}
+
+\proj{Handling Large Datasets}{ip}{largedata}
+{We would conduct a study into the problems of handling image datasets
+which are substantially larger than currently processed. We would
+publicise recommendations to users on choice of software for this
+purpose and to programmers on techniques for handling such data. We
+would also identify any further software development work that may be
+required (but would not expect to implement it as part of this
+project).}
+
+\proj{Graphical Image Manipulation Tool}{ip}{GUI}
+{We would implement a graphical tool for performing common interactive
+astronomical tasks on images in a readily-accessible and efficient
+way. Although SAOIMAGE is perhaps the closest existing facility for
+comparison purposes, we
+would not expect to overlap much with what it provides, but to
+concentrate instead on accessing new astronomical functionality in a
+similar way. Such a tool might best be developed by extending image
+{\em widgets} that have already been developed elsewhere in a
+compatible manner to our own (Tcl/Tk based) approach, and we would
+explore the possibility for international collaboration.
+
+As part of the user survey we would need to conduct in order to design
+such a tool, we would also survey the need for similar graphical
+interfaces for other purposes.}
+
+\proj{Integration with IRAF}{ip}{IRAF}
+{We note the \htmlref{Image Processing SSG's support}{ipSSG:IRAF} for
+a system that allows Starlink software to be run from the IRAF command
+langage. A project to address this is described elsewhere
+(\S\ref{infra:IRAF}).}
+
+\proj{Imaging Polarimetry Data Reduction}{ip}{polar}
+{We would investigate the requirements for reducing two-channel
+imaging polarimetry data from the instruments available to UK
+astronomers (incorporating the similar requirements of
+spectropolarimetry work as far as possible -- \S\ref{spec:polar}) and
+provide suitable data reduction software. According to current
+information, disparate software initiatives associated with several
+different instruments may already be underway and we would investigate
+the scope for collaboration and coordination of this work.}
+
+\proj{Transparent Foreign Data Access for Figaro}{ip}{figaro}
+{We note the \htmlref{Image Processing SSG's support}{ipSSG:figaro}
+for Figaro to be able to access foreign format data files. A project
+to address this is described elsewhere (\S\ref{spec:figaro}).}
+
+\proj{Interoperability with IDL}{ip}{IDL}
+{The possibility of providing an interface between existing Starlink
+applications and IDL as part of the overall interoperability programme
+would probably best be examined as part of investigations into new
+command languages described elsewhere (\S\ref{infra:cl}).
+
+Although IDL is a commercial system, it has many attractions as a
+command language with the additional advantage of already being in
+wide use. At present, this would appear to make it the most promising
+system for prototyping a new command language for Starlink wide use.}
+
+\proj{ISO Data Access}{ip}{ISO}
+{We would complete work on providing software for accessing imaging
+data from ISO (along with spectroscopic data -- \S\ref{spec:ISO}) as
+soon as the required data format specification becomes available.}
+
+\proj{Advice on Format Conversion Implications}{ip}{convert}
+{We would provide documentation on the limitations of the most
+commonly-encountered astronomical data formats and the implications
+for converting data between those formats. Advice on how to avoid
+unnecessary data loss would be included. We would also investigate
+ways of warning users when data loss may be occurring.}
+
+\proj{CCD Reduction Cookbook}{ip}{CCDcook}
+{We would develop a cookbook describing in easy-to-follow terms
+precisely how to reduce CCD data. We would propose to address this
+project as part of a more general survey of cookbook requirements
+(\S\ref{docs:cookbooks}).}
+
+\proj{Photometry Cookbook}{ip}{photcook}
+{We would develop a cookbook describing precisely how to reduce
+imaging data to obtain photometric results. We would propose to
+address this project as part of a more general survey of cookbook
+requirements (\S\ref{docs:cookbooks}).}
+
+\proj{Starlink Software on PCs}{ip}{PC}
+{We note the \htmlref{low priority given by the Image Processing
+SSG}{ipSSG:PC} to the project to make the Starlink Software Collection
+available on PCs (see \S\ref{infra:PC}).}
+
+\proj{Upgrades to PISA}{ip}{pisa}
+{We receive frequent requests to upgrade the PISA object analysis
+package to use floating point data instead of the INTEGER$*$2 format
+it currently uses. This is a difficult project what would take a
+disproportionate amount of work, but it may be possible to convert to
+INTEGER$*$4 format more easily (a trial has already been done) and
+achieve most of the benefits.
+
+We would investigate the usefulness of this approach further and
+produce a new release if it seems workable.}
+
+\subsection{THEORY AND STATISTICAL ANALYSIS}
+
+\proj{Advertise Computer Algebra Software}{theory}{algebra}
+{We would convert the results of last year's survey of computer
+algebra software into a brief guide to this field to help new
+prospective users. As part of this, we would ensure that the existing
+central MAPLE service is well-publicised and monitor its use with a
+view to deciding whether to continue this service.}
+
+\proj{Enhanced User Support For Visualisation Software}{theory}{visual}
+{Following the distribution of products produced last year to support
+visualisation of theory datasets, we would provide an enhanced level
+of user support for one year. This would initially consist of helping
+prospective users to assess the {\em IBM Data Explorer} software, and
+would then go on to include extending the facilities already provided
+in the light of experience with using this new system. The intention
+would be to ease the path of new users into the visualisation field,
+and might consist largely of supplying expertise.}
+
+\proj{UK Archive of Theory Software}{theory}{mirror}
+{We would include the requirement to provide a UK ftp archive of
+theory software in the more general project described elsewhere (see
+\S\ref{info:archive}) to find a solution to the problem of slow network access
+to international astronomy software, documentation and data.}
+
+\proj{Ease the Transition to Fortran~90}{theory}{F90}
+{With the planned distribution of Fortran~90 compilers to Starlink
+sites in response to increasing user interest, some compatibility
+problems might be anticipated due to the simultaneous use of both
+Fortran~77 and Fortran~90.  At present, we know of only one definite
+(but fairly minor) difficulty, but others may arise, particularly when
+linking programs that use code compiled with both compilers. If it
+becomes necessary to re-build subroutine libraries with Fortran~90
+compilers, considerable work could potentially be involved.
+
+The purpose of this project would be to perform the minimum necessary
+to ease the transition. The amount of work involved is clearly very
+uncertain, but it would not at this stage involve re-building existing
+software with new compilers unless this proved unavoidable, nor would
+it involve re-design of software ({\em e.g.}\ library interfaces) for
+more convenient Fortan~90 usage (although these remain possibilities
+for future work).}
+
+\subsection{\label{info}INFORMATION SERVICES AND DATABASES}
+
+\proj{A UK Astronomy ftp Archive}{info}{archive}
+{There have been requests from many areas of UK astronomy for a
+facility whereby a local (UK) copy of important astronomical software,
+documentation and data could be kept to overcome the problems of slow
+network access to international ftp sites.
+
+We would investigate the provision of such a facility, initially
+aiming to ``mirror'' the IRAF and AIPS packages within the UK, but
+also to provide a service for other less well-centralised information
+sources that are important to UK astronomy. (Note that this would
+inevitably also depend on the availability of hardware, especially
+disk space.)}
+
+\proj{Makefiles}{info}{makefiles}
+{We would document the {\em makefile} system used for distributing
+Starlink software and investigate ways of automating the generation of
+makefiles. This could probably be done relatively easily using
+standard UNIX tools (but note that there is actually no need for
+submitted software to come with makefiles, as these can always be
+written by Starlink staff if necessary).}
+
+\proj{Removal of Calls to the NAG Library}{info}{NAG}
+{We note the \htmlref{Information Services and Databases SSG's
+support}{infoSSG:NAG} for the project to remove calls to the NAG
+library from applications to facilitate their international
+distribution. This is described elsewhere (\S\ref{infra:NAG}).}
+
+\proj{Automatic Recording of Software Usage}{info}{usage}
+{We would develop a system for automatically recording usage of (any)
+software at Starlink sites and for producing statistics suitable for
+guiding policy decisions and assisting with software support
+work. After investigating possible mechanisms, part of this work would
+involve preparing guidelines for the operation of such a system (for
+approval by the Starlink Panel) to protect the privacy of individuals
+and to address any other concerns raised.}
+
+\proj{Cookbook/Tutorial Documentation Survey}{info}{cookbook}
+{We note \htmlref{the SSG's advocacy}{infoSSG:cookbook} of this form
+of documentation, but note that the main problem at present lies in
+identifying which subjects would best be served by cookbooks. To
+address this problem, we propose to conduct a small user survey, as
+described elsewhere (\S\ref{docs:cookbooks}).}
+
+\proj{Port of Starlink Software to Linux}{info}{PC}
+{We note the \htmlref{SSG's encouragement}{infoSSG:PC} for the
+Starlink Software Collection to be made available on PCs running the
+Linux operating system (see \S\ref{infra:PC}).}
+
+\proj{Enhancement of Catalogue Handling Applications}{info}{CURSA}
+{We would allocate a fixed amount of time to be spent on enhancements
+to the CURSA package of catalogue handling applications and the CAT
+library that supports it, and to promoting this software amongst a
+wider audience. These enhancements would be driven by user requests,
+of which we already have rather more than can reasonably be
+accommodated. Nevertheless, a useful degree of enhancement to this
+package should be possible this year.}
+
+\proj{Conversion of VMS/SCAR Catalogues}{info}{catalogues}
+{We would investigate usage of the astronomical catalogues available
+on the old VAX/VMS STADAT machine at RAL and identify which (if any)
+are worth making available in a more accessible form. For those
+identified, we would convert to FITS table format for compatibulity
+with the CURSA software (above). We would also implememt a new way of
+making these catalogues available to users, a WWW interface being a
+likely possibility.}
+
+\proj{Upgrades to HTML Facilities}{info}{HTML}
+{It is possible that during the next year significant improvements to
+the HTML language may become available to allow the use of ({\em
+e.g.}) tables in hypertext documents. If this occurs, we would provide
+suitable upgrades to our facilities for hypertext documentation.}
+
+\proj{Update CHART Documentation}{info}{chart}
+{We would update the documentation for the CHART package, as it is not
+currently consistent with the UNIX version of the software.}
+
+\proj{A Gripe Command}{info}{gripe}
+{We would implement a ``gripe'' command ({\em e.g.}\ as in AIPS) to
+make it simple for users to feed back complaints about software to its
+author (and Starlink). The ability to run this from within any
+existing package may be required.}
+
+\proj{Observing Preparation Software}{info}{prepare}
+{We would investigate the software available for preparing to make
+observations ({\em e.g.}\ rising and setting times, phase of moon,
+finding charts, standard stars, {\em etc.}) and provide a collection
+of suitable applications with documentation on their use (this would
+probably include the OBSERVE program already distributed by Starlink). We would
+not expect to write much, if any, of this software ourselves.}
+
+\subsection{\label{infra}GRAPHICS AND INFRASTRUCTURE}
+
+\proj{Port of Starlink Software to Linux}{infra}{PC}
+{We would continue our port of the Starlink Software Collection to
+Linux by moving on to port applications packages. Given the evidence
+from SSGs and discussions with users, it appears that this is seen as a
+high priority mainly in areas with relatively light machine
+resource requirements, and as less important in areas such as image
+processing, where demands are typically heavier. We would therefore
+concentrate on spectroscopy applications as the first priority, but
+would nevertheless expect to have most applications running on Linux
+by the end of the year.
+
+The infrastructure part of this port is already essentially complete,
+although we might have to return to parts of it if new problems are
+revealed when applications start to use it.}
+
+\proj{Removal of NAG dependence}{infra}{NAG}
+{We would continue the project, which is already well advanced, to
+remove the dependence of Starlink applications on the NAG
+library. This would then allow free distribution via ftp and the WWW.}
+
+\proj{Integration with IRAF}{infra}{IRAF}
+{We would develop our current prototype system for running Starlink
+applications from the IRAF command language to the point of releasing
+a production system for general use. This would include at least one
+Starlink applications package accessible as an IRAF package. We would
+make Figaro the highest priority package for inclusion, but since this
+also depends on work to allow Figaro to access IRAF datasets (see
+\S\ref{spec:figaro}) it might not be realistic to complete all of this in one
+year. In that event, we might need to substitute an alternative
+package in the first instance.}
+
+\proj{Training Courses}{infra}{training}
+{We note that the \htmlref{Graphics and Infrastructure SSG does not
+favour}{infraSSG:training} Starlink running training courses on how to
+use software.}
+
+\proj{Library Interfaces for the C Language}{infra}{C}
+{We would implement C~language interfaces to Starlink subroutine
+libraries, to provide an alternative calling interface to Fortran~77,
+and would update the documentation to describe them. This would open
+the way to developing applications in C by the end of the year.}
+
+\proj{Astrometric Coordinate Systems}{infra}{astrom}
+{We would develop a subroutine library, based on the existing SLALIB
+library, that provides the functions required to allow applications
+properly to handle accurate astrometric information associated with
+astronomical datasets. Facilities for plotting astrometric grids would
+be included. The library would be designed for use independently of
+other Starlink software as far as possible and accuracy would be
+substantially superior to existing systems. Access to specific data
+formats would be performed separately from the main library interface
+to facilitate its re-use in other environments.}
+
+\proj{Graphics Evaluation}{infra}{graphics}
+{We would conduct an investigation into modern 3-D graphics libraries
+and related visualisation products with a view to identifying a
+successor to GKS. If a suitable product can be identified, we would
+provide a trial release for evaluation by potential users before
+considering what further integration (if any) is needed with other
+astronomical software.}
+
+\proj{Experimental Port to Non-SPARC Solaris}{infra}{solaris}
+{We would conduct a trial port of key items of Starlink software to
+run on a version of the Solaris operating system on non-SPARC
+hardware. This would be an experiment intended to identify any
+problems that might arise, and would not necessarily result in a
+usable product at this stage.}
+
+\proj{Investigate New Command Language Possibilities}{infra}{cl}
+{We would investigate ways of integrating state-of-the art command
+language facilities with existing applications software as a move
+towards greater interoperability between the software systems in use
+in the UK. This would involve an evaluation of the options available
+(Tcl/Tk, IDL, Khoros, AVS, Java, perl {\em etc.}) and the development
+of a prototype system, comparable to the work already done on IRAF, as
+a test of its feasibility.}
+
+\proj{Facilitate Modification of Standard Applications}{infra}{modify}
+{We would investigate the provision of facilities to make it far
+easier to locate copies of the source code of Starlink applications,
+to modify those copies for personal use, and to re-build a modified
+copy of the application.}
+
+\proj{Simplified Interface to N-Dimensional Data}{infra}{IMG}
+{We would complete the project, which is already well-advanced, to
+provide a much simplified programming interface to astronomical
+datasets with between 1 and 3 dimensions. Simple access to header
+information would also be included.
+
+The value of this development has recently been enhanced by the
+addition of ``on-the-fly'' format conversion to the NDF library, which
+would give such an interface simultaneous access a range of common
+astronomical data formats with no additional effort on the user's
+part.}
+
+\proj{ADAM Message System Upgrades}{infra}{ADAM}
+{We would implement changes to the ADAM message system to allow (old)
+VMS based ADAM systems to communicate with newer UNIX systems. This
+facility is required at UKIRT to allow data reduction facilities to be
+migrated from VMS to UNIX platforms.}
+
+\proj{Assist with SCUBA Software}{infra}{SCUBA}
+{We would provide assistance to resolve any problems experienced by
+the SCUBA project once its real-time software goes into service. (This
+will be the first demanding use of a real-time UNIX ADAM system.)}
+
+\proj{C~shell Cookbook}{infra}{cshell}
+{We would provide a book of common C~shell techniques, with examples
+from astronomy, to help users write their own UNIX shell scripts for
+data processing. We would propose to address this project as part of a
+more general survey of cookbook requirements
+(\S\ref{docs:cookbooks}).}
+
+\subsection{RADIO, MM \& SUB-MM ASTRONOMY}
+
+\proj{Fix Problems with SPECX}{radio}{SPECX}
+{We are already collaborating with JACH staff to solve the problems in
+SPECX that have been reported and which appear to arise from
+inappropriate use of the HDS library. Under new support arrangements
+which have been agreed with all the parties concerned, the necessary
+changes will be carried out by JACH staff, with Starlink providing any
+necessary programming advice and implementing the re-release to
+Starlink sites.}
+
+\proj{Importing Datasets into IRAS90}{radio}{IRAS90}
+{A new application in KAPPA will shortly be released which we believe
+will address this problem (which is primarily one of handling
+astrometric information correctly). We would monitor the situation and
+make further improvements if necessary.}
+
+\proj{2-D Gaussian Fitting Program}{radio}{gauss}
+{We would provide a facility for performing the required 2-D
+multiple-component Gaussian fits to JCMT data. This would very
+probably be possible by modification or interfacing to existing
+software.}
+
+\proj{Export Copies of SPECX and JCMTDR}{radio}{export}
+{We would provide easily-accessed versions of SPECX and JCMTDR
+(packaged with other required software), most probably based on the
+new WWW ``Software Store'' once it is populated with the necessary
+software items.}
+
+\proj{Distribution of the DIFMAP Package}{radio}{difmap}
+{We would survey users to determine the level of interest in this
+package and, if appropriate, arrange to distribute it to Starlink
+sites.}
+
+\proj{UNIX Version of the FLUXES Program}{radio}{FLUXES}
+{We would provide a UNIX version of this program, or a suitable
+alternative if appropriate.}
+
+\proj{AIPS Cookbook On-Line}{radio}{AIPScook}
+{We would provide an on-line (WWW) version of the AIPS cookbook.}
+
+\proj{Fix Figaro/KAPPA Parameter Problem}{radio}{param}
+{We believe that the problem which arose was temporary and no longer
+exists, but would investigate and provide a solution if necessary.}
+
+\proj{Export SPECX Data to Visualisation Software}{radio}{visual}
+{We would provide software and documentation to allow SPECX data to be
+transferred easily to commercial visualisation systems.}
+
+\proj{UNIX Port of IRAS MEM Software}{radio}{MEM}
+{We would investigate the work required and likely usage of this
+(originally VMS specific) product on UNIX and provide a port if
+appropriate.}
+
+\proj{RA, Dec Pointing Corrections in JCMTDR}{radio}{pointing}
+{We expect this minor upgrade may be implemented by ROE staff, but
+would perform the work ourselves if this is not the case.}
+
+\proj{Importing ISO Data}{radio}{ISO}
+{This requirement would be covered by projects described elsewhere
+(see \S\ref{spec:ISO} and \S\ref{ip:ISO}).}
+
+\subsection{X-RAY ASTRONOMY}
+
+\proj{Maintaining FTOOLS/XSELECT Software}{xray}{FTOOLS}
+{We would take on the task of building and distributing this software
+for installation at Starlink sites and provide a suitable ``contact
+person'' to help with problems.}
+
+\proj{Sky Map/Catalogue Plotting Software}{xray}{skymap}
+{We would provide a software package to cover the general area of
+plotting astronomical catalogue data on top of image data, with the
+ability to select catalogue entries and specify various plotting
+options and coordinate systems. The solution would be designed for use
+both inside and outside X-ray astronomy, and would probably depend on
+new astrometric capabilities described elsewhere
+(\S\ref{infra:astrom}).
+
+Investigation would be required to define the requirements of this
+project more closely. There are many possibilities, and the eventual
+scope is likely to be determined primarily by the amount of time
+allocated to the project. This year, we would aim to provide an
+initial, simple but effective solution that could be re-assessed for
+possible further development in future if it proves successful.}
+
+\proj{Port of Starlink Software to Linux}{xray}{PC}
+{We note the relatively low priority given to the port of Starlink
+software to Linux (\S\ref{infra:PC}) given \htmlref{by the X-ray
+SSG}{xraySSG:PC}.}
+
+\proj{Further Development of Tcl/Tk Facilities}{xray}{cl}
+{We also note \htmlref{the SSG's support}{xraySSG:cl} for further work
+to develop scripting capabilities based on Tcl/Tk. We would propose to
+consider this as part of a project to examine command languages in
+general (see \S\ref{infra:cl}).}
+
+\proj{Improvements to GUI Tools}{xray}{GUI}
+{We note the \htmlref{SSG's support}{xraySSG:GUI} for the provision of
+further graphical interfaces to software. In the absence of specific
+proposals, we would respond to this by providing any necessary small
+enhancements to the GUI tools we developed during 1995. The experience
+of developing a graphical interface for ASTERIX (being undertaken by
+non-Starlink staff in Birmingham) is likely to be particularly
+valuable in identifying possible improvements.}
+
+\subsection{DOCUMENTATION}
+
+\proj{Cookbooks}{docs}{cookbooks}
+{We have found it difficult to persuade SSGs to propose good subjects
+for which cookbooks might be written. Where they have done so, they
+have tended to give them low priority, which does not tally well with
+the results of the last software survey which clearly identified them
+as a high priority.
+
+To address this, we would conduct a simple survey of users to obtain
+suggestions for the areas we should cover (providing a few examples)
+and to identify which would be most useful. Depending on the outcome,
+we would then investigate the best way of gathering the necessary
+information and producing a cookbook for (say) the most popular half
+dozen suggestions.
+
+We would include the cookbook suggestions noted elsewhere in this
+exercise in order to test their relevance to the user community.}
+
+\newpage
+\appendix
+\section{\xlabel{spectroscopy_ssg_input}SPECTROSCOPY SSG INPUT}
+
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+Dave Wonnacott (secretary, MSSL)\\
+Keith Smith (chair, UCL)\\
+Michael Lemke (Cambridge)\\
+Robert Rolleston (Armagh Observatory)\\
+Suzanne Ramsay Howat (ROE)\\ 
+Tim Harries (St Andrews)\\
+Tim Naylor (Keele)
+
+\item[Also present:]\mbox{}\\
+David Berry (Manchester)\\
+Horst Meyerdierks (ROE)\\
+Malcolm Currie (RAL)\\
+Rodney Warren-Smith (RAL)
+
+\item[Apologies:]\mbox{}\\
+Bahram Mobasher (ICSTM)\\
+Phil Puxley (ROE)
+
+\item[Meeting date:]Wednesday 6th September 1995
+
+\item[Venue:]University College London
+\end{description}
+
+\subsection{Specific Recommendations}
+
+This part of the report documents the recommendations of the
+Spectroscopy Software Strategy Group (SSSG) in order of priority,
+without specific consideration for their manpower requirements.
+
+\subsubsection{Migration of FIGARO to standard NDF library}
+
+\begin{description}
+\item[Recommendation:]
+The spectroscopic reduction package FIGARO should be converted to make
+use of Starlink's standard NDF library, in order to make it consistent
+with the rest of the SSC and to ensure its long-term compatibility
+with Starlink's objective of providing transparent access to multiple
+data formats.
+\end{description}
+
+The Starlink Software Survey identified FIGARO as {\bf the} most
+important scientific package in the SSC.  User feedback suggests that
+this situation is essentially unchanged despite the increasing use of
+external packages such as IRAF.  In the previous year's proposal, the
+SSSG discussed the feasibility of converting the entire FIGARO package
+to make use of the standard NDF library, primarily as a means of
+providing transparent file-format conversion and for consistency with
+the rest of the SSC. At that time, the manpower requirements for such
+an undertaking were considered to be outweighed by the perceived
+demand for such a facility.
+
+In view of Starlink's new, long-term strategy concerning
+inter-operability of its software with external packages, the SSSG
+felt it appropriate to re-examine this issue.  It agreed that the new
+strategy reinforces the value of transparent file-format conversion
+(`on the fly'), especially for a package such as FIGARO which, by its
+nature, contains numerous components (`applications') which are used
+in quite diverse contexts. The SSSG was also particularly concerned
+with the long-term security of FIGARO in view of its continued use of
+an obsolete NDF access library (which requires constant updating
+parallel with modifications to the standard NDF library).
+
+The SSSG therefore considers it timely to address this outstanding
+problem, and accordingly recommends that a phased programme of
+migration of FIGARO applications to use the standard NDF library be
+instituted. A revised (but as yet unqualified) estimate of the
+manpower requirements for this conversion is considerably more
+optimistic than last year's: approximately 2 programmer-months would
+be needed for a new basic library interface, with the average FIGARO
+application requiring a small overhead of typically a fraction of a
+day.  After the initial library interface is developed, it is expected
+that individual applications could be migrated in a user-transparent
+fashion (on a `most-important-first' basis), thereby mitigating the
+impact of this project on Starlink's broader spectroscopy-related
+programme.
+
+\subsubsection{Echelle Data Reduction}
+
+\begin{description}
+\item[Recommendation:]
+On the basis of a report submitted to the SSSG, ECHOMOP was identified
+as providing the preferred framework for a comprehensive echelle
+reduction facility.  It is recommended that new releases of this
+software should be placed at an elevated level of maintenance support
+in order to promote its development.
+\end{description}
+
+In last year's proposal, the SSSG identified echelle data reductions
+as an outstanding area for which the existing software provision is
+inadequate.  This problem is expected to become more acute with the
+advent of ever-larger CCD detectors (e.g., EEV9 on UES/WHT) sampling
+more fully the free-spectral range of new and existing echelle
+spectrographs ({\em e.g.}\ HIRES on the Keck; HROS on Gemini).  The
+processing of large (in size and number) echelle datasets is {\bf
+still} the single most conspicuous area in which software improvements
+and automation could ease the post-observing burden of astronomical
+spectroscopists.
+
+The SSSG has now received a provisional report from Starlink outlining
+the major echelle reduction packages currently available to the
+international astronomical community.  This report identifies the
+DOECSLIT package within IRAF, and the ECHOMOP package within the SSC
+as the two leading echelle reduction facilities.  There are several
+advantages and disadvantages associated with each of these packages:
+in brief, DOECSLIT is a stable product accessed via the IRAF command
+language (cl) familiar to and popular with increasing numbers of
+astronomers; ECHOMOP on the other hand, provides a more comprehensive
+set of echelle reduction tasks with full provision for error
+propagation, albeit hidden behind a somewhat unfriendly
+user-interface.  In light of the fact that the author of DOECSLIT has
+no immediate plans to improve his software, the SSSG agreed that
+ECHOMOP represents a valuable component of the
+echelle-spectroscopist's arsenal deserving further support and
+development by Starlink.
+
+It was felt that the most responsive approach to dealing with the
+various faults identified in ECHOMOP would be to place its next
+release in an elevated status of maintenance support.  Improvements to
+the software should then be guided by the responsible programmer
+actively soliciting input from all users ({\em e.g.}\ via an automated
+`gripe' command or e-mail shots).  Bugs requiring only a few
+programmer-days effort to fix would be resolved with a quick
+turnaround.  Problems needing more than 2 programmer-weeks effort to
+address demand a more appropriate, co-ordinated strategy: they should
+be collated to build a prioritised list of user requirements, which
+can then be reviewed for action at the next SSSG meeting.
+
+User feedback obtained to date indicates considerable dislike of the existing 
+ECHOMOP interface, and it is expected that demand for an improvement
+in this area may prove a user priority.  Options discussed in this
+regard by the SSSG included (a) the provision of a GUI (perhaps with a
+facility for compiling reduction scripts), and (b) the incorporation
+of ECHOMOP within the IRAF cl.  There was some feeling that the latter
+option might safeguard the long-term competitiveness of this package
+and promote its use in the broader community, but should not be
+undertaken at the expense of ECHOMOP's capacity to handle error
+propagation. Both options have significant manpower implications and
+of course would be contingent on there being sufficient user demand.
+
+\subsubsection{IUE Final Archive Data}
+
+\begin{description}
+\item[Recommendation:]
+A facility for reading IUEFA fully extracted spectra should be
+developed in order to ensure access to this valuable data resource as
+and when it becomes available. In the event that {\bf high-resolution}
+IUEFA data products are produced in calibrated-image format only, a
+suitable data reduction facility should be made available. The
+relative merits of existing packages in the SSC and elsewhere as
+suitable reduction engines in this context will need to be assessed.
+\end{description}
+
+The IUE Final Archive Project (IUEFA) will ultimately provide a
+valuable data resource for UK ultraviolet astronomers working in a
+broad diversity of fields.
+
+The SSSG understands that it is now probable that the IUEFA will
+produce only low-resolution spectra in {\bf fully extracted} form;
+high-resolution data will be available as photometrically calibrated
+and geometrically re-sampled images, albeit of considerably higher
+quality than the existing, standard IUESIPS product.  In any event,
+the development of a suitable FITS binary table reader tailored to the
+IUEFA format will be essential in order to allow fully extracted IUEFA
+spectra to be imported into the Starlink environment for manipulation
+and analysis using tools familiar to Starlink users ({\em i.e.}\ the
+SSC).  This would represent a fairly self-contained task requiring
+perhaps 1-2 programmer-months, and should be scheduled so as to
+coincide with the IUEFA's first release of data to the UK community.
+
+In the event that IUEFA {\bf high-resolution} products are only
+available as photometrically calibrated images, a suitable reduction
+facility will be required at the time of their release.  Within the
+SSC, IUEDR and ECHOMOP have been identified as potential reduction
+engines for these data -- in essentially their existing forms --
+although both would require retro-fitted file-reading facilities
+capable of recognising and handling header information unique to IUE
+data.  The relative merits of these packages in this context need to
+be carefully assessed before any concrete proposals on this matter can
+be advanced, bearing in consideration the possibility that some
+appropriate tailored package in, for example, the IRAF environment may
+also become available.  Contingent on a final decision being made on
+the nature of IUEFA high-resolution data products, it is recommended
+that Starlink prepare a brief report outlining the relative merits of
+these options and the associated manpower requirements for
+consideration of the SSSG.
+
+\subsubsection{Spectropolarimetric Data Reduction/Analysis}
+
+\begin{description}
+\item[Recommendation:]
+The spectropolarimetric data {\bf reduction} package TSP should be
+updated to handle data from all instruments normally available to UK
+astronomers.  The spectropolarimetric data {\bf analysis} package
+POLMAP should be released as part of the SSC as soon as possible.
+\end{description}
+
+In the previous proposal, spectropolarimetry was identified as a
+growth area in UK astronomy with the increasing availability of
+dedicated instruments at several observatories (e.g., ISIS polarimeter
+on the WHT; RGO spectrograph polarimetry module on the AAT).  The SSSG
+felt that forseable demand for a spectropolarimetric data reduction
+facility could be accommodated within the TSP package, provided that
+it is updated to handle data from the many instruments currently
+available to the UK community.  Furthermore, a new spectropolarimetric
+{\bf analysis} package, POLMAP, has been submitted to Starlink for
+inclusion in the SSC, but is still awaiting release.  It is strongly
+recommended that this is given immediate attention; the exposure of
+this software to wider use will promote its development and allow a
+better assessment of the software needs of the spectropolarimetry
+community to be made.
+
+\subsection{General Discussions}
+
+In addition to the firm recommendations made above, several other
+topics were discussed by the SSSG for which clear decisions were
+reached, but do not merit the same high priority as those listed
+above.  In some cases, the implications of these recommendations are
+broader than the specific remit of this SSG.  They are listed below in
+no particular order of priority.
+
+\subsubsection{ISO Data Reader/Converter}
+
+Although the ISO Project has yet to finalize its format for data
+products, a provisional specification has been released on CD-ROM.
+Consistent with the prioritised recommendation presented in last
+year's proposal, Malcolm Currie was actioned by the SSSG to
+investigate this provisional format with a view to using it as the
+basis for the development of a tailored FITS reader.  As the launch of
+ISO is imminent (November 1995 at time of writing), he was urged to
+seek a final specification from the ISO Project at the earliest
+possible date.
+
+\subsubsection{\label{specSSG:CGS4DR}Portable CGS4DR}
+
+The SSSG discussed the issue of the port of CGS4DR to Unix systems,
+following on from the recommendation made in last year's proposal that
+this be carried out as soon as possible.  It is understood that an
+interim release of Portable CGS4DR is now available, although several
+critical bugs were reported at the meeting which preclude its use on
+data part-reduced at the telescope.  The SSSG expressed support for
+the implementation of a GUI-version of CGS4DR as a collaborative
+project between JAC and Starlink, and encouraged those involved to
+ensure a rapid release to the user community.
+
+\subsubsection{Multi-Object (Fibre) Spectroscopy}
+
+Multi-object (fibre) spectroscopy is, like spectropolarimetry, an
+expanding field in UK astronomy with several new instruments
+commissioned over the last year (WYFFOS at the WHT; 2dF/FLAIR at the
+AAT).  In relation to this, Malcolm Currie presented a report to the
+SSSG concerning the provision within the SSC (and other sources of
+software) for the reduction of multi-object spectra.  He emphasized
+that while there are no dedicated multi-object spectroscopy reduction
+packages, per se, within the SSC, it is in principle possible to
+combine elements from several different packages to achieve the same
+effect. He also pointed out that there are several instrumentation
+groups currently in the process of developing their own
+instrument-specific software (e.g., an IRAF-based package for WYFFOS).
+He drew attention to the DOFIBER package within IRAF for which a
+detailed user guide is available.  His recommendation to the SSSG was
+that any significant manpower effort in this area undertaken by
+Starlink should either substantially improve on existing software or
+take the form of documentation outlining how the reduction of
+multi-object spectra can be achieved by combining various components
+of the SSC and other packages.
+
+\subsubsection{\label{specSSG:IRAF}Inter-operability of Starlink and Other-Party Software}
+
+The SSSG expressed support for the concept of inter-operability of
+Starlink and other-party software (e.g., IRAF) both verbally, and
+through its recommendation that the widely-used FIGARO package be made
+consistent with the rest of the SSC in its use of a standard NDF
+library.  The SSSG recognized that this represents an important factor
+in promoting the use of Starlink software outside the UK community.
+
+\subsubsection{Documentation}
+
+The SSSG discussed the issue of documentation, particularly in
+relation to complex software such as ECHOMOP.  Support was expressed
+for on-line tutorial-format documentation which incorporates {\bf real}
+data with which the new user can experiment under guidance. It was
+felt that this would be valuable in providing a {\bf first-hand}
+experience of the use of a package via exposure to a concrete example
+with `worked solutions'.
+
+\subsubsection{Communications}
+
+In order to advertise the activities and recommendations of the SSSG,
+its Secretary has prepared, and continues to maintain, an appropriate
+collection of WWW pages which are accessible via the internet.  A
+`user comments' facility has been implemented in order to encourage
+input from the community outside the usual formal channels.  The SSSG
+recommends that Starlink advertise the availability of this facility
+and encourages users to take up the opportunity to influence the SSSG
+through this channel.  The provision of hyperlinks from appropriate
+Starlink WWW pages is requested.
+
+The SSSG WWW page can be accessed at:
+\begin{quote}
+\begin{verbatim}
+http://mssly1.mssl.ucl.ac.uk/~ddxw/sssg/sssg_hp.html
+\end{verbatim}
+\end{quote}
+
+\subsubsection{\label{specSSG:PC}Linux port}
+
+The SSSG has received positive feedback from users concerning the
+prospective port of the SSC to Linux, especially in relation to
+spectroscopic reduction and analysis software.  Now that the NAG
+routines have been removed from the SSC, the SSSG strongly encourages
+Starlink to continue with the Linux port.
+
+\subsection{Glossary}
+
+\begin{quote}
+\begin{tabular}{l@{--}l}
+AAT & Anglo-Australian Observatory \\
+cl & command language (IRAF) \\
+CGS4DR & An infrared data (CGS4) reduction package \\
+DOECSLIT & echelle reduction package in IRAF \\
+DOFIBER & multi-object spectrum reduction package in IRAF \\
+ECHOMOP & An echelle data reduction package \\
+FIGARO & A spectroscopic data reduction package \\
+FITS & Flexile Image Transport System \\
+GUI & Graphical User Interface \\
+IRAF & Image Reduction and Analysis Facility \\
+ISO & Infrared Space Observatory \\
+IUE & International Ultraviolet Explorer \\
+IUEFA & International Ultraviolet Explorer Final Archive \\
+Linux & Unix operating system for PCs \\
+NAG & Numerical Algorithms Group \\
+NDF & N-dimensional Data Format \\
+POLMAP & A spectropolarimetry reduction and analysis package \\
+SSC & Starlink Software Collection \\
+SSG & Software Strategy Group \\
+SSSG & Spectroscopy Software Strategy Group \\
+TSP & Time Series and Polarimetry reduction package \\
+WHT & William Herschel Telescope \\
+WWW & The World Wide Web \\
+WYFFOS & Wide Field Faint Object Spectrograph \\
+2dF & the 2-degree Field (at the AAT)
+\end{tabular}
+\end{quote}
+
+\newpage
+\section{\xlabel{image_processing_ssg_input}IMAGE PROCESSING SSG INPUT}
+
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+Barbara Bromage (UCLAN)\\
+Carole Mundell (Jodrell Bank)\\
+Dave Carter* (RGO)\\
+Helen Walker (RAL ISO Support)\\
+Myf Bryce* (Manchester, Chair)\\
+Nial Tanvir (IOA)\\
+Nigel Metcalfe (Durham)\\
+Phil James (LJMU)\\
+Steve Phillipps (Bristol)\\
+Tim Gledhill (Herts)
+
+\item[Also present:]\mbox{}\\
+David Berry (Manchester)\\
+John Palmer** (Manchester)\\
+Peter Draper (Durham)\\
+Rodney Warren-Smith (RAL)
+
+\item[*] Not at meeting 
+\item[**] Deputizing as chair for M. Bryce
+
+\item[Meeting date:]October 25, 1995
+
+\item[Venue:]Manchster Department of Physics and Astronomy
+\end{description}
+
+\subsection{Recommendations and Priorities}
+
+The Group has recommended that Starlink undertake the following tasks.
+Four priority groupings are suggested, with group 1 being the most
+urgent.  The discussions of the Group are appended in following
+sections to indicate the reasoning behind the decisions.
+
+\subsubsection{\label{ipSSG:astrom}PRIORITY 1}
+
+\begin{description}
+\item[Astrometry]\mbox{}\\
+Produce an astrometry `library', probably based on or layered onto
+SLALIB, along with appropriate NDF handler routines. Existing
+applications should be able to use these with only minor adjustments.
+
+\item[Large data sets]\mbox{}\\
+A study should be undertaken within the next year to assess the impact
+of the increasing size of data sets on the usability of Starlink
+software. In the interim a `guide to the processing of large data
+sets' should be produced.
+
+\item[GUIs]\mbox{}\\
+It is felt that GUIs provide a useful method for constructing
+easy-to-use front ends for specific tasks, integrating a number of
+packages or routines. Over the coming year, Starlink should commission
+a study to find out which tasks could most benefit from such
+treatment.
+
+Starlink should utilize the work it has done so far on GUIs to produce
+a data inspecton tool with a `look and feel' along the lines of
+SAOIMAGE/XIMTOOL, but with much enhanced astonomical
+functionality. Features that are at present partially supplied by
+KAPPA INSPECT and IRAF IMEXAMINE could be integrated and extended. New
+features such as the display of spectra extracted from a slice `into'
+a three dimensional data-cube could also be incorporated.
+
+\end{description}
+
+\subsubsection{\label{ipSSG:IRAF}PRIORITY 2}
+
+\begin{description}
+\item[Integration of Starlink software and IRAF]\mbox{}\\
+It was felt that the ability of Starlink packages to appear as IRAF
+`tasks' was important. Work should continue on the infrastructure
+required to fulfill this aim and, within 1 year, FIGARO should be the
+first package integrated.  Present efforts to persuade the IRAF team
+to adopt the NDF standard as an alternative data format should
+continue.
+
+\item[Polarimetry Support]\mbox{}\\
+Suitable polarimetry data reduction software should be made available
+to the Starlink community as soon as possible.
+
+\item[\label{ipSSG:figaro}Figaro - NDF support]\mbox{}\\
+FIGARO routines should be upgraded to use standard NDF access
+routines.
+
+\end{description}
+
+\subsubsection{PRIORITY 3}
+
+\begin{description}
+\item[Interface between Starlink Software and IDL]\mbox{}\\
+A suitable Starlink interface into the IDL environment should be
+produced.
+
+\item[ISO data]\mbox{}\\
+A small amount of effort may be needed to interface Starlink packages
+and specific software written by the ISO technical experts.
+
+\item[Data Format Conversion]\mbox{}\\
+The CONVERT documentation should be enhanced to detail the loss of
+information that may occur as a consequence of data format
+conversion. Additionally, the CONVERT routines should be altered to
+warn users of such a possibility prior to the conversion taking place.
+
+\item[Cookbooks]\mbox{}\\
+The production of 2 cookbooks is recommended; 1, ``A guide to the
+basic reduction and calibration of CCD data''; 2, ``Performing
+photometry: a guide to the available packages''
+
+\end{description}
+
+\subsubsection{PRIORITY 4}
+
+\begin{description}
+\item[PC software port]
+\end{description}
+
+\subsection{Discussion}
+
+\subsubsection{ISO Data}
+
+The group heard that test image data was still not available. It is
+understood that Starlink packages will be able to read the ISO binary
+FITS files, unlike IRAF which will not do so at present.
+
+A number of problems associated with processing ISO data were
+discussed:
+
+\begin{itemize}
+\item ISO data will include `stacks' of relatively raw image data.
+\item There will be a need to correct for instrument drift.
+\item There will probably not be a good model of detector response until 
+some way through the mission.
+\item Astrometry information will be contained in a file separate from 
+the image header.
+\end{itemize}
+
+It is expected that data sets will start to arrive around March-May
+1996.  Bearing in mind that firstly, the ISO data flow and therefore
+data processing software will have a limited lifetime and secondly,
+ISO specific software is being/will be written by the ISO instrument
+technicians, it was felt that any Starlink effort should be aimed at
+interfacing existing Starlink packages (possibly CCDPACK) with the
+software written by the ISO instrument technicians. The level of
+Starlink effort is anticipated to be of the order of 1 man-month over
+the combing year.
+
+\subsubsection{Large Data Sets}
+
+It was generally felt that the average size of data sets has been
+increasing and will continue to increase over the next few years. This
+is true across all the wavelength ranges. Some doubt was expressed as
+to how these large data sets could be processed efficiently. It was
+recommended that Starlink commission a study into this phenomenon
+during the coming year. In addition it was suggested that a guide to
+processing large data sets be produced by Starlink to clarify the ways
+in which present software should be used to handle such data.
+
+\subsubsection{GUIs}
+
+The Group did not consider that it was either necessary or desirable
+to produce a `standard' Starlink GUI. It was felt, however, that the
+use of GUIs to aid the performance of specific tasks was valuable and
+therefore it was recommended that Starlink continue it's present GUI
+infrastructure work. Further, the Group recommended that over the
+coming year Starlink should commission a survey into the possible
+needs of users vis a viz GUI fronted tasks.
+
+It was accepted that users are keen to be able to use data processing
+tools across the wavelength range, and it was felt that GUIs should
+aid this ideal.
+
+In the case of the `image processing community' it was thought that
+there was an identifiable need for an enhanced interactive data
+visualisation tool. The popularity of a tool such as SAOIMAGE was
+based on the fact that it was fast and responsive to use and performed
+a small subset of tasks in an intuitive, user-friendly manner. The
+Group therefore suggests that Starlink should attempt to produce such
+an enhanced tool over the next year.
+
+\subsubsection{Starlink/non Starlink software integration}
+
+The Group felt that it is increasingly important for Starlink to
+enhances the integration of Starlink software with other software used
+by the global astronomical community. Not only would this reduce
+effort in `reinventing the wheel' but could well result in an
+increased interest internationally in Starlink software.
+
+\begin{itemize}
+\item{\bf IRAF}
+The efforts being made to allow Starlink packages to appear as tasks
+within IRAF were welcomed. It was accepted that an effort equivalent
+to 6 man-months would be required initially to provide a 'production
+system' to allow such integration.  A subsequent expenditure of around
+1 man-month per package was considered feasible. (See also Data format
+section below).It was agreed that as a first step the FIGARO package
+should be made available as such a task.
+
+\item{\bf IDL}
+It was noted that there was a large community of IDL users. It was
+therefore important to allow access between the IDL environment and
+Starlink software. The group agreed that it was therefore desirable
+that Starlink should work on an IDL interface of some kind.
+\end{itemize}
+
+\subsubsection{Data formats}
+
+It was reported that there has been progress towards persuading the
+IRAF team to make available routines that would enable NDF structured
+data to be accessed from IRAF. The Group considered this a highly
+desirable development and encouraged Starlink to continue along this
+path.
+
+It was noted that when converting between data formats it is often the
+case that header information is `lost' as a natural consequence of
+differences in the way the data is stored. It was recommended that the
+documentation for the CONVERT package should be enhanced to detail the
+potential losses that can occur when using CONVERT routines. It was
+also requested that if possible the CONVERT routines should be
+modified to provide an `on screen' warning before such a loss occurs.
+
+\subsubsection{\label{ipSSG:PC}PC software port}
+
+The Group did not feel that the port of Starlink software to LINUX on
+PCs was a particularly pressing need. It was thought that at present
+there would only be a limited number of high-end PCs available at
+Starlink sites and that the introduction of `yet another operating
+system' would in fact be a retrograde step.
+
+\subsubsection{Astrometry}
+
+It was recognized that this was potentially a large project. It was
+however felt that it was very important to be able to handle
+astrometry data in a unified way.  It was suggested that a way forward
+was to produce an software library, probably based around or layered
+onto SLALIB, which with an appropriate NDF handler could be utilized
+by existing applications with only minor adjustments. It was
+anticipated that such a library could be in place by the end of the
+year for an expenditure of approximately 9 man-months.  The Group
+recommends that such an approach be adopted.
+
+\subsubsection{Polarimetry}
+
+Dual-beam polarimetry instruments are operating or soon will be
+operating at all major observatories. There is no Starlink software in
+place to handle such data. TSP can provide rough-and-ready processing,
+but lacks the ability to follow errors, plot vector data, handle
+circular polarization etc.
+
+The Group recommended that suitable reduction software be made
+available as soon as possible. This will probably entail liazing with
+the instrument specialists at the observatories (UKIRT and/or
+AAO). Existing software there should be adopted or adapted if
+possible. It was felt that Starlink has a wealth of Polarimetry
+expertise and should be able to provide a competitive package.
+
+\subsubsection{Visualization tools}
+
+A survey of visualization tools has been undertaken at the request of
+the Theory SSG. The Group felt that nothing further specific should be
+undertaken for the next year until the recommendations of the survey
+had been made available and some experience of the tools had been
+gathered.
+
+\subsubsection{Cookbooks}
+
+The Group recommended that Starlink should provide the following two
+'cookbooks' over the coming year:
+\begin{itemize}
+\item A guide to CCD reduction.
+\item A guide to Photometry - with particular emphasis on the use of
+appropriate packages.
+\end{itemize}
+
+\subsubsection{Figaro}
+
+The Group agreed that it was desirable that Figaro be upgraded to
+utilize standard NDF access routines.
+
+\newpage
+\section{\xlabel{theory_and_statistical_analysis_ssg_input}THEORY AND STATISTICAL ANALYSIS SSG INPUT}
+ 
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+Geraint Lewis (secretary, gfl@ast.cam.ac.uk)\\
+Huw Lloyd (hml@staru1.livjm.ac.uk)\\
+Melvyn Davies (chair, mbd@ast.cam.ac.uk)\\
+Neil Francis (N.Francis@astro.cf.ac.uk)\\
+Steinn Sigurdsson (steinn@ast.cam.ac.uk)
+
+\item[Also present:]\mbox{}\\
+David Berry (dsb@ast.man.ac.uk)\\
+Rodney Warren-Smith (rfws@star.rl.ac.uk)
+
+\item[Apologies:]\mbox{}\\
+Ian Bonnell (IoA)\\
+Matthew Brown (QMW)
+
+\item[Meeting date:]9th November 1995
+
+\item[Venue:]IoA, Cambridge
+\end{description}
+ 
+\subsection{Reports}
+
+The group considered two reports produced by Starlink personel in
+response to the last SSG meeting.
+
+\subsubsection{Visualization Tools}
+
+Since the last meeting, David Berry (Manchester) has been
+investigating various visualisation software packages and he reported
+his findings to the group. In summary, David felt that the package
+produced by IBM -- DX -- seemed the most promising for astronomical
+applications. IBM are willing to send the software to users for free
+for a 60-day trial period.  David, and others, had done some software
+development for use with DX, as well as writing some documentation
+that would become publicly available shortly. The group felt it
+important that the whole astronomical community hear about the
+availability of DX -- possibly in the next Starlink bulletin. They
+also felt it important that starlink provide user support during the
+60-day trial period.
+
+\subsubsection{Computer Algebra Software}
+
+The group studied the report by Martin Clayton (UCL) on computer
+algebra software. Martin has concluded that most Starlink sites that
+have a need for such software have found a local solution, though one
+member of the group recounted having used the version of Maple on
+STADAT. We felt that it would be a sound idea to further advertise the
+availability of Maple at RAL, and see if the current, extremely low,
+rate of usage increases over the coming year. If it didn't the group
+felt it would be reasonable to discontinue this service.
+
+\subsection{Requests for the Year Ahead}
+
+The group identified three key areas where Starlink resources should
+be applied:
+
+\begin{enumerate}
+\item In order that Starlink users be able to successfully use
+the DX visualisation software during the 60 trial period, it was felt
+that David Berry, or another, equally expert, Starlink applications
+programmer be available to help users during December/January.
+Explicitly, they might be called upon to produce small pieces of code
+to transform users' data files into the formats readable by the
+software.
+
+\item In a variety of contexts, all members of the group related problems
+with anonymous ftp transfer of important software available publicly
+from sites chiefly in the US. Given the current (lack of) speed in
+communications to North America at most times, the idea of a more
+local archive was welcomed. Such a system, presumedly located at RAL,
+could contain software such as CLOUDY, and various hyrodynamical codes
+currently available from the Illinois Supercomputing Center, for
+example.  We feel that the community should be asked for further
+suggestions of software packages important to them.  We understand
+that other SSGs have also suggested such an archive, for observational
+packages such as IRAF and AIPS; it would seem logical to combine the
+efforts for both the observational and theoretical communities.
+
+\item All members of the group welcomed the introduction of fortran 90
+to all Starlink nodes. Some concern was expressed relating to the
+compatibility of existing software -- for example NAG routines -- with
+the new fortran.  The group identified as a key need for the coming
+year that resources within Starlink be used to ensure as smooth a
+transition as possible to Fortran~90 within the community.
+
+\end{enumerate}
+
+\newpage
+\section{\xlabel{information_services_and_databases_ssg_input}INFORMATION SERVICES AND DATABASES SSG INPUT}
+
+\subsection{Strategy}
+
+\subsubsection{Information Services}
+
+The use of WWW has continued to accelerate since the first meeting of
+this SSG and there is no reason to expect this growth to slow. The
+number of WWW browsers has grown from about two 2 years ago to around
+a dozen now. Current HTML standards have failed to stay ahead of the
+developers with a resulting proliferation of extensions to the mark up
+language.  The next year or two should see the more popular and well
+thought out extensions being incorporated into the standard, which
+should enable Starlink to construct WWW documents containing tables
+and other complex formatting constructs already used in the paper
+documentation.
+
+There is still no clear choice for the best mark up language for Starlink 
+documentation. Ideally a form which can be used to generate both HTML
+and paper based documents would be used, but at the moment we use a
+language oriented towards paper based documents with an HTML convertor.
+Within the next 5 years we can anticipate further developments in mark
+up languages but in the mean time we should proceed with making Starlink
+documentation WWW based using the current compromise.
+
+Developments in WWW on a 5 year time scale are much harder to predict.
+They will almost certainly include next generation document languages,
+such as VRML and other interpreted interactive documents (such as Java). 
+The applicability of these languages to the astronomical community is
+impossible to anticipate at this time. Many of what seem to be outlandish
+developments now (eg VRML) make significant demands on hardware which
+we may have to cater for.
+
+\subsubsection{Software \& Data Distribution}
+
+The distribution of Starlink software via the WWW is a positive step
+to making the Project's efforts more visible and more widely used (but
+see the recommendations for a couple of caveats on the way this is
+achieved).
+
+The use of CDROM as a medium for data distribution has expanded
+significantly in the last 5 years, with the Digital Sky Survey leading
+the way with about 100 CDROMs. There are a number of other large surveys in
+progress, including the ESO Southern Sky survey, the INT Wide Field
+survey and many more. The ever increasing data volume of these surveys
+means the data will most probably be accessed at the site where the
+survey data is reduced, via a WWW interface such as Skyview. While
+such interfaces make adequate provision for interactive use, more
+automated work (such as extraction of images for every object in a
+catalogue) will become more difficult without standardisation of the
+query protocol and provision of tools to interface between the user's
+object catalogue and the WWW browser being used to access the
+database.
+
+The increasing use of such databases may mean that network bandwidths
+outside Super-Janet become a problem. In this case a UK based mirror
+site or sites may be advantageous for the more commonly used
+databases.  Perhaps the natural successor to STADAT would be such a
+mirror site.
+
+\subsubsection{Database Software}
+
+There is a consensus within the SSG that there is (and will continue
+to be) a need for table handling software, and that the CAT package
+developed by Starlink is the most suitable package which can meet this
+need. CAT is sufficiently divorced from the rest of Starlink to have
+international appeal and is the only FITS based DBMS around.
+
+\subsection{Recommendations to Starlink}
+
+\begin{enumerate}
+
+\item Concern was expressed that the construction of the Makefile required
+for Starlink software distribution was now becoming so complex that
+there was a danger of discouraging software submission to Starlink.
+Care should be taken that the additional infrastructure for
+maintaining the WWW software archive should not further complicate
+matters.
+
+The project is encouraged to provide,
+
+\begin{itemize}
+\item a brief document describing the purpose of the standard Makefile,
+including a diagram describing the different states of a package and
+how the targets result in a change of state.
+
+\item a Makefile 'wizard' of some sort, which could write the Makefile
+given the essential information which comprises perhaps 5% of the text
+in such files.
+\end{itemize}
+
+\item \label{infoSSG:NAG}The SSG fully endorses Starlink's efforts to
+make its software more accessible to the international community and
+encourages it to take those steps necessary to further this aim, in
+particular the provision of an alternative to the NAG library.
+
+\item The SSG agreed that instrumentation of software to gauge usage would
+be a useful thing to implement, with the proviso that it should be
+completely robust and that users should have to explicitly register
+themselves to take part. In addition use should be made of
+questionnaires targeted towards particular subject areas.
+
+\item \label{infoSSG:cookbook}The SSG agreed that the emphasis should
+be placed on cookbooks and tutorials rather than (say) taught courses,
+but recognised the fact that such documents are best written by users
+rather than implementors.  Persuading the former is more difficult
+than ordering the latter!  (A radical thought; perhaps they could be
+paid).
+
+\item \label{infoSSG:PC}There was considerable interest among the
+members of the SSG on the Linux operating system for PCs. The SSG
+encourages the Project to continue its work on porting the SSC to that
+platform.
+
+\item Continuation of work on the CAT library and associated
+applications.
+
+\begin{itemize}     
+\item Continue and expand the publicisation of CAT, especially in the
+US via such media as the Legacy magazine.
+
+\item Implement the list of work items on CAT/CURSA, down to roughly
+item \verb/#/15 on the list produced by ACD (dated 17/7/95)
+
+\item Support conversion and distribution of selected catalogues from 
+the old SCAR catalogue set. 
+
+\end{itemize}
+\end{enumerate}
+
+\newpage
+\section{\xlabel{graphics_and_infrastructure_ssg_input}GRAPHICS AND INFRASTRUCTURE SSG INPUT}
+
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+Andrew Newsam\\
+Barry Kellett\\
+Carl Shaw\\
+David Shone\\
+Karl Glazebrook\\
+Paul Alexander (chair)\\
+Richard Bower
+
+\item[Also Present:]\mbox{}\\
+Alan Chipperfield\\
+Brian McIlwrath\\
+David Terrett\\
+Malcolm Currie\\
+Peter Draper\\
+Rodney Warren-Smith
+
+\item[Meeting date:]Tuesday 20th June 1995
+
+\item[Venue:]Cavendish Laboratory, Cambridge
+\end{description}
+
+\subsection{Preamble}
+
+This was the second meeting of the Graphics and Infrastructure SSG.
+The discussion during focussed on short and long term issues (as we
+had been specifically requested to do).  One immediate consequence of
+this discussion was that we are of the opinion that it is important
+for the planning exercise for the longer term form that STARLINK
+software should take must occur in parallel with the shorter term
+objectives.  We therefore present our discussion in this form as two
+parallel streams and hope that time and effort will be found for our
+recommendations under both headings to be implemented.
+
+We noted the considerable progress already made by the STARLINK team
+in implementing the full list of recommendations we had made at our
+last meeting and congratulate them on this.  Our recommendations are
+therefore framed on the assumption that certain work which is near
+completion will indeed be completed in the near future.
+
+\subsection{Recommendations for short term objectives}
+
+\subsubsection{Support for Linux Platform}
+
+\begin{description}
+\item[Recommendation:] The port of the STARLINK software collection to 
+Linux should continue and that this work be given significant
+priority.
+\end{description}
+
+We noted from RW-S that number of SSGs and the STARLINK panel were of
+mixed opinion as to the value of this port, principally the objection
+appears to be that the hardware on which Linux runs will not be
+adequate for large data reduction programmes.  Our discussion at the
+last meeting and this emphasized the importance of this port for two
+reasons:
+
+\begin{enumerate}
+\item Although it is unlikely that STARLINK will provide and support
+directly Intel hardware, such equipment is cheap and available to a
+very large number of astronomers via other sources (private puchases,
+university support etc.).  This makes it a very important platform
+therefore for general use.
+
+\item The port is not only a port to a new platform but also to using
+the GNU gcc and g77/f2c compilers.  In this sense it is very much a
+generic port and should be a valuable stepping stone to support for
+the STARLINK collection on almost any UNIX platform.
+\end{enumerate}
+
+We note the related work on removing the dependence of NAG from the
+software collection is also central to making software distribution to
+any site a far easier task.
+
+\subsubsection{\label{infraSSG:training}Training and tutorial support}
+
+\begin{description}
+\item[Recommendation:] We do not beleive any useful role would be served in
+the area of graphics and infrastructure by STARLINK running tutorial
+courses.  The effort required to do so would detract from higher
+priority items.
+\end{description}
+
+We were asked by RW-S to consider this issue.  There was no support at
+all for the proposal in the area of graphics and infrastructure, one
+specific session of a course on high to write STARLINK was discussed
+but found no favour.  It is difficult to see how such a course could
+be run as a substantial facility for hands-on sessions would be
+required if the course were to be of any value.
+
+The SSG noted that the situation may be different in specific
+application areas where the tutorials would be much more focussed on
+specific astronomical or instrumental considerations; this is however
+the concern of other SSGs.
+
+\subsubsection{Bindings for C}
+
+\begin{description}
+\item[Recommendation:] A C-binding should be provided for all routines in the
+STARLINK collection.
+\end{description}
+
+A growing proportion of scientists do not learn f77 (or f90).  It is
+now not appropriate for a major enterprise such as the STARLINK to
+effectively demand that applications are coded in FORTRAN.  It is
+particularly odd that even libraries written in C are provided only
+with a F77 binding in the software collection.  Having both a C and
+F77 binding allows programmers to choose the best language for a
+particular task and should be regarded as a high-priority item.
+
+\subsubsection{Coordinate systems}
+
+\begin{description}
+\item[Recommendation:] A new library should be developped or SLALIB expanded to
+provide generic support for coordinate systems.
+\end{description}
+
+A large number of application programs support (or should support)
+directly coordinate systems, but there does not exist an accessible
+library of appropriate routines.  Such a library could be produced
+largely by extraction of routines from IRAS90.  The committee supports
+this aim and believes it would be a valuable tool provided:
+
+\begin{quote}
+The support was at a level of a high-quality product; there is nothing
+worse than an astrometris routine which fails, for example for large
+fields or near the pole of its coordinate system.  We would not like
+to see a library aimed at satisfying a short term need, but one which
+had the quality of SLALIB.
+\end{quote}
+
+We urge STARLINK therefore to provide support at a high level and with
+clearly documented accuracy levels and to achive this to aim to
+support a limited number of the more common projects properly rather
+than aim for complete coverage.
+
+Any aspects of this library that can be separated from the underlying
+data structures should be and provided independent of the rest of the
+STARLINK software library in much the same way as SLALIB achieves.
+
+\subsubsection{Graphics evaluation}
+
+\begin{description}
+\item[Recommendation:] STARLINK should undertake a detailed investigation of
+the suitability of various modern graphics libraries such as PEX and
+OpenGL with intention of switching to support these in preference to
+GKS.  Simulataneously STARLINK to evaluate specific visualization
+packages.
+\end{description}
+
+The need for improved suport for graphics, especially 3D, has a clear
+scientific base:
+
+\begin{quote}
+Considerable amounts of data being collected from all telescopes are
+in the forms of 3 or more dimensional data (spectral-line images for
+example).  Traditional 2D graphics (PGPLOT and GKS etc.)  are not
+capable of providing adequate visualization leading to poorer analysis
+and interpretation of data that would otherwise be possible and wasted
+astronmer time.
+\end{quote}
+
+There is also a technical issue:
+
+\begin{quote}
+The support for GKS under X windows is poor and it is a declining
+standard.  If STARLINK is to continue to support graphical
+applications it is essential that they move to a well supported
+standard.
+\end{quote}
+
+We considered in detail whether a visualization tool (such as AVS, IDL
+etc.) would be sufficient by itself.  Although we consider the
+provision of such a tool to be a very high priority item we also
+believe that there will be a continuing need to incorporate graphics
+directly into application programs so that astronomers can interacts
+with their data during the data processing stage and have support for
+some of the esoteric requirements of astrometric projections etc.
+
+At the present time there are really only two high-quality options,
+PEX or OpenGL.  The former is defined by the X consortium and has a
+free implementation distributed with X11R6 although for performance a
+hardware specific implementation would be required.  OpenGL on the
+other hand is a specification which is CopyRight Silicon Graphic Ins
+(SGI).  OpenGL appears to be however a more widely used and superior
+product.  There are some legitimate free implementations of OpenGL
+appearing and these should be considered.  This situation is not much
+different to the original situation for GKS however which was adopted
+by STARLINK.  Our recommendation is that a thorough analysis of the
+benefits and costs of these two emerging standards (and other
+comparable products) should be undertaken by STARLINK and a report
+produced.
+
+In brief support is required for at least:
+
+\begin{quote}
+3D graphics, display list and immediate mode rendering, tools
+suitable for the visualization of scientific data (cell arrays,
+support for voxel objects would be an advantage).  Consideration
+should also be given to ease of programming and workstation support.
+
+A final issue is the cost implications of supporting either of these
+tools.  Do we need PEX lisences for all X terminals?  Can PEX and
+OpenGL both render directly to X (we believe OpenGL can).
+\end{quote}
+
+\subsubsection{Support for Solaris on non SPARC hardware}
+
+\begin{description}
+\item[Recommendation:] STARLINK should investigate, and hopefully implement
+a port of the software collection to non-SPARC solaris platforms.
+\end{description}
+
+Solaris is one of the few variants of UNIX which is becoming widely
+available on other hardware (Intel and PowerPC most notably). We note
+the support for the new PowerPC range which IBM are to release in the
+near future.  PowerPC 604 based systems have a very substantial
+price/performance advantage (if the advertising is to be believed)
+over almost all other processor ranges (SPARC, ALPHA, MIPS etc.).  If
+STARLINK were to provide software support on such platforms it could
+prove potentially useful when considering hardware purchases as it
+would not imply support for additional operating systems.  We urge
+STARLINK to investigate how easy it is to support the same operating
+system on multiple hardware architectures and therefore gain valuable
+information which will be of use in formulating decisions about
+hardware purchases.
+
+\subsection{Considerations of long term objectives}
+
+We had a considerable discussion concerning the future direction (over
+a five-year plus time span) of astronomical software supplied by
+STARLINK.
+
+Perhaps most surprising was the wide agreement on the most profitable
+way forward. In brief the points of agreement were:
+
+\begin{enumerate}
+\item STARLINK should move towards developping a high-level (4GL) language for
+support of astronomical data reduction.  In many ways this is is just
+a binding for the existing software tools to an appropriate language.
+In this respect we do not consider ICL to have a long term role as
+many excellent alternatives exist which STARLINK would not have to
+support directly.  Some possibilities (which may not be exclusive
+choices) are:
+
+\begin{description}
+\item[tcl] --- provide a high-level scripting like approach
+\item[idl]  --- incorporate astronomical ideas into the idl language
+although this is of course proprietry software.
+\item[java] --- the new network aware, platform indenpendent byte-interpreted/
+or compiled, object oriented language (see below).
+\item[perl] --- originally designed as the ultimate UNIX scripting tool
+the latest perl release is designed to be easily extensible or be used
+as an embedded intepreter (c.f. tcl).
+\end{description}
+
+One or more of these might be combined; indeed tcl/tk will have a very
+close link to java.
+
+Other possibilities exist but were not considered in detail, see item
+3.
+
+\item Emphasis should be on development of the underlying analysis code
+and tools for constructing user interfaces should be taken largely
+from other sources (e.g.tcl/tk).
+
+\item Code and applications should develop in such a way that the binding to
+the high-level interface to form the 4GL should as far as possible be
+independent of the chosen high-level environment.  This would enable
+the code to be re-used in many environments and would ensure greater
+longevity for the system as computer science developments in user
+interface design are vertain to occur over this period.
+
+\item At present the most exciting route appears to be java/tcl/tk with
+tcl/tk forming the scripting part and user interface design while java
+provides an excellent object oriented base for a 4GL language.  The
+astronomical tools would be added as modules to java and tcl/tk (which
+will have direct support for java).  Astronomers would then interact
+on one of a number of levels:
+
+\begin{enumerate}
+\item Use finished applications probably with GUI front ends.
+
+\item Extend existing applications and combine them with system tools
+and write scripts to combine other applications/aspects of the 4GL.
+This would be done in a good scripting language, probably tcl.  Such
+an approach would be accessible to the vast majority of astronomers.
+The aim would be that most users would not need to do more than this
+degree of coding.  This implies that there would need to be direct
+support for data processing tasks in the high-level scripting
+environment together with access to advanced graphics (in addition to
+Tk) for data visualization.
+
+\item Write new applications in an object oriented framework using the
+lower-level binding of the 4GL say to java.  This would be the level
+now undertaken by application programmers.  The language would be
+efficient and optimized for algorithm development and implementation.
+
+\item Extend the language by adding facilities in a low-level language of
+the programmers choice (c, c++, f77...).  The need for this level of
+support will decrease quickly after the initial implementation.  While
+this pattern of use seems the best way forward there are other good
+alternatives to the two languages tcl and java:
+
+\begin{itemize}
+\item tcl $-->$ perl?
+\item java $-->$ use a lower level as of now C, C++, f90...
+\end{itemize}
+
+\item Finally we note the unanimous enthusiasm for java --- this is almost
+certainly due to the fact that it is perhaps the first language which
+has been developped from the bottom up to support those issues that
+any one involved in software development knows are very important:
+
+\begin{enumerate}
+\item Object oriented including automatic memory management!
+\item Network aware
+\item Multi threading (multi tasking)
+\item Platform independent
+\item Support for various user interface possibilities (including
+WWW).
+\end{enumerate}
+
+No doubt over the time scale envisaged competitors to java will
+appear, but at the time of writing it appears as a very exciting new
+development.
+
+\end{enumerate}
+\end{enumerate}
+
+\subsection{Glossary of Non-STARLINK terminology}
+
+\begin{description}
+\item[AIPS]The Astronomical Image Processing System used in Radio Astronomy.
+\item[IRAF]The US optical astronomers equivalent of AIPS.
+\item[X86]The "X86" family or processors used in IBM compatible PCs, mostly
+the 486DX and Pentium chips.
+\item[PowerPC]The new chip from IBM/Apple; could be a very important platform.
+\item[SPARC]The Sun chip used in its SPARC workstations.
+\item[ALPHA]The new DEC chip --- currently the market leader in terms of
+power, but Sun. IBM, HP, SGI are all pushing hard.
+\item[SGI]Silicon Graphics --- probably make the best graphics workstations,
+used extensively in visualization.
+\item[IDL, PV-WAVE, AVS]Commonly used commercial visualization applications
+\item[Khoros, apE]Good freely available visualization applications
+\item[Motif]The now standard "look" and feel for X-windows (also a
+programming library).  This will be available on ALL flavours of UNIX
+workstations and is similar in appearance to WINDOWS
+\item[WINDOWS]The Microsoft windowing system on a PC
+\item[WINDOWS NT]The 32-bit Microsoft windowing system on a PC
+\item[Tcl]Tool Control Language.  An excellent scripting language which
+can be embedded in other applications (c.f. ICL).  In wide use and may
+well become a "stanadrd".  It is free although now is supported by
+SUN, but with a bried to be freely available on all systems (UNIX, PC,
+MAC).
+\item[Tk]A Motif like windowing system linked to tcl (from the same author).
+This is a high-quality product again free and arguably far superior
+(technically) to Motif/Windows!
+\item[PERL]scripting language with (in V5) object-oriented approach, modules
+for networking, tk; cn be used as an embedded interpretor.
+\item[PEX, PHIGS, OpenGL]State of the art graphics packages -- see above
+\item[GNU]Free software which is widely distributed under a license which
+prohibits commercial exploitation.  Good quality stuff and often
+superior to equivalent standard UNIX utilities.
+\item[Linux]A free UNIX-like cloned operating system for the X86 architecture.
+Uses GNU software extensively, but also supports X-windows etc.  A
+very complete system.
+\item[JAVA]The new network aware object-oriented programming language released
+by Sun.
+\item[g77]The GNU fortran compiler.
+\item[f2c]The GNU fortran to C converter.
+\item[C$++$]An object-oriented development of C.
+\item[F90]The new FORTRAN standard.  It has many object-oriented
+features.
+\item[API]Application programmer interface.  The common term for the
+subroutine/function calls used to access the facilities of a
+programming library.
+\end{description}
+
+\newpage
+\section{\xlabel{radio_mm_and_sub-mm_astronomy_ssg_input}RADIO, MM \& SUB-MM ASTRONOMY}
+
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+A.G.Gibb (Kent)\\
+D. Ward-Thompson (chair, ROE)\\
+D.J.Titterington (secretary, MRAO)\\
+J.F.Lightfoot (ROE)\\
+J.L.Osborne (Durham)\\
+K.J.Richardson (QMW)\\
+M.A.Garrett (Jodrell Bank)\\
+P.J.Warner (MRAO)
+
+\item[Also present:]\mbox{}\\
+H.Meyerdierks (ROE)\\
+J.S.Richer (MRAO)\\
+R.F.Warren-Smith (RAL)\\
+R.Padman (MRAO)
+
+\item[Apologies:]\mbox{}\\
+D.L.Shone (Jodrell Bank)\\
+D.S.Berry (Manchester)\\
+G.H.Macdonald (Kent)\\
+J.W.Palmer (Manchester)
+
+\item[Date]16th August 1995
+
+\item[Venue:]MRAO, Cambridge
+\end{description}
+
+\subsection{Summary}
+
+This report represents the views of the members of the Radio, MM and
+Submm SSG, as expressed at its second meeting, August 1995. The
+document is divided into three sections: Firstly, the progress made by
+Starlink since the last meeting is reviewed, and in particular the
+progress in implementing the recommendations of the first meeting are
+discussed:-- At the time of writing, 4 out of 10 items on last year's
+wish-list have been discharged, with 3 more planned for later this
+year. Secondly, the longer term needs of the community are discussed
+both in terms of the developments in instrumentation that are in the
+pipeline for the next few years, and in terms of attempting to predict
+how we might expect software and data reduction techniques to evolve
+away from current practices in the longer term. The most important
+first steps along this road were felt to be related to exploring the
+usage of data visualisation techniques. Finally, recommendations are
+given on general matters concerned with the organisation of software
+development and the SSGs, and a detailed software wish-list for the
+next 12 months is provided at the end of the document, which has been
+concatenated this year, at the request of Starlink. The wish-list
+contains 13 items, of which 4 have been carried forward from last
+year's list, and 3 of those 4 are already in Starlink's software plan
+for completion in 1995. Since some items require relatively little
+effort, and there are only 9 new items, the wish-list is felt to be in
+line with the number of users represented by this SSG ($\sim$
+200-300).
+
+\subsection{Progress since last meeting}
+
+The SSG reminds Starlink that the radio/mm/submm community still
+represents around one-sixth of the UK astronomical community (see
+report of last year's radio/submm SSG meeting), and so should be
+provided with roughly one staff-year per year of applications
+programmer effort, for as long as the current Starlink staffing levels
+are maintained. Bearing this in mind, we review Starlink's progress in
+the last 12 months, dealing with the detailed wish-list, item by item.
+
+In summary, out of last year's total of 10 wish-list items: 4 have
+been completed; 3 are planned for release by the end of 1995; 2 have
+not been attempted; and 1 was cancelled (AIPS++ workshop). Provided
+the goal of releasing the 3 planned items is met, the SSG felt that
+this is a satisfactory result, but would prefer to see all of the
+items on this year's list carried out. Furthermore, one of the
+released items (SPECX) still contains a major bug, which should be
+fixed at the earliest opportunity.
+
+The SSG also decided that it should represent at least the
+long-wavelength part of the ISO community. These users would currently
+be dispersed among several SSG's, and their voices may not be heard in
+unison by Starlink. This was felt to be within the remit of this SSG,
+since ISO will work out to a wavelength of 200$\mu$m, which is in the
+submm part of the spectrum. The validity of this move is backed by
+SGP44, which clearly states that ``SSGs and the subjects they cover
+may be modified'' (SGP 44.1 section 3.9).
+
+\subsubsection{Last year's radio wish-list}
+
+\begin{enumerate}
+\item {\bf AIPS support.} Starlink reported that the responsibility for AIPS 
+support was given to David Berry (Manchester), but this has now passed
+to John W. Palmer (Manchester), although the change was not publicised
+widely. JWP is preparing an installation guide and will also be
+available to provide user support in the near future. The SSG felt
+that Starlink had satisfactorily met the requirements of this
+item. However, ongoing support for AIPS remains the radio community's
+top priority in the foreseeable future, and the SSG requests Starlink
+to advertise John Palmer's role to those sites running AIPS.
+
+\item {\bf AIPS++ awareness.} Starlink reported that RFWS attended the AIPS++ 
+Steering Committee Review (December 1994), and reported on the
+reorganisation of the project that followed the review. Progress
+continues to be slow, with a full release not now expected before the
+year 2000. AIPS++ development is now being targeted towards supporting
+particular instruments, however, and some of the software that is
+being developed for the Green Bank Telescope (e.g. for on-the-fly
+single dish mapping) may be of interest to the UK community on a
+shorter timescale. The SSG felt that Starlink had satisfactorily met
+the requirements of this item.
+
+\item {\bf AIPS$++$ Workshop.} This workshop did not take place due to the late
+running of the AIPS$++$ project. The SSG felt that maintaining a
+watching brief on AIPS$++$ progress was all that was needed from
+Starlink at this stage.
+
+\item {\bf DIFMAP.} Starlink reported that the author of the Caltech
+VLBI DIFMAP mapping package had agreed to write a short article for
+the next Starlink Newsletter, after which it would assess likely usage
+of this package.  Unfortunately, development of DIFMAP appears to be
+effectively frozen at present, although this may change if further
+funding is found. The SSG felt that it was regrettable that this
+simple item had taken so long to complete, but if the outcome of the
+response to DIFMAP proved favourable, then it would request Starlink
+to distribute this to interested sites.
+
+\item {\bf IRAS90.} Starlink reported that this item, which requested
+improvements in the ability to read data into IRAS90, had not yet been
+dealt with, although it was in the plan for completion by mid-November
+1995.  The SSG hoped that this target would be met, and would meantime
+keep this item on the wish-list.
+
+\end{enumerate}
+
+\subsubsection{Last year's mm/submm wish-list}
+
+\begin{enumerate}
+\item {\bf GSD file reading.} Starlink reported that this request had been
+satisfactorily met, in that Unix versions of SPECX and JCMTDR now
+include code for reading and writing GSD format data files. The SSG
+agreed, with the reservations outlined in the next paragraph.
+
+\item {\bf Unix SPECX.} Starlink reported that SPECX had been ported to Unix,
+and was now supported under Solaris and OSF. The SSG agreed that the
+port had been completed, but felt that at least one major bug still
+exists in all Unix versions of SPECX, associated with the handling of
+HDS data files in Unix: open work files can be corrupted in some
+circumstances if an untidy exit to the program is made. In addition,
+access to files containing large data cubes can be extremely slow and
+could be significantly shortened. These two matters have been
+transferred to this year's wish-list.
+
+\item {\bf Exportable versions of SPECX and JCMTDR.} Starlink reported that
+the packaging of JCMT software to provide standalone versions of SPECX
+and JCMTDR, which can be made available to non-UK observers to run at
+their own institutions, is also being addressed. Starlink is
+developing a WWW-based software distribution system which will allow
+users to select software items by using an interactive form; they will
+then receive the specified items and all the necessary dependent
+libraries packaged as a distribution kit, in a single network file
+transfer.  This system is now running in test mode, with an expected
+release date of mid-November. Before JCMTDR can be packaged in this
+way, an alternative must be found for a NAg library routine which
+cannot be included in the distribution for copyright reasons. The SSG
+felt that Starlink appeared to be making good progress in this
+direction, and looked forward to the release of this facility.
+
+\item {\bf  Gaussian fitting.} Starlink reported that the provision of
+a general two-dimensional gaussian fitting procedure for JCMT data
+reduction has not been addressed, and is not in this year's software
+plan. The SSG regretted Starlink's decision to omit this item from its
+plans; and transferred this to the current year's wish-list, with the
+recommendation that the best place to include this facility may now be
+as a variation of the fitting procedure within the PISA
+package. Alternatively, an imitation of the AIPS routine JMFIT may be
+quicker to write.
+
+\item {\bf Extract\_Integrations.} Starlink reported that the provision of
+a Unix replacement for the NOD2 routine Extract\_Integrations has not
+been addressed, and is not in this year's software plan. The SSG
+regretted Starlink's decision to omit this item from its plans;
+however, since the user request for this item came from the submm
+polarimetry community, and since the JCMT polarimeter will be
+superseded by SCUBA next year, it was not felt that any software
+effort should now be expended in this direction.
+
+\end{enumerate}
+
+\subsection{Forward look}
+
+\subsubsection{Instrumentation plans for the next three years}
+
+The SSG reviewed the instrumentation plans of UK and other sites in
+order to identify the software requirements for the next few years.
+
+\begin{description}
+\item[Radio Astronomy]\mbox{}\\[-3.0ex]
+\begin{description}
+\item[VLBI]\mbox{}\\
+Several new developments are expected within the radio community which
+will lead to a significant increase in the amount of data to be
+reduced, particularly in the area of VLBI. Upgrades to the European
+VLBI Network (EVN/JIVE), including a new correlator at Dwingeloo,
+receiver upgrades elsewhere, and a new recording system, will provide
+incoming data rates approaching 1 Gbit/sec, with observers having to
+deal eventually with raw datasets of the order of 10 Gbytes per
+observation. This will clearly impact on the data reduction
+requirements of the community.  The VLBA network is now operating in
+production mode and is in use by UK observers; there is also the
+prospect in the next few years of satellite VLBI experiments, and of
+mm-band VLBI becoming available to the UK.
+
+\item[Jodrell]\mbox{}\\
+The main priority is to equip MERLIN with 15~GHz receivers.  There is
+also a move towards frequency flexible operations with the forthcoming
+upgrade of the E-systems dishes to a VLA-type carousel system. Other
+MERLIN telescopes will be upgraded over the next few years. Once
+complete it should be possible to change between observing bands on
+timescales of minutes. The chief data reduction package remains AIPS.
+
+\item[MRAO]\mbox{}\\
+The prospects for the next 3 years include the CAT+, VSA and COAST
+instruments at Cambridge, to add to the continuing observation
+programmes of the Ryle Telescope. The software is in part locally
+written, but also uses AIPS.
+
+\item[Other sites]\mbox{}\\
+Data from the 151MHz Southern Sky Survey of the Mauritius Radio
+Telescope will begin to arrive for reduction at Durham. Whilst the
+telescope-specific software will be handled elsewhere, the software
+requirements of this group focus on the need for comparisons of
+all-sky survey data from different telescopes at different
+wavelengths.
+
+\item[Summary]\mbox{}\\
+All of these developments point to a large increase in the amount of
+data to be processed, and this will no doubt give rise to problems of
+its own, but the expectation is that most of the reduction will be
+done using the existing software packages.  Telescope sites will
+continue to develop local software for initial calibration and
+interference checking, but will then rely on AIPS and/or the Caltech
+VLBI package for subsequent processing. It is unlikely that AIPS++
+will be adopted to any significant extent during this period; indeed,
+one of the effects of the difficulties suffered by the AIPS++ project
+is that support at NRAO for Classic AIPS is now once again very
+strong, and its active life has almost certainly been extended until
+the end of the century. However, new reduction algorithms are unlikely
+to be added to Classic AIPS at this stage, and a watching brief on the
+AIPS++ project should be maintained. Development of the Caltech VLBI
+package, however, appears to be frozen at present, although this may
+begin again if funds become available.
+
+\end{description}
+
+\item[MM/Submm Astronomy]\mbox{}\\
+In the millimetre/submillimetre wavebands the major developments
+chiefly revolve around the expected delivery of 3 new receivers for
+JCMT -- SCUBA, RxB3 \& RxW.
+
+\begin{description}
+\item[SCUBA]\mbox{}\\
+The installation of the SCUBA receiver at JCMT is now expected to take
+place early in 1996. The software for SCUBA is under development at
+ROE and will be installed in Hawaii at the same time. Initial
+calibration will be carried out at the telescope, with raw data being
+stored in Starlink NDF file format. Software for subsequent off-line
+reduction will be in the form of an ADAM A-task, with reduced data and
+error information being exported either in NDF format or as FITS files
+for import to other packages. RFWS asked that Starlink be kept
+up-to-date with the progress of SCUBA software development, so that
+potential problems with interfacing to other Starlink software can be
+identified at an early stage. A standalone version of the off-line
+reduction package will be needed before long. In the longer term, an
+implementation of the DBMEM package for SCUBA is likely to be a
+requirement. Depending on the other committments of its author (JSR)
+at that time, programming support from Starlink may be required.
+
+\item[RxB3]\mbox{}\\
+The new Canadian receiver for the JCMT, RxB3, is also due for delivery
+in early 1996. This will be a new B-band receiver to replace the
+current RxB3i. This receiver will, however, just produce data in a
+format suitable for reduction by SPECX.
+
+\item[RxW]\mbox{}\\
+The third receiver due for delivery to JCMT in 1996 will be RxW, which
+is being built at MRAO. This is a dual C-band and D-band receiver,
+which is capable of producing higher sensitivity data than any
+previously available to the UK community at these frequencies. The
+data from this receiver will also be compatible with SPECX.
+
+\item[Kent]\mbox{}\\
+In the longer term, the University of Kent are building a (non-common
+user) receiver for the 800/900 GHz band which will be mounted on the
+Italian TIRGO telescope on the Gornergrat and on UKIRT. This receiver
+should produce SPECX format data. However, completion of this
+instrument is not expected for around 3 years. The arrangements for
+observing time will be along similar lines to that used for RxG at
+JCMT.
+
+\item[SCUBA-POL]\mbox{}\\
+There are also plans for adding a polarimeter to SCUBA to provide a
+continuum polarimetry capability, with software development being
+partly funded by ROE, QMW and the Japanese. However, there may be a
+need for a small amount of Starlink input into this in the
+future. This instrument is expected in around 2 years.
+
+\item[Heterodyne arrays]\mbox{}\\
+On a 3-5 year timescale, heterodyne array receivers, with a much
+increased data collection rate, will start to become available to UK
+astronomers. At this point enhancements to SPECX will be required, and
+other packages should be kept under review. In particular, techniques
+for dealing with large amounts of non-regularly spaced spectral line
+data may become available elsewhere: e.g. the IRAM data reduction
+package CLASS, and eventually, AIPS++.
+
+\item[Summary]\mbox{}\\
+The needs of the mm/sub-mm community over the next three years are
+likely to be satisfied largely by continued development of the
+existing packages. However, Starlink should remain aware of progress
+being made at non-UK telescopes.
+
+\end{description}
+\end{description}
+
+\subsubsection{The longer term view of software}
+
+Against the background of Starlink General Paper SGP42, the SSG was
+invited to envisage how it might like to see the software situation in
+5 years from now. By way of introduction, RFWS reviewed the progress
+that has been made since the first round of SSG meetings in setting
+out the Starlink software strategy for the next 3 years, as described
+in SGP42. One aspect of the new strategy relevant to this SSG is that
+Starlink will be concentrating software development effort in
+relatively narrow areas in future, while continuing to provide
+maintenance support for software developed within the UK. Starlink are
+however intending to provide a broader level of software distribution
+for UK astronomy, including more items from non-Starlink and non-UK
+sources. The current levels of manpower, in terms of support
+programmers, are expected to be maintained over the next 12 months.
+
+However, looking a little further forward into the future, the
+committee spent some time to see if anything could be said at this
+stage about how data reduction techniques in this field might evolve
+in the longer term. Current software is based on `old technology'
+using monolithic packages often developed for specialised jobs,
+sometimes with overlapping functionality, but largely independent of
+each other. User interfaces are command line or menu driven, although
+the use of GUIs is increasing; graphical output is supported by calls
+to underlying subroutine libraries.
+
+Two developments that are likely to become more important to users in
+this field are the emerging data visualisation products, such as AVS
+and IDL, and the new scripting languages, such as Tcl/Tk.  Experience
+with the visualisation tools is limited at present, but they would
+seem to lend themselves well to the analysis and understanding of the
+data structures that are produced in this area -- e.g. data cubes from
+submm spectral line mapping. It is possible that as these tools are
+brought into use, new ways of presenting and thinking about the data
+will follow.  Starlink are evaluating some of the current commercial
+products and expect to make some recommendations later this year. Some
+thought should be given on how best to export data from Starlink
+software (e.g. SPECX) to these packages.
+
+The new scripting languages, such as Tcl/Tk and PERL, are already
+becoming well known and are in daily use by some of the more adept
+users within the community. There was some discussion about how they
+can be applied to data reduction techniques; for instance by providing
+batch processing scripts for standard reduction procedures. Such
+scripts are already available (e.g. the AIPS pipeline for reduction of
+Merlin data) and are well liked by naive users; however, reservations
+about this were expressed.  It was agreed in the end that the ability
+to set up procedures for off-line processing and the ability to
+interact closely with the data are both essential requirements in data
+reduction.
+
+Another area of continuing interest to this SSG, which can involve the
+use of scripting languages, is that of observation
+scheduling. Flexible scheduling tools for SCUBA are being developed
+and will be made available to observers in due course.
+
+Database software is also important to members of this community
+(emphasizing the overlap in the interests of the various SSGs), and
+those involved in survey work will continue to need good database
+tools, providing efficient ways of accessing and analysing catalogue
+data.
+
+The final conclusion of this part of the discussion was that new data
+processing techniques are likely to be adopted by workers in this
+field, but that the requirements that can be foreseen at this stage
+are likely to be met by the existing and the emerging technology.  It
+was decided that the first steps in the new directions would best be
+served by exploring data visualisation techniques.
+
+\subsection{Priorities for the next 12 months}
+
+We have split our recommendations for priorities for the next 12
+months into general recommendations, and a detailed software
+wish-list, which is a prioritised list of the specific action items
+that emerged from discussions.  This year the wish-list has been
+concatenated into a single list for both radio and mm/submm
+astronomy. The committee feel that this is a relatively modest list
+for such a wide community, and hope that all of these items will be
+addressed by Starlink within the next twelve months, especially as
+many of them concern software vital to new receivers. Starred items
+are carried forward from last year.
+
+\subsubsection{General Recommendations}
+
+The following general recommendations emerged from the discussion;
+these are general points concerned with the organisation of software
+development and the SSGs.
+
+\begin{description}
+\item[Software management:]\mbox{}\\
+Some concern was expressed at how the responsibility for managing some
+of the main software items (SPECX and JCMTDR) has devolved.  In the
+case of SPECX, new developments are done by the author (RP) as time
+and other committments allow.  Preparation of the Starlink Unix
+distribution has been done in the past by HM, based at ROE; but
+maintenance of the `active' VMS version at the telescope, and of the
+ports to non-supported platforms (including SunOS) is now done by Remo
+Tilanus in Hawaii.  The committee would like to see clarification of
+the arrangements for management of these important packages, with
+Starlink taking responsibility for the coordination of effort, and
+communication between the various different parties.
+
+\item[Consultation and Communication:]\mbox{}\\
+For the SSGs to function effectively, input must be canvassed from as
+wide a user base as possible. Starlink should take the initiative by
+advertising the meetings and the membership of committees, and by
+issuing news items and posts to the uk.org.starlink.announce
+newsgroup, with requests for input before each meeting. Similarly
+Starlink should advertise the availability of the reports when they
+are posted on the WWW after the meetings. Documents should be
+available over the network in both HTML and compressed PostScript
+formats. The idea of a newsgroup, or Forum conference, devoted to the
+SSGs was discussed, but wasn't thought worthwhile unless interest is
+shown by users.
+
+\item[Documentation:]\mbox{}\\
+The SSG supports the progress made by Starlink in preparing on-line
+documentation for the Starlink Software Collection.  Cookbooks for
+JCMTDR and SPECX (already available) and the SCUBA software (required
+by early next year) should be included in the on-line documentation
+set.  A UK mirror site for the AIPS Cookbook WWW pages should be set
+up and advertised.
+
+\item[Software support:]\mbox{}\\
+Support for all currently available software should be continued. The
+most important non-Starlink item to this SSG is AIPS. Support for the
+installation and use of AIPS within the UK should be continued by
+Starlink. Details of the installation guide and other material in
+preparation by the support programmer should be distributed to all
+AIPS sites when they are available. The position of John Palmer as
+AIPS support person should be advertised. In addition, the watching
+brief on AIPS++ should be maintained.
+
+\end{description}
+
+\subsubsection{Wish-list for the next 12 months}
+
+\begin{enumerate}
+\item The SPECX bug concerned with the use of HDS files under Unix must be 
+fixed as soon as possible. The corruption of open work files after an
+untidy exit from the program is causing major problems.
+
+\item The SPECX problem of slow access when opening files containing large 
+data cubes should be addressed. According to Starlink this is not a
+difficult problem to overcome.
+
+\item Modifications are still required to allow the importing of
+general datasets into IRAS90. In addition the PREPARE application
+should be modified to accept any NDF file.
+
+\item Provision of a general two-dimensional, multiple component,
+gaussian fitting routine is still required by JCMT users. The best
+place to provide this may now be as an addition to the pisafit command
+within the PISA package.
+
+\item Standalone versions of SPECX and JCMTDR are needed as soon
+as possible. In the case of JCMTDR this requires finding alternatives
+to the use of a NAG routine.
+
+\item Starlink should include a `request for user interest' with the 
+next Newsletter's item about the Caltech DIFMAP package, and if there
+is sufficient response, distribute it to interested sites.
+
+\item A Unix version of the VMS FLUXES program, which uses the RGO
+ephemeris data, should be made available. This program is required by
+all continuum users of JCMT, and is currently run by users remotely in
+Hawaii.
+
+\item The AIPS cookbook should be included as part of the on-line
+documentation set.
+
+\item The recent `upgrade' to the parameter handling system of Kappa and
+Figaro should be `fixed' to the level of user-friendliness in the
+prompt defaults which existed previously.
+
+\item A suitable procedure should be found for exporting data from
+SPECX to commercial data visualisation packages. This would be the
+first step towards the long-term future.
+
+\item The amount of effort required for the conversion to Unix of the 
+program for performing maximum entropy deconvolution of IRAS data
+should be explored. If this is a matter of only 1-2 weeks' work, then
+it should be undertaken. This routine is still preferable to the IPAC
+alternative, which is to use the MCM method of Aumann et al (1990),
+and it was a facility lost in the move to Unix. The Chairman will
+ascertain its likely usage.
+
+\item The ability to specify pointing corrections within JCMTDR in
+terms of RA, Dec as well as azimuth and elevation should be
+provided. This will also be required by SCUBA.
+
+\item Some small level of support for importing ISO data into Starlink
+format may be required when ISO data starts to be available in late
+1995 or early 1996.
+
+\end{enumerate}
+{\small *Item carried over from last year's list.}
+
+\newpage
+\section{\xlabel{x-ray_astronomy_ssg_input}X-RAY ASTRONOMY SSG INPUT}
+
+\subsection{Membership}
+
+\begin{description}
+\item[Members:]\mbox{}\\
+Andrew Norton (OU)\\
+Anne Sansom (UCLAN)\\
+Bob Vallance (Birmingham)\\
+Coel Hellier (Keele)\\
+Colin Barber (Leicester)\\
+Hongchao Pan (Oxford)\\
+Jon Mittaz (MSSL)\\
+Michael Merrifield (Southampton)\\
+Mike Watson (chair, Leicester)\\
+Roderick Johnstone (Cambridge)
+
+\item[Also Present:]\mbox{}\\
+Rodney Warren-Smith (RAL)
+
+\item[Meeting date:]18th August 1995
+
+\item[Venue:]Department of Physics and Astronomy, Leicester University
+\end{description}
+
+\subsection{Overview}
+
+For the last 5 years or more ROSAT has been the dominant project for a
+large fraction of the UK X-ray Astronomy community. Science data
+analysis provision for ROSAT in the UK has focused on the ASTERIX
+package, supported primarily by Birmingham University but with some
+Leicester University involvement. Initially ASTERIX was all that was
+available in the UK for ROSAT data analysis, but the situation has
+changed markedly over the last couple of years as "foreign" packages
+such as IRAF/PROS and FTOOLS have matured and gained currency in
+several UK institutions.
+
+We are currently seeing the trend away from ASTERIX continuing and
+interest in alternate packages seems certain to increase over the next
+few years. There are currently three operational EUV/X-ray missions:
+ROSAT, ASCA and EUVE. Only ROSAT has a direct UK involvement, and only
+ROSAT data reduction is supported by ASTERIX, but there is substantial
+UK interest in the other two missions, and hence in the data analysis
+packages required to use the data (FTOOLS for ASCA and IRAF for EUVE).
+
+The next year will see the launch of two new X-ray missions: XTE and
+SAX.  Within the next 5 years these will be joined by Spectrum
+X-gamma, AXAF, Astro-E and XMM. There is UK involvement in Jet-X on
+Spectrum X-gamma, in AXAF, and in XMM, but only in the case of Jet-X
+is the UK in a position to influence strongly the science data
+analysis planning. FTOOLS seems certain to become the most important
+package over the next 5 years since XTE, SAX, many of the Spectrum
+X-gamma instruments, Astro-E and very possibly XMM will adopt an
+FTOOLS-based approach. AXAF software is likely to adopt a hybrid
+approach underpinned by IRAF/PROS developments but with some degree of
+compatibility with FTOOLS.
+
+Jet-X software developments are also adopting a hybrid approach, with
+FTOOLS and ASTERIX both taking a role, and much of the software effort
+devoted to ASTERIX at present is going into making the system fully
+FITS-compatible. This will effectively convert ASTERIX into a set of
+FTOOLS, and allow it to be used for the post-reduction analysis of
+data from a wide variety of missions.
+
+\subsection{Future Strategy}
+
+Given this background it is clear that the most important software
+developments for UK X-ray astronomy are likely to occur outside this
+country, and in particular at NASA's GSFC. The general feeling of the
+X-ray Astronomy SSG is that the UK cannot hope to compete in this area
+and that there is little point in continuing to develop ASTERIX as the
+'alternative' UK system with a full range of functionality, and
+interfaces to all relevant future data sources. This does not, of
+course, mean that ASTERIX should immediately abandoned. The UK
+investment in ASTERIX has been large over the last decade and ASTERIX
+itself has many features liked by users (some of which are absent or
+poorly presented in other packages). The question for the UK X-ray
+astronomy community is thus whether a cut-down version of ASTERIX
+which would preserve (and in the future develop) the best parts of the
+current system is a sensible option, and if so whether sufficent
+resources can be found to make this viable. No clear consensus on this
+issue emerged from the meeting of the X-ray Astronomy SSG, but the
+majority of the members are not supportive of further substantial
+development. The future of ASTERIX is, nevertheless, still being
+actively examined at Birmingham. We plan another meeting of the X-ray
+Astronomy SSG within the next 3 months to discuss this matter
+
+My personal\footnote{Mike Watson} footnote to this is simply to note
+that one can foresee an entirely different response from the UK
+community if the present generous level of support for X-ray astronomy
+software packages from agencies like NASA were to be drastically
+reduced, but until this happens I believe that we are taking the only
+sensible approach.
+
+The role that Starlink can, or should, play for the X-ray astronomy
+community over the coming years is thus less than clear, and the
+formal requests we make to Starlink, which are of rather general
+nature, reflect this uncertainty. In essence it was felt that the
+X-ray community had too many uncertainties to make long term strategic
+decisions about software: flexibility was the fundamental priority!
+
+\subsection{Formal requests to Starlink}
+
+The X-ray SSG makes two formal requests to Starlink:
+
+\begin{enumerate}
+\item Taking responsibility for the routine task of maintaining/installing
+the GSFC FTOOLS/XSELECT software on various platforms. The precise way
+this should work may require further discussion.
+
+\item To investigate the provision of a software package to produce sky
+maps/overlays of catalogued sources, possibly incorporating some of
+the well-developed display features (e.g. incorporated in ROSAT
+Standard Analysis Software. Important points to be considered include:
+
+\begin{itemize}
+\item which input catalogues should be supported (and in which formats)?
+(should this include pixel data such as the digital sky survey, APM
+data, NED extracts etc etc.)
+
+\item specification of astrometry information
+
+\item choice of display environment (several options supported?)
+\end{itemize}
+
+\end{enumerate}
+
+The X-ray SSG also considered the value to the X-ray community of
+various general software development areas. Its general views on these
+are summarised here:
+
+\begin{enumerate}
+\item {\label{xraySSG:PC}\bf LINUX.} LINUX development activity was
+not high on X-ray SSG's priorities.
+
+\item {\label{xraySSG:cl}\bf TcL/Tk.} Further work in this area to
+provide useful scripting tools was seen as being important.
+
+\item {\label{xraySSG:GUI}\bf GUIs.} The X-ray SSG recognized the clear
+need further to develop GUI interfaces to applications packages to
+provide a greater degree of commonality in user interfaces. Such
+activities are already underway for ASTERIX.
+
+\end{enumerate}
+
+\end{document}

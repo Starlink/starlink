@@ -1,0 +1,391 @@
+\documentstyle {article} 
+\markright{SGP/19.5}
+\setlength{\textwidth}{153mm}
+\setlength{\textheight}{220mm}
+\setlength{\oddsidemargin}{3mm}
+\setlength{\evensidemargin}{3mm}
+\pagestyle{myheadings}
+
+\begin{document}
+\thispagestyle{plain}
+\noindent
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill SGP/19.5\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf Starlink Project\\}
+{\large\bf Starlink General Paper 19.5}
+\begin{flushright}
+M D Lawden\\
+30 March 1987
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{10mm}
+\begin{center}
+{\Large \bf
+STARLINK SOFTWARE SUBMISSION}
+\end{center}
+\vspace{10mm}
+\section {INTRODUCTION}
+The definition, structure and management of the Starlink Software Collection is
+described in SGP/20 which should be read by everyone involved in the
+production of software for the Starlink project.
+The Collection is managed by the Starlink Software Librarian (username STAR) who
+decides where new software should be stored in the existing structure and who
+has editorial control of Starlink documentation.
+This paper describes the principles governing the preparation and submission of
+software for inclusion in the Collection.
+Such software should meet appropriate standards of programming, structure,
+completeness and documentation, and should be submitted by following the
+procedure described in section 4.
+\section {ELIGIBILITY FOR RELEASE}
+Everyone is encouraged to submit software of general utility for consideration
+for inclusion in the Collection.
+However, plans for writing such software should first be discussed with the
+Project Manager so that they can be coordinated with the overall plans.
+Software is selected for inclusion in the Collection by the Project Manager and
+the Librarian.
+Their selection is strongly influenced by the various Special Interest Groups
+who advise on the requirements of specific application areas.
+It is also desirable for the Collection to be limited to a reasonable size and
+to avoid unnecessary duplication.
+\section {DEVELOPMENT STANDARDS}
+Software should conform to the programming standards specified in SGP/16 and
+should be as modular as possible.
+It should be possible to store it at a single point in the STARLINK directory
+tree (see RLVAD::LADMINDIR:DIRMAP.LIS) although large or specialised items may
+be installed independently in their own top level directory.
+Associated Starlink Notes or Papers will be stored in DOCSDIR.
+The Librarian is responsible for deciding where your software is placed in the
+Starlink directory structure.
+He may wish to put it in a new subdirectory so do not assume it will go in an
+existing directory.
+He is also responsible for coordinating the use of logical names and global
+symbols defined in the Collection.
+You should discuss these topics with him before finalising software design and
+writing extensive documentation as they will affect your instructions for use
+and the names of directories and files.
+
+Software should be adequately documented and should include at least one
+Starlink User Note (this may refer to other documentation).
+Produce documentation in the form of RUNOFF files since these can be changed
+easily to provide a standard output format or to incorporate future changes
+(see SGP/28).
+Use the standard headers stored in DOCSDIR:SUN.RNO, etc.
+RUNOFF is described in the VAX RUNOFF manual and the Guide to Text Processing.
+Start every new sentence on a new line as this makes editing much easier.
+Although RUNOFF files are the preferred form of text documentation, do not be
+discouraged from including diagrams, illustrations, mathematical formulae or
+special notation in your documentation.
+You can leave space for anything that is more easily produced by other methods
+and the final master copy produced by hand by putting in the missing bits on
+the printed text.
+An alternative to RUNOFF is TEX/LATEX.
+These can produce a more elaborate output style and higher quality masters.
+Starlink recommends that you use LATEX and base your document on the standard
+headers in DOCSDIR called SUN.TEX, SGP.TEX and SSN.TEX.
+A disadvantage of TEX/LATEX is that documentation in this form is not easily
+viewed on a terminal.
+However, there is a clear trend towards using them and I think the advantages
+outweigh the disadvantages.
+The Librarian reserves the right to carry out minor editorial changes to any
+Starlink documentation you submit in order to make it conform to general
+Starlink standards.
+If you revise any existing Starlink documentation, copy the existing version
+from DOCSDIR and edit that so as to preserve any existing editorial changes.
+Do not use a private copy.
+\section {SUBMISSION STANDARDS}
+Installation instructions should be clear, simple, complete and unambiguous.
+Do not assume any special knowledge or insight on the part of the Librarian
+into the structure, relationships, dependencies or operation of your software.
+The installation should be a simple clerical operation as the Librarian is
+performing an administrative function, not a software development task.
+If there are any difficulties or complexities associated with the installation
+of your software, it is your responsibility to resolve them and present the
+Librarian with a simple task.
+
+Supply the Librarian with a list of everything that constitutes the package
+(including both disc files and external items such as paper diagrams), together
+with a clear breakdown into the following categories:
+\begin{itemize}
+\item required for use
+\item documentation
+\item required for support and development
+\end{itemize}
+For anything other than a simple program, explain the structure, relationships
+and dependencies of your software.
+Describe how to create an executable program or system from the source code.
+Everything needed must be provided or already be available in the Collection.
+If it is a simple `Compile-Link' operation, a set of clear and complete
+instructions is adequate.
+Otherwise, provide a command procedure to generate an executable system.
+Thus, the package submitted should be complete in the sense that someone in
+Australia (for example) can recreate the executable files from the source and
+libraries in the Starlink directories.
+
+Supply software in a form that is independent of private source and
+documentation development tools.
+
+Indicate the location of all relevant documentation and provide master copies of
+any supporting documentation, unless you provide a file which can easily be
+printed on a lineprinter or processed by LATEX for output on a laser printer.
+Include enough systems documentation to enable the Librarian to understand the
+structure and operation of your software and how to create a working system
+from your source code.
+
+A form has been designed to help you specify the required information.
+This is the STARLINK SOFTWARE ITEM SUBMISSION FORM (SSISF).
+A specimen is shown in Appendix A.
+They can be obtained from your local Site Manager or from the Librarian at RAL.
+The software you submit for release will comprise one or more software items.
+Fill in a separate SSISF for each item and send them, together with any
+necessary tapes, manuals or master copies, to the Librarian.
+Some notes to help you fill in this form are show in Appendix B.
+
+The Librarian will release your software by carrying out the procedure described
+in SSN/41.
+\section {SUPPORT STANDARDS}
+You should be prepared to support any software you submit for release.
+If you are unable to do this yourself, nominate someone else who is.
+Starlink staff cannot support other people's software except at an elementary
+level.
+If no support is provided, an item will be released (if at all) `as is' and
+designated `not supported' in the Starlink Software Index.
+Sometimes the importance of an item will force its release without support.
+\section {INSTALLATION PROBLEMS}
+Installation problems are usually caused by inaccurate, incomplete or ambiguous
+information.
+Please carefully check your own submissions for these faults.
+
+The problems which have caused more time-delay and frustration than any others
+have been:
+\begin{itemize}
+\item dependence on software which is not in the Collection.
+\item use of devices which are not available at all Starlink nodes.
+\item use of devices in a non-standard way.
+\item use of private documentation production systems.
+\item no instructions about how to generate a working program.
+\end{itemize}
+Often there are good reasons why the software was developed in this way, but you
+must understand that such software may simply not work when installed as
+Starlink software.
+Furthermore, the Collection is routinely distributed to non-Starlink VAX's.
+If your software does depend on some local system, submit this for installation
+in the Collection as a separate item in conjunction with your primary software.
+\section {SUMMARY}
+The steps required to prepare and submit software for the Collection are
+summarised below:
+\begin{enumerate}
+\item Coordinate your software development with the Starlink Project Manager and
+Software Librarian.
+\item Develop and implement your software in private directories, but be aware of
+the changes that will be required when it is installed in Starlink directories.
+\item Gather together all the information and material required by the Librarian.
+\item Complete a Starlink Software Item Submission Form for every item submitted.
+\item Submit the software and SSISF to the Librarian for release.
+\item Resolve any installation problems encountered by the Librarian.
+\item Support the software.
+\end{enumerate}
+\newpage
+\appendix
+\section {STARLINK SOFTWARE ITEM SUBMISSION FORM}
+Please read SGP/19 and the notes in Appendix B before attempting to complete
+this form.
+If the answer to a question is given in a supplied document, give a reference
+as the answer.
+If an answer is too long for the space provided, attach a separate sheet and
+identify the answer by the question number.
+Send the completed form to the Starlink Software Librarian at RAL.
+**************************************************************************************
+\begin{tabbing}
+10.X\=XXX\=\kill
+1.\>Title:\\
+\>Acronym:\\
+\\
+2.\>Names of:\\
+\>\>person submitting this item:\\
+\>\>anyone else who can answer technical queries:\\
+\>\>person responsible for support:\\
+\\
+3.\>With which Starlink staff have you been coordinating development of this
+software?\\
+\\
+\\
+4.\>Is it a New item:\hspace{30mm}Modification to old item:\\
+\>If it is a modification, what modifications have been made:\\
+\\
+\\
+\>Are there any other items which should be released in conjunction with this
+one?\\
+\\
+\\
+5.\>Specify completely the files/directories to be copied into Starlink
+directories:\\
+\\
+\\
+\\
+\\
+6.\>Specify any special environmental requirements:\\
+\>* Logical Name definitions:\\
+\\
+\\
+\\
+\\
+\>* Global symbol definitions:\\
+\\
+\\
+\\
+\\
+\>* Does this program run under a Starlink environment?\\
+\>* What version of VMS is it running under?\\
+\>* Does it use any special device drivers? (state)\\
+\\
+\\
+\\
+\>* Does it use any special devices, eg. Calcomp plotter? (state)\\
+\\
+\\
+\\
+\>* Any other unusual requirements?\\
+7.\>Does this item make use of any software (apart from VMS) which has not\\
+\>been installed in the Starlink Software Collection? (specify)\\
+\\
+\\
+\\
+\\
+8.\> Does this item use any graphics system (eg. GKS, FINGS, etc)? (specify)\\
+\\
+\\
+\\
+\\
+9.\>Is the ARGS or Ikon necessary for the proper use of this item?\\
+10.\>Is the Versatec necessary for the proper use of this item?\\
+11.\>Specify how to create the executable program or system:\\
+\\
+\\
+\\
+\\
+12. Specify how to execute the program or system:\\
+\\
+\\
+\\
+\\
+13. Specify any unusual or large resource requirements:\\
+\\
+\\
+\\
+\\
+14.\>Where is the documentation which supports this software?\\
+\>(eg. name of file holding this document, paper documents attached)\\
+\\
+\\
+\\
+\\
+15.\>Specify a test which can be carried out to verify that this\\
+\>item has been installed correctly and any test data needed.\\
+\\
+\\
+\\
+\\
+16.\>If relevant, specify a demonstration procedure that can be used to\\
+\>show off this item's capabilities to visitors.\\
+\\
+\\
+\\
+\\
+17.\>Installation procedure:
+\end{tabbing}
+\newpage
+\section {SSISF --- NOTES}
+These notes are meant help you complete the STARLINK SOFTWARE ITEM SUBMISSION
+FORM.
+They explain the purpose of the non-trivial sections and the type of
+information required.
+
+1. Specify a short descriptive title.
+Every item should also have a short single word descriptive name associated
+with it; this is the `acronym'.
+
+4. If the item has been released before, describe the changes made in this
+release.
+We also want to know any dependencies this item may have on any software not in
+the Collection.
+
+5. A key part of the installation process is the copying of files into Starlink
+directories from where you store them.
+Specify the location of the files you want released.
+The Librarian will normally decide which Starlink directories should receive
+them.
+He may decide to create one or more new Starlink directories, particularly for
+packages.
+
+6. The Librarian may not be aware of special environmental requirements of
+your software.
+If any other actions are required besides copying the files specified in
+section 5 in order to make your program usable, specify them here; examples of
+what we have in mind are specified on the form.
+
+7. If your software depends on other software that is not in the Collection it
+may not work when installed.
+If it does use such software, consider releasing it for the Collection.
+Remember that if your software proves difficult to install, it will be returned
+to you for action.
+The software contained in the Collection is specified in ADMINDIR:SSI.LIS and
+ADMINDIR:SSF.LIS.
+
+11. Give clear explicit instructions on how to create a working version of your
+program or system.
+You can write this explicitly, specify a command procedure, or point to some
+documentation that contains this information.
+
+12. You can point to supplied documentation.
+
+13. Can a normal user with normal quotas and privileges run your program or
+package?
+If not, what does he need?
+
+14. Software should not be included in the Collection unless it is documented
+to a standard such that another user can use your software successfully with no
+help other than the documentation or on-line support.
+If possible, your documentation should exist in one or more computer files in
+RUNOFF or LATEX format.
+These are the easiest forms to change and edit.
+The Librarian will normally generate a master copy and distribute copies of this
+as part of the release process.
+Do not submit files which depend on private libraries of macros (for instance). 
+Your file should be usable by the Librarian without knowledge of any other of
+your files.
+If your documentation cannot be prepared in this way (eg. it needs diagrams or
+the text is not available in a computer file), send a master of anything that
+needs to be added or copied.
+The Librarian should normally be the person to issue documentation associated
+with software items being released.
+
+15. It is comforting to be able to carry out a simple test on your software
+after it has been installed in Starlink directories to show that it gives the
+same results as it did when you ran it.
+Please provide us with such a test if you can, otherwise your software will be
+released (if at all) untested and marked `No Test Supplied' in our records.
+
+16. Visitors sometimes turn up and ask to be given a demonstration of
+`Starlink'.
+Usually what they want is a colourful, photogenic display of graphs or pictures
+of the `Tomorrows World' variety.
+Sometimes they actually want to see some serious analysis of astronomical data.
+The people who are caught on the spot on these occasions may have very little
+practical experience in actually running this kind of thing.
+The visitors are likely to go away wondering why such an expensive and powerful
+system doesn't seem able to do that much.
+If your program or package is suitable for such demonstrations we would
+appreciate it if you would take the trouble to put together some kind of
+demonstration that would be suitable for showing to visitors.
+It doesn't have to be exhaustive.
+Please help us to give Starlink a good image on these occasions.
+
+17. If no instructions are given the Librarian will copy the files you
+specified in section 5 into likely looking Starlink directories and expect
+your program to work immediately.
+If there is more to it than that and the problems have not been covered by
+answers to previous sections, specify here what the Librarian must do to
+install your software successfully.
+\end{document}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
