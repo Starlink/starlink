@@ -16,6 +16,9 @@
       is now 3-dimensional instead of 2-dimensional. A STOKES axis has
       been attached to the third pixel axis.
 
+   o  A new parameter called TRIMBAD has been added to POLCAL to enable 
+      the output cube to be trimmed to exclude any borders of bad pixels.
+
    o  POLBIN now chooses the bin locations so that the XY origin is always 
       placed at the corner of a bin
 

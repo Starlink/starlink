@@ -15,7 +15,7 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardocnumber}    {223.5}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {11th August 2000}
+\newcommand{\stardocdate}      {16th August 2000}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 2.1-5}
@@ -2860,10 +2860,10 @@ for NDF applications.
          OUT = NDF (Read)
       }{
          The name of the output 3D cube holding the Stokes parameters.
-         The x-y plane of this cube covers the overlap region of the
-         supplied intensity images. Plane 1 contains the total intensity.
-         The other planes contain either Q and U, or V, depending on the
-         value of parameter PMODE.
+         The x-y plane of this cube covers the overlap region of the 
+         supplied intensity images (but see parameter TRIMBAD). Plane 1 
+         contains the total intensity. The other planes contain either Q 
+         and U, or V, depending on the value of parameter PMODE.
       }
       \sstsubsection{
          PMODE = LITERAL (Read)
@@ -2979,6 +2979,12 @@ for NDF applications.
          fact that an image with a larger data range can tolerate a larger
          error in estimating its zero-point). The TOLS value supplied must
          be positive. [0.05]
+      }
+      \sstsubsection{
+         TRIMBAD = \_LOGICAL (Read)
+      }{
+         If a TRUE value is supplied, the bounds of the output data are
+         trimmed to remove any margins of bad pixels round the data. [FALSE]
       }
       \sstsubsection{
          VARIANCE = \_LOGICAL (Read)
@@ -6485,6 +6491,9 @@ catalogue), is always at the corner of a bin.
 \item The WCS information stored with the output cube created by 
 \htmlref{POLCAL}{POLCAL} now has three axes instead of two (the Stokes
 axis is now described in addition to the two spatial axes). 
+
+\item A new parameter called TRIMBAD has been added to \htmlref{POLCAL}{POLCAL} 
+to enable the output cube to be trimmed to exclude any borders of bad pixels.
 
 \item \htmlref{POLBIN}{POLBIN} and \htmlref{POLVEC}{POLVEC} can now
 optionally add RA and DEC columns to their output catalogues, so long as
