@@ -912,21 +912,24 @@ itcl::class gaia::GaiaContour {
 
       #  Number of contours to generate.
       itk_component add ncont {
-         util::LabelMenu $w.ncont \
-            -relief raised \
+         LabelEntryScale $w.ncont \
             -text "Number:" \
             -labelwidth 14 \
-            -valuewidth 20
+            -valuewidth 3 \
+            -increment 1  \
+            -resolution 1 \
+            -anchor w \
+            -show_arrows 1 \
+            -show_scale 1 \
+            -from 1 \
+            -to $itk_option(-maxcnt) \
+            -fix_range 1 \
+            -validate integer \
+            -value 5
       }
       pack $itk_component(ncont) -side top -fill x -ipadx 1m -ipady 1m
       add_short_help $itk_component(ncont) \
          {Number of contour levels to generate}
-      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
-         $itk_component(ncont) add \
-            -label $i \
-            -value $i
-      }
-      $itk_component(ncont) configure -value 5
 
       #  Type of generation.
       itk_component add ctype {
@@ -1002,6 +1005,7 @@ itcl::class gaia::GaiaContour {
    #  Generate contours levels.
    protected method generate_contours_ {args} {
       set ncont [$itk_component(ncont) get]
+      set ncont [min $itk_option(-maxcnt) $ncont]
       set method [$itk_component(ctype) get]
       set start [$itk_component(start) get]
       set incre [$itk_component(incre) get]
