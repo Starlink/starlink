@@ -31,4 +31,9 @@ v1.1-1 (November 2001):
    CVS control of the source, and fixes to things which broke under perl/OS
    upgrades.
 
+v1.1-2 (February 2003):
+   Modified so that scb.pl can run without write access to the 
+   SCB_BROWSER_TMP directory.  This will only work in cases where no
+   untarring of source files needs to be done of course.
+
 # $Id$

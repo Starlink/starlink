@@ -503,6 +503,7 @@ sub mkdirp {
 #     mkdir -p).  Any directories created are given the specified 
 #     access mode (in this respect it differs from the mkdir(1) command).
 #     Directories which already exist are not modified.
+#     The given access mode is not modified by the current mask.
 #     The routine exits using the 'error' routine if any of the creations
 #     fails.  The given access mode is not modified by the current umask.
 
@@ -513,6 +514,8 @@ sub mkdirp {
 #        Access mode (presumably in octal) for creation of new directories.
 
 #  Return value:
+#     1 if the directory was created, 0 if there was an error (in which
+#     case $! will be set)
 
 #  Notes:
 
@@ -547,16 +550,21 @@ sub mkdirp {
 #  any which don't already exist.
 
    my $element;
-   for (my $i = 0; $i >= 0;  $i = index ($dir, '/', $i+1)) {
+   my $ok = 1;
+   for (my $i = 0; ($i >= 0) && $ok;  $i = index ($dir, '/', $i+1)) {
       $element = substr $dir, 0, $i;
       unless (-d $element || $element eq '') {
-         mkdir $element, $mode or error "mkdir $dir: $!";
+         $ok &&= mkdir $element, $mode;
       }
    }
 
 #  Restore old umask.
 
    umask $umask;
+
+#  Return status.
+
+   return $ok;
 }
 
 

@@ -170,7 +170,7 @@ sub error;
 
 $tmpdir = $scbindex_tmpdir;
 rmrf $tmpdir;
-mkdirp $tmpdir, 0755;
+mkdirp $tmpdir, 0755 or error "mkdir -p $tmpdir: $!";
 
 #  Set up signal handler.  Note this is not entirely safe since tidyup
 #  does non-trivial work and so (probably) calls some non-reentrant 

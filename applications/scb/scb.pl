@@ -108,7 +108,10 @@
 
 #  History:
 #     14-OCT-1998 (MBT):
-#       Initial revision.
+#        Initial revision.
+#     13-FEB-2003 (MBT):
+#        Modified so that it can operate without writable scratch
+#        directory if it doesn't need to untar any files.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -1151,11 +1154,15 @@ sub get_module {
 
    return (0) unless ($locname);
 
-#  Set up scratch directory.
+#  Set up scratch directory, if we can (if creation of the directory
+#  fails, note this fact - everything will work as long as we don't
+#  need to unpack tar files).
 
-   $tmpfiles = 1;
-   mkdirp $tmpdir, 0777;
-   pushd $tmpdir;
+   $hastmp = mkdirp $tmpdir, 0777;
+   if ($hastmp) {
+      $tmpfiles = 1;
+      pushd $tmpdir;
+   }
 
 #  Interpret the first element (before the '#' sign) of the location as 
 #  a package or symbolic directory name.  If it is a symbolic directory,
@@ -1190,9 +1197,11 @@ sub get_module {
 
 #  Tidy up.
 
-   popd;
-   rmrf $tmpdir;
-   $tmpfiles = 0;
+   if ($hastmp) {
+      popd;
+      rmrf $tmpdir;
+      $tmpfiles = 0;
+   }
 
 #  Return successful exit code.
 
@@ -1299,9 +1308,14 @@ sub extract_file {
 #  If required file doesn't exist, then extract it and recurse.
 
    else {
-      tarxf "$head$tail", $tarcontents unless (-r $tarcontents);
-      extract_file "$tarcontents$rest", $package;
-      unlink $tarcontents;
+      if ($hastmp) {
+         tarxf "$head$tail", $tarcontents unless (-r $tarcontents);
+         extract_file "$tarcontents$rest", $package;
+         unlink $tarcontents;
+      }
+      else {
+         error "No write access to scratch space $scb_tmpdir";
+      }
    }
 }
 
@@ -1657,8 +1671,10 @@ sub tidyup {
 
 #-
 
-   chdir "/";
-   rmrf $tmpdir if ($tmpfiles);
+   if ($hastmp) {
+      chdir "/";
+      rmrf $tmpdir if ($tmpfiles);
+   }
 }
 
 
