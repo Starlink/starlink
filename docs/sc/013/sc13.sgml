@@ -92,13 +92,15 @@
 
 <manualtype type=other>Cookbook
 
-<softwareversion>[software-version]
+<!-- <softwareversion>[software-version] -->
 
 <docnumber>13
 
 <history>
 <version author=ng date='22-DEC-1998' number=1>Last LaTeX version
 <change author=ng date='14-JUN-2000'>Conversion to SGML
+<change author=ng date='20-Jun-2000' versionid='v1.1'>Incorporating
+comments from others.
 </history>
 
 <docbody>
@@ -136,7 +138,7 @@ included references are worth pursuing.
 
 <p>Although the topics are chosen for their relevance to theoretical
 work (and for the purposes of this text, I'm taking the term to
-include all who develop their own modelling codes, a good proportion
+include all who develop their own modelling codes,) a good proportion
 of the information should be of interest to 
 all of the astronomical computing community.
 
@@ -198,13 +200,19 @@ aspects.
 and
 <url>http://star-www.maps.susx.ac.uk/help/4ltrwrd/unixman.html</url>
 
-<p>There are numerous books on Unix.  Two which seem to be at the right
-level are <cite/Unix Shells by Example> <citation/quigley> and
+<p>There are numerous books on Unix.  Two which seem to be at the
+right level are <cite/Unix Shells by Example> <citation/quigley> and
 <cite/Unix in a Nutshell> <citation/nutshell>.  Both cover the Bourne
-and~C shells (by the way, let me put in a plug for <code>bash</code> as a
-usable shell, as it includes all the best bits of the Bourne and~C
-shells), plus other utilities such as <code>sed</code> and <code>awk</code>
-(see <ref id='s.sedawk'/>).
+shell (<code>sh</code>) and the~C shell (<code>csh</code>), plus other
+utilities such as <code>sed</code> and <code>awk</code> (see <ref
+id='s.sedawk'/>).  By the way, let me put in a plug for
+<code>bash</code> as a usable shell, as it includes all the best bits
+of the Bourne and~C shells.  The only disadvantage of bash is that
+Starlink has, to some extent, standardised on <code>csh</code>, so
+that setup scripts, for example, are designed to work with
+<code>csh</code> along; this is not often a real problem, since these
+scripts are generally simple enough that you can duplicate their
+effects `by hand'.
 
 <p>You will occasionally see references to unix manual pages followed by
 a number.  This indicates which section of the manual the
@@ -218,6 +226,7 @@ and lists all those commands which include a particular word in their
 short description.
 
 <subsect id='s.editors' export>Editors
+<update versionid=v1.1>Expanded the description of vi</update>
 
 <p>One of the aspects of working on Unix which you'll have to deal with
 pretty early in your contact with it, is which editor to use.  An
@@ -228,7 +237,7 @@ the tool you'll use more than any other.
 you're feeling understimulated, you can discuss the matter with your
 officemates (don't get blood on the machines, though, and remember to
 wash and dry your thumbscrews carefully after use -- you'll need them
-again when you discuss programming languages-- see
+again when you discuss programming languages -- see
 <ref id='s.progs'/>).
 
 <p><docxref doc=sun170 text='SUN/170'>, <cite>Editors on Unix</cite>, is an
@@ -249,28 +258,36 @@ typing <code>C-h C-t</code> (that's
 control-H, control-T), plus extensive documentation behind <code>C-h
 C-i</code>.  Leave emacs with <code>C-x C-c</code> (obvious, really).
 
-<p>Vi is another favourite.  It is indeed very powerful, but very much an
-acquired taste.  Its main advantage, I feel, is that it's available on every
-Unix system since the Ark, so if you can use vi, you can work on
-whichever Unix system you find yourself.  The main disadvantage is
-that it is exceedingly unintuitive.
-There's quite a lot of help available for
-vi (it needs it, after all), but not, oddly enough, in the manual page,
-which describes in elaborate detail how to start up vi, but
-not what to do once you succeed.  You'll find a good introduction to
-vi in Chapter~6 of the <cite>Solaris 2.6 Advanced Users' Guide</cite>,
-and in Chapter~2 of the old <cite>SunOS 4 Documentation Tools</cite> manual,
-and probably in the corresponding manual for any other Unix you use
-(don't worry about these being out of date, by the way, vi
-doesn't change much...).
+<p>Vi is another favourite.  It is indeed very powerful, but rather
+more of an acquired taste.  An advantage of vi is that it's small, and
+therefore quick to start up -- this makes it useful if you want to
+make a quick change to a file, or make similar changes to a number of
+files, and it makes it useful as a editor for Pine, or any other mail
+program.  An even bigger advantage of vi, however, is that it's
+available on every Unix system since the Ark, so if you can use vi,
+you can work on whichever Unix system you find yourself.  The main
+disadvantage is that it is exceedingly unintuitive.  There's quite a
+lot of help available for vi (it needs it, after all), but not, oddly
+enough, in the manual page, which describes in elaborate detail how to
+start up vi, but not what to do once you succeed.  You'll find a good
+introduction to vi in Chapter~6 of the <cite>Solaris 2.6 Advanced
+Users' Guide</cite>, and in Chapter~2 of the old <cite>SunOS 4
+Documentation Tools</cite> manual, and probably in the corresponding
+manual for any other Unix you use (don't worry about these being out
+of date, by the way, vi doesn't change much...).  Online introductions
+to, and references for, vi include the <webref
+url='http://unixhelp.ed.ac.uk/vi/ref.html' >the unixhelp
+manual</webref>. <!-- FIXME: add the other vi references I've found
+and the ones Mark suggested. -->
 
-<p>Leave vi by typing <code>:q!</code> (if it beeps at you, or if those
-characters simply appear in the typing buffer on screen, try pressing
-escape once or twice first).
-By the way, it's pronounced `vee-eye', not `vye': pronounce it the
-wrong way and you'll lose all your credibility (of course, if you know
-the correct way to pronounce it, you'll lose all credibility with a
-different set of folk -- your choice).
+<p>If you want to leave vi without saving what you've (accidentally?)
+typed, you can do so by typing <code>:q!</code> (if it beeps at you,
+or if those characters simply appear in the typing buffer on screen,
+try pressing escape once or twice first).  By the way, it's pronounced
+`vee-eye', not `vye': pronounce it the wrong way and you'll lose all
+your credibility (of course, if you know the correct way to pronounce
+it, you'll lose all credibility with a different set of folk -- your
+choice).
 
 <p>For VMS fans, there's <code>jed</code>, which is a simple and fairly sane
 editor which includes an emulation of the EDT editor of old.  It's
@@ -419,6 +436,16 @@ VAXes and older Crays use IEEE.  I'll also limit what I say to single
 precision; exactly the same issues arise with double precision, but
 you can sweep them under the carpet for longer.
 
+<p>The IEEE standard leaves it open to chip manufacturers to decide
+the order in memory of the four or eight bytes of a floating point
+number.  This is denoted by the endian-ness (or `bytesex') of the machine.
+Alpha and Intel chips are little-endian; Sparcs, the
+Motorola 68k family used in Macs, and Motorola PowerPC chips, are
+big-endian.  This generally does not matter if you stick to a single
+platform (other than in the context of programs such as those
+described in <ref id=a.fpp.c/>), but it makes a difference if you want
+to share raw data files (see <ref id=ss.io/>) between architectures.
+
 <subsubsubsect id='s.accuracy'>Accuracy
 
 <p>The central insight is that <em>you cannot represent an infinite
@@ -441,7 +468,7 @@ shown in table~<ref id='f.fp'/>.
 IEEE floating-point representations of numbers. 
 This table is adapted from table~2--3 in <citation/sunncg> and figure~1.3.1
 in <citation/nr>, which have fuller discussions of the issues here.  For
-<m>b</m> and <m>b-1</m> see the text.</caption>
+discussion of <m>b</m> and <m>b-1</m> see the text.</caption>
 <tabular frame=none>
 <tgroup cols=4>
 <colspec align=right>
@@ -450,7 +477,7 @@ in <citation/nr>, which have fuller discussions of the issues here.  For
 <colspec>
 
 <tbody>
-<row><entry><m>s</m> <entry><m>e</m> <entry><m>m</m> 
+<row><entry><entry><m>s</m> <entry><m>e</m> <entry><m>m</m> 
 <row><entry><m>1 ={}</m><entry>0<entry>0 1 1 1 1 1 1 1<entry>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 <row><entry><m>2 ={}</m><entry>0<entry>1 0 0 0 0 0 0 0<entry>0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
 <row><entry><m>3 ={}</m><entry>0<entry>1 0 0 0 0 0 0 0<entry>1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
@@ -496,13 +523,17 @@ factor<m>2\epsilon</m> of the larger one, the shift will push the number
 right off the end of the mantissa, and contribute nothing to the sum.
 You can easily confirm that <m>2^{24}=16777216.0\oplus1.0=2^{24}</m>.
 
-<p>The immediate practical consequence of this is that if you are adding
+<p>The immediate practical consequence of this is that if, in the
+bowels of some calculation, you are adding
 up many small numbers (doing an inner product for very large vectors,
 for example), then the final total may be grossly inaccurate if you've
 fallen into this trap.  Similarly, if you are subtracting numbers
-which are almost equal, the subtraction may allow all or most of the
+which are almost equal, perhaps in the course of debiasing or removing
+some DC offset, the subtraction may allow all or most of the
 leading accurate digits to cancel, leaving the result to be determined
-by digits possibly heavily contaminated by roundoff.  Consider the simple
+by digits possibly heavily contaminated by roundoff.  [<ref id=ta.rw/RW>]
+
+<p>Consider the simple
 calculation <m>ab-ac</m>, with <m>a\approx1.000244</m>,
 <m>b\approx1.000220</m> and 
 <m>c\approx1.000269</m>. 
@@ -524,37 +555,79 @@ closely related to the common problem of calculating the discriminant
 <m>b^2-4ac</m> of the quadratic formula, when the quadratic is nearly
 degenerate.
 
-<p>These problems are demonstrated in the short program <code>fpdemo.c</code>
-in <ref id='a.fpdemo.c'/>.  Note that the numbers <m>a=1+1/2^{12}</m>, 
-<m>b=1+(1-)/2^{12}</m> and <m>c=1+(1+)/2^{12}</m> are (a) specifically
-chosen to 
-demonstrate the effect, and (b) are calculated within the program,
-rather than being initialised from the decimal representations
-1.000244, and so on.  If the latter were not true, then the
-improvement in relative error would disappear, since all precision
-would have been lost in this initialisation.
+<p>These problems are demonstrated in the short program
+<code>fpdemo.c</code> in <ref id='a.fpdemo.c'/>.  Note that the
+numbers <m>a=1+1/2^{12}</m>, <m>b=1+(1-)/2^{12}</m> and
+<m>c=1+(1+)/2^{12}</m> are (a) specifically chosen to demonstrate the
+effect, and (b) are calculated within the program, rather than being
+initialised from the decimal representations 1.000244, and so on.  If
+the latter were not true, then the improvement in relative error would
+disappear, since all precision would have been lost in this
+initialisation.  
 
-<p>These problems are unfortunately both easy to run
-into, and hard to notice if you're not in the habit of looking for
-them whilst writing your code.  A brute-force way around them is to do
-sensitive parts of your calculation in double precision.  If you are 
-doing the calculation in double precision and still running into
-the problem, then you will have to rearrange the calculation somehow,
-to contain the loss of precision.<note>For example, appendix~E of
-<citation/sunncg> displays `Kahan's summation formula', which allows you
-to perform a large sum without losing precision in the manner
-described above.
-</note>
+<p>These problems are unfortunately both easy to run into, and hard to
+notice if you're not in the habit of looking for them whilst writing
+your code.  A brute-force way around them is to do sensitive parts of
+your calculation in double precision.  If you are doing the
+calculation in double precision and still running into the problem,
+then you will have to rearrange the calculation somehow, to contain
+the loss of precision.<note>For example, appendix~E of
+<citation/sunncg> displays `Kahan's summation formula', which allows
+you to perform a large sum without losing precision in the manner
+described above.</note>Note, however, that a compiler's optimiser can
+frustrate your efforts here, if you've given it a sufficiently high
+optimisation level that it starts reorganising your code: in general
+<m>(a\oplus b)\oplus c \neq a\oplus (b\oplus c)</m>, and <m>a\ominus
+b\oplus(b\ominus c)\neq a\ominus c</m>, but a high optimisation level
+may instruct the compiler to ignore this fact, which can be disastrous
+for the accuracy of your code.  Moral: make sure you know what the
+various optimisation levels actually do before you invoke them.
 
-Note, however, that a compiler's optimiser can frustrate your efforts
-here, if you've given it a sufficiently high optimisation level that
-it starts reorganising your code: in general <m>(a\oplus b)\oplus c
-\neq a\oplus 
-(b\oplus c)</m>, and <m>a\ominus b\oplus(b\ominus c)\neq a\ominus c</m>, but a
-high optimisation level may instruct the compiler to ignore this fact,
-which can be disastrous for the accuracy of your code.  Moral: make
-sure you know what the various optimisation levels actually do before
-you invoke them.
+<p>As alluded to above, it is generally possible to sweep accuracy
+problems under the carpet by using double-precision floats (which
+take up eight bytes of storage rather than four, and have a range of
+??? and machine epsilon of ???<!--FIXME: add d.p. figures-->); on some
+platforms such as Solaris and Compaq, with the manufacturer's
+compilers, it is possible to use quadruple precision.  You should not
+use double or quadruple precision automatically, however, for a
+variety of practical and principled reasons.
+
+<p>Firstly, if your program already suffers from rather prodigal use
+of memory (ie, has very large arrays), then the doubling in the size
+of real arrays will only make the problem worse and, by probably
+increasing the amount of swapping, might make your program
+significantly slower.
+
+<p>Secondly, although there are some issues to do with the relative
+speed of single- and double-precision calculations, these are probably
+not significant enough to be worth worrying about in all but the most
+long-running codes, and in any case would generally be swept up by the
+compiler (I'd welcome any correction or amplification on this
+point).<note>There used to be an issue here in that all of K&amp;R~C's
+floating-point operations were defined to be done in double-precision
+-- this made things easy for compiler writers, at the expense of
+runtime.  This is no longer true in ANSI~C.</note>
+
+<p>Thirdly, if your results change if you switch to
+double-precision, then there is an accuracy problem in your code,
+which would probably bear some investigation.  If there is some part
+of your code which genuinely requires the extra precision -- say
+because you have to add numbers of hugely different scale in
+accumulating a large inner product -- then there is not much you can do
+about it, and that part of your code, at least, must have the extra
+precision.  Failing such an explanation, however, you can regard such
+behaviour as a miner's canary, indicating <em/some> potential problem
+with your code, which you might benefit from investigating further.
+
+<p>Fourthly, remember that some algorithms are designed to work with
+single precision, and will no longer work properly if you
+search-and-replace <code/double> for <code/float> or <code/real*8> for
+<code/real*4>.  As just one example, one of the Numerical Recipes
+algorithms (<code/svdcmp>) includes a convergence test of,
+essentially, <code/if (val+err==val)>.  Whatever the merits or
+otherwise of this as a test, it is a cheap way of establishing whether
+<code/err> has reached machine precision, which will not work in the
+expected way if <code/val> and <code/err> are double precision.
 
 <p>For further details on floating point representation, see, for example
 <citation/hauser96>, and informal but very useful discussions (both
@@ -719,7 +792,7 @@ strength of their optimisers, so that it is both easier <em>and</em>
 profitable for Fortran compilers to produce very fast code.
 
 <p>Though~C's loop semantics are troublesome, it is really the pointer
-type which causes a lot of the trouble-- since a pointer is little
+type which causes a lot of the trouble -- since a pointer is little
 more than an address, the compiler can have little clue what the
 programmer is aiming to do with it, and so has little choice but to
 make a literal translation of the~C code into assembler.
@@ -746,14 +819,41 @@ computing, see the book <cite>High Performance Computing</cite>
 are available at all sites.
 
 <subsubsect id='s.fortran77'>Fortran 77
+<update versionid=v1.1>Added pointers to Fortran standard document.</update>
 
-<p>Fortran~77 is the principal current Fortran standard, replacing
-earlier ones such as Fortran~IV and Fortran~66.  There are several
-dialects of Fortran, containing various vendors' language extensions,
-but the only extensions which are usually portable are those in VAX
-Fortran, which includes the <code>enddo</code> statement for
-terminating do-loops, and the <code>%val()</code> function which is
-necessary to intermix Fortran and~C code (see <ref id='s.candf'/>).
+<p>Fortran~77 is probably the dominant current Fortran dialect,
+replacing earlier standards such as Fortran~IV and Fortran~66<note>A
+statement like that can't be made without some qualification.
+Depending how you added it up, you could probably make a case that old
+Fortran dialects probably have more code actually running on CPUs,
+since many heavily-used libraries were written a long time
+ago.</note>.  There are several dialects of Fortran, containing
+various vendors' language extensions, but the only extensions which
+are usually portable are those in VAX Fortran, which includes the
+<code>enddo</code> statement for terminating do-loops, and the
+<code>%val()</code> function which is necessary to intermix Fortran
+and~C code (see <ref id='s.candf'/>).
+
+<p>The <webref url='http://www.fortran.com/fortran/F77_std/rjcnf.html'
+>standards document for Fortran~77</> is not exactly bedtime reading,
+but can be quite useful when you have forgotten details of syntax,
+especially to make sure what you are writing is correct rather than
+just allowed by the compiler you are using at the time.  As an
+introduction to Fortarn~77, I've heard good things about
+<citation/metcalfsometime>. [<ref id=ta.mbt>MBT</ref>]
+
+<p>Dynamic memory allocation in Fortran: 
+How about a section on hacking dynamic memory allocation in fortran 77,
+since it's the one thing that you really can't do if you stick to the
+standard?  I don't know whether it makes sense to go into detail, but it
+could be useful to mention what the options are, e.g. vaxisms 
+(or other non- standard constructs) and where you can expect 
+them to be supported, using Starlink CNF, writing your own fortran 
+wrapper for malloc, DIY allocation from a statically allocated 
+common block.  On the other hand it's a bit of a can of worms,
+perhaps it's getting a bit specific for a document like this. (MBT)
+<!-- FIXME: section on F77 memory allocation -->
+
 
 <p>There is a large number of introductions to Fortran, but not, I
 believe, a single preeminent one.  The
@@ -768,7 +868,6 @@ Fortran, which is well-covered at the
 which includes several Fortran FAQs.
 
 <subsubsect id='s.fortran90'>Fortran 90/95
-
 
 <p>Almost immediately after Fortran77 was standardised, work began on
 its successor.  Although this project was named Fortran~8X, the work
@@ -824,12 +923,12 @@ and C.  See <ref id='s.candf'/>.
 
 <subsubsect id='s.c'>C
 
-<p>There are hundreds of books on~C, but the only <em>essential</em> one is
-the Kernighan and Ritchie book <citation/kr> (also known as just `K&amp;R').  This is
-a very short book, by the authors of the language, which combines a
-tutorial introduction with a detailed reference to the language and
-its standard libraries.  I believe it's the only~C book you'll ever
-need.
+<p>There are hundreds of books on~C, but the only <em>essential</em>
+one is the Kernighan and Ritchie book <citation/kr> (also known as
+just `K&amp;R').  This is a very short book, by the authors of the
+language, which combines a tutorial introduction with a detailed
+reference to the language and its standard libraries.  I believe it's
+the only~C book you'll ever need.
 
 <p>The book's compression makes it possible, and even advisable, to read
 it from beginning to end.  It avoids the bloat found in many other~C
@@ -858,14 +957,15 @@ suggestions in <docxref doc=sgp4 text='SGP/4'>.
 <p>The~C language as originally designed by Kernighan and Ritchie was
 standardised as ANSI-C in 1990 (K&amp;R 2nd edition describes the
 latter).  This standard is currently being revised by an ISO working
-group with the memorable name
-<webref url='http://www.dkuug.dk/JTC1/SC22/WG14/'>ISO/IEC JTC1/SC22/WG14~--~C</webref>.
-One of the motivations to the work is to provide better support for
-floating point calculations in~C, such as defining a standard
-interface to the IEEE floating point exceptions.
+group with the memorable name <webref
+url='http://www.dkuug.dk/JTC1/SC22/WG14/'>ISO/IEC
+JTC1/SC22/WG14~--~C</webref>.  One of the motivations to the work is
+to provide better support for floating point calculations in~C, such
+as defining a standard interface to the IEEE floating point
+exceptions.
 
-<p>The excellent
-<webref url='http://www.eskimo.com/%7Escs/C-faq/top.html'>C FAQ</webref>
+<p>The excellent <webref
+url='http://www.eskimo.com/%7Escs/C-faq/top.html'>C FAQ</webref>
 contains <em>substantially</em> more than you realised you wanted to
 know about~C.  It contains detailed discussions of both common and
 arcane problems.
@@ -899,8 +999,8 @@ object-oriented approaches mean that old programs can use new code
 same).
 
 <p>Of course, both of these points are to some extent true of traditional
-programming languages-- indeed I'd doubt that there's anything you
-can do in C++ which you couldn't do with some ingenuity in~C-- but
+programming languages -- indeed I'd doubt that there's anything you
+can do in C++ which you couldn't do with some ingenuity in~C -- but
 the point is that they are much easier, and much more natural, in~C++.
 
 <p>It may be clear at this point that C++ is not a beginner's language.
@@ -920,14 +1020,22 @@ The canonical book for C++, with the same status K&amp;R has for~C, is
 <cite>The C++ Programming Language</cite>
 <citation/stroustrup>, by the language's author.
 
+<p>Note, by the way, that the C++ compiler on Suns is named <code/CC>,
+on Alphas named <code/cxx>, and on Linux named both <code/c++> and
+<code/g++>.
+
 <subsubsect id='s.otherlang'>Other languages
 
 <p>C and Fortran cover most of the bases for scientific computing, but
 there are one or two others which come in useful occasionally.
 
 <subsubsubsect>Java
+<update versionid=v1.1>Added a description of Java's model of
+compiling to interpreted bytecodes, to the extent that this relates to
+efficiency and speed.</update>
 
-<p>Java was developed by Sun and is (late 1998) the current Big Thing.
+<p>Java was developed by Sun and at present (mid-2000) eclipsed only
+by XML as the current Big Thing.
 Source code is compiled to machine-independent bytecode, which is then
 either interpreted, or compiled to machine code on the fly, by a
 Java Virtual Machine on a particular platform.  The main interest to
@@ -939,6 +1047,23 @@ textbook, written (you won't be surprised to guess) by two of the
 language's authors, is <cite>The Java Programming Language</cite>
 <citation/arnold98>.  There are numerous resources 
 at Sun's Java site at <url>http://java.sun.com</url>.
+
+<p>Java is a mixture of an interpreted and a compiled language.  Java
+source code is compiled by the Java compiler into bytecodes, which are
+then interpreted by a Java Virtual Machine.  These bytecodes are
+low-level, but architecture-independent so that, in principle, only
+the virtual machine and its runtime need to be ported to a new
+machine, whereas the code should be completely portable.  This does
+not work quite as well in practice as it does in principle, but it
+does mean that Java is not <em/that> far off the ideal of run-anywhere
+code.  Since Java bytecodes are ultimately interpreted, Java programs
+have the potential to be rather inefficient.  However, just-in-time
+compilers (JIT), which analyse running code and optimise, by
+compilation to native code, the most heavily-used parts, and similar
+developments, can help the situation improve in the future.  This does
+not suggest that Java will ever become a good language for numerically
+intensive applications, but it does mean that efficiency
+considerations will become less of a problem than they are at present.
 
 <subsubsubsect id='s.sedawk'>awk and sed
 
@@ -987,7 +1112,7 @@ Weinberger and Kernighan.  Like <code>sed</code>, it works through a text
 file, executing scraps of code whenever a line matches some condition.
 Before it does anything with a line, it breaks it into fields,
 separated by whitespace by default.  Consider the following
-example<note>There are two versions of <code>ps</code> on Suns-- this
+example<note>There are two versions of <code>ps</code> on Suns -- this
 example assumes you are using the <code>/usr/ucb/ps</code> version.
 </note>
 
@@ -1002,7 +1127,7 @@ This (not terribly useful) line generates a process listing using
 executes the command <code>d</code> on line number~1), and then passes the
 result through the <code>awk</code> program contained in quotes.  On every
 line, this prints field number~4 (the <code>%MEM</code> column in the
-listing) and field~0 (which is <code>sed</code>-speak for the whole input
+listing) and field~0 (which is <code>awk</code>-speak for the whole input
 line), and adds the value of the fourth field to a running total; on
 the line matching the pattern <code>END</code> -- that is, the pseudo-line
 at the end of the file -- <code>awk</code> prints out the accumulated
@@ -1021,6 +1146,8 @@ using an advanced introduction to Unix, such as <citation/quigley> or
 is on the <code>ed(1)</code> manual page.
 
 <subsubsubsect>Perl
+<update versionid=v1.1>Added pointer to the Schwartz reference, and a
+description of Perl's compile-then-interpret model.</update>
 
 <p>Perl is a general-purpose scripting language.  It started off as a
 text-reformatting facility, rather like a super-<code>awk</code>, but it
@@ -1031,15 +1158,25 @@ collected at the Comprehensive Perl Archive Network,
 <webref url='http://www.cpan.org'>CPAN</webref>, 
 to do everything from internet programming to database access.  Perl's
 expressive power makes it ideal for rapid development
-of all sorts of complex systems-- some huge proportion of the web's CGI
-scripts are written in Perl.  Unfortunately, the flexibility of
+of all sorts of complex systems -- some huge proportion of the web's CGI
+scripts, for example, are written in Perl.  Unfortunately, the flexibility of
 Perl's syntax make it quite possible to write spaghetti, the like of
 which we have not seen since Fortran~IV dropped out of fashion.
 
 <p>The Perl manual pages are reasonably clear.  O'Reilly publishes a good
-book on Perl, written by Larry Wall, its author <citation/wall>.
+book on Perl, written by Larry Wall, its author <citation/wall>.  This
+is a good reference book, but <citation/schwartz97> is possibly a
+better tutorial introduction.
 Perl regular expressions are <em>slightly</em> different from the ones
-used by <code>sed</code> and friends-- see the <code>perlre</code> manual page.
+used by <code>sed</code> and friends -- see the <code>perlre</code>
+manual page.
+
+<p>Perl is a semi-interpreted language.  Somewhat like Java, when the
+Perl interpreter first processes your Perl script, it compiles it to
+an internal code, which it then proceeds to interpret.  This means
+that Perl programs have a relatively long startup time, but run
+reasonably efficiently after that.  This is not a big issue in most
+applications.
 
 <subsect id='s.codetopics' export>Code topics
 
@@ -1050,7 +1187,7 @@ even if you program only in~C.
 <subsubsect id='s.profiling'>Profiling
 
 <p>Before you start doing any optimisation at all, check which parts of
-your code are slowing the machine down-- there's no point in
+your code are slowing the machine down -- there's no point in
 tweaking, for example, a one-time initialisation routine which takes
 only a tiny fraction of the program's runtime.  You do this by using a
 profiler.
@@ -1085,7 +1222,7 @@ jupiter:examples> gprof timewaster >timewaster.gprof
 </blockquote>
 
 <p>The output file <code>timewaster.gprof</code> is 439 lines long, even
-thought he program is so short!  The file contains a great deal of
+though the program is so short!  The file contains a great deal of
 information, but buried amongst it is the following display (trimmed):
 <blockquote>
 <verbatim>
@@ -1108,14 +1245,15 @@ index  %time    self descendents  called+self    name    	index
 </verbatim>
 </blockquote>
 This indicates that the subroutine <code>mkidentity</code> was called
-100000 times from the main program, and that 90.1% of the time-- a
-total of 0.64 seconds-- was spent in that routine.  Were this a real
+100000 times from the main program, and that 90.1% of the time -- a
+total of 0.64 seconds -- was spent in that routine.  Were this a real
 project, this would indicate that this routine would be a good one to
 examine for speedups.
 
 <p>This example, and a further one using the <code>tcov</code> utility, were
 taken from <citation/sunf77>, which might be consulted for further
-details.
+details.  I understand that <code/pixie> is the corresponding utility
+on Compaqs, but I have no further details [<ref id=ta.rw/RW>].
 
 <p><code>gprof</code> is not specific to Sun, but is available for other
 architectures, and other compilers (including <code>gcc</code>) as well.
@@ -1134,9 +1272,7 @@ in runtime you achieve by reordering the code have a good chance of being
 wiped out by the time spent debugging a convoluted juggling act.
 Within reason, prefer simplicity and robustness to
 efficiency<note>However, there is <em>no</em> excuse for Bubble
-Sort!
-</note>
--- get your code working correctly and believably, and only
+Sort!</note> -- get your code working correctly and believably, and only
 then start worrying about speed.  That way, if you later establish
 that you need to work on part of the code, you at least have a trusted
 set of results to check the new version's against.
@@ -1148,6 +1284,22 @@ learning more about your machine's architecture than you might
 enjoy, and as as result will make your program less portable to the
 next generation of whizz-bang hardware, or even the next compiler.
 
+<p>It is generally worthwhile to use hand-optimised routines, if they
+are available for your compiler.  Where this can pay particularly good
+dividends is in the case of linear algebra, where the speed of a
+calculation can be significantly improved (`a factor of several') by
+routines carefully written to access memory in an optimal way.  There is a
+standard interface to such routines called the BLAS (Basic Linear
+Algebra Subroutines) 
+<!-- FIXME: find info about BLAS from the Sun and Alpha compiler docs,
+and check these Netlib URLs.  Mention LAPACK? -->
+Although it won't be as fast as a machine-specific implementation, the
+free <webref url='http://www.netlib.org/blas/'
+>BLAS implementation at Netlib</webref> (<webref
+url='http://sunsite.doc.ic.ac.uk/packages/netlib/blas/index.html'
+>UK mirror</webref>) should speed your codes up significantly. [<ref
+id=ta.mbt/MBT>,<ref id=ta.rw/RW>]
+
 <p>The first lesson to learn about optimisation is that the compiler can
 probably do it better than you can.
 
@@ -1156,7 +1308,9 @@ to set how aggressive the compiler's optimisation will be.  The GNU
 gcc compiler, for example, allows optimisation levels~1, 2 and~3, and
 Solaris Fortran has five levels,
 which progressively enable more techniques for improving your
-program's execution speed.
+program's execution speed.  Compaq compilers have a `<code>-tune
+host</code>' option, to produce code optimised for a particular
+machine. [<ref id=ta.mbt>MBT</ref>]
 
 <p>If your program starts behaving oddly, at some point you should start
 worrying about errant optimisation, if you have that turned on.
@@ -1169,8 +1323,8 @@ language that you manage to confuse the compiler, then you could trick
 it into doing the wrong thing.
 
 <p>Specifically, if you have occasion to worry about the order in which
-expressions are evaluated-- for example to conserve precision, as
-described in <ref id='s.accuracy'/>-- then you should be very wary
+expressions are evaluated -- for example to conserve precision, as
+described in <ref id='s.accuracy'/> -- then you should be very wary
 of optimisation, as one of the first things an optimiser <em>might</em>
 do is to reorder expressions which are associative mathematically but
 not computationally.  If you have some code like this, it might be
@@ -1180,15 +1334,26 @@ separately with its own appropriate optimisation level.
 <p>Although you should generally leave optimisation to the compiler,
 there are some things you can do to at least avoid getting in its way.
 
-<subsubsubsect>
-Avoid using the <code>register</code> keyword in~C
+<subsubsubsect>Avoid using the <code>register</code> keyword in~C
+<update versionid=v1.1>Rewritten following comments</update>
 
-<p>This is supposed to suggest to a compiler that a particular variable
-might be better stored in a register than in main memory.  However, the
-compiler will probably do this anyway, and have a better idea of which
+<p>This is, historically, supposed to suggest to a compiler that a
+particular variable might be better stored in a register than in main
+memory, though the actual semantics defined in the~C standard is that
+the keyword is an assertion that the program nowhere takes the address
+of the variable so qualified.  Such an assertion means, amongst other
+things, that the variable will never be visible from any other
+functions, which might trigger other optimisations. [<ref id=ta.sg/SG>]
+
+<p>You do not need to use this keyword to actually suggest to the
+compiler that it store the variable in a register, since the compiler
+might well do this anyway, and have a better idea of which
 (non-obvious, or temporary) variables to choose than you have.
+<!--FIXME: discuss this with Sergio -->
 
 <subsubsubsect id='s.arrays'>Walk through arrays in the correct order
+<update versionid=v1.1>Updated/corrected comments on page faults by
+adding MBT's comments on cache faults.</update>
  
 <p>A multi-dimensional array is necessarily stored in memory as a linear
 array.  If you have to process this entire array, it will be fastest
@@ -1215,7 +1380,7 @@ however, you process it in the other order, with the second index
 changing fastest, then when you move from <code>ia(i,j)</code> to
 <code>ia(i,j+1)</code>, the computer will have to jump 1000 places forward
 in the stored array, each time round the loop.  This would not matter
-at all if the entire array were stored in physical memory, but this
+<em/too> much if the entire array were stored in physical memory, but this
 will not be the case for any sizable matrix, so that to find the
 appropriate array element, the machine may have to reload part of its
 memory from a saved version on disk.  Such input is relatively slow,
@@ -1230,15 +1395,39 @@ is swapped out is known as a `page fault', and is one of the important
 statistics about the run of your program.  You can obtain such
 statistics in copious detail by using the compiler's profiler (see
 <ref id='s.profiling'/>), or quickly by using the <code>time</code>
-command (see your system's <code>time</code> man-page for details-- not
+command (see your system's <code>time</code> man-page for details -- not
 all versions provide this information by default).
+
+<p>Even when the entire array <em/is> stored in physical memory, or
+when you have rearranged your program to minimise the number of page
+faults, it
+can be important not to hop about in arrays too much.  Modern
+architectures will typically have a small amount (modern PCs around
+half a Mb, biggish servers around 8 Mb) of memory called 'cache' which
+has much faster access time (typically an order of magnitude or more)
+than the bulk of the RAM.  The relationship between this and core RAM
+is strongly analogous to the relationship between core RAM and disk,
+in that cache-lines (which are like memory pages, but typically only a
+few words long) get swapped in and out of it when one word from the
+line is required.  The upshot of that is that it's important to avoid
+hopping about over distances much smaller than an I/O page since, even if
+you have no page faults, cache faults make a huge difference.  And of
+course it's not as simple as that either -- sometimes there are two
+levels of cache, some architectures implement some sort of
+prefetching, and so on.  Except with some rather sophisticated
+profilers (which generally have to be supported by a processor
+architecture which keeps a record of these things) it's not really
+possible to see how many cache faults you're getting, except by
+writing the code more efficiently and seeing what the difference is.
+[<ref id=ta.mbt>MBT</ref>]
 
 <p>Unlike Fortran, C arrays are stored with the <em>rightmost</em> index
 increasing fastest, so that the array <code>int i[2][2]</code> will be stored
 as <code>i[0][0]</code>, <code>i[0][1]</code>, <code>i[1][0]</code> and
 <code>i[1][1]</code>.
 
-<subsubsubsect>Avoid I/O
+<subsubsubsect id=ss.io>I/O
+<update versionid=v1.1>Added remarks and examples on raw IO</update>
 
 <p>Input and output are slow, and the faster processors become, the
 bigger is the cost of I/O relative to CPU cycles.  That means you
@@ -1250,7 +1439,38 @@ time to read the file than it would take to recalculate the table from
 scratch each time.  Remember that computers don't get bored, and don't
 mind doing the same calculation repeatedly.
 
+<p>If you do need to save values for later use, and don't mind doing
+it only semi-portably, you can save time and precision by using raw
+I/O rather than formatted ASCII [<ref id=ta.rw/RW>].
+
+A~C example is:
+<verbatim>
+FILE *ofile;
+float arr[10];
+
+ofile = fopen ("output.dat", "w");
+fwrite (arr, sizeof(arr[0]), 10, ofile);
+fclose (ofile);
+</verbatim>
+<!--FIXME: check fwrite syntax-->
+Note the minor trick of using <code/sizeof(arr[0])> rather than the
+more obvious <code/sizeof(float)>; they are equivalent, but the first
+will remain correct even if we change our mind about the size of the
+elements of the array <code/arr>.  You would read the contents of this
+file in using the function <code/fread>.
+
+<!--FIXME: Details on Fortran raw IO -->
+
+<p>The <code/fwrite> and <code/fread> functions, and their Fortran
+equivalents, deal with floating point numbers merely as bundles of
+bits, and pays no attention to how these are interpreted.  This means
+that such files are not portable between machines which interpret
+these bits differently, so that files written on a little-endian
+machine (see <ref id=s.fp/>) will be gibberish if read on a big-endian
+machine, and vice-versa.
+
 <subsubsubsect>Use NaN and Infinity
+<update versionid=v1.1>Mention speed tradeoffs, following comments</update>
 
 <p>As described in <ref id='s.otherfloat'/>, any operation which has a
 <code>NaN</code> as input, produces a <code>NaN</code> as its result.
@@ -1278,9 +1498,32 @@ include numerous <code>Infinity</code>s and one <code>NaN</code> (due to 0/0).
 Because both of these values are permissable floating-point operands,
 they can be allowed to percolate through the rest of the calculation
 without elaborate further tests, to be checked only at the end.  This
-is possible only if, as is usual, the floating-point environment is set up
+is possible only if the floating-point environment is set up
 <em>not</em> to generate signals on floating-point exceptions
-(see also <ref id='s.otherfloat'/>).
+(see also <ref id='s.otherfloat'/>).  That is the default behaviour on
+Suns, but not on Alphas, where you need to compile with <code/-fpe1>
+rather than the default <code/-fpe>.
+
+<p>Note that calculations involving the exceptional values tend to run
+more slowly than those using normal values, so if your calculation
+produces a significant number of exceptional values -- like the
+artificial example above -- a switch to IEEE semantics might not
+produce a speed win overall.  Note also that the expression <code/(a.lt.b)> is
+<em/not> equivalent to <code/.not.(a.gt.b)> when one of the variables is an
+IEEE exceptional value: this could produce hard-to-find bugs if you
+were not alert to this when you were writing the code. [<ref
+id=ta.sg/SG>]
+<!--FIXME: a.lt.b and a.gt.b are both false when either is
+exceptional, right?  Discuss this more with Sergio -->
+
+<subsubsubsect>Remove debugging options
+
+<p>It may or may not be obvious that debugging and profiling options,
+as discussed in <ref id=s.debugging/> and <ref id=s.profiling/>, will
+both slow your program down (especially in the latter case), and make
+it bigger.  You should compile your program, or at least the
+numerically intensive parts of it, without them when you are
+not debugging it. [<ref id=ta.mbt/MBT>]
 
 <subsubsubsect>Further reading
 
@@ -1293,7 +1536,10 @@ generally useful collection of Sun papers, by the way).
 
 <p>If you <em>do</em> need to spend significant effort tuning your code,
 then you should consult a textbook on the matter.  A good one is
-<cite>High Performance Computing</cite> <citation/dowd>.
+<cite>High Performance Computing</cite> <citation/dowd>.  This
+reference touches on parallelising your code, a topic which I have
+deemed sufficiently arcane not to be discussed at all in this
+introductory guide.
 
 <subsubsect id='s.debugging'>Debugging
 
@@ -1311,19 +1557,23 @@ tools to master.  However, there is a good deal you can do armed only
 with experience of the foothills of the debugger's learning curve.
 
 <p>I will describe the Sun debugger <code>dbx</code>, here.  The use of the
-GNU debugger <code>gdb</code> is broadly similar.<p>
-First, compile <code>crash.c</code>, listed in <ref id='a.crash.c'/>,
-in the usual way (<code>cc -o crash crash.c</code>), run it, and watch it
-crash when it tries to dereference a zero pointer.  This leaves a
-<code>core</code> file in the current directory<note>If you don't get
-a core file, it might be that you have your shell set to prevent it-- possibly as a (reasonable) precaution to avoid filling up filespace
-with `useless' core files.  The command <code>ulimit -c</code> will show
-the maximum size of core file: setting this to zero inhibits creating
-core files, and setting it to a very large number or to
-<code>unlimited</code> allows core files to be created.
-</note>.  You can obtain
-rudimentary post-mortem information from this core file with
-<code>dbx</code>, as follows:
+GNU debugger, <code>gdb</code>, and the <code/dbx> debugger on Digital
+Unix, are broadly similar.
+
+<p>First, compile <code>crash.c</code>, listed in <ref
+id='a.crash.c'/>, in the usual way (<kbd/cc -o crash crash.c>),
+run it, and watch it crash when it tries to dereference a zero
+pointer.  This leaves a <code>core</code> file in the current
+directory<note>If you don't get a core file, it might be that you have
+your shell set to prevent it -- possibly as a (reasonable) precaution
+to avoid filling up filespace with `useless' core files.  The command
+<kbd/ulimit -c> (<code/sh>-type shells only) will show the maximum
+size of core file: setting this to zero inhibits creating core files,
+and setting it to a very large number or to <kbd/unlimited> allows
+core files to be created.  On <code/csh>-type shells, the
+corresponding command is <kbd/limit coredumpsize unlimited></note>.
+You can obtain rudimentary post-mortem information from this core file
+with <code>dbx</code>, as follows:
 <blockquote>
 <verbatim>
 jupiter:examples> dbx crash core
@@ -1339,17 +1589,16 @@ The <code>where</code> command to <code>dbx</code> shows where the program was
 when it crashed (the <code>[...]</code> shows where I have omitted some
 unenlightening chatter from the debugger).
 
-<p>The other information <code>dbx</code> gives you is less useful-- the
+<p>The other information <code>dbx</code> gives you is less useful -- the
 debugger doesn't know enough about your program to be more helpful.
 You can, however, tell the compiler to pass on more information to the
 debugger when it processes your code; do this with the <code>-g</code>
-flag to the compiler, as in <code>cc -g -o crash crash.c</code>.  If you
+flag to the compiler, as in <kbd/cc -g -o crash crash.c>.  If you
 compile several modules to produce your executable, you'll need to
 give this option to the compilation of each module you wish to debug.
 You'll also have to give this option at the link stage on SunOS4, but
 not on Solaris or for <code>gdb</code> on Linux<note>Can anyone fill
-in details on Alphas?
-</note>.
+in details on Alphas?</note>.
 
 <p>If we run <code>crash</code> again now, and look at the core file, we see
 that the debugger can provide us with more information.
@@ -1435,8 +1684,9 @@ signal SEGV (no mapping at the fault address) in bananas
 </verbatim>
 </blockquote>
 
-<p>On Solaris, you can use the debugger through a GUI: give the command
-<code>debugger</code> to start this up.
+<p>The Solaris debugger can be used through a GUI: give the command
+<kbd/debugger> to start this up.  The Digital GUI debugger is
+<code/ladebug>.  There is a GUI interface to <code/gdb>, called <code/xxgdb>.
 
 <p>In general, you can't debug optimised code (that is, code compiled
 with the option <code>-O</code>), because the optimiser may rearrange
@@ -1483,7 +1733,7 @@ Fortran, you will typically need to pass it the <em>value</em> of the
 variable using the <code>%val()</code> function (this is a non-standard
 VAX Fortran extension, but one which is now so ubiquitous that it's
 safe to use).  These remarks apply to unstructured types such as
-characters, integers and floats-- arrays and strings present other
+characters, integers and floats -- arrays and strings present other
 problems, as described below.  It follows from what I've said that if
 a~C function is declared as <code>void subr (int *p)</code>, it's expecting (the
 value of) a pointer to an integer, so that this could be called in the
@@ -1583,15 +1833,57 @@ routine, you will have to tell the compiler not to add the underscore
 to the external name when it generates object code.  For Sun's
 <code>f77</code> compiler, you do this with the
 compiler option <code>-ext_names=plain</code>, for the GNU <code>g77</code>
-compiler it is with the <code>-fno-underscoring</code> option.  Note that
+compiler it is with the <code>-fno-underscoring</code> option, and for
+<code/f77> on the Alpha, it is <code/-assume nounderscore> [<ref
+id=ta.rw/RW>].  Note that 
 this will apply to all function names in that module.  Sun's compiler
 also allows you to declare that a function is in a~C module, using a
-pragma, but this is obviously non-portable, and so is not recommended.
+pragma, but this is obviously non-portable, and so is not
+recommended.
+
+<!-- RW:
+o p21: to get access to main() via f77 on decs, you need to set
+-nofor_main at link time -->
 
 <p>You should, in general, use the Fortran compiler to link the object
 files into an executable.  This calls the linker with all the correct
 Fortran libraries.  It is of course possible to do the same with the~C
 compiler, but requires a much more elaborate call.
+
+<subsubsect id=s.compilers>Compilers, and other stray remarks on code
+
+<p>Using Fortran's <code/implicit none> keyword is a Good Idea.  The
+tiny amount of typing time you save by relying on Fortran's automatic
+declaration of variables, is more than likely wiped out by the
+debugging time spent clearing up silly problems <code/implicit none> would
+have avoided from the beginning.
+
+<p>Make your code portable.  Unless you are specifically targetting
+your code at a particular (supercomputer) processor, or magic
+parallelising compiler, you will save yourself time in the long run by
+not making assumptions about the machine or compiler environment.
+Especially given the imminent arrival of 64-bit machines, you are
+probably not doing yourself any favours by, for example, assuming that
+integers are four bytes.  Probably more pertinently, exploiting
+compiler-specific features might prevent you running your code on some
+new faster architecture.  If you do decide to use some non-portable
+features, you can make the future porting effort easier by having
+second or third thoughts about precisely how to use them, and by
+isolating them into a few subroutines, rather than scattering them
+throughout your code.  It follows that&dots;
+
+<p>Compiler Warnings Are Your Friend.  Try compiling your codes with
+compiler warnings switched on (with the option <code/-Wall> on GNU
+compilers, ?? on Suns, and ?? on Compaqs
+<!--FIXME: warnings-on and ANSI-C flags on Suns and DUX? -->).  You
+might be surprised at the number of peculiarities and non-standard
+features this exposes, each of which is a potential portability
+problem for the future.  I would particularly advise this if you
+develop using GNU compilers, as these seem particularly liberal about
+standards: <code/gcc> in particular seems happy to take any old
+nonsense, say `I know what you mean', and produce code from it -- in
+my experience it usually guesses my intentions correctly, but I don't
+want to rely on it.
 
 <subsect id=s.linkfarms export>Link farms
 
@@ -1729,7 +2021,7 @@ common one, you must explicity load the~C library first.
 </blockquote>
 There are two things to note here.  The first is that we have renamed
 the expression <code>gid</code> on the fly.  The second is that the
-expression for <code>t4</code> is not the most efficient-- it is very bad
+expression for <code>t4</code> is not the most efficient -- it is very bad
 to use the <code>pow()</code> function for raising expressions to small
 integer powers: much better would be <code>t4a=xc-x0; t4=t4a*t4a;</code>,
 as has happened automatically for <code>t10</code>.
@@ -1766,7 +2058,7 @@ See also the example Maple program in <ref id='a.maple'/>.
 <p>As a final point, don't fall into the common trap of thinking that because
 you've produced your result using computer algebra, it must be right.
 This is as false of computer algebra as it is of numerical
-programming-- be inventive in thinking of cross-checks.
+programming -- be inventive in thinking of cross-checks.
 
 
 <subsect id='s.visualisation' export>Data visualisation
@@ -1789,7 +2081,7 @@ which mentions both~IDL and~DX.
 
 <subsubsect id='s.gausssine-g'>gnuplot
 
-<p>Gnuplot is valuable because it's so simple-- easy things can be done
+<p>Gnuplot is valuable because it's so simple -- easy things can be done
 easily.  If you want to graph an equation or plot some data, and
 produce postscript output, then you'll probably do it faster, from a
 standing start, than someone using one of the beefier packages.  Its
@@ -1912,7 +2204,9 @@ A minor, but persistent, irritation with IDL is that, although its
 input and output facilities are as flexible as, say, Fortran's (which
 they closely resemble), it doesn't come with a function for dealing
 with the common case of data printed out in columns (the only case
-gnuplot naturally deals with).  Fortunately, such a function is not
+gnuplot naturally deals with).
+<!-- FIXME: is this still true? -->
+Fortunately, such a function is not
 only easy to write, but a useful example, too.  See <ref
 id='a.idl'/>.
 <figure id=f.gausssine-i 
@@ -1927,7 +2221,6 @@ available on-line by typing <code>?</code> at the IDL prompt.
 
 <p>See appendix~B of <docxref doc=sun55 text='SUN/55'> for a
 description of how to import data in the Starlink NDF format into IDL.
-
 
 <subsubsect id='s.dx'>DX
 
@@ -1952,9 +2245,8 @@ are using DX at a Starlink site then these enhancements should be
 available automatically. The use of DX at Starlink sites and the
 Starlink enhancements to DX are documented in
 <docxref doc=sun203 text='SUN/203'>.</blockquote>
-<subsubsect id='s.pgplot'>
-PGPLOT
 
+<subsubsect id='s.pgplot'>PGPLOT
 
 <p>The above recommendations describe standalone packages which work on
 data produced by your code in a separate step.  An alternative route
@@ -1976,7 +2268,6 @@ library.  At the time of writing (December 1998), the way in which the
 dual versions will be supported has not been finalised; ask your
 system manager for advice.
 
-
 <subsect id='s.im' export>Producing images
 
 <p>If you wish to include images in your &latex; output, do so using the
@@ -1996,8 +2287,8 @@ comment at the top of the file, and typically has the extension
 <p>See <ref id='s.visualisation'/> for details of how to produce EPS
 plots from gnuplot and IDL.
 
-<p>If it's diagrams you want to produce, then xfig has its adherents.
-There's a <em>large</em> manual page for xfig, but you can do pretty
+<p>If it's diagrams you want to produce, then <code/xfig> has its adherents.
+There's a <em>large</em> manual page for <code/xfig>, but you can do pretty
 well just starting it up, and pointing and clicking.
 
 <p>If point and click isn't your style, try Metapost.  This is a variant
@@ -2012,6 +2303,7 @@ look very good.  See <code>.../texmf/doc/metapost</code> under the
 <sect id='s.astro' export>Astrophysical and other libraries
 
 <subsect id='s.models' export>Models
+<!-- FIXME: add more specific pointers.  See Simon Jeffrey's comments -->
 
 <p><webref url='http://ccp7.dur.ac.uk/'>CCP7</webref>
 is a 
@@ -2038,19 +2330,55 @@ requests for new tables to be generated.
 <p>A number of 
 <webref url='http://www.fges.demon.co.uk/cfd/CFD_codes.html'>CFD codes</webref>
 are available to buy or download.  This is a collection of pointers
-and notes about a large number of CFD codes, from a variety of sources.
+and notes about a large number of CFD codes, from a variety of
+sources.
+
+<!-- FIXME: Barry Smalley's comments
+[<ref id=ta.bs>BS</ref>]
+http://cfaku5.harvard.edu/  This is Robert Kurucz Home Page, of ATLAS
+fame. The much used program to calculate model atmospheres, also he gives
+predicted flux distributions (e.g. ATLASRD in DIPSO) and colours (UBV,
+uvby etc). This is a new site.
+
+http://server1.pa.uky.edu:80/~gray/cloudy   Cloudy and Associates,
+Photoionization Simulations by Gray Ferland.
+
+Atomic Data for Astrophysics:
+http://www.pa.uky.edu/~verner/atom.html
+Atomic & Molecular Database for Astronomy:
+http://cfa-www.harvard.edu/amp/data/amdata.html
+
+Both these give useful links.
+
+The Yeti Homepage: http://dilbert.physast.uga.edu/~yeti/  Peter
+Haushault's home page - one of the authors of PHEONIX used to calculate
+state-of-the-art M-star model atmospheres.
+
+JPL Molecular Spectroscopy: http://spec.jpl.nasa.gov/
+-->
+
+
 
 
 <subsect id='s.lib' export>Libraries
 
 <p>There are numerous software libraries available.  Many of these are
 free, many are public domain.  The difference between the two is that
-`public-domain software' is yours to play with, or modify, or exploit,
-as you wish, whilst `free software' is still copyrighted, but made
-available to certain categories of user (which typically include
-academic use) for no charge.  The distinction makes a difference if
-you plan to redistribute your code.  See also the observations about
-libraries, and thoughtless use of them, in <ref id='s.na'/>.
+`public-domain software' is in some sense `ownerless': it's yours to
+play with, or modify, or exploit, as you wish, with only good manners
+requiring you to acknowledge the source (this is not an authoritative
+statement of copyright law, by the way&dots;).  `Free' software, on
+the other hand, is still copyrighted, but you may have a free licence
+to use it for certain purposes.  One of the best known of these
+licences is the GNU General Public Licence (GPL; details at
+<url>???</url> <!-- FIXME: add GPL URL, and check that this summary of
+GPL provisions is correct -->), which gives you very good access to
+the code, limited only by the requirement that programs produced using
+GPL'd code are themselves made as freely availale.  Other licences
+might make the code available to academic users only.  The distinction
+makes a difference if you plan to redistribute your code.  See also
+the observations about libraries, and thoughtless use of them, in <ref
+id='s.na'/>.
 
 <p>Probably the most commonly used numerical library is the 
 <webref url='http://www.nag.co.uk'>NAG library</webref>.
@@ -2194,6 +2522,10 @@ and reading and writing FITS files
 CONVERT package, documented in
 <docxref doc=sun55 text='SUN/55'>.
 
+<!-- FIXME: add an example using CONVERT -->
+
+<!-- FIXME: move the text on raw IO to here? -->
+
 <p>Once the data is there, you will need to visualise it.  See
 <ref id='s.im'/> for some pointers to suitable software.
 
@@ -2223,8 +2555,7 @@ resources.
 
 <sect id=s.paper export>Paper production
 
-<subsect id='s.latex' export>
-TeX and LaTeX
+<subsect id='s.latex' export>TeX and LaTeX
 
 <p>Starlink supports &latex; and &tex; users by maintaining and
 packaging for release a &tex; distribution.  This is typically based
@@ -2287,7 +2618,7 @@ book.  Having said that, the advantage is a narrow one, and you'd be
 well-advised to choose based on whose writing style you prefer, and
 which one happens to be in the bookshop on the right day<note>It's
 unfortunate that neither book is much of an advert for &tex;'s
-potentially beautiful typesetting-- both seem to be produced using a
+potentially beautiful typesetting -- both seem to be produced using a
 practically unmodified &latex; <code>book</code> style.
 </note>
 .
@@ -2429,6 +2760,30 @@ and more generally
 <docxref doc=sun162 text='SUN/162'>, <cite>A Guide to
 Astronomical Catalogues, Databases and Archives
 available through Starlink</cite>.
+
+<sect id=s.acknowledgements export>Acknowledgements
+
+<p>A number of people have contributed to this document, either with
+helpful general remarks or corrections or amplifications on points of
+detail.  Where their contribution was precisely localisable -- in
+particular where I have merely sub-edited their comments into place --
+they are also acknowledged at the appropriate specific points in the text.
+<ul>
+<li id=ta.rfws>RFWS: Rodney Warren-Smith made many comments on an
+early draft of the text, which made it much better than it otherwise
+might have been.
+<li id=ta.mbt>MBT: Mark Taylor (<code/mbt@ast.cam.ac.uk>) made a number of
+points about my coverage of Fortran, and several insightful remarks
+about numerical programming.
+<li id=ta.sj>SJ: Simon Jeffery (<code/csj@star.arm.ac.uk>) added
+pointers to model atmosphere codes.
+<li id=ta.bs>BS: Barry Smalley (<code/star@astro.keele.ac.uk>).
+Pointers to model atmospheres.
+<li id=ta.sg>SG: Sergio Gelato (<code/Sergio.Gelato@Durham.ac.uk>)
+added remarks about optimising~C, and compiler switches.
+<li id=ta.rw>RW: Robin Williams (<code/Robin.Williams@astro.cf.ac.uk>)
+general comments, and information about Alpha switches.
+</ul>
 
 <appendices>
 
@@ -3107,3 +3462,4 @@ nodes. Ask your Site Manager if you want one.<p>
 &release.notes;
 
 <backmatter bibliography=sc13>
+
