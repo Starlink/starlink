@@ -16723,7 +16723,7 @@ iraf! {
    } 
 
    command snapshot {
-      obsolete { The snapshot command has been retired. Use a utility such as xv, or use the snapshot command in the KAPRH package (see SUN/239). }
+      obsolete { The snapshot command has been retired. Use a utility such as gimp or xv, or use the snapshot command in the KAPRH package (see SUN/239). }
    } 
 
    command turbocont {
