@@ -95,18 +95,19 @@ AC_CONFIG_FILES([Makefile component.xml
     include/Makefile include/gkmc.par.fpp])
 
 dnl    Not all the driver subdirectories are autoconfed, only...
-DRIVER_SUBDIRS="canon cgmi cgmo mi mo postscript regis tek4010 wiss xwindows"
-dnl    ...must match the list below
-AC_CONFIG_FILES([drivers/Makefile
-    drivers/canon/Makefile drivers/cgmi/Makefile
-    drivers/cgmo/Makefile drivers/mi/Makefile drivers/mo/Makefile
-    drivers/postscript/Makefile drivers/regis/Makefile drivers/tek4010/Makefile
-    drivers/wiss/Makefile drivers/xwindows/Makefile])
+dnl    (using m4 regexps and substitutions is somewhat safer than being
+dnl    hostage to the vaguaries of different platforms' seds)
+m4_define([driverlist],
+          [canon cgmi cgmo mi mo postscript regis tek4010 wiss xwindows])
+
+AC_CONFIG_FILES([drivers/Makefile ]
+                m4_bpatsubst(driverlist, [[a-z0-9]+],
+                             [drivers/\&/Makefile]))
 
 dnl    Substitute this list into the drivers/Makefile.in, along with a
 dnl    generated list of the corresponding libraries
-AC_SUBST(DRIVER_SUBDIRS)
-DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([[a-z0-9]]*\)+drivers/\1/libgks_driver_\1.la+g'`
-AC_SUBST(DRIVER_LIBLIST)
+AC_SUBST(DRIVER_SUBDIRS, "driverlist")
+AC_SUBST(DRIVER_LIBLIST, "m4_bpatsubst(driverlist, [[a-z0-9]+],
+                                       [drivers/\&/libgks_driver_\&.la])")
 
 AC_OUTPUT
