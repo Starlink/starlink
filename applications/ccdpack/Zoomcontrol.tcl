@@ -54,19 +54,10 @@
             frame [ childsite ].control
          }
          itk_component add zoom {
-            menubutton $itk_component(control).zoom \
-               -width 4 \
-               -relief raised \
-               -menu $itk_component(control).zoom.menu
+            iwidgets::optionmenu $itk_component(control).zoom \
+               -width 70 \
+               -command [ code $this setvalue ]
          }
-         set menubutton $itk_component(zoom)
-         itk_component add menu {
-            menu $menubutton.menu
-         }
-         set menu $itk_component(menu)
-
-
-
          itk_component add zoomin {
             button $itk_component(control).zoomin \
                -text "+" \
@@ -77,15 +68,16 @@
                -text "-" \
                -command [ code $this zoomer -1 ]
          }
-         itk_component add zoomnum {
-            label $itk_component(control).zoomnum \
-                  -width 3
-         }
+         # itk_component add zoomnum {
+         #    label $itk_component(control).zoomnum \
+         #          -width 3
+         # }
          pack $itk_component(zoomout) \
               $itk_component(zoom) \
               $itk_component(zoomin) \
-              -side left
+              -side left -fill y
          pack $itk_component(control)
+         set omenu $itk_component(zoom)
          eval itk_initialize $args
       }
 
@@ -152,21 +144,13 @@
             configure -value $max 
          }
          set level [ factor2level $value ]
-         $itk_component(zoom) configure -text [ level2text $level ]
+         $omenu select [ expr $level + $minlevel ]
       }
 
 
 ########################################################################
 #  Private procedures.
 ########################################################################
-
-      common factorreps
-      common factors
-      foreach fac { 1/20 1/16 1/12 1/8 1/6 1/4 1/3 1/2 1 2 3 4 6 8 12 } {
-         lappend factorreps $fac
-         lappend factors [ expr "${fac}.0" ]
-      }
-
 
 #-----------------------------------------------------------------------
       private proc level2factor { level } {
@@ -206,6 +190,22 @@
       }
 
 
+#-----------------------------------------------------------------------
+      private proc text2factor { text } {
+#-----------------------------------------------------------------------
+         return [ expr ${text}.0 ]
+      }
+
+
+      common factorreps
+      common factors
+      foreach fac { 1/20 1/16 1/12 1/8 1/6 1/4 1/3 1/2 1 2 3 4 6 8 12 } {
+         lappend factorreps $fac
+         lappend factors [ expr ${fac}.0 ]
+      }
+
+
+
 ########################################################################
 #  Private methods.
 ########################################################################
@@ -221,17 +221,22 @@
       private method menuconfig { } {
 #-----------------------------------------------------------------------
 #  Clear out the current contents of the menu.
-         $menu delete 0 end
+         $omenu delete 0 end
 
 #  Fill up the menu with all the valid values of the zoom factor between
 #  the min and max values.
          for { set lev $minlevel } { $lev <= $maxlevel } { incr lev } {
             set tex [ level2text $lev ]
-            set fac [ level2factor $lev ]
-            $menu add command \
-               -label [ level2text $lev ] \
-               -command [ code "$this configure -value $fac" ]
+            $omenu insert end $tex
          }
+      }
+
+
+#-----------------------------------------------------------------------
+      private method setvalue { } {
+#-----------------------------------------------------------------------
+         set factor [ text2factor [ $omenu get ] ]
+         configure -value $factor
       }
 
 
@@ -241,8 +246,7 @@
 
       private variable maxlevel [ expr [ llength $factorreps ] - 1 ]     
                                        # Maximum zoom level
-      private variable menu           ;# Path name of the menu widget
-      private variable menubutton     ;# Path name of the menubutton widget
+      private variable omenu          ;# Path name of the optionmenu widget
       private variable minlevel 0     ;# Minimum zoom level
       private variable level          ;# The zoom level
 
