@@ -365,6 +365,12 @@
 *        Added parameters AMP1 and NORM.
 *     17-MAY-2000 (DSB):
 *        Added data units to Y axis label of the plot if NORM is FALSE.
+*     22-MAY-2000 (DSB):
+*        Use an inverted copy of MAP1 when creating MAP3 instead of just
+*        temporarily inverting MAP1 itself. This is because the call to
+*        AST_SIMPLIFY could otherwise sometimes return a pointer to MAP1
+*        (eg if MAP2 was a UnitMap), and so subsequently re-inverting 
+*        MAP1 would also invert MAP3.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -423,6 +429,7 @@
       INTEGER LBND( NDIM )      ! Lower bounds of the output image
       INTEGER LBNDS( NDF__MXDIM )! Lower bounds of the input NDF
       INTEGER MAP1              ! Mapping from PIXEL Frame to Current Frame
+      INTEGER MAP1B             ! Inverted copy of MAP1
       INTEGER MAP2              ! Mapping from supplied Frame to Current Frame
       INTEGER MAP3              ! Mapping from supplied Frame to PIXEL Frame
       INTEGER MAP4              ! Mapping from GRID Frame to Current Frame
@@ -606,11 +613,11 @@
 *  supplied, to the PIXEL Frame of the NDF. We get this Mapping by
 *  concatenating the Mapping from input Frame to Current Frame, with 
 *  the Mapping from Current Frame to PIXEL Frame (obtained by 
-*  temporarily inverting the Mapping from PIXEL to Current Frame).
-      CALL AST_INVERT( MAP1, STATUS )
-      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1, .TRUE., ' ', 
+*  inverting the Mapping from PIXEL to Current Frame). 
+      MAP1B = AST_COPY( MAP1, STATUS )
+      CALL AST_INVERT( MAP1B, STATUS )
+      MAP3 = AST_SIMPLIFY( AST_CMPMAP( MAP2, MAP1B, .TRUE., ' ', 
      :                                 STATUS ), STATUS )
-      CALL AST_INVERT( MAP1, STATUS )
 
 *  Check the Mapping has the required transformations.
       IF( .NOT. AST_GETL( MAP3, 'TRANFORWARD', STATUS ) .AND.

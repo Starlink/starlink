@@ -732,16 +732,23 @@
             WRITE ( BUFFER, '(''   FWHM seeing ='', SS, G11.4, A )' )
      :              FWHM * SCALE, FWHMUN
             CALL MSG_OUT( 'FWHMREP', BUFFER, STATUS )
-            IF ( LOGF )
-     :        CALL FIO_WRITE( FD, BUFFER( :CHR_LEN( BUFFER ) ), STATUS )
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUFFER(:CHR_LEN( BUFFER )), 
+     :                                  STATUS )
 
             WRITE ( BUFFER, '( ''   Gamma ='', SS, G11.4 )' ) GAMMA
             CALL MSG_OUT( 'GAMMAREP', BUFFER, STATUS )
-            CALL MSG_OUT( 'BLANK', ' ', STATUS )
-            IF ( LOGF ) THEN
-               CALL FIO_WRITE( FD, ' ', STATUS )
-               CALL FIO_WRITE( FD, BUFFER( :21 ), STATUS )
+            IF ( LOGF ) CALL FIO_WRITE( FD, BUFFER( :21 ), STATUS )
+
+            IF( .NOT. NM ) THEN
+               WRITE ( BUFFER, '( ''   Peak value ='', SS, G11.4 )' ) 
+     :               AMP1
+               CALL MSG_OUT( 'AMPREP', BUFFER, STATUS )
+               IF ( LOGF ) CALL FIO_WRITE( FD, 
+     :                            BUFFER( :CHR_LEN( BUFFER ) ), STATUS )
             END IF
+
+            CALL MSG_OUT( 'BLANK', ' ', STATUS )
+            IF( LOGF ) CALL FIO_WRITE( FD, ' ', STATUS )
 
          END IF
 
