@@ -42,7 +42,6 @@ use strict;
 # Starlink data type conversion
 use vars qw/%pdltypes %startypes $ndf_loaded $VERSION $EXTNAME/;
 
-$VERSION = undef;
 $VERSION = '1.00';
 
 # Set PDL -> Starlink data types
