@@ -3489,6 +3489,7 @@ static UnitNode *NewNode( UnitNode *old, Oper code ) {
             break;
 
          default:
+            ;
       }
 
 /* Allocate memory for the UnitNode pointers which will locate the

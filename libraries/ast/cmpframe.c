@@ -2106,7 +2106,7 @@ static const char *GetDomain( AstFrame *this_frame ) {
    const char *dom1;             /* Pointer to first sub domain */
    const char *dom2;             /* Pointer to second sub domain */
    const char *result;           /* Pointer value to return */
-   static const char buff[ 100 ];/* Buffer for returned domain name */
+   static char buff[ 100 ];      /* Buffer for returned domain name */
 
 /* Initialise. */
    result = NULL;
@@ -3357,6 +3357,13 @@ static void Offset( AstFrame *this_frame, const double point1[],
    p2 = astMalloc( sizeof( double ) * (size_t) naxes );
    p3 = astMalloc( sizeof( double ) * (size_t) naxes );
    
+/* Initialise variables to avoid compiler warnings. */
+   dist1 = 0.0;
+   dist2 = 0.0;
+   offset1 = 0.0;
+   offset2 = 0.0;
+   naxes1 = 0;
+
 /* Initialise a flag to indicate whether "bad" coordinates should be
    returned. */
    bad = 0;
@@ -3781,6 +3788,9 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
 /* Check the global error status. */
    if ( !astOK ) return match;
 
+/* Initialise other variables to avoid compiler errors. */
+   ref_naxes = 0;
+
 /* Select the required sub-Frames from the target. */
 /* ----------------------------------------------- */
 /* We first create two sub-Frames (that can be matched against the two
@@ -3826,7 +3836,7 @@ static int PartMatch( AstCmpFrame *template, AstFrame *target,
    the resulting match may still have to be rejected, but this must be
    done at a higher level. */
    permute_set = astTestPermute( template->frame1 );
-   if ( permute_set ) permute_value = astGetPermute( template->frame1 );
+   permute_value = ( permute_set ) ? astGetPermute( template->frame1 ) : 0;
    astSetPermute( template->frame1, 1 );
 
 /* Test for a match with the first template component Frame. */
@@ -4705,6 +4715,10 @@ static void Resolve( AstFrame *this_frame, const double point1[],
    returned. */
    bad = 0;
 
+/* Initialise ther variables to avoid compiler warnings. */
+   da = 0.0;
+   db = 0.0;
+
 /* Check that all the coordinates of both input points are OK. If not,
    set the "bad" flag and quit checking. */
    if ( astOK ) {
@@ -5387,6 +5401,12 @@ static int SubFrame( AstFrame *target_frame, AstFrame *template,
    naxes = astGetNaxes( target );
    naxes1 = astGetNaxes( target->frame1 );
    naxes2 = astGetNaxes( target->frame2 );
+
+/* Iinitialise variables to avoid compiler warnings. */
+   template_axes1 = NULL;
+   template_axes2 = NULL;
+   n1 = 0;
+   n2 = 0;
 
 /* Obtain the axis permutation array for the target CmpFrame. */
    perm = astGetPerm( target );
@@ -6606,7 +6626,8 @@ f     function is invoked with STATUS set to an error value, or if it
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
-   if ( !astOK ) return NULL;
+   new = NULL;
+   if ( !astOK ) return new;
 
 /* Obtain and validate pointers to the Frame structures provided. */
    frame1 = astCheckFrame( frame1_void );
@@ -6688,7 +6709,8 @@ AstCmpFrame *astCmpFrameId_( void *frame1_void, void *frame2_void,
    va_list args;                 /* Variable argument list */
 
 /* Check the global status. */
-   if ( !astOK ) return NULL;
+   new = NULL;
+   if ( !astOK ) return new;
 
 /* Obtain the Frame pointers from the ID's supplied and validate the
    pointers to ensure they identify valid Frames. */
