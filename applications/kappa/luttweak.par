@@ -1,4 +1,0 @@
-device,f,a,,,,"*! Name of display device"
-plane,i,h,0,,,"Memory plane number"
-view,b,h,n,,,"Display the colour table?"
-full,b,h,n,,,"Tweak the full colour table?"

@@ -1,4 +1,0 @@
-in1,f,a,,,,"First transformation"
-in2,f,a,,,,"Second transformation"
-out,f,a,,,,"New structure to hold concatenated transformation"
-dest,s,h,"NEW",,,"Destination of concatenated transformation"
