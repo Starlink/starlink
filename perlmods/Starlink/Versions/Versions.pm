@@ -2,7 +2,7 @@ package Starlink::Versions;
 
 =head1 NAME
 
-Starlink::Versions - determine version numbers of starlink applications
+Starlink::Versions - determine version numbers of Starlink applications
 
 =head1 SYNOPSIS
 
@@ -26,10 +26,17 @@ The answer is cached such that a subsequent call will return the
 precalculated answer without having to look for it. It is assumed that
 a version will not change whilst this program is running!
 
+By default no functions are imported into the users namespace unless
+the function is requested explicitly. The C<:Funcs> tag can be
+specified to import all functions:
+
+ use Starlink::Versions qw/ :Funcs /;
+
 =cut
 
+use strict;
 use base qw/ Exporter /;
-use vars qw/ $VERSION @EXPORT_OK /;
+use vars qw/ $VERSION @EXPORT_OK $DEBUG %EXPORT_TAGS/;
 
 use Symbol;             # For lexical file handles
 use Starlink::Config;   # For location of root starlink dir
@@ -40,7 +47,12 @@ use File::Spec;         # For catfile()
   starversion_major starversion_patchlevel
   /;
 
+%EXPORT_TAGS = (
+		'Funcs' => [ @EXPORT_OK ],
+		);
+
 $VERSION = '0.01';
+$DEBUG = 0;
 
 # This is the cache used to store the version numbers 
 # so that we can be fast with repeat calls
@@ -65,7 +77,10 @@ version number for an application called "prog".
 Determine the installed directory by looking in the directory pointed
 to by the environment variable C<PROG_DIR> for a file called 
 C<version.dat>. Some applications such as POLPACK or KAPPA write 
-version numbers in this file.
+version numbers in this file. This allows the version number to be determined
+directly from the C<PROG_DIR> rather than trying to determine it from
+related directories (which relies on the application being properly
+installed).
 
 =item 2
 
@@ -95,7 +110,24 @@ tree).
 
 If these methds fail undefined values are returned. Note that
 this module will not look explicitly in a Starlink install tree
-unless it can not work out a directory tree to search instead.
+unless it can not work out a directory tree to search as an alternative.
+
+Care must be taken for applications where the environment variable
+used is not the same as the application name. For example, C<figaro>
+uses C<$FIG_DIR> rather than C<$FIGARO_DIR>. In this case,
+the environment variable will not be located and C</star> (or 
+wherever) will be searched for the version number regardless of the
+actual location where FIGARO is installed. If you are interested
+in applications which do this, the simplest way to overcome
+this is to set C<FIGARO_DIR> to C<FIG_DIR> just before executing
+the C<starversion> (or related) function:
+
+ $ENV{FIGARO_DIR} = $ENV{FIG_DIR};
+ $version = starversion('figaro');
+
+Finally, applications that do not have an application directory
+(and therefore most likely no datestamp file), for example C<hdstrace>,
+can not have their version determined with this module.
 
 =head1 FUNCTIONS
 
@@ -108,15 +140,26 @@ patchlevel version numbers.
 
   ($major, $minor, $patchlevel) = starversion( 'prog' );
 
+Starting with Perl version 5.6.0, a perl version string is returned
+when C<starversion> is called in a scalar context. This allows 
+versions to be compared directly using Perl.
+
+  $version = starversion( 'prog' );
+  print "yes" if $version > v0.15.2;
+
 Returns undef if a version number can not be determined.
 
 =cut
 
 sub starversion {
-
-
+  local($^W) = 0; # localize warnings to hide odd number of hash warning
+  my %version = _get_version( $_[0] ) or return undef;
+  if (wantarray) {
+    return ( $version{MAJOR}, $version{MINOR}, $version{PATCHLEVEL} );
+  } else {
+    return $version{VERSION};
+  }
 }
-
 
 =head2 starversion_string
 
@@ -130,8 +173,9 @@ if a version can not be determined.
 =cut
 
 sub starversion_string {
-
-
+  local($^W) = 0; # localize warnings to hide odd number of hash warning
+  my %version = _get_version( $_[0] ) or return undef;
+  return $version{ STRING };
 }
 
 
@@ -145,8 +189,9 @@ can not be determined.
 =cut
 
 sub starversion_major {
-
-
+  local($^W) = 0; # localize warnings to hide odd number of hash warning
+  my %version = _get_version( $_[0] ) or return undef;
+  return $version{ MAJOR };
 }
 
 =head2 starversion_minor
@@ -159,8 +204,9 @@ can not be determined.
 =cut
 
 sub starversion_minor {
-
-
+  local($^W) = 0; # localize warnings to hide odd number of hash warning
+  my %version = _get_version( $_[0] ) or return undef;
+  return $version{ MINOR };
 }
 
 =head2 starversion_patchlevel
@@ -168,13 +214,14 @@ sub starversion_minor {
 Returns the patchlevel number. Returns C<undef> if a version
 can not be determined.
 
- $major = starversion_major( 'prog' );
+ $patch = starversion_patchlevel( 'prog' );
 
 =cut
 
 sub starversion_patchlevel {
-
-
+  local($^W) = 0; # localize warnings to hide odd number of hash warning
+  my %version = _get_version( $_[0] ) or return undef;
+  return $version{ PATCHLEVEL };
 }
 
 
@@ -201,7 +248,6 @@ determined (usually because the environment variable was not set).
 sub _get_app_dir ($) {
   # Construct the environment variable name
   my $env = uc($_[0]) . '_DIR';
-
   return ( exists $ENV{$env} ? $ENV{$env} : undef);
 }
 
@@ -241,7 +287,7 @@ be C</star/dates>.
 =cut
 
 sub _get_standard_datestamp_dir () {
-  return $StarConfig{'Star'} . "/dates";
+  return File::Spec->catdir( $StarConfig{'Star'} , "dates" );
 }
 
 
@@ -252,7 +298,7 @@ and directory.
 
  $file = _get_datestamp_file( $dir, 'prog' );
 
-The directory is usually obtained via the C<_get_standard_datestamp_die>
+The directory is usually obtained via the C<_get_standard_datestamp_dir>
 or C<_get_app_datestamp_dir> routines.
 
 Does not check to see if the file exists.
@@ -312,19 +358,19 @@ Returns C<undef> on error.
 
 sub _read_datestamp_file ($) {
   my $file = shift;
-
+  print "Opening datestamp file $file\n" if $DEBUG;
   my $sym = gensym;
   open( $sym, "< $file" ) || return (undef, undef, undef);
 
   while (<$sym>) {
     if (/^Version/i) {
-      print "FOUND: $_\n";
-      my ($major, $minor, $patchlevel) = _parse_version_string($_);
+      print "FOUND in datestamp: $_\n" if $DEBUG;
+      my (@version) = _parse_version_string($_);
       # Return immediately, the file will be closed automatically
       # but close it anyway for clarity
-      if (defined $major) {
+      if (defined $version[0]) {
 	close($sym);
-	return ($major, $minor, $patchlevel);
+	return (@version);
       }
     }
   }
@@ -352,21 +398,120 @@ Returns C<undef> on error.
 sub _get_version_from_datestamp ($$) {
   my $dir;
   if ($_[0]) {
-    $dir = _get_standard_datestamp_dir;
-  } else {
     $dir = _get_app_datestamp_dir($_[1]);
+  } else {
+    $dir = _get_standard_datestamp_dir;
   }
   # Get the filename
+  print "Using datestamp dir = $dir\n" if $DEBUG;
   my $file = _get_datestamp_file($dir, $_[1]);
 
   # Return the version number
   return &_read_datestamp_file($file);
 }
 
+=head2 _get_version_from_appdir
+
+Attempt to retrieve a version number from the C<version.dat>
+file in the application directory.
+
+ ($major, $minor, $patchlevel) = _get_version_from_appdir( 'prog' );
+
+Returns C<undef> if the version number could not be determined.
+
+=cut
+
+sub _get_version_from_appdir ($) {
+  # Determine the directory to use
+  my $dir = _get_app_dir ( $_[0] ) or return undef;
+
+  # Construct the filename
+  print "Reading version info from app dir version.dat\n" if $DEBUG;
+  my $file = File::Spec->catfile($dir, 'version.dat');
+
+  # open the file
+  my $fh = gensym;
+  open( $fh, "< $file") or return undef;
+
+  # Read the first line and parse it
+  my @version = _parse_version_string( <$fh> );
+
+  # Tidy up
+  close($fh);
+
+  # return
+  return (@version);
+}
+
+=head2 _get_version
+
+Retrieve the version number using a variety of techniques.
+
+ %version = _get_version( 'prog' );
+
+The answer is cached.  If the version has already been determined for
+this application, the answer is returned directly.
+
+The returned hash contains the following keys:
+
+ MAJOR =>  major version number
+ MINOR =>  minor version number
+ PATCHLEVEL => patchlevel
+ STRING => stringified version in form "Vm.n-p"
+ VERSION => perl 5.6.0 version number vm.n.p
+
+The "VERSION" key is only set for perl versions 5.6.0 and newer.
+C<undef> is returned if version can not be determined.
+
+=cut
+
+sub _get_version ($) {
+  my $app = shift;
+  $app = lc($app);
+
+  # Check to see if the hash is used and return immediately if it is
+  return %{ $CACHE{ $app } } if exists $CACHE{ $app };
+
+  my @version;
+  # see if we have a PROG_DIR
+  if (defined _get_app_dir( $app ) ) {
+    @version = _get_version_from_appdir( $app );
+
+    # Read from datestamp file if could not get from appdir
+    @version = _get_version_from_datestamp( 1, $app )
+      unless defined $version[0];
+
+  } else {
+    # Okay, no PROG_DIR defined so look in /star (or wherever)
+    @version = _get_version_from_datestamp( 0, $app );
+  }
+
+  # If we have something we need to cache, cache it
+  if (defined $version[0]) {
+    $CACHE{$app} = {
+		    MAJOR => $version[0],
+		    MINOR => $version[1],
+		    PATCHLEVEL => $version[2],
+		    STRING => "V$version[0].$version[1]-$version[2]",
+		   };
+    if ($] >= 5.006) {
+      $CACHE{$app}{VERSION} = eval "v$version[0].$version[1].$version[2]";
+    }
+  }
+
+  # Return the version hash if we have a version
+  # else we dont want to add the key
+  return (defined $version[0] ? %{ $CACHE{ $app } } : undef );
+}
 
 
 =end __PRIVATE__
 
+=head1 NOTES
+
+Can be used to determine any Starlink product that installs a datestamp
+file. For example, it can be used to determine library versions as well
+as applications.
 
 =head1 AUTHOR
 
