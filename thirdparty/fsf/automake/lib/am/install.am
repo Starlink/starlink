@@ -114,8 +114,12 @@ install-manifest:
 ?!STANDARDMANIFEST?	    (cd $$STG && find . ! -type d | \
 ?!STANDARDMANIFEST?	      sed "s,^\.,$$DESTDIR," | \
 ?!STANDARDMANIFEST?	      while read f; do \
-?!STANDARDMANIFEST?	        echo $$f>&5; \
-?!STANDARDMANIFEST?	        test -f $$f && { chmod 666 $$f && rm -f $$f; }; \
+?!STANDARDMANIFEST?	        echo $$f >&5; \
+?!STANDARDMANIFEST?	        test -f $$f && chmod 666 $$f && rm -f $$f; \
+## The following null command appears to be necessary.  The /bin/sh on
+## Solaris (SunOS 5.9) appears to get very upset if it isn't there.
+## I haven't a clue why!
+?!STANDARDMANIFEST?	        :; \
 ?!STANDARDMANIFEST?	      done ); \
 ?!STANDARDMANIFEST?	    if test -d "$$STG$(prefix)"; then \
 ?!STANDARDMANIFEST?	      echo "(cd $$STG$(prefix); $(CP_RECURSIVE) . $$DESTDIR$(prefix))"; \
