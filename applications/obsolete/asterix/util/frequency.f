@@ -287,8 +287,8 @@
       END IF
 
 *    Obtain whether normalisation is required
-      CALL USI_DEF0L( 'NORMALISE', .TRUE., STATUS )
-      CALL USI_GET0L( 'NORMALISE', NORMALISE, STATUS )
+      CALL USI_DEF0L( 'NORM', .TRUE., STATUS )
+      CALL USI_GET0L( 'NORM', NORMALISE, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map data for bins
