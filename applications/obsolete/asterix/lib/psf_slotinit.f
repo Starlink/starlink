@@ -192,7 +192,8 @@
 
 *    Call the INIT routine if defined
       IF ( L_MOD_I(MID,LID) .NE. 0 ) THEN
-        CALL PSF_PSF_INIT_EXEC( %VAL(L_MOD_I(MID,LID)), SLOT,
+        CALL PSF_PSF_INIT_EXEC( %VAL(L_MOD_I(MID,LID)),
+     :                          P_PSID(SLOT), SLOT,
      :                          P_FID(SLOT), P_INST(SLOT), STATUS )
       END IF
 
@@ -262,7 +263,8 @@
 
 
 *+  PSF_PSF_INIT_EXEC - Call initialisation routine for a given slot
-      SUBROUTINE PSF_PSF_INIT_EXEC( ROUTINE, SLOT, FID, INST, STATUS )
+      SUBROUTINE PSF_PSF_INIT_EXEC( ROUTINE, PSID,
+     :            SLOT, FID, INST, STATUS )
 *
 *    Authors :
 *
@@ -288,6 +290,7 @@
 *    Import :
 *
       EXTERNAL			ROUTINE			! Psf initialiser
+      INTEGER			PSID
       INTEGER			SLOT			! Dataset id
       INTEGER			FID			! Dataset id
       INTEGER          		INST                   	! Internal data
@@ -297,6 +300,6 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Invoke initialisation routine
-      CALL ROUTINE( SLOT, FID, INST, STATUS )
+      CALL ROUTINE( PSID, SLOT, FID, INST, STATUS )
 
       END
