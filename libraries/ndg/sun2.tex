@@ -6,13 +6,13 @@
 %------------------------------------------------------------------------------
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun2.4}
+\newcommand{\stardocsource}    {sun2.5}
 \newcommand{\stardocnumber}    {2.4}
 \newcommand{\stardocauthors}   {D.S.\ Berry \\ M.B.\ Taylor}
-\newcommand{\stardocdate}      {15th June 2001}
+\newcommand{\stardocdate}      {3rd September 2002}
 \newcommand{\stardoctitle}     {NDG \\ [1ex]
                                 Routines for Accessing Groups of NDFs}
-\newcommand{\stardocversion}   {Version 5.1}
+\newcommand{\stardocversion}   {Version 5.2}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1888,6 +1888,13 @@ to add further members.
 }
 
 \newpage
+\section{Changes Introduced in NDG Version 5.2}
+\begin{itemize}
+   \item The C routine ndg1\_regsb.c has been changed to avoid warning 
+         message about "tmpnam" when linking applications on Redhat Linux 
+	 systems.
+\end{itemize}
+
 \section{Changes Introduced in NDG Version 5.1}
 \begin{itemize}
    \item A new routine NDG\_ASEXP has been added which allows a group of
