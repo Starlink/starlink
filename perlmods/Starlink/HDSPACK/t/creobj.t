@@ -4,8 +4,9 @@
 
 use strict;
 use Test;
-BEGIN { plan tests => 11 }
+BEGIN { plan tests => 12 }
 use Starlink::HDSPACK qw/ creobj setobj /;
+use NDF;
 
 $Starlink::HDSPACK::DEBUG = 1;
 
@@ -13,7 +14,8 @@ $Starlink::HDSPACK::DEBUG = 1;
 my $status = &Starlink::HDSPACK::SAI__OK;
 my $good = $status;
 
-
+# Start error context
+err_begin($status);
 
 # Now need to set up a target
 my $out = "out$$";
@@ -74,8 +76,15 @@ for (0..($nfits-1)) {
 $status = setobj($out . ".MORE.FITS", \@fits, $status);
 ok($status, $good);
 
+# One final setobj of an error condition
+$status = setobj($out, 5, $status);
+ok($status != $good);
+err_annul($status);
+
 unlink "${out}.sdf"
   or die "Error removing temporary file";
+
+err_end($status);
 
 exit;
 
