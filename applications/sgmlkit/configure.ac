@@ -23,9 +23,13 @@ AC_ARG_WITH(perlsgml,
 hich contains lib/SGML/DTD.pm)]),
             PERLSGMLDIR=$withval/lib,
             PERLSGMLDIR=./lib)
-# make PERLSGMLDIR absolute
-PERLSGMLDIR=`cd $PERLSGMLDIR; pwd`
-AC_CHECK_FILE([$PERLSGMLDIR/SGML/DTD.pm],,[PERLSGMLDIR=/UNKNOWN])
+AC_CHECK_FILE([$PERLSGMLDIR/SGML/DTD.pm],,[PERLSGMLDIR=UNKNOWN])
+if test "$PERLSGMLDIR" = UNKNOWN; then
+    AC_MSG_NOTICE([Can't find perlSGML, which is required for building SSN/70.  Get it from http://search.cpan.org/~ehood/perlSGML.1997Sep18/ and point to it using --with-perlsgml])
+else
+    # make PERLSGMLDIR absolute
+    PERLSGMLDIR=`cd $PERLSGMLDIR; pwd`
+fi
 AC_SUBST(PERLSGMLDIR)
 
 
