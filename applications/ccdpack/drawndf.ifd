@@ -88,14 +88,14 @@
             helpkey *
          }
 
-         parameter labmode {
+         parameter label {
                             # Labelling mode
             type LITERAL
             access READ
             vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default NAME
-            prompt {Text labelling mode (NAME,INDEX,BOTH,NONE)}
+            default NAME DOT
+            prompt {Labelling mode (0 or more of NAME,INDEX,DOT)}
             helpkey *
          }
 
