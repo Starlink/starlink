@@ -28,5 +28,5 @@ figaro3_LDADD = $(LDADD) \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
 ../ich/libich.la \
-`pda_link` `agi_link_adam` `grp_link_adam` `ndf_link_adam` \
+`pda_link`  `agp_link_adam` `grp_link_adam` `ndf_link_adam` \
 `fio_link_adam` 
