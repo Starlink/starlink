@@ -136,7 +136,6 @@
 							! and variance
       INTEGER 			OPT			! Rebinning option
       INTEGER			OFID			! Output dataset id
-      INTEGER			SPID			! Interface object
 
       BYTE 			MASK			! I/p quality mask
 
@@ -210,9 +209,7 @@
      :                   %VAL(TWPTR),%VAL(TVPTR),STATUS)
 
 *    Create output object
-        CALL BDI_NEW( 'Spectrum', 1, ONVAL, 'REAL', SPID, STATUS )
-        CALL ADI_SETLNK( SPID, OFID, STATUS )
-        OFID = SPID
+        CALL BDI_LINK( 'Spectrum', 1, ONVAL, 'REAL', OFID, STATUS )
 
 *    Copy data from temporary storage to output file
         CALL BDI_PUT1R( OFID, 'Data', ONVAL, %val(TDPTR), STATUS )

@@ -129,7 +129,6 @@
       CHARACTER*80              HTXT(5)    		!
       CHARACTER*10              NSTR              	!
 
-      INTEGER			BDID			! Interface object
       INTEGER                   DIMS(ADI__MXDIM)  	! Input dimensions
       INTEGER                   IDPTR,IVPTR,IQPTR 	! Input data pointers
       INTEGER                   ODIMS(ADI__MXDIM) 	! Output dimensions
@@ -260,9 +259,7 @@
       END IF
 
 *  Define output file
-      CALL BDI_NEW( 'BinDS', NDIM, ODIMS, 'REAL', BDID, STATUS )
-      CALL ADI_SETLNK( BDID, OFID, STATUS )
-      OFID = BDID
+      CALL BDI_LINK( 'BinDS', NDIM, ODIMS, 'REAL', OFID, STATUS )
 
 *  Create and map output data
       CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )

@@ -120,7 +120,6 @@
       REAL                      DMAX, DMIN              ! Range in data
       REAL			SPARR(2)		! Spaced array data
 
-      INTEGER			BDID			! Interface object
       INTEGER                   I                       ! General loop variable
       INTEGER                   IDIMS(ADI__MXDIM)       ! Input dimensions
       INTEGER                   IDPTR                   ! Input data ptr
@@ -204,9 +203,7 @@
       END IF
 
 *  Create interface object
-      CALL BDI_NEW( 'BinDS', INDIM-1, ODIMS, 'REAL', BDID, STATUS )
-      CALL BDI_SETLNK( BDID, OFID, STATUS )
-      OFID = BDID
+      CALL BDI_LINK( 'BinDS', INDIM-1, ODIMS, 'REAL', OFID, STATUS )
 
 *  Create output axes. First axis comes from input data, second and
 *  subsequent axes are copied from 3rd onwards from input, if present.
