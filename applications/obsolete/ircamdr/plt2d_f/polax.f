@@ -48,12 +48,12 @@
 
 	CALL NDF_ASSOC( 'INPICQP', 'READ', LOCIQP, STATUS)
 	CALL NDF_ASSOC( 'INPICUT', 'READ', LOCIUT, STATUS)
-	if( status .ne. adam__ok) then
+	IF ( STATUS .NE. SAI__OK) then
           CALL ERR_REP('ERR', 
      :                 'Error, after NDF_assoc in polax ...',
      :                  STATUS )
-	  return
-	end if
+	  RETURN
+	END IF
 
 *      map in the two input images
 
@@ -62,7 +62,7 @@
 	CALL NDF_MAP( LOCIUT, 'Data', '_REAL', 'READ', PNTRIUT, 
      :                NELEMENTS, STATUS)
 
-	if( status .ne. adam__ok) then
+	if( status .ne. sai__ok) then
           CALL ERR_REP('ERR', 
      :                 'Error, after NDF_map in polax ...',
      :                  STATUS )
@@ -101,7 +101,7 @@
 *      get option to plot (or not) the annotation around plot
 
 	CALL PAR_GET0C( 'POLANN', POLANN, STATUS)
-	if( status .ne. adam__ok) then
+	if( status .ne. sai__ok) then
           CALL ERR_REP('ERR', 
      :                 'Error, after par_gets in polax ...',
      :                  STATUS )
@@ -118,7 +118,7 @@
 
 	CALL NDF_ANNUL( LOCIQP, STATUS)
 	CALL NDF_ANNUL( LOCIUT, STATUS)
-	if( status .ne. adam__ok) then
+	if( status .ne. sai__ok) then
           CALL ERR_REP('ERR', 
      :                 'Error, after NDF_annuls in polax ...',
      :                  STATUS )
