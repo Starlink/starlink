@@ -32,6 +32,7 @@
 *      3 Mar 92 : V1.6-0 Renamed from EXPORT (DJA)
 *     30 Mar 92 : V1.6-1 Correct use ERR_ANNUL (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     14 Feb 95 : V1.8-1 Use AIO for i/o to allow file clobbering (DJA)
 *
 *    Type definitions :
 *
@@ -78,7 +79,6 @@
       INTEGER              N
       INTEGER              NELM
       INTEGER              NDIM, ONDIM
-      INTEGER              OFFSET                 ! Current data offset
       INTEGER              OLEN                   ! Output format
       INTEGER              PTR(MX_IN)
 
@@ -89,7 +89,7 @@
 *    Version :
 *
       CHARACTER*30         VERSION
-        PARAMETER          ( VERSION = 'HDS2TEXT Version 1.8-0' )
+        PARAMETER          ( VERSION = 'HDS2TEXT Version 1.8-1' )
 *-
 
 *    Check status
@@ -240,11 +240,10 @@
       END IF
 
 *    Grab output file
-      CALL FIO_ASSOC( 'OUT', 'WRITE', 'FORTRAN', 0, CHAN, STATUS )
+      CALL AIO_ASSOCO( 'OUT', 'LIST', CHAN, OUTWIDTH, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Output the data
-      OFFSET = 0
       OLEN = CHR_LEN(OUTF)
       OUTF = '('//OUTF(:OLEN)//')'
       OLEN = OLEN + 2
@@ -252,19 +251,18 @@
          STR = ' '
          LTAB = 2
          DO J = 1, N
-            CALL ARR_COP1R( 1, %VAL(PTR(J)+OFFSET), DATUM, STATUS )
+            CALL ARR_ELEM1R( PTR(J), NELM, I, DATUM, STATUS )
             WRITE ( STR(LTAB:(LTAB+14)), OUTF(:OLEN) ) DATUM
             LTAB = LTAB + 15
          END DO
-         CALL FIO_WRITE( CHAN, STR(:(LTAB-1)), STATUS )
-         OFFSET = OFFSET + 4
+         CALL AIO_WRITE( CHAN, STR(:(LTAB-1)), STATUS )
       END DO
 
 *    Close down output
-      CALL FIO_CANCL( 'OUT', STATUS )
+      CALL AIO_CANCL( 'OUT', STATUS )
 
 *    Tidy up
- 99   CALL AST_CLOSE( STATUS )
+ 99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
