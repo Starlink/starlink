@@ -108,7 +108,7 @@
 	<verbatim>autoastrom [options...] &lt;NDF&gt;</verbatim></p>
       
       <p>The options available are described in <ref id="tab.opts"/>.
-	Values can be specified in the form <code>&ddash;catalogue
+	String or integer values can be specified in the form <code>&ddash;catalogue
 	  usno@eso</code> or <code>&ddash;catalogue=usno@eso</code>;
 	booleans can be specified as either <code>&ddash;insert</code>
 	(meaning true) or <code>&ddash;noinsert</code> (false).</p>
@@ -141,6 +141,11 @@
 	      </row>
 -->
 	      <row>
+		<entry><ref id="opt.defects">&ddash;defects</ref></entry>
+		<entry>string</entry>
+		<entry>Remove CCD defects</entry>
+	      </row>
+	      <row>
 		<entry><ref id="opt.help">&ddash;help</ref></entry>
 		<entry></entry>
 		<entry>Print usage information and exit</entry>
@@ -159,6 +164,11 @@
 		<entry><ref id="opt.keeptemps">&ddash;keeptemps</ref></entry>
 		<entry>boolean</entry>
 		<entry>keep temporary files?</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.match">&ddash;match</ref></entry>
+		<entry>string</entry>
+		<entry>choose matching algorithm</entry>
 	      </row>
 	      <row>
 		<entry><ref id="opt.maxobj">&ddash;maxobj</ref></entry>
@@ -322,6 +332,44 @@
 	</subsubsect>
 -->
 
+	<subsubsect id="opt.defects">
+	  <subhead>
+	    <title>--defects</title>
+	  </subhead>
+
+	  <p>If this option is present, then when the application
+	    extracts the list of objects from the CCD, it will try to
+	    remove CCD blemishes.</p>
+
+	  <p>Some of the `objects' detected by
+	    EXTRACTOR are in fact CCD defects, or readout errors, or the
+	    like.  These are very bright, so they can confuse a matching
+	    program which examines only or preferentially the brightest
+	    objects.  However these are either very small or, if they're
+	    defects such as a line, extremely elliptical, with
+	    ellipticities around 10.  If the option is present then
+	    any object which has too small an area or too large an
+	    ellipticity is ignored.</p>
+
+	  <p>The option may be followed by a list of comma-separated
+	    keyword-value pairs, such as
+	    <code>--defects=area=50,ellipticity=3</code>, to set the
+	    thresholds.  The default minimum area is 100 pixels, and
+	    the default maximum ellipticity is 3.5.</p>
+
+	  <p>This option is not typically necessary when used with the
+	    default FINDOFF matching algorithm, but it is vital when
+	    used with the `match' matching algorithm
+	    (see <ref id="opt.match"/>), since that algorithm uses only the
+	      brightest objects detected.</p>
+
+	  <p>This defect-removal algorithm is not particularly
+	    sophisticated -- if the object-extraction is producing
+	    spurious objects, you may need to mask the defects out
+	    using GAIA or similar.</p>
+
+	</subsubsect>
+
 	<subsubsect id="opt.help">
 	  <subhead>
 	    <title>--help</title>
@@ -376,6 +424,23 @@
 	    execution.</p>
 
 	  <p>Default: true (but this <em>will</em> change)</p>
+	</subsubsect>
+
+	<subsubsect id="opt.match">
+	  <subhead>
+	    <title>--match</title>
+	  </subhead>
+
+	  <p>Specifies an alternative matching algorithm.  The default
+	    algorithm is `findoff', which is part of CCDPACK.  This does
+	    work, but is rather slow, and is completely thrown by a CCD
+	    image with unequal X and Y scales, making it essentially
+	    unusable if the image NDF does not have some astrometry
+	    already, or if you try to specify a position with
+	    <code>--obsdata</code> (see <ref id="opt.obsdata"/>).</p>
+
+	  <p>&autoastrom; has support for plugins which provide
+	    alternative matching algorithms.  See <ref id="plugins"/>.</p>
 	</subsubsect>
 
 	<subsubsect id="opt.maxobj">
@@ -731,6 +796,10 @@
 	  <title>Environment</title>
 	</subhead>
 
+	<p>The environment variable <code>AUTOASTROM_DIR</code> points
+	  to the installed location of the software and its auxiliary
+	  programs. </p>
+
 	<p>If you need to use a proxy to get to the web, then you
 	  should define the environment variable
 	  <code>http_proxy</code> to the appropriate value for your
@@ -743,6 +812,39 @@
 	  specify an alternative SkyCat configuration file, you should 
 	  do that with the <code>--skycatconfig</code> option instead
 	  (see <ref id="opt.skycatconfig"/>).</p>
+      </subsect>
+
+      <subsect id="plugins" export="export">
+	<subhead>
+	  <title>Plugins</title>
+	</subhead>
+
+	<p>&autoastrom; has a flexible extension mechanism,
+	  implemented through plugins.  At present, the only area of
+	  the code which takes advantage of this is the part which
+	  finds matches between the objects found on the CCD and those
+	  in the downloaded object catalogue.</p>
+
+	<p>The program searches the directory pointed to by the
+	  environment variable <code>AUTOASTROM_DIR</code> (see <ref
+	    id="environment"/>) for files which match the pattern
+	  <code>plugin-*.pl</code>, and reads in all it finds.  Each
+	  such file must define a single subroutine, and assign a
+	  reference to that subroutine to the
+	  appropriate member of the hash <code>%helpers</code>.</p>
+
+	<p>&autoastrom; comes with a single plugin, to use the `match'
+	algorithm for object matching, rather than CCDPACK's
+	`findoff'.  To use this, specify `match' as the argument to
+	the `match' option, as <code>--match=match</code> (see <ref
+	id="opt.match"/>).</p>
+
+	<p>If you wish to add further plugins, see the documentation
+	  for the function <code>match_positions</code>.  That is
+	  given a plugin name, say `mymatch', and
+	  searches for the entry
+	  <code>$helpers{plugin-match-mymatch}</code>.</p>
+
       </subsect>
       
     </sect>
