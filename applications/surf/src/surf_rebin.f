@@ -93,6 +93,7 @@
       INTEGER          DIMX (MAX_DIM)  ! expected array dimensions
       DOUBLE PRECISION DTEMP           ! scratch double
       DOUBLE PRECISION DTEMP1          ! scratch double
+      INTEGER          DUMMY_PTR       ! Dummy pointer
       INTEGER          EXPOSURE        ! exposure index in DO loop
       INTEGER          EXP_END         ! end index of data for an exposure
       DOUBLE PRECISION EXP_LST         ! sidereal time at which exposure
@@ -198,6 +199,7 @@
                                        ! data variance from input files
       INTEGER          ISTART          ! index of start of sub-string
       INTEGER          ITEMP           ! scratch integer
+      INTEGER          ITEMPB          ! Another scratch integer
       INTEGER          IY              ! year in which input observation started
       INTEGER          I_CENTRE        ! I index of central pixel in output
                                        ! map
@@ -304,6 +306,7 @@
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
       CHARACTER*1      SIGN            ! + or -
+      LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
@@ -699,10 +702,45 @@
             CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
             CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', 
      :        FILE_DATA_PTR, ITEMP, STATUS)
-            CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
-     :        FILE_VARIANCE_PTR, ITEMP, STATUS)
-            CALL NDF_MAP (IN_NDF, 'QUALITY', '_INTEGER', 'READ',
-     :        FILE_QUALITY_PTR, ITEMP, STATUS)
+
+* Need to check if FIGARO has removed the VARIANCE array
+            CALL NDF_STATE(IN_NDF, 'VARIANCE', STATE, STATUS)
+
+            IF (STATE) THEN
+               CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ',
+     :              FILE_VARIANCE_PTR, ITEMP, STATUS)
+            ELSE
+               CALL MSG_OUT(' ','WARNING! REDS_BESSEL_REBIN: '//
+     :              'Variance array is missing. Using dummy array',
+     :              STATUS)
+               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBR,
+     :              FILE_VARIANCE_PTR, DUMMY_PTR, STATUS)
+               ITEMP = DIM(1) * DIM(2)
+               RTEMP = 1.0e-6
+               CALL SCULIB_ENTER_DUMMY_DATA_R(%VAL(FILE_VARIANCE_PTR),
+     :              ITEMP, RTEMP, STATUS)
+            END IF
+ 
+               
+           CALL NDF_STATE(IN_NDF, 'QUALITY', STATE, STATUS)
+
+            IF (STATE) THEN
+                CALL NDF_MAP (IN_NDF, 'QUALITY', '_INTEGER', 'READ',
+     :              FILE_QUALITY_PTR, ITEMP, STATUS)
+
+            ELSE
+               CALL MSG_OUT(' ','WARNING! REDS_BESSEL_REBIN: '//
+     :              'Quality array is missing. Unflagging all data',
+     :              STATUS)
+               CALL SCULIB_MALLOC(DIM(1)*DIM(2)*VAL__NBI,
+     :              FILE_QUALITY_PTR, DUMMY_PTR, STATUS)
+               ITEMP = DIM(1) * DIM(2)
+               RTEMP = 0
+               CALL SCULIB_ENTER_DUMMY_DATA_I(%VAL(FILE_QUALITY_PTR),
+     :              ITEMP, ITEMPB, STATUS)
+            END IF
+ 
+               
 
             IF (STATUS .EQ. SAI__OK) THEN
                IF ((NDIM .NE. 2)    .OR.
@@ -1484,7 +1522,7 @@
          CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
 
          STEMP = SIGN
-         WRITE (STEMP(2:4),'(I3.3)') HMSF(1)
+         WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
          STEMP (5:5) = ' '
          WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
          STEMP (8:8) = ' '
@@ -1777,3 +1815,47 @@
       CALL NDF_END (STATUS)
  
       END
+
+
+
+      SUBROUTINE SCULIB_ENTER_DUMMY_DATA_R(ARRAY, NUM, VALUE, STATUS)
+
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+
+      INTEGER STATUS          ! Global status
+
+      INTEGER I
+      INTEGER NUM             ! Number of elements in array
+      REAL    VALUE           ! Values to be entered in array
+      REAL    ARRAY(NUM)      ! Data array
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO I = 1, NUM
+         ARRAY(I) = VALUE
+      END DO
+
+      END
+
+
+      SUBROUTINE SCULIB_ENTER_DUMMY_DATA_I(ARRAY, NUM, VALUE, STATUS)
+
+      IMPLICIT NONE
+      INCLUDE 'SAE_PAR'
+
+      INTEGER STATUS          ! Global status
+
+      INTEGER I
+      INTEGER NUM             ! Number of elements in array
+      INTEGER VALUE           ! Values to be entered in array
+      INTEGER ARRAY(NUM)      ! Data array
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      DO I = 1, NUM
+         ARRAY(I) = VALUE
+      END DO
+
+      END
+
