@@ -1,0 +1,73 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     ast_dev
+
+#  Purpose:
+#     Create links to EXTREME include files.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This command creates (or removes) symbolic links in your current
+#     directory which refer to the EXTREME include files. It is provided so
+#     that you may develop software which uses these files without having
+#     to know where they reside.
+
+#  Invocation:
+#     ext_dev [option]
+
+#  Arguments:
+#     option
+#        If no value is supplied for this argument, symbolic links to EXTREME
+#        include files (for both Fortran and C) are created in your current
+#        directory. If the value ``remove'' is given, these links are
+#        removed. Any other value results in an error.
+
+#  Examples:
+#     ext_dev
+#        Creates links to the EXTREME include files in your current directory.
+#     ext_dev remove
+#        Removes any links to the EXTREME include files from your current
+#        directory.
+
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+
+#  History:
+#     18-FEB-2000 (MBT):
+#        Original version.
+
+#-
+
+#  Implementation Notes:
+#     The pathname of the installation include directory (e.g. /star/include)
+#     must be edited into this script when it is installed. This is normally
+#     done by the makefile.
+
+#  Interpret command line.
+      case "${1}" in
+
+#  No arguments: create appropriate links.
+      '')
+         ln -s INSTALL_INC/extreme.h extreme.h
+         ln -s INSTALL_INC/ext_dec EXT_DEC
+         ln -s INSTALL_INC/ext_def EXT_DEF
+         ln -s INSTALL_INC/ext_par EXT_PAR
+         ;;
+
+#  Argument is "remove": delete links.
+      remove)
+         rm -f extreme.h EXT_DEC EXT_DEF EXT_PAR
+         ;;
+
+#  Any other argument is invalid: report an error.
+      *)
+         echo "ast_dev: invalid argument \"${1}\" given" >&2
+         exit 1
+      ;;
+      esac
+
+# $Id$
