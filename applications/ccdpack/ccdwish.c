@@ -62,6 +62,8 @@
 #include "sae_par.h"
 #include "cnf.h"
 
+#include <config.h>
+
 #define BUFLENG 4096
 
 /* Global variables. */
@@ -102,6 +104,9 @@
 
 /* Tweak floating point behaviour on linux. */
       F77_CALL(ccd1_linflt)();
+
+/* Pass on the command-line to Fortran getarg() */
+      FC_SETARG(argc, argv);
 
 /* Set the TCL library environment variables to the same value as CCDPACK_DIR.
    This will cause the autoloader to look there for various library files. */
