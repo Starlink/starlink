@@ -45,6 +45,8 @@
 *        Original version.
 *     8-SEP-2000 (DSB):
 *        Check for errors in AST_MAPBOX.
+*     27-FEB-2001 (DSB):
+*        Report an error if there are no significant axes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -158,7 +160,7 @@
      :                     AST_GETC( IWCS, ATT( : IAT ), STATUS ) )
 
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPG1_ASSIG_ERR', 'Unable to find limits '//
+            CALL ERR_REP( 'KPG1_ASSIG_ERR1', 'Unable to find limits '//
      :                    'for ^AX over the pixel grid. Try using '//
      :                    'WCSFRAME to set the current co-ordinate '//
      :                    'Frame to PIXEL.', STATUS )
@@ -197,8 +199,14 @@
 
       END DO
 
+*  Report an error if no significant axes were found.
+      IF( NSIG .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN 
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_ASSIG_ERR2', 'No significant axes found '//
+     :                 'in the current coordinate Frame.', STATUS )
+      
 *  If any insignificant axes were found...
-      IF( NINSIG .GT. 0 ) THEN
+      ELSE IF( NINSIG .GT. 0 ) THEN
 
 *  Create a PermMap which connects the full Current Frame (with NAXC axes)
 *  to the cut-down Frame (with NSIG axes).
