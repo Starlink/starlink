@@ -267,7 +267,7 @@
 *  Read in the next batch of values to use as the basis of the RA and DEC
 *  values.
                DO IGA = 1, NDIM
-                  CALL POL1_GCOLD( CI, GA( IGA ), IROW, BATSZ, 
+                  CALL CAT_GCOLD( CI, GA( IGA ), IROW, BATSZ, 
      :                             WORK1( 1, IGA ), STATUS )     
                END DO
 
@@ -281,9 +281,9 @@
 
 *  Otherwise, read the RA and DEC values in from the input catalogue.
             ELSE
-               CALL POL1_GCOLD( CI, GCOL( 3 ), IROW, BATSZ, 
+               CALL CAT_GCOLD( CI, GCOL( 3 ), IROW, BATSZ, 
      :                          WORK2( 1, 1 ), STATUS )     
-               CALL POL1_GCOLD( CI, GCOL( 4 ), IROW, BATSZ, 
+               CALL CAT_GCOLD( CI, GCOL( 4 ), IROW, BATSZ, 
      :                          WORK2( 1, 2 ), STATUS )     
 
 *  Indicate that we stll need to read X and Y columns.
@@ -294,9 +294,9 @@
 
 *  Read in the next batch of X and Y values, if we do not already have
 *  them.
-            IF( READX ) CALL POL1_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, 
+            IF( READX ) CALL CAT_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, 
      :                                   WORK1( 1, 1 ), STATUS )     
-            IF( READY ) CALL POL1_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, 
+            IF( READY ) CALL CAT_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, 
      :                                   WORK1( 1, 2 ), STATUS )     
 
 *  Read the remaining columns.
@@ -307,14 +307,14 @@
                         WORK3( KK, I - 4 ) = KK + IROW - 1
                      END DO
                   ELSE IF( CHARID ) THEN
-                     CALL POL1_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
+                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
      :                                WORK4, STATUS )     
                   ELSE 
-                     CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                                WORK3( 1, I - 4 ), STATUS )
                   END IF      
                ELSE
-                  CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                             WORK3( 1, I - 4 ), STATUS )     
                END IF
             END DO
@@ -405,9 +405,9 @@
          ELSE
 
 *  Read in the next batch of X and Y values.
-            CALL POL1_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, WORK1( 1, 1 ),
+            CALL CAT_GCOLD( CI, GCOL( 1 ), IROW, BATSZ, WORK1( 1, 1 ),
      :                       STATUS )     
-            CALL POL1_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, WORK1( 1, 2 ),
+            CALL CAT_GCOLD( CI, GCOL( 2 ), IROW, BATSZ, WORK1( 1, 2 ),
      :                       STATUS )     
 
 *  Read the remaining columns.
@@ -418,14 +418,14 @@
                         WORK3( KK, I - 2 ) = KK + IROW - 1
                      END DO
                   ELSE IF( CHARID ) THEN
-                     CALL POL1_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
+                     CALL CAT_GCOLC( CI, GCOL( I ), IROW, BATSZ, 
      :                                WORK4, STATUS )     
                   ELSE
-                     CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+                     CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                                WORK3( 1, I - 2 ), STATUS )     
                   END IF      
                ELSE
-                  CALL POL1_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
+                  CALL CAT_GCOLR( CI, GCOL( I ), IROW, BATSZ, 
      :                             WORK3( 1, I - 2 ), STATUS )     
                END IF
             END DO
