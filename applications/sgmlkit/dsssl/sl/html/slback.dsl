@@ -688,7 +688,7 @@ Indexing support.
           ((string=? (car k1) (car k2))
            (loop (cdr k1) (cdr k2)))
           (else
-           (string<=? (car k1) (car k2))))))
+           (string-ci<=? (car k1) (car k2))))))
 
 ;; Return true if the two index entries have different text, and false if
 ;; they represent the same test.  The true value encodes how they are
