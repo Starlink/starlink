@@ -390,6 +390,7 @@
 
 *  Local Variables:
       CHARACTER ACTDES( 2 )*20  ! Cursor action descriptions
+      CHARACTER ATTR*15         ! AST attribute name
       CHARACTER BUFFER*80       ! Buffer for reading the x-y lists
       CHARACTER BUFOUT*80       ! Buffer for writing the logfile
       CHARACTER COMP*13         ! Array components to process
@@ -426,6 +427,7 @@
       INTEGER FD                ! File description of input text file
       INTEGER FDO               ! File description of output text file
       INTEGER I                 ! Loop counter
+      INTEGER IAT               ! No. of characters in a string
       INTEGER IERR              ! Position of first exception during variance generation
       INTEGER IMARK             ! Index of PGPLOT marker symbol for this region
       INTEGER INDF1             ! Input-NDF identifier
@@ -439,6 +441,7 @@
       INTEGER LCSTA             ! The state of parameter LINCOL
       INTEGER LINES             ! Non-zero if a line is to be drawn
       INTEGER MAP               ! Mapping from supplied Frame to PIXEL Frame
+      INTEGER NAX               ! No. of axes in CFRM
       INTEGER NC                ! Character column counter
       INTEGER NCHAR             ! Number of characters in buffer read from the co-ordinate file
       INTEGER NERR              ! Number of exceptions in variance generation
@@ -634,18 +637,37 @@
 
 *  Write a header to the output log file if one is being created.
       IF( COLLOG ) THEN
-         CALL NDF_MSG( 'N', INDF1 )
-         CALL MSG_LOAD( ' ', '# File created by KAPPA:ZAPLIN '//
-     :                  'describing areas zapped in ''^N''.', BUFOUT,
-     :                  NC, STATUS )
-         CALL FIO_WRITE( FDO, BUFOUT( : NC ), STATUS )
+         CALL FIO_WRITE( FDO, '# File created by KAPPA:ZAPLIN '//
+     :                  'describing areas zapped in:', STATUS )
 
-         CALL FIO_WRITE( FDO, '# Title of co-ordinate Frame used '//
-     :                   'in this file:', STATUS )
-         CALL MSG_SETC( 'T', AST_GETC( CFRM, 'TITLE', STATUS ) )
-         CALL MSG_LOAD( ' ', '#    ''^T''', BUFOUT, NC, STATUS )
+         CALL NDF_MSG( 'N', INDF1 )
+         CALL MSG_LOAD( ' ', '#    ^N', BUFOUT, NC, STATUS )
+         CALL FIO_WRITE( FDO, BUFOUT( : NC ), STATUS )
+         CALL FIO_WRITE( FDO, '#', STATUS )
+         CALL FIO_WRITE( FDO, '# Axis labels for co-ordinate Frame '//
+     :                   'used in this file:', STATUS )
+         BUFOUT = '#   '
+         NC = 4
+
+         NAX = AST_GETI( CFRM, 'NAXES', STATUS )
+         DO I = 1, NAX
+            ATTR = 'LABEL('
+            IAT = 6
+            CALL CHR_PUTI( I, ATTR, IAT )
+            CALL CHR_APPND( ')', ATTR, IAT )
+            CALL CHR_APPND( AST_GETC( CFRM, ATTR( : IAT ), STATUS ),
+     :                      BUFOUT, NC )
+
+            IF( I .LT. NAX ) THEN
+               CALL CHR_APPND( ',', BUFOUT, NC )
+               NC = NC + 1
+            END IF
+
+         END DO
+
          CALL FIO_WRITE( FDO, BUFOUT( : NC ), STATUS )
          CALL FIO_WRITE( FDO, ' ', STATUS )
+
       END IF
 
 *  In graphics mode, merge the WCS FrameSet read from the NDF with the
