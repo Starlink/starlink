@@ -113,7 +113,7 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 	$(JADE) -t sgml -d $(STYLESHEET)/html/slback.dsl#back.main $< > $@
 	ROOT=`awk -F: '{print $$1}' $@`; \
 	if [ -r $$ROOT.bibliography.aux ]; then \
-		BSTINPUTS=$(LIBDIR); \
+		BSTINPUTS=$(LIBDIR) \
 		bibtex $$ROOT.bibliography; \
 		sed -f $(LIBDIR)/postprocess-bbl.sed \
 			$$ROOT.bibliography.bbl > t.bbl; \
