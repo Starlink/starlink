@@ -13,9 +13,26 @@
 # modules which are necessary (module "prolog sgml document string"
 # for class DocumentTypeDecl and friends).  Pity....
 
-$#ARGV == 0 || die "Usage: $0 dtd-file\n";
+$Usage = "Usage: $0 [--descrip descrip-file] dtd-file\n";
 
-$dtdfilename = $ARGV[0];
+while ($#ARGV >= 0) {
+  Switch: {
+      ($ARGV[0] eq '--descrip') && do {
+	  ($#ARGV > 0) || die $Usage;
+	  shift (@ARGV);
+	  $descripfilename = $ARGV[0];
+	  last Switch;
+      };
+      $dtdfilename = $ARGV[0];
+  }
+    shift (@ARGV);
+}
+
+defined ($dtdfilename) || die $Usage;
+defined ($descripfilename) || do {
+    ($descripfilename = $dtdfilename) =~ s+^.*/++;
+    $descripfilename =~ s/\.[^.]*$/\.description/;
+};
 
 use SGML::DTD;
 
@@ -29,7 +46,7 @@ $dtd->read_dtd(\*DTDFILE);
 
 @top_element = $dtd->get_top_elements();
 
-print "<!doctype dtdelementlist system 'dtdelementlist.dtd'>\n<dtdelementlist sysid='$dtdfilename' top='$top_element[0]'>\n";
+print "<!doctype dtdelementlist system 'dtdelementlist.dtd'>\n<dtdelementlist sysid='$dtdfilename' top='$top_element[0]' description='$descripfilename'>\n";
 
 foreach $e (@elements) {
     print "<dtdelement gi='$e'>\n";
