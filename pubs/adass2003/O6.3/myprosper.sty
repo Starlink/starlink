@@ -1,0 +1,99 @@
+% My additions to prosper, to support TOC
+
+
+\newcommand\tableofslides{
+  \begin{itemize}
+  \def\x@tocentry##1##2{%
+    \x@appendtocentry{##1}{##2}%
+    \item ##2}
+  \newcommand\x@tocsubentries[2]{%
+    \expandafter\gdef\csname x@subentries##1\endcsname{##2}}
+  \@starttoc{toc}
+  \x@dummyitem
+  \end{itemize}
+}
+\newcommand\slidetoc[1]{\@writefile{toc}{\x@tocentry{}{#1}}}
+
+% \x@dummyitem writes out an item if it's at the beginning of a list,
+% and thus avoids a `missing \item' error.
+\newcommand\x@dummyitem{\if@newlist\item No TOC yet\fi}
+
+% \begin{slidegroup}{label}{Title}
+\newif\ifx@ingroup \x@ingroupfalse
+\newenvironment{slidegroup}[2]{
+  \ifx@ingroup\PackageError{x}%
+    {{slidegroup} environments may not be nested}%
+    {...and you have nested them}
+  \else
+    \def\x@grouplabel{#1}
+    \def\theslidegroup{#2}
+    \@writefile{toc}{\x@tocentry{#1}{#2}}
+    \gdef\x@subtocentries{}
+    \def\slidetoc##1{%
+      \x@tocentrycounter=0
+      \xdef\x@subtocentries{\x@subtocentries\string\x@tocentry{}{##1}}%
+      %\typeout{totoc=\x@subtocentries}
+    }
+    \x@ingrouptrue
+  \fi
+  \begin{slide}{#2}
+Contents
+\begin{itemize}
+  \def\x@tocentry##1##2{\item ##2
+    \def\@tempa{##1}%
+    \ifx\@tempa\x@grouplabel
+      \begin{itemize}
+	\let\x@tocentry\x@countedtocentry
+	\csname x@subentries##1\endcsname
+	\x@dummyitem
+      \end{itemize}
+    \fi
+  }
+  \x@alltocentries
+  \x@dummyitem
+\end{itemize}
+  \end{slide}
+}{
+  %\x@closeslide
+  \immediate\write\tf@toc{\string\x@tocsubentries{\x@grouplabel}{\x@subtocentries}}
+  \def\theslidegroup{}
+  \x@ingroupfalse
+}
+
+% Support tocs of tocs
+\newtoks\@temptokenb		% not in the LaTeX kernel
+\def\x@appendtocentry#1#2{%
+  \@temptokena={\x@tocentry{#1}{#2}}%
+  \@temptokenb=\expandafter{\x@alltocentries}%
+  \xdef\x@alltocentries{\the\@temptokenb\the\@temptokena}}
+\def\x@alltocentries{}
+
+% \x@countedtocentry outputs a maximum number of \items
+\newcount\x@tocentrycounter
+\newcount\x@maxtocentry \x@maxtocentry=5
+\def\x@countedtocentry#1#2{\advance\x@tocentrycounter by 1 
+  \ifnum\x@tocentrycounter<\x@maxtocentry
+    \item #2 
+  \else\ifnum\x@tocentrycounter=\x@maxtocentry
+    \space\emph{[\dots]}
+  \fi\fi}
+
+% \closeslide executes \end{slide} if we're in the slide environment.
+% If we're calling this and we're not immediately in the slide
+% environment, then there's some other error, such as mismatched
+% \begin...\end, or \nextslide being called at the wrong time (which
+% amounts to the same thing, but will manifest itself as a `nested
+% slides' error).
+%\newcommand\x@closeslide{%
+%  \typeout{x@closeslide:curr=\@currenvir}
+%  \def\@tempa{slide}%
+%  \ifx\@currenvir\@tempa
+%    \end{slide}
+%  \fi
+%}
+%\newcommand\nextslide[1]{%
+%  \x@closeslide
+%  \begin{slide}{#1}\slidetoc{#1}
+%}
+%\AtEndDocument{\x@closeslide}
+
