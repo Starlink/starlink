@@ -211,7 +211,6 @@
 *   of fitness for any purpose.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id$
 *===========================================================================*/
 
 #include "proj.h"

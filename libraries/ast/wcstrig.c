@@ -39,8 +39,6 @@
 *
 *   The functions defined herein are trigonometric or inverse trigonometric
 *   functions which take or return angular arguments in decimal degrees.
-*
-*   $Id$
 *---------------------------------------------------------------------------*/
 
 #include "wcstrig.h"
