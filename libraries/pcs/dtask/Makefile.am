@@ -76,6 +76,7 @@ edit = sed \
     -e 's,@CFLAGS\@,$(CFLAGS),g' \
     -e 's,@FC\@,$(FC),g' \
     -e 's,@FCFLAGS\@,$(FCFLAGS),g' \
+    -e 's,@FCLIBS\@,$(FCLIBS),g' \
     -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g'
 

@@ -13,13 +13,17 @@ dnl    Sanity-check: name a file in the source directory -- if this
 dnl    isn't found then configure will complain
 AC_CONFIG_SRCDIR([DTASK_PAR])
 
-dnl    Include defaults for Starlink configurations
+# Include defaults for Starlink configurations
 STAR_DEFAULTS
 
-dnl    Find required versions of the programs we need for configuration
+# Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
+
+# This is STAR[]_FC_LIBRARY_LDFLAGS instead of
+# AC[]_FC_LIBRARY_LDFLAGS: works around OSX 10.3/gcc linking problem.
+STAR_FC_LIBRARY_LDFLAGS
 
 AC_PATH_PROGS(M4, m4, m4)
 
@@ -28,6 +32,7 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [adam cnf messys psx sae subpar])
 STAR_DECLARE_DEPENDENCIES([link],  [chr ems mers ams atimer hds psx subpar])
+STAR_DECLARE_DEPENDENCIES([use],   [hdspar])
 
 dnl    There are two .msg files in this directory, and this adds Makefile
 dnl    rules to generate the xxx_ERR, xxx_err.h and fac_nnn_err files

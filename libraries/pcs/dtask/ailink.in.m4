@@ -411,14 +411,22 @@ then
            >dtask_main.f
 fi
 
-linkcmd="$LIBTOOL --mode=link @FC@ $extra_mode_args @FCFLAGS@ -o $EXENAME \
+# Compile dtask_applic.f
+cmpdtask="$LIBTOOL --mode=compile @FC@ -static $extra_mode_args @FCFLAGS@ \
+        -c -o dtask_applic.o dtask_applic.f"
+$verbose && echo $cmpdtask
+eval $cmpdtask
+
+# Link this using the C compiler, linking in the Fortran runtime in FCLIBS
+linkcmd="$LIBTOOL --mode=link @CC@ $extra_mode_args -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
-        dtask_applic.f \
+        dtask_applic.o \
         $ARGS \
         -lhdspar_adam \
         -lpar_adam \
-        `dtask_link_adam`"
+        `dtask_link_adam` \
+         @FCLIBS@"
 
 # Substitute any -lX options which refer to a libtool library
 # @libdir@/libX.la, with an explicit reference to that library.  We
