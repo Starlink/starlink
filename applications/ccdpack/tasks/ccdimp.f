@@ -162,13 +162,19 @@
       CALL NDF_TUNE( 0, 'DOCVT', STATUS )
 
 *  Obtain the NDF to be updated.
+      CALL NDF_BEGIN
       CALL NDF_ASSOC( 'IN', 'UPDATE', IDIN, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Open the CCDPACK extension (or a new one).
       CALL CCD1_CEXT( IDIN, .TRUE., 'UPDATE', CCDLOC, STATUS )
 
 *  Find the FITS extension and map it.
       CALL NDF_XLOC( IDIN, 'FITS', 'READ', LOC, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN 
+         CALL ERR_ANNUL( STATUS )
+         GO TO 98
+      END IF
       CALL DAT_MAPV( LOC, '_CHAR*80', 'READ', PNTR( 1 ), EL, STATUS )
       LENGTH = 80
 
@@ -441,12 +447,14 @@
       CALL ERR_RLSE
 
 *  Annul (thereby unmapping) the FITS extension locator and the NDF
-*  identifier.
-      CALL DAT_ANNUL( CCDLOC, STATUS )
+*  identifier. Jump to 98 when FITS extension doesn't exist.
       CALL DAT_ANNUL( LOC, STATUS )
-      CALL NDF_ANNUL( IDIN, STATUS )
+ 98   CONTINUE
+      CALL DAT_ANNUL( CCDLOC, STATUS )
+      CALL NDF_END( STATUS )
 
 *  Restore the NDF tuning parameter.
+ 99   CONTINUE
       CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS )
 
 *  If an error occurred, then report a contextual message.
