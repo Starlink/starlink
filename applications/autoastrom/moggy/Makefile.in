@@ -17,18 +17,17 @@
 #
 SLASHSTAR=@SLASHSTAR@
 DEFS=@DEFS@
-CPPFLAGS=@CPPFLAGS@ -ISkyCat/include -I$(SLASHSTAR)/include
+CPPFLAGS=@CPPFLAGS@ -I$(MYCATLIB)/include -I$(SLASHSTAR)/include
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 #CXXFLAGS=-g -Wall @CXXFLAGS@ $(CPPFLAGS) $(DEFS)
-LIBS=-lm @LIBS@ -LSkyCat/lib -lskycat -L$(SLASHSTAR)/lib `ast_link` `cnf_link`
+LIBS=-lm @LIBS@ -L$(MYCATLIB)/lib -lskycat -L$(SLASHSTAR)/lib `ast_link` `cnf_link`
 
-# CATLIBINSTALLDIR is the directory that SkyCat is temporarily installed
+# CATLIBDIR is the directory that SkyCat is temporarily installed
 # it.  This is not the directory we link against -- see the
-# SkyCat/lib/libskycat.a target below.
-CATLIBSRCDIR=@CATLIBSRCDIR@
-CATLIBINSTALLDIR=@CATLIBINSTALLDIR@
-CATLIBTOP=@CATLIBTOP@
+# $(MYCATLIB)/lib/libskycat.a target below.
+CATLIBDIR=@CATLIBDIR@
+MYCATLIB=SkyCat
 
 RANLIB=@RANLIB@
 
@@ -58,39 +57,24 @@ RANLIB=@RANLIB@
 EXEC=moggy
 OBJS=moggy.o CommandParse.o CatalogueHandler.o AstHandler.o util.o SkyCatHoles.o
 
-$(EXEC): $(OBJS) SkyCat/lib/libskycat.a
+$(EXEC): $(OBJS) $(MYCATLIB)/lib/libskycat.a
 	$(CXX) $(OBJS) $(LIBS) -o $@
 
-# The skycat library will have been configured at the ./configure
-# stage, and will have been installed in $(CATLIBINSTALLDIR) by the
-# dependency on libcat.a.  Copy the required parts of this library to
-# the SkyCat subdirectory, and remove problematic modules from the library.
-# This target can also be used to express a dependency on the SkyCat includes.
-SkyCat/lib/libskycat.a: $(CATLIBINSTALLDIR)/lib/libcat.a
-	test -d SkyCat || mkdir SkyCat
-	test -d SkyCat/lib || mkdir SkyCat/lib
-	cp $(CATLIBINSTALLDIR)/lib/libcat.a SkyCat/lib/libskycat.a
-	ar -d SkyCat/lib/libskycat.a proj.o slasubs.o
-	$(RANLIB) SkyCat/lib/libskycat.a
-	(cd $(CATLIBINSTALLDIR); tar cf - include) | (cd SkyCat; tar xf -)
-
-# Make the SkyCat libraries, and install them in $(CATLIBINSTALLDIR).
-# Make the target directories by hand, because the SkyCat install
-# script is a bit stupid.
+# The SkyCat cat library has been installed in $(CATLIBDIR) (the
+# makefile or other configuration which calls this should have ensured 
+# this) if it isn't there, then this makefile will object.
 #
-# We rely on the configure script to have unpacked the distribution
-# correctly: the build root of the distribution is $(CATLIBTOP)
-# (which lives somewhere under $(CATLIBSRCDIR), but we don't have to
-# know that here).
-$(CATLIBINSTALLDIR)/lib/libcat.a:
-	test -d $(CATLIBINSTALLDIR) || mkdir -p $(CATLIBINSTALLDIR)
-	for dir in include lib man man/man3; \
-	do \
-		test -d $(CATLIBINSTALLDIR)/$$dir || \
-			mkdir $(CATLIBINSTALLDIR)/$$dir; \
-	done
-	cd $(CATLIBTOP) && make
-	cd $(CATLIBTOP) && make install
+# Here, we make a private version of it, with some awkward object
+# modules removed, and with the include files copied across.  It's
+# this version that we compile and link against.
+$(MYCATLIB)/lib/libskycat.a: $(CATLIBDIR)/lib/libcat.a
+	test -d $(MYCATLIB) || mkdir $(MYCATLIB)
+	test -d $(MYCATLIB)/lib || mkdir $(MYCATLIB)/lib
+	cp $(CATLIBDIR)/lib/libcat.a $(MYCATLIB)/lib/libskycat.a
+	ar -d $(MYCATLIB)/lib/libskycat.a proj.o slasubs.o
+	$(RANLIB) $(MYCATLIB)/lib/libskycat.a
+	(cd $(CATLIBDIR); tar cf - include) | (cd $(MYCATLIB); tar xf -)
+
 
 test: $(EXEC)
 	cd t; $(MAKE) test
@@ -106,14 +90,9 @@ TAGS:
 tidy:
 	rm -f *~ *.o core
 
-# The CATLIB* variables are not independent by default, so these successive
-# deletions will probably (but not certainly) be redundant.
 clean: tidy
 	rm -f $(EXEC)
-	test ! -d SkyCat || rm -Rf SkyCat
-	test ! -d $(CATLIBSRCDIR) || rm -Rf $(CATLIBSRCDIR)
-	test ! -d $(CATLIBINSTALLDIR) || rm -Rf $(CATLIBINSTALLDIR)
-	test ! -d $(CATLIBTOP) || rm -Rf $(CATLIBTOP)
+	test ! -d $(MYCATLIB) || rm -Rf $(MYCATLIB)
 
 distclean: clean
 	rm -f config.cache config.log config.status config.h Makefile
@@ -124,7 +103,7 @@ distclean: clean
 # modules which do, moggy.C and CatalogueHandler.C, do depend on
 # moggy.h, so this will ensure that the SkyCat includes are built and
 # installed in the correct order.
-moggy.h: SkyCat/lib/libskycat.a
+moggy.h: $(MYCATLIB)/lib/libskycat.a
 
 # Because of the #include <cat/...> dependencies in some files, this
 # depend target only works after SkyCat/include has been built.
