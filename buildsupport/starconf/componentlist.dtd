@@ -1,0 +1,16 @@
+<!ELEMENT componentlist (component+)>
+<!ELEMENT component     (description, path, dependencies, developers?, notes?)>
+<!ELEMENT description   (#PCDATA)>
+<!ELEMENT path          (#PCDATA)>
+<!ELEMENT dependencies  (#PCDATA)>
+<!ELEMENT developers    (person+)>
+<!ELEMENT person        (name, email, role?)>
+<!ELEMENT name          (#PCDATA)>
+<!ELEMENT email         (#PCDATA)>
+<!ELEMENT role          (#PCDATA)>
+<!ELEMENT notes         (p+)>
+<!ELEMENT p             (#PCDATA)>
+
+<!ATTLIST component
+        id      ID      #REQUIRED
+        >
