@@ -1,10 +1,14 @@
 .help tranjoin Starlink kappa
 .nf
 Joins two transformations.
- Usage:
-    tranjoin in1 in2 out dest=?
- Description:
-    This joins two transformations stored in the TRANSFORM (SUN/61)
+
+Usage:
+
+   tranjoin in1 in2 out dest=?
+
+Description:
+
+   This joins two transformations stored in the TRANSFORM (SUN/61)
    format.  The concatenated transformation can be stored with either
    original transformation or be placed in a new file.
 
@@ -71,18 +75,21 @@ tranjoin tr1 tr2 tr3
    tr1.sdf to that in file tr2.sdf, and stores the result in HDS
    file tr3.sdf.  All three transformations are located within
    objects called TRANSFORM at the top-level.
- tranjoin offset shear.tr1 shape.rotate
+
+tranjoin offset shear.tr1 shape.rotate
    This prefixes the transformation in the structure TRANSFORM at
    the top level of the HDS container file called offset.sdf
    (i.e.  OFFSET.TRANSFORM) to the transformation in the
    structure TR1 in the HDS file shear.sdf.  The resulting
    transformation is in the file called shape.sdf and is named
    ROTATE.
- tranjoin norm.scale1 polar dest=S
+
+tranjoin norm.scale1 polar dest=S
    This prefixes the transformation structure NORM.SCALE1 to
    POLAR.TRANSFORM, the concatenation being stored in
    POLAR.TRANSFORM.
- tranjoin norm.scale1 polar dest=f
+
+tranjoin norm.scale1 polar dest=f
    This appends the transformation structure POLAR.TRANSFORM to
    NORM.SCALE1, the concatenation being stored in NORM.SCALE1.
 
@@ -93,7 +100,8 @@ equal the number of input variables of the second.  Also it is not
 permitted to concatenate a transformation in which only the
 forward mapping is defined with another in which only the inverse
 mapping is specified.
- -  On completion, the destination structure for the
+
+-  On completion, the destination structure for the
 transformation information equates to the current transformation
 global parameter.
 

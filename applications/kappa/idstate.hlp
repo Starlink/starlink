@@ -1,10 +1,14 @@
 .help idstate Starlink kappa
 .nf
 Shows the current status of an image display.
- Usage:
-    idstate [device]
- Description:
-    This application displays the current status of an image-display
+
+Usage:
+
+   idstate [device]
+
+Description:
+
+   This application displays the current status of an image-display
    device, including details of the current graphics-database
    picture (e.g. its co-ordinate system and position on the display
    surface), and the reserved colour table.
@@ -104,16 +108,20 @@ Examples
 
 idstate
    Shows the status of the current image-display device.
- idstate xwindows
+
+idstate xwindows
    Shows the status of the xwindows device.
- idstate outline
+
+idstate outline
    Shows the status of the current image-display device and draws
    an outline around the current database picture.
- idstate refnam=(ndfname)
+
+idstate refnam=(ndfname)
    Shows the status of the current image-display device.  If there
    is a reference data object, its name is written to the ICL
    variable NDFNAME.
- gdstate wcx1=(x1) wcx2=(x2) wcy1=(y1) wcy2=(y2)
+
+gdstate wcx1=(x1) wcx2=(x2) wcy1=(y1) wcy2=(y2)
    Shows the status of the current image-display device.  The
    bounds of the current picture in world co-ordinates are
    written to the ICL variables: X1, X2, Y1, Y2.
@@ -132,12 +140,14 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1991 July 10 (RFWS and MJC):
     Original version based on GDSTATE.
-  1991 August 20 (MJC):
+
+ 1991 August 20 (MJC):
     Added output parameters and REPORT parameter.
 .endhelp

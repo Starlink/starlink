@@ -2,10 +2,14 @@
 .nf
 Replaces all occurrences of a given value in an NDF array with
 the bad value.
- Usage:
-    setmagic in out repval [comp]
- Description:
-    This application flags all pixels that have a defined value in an
+
+Usage:
+
+   setmagic in out repval [comp]
+
+Description:
+
+   This application flags all pixels that have a defined value in an
    NDF with the standard bad (`magic') value.  Other values are
    unchanged.  The number of replacements is reported.  SETMAGIC's
    applications include the import of data from software that has a
@@ -60,7 +64,8 @@ setmagic irasmap aitoff repval=-2000000
    This copies the NDF called irasmap to the NDF aitoff, except
    that any pixels with the IPAC blank value of -2000000 are
    flagged with the standard bad value in aitoff.
- setmagic saturn saturnb 9999.0 comp=All
+
+setmagic saturn saturnb 9999.0 comp=All
    This copies the NDF called saturn to the NDF saturnb, except
    that any elements in the data and variance arrays that have
    value 9999.0 are flagged with the standard bad value.
@@ -79,16 +84,19 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie  (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1991 November 6 (MJC):
     Original NDF_ version.
-  1994 September 26 (MJC):
+
+ 1994 September 26 (MJC):
     Replaced AIF calls, and used a modern style of commenting.
     Made messages conditional.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -96,8 +104,11 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.
-    -  Any number of NDF dimensions is supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
 .endhelp

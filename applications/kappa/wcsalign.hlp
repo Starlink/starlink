@@ -2,13 +2,18 @@
 .nf
 Aligns a group of 2-dimensional NDFs using World Co-ordinate System
 information.
- Usage:
-    wcsalign in out lbnd ubnd ref
- Description:
-    This application resamples a group of 2-dimensional input NDFs,
+
+Usage:
+
+   wcsalign in out lbnd ubnd ref
+
+Description:
+
+   This application resamples a group of 2-dimensional input NDFs,
    producing corresponding output NDFs which are aligned pixel-for-pixel
    with a specified reference NDF.
-    The transformations needed to produce alignment are derived from the
+
+   The transformations needed to produce alignment are derived from the
    co-ordinate system information stored in the WCS components of the
    supplied NDFs. For each input NDF, alignment is first attempted in
    the current co-ordinate Frame of the reference NDF. If this fails,
@@ -16,10 +21,12 @@ information.
    NDF. If this fails, alignment occurs in the pixel co-ordinate Frame.
    A message indicating which Frame alignment was achieved in is
    displayed.
-    The output image values are formed by re-sampling the input image
+
+   The output image values are formed by re-sampling the input image
    values using either nearest neighbour or bi-linear interpolation
    (see parameter METHOD).
-    Two methods exist for determining the bounds of the output images.
+
+   Two methods exist for determining the bounds of the output images.
    Firstly, the user can give values for parameters LBND and UBND
    which are then used as the pixel index bounds for all output
    images. Secondly, if a null value is given for LBND or UBND,
@@ -53,15 +60,18 @@ IN
 IN = NDF (Read)
    A group of 2-dimensional input images. This should be given as
    a comma separated list, in which each list element can be:
-    - an NDF name, optionally containing wild-cards and/or regular
+
+   - an NDF name, optionally containing wild-cards and/or regular
    expressions ("*", "?", "[a-z]" etc.).
-    - the name of a text file, preceded by an up-arrow character "^".
+
+   - the name of a text file, preceded by an up-arrow character "^".
    Each line in the text file should contain a comma separated list
    of elements, each of which can in turn be an NDF name (with
    optional wild-cards, etc), or another file specification
    (preceded by an up-arrow). Comments can be included in the file
    by commencing lines with a hash character "#".
-    If the value supplied for this parameter ends with a minus
+
+   If the value supplied for this parameter ends with a minus
    sign "-", then the user is re-prompted for further input until
    a value is given which does not end with a minus sign. All the
    images given in this way are concatenated into a single group.
@@ -83,14 +93,18 @@ METHOD = LITERAL (Read)
    The method to use when sampling the input pixel values, in
    order to find the corresponding output pixel value. It can
    take the following values:
-    - "Bilinear" -- the output pixel values are calculated by
+
+   - "Bilinear" -- the output pixel values are calculated by
    bi-linear interpolation among the four nearest pixels values
    in the input image.
-    - "Nearest" -- the output pixel values are assigned the value
+
+   - "Nearest" -- the output pixel values are assigned the value
    of the single nearest input pixel.
-    Bi-linear interpolation generally produces smoother output
+
+   Bi-linear interpolation generally produces smoother output
    images with lower noise, but is marginally slower.
-    Both methods propagate variances from input to output, but the
+
+   Both methods propagate variances from input to output, but the
    variance estimates produced using bi-linear interpolation need
    to be treated with care since the spatial smoothing produced by
    this interpolation method introduces correlations in the
@@ -112,7 +126,8 @@ OUT = NDF (Write)
    A group of output NDFs corresponding one-for-one with the list
    of input NDFs given for parameter IN. This should be given as
    a comma separated list, in which each list element can be:
-    - an NDF name. If the name contains an asterisk character "*",
+
+   - an NDF name. If the name contains an asterisk character "*",
    the name of the corresponding input image (without directory or
    file suffix) is substituted for the asterisk (for instance, "*_al"
    causes the output image name to be formed by appending the string
@@ -122,13 +137,15 @@ OUT = NDF (Write)
    *_al|b4|B1| causes any occurrence of the string "B4" in the input
    image name to be replaced by the string "B1" before appending the
    string "_al" to the result).
-    - the name of a text file, preceded by an up-arrow character "^".
+
+   - the name of a text file, preceded by an up-arrow character "^".
    Each line in the text file should contain a comma separated list
    of elements, each of which can in turn be an NDF name (with
    optional editing, etc), or another file specification
    (preceded by an up-arrow). Comments can be included in the file
    by commencing lines with a hash character "#".
-    If the value supplied for this parameter ends with a minus
+
+   If the value supplied for this parameter ends with a minus
    sign "-", then the user is re-prompted for further input until
    a value is given which does not end with a minus sign. All the
    images given in this way are concatenated into a single group.
@@ -158,14 +175,16 @@ wcsalign image1 image1_al ref=image2 accept
    it is aligned with the 2-dimensional NDF call image2, putting the
    output in image1_al. The output image has the same pixel index
    bounds as image2 and inherits WCS information from image2.
- wcsalign m51* *_al lbnd=! accept
+
+wcsalign m51* *_al lbnd=! accept
    This example resamples all the 2-dimensional NDFs with names
    starting with the string "m51" in the current directory so that
    they are aligned with the first input NDF. The output images
    have the same names as the input images, but extended with the
    string "_al". Each output image is just big enough to contain all
    the pixels in the corresponding input image.
- wcsalign ^in.lis ^out.lis lbnd=! accept
+
+wcsalign ^in.lis ^out.lis lbnd=! accept
    This example is like the previous example, except that the names
    of the input images are read from the text file in.lis, and the
    names of the corresponding output images are read from text file
@@ -175,7 +194,8 @@ Notes
 
 -  WCS information (including the current co-ordinate Frame) is
 propagated from the reference NDF to all output NDFs.
- -  QUALITY is propagated from input to output only if parameter
+
+-  QUALITY is propagated from input to output only if parameter
 METHOD is set to Nearest.
 
 Related_Applications
@@ -196,4 +216,5 @@ Implementation_Status
    -  Only real data can be processed directly.  Other non-complex
    numeric data types will undergo a type conversion before the
    resampling takes place.
+
 .endhelp

@@ -2,22 +2,28 @@
 .nf
 Replaces all occurrences of magic value pixels in an NDF array
 with a new value.
- Usage:
-    nomagic in out repval sigma [comp]
- Description:
-    This function replaces the standard `magic value' assigned to bad
+
+Usage:
+
+   nomagic in out repval sigma [comp]
+
+Description:
+
+   This function replaces the standard `magic value' assigned to bad
    pixels in an NDF with an alternative value, or with random
    samples taken from a Normal distribution.  Input pixels which do
    not have the magic value are left unchanged.  The number of
    replacements is reported.  NOMAGIC's applications include the
    export of data to software that has different magic values or
    does not support bad values.
-    If a constant value is used to replace magic values (which will
+
+   If a constant value is used to replace magic values (which will
    be the case if parameter SIGMA is given the value zero), then the
    same replacement value is used for both the data and variance
    arrays when COMP="All".  If the variance is being processed, the
    replacement value is constrained to be non-negative.
-    Magic values are replaced by random values if the parameter SIGMA
+
+   Magic values are replaced by random values if the parameter SIGMA
    is given a non-zero value.  If both Data and Variance components
    are being processed, then the random values are only stored in
    the Data component; a constant value equal to SIGMA squared is
@@ -95,11 +101,13 @@ nomagic aitoff irasmap repval=-2000000
    This copies the NDF called aitoff to the NDF irasmap, except
    that any bad values in the data array are replaced with the
    IPAC blank value, -2000000, in the NDF called irasmap.
- nomagic saturnb saturn 9999.0 comp=all
+
+nomagic saturnb saturn 9999.0 comp=all
    This copies the NDF called saturnb to the NDF saturn, except
    that any bad values in the data and variance arrays are
    replaced with 9999 in the NDF called saturn.
- nomagic in=cleaned out=filled  repval=0 sigma=10 comp=all
+
+nomagic in=cleaned out=filled  repval=0 sigma=10 comp=all
    This copies the NDF called cleaned to the NDF filled, except
    that any bad values in the data array are replaced by random
    samples taken from a Normal distribition of mean zero and
@@ -110,7 +118,8 @@ Notes
 
 -  If the NDF arrays have no bad pixels the application will
 abort.
- -  Use GLITCH if a neighbourhood context is required to remove
+
+-  Use GLITCH if a neighbourhood context is required to remove
 the bad values.
 
 Related_Applications
@@ -121,21 +130,25 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie  (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1991 November 4 (MJC):
     Original NDF_ version.
-  1994 September 26 (MJC):
+
+ 1994 September 26 (MJC):
     Replaced AIF calls, and used a modern style of commenting.
     Made messages conditional.
-  1994 December 15 (DSB):
+
+ 1994 December 15 (DSB):
     Added SIGMA parameter and associated code.  Unmap '*'
     components rather than COMP( I ) component to avoid
     possibility of NDF_UNMAP being asked to unmap the 'Error'
     component.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -143,8 +156,11 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.
-    -  Any number of NDF dimensions is supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
 .endhelp

@@ -1,10 +1,14 @@
 .help lutspec Starlink kappa
 .nf
    Loads a spectrum-like lookup table.
- Usage:
-    lutspec
- Description:
-    This procedure loads an optical-spectrum-like lookup table with linear
+
+Usage:
+
+   lutspec
+
+Description:
+
+   This procedure loads an optical-spectrum-like lookup table with linear
    scaling into the current image-display device.
 
 Parameters
@@ -32,6 +36,8 @@ History
 
  1990 Apr 16 (MJC):
     Original version.
-  1991 April 24 (MJC):
+
+ 1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
+
 .endhelp

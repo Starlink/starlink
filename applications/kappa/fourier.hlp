@@ -2,10 +2,14 @@
 .nf
 Performs forward and inverse Fourier transforms of 1- or
 2-dimensional NDFs.
- Usage:
-    fourier in hermout
- Description:
-    This application performs forward or reverse Fast Fourier
+
+Usage:
+
+   fourier in hermout
+
+Description:
+
+   This application performs forward or reverse Fast Fourier
    Transforms (FFTs) of 1- or 2-dimensional NDFs.  The output in the
    forward transformation (from the space domain to the Fourier) can
    be produced in Hermitian form in a single NDF, or as two NDFs
@@ -14,10 +18,12 @@ Performs forward and inverse Fourier transforms of 1- or
    Any combination of these may also be produced.  The inverse
    procedure accepts any of these NDFs and produces a purely real
    output NDF.
-    Any bad pixels in the input NDF may be replaced by a constant
+
+   Any bad pixels in the input NDF may be replaced by a constant
    value.  Input NDFs need neither be square, nor be a power of 2 in
    size in either dimension; their shape is arbitrary.
-    The Hermitian transform is a single image in which each quadrant
+
+   The Hermitian transform is a single image in which each quadrant
    consists of a linear combination of the real and imaginary
    parts of the transform.  This form is useful if you just want to
    multiply the Fourier transform by some known purely real mask and
@@ -26,7 +32,8 @@ Performs forward and inverse Fourier transforms of 1- or
    Fourier transform of another NDF), or do any other operation
    involving combining complex values, then the Hermitian NDF must
    be untangled into separate real and imaginary parts.
-    There is an option to swap the quadrants of the input NDF around
+
+   There is an option to swap the quadrants of the input NDF around
    before performing a forward FFT.  This is useful if you want to
    perform convolutions with the FFTs, since the point-spread
    function (PSF) image can be created with the PSF centre at the
@@ -226,17 +233,20 @@ Examples
 fourier galaxy ft_gal
    Makes an Hermitian Fourier transform stored in an NDF called
    ft_gal from the 2-d NDF called galaxy.
- fourier hermin=ft_gal out=galaxy inverse
+
+fourier hermin=ft_gal out=galaxy inverse
    Takes an Hermitian Fourier transform stored in an NDF called
    ft_gal and performs the inverse transformation to yield a
    normal (spatial domain) image in NDF galaxy.
- fourier in=galaxy powerout=galpow hermout=ft_gal fillval=mean
+
+fourier in=galaxy powerout=galpow hermout=ft_gal fillval=mean
    Makes an Hermitian Fourier transform stored in an NDF called
    ft_gal from the 2-d NDF called galaxy.  Any bad values in
    galaxy are replaced by the mean data value of galaxy.  In
    addition the power of the transform is written to an NDF
    called galpow.
- fourier realin=real_gal out=galaxy inverse
+
+fourier realin=real_gal out=galaxy inverse
    Takes the real component of a Fourier transform stored in an
    NDF called real_gal and performs the inverse transformation to
    yield a normal image in NDF galaxy.
@@ -254,44 +264,54 @@ Related_Applications
 Authors
 
 DSB: D.S. Berry (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1988 Jun 6 (DSB):
     Original version.
-  1990 Mar 19 (MJC):
+
+ 1990 Mar 19 (MJC):
     Converted to KAPPA/ADAM style.
-  1990 Mar 29 (MJC):
+
+ 1990 Mar 29 (MJC):
     Added mean option for fill values and the trim option.
-  20-MAY-1991 (DSB):
+
+ 20-MAY-1991 (DSB):
     Bug fixed which caused incorrect power and phase images to be
     used when performing an inverse transformation.
-  1991 May 20 (MJC):
+
+ 1991 May 20 (MJC):
     Added error reports when no input or output NDFs are specified.
     There is less prompting for input NDFs during an inverse
     transformation when the values of one or more input NDFs are
     supplied on the command line.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  1992 April 21 (MJC):
+
+ 1992 April 21 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-  6-JAN-1995 (DSB):
+
+ 6-JAN-1995 (DSB):
     SUBPAR constants replaced by PAR constants.  AIF VM routines
     replaced by PSX routines.  Re-format to edstar-style
     commenting.  Add final context error report.  Changed to use
     double precision arithmetic.  Use of STATV replaced by
     KPG1_MEAND.
-  1995 March 29 (MJC):
+
+ 1995 March 29 (MJC):
     Changed the Usage and Examples to lowercase, added Related
     Applications section, removed redundant variables previously
     needed by STATV, used a modern-style variable declaration,
     made message reporting conditional, revised the commentary for
     the 1-d case and no NAG usage and used headings to break up
     the code, and various minor stylistic changes.
-  1995 March 30 (MJC):
+
+ 1995 March 30 (MJC):
     Made to work on single precision too.
 
 Implementation_Status

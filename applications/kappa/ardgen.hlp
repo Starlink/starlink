@@ -1,18 +1,23 @@
 .help ardgen Starlink kappa
 .nf
 Creates a text file describing selected regions of an image.
- Usage:
-    ardgen ardout shape option [device] [startup] [palnum] [poicol]
+
+Usage:
+
+   ardgen ardout shape option [device] [startup] [palnum] [poicol]
       { operands=? operator=?
       { regions=?
       option
- Description:
-    This is an interactive tool for selecting regions of a displayed
+
+Description:
+
+   This is an interactive tool for selecting regions of a displayed
    image using a cursor, and then stores a description of the
    selected regions in a text file in the form of an `ARD
    Description' (see SUN/183).  This text file may subsequently be
    used in conjunction with packages such as CCDPACK or ESP.
-    The application initially obtains a value for the SHAPE parameter
+
+   The application initially obtains a value for the SHAPE parameter
    and then allows you to identify either one or many regions of the
    specified shape, dependent on the value of parameter STARTUP.
    When the required regions have been identified, a value is
@@ -22,14 +27,16 @@ Creates a text file describing selected regions of an image.
    regions, leaving the application, etc.  Once the selected action
    has been performed, another value is obtained for OPTION, and
    this continues until you choose to leave the application.
-    Instructions on the use of the cursor are displayed when the
+
+   Instructions on the use of the cursor are displayed when the
    application is run.  The points required to define a region of
    the requested shape are described whenever the current region
    shape is changed using parameter SHAPE.  Once the points required
    to define a region have been given an outline of the entire
    region is drawn on the graphics device using the pen specified by
    parameter PALNUM.
-    In the absence of any other information, subsequent application
+
+   In the absence of any other information, subsequent application
    will use the union (i.e. the logical OR) of all the defined
    regions.  However, regions can be combined in other ways using the
    COMBINE option (see parameter OPTION).  For instance, two regions
@@ -69,7 +76,8 @@ OPERATOR = LITERAL (Read)
    The operator to use when combining two regions into a single
    region.  The pixels included in the resulting region depend on
    which of the following operators is selected.
-    "AND" - Pixels are included if they are in both of the regions
+
+   "AND" - Pixels are included if they are in both of the regions
            specified by parameter OPERANDS.
    "EQV" - Pixels are included if they are in both or neither of
            the regions specified by parameter OPERANDS.
@@ -90,7 +98,8 @@ OPTION= LITERAL (Read)
    cursor input (by pressing the relevant button as described
    when the application starts up).  It determines what to do
    next.  The following options are available:
-    "Combine" - Combine two previously defined regions into a
+
+   "Combine" - Combine two previously defined regions into a
                single region using a Boolean operator, or invert
                a previously defined region using a Boolean .NOT.
                operator.  See parameters OPERANDS and OPERATOR.  The
@@ -151,7 +160,8 @@ REGIONS() = LITERAL (Read)
    single string including commas.  The brackets are unnecessary
    when there is only one item.)  The numbers need not be in
    ascending order.
-    If you wish to delete all the regions enter the wildcard *.
+
+   If you wish to delete all the regions enter the wildcard *.
    5-* will delete from 5 to the last region.
 
 SHAPE
@@ -162,7 +172,8 @@ SHAPE = LITERAL (Read)
    identify multiple regions as if "Multi" had been specified for
    parameter OPTION.  The currently available shapes are listed
    below.
-    "Box"       - A rectangular box with sides parallel to the
+
+   "Box"       - A rectangular box with sides parallel to the
                  image axes, defined by its centre and one of its
                  corners.
    "Circle"    - A circle, defined by its centre and radius.
@@ -203,9 +214,11 @@ Notes
 
 -  An image must previously have been displayed on the graphics
 device.
- -  The arguments for the textual description of each shape are as
+
+-  The arguments for the textual description of each shape are as
 follows  (all co-ordinates are pixel, i.e. world co-ordinates):
- "Box"       - The co-ordinates of the centre, followed by the
+
+"Box"       - The co-ordinates of the centre, followed by the
               lengths of the two sides.
 "Circle"    - The co-ordinates of the centre, followed by the
               radius.
@@ -231,16 +244,20 @@ Related_Applications
 Authors
 
 GJP: Grant Privett (STARLINK)
- DSB: David Berry (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  15-JUL-1994 (GJP)
     Original version
-  11-NOV-1994 (GJP)
+
+ 11-NOV-1994 (GJP)
     Added ARD further keywords.
-  30-NOV-1994 (DSB)
+
+ 30-NOV-1994 (DSB)
     Prologue largely re-written.  Re-formatted the code to
     EDSTAR-style.  Removed redundant checks on STATUS.  KEYWORD
     parameter renamed SHAPE.  Button assignments changed.  PIXEL
@@ -248,10 +265,12 @@ History
     Re-structured.  Store ARD descriptions internally in a GRP
     group instead of a text file.  LIST, DELETE, COMBINE and QUIT
     options added.  STARTUP parameter added.
-  1995 March 15 (MJC):
+
+ 1995 March 15 (MJC):
     Added commentary, and corrected typographical errors.
     Standardised the variable declarations and style.  Removed
     the impersonal "the user".
-  1995 December 16 (MJC):
+
+ 1995 December 16 (MJC):
     Devices with a mouse can use it instead of the keyboard.
 .endhelp

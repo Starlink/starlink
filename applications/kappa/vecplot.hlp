@@ -1,10 +1,14 @@
 .help vecplot Starlink kappa
 .nf
 Plots a 2-dimensional vector map.
- Usage:
-    vecplot ndf1 ndf2 [comp] [step] [vscale] [vtype] [just] [device]
- Description:
-    This application plots vectors defined by the values contained
+
+Usage:
+
+   vecplot ndf1 ndf2 [comp] [step] [vscale] [vtype] [just] [device]
+
+Description:
+
+   This application plots vectors defined by the values contained
    within a pair of 2-dimensional NDFs, the first holding the
    magnitude of the vector quantity at each pixel, and the second
    holding the corresponding vector orientations.  The number of
@@ -15,7 +19,8 @@ Plots a 2-dimensional vector map.
    angle within the plot by specifying an appropriate value for
    parameter ANGROT.  Each vector may be represented either by an
    arrow or by a simple line, as selected by parameter VTYPE.
-    The plot is situated within the current graphics-database
+
+   The plot is situated within the current graphics-database
    picture, and may reside within optional, annotated and enumerated
    axes.  An optional, but recommended, key may be drawn to the
    right of the plot.  It reports the data units if there are any
@@ -104,13 +109,17 @@ JUST
 JUST = LITERAL (Read)
    The justification for each vector; it can take any of the
    following values:
-     "Centre" - the vectors are drawn centred on the
+
+    "Centre" - the vectors are drawn centred on the
                corresponding pixel,
-     "Start"  - the vectors are drawn starting at the
+
+    "Start"  - the vectors are drawn starting at the
                corresponding pixel,
-     "End"    - the vectors are drawn ending at the corresponding
+
+    "End"    - the vectors are drawn ending at the corresponding
                pixel.
-    ["Centre"]
+
+   ["Centre"]
 
 KEY
 
@@ -222,7 +231,8 @@ VECCOL = LITERAL (Read)
      A named colour - Uses the named colour from the palette, and
                       if it is not present, the nearest colour
                       from the palette is selected.
-    If the colour is to remain unaltered as the lookup table is
+
+   If the colour is to remain unaltered as the lookup table is
    manipulated choose an integer between 0 and 15, or a named
    colour.  The suggested default is the current value. [The
    current value, but equals "MIN" if there is no current value.]
@@ -250,12 +260,14 @@ vecplot polint polang
    orientation taken from NDF polang.  All other settings are
    defaulted, so for example about 20 vectors are displayed along
    the longest axis, and a key is plotted.
- vecplot polint polang angrot=23.4
+
+vecplot polint polang angrot=23.4
    Produces a vector map in which the primary axis of the vectors
    (as defined by the value zero in the NDF polang) is at the
    position angle 23.4 degrees (measured anti-clockwise from the
    positive y axis) in the displayed map.
- vecplot stack(,,2) stack(,,1) vtype=arrow just=start nokey
+
+vecplot stack(,,2) stack(,,1) vtype=arrow just=start nokey
    Produces a vector map in which the vectors are defined by two
    planes in the 3-dimensional NDF called stack.  There is no
    need to copy the two planes into two separate NDFs before
@@ -277,7 +289,8 @@ DATA picture can be found within the current picture then you
 specify the total size of the plot frame using parameters PXSIZE
 and PYSIZE, but the application itself chooses how to position
 the vector plot and key within this frame.
- -  The application stores a number of pictures in the graphics
+
+-  The application stores a number of pictures in the graphics
 database in the following order: a FRAME of the specified size
 containing the title, annotated axes, vector map and key; a DATA
 picture which is stored with world co-ordinates in units of data
@@ -288,7 +301,8 @@ different from pixel co-ordinates; the data co-ordinates are
 stored via a linear transformation.  A reference to NDF1 is
 stored with the DATA picture.  On exit the current database
 picture for the chosen device reverts to the input picture.
- -  The units string in the key may be truncated with an ellipsis
+
+-  The units string in the key may be truncated with an ellipsis
 if it cannot be accommodated in full at the smallest allowed
 character height.  Generally the maximum length will be between
 18 and 27 characters, the exact value depending on the number of
@@ -301,16 +315,19 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  16-AUG-1993 (DSB):
     Original version.
-  21-SEP-1993 (DSB):
+
+ 21-SEP-1993 (DSB):
     Modified to overlay the vector plot on any existing DATA plot
     contained within the current picture.
-  1995 April 12 (MJC):
+
+ 1995 April 12 (MJC):
     Added Related Applications and Implementation Status, and a
     further example.  Moved last paragraph of the long Description
     to Notes.  Made Examples and Usage lowercase.  KEY is no longer
@@ -324,5 +341,7 @@ Implementation_Status
    -  Only real data can be processed directly.  Other non-complex
    numeric data types will undergo a type conversion before the
    vector plot is drawn.
-    -  Bad pixels and automatic quality masking are supported.
+
+   -  Bad pixels and automatic quality masking are supported.
+
 .endhelp

@@ -1,14 +1,22 @@
 .help picframe Starlink kappa
 .nf
 Selects the last FRAME picture from the graphics database.
- Usage:
-    picframe
- Description:
-    This command selects the last-created FRAME picture.  Subsequent
+
+Usage:
+
+   picframe
+
+Description:
+
+   This command selects the last-created FRAME picture.  Subsequent
    plotting for the chosen device will be in this new current
    picture.  By default the chosen device is the current one.
-    This command is a synonym for "piclist name=frame picnum=last".
- 2 Parameters
+
+   This command is a synonym for "piclist name=frame picnum=last".
+
+
+Parameters
+
 For information on individual parameters, select from the list below:
 
 DEVICE
@@ -21,7 +29,8 @@ Examples
 picframe
    This selects the last FRAME picture for the current graphics
    device.
- picframe device=xw
+
+picframe device=xw
    This selects the last FRAME picture for the xw device.
 
 Related_Applications
@@ -36,293 +45,6 @@ History
 
  1995 August 23 (MJC):
     Original version.
- 1 PICGRID
-Creates an array of FRAME pictures
- Usage:
-    picgrid xpic ypic
- Description:
-    This command creates a two-dimensional grid of equally sized
-   new FRAME pictures in the graphics database.  The array of
-   pictures do not have to abut, but abutting is the default.  The
-   new pictures are formed within either the current or BASE
-   picture, and they adopt the world co-ordinate system of that
-   enclosing picture.  On completion, the bottom-left picture in the
-   array becomes the current picture.
-    For easy reference in later processing the pictures have integer
-   labels.  The numbering starts at a defined value, usually one,
-   and increments by one for each new picture starting from the
-   bottom-left corner and moving from left to right to the end of
-   the line.  This is repeated in each line until the top-right
-   picture.
-    This command is a synonym for "picdef array 1.0 false prefix=''"}.
 
-Parameters
 
-For information on individual parameters, select from the list below:
-
-CURRENT
-
-CURRENT = _LOGICAL (Read)
-   TRUE if the new pictures are to lie within the current picture,
-   otherwise the new pictures can lie anywhere within the BASE
-   picture.  In other words, when CURRENT is TRUE the current picture
-   is the reference picture, and when it is FALSE the BASE is the
-   reference picture. [FALSE]
-
-DEVICE
-
-DEVICE = DEVICE (Read)
-   The graphics device. [Current graphics device]
-
-FILL
-
-FILL = _REAL (Read)
-   The linear filling factor for the array.  In other words the
-   fractional size (applied to both co-ordinates) of the new
-   picture within each of the XPIC * YPIC abutted sections of
-   the picture being sub-divided.  Each new picture is located
-   centrally within the section.  A filling factor of 1.0 means
-   that the pictures in the array abut.  Smaller factors permit a
-   gap between the pictures.  For example, FILL = 0.9 would give
-   a gap between the created pictures of 10 per cent of the
-   height and width of each picture, with exterior borders of 5
-   per cent.  FILL must lie between 0.1 and 1.0. [1.0]
-
-LABELNO
-
-LABELNO = _INTEGER (Read)
-   The number used to form the label for the first (bottom-left)
-   picture.  It cannot be negative. [1]
-
-OUTLINE
-
-OUTLINE = _LOGICAL (Read)
-   If TRUE, a box that delimits the new picture is drawn. [TRUE]
-
-XPIC
-
-XPIC = _INTEGER (Read)
-   The number of new pictures to be formed horizontally in the
-   BASE picture.  The total number of new pictures is XPIC * YPIC.
-   The value must lie in the range 1--20.  The suggested default is 2.
-
-YPIC
-
-YPIC = _INTEGER (Read)
-   The number of new pictures to be formed vertically in the
-   BASE picture.  The total number of new pictures is XPIC * YPIC.
-   The value must lie in the range 1--20.  The suggested default is 2.
-   The suggested default is the value of parameter XPIC.
-
-Examples
-
-picgrid 3 2
-   Creates six new equally sized and abutting FRAME pictures within
-   the full display area of the current graphics device.  All the
-   pictures are outlined.  They have labels 1, 2, 3, 4, 5, and 6.
-   The bottom-left picture (1) becomes the current picture.
- picgrid xpic=3 ypic=2 fill=0.8 labelno=11 nooutline
-   As above except that the pictures do not abut since each is
-   0.8 times smaller in both dimensions, the labels are 11 to
-   16, and there are no picture outlines drawn.
- picgrid device=xw current \
-   This creates a 2-by-2 grid of new FRAME pictures within the
-   current picture on device xw.
-
-Related_Applications
-
-   KAPPA: PICCUR, PICDEF, PICGRID, PICSEL.
-
-Authors
-
-MJC: Malcolm J. Currie  (STARLINK)
-
-History
-
- 1995 August 23 (MJC):
-    Original version.
- 1 PICIN
-Finds the attributes of a picture interior to the current picture.
- Usage:
-    picin [name] [device]
- Description:
-    This application finds the attributes of a picture, selected by
-   name, that was created since the current picture and lies within
-   the bounds of the current picture.  The search starts from the
-   most-recent picture, unless the current picture is included,
-   whereupon the current picture is tested first.
-    The attributes reported are the name, comment, label, name of the
-   reference data object, the bounds in world, raster, and normalised
-   device co-ordinates.
-
-Parameters
-
-For information on individual parameters, select from the list below:
-
-COMMENT
-
-COMMENT = LITERAL (Write)
-   The comment of the current picture.  Up to 132 characters
-   will be written.
-
-CURRENT
-
-CURRENT = _LOGICAL (Read)
-   If this is {\tt TRUE}, the current picture is compared against the
-   chosen name before searching from the most-recent picture
-   within the current picture. [FALSE]
-
-DEVICE
-
-DEVICE = DEVICE (Read)
-   Name of the graphics device about which information is
-   required. [Current graphics device]
-
-LABEL
-
-LABEL = LITERAL (Write)
-   The label of the current picture.  It is blank if there is no
-   label.
-
-NAME
-
-NAME = LITERAL (Read)
-   The name of the picture to be found within the current picture.
-   If it is null (!), the first interior picture is selected.
-   ["DATA"]
-
-NCX1
-
-NCX1 = _REAL (Write)
-   The lower x normalised device co-ordinate of the current
-   picture.
-
-NCX2
-
-NCX2 = _REAL (Write)
-   The upper x normalised device co-ordinate of the current
-   picture.
-
-NCY1
-
-NCY1 = _REAL (Write)
-   The lower y normalised device co-ordinate of the current
-   picture.
-
-NCY2
-
-NCY2 = _REAL (Write)
-   The upper y normalised device co-ordinate of the current
-   picture.
-
-PNAME
-
-PNAME = LITERAL (Write)
-   The name of the current picture.
-
-RCX1
-
-RCX1 = _REAL (Write)
-   The lower x raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-
-RCX2
-
-RCX2 = _REAL (Write)
-   The upper x raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-
-RCY1
-
-RCY1 = _REAL (Write)
-   The lower y raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-   picture.
-
-RCY2
-
-RCY2 = _REAL (Write)
-   The upper y raster co-ordinate of the current picture.  A
-   value of -1 signifies that the value could not be determined
-   because the device is not of the raster type.
-
-REFNAM
-
-REFNAM = LITERAL (Write)
-   The reference object associated with the current picture.  It
-   is blank if there is no reference object.  Up to 132 characters
-   will be written.
-
-REPORT
-
-REPORT = _LOGICAL (Read)
-   If this is FALSE details of the interior picture are not
-   reported, merely the results are written to the output
-   parameters.  It is intended for use within procedures. [TRUE]
-
-WCX1
-
-WCX1 = _REAL (Write)
-   The lower x world co-ordinate of the current picture.
-
-WCX2
-
-WCX2 = _REAL (Write)
-   The upper x world co-ordinate of the current picture.
-
-WCY1
-
-WCY1 = _REAL (Write)
-   The lower y world co-ordinate of the current picture.
-
-WCY2
-
-WCY2 = _REAL (Write)
-   The upper y world co-ordinate of the current picture.
-
-Examples
-
-picin
-   This reports the attributes of the last DATA picture within
-   the current picture for the current graphics device.
- picin frame graphon
-   This reports the attributes of the last FRAME picture within
-   the current picture for the Graphon device.
- picin refnam=(object) current
-   This reports the attributes of the last data picture within
-   the current picture for the current graphics device.  If there
-   is a reference data object, its name is written to the ICL
-   variable OBJECT.  The search includes the current picture.
- picin ncx1=(x1) ncx2=(x2) ncy1=(y1) ncy2=(y2)
-   This reports the attributes of the last DATA picture within
-   the current picture for the current graphics device.  The
-   bounds of the current picture in normalised device
-   co-ordinates are written to the ICL variables: X1, X2, Y1, Y2.
-
-Notes
-
-This application is intended for use within procedures.  Also if
-a DATA picture is selected and the current picture is included in
-the search, this application informs about the same picture that
-an application that works in a cursor interaction mode would
-select, and so acts as a check that the correct picture will be
-accessed.
-
-Related_Applications
-
-   KAPPA: GDSTATE, PICDEF, PICLIST, PICTRANS, PICXY.
-
-Authors
-
-MJC: Malcolm J. Currie (STARLINK)
-
-History
-
- 1991 August 20 (MJC):
-    Original version.
-  1993 August 19 (MJC):
-    Added raster co-ordinates.
 .endhelp

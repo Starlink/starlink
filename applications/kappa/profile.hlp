@@ -1,13 +1,18 @@
 .help profile Starlink kappa
 .nf
 Creates a 1-dimensional profile through an N-dimensional NDF.
- Usage:
-    profile in out start finish [nsamp]
- Description:
-    This application samples an N-dimensional NDF at a set of positions,
+
+Usage:
+
+   profile in out start finish [nsamp]
+
+Description:
+
+   This application samples an N-dimensional NDF at a set of positions,
    producing a 1-dimensional output NDF containing the sample values.
    Nearest neighbour interpolation is used.
-    The samples can be placed at specified positions within the input NDF,
+
+   The samples can be placed at specified positions within the input NDF,
    or can be spaced evenly along a poly-line joining a set of vertices
    (see parameter MODE). The positions of the samples may be saved in an
    output positions list (see parameter OUTLIST).
@@ -37,7 +42,8 @@ GEODESIC = _LOGICAL (Read)
    Otherwise, the line segments are simple straight lines within the
    current co-ordinate Frame. This parameter is only accessed if
    parameter MODE is set to "Curve".
-    As an example, consider a profile through an all-sky image consisting
+
+   As an example, consider a profile through an all-sky image consisting
    of a single line segment which starts at RA=0h DEC=80d and finishes
    at RA=12h DEC=80d. If GEODESIC is FALSE, the line segment will be a
    line of constant declination, i.e. the "straight" line from the
@@ -69,17 +75,20 @@ MODE
 MODE = LITERAL (Read)
    The mode by which the sample positions are selected. The options
    are:
-    - "Curve" -- The samples are placed evenly along a curve specified
+
+   - "Curve" -- The samples are placed evenly along a curve specified
    by a set of vertices obtained from the user. The line segments
    joining these vertices may be linear or geodesic (see parameter
    GEODESIC). Multiple vertices may be supplied using a text file
    (see parameter INLIST). Alternatively, a single line segment can
    be specified using parameters START and FINISH. The number of
    samples to place along the curve is specified by parameter NSAMP.
-    - "Points" -- The positions at which samples should be taken are
+
+   - "Points" -- The positions at which samples should be taken are
    given explicitly by the user in a text file (see parameter
    INLIST). No other sample positions are used.
-    [Curve]
+
+   [Curve]
 
 NSAMP
 
@@ -142,20 +151,23 @@ profile my_data prof "0 0" "100 100" 40 outlist=samps
    information describing all the co-ordinate Frames in which the
    positions of the samples are known. This file may be examined
    using application LISTSHOW.
- profile my_data prof "15:32:47 23:40:08" "15:32:47 23:42"
+
+profile my_data prof "15:32:47 23:40:08" "15:32:47 23:42"
    This example is the same as the last one except that it is
    assumed that the current co-ordinate Frame in the input NDF my_data
    is an equatorial (RA/DEC) system. It creates a 1-dimensional
    profile starting at RA=15:32:47 DEC=23:40:08, and ending at the same
    RA, and DEC=23:42:00. The number of points in the profile is
    determined by the resolution of the data.
- profile allsky prof inlist=prof_path npoint=200 geodesic outlist=aa
+
+profile allsky prof inlist=prof_path npoint=200 geodesic outlist=aa
    This examples creates a profile of the NDF allsky through a set of
    points given in a text file called prof_path. Such files can be
    created (for example) using application CURSOR. Each line segment
    is a geodesic curve. The profile is sampled at 200 points. The
    samples positions are written to the output positions list aa.
- profile allsky2 prof2 mode=point inlist=aa
+
+profile allsky2 prof2 mode=point inlist=aa
    This examples creates a profile of the NDF allsky2 containing
    samples at the positions given in the positions list aa. Thus,
    the profiles created by this example and the previous example
@@ -179,8 +191,10 @@ Implementation_Status
 
    -  This routine correctly processes the DATA, VARIANCE, WCS, LABEL,
    TITLE, and UNITS components of the NDF.
-    -  All non-complex numeric data types can be handled.  Only
+
+   -  All non-complex numeric data types can be handled.  Only
    double-precision floating-point data can be processed directly.
    Other non-complex data types will undergo a type conversion
    before the profile is produced.
+
 .endhelp

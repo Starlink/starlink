@@ -1,11 +1,15 @@
 .help lutview Starlink kappa
 .nf
 Draws a colour-table key.
- Usage:
-    lutview [mode] [low] [high] [annota] [curpic] [device] lbound=?
+
+Usage:
+
+   lutview [mode] [low] [high] [annota] [curpic] [device] lbound=?
      ubound=?
- Description:
-    This application draws a key of the colour table at a location
+
+Description:
+
+   This application draws a key of the colour table at a location
    you select.  You can constrain the key to lie within either the
    current or the BASE picture.  The key may be annotated, in which
    case you must allow sufficient room for the annotations.  For
@@ -14,7 +18,8 @@ Draws a colour-table key.
    appearing to the top and right respectively.  The annotations
    scale linearly between the values corresponding to the lower and
    upper indices of the colour table.
-    The situation of the key is defined by the co-ordinates of a pair
+
+   The situation of the key is defined by the co-ordinates of a pair
    of opposite corners of a rectangular region.  You may specify
    these using one of the following methods:
      1.  moving a cursor and pressing a button on the mouse or
@@ -88,7 +93,8 @@ LUT = NDF (Read)
    Ikons, the new colour table remains after this application has
    completed.  A null, !, means that the existing colour table
    will be used.
-    The LUT must be two-dimensional, the first dimension
+
+   The LUT must be two-dimensional, the first dimension
    being 3, and the second being arbitrary.  The method used to
    compress or expand the colour table if the second dimension is
    different from the number of unreserved colour indices is
@@ -135,17 +141,22 @@ Examples
 lutview annota
    Draws an annotated colour table at a position selected via
    the cursor on the current image-display device.
- lutview p
+
+lutview p
    Draws a colour table that fills the current picture on the
    current image-display device.
- lutview curpic
+
+lutview curpic
    Draws a colour table within the current picture positioned
    via the cursor.
- lutview mode=xy outline device=ikon \
+
+lutview mode=xy outline device=ikon \
    Draws a outlined colour table within the BASE picture
    on the Ikon, defined by x-y extents.
- lutview xy lut=my_lut device=lj250_p lbound=[0.92,0.2]
- ubound=[0.98,0.8]
+
+lutview xy lut=my_lut device=lj250_p lbound=[0.92,0.2]
+
+ubound=[0.98,0.8]
    Draws the colour table in the NDF called my_lut with an
    outline within the BASE picture on the device lj250_p, defined
    by the x-y bounds (0.92,0.2) and (0.98,0.8).  In other words
@@ -160,17 +171,20 @@ significant figures in an annotation.  The colour table will have
 an aspect ratio in the range 0.17--0.45, and the text height is
 adjusted to fit the characters within the available room.  The
 default aspect ratio is 0.275.
- -  The text has a maximum height as a fraction of width (if
+
+-  The text has a maximum height as a fraction of width (if
 oblate) or height of the initial picture (BASE or current) so
 that ridiculously large characters are drawn for big keys.
 However, this can result in characters which are too small if for
 example a highly oblate colour table is plotted within a strongly
 prolate current picture.
- -  A FRAME picture (when there are annotations) and the
+
+-  A FRAME picture (when there are annotations) and the
 colour-table picture are stored in the graphics database. These
 have names FRAME and KEY respectively.  On completion the
 current picture is unchanged.
- -  Parameters LOW and HIGH are single precision because they are
+
+-  Parameters LOW and HIGH are single precision because they are
 also required to define world co-ordinates of the graphics.  Thus
 this application is not suitable for double-precision data that
 have been scaled over a range near the precision of real values.
@@ -187,18 +201,24 @@ History
 
  1990 July 24 (MJC):
     Original version.
-  1991 April 9 (MJC):
+
+ 1991 April 9 (MJC):
     Added AGI begin-and-end block.  Added LOW and HIGH parameters
     and made to display only the non-reserved pens.
-  1991 July 31 (MJC):
+
+ 1991 July 31 (MJC):
     No longer redefines colours of SGS pens to predefined state if
     workstation has dynamic colour representation, now there is
     palette control.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  1992 December 1 (MJC):
+
+ 1992 December 1 (MJC):
     LOW and HIGH default to the current linear scaling limits.
-  1993 January 14 (MJC):
+
+ 1993 January 14 (MJC):
     Added LUT and NN parameters.
+
 .endhelp

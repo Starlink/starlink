@@ -1,12 +1,17 @@
 .help hisset Starlink kappa
 .nf
 Sets the NDF history update mode.
- Usage:
-    hisset ndf [mode] ok=?
- Description:
-    This task controls the level of history recording in an NDF,
+
+Usage:
+
+   hisset ndf [mode] ok=?
+
+Description:
+
+   This task controls the level of history recording in an NDF,
    and can also erase the history information.
-    The level is called the history update mode and it is a permanent
+
+   The level is called the history update mode and it is a permanent
    attribute of the history component of the NDF, and remains with
    the NDF and any NDF created therefrom until the history is erased
    or the update mode is modified (say by this task).
@@ -20,14 +25,16 @@ MODE
 MODE = LITERAL (Read)
    The history update mode.  It can take one of the following
    values.
-       "Disabled"  ---  No history recording is to take place.
+
+      "Disabled"  ---  No history recording is to take place.
       "Erase"     ---  Erases the history of the NDF.
       "Normal"    ---  Normal history recording is required.
       "Quiet"     ---  Only brief history information is to be
                        recorded.
       "Verbose"   ---  The fullest-possible history information
                        is to be recorded.
-    The suggested default is "Normal".  ["Normal"]
+
+   The suggested default is "Normal".  ["Normal"]
 
 NDF
 
@@ -48,14 +55,18 @@ Examples
 hisset final
    This sets the history-recording level to be normal for the NDF
    called final.
- hisset final erase ok
+
+hisset final erase ok
    This erases the history information from the NDF called final.
- hisset mode=disabled ndf=spectrum
+
+hisset mode=disabled ndf=spectrum
    This disables history recording in the NDF called spectrum.
- hisset test42 v
+
+hisset test42 v
    This sets the history-recording level to be verbose for the NDF
    called test42 so that the fullest-possible history is included.
- hisset ndf=test42 mode=q
+
+hisset ndf=test42 mode=q
    This sets the history-recording level to be quiet for the NDF
    called test42, so that only brief information is recorded.
 
@@ -63,7 +74,8 @@ Notes
 
 -  A history component is created if it does not exist within the
 NDF, except for MODE="Erase".
- -  The task records the new history update mode within the
+
+-  The task records the new history update mode within the
 history records, even if MODE="Disabled" provided the mode has
 changed.  Thus the history information will show where there may
 be gaps in the recording.
@@ -75,13 +87,15 @@ Related_Applications
 Authors
 
 RFWS: R.F.Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1993 June 3 (RFWS):
     Original version.
-  1995 June 24 (MJC):
+
+ 1995 June 24 (MJC):
     Added the documentation.  Corrected some typo's and placed
     the local variables in alphabetical order.  Used PAR_CHOIC.
     Corrected bug in NDF_HINFO call.

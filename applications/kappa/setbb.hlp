@@ -1,15 +1,20 @@
 .help setbb Starlink kappa
 .nf
 Sets a new value for the quality bad-bits mask of an NDF.
- Usage:
-    setbb ndf bb
- Description:
-    This application sets a new value for the bad-bits mask
+
+Usage:
+
+   setbb ndf bb
+
+Description:
+
+   This application sets a new value for the bad-bits mask
    associated with the quality component of an NDF.  This 8-bit mask
    is used to select which of the bits in the quality array should
    normally be used to generate "bad" pixels when the NDF is
    accessed.
-    Wherever a bit is set to 1 in the bad-bits mask, the
+
+   Wherever a bit is set to 1 in the bad-bits mask, the
    corresponding bit will be extracted from the NDF's quality array
    value for each pixel (the other quality bits being ignored).  A
    pixel is then considered "bad" if any of the extracted quality
@@ -31,7 +36,8 @@ AND = _LOGICAL (Read)
    This facility allows individual bits in within the mask to be
    cleared (i.e. reset to zero) without affecting the current
    state of other bits (see the "Examples" section).
-    The AND parameter is not used if a TRUE value is given for the
+
+   The AND parameter is not used if a TRUE value is given for the
    OR parameter. [FALSE]
 
 BB
@@ -43,12 +49,14 @@ BB = LITERAL (Read)
    "Z" prefix (respectively) to the appropriate string of digits.
    The value supplied should lie in the range 0 to 255 decimal (or
    8 bits of binary).
-    If the AND and OR parameters are both FALSE, then the value
+
+   If the AND and OR parameters are both FALSE, then the value
    supplied will be used directly as the new mask value.
    However, if either of these logical parameters is set to TRUE,
    then an appropriate bit-wise `AND' or `OR' operation with the
    old mask value will first be performed.
-    The default value suggested when prompting for this value is
+
+   The default value suggested when prompting for this value is
    chosen so as to leave the original mask value unchanged.
 
 NDF
@@ -74,16 +82,19 @@ setbb myframe 3
    NDF called myframe to the value 3.  This means that bits 1 and
    2 of the associated quality array will be used to generate bad
    pixels.
- setbb ndf=myframe bb=b11
+
+setbb ndf=myframe bb=b11
    This example performs the same operation as above, but in this
    case the new mask value has been specified using binary
    notation.
- setbb xspec b10001000 or
+
+setbb xspec b10001000 or
    Causes the bad-bits mask value in the NDF called xspec to
    undergo a bit-wise `OR' operation with the binary value
    10001000.  This causes bits 4 and 8 to be set without changing
    the state of any other bits in the mask.
- setbb quasar ze7 and
+
+setbb quasar ze7 and
    Causes the bad-bits mask value in the NDF called quasar to
    undergo a bit-wise `AND' operation with the hexadecimal value
    E7 (binary 11100111).  This causes bits 4 and 5 to be cleared
@@ -103,15 +114,18 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  15-APR-1991 (RFWS):
     Original version.
-  17-APR-1991 (RFWS):
+
+ 17-APR-1991 (RFWS):
     Added the AND and OR parameters and changed to allow binary,
     octal and hexadecimal notation.
-  1995 April 24 (MJC):
+
+ 1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 .endhelp

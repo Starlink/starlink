@@ -1,10 +1,14 @@
 .help gausmooth Starlink kappa
 .nf
 Smooths a 1- or 2-dimensional image using a Gaussian filter.
- Usage:
-    gausmooth in out fwhm
- Description:
-    This application applies a symmetrical filter to a 1- or
+
+Usage:
+
+   gausmooth in out fwhm
+
+Description:
+
+   This application applies a symmetrical filter to a 1- or
    2-dimensional image so as to convolve it with a Gaussian point
    spread function (PSF) of specified width, or widths and
    orientation.  The image is held in an NDF data structure.
@@ -25,7 +29,8 @@ BOX() = _INTEGER (Read)
    second size is ignored.  Two values are expected when an
    elliptical PSF is requested (see the description of parameter
    FWHM).
-    The values given will be rounded up to positive odd integers
+
+   The values given will be rounded up to positive odd integers
    if necessary.  A dynamic default value is calculated which is
    just sufficient to accommodate the Gaussian PSF out to a
    radius of 3 standard deviations.  Note that the time taken to
@@ -86,12 +91,14 @@ WLIM = _DOUBLE (Read)
    generated.  It can be used, for example, to prevent output
    pixels from being generated in regions where good pixels are
    only present in the wings of the PSF.
-    By default, a null (!) value is used for WLIM, which causes
+
+   By default, a null (!) value is used for WLIM, which causes
    the pattern of bad pixels to be propagated from the input
    image to the output image unchanged. In this case, smoothed
    output values are only calculated for those pixels which are
    not bad in the input image.
-    If a numerical value is given for WLIM, then it specifies the
+
+   If a numerical value is given for WLIM, then it specifies the
    minimum PSF-weighted fraction of good pixels which must be
    present in the PSF area (i.e. box) in order to generate a good
    output pixel.  The maximum value, in the absence of bad
@@ -109,19 +116,22 @@ gausmooth image1 image2 5.0
    half-maximum of 5 pixels.  The smoothed image is written to
    image2.  If any pixels in the input image are bad, then the
    corresponding pixels in the output image will also be bad.
- gausmooth spectrum1 spectrum2 5.0 box=9
+
+gausmooth spectrum1 spectrum2 5.0 box=9
    Smooths the 1-dimensional image held in the NDF structure
    spectrum1 using a symmetrical Gaussian PSF with a full-width
    at half-maximum of 5, and is evaluated over a length of 9
    pixels.  The smoothed image is written to spectrum2.  If any
    pixels in the input image are bad, then the corresponding
    pixels in the output image will also be bad.
- gausmooth in=a out=b fwhm=3.5 box=31
+
+gausmooth in=a out=b fwhm=3.5 box=31
    Smooths the 2-dimensional image held in the NDF structure a,
    writing the result into the structure b. The Gaussian
    smoothing PSF has a full-width at half-maximum of 3.5 pixels
    and is evaluated over a large square of size 31x31 pixels.
- gausmooth in=a out=b fwhm=[4,3] orient=52.7 box=[29,33]
+
+gausmooth in=a out=b fwhm=[4,3] orient=52.7 box=[29,33]
    Smooths the 2-dimensional image held in the NDF structure a,
    writing the result into the structure b.  The elliptical
    Gaussian smoothing PSF has full-width at half-maximum of 4
@@ -129,7 +139,8 @@ gausmooth image1 image2 5.0
    axis, and is evaluated over a large rectangle of size 29x33
    pixels.  The major axis of the PSF is oriented 52.7 degrees
    anti-clockwise from the x axis of the data array.
- gausmooth ngc1097 ngc1097s fwhm=7.2 wlim=0.1
+
+gausmooth ngc1097 ngc1097s fwhm=7.2 wlim=0.1
    Smooths the specified image data using a Gaussian PSF with a
    full-width at half-maximum of 7.2.  An output value is
    calculated for any pixel for which the PSF-weighted fraction
@@ -158,35 +169,45 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  7-AUG-1990 (RFWS):
     Original version.
-  24-SEP-1990 (RFWS):
+
+ 24-SEP-1990 (RFWS):
     Fixed error in the smoothing of the variance component.
-  25-SEP-1990 (RFWS):
+
+ 25-SEP-1990 (RFWS):
     Added calls to ERR_MARK and ERR_RLSE when checking for null
     parameter values.
-  25-SEP-1990 (RFWS):
+
+ 25-SEP-1990 (RFWS):
     Converted to use full-width at half-maximum (FWHM) rather than
     standard deviation (SIGMA).
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  1992 April 4 (MJC):
+
+ 1992 April 4 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-  1992 November 13 (MJC):
+
+ 1992 November 13 (MJC):
     Added support for elliptical Gaussian PSFs.
-  1995 April 5 (MJC):
+
+ 1995 April 5 (MJC):
     Renamed from GAUSS to avoid clash with Figaro.  Made to work on
     1-dimensional arrays.  Used lowercase examples and usage.
     Added Related Applications and additional commentary.  Changed
     default of TITLE to null.  Used PSX to obtain workspace.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -194,10 +215,12 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.  The bad-pixel flag is also written for the data and
    variance arrays.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single-precision floating point, or double
    precision, if appropriate.
 .endhelp

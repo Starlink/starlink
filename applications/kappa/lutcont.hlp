@@ -2,10 +2,14 @@
 .nf
 Loads a lookup table to give the display the appearance of a
 contour plot.
- Usage:
-    lutcont
- Description:
-    This procedure loads a lookup table that gives a contour-plot
+
+Usage:
+
+   lutcont
+
+Description:
+
+   This procedure loads a lookup table that gives a contour-plot
    appearance into the current image-display device.  The lookup table
    is mainly black with a set of white stripes and it is loaded with
    linear scaling.
@@ -35,6 +39,8 @@ History
 
  1990 Apr 16 (MJC):
     Original version.
-  1991 April 24 (MJC):
+
+ 1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
+
 .endhelp

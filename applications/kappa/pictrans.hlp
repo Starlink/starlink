@@ -1,10 +1,14 @@
 .help pictrans Starlink kappa
 .nf
 Transforms co-ordinates between the current and BASE pictures.
- Usage:
-    pictrans inxy [outx] [outy] [bound]
- Description:
-    This application converts a position's co-ordinates from the
+
+Usage:
+
+   pictrans inxy [outx] [outy] [bound]
+
+Description:
+
+   This application converts a position's co-ordinates from the
    current picture to their equivalent in the BASE picture, or
    vice versa.
 
@@ -30,7 +34,8 @@ COSYS = LITERAL (Read)
    picture will not normally have data co-ordinates, so the value
    of COSYS usually selects in which co-ordinate system positions
    in the current picture are specified.
-    Data co-ordinates are arbitrary but most often they will be a
+
+   Data co-ordinates are arbitrary but most often they will be a
    linear or logarithmic transformation of the world
    co-ordinates.  For example, the x co-ordinate of a spectrum
    would be given in pixels if COSYS = "World", but if COSYS =
@@ -80,13 +85,15 @@ pictrans [100.3,-20.1] outx=(dx) outy=(dy) cosys=w
    world co-ordinates of that point in the BASE picture.  The base
    co-ordinates are written to ICL variables DX and DY (as well as
    the application's parameter file).
- pictrans [-1.e4,2.56] outy=(dy) device=xwindows
+
+pictrans [-1.e4,2.56] outy=(dy) device=xwindows
    This converts the position (-10000.0,2.56), in the current
    picture of the xwindows device, to the co-ordinates of that
    point in the BASE picture.  All positions use the current
    co-ordinate system.  The base y co-ordinate is written to ICL
    variable DY.
- pictrans [0.314,0.137] (dx) (dy) (within) cosys=d notobase
+
+pictrans [0.314,0.137] (dx) (dy) (within) cosys=d notobase
    This converts the position (0.314,0.137), in the data
    co-ordinates of the BASE picture of the current graphics
    device, to the data co-ordinates of that point in the current
@@ -107,4 +114,5 @@ History
 
  1993 August 19 (MJC):
     Original version.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help convolve Starlink kappa
 .nf
 Convolves a pair of 1- or 2-dimensional NDFs together
- Usage:
-    convolve in psf out xcentre ycentre
- Description:
-    This application smooths a 1- or 2-dimensional NDF using a Point-
+
+Usage:
+
+   convolve in psf out xcentre ycentre
+
+Description:
+
+   This application smooths a 1- or 2-dimensional NDF using a Point-
    Spread Function given by a second NDF.  The output NDF is
    normalised to the same mean data value as the input NDF,
    and is the same size as the input NDF.
@@ -51,12 +55,14 @@ WLIM = _REAL (Read)
    output pixels from being generated in regions where there are
    relatively few good pixels to contribute to the smoothed
    result.
-    By default, a null (!) value is used for WLIM, which causes
+
+   By default, a null (!) value is used for WLIM, which causes
    the pattern of bad pixels to be propagated from the input
    array to the output array unchanged.  In this case, smoothed
    output values are only calculated for those pixels which are
    not bad in the input array.
-    If a numerical value is given for WLIM, then it specifies the
+
+   If a numerical value is given for WLIM, then it specifies the
    minimum total weight associated with the good pixels in the
    smoothing box required to generate a good output pixel
    (weights for each pixel are defined by the normalised PSF).
@@ -93,10 +99,12 @@ convolve ccdframe iraspsf ccdlores 50 50
    centre of the PSF image in iraspsf is at pixel indices
    (50,50).  Any bad pixels in the input image are propagated to
    the output.
- convolve ccdframe iraspsf ccdlores 50 50 wlim=1.0
+
+convolve ccdframe iraspsf ccdlores 50 50 wlim=1.0
    As above, but good output values are only created for pixels
    which have no contributions from bad input pixels.
- convolve ccdframe iraspsf ccdlores \
+
+convolve ccdframe iraspsf ccdlores \
    As in the first example except the centre of the PSF is located
    at the centre of the PSF array.
 
@@ -104,7 +112,8 @@ Notes
 
 -  The algorithm used is based on the multiplication of the
 Fourier transforms of the input array and PSF array.
- -  A PSF can be created using the PSF command or MATHS if the
+
+-  A PSF can be created using the PSF command or MATHS if the
 PSF is an analytic function.
 
 Related_Applications
@@ -115,20 +124,25 @@ Related_Applications
 Authors
 
 RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
- DSB: David Berry (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  12-MAY-1992 (RAHM):
     Original version.
-  10-JAN-1995 (DSB):
+
+ 10-JAN-1995 (DSB):
     Major changes for inclusion in KAPPA.
-  1995 March 17 (MJC):
+
+ 1995 March 17 (MJC):
     Improvements to the documentation including remarks about
     suggested defaults for XCENTRE and YCENTRE, and a related
     example, and a list of related applications.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -136,8 +150,11 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using double-precision floating point.
+
 .endhelp

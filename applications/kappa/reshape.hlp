@@ -85,7 +85,7 @@ Implementation_Status
 
    -  This routine correctly processes the DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, and HISTORY, components of an NDF
-   data structure and propagates all extensions.  WCS and AXIS information 
+   data structure and propagates all extensions.  WCS and AXIS information
    is lost.
 
    -  All non-complex numeric data types can be handled.

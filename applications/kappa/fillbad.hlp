@@ -1,13 +1,18 @@
 .help fillbad Starlink kappa
 .nf
 Removes regions of bad values from a 2-dimensional NDF.
- Usage:
-    fillbad in out [niter] [size]
- Description:
-    This application replaces bad values in a 2-dimensional NDF with
+
+Usage:
+
+   fillbad in out [niter] [size]
+
+Description:
+
+   This application replaces bad values in a 2-dimensional NDF with
    a smooth function which matches the surrounding data.  It can fill
    arbitrarily shaped regions of bad values within images.
-    It forms a smooth replacement function for the regions of bad
+
+   It forms a smooth replacement function for the regions of bad
    values by forming successive approximations to a solution of
    Laplace's equation, with the surrounding valid data providing the
    boundary conditions.
@@ -51,7 +56,7 @@ MEMORY = _LOGICAL (Read)
 
 NITER
 
-NITER = INTEGER (Read)
+NITER = INTEGER (Given)
    The number of iterations of the relaxation algorithm.  This
    value cannot be less than two, since this is the minimum
    number required to ensure that all bad values are assigned a
@@ -96,11 +101,13 @@ fillbad aa bb
    derived from the surrounding good pixel values using two
    iterations of a relaxation algorithm.  The initial scale length
    is 5 pixels.  The resultant NDF is called bb.
- fillbad aa bb 6 20 title="Cleaned image"
+
+fillbad aa bb 6 20 title="Cleaned image"
    As above except the initial scale length is 20 pixels, 5
    iterations will be performed, and the output title is "Cleaned
    image" instead of the title of NDF aa.
- fillbad aa bb memory novariance
+
+fillbad aa bb memory novariance
    As in the first example except that processing is performed
    with blocks up to 512 by 512 pixels to reduce the memory
    requirements, and no variance information will be used or
@@ -114,7 +121,8 @@ neighbours.  Such a method converges to the required solution,
 but information about the good regions only propagates at a rate
 of about one pixel per iteration into the bad regions, resulting
 in slow convergence if large areas are to be filled.
- This application speeds convergence to an acceptable function by
+
+This application speeds convergence to an acceptable function by
 forming the replacement mean from all the pixels in the same
 image row and column, using a weight which decreases
 exponentially with distance and goes to zero after the first good
@@ -133,21 +141,24 @@ detail into the solution.  Since this fine detail occurs
 predominantly close to the `crinkly' edges of the bad regions,
 the slower propagation of the solution in the later iterations is
 then less important.
- When there is variance processing the output variance is
+
+When there is variance processing the output variance is
 reassigned if either the input variance or data value was bad.
 Where the input value is good but its associated variance is bad,
 the calculation proceeds as if the data value were bad, except
 that only the variance is substituted in the output.  The new
 variance is approximated as twice the inverse of the sum of the
 weights.
- -  The price of the above efficiency means that considerable
+
+-  The price of the above efficiency means that considerable
 workspace is required, typically two or three times the size of
 the input image, but even larger for the one and two-byte integer
 types.  If memory is at a premium, there is an option to process
 in blocks (cf. parameter MEMORY).  However, this may not give as
 good results as processing the array in full, especially when the
 bad-pixel regions span blocks.
- -  The value of the parameter SIZE is not critical and the
+
+-  The value of the parameter SIZE is not critical and the
 default value will normally prove effective.  It primarily
 affects the efficiency of the algorithm on various size scales.
 If the smoothing scale is set to a large value, large scale
@@ -162,8 +173,10 @@ should be about half the size of the largest scale variations
 expected.  Unless the valid pixels are very sparse, this is
 usually determined by the `size' of the largest invalid region to
 be replaced.
- -  An error results if the input NDF has no bad values to replace.
- -  The progress of the iterations is reported.
+
+-  An error results if the input NDF has no bad values to replace.
+
+-  The progress of the iterations is reported.
 
 Timing
 
@@ -180,17 +193,20 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1995 April 16 (MJC):
     Original version.  Some of the documentation was derived from
     R.F. Warren-Smith's EDRS manual.
-  21-MAY-1998 (DSB):
+
+ 21-MAY-1998 (DSB):
     Check that input variances are not all bad or zero, and ignore
     them if they are.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -198,10 +214,12 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.  The output bad-pixel flag is set to indicate no bad
    values in the data and variance arrays.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single- or double-precision floating point as
    appropriate.
 .endhelp

@@ -1,14 +1,18 @@
 .help elprof Starlink kappa
 .nf
 Creates a radial or azimuthal profile of a 2-dimensional image.
- Usage:
-    elprof in out nbin xc yc { angmaj=?
+
+Usage:
+
+   elprof in out nbin xc yc { angmaj=?
                             { ratio=?
                             { rmin=?
                             { rmax=?
                             radial
- Description:
-    This application will bin the input image into elliptical annuli,
+
+Description:
+
+   This application will bin the input image into elliptical annuli,
    or into a `fan' of adjacent sectors, centred on a specified
    position.  The mean data values in each bin are found, and stored
    in a 1-dimensional NDF which can be examined using LINPLOT,
@@ -16,12 +20,14 @@ Creates a radial or azimuthal profile of a 2-dimensional image.
    given range of radial distance and/or azimuthal angle.  A
    2-dimensional mask image can optionally be produced indicating
    which bin each input pixel was placed in.
-    If radial binning is selected (the default), then each bin is an
+
+   If radial binning is selected (the default), then each bin is an
    elliptical annulus of shape and size determined by parameters
    RMIN, RMAX, ANGMAJ, RATIO, XC, YC, and WIDTH.  The bins can be
    restricted to a specified sector of these annuli using parameter
    ANGLIM.
-    If azimuthal binning is selected, then each bin is a sector
+
+   If azimuthal binning is selected, then each bin is a sector
    (i.e. a wedge-shape), with its vertex given by parameters XC and
    YC, and its opening angle given by parameters WIDTH.  The range of
    azimuthal angles to be binned can be specified by parameter
@@ -177,8 +183,10 @@ elprof galaxy galprof 20 113 210 angmaj=49 rmin=10 rmax=210 ratio=0.5
    the major axis), and there will be no gaps between adjacent
    bins (i.e. each bin will have a width on the major axis of
    about 10 pixels).
- elprof galaxy galprof 10 113 210 radial=f anglim=20 rmin=50
- rmax=60
+
+elprof galaxy galprof 10 113 210 radial=f anglim=20 rmin=50
+
+rmax=60
    This example also creates a 1-dimensional NDF called galprof,
    this time containing an azimuthal profile of the 2-dimensional
    NDF called "galaxy", containing 10 bins.  Each bin will be a
@@ -199,13 +207,15 @@ Related_Applications
 Authors
 
 DSB: David Berry (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  2-FEB-1995 (DSB):
     Original version.
-  1995 March 27 (MJC):
+
+ 1995 March 27 (MJC):
     Some improvements to the documentation, removed tabs, used
     modern variable-declaration style and other stylish changes,
     removed long lines, mapped the input arrays together for
@@ -215,8 +225,10 @@ Implementation_Status
 
    -  This routine correctly processes the DATA, VARIANCE, TITLE,
    UNITS, and HISTORY components of the input NDF.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single-precision floating point.
 .endhelp

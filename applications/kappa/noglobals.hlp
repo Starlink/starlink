@@ -1,10 +1,14 @@
 .help noglobals Starlink kappa
 .nf
 Resets the KAPPA global parameters.
- Usage:
-    noglobals
- Description:
-    This application resets the KAPPA global parameters, and so makes
+
+Usage:
+
+   noglobals
+
+Description:
+
+   This application resets the KAPPA global parameters, and so makes
    their values undefined.
 
 Authors
@@ -15,6 +19,7 @@ History
 
  1992 December 1 (MJC):
     Original version.
-  1995 August 31 (MJC):
+
+ 1995 August 31 (MJC):
     Removes the current transformation.
 .endhelp

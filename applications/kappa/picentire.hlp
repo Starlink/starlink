@@ -2,10 +2,14 @@
 .nf
 Finds the first unobscured and unobscuring FRAME picture in the
 graphics database.
- Usage:
-    picentire [device]
- Description:
-    This application selects the first, i.e. oldest, FRAME picture in
+
+Usage:
+
+   picentire [device]
+
+Description:
+
+   This application selects the first, i.e. oldest, FRAME picture in
    the graphics database for a graphics device, subject to the
    following criterion.  The picture must not obstruct any other
    picture except the BASE, and must itself not be obstructed.
@@ -28,7 +32,8 @@ Examples
 picentire
    This selects the first unobscured and unobscuring FRAME
    picture for the current graphics device.
- picentire xwindows
+
+picentire xwindows
    This selects the first unobscured and unobscuring FRAME picture
    for the xwindows graphics device.
 
@@ -36,7 +41,8 @@ Notes
 
 -  An error is returned if there is no suitable FRAME picture,
 and the current picture remains unchanged.
- -  This routine cannot know whether or a picture has been cleared,
+
+-  This routine cannot know whether or a picture has been cleared,
 and hence is safe to reuse, as such information is not stored in
 the graphics database.
 
@@ -59,4 +65,5 @@ History
 
  1995 October 30 (MJC):
     Original version.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help globals Starlink kappa
 .nf
 Displays the values of the KAPPA global parameters.
- Usage:
-    globals
- Description:
-    This procedure lists the meanings and values of the KAPPA global
+
+Usage:
+
+   globals
+
+Description:
+
+   This procedure lists the meanings and values of the KAPPA global
    parameters.  If a global parameter does not have a value, the
    string "<undefined>" is substituted where the value would have
    been written.
@@ -17,12 +21,15 @@ History
 
  1991 July 18 (MJC):
     Original version.
-  1992 June 5 (MJC):
+
+ 1992 June 5 (MJC):
     Finds the operating system in order to define the path to the
     global file.
-  1995 August 31 (MJC):
+
+ 1995 August 31 (MJC):
     Lists the current transformation.
-  1995 December 6 (MJC):
+
+ 1995 December 6 (MJC):
     Revised the displayed wording for the current DATA_ARRAY to
     apply to foreign formats too.
 .endhelp

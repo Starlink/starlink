@@ -1,15 +1,20 @@
 .help fitsurface Starlink kappa
 .nf
 Fits a polynomial surface to 2-dimensional data array.
- Usage:
-    fitsurface ndf [fittype] nxpar nypar
- Description:
-    This task fits a surface to a 2-dimensional data array stored
+
+Usage:
+
+   fitsurface ndf [fittype] nxpar nypar
+
+Description:
+
+   This task fits a surface to a 2-dimensional data array stored
    array within an NDF data structure.  At present it only
    permits a fit with a polynomial, and the coefficients of that
    surface are stored in a POLYNOMIAL structure (SGP/38) as an
    extension to that NDF.
-    Unlike SURFIT, neither does it bin the data nor does it reject
+
+   Unlike SURFIT, neither does it bin the data nor does it reject
    outliers.
 
 Parameters
@@ -133,10 +138,12 @@ fitsurface virgo nxpar=4 nypar=4 novariance
    in the NDF called virgo.  All the data values are given
    equal weight.  The coefficients of the fitted surface are
    stored in an extension of virgo.
- fitsurface virgo nxpar=4 nypar=4
+
+fitsurface virgo nxpar=4 nypar=4
    As the first example except the data variance, if present,
    is used to weight the data values.
- fitsurface mkn231 nxpar=6 nypar=2 cosys=d xmin=-10.0 xmax=8.5
+
+fitsurface mkn231 nxpar=6 nypar=2 cosys=d xmin=-10.0 xmax=8.5
    This fits a polynomial surface to the data array in the NDF
    called mkn231.  A fifth order is used along the x direction,
    but only a linear fit along the y direction.  The fit is made
@@ -160,35 +167,44 @@ Related_Applications
 Authors
 
 SMB: Steven M. Beard (ROE)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  20-Apr-1993 (SMB):
     Original version, based on the KAPPA function SURFIT written
     by Malcolm Currie.
-  22-Apr-1993 (SMB):
+
+ 22-Apr-1993 (SMB):
     Modified to use PLYPUT2D.
-  23-Apr-1993 (SMB):
+
+ 23-Apr-1993 (SMB):
     DAT_PAR included (commented out) so the routine can work in a
     UNIX environment.
-  06-May-1993 (SMB):
+
+ 06-May-1993 (SMB):
     DAT_PAR does not need to be commented out.
-  02-Jun-1993 (SMB):
+
+ 02-Jun-1993 (SMB):
     Modified to report some goodness of fit information.
-  08-Nov-1993 (SMB):
+
+ 08-Nov-1993 (SMB):
     Modified to allow the x and y extrema returned by ARXYZW to be
     overridden by specifying XMIN, XMAX, YMIN, YMAX parameters.
-  07-Dec-1993 (SMB):
+
+ 07-Dec-1993 (SMB):
     Comments tidied up.
-  1995 August 2 (MJC):
+
+ 1995 August 2 (MJC):
     Used a modern prologue and completed it.  Renamed many of the
     routines and called existing subroutines rather than use SMB's
     new ones.  Added COSYS parameter, and stored its value in the
     SURFACEFIT extension.  Obtain axis centres in double
     precision.  Insisted on two significant dimensions in the NDF.
     Used PSX to get workspace to improve efficiency.
-  1996 October 10 (MJC):
+
+ 1996 October 10 (MJC):
     Remove one work array no longer needed for NAG-free
     subroutines.
 
@@ -196,8 +212,10 @@ Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, and HISTORY components of an NDF data structure.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using double-precision floating point.
 .endhelp

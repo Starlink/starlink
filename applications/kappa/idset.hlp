@@ -1,10 +1,14 @@
 .help idset Starlink kappa
 .nf
 Selects a current image-display device.
- Usage:
-    idset device
- Description:
-    This application selects a current image-display device. This
+
+Usage:
+
+   idset device
+
+Description:
+
+   This application selects a current image-display device. This
    device will be used for all applications requiring an
    image-display until changed explicitly.
 

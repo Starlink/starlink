@@ -1,14 +1,22 @@
 .help piclast Starlink kappa
 .nf
 Selects the last picture from the graphics datalast.
- Usage:
-    piclast
- Description:
-    This command selects the last-created picture.  Subsequent plotting
+
+Usage:
+
+   piclast
+
+Description:
+
+   This command selects the last-created picture.  Subsequent plotting
    for the chosen device will be in this new current picture.
    By default the chosen device is the current one.
-    This command is a synonym for "piclist picnum=1".
- 2 Parameters
+
+   This command is a synonym for "piclist picnum=1".
+
+
+Parameters
+
 For information on individual parameters, select from the list below:
 
 DEVICE
@@ -20,7 +28,8 @@ Examples
 
 piclast
    This selects the last picture for the current graphics device.
- piclast device=x2w
+
+piclast device=x2w
    This selects the last picture for the x2w device.
 
 Related_Applications
@@ -35,125 +44,5 @@ History
 
  1995 August 23 (MJC):
     Original version.
- 1 PICLIST
-Lists the pictures in the graphics database for a device.
- Usage:
-    piclist [name] [logfile] [device] picnum=?
- Description:
-    This application produces a summary of the contents of the
-   graphics database for a graphics device, and/or permits a picture
-   specified by its order in the list to be made the new current
-   picture.  The list may either be reported or written to a text
-   file.
-    The headed list has one line per picture.  Each line comprises
-   a reference number; the picture's name, comment (up to 24
-   characters), and label; and a flag to indicate whether or not
-   there is a reference data object associated with the picture.  A
-   `C' in the first column indicates that the picture that was
-   current when this application was invoked.  In the text file,
-   because there is more room, the name of the reference object is
-   given (up to 64 characters) instead of the reference flag.
-   Pictures are listed in chronological order of their creation.
 
-Parameters
-
-For information on individual parameters, select from the list below:
-
-DEVICE
-
-DEVICE = DEVICE (Read)
-   The graphics workstation. [The current graphics device]
-
-LOGFILE
-
-LOGFILE = FILENAME (Write)
-   The name of the text file in which the list of pictures will
-   be made.  A null string (!) means the list will be reported
-   to you.  The suggested default is the current value. [!]
-
-NAME
-
-NAME = LITERAL (Read)
-   Only pictures of this name are to be selected.  A null string
-   (!) or blanks means that pictures of all names may be selected.
-   [!]
-
-PICNUM
-
-PICNUM = LITERAL (Read)
-   The reference number of the picture to be made the current
-   picture when the application exits.  PICNUM="Last" selects the
-   last picture in the database.  Parameter PICNUM is not accessed
-   if the list is written to the text file.  A null (!) or any
-   other error causes the current picture on entry to be current
-   again on exit.  The suggested default is null.
-
-Examples
-
-piclist
-   This reports all the pictures in the graphics database for the
-   current graphics device.
- piclist device=ps_l
-   This reports all the pictures in the graphics database for the
-   ps_l device.
- piclist data
-   This reports all the DATA pictures in the graphics database for
-   the current graphics device.
- piclist data logfile=datapic.dat
-   This lists all the DATA pictures in the graphics database for
-   the current graphics device into the text file datapic.dat.
- piclist frame picnum=5
-   This selects the fifth most ancient FRAME picture (in the
-   graphics database for the current graphics device) as the
-   current picture.  The pictures are not listed.
- piclist picnum=last
-   This makes the last picture in the graphics database for the
-   current graphics device current.  The pictures are not listed.
-
-Notes
-
--  The list is not reported to the user when PICNUM is specified
-on the command line.  This feature is useful where a procedure
-just wants to select a new current picture (hiding the details
-from the user).  A new current picture cannot be selected with
-text-file output, and so the presence of PICNUM on the command
-line does not affect writing to a text file.
-
-Related_Applications
-
-   KAPPA: PICBASE, PICDATA, PICEMPTY, PICENTIRE, PICFRAME, PICIN,
-   PICLAST, PICSEL, PICVIS.
-
-Timing
-
-   The execution time is approximately proportional to the number of
-   pictures in the database for the chosen graphics device.
-   Selecting only a subset by name is slightly faster.
-
-Authors
-
-MJC: Malcolm J. Currie (STARLINK)
-
-History
-
- 1991 July 24 (MJC):
-    Original version.
-  1992 January 29 (MJC):
-    Correctly Handles the case when there are no pictures of the
-    given name in the database.
-  1992 March 3 (MJC):
-    Replaced AIF parameter-system calls by the extended PAR
-    library.
-  1992 December 2 (MJC):
-    Added the current-picture indicator.
-  1993 August 18 (MJC):
-    Prevented reporting of the list when PICNUM is on the command
-    line, and allowed PICNUM to select the last picture.
-  1995 January 13 (MJC):
-    Made examples and usage lowercase.
-
-Implementation_Status
-
-   -  Assumes that there are no more than 9999 pictures in the
-   database.
 .endhelp

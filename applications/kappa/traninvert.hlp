@@ -1,10 +1,14 @@
 .help traninvert Starlink kappa
 .nf
 Inverts a transformation.
- Usage:
-    traninvert transform
- Description:
-    This inverts a transformation stored in the TRANSFORM (SUN/61)
+
+Usage:
+
+   traninvert transform
+
+Description:
+
+   This inverts a transformation stored in the TRANSFORM (SUN/61)
    format within an existing HDS file.
 
 Parameters
@@ -25,11 +29,14 @@ Examples
 traninvert shear.transform
    This inverts the transformation structure stored in object
    TRANSFORM within the HDS file called shear.
- traninvert shear
+
+traninvert shear
    This does the same as above.
- traninvert \
+
+traninvert \
    This inverts the current transformation structure.
- traninvert m51.more.polar
+
+traninvert m51.more.polar
    This inverts the transformation structure called POLAR in
    the extension of the NDF called m51.
 

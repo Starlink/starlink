@@ -1,6 +1,6 @@
 .help ndf_sections Starlink kappa
 .nf
-  You will frequently want to examine or process only a portion of
+ You will frequently want to examine or process only a portion of
  your dataset, be it to focus on a given object in an image, or a
  single spectrum between nominated wavelengths, or a plane of a
  cube.  You could use NDFCOPY or MANIC in some circumstances to
@@ -16,25 +16,30 @@
  use it a few times it will seem cheap at the price for the
  advantages it offers.  Please note however, that sections
  cannot be given to an IMAGE-format application. 
-  An NDF section is defined by specifying the bounds of the portion
+
+ An NDF section is defined by specifying the bounds of the portion
  of the NDF to be processed immediately following the name of the
  NDF.  You can do this in any place where an NDF name alone would
  suffice, for example, on the command line or in response to a
  prompt or as a default in an interface file.  The syntax is a
  series of subscripts within parentheses and may be given in several
  ways.  Here is a simple example.
-       ICL> stats cluster(101:200,51:150)
-  This would derive statistics of a 100-by-100-pixel region starting
+
+      ICL> stats cluster(101:200,51:150)
+
+ This would derive statistics of a 100-by-100-pixel region starting
  at pixel indices (101,51) in the NDF called cluster. 
  Alternatively, ranges of axis co-ordinates may be given instead of
  pixel indices.  Besides giving lower and upper bounds as above, you
  may specify a centre and extent.  Sections are not limited to
  subsets---supersets are allowed.  See the subtopic below for more
  details of these features.
-  If you do want to make a new NDF from a portion of an existing one,
+
+ If you do want to make a new NDF from a portion of an existing one,
  you should use the command NDFCOPY.  An NDF's shape may be changed
  in situ by SETBOUND.
-  ******************************************************************
+
+ ******************************************************************
  *  Note if you supply an NDF section on a C-shell command line,  *
  *  you must escape the parentheses.  For example,                *
  *                                                                *
@@ -43,52 +48,80 @@
  *                                                                *
  *  are both equivalent to the earlier example.                   *
  ******************************************************************
- 2 Specifying_Lower_and_Upper_Bounds
-  The subscript expression appended to an NDF name to specify a
+
+
+Specifying_Lower_and_Upper_Bounds
+
+
+ The subscript expression appended to an NDF name to specify a
  section may be given as the lower and upper bounds in each
  dimension, as follows
-                       NAME( a:b, c:d, ... )
-  where `a:b', `c:d', (etc.) specify the lower and upper bounds.  The
+
+                      NAME( a:b, c:d, ... )
+
+ where `a:b', `c:d', (etc.) specify the lower and upper bounds.  The
  bounds specified need not necessarily lie within the actual bounds
  of the NDF, because bad pixels will be supplied in the usual way,
  if required, to pad out the NDF's array components whenever they
  are accessed.  However, none of the lower bounds should exceed the
  corresponding upper bound. 
-  Omitting any of the bounds from the subscript expression will cause
+
+ Omitting any of the bounds from the subscript expression will cause
  the appropriate (lower or upper) bound of the NDF to be used
  instead. If you also omit the separating `:', then the lower and
  upper bounds of the section will both be set to the same value, so
  that a single pixel will be selected for that dimension.  Omitting
  the bounds entirely for a dimension (but still retaining the comma)
  will cause the entire extent of that dimension to be used. Thus, 
-                             IMAGE(,64)
-  could be used to specify row 64 of a 2-dimensional image, while:
-                        CUBE( 1, 257:, 100 )
-  would specify column 1, pixels 257 onwards, selected from plane
+
+                            IMAGE(,64)
+
+ could be used to specify row 64 of a 2-dimensional image, while:
+
+                       CUBE( 1, 257:, 100 )
+
+ would specify column 1, pixels 257 onwards, selected from plane
  number 100 of a 3-dimensional `data cube', forming a
  one-dimensional section.
- 2 Specifying_Centre_and_Extent
-  An alternative form for the subscript expression involves
+
+
+Specifying_Centre_and_Extent
+
+
+ An alternative form for the subscript expression involves
  specifying the centre and extent of the region required along each
  dimension, as follows
-                        NAME( p~q, r~s, ... )
-  where `p~q', `r~s', etc. specify the centre and extent. Thus, 
-                         NAME(100~11,200~5)
-  would refer to an 11-by-5-pixel region of an image centred on pixel
+
+                       NAME( p~q, r~s, ... )
+
+ where `p~q', `r~s', etc. specify the centre and extent. Thus, 
+
+                        NAME(100~11,200~5)
+
+ would refer to an 11-by-5-pixel region of an image centred on pixel
  (100, 200).
-  If the value before the delimiting `~' (tilde) is omitted, it will
+
+ If the value before the delimiting `~' (tilde) is omitted, it will
  default to the index of the central pixel in that dimension
  (rounded downwards if there are an even number of pixels).  If the
  value following the `~' is omitted, it will default to the number
  of pixels in that dimension. Thus, 
-                         IMAGE( ~100, ~100)
-  could be used to refer to a 100-by-100-pixel region located
+
+                        IMAGE( ~100, ~100)
+
+ could be used to refer to a 100-by-100-pixel region located
  centrally within an image, while 
-                          IMAGE( 10~, 20~)
-  would specify a section which is the same size as the original
+
+                         IMAGE( 10~, 20~)
+
+ would specify a section which is the same size as the original
  image, but displaced so that it is centred on pixel (10,20). 
- 2 Using_Axis_Co-ordinates_to_Specify_Sections
-  A further variation is that numerical values in subscript
+
+
+Using_Axis_Co-ordinates_to_Specify_Sections
+
+
+ A further variation is that numerical values in subscript
  expressions may be specified either as integers, in which case they
  refer to pixel indices, or as floating-point numbers, in which case
  they refer to axis or data co-ordinates (for a description of data
@@ -99,23 +132,36 @@
  when supplying them. Both linear and non-linear axis co-ordinates
  are supported, the values supplied being automatically converted
  into the corresponding pixel indices before use.  For instance
-                     SPECTRUM(6500.0:7250.0)
-  could be used to select the appropriate region of a spectrum
+
+                    SPECTRUM(6500.0:7250.0)
+
+ could be used to select the appropriate region of a spectrum
  calibrated in Angstroms, while
-                     SPECTRUM(6000.0~500.0)
-  would select a region of the spectrum approximately from 5750 to 
+
+                    SPECTRUM(6000.0~500.0)
+
+ would select a region of the spectrum approximately from 5750 to 
  6250.0 Angstroms (the exact extent depending the values of the axis
  co-ordinates), and
-                       SPECTRUM(5500.0~21)
-  would select a 21-pixel-wide region of the spectrum centred on
+
+                      SPECTRUM(5500.0~21)
+
+ would select a 21-pixel-wide region of the spectrum centred on
  5500.0 Angstroms. 
-  Command NDFTRACE will show whether or not an NDF has axis
+
+ Command NDFTRACE will show whether or not an NDF has axis
  co-ordinates, and if so, it reports their extents.
-  2 Changing_Dimensionality
-  The number of dimensions given when specifying an NDF section need
+
+
+
+Changing_Dimensionality
+
+
+ The number of dimensions given when specifying an NDF section need
  not necessarily correspond with the actual number of NDF
  dimensions, although usually it will do so. 
-  If you specify fewer dimensions than there are NDF dimensions, then
+
+ If you specify fewer dimensions than there are NDF dimensions, then
  any unspecified bounds will be set to (1:1) for the purposes of
  identifying the pixels to which the section should refer.
  Conversely, if extra dimensions are given, then the shape of the
@@ -124,19 +170,26 @@
  have the number of dimensions you have actually specified, the
  padding serving only to identify the pixels to which the section
  should refer. 
-  In KAPPA there are a number of applications that can only handle a
+
+ In KAPPA there are a number of applications that can only handle a
  fixed number of dimensions (e.g. DISPLAY, LINPLOT).  NDF sections
  permit such applications to have wider applicability since they can
  operate on full NDFs of arbitrary dimensionality.  So for instance,
  DISPLAY could show planes of a datacube.
-  2 Mixing_Bounds_Expressions
-  Any of the features described in the other subtopics may be
+
+
+
+Mixing_Bounds_Expressions
+
+
+ Any of the features described in the other subtopics may be
  combined when specifying an NDF section, the only restriction being
  that when the shape of the resulting section is expressed in pixel
  indices, the lower bound must not exceed the upper bound in any
  dimension. Thus, all the following might be used as valid
  specifications for NDF sections
-                         NDF(3.7)
+
+                        NDF(3.7)
                         NDF(,5:)
                         NDF(-77:13.8,,4)
                         NDF(66~9,4:17)
@@ -144,109 +197,7 @@
                         NDF(~,:)
                         NDF(5500.0~150,)
                         NDF(3.0~1.5,-78.06D-3:13.0545,,,,)
-  Many other combinations are obviously possible.
- 1 NDFCOPY
-Copies an NDF (or NDF section) to a new location.
- Usage:
-    ndfcopy in out
- Description:
-    This application copies an NDF to a new location.  By supplying an
-   NDF section as input it may be used to extract a subset, or to
-   change the size or dimensionality of an NDF.  A second NDF may
-   also be supplied to act as a shape template, and hence to define
-   the region of the first NDF which is to be copied.
-    Any unused space will be eliminated by the copying operation
-   performed by this routine, so it may be used as a way of
-   compressing NDF structures from which components have been
-   deleted.  This ability also makes NDFCOPY a useful alternative to
-   SETBOUND in cases where an NDF's size is to be reduced.
 
-Parameters
+ Many other combinations are obviously possible.
 
-For information on individual parameters, select from the list below:
-
-IN
-
-IN = NDF (Read)
-   The input NDF (or section) which is to be copied.
-
-LIKE
-
-LIKE = NDF (Read)
-   This parameter may be used to supply an NDF to be used as a
-   shape template during the copying operation.  If such a
-   template is supplied, then its shape will be used to select a
-   matching section from the input NDF before copying takes
-   place.  By default, no template will be used and the shape of
-   the output NDF will therefore match that of the input NDF (or
-   NDF section). [!]
-
-OUT
-
-OUT = NDF (Write)
-   The output NDF data structure.
-
-TITLE
-
-TITLE = LITERAL (Read)
-   A title for the output NDF.  A null value (the default) will
-   cause the title of the NDF supplied for parameter IN to be
-   used instead. [!]
-
-Examples
-
-ndfcopy infile outfile
-   Copies the contents of the NDF structure infile to the new
-   structure outfile.  Any unused space will be eliminated during
-   the copying operation.
- ndfcopy in=data1(3:40,-3:17) out=data2 title="Extracted section"
-   Copies the section (3:40,-3:17) of the NDF called data1 to a
-   new NDF called data2.  The output NDF is assigned the new title
-   "Extracted section", which replaces the title derived from the
-   input NDF.
- ndfcopy galaxy newgalaxy like=oldgalaxy
-   Copies a section of the NDF called galaxy to form a new NDF
-   called newgalaxy.  The section which is copied will correspond
-   in shape with the template oldgalaxy.  Thus, after the copying
-   operation, both newgalaxy and oldgalaxy will have the same
-   pixel-index bounds.
- ndfcopy aa(20~11,20~11) bb like=aa
-   Copies from the NDF section consisting of an 11x11 pixel
-   region of aa centred on pixel (20,20), into a new NDF called
-   bb.  The shape of the region copied is made to match the
-   original shape of aa.  The effect is to extract the selected
-   square region of pixels into a new NDF of the same shape as
-   the original, setting the surrounding region to the bad-pixel
-   value.
-
-Related_Applications
-
-   KAPPA: SETBOUND; Figaro: ISUBSET.
-
-Authors
-
-RFWS: R.F. Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
-
-History
-
- 27-FEB-1991 (RFWS):
-    Original version.
-  19-MAR-1991 (RFWS):
-    Added the LIKE parameter to allow the use of a shape template.
-  22-MAR-1991 (RFWS):
-    Added the TITLE parameter.
-  1995 April 24 (MJC):
-    Made usage and examples lowercase.  Added Related Applications.
-  5-JUN-1998 (DSB):
-    Added propagation of the WCS component.
-
-Implementation_Status
-
-   If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-   QUALITY, AXIS WCS and HISTORY components are copied by this routine,
-   together with all extensions.  The output NDF's title may be
-   modified, if required, by specifying a new value via the TITLE
-   parameter.
 .endhelp

@@ -1,14 +1,19 @@
 .help fitsin Starlink kappa
 .nf
 Reads a FITS tape composed of simple, group or table files.
- Usage:
-    fitsin mt files out [auto] fmtcnv [logfile] more=? dscftable=?
+
+Usage:
+
+   fitsin mt files out [auto] fmtcnv [logfile] more=? dscftable=?
       table=?
- Description:
-    This application reads selected files from a FITS tape.  The
+
+Description:
+
+   This application reads selected files from a FITS tape.  The
    files may be Basic (simple) FITS, and/or have TABLE extensions
    (Harten et al. 1988).
-    The programme reads a simple or a random-groups-format FITS file
+
+   The programme reads a simple or a random-groups-format FITS file
    (Wells et al. 1981; Greisen & Harten 1981), and writes the data
    into an NDF, and the headers into the NDF's FITS extension.
    Table-format files (Grosbol et al. 1988) are read, and the
@@ -18,7 +23,8 @@ Reads a FITS tape composed of simple, group or table files.
    specify a list of files, including wildcards.  A record of the
    FITS headers, and group parameters (for a group-format file) can
    be stored in a text file.
-    There is an option to run in automatic mode, where the names of
+
+   There is an option to run in automatic mode, where the names of
    output NDF data structures are generated automatically, and you
    can decide whether or not format conversion is to be applied to
    all files (rather than being prompted for each).  This is very
@@ -38,13 +44,15 @@ AUTO = _LOGICAL (Read)
    the application, and therefore not prompted; and a global
    format-conversion switch may be set.  In manual mode the FITS
    header is reported, but not in automatic.
-    For simple or group format FITS objects in automatic mode the
+
+   For simple or group format FITS objects in automatic mode the
    application generates a filename beginning with a defined
    prefix followed by the number of the file on tape.  For
    example, if the prefix was "XRAY" and the 25th file of the
    tape was being processed, the filename of the NDF would be
    XRAY25.
-    For table-format FITS objects in the automatic mode the
+
+   For table-format FITS objects in the automatic mode the
    application generates a filename beginning with a defined
    prefix followed by the number of the file on tape.  For
    example, if the prefix was "cat" and the 9th file of the tape
@@ -65,7 +73,8 @@ DSCFTABLE = FILENAME (Read)
    FITS file comprises just tables, you should consider other
    tools such as the CURSA package, which has facilities for
    examining and processing ASCII and binary FITS tables.
-    A suggested filename for the description file is reported
+
+   A suggested filename for the description file is reported
    immediately prior to prompting in manual mode.  It is the name
    of the catalogue, as written in the FITS header, with a "dscf"
    prefix.
@@ -76,17 +85,21 @@ ENCODINGS = LITERAL (Read)
    Determines which FITS keywords should be used to define the
    world co-ordinate information stored in NDF's WCS component.
    The allowed values (case-insensitive) are:
-    "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
+
+   "FITS-WCS" --- This uses keywords CRVALi, CDELTi, CRPIXi,
       PCiiijjj, etc., as described in the (draft) FITS world
       co-ordinate system paper by E.W.Greisen and M.Calabretta
       (A & A, in preparation).
-    "DSS" --- This is the system used by the Digital Sky Survey,
+
+   "DSS" --- This is the system used by the Digital Sky Survey,
       and uses keywords AMDXn, AMDYn, PLTRAH, etc.
-    "Native" --- This is the native system used by the AST library
+
+   "Native" --- This is the native system used by the AST library
       (see SUN/210), and is the most general.  The others are
       limited in the co-ordinate systems they can describe, and
       may thus not fully describe the NDF's WCS component.
-    A comma-separated list of up to three values may be supplied,
+
+   A comma-separated list of up to three values may be supplied,
    in which case the value actually used is in the first in the
    list for which corresponding keywords can be found in the FITS
    header. If a null parameter value (!) is supplied, the encoding
@@ -104,7 +117,8 @@ FILES()  = _CHAR (Read)
    brackets are unnecessary when there only one item.) For
    efficiency reasons it is sensible to give the file numbers in
    ascending order.
-    If you wish to extract all the files enter the wildcard *.
+
+   If you wish to extract all the files enter the wildcard *.
    5-* will read from 5 to the last file.  The processing will
    continue until the end of the tape is reached; no error
    will result from this.
@@ -203,7 +217,8 @@ fitsin mt=/dev/rmt/1n files=[2-4,9] auto prefix=ccd nofmtcnv
    device /dev/rmt/1n.  The output NDF names will be ccd2, ccd3,
    ccd4, and ccd9 (assuming there are no groups).  The data will
    not have format conversion.
- fitsin mt=$TAPE files=* auto prefix=ccd fmtcnv logfile=jkt.log
+
+fitsin mt=$TAPE files=* auto prefix=ccd fmtcnv logfile=jkt.log
    This reads all the files from the FITS tape on the device
    assigned to the environment variable TAPE.  The output files
    begin with a prefix "ccd".  Integer data arrays are converted
@@ -230,106 +245,139 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
- PMA: Peter Allan (University of Manchester)
- DSB: David S. Berry (STARLINK)
+
+PMA: Peter Allan (University of Manchester)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1987 Jul  8 (PMA):
     Uses HDS but not the NDF format as it was not then defined.
-  1988 Mar 25 (PMA):
+
+ 1988 Mar 25 (PMA):
     Second version. Modified to use FITS extension to standard NDF
     format.
-  1988 Apr 19 (PMA):
+
+ 1988 Apr 19 (PMA):
     Allow a null parameter for the output dataset, which skips the
     processing of that file. This allows the user to read the fits
     header and to then decide not to create an output file.
-  1988 May (MJC):
+
+ 1988 May (MJC):
     Converted to KAPPA style, added further error checks and
     aborts, removed references to the Interim environment.
-  1988 Sept  (MJC):
+
+ 1988 Sept  (MJC):
     Greatly expanded and rewritten to process group-format files
     and blocked records.
-  1988 Nov  2 (MJC):
+
+ 1988 Nov  2 (MJC):
     Corrected some of the tidying, particularly cancelling OUTPUT,
     annulling FLOC and fixing an editing typo' unmapping and
     annulling of the work array.
-  1988 Nov  3 (MJC):
+
+ 1988 Nov  3 (MJC):
     Added automatic mode, no data-conversion option and more
     commentary as each file is processed.
-  1988 Nov  4 (MJC):
+
+ 1988 Nov  4 (MJC):
     Close HDS files created by HDS_NEW to prevent lots of files
     being open .
-  1988 Nov  5 (MJC):
+
+ 1988 Nov  5 (MJC):
     Version that uses MORE.FITS instead of MORE.FITS.IN in case we
     change our minds! .
-  1989 Feb 15 (MJC):
+
+ 1989 Feb 15 (MJC):
     Corrected tidying of all workspace .
-  1989 Jul 19 (MJC):
+
+ 1989 Jul 19 (MJC):
     Removed LOGHDR parameter and tested for a null log-file name;
     reported all groups' completed via the same method, so that
     logical prefixes appears for the first group.
-  1989 Aug  1 (MJC):
+
+ 1989 Aug  1 (MJC):
     Converted to read tables format.
-  1989 Sep 18 (MJC):
+
+ 1989 Sep 18 (MJC):
     NOCON is now a global-format-conversion PROMPTING switch,
     formerly it could only set no format conversion globally (when
     not in automatic mode), the name of the output file is written
     to the logfile.
-  1989 Nov 22 (MJC):
+
+ 1989 Nov 22 (MJC):
     Loops for multiple FITS files/extensions within a tape file,
     and sub file numbers written to the log file.
-  1989 Nov 24 (MJC):
+
+ 1989 Nov 24 (MJC):
     Change to use OFFSET=ACTSIZ meaning block is exhausted rather
     than the counter-intuitive 0; skip over data for null output
     files.
-  1989 Dec 21 (MJC):
+
+ 1989 Dec 21 (MJC):
     Workspace managed by AIF_TEMP.
-  1990 Jan 11 (MJC):
+
+ 1990 Jan 11 (MJC):
     Fixed bug in the test for multiple files so that it tests for
     blank data in the current block.
-  1990 Feb 20 (MJC):
+
+ 1990 Feb 20 (MJC):
     Auto mode is available for table files, replaced SUBPAR calls
     by AIF_FLNAM call, AIF_OPFIO call renamed AIF_ASFIO, and
     logging of table and description file names.
-  1990 Nov 15 (MJC):
+
+ 1990 Nov 15 (MJC):
     NDF version featuring axes, title and units; expanded and
     restructured prologue; parameter NOCON renamed GLOCON so that
     a NO prefix may be used to indicate false.
-  1990 November 30 (MJC):
+
+ 1990 November 30 (MJC):
     Altered logic to process FITS records rather than blocks and
     modified subroutine calls to reflect this (record-processing is
     needed to handle disk files and tape consistently by the same
     subroutines). IEEE floating-point supported.
-  1991 February 28 (MJC):
+
+ 1991 February 28 (MJC):
     Added the NCARD argument for various revised FTS1_x calls.
-  1991 October 10 (MJC):
+
+ 1991 October 10 (MJC):
     Fixed bug when GLOCON and FMTCNV set to true and dealing with
     IEEE-format data.
-  1991 October 11 (MJC):
+
+ 1991 October 11 (MJC):
     Increased the maximum buffer size to 22 FITS records in order
     to accommodate IRAF's non-standard blocking factors.
-  1992 February 24 (MJC):
+
+ 1992 February 24 (MJC):
     Ensured that HDS file mapping will occur after tuning option
     is added.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  1993 April 15 (MJC):
+
+ 1993 April 15 (MJC):
     Made to work on UNIX.
-  1993 December 3 (MJC):
+
+ 1993 December 3 (MJC):
     Made to work for Alphas.
-  1995 October 5 (MJC):
+
+ 1995 October 5 (MJC):
     Documentation overhaul.  Changed dynamic default of FMTCNV.
-  1995 November 18 (MJC):
+
+ 1995 November 18 (MJC):
     The tape drive is no longer rewound.
-  1996 June 11 (MJC):
+
+ 1996 June 11 (MJC):
     Added REWIND parameter to control initial rewinding.  Linux
     usage enabled.
-  18-FEB-1998 (DSB):
+
+ 18-FEB-1998 (DSB):
     Call to FTS1_GKEYL had arguments THERE and NOCCUR swapped, causing
     a segmentation violation.
-  9-JUN-1998 (DSB):
+
+ 9-JUN-1998 (DSB):
     Added support for WCS component.
 
 Implementation_Status
@@ -337,32 +385,41 @@ Implementation_Status
    -  The application processes tapes blocked at other than an
    integer multiple of 2880 bytes up to a maximum of 63360, provided
    it is a multiple of the number of bytes per data value.
-    -  For simple or group format FITS:
-       -  IEEE floating point is supported.
-       -  If BUNIT is present its value will appear as the NDF's units
+
+   -  For simple or group format FITS:
+
+      -  IEEE floating point is supported.
+
+      -  If BUNIT is present its value will appear as the NDF's units
       component.
-       -  If OBJECT is present its value will appear as the NDF's
+
+      -  If OBJECT is present its value will appear as the NDF's
       title component.
-       -  If the BLANK item is present in the header, undefined pixels
+
+      -  If the BLANK item is present in the header, undefined pixels
       are converted from the BLANK value to Starlink-standard bad
       value during data conversion.
-       -  An AXIS component will be stored in the NDF if the CRVALn
+
+      -  An AXIS component will be stored in the NDF if the CRVALn
       keyword is present.  (n is the number of the dimension.)  If
       the CRPIXn keyword is absent it defaults to 1, and likewise
       for the CDELTn keyword.  The value of CRTYPEn is made the label
       of the axis structure.
-    -  For groups format, a new NDF is created for each data array.
+
+   -  For groups format, a new NDF is created for each data array.
    The name of the NDF of the second and subsequent data arrays is
    generated by the application as the <filename>G<number>, where
    filename is the name of the first NDF, supplied by you or
    generated automatically, and <number> is the number of the group.
-    Each group NDF contains the full header in the FITS extension,
+
+   Each group NDF contains the full header in the FITS extension,
    appended by the set of group parameters.  The group parameters
    are evaluated using their scales and offsets, and made to look
    like FITS cards, whose keywords are derived from the values of
    PTYPEm in the main header.  (m is the number of the group
    parameter.) The same format is used in the log file.
-    -  If there is no data array on tape, i.e. the FITS file comprises
+
+   -  If there is no data array on tape, i.e. the FITS file comprises
    header cards only, then a dummy vector data array of dimension
    two is created to make the output a valid NDF.  This data array
    is undefined.

@@ -1,11 +1,15 @@
 .help setsky Starlink kappa
 .nf
 Makes an IRAS astrometry extension.
- Usage:
-    setsky ndf positions coords epoch [projtype] [lon] [lat]
+
+Usage:
+
+   setsky ndf positions coords epoch [projtype] [lon] [lat]
           [refcode] [pixelsize] [orient] [tilt] [logfile]
- Description:
-    This application makes an IRAS astrometry extension within a
+
+Description:
+
+   This application makes an IRAS astrometry extension within a
    two-dimensional NDF, therefore allowing sky co-ordinate
    information to be stored with an arbitrary image.  This
    information is used by certain IRAS90 applications (those with
@@ -14,7 +18,8 @@ Makes an IRAS astrometry extension.
    co-ordinates, marking the location of a given celestial position
    given a pixel position, and aligning a group of images.  See
    SUN/163 for details.
-    The astrometry is determined either by you supplying explicit
+
+   The astrometry is determined either by you supplying explicit
    values for certain projection parameters, or by you providing the
    sky and corresponding image co-ordinates for a set of positions
    (see parameter POSITIONS).  In the latter case, the projection
@@ -158,11 +163,13 @@ PROJTYPE = LITERAL (Read)
       "Gnomonic"       - Gnomonic or tangent plane,
       "Lambert"        - Lambert normal equivalent cylindrical,
       "Orthographic"   - Orthographic.
-    The following synonyms are also recognised:
+
+   The following synonyms are also recognised:
        "All_sky"       - Aitoff,
        "Cylindrical"   - Lambert,
        "Tangent_plane" - Gnomonic.
-    See SUN/163 for descriptions of these projections.  A null
+
+   See SUN/163 for descriptions of these projections.  A null
    value causes the projection to be determined automatically
    from the data supplied for parameter POSITIONS. [!]
 
@@ -215,7 +222,8 @@ setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
    mean equinox at Julian epoch 1994.0.  The determined parameter
    values together with the residual at each position are logged
    to file m51.log.
- setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
+
+setsky m51 ^stars.lis ecl(j1994.0) 1994.0 orient=0 projtype=orth
    This creates an astrometry extension within the
    two-dimensional NDF called m51.  The values for parameters
    PROJTYPE, LON, LAT, PIXELREF and PIXELSIZE are determined
@@ -223,7 +231,8 @@ setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
    however, an Orthographic projection is forced, and the value
    zero is assigned to parameter ORIENT, resulting in north being
    `upwards' in the image.
- setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
+
+setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
        0.0d
    This creates an astrometry extension within the two-dimensional
    NDF called virgo.  It is a gnomonic projection in the
@@ -234,7 +243,8 @@ setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
    The image was observed at epoch 1989.3.  At the bottom-left of
    the image, north is at the top, parallel to the y-axis of the
    image.
- setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
+
+setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
    [0.5d,0.007r] 180.0d
     This creates an astrometry extension within the two-dimensional
     NDF called map.  It is an Aitoff projection in the galactic
@@ -244,14 +254,16 @@ setsky m51 ^stars.lis ecl(j1994.0) 1994.0 logfile=m51.log
     of 0.5 degrees by 0.007 radians.  The image was made at epoch
     1993.8.  At the image centre, south is at the top and is
     parallel to the y-axis of the image.
- setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
+
+setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
    pixelref=[9.5,-11.2]
     This creates an astrometry extension within the
     two-dimensional NDF called zodiac.  It is an orthographic
     projection in the Ecliptic system at Besselian epoch 1950.0.
     The reference point at pixel co-ordinates (9.5,-11.2)
     corresponds to ecliptic longitude 10.3 degrees, latitude
-     -5.6 degrees.  A pixel at that position is square and has
+
+    -5.6 degrees.  A pixel at that position is square and has
     angular size of 20 arcminutes.  The image was observed at
     epoch 1983.4.  At the reference point the y-axis of the image
     points to 0.3 degrees east of north.
@@ -260,7 +272,8 @@ Notes
 
 -  SETSKY overwrites an existing astrometry extension within
 the NDF.
- -  WARNING: As is standard for NDF extensions, the transformation
+
+-  WARNING: As is standard for NDF extensions, the transformation
 stored in the NDF will be propagated to new NDFs derived from it.
 However, certain operations will invalidate the transformation.
 These include configuration change, a shift of origin, and
@@ -276,17 +289,20 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1994 April 13 (MJC):
     Original version.
-  28-OCT-1994 (DSB):
+
+ 28-OCT-1994 (DSB):
     Added parameters POSITIONS and LOGFILE.  Modified to determine
     projection parameters automatically from the data suplied for
     POSITIONS.
-  1995 February 13 (MJC):
+
+ 1995 February 13 (MJC):
     Corrected typo's, errors in the examples, output the fitted
     pixel size in arcseconds if appropriate.  Validated the
     extension locator before annulling it.

@@ -1,10 +1,14 @@
 .help fitsimp Starlink kappa
 .nf
 Imports FITS information into an NDF extension.
- Usage:
-    fitsimp ndf table xname xtype
- Description:
-    This application extracts the values of FITS keywords from a FITS
+
+Usage:
+
+   fitsimp ndf table xname xtype
+
+Description:
+
+   This application extracts the values of FITS keywords from a FITS
    extension in an NDF and uses them to construct another NDF
    extension.  The list of new extension components required, their
    data types and the names of the FITS keywords from which to
@@ -54,7 +58,8 @@ fitsimp datafile fitstable ccdinfo ccd_ext
    are read from the NDF's FITS extension and written into the new
    extension as separate components under control of a keyword
    translation table held in the file fitstable.
- fitsimp ndf=n1429 table=std_table xname=std_extn
+
+fitsimp ndf=n1429 table=std_table xname=std_extn
    FITS keyword values are read from the FITS extension in the
    NDF structure n1429 and written into the pre-existing
    extension STD_EXTN under control of the translation table
@@ -71,19 +76,23 @@ Table_Format
    The keyword translation table should be held in a text file, with
    one extension component specified per line.  Each line should
    contain 3 fields, separated by spaces and/or tabs, as follows.
-    -  Field 1:
+
+   -  Field 1:
       The name of the component in the output extension for which a
       value is to be obtained.
-    -  Field 2:
+
+   -  Field 2:
       The data type of the output component, to which the keyword
       value will be converted (one of _INTEGER, _REAL, _DOUBLE,
       _LOGICAL or _CHAR).
-    -  Field 3:
+
+   -  Field 3:
       The name of the FITS keyword from which the value is to be
       obtained.  Hierarchical keywords are permissible; the format
       is concatenated keywords joined with full stops and no spaces,
       e.g. HIERARCH.ESO.NTT.HUMIDITY, ING.DETHEAD.
-    Comments may appear at any point in the table and should begin
+
+   Comments may appear at any point in the table and should begin
    with an exclamation mark. The remainder of the line will then be
    ignored.
 
@@ -95,12 +104,14 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  28-FEB-1991 (RFWS):
     Original version.
-  1991 July 15 (MJC):
+
+ 1991 July 15 (MJC):
     Added hierarchical keywords.
 .endhelp

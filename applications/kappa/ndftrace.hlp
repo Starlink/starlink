@@ -1,32 +1,40 @@
 .help ndftrace Starlink kappa
 .nf
 Displays the attributes of an NDF data structure.
- Usage:
-    ndftrace ndf
- Description:
-    This routine displays the attributes of an NDF data structure
+
+Usage:
+
+   ndftrace ndf
+
+Description:
+
+   This routine displays the attributes of an NDF data structure
    including:
-    -  its name;
-    -  the values of its character components (title, label and
+
+   -  its name;
+
+   -  the values of its character components (title, label and
    units);
-    -  its shape (pixel bounds, dimension sizes, number of dimensions
+
+   -  its shape (pixel bounds, dimension sizes, number of dimensions
    and total number of pixels);
-    -  axis co-ordinate information (axis labels, units and extents);
-    -  optionally, axis array attributes (type and storage form) and
+
+   -  zxis co-ordinate information (axis labels, units and extents);
+
+   -  optionally, axis array attributes (type and storage form) and
    the values of the axis normalisation flags;
-    -  attributes of the main data array and any other array
+
+   -  attributes of the main data array and any other array
    components present (including the type and storage form and an
    indication of whether `bad' pixels may be present);
-    -  attributes of the current co-ordinate Frame in the WCS component
-   (title, domain, and ,optionally, axis labels and axis units, plus the
-   system epoch and projection for sky co-ordinate Frames).
-    -  optionally, attributes of all other co-ordinate Frames in the WCS
-   component.
-    -  a list of any NDF extensions present, together with their data
+
+   -  a list of any NDF extensions present, together with their data
    types; and
-    -  history information (creation and last-updated dates, the
+
+   -  history information (creation and last-updated dates, the
    update mode and the number of history records).
-    Most of this information is output to parameters.
+
+   Most of this information is output to parameters.
 
 Parameters
 
@@ -104,12 +112,6 @@ BADBITS
 BADBITS = LITERAL (Write)
    The BADBITS mask.  This is only valid when QUALITY is TRUE.
 
-CURRENT
-
-CURRENT = _INTEGER (Write)
-   The integer Frame index of the current co-ordinate Frame in the
-   WCS component.
-
 DIMS
 
 DIMS( ) = _INTEGER (Write)
@@ -128,34 +130,10 @@ EXTTYPE( ) = LITERAL (Write)
    corresponds to the names in EXTNAME.  It is only written when
    NEXTN is positive.
 
-FDIM
-
-FDIM( ) = _INTEGER (Write)
-   The numbers of axes in each co-ordinate Frame stored in the WCS
-   component of the NDF. The elements in this parameter correspond to
-   those in the FDOMAIN and FTITLE parameters. The number of elements
-   in each of these parameters is given by NFRAME.
-
-FDOMAIN
-
-FDOMAIN( ) = LITERAL (Write)
-   The domain of each co-ordinate Frame stored in the WCS component
-   of the NDF. The elements in this parameter correspond to
-   those in the FDIM and FTITLE parameters. The number of elements
-   in each of these parameters is given by NFRAME.
-
 FORM
 
 FORM = LITERAL (Write)
    The storage form of the NDF's data array.
-
-FTITLE
-
-FTITLE( ) = LITERAL (Write)
-   The title of each co-ordinate Frame stored in the WCS component of
-   the NDF. The elements in this parameter correspond to those in the
-   FDOMAIN and FDIM parameters. The number of elements in each
-   of these parameters is given by NFRAME.
 
 FULLAXIS
 
@@ -165,20 +143,6 @@ FULLAXIS = _LOGICAL (Read)
    each axis will be displayed.  However, if a TRUE value is given
    for this parameter, full details of the attributes of all the
    axis arrays will also be given. [FALSE]
-
-FULLFRAME
-
-FULLFRAME = _LOGICAL (Read)
-   If a FALSE value is given for this parameter then only the
-   Title and Domain attributes are displayed for a co-ordinate Frame.
-   Otherwise, a more complete description is given.   [FALSE]
-
-FULLWCS
-
-FULLWCS = _LOGICAL (Read)
-   If a TRUE value is given for this parameter then all co-ordinate
-   Frames in the WCS component of the NDF are displayed. Otherwise,
-   only the current co-ordinate Frame is displayed. [FALSE]
 
 HISTORY
 
@@ -209,12 +173,6 @@ NEXTN
 
 NEXTN = _INTEGER (Write)
    The number of extensions in the NDF.
-
-NFRAME
-
-NFRAME = _INTEGER (Write)
-   The number of WCS Frames described by parameters FDIM, FDOMAIN and
-   FTITLE. Set to zero if WCS is FALSE.
 
 QUALITY
 
@@ -253,12 +211,6 @@ VARIANCE
 VARIANCE = _LOGICAL (Write)
    Whether or not the NDF contains a VARIANCE array.
 
-WCS
-
-WCS = _LOGICAL (Write)
-   Whether or not the NDF has any WCS co-ordinate Frames, over
-   and above the default GRID, PIXEL and AXIS Frames.
-
 WIDTH
 
 WIDTH( ) = _LOGICAL (Write)
@@ -270,54 +222,50 @@ Examples
 ndftrace mydata
    Displays information about the attributes of the NDF structure
    called mydata.
- ndftrace ndf=r106 fullaxis
+
+ndftrace ndf=r106 fullaxis
    Displays information about the NDF structure r106, including
    full details of any axis arrays present.
- ndftrace mydata quiet ndim=(mdim)
+
+ndftrace mydata quiet ndim=(mdim)
    Passes the number of dimensions of the NDF called mydata
    into the ICL variable mdim.  No information is displayed.
 
-Notes
-
--  If the WCS component of the NDF is undefined, then an attempt is
-made to find WCS information from two other sources: firstly, an
-IRAS90 astrometry structure, and secondly, the FITS extension. If
-either of these sources yield usable WCS information, then it is
-displayed in the same way as the NDF WCS component. Other KAPPA
-applications will use this WCS information as if it were stored in
-the WCS component.
-
 Related_Applications
 
-   KAPPA: WCSFRAME; HDSTRACE
+   HDSTRACE.
 
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1990 April 6 (RFWS):
     Original version.
-  1991 April 29 (RFWS):
+
+ 1991 April 29 (RFWS):
     Added support for axis components and added the usage and
     examples sections to the prologue.
-  1992 November 30 (MJC):
+
+ 1992 November 30 (MJC):
     Reports non-monotonic axis centres.
-  1993 February 4 (MJC):
+
+ 1993 February 4 (MJC):
     Fixed bug that caused incorrect axis extents to be reported
     when there were no axis-width arrays and the axis centres did
     not increment by one.
-  1994 July 29 (RFWS):
+
+ 1994 July 29 (RFWS):
     Adapted to handle history information.
-  1995 April 24 (MJC):
+
+ 1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
     Added History to the Description.  Sorted the variable
     declarations and other tidying.
-  1995 June 18 (MJC):
+
+ 1995 June 18 (MJC):
     Added QUIET option and the output parameters.
-  1997 November 27 (DSB):
-    Added support for WCS component.
 .endhelp

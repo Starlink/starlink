@@ -7,7 +7,8 @@
    and bins up all the pixels that lie within specified circles to
    either increase the signal-to-noise over that region, or to
    simulate a circular-aperture measurement of the image.
-    WARNING: This simple task does not divide the light of pixels
+
+   WARNING: This simple task does not divide the light of pixels
    spanning the circle.  If the pixel's centre lies within the circle,
    its full value is included in the summation; if it lies outside
    the circle, the pixel value is excluded from the summation.
@@ -15,7 +16,8 @@
    photometry, especially where the aperture diameter is less than
    about ten times the pixel size.  Use PHOTOM where accuracy, rather
    than speed, is paramount.
-    The following are displayed: the standard deviation of the
+
+   The following are displayed: the standard deviation of the
    intensity of the pixels within the aperture before binning, the
    integrated value over the aperture, and the calculated mean level
    and reduced noise after binning.

@@ -7,48 +7,66 @@
  information displayed by the help system on a particular topic
  includes a description of the topic and a list of subtopics that
  further describe the topic.  These topic names are called keywords. 
-  At a prompt you may enter:
-    o  a topic or subtopic name to display the help for that topic or
+
+ At a prompt you may enter:
+
+   o  a topic or subtopic name to display the help for that topic or
       subtopic;
-    o  just a <CR> to move up one level in the hierarchy, and if you
+
+   o  just a <CR> to move up one level in the hierarchy, and if you
       are at the top level it will terminate the help session;
-    o  a CTRL/D will terminate the help session;
-    o  a question mark "?" to redisplay the text for the current topic,
+
+   o  a CTRL/D will terminate the help session;
+
+   o  a question mark "?" to redisplay the text for the current topic,
       including the list of topic or subtopic names; or
-    o  an ellipsis "..." to display all the text below the current point 
+
+   o  an ellipsis "..." to display all the text below the current point 
       in the hierarchy.  For example, "GLITCH..." displays information 
       on the GLITCH topic as well as information on all the subtopics
       under GLITCH.
-  You can abbreviate any keyword using the following rules:
-    1) Just give the first few characters, e.g. "PARA" for
+
+ You can abbreviate any keyword using the following rules:
+
+   1) Just give the first few characters, e.g. "PARA" for
    "Parameters".
-    2) Some keywords are composed of several words separated by
+
+   2) Some keywords are composed of several words separated by
    underscores.  Each word of the keyword may be abbreviated,
    e.g. "Colour_Set" can be shortened to "C_S".
-    3) The characters "%" and "*" act as wildcards, where the percent
+
+   3) The characters "%" and "*" act as wildcards, where the percent
    sign matches any single character, and asterisk matches any
    sequence of characters.  Thus to display information on all
    available topics, type an asterisk (*) in reply to a hrlp prompt.
-    4) If a word contains but does end with an asterisk wildcard, it
+
+   4) If a word contains but does end with an asterisk wildcard, it
    must not be truncated.
-    5) The entered string must not contain leading or embedded spaces.
-  Ambiguous abbreviations result in all matches being displayed. 
+
+   5) The entered string must not contain leading or embedded spaces.
+
+ Ambiguous abbreviations result in all matches being displayed. 
  
 
 Help_Parameters
 
-  keyword ...
-   Specifies one or more keywords that refer to the topic  or  subtopic
+
+ keyword ...
+
+  Specifies one or more keywords that refer to the topic  or  subtopic
   on  which you  want  information from the help library.  Information
   within the help library is arranged in a hierarchical  manner.   The
   levels are:
-   1.  None--- If you do not specify a keyword,  KAPHELP introduces the 
+
+  1.  None--- If you do not specify a keyword,  KAPHELP introduces the 
       help system  and  lists the  top-level topics.  Each item in the
       list is a keyword in the first level of the hierarchy.
-   2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
+
+  2.  Topic-name---If you specify  a keyword  by naming  a topic,  the
       help facility  describes  the  topic.  Keywords  for  additional
       information available on this topic are listed.
-   3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
+
+  3.  Topic-name subtopic---If you  specify  a  subtopic  following  a
       topic, the help facility provides a description of the specified
       subtopic.
 .endhelp

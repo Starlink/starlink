@@ -1,25 +1,37 @@
 .help unix_usage Starlink kappa
 .nf
- The following applies to operation from the shell.  To start you must
+The following applies to operation from the shell.  To start you must
 issue the usual KAPPA command, but note that it must be in lowercase. 
-      % kappa
- All commands must be given in full and in lowercase.  Normal command
+
+     % kappa
+
+All commands must be given in full and in lowercase.  Normal command
 syntax may contain shell metacharacters.  These include parenthesis,
 bracket, quote, double quote and backslash.  A backslash is needed
 before each metacharacter for these characters to be taken literally. 
 Here are some examples: 
-      % stats image\(100:199,~100\)
- obtains statistics of a section of an NDF; while
-      % display picture \\
- displays NDF picture, accepting the suggested defaults for other 
+
+     % stats image\(100:199,~100\)
+
+obtains statistics of a section of an NDF; while
+
+     % display picture \\
+
+displays NDF picture, accepting the suggested defaults for other 
 parameters; and
-      % contour psf mode=fr heights=\[10,20,40\] pltitl=\"Demo plot\"
- contours the NDF called psf at array values of 10, 20, and 40,
+
+     % contour psf mode=fr heights=\[10,20,40\] pltitl=\"Demo plot\"
+
+contours the NDF called psf at array values of 10, 20, and 40,
 with a title of "Demo plot".
- An alternative is to enclose the metacharacters in double quotes,
+
+An alternative is to enclose the metacharacters in double quotes,
 for example:
-      stats image"(100:199,~100)"
- would have the same effect as the earlier example.
- When responding to prompts neither the <TAB> function for editing the
+
+     stats image"(100:199,~100)"
+
+would have the same effect as the earlier example.
+
+When responding to prompts neither the <TAB> function for editing the
 default nor command-line recall is available.
 .endhelp

@@ -1,11 +1,14 @@
 .help idpazo Starlink kappa
 .nf
 Pans and zooms an image-display device.
- Description:
-    This routine pans all planes of an IDI-supported image display,
+
+Description:
+
+   This routine pans all planes of an IDI-supported image display,
    such as X-windows.  The zoom factor is controlled by the mouse
    or trackerball buttons.
-    For an X-windows device, pressing the left button of the mouse
+
+   For an X-windows device, pressing the left button of the mouse
    increases the zooming, the centre button reduces the zoom factor,
    and the right-hand button ends the pan and zoom operation.
 
@@ -24,7 +27,8 @@ Examples
 
 idpazo xwindows
    Pans and zooms the xwindows device
- idpazo
+
+idpazo
    Pans and zooms the current image-display device.
 
 Authors
@@ -35,9 +39,11 @@ History
 
  1990 Apr 11 (MJC):
     Original version.
-  1991 October 28 (MJC):
+
+ 1991 October 28 (MJC):
     Made exit trigger number 2.  Inceased maximum number of
     triggers to 64.  Added a memory-visibility call.
-  1992 February 19 (MJC):
+
+ 1992 February 19 (MJC):
     Removed the memory-visibility call.
 .endhelp

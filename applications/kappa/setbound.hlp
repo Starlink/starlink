@@ -1,10 +1,14 @@
 .help setbound Starlink kappa
 .nf
 Sets new bounds for an NDF.
- Usage:
-    setbound ndf
- Description:
-    This application sets new pixel-index bounds for an NDF, either
+
+Usage:
+
+   setbound ndf
+
+Description:
+
+   This application sets new pixel-index bounds for an NDF, either
    trimming it to remove unwanted pixels, or padding it with bad
    pixels to achieve the required shape.  The number of dimensions
    may also be altered.  The NDF is accessed in update mode and
@@ -45,28 +49,33 @@ setbound datafile(1:512,1:512)
    Sets the pixel-index bounds of the NDF called datafile to be
    (1:512,1:512), either by trimming off unwanted pixels or by
    padding out with bad pixels, as necessary.
- setbound alpha(:7,56:)
+
+setbound alpha(:7,56:)
    Modifies the NDF called alpha so that its first dimension has
    an upper bound of 7 and its second dimension has a lower bound
    of 56.  The lower bound of the first dimension and the upper
    bound of the second dimension remain unchanged.
- setbound ndf=kg74b(,5500.0~100.0)
+
+setbound ndf=kg74b(,5500.0~100.0)
    Sets new bounds for the NDF called kg74b.  The bounds of the
    first dimension are left unchanged, but those of the second
    dimension are changed so that this dimension has an extent of
    100.0 centred on 5500.0, using the physical units in which
    this second dimension is calibrated.
- setbound newspec like=oldspec
+
+setbound newspec like=oldspec
    Changes the bounds of the NDF newspec so that they are equal
    to the bounds of the NDF called oldspec.
- setbound xflux(:2048) like=xflux
+
+setbound xflux(:2048) like=xflux
    Extracts the section extending from the lower bound of the
    1-dimensional NDF called xflux up to pixel 2048, and then
    modifies the bounds of this section to be equal to the
    original bounds of xflux, replacing xflux with this new NDF.
    This leaves the final shape unchanged, but sets all pixels
    from 2049 onwards to be equal to the bad-pixel value.
- setbound whole(5:10,5:10) like=whole(0:15,0:15)
+
+setbound whole(5:10,5:10) like=whole(0:15,0:15)
    Extracts the section (5:10,5:10) from the base NDF called
    whole and then sets its bounds to be equal to those of the
    section whole(0:15,0:15), replacing whole with this new NDF.
@@ -90,12 +99,14 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  11-MAR-1991 (RFWS):
     Original version.
-  1995 April 24 (MJC):
+
+ 1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 .endhelp

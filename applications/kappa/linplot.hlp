@@ -470,4 +470,5 @@ Implementation_Status
    double-precision floating-point data can be processed directly.
    Other non-complex data types will undergo a type conversion
    before the plot is drawn.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help fitshead Starlink kappa
 .nf
 Lists the headers of FITS files.
- Usage:
-    fitshead file [block] [start] [finish]
- Description:
-    This procedure lists to standard output the headers of the primary
+
+Usage:
+
+   fitshead file [block] [start] [finish]
+
+Description:
+
+   This procedure lists to standard output the headers of the primary
    header and data unit, and any extensions present that are
    contained within a set of input FITS files, or a range of
    specified files on a tape.
@@ -53,19 +57,23 @@ Examples
 fitshead /dev/nrmt1
    This lists the FITS headers for all the files of the tape mounted
    on device /dev/nrmt1.  The tape block size is 2880 bytes.
- fitshead /dev/nrmt1 10 > tape.lis
+
+fitshead /dev/nrmt1 10 > tape.lis
    This lists to file tape.lis the FITS headers for all the files of
    the tape mounted on device /dev/nrmt1.  The tape blocking factor is
    10, the tape's blocksize is 28800 bytes.
- fitshead /dev/rmt/0n 2 3 5 >> tape.lis
+
+fitshead /dev/rmt/0n 2 3 5 >> tape.lis
    This appends the FITS headers for files 3 to 5 of the tape mounted
    on device /dev/rmt/0n to the file tape.lis.  The tape blocking factor
    is 2, i.e. the tape's blocksize is 5760 bytes.
- fitshead /dev/nrst2 prompt
+
+fitshead /dev/nrst2 prompt
    This lists the FITS headers for files of the tape mounted on
    device /dev/nrst2.  The command prompts you for the file limits
    and tape blocking factor.
- fitshead ~/fits/*.fit ~/data/p?.fi* | lpr
+
+fitshead ~/fits/*.fit ~/data/p?.fi* | lpr
    This prints the FITS headers in the files ~/fits/*.fit and
    ~/data/p?.fi*.
 
@@ -73,7 +81,8 @@ Notes
 
 -  Prompting is directed to the standard error, so that the listings
 may be redirected to a file.
- -  If the blocking factor is unknown it is possible to obtain only
+
+-  If the blocking factor is unknown it is possible to obtain only
 a part of the headers and some of the FITS data.  Unless the FITS
 file is small, it is usually safe to set parameter BLOCK higher
 than its true value.
@@ -90,6 +99,7 @@ History
 
  1994 November 4 (MJC):
     Original version.
-  1994 November 10 (MJC):
+
+ 1994 November 10 (MJC):
     Added ADAM-like prompting user interface.
 .endhelp

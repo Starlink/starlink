@@ -1,10 +1,14 @@
 .help gdclear Starlink kappa
 .nf
 Clears a graphics device and purges its database entries.
- Usage:
-    gdclear [device] [current]
- Description:
-    This application software resets an SGS graphics device. In effect
+
+Usage:
+
+   gdclear [device] [current]
+
+Description:
+
+   This application software resets an SGS graphics device. In effect
    the device is cleared.  It purges the graphics-database entries
    for the device.  Optionally, only the current picture is cleared
    and the database unchanged. (Note the clearing of the current
@@ -29,9 +33,11 @@ Examples
 gdclear
    Clears the current graphics device and purges its graphics
    database entries.
- gdclear current
+
+gdclear current
    Clears the current picture on the current graphics device.
- gdclear xw
+
+gdclear xw
    Clears the xw device and purges its graphics database entries.
 
 Related_Applications
@@ -46,16 +52,21 @@ History
 
  1989 Apr 13 (MJC):
     Original version.
-  1989 Jul 24 (MJC):
+
+ 1989 Jul 24 (MJC):
     Uses SGS to get device names consistent with the rest of KAPPA
     in the partial GNS era.
-  1990 Jan 12 (MJC):
+
+ 1990 Jan 12 (MJC):
     Option to clear the current picture added.
-  1991 March 24 (MJC):
+
+ 1991 March 24 (MJC):
     Converted to SST prologue.
-  1991 April 9 (MJC):
+
+ 1991 April 9 (MJC):
     Added AGI begin-and-end block.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
 .endhelp

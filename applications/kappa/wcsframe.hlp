@@ -1,10 +1,14 @@
 .help wcsframe Starlink kappa
 .nf
 Change the current co-ordinate Frame in the WCS component of an NDF.
- Usage:
-    wcsframe ndf frame epoch
- Description:
-    This application displays the current co-ordinate Frame associated
+
+Usage:
+
+   wcsframe ndf frame epoch
+
+Description:
+
+   This application displays the current co-ordinate Frame associated
    with an NDF and then allows the user to specify a new Frame. The
    current co-ordinate Frame determines the co-ordinate system in
    which positions within the NDF will be expressed when communicating
@@ -31,13 +35,16 @@ FRAME = LITERAL (Read)
    A string specifying the new co-ordinate Frame. If a null parameter
    value is supplied, then the current Frame is left unchanged. The
    string can be one of the following:
-    - A domain name such as SKY, AXIS, PIXEL, etc. The two
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
    "pseudo-domains" WORLD and DATA may be supplied and will be
    translated into PIXEL and AXIS respectively, so long as the WCS
    component of the NDF does not contain Frames with these domains.
-    - An integer value giving the index of the required Frame within
+
+   - An integer value giving the index of the required Frame within
    the WCS component.
-    - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
    section "Sky Co-ordinate Systems" in SUN/95).
 
 NDF
@@ -51,24 +58,29 @@ Examples
 wcsframe m51 pixel
    This chooses pixel co-ordinates for the current co-ordinate
    Frame in the NDF m51.
- wcsframe m51 sky
+
+wcsframe m51 sky
    This chooses celestial co-ordinates for the current co-ordinate
    Frame in the NDF m51. The specific celestial co-ordinate system
    will depend on the contents of the WCS component of the NDF.
- wcsframe m51 equ(J2000) epoch=1998.2
+
+wcsframe m51 equ(J2000) epoch=1998.2
    This chooses equatorial (RA/DEC) co-ordinates referred to the
    equinox at Julian epoch 2000.0 for the current co-ordinate
    Frame in the NDF m51. The positions were determined at the
    Julian epoch 1998.2 (this is needed to correct positions for
    the fictitious proper motions which may be introduced when
    converting between different celestial co-ordinate systems).
- wcsframe m51 2
+
+wcsframe m51 2
    This chooses the second co-ordinate Frame in the WCS component
    of the NDF.
- wcsframe m51 data
+
+wcsframe m51 data
    This chooses a co-ordinate Frame with domain DATA if one exists,
    or the AXIS co-ordinate Frame otherwise.
- wcsframe m51 world
+
+wcsframe m51 world
    This chooses a co-ordinate Frame with domain WORLD if one exists,
    or the PIXEL co-ordinate Frame otherwise.
 
@@ -76,9 +88,11 @@ Notes
 
 -  The current co-ordinate Frame in the supplied NDF is not displayed
 if a value is assigned to parameter FRAME on the command line.
- -  This routine may add a new co-ordinate Frame into the WCS component
+
+-  This routine may add a new co-ordinate Frame into the WCS component
 of the NDF.
- -  The NDFTRACE command can be used to examine the co-ordinate
+
+-  The NDFTRACE command can be used to examine the co-ordinate
 Frames in the WCS component of an NDF.
 
 Related_Applications
@@ -93,4 +107,5 @@ History
 
  13-AUG-1998 (DSB):
     Original version.
+
 .endhelp

@@ -7,7 +7,8 @@ Applications that require co-ordinates are being modified to permit
 a variety of mechanisms for obtaining those co-ordinates.  Those
 converted so far are ARDMASK, CENTROID, INSPECT and ZAPLIN.  The
 possibilities are as follows. 
-    o  Cursor    --- This mode utilises the cursor of the current
+
+   o  Cursor    --- This mode utilises the cursor of the current
                     graphics device. For this to work the array must
                     already be displayed as an image, or a contour
                     plot, or line plot (provided the application
@@ -23,7 +24,8 @@ possibilities are as follows.
                     # or !.  The format and syntax of the files are
                     ad hoc, and are described in the application
                     documentation.
- Applications that permit these options have a parameter, called
+
+Applications that permit these options have a parameter, called
 MODE, by which you can control how positional data are to be
 acquired.  It would be tedious to have to specify a mode for each
 application, therefore KAPPA has a global parameter---the
@@ -33,7 +35,8 @@ change it by assigning an application's interaction mode on the
 command line.  The following examples shows the effect of the global
 parameter.  For compactness GLOBALS will merely show the interaction
 mode.
- First we display an image on the xw windows device.
+
+First we display an image on the xw windows device.
  
      ICL> gdset xw
      ICL> idset xw
@@ -73,12 +76,14 @@ Yes a cursor appears rather than a prompt for the pixel value.
      ICL> globals 
      The current interaction mode is      : CURSOR
      ICL> inspect 
-      For certain options, boxes will appear.  The functions are controlled
+
+     For certain options, boxes will appear.  The functions are controlled
      by the mouse/trackerball buttons and keyboard...
         Press left button to select the operation shown in the left box.
         Press middle button/keyboard "2" to select the operation shown in the middle box
         Press right button to select the operation shown in the right box.
-      Current picture has name: DATA, comment: KAPPA_DISPLAY. 
+
+     Current picture has name: DATA, comment: KAPPA_DISPLAY. 
      Using /star/bin/kappa/ccdframec as the input NDF
      GDEVICE - Graphics device to be used for line plots /@xov/ > 
      OPTION - Option required /'Region'/ > VA 
@@ -97,7 +102,8 @@ we shall prompt for the co-ordinates.  A null ends the loop.
      ICL> centroid mode=i 
      NDF - Array to be analysed /@/star/bin/kappa/ccdframec/ >
      INIT - Guess at co-ordinates of star-like feature /108.8,403.5/ > 86,295 
-      Input guess position was     86, 295 
+
+     Input guess position was     86, 295 
      Output centroid position is  86.41057, 295.1141
       
      INIT - Guess at co-ordinates of star-like feature /86,295/ > 73.3,319 
@@ -118,7 +124,8 @@ CENTROID in file mode.
      ICL> centroid mode=f 
      COIN - File of initial positions /@centroid.lis/ > starlist.dat
      NDF - Array to be analysed /@$KAPPA_DIR/ccdframec/ >
-      Input guess position was     86, 295 
+
+     Input guess position was     86, 295 
      Output centroid position is  86.41057, 295.1141
   
      Input guess position was     73, 320 
@@ -126,97 +133,5 @@ CENTROID in file mode.
  
 Such co-ordinate files can also be created interactively with images by
 CURSOR, PICCUR, or the XYcur mode of INSPECT.
- 1 IRAF_usage
-KAPPA may be run from the IRAF CL with automatic data conversion to and
-from IRAF or FITS image format. For general advice on running Starlink
-applications from IRAF, see SUN/217.
- Assuming that the required software has been installed as recommended,
-KAPPA is loaded by typing kappa at the cl> prompt.  Applications are
-invoked and parameter values generally given as for normal IRAF tasks.
-There are a few anomalies and these are described in SUN/217.
- 1 DIV
-Divides one NDF data structure by another.
- Usage:
-    div in1 in2 out
- Description:
-    The routine divides one NDF data structure by another
-   pixel-by-pixel to produce a new NDF.
 
-Parameters
-
-For information on individual parameters, select from the list below:
-
-IN1
-
-IN1 = NDF (Read)
-   First NDF, to be divided by the second NDF.
-
-IN2
-
-IN2 = NDF (Read)
-   Second NDF, to be divided into the first NDF.
-
-OUT
-
-OUT = NDF (Write)
-   Output NDF to contain the ratio of the two input NDFs.
-
-TITLE
-
-TITLE = LITERAL (Read)
-   Value for the title of the output NDF.  A null value will cause
-   the title of the NDF supplied for parameter IN1 to be used
-   instead. [!]
-
-Examples
-
-div a b c
-   This divides the NDF called a by the NDF called b, to make the
-   NDF called c.  NDF c inherits its title from a.
- div out=c in1=a in2=b title="Normalised data"
-   This divides the NDF called a by the NDF called b, to make the
-   NDF called c.  NDF c has the title "Normalised data".
-
-Notes
-
-If the two input NDFs have different pixel-index bounds, then
-they will be trimmed to match before being divided.  An error will
-result if they have no pixels in common.
-
-Related_Applications
-
-   KAPPA: ADD, CADD, CDIV, CMULT, CSUB, MATHS, MULT, SUB.
-
-Authors
-
-RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
-
-History
-
- 9-APR-1990 (RFWS):
-    Original version.
-  1992 January 15 (MJC):
-    Added Usage and Examples items.
-  1995 September 12 (MJC):
-    Title inherited by default.  Usage and examples to lowercase.
-    Added Related Applications.
-  5-JUN-1998 (DSB):
-    Added propagation of the WCS component.
-
-Implementation_Status
-
-   -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
-   structure and propagates all extensions.
-    -  Units processing is not supported at present and therefore the
-   UNITS component is not propagated.
-    -  Processing of bad pixels and automatic quality masking are
-   supported.
-    -  All non-complex numeric data types can be handled.
-   Calculations will be performed using either real or double
-   precision arithmetic, whichever is more appropriate.  If the
-   input NDF structures contain values with other data types, then
-   conversion will be performed as necessary.
 .endhelp

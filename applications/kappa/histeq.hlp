@@ -1,10 +1,14 @@
 .help histeq Starlink kappa
 .nf
 Performs an histogram equalisation on an NDF.
- Usage:
-    histeq in out [numbin]
- Description:
-    This application transforms an NDF via histogram equalisation.
+
+Usage:
+
+   histeq in out [numbin]
+
+Description:
+
+   This application transforms an NDF via histogram equalisation.
    Histogram equalisation is an image-processing technique in which
    the distribution (between limits) of data values in the input
    array is adjusted so that in the output array there are
@@ -47,7 +51,8 @@ Examples
 histeq halley maxinf
    The data array in the NDF called halley is remapped via
    histogram equalisation to form the new NDF called maxinf.
- histeq halley maxinf 10000 title="Maximum information of Halley"
+
+histeq halley maxinf 10000 title="Maximum information of Halley"
    The data array in the NDF called halley is remapped via
    histogram equalisation to form the new NDF called maxinf.
    Ten thousand bins in the histogram are required rather than
@@ -67,16 +72,19 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1991 November 8 (MJC):
     Original NDF version.
-  1995 January 12 (MJC):
+
+ 1995 January 12 (MJC):
     Replaced AIF calls with PAR and PSX.  Lowercase examples and
     usage.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -85,8 +93,11 @@ Implementation_Status
    LABEL, TITLE, WCS and HISTORY components of an NDF data structure and
    propagates all extensions.  UNITS and VARIANCE become undefined
    by the transformation, and so are not propagated.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.
-    -  Any number of NDF dimensions is supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
 .endhelp

@@ -1,15 +1,20 @@
 .help wcsadd Starlink kappa
 .nf
 Adds a new co-ordinate Frame into the WCS component of an NDF.
- Usage:
-    wcsadd ndf frame domain [tr]
- Description:
-    This application adds a new co-ordinate Frame into the WCS component
+
+Usage:
+
+   wcsadd ndf frame domain [tr]
+
+Description:
+
+   This application adds a new co-ordinate Frame into the WCS component
    of an NDF. The new Frame must be linearly connected to an existing
    Frame (called the "basis" Frame) in the WCS component. The linear
    transformation is specified by parameter TR. The new Frame becomes the
    current co-ordinate Frame in the NDF.
-    The new Frame is a copy of the basis Frame, with the new Domain
+
+   The new Frame is a copy of the basis Frame, with the new Domain
    attribute specified by parameter DOMAIN. If necessary, other attributes
    of the Frame (Title, Label, Format, etc) can be changed using
    application WCSATTRIB.
@@ -46,13 +51,16 @@ FRAME = LITERAL (Read)
    A string specifying the basis Frame. If a null value is supplied
    the current co-ordinate Frame in the NDF is used. The string can
    be one of the following:
-    - A domain name such as SKY, AXIS, PIXEL, etc. The two
+
+   - A domain name such as SKY, AXIS, PIXEL, etc. The two
    "pseudo-domains" WORLD and DATA may be supplied and will be
    translated into PIXEL and AXIS respectively, so long as the WCS
    component of the NDF does not contain Frames with these domains.
-    - An integer value giving the index of the required Frame within
+
+   - An integer value giving the index of the required Frame within
    the WCS component.
-    - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
+
+   - A "Sky Co-ordinate System" (SCS) value such as EQUAT(J2000) (see
    section "Sky Co-ordinate Systems" in SUN/95).
 
 NDF
@@ -69,16 +77,26 @@ TR( ) = _DOUBLE (Read)
    (X,Y,Z,...) in the basis Frame, and co-ordinates (U,V,W,...) in
    the new Frame, then the following transformations would be used,
    depending on how many axes the two Frames have:
-    - 1-dimensional:
-          U = TR(1) + TR(2)*X
-    - 2-dimensional:
-          U = TR(1) + TR(2)*X + TR(3)*Y
-          V = TR(4) + TR(5)*X + TR(6)*Y
-    - 3-dimensional:
-          U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z
-          V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z
-          W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
-    The correct number of values must be supplied (that is, N*(N+1)
+
+   - 1-dimensional:
+
+         U = TR(1) + TR(2)*X
+
+   - 2-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y
+
+         V = TR(4) + TR(5)*X + TR(6)*Y
+
+   - 3-dimensional:
+
+         U = TR(1) + TR(2)*X + TR(3)*Y + TR(4)*Z
+
+         V = TR(5) + TR(6)*X + TR(7)*Y + TR(8)*Z
+
+         W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
+
+   The correct number of values must be supplied (that is, N*(N+1)
    where N is the number of axes in the new and old Frames). If a
    null value (!) is given it is assumed that the new Frame and the
    basis Frame are connected using a unit mapping (i.e. corresponding
@@ -92,7 +110,8 @@ wcsadd ngc5128 pixel old_pixel
    and is a copy of the existing PIXEL Frame. This OLD_PIXEL Frame
    will be retained through further processing and can be used as a
    record of the original pixel co-ordinate Frame.
- wcsadd my_data dist-lum dist(au)-lum [0,2.0628E5,0,0,0,1]
+
+wcsadd my_data dist-lum dist(au)-lum [0,2.0628E5,0,0,0,1]
    This adds a new co-ordinate Frame into the WCS component of the
    NDF called my_data. The new Frame is given the domain DIST(AU)-LUM
    and is a copy of an existing Frame with domain DIST-LUM. The first
@@ -106,7 +125,8 @@ wcsadd ngc5128 pixel old_pixel
 Notes
 
 -  The new Frame has the same number of axes as the basis Frame.
- -  An error is reported if the transformation supplied using parameter
+
+-  An error is reported if the transformation supplied using parameter
 TR is singular.
 
 Related_Applications
@@ -121,4 +141,5 @@ History
 
  2-OCT-1998 (DSB):
     Original version.
+
 .endhelp

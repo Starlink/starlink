@@ -324,4 +324,5 @@ Implementation_Status
 
    -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single-precision floating point.
+
 .endhelp

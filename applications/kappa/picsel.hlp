@@ -1,17 +1,22 @@
 .help picsel Starlink kappa
 .nf
 Selects a graphics-database picture by its label.
- Usage:
-    picsel label [device]
- Description:
-    This application selects by label a graphics-database picture of a
+
+Usage:
+
+   picsel label [device]
+
+Description:
+
+   This application selects by label a graphics-database picture of a
    specified device.  If such a picture is found then it becomes the
    current picture on exit, otherwise the input picture remains
    current.  Labels in the database are stored in the case supplied
    when they were created.  However, the comparisons of the label you
    supply with the labels in the database are made in uppercase, and
    leading spaces are ignored.
-    Should the label not be found the current picture is unchanged.
+
+   Should the label not be found the current picture is unchanged.
 
 Parameters
 
@@ -33,7 +38,8 @@ picsel GALAXY
    This makes the picture labelled "GALAXY" the current picture on
    the current graphics device.  Should there be no picture of
    this name, the current picture is unchanged.
- picsel A3 xwindows
+
+picsel A3 xwindows
    This makes the picture labelled "A3" the current picture on the
    xwindows device.  Should there be no picture of this name, the
    current picture is unchanged.
@@ -46,15 +52,20 @@ History
 
  1990 Jan 14 (MJC):
     Original.
-  1990 Apr 12 (MJC):
+
+ 1990 Apr 12 (MJC):
     Bug fix so that the last picture's label is tested, and
     improved the closedown operation when there is no match with
     the label.
-  1991 February 12 (MJC):
+
+ 1991 February 12 (MJC):
     Annulled pictures to enable an unlimited number of pictures
     to be searched.
-  1991 March 19 (MJC):
+
+ 1991 March 19 (MJC):
     Converted to the SST prologue.
-  1991 April 9 (MJC):
+
+ 1991 April 9 (MJC):
     Added AGI begin-and-end block.
+
 .endhelp

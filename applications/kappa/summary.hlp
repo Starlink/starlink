@@ -3,7 +3,8 @@
 The growing number of KAPPA applications makes a simple list of their
 functions unwieldy.  More practically, the "Classified_commands"
 topic contains commands grouped by their functionality.
- ADD         - Adds two NDF data structures.
+
+ADD         - Adds two NDF data structures.
 APERADD     - Derives statistics of pixels within a specified circle
               of a 2-d data array.
 ARDGEN      - Creates a text file describing selected regions of an
@@ -15,9 +16,13 @@ AXLABEL     - Sets a new label value for an axis within an NDF data
               structure.
 AXUNITS     - Sets a new units value for an axis within an NDF data
               structure.
-  BLOCK       - Smooths a 1- or 2-dimensional image using a square or
+
+
+BLOCK       - Smooths a 1- or 2-dimensional image using a square or
               rectangular box filter.
-  CADD        - Adds a scalar to an NDF data structure.
+
+
+CADD        - Adds a scalar to an NDF data structure.
 CALC        - Evaluates a mathematical expression.
 CALPOL      - Calculates polarisation parameters.
 CDIV        - Divides an NDF by a scalar.
@@ -41,10 +46,13 @@ CRELUT      - Creates or manipulates an image-display lookup table
 CSUB        - Subtracts a scalar from an NDF data structure.
 CURSOR      - Reports the co-ordinates of points selected using the
               cursor.
-  DISPLAY     - Displays a 1-d or 2-d NDF.
+
+
+DISPLAY     - Displays a 1-d or 2-d NDF.
 DIV         - Divides one NDF data structure by another.
 DRAWSIG     - Draws +/-n standard-deviation lines on a line plot.
- ELPROF      - Creates a radial or azimuthal profile of a
+
+ELPROF      - Creates a radial or azimuthal profile of a
               2-dimensional image.
 ERASE       - Erases an HDS object.
 ERRCLIP     - Removes pixels with large errors from an NDF.
@@ -53,7 +61,9 @@ EXP10       - Takes the base-10 exponential of each pixel of a data
 EXPE        - Takes the exponential of each pixel of a data array
               (base e).
 EXPON       - Takes the exponential of each pixel  of a data array.
-  FFCLEAN     - Removes defects from a substantially flat 1- or
+
+
+FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
 FILLBAD     - Removes regions of bad values from a 2-dimensional NDF.
 FITSDIN     - Reads a FITS disc file composed of simple, group or
@@ -77,7 +87,9 @@ FITSWRITE   - Writes a new keyword to the FITS extension.
 FLIP        - Reverses an NDF's pixels along a specified dimension.
 FOURIER     - Performs forward and inverse Fourier transforms of
               1- or 2-dimensional NDFs.
-  GAUSMOOTH   - Smooths a 1- or 2-dimensional image using a Gaussian
+
+
+GAUSMOOTH   - Smooths a 1- or 2-dimensional image using a Gaussian
               filter.
 GDCLEAR     - Clears a graphics device and purges its database
               entries.
@@ -88,14 +100,18 @@ GLITCH      - Replaces bad pixels in a 2-d data array with the local
               median.
 GLOBALS     - Displays the values of the KAPPA global parameters.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
-  HISCOM      - Adds commentary to the history of an NDF.
+
+
+HISCOM      - Adds commentary to the history of an NDF.
 HISLIST     - Lists NDF history records.
 HISSET      - Sets the NDF history update mode.
 HISTAT      - Computes ordered statistics for an NDF's pixels using
               an histogram.
 HISTEQ      - Performs an histogram equalisation on an NDF.
 HISTOGRAM   - Computes an histogram of an NDF's values.
-  IDCLEAR     - Clears an image display and purges its database
+
+
+IDCLEAR     - Clears an image display and purges its database
               entries.
 IDINVISIBLE - Makes memory planes of an image-display device
               invisible.
@@ -103,9 +119,12 @@ IDPAZO      - Pans and zooms an image-display device.
 IDSET       - Selects a current image-display device.
 IDSTATE     - Shows the current status of an image display.
 INSPECT     - Inspects a 2-d NDF in a variety of ways.
-  KAPHELP     - Gives help about KAPPA.
+
+
+KAPHELP     - Gives help about KAPPA.
 KSTEST      - Compares data sets using the Kolmogorov-Smirnov test.
- LAPLACE     - Performs a Laplacian convolution as an edge detector
+
+LAPLACE     - Performs a Laplacian convolution as an edge detector
               in a 2-d data array.
 LINPLOT     - Draws a line plot of a 1-d NDF's data values against
               their axis co-ordinates.
@@ -140,7 +159,9 @@ LUTSPEC     - Loads a spectrum-like lookup table.
 LUTTWEAK    - Tweaks a colour table of an image-display device.
 LUTVIEW     - Draws a colour-table key.
 LUTZEBRA    - Loads a pseudo-contour lookup table.
-  MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of
+
+
+MAKESURFACE - Creates a 2-dimensional NDF from the coefficients of
               a polynomial surface.
 MANIC       - Converts all or part of a data array from one
               dimensionality to another.
@@ -157,7 +178,9 @@ MOSAIC      - Merges several non-congruent 2-d data arrays into one
 MSTATS      - Does cumulative statistics on a 2-d sub-array over a
               sequence of data arrays.
 MULT        - Multiplies two NDF data structures.
-  NATIVE      - Converts an HDS object to native machine data
+
+
+NATIVE      - Converts an HDS object to native machine data
               representation.
 NDFCOPY     - Copies an NDF (or NDF section) to a new location.
 NDFTRACE    - Displays the attributes of an NDF data structure.
@@ -168,11 +191,15 @@ NORMALIZE   - Normalises one NDF to a similar NDF by calculating a
               scale factor and zero difference.
 NUMB        - Counts the number of elements of an NDF with values or
               absolute values above or below a threshold.
-  OUTSET      - Sets pixels outside a specified circle in a 2-d data
+
+
+OUTSET      - Sets pixels outside a specified circle in a 2-d data
               array to a specified value.
 OVCLEAR     - Clears an image-display overlay.
 OVSET       - Selects a current image-display overlay.
-  PALDEF      - Loads the default palette to a colour table.
+
+
+PALDEF      - Loads the default palette to a colour table.
 PALENTRY    - Enters a colour into an image display's palette.
 PALREAD     - Fills the palette of a colour table from an NDF.
 PALSAVE     - Saves the current palette of a colour table to an NDF.
@@ -210,13 +237,19 @@ POW         - Takes the specified power of each pixel of a data
               array.
 PSF         - Determines the parameters of a model star profile by
               fitting star images in a two-dimensional NDF.
-  QUILT       - Generates a mosaic from equally sized 2-d data arrays,
+
+
+QUILT       - Generates a mosaic from equally sized 2-d data arrays,
               optionally specified from an ASCII file.
-  RIFT        - Adds a scalar to a section of an NDF data structure
+
+
+RIFT        - Adds a scalar to a section of an NDF data structure
               to correct rift-valley defects.
 ROTATE      - Rotates a 2-dimensional NDF about its centre through
               any angle.
-  SEGMENT     - Copies polygonal segments from one NDF to another.
+
+
+SEGMENT     - Copies polygonal segments from one NDF to another.
 SETAXIS     - Sets values for an axis array component within an NDF
               data structure.
 SETBAD      - Sets new bad-pixel flag values for an NDF.
@@ -249,7 +282,9 @@ SUBSTITUTE  - Replaces all occurrences of a given value in an NDF
               array with another value.
 SURFIT      - Fits a polynomial or spline surface to a 2-d data
               array using blocking.
-  THRESH      - Edits an NDF such that array values below and above
+
+
+THRESH      - Edits an NDF such that array values below and above
               two thresholds take constant values.
 TRANDAT     - Converts free-format text data into an NDF.
 TRANINVERT  - Inverts a transformation.
@@ -261,228 +296,12 @@ TRANTRACE   - Lists the contents of a transformation structure.
 TRIG        - Performs a trigonometric transformation on a data
               array.
 TURBOCONT   - Contours a 2-d NDF quickly.
-  VECPLOT     - Plots a 2-dimensional vector map.
+
+
+VECPLOT     - Plots a 2-dimensional vector map.
 WIENER      - Applies a Wiener filter to a 1- or 2-dimensional
               array.
 ZAPLIN      - Replaces regions in a 2-d NDF by bad values or by
               linear interpolation.
- 1 SURFIT
-Fits a polynomial or bi-cubic spline surface to 2-dimensional
-data array.
- Usage:
-    surfit in out [fittype] [estimator] [bindim] [evaluate]
- Description:
-    The background of a 2-dimensional data array in the supplied NDF
-   structure is estimated by condensing the array into equally sized
-   rectangular bins, fitting a spline or polynomial surface to the
-   bin values, and finally evaluating the surface for each pixel in
-   the data array.
-    There is a selection of estimators by which representative
-   values for each bin are determined.  There are several options to
-   make the fit more accurate.  Values beyond upper and lower
-   thresholds may be excluded from the binning.  Bad pixels are also
-   excluded, so prior masking may help to find the background more
-   rapidly.  Kappa-sigma clipping of the fitted bins is available
-   so that the fit is not biased by anomalous bins, such as those
-   entirely within an extended object.  If a given bin contains more
-   than a prescribed fraction of bad pixels, it is excluded from the
-   fit.
-    The data array representing the background is evaluated at each
-   pixel by one of two methods.  It is written to the output NDF
-   structure.
-    The raw binned data, the weights, the fitted binned data and the
-   residuals to the fit may be written to a logfile.  This also
-   keeps a record of the input parameters and the rms error of the
-   fit.
 
-Parameters
-
-For information on individual parameters, select from the list below:
-
-BINDIM
-
-BINDIM() = _INTEGER (Read)
-   The x-y dimensions of a bin used to estimate the local
-   background.  If you supply only one value, it is used for
-   both dimensions.  The minimum value is 2.  The maximum may be
-   constrained by the number of polynomial terms, such that in
-   each direction there are at least as many bins as terms.  The
-   default is dynamic such that 32 bins are created along each
-   axis. []
-
-CLIP
-
-CLIP() = _REAL (Read)
-   Array of limits for progressive clipping of pixel values
-   during the binning process in units of standard deviation.  A
-   null value means only unclipped statistics are computed and
-   presented.  Between 1 and 5 values may be supplied. [2,3]
-
-ESTIMATOR
-
-ESTIMATOR = LITERAL (Read)
-   The estimator for the bin.  It must one of the following
-   values: "Mean" for the mean value, "Ksigma" for the mean with
-   kappa-sigma clipping; "Mode" for the mode, and "Median" for
-   the median.  "Mode" is only available when there are at least
-   twelve pixels in a bin.  It is also the default when this
-   criterion is met, other the default is "Median". []
-
-EVALUATE
-
-EVALUATE = LITERAL (Read)
-   The method by which the resulting data array is to be
-   evaluated from the surface-fit.  It must be either
-   "Interpolate" where the values at the corners of the bins are
-   derived first, and then the pixel values are found by linear
-   interpolation within those bins; or "All" where the
-   surface-fit is evaluated for every pixel.  The latter is
-   slower, but can produce more-accurate results, unless the
-   surface is well behaved.  The default is the current value,
-   which is initially set to "Interpolate". []
-
-FITCLIP
-
-FITCLIP() = _REAL (Read)
-   Array of limits for progressive clipping of the binned array
-   in units of the rms deviation of the fit.  A null value (!)
-   means no clipping of the binned array will take place.
-   Between 1 and 5 values may be supplied.  The default is the
-   current value, which is ! initially. []
-
-FITTYPE
-
-FITTYPE = LITERAL (Read)
-   The type of fit.  It must be either "Polynomial" for a
-   Chebyshev polynomial or "Spline" for a bi-cubic spline.  The
-   default is the current value, which initially is "Spline". []
-
-LOGFILE
-
-LOGFILE = FILENAME (Read)
-   Name of the file to log the binned array and errors before and
-   after fitting.  If null, there will be no logging. [!]
-
-IN
-
-IN = NDF (Read)
-   NDF containing the 2-dimensional data array to be fitted.
-
-KNOTS
-
-KNOTS( 2 ) = _INTEGER (Read)
-   The number of interior knots used for the bi-cubic-spline fit
-   along the x and y axes.  These knots are equally spaced within
-   the image.  Both values must be in the range 0 to 11.  If you
-   supply a single value, it applies to both axes.  Thus 1
-   creates one interior knot, [5,4] gives 5 along the x axis and
-   4 along the y direction.  Increasing this parameter values
-   increases the flexibility of the surface.  Normally, 4 is a
-   reasonable value.  The upper limit of acceptable values will
-   be reduced along each axis when its binned array dimension is
-   less than 29.  KNOTS is only accessed when FITTYPE="Spline".
-   The default is the current value, which is 4 initially. []
-
-ORDER
-
-ORDER( 2 ) = _INTEGER (Read)
-   The orders of the fits along the x and y directions.  Both
-   values must be in the range 0 to 14.  If you supply a single
-   single value, it applies to both axes.  Thus 0 gives a
-   constant, [3,1] gives a cubic along the x direction and a
-   linear fit along the y.  Increasing this parameter values
-   increases the flexibility of the surface.  The upper limit of
-   acceptable values will be reduced along each axis when its
-   binned array dimension is less than 29.  ORDER is only
-   accessed when FITTYPE="Polynomial".  The default is the current
-   value, which is 4 initially. []
-
-OUT
-
-OUT = NDF (Write)
-   NDF to contain the fitted 2-dimensional data array.
-
-THRHI
-
-THRHI = _REAL (Read)
-   Upper threshold above which values will be excluded from the
-   analysis to derive representative values for the bins.  If it
-   is null (!) there will be no upper threshold. [!]
-
-THRLO
-
-THRLO = _REAL (Read)
-   Lower threshold below which values will be excluded from the
-   analysis to derive representative values for the bins.  If it
-   is null (!) there will be no lower threshold. [!]
-
-TITLE
-
-TITLE = LITERAL (Read)
-   Value for the title of the output NDF.  A null value will cause
-   the title of the NDF supplied for parameter IN to be used
-   instead. [!]
-
-WLIM
-
-WLIM = _REAL (Read)
-   The minimum fraction of good pixels in a bin that permits the
-   bin to be included in the fit.  Here good pixels are ones that
-   participated in the calculation of the bin's representative
-   value. So they exclude both bad pixels and ones rejected
-   during estimation (e.g. ones beyond the thresholds or were
-   clipped). [!]
-
-Examples
-
-surfit comaB comaB_bg
-   This calculates the surface fit to the 2-dimensional NDF
-   called comaB using the current defaults.  The evaluated fit is
-   stored in the NDF called comaB_bg.
- surfit comaB comaB_bg poly median order=5 bindim=[24,30]
-   As above except that 5th-order polynomial fit is chosen,
-   the median is used to derive the representative value for each
-   bin, and the binning size is 24 pixels along the first axis,
-   and 32 pixels along the second.
- surfit comaB comaB_bg fitclip=[2,3] logfile=comaB_fit.lis
-   As the first example except that the binned array is clipped at
-   2 then 3 standard deviations to remove outliers before the
-   final fit is computed.  The text file comaB_fit.lis records a
-   log of the surface fit.
- surfit comaB comaB_bg estimator=ksigma clip=[2,2,3]
-   As the first example except that the representative value of
-   each bin is the mean after clipping twice at 2 then once at
-   3 standard deviations.
- surfit in=irasorion out=sback evaluate=all fittype=s knots=7
-   This calculates the surface fit to the 2-dimensional NDF called
-   irasorion.  The fit is evaluated at every pixel and the
-   resulting array stored in the NDF called sback.  A spline with
-   seven knots along each axis is used to fit the surface.
-
-Related_Applications
-
-   KAPPA: ARDMASK, FITSURFACE, MAKESURFACE.
-
-Authors
-
-MJC: Malcolm J. Currie (STARLINK).
- DSB: David S. Berry (STARLINK)
-
-History
-
- 1996 October 23 (MJC):
-    Original NDF version.
-  5-JUN-1998 (DSB):
-    Added propagation of the WCS component.
-
-Implementation_Status
-
-   -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
-   There is no support for VARIANCE processing.
-    -  Processing of bad pixels and automatic quality masking are
-   supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
-   is performed using single- or double-precision floating point for
-   FITTYPE = "Spline" or "Polynomial" respectively.
 .endhelp

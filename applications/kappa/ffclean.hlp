@@ -1,10 +1,14 @@
 .help ffclean Starlink kappa
 .nf
 Removes defects from a substantially flat 1- or 2-dimensional NDF.
- Usage:
-    ffclean in out clip box [thresh] [wlim] [ilevel]
- Description:
-    This application cleans a 1- or 2-dimensional NDF by removing
+
+Usage:
+
+   ffclean in out clip box [thresh] [wlim] [ilevel]
+
+Description:
+
+   This application cleans a 1- or 2-dimensional NDF by removing
    defects smaller than a specified size.  The defects are flagged
    with the bad value.  The defects are found by looking for pixels
    that deviate from the image's smoothed version by more than an
@@ -92,12 +96,14 @@ WLIM = _REAL (Read)
    output pixels from being generated in regions where there are
    relatively few good pixels to contribute to the smoothed
    result.
-    By default, a null (!) value is used for WLIM, which causes
+
+   By default, a null (!) value is used for WLIM, which causes
    the pattern of bad pixels to be propagated from the input
    image to the output image unchanged.  In this case, smoothed
    output values are only calculated for those pixels which are
    not bad in the input image.
-    If a numerical value is given for WLIM, then it specifies the
+
+   If a numerical value is given for WLIM, then it specifies the
    minimum fraction of good pixels which must be present in the
    smoothing box in order to generate a good output pixel.  If
    this specified minimum fraction of good input pixels is not
@@ -115,10 +121,12 @@ ffclean dirty clean \
    version of dirty are rejected.  Three iterations are performed.
    Each pixel in the smoothed image is the average of the
    neighbouring nine pixels.  The filtered NDF is called clean.
- ffclean out=clean in=dirty thresh=[-100,200]
+
+ffclean out=clean in=dirty thresh=[-100,200]
    As above except only those pixels whose values lie between -100
    and 200 can be cleaned.
- ffclean poxy dazed [2.5,2.8] [5,5]
+
+ffclean poxy dazed [2.5,2.8] [5,5]
    The 2-dimensional NDF called poxy is filtered such that pixels
    that deviate by more than 2.5 then 2.8 standard deviations from
    the smoothed version of poxy are rejected.  The smoothing is an
@@ -133,29 +141,37 @@ Related_Applications
 Authors
 
 RFWS: R. F. Warren-Smith (STARLINK)
- WG: Wei Gong  (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+WG: Wei Gong  (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  1981 July (RFWS):
     Original INTERIM version.
-  5-OCT-1990 (WG):
+
+ 5-OCT-1990 (WG):
     Converted to the KAPPA/ADAM version.
-  1991 June 30 (MJC):
+
+ 1991 June 30 (MJC):
     Made generic; completed and expanded the prologue, renaming
     some parameters for consistency with other applications;
     introduced WLIM parameter for fraction; corrected error
     reporting; and added thresholds.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  1992 April 21 (MJC):
+
+ 1992 April 21 (MJC):
     Made to handle significant dimensions for user-defined
     sections.
-  1992 December 17 (MJC):
+
+ 1992 December 17 (MJC):
     Sets the bad-pixel flag in the output NDF.
-  1995 April 5 (MJC):
+
+ 1995 April 5 (MJC):
     Renamed from CLEANER to avoid name clash with Figaro.  Made to
     work on 1-dimensional arrays.  Used lowercase examples and
     usage.  Added Related Applications and additional commentary.
@@ -167,9 +183,11 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is performed using single- or double-precision floating point as
    appropriate.
 .endhelp

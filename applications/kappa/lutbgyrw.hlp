@@ -1,10 +1,14 @@
 .help lutbgyrw Starlink kappa
 .nf
 Loads the BGYRW lookup table.
- Usage:
-    lutbgyrw
- Description:
-    This procedure loads the "BGYRW" lookup table with linear scaling
+
+Usage:
+
+   lutbgyrw
+
+Description:
+
+   This procedure loads the "BGYRW" lookup table with linear scaling
    into the current image-display device.  It is a continuous LUT
    starting with blue, followed by green, yellow, red and a splash of
    white.
@@ -34,6 +38,8 @@ History
 
  1990 Apr 10 (MJC):
     Original version.
-  1991 April 24 (MJC):
+
+ 1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
+
 .endhelp

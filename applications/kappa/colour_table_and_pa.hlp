@@ -10,7 +10,8 @@ in the colour table that are numbered consecutively increasing from
 able display 256 different colours simultaneously;  and when you
 display an image your data values would be scaled to map onto the
 integer range of the colour indices, 0--255.
- In many systems the full colour table is used.  This has the
+
+In many systems the full colour table is used.  This has the
 disadvantage that if you want to annotate images with captions or
 axes, plot coloured borders about images, plot graphs etc., yet
 simultaneously display images with certain colour tables, there may
@@ -21,31 +22,40 @@ line graphics, thus any plots will be invisible.  If you reset
 colour index 1 to white, the appearance of your image alters.
 Whenever you alter the colour table to enhance the look of your
 image, it will affect the line graphics.
- To circumvent this dilemma, KAPPA reserves a portion of the colour
+
+To circumvent this dilemma, KAPPA reserves a portion of the colour
 table, called the palette, that is unaffected by changes to the rest
 of the colour table. It is shown schematically below.  The palette
 contains 16 indices.  N is the total number of indices.  In KAPPA
 the remainder of colour indices is called the colour table.
-   0                              15 16                           N-1
+
+  0                              15 16                           N-1
  _____________________________________________________ ... _________
  | | | | | | | | | | | | | | | | | | | | | | | | | | |     | | | | |
  ----------------------------------------------------- ... ---------
  <-----------  Palette  -----------><-------  Colour Table  ------->
- 2 Manipulating_Colour_Tables
+
+
+Manipulating_Colour_Tables
+
 KAPPA provides a number of commands for adjusting a colour table.
 LUTFLIP, LUTHILITE, LUTROT, LUTTWEAK are all IDI-based. Remember
 that only the colour table will be flipped; highlighted; rotated;
 stretched, or squashed, and/or have its origin moved.  Thus during
 flipping, colour index 16 will swap with N-1, 17 with N-2 etc. 
 CRELUT uses an enlarged palette to modify a lookup table. 
- 2 Lookup_Tables
+
+
+Lookup_Tables
+
 In order to distinguish between the set of colours in the physical
 image display (the colour table) and some external table of colours,
 the latter is called a lookup table.  Lookup tables comprise a
 series of red, green and blue (RGB) intensities, each normalised to
 1.0; they may be stored in NDFs---indeed some are provided with
 KAPPA---or be coded within applications.
- A lookup table may be transferred into the display's colour table.
+
+A lookup table may be transferred into the display's colour table.
 However, the number of indices in the colour table is usually not
 the same as the number of colours in the lookup table and so a
 simple substiution is not possible.  Therefore, KAPPA squeezes or
@@ -57,7 +67,8 @@ to lookup tables with sharp boundaries between contrasting colours,
 e.g. a series of coloured blocks, and the former to smoothly varying
 lookup tables where there are no obvious discontinuities, e.g.
 spectrum-like.
- Let's have a few examples.
+
+Let's have a few examples.
  
      % lutheat
      % lutramps
@@ -82,8 +93,14 @@ does not matter should the display not have a palette, since
      ICL> lutsave pirated full
  
 will save the full set of colour indices to the NDF.
- 3 Creating_Lookup_Tables
- 4 From_a_Text_File
+
+
+Creating_Lookup_Tables
+
+
+
+From_a_Text_File
+
 You can make a text file of the RGB intensities and use TRANDAT to
 create the NDF, or manipulate the colour table and then save it in a
 lookup-table NDF.  If you choose the second option remember that all
@@ -104,11 +121,15 @@ text file col6.dat with contents
 and then run TRANDAT to make the NDF called collut6.
  
      % trandat col6 collut6 shape='[3,6]' auto
- 4 Running_CRELUT
+
+
+Running_CRELUT
+
 There is an interactive task called CRELUT for creating lookup tables.
 Let's be honest; it's a bit dated compared with what is possible today
 with X-windows, but it works, and I still use it.
- CRELUT has a number of stages that cannot be expressed via the
+
+CRELUT has a number of stages that cannot be expressed via the
 examples in the reference manual, so here is a walk through with
 commentary.  It would be a good idea to find an image display and
 repeat the example yourself.  CRELUT asks for an initial lookup
@@ -134,7 +155,8 @@ palette, as would be given by command PALDEF, and an adjustable
 upper line. To manipulate the colour table (and hence generate a new
 lookup table) we select palette colours and data-value ranges.
 First we want to add some colours of our own to the palette. 
- We first add a named colour, sienna, to the palette, followed by a
+
+We first add a named colour, sienna, to the palette, followed by a
 pale yellow given as RGB intensities.  We try Violetred, but don't
 like it so the previous grey value is restored.  Orchid is paler
 than Violetred and more like what we want.  A null ends the loop.
@@ -177,9 +199,11 @@ manipulation.
      assigned colours obtained by interpolation of pairs of numbered
      colours selected from the palette.  Type ! to complete the
      creation of the LUT. 
-      VALRANGE - Data-value range to be assigned colours > 2300,2350 
+
+     VALRANGE - Data-value range to be assigned colours > 2300,2350 
      COLRANGE - Select one or two colours from the palette > 4,18 
-      VALRANGE - Data-value range to be assigned colours > 2300,2380 
+
+     VALRANGE - Data-value range to be assigned colours > 2300,2380 
      COLRANGE - Select one or two colours from the palette > 4,18 
   
      VALRANGE - Data-value range to be assigned colours > 2375,2400 
@@ -222,17 +246,21 @@ Once you have a palette you like, save it in an NDF with PALSAVE.
 IDSTATE reports the current palette colours by name, picking the
 nearest named colour from the standard colour set given in
 "Colour_Set".
- The palette has limited direct use in KAPPA so far, but it is
+
+The palette has limited direct use in KAPPA so far, but it is
 expected to grow as more applications support different colouring
 of the components of a plot.  One example, is in DISPLAY where you
 can have a coloured border for effect (as seen on television news
 programmes).  The colour of the border is selected from the palette
 or the nearest colour in the palette is used.
- Indirectly, the appearance of existing plots may be changed.
+
+Indirectly, the appearance of existing plots may be changed.
 Palette entry 0 is the background colour, and entries 1--5
 correspond to SGS pens or PGPLOT colour indices of the same number.
 By choosing a palette colour equal to the background colour,
 features may be `erased'.
- Note that X-windows overlays only have one colour, and so do not
+
+Note that X-windows overlays only have one colour, and so do not
 have a palette.
+
 .endhelp

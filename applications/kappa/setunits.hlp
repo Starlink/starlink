@@ -1,10 +1,14 @@
 .help setunits Starlink kappa
 .nf
 Sets a new units value for an NDF data structure.
- Usage:
-    setunits ndf units
- Description:
-    This routine sets a new value for the units component of an
+
+Usage:
+
+   setunits ndf units
+
+Description:
+
+   This routine sets a new value for the units component of an
    existing NDF data structure. The NDF is accessed in update mode
    and any pre-existing units component is over-written with a new
    value.  Alternatively, if a `null' value (!) is given for the
@@ -34,10 +38,12 @@ Examples
 setunits ngc1342 "count/s"
    Sets the units component of the NDF structure ngc1342 to have
    the value "count/s".
- setunits ndf=spect units="J/(m**2*Ang*s)"
+
+setunits ndf=spect units="J/(m**2*Ang*s)"
    Sets the units component of the NDF structure spect to have
    the value "J/(m**2*Ang*s)".
- setunits datafile units=!
+
+setunits datafile units=!
    By specifying a null value (!), this example erases any
    previous value of the units component in the NDF structure
    datafile.
@@ -49,13 +55,15 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
 
 History
 
  25-JUN-1990 (RFWS):
     Original version.
-  1995 April 21 (MJC):
+
+ 1995 April 21 (MJC):
     Made usage and examples lowercase.  Added closing error
     report and Related Applications.
 .endhelp

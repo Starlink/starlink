@@ -1,10 +1,14 @@
 .help lutramps Starlink kappa
 .nf
 Loads the coloured-ramps lookup table.
- Usage:
-    lutramps
- Description:
-    This procedure loads the coloured-ramps lookup table with linear
+
+Usage:
+
+   lutramps
+
+Description:
+
+   This procedure loads the coloured-ramps lookup table with linear
    scaling into the current image-display device.
 
 Parameters
@@ -32,6 +36,8 @@ History
 
  1990 Apr 10 (MJC):
     Original version.
-  1991 April 24 (MJC):
+
+ 1991 April 24 (MJC):
     NDF version of LUTABLE and extended the prologue.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help cdiv Starlink kappa
 .nf
 Divides an NDF by a scalar.
- Usage:
-    cdiv in scalar out
- Description:
-    This application divides each pixel of an NDF by a scalar
+
+Usage:
+
+   cdiv in scalar out
+
+Description:
+
+   This application divides each pixel of an NDF by a scalar
    (constant) value to produce a new NDF.
 
 Parameters
@@ -39,7 +43,8 @@ Examples
 cdiv a 100.0 b
    Divides all the pixels in the NDF called a by the constant
    value 100.0 to produce a new NDF called b.
- cdiv in=data1 out=data2 scalar=-38
+
+cdiv in=data1 out=data2 scalar=-38
    Divides all the pixels in the NDF called data1 by -38 to give
    data2.
 
@@ -50,17 +55,21 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  12-MAR-1991 (RFWS):
     Original version.
-  1995 September 12 (MJC):
+
+ 1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -68,9 +77,11 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    LABEL, TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  Arithmetic
+
+   -  All non-complex numeric data types can be handled.  Arithmetic
    is carried out using the appropriate floating-point type, but the
    numeric type of the input pixels is preserved in the output NDF.
 .endhelp

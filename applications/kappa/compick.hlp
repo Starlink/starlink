@@ -1,10 +1,14 @@
 .help compick Starlink kappa
 .nf
 Reduces the size of an NDF by picking equally spaced pixels.
- Usage:
-    compick in out compress [origin]
- Description:
-    This application takes an NDF data structure and reduces it in
+
+Usage:
+
+   compick in out compress [origin]
+
+Description:
+
+   This application takes an NDF data structure and reduces it in
    size by integer factors along each dimension.  The input NDF is
    sampled at these constant compression factors or intervals along
    each dimension, starting from a defined origin, to form an output
@@ -61,12 +65,14 @@ compick cosmos galaxy 4
    array element along each dimension, starting from the first
    element in the NDF, and stores the reduced data in the NDF
    called galaxy.
- compick cosmos galaxy 4 [3,2]
+
+compick cosmos galaxy 4 [3,2]
    This compresses the two-dimensional NDF called cosmos
    selecting every fourth array element along each dimension,
    starting from the pixel index (3,2), and stores the
    reduced data in the NDF called galaxy.
- compick in=arp244 compress=[1,1,3] out=arp244cs
+
+compick in=arp244 compress=[1,1,3] out=arp244cs
    Suppose arp244 is a huge NDF storing a spectral-line data
    cube, with the third dimension being the spectral axis.
    This command compresses arp244 in the spectral dimension,
@@ -76,8 +82,8 @@ compick cosmos galaxy 4
 Notes
 
 -  The compression is centred on the origin of the pixel co-ordinate
-Frame. That is, if a position has a value p(i) on the i'th pixel 
-co-ordinate axis of the input NDF, then it will have position 
+Frame. That is, if a position has a value p(i) on the i'th pixel
+co-ordinate axis of the input NDF, then it will have position
 p(i)/COMPRESS(i) on the corresponding axis of the output NDF. The
 pixel index bounds of the output NDF are chosen accordingly.
 
@@ -89,25 +95,36 @@ Related_Applications
 Authors
 
 MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  1991 November 27 (MJC):
     Original version.
-  1995 January 11 (MJC):
+
+ 1995 January 11 (MJC):
     Made TITLE propagate from the input NDF.
-  10-JUN-1998 (DSB):
+
+ 10-JUN-1998 (DSB):
     Propagate WCS component. Ensure each output dimension is at least
     one pixel long.
+
+ 12-OCT-1998 (DSB):
+    Changed the way in which the bounds of the output image are
+    determined so that pixel origin information is retained.
 
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.
-    -  Any number of NDF dimensions is supported.
+
+   -  All non-complex numeric data types can be handled.
+
+   -  Any number of NDF dimensions is supported.
+
 .endhelp

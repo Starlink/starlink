@@ -1,16 +1,21 @@
 .help paldef Starlink kappa
 .nf
 Loads the default palette to a colour table.
- Usage:
-    paldef [device]
- Description:
-    This application loads the standard palette of colours to fill
+
+Usage:
+
+   paldef [device]
+
+Description:
+
+   This application loads the standard palette of colours to fill
    the portion of the current image display's colour table which is
    reserved for the palette.  The palette comprises 16 colours and
    is intended to provide coloured annotations, borders, axes,
    graphs etc. that are unaffected by changes to the lookup table
    used for images.
-    The standard palette is as follows
+
+   The standard palette is as follows
      0: Black     1: White     2: Red       3: Green     4: Blue
      5: Yellow    6: Magenta   7: Cyan      8--15: Black
 
@@ -31,7 +36,8 @@ Examples
 paldef
    This loads the standard palette into the reserved portion of
    the colour table of the current image display.
- paldef xwindows
+
+paldef xwindows
    This loads the standard palette into the reserved portion of
    the colour table of the xwindows device.
 
@@ -47,6 +53,7 @@ History
 
  1991 July 19 (MJC):
     Original version.
-  1994 January 24 (MJC):
+
+ 1994 January 24 (MJC):
     Allowed the device to be a MATRIX_PRINTER.
 .endhelp

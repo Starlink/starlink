@@ -135,4 +135,5 @@ Implementation_Status
 
    -  Assumes that there are no more than 9999 pictures in the
    database.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help flip Starlink kappa
 .nf
 Reverses an NDF's pixels along a specified dimension.
- Usage:
-    flip in out dim
- Description:
-    This application reverses the order of an NDF's pixels along a
+
+Usage:
+
+   flip in out dim
+
+Description:
+
+   This application reverses the order of an NDF's pixels along a
    specified dimension, leaving all other aspects of the data
    structure unchanged.
 
@@ -52,12 +56,14 @@ Examples
 flip a b 2
    Reverses the pixels in the NDF called a along its second
    dimension to create the new NDF called b.
- flip specin specout
+
+flip specin specout
    If specin is a 1-dimensional spectrum, then this example
    reverses the order of its pixels to create a new spectrum
    specout.  Note that no value for the DIM parameter need be
    supplied in this case.
- flip in=cube out=newcube dim=2 noaxis
+
+flip in=cube out=newcube dim=2 noaxis
    Reverses the order of the pixels along dimension 2 of the NDF
    called cube to give newcube, but leaves the associated axis
    values in their original order.
@@ -73,17 +79,21 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  13-MAR-1991 (RFWS):
     Original version.
-  1992 March 3 (MJC):
+
+ 1992 March 3 (MJC):
     Replaced AIF parameter-system calls by the extended PAR
     library.
-  11-JUN-1998 (DSB):
+
+ 11-JUN-1998 (DSB):
     Added propagation of the NDF WCS component.
 
 Implementation_Status
@@ -91,8 +101,10 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.  The data
+
+   -  All non-complex numeric data types can be handled.  The data
    type of the input pixels is preserved in the output NDF.
 .endhelp

@@ -1,10 +1,14 @@
 .help piclabel Starlink kappa
 .nf
 Labels the current graphics-database picture.
- Usage:
-    piclabel label [device]
- Description:
-    This application annotates the current graphics-database picture
+
+Usage:
+
+   piclabel label [device]
+
+Description:
+
+   This application annotates the current graphics-database picture
    of a specified device with a label you define.  This provides an
    easy-to-remember handle for selecting pictures in subsequent
    processing.
@@ -30,7 +34,8 @@ Examples
 piclabel GALAXY
    This makes the current picture of the current graphics device
    have a label of "GALAXY".
- piclabel A3 xwindows
+
+piclabel A3 xwindows
    This labels the current xwindows picture "A3".
 
 Notes
@@ -50,8 +55,11 @@ History
 
  1990 Jan 12 (MJC):
     Original.
-  1991 March 19 (MJC):
+
+ 1991 March 19 (MJC):
     Converted to the SST prologue.
-  1991 April 9 (MJC):
+
+ 1991 April 9 (MJC):
     Added AGI begin-and-end block.
+
 .endhelp

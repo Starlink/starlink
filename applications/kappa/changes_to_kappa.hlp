@@ -1,130 +1,209 @@
 .help changes_to_kappa Starlink kappa
 .nf
- The main changes made to KAPPA at each release are described in the
+The main changes made to KAPPA at each release are described in the
 following sub-topics.
- 2 V0.4
+
+
+V0.4
+
 Version 0.3 was not available on general release, hence the highlights
 of the modifications to KAPPA v0.2 are given below.  Detailed bug fixes
 are not listed.
- To run KAPPA most effectively, ICL should be used in preference to
+
+To run KAPPA most effectively, ICL should be used in preference to
 ADAMCL.
- 3 New_and_extended_applications
+
+
+New_and_extended_applications
+
 New applications:
-   o CONTOUR and LINPLOT for line graphics.
-   o FITSIN for reading FITS tapes.
-   o HISTOGRAM for histogramming 2-d data arrays.
-   o IDRSET and IDPAN to reset or pan and zoom an image display.
-   o NUMB to give the number of pixels above any value (the former NUMB
+
+  o CONTOUR and LINPLOT for line graphics.
+
+  o FITSIN for reading FITS tapes.
+
+  o HISTOGRAM for histogramming 2-d data arrays.
+
+  o IDRSET and IDPAN to reset or pan and zoom an image display.
+
+  o NUMB to give the number of pixels above any value (the former NUMB
     is now called NUMBA).
-   o QUILT a variant of MOSAIC where a list of files and offsets can be
+
+  o QUILT a variant of MOSAIC where a list of files and offsets can be
     stored in an ASCII file for convenience.
-  Extended applications (only the highlights):
-   o CENTROID default search parameters have been increased to make the
+
+
+Extended applications (only the highlights):
+
+  o CENTROID default search parameters have been increased to make the
     location of features easier.
-   o CRELUT and LUTABLE have commentary.
-   o CREFRAME has a Gaussian-noise option.
-   o DISPLAY and GREYPLOT now allow any scaling limits (within the range
+
+  o CRELUT and LUTABLE have commentary.
+
+  o CREFRAME has a Gaussian-noise option.
+
+  o DISPLAY and GREYPLOT now allow any scaling limits (within the range
     of floating-point numbers) in SC mode, rather than being constrained
     by the extreme values in the data array.
-   o GLITCH has an option to automatically remove bad pixels.
-   o INSPECT has an XYcur option to store a series of x-y-values in an
+
+  o GLITCH has an option to automatically remove bad pixels.
+
+  o INSPECT has an XYcur option to store a series of x-y-values in an
     ASCII file selected via the cursor. In HI mode not only can the
     summary histogram be reported, but also the full histogram.  The
     HElp just fits onto a terminal screen.
-   o KAPHELP has been largely rewritten.  See the subtopic on changes
+
+  o KAPHELP has been largely rewritten.  See the subtopic on changes
     to the help system.
-   o MOSAIC has the option to sum or average in the overlap regions.
-   o MSTATS now checks that the various data arrays have the same
+
+  o MOSAIC has the option to sum or average in the overlap regions.
+
+  o MSTATS now checks that the various data arrays have the same
     dimensions.
-   o POW will raise negative values to even-integer powers.
-   o ROTATE can now compute output pixels values by bi-linear 
+
+  o POW will raise negative values to even-integer powers.
+
+  o ROTATE can now compute output pixels values by bi-linear 
     interpolation, as an alternative to the nearest-neighbour method.
-   o Statistics routines now give the number of bad pixels in the sample.
+
+  o Statistics routines now give the number of bad pixels in the sample.
     Undefined statistics are shown as such, rather than the numeric
     bad-pixel value.
- HISTO has been renamed HISTAT to avoid confusion with the new HISTOGRAM.
+
+HISTO has been renamed HISTAT to avoid confusion with the new HISTOGRAM.
 Some applications have had astronomical parameters removed, e.g. SCALE
 in CREFRAME and APERADD.  Some CREFRAME parameters have been renamed.
 Existing procedures will need to be revised.
- 3 Help
- The help system now displays a screen of text.  Pressing return will
+
+
+Help
+
+
+The help system now displays a screen of text.  Pressing return will
 move on to the next page, i.e. as normal in VMS help.
- Help on subtopics may be obtained from the command line, e.g.
- ICL> KAPHELP GAUSS PARAMETER SIGMA
- Also wildcards may be used, e.g.
- ICL> KAPHELP * BUGS
- would show all the known bugs.
- The help library now contains background information.
- 3 Parameters
- Obtaining parameter values is now faster and more flexible than before.
-   o KAPPA stores the last IMAGE written or accessed, and uses it as the
+
+Help on subtopics may be obtained from the command line, e.g.
+
+ICL> KAPHELP GAUSS PARAMETER SIGMA
+
+Also wildcards may be used, e.g.
+
+ICL> KAPHELP * BUGS
+
+would show all the known bugs.
+
+The help library now contains background information.
+
+
+Parameters
+
+
+Obtaining parameter values is now faster and more flexible than before.
+
+  o KAPPA stores the last IMAGE written or accessed, and uses it as the
     default value for the next prompt for an IMAGE structure. 
-   o Current values are now frequently given as defaults.
-   o Responding to a prompt with a null value (!) will not necessarily
+
+  o Current values are now frequently given as defaults.
+
+  o Responding to a prompt with a null value (!) will not necessarily
     cause the application to abort, but it can force a suitable default
     to be used, where this is the most-sensible action.
-   o Responding to a prompt with an abort request (!!) will now always
+
+  o Responding to a prompt with an abort request (!!) will now always
     abort the application.
-   o ICL makes it easy to override a normally defaulted parameter by
+
+  o ICL makes it easy to override a normally defaulted parameter by
     keyword e.g.
-     ICL> CONTOUR ANNOTA=T MINTIC=[4.,4.]
-     ICL> MOSAIC OTITLE='Design for the bathroom tiling'
-     This facility is not limited to defaulted parameters, so it can be
+
+    ICL> CONTOUR ANNOTA=T MINTIC=[4.,4.]
+
+    ICL> MOSAIC OTITLE='Design for the bathroom tiling'
+
+    This facility is not limited to defaulted parameters, so it can be
     used to write powerful automatic ICL procedures. For example, to
     perform a series of KAPPA applications on a set of data arrays.
- 3 Error_handling
- Many contextual error messages have been added.  This should help to
+
+
+Error_handling
+
+
+Many contextual error messages have been added.  This should help to
 pinpoint the origins of errors, in particular the ubiquitous and
 unhelpful HDS-locator-invalid and HDS-fatal-internal errors.
 Occasionally, there will be some duplication of the content of the
 error reports, but it is felt that too much information is better than
 too little. 
- The error message begins with the routine name where the error was
+
+The error message begins with the routine name where the error was
 detected.
- Much of the code has been restructured to tidy up correctly after an
+
+Much of the code has been restructured to tidy up correctly after an
 error, or an abort request.  So there should be no data left mapped
 or locked, or devices open when an application completes.
- 2 V0.5
- The main change since the last release is the introduction of the
+
+
+V0.5
+
+
+The main change since the last release is the introduction of the
 graphics database to enable graphics applications to communicate and
 interact.
- During the intervening period while the NDF-access routines are being
+
+During the intervening period while the NDF-access routines are being
 written, KAPPA applications will now process a primitive NDF, i.e.
 containing a primitive DATA_ARRAY at the top level, following the rules
 of SGP/38.  The (principal) input MORE structure is propagated to an
 output NDF.  QUALITY is propagated if the processing has not affected
 it.  For example, an arithmetic operation would permit QUALITY to be
 copied, but a convolution or configuration change would not.
- Detailed bug fixes are not listed.
- 3 New_and_extended_applications
- New applications:
-   o CONTOVER for creating a contour-plot overlay of a previously
+
+Detailed bug fixes are not listed.
+
+
+New_and_extended_applications
+
+
+New applications:
+
+  o CONTOVER for creating a contour-plot overlay of a previously
     displayed image.  The origins of the pictures need not be the
     same.
-   o CURSOR selects a current graphics-database picture and reports
+
+  o CURSOR selects a current graphics-database picture and reports
     the co-ordinates of points chosen using the cursor.
-   o DEFPIC defines a new picture in the database, via the cursor or
+
+  o DEFPIC defines a new picture in the database, via the cursor or
     explicit x,y limits, or via a position code and size.  Montages
     of plots from different applications are now possible.
-   o GDCLEAR clears a graphics workstation and purges entries for that
+
+  o GDCLEAR clears a graphics workstation and purges entries for that
     device in the graphics database.
-   o MATHS evaluates arithmetic and mathematical expressions operating
+
+  o MATHS evaluates arithmetic and mathematical expressions operating
     on (1 to 26) whole images.  This is a powerful and flexible
     application.
-   o NOMAGIC removes all magic-value bad pixels from a data array.
-   o PICK2D creates a slice of a 2-d data array.
-   o SHODEV gives the names of the available graphics workstations.
-   o TURBOCONT is a much faster version of the original CONTOUR.
- Extended applications (only the highlights):
-   o CONTOUR now has sub-pixel smoothing to the resolution of the
+
+  o NOMAGIC removes all magic-value bad pixels from a data array.
+
+  o PICK2D creates a slice of a 2-d data array.
+
+  o SHODEV gives the names of the available graphics workstations.
+
+  o TURBOCONT is a much faster version of the original CONTOUR.
+
+Extended applications (only the highlights):
+
+  o CONTOUR now has sub-pixel smoothing to the resolution of the
     graphics device, and the contour-labelling frequency can be
     adjusted.
-   o FITSIN can now process FITS table-extension files into SCAR/ADC
+
+  o FITSIN can now process FITS table-extension files into SCAR/ADC
     format.  Type conversion may be set globally when not in
     automatic mode.  Previously, format conversion could only be
     switched off globally. The logfile records the name of the output
     HDS file associated with a set of FITS descriptors.
-   o INSPECT has been made more flexible and easier to use because of
+
+  o INSPECT has been made more flexible and easier to use because of
     the graphics database.  You no longer have to display an image in
     INSPECT or be constrained to unit magnification located at the
     centre of the display surface.  Now you should use DISPLAY to do 
@@ -132,192 +211,325 @@ copied, but a convolution or configuration change would not.
     inquires from the database where the last data picture is to be
     found. The line plots now use NCAR and so are better looking and
     there are parameters for altering the style of the plots.
-   o MSTATS has an option to create a median array. In Single mode
+
+  o MSTATS has an option to create a median array. In Single mode
     the median is also reported.
-   o TWEAK has been modified to work tolerably with an Ikon (the problem
+
+  o TWEAK has been modified to work tolerably with an Ikon (the problem
     being that there are only three buttons on the mouse).
-  3 Help
- The growing number of applications means the V0.4 command
- ICL> KAPHELP SUMMARY
- is becoming unwieldy.  Therefore this command now gives a list of
+
+
+
+Help
+
+
+The growing number of applications means the V0.4 command
+
+ICL> KAPHELP SUMMARY
+
+is becoming unwieldy.  Therefore this command now gives a list of
 subtopics into which applications have been classified by their
 functionality.  If you still want the full summary then type
- ICL> KAPHELP SUMMARY ALPHA
- The help library contains more background information and instructions
+
+ICL> KAPHELP SUMMARY ALPHA
+
+The help library contains more background information and instructions
 for navigating the help library.
- 3 Parameters
-   o More parameters are now defaulted to reduce the number of prompts.
+
+
+Parameters
+
+
+  o More parameters are now defaulted to reduce the number of prompts.
     Check the latest version of SUN/95 for details.
-   o Additional global parameters are used in addition to the last IMAGE
+
+  o Additional global parameters are used in addition to the last IMAGE
     written or accessed.  These are for the last used image-display
     device, image-display overlay, and graphics device, and for the
     last accessed lookup table.  These should reduce typing.
-   o Defaults for graphics devices use the GNS names.
- 2 V0.6
- The most important change since the last release is the introduction
+
+  o Defaults for graphics devices use the GNS names.
+
+
+V0.6
+
+
+The most important change since the last release is the introduction
 of the access routines to support the standard data format---the NDF,
 albeit in just a handful of applications so far.  The other main
 developments are over thirty new commands, and the introduction of
 IDI, initially for the Ikon.
- 3 New_applications
-   o BLINK  Blinks two planes of an image display.
-   o ERASE  Erases an HDS object.
-   o FOURIER  Performs forward and reverse Fourier transforms on 2-d
+
+
+New_applications
+
+
+  o BLINK  Blinks two planes of an image display.
+
+  o ERASE  Erases an HDS object.
+
+  o FOURIER  Performs forward and reverse Fourier transforms on 2-d
     NDFs.
-   o GDSTATE  Shows the current status of a graphics device.
-   o IDPAZO  Pans and zooms an image-display device.
-   o LUTFLIP  Flips a lookup table of image-display device.
-   o LUTROT  Rotates a lookup table of image-display device.
-   o LUTSAVE  Saves the current lookup table of image-display device
+
+  o GDSTATE  Shows the current status of a graphics device.
+
+  o IDPAZO  Pans and zooms an image-display device.
+
+  o LUTFLIP  Flips a lookup table of image-display device.
+
+  o LUTROT  Rotates a lookup table of image-display device.
+
+  o LUTSAVE  Saves the current lookup table of image-display device
     in an NDF.
-   o NDFTRACE  Displays the attributes of an NDF data structure.
-   o PICLABEL  Labels the current graphics-database picture.
-   o PICSEL  Selects a graphics-database picture by its label.
-   o SEGMENT  Copies polygonal segments from one 2-d data array to
+
+  o NDFTRACE  Displays the attributes of an NDF data structure.
+
+  o PICLABEL  Labels the current graphics-database picture.
+
+  o PICSEL  Selects a graphics-database picture by its label.
+
+  o SEGMENT  Copies polygonal segments from one 2-d data array to
     another.
-   o SETMAGIC   Replaces all occurrences of pixels of a given value
+
+  o SETMAGIC   Replaces all occurrences of pixels of a given value
     in a data array by the magic value.
-   o SETVAR  Sets new values for the variance component of an NDF
+
+  o SETVAR  Sets new values for the variance component of an NDF
     data structure.
-   o SNAPSHOT  Dumps an image-display memory to a graphics hardcopy
+
+  o SNAPSHOT  Dumps an image-display memory to a graphics hardcopy
     and optionally to an NDF.
-   o STATS  Computes simple statistics for a data array.
-   o SURFIT  Fits a polynomial or spline surface to 2-d data array.
-   SNAPSHOT is a separate application.
- 3 New_procedures
-   o GDSET  Sets the current graphics device.
-   o GLOBALS  Displays the values of the KAPPA global parameters.
-   o IDSET  Sets the current image-display device.
-   o LUTBGYRW  Loads the BGYRW lookup table.
-   o LUTCOL  Loads the standard colour lookup table.
-   o LUTCONT  Loads a lookup table to give the display the
+
+  o STATS  Computes simple statistics for a data array.
+
+  o SURFIT  Fits a polynomial or spline surface to 2-d data array.
+
+  SNAPSHOT is a separate application.
+
+
+New_procedures
+
+
+  o GDSET  Sets the current graphics device.
+
+  o GLOBALS  Displays the values of the KAPPA global parameters.
+
+  o IDSET  Sets the current image-display device.
+
+  o LUTBGYRW  Loads the BGYRW lookup table.
+
+  o LUTCOL  Loads the standard colour lookup table.
+
+  o LUTCONT  Loads a lookup table to give the display the
     appearance of a contour plot.
-   o LUTGREY  Loads the standard greyscale lookup table.
-   o LUTHEAT  Loads the heat lookup table.
-   o LUTNEG   Loads a negative greyscale lookup table.
-   o LUTRAMPS  Loads the coloured-ramps lookup table.
-   o LUTREAD  Loads an image-display lookup table.
-   o LUTSPEC  Loads a spectrum-like lookup table.
-   o LUTZEBRA  Loads a pseudo-contour lookup table.
-   o OVSET  Sets the current image-display overlay.
- 3 Renamed_applications
-   Some applications have had to be renamed for consistency,
+
+  o LUTGREY  Loads the standard greyscale lookup table.
+
+  o LUTHEAT  Loads the heat lookup table.
+
+  o LUTNEG   Loads a negative greyscale lookup table.
+
+  o LUTRAMPS  Loads the coloured-ramps lookup table.
+
+  o LUTREAD  Loads an image-display lookup table.
+
+  o LUTSPEC  Loads a spectrum-like lookup table.
+
+  o LUTZEBRA  Loads a pseudo-contour lookup table.
+
+  o OVSET  Sets the current image-display overlay.
+
+
+Renamed_applications
+
+
+  Some applications have had to be renamed for consistency,
   and hence made more memorable.  SHODEV is now called
   GDNAMES, and IDRSET is now IDRESET.  The old commands will
   still function, but point to the renamed applications.
-   The old STATS has been renamed STATS2D prior to its
+
+  The old STATS has been renamed STATS2D prior to its
   deprecation, since the new STATS works on n-D data arrays,
   and will be able process sub-arrays via the NDF access
   routines.
- 3 Extended_applications
+
+
+Extended_applications
+
   
   Here is a summary of the main modifications.
-   o ADD, CADD, CSUB, DIV, MULT and SUB have been converted to use
+
+  o ADD, CADD, CSUB, DIV, MULT and SUB have been converted to use
     the NDF-access routines.  They process variance arrays in
     addition to the data array.
-   o APERADD, CENTROID, HISTAT, HISTOGRAM, STATS2D have logging
+
+  o APERADD, CENTROID, HISTAT, HISTOGRAM, STATS2D have logging
     of results.
-   o CENTROID has cursor and x-y list modes so the objects whose
+
+  o CENTROID has cursor and x-y list modes so the objects whose
     centroids are to be found can be selected by cursor of from
     an ASCII file.
-   o CONTOUR and TURBOCONT has a better placement of the key,
+
+  o CONTOUR and TURBOCONT has a better placement of the key,
     aligned with the top of the box around the contours.
-   o CONTOUR now replaces all bad pixels with a user-defined value
+
+  o CONTOUR now replaces all bad pixels with a user-defined value
     if an initial median filter leaves any remaining.  The NAG
     contouring routine cannot handle magic values. This does not
     apply when pen rotation is selected.
-   o CURSOR may output a file containing an x-y list of the
+
+  o CURSOR may output a file containing an x-y list of the
     co-ordinates.  The synchronisation of the cursor and
     commentary has been meshed.
-   o CONTOUR, CONTOVER, CURSOR, DEFPIC, and TURBOCONT have
+
+  o CONTOUR, CONTOVER, CURSOR, DEFPIC, and TURBOCONT have
     improved commentary.
-   o DEFPIC has array mode for n*m pictures, and outline option.
-   o FITSIN can handle Tables automatically.  The name of the
+
+  o DEFPIC has array mode for n*m pictures, and outline option.
+
+  o FITSIN can handle Tables automatically.  The name of the
     output files are recorded in the log file.
-   o GDCLEAR has an extra option to clear just the current
+
+  o GDCLEAR has an extra option to clear just the current
     picture.
-   o HISTAT can compute a user-defined list of percentiles.
-   o TRANDAT has no limit on the number of points or the size of
+
+  o HISTAT can compute a user-defined list of percentiles.
+
+  o TRANDAT has no limit on the number of points or the size of
     the output data array.
-   o THRESH permits values beyond the thresholds to be bad.
-   o ZAPLIN has cursor and ASCII-file modes for interactive
+
+  o THRESH permits values beyond the thresholds to be bad.
+
+  o ZAPLIN has cursor and ASCII-file modes for interactive
     and duplicated processing respectively.  In addition to
     lines and columns a region may be zapped. The zapped areas
     may now be made bad.
-   o All n-d applications can work on up to 7-dimensional data
+
+  o All n-d applications can work on up to 7-dimensional data
     arrays.
- 3 Help
-   Help can now be obtained via the ICL help system once KAPPA
+
+
+Help
+
+
+  Help can now be obtained via the ICL help system once KAPPA
   has been typed, although the KAPPA applications are not
   loaded.
-   ICL> KAPPA
+
+  ICL> KAPPA
   ICL> HELP ADD
-   KAPPA conforms to the conventions of SSN/64, so you can obtain
+
+  KAPPA conforms to the conventions of SSN/64, so you can obtain
   general help about KAPPA without entering the command KAPPA.
- 3 Parameters
-   Still more parameters are now normally defaulted.  In
+
+
+Parameters
+
+
+  Still more parameters are now normally defaulted.  In
   particular the current graphics device, image display and
   image overlay will be used, rather than being prompted
   each time.
-   The choices in menus can be abbreviated to the shortest
+
+  The choices in menus can be abbreviated to the shortest
   unambiguous string to select an option.
- 3 Workspace
-   An improved scheme for managing workspace is introduced.  This
+
+
+Workspace
+
+
+  An improved scheme for managing workspace is introduced.  This
   is more robust than the previous method, since in particular
   it avoids an HDS bug.  The work file should only be as large
   as the largest work array used during processing. Application
   WORKFX has been withdrawn and consequently KAPPA is only loaded
   once an application is run.
- 2 V0.7
- The release features more applications that use the NDF---including
+
+
+V0.7
+
+
+The release features more applications that use the NDF---including
 both new and modified applications.
- 3 New_applications
-   o COLUMNAR  Draws a perspective-histogram representation of a
+
+
+New_applications
+
+
+  o COLUMNAR  Draws a perspective-histogram representation of a
     two-dimensional NDF.  The data, variance or quality array can
     be plotted.
-   o HIDE  Draws a perspective plot of a two-dimensional NDF.  The
+
+  o HIDE  Draws a perspective plot of a two-dimensional NDF.  The
     data, variance or quality array can be plotted.
-   o IDINVISIBLE  Makes memory planes of an image-display device
+
+  o IDINVISIBLE  Makes memory planes of an image-display device
     invisible.
-   o IDUNZOOM  Unzooms and optionally re-centres an image-display
+
+  o IDUNZOOM  Unzooms and optionally re-centres an image-display
     device.
-   o IDVISIBLE  Makes all the memory planes of an image-display
+
+  o IDVISIBLE  Makes all the memory planes of an image-display
     device visible.
-   o LUTVIEW  Draws a colour-table key.
-   o NORMALIZE  Normalizes one NDF to a similar NDF by calculating
+
+  o LUTVIEW  Draws a colour-table key.
+
+  o NORMALIZE  Normalizes one NDF to a similar NDF by calculating
     a scale and zero difference.
-   o PSF  Determines the parameters of a model star profile by
+
+  o PSF  Determines the parameters of a model star profile by
     fitting star images in a 2-dimensional NDF.
-   o SETLABEL  Sets a new label for an NDF data structure.
-   o SETTITLE  Sets a new title for an NDF data structure.
-   o SETTYPE  Sets a new numeric type for the data and variance
+
+  o SETLABEL  Sets a new label for an NDF data structure.
+
+  o SETTITLE  Sets a new title for an NDF data structure.
+
+  o SETTYPE  Sets a new numeric type for the data and variance
     components of an NDF.
-   o SETUNITS  Sets a new units value for an NDF data structure.
-  3 New_procedures
-   o LUTIKON  Loads the Ikon lookup table.
- 3 Renamed_applications
-   DEFPIC has been renamed to PICDEF for consistency,
+
+  o SETUNITS  Sets a new units value for an NDF data structure.
+
+
+
+New_procedures
+
+
+  o LUTIKON  Loads the Ikon lookup table.
+
+
+Renamed_applications
+
+
+  DEFPIC has been renamed to PICDEF for consistency,
   and hence made more memorable.  It also avoids a clash with
   the ICL command DEFPROC.  The old command will still function,
   but it points to the renamed application.
- 3 Extended_applications
+
+
+Extended_applications
+
   
   Here is a summary of the main modifications.
-   o APERADD, CENTROID, HISTAT, STATS, and STATS2D write their
+
+  o APERADD, CENTROID, HISTAT, STATS, and STATS2D write their
     results to ADAM parameters for use by other applications and
     procedures.
-   o BLOCK  has been converted to the NDF and features variance
+
+  o BLOCK  has been converted to the NDF and features variance
     processing.  The calculations are performed in single- or
     double-precision floating point using a faster algorithm.  A
     rectangular box may now be used.  There is more control of
     bad-pixel processing.
-   o CONTOUR has been converted to the NDF.  In addition to the data
+
+  o CONTOUR has been converted to the NDF.  In addition to the data
     array, the variance or quality can be contoured.  The bounds
     are defined by a pair of defaulted parameters.  The units appear
     in the key.
-   o CRELUT may now be supplied an initial colour table that can be 
+
+  o CRELUT may now be supplied an initial colour table that can be 
     modified.
-   o DISPLAY has been converted to the NDF.  It handles all
+
+  o DISPLAY has been converted to the NDF.  It handles all
     non-complex data types, and has optional bad-pixel handling.  In
     addition to the data array, the variance or quality can be
     displayed.  Axes can be drawn. The centering now refers to the
@@ -325,66 +537,95 @@ both new and modified applications.
     more options for scaling the data, including percentiles.  It
     is more efficent when subsets of an image are to be displayed,
     since only the visible portion is mapped and scaled.
-   o GAUSS has been converted to the NDF and features variance
+
+  o GAUSS has been converted to the NDF and features variance
     processing.  The calculations are performed in single- or
     double-precision floating point using a faster algorithm.  
     There is more control of bad-pixel processing.  For consistency
     and ease of use the Gaussian is defined in terms of its
     full width at half-maximum height.
-   o MATHS has been converted to the NDF and will process variance
+
+  o MATHS has been converted to the NDF and will process variance
     arrays.  The documentation has been significantly improved.
-   o OUTSET now permits the centre of the circle to be located at sites
+
+  o OUTSET now permits the centre of the circle to be located at sites
     other than pixel centres, and the pixels outside the circle can be
     replaced by the bad-pixel value.
-   o PICDEF has two parameters to define the upper and lower bounds of
+
+  o PICDEF has two parameters to define the upper and lower bounds of
     the region instead of four parameters.  By default outlines of new
     pictures are drawn.
-   o SNAPSHOT is now integrated fully into the KAPPA monolith following
+
+  o SNAPSHOT is now integrated fully into the KAPPA monolith following
     an increase in some ADAM quotas.
-   o TRANDAT has been converted to the NDF.  It has been largely 
+
+  o TRANDAT has been converted to the NDF.  It has been largely 
     rewritten.  New features include the creation of n-dimensional
     NDFs of all non-complex data types; and the input data file can
     contain just data values, i.e. no co-ordinate information.
-   o TURBOCONT has been converted to the NDF.  In addition to the data
+
+  o TURBOCONT has been converted to the NDF.  In addition to the data
     array, the variance or quality can be contoured.  The bounds
     are defined by a pair of defaulted parameters. The units appear
     in the key.
- 3 Command_names
-   All KAPPA commands can be abbreviated subject to the constraints
+
+
+Command_names
+
+
+  All KAPPA commands can be abbreviated subject to the constraints
   that the abbreviation must be unambiguous and at least four
   characters.  Commands shorter than five characters therefore cannot
   be abbreviated.
- 3 Help
-   The details of parameters for applications converted to the NDF
+
+
+Help
+
+
+  The details of parameters for applications converted to the NDF
   are now at level 3, the same as the old applications.  However,
   the content of the two styles is different with the SST/STARLSE
   form (used for NDF applications) gradually replacing the old
   SSE/MAN format (which includes the interface file).
-   SSE  Level-2 Parameters gives a list and descriptions of the 
+
+  SSE  Level-2 Parameters gives a list and descriptions of the 
        parameters.  Level-3 gives the interface-file entry for the
        parameter.
-   NDF  Level-2 Parameters is just a heading.  Level-3 gives detailed
+
+  NDF  Level-2 Parameters is just a heading.  Level-3 gives detailed
        description of each parameter, its acceptable values and its
        default if it has one. In some cases there is a level-2 topic
        called "Usage" to indicate the order of positional
        parameters.
- 2 V0.8
- The main change is the introduction of a DCL version of KAPPA.
+
+
+V0.8
+
+
+The main change is the introduction of a DCL version of KAPPA.
 The release features more applications that use the NDF---including
 both new and modified applications.  There are 18 new commands.
- 3 Global_changes
-   o Access to KAPPA commands from DCL.
-   o Supports the CENTRE arrays of the NDF's AXIS structure.
-   o Where it is valid and straightforward, IMAGE-format applications
+
+
+Global_changes
+
+
+  o Access to KAPPA commands from DCL.
+
+  o Supports the CENTRE arrays of the NDF's AXIS structure.
+
+  o Where it is valid and straightforward, IMAGE-format applications
     now propagate the NDF components VARIANCE, AXIS, LABEL, UNITS,
     and HISTORY.  Previously, only QUALITY and extensions were copied.
-   o Supports world and data co-ordinates (via the AXIS structures in
+
+  o Supports world and data co-ordinates (via the AXIS structures in
     the NDF).  These co-ordinates and AXIS structures not only control
     the appearance of axes, but enable the positions of features or a
     range of positions to to be specified either in pixels or data
     units.  There is a global parameter to control which system to
     use.
-   o It incorporates the latest version of the graphics database, AGI.
+
+  o It incorporates the latest version of the graphics database, AGI.
     This means that the data co-ordinate system may be stored with
     pictures and used later.  Also the name of the NDF creating the
     plot is recorded;  this can be used to advantage in interactive
@@ -393,61 +634,82 @@ both new and modified applications.  There are 18 new commands.
     there is no longer a superfluous almost-blank sheet of paper
     produced on hardcopy devices.  There are separate databases in
     separate files for each computer node in a cluster.
-   o There is a new global parameter to control the interaction mode
+
+  o There is a new global parameter to control the interaction mode
     for obtaining co-ordinates.  It can take three states: Cursor
     (for a graphics cursor), Interface (for prompting), and File
     (for an ASCII file).
-   o Specification of a graphics device within an application now
+
+  o Specification of a graphics device within an application now
     lasts for the duration of that application.  Formerly, the
     application would update the global parameters.  These must be
     set via the GDSET, IDSET and OVSET commands.
-   o All the applications that create, read, manipulate and use colour
+
+  o All the applications that create, read, manipulate and use colour
     tables have been converted to ignore a set of reserved pens.  The
     reserved pens form a static palette for axes, text, borders,
     bad-pixel flagging etc.  The palette is unaffected by changes to
     the colour table.  There are also applications for handling the
     palette.
-   o All the applications that require an image-display device have
+
+  o All the applications that require an image-display device have
     more-flexible criteria, and these are documented.  The error
     messages that result when an unsuitable graphics device is
     chosen give explicit reasons why that device cannot be used.
-   o There is a FONT parameter for controlling the graphics fount in
+
+  o There is a FONT parameter for controlling the graphics fount in
     line graphics (excluding COLUMNAR and HIDE).
-   o In addition to describing new functionality the documentation
+
+  o In addition to describing new functionality the documentation
     has been expanded featuring more examples, ICL procedures, and
     tips; appendices describing the NDF and supported HDS data types. 
     There is structuring of the parameter lists, separating result,
     and graphics-style parameters from the primary parameters. 
-   o KAPPA V0.8 requires 1.5MB *less* virtual memory than V0.7.
- 3 New_applications
-   o CLEANER  Flags small defects in a substantially smooth 2-d NDF.
-   o FITSDIN  Reads a list of disc-FITS files including wildcards.
+
+  o KAPPA V0.8 requires 1.5MB *less* virtual memory than V0.7.
+
+
+New_applications
+
+
+  o CLEANER  Flags small defects in a substantially smooth 2-d NDF.
+
+  o FITSDIN  Reads a list of disc-FITS files including wildcards.
     It supports all standard FITS including floating-point data.
     Like FITSIN it can run in automatic mode, and will process files
     with block sizes other than a multiple of 2880 bytes.
-   o FITSIMP  Moves ancillary data from the FITS extension to other
+
+  o FITSIMP  Moves ancillary data from the FITS extension to other
     extensions within an NDF.
-   o FITSLIST  Lists the contents of the FITS extension in an NDF to
+
+  o FITSLIST  Lists the contents of the FITS extension in an NDF to
     the screen or a file.
-   o IDCLEAR  Clears an image-display device. (It is the equivalent of
+
+  o IDCLEAR  Clears an image-display device. (It is the equivalent of
     GDCLEAR and it is provided for ease of use.)
-   o IDSTATE  Shows the current status of of an image-display device.
+
+  o IDSTATE  Shows the current status of of an image-display device.
     It is the equivalent of GDSTATE and it is provided for ease of
     use, but it also has additional information about the number of
     entries in the colour table and the palette colours. (See PAL*)
-   o LUTHILITE  Interactively highlights an image-display's colour 
+
+  o LUTHILITE  Interactively highlights an image-display's colour 
     table.  A variable-width band of a nominated colour may be moved
     along the colour table in real time to highlight image features.
-   o LUTTWEAK  Interactively modifies (squash/stretch and offset) an
+
+  o LUTTWEAK  Interactively modifies (squash/stretch and offset) an
     image-display's colour table.  It is the long-term replacement
     for TWEAK.  Since it uses IDI it changes the colour table in real 
     time.
-   o MEM2D  Maximum-entropy deconvolution of a 2-D NDF---an important
+
+  o MEM2D  Maximum-entropy deconvolution of a 2-D NDF---an important
     application for those wishing to extract fine detail from their
     images.
-   o MLINPLOT  Draws a multiple line plot of a 2-D NDF's data values
+
+  o MLINPLOT  Draws a multiple line plot of a 2-D NDF's data values
     versus their axis co-ordinates.
-   o PAL*  From this release KAPPA reserves a portion of an image
+
+  o PAL*  From this release KAPPA reserves a portion of an image
     display's colour table to hold a palette of 16 colours for
     annotations, axes, borders, marking bad pixels etc.  The palette
     is unaffected by changes to the colour table.  Four applications
@@ -455,33 +717,53 @@ both new and modified applications.  There are 18 new commands.
     palette. PALENTRY sets a palette to a named colour or RGB 
     intensities. PALSAVE saves the current palette in an NDF. 
     PALREAD restores a saved palette.
-   o PICIN  Reports the size, location, name, comment, label,
+
+  o PICIN  Reports the size, location, name, comment, label,
     associated NDF of a picture interior to the current one. The
     results are written to parameters.  It is provided to help
     construct composite plots within procedures.
-   o PICLIST  Lists the graphics-database pictures for a device from 
+
+  o PICLIST  Lists the graphics-database pictures for a device from 
     which a new current picture may be chosen.
-   o SETBB  Sets the badbits mask of an NDF data structure in order to
+
+  o SETBB  Sets the badbits mask of an NDF data structure in order to
     control the effect of data quality.
- 3 New_procedures
-   o LUTFC  Loads the standard false-colour lookup table.
- 3 Withdrawn_applications
+
+
+New_procedures
+
+
+  o LUTFC  Loads the standard false-colour lookup table.
+
+
+Withdrawn_applications
+
   SHSIZE has been withdrawn.  Use NDFTRACE instead.
- 3 Deprecated_features
+
+
+Deprecated_features
+
   All the application parameters specifying the bounds of an NDF will
   be withdrawn, except those in INSPECT, since the bounds can be
   supplied following the name of the NDF.  This will be done when
   only a few of the KAPPA applications that use the old IMAGE data
   format remain.
-   The following applications will be withdrawn at V0.9:
-   STATS2D  --- STATS with NDF_ sectioning (see SUN/33.3 Section 16) 
+
+  The following applications will be withdrawn at V0.9:
+
+  STATS2D  --- STATS with NDF_ sectioning (see SUN/33.3 Section 16) 
                already duplicates STATS2D.
- 3 Extended_applications
+
+
+Extended_applications
+
   
   Here is a summary of the main modifications.
-   o CDIV and CMULT have been converted to NDF_ and include variance
+
+  o CDIV and CMULT have been converted to NDF_ and include variance
     processing.  They can process any non-complex numeric data.
-   o CENTROID has been converted to NDF_ and can process n-D data.
+
+  o CENTROID has been converted to NDF_ and can process n-D data.
     It works in either world or data co-ordinates.  The input NDF
     name need not be supplied in cursor mode as it is obtained from
     the graphics database.  Errors in the centroid position may be
@@ -489,17 +771,21 @@ both new and modified applications.  There are 18 new commands.
     applications, such as PSF.  A single centroid may be obtained
     by giving the INIT parameter on the command line, i.e. it
     prevents looping.
-   o COLUMNAR and HIDE obtain their axis labels from the NDF axis
+
+  o COLUMNAR and HIDE obtain their axis labels from the NDF axis
     component, by default.  The associated NDF is stored with the
     data picture in the graphics database.
-   o CONTOUR and TURBOCONT obtain their axis labels and annotations
+
+  o CONTOUR and TURBOCONT obtain their axis labels and annotations
     from the NDF axis structure, by default.  The graphics database
     records the NDF and the transformation from world-to-data
     co-ordinates, provided the latter is approximately linear.  The
     axes are now optional.
-   o CONTOVER has been converted to NDF_.  In addition to the data
+
+  o CONTOVER has been converted to NDF_.  In addition to the data
     array, the variance or quality can be contoured.
-   o CRELUT has been converted to NDF_ and made more efficient. 
+
+  o CRELUT has been converted to NDF_ and made more efficient. 
     There are double the number of user-definable entries in the
     palette, and the handling of the reserved pens is improved, e.g.
     no striping in the histogram.  The image NDF may be any of the
@@ -510,9 +796,11 @@ both new and modified applications.  There are 18 new commands.
     colour.  Specifying the scaling limits on the command line
     prevents the calculation of the extreme values of the NDF used
     as suggested defaults.
-   o CURSOR reports either world or data co-ordinates, single or double
+
+  o CURSOR reports either world or data co-ordinates, single or double
     precision.
-   o DISPLAY features several efficiency improvements, particularly
+
+  o DISPLAY features several efficiency improvements, particularly
     for large arrays.  Byte and word arrays may be processed directly.
     The scaled image may be stored for quicker re-display via a
     no-scaling option.  The scaling limits may be written to output
@@ -527,23 +815,29 @@ both new and modified applications.  There are 18 new commands.
     colour table.  As an alternative to axes a coloured border may be
     drawn about the image, using a colour selected from the palette.
     There is control of the appearance of bad pixels.
-   o FITSIN has been converted to NDF_.  It can process block sizes
+
+  o FITSIN has been converted to NDF_.  It can process block sizes
     other than 2880-byte multiples and floating-point data.  NDF
     axis-structure components are written.
-   o FLIP has been converted to NDF_ and works in n-D.  It handles all
+
+  o FLIP has been converted to NDF_ and works in n-D.  It handles all
     non-complex data types.
-   o FOURIER provides easier control on the selection of the various
+
+  o FOURIER provides easier control on the selection of the various
     input NDFs.
-   o GDSET, IDSET, and OVSET are no longer procedures.  They check that
+
+  o GDSET, IDSET, and OVSET are no longer procedures.  They check that
     the chosen device is suitable.
-   o GDSTATE outputs the size, location, name, comment, label, and
+
+  o GDSTATE outputs the size, location, name, comment, label, and
     associated NDF name to parameters.  Also for procedures there is
     a switch to prevent reporting when just output parameters are
     needed. 
    
   o GLOBALS is no longer a procedure and is much faster as a
     consequence.
-   o GREYPLOT has been converted to NDF_.  It handles all
+
+  o GREYPLOT has been converted to NDF_.  It handles all
     non-complex data types, and has optional bad-pixel handling.  In
     addition to the data array, the variance or quality can be
     displayed.  There are more options for scaling the data,
@@ -557,19 +851,22 @@ both new and modified applications.  There are 18 new commands.
     provided the latter is approximately linear.  The reserved pens
     may be bypassed to improve the quality of the output on hardcopy
     devices.  There is control of the appearance of bad pixels.
-   o INSPECT has been partially converted to NDF_.  The input NDF
+
+  o INSPECT has been partially converted to NDF_.  The input NDF
     name need not be supplied in cursor mode as it is obtained from
     the graphics database.  It requires an OVERLAY class of device.
     The parameter names have been rationalised as an aide-memoire.
     If the OPTION keyword is given on the command line it prevents 
     looping for further inspections.
-   o LUTABLE has been converted to NDF_.  The input lookup table
+
+  o LUTABLE has been converted to NDF_.  The input lookup table
     may be mapped to the device's colour table via a nearest-
     neighbour method.  This provides better colour tables for
     discontinuous lookup tables.  Some of the parameters have been
     renamed for clarity and consistency. If the COLTAB and MAPPING
     parameters are provided on the command line, there is no looping.
-   o LINPLOT has been converted to NDF_.  It handles all non-complex
+
+  o LINPLOT has been converted to NDF_.  It handles all non-complex
     numeric data types.  In addition to the data array, the variance
     or quality can be plotted.  The abscissa axis is labelled and
     annotated in data co-ordinates obtained from the NDF axis
@@ -577,26 +874,34 @@ both new and modified applications.  There are 18 new commands.
     graphics database records the NDF and the transformation from
     world-to-data co-ordinates, provided the latter is approximately
     linear, or logarithmic.
-   o NDFTRACE reports details of any axis component.
-   o PICSEL has no restriction on the maximum number of pictures that
+
+  o NDFTRACE reports details of any axis component.
+
+  o PICSEL has no restriction on the maximum number of pictures that
     can be searched following AGI enhancements.
-   o PSF outputs the point-spread function to an NDF.  The dimensions
+
+  o PSF outputs the point-spread function to an NDF.  The dimensions
     of the NDF are given by the fitting area or such that a fraction
     of the peak amplitude is just included within the image.  The
     restriction that prevented a single object from being used to
     define the psf has been lifted.  The list of positions may be in
     world or data co-ordinates.
-   o SNAPSHOT has a rubber-band cursor to define the region to capture.
-   o STATS has been converted to NDF_.  It works directly on all
+
+  o SNAPSHOT has a rubber-band cursor to define the region to capture.
+
+  o STATS has been converted to NDF_.  It works directly on all
     non-complex data types.
-   o TWEAK has been converted to NDF_.
-   o ZAPLIN has been converted to NDF_.  It works in either world or
+
+  o TWEAK has been converted to NDF_.
+
+  o ZAPLIN has been converted to NDF_.  It works in either world or
     data co-ordinates.  The input NDF name need not be supplied in
     cursor mode as it is obtained from the graphics database.  All
     non-complex data types are processed directly.  Giving parameter
     LINCOL on the command line prevents looping, and so `zaps' a
     single region.
-   o The following applications, though not requiring conversion to the
+
+  o The following applications, though not requiring conversion to the
     NDF_ library, also had improved documentation including examples,
     usage, and multi-line parameter help:  BLINK, CURSOR, GDCLEAR,
     GDNAMES, GDSTATE, IDINVISIBLE, IDPAZO, IDRESET, IDUNZOOM,
@@ -604,65 +909,94 @@ both new and modified applications.  There are 18 new commands.
     
   o All the procedures have been converted to the new-style
     documentation.
- 2 V0.8-4
- Originally, the main purpose of this release was to fix bugs, however, 
+
+
+V0.8-4
+
+
+Originally, the main purpose of this release was to fix bugs, however, 
 due to various circumstances it is opportune to release some other
 facilities.  Most notable are the first releases of KAPPA for
 DECstation and SUN.  There are four new commands.
- 3 Global_changes
+
+
+Global_changes
+
   o There are versions of KAPPA for DECstation and SUN platforms.
-   o Where it is valid and straightforward, IMAGE-format applications
+
+  o Where it is valid and straightforward, IMAGE-format applications
     now propagate the NDF components VARIANCE, AXIS, LABEL, UNITS,
     and HISTORY.  Previously, only QUALITY and extensions were copied.
-   o Additional support for NDF sections is provided as follows:
-      - There are new applications for copying sections to a new
+
+  o Additional support for NDF sections is provided as follows:
+
+     - There are new applications for copying sections to a new
        NDF or in situ (see below).
-      - NDF applications with parameters for defining a section
+
+     - NDF applications with parameters for defining a section
        of an NDF, e.g. CONTOUR, LINPLOT, and HIDE, have had these
        parameters removed, since the section can be defined more
        flexibly following the input NDF's name.  The section may be
        arbitrary, for example, DISPLAY can plot a portion of any of
        the planes (XY, XZ, YZ) of a cube.
-      - IMAGE-format applications can access the data array in a
+
+     - IMAGE-format applications can access the data array in a
        simple NDF, and in some cases can use the origin information.
        Besides NDF's with non-default origins, IMAGE-format
        applications can now process NDFs with a bad-pixel flag.
-     See topic "NDF_sections" for details of NDF sections and how to
+
+    See topic "NDF_sections" for details of NDF sections and how to
     specify them.
   
   o IDI applications operate on X-windows image displays in addition
     to Ikons. A window may be shared by GKS and IDI applications---for
     example, run DISPLAY to view an image then invoke LUTROT to rotate
     the colour table---as well as by non-KAPPA applications.  
-   o X-window-overlay devices are supported.
+
+  o X-window-overlay devices are supported.
   
   o The colour set has been expanded to over 550 colours and grey 
     levels.  This new set corrects the anomalous values.
-   o In addition to describing new functionality the paper
+
+  o In addition to describing new functionality the paper
     documentation has been expanded and reorganised to assist new
     users.  Several typographical and editing errors in the
     documentation have been corrected.
-   o KAPPA_DIR:BAD.PAR has been withdrawn, since KAPPA no longer
+
+  o KAPPA_DIR:BAD.PAR has been withdrawn, since KAPPA no longer
     uses it.  Programmers should use PRIMDAT's PRM_PAR instead.
- 3 New_applications
+
+
+New_applications
+
 Although only an incremental release, the following applications
 have been pending release for over a year.  Now that simple NDFs
 are supported to a limited degree, these applications can now be
 made available.
-   o NDFCOPY  Copies an NDF (or NDF section) to a new location.
-   o SETBAD  Sets new bad-pixel flag values for an NDF.  This
+
+  o NDFCOPY  Copies an NDF (or NDF section) to a new location.
+
+  o SETBAD  Sets new bad-pixel flag values for an NDF.  This
     accelerates processing when the flag indicates that there are
     no bad data present.
-   o SETBOUND  Sets new bounds for an NDF.  The NDF may be trimmed
+
+  o SETBOUND  Sets new bounds for an NDF.  The NDF may be trimmed
     or enlarged to a specific shape.
-   o SETORIGIN  Sets a new pixel origin for an NDF.
- There is another new application that provides more-efficient
+
+  o SETORIGIN  Sets a new pixel origin for an NDF.
+
+There is another new application that provides more-efficient
 processing of an HDS file after its transfer between machines.
-   o NATIVE  Converts an HDS object to native machine data
+
+  o NATIVE  Converts an HDS object to native machine data
     representation.
- 3 Deprecated_features
+
+
+Deprecated_features
+
   The following applications will be withdrawn at V0.9:
-   COMPRESS  --- The NDF_ version of COMPAVE will provide COMPRESS's
+
+  COMPRESS  --- The NDF_ version of COMPAVE will provide COMPRESS's
      functionality.
   NUMBA  --- The NDF_ version of NUMB will provide NUMBA's
      functionality.
@@ -670,99 +1004,149 @@ processing of an HDS file after its transfer between machines.
      in n-d.
   THRESH0  --- The THRESH0 operation can easily be performed
      by THRESH.
-   To prevent command-name clashes with Figaro two applications
+
+  To prevent command-name clashes with Figaro two applications
   will be renamed at V0.9.  GAUSS becomes GAUSMOOTH, and CLEANER
   reverts to FFCLEAN.
- 3 Extended_applications
-   Here is a summary of the main modifications.
-   o DISPLAY and GREYPLOT parameters BADCOL and BCOLOUR default
+
+
+Extended_applications
+
+
+  Here is a summary of the main modifications.
+
+  o DISPLAY and GREYPLOT parameters BADCOL and BCOLOUR default
     to their current values.  PERCENTILES accepts values from 0 to 100
     rather than fractionally within this range as occurred previously.
-   o KAPHELP uses portable help.
-   o LUTCOL (LUTABLE COLTAB=COLOUR) fills the available colour
+
+  o KAPHELP uses portable help.
+
+  o LUTCOL (LUTABLE COLTAB=COLOUR) fills the available colour
     table, though this means that each coloured block will not
     necessarily occupy the same number of coloured indices.
-   o LUTHILITE, LUTROT, and LUTTWEAK permit fine-tune control.  The
+
+  o LUTHILITE, LUTROT, and LUTTWEAK permit fine-tune control.  The
     rate of motion of the colour table or highlight is a function of
     the speed of cursor movement in addition to the cursor position.
     For a given cursor displacement sluggish motion rotates the
     colour table more slowly than for faster motion.  LUTTWEAK has a
     larger dynamic range and smaller increments for squashing and
     stretching.
-   o PICDEF has a new parameter, FILL, for controlling the fractional
+
+  o PICDEF has a new parameter, FILL, for controlling the fractional
     size of array pictures within the grid.  Parameter CURPIC has
     been renamed CURRENT for consistency with other applications.
- 2 V0.8-5
- 3 Global_changes
+
+
+V0.8-5
+
+
+
+Global_changes
+
   o All the graphics modules are linked shareably with AGI, thus any
     bug fixes in AGI can be applied without relinking KAPPA.
-   o Applications using axis data will now detect if the axis centres
+
+  o Applications using axis data will now detect if the axis centres
     are not monotonic, and then take appropriate action, e.g.
     DISPLAY would use world co-ordinates for axes, and NDFTRACE
     would flag the axis as being non-monotonic.
-   o Typographical errors in the online documentation are corrected.
- 3 New_applications
+
+  o Typographical errors in the online documentation are corrected.
+
+
+New_applications
+
 Although only an incremental release, the following applications
 have been made available because they are simple to use, and AXCONV
 is needed urgently.
-   o AXCONV  Expands spaced axes in an NDF into the primitive form.
+
+  o AXCONV  Expands spaced axes in an NDF into the primitive form.
     (This is to enable certain ASTERIX files to be useable in
     KAPPA).
-   o FITSDIN  The disc-FITS reader is now available on UNIX
+
+  o FITSDIN  The disc-FITS reader is now available on UNIX
      platforms.
-   o FITSIN  The FITS reader is now available on UNIX platforms.
-   o MEM2D  The maximum-entropy deconvolution application is
+
+  o FITSIN  The FITS reader is now available on UNIX platforms.
+
+  o MEM2D  The maximum-entropy deconvolution application is
      available under SunOS.
-   o NOGLOBALS  Resets the KAPPA global parameters.
-   o OVCLEAR  Clears the current image-overlay device (without
+
+  o NOGLOBALS  Resets the KAPPA global parameters.
+
+  o OVCLEAR  Clears the current image-overlay device (without
      purging the graphics database)
- 3 Extended_applications
-   o CLEANER writes the bad-pixel flag.
-   o CONTOUR/DISPLAY/GREYPLOT/TURBOCONT each has a new FILL
+
+
+Extended_applications
+
+
+  o CLEANER writes the bad-pixel flag.
+
+  o CONTOUR/DISPLAY/GREYPLOT/TURBOCONT each has a new FILL
     parameter that permits the maximum-sized plots, ignoring any
     restriction on square pixels.  It is useful for displaying
     images with markedly different dimensions, such as spectra.
     FILL defaults to false.
-   o CONTOUR/TURBOCONT each has a new BORDER parameter that
+
+  o CONTOUR/TURBOCONT each has a new BORDER parameter that
     defaults to TRUE.  When it and parameter AXES are both false,
     no border is drawn around the contour plot.
-   o DISPLAY/GREYPLOT pass the linear scaling limits to global
+
+  o DISPLAY/GREYPLOT pass the linear scaling limits to global
     parameters that LUTVIEW now uses by default.  (Note that this
     is a temporary arrangement, since a means to pass non-linear
     scalings is planned.) 
-   o GAUSS permits arbitrarily oriented elliptical Gaussian
+
+  o GAUSS permits arbitrarily oriented elliptical Gaussian
     smoothing kernels, though the default still produces a
     circularly symmetric filter.
-   o INSPECT uses the existing palette for its annotations in
+
+  o INSPECT uses the existing palette for its annotations in
     cursor mode.
-   o MLINPLOT has a KEY parameter so that the key may be removed.
+
+  o MLINPLOT has a KEY parameter so that the key may be removed.
     It is defaulted to true, giving the previous behaviour.
-   o PALENTRY works for X-window overlays, so that it is now
+
+  o PALENTRY works for X-window overlays, so that it is now
     possible to alter the foreground colour of the overlay. 
-   o PICLIST indicates the current picture.
-   o SNAPSHOT parameter ODEVICE suggested default is the current
+
+  o PICLIST indicates the current picture.
+
+  o SNAPSHOT parameter ODEVICE suggested default is the current
     value of the parameter.  There is a new defaulted parameter
     PLANES that enables snapshots of just the base or the overlay
     for X-windows.  The default behaviour is to capture all planes,
     as happened prior to this version.
-   o SURFIT has more constraints to prevent problems with small
+
+  o SURFIT has more constraints to prevent problems with small
     arrays.  It obtains the value of ESTIMATOR after the number of
     values in a bin is known, its default becomes the median when
     the bins comprise less than 12 pixels.
- 2 V0.9
- The main features of this release are 39 new tasks, 6 new synonym
+
+
+V0.9
+
+
+The main features of this release are 39 new tasks, 6 new synonym
 commands for easier use, 15 applications converted to use NDFs, numerous
 enhancements to existing facilities, and updated documentation for UNIX
 and hypertext.
- 3 Global_changes
-   o There is no longer support for VMS.
+
+
+Global_changes
+
+
+  o There is no longer support for VMS.
   
   o The KAPPA monolith has been fragmented.  It now comprises three 
     monoliths: KAPVIEW for the graphics tasks; NDFPACK for the NDF
     and HDS-object manipulations; and KAPPA itself for the remainder
     (mostly image-processing tasks).  All are linked statically for
     efficiency and ease of export. 
-     
+
+    
   o In addition to describing new and revised commands in the
     Appendices, the documentation has been greatly expanded 
     featuring more examples and tutorials; new sections on C-shell
@@ -778,27 +1162,40 @@ and hypertext.
     are documented in paper form for the first time.  Several
     typographical and editing errors have been corrected in the
     documentation.
-   o There is hypertext documentation based upon this SUN.  It
+
+  o There is hypertext documentation based upon this SUN.  It
     includes links to other documents and coloured graphics.
-   o KAPHELP and its navigational aids work from within ICL.
-   o There are improved instructions for cursor interactions,
+
+  o KAPHELP and its navigational aids work from within ICL.
+
+  o There are improved instructions for cursor interactions,
     including using the mouse for X-window devices.
-   o There is more-efficient workspace management scheme available
+
+  o There is more-efficient workspace management scheme available
     in most tasks where work arrays are needed.
-   o COMP parameters that obtain array components, now support a
+
+  o COMP parameters that obtain array components, now support a
     value of "Error" to use the square root of the variance.
-   o The TITLE parameters largely default to null, so that an
+
+  o The TITLE parameters largely default to null, so that an
     output NDF inherits the title of the input NDF.  Previously, the
     TITLE defaulted to "KAPPA - <task>".
-   o An improved algorithm is used to test whether axes are linear
+
+  o An improved algorithm is used to test whether axes are linear
     or not.
-   o The bad-pixel flag is now updated throughout KAPPA.  Previously,
+
+  o The bad-pixel flag is now updated throughout KAPPA.  Previously,
     it had been commented out so that it would not cause problems
     with the IMAGE-format tasks.
-   o A dot in the foreground colour that could appear at 
+
+  o A dot in the foreground colour that could appear at 
     co-ordinate (0,0) in plots with axes has been removed.
- 3 New_applications
-   o ARDGEN  Creates a text file which describes selected regions of
+
+
+New_applications
+
+
+  o ARDGEN  Creates a text file which describes selected regions of
     a previously displayed image.  The file is in the ARD format.
     There are eleven shapes, and 5 logical operators for combining
     regions.  There are options, amongst others, for listing and
@@ -807,21 +1204,27 @@ and hypertext.
   o ARDMASK  Uses an ARD file, such as created by ARDGEN, to 
     define regions of an NDF to mask.  It therefore allows regions
     to be excluded from subsequent data processing.
-   o AXLABEL  Sets a new label component for an NDF axis.
-   o AXUNITS  Sets a new units component for an NDF axis.
-   o CALC  Evaluates a Fortran-like mathematical expression.  This
+
+  o AXLABEL  Sets a new label component for an NDF axis.
+
+  o AXUNITS  Sets a new units component for an NDF axis.
+
+  o CALC  Evaluates a Fortran-like mathematical expression.  This
     is particularly useful for non-integer arithmetic in C-shell
     scripts.  Parameters and sub-expressions are supported.
-   o CALPOL  Calculates various polarisation parameters from
+
+  o CALPOL  Calculates various polarisation parameters from
      four NDFs containing intensity arrays analysed at 0 degrees,
      45 degrees, 90 degrees, and 135 degrees from a reference
      direction.  The resultant parameters are stored in NDFs, of
      which there are eight possible.
-   o CONVOLVE  Convolves a 1- or 2-dimensional NDF using a function
+
+  o CONVOLVE  Convolves a 1- or 2-dimensional NDF using a function
      given by a second NDF.  The latter is normally a point-spread
      function, and need not have the same dimensions as the
      convolved NDF.
-   o ELPROF  Creates a radial or azimuthal profile of a
+
+  o ELPROF  Creates a radial or azimuthal profile of a
     2-dimensional NDF.  It bins the image into elliptical annuli
     or a fan-shaped region of adjacent sectors.  The mean values
     in each bin are stored in a 1-dimensional output NDF.  There
@@ -830,14 +1233,18 @@ and hypertext.
   
   o ERRCLIP  Removes pixels with errors larger than some limit
     from an NDF by flagging them with the bad value in a copy NDF.
-   o FILLBAD  Removes regions of bad values from a 2-dimensional
+
+  o FILLBAD  Removes regions of bad values from a 2-dimensional
     NDF using a smooth function which matches the surrounding data.
-   o FITSEXP  Moves ancillary data within an NDF from arbitrary
+
+  o FITSEXP  Moves ancillary data within an NDF from arbitrary
     extensions to the FITS extension.  It uses a keyword
     translation table held in a text file.
-   o FITSTEXT  Creates an NDF FITS extension from a text file.
+
+  o FITSTEXT  Creates an NDF FITS extension from a text file.
     There is limited validation of the headers.
-   o FITSURFACE   Fits a polynomial surface to 2-dimensional NDF.
+
+  o FITSURFACE   Fits a polynomial surface to 2-dimensional NDF.
     It does not bin the data and does not reject outliers to the fit.
     It stores the result within a POLYNOMIAL data structure called
     SURFACEFIT within the fitted NDF.
@@ -845,13 +1252,16 @@ and hypertext.
   o HISCOM  Adds commentary to the history records of an NDF.
     The text can be supplied through a parameter, or a text file.
     There is optional control of paragraph wrapping.
-   o HISLIST  Lists all the history records in an NDF.  The
+
+  o HISLIST  Lists all the history records in an NDF.  The
     output comprises the date, time, and application name, and
     optionally the history text.
-   o HISSET  Sets the history update mode for an NDF.  History
+
+  o HISSET  Sets the history update mode for an NDF.  History
     recording disabled, or set to record at three levels of
     verbosity.  Existing history records can also be deleted.
-   o LUCY  Performs a Lucy-Richardson deconvolution of a 1- or
+
+  o LUCY  Performs a Lucy-Richardson deconvolution of a 1- or
     2-dimensional NDF with a point-spread function.  It uses an
     iterative process to provide new estimates of the restored,
     higher-resolution array.  The closeness of the fit is
@@ -859,47 +1269,59 @@ and hypertext.
     terminates after a specified number of iterations or when a
     certain chi-squared has been reached.  The Synder correction
     may be applied using the data variance.
-   o MAKESURFACE  Creates a 2-dimensional NDF from the
+
+  o MAKESURFACE  Creates a 2-dimensional NDF from the
     coefficients of a polynomial surface stored in a SURFACEFIT
     extension (as written by FITSURFACE).  The size and extent of
     the output NDF may be defined by a template NDF.
-   o PARGET  Obtains the value or values of an application
+
+  o PARGET  Obtains the value or values of an application
     parameter.  This offers an easier way to pass parameter
     values between tasks in shell scripts.
-   o PASTE  Pastes a series of NDFs upon each other.  Bad values
+
+  o PASTE  Pastes a series of NDFs upon each other.  Bad values
     may be transparent or opaque.  The NDFs need not be congruent
     or even have the same number of dimensions.
-   o PICCUR  Uses a cursor to select the current picture and to
+
+  o PICCUR  Uses a cursor to select the current picture and to
     report the co-ordinates of points.  Some of the functions of
     CURSOR have been moved to this task.
-   o PICEMPTY  Finds the first empty FRAME picture in the graphics
+
+  o PICEMPTY  Finds the first empty FRAME picture in the graphics
     database.  This is most useful with PICGRID to fill in a 
     a grid of FRAME pictures without having to know or compute
     their labels.
-   o PICENTIRE  Finds the first unobscured and unobscuring FRAME
+
+  o PICENTIRE  Finds the first unobscured and unobscuring FRAME
     picture in the graphics database.  This tries to locate a
     FRAME picture such that additional plotting within it will
     not affect earlier plots.
-   o PICTRANS  Transforms co-ordinates between the current and
+
+  o PICTRANS  Transforms co-ordinates between the current and
     BASE pictures of the graphics database.
   
   o PICVIS  Finds the first unobscured FRAME picture in the
     graphics database.
-   o RIFT  Adds a constant to a sub-section of an NDF to correct
+
+  o RIFT  Adds a constant to a sub-section of an NDF to correct
     rift-valley defects.
-   o SETAXIS  Sets the values for an axis array component of an
+
+  o SETAXIS  Sets the values for an axis array component of an
     NDF.  There are several options which permit the deletion of
     the axis system, or an individual variance or width array;
     the replacement of one or more individual values; the
     assignment of the whole array using a Fortran-like
     mathematical expression, or from a text file, or set to
     pixel co-ordinates.
-   o SETEXT  Manipulates the contents of a specified NDF
+
+  o SETEXT  Manipulates the contents of a specified NDF
     extension.  There are six options including erasure,
     renaming, and assignment of extension components.
-   o SETNORM  Sets one or more of the axis-normalisation flags
+
+  o SETNORM  Sets one or more of the axis-normalisation flags
     in an NDF.
-   o SETSKY  Makes an IRAS astrometry extension for a
+
+  o SETSKY  Makes an IRAS astrometry extension for a
     2-dimensional NDF, thereby allowing sky co-ordinate
     information to be stored with an arbitrary image.  The
     co-ordinate system can be defined by suppling explicit
@@ -909,11 +1331,14 @@ and hypertext.
     in the IRAS90 package which perform various astrometric
     tasks such as plotting axes and overlay grids in sky
     co-ordinates.
-   o TRANINVERT  Inverts a transformation stored in a TRANSFORM
+
+  o TRANINVERT  Inverts a transformation stored in a TRANSFORM
     structure within an existing HDS file.
-   o TRANJOIN  Joins two transformation stored in the TRANSFORM
+
+  o TRANJOIN  Joins two transformation stored in the TRANSFORM
     format.
-   o TRANMAKE  Makes a transformation structure from supplied
+
+  o TRANMAKE  Makes a transformation structure from supplied
     forward and inverse mappings.  The structure can have
     classification qualifiers and a comment.  The mappings are
     defined using Fortran-like expressions, and may include
@@ -921,73 +1346,114 @@ and hypertext.
     2-dimensional transformations: polar about a supplied
     origin, and the six-term linear which encompasses shift
     of origin, rotation, magnification, and shear.
-   o TRANSFORMER  Applies a transformation stored in TRANSFORM
+
+  o TRANSFORMER  Applies a transformation stored in TRANSFORM
     structure to an NDF by resampling.  There is full control
     of the shape, origin, and co-ordinate limits of the
     transformed NDF.  The resampling use either linear
     interpolation or the nearest-neighbour method.
-   o TRANTRACE  Lists the contents of a TRANSFORM structure.
-   o VECPLOT  Plots a 2-dimensional vector map of an NDF.  The
+
+  o TRANTRACE  Lists the contents of a TRANSFORM structure.
+
+  o VECPLOT  Plots a 2-dimensional vector map of an NDF.  The
     vectors may be arrows or lines, and there is control of
     the frequency, justification, and scaling of the vectors.
     There is an optional key, and many parameters for
     customising the appearance of the plot.
-   o WIENER  Applies a Wiener filter to a 1- or 2-dimensional
+
+  o WIENER  Applies a Wiener filter to a 1- or 2-dimensional
     array.  It offers a much faster, but cruder, deconvolution
     method.  This task uses a `white' noise model or a power
     spectrum supplied in another NDF.  The noise power is
     adjustable.
- 3 New_synonyms
-   o PICBASE  Selects the BASE picture from the graphics database.
-   o PICDATA  Selects the last DATA picture from the graphics
+
+
+New_synonyms
+
+
+  o PICBASE  Selects the BASE picture from the graphics database.
+
+  o PICDATA  Selects the last DATA picture from the graphics
     database.
-   o PICFRAME  Selects the last FRAME picture from the graphics
+
+  o PICFRAME  Selects the last FRAME picture from the graphics
     database.
-   o PICGRID  Creates an array of FRAME pictures in the graphics
+
+  o PICGRID  Creates an array of FRAME pictures in the graphics
     database.
-   o PICLAST  Selects the last picture from the graphics database.
-   o PICXY  Creates a new FRAME picture defined by co-ordinate
+
+  o PICLAST  Selects the last picture from the graphics database.
+
+  o PICXY  Creates a new FRAME picture defined by co-ordinate
     bounds.
- 3 New_procedures
-   o FITSEDIT  Edits the FITS extension of an NDF.  You can use
+
+
+New_procedures
+
+
+  o FITSEDIT  Edits the FITS extension of an NDF.  You can use
     your favourite editor to modify the FITS headers in a NDF's
     FITS extension.  There is limited validation of the edited
     headers.
     
   o FITSHEAD  Lists the primary and extension headers of a
     list of FITS files or a range of FITS files on tape.
- 3 Withdrawn_and_renamed_applications
-   The following applications have been withdrawn at V0.9.
-   o COMPRESS  The NDF_ version of COMPAVE provides COMPRESS's
+
+
+Withdrawn_and_renamed_applications
+
+
+  The following applications have been withdrawn at V0.9.
+
+  o COMPRESS  The NDF_ version of COMPAVE provides COMPRESS's
     functionality.
-   o NUMBA  The NDF_ version of NUMB provides NUMBA's functionality.
-   o PICK2D  NDFCOPY or SETBOUND provides the functionality in n-d.
-   o STATS2D  Use STATS with NDF_ sectioning (see SUN/33.4
+
+  o NUMBA  The NDF_ version of NUMB provides NUMBA's functionality.
+
+  o PICK2D  NDFCOPY or SETBOUND provides the functionality in n-d.
+
+  o STATS2D  Use STATS with NDF_ sectioning (see SUN/33.4
     Section 16 or topic "NDF_sections") replaces the capability
     of STATS2D.
-   o THRESH0  The THRESH0 operation can easily be performed
+
+  o THRESH0  The THRESH0 operation can easily be performed
      by THRESH.
-   o TWEAK  Use LUTTWEAK.
-   To prevent command-name clashes with Figaro and C-shell built-in
+
+  o TWEAK  Use LUTTWEAK.
+
+  To prevent command-name clashes with Figaro and C-shell built-in
   functions three applications are renamed.  GAUSS has become
   GAUSMOOTH, CLEANER reverts to FFCLEAN, and SHIFT becomes SLIDE.
- 3 Deprecated_features
-   The following commands, which do not work for X-window devices,
+
+
+Deprecated_features
+
+
+  The following commands, which do not work for X-window devices,
   will be withdrawn at V0.10.
-   o BLINK  We hope to provide this facility for X-windows through
+
+  o BLINK  We hope to provide this facility for X-windows through
     a graphical-user-interface (GUI) image-processing tool.
-   o IDUNZOOM  Full control of zoom and unzooming should be a
+
+  o IDUNZOOM  Full control of zoom and unzooming should be a
     feature of the planned GUI tool.
-   o IDVISIBLE  This functionality might be part of the planned
+
+  o IDVISIBLE  This functionality might be part of the planned
     GUI.
- 3 Modified_applications
-   Here is a summary of the main modifications.  All those
+
+
+Modified_applications
+
+
+  Here is a summary of the main modifications.  All those
   converted to use the NDF_ library feature much-improved
   documentation.
-   o The accuracy of APERADD has been improved by using pixel
+
+  o The accuracy of APERADD has been improved by using pixel
     co-ordinates rather than indices.  There is a warning in the
     documentation concerning its limited algorithm and accuracy.
-   o BLOCK permits smoothing of 1-dimensional NDFs.  There is an
+
+  o BLOCK permits smoothing of 1-dimensional NDFs.  There is an
     ESTIMATOR parameter for forming the output values.  At
     present it may select the mean or median of the neighbourhood.
     There is no restriction on maximum box size.
@@ -995,42 +1461,55 @@ and hypertext.
   o CHPIX has been converted to use NDF_, and works in n
     dimensions.  Sections as well as individual pixels may be
     edited in any of the NDF array components.
-   o COLUMNAR and HIDE have a THRESH parameter to set lower and
+
+  o COLUMNAR and HIDE have a THRESH parameter to set lower and
     upper data values to appear in the plot.
-   o COMPADD, COMPAVE, and COMPICK now use NDF_ and operate on
+
+  o COMPADD, COMPAVE, and COMPICK now use NDF_ and operate on
     n-dimensional NDFs.  They can have different compression
     factors along each axis.  COMPADD and COMPAVE have the WLIM
     parameter for deciding whether each output pixel is good or
     bad, and permit weighting using the variance information of
     the input NDF.
-   o CONTOVER works with MATRIX_PRINTER class devices so can be
+
+  o CONTOVER works with MATRIX_PRINTER class devices so can be
     used to generate composite hardcopy plots.
-   o CURSOR no longer changes the current picture in the graphics
+
+  o CURSOR no longer changes the current picture in the graphics
     database.  The chosen points may be marked with crosses or
     joined by polygon lines in a nominated colour.  Points are
     also erasable.  The final set of co-ordinates and the number
     of points are written to output parameters XP, YP, and NUMBER
     respectively.
-   o FFCLEAN (formerly CLEANER) can filter 1-dimensional NDFs.
-   o A bug in FITSDIN and FITSIN, where BITPIX=8 FITS data would
+
+  o FFCLEAN (formerly CLEANER) can filter 1-dimensional NDFs.
+
+  o A bug in FITSDIN and FITSIN, where BITPIX=8 FITS data would
     generate a _BYTE type data array instead of the correct _UBYTE
     type, has been cured.   FITSIN no longer rewinds the tape
     before reading it.  The suggested default for parameter FMTCNV
     in both FITSIN and FITSDIN has been changed from FALSE to TRUE.
-   o FOURIER no longer uses NAG and calls the FFTPACK routines of
+
+  o FOURIER no longer uses NAG and calls the FFTPACK routines of
     the PDA library.  As a result it is slightly faster, and is now
     available on all supported systems.  It can now operate upon
     1-dimensional NDFs too.
-   o GAUSMOOTH (formerly GAUSS) will now smooth 1-dimensional NDFs.
-   o GLOBALS reports the current transformation structure.
-   o When reading from a text file, GLITCH interprets integer
+
+  o GAUSMOOTH (formerly GAUSS) will now smooth 1-dimensional NDFs.
+
+  o GLOBALS reports the current transformation structure.
+
+  o When reading from a text file, GLITCH interprets integer
     positions as pixel indices, and floating-point positions as
     pixel co-ordinates.
-   o HISTAT has been converted to NDF_.  It supports all NDF array
+
+  o HISTAT has been converted to NDF_.  It supports all NDF array
     components, and operates on NDFs of arbitrary dimensionality.
-   o HISTEQ has been converted to NDF_.  It operates on NDFs of
+
+  o HISTEQ has been converted to NDF_.  It operates on NDFs of
     arbitrary dimensionality.
-   o HISTOGRAM has been converted to NDF_.  It supports all NDF
+
+  o HISTOGRAM has been converted to NDF_.  It supports all NDF
     array components, and operates on NDFs of arbitrary
     dimensionality.  The histogram may be saved to an NDF (with
     the bad-pixel flag set to false); and/or plotted, with
@@ -1043,52 +1522,68 @@ and hypertext.
     controllable using the mouse buttons; pressing the mouse
     middle button allows sampling of the region or slice, or
     erasure of points in the XYcur mode.
-   o LUTABLE requires fewer required pens (8 if FULL=TRUE or 24
+
+  o LUTABLE requires fewer required pens (8 if FULL=TRUE or 24
     if FULL=FALSE).  Works directly on double-precision NDFs
     for the histogram equalisation.
-   o LUTHILITE, LUTROT, LUTTWEAK have a FULL parameter to allow
+
+  o LUTHILITE, LUTROT, LUTTWEAK have a FULL parameter to allow
     manipulation of the full colour table.
-   o LUTSAVE now creates NDF with data array having the simple
+
+  o LUTSAVE now creates NDF with data array having the simple
     variant, and the bad-pixel flag set to FALSE.
-   o LUTVIEW has new NN and LUT parameters, to read in a lookup
+
+  o LUTVIEW has new NN and LUT parameters, to read in a lookup
     table NDF into the colour table.
-   o MATHS supports tokens for pixel and data co-ordinates, and
+
+  o MATHS supports tokens for pixel and data co-ordinates, and
     so can generate test data of virtually arbitrary functions.
     When there are no input NDFs, the bounds of the output NDF
     is controlled either by parameters or a template NDF.  There
     are also new tokens for variance and sub-expressions.
-   o MEDIAN has been converted to NDF_.
-   o MEM2D no longer uses NAG and calls the FFTPACK routines of
+
+  o MEDIAN has been converted to NDF_.
+
+  o MEM2D no longer uses NAG and calls the FFTPACK routines of
     the PDA library.  As a result it is slightly faster, and is
     now available on all supported systems.  The limitation on the
     array size has been relaxed.
-   o NDFTRACE has 28 output parameters.  There is now also a QUIET
+
+  o NDFTRACE has 28 output parameters.  There is now also a QUIET
     flag to suppress output for procedures.
-   o NOGLOBALS erases the current transformation structure.
-   o NOMAGIC has been converted to NDF_.  There is a new SIGMA
+
+  o NOGLOBALS erases the current transformation structure.
+
+  o NOMAGIC has been converted to NDF_.  There is a new SIGMA
     parameter, to allow the replacement values to be replaced with
     random numbers of a Gaussian distribution about the replacement
     value.  All array components may be processed.
-   o NUMB has been converted to NDF_.  All array components may be
+
+  o NUMB has been converted to NDF_.  All array components may be
     processed.  There are new parameters ABS and ABOVE.  NUMB ABS
     is equivalent to the defunct NUMBA: it finds the number of
     pixels whose absolute value exceeds or is less than a threshold.
     The ABOVE parameter controls the sense of the comparison.
-   o PALENTRY and PALDEF permit the DEVICE to be of class
+
+  o PALENTRY and PALDEF permit the DEVICE to be of class
     MATRIX_PRINTER and have the reset attribute.  In other words
     you can call these for output to coloured PostScript.
-   o PICDEF has an ASPECT parameter for controlling the aspect
+
+  o PICDEF has an ASPECT parameter for controlling the aspect
     ratio of pictures defined by the TBC and LRC positioning modes.
     Parameter FRACTION can have different values for the two axes.
     The order of the positional parameters has changed: DEVICE and
     CURRENT were removed, XPIC and YPIC were added at positions 3
     and 4, and LBOUND and UBOUND at positions 5 and 6.  These
     modifications were needed to make PICGRID and PICXY work.
-   o PICIN writes the bounds of the picture in raster co-ordinates
+
+  o PICIN writes the bounds of the picture in raster co-ordinates
     to parameters RCX1, RCX2, RCY1, and RCY2.
-   o PICLABEL documentation explains what happens if the new label
+
+  o PICLABEL documentation explains what happens if the new label
     already exists in the database.
-   o PICLIST does not report the list of pictures when a value
+
+  o PICLIST does not report the list of pictures when a value
     for parameter PICNUM is supplied on the command line.  PICNUM
     may take the value "Last" to select the last picture in the
     graphics database.
@@ -1096,77 +1591,122 @@ and hypertext.
   o PIXDUPE has been converted to NDF_.  It operates on NDFs of
     arbitrary dimensions.  The expansion factors may be different
     along each axis.
-   o PSF allows greater control of the plotting style, including
+
+  o PSF allows greater control of the plotting style, including
     the option to plot along the major axis of an elliptical
     point-spread function, and scaling of the abscissa from pixels
     to physical units.  It now aborts correctly at a prompt for
     the POSCOLS parameter, and computes the correct dimensions for
     the output point-spread function NDF.
-   o ROTATE has been converted to NDF_.  Variance and quality
+
+  o ROTATE has been converted to NDF_.  Variance and quality
     information may be rotated.
-   o SEGMENT has been converted to NDF_.  The x-y positions may be
+
+  o SEGMENT has been converted to NDF_.  The x-y positions may be
     specified through parameters, from a text file, and by using
     the graphics cursor.  The chosen points may be marked with
     crosses, or connected with polygon lines in a nominated
     colour.  Variance and quality information may be copied.  The
     number of polygons can be constrained between limits.
-   o SETMAGIC has been converted to NDF_.  All array components
+
+  o SETMAGIC has been converted to NDF_.  All array components
     may be processed.
-   o SHADOW has been converted to NDF_.  The shifts have been
+
+  o SHADOW has been converted to NDF_.  The shifts have been
     combined into a single SHIFT parameter
-   o THRESH has been converted to the NDF_.  All array components
+
+  o THRESH has been converted to the NDF_.  All array components
     may be processed.
-   o TRANDAT has a new parameter LBOUND for setting the array lower
+
+  o TRANDAT has a new parameter LBOUND for setting the array lower
     bounds in automatic mode.  The created NDF uses the simple variant
     for the data array.
- 2 V0.10
- This release includes four new applications, three new synonyms, and
+
+
+V0.10
+
+
+This release includes four new applications, three new synonyms, and
 enhancements to existing applications.  Five applications have been
 withdrawn, two to enable KAPPA to be NAG-free.
- 3 Global_changes
-   o The NAG library is no longer used, and thus KAPPA is available
+
+
+Global_changes
+
+
+  o The NAG library is no longer used, and thus KAPPA is available
     via the Starlink Software Store.
-   o Standardized the implementation status in the reference
+
+  o Standardized the implementation status in the reference
     section, and corrected the HISTORY processing.
-   o Improved the documentation: clarified and reduced the usage of
+
+  o Improved the documentation: clarified and reduced the usage of
     the term `magic pixel'; added more warnings about metacharacters
     in C-shell usage; updated the related applications; extended the
     FITS airlock to include the new editing commands; added a new
     section on bad-pixel removal; and corrected various
     typographical errors, mostly in the reference section.
-   o The reference dataset in the AGI database may be a foreign file
+
+  o The reference dataset in the AGI database may be a foreign file
     and/or include an NDF section.
-   o Several tasks use a faster method of managing workspace.
- 3 New_applications
-   o DRAWSIG  Draws +/-n standard-deviation lines on a line plot.
+
+  o Several tasks use a faster method of managing workspace.
+
+
+New_applications
+
+
+  o DRAWSIG  Draws +/-n standard-deviation lines on a line plot.
     There is clipping, and the statistics may be reported too.  It
     is expected to be used in conjunction with LINPLOT or HISTOGRAM.
-   o FITSMOD  Edits an NDF FITS extension via a text file or
+
+  o FITSMOD  Edits an NDF FITS extension via a text file or
     parameters.  This allows you to manipulate ancillary data not in
     a special extension.
-   o KSTEST  Compares datasets against a reference dataset using the
+
+  o KSTEST  Compares datasets against a reference dataset using the
     Kolmogorov-Smirnov test, and combines statistically similar data
     into an output vector dataset.  You can supply a single dataset,
     which is divided for the comparisons.
-   o SUBSTITUTE  Replaces all occurrences of a given value in an NDF
+
+  o SUBSTITUTE  Replaces all occurrences of a given value in an NDF
     array with another value.
- 3 New_synonyms
-   o FITSEXIST  Inquires whether or not a keyword exists in an NDF's
+
+
+New_synonyms
+
+
+  o FITSEXIST  Inquires whether or not a keyword exists in an NDF's
     FITS extension.  It is intended for scripts.
-   o FITSVAL  Reports the value of a keyword in the FITS extension.
-   o FITSWRITE  Writes a new keyword and optional comment to the FITS
+
+  o FITSVAL  Reports the value of a keyword in the FITS extension.
+
+  o FITSWRITE  Writes a new keyword and optional comment to the FITS
     extension.
- 3 Withdrawn_applications
-   o BLINK  Does not work with X-windows.  Use GAIA.
-   o COLUMNAR  No suitable public-domain equivalent plotting could be
+
+
+Withdrawn_applications
+
+
+  o BLINK  Does not work with X-windows.  Use GAIA.
+
+  o COLUMNAR  No suitable public-domain equivalent plotting could be
     found to replace the NAG graphics.  This command may reappear if
     an adequate replacement subroutine can be located.
-   o HIDE  See COLUMNAR.
-   o IDUNZOOM   Does not work with X-windows.  Use GAIA.
-   o IDVISIBLE  Does not work with X-windows.
- 3 Modified_applications
-   o Examples added to CHPIX documentation.
-   o CONTOVER, CONTOUR, and TURBOCONT have had several improvements.
+
+  o HIDE  See COLUMNAR.
+
+  o IDUNZOOM   Does not work with X-windows.  Use GAIA.
+
+  o IDVISIBLE  Does not work with X-windows.
+
+
+Modified_applications
+
+
+  o Examples added to CHPIX documentation.
+
+  o CONTOVER, CONTOUR, and TURBOCONT have had several improvements.
     There are two new methods for selecting the contour heights
     using percentiles (MODE="Equalised" and "Percentiles"}).  There
     is a CONCOL parameter for selecting the colour of the contours.
@@ -1176,22 +1716,29 @@ withdrawn, two to enable KAPPA to be NAG-free.
     thickness has been increased to 10.  The tessellation size has
     been increased to 512 pixels for CONTOVER and TURBOCONT.  There
     are new examples.
-   o The smoothed contouring and annotation facilities in CONTOUR
+
+  o The smoothed contouring and annotation facilities in CONTOUR
     have been withdrawn, possibly temporarily, as they called NAG
     graphics routines.  Thus parameters ANNOTA, LABELFREQ, MAXRES,
     NOISY, RESOLUTION, and SMOOTHING are no longer available.
-   o CONTOUR has a new parameter---STATS---which, if set to TRUE, will
+
+  o CONTOUR has a new parameter---STATS---which, if set to TRUE, will
     compute the number of closed contours and the total contour
     length at each height.  The statistics are written to new output
     parameters called NUMBER and LENGTH respectively.
-   o FITSIN has a REWIND parameter to enable tape rewinding between
+
+  o FITSIN has a REWIND parameter to enable tape rewinding between
     invocations.  FITSDIN and FITSIN are available from Linux.
-   o FITSURFACE computes and records the variances of the polynomial
+
+  o FITSURFACE computes and records the variances of the polynomial
     coefficients.
-   o FITSTEXT has improved validation of the FITS headers.
-   o LINPLOT has had a big overhaul to make it easier to use,
+
+  o FITSTEXT has improved validation of the FITS headers.
+
+  o LINPLOT has had a big overhaul to make it easier to use,
     especially for composite plots, and to offer more facilities.
-     There is an option through parameter ERRBAR to plot error bars
+
+    There is an option through parameter ERRBAR to plot error bars
     with a choice of styles (SHAPE) and including co-ordinate errors.
     To avoid clutter the frequency of errors bars is controllable
     using parameter FREQ.  There is a choice of graph styles via
@@ -1201,7 +1748,8 @@ withdrawn, two to enable KAPPA to be NAG-free.
     error bars, graph lines, and symbols respectively.  Thick lines
     now work for all parts of the plot, and the maximum thickness is
     10.  There are new examples.
-     LINPLOT was redesigned to allow easy production of composite
+
+    LINPLOT was redesigned to allow easy production of composite
     plots, controlled using the CLEAR parameter.  When CLEAR is
     FALSE the axis limits are inquired from the graphics database.
     The abscissa limits are now adjustable, so there is a new
@@ -1210,188 +1758,105 @@ withdrawn, two to enable KAPPA to be NAG-free.
     and ORDUPP.   The abscissa limits may be adjusted through
     parameter ABSLIM.  Both ABSLIM and ORDLIM have sensible
     (dynamic) defaults.
-     Using the new facilities it is possible to create colour hardcopy
+
+    Using the new facilities it is possible to create colour hardcopy
     graphs combining graphs from multiple datasets, with each plotted
     in a different colour and/or linestyle.
-   o MAKESURFACE can create a variance array when the new parameter
+
+  o MAKESURFACE can create a variance array when the new parameter
     VARIANCE is set to TRUE.
-   o In MLINPLOT, the LNINDX parameter prompts with the current value
+
+  o In MLINPLOT, the LNINDX parameter prompts with the current value
     as the suggested default.
-   o The SETAXIS documentation has an improved description of
+
+  o The SETAXIS documentation has an improved description of
     parameter EXPRS and additional examples.
-   o SURFIT has been rewritten to use the NDF library and thus can take
+
+  o SURFIT has been rewritten to use the NDF library and thus can take
     advantage of NDF facilities including sections and history, and
     can accept foreign-format files.
-     Several of the parameters have been renamed to their standard
+
+    Several of the parameters have been renamed to their standard
     values (INPIC to IN, OUTPIC to OUT, OTITLE to TITLE, WLIMIT to
     WLIM), or combined to make array parameters (IX and IY have become
     BINDIM, NXPAR and NYPAR have become ORDER or KNOTS depending on
     wheher a polyomial or spline fit is selected).  If you use SURFIT
     in scripts, you should check the usage carefully.
-   o The TRANDAT description has been improved and there is an
+
+  o The TRANDAT description has been improved and there is an
     additional example.
-  o  Relaxed the limits of parameter UCOORD in TRANSFORMER.
- 2 V0.11
- This release includes the package-specific files required to run
+
+ o  Relaxed the limits of parameter UCOORD in TRANSFORMER.
+
+
+V0.11
+
+
+This release includes the package-specific files required to run
 KAPPA applications from IRAF CL.  For general advice on running
 Starlink applications from IRAF, see SUN/217.
- 2 V0.12
+
+
+V0.12
+
 V0.12 introduces limited support for the NDF WCS component which allows
 descriptions of world coordinate systems to be stored within NDF data
 structures. Currently, this support only includes:
-  o  the creation of WCS components by FITSIN and FITSDIN, on the basis of
+
+ o  the creation of WCS components by FITSIN and FITSDIN, on the basis of
     appropriate keywords supplied in the FITS files.
-  o  the propagation of WCS components when new NDFs are created based 
+
+ o  the propagation of WCS components when new NDFs are created based 
     on existing NDFs. 
- The applications affected by these, and any other, changes are:
-   o  COMPAVE, COMPADD and COMPICK now correctly process NDFs with more
+
+The applications affected by these, and any other, changes are:
+
+  o  COMPAVE, COMPADD and COMPICK now correctly process NDFs with more
      than 2 dimensions.
-   o  DISPLAY changed to avoid a spurious error previously reported if 
+
+  o  DISPLAY changed to avoid a spurious error previously reported if 
      double precision data is displayed which requires compression to fit 
      in the display.
-   o  DIV now stores standard Starlink bad values in the output NDF for any
+
+  o  DIV now stores standard Starlink bad values in the output NDF for any
      pixel where the denominator NDF has a zero value. This used to be
      the case only on Solaris. Correct behaviour on Linux and Digital UNIX
      has required the removal of the facility for trapping floating
      overflow conditions which used to be available on Solaris.
-   o  DRAWSIG changed to avoid spurious clearing of X displays when using 
+
+  o  DRAWSIG changed to avoid spurious clearing of X displays when using 
      two or more GWM windows under ICL.
-   o  FFCLEAN bug fixed which caused parameter THRESH to be ignored when 
+
+  o  FFCLEAN bug fixed which caused parameter THRESH to be ignored when 
      using a _DOUBLE data array.
-   o  FILLBAD now ignores any input VARIANCE component if all the variances 
+
+  o  FILLBAD now ignores any input VARIANCE component if all the variances 
      are bad or zero. Also added protection against division by zero which 
      occurred if the variance array contained any isolated zeros.
-   o  FITSIN and FITSDIN now create an NDF WCS component (if possible) 
+
+  o  FITSIN and FITSDIN now create an NDF WCS component (if possible) 
      storing a description of any world coordinate systems defined in 
      the FITS headers.
-   o  FITSEDIT now creates a new FITS extension if the specified NDF does 
+
+  o  FITSEDIT now creates a new FITS extension if the specified NDF does 
      not already contain a FITS extension.
-   o  LINPLOT changed to avoid spurious clearing of X displays when using 
+
+  o  LINPLOT changed to avoid spurious clearing of X displays when using 
      two or more GWM windows under ICL.
-   o  PARGET bug fixed which caused the application to terminate if the 
+
+  o  PARGET bug fixed which caused the application to terminate if the 
      specified parameter is an array with only a single element.
-   o  TRANMAKE no longer reports a compilation error if a null value is given 
+
+  o  TRANMAKE no longer reports a compilation error if a null value is given 
      for parameter CLASS.
- The following applications now propagate the WCS component of an NDF
+
+The following applications now propagate the WCS component of an NDF
 structure: 
-    ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
+
+   ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT COMPADD COMPAVE COMPICK
    CONVOLVE CSUB DISPLAY DIV ERRCLIP FFCLEAN FILLBAD FLIP GAUSMOOTH GREYPLOT 
    HISTEQ INSPECT LUCY MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY 
    NOMAGIC NORMALIZE PASTE PIXDUPE RIFT ROTATE SEGMENT SETMAGIC SHADOW SUB 
    SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
- 1 CHPIX
-Replaces the values of selected pixels in an NDF.
- Usage:
-    chpix in out section newval [comp]
- Description:
-    This application replaces selected elements of an NDF array
-   component with specified values.  The task loops until there are
-   no more elements to change, indicated by a null value in response
-   to a prompt.  For non-interactive processing, supply the value of
-   parameter NEWVAL on the command line.
 
-Parameters
-
-For information on individual parameters, select from the list below:
-
-COMP
-
-COMP = LITERAL (Read)
-   The name of the NDF array component to be modified.  The
-   options are: "Data", "Error", "Quality" or "Variance".
-   "Error" is the alternative to "Variance" and causes the
-   square of the supplied replacement value to be stored in the
-   output VARIANCE array.
-
-IN
-
-IN = NDF (Read)
-   NDF structure containing the array component to be modified.
-
-NEWVAL
-
-NEWVAL = LITERAL (Read)
-   Value to substitute in the output array element or elements.
-   The range of allowed values depends on the data type of the
-   array being modified.  NEWVAL="Bad" instructs that the bad
-   value appropriate for the array data type be substituted.
-   Placing NEWVAL on the command line permits only one section
-   to be replaced.  If there are multiple replacements, a null
-   value (!) terminates the loop.
-
-OUT
-
-OUT = NDF (Write)
-   Output NDF structure containing the modified version of
-   the array component.
-
-SECTION
-
-SECTION = LITERAL (Read)
-   The elements to change.  This is defined as an NDF section, so
-   that ranges can be defined along any axis, and be given as
-   pixel indices or axis (data) co-ordinates.  So for example
-   "3,4,5" would select the pixel at (3,4,5); "3:5," would
-   replace all elements in columns 3 to 5; ",4" replaces line 4.
-   See "NDF sections" in SUN/95, or the online documentation for
-   details.  A null value (!) terminates the loop during multiple
-   replacements.
-
-TITLE
-
-TITLE = LITERAL (Read)
-   Title for the output NDF structure.  A null value (!)
-   propagates the title from the input NDF to the output NDF. [!]
-
-Examples
-
-chpix rawspec spectrum 55 100
-   Assigns the value 100 to the pixel at index 55 within the
-   one-dimensional NDF called rawspec, creating the output NDF
-   called spectrum.
- chpix rawspec spectrum 10:19 0 error
-   Assigns the value 0 to the error values at indices 10 to 19
-   within the one-dimensional NDF called rawspec, creating the
-   output NDF called spectrum.  The rawspec dataset must have a
-   variance compoenent.
- chpix in=rawimage out=galaxy section="~20,100:109" newval=bad
-   Assigns the bad value to the pixels in the section ~20,100:109
-   within the two-dimensional NDF called rawimage, creating the
-   output NDF called galaxy.  This section is the central
-   20 pixels along the first axis, and pixels 110 to 199 along the
-   second.
- chpix in=zzcha out=zzcha_c section="45,21," newval=-1
-   Assigns value -1 to the pixels at index (45,21) within all
-   planes of the three-dimensional NDF called zzcha, creating
-   the output NDF called zzcha_c.
-
-Related_Applications
-
-   KAPPA: ARDMASK, FILLBAD, GLITCH, NOMAGIC, SEGMENT, SETMAGIC
-   SUBSTITUTE, ZAPLIN; Figaro: CSET, ICSET, NCSET, TIPPEX.
-
-Authors
-
-MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
-
-History
-
- 1995 April 25 (MJC):
-    Original NDF version.
-  27-FEB-1998 (DSB):
-    Use NUM_ functions to convert lower precision integer values to
-    _INTEGER when calling PAR_MIX0I.
-  5-JUN-1998 (DSB):
-    Added propagation of the WCS component.
-  {enter_any_changes_here}
-
-Implementation_Status
-
-   -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
-   TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
-   propagates all extensions.  Bad pixels and all non-complex
-   numeric data types can be handled.
-    -  The HISTORY component, if present, is simply propagated without
-   change.
 .endhelp

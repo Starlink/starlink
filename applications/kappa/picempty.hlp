@@ -1,10 +1,14 @@
 .help picempty Starlink kappa
 .nf
 Finds the first empty FRAME picture in the graphics database.
- Usage:
-    picempty [device]
- Description:
-    This application selects the first, i.e. oldest, empty FRAME
+
+Usage:
+
+   picempty [device]
+
+Description:
+
+   This application selects the first, i.e. oldest, empty FRAME
    picture in the graphics database for a graphics device.  Empty
    means that there is no additional picture lying completely with
    its bounds.  This implies that the FRAME is clear for plotting.
@@ -25,7 +29,8 @@ Examples
 picempty
    This selects the first empty FRAME picture for the current
    graphics device.
- picempty xwindows
+
+picempty xwindows
    This selects the first empty FRAME picture for the xwindows
    graphics device.
 
@@ -52,4 +57,5 @@ History
 
  1995 October 29 (MJC):
     Original version.
+
 .endhelp

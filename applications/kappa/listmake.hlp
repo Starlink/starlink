@@ -1,31 +1,39 @@
 .help listmake Starlink kappa
 .nf
 Creates a text file holding a positions list.
- Usage:
-    listmake outlist [ndf] [mode] [file]
- Description:
-    This application creates a text file containing a list of positions
+
+Usage:
+
+   listmake outlist [ndf] [mode] [file]
+
+Description:
+
+   This application creates a text file containing a list of positions
    supplied by the user. Positions list are primarily intended for
    communicating positions between applications. In addition to the
    positions themselves, they contain information describing the
    co-ordinate Frames in which the positions are defined. They also
    contain integer position identifiers which allow positions to be
    distinguished.
-    If an NDF is specified using parameter NDF, then the positions should
+
+   If an NDF is specified using parameter NDF, then the positions should
    be given in the current co-ordinate Frame of the NDF. Information
    describing the co-ordinate Frames available within the NDF will be
    copied to the output positions list. Subsequent applications can
    use this information in order to align the positions with other
    data sets.
-    If no NDF is specified, then the user must indicate the co-ordinate
+
+   If no NDF is specified, then the user must indicate the co-ordinate
    Frame in which the positions will be supplied using parameter FRAME.
    A description of this Frame will be written to the output positions
    list for use by subsequent applications.
-    The positions themselves may be supplied within another text file,
+
+   The positions themselves may be supplied within another text file,
    or may be given in response to repeated prompts for a parameter.
    Alternatively, the pixel centres in the NDF supplied for parameter
    NDF can be used (see parameter MODE).
-    The output can be initialised by copying positions from an existing
+
+   The output can be initialised by copying positions from an existing
    positions list. Any positions supplied directly by the user are then
    appended to the end of this initial list (see parameter INLIST).
 
@@ -97,13 +105,17 @@ MODE
 MODE = LITERAL (Read)
    The mode by which the positions are to be obtained. The options are
    as follows:
-    - "Interface" -- The positions are obtained using parameter
+
+   - "Interface" -- The positions are obtained using parameter
    POSITION.
-    - "File" -- The positions are to be read from a text file
+
+   - "File" -- The positions are to be read from a text file
    specified using parameter FILE.
-    - "Pixel" -- The positions used are the pixel centres in the data
+
+   - "Pixel" -- The positions used are the pixel centres in the data
    file specified by parameter NDF.
-    [Interface]
+
+   [Interface]
 
 NDF
 
@@ -150,7 +162,8 @@ listmake newlist frame=pixel dim=2
    pixel co-ordinate Frame. The positions are supplied as a set of
    space-separated pixel co-ordinates in response to repeated prompts
    for the parameter POSITION.
- listmake stars.dat frame=equat(B1950) epoch=1962.3
+
+listmake stars.dat frame=equat(B1950) epoch=1962.3
    This creates a text file called stars.dat containing a list of
    positions, together with a description of a single FK4 equatorial
    RA/DEC co-ordinate Frame (referenced to the B1950 equinox). The
@@ -160,7 +173,8 @@ listmake newlist frame=pixel dim=2
    introducing fictitious proper motions. The positions are supplied
    as hours and degrees values in response to repeated prompts for
    parameter POSITIONS.
- listmake outlist ndf=allsky mode=file file=stars
+
+listmake outlist ndf=allsky mode=file file=stars
    This creates a text file called outlist containing a list of
    positions, together with descriptions of all the co-ordinate
    Frames contained in the NDF allsky. The positions are supplied
@@ -173,7 +187,8 @@ listmake newlist frame=pixel dim=2
    which enable subsequent applications to align the positions with
    other data, and it also contains integer position identifiers which
    allow the positions to be distinguished.
- listmake out inlist=old.dat frame=gal
+
+listmake out inlist=old.dat frame=gal
    This creates a text file called out containing a list of
    positions, together with a description of a single galactic
    co-ordinate Frame. The positions contained in the existing
@@ -182,13 +197,15 @@ listmake newlist frame=pixel dim=2
    galactic co-ordinate positions are then obtained by repeated
    prompting for the parameter POSITION. These positions are
    appended to the positions obtained from file old.dat.
- listmake out inlist=old.dat ndf=cobe
+
+listmake out inlist=old.dat ndf=cobe
    As above but the output positions list contains copies of all the
    Frames in the NDF cobe. The positions in old.dat are mapped into
    the current co-ordinate Frame of the NDF (if possible) before
    being stored in the output positions list. The new positions must
    also be supplied in the same Frame (using parameter POSITION).
- listmake profpos ndf=prof1 mode=pixel
+
+listmake profpos ndf=prof1 mode=pixel
    This creates a positions list called profpos containing the
    positions of all the pixel centres in the 1-dimensional NDF
    called prof. This could for instance be used as input to
@@ -200,13 +217,15 @@ Notes
 -  There is a limit of 200 on the number of positions which can be
 given using parameter POSITION. There is no limit on the number of
 positions which can be given using parameter FILE.
- -  Position identifiers are assigned to the supplied positions in
+
+-  Position identifiers are assigned to the supplied positions in
 the order in which they are supplied. If no input positions list is
 given using parameter INLIST, then the first supplied position will
 be assigned the identifier "1". If an input positions list is
 given, then the first supplied position is assigned an identifier
 one greater than the largest identifier in the input positions list.
- -  Each line in the created file will either be a comment line
+
+-  Each line in the created file will either be a comment line
 commencing with a "#" character, or will contain a single integer
 position identifier, followed by a set of space separated double
 precision floating point axis values. A block of comments will be
@@ -232,4 +251,5 @@ History
 
  16-SEP-1998 (DSB):
     Original version.
+
 .endhelp

@@ -1,10 +1,14 @@
 .help sub Starlink kappa
 .nf
 Subtracts one NDF data structure from another.
- Usage:
-    sub in1 in2 out
- Description:
-    The routine subtracts one NDF data structure from another
+
+Usage:
+
+   sub in1 in2 out
+
+Description:
+
+   The routine subtracts one NDF data structure from another
    pixel-by-pixel to produce a new NDF.
 
 Parameters
@@ -38,7 +42,8 @@ Examples
 sub a b c
    This subtracts the NDF called b from the NDF called a, to make
    the NDF called c.  NDF c inherits its title from a.
- sub out=c in1=a in2=b title="Background subtracted"
+
+sub out=c in1=a in2=b title="Background subtracted"
    This subtracts the NDF called b from the NDF called a, to make
    the NDF called c.  NDF c has the title "Background subtracted".
 
@@ -55,19 +60,24 @@ Related_Applications
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  6-APR-1990 (RFWS):
     Original version.
-  1992 January 15 (MJC):
+
+ 1992 January 15 (MJC):
     Added Usage and Examples items.
-  1995 September 12 (MJC):
+
+ 1995 September 12 (MJC):
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -75,9 +85,12 @@ Implementation_Status
    -  This routine correctly processes the AXIS, DATA, QUALITY,
    LABEL, TITLE, HISTORY, WCS and VARIANCE components of an NDF data
    structure and propagates all extensions.
-    -  Units processing is not supported at present and therefore the
+
+   -  Units processing is not supported at present and therefore the
    UNITS component is not propagated.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  All non-complex numeric data types can be handled.
+
+   -  All non-complex numeric data types can be handled.
 .endhelp

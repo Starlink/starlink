@@ -1,10 +1,14 @@
 .help ardmask Starlink kappa
 .nf
 Uses an ARD file to set some pixels of an NDF to be bad.
- Usage:
-    ardmask in ardfile out
- Description:
-    This task allows regions of a NDF's data array to be masked, so
+
+Usage:
+
+   ardmask in ardfile out
+
+Description:
+
+   This task allows regions of a NDF's data array to be masked, so
    that they can be excluded from subsequent data processing.  ARD
    (ASCII Region Definition) descriptions stored in a text
    file define which pixels of the data array are masked.  An
@@ -61,12 +65,14 @@ ardmask a1060 galaxies.ard a1060_sky title="A1060 galaxies masked"
    a1060_sky has a title="A1060 galaxies masked".  This might be
    to flag the pixels where bright galaxies are located to
    exclude them from sky-background fitting.
- ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a
+
+ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a
    This example uses as the source image the NDF called ic3374
    and sets the pixels specified by the ARD description contained
    in ardfile.txt to the bad value.  The resultant image is
    output to the NDF called ic3374a.  The title is unchanged.
- ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
+
+ardmask in=ic3374 ardfil=ardfile.txt out=ic3374a cosys=data
    As the previous example except that the ARD file is
    written using data co-ordinates.
 
@@ -86,14 +92,17 @@ Related_Applications
 Authors
 
 GJP: Grant Privett (STARLINK)
- MJC: Malcolm J. Currie (STARLINK)
- DSB: David S. Berry (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+
+DSB: David S. Berry (STARLINK)
 
 History
 
  08-Jun-1994 (GJP):
     Original version.
-  1995 June 29 (MJC):
+
+ 1995 June 29 (MJC):
     Converted for KAPPA use: completed and re-ordered the
     prologue, lowercase usage and examples, various stylistic
     changes, standard comment indentation, removed unnecessary
@@ -103,9 +112,11 @@ History
     work on n-dimensional NDFs, validated the input text file and
     removed the need for the leading caret, and made the output
     TITLE a parameter.
-  1996 July 31 (MJC):
+
+ 1996 July 31 (MJC):
     Made ARDFILE have type FILENAME for IRAF usage.
-  5-JUN-1998 (DSB):
+
+ 5-JUN-1998 (DSB):
     Added propagation of the WCS component.
 
 Implementation_Status
@@ -113,8 +124,11 @@ Implementation_Status
    -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, UNITS, HISTORY, and VARIANCE components of an NDF
    data structure and propagates all extensions.
-    -  Processing of bad pixels and automatic quality masking are
+
+   -  Processing of bad pixels and automatic quality masking are
    supported.
-    -  Bad pixels and automatic quality masking are supported.
-    -  All non-complex numeric data types can be handled.
+
+   -  Bad pixels and automatic quality masking are supported.
+
+   -  All non-complex numeric data types can be handled.
 .endhelp
