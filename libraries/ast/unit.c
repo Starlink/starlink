@@ -214,6 +214,7 @@ static int DimAnal( UnitNode *, double[NQUANT], double * );
 static int Ustrncmp( const char *, const char *, size_t );
 static int SplitUnit( const char *, int, const char *, int, Multiplier **, int * );
 static UnitNode *ModifyPrefix( UnitNode * );
+static int ConStart( const char *, double *, int *);
 
 /*  Debug functions... 
 static const char *DisplayTree( UnitNode *, int );
@@ -1047,6 +1048,80 @@ static UnitNode *ConcatTree( UnitNode *tree1, UnitNode *tree2 ) {
    if( !astOK ) result = FreeTree( result );
 
 /* Return the answer. */
+   return result;
+}
+
+static int ConStart( const char *text, double *val, int *nc ) {
+/*
+*  Name:
+*     ConStart
+
+*  Purpose:
+*     See if the supplied string starts with a literal numeric constant.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "unit.h"
+*     int ConStart( const char *text, double *val, int *nc ) 
+
+*  Class Membership:
+*     Unit member function.
+
+*  Description:
+*     This function checks if the supplied string starts with a literal
+*     numeric constant and returns it if it does. It is a wrap-up for scanf
+*     since scanf has non-standard behaviour on some platforms (e.g. Cygwin 
+*     scanf interprets the character "n" as a floating point number!).
+
+*  Parameters:
+*     text
+*        The text to check.
+*     val
+*        Address of a double to receive any numerical constant read
+*        from the start of the string. Supplied value is unchanged on
+*        exit if the string does not start with a numerical constant.
+*     nc
+*        Address of an int to receive the number of characters used to
+*        create the value returned in "val". Zero is returned if the
+*        string does not start with a numerical constant.
+
+*  Returned Value:
+*     Non-zero if the text started with a numerical constant.
+
+*/
+
+/* Local Variables: */
+   int result;
+   double val0;
+   const char *c;
+
+/* initialise */      
+   *nc = 0;
+
+/* Return zero if no text was supplied */
+   if( !text ) return 0;
+
+/* Save the supplied value so it can be reinstated later if necessary. */
+   val0 = *val;
+
+/* Use sscanf to see if the string begin with a numerical constant */
+   result = astSscanf( text, "%lf%n", val, nc );
+
+/* If so, check that the first non-blank character in the string 
+   is not "N" (interpreted by Cygwin as numerical zero!). */
+   if( result ) {
+      c = text;
+      while( isspace( *c ) ) c++;   
+      if( *c == 'n' || *c == 'N' ) {
+         result = 0;
+         *nc = 0;
+         *val = val0;       
+      }
+   }
+
+/* Return the result. */
    return result;
 }
 
@@ -3369,7 +3444,7 @@ static UnitNode *MakeLabelTree( const char *lab, int nc ){
          result = MakeLabelTree( exp + 1, nc - 2 );
 
 /* Does the string begin with a numerical constant? */
-      } else if( n = 0, astSscanf( exp, "%lf%n", &con, &n ) == 1 ) {
+      } else if( ConStart( exp, &con, &n ) == 1 ) {
 
 /* If the entire string was a numerical constant, represent it by a LDCON
    node. */
@@ -3725,7 +3800,7 @@ static UnitNode *MakeTree( const char *exp, int nc ){
             result = MakeTree( exp + 1, nc - 2 );
 
 /* Does the string begin with a numerical constant? */
-         } else if( n = 0, astSscanf( exp, "%lf%n", &con, &n ) == 1 ) {
+         } else if( ConStart( exp, &con, &n ) == 1 ) {
 
 /* If the entire string was a numerical constant, represent it by a LDCON
    node. */
