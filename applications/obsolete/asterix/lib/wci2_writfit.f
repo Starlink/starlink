@@ -86,7 +86,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
       INCLUDE 'ADI_PAR'					! ADI constants
-      INCLUDE 'DAT_PAR'					! HDS constants
       INCLUDE 'WCI_PAR'					! WCI constants
 
 *  Arguments Given:
@@ -100,8 +99,8 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			SLA_EPJ
-        DOUBLE PRECISION	SLA_EPJ
+      EXTERNAL			SLA_EPJ2D
+        DOUBLE PRECISION	SLA_EPJ2D
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	HLOC			! Object header
@@ -154,8 +153,24 @@
 
 *  Get coordinate system details
       IF ( SYSID .NE. ADI__NULLID ) THEN
+
+*    Get system name
         CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
-        CALL ADI2_PKEY0C( ID, ' ', 'RADECSYS', SYS, '*', STATUS )
+        CALL ADI2_PKEY0C( ID, ' ', 'RADECSYS', SYS,
+     :                    'World coordinate system', STATUS )
+
+*    Get equinox
+        CALL ADI_CGET0R( SYSID, 'EQUINOX', EQNX, STATUS )
+        CALL ADI2_PKEY0R( ID, ' ', 'EQUINOX', EQNX,
+     :                    'Epoch of mean equator & equinox', STATUS )
+
+*    Epoch. Don't write if default was supplied
+        CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
+        IF ( EPOCH .NE. WCI__FLAG ) THEN
+          CALL ADI2_PKEY0D( ID, ' ', 'MJD-OBS', SLA_EPJ2D( EPOCH ),
+     :                      'MJD of observation', STATUS )
+        END IF
+
       END IF
 
 *  Report any errors
