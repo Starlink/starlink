@@ -99,6 +99,9 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL                  HSI0_BLK                ! Ensures inclusion
+
 *  Local Variables:
       INTEGER			IARG(2)			! Method inputs
       INTEGER			OARG			! Method output
