@@ -108,7 +108,8 @@ vec_wtouw.f vec_wtow.f
 # we can compile it unconditionally.
 PLATFORM_C = num_han.c num1_cvt.c
 
-
+PLATFORM_SOURCE = num_han.c num_han.cdefault num_han.c_sun num_han.c_dec_osf \
+num_han.cmips num_han.c_sun_solaris
 
 #  List of non platform-specific include files.
 NORMAL_INCLUDES = \
@@ -178,3 +179,7 @@ check_PROGRAMS = $(TESTS)
 
 prm_test_SOURCES = prm_test.f
 prm_test_LDADD = libprm.la libprm_a.la
+
+# Files for distribution that are not picked up elsewhere.
+EXTRA_DIST = $(PLATFORM_SOURCE) $(PLATFORM_INCLUDES:=.fpp) $(PRIVATE_INCLUDES)
+
