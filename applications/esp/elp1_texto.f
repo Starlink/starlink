@@ -162,7 +162,7 @@
          
          OPENF = .FALSE.
          EXCLAIM = .FALSE.
-         CALL FIO_ASSOC('OUT','WRITE','LIST',80,FIOD,STATUS)
+         CALL FIO_ASSOC('OUT','WRITE','LIST',LINSIZ,FIOD,STATUS)
          IF (STATUS .EQ. PAR__NULL) THEN
             EXCLAIM = .TRUE.
             CALL ERR_ANNUL (STATUS)

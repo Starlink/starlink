@@ -156,8 +156,9 @@ interface ELLPRO
     type '_CHAR'
     access 'read'
     prompt 'Name of catalogue file'
-    ppath 'current'
+    ppath 'current,default'
     vpath 'prompt'
+    default elpcat.txt
   endparameter
 
   parameter AUTOL       # Conduct search for a better origin?

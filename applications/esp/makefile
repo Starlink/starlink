@@ -425,7 +425,7 @@ PKG_LINK = ESP
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 0.10-6
+PKG_VERS = 0.10-7
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -740,6 +740,7 @@ HELP_FILES = $(HELP_SOURCES:.hlp=.shl)
 		>>tmp.hlp
 	$(STAR_BIN)/hlib tmp.hlp
 	mv tmp.shl $(<:.hlp=.shl)
+	rm -f tmp.hlp
 
 #  Rules for compiling the interface files.
 

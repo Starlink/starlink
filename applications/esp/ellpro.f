@@ -41,7 +41,7 @@
 *     its co-ordinates.
 
 *  Usage:
-*     ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT OUTCAT
+*     ELLPRO MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT (OUTCAT)
 *            AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FAST) 
 *            (FINE) [RLIM] (LIM1) (LIM2) (LIM3) (FRACT) [SAME] 
 *            [AGAIN] [INFILE) [IMGDEV] (COLOUR) (ANGCON) (ANGOFF)
@@ -223,19 +223,21 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
-*     {enter_new_authors_here}
+*     NG: Norman Gray (Starlink, Glasgow)
 
 *  History:
 *     19-JUL-1994 (GJP).
-*     Original version
+*       Original version
 *     16-OCT-1996 (GJP).
-*     NAG free version.
+*       NAG free version.
 *     27-JAN-1997 (GJP).
-*     Modified output formatting to make it work better with 
-*     very large images. Also tweaked ELP1_SOLVE routine
-*     to enhance robustness/speed. Some pointer usage slightly modified.
+*       Modified output formatting to make it work better with 
+*       very large images. Also tweaked ELP1_SOLVE routine
+*       to enhance robustness/speed. Some pointer usage slightly modified.
 *     8-NOV-1999 (MBT).
-*     Modified to work with World Coordinate System components.
+*       Modified to work with World Coordinate System components.
+*     5-Feb-2000 (NG).
+*       Added OUTCAT parameter, assorted fixes.
 
 *-
 
@@ -1401,6 +1403,7 @@
       LOGICAL INOKAY                  ! Was the most recent input value okay
       LOGICAL SAME                    ! Use the display device the image is
                                       ! on to show the result graphs?
+      LOGICAL WRITECAT                ! Output a catalogue?
       INTEGER AGIID                   ! AGI identifier
       INTEGER COLOUR                  ! Pen colour used for galaxy marker
       INTEGER ELEMS                   ! Total number of pixels in the NDF
@@ -1493,6 +1496,15 @@ C         MINMOD=0
 C      END IF
       CALL PAR_GET0I('MINMOD',MINMOD,STATUS)
       IF (STATUS .NE. SAI__OK) GOTO 9999
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .EQ. SUBPAR__ACTIVE) THEN
+*      Parameter was present on the command line
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 
 
@@ -1783,11 +1795,13 @@ C      END IF
      :        SIGMA,PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
          
          CALL ERR_MARK
-         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
-     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-     :        SIGMA,PSIZE,LBND,.TRUE.,STATUS)
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL (STATUS)
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
+     :           SIGMA,PSIZE,LBND,.TRUE.,STATUS)
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL (STATUS)
+            ENDIF
          ENDIF
          CALL ERR_RLSE
 
@@ -2798,7 +2812,8 @@ C      END IF
 
 *   Are we to write a catalogue output file?
       CALL PAR_STATE ('OUTCAT',I,STATUS)
-      IF (I .NE. SUBPAR__NULL) THEN
+      IF (I .EQ. SUBPAR__ACTIVE) THEN
+*      Parameter was present on the command line
          WRITECAT = .TRUE.
       ELSE
          WRITECAT = .FALSE.
@@ -4311,6 +4326,7 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       LOGICAL FRZORI                  ! Is the galaxy origin frozen?
       LOGICAL GRAPH                   ! Is a graph to be plotted
       LOGICAL INOKAY                  ! Was the most recent input value okay
+      LOGICAL WRITECAT		      ! Write a catalogue?
       INTEGER AGIID                   ! AGI identifier
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD                    ! FIO file descriptor
@@ -4390,6 +4406,15 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
       ELSE
          ANGOFF=0.0
       END IF
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .EQ. SUBPAR__ACTIVE) THEN
+*      Parameter was present on the command line
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 *   Look at another location on the image.
       AGAIN=.TRUE.
@@ -4601,11 +4626,13 @@ C      CALL HDS_SHOW ('LOCATORS', STATUS)
      :        PSIZE,LBND,.TRUE.,FIOD,EXCLAIM,STATUS)
 
          CALL ERR_MARK
-         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
-     :        RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
-     :        SIGMA,PSIZE,LBND,.TRUE.,STATUS)
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL (STATUS)
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :           RESULT,ELP__NRES,ELP__MXPOI,XCO,YCO,BACK,
+     :           SIGMA,PSIZE,LBND,.TRUE.,STATUS)
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL (STATUS)
+            ENDIF
          ENDIF
          CALL ERR_RLSE
 

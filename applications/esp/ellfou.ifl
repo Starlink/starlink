@@ -157,7 +157,7 @@ interface ELLFOU
     prompt 'Text file for profile output'
     ppath 'current,default'
     vpath 'prompt'
-    default ellfou.dat
+    default 'elfout.dat'
     helpkey '*'
   endparameter
 
@@ -165,8 +165,9 @@ interface ELLFOU
     type '_CHAR'
     access 'read'
     prompt 'Name of catalogue file'
-    ppath 'current'
+    ppath 'current,default'
     vpath 'prompt'
+    default 'elfcat.txt'
   endparameter
 
   parameter AUTOL       # Conduct search for a better origin?

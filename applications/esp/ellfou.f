@@ -38,7 +38,7 @@
 *     used for all input required by the application.
 
 *  Usage:
-*     ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT OUTCAT
+*     ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT (OUTCAT)
 *            AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE) 
 *            [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE] 
 *            [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
@@ -202,18 +202,21 @@
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
 *     MBT: Mark Taylor (STARLINK)
+*     NG: Norman Gray (Starlink, Glasgow)
 *     {enter_new_authors_here}
 
 *  History:
 *     1-JUL-1994 (GJP)
-*     Original version.
+*       Original version.
 *     16-OCT-1996 (GJP)
-*     NAG free version.
+*       NAG free version.
 *     27-JAN-1997 (GJP).
-*     Modified output formatting to make it work better with 
-*     very large images. Some pointer usage slightly modified.
+*       Modified output formatting to make it work better with 
+*       very large images. Some pointer usage slightly modified.
 *     8-NOV-1999 (MBT).
-*     Modified to work with World Coordinate System components.
+*       Modified to work with World Coordinate System components.
+*     5-Feb-2000 (NG).
+*       Added OUTCAT parameter, assorted fixes.
 
 *-
      
@@ -1604,6 +1607,7 @@
       LOGICAL INOKAY                  ! Was the most recent input value okay
       LOGICAL SAME                    ! Use the display device the image is
                                       ! on to show the result graphs?
+      LOGICAL WRITECAT                ! Output a catalogue?
       INTEGER COLOUR                  ! Pen colour used to show galaxy centre
       INTEGER AGIID                   ! AGI identifier
       INTEGER ELEMS                   ! Total number of pixels in the NDF
@@ -1677,6 +1681,15 @@
       ELSE
          ANGOFF=0.0
       END IF
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .EQ. SUBPAR__ACTIVE) THEN
+*      Parameter was present on the command line
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 *   Begin an NDF context.                               
       CALL NDF_BEGIN
@@ -1929,11 +1942,13 @@
      :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
 
          CALL ERR_MARK
-         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
-     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
-     :        SIGMA,PSIZE,LBND,.FALSE.,STATUS)
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL (STATUS)
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :           RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :           SIGMA,PSIZE,LBND,.FALSE.,STATUS)
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL (STATUS)
+            ENDIF
          ENDIF
          CALL ERR_RLSE
 
@@ -4118,6 +4133,7 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
       LOGICAL FRZORI                  ! Is the galaxy origin frozen?
       LOGICAL GRAPH                   ! Is a graph to be plotted
       LOGICAL INOKAY                  ! Was the most recent input value okay
+      LOGICAL WRITECAT                ! Write a catalogue?
       INTEGER AGIID                   ! AGI identifier
       INTEGER ELEMS                   ! Total number of pixels in the NDF
       INTEGER FIOD                    ! FIO file descriptor
@@ -4190,6 +4206,15 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
       ELSE
          ANGOFF=0.0
       END IF
+
+*   Are we to write a catalogue output file?
+      CALL PAR_STATE ('OUTCAT',I,STATUS)
+      IF (I .EQ. SUBPAR__ACTIVE) THEN
+*      Parameter was present on the command line
+         WRITECAT = .TRUE.
+      ELSE
+         WRITECAT = .FALSE.
+      ENDIF
 
 *   Look at another location on the image.
       AGAIN=.TRUE.
@@ -4359,11 +4384,13 @@ D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
      :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
 
          CALL ERR_MARK
-         CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
-     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+         IF (WRITECAT) THEN
+            CALL ELP1_CATO(0, NDF1,VALIDP,ZEROP,
+     :           RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
      :           SIGMA,PSIZE,LBND,.FALSE.,STATUS)
-         IF (STATUS .EQ. PAR__NULL) THEN
-            CALL ERR_ANNUL (STATUS)
+            IF (STATUS .EQ. PAR__NULL) THEN
+               CALL ERR_ANNUL (STATUS)
+            ENDIF
          ENDIF
          CALL ERR_RLSE
 
