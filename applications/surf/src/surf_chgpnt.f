@@ -40,7 +40,9 @@
 
 *  ADAM Parameters:
 *     CHANGE_POINT = _CHAR (Read)
-*         If true you will be prompted for pointing corrections.
+*         If true you will be prompted for pointing corrections otherwise
+*         the program will exit after listing the current pointing 
+*         corrections.
 *     IN = NDF (Read)
 *         Name of NDF to change.
 *     MSG_FILTER = _CHAR (Read)
@@ -50,11 +52,21 @@
 *     POINT_DEL = _REAL (Read)
 *         The elevation pointing correction (arcsec).
 *     POINT_LST = _CHAR (Read)
-*         The sidereal time of the pointing correction. Returning -1
-*         will end the pointing offsets specification.
+*         The sidereal time of the pointing correction. Pointing corrections
+*         are asked for repeatedly until a NULL (!) or negative value are 
+*         given for POINT_LST.
+
+*  Notes:
+*     - Pointing corrections are erased when new items are written.
+*     - Pointing corrections can be removed completely by issuing
+*       null (!) in response to POINT_LST when first prompted.
+*       (ie pointing corrections are removed if no corrections are given)
+*     - Use ABORT (!!) if you don't want to change the pointing corrections
+*       once you have started entering values.
+*     - Pointing corrections must be given in LST order.
 
 *  Related Application:
-*     REBIN
+*     SURF: REBIN
 
 *  Authors:
 *     JFL:  J.Lightfoot (jfl@roe.ac.uk)
@@ -77,6 +89,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'REDS_SYS'                         ! REDS constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
+      INCLUDE 'PAR_ERR'
 
 *    Import:
 *    Import-Export:
@@ -357,8 +370,13 @@
                CALL PAR_GET0C ('POINT_LST', STEMP, STATUS)
                CALL PAR_CANCL ('POINT_LST', STATUS)
 
-               IF (STATUS .NE. SAI__OK) THEN
+               IF (STATUS .EQ. PAR__NULL) THEN
                   LOOPING = .FALSE.
+                  CALL ERR_ANNUL(STATUS)
+
+               ELSE IF (STATUS .NE. SAI__OK) THEN
+                  LOOPING = .FALSE.
+
                ELSE
                   ITEMP = 1
                   CALL SLA_DAFIN (STEMP, ITEMP, DTEMP, STATUS)
@@ -381,6 +399,13 @@
                      CALL PAR_GET0R ('POINT_DEL', POINT_DEL(N_POINT),
      :                    STATUS)
                      CALL PAR_CANCL ('POINT_DEL', STATUS)
+
+*     Reset N_POINT if error during read
+                     IF (STATUS .EQ. PAR__NULL) THEN
+                        N_POINT = N_POINT - 1
+                        CALL ERR_ANNUL(STATUS)
+                     END IF
+
                   END IF
                END IF
                
