@@ -6,3 +6,4 @@ typemap
 t/sai.t
 t/ems.t
 t/token.t
+t/cstyle.t
