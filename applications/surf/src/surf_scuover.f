@@ -48,7 +48,7 @@
 *        positions should be taken.
 *     INTEGRATION = INTEGER (Read)
 *        Use the bolometer positions at the specified integration. Default
-*        is measuremnt 1.
+*        is measurement 1.
 *     MEASUREMENT = INTEGER (Read)
 *        Use the bolometer positions at the specified exposure. Default
 *        is measurement 1.
@@ -99,7 +99,6 @@
 *  Related Applications:
 *     SURF: REBIN, SCUPA
 *     KAPPA: DISPLAY, GDSET
-*     FIGARO: IMAGE
 
 *  Authors:
 *     JFL: J.Lightfoot (ROE)
@@ -112,6 +111,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.17  2000/07/07 03:24:16  timj
+*     Doc fixes
+*
 *     Revision 1.16  2000/06/16 01:24:38  timj
 *     Plot text in different style to circles
 *

@@ -49,7 +49,7 @@
 *        be on sky)
 *     BOLOMETERS = CHAR (Read)
 *        List of sky bolometers (either by number in the data file, or
-*        by id (eg H7,G3)), or by ring number (r0,r1, etc) or even
+*        by id (eg H7,G3)), or by ring number (r0,r1,r-2 etc) or even
 *        'all' for all bolometers. Any bolometer can be removed by
 *        prefixing the id with a minus sign.
 *        For example:
@@ -137,6 +137,9 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.18  2000/07/07 03:24:15  timj
+*     Doc fixes
+*
 *     Revision 1.17  1999/08/03 20:01:39  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.

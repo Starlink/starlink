@@ -37,7 +37,7 @@
 *     DR = REAL (Write)
 *        Positional error at the edge of the array for this particular
 *        observation. In arcseconds.
-*        Edge is defined as a radius of 60 arcseconds.
+*        Edge is defined as a radius of 70 arcseconds.
 *     IN = NDF (Read)
 *        The name of the NDF containing to be tested.
 *     MSG_FILTER = CHAR (Read)
@@ -45,7 +45,7 @@
 *     LAG = REAL (Write).
 *        The discrepancy between the LST stored in the FITS header
 *        and the LST when data acquisition begins. This provides 
-*        a mesaure of the lag in starting up the observation (including
+*        a measure of the lag in starting up the observation (including
 *        slew times). The value is stored in seconds.
 *     MJD = DOUBLE (Write)
 *        Modified Julian Date of start of observation corrected for the
@@ -54,6 +54,8 @@
 *  Notes:
 *     - The calculated clock error is only accurate to about 15 seconds.
 
+*  Reference:
+*     Jenness, T., 2000, JCMT Technical Report TR/001/84
 
 *  Authors:
 *     TIMJ: Tim Jenness (JAC)
@@ -65,6 +67,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  2000/07/07 03:24:15  timj
+*     Doc fixes
+*
 *     Revision 1.1  2000/06/22 23:56:21  timj
 *     First version
 *
