@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalog.C,v 1.6 2001/08/27 10:10:32 abrighto Exp $
+ * $Id: TcsCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * TcsCatalog.C - method definitions for class TcsCatalog
  * 
@@ -10,14 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TcsCatalog.C,v 1.6 2001/08/27 10:10:32 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TcsCatalog.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdlib.h>
-#include <iostream.h>
-#include <fstream.h>
-#include <strstream.h>
-#include <string.h>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
+#include <cstring>
 #include "error.h"
 #include "TcsLocalCatalog.h"
 #include "TcsCatalog.h"

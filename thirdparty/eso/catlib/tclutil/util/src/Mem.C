@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.C,v 1.14 2001/08/27 10:11:33 abrighto Exp $" 
+ * "@(#) $Id: Mem.C,v 1.3 2003/01/20 15:52:22 brighton Exp $" 
  *
  * Mem.C - method definitions for class Mem, for managing memory
  *         areas with or without shared memory.
@@ -14,14 +14,14 @@
  * pbiereic        10/11/99  Use _exit() in signal handler, so that the
  *                           message queue of a possible parent process is not closed
  */
-static const char* const rcsId="@(#) $Id: Mem.C,v 1.14 2001/08/27 10:11:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Mem.C,v 1.3 2003/01/20 15:52:22 brighton Exp $";
 
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
-#include <stdio.h>
-#include <iostream.h>
+#include <cstdio>
+#include <iostream>
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>

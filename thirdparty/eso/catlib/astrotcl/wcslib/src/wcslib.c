@@ -375,7 +375,7 @@
 *      projections.
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: wcslib.c,v 1.9 2001/08/27 10:10:26 abrighto Exp $
+*   $Id: wcslib.c,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
 *===========================================================================*/
 
 #include <stdio.h>

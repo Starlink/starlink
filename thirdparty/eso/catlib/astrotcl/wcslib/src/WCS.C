@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: WCS.C,v 1.10 2001/08/27 10:10:24 abrighto Exp $" 
+ * "@(#) $Id: WCS.C,v 1.2 2003/01/20 15:52:21 brighton Exp $" 
  *
  * WCS.C - method definitions for class WCS, a reference counting
  *         wrapper class for managing world coordinates for an image.
@@ -13,11 +13,11 @@
  *                            new implementations of WCS. Renamed old WCSRep
  *                            to SAOWCS (based on Doug Mink's saoimage version).
  */
-static const char* const rcsId="@(#) $Id: WCS.C,v 1.10 2001/08/27 10:10:24 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: WCS.C,v 1.2 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "error.h"
 #include "WCS.h"
 

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclQueryUtil.h,v 1.5 2001/08/27 10:10:36 abrighto Exp $
+ * $Id: TclQueryUtil.h,v 1.2 2003/01/20 15:52:21 brighton Exp $
  *
  * TclQueryUtil.h - utility routines for Tcl catalog commands
  *
@@ -15,7 +15,7 @@
 
 
 #include <tcl.h>
-#include <stdio.h>
+#include <cstdio>
 
 class AstroQuery;
 class WorldCoords;

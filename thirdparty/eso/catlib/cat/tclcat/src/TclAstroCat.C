@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroCat.C,v 1.54 2001/08/27 10:10:38 abrighto Exp $
+ * $Id: TclAstroCat.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
  *
  * TclAstroCat.C - method definitions for class TclAstroCat
  * 
@@ -11,17 +11,18 @@
  * Allan Brighton  26 Sep 95  Created
  * pbiereic        26/08/99   Changed Cat_Init()
  */
-static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.54 2001/08/27 10:10:38 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroCat.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <fstream.h>
-#include <strstream.h>
+#include <fstream>
+#include <sstream>
+#include "config.h"
 #include "TabTable.h"
 #include "Mem.h"
 #include "error.h"
@@ -181,7 +182,7 @@ int Cat_Init(Tcl_Interp* interp)
         return TCL_ERROR;
     }
     // install the astrocat command 
-    Tcl_CreateCommand(interp, "astrocat", TclAstroCat::astroCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "astrocat", (Tcl_CmdProc*)TclAstroCat::astroCatCmd, NULL, NULL);
 
     // Set the global Tcl variable cat_version 
     Tcl_SetVar(interp, "cat_version", CAT_VERSION, TCL_GLOBAL_ONLY);
@@ -468,7 +469,7 @@ int TclAstroCat::saveCmd(int argc, char* argv[])
     }
 
     // save the query results
-    int status = saveQueryResult(filename, numCols, colNames, argv[2], iflag, equinoxStr);
+    int status = saveQueryResult(filename, numCols, (char**)colNames, argv[2], iflag, equinoxStr);
 
     // clean up
     if (freeColNames && colNames)
@@ -578,7 +579,7 @@ int TclAstroCat::removeCmd(int argc, char* argv[])
 
     // create a QueryResult object from the headings and data and 
     // remove rows matching it from the file
-    int status = removeQueryResult(argv[0], numCols, colNames, argv[1], equinoxStr);
+    int status = removeQueryResult(argv[0], numCols, (char**)colNames, argv[1], equinoxStr);
     
     // clean up
     if (freeColNames && colNames)
@@ -809,15 +810,14 @@ int TclAstroCat::getimageCmd(int argc, char* argv[])
  */
 int TclAstroCat::queryposCmd(int argc, char* argv[])
 {
-    char buf[126];
-    ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
 
     if (! pos1_.isNull()) {
 	pos1_.print(os, equinoxStr_);	// print coords in given equinox
 	if (pos1_.isWcs())
 	    os << " " << equinoxStr_;
-	os << ends;
-	return set_result(buf);
+	
+	return set_result(os.str().c_str());
     }
     return TCL_OK;
 }
@@ -986,7 +986,7 @@ int TclAstroCat::appendKeyListVal(const char* keyword, const char* value)
  *
  * Write the config file format entry value part to the stream.
  */
-int TclAstroCat::tclListToConfigStreamValue(const char* tclList, ostream& os)
+int TclAstroCat::tclListToConfigStreamValue(const char* tclList, std::ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1012,7 +1012,7 @@ int TclAstroCat::tclListToConfigStreamValue(const char* tclList, ostream& os)
  *
  * keyword; value
  */
-int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
+int TclAstroCat::tclListToConfigStreamLine(const char* tclList, std::ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1025,8 +1025,8 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
 	free(values);
 	return error("astrocat: expected {keyword value} list, not: ", tclList);
     }
-    char* keyword = values[0];
-    char* value = values[1];
+    const char* keyword = values[0];
+    const char* value = values[1];
 
     // append to an inline config entry to pass to the entry update method
     if (strcmp(keyword, "symbol") == 0 || strcmp(keyword, "search_cols") == 0) {
@@ -1035,10 +1035,10 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
 	    free(values);
 	    return TCL_ERROR;
 	}
-	os << endl;
+	os << std::endl;
     }
     else {
-	os << keyword << ": " << value << endl;
+	os << keyword << ": " << value << std::endl;
     }
     free(values);
     return TCL_OK;
@@ -1052,7 +1052,7 @@ int TclAstroCat::tclListToConfigStreamLine(const char* tclList, ostream& os)
  * keyword; value
  * keyword: valuue
  */
-int TclAstroCat::tclListToConfigStream(const char* tclList, ostream& os)
+int TclAstroCat::tclListToConfigStream(const char* tclList, std::ostream& os)
 {
     int numValues = 0;
     char** values = NULL;
@@ -1245,19 +1245,17 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
 	if (argc < 2)
 	    return error("missing catalog entry argument");
 
-	char buf[10*1024];
-	ostrstream os(buf, sizeof(buf));
+	std::ostringstream os;
 
 	// convert tcl list entry to config file format
 	if (tclListToConfigStream(argv[1], os) != TCL_OK)
 	    return TCL_ERROR;
 
 	// read the new config file entry
-	os << ends;
 	if (! os)
 	    return error("internal error writing config entry");
 
-	istrstream is(buf);
+	std::istringstream is(os.str());
 	
 	if (update || set) {
 	    if (argc == 2) {
@@ -1307,7 +1305,7 @@ int TclAstroCat::entryCmd(int argc, char* argv[])
  */
 int TclAstroCat::loadCmd(int argc, char* argv[])
 {
-    ifstream is(argv[0]);
+    std::ifstream is(argv[0]);
     if (!is)
 	return sys_error("can't open file: ", argv[0]);
 
@@ -1830,12 +1828,11 @@ int TclAstroCat::authorizeCmd(int argc, char* argv[])
     
     if (argc == 0) {
 	HTTP& http = cat_->http();
-	char buf[1024];
-	ostrstream os(buf, sizeof(buf));
+	std::ostringstream os;
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
-	   << " " << http.hostname() << ends;
-	return set_result(buf);
+	   << " " << http.hostname();
+	return set_result(os.str().c_str());
     }
 
     if (argc == 2) 
@@ -1926,7 +1923,6 @@ int TclAstroCat::plotCmd(int argc, char* argv[])
 
     int nrows = tab.numRows();
     int nvalues = nrows*2;
-    char** colNames = tab.colNames();
     double* xyvalues = new double[nvalues];
     int n;
 
@@ -2004,7 +2000,7 @@ int TclAstroCat::shortnameCmd(int argc, char* argv[])
 int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list, 
 				const char* equinoxStr, QueryResult& r)
 {
-    ostrstream os;
+    std::ostringstream os;
     int numRows = 0;
     char** rows = NULL;
     char raStr[32], decStr[32];
@@ -2024,8 +2020,8 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 		// convert ra,dec to J2000, then print out in the catalog's equinox
 		int ra_col = r.ra_col();
 		int dec_col = r.dec_col();
-		char* raPtr = cols[ra_col];
-		char* decPtr = cols[dec_col]; 
+		const char* raPtr = cols[ra_col];
+		const char* decPtr = cols[dec_col]; 
 		WorldCoords pos(raPtr, decPtr, equinoxStr);  // converts to J2000 internally
 		if (pos.status() != 0) {
 		    raStr[0] = decStr[0] = '\0';
@@ -2058,17 +2054,15 @@ int TclAstroCat::getQueryResult(int numCols, char** colNames, const char* list,
 	    os << '\n';
 	    free(cols);
 	}
-	os << ends;
     }
 
     // create a QueryResult object from the headings and data and 
     // save (or append) it to the file
     if (status == 0) 
-	status = r.init(numCols, colNames, os.str());
+	status = r.init(numCols, colNames, os.str().c_str());
 
     if (rows)
 	free(rows);		// free split list of rows
-    delete os.str();		// free generated tab table buffer
 
     return status;
 }

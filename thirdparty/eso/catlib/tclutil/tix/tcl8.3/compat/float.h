@@ -12,5 +12,5 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: float.h,v 1.2 2001/08/27 10:11:24 abrighto Exp $
+ * RCS: @(#) $Id: float.h,v 1.1.1.1 2002/04/04 20:12:02 brighton Exp $
  */

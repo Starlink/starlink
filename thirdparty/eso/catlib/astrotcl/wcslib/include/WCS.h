@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: WCS.h,v 1.9 2001/08/27 10:10:23 abrighto Exp $" 
+ * "@(#) $Id: WCS.h,v 1.1.1.1 2002/04/04 20:11:43 brighton Exp $" 
  *
  * WCS.h - declarations for class WCS, a reference counted wrapper class
  *         for managing world coordinates for an image. The implementation

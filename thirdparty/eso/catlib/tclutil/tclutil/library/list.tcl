@@ -1,7 +1,7 @@
 # list.tcl - list utility routines for tcl
 #
 # Copyright (C) 1994 Allan Brighton (abrighto@eso.org)
-# "@(#) $Id: list.tcl,v 1.3 2001/08/27 10:11:12 abrighto Exp $"
+# "@(#) $Id: list.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 
 
 

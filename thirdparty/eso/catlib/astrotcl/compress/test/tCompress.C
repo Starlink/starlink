@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tCompress.C,v 1.4 2001/08/27 10:10:10 abrighto Exp $
+ * $Id: tCompress.C,v 1.2 2003/01/17 11:10:01 brighton Exp $
  *
  * tCompress.C - test cases for class Compress
  * 
@@ -10,7 +10,7 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "define.h"

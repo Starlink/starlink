@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tFitsIO.C,v 1.6 2001/08/27 10:10:22 abrighto Exp $
+ * $Id: tFitsIO.C,v 1.2 2003/01/17 11:10:01 brighton Exp $
  *
  * tFitsIO.C - test cases for class FitsIO
  * 
@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "FitsIO.h"

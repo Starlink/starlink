@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsLocalCatalog.h,v 1.8 2001/08/27 10:10:30 abrighto Exp $
+ * $Id: TcsLocalCatalog.h,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $
  *
  * TcsLocalCatalog.h - class definitions for accessing local
  *                     TCS catalogs stored as starbase format tab tables.

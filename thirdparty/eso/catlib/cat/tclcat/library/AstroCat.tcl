@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: AstroCat.tcl,v 1.60 2001/08/27 10:10:36 abrighto Exp $
+# @(#) $Id: AstroCat.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # AstroCat.tcl - user interface class for viewing catalog info
 #
@@ -1203,7 +1203,7 @@ itcl::class cat::AstroCat {
 		set filename $info
 		# load the image and remove the temp file
 		display_image_file $filename
-		catch {file delete $filename}
+		#catch {file delete $filename}
 	    } else {
 		busy {
 		    set prev_headings $headings_

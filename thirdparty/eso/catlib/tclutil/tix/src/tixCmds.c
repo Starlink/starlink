@@ -620,7 +620,7 @@ TIX_DEFINE_CMD(Tix_StringSubCmd)
     if (argc!=4) {
 	return Tix_ArgcError(interp, argc, argv, 1, "strVar from to");
     }
-    if ((str = Tcl_GetVar(interp, argv[1], 0)) == NULL) {
+    if ((str = (char*)Tcl_GetVar(interp, argv[1], 0)) == NULL) {
 	Tcl_AppendResult(interp, "variable ", argv[1]," does not exist", NULL);
 	return TCL_ERROR;
     }

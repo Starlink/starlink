@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: HMS.h,v 1.4 2001/08/27 10:10:22 abrighto Exp $
+ * $Id: HMS.h,v 1.4 2003/01/20 15:52:21 brighton Exp $
  *
  * HMS.h - class representing a value of the form "hours:min:sec"
  *
@@ -15,8 +15,8 @@
  * Allan Brighton  27 Sep 95  Created
  */
 
-#include <iostream.h>
-#include <math.h>
+#include <iostream>
+#include <cmath>
 
 const double HMS_NULL = HUGE_VAL;	// null value for a double
 
@@ -60,8 +60,8 @@ public:
     // ... (add I/O and arithmetic operators here) ...
     
     // output operator
-    friend ostream& operator<<(ostream&, const HMS&);
-    friend istream& operator>>(istream&, HMS&);
+    friend std::ostream& operator<<(std::ostream&, const HMS&);
+    friend std::istream& operator>>(std::istream&, HMS&);
 
     // print in the given buffer in H:M:S format
     void print(char* buf) const;

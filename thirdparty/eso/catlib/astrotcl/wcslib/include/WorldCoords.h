@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: WorldCoords.h,v 1.5 2001/08/27 10:10:23 abrighto Exp $
+ * $Id: WorldCoords.h,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * WorldCoords.h - class representing world coordinates 
  *                 (right-ascension, declination, stored as J2000 internally)
@@ -16,7 +16,7 @@
  * Allan Brighton  27 Sep 95  Created
  */
 
-#include <stdio.h>
+#include <cstdio>
 #include "HMS.h"
 
 const double WCS_NULL = HMS_NULL;	// null value for double coordinate value
@@ -82,11 +82,11 @@ public:
    
 #if 0
     // input operator: format: H:M:S[+-]D:M:S, J2000
-    friend istream& operator>>(istream&, WorldCoords& pos);
+    friend std::istream& operator>>(std::istream&, WorldCoords& pos);
 #endif
 
     // output operator: format: H:M:S[+-]D:M:S, J2000
-    friend ostream& operator<<(ostream&, const WorldCoords& pos);
+    friend std::ostream& operator<<(std::ostream&, const WorldCoords& pos);
 
     // print coords to the given buffer with given equinox in the given format
     void print(char* ra_buf, char* dec_buf, double equinox = 2000.0, int hmsFlag=1);
@@ -96,10 +96,10 @@ public:
     void print(char* ra_buf, char* dec_buf, const char* equinoxStr, int hmsFlag=1);
     
     // print coords to the given stream with the given equinox in H:M:S format
-    void print(ostream& os, double equinox = 2000.0);
+    void print(std::ostream& os, double equinox = 2000.0);
 
     // print coords to the given stream with the given equinox (or system name) in H:M:S format
-    void print(ostream& os, const char* equinoxStr);
+    void print(std::ostream& os, const char* equinoxStr);
 
     // get ra and dec in degrees in the given equinox
     void get(double& ra, double& dec, double equinox);

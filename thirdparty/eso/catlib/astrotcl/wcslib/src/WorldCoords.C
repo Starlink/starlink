@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: WorldCoords.C,v 1.10 2001/08/27 10:10:24 abrighto Exp $
+ * $Id: WorldCoords.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * WorldCoords.C - method definitions for class WorldCoords
  * 
@@ -10,13 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: WorldCoords.C,v 1.10 2001/08/27 10:10:24 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: WorldCoords.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
 #include "error.h"
 #include "wcs.h"
 #include "WorldCoords.h"
@@ -58,6 +58,9 @@ static int getEquinox(const char* equinoxStr, double& equinox) {
 	equinox = 1950.;
 	return 0;
     }
+    if (*equinoxStr == 'J' || *equinoxStr == 'B')
+	equinoxStr++;
+
     if (sscanf(equinoxStr, "%lf", &equinox) == 1) {
 	return 0;
     }
@@ -323,7 +326,7 @@ void WorldCoords::print(char* ra_buf, char* dec_buf, const char* equinoxStr, int
 /*
  * Print the coordinates to the given stream in the given equinox.
  */
-void WorldCoords::print(ostream& os, double equinox)
+void WorldCoords::print(std::ostream& os, double equinox)
 {
     if (equinox == 2000.0) {
 	os << *this;
@@ -341,7 +344,7 @@ void WorldCoords::print(ostream& os, double equinox)
  * Print the coordinates to the given stream in the given equinox (or system).
  * Here equinoxStr may be a number or the system name, such as "GALACTIC" or "ECLIPTIC".
  */
-void WorldCoords::print(ostream& os, const char* equinoxStr)
+void WorldCoords::print(std::ostream& os, const char* equinoxStr)
 {
     double equinox = 2000.;
     if (getEquinox(equinoxStr, equinox) == 0) {
@@ -398,7 +401,7 @@ void WorldCoords::get(double& ra, double& dec, const char* equinoxStr)
 /*
  * output operator: format: h:m:s[+-]d:m:s (J2000) or "" for null coords
  */
-ostream& operator<<(ostream& os, const WorldCoords& pos)
+std::ostream& operator<<(std::ostream& os, const WorldCoords& pos)
 {
     if (pos.isNull())
 	os << "\"\"";
@@ -411,7 +414,7 @@ ostream& operator<<(ostream& os, const WorldCoords& pos)
 /*
  * input operator: format:  h:m:s[+-]d:m:s (J2000)
  */
-istream& operator>>(istream& is, WorldCoords& pos)
+std::istream& operator>>(std::istream& is, WorldCoords& pos)
 {
     is >> pos.ra_ >> pos.dec_;	// XXX need to input equinox ?
     pos.dec_.show_sign(1);

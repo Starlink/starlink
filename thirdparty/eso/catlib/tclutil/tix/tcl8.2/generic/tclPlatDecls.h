@@ -6,7 +6,7 @@
  * Copyright (c) 1998-1999 by Scriptics Corporation.
  * All rights reserved.
  *
- * RCS: @(#) $Id: tclPlatDecls.h,v 1.2 2001/08/27 10:11:21 abrighto Exp $
+ * RCS: @(#) $Id: tclPlatDecls.h,v 1.1.1.1 2002/04/04 20:12:02 brighton Exp $
  */
 
 #ifndef _TCLPLATDECLS

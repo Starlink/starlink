@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: DialogWidget.tcl,v 1.10 2001/08/27 10:11:09 abrighto Exp $"
+# "@(#) $Id: DialogWidget.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # DialogWidget.tcl - Base class of dialog widget classes
 #

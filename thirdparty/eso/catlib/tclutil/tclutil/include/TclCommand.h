@@ -26,7 +26,7 @@
  * software for any purpose. It is provided "as is" without express or 
  * implied warranty.
  * -----------------------------------------------------------------------------
- * "@(#) $Id: TclCommand.h,v 1.9 2001/08/27 10:11:08 abrighto Exp $" 
+ * "@(#) $Id: TclCommand.h,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $" 
  */
 
 #include <tcl.h>

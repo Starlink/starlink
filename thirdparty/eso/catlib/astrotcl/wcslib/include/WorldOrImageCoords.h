@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: WorldOrImageCoords.h,v 1.5 2001/08/27 10:10:23 abrighto Exp $
+ * $Id: WorldOrImageCoords.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
  *
  * WorldOrImageCoords.h - class representing either world (ra, dec, equinox)
  *                        or image (x, y) coordinates
@@ -53,7 +53,7 @@ public:
     void setNull() {if (isWcs_) wc_.setNull(); else ic_.setNull();}
    
     // output operator
-    friend ostream& operator<<(ostream& os, const WorldOrImageCoords& pos) {
+    friend std::ostream& operator<<(std::ostream& os, const WorldOrImageCoords& pos) {
 	if (pos.isWcs_) os << pos.wc_; else os << pos.ic_;
 	return os;
     }
@@ -75,7 +75,7 @@ public:
     }
     
     // print coords to the given stream in the given equinox 
-    void print(ostream& os, double equinox = 2000.) {
+    void print(std::ostream& os, double equinox = 2000.) {
 	if (isWcs_) 
 	    wc_.print(os, equinox);
 	else
@@ -83,7 +83,7 @@ public:
     }
 
     // print coords to the given stream in the given equinox (or system, such as "GALACTIC", "ECLIPTIC")
-    void print(ostream& os, const char* equinoxStr) {
+    void print(std::ostream& os, const char* equinoxStr) {
 	if (isWcs_) 
 	    wc_.print(os, equinoxStr);
 	else

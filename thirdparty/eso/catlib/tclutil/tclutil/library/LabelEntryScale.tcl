@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: LabelEntryScale.tcl,v 1.11 2001/08/27 10:11:10 abrighto Exp $"
+# "@(#) $Id: LabelEntryScale.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # LabelEntryScale.tcl - Widget combining a labeled entry with a scale widget
 #

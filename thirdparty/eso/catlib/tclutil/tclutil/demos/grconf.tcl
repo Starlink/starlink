@@ -4,7 +4,7 @@
 # 
 # Note: this file was taken from the BLT-1.7 distribution and modified
 # slightly (Allan Brighton)
-# "@(#) $Id: grconf.tcl,v 1.3 2001/08/27 10:11:07 abrighto Exp $"
+# "@(#) $Id: grconf.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 
 if [file exists ../library] {
     set blt_library ../library

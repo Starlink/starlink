@@ -4,6 +4,16 @@ CHANGES to the "catlib" Catalog Interface Library
 This file contains a list of changes to the "catlib" libraries. 
 The latest changes are at the top.
 
+--------------- 20.01.03 released cat-3.7.4 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
+--------------- 27.02.02 released catlib-3.7.3 -----------------
+
+* Fixed problem with temporary downloaded image files being deleted too soon.
+  (Now they are only deleted after they are loaded, so that the OS can delete
+   them later on.)
+
 --------------- 27.08.01 released catlib-3.7.2 -----------------
 
 * Merged in minor changes from Peter Biereichel (added some #include files).

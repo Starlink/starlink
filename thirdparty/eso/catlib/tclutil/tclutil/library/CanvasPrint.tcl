@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasPrint.tcl,v 1.10 2001/08/27 10:11:09 abrighto Exp $"
+# "@(#) $Id: CanvasPrint.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # CanvasPrint.tcl - Popup dialog for printing the contents of a Tk canvas
 #

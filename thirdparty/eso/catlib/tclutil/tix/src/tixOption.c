@@ -19,8 +19,8 @@
  * 3) Merge aliases with specs
  *
  */
-#include <tk.h>
 #include <tixPort.h>
+#include <tk.h>
 #include <tixInt.h>
 
 static char *			FormatConfigInfo _ANSI_ARGS_((
@@ -48,7 +48,7 @@ int Tix_GetVar (interp, cPtr, widRec, flag)
 	    /* The user may have specified a shorthand like -backgro */
 	    flag = spec->argvName;
 	}
-	value = Tcl_GetVar2(interp, widRec, flag, TCL_GLOBAL_ONLY);
+	value = (char*)Tcl_GetVar2(interp, widRec, flag, TCL_GLOBAL_ONLY);
 
 	Tcl_AppendResult(interp, value, (char*)NULL);
 	return TCL_OK;
@@ -378,7 +378,7 @@ static char * FormatConfigInfo(interp, cPtr, widRec, sPtr)
 	argv[1] = sPtr->dbName;
 	argv[2] = sPtr->dbClass;
 	argv[3] = sPtr->defValue;
-	argv[4] = Tcl_GetVar2(interp, widRec, argv[0], TCL_GLOBAL_ONLY);
+	argv[4] = (char*)Tcl_GetVar2(interp, widRec, argv[0], TCL_GLOBAL_ONLY);
 
 	return Tcl_Merge(5, argv);
     }

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: HTTP.h,v 1.8 2001/08/27 10:11:31 abrighto Exp $
+ * $Id: HTTP.h,v 1.4 2003/01/20 15:52:22 brighton Exp $
  *
  * HTTP.h - utility class for communicating with the HTTP daemon
  * 
@@ -16,14 +16,14 @@
  * Peter W. Draper 16 Jun 98  Added support for proxy servers
  */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netdb.h>
 #include <arpa/inet.h>
-#include <iostream.h>
+#include <iostream>
 
 
 /*
@@ -126,7 +126,7 @@ public:
 
     // do an HTTP get on the given URL and write the results to the
     // given stream
-    int get(const char* url, ostream&);
+    int get(const char* url, std::ostream&);
 
     // do an HTTP POST using the given URL and data and position the read 
     // fd after the result HTTP header. 
@@ -134,10 +134,10 @@ public:
 
     // do an HTTP post using the given URL and data and write the results 
     // to the given stream
-    int post(const char* url, const char* data, ostream&);
+    int post(const char* url, const char* data, std::ostream&);
 
     // copy the results of a previous get(url) to the given stream
-    int copy(ostream& os);
+    int copy(std::ostream& os);
 
     // read a line of the results after a call to get(url, nlines)
     int readline(char* ptr, int maxlen);
@@ -179,7 +179,7 @@ public:
 
     // take an error message in HTML format and pass it
     // on to error(), stripped of HTML syntax (<...>)
-    int html_error(istream& is);
+    int html_error(std::istream& is);
     int html_error(char* s);
 
     // get/set flag value to allow URL to be a local command

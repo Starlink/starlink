@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: FrameWidget.tcl,v 1.12 2001/08/27 10:11:10 abrighto Exp $"
+# "@(#) $Id: FrameWidget.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # FrameWidget.tcl - Itk base class for widgets with their own frame
 #

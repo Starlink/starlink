@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: SAOWCS.C,v 1.12 2001/08/27 10:10:24 abrighto Exp $" 
+ * "@(#) $Id: SAOWCS.C,v 1.2 2003/01/20 15:52:21 brighton Exp $" 
  *
  * SAOWCS.C - method definitions for class SAOWCS, an implementation
  *            of the abstract WCS (WCSRep) class interface based on 
@@ -19,11 +19,11 @@
  *                            libraries.
  * pbiereic        11/10/99   Added deltset()
  */
-static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.12 2001/08/27 10:10:24 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: SAOWCS.C,v 1.2 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "error.h"
 #include "SAOWCS.h"
 
@@ -103,14 +103,14 @@ void SAOWCS::setEquinox()
 char* SAOWCS::pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag) const
 {
     buf[0] = '\0';
-    if (isWcs() && x > 0 && y > 0 && x < pixWidth() && y < pixHeight()) {
+    if (isWcs() /* && x > 0 && y > 0 && x < pixWidth() && y < pixHeight()*/) {
 	if (hms_flag == 0) {
 	    ::pix2wcst(wcs_, x, y, buf, bufsz);
 	}
 	else {
 	    double ra, dec;
 	    ::pix2wcs(wcs_, x, y, &ra, &dec);
-	    if (!wcs_->offscl) {
+	    if (! (wcs_->offscl == 1)) {
 		char rastr[32], decstr[32];
 		if (wcs_->degout == 0 || wcs_->sysout == WCS_J2000 || wcs_->sysout == WCS_B1950) 
 		    ::ra2str(rastr, sizeof(rastr), ra, 3);
@@ -163,7 +163,7 @@ int SAOWCS::wcs2pix(double ra, double dec, double &x, double &y) const
     int	offscl = 0;		// set to 1 if offscale
     ::wcs2pix(wcs_, ra, dec, &x, &y, &offscl);
 
-    if (offscl)
+    if (offscl == 1)
 	return error("can't convert world coords: off scale");
     return 0;
 }

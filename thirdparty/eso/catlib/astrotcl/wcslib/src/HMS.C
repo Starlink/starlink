@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HMS.C,v 1.11 2001/08/27 10:10:24 abrighto Exp $
+ * $Id: HMS.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * HMS.C - method definitions for class HMS
  * 
@@ -10,12 +10,12 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: HMS.C,v 1.11 2001/08/27 10:10:24 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: HMS.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
 #include "error.h"
 #include "HMS.h"
 
@@ -150,7 +150,7 @@ void HMS::print(char* buf) const
  * write this object to the given stream in the format
  * H:M:S.sss
  */
-ostream& operator<<(ostream& os, const HMS& hms) 
+std::ostream& operator<<(std::ostream& os, const HMS& hms) 
 {
     char buf[80];
     hms.print(buf);
@@ -163,7 +163,7 @@ ostream& operator<<(ostream& os, const HMS& hms)
  * read an HMS object from the given stream in the format
  * H:M:S.sss or H M S
  */
-istream& operator>>(istream& is, HMS& hms) 
+std::istream& operator>>(std::istream& is, HMS& hms) 
 {
     char c;
     double hours = 0;

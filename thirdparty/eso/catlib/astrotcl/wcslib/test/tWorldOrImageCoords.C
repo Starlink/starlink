@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tWorldOrImageCoords.C,v 1.3 2001/08/27 10:10:27 abrighto Exp $
+ * $Id: tWorldOrImageCoords.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tWorldOrImageCoords.C - test cases for class WorldOrImageCoords
  * 
@@ -10,7 +10,7 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
+#include <iostream>
 #include <stdlib.h>
 #include "error.h"
 #include "WorldOrImageCoords.h"
@@ -18,7 +18,7 @@
 // test automatic conversion
 static void print_coords(const ImageCoords& ic, const WorldCoords& wc)
 {
-    cout << "\nconversion test: image coords: " << ic << ", world coords: " << wc << endl;
+    std::cout << "\nconversion test: image coords: " << ic << ", world coords: " << wc << std::endl;
 }
 
 
@@ -31,14 +31,14 @@ main()
     WorldOrImageCoords ic1(ImageCoords(123.456, 654.321));
     WorldOrImageCoords ic2(ImageCoords("123.456.", "654.321."));
 
-    cout << "these coords should be the same (or very close):" << endl
-	<< ic1 << endl
-	<< ic2 << endl;
+    std::cout << "these coords should be the same (or very close):" << std::endl
+	<< ic1 << std::endl
+	<< ic2 << std::endl;
 
     // test the "box" method (get 2 points given a radius)
     WorldOrImageCoords ic3(ImageCoords(100., 200.)), ic4, ic5;
     ic3.box(10., ic4, ic5);
-    cout << "\nbox of radius 10 with center at (100, 200) ==> ("
+    std::cout << "\nbox of radius 10 with center at (100, 200) ==> ("
 	<< ic4 << "), (" << ic5 << ")\n";
 
     // test world coords
@@ -52,14 +52,14 @@ main()
     sprintf(buf, "%f", 49.95096/15);
     WorldOrImageCoords c7(WorldCoords(buf, "41.51173", 2000.0));
 
-    cout << "these coords should all be the same (or very close):" << endl
-	<< c1 << endl
-	<< c2 << endl
-	<< c3 << endl
-	<< c4 << endl
-	<< c5 << endl
-	<< c6 << endl
-	<< c7 << endl;
+    std::cout << "these coords should all be the same (or very close):" << std::endl
+	<< c1 << std::endl
+	<< c2 << std::endl
+	<< c3 << std::endl
+	<< c4 << std::endl
+	<< c5 << std::endl
+	<< c6 << std::endl
+	<< c7 << std::endl;
 
     c1 = WorldOrImageCoords(WorldCoords(49.95096, -41.51173));
     c2 = WorldOrImageCoords(WorldCoords(3, 19, 48.2304, -41, 30, 42.228));
@@ -69,38 +69,38 @@ main()
     c6 = WorldOrImageCoords(WorldCoords("3:19:48.2304", "-41:30:42.228", 2000.0));
     c7 = WorldOrImageCoords(WorldCoords(buf, "-41.51173", 2000.0));
 
-    cout << "Here is the same with negative dec:" << endl
-	<< c1 << endl
-	<< c2 << endl
-	<< c3 << endl
-	<< c4 << endl
-	<< c5 << endl
-	<< c6 << endl
-	<< c7 << endl;
+    std::cout << "Here is the same with negative dec:" << std::endl
+	<< c1 << std::endl
+	<< c2 << std::endl
+	<< c3 << std::endl
+	<< c4 << std::endl
+	<< c5 << std::endl
+	<< c6 << std::endl
+	<< c7 << std::endl;
 
     WorldOrImageCoords c8(WorldCoords("3:19", "+41:30", 2000.0));
     WorldOrImageCoords c9(WorldCoords("3", "+41", 2000.0));
-    cout << "And with missing minutes, ... seconds, ..." << endl
-	<< c8 << endl
-	<< c9 << endl;
+    std::cout << "And with missing minutes, ... seconds, ..." << std::endl
+	<< c8 << std::endl
+	<< c9 << std::endl;
 
     // test the "box" method (get 2 points given a radius)
     WorldOrImageCoords c10(WorldCoords("03:19:48.243", "+41:30:40.31")), c11, c12;
     c10.box(7.05, c11, c12);
-    cout << "\nbox of radius 7.05 with center at (03:19:48.243, +41:30:40.31) ==> ("
+    std::cout << "\nbox of radius 7.05 with center at (03:19:48.243, +41:30:40.31) ==> ("
 	<< c11 << "), (" << c12 << ")\n";
 
     
     // test values at or near 0,0
     WorldOrImageCoords c13(WorldCoords("0", "+41:30:40.31"));
-    cout << "\nWith ra = 0.0: " << c13 
-	 << ", vals = " << c13.ra().val()  << ", " << c13.dec().val() << endl;
+    std::cout << "\nWith ra = 0.0: " << c13 
+	 << ", vals = " << c13.ra().val()  << ", " << c13.dec().val() << std::endl;
     WorldOrImageCoords c14(WorldCoords("0.0", "-0.0"));
-    cout << "\nWith ra = 0.0, dec = -0.0: " << c14 
-	 << ", vals = " << c14.ra().val()  << ", " << c14.dec().val() << endl;
+    std::cout << "\nWith ra = 0.0, dec = -0.0: " << c14 
+	 << ", vals = " << c14.ra().val()  << ", " << c14.dec().val() << std::endl;
     WorldOrImageCoords c15(WorldCoords("0:0:1", "-0:1:1"));
-    cout << "\nWith ra = 0:0:1, dec = -0:1:1: " << c15 
-	 << ", vals = " << c15.ra().val() << ", " << c15.dec().val() << endl;
+    std::cout << "\nWith ra = 0:0:1, dec = -0:1:1: " << c15 
+	 << ", vals = " << c15.ra().val() << ", " << c15.dec().val() << std::endl;
 
 
     // test automatic conversion

@@ -14,8 +14,8 @@
 /*
  * tclInt.h is needed for the va_list declaration.
  */
-#include <tclInt.h>
 #include <tixPort.h>
+#include <tclInt.h>
 #include <tixInt.h>
 
 /*
@@ -70,14 +70,14 @@ TixSaveInterpState(interp, statePtr)
 	statePtr->result = NULL;
     }
 
-    p = Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
+    p = (char*)Tcl_GetVar2(interp, "errorInfo", NULL, TCL_GLOBAL_ONLY);
     if (p) {
 	statePtr->errorInfo = (char*)strdup(p);
     } else {
 	statePtr->errorInfo = NULL;
     }
 
-    p = Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
+    p = (char*)Tcl_GetVar2(interp, "errorCode", NULL, TCL_GLOBAL_ONLY);
     if (p) {
 	statePtr->errorCode = (char*)strdup(p);
     } else {

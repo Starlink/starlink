@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: ImageCoords.C,v 1.4 2001/08/27 10:10:24 abrighto Exp $
+ * $Id: ImageCoords.C,v 1.3 2003/01/20 15:52:21 brighton Exp $
  *
  * ImageCoords.C - method definitions for class ImageCoords
  * 
@@ -10,13 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: ImageCoords.C,v 1.4 2001/08/27 10:10:24 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ImageCoords.C,v 1.3 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdio>
+#include <cstring>
+#include <cctype>
+#include <cmath>
 #include "error.h"
 #include "ImageCoords.h"
 
@@ -46,7 +46,7 @@ void ImageCoords::print(char* x_buf, char* y_buf)
 /*
  * Print the coordinates to the given stream.
  */
-void ImageCoords::print(ostream& os)
+void ImageCoords::print(std::ostream& os)
 {
     os << *this;
 }
@@ -65,7 +65,7 @@ void ImageCoords::get(double& x, double& y)
 /*
  * output operator: ("" for null coords)
  */
-ostream& operator<<(ostream& os, const ImageCoords& pos)
+std::ostream& operator<<(std::ostream& os, const ImageCoords& pos)
 {
     if (pos.isNull())
 	os << "\"\"";

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tHTTP.C,v 1.4 2001/08/27 10:11:33 abrighto Exp $
+ * $Id: tHTTP.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tHTTP.C - test cases for class HTTP
  * 
@@ -13,8 +13,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <assert.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <string.h>
 #include "error.h"
 #include "HTTP.h"
@@ -33,7 +33,7 @@ static int createTestFile(const char *fname)
     ofstream ofile(fname);
 
     if (!ofile) {
-	cout << "Couldn't create test file: " << fname << endl;
+	cout << "Couldn't create test file: " << fname << std::endl;
 	exit(-1);
     }
 

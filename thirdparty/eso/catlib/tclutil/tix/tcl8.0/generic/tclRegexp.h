@@ -4,7 +4,7 @@
  * Caveat:  this is V8 regexp(3) [actually, a reimplementation thereof],
  * not the System V one.
  *
- * RCS: @(#) $Id: tclRegexp.h,v 1.4 2001/08/27 10:11:17 abrighto Exp $
+ * RCS: @(#) $Id: tclRegexp.h,v 1.1.1.1 2002/04/04 20:12:01 brighton Exp $
  */
 
 #ifndef _REGEXP

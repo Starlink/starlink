@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TcsCatalog.h,v 1.6 2001/08/27 10:10:30 abrighto Exp $
+ * $Id: TcsCatalog.h,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $
  *
  * TcsCatalog.h - class specialized for accessing GSC, PPM or similar catalogs 
  *                for use by the TCS (Telescope Control Software).

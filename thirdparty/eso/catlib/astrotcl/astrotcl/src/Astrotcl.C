@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Astrotcl.C,v 1.9 2001/08/27 10:10:09 abrighto Exp $"
+ * "@(#) $Id: Astrotcl.C,v 1.5 2003/01/20 15:52:21 brighton Exp $"
  *
  * Astrotcl.C - Initialize Astrotcl package
  * 
@@ -9,23 +9,22 @@
  * Allan Brighton  21 Nov 97  Created
  * pbiereic        26/08/99   Changed Astrotcl_Init()
  */
-static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.9 2001/08/27 10:10:09 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Astrotcl.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
 
-#include <stdlib.h>
-#include <string.h>
-#include <signal.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <strstream.h>
+#include <cstdlib>
+#include <cstring>
+#include <csignal>
+#include <cstdio>
+#include <iostream>
 #include <sys/types.h>
 #include <unistd.h>
-#include <math.h>
-#include <assert.h>
+#include <cmath>
+#include <cassert>
+#include "config.h"
 #include <tcl.h>
 #include <tk.h>
 #include "error.h"
 #include "define.h"
-#include "config.h"
 
 extern "C" int TclWorldCoords_Init(Tcl_Interp* interp);
 
@@ -61,7 +60,7 @@ int Astrotcl_Init(Tcl_Interp* interp)
     defineAstrotclBitmaps(interp);
 
     // add a dummy tcl command (this command doesn't do anything currently)
-    Tcl_CreateCommand(interp, "astrotcl", astrotcl_cmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "astrotcl", (Tcl_CmdProc*)astrotcl_cmd, NULL, NULL);
     
     // add the wcs command
     TclWorldCoords_Init(interp);

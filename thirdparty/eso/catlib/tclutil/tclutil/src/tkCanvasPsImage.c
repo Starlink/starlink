@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: tkCanvasPsImage.c,v 1.7 2001/08/27 10:11:14 abrighto Exp $" 
+ * "@(#) $Id: tkCanvasPsImage.c,v 1.1.1.1 2002/04/04 20:11:57 brighton Exp $" 
  *
  * TkCanvasPsImage.C -  Implement Tk postscript output for images
  *
@@ -24,7 +24,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  19/06/98  Created
  */
-static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.7 2001/08/27 10:11:14 abrighto Exp $";
+static char* rcsId="@(#) $Id: tkCanvasPsImage.c,v 1.1.1.1 2002/04/04 20:11:57 brighton Exp $";
 
 
 #include <stdio.h>

@@ -4,6 +4,19 @@ CHANGES to Astrotcl
 This file contains a list of changes to the Astrotcl software.
 The latest changes are at the top.
 
+--------------- 20.01.03 released astrotcl-1.4.8 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
+* Fixed bug in wcslib/src/hget.c, routine ksearch, that could
+  cause skycat to core dump on some FITS files. (The routine
+  called strlen() on the FITS header, which was mmap'ed and might
+  not contain a null char).
+
+--------------- 13.12.01 released astrotcl-1.4.7 -----------------
+
+* Enabled WCS coordinate conversion outside of the image area (by request).
+
 --------------- 27.08.01 released astrotcl-1.4.6 -----------------
 
 * Merged in minor changes from Peter Biereichel (added some #include files).

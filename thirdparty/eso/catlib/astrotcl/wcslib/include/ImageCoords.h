@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: ImageCoords.h,v 1.5 2001/08/27 10:10:22 abrighto Exp $
+ * $Id: ImageCoords.h,v 1.4 2003/01/20 15:52:21 brighton Exp $
  *
  * ImageCoords.h - class representing image coordinates (x, y)
  *                 (see also class WorldCoords)
@@ -14,9 +14,9 @@
  * Allan Brighton  26 Sep 97  Created
  */
 
-#include <stdio.h>
-#include <iostream.h>
-#include <math.h>
+#include <cstdio>
+#include <iostream>
+#include <cmath>
 
 const double IMAGE_COORD_NULL = HUGE_VAL;	// null value for a double
 
@@ -48,13 +48,13 @@ public:
     void setNull() {x_ = IMAGE_COORD_NULL; y_ = IMAGE_COORD_NULL;}
    
     // output operator: format: "x y"
-    friend ostream& operator<<(ostream&, const ImageCoords& pos);
+    friend std::ostream& operator<<(std::ostream&, const ImageCoords& pos);
 
     // print coords to the given buffer
     void print(char* x_buf, char* y_buf);
     
     // print coords to the given stream
-    void print(ostream& os);
+    void print(std::ostream& os);
 
     // get x and y
     void get(double& x, double& y);

@@ -409,8 +409,8 @@ ImgCmpCreate(interp, name, argc,
     CmpMaster *masterPtr;
 
 #if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
-    // just generate an argv from the objv argument
-    char* argv[64];  // there shouldn't be more than a few options...
+    /* just generate an argv from the objv argument */
+    char* argv[64];  /* there shouldn't be more than a few options... */
     int i;
     for(i = 0; i < argc; i++)
 	argv[i] = Tcl_GetString(objv[i]);
@@ -1358,7 +1358,7 @@ ImgCmpDelete(masterData)
     }
     masterPtr->tkMaster = NULL;
     if (masterPtr->imageCmd != NULL) {
-	char * cmd = Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
+	char * cmd = (char*)Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
 	masterPtr->imageCmd = NULL;
 	Tcl_DeleteCommand(masterPtr->interp, cmd);
     }
@@ -1471,7 +1471,7 @@ CmpEventProc(clientData, eventPtr)
 
     if (eventPtr->type == DestroyNotify) {
 	if (masterPtr->imageCmd != NULL) {
-	    cmd = Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
+	    cmd = (char*)Tcl_GetCommandName(masterPtr->interp,masterPtr->imageCmd);
 	    masterPtr->imageCmd = NULL;
 	    Tcl_DeleteCommand(masterPtr->interp, cmd);
 	}

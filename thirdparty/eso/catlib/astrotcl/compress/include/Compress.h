@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: Compress.h,v 1.4 2001/08/27 10:10:09 abrighto Exp $
+ * $Id: Compress.h,v 1.1.1.1 2002/04/04 20:11:40 brighton Exp $
  *
  * Compress.h - utility class for compressing/decompressing FITS files
  * 

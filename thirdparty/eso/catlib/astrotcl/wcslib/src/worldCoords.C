@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: worldCoords.C,v 1.3 2001/08/27 10:10:27 abrighto Exp $
+ * $Id: worldCoords.C,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
  *
  * worldCoords.C - C interface implementation for C++ class WorldCoords
  * 
@@ -10,7 +10,7 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  13 Oct 95  Created
  */
-static const char* const rcsId="@(#) $Id: worldCoords.C,v 1.3 2001/08/27 10:10:27 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: worldCoords.C,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $";
 
 
 

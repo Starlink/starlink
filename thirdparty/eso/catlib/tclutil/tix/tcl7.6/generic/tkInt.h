@@ -15,7 +15,7 @@
  *           mmclennan@lucent.com
  *           http://www.tcltk.com/itcl
  *
- *     RCS:  $Id: tkInt.h,v 1.3 2001/08/27 10:11:15 abrighto Exp $
+ *     RCS:  $Id: tkInt.h,v 1.1.1.1 2002/04/04 20:12:00 brighton Exp $
  * ========================================================================
  *               Copyright (c) 1993-1996  Lucent Technologies
  * ------------------------------------------------------------------------

@@ -29,7 +29,7 @@
 *                      AUSTRALIA
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: wcslib.h,v 1.9 2001/08/27 10:10:23 abrighto Exp $
+*   $Id: wcslib.h,v 1.1.1.1 2002/04/04 20:11:43 brighton Exp $
 *===========================================================================*/
 
 #ifdef __cplusplus

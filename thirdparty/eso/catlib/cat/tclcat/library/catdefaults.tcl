@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: catdefaults.tcl,v 1.15 2001/08/27 10:10:37 abrighto Exp $
+# @(#) $Id: catdefaults.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # catdefaults.tcl - X defaults for itk catalog widgets
 #

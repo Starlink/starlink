@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: TableListConfig.tcl,v 1.8 2001/08/27 10:11:12 abrighto Exp $"
+# "@(#) $Id: TableListConfig.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # TableListConfig.tcl - Popup widget for editing table layout for TableList
 #

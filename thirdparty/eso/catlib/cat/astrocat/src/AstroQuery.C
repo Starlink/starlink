@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: AstroQuery.C,v 1.16 2001/08/27 10:10:31 abrighto Exp $
+ * $Id: AstroQuery.C,v 1.2 2003/01/20 15:52:21 brighton Exp $
  *
  * AstroQuery.C - method definitions for class AstroQuery
  * 
@@ -10,13 +10,13 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created 
  */
-static const char* const rcsId="@(#) $Id: AstroQuery.C,v 1.16 2001/08/27 10:10:31 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: AstroQuery.C,v 1.2 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
+#include <cstring>
 #include "error.h"
 #include "util.h"
 #include "AstroQuery.h"

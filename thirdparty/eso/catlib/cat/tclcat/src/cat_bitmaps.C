@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project / ESO Archive
- * "@(#) $Id: cat_bitmaps.C,v 1.3 2001/08/27 10:10:39 abrighto Exp $"
+ * "@(#) $Id: cat_bitmaps.C,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
  *
  * Tk Bitmap/Pixmap definitions
  *

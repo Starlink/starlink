@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.38 2001/08/27 10:10:28 abrighto Exp $
+# $Id: configure.in,v 1.1.1.1 2002/04/04 20:11:45 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Catalog modules.

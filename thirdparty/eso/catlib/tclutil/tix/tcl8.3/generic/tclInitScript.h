@@ -8,7 +8,7 @@
  * Copyright (c) 1999 by Scriptics Corporation.
  * All rights reserved.
  *
- * RCS: @(#) $Id: tclInitScript.h,v 1.2 2001/08/27 10:11:28 abrighto Exp $
+ * RCS: @(#) $Id: tclInitScript.h,v 1.1.1.1 2002/04/04 20:12:03 brighton Exp $
  */
 
 /*

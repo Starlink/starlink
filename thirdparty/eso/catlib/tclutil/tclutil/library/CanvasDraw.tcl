@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ ESO Archive
-# "@(#) $Id: CanvasDraw.tcl,v 1.22 2001/08/27 10:11:09 abrighto Exp $"
+# "@(#) $Id: CanvasDraw.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 #
 # CanvasDraw.tcl - Add interactive drawing capabilities to a Tk canvas.
 #

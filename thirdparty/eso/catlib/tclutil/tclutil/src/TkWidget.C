@@ -1,7 +1,7 @@
 /*
  * TkWidget.C - base class definitions for Tk widgets implemented in C++
  *
- * "@(#) $Id: TkWidget.C,v 1.3 2001/08/27 10:11:14 abrighto Exp $"
+ * "@(#) $Id: TkWidget.C,v 1.5 2003/01/20 15:52:22 brighton Exp $"
  *
  * See the man page for a complete description.
  *
@@ -17,14 +17,15 @@
  * -----------------------------------------------------------------------------
  *
  */
-static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.3 2001/08/27 10:11:14 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TkWidget.C,v 1.5 2003/01/20 15:52:22 brighton Exp $";
 
 
 
-#include <stdlib.h>
-#include <ctype.h>
-#include <iostream.h>
-#include <string.h>
+#include <cstdlib>
+#include <cctype>
+#include <iostream>
+#include <cstring>
+#include "config.h"
 #include "TkWidget.h"
 
 
@@ -182,7 +183,7 @@ int TkWidget::initWidget(int argc, char* argv[])
 int TkWidget::configureWidget(int argc, char* argv[], int flags)
 {
     if (Tk_ConfigureWidget(interp_, tkwin_, configSpecsPtr_,
-	    argc, argv, (char*)optionsPtr_, flags) != TCL_OK) {
+			   argc, argv, (char*)optionsPtr_, flags) != TCL_OK) {
 	return TCL_ERROR;
     }
     return TCL_OK;

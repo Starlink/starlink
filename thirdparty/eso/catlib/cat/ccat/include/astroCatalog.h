@@ -3,7 +3,7 @@
 
 /*
  * E.S.O. - VLT project 
- * $Id: astroCatalog.h,v 1.5 2001/08/27 10:10:34 abrighto Exp $
+ * $Id: astroCatalog.h,v 1.1.1.1 2002/04/04 20:11:46 brighton Exp $
  *
  * astroCatalog.h - C interface to C++ class AstroCatalog
  *

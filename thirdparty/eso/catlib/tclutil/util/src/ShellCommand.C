@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ShellCommand.C,v 1.5 2001/08/27 10:11:33 abrighto Exp $" 
+ * "@(#) $Id: ShellCommand.C,v 1.3 2003/01/20 15:52:22 brighton Exp $" 
  *
  * ShellCommand.C - methods for class ShellCommand, util class for
  *                  running a shell command and getting the output.
@@ -10,7 +10,7 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  12 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.5 2001/08/27 10:11:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.3 2003/01/20 15:52:22 brighton Exp $";
 
 
 #include <sys/types.h>
@@ -18,12 +18,11 @@ static const char* const rcsId="@(#) $Id: ShellCommand.C,v 1.5 2001/08/27 10:11:
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <signal.h>
-#include <iostream.h>
-#include <strstream.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <csignal>
+#include <iostream>
+#include <cstring>
 #include "error.h"
 #include "define.h"
 #include "ShellCommand.h"

@@ -122,7 +122,7 @@ static versions.
 ------------------------------
 
 The top level configure script actually runs "configure" in each of
-the package subdirectories found (tclutil, astrotcl, rtd, cat, et, and
+the package subdirectories found (tclutil, astrotcl, rtd, cat, and
 skycat).  If there are errors, you might try to run configure and make
 manually in a subdirectory. As an alternative to configure, you can
 also use one of the scripts config.debug, config.shared, etc, which do

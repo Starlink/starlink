@@ -1,5 +1,5 @@
 # E.S.O. - VLT project
-# "@(#) $Id: PreviewPlot.tcl,v 1.20 2001/08/27 10:10:37 abrighto Exp $"
+# "@(#) $Id: PreviewPlot.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $"
 #
 # PreviewPlot.tcl - Widget for displaying a graph of tab table data
 # 

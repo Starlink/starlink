@@ -18,9 +18,9 @@
  * 1) Tix_CallMethod() needs to be re-written
  *
  */
+#include <tixPort.h>
 #include <tclInt.h>
 #include <tk.h>
-#include <tixPort.h>
 #include <tixInt.h>
 
 #define GetMethodTable(interp) (_TixGetHashTable(interp, "tixMethodTab", MethodTableDeleteProc))
@@ -59,7 +59,7 @@ TIX_DEFINE_CMD(Tix_CallMethodCmd)
 	return Tix_ArgcError(interp, argc, argv, 1, "w method ...");
     }
  
-    if ((context = GET_RECORD(interp, widRec, "className")) == NULL) {
+    if ((context = (char*)GET_RECORD(interp, widRec, "className")) == NULL) {
 	Tcl_ResetResult(interp);
 	Tcl_AppendResult(interp, "invalid object reference \"", widRec,
 	    "\"", (char*)NULL);
@@ -266,7 +266,7 @@ static char * Tix_SaveContext(interp, widRec)
 {
     char * context;
 
-    if ((context = GET_RECORD(interp, widRec, "context")) == NULL) {
+    if ((context = (char*)GET_RECORD(interp, widRec, "context")) == NULL) {
 	Tcl_ResetResult(interp);
 	Tcl_AppendResult(interp, "invalid object reference \"", widRec,
 	    "\"", (char*)NULL);
@@ -301,7 +301,7 @@ char * Tix_GetContext(interp, widRec)
 {
     char * context;
 
-    if ((context = GET_RECORD(interp, widRec, "context")) == NULL) {
+    if ((context = (char*)GET_RECORD(interp, widRec, "context")) == NULL) {
 	Tcl_ResetResult(interp);
 	Tcl_AppendResult(interp, "invalid object reference \"", widRec,
 	    "\"", (char*)NULL);
@@ -318,7 +318,7 @@ int Tix_SuperClass(interp, class, superClass_ret)
 {
     char * superclass;
 
-    if ((superclass = GET_RECORD(interp, class, "superClass")) == NULL) {
+    if ((superclass = (char*)GET_RECORD(interp, class, "superClass")) == NULL) {
 	Tcl_ResetResult(interp);
 	Tcl_AppendResult(interp, "invalid class \"", class,
 	    "\"; ", (char*)NULL);

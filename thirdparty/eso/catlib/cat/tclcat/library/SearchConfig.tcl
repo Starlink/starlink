@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: SearchConfig.tcl,v 1.10 2001/08/27 10:10:37 abrighto Exp $
+# @(#) $Id: SearchConfig.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # SearchConfig.tcl - Widget for editing a list of search columns
 #

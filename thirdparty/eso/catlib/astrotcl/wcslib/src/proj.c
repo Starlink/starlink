@@ -189,7 +189,7 @@
 *   where the projection may diverge).
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: proj.c,v 1.9 2001/08/27 10:10:25 abrighto Exp $
+*   $Id: proj.c,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
 *===========================================================================*/
 
 #include <stdlib.h>

@@ -4,6 +4,10 @@ CHANGES to Tclutil
 This file contains a list of changes to the Tclutil software.
 The latest changes are at the top.
 
+--------------- 20.01.03 released tclutil-1.2.5 -----------------
+
+* Ported to gcc-3.2.1 and Tcl-8.4.1
+
 --------------- 27.08.01 released tclutil-1.2.4 -----------------
 
 * Merged in minor changes from Peter Biereichel (added some #include files).

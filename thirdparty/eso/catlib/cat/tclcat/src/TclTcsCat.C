@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclTcsCat.C,v 1.11 2001/08/27 10:10:39 abrighto Exp $
+ * $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
  *
  * TclTcsCat.C - method definitions for class TclTcsCat
  * 
@@ -10,16 +10,16 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.11 2001/08/27 10:10:39 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclTcsCat.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <strstream.h>
+#include "config.h"
 #include "TcsCatalog.h"
 #include "TcsLocalCatalog.h"
 #include "TclQueryUtil.h"
@@ -34,7 +34,7 @@ extern "C"
 int TclTcsCat_Init(Tcl_Interp* interp)  
 {
     // install the tcscat command 
-    Tcl_CreateCommand(interp, "tcscat", TclTcsCat::tcsCatCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "tcscat", (Tcl_CmdProc*)TclTcsCat::tcsCatCmd, NULL, NULL);
     return TCL_OK;
 }
 

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclWorldCoords.C,v 1.4 2001/08/27 10:10:09 abrighto Exp $
+ * $Id: TclWorldCoords.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
  *
  * TclWorldCoords.C - method definitions for class TclWorldCoords
  *                    (Tcl interface to the WorldCoords class)
@@ -11,14 +11,15 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  09 Nov 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.4 2001/08/27 10:10:09 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <stdio.h>
-#include <string.h>
-#include <iostream.h>
-#include <stdlib.h>
-#include <strstream.h>
+#include <cstdio>
+#include <cstring>
+#include <iostream>
+#include <cstdlib>
+#include <sstream>
+#include "config.h"
 #include "WorldCoords.h"
 #include "TclWorldCoords.h"
 
@@ -63,7 +64,7 @@ int TclWorldCoords::call(const char* name, int len, int argc, char* argv[])
 extern "C"
 int TclWorldCoords_Init(Tcl_Interp* interp)  
 {
-    Tcl_CreateCommand(interp, "wcs", TclWorldCoords::wcsCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "wcs", (Tcl_CmdProc*)TclWorldCoords::wcsCmd, NULL, NULL);
     return TCL_OK;
 }
 
@@ -106,10 +107,9 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
 {
     if (wcs.status() != 0)
 	return TCL_ERROR;
-    char buf[32];
-    ostrstream os(buf, sizeof(buf));
-    os << wcs << ends;
-    return set_result(buf);
+    std::ostringstream os;
+    os << wcs;
+    return set_result(os.str().c_str());
 }
 
 
@@ -118,10 +118,9 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
  */
 int TclWorldCoords::set_hms_result(const HMS& hms)
 {
-    char buf[32];
-    ostrstream os(buf, sizeof(buf));
-    os << hms << ends;
-    return set_result(buf);
+    std::ostringstream os;
+    os << hms;
+    return set_result(os.str().c_str());
 }
 
 

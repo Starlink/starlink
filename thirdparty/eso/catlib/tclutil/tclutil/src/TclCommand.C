@@ -1,6 +1,6 @@
 /*
  * TclCommand.C - base class definitions for tcl command classes
- * "@(#) $Id: TclCommand.C,v 1.6 2001/08/27 10:11:14 abrighto Exp $"
+ * "@(#) $Id: TclCommand.C,v 1.6 2003/01/20 15:52:22 brighton Exp $"
  * 
  * See the man page for a complete description.
  * -----------------------------------------------------------------------------
@@ -15,15 +15,16 @@
  * -----------------------------------------------------------------------------
  *
  */
-static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.6 2001/08/27 10:11:14 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclCommand.C,v 1.6 2003/01/20 15:52:22 brighton Exp $";
 
 
 
-#include <stdlib.h>
-#include <iostream.h>
-#include <strstream.h>
-#include <errno.h>
-#include <string.h>
+#include <cstdlib>
+#include <iostream>
+#include <sstream>
+#include <cerrno>
+#include <cstring>
+#include "config.h"
 #include "error.h"
 #include "TclCommand.h"
 
@@ -59,7 +60,7 @@ TclCommand::TclCommand(Tcl_Interp* interp, const char* cmdname, const char* inst
     }
 
     // create the basic tcl command and return its name
-    Tcl_CreateCommand(interp, instname_, TclCommand::tclCmdProc, (ClientData)this, 
+    Tcl_CreateCommand(interp, instname_, (Tcl_CmdProc*)TclCommand::tclCmdProc, (ClientData)this, 
 		      TclCommand::tclDeleteProc);
 
     // The result of the comamnd is its name
@@ -297,12 +298,11 @@ int TclCommand::append_element(const char* s)
 int TclCommand::error(const char* msg1, const char* msg2) 
 {
     // msg1 or msg2 might be the same as interp_->result...
-    char buf[1024];
-    ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ends;
+    std::ostringstream os;
+    os << msg1 << msg2;
 
     Tcl_ResetResult(interp_);
-    Tcl_SetResult(interp_, buf, TCL_VOLATILE);
+    Tcl_SetResult(interp_, (char*)os.str().c_str(), TCL_VOLATILE);
     return TCL_ERROR;
 }
 
@@ -312,11 +312,10 @@ int TclCommand::error(const char* msg1, const char* msg2)
 int TclCommand::more_error(const char* msg1, const char* msg2) 
 {
     // msg1 or msg2 might be the same as interp_->result...
-    char buf[1024];
-    ostrstream os(buf, sizeof(buf));
-    os << msg1 << msg2 << ends;
+    std::ostringstream os;
+    os << msg1 << msg2;
 
-    Tcl_AppendResult(interp_, buf, (char *)NULL);
+    Tcl_AppendResult(interp_, os.str().c_str(), (char *)NULL);
     return TCL_ERROR;
 }
 

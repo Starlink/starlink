@@ -147,8 +147,8 @@ ImgXpmCreate(interp, name, argc,
     PixmapMaster *masterPtr;
 
 #if TCL_MAJOR_VERSION >= 8 && TCL_MINOR_VERSION >= 3
-    // just generate an argv from the objv argument
-    char* argv[64];  // there shouldn't be more than a few options...
+    /* just generate an argv from the objv argument */
+    char* argv[64];  /* there shouldn't be more than a few options... */
     int i;
     for(i = 0; i < argc; i++)
 	argv[i] = Tcl_GetString(objv[i]);
@@ -301,7 +301,7 @@ ImgXpmGetData(interp, masterPtr)
     int code = TCL_OK;
 
     if (masterPtr->id != NULL) {
-	data = ImgXpmGetDataFromId(interp, masterPtr->id);
+	data = (char**)ImgXpmGetDataFromId(interp, (char*)masterPtr->id);
 	isAllocated = 0;
     }
     else if (masterPtr->fileString != NULL) {

@@ -1,5 +1,5 @@
 # E.S.O. - VLT project/ESO Archive
-# @(#) $Id: ProxyDialog.tcl,v 1.4 2001/08/27 10:10:37 abrighto Exp $
+# @(#) $Id: ProxyDialog.tcl,v 1.1.1.1 2002/04/04 20:11:47 brighton Exp $
 #
 # ProxyDialog.tcl - user interface class for defining a proxy server
 #                   for HTTP access.

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tShellCommand.C,v 1.5 2001/08/27 10:11:33 abrighto Exp $
+ * $Id: tShellCommand.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tShellCommand.C - test cases for class ShellCommand
  * 
@@ -12,8 +12,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include "error.h"
 #include "ShellCommand.h"
 
@@ -30,7 +30,7 @@ static int createTestFile(const char *fname)
     ofstream ofile(fname);
 
     if (!ofile) {
-	cout << "Couldn't create test file: " << fname << endl;
+	cout << "Couldn't create test file: " << fname << std::endl;
 	exit(-1);
     }
 

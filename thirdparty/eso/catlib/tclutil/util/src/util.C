@@ -1,7 +1,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: util.C,v 1.5 2001/08/27 10:11:33 abrighto Exp $" 
+ * "@(#) $Id: util.C,v 1.2 2003/01/17 11:10:02 brighton Exp $" 
  *
  * util.C - utility routines
  * 
@@ -13,7 +13,7 @@
  *                            the beginning of string if no '/'
  *                            available, rather than just last '.'. 
  */
-static const char* const rcsId="@(#) $Id: util.C,v 1.5 2001/08/27 10:11:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: util.C,v 1.2 2003/01/17 11:10:02 brighton Exp $";
 
 
 #include <stdio.h>
@@ -25,7 +25,7 @@ static const char* const rcsId="@(#) $Id: util.C,v 1.5 2001/08/27 10:11:33 abrig
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/utsname.h>
-#include <iostream.h>
+#include <iostream>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <errno.h>

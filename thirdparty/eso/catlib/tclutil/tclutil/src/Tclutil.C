@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: Tclutil.C,v 1.10 2001/08/27 10:11:14 abrighto Exp $"
+ * "@(#) $Id: Tclutil.C,v 1.5 2003/01/20 15:52:22 brighton Exp $"
  *
  * Tclutil.C - Initialize Tclutil package
  * 
@@ -10,23 +10,22 @@
  * pbiereic        26/08/99   Changed Tclutil_Init()
 
  */
-static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.10 2001/08/27 10:11:14 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: Tclutil.C,v 1.5 2003/01/20 15:52:22 brighton Exp $";
 
-#include <stdlib.h>
-#include <signal.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <strstream.h>
+#include <cstdlib>
+#include <csignal>
+#include <cstdio>
+#include <iostream>
 #include <sys/types.h>
 #include <unistd.h>
-#include <math.h>
-#include <assert.h>
-#include <string.h>
-#include <tcl.h>
-#include <tk.h>
+#include <cmath>
+#include <cassert>
+#include <cstring>
+#include "config.h"
+#include "tcl.h"
+#include "tk.h"
 #include "error.h"
 #include "define.h"
-#include "config.h"
 
 // generated code for bitmaps used in tcl scripts
 void defineTclutilBitmaps(Tcl_Interp*);
@@ -65,7 +64,7 @@ int Tclutil_Init(Tcl_Interp* interp)
     defineTclutilBitmaps(interp);
 
     // add a dummy tcl command (this command doesn't do anything currently)
-    Tcl_CreateCommand(interp, "tclutil", tclutil_cmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "tclutil", (Tcl_CmdProc*)tclutil_cmd, NULL, NULL);
 
     // Set the global Tcl variable  tclutil_version 
     Tcl_SetVar(interp, "tclutil_version", TCLUTIL_VERSION, TCL_GLOBAL_ONLY);

@@ -4,7 +4,7 @@
 
 /*
  * E.S.O. - VLT project/ESO Archive
- * $Id: TclAstroCat.h,v 1.22 2001/08/27 10:10:36 abrighto Exp $
+ * $Id: TclAstroCat.h,v 1.2 2003/01/18 21:11:11 brighton Exp $
  *
  * TclAstroCat.h - Tcl interface to the AstroCatalog C++ class for 
  * 	 	  accessing astronomical catalogs
@@ -53,9 +53,9 @@ protected:
     virtual int appendListVal(const char* value);
 
     // convert tcl list cat entry to config file format
-    virtual int tclListToConfigStreamValue(const char* tclList, ostream& os);
-    virtual int tclListToConfigStreamLine(const char* tclList, ostream& os);
-    virtual int tclListToConfigStream(const char* tclList, ostream& os);
+    virtual int tclListToConfigStreamValue(const char* tclList, std::ostream& os);
+    virtual int tclListToConfigStreamLine(const char* tclList, std::ostream& os);
+    virtual int tclListToConfigStream(const char* tclList, std::ostream& os);
 
     // Return the catalog directory entry for the given name or path
     CatalogInfoEntry* lookupCatalogDirectoryEntry(const char* dirList);

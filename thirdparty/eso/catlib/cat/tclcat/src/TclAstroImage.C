@@ -1,7 +1,7 @@
 
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclAstroImage.C,v 1.16 2001/08/27 10:10:38 abrighto Exp $
+ * $Id: TclAstroImage.C,v 1.6 2003/01/20 15:52:21 brighton Exp $
  *
  * StarCat.C - method definitions for class TclAstroImage
  * 
@@ -14,16 +14,17 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
  */
-static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.16 2001/08/27 10:10:38 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclAstroImage.C,v 1.6 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <strstream.h>
-#include <string.h>
+#include <sstream>
+#include <cstring>
+#include "config.h"
 #include "TclAstroCat.h"
 #include "TclAstroImage.h"
 
@@ -79,7 +80,7 @@ int TclAstroImage::call(const char* name, int len, int argc, char* argv[])
 extern "C"
 int TclAstroImage_Init(Tcl_Interp* interp)  
 {
-    Tcl_CreateCommand(interp, "astroimage", TclAstroImage::astroImageCmd, NULL, NULL);
+    Tcl_CreateCommand(interp, "astroimage", (Tcl_CmdProc*)TclAstroImage::astroImageCmd, NULL, NULL);
     return TCL_OK;
 }
 
@@ -267,13 +268,12 @@ int TclAstroImage::getimageCmd(int argc, char* argv[])
  */
 int TclAstroImage::centerposCmd(int argc, char* argv[])
 {
-    char buf[126];
-    ostrstream os(buf, sizeof(buf));
+    std::ostringstream os;
 
     pos_.print(os, equinox_);	// print coords in given equinox
     if (im_->isWcs())
-	os << " " << equinox_ << ends;
-    return set_result(buf);
+	os << " " << equinox_;
+    return set_result(os.str().c_str());
 }
 
 
@@ -429,12 +429,11 @@ int TclAstroImage::authorizeCmd(int argc, char* argv[])
     
     if (argc == 0) {
 	HTTP& http = im_->http();
-	char buf[1024];
-	ostrstream os(buf, sizeof(buf));
+	std::ostringstream os;
 	os << http.authorizationRequired() 
 	   << " " << http.www_auth_realm()
-	   << " " << http.hostname() << ends;
-	return set_result(buf);
+	   << " " << http.hostname();
+	return set_result(os.str().c_str());
     }
 
     if (argc == 2) 

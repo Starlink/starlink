@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: ErrorHandler.C,v 1.3 2001/08/27 10:11:13 abrighto Exp $"
+ * "@(#) $Id: ErrorHandler.C,v 1.4 2003/01/20 15:52:22 brighton Exp $"
  *
  * ErrorHandler.C - class definitions for catching X errors in Tk
  * 
@@ -10,13 +10,13 @@
  * --------------  --------  ----------------------------------------
  * Allan Brighton  05/10/95  Created
  */
-static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.3 2001/08/27 10:11:13 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: ErrorHandler.C,v 1.4 2003/01/20 15:52:22 brighton Exp $";
 
 
 
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
 #include "error.h"
 #include "ErrorHandler.h"
 
@@ -67,7 +67,7 @@ int ErrorHandler::error(XErrorEvent *errEventPtr)
     if (verbose_) {
 	char msg[80];
 	XGetErrorText(display_, errEventPtr->error_code, msg, sizeof(msg));
-	cout << "X Error: " << msg << endl;
+	std::cout << "X Error: " << msg << std::endl;
 	::error("X Error: ", msg);
     }
     return TCL_OK;

@@ -1,6 +1,6 @@
 /* 
  * tkAppInit.C -- 
- * "@(#) $Id: tkAppInit.C,v 1.5 2001/08/27 10:10:07 abrighto Exp $"
+ * "@(#) $Id: tkAppInit.C,v 1.1.1.1 2002/04/04 20:11:39 brighton Exp $"
  * ---------------------------------------------------------------------
  * NOTE: This file was modified by adding the BLT, Itcl and TclX extensions.
  *       It was also modified to be compiled with a C++ compiler,

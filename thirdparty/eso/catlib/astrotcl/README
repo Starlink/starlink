@@ -9,8 +9,7 @@ decompression. The library may be loaded dynamically as a Tcl package
 or compiled into an application, with or without Tcl support.
 
 --------------------------------------------
-Contact: Allan Brighton (abrighto@eso.org)
-         ESO - European Southern Observatory
+Contact: Allan Brighton (abrighton@gemini.edu)
 --------------------------------------------
 
 For installation instructions, see the file INSTALL in this directory.

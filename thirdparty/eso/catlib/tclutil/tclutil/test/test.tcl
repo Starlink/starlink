@@ -1,6 +1,6 @@
 # E.S.O. - VLT project
 #
-# "@(#) $Id: test.tcl,v 1.6 2001/08/27 10:11:14 abrighto Exp $" 
+# "@(#) $Id: test.tcl,v 1.1.1.1 2002/04/04 20:11:57 brighton Exp $" 
 #
 # test.tcl - tcl defs to set up environment for test scripts
 #

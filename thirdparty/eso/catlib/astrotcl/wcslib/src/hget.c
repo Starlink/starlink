@@ -994,9 +994,11 @@ char *keyword;	/* character string containing the name of the variable
 	while (lhead < 256000 && hstring[lhead] != 0)
 	    lhead++;
 	}
+    /* XXX allan: causes core dump on solaris, with mmapped header
     lhstr = strlen (hstring);
     if (lhstr < lhead)
 	lhead = lhstr;
+	XXX */
 	
     headlast = hstring + lhead;
     headnext = hstring;

@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * "@(#) $Id: config.h.in,v 1.6 2001/08/27 10:11:32 abrighto Exp $" 
+ * "@(#) $Id: config.h.in,v 1.2 2003/01/16 22:09:10 brighton Exp $" 
  *
  * config.h.in - global configuration values, set by configure
  * 
@@ -9,6 +9,12 @@
  * Allan Brighton  05/10/95  Created
  *
  */
+
+
+/* For compatibility between tcl8.4 and previous tcl releases
+ * (problems with CONSTification)
+ */
+#define USE_COMPAT_CONST
 
 
 /* define this if the SHM (shared memory) prototypes are missing 

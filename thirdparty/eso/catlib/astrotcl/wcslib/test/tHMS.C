@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project 
- * $Id: tHMS.C,v 1.5 2001/08/27 10:10:27 abrighto Exp $
+ * $Id: tHMS.C,v 1.3 2003/01/18 21:11:11 brighton Exp $
  *
  * tHMS.C - test cases for class HMS
  * 
@@ -10,8 +10,8 @@
  */
 
 #include <stdio.h>
-#include <iostream.h>
-#include <iomanip.h>
+#include <iostream>
+#include <iomanip>
 #include <stdlib.h>
 #include "error.h"
 #include "HMS.h"
@@ -20,51 +20,51 @@ main()
 {
     // errors will be printed on stderr automatically
     set_error_handler(print_error);
-    //cout << setprecision(17);
+    //std::cout << setprecision(17);
 
-    cout << "test 1" << endl;
+    std::cout << "test 1" << std::endl;
 
     HMS h(3, 19, 48.23);
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
     
     if (h != HMS(h.val()))
-	cout << "Equality test failed: " << h << " != " << HMS(h.val()) << endl;
+	std::cout << "Equality test failed: " << h << " != " << HMS(h.val()) << std::endl;
 
     h = HMS(41, 30, 42.2);
-    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+    std::cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << std::endl;
 
     h = HMS(-41, 30, 42.2);
-    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+    std::cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << std::endl;
     
     h = HMS(-0, 15, 33.3333);
-    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+    std::cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << std::endl;
 
     h = HMS(-0.0001);
-    cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << endl;
+    std::cout << h << " DMS = " << h.val() << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 2" << endl;
+    std::cout << "\ntest 2" << std::endl;
     h = HMS(121.39583332/15.);
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 3" << endl;
+    std::cout << "\ntest 3" << std::endl;
     h = HMS(121.09583332/15.);
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 4" << endl;
+    std::cout << "\ntest 4" << std::endl;
     h = HMS(-121.39583332/15.);
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 5" << endl;
+    std::cout << "\ntest 5" << std::endl;
     h = HMS(-121.09583332/15.);
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 6" << endl;
+    std::cout << "\ntest 6" << std::endl;
     h = HMS("-08:05:35");
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
-    cout << "\ntest 7" << endl;
+    std::cout << "\ntest 7" << std::endl;
     h = HMS("-08:04:23");
-    cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << endl;
+    std::cout << h << " HMS = " << h.val()*15 << " = " << HMS(h.val()) << std::endl;
 
     return(0);
 }

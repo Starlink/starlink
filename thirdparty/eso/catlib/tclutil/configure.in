@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.28 2001/08/27 10:11:06 abrighto Exp $
+# $Id: configure.in,v 1.3 2003/01/17 11:10:02 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script
 #
@@ -217,7 +217,16 @@ if test "$NO_TCL" = "0" ; then
         ITCL_VERSION=$ITCL_MAJOR_VERSION.$ITCL_MINOR_VERSION
         ITK_VERSION=$ITCL_VERSION
         ITCL_LIB_SPEC=-litcl$ITCL_VERSION
-        ITK_LIB_SPEC=-litcl$ITK_VERSION ;;
+        ITK_LIB_SPEC=-litk$ITK_VERSION ;;
+
+  8.4*) BLT_VERSION=2.4
+        ITCL_MAJOR_VERSION=3
+        ITCL_MINOR_VERSION=2
+        ITK_MAJOR_VERSION=$ITCL_MAJOR_VERSION
+        ITCL_VERSION=$ITCL_MAJOR_VERSION.$ITCL_MINOR_VERSION
+        ITK_VERSION=$ITCL_VERSION
+        ITCL_LIB_SPEC="-L$TCL_PACKAGE_PATH -litcl$ITCL_VERSION"
+        ITK_LIB_SPEC=-litk$ITK_VERSION ;;
 
   *)   echo "unsupported Tcl version: $TCL_VERSION, expected at least tcl 7.6"; exit 1 ;;
 
@@ -250,7 +259,7 @@ fi
 # -----------------------------------------------------------------------
 AC_MSG_CHECKING([C++ include dir for makedepend])
 tmpfile=/tmp/tmp$$.C
-echo '#include <iostream.h>' > $tmpfile
+echo '#include <iostream>' > $tmpfile
 tmp=`$CXX -E $tmpfile 2>&1 | grep '^# 1 .*iostream\.h' | awk '{print $3}' | sed -e 's/\"//g' `
 test "$tmp" = "" && tmp=`$CXX -E $tmpfile 2>&1 | grep '^#.*iostream\.h' | awk '{print $2}' | sed -e 's/\"//g' `
 rm -f $tmpfile
@@ -457,20 +466,20 @@ if test ! -f $XINCDIR/X11/extensions/XShm.h ; then
   done
 fi
 
-if test "$NO_TCL" = "0" ; then
-  while test ! -f "$XINCDIR/X11/extensions/XShm.h" ; do
-    echo "What topl level include dir contains the X11R5 extension 'X11/extensions/XShm.h' ?"
-    read XINCDIR
-    XINCSW="-I$XINCDIR"
-    if test ! -f "$XINCDIR/X11/extensions/XShm.h" ; then
-      echo "can't find $XINCDIR/X11/extensions/XShm.h"
-    fi
-    if test -d "$XLIBDIR/$i" ; then
-      XLIBDIR=$XLIBDIR/$i
-      XLIBSW="-L$XLIBDIR -lX11 -lXext"
-    fi
-  done
-fi
+#if test "$NO_TCL" = "0" ; then
+#  while test ! -f "$XINCDIR/X11/extensions/XShm.h" ; do
+#    echo "What topl level include dir contains the X11R5 extension 'X11/extensions/XShm.h' ?"
+#    read XINCDIR
+#    XINCSW="-I$XINCDIR"
+#    if test ! -f "$XINCDIR/X11/extensions/XShm.h" ; then
+#      echo "can't find $XINCDIR/X11/extensions/XShm.h"
+#    fi
+#    if test -d "$XLIBDIR/$i" ; then
+#      XLIBDIR=$XLIBDIR/$i
+#      XLIBSW="-L$XLIBDIR -lX11 -lXext"
+#    fi
+#  done
+#fi
 
 AC_SUBST(XINCSW)
 AC_SUBST(XLIBSW)

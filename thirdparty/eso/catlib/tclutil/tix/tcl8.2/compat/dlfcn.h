@@ -17,7 +17,7 @@
  *	for any results of using the software, alterations are clearly marked
  *	as such, and this notice is not modified.
  *
- * RCS: @(#) $Id: dlfcn.h,v 1.2 2001/08/27 10:11:19 abrighto Exp $
+ * RCS: @(#) $Id: dlfcn.h,v 1.1.1.1 2002/04/04 20:12:01 brighton Exp $
  */
 
 /*

@@ -1,7 +1,7 @@
 #!../bin/tclutil_wish
 #
 # mkIndex.tcl - generate a tclIndex file in the current directory
-# "@(#) $Id: mkIndex.tcl,v 1.4 2001/08/27 10:11:12 abrighto Exp $"
+# "@(#) $Id: mkIndex.tcl,v 1.1.1.1 2002/04/04 20:11:56 brighton Exp $"
 
 package require Itcl
 auto_mkindex . *.tcl

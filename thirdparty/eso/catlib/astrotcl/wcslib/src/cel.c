@@ -231,7 +231,7 @@
 *      TSC: tangential spherical cube
 *
 *   Author: Mark Calabretta, Australia Telescope National Facility
-*   $Id: cel.c,v 1.10 2001/08/27 10:10:24 abrighto Exp $
+*   $Id: cel.c,v 1.1.1.1 2002/04/04 20:11:44 brighton Exp $
 *===========================================================================*/
 
 #include <math.h>

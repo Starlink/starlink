@@ -123,9 +123,12 @@
 
    Once the file is closed then the socket is closed.
 
-$Id: drvrnet.c,v 1.4 2001/08/27 10:10:12 abrighto Exp $
+$Id: drvrnet.c,v 1.1.1.1 2002/04/04 20:11:41 brighton Exp $
 
 $Log: drvrnet.c,v $
+Revision 1.1.1.1  2002/04/04 20:11:41  brighton
+Imported sources
+
 Revision 1.4  2001/08/27 10:10:12  abrighto
 Merged in changes from pbiereic
 

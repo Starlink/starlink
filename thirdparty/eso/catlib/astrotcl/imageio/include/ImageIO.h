@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: ImageIO.h,v 1.12 2001/08/27 10:10:11 abrighto Exp $" 
+ * "@(#) $Id: ImageIO.h,v 1.4 2003/01/20 15:52:21 brighton Exp $" 
  *
  * ImageIO.h - declarations for class ImageIO, an abstract base class 
  *             representing the contents of an image file (or other
@@ -25,8 +25,8 @@
  */
 
 
-#include <iostream.h>
-#include <math.h>
+#include <iostream>
+#include <cmath>
 #include "WCS.h"
 #include "Mem.h"
 
@@ -105,7 +105,7 @@ public:
     virtual char* get(const char* keyword) const = 0;
 
     //  write a (ASCII formatted) copy of the FITS header to the given stream.
-    virtual int getFitsHeader(ostream& os) const = 0;
+    virtual int getFitsHeader(std::ostream& os) const = 0;
 
     // write the data to an image file 
     virtual int write(const char *filename) const = 0;
@@ -248,7 +248,7 @@ public:
     }
 
     //  write a (ASCII formatted) copy of the FITS header to the given stream.
-    int getFitsHeader(ostream& os) const {
+    int getFitsHeader(std::ostream& os) const {
 	return rep_->getFitsHeader(os);
     }
 

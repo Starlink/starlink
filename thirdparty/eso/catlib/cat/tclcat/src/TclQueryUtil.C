@@ -1,6 +1,6 @@
 /*
  * E.S.O. - VLT project/Archive
- * $Id: TclQueryUtil.C,v 1.15 2001/08/27 10:10:39 abrighto Exp $
+ * $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $
  *
  * TclQueryUtil.C - utility routines used by TclAstroCat and TclTcsCat
  * 
@@ -10,17 +10,17 @@
  * --------------  --------   ----------------------------------------
  * Allan Brighton  14 Jun 96  Created
  */
-static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.15 2001/08/27 10:10:39 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: TclQueryUtil.C,v 1.5 2003/01/20 15:52:21 brighton Exp $";
 
 
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <iostream.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cctype>
+#include <cstdio>
+#include <iostream>
+#include <cstdlib>
 #include <unistd.h>
-#include <strstream.h>
-#include <tcl.h>
+#include "config.h"
+#include "tcl.h"
 #include "error.h"
 #include "AstroCatalog.h"
 
@@ -195,7 +195,7 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 		return error("bad -height value: ", interp->result);
 	}
 	else {
-	    // handle options which may have a tcl list of values
+	    // handle options whic<h may have a tcl list of values
 	    if (Tcl_SplitList(interp, value, &numValues, &values) != TCL_OK) 
 		return TCL_ERROR;
 	    
@@ -340,20 +340,20 @@ int genAstroQuery(Tcl_Interp* interp, int argc, char* argv[],
 	    return TCL_ERROR;
     
     if (numCols && colNames) 
-	if (q.colNames(numCols, colNames, 1))
+	if (q.colNames(numCols, (char**)colNames, 1))
 	    return TCL_ERROR;
 
     if (nrows && q.maxRows(nrows)) 
 	return TCL_ERROR;
 
     if (numSortCols && sortCols) {
-	if (q.sort(numSortCols, sortCols, 1))
+	if (q.sort(numSortCols, (char**)sortCols, 1))
 	    return TCL_ERROR;
 	q.sortOrder(*sortOrder == 'i' ? 1 : -1);
     }
 
     if (numSearchCols && searchCols) {
-	if (q.condition(numSearchCols, searchCols, minValues, maxValues, 1))
+	if (q.condition(numSearchCols, (char**)searchCols, (char**)minValues, (char**)maxValues, 1))
 	    return TCL_ERROR;
     }
 

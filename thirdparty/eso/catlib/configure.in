@@ -1,5 +1,5 @@
 # E.S.O. - VLT project 
-# $Id: configure.in,v 1.5 2001/05/18 14:58:40 abrighto Exp $
+# $Id: configure.in,v 1.1.1.1 2002/04/04 20:11:39 brighton Exp $
 #
 # This file is used with GNU autoconf to generate a configure script for
 # the Skycat modules.

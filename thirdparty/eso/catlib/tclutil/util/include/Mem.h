@@ -4,7 +4,7 @@
 /*
  * E.S.O. - VLT project / ESO Archive
  *
- * "@(#) $Id: Mem.h,v 1.5 2001/08/27 10:11:32 abrighto Exp $" 
+ * "@(#) $Id: Mem.h,v 1.2 2003/01/20 15:52:22 brighton Exp $" 
  *
  * Mem.h - declarations for class Mem, a class for managing memory areas,
  *         which may or may not be shared memory.
@@ -17,7 +17,7 @@
  * D.Hopkinson      21/01/97  Added constructor to use when multi-buffering shared memory.
  */
 
-#include <stdio.h>
+#include <cstdio>
 class Mem_Map;
 
 // internal struct used for reference counting
