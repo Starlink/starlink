@@ -581,6 +581,7 @@
             GOTO 39
           END IF
 
+          IC = IC + 1
           CALL CHR_FIWS( FTPAR, IC, STATUS )
           BEG = IC
           CALL CHR_FIWE( FTPAR, IC, STATUS )
