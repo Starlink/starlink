@@ -99,8 +99,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Map QUALITY as a logical.
-      CALL BDI_MAPL( IFID, 'LogicalQuality', IQPTR, STATUS )
-      CALL BDI_MAPL( BFID, 'LogicalQuality', BQPTR, STATUS )
+      CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR, STATUS )
+      CALL BDI_MAPL( BFID, 'LogicalQuality', 'READ', BQPTR, STATUS )
 
 *  Map memory for area correction factors
       CALL DYN_MAPR( 1, INELM, IACT, STATUS )

@@ -87,7 +87,6 @@
         INTEGER IQPTR1, IQPTR2                  ! Input quality
         INTEGER NLINES                          ! Lines of history text used
 	INTEGER SIZE1,SIZE2			! sizes of objects
-        INTEGER NDIM,DIMS(DAT__MXDIM)		! dimensions of data
 	INTEGER SUBSET(3)			! required subset, spacing
         INTEGER FROM,TO,INCR			!            "       "
 	INTEGER XPTR,YPTR			! pointers to input data
@@ -113,7 +112,7 @@
 *    Version id :
 *
       CHARACTER*(30) VERSION
-	 PARAMETER   (VERSION = 'SCATTERGRAM Version 1.8-1')
+	 PARAMETER   (VERSION = 'SCATTERGRAM Version 2.0-0')
 *-
 
 *    Version announcement
@@ -122,14 +121,15 @@
       CALL AST_INIT()
 
 *    Associate input objects
-      CALL USI_TASSOCI( 'INP1', '*', 'READ', IFID1, STATUS )
-      CALL USI_TASSOCI( 'INP2', '*', 'READ', IFID2, STATUS )
-      CALL BDI_PRIM( IFID1, PRIM1, STATUS )
-      CALL BDI_PRIM( IFID2, PRIM2, STATUS )
+      CALL USI_ASSOC( 'INP1', 'BinDS|Array', 'READ', IFID1, STATUS )
+      CALL USI_ASSOC( 'INP2', 'BinDS|Array', 'READ', IFID2, STATUS )
+      CALL ADI_DERVD( IFID1, 'Array', PRIM1, STATUS )
+      CALL ADI_DERVD( IFID2, 'Array', PRIM2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check out input objects
-      CALL BDI_CHKDATA( IFID1, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHK( IFID1, 'Data', OK, STATUS )
+      CALL BDI_GETNEL( IFID1, SIZE1, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -137,9 +137,9 @@
      :                                                      STATUS )
         GOTO 99
       END IF
-      CALL ARR_SUMDIM( NDIM, DIMS, SIZE1 )
 
-      CALL BDI_CHKDATA( IFID2, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHK( IFID2, 'Data', OK, STATUS )
+      CALL BDI_GETNEL( IFID2, SIZE2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -147,18 +147,17 @@
      :                                                      STATUS )
         GOTO 99
       END IF
-      CALL ARR_SUMDIM( NDIM, DIMS, SIZE2 )
 
-*    Errors present in inputs?
-      CALL BDI_CHKVAR( IFID1, DEX, NDIM, DIMS, STATUS )
-      CALL BDI_CHKVAR( IFID2, DEY, NDIM, DIMS, STATUS )
+*  Errors present in inputs?
+      CALL BDI_CHK( IFID1, 'Variance', DEX, STATUS )
+      CALL BDI_CHK( IFID2, 'Variance', DEY, STATUS )
 
-*    Quality present in inputs?
-      CALL BDI_CHKQUAL( IFID1, QOK1, NDIM, DIMS, STATUS )
-      CALL BDI_CHKQUAL( IFID2, QOK2, NDIM, DIMS, STATUS )
+*  Quality present in inputs?
+      CALL BDI_CHK( IFID1, 'Quality', QOK1, STATUS )
+      CALL BDI_CHK( IFID2, 'Quality', QOK2, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Check sizes
+*  Check sizes
       IF ( SIZE1 .NE. SIZE2 ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Input objects have different size', STATUS )
@@ -167,7 +166,7 @@
         N = SIZE1
       END IF
 
-*    Obtain subset
+*  Obtain subset
       CALL MSG_SETI('N',N)
       CALL MSG_PRNT( 'There are ^N items' )
       SUBSET(1)=1
@@ -193,41 +192,37 @@
       END DO
       IF ( STATUS.NE. SAI__OK) GOTO 99
 
-*    Deduce item count of output dataset
+*  Deduce item count of output dataset
       FROM = SUBSET(1)
       TO = SUBSET(2)
       INCR = SUBSET(3)
       NITEM = (TO-FROM+1)/INCR
 
-*    Set output style to markers?
+*  Set output style to markers?
       CALL USI_GET0L( 'MARKER', DOMARKER, STATUS )
 
-*    Create display object
-      CALL USI_TASSOCO( 'OUT', 'SCATTERGRAM', DFID, STATUS )
+*  Create display object
+      CALL USI_CREAT( 'OUT', ADI__NULLID, DFID, STATUS )
+      CALL BDI_LINK( 'BinDS', 1, NITEM, 'REAL', DFID, STATUS )
 
-*    Create components
-      CALL BDI_CREDATA(DFID,1,NITEM,STATUS)
-      CALL BDI_CREAXVAL(DFID,1,.FALSE.,NITEM,STATUS)
-
-*    Create output quality?
+*  Create output quality?
       OUTQ = (QOK1 .OR. QOK2)
       IF ( OUTQ ) THEN
 
-*      Read input quality arrays
-        CALL BDI_MAPQUAL( IFID1, 'READ', IQPTR1, STATUS )
-        CALL BDI_MAPQUAL( IFID2, 'READ', IQPTR2, STATUS )
-        CALL BDI_GETMASK( IFID1, MASK1, STATUS )
-        CALL BDI_GETMASK( IFID2, MASK2, STATUS )
+*    Read input quality arrays
+        CALL BDI_MAPUB( IFID1, 'Quality', 'READ', IQPTR1, STATUS )
+        CALL BDI_MAPUB( IFID2, 'Quality', 'READ', IQPTR2, STATUS )
+        CALL BDI_GET0UB( IFID1, 'QualityMask', MASK1, STATUS )
+        CALL BDI_GET0UB( IFID2, 'QualityMask', MASK2, STATUS )
 
-*      Output mask is the bit-wise OR of the inputs
+*    Output mask is the bit-wise OR of the inputs
         OMASK = BIT_ORUB(MASK1,MASK2)
 
-*      Create o/p quality
-        CALL BDI_CREQUAL( DFID, 1, NITEM, STATUS )
-        CALL BDI_MAPQUAL( DFID, 'WRITE', OQPTR, STATUS )
-        CALL BDI_PUTMASK( DFID, OMASK, STATUS )
+*    Create o/p quality
+        CALL BDI_MAPUB( DFID, 'Quality', 'WRITE', OQPTR, STATUS )
+        CALL BDI_PUT0UB( DFID, 'QualityMask', OMASK, STATUS )
 
-*      Copy it
+*    Copy it
         CALL SCATTERGRAM_COPQUAL( QOK1, %VAL(IQPTR1),
      :                            QOK2, %VAL(IQPTR2),
      :                            FROM, TO, INCR,
@@ -235,45 +230,45 @@
 
        END IF
 
-*    Map and copy data
-      CALL BDI_MAPDATA( IFID1, 'READ', XPTR, STATUS )
-      CALL BDI_MAPDATA( IFID2, 'READ', YPTR, STATUS )
+*  Map and copy data
+      CALL BDI_MAPR( IFID1, 'Data', 'READ', XPTR, STATUS )
+      CALL BDI_MAPR( IFID2, 'Data', 'READ', YPTR, STATUS )
 
-      CALL BDI_MAPDATA( DFID,'WRITE',DPTR,STATUS)
-      CALL BDI_MAPAXVAL(DFID,'WRITE',1,APTR,STATUS)
+      CALL BDI_MAPR( DFID, 'Data', 'WRITE', DPTR, STATUS )
+      CALL BDI_AXMAPR( DFID, 1, 'Data', 'WRITE', APTR, STATUS )
 
       CALL SCATTERGRAM_COPDATR(%VAL(XPTR),FROM,TO,INCR,%VAL(APTR),
      :                                                   STATUS )
       CALL SCATTERGRAM_COPDATR(%VAL(YPTR),FROM,TO,INCR,%VAL(DPTR),
      :                                                   STATUS )
 
-*    Map and copy error data
+*  Map and copy error data
       IF ( DEX ) THEN
-        CALL BDI_MAPVAR( IFID1, 'READ', VPTR, STATUS )
-        CALL BDI_CREAXWID(DFID,1,.FALSE.,NITEM,STATUS)
-        CALL BDI_MAPAXWID(DFID,'W',1,WPTR,STATUS)
+        CALL BDI_MAPR( IFID1, 'Variance', 'READ', VPTR, STATUS )
+        CALL BDI_AXMAPR( DFID, 1, 'Width', 'WRITE', WPTR, STATUS )
         CALL SCATTERGRAM_COPWID(%VAL(VPTR),FROM,TO,INCR,%VAL(WPTR),
      :                                                      STATUS )
       END IF
       IF ( DEY ) THEN
-        CALL BDI_COPVAR( IFID2, DFID, STATUS )
+        CALL BDI_COPY( IFID2, 'Variance', DFID, ' ', STATUS )
       END IF
 
-*    Fill in labels and units
+*  Fill in labels and units
       IF ( PRIM1 ) THEN
         CALL ADI_FTRACE( IFID1, NLEV, LABEL, FILE, STATUS )
         UNITS = ' '
       ELSE
-        CALL BDI_GETLABEL( IFID1, LABEL, STATUS )
-        CALL BDI_GETUNITS( IFID1, UNITS, STATUS )
+        CALL BDI_AXGET0C( IFID1, 'Label', LABEL, STATUS )
+        CALL BDI_AXGET0C( IFID1, 'Units', UNITS, STATUS )
       END IF
-      CALL BDI_PUTAXTEXT( DFID, 1, LABEL, UNITS, STATUS )
+      CALL BDI_AXPUT0C( IFID1, 'Label', LABEL, STATUS )
+      CALL BDI_AXPUT0C( IFID1, 'Units', UNITS, STATUS )
 
       IF ( PRIM2 ) THEN
         CALL ADI_FTRACE( IFID2, NLEV, LABEL, FILE, STATUS )
-        CALL BDI_PUTLABEL( DFID, LABEL, STATUS )
+        CALL BDI_PUT0C( DFID, 'Label', LABEL, STATUS )
       ELSE
-        CALL BDI_COPTEXT( IFID2, DFID, STATUS )
+        CALL BDI_COPY( IFID1, 'Title,Label,Units', OFID, ' ', STATUS )
       END IF
 
 *    GCB control (format output as markers)
@@ -288,7 +283,7 @@
 
       END IF
 
-*    History
+*  History
       CALL HSI_ADD( DFID, VERSION, STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -304,12 +299,7 @@
         CALL HSI_PTXT( DFID, NLINES, LINES, STATUS )
       END IF
 
-*    Release files
-      CALL BDI_RELEASE( IFID1, STATUS )
-      CALL BDI_RELEASE( IFID2, STATUS )
-      CALL BDI_RELEASE( DFID, STATUS )
-
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE
       CALL AST_ERR( STATUS )
 
