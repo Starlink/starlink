@@ -2570,7 +2570,7 @@ cvs -d username@cvs.starlink.ac.uk:/cvs co -l applications
 3% export STARCONF_DEFAULT_STARLINK=/local/star
 4% export STARCONF_DEFAULT_PREFIX=/local/star
 5% rm -Rf /local/star
-6% PATH=/local/star/bin:/local/star/buildsupport/bin:$PATH
+6% PATH=/local/star/bin:/local/star/buildsupport/bin:...??? # see note
 7% ./bootstrap
 ... a few harmless warnings, and miscellaneous other chatter
 ... takes quite a while
@@ -2635,9 +2635,11 @@ autoconf  dtask     hdspar  mers     msp      psx       sst   subpar
 
         <p>Line 6: put <code>/local/star/bin</code> and
           <code>/local/star/buildsupport/bin</code> in the
-          path<index>PATH</index>, and 
-          make sure that there are <em>no</em> Starlink binary
-          directories elsewhere in the path.</p>
+          path<index>PATH</index>.
+          Make sure that there are <em>no</em> Starlink binary
+          directories elsewhere in the path: running <kbd>which
+          messgen</kbd> (for example) at this point should find
+          nothing.</p>
 
         <p>Line 7: run the <code>./bootstrap</code> script.  This
           configures, builds and installs the `buildsupport' tools --
