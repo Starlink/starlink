@@ -80,6 +80,7 @@
       INTEGER              NELM
       INTEGER              NDIM, ONDIM
       INTEGER              OLEN                   ! Output format
+      INTEGER			OUTWID			! Output channel width
       INTEGER              PTR(MX_IN)
 
       LOGICAL              B_THERE, D_THERE, S_THERE
@@ -239,8 +240,8 @@
         CALL ERR_ANNUL( STATUS )
       END IF
 
-*    Grab output file
-      CALL AIO_ASSOCO( 'OUT', 'LIST', CHAN, OUTWIDTH, STATUS )
+*    Open output file
+      CALL AIO_ASSOCO( 'OUT', 'LIST', CHAN, OUTWID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Output the data
