@@ -120,7 +120,6 @@
       INTEGER			DIMS(ADI__MXDIM), NDIM	! Dataset dimensions
       INTEGER			FID			! File identifier
       INTEGER			I,J			!
-      INTEGER			SLOT			! Psf slot number
       INTEGER			X_AX,Y_AX,E_AX,T_AX
 
       LOGICAL			PHADEF			! PHA band defined?
@@ -208,9 +207,8 @@
      :                 /'assuming 0..^TOP' )
         END IF
 
-*      Get channel axis range
-        CALL ADI_CGET0I( PSID, 'Slot', SLOT, STATUS )
-        CALL PSF_QAXES( SLOT, X_AX, Y_AX, E_AX, T_AX, STATUS )
+*    Get channel axis range
+        CALL PSF_QAXES( PSID, X_AX, Y_AX, E_AX, T_AX, STATUS )
         IF ( E_AX .GT. 0 ) THEN
           CALL BDI_GETSHP( FID, ADI__MXDIM, DIMS, NDIM, STATUS )
           CALL BDI_AXMAPR( FID, E_AX, 'Bounds', 'READ', ABPTR, STATUS )
