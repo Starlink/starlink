@@ -1,0 +1,126 @@
+element-description abstract        
+<p>The abstract for the document
+
+element-description appendices  
+<p>The appendices element contains the appendices, with one *sect* for
+each appendix. These may be preceded by an optional *routinelist*, if
+the specific Starlink document type allows that element.  Note that
+material such as bibliography and indexes is in a separate
+*backmatter* element, and not an appendix.
+
+element-description attribution
+<p>The source of a quotation, either as free text or a *citation* element.
+
+element-description author
+<p>An author/editor of the current document.
+
+element-description author*affiliation
+<p>The `home institution' of an author, such as `Starlink, University
+of Glasgow'.
+
+element-description author*email
+<p>An email address for the author.
+
+element-description author*id
+<p>An ID which may be used to refer to the author from within a
+*history* element, for example.
+
+element-description author*role
+<p>The role this individual has played in the maintenance of this
+document, if it's different from the straightforward `author'.  For
+example, this might be `maintainer', `original version', and so on.
+
+element-description author*webpage
+<p>A home page for the author, which might contain further contact details.
+
+element-description authorlist
+<p>The list of authors and editors who have contributed to a
+document.  If a document is passed on from one person to another, it
+might be appropriate for the original author to retain a credit for
+the document, by being listed as one of the *otherauthors*.
+
+element-description backmatter
+<p>Bundles together the various backmatter elements.
+
+element-description bibliography
+<p>If this element is present within the *backmatter* element, then a
+bibliography will be included in the document.  The application will
+generate the bibliography itself -- it is not included within this
+element, which is empty.  
+
+<p>Bibliographic entries are included in the bibliography if they were
+referred to in the document using the *citation* element.
+
+element-description bibliography*all
+<p>If this attribute is present, then the complete bibliography will
+be included, rather than just those entries which were referred to by
+a *citation* element.
+
+element-description bibliography*bib
+<p>Names the bibliography which is to be searched for entries.
+<p>The transformation of this name into an actual bibliography file is
+in principle up to the application which processes the SGML file.  In
+the current application, however, this attribute names a BibTeX
+bib-file (without the .bib extension).
+
+element-description blockquote
+element-description caption
+element-description change
+element-description citation
+element-description cite
+element-description code
+element-description codecollection
+element-description colspec
+element-description copyright
+element-description dd
+element-description distribution
+element-description dl
+element-description docbody
+element-description docdate
+element-description docinfo
+element-description docnumber
+element-description docxref
+element-description draftnote
+element-description dt
+element-description editors
+element-description em
+element-description entry
+element-description figure
+element-description figurecontent
+element-description history
+element-description index
+element-description indexcontents
+element-description kbd
+element-description keyword
+element-description li
+element-description m
+element-description meqnarray
+element-description mequation
+element-description note
+element-description notecontents
+element-description ol
+element-description otherauthors
+element-description p
+element-description px
+element-description quote
+element-description ref
+element-description routinelist
+element-description row
+element-description sect
+element-description strong
+element-description subhead
+element-description subsect
+element-description subsubsect
+element-description subsubsubsect
+element-description sun
+element-description table
+element-description tbody
+element-description tgroup
+element-description thead
+element-description title
+element-description ul
+element-description update
+element-description url
+element-description verbatim
+element-description version
+element-description webref
