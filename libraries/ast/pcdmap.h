@@ -30,8 +30,8 @@
 
 *  New Attributes Defined:
 *     Disco (double)
-*        This attribute holds the PcdMap distortion co-efficient used by 
-*        the forward transformation. This co-efficient is set when a 
+*        This attribute holds the PcdMap distortion coefficient used by 
+*        the forward transformation. This coefficient is set when a 
 *        PcdMap is created, but may later be modified. The default value 
 *        is zero, which gives no distortion. For pincushion distortion, 
 *        the supplied value should be positive. For barrel distortion, it 
@@ -165,7 +165,7 @@ typedef struct AstPcdMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double disco;                 /* Distortion co-efficient */
+   double disco;                 /* Distortion coefficient */
    double pcdcen[2];             /* Distortion centre */
 
 } AstPcdMap;

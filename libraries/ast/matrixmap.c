@@ -3566,8 +3566,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             matrix_element = matrix;
 
 
-/* Each output co-ordinate value is created by summing the product of the 
-   corresponding input co-ordinates and the elements of one row of the 
+/* Each output coordinate value is created by summing the product of the 
+   corresponding input coordinates and the elements of one row of the 
    matrix. */
             for ( out_coord = 0; out_coord < ncoord_out; out_coord++ ) {
                sum = 0.0;

@@ -14786,7 +14786,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
                if( store->longpole != AST__BAD ) store->longpole *= AST__DR2D;
                if( store->latpole != AST__BAD ) store->latpole *= AST__DR2D;
 
-/* Save the celestial co-ordinate axis indices. */
+/* Save the celestial coordinate axis indices. */
                store->axlat = axlat;
                store->axlon = axlon;
 

@@ -51,7 +51,7 @@
 *  D.S. Berry (6th August 1996)
 *
 *     -  Perspective zenithal projections (AZP, TAN, SIN) modified so that
-*     bad (x,y) co-ordinates are returned if the supplied native latitude
+*     bad (x,y) coordinates are returned if the supplied native latitude
 *     represents a point on the "far-side" of the unit sphere (i.e. the
 *     side away from the projection plane).
 *

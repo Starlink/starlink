@@ -6675,7 +6675,7 @@ static AstPointSet *DefGap( AstPlot *this, double *gaps, int *ngood,
 /* Report an error if there are too few good points. */
       if( ngood[ j ] < MAJTICKS_OPT ){
          astError( AST__VSMAL, "%s(%s): The area of the plot containing "
-                      "valid co-ordinates is too small.", method, class );
+                      "valid coordinates is too small.", method, class );
          break;
       }
 
@@ -10365,7 +10365,7 @@ static double GoodGrid( AstPlot *this, int *dim, AstPointSet **pset1,
 /* Report an error if the grid is now too big. */
       if( *dim >= 256 ){
          astError( AST__VSMAL, "%s(%s): The area of the plot containing "
-                   "valid co-ordinates is too small.", method, class );
+                   "valid coordinates is too small.", method, class );
          break;
       }
 
