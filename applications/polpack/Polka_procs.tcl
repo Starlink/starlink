@@ -42,6 +42,9 @@
 #        Modified call to KAPPA:SEGMENT to do away with COSYS parameter.
 #     19-APR-2000 (DSB):
 #        Added USEWCS=NO to CCDPACK:TRANNDF parameter list.
+#     14-APR-2003 (DSB):
+#        Use KAPPA:REGRID instead of CCDPACK:TRANNDF, and KAPPA:WCSADD
+#        instead of KAPPA:TRANMAKE.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -4429,7 +4432,7 @@ proc Effects {im effect nodisp} {
                      } {
                         set out [UniqueFile]
                         set desc "Align (with image $ALIMG)"
-                        if { [TranImage $image $m21 $out "" 5] } {
+                        if { [TranImage $image $m21 $out ""] } {
 
 # Modify things (like positions lists, etc) to take account of the
 # mapping just applied to the image. If anything goes wrong with this,
@@ -5239,25 +5242,21 @@ proc MappingMod {image map undo} {
 
 }
 
-proc MakeTrn {map fittype} {
+proc MakeTrn {map} {
 #+
 #  Name:
 #     MakeTrn
 #
 #  Purpose:
-#     Create a TRANSFORM structure from a set of 6 linear mapping
-#     parameters.
+#     Create an AST MApping from a set of 6 linear mapping parameters.
 #
 #  Arguments:
 #     map
 #        A set of 6 linear mapping parameters, or "ref" for a unit mapping.
-#     fittype
-#        The numerical fit type (1-5) as used by the FITTYPE parameter of
-#        KAPPA:TRANMAKE.
 #
 #  Returned Value:
-#     The HDS path to the TRANSFORM structure, or a null string if the 
-#     supplied mapping was undefined, or if KAPPA:TRANMAKE failed.
+#     The path to the text file holding the Mapping, or a null string if the 
+#     supplied mapping was undefined, or if KAPPA:WCSADD failed.
 #-
 
 # Initialise the returned string.
@@ -5266,28 +5265,29 @@ proc MakeTrn {map fittype} {
 # Only proceed if the supplied mapping is defined.
    if { $map != "" } {
 
-# If a unit mapping has been supplied, use the corresponding numerical
-# values.
+# If a unit mapping has been specified, we will create an AST UnitMap.
       if { $map == "ref" } {
-         set coeffs "\[0.0,1.0,0.0,0.0,0.0,1.0\]"
+         set maptype "unit"
+         set coeffs ""
 
-# Otherwise, construct a string holding all 6 coefficients, in a form suitable
-# for passing to an A-task as the value for a vector parameter.
+# Otherwise, we will create a compound WinMap/MatrixMap. Construct a string 
+# holding all 6 coefficients, in a form suitable for passing to an A-task as 
+# the value for a vector parameter.
       } {
+         set maptype "linear"
          set coeffs "\[[lindex $map 0]"
          for {set i 1} {$i < 6} {incr i} {
             append coeffs ",[lindex $map $i]"
          }
          append coeffs "\]"
+      }
 
-# Get the name for the container file to hold the TRANSFORM structure.
-         set trfile [UniqueFile]
+# Get the name for the text file to hold the AST Mapping.
+      set trfile [UniqueFile]
 
-# Create the new structure. Return the name of the TRANSFORM structure if
-# succesful.
-         if { [Obey kappa tranmake "trtype=bilin transform=$trfile comment=polka tr=$coeffs fittype=$fittype"] } {
-            set ret ${trfile}.TRANSFORM
-         }
+# Create the new Mapping. Return the name of the Mapping file if succesful.
+      if { [Obey kappa wcsadd "ndf=\! naxes=2 maptype=$maptype mapout=$trfile tr=$coeffs"] } {
+         set ret ${trfile}
       }
    }
 
@@ -11319,7 +11319,7 @@ proc Save {} {
                set map [ConcMap $map1 0 $map2 0]
 
 # If a mapping exists find the bounds of the mask area in the transformed
-# image. These bounds are passed on to CCDPACK:TRANNDF as the required
+# image. These bounds are passed on to KAPPA:REGRID as the required
 # bounds for the output image so that the output image contains only the
 # area of interest.
                if { $map != "" } {
@@ -11336,7 +11336,7 @@ proc Save {} {
                   }         
 
 # Transform the mask area using the mapping (if defined). 
-                  if { ![TranImage $maskarea $map $outndf $sect 5] } {
+                  if { ![TranImage $maskarea $map $outndf $sect] } {
                      set ok 0
                      break
                   }
@@ -13885,7 +13885,7 @@ proc TotalMap {image} {
    return $tot_map
 }
 
-proc TranImage {data map trandata section fittype} {
+proc TranImage {data map trandata section} {
 #+
 #  Name:
 #     TranImage
@@ -13904,12 +13904,9 @@ proc TranImage {data map trandata section fittype} {
 #        The required section of the output image. If this is a null
 #        string, then the output image is just big enough to contain the 
 #        entire input image.
-#     fittype
-#        The numerical fit type (1-5) as used by the FITTYPE parameter of
-#        KAPPA:TRANMAKE.
 #
 #  Returned Value:
-#     One for success, zero if CCDPACK:TRANNDF failed.
+#     One for success, zero if KAPPA:REGRID failed.
 #
 #-
    global INTERP
@@ -13921,7 +13918,7 @@ proc TranImage {data map trandata section fittype} {
    if { $map == "" } {
       set ok 0
 
-# Otherwise, if a unit mapping has been supplied, just sopy the reqwuired image
+# Otherwise, if a unit mapping has been supplied, just copy the required image
 # section.
    } elseif { $map == "ref" } {
       append data $section
@@ -13929,14 +13926,14 @@ proc TranImage {data map trandata section fittype} {
          set ok 0
       }
 
-# For any other mapping, construct a TRANSFORM structure.
+# For any other mapping, construct an AST Mapping.
    } {
-      set trn [MakeTrn $map $fittype]
+      set trn [MakeTrn $map]
       if { $trn != "" } {
 
 # If only part of the output image is required, set up the relevant
-# TRANNDF parameters.
-         set shape "shape=auto"
+# REGRID parameters.
+         set shape "lbound=\! ubound=\!"
       
          if { $section != "" } {
             set sec [SecList $section]
@@ -13945,36 +13942,21 @@ proc TranImage {data map trandata section fittype} {
                set xhi [lindex $sec 1]
                set ylo [lindex $sec 2]
                set yhi [lindex $sec 3]
-               set shape "shape=specify lbound=\[$xlo,$ylo\] ubound=\[$xhi,$yhi\]"
+               set shape "lbound=\[$xlo,$ylo\] ubound=\[$xhi,$yhi\]"
             }      
          }
 
-# Get the interpolation method in a form which CCDPACK:TRANNDF can use.
+# Get the interpolation method in a form which KAPPA:REGRID can use.
          if { $INTERP == "Linear" } {
-            set method LININT
+            set method LINEAR
          } {
             set method NEAREST
          }
 
-         set ok [Obey ccdpack tranndf "inext=no usewcs=no logto=neither method=$method out=$trandata in=$data $shape transform=$trn"] 
-         catch "exec ls -al ${trandata}*"
+         set ok [Obey kappa regrid "method=$method out=$trandata in=$data $shape mapping=$trn"] 
 
-# Modify the WCS information in the mapped image (if the mapping is not a
-# unit mapping) to take account of the transformation. This can be omitted 
-# when CCDPACK:TRANNDF is modified to propagate the NDF WCS component.
-         if { $ok && $map != "ref" } {
-            set coeffs "\[[lindex $map 0]"
-            for {set i 1} {$i < 6} {incr i} {
-               append coeffs ",[lindex $map $i]"
-            }
-            append coeffs "\]"
-
-            set ok [Obey ndfpack wcscopy "ndf=$trandata like=$data \
-                                          tr=$coeffs confirm=no"] 
-         }
-
-# Delete the TRANSFORM structure.
-         HdsDel $trn
+# Delete the Mapping file.
+         catch "exec rm -f $trn"
       }
    }
    return $ok
