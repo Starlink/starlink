@@ -50,8 +50,9 @@
         STATUS = 0
         CALL PSX_TIME( TICKS, STATUS )
         CALL PSX_GETPID( PID, STATUS )
-        SEED = 1000 * (( TICKS / 4 ) / 1000 ) + MOD( TICKS, 1000 )
-     :                                        + MOD( PID, 1000 )
+        SEED = 1000 * (( TICKS / 4 ) / 1000 ) + 4 * MOD( TICKS, 1000 )
+     :                                        + 4 * MOD( PID, 1000 )
+	IF ( MOD( SEED, 2 ) .EQ. 0 ) SEED = SEED + 1
         CALL PDA_RNSED( SEED )
 	INITIALISE=.FALSE.
       END IF
