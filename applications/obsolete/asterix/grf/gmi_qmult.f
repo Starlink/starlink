@@ -83,7 +83,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE '{global_constants_file}' ! [global_constants_description]
+      INCLUDE 'DAT_PAR'
 
 *  Global Variables:
 c      INCLUDE 'GMI_CMN'                                 ! GMI common block

@@ -41,7 +41,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'GMD_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
@@ -52,9 +51,6 @@
 *
 *    Local variables :
 *
-      CHARACTER             GDLOC*(DAT__SZLOC)        ! Graph
-      CHARACTER             GLOC*(DAT__SZLOC)         ! Graphics dataset
-
       DOUBLE PRECISION		EQUPOS(2)		! Source RA,DEC
 
       REAL			AXPOS(2)       		! Axis position
@@ -129,9 +125,9 @@
       END IF
 
 *    Is this a multi-graph dataset?
-      CALL GMD_QMULT( GLOC, MULTI, STATUS )
+      CALL GMI_QMULT( IFID, MULTI, STATUS )
       IF ( MULTI ) THEN
-        CALL GMD_QNDF( GLOC, NNDF, STATUS )
+        CALL GMI_QNDF( IFID, NNDF, STATUS )
         IF ( NNDF .LE. GMD__MXNDF ) THEN
           CALL PRS_GETLIST( 'NDF', NNDF, NDFS, NSEL, STATUS )
         ELSE
@@ -190,21 +186,20 @@
 
 *      Locate NDF to mark
         IF ( MULTI ) THEN
-          CALL GMD_LOCNDF( GLOC, NDFS(INDF), GDLOC, STATUS )
+          CALL GMI_LOCNDF( IFID, NDFS(INDF), GID, STATUS )
         ELSE
-          CALL DAT_CLONE( GLOC, GDLOC, STATUS )
+          CALL ADI_CLONE( IFID, GID, STATUS )
         END IF
 
 *      Load graphics control from file
-        CALL GCB_LOAD( GDLOC, STATUS )
+        CALL GCB_FLOAD( GFID, STATUS )
 
 *      Any notes there?
         CALL GCB_GETI( 'MARKER_N', OK, NMARK, STATUS )
         IF ( .NOT. OK ) NMARK = 0
 
 *      Get pointing information
-        CALL ADI1_PUTLOC( GDLOC, GID, STATUS )
-        CALL WCI_READ( GID, PIXID, PRJID, SYSID, STATUS )
+        CALL WCI_GETIDS( GID, PIXID, PRJID, SYSID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Get axis values for dataset, then units
@@ -265,7 +260,7 @@
         CALL GCB_FSAVE( GID, STATUS )
         CALL GCB_DETACH( STATUS )
         CALL BDI_RELEASE( GID, STATUS )
-        CALL DAT_ANNUL( GDLOC, STATUS )
+        CALL ADI_ERASE( GID, STATUS )
 
       END DO
 
@@ -277,7 +272,7 @@
 
 *    Release files
       CALL USI_TANNUL( SID, STATUS )
-      CALL USI_ANNUL( GLOC, STATUS )
+      CALL USI_TANNUL( IFID, STATUS )
 
 *    Shutdown sub-systems
  99   CALL AST_CLOSE
