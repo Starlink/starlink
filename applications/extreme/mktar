@@ -29,7 +29,7 @@
       tar cvf extreme_source.tar \
               crepint.c frepint.c inscnf.c \
               ctok.l ftok.l ctokens.h ftokens.h ygen.c ygen.h \
-              do_filter cmp_filter.pl \
+              do_filter cmp_filter.pl extmk.pl \
               ext_dec ext_def ext_par ext_dev \
               $sysvarfiles
 
