@@ -2780,7 +2780,7 @@ package kappa {
             vpath GLOBAL PROMPT
             prompt {Name of display device}
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             helpkey *
           }
 
@@ -3513,7 +3513,7 @@ package kappa {
             position 4
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of display device}
             helpkey *
           }
@@ -4094,7 +4094,7 @@ package kappa {
             position 1
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of the image display}
             helpkey *
           }
@@ -4113,7 +4113,7 @@ package kappa {
             prompt {Image-display device}
             helpkey *
             vpath PROMPT
-            association ->GLOBAL.IMAGE_DISPLAY
+            association ->GLOBAL.GRAPHICS_DEVICE
           }
 
       }
@@ -4147,7 +4147,7 @@ package kappa {
             helpkey *
             vpath GLOBAL CURRENT
             ptype DEVICE
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
           }
 
           parameter domain {
@@ -4512,7 +4512,7 @@ package kappa {
             ptype DEVICE
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Name of display device}
             helpkey *
           }
@@ -4619,7 +4619,7 @@ package kappa {
             vpath GLOBAL PROMPT
             prompt {Name of display device}
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             helpkey *
           }
          parameter full {
@@ -4682,7 +4682,7 @@ package kappa {
             vpath GLOBAL PROMPT
             prompt {Name of display device}
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             helpkey *
           }
          parameter epoch {
@@ -5105,7 +5105,7 @@ package kappa {
             position 1
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Image-display device}
             helpkey *
           }
@@ -5131,7 +5131,7 @@ package kappa {
             position 3
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Image-display device}
             helpkey *
           }
@@ -5156,7 +5156,7 @@ package kappa {
             position 2
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Image-display device}
             helpkey *
           }
@@ -5182,7 +5182,7 @@ package kappa {
             position 2
             vpath GLOBAL PROMPT
             ppath GLOBAL CURRENT
-            association <-GLOBAL.IMAGE_DISPLAY
+            association <-GLOBAL.GRAPHICS_DEVICE
             prompt {Image-display device}
             helpkey *
           }
