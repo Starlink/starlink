@@ -29,7 +29,13 @@ jars:
 dist:
 
 install:
-     [copy] Copying 2 files to /star/starjava/lib
+    [mkdir] Created dir: /apps/cvsbuild/starjava/bin
+    [mkdir] Created dir: /apps/cvsbuild/starjava/lib
+    [mkdir] Created dir: /apps/cvsbuild/starjava/etc/ant
+    [mkdir] Created dir: /apps/cvsbuild/starjava/docs/ant
+     [copy] Copying 9 files to /apps/cvsbuild/starjava/bin
+     [copy] Copying 4 files to /apps/cvsbuild/starjava/lib
+     [copy] Copying 1031 files to /apps/cvsbuild/starjava/docs/ant
 
 BUILD SUCCESSFUL
-Total time: 17 seconds
+Total time: 29 seconds
