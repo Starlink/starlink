@@ -17,7 +17,6 @@
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Dave Terrett</name>
@@ -25,8 +24,7 @@
       <email>dlt@star.rl.ac.uk</email>
     </person>
   </developers>
-  -->
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
