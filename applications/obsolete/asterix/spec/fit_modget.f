@@ -32,6 +32,7 @@
 *     10 Jan 94 : Added NPAR object to model structure (DJA)
 *     24 Jan 94 : Added SPEC and ADDITIVE objects to model structure (DJA)
 *     21 Apr 95 : Adapted from pure HDS version (DJA)
+*      2 May 95 : Added format field (DJA)
 *
 *    Type definitions :
 *
@@ -152,6 +153,13 @@
             MODEL.PARNAME(NPAR) = CBUF
 	    CALL CMP_GET0C(MIPJLOC,'UNITS',CBUF,STATUS)
             MODEL.UNITS(NPAR) = CBUF
+            CALL DAT_THERE(MIPJLOC,'FORMAT',THERE,STATUS)
+            IF ( THERE ) THEN
+	      CALL CMP_GET0C(MIPJLOC,'FORMAT',CBUF,STATUS)
+            ELSE
+              CBUF = ' '
+            END IF
+            MODEL.FORMAT(NPAR) = CBUF
 	    CALL CMP_GET0R(MIPJLOC,'VAL',PARAM(NPAR),STATUS)
 	    CALL CMP_GET0R(MIPJLOC,'LOW',LB(NPAR),STATUS)
 	    CALL CMP_GET0R(MIPJLOC,'HI',UB(NPAR),STATUS)

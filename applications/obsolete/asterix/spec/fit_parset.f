@@ -70,7 +70,7 @@
 
 *    Access menu file
       CALL FIT_MEN_OPEN( GENUS, MFD, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Loop through pmodels
       DO I = 1, NCOMP
@@ -103,7 +103,7 @@
       CALL FIT_MEN_CLOSE( MFD, STATUS )
 
 *    Exit
- 9000 IF ( STATUS .NE. SAI__OK ) THEN
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_PARSET', STATUS )
       END IF
 
@@ -125,8 +125,6 @@
 *    Method :
 *    Deficiencies :
 *
-*     Only spectral models supported at present.
-*
 *    Bugs :
 *    Authors :
 *     Trevor Ponman  (BHVAD::TJP)
@@ -145,6 +143,7 @@
 *                 exist before they are created. Means that that this routine
 *                 can be used to update a existing model. (DJA)
 *     11 Nov 94 : Use AIO to do menu file input (DJA)
+*      2 May 95 : Added 'format' field (DJA)
 *
 *    Type definitions :
 *
@@ -179,6 +178,8 @@
 							! of this pmodel
       CHARACTER*(DAT__SZLOC) 	MIPJLOC			! Locator to param J of
 							! this pmodel
+
+      CHARACTER*12		FMT			! Format for output
       CHARACTER*40 		NAME			! Pmodel name
       CHARACTER*30 		PNAME			! Parameter name
       CHARACTER*80 		STRING			! String from LINE
@@ -194,6 +195,7 @@
       INTEGER 			I,J,N
 
       LOGICAL			FROZEN			! Frozen in menu file
+      LOGICAL			SKIP			! Skip next line read?
 *-
 
 *    Check status
@@ -207,7 +209,7 @@
 	STATUS = SAI__ERROR
 	CALL ERR_REP( 'BADMOD', 'Model not found in fit_model file',
      :                STATUS )
-	GOTO 9000
+	GOTO 99
       END IF
       N = INDEX(LINE,'key:')
       IF ( N .EQ. 0 ) GOTO 10
@@ -215,7 +217,7 @@
 *    Extract keyword and compare with MODL
       STRING=LINE(N+4:80)
       CALL CHR_LDBLK(STRING)
-      IF(STATUS.NE.SAI__OK) GOTO 9000
+      IF(STATUS.NE.SAI__OK) GOTO 99
       KEY = STRING(1:MAXKEYLEN)
       IF ( KEY .NE. MODL ) GOTO 10
 
@@ -228,7 +230,7 @@
 *    Correct pmodel found - copy attributes from menu to fit_model object
       CALL DAT_NEWC( PCELL, 'KEY', MAXKEYLEN, 0, 0, STATUS )
       CALL CMP_PUT0C( PCELL, 'KEY', KEY, STATUS )
-      IF(STATUS.NE.SAI__OK) GOTO 9000
+      IF(STATUS.NE.SAI__OK) GOTO 99
 
 *    Pmodel name
  20   CALL AIO_READF( MFD, LINE, STATUS )
@@ -269,7 +271,7 @@
       IF(INDEX(LINE,'endmodel').GT.0)THEN
 	STATUS=SAI__ERROR
 	CALL ERR_REP( 'BADMNU', ERRMEN, STATUS )
-	GOTO 9000
+	GOTO 99
       ELSE IF(N.GT.0)THEN
 	STRING=LINE(N+5:80)
 	CALL CHR_CTOI(STRING,NPAR,STATUS)
@@ -283,7 +285,7 @@
 *    Create parameter structure, & access
       CALL DAT_NEW( PCELL, 'PAR', 'SPEC_PARAMETER', 1, NPAR, STATUS )
       CALL DAT_FIND( PCELL, 'PAR', MIPLOC, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GOTO 9000
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy across all parameters for current pmodel
       DO J = 1, NPAR
@@ -295,7 +297,7 @@
 	  IF(INDEX(LINE,'endmodel').GT.0)THEN
 	    STATUS=SAI__ERROR
 	    CALL ERR_REP( 'BADMNU', ERRMEN, STATUS )
-	    GOTO 9000
+	    GOTO 99
 	  ELSE
 	    GOTO 50		! Read next menu line
 	  END IF
@@ -332,8 +334,23 @@
 	END IF
         IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
 
-*      Parameter value
+*      Parameter format
 	CALL AIO_READF( MFD, LINE, STATUS )
+	N=INDEX(LINE,'format:')
+	IF(N.EQ.0)THEN
+          SKIP = .TRUE.
+	ELSE
+          SKIP = .FALSE.
+	  STRING=LINE(N+7:80)
+	  CALL CHR_LDBLK(STRING)
+	  FMT = STRING(1:12)
+	  CALL DAT_NEWC(MIPJLOC,'FORMAT',12,0,0,STATUS)
+	  CALL CMP_PUT0C(MIPJLOC,'FORMAT',FMT,STATUS)
+	END IF
+        IF ( STATUS .NE. SAI__OK ) CALL ERR_FLUSH(STATUS)
+
+*      Parameter value
+	IF ( .NOT. SKIP ) CALL AIO_READF( MFD, LINE, STATUS )
 	N=INDEX(LINE,'val:')
 	IF(N.EQ.0)THEN
 	  STATUS=SAI__ERROR
@@ -393,7 +410,7 @@
       CALL DAT_ANNUL( MIPLOC, STATUS )
 
 *    Exit
- 9000 IF ( STATUS .NE. SAI__OK ) THEN
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_PARSET_SUB', STATUS )
       END IF
 
