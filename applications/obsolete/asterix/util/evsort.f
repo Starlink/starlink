@@ -105,10 +105,6 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_INSET
-        LOGICAL			CHR_INSET
-
 *  Local Constants:
       INTEGER                	MXLIN              	! Max amount of history
         PARAMETER            	( MXLIN = 8 )

@@ -368,6 +368,8 @@
       BYTE          OQ(*)		! output values
 *    Status :
       INTEGER STATUS
+*    Functions:
+      BYTE BIT_ORUB
 *    Local variables :
       INTEGER I,J			! index variables
 *-
@@ -394,7 +396,7 @@
         J=0
         DO I=I1,I2,INC
           J=J+1
-          OQ(J)=(Q1(I).OR.Q2(I))
+          OQ(J)=BIT_ORUB(Q1(I),Q2(I))
         END DO
       END IF
 

@@ -116,7 +116,6 @@
       CHARACTER*9               WSTR              	! Axis width description
 
       REAL                      LO, HI            	! Axis range
-      REAL                      WIDTH             	! Axis width
 
       INTEGER                   DEVWID            	! Device width
       INTEGER			DIMS(ADI__MXDIM)	! Dataset dimensions

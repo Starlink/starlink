@@ -288,7 +288,7 @@
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 	  IF ( IDIM.LE.0 .OR. IDIM.GT.NDIMS ) THEN
-            CALL MSG_SETI(IDIM, IDIM)
+            CALL MSG_SETI( 'IDIM', IDIM)
 	    CALL MSG_PRNT('Error: there is no dimension ^IDIM')
             CALL USI_CANCL('MSK_IDIM',STATUS)
           ELSE
@@ -309,7 +309,7 @@
           IF (STATUS .NE. SAI__OK) GOTO 99
 
 	  IF (IDIM1.LT.0 .OR. IDIM1.GT.NDIMS) THEN
-            CALL MSG_SETI(IDIM, IDIM)
+            CALL MSG_SETI( 'IDIM', IDIM)
 	    CALL MSG_PRNT('Error: there is no dimension ^IDIM')
             CALL USI_CANCL('MSK_IDIM1',STATUS)
           ELSE
@@ -325,7 +325,7 @@
 
 *  Test data size
       IF ( NELS(IDIM) .GT. NMAX ) THEN
-        CALL MSG_SETI(NMAX, NMAX)
+        CALL MSG_SETI( 'NMAX', NMAX)
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Error: too much data - the maximum'/
      :                                       /' is ^NMAX', STATUS )
@@ -333,7 +333,7 @@
       END IF
 *
       IF ( (IDIM1.GT.0) .AND. (NELS(IDIM1).GT.NMAX) ) THEN
-        CALL MSG_SETI(NMAX, NMAX)
+        CALL MSG_SETI( 'NMAX', NMAX)
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Error: too much data - the maximum'/
      :                                    /' is ^NMAX', STATUS )
@@ -512,7 +512,7 @@
 	    LM2 = IDLEN+1
 	    LMASK = LM2*2
 	    IF ( IDLEN .GT. NMASK ) THEN
-              CALL MSG_SETI(  NMASK, NMASK )
+              CALL MSG_SETI( 'NMASK', NMASK )
               STATUS = SAI__ERROR
               CALL ERR_REP(' ','Error: template length greater'/
      :                             /' than ^NMASK',STATUS)
@@ -1107,14 +1107,12 @@
      :       /' slice. The average data value will be calculated'/
      :       /' within a region you specify, and used to extend '/
      :       /'the end regions for the smoothing.' )
-            CALL MSG_OUT( 'MSG',
-     :                      'You will specify 2 such regions:', STATUS )
-            CALL MSG_OUT( 'MSG',
-     :                 'Enter lower bound of region to extend', STATUS )
+            CALL MSG_PRNT( 'You will specify 2 such regions:' )
+            CALL MSG_PRNT( 'Enter lower bound of region to extend' )
             CALL USI_GET0I( 'START1', START1, STATUS )
 *
-            CALL MSG_OUT( 'MSG',
-     :             'Enter upper bound of the region to extend', STATUS )
+            CALL MSG_PRNT( 'Enter upper bound of the region to '/
+     :                    /'extend' )
             CALL USI_GET0I( 'END1', END1, STATUS )
 *
             CALL MSG_OUT( 'MSG',

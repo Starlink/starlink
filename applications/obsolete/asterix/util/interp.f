@@ -173,7 +173,7 @@
 *  Check shape of data
       IF ( NDIM .GT. 4 ) THEN
         STATUS=SAI__ERROR
-        CALL ERR_REP(' ','Data array has more than four dimensions',
+        CALL ERR_REP(' ','Data array has more than four dimensions'//
      :                     ' it will have to be binned up *',STATUS)
       END IF
       IF (STATUS.NE.SAI__OK) GOTO 99

@@ -150,7 +150,7 @@
           IF ( BAD .NE. N ) THEN
             CALL MSG_SETI( 'I', I )
             CALL MSG_PRNT( 'Object number ^I has no valid data - '/
-     :                               /'ignored in output', STATUS )
+     :                               /'ignored in output' )
           ELSE
             CALL MSG_PRNT( 'All inputs are bad!' )
             STATUS = SAI__ERROR

@@ -624,6 +624,7 @@
 *
 *    Local variables :
 *
+      CHARACTER*200           LTXT
       INTEGER                 TLEN               ! Non-blank length of TEXT
 *-
 
@@ -635,9 +636,11 @@
 
 *      Set token and enclose data in double quotes if it has a space in it
         IF ( INDEX(TEXT(:TLEN),' ') .EQ. 0 ) THEN
-          CALL MSG_SETC( TOKEN, TOKEN//' '//TEXT(:TLEN) )
+          LTXT = TOKEN//' '//TEXT(:TLEN)
+          CALL MSG_SETC( TOKEN, LTXT )
         ELSE
-          CALL MSG_SETC( TOKEN, TOKEN//' "'//TEXT(:TLEN)//'"' )
+          LTXT = TOKEN//' "'//TEXT(:TLEN)//'"'
+          CALL MSG_SETC( TOKEN, LTXT )
         END IF
 
       ELSE

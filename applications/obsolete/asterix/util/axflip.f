@@ -150,9 +150,9 @@
 
 *  Local Data:
       CHARACTER*7               AXOBJ(NAXOBJ)
+      CHARACTER*8               OBJ(NOBJ)
       DATA                      AXOBJ/'Data','Width',
      :                                'LoWidth','HiWidth'/
-      CHARACTER*8               OBJ(NOBJ)
       DATA                      OBJ/'Data','Quality','Variance',
      :                              'LoError', 'HiError', 'Grouping'/
 *.

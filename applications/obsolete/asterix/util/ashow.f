@@ -851,7 +851,7 @@
         L = CHR_LEN( LNAMS(I) )
         CALL FRI_CHK( IFID, LNAMS(I)(:L), OK, STATUS )
         IF ( OK ) THEN
-          CALL FRI_CHK( IFID, LNAMS(I)(:L),  LINK, STATUS )
+          CALL FRI_GETC( IFID, LNAMS(I)(:L),  LINK, STATUS )
           CALL ASHOW_VAL( LINK, LDESC(I), ' ', OCH, STATUS )
         ELSE
           CALL ASHOW_VAL( '* not set *', LDESC(I), ' ', OCH, STATUS )

@@ -1843,12 +1843,13 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 *    Global variables :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*7 C/'1234567'/
+      CHARACTER*7 C
       CHARACTER*20 PARNAM       ! Input parameter
       REAL OWID
       INTEGER BDIMS(2),DIMS(ADI__MXDIM)
       INTEGER NAX,CAX
       LOGICAL OK
+      DATA C/'1234567'/
 *-
 
       IF (STATUS .NE. SAI__OK) RETURN

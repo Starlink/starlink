@@ -121,10 +121,6 @@
 *  Status:
       INTEGER			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-        INTEGER			CHR_LEN
-
 *  Local Constants:
       CHARACTER*30		VERSION
         PARAMETER		( VERSION = 'AXORDER Version V2.0-2' )

@@ -42,14 +42,12 @@
 *    Status :
 *
       INTEGER STATUS
-*
-*    Function declarations :
-*
-      INTEGER CHR_LEN
-         EXTERNAL CHR_LEN
 *    Local constants :
       INTEGER MAXCOL
          PARAMETER (MAXCOL=40)
+*    Version :
+      CHARACTER*30 VERSION
+      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-2')
 *    Local variables :
       CHARACTER*3 STRING
       CHARACTER*40 CNAME(MAXCOL)
@@ -80,9 +78,6 @@
 
 *    Local data :
       DATA NULL/'                                        '/
-*    Version :
-      CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS - version 1.8-2')
 *-
 
       CALL AST_INIT(STATUS)
@@ -612,7 +607,7 @@
             STATUS = SAI__ERROR
             CALL MSG_SETC( 'F', CNAME(ICNT) )
             CALL ERR_REP( ' ', 'AST_ERR: DSCF field ^F is not a '/
-     :                    /'numeric type')
+     :                    /'numeric type', STATUS )
           END IF
 
         END IF

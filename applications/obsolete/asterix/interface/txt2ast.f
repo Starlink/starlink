@@ -276,9 +276,9 @@
 
 *  Local Data:
       CHARACTER           QMASK_NAMES(NMASKS)*8
+      INTEGER             QMASK_VALS(NMASKS)
          DATA             QMASK_NAMES/'OK','MISSING','ARITH','BAD',
      :                            'IGNORE', 'PATCHED'/
-      INTEGER             QMASK_VALS(NMASKS)
          DATA             QMASK_VALS/QUAL__GOOD,QUAL__MISSING,
      :                               QUAL__ARITH,QUAL__BAD,
      :                             QUAL__IGNORE, QUAL__PATCHED/
@@ -717,7 +717,8 @@
       END IF
 
 *  Must have both lower and upper data errors, or neither
-      IF ( IEOR( USE_LOERR, USE_UPERR ) ) THEN
+      IF ( (USE_LOERR.OR.USE_UPERR) .AND.
+     :     .NOT. (USE_LOERR.AND.USE_UPERR) ) THEN
         IF ( USE_LOERR ) THEN
           CALL MSG_SETC( 'DESC', 'UPERROR/UPLIM' )
         ELSE
@@ -1284,7 +1285,8 @@
       INTEGER              LINENUMBER           ! Text line where error occ'd
 *-
       CALL MSG_SETI( 'LINE', LINENUMBER  )
-      CALL MSG_PRNT( MESSAGE//' at line ^LINE' )
+      CALL MSG_SETC( 'MSG', MESSAGE )
+      CALL MSG_PRNT( '^MSG at line ^LINE' )
       END
 
 

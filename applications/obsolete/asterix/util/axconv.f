@@ -65,7 +65,8 @@
       INTEGER			IAX			! Input axis loop
       INTEGER			NDIM         		! Input dimensionality
 
-      INTEGER			OK			! Axis data ok?
+      LOGICAL			OK			! Axis data ok?
+
 *  Version
       CHARACTER*20 VERSION
           PARAMETER (VERSION='AXCONV version 2.0-0')
