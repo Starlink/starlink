@@ -784,6 +784,7 @@ $(MANIFEST)/hdstools: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/one \
 		$(MANIFEST)/par \
@@ -1083,6 +1084,7 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
@@ -1401,6 +1403,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
@@ -1669,6 +1672,7 @@ $(MANIFEST)/tsp: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
+		$(MANIFEST)/ifd \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/ndf \
