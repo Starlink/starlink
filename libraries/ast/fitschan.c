@@ -412,6 +412,10 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Only use CTYPE comments as axis labels if all non-celestial
 *          axes have a unique non-blank comment (otherwise use CTYPE
 *          values as labels).
+*        - Updated to use latest FITS-WCS projections. This means that the
+*          "TAN with projection terms" is no longer a standard FITS
+*          projection. It is now represented using the AST-specific TPN
+*          projection (until such time as FITS-WCS paper IV is finished).
 *class--
 */
 
@@ -3494,6 +3498,7 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
    double xpixelsz;    /* XPIXELSZ keyword value */
    double ypixelsz;    /* YPIXELSZ keyword value */
    int i;              /* Loop count */
+   int gottan;         /* Is a simple TAN projection being used? */
    int ret;            /* Returned value. */
 
 /* Initialise */
@@ -3505,13 +3510,17 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
 /* Check the image is 2 dimensional. */
    if( GetMaxIM( &(store->crpix) ) != 1 ) return ret;
 
-/* Check the first axis is RA with a TAN projection. */
+/* Check the first axis is RA with a TAN or TPN projection. Note if a
+   simple TAN projection is being used. */
    cval = GetItemC( &(store->ctype), 0, ' ', NULL, method, class );
-   if( !cval || strcmp( "RA---TAN", cval ) ) return ret;
+   gottan = ( cval && !strcmp( "RA---TAN", cval ));
+   if( !cval || ( strcmp( "RA---TAN", cval ) && 
+                  strcmp( "RA---TPN", cval ) ) ) return ret;
 
-/* Check the second axis is DEC with a TAN projection. */
+/* Check the second axis is DEC with a TAN or TPN projection. */
    cval = GetItemC( &(store->ctype), 1, ' ', NULL, method, class );
-   if( !cval || strcmp( "DEC--TAN", cval ) ) return ret;
+   if( !cval || ( strcmp( "DEC--TAN", cval ) && 
+                  strcmp( "DEC--TPN", cval ) ) ) return ret;
 
 /* Check that LONPOLE is undefined or is 180 degrees. */
    val = GetItem( &(store->lonpole), 0, 0, ' ', NULL, method, class );
@@ -3541,14 +3550,14 @@ static int DSSFromStore( AstFitsChan *this, FitsStore *store,
    val = GetItem( &(store->cd), 1, 0, ' ', NULL, method, class );
    if( val != AST__BAD && val != 0.0 ) return ret;
    
-/* Get the required projection parameter values from the store. */
+/* Get the required projection parameter values from the store, supplying
+   appropriate values if a simple TAN projection is being used. */
    for( i = 0; i < 22; i++ ){
-      pvx[ i ] = GetItem( &(store->pv), 0, i, ' ', NULL, method, class );
+      pvx[ i ] = gottan ? AST__BAD : GetItem( &(store->pv), 0, i, ' ', NULL, method, class );
       if( pvx[ i ] == AST__BAD ) pvx[ i ] = ( i == 1 ) ? 1.0 : 0.0;
 
-      pvy[ i ] = GetItem( &(store->pv), 1, i, ' ', NULL, method, class );
+      pvy[ i ] = gottan ? AST__BAD : GetItem( &(store->pv), 1, i, ' ', NULL, method, class );
       if( pvy[ i ] == AST__BAD ) pvy[ i ] = ( i == 1 ) ? 1.0 : 0.0;
-
    }
 
 /* Check that no other projection parameters have been set. */
@@ -3715,7 +3724,7 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 *     DSSToStore
 
 *  Purpose:
-*     Extract WCS information from the supplied FItsChan using a DSS
+*     Extract WCS information from the supplied FitsChan using a DSS
 *     encoding, and store it in the supplied FitsStore.
 
 *  Type:
@@ -3740,9 +3749,12 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 *     This function extracts DSS keywords from the supplied FitsChan, and
 *     stores the corresponding WCS information in the supplied FitsStore.
 *     The conversion from DSS encoding to standard WCS encoding is
-*     described in the Calabretta & Greisen paper "Representations of
-*     celestial coordinates in FITS" (A&A, in prep.). Here we use
-*     "lambda=1" (i.e. plate co-ordinate are measured in mm, not degrees).
+*     described in an ear;y draft of the Calabretta & Greisen paper 
+*     "Representations of celestial coordinates in FITS" (A&A, in prep.),
+*     and uses the now deprecated "TAN with polynomial corrections",
+*     which is still supported by the WcsMap class as type AST__TPN.
+*     Here we use "lambda=1" (i.e. plate co-ordinate are measured in mm, 
+*     not degrees).
 *
 *     It is assumed that DSS images are 2 dimensional.
 
@@ -3956,8 +3968,11 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
       SetItem( &(store->lonpole), 0, 0, ' ', 180.0 );
       SetItem( &(store->equinox), 0, 0, ' ', 2000.0 );
       SetItemC( &(store->radesys), 0, ' ', "FK5" );
-      SetItemC( &(store->ctype), 0, ' ', "RA---TAN" );
-      SetItemC( &(store->ctype), 1, ' ', "DEC--TAN" );
+
+/* The WcMap class uses the projection code "TPN" to represent a "TAN with 
+   polynomial corrections" projection. */
+      SetItemC( &(store->ctype), 0, ' ', "RA---TPN" );
+      SetItemC( &(store->ctype), 1, ' ', "DEC--TPN" );
 
    }
 
@@ -5869,7 +5884,7 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
    the Frame which has been assigned that version character. Initialise
    this array to indicate that no version letters have yet been assigned. */
          for( s = 'A'; s <= 'Z'; s++ ) {
-            frms[ s ] = 0;
+            frms[ (int) s ] = 0;
          }
 
 /* Loop round all frames (excluding the current and base Frames which do not 
@@ -5882,8 +5897,8 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
                frame = astGetFrame( fset, ifrm );
                id = astGetIdent( frame );
                if( strlen( id ) == 1 && isupper( id[ 0 ] ) ) {
-                  if( frms[ id[ 0 ] ] == 0 ) {
-                     frms[ id[ 0 ] ] = ifrm;
+                  if( frms[ (int) id[ 0 ] ] == 0 ) {
+                     frms[ (int) id[ 0 ] ] = ifrm;
                      sid[ ifrm ] = id[ 0 ];
                   }
                }
@@ -5899,10 +5914,10 @@ static FitsStore *FsetToStore( AstFrameSet *fset, int naxis, double *dim,
          for( ifrm = 1; ifrm <= nfrm; ifrm++ ){
             if( sid[ ifrm ] == 0 ){
                if( ifrm != icurr && ifrm != ibase ) { 
-                  while( frms[ ++s ] != 0 );
+                  while( frms[ (int) ++s ] != 0 );
                   if( s <= 'Z' ) { 
                      sid[ ifrm ] = s;
-                     frms[ s ] = ifrm;
+                     frms[ (int) s ] = ifrm;
                   }
                }
             }
@@ -6109,9 +6124,9 @@ static double GetItem( double ****item, int j, int im, char s, char *name,
 *        intermediate axis number.
 *     im
 *        The zero based pixel axis index (in the range 0 to 98) or parameter 
-*        index (in the range 0 to 99). Set this to zero for keywords (e.g. 
-*        CRVAL) which are not indexed by either pixel axis or parameter 
-*        number.
+*        index (in the range 0 to WCSLIB_MXPAR-1). Set this to zero for 
+*        keywords (e.g. CRVAL) which are not indexed by either pixel axis or 
+*        parameter number.
 *     s
 *        The co-ordinate version character (A to Z, or space), case
 *        insensitive
@@ -6631,15 +6646,15 @@ static int KeyFields( AstFitsChan *this, const char *filter, int maxfld,
 *        The filter string. 
 *     maxfld
 *        The size of the "ubnd" and "lbnd" arrays.
-*     lbnd
-*        A pointer to an integer array in which to return the
-*        lower bound found for each integer field in the filter.
-*        They are stored in the order in which they occur in the filter.
-*        If the filter contains too many fields to fit in the supplied
-*        array, the excess trailing fields are ignored.
 *     ubnd
 *        A pointer to an integer array in which to return the
 *        upper bound found for each integer field in the filter.
+*        They are stored in the order in which they occur in the filter.
+*        If the filter contains too many fields to fit in the supplied
+*        array, the excess trailing fields are ignored.
+*     lbnd
+*        A pointer to an integer array in which to return the
+*        lower bound found for each integer field in the filter.
 
 *  Returned Value:
 *     astKeyFields()
@@ -11660,7 +11675,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
                val = GetItem( &(store->pv), j, m, s, NULL, method, class );
                if( s == ' ' ){
                   if( val != AST__BAD ) {
-                     if( j != axlat || prj == AST__TAN || m >= 10 ){
+                     if( j != axlat || prj == AST__TPN || m >= 10 ){
                         ok = 0;
                         goto next;
                      } else {
@@ -12572,9 +12587,9 @@ static void SetItem( double ****item, int j, int im, char s, double val ){
 *        intermediate axis number.
 *     im
 *        The zero based pixel axis index (in the range 0 to 98) or parameter 
-*        index (in the range 0 to 99). Set this to zero for keywords (e.g. 
-*        CRVAL) which are not indexed by either pixel axis or parameter 
-*        number.
+*        index (in the range 0 to WCSLIB__MXPAR-1). Set this to zero for 
+*        keywords (e.g. CRVAL) which are not indexed by either pixel axis or 
+*        parameter number.
 *     val
 *        The keyword value to store.
 
@@ -13357,11 +13372,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *
 *     13) The IRAF "TNX" projection. If the last 4 chacaters of CTYPEi 
 *       (i = 1, naxis) are "-TNX", then:
-*	- "TNX" is replaced by "TAN" within the CTYPEi value
+*	- "TNX" is replaced by "TPN" within the CTYPEi value (a AST-specific
+*       projection code representing the "TAN with polynomial corrections" 
+*       which was included in an early draft of the FITS-WCS paper).
 *       - If the FitsChan contains no PROJP keywords, then projection
 *       parameter valus are read from any WATi_nnn keywords, and
 *       corresponding PV keywords are added to the FitsChan.
-*       - If the TNX projection cannot be converted exactly into a TAN 
+*       - If the TNX projection cannot be converted exactly into a TPN 
 *       projection, ASTWARN keywords are added to the FitsChan 
 *       containing a warning message. The calling application can (if it
 *       wants to) check for this keyword, and report its contents to the
@@ -13371,6 +13388,9 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 *       This is the IRAF equivalent of the AST native encoding. Mini-WCS
 *       keywords are removed in order to avoid confusion arising between
 *       potentially inconsistent encodings.
+*
+*     15) TAN projections are converted to "TPN" projections if they have
+*       any polynomial correction terms.
 
 *  Parameters:
 *     this
@@ -13427,7 +13447,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    size_t size;                   /* Length of string value */
 
 /* Arrays needed to convert the index of a TNX co-efficient into an index
-   of a TAN projection parameter. */
+   of a TPN projection parameter. */
    static int abskip[] = {0,1,4,10,20,35,56,84};
    static int nab[] = {1,3,6,10,15,21,28,36};
    static int a[] = { 
@@ -13954,6 +13974,27 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
       }
    }
 
+/* "TAN with polynomial correction" projections 
+   -------------------------------------------- */
+
+/* Compare the projection type with "-TAN" */
+   if( !Ustrcmp( prj, "-TAN" ) ) {
+
+/* If there are any latitude projection parameters, change the projection
+   code to "TPN". */
+      if( astKeyFields( this, "PV%d_%d", 2, ubnd, lbnd ) ){
+         if( lbnd[ 0 ] <= axlat + 1 && axlat + 1 <= ubnd[ 0 ] ) {
+            strcpy( lontype + 4, "-TPN" );
+            cval = lontype;
+            SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
+                      (void *) &cval, AST__STRING, NULL );
+            strcpy( lattype + 4, "-TPN" );
+            cval = lattype;
+            SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
+                      (void *) &cval, AST__STRING, NULL );
+         }
+      }
+   }     
 
 /* IRAF "ZPX" projections 
    --------------------- */
@@ -14035,13 +14076,13 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
    --------------------- */
    } else if( !Ustrcmp( prj, "-TNX" ) ) {
 
-/* Replace TNX with TAN in the CTYPE values. */
-      strcpy( lontype + 4, "-TAN" );
+/* Replace TNX with TPN in the CTYPE values. */
+      strcpy( lontype + 4, "-TPN" );
       cval = lontype;
       SetValue( ret, FormatKey( "CTYPE", axlon + 1, -1, ' ' ),
                 (void *) &cval, AST__STRING, NULL );
 
-      strcpy( lattype + 4, "-TAN" );
+      strcpy( lattype + 4, "-TPN" );
       cval = lattype;
       SetValue( ret, FormatKey( "CTYPE", axlat + 1, -1, ' ' ),
                 (void *) &cval, AST__STRING, NULL );
@@ -14099,7 +14140,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* The second and third numbers gives the orders of the polynomial in X
    and Y. We can only handle cases in which the orders are the same on
    both axes, and greater than 0 and less than 9. Store a pointer to the
-   first TAN projection parameter index to use. */
+   first TPN projection parameter index to use. */
                   } else if( j == 1 ){
                      porder = dval - 1;
                   } else if( j == 2 ){
@@ -14130,7 +14171,7 @@ static AstFitsChan *SpecTrans( AstFitsChan *this, int encoding,
 /* Store the PV value */
                      SetValue( ret, FormatKey( "PV", iaxis + 1, m, ' ' ),
                                (void *) &dval, AST__FLOAT, 
-                               "TAN projection parameter" );
+                               "TPN projection parameter" );
                   }
 
                   start += nch;
@@ -14971,9 +15012,11 @@ static int SplitMap2( AstMapping *map, int invert, AstMapping **map1,
                                               axlon + wcsaxis + 1, 
                                               axlat + wcsaxis + 1, "");
             for( j = 0; j < astGetNin( mapb ); j++ ){
-               for( m = 0; m < 100; m++ ){
-                  pv = astGetPV( mapb, j, m );
-                  if( pv != AST__BAD ) astSetPV( *map2, j + wcsaxis, m, pv );
+               for( m = 0; m < WCSLIB_MXPAR; m++ ){
+                  if( astTestPV( mapb, j, m ) ) {
+                     pv = astGetPV( mapb, j, m );
+                     if( pv != AST__BAD ) astSetPV( *map2, j + wcsaxis, m, pv );
+                  }
                }
             }
             astInvert( *map2 );
@@ -16559,12 +16602,10 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
    double equinox;                /* EQUINOX value */
    double mjdobs;                 /* MJD-OBS value */
    int *perm;                     /* Permuted axis indices */
-   int axis2;                     /* Another axis index */
    int axis;                      /* Axis index */
    int inon;                      /* Index of next non-celestial axis */
    int naxis;                     /* No. of axes */
    int noncel;                    /* Number of non-celestial axes */
-   int ok;                        /* No identical labels found yet? */
    int radesys;                   /* RADESYS value */
    int skperm[2];                 /* Axis permutation for SkyFrames */
    int usecom;                    /* Use CTYPE comments as axis labels? */
@@ -18745,7 +18786,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
    into absolute physical coordinates using map3b. Note, the reference 
    pixel given by CRPIX does not necessarily map onto physical 
    reference point given by CRVAL. For instance, the two points will be
-   different for a TAN projection in which any of the PVi_0 projection
+   different for a TPN projection in which any of the PVi_0 projection
    parameters are not zero. */
       for( i = 0; i < naxis; i++ ) ptr1[ i ][ 0 ] = 0.0;
       natlat = astGetNatLat( map2 );
@@ -18778,11 +18819,15 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
          SetItem( &(store->crval), axlat, 0, s, AST__DR2D*skyref[ skylataxis ] );
 
 /* Store the WCS projection parameters. */
-         for( i = 0; i < 99; i++ ){
-            pv = astGetPV( map2, axlon, i );
-            if( pv != AST__BAD ) SetItem( &(store->pv), axlon, i, s, pv );
-            pv = astGetPV( map2, axlat, i );
-            if( pv != AST__BAD ) SetItem( &(store->pv), axlat, i, s, pv );
+         for( i = 0; i < WCSLIB_MXPAR; i++ ){
+            if( astTestPV( map2, axlon, i ) ) {
+               pv = astGetPV( map2, axlon, i );
+               if( pv != AST__BAD ) SetItem( &(store->pv), axlon, i, s, pv );
+            }
+            if( astTestPV( map2, axlat, i ) ) {
+               pv = astGetPV( map2, axlat, i );
+               if( pv != AST__BAD ) SetItem( &(store->pv), axlat, i, s, pv );
+            }
          }
 
       }
@@ -20482,7 +20527,7 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     be a FrameSet which conforms to the STScI/DSS coordinate system
 *     model (this means the Mapping which relates its base and current 
 *     Frames must include either a DssMap or a WcsMap with type 
-*     AST__TAN).
+*     AST__TAN or AST__TPN).
 *
 c     When reading a DSS encoded Object (using astRead), the FitsChan
 f     When reading a DSS encoded Object (using AST_READ), the FitsChan
@@ -20535,6 +20580,11 @@ f     data will be written to the FitsChan and AST_WRITE will return
 *     used to store a single AST Object in any set of FITS header
 *     cards, and that Object must be a FrameSet which conforms to the
 *     FITS-WCS model (the FrameSet may, however, contain multiple Frames).
+*     The projections supported include all those in the fits-wcs standard.
+*     In addition, it supports the "TAN with polynomial correction terms"
+*     projection which was included in a draft of the FITS-WCS paper, but
+*     was not present in the final version. This projection is identified
+*     by the code "TPN" within AST.
 *
 c     When reading a FITS-WCS encoded Object (using astRead), the FitsChan
 f     When reading a FITS-WCS encoded Object (using AST_READ), the FitsChan
@@ -20614,14 +20664,14 @@ f     no data will be written to the FitsChan and AST_WRITE will
 *
 *     In addition, the experimental IRAF "ZPX" and "TNX" sky projections will 
 *     be accepted when reading, but will never be written (the corresponding
-*     FITS "ZPN" or "TAN" projection being used instead). However, there
+*     FITS "ZPN" or "TPN" projection being used instead). However, there
 *     are restrictions on the use of these experimental projections. For
 *     "ZPX", longitude and latitude correction surfaces (appearing as
 *     "lngcor" or "latcor" terms in the IRAF-specific "WAT" keywords) are
 *     not supported. For "TNX" projections, only cubic surfaces encoded as 
 *     simple polynomials with "half cross-terms" are supported. If an
 *     un-usable "TNX" or "ZPX" projection is encountered while reading 
-*     from a FitsChan, a simpler form of TAN or ZPN projection is used
+*     from a FitsChan, a simpler form of TPN or ZPN projection is used
 *     which ignores the unsupported features and may therefore be
 *     inaccurate. If this happens, a warning message is added to the 
 *     contents of the FitsChan as a set of cards using the keyword "ASTWARN".

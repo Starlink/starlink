@@ -1,7 +1,7 @@
 /*============================================================================
 *
 *   WCSLIB - an implementation of the FITS WCS proposal.
-*   Copyright (C) 1995, Mark Calabretta
+*   Copyright (C) 1995-2002, Mark Calabretta
 *
 *   This library is free software; you can redistribute it and/or modify it
 *   under the terms of the GNU Library General Public License as published
@@ -27,32 +27,23 @@
 *
 *=============================================================================
 *
-*  This version of wcstrig.c is based on the version in wcslib-2.2, but has
+*  This version of wcstrig.c is based on the version in wcslib-2.9, but has
 *  been modified in the following ways by the Starlink project (e-mail: 
 *  ussc@star.rl.ac.uk):
 *     -  Support for non-ANSI C "const" class removed
-*        (D.S. Berry, 19th June 1996).
-*     -  Undefine PI, if previously defined
-*        (R.F. Warren-Smith, 15th November 1996).
 *     -  Changed names of projection functions and degrees trig functions
-*        to avoid clashes with wcslib. Also made variables "r2d" and "d2r"
-*        static.
-*        (D.S. Berry 26th September 2001)
-*
+*        to avoid clashes with wcslib. 
 *=============================================================================
 *
 *   The functions defined herein are trigonometric or inverse trigonometric
 *   functions which take or return angular arguments in decimal degrees.
+*
+*   $Id$
 *---------------------------------------------------------------------------*/
 
+#include <math.h>
+#include "wcsmath.h"
 #include "wcstrig.h"
-
-#if defined(PI)
-#undef PI
-#endif
-#define PI 3.141592653589793238462643
-static const double d2r = PI / 180.0;
-static const double r2d = 180.0 / PI;
 
 double astCosd(angle)
 
@@ -72,7 +63,7 @@ double angle;
       return 0.0;
    }
 
-   return cos(angle*d2r);
+   return cos(angle*D2R);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -95,7 +86,7 @@ double angle;
       return 0.0;
    }
 
-   return sin(angle*d2r);
+   return sin(angle*D2R);
 }
 
 /*--------------------------------------------------------------------------*/
@@ -116,12 +107,12 @@ double angle;
       return -1.0;
    }
 
-   return tan(angle*d2r);
+   return tan(angle*D2R);
 }
 
 /*--------------------------------------------------------------------------*/
 
-double astAastCosd(v)
+double astACosd(v)
 
 double v;
 
@@ -134,12 +125,12 @@ double v;
       if (v+1.0 > -WCSTRIG_TOL) return 180.0;
    }
 
-   return acos(v)*r2d;
+   return acos(v)*R2D;
 }
 
 /*--------------------------------------------------------------------------*/
 
-double astAastSind(v)
+double astASind(v)
 
 double v;
 
@@ -152,12 +143,12 @@ double v;
       if (v-1.0 <  WCSTRIG_TOL) return 90.0;
    }
 
-   return asin(v)*r2d;
+   return asin(v)*R2D;
 }
 
 /*--------------------------------------------------------------------------*/
 
-double astAastTand(v)
+double astATand(v)
 
 double v;
 
@@ -170,12 +161,12 @@ double v;
       return 45.0;
    }
 
-   return atan(v)*r2d;
+   return atan(v)*R2D;
 }
 
 /*--------------------------------------------------------------------------*/
 
-double astAtan2d(y, x)
+double astATan2d(y, x)
 
 double x, y;
 
@@ -194,5 +185,5 @@ double x, y;
       }
    }
 
-   return atan2(y,x)*r2d;
+   return atan2(y,x)*R2D;
 }

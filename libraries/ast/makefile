@@ -448,7 +448,7 @@ PGPLOT_C_ROUTINES = grf_pgplot.c
 SLALIB_C_ROUTINES = sla.c
 
 #  Modules adapted from the wcslib library.
-WCSLIB_C_ROUTINES = proj.c wcstrig.c
+WCSLIB_C_ROUTINES = proj.c tpn.c wcstrig.c
 
 #  The facility error file, which associates messages with error codes.
 
@@ -1406,6 +1406,7 @@ plot.o: plot.c channel.h object.h error.h cmpmap.h mapping.h \
 pointset.o: pointset.c error.h memory.h object.h channel.h pointset.h \
  ast_err.h
 proj.o: proj.c proj.h wcstrig.h
+tpn.o: tpn.c proj.h wcstrig.h
 skyaxis.o: skyaxis.c ast_err.h slalib.h error.h memory.h pointset.h \
  object.h channel.h axis.h skyaxis.h
 skyframe.o: skyframe.c error.h memory.h object.h channel.h pointset.h \
