@@ -381,7 +381,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 
 PRIVATE_INCLUDES = $(I_SUB1) $(I_SUB2)
 
-I_SUB1 = ndf_const ndg_com ndg_const ndg_err
+I_SUB1 = ndg_com ndg_const ndg_err
 
 I_SUB2 = hlpcmd
 
@@ -392,7 +392,7 @@ I_SUB2 = hlpcmd
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR DAT_PAR GRP_PAR MSG_PAR NDF_PAR PAR_ERR \
-PAR_PAR PRM_PAR FIO_ERR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR \
+PAR_PAR PRM_PAR FIO_ERR NDF_ERR GRP_ERR NUM_DEF_CVT PAR_PAR PSX_ERR \
 NUM_DEC_CVT 
 
 #  List of Fortran routines required for building the package.  This is
@@ -401,11 +401,9 @@ NUM_DEC_CVT
 
 F_ROUTINES = $(F_SUB1) $(F_SUB2) $(MONO_SOURCE)
 
-F_SUB1 = ndf1_a2p.f ndf1_chxnm.f ndf1_fparx.f ndf1_indxp.f ndf1_p2a.f \
-ndf1_pscpx.f ndf1_psndb.f ndf1_psnde.f ndf1_psndf.f ndf1_pxlst.f \
-ndf1_simlr.f ndg1_axlim.f ndg1_ffind.f ndg1_fspec.f ndg1_gtloc.f \
-ndg1_init.f ndg1_lasto.f ndg1_ncut.f ndg1_ndfch.f ndg1_slice.f \
-ndg1_stloc.f ndg_annul.f ndg_asexp.f ndg_assoc.f ndg_creat.f \
+F_SUB1 = ndg1_ffind.f ndg1_fspec.f \
+ndg1_lasto.f ndg1_ndfch.f ndg1_slice.f \
+ndg_annul.f ndg_asexp.f ndg_assoc.f ndg_creat.f \
 ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f ndg_ndfpr.f
 
 F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
@@ -518,17 +516,17 @@ $(DATA_FILES)
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) \
-HLPCMD NDG_ERR NDF_CONST NDG_CONST NDG_COM
+HLPCMD NDG_ERR NDG_CONST NDG_COM
 
 #  Rules to set up links to locate each of the above include files.
 
 HLPCMD:    hlpcmd;                $(LINK) $? $@
 NDG_ERR:   ndg_err;               $(LINK) $? $@
-NDF_CONST: ndf_const;             $(LINK) $? $@
 NDG_CONST: ndg_const;             $(LINK) $? $@
 NDG_COM:   ndg_com;               $(LINK) $? $@
 NDF_ERR:   $(STAR_INC)/ndf_err;   $(LINK) $? $@
 GRP_ERR:   $(STAR_INC)/grp_err;   $(LINK) $? $@
+PSX_ERR:   $(STAR_INC)/psx_err;   $(LINK) $? $@
  
 DAT_PAR:   $(STAR_INC)/dat_par;   $(LINK) $? $@
 GRP_PAR:   $(STAR_INC)/grp_par;   $(LINK) $? $@
@@ -1375,24 +1373,11 @@ wrndf.f: PAR_ERR
 wrndf.f: SAE_PAR
 polpack_mon.f: SAE_PAR PAR_PAR
 
-ndf1_a2p.o: DAT_PAR NDF_ERR SAE_PAR
-ndf1_chxnm.o: NDF_ERR NDF_PAR SAE_PAR
-ndf1_p2a.o: DAT_PAR NDF_ERR SAE_PAR
-ndf1_pscpx.o: DAT_PAR NDF_CONST NDF_ERR SAE_PAR
-ndf1_psndb.o: DAT_PAR NDF_ERR SAE_PAR
-ndf1_psnde.o: DAT_PAR NDF_ERR NDF_PAR SAE_PAR
-ndf1_psndf.o: DAT_PAR NDF_ERR SAE_PAR
-ndf1_pxlst.o: DAT_PAR NDF_ERR SAE_PAR
-ndg1_axlim.o: NDF_ERR NDF_PAR SAE_PAR
 ndg1_ffind.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
 ndg1_fspec.o: GRP_PAR SAE_PAR
-ndg1_gtloc.o: DAT_PAR NDF_PAR NDG_COM NDG_CONST SAE_PAR
-ndg1_init.o: DAT_PAR NDF_PAR NDG_COM NDG_CONST SAE_PAR
 ndg1_lasto.o: SAE_PAR
-ndg1_ncut.o: DAT_PAR NDF_ERR NDF_PAR SAE_PAR
-ndg1_ndfch.o: DAT_PAR GRP_PAR NDG_CONST NDG_ERR SAE_PAR
+ndg1_ndfch.o: DAT_PAR GRP_PAR NDG_CONST NDG_ERR SAE_PAR PSX_ERR
 ndg1_slice.o: GRP_PAR SAE_PAR
-ndg1_stloc.o: DAT_PAR NDF_PAR NDG_COM NDG_CONST SAE_PAR
 ndg_annul.o: DAT_PAR SAE_PAR
 ndg_asexp.o: GRP_PAR NDG_CONST NDG_ERR SAE_PAR
 ndg_assoc.o: GRP_ERR GRP_PAR NDG_ERR PAR_ERR SAE_PAR
@@ -1401,7 +1386,7 @@ ndg_crexp.o: GRP_PAR NDG_CONST SAE_PAR
 ndg_delet.o: DAT_PAR SAE_PAR
 ndg_ndfas.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
 ndg_ndfcr.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
-ndg_ndfpr.o: DAT_PAR GRP_PAR NDF_CONST NDF_PAR NDG_CONST SAE_PAR
+ndg_ndfpr.o: DAT_PAR GRP_PAR NDF_PAR NDG_CONST SAE_PAR
 ndg_test.o: GRP_PAR SAE_PAR
 
 
