@@ -115,7 +115,7 @@
 
 *  Ensure objects satisfy mapping requirement
       CALL BDI1_CFIND( ARGS(1), ARGS(2), ITEM, .FALSE., CLOC,
-     :                 BDIM, DIMS, STATUS )
+     :                 NDIM, DIMS, STATUS )
 
 *  Everything ok?
       IF ( (STATUS .EQ. SAI__OK) .AND. (CLOC.NE.DAT__NOLOC) ) THEN
