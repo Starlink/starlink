@@ -57,9 +57,17 @@ immediately resolve the indirection.
 	    (literal linktext)	;override generation of link text
 	    )
 	(if target
-	    (error (string-append
-		    "The stylesheet is presently unable to link to elements of type "
-		    (gi target)))
+	    (make sequence
+	      ;; Can't make this type of link.  Object, but try to
+	      ;; emit something nonetheless.
+	      (if (string=? linktext "")
+		  (literal (string-append
+			    "[reference to " (gi target) "]"))
+		  (literal linktext))
+	      (error (string-append
+		      "The stylesheet is presently unable to link to elements of type "
+		      (gi target)
+		      " (ID " target-id ")")))
 	    (error (string-append
 		    "Can't find element with ID " target-id))))))
 
@@ -124,8 +132,16 @@ it produces an <funcname>error</>.
 			 tmp-xreftarget))
 	 (xrefurl (and xreftarget
 		       (get-link-policy-target xreftarget no-urls: #t)))
-	 (linktext (attribute-string (normalize "text")
-				     (current-node))))
+	 ;; If the element has content, make that the link text, else
+	 ;; if the element has a `text' attribute, make that the link
+	 ;; text, else generate the text below.
+	 (linktext (if (not (string=? (data (current-node)) ""))
+		       (data (current-node))
+		       (attribute-string (normalize "text")
+					 (current-node))))
+	 ;(linktext (attribute-string (normalize "text")
+		;		     (current-node)))
+	 )
     (if (and xrefent-gen-sysid
 	     docelem
 	     (string=? (gi docelem)
