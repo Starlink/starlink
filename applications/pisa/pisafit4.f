@@ -253,7 +253,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
-      INCLUDE 'SUBPAR_PAR'
       INCLUDE 'FIO_ERR'         ! FIO system error codes
       INCLUDE 'PRM_PAR'         ! Primitive data constants
 
