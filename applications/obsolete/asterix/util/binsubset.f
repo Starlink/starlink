@@ -171,7 +171,6 @@
       INTEGER                HU                 ! History lines used
       INTEGER                	IDPTR              	! Pointer to input data
       INTEGER			IFID			! Input dataset id
-      INTEGER			IOBJ			! Loop over subset objs
       INTEGER                IWPTR(ADI__MXDIM)  ! Pointer to input axis widths
       INTEGER                NDIM               ! Number of input dimensions
       INTEGER                NRANGE(ADI__MXDIM) ! # item ranges
@@ -444,7 +443,7 @@
       CALL BDI_COPY( IFID, 'Title,Label,Units', OFID, ' ', STATUS )
 
 *  Loop over objects which require subsetting
-      DO IOBJ = 1, NOBJ
+      DO I = 1, NOBJ
 
 *    Does object exist
         CALL BDI_CHK( IFID, OBJ(I), OK, STATUS )
@@ -477,6 +476,7 @@
 
         END IF
 
+*  End loop over subsettable arrays
       END DO
 
 *  Finished with logical array
@@ -599,7 +599,7 @@
         CALL MSG_PRNT ('The axes present are:')
 
         DO I = 1, NDIM
-          CALL BDI_CHK( FID, I, 'Data', OK, STATUS )
+          CALL BDI_AXCHK( FID, I, 'Data', OK, STATUS )
           IF ( OK ) THEN
             NAX=NAX+1
             CALL BDI_AXGET0C( FID, I, 'Label', AXLAB, STATUS )
