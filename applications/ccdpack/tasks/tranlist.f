@@ -293,8 +293,9 @@
 *        The WCS component of each NDF is used to transform the 
 *        coordinates in the position lists from pixel coordinates to
 *        coordinates in the frame with a domain 'CCD_REG' (the 
-*        registration domain).  The output lists are called 
-*        ndf-name.reg and are associated with the NDFs.
+*        domain written by default by the REGISTER program).  The 
+*        output lists are called ndf-name.reg and are associated 
+*        with the NDFs.
 *     tranlist inlist='*' outlist='*.tran' trtype=struct forward=false
 *        In this example transform structures in each of the NDFs in
 *        the current directory are used to transform their associated
