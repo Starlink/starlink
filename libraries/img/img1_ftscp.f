@@ -14,10 +14,11 @@
 
 *  Description:
 *     This routine copies a FITS block from one array into another.
-*     FITS blocks are 1-D character arrays with a string size of 80.
-*     If any elements of the input array are blank them they are not
-*     copied to the output array. The number of real elements in the
-*     output array is returned as NOUT.
+*     FITS blocks are 1-D character arrays with a string size of 80.  If
+*     any elements of the input array are blank then they are not copied
+*     to the output array (this indicates a deleted record in IMG). The
+*     number of real elements in the output array is returned as NOUT.
+*     Extra elements of the output array are set blank.
 
 *  Arguments:
 *     A( NIN ) = CHARACTER * ( * ) (Given)
@@ -80,5 +81,14 @@
             B( NOUT ) = A( I )
          END IF
  1    CONTINUE
+
+*  Fill any remaining output elements with blanks (this is required by
+*  the FITS standard).
+      IF( NOUT .LT. NIN ) THEN
+         DO 2 I = NOUT + 1, NIN
+            B( I ) = ' '
+ 2       CONTINUE
+      END IF
+
       END
 * $Id$
