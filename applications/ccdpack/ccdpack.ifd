@@ -121,7 +121,7 @@ package ccdpack {
       source astexp.ifd
       source wcsedit.ifd
       source wcsreg.ifd
-      source outline.ifd
+      source bounds.ifd
    }
 
    executable ccdpack_res {
