@@ -377,8 +377,10 @@
                   CALL PAR_GET0R ('SHIFT_DY', SHIFT_DY(N_FILE), STATUS)
                END IF
 
-               SHIFT_DX(N_FILE) = SHIFT_DX(N_FILE) / REAL (R2AS)
-               SHIFT_DY(N_FILE) = SHIFT_DY(N_FILE) / REAL (R2AS)
+               IF (STATUS .EQ. SAI__OK) THEN
+                  SHIFT_DX(N_FILE) = SHIFT_DX(N_FILE) / REAL (R2AS)
+                  SHIFT_DY(N_FILE) = SHIFT_DY(N_FILE) / REAL (R2AS)
+               END IF
 
                CALL PAR_CANCL ('WEIGHT', STATUS)
                CALL PAR_CANCL ('SHIFT_DX', STATUS)
