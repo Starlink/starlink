@@ -5573,7 +5573,6 @@ U java/source/frog/src/jni/frog_libraries
 U java/source/frog/src/jni/makefile
 U java/source/frog/src/jni/mk
 cvs checkout: Updating java/source/frog/src/lib
-U java/source/frog/src/lib/diva.jar
 U java/source/frog/src/lib/jama.jar
 cvs checkout: Updating java/source/frog/src/main
 cvs checkout: Updating java/source/frog/src/main/uk

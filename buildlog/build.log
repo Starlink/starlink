@@ -21,8 +21,6 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/tamfits/build/classes
     [javac] Compiling 45 source files to /apps/cvsbuild/java/source/tamfits/build/classes
-    [javac] Note: /apps/cvsbuild/java/source/tamfits/src/main/nom/tam/fits/BasicHDU.java uses or overrides a deprecated API.
-    [javac] Note: Recompile with -deprecation for details.
      [echo] Executing axis target: build
 
 prepare:
@@ -100,12 +98,12 @@ assemble_jni:
     [javah] ClassArgument.name=uk.ac.starlink.ast.WcsMap
     [javah] ClassArgument.name=uk.ac.starlink.ast.WinMap
     [javah] ClassArgument.name=uk.ac.starlink.ast.ZoomMap
-    [javah] [Search path = /apps/j2sdk1.4.2_02/jre/lib/rt.jar:/apps/j2sdk1.4.2_02/jre/lib/i18n.jar:/apps/j2sdk1.4.2_02/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.2_02/jre/lib/jsse.jar:/apps/j2sdk1.4.2_02/jre/lib/jce.jar:/apps/j2sdk1.4.2_02/jre/lib/charsets.jar:/apps/j2sdk1.4.2_02/jre/classes:/apps/cvsbuild/java/source/jniast/build/classes]
+    [javah] [Search path = /apps/j2sdk1.4.1_06/jre/lib/rt.jar:/apps/j2sdk1.4.1_06/jre/lib/i18n.jar:/apps/j2sdk1.4.1_06/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_06/jre/lib/jsse.jar:/apps/j2sdk1.4.1_06/jre/lib/jce.jar:/apps/j2sdk1.4.1_06/jre/lib/charsets.jar:/apps/j2sdk1.4.1_06/jre/classes:/apps/cvsbuild/java/source/jniast/build/classes]
     [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstException.class]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/lang/RuntimeException.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/lang/Exception.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/lang/Throwable.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/lang/Object.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/RuntimeException.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Exception.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Throwable.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Object.class)]
     [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstException.h]
     [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/AstObject.class]
     [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_AstObject.h]
@@ -138,8 +136,8 @@ assemble_jni:
     [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/PermMap.class]
     [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_PermMap.h]
     [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/Plot.class]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/awt/geom/Rectangle2D.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/awt/geom/RectangularShape.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/awt/geom/Rectangle2D.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/awt/geom/RectangularShape.class)]
     [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_Plot.h]
     [javah] [Loaded /apps/cvsbuild/java/source/jniast/build/classes/uk/ac/starlink/ast/SkyFrame.class]
     [javah] [Creating file /apps/cvsbuild/java/source/jniast/build/jni/uk_ac_starlink_ast_SkyFrame.h]
@@ -165,36 +163,36 @@ build_jni:
 
 execute_mk_script:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/lib/i386
-     [echo] java.home=/apps/j2sdk1.4.2_02/jre
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e shared
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jniast.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c err_jniast.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstException.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstObject.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Channel.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c CmpFrame.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c CmpMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c FitsChan.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Frame.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c FrameSet.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c IntraMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c LutMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Mapping.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c MathMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c MatrixMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c PcdMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c PermMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Plot.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SkyFrame.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SlaMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SpecFrame.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SpecMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SphMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c UnitMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c WcsMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c WinMap.c
-     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c ZoomMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jniast.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c err_jniast.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstException.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c AstObject.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Channel.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c CmpFrame.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c CmpMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c FitsChan.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Frame.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c FrameSet.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c IntraMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c LutMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Mapping.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c MathMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c MatrixMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c PcdMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c PermMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Plot.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SkyFrame.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SlaMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SpecFrame.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SpecMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c SphMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c UnitMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c WcsMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c WinMap.c
+     [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c ZoomMap.c
      [exec] mkdir temp
      [exec] (cd temp; \
      [exec]            for f in `../jniast_libraries` ""; do \
@@ -218,7 +216,7 @@ build:
 prepare:
 
 check_packages:
-[available] Dec 5, 2003 5:07:27 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Dec 8, 2003 5:07:13 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -239,21 +237,21 @@ build_classes:
 assemble_jni:
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jnihds/build/jni
     [javah] ClassArgument.name=uk.ac.starlink.hds.HDSObject
-    [javah] [Search path = /apps/j2sdk1.4.2_02/jre/lib/rt.jar:/apps/j2sdk1.4.2_02/jre/lib/i18n.jar:/apps/j2sdk1.4.2_02/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.2_02/jre/lib/jsse.jar:/apps/j2sdk1.4.2_02/jre/lib/jce.jar:/apps/j2sdk1.4.2_02/jre/lib/charsets.jar:/apps/j2sdk1.4.2_02/jre/classes:/apps/cvsbuild/java/source/jnihds/build/classes]
+    [javah] [Search path = /apps/j2sdk1.4.1_06/jre/lib/rt.jar:/apps/j2sdk1.4.1_06/jre/lib/i18n.jar:/apps/j2sdk1.4.1_06/jre/lib/sunrsasign.jar:/apps/j2sdk1.4.1_06/jre/lib/jsse.jar:/apps/j2sdk1.4.1_06/jre/lib/jce.jar:/apps/j2sdk1.4.1_06/jre/lib/charsets.jar:/apps/j2sdk1.4.1_06/jre/classes:/apps/cvsbuild/java/source/jnihds/build/classes]
     [javah] [Loaded /apps/cvsbuild/java/source/jnihds/build/classes/uk/ac/starlink/hds/HDSObject.class]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/lang/Object.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/nio/ByteBuffer.class)]
-    [javah] [Loaded /apps/j2sdk1.4.2_02/jre/lib/rt.jar(java/nio/Buffer.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/lang/Object.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/ByteBuffer.class)]
+    [javah] [Loaded /apps/j2sdk1.4.1_06/jre/lib/rt.jar(java/nio/Buffer.class)]
     [javah] [Creating file /apps/cvsbuild/java/source/jnihds/build/jni/uk_ac_starlink_hds_HDSObject.h]
 
 build_jni:
 
 execute_mk_script:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jnihds/lib/i386
-     [echo] java.home=/apps/j2sdk1.4.2_02/jre
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e shared
-     [exec] gcc -I.  -I/apps/j2sdk1.4.2_02/jre/../include -I/apps/j2sdk1.4.2_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c HDSObject.c
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c HDSObject.c
      [exec] mkdir temp
      [exec] (cd temp; \
      [exec]            for f in `../jnihds_libraries` ""; do \
@@ -394,19 +392,188 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/votable/build/classes
     [javac] Compiling 26 source files to /apps/cvsbuild/java/source/votable/build/classes
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java:173: cannot resolve symbol
-    [javac] symbol  : method writeFields (uk.ac.starlink.votable.Encoder[],uk.ac.starlink.table.StarTable,java.io.BufferedWriter)
-    [javac] location: class uk.ac.starlink.votable.VOSerializer.TabledataVOSerializer
-    [javac]             writeFields( encoders, table, writer );
-    [javac]             ^
-    [javac] /apps/cvsbuild/java/source/votable/src/main/uk/ac/starlink/votable/VOSerializer.java:311: cannot resolve symbol
-    [javac] symbol  : method writeFields (uk.ac.starlink.votable.Encoder[],uk.ac.starlink.table.StarTable,java.io.BufferedWriter)
-    [javac] location: class uk.ac.starlink.votable.VOSerializer.BinaryVOSerializer
-    [javac]             writeFields( encoders, table, writer );
-    [javac]             ^
-    [javac] 2 errors
+     [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/votable/build/classes
+     [echo] Executing JAIUtil target: build
 
-BUILD FAILED
-file:/apps/cvsbuild/java/source/votable/build.xml:362: Compile failed; see the compiler error output for details.
+prepare:
 
-Total time: 51 seconds
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/jaiutil/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/jaiutil/build/classes
+     [echo] Executing SOAPSERVER target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/build/classes
+    [javac] Compiling 5 source files to /apps/cvsbuild/java/source/soapserver/build/classes
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/soapserver/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/soapserver/lib/soapserver
+     [echo] Executing SOG target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/sog/build/classes
+    [javac] Compiling 28 source files to /apps/cvsbuild/java/source/sog/build/classes
+    [javac] Note: /apps/cvsbuild/java/source/sog/src/main/uk/ac/starlink/sog/photom/PhotometryWorker.java uses or overrides a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/sog/build/classes
+     [echo] Executing SPLAT target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Compiling 169 source files to /apps/cvsbuild/java/source/splat/build/classes
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 64 files to /apps/cvsbuild/java/source/splat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
+     [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
+
+execute_mk_script:
+     [copy] Copying 6 files to /apps/cvsbuild/java/source/splat/build/jni
+    [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/i386
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
+     [exec] In file included from NDFJImpl.c:1425:
+     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
+     [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
+     [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
+     [exec] NDFJImplGet.h:244: warning: passing arg 5 of pointer to function from incompatible pointer type
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../splat_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing /apps/cvsbuild/star/lib/libndf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libary.a
+     [exec] Processing /apps/cvsbuild/star/lib/libhds.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr.a
+     [exec] Processing /apps/cvsbuild/star/lib/liberr_standalone.a
+     [exec] Processing /apps/cvsbuild/star/lib/libpsx.a
+     [exec] Processing /apps/cvsbuild/star/lib/libchr.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm.a
+     [exec] Processing /apps/cvsbuild/star/lib/libprm_a.a
+     [exec] Processing /apps/cvsbuild/star/lib/libsla.a
+     [exec] Processing /apps/cvsbuild/star/lib/libemsf.a
+     [exec] Processing /apps/cvsbuild/star/lib/libems.a
+     [exec] Processing /apps/cvsbuild/star/lib/libcnf.a
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/splat/lib/i386/libsplat.so 'NDFJImpl.o temp/*.o -L/apps/cvsbuild/starjava/lib/i386                -L/apps/cvsbuild/java/source/jniast/lib/i386 -ljniast' '';\
+     [exec] rm -r -f temp
+     [echo] Executing Mirage target: build
+/apps/cvsbuild/starjava/bin/ant: line 239: 25161 Killed                  "$JAVACMD" $ANT_OPTS -classpath "$LOCALCLASSPATH" -Dant.home="${ANT_HOME}" org.apache.tools.ant.Main $ANT_ARGS "$@"
+lasses
+     [echo] Executing TOPCAT target: build
+
+prepare:
+
+check_packages:
+
+build_demo:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+    [touch] Creating /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo_list
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo
+     [gzip] Building: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/tables.fit.gz
+      [tar] Building tar: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2
+
+build:
+    [javac] Compiling 38 source files to /apps/cvsbuild/java/source/topcat/build/classes
+     [copy] Copying 90 files to /apps/cvsbuild/java/source/topcat/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
+     [echo] Executing Treeview target: build
+
+prepare:
+
+really_check_packages:
+
+check_packages:
+
+build_demo:
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/etc/demo
+     [gzip] Building: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar
+      [tar] Building tar: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/classes
+    [javac] Compiling 108 source files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 10 files to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
+     [copy] Copying 67 files to /apps/cvsbuild/java/source/treeview/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/lib/treeview
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/treeview/lib/treeview
+     [echo] Executing Coco target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/coco/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/coco/lib/coco
+     [echo] Executing RV target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/build/classes
+    [javac] Compiling 3 source files to /apps/cvsbuild/java/source/rv/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/rv/lib/rv
+     [echo] Executing FROG target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Compiling 89 source files to /apps/cvsbuild/java/source/frog/build/classes
+    [javac] Note: Some input files use or override a deprecated API.
+    [javac] Note: Recompile with -deprecation for details.
+     [copy] Copying 12 files to /apps/cvsbuild/java/source/frog/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/frog/lib/frog
+     [copy] Copying 1 file to /apps/cvsbuild/java/source/frog/lib/frog
+
+execute_mk_script:
+     [copy] Copying 5 files to /apps/cvsbuild/java/source/frog/build/jni
+     [echo] java.home=/apps/j2sdk1.4.1_06/jre
+     [exec] Running MK script...
+     [exec] mk: Environment variables defined for ix86_Linux system
+     [exec] make -e build
+     [exec] gcc -I.  -I/apps/j2sdk1.4.1_06/jre/../include -I/apps/j2sdk1.4.1_06/jre/../include/linux -I/apps/cvsbuild/star/include -O -c Dummy.c
+     [exec] mkdir temp
+     [exec] (cd temp; \
+     [exec]    for f in `../frog_libraries` ""; do \
+     [exec]       echo "Processing $f"; \
+     [exec]       if test -n "$f"; then \
+     [exec]          ar x $f; \
+     [exec]       fi;\
+     [exec] done)
+     [exec] Processing 
+     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
+     [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
+
+BUILD SUCCESSFUL
+Total time: 1 minute 5 seconds
