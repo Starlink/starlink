@@ -506,7 +506,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       SetVar( interp, "stokes", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
 
 /* Otherwise, we are producing alighned output intensity images. */
-   } {
+   } else {
 
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
       for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
