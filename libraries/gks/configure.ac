@@ -92,7 +92,7 @@ AC_CONFIG_FILES([drivers/Makefile
 dnl    Substitute this list into the drivers/Makefile.in, along with a
 dnl    generated list of the corresponding libraries
 AC_SUBST(DRIVER_SUBDIRS)
-DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([a-z0-9]*\)+\1/libgks_driver_\1.la+g'`
+DRIVER_LIBLIST=`echo $DRIVER_SUBDIRS | sed 's+\([[a-z0-9]]*\)+\1/libgks_driver_\1.la+g'`
 AC_SUBST(DRIVER_LIBLIST)
 
 AC_OUTPUT
