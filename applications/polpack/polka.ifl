@@ -59,7 +59,7 @@ interface POLKA
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
       default  YES
-      prompt   'Run in dual-beam mode?"
+      prompt   'Run in dual-beam mode?'
       helpkey  '*'
    endparameter
 
@@ -300,7 +300,7 @@ interface POLKA
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
       default  YES
-      prompt   'Use a cross-hair over the image display area?"
+      prompt   'Use a cross-hair over the image display area?'
       helpkey  '*'
    endparameter
 
