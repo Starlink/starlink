@@ -1023,11 +1023,14 @@ c     END IF
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
 *     11 Sep 1995 (DJA):
 *        Original version.
+*     31 Jan 1997 (RB):
+*        Junk keyword records when the value cannot be interpreted
 *     {enter_changes_here}
 
 *  Bugs:
@@ -1088,6 +1091,7 @@ c     END IF
       FSTAT = 0
       MORE = .TRUE.
       DO WHILE ( MORE .AND. (FSTAT .EQ. 0) )
+        if (status.ne.0) print*, icard, keywrd, value, cmnt, fstat
 
 *    Extract name and value
         CALL FTGKYN( LUN, ICARD, KEYWRD, VALUE, CMNT, FSTAT )
@@ -1172,15 +1176,24 @@ c     END IF
 
           END IF
 
-*      Store format
-          CALL ADI_CPUT0L( VID, '.Scientific', SCINOT, STATUS )
-          CALL ADI_CPUT0I( VID, '.Ndecimal', MAX(1,NDECIM), STATUS )
+*      Did we interpret the record properly?
+          IF ( STATUS .EQ. SAI__OK ) THEN
 
-*      Write value to cache object
-          CALL ADI2_ADDKEY( HDUID, '@'//KEYWRD, VID, CMNT, STATUS )
+*        Store format
+            CALL ADI_CPUT0L( VID, '.Scientific', SCINOT, STATUS )
+            CALL ADI_CPUT0I( VID, '.Ndecimal', MAX(1,NDECIM), STATUS )
 
-*      Next card
-          ICARD = ICARD + 1
+*        Write value to cache object
+            CALL ADI2_ADDKEY( HDUID, '@'//KEYWRD, VID, CMNT, STATUS )
+
+*        Next card
+            ICARD = ICARD + 1
+
+*      If not then just junk the card.
+          ELSE
+            CALL ERR_ANNUL( STATUS )
+            ICARD = ICARD + 1
+          END IF
 
 *    Blank? Do nothing
         ELSE IF ( KEYWRD .LE. ' ' ) THEN
