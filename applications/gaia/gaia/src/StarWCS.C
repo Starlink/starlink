@@ -660,6 +660,40 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 }
 
 
+//
+//  Convert the given world coordinates to x,y image coordinates and
+//  put the results in x and y. The input coordinates are assumed to 
+//  be in the correct units, unless the current frame is celestial, in
+//  which case they are assumed to be in degrees.
+//
+
+int StarWCS::anyWcs2pix( double inx, double iny, 
+                         double &outx, double &outy ) const
+{
+    outx = outy = 0.0;
+
+    if ( !isWcs() ) {
+        return error( "image does not support world coords" );
+    }
+
+    if ( issky_ ) {
+        return wcs2pix( inx, iny, outx, outy );
+    }
+
+    double oldx[1], oldy[1], newx[1], newy[1];
+    oldx[0] = inx;
+    oldy[0] = iny;
+    astTran2( wcs_, 1, oldx, oldy, 0, newx, newy );
+    if ( ! astOK ) {
+        astClearStatus;
+        return error( "can't convert world coords" );
+    } else {
+        outx = newx[0];
+        outy = newy[0];
+    }
+    return 0;
+}
+
 //+
 // convert the given image coordinates distance (x,y) to a world coordinates
 // distance (ra and dec, in degrees J2000) and put the results in ra and dec.

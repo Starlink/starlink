@@ -229,6 +229,7 @@ public:
     { "astcelestial",  &StarRtdImage::astcelestialCmd, 0, 0 },
     { "astcopy",       &StarRtdImage::astcopyCmd,      1, 1 },
     { "astcreate",     &StarRtdImage::astcreateCmd,    0, 0 },
+    { "astcur2pix",    &StarRtdImage::astcur2pixCmd,   2, 2 },
     { "astdelete",     &StarRtdImage::astdeleteCmd,    1, 1 },
     { "astdomains",    &StarRtdImage::astdomainsCmd,   0, 0 },
     { "astfix",        &StarRtdImage::astfixCmd,       0, 0 },
@@ -2609,6 +2610,53 @@ int StarRtdImage::astpix2curCmd( int argc, char *argv[] )
     }
     else {
         return error( "failed to transform positions" );
+    }
+}
+
+//+
+//  StarRtdImage::astcur2pixCmd
+//
+//  Purpose:
+//     Given a position in current coordinates (double precision)
+//     convert it to pixel coordinates.
+//
+//  Input:
+//     Pair of double precision coordinates.
+//
+//  Result:
+//     Pair of pixel coordinates.
+//
+//  Notes:
+//     This provides some of the functionality of the convert command,
+//     but avoids any issues to do with equinoxes, celestial
+//     coordinates systems (FK5/FK4 etc.) and epochs.
+//-
+int StarRtdImage::astcur2pixCmd( int argc, char *argv[] )
+{
+#ifdef _DEBUG_
+    cout << "Called StarRtdImage::astcur2pixCmd" << endl;
+#endif
+ 
+    //  Extract the input positions.
+    double inx;
+    double iny;
+    if (Tcl_GetDouble( interp_, argv[0], &inx ) != TCL_OK
+        || Tcl_GetDouble( interp_, argv[1], &iny ) != TCL_OK) {
+        return TCL_ERROR;
+    }
+
+    //  Convert to pixel coordinates.
+    StarWCS* wcsp = getStarWCSPtr();
+    double outx;
+    double outy;
+    if ( wcsp->anyWcs2pix( inx, iny, outx, outy ) == 0 ) { 
+
+        //  Set the result and return.
+        set_result( outx, outy );
+        return TCL_OK;
+    }
+    else {
+        return error( "can't convert to image coordinates" );
     }
 }
 
