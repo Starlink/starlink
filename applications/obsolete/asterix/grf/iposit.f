@@ -230,7 +230,7 @@
           IF (RADEC) THEN
 
             REPEAT=.TRUE.
-            DO WHILE (REPEAT.AND.STATUS.EQ.SAI_OK)
+            DO WHILE (REPEAT.AND.STATUS.EQ.SAI__OK)
 
 *  check for continuation character
               L=CHR_LEN(TEXT)
@@ -284,7 +284,8 @@
                     CALL CONV_DEGHMS(REAL(RA),RAS)
                     CALL CONV_DEGDMS(REAL(DEC),DECS)
 *  and store
-                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,STATUS)
+                    CALL GRP_PUT(I_POS_ID,1,RAS(:11)//DECS(:11),0,
+     :                                                      STATUS)
                     I_NPOS=I_NPOS+1
 
 *  make the first one the current position
@@ -513,7 +514,7 @@
           ELSE
             IF (C.EQ.' '.OR.C.EQ.':'.OR.C.EQ.'h'.OR.C.EQ.'d'.OR.
      :                                  C.EQ.'m'.OR.C.EQ.'s') THEN
-              DELIM=DELIM+1
+              NDELIM=NDELIM+1
             ENDIF
           ENDIF
         ENDDO
