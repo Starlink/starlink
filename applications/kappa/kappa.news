@@ -1,10 +1,9 @@
 1 KAPPA_Version_1.4
 
-   A new release of KAPPA (v1.4) has been made. The main changes are:
+   A new release of KAPPA (v1.4-1) has been made. The main changes are:
 
-   o The HISTAT and STATS applications now display the position of the
-   minimum and maximum pixel values in the current WCS coordinate system
-   rather than AXIS coordinates.
+   o  The PIXDUPE application now has a facility for applying a mask to 
+   each block of output pixels.
 
  For complete details of all changes, see the "Release Notes" appendix in
  SUN/95.

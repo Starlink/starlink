@@ -21,8 +21,10 @@
 
 *  Description:
 *     This routine expands the size of an NDF structure by duplicating
-*     each input pixel a specified number of times along each
-*     dimension, to create a new NDF structure.
+*     each input pixel a specified number of times along each dimension, 
+*     to create a new NDF structure. Each block of output pixels (formed 
+*     by duplicating a single input pixel) can optionally be masked, for 
+*     instance to set selected pixels within each output block bad.
 
 *  Usage:
 *     pixdupe in out expand
@@ -37,8 +39,28 @@
 *        in all dimensions, just one value need be entered.  If the net
 *        expansion is one, an error results.  The suggested default is
 *        the current value.
+*     IMASK() = INTEGER (Read)
+*        Only used if a null (!) value is supplied for parameter MASK. If
+*        accessed, the number of values supplied for this parameter should 
+*        equal the number of pixel axes in the output NDF. A mask array
+*        is then created which has bad values at every element except for
+*        the element with indices given by IMASK, which is set the value
+*        1.0. See parameter MASK for a description of the use of the mask
+*        array. If a null (!) value is supplied for IMASK, then no mask
+*        is used, and every output pixel in an output block is set to the 
+*        value of the corresponding input pixel. [!]
 *     IN  = NDF (Read)
 *        Input NDF structure to be expanded.
+*     MASK = NDF (Read)
+*        An input NDF structure holding the mask to be used. If a null (!)
+*        value is supplied, parameter IMASK will be used to determine the 
+*        mask. If supplied, the NDF Data array will be trimmed or padded 
+*        (with bad values) to create an array in which the lengths of the
+*        pixel axes are equal to the values supplied for parameter EXPAND.
+*        Each block of pixels in the output array (i.e. the block of
+*        output pixels which are created from a single input pixel) are
+*        multiplied by this mask array before being stored in the output 
+*        NDF. [!]
 *     OUT = NDF (Write)
 *        Output NDF structure.
 *     TITLE = LITERAL (Read)
@@ -93,6 +115,8 @@
 *        information is not lost.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     11-NOV-2004 (DSB):
+*        Added parameters MASK and IMASK.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -109,6 +133,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'MSG_PAR'          ! MSG__ constants
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
+      INCLUDE 'PAR_ERR'          ! PAR error constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -131,23 +156,30 @@
       INTEGER IAXIS              ! Loop counter for the axis-array
                                  ! components
       INTEGER IDIMS( NDF__MXDIM )! Dimensions of input NDF
+      INTEGER IMASK( NDF__MXDIM )! Indices of the good mask pixel
       INTEGER ISHIFT( NDF__MXDIM )! Shift required to align pixel coords
       CHARACTER ITYPE * ( NDF__SZTYP ) ! Numeric type for processing
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF
+      INTEGER LBNDM( NDF__MXDIM ) ! Lower bounds of mask NDF
       INTEGER LBNDO( NDF__MXDIM ) ! Lower bounds of output NDF
       INTEGER NCD                ! No. of characters in dimension list
       INTEGER NDFI               ! Identifier to the input NDF
+      INTEGER NDFM               ! Identifier to the mask NDF
+      INTEGER NDFMS              ! Identifier for a section of the mask NDF
       INTEGER NDFO               ! Identifier to the output NDF
       INTEGER NDFS               ! Identifier to the section of the input
                                  ! NDF
       INTEGER NDIM               ! Dimensionality of the NDF
       INTEGER ODIMS( NDF__MXDIM )! Dimensions of output array
       INTEGER PNTRI( 2 )         ! Pointer to input array component(s)
+      INTEGER PNTRM              ! Pointer to mask array 
       INTEGER PNTRO( 2 )         ! Pointer to output array component(s)
       LOGICAL QUAL               ! Quality is present?
       INTEGER TOTEXP             ! Total expansion factor
       INTEGER UBNDI( NDF__MXDIM )! Upper bounds of input NDF
+      INTEGER UBNDM( NDF__MXDIM )! Upper bounds of mask NDF
       INTEGER UBNDO( NDF__MXDIM )! Upper bounds of output NDF
+      LOGICAL USEMSK             ! Use the mask array?
       LOGICAL VAR                ! Variance is present?
       LOGICAL WIDTH              ! Axis width is present?
 
@@ -160,12 +192,13 @@
       CALL NDF_BEGIN
 
 *  Obtain the input NDF.
+*  =====================
       CALL LPG_ASSOC( 'IN', 'READ', NDFI, STATUS )
 
 *  Inquire the bounds of the NDF.
       CALL NDF_BOUND( NDFI, NDF__MXDIM, LBNDI, UBNDI, NDIM, STATUS )
 
-*  Store the dimensions of th einput NDF.
+*  Store the dimensions of the input NDF.
       DO I = 1, NDIM
          IDIMS ( I ) = UBNDI( I ) - LBNDI( I ) + 1    
       END DO
@@ -259,13 +292,73 @@
       CALL NDF_CINP( 'TITLE', NDFO, 'Title', STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
+*  Get the mask array.
+*  ===================
+
+*  See if an NDF mask is available.
+      CALL LPG_ASSOC( 'MASK', 'READ', NDFM, STATUS )
+
+*  If an NDF was obtained, take a section of it which matches the
+*  expansion factors  and get a pointer to its data array.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         USEMSK = .TRUE.
+
+         DO I = 1, NDF__MXDIM
+            LBNDM( I ) = 1
+            UBNDM( I ) = EXPAND( I ) 
+         END DO
+
+         CALL NDF_SECT( NDFM, NDF__MXDIM, LBNDM, UBNDM, NDFMS, STATUS )
+         CALL KPG1_MAP( NDFMS, 'Data', '_REAL', 'READ', PNTRM, EL, 
+     :                  STATUS )
+
+*  If a null value was supplied, annul the error and get the indicies of 
+*  the one good mask pixel. 
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL PAR_EXACI( 'IMASK', NDIM, IMASK, STATUS )
+
+*  If a null value was supplied for IMASK, do not use a mask.
+         IF( STATUS .EQ. PAR__NULL ) THEN    
+            CALL ERR_ANNUL( STATUS )
+            USEMSK = .FALSE.
+         ELSE 
+            USEMSK = .TRUE.
+
+*  Ensure all the indices are within the range of the expansion box. At the
+*  same time store the number of elements in the mask array.
+            EL = 1
+            DO I = 1, NDIM
+               IF( IMASK( I ) .LT. 1 ) THEN
+                  IMASK( I ) = 1
+               ELSE IF( IMASK( I ) .GT. EXPAND( I ) ) THEN
+                  IMASK( I ) = EXPAND( I )
+               END IF
+               EL = EL * EXPAND( I ) 
+            END DO
+
+*  Pad with ones.
+            DO I = NDIM + 1, NDF__MXDIM
+               IMASK( I ) = 1
+            END DO
+   
+*  Get work space to hold the mask array
+            CALL PSX_CALLOC( EL, '_REAL', PNTRM, STATUS )
+   
+*  Create the mask.
+            CALL KPS1_PXDPM( NDIM, IMASK, EXPAND, EL, 
+     :                       %VAL( CNF_PVAL( PNTRM ) ), STATUS )
+         END IF
+
+      END IF
+
 *  Expand the data array.
 *  ======================
 
-*  As the values and quality are merely duplicated, there is no need to
-*  test for bad values.  Hence we can switch off automatic quality
+*  Without masking the values and quality are merely duplicated, so there is 
+*  no need to test for bad values.  Hence we can switch off automatic quality
 *  masking too.
-      CALL NDF_SQMF( .FALSE., NDFI, STATUS )
+      IF( .NOT. USEMSK ) CALL NDF_SQMF( .FALSE., NDFI, STATUS )
 
 *  Find the data type of the data array.
       CALL NDF_TYPE( NDFI, 'Data', ITYPE, STATUS )
@@ -278,38 +371,45 @@
 *  type.
       IF ( ITYPE .EQ. '_REAL' ) THEN
          CALL KPG1_PXDPR( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                    EXPAND, ODIMS,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
          CALL KPG1_PXDPB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                    EXPAND, ODIMS,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
          CALL KPG1_PXDPD( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                    EXPAND, ODIMS,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
          CALL KPG1_PXDPI( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                    EXPAND, ODIMS,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
          CALL KPG1_PXDPUB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                     EXPAND, ODIMS,
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
          CALL KPG1_PXDPUW( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                     EXPAND, ODIMS,
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
 
       ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
          CALL KPG1_PXDPW( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                    EXPAND, ODIMS,
-     :                    %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                    EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                    ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                    STATUS )
       END IF
 
 *  Tidy the data arrays.
@@ -341,38 +441,45 @@
 *  data type.
          IF ( ITYPE .EQ. '_REAL' ) THEN
             CALL KPG1_PXDPR( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       EXPAND, ODIMS,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
             CALL KPG1_PXDPB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       EXPAND, ODIMS,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
             CALL KPG1_PXDPD( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       EXPAND, ODIMS,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
             CALL KPG1_PXDPI( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       EXPAND, ODIMS,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
             CALL KPG1_PXDPUB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                        EXPAND, ODIMS,
-     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
 
          ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
             CALL KPG1_PXDPUW( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                        EXPAND, ODIMS,
-     :                        %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                        EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                        ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                        STATUS )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
             CALL KPG1_PXDPW( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                       EXPAND, ODIMS,
-     :                       %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                       EXPAND, USEMSK, %VAL( CNF_PVAL( PNTRM ) ),
+     :                       ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                       STATUS )
          END IF
 
 *  Tidy the variance arrays.
@@ -395,10 +502,12 @@
          CALL KPG1_MAP( NDFO, 'Quality', '_UBYTE', 'WRITE', PNTRO, EL,
      :                 STATUS )
 
-*  Expand the quality array.
+*  Expand the quality array. Do not use masking since the result of
+*  multiplying a quality value by a mask value may not mean anything.
          CALL KPG1_PXDPUB( IDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                     EXPAND, ODIMS,
-     :                     %VAL( CNF_PVAL( PNTRO( 1 ) ) ), STATUS )
+     :                     EXPAND, .FALSE., %VAL( PNTRM ),
+     :                     ODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
+     :                     STATUS )
 
 *  Tidy the quality arrays.
          CALL NDF_UNMAP( NDFI, 'Quality', STATUS )
@@ -440,46 +549,46 @@
             AODIMS( 1 ) = ODIMS( IAXIS )
 
 *  Duplicate the axis centres, calling the appropriate routine for the
-*  data type.
+*  data type. No masking here.
             IF ( ITYPE .EQ. '_REAL' ) THEN
                CALL KPG1_PXDPR( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                          AEXPND,
+     :                          AEXPND, .FALSE., %VAL( PNTRM ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                CALL KPG1_PXDPB( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                          AEXPND,
+     :                          AEXPND, .FALSE., %VAL( PNTRM ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                 CALL KPG1_PXDPD( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                           AEXPND,
+     :                           AEXPND, .FALSE., %VAL( PNTRM ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                CALL KPG1_PXDPI( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                          AEXPND,
+     :                          AEXPND, .FALSE., %VAL( PNTRM ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                          STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                CALL KPG1_PXDPUB( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                           AEXPND,
+     :                           AEXPND, .FALSE., %VAL( PNTRM ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                CALL KPG1_PXDPUW( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                           AEXPND,
+     :                           AEXPND, .FALSE., %VAL( PNTRM ),
      :                           AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                           STATUS )
 
             ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                CALL KPG1_PXDPW( AIDIMS, %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                          AEXPND,
+     :                          AEXPND, .FALSE., %VAL( PNTRM ),
      :                          AODIMS, %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                          STATUS )
             END IF
@@ -519,7 +628,7 @@
                IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_PXDPR( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -527,7 +636,7 @@
                ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                    CALL KPG1_PXDPB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -535,7 +644,7 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                    CALL KPG1_PXDPD( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -543,7 +652,7 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -551,7 +660,7 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_PXDPUB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -559,7 +668,7 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_PXDPUW( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -567,7 +676,7 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_PXDPW( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -609,7 +718,7 @@
                IF ( ITYPE .EQ. '_REAL' ) THEN
                   CALL KPG1_PXDPR( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -617,7 +726,7 @@
                ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
                   CALL KPG1_PXDPB( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -625,7 +734,7 @@
                ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
                    CALL KPG1_PXDPD( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -633,7 +742,7 @@
                ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
                   CALL KPG1_PXDPI( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -641,7 +750,7 @@
                ELSE IF ( ITYPE .EQ. '_UBYTE' ) THEN
                   CALL KPG1_PXDPUB( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -649,7 +758,7 @@
                ELSE IF ( ITYPE .EQ. '_UWORD' ) THEN
                   CALL KPG1_PXDPUW( AIDIMS, 
      :                              %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                              AEXPND,
+     :                              AEXPND, .FALSE., %VAL( PNTRM ),
      :                              AODIMS, 
      :                              %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                              STATUS )
@@ -657,7 +766,7 @@
                ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
                   CALL KPG1_PXDPW( AIDIMS, 
      :                             %VAL( CNF_PVAL( PNTRI( 1 ) ) ), 
-     :                             AEXPND,
+     :                             AEXPND, .FALSE., %VAL( PNTRM ),
      :                             AODIMS, 
      :                             %VAL( CNF_PVAL( PNTRO( 1 ) ) ), 
      :                             STATUS )
@@ -688,6 +797,10 @@
 
 *  Come here if something has gone wrong.
   999 CONTINUE
+
+*  Free workspace.
+      IF( USEMSK .AND. NDFM .EQ. NDF__NOID ) CALL PSX_FREE( PNTRM, 
+     :                                                      STATUS )
 
 *  Tidy the NDF system.
       CALL NDF_END( STATUS )

@@ -12,12 +12,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.29}
-\newcommand{\stardocnumber}    {95.29}
+\newcommand{\stardocsource}    {sun95.30}
+\newcommand{\stardocnumber}    {95.30}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {2004 August 9}
+\newcommand{\stardocdate}      {11th November 2004}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.4}
+\newcommand{\stardocversion}   {1.4-1}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -34901,9 +34901,11 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
    Expands an NDF by pixel duplication
 }{
    \sstdescription{
-      This routine expands the size of an \NDFref{NDF} structure by duplicating
-      each input pixel a specified number of times along each
-      dimension, to create a new NDF structure.
+      This routine expands the size of an NDF structure by duplicating
+      each input pixel a specified number of times along each dimension, 
+      to create a new NDF structure. Each block of output pixels (formed 
+      by duplicating a single input pixel) can optionally be masked, for 
+      instance to set selected pixels within each output block bad.
    }
    \sstusage{
       pixdupe in out expand
@@ -34922,9 +34924,35 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          the current value.
       }
       \sstsubsection{
+         IMASK() = \_INTEGER (Read)
+      }{
+        Only used if a null ({\tt{!}}) value is supplied for parameter MASK.
+        If accessed, the number of values supplied for this parameter should 
+        equal the number of pixel axes in the output NDF. A mask array
+        is then created which has bad values at every element except for
+        the element with indices given by IMASK, which is set the value
+        1.0. See parameter MASK for a description of the use of the mask
+        array. If a null value is supplied for IMASK, then no mask
+        is used, and every output pixel in an output block is set to the 
+        value of the corresponding input pixel. {\tt [!]}
+      }
+      \sstsubsection{
          IN = NDF (Read)
       }{
          Input NDF structure to be expanded.
+      }
+      \sstsubsection{
+         MASK = NDF (Read)
+      }{
+        An input NDF structure holding the mask to be used. If a null ({\tt{!}}) 
+        value is supplied, parameter IMASK will be used to determine the 
+        mask. If supplied, the NDF Data array will be trimmed or padded 
+        (with bad values) to create an array in which the lengths of the
+        pixel axes are equal to the values supplied for parameter EXPAND.
+        Each block of pixels in the output array (\emph{i.e.} the block of
+        output pixels which are created from a single input pixel) are
+        multiplied by this mask array before being stored in the output 
+        NDF.  {\tt [!]}
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -34942,6 +34970,7 @@ KAPPA: \htmlref{PICCUR}{PICCUR},
          pixdupe aa bb 2
       }{
          This expands the NDF called aa duplicating pixels along each
+
          dimension, and stores the enlarged data in the NDF called bb.
          Thus if aa is two-dimensional, this command would result in a
          four-fold increase in the array components.
@@ -48336,13 +48365,22 @@ interface mode even if the LINCOL parameter was specified on the command line.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V1.4\label{se:changes}}
+\section{Release Notes---V1.4}
 
 \begin{itemize}
 
 \item The \htmlref{HISTAT}{HISTAT} and \htmlref{STATS}{STATS} applications 
 now display the position of the minimum and maximum pixel values in the 
 current WCS co-ordinate system rather than AXIS co-ordinates.
+
+\end{itemize}
+
+\section{\xlabel{se_changes}Release Notes---V1.4-1\label{se:changes}}
+
+\begin{itemize}
+
+\item The \htmlref{PIXDUPE}{PIXDUPE} application now has a facility for
+applying a mask to each block of output pixels.
 
 \end{itemize}
 
