@@ -663,7 +663,8 @@
       IF( JAXIS .NE. NDIM ) THEN
          CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW1, STATUS )
          IF( VAR ) THEN
-            CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW2, STATUS )
+            CALL PSX_CALLOC( EL2*( JHI - JLO + 1 ), ITYPE, IPW2, 
+     :                       STATUS )
          ELSE
             IPW2 = IPW1
          END IF  
