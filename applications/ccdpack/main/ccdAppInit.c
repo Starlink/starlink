@@ -151,6 +151,9 @@ Tcl_AppInit(interp)
         return TCL_ERROR;
     }
     */
+    if (Tcl_Eval(interp, "auto_mkindex_parser::slavehook { _%@namespace import -force ::itcl::class }") != TCL_OK) {
+        return TCL_ERROR;
+    }
 
     /*
      * Call Tcl_CreateCommand for application-specific commands, if
