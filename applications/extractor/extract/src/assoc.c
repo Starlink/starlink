@@ -9,7 +9,7 @@
 *
 *	Contents:	Routines for catalog-associations.
 *
-*	Last modify:	13/12/2002
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -96,6 +96,11 @@ assocstruct  *load_assoc(char *filename)
   if (!(file = fopen(filename, "r")))
     return NULL;
 
+  assoc = NULL;				/* To avoid gcc -Wall warnings */
+  list  = NULL;				/* To avoid gcc -Wall warnings */
+  data  = NULL;				/* To avoid gcc -Wall warnings */
+  ispoon = ncol = ndata = nlist = size = spoonsize = xindex = yindex
+	= mindex = 0;
   NFPRINTF(OUTPUT, "Reading ASSOC input-list...");
   for (i=0; fgets(str, MAXCHAR, file);)
     {
@@ -182,7 +187,7 @@ assocstruct  *load_assoc(char *filename)
         *(list+1) = val;
       else if (j==mindex)
         *(list+2) = val;
-      if (k=data[j])
+      if ((k=data[j]))
         *(list+2+k) = val;
       }
     list += nlist;
@@ -262,7 +267,7 @@ int	do_assoc(picstruct *field, float x, float y)
 
   if (prefs.assoc_type == ASSOC_MIN || prefs.assoc_type == ASSOC_NEAREST)
     comp = BIG;
-  else if (prefs.assoc_type == ASSOC_MAX)
+  else
     comp = -BIG;
 
   iy = (int)(y+0.499999);
@@ -358,8 +363,8 @@ int	do_assoc(picstruct *field, float x, float y)
   if (prefs.assoc_type == ASSOC_MAGSUM)
     {
     data = assoc->data;
-    for (i=assoc->ndata; i--;)
-      *(data++) = *data>0.0? -2.5*log10(*data):99.0;
+    for (i=assoc->ndata; i--; data++)
+      *data = *data>0.0? -2.5*log10(*data):99.0;
     }
 
   return flag;

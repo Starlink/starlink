@@ -23,6 +23,7 @@
 *                       AST (2.0).
 *	Last modify:	03/04/2003
 *                       (EB): 2.3.
+*	Last modify:	26/11/2003
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -39,6 +40,8 @@
 #include	"globals.h"
 #include	"prefs.h"
 #include	"astrom.h"
+
+static obj2struct	*obj2 = &outobj2;
 
 #ifndef PI 
 #define PI 3.14159265358979323846
