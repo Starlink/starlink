@@ -526,7 +526,10 @@
 	print *,'finding ',object
         call dat_name(loc,name,status)
         print *,name
-      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
+        call dat_there(loc,'head',valid,status)
+        print *,valid
+        call dat_find(loc,'head',aloc,status)
+c      CALL HDX_FIND(LOC,OBJECT,ALOC,STATUS)
 
 	print *,1
 
