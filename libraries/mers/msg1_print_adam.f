@@ -105,6 +105,8 @@
       INTEGER CHR_LEN                   ! String length
       INTEGER MSG1_GTWSZ
       LOGICAL MSG1_GTSTM
+      EXTERNAL MSG1_GTSTM
+      EXTERNAL MSG1_GTWSZ
 
 *  Local Variables:
       INTEGER IPOSN                     ! Character pointer
