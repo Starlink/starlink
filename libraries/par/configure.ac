@@ -22,7 +22,7 @@ AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
-STAR_DECLARE_DEPENDENCIES([build], [cnf sae mers subpar])
+STAR_DECLARE_DEPENDENCIES([build], [cnf sae mers subpar parsecon])
 STAR_DECLARE_DEPENDENCIES([link],  [chr mers subpar])
 
 STAR_LATEX_DOCUMENTATION(sun114)
