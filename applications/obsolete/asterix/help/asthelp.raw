@@ -4795,8 +4795,8 @@
  OUT         2   CHARACTER Dataset to receive copy
  CLASS       3   CHARACTER Class of output dataset
 
-<exam>
 3 Examples
+<exam>
    > astcopy img.fits img2.sdf         -  convert FITS image to HDS
 
    > astcopy "5.6 7.8 4.5..." file1    -  create NDF from set of
