@@ -246,6 +246,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.73  1999/08/19 21:17:54  timj
+*     Remove debug print statements.
+*
 *     Revision 1.72  1999/08/03 20:01:36  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -846,7 +849,7 @@ c
 
                CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_M_FITS,
      :              MODEL_FITS, 'SCUPROJ', OUT_COORDS, STATUS)
-               print *, 'cproj ', out_coords
+*               print *, 'cproj ', out_coords
 
 *     For PLanet we do not need a LONG/LAT
                IF (OUT_COORDS .NE. 'PL' .AND. OUT_COORDS .NE. 'AZ'
@@ -860,7 +863,7 @@ c
                   MODEL_DEC_CEN = 0.0
                END IF
 
-               print *, model_ra_cen, model_dec_cen 
+*               print *, model_ra_cen, model_dec_cen 
 
 *     NOTE: The model file is kept open until after the despiking.
             
@@ -1260,7 +1263,7 @@ c
                OUT_LONG = MODEL_RA_CEN
                OUT_LAT  = MODEL_DEC_CEN
             END IF
-            print *,'OUTLONG OUTLAT', OUT_LONG, OUT_LAT
+*            print *,'OUTLONG OUTLAT', OUT_LONG, OUT_LAT
 
 *     calculate the apparent RA,Dec of the selected output centre
 *     (Hopefully this will provide the same values for OUT_RA_CEN
