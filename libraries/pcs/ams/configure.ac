@@ -6,7 +6,7 @@ AC_INIT(ams, 1.3, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl    Require automake-1.6 at least
+dnl    Require Starlnk automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -20,8 +20,10 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_BUILD_DEPENDENCIES(sae cnf dtask atimer messys msp adam)
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf dtask atimer messys msp adam])
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.

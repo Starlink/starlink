@@ -6,7 +6,7 @@ AC_INIT(hlp, 3.3-2, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl    Require automake-1.6 at least
+dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -22,17 +22,15 @@ AC_PROG_FC
 AC_PROG_FPP
 AC_PROG_LIBTOOL
 
-STAR_HAVE_F77_OPEN_READONLY
+STAR_CNF_COMPATIBLE_SYMBOLS
+STAR_HAVE_FC_OPEN_READONLY
 
 AC_CONFIG_HEADERS([config.h])
 
-dnl    Declare the build and use dependencies for this package
-dnl    No dependencies at all!
-dnl    STAR_DECLARE_BUILD_DEPENDENCIES()
-dnl    STAR_DECLARE_USE_DEPENDENCIES()
+dnl    This package has no dependencies
 
 STAR_LATEX_DOCUMENTATION(sun124)
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES([Makefile component.xml])
 
 AC_OUTPUT

@@ -6,7 +6,7 @@ AC_INIT(par, 2.3, ussc@star.rl.ac.uk)
 
 dnl   Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl   Require automake-1.6 at least
+dnl   Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl   Sanity-check: name a file in the source directory
@@ -16,11 +16,13 @@ dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 AC_PROG_LIBTOOL
 
-STAR_DECLARE_BUILD_DEPENDENCIES(cnf sae mers subpar)
-STAR_DECLARE_USE_DEPENDENCIES(chr)
+STAR_CNF_COMPATIBLE_SYMBOLS
+
+STAR_DECLARE_DEPENDENCIES([build], [cnf sae mers subpar])
+STAR_DECLARE_DEPENDENCIES([link],  [chr mers subpar])
 
 STAR_LATEX_DOCUMENTATION(sun114)
 

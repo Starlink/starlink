@@ -6,7 +6,7 @@ AC_INIT(atimer, 1.0, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl    Require automake-1.6 at least
+dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -21,12 +21,12 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_BUILD_DEPENDENCIES(sae cnf)
+STAR_DECLARE_DEPENDENCIES([build], [sae cnf])
 dnl    No use dependencies
 
 dnl    Described in SSN/29
 
-STAR_MESSGEN
+STAR_MESSGEN(atimer_err.msg)
 
 AC_CONFIG_FILES(Makefile component.xml)
 

@@ -6,7 +6,7 @@ AC_INIT(messys, 3.0, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl    Require automake-1.6 at least
+dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -18,13 +18,15 @@ STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 AC_PROG_LIBTOOL
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl    Declare the build and use dependencies for this package
-STAR_DECLARE_BUILD_DEPENDENCIES(sae)
+STAR_DECLARE_DEPENDENCIES([build], [sae])
 dnl    Calls FAMS functions, in the AMS package
-STAR_DECLARE_USE_DEPENDENCIES(mers ams)
+STAR_DECLARE_DEPENDENCIES([link],  [ams])
 
 dnl    The documentation for this package is maintained as part of
 dnl    the PCS package 

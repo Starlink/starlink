@@ -16,12 +16,13 @@ dnl   Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 AC_PROG_CC
-AC_PROG_F77
+AC_PROG_FC
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
+STAR_CNF_COMPATIBLE_SYMBOLS
+
 dnl   This package has no dependencies
-dnl STAR_DECLARE_BUILD_DEPENDENCIES()
 
 STAR_LATEX_DOCUMENTATION(sun209)
 

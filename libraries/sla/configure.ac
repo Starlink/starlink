@@ -46,7 +46,7 @@ STAR_PLATFORM_SOURCES([random.fpp gresid.fpp wait.f],
 
 if cmp -s random.fpp random.fppdefault; then
     # The unix version, to be configured
-    #AC_LANG_PUSH([Fortran 77])
+    #AC_LANG_PUSH([Fortran])
     found_random=false
     AC_CHECK_FUNCS([rand random], [found_random=true])
     if $found_random; then
@@ -54,10 +54,10 @@ if cmp -s random.fpp random.fppdefault; then
     else
         AC_LIBOBJ([rtl_random])
     fi
-    #AC_LANG_POP([Fortran 77])
+    #AC_LANG_POP([Fortran])
 fi
 
-dnl STAR_FPP_SOURCES(random gresid)
+STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CONFIG_HEADERS([config.h])
 

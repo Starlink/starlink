@@ -12,7 +12,7 @@ AC_INIT(pcs, 4.1-1, ussc@star.rl.ac.uk)
 
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
-dnl    Require automake-1.6 at least
+dnl    Require Starlink automake at least
 AM_INIT_AUTOMAKE(1.8.2-starlink)
 
 dnl    Sanity-check: name a file in the source directory -- if this
@@ -25,8 +25,9 @@ STAR_DEFAULTS
 dnl    Declare the build and use dependencies for this package
 dnl    The dependencies should expand to include each of the
 dnl    subpackages as they are added to the system
-STAR_DECLARE_BUILD_DEPENDENCIES(adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
-dnl STAR_DECLARE_USE_DEPENDENCIES()
+STAR_DECLARE_DEPENDENCIES([build], [adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task])
+dnl    There are no `link' or `use' dependencies, because there is no way this
+dnl    package can be `used' -- it's just a wrapper
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
@@ -36,7 +37,7 @@ dnl    List the set of active subdirectories.
 dnl    This must be kept up-to-date by hand.
 dnl    The list is available as the substitution variable @subdirs@.
 dnl    (must be kept on one line)
-AC_CONFIG_SUBDIRS(adam ams dtask hdspar lex messys misc msp parsecon sock string subpar task)
+AC_CONFIG_SUBDIRS(adam ams atimer dtask hdspar lex messys misc msp parsecon sock string subpar task)
 dnl     Missing from above list:
 dnl         adamnet -- redundant, and may not work
 
