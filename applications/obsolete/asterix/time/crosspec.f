@@ -111,7 +111,7 @@
 *    Version id :
 *
       CHARACTER*20		VERSION
-        PARAMETER               ( VERSION = 'CROSSPEC Version 2.0-0' )
+        PARAMETER               ( VERSION = 'CROSSPEC Version 2.1-0' )
 *-
 
 *    Version

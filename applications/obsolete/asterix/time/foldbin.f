@@ -150,7 +150,7 @@
          PARAMETER       (MAXHTXT = 10)
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'FOLDBIN Version V2.0-0' )
+        PARAMETER		( VERSION = 'FOLDBIN Version 2.1-0' )
 
 *  Local Variables:
       CHARACTER*132      HTXT(MAXHTXT)          ! History text

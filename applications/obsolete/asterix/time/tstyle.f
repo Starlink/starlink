@@ -25,7 +25,7 @@
       LOGICAL SET
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TSTYLE Version 1.4-0')
+      PARAMETER (VERSION = 'TSTYLE Version 2.1-0')
 *-
       CALL MSG_PRNT(VERSION)
 

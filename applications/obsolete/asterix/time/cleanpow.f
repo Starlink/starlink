@@ -99,7 +99,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER               ( VERSION = 'CLEANPOW Version V2.0-0' )
+        PARAMETER               ( VERSION = 'CLEANPOW Version 2.1-0' )
 *-
 
 *  Initialise

@@ -22,7 +22,7 @@
       INTEGER OFID,ISEG
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TSAVE Version 2.0-0')
+      PARAMETER (VERSION = 'TSAVE Version 2.1-0')
 *-
       CALL MSG_PRNT(VERSION)
 

@@ -137,7 +137,7 @@
 *    Version id
 *
       CHARACTER*30		VERSION
-        PARAMETER       	( VERSION = 'FOLDLOTS Version 2.0-0' )
+        PARAMETER       	( VERSION = 'FOLDLOTS Version 2.1-0' )
 *-
 
 *  Check status.
