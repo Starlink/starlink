@@ -1,69 +1,122 @@
-*+  TIM_PUTOUT - Produces output file
-      SUBROUTINE TIM_PUTOUT( PARAM, TYPE, NFREQ, POWER, BASE, SCALE,
-     :                                                OFID, STATUS )
-*    Description :
-*      Produces an output file, usually either a periodogram or phase file
-*    Environment parameters :
-*      PARAM     UNIV       Name of output file
-*    Method :
-*     <description of how the subroutine works - for programmer info>
-*    Deficiencies :
-*     <description of any deficiencies>
-*    Bugs :
-*     <description of any "bugs" which have not been fixed>
-*    Authors :
-*     author (institution::username)
-*    History :
-*     date:  changes (institution::username)
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-*
-*    Import :
-*
-      CHARACTER*(*) PARAM                  ! Output file name
-      CHARACTER*(*) TYPE                   ! Output file type
-      INTEGER NFREQ                        ! Number of output bins
-      REAL POWER(*)                        ! Power from time series application
-      REAL BASE,SCALE                      ! Start and width values for
-*                                          ! output axis
-*    Export :
-*                                          ! output axis
-      INTEGER			OFID			! Output dataset id
-*                                          ! output axis
-*    Status :
-*                                          ! output axis
-      INTEGER STATUS
+      SUBROUTINE TIM_PUTOUT( PARAM, OCLASS, NFREQ, POWER, BASE,
+     :                       SCALE, OFID, STATUS )
+*+
+*  Name:
+*     TIM_PUTOUT
 
-*  Local Variables:
-      INTEGER			ODPTR			! Output data ptr
+*  Purpose:
+*     Start production of an output file
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL TIM_PUTOUT( PARAM, OCLASS, NFREQ, POWER, BASE, SCALE, OFID, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     PARAM = CHARACTER*(*) (given)
+*        Name of the environment parameter used to open file
+*     OCLASS = CHARACTER*(*) (given)
+*        Output class of interface object
+*     NFREQ = INTEGER (given)
+*        Number of points in output dataset
+*     POWER[] = REAL (given)
+*        Power values for output data
+*     BASE = REAL (given)
+*        Frequency of first bin
+*     SCALE = REAL (given)
+*        Change in  frequency per bin
+*     OFID = INTEGER (returned)
+*        ADI identifier of opened file
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  References:
+*     TIM Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/tim.html
+
+*  Keywords:
+*     package:tim, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     10 Dec 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 
-*    Check status
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
+
+*  Arguments Given:
+      CHARACTER*(*)             PARAM, OCLASS
+      INTEGER                   NFREQ
+      REAL                      POWER(*), BASE, SCALE
+
+*  Arguments Returned:
+      INTEGER                   OFID
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      REAL                      SPARR(2)                ! Spaced array data
+*.
+
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Open output file
-      CALL USI_TASSOCO(PARAM, TYPE, OFID, STATUS)
-      IF (STATUS .NE. SAI__OK) GOTO 99
+*  Create the file
+      CALL USI_CREAT( PARAM, ADI__NULLID, OFID, STATUS )
 
-*    Create standard components in output file
-      CALL BDI_CREBDS(OFID, 1, NFREQ, .TRUE., .FALSE., .FALSE., STATUS)
+*  Create interface object
+      CALL BDI_LINK( OCLASS, 1, NFREQ, 'REAL', OFID, STATUS )
 
-*    Write data array into output file
-      CALL BDI_CREDATA( OFID, 1, NFREQ, STATUS )
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
-      CALL ARR_COP1R( NFREQ, POWER, %VAL(ODPTR), STATUS )
-      CALL BDI_UNMAPDATA( OFID, STATUS )
+*  Create the frequency axis
+      SPARR(1) = BASE
+      SPARR(2) = SCALE
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
 
-*    Create axis in output file
-      CALL BDI_PUTAXVAL(OFID, 1, BASE, SCALE, NFREQ, STATUS)
-
-*    Add history record
-
-*    Abort point
-  99  IF ( STATUS .NE. SAI__OK ) THEN
-        CALL AST_REXIT( 'TIM_PUTOUT', STATUS )
-      END IF
+*  Write the power data
+      CALL BDI_PUT1R( OFID, 'Data', NFREQ, POWER, STATUS )
 
       END

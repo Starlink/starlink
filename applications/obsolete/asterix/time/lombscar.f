@@ -16,16 +16,17 @@
 *     date:  changes (institution::username)
 *     ?? ??? ?? : V1.5-0 Original (RDS)
 *     11 Apr 95 : V1.8-0 Updated data interfrace (DJA)
+*     11 Dec 1995 : V2.0-0 ADI port (DJA)
+*
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PAR_ERR'
 *    Status :
       INTEGER STATUS
 *    Local constants :
       CHARACTER*30 TYPE
-          PARAMETER(TYPE='Power_spectrum')
+          PARAMETER(TYPE='PowerSpectrum')
 *    Local variables :
       CHARACTER*80 PATH(4)                  !Input data path
       INTEGER			IFID, OFID		! Dataset identifiers
@@ -56,7 +57,7 @@
 
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'LOMBSCAR Version 1.8-0')
+      PARAMETER (VERSION = 'LOMBSCAR Version 2.0-0')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -70,17 +71,16 @@
 * Get input parameters
 *   Oversampling function
       CALL USI_GET0R('OFAC', OFAC, STATUS)
-*
+
 *   Multiple of Nyquist frequency to extrapolate power spectrum to.
       CALL USI_GET0R('HIFAC', HIFAC, STATUS)
-*
-*   Window function frequency. This should be set to zero if window
-*   function is not wanted
+
+*  Window function frequency. This should be set to zero if window
+*  function is not wanted
       CALL USI_GET0R('WFREQ', F1, STATUS)
-*
       IF (STATUS .NE. SAI__OK) GOTO 99
-*
-* Calculate the maximum workspace requirement in TIM_FASPER
+
+*  Calculate the maximum workspace requirement in TIM_FASPER
       VALUE = REAL(OFAC * HIFAC * NGOOD * 4.0)
 *
       DO LP=1,100
@@ -91,16 +91,16 @@
       ENDDO
 *
 10    CONTINUE
-*
-* Calculate the workspace needed for the window function calculation.
-* This will be the same as NWORK if window function is being calculated
-* otherwise just set to one.
+
+*  Calculate the workspace needed for the window function calculation.
+*  This will be the same as NWORK if window function is being calculated
+*  otherwise just set to one.
       IF (F1 .GT. 0.0) THEN
-         NWIND = NWORK
+        NWIND = NWORK
       ELSE
-         NWIND = 1
-      ENDIF
-*
+        NWIND = 1
+      END IF
+
 * Map dynamic arrays
 *   Window workspace
       CALL DYN_MAPR(1, NGOOD, W1PNTR, STATUS)
@@ -125,11 +125,12 @@
      :                                      DF, OFID, STATUS )
 
 *  Add axis label and units
-      CALL BDI_PUTAXTEXT( OFID, 1, 'Frequency', 'Hz', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Units', 'Hz', STATUS )
 
 *  Add data label and units
-      CALL BDI_PUTLABEL(OFID, 'Power', STATUS)
-      CALL BDI_PUTUNITS(OFID, '(Counts/s)**2', STATUS)
+      CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
+      CALL BDI_PUT0C( OFID, 'Units', '(Counts/s)**2', STATUS )
 
 *  Add history
       CALL HSI_COPY( IFID, OFID, STATUS)
@@ -137,7 +138,7 @@
       CALL USI_NAMEI(NLINES, PATH, STATUS)
       CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
 
-*   Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
