@@ -3473,9 +3473,6 @@ The applications affected by these, and any other, changes are:
   o  TRANMAKE no longer reports a compilation error if a null value is given 
      for parameter CLASS.
 
-  o  All applications now consider IEEE NaN and Inf values to be
-     equivalent to the appropriate standard Starlink BAD values. 
-
 The following applications now propagate the WCS component of an NDF
 structure: 
 
