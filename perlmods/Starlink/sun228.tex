@@ -15,16 +15,17 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {228.1}
+\newcommand{\stardocnumber}    {228.2}
 \newcommand{\stardocauthors}   {T.\ Jenness, F.\ Economou\\
                                 Joint Astronomy Centre, Hilo, Hawaii}
-\newcommand{\stardocdate}      {16 February 1999}
+\newcommand{\stardocdate}      {15 June 1999}
 \newcommand{\stardoctitle}     {STARPERL -- Starlink perl modules}
-\newcommand{\stardocversion}   {1.00}
+\newcommand{\stardocversion}   {1.10}
 \newcommand{\stardocmanual}    {User's manual}
 \newcommand{\stardocabstract}  {The StarPerl package is a selection
 of perl modules that provide access to Starlink infrastructure libraries.
-Currently an interface to the ADAM messaging system is provided.
+Currently, interfaces are provided to the ADAM messaging system and
+the Starlink Noticeboard system.
 }
 
 % Environment for indenting and using a small font.
@@ -300,7 +301,7 @@ The Starperl package provides modules for perl/Starlink interoperability. The
 purpose of this package is to allow access to the Starlink infrastructure
 libraries from the \xref{perl}{sun193}{} programming language. Available
 modules in this release are the ADAM module (for interface with the ADAM
-messaging system) and the EMS module.
+messaging system), the EMS module and an interface to the Noticeboard system.
 
 The mechanism for reading, writing and manipulating Starlink data format files
 (NDF and HDS) from perl is documented in \xref{SUN/222}{sun222}{}.
@@ -328,6 +329,10 @@ one wishes to not only detect the success or failure of a task, but
 also particular status codes (such as whether a fitting routine failed
 due to anomalies in the data or simply lack of disk space).
 
+Additionally, it is sometimes convenient to use shared memory to pass
+information between processes on the same machine. The NBS interface
+provides a simple way of doing this from perl (even allowing the use
+of tied hashes).
 
 \section{The Starlink Perl modules}
 
@@ -343,7 +348,7 @@ using the \texttt{use} function in perl at the start of your program:
 
 \begin{myquote}
 \begin{verbatim}
-#!/star/bin/perl
+#!/star/Perl/bin/perl
 
 use Starlink::modulename;
 \end{verbatim}
@@ -354,15 +359,54 @@ See the perl \texttt{perlmods} man page for more information on using modules.
 
 \section{EMS interface}
 
-A simple interface to the Starlink EMS C library (\xref{SSN/4}{ssn4}{}) is
-provided by the \texttt{Starlink::EMS} module. Currently only the internal
-routine \texttt{ems1\_get\_facility\_error} is available.
+An interface to the Starlink EMS C library (\xref{SSN/4}{ssn4}{}) is
+provided by the \texttt{Starlink::EMS} module. All routines described in
+that document are available as well as internal routine for converting a
+status code directly to the error mesage components (ems1\_get\_facility\_error).
+
+The EMS functions can be imported using the '\texttt{ems}' tag:
 
 \begin{myquote}
 \begin{verbatim}
-use Starlink::EMS;
+use Starlink::EMS qw/ :ems /;
+\end{verbatim}
+\end{myquote}
 
+The following routines are available:
+
+\texttt{ems\_annul(), ems\_begin(), ems\_eload(), ems\_end(),
+ems\_errno(), ems\_facer(), ems\_fmtc(), ems\_fmtd(),
+ems\_fmti(), ems\_fmtl(), ems\_fmtr() ems\_level(), ems\_mark(),
+ems\_mload(), ems\_renew(), ems\_rep(), ems\_rlse(), ems\_setc(),
+ems\_setd(), ems\_seti(), ems\_setl(), ems\_setr(), ems\_stat(),
+ems\_syser()}.
+
+One difference between the perl implementation and the C/Fortran version
+described in \xref{SSN/4}{ssn4}{} concerns return values. Routines with
+arguments that contain pure return values (as opposed to
+modifications of an existing variable) return the values as
+a perl array or scalar. The routines are:
+
+\begin{myquote}
+\begin{verbatim}
+($par, $str, $status) = ems_load();
+$level = ems_level();
+$string = ems_mload($par, $str, $status);
+\end{verbatim}
+\end{myquote}
+
+The \texttt{ems1\_get\_facility\_error()} routine is not documented in
+\xref{SSN/4}{ssn4}{} but can be used to convert an error status to the
+corresponding error code and text. This is similar to the
+\texttt{ems\_facer()} routine (also available) but gives more control over the
+use of this information and does not go via a token.  This command is
+available in two forms. One form is identical to the C implementation, the
+other provides the values as a perl array:
+
+\begin{myquote}
+\begin{verbatim}
 ems1_get_facility_error($status, $facility, $ident, $text);
+($facility, $ident, $text) = get_facility_error($status);
 \end{verbatim}
 \end{myquote}
 
@@ -370,8 +414,21 @@ When passed a status error code, this routine returns the facility
 name, error identifier and error message. It is used by the perl/ADAM
 module to decode error status codes returned by ADAM monoliths. 
 
+Generic status values can be imported with the '\texttt{sai}' tag:
+
+\begin{myquote}
+\begin{verbatim}
+use Starlink::EMS qw( :sai );
+
+$ok = SAI__OK;
+$warn = SAI__WARN;
+$err  = SAI__ERROR;
+\end{verbatim}
+\end{myquote}
+% $
+
 An interface to MERS (\xref{SUN/104}{sun104}{}) is provided by the 
-\xref{NDFPERL}{sun222}{} package (\xref{NDFPERL}{SUN/222}{}).
+\xref{NDFPERL}{sun222}{} package (\xref{SUN/222}{sun222}{}).
 
 \section{ADAM interface}
 
@@ -546,7 +603,8 @@ The available constants are:
 
 \begin{myquote}
 SAI\_\_OK, SAI\_\_WARN, SAI\_\_ERROR\footnote{The 
-SAI\_\_ constants are also available from the NDFPERL package},
+SAI\_\_ constants are also available from the NDFPERL package and from the
+Starlink::EMS module},
 
 DTASK\_\_ACTSTART, DTASK\_\_ACTCOMPLETE, 
 
@@ -563,14 +621,13 @@ and must be fully-qualified, eg:
 
 \begin{myquote}
 \begin{verbatim}
-$good_status = &Starlink::SAI__OK;
-$complete    = &Starlink::DTASK__ACTCOMPLETE;
+$good_status = &Starlink::ADAM::SAI__OK;
+$complete    = &Starlink::ADAM::DTASK__ACTCOMPLETE;
 \end{verbatim}
 \end{myquote}
 
 Note the use of the ampersand to indicate that this is actually an
-autoloaded function and not a variable.
-
+autoloaded function and not a variable or perl constant.
 
 \subsection{Limitations and bugs}
 
@@ -580,7 +637,7 @@ wait (block) for the monolith to respond before control is returned
 to the perl program. A non-blocking OBEY is not yet available.
 
 There seems to be a problem when removing monoliths from the message
-system. When a monolith is killed it should send a message to 
+system. When a monolith is killed it should send a message to
 all processes that have previously talked to it via the messaging
 system so that the communications are shut down cleanly. In the perl
 implementation a segmentation fault occurs when attempting to talk
@@ -590,11 +647,67 @@ listening to messages at all times (no event loop). Currently, the
 only solution is to create a new perl Task object with a different
 name in the message system.
 
+\section{Notice Board interface}
+
+The Starlink::NBS module provides an interface to the Starlink
+Noticeboard system (\xref{SUN/77}{sun77}{}). Additionally, it is possible
+to tie the noticeboard to a perl variable allowing the notice board
+to be manipulated using normal perl commands.
+
+The noticeboard (NB) can be accessed using:
+
+\begin{myquote}
+\begin{verbatim}
+use Starlink::NBS;
+
+$nbs = new Starlink::NBS($nbsname);
+\end{verbatim}
+\end{myquote}
+
+Once a top-level object exists, the find() method can be used to 
+descend the hierarchy returning new Starlink::NBS objects each time.
+This means that a Starlink::NBS object can be associated with a structure
+in the NB or a primitive (i.e.\ an integer, or character string).
+
+\begin{myquote}
+\begin{verbatim}
+$level1 = $nbs->find(".struct1.component");
+($status, @values) = $level1->get;
+\end{verbatim}
+\end{myquote}
+
+In general, it is much easier (and more obvious) to tie the NB
+to a perl hash and then manipulate it as normal:
+
+\begin{myquote}
+\begin{verbatim}
+use Data::Dumper;
+
+tie %nb, ref($nbs), $nbs;
+@values = $nb{struct1}{component};
+print Dumper(\%nb); # list the Notice board
+\end{verbatim}
+\end{myquote}
+
+More information can be found in the Starlink::NBS man page
+(\texttt{perldoc Starlink::NBS} and in the appendix of this document).
 
 \appendix
 
+\section{Changes}
 
-\section{ADAM interface}
+\subsection{New in version 1.10}
+
+\begin{itemize}
+\item Include Starlink::NBS module.
+\item Add interface to all documented routines in the EMS library.
+\item Fix bug in Starlink::AMS::Init that made it impossible to redirect
+standard error to a different file handle.
+\item Starlink::AMS::Core now uses Proc::Simple version 1.13
+\end{itemize}
+
+
+\section{ADAM interface specification}
 
 This section describes the methods available from the Starlink::AMS::Init
 and Starlink::AMS::Task modules.
@@ -622,7 +735,7 @@ $ams = new Starlink::AMS::Init(0);  # Delay messaging start
 
 \item[messages]%
 \index{messages@messages}%
-\hfil\\
+\hfill\\
 Method to set whether standard messages returned from monoliths
 are printed or not. If set to true the messages are printed
 else they are ignored.
@@ -638,7 +751,7 @@ Default is to print all messages.
 
 \item[errors]%
 \index{errors@errors}%
-\hfil\\
+\hfill\\
 Method to set whether error messages returned from monoliths
 are printed or not. If set to true the errors are printed
 else they are ignored.
@@ -653,7 +766,7 @@ Default is to print all messages.
 
 \item[timeout]%
 \index{timeout@timeout}%
-\hfil\\
+\hfill\\
 Set or retrieve the timeout (in seconds) for some of the ADAM messages.
 Default is 30 seconds.
 \begin{myquote}
@@ -665,19 +778,19 @@ $current = $ams->timeout;
 
 \item[stderr]%
 \index{stderr@stderr}%
-\hfil\\
+\hfill\\
 Set and retrieve the current filehandle to be used for printing
 error messages. Default is to use STDERR.
 
 \item[stderr]%
 \index{stderr@stderr}%
-\hfil\\
+\hfill\\
 Set and retrieve the current filehandle to be used for printing
 normal ADAM messages. Default is to use STDOUT.
 
 \item[paramrep]%
 \index{paramrep@paramrep}%
-\hfil\\
+\hfill\\
 Set and retrieve the code reference that will be executed if
 the parameter system needs to ask for a parameter.
 Default behaviour is to call a routine that simply prompts
@@ -698,7 +811,7 @@ to continually return an unacceptable answer.
 
 \item[init]%
 \index{init@init}%
-\hfil\\
+\hfill\\
 Initialises the ADAM messaging system. This routine should always be
 called before attempting to control I-tasks.
 
@@ -713,7 +826,7 @@ Starlink Status is returned.
 
 \item[shutdown]%
 \index{shutdown@shutdown}%
-\hfil\\
+\hfill\\
 This method forces the Adam messaging system to be shutdown.
 (It runs the adamtask\_exit routine in Starlink::AMS::Core).
 
@@ -732,7 +845,7 @@ The methods provided by this class are:
 
 \item[new()]%
 \index{new()@new()}%
-\hfil\\
+\hfill\\
 Create a new instance of a Starlink::AMS::Task object.
 \begin{myquote}
 \begin{verbatim}
@@ -747,7 +860,7 @@ fails then undef is returned (which will not be an object reference).
 
 \item[name]%
 \index{name@name}%
-\hfil\\
+\hfill\\
 The name used by the messaging system to contact the monolith.
 Can be used to set or retrieve the value of name (do not set
 this value from outside unless you know that a path to the 
@@ -774,7 +887,7 @@ $proc = $obj->pid;
 
 \item[tasktype]%
 \index{tasktype@tasktype}%
-\hfil\\
+\hfill\\
 Return or set the type of task associated with the object.
 Should be either 'A' or 'I'.
 \begin{myquote}
@@ -785,7 +898,7 @@ $task->tasktype('A');
 
 \item[monolith]%
 \index{monolith@monolith}%
-\hfil\\
+\hfill\\
 Returns or sets the name of the monolith (not including path).
 This is obtained by looking at the second argument to the
 load method and is required for A-tasks when performing a parameter
@@ -793,7 +906,7 @@ get.
 
 \item[adamdir]%
 \index{adamdir@adamdir}%
-\hfil\\
+\hfill\\
 Retrieve the current value of \$ADAM\_{}USER. If not defined the
 value of \$ADAM\_{}USER is stored --- this method is used to store the
 value of \$ADAM\_{}USER at load time so that the location of any
@@ -801,7 +914,7 @@ adam parameter file can be found (for A-tasks).
 
 \item[DESTROY]%
 \index{DESTROY@DESTROY}%
-\hfil\\
+\hfill\\
 Destructor for this object. When the last reference to this
 object is removed the destructor is executed automatically.
 In this case the monolith attached to object is killed 
@@ -810,7 +923,7 @@ via the {\em forget()\/} method.
 
 \item[load]%
 \index{load@load}%
-\hfil\\
+\hfill\\
 Load a monolith and set up the name in the messaging system.
 This task is called by the 'new' method.
 \begin{myquote}
@@ -846,7 +959,7 @@ is not loaded.
 
 \item[obeyw]%
 \index{obeyw@obeyw}%
-\hfil\\
+\hfill\\
 Send an obey to a task and wait for a completion message
 \begin{myquote}
 \begin{verbatim}
@@ -892,7 +1005,7 @@ This routine has no effect in A-tasks.
 
 \item[control]%
 \index{control@control}%
-\hfil\\
+\hfill\\
 Send control messages to a monolith.
 \begin{myquote}
 \begin{verbatim}
@@ -903,7 +1016,7 @@ $obj->control("par_reset");
 
 \item[forget]%
 \index{forget@forget}%
-\hfil\\
+\hfill\\
 Remove the monolith name from the list of known monoliths.
 This method prevents the monolith from being killed when adam
 exits or when the object is destroyed.
@@ -912,20 +1025,344 @@ This routine has no input arguments.
 
 \item[contact]%
 \index{contact@contact}%
-\hfil\\
+\hfill\\
 This method can be used to determine whether the object can
 contact a monolith. Returns a 1 if we can contact a monolith and
 a zero if we cant.
 
 \item[contactw]%
 \index{contactw@contactw}%
-\hfil\\
+\hfill\\
 This method will not return unless the monolith can be contacted.
 It only returns with a timeout. Returns a '1' if we contacted okay
 and a '0' if we timed out. It will timeout if it takes longer than
 specified in Starlink::AMS::Init-$>$timeout.
 
 \end{itemize}
+
+\section{Starlink::NBS interface specification}
+
+\subsection{Methods}
+
+\subsubsection*{Constructors}%
+\index{Constructors}
+
+\begin{description}
+
+\item[new]%
+\index{new@new}%
+
+Create a new instance of a Starlink::NBS object.
+Only used directly to access the top level of the noticeboard
+\begin{verbatim}
+   $nbs_id  = new Starlink::NBS("nbsname");
+\end{verbatim}
+
+The {\em loadnbs()\/} method is invoked with the supplied argument.
+
+\end{description}
+
+\subsubsection*{Accessor Methods}%
+\index{Accessor Methods}
+
+These methods are for accessing the "instance" data.
+With arguments they set the value, without arguments they
+retrieve the current value.
+
+\begin{description}
+
+\item[path]%
+\index{path@path}%
+\hfill\\
+Full path (name) to the item associated with this object
+including the name of the noticeboard.
+
+\item[id]%
+\index{id@id}%
+
+ID of the shared memory area.
+
+\item[pos]%
+\index{pos@pos}%
+
+Position in structure.
+
+\item[rootid]%
+\index{rootid@rootid}%
+\hfill\\
+ID of the actual noticeboard.
+
+\item[top]%
+\index{top@top}%
+
+True if this is a top-level object. False otherwise.
+
+\item[status]%
+\index{status@status}%
+\hfill\\
+Contains the current status associated with the object. Status from
+each method call is placed in here (and usually returned with each
+command). Methods will not do anything if the stored status is not
+good. This behaves as an inherited status without having to pass
+the status into the methods explicitly.
+
+\item[debug]%
+\index{debug@debug}%
+\hfill\\
+Turns debugging on or off. Default is off.
+
+\item[nchilds]%
+\index{nchilds@nchilds}%
+\hfill\\
+Returns the number of children associated with the current object.
+Can not be set externally.
+
+\end{description}
+
+\subsubsection*{General Methods}%
+\index{General Methods}
+
+\begin{description}
+
+\item[isokay]%
+\index{isokay@isokay}%
+\hfill\\
+Method that simply returns whether status is acceptable (SAI\_{}\_{}OK)
+or not. If everything is okay return 1, else return 0.
+
+\item[loadnbs]%
+\index{loadnbs@loadnbs}%
+\hfill\\
+Method to load a top level noticeboard
+
+\item[type]%
+\index{type@type}%
+\hfill\\
+Find the storage type of an object
+\begin{verbatim}
+ Arguments: None (but uses the current status of the object)
+ Returns:  ($type, $status)
+\end{verbatim}
+
+\item[primitive]%
+\index{primitive@primitive}%
+\hfill\\
+Determines whether the object is a primitive
+\begin{verbatim}
+  Arguments: None (but uses the current status of the object)
+  Returns:  ($prim, $status)
+  $prim is 1 if it is a primitive, 0 otherwise (including if status
+  is bad).
+\end{verbatim}
+
+\item[name]%
+\index{name@name}%
+\hfill\\
+Find the name of the object
+\begin{verbatim}
+   Arguments:  None (but uses the current status of the object)
+   Returns:  ($name, $status)
+\end{verbatim}
+
+\item[size]%
+\index{size@size}%
+\hfill\\
+Find the size of the item
+\begin{verbatim}
+ Arguments: None (but uses the current status of the object)
+ Returns: ($size, $maxsize, $status)
+\end{verbatim}
+
+Returns status = NBS\_{}\_{}NOTPRIMITIVE if the object is not a primitive.
+Returns status = NBS\_{}\_{}NILID  if the object is not defined
+
+The returned size is the number of entries that can be contained.
+(ie not bytes unless a \_{}CHAR) and depends on the type of the object.
+
+\item[nth\_{}name(num)]%
+\index{nth_name(num)@nth\_{}name(num)}%
+\hfill\\
+Return the name of the nth component in the objects structure.
+\begin{verbatim}
+ Arguments: number
+ Return:    name
+\end{verbatim}
+
+\item[find]%
+\index{find@find}%
+\hfill\\
+Find an item in a noticeboard. The full path name must be given.
+The item must exist below the current object.
+\begin{verbatim}
+  Arguments: Full name of object (separated by dots)
+             An object relative to the current object can be
+             given if it starts with a '.'
+\end{verbatim}
+
+Returns an object blessed into {\tt Starlink::NBS} class.
+
+\item[get]%
+\index{get@get}%
+
+Get the item corresponding to the current object.
+Must be a primitive object
+\begin{verbatim}
+  Arguments: None (uses current status of object)
+  Returns:   Status and The values (in array context)
+               ($status, @values)
+\end{verbatim}
+
+\item[put]%
+\index{put@put}%
+
+Put values into the object
+\begin{verbatim}
+   Arguments: Values (however many values are supported)
+   Returns:  Status
+\end{verbatim}
+
+\item[poke(item, val)]%
+\index{poke(item, val)@poke(item, val)}%
+\hfill\\
+Set the value of item to 'val'.
+This is the equivalent of a {\em find()\/} followed by a {\em put()\/}.
+\begin{verbatim}
+  $nbs->poke(".port_0.display_data", 'IMAGE');
+\end{verbatim}
+
+Status of the {\em put()\/} is returned.
+
+\item[peek(item)]%
+\index{peek(item)@peek(item)}%
+\hfill\\
+Return the value stored in item. This is the equivalent of a {\em find()\/}
+followed by a {\em get()\/}
+\begin{verbatim}
+  ($value) = $nbs->peek(".port_0.display_data");
+\end{verbatim}
+
+undef is returned if bad status is encountered.
+The values are returned in an array context.
+
+\end{description}
+
+\subsection{Tied interface}%
+\index{TIE}
+
+Scalar values in the noticeboard can be tied to scalar perl variables
+using the perl {\em tie()\/} function.
+\begin{verbatim}
+   $what = $Nbs->find("primitive.object");
+   tie ($object, ref($what), $what);
+\end{verbatim}
+
+Now \$object will automatically reflect the value in the notice board
+associated with primitive.object. Note that this only works for
+primitives (not structures).
+
+Noticeboard structures can be tied to perl hashes also:
+\begin{verbatim}
+   $what = $Nbs->find("structure");
+   tie (%hash, ref($what), $what);
+\end{verbatim}
+
+Now \%hash can be used to update the entire noticeboard structure.
+Note that keys are always assumed to be relative to the 
+tied object --- in effect this means that a '.' is automatically
+prepended to all keys if one is not found. (see {\em find()\/}
+for more information on relative addressing).
+
+Note that ties can be broken by using simple copies.
+For example, for
+\begin{verbatim}
+     %new = %hash
+\end{verbatim}
+
+\%new will not be tied even though \%hash was.
+
+It is possible to tie a hash to the top-level noticeboard structure
+and to access lower levels of the noticeboard entirely using the
+tie. For example, a simple way to list the noticeboard contents
+is to tie a hash to the top level and then use Data::Dumper to
+list the hash.
+\begin{verbatim}
+  use Starlink::NBS;
+  use Data::Dumper;
+\end{verbatim}
+\begin{verbatim}
+  $nbs = new Starlink::NBS($nbsname);
+  tie %hash, ref($nbs), $nbs;
+\end{verbatim}
+\begin{verbatim}
+  print Dumper(\%hash);  
+\end{verbatim}
+
+A method is supplied for tieing NBS objects to variables:
+
+\begin{description}
+
+\item[tienbs]%
+\index{tienbs@tienbs}%
+\hfill\\
+Tie a Starlink::NBS object to a perl variable. No arguments.  If the
+object points to a structure a reference to a perl hash is returned.
+If the object points to a primitive a reference to a perl scalar is
+returned.
+
+\end{description}
+
+\subsection{Non-methods}%
+\index{NON-METHODS}
+
+In addition to the OO implementation. Direct hooks to the NBS library
+can be accessed. They can be imported into your global namespace by
+using:
+\begin{verbatim}
+      use Starlink::NBS qw/:nbslib/;
+\end{verbatim}
+
+The available commands are:
+\begin{myquote}
+\begin{verbatim}
+nbs_find_item(envid, name, id, status)
+nbs_find_noticeboard( noticeboard, topid, status)
+nbs_find_nth_item(envid, posn, id, status)
+nbs_get_children(id, children, status)
+nbs_get_info(id, name, value, status)
+nbs_get_name(id, name, status)
+nbs_get_primitive(id, primitive, status)
+nbs_get_shape(id, maxdims, dims, actdims, status)
+nbs_get_size(id, maxbytes, actbytes, status)
+nbs_get_type(id, type, status)
+nbs_get_updated(id, updated, status)
+nbs_get_value_c(id, $cvalue, status)
+nbs_get_value_d(id, \@values, status)
+nbs_get_value_f(id, \@values, status)
+nbs_get_value_i(id, \@values, status)
+nbs_get_value_l(id, \@values, status)
+nbs_lose_item(id, option, status)
+nbs_lose_noticeboard(id, option, status)
+nbs_put_value_c(id, $string, status)
+nbs_put_value_d(id, nvals, \@values, status)
+nbs_put_value_f(id, nvals, \@values, status)
+nbs_put_value_i(id, nvals, \@values, status)
+nbs_put_value_l(id, nvals, \@values, status)
+nbs_tune(name, value, oldvalue, status)
+nbs_tune_noticeboard(id, name, value, oldvalue, status)
+nbs_begin_definition(id, status)
+nbs_define_structure(envsid, name, type, sid, status)
+nbs_define_primitive(envsid, name, type, maxdims, maxbytes, sid, status)
+nbs_define_shape(sid, ndims, dims, status)
+nbs_end_definition(name, option, status)
+nbs_restore_definition(name, save_name, status)
+nbs_restore_noticeboard(name, save_name, status)
+nbs_save_noticeboard(id, status)
+\end{verbatim}
+\end{myquote}
+
+Note that nbs\_{}get\_{} and nbs\_{}put\_{} require a separate routine for each
+type. Additionally, the get and set routines expect array arguments.
+
 
 
 
