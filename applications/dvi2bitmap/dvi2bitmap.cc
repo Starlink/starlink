@@ -166,33 +166,33 @@ int main (int argc, char **argv)
     int optch;
     extern char *optarg;
     struct option long_options[] = {
-	{ "crop",          1, 0, 'c' },
-	{ "font-search",   1, 0, 'F' },
-	{ "debug",         1, 0, 'g' },
-	{ "font-gen",      1, 0, 'G' },
-	{ "height",        1, 0, 'h' },
-	{ "end-page",      1, 0, 'l' },
-	{ "magnification", 1, 0, 'm' },
-	{ "font-mode",     1, 0, 'M' },
-	{ "preamble-only", 0, 0, 'n' },
-	{ "output",        1, 0, 'o' },
-	{ "start-page",    1, 0, 'p' },
-	{ "page-range",    1, 0, 'P' },
-	{ "query",         1, 0, 'Q' },
-	{ "resolution",    1, 0, 'r' },
-	{ "colours",       1, 0, 'R' },
-	{ "colors",        1, 0, 'R' },	// synonym
-	{ "scale",         1, 0, 's' },
-	{ "paper-size",    1, 0, 't' },
-	{ "output-type",   1, 0, 'T' },
-	{ "verbose",       1, 0, 'v' },
-	{ "version",       0, 0, 'V' },
-	{ "width",         1, 0, 'w' },
-	{ "process",       1, 0, 'X' },
-	{ 0,               0, 0, 0   }
+	{ (char*)"crop",          1, 0, 'c' },
+	{ (char*)"font-search",   1, 0, 'F' },
+	{ (char*)"debug",         1, 0, 'g' },
+	{ (char*)"font-gen",      1, 0, 'G' },
+	{ (char*)"height",        1, 0, 'h' },
+	{ (char*)"end-page",      1, 0, 'l' },
+	{ (char*)"magnification", 1, 0, 'm' },
+	{ (char*)"font-mode",     1, 0, 'M' },
+	{ (char*)"preamble-only", 0, 0, 'n' },
+	{ (char*)"output",        1, 0, 'o' },
+	{ (char*)"start-page",    1, 0, 'p' },
+	{ (char*)"page-range",    1, 0, 'P' },
+	{ (char*)"query",         1, 0, 'Q' },
+	{ (char*)"resolution",    1, 0, 'r' },
+	{ (char*)"colours",       1, 0, 'R' },
+	{ (char*)"colors",        1, 0, 'R' },	// synonym
+	{ (char*)"scale",         1, 0, 's' },
+	{ (char*)"paper-size",    1, 0, 't' },
+	{ (char*)"output-type",   1, 0, 'T' },
+	{ (char*)"verbose",       1, 0, 'v' },
+	{ (char*)"version",       0, 0, 'V' },
+	{ (char*)"width",         1, 0, 'w' },
+	{ (char*)"process",       1, 0, 'X' },
+	{ 0,                      0, 0, 0   }
     };
     // should generate this from long_options
-    char *short_options = "c:F:g:G:h:l:M:no:p:P:Q:r:R:s:t:T:v:Vw:X:";
+    char *short_options = (char*)"c:F:g:G:h:l:M:no:p:P:Q:r:R:s:t:T:v:Vw:X:";
     
 
     progname = argv[0];
@@ -223,8 +223,9 @@ int main (int argc, char **argv)
 		char *options = optarg;
 		char *value;
 		char *tokens[] = {
-		    "left", "right", "top", "bottom", "all",
-		    "absolute", "relative",
+		    (char*)"left", (char*)"right",
+		    (char*)"top", (char*)"bottom", (char*)"all",
+		    (char*)"absolute", (char*)"relative",
 		    NULL
 		};
 		bool absCrop = false;
@@ -296,10 +297,10 @@ int main (int argc, char **argv)
 		char *options = optarg;
 		char *value;
 		char *tokens[] = {
-		    "path", "nopath",
-		    "command", "nocommand",
-		    "kpathsea", "nokpathsea",
-		    "none",
+		    (char*)"path",     (char*)"nopath",
+		    (char*)"command",  (char*)"nocommand",
+		    (char*)"kpathsea", (char*)"nokpathsea",
+		    (char*)"none",
 		    NULL,
 		};
 		while (*options) {
@@ -431,11 +432,13 @@ int main (int argc, char **argv)
 		char *options = optarg;
 		char *value;
 		char *tokens[] = {
-		    "missing-fonts", "f",
-		    "all-fonts", "F",
-		    "missing-fontgen", "g",
-		    "all-fontgen", "G",
-		    "bitmaps", "paper", "types",
+		    (char*)"missing-fonts",   (char*)"f",
+		    (char*)"all-fonts",       (char*)"F",
+		    (char*)"missing-fontgen", (char*)"g",
+		    (char*)"all-fontgen",     (char*)"G",
+		    (char*)"bitmaps",
+		    (char*)"paper",
+		    (char*)"types",
 		    NULL
 		};
 		int cropmargin;
@@ -523,7 +526,7 @@ int main (int argc, char **argv)
 		char *options = optarg;
 		char *value;
 		char *tokens[] = {
-		    "foreground", "background", NULL
+		    (char*)"foreground", (char*)"background", NULL
 		};
 		int cropmargin;
 		char c;
@@ -676,8 +679,10 @@ int main (int argc, char **argv)
 		char *options = optarg;
 		char *value;
 		char *tokens[] = {
-		    "options-only", "preamble-only",
-		    "blur", "transparent", "crop",
+		    (char*)"options-only", (char*)"preamble-only",
+		    (char*)"blur",
+		    (char*)"transparent",
+		    (char*)"crop",
 		    NULL
 		};
 		int cropmargin;
