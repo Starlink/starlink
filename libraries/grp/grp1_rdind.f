@@ -27,7 +27,7 @@
 *        The fortran unit number on which to open the file.
 *     INFILE = CHARACTER * ( * ) (Given)
 *        The name of the indirection file.
-*     SLOT1 = INTEGER (Given)
+*     SLOT = INTEGER (Given)
 *        The slot number for the group in which to store the records
 *        read from the file.
 *     INDX = INTEGER (Given)
@@ -110,25 +110,26 @@
       LOGICAL GRP1_CHKCC         ! See if a character is a control character
 
 *  Local Variables:
-      INTEGER COM                ! Index of the comment character
       CHARACTER COMC*1           ! Groups current omment character.
-      LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
-      LOGICAL EOF                ! Has end of file has been reached ?
       CHARACTER ESCC*1           ! The escape character
-      LOGICAL ESCOK              ! Is the escape character defined?
       CHARACTER FLAGC*1          ! Current flag character
-      LOGICAL FLAGOK             ! Is a flag character defined?
       CHARACTER GEXP*(GRP__SZNAM)! A group expression read from a file
+      CHARACTER KCLCC*1          ! Closing kernel delimiter character
+      CHARACTER KOPCC*1          ! Opening kernel delimiter character
+      CHARACTER LGEXP*(GRP__SZNAM)! Last times group expression 
+      CHARACTER LINE*(GRP__SZNAM)! A line of text read from the file
+      INTEGER COM                ! Index of the comment character
       INTEGER GF                 ! First free character in GEXP.
       INTEGER INDIND             ! Index within the FILES array
       INTEGER IOERR              ! Fortran IO status value
-      CHARACTER KCLCC*1          ! Closing kernel delimiter character
-      CHARACTER KOPCC*1          ! Opening kernel delimiter character
+      INTEGER TLEN               ! Used length of the group expression
+      LOGICAL COMOK              ! .TRUE. if COMC is not NULL.
+      LOGICAL EOF                ! Has end of file has been reached ?
+      LOGICAL ESCOK              ! Is the escape character defined?
+      LOGICAL FLAGOK             ! Is a flag character defined?
       LOGICAL KCLOK              ! Is closing kernel delimiter defined?
       LOGICAL KOPOK              ! Is opening kernel delimiter defined?
-      CHARACTER LGEXP*(GRP__SZNAM)! Last times group expression 
-      CHARACTER LINE*(GRP__SZNAM)! A line of text read from the file
-      INTEGER TLEN               ! Used length of the group expression
+      LOGICAL VERB               ! Are we in a verbatim section?
 *.
 
 *  Check inherited global status.
@@ -182,10 +183,18 @@
 *  Indicate that no flag character has yet been found.
       FLAG = .FALSE.
 
+*  Indicate that we are currently not in a verbatim section.
+      VERB = .FALSE.
+
 *  Loop round while text can be read from the file, and no error occurs.
       DO WHILE( LINE .NE. " " .OR.  .NOT. EOF .AND. 
      :          STATUS .EQ. SAI__OK )
-         GEXP( GF : ) = LINE
+
+*  Create a copy of the text read form the file in which any control
+*  characters within verbatim sections (delimited by "<!!" and !!>"
+*  strings) are preceeded by escape charaters. The copy is stored in
+*  GEXP, following any opening kernel delimiter.
+         CALL GRP1_VRBTM( SLOT, LINE, VERB, GEXP( GF : ), STATUS )
 
 *  If a comment character is defined...
          IF( COMOK ) THEN

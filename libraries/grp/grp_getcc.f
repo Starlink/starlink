@@ -165,6 +165,15 @@
      :                                                     .EQ. 1 ) THEN
                      CALL GRP1_CONC( SLOT, I, CC( NCC : NCC ), OK,
      :                               STATUS )
+
+*  Do not return the default internal escape character to the user.
+                     IF( NCC .EQ. GRP__PESCC .AND. OK .AND.
+     :                   CC( NCC : NCC ) .EQ. CHAR( GRP__DFESC ) ) THEN
+                        CALL GRP1_CONC( SLOT, GRP__PNULC, 
+     :                                  CC( NCC : NCC ), OK, STATUS )
+                        OK = .FALSE.
+                     END IF
+
                      NMATCH = NMATCH + 1
                   END IF
                END DO

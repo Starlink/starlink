@@ -169,4 +169,8 @@
       INTEGER GRP__SZWRD
       PARAMETER ( GRP__SZWRD = 12 )
 
+*  The integer ASCII value for the default escape character.
+      INTEGER GRP__DFESC
+      PARAMETER ( GRP__DFESC = 1 )
+
 *.

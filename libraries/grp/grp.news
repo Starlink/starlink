@@ -1,9 +1,10 @@
 1 GRP_library
                                              Expires: ???
 
-A new release (V3.0-3) of the GRP library is now available. It includes
+A new release (V3.1) of the GRP library is now available. It includes
 the following changes:
 
- - The maximum number of groups which can be active at any one time has
- been increased from 100 to 500.
+ - Facilities have been added to allow sections of a group expression to
+be interpreted in a verbatim manner (that is, ignoring all control
+characters).
 

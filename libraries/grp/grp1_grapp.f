@@ -92,26 +92,24 @@
       EXTERNAL GRP1_INIT         ! Initalise GRP common blocks.
 
 *  Local Variables:
-      LOGICAL AGAIN              ! May elements need further expansion?
+      CHARACTER GRPEXP*(GRP__SZGEX) ! Modified group expression
+      CHARACTER ELEM*(GRP__SZGEX)   ! Retrieved element
+      CHARACTER NEWEL*(GRP__SZGEX)  ! Edited element
       INTEGER BSIZE              ! Size of basis group
       INTEGER EDEP               ! Indirection depth of the element
       INTEGER EIFILE             ! Index of the indirection file name
-      CHARACTER ELEM*(GRP__SZGEX)! Retrieved element
       INTEGER EMODGP             ! Identifier for basis group 
       INTEGER EMODIN             ! Index into the group given by EMODGP
       INTEGER F                  ! First character checked.
       INTEGER FIRST              ! Index of 1st element just added
-      CHARACTER GRPEXP*(GRP__SZGEX)! Group exp. with enclosed NAME_TOKENs
       INTEGER I                  ! Loop count
       INTEGER II                 ! Loop count
       INTEGER INDEX              ! Index of next element to be stored
-      INTEGER K2                 ! Index of last character in kernel
       INTEGER K1                 ! Index of 1st character in kernel
+      INTEGER K2                 ! Index of last character in kernel
       INTEGER L                  ! Last character checked.
       INTEGER LAST               ! Index of last element just added
       INTEGER NADDED             ! No. of elements added to the group
-      LOGICAL NAME               ! Is the kernel a single literal name?
-      CHARACTER NEWEL*(GRP__SZGEX)! Edited element
       INTEGER NEXT               ! Index of delimiter starting next element
       INTEGER P1                 ! Start of prefix
       INTEGER P2                 ! End of prefix
@@ -121,7 +119,10 @@
       INTEGER START              ! Index of first character to be checked
       INTEGER T1                 ! Start of substitution string
       INTEGER T2                 ! End of substitution string
+      LOGICAL AGAIN              ! May elements need further expansion?
+      LOGICAL NAME               ! Is the kernel a single literal name?
       LOGICAL TFLAG              ! Was a flag found in an indirection file?
+      LOGICAL VERB               ! Are we now in a verbatim section?
 *.
 
 *  Check inherited global status.
@@ -144,8 +145,12 @@
          BSIZE = 0
       END IF
 
-*  Take a local copy of the supplied group expression.
-      GRPEXP = GEXP
+*  Create a copy of the supplied group expression in which any control
+*  characters within verbatim sections (delimited by "<!!" and !!>"
+*  strings) are preceeded by escape charaters. The copy is stored in
+*  GRPEXP.
+      VERB = .FALSE.
+      CALL GRP1_VRBTM( SLOT2, GEXP, VERB, GRPEXP, STATUS )
 
 *  See if the last element in the supplied group expression is flagged.
 *  If so the flag character is removed from the element.
@@ -171,15 +176,15 @@
 *  Locate the end of the next element within the group expression
 *  (commencing at the character pointed to by START), and find the
 *  start and end of the inner-most kernel within it.
-         CALL GRP1_FKERN( SLOT2, START, GRPEXP, NEXT, P1, P2, K1,
-     :                    K2, S1, S2, T1, T2, F, L, STATUS )
+         CALL GRP1_FKERN( SLOT2, START, GRPEXP, NEXT, P1, P2, 
+     :                    K1, K2, S1, S2, T1, T2, F, L, STATUS )
 
 *  Expand the kernel into a list of elements, storing the list at the
 *  end of the group. The number of names added to the end of the group
 *  is returned in NADDED.
-         CALL GRP1_EXPAN( GRPEXP, K1, K2, BSIZE, SLOT1, SLOT2, INDEX,
-     :                    0, 0, GRP__NOID, 0, NADDED, NAME, TFLAG,
-     :                    STATUS )
+         CALL GRP1_EXPAN( GRPEXP, K1, K2, BSIZE, SLOT1, SLOT2, 
+     :                    INDEX, 0, 0, GRP__NOID, 0, NADDED, NAME, 
+     :                    TFLAG, STATUS )
 
 *  If this is the last element in the group expression, and if no 
 *  flag character has already been found, indicate that the group 
@@ -192,8 +197,8 @@
 
 *  Modify each of the elements in the expanded list to include the
 *  characters which specify any editing to be done on the name.
-         CALL GRP1_INCED( SLOT2, INDEX, INDEX + NADDED - 1, GRPEXP,
-     :                    START, K1, K2, NEXT, STATUS )
+         CALL GRP1_INCED( SLOT2, INDEX, INDEX + NADDED - 1, 
+     :                    GRPEXP, START, K1, K2, NEXT, STATUS )
 
 *  Update the index of the next available slot in the group.   
          INDEX = INDEX + NADDED

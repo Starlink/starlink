@@ -1,4 +1,4 @@
-      SUBROUTINE GRP1_CONC( SLOT, INDEX, CHAR, OK, STATUS )
+      SUBROUTINE GRP1_CONC( SLOT, INDEX, CH, OK, STATUS )
 *+
 *  Name:
 *     GRP1_CONC
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL GRP1_CONC( SLOT, INDEX, CHAR, OK, STATUS )
+*     CALL GRP1_CONC( SLOT, INDEX, CH, OK, STATUS )
 
 *  Description:
 *     Each group has associated with it several "control characters"
@@ -36,7 +36,7 @@
 *        CMN_CHAR( SLOT ) held in common. The calling routine should
 *        specify one of the parameters GRP__PxxxC (see GRP_CONST) for
 *        this argument.
-*     CHAR = CHARACTER * ( * ) (Returned)
+*     CH = CHARACTER * ( * ) (Returned)
 *        The required control character is returned as the first
 *        character in this string. The rest of the string is unchanged.
 *     OK = LOGICAL (Returned)
@@ -82,7 +82,7 @@
       INTEGER INDEX
 
 *  Arguments Returned:
-      CHARACTER CHAR*(*)
+      CHARACTER CH*(*)
       LOGICAL OK
 
 *  Status:
@@ -106,16 +106,23 @@
 
 *  Otherwise, extract the required control character.
       ELSE
-         CHAR( 1 : 1 ) = CMN_CHARS( SLOT )( INDEX : INDEX )
+         CH( 1 : 1 ) = CMN_CHARS( SLOT )( INDEX : INDEX )
 
 *  Compare it against the NULL control character.
-         IF( CHAR( 1 : 1 ) .EQ.
+         IF( CH( 1 : 1 ) .EQ.
      :       CMN_CHARS( SLOT )( GRP__PNULC : GRP__PNULC ) ) THEN
             OK = .FALSE.
          ELSE
             OK = .TRUE.
          END IF
 
+      END IF
+
+*  If the escape character has been requested, but no escape character is
+*  defined, use a "safe" value.
+      IF( INDEX .EQ. GRP__PESCC .AND. .NOT. OK ) THEN
+         CH( 1 : 1 ) = CHAR( GRP__DFESC )
+         OK = .TRUE.
       END IF
 
       END

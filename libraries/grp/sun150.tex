@@ -9,11 +9,11 @@
 \newcommand{\stardocsource}    {sun150.5}
 \newcommand{\stardocnumber}    {150.5}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {13th July 2001}
+\newcommand{\stardocdate}      {30th August 2001}
 \newcommand{\stardoctitle}     {GRP \\ [1ex]
                                 Routines for Managing Groups of\\
                                 Objects}
-\newcommand{\stardocversion}   {Version 3.0-3}
+\newcommand{\stardocversion}   {Version 3.1}
 \newcommand{\stardocmanual}    {Programmer's Manual}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -1187,6 +1187,10 @@ expression was:
 \normalsize
 
 the string ``\verb+\* | A+'' would be returned to the application.
+
+All escape characters within a section of a group expression can be
+ignored by using the special strings ``<!!'' and ``!!>'' to mark the
+start and end of the section.
 
 \subsection{The Order of Names Within a Group}
 Names are stored within a group in the order in which they are specified in the
