@@ -314,7 +314,7 @@
      :           BOL_DEC_END(N_FILE), DATA_PTR(N_FILE), 
      :           DATA_END(N_FILE), VARIANCE_PTR(N_FILE),
      :           VARIANCE_END(N_FILE), QMF, QUALITY_PTR(N_FILE),
-     :           QUALITY_END(N_FILE), QBITS, INT_LIST, STATUS)
+     :           QUALITY_END(N_FILE), QBITS(N_FILE), INT_LIST, STATUS)
 
             CALL MSG_BLANK(STATUS)
 
