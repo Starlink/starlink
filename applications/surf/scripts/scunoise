@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.18  2002/03/22 01:47:51  timj
+#        support bgcolor
+#
 #        Revision 1.17  2002/03/22 01:09:38  timj
 #        - work around bug in Tk 800.024
 #        - Change default noise level
@@ -341,6 +344,7 @@ sub obsdir_panel {
     $OM = $OP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
+		       -background => $bbg,
 		       -foreground => 'Indianred',
 		       -height     => 4,
 		       -width      => 30,
@@ -388,6 +392,7 @@ sub obsdir_panel {
     my $OT = $OP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
+		       -background => $bbg,
 		       -foreground => 'midnightblue',
                        -height     => 5,
                        -width      => 30,
@@ -647,6 +652,7 @@ sub control_panel {
     my $CT = $CP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
+		       -background => $bbg,
 		       -foreground => 'midnightblue',
                        -height     => 3,
                        -width      => 30,
