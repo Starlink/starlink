@@ -282,11 +282,11 @@
   There are several distinct types of links:
 
   * Internal to the document
-    Element REF: EMPTY.  Can refer to sections, tables, and possibly
+    Element REF.  Can refer to sections, tables, and possibly
     to paragraphs.
 
   * To other Starlink documents
-    Element DOCXREF: EMPTY.
+    Element DOCXREF.
 
   * To URLs
     Element WEBREF: contains self anchor, just like HTML A element.
@@ -294,7 +294,7 @@
 -->
 
 
-<!-- REF element is for internal cross-references.  It's EMPTY.
+<!-- REF element is for internal cross-references.  
      For a detailed discussion of how to implement this, see Eliot
      Kimber's 9 March 1998 posting to comp.text.sgml.
 
@@ -304,7 +304,7 @@
      guarantee that this is precisely what the stylesheets do (check
      them), but this at least documents the intent.
      -->
-<!ELEMENT ref %MXO; (#PCDATA)>
+<!ELEMENT ref %MXO; (%simpletext;)*>
 		<!-- Internal cross reference, with effective content
 		     to be title of target --> 
 <!ATTLIST ref
@@ -403,7 +403,7 @@
      The link's effective content should be whatever corresponds to
      the title of the object addressed by LOC.  
      -->
-<!ELEMENT docxref %MXO; (#PCDATA)>
+<!ELEMENT docxref %MXO; (%simpletext;)*>
 			<!-- References to elements and data within other
 			     Starlink documents -->
 <!ATTLIST docxref
