@@ -247,6 +247,8 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
      \\global\\@eqcnt\\z@\\cr}
 % Make \\nonumber a no-op, so it can't cause confusion
 \\let\\nonumber\\relax
+<!-- Other bits and bobs -->
+\\def\\Underscore{\\ifmmode _\\else\\texttt{\\char"5F}\\fi}
 \\def\\Eqnref#1{Eqn.~(#1)}
 %\\catcode`\\^^M=10 % make end-of-line a space
 \\makeatother
