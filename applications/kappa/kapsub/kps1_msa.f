@@ -56,8 +56,7 @@
 
 *  History:
 *     4-DEC-2001 (MBT):
-
-*.
+*-
 
 *  Type Definitions:
       IMPLICIT NONE              ! No implicit typing
