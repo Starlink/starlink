@@ -166,8 +166,8 @@
 
 /* Define HAVE_GETOPT if the getopt function (and thus, which is more
  * important to us, the getopt globals, optarg, optind, opterr and
- * optopt) is defined by the system.  Define as 0 if they should be
- * defined instead by getopt_long.c
+ * optopt) is defined by the system.  Leave undefined if they should be
+ * defined here instead.
  */
 #ifndef HAVE_GETOPT
 
