@@ -43,6 +43,8 @@
 *  History:
 *     18-AUG-1992 (DSB):
 *        Original version
+*     9-FEB-2001 (DSB):
+*        Corrected use of CMN_SIZE to CMN_GSIZE (DSB).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -62,8 +64,10 @@
       INCLUDE 'GRP_COM'          ! GRP common blocks.
 *        CMN_NMPNT( GRP__MAXG ) = INTEGER (Read)
 *           Pointers to the mapped NAMES array of each group.
-*        CMN_SIZE( GRP__MAXG ) = INTEGER (Read)
-*           The size of the mapped NAMES array of each group.
+*        CMN_GSIZE( GRP__MAXG ) = INTEGER (Read)
+*           The number of values stored in the mapped NAMES array 
+*           for each group (this may be less than the total size of the
+*           array).
 *        CMN_UPPER( GRP__MAXG ) = LOGICAL (Read)
 *           If true, then all names in the group should be converted
 *           to upper case before being used. Otherwise, they are left
@@ -107,7 +111,7 @@
 *  length of each character string in the mapped NAMES array, and is
 *  required by UNIX. There is no corresponding dummy argument in the
 *  code for GRP1_FIND.
-      CALL GRP1_FIND( CMN_UPPER( SLOT ), CMN_SIZE( SLOT ), START,
+      CALL GRP1_FIND( CMN_UPPER( SLOT ), CMN_GSIZE( SLOT ), START,
      :                %VAL( CMN_NMPNT( SLOT ) ), NAME, INDEX, STATUS,
      :                %VAL( GRP__SZNAM ) )
 
