@@ -71,7 +71,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
-      INCLUDE 'DCV_EXT'
+      INCLUDE 'DCV_FUN'          ! Generic type conversion functions
       EXTERNAL PDA_RNNOR
       REAL PDA_RNNOR             ! The normal random number routine
 
