@@ -140,8 +140,6 @@
 #           Portable help.
 #        idi
 #           Image-display Interface.
-#        ira
-#           IRAS90 Astrometry routines.
 #        mag
 #           Magnetic-tape routines.
 #        memsys3
@@ -224,6 +222,8 @@
 #        Add links to lookup tables for IRAF
 #     2-JUN-1998 (DSB):
 #        Version 0.12. Various bug fixes...
+#     2-SEP-1998 (DSB):
+#        Added internal IRA library.
 #     {note_further_changes_here}
 #
 #  Bugs:
@@ -330,7 +330,6 @@ STAR_INC = $(STARLINK)/include
 STAR_LIB = $(STARLINK)/lib
 STAR_SHARE = $(STARLINK)/share
 STAR_IRAF = $(STARLINK)/iraf
-IRAS_LIB = $(STARLINK)/iras90
 
 #  Pathname of the directory containing the IRAF inter-operability
 #  infrastructure
@@ -420,7 +419,7 @@ PKG_VERS = 0.12
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-               aif_sub.tar fts_sub.tar irm_sub.tar kapgen_sub.tar \
+               aif_sub.tar fts_sub.tar irm_sub.tar ira_sub.tar kapgen_sub.tar \
                kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
@@ -460,8 +459,8 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = c1_com me_com irm_com ctm_com ctm_par fts_par \
-                   hlpcmd irg_err irg_err.h sft_com
+PRIVATE_INCLUDES = c1_com me_com irm_com ira_par ira_com ira_err ctm_com \
+                   ctm_par fts_par hlpcmd irg_err irg_err.h sft_com
 
 #  List of external include files. These are files which are required
 #  in order to build the package but form part of other, externally
@@ -483,7 +482,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
 #  routines and the main routine, which are treated separately).
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) \
-             $(IRM_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
+             $(IRM_F_ROUTINES) $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
              $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) \
@@ -507,6 +506,18 @@ fts1_sdscf.f fts1_skip.f fts1_tread.f fts1_ukeyc.f fts1_ukeyd.f \
 fts1_ukeyi.f fts1_ukeyl.f fts1_ukeyr.f fts1_vhead.f fts1_wcsdf.f \
 fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
 fts1_ftwcs.f fts1_wcsim.f fts1_fndfs.f fts1_wcsax.f fts1_wcsut.f
+
+IRA_F_ROUTINES = \
+ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
+ira1_asset.f ira1_check.f ira1_chprj.f ira1_chscs.f ira1_decod.f \
+ira1_ecec.f ira1_eqecl.f ira1_eqeq.f ira1_eqgal.f ira1_fpars.f \
+ira1_galec.f ira1_getid.f ira1_gnom.f ira1_iconv.f ira1_ictd1.f \
+ira1_idtc1.f ira1_igtc1.f ira1_iprj.f ira1_iscnm.f ira1_isscs.f \
+ira1_lamb.f ira1_orth.f ira1_prec.f ira_annul.f ira_close.f ira_convt.f \
+ira_creat.f ira_ctod.f ira_ctod1.f ira_dtoc.f ira_dtoc1.f ira_exprt.f \
+ira_find.f ira_getco.f ira_geteq.f ira_gtco1.f ira_gtscs.f ira_init.f \
+ira_iproj.f ira_iscs.f ira_locat.f ira_norm.f ira_seteq.f ira_trans.f \
+ira_write.f
 
 IRM_F_ROUTINES = \
 irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
@@ -950,7 +961,8 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
-                FTS_PAR HLPCMD IRG_ERR IRM_COM SFT_COM 
+                FTS_PAR HLPCMD IRG_ERR IRM_COM SFT_COM IRA_COM IRA_PAR \
+                IRA_ERR
 
 #
 #  Rules to set up links to locate each of the above include files.
@@ -971,7 +983,9 @@ GRP_PAR:     $(STAR_INC)/grp_par;     $(LINK) $? $@
 HLPCMD:      hlpcmd;                  $(LINK) $? $@
 IDI_ERR:     $(STAR_INC)/idi_err;     $(LINK) $? $@
 IDI_PAR:     $(STAR_INC)/idi_par;     $(LINK) $? $@
-IRA_PAR:     $(IRAS_LIB)/ira_par;     $(LINK) $? $@
+IRA_COM:     ira_com;                 $(LINK) $? $@
+IRA_ERR:     ira_err;                 $(LINK) $? $@
+IRA_PAR:     ira_par;                 $(LINK) $? $@
 IRG_ERR:     irg_err;                 $(LINK) $? $@
 IRM_COM:     irm_com;                 $(LINK) $? $@
 MAG_ERR:     $(STAR_INC)/mag_err;     $(LINK) $? $@
@@ -1028,6 +1042,11 @@ $(AIF_F_ROUTINES) :
 
 $(FITS_F_ROUTINES) $(FITS_C_ROUTINES):
 	$(TAR_OUT) fts_sub.tar $@
+	@ if test -f $@; then :;\
+           else echo $@ is not in the tar file; exit 1; fi
+
+$(IRA_F_ROUTINES) :
+	$(TAR_OUT) ira_sub.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
@@ -1094,13 +1113,15 @@ $(IRAF_DEMO) :
 #  for performing the compilations.
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) \
-               $(IRM_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
+               $(IRA_OBJECT_FILES) $(IRM_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
                $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
 AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o) 
 
 FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
+
+IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o)
 
 IRM_OBJECT_FILES = $(IRM_F_ROUTINES:.f=.o)
 
@@ -1126,7 +1147,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 
 OBJECT_LIBRARIES = \
 libkappa.a libkapview.a libndfpack.a \
-libkapsub.a libfits.a libkapgen.a libirm.a libaif.a 
+libkapsub.a libfits.a libkapgen.a libirm.a libaif.a libira.a
 
 #
 libaif.a: $(AIF_OBJECT_FILES)
@@ -1134,6 +1155,10 @@ libaif.a: $(AIF_OBJECT_FILES)
 	$(RANLIB) $@
 #
 libfits.a: $(FITS_OBJECT_FILES)
+	$(AR_IN) $@ $?
+	$(RANLIB) $@
+#
+libira.a: $(IRA_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1205,7 +1230,7 @@ $(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
 
 $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
-	         lsfun1.o $(OBJECT_LIBRARIES) $(IRAS_LIB)/libira.a \
+	         lsfun1.o $(OBJECT_LIBRARIES) \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)`
 
 #  List of the interface files to be built and rules for compiling them.
@@ -1293,7 +1318,7 @@ $(INSTALL_DIRS):
 
 archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar irm_sub.tar \
          kapgen_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
-         ndfpack_sub.tar $(PKG_NAME)_ifls.tar \
+         ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar \
          $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
 #
 	@ echo "   Build of the $(PACK_NAME) tar files is complete."
@@ -2287,6 +2312,9 @@ fts_sub.tar:
 
 irm_sub.tar:
 	$(TAR_IN) irm_sub.tar $(IRM_F_ROUTINES)
+
+ira_sub.tar:
+	$(TAR_IN) ira_sub.tar $(IRA_F_ROUTINES)
 
 kapgen_sub.tar:
 	$(TAR_IN) kapgen_sub.tar $(KAPGEN_F_ROUTINES) \
