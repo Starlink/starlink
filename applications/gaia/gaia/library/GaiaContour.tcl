@@ -428,11 +428,9 @@ itcl::class gaia::GaiaContour {
 
          #  Get the levels.
          set levels [get_levels_]
-         puts "levels = $levels"
 
          #  Get the attributes.
          set atts [get_attributes_]
-         puts "atts = $atts"
 
          #  Set the tag used to control clear etc.
          $itk_option(-rtdimage) configure -grid_tag $itk_option(-contour_tag)
@@ -455,7 +453,7 @@ itcl::class gaia::GaiaContour {
       if { $levels != {} } {
          return $levels
       } else {
-         error "You must give some valid contour levels"
+         warning_dialog "You must give some valid contour levels"
          return {}
       }
    }
@@ -464,10 +462,13 @@ itcl::class gaia::GaiaContour {
    protected method get_attributes_ {} {
       set atts {}
       for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
-         set colour [$itk_component(colour$i) get]
-         set colour $colindex_($colour)
-         set width [expr [$itk_component(width$i) get]*0.005]
-         lappend atts "colour(curve)=$colour,width(curve)=$width"
+         set value [$itk_component(value$i) get]
+         if { $value != {} } {
+            set colour [$itk_component(colour$i) get]
+            set colour $colindex_($colour)
+            set width [expr [$itk_component(width$i) get]*0.005]
+            lappend atts "colour(curve)=$colour,width(curve)=$width"
+         }
       }
       return $atts
    }
@@ -564,9 +565,9 @@ itcl::class gaia::GaiaContour {
 
    #  Names of the possible colours and their AST index equivalents.
    protected variable colourmap_ {
-      0 "#fff" 1 "#000" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
+      0 "#fff" 2 "#f00" 3 "#0f0" 4 "#00f" 5 "#0ff" 6 "#f0f"
       7 "#ff0" 8 "#f80" 9 "#8f0" 10 "#0f8" 11 "#08f" 12 "#80f"
-      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4"}
+      13 "#f08" 14 "#512751275127" 15 "#a8b4a8b4a8b4" 1 "#000" }
 
    #  Colours-v-indices (set up from colourmap_) and default colours.
    protected variable colindex_

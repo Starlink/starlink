@@ -129,13 +129,9 @@ itcl::class gaia::GaiaForeignExec {
    #  -----------
    destructor  {
 
-      #  Delete scrollbox if it exists.
-      if { [winfo exists $Scrollbox_] } {
+      #  Delete widgets created here (Top_ is set as well as Scrollbox_).
+      if { [winfo exists $Scrollbox_] && [winfo exists $Top_] } {
          destroy $Scrollbox
-      }
-
-      #  And top-level widget.
-      if { [winfo exists $Top_] } {
          destroy $Top_
       }
    }
@@ -186,6 +182,8 @@ itcl::class gaia::GaiaForeignExec {
 
          #  Run the jobs with the current arguments.
          set forret_($this) {}
+         set forerr_($this) {}
+         set forout_($this) {}
          catch {eval "blt::bgexec \[scope forret_($this)\] \
                          -keepnewline 1 \
                          -error \[scope forerr_($this)\] \
@@ -231,6 +229,7 @@ itcl::class gaia::GaiaForeignExec {
       } else {
          set output $forout_($this)
       }
+      set forout_($this) {}
 
       #  Write output from task into window if required.
       if { $show_output_ } {

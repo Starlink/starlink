@@ -3312,7 +3312,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
   if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
 
     //  Current frame is the GRID coordinates of the image to be
-    //  contoured. XXX - second image???
+    //  contoured.
     astSetI( wcs, "Current", AST__BASE );
 
     //  Create an AstPlot that incorporates an additional FrameSet

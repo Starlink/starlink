@@ -78,6 +78,8 @@
 #define CMDLEN 512               /* Maximum length of Tcl message string */
 #define TAGLEN 32                /* Maximum length of a canvas tag */
 #define WIDLEN 132               /* Maximum length of widget name */
+#define MAXSEG 8                 /* Maximum number of segments in one
+                                    canvas item */ 
 
 /* Local Macros */
 /* ============ */
@@ -107,6 +109,7 @@ static int NewSegment = 1;         /* True when a new line segment is
 static int HaveScale = 0;          /* True after pixel scale is
                                     * initialised */
 static float Scale = 1.0;          /* Pixels per millimetre */
+static int Plotted = 0;            /* Number of segments plotted */
 
 /* Structure to contain the current graphics configuration. */
 typedef struct configInfo {
@@ -384,7 +387,7 @@ int astGLine( int n, const float *x, const float *y ) {
   int j;
   int need;
   int used;
-
+  
   if ( Interp == NULL ) {
     astError( AST__GRFER, "astGLine: Tk graphics system not initialised\n");
     return 0;
@@ -414,6 +417,7 @@ int astGLine( int n, const float *x, const float *y ) {
     /*  If using an existing segment then add these new values,
         otherwise create a new segment and record its tag. */
     if ( NewSegment ) {
+      Plotted = 0;
 
       /*  Finish the command by adding the canvas name and all the
           required options. */
@@ -456,6 +460,13 @@ int astGLine( int n, const float *x, const float *y ) {
 
     }
     free( (void *) coords );
+  }
+
+  /*  If number of segments exceeds the maximum number allowed per
+      item, then start a new Segment next time */
+  Plotted += n;
+  if ( Plotted > MAXSEG ) {
+    NewSegment = 1;
   }
   return 1;
 }
