@@ -26,7 +26,7 @@
       PARAMETER (TAB=CHAR(9),BLANK=' ')
 *    Local variables :
       INTEGER CF,CL
-      INTEGER IC
+      INTEGER IC,JC
       INTEGER NB
       INTEGER POS(10),SP
 *-
@@ -47,8 +47,12 @@
         NB=0
         DO IC=CF,CL
           IF (RADEC(IC:IC).EQ.TAB.OR.RADEC(IC:IC).EQ.BLANK) THEN
-            NB=NB+1
-            POS(NB)=IC
+            JC=IC-1
+* multiple blanks only count as one
+            IF (RADEC(JC:JC).NE.TAB.AND.RADEC(JC:JC).NE.BLANK) THEN
+              NB=NB+1
+              POS(NB)=IC
+            ENDIF
           ENDIF
         ENDDO
 
