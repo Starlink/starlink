@@ -41,6 +41,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.6  1998/03/04 05:45:39  timj
+*     Initialise pointers
+*
 *     Revision 1.5  1997/11/13 19:14:38  timj
 *     Remove unwanted SCULIB_BITOFF declaration.
 *
@@ -109,6 +112,8 @@
       IF (STATUS .NE. SAI__OK) RETURN
 
 *     Generate some scratch memory for sort
+      SPNTR = 0
+      SPNTR_END = 0
       CALL SCULIB_MALLOC(N_POS * VAL__NBR, SPNTR, SPNTR_END, STATUS)
 
 *  Find the statistics (Mean and standard deviation
