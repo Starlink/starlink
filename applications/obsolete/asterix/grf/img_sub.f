@@ -3508,7 +3508,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+ IMG_SETELLIPSE
-	SUBROUTINE IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,EXCLUDE,ANGLE
+	SUBROUTINE IMG_SETELLIPSE(XC,YC,MAJOR,MINOR,EXCLUDE,ANGLE,
      :                                                      STATUS)
 
         IMPLICIT NONE
@@ -3538,7 +3538,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         ENDIF
 
 *  get range of pixels containing slice
-        CALL IMG_SLICETOBOX(XC,YC,ANGLE,LENGTH,WIDTH,I1,I2,J1,J2,
+        CALL IMG_ELLIPSETOBOX(XC,YC,MAJOR,MINOR,ANGLE,I1,I2,J1,J2,
      :                                                     STATUS)
 
 *  set region mask
@@ -4478,6 +4478,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       REAL XOEND,YOEND
       REAL XWID,YWID
       REAL A,ASQ,B,BSQ,C,CSQ
+      REAL ALPHA
       LOGICAL LEFT,RIGHT
 *-
 
@@ -4550,7 +4551,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
         ENDIF
 
 *  plot ellipse
-        CALL IMG_ELLIPSE(XC,YC,MAJOR,MINOR,ANGLE,STATUS)
+        CALL IMG_ELLIPSE(XCENT,YCENT,MAJOR,MINOR,ANGLE,STATUS)
 
       ENDIF
 
