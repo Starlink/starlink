@@ -171,9 +171,11 @@
 *        the previously displayed image, contour map, etc. The arrows are
 *        drawn at the top left of the picture. The current values for all
 *        other parameters are used.
-*     drawnorth blank origin="0.5,0.5" 
+*     drawnorth blank origin="0.5,0.5" style='TextBackColour=clear'
 *        As above, but blanks out the picture area behind the arrows, and 
-*        positions them in the middle of the underlying DATA picture.
+*        positions them in the middle of the underlying DATA picture. In
+*        addition, the text labels are drawn with a clear background so
+*        that the underlying image can seen around the text. 
 *     drawnorth blank blanksize=1.2 oframe=pixel origin="150,250" 
 *        As above, but positions the arrows at pixel co-ordinates
 *        (150,250), and blanks out a larger area around the arrows.

@@ -40,6 +40,8 @@
 *  History:
 *     19-AUG-1998 (DSB):
 *        Original version.
+*     22-AUG-2002 (DSB):
+*        Report error if no overlap with current picture.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -100,6 +102,15 @@
       ELSE
          LY1 = MIN( WY1, MAX( WY2, Y1 ) )
          LY2 = MIN( WY1, MAX( WY2, Y2 ) )
+      END IF
+
+*  Check the requested window overlaps the current window. Report an 
+*  error otherwise.
+      IF( LX1 .EQ. LX2 .OR. LY1 .EQ. LY2 ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'KPG1_PGCUT_2', 'The requested graphics fall '//
+     :                 'entirely outside the current picture.', STATUS )
+         GO TO 999
       END IF
 
 *  Get the current extent of the PGPLOT viewport, in NDC.
