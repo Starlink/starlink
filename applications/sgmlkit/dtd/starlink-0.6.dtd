@@ -29,34 +29,44 @@
 <!ENTITY % XML.Variant "IGNORE">
 
 <![ %XML.Variant; [
-  <!ENTITY % Full.SGML "IGNORE">
+  <!ENTITY % Full.SGML.Only "IGNORE">
   <!ENTITY % MXX "">
   <!ENTITY % MXO "">
   <!ENTITY % MOO "">
-  <!ENTITY % CATSYSID "">
   <!-- A couple of entities for syntax removed from SGML -->
   <!ENTITY % CONREF "#IMPLIED">
   <!ENTITY % CURRENT "#REQUIRED">
 ]]>
-<!ENTITY % Full.SGML "INCLUDE">
+<!ENTITY % Full.SGML.Only "INCLUDE">
 <!ENTITY % MXX "- -">
 <!ENTITY % MXO "- O">
 <!ENTITY % MOO "O O">
-<!ENTITY % CATSYSID "--">
 <!ENTITY % CONREF "#CONREF">
 <!ENTITY % CURRENT "#CURRENT">
 
 <!-- XML requires that all external entities have a SYSTEM identifier.
-     The following DTD declares empty dummy identifiers.
+     All public IDs in this file which are not protected by a
+     Full.SGML.Only marked section, should therefore have suitable
+     system identifiers.  The script add-sysids.sed can add these.
+
+     That script searches for public identifiers, followed by a string
+     on the next line (delimited by " or ').  It replaces that next
+     line with a URL which points to a catalogue server, and which
+     contains an HTTP-escaped and normalised version of the public
+     identifier.  
+
+     The public identifier must be on a single line, and the string
+     must be on the immediately following line.  That line is replaced
+     completely, so it mustn't have anything else on the line.
      -->
 
 
 <!--========== Architectures ==========-->
-<!-- Bracket all the HyTime stuff within a %Full.SGML marked section.
+<!-- Bracket all the HyTime stuff within a %Full.SGML.Only marked section.
      I imagine it's possible to declare architectures within XML
      _somehow_, but I don't want to worry about that just now.
      -->
-<![ %Full.SGML; [
+<![ %Full.SGML.Only; [
 <!-- The HyTime standard is ISO 10744:1997, referred to as simply
      `HyTime' below.
      -->
@@ -167,14 +177,20 @@
 <!ENTITY % notations-read "INCLUDE">
 <![ %notations-read; [
 
+<![ %Full.SGML.Only; [
 <!ENTITY % notations-subset 
 	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Notation%20Declarations//EN" %CATSYSID;
+	>
+]]>
+<!ENTITY % notations-subset 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Notation%20Declarations//EN"
 	>
 %notations-subset;
 
 ]]>
 
+<![ %Full.SGML.Only; [
 <!-- First declare the DSSSL notation, so we can refer to SDQL queries.
      (this comes from dsssl/style-sheet.dtd).
      This doesn't live with the notations above, because it's used
@@ -182,11 +198,10 @@
      -->
 <!NOTATION DSSSL
 	PUBLIC "ISO/IEC 10179:1996//NOTATION DSSSL Architecture Definition Document//EN" 
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/ISO/IEC%2010179:1996//NOTATION%20DSSSL%20Architecture%20Definition%20Document//EN" %CATSYSID;
 	>
 <!-- A document architecture conforming to the
      Architectural Form Definition Requirements of ISO/IEC 10744. -->
-
+]]>
 
 <!--========== Parameter entities for configuration ==========-->
 <!ENTITY % DocClass "SUN">
@@ -291,9 +306,14 @@
      I don't believe this is the best way to go about this, but I
      _cannot_ work out a better one.
      -->
+<![ %Full.SGML.Only; [
 <!ENTITY starlink.decl 
 	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//TEXT%20Starlink%20Declaration//EN" %CATSYSID;
+	>
+]]>
+<!ENTITY starlink.decl 
+	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//TEXT%20Starlink%20Declaration//EN"
 	>
 
 
@@ -313,40 +333,47 @@
 <!ENTITY % LaTeX.entities 'IGNORE'>
 <!ENTITY % HTML.entities 'IGNORE'>
 
+<![ %Full.SGML.Only; [
 <![ %LaTeX.entities; [
 <!ENTITY % Additional.Char.Ents
 	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//LATEX"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ENTITIES%20Additional%20entities//EN//LATEX" %CATSYSID;
 	>
 <!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//LATEX"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/ISO%208879:1986//ENTITIES%20Added%20Latin%201//EN//LATEX" %CATSYSID;
 	>
 ]]>
 <![ %HTML.entities; [
 <!ENTITY % Additional.Char.Ents
 	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//HTML"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ENTITIES%20Additional%20entities//EN//HTML" %CATSYSID;
 	>
 <!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//HTML"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/ISO%208879:1986//ENTITIES%20Added%20Latin%201//EN//HTML" %CATSYSID;
 	>
 ]]>
 <!ENTITY % Additional.Char.Ents
 	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//PLAIN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ENTITIES%20Additional%20entities//EN//PLAIN" %CATSYSID;
 	>
 <!ENTITY % ISOents
 	PUBLIC  "ISO 8879:1986//ENTITIES Added Latin 1//EN//PLAIN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/ISO%208879:1986//ENTITIES%20Added%20Latin%201//EN//PLAIN" %CATSYSID;
+	>
+]]>
+
+<!-- Finally, the XML versions -->
+<!ENTITY % ISOents
+	PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//Unicode"
+	"http://goedel.astro.gla.ac.uk/catalogue/public/ISO%208879:1986//ENTITIES%20Added%20Latin%201//EN//Unicode"
+	>
+<!-- Most of these `additional' entities are selections from the ISO set. -->
+<!ENTITY % Additional.Char.Ents
+	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//Unicode"
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ENTITIES%20Additional%20entities//EN//Unicode"
 	>
 
 %Additional.Char.Ents;
 %ISOents;
 
 
-<![ %Full.SGML; [
+<![ %Full.SGML.Only; [
 <!--======== Shortrefs ==========-->
 <!-- Have double-dash as a shortref for &endash, but don't define a
      separate shortref for emdash.  This way, we could switch between
@@ -429,9 +456,14 @@
 <!ENTITY % additional.structuring "| tabular">
 <!ENTITY % additional.references  "| citation">
 
+<![ %Full.SGML.Only; [
 <!ENTITY % paragraph.elements 
 	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Paragraph%20Elements%200.6//EN" %CATSYSID;
+	>
+]]>
+<!ENTITY % paragraph.elements 
+	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN"
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Paragraph%20Elements%200.6//EN"
 	>
 %paragraph.elements;
 
@@ -880,13 +912,17 @@
 <!ENTITY % tbl.table.name 'tabular'>
 <!ENTITY % tbl.table-titles.mdl ''>
 <!ENTITY % tbl.entry.mdl '(%phrase;)*'>
-<!--
+<![ %Full.SGML.Only; [
+<!ENTITY % calstbls 
+	PUBLIC "-//OASIS//DTD Exchange Table Model 19960430//EN"
+	>
+]]>
 <!ENTITY % calstbls 
 	PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN"
-	%CATSYSID; "http://goedel.astro.gla.ac.uk/catalogue/public/-//OASIS//DTD%20XML%20Exchange%20Table%20Model%2019990315//EN" %CATSYSID;
+	"http://goedel.astro.gla.ac.uk/catalogue/public/-//OASIS//DTD%20XML%20Exchange%20Table%20Model%2019990315//EN"
 	>
 %calstbls;
--->
+
 
 <!-- The FIGURE element contains a sequence of _alternatives_ for the
      figure's content.  The application may choose any one of these
