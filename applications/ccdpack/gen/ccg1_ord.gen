@@ -20,9 +20,10 @@
 *     value, this routine will generate a new array BARR2 of type 
 *     <COMM> which corresponds in the same way to a given
 *     group AGRP2.
-*     So if AGRP1 consists of the names AX, AY, AZ; BGRP1 consists
+*
+*     So if AGRP1 consists of the names AX, AY, AZ; BARR1 consists
 *     of the values 1, 2, 3; and AGRP2 consists of the name AY, a
-*     new group BARR2 will be created containing the single element 2.
+*     single element 2 will be written into the output array BARR2.
 
 *  Arguments:
 *     AGRP1 = INTEGER (Given)
@@ -32,7 +33,7 @@
 *        number of elements as the size of group AGRP1.
 *     AGRP2 = INTEGER (Given)
 *        GRP identifier of the A-type actual group.
-*     BGRP2( * ) = <COMM> (Returned)
+*     BARR2( * ) = <COMM> (Returned)
 *        The B-type actual array, constructed by this routine.  It will
 *        have the same number of elements as the size of group AGRP2.
 *     STATUS = INTEGER (Given and Returned)
@@ -56,6 +57,8 @@
 *  History:
 *     12-FEB-2001 (MBT):
 *        Original version.
+*     16-JUL-2001 (MBT):
+*        Fixed a serious bug; had INTEGER where I meant <TYPE>.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -76,7 +79,7 @@
       INTEGER AGRP2
       
 *  Arguments Returned:
-      INTEGER BARR2( * )
+      <TYPE> BARR2( * )
       
 *  Status:
       INTEGER STATUS             ! Global status
@@ -111,9 +114,7 @@
             GO TO 99
          END IF
 
-*  Copy the corresponding name from BGRP1 to BGRP2.  For the first 
-*  item only use GRP_COPY, since this should copy across all the 
-*  auxiliary data like case significance flags etc.
+*  Copy the corresponding name from BARR1 to BARR2.
          BARR2( I ) = BARR1( IGOT )
       END DO
 
