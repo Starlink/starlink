@@ -59,15 +59,19 @@
 
 *   VAX-specific features used:
 *      -  Uses BYTE arrays.
-*      -  Uses functions IAND and IZEXT.
+*      -  Uses functions IAND.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
 *     25-JUL-1991 (DSB):
 *        Original version.
+*      7-AUG-2004 (TIMJ):
+*        Replace non-portable IZEXT with NUM_UBTOI
+*        TEMP is now a INTEGER (to match type of MSK)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -112,8 +116,12 @@
       INTEGER NEWTOS             ! New value for TOS after operation is
                                  ! completed.
       INTEGER NXTMSK             ! Index of next mask to be used.
-      LOGICAL TEMP               ! Temporary logical storage.
+      INTEGER TEMP               ! Temporary logical storage.
       INTEGER TOS                ! Current position of top of stack.
+
+      INCLUDE 'NUM_DEC_CVT'
+      INCLUDE 'NUM_DEF_CVT'
+
 
 *.
 
@@ -154,7 +162,7 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            WORK( EL, TOS ) = ( IAND( IZEXT( QUAL( EL ) ), MSK )
+            WORK( EL, TOS ) = ( IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
      :                          .EQ. MSK )
          END DO
 
@@ -285,7 +293,7 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            TEMP = IAND( IZEXT( QUAL( EL ) ), MSK )
+            TEMP = IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
             WORK( EL, TOS ) = ( TEMP .EQ. MSK ) .OR.
      :                        ( TEMP .EQ. 0 )
          END DO
@@ -305,7 +313,7 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            TEMP = IAND( IZEXT( QUAL( EL ) ), MSK )
+            TEMP = IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
             WORK( EL, TOS ) = ( TEMP .NE. MSK ) .AND.
      :                        ( TEMP .NE. 0 )
          END DO
@@ -325,7 +333,8 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            WORK( EL, TOS ) = IAND( IZEXT( QUAL( EL ) ), MSK ) .NE. 0
+            WORK( EL, TOS ) = IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
+     :           .NE. 0
          END DO
 
          GO TO 170
@@ -343,7 +352,8 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            WORK( EL, TOS ) = IAND( IZEXT( QUAL( EL ) ), MSK ) .EQ. MSK
+            WORK( EL, TOS ) = IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
+     :           .EQ. MSK
          END DO
 
          GO TO 170
@@ -361,7 +371,8 @@
          MSK = MASK( NXTMSK )
 
          DO EL = 1, SIZE
-            WORK( EL, TOS ) = IAND( IZEXT( QUAL( EL ) ), MSK ) .EQ. 0
+            WORK( EL, TOS ) = IAND( NUM_UBTOI( QUAL( EL ) ), MSK )
+     :           .EQ. 0
          END DO
 
          GO TO 170
