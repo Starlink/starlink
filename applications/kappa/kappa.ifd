@@ -2714,7 +2714,7 @@ package kappa {
 
    executable kapview_mon {
 
-      action comcomp {
+      action colcomp {
 
          alias {colcomp}
 
