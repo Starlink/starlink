@@ -186,6 +186,15 @@
 #define _ASSFLOG(_x,_y) if (_y) (_x) = F77_TRUE; else (_x) = F77_FALSE;
 
 
+/*
+ * Macro to assign Fortran POINTER type given some real pointer sptr
+ */
+#define EXPORT_POINTER(sptr,dptr_addr) \
+{F77_POINTER_TYPE _pnt = (F77_POINTER_TYPE) sptr; \
+*((F77_POINTER_TYPE *) dptr_addr) = _pnt;}
+
+
+
 /* -------------------------------------------------------------------------
  * ADI error handling
  * -------------------------------------------------------------------------
@@ -979,10 +988,14 @@ F77_SUBROUTINE(adifn(map))( INTEGER(id), CHARACTER(type), CHARACTER(mode),
   GENPTR_POINTER(vptr)
   GENPTR_INTEGER(status)
 
+  void	*mptr;
+
   _chk_stat;
 
   adix_map_t( 0, (ADIobj) *id, NULL, 0, type, type_length, mode,
-	      mode_length, (void **) vptr, status );
+	      mode_length, &mptr, status );
+
+  _EXPORT_POINTER(mptr,vptr);
 
   _ERR_REP( "ADI_MAP", Estr__MapObjDat );
   }
@@ -994,10 +1007,12 @@ F77_SUBROUTINE(_TM_fname(map,_t))( INTEGER(id), CHARACTER(mode), \
   GENPTR_CHARACTER(mode) \
   GENPTR_POINTER(vptr) \
   GENPTR_INTEGER(status) \
+  void	*mptr; \
   _chk_stat; \
   adix_map_n( 0, (ADIobj) *id, NULL, 0, mode, mode_length, \
 	      &_TM_alloc(_t), sizeof(_TM_ftype(_t)), \
-	      (void **) vptr, status );\
+	      &Mptr, status );\
+  _EXPORT_POINTER(mptr,vptr); \
   _ERR_REP( _TM_fnames(map,_t), Estr__MapObjDat );}
 
 _genproc(b)	_genproc(w)
@@ -1452,10 +1467,14 @@ F77_SUBROUTINE(adifn(cmap))( INTEGER(id), CHARACTER(name), CHARACTER(type),
   GENPTR_POINTER(vptr)
   GENPTR_INTEGER(status)
 
+  void	*mptr;
+
   _chk_stat;
 
   adix_map_t( 0, (ADIobj) *id, name, name_length, type, type_length, mode,
-	      mode_length, (void **) vptr, status );
+	      mode_length, &mptr, status );
+
+  _EXPORT_POINTER(mptr,vptr);
 
   _ERR_REP( "ADI_CMAP", Estr__MapObjDat );
   }
@@ -1470,10 +1489,12 @@ F77_SUBROUTINE(_TM_fname(cmap,_t))( INTEGER(id), CHARACTER(name), \
   GENPTR_CHARACTER(mode) \
   GENPTR_POINTER(vptr) \
   GENPTR_INTEGER(status) \
+  void		*mptr; \
   _chk_stat; \
   adix_map_n( 0, (ADIobj) *id, name, name_length, mode, mode_length, \
 	      &_TM_alloc(_t), sizeof(_TM_ftype(_t)), \
-	      (void **) vptr, status );\
+	      &mptr, status );\
+  _EXPORT_POINTER(mptr,vptr);\
   _ERR_REP( _TM_fnames(cmap,_t), Estr__MapObjDat );}
 
 _genproc(b)	_genproc(w)
