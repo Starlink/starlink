@@ -48,7 +48,7 @@
 
 *  Implementation Status:
 *     - Deals with bad pixels
-*     - Uses Kappa sort routine
+*     - Uses PDA sort routine
 
 *  Authors:
 *     TIMJ: Tim Jenness (JACH)
@@ -146,8 +146,8 @@
 
 *     Go through all data, initialise values
             NKEPT = 0
-            SUM = 0.0
-            SUMSQ = 0.0
+            SUM = 0.0D0
+            SUMSQ = 0.0D0
             STDEV = VAL__BADD
 
             DO I = 1, NGOOD
@@ -176,7 +176,7 @@
 
 *     Now loop through and clip points above CLIP level
                IF (CLIP.GT.0.0 .AND. MEAN.NE.VAL__BADD .AND.
-     :              STDEV.GT.0.0) THEN
+     :              STDEV.GT.0.0D0) THEN
 
                   NREM = 0
                   ULIMIT =  REAL(MEAN + (DBLE(CLIP) * STDEV))
