@@ -116,8 +116,6 @@
       CHARACTER*1		CAX, AXIS
       CHARACTER*40		CVAL
 
-      DOUBLE PRECISION		DVAL
-
       REAL			AXINFO(2), BASE, DELTA, TANG
       REAL			RVAL
 
@@ -131,7 +129,7 @@
       INTEGER			WBPTR			! Write back proc
       INTEGER			IDUM, I
 
-      LOGICAL			DIDCRE, LVAL, THERE
+      LOGICAL			LVAL, THERE
 
 *  Local data:
       DATA AXITEM		/'Label', 'Units', 'Normalised', 'Data',
