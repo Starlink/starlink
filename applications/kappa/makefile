@@ -1225,11 +1225,11 @@ NDFPACK_TASKS = $(NDFPACK_F_ROUTINES:.f=)
 #  Rule and dependencies for creating the MEM A-tasks.  The build does
 #  not see the opus and tropus modules when they are in a library.
 
-$(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o \
+$(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o grf_kappa.o \
               $(OBJECT_LIBRARIES) $(LINK_SCRIPT) 
 	for f in $(MEMTASKS) ;\
 	   do $(ALINK) $$f.o opus.o tropus.o uput.o uget.o $(OBJECT_LIBRARIES) \
-	          $(ADDLIBS) `./$(LINK_SCRIPT)` -last_grf `memsys3_link`;\
+	          $(ADDLIBS) `./$(LINK_SCRIPT)` `memsys3_link`;\
 	done
 
 #  Give dependencies and rule for building the pseudo-monoliths.
