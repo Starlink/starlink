@@ -530,6 +530,10 @@ f     - Title: The Plot title drawn using AST_GRID
 *        - Avoid using astStore to allocate more storage than is supplied
 *        in the "data" pointer. This can cause access violations since 
 *        astStore will then read beyond the end of the "data" area.
+*     15-MAR-2005 (DSB):
+*        - Modified GridLines to use appropriate algorithm for choosing
+*        start of grid lines in cases where one axis has logarithmic tick 
+*        spacing and the other has linear tick spacing.
 *class--
 */
 
@@ -16011,13 +16015,15 @@ static TickInfo **GridLines( AstPlot *this, double *cen, double *gap,
 /* Check that the pointers can be used. */
             if( astOK ) {
 
-/* The section starts one gap below the first tick. Limit it to the
-   displayed range of the axis. */
-               starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ]/gap[ 1 - j ] ) );
-
-/* The section ends one gap above the first tick. Limit it to the
-   displayed range of the axis. */
-               end = MIN( top, MAX( bot, ticks[ nticks - 1 ]*gap[ 1 - j ] ) );
+/* The section starts one gap below the first tick, and ends one gap above 
+   the first tick. Limit both to the displayed range of the axis. */
+               if( logticks[ 1 - j ] ) {
+                  starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ]/gap[ 1 - j ] ) );
+                  end = MIN( top, MAX( bot, ticks[ nticks - 1 ]*gap[ 1 - j ] ) );
+               } else {
+                  starts[ 0 ] = MIN( top, MAX( bot, ticks[ 0 ] - gap[ 1 - j ] ) );
+                  end = MIN( top, MAX( bot, ticks[ nticks - 1 ] + gap[ 1 - j ] ) );
+               }
 
 /* Store the length of the section. */
                lengths[ 0 ] = end - starts[ 0 ];
