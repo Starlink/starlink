@@ -21,6 +21,9 @@ use Symbol;
 use IPC::Open2;
 use Carp;
 
+use lib "$ENV{AUTOASTROM_DIR}";
+use autoastrom qw(deg2sex);		# for deg2sex
+
 my $DefaultCatalogue = 'usno@eso';
 my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
 #my $MoggyCommand = '$AUTOASTROM_DIR/test/dummy-slave.pl';
@@ -35,8 +38,10 @@ sub catconfig ($);
 sub radius ($);
 sub columns ($;$);
 sub maxrow ($;$);
-sub point ($$$;$$$$);
-sub otherpoint ($$$;$$$$);
+sub point ($$$);
+sub otherpoint ($$$);
+#sub point ($$$;$$$$);
+#sub otherpoint ($$$;$$$$);
 sub searchtype ($;$);
 sub astinformation ($;$\@);
 sub astdomain ($);
@@ -104,7 +109,7 @@ sub new {
     $self->{POINT} = undef;	# reference to six-element array
     $self->{OTHERPOINT} = undef;# reference to six-element array
     $self->{ASTINFORMATION} = undef;
-    $self->{ASTDOMAIN} = undef;
+    $self->{ASTDOMAIN} = 'SKY';
 
     # Query result
     $self->{RESULT} = undef;	# result of query (reference to array
@@ -229,87 +234,197 @@ sub maxrow ($;$) {
     return $self->{MAXROW};
 }
 
-#+
-# <routinename>point
-# <description><p>Gets or, with an argument, sets the location of the `point'
-#   used by moggy.  This point is either the centre of the search, for the 
-#   `RADIUS' and `RADIUS2' searches, or one corner of the box for the
-#   `BOX' search.
-#   <p>Takes either two or six arguments.  If there are two arguments, they
-#   should be string representations of RA and DEC respectively, with
-#   fields separated by colons.  If there are six, they are already
-#   split.  This method doesn't itself do any checking of the values, 
-#   but instead relies on moggy to indicate that the values were set
-#   successfully.
-# <returnvalue>The current value.  If the argument is given, but there is
-#   an error setting it, then the point is set to the undefined value, and
-#   it is this which is returned.
-#-
-sub point ($$$;$$$$) {
+#+ <routinename>point
+#  <description>
+#
+#  <p>Gets or, with an argument, sets
+#   the location of the `point' used by moggy.  This point is either
+#   the centre of the search, for the `RADIUS' and `RADIUS2' searches,
+#   or one corner of the box for the `BOX' search.
+#
+#  <p>Takes two arguments.  If the current ASTDOMAIN is `SKY', then
+#   the arguments may be either decimal degrees or colon-separated
+#   sexagesimal angles (RA then Dec).  This method doesn't itself do
+#   any checking of the values, but instead relies on moggy to
+#   indicate that the values were set successfully.
+#
+#  <returnvalue>The current value.  If the argument is given, but
+#  there is an error setting it, then the point is set to the
+#  undefined value, and it is this which is returned.  -
+sub point ($$$) {
     my $self = shift;
     my @args = @_;
-    my $i;
-    for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
+    foreach (@args) { s/[\s]//g; }
     if (@args) {
-	if ($#args == 5) {
-	    unshift (@args, "COORD1");
-	    $self->send_command_to_slave_(@args);
-	    shift (@args);
-	    $self->{POINT} = ($self->status_ok() ? \@args : undef);
-	} elsif ($#args == 1) {
+	if ($#args == 1) {
 	    my @a = "COORD1";
-	    push (@a, split (':',$args[0]));
-	    push (@a, split (':',$args[1]));
-	    $self->send_command_to_slave_(@a);
-	    shift (@a);
-	    $self->{POINT} = ($self->status_ok() ? \@a : undef);
+	    my $badcoord = 0;
+	    if ($args[0] =~ /:/ || $args[1] =~ /:/) {
+		if ($self->{ASTDOMAIN} eq 'SKY') {
+		    # That's OK
+		    for my $i (0..1) {
+			if ($args[$i] =~ /:/) {
+			    push (@a, split (':',$args[$i]));
+			} else {
+			    # Since one of the coordinates is
+			    # sexagesimal, we need to convert the
+			    # other one, too.
+			    my $sexco = deg2sex ($args[$i],
+						 ($i==0?1:0)); # isra
+			    if (defined($sexco)) {
+				push (@a, split (' ',$sexco));
+			    } else {
+				carp "Moggy::point: invalid ".
+				  ($i==0?"RA":"Dec").": ".
+				    $args[$i];
+				$badcoord = 1;
+			    }
+			}
+		    }
+		} else {
+		    # Error -- not a SKY domain
+		    carp "Moggy::point: no sexagesimal coords in domain ".
+		      $self->{ASTDOMAIN}."\n";
+		    $badcoord = 1;
+		}
+	    } else {
+		# Decimal coordinates (in whatever domain).  Just add
+		# to the command
+		push (@a, @args);
+	    }
+	    if ($badcoord) {
+		# Some problem earlier
+		$self->{POINT} = undef;
+	    } else {
+		$self->send_command_to_slave_(@a);
+		shift (@a);
+		$self->{POINT} = ($self->status_ok() ? \@a : undef);
+	    }
 	} else {
+	    carp "Moggy::point: Wrong number of arguments ($#args)\n";
 	    $self->{POINT} = undef;
 	}
     }
+#    my $self = shift;
+#    my @args = @_;
+#    my $i;
+#    for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
+#     if (@args) {
+# 	if ($#args == 5) {
+# 	    unshift (@args, "COORD1");
+# 	    $self->send_command_to_slave_(@args);
+# 	    shift (@args);
+# 	    $self->{POINT} = ($self->status_ok() ? \@args : undef);
+# 	} elsif ($#args == 1) {
+# 	    my @a = "COORD1";
+# 	    push (@a, split (':',$args[0]));
+# 	    push (@a, split (':',$args[1]));
+# 	    $self->send_command_to_slave_(@a);
+# 	    shift (@a);
+# 	    $self->{POINT} = ($self->status_ok() ? \@a : undef);
+# 	} else {
+# 	    $self->{POINT} = undef;
+# 	}
+#     }
     return $self->{POINT};
 }
 
 #+
 # <routinename>otherpoint
-# <description><p>Gets or, with an argument, sets the location of the
+# <description>
+#
+#  <p>Gets or, with an argument, sets the location of the
 #   `otherpoint' used by moggy.  In the case of the `RADIUS' search, this
 #   point is not used; for the `RADIUS2' search, the search radius is 
 #   taken to be the distance between `point' and `otherpoint'; and for the
 #   `BOX' search, this specifies the other corner of the search box.
-#   <p>Takes either two or six arguments.  If there are two arguments, they
-#   should be string representations of RA and DEC respectively, with
-#   fields separated by colons.  If there are six, they are already
-#   split.  This method doesn't itself do any checking of the values, 
-#   but instead relies on moggy to indicate that the values were set
-#   successfully.
+#
+#  <p>Takes two arguments.  If the current ASTDOMAIN is `SKY', then
+#   the arguments may be either decimal degrees or colon-separated
+#   sexagesimal angles (RA then Dec).  This method doesn't itself do
+#   any checking of the values, but instead relies on moggy to
+#   indicate that the values were set successfully.
+#
 # <returnvalue>The current value.  If the argument is given, but there is
 #   an error setting it, then the point is set to the undefined value, and
 #   it is this which is returned.
 #-
-sub otherpoint ($$$;$$$$) {
+sub otherpoint ($$$) {
     my $self = shift;
     my @args = @_;
-    my $i;
-    for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
+    foreach (@args) { s/[\s]//g; }
     if (@args) {
-	if ($#args == 5) {
-	    unshift (@args, "COORD2");
-	    $self->send_command_to_slave_(@args);
-	    shift (@args);
-	    $self->{OTHERPOINT} = ($self->status_ok() ? \@args : undef);
-	} elsif ($#args == 1) {
+	if ($#args == 1) {
 	    my @a = "COORD2";
-	    push (@a, split (':',$args[0]));
-	    push (@a, split (':',$args[1]));
-	    $self->send_command_to_slave_(@a);
-	    shift (@a);
-	    $self->{OTHERPOINT} = ($self->status_ok() ? \@a : undef);
+	    my $badcoord = 0;
+	    if ($args[0] =~ /:/ || $args[1] =~ /:/) {
+		if ($self->{ASTDOMAIN} eq 'SKY') {
+		    # That's OK
+		    for my $i (0..1) {
+			if ($args[$i] =~ /:/) {
+			    push (@a, split (':',$args[$i]));
+			} else {
+			    # Since one of the coordinates is
+			    # sexagesimal, we need to convert the
+			    # other one, too.
+			    my $sexco = deg2sex ($args[$i],
+						 ($i==0?1:0)); # isra
+			    if (defined($sexco)) {
+				push (@a, split (' ',$sexco));
+			    } else {
+				carp "Moggy::otherpoint: invalid ".
+				  ($i==0?"RA":"Dec").": ".
+				    $args[$i];
+				$badcoord = 1;
+			    }
+			}
+		    }
+		} else {
+		    # Error -- not a SKY domain
+		    carp "Moggy::otherpoint: no sexagesimal coords in domain ".
+		      $self->{ASTDOMAIN}."\n";
+		    $badcoord = 1;
+		}
+	    } else {
+		# Decimal coordinates (in whatever domain).  Just add
+		# to the command
+		push (@a, @args);
+	    }
+	    if ($badcoord) {
+		# Some problem earlier
+		$self->{OTHERPOINT} = undef;
+	    } else {
+		$self->send_command_to_slave_(@a);
+		shift (@a);
+		$self->{OTHERPOINT} = ($self->status_ok() ? \@a : undef);
+	    }
 	} else {
+	    carp "Moggy::otherpoint: Wrong number of arguments ($#args)\n";
 	    $self->{OTHERPOINT} = undef;
 	}
     }
-    return $self->{OTHERPOINT};
+#     my $self = shift;
+#     my @args = @_;
+#     my $i;
+#     for ($i=0; $i<=$#args; $i++) { $args[$i] =~ s/\s*//g; };
+#     if (@args) {
+# 	if ($#args == 5) {
+# 	    unshift (@args, "COORD2");
+# 	    $self->send_command_to_slave_(@args);
+# 	    shift (@args);
+# 	    $self->{OTHERPOINT} = ($self->status_ok() ? \@args : undef);
+# 	} elsif ($#args == 1) {
+# 	    my @a = "COORD2";
+# 	    push (@a, split (':',$args[0]));
+# 	    push (@a, split (':',$args[1]));
+# 	    $self->send_command_to_slave_(@a);
+# 	    shift (@a);
+# 	    $self->{OTHERPOINT} = ($self->status_ok() ? \@a : undef);
+# 	} else {
+# 	    $self->{OTHERPOINT} = undef;
+# 	}
+#     }
+     return $self->{OTHERPOINT};
 }
 
 #+
@@ -362,6 +477,7 @@ sub astinformation ($;$\@) {
 
     if (defined($domain)) {
 	if (@astarray) {
+	    $domain = uc($domain);
 	    $self->send_command_to_slave_ ("AST FRAMESET", $domain);
 
 	    unless ($self->status_continue()) {
