@@ -241,6 +241,8 @@
 *        Converted to use INTEGER images.
 *     31-AUG-1996 (PDRAPER):
 *        Removed call to NAG routine E04JAF and replaced with PDA_LMDIF1.     
+*     07-SEP-2004 (PDRAPER):
+*        Modified to use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -255,6 +257,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'FIO_ERR'         ! FIO system error codes
       INCLUDE 'PRM_PAR'         ! Primitive data constants
+      INCLUDE 'CNF_PAR'         ! CNF funtions
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -444,9 +447,11 @@
 *  PISAFIND  histogram bin limit as a lower point.
       NHIST = INT( MAX( 32767.0, 16.0 * SQRT( REAL( NPIX ) ) ) )
       CALL PSX_CALLOC( NHIST, '_INTEGER', IHIST, STATUS )
-      CALL PSA1_MKHII( %VAL( MAP ), NPIX, BAD, NHIST, %VAL( IHIST ), 
-     :                 MODE, ZERO, WIDTH, STATUS )
-      CALL HISTAT(%VAL(IHIST),MODE,MAXH,XMEAN,XPEAK,SIGMA,GSIGMA,NHIST)
+      CALL PSA1_MKHII( %VAL( CNF_PVAL( MAP ) ), NPIX, BAD, NHIST, 
+     :                 %VAL( CNF_PVAL( IHIST ) ), MODE, ZERO, WIDTH, 
+     :                 STATUS )
+      CALL HISTAT( %VAL( CNF_PVAL( IHIST ) ), MODE, MAXH, XMEAN, XPEAK,
+     :             SIGMA, GSIGMA, NHIST )
       CALL PSX_FREE( IHIST, STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 999
 
@@ -563,8 +568,8 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
 
 *  Map the appropriate part of map array into our box and subtract the
 *  sky value.
-         CALL PSA1_EXSS4( %VAL( MAP ), IQL, IQH, IYL, IYH, NYOUT,
-     :                    SUBSID, XPEAK, XBUF, STATUS )
+         CALL PSA1_EXSS4( %VAL( CNF_PVAL( MAP ) ), IQL, IQH, IYL, IYH, 
+     :                    NYOUT, SUBSID, XPEAK, XBUF, STATUS )
 
 *  Form the actual position of object in sub-array
          XS = REAL( XLIST( K ) - IQL + 1 )

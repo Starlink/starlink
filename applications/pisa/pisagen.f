@@ -138,6 +138,8 @@
 *        Changed to use pixel averaging.
 *     11-AUG-1992 (PDRAPER):
 *        Enabled simple NDFs.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,6 +155,7 @@
       INCLUDE 'PAR_ERR'          ! PAR error codes
       INCLUDE 'FIO_ERR'          ! FIO error codes
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -360,15 +363,16 @@
 
 *  Now in a position to add the model stars
       IF ( STATUS .EQ. SAI__OK ) THEN
-         CALL ADDMOD( %VAL( PNTR ), IDIM( 1 ), IDIM( 2 ), LBND( 1 ), 
-     :                LBND( 2 ), IFS, NOBJ, GSIGM, CROSS, COMIX, ELLIP, 
-     :                ANGLE, BACK, SAT, NSIGMA, .FALSE.,SCALE, STATUS )
+         CALL ADDMOD( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ), IDIM( 2 ), 
+     :                LBND( 1 ), LBND( 2 ), IFS, NOBJ, GSIGM, CROSS, 
+     :                COMIX, ELLIP, ANGLE, BACK, SAT, NSIGMA, .FALSE., 
+     :                SCALE, STATUS )
       END IF
 
 *  Add some noise to the data, if required 
       IF ( ADDNOI ) THEN
-         CALL ANOISE( %VAL( PNTR ), IDIM( 1 ) * IDIM( 2 ), POISON,
-     :                SIGMA, ADU, %VAL( IPVAR ), STATUS )
+         CALL ANOISE( %VAL( CNF_PVAL( PNTR ) ), IDIM( 1 ) * IDIM( 2 ), 
+     :                POISON, SIGMA, ADU, %VAL( IPVAR ), STATUS )
       END IF
 
 *  Add title to the output frame.

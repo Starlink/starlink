@@ -239,6 +239,8 @@
 *        Now uses simple NDFs correctly.
 *     31-AUG-1996 (PDRAPER):
 *        Removed call to NAG routine E04JAF and replaced with PDA_LMDIF1.     
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -253,6 +255,7 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'FIO_ERR'         ! FIO system error codes
       INCLUDE 'PRM_PAR'         ! Primitive data constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
 
 *  Status:
       INTEGER STATUS            ! Global status
@@ -435,7 +438,7 @@
 *      Consequently x and y will need to be reversed on input.
 *
 *  Bin up data into a (integer) histogram, uses offset of 101 (?).
-      CALL PSA1_MKHIS( %VAL( MAP ), NPIX, IHIST, STATUS )
+      CALL PSA1_MKHIS( %VAL( CNF_PVAL( MAP ) ), NPIX, IHIST, STATUS )
 
 *  Call histat to estimate the sky background (xpeak) and the noise
 *  (sigma) in the background.
@@ -557,8 +560,8 @@ C        XOUT = XOUT - (ORIGX - 1.5) - (IXL - 1.0)
 
 *  Map the appropriate part of map array into our box and subtract the
 *  sky value.
-         CALL PSA1_EXSS( %VAL( MAP ), IQL, IQH, IYL, IYH, NYOUT,
-     :                   SUBSID, XPEAK, XBUF, STATUS )
+         CALL PSA1_EXSS( %VAL( CNF_PVAL( MAP ) ), IQL, IQH, IYL, IYH, 
+     :                   NYOUT, SUBSID, XPEAK, XBUF, STATUS )
 
 *  Form the actual position of object in sub-array
          XS = REAL( XLIST( K ) - IQL + 1 )

@@ -67,6 +67,8 @@
 *  History:
 *     18-DEC-1990 (PDRAPER):
 *        Original version.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -79,6 +81,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -135,8 +138,8 @@
      :              EL, STATUS )
 
 *  right do the processing
-      CALL ANOISE( %VAL( IPOUT ), EL, POISON, SIGMA, ADU, %VAL( IPVAR ),
-     :              STATUS )
+      CALL ANOISE( %VAL( CNF_PVAL( IPOUT ) ), EL, POISON, SIGMA, ADU, 
+     :             %VAL( CNF_PVAL( IPVAR ) ), STATUS )
 
 *  close down
       CALL NDF_END( STATUS )

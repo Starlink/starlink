@@ -280,6 +280,8 @@
 *     30-NOV-1998 (PDRAPER):
 *        Added test to stop the number of pixels in ILIST from 
 *        being exceeded.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PAR
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -292,6 +294,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'          ! Standard constants
       INCLUDE 'FIO_PAR'          ! FIO parameters
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *    Maximum number of thresholded pixels Note : This limit is not
 *    critical, the program loops using this as workspace for containing
@@ -521,7 +524,7 @@ c *** clear arrays
       ENDIF
 
 *   Form the histogram of whole map to find sky and sd
-      CALL PSA1_MKHIS( %VAL( MAP ), NPIX, IHIST, STATUS )
+      CALL PSA1_MKHIS( %VAL( CNF_PVAL( MAP ) ), NPIX, IHIST, STATUS )
       call histat(ihist,mode,maxh,xmean,xpeak,sigma,gsigma,32867)
       XPEAK = MIN( REAL( IUPP ), MAX( 0.0, XPEAK - 100.0 ) )
       mode=mode-100
@@ -609,8 +612,10 @@ c *** negative objects pass 1, positive objects pass 2
       IF ( IPASS .EQ. 3 ) GOTO 900
 
 *   Load 1st and 2nd lines into the buffers
-      CALL PSA1_CLWO( %VAL( MAP ), IBUFO, NYOUT, 0, STATUS )
-      CALL PSA1_CLWO( %VAL( MAP ), IBUF, NYOUT, NYOUT, STATUS )
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0, 
+     :                STATUS )
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT, 
+     :                STATUS )
 
 *   Reset some variables
       kk=nyout
@@ -629,7 +634,8 @@ c *** negative objects pass 1, positive objects pass 2
 
 *   Load next line into buffer
       KK = KK + NYOUT
-      CALL PSA1_CLWO( %VAL( MAP ), IBUFN, NYOUT, KK, STATUS )
+      CALL PSA1_CLWO( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK, 
+     :                STATUS )
       iw=irec+1
       iww=ijc+jjc
 
@@ -966,7 +972,8 @@ c  *** record initial isophotal analysis
          r=amax1(1.1,(tmax-sigman)/thresh)
 c  *** estimate total intensity
          if(isoph.eq.1)then
-            call extend(%VAL(MAP),parm(1,1),xpeak,r,sigsq,icirc,rcirc)
+            call extend( %VAL( CNF_PVAL( MAP ) ), parm( 1, 1 ), xpeak,
+     :                   r, sigsq, icirc, rcirc )
             tmn=parm(1,1)
             rec(1)=tmn
          endif
@@ -983,7 +990,8 @@ c  *** check if image is overlapped
          endif
 c  *** get profile intensities
          if(isoph.eq.2)then
-            call phopt(%VAL(MAP),parm,nbit,rec,xpeak,r,sigsq)
+            call phopt( %VAL( CNF_PVAL( MAP ) ), parm, nbit, rec, 
+     :                  xpeak, r, sigsq )
          endif
          ib=0
          if(isoph.eq.3)call phopt2(ims,icount)

@@ -281,6 +281,8 @@
 *     9-FEB-1995 (PDRAPER):
 *        ISMOO behaviour now correct. Detection always used smoothed
 *        data previous to this.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -294,6 +296,7 @@
       INCLUDE 'SAE_PAR'         ! Standard constants
       INCLUDE 'FIO_PAR'         ! FIO parameters
       INCLUDE 'PRM_PAR'         ! PRIMDAT constants
+      INCLUDE 'CNF_PAR'         ! CNF functions
       INCLUDE 'PSA1_PAR'        ! PISA parameters
 
 *     .. Scalar Arguments ..
@@ -512,9 +515,11 @@
 *     PISAFIND  histogram bin limit as a lower point.
       NHIST = INT( MAX( 32767.0, 16.0 * SQRT( REAL( NPIX ) ) ) )
       CALL PSX_CALLOC( NHIST, '_INTEGER', IHIST, STATUS )
-      CALL PSA1_MKHII( %VAL( MAP ), NPIX, BAD, NHIST, %VAL( IHIST ), 
+      CALL PSA1_MKHII( %VAL( CNF_PVAL( MAP ) ), NPIX, BAD, NHIST, 
+     :                 %VAL( CNF_PVAL( IHIST ) ), 
      :                 MODE, ZERO, WIDTH, STATUS )
-      CALL HISTAT(%VAL(IHIST),MODE,MAXH,XMEAN,XPEAK,SIGMA,GSIGMA,NHIST)
+      CALL HISTAT( %VAL( CNF_PVAL( IHIST ) ), MODE, MAXH, XMEAN, XPEAK,
+     :             SIGMA, GSIGMA, NHIST )
       CALL PSX_FREE( IHIST, STATUS )
       IF (STATUS.NE.SAI__OK) GOTO 900
 
@@ -593,8 +598,8 @@
      :                 STATUS )
          CALL NDF_MAP( PTEMP, 'Data', '_INTEGER', 'WRITE', IPTMP, EL,
      :                 STATUS )
-         CALL PSA1_IMINV( %VAL( MAP ), NPIX, %VAL( IPTMP ), IXPEAK, 
-     :                   STATUS )
+         CALL PSA1_IMINV( %VAL( CNF_PVAL( MAP ) ), NPIX, 
+     :                    %VAL( CNF_PVAL( IPTMP ) ), IXPEAK, STATUS )
 
 *     MAP should now point to temporary NDF array. Ideally would release
 *     the input NDF at this point, but the identifier isn't available,
@@ -619,8 +624,10 @@
       IF (IPASS.EQ.3) GOTO 900
 
 *     Load 1st and 2nd lines into the buffers
-      CALL PSA1_CLWO4( %VAL( MAP ), IBUFO, NYOUT, 0, STATUS )
-      CALL PSA1_CLWO4( %VAL( MAP ), IBUF, NYOUT, NYOUT, STATUS )
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFO, NYOUT, 0, 
+     :                 STATUS )
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUF, NYOUT, NYOUT, 
+     :                 STATUS )
 
 *     Reset some variables
       KK = NYOUT
@@ -639,7 +646,8 @@
 
 *     Load next line into buffer
       KK = KK + NYOUT
-      CALL PSA1_CLWO4( %VAL( MAP ), IBUFN, NYOUT, KK, STATUS )
+      CALL PSA1_CLWO4( %VAL( CNF_PVAL( MAP ) ), IBUFN, NYOUT, KK, 
+     :                 STATUS )
       IW = IREC + 1
       IWW = IJC + JJC
 
@@ -1000,7 +1008,8 @@
          R = AMAX1(1.1, (TMAX-SIGMAN)/THRESH)
 *     *** estimate total intensity
          IF (ISOPH.EQ.1) THEN
-            CALL EXTEND4(%VAL(MAP),PARM(1,1),XPEAK,R,SIGSQ,ICIRC,RCIRC)
+            CALL EXTEND4( %VAL( CNF_PVAL( MAP ) ), PARM( 1, 1 ), XPEAK,
+     :                    R, SIGSQ, ICIRC, RCIRC )
             TMN = PARM(1,1)
             REC(1) = TMN
          ENDIF
@@ -1018,7 +1027,8 @@
          ENDIF
 *     *** get profile intensities
          IF (ISOPH.EQ.2) THEN
-            CALL PHOPT4(%VAL(MAP),PARM,NBIT,REC,XPEAK,R,SIGSQ)
+            CALL PHOPT4( %VAL( CNF_PVAL( MAP ) ), PARM, NBIT, REC, 
+     :                   XPEAK, R ,SIGSQ )
          ENDIF
 
          IB = 0

@@ -77,6 +77,8 @@
 *  History:
 *     1-APR-1992 (PDRAPER):
 *        Original version.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -90,6 +92,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PAR_ERR'          ! Parameter-system error definitions
       INCLUDE 'PRM_PAR'
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -287,7 +290,8 @@
       IUBND( 2 ) = MIN( IUBND( 2 ) , INT( UBND( 2 ) ) )
 
 *  Get data range
-      CALL PSA1_MNMAX( %VAL( IPIN ), EL , RMIN, RMAX, STATUS )
+      CALL PSA1_MNMAX( %VAL( CNF_PVAL( IPIN ) ), EL , RMIN, RMAX, 
+     :                 STATUS )
       CALL MSG_SETR( 'MIN', RMIN )
       CALL MSG_SETR( 'MAX', RMAX )
       CALL MSG_OUT( ' ',
@@ -325,7 +329,8 @@
 
 *  Trap invalid pixels etc.
       CALL PSX_MALLOC( EL * VAL__NBR, IPWORK, STATUS )
-      CALL PSA1_RMINV( %VAL( IPIN ), EL, %VAL( IPWORK), RMIN, STATUS )
+      CALL PSA1_RMINV( %VAL( CNF_PVAL( IPIN ) ), EL, 
+     :                 %VAL( CNF_PVAL( IPWORK ) ), RMIN, STATUS )
 
 *  Draw greyscale.
       TR( 3 ) = 0.0
@@ -339,7 +344,8 @@
       ILBND( 2 ) = ILBND( 2 ) - YORIG + 1
       IUBND( 2 ) = IUBND( 2 ) - YORIG + 1
       IF ( STATUS .NE. SAI__OK ) GO TO 960
-      CALL PGGRAY( %VAL( IPWORK ), NX, NY, ILBND( 1 ), IUBND( 1 ),
+      CALL PGGRAY( %VAL( CNF_PVAL( IPWORK ) ), NX, NY, 
+     :             ILBND( 1 ), IUBND( 1 ),
      :             ILBND( 2 ), IUBND( 2 ), DRANGE( 1 ), DRANGE( 2 ),
      :             TR )
 

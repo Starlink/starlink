@@ -101,6 +101,9 @@
 *  History:
 *     11-MAR-1991 (PDRAPER):
 *        Original version.
+*     07-SEP-2004 (PDRAPER):
+*        Changed to use CNF_PVAL. Look at that previous date! 
+*        Boy never thought I'd still be in this job!
 *     {enter_changes_here}
 
 *  Bugs:
@@ -113,6 +116,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'CNF_PAR'          ! CNF functions
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -175,9 +179,9 @@
 
 *  Do the work, derive model radius, model intensity peak ratios and
 *  transform the input data.
-      CALL PEAKN( %VAL( IPIN ), IDIM( 1 ), IDIM( 2 ), LBND( 1 ),
-     :            LBND( 2 ), GSIGM, CROSS, COMIX, BACK, THRESH,
-     :            IFS, IFO, STATUS )
+      CALL PEAKN( %VAL( CNF_PVAL( IPIN ) ), IDIM( 1 ), IDIM( 2 ), 
+     :            LBND( 1 ), LBND( 2 ), GSIGM, CROSS, COMIX, BACK, 
+     :            THRESH, IFS, IFO, STATUS )
       
 999   CONTINUE
 
