@@ -93,7 +93,7 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*50		CMNT			! Comment
+      CHARACTER*72		CMNT			! Comment
       CHARACTER*8		KEYWRD			! Keyword name
       CHARACTER*50		VALUE			! Keyword value
 
@@ -138,12 +138,20 @@
         IF ( KEYWRD .EQ. 'END' ) THEN
           MORE = .FALSE.
 
+*    Comment card?
         ELSE IF ( KEYWRD .EQ. 'COMMENT' ) THEN
+
+*      Write comment to container
+          CALL ADI2_ADDCMT( HDUID, CMNT, .FALSE., STATUS )
 
 *      Next keyword
           IKEY = IKEY + 1
 
+*    History card?
         ELSE IF ( KEYWRD .EQ. 'HISTORY' ) THEN
+
+*      Write history to container
+          CALL ADI2_ADDHIS( HDUID, CMNT, .FALSE., STATUS )
 
 *      Next keyword
           IKEY = IKEY + 1
@@ -191,7 +199,7 @@
 
 *  Warn if not END keyword
       IF ( MORE ) THEN
-        CALL ADI_CGET0L( HDUID, '.Changed', UPDATE, STATUS )
+        CALL ADI_CGET0L( HDUID, 'Changed', UPDATE, STATUS )
         IF ( UPDATE ) THEN
           CALL ERR_ANNUL( STATUS )
         ELSE

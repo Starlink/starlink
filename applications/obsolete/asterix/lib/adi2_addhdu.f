@@ -119,6 +119,9 @@
       CALL ADI_CPUT0I( HDUID, 'Ihdu', IHDU, STATUS )
       CALL ADI_CPUT0I( HDUID, 'HduType', HDUTYP, STATUS )
 
+*  Write HDU index entry
+      CALL ADI2_PUTHDI( ID, HDU, HDUID, IHDU, STATUS )
+
 *  Write to HDU container
       CALL ADI_CPUTID( HCID, HDU, HDUID, STATUS )
 
