@@ -123,8 +123,8 @@
 *  Extract logical unit
       CALL ADI2_GETLUN( FID, LUN, STATUS )
 
-*  Loop over all previous HDU's, ensuring they have defined data areas
-      DO IHDU = 1, NHDU
+*  Loop over all specified HDU's, ensuring they have defined data areas
+      DO IHDU = 1, CHDU
 
 *    Initialise for this HDU
         FSTAT = 0
