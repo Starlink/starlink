@@ -1,0 +1,32 @@
+      calcor - Subtracts a scaled dark or flash calibration image from a list.
+    ccdalign - Interactive procedure to aid the alignment of images.
+    ccdclear - Clears CCDPACK global parameters.
+     ccdedit - Edits CCDPACK header items.
+    ccdndfac - Accesses a list of images and writes their names to a file.
+     ccdnote - Adds a note to the current CCDPACK log file.
+    ccdsetup - Sets the CCDPACK global parameters.
+     ccdshow - Displays the value of the CCDPACK global parameters.
+      debias - Performs the debiassing and initial preparation of CCD data.
+    findcent - Centroids image features.
+     findobj - Locates and centroids image features.
+     findoff - Performs pattern-matching between offset position lists.
+     flatcor - Divides a series of images by a flatfield
+     idicurs - Reads coordinates from an X display device.
+      import - Imports FITS information.
+    makebias - Produces a master from a set of bias frames.
+     makecal - Produces a dark or pre-flash calibration image.
+    makeflat - Produces a flatfield calibration image.
+     makemos - Make a mosaic by combining and (optionally) normalising images.
+     pairndf - Displays and manipulates image pairs to allow easy registration.
+    plotlist - Draws position markers on a graphics display.
+     present - Presents a list of images to CCDPACK.
+      reduce - Automatic CCD data reduction facility (command-line version).
+    register - Determines transformations between lists of positions.
+    schedule - Schedules an automated CCDPACK reduction.
+ use_globals - Controls the use of global parameters in IRAF CCDPACK.
+    tranlist - Transform lists of positions.
+     tranndf - Transforms a list of images by resampling.
+     xreduce - Starts the automated CCD data reduction GUI.
+position_lists            - Help about position lists
+processing_lists_of_data  - Help about using wildcards in CCDPACK
+typical_initial_reduction - Help showing typical reduction sequence

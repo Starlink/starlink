@@ -1,0 +1,6 @@
+# Help definitions for the ccdpack package
+ccdpack men = ccdpack.men,
+         hlp = ..,
+         sys = ccdpack.hlp,
+         pkg = ccdpack.hd,
+         src = ccdpack.cl
