@@ -228,3 +228,15 @@ stylesheet will be written to the file named by '%latex-manifest%'.
 	"LaTeX.manifest"
 	)
 
+<func>
+<routinename>suppress-manifest
+<description>
+If true, this will suppress the generation of a manifest, even if the variable 
+<funcname/%latex-manifest%/ is given.
+(This option can conveniently be set with <code/-V suppress-manifest/ on the 
+Jade command line).
+<returnvalue type=boolean>True if the manifest is to be suppressed
+<argumentlist none>
+<codebody>
+(define suppress-manifest #f)
+
