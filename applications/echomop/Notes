@@ -1,6 +1,6 @@
 !-*-Mode: Text; -*-
 
-Norman took over maintenance of ECHOMOP in late 1998.
+Norman Gray took over maintenance of ECHOMOP in late 1998.
 
 Only in late-ish 2000 did I get around to much of a reorganisation of
 the source, and importing it properly into CVS.  The source is all in
@@ -19,6 +19,29 @@ Martin Clayton.
 I think I've tidied it all up, but because of the change in structure,
 I need more work to get it to build and package up.  I've got a bundle
 of ECHOMOP bug reports now, so I need to do _something_ with it.
+
+
+
+Building
+--------
+
+The makefile could do with some work, to resolve some rather twisted
+dependencies.  From a freshly-exported copy, build the following
+makefile targets in order:
+
+% STARLINK=/star    # or equivalent
+% ./mk build
+% ./mk export       # builds the docs using star2html (takes ages)
+% ./mk export_run
+% ./mk export_source
+
+That leaves:
+
+    echomop-3.3-6.tar.Z                 echomop.tar.Z@
+    echomop-3.3-6_ix86_Linux.tar.Z      echomop_ix86_Linux.tar.Z@
+    echomop-3.3-6_ix86_Linux_run.tar.Z  echomop_ix86_Linux_run.tar.Z@
+
+
 
 Structure
 ---------
