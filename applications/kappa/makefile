@@ -580,7 +580,7 @@ ccg1_tmr3r.f ccg1_trm2d.f ccg1_trm2r.f ccg1_trm3d.f ccg1_trm3r.f \
 ccg1_wmd2d.f ccg1_wmd2r.f ccg1_wmd3d.f ccg1_wmd3r.f ccg1_wtm2d.f \
 ccg1_wtm2r.f ccg1_wtm3d.f ccg1_wtm3r.f ccg1_wtm4d.f ccg1_wtm4r.f
 
-KAPSUB_F_ROUTINES = \
+KAPSUB_F_ROUTINES = crfrsb.f \
 apadsb.f cnthlt.f cntkey.f cntsbp.f curre.f ftsize.f ftsizt.f \
 gethlp.f getv2.f gltbsb.f gltclt.f gltcsb.f hstdsp.f hstlo.f hstrep.f \
 imlst.f inhi.f inpe.f inpol.f inre.f insl.f inva.f inxy.f kps1_agndr.f \
