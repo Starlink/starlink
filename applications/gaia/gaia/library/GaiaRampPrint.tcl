@@ -101,6 +101,9 @@ itcl::class gaia::GaiaRampPrint {
 	    -command [code $this set_label_size_]
       }
       set lsize 1.0
+      set parent [winfo parent $w_]
+      $parent add_short_help $itk_component(lsize) \
+         {Size of labels added around ramp}
       pack $itk_component(lsize) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Create a menu that allows the visual selection of one of the
@@ -113,6 +116,9 @@ itcl::class gaia::GaiaRampPrint {
 	    -valuewidth 5
       }
       pack $itk_component(lfont) -side top -fill x -ipadx 1m -ipady 1m
+      $parent add_short_help $itk_component(lfont) \
+         {Font for the labels added around ramp}
+
       catch {
 	 #  Now add all the fonts.
 	 foreach {index xname desc} $fontmap_ {
@@ -132,6 +138,8 @@ itcl::class gaia::GaiaRampPrint {
 	    -relief raised \
 	    -labelwidth 10
       }
+      $parent add_short_help $itk_component(lcolour) \
+         {Colour for labels added around ramp}
       pack $itk_component(lcolour) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Now add all the colours.
@@ -150,6 +158,8 @@ itcl::class gaia::GaiaRampPrint {
 	    -relief raised \
 	    -labelwidth 10
       }
+      $parent add_short_help $itk_component(bcolour) \
+         {Colour of border added around the ramp}
       pack $itk_component(bcolour) -side top -fill x -ipadx 1m -ipady 1m
 
       #  Now add all the colours.
@@ -208,7 +218,7 @@ itcl::class gaia::GaiaRampPrint {
                         labelunits(1)=0 majticklen=0.0 minticklen=0.0"
    }
 
-   #  Print the contents of the canvas to the open filedescriptor
+   #  Print the contents of the canvas to the open file descriptor
    protected method print {fd} {
        global ::$w_.color ::$w_.rotate $w_.colormap
 
@@ -262,7 +272,7 @@ itcl::class gaia::GaiaRampPrint {
        remove_background
 
        #  Remove border.
-       $canvas_ delete ${this}_border
+       #$canvas_ delete ${this}_border
    }
 
    #  Configuration options: (public variables)
