@@ -1,9 +1,7 @@
-<!doctype dtddescription system "dtddescription.dtd" [
-  <!entity progelems system "programcode-0.2.dtdsummary" subdoc>
-]>
+<!doctype dtddescription system "dtddescription.dtd">
 <!-- $Id$ -->
 
-<dtddescription elementlist=progelems prefix='progcode'>
+<dtddescription docelem=programcode>
 
 <element gi='argumentlist'>
 <p>The list of arguments/parameters to a function.
