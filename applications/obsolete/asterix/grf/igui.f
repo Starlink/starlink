@@ -599,7 +599,7 @@
             IF (.NOT.OK) THEN
               ANGLE=0.0
             ENDIF
-            CALL IMG_NBPUT0R('PAR_R4',X,STATUS)
+            CALL IMG_NBPUT0R('PAR_R4',ANGLE,STATUS)
 *  take block off reading
             CALL IMG_NBPUT0I('FLAG',0,STATUS)
             FLAG=0
