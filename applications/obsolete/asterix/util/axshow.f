@@ -113,7 +113,7 @@
       CHARACTER*80              LABEL, UNITS      	! Axis attributes
       CHARACTER*79		OBUF			! Output buffer
       CHARACTER*30              RSTR              	! Axis range description
-      CHARACTER*20              WSTR              	! Axis width description
+      CHARACTER*9               WSTR              	! Axis width description
 
       REAL                      LO, HI            	! Axis range
       REAL                      WIDTH             	! Axis width
