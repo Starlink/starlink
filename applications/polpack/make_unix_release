@@ -59,8 +59,8 @@
       chmod 777 *
 
 #  Tar up the source files and then remove them.
-      tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` surfit*
-      rm -f `grp unix_source`
+      tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` surfit surfit.ifl
+      rm -f `grp unix_source` surfit surfit.ifl
       mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}
 
 #  Tar up all the release files (source and non-source), and then remove
