@@ -204,9 +204,10 @@ NDF into the FITS header, listed by FITS keyword.
      label, and units components respectively are used if
      they are defined; otherwise any values found in the FITS
      extension are used (provided parameter PROFITS is TRUE).
-   ORIGIN and DATE --- are created automatically.  However the
-     former may be overridden by an ORIGIN card in the NDF
-     extension.
+   DATE --- is created automatically.
+   ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
+     extension, unless you supply a value through parameter
+     ORIGIN other than the default "Starlink Project, U.K."
    EXTNAME --- is the array-component name when the EXTNAME
      appears in the primary header or an IMAGE extension.  In a
      binary-table derived from an NDF extension, EXTNAME is the

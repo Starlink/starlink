@@ -231,30 +231,33 @@
          \ssthitemlist{
 
             \sstitem
-            SIMPLE, EXTEND, PCOUNT, GCOUNT -- all take their default
+            SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default
               values.
 
             \sstitem
-            BITPIX, NAXIS, NAXISn -- are derived directly from the NDF
+            BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
               data array;
 
             \sstitem
-            CRVAL{\em{n}}, CDELT{\em{n}}, CRPIX{\em{n}}, CTYPE{\em{n}}, CUNIT{\em{n}} -- are derived from
+            CRVAL{\em{n}}, CDELT{\em{n}}, CRPIX{\em{n}}, CTYPE{\em{n}}, CUNIT{\em{n}} --- are derived from
               the NDF axis structures if possible.  If no linear NDF axis
               structures are present, the values in the NDF FITS extension
               are copied (when parameter PROFITS is {\tt TRUE}).  If any axes
               are non-linear, all FITS axis information is lost.
 
             \sstitem
-            OBJECT, LABEL, BUNIT -- the values held in the NDF's title,
+            OBJECT, LABEL, BUNIT --- the values held in the NDF's title,
               label, and units components respectively are used if
               they are defined; otherwise any values found in the FITS
               extension are used (provided parameter PROFITS is {\tt TRUE}).
 
             \sstitem
-            ORIGIN and DATE -- are created automatically.  However, the
-              former may be overridden by an ORIGIN card in the NDF
-              extension.
+            DATE --- is created automatically.
+
+            \sstitem
+            ORIGIN --- inherits any existing ORIGIN card in the NDF FITS
+            extension, unless you supply a value through parameter
+            ORIGIN other than the default {\tt "Starlink Project, U.K."}
 
             \sstitem
             EXTNAME --- is the array-component name when the EXTNAME
@@ -280,16 +283,16 @@
             dimensions, and is 0 when the extension is not an array.
 
             \sstitem
-            HDUCLAS1, HDUCLAS{\em{n}} -- {\tt "NDF"} and the
+            HDUCLAS1, HDUCLAS{\em{n}} --- {\tt "NDF"} and the
               array-component name respectively.
 
             \sstitem
-            LBOUND{\em{n}} -- is the pixel origin for the $n^{\rm th}$ dimension
+            LBOUND{\em{n}} --- is the pixel origin for the $n^{\rm th}$ dimension
               when any of the pixel origins is not equal to 1.  (This is not a
               standard FITS keyword.)
 
             \sstitem
-            XTENSION, BSCALE, BZERO, BLANK and END -- are not propagated
+            XTENSION, BSCALE, BZERO, BLANK and END --- are not propagated
               from the NDF's FITS extension.  XTENSION will be set for
               any extension.  BSCALE and BZERO will be defined based on
               the chosen output data type in comparison with the NDF
@@ -304,7 +307,7 @@
               as before.  The END card terminates the FITS header.
 
            \sstitem
-              HISTORY -- HISTORY headers are propagated from the FITS
+              HISTORY --- HISTORY headers are propagated from the FITS
               extension when PROFITS is {\tt TRUE}, and from the NDF
               history component when PROHIS is {\tt TRUE}.
 
