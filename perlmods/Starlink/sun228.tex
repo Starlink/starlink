@@ -1,0 +1,933 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+% Fixed part
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+
+% Variable part - replace [xxx] as appropriate.
+\newcommand{\stardocnumber}    {228.1}
+\newcommand{\stardocauthors}   {T.\ Jenness, F.\ Economou\\
+                                Joint Astronomy Centre, Hilo, Hawaii}
+\newcommand{\stardocdate}      {16 February 1999}
+\newcommand{\stardoctitle}     {STARPERL -- Starlink perl modules}
+\newcommand{\stardocversion}   {1.00}
+\newcommand{\stardocmanual}    {User's manual}
+\newcommand{\stardocabstract}  {The StarPerl package is a selection
+of perl modules that provide access to Starlink infrastructure libraries.
+Currently an interface to the ADAM messaging system is provided.
+}
+
+% Environment for indenting and using a small font.
+\newenvironment{myquote}{\begin{quote}\begin{small}}{\end{small}\end{quote}}
+
+\newcommand{\text}[1]{{\small \tt #1}}
+
+% LaTeX document produced by pod2latex from "Init.pm.pod".
+% The followings need be defined in the preamble of this document:
+\def\C++{{\rm C\kern-.05em\raise.3ex\hbox{\footnotesize ++}}}
+% \def\underscore{\leavevmode\kern.04em\vbox{\hrule width 0.4em height 0.3pt}}
+\setlength{\parindent}{0pt}
+
+
+
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun227.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%     TIMJ: Tim Jenness (Joint Astronomy Centre)
+
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%     16-Feb-1999 (TIMJ)
+%        Convert template to SUN227 - STARPERL.
+%     {Add further history here}
+%
+% -
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\renewcommand{\_}{\texttt{\symbol{95}}}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
+% -----------------------------------------------------------------------------
+% ? Document specific \newcommand or \newenvironment commands.
+% ? End of document specific commands
+% -----------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\textsc Rutherford Appleton Laboratory} \hfill {\textbf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\textbf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\textbf \stardocversion \\ [4ex]}
+   {\Huge\textbf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\textbf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1 ALIGN=CENTER> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
+
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory\ \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%  ==================
+\stardocabstract
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+  \newpage
+  \begin{latexonly}
+    \setlength{\parskip}{0mm}
+    \tableofcontents
+    \setlength{\parskip}{\medskipamount}
+    \markboth{\stardocname}{\stardocname}
+  \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% ? Main text
+
+\section{Introduction}
+
+The Starperl package provides modules for perl/Starlink interoperability. The
+purpose of this package is to allow access to the Starlink infrastructure
+libraries from the \xref{perl}{sun193}{} programming language. Available
+modules in this release are the ADAM module (for interface with the ADAM
+messaging system) and the EMS module.
+
+The mechanism for reading, writing and manipulating Starlink data format files
+(NDF and HDS) from perl is documented in \xref{SUN/222}{sun222}{}.
+
+\section{The usefulness of this package\label{stats}}
+
+The ADAM  modules are useful in situations where there is a need for
+efficient scripting without recourse to compiled code. An example of
+such a script is to process a large number of files.
+
+Suppose, for example that you wish to perform an operation (say calculation of
+the standard deviation) on a thousand data frames using the
+\xref{KAPPA}{sun95}{} \xref{\texttt{stats}}{sun95}{STATS} command. A unix
+c-shell script to perform this task would have a significant overhead, as
+every time the \texttt{stats} command is issued, the \xref{KAPPA}{sun95}{}
+monolith has to be started up and run down. On the other hand a perl script
+using the Starlink modules needs to run up the monolith only once, and while
+it is resident in memory fire off messages requesting it to perform the
+\xref{\texttt{stats}}{sun95}{STATS} operation.
+
+Another use for these modules is in situations where accurate status
+information needs to be propagated correctly to the calling
+programme. An example of this is a data reduction pipeline in which
+one wishes to not only detect the success or failure of a task, but
+also particular status codes (such as whether a fitting routine failed
+due to anomalies in the data or simply lack of disk space).
+
+
+\section{The Starlink Perl modules}
+
+All the modules from this distribution are placed in the \texttt{Starlink::}
+hierarchy so that Starlink perl functionality does not clash with existing
+modules.  The individual modules are discussed in the following sections.
+
+\section{Using these modules}
+
+The modules described in this document are distributed as standard
+perl dynamic modules. Like all such modules, they can be included by
+using the \texttt{use} function in perl at the start of your program:
+
+\begin{myquote}
+\begin{verbatim}
+#!/star/bin/perl
+
+use Starlink::modulename;
+\end{verbatim}
+\end{myquote}
+
+See the perl \texttt{perlmods} man page for more information on using modules.
+
+
+\section{EMS interface}
+
+A simple interface to the Starlink EMS C library (\xref{SSN/4}{ssn4}{}) is
+provided by the \texttt{Starlink::EMS} module. Currently only the internal
+routine \texttt{ems1\_get\_facility\_error} is available.
+
+\begin{myquote}
+\begin{verbatim}
+use Starlink::EMS;
+
+ems1_get_facility_error($status, $facility, $ident, $text);
+\end{verbatim}
+\end{myquote}
+
+When passed a status error code, this routine returns the facility
+name, error identifier and error message. It is used by the perl/ADAM
+module to decode error status codes returned by ADAM monoliths. 
+
+An interface to MERS (\xref{SUN/104}{sun104}{}) is provided by the 
+\xref{NDFPERL}{sun222}{} package (\xref{NDFPERL}{SUN/222}{}).
+
+\section{ADAM interface}
+
+This package provides modules that allow perl to send and receive ADAM
+messages. This allows a perl program to control ADAM monoliths without having
+to launch a new process each time a data reduction task is required (as found
+in \xref{shell scripts}{sc4}{} or using the \texttt{system} call from perl).
+
+
+\subsection{A simple example}
+
+Here is the code for the example discussed in section \ref{stats}. We have
+written this script to find the standard deviation of all files in directory
+matching the \texttt{obs*.sdf} pattern (such as \texttt{obs1.sdf},
+\texttt{obs2.sdf}, etc).
+
+This is what needs to happen in such as script
+
+\begin{itemize} 
+
+\item The Starlink modules are included
+
+\item The ADAM messaging is started and the KAPPA monolith is loaded
+
+\item Stuff happens
+
+\end{itemize}
+
+And here is what it really looks like:
+
+\begin{myquote}
+\begin{verbatim}
+#!/star/Perl/bin/perl
+
+# Include the modules}
+use Starlink::AMS::Init;
+use Starlink::AMS::Task;
+
+# Start the messaging system
+$ams = new Starlink::AMS::Init(1);
+
+# Set timeout to be 30 seconds
+$ams->timeout(30);
+
+# Turn off all information messages (eg the output of stats)
+# keeping error messages
+$ams->messages(0);
+
+# Now launch kappa (as an A-task) and store the object.
+# The first argument uses '$$' (the process id) so that this
+# script can be run without the possibility of clashing with another
+# script using kappa on the same machine.
+$kappa = new Starlink::AMS::Task("kappa_mon_$$", "$ENV{KAPPA_DIR}/kappa_mon");
+
+# Now wait for kappa to load
+$kappa->contactw || die "Error launching kappa - timeout";
+
+# Now loop over the required files
+
+foreach my $file (<obs*.sdf>) {
+
+  # Remove the trailing sdf from the filename for ADAM tasks
+  $file =~ s/\.sdf$//;
+
+  # Run kappa stats
+  $status = $kappa->obeyw("stats","ndf=$file");
+
+  # Return status should be DTASK__ACTCOMPLETE
+  die "error running stats" if $status != &Starlink::ADAM::DTASK__ACTCOMPLETE;
+
+  # Retrieve the standard deviation and print it out
+  ($status, $stdev) = $kappa->get("stats","sigma");
+
+  die "Error retrieving statistics for file $file"
+    if $status != &Starlink::ADAM::SAI__OK;
+
+  print "$file : $stdev\n";
+
+}
+
+# Messaging system and monolith are shutdown automatically.
+
+\end{verbatim}
+\end{myquote}
+
+\subsection{Component modules}
+
+The perl-ADAM interface is made of four modules:
+
+\begin{description}
+\item[Starlink::ADAM] 
+
+This is the low-level interface to libams. It should not be used directly
+unless you are familiar with the AMS library.\footnote{In future releases this 
+module might be renamed to Starlink::AMS::AMSLib. If this happens a stub
+interface to Starlink::ADAM will be provided.} This module does provide
+access to constants such as SAI\_\_OK and DTASK\_\_ACTCOMPLETE.
+
+\item[Starlink::AMS::Core]
+
+This is the lowest level task interface for controlling ADAM tasks. It should
+not be used directly.
+
+\item[Starlink::AMS::Init]
+
+This is a high level object-oriented interface to the messaging layer. It is
+used to turn on ADAM messaging, control timeouts and control the printing
+of information and error messages.
+
+\item[Starlink::AMS::Task]
+
+This is a high-level object-oriented interface to ADAM tasks and provides
+means for launching monoliths and sending CONTROL, OBEY, GET and SET
+messages. An instance of this object is created for each monolith.
+
+\end{description}
+
+Only the high-level interface will  be discussed in this document.
+The methods are described in the appendix.
+
+\subsubsection{Starlink::AMS::Init}
+
+
+This class is responsible for starting the messaging layer (unlike
+\xref{STARTCL}{sun186}{} the messaging system is not initialised as soon as
+the code is loaded) and controlling the user-interface to the messaging system
+(such as timeouts and where the replies from the monolith are sent).
+
+The messaging is initialised by creating a new instance of 
+a Starlink::AMS::Init object. All further attempts to create a new
+instance of this object will result in the \emph{same} object being
+returned (i.e.\ only one instance of this object will actually exist).
+
+\begin{myquote}
+\begin{verbatim}
+use Starlink::AMS::Init;
+
+$ams = new Starlink::AMS::Init(1);  # Start messaging
+
+$ams->timeout(600); # Set timeout to 10 minutes
+\end{verbatim}
+\end{myquote}
+
+\subsubsection{Starlink::AMS::Task}
+
+This class is responsible for launching and communicating with ADAM
+monoliths. The monoliths can be launched as either A-tasks (where the
+parameters are reset after each message and values stored in a
+file in the ADAM\_USER directory) or as I-tasks (where the state
+of the parameters is retained in the monolith). The default is to launch
+monoliths as A-tasks since this replicates the behaviour seen from 
+\xref{ICL}{sg5}{} and the Unix shell.
+
+Example usage is:
+\begin{myquote}
+\begin{verbatim}
+$kappa = new Starlink::AMS::Task("name","monolith_image");
+$status = $kappa->obeyw("task", "params");
+$status = $kappa->set("task","param","value");
+($status, $value) = $kappa->get("task","param");
+$dir = $kappa->control("default","dir");
+$kappa->control("par_reset");
+\end{verbatim}
+\end{myquote}
+
+
+
+\subsection{Constants}
+
+Compiler constants are made available via the Starlink::ADAM module.
+The available constants are: 
+
+\begin{myquote}
+SAI\_\_OK, SAI\_\_WARN, SAI\_\_ERROR\footnote{The 
+SAI\_\_ constants are also available from the NDFPERL package},
+
+DTASK\_\_ACTSTART, DTASK\_\_ACTCOMPLETE, 
+
+MESSYS\_\_INFINITE, MESSYS\_\_PARAMREQ, MESSYS\_\_PARAMREP, MESSYS\_\_INFORM,
+MESSYS\_\_SYNC, MESSYS\_\_SYNCREP, MESSYS\_\_TRIGGER, MESSYS\_\_MESSAGE,
+
+MSG\_VAL\_LEN, MSG\_NAME\_LEN, 
+
+OBEY, GET, SET, CANCEL, CONTROL.
+\end{myquote}
+
+These constants are not exported by the module (the Autoloader module is used) 
+and must be fully-qualified, eg:
+
+\begin{myquote}
+\begin{verbatim}
+$good_status = &Starlink::SAI__OK;
+$complete    = &Starlink::DTASK__ACTCOMPLETE;
+\end{verbatim}
+\end{myquote}
+
+Note the use of the ampersand to indicate that this is actually an
+autoloaded function and not a variable.
+
+
+\subsection{Limitations and bugs}
+
+Currently the perl/ADAM interface does not make use of an event loop.
+This means that, for example, a GET, SET, OBEYW or CONTROL message will
+wait (block) for the monolith to respond before control is returned
+to the perl program. A non-blocking OBEY is not yet available.
+
+There seems to be a problem when removing monoliths from the message
+system. When a monolith is killed it should send a message to 
+all processes that have previously talked to it via the messaging
+system so that the communications are shut down cleanly. In the perl
+implementation a segmentation fault occurs when attempting to talk
+to a monolith that has been contacted before, but has since died.
+This may be related to the fact that the perl interface is not
+listening to messages at all times (no event loop). Currently, the
+only solution is to create a new perl Task object with a different
+name in the message system.
+
+
+\appendix
+
+
+\section{ADAM interface}
+
+This section describes the methods available from the Starlink::AMS::Init
+and Starlink::AMS::Task modules.
+
+\subsection{Starlink::AMS::Init}
+
+The following methods are provided:
+
+\begin{itemize}
+
+\item[new()]%
+\index{new@new}%
+
+Create a new instance of Starlink::AMS::Init.
+If a true argument is supplied the messaging system is also
+initialised via the {\em init()\/} method.
+
+\begin{myquote}
+\begin{verbatim}
+$ams = new Starlink::AMS::Init(1);  # Start messaging
+$ams = new Starlink::AMS::Init(0);  # Delay messaging start
+\end{verbatim}
+\end{myquote}
+
+
+\item[messages]%
+\index{messages@messages}%
+\hfil\\
+Method to set whether standard messages returned from monoliths
+are printed or not. If set to true the messages are printed
+else they are ignored.
+
+\begin{myquote}
+\begin{verbatim}
+$current = $ams->messages;
+$ams->messages(0);
+\end{verbatim}
+\end{myquote}
+
+Default is to print all messages.
+
+\item[errors]%
+\index{errors@errors}%
+\hfil\\
+Method to set whether error messages returned from monoliths
+are printed or not. If set to true the errors are printed
+else they are ignored.
+\begin{myquote}
+\begin{verbatim}
+$current = $ams->errors;
+$ams->errors(0);
+\end{verbatim}
+\end{myquote}
+
+Default is to print all messages.
+
+\item[timeout]%
+\index{timeout@timeout}%
+\hfil\\
+Set or retrieve the timeout (in seconds) for some of the ADAM messages.
+Default is 30 seconds.
+\begin{myquote}
+\begin{verbatim}
+$ams->timeout(10);
+$current = $ams->timeout;
+\end{verbatim}
+\end{myquote}
+
+\item[stderr]%
+\index{stderr@stderr}%
+\hfil\\
+Set and retrieve the current filehandle to be used for printing
+error messages. Default is to use STDERR.
+
+\item[stderr]%
+\index{stderr@stderr}%
+\hfil\\
+Set and retrieve the current filehandle to be used for printing
+normal ADAM messages. Default is to use STDOUT.
+
+\item[paramrep]%
+\index{paramrep@paramrep}%
+\hfil\\
+Set and retrieve the code reference that will be executed if
+the parameter system needs to ask for a parameter.
+Default behaviour is to call a routine that simply prompts
+the user for the required value. The supplied subroutine
+should accept three arguments (the parameter name, prompt string and
+default value) and should return the required value.
+\begin{myquote}
+\begin{verbatim}
+$self->paramrep(\&mysub);
+\end{verbatim}
+\end{myquote}
+
+A simple check is made to make sure that the supplied argument
+is a code reference.
+
+Warning: It is possible to get into an infinite loop if you try
+to continually return an unacceptable answer.
+
+\item[init]%
+\index{init@init}%
+\hfil\\
+Initialises the ADAM messaging system. This routine should always be
+called before attempting to control I-tasks.
+
+A relay task is spawned in order to test that the messaging system
+is functioning correctly. The relay itself is not necessary for the
+non-event loop implementation. If this command hangs then it is
+likely that the messaging system is not running correctly (eg
+because the system was shutdown uncleanly --- try removing named pipes
+from the $\tilde{\hspace{0.4em}}$/adam directory).
+
+Starlink Status is returned.
+
+\item[shutdown]%
+\index{shutdown@shutdown}%
+\hfil\\
+This method forces the Adam messaging system to be shutdown.
+(It runs the adamtask\_exit routine in Starlink::AMS::Core).
+
+Returns the status.
+
+\end{itemize}
+
+The messaging interface is automatically shutdown when the perl process is
+exited. 
+
+\subsection{Starlink::AMS::Task}
+
+The methods provided by this class are:
+
+\begin{itemize}
+
+\item[new()]%
+\index{new()@new()}%
+\hfil\\
+Create a new instance of a Starlink::AMS::Task object.
+\begin{myquote}
+\begin{verbatim}
+$obj = new Starlink::AMS::Task;
+$obj = new Starlink::AMS::Task("name_in_message_system","monolith");
+\end{verbatim}
+\end{myquote}
+
+If supplied with arguments (matching those expected by {\em load()\/} ) the
+specified task will be loaded upon creating the object. If the {\em load()\/}
+fails then undef is returned (which will not be an object reference).
+
+\item[name]%
+\index{name@name}%
+\hfil\\
+The name used by the messaging system to contact the monolith.
+Can be used to set or retrieve the value of name (do not set
+this value from outside unless you know that a path to the 
+new name exists in the messaging system).
+\begin{myquote}
+\begin{verbatim}
+$name = $obj->name;
+$name = $obj->name("name")
+\end{verbatim}
+\end{myquote}
+
+\item[pid]%
+\index{pid@pid}%
+
+Returns the process object (derived from a Proc::Simple object)
+of the monolith if the monolith was started by this object.
+This can be used to query the process ID and to check that
+the process associated with the monolith still exists.
+\begin{myquote}
+\begin{verbatim}
+$proc = $obj->pid;
+\end{verbatim}
+\end{myquote}
+
+\item[tasktype]%
+\index{tasktype@tasktype}%
+\hfil\\
+Return or set the type of task associated with the object.
+Should be either 'A' or 'I'.
+\begin{myquote}
+\begin{verbatim}
+$task->tasktype('A');
+\end{verbatim}
+\end{myquote}
+
+\item[monolith]%
+\index{monolith@monolith}%
+\hfil\\
+Returns or sets the name of the monolith (not including path).
+This is obtained by looking at the second argument to the
+load method and is required for A-tasks when performing a parameter
+get.
+
+\item[adamdir]%
+\index{adamdir@adamdir}%
+\hfil\\
+Retrieve the current value of \$ADAM\_{}USER. If not defined the
+value of \$ADAM\_{}USER is stored --- this method is used to store the
+value of \$ADAM\_{}USER at load time so that the location of any
+adam parameter file can be found (for A-tasks).
+
+\item[DESTROY]%
+\index{DESTROY@DESTROY}%
+\hfil\\
+Destructor for this object. When the last reference to this
+object is removed the destructor is executed automatically.
+In this case the monolith attached to object is killed 
+unless it is already {\em dead\/}(!) or it has been forgotten
+via the {\em forget()\/} method.
+
+\item[load]%
+\index{load@load}%
+\hfil\\
+Load a monolith and set up the name in the messaging system.
+This task is called by the 'new' method.
+\begin{myquote}
+\begin{verbatim}
+$status = $obj->load("name","monolith_binary",{ TASKTYPE => 'A' });
+\end{verbatim}
+\end{myquote}
+
+If the second argument is omitted it is assumed that the binary
+is already running and can be called by "name".   
+
+The last argument, if needed, is a reference to a hash containing
+the load options. 
+
+Options currently supported are:
+\begin{myquote}
+\begin{verbatim}
+TASKTYPE => 'A' for A-task, 'I' for I-task.
+MONOLITH => monolith name to be used for A-task parameter retrieval
+\end{verbatim}
+\end{myquote}
+
+Default is to launch an A-task. Default task type when no monolith
+or options are specified is 'I'.
+
+The MONOLITH option can be used to configure A-tasks such that 
+they can retrieve parameters from monoliths that were not started by this 
+object. (It is identical to creating the object and then setting the
+monolith name via the {\em monolith()\/} method)
+
+If a path to a binary with name "name" already exists then the monolith
+is not loaded.
+
+\item[obeyw]%
+\index{obeyw@obeyw}%
+\hfil\\
+Send an obey to a task and wait for a completion message
+\begin{myquote}
+\begin{verbatim}
+$status = $obj->obeyw("action","params");
+\end{verbatim}
+\end{myquote}
+
+\item[get]%
+\index{get@get}%
+
+Obtain the value of a parameter from a task. 
+When called from an array context the status and values are returned
+(multiple values are returned in an array). When called from a scalar
+context the values are returned as a single string joined by commas.
+
+\begin{myquote}
+\begin{verbatim}
+($status, @values) = $obj->get("task","param");
+\end{verbatim}
+\end{myquote}
+or
+\begin{myquote}
+\begin{verbatim}
+$value = $obj->get("task","param");
+\end{verbatim}
+\end{myquote}
+
+If the monolith has been started as an A-task the adam messaging
+system can not be used to retrieve the parameter value. Instead,
+the par\_{}get routine from the perl NDF module is invoked.
+
+\item[set]%
+\index{set@set}%
+
+Set the value of a parameter in an I-task.
+\begin{myquote}
+\begin{verbatim}
+$status = $obj->set("action","param","value");
+\end{verbatim}
+\end{myquote}
+
+This routine has no effect in A-tasks.
+
+\item[control]%
+\index{control@control}%
+\hfil\\
+Send control messages to a monolith.
+\begin{myquote}
+\begin{verbatim}
+$obj->control("par_reset");
+($value, $status)  = $obj->control("default","dir");
+\end{verbatim}
+\end{myquote}
+
+\item[forget]%
+\index{forget@forget}%
+\hfil\\
+Remove the monolith name from the list of known monoliths.
+This method prevents the monolith from being killed when adam
+exits or when the object is destroyed.
+
+This routine has no input arguments. 
+
+\item[contact]%
+\index{contact@contact}%
+\hfil\\
+This method can be used to determine whether the object can
+contact a monolith. Returns a 1 if we can contact a monolith and
+a zero if we cant.
+
+\item[contactw]%
+\index{contactw@contactw}%
+\hfil\\
+This method will not return unless the monolith can be contacted.
+It only returns with a timeout. Returns a '1' if we contacted okay
+and a '0' if we timed out. It will timeout if it takes longer than
+specified in Starlink::AMS::Init-$>$timeout.
+
+\end{itemize}
+
+
+
+% ? End of main text
+\end{document}
