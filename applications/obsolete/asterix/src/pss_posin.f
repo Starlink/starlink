@@ -124,7 +124,7 @@
         ELSE
 
 *        Try to open as HDS file
-          CALL ADI_FOPEN( PLIST(:PLEN), 'SSDSset|SSDDS', 'READ',
+          CALL ADI_FOPEN( PLIST(:PLEN), 'SSDSset|SSDS', 'READ',
      :                    SID, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             SSDS_THERE = .TRUE.
@@ -164,6 +164,17 @@
 
 *    Switch on file type
       IF ( SSDS_THERE ) THEN
+
+*      Try to open file
+        IF ( .NOT. ALREADY_OPEN ) THEN
+          CALL ADI_FOPEN( PLIST(:PLEN), 'SSDSset|SSDS', 'READ',
+     :                    SID, STATUS )
+        END IF
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL MSG_SETC( 'FILE', PLIST )
+          CALL MSG_PRNT( 'Unable to open file ^FILE' )
+          GOTO 99
+        END IF
 
 *      Associate into SSO system
         CALL ADI_CGET0I( SID, 'NSRC', NSRC, STATUS )
