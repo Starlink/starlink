@@ -152,6 +152,11 @@
 *  History:
 *     20-MAY-1997 (PDRAPER):
 *        Original version.
+*     16-OCT-1998 (PDRAPER):
+*        Added call to SLV_RESET to work around problems with
+*        KAPPA:DISPLAY dynamic parameters (X/YMAGN and CENTRE) not
+*        updating. This is a problem when using images of differing
+*        sizes.  
 *     {enter_changes_here}
 
 *  Bugs:
@@ -535,13 +540,15 @@ C      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
          CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
          CALL FIO_CLOSE( FD, STATUS )
          
-*  Display this NDF.
+*  Display this NDF. Note we need to reset the monolith parameters
+*  as display centre & x/ymagn are not updated.
          CALL MSG_SETC( 'NDFNAM', NDFNAM( :NDFLEN ) )
          CALL CCD1_MSG( ' ',  '  Displaying NDF ^NDFNAM', STATUS )
          CALL MSG_BLANK( STATUS )
          CMD = 'in='//NDFNAM( :NDFLEN )//' '//
      :         'mode=percentiles '//
      :         'percentiles='//PERC//' accept'
+         CALL SLV_RESET( KAPVIE, STATUS )
          CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
 
 *  Activate the cursor routine. Use all the NDF names of this group as the IN

@@ -1899,3 +1899,36 @@ void SlvKill( pid_t pid, int *status ) {
    }
    ems_end_c( status );
 }
+
+/*  
+ *  PWD: added this function to allow parameters to be reset (some
+ *       dynamic variable in KAPPA:DISPLAY where causing problems by
+ *       remaining locked.
+ */
+
+F77_SUBROUTINE(slv_reset)( CHARACTER(TASK), INTEGER(STATUS) TRAIL(TASK) ) {
+   GENPTR_CHARACTER(TASK)
+   GENPTR_INTEGER(STATUS)
+
+   char *task;
+   int messid;
+   int path;
+   int status;
+
+   status = (int) *STATUS;
+   if ( status != SAI__OK ) return 0;
+
+   task = cnf_creim( (char *) TASK, TASK_length );
+
+   /* Get the path to the task */
+   ams_path( (char *) task, &path, &status );
+   if ( status == MESSYS__PATHOPEN ) status = SAI__OK;
+
+   /* Send the CONTROL request to the task. */
+   ams_send( path, MESSYS__MESSAGE, SAI__OK, CONTROL, "PAR_RESET",
+             1, " ", &messid, &status );
+
+   cnf_free( task );
+}
+
+
