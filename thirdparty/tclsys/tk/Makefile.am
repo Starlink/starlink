@@ -4,4 +4,4 @@
 RECURSIVE_TARGETS = all clean
 
 $(RECURSIVE_TARGETS):
-	cd unix; $(MAKE) $@
+	cd unix; $(MAKE) CFLAGS="$(STAR_CPPFLAGS) $(AM_CPPFLAGS) $(CPPFLAGS) $(CFLAGS)" $@
