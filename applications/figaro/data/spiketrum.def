@@ -1,0 +1,165 @@
+   *---------------------------------------------------------------------------
+   *
+   *                     S P I K E T R U M . D E F
+   *
+   *  Figaro structure definition file for a 1D spiketrum.
+   *
+   *  Structure parameters -
+   *
+   *  NX     (Integer) Number of elements in the data.  Required.
+   *  NCH    (Integer) Number of characters in the various strings
+   *                                              (defaults to 64).
+   *  LVAL   (Logical) True if there is a left hand value in the 
+   *                                      table (dafault is false).
+   *  RVAL   (Logical) True if there is a right hand value in the 
+   *                                      table (dafault is false).
+   *  NTAB   (Integer) Number of table values (excluding the left 
+   *                                  and right values).  Required.
+   *
+   *  Structure elements defined symbolically -
+   *
+   *  LAMDA_LEFT    Wavelength of left hand point
+   *  LAMDA_RIGHT   Wavelength of right hand point
+   *  DATA_LEFT     Data value for left hand point
+   *  DATA_RIGHT    Data value for right hand point
+   *  TABLE_DATA    Array of tabled data values
+   *
+   *  Note:  An additional number of EQUATES have been added to this
+   *  file so that old-fashioned Figaro .TAB files can continue to be
+   *  used.  These contain explicit SET commands that specify items like
+   *  .TABLE.BANDWIDTH. In this file, all those used by the standard
+   *  Figaro 2.4 .TAB files are defined as EQUATEd variables, so that
+   *  these can be translated automatically into the correct NDF items.
+   *---------------------------------------------------------------------------
+
+   *---------------------------------------------------------------------------
+   *  Modifications:
+   *  24th March 1991.  NDF variant added. EQUATES added for the two
+   *                    structure types so .TABLE.BANDWIDTH etc can
+   *                    be interpreted properly for both types.
+   *---------------------------------------------------------------------------
+
+   VARIABLE nx
+   VARIABLE nch  DEFAULT 64
+   VARIABLE lval DEFAULT False
+   VARIABLE rval DEFAULT False
+   VARIABLE ntab
+
+   *---------------------------------------------------------------------------
+   *  TABLE_STRUCT definition is the same for both data formats.
+   *---------------------------------------------------------------------------
+
+   STRUCTURE TABLE_STRUCT STRUCT
+      IF (lval) THEN
+         .XLEFT  FLOAT
+         .ZLEFT  FLOAT
+      END IF
+      IF (rval) THEN
+         .XRIGHT  FLOAT
+         .ZRIGHT  FLOAT
+      END IF
+      .DATA[ntab] FLOAT
+      .BANDWIDTH FLOAT
+      .LAMBDA_DOUBLE FLOAT
+   END STRUCTURE
+
+   *---------------------------------------------------------------------------
+   *  The DST definition follows the original Figaro structure.
+   *---------------------------------------------------------------------------
+
+   VARIANT DST
+
+      STRUCTURE SPIKETRUM SPIKE_TYPE
+         .OBS   OBS_STRUCT
+         .X     AXIS_STRUCT
+         .Z     DATA_STRUCT
+        *.TABLE TABLE_STRUCT  !Usually added explicitly by FGR_ADD_STRUCTURE
+      END STRUCTURE
+
+      STRUCTURE OBS_STRUCT STRUCT
+         .OBJECT[nch]  CHAR
+      END STRUCTURE
+
+      STRUCTURE AXIS_STRUCT STRUCT
+         .DATA[nx]   FLOAT
+         .LABEL[nch] CHAR
+         .UNITS[nch] CHAR
+      END STRUCTURE
+
+      STRUCTURE DATA_STRUCT STRUCT
+         .DATA[nx]   FLOAT
+         .LABEL[nch] CHAR
+         .UNITS[nch] CHAR
+      END STRUCTURE
+
+      EQUATE lambda_right .TABLE.XRIGHT
+      EQUATE lambda_left  .TABLE.XLEFT
+      EQUATE data_right   .TABLE.ZRIGHT
+      EQUATE data_left    .TABLE.ZLEFT
+      EQUATE table_data   .TABLE.DATA
+      EQUATE bandwidth    .TABLE.BANDWIDTH
+      EQUATE lambda_double .TABLE.LAMBDA_DOUBLE
+
+      EQUATE table_structure .TABLE
+
+      EQUATE .table.bandwidth .TABLE.BANDWIDTH
+      EQUATE .table.lambda_double .TABLE.LAMBDA_DOUBLE
+      EQUATE .z.revscale      .Z.MAGFLAG
+      EQUATE .z.magflag       .Z.MAGFLAG
+      EQUATE .z.units         .Z.UNITS
+      EQUATE .z.label         .Z.LABEL
+      EQUATE .revscale        .Z.MAGFLAG
+      EQUATE .magflag         .Z.MAGFLAG
+      EQUATE .units           .Z.UNITS
+      EQUATE .label           .Z.LABEL
+
+   END VARIANT
+
+   *---------------------------------------------------------------------------
+   *  The NDF definition should follow the Starlink SGP 38 guidelines, putting
+   *  the .TABLE structure down into .MORE.FIGARO.TABLE.
+   *---------------------------------------------------------------------------
+
+   VARIANT NDF
+
+      STRUCTURE SPIKETRUM SPIKE_TYPE
+         .DATA_ARRAY[nx] FLOAT
+         .TITLE[nch]     CHAR
+         .AXIS[1]        AXIS_STRUCT
+         .MORE           MORE_STRUCT
+      END STRUCTURE
+
+      STRUCTURE AXIS_STRUCT AXIS
+         .DATA_ARRAY[nx] FLOAT
+      END STRUCTURE
+
+      STRUCTURE MORE_STRUCT EXT
+         .FIGARO         FIG_EXT_STRUCT
+      END STRUCTURE
+
+      STRUCTURE FIG_EXT_STRUCT FIG_EXT
+         *.TABLE TABLE_STRUCT  !Usually added explicitly by FGR_ADD_STRUCTURE
+      END STRUCTURE
+
+      EQUATE lambda_right .MORE.FIGARO.TABLE.XRIGHT
+      EQUATE lambda_left  .MORE.FIGARO.TABLE.XLEFT
+      EQUATE data_right   .MORE.FIGARO.TABLE.ZRIGHT
+      EQUATE data_left    .MORE.FIGARO.TABLE.ZLEFT
+      EQUATE table_data   .MORE.FIGARO.TABLE.DATA
+      EQUATE bandwidth    .MORE.FIGARO.TABLE.BANDWIDTH
+      EQUATE lambda_double .MORE.FIGARO.TABLE.LAMBDA_DOUBLE
+
+      EQUATE table_structure .MORE.FIGARO.TABLE
+
+      EQUATE .table.bandwidth .MORE.FIGARO.TABLE.BANDWIDTH
+      EQUATE .table.lambda_double .MORE.FIGARO.TABLE.LAMBDA_DOUBLE
+      EQUATE .revscale        .MORE.FIGARO.MAGFLAG
+      EQUATE .magflag         .MORE.FIGARO.MAGFLAG
+      EQUATE .units           .UNITS
+      EQUATE .label           .LABEL
+      EQUATE .z.revscale      .MORE.FIGARO.MAGFLAG
+      EQUATE .z.magflag       .MORE.FIGARO.MAGFLAG
+      EQUATE .z.units         .UNITS
+      EQUATE .z.label         .LABEL
+
+   END VARIANT

@@ -1,0 +1,68 @@
+   *--------------------------------------------------------------
+   *
+   *                     S P E C T R U M . D E F
+   *
+   *  Figaro structure definition file for a 1D spectrum.
+   *
+   *  Structure parameters -
+   *
+   *  NX     (Integer) Number of elements in the data.  Required.
+   *  NCH    (Integer) Number of characters in the various strings
+   *                                              (defaults to 64).
+   *
+   *  Structure elements defined symbolically -  None.
+   *
+   *  Changes: 22 May 1991 (JM)  AXIS type in NDF variant changed
+   *                             from STRUCT to AXIS.
+   *           18 May 1993 (HME) NDF variant must have VARIANCE,
+   *                             not ERRORS.
+   *--------------------------------------------------------------
+
+   VARIABLE nx
+   VARIABLE nch  DEFAULT 64
+
+   VARIANT DST
+
+      STRUCTURE SPECTRUM SPECT_TYPE
+         .OBS   OBS_STRUCT
+         .X     AXIS_STRUCT
+         .Z     DATA_STRUCT
+      END STRUCTURE
+
+      STRUCTURE OBS_STRUCT STRUCT
+         .OBJECT[nch]  CHAR
+      END STRUCTURE
+
+      STRUCTURE AXIS_STRUCT STRUCT
+         .DATA[nx]   FLOAT
+         .LABEL[nch] CHAR
+         .UNITS[nch] CHAR
+      END STRUCTURE
+
+      STRUCTURE DATA_STRUCT STRUCT
+         .DATA[nx]   FLOAT
+         .ERRORS[nx] FLOAT
+         .LABEL[nch] CHAR
+         .UNITS[nch] CHAR
+      END STRUCTURE
+
+   END VARIANT
+
+   VARIANT NDF
+
+      STRUCTURE SPECTRUM SPECT_TYPE
+         .AXIS[1]   AXIS_STRUCT
+         .DATA_ARRAY[nx] FLOAT
+         .VARIANCE[nx] FLOAT
+         .UNITS[nch] CHAR
+         .LABEL[nch] CHAR
+         .TITLE[nch] CHAR
+      END STRUCTURE
+
+      STRUCTURE AXIS_STRUCT AXIS
+         .DATA_ARRAY[nx]   FLOAT
+         .LABEL[nch] CHAR
+         .UNITS[nch] CHAR
+      END STRUCTURE
+
+   END VARIANT

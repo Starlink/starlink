@@ -1,0 +1,35 @@
+
+   *
+   *                         K M A G S . D A T
+   *
+   *   This file lists the AAO JHKL' photometric standards (Allen &
+   *   Cragg 1983, MNRAS 203, 777), giving the K magnitudes for the
+   *   various stars.  This file is intended to be used by the FIGARO
+   *   routine FIGSFLUX.  The format is fairly free, but note that the
+   *   object names cannot have embedded spaces - ie 'BS88', not 'BS 88'
+   *
+
+   BS88    4.88
+   BS448   4.28
+   BS772   4.26
+   BS996   3.27
+   BS1006  4.00
+   BS1294  4.84
+   BS2007  4.45
+   BS2290  5.15
+   BS2882  5.18
+   BS3421  5.16
+   BS4013  5.01
+   BS4523  3.32
+   BS4903  4.51
+   BS5384  4.71
+   BS5699  4.10
+   BS5868  3.00
+   BS5996  4.87
+   BS6094  3.94
+   BS6441  5.17
+   BS6748  4.57
+   BS7330  4.97
+   BS7644  4.57
+   BS8477  4.70
+   BS8658  5.11
