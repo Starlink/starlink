@@ -6,6 +6,7 @@
       status = sai__ok
 
 
+      call checkPrism( status )
       call checkInterval( status )
       call checkPolygon( status )
       call checkBox( status )
@@ -353,19 +354,19 @@
       call ast_setl( int3, 'Negated', .false., status )
       int4 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
       if( ast_overlap( int3, int4, status ) .ne. 4 ) 
-     :    call stopit( status, 'Interval overlap 1' );
+     :    call stopit( status, 'Interval overlap 1' )
 
       call ast_negate( int3, status )
       if( ast_overlap( int3, int4, status ) .ne. 4 ) 
-     :    call stopit( status, 'Interval overlap 2' );
+     :    call stopit( status, 'Interval overlap 2' )
 
       call ast_negate( int4, status )
       if( ast_overlap( int3, int4, status ) .ne. 4 ) 
-     :    call stopit( status, 'Interval overlap 3' );
+     :    call stopit( status, 'Interval overlap 3' )
 
       call ast_negate( int3, status )
       if( ast_overlap( int3, int4, status ) .ne. 4 ) 
-     :    call stopit( status, 'Interval overlap 4' );
+     :    call stopit( status, 'Interval overlap 4' )
 
 
       lbnd( 1 ) = 0.6
@@ -377,28 +378,28 @@
 
       int4 = ast_interval( frm3, lbnd, ubnd, AST__NULL, ' ', status )
       if( ast_overlap( int3, int4, status ) .ne. 1 ) 
-     :    call stopit( status, 'Interval overlap 5' );
+     :    call stopit( status, 'Interval overlap 5' )
 
       call ast_negate( int3, status )
       if( ast_overlap( int3, int4, status ) .ne. 3 ) 
-     :    call stopit( status, 'Interval overlap 6' );
+     :    call stopit( status, 'Interval overlap 6' )
 
       call ast_negate( int4, status )
       if( ast_overlap( int3, int4, status ) .ne. 4 ) 
-     :    call stopit( status, 'Interval overlap 7' );
+     :    call stopit( status, 'Interval overlap 7' )
 
       call ast_negate( int3, status )
       if( ast_overlap( int3, int4, status ) .ne. 2 ) 
-     :    call stopit( status, 'Interval overlap 8' );
+     :    call stopit( status, 'Interval overlap 8' )
 
 
       int4 = ast_copy( int3, status )
       if( ast_overlap( int3, int4, status ) .ne. 5 ) 
-     :    call stopit( status, 'Interval overlap 9' );
+     :    call stopit( status, 'Interval overlap 9' )
 
       call ast_negate( int4, status )
       if( ast_overlap( int3, int4, status ) .ne. 6 ) 
-     :    call stopit( status, 'Interval overlap 10' );
+     :    call stopit( status, 'Interval overlap 10' )
 
 
 
@@ -1424,10 +1425,10 @@ C
       call ast_clear( fc, 'card', status )
       fs = ast_read( fc, status )
 
-      p1( 1 ) = 0.13089969 /* RA at centre = 0h30m /
-      p1( 2 ) = 0.17453293 /* Dec at centre = 10d /
-      p2( 1 ) = 6.1522856  /* RA at corner = 23h30m /
-      p2( 2 ) = -0.17453293 /* Dec at corner = -10d /
+      p1( 1 ) = 0.13089969  ! RA at centre = 0h30m 
+      p1( 2 ) = 0.17453293  ! Dec at centre = 10d
+      p2( 1 ) = 6.1522856   ! RA at corner = 23h30m
+      p2( 2 ) = -0.17453293 ! Dec at corner = -10d
 
       box1 = ast_box( fs, 0, p1, p2, AST__NULL, ' ', status )
 
@@ -1737,10 +1738,10 @@ C
       p2(1) = 0.1
       unc = ast_circle( bfrm, 1, p1, p2, AST__NULL, ' ', status )
 
-      p1( 1 ) = 100.0; /* Pix_X at centre /
-      p1( 2 ) = 150.0; /* Pix_Y at centre /
-      p2( 1 ) = 150.0; /* Pix_X at corner /
-      p2( 2 ) = 170.0; /* Pix_Y at corner /
+      p1( 1 ) = 100.0 ! Pix_X at centre
+      p1( 2 ) = 150.0 ! Pix_Y at centre
+      p2( 1 ) = 150.0 ! Pix_X at corner
+      p2( 2 ) = 170.0 ! Pix_Y at corner
 
       box1 = ast_box( bfrm, 0, p1, p2, AST__NULL, ' ', status )
 
@@ -2309,8 +2310,10 @@ C
       p2( 3 ) = 0.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status, 
-     :                                          'Sphere: Error 15' )
+      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) then
+         write(*,*) ast_overlap( cir1, cir2, status ),' should be 4 '
+         call stopit(status, 'Sphere: Error 15' )
+      end if
  
       p1( 1 ) = 2.000001
       p1( 2 ) = 0.0
@@ -2320,9 +2323,29 @@ C
       p2( 3 ) = 0.0
       cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
 
-      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
+      if( ast_overlap( cir1, cir2, status ) .ne. 4 ) call stopit(status, 
      :                                          'Sphere: Error 16' )
 
+      cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
+
+      call ast_setl( cir1, 'Closed', .false., status ) 
+      call ast_setl( cir2, 'Closed', .false., status )
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
+     :                                          'Sphere: Error 17' )     
+      call ast_clear( cir1, 'Closed', status ) 
+      call ast_clear( cir2, 'Closed', status )
+           
+      p1( 1 ) = 2.000003
+      p1( 2 ) = 0.0
+      p1( 3 ) = 0.0
+      p2( 1 ) = 2.000003
+      p2( 2 ) = 1.0
+      p2( 3 ) = 0.0
+      cir2 = ast_circle( frm1, 0, p1, p2, unc, ' ', status )
+
+      if( ast_overlap( cir1, cir2, status ) .ne. 1 ) call stopit(status, 
+     :                                          'Sphere: Error 18' )     
+      
       call ast_end( status )
       if( status .ne. sai__ok ) write(*,*) 'Circle tests failed'
 
@@ -3090,8 +3113,11 @@ C
 
 
 
-
+*
+*  Tests the dump function, the loader, and the astOverlap method.
+*
       subroutine checkdump( obj, text, status )
+
       implicit none
       include 'SAE_PAR'
       include 'AST_PAR'
@@ -3105,9 +3131,10 @@ C
 
       if( status .ne. sai__ok ) return
 
+*  Create a Channel which reads and writes to an internal string buffer.
       ch = ast_channel( mysource, mysink, ' ', status )
 
-
+*  Write the supplied Region out to this Channel.
       ll = 160
       next = 1
       if( ast_write( ch, obj, status ) .ne.1 ) then
@@ -3116,13 +3143,16 @@ C
      :                'channel' )
       end if
 
+*  Read an Object back from this Channel.
       next = 1
       result = ast_read( ch, status )
       if( result .eq. ast__null ) then
          write(*,*) text
          call stopit( status, 'Cannot read object from channel' )
       end if
-     
+
+*  Check that it is a Region and its boundary is identical to the supplied 
+*  Region.
       overlap = ast_overlap( obj, result, status )
       if( overlap .ne. 5 ) then
          write(*,*) 'obj result Overlap: ', overlap
@@ -3199,8 +3229,108 @@ C
 
 
 
+      subroutine checkPrism( status )
+      implicit none
+      include 'AST_PAR'
+      include 'SAE_PAR'
+
+      integer f1, f2, r1, r2, r3, r4, status
+      double precision lbnd(5),ubnd(5),p1(5),p2(5)
+      logical hasframeset
+
+      if( status .ne.sai__ok ) return
+
+      call ast_begin( status )
+
+      f1 = ast_skyframe( 'system=fk5', status )
+      p1(1) = 0.0
+      p1(2) = 0.0
+      p2(1) = 1.0E-4
+      p2(2) = 1.0E-4
+      r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
+
+      f2 = ast_specframe( 'Unit=Angstrom', status )
+      lbnd( 1 ) = 5000.0
+      ubnd( 1 ) = 6000.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r3 = ast_prism( r1, r2, ' ', status )
+
+      call checkdump( r3, 'checkdump Prism 1', status )
+
+      if( ast_overlap( r3, r3, status ) .ne. 5 ) call stopit( status, 
+     :                                                    'Prism 1' )
 
 
+      lbnd( 1 ) = 5500.0
+      ubnd( 1 ) = 5800.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r4 = ast_prism( r1, r2, ' ', status )
+
+
+      if( ast_overlap( r3, r4, status ) .ne. 3 ) call stopit( status, 
+     :                                                    'Prism 2' )
+      if( ast_overlap( r4, r3, status ) .ne. 2 ) then
+         write(*,*) ast_overlap( r4, r3, status ),' should be 2'
+         call stopit( status, 'Prism 3' )
+      end if
+
+      lbnd( 1 ) = 5500.0
+      ubnd( 1 ) = 6500.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r4 = ast_prism( r1, r2, ' ', status )
+      if( ast_overlap( r3, r4, status ) .ne. 4 ) call stopit( status, 
+     :                                                    'Prism 4' )
+      if( ast_overlap( r4, r3, status ) .ne. 4 ) call stopit( status, 
+     :                                                    'Prism 5' )
+
+      lbnd( 1 ) = 6500.0
+      ubnd( 1 ) = 7500.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r4 = ast_prism( r1, r2, ' ', status )
+      if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status, 
+     :                                                    'Prism 6' )
+      if( ast_overlap( r4, r3, status ) .ne. 1 ) call stopit( status, 
+     :                                                    'Prism 7' )
+
+      r4 = ast_copy( r3, status )
+      call ast_Negate( r4, status )
+      if( ast_overlap( r4, r3, status ) .ne. 6 ) call stopit( status, 
+     :                                                    'Prism 8' )
+
+
+      p1(1) = 2.0E-4
+      p1(2) = 2.0E-4
+      p2(1) = 1.1E-4
+      p2(2) = 1.0E-4
+      r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
+      lbnd( 1 ) = 5000.0
+      ubnd( 1 ) = 6000.0
+      r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
+      r4 = ast_prism( r1, r2, ' ', status )
+      if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status,
+     :                                                    'Prism 9' )
+
+      p1(1) = 2.0E-4
+      p1(2) = 2.0E-4
+      p2(1) = 1.0E-4
+      p2(2) = 1.0E-4
+      r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
+      r4 = ast_prism( r1, r2, ' ', status )
+      if( ast_overlap( r3, r4, status ) .ne. 4 ) call stopit( status,
+     :                                                    'Prism 10' )
+
+      call ast_setl( r3, 'Closed', .false., status )
+      call ast_setl( r4, 'Closed', .false., status )
+      if( ast_overlap( r3, r4, status ) .ne. 1 ) call stopit( status,
+     :                                                    'Prism 11' )
+      
+
+
+
+      call ast_end( status )
+      if( status .ne. sai__ok ) write(*,*) 'Prism tests failed'
+
+      end
 
 
 

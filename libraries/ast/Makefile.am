@@ -47,6 +47,7 @@ GRP_C_ROUTINES = \
     fpointlist.c \
     fpolygon.c \
     fpolymap.c \
+    fprism.c \
     frame.c \
     frameset.c \
     fratemap.c \
@@ -83,6 +84,7 @@ GRP_C_ROUTINES = \
     pointset.c \
     polygon.c \
     polymap.c \
+    prism.c \
     ratemap.c \
     region.c \
     shiftmap.c \
@@ -157,6 +159,7 @@ AST_H_FILES = \
                 nullregion.h \
                 pointlist.h \
                 polygon.h \
+                prism.h \
        channel.h \
           fitschan.h \
           xmlchan.h 

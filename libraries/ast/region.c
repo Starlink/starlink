@@ -758,6 +758,7 @@ static AstPointSet *RegGrid( AstRegion * );
 static AstPointSet *RegMesh( AstRegion * );
 static AstPointSet *RegTransform( AstRegion *, AstPointSet *, int, AstPointSet *, AstFrame ** );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
+static AstPointSet *GetSubMesh( int *, AstPointSet * );
 static AstRegion *MapRegion( AstRegion *, AstMapping *, AstFrame * );
 static AstSystemType SystemCode( AstFrame *, const char * );
 static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
@@ -2828,6 +2829,100 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    return result;
 }
 
+static AstPointSet *GetSubMesh( int *mask, AstPointSet *in ) {
+/*
+*  Name:
+*     GetSubMesh
+
+*  Purpose:
+*     Extract a selection of points from a PointSet.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstPointSet *GetSubMesh( int *mask, AstPointSet *in )
+
+*  Class Membership:
+*     Region member function 
+
+*  Description:
+*     This function creates a new PointSet holding points selected from a
+*     supplied PointSet. An integer mask is supplied to indicate which
+*     points should be selected.
+
+*  Parameters:
+*     mask
+*        Pointer to a mask array, Its size should be equal to the number
+*        of points in the supplied PointSet. Each corresponding point will 
+*        be copied if the mask value is zero.
+*     in
+*        Pointer to the PointSet holding the input positions.
+
+*  Returned Value:
+*     Pointer to the output PointSet. 
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstPointSet *result;          /* Pointer to output PointSet */
+   double **ptr_in;              /* Pointers to input axis values */
+   double **ptr_out;             /* Pointers to output axis values */
+   double *pin;                  /* Pointer to next input axis value */
+   double *pout;                 /* Pointer to next output axis value */
+   int *m;                       /* Pointer to next mask element */
+   int ic;                       /* Axis index */
+   int ip;                       /* Point index */
+   int nc;                       /* Number of axes in both PointSets */
+   int npin;                     /* Number of points in input PointSet */
+   int npout;                    /* Number of points in output PointSet */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the length of the mask. */
+   npin = astGetNpoint( in );
+
+/* Count the number of zeros in the mask. */
+   npout = 0;
+   m = mask;
+   for( ip = 0; ip < npin; ip++ ) {
+      if( *(m++) == 0 ) npout++;
+   }
+
+/* Create the output PointSet and get pointers to its data arrays. */
+   nc = astGetNcoord( in );
+   result = astPointSet( npout, nc, "" );
+   ptr_in = astGetPoints( in );
+   ptr_out = astGetPoints( result );
+
+/* Check pointers can be dereferenced safely. */
+   if( astOK ) {
+
+/* Copy the required axis values from the input to the output. */
+      for( ic = 0; ic < nc; ic++ ) {
+         pin = ptr_in[ ic ];
+         pout = ptr_out[ ic ];
+         m = mask;
+         for( ip = 0; ip < npin; ip++, pin++, m++ ) {
+            if( *m == 0 ) *(pout++) = *pin;
+         }
+      }
+   }
+
+/* Return a pointer to the output PointSet. */
+   return result;
+
+}
+
 static AstRegion *GetUnc( AstRegion *this, int ifrm ) {
 /*
 *+
@@ -4654,6 +4749,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    AstPointSet *ps2;              /* Mesh covering second Region */
    AstPointSet *ps3;              /* Mesh covering first Region */
    AstPointSet *ps4;              /* Mesh covering first Region */
+   AstPointSet *reg2_submesh;     /* Second Region mesh minus boundary points */
    AstPointSet *reg2_mesh;        /* Mesh covering second Region */
    AstPointSet *reg1_mesh;        /* Central point within first Region */
    AstRegion *reg1;               /* Region to use as the first Region */
@@ -4662,6 +4758,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    AstRegion *unc;                /* Uncertainty in second Region */
    double **ptr;                  /* Pointer to pointset data */
    double *p;                     /* Pointer to next axis value */
+   int *mask;                     /* Mask identifying common boundary points */
    int allbad;                    /* Were all axis values bad? */
    int allgood;                   /* Were all axis values good? */
    int bnd1;                      /* Does reg1 have a finite boundary */
@@ -4672,6 +4769,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    int nc;                        /* Number of axis values per point */
    int np;                        /* Number of points in mesh */
    int result;                    /* Value to return */
+   int touch;                     /* Do the Regions touch? */
 
 /* Initialise. */
    result = 0;
@@ -4696,9 +4794,9 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    Regions as a mesh of points along its boundary, and then checking to see
    if any of the points in this mesh fall inside or outside the other Region. 
    This can only be done if the Region has a boundary of finite length (e.g. 
-   Circles, Boxes, etc). Other Regions (e.g. Intervals) do not have finite 
-   boundaries and consequently report an error if an attempt is made to 
-   represent them using a boundary mesh. We now therefore check to see if 
+   Circles, Boxes, etc). Other Regions (e.g. some Intervals) do not have 
+   finite boundaries and consequently report an error if an attempt is made 
+   to represent them using a boundary mesh. We now therefore check to see if 
    either of the two Regions has a finite boundary length. This will be the 
    case if the region is bounded, or if it can be made bounded simply by 
    negating it. If a Region is unbounded regardless of the setting of its 
@@ -4718,9 +4816,9 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
    }
 
 /* If neither Regions has a finite boundary, then we cannot currently
-   determine any overlap, so report an error. Given more time, it is
-   probably possible to think of some way of determining overlap between
-   two unbounded Regions, but it will probably not be a common
+   determine any overlap, so report an error. Given more time, it 
+   is probably possible to think of some way of determining overlap
+   between two unbounded Regions, but it will probably not be a common
    requirement and so is currently put off to a rainy day. */
    if( !bnd_this && !bnd_that && astOK ) {
       astError( AST__INTER, "astOverlap(Region): Neither of the two "
@@ -4780,7 +4878,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 /* See if all points within this transformed mesh fall on the boundary of
    the first Region, to within the joint uncertainty of the two Regions. If
    so the two Regions have equivalent boundaries. */
-      if( astRegPins( reg1, ps1, unc1, NULL ) ) {
+      if( astRegPins( reg1, ps1, unc1, &mask ) ) {
 
 /* If the boundaries are equivalent, the Regions are either identical or 
    are mutually exclusive. To distinguish between these cases, we
@@ -4792,18 +4890,27 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
 /* If the boundaries of the two Regions are not equivalent. */
       } else {
 
-/* Transform the points in the mesh covering the second Region into the
+/* Create a new PointSet containing those points from the mesh which are
+   not on the boundary of the first Region. These points are identified by 
+   the mask array created by the astRegPins method above. */
+         reg2_submesh = GetSubMesh( mask, reg2_mesh );
+
+/* Transform the points in the submesh of the second Region into the
    current Frame of the first Region. */
          astAnnul( ps1 );
-         ps1 = astTransform( cmap, reg2_mesh, 1, NULL );
+         ps1 = astTransform( cmap, reg2_submesh, 1, NULL );
 
-/* Transform this mesh using the first Region as a Mapping. Any points
+/* Transform this submesh using the first Region as a Mapping. Any points
    outside the first region will be set bad in the output PointSet. */
          ps2 = astTransform( (AstMapping *) reg1, ps1, 1, NULL );
 
 /* Get the number of axes and points in this PointSet. */
          nc = astGetNcoord( ps2 );
          np = astGetNpoint( ps2 );
+
+/* Note if there were any common points (i.e. points on the boundary of
+   both regions). */
+         touch = ( astGetNpoint( reg2_mesh ) != np );
 
 /* Get pointers to the axis data in this PointSet, and check they can be
    used safely. */
@@ -4828,9 +4935,9 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
                }
             }
 
-/* If the entire mesh of the second Region was inside the first region,
-   return a result depending on whether the second region is bounded or
-   infinite. */
+/* If the entire mesh of the second Region was either on the boundary
+   of, or inside, the first region, return a result depending on whether the 
+   second region is bounded or infinite. */
             if( allgood ) {
                result = astGetBounded( reg2 ) ?  3 : 4;
 
@@ -4839,8 +4946,8 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
             } else if( !allbad ) {
                result = 4;
 
-/* Otherwise,(i.e. if all points in the second Region mesh were outside the 
-   first Region) if the first region is unbounded then all points on the 
+/* Otherwise,(i.e. if all points in the second Region mesh were on or outside 
+   the first Region) if the first region is unbounded then all points on the 
    second region mesh must be in a hole. The returned result then 
    depends on whether the second Region is bounded or not. */
             } else if( !astGetBounded( reg1 ) ) {
@@ -4857,11 +4964,11 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
                             "boundary (AST programming error)." );
                }
 
-/* Since the first Region is bounded, we have two possibilities - the boundary
-   of the first Region is either entirely inside or entirely outside the 
-   second Region. To distinguish between these two cases we get a mesh of 
-   points covering the boundary of the first Region (now known to be finite) 
-   and transform it using the second Region. */
+/* Since the first Region is bounded, we have two possibilities - the 
+   boundary of the first Region is either entirely on-or-inside, or entirely 
+   on-or-outside the second Region. To distinguish between these two cases 
+   we get a mesh of points covering the boundary of the first Region (now 
+   known to be finite) and transform it using the second Region. */
             } else {
                reg1_mesh = astRegMesh( reg1 );
 
@@ -4890,8 +4997,14 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
                reg1_mesh = astAnnul( reg1_mesh );
             }
          }
-
+	 
+/* If there was no intersection or overlap, but the regions touch, then we consider there    to be an intersection if either region is closed. */	 
+	if( touch && result == 1 ) {
+	   if( astGetClosed( this) || astGetClosed( that ) ) result = 4;
+	} 
+	 
 /* Free resources.*/
+         reg2_submesh = astAnnul( reg2_submesh );
          ps2 = astAnnul( ps2 );
       }
 
@@ -4905,6 +5018,7 @@ static int OverlapX( AstRegion *that, AstRegion *this ){
       reg2_mesh = astAnnul( reg2_mesh );
       unc = astAnnul( unc );
       unc1 = astAnnul( unc1 );
+      if( mask) mask = astFree( mask );
    }
 
 /* The returned value should take account of whether "this" or "that" is
@@ -5385,8 +5499,6 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
       box = astAnnul( box );
       ps1 = astAnnul( ps1 );
       ps2 = astAnnul( ps2 );
-      frmb = astAnnul( frmb );
-      frmb = astAnnul( frmb );
 
 /* Cache the new grid for future use. */
       if( astOK ) this->basegrid = astClone( result );
@@ -6576,7 +6688,9 @@ f        The global status.
    if( !astOK ) return;
 
 /* Annul any existing uncertainty Region. */
-   if( this->unc && astIsAObject( this->unc ) ) this->unc = astAnnul( this->unc );
+   if( this->unc ) {
+      this->unc = astIsAObject( this->unc ) ? astAnnul( this->unc ) : NULL;
+   } 
    this->defunc = 1;
 
 /* Check an uncertainty Region was supplied, and is of a usable class. */

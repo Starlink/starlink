@@ -12,7 +12,7 @@ Added 17/1/05:
 - Add support for HEALPIX ?? (e.g. see http://www.spacebanter.com/showthread.php?p=336715#post336715)
 - Pure Java version
 - Add Prism class
-- Correct void * arithmetic in keymap.c
+Done 17/1/05 - Correct void * arithmetic in keymap.c 
 - Integrate TimeFrame
 - Monitor progresss on FITS-WCS paper IV (and eventually paper V)
 - Write SOAP service to show off STC functionality
