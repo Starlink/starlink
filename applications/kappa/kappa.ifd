@@ -2968,6 +2968,15 @@ package kappa {
             default !
           }
 
+         parameter labout {
+            type _LOGICAL
+            prompt {Label outlines in Good and Bounds modes?}
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            helpkey *
+          }
+
          parameter length {
             size *
             type _REAL
@@ -18090,6 +18099,21 @@ iraf! {
 
    command fitshead {
       obey {$KAPPA_DIR/fitshead.csh}      
+   }
+
+   command outline {
+      task contour {
+         taskinherit axes
+         taskinherit clear
+         taskinherit device
+         taskinherit margin
+         taskinherit ndf
+         taskinherit pens
+         taskinherit style
+         taskparam labout=y
+         taskparam mode=bounds
+         taskparam penrot=y
+      }
    }
 
    command picbase {
