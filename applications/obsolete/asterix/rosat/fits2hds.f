@@ -582,7 +582,11 @@
 
 *         Create hds structure
              MAPMODE = 'WRITE'
-             IF ( DTYPE(COL).EQ.21) THEN
+             IF ( DTYPE(COL).EQ.11) THEN
+               CALL DAT_NEW1I(LOC,TTYPE(COL)(1:NLEN),NROWS,STATUS)
+               FTYPE(COL) = '_INTEGER'
+
+             ELSE IF ( DTYPE(COL).EQ.21) THEN
                CALL DAT_NEW1I(LOC,TTYPE(COL)(1:NLEN),NROWS,STATUS)
                FTYPE(COL) = '_INTEGER'
 
@@ -656,7 +660,11 @@
              IF (STATUS.NE.SAI__OK) GOTO 99
 
 *         Read the data
-             IF (DTYPE(COL).EQ.21) THEN
+             IF (DTYPE(COL).EQ.11) THEN
+               CALL FTGCVJ(IUNIT,COL,FBEG,1,FNUM,0,
+     :                                  %val(PNTR(COL)),ANYF,ISTATUS)
+
+             ELSE IF (DTYPE(COL).EQ.21) THEN
                CALL FTGCVJ(IUNIT,COL,FBEG,1,FNUM,0,
      :                                  %val(PNTR(COL)),ANYF,ISTATUS)
 
