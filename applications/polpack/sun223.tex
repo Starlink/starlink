@@ -14,7 +14,7 @@
 \newcommand{\stardocsource}    {sun\stardocumber}
 \newcommand{\stardocnumber}    {223.1}
 \newcommand{\stardocauthors}   {D.S. Berry \& T.M. Gledhill }
-\newcommand{\stardocdate}      {4 June 1998}
+\newcommand{\stardocdate}      {24 June 1998}
 \newcommand{\stardoctitle}     {POLPACK}
 \newcommand{\stardoconeline}   {An Imaging Polarimetry Reduction Package}
 \newcommand{\stardocversion}   {Version 1.0}
@@ -821,7 +821,7 @@ uncertainty in the final polarization parameters. If you use CCDPACK to
 calibrate your data, then the \xref{DEBIAS}{sun139}{DEBIAS} application
 can be used to create a VARIANCE component.
 
-\subsection{\xlabel{startup}Starting up POLPACK}
+\subsection{\label{SEC:START}\xlabel{startup}Starting up POLPACK}
 
 The applications within POLPACK are made available from the C shell using the 
 command:
@@ -1647,6 +1647,36 @@ lines:
 \end{verbatim}
 \end{myquote}
 \end{enumerate}
+
+\section{\label{SEC:TROUBLE}\xlabel{troubleshooting}Trouble-shooting}
+This section contains a few hints and tips which may be useful when
+unexpected behaviour is encountered while using POLPACK:
+
+\begin{description}
+
+\item [``\texttt{Command not found.}''] - Have you started up POLPACK
+as described \hyperref{here}{in section }{}{SEC:START}?
+
+\item [``POLIMP will not accept my IRAF/FITS/etc data files.''] - Have
+you started up the CONVERT package has described \hyperref{here}{in section }
+{}{SEC:CONVERT}?
+
+\item [``\texttt{Rendezvous file has disappeared!}''] - If this message
+appears while using \htmlref{POLKA}{POLKA}, you may have run out of disk 
+space. POLKA attempts to create files within your \emph{ADAM directory},
+and this message may appear if file creation fails. Your ADAM directory is
+usually a sub-directory named \texttt{adam} within your home directory.
+This may be changed by assigning an alternative directory path to the 
+environment variable ADAM\_USER.
+
+\item [``Odd messages appear when I run POLKA from ICL''] - When POLKA is
+run from ICL, you may get messages on start-up and exit about errors
+reading from sockets. These are currently being investigated, but appear
+not to prevent POLKA functioning correctly.
+
+\end{description}
+
+
 
 \newpage
 \appendix
