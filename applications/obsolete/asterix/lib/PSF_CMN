@@ -110,4 +110,4 @@
      :          P_USED, P_LIBID, P_MODID, P_EOK, 	! Psf instances
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
-     :          PSFINIT					! System initialised flag
+     :          PSFLIBINIT,PSFINIT			! System initialised flag
