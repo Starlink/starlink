@@ -131,6 +131,10 @@ f     - AST_VERSION: Return the verson of the AST library being used.
 
 /* Include files. */
 /* ============== */
+/* Configuration information */
+/* ------------------------ */
+#include "version.h"             /* Version numbers */
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */

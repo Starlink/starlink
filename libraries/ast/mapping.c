@@ -119,6 +119,11 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "error.h"               /* Error reporting facilities */
@@ -141,8 +146,14 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 #include <stdlib.h>
 #include <string.h>
 
-/* Seems that math.h does not include a prototype for isnan */
-int isnan( double );
+#if !HAVE_DECL_ISNAN
+#  if HAVE_ISNAN
+     /* Seems that math.h does not include a prototype for isnan */
+     int isnan( double );
+#  else
+#    define isnan(x) ((x) != (x))
+#  endif
+#endif
 
 /* Module type definitions. */
 /* ======================== */

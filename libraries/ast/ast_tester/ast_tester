@@ -46,14 +46,10 @@ endif
 
 # Build the progs
 
-star_dev
-ast_dev
-g77 -fno-second-underscore -o regression regression.f -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
-g77 -fno-second-underscore -o plotter plotter.f -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
-g77 -fno-second-underscore -o wcsconverter wcsconverter.f -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-g77 -fno-second-underscore -o testxmlchan testxmlchan.f -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
-ast_dev remove
-star_dev remove
+g77 -fno-second-underscore -o regression regression.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link`
+g77 -fno-second-underscore -o plotter plotter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -pgp -ems` `pgplot_link`
+g77 -fno-second-underscore -o wcsconverter wcsconverter.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
+g77 -fno-second-underscore -o testxmlchan testxmlchan.f -I$AST/include -I$STARLINK/include -L$AST/lib -L$STARLINK/lib `ast_link -ems` `chr_link` `err_link`
 
 # Run the main regression tester
 regression >& regression.out

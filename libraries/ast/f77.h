@@ -1,30 +1,10 @@
 /*
-*  Important Note:
-*     This file is a copy of the "f77.h" include file provided by the
-*     Starlink CNF library (as described in Starlink User Note 209,
-*     http://star-www.rl.ac.uk/cgi-bin/htxserver/sun209.htx/) and
-*     defines C macros used to interface between the C and FORTRAN 77
-*     languages. This copy is provided for use on systems where the
-*     CNF library is not installed. On systems where CNF is installed,
-*     the proper "f77.h" file should be located and used during the
-*     build, and this one should not be used.
-*
-*     If you are porting the AST library to a new platform, some
-*     definitions in this file may need changing, because the
-*     C/FORTRAN interface is unavoidably platform dependent. First,
-*     however, you may wish to check if an implementation of CNF
-*     exists for your new platform, in which case you can simply copy
-*     the "f77.h" file from it. If you produce a new version of this
-*     file, please send a copy to Starlink for possible future use
-*     (with both this library and CNF).
-*/
-/*
 *+
 *  Name:
-*     f77.h
+*     f77.h and cnf.h
 
 *  Purpose:
-*     C - FORTRAN interace macros
+*     C - FORTRAN interace macros and prototypes
 
 *  Language:
 *     C (part ANSI, part not)
@@ -33,6 +13,10 @@
 *     C include file
 
 *  Description:
+*     For historical reasons two files, F77.h and cnf.h are required
+*     but the have now been combined and for new code, only one is 
+*     necessary.
+*
 *     This file defines the macros needed to write C functions that are
 *     designed to be called from FORTRAN programs, and to do so in a
 *     portable way. Arguments are normally passed by reference from a
@@ -45,22 +29,18 @@
 *     -  Macros are provided to handle the conversion of logical data
 *        values between the way that FORTRAN represents a value and the
 *        way that C represents it.
-*     -  No macros are provided to convert character variables between
+*     -  Macros are provided to convert variables between the FORTRAN and
+*        C method of representing them. In most cases there is no
+*        conversion required, the macros just arrange for a pointer to
+*        the FORTRAN variable to be set appropriately. The possibility that
+*        FORTRAN and C might use different ways of representing integer
+*        and floating point values is considered remote, the macros are
+*        really only there for completeness and to assist in the automatic 
+*        generation of C interfaces.
+*     -  For character variables the macros convert between
 *        the FORTRAN method of representing them (fixed length, blank
 *        filled strings) and the C method (variable length, null
-*        terminated strings). Such conversions must be handled
-*        explicitly by calls to the CNF functions.
-*     -  There is no way provided to handle the possibility that
-*        FORTRAN and C might use different ways of representing integer
-*        and floating point values, although differences in the amount
-*        of storage are handled. This possibility is considered so
-*        remote that the costs of providing and using such a facility
-*        are deemed to outweigh the benefits.
-*     -  There is fuller documentation of the macros in the file
-*        F77.PROLAT. The documentation is in this separate file as it
-*        used to contain a null C comment and so could not be included
-*        in the source file as a comment itself. The file F77.PROLAT
-*        can be fed into PROLAT to generate LaTeX documentation.
+*        terminated strings) using calls to the CNF functions.
 
 *  Implementation Deficiencies:
 *     -  The macros support the K&R style of function definition, but
@@ -71,7 +51,7 @@
 *        should disappear as ANSI compilers become the default.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 1991, 1993 Science & Engineering Research Council
 
 *  Authors:
 *     PMA: Peter Allan (Starlink, RAL)
@@ -168,6 +148,32 @@
 *            F77_CREATE_LOGICAL_ARRAY
 *     21-JUN-1996 (AJC):
 *        Add cast to _ARRAY_ARGs to allow multidimensional arrays
+*     17-MAR-1998 (AJC):
+*        Add DECLARE, CREATE and FREE dynamic array macros for all types
+*        Changed CREATE_CHARACTER_ARRAY and CREATE_LOGICAL_ARRAY to use
+*         number of elements rather than dimensions.
+*        Add IMPORT, EXPORT and ASSOC macros
+*     22-JUL-1998 (AJC):
+*        Combined F77.h and cnf.h
+*     23-SEP-1998 (AJC):
+*        Input strings for cnf -> const char *
+*        Input int arrays for cnf -> const int *
+*      4-NOV-1998 (AJC):
+*        Bring cnf prototypes in line with .c routines
+*      8-FEB-1999 (AJC):
+*        Added cnf_mem stuff
+*      9-FEB-1999 (AJC):
+*        Use cnf_cptr/fptr for IMPORT/EXPORT_POINTER
+*     16-FEB-1999 (AJC):
+*        Added missing cnf_fptr prototype
+*     23-JUN-1999 (AJC):
+*        Change cnf_name to cnfName
+*        and add macros for cnf_name
+*      1-DEC-1999 (AJC):
+*        Add define cnf_free
+*      7-JAN-2000 (AJC):
+*        Correct omission of F77_ASSOC_UBYTE_ARRAY
+*        Correct F77_EXPORT_UWORD_ARRAY
 *     {enter_further_changes_here}
 *        
 
@@ -177,11 +183,10 @@
 *-
 ------------------------------------------------------------------------------
 */
+#if !defined(CNF_MACROS)
+#define CNF_MACROS
 
-
-#if !defined(F77_MACROS)
-#define F77_MACROS
-
+#include <stdlib.h>
 /*  This initial sections defines values for all macros. These are the	    */
 /*  values that are generally appropriate to an ANSI C compiler on Unix.    */
 /*  For macros that have different values on other systems, the macros	    */
@@ -435,29 +440,150 @@
 #define DECLARE_WORD_ARRAY(X,D)    F77_WORD_TYPE X[D]
 #define DECLARE_UBYTE_ARRAY(X,D)   F77_UBYTE_TYPE X[D]
 #define DECLARE_UWORD_ARRAY(X,D)   F77_UWORD_TYPE X[D]
-
 #define DECLARE_POINTER_ARRAY(X,D) F77_POINTER_TYPE X[D]
-
 #define DECLARE_CHARACTER_ARRAY(X,L,D) F77_CHARACTER_TYPE X[D][L]; \
    const int X##_length = L
 
 /*  ---  Declare and construct dynamic CHARACTER arguments ---                      */
 #define DECLARE_CHARACTER_DYN(X)   F77_CHARACTER_TYPE *X;\
    int X##_length
+#define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
+   X##_length = L
+
+/* Declare Dynamic Fortran arrays */
+#define DECLARE_INTEGER_ARRAY_DYN(X) F77_INTEGER_TYPE *X
+#define DECLARE_REAL_ARRAY_DYN(X)    F77_REAL_TYPE *X
+#define DECLARE_DOUBLE_ARRAY_DYN(X)  F77_DOUBLE_TYPE *X
+#define DECLARE_LOGICAL_ARRAY_DYN(X) F77_LOGICAL_TYPE *X
+#define DECLARE_BYTE_ARRAY_DYN(X)    F77_BYTE_TYPE *X
+#define DECLARE_WORD_ARRAY_DYN(X)    F77_WORD_TYPE *X
+#define DECLARE_UBYTE_ARRAY_DYN(X)   F77_UBYTE_TYPE *X
+#define DECLARE_UWORD_ARRAY_DYN(X)   F77_UWORD_TYPE *X
+#define DECLARE_POINTER_ARRAY_DYN(X) F77_POINTER_TYPE *X
 #define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X;\
    int X##_length
-#define F77_CREATE_CHARACTER(X,L)  X=cnf_cref(L);\
+
+/* Create arrays dynamic Fortran arrays for those types which require */
+/* Separate space for Fortran and C arrays                            */
+/* Character and logical are already defined                          */
+/* For most types there is nothing to do                              */
+#define F77_CREATE_CHARACTER_ARRAY(X,L,N) \
+        {int f77dims[1];f77dims[0]=N;X=cnfCrefa(L,1,f77dims);X##_length=L;}
+#define F77_CREATE_CHARACTER_ARRAY_M(X,L,N,D)  X=cnfCrefa(L,N,D);\
    X##_length = L
-#define F77_CREATE_CHARACTER_ARRAY(X,L,N,D)  X=cnf_crefa(L,N,D);\
-   X##_length = L
-#define F77_FREE_CHARACTER(X)      cnf_freef( X )
+#define F77_CREATE_LOGICAL_ARRAY(X,N) \
+        {int f77dims[1];f77dims[0]=N;X=cnfCrela(1,f77dims);}
+#define F77_CREATE_LOGICAL_ARRAY_M(X,N,D) X=cnfCrela(N,D)
+#define F77_CREATE_INTEGER_ARRAY(X,N)
+#define F77_CREATE_REAL_ARRAY(X,N)
+#define F77_CREATE_DOUBLE_ARRAY(X,N)
+#define F77_CREATE_BYTE_ARRAY(X,N)
+#define F77_CREATE_UBYTE_ARRAY(X,N)
+#define F77_CREATE_WORD_ARRAY(X,N)
+#define F77_CREATE_UWORD_ARRAY(X,N)
+#define F77_CREATE_POINTER_ARRAY(X,N)\
+        X=(F77_POINTER_TYPE *) malloc(N*sizeof(F77_POINTER_TYPE))
 
-/*  ---  Declare and construct dynamic LOGICAL arrays --- */
+/* Associate Fortran arrays with C arrays                             */
+/* These macros ensure that there is space somewhere for the Fortran  */
+/* array. They are complemetary to the CREATE_type_ARRAY macros       */
+#define F77_ASSOC_CHARACTER_ARRAY(F,C)
+#define F77_ASSOC_LOGICAL_ARRAY(F,C)
+#define F77_ASSOC_INTEGER_ARRAY(F,C) F=C
+#define F77_ASSOC_REAL_ARRAY(F,C) F=C
+#define F77_ASSOC_DOUBLE_ARRAY(F,C) F=C
+#define F77_ASSOC_BYTE_ARRAY(F,C) F=C
+#define F77_ASSOC_UBYTE_ARRAY(F,C) F=C
+#define F77_ASSOC_WORD_ARRAY(F,C) F=C
+#define F77_ASSOC_UWORD_ARRAY(F,C) F=C
+#define F77_ASSOC_POINTER_ARRAY(F,C)
 
-#define DECLARE_LOGICAL_ARRAY_DYN(X)  F77_LOGICAL_TYPE *X
-#define F77_CREATE_LOGICAL_ARRAY(X,N,D) X=cnf_crela(N,D)
-#define F77_FREE_LOGICAL(X)    cnf_free( (char *)X )
+/* Free created dynamic arrays */
+/* Character and logical are already defined */
+/* For most types there is nothing to do */
+#define F77_FREE_INTEGER(X)
+#define F77_FREE_REAL(X)
+#define F77_FREE_DOUBLE(X)
+#define F77_FREE_BYTE(X)
+#define F77_FREE_UBYTE(X)
+#define F77_FREE_WORD(X)
+#define F77_FREE_UWORD(X)
+#define F77_FREE_POINTER(X) cnfFree((void *)X);
+#define F77_FREE_CHARACTER(X) cnfFreef( X )
+#define F77_FREE_LOGICAL(X) cnfFree( (char *)X )
 
+/*  ---  IMPORT and EXPORT of values  --- */
+/* Export C variables to Fortran variables */
+#define F77_EXPORT_CHARACTER(C,F,L) cnfExprt(C,F,L)
+#define F77_EXPORT_DOUBLE(C,F) F=C
+#define F77_EXPORT_INTEGER(C,F) F=C
+#define F77_EXPORT_LOGICAL(C,F) F=C?F77_TRUE:F77_FALSE
+#define F77_EXPORT_REAL(C,F) F=C
+#define F77_EXPORT_BYTE(C,F) F=C
+#define F77_EXPORT_WORD(C,F) F=C
+#define F77_EXPORT_UBYTE(C,F) F=C
+#define F77_EXPORT_UWORD(C,F) F=C
+#define F77_EXPORT_POINTER(C,F) F=cnfFptr(C)
+#define F77_EXPORT_LOCATOR(C,F) cnfExpch(C,F,DAT__SZLOC)
+
+/* Export C arrays to Fortran */
+/* Arrays are assumed to be 1-d so just the number of elements is given  */
+/* This may be OK for n-d arrays also */
+/* CHARACTER arrays may be represented in C as arrays of arrays of char or */
+/* as arrays of pointers to char (the _P variant) */
+#define F77_EXPORT_CHARACTER_ARRAY(C,LC,F,LF,N) \
+        {int f77dims[1];f77dims[0]=N;cnfExprta(C,LC,F,LF,1,f77dims);}
+#define F77_EXPORT_CHARACTER_ARRAY_P(C,F,LF,N) \
+        {int f77dims[1];f77dims[0]=N;cnfExprtap(C,F,LF,1,f77dims);}
+#define F77_EXPORT_DOUBLE_ARRAY(C,F,N) F=(F77_DOUBLE_TYPE *)C
+#define F77_EXPORT_INTEGER_ARRAY(C,F,N) F=(F77_INTEGER_TYPE *)C
+#define F77_EXPORT_LOGICAL_ARRAY(C,F,N) \
+        {int f77dims[1];f77dims[0]=N;cnfExpla(C,F,1,f77dims);}
+#define F77_EXPORT_REAL_ARRAY(C,F,N) F=(F77_REAL_TYPE *)C
+#define F77_EXPORT_BYTE_ARRAY(C,F,N) F=(F77_BYTE_TYPE *)C
+#define F77_EXPORT_WORD_ARRAY(C,F,N) F=(F77_WORD_TYPE *)C
+#define F77_EXPORT_UBYTE_ARRAY(C,F,N) F=(F77_UBYTE_TYPE *)C
+#define F77_EXPORT_UWORD_ARRAY(C,F,N) F=(F77_UWORD_TYPE * )C
+#define F77_EXPORT_POINTER_ARRAY(C,F,N) \
+     {int f77i;for (f77i=0;f77i<N;f77i++)F[f77i]=cnfFptr(C[f77i]);}
+#define F77_EXPORT_LOCATOR_ARRAY(C,F,N) \
+        {int f77i;for (f77i=0;f77i<N;f77i++)cnfExpch(C,F,DAT__SZLOC);}
+
+/* Import Fortran variables to C */
+#define F77_IMPORT_CHARACTER(F,L,C) cnfImprt(F,L,C)
+#define F77_IMPORT_DOUBLE(F,C) C=F
+#define F77_IMPORT_INTEGER(F,C) C=F
+#define F77_IMPORT_LOGICAL(F,C) C=F77_ISTRUE(F)
+#define F77_IMPORT_REAL(F,C) C=F
+#define F77_IMPORT_BYTE(F,C) C=F
+#define F77_IMPORT_WORD(F,C) C=F
+#define F77_IMPORT_UBYTE(F,C) C=F
+#define F77_IMPORT_UWORD(F,C) C=F
+#define F77_IMPORT_POINTER(F,C) C=cnfCptr(F)
+#define F77_IMPORT_LOCATOR(F,C) cnfImpch(F,DAT__SZLOC,C)
+
+/* Import Fortran arrays to C */
+/* Arrays are assumed to be 1-d so just the number of elements is given  */
+/* This may be OK for n-d arrays also */
+/* CHARACTER arrays may be represented in C as arrays of arrays of char or */
+/* as arrays of pointers to char (the _P variant) */
+#define F77_IMPORT_CHARACTER_ARRAY(F,LF,C,LC,N) \
+        {int f77dims[1];f77dims[0]=N;cnfImprta(F,LF,C,LC,1,f77dims);}
+#define F77_IMPORT_CHARACTER_ARRAY_P(F,LF,C,LC,N) \
+        {int f77dims[1];f77dims[0]=N;cnfImprtap(F,LF,C,LC,1,f77dims);}
+#define F77_IMPORT_DOUBLE_ARRAY(F,C,N)
+#define F77_IMPORT_INTEGER_ARRAY(F,C,N)
+#define F77_IMPORT_LOGICAL_ARRAY(F,C,N) \
+        {int f77dims[1];f77dims[0]=N;cnfImpla(F,C,1,f77dims);}
+#define F77_IMPORT_REAL_ARRAY(F,C,N)
+#define F77_IMPORT_BYTE_ARRAY(F,C,N)
+#define F77_IMPORT_WORD_ARRAY(F,C,N)
+#define F77_IMPORT_UBYTE_ARRAY(F,C,N)
+#define F77_IMPORT_UWORD_ARRAY(F,C,N)
+#define F77_IMPORT_POINTER_ARRAY(F,C,N) \
+        {int f77i;for (f77i=0;f77i<N;f77i++)C[f77i]=cnfCptr(F[f77i]);}
+#define F77_IMPORT_LOCATOR_ARRAY(F,C,N) \
+        {int f77i;for (f77i=0;f77i<N;f77i++)cnfImpch(F,DAT__SZLOC,C);}
 
 /*  ---  Call a FORTRAN routine  ---					    */
 
@@ -547,11 +673,11 @@
 #define DECLARE_CHARACTER_ARRAY_DYN(X)   F77_CHARACTER_TYPE *X;\
    int X/**/_length
 #undef F77_CREATE_CHARACTER
-#define F77_CREATE_CHARACTER(X,L)  X=cnf_cref(L);\
+#define F77_CREATE_CHARACTER(X,L)  X=cnfCref(L);\
    X/**/_length = L
 #undef F77_CREATE_CHARACTER_ARRAY
-#define F77_CREATE_CHARACTER_ARRAY(X,L,N,D)  X=cnf_crefa(L,N,D);\
-   X/**/_length = L
+#define F77_CREATE_CHARACTER_ARRAY(X,L,N) \
+        {int f77dims[1];f77dims[0]=N;X=cnfCrefa(L,1,f77dims);X/**/_length=L;}
 
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
@@ -687,15 +813,17 @@
                                   F77_CHARACTER_ARRAY_ARG_TYPE *X/**/_arg;\
                                   F77_CHARACTER_TYPE *X
 #undef F77_CREATE_CHARACTER
-#define F77_CREATE_CHARACTER(X,L) X/**/_arg = cnf_cref(L);\
+#define F77_CREATE_CHARACTER(X,L) X/**/_arg = cnfCref(L);\
                                   X = X/**/_arg->dsc$a_pointer; \
                                   X/**/_length = X/**/_arg->dsc$w_length
 #undef F77_CREATE_CHARACTER_ARRAY
-#define F77_CREATE_CHARACTER_ARRAY(X,L,N,D) X/**/_arg = cnf_crefa(L,N,D);\
+#define F77_CREATE_CHARACTER_ARRAY(X,L,N) \
+  {int f77dims[1];f77dims[0]=N;X/**/_arg=cnfCrefa(L,1,f77dims);X/**/_length=L;}
+#define F77_CREATE_CHARACTER_ARRAY_M(X,L,N,D) X/**/_arg = cnfCrefa(L,N,D);\
                                   X = X/**/_arg->dsc$a_pointer; \
                                   X/**/_length = X/**/_arg->dsc$w_length
 #undef F77_FREE_CHARACTER
-#define F77_FREE_CHARACTER(X)     cnf_freef( X/**/_arg )
+#define F77_FREE_CHARACTER(X)     cnfFreef( X/**/_arg )
 
 /*  ---  Pass arguments to a FORTRAN routine  ---			    */
 
@@ -758,5 +886,126 @@
 
 
 #endif  /* DEC Unix							    */
+
+/*
+*+
+*  Name:
+*     cnf.h
+
+*  Purpose:
+*     Function prototypes for cnf routines
+
+*  Language:
+*     ANSI C
+
+*  Type of Module:
+*     C include file
+
+*  Description:
+*     These are the prototype definitions for the functions in the CNF
+*     library. They are used used in mixing C and FORTRAN programs.
+
+*  Copyright:
+*     Copyright (C) 1991 Science & Engineering Research Council
+
+*  Authors:
+*     PMA: Peter Allan (Starlink, RAL)
+*     AJC: Alan Chipperfield (Starlink, RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     23-MAY-1991 (PMA):
+*        Original version.
+*     12-JAN-1996 (AJC):
+*        Add cnf_cref and cnf_freef
+*     14-JUN-1996 (AJC):
+*        Add cnf_crefa, imprta, exprta
+*                crela, impla, expla
+*     18-JUL-1996 (AJC):
+*        Add impch and expch
+*     17-MAR-1998 (AJC):
+*        Add imprtap and exprtap
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+------------------------------------------------------------------------------
+*/
+void *cnfCalloc( size_t, size_t );
+void cnfCopyf( const char *source_f, int source_len, char *dest_f,
+                int dest_len );
+void *cnfCptr( F77_POINTER_TYPE );
+char *cnfCreat( int length );
+F77_CHARACTER_ARG_TYPE *cnfCref( int length );
+F77_CHARACTER_ARG_TYPE *cnfCrefa( int length, int ndims, const int *dims );
+char *cnfCreib( const char *source_f, int source_len );
+char *cnfCreim( const char *source_f, int source_len );
+F77_LOGICAL_TYPE *cnfCrela( int ndims, const int *dims );
+void cnfExpch( const char *source_c, char *dest_f, int nchars );
+void cnfExpla( const int *source_c, F77_LOGICAL_TYPE *dest_f, int ndims,
+                const int *dims );
+void cnfExpn( const char *source_c, int max, char *dest_f, int dest_len );
+void cnfExprt( const char *source_c, char *dest_f, int dest_len );
+void cnfExprta( const char *source_c, int source_len, char *dest_f,
+                 int dest_len, int ndims, const int *dims );
+void cnfExprtap( char *const *source_c, char *dest_f, int dest_len, 
+                  int ndims, const int *dims );
+F77_POINTER_TYPE cnfFptr( void *cpointer );
+void cnfFree( void * );
+void cnfFreef( F77_CHARACTER_ARG_TYPE *temp );
+void cnfImpb( const char *source_f, int source_len, char *dest_c );
+void cnfImpbn( const char *source_f, int source_len, int max, char *dest_c );
+void cnfImpch( const char *source_f, int nchars, char *dest_c );
+void cnfImpla( const F77_LOGICAL_TYPE *source_f, int *dest_c,
+                int ndims, const int *dims );
+void cnfImpn( const char *source_f, int source_len, int max, char *dest_c );
+void cnfImprt( const char *source_f, int source_len, char *dest_c );
+void cnfImprta( const char *source_f, int source_len, char *dest_c,
+                 int dest_len, int ndims, const int *dims );
+void cnfImprtap( const char *source_f, int source_len, char *const *dest_c,
+                  int dest_len, int ndims, const int *dims );
+int cnfLenc( const char *source_c );
+int cnfLenf( const char *source_f, int source_len );
+void *cnfMalloc( size_t );
+int cnfRegp( void * );
+void cnfUregp( void * );
+#endif
+
+#ifndef CNF_OLD_DEFINED
+#define CNF_OLD_DEFINED
+/* Define old names to be new names */
+#define cnf_calloc cnfCalloc
+#define cnf_copyf cnfCopyf
+#define cnf_cptr cnfCptr
+#define cnf_creat cnfCreat
+#define cnf_cref cnfCref
+#define cnf_crefa cnfCrefa
+#define cnf_creib cnfCreib
+#define cnf_creim cnfCreim
+#define cnf_crela cnfCrela
+#define cnf_expch cnfExpch
+#define cnf_expla cnfExpla
+#define cnf_expn cnfExpn
+#define cnf_exprt cnfExprt
+#define cnf_exprta cnfExprta
+#define cnf_exprtap cnfExprtap
+#define cnf_fptr cnfFptr
+#define cnf_free cnfFree
+#define cnf_freef cnfFreef
+#define cnf_impb cnfImpb
+#define cnf_impbn cnfImpbn
+#define cnf_impch cnfImpch
+#define cnf_impla cnfImpla
+#define cnf_impn cnfImpn
+#define cnf_imprt cnfImprt
+#define cnf_imprta cnfImprta
+#define cnf_imprtap cnfImprtap
+#define cnf_lenc cnfLenc
+#define cnf_lenf cnfLenf
+#define cnf_malloc cnfMalloc
+#define cnf_regp cnfRegp
+#define cnf_uregp cnfUregp
 
 #endif

@@ -1064,15 +1064,6 @@ int astTest##attribute##_( Ast##class *this ) { \
 #define AST__NULL (astI2P(0))
 
 
-/* VERSION MACROS */
-/* -------------- */
-/* define macros containing the library major version, minor version and 
-   release numbers. The values of these macros are edited in automatically
-   when the AST release is prepared. */
-#define AST__VMAJOR <MAJOR_VERSION_NUMBER>
-#define AST__VMINOR <MINOR_VERSION_NUMBER>
-#define AST__RELEASE <RELEASE_NUMBER>
-
 /* Type Definitions. */
 /* ================= */
 

@@ -1,5 +1,5 @@
 
-vers="`cat ${AST_REF}/version.number`"
+vers="@PACKAGE_VERSION@"
 versno="`echo "${vers}" | sed -e 's/\-.*$//'`"
 majversno="`echo "${versno}" | sed -e 's/\..*$//'`"
 minversno="`echo "${versno}" | sed -e 's/^.*\.//'`"

@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! /usr/bin/env perl
 
 #  Reads a Latex file which contains \include{file} commands and writes
 #  the document to standard output with the text of the included files

@@ -2,7 +2,7 @@
 /* ============= */
 /* Interface definitions. */
 /* ---------------------- */
-#include "ast.h"                 /* AST C interface definition */
+#include "pointset.h"           /* declaration of AST__BAD */
 
 /* C header files. */
 /* --------------- */

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/ast</path>
+  <description>WCS library</description>
+  <abstract>
+    <p>The AST library provides a comprehensive range of facilities for
+      attaching world coordinate systems to astronomical data, for
+      retrieving and interpreting that information in a variety of formats,
+      including FITS-WCS, and for generating graphical output based on it.</p>
+    <p>This library should be of interest to anyone writing
+      astronomical applications which need to manipulate coordinate system
+      data, especially celestial or spectral coordinate systems. AST
+      is portable and environment-independent.</p>
+  </abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+      <email>dsb@ast.man.ac.uk</email>
+    </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+</component>

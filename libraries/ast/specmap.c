@@ -143,6 +143,11 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 
 /* Include files. */
 /* ============== */
+
+/* Configuration results. */
+/* ---------------------- */
+#include <config.h>
+
 /* Interface definitions. */
 /* ---------------------- */
 #include "slalib.h"              /* SLALIB interface */
@@ -166,9 +171,14 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 #include <string.h>
 #include <math.h>
 
-/* Seems that math.h does not include a prototype for isnan */
-int isnan( double );
-
+#if !HAVE_DECL_ISNAN
+#  if HAVE_ISNAN
+     /* Seems that math.h does not include a prototype for isnan */
+     int isnan( double );
+#  else
+#    define isnan(x) ((x) != (x))
+#  endif
+#endif
 
 /* Module Variables. */
 /* ================= */

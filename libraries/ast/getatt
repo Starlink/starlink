@@ -1,4 +1,7 @@
-#!/usr/bin/perl
+#! /usr/bin/env perl
+# This script requires that Perl be in the path, and that the
+# environment variable SST_DIR be set to the location of the prolat
+# binary.
 
    $C = 1;
    $fortran = 0;

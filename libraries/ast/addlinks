@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#! /usr/bin/env perl
 
 #  Read a set of labels (one per line) from the "global.labels" file.
 #  Then read the input lines and create links for the first occurrence

@@ -17,13 +17,13 @@
 
 % Variable part - replace [xxx] as appropriate.
 c+
-\newcommand{\stardocnumber}    {211.14}
+\newcommand{\stardocnumber}    {211.15}
 c-
 f+
-\newcommand{\stardocnumber}    {210.14}
+\newcommand{\stardocnumber}    {210.15}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {19th March 2004}
+\newcommand{\stardocdate}      {29th March 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -1572,39 +1572,25 @@ The use of astBegin and astEnd is optional, but has the effect of
 tidying up after you have finished using AST, so is normally
 recommended. For more details of this, see \secref{ss:contexts}. For
 details of how to access the ``ast.h'' header file, see
-\secref{ss:accessingheaderfile} and the description of the
-``ast\_dev'' command in \appref{ss:commanddescriptions}.
+\secref{ss:accessingheaderfile}.
 c-
 f+
 The use of AST\_BEGIN and AST\_END is optional, but has the effect of
 tidying up after you have finished using AST, so is normally
 recommended. For more details of this, see \secref{ss:contexts}. For
 details of how to access the AST\_PAR include file, see
-\secref{ss:accessingheaderfile} and the description of the
-``ast\_dev'' command in \appref{ss:commanddescriptions}.
+\secref{ss:accessingheaderfile}.
 f-
 
 \subsection{\label{ss:howtobuild}\ldots Build an AST Program}
 
-Before building any AST program, you may want to issue the UNIX command:
-
-\begin{quote}
-\small
-\begin{verbatim}
-ast_dev
-\end{verbatim}
-\normalsize
-\end{quote}
-
-which will set up links to the AST include files in your current
-directory.  Then, to build a simple AST program that doesn't use
-graphics, use:
+To build a simple AST program that doesn't use graphics, use:
 
 c+
 \begin{quote}
 \small
 \begin{verbatim}
-cc program.c -L/star/lib `ast_link` -o program
+cc program.c -L/star/lib -I/star/include `ast_link` -o program
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -1613,7 +1599,7 @@ f+
 \begin{quote}
 \small
 \begin{verbatim}
-f77 program.f -L/star/lib `ast_link` -o program
+f77 program.f -L/star/lib -I/star/include `ast_link` -o program
 \end{verbatim}
 \normalsize
 \end{quote}
@@ -1649,16 +1635,14 @@ f-
 
 c+
 For more details about accessing the ``ast.h'' header file, see
-\secref{ss:accessingheaderfile} and the description of the
-``ast\_dev'' command in \appref{ss:commanddescriptions}.  For more
+\secref{ss:accessingheaderfile}. For more
 details about linking programs, see \secref{ss:linking} and the
 description of the ``ast\_link'' command in
 \appref{ss:commanddescriptions}.
 c-
 f+
 For more details about accessing AST include files, see
-\secref{ss:accessingheaderfile} and the description of the
-``ast\_dev'' command in \appref{ss:commanddescriptions}.  For more
+\secref{ss:accessingheaderfile}. For more
 details about linking programs, see \secref{ss:linking} and the
 description of the ``ast\_link'' command in
 \appref{ss:commanddescriptions}.
@@ -18012,84 +17996,8 @@ f+
 f-
 
 c+
-Before compiling software which uses AST facilities, you may like to
-``log in'' for AST software development with the following command:
-c-
-f+
-Before compiling software which uses AST facilities, you should
-normally ``log in'' for AST software development with the following
-command:
-f-
-
-\begin{quote}
-\small
-\begin{verbatim}
-ast_dev
-\end{verbatim}
-\normalsize
-\end{quote}
-
-This will create links in your current directory which refer to the
-AST include files (for both Fortran and C).
-c+
-You may then refer to the ``ast.h'' header file without having to know
-where it actually resides, for example:
-c-
-f+
-You may then refer to these files using their standard (upper case)
-names without having to know where they actually reside, for example:
-f-
-
-c+
-\begin{quote}
-\small
-\begin{verbatim}
-#include "ast.h"
-\end{verbatim}
-\normalsize
-\end{quote}
-c-
-f+
-\small
-\begin{verbatim}
-      INCLUDE 'AST_PAR'
-\end{verbatim}
-\normalsize
-f-
-
-c+
-This file defines the external interface to the AST library, including
-all constants, function prototypes, macros, {\em{etc.}}
-c-
-f+
-The include files provided for use with Fortran are:
-
-\begin{quote}
-\begin{description}
-\item[AST\_PAR]\mbox{}\\
-Declares the types of all AST functions and defines parameter
-constants, except those that identify error values.
-
-\item[AST\_ERR]\mbox{}\\
-Defines parameter constants to represent the various error values to
-which the AST error status may be set when an error occurs
-(\secref{ss:errordetection}).
-\end{description}
-\end{quote}
-f-
-The links created by ``ast\_dev'' will persist, but may be removed at
-any time, either explicitly or with the command:
-
-\begin{quote}
-\small
-\begin{verbatim}
-ast_dev remove
-\end{verbatim}
-\normalsize
-\end{quote}
-
-c+
-If you do not log in in this way, then the ``ast.h'' header file
+The ``ast.h'' header file defines the external interface to the AST library, 
+including all constants, function prototypes, macros, {\em{etc.}}. This file
 should be located using the usual compiler options for finding C
 include files, for instance:
 
@@ -18105,17 +18013,54 @@ This is preferable to specifying the file's absolute name within your
 software.
 c-
 f+
-If you do not use ``ast\_dev'', then references to AST include files
-should be in lower case and must contain an absolute file name
-identifying the directory where they reside, for instance:
+
+The include files provided for use with Fortran are:
+
+\begin{quote}
+\begin{description}
+\item[AST\_PAR]\mbox{}\\
+Declares the types of all AST functions and defines parameter
+constants, except those that identify error values.
+
+\item[AST\_ERR]\mbox{}\\
+Defines parameter constants to represent the various error values to
+which the AST error status may be set when an error occurs
+(\secref{ss:errordetection}).
+\end{description}
+\end{quote}
+
+References to AST include files should be in upper case. Most modern
+Fortran compilers allow the directory to be specified as a command line
+option:
+
+\begin{quote}
+\small
+\begin{verbatim}
+f77 prog.f -I/star/include -o prog
+\end{verbatim}
+\normalsize
+\end{quote}
+
+If you are using such a compiler then your Fortran source code should,
+for instance, include:
 
 \small
 \begin{verbatim}
-      INCLUDE '/star/include/ast_par'
+      INCLUDE 'AST_PAR'
 \end{verbatim}
 \normalsize
 
-The former method is strongly recommended.
+(that is, there is no need to include the directory within the INCLUDE
+statement). If your compiler does not provide such an option then your
+source code must contain an absolute file name identifying the directory 
+where the include files reside, for instance:
+
+\small
+\begin{verbatim}
+      INCLUDE '/star/include/AST_PAR'
+\end{verbatim}
+\normalsize
+
 f-
 
 \subsection{\label{ss:linking}Linking with AST Facilities}
@@ -20207,12 +20152,10 @@ Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V3.2}
+\subsection{Changes Introduced in V3.2}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V3.1 and V3.2 (the
-current version):
+occurred in the AST library between versions V3.1 and V3.2:
 
 \begin{enumerate}
 
@@ -20302,6 +20245,42 @@ transformation from another existing Mapping.
 
 \item A bug has been fixed in WcsMap which caused error reports to
 include erroneous axis numbers when referring to missing parameter values.
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V3.3}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V3.2 and V3.3 (the
+current version):
+
+\begin{enumerate}
+
+\item The organisation of the AST distribution and the commands for
+building it have been changed. Whereas AST used to be built and installed
+with \verb+./mk build; ./mk install+, it now builds using the more standard
+idiom \verb+./configure; make; make install+. The installation location is
+controlled by the \verb+--prefix+ argument to ./configure (as is usual
+for other packages which use this scheme).  Note that the INSTALL environment 
+variable now has a \emph{different} meaning to that which it had
+before, and it should generally be \emph{unset}. Also, there is no need to
+set the SYSTEM variable.
+
+\item Shared libraries are now installed in the same directory as the
+static libraries. In addition, links to sharable libraries are installed 
+with names which include version information, and ``libtool libraries'' 
+are also installed (see \htmladdnormallink{http://www.gnu.org/software/libtool/manual.html}{
+http://www.gnu.org/software/libtool/manual.html}).
+
+\item The \verb+ast_dev+ script has been removed. Instead, the location of
+the AST include files should be specified using the -I option when
+compiling.
+
+f+
+\item The names of the installed AST include files have been changed to
+upper case.
+f-
 
 \end{enumerate}
 

@@ -1,0 +1,56 @@
+#if !defined( VERSION_INCLUDED )
+#define VERSION_INCLUDED 1
+/*
+*+
+*  Name:
+*     version.h
+
+*  Purpose:
+*     Declare version numbers
+
+*  Description:
+*     Defines macros which expand to the components of the AST version
+*     number, namely the major and minor version numbers, and the
+*     release number.  The version number as a string is available by
+*     including the file config.h, which defines macros PACKAGE_STRING,
+*     PACKAGE_VERSION and (equivalently to the latter) VERSION.
+*
+*     For example, the version string `3.2-1' corresponds to major version
+*     3, minor version 2, release 1.
+
+*  Macros defined:
+*     AST__VMAJOR
+*        The AST major version number
+*     AST__VMINOR
+*        The AST minor version number
+*     AST__RELEASE
+*        The AST release number
+*
+*     For backwards compatibility, this module also declares macros
+*     AST_MAJOR_VERS, AST_MINOR_VERS and AST_RELEASE.  The AST__*
+*     macros should be used in preference to these, since the latter
+*     use (non-standard) single underscores.
+
+*  Copyright:
+*     <COPYRIGHT_STATEMENT>
+
+*  Authors:
+*     NG: Norman Gray (Starlink)
+
+*  History:
+*     25-NOV-2003 (NG):
+*        Original version
+*-
+*/
+
+/* The current version of AST is @PACKAGE_VERSION@ */
+#define AST__VMAJOR    @PACKAGE_VERSION_MAJOR@
+#define AST__VMINOR    @PACKAGE_VERSION_MINOR@
+#define AST__RELEASE   @PACKAGE_VERSION_RELEASE@
+
+/* Deprecated macros */
+#define AST_MAJOR_VERS @PACKAGE_VERSION_MAJOR@
+#define AST_MINOR_VERS @PACKAGE_VERSION_MINOR@
+#define AST_RELEASE    @PACKAGE_VERSION_RELEASE@
+
+#endif /* #if ! defined(VERSION_INCLUDED) */
