@@ -700,7 +700,11 @@
 *  Get the position required for the key. The margin between DATA and KEY 
 *  Frames is determined by the horizontal position requested for the key.
          CALL PAR_GDRVR( 'KEYPOS', 2, 0.0, 1.0, KEYPOS, NKP, STATUS )
-         MARGIN( 2 ) = KEYPOS( 1 )
+         IF( KEYPOS( 1 ) .GE. 0.0 ) THEN
+            MARGIN( 2 ) = KEYPOS( 1 )
+         ELSE
+            MARGIN( 2 ) = KEYPOS( 1 ) - KW
+         END IF         
   
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'KAPPA_CONTOUR', 

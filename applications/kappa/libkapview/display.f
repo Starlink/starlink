@@ -736,7 +736,11 @@
       IF( KEY ) THEN
          CALL PAR_GDR0R( 'KEYPOS', 0.0, 0.0, 0.99 - MARGIN( 4 ) - KW, 
      :                   .FALSE., KEYPOS, STATUS )
-         MARGIN( 2 ) = KEYPOS
+         IF( KEYPOS( 1 ) .GE. 0.0 ) THEN
+            MARGIN( 2 ) = KEYPOS( 1 )
+         ELSE
+            MARGIN( 2 ) = KEYPOS( 1 ) - KW
+         END IF
          KWID = KW
       ELSE
          KWID = 0.0
