@@ -437,7 +437,7 @@ PRIVATE_INCLUDES =
 
 EXTERNAL_INCLUDES = HLPCMD PRM_PAR SAE_PAR DAT_PAR CTM_PAR FIO_ERR \
 IDI_ERR NUM_DEC_CVT FIO_PAR IDI_PAR NDF_ERR NUM_DEF_CVT GNS_PAR NDF_PAR \
-PAR_ERR NUM_DEC_R SUBPAR_PAR NUM_DEF_R GKS_PAR
+PAR_ERR NUM_DEC_R SUBPAR_PAR NUM_DEF_R GKS_PAR AST_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -603,6 +603,7 @@ INCLUDE_LINKS = $(EXTERNAL_INCLUDES)
 #
 #  Rules to set up links to locate each of the above include files.
 #
+AST_PAR:	$(STAR_INC)/ast_par;	$(LINK) $? $@
 CTM_PAR:	$(STAR_INC)/ctm_par;	$(LINK) $? $@
 DAT_PAR:	$(STAR_INC)/dat_par;	$(LINK) $? $@
 FIO_ERR:	$(STAR_INC)/fio_err;	$(LINK) $? $@

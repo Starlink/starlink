@@ -1,9 +1,10 @@
+package kaprh {
    version PKG_VERS
    prefix krh
 
    executable kaprh_mon {
 
-action idclear {
+      action idclear {
          alias {idcl(ear)}
 
          helplib {$KAPPA_HELP}

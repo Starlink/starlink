@@ -1,7 +1,7 @@
 0 Help
  Welcome to the KAPRH online help system.  Here you can display
  details about a specific KAPRH command. For more-general information,
- see the KAPPA documentation (SUN/95).
+ see the KAPRH and KAPPA documentation (SUN/239 and SUN/95).
 
 1 CONTOVER
 Contours a 2-d NDF overlaid on an image displayed previously.
@@ -504,10 +504,10 @@ PENRANGE() = _INTEGER (Read)
    maximum number of available pens.
 3 PTITLE
 PTITLE = LITERAL (Read)
-   Title for the output palette NDF. ["KAPPA - Crelut"]
+   Title for the output palette NDF. ["KAPRH - Crelut"]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output lookup table NDF. ["KAPPA - Crelut"]
+   Title for the output lookup table NDF. ["KAPRH - Crelut"]
 3 VALRANGE
 VALRANGE() = _DOUBLE (Read)
    The range of data values in the histogram/image which is to
