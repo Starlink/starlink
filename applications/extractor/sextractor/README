@@ -4,6 +4,13 @@ This is V2.2.2 of SExtractor.
 SExtractor stands for ``Source Extractor'': a software for making
 catalog of sources from astronomical images.
 
+SExtractor is:
+Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001 Emmanuel Bertin
+
+SExtractor is free software, and is distributed under the terms of the
+GNU General Public License.  See the file COPYING in this distribution
+for more information.
+
 In case of problems, questions or suggestions related to the software,
 please don't hesitate to send a mail (preferably in english) to the
 official mailing list:
