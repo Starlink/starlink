@@ -1,3 +1,13 @@
+This set of reply codes is closely modelled on the SMTP reply system,
+as described in RFC 821.  However, it doesn't use the multiline
+replies for the two commands -- CONF and SEARCH produce -- which
+produce more than one line of response.  In each of these cases,
+however, a single status line is sent first, and the subsequent
+responses are due to be sent only if that was an OK status.
+
+That is, each command results in one response line, in two cases
+followed by further data.
+
 x5z = Catalogue system -- problems relating to the availability of
 catalogue resources
 
@@ -8,24 +18,25 @@ Connection establishment
 CONF
          [ Send configuration file ]
   s: 210 Configuration file follows, terminated by <CRLF>.<CRLF>
+         Like the message says, the configuration file appears on stdout.
   e: 551 Unspecified problem obtaining configuration     
      501 Wrong number or type of parameters
   f: 450 Can't connect to server, or otherwise can't generate config file
 
 SEARCH
-	 [ Perform catalogue search.  If successful, this command
-           results in a line containing the number of columns, then
-           that number of rows containing the column names, then a
-           line containing the number of rows, then that number of
-           catalogue rows with no further termination. ]
-  s: 210 Catalogue follows
+	 [ Perform catalogue search. ]
+  s: 210 Catalogue follows.
+         Next line contains a number giving the number of columns, then
+         that number of rows containing the column names, then a
+         line containing the number of rows, then that number of
+         catalogue rows with no further termination.
   e: 501 Wrong number or type of parameters.
      503 Out of order: not all required information has been supplied
   f: 451 Can't connect to catalogue
 
 TYPE <type>
          [ Type can be `BOX', `RADIUS' or
-         `RADIUS12', which mean, in turn, that the search should be
+         `RADIUS2', which mean, in turn, that the search should be
          in the box between the points COORD1 and COORD2, within a
          circle centred on COORD1 with radius given by the RADIUS
          command, or a circle centred on COORD1 with radius given by

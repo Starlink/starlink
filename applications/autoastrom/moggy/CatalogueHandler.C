@@ -326,6 +326,8 @@ bool CatalogueHandler::setResultCols (string cols)
     if (! isValid_(CATNAME))
 	return false;
 
+    Util::uppercaseString(cols);
+
     if (cols == "SIMPLE")
     {
 	if (returnCols_ != 0)
@@ -398,14 +400,22 @@ bool CatalogueHandler::setCatname (string name)
 {
     // Must also check here, that the catalogue name is a valid one.
     catname_ = name;
-    cat_ = AstroCatalog::open (name.c_str());
-    if (cat_)
+    try
     {
-	setValid_(CATNAME);
-	return true;
+	cat_ = AstroCatalog::open (name.c_str());
+	if (cat_)
+	{
+	    setValid_(CATNAME);
+	    return true;
+	}
+	else
+	    return false;
     }
-    else
+    catch (MoggyException)
+    {
+	// This error will be `unknown catalog', raised by the error handler
 	return false;
+    }
 }
 
 string CatalogueHandler::getConfig () const

@@ -32,9 +32,10 @@ CommandParse::CommandParse (string cmd)
 	 p != args_.end(); 
 	 p++)
     {
-	cerr << "Arg ["<<i<<"] "<<*p<<endl;
+	cerr << "Arg ["<<i<<"]=["<<*p<<"]"<<endl;
 	i++;
     }
+    cerr << "args_.size()=" << args_.size() << endl;
 #endif
 
     if (args_.size() == 0)

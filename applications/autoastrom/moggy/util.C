@@ -116,7 +116,7 @@ vector<string> Util::tokeniseString (const string str, const char *seps)
 	endpos   = str.find_first_of     (seps, startpos);
 	int len = (endpos==string::npos ? string::npos : endpos-startpos);
 	//cout << "tokenise:substr(" << startpos << ',' << len
-	//     << ")=<" << str.substr(startpos,len) << endl;
+	//     << ")=<" << str.substr(startpos,len) << '>' << endl;
 	tokens.push_back (str.substr(startpos, len));
 	startpos = endpos;
     }

@@ -23,6 +23,7 @@ static const char RCSID[] =
 #endif
 
 #include <string>
+#include <fstream>
 
 #include <cat/CatalogInfo.h>
 
@@ -34,6 +35,7 @@ static const char RCSID[] =
 const char *progname;
 
 void dumpCatalogue (ostream& o);
+void Usage ();
 
 int main (int argc, char **argv)
 {
@@ -41,8 +43,31 @@ int main (int argc, char **argv)
     string crlf = "\r\n";
     bool keepGoing = true;
     CatalogueHandler cat;
+    ofstream logfile;	// for debugging only
 
     progname = argv[0];
+
+    for (argc--, argv++; argc>0; argc--, argv++)
+    {
+	if (**argv == '-')
+	    switch (*++*argv)
+	    {
+	      case 'l':		// log file
+		++*argv;
+		if (**argv == '\0')
+		    Usage();
+		logfile.open (*argv);
+		// Did we manage to open it OK?
+		// If it's not open, there's little we can do about
+		// it, and it won't cause problems below, since we
+		// always test (logfile) before writing to it.
+		break;
+	      default:
+		Usage();
+	    }
+	else
+	    Usage();
+    }
 
     // Initialisation is very simple -- delete the CATLIB_CONFIG
     // environment variable.  This program is supposed to be run as a
@@ -52,36 +77,52 @@ int main (int argc, char **argv)
 
     try
     {
+	// Keep reading a string from stdin until EOF or keepGoing
+	// becomes true.  This will read lines terminated by '\n' (on
+	// unix): this is supposed to accept lines terminated by
+	// "\r\n", but will in fact accept either _because_ 
+	// CommandParse splits strings at whitespace which includes
+	// both '\r' and '\n'
 	while (keepGoing && getline (cin, commandline))
 	{
 	    CommandParse* cmd = new CommandParse (commandline);
 	    vector<string> arglist = cmd->arguments();
+	    string response;
+
+	    if (logfile)
+	    {
+		logfile << "Command :";
+		for (vector<string>::const_iterator p=arglist.begin();
+		     p != arglist.end();
+		     ++p)
+		    logfile << ' ' << *p;
+		logfile << endl;
+	    }
 
 	    switch (cmd->type())
 	    {
 	      case CommandParse::INVALID:
-		cout << "500 Unknown command" << crlf;
+		response = "500 Unknown command";
 		break;
 
 	      case CommandParse::CATCONFIG:
 		if (arglist.size() == 2)
 		    if (cat.setConfig (arglist[1]))
-			cout << "250 Parameter set successfully" << crlf;
+			response = "250 Parameter set successfully";
 		    else
-			cout << "550 Error setting catlib" << crlf;
+			response = "550 Error setting catlib";
 		else
-		    cout << "501 Wrong number of parameters" << crlf;
+		    response = "501 Wrong number of parameters";
 		break;
 
 	      case CommandParse::COLUMNS:
 		if (arglist.size() == 2)
 		    if (cat.setResultCols (arglist[1]))
-			cout << "250 Parameter set successfully" << crlf;
+			response = "250 Parameter set successfully";
 		    else
-			cout << "550 Error setting colums to " << arglist[1]
-			     << crlf;
+			response = "550 Error setting columns";
 		else
-		    cout << "501 Wrong number of parameters" << crlf;
+		    response = "501 Wrong number of parameters";
 		break;
 
 	      case CommandParse::CONF:
@@ -90,10 +131,10 @@ int main (int argc, char **argv)
 		    cout << "210 Configuration file follows, "
 			"terminated by <CRLF>.<CRLF>" << crlf;
 		    dumpCatalogue (cout);
-		    cout << "." << crlf;
+		    response = ".";
 		}
 		else
-		    cout << "501 Unexpected parameter" << crlf;
+		    response = "501 Unexpected parameter";
 		break;
 
 	      case CommandParse::COORD1:
@@ -124,25 +165,25 @@ int main (int argc, char **argv)
 					rah, ramin, rasec,
 					decdeg, decmin, decsec,
 					equinox))
-			    cout << "250 Parameter set successfully" << crlf;
+			    response = "250 Parameter set successfully";
 			else
-			    cout << "501 Error setting coordinates" << crlf;
+			    response = "501 Error setting coordinates";
 		    else
-			cout << "501 Error parsing parameters" << crlf;
+			response = "501 Error parsing parameters";
 		}
 		else
-		    cout << "501 Wrong number of parameters" << crlf;
+		    response = "501 Wrong number of parameters";
 
 		break;
 
 	      case CommandParse::NAME:
 		if (arglist.size() == 2)
 		    if (cat.setCatname (arglist[1]))
-			cout << "250 Parameter set successfully" << crlf;
+			response = "250 Parameter set successfully";
 		    else
-			cout << "552 Unknown catalogue " << arglist[1] << crlf;
+			response = "552 Unknown catalogue";
 		else
-		    cout << "501 Wrong number or type of parameters" << crlf;
+		    response = "501 Wrong number or type of parameters";
 		break;
 
 	      case CommandParse::NROW:
@@ -151,15 +192,14 @@ int main (int argc, char **argv)
 		    int nrow;
 		    if (Util::stringToInteger(arglist[1], nrow))
 			if (cat.setNrows (nrow))
-			    cout << "250 Parameter set successfully" << crlf;
+			    response = "250 Parameter set successfully";
 			else
-			    cout << "501 Can't set nrows to " << nrow << crlf;
+			    response = "501 Can't set nrows to specified value";
 		    else
-			cout << "501 Can't convert " << arglist[1]
-			     << " to integer" << crlf;
+			response = "501 Can't convert given value to integer";
 		}
 		else
-		    cout << "501 Wrong number or type of parameters" << crlf;
+		    response = "501 Wrong number or type of parameters";
 		break;
 
 	      case CommandParse::RADIUS:
@@ -168,15 +208,14 @@ int main (int argc, char **argv)
 		    double rad;
 		    if (Util::stringToDouble(arglist[1], rad))
 			if (cat.setRadius (rad))
-			    cout << "250 Parameter set successfully" << crlf;
+			    response = "250 Parameter set successfully";
 			else
-			    cout << "501 Can't set radius to " << rad << crlf;
+			    response = "501 Can't set radius to given value";
 		    else
-			cout << "501 Can't convert " << arglist[1]
-			     << " to double" << crlf;
+			response = "501 Can't convert given value to double";
 		}
 		else
-		    cout << "501 Wrong number or type of parameters" << crlf;
+		    response = "501 Wrong number or type of parameters";
 		break;
 
 	      case CommandParse::SEARCH:
@@ -187,10 +226,10 @@ int main (int argc, char **argv)
 		    {
 			vector<string> names = cat.getColnames();
 			if (names.size() == 0)
-			    cout << "550 Can't obtain column names" << crlf;
+			    response = "550 Can't obtain column names";
 			else
 			{
-			    cout << "210 Catalogue follows" << crlf;
+			    cout << "210 Catalogue follows" << crlf << flush;
 			    // Write out the number of columns, and a
 			    // row for each one.
 			    //
@@ -211,15 +250,15 @@ int main (int argc, char **argv)
 				 p != cat.end();
 				 ++p)
 				cout << *p << crlf;
+			    response = ""; // no further response required
 			}
 		    }
 		    else
-			cout << "503 Out of order: "
-			    "not all required information has been supplied"
-			     << crlf;
+			response = "503 Out of order: "
+			    "not all required information has been supplied";
 		}
 		else
-		    cout << "501 Wrong number or type of parameters" << crlf;
+		    response = "501 Wrong number or type of parameters";
 		break;
 
 	      case CommandParse::STATUS:
@@ -228,35 +267,48 @@ int main (int argc, char **argv)
 		    cout << "210 Status follows, terminated by <CRLF>.<CRLF>"
 			 << crlf;
 		    cat.printStatus (cout, crlf);
-		    cout << '.' << crlf;
+		    response = ".";
 		}
 		else
-		    cout << "501 Syntax error" << crlf;
+		    response = "501 Syntax error";
 		break;
 
 	      case CommandParse::TYPE:
 		if (arglist.size() == 2)
 		    if (cat.setSearchtype(arglist[1]))
-			cout << "250 Parameter set successfully" << crlf;
+			response = "250 Parameter set successfully";
 		    else
-			cout << "502 Unrecognised search type" << crlf;
+			response = "502 Unrecognised search type";
 		else
-		    cout << "501 Wrong number or type of parameters" << crlf;
+		    response = "501 Wrong number or type of parameters";
 		break;
 
 	      case CommandParse::VERSION:
-		cout << "250 " << RCSID << crlf;
+		{
+		    string tmp("250 ");
+		    response = tmp + RCSID;
+		}
 		break;
 
 	      case CommandParse::QUIT:
-		cout << "220 Goodbye" << crlf;
+		response = "220 Goodbye";
 		keepGoing = false;
 		break;
 
 	      default:
-		cout << "502 Command not implemented" << crlf;
+		response = "502 Command not implemented";
 		break;
 	    }
+
+	    if (response.length() > 0)
+	    {
+		cout << response << crlf;
+
+		if (logfile)
+		    logfile << "Response: " << response << endl;
+	    }
+	    // Flush the output, since this program will be used inside a pipe.
+	    cout << flush;
 	}
 
     }
@@ -312,4 +364,10 @@ void dumpCatalogue (ostream& o)
     }
 
     return;
+}
+
+void Usage ()
+{
+    cerr << "Usage: " << progname << " [-lfname]" << endl;
+    exit (1);
 }

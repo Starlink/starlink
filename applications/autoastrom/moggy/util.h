@@ -18,7 +18,7 @@ namespace Util {
        conversion is completely successful.  */
     bool stringToInteger (string str, int& i);
     bool stringToDouble (string str, double& f);
-    vector<string> tokeniseString (const string s, const char *seps = " \t");
+    vector<string> tokeniseString (const string s, const char *seps = " \r\n\t");
 }
 
 
