@@ -81,6 +81,12 @@ IN = LITERAL (Read)
    lines are required, append the continuation character "-" to
    the end of the line.  Comments in the indirection file begin
    with the character "#".
+3 ORIGIN
+ORIGIN = LITERAL (Read)
+   The origin of the FITS files.  This becomes the value of the
+   ORIGIN keyword in the FITS headers.  If a null value is given
+   it defaults to "Starlink Project, U.K.".
+   [!]
 3 OUT
 OUT = LITERAL (Write)
    The names for the output FITS files.  These may be enclosed in
@@ -102,12 +108,6 @@ OUT = LITERAL (Write)
    in the output filename, for example OUT="x*.fit/cal/Starlink/"
    replaces the string "cal" with "Starlink" in any of the output
    names "x*.fit".
-3 ORIGIN
-ORIGIN = LITERAL (Read)
-   The origin of the FITS files.  This becomes the value of the
-   ORIGIN keyword in the FITS headers.  If a null value is given
-   it defaults to "Starlink Project, U.K.".
-   [!]
 3 PROEXTS
 PROEXTS = _LOGICAL (Read)
    If TRUE, the NDF extensions (other than the FITS extension)

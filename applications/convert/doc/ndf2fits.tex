@@ -92,6 +92,14 @@
          with the character \hash.
       }
       \sstsubsection{
+         ORIGIN = LITERAL (Read)
+      }{
+         The origin of the FITS files.  This becomes the value of the
+         ORIGIN keyword in the FITS headers.  If a null value is given
+         it defaults to {\tt "Starlink Project, U.K."}.
+         {\tt [!]}
+      }
+      \sstsubsection{
          OUT = LITERAL (Write)
       }{
          The names for the output FITS files.  These may be enclosed in double
@@ -111,14 +119,6 @@
          string in the output filename, for example OUT=\dqt{x$*$|cal|Starlink|}
          replaces the string {\tt "cal"} with {\tt "Starlink"} in any of
          the output names {\tt "x$*$.fit"}.
-      }
-      \sstsubsection{
-         ORIGIN = LITERAL (Read)
-      }{
-         The origin of the FITS files.  This becomes the value of the
-         ORIGIN keyword in the FITS headers.  If a null value is given
-         it defaults to {\tt "Starlink Project, U.K."}.
-         {\tt [!]}
       }
       \sstsubsection{
          PROEXTS = \_LOGICAL (Read)
