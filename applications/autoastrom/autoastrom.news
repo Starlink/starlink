@@ -12,7 +12,9 @@ Documentation, including release notes, is in sun242.tar-htx
 At present, you'll probably need to define the STARLINK environment
 variable to point to the /stardev tree.  If you have CCDPACK_DIR and
 ATOOLS_DIR defined, make sure that these are pointing to at least
-versions 4.0-1 and 1.3 respectively.
+versions 4.0-1 and 1.3 respectively.  It's probably best if KAPPA_DIR
+and EXTRACTOR_DIR are pointing at /stardev versions, too, just on
+general principles.
 
 To build, give the sequence of commands
 
@@ -28,4 +30,13 @@ There's a pre-installation regression test:
 
 A couple of regression tests fail on DUX, apparently due to rounding
 errors somewhere.
+
+The regression test t/t9 (which consists of two runs of autoastrom
+right after each other) seems to hang on rlspc5 at RAL (though it
+works on my box in Glasgow), with an error which suggests that the
+Perl/ADAM system has got itself into a terminal fankle.  I suspect
+that this is caused by something like the monoliths from the first run
+not being fully shut down before the second starts, and thus it's to
+do with the lack of a robust exit handler in autoastrom (coming
+next!).
 
