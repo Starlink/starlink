@@ -83,16 +83,14 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'TCI_CMN'					! TCI globals
-*        TCI_INIT = LOGICAL (given and returned)
-*           TCI definitions load attempted?
+      INCLUDE 'AST_PKG'
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
       EXTERNAL			ADI_REQPKG
       EXTERNAL			TCI1_READ
       EXTERNAL			TCI1_WRITE
@@ -107,7 +105,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check not already initialised?
-      IF ( .NOT. TCI_INIT ) THEN
+      IF ( .NOT. AST_QPKGI( TCI__PKG ) ) THEN
 
 *    Load the ADI classes
         CALL ADI_REQPKG( 'time', STATUS )
@@ -123,7 +121,7 @@
      :                   TCI2_WRITE, DID, STATUS )
 
 *    Now initialised
-	TCI_INIT = .TRUE.
+        CALL AST_SPKGI( TCI__PKG )
 
       END IF
 

@@ -86,20 +86,24 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'TCI_CMN'                 ! ASTERIX TCI common block
-*       TCI_INIT = LOGICAL (given)
-*         TCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
-      INTEGER                   ID                      ! Dataset id
+      INTEGER                   ID
 
 *  Arguments Returned:
-      INTEGER                   TIMID                   ! Detector info
+      INTEGER                   TIMID
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
+
+*  Local Constants:
+      CHARACTER*4		TCI_PROP
+        PARAMETER		( TCI_PROP = '.TCS' )
 
 *  Local Variables:
       INTEGER			FILID			! File identifier
@@ -109,7 +113,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. TCI_INIT ) CALL TCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( TCI__PKG ) ) CALL TCI0_INIT( STATUS )
 
 *  Initialise return values
       TIMID = ADI__NULLID

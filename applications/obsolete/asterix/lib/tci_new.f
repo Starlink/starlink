@@ -84,11 +84,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-
-*  Global Variables:
-      INCLUDE 'TCI_CMN'                 ! ASTERIX TCI common block
-*       TCI_INIT = LOGICAL (given)
-*         TCI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       CHARACTER*(*)		SYSTEM
@@ -98,13 +94,17 @@
 
 *  Status:
       INTEGER                   STATUS                  ! Global status
+
+*  External References:
+      EXTERNAL			AST_QPKGI
+        LOGICAL			AST_QPKGI
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. TCI_INIT ) CALL TCI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( TCI__PKG ) ) CALL TCI0_INIT( STATUS )
 
 *  Create new object
       CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
