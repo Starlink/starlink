@@ -110,6 +110,8 @@
 //        through horizonal and vertical.
 //     25-AUG-1999 (PWD):
 //        Added changes to support NDFs stored within container files.
+//     15-OCT-1999 (PWD):
+//        Added changes to astsystem to select a pixel coordinate system.
 //-
 
 #include <string.h>
@@ -410,8 +412,8 @@ int StarRtdImage::call ( const char *name, int len, int argc, char *argv[] )
 // name string for NDFIO.  (17.03.98, ALLAN), note all images with
 // slices, must be processed by the NDF library.
 //-
-ImageData* StarRtdImage::getStarImage(const char* filename, 
-				      const char* slice, 
+ImageData* StarRtdImage::getStarImage(const char* filename,
+				      const char* slice,
 				      const char* path)
 {
   // Check if the file extension is one known to the NDF library
@@ -422,7 +424,7 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
   ImageIO imio;
 
   //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
-  //  for a compressed FITS file. 
+  //  for a compressed FITS file.
   char* p = (char *) strchr( filename, '.' );
   int isfits = 1;
   if ( p && ! strstr( p, ".fit" ) ) {
@@ -1069,7 +1071,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
   //  If just showing pixels, then just get a suitable FrameSet.
   AstFrameSet *wcs = (AstFrameSet *) NULL;
   if ( showpixels ) {
-    wcs = makePixelWCS();
+    wcs = makeGridWCS();
   } else {
 
     //  See if a copy of the current WCS frameset is available (we
@@ -2039,7 +2041,7 @@ int StarRtdImage::astcopyCmd( int argc, char *argv[] )
     return error( argv[0], " is not an image" );
   }
 
-  // Open the image to get at the WCS information. 
+  // Open the image to get at the WCS information.
   // XXX this is a very inefficient way to get at WCS information, but
   // at least it's general.
   ImageData* newimage = getStarImage( name, slice, path );
@@ -2480,7 +2482,7 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //   StarRtdImage::astsystemCmd
 //
 //   Purpose:
-//       Creates a WCS system with new celestial coordinates.
+//       Creates a WCS system with new celestial/pixel coordinates.
 //
 //    Notes:
 //       The system attributes are passed in the argv[1] element
@@ -2488,6 +2490,9 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //       routine, i.e. system=newsystem epoch=epoch equinox=equinox).
 //       The first value is the source of the WCS to modify and
 //       should be image or local (as in astassign and astrefine).
+//
+//       If system is set to "pixel" then a pixel coordinate system is 
+//       used, rather than sky coordinates.
 //-
 int StarRtdImage::astsystemCmd( int argc, char *argv[] )
 {
@@ -2530,10 +2535,19 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     }
   }
 
-  // Ok now create a new SkyFrame with the options we have been given.
-  AstSkyFrame *newsky = astSkyFrame( argv[1] );
-  if ( !astOK ) {
+  AstFrame *newfrm;
+  if ( strstr( argv[1], "pixel" ) == NULL ) {
 
+    //  Ok now create a new SkyFrame with the options we have been given.
+    newfrm = (AstFrame *) astSkyFrame( argv[1] );
+  } else {
+
+    //  Want a pixel coordinate system (only sensible for NDFs when
+    //  pixel coordinates are different from grid coordinates).
+    newfrm = (AstFrame *) makeGridWCS( );
+  }
+  if ( !astOK ) {
+    
     // If any of the above failed, then report the error.
     return error ( "failed to establish new system coordinates system");
   } else {
@@ -2543,8 +2557,8 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     // the new skyframe to force AST to retain all the current
     // frameset mappings.
     astSetI( newset_, "Current", AST__BASE );
-    AstFrameSet *cvt = (AstFrameSet *) astConvert( newset_, newsky, "" );
-    newsky = (AstSkyFrame *) astAnnul( newsky );
+    AstFrameSet *cvt = (AstFrameSet *) astConvert( newset_, newfrm, "" );
+    newfrm = (AstFrame *) astAnnul( newfrm );
     if ( astOK ) {
       newset_ = (AstFrameSet *) astAnnul( newset_ );
       newset_ = cvt;
@@ -2993,28 +3007,11 @@ int StarRtdImage::sliceCmd(int argc, char *argv[])
   }
 
   //  Strip out any blank values, if needed. Do this now to preserve
-  //  X-Y correspondence. The replacement value is the mean, which is
-  //  as unlikely to occur as any other value and will still look odd
+  //  X-Y correspondence. The replacement value is 0.0, which is as
+  //  unlikely to occur as any other value and will still look odd
   //  when a long run of values occur.
   if ( image_->haveBlank() ) {
     double blank = image_->getBlank();
-    //     double mean = 0.0;
-    //     int count = 0;
-    //     for ( i = 0; i < numValues; i++ ) {
-    //       if ( ivvalues[i*2+1] != blank ) {
-    // 	       mean += ivvalues[i*2+1];
-    // 	       count++;
-    //       }
-    //     }
-    //     if ( count != 0 ) {
-    //       mean /= (double) count;
-    //     }
-    //     for ( i = 0; i < numValues; i++ ) {
-    //       if ( ivvalues[i*2+1] == blank ) {
-    // 	       ivvalues[i*2+1] = mean;
-    //       }
-    //     }
-
     int inblank = 0;
     int start = 0;
     double fill = 0.0;
@@ -3359,7 +3356,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
     //  If no WCS is available then we need to create a suitable AST
     //  frameset. This just maps GRID coordinates to themselves, or to
     //  pixel coordinates.
-    wcs = makePixelWCS();
+    wcs = makeGridWCS();
   }
 
   //  See if another image is to be used for contouring. If so then
@@ -3384,7 +3381,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
       //  If no WCS is available then we need to create a suitable AST
       //  frameset. This just maps GRID coordinates to themselves, or to
       //  pixel coordinates.
-      farwcs = rtdimage->makePixelWCS();
+      farwcs = rtdimage->makeGridWCS();
     }
   }
   if ( ! inerror && wcs != (AstFrameSet *) NULL ) {
@@ -3471,7 +3468,7 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 }
 
 //+
-//   StarRtdImage::makePixelWCS
+//   StarRtdImage::makeGridWCS
 //
 //   Purpose:
 //       Create a pseudo WCS that describes the GRID coordinates of
@@ -3481,14 +3478,14 @@ int StarRtdImage::contourCmd( int argc, char *argv[] )
 //       Basic AstFrameSet.
 //
 //    Notes:
-//       If the image is derived from an NDF then a pixel coordinates
+//       If the image is derived from an NDF then a PIXELl coordinates
 //       Frame will be added.
 //
 //-
-AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image )
+AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image )
 {
 #ifdef _DEBUG_
-  cout << "Called StarRtdImage::makePixelWCS" << endl;
+  cout << "Called StarRtdImage::makeGridWCS" << endl;
 #endif
 
   //  If no image is given then use the default.
@@ -4240,7 +4237,7 @@ int StarRtdImage::parseName( const char *imagename, char **fullname,
     if ( *sdf == '.' ) {
       strcpy( *path, sdf );
       *sdf = '\0';
-      
+
       //  OK fullname should be a filename.
       found = fileExists( *fullname );
     }
@@ -4307,7 +4304,7 @@ int StarRtdImage::isNDFtype( const char *type )
 //   Return:
 //      1 if file exists, 0 otherwise.
 //-
-int StarRtdImage::fileExists( const char *filename ) 
+int StarRtdImage::fileExists( const char *filename )
 {
   struct stat buf;
   if ( stat( filename, &buf ) == 0 ) {

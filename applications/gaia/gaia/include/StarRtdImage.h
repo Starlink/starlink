@@ -289,8 +289,8 @@ protected:
   //  Return a pointer to the StarWCS object for the image, or NULL on error
   StarWCS* getStarWCSPtr(ImageData* image = (ImageData*)NULL);
 
-  //  Create a basic GRID-Pixel coordinates domain FrameSet.
-  AstFrameSet* StarRtdImage::makePixelWCS( ImageData *image = NULL );
+  //  Create a basic GRID/PIXEL coordinates domain FrameSet.
+  AstFrameSet* StarRtdImage::makeGridWCS( ImageData *image = NULL );
 
   //  Create AST plot for drawing grids and contours to canvas.
   AstPlot* createPlot( AstFrameSet *wcs, AstFrameSet *extraset,

@@ -408,14 +408,14 @@ itcl::class gaia::StarAstSystem {
    #  need for epoch and equinox qualifiers.
    protected variable systemattrib_ \
 	 {default 1 1 fk5 0 1 fk4 1 1 fk4-no-e 1 1 gappt 1 0 ecliptic 0 1 \
-	 galactic 0 0 supergalactic 0 0}
+	 galactic 0 0 supergalactic 0 0 pixel 0 0}
 
    #  Array of the various system names and their default
    #  epochs and equinoxes and the initialising list.
    protected variable systemmap_ \
-	 {fk5 {} J2000 fk4 B1950 B1950 fk4-no-e B1950 B1950 \
-	 gappt J2000 {} ecliptic {} J2000 galactic {} {} \
-         supergalactic {} {} }
+      {fk5 {} J2000 fk4 B1950 B1950 fk4-no-e B1950 B1950 \
+          gappt J2000 {} ecliptic {} J2000 galactic {} {} \
+          supergalactic {} {} pixel {} {} }
    protected variable system_defaults_
 
    #  Names of sensible epochs.
