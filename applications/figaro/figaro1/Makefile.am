@@ -49,7 +49,6 @@ figaro1_LDADD = $(LDADD) \
 ../fig/libfig.la \
 ../fda/libfda.la \
 ../jty/libjty.la \
-../dta/libdta.la \
 ../fit/libfit.la \
 ../tio/libtio.la \
 ../gen/libgen.la \

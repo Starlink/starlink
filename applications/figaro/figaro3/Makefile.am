@@ -20,7 +20,6 @@ vachel.f xcopy.f
 figaro3_LDADD = \
 ../par/libfigpar.la \
 ../fla/libfla.la \
-../dta/libdta.la \
 ../appsub/libappsub.la \
 ../fig/libfig.la \
 ../jty/libjty.la \
