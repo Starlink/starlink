@@ -79,6 +79,15 @@ MISC_FILES = misc/cpoint.bit misc/dpoint.bit misc/minus.bit \
 misc/plus.bit misc/unzoom.bit misc/uparrow.bit lutedit.help \
 misc/blank.bit
 
+#  Help files for command aliases, scripts, etc.
+
+HELP_FILES = help/fitsedit.hlp help/fitsexist.hlp help/fitshead.hlp \
+help/fitsval.hlp help/fitswrite.hlp help/lutbgyrw.hlp help/lutcol.hlp \
+help/lutcold.hlp help/lutcont.hlp help/lutfc.hlp help/lutgrey.hlp \
+help/lutheat.hlp help/lutikon.hlp help/lutneg.hlp help/lutramps.hlp \
+help/lutread.hlp help/lutspec.hlp help/lutwarm.hlp help/lutzebra.hlp \
+help/outline.hlp help/picbase.hlp help/picdata.hlp help/picframe.hlp \
+help/picgrid.hlp help/piclast.hlp help/picxy.hlp
 
 #  Define the tasks for each monolith.
 
@@ -171,8 +180,9 @@ starhelp_DATA = kappa.shl
 .hlp.shl:
 	@HLIB@ $<
 
-kappa.hlp: kappa_master.hlp
-	cat kappa_master.hlp libkappa/kapmon.hlp libkapview/kapview.hlp libndfpack/ndfpack.hlp > kappa.hlp
+kappa.hlp: kappa_master.hlp $(HELP_FILES)
+	cat kappa_master.hlp libkappa/kapmon.hlp libkapview/kapview.hlp \
+	    libndfpack/ndfpack.hlp $(HELP_FILES) > kappa.hlp
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
