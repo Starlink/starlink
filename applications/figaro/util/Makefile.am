@@ -1,4 +1,7 @@
-## Process this file with automake to produce Makefile.in
+# Process this file with automake to produce Makefile.in
+
+# Use common set of include files.
+AM_FCFLAGS = -I../include
 
 lib_LTLIBRARIES = libutil.la
 
