@@ -2,6 +2,7 @@ proc cgs4drPrint {taskname} {
 
 # Set a local task name
   global env
+  global cgs4drXopts
   global QmanTask
   global P4Task
   global Cred4Task
@@ -19,6 +20,7 @@ proc cgs4drPrint {taskname} {
 
 # Show the dialog box and proceed if OK
   set bv [dialogShow .cgs4drDialogue .cgs4drDialogue]
+  destroy .cgs4drDialogue
   if {$bv == 0} {
 
 # open the output file
@@ -56,11 +58,11 @@ proc cgs4drPrint {taskname} {
 # print off the result
     close $fid
     cgs4drInform $taskname "Sending $env(HOME)/$taskname.textpane to the printer"
-    exec /usr/bin/lp -c $env(HOME)/$taskname.textpane
+    catch {eval exec $cgs4drXopts(PrintCommand) $env(HOME)/${taskname}.textpane} err
+    tk_dialog .info "Print Status" "$err" info 0 Dismiss
     update idletasks
   }
 
 # Destroy the panel and quit
-  destroy .cgs4drDialogue
   cgs4drCursor arrow green black
 }

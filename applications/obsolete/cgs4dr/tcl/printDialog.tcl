@@ -19,6 +19,7 @@
 proc gwm_printDialog {w gwm c} {
     global env
     global gwm_priv
+    global cgs4drXopts
 
 # Create the top level window.
     toplevel $w -class Dialog -bd 10
@@ -39,18 +40,12 @@ proc gwm_printDialog {w gwm c} {
     if [catch {set gwm_priv($w,background_opt)}] {
 	set gwm_priv($w,background_opt) colour
     }
-    #if [catch {set gwm_priv($w,print_foreground)}] {
-    #  seset gwm_priv($w,print_foreground) Black
-    #}
-    #if [catch {set gwm_priv($w,foreground_opt)}] {
-    #  set gwm_priv($w,foreground_opt) colour
-    #}
 
 # Create and pack three frames one above the other and divide the top frame
 # into two side by side.
-    pack [frame $w.top] [frame $w.file] [frame $w.bot] -fill x -pady 2m
-    pack [frame $w.top.l] -side left -fill y -expand y
-    pack [frame $w.top.r] -side right -fill y  -expand y
+    pack [frame $w.top] [frame $w.file] [frame $w.bot] -fill both -pady 2m
+    pack [frame $w.top.l] -side left -fill both -expand y
+    pack [frame $w.top.r] -side right -fill both  -expand y
 
 # Create a label and a stack or radio buttons for selecting the print
 # format and pack them into the top left frame.
@@ -77,39 +72,23 @@ proc gwm_printDialog {w gwm c} {
 	-variable gwm_priv($w,background_opt) -value colour -anchor w
       entry $w.top.r.bname -relief sunken -bd 2 -width 15
     pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname -side top 
-    #label $w.top.r.flab -fg blue -text "Foreground:"
-    #radiobutton $w.top.r.fg -text "As window" -relief flat \
-    #  -variable gwm_priv($w,foreground_opt) -value window -anchor w
-    #radiobutton $w.top.r.fcol -text "Colour:" -relief flat \
-    #  -variable gwm_priv($w,foreground_opt) -value colour -anchor w
-    #entry $w.top.r.fname -relief sunken -bd 2 -width 15
-    #pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname \
-    #$w.top.r.flab $w.top.r.fg $w.top.r.fcol $w.top.r.fname -side top 
 
 # Initialise the entry widget.
     $w.top.r.bname insert 0 $gwm_priv($w,print_background)
-    #$w.top.r.fname insert 0 $gwm_priv($w,print_foreground)
 
 # Pack a label and an entry widget for entering a file name into the middle frame.
-    global printOption
-    global printCommand
-    global printFile
-    set printOption file
-    set printCommand "/usr/bin/lp -c"
-    set printFile "$env(HOME)/gwm.ps"
-
     pack [frame $w.file.t] [frame $w.file.m] [frame $w.file.b]
     label $w.file.t.wlab -fg blue -text "Output Options:" 
     pack $w.file.t.wlab
 
-    radiobutton $w.file.m.pbut -text "Printer" -width 15 -relief flat -variable printOption -value printer 
+    radiobutton $w.file.m.pbut -text "Printer" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value printer 
     label $w.file.m.plab -text "Command:" -width 15  
-    entry $w.file.m.pname -width 30 -relief sunken -bd 2 -textvariable printCommand
+    entry $w.file.m.pname -width 30 -relief sunken -bd 2 -textvariable cgs4drXopts(PrintCommand)
     pack $w.file.m.pbut $w.file.m.plab $w.file.m.pname -side left -anchor w
 
-    radiobutton $w.file.b.fbut -text "File" -width 15 -relief flat -variable printOption -value file 
+    radiobutton $w.file.b.fbut -text "File" -width 15 -relief flat -variable cgs4drXopts(PrintOption) -value file 
     label $w.file.b.flab -text "Filename:" -width 15  
-    entry $w.file.b.fname -width 30 -relief sunken -bd 2 -textvariable printFile
+    entry $w.file.b.fname -width 30 -relief sunken -bd 2 -textvariable cgs4drXopts(PrintFile)
     pack $w.file.b.fbut $w.file.b.flab $w.file.b.fname -side left -anchor w
 
 # Create an "OK" and a "Cancel" button.
@@ -159,11 +138,6 @@ proc gwm_printDialog {w gwm c} {
 	  } {
             $gwm configure -printbg [$w.top.r.bname get]
 	  }
-	  #if [string compare $gwm_priv($w,foreground_opt) colour] {
-	  #  $gwm configure -printfg [$gwm get colour 1]
-    	  #} {
-	  #  $gwm configure -printfg [$w.top.r.fname get]
-	  #}
 
 	# Set the variable to be used to signal completion of the print to zero
 	    global gwm_printvar
@@ -172,20 +146,20 @@ proc gwm_printDialog {w gwm c} {
 
 	# Set a trace on gwm_printvar that re-enables the control that
 	# popped up the dialog box.
-            set printFile [string trim [$w.file.b.fname get]]
-            if {$printFile == ""} {set printFile "$env(HOME)/gwm.ps"}
-            if {[file exists $printFile] == 1} {exec /usr/bin/rm -f $printFile}
-            set printCommand [string trim [$w.file.m.pname get]]
-            if {$printCommand == ""} {set printCommand "/usr/bin/lp -c"}
+            set cgs4drXopts(PrintFile) [string trim [$w.file.b.fname get]]
+            if {$cgs4drXopts(PrintFile) == ""} {set cgs4drXopts(PrintFile) "$env(HOME)/gwm.ps"}
+            if {[file exists $cgs4drXopts(PrintFile)] == 1} {exec /usr/bin/rm -f $cgs4drXopts(PrintFile)}
+            set cgs4drXopts(PrintCommand) [string trim [$w.file.m.pname get]]
+            if {$cgs4drXopts(PrintCommand) == ""} {set cgs4drXopts(PrintCommand) "/usr/bin/lp -c"}
 	    trace variable gwm_printvar w "gwm_printComplete $c"
 
 	# Start the print
-	    if [catch {$gwm print $printFile}] {
+	    if [catch {$gwm print $cgs4drXopts(PrintFile)}] {
 
 	    # Report the error and re-grab the pointer
-		set message "The file $printFile could not be opened \
-for printing. Please check the file and directory name."
-		tk_dialog .error Error $message error 0 OK
+		set message "The file $cgs4drXopts(PrintFile) could not be opened for printing. \
+                   Please check the file and directory name."
+		tk_dialog .error Error $message error 0 Dismiss
 		grab $w
 	    } {
 
@@ -224,12 +198,10 @@ proc gwm_printComplete {c name elem op} {
   trace vdelete $name $op "gwm_printComplete $c"
 
 # Send the output to printer in background
-  global printOption
-  global printFile
-  global printCommand
-  if {[string tolower $printOption] == "printer"} {
-    set message [exec /usr/bin/csh -c "$printCommand $printFile"]
-    tk_dialog .info "Print Status" "$message $printFile" info 0 OK
+  global cgs4drXopts
+  if {[string tolower $cgs4drXopts(PrintOption)] == "printer"} {
+    catch {eval exec $cgs4drXopts(PrintCommand) $cgs4drXopts(PrintFile)} err
+    tk_dialog .info "Print Status" "$err" info 0 Dismiss
   } 
 
 # Enable the widget.

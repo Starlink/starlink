@@ -6,12 +6,15 @@
 # Global variables
     global env
     global cgs4drBitmaps
+    global cgs4drXopts
+    global cgs4drWebBrowser
 
 # Path and file names that may need to be cutomised
-    set tclAdamLib    STAR_LIB/tk/adam
-    set cgs4drTclLib  $env(CGS4DR_ROOT)/tcl
-    set cgs4drBitmaps $env(CGS4DR_ROOT)/tcl
-    set cgs4drHtml    STAR_DOCS/sun27.htx
+    set tclAdamLib       STAR_LIB/tk/adam
+    set cgs4drTclLib     $env(CGS4DR_ROOT)/tcl
+    set cgs4drBitmaps    $env(CGS4DR_ROOT)/tcl
+    set cgs4drHtml       STAR_DOCS/sun27.htx
+    set cgs4drWebBrowser /usr/local/bin/netscape
 
 # Set up library search path
     lappend auto_path [exec /usr/bin/pwd] $cgs4drTclLib $tclAdamLib 
@@ -32,49 +35,8 @@
     set cmd [string tolower [string trim $argv0]]
 
 # Set some widget defaults
-    option add *background                    wheat
-    option add *foreground                    black
-    option add *Scrollbar.background          khaki
-    option add *Scrollbar.activeBackground    palegreen
-    option add *Button.background             pink
-    option add *Button.activeBackground       palegreen
-    option add *Button.activeForeground       red
-    option add *Menubar.activeBackground      palegreen
-    option add *Menubar.activeForeground      red
-    option add *Menubutton.background         wheat
-    option add *Menubutton.foreground         black
-    option add *Menubutton.activeBackground   palegreen
-    option add *Menubutton.activeForeground   red
-    option add *Menu.background               wheat
-    option add *Menu.foreground               black
-    option add *Menu.activeBackground         palegreen
-    option add *Menu.activeForeground         red
-    option add *Radiobutton.background        wheat
-    option add *Radiobutton.activeBackground  palegreen
-    option add *Radiobutton.activeForeground  red
-    option add *Checkbutton.background        wheat
-    option add *Frame.background              wheat
-    option add *Label.background              wheat
-    option add *Listbox.background            wheat
-    option add *Listbox.selectbackground      palegreen
-    option add *Listbox.highlightcolor        palegreen
-    option add *Text.background               snow
-    option add *Entry.background              snow
-    option add *Button.width                  10
-    option add *Dialog.width                  60
-    option add *Radiobutton.width             12
-    option add *Radiobutton.relief            flat
-    option add *Entry.relief                  sunken
-    option add *Entry.width                   10
-    option add *Entry.font                    -adobe-helvetica-medium-o-normal--*-140-*
-    option add *Label.font                    -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Listbox.font                  -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Radiobutton.font              -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Checkbutton.font              -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Button.font                   -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Menubar.font                  -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Menu.font                     -adobe-helvetica-bold-r-normal--*-140-*
-    option add *Menubutton.font               -adobe-helvetica-bold-r-normal--*-140-*
+    set cgs4drXopts(File) $env(HOME)/cgs4dr_configs/cgs4dr.xopts
+    cgs4drSetXopts
 
 # Get arguments and set environmental variables
     wm withdraw .
@@ -167,7 +129,7 @@
       .qman.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $QmanTask author"
       .qman.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $QmanTask tcl/tk"
       .qman.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $QmanTask cgs4dr"
-      .qman.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+      .qman.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $QmanTask file://$cgs4drHtml/sun27.html"
    
 # Build the qman interface widget tree and bind to task
       set qmanWidget [buildQmanWidgets .qman]
@@ -238,6 +200,7 @@
       .p4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $P4Task tcl/tk"
       .p4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $P4Task cgs4dr"
       .p4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+      .p4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $P4Task file://$cgs4drHtml/sun27.html"
     
 # Build the p4 interface widget tree and bind actions to task
       set p4Widget [buildP4Widgets1 .p4]
@@ -301,6 +264,7 @@
       .red4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Red4Task tcl/tk"
       .red4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Red4Task cgs4dr"
       .red4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+      .red4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $Red4Task file://$cgs4drHtml/sun27.html"
     
 # Build the red4 interface widget tree and bind actions to task
       set red4Widget [buildRed4Widgets .red4]
@@ -367,6 +331,7 @@
       .cred4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Cred4Task tcl/tk"
       .cred4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Cred4Task cgs4dr"
       .cred4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+      .cred4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command "cgs4drWebPage $Cred4Task file://$cgs4drHtml/sun27.html"
     
 # Build the cred4 interface widget tree and bind actions to task
       set cred4Widget [buildCred4Widgets .cred4]
