@@ -12,7 +12,7 @@ in ordinary text files. It is based around the PGPLOT (SUN/15) graphics
 package. 
   </p></abstract>
   <dependencies >
-    <build>pcs</build><build>agi</build><build>sla</build><build>fio</build><build>pda</build><sourceset>star2html</sourceset>
+    <build>pcs</build><build option='link'>agi</build><build option='link'>sla</build><build option='link'>fio</build><build option='link'>pda</build><sourceset>star2html</sourceset>
   </dependencies>
   <developers>
     <person>

@@ -30,7 +30,7 @@ dnl  Extenral programs
 STAR_CHECK_PROGS([hlib])
 
 dnl dependances on starlink packages
-STAR_DECLARE_DEPENDENCIES(build, [agi sla fio pda])
+STAR_DECLARE_DEPENDENCIES([build], [agi sla fio pda], [link])
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot
