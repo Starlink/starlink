@@ -7221,14 +7221,16 @@ f-
 c+
 The functions astAxDistance and astAxOffset are similar to astDistance
 and astOffset, except that the curves which they use as ``straight
-lines'' are not geodesics, but curves parallel to a specified axis. One
+lines'' are not geodesics, but curves parallel to a specified axis\footnote
+{For instance, a line of constant Declination is not a geodesic}. One
 reason for using these functions is to deal with the cyclic ambigity of
 longitude and latitude axes.
 c-
 f+
 The routines AST\_AXDISTANCE and AST\_AXOFFSET are similar to AST\_DISTANCE
 and AST\_OFFSET, except that the curves which they use as ``straight
-lines'' are not geodesics, but curves parallel to a specified axis. One
+lines'' are not geodesics, but curves parallel to a specified axis\footnote
+{For instance, a line of constant Declination is not a geodesic}. One
 reason for using these routines is to deal with the cyclic ambigity of
 longitude and latitude axes.
 f-
@@ -7240,12 +7242,16 @@ f+
 The AST\_OFFSET2 routine is similar to AST\_OFFSET, but instead of using the
 f-
 geodesic which passes through two positions, it uses the geodesic which
-passes at a given position angle\footnote{The angle from the positive
-direction of the second Frame axis to the geodesic, positive values being
-in the same sense as rotation from the positive direction of the second
-axis to the positive direction of the first Frame axis.}through a given
-starting position. The method is restricted to 2-dimensional Frames, and
-may not be used with CmpFrames.
+passes at a given position angle through the starting position. For
+SkyFrames, the position angle is the angle from north to the required
+geodesic, with positive rotation in the same sense as rotation from north
+to east. Any permutation of the axes in a SkyFrame is taken into
+account when interpreting position angles. For simple Frames, axis
+permutations are ignored, and the position angle is always the angle 
+between the positive direction of the second Frame axis to the required
+line, with positive angles being in the same sense as rotation from the 
+positive direction of the second axis to the positive direction of the 
+first Frame axis. 
 
 Within a Cartesian coordinate system, the position angle of a geodesic
 ({\em{i.e.}}\ a straight line) is constant along its entire length, but
@@ -7281,11 +7287,38 @@ f+
 The AST\_ANGLE routine 
 f-
 calculates the angle subtended by two points, at a third point.
-It can only be used with 2 or 3 dimensional Frames, and may not be used
-with a CmpFrame. If used with a 2-dimensional Frame the returned angle
+If used with a 2-dimensional Frame the returned angle
 is signed to indicate the sense of rotation (clockwise or anticlockwise)
 in taking the ``shortest route'' from the first point to the second.
-If used with a 3-dimensional Frame the result is un-signed.
+If used with a 3-dimensional Frame the result is un-signed. Other
+dimensionalities cause a value of AST\_\_BAD to be returned.
+
+c+
+The astBear function 
+c-
+f+
+The AST\_BEAR routine 
+f-
+calculates the position angle of one point as seen from a second point
+within a 2 dimensional Frame (an error is reported if the Frame is not
+2 dimensional). Again, the algorithm used is appropriate to the class of
+the Frame.
+
+c+
+The astResolve function
+c-
+f+
+The AST_RESOLVE routine
+f-
+resolves a given displacement within a Frame into two components, parallel and 
+perpendicular to a given reference direction. 
+
+The displacement is specified by two positions within the Frame; the
+starting and ending positions. The reference direction is defined by the 
+geodesic curve passing through the starting position and a third specified
+position. The lengths of the two components are returned, together with
+the position on the reference geodesic which is closest to the third
+supplied point.
 
 \subsection{\label{ss:framedomains}The Domain Attribute}
 
