@@ -38,11 +38,11 @@ command stands out somewhat).
     (if (member (gi target) (target-element-list))
 	(if linktext
 	    (literal linktext)	;override generation of link text
-	    (make command name: "textit"
-		  (if (member (gi target) (section-element-list))
-		      (make-section-reference target: target specify-type: #t)
-		      (with-mode section-reference
-			(process-node-list target)))))
+	    (if (member (gi target) (section-element-list))
+		(make command name: "textit"
+		      (make-section-reference target: target specify-type: #t))
+		(with-mode section-reference
+			(process-node-list target))))
 	(error (string-append
 	     "The stylesheet is presently unable to link to elements of type "
 	          (gi target))))))
@@ -78,24 +78,29 @@ it produces an <funcname/error/.
 	 ;; an ID
 	 (xreftarget (and xrefid
 			  (node-list-or-false (element-with-id xrefid
-							 docelem))))
+							       docelem))))
 	 (xrefurl (and xreftarget
-		       (get-link-policy-target xreftarget no-urls: #t))))
+		       (get-link-policy-target xreftarget no-urls: #t)))
+	 (linktext (attribute-string (normalize "text")
+				     (current-node))))
     (if (string=? (gi docelem)
 		  (normalize "documentsummary")) ; sanity check...
 	(if xrefent
-	    (if xreftarget
-		(if (car xrefurl)	; link to element by id
-		    (error (car xrefurl)) ; violated policy - complain
-		    (make command name: "textit"
+	    (if linktext
+		(literal linktext)	;override generation of link text
+		(if xreftarget
+		    (if (car xrefurl)	; link to element by id
+			(error (car xrefurl)) ; violated policy - complain
+			(make command name: "textit"
+			      (with-mode mk-docxref
+				(process-node-list (document-element
+						    xreftarget)))
+			      (literal ": ")
+			      (with-mode section-reference
+				(process-node-list xreftarget))))
+		    (make command name: "textit" ; link to whole document
 			  (with-mode mk-docxref
-			    (process-node-list (document-element xreftarget)))
-			  (literal ": ")
-			  (with-mode section-reference
-			    (process-node-list xreftarget))))
-		(make command name: "textit" ; link to whole document
-		      (with-mode mk-docxref
-			(process-node-list docelem))))
+			    (process-node-list docelem)))))
 	    (error "No value for docxref's DOC attribute"))
 	(error (string-append "DOCXREF target " xrefent
 			      " has document type " (gi docelem)
