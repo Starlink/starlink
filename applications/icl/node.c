@@ -11,7 +11,7 @@
  */
 #include "icl.h"
 #include "expr.h"
-#include "ytab.h"
+#include "parse.h"
 extern value comment_interpret (node *n, int op);	/* control.c */
 extern value builtin_interpret (node *n, int op);	/* interp.c  */
 

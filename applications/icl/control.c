@@ -21,7 +21,7 @@
 #include "control.h"
 #include "interp.h"
 #include "symtab.h"
-#include "ytab.h"
+#include "parse.h"
 #include "ems.h"
 
 extern void outfpstring(char *mess);			    /* output.c */

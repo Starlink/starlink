@@ -22,7 +22,7 @@
 #include <limits.h>
 
 #include "icl.h"
-#include "ytab.h"
+#include "parse.h"
 #include "carith.h"
 #include "expr.h"
 #include "interp.h"

@@ -105,7 +105,9 @@ extern char *errormessage;					/* parse.c */
  * We include the header file that YACC generates to name its terminal values
  ******************************************************************************
  */
-#include "ytab.h"
+/* Note that the autoconf system generates a header files the same name as
+  the original .y files */
+#include "parse.h"
 
 /******************************************************************************
  * The variable 'nested' keeps track of the paraenthesis nesting level in 

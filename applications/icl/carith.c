@@ -24,7 +24,7 @@
 #include <setjmp.h>
 #include "icl.h"
 #include "carith.h"
-#include "ytab.h"
+#include "parse.h"
 
 extern void systemfail(char *mess);				/* output.c */
 #define same_sign(a,b) (((a) < 0) == ((b) < 0))
