@@ -1,0 +1,143 @@
+      SUBROUTINE COF_GKEY<T>( FUNIT, KEYWRD, THERE, VALUE, COMENT,
+     :                        STATUS )
+*+
+*  Name:
+*     COF_GKEYx
+
+*  Purpose:
+*     Obtains the value and comment of a FITS header keyword.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COF_GKEYX( FUNIT, KEYWRD, THERE, VALUE, COMENT, STATUS )
+
+*  Description:
+*     This routine searches through the current header and data unit
+*     of a FITS header searching for a named keyword.  If the keyword
+*     is present, it is indicated via the THERE argument.  The value
+*     of the keyword is returned, converted to the required data type
+*     if necessary and is possible.
+
+*  Arguments:
+*     FUNIT = INTEGER (Given)
+*        The FITSIO unit number for the FITS file.
+*     KEYWRD = CHARACTER * ( * ) (Given)
+*        The name of the keyword whose value is required.  Comparisons
+*        are performed in uppercase and blanks are removed.  Each
+*        keyword must be no longer than 8 characters.
+*     THERE = LOGICAL (Returned)
+*        If .TRUE. the keyword KEYWRD is present and has a value.
+*     VALUE = <TYPE> (Returned)
+*        The value of the keyword.
+*     COMENT = CHARACTER * ( * ) (Returned)
+*        The comment associated with the keyword.  This should be at
+*        least 48 characters long.
+*     STATUS = INTEGER (Given)
+*        Global status value.
+
+*  Notes:
+*     -  There is a routine for _CHAR, _LOGICAL, _INTEGER, _REAL, and
+*     _DOUBLE data types: replace "x" in the routine name by C, L, W,
+*     I, R, D as appropriate.  Argument VALUE supplied to the routine
+*     must have the data type specified.
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1996 January 25 (MJC):
+*        Original version.
+*     1997 January 17 (MJC):
+*        Added COMENT argument.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER FUNIT
+      CHARACTER * ( * ) KEYWRD
+
+*  Arguments Returned:
+      LOGICAL THERE
+      <TYPE> VALUE
+      CHARACTER * ( * ) COMENT
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      INTEGER FITSOK             ! Value of good FITSIO status
+      PARAMETER ( FITSOK = 0 )
+
+*  Local Variables:
+      CHARACTER * ( 80 ) BUFFER  ! Error-message buffer
+      INTEGER FSTAT              ! FITSIO status
+      CHARACTER * ( 6 ) ROUTIN   ! FITSIO routine name
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise the presence flag.
+      THERE = .FALSE.
+
+*  Initialise the FITSIO status.  It's not the same as the Starlink
+*  status, which is reset by the fixed part.
+      FSTAT = FITSOK
+
+*  Call the appropriate routine depending on the type.  Also
+*  note the routine called in case there is an error to report.
+      IF ( '<T>' .EQ. 'R' ) THEN
+         CALL FTGKYE( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
+         ROUTIN = 'FTGKYE'
+
+      ELSE IF ( '<T>' .EQ. 'D' ) THEN
+         CALL FTGKYD( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
+         ROUTIN = 'FTGKYD'
+
+      ELSE IF ( '<T>' .EQ. 'I' ) THEN
+         CALL FTGKYJ( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
+         ROUTIN = 'FTGKYJ'
+
+      ELSE IF ( '<T>' .EQ. 'L' ) THEN
+         CALL FTGKYL( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
+         ROUTIN = 'FTGKYL'
+
+      ELSE IF ( '<T>' .EQ. 'C' ) THEN
+         CALL FTGKYS( FUNIT, KEYWRD, VALUE, COMENT, FSTAT )
+         ROUTIN = 'FTGKYS'
+
+      END IF
+
+*  Check for the error indicating that the keyword does not exist in
+*  the FITS header.  Flush the error-message stack.
+      IF ( FSTAT .EQ. 202 ) THEN
+         FSTAT = FITSOK
+         CALL FTCMSG
+
+*  Report other errors.
+      ELSE IF ( FSTAT .GT. FITSOK ) THEN
+         BUFFER = 'Trying to find the value of the FITS header with '/
+     :            /'keyword '//KEYWRD//'. '
+         CALL COF_FIOER( FSTAT, 'COF_GKEY<T>_ERR', ROUTIN,
+     :                   BUFFER, STATUS )
+
+      ELSE
+         THERE = .TRUE.
+      END IF
+
+      END
