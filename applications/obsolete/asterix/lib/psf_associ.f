@@ -77,7 +77,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Extract locator from ADI
-      CALL ADI1_GETLOC( ID, LOC, STATUS )
+      CALL ADI1_GETLOC( FID, LOC, STATUS )
 
 *    Initialise
       GOOD_PSF = .FALSE.

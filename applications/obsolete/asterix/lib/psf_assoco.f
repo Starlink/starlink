@@ -1,17 +1,5 @@
-      SUBROUTINE PSF_TASSOCO( ID, SLOT, STATUS )
-      IMPLICIT NONE
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      CHARACTER*(DAT__SZLOC) LOC
-        INTEGER ID,SLOT,STATUS
-      IF ( STATUS.NE.SAI__OK) RETURN
-      CALL ADI1_GETLOC( ID,LOC,STATUS)
-      CALL PSF_ASSOCO( LOC, SLOT, STATUS )
-
-      END
-
 *+  PSF_ASSOCO - Associate a dataset and create PSF if necessary
-      SUBROUTINE PSF_ASSOCO( LOC, SLOT, STATUS )
+      SUBROUTINE PSF_ASSOCO( FID, SLOT, STATUS )
 *
 *    Description :
 *
@@ -36,45 +24,38 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
-      CHARACTER*(DAT__SZLOC)   LOC                     ! Input dataset
+      INTEGER			FID			! Dataset id
 *
 *    Export :
 *
-      INTEGER                  SLOT                    ! PSF slot number
+      INTEGER                   SLOT                    ! PSF slot number
 *
 *    Status :
 *
-      INTEGER                  STATUS                  ! Run-time error
+      INTEGER                  	STATUS                  ! Run-time error
 *
 *    External references :
 *
-      EXTERNAL		       PSF_BLK
+      EXTERNAL		       	PSF_BLK
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *    Grab slot
-      CALL PSF_GETSLOTL( LOC, SLOT, STATUS )
+      CALL PSF_GETSLOT( FID, SLOT, STATUS )
 
 *    Get library and routine name from user
       CALL PSF_PROMPT( .FALSE., ' ', SLOT, STATUS )
 
 *    Initialise the PSF routine
-      CALL PSF_SLOTINIT( LOC, SLOT, STATUS )
+      CALL PSF_SLOTINIT( SLOT, STATUS )
 
 *    Try to write model to file
-      CALL PSF_PUT_MODEL( LOC, SLOT, STATUS )
+      CALL PSF_PUT_MODEL( SLOT, STATUS )
 
 *    Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
