@@ -81,6 +81,8 @@
             CALL IREGION_SHOW(STATUS)
           ELSEIF (MODE.EQ.'EXP') THEN
             CALL IREGION_EXPORT(STATUS)
+          ELSEIF (MODE.EQ.'IMP') THEN
+            CALL IREGION_IMPORT(STATUS)
           ELSE
             CALL MSG_PRNT('AST_ERR: unknown mode '//MODE)
           ENDIF
@@ -615,7 +617,6 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
-      CHARACTER*40 FILE
       INTEGER DIMS(2)
       INTEGER PTR
 *-
@@ -635,6 +636,55 @@
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_EXPORT',STATUS)
+        ENDIF
+
+      ENDIF
+
+      END
+
+
+
+*+
+      SUBROUTINE IREGION_IMPORT(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    History :
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+      INCLUDE 'QUAL_PAR'
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+*    Import :
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Local variables :
+      CHARACTER*(DAT__SZLOC) LOC
+      INTEGER PTR
+      LOGICAL PRIM
+      LOGICAL MATCH
+*-
+
+      IF (STATUS.EQ.SAI__OK) THEN
+
+        CALL USI_ASSOCI('INP','READ',LOC,PRIM,STATUS)
+        CALL IMG_MATCH(LOC,MATCH,STATUS)
+        CALL BDA_MAPTDATA(LOC,'_BYTE','R',PTR,STATUS)
+        CALL ARR_COP1B(I_NX*I_NY,%val(PTR),%val(I_REG_PTR),STATUS)
+        I_REG_TYPE='COMPLEX'
+        CALL BDA_RELEASE(LOC,STATUS)
+        CALL USI_ANNUL(LOC,STATUS)
+
+        IF (STATUS.NE.SAI__OK) THEN
+          CALL ERR_REP(' ','from IREGION_IMPORT',STATUS)
         ENDIF
 
       ENDIF
