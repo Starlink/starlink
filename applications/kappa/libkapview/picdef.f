@@ -117,9 +117,12 @@
 *        The number used to form the label for the first (bottom-left)
 *        picture in Array mode.  It cannot be negative. [1]
 *     LBOUND( 2 ) = _REAL (Read)
-*        Co-ordinates of the lower bound that defines the new picture.
-*        The suggested default is the bottom-left of the current
-*        picture.  (XY mode)
+*        BASEPIC co-ordinates of the lower bounds that defines the new 
+*        picture. The BASEPIC co-ordinates of the bottom left corner of 
+*        the BASE picture are (0,0). The shorter dimension of the BASE 
+*        picture has length 1.0, and the other axis has a length greater 
+*        than 1.0. The suggested default is the top-right of the current 
+*        picture. (XY mode)
 *     MODE = LITERAL (Read)
 *        Method for selecting the new picture. The options are "Cursor"
 *        for cursor mode (provided the graphics device has one), "XY"
@@ -147,9 +150,12 @@
 *        value (!) is given, then the size of the picture is determined 
 *        by parameter FRACTION. [!]
 *     UBOUND( 2 ) = _REAL (Read)
-*        Co-ordinates of the upper bound that defines the new picture.
-*        The suggested default is the top-right of the current picture.
-*        (XY mode)
+*        BASEPIC co-ordinates of the upper bound that defines the new 
+*        picture. The BASEPIC co-ordinates of the bottom left corner of 
+*        the BASE picture are (0,0). The shorter dimension of the BASE 
+*        picture has length 1.0, and the other axis has a length greater 
+*        than 1.0. The suggested default is the top-right of the current 
+*        picture. (XY mode)
 *     XPIC = _INTEGER (Read)
 *        The number of new pictures to be formed horizontally in the
 *        BASE or current picture in Array mode.  The total number of

@@ -73,3 +73,11 @@
 #  Only put tick marks on the labelled edge.
       tickall=0
 
+#  Produce a ramp key.
+      form=ramp
+
+#  Annotate the main axis with data value.
+      pennums=0
+
+#  If a histogram-style key is requested, make it linear.
+      logpop=0

@@ -5030,10 +5030,15 @@ package kappa {
       }
 
       action lutview {
-         alias {lutv(iew)}
-
          helplib {$KAPPA_HELP}
-
+         parameter comp {
+            type LITERAL
+            vpath DEFAULT
+            prompt {Displayed NDF component}
+            ppath CURRENT DEFAULT
+            default Data
+            helpkey *
+          }
          parameter curpic {
             position 4
             type _LOGICAL
@@ -5109,6 +5114,16 @@ package kappa {
             default CURSOR
             helpkey *
           }
+         parameter ndf {
+            type NDF
+            access READ
+            vpath DEFAULT
+            prompt {Displayed image}
+            ppath GLOBAL DEFAULT
+            association <-GLOBAL.DATA_ARRAY
+            default !
+            helpkey *
+          }
          parameter nn {
             type _LOGICAL
             vpath DEFAULT
@@ -5130,7 +5145,6 @@ package kappa {
             ppath DYNAMIC
             helpkey *
           }
-
       }
 
       action mlinplot {

@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_REPRT( MESS, LOG, FD, STATUS )
+      SUBROUTINE KPG1_REPRT( MESS, QUIET, LOG, FD, STATUS )
 *+
 *  Name:
 *     KPG1_REPRT
@@ -10,15 +10,18 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_REPRT( MESS, LOG, FD, STATUS )
+*     CALL KPG1_REPRT( MESS, QUIET, LOG, FD, STATUS )
 
 *  Description:
-*     This routine dislays the supplied message using MSG_OUT, and if
-*     LOG is .TRUE., write out the same text to the file identified by FD.
+*     This routine dislays the supplied message using MSG_OUT (unless
+*     QUIET is .TRUE), and (if LOG is .TRUE.) writes out the same text 
+*     to the file identified by FD.
 
 *  Arguments:
 *     MESS = CHARACTER * ( * ) (Given)
 *        The message, which may contain MSG tokens.
+*     QUIET = LOGICAL (Given)
+*        Supress screen output?
 *     LOG = LOGICAL (Given)
 *        Write the text to  a file?
 *     FD = INTEGER (Given)
@@ -49,6 +52,7 @@
 
 *  Arguments Given:
       CHARACTER MESS*(*)
+      LOGICAL QUIET
       LOGICAL LOG
       INTEGER FD
 
@@ -65,7 +69,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Show the message to the user.
-      CALL MSG_OUT( ' ', MESS, STATUS )
+      IF( .NOT. QUIET ) CALL MSG_OUT( ' ', MESS, STATUS )
 
 *  If writing to the file...
       IF( LOG ) THEN 

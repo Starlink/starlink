@@ -945,7 +945,7 @@
 *  comment of the current keyword, and $C(keyword{[occurrence]}) meaning
 *  use the comment of the occurrence of a named keyword.
             REFCOM = COMENT( 1:2 ) .EQ. '$C'
-            IF ( REFCOM .AND. EDIT .NE. 'R' ) THEN
+            IF ( REFCOM ) THEN
 
 *  Initialise as the current editing keyword.
                KEYREC = KEYNAM

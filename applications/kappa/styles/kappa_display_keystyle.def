@@ -64,3 +64,12 @@
 #  Suppress tick marks on axis 2.
       majticklen(2)=0
       minticklen(2)=0
+
+#  Produce a ramp key.
+      form=ramp
+
+#  Annotate the main axis with data value.
+      pennums=0
+
+#  If a histogram-style key is requested, make it linear.
+      logpop=0

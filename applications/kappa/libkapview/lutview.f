@@ -19,26 +19,40 @@
 *     lutview [mode] [low] [high] [curpic] [device] 
 
 *  Description:
-*     This application displays a ramp of colours on the specified image
-*     display device using the whole of the current colour table (excluding
-*     the low 16 pens which are reserved for axis annotation ,etc). By 
-*     default, numerical values are displayed along the long edge of the 
-*     ramp. The values corresponding to the maximum and minimum colour 
+*     This application displays a key to the current colour table on the 
+*     specified image display device using the whole of the current colour 
+*     table (excluding the low 16 pens which are reserved for axis
+*     annotation, etc). The key can either be a simple rectangular block 
+*     of colour which ramps through the colour table, a histogram-style 
+*     key in which the width of the block reflects the number of pixels
+*     allocated to each colour index, or a set of RGB intensity curves. 
+*     The choice is made using the STYLE parameter.
+*
+*     By default, numerical data values are displayed along the long edge of 
+*     the key. The values corresponding to the maximum and minimum colour 
 *     index are supplied using parameters HIGH and LOW. Intermediate colour 
 *     indices are labelled with values which are linearly interpolated 
 *     between these two extreme values.
 *
-*     The rectangular area in which the ramp (plus annotations) is drawn
+*     The rectangular area in which the key (plus annotations) is drawn
 *     may be specified either using a graphics cursor, or by specifying the
 *     co-ordinates of two corners using parameters LBOUND and UBOUND.
-*     Additionally, there is an option to make the ramp fill the current
-*     picture. See parameter MODE. The ramp may be constrained to the
+*     Additionally, there is an option to make the key fill the current
+*     picture. See parameter MODE. The key may be constrained to the
 *     current picture using parameter CURPIC.
 *
 *     The appearance of the annotation my be controlled in detail using
 *     the STYLE parameter.
 
 *  ADAM Parameters:
+*     COMP = LITERAL (Read)
+*        The component (within the NDF given by parameter NDF) which is
+*        currently displayed.  It may be "Data", "Quality", "Variance", or 
+*        "Error" (where "Error" is an alternative to "Variance" and causes 
+*        the square root of the variance values to be used).  If "Quality" is 
+*        specified, then the quality values are treated as numerical values (in
+*        the range 0 to 255). The dynamic default is obtained from global
+*        parameter COMP which is set by applications such as KAPPA:DISPLAY. []
 *     CURPIC = _LOGICAL (Read)
 *        If CURPIC is TRUE, the colour table key is to lie within the
 *        current picture, otherwise the new picture can lie anywhere
@@ -77,7 +91,8 @@
 *     HIGH = _REAL (Read)
 *        The value corresponding to the maximum colour index.  It is
 *        used to calculate the annotation scale for the key.  If it
-*        is null (!) the maximum colour index is used.
+*        is null (!) the maximum colour index is used, and histogram
+*        style keys are not available.
 *        [Current display linear-scaling maximum]
 *     LBOUND = LITERAL (Read)
 *        Co-ordinates of the lower left corner of the rectangular region
@@ -90,7 +105,8 @@
 *     LOW = _REAL (Read)
 *        The value corresponding to the minimum colour index.  It is
 *        used to calculate the annotation scale for the key.  If it
-*        is null (!) the minimum colour index is used.
+*        is null (!) the minimum colour index is used, and histogram
+*        style keys are not available.
 *        [Current display linear-scaling minimum]
 *     LUT = NDF (Read)
 *        Name of the NDF containing a lookup table as its data array;
@@ -127,6 +143,15 @@
 *        the picture mode. 
 *
 *        ["Cursor"]
+*     NDF = NDF (Read)
+*        The NDF defining the image values to be used if a
+*        histogram-style key is requested. This should normally be the
+*        NDF currently displayed in the most recently created DATA picture.
+*        If a value is supplied on the command line for this parameter it
+*        will be used. Otherwise, the NDF to used is found by
+*        interogating the graphics database (which contains references to
+*        displayed images). If no reference NDF can be obtained from the
+*        graphics database, the user will be prompted for a value.
 *     NN = _LOGICAL (Read)
 *        If NN is TRUE, the input lookup table is mapped to the colour
 *        table by using the nearest-neighbour method.  This preserves
@@ -161,7 +186,18 @@
 *        Axis 1 is always the "data value" axis, whether it is displayed 
 *        horizontally or vertically. So for instance, to set the label
 *        for the data value axis, assign a value to "Label(1)" in the 
-*        supplied style. [current value] 
+*        supplied style. 
+*
+*        To get a ramp key (the default), specify "form=ramp". To
+*        get a histogram key (a coloured histogram of pen indices), 
+*        specify "form=histogram". To get a graph key (three curves of
+*        RGB intensities), specify "form=graph". If a histogram key 
+*        is produced, the population axis can be either logarithmic or 
+*        linear. To get a logarithmic population axis, specify "logpop=1". 
+*        To get a linear population axis, specify "logpop=0" (the default). 
+*        To annotate the long axis with pen numbers instead of pixel value, 
+*        specify "pennums=1" (the default, "pennums=0", shows pixel 
+*        values). [current value]
 *     UBOUND = LITERAL (Read)
 *        Co-ordinates of the upper right corner of the rectangular region
 *        containing the colour ramp and annotation, in the co-ordinate 
@@ -179,6 +215,15 @@
 *     lutview 
 *        Draws an annotated colour table at a position selected via
 *        the cursor on the current image-display device.
+*     lutview style='form=hist,logpop=1'
+*        As above, but the key has the form of a coloured histogram of
+*        the pen numbers in the most recently displayed image. The second 
+*        axis display the logarithm (base 10) of the bin population. 
+*     lutview style='form=graph,pennums=1'
+*        The key is drawn as a set of three (or one if a monochrome
+*        colour table is in use) curves indicating the red, green and
+*        blue intensity for each pen. The first axis is annotated with
+*        pen numbers instead of data values.
 *     lutview style="'edge(1)=right,label(1)=Data value in m31'"
 *        As above, but the data values are labelled on the right edge of 
 *        the box, and the values are labelled with the string "Data value
@@ -219,6 +264,8 @@
 *        order.
 *     15-FEB-2000 (DSB):
 *        Calls to KPG1_PGCUR modified for new argument list.
+*     4-OCT-2001 (DSB):
+*        Added graph and histogram-style keys.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -245,16 +292,13 @@
                                ! display
       PARAMETER ( MINCOL = 8 + CTM__RSVPN )
 
-      INTEGER MXLUTE           ! Maximum lookup table entry
-      PARAMETER ( MXLUTE = CTM__MXPEN )
-
-      INTEGER NPRICL           ! Number of primary colours
-      PARAMETER ( NPRICL = 3 )
-
 *  Local Variables:
       CHARACTER AMES(2)*30     ! Instructions on cursor use
+      CHARACTER COMP*8         ! Component to be displayed
       CHARACTER LABEL*15       ! Label for data axis
+      CHARACTER MCOMP*8        ! Component to be mapped
       CHARACTER MODE*7         ! How to get KEY Frame size and position
+      CHARACTER REFNAM*256     ! Reference name
       DOUBLE PRECISION C1( 2 ) ! First corner
       DOUBLE PRECISION C2( 2 ) ! Second corner
       DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords at corner
@@ -265,28 +309,34 @@
       INTEGER I                ! General variable
       INTEGER IFRM             ! Frame index
       INTEGER INDF             ! NDF identifier for input LUT NDF
+      INTEGER INDF1            ! NDF identifier for input image NDF
+      INTEGER IPCOL            ! Pointer to vector of colour indices
       INTEGER IPIC             ! AGI id. for original current picture
       INTEGER IPICB            ! AGI id. for Base picture
+      INTEGER IPICD            ! AGI id. for most recent DATA picture
       INTEGER IPICK            ! AGI id. for new KEY picture
+      INTEGER IPIN             ! Pointer to input pixel array 
       INTEGER IPLOT            ! Pointer to AST Plot 
       INTEGER IPLUT            ! Pointer to LUT array
-      INTEGER IPWORK           ! Pointer to work space
       INTEGER LDIMS( 2 )       ! Dimensions of input LUT array
       INTEGER LP               ! Lowest pen with which to display the image
       INTEGER NAX              ! No. of current Frame axes
+      INTEGER NCOL             ! No. of pixels in displayed image
       INTEGER NDIMS            ! Total number of NDF dimensions
-      INTEGER NEL              ! Number of elements in the mapped LUT array
+      INTEGER NEL              ! Number of elements in array
       INTEGER NP               ! Number of positions supplied
       INTEGER UP               ! Highest pen with which to display the image
       LOGICAL CURPIC           ! Constrain LUT key to current picture?
+      LOGICAL GOTLIM           ! Were high and low data limits supplied?
+      LOGICAL GOTNAM           ! Reference name obtained for the NDF?
       LOGICAL NN               ! Map the LUT via nearest-neighbour method?
       LOGICAL SAME             ! Is the current picture the BASE picture?
       REAL HIGH                ! High data value for LUT key
       REAL LOW                 ! Low data value for LUT key
-      REAL LUT( NPRICL, 0:MXLUTE ) ! Lookup table
       REAL RXC( 2 )            ! Single precision X valeus at corners
       REAL RYC( 2 )            ! Single precision Y valeus at corners
       REAL X1, X2, Y1, Y2      ! Bounds of current picture viewport in mm.
+
 *.
 
 *  Check the inherited global status.
@@ -295,11 +345,11 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
 *  Open the graphics data base and PGPLOT workstation (without clearing it).
       CALL KPG1_PGOPN( 'DEVICE', 'UPDATE', IPIC, STATUS )
-
-*  Get an AGI identifier for the Base picture.
-      CALL AGI_IBASE( IPICB, STATUS ) 
 
 *  Check whether the chosen device is an 'image display' with a suitable
 *  minimum number of colour indices, and obtain the number of colour 
@@ -308,29 +358,99 @@
      :                 'WINDOW,MATRIX_PRINTER', ' ', MINCOL, UP, 
      :                 STATUS )
 
-*  Define the lowest pen number for LUTVIEW of the image.  0 is
-*  reserved for the background.  Others are reserved for annotations.
+*  Define the lowest pen number for the image.  0 is reserved for the 
+*  background.  Others are reserved for annotations.
       LP = CTM__RSVPN
 
 *  Get the data values corresponding to the maximum and minimum colour
 *  indices. Use defaults of the highest and lowest non-reserved pen indices.
-      HIGH = REAL( UP )
-      LOW = REAL( LP )
+      HIGH = REAL( UP ) + 0.5
+      LOW = REAL( LP ) - 0.5
       CALL PAR_DEF0R( 'HIGH', HIGH, STATUS )
       CALL PAR_DEF0R( 'LOW', LOW, STATUS )
+      GOTLIM = .FALSE.
 
       IF( STATUS .EQ. SAI__OK ) THEN
          CALL PAR_GET0R( 'HIGH', HIGH, STATUS )
          CALL PAR_GET0R( 'LOW', LOW, STATUS )
-         LABEL = 'data value'
+         LABEL = 'Data Value'
+         GOTLIM = ( STATUS .EQ. SAI__OK )
 
          IF( STATUS .EQ. PAR__NULL ) THEN
             CALL ERR_ANNUL( STATUS )      
-            HIGH = REAL( UP )
-            LOW = REAL( LP )
-            LABEL = 'colour index'
+            HIGH = REAL( UP ) + 0.5
+            LOW = REAL( LP ) - 0.5
+            LABEL = 'Pen Number'
          END IF         
       END IF
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Indicate that we have no colour index data for the currently displayed 
+*  image.
+      NCOL = 0
+
+*  We can only produce a histogram if low and high data values were
+*  supplied.
+      IF( GOTLIM ) THEN 
+
+*  Find the most recent DATA picture.
+         CALL KPG1_AGFND( 'DATA', IPICD, STATUS )
+
+*  If a DATA picture was found...
+         IF( STATUS .EQ. SAI__OK ) THEN 
+
+*  Re-instate the original current picture. 
+            CALL AGI_SELP( IPIC, STATUS )
+
+*  Obtain a reference to the NDF.
+            CALL KPG1_AGREF( IPICD, 'READ', GOTNAM, REFNAM, STATUS )
+
+*  Annul the error if no DATA picture could be found.
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+            GOTNAM = .FALSE.
+         END IF
+
+*  Obtain the input NDF. If the name is given on the command line
+*  it will be used.  If not, the database data reference is used,
+*  if there is one.  Otherwise, the user is prompted.
+         CALL KPG1_ASREF( 'NDF', 'READ', GOTNAM, REFNAM, INDF1, STATUS )
+
+*  If a null parameter values was obtained, annul the error (histogram
+*  keys will not be available).
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )
+         ELSE
+
+*  Find which component of the NDF to use. MCOMP is for use with NDF_MAP and 
+*  may be set to 'Error'. COMP is for use with all other NDF routines (which
+*  do not accept 'Error' as an NDF component name), and has 'Variance' in
+*  place of 'Error'.
+            CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
+
+*  Map the required component.
+            CALL NDF_MAP( INDF1, MCOMP, '_REAL', 'READ', IPIN, NCOL,
+     :                    STATUS )
+
+*  Allocate memory for an array of corresponding colour indices.
+            CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL, STATUS )
+
+*  Produce the colour index corresponding to each data value.
+            CALL KPG1_ISCLR( .TRUE., NCOL, 1, %VAL( IPIN ), .FALSE., 
+     :                       LOW, HIGH, LP, UP, 0, %VAL( IPCOL ), 
+     :                       STATUS )
+
+* Annul the NDF identifier.
+            CALL NDF_ANNUL( INDF1, STATUS )
+ 
+         END IF
+
+      END IF
+
+*  Get an AGI identifier for the Base picture.
+      CALL AGI_IBASE( IPICB, STATUS ) 
 
 *  See how the area to use for the LUT key is to be specified.
       CALL PAR_CHOIC( 'MODE', 'Cursor', 'Cursor,XY,Picture', .FALSE.,
@@ -473,49 +593,46 @@
 *  Validate the LUT.
       CALL KPG1_AVLUT( 'LUT', INDF, IPLUT, NEL, STATUS )
 
-*  Null status means do not read a lookup table.
+*  Null status means do not read a new lookup table. Instead, we will use
+*  the existing table.
       IF ( STATUS .EQ. PAR__NULL ) THEN
+
+*  Annul the error.
          CALL ERR_ANNUL( STATUS )
 
-*  Otherwise, obtain the array dimensions.
+*  If a new lookup table was supplied, load it instead of the users LUT.
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+
+*  Obtain the array dimensions.
          CALL NDF_DIM( INDF, 2, LDIMS, NDIMS, STATUS )
 
 *  Map the lookup table to the colour table by interpolation or by
 *  nearest neighbour?
          CALL PAR_GTD0L( 'NN', .FALSE., .TRUE., NN, STATUS )
 
-*  If the structure was found then read in the lookup table.
-         CALL KPG1_LUTIN( LDIMS( 2 ), %VAL( IPLUT ),
-     :                    UP - LP + 1, NN, LUT, STATUS )
-
-*  Install the lookup table into image-LUTVIEW colour table.
-*  The lookup table follows the palette, hence the offset in the
-*  colour index.
-         DO  I = 0, UP - LP 
-            CALL PGSCR( I + LP, LUT( 1, I ), LUT( 2, I ),
-     :                  LUT( 3, I ) )
-         END DO
+*  Install the lookup table into image-display colour table.
+         CALL KPG1_PGLUT( LDIMS( 2 ), %VAL( IPLUT ), LP, UP, NN,
+     :                    STATUS )
 
       END IF
-
-*  Get work space to hold the array of colour indices. The number of
-*  entries is equal to the number of pens.
-      CALL PSX_CALLOC( UP - LP + 1, '_INTEGER', IPWORK, STATUS )
 
 *  Create the LUT key within the KEY Picture.
       CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL, 
      :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
-     :                 %VAL( IPWORK ), STATUS ) 
-
-*  Free the memory.
-      CALL PSX_FREE( IPWORK, STATUS )
+     :                 NCOL, %VAL( IPCOL ), STATUS ) 
 
 *  Tidy up
  999  CONTINUE
 
+*  Deallocate any colour index array.
+      IF( NCOL .GT. 0 ) CALL PSX_CALLOC( NCOL, '_INTEGER', IPCOL, 
+     :                                   STATUS )
+
 *  Shutdown PGPLOT and the graphics database.
       CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
 
 *  End the AST context.
       CALL AST_END( STATUS )
@@ -527,3 +644,4 @@
       END IF
 
       END
+

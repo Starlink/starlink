@@ -1,521 +1,400 @@
-*+  LOOK - Outputs the values of a sub-array of a 2-d data array to the
-*          screen or a text file
+      SUBROUTINE LOOK( STATUS )
+*+
+*  Name:
+*     LOOK
 
-      SUBROUTINE LOOK ( STATUS )
-*
-*    Description :
-*
-*     This routine reports to user or writes to a text file the values
-*     in a specified sub-array of the 2-d data array in the input IMAGE
-*     structure. Three options are allowed 
-*       [Peep]    - gives a fixed 7x7 box on the screen, centred on a
-*                   given pixel;
-*       [Examine] - gives an NxM box on the screen, with the lower-left
-*                   pixel as specified;
-*       [List]    - outputs the specified sub-array to a text file
-*                   (maximum width 132 characters) of a defined name.
-*                   Beware that the List option can produce very large
-*                   files if it is not used sensibly.
-*
-*     The magic-value method is used for processing bad data. Bad pixels
-*     are denoted in the display or file by INVALID rather than a
-*     numerical value.
-*
-*    Invocation :
-*
+*  Purpose:
+*     List pixel values in an NDF.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation
 *     CALL LOOK( STATUS )
+
+*  Description:
+*     This application lists pixel values within a rectangular region of
+*     a 2D NDF. The listing may be displayed on the screen and logged in
+*     a text file (see parameters QUIET and LOGFILE). The rectangular region 
+*     to be listed can be specified either by giving its centre and size 
+*     (see parameters CENTRE and SIZE), or its corners (see parameters LBOUND 
+*     and UBOUND). The top-right pixel value is also written to an output 
+*     parameter (VALUE). The listing may be produced in several different
+*     formats (see parameter FORMAT), and the format of each individual
+*     displayed data value can be controlled using parameter STYLE.
+
+*  Usage:
+*     look ndf centre [size] [lbound] [ubound] [logfile] [format] [comp] 
+
+*  ADAM Parameters:
+*     CENTRE = LITERAL (Read)
+*        The co-ordinates of the data pixel at the centre of the area to
+*        be displayed, in the current co-ordinate Frame of the NDF (supplying 
+*        a colon ":" will display details of the current co-ordinate Frame). 
+*        The position should be supplied as a list of formatted axis values 
+*        separated by spaces or commas. See also parameter USEAXIS.  A
+*        null (!) value causes the displayed area to be determined using
+*        parameters LBOUND and UBOUND.
+*     COMP = LITERAL (Read)
+*        The NDF array component to be displayed.  It may be "Data",
+*        "Quality", "Variance", or "Error" (where "Error" is an
+*        alternative to "Variance" and causes the square root of the
+*        variance values to be displayed).  If "Quality" is specified,
+*        then the quality values are treated as numerical values (in
+*        the range 0 to 255). ["Data"]
+*     FORMAT = LITERAL (Read)
+*        Specifies the format for the listing:
 *
-*    Parameters :
+*        - "strips" -- The area being displayed is divided up into
+*        vertical strips of limited width. Each strip is displayed in
+*        turn, with Y pixel index at the left of each row, and
+*        X pixel index at the top of each column. The highest row is
+*        listed first in each strip. This format is intended for human
+*        readers - the others are primarily intended for being read by
+*        other software.
 *
-*     INPIC  =  IMAGE( READ )
-*         IMAGE structure containing the 2-d data array to be inspected
-*     CHOICE = LITERAL( READ )
-*         The means by which the data array is examined.  The options
-*           are 'Peep' --- reports the values in a 7x7 pixel region;
-*           'Examine' --- reports the values of a region whose size is
-*           defined by the user; and 'List' is similar to 'Examine',
-*           but it generates a listing to a text file.
-*     XCEN  =  INTEGER( READ )
-*         x centre of box to be examined on the screen.
-*     YCEN  =  INTEGER( READ )
-*         y centre of box to be examined on the screen.
-*     XLOW  =  INTEGER( READ )
-*         x pixel index of the lower left of the sub-array to be output.
-*     YLOW  =  INTEGER( READ )
-*         y pixel index of the lower left of the sub-array to be output.
-*     XSIZE  =  INTEGER( READ )
-*         x size of the sub-array to be output.
-*     YSIZE  =  INTEGER( READ )
-*         y size of the sub-array to be output.
-*     FILENAME  =  FILENAME( READ )
-*         Name of the file to be used for the output of the sub-array
-*           listing.
-*     ANOTHER = LOGICAL( READ )
-*         If true, another look at the data is required.
+*        - "clist" -- Each row of textual output consists of an X pixel 
+*        index, followed by a Y pixel index, followed by the pixel data
+*        value. No headers or blank lines are included. The pixels are
+*        listed in "fortran order" - the lower left pixel first, and the
+*        upper right pixel last. 
 *
-*    Arguments:
+*        - "vlist" -- Each row of textual output consists of just the
+*        pixel data value. No headers or blank lines are included. The 
+*        pixels are listed in "fortran order" - the lower left pixel first, 
+*        and the upper right pixel last.
 *
-*     STATUS  = INTEGER( READ, WRITE )
-*         Global status value
+*        - "region" -- The pixel data values are listed as a 2 dimensional
+*        region. Each row of textual output contains a whole row of data 
+*        values. The textual output may be truncated if it is too wide. The
+*        lowest row is listed first.
 *
-*    Method :
+*        In all cases, adjacent values are sepaerated by spaces, and bad
+*        pixel values are represented by the string "BAD". ["strips"]
 *
-*     Check for error on entry - return if not o.k.
-*     Get locator to input IMAGE structure
-*     If no error then 
-*        Map the data-array component
-*        If no error then 
-*           Output image dimensions to user
-*           Do while another inspection wanted and no error
-*              Get choice of Peep, Examine, or List
-*              If Peep then
-*                 Get x and y co-ords of centre of 7x7 box to be peeped
-*                 If no error then 
-*                    Call subroutine to output 7x7 box to screen
-*                    If status is bad on return then
-*                       Report context of PEEPSB error
-*                    Endif
-*                 Else
-*                    Report error
-*                 Endif
-*                 Ask if another inspection wanted
-*                 Clear parameters before looping
-*              Else if Examine wanted then
-*                 Get x and y lower bounds and size of box to be output
-*                   to screen
-*                 If no error then
-*                    Call subroutine to output box to screen
-*                    If status is bad on return then
-*                       Report context of PEEPSB error
-*                    Endif
-*                 Else
-*                    Report error
-*                 Endif
-*                 Ask if another inspection wanted
-*                 Clear parameters before looping
-*              Else if List wanted then
-*                 Get x and y lower bounds and size of box to be listed
-*                 If no error then
-*                    Call subroutine to output sub-array to listing file
-*                 Else
-*                    Report error
-*                 Endif
-*                 Ask if another inspection is wanted
-*                 Clear parameters before looping
-*              Else
-*                 Report error
-*              Endif
-*           Enddo
-*           Unmap input data array
-*        Else
-*           Report error
-*        Endif
-*        Clean up input data structure
-*     Else
-*        Report error
-*     Endif
-*     End
+*     LBOUND = LITERAL (Read)
+*        The co-ordinates of the data pixel at the bottom-left of the 
+*        area to be displayed, in the current co-ordinate Frame of the NDF 
+*        (supplying a colon ":" will display details of the current 
+*        co-ordinate Frame). The position should be supplied as a list of 
+*        formatted axis values separated by spaces or commas. See also 
+*        parameter USEAXIS.  A null (!) value causes the bottom-left corner
+*        of the supplied NDF to be used. The value is ignored unless a null 
+*        value is supplied for parameter CENTRE or SIZE.
+*     LOGFILE = FILENAME (Write)
+*        The name of the text file in which the textual output may be stored. 
+*        See MAXLEN. A null string (!) means that no file is created.  [!]
+*     MAXLEN = _INTEGER (Read)
+*        The maximum number of characters in a line of textual output. The 
+*        line is truncated after the last complete value if it would extend
+*        beyond this value. [80]
+*     NDF = NDF (Read)
+*        The input NDF structure containing the data to be displayed.
+*     QUIET = LOGICAL (Read)
+*        If TRUE then output is not displayed on the screen. The log file
+*        and output parameter values are still created. [FALSE]
+*     SIZE( 2 ) = _INTEGER (Read)
+*        The dimensions of the rectangular area to be displayed, in pixels.
+*        If a single value is given, it is used for both axes. The area
+*        is centred on the position specified by parameter CENTRE. A null 
+*        (!) value for SIZE causes the displayed area to be determined using 
+*        parameters LBOUND and UBOUND. [7]
+*     STYLE = GROUP (Read)
+*        A group of attribute settings describing the format to use 
+*        for individual data values.
 *
-*    Bugs :
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
 *
-*     None known.
+*        Each individual attribute setting should be of the form:
 *
-*    Authors :
+*           <name>=<value>
+*        
+*        where <name> is the name of a Frame attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
 *
-*     Mark McCaughrean UoE ( REVA::MJM )
-*     Malcolm J. Currie   STARLINK( RAL::CUR )
-*
-*    History :
-*
-*     11-06-1986 : First implementation (REVA::MJM)
-*     15-06-1986 : Modified to include Examine option (REVA::MJM)
-*     1986 Aug 7 : Renamed algorithmic routines to PEEPSB and LISTSB
-*                  (RAL::CUR).
-*     1986 Aug 29: Added argument section to prologue, and nearly
-*                  conformed to Starlink standards (RAL::CUR).
-*     1987 Oct 15: Reordered tidying and extra status check (RAL::CUR).
-*     1988 Mar 17: Referred to `array' rather than `image' (RAL::CUR).
-*     1988 Jun 4 : More reporting of error context (RAL::CUR).
-*     1988 Jun 30: File name obtained in LISTSB (RAL::CUR).
-*     1988 Dec  6: Improved Examine XSIZE default (RAL::CUR).
-*     1989 Jul 27: Passed array dimensions to PEEPSB and LISTSB as
-*                  separate variables (RAL::CUR).
-*     1990 Feb 22: Modified the calling sequence for the new
-*                  more-modular version of LISTSB (RAL::CUR).
-*     1991 Jun 11: Revised calling sequence for PEEPSB (RAL::CUR).
-*     1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-*     1992 Mar  3: Replaced AIF parameter-system calls by the extended
-*                  PAR library (RAL::CUR).
-*
-*    Type definitions :
+*        Data values are formatted using attributes Format(1) and Digits(1). 
+*        [current value] 
+*     UBOUND = LITERAL (Read)
+*        The co-ordinates of the data pixel at the top-right corner of the 
+*        area to be displayed, in the current co-ordinate Frame of the NDF 
+*        (supplying a colon ":" will display details of the current 
+*        co-ordinate Frame). The position should be supplied as a list of 
+*        formatted axis values separated by spaces or commas. See also 
+*        parameter USEAXIS.  A null (!) value causes the top right corner
+*        of the supplied NDF to be used. The value is ignored unless a null 
+*        value is supplied for parameter CENTRE or SIZE.
+*     USEAXIS = GROUP (Read)
+*        USEAXIS is only accessed if the current co-ordinate Frame of the 
+*        NDF has more than 2 axes. A group of two strings should be
+*        supplied specifying the 2 axes which are to be used when supplying 
+*        positions for parameters CENTRE, LBOUND and UBOUND. Each axis can 
+*        be specified either by its integer index within the current Frame 
+*        (in the range 1 to the number of axes in the current Frame), or by
+*        its symbol string. A list of acceptable values is displayed if an 
+*        illegal value is supplied. If a null (!) value is supplied, the axes 
+*        with the same indices as the 2 used pixel axes within the NDF
+*        are used. [!]
+*     VALUE = _DOUBLE (Write)
+*        An output parameter to wghich is written the data value at the 
+*        top-right pixel in the displayed region.
 
-      IMPLICIT  NONE           ! no default typing allowed
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
 
-*    Global constants :
+*  Examples:
+*     look ngc6872 "1:27:23 -22:41:12" quiet logfile=log
+*        Lists a 7x7 block of pixel values centred on RA/DEC 1:27:23,
+*        -22:41:12 (this assumes that the current co-ordinate Frame in
+*        the NDF is an RA/DEC Frame). The listing is written to the text 
+*        file "log" but is not displayed on the screen.
+*     look ngc6872 centre=\! lbound="189 207" ubound="203 241" values.dat 
+*        Lists the pixel values in an NDF called ngc6872, within a
+*        rectangular region from pixel (189,207) to (203,241) (this
+*        assumes that the current co-ordinate Frame in the NDF is pixel
+*        co-ordinates). The listing is displayed on the screen and written 
+*        to the text file "values.dat".
+*     look ngc6872 centre="10 11" size=1 quiet 
+*        Stores the value of pixel (10,11) in output parameter VALUE, but
+*        does not display it on the screen or store it in a log file. This
+*        assumes that the current co-ordinate Frame in the NDF is pixel
+*        co-ordinates. 
 
-      INCLUDE 'SAE_PAR'        ! SSE global definitions
-      INCLUDE 'DAT_PAR'        ! Data-system constants
-      INCLUDE 'PAR_ERR'        ! parameter-system errors
+*  Related Applications:
+*     KAPPA: TRANDAT.
 
-*    Status :
+*  Implementation Status:
+*     -  This routine correctly processes the DATA, QUALITY and 
+*     VARIANCE components of the input NDF.
+*     -  Processing of bad pixels and automatic quality masking are
+*     supported.
 
-      INTEGER  STATUS
+*  Authors:
+*     DSB: David S. Berry (STARLINK)
+*     {enter_new_authors_here}
 
-*    Local Constants :
+*  History:
+*     19-OCT-2001 (DSB):
+*        Original NDF/AST version.
+*     {enter_further_changes_here}
 
-      INTEGER
-     :  NDIMS                  ! dimensionality of input array
-      PARAMETER( NDIMS = 2 )   ! default to 2-d
-
-*    Local variables :
-
-      INTEGER
-     :  DIMS( NDIMS ),         ! array dimensions
-     :  I,                     ! Loop counter
-     :  LBND( NDIMS ),         ! Lower bounds of the array
-     :  ORIGIN( DAT__MXDIM ),  ! Origin of the data array
-     :  PNTRI,                 ! pointer to data array component
-     :  XCENDF,                ! x default centre of box
-     :  YCENDF,                ! y default centre of box 
-     :  XCEN,                  ! x centre of 7x7 box to be peeped at
-     :  YCEN,                  ! y    "    "  "   "   "  "    "    "
-     :  XSIZE,                 ! x size of box to be inspected
-     :  YSIZE,                 ! y   "   "  "   "  "     "
-     :  XLOW,                  ! x lower left of sub-array
-     :  YLOW,                  ! y   "     "   "  "    "
-     :  XUPP,                  ! x upper right "  "    "
-     :  YUPP                   ! y   "     "   "  "    "
-
-      CHARACTER*80
-     :  CHOILS                 ! list of choices - Peep, Examine or
-                               ! List
-
-      CHARACTER*10
-     :  CHOICE                 ! choice made by user
-
-      CHARACTER*(DAT__SZLOC)   ! Locator for :
-     :  LOCDI,                 ! structure containing the input data
-                               ! array
-     :  LOCI                   ! Input data structure
-
-      CHARACTER * ( DAT__SZNAM )
-     :  DNAMEI                 ! Name of the input data-array component
-
-      LOGICAL                  ! true if:
-     :  ANOTHR                 ! another inspection is wanted
+*  Bugs:
+*     {note_new_bugs_here}
 
 *-
-*    check status on entry - return if not o.k.
 
-      IF ( STATUS .NE. SAI__OK ) RETURN
+*  Type Definitions:
+      IMPLICIT NONE
 
-*    By definition the lower bounds are 1 until converted to use NDF_.
+*  Global Constants:
+      INCLUDE 'SAE_PAR'        ! Global SSE definitions
+      INCLUDE 'PAR_ERR'        ! PAR error constants
+      INCLUDE 'AST_PAR'        ! AST constants and functions
 
-      DO  I = 1, NDIMS
-         LBND( I ) = 1
+*  Status:
+      INTEGER STATUS
+
+*  Local Variables:
+      CHARACTER COMP*8         ! Component to be displayed
+      CHARACTER FORMAT*6       ! Output format
+      CHARACTER MCOMP*8        ! Component to be mapped
+      CHARACTER TEXT*80        ! Text buffer
+      DOUBLE PRECISION CC( 2 ) ! Current Frame co-ords 
+      DOUBLE PRECISION GC( 2 ) ! GRID co-ords 
+      DOUBLE PRECISION VALUE   ! Final data value
+      INTEGER EL               ! No. of mapped values
+      INTEGER FDL              ! Log file descriptor
+      INTEGER FRM              ! Frame used to format data values
+      INTEGER I                ! Loop counter
+      INTEGER INDF1            ! Input NDF
+      INTEGER INDF2            ! Section of input NDF to be listed
+      INTEGER IPDAT            ! Pointer to mapped pixel values
+      INTEGER IPLINE           ! Pointer to line buffer
+      INTEGER IWCS             ! Pointer to the WCS FrameSet from the NDF
+      INTEGER MAXLEN           ! Maximum line length
+      INTEGER NC               ! No. of characters used
+      INTEGER NVAL             ! No. of values obtained from parameter
+      INTEGER RLBND( 2 )       ! The lower bounds of region to be listed
+      INTEGER RUBND( 2 )       ! The upper bounds of region to be listed
+      INTEGER SDIM( 2 )        ! The significant NDF axes
+      INTEGER SIZE( 2 )        ! Region dimensions
+      INTEGER SLBND( 2 )       ! Significant lower bounds of the image
+      INTEGER SUBND( 2 )       ! Significant upper bounds of the image
+      LOGICAL LOG              ! Write to log file?
+      LOGICAL QUIET            ! Suppress screen output?
+*.
+
+*  Check the inherited global status.
+      IF( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Begin an NDF context.
+      CALL NDF_BEGIN
+
+*  Get the input NDF identifier.
+      CALL LPG_ASSOC( 'NDF', 'READ', INDF1, STATUS )
+
+*  Find which component to display. MCOMP is for use with NDF_MAP and may
+*  be set to 'Error'. COMP is for use with all other NDF routines (which
+*  do not accept 'Error' as an NDF component name), and has 'Variance' in
+*  place of 'Error'.
+      CALL KPG1_ARCOG( 'COMP', INDF1, MCOMP, COMP, STATUS )
+
+*  Now get the WCS FrameSet from the NDF.
+      CALL KPG1_ASGET( INDF1, 2, .FALSE., .TRUE., .TRUE., SDIM, 
+     :                 SLBND, SUBND, IWCS, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the centre position (used as a default for CENTRE).
+      GC( 1 ) = 0.5*( SUBND( SDIM( 1 ) ) - SLBND( SDIM( 1 ) ) )  + 1.0
+      GC( 2 ) = 0.5*( SUBND( SDIM( 2 ) ) - SLBND( SDIM( 2 ) ) )  + 1.0
+      CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CC( 1 ), 
+     :                CC( 2 ), STATUS ) 
+
+*  KPG1_GTPOS displays the default with large accuracy. This is probably
+*  more than we need here, so reduce the accuracy of the defaults by
+*  formatting them and unformatting them.
+      DO I = 1, 2
+         TEXT = AST_FORMAT( IWCS, I, CC( I ), STATUS )
+         NC = AST_UNFORMAT( IWCS, I, TEXT, CC( I ), STATUS ) 
       END DO
 
-*    start by getting input IMAGE structure
-
-      CALL KPG1_GETIM( 'INPIC', LOCI, LOCDI, DNAMEI, ORIGIN, STATUS )
-
-*    check for error before continuing
-
-      IF ( STATUS .EQ. SAI__OK ) THEN
-
-*       map the data array component
-
-         CALL CMP_MAPN( LOCDI, DNAMEI, '_REAL', 'READ', NDIMS,
-     :                  PNTRI, DIMS, STATUS )
-
-*       check for error before continuing
-
-         IF ( STATUS .EQ. SAI__OK ) THEN
-
-*          output array dimensions to user
-
-            CALL MSG_SETI( 'XDIM', DIMS( 1 ) )
-            CALL MSG_SETI( 'YDIM', DIMS( 2 ) )
-            CALL MSG_OUT( 'INPUT_DIMS',
-     :                    'Array is ^XDIM by ^YDIM pixels', STATUS )
-
-*          initialise loop flag and defaults
-
-            ANOTHR  =  .TRUE.
-            XCENDF  =  NINT( REAL( DIMS( 1 ) ) / 2.0 )
-            YCENDF  =  NINT( REAL( DIMS( 2 ) ) / 2.0 )
-
-*          loop round doing output until requested to stop
-
-            DO WHILE ( ANOTHR .AND. STATUS .EQ. SAI__OK )
-
-*             set up the list of choices allowed
-
-               CHOILS  =  'Peep,Examine,List'
-
-*            get type of output required - Peep, Examine or List
-
-               CALL MSG_OUT( 'BLANK', ' ', STATUS )
-               CALL PAR_CHOIC( 'CHOICE', 'Peep', CHOILS, .TRUE., CHOICE,
-     :                         STATUS )
-               CALL MSG_OUT( 'BLANK', ' ', STATUS )
-
-*             force string to upper case
-
-               CALL CHR_UCASE( CHOICE )
-
-*             act accordingly - check first for a Peep
-
-               IF ( CHOICE( 1:1 ) .EQ. 'P' .AND.
-     :              STATUS .EQ. SAI__OK ) THEN 
-
-*                get the pixel indices of the centre of the box to be
-*                output to the screen
-
-                  CALL PAR_GDR0I( 'XCEN', XCENDF, 1, DIMS(1), .FALSE.,
-     :                            XCEN, STATUS )
-                  CALL PAR_GDR0I( 'YCEN', YCENDF, 1, DIMS(2), .FALSE.,
-     :                            YCEN, STATUS )
-
-*                check status before accessing pointer
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   Make the current values the dynamic defaults
-
-                     XCENDF = XCEN
-                     YCENDF = YCEN
-
-*                   work out lower bounds and box size for 7x7 box
-*                   centred on input pixel indices
-
-                     XLOW  =  XCEN - 3
-                     YLOW  =  YCEN - 3
-                     XSIZE  =  7
-                     YSIZE  =  7
-
-*                   call subroutine to output to the screen a 7x7 box
-*                   centred on XCEN, YCEN
-
-                     CALL PEEPSB( %VAL( PNTRI ), LBND, DIMS( 1 ),
-     :                            DIMS( 2 ), XLOW, YLOW, XSIZE, YSIZE,
-     :                            STATUS )
-
-*                   report context of any error
-
-                     IF ( STATUS .NE. SAI__OK ) THEN
-                        CALL ERR_REP( 'ERR_LOOK_SUB1',
-     :                    'LOOK : Error occurred in Peep mode',
-     :                    STATUS )
-                     END IF
-
-                  ELSE
-
-                     IF ( STATUS .NE. PAR__ABORT .AND.
-     :                    STATUS .NE. PAR__NULL ) THEN
-
-*                      announce the error
-
-                        CALL ERR_REP( 'ERR_LOOK_PAR1',
-     :                    'LOOK : Error obtaining centre in Peep '/
-     :                    /'mode - aborting', STATUS )
-                     END IF
-
-*                end of check-status-from-getting-centre check
-
-                  END IF
-
-*                ask user if he wants to do another inspection
-
-                  CALL MSG_OUT( 'BLANK', ' ', STATUS )
-                  CALL PAR_GET0L( 'ANOTHER', ANOTHR, STATUS )
-
-*                cancel the parameters before next use
-
-                  CALL PAR_CANCL( 'CHOICE', STATUS )
-                  CALL PAR_CANCL( 'XCEN', STATUS )
-                  CALL PAR_CANCL( 'YCEN', STATUS )
-                  CALL PAR_CANCL( 'ANOTHER', STATUS )
-
-*             else check if an Examine is wanted
-
-               ELSE IF ( CHOICE( 1:1 ) .EQ. 'E' .AND.
-     :                   STATUS .EQ. SAI__OK ) THEN
-
-*                get the x and y lower bounds and box size to be
-*                examined
-
-                  CALL PAR_GDR0I( 'XLOW', 1, 1, DIMS( 1 ), .FALSE.,
-     :                            XLOW, STATUS )
-                  CALL PAR_GDR0I( 'YLOW', 1, 1, DIMS( 2 ), .FALSE.,
-     :                            YLOW, STATUS )
-                  CALL PAR_GDR0I( 'XSIZE', MIN( DIMS( 2 ) - XLOW + 1,
-     :                             9 ), 1, 9, .FALSE., XSIZE, STATUS )
-                  CALL PAR_GDR0I( 'YSIZE', DIMS( 2 ) - YLOW + 1, 1,
-     :                             DIMS( 2 ), .FALSE., YSIZE, STATUS )
-
-*                check for error before calling subroutine
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   call subroutine to output box to screen
-
-                     CALL PEEPSB( %VAL( PNTRI ), LBND, DIMS( 1 ),
-     :                            DIMS( 2 ), XLOW, YLOW, XSIZE, YSIZE,
-     :                            STATUS )
-
-*                   report context of any error
-
-                     IF ( STATUS .NE. SAI__OK ) THEN
-                        CALL ERR_REP( 'ERR_LOOK_SUB2',
-     :                    'LOOK : Error occurred in Examine mode',
-     :                    STATUS )
-                     END IF
-
-                  ELSE
-
-                     IF ( STATUS .NE. PAR__ABORT .AND.
-     :                    STATUS .NE. PAR__NULL ) THEN
-
-*                      announce the error
-
-                        CALL ERR_REP( 'ERR_LOOK_PAR2',
-     :                    'LOOK : Error obtaining box limits in '/
-     :                    /'Examine mode - aborting', STATUS )
-                     END IF
-
-*                end of check-status-from-getting-box-limits check
-
-                  END IF
-
-*                ask if another inspection is wanted
-
-                  CALL MSG_OUT( 'BLANK', ' ', STATUS )
-                  CALL PAR_GET0L( 'ANOTHER', ANOTHR, STATUS )
-
-*                cancel parameters ready for another inspection
-
-                  CALL PAR_CANCL( 'CHOICE', STATUS )
-                  CALL PAR_CANCL( 'XLOW', STATUS )
-                  CALL PAR_CANCL( 'YLOW', STATUS )
-                  CALL PAR_CANCL( 'XSIZE', STATUS )
-                  CALL PAR_CANCL( 'YSIZE', STATUS )
-                  CALL PAR_CANCL( 'ANOTHER', STATUS )
-
-*             else check if a List is wanted
-
-               ELSE IF ( CHOICE( 1:1 ) .EQ. 'L' .AND.
-     :                   STATUS .EQ. SAI__OK ) THEN 
-
-*                get the x and y lower bounds and box size to be
-*                examined
-
-                  CALL PAR_GDR0I( 'XLOW', 1, 1, DIMS( 1 ), .FALSE.,
-     :                            XLOW, STATUS )
-                  CALL PAR_GDR0I( 'YLOW', 1, 1, DIMS( 2 ), .FALSE.,
-     :                            YLOW, STATUS )
-                  CALL PAR_GDR0I( 'XSIZE', DIMS( 1 ) - XLOW + 1, 1, 
-     :                             DIMS( 1 ), .FALSE., XSIZE, STATUS )
-                  CALL PAR_GDR0I( 'YSIZE', DIMS( 2 ) - YLOW + 1, 1,
-     :                             DIMS( 2 ), .FALSE., YSIZE, STATUS )
-
-                  IF ( STATUS .EQ. SAI__OK ) THEN
-
-*                   work out the upper bounds from the lower bounds and
-*                   box size
-
-                     XUPP  =  XLOW + XSIZE - 1
-                     YUPP  =  YLOW + YSIZE - 1
-
-*                   call subroutine to output array listing to file
-
-                     CALL LISTSB( %VAL( PNTRI ), DIMS( 1 ), DIMS( 2 ),
-     :                            XLOW, YLOW, XUPP, YUPP, .TRUE., 0,
-     :                            'FILENAME', STATUS )
-
-                  ELSE
-
-                     IF ( STATUS .NE. PAR__ABORT .AND.
-     :                    STATUS .NE. PAR__NULL ) THEN
-
-*                      announce the error
-
-                        CALL ERR_REP( 'ERR_LOOK_PAR3',
-     :                    'LOOK : Error obtaining box limits in List '/
-     :                    /'mode - aborting', STATUS )
-                     END IF
-
-*                end of check-status-from-getting-box-limits check
-
-                  END IF
-
-*                see if user wants another output doing
-
-                  CALL MSG_OUT( 'BLANK', ' ', STATUS )
-                  CALL PAR_GET0L( 'ANOTHER', ANOTHR, STATUS )
-
-*                cancel parameters ready for another inspection.
-*                FILENAME is cancelled by the listing routine.
-
-                  CALL PAR_CANCL( 'CHOICE', STATUS )
-                  CALL PAR_CANCL( 'XLOW', STATUS )
-                  CALL PAR_CANCL( 'YLOW', STATUS )
-                  CALL PAR_CANCL( 'XSIZE', STATUS )
-                  CALL PAR_CANCL( 'YSIZE', STATUS )
-                  CALL PAR_CANCL( 'ANOTHER', STATUS )
-
-               ELSE
-
-                  IF ( STATUS .NE. PAR__ABORT .AND.
-     :                 STATUS .NE. PAR__NULL ) THEN
-
-*                   announce the error
-
-                     CALL ERR_REP( 'ERR_LOOK_MODE',
-     :                 'LOOK : Mode not recognised - aborting',
-     :                 STATUS )
-                  END IF
-
-*             end of if-mode check
-
-               END IF
-
-*          end of loop round whilst another inspection required
-
-            END DO
-
-*          unmap input data array
-
-            CALL CMP_UNMAP( LOCDI, DNAMEI, STATUS )
-
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Obtain the Current Frame co-ordinates (returned in CC) to put at the 
+*  centre of the listing, using parameter CENTRE. 
+      CALL KPG1_GTPOS( 'CENTRE', IWCS, .FALSE., CC, GC, STATUS )
+
+*  Get the box size in pixel, and store the pixel index bounds of the 
+*  region to be listed.
+      CALL PAR_GDRVI( 'SIZE', 2, 1, 200, SIZE, NVAL, STATUS )
+      IF ( NVAL .LT. 2 ) SIZE( 2 ) = SIZE( 1 )
+
+*  If no error occurred, store the pixel index bounds of the 
+*  region to be listed.
+      IF( STATUS .EQ. SAI__OK ) THEN
+         RLBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) ) - 
+     :                SIZE( 1 )/2
+         RUBND( 1 ) = RLBND( 1 ) + SIZE( 1 ) - 1
+         RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) - 
+     :                SIZE( 2 )/2
+         RUBND( 2 ) = RLBND( 2 ) + SIZE( 2 ) - 1
+ 
+*  If no centre or size value was obtained, annul the error and get the pixel
+*  index bounds of the region to be listed using parameters LBOUND and
+*  UBOUND.
+      ELSE IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )   
+
+         CC( 1 ) = AST__BAD
+         CALL KPG1_GTPOS( 'LBOUND', IWCS, .FALSE., CC, GC, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )   
+            RLBND( 1 ) = SLBND( SDIM( 1 ) ) 
+            RLBND( 2 ) = SLBND( SDIM( 2 ) ) 
          ELSE
-
-            CALL ERR_REP( 'ERR_LOOK_NOMPI',
-     :        'LOOK : Error occurred whilst trying to map input frame',
-     :        STATUS )
-
-*       end of if-no-error-after-mapping-input-array check
-
+            RLBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) )
+            RLBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) 
          END IF
 
-*       clean up input data structures
-
-         CALL DAT_ANNUL( LOCDI, STATUS )
-         CALL DAT_ANNUL( LOCI, STATUS )
-
-      ELSE
-
-         IF ( STATUS .NE. PAR__ABORT ) THEN
-            CALL ERR_REP( 'ERR_LOOK_NOFRI',
-     :        'LOOK : Error occurred whilst trying to access input '/
-     :        /'frame', STATUS )
+         CC( 1 ) = AST__BAD
+         CALL KPG1_GTPOS( 'UBOUND', IWCS, .FALSE., CC, GC, STATUS )
+         IF( STATUS .EQ. PAR__NULL ) THEN
+            CALL ERR_ANNUL( STATUS )   
+            RUBND( 1 ) = SUBND( SDIM( 1 ) ) 
+            RUBND( 2 ) = SUBND( SDIM( 2 ) ) 
+         ELSE
+            RUBND( 1 ) = NINT( GC( 1 ) ) - 1 + SLBND( SDIM( 1 ) )
+            RUBND( 2 ) = NINT( GC( 2 ) ) - 1 + SLBND( SDIM( 2 ) ) 
          END IF
-
-*    end of if-status-ok-after-getting-input-array-locator check
 
       END IF
 
-*    return and end
+*  Get an NDF identifier for the relevant section.
+      CALL NDF_SECT( INDF1, 2, RLBND, RUBND, INDF2, STATUS ) 
+
+*  Map the required NDF component.
+      CALL NDF_MAP( INDF2, MCOMP, '_DOUBLE', 'READ', IPDAT, EL,
+     :              STATUS )
+
+*  Get the maximum line length, and allocate a buffer string of this size.
+      CALL PAR_GDR0I( 'MAXLEN', 80, 1, 10000, .TRUE., MAXLEN, STATUS )
+      CALL PSX_CALLOC( MAXLEN, '_CHAR', IPLINE, STATUS )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Attempt to open a log file to store the results.
+      LOG = .FALSE.
+      CALL FIO_ASSOC( 'LOGFILE', 'WRITE', 'LIST', MAXLEN, FDL, STATUS )
+
+*  Annul the error if a null value was given, and indicate that a log
+*  file is not to be created.
+      IF( STATUS .EQ. PAR__NULL ) THEN
+         CALL ERR_ANNUL( STATUS )
+
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+         LOG = .TRUE.
+
+      END IF
+
+*  See if we are to run quietly.
+      CALL PAR_GET0L( 'QUIET', QUIET, STATUS )
+
+*  Obtain the formatting method to use.
+      CALL PAR_CHOIC( 'FORMAT', 'strips', 'Strips,Clist,Vlist,Region', 
+     :                .FALSE., FORMAT, STATUS )
+
+*  Create a 1D Frame and set its style. The AST_FORMAT method for axis 1 of
+*  this Frame is used to format the data values.
+      FRM = AST_FRAME( 1, ' ', STATUS )
+      CALL KPG1_ASSET( 'KAPPA_LOOK', 'STYLE', FRM, STATUS )
+
+*  Do the work.
+      CALL KPS1_LOOK( FRM, RLBND( 1 ), RUBND( 1 ), RLBND( 2 ), 
+     :                RUBND( 2 ), %VAL( IPDAT ), QUIET, LOG, FDL, 
+     :                %VAL( IPLINE ), FORMAT, MAXLEN, VALUE, STATUS, 
+     :                %VAL( MAXLEN ) )
+
+*  Write out the last data value to the output parameter.
+      CALL PAR_PUT0D( 'VALUE', VALUE, STATUS )
+
+*  Shutdown procedure.
+*  ===================
+ 999  CONTINUE
+
+*  Close any log file.
+      IF( LOG ) CALL FIO_ANNUL( FDL, STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+*  Add a context report if anything went wrong.
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'LOOK_ERR', 'LOOK: Failed to list pixel values'//
+     :                 ' in a 1 or 2-dimensional data set.', STATUS )
+      END IF
 
       END
-
