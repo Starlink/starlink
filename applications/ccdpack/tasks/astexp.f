@@ -79,9 +79,7 @@
 *        output AST file.  To be useful, this must specify a frame 
 *        which occurs in all the NDFs in the IN list, and can be 
 *        expected to occur in any NDF to which the AST file will 
-*        later be applied using ASTIMP.  AXIS is a good choice since
-*        this may be applicable to frames which have been modified,
-*        for instance by an application like KAPPA's COMPAVE.
+*        later be applied using ASTIMP.  It will normally be PIXEL.
 *
 *        The value of the parameter can be one of the following:
 *        - A domain name such as SKY, AXIS, PIXEL, etc.
@@ -94,7 +92,7 @@
 *        Unlike the Current frame, the frame selected using this
 *        parameter is copied to the AST file unmodified; in particular
 *        it retains the same Domain name.
-*        [AXIS]
+*        [PIXEL]
 *     FITSID = LITERAL (Read)
 *        If the IDTYPE parameter has the value FITSID, this parameter
 *        gives the FITS header keyword whose value distinguishes
@@ -196,20 +194,21 @@
 *        of a FITS header keyword present in the FITS extension of each
 *        NDF whose value distinguishes the CCDs from each other 
 *        (presumably present in the unreduced data).  The mappings 
-*        between the frame in the 'AXIS' domain of the input NDFs and 
+*        between the frame in the 'PIXEL' domain of the input NDFs and 
 *        their Current frames are recorded.
 *
-*     astexp "im1,im2,im3" astfile=camera.ast baseframe=PIXEL 
+*     astexp "im1,im2,im3" astfile=camera.ast baseframe=AXIS 
 *            title="Focal plane alignment" accept
 *        In this case the OUTDOMAIN parameter takes its default value
 *        of 'CCD_EXPORT', but mappings are between the Current domains
-*        of the input NDFs and their 'PIXEL' domains.  This would be 
-*        appropriate if these NDFs, or NDFs to which camera.ast will
-*        be applied in future, might have no valid 'AXIS' domain frames
-*        in their WCS components.  No suitable FITS header is available
+*        of the input NDFs and their 'AXIS' domains.  This could be
+*        a good idea if the images had been shrunk using KAPPA's
+*        COMPAVE or something similar, which modifies the PIXEL 
+*        coordinates but leaves the AXIS coordinates unchanged.
+*        No suitable FITS header is available
 *        to distinguish the different types of NDF, so the IDTYPE 
 *        parameter is allowed to assume its default value of INDEX.  
-*        When camera.ast is used for importing framset information, 
+*        When camera.ast is used for importing frameset information, 
 *        the NDFs from the three different chips must be listed in the 
 *        same order as when this command was invoked.  The title of the
 *        output Current frame will be as given.
