@@ -12,8 +12,6 @@
 
       INTEGER			AS_GPTR(AS_NE,AS_NSP)
       INTEGER			AS_SPTR(AS_NE,AS_NSP)
-      INTEGER			AS_XPTR(AS_NE,AS_NSP)
-      REAL			AS_XPIX			! Psf pixel sizes (arcmin)
       REAL			AS_GPIX
       REAL			AS_SPIX
 
@@ -29,7 +27,7 @@
 
       COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
      :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF,
-     :                        AS_GPTR,AS_SPTR,AS_XPTR,AS_XPIX,AS_GPIX,
+     :                        AS_GPTR,AS_SPTR, AS_GPIX,
      :                        AS_SPIX, AS_CALDBL
 
       COMMON /PSF_ASCA_CMNC/   AS_INSTR, AS_CALDB
