@@ -131,17 +131,18 @@ ifelse(SCRIPTNAME, alink,
 includedebug=false
 verbose=false
 staticlink=false
+found_c_files=false
 while [ $# != 0 ]
 do 
-        case $1 in
+    case $1 in
         -xdbx|--xdbx)
-            includedebug=true
+            includedebug=:
             ;;
         --verbose)
-            verbose=true
+            verbose=:
             ;;
         --static)
-            staticlink=true
+            staticlink=:
             ;;
         -?|--help)
             cat >&2 <<FOO
@@ -180,9 +181,9 @@ FOO
             # not one of `our' options -- stop looking
             break
             ;;
-        esac
+    esac
 dnl shift is an m4 macro
-        [[shift]]
+    [[shift]]
 done
 
 
@@ -194,22 +195,22 @@ PROGNAME=
 INITOPTS=
 while [ $# != 0 -a -z "$PROGNAME" ]
 do
-        case $1 in
+    case $1 in
         -*)
             INITOPTS="$INITOPTS $1"
             ;;
         *)
             PROGNAME=$1
             ;;
-        esac
-        [[shift]]
+    esac
+    [[shift]]
 done
 
 # No PROGNAME specified yet, so prompt for it.
 if [ -z "$PROGNAME" ]
 then
-        echo >&2 -n `basename $0`: 'name of execution module: '
-        read PROGNAME
+    echo >&2 -n `basename $0`: 'name of execution module: '
+    read PROGNAME
 fi
 
 # next determine name of program allowing a certain amount of flexibility
@@ -221,23 +222,23 @@ DIR=`dirname $PROGNAME`
 #     EXENAME to the name to call the executable
 
 case $PROGNAME in
-*.o)
-	EXENAME=`basename $PROGNAME .o`
+    *.o)
+        EXENAME=`basename $PROGNAME .o`
         PROGNAME=$EXENAME
-	ARGS=${DIR}/${PROGNAME}.o
-	;;
-*.f)
-	EXENAME=`basename $PROGNAME .f`
+        ARGS=${DIR}/${PROGNAME}.o
+        ;;
+    *.f)
+        EXENAME=`basename $PROGNAME .f`
         PROGNAME=$EXENAME
-	ARGS=${DIR}/${PROGNAME}.f
-	;;
-*.c)
-        CFILE="YES"
-	EXENAME=`basename $PROGNAME .c`
+        ARGS=${DIR}/${PROGNAME}.f
+        ;;
+    *.c)
+        found_c_files=:
+        EXENAME=`basename $PROGNAME .c`
         PROGNAME=dtask_wrap
-	CARGS="${DIR}/${EXENAME}.c dtask_wrap.c"
+        CARGS="${DIR}/${EXENAME}.c dtask_wrap.c"
         ARGS="${EXENAME}.o dtask_wrap.o"
-cat >dtask_wrap.c <<FOO
+        cat >dtask_wrap.c <<FOO
 #include "f77.h"
 void $EXENAME(int *status);
 
@@ -249,25 +250,25 @@ F77_EXPORT_INTEGER(status,*fstatus);
 return;
 }
 FOO
-	;;
-*)
-	EXENAME=`basename $PROGNAME`
+        ;;
+    *)
+        EXENAME=`basename $PROGNAME`
         PROGNAME=$EXENAME
-	ARGS=${DIR}/${PROGNAME}.o
-	;;
+        ARGS=${DIR}/${PROGNAME}.o
+        ;;
 esac
 
 # Add remaining arguments to ARGS, starting with any INITOPTS.
 if [ -n "$INITOPTS" ]
 then
-        ARGS="$ARGS $INITOPTS"
+    ARGS="$ARGS $INITOPTS"
 fi
 
 while [ $# != 0 ]
 do
-	case $1 in
+    case $1 in
         *.c) 
-          CFILE="YES"
+          found_c_files=:
           NAME=`basename $1 .c`
           CARGS="$CARGS $1"
           ARGS="$ARGS ${NAME}.o"
@@ -283,16 +284,17 @@ do
         *)
           ARGS="$ARGS $1"
           ;;
-        esac
-	[[shift]]
+    esac
+    [[shift]]
 done
 
-# Compile C files if any
-if [ -n "$CFILE" ]
+# Compile C files if any.  This compiles all of the files listed in CARGS.
+# Is this portable?
+if $found_c_files
 then
-echo "Compiling C files"
-@CC@ @CFLAGS@ $CARGS \
--c
+    $verbose && echo "Compiling C files"
+    $verbose && echo @CC@ -c @CFLAGS@ $CARGS
+    @CC@ -c @CFLAGS@ $CARGS
 fi
 
 cat >dtask_applic.f <<FOO
@@ -436,7 +438,8 @@ xlinkcmd=
 for x in $linkcmd
 do
     l=`expr x$x : 'x-l\(.*\)'`
-    if test -n "$l" -a -r @libdir@/lib$l.la; then
+    if [ -n "$l" -a -r @libdir@/lib$l.la ]
+    then
         xlinkcmd="$xlinkcmd @libdir@/lib$l.la"
     else
         xlinkcmd="$xlinkcmd $x"
