@@ -56,10 +56,10 @@ ssn78.texml: ssn78.texml_tar
 # Though the following rule uses a configured pstoimg, it will fail if
 # epstopdf doesn't happen to be in the path
 SUFFIXES = .eps .pdf .gif
-EPSFILES = ssn78-1.eps ssn78-2.eps ssn78-3.eps ssn78-4.eps
-PDFFILES = ssn78-1.pdf ssn78-2.pdf ssn78-3.pdf ssn78-4.pdf
-PNGFILES = ssn78-1.png ssn78-2.png ssn78-3.png ssn78-4.png
-GIFFILES = ssn78-1.gif ssn78-2.gif ssn78-3.gif ssn78-4.gif
+EPSFILES = ssn78-1.eps ssn78-2.eps ssn78-3.eps ssn78-4.eps ssn78-5.eps
+PDFFILES = ssn78-1.pdf ssn78-2.pdf ssn78-3.pdf ssn78-4.pdf ssn78-5.pdf
+PNGFILES = ssn78-1.png ssn78-2.png ssn78-3.png ssn78-4.png ssn78-5.png
+GIFFILES = ssn78-1.gif ssn78-2.gif ssn78-3.gif ssn78-4.gif ssn78-5.gif
 $(EPSFILES): ssn78.mp
 	@METAPOST@ ssn78.mp
 	for f in `ls ssn78.* | sed -n 's/.*\.\([0-9]*\)$$/\1/p'`; do \
