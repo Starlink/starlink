@@ -1,0 +1,147 @@
+*+
+*  Name:
+*     SPD_PCOM
+
+*  Purpose:
+*     Common block include file, internal to SPLOOP library.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     INCLUDE SPD_PCOM
+
+*  Description:
+*     This file declares the common block used by the SPLOOP library to
+*     store information on the interactive display, i.e. the finder
+*     image, the spectrum and model, the PGPLOT viewports and zoom
+*     transformations.
+*
+*     This file should be used only internally by the SPLOOP library,
+*     other routines are not supposed to access the common block
+*     directly.
+
+*  Variables:
+*     DEVOPN = LOGICAL
+*        True if PGPLOT has been successfully opened on a valid device.
+*     IMXST = LOGICAL
+*        True if a finder image has been registered.
+*     IMAGE = INTEGER
+*        The pointer to the finder image. The finder image is a
+*        two-dimensional REAL array of size IMDIM(1) by IMDIM(2).
+*     IMDIM( 2 ) = INTEGER
+*        First and second dimension of the image.
+*     IMWIN( 4 ) = REAL
+*        The world coordinates to be mapped to the viewport edges for
+*        the finder image. The four elements are for left, right,
+*        bottom, and top edge, resp. Pan and zoom actions will affect
+*        these numbers.
+*     IMZOOM( 6 ) = REAL
+*        The matrix to scale and shift array indices into world
+*        coordinates for the finder image. Usually world coordinates are
+*        NDF pixel indices, so that
+*           IMZOOM = { LBND1-1., 1., 0., LBND2-1., 0., 1. }
+*     IMRNG( 2 ) = REAL
+*        The image value that is to be displayed in background and
+*        foreground colour respectively. Re-scaling the display will
+*        affect these numbers.
+*     SPXST = LOGICAL
+*        True if a spectrum has been registered.
+*     VARXST = LOGICAL
+*        True if the spectrum has a variance array.
+*     NDATA = INTEGER
+*        The size of the arrays that XDAT, YBIN, YVAR, YCRS, YER{LU}
+*        point to.
+*     XDAT = INTEGER
+*        The pointer to the x array, which is REAL and has length NDATA.
+*     YBIN = INTEGER
+*        The pointer to a REAL array of NDATA y values. YBIN(XDAT) is
+*        plotted in the bottom viewport with bin style, ignoring bad
+*        values.
+*     YVAR = INTEGER
+*        The pointer to a REAL array of NDATA variance values.
+*        YVAR(XDAT) is used to plot error bars in the upper viewport.
+*     YCRS = INTEGER
+*        The pointer to a REAL work space for NDATA values. YCRS(XDAT)
+*        is calculated prior to display by subtracting the model from
+*        YBIN. It is plotted in the top viewport as crosses, ignoring
+*        bad values.
+*     YER{LU} = INTEGER
+*        The pointers to two REAL work spaces of NDATA values.
+*        YER{LU}(XDAT) are calculated prior to display as YCRS -+
+*        SQRT(YVAR). They are plotted in the top viewport as y error
+*        bars, ignoring bad values. These work spaces are needed only if
+*        a variance is registered.
+*     SPWIN( 6 ) = REAL
+*        The world coordinates to be mapped to the viewport edges for
+*        the spectrum and model. The six elements are for left, right,
+*        bottom for lower viewport, top for lower viewport, bottom for
+*        upper viewport, and top for upper viewport, resp. Pan and zoom
+*        actions will affect these numbers.
+*
+*        Upon registration of a spectrum the x range is set to the
+*        extrema of the XDAT array at time of registration. The bottom y
+*        range is set to the extrema of the YBIN array at time of
+*        registration, plus 5 per cent at the top and bottom. The top y
+*        range is calculated prior to display according to what needs to
+*        be plotted in that viewport and what the actual numbers over
+*        the whole x range are.
+*     SPRNG( 4 ) = REAL
+*        A backup of the original first four elements of SPWIN. This is
+*        used to unzoom the display to the original x and y ranges. The
+*        y range of the top viewport does not change, so no need to keep
+*        a backup.
+
+*  Authors:
+*     hme: Horst Meyerdierks (UoE, Starlink)
+*     {enter_new_authors_here}
+
+*  History:
+*     27 Apr 1994 (hme):
+*        Original version.
+*     06 May 1994 (hme):
+*        Changed the spectrum and model part. It is now up to the SPLOOP
+*        display routine to work out the model, data-model etc. from
+*        model parameters and a given model function EXTERNAL.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Variables:
+      LOGICAL DEVOPN
+      LOGICAL IMXST
+      LOGICAL SPXST, VARXST
+      INTEGER IMAGE
+      INTEGER IMDIM( 2 )
+      INTEGER XDAT, YBIN, YVAR
+      INTEGER YCRS, YERL, YERU
+      INTEGER NDATA
+      REAL IMWIN(  4 )
+      REAL IMZOOM( 6 )
+      REAL IMRNG(  2 )
+      REAL SPWIN(  6 )
+      REAL SPRNG(  4 )
+
+      COMMON / SPD_PCOML /
+     :   DEVOPN,
+     :   IMXST,
+     :   SPXST, VARXST
+
+      COMMON / SPD_PCOMI /
+     :   IMAGE, IMDIM,
+     :   XDAT, YBIN, YVAR,
+     :   YCRS, YERL, YERU,
+     :   NDATA
+
+      COMMON / SPD_PCOMR /
+     :   IMWIN, IMZOOM, IMRNG,
+     :   SPWIN, SPRNG
+
+      SAVE / SPD_PCOML /
+      SAVE / SPD_PCOMI /
+      SAVE / SPD_PCOMR /
+
+*.
