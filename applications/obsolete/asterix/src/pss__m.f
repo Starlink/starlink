@@ -22,15 +22,10 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'PRM_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSS_PAR'
-*
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -60,13 +55,13 @@
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SSDS dataset
       CHARACTER*80             TEXT                    !
       CHARACTER*40             UNITS                   ! Background units
 
       DOUBLE PRECISION         FLEV(PSS__MXEL)         ! Flux error levels in %
       DOUBLE PRECISION         PLEV(PSS__MXEL)         ! Pos error levels in %
 
+      REAL		  	APOS(2)			! Axis units position
       REAL                     FVEC(2)		       ! Psf shift vector
       REAL                     MULREJ                  ! Multiple rejection
       REAL                     SIGMIN(2)               ! Significance threshold
@@ -93,6 +88,7 @@
       INTEGER                  O_RA                    ! Source image RA
       INTEGER                  O_DEC                   ! Source image DEC
       INTEGER                  OSIGDIM(2)              ! Last significance dims
+      INTEGER			SID			! Output SSDS
       INTEGER                  SIGDIM(2)               ! Significance dims
       INTEGER                  MPTR                    ! Ptr to SMAP data
       INTEGER                  TLEN                    ! Length of TEXT used
@@ -462,10 +458,12 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
         END IF
 
 *      Find celestial coordinates
-        IF ( GE_POINT.OK ) THEN
-          CALL CONV_XY2EQU( S_CP(1,ID), S_CP(2,ID),
-     :                   (AX_DR(1) .LT. 0.0), GE_POINT.CTOS,
-     :				S_RA(ID), S_DEC(ID), STATUS )
+        IF ( GE_OK ) THEN
+          APOS(1) = S_CP(1,ID)
+          APOS(2) = S_CP(2,ID)
+          CALL WCI_CNA2S( APOS, GE_PIXID, GE_PRJID, CELPOS, STATUS )
+          S_RA(ID) = CELPOS(1)*RTOD
+          S_DEC(ID) = CELPOS(2)*RTOD
         ELSE
           S_RA(ID) = S_RA(ID)*RTOD
           S_DEC(ID) = S_DEC(ID)*RTOD
@@ -474,7 +472,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       END DO
 
 *    Sort into RA order
-      IF ( GE_POINT.OK ) THEN
+      IF ( GE_OK ) THEN
         CALL PSS_SRC_SORT( 'RA', .TRUE., STATUS )
       ELSE
         CALL MSG_SETC( 'IFILE', IM_FILE )
@@ -488,7 +486,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       CALL PSS_SRC_DUMP( 3, STATUS )
 
 *    Get name of user's output file
- 69   CALL PSS_OUT_OPEN( NFILE, IFILE, SLOC, STATUS )
+ 69   CALL PSS_OUT_OPEN( NFILE, IFILE, SID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         GOTO 94
@@ -497,36 +495,36 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       END IF
 
 *    Write number of sources
-      CALL SSO_PUTNSRC( SLOC, LI_NSRC, STATUS )
+      CALL SSI_PUTNSRC( SID, LI_NSRC, STATUS )
 
 *    Only create lists if sources found!
       IF ( LI_NSRC .GT. 0 ) THEN
 
 *      Image coordinate fields
-        CALL PSS_CRERF( SLOC, 'X_CORR', '_REAL', AX_UNITS(1),
+        CALL PSS_CRERF( SID, 'X_CORR', '_REAL', AX_UNITS(1),
      :						   O_XC, STATUS )
-        CALL PSS_CRERF( SLOC, 'Y_CORR', '_REAL', AX_UNITS(2),
+        CALL PSS_CRERF( SID, 'Y_CORR', '_REAL', AX_UNITS(2),
      :						   O_YC, STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'X_CORR', 'LABEL', 20,
+        CALL SSI_PUTFITEM0C( SID, 'X_CORR', 'LABEL', 20,
      :			        AX_LABEL(1), STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'Y_CORR', 'LABEL', 20,
+        CALL SSI_PUTFITEM0C( SID, 'Y_CORR', 'LABEL', 20,
      :			        AX_LABEL(2), STATUS )
 
 *      Write celestial coordinates if pointing data there
-        IF ( GE_POINT.OK ) THEN
-          CALL PSS_CRERF( SLOC, 'RA', '_DOUBLE', 'degrees', O_RA,
+        IF ( GE_OK ) THEN
+          CALL PSS_CRERF( SID, 'RA', '_DOUBLE', 'degrees', O_RA,
      :							 STATUS )
-          CALL PSS_CRERF( SLOC, 'DEC', '_DOUBLE', 'degrees', O_DEC,
-     :							   STATUS )
+          CALL PSS_CRERF( SID, 'DEC', '_DOUBLE', 'degrees', O_DEC,
+     :		        				   STATUS )
         END IF
 
 *      Create FLUX structure
-        CALL PSS_CRERF( SLOC, 'FLUX', '_REAL', IM_UNITS,
-     :					     O_FLX, STATUS )
+        CALL PSS_CRERF( SID, 'FLUX', '_REAL', IM_UNITS,
+     :				        O_FLX, STATUS )
 
 *      ENCPSF field
-        CALL PSS_CRERF( SLOC, 'ENCPSF', '_REAL', ' ', O_EPSF, STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'ENCPSF', 'LABEL', 30,
+        CALL PSS_CRERF( SID, 'ENCPSF', '_REAL', ' ', O_EPSF, STATUS )
+        CALL SSI_PUTFITEM0C( SID, 'ENCPSF', 'LABEL', 30,
      :			        'Enclosed psf fraction', STATUS )
 
 *      Background list if background supplied
@@ -536,7 +534,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
           ELSE
             UNITS = 'count/pix'
           END IF
-          CALL PSS_CRERF( SLOC, 'BACK', '_REAL', UNITS, O_BK, STATUS )
+          CALL PSS_CRERF( SID, 'BACK', '_REAL', UNITS, O_BK, STATUS )
         END IF
 
 *      Fields and errors if doing positional errors
@@ -545,16 +543,16 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *        Positional error field.
           CALL MSG_SETI( 'NLEV', NPLEV )
           CALL MSG_MAKE( '_REAL[^NLEV]', TEXT, TLEN )
-          CALL PSS_CRERF( SLOC, 'ERRORS', TEXT(:TLEN), 'arcmin',
+          CALL PSS_CRERF( SID, 'ERRORS', TEXT(:TLEN), 'arcmin',
      :                                          O_PERR, STATUS )
-          CALL SSO_PUTFITEM1D( SLOC, 'ERRORS', 'ELEVS', NPLEV,
+          CALL SSI_PUTFITEM1D( SID, 'ERRORS', 'ELEVS', NPLEV,
      :                                            PLEV, STATUS )
 
 *        Errors on position fields
           IF ( NPLEV .GT. 0 ) THEN
-            CALL PSS_CRERFE( SLOC, 'X_CORR', NED, NPLEV, PLEV,
+            CALL PSS_CRERFE( SID, 'X_CORR', NED, NPLEV, PLEV,
      :                                         O_EXC, STATUS )
-            CALL PSS_CRERFE( SLOC, 'Y_CORR', NED, NPLEV, PLEV,
+            CALL PSS_CRERFE( SID, 'Y_CORR', NED, NPLEV, PLEV,
      :                                         O_EYC, STATUS )
           END IF
 
@@ -562,44 +560,44 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Flux error
         IF ( NFLEV .GT. 0 ) THEN
-          CALL PSS_CRERFE( SLOC, 'FLUX', NED, NFLEV, FLEV,
+          CALL PSS_CRERFE( SID, 'FLUX', NED, NFLEV, FLEV,
      :                                    O_EFLX, STATUS )
         END IF
 
 *      Significance
-        CALL PSS_CRERF( SLOC, 'SIGNIF', '_REAL', 'sigma', O_SIG,
+        CALL PSS_CRERF( SID, 'SIGNIF', '_REAL', 'sigma', O_SIG,
      :                                                  STATUS )
-        CALL PSS_CRERFE( SLOC, 'SIGNIF', 1, 1, 68.0D0,
+        CALL PSS_CRERFE( SID, 'SIGNIF', 1, 1, 68.0D0,
      :                                   O_ESIG, STATUS )
 
 *      Extension fields
         IF ( CP_FITWIDTH ) THEN
-          CALL PSS_CRERF( SLOC, 'EXTEN', '_REAL', 'arcmin', O_EXT,
+          CALL PSS_CRERF( SID, 'EXTEN', '_REAL', 'arcmin', O_EXT,
      :                                                    STATUS )
-          CALL PSS_CRERFE( SLOC, 'EXTEN', NED, 1, 68.0D0,
+          CALL PSS_CRERFE( SID, 'EXTEN', NED, 1, 68.0D0,
      :                                   O_EEXT, STATUS )
-          CALL PSS_CRERF( SLOC, 'EXSIG', '_REAL', 'sigma', O_EXS,
+          CALL PSS_CRERF( SID, 'EXSIG', '_REAL', 'sigma', O_EXS,
      :                                                   STATUS )
         END IF
 
 *      Background errors if allowed to rescale
         IF ( CP_RESCALE .AND. BG_OK .AND. (NFLEV.GT.0) ) THEN
-          CALL PSS_CRERFE( SLOC, 'BACK', NED, NFLEV, FLEV,
+          CALL PSS_CRERFE( SID, 'BACK', NED, NFLEV, FLEV,
      :                                     O_EBK, STATUS )
         END IF
 
 *      Diagnostic parameters
         IF ( DI_FREE_FIT ) THEN
-          CALL PSS_CRERF( SLOC, 'DELTA_C', '_REAL', 'none', O_DC,
+          CALL PSS_CRERF( SID, 'DELTA_C', '_REAL', 'none', O_DC,
      :                                                   STATUS )
         END IF
         IF ( DI_POISS_PROB ) THEN
-          CALL PSS_CRERF( SLOC, 'PPROB', '_DOUBLE', 'none', O_PP,
+          CALL PSS_CRERF( SID, 'PPROB', '_DOUBLE', 'none', O_PP,
      :                                                   STATUS )
         END IF
 
 *      Error form
-        CALL SSO_PUTPAR0L( SLOC, 1, 'SYMMETRIC', (.NOT.ASYMET), STATUS )
+        CALL SSI_PUTPAR0L( SID, 1, 'SYMMETRIC', (.NOT.ASYMET), STATUS )
 
       ELSE
         GOTO 89
@@ -618,7 +616,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
         CALL PSS_SRC_SETR( AXV(2,S_CP(2,ID)), ISRC, O_YC, STATUS )
 
 *      Pointing data
-        IF ( GE_POINT.OK ) THEN
+        IF ( GE_OK ) THEN
           CALL PSS_SRC_SETD( S_RA(ID), ISRC, O_RA, STATUS )
           CALL PSS_SRC_SETD( S_DEC(ID), ISRC, O_DEC, STATUS )
 	END IF
@@ -668,7 +666,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       END DO
 
 *    Release results dataset
- 89   CALL PSS_OUT_CLOSE( IFILE, SLOC, STATUS )
+ 89   CALL PSS_OUT_CLOSE( IFILE, SID, STATUS )
 
 *    Write source subtracted image
  94   IF ( CP_EXPERT ) THEN
@@ -739,7 +737,6 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -846,7 +843,6 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -933,14 +929,9 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSS_PAR'
-*
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
 *
 *    Global variables :
 *
@@ -965,7 +956,6 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)   SLOC                    ! SSDS dataset
       CHARACTER*80             TEXT                    !
       CHARACTER*40             UNITS                   ! Background units
       CHARACTER*40             UPSTR                   ! Upper limit string
@@ -993,6 +983,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       INTEGER                  O_PP                    ! Poisson probability
       INTEGER                  O_RA                    ! Source image RA
       INTEGER                  O_DEC                   ! Source image DEC
+      INTEGER			SID			! Output SSDS
 
       LOGICAL                  ASYMET                  ! Asymmetric errors?
       LOGICAL                  GOT_FLUX                ! Read flux from list?
@@ -1169,7 +1160,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       CALL PSS_SRC_DUMP( 3, STATUS )
 
 *    Get name of user's output file
- 69   CALL PSS_OUT_OPEN( NFILE, IFILE, SLOC, STATUS )
+ 69   CALL PSS_OUT_OPEN( NFILE, IFILE, SID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         GOTO 94
@@ -1178,36 +1169,36 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       END IF
 
 *    Write number of sources
-      CALL SSO_PUTNSRC( SLOC, LI_NSRC, STATUS )
+      CALL SSI_PUTNSRC( SID, LI_NSRC, STATUS )
 
 *    Only create lists if sources found!
       IF ( LI_NSRC .GT. 0 ) THEN
 
 *      Image coordinate fields
-        CALL PSS_CRERF( SLOC, 'X_CORR', '_REAL', AX_UNITS(1),
+        CALL PSS_CRERF( SID, 'X_CORR', '_REAL', AX_UNITS(1),
      :						   O_XC, STATUS )
-        CALL PSS_CRERF( SLOC, 'Y_CORR', '_REAL', AX_UNITS(2),
+        CALL PSS_CRERF( SID, 'Y_CORR', '_REAL', AX_UNITS(2),
      :						   O_YC, STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'X_CORR', 'LABEL', 20,
+        CALL SSI_PUTFITEM0C( SID, 'X_CORR', 'LABEL', 20,
      :			        AX_LABEL(1), STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'Y_CORR', 'LABEL', 20,
+        CALL SSI_PUTFITEM0C( SID, 'Y_CORR', 'LABEL', 20,
      :			        AX_LABEL(2), STATUS )
 
 *      Write celestial coordinates if pointing data there
-        IF ( GE_POINT.OK ) THEN
-          CALL PSS_CRERF( SLOC, 'RA', '_DOUBLE', 'degrees', O_RA,
+        IF ( GE_OK ) THEN
+          CALL PSS_CRERF( SID, 'RA', '_DOUBLE', 'degrees', O_RA,
      :							 STATUS )
-          CALL PSS_CRERF( SLOC, 'DEC', '_DOUBLE', 'degrees', O_DEC,
+          CALL PSS_CRERF( SID, 'DEC', '_DOUBLE', 'degrees', O_DEC,
      :							   STATUS )
         END IF
 
 *      Create FLUX structure
-        CALL PSS_CRERF( SLOC, 'FLUX', '_REAL', IM_UNITS,
+        CALL PSS_CRERF( SID, 'FLUX', '_REAL', IM_UNITS,
      :					     O_FLX, STATUS )
 
 *      ENCPSF field
-        CALL PSS_CRERF( SLOC, 'ENCPSF', '_REAL', ' ', O_EPSF, STATUS )
-        CALL SSO_PUTFITEM0C( SLOC, 'ENCPSF', 'LABEL', 30,
+        CALL PSS_CRERF( SID, 'ENCPSF', '_REAL', ' ', O_EPSF, STATUS )
+        CALL SSO_PUTFITEM0C( SID, 'ENCPSF', 'LABEL', 30,
      :			        'Enclosed psf fraction', STATUS )
 
 *      Background list if background supplied
@@ -1217,21 +1208,21 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
           ELSE
             UNITS = 'count/pix'
           END IF
-          CALL PSS_CRERF( SLOC, 'BACK', '_REAL', UNITS, O_BK, STATUS )
+          CALL PSS_CRERF( SID, 'BACK', '_REAL', UNITS, O_BK, STATUS )
         END IF
 
 *      Optimising?
         IF ( CP_OPT .AND. .NOT. GOT_FLUX ) THEN
 
 *        Significance field
-          CALL PSS_CRERF( SLOC, 'SIGNIF', '_REAL', 'sigma', O_SIG,
+          CALL PSS_CRERF( SID, 'SIGNIF', '_REAL', 'sigma', O_SIG,
      :                                                    STATUS )
 
 *        Strength errors if wanted
           IF ( NFLEV .GT. 0 ) THEN
-            CALL PSS_CRERFE( SLOC, 'FLUX', NED, NFLEV, FLEV,
+            CALL PSS_CRERFE( SID, 'FLUX', NED, NFLEV, FLEV,
      :                                      O_EFLX, STATUS )
-            CALL PSS_CRERFE( SLOC, 'SIGNIF', 1, 1, 68.0D0,
+            CALL PSS_CRERFE( SID, 'SIGNIF', 1, 1, 68.0D0,
      :                                    O_ESIG, STATUS )
           END IF
 
@@ -1239,32 +1230,32 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 
 *      Extension fields
         IF ( CP_FITWIDTH ) THEN
-          CALL PSS_CRERF( SLOC, 'EXTEN', '_REAL', 'arcmin', O_EXT,
+          CALL PSS_CRERF( SID, 'EXTEN', '_REAL', 'arcmin', O_EXT,
      :                                                    STATUS )
-          CALL PSS_CRERFE( SLOC, 'EXTEN', NED, 1, 68.0D0,
+          CALL PSS_CRERFE( SID, 'EXTEN', NED, 1, 68.0D0,
      :                                   O_EEXT, STATUS )
-          CALL PSS_CRERF( SLOC, 'EXSIG', '_REAL', 'sigma', O_EXS,
+          CALL PSS_CRERF( SID, 'EXSIG', '_REAL', 'sigma', O_EXS,
      :                                                   STATUS )
         END IF
 
 *      Background errors if allowed to rescale
         IF ( CP_RESCALE .AND. BG_OK .AND. CP_OPT
      :                              .AND. (NFLEV.GT.0) ) THEN
-          CALL PSS_CRERFE( SLOC, 'BACK', NED, NFLEV, FLEV,
+          CALL PSS_CRERFE( SID, 'BACK', NED, NFLEV, FLEV,
      :                                     O_EBK, STATUS )
         END IF
 
 *      Error form
-        CALL SSO_PUTPAR0L( SLOC, 1, 'SYMMETRIC', (.NOT.ASYMET),
+        CALL SSO_PUTPAR0L( SID, 1, 'SYMMETRIC', (.NOT.ASYMET),
      :                                                 STATUS )
 
 *      Diagnostic parameters
         IF ( DI_FREE_FIT ) THEN
-          CALL PSS_CRERF( SLOC, 'DELTA_C', '_REAL', 'none', O_DC,
+          CALL PSS_CRERF( SID, 'DELTA_C', '_REAL', 'none', O_DC,
      :                                                   STATUS )
         END IF
         IF ( DI_POISS_PROB ) THEN
-          CALL PSS_CRERF( SLOC, 'PPROB', '_DOUBLE', 'none', O_PP,
+          CALL PSS_CRERF( SID, 'PPROB', '_DOUBLE', 'none', O_PP,
      :                                                   STATUS )
         END IF
 
@@ -1285,7 +1276,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
         CALL PSS_SRC_SETR( AXV(2,S_CP(2,ID)), ISRC, O_YC, STATUS )
 
 *      Pointing data
-        IF ( GE_POINT.OK ) THEN
+        IF ( GE_OK ) THEN
           CALL PSS_SRC_SETD( S_RA(ID), ISRC, O_RA, STATUS )
           CALL PSS_SRC_SETD( S_DEC(ID), ISRC, O_DEC, STATUS )
 	END IF
@@ -1337,7 +1328,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       END IF
 
 *    Close output
- 89   CALL PSS_OUT_CLOSE( IFILE, SLOC, STATUS )
+ 89   CALL PSS_OUT_CLOSE( IFILE, SID, STATUS )
 
 *    Write source subtracted image
  94   IF ( CP_EXPERT ) THEN
@@ -1371,7 +1362,6 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'PSS_PAR'
 *
 *    Global variables :
@@ -1441,7 +1431,7 @@ C        CALL PSS_STAT( %VAL(GR_ROUTINE), ID, 0.0, MPTR, STATUS )
       CALL PSS_MAP_TITLE( '^STR confidence upper limit map ', STATUS )
 
 *    Write map units
-      CALL BDA_PUTUNITS_INT( MP_BDA, IM_UNITS, STATUS )
+      CALL BDI_PUTUNITS( MP_ID, IM_UNITS, STATUS )
 
 *    Convert confidence to delta-chisquared for upper limits map
       CALL MATH_CHISQD( REAL(1.0D0-CONF/100.D0), 1, DELSTAT, STATUS )

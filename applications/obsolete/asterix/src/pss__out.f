@@ -101,9 +101,6 @@
       CHARACTER*20             STIME                   ! Formatted time string
 
       INTEGER                  NTICKS                  ! System time
-
-      LOGICAL                  PRIM                    ! Input primitive?
-      LOGICAL                  THERE                   ! Component exists?
 *-
 
 *    Check status
