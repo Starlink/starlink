@@ -16,15 +16,15 @@
 
   <p>Changes since version 0.4:
     <ul>
-      <li>&autoastrom; now supports plugins, and there is one plugin
+      <li><p>&autoastrom; now supports plugins, and there is one plugin
 	supplied, for the `match' matching application available at
 	<url>http://acd188a-005.rit.edu/match/</url>.  This is not
 	distributed with &autoastrom;, but it is easy to download,
 	build, and install in the directory
-	<code>$AUTOASTROM_DIR</code>.</li>
+	<code>$AUTOASTROM_DIR</code>.</p></li>
 
-      <li>Now, if you type Control-C, &autoastrom; will delete the
-	monoliths it is using, and tidy up after itself.</li>
+      <li><p>Now, if you type Control-C, &autoastrom; will delete the
+	monoliths it is using, and tidy up after itself.</p></li>
     </ul>
   </p>
 
