@@ -4887,6 +4887,8 @@ f     - Each vector used in this routine is the path of
 *     shortest distance between two points, as defined by the
 c     astDistance function.
 f     AST_DISTANCE function.
+*     - An error will be reported if an attempt is made to use this
+*     method with a CmpFrame.
 *     - This function will return "bad" coordinate values (AST__BAD)
 *     if any of the input coordinates has this value, or if the required
 *     output values are undefined.
