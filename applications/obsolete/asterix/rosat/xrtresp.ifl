@@ -32,22 +32,21 @@
                TYPE    '_LOGICAL'
                PROMPT  'Erase existing response structure ?'
                PPATH   'DEFAULT'
-               VPATH   'PROMPT'
+               DEFAULT N
                HELP ' "YES" will cause the old response matrix to be replaced'
             ENDPARAMETER
 
      PARAMETER PH_DIM
                TYPE    '_INTEGER'
                PROMPT  'Enter code for the PH axis'
-               VPATH   'PROMPT'
                HELP 'Enter one of the above integers'
             ENDPARAMETER
 
      PARAMETER CONTINUE
                TYPE    '_LOGICAL'
                PROMPT  'Continue execution'
-               VPATH   'PROMPT'
                HELP 'Please enter "YES", if you have enough disk space'
-            ENDPARAMETER
+     ENDPARAMETER
 
  ENDINTERFACE
+
