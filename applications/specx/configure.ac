@@ -61,7 +61,7 @@ dnl    Need to build subdir makefiles
 
 AC_CONFIG_FILES([Makefile component.xml astro/Makefile command/Makefile exprt/Makefile external/Makefile fitting/Makefile fv4/Makefile gen/Makefile getaline/Makefile graph/Makefile mapdis4/Makefile mv4/Makefile plots/Makefile reduce/Makefile scl/Makefile tek/Makefile term/Makefile util/Makefile vms/Makefile src/Makefile docs/Makefile docs/hlp/Makefile docs/sun17/Makefile docs/sc8/Makefile])
 
-AC_CONFIG_FILES([src/TITLE])
+AC_CONFIG_FILES([src/TITLE misc/specx_welcome.txt])
 AC_CONFIG_FILES([getaline/getaline_link],[chmod +x getaline/getaline_link])
 
 AC_OUTPUT
