@@ -31,6 +31,34 @@
 #-
 
 
+#  Procedure definitions:
+#  ======================
+
+#  Display a string on the screen, splitting it into lines, each with 
+#  a given indentation.
+# -------------------------------------------------------------------
+proc display {text llen ind} {
+
+   set pref [string repeat " " $ind]
+   set buf $pref
+   set lb $ind
+
+   while { [regexp {^ *([^ ]+)(.*)$} $text match word text] } {
+         set lw [string length $word]
+         if { $lw + $lb >= $llen } {
+            puts $buf
+            set buf $pref
+            set lb $ind
+         }
+         append buf "$word "
+         incr lb $lw
+         incr lb
+      }
+   }
+   if { $lb > $ind } { puts $buf }
+}
+
+
 #  Searchs for any sub-string of $words within $test, and returns a
 #  weight for all matches. Matches of longer sub-strings have more 
 #  weight per word than shorter sub-strings. Thus checking the test
@@ -218,7 +246,9 @@ proc search {test words} {
 
 #  If no matching routines were found, say so.
    if { $names == "" } {
-      set result "No matching KAPLIBS routines found."
+      puts ""
+      puts "  No matching KAPLIBS routines found."
+      puts ""
    } else {
 
 #  Set up an associative array of routine names index by position in the
@@ -268,18 +298,14 @@ proc search {test words} {
          }
       }         
 
-#  Format the results.
+#  Display the results.
+      puts ""
       for {set i 0} {$i < $nrout} {incr i} {
-         set name $routine($i)
-         set purp $purpose($name)
-         append result "  $name:\n     $purp\n"
+         puts "  $routine($i):"
+         display $purpose($name) 75 5
+         puts ""
       }
    }
-
-#  Display the results.
-   puts ""
-   puts $result
-   puts ""
 
 #  End.
    exit
