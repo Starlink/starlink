@@ -50,7 +50,7 @@ protected:
   virtual int freeCat();
 
   //  Length and name of conversion control object.
-  enum {NAMELEN = 32};
+  enum {NAMELEN = 132};
   char convertTable_[NAMELEN];
   
   //  Create the conversion control object.
