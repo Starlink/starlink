@@ -79,7 +79,11 @@
          T_VER = VALUES(I)(5:7)
          T_NAM = VALUES(I)(9:19)
          T_KEY = VALUES(I)(21:50)
-         CALL CHR_CTOR(T_VER,R_VER1,STATUS)
+         IF ( T_VER.GT.' ')THEN
+           CALL CHR_CTOR(T_VER,R_VER1,STATUS)
+         ELSE
+           R_VER1=0.0
+         END IF
 *        check for matches, ' ' matches anything
          IF (((T_ORI.EQ.' ').OR.(T_ORI.EQ.ORIGIN)).AND.
      &       ((T_VER.EQ.' ').OR.(R_VER1.LE.R_VER2)).AND.
