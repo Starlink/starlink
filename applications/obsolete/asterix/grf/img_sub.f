@@ -1997,7 +1997,7 @@ c                                                          STATUS)
             CALL MSG_PRNT('AST_ERR: x-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
           END IF
-
+          I_XSCALE=0.0
         ELSE
           I_XBASE = 1.0
           I_XSCALE = 1.0
@@ -2015,7 +2015,7 @@ c     :                                                    STATUS)
             CALL MSG_PRNT('AST_ERR: y-axis has non-equal bin sizes')
             STATUS=SAI__ERROR
           END IF
-
+          I_YSCALE=0.0
         ELSE
           I_YBASE = 1.0
           I_YSCALE = 1.0
@@ -2287,6 +2287,7 @@ c     LOGICAL XNORM,YNORM
       INCLUDE 'IMG_CMN'
 *  Local constants :
 *  Local variables :
+      REAL V1,V2
       INTEGER NDIM,DIMS(ADI__MXDIM),NVAL
       INTEGER DPTR
       INTEGER VPTR,QPTR
@@ -2315,12 +2316,32 @@ c     LOGICAL UNIF,WOK
 
         CALL DYN_MAPR(1,I_NX,I_XPTR,STATUS)
         CALL DYN_MAPR(1,I_NX,I_XPTR_W,STATUS)
-        CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
+        IF (I_XSCALE.EQ.0.0) THEN
+          CALL BDI_AXMAPR(IFID,1,'Data',%val(I_XPTR),STATUS)
+          CALL ARR_ELEM1R(I_XPTR,I_NX,1,V1,STATUS)
+          CALL ARR_ELEM1R(I_XPTR,I_NX,2,V2,STATUS)
+          I_XBASE=V1
+          I_XSCALE=V2-V1
+        ELSE
+          I_XBASE=1.0
+          I_XSCALE=1.0
+          CALL ARR_REG1R(I_XBASE,I_XSCALE,I_NX,%VAL(I_XPTR),STATUS)
+        ENDIF
         CALL DYN_MAPR(1,I_NY,I_YPTR,STATUS)
-        CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS)
-        CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
-          I_XWID=ABS(I_XSCALE)
-          I_YWID=ABS(I_YSCALE)
+        CALL DYN_MAPR(1,I_NY,I_YPTR_W,STATUS
+        IF (I_YSCALE.EQ.0.0) THEN
+          CALL BDI_AXMAPR(IFID,2,'Data',%val(I_YPTR),STATUS)
+          CALL ARR_ELEM1R(I_YPTR,I_NY,1,V1,STATUS)
+          CALL ARR_ELEM1R(I_YPTR,I_NY,2,V2,STATUS)
+          I_YBASE=V1
+          I_YSCALE=V2-V1
+        ELSE
+          I_YSCALE=1.0
+          I_YBASE=1.0
+          CALL ARR_REG1R(I_YBASE,I_YSCALE,I_NY,%VAL(I_YPTR),STATUS)
+        ENDIF
+        I_XWID=ABS(I_XSCALE)
+        I_YWID=ABS(I_YSCALE)
 
 *  get variance and quality if there
         CALL BDI_CHK( IFID, 'Variance', I_VOK, STATUS )
