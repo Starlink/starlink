@@ -144,7 +144,7 @@ INTERFACE IMSIM
     DEFAULT 0
     VPATH 'PROMPT'
     PPATH 'DYNAMIC,DEFAULT'
-    PROMPT 'Width of gaussian for psf convolution'
+    PROMPT 'FWHM of gaussian for psf convolution (arcmin)'
     HELP 'Separate by commas for more than one source'
   ENDPARAMETER
 
