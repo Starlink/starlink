@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.15  2001/12/13 21:42:29  timj
+#        Fix from RPT to use UT rather than HST
+#
 #        Revision 1.14  2000/04/18 04:26:42  timj
 #        Now works on WinNT
 #
@@ -160,6 +163,7 @@ my $idsk = -1;
 
 my $run = "";
 my $hst = "";
+my $ut =  "";
 my (@runlist, @noiseentry, %bol, %xybol, @pw_point, @bw_point);
 my ($source, %min, %max, $varinfo, $iteminfo);
 my ($cutoff, $cutoff_line);
@@ -1008,12 +1012,19 @@ sub rddata {
 	  }
 	}
 
+        # Convert to UT time
+        my ($hh, $mmss) = split(/:/,$hst,2);
+        $hh = int($hh + 10 + 0.5);
+        $hh -= 24 if ($hh > 24);
+        $hh = "0$hh" if ($hh < 10);
+        $ut = $hh . ":" . $mmss;
+
 	# Skip the other header lines
 	unless ( $line =~ /^[A-I]\d/ ) {
 	    $i++;
 	    next;
 	}
-      
+
 	# Some messy stuff which probably can be done a lot better
 	# but don't mess with things that work
 	$line =~ s/^\s+//;
@@ -1150,10 +1161,10 @@ sub plot {
 			      -font => $plotfont, -fill => $tc);
         # Display observation info: date, time, run and source
 	$C->create('text', $xleft, $ytop-30, 
-		   -text => "$obsdate", -anchor => 'w',
+		   -text => "${obsdate}UT", -anchor => 'w',
 		   -font => $plotfont, -fill => $tc);
 	$C->create('text', $xleft, $ytop-10, 
-		   -text => "$hst", -anchor => 'w',
+		   -text => "$ut", -anchor => 'w',
 		   -font => $plotfont, -fill => $tc);
 	$C->create('text', 2*$xleft, $ybottom+35, 
 		   -text => "$run:$source", 
