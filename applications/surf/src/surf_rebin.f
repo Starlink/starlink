@@ -241,6 +241,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.66  1999/07/14 04:50:18  timj
+*     Use surf_request_output_coords
+*
 *     Revision 1.65  1999/06/25 05:59:36  timj
 *     Fix REFPIX bounds problem.
 *
@@ -553,8 +556,6 @@ c
       CHARACTER*80     FITS(SCUBA__MAX_FITS, MAX_FILE)
                                        ! FITS entries for each file
       CHARACTER*(DAT__SZNAM) HDSNAME   ! Name of the container (not the fname)
-      INTEGER          HMSF (4)        ! holds converted angle information from
-                                       ! SLA routine
       LOGICAL          HOURS           ! .TRUE. if the angle being read in is
                                        ! in units of hours rather than degrees
       INTEGER          I               ! DO loop index
@@ -684,7 +685,6 @@ c
       REAL             SHIFT_DY (MAX_FILE)
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
-      CHARACTER*1      SIGN            ! + or -
       INTEGER          SKYNDF          ! NDF identifier to SKY
       INTEGER          SKY_PTR(MAX_FILE) ! Pointer to SKY data
       INTEGER          SKY_END(MAX_FILE) ! Pointer to end of SKY data
@@ -1113,12 +1113,6 @@ c
       IF ((OUT_COORDS.NE.'NA'.AND.OUT_COORDS.NE.'AZ' 
      :     .AND. OUT_COORDS.NE.'PL')) THEN
 
-*     Convert the input coordinates to the output coordinates
-*     and use them as the default.
-
-         CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
-     :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
-
 *     Inform the 'RD' regridder the date of regrid
 
          IF (OUT_COORDS .EQ. 'RD') THEN
@@ -1136,92 +1130,32 @@ c
 
          IF (.NOT.DESPIKE .AND. .NOT.CALCSKY) THEN
 
-            IF (STATUS .EQ. SAI__OK) THEN
-               IF (HOURS) then
-                  CALL SLA_DR2TF (2, OUT_LONG, SIGN, HMSF)
-                  
-                  STEMP = SIGN
-                  WRITE (STEMP(2:3),'(I2.2)') HMSF(1)
-                  STEMP (4:4) = ' '
-                  WRITE (STEMP(5:6),'(I2.2)') HMSF(2)
-                  STEMP (7:7) = ' '
-                  WRITE (STEMP(8:9),'(I2.2)') HMSF(3)
-                  STEMP (10:10) = '.'
-                  WRITE (STEMP(11:12),'(I2.2)') HMSF(4)
-               ELSE
-                  CALL SLA_DR2AF (1, OUT_LONG, SIGN, HMSF)
-                  
-                  STEMP = SIGN
-                  WRITE (STEMP(2:4), '(I3.3)') HMSF(1)
-                  STEMP (5:5) = ' '
-                  WRITE (STEMP(6:7), '(I2.2)') HMSF(2)
-                  STEMP (8:8) = ' '
-                  WRITE (STEMP(9:10), '(I2.2)') HMSF(3)
-                  STEMP (11:11) = '.'
-                  WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
-               END IF
-            END IF
+*     Request the new apparent ra/dec centre
+            CALL SURF_REQUEST_OUTPUT_COORDS( TSKNAME, 'LONG_OUT',
+     :           'LAT_OUT', OUT_COORDS, OUT_RA_CEN, OUT_DEC_CEN, 
+     :           MJD_STANDARD, HOURS, OUT_RA_CEN, OUT_DEC_CEN, 
+     :           OUT_ROTATION, OUT_LONG, OUT_LAT, STATUS)
 
+         ELSE
 
-*     Ask for long and lat of output image
+*     We already have the apparent ra/dec of the centre - we need
+*     the rotation angle though. Either we calculate it ourselves
+*     or we convert from apparent to long and lat and back again!!!
+*     Probably want a separate rotation sub
 
+*     Convert the input coordinates to the output coordinates
+*     and use them as the default.
 
-            CALL PAR_DEF0C ('LONG_OUT', STEMP, STATUS)
-            CALL PAR_GET0C ('LONG_OUT', STEMP, STATUS)
-         
-            IF (STATUS .EQ. SAI__OK) THEN
-               ITEMP = 1
-               CALL SLA_DAFIN (STEMP, ITEMP, OUT_LONG, STATUS)
-               IF (STATUS .NE. SAI__OK) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC('TASK', TSKNAME)
-                  CALL ERR_REP (' ', '^TASK: error reading '//
-     :                 'output centre longitude - it must be in '//
-     :                 '5 10 34.6 format', STATUS)
-               ELSE
-                  IF (HOURS) THEN
-                     OUT_LONG = OUT_LONG * 15.0D0
-                  END IF
-               END IF
-            END IF
+         CALL SCULIB_CALC_OUTPUT_COORDS (OUT_RA_CEN, OUT_DEC_CEN, 
+     :        MJD_STANDARD, OUT_COORDS, OUT_LONG, OUT_LAT, STATUS)
 
-            IF (STATUS .EQ. SAI__OK) THEN
-               CALL SLA_DR2AF (1, OUT_LAT, SIGN, HMSF)
-               
-               STEMP = SIGN
-               WRITE (STEMP(3:4),'(I2.2)') HMSF(1)
-               STEMP (5:5) = ' '
-               WRITE (STEMP(6:7),'(I2.2)') HMSF(2)
-               STEMP (8:8) = ' '
-               WRITE (STEMP(9:10),'(I2.2)') HMSF(3)
-               STEMP (11:11) = '.'
-               WRITE (STEMP(12:12), '(I1.1)') HMSF(4)
-            END IF
-            
-            CALL PAR_DEF0C ('LAT_OUT', STEMP, STATUS)
-            CALL PAR_GET0C ('LAT_OUT', STEMP, STATUS)
-            
-            IF (STATUS .EQ. SAI__OK) THEN
-               ITEMP = 1
-               CALL SLA_DAFIN (STEMP, ITEMP, OUT_LAT, STATUS)
-               IF (STATUS .NE. SAI__OK) THEN
-                  STATUS = SAI__ERROR
-                  CALL MSG_SETC('TASK', TSKNAME)
-                  CALL ERR_REP (' ', '^TASK: error reading '//
-     :                 'output centre latitude -  it must be in '//
-     :                 '-30 13 56.4 format', STATUS)
-               END IF
-            END IF
-
-         END IF
-
-            
-*  calculate the apparent RA,Dec of the selected output centre
+*     calculate the apparent RA,Dec of the selected output centre
 
          CALL SCULIB_CALC_APPARENT (OUT_LONG, OUT_LAT, 0.0D0, 0.0D0,
      :        0.0D0, 0.0D0, OUT_COORDS, 0.0, MJD_STANDARD, 0.0D0, 0.0D0,
      :        OUT_RA_CEN, OUT_DEC_CEN, OUT_ROTATION, STATUS)
 
+         END IF            
 
 *  convert the RA,Decs of the observed points to tangent plane offsets
 *  from the chosen output centre
