@@ -1,5 +1,8 @@
 1999-06-16  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* src/surf_add_dbm.f (SURF_ADD_DBM): Rewrite fits keywords if they 
+	are already present (CHOP_PA, CHOP_THR)
+
 	* scripts/remdbm.pl: Turn off variance in MATHS command.
 	Add high frequency filter.
 
