@@ -2,8 +2,8 @@ o Colour Depth: 8, 16 or 24 Bit Colour Tables:
 
 LutEdit can be used with nearly any type of X windows visual. The only
 real difference in the behaviour of LutEdit is that the updating of the
-image display and histogram happens much faster if the if your window 
-is set to 256 (8 bit) colour.
+image display and histogram happens much faster if your window is set 
+to 256 (8 bit) colour.
 
 o Colour Tables, Pens & Entries:
 
@@ -47,10 +47,11 @@ Under this is an area containing INFORMATION about the number of pens and
 entries in the colour table, and the data values used to scale the
 displayed image.
 
-Under this, on the left there is a IMAGE DISPLAY which uses the current 
-contents of the colour table editor to render the image specified at
-start-up. The upper and lower scaling limits can be selected within the
-"Options" menu. To the right of the image display is a HISTOGRAM of the 
+Under this, on the left there is a IMAGE DISPLAY which uses the current
+contents of the colour table editor to render a specified image
+(specified either at start-up, or using the "File/Open Image" menu
+command). The upper and lower scaling limits can be selected within the
+"Options" menu. To the right of the image display is a HISTOGRAM of the
 pens used to draw the image. Each bin within the histogram is coloured
 using the colour of the pen to which it refers. The horizontal axis of
 this histogram may be annotated either with pen numbers or with data
@@ -137,6 +138,11 @@ o The File Menu:
   need to press the manual update button (to the right of the editor
   panel) to force the display to be updated. 
 
+  - Open Image: Opens an NDF containing an image, and replaces the
+  currently displayed image with the new image. The current colour table
+  is use to display the image. This command is also available within the
+  "Options" menu ("Options/Image Display/Open").
+
   - Read Current: Closes the current colour table and loads the colour
   table currently being used to display the image at the top left corner
   of the interface, using a single entry for each pen. This will usually 
@@ -222,13 +228,16 @@ o The Options Menu:
   colour table. This value is used both to produce the curves in the
   editor, and to colour the image display and histogram.
 
-  - Image display: Determines how the the image display in the top left 
-  corner should be produced. "Auto-cut" allows the scaling of the image
-  to be selected. For instance, "0.5%" means that the top 0.5% of the 
-  pixel values in the image will be coloured with the highest available 
-  pen, and lowest 0.5% will be coloured with the lowest available pen. 
-  This can be changed by selecting "Negative" in which case the top data
-  values are coloured using the bottom pen, and vice-versa.
+  - Image display: Determines how the the image display in the top left
+  corner should be produced. "Open" can be used to replace the currently
+  displayed image with a different one (this command is also available
+  within the "File" menu as "Open Image"). "Auto-cut" allows the scaling
+  of the image to be selected. For instance, "0.5%" means that the top
+  0.5% of the pixel values in the image will be coloured with the highest
+  available pen, and lowest 0.5% will be coloured with the lowest
+  available pen. This can be changed by selecting "Negative" in which
+  case the top data values are coloured using the bottom pen, and
+  vice-versa.
 
   - Histogram: Determines how the histogram to the top right corner
   should be produced. The labels on the X axis can be either pen numbers
