@@ -2292,7 +2292,6 @@ javadocs:
 webstart:
 
 dist:
-    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
@@ -2428,4 +2427,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 7 minutes 12 seconds
+Total time: 7 minutes 41 seconds
