@@ -36,25 +36,27 @@ c     following functions may also be applied to all KeyMaps:
 f     In addition to those routines applicable to all Objects, the
 f     following routines may also be applied to all KeyMaps:
 *
-c     - astMapPut0<X>: Add a new scalar entry to a KeyMap
-c     - astMapPut1<X>: Add a new vector entry to a KeyMap
 c     - astMapGet0<X>: Get a named scalar entry from a KeyMap
 c     - astMapGet1<X>: Get a named vector entry from a KeyMap
-c     - astMapRemove: Removed a named entry from a KeyMap
-c     - astMapSize: Get the number of entries in a KeyMap
-c     - astMapLength: Get the length of a named entry in a KeyMap
 c     - astMapHasKey: Does the KeyMap contain a named entry?
 c     - astMapKey: Return the key name at a given index in the KeyMap
+c     - astMapLenC: Get the length of a named character entry in a KeyMap
+c     - astMapLength: Get the length of a named entry in a KeyMap
+c     - astMapPut0<X>: Add a new scalar entry to a KeyMap
+c     - astMapPut1<X>: Add a new vector entry to a KeyMap
+c     - astMapRemove: Removed a named entry from a KeyMap
+c     - astMapSize: Get the number of entries in a KeyMap
 c     - astMapType: Return the data type of a named entry in a map.
-f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
-f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
 f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
 f     - AST_MAPGET1<X>: Get a named vector entry from a KeyMap
-f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
-f     - AST_MAPSIZE: Get the number of entries in a KeyMap
-f     - AST_MAPLENGTH: Get the length of a named entry in a KeyMap
 f     - AST_MAPHASKEY: Does the KeyMap contain a named entry?
 f     - AST_MAPKEY: Return the key name at a given index in the KeyMap
+f     - AST_MAPLENC: Get the length of a named character entry in a KeyMap
+f     - AST_MAPLENGTH: Get the length of a named entry in a KeyMap
+f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
+f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
+f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
+f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 
 *  Copyright:
@@ -64,8 +66,10 @@ f     - AST_MAPTYPE: Return the data type of a named entry in a map.
 *     DSB: B.S. Berry (Starlink)
 
 *  History:
-*     12-NOV-2005 (DSB):
+*     12-NOV-2004 (DSB):
 *        Original version.
+*     5-JAN-2005 (DSB):
+*        Added astMapLenC method.
 *class--
 */
 
@@ -187,6 +191,7 @@ static int MapGet1C( AstKeyMap *, const char *, int, int, int *, char * );
 static int MapGet1D( AstKeyMap *, const char *, int, int *, double * );
 static int MapGet1I( AstKeyMap *, const char *, int, int *, int * );
 static int MapHasKey( AstKeyMap *, const char *);
+static int MapLenC( AstKeyMap *, const char *);
 static int MapLength( AstKeyMap *, const char *);
 static int MapSize( AstKeyMap *);
 static int MapType( AstKeyMap *, const char *);
@@ -283,7 +288,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 *     KeyMap member function.
 
 *  Description:
-*     This function converts a supplied value form one KeyMap data type to
+*     This function converts a supplied value from one KeyMap data type to
 *     another, if possible.
 
 *  Parameters:
@@ -292,12 +297,18 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 *     raw_type
 *        The data type of the input value.
 *     out
-*        Pointer to the location at which to store the output value.
+*        Pointer to the location at which to store the output value. This
+*        may be NULL, in which case the conversion is still performed if
+*        possible, but the result of the conversion is thrown away.
 *     out_type
 *        The data type of the output value.
 
 *  Returned Value:
-*     One if the conversion was performed succesfully, otherwise zero.
+*     Non-zero if the conversion was performed succesfully, otherwise zero.
+*     In the case of the output type being AST__STRINGTYPE, the returned
+*     non-zero value will be the length of the formatted string (not including 
+*     the terminating null character). This value will be returned correctly 
+*     even if "out" is NULL.
 
 *  Notes:
 *     - Zero will be returned if this function is invoked with the global 
@@ -327,7 +338,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    result = 0;
 
 /* Check the global error status and the supplied pointers. */
-   if( !astOK || !raw || !out ) return result;
+   if( !astOK || !raw ) return result;
 
 /* If the "strings" array has not been initialised, fill it with
    NULL pointers. */
@@ -346,11 +357,11 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 /* Consider conversion to "int". */
       if( out_type == AST__INTTYPE ) {
-         *( (int *) out ) = ival;
+         if( out ) *( (int *) out ) = ival;
          
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
-         *( (double *) out ) = (double) ival;
+         if( out ) *( (double *) out ) = (double) ival;
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
@@ -375,11 +386,11 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 
 /* Consider conversion to "int". */
       if( out_type == AST__INTTYPE ) {
-         *( (int *) out ) = (int)( dval + 0.5 );
+         if( out ) *( (int *) out ) = (int)( dval + 0.5 );
          
 /* Consider conversion to "double". */
       } else if( out_type == AST__DOUBLETYPE ) {
-         *( (double *) out ) = dval;
+         if( out ) *( (double *) out ) = dval;
 
 /* Consider conversion to "const char *". */
       } else if( out_type == AST__STRINGTYPE ) {
@@ -407,7 +418,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
          nc = 0;
          nval = astSscanf( cval, " %d %n", &ival, &nc );
          if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
-            *( (int *) out ) = ival;
+            if( out ) *( (int *) out ) = ival;
          } else {
             result = 0;
          }
@@ -417,7 +428,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
          nc = 0;
          nval = astSscanf( cval, " %lf %n", &dval, &nc );
          if( ( nval == 1 ) && ( nc >= (int) strlen( cval ) ) ) {
-            *( (double *) out ) = dval;
+            if( out ) *( (double *) out ) = dval;
          } else {
             result = 0;
          }
@@ -456,7 +467,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 /* Consider conversion to "AstObject *". */
       } else if( out_type == AST__OBJECTTYPE ) {
          aval = *( (AstObject **) raw );
-         *( (AstObject **) out ) = aval ? astClone( aval ) : NULL;
+         if( out ) *( (AstObject **) out ) = aval ? astClone( aval ) : NULL;
 
 /* Report an error if the data type is unknown. */
       } else {
@@ -469,7 +480,7 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
 /* Report an error if the data type is unknown. */
    } else {
       result = 0;
-      astError( AST__INTER, "CopyMapEntry(KeyMap): Illegal map entry data "
+      astError( AST__INTER, "ConvertValue(KeyMap): Illegal map entry data "
                 "type %d encountered (internal AST programming error).",
                 raw_type );
    }
@@ -481,14 +492,15 @@ static int ConvertValue( void *raw, int raw_type, void *out, int out_type ) {
    element, so the earlier string is effectively replaced by the new
    one.) */
    if( out_type == AST__STRINGTYPE && astOK && result && cvalue ) {
-      strings[ istr ] = astStore( strings[ istr ], cvalue,
-                                  strlen( cvalue ) + (size_t) 1 );
+      result = strlen( cvalue );
+      strings[ istr ] = astStore( strings[ istr ], cvalue, 
+                                  (size_t) ( result + 1 ) );
 
 /* If OK, return a pointer to the copy and increment "istr" to use the
    next element of "strings" on the next invocation. Recycle "istr" to
    zero when all elements have been used. */
       if ( astOK ) {
-         *( (const char **) out ) = strings[ istr++ ];
+         if( out ) *( (const char **) out ) = strings[ istr++ ];
          if( istr == ( MAX_STRINGS - 1 ) ) istr = 0;
       }
    }
@@ -1263,6 +1275,7 @@ void astInitKeyMapVtab_(  AstKeyMapVtab *vtab, const char *name ) {
    vtab->MapGet1I = MapGet1I;
    vtab->MapRemove = MapRemove;
    vtab->MapSize = MapSize;
+   vtab->MapLenC = MapLenC;
    vtab->MapLength = MapLength;
    vtab->MapType = MapType;
    vtab->MapHasKey = MapHasKey;
@@ -2335,15 +2348,15 @@ f     - I: INTEGER
 f     - C: CHARACTER
 f     - A: INTEGER used to identify an AstObject
 *
-c     For example, astMapGet0D would be used to get "double" values, while 
-c     astMapGet0I would be used to get "int" values, etc. For D or I, the 
+c     For example, astMapGet1D would be used to get "double" values, while 
+c     astMapGet1I would be used to get "int" values, etc. For D or I, the 
 c     supplied "value" parameter should be a pointer to an array of doubles
 c     or ints, with "mxval" elements. For C, the supplied "value" parameter 
 c     should be a pointer to a character string with "mxval*l" elements.
 c     For A, the supplied "value" parameter should be a pointer to an
 c     array of AstObject pointers.
-f     For example, AST_MAPGET0D would be used to get DOUBLE PRECISION values,
-f     while AST_MAPGET0I would be used to get INTEGER values, etc.
+f     For example, AST_MAPGET1D would be used to get DOUBLE PRECISION values,
+f     while AST_MAPGET1I would be used to get INTEGER values, etc.
 
 *--
 */
@@ -2943,6 +2956,160 @@ f     AST_MAPSIZE = INTEGER
 
 /* Add up the number of entries in all elements of the hash table. */
    for( itab = 0; itab < AST__MAPSIZE; itab++ ) result += this->nentry[ itab ];
+
+/* Return the result. */
+   return result;
+
+}
+
+static int MapLenC( AstKeyMap *this, const char *key ) {
+/*
+*++
+*  Name:
+c     astMapLenC
+f     AST_MAPLENC
+
+*  Purpose:
+*     Get the number of characters in a character entry in a KeyMap.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "keymap.h"
+c     int astMapLenC( AstKeyMap *this, const char *key )
+f     RESULT = AST_MAPLENC( THIS, KEY, STATUS )
+
+*  Class Membership:
+*     KeyMap method.
+
+*  Description:
+*     This function returns the minimum length which a character variable 
+*     which must have in order to be able to store a specified entry in
+*     the supplied KeyMap. If the named entry is a vector entry, then the
+*     returned value is the length of the longest element of the vector
+*     value.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the KeyMap.
+c     key
+f     KEY = CHARACTER * ( * ) (Given)
+*        The character string identifying the KeyMap entry. Trailing 
+*        spaces are ignored.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astMapLenC()
+f     AST_MAPLENC = INTEGER
+*        The length (i.e. number of characters) of the longest formatted
+*        value associated with the named entry.
+c        This does not include the trailing null character.
+
+*  Notes:
+*     - A function value of zero will be returned without error if the 
+*     named entry cannot be formatted as a character string.
+*     - A function value of zero will be returned if an error has already
+*     occurred, or if this function should fail for any reason.
+
+*--
+*/
+
+/* Local Variables: */
+   AstMapEntry *mapentry;  /* Pointer to parent MapEntry structure */ 
+   int i;                  /* Element index */
+   int itab;               /* Index of hash table element to use */
+   int l;                  /* Length of formatted vector element */
+   int nel;                /* Number of elements in raw vector */ 
+   int raw_type;           /* Data type of stored value */
+   int result;             /* Returned value */
+   size_t raw_size;        /* Size of a single raw value */
+   void *raw;              /* Pointer to stored value */ 
+
+/* Initialise */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Use the hash function to determine the element of the hash table in
+   which the key will be stored. */
+   itab = HashFun( key );
+
+/* Search the relevent table entry for the required MapEntry. */
+   mapentry = SearchTableEntry( this, itab, key );
+
+/* Skip rest if the key was not found. */
+   if( mapentry ) {
+
+/* Get the address of the first raw value, and its data type. Also get 
+   the size of each element of the vector. */ 
+      nel = mapentry->nel; 
+      raw_type = mapentry->type; 
+      if( raw_type == AST__INTTYPE ){ 
+         raw_size = sizeof( int ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0I *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1I *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__DOUBLETYPE ){ 
+         raw_size = sizeof( double ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0D *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1D *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__STRINGTYPE ){ 
+         raw_size = sizeof( const char * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0C *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1C *)mapentry)->value; 
+         } 
+
+      } else if( raw_type == AST__OBJECTTYPE ){ 
+         raw_size = sizeof( AstObject * ); 
+         if( nel == 0 ) { 
+            raw = &( ((Entry0A *)mapentry)->value ); 
+         } else { 
+            raw = ((Entry1A *)mapentry)->value; 
+         } 
+
+      } else { 
+         raw_size = 0; 
+         raw = NULL; 
+         astError( AST__INTER, "astMapLenC(KeyMap): Illegal map entry data " 
+                   "type %d encountered (internal AST programming error).", 
+                   raw_type ); 
+      } 
+
+/* Treat scalars as single-value vectors. */ 
+      if( nel == 0 ) nel = 1; 
+
+/* Initialise the maximum length of any formatted value in the entry. */
+      result= 0;
+
+/* Loop round all values in the vector. */ 
+      for( i = 0; i < nel && astOK; i++ ) { 
+
+/* Go through the motions of formatting the value. We do not actually
+   need the formatted string (just its length) so we provide a NULL pointer
+   for the output buffer. The entry is ignored if it cannot be formatted. */
+         l = ConvertValue( raw, raw_type, NULL, AST__STRINGTYPE );
+         if( l > result ) result = l;
+
+/* Increment the pointer to the next raw value. */
+         raw += raw_size;
+      } 
+   }
+
+/* If an error has occurred, return zero. */
+   if( !astOK ) result = 0;
 
 /* Return the result. */
    return result;
@@ -4131,6 +4298,10 @@ void astMapRemove_( AstKeyMap *this, const char *key ){
 int astMapSize_( AstKeyMap *this ){ 
    if ( !astOK ) return 0;
    return (**astMEMBER(this,KeyMap,MapSize))(this); 
+}
+int astMapLenC_( AstKeyMap *this, const char *key ){ 
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,KeyMap,MapLenC))(this,key); 
 }
 int astMapLength_( AstKeyMap *this, const char *key ){ 
    if ( !astOK ) return 0;

@@ -122,6 +122,7 @@ typedef struct AstKeyMapVtab {
    void (* MapRemove)( AstKeyMap *, const char * );
    int (* MapSize)( AstKeyMap * );
    int (* MapLength)( AstKeyMap *, const char * );
+   int (* MapLenC)( AstKeyMap *, const char * );
    int (* MapType)( AstKeyMap *, const char * );
    int (* MapHasKey)( AstKeyMap *, const char * );
    const char *(* MapKey)( AstKeyMap *, int );
@@ -177,6 +178,7 @@ int astMapGet1D_( AstKeyMap *, const char *, int, int *, double * );
 int astMapGet1I_( AstKeyMap *, const char *, int, int *, int * );
 int astMapHasKey_( AstKeyMap *, const char * );
 int astMapLength_( AstKeyMap *, const char * );
+int astMapLenC_( AstKeyMap *, const char * );
 int astMapSize_( AstKeyMap * );
 int astMapType_( AstKeyMap *, const char * );
 int astMapType_( AstKeyMap *, const char * );
@@ -249,6 +251,7 @@ astINVOKE(O,astLoadKeyMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astMapRemove(this,key) astINVOKE(V,astMapRemove_(astCheckKeyMap(this),key))
 #define astMapSize(this) astINVOKE(V,astMapSize_(astCheckKeyMap(this)))
 #define astMapLength(this,key) astINVOKE(V,astMapLength_(astCheckKeyMap(this),key))
+#define astMapLenC(this,key) astINVOKE(V,astMapLenC_(astCheckKeyMap(this),key))
 #define astMapHasKey(this,key) astINVOKE(V,astMapHasKey_(astCheckKeyMap(this),key))
 #define astMapKey(this,index) astINVOKE(V,astMapKey_(astCheckKeyMap(this),index))
 #define astMapType(this,key) astINVOKE(V,astMapType_(astCheckKeyMap(this),key))

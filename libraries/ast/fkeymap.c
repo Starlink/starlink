@@ -23,6 +23,7 @@
 *     AST_MAPREMOVE
 *     AST_MAPSIZE
 *     AST_MAPLENGTH
+*     AST_MAPLENC
 *     AST_MAPTYPE
 *     AST_MAPKEY
 
@@ -589,6 +590,24 @@ F77_INTEGER_FUNCTION(ast_maplength)( INTEGER(THIS),
    astWatchSTATUS(
       key = astString( KEY, KEY_length );
       RESULT = astMapLength( astI2P( *THIS ), key );
+      astFree( key );
+   )
+   return RESULT;
+}
+
+F77_INTEGER_FUNCTION(ast_maplenc)( INTEGER(THIS), 
+                                   CHARACTER(KEY),
+                                   INTEGER(STATUS)
+                                   TRAIL(KEY) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_CHARACTER(KEY)
+   F77_INTEGER_TYPE(RESULT);
+   char *key;
+
+   astAt( "AST_MAPLENGTH", NULL, 0 );
+   astWatchSTATUS(
+      key = astString( KEY, KEY_length );
+      RESULT = astMapLenC( astI2P( *THIS ), key );
       astFree( key );
    )
    return RESULT;
