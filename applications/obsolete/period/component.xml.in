@@ -2,7 +2,7 @@
 <!DOCTYPE component SYSTEM "componentinfo.dtd">
 <!-- @configure_input@ -->
 
-<component id="@PACKAGE@">
+<component id="@PACKAGE@" status="obsolete">
   <version>@PACKAGE_VERSION@</version>
   <path>applications/obsolete/period</path>
   <description>PERIOD - A Time-series analysis package</description>
