@@ -1,11 +1,19 @@
 1 IMG_update
 
-  This is a minor bug fix release of IMG. Previously it was possible
-  that records after the END card could contain NULL characters. These
-  should now always be set BLANK.
+  This is a minor release of IMG. 
+
+  The documentation has been updated to reinforce the fact that NDF
+  identifiers obtained using IMG_INDF are not released by any IMG
+  calls (you must do this for yourself using NDF_ANNUL). 
+
+  A new routine HDR_COPY that copys sources of header information
+  between images has been added.
+
+  Previously it was possible that records after the END card could
+  contain NULL characters. These should now always be set BLANK.
 
   IMG is fully described in SUN/160, which you can view on-line with
   the "showme sun160" command.
 
-  Peter W. Draper 20-OCT-2000 (img@star.rl.ac.uk).
+  Peter W. Draper 24-OCT-2000 (img@star.rl.ac.uk).
 

@@ -565,7 +565,7 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = StringArray.c hdrDelet.c hdrIn.c hdrInC.c hdrInD.c \
+C_ROUTINES = StringArray.c hdrCopy.c hdrDelet.c hdrIn.c hdrInC.c hdrInD.c \
    hdrInI.c hdrInL.c hdrInF.c hdrMod.c hdrName.c hdrNumb.c hdrOut.c \
    hdrOutC.c hdrOutD.c hdrOutI.c hdrOutL.c hdrOutF.c imgCancl.c \
    imgCheck.c imgDelet.c imgFree.c imgIn.c imgIn1.c imgIn2.c imgIn3.c \
@@ -1645,6 +1645,7 @@ img_tmpxr.o: IMG_CONST SAE_PAR
 img_tmpxw.o: IMG_CONST SAE_PAR
 
 StringArray.o:	img_err.h
+hdrCopy.o:	img1.h
 hdrIn.o:	img1.h
 hdrInC.o:	img1.h
 hdrInL.o:	img1.h

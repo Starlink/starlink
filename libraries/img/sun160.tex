@@ -1,21 +1,65 @@
-\documentstyle[twoside,11pt]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+% \usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
 % ? Document identification
+% Fixed part
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun160.5}
+\newcommand{\stardocsource}    {sun\stardocnumber}
+\newcommand{\stardoccopyright} 
+{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+
+% Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {160.5}
 \newcommand{\stardocauthors}   {P.W. Draper \\
                                 R.F. Warren-Smith}
-\newcommand{\stardocdate}      {20 October 2000}
+\newcommand{\stardocdate}      {24 October 2000}
 \newcommand{\stardoctitle}     {IMG \\ [1ex]
                                 Simple Image Data Access}
-\newcommand{\stardocversion}   {Version 1.4}
+\newcommand{\stardocversion}   {Version 1.3}
 \newcommand{\stardocmanual}    {Subroutine Library}
+\newcommand{\stardocabstract}  {
+IMG is a subroutine library for accessing astronomical image data and
+associated header information. It is designed to be easy to use and
+understand.}
+
 % ? End of document identification
 % -----------------------------------------------------------------------------
+
+% +
+%  Name:
+%     sun.tex
+%
+%  Purpose:
+%     Template for Starlink User Note (SUN) documents.
+%     Refer to SUN/199
+%
+%  Authors:
+%     AJC: A.J.Chipperfield (Starlink, RAL)
+%     BLY: M.J.Bly (Starlink, RAL)
+%     PWD: Peter W. Draper (Starlink, Durham University)
+%
+%  History:
+%     17-JAN-1996 (AJC):
+%        Original with hypertext macros, based on MDL plain originals.
+%     16-JUN-1997 (BLY):
+%        Adapted for LaTeX2e.
+%        Added picture commands.
+%     13-AUG-1998 (PWD):
+%        Converted for use with LaTeX2HTML version 98.2 and
+%        Star2HTML version 1.3.
+%      1-FEB-2000 (AJC):
+%        Add Copyright statement in LaTeX
+%     {Add further history here}
+%
+% -
 
 \newcommand{\stardocname}{\stardocinitials /\stardocnumber}
 \markboth{\stardocname}{\stardocname}
@@ -44,9 +88,9 @@
 %    Knoxville, TN 37996
 %    USA
 
-%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by
-%  star2html to signify raw TeX that latex2html cannot process).
-%\begin{rawtex}
+%  Do not remove the %begin{latexonly} and %end{latexonly} lines (used by 
+%  LaTeX2HTML to signify text it shouldn't process).
+%begin{latexonly}
 \makeatletter
 \def\makeinnocent#1{\catcode`#1=12 }
 \def\csarg#1#2{\expandafter#1\csname#2\endcsname}
@@ -81,7 +125,6 @@
 \excludecomment{comment}
 \excludecomment{rawhtml}
 \excludecomment{htmlonly}
-%\end{rawtex}
 
 %  Hypertext commands etc. This is a condensed version of the html.sty
 %  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
@@ -92,47 +135,46 @@
 \newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
 \newcommand{\htmladdnormallink}[2]{#1}
 \newcommand{\htmladdimg}[1]{}
-\newenvironment{latexonly}{}{}
 \newcommand{\hyperref}[4]{#2\ref{#4}#3}
 \newcommand{\htmlref}[2]{#1}
 \newcommand{\htmlimage}[1]{}
 \newcommand{\htmladdtonavigation}[1]{}
+
+\newenvironment{latexonly}{}{}
+\newcommand{\latex}[1]{#1}
+\newcommand{\html}[1]{}
+\newcommand{\latexhtml}[2]{#1}
+\newcommand{\HTMLcode}[2][]{}
 
 %  Starlink cross-references and labels.
 \newcommand{\xref}[3]{#1}
 \newcommand{\xlabel}[1]{}
 
 %  LaTeX2HTML symbol.
-\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+\newcommand{\latextohtml}{\LaTeX2\texttt{HTML}}
 
 %  Define command to re-centre underscore for Latex and leave as normal
 %  for HTML (severe problems with \_ in tabbing environments and \_\_
 %  generally otherwise).
-\newcommand{\latex}[1]{#1}
-\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
-\latex{\setunderscore}
-
-%  Redefine the \tableofcontents command. This procrastination is necessary
-%  to stop the automatic creation of a second table of contents page
-%  by latex2html.
-\newcommand{\latexonlytoc}[0]{\tableofcontents}
+\renewcommand{\_}{\texttt{\symbol{95}}}
 
 % -----------------------------------------------------------------------------
 %  Debugging.
 %  =========
 %  Remove % on the following to debug links in the HTML version using Latex.
+
 % \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
 % \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
 % \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
 % \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
 % \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
 % \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+%end{latexonly}
 % -----------------------------------------------------------------------------
 % ? Document specific \newcommand or \newenvironment commands.
-
 % In-line verbatim. Note that special characters within this still need
 % escaping.
-\newcommand{\myverb}[1]{{\tt{#1}}}
+\newcommand{\myverb}[1]{{\texttt{#1}}}
 %
 %  Notes are:
 \newcommand{\mynote}{The following notes refer to the numbered statements:}
@@ -172,12 +214,272 @@
 \end{htmlonly}
 
 %  SST quotes.
-\newcommand{\qt}[1]{{\tt "}#1{\tt "}}
-\newcommand{\qs}[1]{{\tt '}#1{\tt '}}
+\newcommand{\qt}[1]{\texttt{"}#1\texttt{"}}
+\newcommand{\qs}[1]{\texttt{'}#1\texttt{'}}
 \begin{htmlonly}
-   \renewcommand{\qt}[1]{ {\tt{"}}#1{\tt{"}} }
-   \renewcommand{\qs}[1]{ {\tt{'}}#1{\tt{'}} }
+   \renewcommand{\qt}[1]{\texttt{"}#1\texttt{"}}
+   \renewcommand{\qs}[1]{\texttt{'}#1\texttt{'}}
 \end{htmlonly}
+
+%+
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commnds.
+
+%  Notes:
+%     The style file html.sty provided with LaTeX2html needs to be used.
+%     This must be before this file.
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+%-
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\latex{\newfont{\ssttt}{cmtt10 scaled 1095}}
+\html{\newcommand{\ssttt}{\tt}}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-5.0pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{}
+\\[1.3ex]{\raggedright \ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+\newcommand{\sstexamplesubsection}[2]{\sloppy
+\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \vspace{1.0ex}
+\\ #2 }
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}]
+\mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%% Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  sstroutine.
+   \newcommand{\sstroutine}[3]{
+      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \newcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstusage
+   \newcommand{\sstusage}[1]{\item[Usage:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstinvocation
+   \newcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+      \\
+   }
+
+%  sstarguments
+   \newcommand{\sstarguments}[1]{
+      \item[Arguments:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstreturnedvalue
+   \newcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstparameters
+   \newcommand{\sstparameters}[1]{
+      \item[Parameters:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstexamples
+   \newcommand{\sstexamples}[1]{
+      \item[Examples:] \\
+      \begin{description}
+         #1
+      \end{description}
+      \\
+   }
+
+%  sstsubsection
+   \newcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \newcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] #2}
+
+%  sstnotes
+   \newcommand{\sstnotes}[1]{\item[Notes:] #1 }
+
+%  sstdiytopic
+   \newcommand{\sstdiytopic}[2]{\item[{#1}] #2 }
+
+%  sstimplementationstatus
+   \newcommand{\sstimplementationstatus}[1]{
+      \item[Implementation Status:] #1
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+      \\
+   }
+%  sstitem
+   \newcommand{\sstitem}{\item}
+
+\end{htmlonly}
+
+%  End of "sst.tex" layout definitions.
+%.
 
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
@@ -190,7 +492,7 @@
 %  Latex document header.
 %  ======================
 \begin{latexonly}
-   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   CCLRC / \textsc{Rutherford Appleton Laboratory} \hfill \textbf{\stardocname}\\
    {\large Particle Physics \& Astronomy Research Council}\\
    {\large Starlink Project\\}
    {\large \stardoccategory\ \stardocnumber}
@@ -202,16 +504,20 @@
    \rule{\textwidth}{0.5mm}
    \vspace{5mm}
    \begin{center}
-   {\Huge\bf  \stardoctitle \\ [2.5ex]}
-   {\LARGE\bf \stardocversion \\ [4ex]}
-   {\Huge\bf  \stardocmanual}
+   {\Huge\textbf{\stardoctitle \\ [2.5ex]}}
+   {\LARGE\textbf{\stardocversion \\ [4ex]}}
+   {\Huge\textbf{\stardocmanual}}
    \end{center}
    \vspace{5mm}
+
+% ? Add picture here if required for the LaTeX version.
+%   e.g. \includegraphics[scale=0.3]{filename.ps}
+% ? End of picture
 
 % ? Heading for abstract if used.
    \vspace{10mm}
    \begin{center}
-      {\Large\bf Description}
+      {\Large\textbf{Abstract}}
    \end{center}
 % ? End of heading for abstract.
 \end{latexonly}
@@ -222,98 +528,90 @@
    \xlabel{}
    \begin{rawhtml} <H1> \end{rawhtml}
       \stardoctitle\\
-   \begin{rawhtml} </H1> \end{rawhtml}
-   \begin{rawhtml} <H2> \end{rawhtml}
       \stardocversion\\
       \stardocmanual
-   \begin{rawhtml} </H2> \end{rawhtml}
+   \begin{rawhtml} </H1> <HR> \end{rawhtml}
 
-% ? Add picture here if required.
+% ? Add picture here if required for the hypertext version.
+%   e.g. \includegraphics[scale=0.7]{filename.ps}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
-   \stardoccategory \stardocnumber \\
+   \stardoccategory\ \stardocnumber \\
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://star-www.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://star-www.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
-%  HTML document table of contents.
+%  HTML document table of contents. 
 %  ================================
-%  Add table of contents header and a navigation button to return to this
-%  point in the document (this should always go before the abstract \section).
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
   \label{stardoccontents}
-  \begin{rawhtml}
+  \begin{rawhtml} 
     <HR>
     <H2>Contents</H2>
   \end{rawhtml}
-  \renewcommand{\latexonlytoc}[0]{}
   \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
         {stardoccontents}}
 
 % ? New section for abstract if used.
-  \section{\xlabel{abstract}Description}
+  \section{\xlabel{abstract}Abstract}
 % ? End of new section for abstract
 \end{htmlonly}
 
 % -----------------------------------------------------------------------------
 % ? Document Abstract. (if used)
-%   ==================
+%  ==================
 \begin{center}
-  \textsl{
-    IMG is a subroutine library for accessing astronomical image data and
-    associated header information. It is designed to be easy to use and
-    understand.
-  }
+\textsl{\stardocabstract}
 \end{center}
+
 % ? End of document abstract
+
+% -----------------------------------------------------------------------------
+% ? Latex Copyright Statement
+%  =========================
+\begin{latexonly}
+\newpage
+\vspace*{\fill}
+\stardoccopyright
+\end{latexonly}
+% ? End of Latex copyright statement
+
 % -----------------------------------------------------------------------------
 % ? Latex document Table of Contents (if used).
 %  ===========================================
 \newpage
-% \renewcommand{\thepage}{\arabic{page}}
-% \setcounter{page}{1}
 \begin{latexonly}
   \markboth{\stardocname}{\stardocname}
   \vspace{5mm}
-  \begin {center}
+  \begin{center}
      \rule{80mm}{0.5mm} \\ [1ex]
      {\Large\bf \stardoctitle \\ [2.5ex]
-           \stardocversion} \\ [2ex]
+                \stardocversion} \\ [2ex]
      \rule{80mm}{0.5mm}
   \end{center}
   \vspace{30mm}
   \setlength{\parskip}{0mm}
-  \latexonlytoc
+  \tableofcontents
   \setlength{\parskip}{\medskipamount}
   \markboth{\stardocname}{\stardocname}
 \end{latexonly}
 % ? End of Latex document table of contents
 % -----------------------------------------------------------------------------
-%  Introduction page
+
 \cleardoublepage
 \renewcommand{\thepage}{\arabic{page}}
 \setcounter{page}{1}
-\begin{latexonly}
-   \markboth{\stardocname}{\stardocname}
-   \vspace {5mm}
-   \begin {center}
-      \rule{80mm}{0.5mm} \\ [1ex]
-      {\Large\bf \stardoctitle \\ [2.5ex]
-            \stardocversion} \\ [2ex]
-      \rule{80mm}{0.5mm}
-   \end{center}
-   \vspace{30mm}
-\end{latexonly}
 
 \section{INTRODUCTION}
 This document describes the IMG library and how to use it to access
@@ -1216,7 +1514,7 @@ items. The complete example is called
 \begin{code}
 \begin{verbatim}
 *  See how many header items are available.
-      CALL HDR_NUMB( 'IN', ' ', '*', N, ISTAT )               [1]
+      CALL HDR_NUMB( 'IN', ' ', '*', N, ISTAT )            [1]
       DO 1 I = 1, N
 
 *  Get the name of the I'th header item.
@@ -1462,8 +1760,8 @@ This returns an NDF identifier (\myverb{ID}) to your image dataset
 (this shouldn't be confused with the pointers to images which we have
 used so far). This allows you to get at the other components of the
 NDF (our ``images'' are really the main NDF data array) such as its
-variance, quality and axes. It also allows you to access NDF
-extensions (our ``sources'' of header information) in more
+variance, quality or world coordinate system. It also allows you to
+access NDF extensions (our ``sources'' of header information) in more
 sophisticated ways.  As a very simple example the next program snippet
 shows how to write out the name of an image dataset:
 \begin{code}
@@ -1530,10 +1828,9 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \appendix
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \xlabel{appendix}
 
-\begin{latexonly}
+%begin{latexonly}
   \newpage
   \latexonlysection{ALPHABETICAL LIST OF FORTRAN SUBROUTINES}
 
@@ -1543,8 +1840,8 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 % Command for displaying routines in routine lists:
 % =================================================
 
-  \newcommand{\noteroutine}[3]{\item {\small \tt #1#2} \nopagebreak \\
-                                \hspace*{3em} {\em #3 } }
+  \newcommand{\noteroutine}[3]{\item {\small\texttt{#1#2}} \nopagebreak \\
+                                \hspace*{3em}\textit{#3} }
   {\small
   \latexonlysubsection{IMG Fortran Subroutines}
   \begin{description}
@@ -1572,6 +1869,8 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 
   \latexonlysubsection{HDR Fortran Subroutines}
   \begin{description}
+    \noteroutine{HDR\_COPY}{( PARAM1, XNAME1, PARAM2, XNAME2, STATUS )}
+       {Copy header information from one image to another}
     \noteroutine{HDR\_DELET}{( PARAM, XNAME, ITEM, COMP, STATUS )}
        {Delete a header item}
     \noteroutine{HDR\_IN[x]}{( PARAM, XNAME, ITEM, COMP, VALUE, STATUS )}
@@ -1586,275 +1885,10 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
        {Write a header item}
   \end{description}
   } % end of \small
-\end{latexonly}
+%end{latexonly}
 
 \newpage
 \section{FULL \label{IMGDESCRIPTIONS} FORTRAN SUBROUTINE DESCRIPTIONS}
-
-
-% +
-%  Name:
-%     SST.TEX
-
-%  Purpose:
-%     Define LaTeX commands for laying out Starlink routine descriptions.
-
-%  Language:
-%     LaTeX
-
-%  Type of Module:
-%     LaTeX data file.
-
-%  Description:
-%     This file defines LaTeX commands which allow routine documentation
-%     produced by the SST application PROLAT to be processed by LaTeX and
-%     by LaTeX2html. The contents of this file should be included in the
-%     source prior to any statements that make of the sst commnds.
-
-%  Notes:
-%     The commands defined in the style file html.sty provided with LaTeX2html
-%     are used. These should either be made available by using the appropriate
-%     sun.tex (with hypertext extensions) or by putting the file html.sty
-%     on your TEXINPUTS path (and including the name as part of the
-%     documentstyle declaration).
-
-%  Authors:
-%     RFWS: R.F. Warren-Smith (STARLINK)
-%     PDRAPER: P.W. Draper (Starlink - Durham University)
-
-%  History:
-%     10-SEP-1990 (RFWS):
-%        Original version.
-%     10-SEP-1990 (RFWS):
-%        Added the implementation status section.
-%     12-SEP-1990 (RFWS):
-%        Added support for the usage section and adjusted various spacings.
-%     8-DEC-1994 (PDRAPER):
-%        Added support for simplified formatting using LaTeX2html.
-%     {enter_further_changes_here}
-
-%  Bugs:
-%     {note_any_bugs_here}
-
-% -
-
-%  Define length variables.
-\newlength{\sstbannerlength}
-\newlength{\sstcaptionlength}
-\newlength{\sstexampleslength}
-\newlength{\sstexampleswidth}
-
-%  Define a \tt font of the required size.
-\newfont{\ssttt}{cmtt10 scaled 1095}
-
-%  Define a command to produce a routine header, including its name,
-%  a purpose description and the rest of the routine's documentation.
-\newcommand{\sstroutine}[3]{
-   \goodbreak
-   \rule{\textwidth}{0.5mm}
-   \vspace{-7ex}
-   \newline
-   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
-   \setlength{\sstcaptionlength}{\textwidth}
-   \setlength{\sstexampleslength}{\textwidth}
-   \addtolength{\sstbannerlength}{0.5em}
-   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
-   \addtolength{\sstcaptionlength}{-5.0pt}
-   \settowidth{\sstexampleswidth}{{\bf Examples:}}
-   \addtolength{\sstexampleslength}{-\sstexampleswidth}
-   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
-   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
-   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
-   \begin{description}
-      #3
-   \end{description}
-}
-
-%  Format the description section.
-\newcommand{\sstdescription}[1]{\item[Description:] #1}
-
-%  Format the usage section.
-\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
-
-
-%  Format the invocation section.
-\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
-
-%  Format the arguments section.
-\newcommand{\sstarguments}[1]{
-   \item[Arguments:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the returned value section (for a function).
-\newcommand{\sstreturnedvalue}[1]{
-   \item[Returned Value:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the parameters section (for an application).
-\newcommand{\sstparameters}[1]{
-   \item[Parameters:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Format the examples section.
-\newcommand{\sstexamples}[1]{
-   \item[Examples:] \mbox{} \\
-   \vspace{-3.5ex}
-   \begin{description}
-      #1
-   \end{description}
-}
-
-%  Define the format of a subsection in a normal section.
-\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
-
-%  Define the format of a subsection in the examples section.
-\newcommand{\sstexamplesubsection}[2]{\sloppy
-\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
-
-%  Format the notes section.
-\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
-
-%  Provide a general-purpose format for additional (DIY) sections.
-\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
-
-%  Format the implementation status section.
-\newcommand{\sstimplementationstatus}[1]{
-   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
-
-%  Format the bugs section.
-\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
-
-%  Format a list of items while in paragraph mode.
-\newcommand{\sstitemlist}[1]{
-  \mbox{} \\
-  \vspace{-3.5ex}
-  \begin{itemize}
-     #1
-  \end{itemize}
-}
-
-%  Define the format of an item.
-\newcommand{\sstitem}{\item}
-
-%  Now define html equivalents of those already set. These are used by
-%  latex2html and are defined in the html.sty files.
-\begin{htmlonly}
-
-%  Re-define \ssttt.
-   \newcommand{\ssttt}{\tt}
-
-%  sstroutine.
-   \renewcommand{\sstroutine}[3]{
-      \subsubsection{#1\xlabel{#1}-\label{#1}#2}
-      \begin{description}
-         #3
-      \end{description}
-   }
-
-%  sstdescription
-   \renewcommand{\sstdescription}[1]{\item[Description:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstusage
-   \renewcommand{\sstusage}[1]{\item[Usage:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstinvocation
-   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
-      \begin{description}
-         {\ssttt #1}
-      \end{description}
-   }
-
-%  sstarguments
-   \renewcommand{\sstarguments}[1]{
-      \item[Arguments:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstreturnedvalue
-   \renewcommand{\sstreturnedvalue}[1]{
-      \item[Returned Value:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstparameters
-   \renewcommand{\sstparameters}[1]{
-      \item[Parameters:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstexamples
-   \renewcommand{\sstexamples}[1]{
-      \item[Examples:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstsubsection
-   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
-
-%  sstexamplesubsection
-   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
-
-%  sstnotes
-   \renewcommand{\sstnotes}[1]{\item[Notes:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstdiytopic
-   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
-      \begin{description}
-         #2
-      \end{description}
-   }
-
-%  sstimplementationstatus
-   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:]
-      \begin{description}
-         #1
-      \end{description}
-   }
-
-%  sstitemlist
-   \newcommand{\sstitemlist}[1]{
-      \begin{itemize}
-         #1
-      \end{itemize}
-   }
-\end{htmlonly}
-
-%  End of "sst.tex" layout definitions.
-% .
-% @(#)sst.tex   1.4   95/06/06 11:46:41   95/06/06 11:49:58
-
 
 \subsection{IMG Fortran Subroutines}
 
@@ -2475,6 +2509,67 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
 \newpage
 \subsection{HDR Fortran Subroutines}
 
+\sstroutine{
+   HDR\_COPY
+}{
+   Copy header information from one image to another
+}{
+   \sstdescription{
+      This routine copies a compatible source of header information
+      from one image to another. FITS headers may only be copied to
+      FITS headers, other sources may be copied without restriction.
+   }
+   \sstinvocation{
+      CALL HDR\_COPY( PARAM1, XNAME1, PARAM2, XNAME2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         PARAM1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image containing the input source of
+         header information (case insensitive).
+      }
+      \sstsubsection{
+         XNAME1 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the extension to be copied (\qs{FITS} or \qs{ }
+         for FITS). 
+      }
+      \sstsubsection{
+         PARAM2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         Parameter name of the image that you want to copy a header
+         source into (case insensitive).
+      }
+      \sstsubsection{
+         XNAME2 = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The name of the destination header source (\qs{FITS} or 
+         \qs{ } for FITS, must be FITS if XNAME1 is FITS).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status. If a header source or destination is FITS
+         and the other isn't then IMG\_\_BDEXT will be returned.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Modified headers associated with the input source will copied
+         to the new image. 
+
+         \sstitem
+         This routine may be used to copy the same header source (from a
+           single input image), to more than one image at a time by using
+           multiple parameter names for PARAM2. Multiple parameter names are
+           provided as a comma separated list (i.e. \qs{OUT1,OUT2,OUT3}).
+      }
+   }
+}
+
 \sstroutine{HDR\_DELET}{
    Delete a header item
 }{
@@ -2657,6 +2752,7 @@ command is described more fully in \xref{SUN/144}{sun144}{}.
          The global status.
       }
    }
+\newpage
    \sstnotes{
       \sstitemlist{
 
@@ -2915,7 +3011,7 @@ are that the names of functions change from \myverb{img\_something} or
 be passed as arrays also have a length argument.
 
 \newcommand{\cnoteroutine}[4]{
-   \item {\small \tt #1~#2 #3} \nopagebreak \\ {\em #4 }
+   \item {\small \texttt{#1~#2 #3}} \nopagebreak \\ {\em #4 }
 }
 \subsection{IMG C Functions}
 \begin{latexonly}
@@ -2985,24 +3081,25 @@ be passed as arrays also have a length argument.
 </PRE>
 \end{rawhtml}
 
-Where the parts in {\tt "[]"} are optional or not always available.
-{\tt [N]} indicates the number of dimensions of the data you want to access
-and the necessary {\tt nx}, {\tt ny} and {\tt nz} arguments should be passed.
+Where the parts in \texttt{"[]"} are optional or not always available.
+\texttt{[N]} indicates the number of dimensions of the data you want to access
+and the necessary \texttt{nx}, \texttt{ny} and \texttt{nz} arguments should
+be passed.
 \begin{small}
 \begin{center}
 \begin{tabular}{||l|l||}
 \hline
-Number of dimensions {\tt [N]}    &    {\tt nx}, {\tt ny} \& {\tt nz} required \\
+Number of dimensions \texttt{[N]}    &    \texttt{nx}, \texttt{ny} \& \texttt{nz} required \\
 \hline
-     {\tt 1}                      &    {\tt nx}       \\
-     {\tt 2}                      &    {\tt nx} \& {\tt ny} \\
-     {\tt 3}                      &    {\tt nx}, {\tt ny} \& {\tt nz} \\
+     \texttt{1}                      &    \texttt{nx}       \\
+     \texttt{2}                      &    \texttt{nx} \& \texttt{ny} \\
+     \texttt{3}                      &    \texttt{nx}, \texttt{ny} \& \texttt{nz} \\
 \hline
 \end{tabular}
 \end{center}
 \end{small}
 The default number of dimensions are two (in which case do not replace
-{\tt [N]} by anything). 
+\texttt{[N]} by anything). 
 
 The ordering of array dimensions is different in C to Fortran, so for
 instance the Fortran array \myverb{ARRAY(NX,NY,NZ)} is equivalent to
@@ -3011,39 +3108,42 @@ importance since images are not of fixed sizes (so you're unlikely to
 hard code any array dimensions) and you're far more likely to use the
 data via a pointer to the first element. Since C arrays also always start
 at 0 (rather than 1 as is the default in Fortran) the index of an
-element say {\tt [y][x]} is
-{\tt nx}~$\times$~{\tt y}~$+$~{\tt x}. In 3-D this becomes 
-{\tt [z][y][x]} --- 
-{\tt nx}~$\times$~{\tt ny}~$\times$~{\tt z}~$+$~{\tt nx}~$\times$~{\tt y}~$+$~{\tt x}.
+element say \texttt{[y][x]} is
+\texttt{nx}~$\times$~\texttt{y}~$+$~\texttt{x}. In 3-D this becomes 
+\texttt{[z][y][x]} --- 
+\texttt{nx}~$\times$~\texttt{ny}~$\times$~\texttt{z}~$+$~\texttt{nx}~$\times$~\texttt{y}~$+$~\texttt{x}.
 
 \label{IMGCdatatypes}
-The data type of the image is specified by replacing the {\tt [X]} part
+The data type of the image is specified by replacing the \texttt{[X]} part
 of the name by one of the following character codes:
 \begin{small}
 \begin{center}
 \begin{tabular}{||l|l|l||}
 \hline
-Character code {\tt [X]} & C data type ({\tt TYPE}) &  Description \\
+Character code {\tt [X]} & C data type (\texttt{TYPE}) &  Description \\
 \hline
- {\tt F}       & {\tt float}          &   \\
- {\tt D}       & {\tt double}         &  \\
- {\tt I}       & {\tt int}            &  \\
- {\tt S}       & {\tt short}          &  \\
- {\tt US}      & {\tt unsigned short} &  \\
- {\tt B}       & {\tt signed char}    &  Signed byte      \\
- {\tt UB}      & {\tt unsigned char}  &  Unsigned byte    \\
+ \texttt{F}       & \texttt{float}          &   \\
+ \texttt{D}       & \texttt{double}         &  \\
+ \texttt{I}       & \texttt{int}            &  \\
+ \texttt{S}       & \texttt{short}          &  \\
+ \texttt{US}      & \texttt{unsigned short} &  \\
+ \texttt{B}       & \texttt{signed char}    &  Signed byte      \\
+ \texttt{UB}      & \texttt{unsigned char}  &  Unsigned byte    \\
 \hline
 \end{tabular}
 \end{center}
 \end{small}
-You will also need to replace {\tt TYPE} by the related data type.
-The default data type is {\tt float} (in which case do not replace
-{\tt [X]} by anything and set {\tt TYPE} to {\tt float}).
+You will also need to replace \texttt{TYPE} by the related data type.
+The default data type is \texttt{float} (in which case do not replace
+\texttt{[X]} by anything and set \texttt{TYPE} to \texttt{float}).
 
 \subsection{HDR C Functions}
 \begin{latexonly}
 {\small
 \begin{description}
+  \cnoteroutine{void}{hdrCopy}
+     {( char *param1, char *xname1, char *param2, char *xname2, int *status )}
+     {Copy header information from one image to another}
   \cnoteroutine{void}{hdrDelet}
      {(char *param, char *xname, char *item, int comp, int *status)}
      {Delete a header item}
@@ -3119,19 +3219,19 @@ The default data type is {\tt float} (in which case do not replace
 </PRE>
 \end{rawhtml}
 \label{HDRCdatatypes}
-Where the {\tt "[X]"} indicate the data type of the header items. 
-The possible values of {\tt [X]} are:
+Where the \texttt{"[X]"} indicate the data type of the header items. 
+The possible values of \texttt{[X]} are:
 \begin{small}
 \begin{center}
 \begin{tabular}{||l|l|l||}
 \hline
-Character code[X] & C data type ({\tt TYPE)} &  Description      \\
+Character code[X] & C data type (\texttt{TYPE)} &  Description      \\
 \hline
- {\tt C}          & {\tt char}               &  Character string \\
- {\tt D}          & {\tt double}             &  \\
- {\tt I}          & {\tt int}                &  \\
- {\tt L}          & {\tt int}                &  Boolean          \\
- {\tt F}          & {\tt float}              &  \\
+ \texttt{C}          & \texttt{char}               &  Character string \\
+ \texttt{D}          & \texttt{double}             &  \\
+ \texttt{I}          & \texttt{int}                &  \\
+ \texttt{L}          & \texttt{int}                &  Boolean          \\
+ \texttt{F}          & \texttt{float}              &  \\
 \hline
 \end{tabular}
 \end{center}
@@ -3378,13 +3478,13 @@ however, the bad data values themselves are now defined in the
 \hline
 Bad value macro  & C data type          \\
 \hline
- {\tt VAL\_\_BADF}   & {\tt float}          \\
- {\tt VAL\_\_BADD}   & {\tt double}         \\
- {\tt VAL\_\_BADI}   & {\tt int}            \\
- {\tt VAL\_\_BADS}   & {\tt short}          \\
- {\tt VAL\_\_BADUS}  & {\tt unsigned short} \\
- {\tt VAL\_\_BADB}   & {\tt signed char}    \\
- {\tt VAL\_\_BADUB}  & {\tt unsigned char}  \\
+ \texttt{VAL\_\_BADF}   & \texttt{float}          \\
+ \texttt{VAL\_\_BADD}   & \texttt{double}         \\
+ \texttt{VAL\_\_BADI}   & \texttt{int}            \\
+ \texttt{VAL\_\_BADS}   & \texttt{short}          \\
+ \texttt{VAL\_\_BADUS}  & \texttt{unsigned short} \\
+ \texttt{VAL\_\_BADB}   & \texttt{signed char}    \\
+ \texttt{VAL\_\_BADUB}  & \texttt{unsigned char}  \\
 \hline
 \end{tabular}
 \end{center}
@@ -3488,7 +3588,7 @@ shows how to access header items by index.
 \mynote
 \begin{enumnotes}
 % 1
-\item Note the extra arguments ({\tt 30} \& {\tt 80}) that pass the
+\item Note the extra arguments (\texttt{30} \& \texttt{80}) that pass the
       maximum length of the output strings.
 \end{enumnotes}
 
@@ -3496,9 +3596,9 @@ shows how to access header items by index.
 It is possible to read and write header items from/to many images in
 one call and some examples follow. Note that arrays of strings can
 only be passed using fixed string length. It is not possible to use
-arrays of pointers to {\tt char} forming a ragged array. When
+arrays of pointers to \texttt{char} forming a ragged array. When
 using a character array you should pass a pointer to the first element
-not the actual array (as the HDR routines expect to see {\tt char *}).
+not the actual array (as the HDR routines expect to see \texttt{char *}).
 
 This example shows how to read the same header item from two images
 at the same time.
@@ -3516,9 +3616,9 @@ at the same time.
 \mynote
 \begin{enumnotes}
 % 1
-\item The address to the first element of the {\tt RA} and {\tt DEC}
+\item The address to the first element of the \texttt{RA} and \texttt{DEC}
 arrays is passed. This could have been written as 
-{\tt \&RA[0][0]} and {\tt \&DEC[0][0]}.
+\texttt{\&RA[0][0]} and \texttt{\&DEC[0][0]}.
 \end{enumnotes}
 
 This example shows how to write values to the same header item of two images.
@@ -3564,8 +3664,14 @@ image data file for use when producing logfile information etc.
 The documentation has been updated to reinforce the fact that NDF
 identifiers obtained using \htmlref{IMG\_INDF}{IMG\_INDF} are not
 released by any IMG calls (you must do this for yourself using
-NDF\_ANNUL). A new routine for copying sources of header information
-(\htmlref{HDR\_COPY}{HDR\_COPY}) has been added.
+NDF\_ANNUL). 
+
+A new routine for copying sources of header information
+(\htmlref{HDR\_COPY}{HDR\_COPY}) has been added. 
+
+A bug in the FITS header writer that added NULL characters after the
+END card has been corrected. This should have only effected output
+FITS headers that contained some initially empty cards.
 
 \end{document}
 % $Id$

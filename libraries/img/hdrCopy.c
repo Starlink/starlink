@@ -3,7 +3,7 @@
  *     hdrCopy
  
  *  Purpose:
- *    Copies header information from one image to another.
+ *    Copy header information from one image to another.
  
  *  Language:
  *     ANSI C

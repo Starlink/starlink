@@ -4,7 +4,7 @@
 *    HDR_COPY
 
 *  Purpose:
-*    Copies header information from one image to another.
+*    Copy header information from one image to another.
 
 *  Language:
 *     Starlink Fortran 77
@@ -38,7 +38,7 @@
 *       will copied to the new image.
 *
 *     - This routine may be used to copy the same header source (from a
-*       single input image, to more than one image at a time by using
+*       single input image), to more than one image at a time by using
 *       multiple parameter names for PARAM2. Multiple parameter names are
 *       provided as a comma separated list (i.e. 'OUT1,OUT2,OUT3').
 
