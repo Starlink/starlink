@@ -97,15 +97,16 @@
 #  Attempt to make browser goto the required page. If this fails then the 
 #  browser has exited for some reason, so restart it.
             if { ! [info exists netscapepid] } { set netscapepid 1 }
-	    if { [catch {exec $CCDbrowser -remote openURL($url)}] } {
+	    if { [catch {exec $CCDbrowser -remote openURL($url)} mess] } {
 	       set netscapepid 0
 	    }
             if { $netscapepid == 0 } { 
-               set netscapepid [exec $CCDbrowser $url &]
-               Message "Starting up $CCDbrowser"
+               if { [catch { set netscapepid [exec $CCDbrowser $url &]} mess] } {
+                  Message "Failed to start $CCDbrowser - $mess"
+               } {               
+                  Message "Starting up $CCDbrowser"
+               }
 	    }
 	 }
       }
-
-#  End of procedure.
    }

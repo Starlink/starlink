@@ -514,7 +514,7 @@
 
 # Add menu items to the Effects menu.
    foreach effect [list Align Fill Filter Log Maths Negate Smooth Threshold] {
-      $EFFECTSMENU add command -label $effect -command "Effects $effect"
+      $EFFECTSMENU add command -label $effect -command "Effects \$IMAGE_DISP $effect 0"
    }
    $EFFECTSMENU add separator
    $EFFECTSMENU add command -label "Show Effects" -command {Effects Show}
@@ -657,6 +657,9 @@
 # Ensure we have a standard NDF section expressed as ranges of pixel indices.
       set stdsec $image
       append stdsec [PixIndSection $imsec]
+
+# Save the standard section for the first image.
+      if { ![info exists IMSEC_FIRST] } { set IMSEC_FIRST $stdsec }
 
 # Arrange for the first image in the supplied list to be displayed first.
       if { ![info exists IMSEC_REQ] } { set IMSEC_REQ $stdsec }
@@ -893,10 +896,7 @@
                   } {
                      ${BLACK}.ent configure -state normal
                      ${WHITE}.ent configure -state normal
-                     if { \$old_image != \$IMAGE_DISP ||
-                          \$old_section != \$SECTION_DISP } {
-                        UpdateDisplay gwm
-                     }
+                     UpdateDisplay gwm
                   }"]
 
    SetHelp $LOCK ".  Check to use the current data limits to display subsequent images. This causes the percentiles entered in the \"% black\" and \"% not white\" entry boxes to be ignored." POLREG_LOCK_SCALING
