@@ -101,6 +101,7 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	ALOC			! ASTERIX locator
       CHARACTER*(DAT__SZLOC)	ARLOC			! AST_REF object
+      CHARACTER*(DAT__SZLOC)	RLOC			! Referenced HDS object
       CHARACTER*(DAT__SZNAM)	ROBJ			! Reference obj name
       CHARACTER*132		FILE,PATH		! ADI path info
       CHARACTER*20		TYPE			! ADI type of arg(3)
