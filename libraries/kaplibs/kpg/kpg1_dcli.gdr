@@ -24,7 +24,8 @@
 
 *  Arguments:
 *     NDIM = INTEGER (Given)
-*        The number of contiguous axes.
+*        The number of contiguous axes.  If it is negative, it indicates
+*        that not all the dimensions need be significant.
 *     NDF = INTEGER (Given)
 *        The identifier of the NDF whose axes are to provide the data
 *        co-ordinates.  It must have at least NDIM dimensions, though
@@ -70,6 +71,10 @@
 *        Converted to generic.
 *     1992 March 31 (MJC):
 *        Checked for significant dimensions.
+*     1993 January 7 (MJC):
+*        Allowed axes to be insignificant by passing a negative NDIM,
+*        calling KPG1_SDIMP instead of KPG1_SGDIM, and setting the scale
+*        and offset.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -92,10 +97,10 @@
 
 *  Arguments Returned:
       <TYPE>
-     :  DALBND( NDIM ),
-     :  DAUBND( NDIM ),
-     :  SCALE( NDIM ),
-     :  OFFSET( NDIM )
+     :  DALBND( * ),
+     :  DAUBND( * ),
+     :  SCALE( * ),
+     :  OFFSET( * )
 
       LOGICAL
      :  LINEAR
@@ -134,7 +139,15 @@
 *  bound is needed to compute the linear offset between world and data
 *  co-ordinates.  The scale only needs the number of pixels which is
 *  derived by mapping the axis.
-      CALL KPG1_SGDIM( NDF, NDIM, SGDIM, STATUS )
+
+*  Some applications may not need all the dimensions to be significant.
+*  In this case we do not want an error, so call the routine that pads
+*  out the list of "significant" dimensions with dummy ones.
+      IF ( NDIM .LT. 0 ) THEN
+         CALL KPG1_SDIMP( NDF, -NDIM, SGDIM, STATUS )
+      ELSE
+         CALL KPG1_SGDIM( NDF, NDIM, SGDIM, STATUS )
+      END IF
       CALL NDF_BOUND( NDF, NDF__MXDIM, LBND, UBND, NDIMS, STATUS )
 
 *  Assume that the data co-ordinates are linear and all have the
@@ -149,49 +162,64 @@
       END IF
 
 *  Loop for each axis dimension.
-      DO  I = 1, NDIM
+      DO  I = 1, ABS( NDIM )
 
 *  Map the axis centres for the dimension.
          CALL NDF_AMAP( NDF, 'Centre', SGDIM( I ), ATYPE, 'READ',
      :                  AXPNTR, AEL, STATUS )
 
+*  Only evaluate the transformation when there are more than one element
+*  along the axis.
+         IF ( AEL .GT. 1 ) THEN
+
 *  Find the range of the axis co-ordinates and whether or not the axis
 *  is linear.
-         CALL KPG1_AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
-     :                      DAUBND( I ), AXLIN( I ), STATUS )
+            CALL KPG1_AXLI<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
+     :                         DAUBND( I ), AXLIN( I ), STATUS )
 
 *  Let the application complete without an error if the world
 *  co-ordinates are non-linear, but issue a warning.
-         IF ( .NOT. AXLIN( I ) ) THEN
-            CALL MSG_SETI( 'IAXIS', I )
-            CALL MSG_OUT( 'NONLINEAR',
-     :        'Axis ^IAXIS is non-linear or reversed.  Data '/
-     :        /'co-ordinates along any plot axis and in the '/
-     :        /'database will be wrong.', STATUS )
+            IF ( .NOT. AXLIN( I ) ) THEN
+               CALL MSG_SETI( 'IAXIS', I )
+               CALL MSG_OUT( 'NONLINEAR',
+     :           'Axis ^IAXIS is non-linear or reversed.  Data '/
+     :           /'co-ordinates along any plot axis and in the '/
+     :           /'database will be wrong.', STATUS )
 
 *  Cannot store a non-linear transformation.
-            LINEAR = .FALSE.
-         ELSE
+               LINEAR = .FALSE.
+            ELSE
 
 *  Determine the scale and offset of the transformation between world
 *  and data co-ordinates.
-            SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) /
-     :                   NUM_ITO<T>( AEL - 1 )
-            OFFSET( I ) = DALBND( I ) - SCALE( I ) *
-     :                    ( NUM_ITO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
+               SCALE( I ) = ( DAUBND( I ) - DALBND( I ) ) /
+     :                      NUM_ITO<T>( AEL - 1 )
+               OFFSET( I ) = DALBND( I ) - SCALE( I ) *
+     :                       ( NUM_ITO<T>( LBND( SGDIM( I ) ) ) - 0.5 )
 
 *  Correct the lower and upper bounds data co-ordinates.  Current
 *  values are for the array-element centres, whereas the co-ordinates
 *  at the sides are required.  Thus apply half-pixel corrections.
-            DAUBND( I ) = DAUBND( I ) + 0.5 * SCALE( I )
-            DALBND( I ) = DALBND( I ) - 0.5 * SCALE( I )
+               DAUBND( I ) = DAUBND( I ) + 0.5 * SCALE( I )
+               DALBND( I ) = DALBND( I ) - 0.5 * SCALE( I )
       
 *  Determine whether the two co-ordinate systems are identical.
-            IDENTY = IDENTY .AND. (
+               IDENTY = IDENTY .AND. (
      :               ABS( SCALE( I ) - 1<CONST> ) .LT. VAL__EPS<T> .AND.
      :               ABS( OFFSET( I ) - 0<CONST> ) .LT. VAL__EPS<T> )
 
 *  End of check for linear axis.
+            END IF
+
+*  Given just one pixel, the scale is undefined.  The offset is just
+*  the data-co-ordinate value of the single axis position, obtained by
+*  the bounds-finding routine.
+         ELSE
+            CALL KPG1_AXBN<T>( AEL, %VAL( AXPNTR( 1 ) ), DALBND( I ),
+     :                         DAUBND( I ), STATUS )
+            SCALE( I ) = 0<CONST>
+            OFFSET( I ) = DALBND( I )
+            IDENTY = .FALSE.
          END IF
 
 *  Unmap the axis co-ordinates.
