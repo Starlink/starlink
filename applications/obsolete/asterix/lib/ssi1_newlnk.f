@@ -108,9 +108,9 @@
 
 *  Change the type
       IF ( ISSET ) THEN
-        CALL DAT_RETYP( LOC, 'SSDS', STATUS )
-      ELSE
         CALL DAT_RETYP( LOC, 'SSDS_SET', STATUS )
+      ELSE
+        CALL DAT_RETYP( LOC, 'SSDS', STATUS )
       END IF
 
 *  Make the file link

@@ -102,6 +102,7 @@
       CHARACTER*20             STIME                   ! Formatted time string
 
       INTEGER                  NTICKS                  ! System time
+      INTEGER			SSID
 *-
 
 *    Check status
