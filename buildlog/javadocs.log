@@ -1574,9 +1574,9 @@ javadocs:
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
   [javadoc] Building index for all classes...
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:88: warning - Tag @link: reference not found: uk.ac.starlink.votable.FitsPlusTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:88: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
-  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:88: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.votable.FitsPlusTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableBuilder
+  [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableFactory.java:90: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableBuilder
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:45: warning - Tag @link: reference not found: uk.ac.starlink.votable.FitsPlusTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:45: warning - Tag @link: reference not found: uk.ac.starlink.fits.FitsTableWriter
   [javadoc] /apps/cvsbuild/java/source/table/src/main/uk/ac/starlink/table/StarTableOutput.java:45: warning - Tag @link: reference not found: uk.ac.starlink.votable.VOTableWriter
@@ -2865,4 +2865,4 @@ javadocs:
   [javadoc] 208 warnings
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 11 seconds
+Total time: 3 minutes 10 seconds
