@@ -293,7 +293,9 @@ f     using AST_GRID
 *        to "if *all* subsections are very short then none are divided.
 *        This was implemented by changing dl2_min to dl2_max, and adding
 *        a check for very short segments (which are then not sub-divided). 
-
+*     16-AUG-2001 (DSB):
+*        Remove the check for very short segments introduced above, as it 
+*        caused south pole tan projection to include some spurious lines.
 *class--
 */
 
@@ -6267,11 +6269,6 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
 
    if( !(*segm) ) *seg0 = 0;
 
-/* Very short segments should not be sub-divided. */
-   for( i = 0; i < CRV_NSEG; i++ ){
-      if( !seg_ok[i] && dl2[i] < limit2 ) seg_ok[i] = 1;
-   }
-
 /* ======================================================================
    The next section of this function draws the curve. Each segment is drawn
    as a straight line if the corresponding flag in "seg_ok" is set.
@@ -6322,7 +6319,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
                dd[ el++ ] = d0;
                d0 += delta;
             }
-          }
+         }
       }
 
 /* If any segments needed subdividing, get room to store the graphics
@@ -6360,7 +6357,7 @@ static void Crv( AstPlot *this, double *d, double *x, double *y,
    Increment pointers into the "xx", "yy" and "dd" arrays so that they
    point to the start of the subsegment information for the next segment
    to be subdivided. */
-         } else if( subdivide ){             
+         } else if( subdivide ) {
             Crv( this, pd, px, py, method, class );
             pd += CRV_NSEG + 1;
             px += CRV_NSEG + 1;
