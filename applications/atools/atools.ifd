@@ -716,6 +716,11 @@ iraf! {
           }
 
       }
+
+   }
+
+   command show {
+      obey {$ATOOLS_DIR/show.tcl}      
    }
 
    icl {defhelp atools $ATOOLS_HELP 0}

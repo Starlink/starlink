@@ -18,7 +18,7 @@ frame.f frame.ifl getframe.f getframe.ifl getmapping.ifl getmapping.f \
 kpg1_gtgrp.f unitmap.f unitmap.ifl atlhelp.f atlhelp.ifl frameset.f \
 frameset.ifl skyframe.f skyframe.ifl permmap.f permmap.ifl \
 removeframe.ifl removeframe.f remapframe.ifl remapframe.f matrixmap.f \
-matrixmap.ifl convert.f convert.ifl
+matrixmap.ifl convert.f convert.ifl show.tcl
 
 # The contents of the atools_iraf.tar file:
 ATOOLS_IRAF = doc addframe.par astclear.par astget.par astset.par \

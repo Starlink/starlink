@@ -410,7 +410,7 @@ SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS =
+PUBLIC_SCRIPTS = show.tcl
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases 

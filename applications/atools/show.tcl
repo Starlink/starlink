@@ -1,13 +1,13 @@
 #!/usr/bin/wish
 #+
 #  Name:
-#     tkast
+#     show
 #
 #  Purpose:
 #     Browse an AST Object. 
 #
 #  Invocation:
-#     tkast <file>
+#     show <file>
 #
 #  Command Line Arguments:
 #     file - A text file containing descriptions of one or more AST Objects
@@ -139,7 +139,7 @@ proc MakeData {top} {
 
             set value [MakeData 0]
             if { $value == $ERROR } {
-               set mess "tkast: Error reading "
+               set mess "show: Error reading "
 
                if { $type != "" } {
                   if { [regexp -nocase {^A|^E|^I|^O|^U} $type] } {
@@ -356,7 +356,7 @@ proc SplitLine {line namen typen commn valuen reqn } {
 
 # Abort if any other items are found.
    } {
-      puts "tkast: The following line of file \"FILE\" has an unrecognised format:\n$oline"
+      puts "show: The following line of file \"FILE\" has an unrecognised format:\n$oline"
       close $FD
       exit 1
    }
@@ -404,7 +404,7 @@ proc ShowObject {w object parent} {
 # Ensure the window exists.
    if { $w != "." } { 
       catch {destroy $w}
-      toplevel $w -class TkAst
+      toplevel $w -class Show
       wm transient $w [winfo toplevel [winfo parent $w]]
    }
 
@@ -787,8 +787,8 @@ proc ShowComp {comp c1 c2 c3 path count} {
 # it.
    if { ![info exists FILE] } {
       if { $argc != 1 } {
-         puts "tkast: No input file supplied."
-         puts "tkast: usage - \"tkast <file>\""   
+         puts "show: No input file supplied."
+         puts "show: usage - \"show <file>\""   
          exit 1
       } {
          set FILE [lindex $argv 0]
@@ -796,10 +796,10 @@ proc ShowComp {comp c1 c2 c3 path count} {
    }
 
    if { $FILE == "" } {
-      puts "tkast: Blank input file supplied."
+      puts "show: Blank input file supplied."
       exit 1
    } elseif { ![file readable $FILE] } {
-      puts "tkast: Cannot read input file \"$FILE\"."
+      puts "show: Cannot read input file \"$FILE\"."
       exit 1
    } {
       set FD [open $FILE]
@@ -811,7 +811,7 @@ proc ShowComp {comp c1 c2 c3 path count} {
          exit 1
 
       } elseif { [llength $data] == 0 } {
-         puts "tkast: Input file \"$FILE\" does not contain any AST data."
+         puts "show: Input file \"$FILE\" does not contain any AST data."
          exit 1
       } {
          set AST_DATA [list {} {} {Index of supplied Objects} $data 1]
