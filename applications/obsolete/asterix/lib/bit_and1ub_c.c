@@ -57,11 +57,8 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
 *  References:
-*     bit Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bit.html
+*     BIT Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/bit.html
 
 *  Keywords:
 *     package:bit, usage:public
