@@ -825,6 +825,16 @@ give the commands
 is not distributed with this package and not present by default on all
 project machines).
 
+<p>There are some issues involved in creating an <code/export_run>
+distribution.  Part of the configuration of <code/dvi2bitmap> involves
+establishing the location of font-building scripts and TeX
+configuration files.  This means that <code/export_run> distributions
+must be configured at <em/installation> time, rather than at build
+time; that probably requires either configuration files or lots of
+environment variables, and is almost certainly a bit of a mess.  This
+hasn't been properly confronted, yet, and I do <em/not> recommend
+<code/export_run> distributions at present.
+
 <subsect id=install.nonstarlink export>General installation and configuration
 <update versionid="upd1">
   Added instructions on configuring in support for the kpathsea
