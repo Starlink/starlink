@@ -1,0 +1,46 @@
+<HEAD>
+<TITLE> Changing System Defaults</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node29.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node27.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Changing System Defaults</H1>
+<P>
+On some systems, certain defaults may be changed <em> prior</em> to
+starting the software. Some common examples are:
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT> % setenv SHELL /bin/csh  
+<DD> - Invokes csh via ICL `sh' command 
+<DT> % setenv TERM vt100
+<DD> - Required by DEC-Alphas? <BR> 
+<DT> % setenv LPDEST hp3d 
+<DD> - Where `hp3d' is a PostScript printer <BR> 
+<DT> % setenv CGS4_MASKS  /scratch/pnd/19940811
+<DD> - User's bad pixel masks
+</DL>
+</BLOCKQUOTE>
+<P>
+The last option allows user defined bad pixel masks <em> e.g.</em> 
+when reducing echelle data. If the user requires system defined bad pixel 
+masks as well these must be manually copied to the new directory before the 
+software is invoked. For example, to use fpa46_short and one's own masks 
+enter:
+<P>
+<blockquote> % setenv   CGS4_MASKS   /scratch/pnd/19940811/masks <BR> 
+ % cp -p   $CGS4DR_ROOT/ndf/fpa46_short.sdf   $cgs4_masks/fpa46_short.sdf <BR> 
+ % cgs4dr   /scratch/pnd/19940811   940811   ndf 
+</blockquote>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,173 @@
+#!/bin/csh -f
+
+#+
+# file:        CGS4DR_ROOT/cgs4dr
+# type:        C-shell script
+# author:      Phil Daly
+# description: Invokes the Portable-CGS4DR command line software
+# history:
+#   06-mar-95: original version (pnd@jach.hawaii.edu)
+# endhistory
+# parameters: $1 is a directory /$HOME/
+#             $2 is a UT-date   /UT=today/
+#             $3 is NDF or DST  /NDF/
+#-
+
+# If CGS4DR_ROOT is not set, abort
+if ( ${?CGS4DR_ROOT} == 0 ) then
+  setenv CGS4DR_ROOT INSTALL_BIN
+endif
+
+# Set some default values
+set defdir = "${HOME}"
+set defutdate = "`date -u +%y%m%d`"
+set defformat = "NDF"
+set host = "`uname -n`"
+
+# If not arguments supplied, get them all
+if ( ${#argv} == 0 ) then
+  # Get data directory
+  echo -n "Path to data directory?  <${defdir}> > "
+  set datadir = $<
+  if ( "${datadir}" == "" ) set datadir = "${defdir}"
+  # Get the UT date
+  echo -n "UT date?  <${defutdate}> > "
+  set utdate = $<
+  if ( "${utdate}" == "" ) set utdate = "${defutdate}"
+  # Get the format
+  echo -n "Format of data?  <NDF> > "
+  set format = $<
+  if ( "${format}" == "" ) set format = "${defformat}"
+
+else if ( ${#argv} == 1 ) then
+  # Get data directory
+  set datadir = "${argv[1]}"
+  # Get the UT date
+  echo -n "UT date?  /${defutdate}/ > "
+  set utdate = $<
+  if ( "${utdate}" == "" ) set utdate = "${defutdate}"
+  # Get the format
+  echo -n "Format of data?  /NDF/ > "
+  set format = $<
+  if ( "${format}" == "" ) set format = "${defformat}"
+
+else if ( ${#argv} == 2 ) then
+  # Get data directory
+  set datadir = "${argv[1]}"
+  # Get the UT date
+  set utdate = "${argv[2]}"
+  # Get the format
+  echo -n "Format of data?  /NDF/ > "
+  set format = $<
+  if ( "${format}" == "" ) set format = "${defformat}"
+
+else if ( ${#argv} == 3 ) then
+  # Get the data directory
+  set datadir = "${argv[1]}"
+  # Get the UT date
+  set utdate = "${argv[2]}"
+  # Get the format
+  set format = "${argv[3]}"
+endif
+
+# Check the data directory is readable
+if ( ! -r "${datadir}" ) then
+  echo "${0}-f-norread, ${datadir} is not readable from ${host}\!"
+  exit 1
+endif
+
+# Check the UT date is of the form YYMMDD or YYYYMMDD
+if ! ( "${utdate}" =~ [0-9][0-9][0-9][0-9][0-9][0-9] ) then
+  if ! ( "${utdate}" =~ [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ) then
+    echo "${0}-f-invutdate, invalid UT date\!"
+    exit 1
+  endif
+endif
+
+# Check the format is NDF or DST
+set format = "`echo ${format} | tr '[a-z]' '[A-Z]'`"
+if ! ( "${format}" =~ [Nn][Dd][Ff] || "${format}" =~ [Dd][Ss][Tt] ) then
+  echo "${0}-f-invfmt, invalid format\!"
+  exit 1
+endif
+
+# Check directories exist
+if ( ! -e ${HOME}/cgs4dr_configs ) mkdir ${HOME}/cgs4dr_configs
+if ( ! -e ${HOME}/adam ) mkdir ${HOME}/adam
+
+# set some CGS4 environmental variables
+setenv PID `echo $$ | awk '{for (i=length($0);i>=1;i--) printf substr($0,i,1)}'`
+setenv CGS4_CT            ${CGS4DR_ROOT}/ndf
+setenv CGS4_TEMPLATES     ${CGS4DR_ROOT}/ndf
+setenv CGS4_NDF_TEMPLATES ${CGS4DR_ROOT}/ndf
+setenv CGS4_DST_TEMPLATES ${CGS4DR_ROOT}/dst
+setenv CGS4_ARLINES       ${CGS4DR_ROOT}
+setenv CGS4_DOCS          ${CGS4DR_ROOT}/Docs
+setenv CGS4_EXE           ${CGS4DR_ROOT}
+setenv CGS4_ICL           ${CGS4DR_ROOT}
+if ( ${?CGS4_MASKS} == 0 ) setenv CGS4_MASKS ${CGS4DR_ROOT}/ndf
+
+setenv CGS4_CONFIG        ${HOME}/cgs4dr_configs
+setenv CGS4_HOME          ${HOME}
+setenv CGS4_ENG           ${HOME}
+setenv CGS4_INDEX         ${datadir}
+setenv CGS4_DATA          ${datadir}
+setenv CGS4_DATE          ${utdate}
+setenv CGS4_FORMAT        ${format}
+setenv FIGARO_FORMATS     ${format}
+
+# Set some P4 environmental variables
+setenv P4_ROOT   ${CGS4DR_ROOT}
+setenv P4_EXE    ${P4_ROOT}
+setenv P4_ICL    ${P4_ROOT}
+setenv P4_CT     ${P4_ROOT}/ndf
+setenv P4_HOME   ${HOME}
+setenv P4_CONFIG ${HOME}/cgs4dr_configs
+setenv P4_HC     "`pwd`"
+setenv P4_DATE   ${utdate}
+setenv P4_DATA   ${datadir}
+
+# Do plot4 startuo
+if ( ! -e ${P4_CONFIG}/default.p4 ) then
+  echo "Creating a default PLOT4 startup file" 
+  cp ${P4_ROOT}/default.p4 ${P4_CONFIG}/default.p4
+endif
+
+# Set some QMAN environmental variables
+setenv QMAN_ROOT   ${CGS4DR_ROOT}
+setenv QMAN_EXE    ${QMAN_ROOT}
+setenv QMAN_ICL    ${QMAN_ROOT}
+setenv QMAN_CONFIG ${HOME}/cgs4dr_configs
+setenv QMAN_DATE   ${utdate}
+setenv QMAN_PASS   "${PID}pass"
+setenv QMAN_LOCK   "${PID}lock"
+
+# Do qman startup
+if ( ! -e ${QMAN_CONFIG}/default.qman ) then
+  echo "Creating a default QMAN startup file"
+  cp ${QMAN_ROOT}/default.qman ${QMAN_CONFIG}/default.qman
+endif 
+
+# Do cred4 startup
+if ( ! -e ${CGS4_CONFIG}/default.cred4 ) then
+  echo "Creating a default CRED4 startup file"
+  cp ${CGS4DR_ROOT}/default.cred4 ${CGS4_CONFIG}/default.cred4
+endif
+
+# Set the CGS4 data directories
+setenv ODIR ${datadir}/odir
+setenv IDIR ${datadir}/idir
+setenv RODIR ${datadir}/rodir
+setenv RIDIR ${datadir}/ridir
+setenv RGDIR ${datadir}/rgdir
+
+# Print out a welcome message
+echo ""
+echo "      Welcome to Portable-CGS4DR VPKG_VERS"
+echo ""
+
+# Start icl and invoke cgs4dr
+icl ${CGS4DR_ROOT}/cgs4dr.icl
+echo ""
+echo "To sure kill Portable-CGS4DR, use % cgs4dr_kill"
+

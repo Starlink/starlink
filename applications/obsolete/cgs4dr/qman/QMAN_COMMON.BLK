@@ -1,0 +1,61 @@
+*+  QMAN_COMMON.BLK - Common block file for QMAN I-task
+*    Authors :
+*     P. N. Daly (PND@JACH.HAWAII.EDU)
+*    History :
+*     18-May-1994: Original version                                  (PND)
+*    endhistory
+*-
+
+*    True if verbose mode enabled
+      LOGICAL VERBOSE
+*    True if task has been initialised
+      LOGICAL INITIALISED
+*    True if task is lockword secure
+      LOGICAL DB_LOCKED
+*    True if task is password secure
+      LOGICAL SECURE
+*    True if record was read OK
+      LOGICAL READREC_OK
+
+*    String to say if task has been initialised
+      CHARACTER*( MSG_VAL_LEN ) INIT_STRING
+*    String to say who initialised the task
+      CHARACTER*( MSG_VAL_LEN ) INIT_USER
+*    A user-defined password
+      CHARACTER*( MSG_VAL_LEN ) PASSWORD
+*    A user-defined lockword
+      CHARACTER*( MSG_VAL_LEN ) LOCKWORD
+*    String used for records
+      CHARACTER*( MSG_VAL_LEN ) STRING
+*    The array of queue entries
+      CHARACTER*( MSG_VAL_LEN ) CHARQ( MAX_QENTRIES )
+
+*    The timestamp
+      DOUBLE PRECISION TIMESTAMP
+*    The array of queue time-stamps
+      DOUBLE PRECISION DATEQ( MAX_QENTRIES )
+
+*    The pointer to the minimum record in use
+      INTEGER MINREC_PTR
+*    The pointer to the maximum record in use
+      INTEGER MAXREC_PTR
+*    The pointer to the record being read
+      INTEGER READREC_PTR
+*    The fraction of a second used for time-stamping
+      INTEGER FRACTION
+*    The number of used records
+      INTEGER USED_RECORDS
+
+*    Declare the common blocks for each data type and save them
+      COMMON  /QMAN0L/ VERBOSE, INITIALISED, DB_LOCKED, 
+     :                 SECURE, READREC_OK
+      COMMON  /QMAN0C/ INIT_STRING, INIT_USER, PASSWORD, 
+     :                 LOCKWORD, STRING, CHARQ
+      COMMON  /QMAN0D/ TIMESTAMP, DATEQ
+      COMMON  /QMAN0I/ MINREC_PTR, MAXREC_PTR, READREC_PTR, 
+     :                 FRACTION, USED_RECORDS
+
+      SAVE    /QMAN0L/
+      SAVE    /QMAN0C/
+      SAVE    /QMAN0D/
+      SAVE    /QMAN0I/

@@ -1,0 +1,1341 @@
+#+
+INTERFACE CRED4
+# Description :
+#   This is the interface file for the CRED4 data reduction CD task
+#   for CGS4.
+# Authors :
+#   J Lightfoot (ROE::JFL)
+#   S M Beard   (ROE::SMB)
+#   P N Daly    (JACH::PND)
+# History :
+#   September 1989 : Original version                     (JFL)
+#   11-Oct-1989: Prologue added                           (SMB)
+#   26-Oct-1989: Minimal HELP entries added. NEEDS lists 
+#                added to actions                         (SMB)
+#   10-Jan-1990: String size is no longer 17 characters.  (SMB)
+#   10-Jan-1990: LIST_PENDING action included.            (SMB)
+#   11-Jan-1990: Several PROCEED parameters used.         (SMB)
+#   18-Jan-1990: Illegal "POSITION 1" removed.            (SMB)
+#   26-Jan-1990: Original VPATH's of PROMPT,CURRENT,DEFAULT
+#                were not sensible. Replaced.             (SMB)
+#   30-Jan-1990: Range of display ports changed from 0-4
+#                to 0-6.                                  (SMB)
+#   31-Jan-1990: Modified to accomodate changes to P4
+#                SLICE parameters.                        (SMB)
+#    1-Feb-1990: Proper HELP entries added. Documentation
+#                improved.                                (SMB)
+#    8-Feb-1990: PROCEED_FF parameter moved to RED4.
+#                DISP_NBINS parameter added, so that P4
+#                HISTOGRAM sction can be used.            (SMB)
+#   20-Feb-1990: MASK parameter added.                    (SMB)
+#   20-Feb-1990: Null mask changed from ' ' to '#', as
+#                it was difficult to process ' ' with an
+#                ICL variable.                            (SMB)
+#    4-Apr-1990: SPRAY changed to SURFACE.                (SMB)
+#    4-May-1990: FF_NORM and ORDER parameters added.      (SMB)
+#   31-May-1990: AUTOFIT, AFIT_ROW1, AFIT_ROW2,
+#                AFIT_XSTART and AFIT_XEND parameters
+#                included.                                (SMB)
+#   31-May-1990: PROCEED_ANALYSE parameter included.      (SMB)
+#    5-Jun-1990: Phase 1 of major changes: Rewritten to
+#                allow parameters to be obtained from NBS.(SMB)
+#   14-Jun-1990: DEBUG action added.                      (SMB)
+#   18-Jun-1990: Global changes to action names, so the
+#                names describe what the actions actually
+#                do and the names are more consistent.    (SMB)
+#   18-Jun-1990: QFILE parameter added.                   (SMB)
+#   19-Jun-1990: Phase 2 of major changes: Display
+#                parameters separated. SET_SEQUENCE,
+#                SET_xxxDISPLAY actions removed. INIT_NB
+#                action added.                            (SMB)
+#   20-Jun-1990: SUBTRACT_BIAS, SUBTRACT_DARK, NORMALISE_FF,
+#                SUBTRACT_SKY, TO_WAVELENGTH and
+#                DIVIDE_BY_STD parameters added. Also
+#                parameters grouped together where they can
+#                be found more easily.                    (SMB)
+#   20-Jun-1990: Ty[ping mistak76s fixed.                 (SMB)
+#   21-Jun-1990: More ty[ping mistak76s fixed.
+#                NOTICEBOARD, QFILE and MASK parameters
+#                removed from NEEDS list of actions
+#                because for some reason I could not stop
+#                the system prompting for them, even with
+#                a VPATH of 'DEFAULT'.                    (SMB)
+#   21-Jun-1990: Noticeboard actions restructured.        (SMB)
+#   22-Jun-1990: Bug fix. SLICE_START and SLICE_END 
+#                parameters are REAL.                     (SMB)
+#   22-Jun-1990: LIST_NB action added.                    (SMB)
+#   22-Jun-1990: NBFILE parameter included.               (SMB)
+#   25-Jun-1990: ADD_QENTRY, DELETE_QENTRY and LIST_QUEUE
+#                actions removed, together with STRING
+#                parameter.                               (SMB)
+#   27-Jun-1990: UPDATE action added. VPATH for some
+#                display parameters changed from 'PROMPT'
+#                to 'CURRENT,PROMPT'.                     (SMB)
+#   28-Jun-1990: PAUSE_ON_ERROR parameter added.          (SMB)
+#   18-Jul-1990: Parameters added to allow a reduced
+#                observation to be displayed up to 4 times
+#                using any desired method.                (SMB)
+#   18-Jul-1990: SUBTRACT_BIAS parameter removed. It will
+#                never be used.                           (SMB)
+#   25-Jul-1990: Mistakes in default parameter values
+#                fixed.                                   (SMB)
+#   10-Sep-1990: Modified to save and restore parameters
+#                from a configuration file, rather than
+#                relying on NBS, which was inappropriate. (SMB)
+#    1-Oct-1990: AFIT_NROWS parameter added, to allow more
+#                than one row to be averaged for line
+#                fitting.                                 (SMB)
+#    2-Oct-1990: SUBTRACT_SKY parameter removed and replaced
+#                with ADD_OBS.                            (SMB)
+#    5-Oct-1990: Data reduction queue moved into ODIR.    (SMB)
+#   23-Oct-1990: Temporary PAUSE parameter added.         (SMB)
+#   25-Oct-1990: GROUP display parameters added.          (SMB)
+#   29-Oct-1990: Sensible defaults given for GROUP display
+#                parameters.                              (SMB)
+#    1-Nov-1990: DISP_FREQUENCY parameter added.          (SMB)
+#    5-Nov-1990: VARIANCE_WT and SKY_WT parameters added. (SMB)
+#   13-Nov-1990: ISTART, IEND, JSTART, JEND display parameters
+#                removed, as the P4 task has now been made
+#                more consistent.                         (SMB)
+#   19-Nov-1990: LAMBDA_METHOD parameter added, to control
+#                the wavelength calibration.              (SMB)
+#   22-Nov-1990: SET_VERBOSE action added.                (SMB)
+#   29-Nov-1990: LINCOEFFS parameter added.               (SMB)
+#   31-Dec-1990: PROCEED_STD parameter added. "Flux
+#                standard" referred to as "Standard
+#                source".                                 (SMB)
+#    4-Jan-1991: PRINTER parameter added.                 (SMB)
+#    2-Feb-1991: ADD_IN_PAIRS parameter added.            (UKIRT::SMB)
+#    9-Feb-1991: QFILE changed to 'DEFAULT' from
+#                'CURRENT,DEFAULT' , to ensure the queue
+#                name is always reset.                    (UKIRT::SMB)
+#   21-Feb-1991: QFILE changed back temporarily. The above
+#                change makes the task difficult to debug.(UKIRT::SMB)
+#   21-Feb-1991: QFILE put back to 'DEFAULT'.             (UKIRT::SMB)
+#   26-Jun-1991: Add Point_source_options parameters      (UKIRT::PND)
+#   31-Jul-1991: BOXSIZE parameter added.                 (SMB)
+#   16-Aug-1991: Minor cosmetic change to PF_POLYFIT      (JACH::PND)
+#   14-Apr-1992: Add BIAS_MODE, DARK_MODE, FLAT_MODE,
+#                CALIB_MODE, STANDARD_MODE, SPECIFIED_BIAS,
+#                SPECIFIED_DARK, SPECIFIED_FLAT,
+#                SPECIFIED_CALIB and SPECIFIED_STD
+#                parameters, for DRIMP/5.1 and DRIMP/5.2. (SMB)
+#   15-Apr-1992: INIT action added, to take the place of
+#                the DEVINIT routine used before ADAM V2. (SMB)
+#   16-Apr-1992: Change DEFAULT for EXTRACT_SPC and
+#                DISPLAY_SPC from 'YES' to 'NO'.          (SMB)
+#   21-Apr-1992: Typing mistake fixed.                    (SMB)
+#   22-Jun-1992: Change location of CGS4_PENDING.DAT      (PND)
+#   17-Jul-1992: Add SUBTRACT_BIAS and ARCHIVE_OBS        (PND)
+#   22-JAN-1993: Change display min/max from 
+#                CURRENT,PROMPT to CURRENT,DEFAULT        (PND)
+#   11-Feb-1993: Add NBS option                           (PND)
+#   10-Dec-1993: Add task aliases                         (PND)
+#    6-Apr-1994: Add Figaro/Ukirtfig_aliases              (PND)
+#   28-Jul-1994: Add QMAN_ALIAS                           (PND)
+#   29-Jul-1994: Major changes for Unix port              (PND)
+# endhistory
+#-
+
+PROGRAM CRED4
+
+# --- task aliases ---
+
+PARAMETER QMAN_ALIAS
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'Name of the QMAN task'
+  HELP 'Defines the name of the QMAN task'
+  DEFAULT 'QMAN'
+ENDPARAMETER
+
+PARAMETER QMAN_PWRD
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'QMAN password'
+  HELP 'Required password for QMAN task'
+  DEFAULT ' '
+ENDPARAMETER
+
+PARAMETER QMAN_LWRD
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'QMAN lockword'
+  HELP 'Required lockword for QMAN task'
+  DEFAULT ' '
+ENDPARAMETER
+
+PARAMETER RED4_ALIAS
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'Name of the RED4 task'
+  HELP 'Defines the name of the RED4 task'
+  DEFAULT 'RED4'
+ENDPARAMETER
+
+PARAMETER P4_ALIAS
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'Name of the P4 task'
+  HELP 'Defines the name of the P4 task'
+  DEFAULT 'P4'
+ENDPARAMETER
+
+PARAMETER FIGARO_ALIAS
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'Name of the FIGARO task'
+  HELP 'Defines the name of the FIGARO task'
+  DEFAULT 'FIGARO'
+ENDPARAMETER
+
+PARAMETER UKIRTFIG_ALIAS
+  TYPE '_CHAR'
+  VPATH 'INTERNAL'
+  PROMPT 'Name of the UKIRTFIG task'
+  HELP 'Defines the name of the UKIRTIG task'
+  DEFAULT 'UKIRTFIG'
+ENDPARAMETER
+
+# --- Data reduction sequence parameters ---
+
+PARAMETER SUBTRACT_BIAS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Subtract BIAS frame (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when subtracting BIAS frame from data'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER SUBTRACT_DARK
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Subtract DARK frame (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when subtracting DARK frame from data'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER ADD_INT
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Add reduced integration (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when co-adding integration into observation'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'ASK'
+ENDPARAMETER
+
+PARAMETER ARCHIVE_OBS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Archive observation (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when archiving observation in data archive'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER FILE_OBS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'File observation (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when filing completed observation in index file'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER NORMALISE_FF
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Normalise and smooth flat field (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when normalising FLAT to remove wavelength variations'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER DIVIDE_BY_FF
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Divide by flat field (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when dividing a SPECTRA observation by a FLAT'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER ADD_OBS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Add observation into group (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when co-adding observation into group'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER TO_WAVELENGTH
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Calibrate into wavelength (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when calibrating observation into wavelength'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER DIVIDE_BY_STD
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Divide by standard source (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when dividing an OBJECT observation by a STANDARD'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'YES'
+ENDPARAMETER
+
+PARAMETER EXTRACT_SPC
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Extract a nodded spectrum (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when extracting spectrum from observation or group'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER AUTOFIT
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Automatic line fit (YES, NO or ASK) ?'
+  HELP 'Tailors prompting for an automatic line fit after the reduction'
+  IN 'YES', 'YE', 'Y', 'NO', 'N', 'ASK', 'AS', 'A'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+# --- Parameters used to prompt for steps which have 'ASK' ---
+
+PARAMETER PROCEED_RED
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Reduce these data (Y or N) ?'
+  HELP 'Calibrate these data using BIAS, DARK, FLAT as appropriate ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_DISP
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display these data (Y or N) ?'
+  HELP 'Display the integration or observation mentioned above ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_ADD
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Add this integration to the current observation (Y or N) ?'
+  HELP 'Add this integration to the current co-added observation ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_FILE
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'File this observation in the index (Y or N) ?'
+  HELP 'File this observation so it may be used for subsequent reduction ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_GRP
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Add this observation to the current group (Y or N) ?'
+  HELP 'Add OBJECT or SKY observation to the current co-added group ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_STD
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Divide this group by a standard source (Y or N) ?'
+  HELP 'Divide by STANDARD observation to calibrate out atmospheric features ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_ANALYSE
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Search these data for emission lines (Y or N) ?'
+  HELP 'Extract rows and apply EMLT function to get engineering info ?'
+  DEFAULT T
+ENDPARAMETER
+
+PARAMETER PROCEED_EXTRACT
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Extract a spectrum (Y or N) ?'
+  HELP 'Extracts a spectrum from up to three rows in the array'
+  DEFAULT N
+ENDPARAMETER
+
+PARAMETER PROCEED_POLYFIT
+  TYPE '_LOGICAL'
+  VPATH 'PROMPT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Remove residual sky (Y or N) ?'
+  HELP 'removes residual sky using FIGARO POLYSKY routine'
+  DEFAULT N
+ENDPARAMETER
+
+# --- Calibration observation/group search parameters ---
+
+PARAMETER BIAS_MODE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'BIAS observation search mode.'
+  HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+  IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+  DEFAULT 'BOTH'
+ENDPARAMETER
+
+PARAMETER DARK_MODE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'DARK observation search mode.'
+  HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+  IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+  DEFAULT 'BOTH'
+ENDPARAMETER
+
+PARAMETER FLAT_MODE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Flat-field observation search mode.'
+  HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+  IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+  DEFAULT 'BOTH'
+ENDPARAMETER
+
+PARAMETER CALIB_MODE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Wavelength calibration search mode.'
+  HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+  IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+  DEFAULT 'BOTH'
+ENDPARAMETER
+
+PARAMETER STANDARD_MODE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'STANDARD group search mode.'
+  HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+  IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+  DEFAULT 'BOTH'
+ENDPARAMETER
+
+PARAMETER SPECIFIED_BIAS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'BIAS observation to be used.'
+  HELP 'This observation will be used when BIAS_MODE=SPECIFIED.'
+  DEFAULT 'ROyymmdd_oooo'
+ENDPARAMETER
+
+PARAMETER SPECIFIED_DARK
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'DARK observation to be used.'
+  HELP 'This observation will be used when DARK_MODE=SPECIFIED.'
+  DEFAULT 'ROyymmdd_oooo'
+ENDPARAMETER
+
+PARAMETER SPECIFIED_FLAT
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Flat-field observation to be used.'
+  HELP 'This observation will be used when FLAT_MODE=SPECIFIED.'
+  DEFAULT 'ROyymmdd_oooo'
+ENDPARAMETER
+
+PARAMETER SPECIFIED_CALIB
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Wavelength calibration to be used.'
+  HELP 'This observation will be used when CALIB_MODE=SPECIFIED.'
+  DEFAULT 'CAyymmdd_oooo'
+ENDPARAMETER
+
+PARAMETER SPECIFIED_STD
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'STANDARD group to be used.'
+  HELP 'This group will be used when STANDARD_MODE=SPECIFIED.'
+  DEFAULT 'STyymmdd_gggg'
+ENDPARAMETER
+
+# --- Miscellaneous parameters ---
+
+PARAMETER LINCOEFFS
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Linearisation coefficients file'
+  HELP 'A text file containing linearisation coefficients (# for none)'
+  DEFAULT '#'
+ENDPARAMETER
+
+PARAMETER MASK
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Bad pixel mask'
+  HELP 'A data structure containing a bad pixel mask (# for none)'
+  DEFAULT '#'
+ENDPARAMETER
+
+PARAMETER ADD_IN_PAIRS
+   TYPE '_LOGICAL'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Should OBJECT/SKY be combined in pairs (Y or N) ?'
+   HELP 'This option should be selected for correct sky-subtraction.'
+   DEFAULT TRUE
+ENDPARAMETER
+
+PARAMETER ERRORS
+   TYPE '_CHAR'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Estimate errors from integrations or observations ?'
+   HELP 'FROM_INT=from variation in ints, FROM_OBS=from variation in obs.'
+   IN 'FROM_INT', 'FROM_OBS'
+   DEFAULT 'FROM_OBS'
+ENDPARAMETER
+
+PARAMETER VARIANCE_WT
+   TYPE '_LOGICAL'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Is variance weighting required (Y or N) ?'
+   HELP 'Should observations be weighted by variance when combined ?'
+   DEFAULT FALSE
+ENDPARAMETER
+
+PARAMETER SKY_WT
+   TYPE '_REAL'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'SKY observation weighting factor'
+   HELP 'SKY observations will be multiplied by this number.'
+   DEFAULT 1.0
+ENDPARAMETER
+
+PARAMETER DISP_FREQUENCY
+   TYPE '_CHAR'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Group display frequency'
+   HELP 'EVERY_TIME, ODD_TIMES, EVEN_TIMES or AT_END_ONLY'
+   DEFAULT 'EVERY_TIME'
+   IN 'EVERY_TIME', 'ODD_TIMES', 'EVEN_TIMES', 'AT_END_ONLY'
+ENDPARAMETER
+
+PARAMETER PF_POLYFIT
+   TYPE '_CHAR'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Type of POLYFIT (NONE, OBJ-SKY, REDUCED_GRP or OBJECT) ? '
+   HELP 'This option enables enhanced sky-subtraction for point sources'
+   DEFAULT 'NONE'
+   IN 'NONE', 'OBJ-SKY', 'REDUCED_GRP', 'OBJECT'
+ENDPARAMETER
+
+PARAMETER PF_WEIGHT
+   TYPE '_LOGICAL'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'WEIGHT the data according to their errors ? '
+   HELP 'WEIGHT the data according to their errors'
+   DEFAULT TRUE
+ENDPARAMETER
+
+PARAMETER PF_DEGREE
+   TYPE '_INTEGER'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'DEGREE of polynomial to be fitted ? '
+   HELP 'DEGREE of the polynomial to be fitted'
+   DEFAULT 1
+   RANGE 1,10
+ENDPARAMETER
+
+PARAMETER PF_NREJECT
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Number of points to reject from fit? '
+  HELP 'NREJECT is the number of points to be omitted from the fit'
+  DEFAULT 0
+ENDPARAMETER
+
+PARAMETER PF_SAYS1
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Ystart of first sky area ? '
+  HELP 'PF_SAYS1 delimits the start, in y, of the first sky area'
+  DEFAULT 20
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYE1
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Yend of first sky area ? '
+  HELP 'PF_SAYE1 delimits the end, in y, of the first sky area'
+  DEFAULT 25
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYS2
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Ystart of second sky area ? '
+  HELP 'PF_SAYS2 delimits the start, in y, of the second sky area'
+  DEFAULT 35
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYE2
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Yend of second sky area ? '
+  HELP 'PF_SAYE2 delimits the end, in y, of the second sky area'
+  DEFAULT 40
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYS3
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Ystart of third sky area ? '
+  HELP 'PF_SAYS3 delimits the start, in y, of the third sky area'
+  DEFAULT -1
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYE3
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Yend of third sky area ? '
+  HELP 'PF_SAYE3 delimits the end, in y, of the third sky area'
+  DEFAULT -1
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYS4
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Ystart of fourth sky area ? '
+  HELP 'PF_SAYS4 delimits the start, in y, of the fourth sky area'
+  DEFAULT -1
+  RANGE -1,62
+ENDPARAMETER
+
+PARAMETER PF_SAYE4
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Yend of fourth sky area ? '
+  HELP 'PF_SAYE4 delimits the end, in y, of the fourth sky area'
+  DEFAULT -1
+  RANGE -1,62
+ENDPARAMETER
+
+# --- Flat field normalisation parameters ---
+
+PARAMETER NORM_METHOD
+   TYPE '_CHAR'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Flat-field normalisation method'
+   HELP 'Use POLYFIT for CGS4, SMOOTH for IRCAM3'
+   DEFAULT 'POLYFIT'
+   IN 'POLYFIT', 'SMOOTH'
+ENDPARAMETER
+
+PARAMETER ORDER
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Order for polynomial fit'
+  HELP 'The FLAT will be divided by a polynomial of this order'
+  DEFAULT 3
+  RANGE 1, 7
+ENDPARAMETER
+
+PARAMETER BOXSIZE
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Box size for smoothing (in pixels)'
+  HELP 'The FLAT will be divided by a spectrum smoothed with this box size'
+  DEFAULT 5
+  IN 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31
+ENDPARAMETER
+
+# --- Wavelength calibration parameters ---
+
+PARAMETER LAMBDA_METHOD
+   TYPE '_CHAR'
+   VPATH 'CURRENT,DEFAULT'
+   PPATH 'DYNAMIC,CURRENT,DEFAULT'
+   PROMPT 'Wavelength calibration method'
+   HELP 'ESTIMATED from the grating equation or CALIBRATED from an arc'
+   DEFAULT 'ESTIMATED'
+   IN 'ESTIMATED', 'CALIBRATED'
+ENDPARAMETER
+
+# --- Extract spc parameters ---
+
+PARAMETER SPC_ROW1S
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The start row for extracting the first spectrum'
+  HELP 'Start row of lower negative beam '
+  DEFAULT 27.0
+ENDPARAMETER
+
+PARAMETER SPC_ROW1E
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The end row for extracting the first spectrum'
+  HELP 'End row of lower negative beam '
+  DEFAULT 27.0
+ENDPARAMETER
+
+PARAMETER SPC_ROW2S
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The start row for extracting the second spectrum'
+  HELP 'Start row of positive beam '
+  DEFAULT -1.0
+ENDPARAMETER
+
+PARAMETER SPC_ROW2E
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The end row for extracting the second spectrum'
+  HELP 'Start row of positive beam '
+  DEFAULT -1.0
+ENDPARAMETER
+
+PARAMETER SPC_ROW3S
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The start row for extracting the third spectrum'
+  HELP 'Start row of upper negative beam '
+  DEFAULT -1.0
+ENDPARAMETER
+
+PARAMETER SPC_ROW3E
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The end row for extracting the third spectrum'
+  HELP 'Start row of upper negative beam '
+  DEFAULT -1.0
+ENDPARAMETER
+
+PARAMETER SPC_INVERT
+  TYPE '_LOGICAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Invert the output spectrum?'
+  HELP 'YES = turn spectrum upside-down'
+  DEFAULT FALSE
+ENDPARAMETER
+
+PARAMETER SPC_ALGORITHM
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Bright or faint source algorithm?'
+  HELP 'BRIGHT=(P-(N1+N2))/4  FAINT=4/3*(P-(N1+N2)/2)'
+  IN 'BRIGHT', 'FAINT'
+  DEFAULT 'BRIGHT'
+ENDPARAMETER
+
+# --- Automatic line fit parameters ---
+
+PARAMETER AFIT_NROWS
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Number of rows to be averaged'
+  HELP 'The number of rows around each central row to be averaged'
+  IN 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25
+  DEFAULT 1
+ENDPARAMETER
+
+PARAMETER AFIT_ROW1
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'First row for line fitting'
+  HELP 'The bottom (central) row to be extracted and searched for lines'
+  DEFAULT 10
+ENDPARAMETER
+
+PARAMETER AFIT_ROW2
+  TYPE '_INTEGER'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Second row for line fitting'
+  HELP 'The top (central) row to be extracted and searched for lines'
+  DEFAULT 40
+ENDPARAMETER
+
+PARAMETER AFIT_XSTART
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The first column for line fitting'
+  HELP 'The left-most column to search for lines'
+  DEFAULT 1.0
+ENDPARAMETER
+
+PARAMETER AFIT_XEND
+  TYPE '_REAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'The second column for line fitting'
+  HELP 'The right-most column to search for lines'
+  DEFAULT 62.0
+ENDPARAMETER
+
+
+# --- Display parameters ---
+
+PARAMETER INT_P0
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P0 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P1
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P1 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P2
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P2 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P3
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P3 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P4
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P4 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P5
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P5 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P6
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P6 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P7
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P7 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER INT_P8
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced integration in P8 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P0
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P0 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P1
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P1 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P2
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observtion in P2 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P3
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P3 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P4
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P4 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P5
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P5 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P6
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P6 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P7
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P7 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER OBS_P8
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced observation in P8 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P0
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P0 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P1
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P1 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P2
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P2 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P3
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P3 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P4
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P4 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P5
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P5 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P6
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P6 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P7
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P7 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER GRP_P8
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced group in P8 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P0
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reuced spectrum in P0 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P1
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P1 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P2
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P2 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P3
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P3 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P4
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P4 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P5
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P5 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'  
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P6
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P6 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P7
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P7 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+PARAMETER SPC_P8
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Display reduced spectrum in P8 (YES, NO or ASK) ?'
+  HELP 'Tailors prompting when plottingf data'
+  DEFAULT 'NO'
+ENDPARAMETER
+
+# --- Other general data reduction parameters ---
+
+PARAMETER PAUSE
+  TYPE '_CHAR'
+  VPATH 'PROMPT'
+  PROMPT 'Press RETURN to continue'
+  HELP 'This is a temporary PAUSE prompt.'
+  DEFAULT ' '
+ENDPARAMETER
+
+PARAMETER CONFIG_FILE
+  TYPE '_CHAR'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Name of configuration file'
+  HELP 'File used for saving/restoring data reduction parameters'
+  DEFAULT 'CRED4_PARAMETERS'
+ENDPARAMETER
+
+PARAMETER NBS
+  TYPE '_LOGICAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Format configuration file for ICL (Y or N) ?'
+  HELP 'YES=ICL-format; NO=KEYWORD=format'
+  DEFAULT TRUE
+ENDPARAMETER
+
+PARAMETER NOTICEBOARD
+  TYPE '_CHAR'
+  VPATH 'DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Name of noticeboard global section'
+  HELP 'The name which NBS will use to refer to the noticeboard.'
+  DEFAULT 'CRED4_NB'  
+ENDPARAMETER
+
+PARAMETER PAUSE_ON_ERROR
+  TYPE '_LOGICAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Should the data reduction pause if an error occurs (Y or N) ?'
+  HELP 'YES=Pause after each error. NO=Carry on with rest of queue.'
+  DEFAULT TRUE
+ENDPARAMETER
+
+PARAMETER PRINTER
+  TYPE '_LOGICAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Print the configuration file (Y or N) ?'
+  HELP 'YES=Write file and submit to to printer. NO=Write file only.'
+  DEFAULT FALSE
+ENDPARAMETER
+
+PARAMETER VERBOSE
+  TYPE '_LOGICAL'
+  VPATH 'CURRENT,DEFAULT'
+  PPATH 'DYNAMIC,CURRENT,DEFAULT'
+  PROMPT 'Would you like verbose messages (Y or N) ?'
+  HELP 'Answering YES will make CRED4 produce more commentary.'
+  DEFAULT FALSE
+ENDPARAMETER
+
+# ------------------------------ Actions ------------------------------
+
+ACTION CLOSE_NB
+   OBEY
+   ENDOBEY
+   CANCEL
+   ENDCANCEL
+ENDACTION
+
+ACTION CLOSE_QFILE
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION OPEN_NB
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION INIT
+  OBEY
+  ENDOBEY
+  CANCEL 
+  ENDCANCEL
+ENDACTION
+
+ACTION INIT_SYS
+  OBEY
+  ENDOBEY
+  CANCEL 
+  ENDCANCEL
+ENDACTION
+
+ACTION LIST_NB
+  OBEY
+  ENDOBEY
+  CANCEL 
+  ENDCANCEL
+ENDACTION
+
+ACTION OPEN_QFILE
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION REDUCE
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION RESET
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION RESTORE_CONFIG
+  OBEY
+    NEEDS CONFIG_FILE
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION SAVE_CONFIG
+  OBEY
+    NEEDS CONFIG_FILE
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION SET_VERBOSE
+  OBEY
+    NEEDS VERBOSE
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ACTION STATUS
+  OBEY
+  ENDOBEY
+  CANCEL
+  ENDCANCEL
+ENDACTION
+
+ENDINTERFACE

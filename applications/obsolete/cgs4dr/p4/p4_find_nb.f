@@ -1,0 +1,150 @@
+*+  P4_FIND_NB - Define the contents of the P4_NB noticeboard
+      SUBROUTINE P4_FIND_NB( STATUS )
+*    Description :
+*     This routine finds the contents of the P4_NB noticeboard.
+*    Invocation :
+*     CALL P4_FIND_NB( STATUS )
+*    Authors :
+*     P N Daly   (JACH.HAWAII.EDU::PND)
+*    History :
+*      4-Aug-1994: Original version (PND)
+*    endhistory
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'          ! SAI error and status codes
+      INCLUDE 'PRM_PAR'          ! PRM codes
+      INCLUDE 'NBS_ERR'          ! NBS error codes
+*    Status :
+      INTEGER STATUS             ! Global status
+*    Global variables :
+      INCLUDE 'P4COM.INC'        ! P4 common block
+*    External references :
+      INTEGER CHR_LEN            ! Finds used length of string
+*    Local variables :
+      INTEGER
+     :  I,                       ! Loop counter
+     :  ERR_STAT                 ! An error status
+*-
+
+*    Check for error on entry.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Find the top level
+      IF ( VERBOSE ) THEN
+        CALL MSG_SETC( 'NB', NOTICEBOARD )
+        CALL MSG_OUT( ' ', 'Finding top-level noticeboard ^NB', STATUS )
+      ENDIF
+      CALL NBS_FIND_NOTICEBOARD( NOTICEBOARD(1:CHR_LEN(NOTICEBOARD)), NB_TOPID, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         ERR_STAT= STATUS
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'NB', NOTICEBOARD )
+         CALL MSG_SETI( 'ES', ERR_STAT )
+         CALL ERR_REP( ' ', 'P4_DEFINE_NB: '/
+     :     /'Failed to find top-level ID for ^NB, Status = ^ES', STATUS )
+      ELSE
+        IF ( VERBOSE ) THEN
+          CALL MSG_SETI( 'TOP', NB_TOPID )
+          CALL MSG_OUT( ' ', 'Found NB top-level ID OK (^TOP)', STATUS )
+        ENDIF
+      ENDIF
+
+*    Find the PORT_n items
+      CALL NBS_FIND_ITEM( NB_TOPID, 'TASK_BUSY', TASK_BUSY_ID, STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_0', PORT_ID(0), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_1', PORT_ID(1), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_2', PORT_ID(2), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_3', PORT_ID(3), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_4', PORT_ID(4), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_5', PORT_ID(5), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_6', PORT_ID(6), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_7', PORT_ID(7), STATUS )
+      CALL NBS_FIND_ITEM( NB_TOPID, 'PORT_8', PORT_ID(8), STATUS )
+
+*    Find sub-structures for each port
+      DO I = 0, MAXPORT, 1
+
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DISPLAY_DATA', DISPLAY_DATA_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DEVICE_LUT', DEVICE_LUT_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'TITLE', TITLE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DEVICE_NAME', DEVICE_NAME_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DEVICE_XOPT', DEVICE_XOPT_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DEVICE_YOPT', DEVICE_YOPT_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DISPLAY_TYPE', DISPLAY_TYPE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'DISPLAY_PLANE', DISPLAY_PLANE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'CONTOUR_TYPE', CONTOUR_TYPE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'OVERCOLOUR', OVERCOLOUR_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'COLOUR_STYLE', COLOUR_STYLE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'FG_COLOUR', FG_COLOUR_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'BG_COLOUR', BG_COLOUR_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'CUT_DIRECTION', CUT_DIRECTION_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'LAST_TYPE', LAST_TYPE_ID(I), STATUS )
+
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PLOT_AXES', PLOT_AXES_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PLOT_ERRORS', PLOT_ERRORS_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PLOT_WHOLE', PLOT_WHOLE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PRE_ERASE_PLOT', PRE_ERASE_PLOT_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'AUTOSCALE', AUTOSCALE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PORT_OK', PORT_OK_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'PLOT_OK', PLOT_OK_ID(I), STATUS )
+
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'CONTOUR_LEVELS', CONTOUR_LEVELS_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'HISTOGRAM_BINS', HISTOGRAM_BINS_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'HISTOGRAM_XSTEP', HISTOGRAM_XSTEP_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'HISTOGRAM_YSTEP', HISTOGRAM_YSTEP_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'HIST_SMOOTH', HIST_SMOOTH_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'TOOSMALL', TOOSMALL_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'TOOLARGE', TOOLARGE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'ISTART', ISTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'IEND', IEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'JSTART', JSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'JEND', JEND_ID(I), STATUS )
+
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'VXSTART', VXSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'VXEND', VXEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'VYSTART', VYSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'VYEND', VYEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'AXSTART', AXSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'AXEND', AXEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'AYSTART', AYSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'AYEND', AYEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'XSTART', XSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'XEND', XEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'YSTART', YSTART_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'YEND', YEND_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'MODE', MODE_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'MEAN', MEAN_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'SIGMA', SIGMA_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'LOW', LOW_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'HIGH', HIGH_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'FMIN', FMIN_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'FMAX', FMAX_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'SLICE_START', SLICE_START_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'SLICE_END', SLICE_END_ID(I), STATUS )
+        CALL NBS_FIND_ITEM( PORT_ID(I), 'CHAR_HEIGHT', CHAR_HEIGHT_ID(I), STATUS )
+
+        IF ( STATUS .NE. SAI__OK ) THEN
+           ERR_STAT = STATUS
+           STATUS = SAI__ERROR
+           CALL MSG_SETI( 'I', I )
+           CALL MSG_SETI( 'ES', ERR_STAT )
+           CALL ERR_REP( ' ', 'P4_DEFINE_NB: '/
+     :       /'Failed to find primitives for port ^I, '/
+     :       /'Status = ^ES', STATUS )
+        ELSE
+          IF ( VERBOSE ) THEN
+            CALL MSG_SETI( 'I', I )
+            CALL MSG_OUT( ' ', 'Found primitives for port ^I', STATUS )
+          ENDIF
+        ENDIF
+      ENDDO
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        IF ( VERBOSE ) CALL MSG_OUT( ' ',
+     :    'Found noticeboard sub-structure IDs OK', STATUS )
+      ENDIF
+
+*   Initialise the task busy flag here
+      CALL NBS_PUT_VALUE( TASK_BUSY_ID, 0, VAL__NBI, .FALSE., STATUS )
+      END

@@ -1,0 +1,54 @@
+<HEAD>
+<TITLE> How to Enable Overgraphs</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node108.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node106.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>How to Enable Overgraphs</H1>
+<P>
+It might appear from the other sections of this document that the 
+set_<em>something</em>_display routines refer to specific ports. If that were true, 
+there would be no way to enable overgraphs during the automated display 
+of reduced data. How then do we overcome this restriction? The answer lies 
+in allowing the procedure to prompt for a response and entering one of 
+the following (where sans-serif type indicates an input):
+<blockquote> ICL<b>&gt;</b> set_observation_display <BR> 
+Display in port 0?  <b>&gt;</b> <tt> yes</tt> <BR> 
+Display in port 1?  <b>&gt;</b> <tt> yes</tt> <BR> 
+Display in port 2?  <b>&gt;</b> <tt> yes</tt> <BR> 
+Display in port 3?  <b>&gt;</b> <tt> yes</tt> <BR> 
+Display in port 4?  <b>&gt;</b> <tt> yes</tt> <BR> 
+Display in port 5?  <b>&gt;</b> <tt> overgraph port=1 cut=X spos=20 epos=40 colour=red</tt> <BR> 
+Display in port 6?  <b>&gt;</b> <tt> overgraph port=1 cut=X spos=25 epos=30 colour=blue</tt> <BR> 
+Display in port 7?  <b>&gt;</b> <tt> overgraph port=1 cut=X spos=30 epos=35 colour=green</tt> <BR> 
+Display in port 8?  <b>&gt;</b> <tt> overgraph port=1 cut=X spos=15 epos=45 colour=yellow</tt>
+</blockquote>
+<P>
+In this example, port 0 - 4 display data in whatever way they are set
+up. Ports 5 - 8, however, are used as dummies to display overgraphs in
+port 1 (which has presumably been set up to display graphs in the first
+place). Note the syntax of the overgraph command line. The parameters
+have the following meaning:
+<P>
+<BLOCKQUOTE>
+<DL><DT>PORT - The port in which to display the overgraph.
+<DT>CUT - cut direction (x, X, y, Y, h, H, v or V).
+<DT>SPOS - Start row of slice for extraction of graph data.
+<DT>EPOS - End row of slice for extraction of graph data.
+<DT>COLOUR - The colour of the pen for the overgraph plot.
+<P>
+</DL>
+</BLOCKQUOTE>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

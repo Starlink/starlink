@@ -1,0 +1,124 @@
+<HEAD>
+<TITLE> Sky Subtraction and the Propagation of Variance</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node21.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node19.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Sky Subtraction and the Propagation of Variance</H1>
+<P>
+There are two strategies for combining observations into groups depending
+upon the value of the logical flag add_in_pairs. If TRUE the
+reduction routines combine reduced observations belonging to a particular
+group into pairs of observations. Each pair must consist of one
+observation of type OBJECT and one of type SKY. Other
+combinations are not allowed.
+<P>
+If an observation is the first of the pair, it is simply remembered until
+next time around. If it is the second observation, the SKY member of
+the pair may be multiplied by a weighting factor indicated by the sky_wt
+parameter before being subtracted from the OBJECT member, and the
+result co-added to the group. Pairs of observations may also be weighted
+according to their variance.
+<P>
+The variance, <I>V</I>, in the group may be propagated by combining together the
+variances contained in the individual (<em>m</em>) reduced observations comprising 
+the group according to the familiar variance rule (Bevington 1969):
+<P>
+<BLOCKQUOTE>
+<I> V&#178;<SUB>grp(n)</SUB> = V&#178;<SUB>obs(n)</SUB> + 
+V&#178;<SUB>obs(n+1)</SUB> + V&#178;<SUB>obs(n+2)</SUB> + ... + 
+V&#178;<SUB>obs(n+m-1)</SUB> + V&#178;<SUB>obs(n+m)</SUB></I>
+</BLOCKQUOTE>
+<P>
+This scheme is called propagation of errors FROM_INT.
+If these are poorly determined, we can estimate the standard error, <I>S</I>,
+in the variation between the pairs of reduced observations when they are
+co-added into the group according to the formula:
+<P>
+<BLOCKQUOTE><I> S&#178; = V&#178; / n = { (x<SUB>1</SUB>&#178; + x<SUB>2</SUB>&#178; + ... + x<SUB>n</SUB>&#178; ) - 
+(x<SUB>1</SUB> + x<SUB>2</SUB> + ... + x<SUB>n</SUB> )&#178;/n } / n(n - 1) </I></BLOCKQUOTE>
+<P>
+This scheme is called propagation of errors FROM_OBS 
+and is necessary if the observations consist of only one
+exposure per integration and one detector scan, and therefore contain no
+error information themselves.
+<P>
+It is important to grasp that variance weighting of errors can only be
+used when the errors are already determined. It makes no sense, therefore,
+to enable variance weighting and attempt to propagate errors using the
+FROM_OBS regime.
+<P>
+Indeed, at the present time, although the data reduction provides both
+methods for error propagation <em> i.e. viz.</em> FROM_INT and FROM_OBS, the user is advised to default to FROM_OBS as, aside from
+the aforementioned caveat, a bug exists somewhere in the FROM_INT code that has never been traced. For completeness, however,
+both are documented here.
+<P>
+If add_in_pairs is FALSE, the routines apply a reduced observation
+belonging to a particular group to a reduced group file.  Reduced
+observations of type OBJECT are added to the contents of the reduced
+group file whilst reduced observations of type SKY are subtracted
+from the contents of the reduced group file, after being optionally
+multiplied by a weighting factor indicated by the sky_wt parameter. 
+Observations may also be weighted according to their variance if observing
+conditions dictate. Observation types other than OBJECT and SKY are not allowed.
+<P>
+You might well ask, then, what is the difference between add_in_pairs
+set to FALSE as opposed to TRUE since both appear to produce
+sky subtracted reduced groups?
+<P>
+First, if an equal number of OBJECT and SKY observations are
+taken, the running mean should be calculated using the number of pairs of
+observations, rather than the total number of observations, or the mean
+signal calculated will be a factor of 2 smaller than it should be. The
+signal will be calculated correctly for a series of OBJECT
+observations with no SKYs.
+<P>
+Second, if there are unequal numbers of bad pixels at a given location
+from the SKY and OBJECT observations, that particular point
+will not be sky-subtracted properly.
+<P>
+Third, the variance weighting algorithm will work properly only for a
+series of consecutive OBJECT observations. If both OBJECT and
+SKY observations are reduced, different weights may be applied to
+OBJECT and SKY, and the data will not be properly
+sky-subtracted.
+<P>
+For these reasons, it is better to add such observations in pairs <em>
+i.e.</em> with add_in_pairs set to TRUE.
+<P>
+This is only part of the story, however, as CGS4 can take data in several
+modes the two most common of which are CHOP and STARE.  For
+CHOP mode sky subtraction, phase A - B is calculated within the
+acquisition electronics and groups are formed as a sum of objects. If
+chopping and nodding are enabled then OBJECT-SKY pairs are formed
+as for STARE mode (essentially already described above but, of
+course, there should be an equal number of OBJECT and SKY
+frames taken during the acquisition phase).
+<P>
+Note that when observations are combined into reduced groups, a running
+average is maintained, with hooks built in for first and second
+observations so that a sensible mean and variance are generated, broadly
+according to the formula:
+<P>
+<BLOCKQUOTE><I> D<SUB>grp</SUB> = { nD<SUB>grp</SUB> + (D<SUB>obj</SUB> - D<SUB>sky</SUB> ) } / n + 1 </I></BLOCKQUOTE>
+<P>
+where <I>D<SUB>item</SUB></I> is the data value for group, 
+object and sky (as appropriate) and <em>n</em> is
+the number of coadds. Some observers have noted that coadding many sky
+subtracted frames into reduced groups (<em> i.e.</em> <em> n &gt; 50 </em>) slows the data reduction down by a significant factor and have attributed this to
+re-averaging the whole stack. That is incorrect. The probable cause of the
+slow down is the many FITS items and Portable-CGS4DR specific
+structures that must be included in the reduced group as part of the
+reduction. Extending such structures is, unfortunately, a costly process.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

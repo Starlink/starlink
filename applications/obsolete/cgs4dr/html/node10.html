@@ -1,0 +1,134 @@
+<HEAD>
+<TITLE> How Does Portable-CGS4DR Select Calibration Frames?</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node12.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node9.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>How Does Portable-CGS4DR Select Calibration Frames?</H1>
+<P>
+The files of type BIAS, DARK, FLAT, CALIBR and
+STANDARD are generically termed calibration frames. When
+such frames are required by the software to reduce another observation, a
+search is made on the index file of already reduced observations.
+<P>
+Normally, the user lets the software decide which calibration frames to
+use. In general, it is true to say that the nearest observation in time
+that matches the instrument configuration of the observed object is
+selected and such frames are memory mapped to prevent unnecessary
+processing thus speeding up the reduction considerably.
+<P>
+If a specific observation is chosen, the software will use that
+observation irrespective of any criteria mis-match. In verbose mode the
+software will report any mis-matched criteria to the user but otherwise
+the user may be unaware that the frame is unsuitable. Indeed, if a user
+wants to know why certain calibration frames are being rejected, setting
+verbose output to TRUE is the only way of obtaining such
+information.
+<P>
+<P><CENTER>
+Table 1.1: Calibration Frame Matching Criteria<P>
+<TABLE BORDER><TR>
+<TD ALIGN=LEFT><B>CRITERIA</B></TD>
+<TD ALIGN=MIDDLE><B>BIAS</B></TD>
+<TD ALIGN=MIDDLE><B>DARK</B></TD>
+<TD ALIGN=MIDDLE><B>FLAT</B></TD>
+<TD ALIGN=MIDDLE><B>CALIBR</B></TD>
+<TD ALIGN=MIDDLE><B>STANDARD</B></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Detector Size</B></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Detector Columns</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>On-Chip Exposure Time</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Observation Mode (NDR)</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Oversampling Parameters</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Grating Name</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Grating Wavelength</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Slit Name</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT><B>Configuration Index Name</B></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+<TD ALIGN=MIDDLE><I>Yes</I></TD>
+<TD ALIGN=MIDDLE><I>No</I></TD>
+</TR></TABLE></CENTER><P>
+<P>
+There are two types of calibration frame checking within Portable-CGS4DR. 
+Compulsory checks are hard-wired into the code and consist of basic
+integrity checks such as detector size and so forth. Optional checks are
+defined only for oversampled frames and are specified by the flat_match,
+calib_match and standard_match parameters in the task interface file. In
+both cases, these criteria are not configurable by the end user but are,
+for completeness, shown in the table.
+<P>
+These matches are performed by evaluating and equating various FITS
+items pertinent to each observation. Note that the configuration index in
+the table is a time-stamp referring to when the grating was last moved and
+as such provides the strictest criteria.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

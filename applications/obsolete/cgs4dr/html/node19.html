@@ -1,0 +1,67 @@
+<HEAD>
+<TITLE> Wavelength Calibration</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node20.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node18.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Wavelength Calibration</H1>
+<P>
+Wavelength calibration can take two forms within Portable-CGS4DR <em>
+i.e. viz.</em> estimated or calibrated. The estimated method generates a
+rough scale from the grating wavelength and dispersion and is usually
+accurate to better than 20% of the resolution. The X axis label will be
+set to `estimated wavelength' in microns.
+<P>
+If the wavelength calibration option is set to calibrated,
+Portable-CGS4DR searches the index file for a suitable CALIBR frame
+of the form cayymmdd_oooo and having the same instrument configuration
+and oversampling factor as the observation to be calibrated and uses that. 
+Note that when such a CALIBR observation is used, the X axis is
+simply copied over and no attempt is made to re-bin the data. This means
+that if anything other than a straight line fit is used in the ARC
+function, the data will end up with an X axis whose values are not equally
+spaced.
+<P>
+Wavelength calibration by either method takes place when the reduced
+observation file is created and before any integrations are reduced so if
+you change your mind about wavelength calibration and the reduced
+observation file already exists, you will have to delete it before new
+instructions take effect.
+<P>
+A CALIBR frame is created by observing a wavelength calibration
+source such as a lamp or the sky (OH-lines) and this is normally called an
+ARC frame. This data is reduced in the usual way (and may be
+wavelength calibrated!). CGS4 has argon, xenon and krypton lamps for this
+purpose and the in-vacuum wavelengths for most infra-red emission lines
+from these lamps are included with the software (as indeed are the OH
+lines). They are recorded in &#197;  but may be converted to &#181;m by the
+calibrate procedure.
+<P>
+Arc-lines are identified using the mouse and selected by depressing the
+space bar. Note that if you know the exact value of a spectral line, you
+can over-ride that chosen by the software by specifying the the `E' suffix
+when inputting the wavelength value to the prompt. For example, the
+wavelength 16952.3 &#197;  may be specified:
+<P>
+<blockquote> ? Enter wavelength (null to delete) - /''/ <b>&gt;</b> 16952.3 E
+</blockquote>
+<P>
+After this procedure is complete, the frame is automaticall filed as a CALIBR frame. 
+By invoking file_calib manually, the x-axis label and units may be 
+altered by the user but default to those contained in the original frame.
+<P>
+Observations such as BIAS, DARK, FLAT, OBJECT or 
+SKY may be used for wavelength calibration but once filed as a
+CALIBR frame it cannot be used for any other purpose.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,256 @@
+#+
+INTERFACE P4
+#
+# Description :
+#   This is the interface file for the P4 plotting D-task for CGS4.
+#   P N Daly (JAC::PND)
+# History :
+#   05-Aug-1994: Completely re-written for Unix port (PND)
+#   17-Jan-1995: Added CUT, SPOS, EPOS and COLOUR for OVERGRAPH (PND)
+# endhistory
+#-
+
+   PROGRAM P4
+
+#------------ Parameters -------------------#
+
+   PARAMETER ACT_X   # X co-ord hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER ACT_Y   # Y co-ord hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER CURSOR_STATUS  # Did cursoring work (0=OK) ?
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT 0
+   ENDPARAMETER
+   PARAMETER DATAERR        # Error of data point hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER DATAQUAL       # Qual of data point hit by cursor
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER DATAVAL        # Value of data point hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER INPUT_CT       # Name of colour table to convert
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+      PROMPT 'Input colour table'
+      HELP 'Name of a Starlink/HDS data structure containing a colour table'
+   ENDPARAMETER
+   PARAMETER IPOS           # Array index (col) of data point hit by cursor
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER JPOS           # Array index (row) of data point hit by cursor
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER KEYSTROKE      # Value of of key hit by cursor
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER MASK_X         # Bad pixel mask value hit by cursor
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER MASK_Y         # Bad pixel mask value hit by cursor
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER NOTICEBOARD    # Name of noticeboard global section
+      TYPE '_CHAR'
+      VPATH 'DEFAULT'
+      PPATH 'DYNAMIC,CURRENT,DEFAULT'
+      PROMPT 'Name of noticeboard global section'
+      HELP 'The name which NBS will use to refer to the noticeboard.'
+      DEFAULT 'P4_NB'  
+   ENDPARAMETER
+   PARAMETER UPDATE         # Re-draw everytime use cursor
+      TYPE '_LOGICAL'
+      VPATH 'INTERNAL'
+      PROMPT 'Update display (Y or N) ?'
+      HELP 'Redraw all graphics before cursoring ?'
+      DEFAULT F
+   ENDPARAMETER
+   PARAMETER X              # X position when hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER Y              # Y position when hit by cursor
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT !
+   ENDPARAMETER
+   PARAMETER DATA           # Name of data file to be plotted
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+   ENDPARAMETER
+   PARAMETER SPOS           # Start of slice
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT 20.0
+   ENDPARAMETER
+   PARAMETER EPOS           # End of slice
+      TYPE '_REAL'
+      VPATH 'INTERNAL'
+      DEFAULT 40.0
+   ENDPARAMETER
+   PARAMETER CUT            # Direction of cut
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+      IN 'X', 'x', 'Y', 'y', 'H', 'h', 'V', 'v'
+      DEFAULT 'X'
+   ENDPARAMETER
+   PARAMETER COLOUR         # Colour for overgraphs
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+      IN 'RED', 'YELLOW', 'BLUE', 'GREEN', 'ORANGE', 'BLACK', 'WHITE', 'WHATEVER'
+      DEFAULT 'WHATEVER'
+   ENDPARAMETER
+   PARAMETER PORT           # Port in which to plot the data
+      TYPE '_INTEGER'
+      VPATH 'INTERNAL'
+      DEFAULT 0
+   ENDPARAMETER
+   PARAMETER FILE           # Name of a file
+      TYPE '_CHAR'
+      VPATH 'INTERNAL'
+   ENDPARAMETER
+
+#-------------- Actions --------------------#
+
+   ACTION BAR
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION CLEAR
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION CLOSE_NB
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION CLOSE_PORT
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION CURSOR
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION CURSORVAL
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION DISPLAY
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION IDENTIFY
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION LIST_CB
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION LIST_NB
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION LUT
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION OVERGRAPH
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION OPEN_NB
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION RESET
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION RESTORE
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION SAVE
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION STATUS
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION VERBOSE
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+   ACTION NOVERBOSE
+      OBEY
+      ENDOBEY
+      CANCEL
+      ENDCANCEL
+   ENDACTION
+
+ENDINTERFACE

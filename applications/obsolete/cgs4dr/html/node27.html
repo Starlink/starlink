@@ -1,0 +1,47 @@
+<HEAD>
+<TITLE> Starting the Software</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node28.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node26.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Starting the Software</H1>
+<P>
+Portable-CGS4DR can be started with three optional command line parameters:
+<P>
+<blockquote> $1 is a data directory  /${home}/ <BR> 
+  $2 is a UT date  /current UT-date/ <BR> 
+  $3 is the file type DST or NDF  /ndf/
+</blockquote>
+<P>
+To start the software, source the Starlink login and cshrc files
+and use your local data directory. <em> E.g.:</em>
+<P>
+<blockquote> %  source   /star/etc/login <BR> 
+  %  source   /star/etc/cshrc <BR> 
+  %  cgs4dr   /scratch/pnd/19940811   940811   ndf <BR>
+      <tt> Welcome to Portable-CGS4DR V1.3-0</tt> <BR>
+  ICL<b>&gt;</b>
+</blockquote>
+<P>
+There is also a `setup' facility for defining environmental variables without
+starting the software:
+<P>
+<blockquote> %  source   /star/etc/login <BR> 
+  %  source   /star/etc/cshrc <BR> 
+  %  cgs4dr_setup   /scratch/pnd/19940811   940811   ndf <BR>
+      <tt> Setup Portable-CGS4DR V1.3-0 for /scratch/pnd/19940811 </tt> <BR>
+  %
+</blockquote>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

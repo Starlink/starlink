@@ -1,0 +1,40 @@
+*+  QMAN_GLOBAL.PAR - Global parameters file for QMAN I-task
+*    Authors :
+*     P. N. Daly (PND@JACH.HAWAII.EDU)
+*    History :
+*     18-May-1994: Original version                                  (PND)
+*    endhistory
+*    Global constants :    
+
+*    Initialisation string
+      CHARACTER*30 TASK_INIT
+      PARAMETER ( TASK_INIT = 'Task has been initialised' )
+
+*    Maximum number of queue entries
+      INTEGER MAX_QENTRIES
+      PARAMETER ( MAX_QENTRIES = 1000 )
+
+*    Maximum number of words in the queue string
+      INTEGER MAX_WORDS
+      PARAMETER ( MAX_WORDS = 128 )
+
+*    Required accuracy (e.g. this specifies to a millisecond)
+      INTEGER ACCURACY
+      PARAMETER ( ACCURACY = 1000 )
+
+*    Number of hours in a day
+      INTEGER HPD
+      PARAMETER ( HPD = 24 )
+
+*    Number of minutes in a day
+      INTEGER MPD
+      PARAMETER ( MPD = 24 * 60 )
+
+*    Number of seconds in a day
+      INTEGER SPD
+      PARAMETER ( SPD = 24 * 60 * 60 )
+
+*    Number of fractions of a second in a day 
+      INTEGER FPD
+      PARAMETER ( FPD = 24 * 60 * 60 * ACCURACY )
+

@@ -1,0 +1,48 @@
+
+#
+
+user=${USER}
+
+# Kill qman
+echo "Killing qman task ..."
+for pid in \
+   `ps -a -f -u ${user} | grep /qman | grep -v grep | nawk '{print $2}'` ;\
+   do kill -9 ${pid} ;\
+done 
+echo " OK"
+
+# Kill p4
+echo "Killing p4 task ..."
+for pid in \
+   `ps -a -f -u ${user} | grep /p4 | grep -v grep | nawk '{print $2}'` ;\
+   do kill -9 ${pid} ;\
+done 
+echo " OK"
+
+# Kill cred4
+echo "Killing cred4 task ..."
+for pid in \
+   `ps -a -f -u ${user} | grep /cred4 | grep -v grep | nawk '{print $2}'` ;\
+   do kill -9 ${pid} ;\
+done 
+echo " OK"
+
+# Kill red4
+echo "Killing red4 task ..."
+for pid in \
+   `ps -a -f -u ${user} | grep /red4 | grep -v grep | nawk '{print $2}'` ;\
+   do kill -9 ${pid} ;\
+done 
+echo " OK"
+
+# Kill global sections
+echo "Killing global sections ..."
+for section in \
+   `ipcs | grep ${user} | nawk '{print $2}'` ;\
+   do ipcrm -m ${section} ;\
+done 
+echo " OK"
+
+# Exit script
+exit 0
+#.

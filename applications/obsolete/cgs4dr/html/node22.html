@@ -1,0 +1,96 @@
+<HEAD>
+<TITLE> Flux Calibration</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node23.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node21.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Flux Calibration</H1>
+<P>
+The technique most frequently used to flux calibrate a spectrum is to
+re-use the standard source which has a known brightness quoted relative to
+Vega (defined as having zero magnitude at every wavelength). 
+The wavelength dependent flux density, F, of a star at magnitude <em>m</em>
+can be described thus (Puxley 1988, Mountain 1985):
+<P>
+<BLOCKQUOTE><I> F(m) = F(Vega) &#215; 10<SUP>-0.4m</SUP> </I></BLOCKQUOTE>
+<P>
+The software uses the values of flux densities for Vega that are
+listed in table 3.1 and automatically accounts for the exposure times of source and standard.
+<P>
+When the flux standard is also the ratio-ing source, <em>k</em>
+is known and we immediately obtain a flux calibrated spectrum.  If the flux and spectral standards are not the same
+then one must determine the relative brightness of the two stars by flux
+calibrating the spectral standard.
+<P>
+<P><CENTER>
+Table 3.1: Flux Densities for Vega<P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN=CENTER><B>PHOTOMETRIC</B><BR><B>BAND</B></TD>
+<TD ALIGN=CENTER><B>WAVELENGTH</B><BR><B>&#181;m</B></TD>
+<TD ALIGN=CENTER><B>FLUX</B><BR><B>W/m &#178;/&#181;m</B></TD>
+<TD ALIGN=CENTER><B>FLUX</B><BR><B>W/m &#178;/Hz</B></TD>
+<TD ALIGN=CENTER><B>FLUX</B><BR><B>mJy</B></TD>
+<TD ALIGN=CENTER><B>FLUX</B><BR><B>ergs/sec/cm &#178;/&#181;m</B></TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>J</TD>
+<TD ALIGN=CENTER>1.2500</TD>
+<TD ALIGN=CENTER>3.07E-09</TD>
+<TD ALIGN=CENTER>1.60E-23</TD>
+<TD ALIGN=CENTER>1.60E+06</TD>
+<TD ALIGN=CENTER>3.07E-06</TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>H</TD>
+<TD ALIGN=CENTER>1.6500</TD>
+<TD ALIGN=CENTER>1.12E-09</TD>
+<TD ALIGN=CENTER>1.02E-23</TD>
+<TD ALIGN=CENTER>1.02E+06</TD>
+<TD ALIGN=CENTER>1.12E-06</TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>K</TD>
+<TD ALIGN=CENTER>2.2000</TD>
+<TD ALIGN=CENTER>4.07E-10</TD>
+<TD ALIGN=CENTER>6.57E-24</TD>
+<TD ALIGN=CENTER>6.57E+05</TD>
+<TD ALIGN=CENTER>4.07E-07</TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>L</TD>
+<TD ALIGN=CENTER>3.4500</TD>
+<TD ALIGN=CENTER>7.30E-11</TD>
+<TD ALIGN=CENTER>2.90E-24</TD>
+<TD ALIGN=CENTER>2.90E+05</TD>
+<TD ALIGN=CENTER>7.30E-07</TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>L'</TD>
+<TD ALIGN=CENTER>3.800</TD>
+<TD ALIGN=CENTER>5.24E-11</TD>
+<TD ALIGN=CENTER>2.52E-24</TD>
+<TD ALIGN=CENTER>2.52E+05</TD>
+<TD ALIGN=CENTER>5.24E-08</TD>
+</TR>
+<TR>
+<TD ALIGN=CENTER>M</TD>
+<TD ALIGN=CENTER>4.800</TD>
+<TD ALIGN=CENTER>2.12E-11</TD>
+<TD ALIGN=CENTER>1.63E-24</TD>
+<TD ALIGN=CENTER>1.63E+05</TD>
+<TD ALIGN=CENTER>2.12E-08</TD>
+</TR>
+</TABLE></CENTER>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

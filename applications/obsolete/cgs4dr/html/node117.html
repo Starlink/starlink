@@ -1,0 +1,505 @@
+<HEAD>
+<TITLE> How to Manipulate the Noticeboards Directly</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node120.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node115.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>How to Manipulate the Noticeboards Directly</H1>
+<P>
+From time to time the user will want to do something not described in
+this document. Perhaps it might be to try something that was available
+under VMS. This is usually accomplished by manipulating the
+noticeboards directly.  So, how is it done?
+<P>
+First, the noticeboards are referenced by aliases contained within the
+ICL (global) variables cred4_nb_alias and p4_nb_alias. These can be
+used in conjunction with the ICL defstring utility to create mnemonics
+for each noticeboard item. Indeed, the files cred4.icl and p4.icl in
+$CGS4DR_ROOT are full of such definitions.
+<P>
+Let us take an example: we wish to use a specific BIAS
+observation rather than let the software auto-select a suitable frame.
+The required BIAS is, say, ro950516_256. This can be achieved by
+defining the following mnemonics:
+<P>
+<blockquote> ICL<b>&gt;</b> defstring set_bias_mode putnbs ((cred4_nb_alias)&amp;'.miscellaneous.bias_mode') <BR> 
+ ICL<b>&gt;</b> defstring get_bias_mode getnbs ((cred4_nb_alias)&amp;'.miscellaneous.bias_mode') <BR> 
+ ICL<b>&gt;</b> defstring set_specified_bias putnbs ((cred4_nb_alias)&amp;'.miscellaneous.specified_bias') <BR> 
+ ICL<b>&gt;</b> defstring get_specified_bias getnbs ((cred4_nb_alias)&amp;'.miscellaneous.specified_bias')
+</blockquote>
+<P>
+The quotes, braces and ampersand are all necessary. We can use them
+(rather verbosely) thus:
+<P>
+<blockquote> ICL<b>&gt;</b> bias_mode = ' ' <BR> 
+ ICL<b>&gt;</b> get_bias_mode (bias_mode) <BR> 
+ ICL<b>&gt;</b> =(bias_mode) <BR> 
+ BOTH <BR> 
+ ICL<b>&gt;</b> set_bias_mode SPECIFIED <BR> 
+ ICL<b>&gt;</b> set_specified_bias ro950516_256 <BR> 
+ ICL<b>&gt;</b> get_bias_mode (bias_mode) <BR> 
+ ICL<b>&gt;</b> =(bias_mode) <BR> 
+ SPECIFIED <BR> 
+ ICL<b>&gt;</b> which_bias = ' ' <BR> 
+ ICL<b>&gt;</b> get_specified_bias (which_bias) <BR> 
+ ICL<b>&gt;</b> =(which_bias) <BR> 
+ ro950516_256
+</blockquote>
+<P>
+This might seem complicated but the above definitions can be saved to a
+file and loaded when needed. <em> E.g:</em>
+<P>
+<blockquote> ICL<b>&gt;</b> % cat mydefs.icl <BR> 
+ defstring set_bias_mode putnbs ((cred4_nb_alias)&amp;'.miscellaneous.bias_mode') <BR> 
+ defstring get_bias_mode getnbs ((cred4_nb_alias)&amp;'.miscellaneous.bias_mode') <BR> 
+ defstring set_specified_bias putnbs ((cred4_nb_alias)&amp;'.miscellaneous.specified_bias') <BR> 
+ defstring get_specified_bias getnbs ((cred4_nb_alias)&amp;'.miscellaneous.specified_bias') <BR> 
+ ICL<b>&gt;</b> load mydefs.icl
+</blockquote>
+<P>
+The noticeboards are described in tables 10.1 - 10.4 respectively.
+
+<P>
+<P><CENTER>
+Table 10.1: CRED4 Noticeboard Display Items <em>0 &lt; n &lt; 8</em><P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN=LEFT><B>ITEM</B></TD>
+<TD ALIGN=LEFT><B>MEANING</B></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.display.int_p<em>n</em>'</TD>
+<TD ALIGN=LEFT>Display integration in port <em>n</em></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.display.obs_p<em>n</em>'</TD>
+<TD ALIGN=LEFT>Display observation in port <em>n</em></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.display.grp_p<em>n</em>'</TD>
+<TD ALIGN=LEFT>Display group in port <em>n</em></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.display.spc_p<em>n</em>'</TD>
+<TD ALIGN=LEFT>Display spectrum in port <em>n</em></TD>
+</TR>
+</TABLE></CENTER>
+<P>
+
+<P>
+<P><CENTER>
+Table 10.2: CRED4 Noticeboard Reduction Items</em><P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN=LEFT><B>ITEM</B></TD>
+<TD ALIGN=LEFT><B>MEANING</B></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.add_int.execute'</TD>
+<TD ALIGN=LEFT>Coadd integrations into ROs?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.add_obs.execute'</TD>
+<TD ALIGN=LEFT>Coadd ROs into RGs?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.archive_obs.execute'</TD>
+<TD ALIGN=LEFT>Archive ROs?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.file_obs.execute'</TD>
+<TD ALIGN=LEFT>File ROs in index file?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.divide_by_ff.execute'</TD>
+<TD ALIGN=LEFT>Divide by FLAT field?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.normalise_ff.method'</TD>
+<TD ALIGN=LEFT>FLAT field normalisation method</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.normalise_ff.order'</TD>
+<TD ALIGN=LEFT>FLAT field polynomial order</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.normalise_ff.boxsize'</TD>
+<TD ALIGN=LEFT>FLAT field smoothing box size</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.divide_by_std.execute'</TD>
+<TD ALIGN=LEFT>Divide by STANDARD source?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.subtract_bias.execute'</TD>
+<TD ALIGN=LEFT>Subtract BIAS frame?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.subtract_dark.execute'</TD>
+<TD ALIGN=LEFT>Subtract DARK frame?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.to_wavelength.execute'</TD>
+<TD ALIGN=LEFT>Wavelength calibrate?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.to_wavelength.method'</TD>
+<TD ALIGN=LEFT>Wavelength calibration method</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.execute'</TD>
+<TD ALIGN=LEFT>Automatically fit lines?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.nrows'</TD>
+<TD ALIGN=LEFT>Number of rows to be averaged</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.row1'</TD>
+<TD ALIGN=LEFT>First row for fitting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.row2'</TD>
+<TD ALIGN=LEFT>Second row for fitting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.xstart'</TD>
+<TD ALIGN=LEFT>Xstart for extraction and fitting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.autofit.xend'</TD>
+<TD ALIGN=LEFT>Xend for extraction and fitting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.execute'</TD>
+<TD ALIGN=LEFT>Extract nodded spectrum?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row1s'</TD>
+<TD ALIGN=LEFT>Start of first row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row1e'</TD>
+<TD ALIGN=LEFT>End of first row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row2s'</TD>
+<TD ALIGN=LEFT>Start of second row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row2e'</TD>
+<TD ALIGN=LEFT>End of second row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row3s'</TD>
+<TD ALIGN=LEFT>Start of third row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.row3e'</TD>
+<TD ALIGN=LEFT>End of third row for extraction</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.invert'</TD>
+<TD ALIGN=LEFT>Invert the output spectrum?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.reduction.extract_spc.algorithm'</TD>
+<TD ALIGN=LEFT>Extraction algorithm?</TD>
+</TR>
+</TABLE></CENTER>
+<P>
+
+<P>
+<P><CENTER>
+Table 10.3: CRED4 Noticeboard Miscellaneous Items<P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN=LEFT><B>ITEM</B></TD>
+<TD ALIGN=LEFT><B>MEANING</B></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.bias_mode'</TD>
+<TD ALIGN=LEFT>Direction to search for BIAS frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.specified_bias'</TD>
+<TD ALIGN=LEFT>Name of specified BIAS frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.dark_mode'</TD>
+<TD ALIGN=LEFT>Direction to search for DARK frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.specified_dark'</TD>
+<TD ALIGN=LEFT>Name of specified DARK frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.flat_mode'</TD>
+<TD ALIGN=LEFT>Direction to search for FLAT frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.specified_flat'</TD>
+<TD ALIGN=LEFT>Name of specified FLAT frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.calib_mode'</TD>
+<TD ALIGN=LEFT>Direction to search for CALIB frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.specified_calib'</TD>
+<TD ALIGN=LEFT>Name of specified CALIB frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.standard_mode'</TD>
+<TD ALIGN=LEFT>Direction to search for STANDARD frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.specified_std'</TD>
+<TD ALIGN=LEFT>Name of specified STANDARD frame</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.errors'</TD>
+<TD ALIGN=LEFT>How to propagate errors</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.lincoeffs'</TD>
+<TD ALIGN=LEFT>Name of linearisation coefficients file</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.mask'</TD>
+<TD ALIGN=LEFT>Name of bad pixel mask</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.variance_wt'</TD>
+<TD ALIGN=LEFT>Enable variance weighting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.add_in_pairs'</TD>
+<TD ALIGN=LEFT>Enable add observations in pairs</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.sky_wt'</TD>
+<TD ALIGN=LEFT>Value for sky weighting</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_polyfit'</TD>
+<TD ALIGN=LEFT>Method for polysky-ing data</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_degree'</TD>
+<TD ALIGN=LEFT>Degree of polynomial</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_nreject'</TD>
+<TD ALIGN=LEFT>Number of points to reject from fit</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_weight'</TD>
+<TD ALIGN=LEFT>Enable weighting by errors?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_says1'</TD>
+<TD ALIGN=LEFT>Start of first sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_saye1'</TD>
+<TD ALIGN=LEFT>End of first sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_says2'</TD>
+<TD ALIGN=LEFT>Start of second sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_saye2'</TD>
+<TD ALIGN=LEFT>End of second sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_says3'</TD>
+<TD ALIGN=LEFT>Start of third sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_saye3'</TD>
+<TD ALIGN=LEFT>End of third sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_says4'</TD>
+<TD ALIGN=LEFT>Start of fourth sky area</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(cred4_nb_alias)&amp;'.miscellaneous.pf_saye4'</TD>
+<TD ALIGN=LEFT>End of fourth sky area</TD>
+</TR>
+</TABLE></CENTER>
+<P>
+
+<P>
+<P><CENTER>
+Table 10.4: P4 Noticeboard Items <em>0 &lt; n &lt; 8</em><P>
+<TABLE BORDER>
+<TR>
+<TD ALIGN=LEFT><B>ITEM</B></TD>
+<TD ALIGN=LEFT><B>MEANING</B></TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.device_name'</TD>
+<TD ALIGN=LEFT>Name of display device</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.device_xopt'</TD>
+<TD ALIGN=LEFT>X axis display options</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.device_yopt'</TD>
+<TD ALIGN=LEFT>Y axis display options</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.device_lut'</TD>
+<TD ALIGN=LEFT>Device look-up-table</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.display_plane'</TD>
+<TD ALIGN=LEFT>Plane of data to display</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.display_data'</TD>
+<TD ALIGN=LEFT>Name of data to display</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.display_type'</TD>
+<TD ALIGN=LEFT>Type of plot</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.title'</TD>
+<TD ALIGN=LEFT>Title of plot</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.char_height'</TD>
+<TD ALIGN=LEFT>Character height</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.fg_colour'</TD>
+<TD ALIGN=LEFT>Foreground colour</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.bg_colour'</TD>
+<TD ALIGN=LEFT>Background colour</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.overcolour'</TD>
+<TD ALIGN=LEFT>Overcolour for graphs</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.colour_style'</TD>
+<TD ALIGN=LEFT>Monochrome or full colour?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.cut_direction'</TD>
+<TD ALIGN=LEFT>Direction of cut?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.slice_start'</TD>
+<TD ALIGN=LEFT>Start of slice for cut</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.slice_end'</TD>
+<TD ALIGN=LEFT>End of slice for cut</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.contour_type'</TD>
+<TD ALIGN=LEFT>Type of contour plot</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.contour_levels'</TD>
+<TD ALIGN=LEFT>Number of contour levels</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.autoscale'</TD>
+<TD ALIGN=LEFT>Autoscale the data?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.high'</TD>
+<TD ALIGN=LEFT>High value when not autoscaling</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.low'</TD>
+<TD ALIGN=LEFT>Low value when not autoscaling</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.plot_errors'</TD>
+<TD ALIGN=LEFT>Plot the error bars?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.plot_axes'</TD>
+<TD ALIGN=LEFT>Plot surrounding axes?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.pre_erase_plot'</TD>
+<TD ALIGN=LEFT>Erase surface before plotting?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.plot_whole'</TD>
+<TD ALIGN=LEFT>Plot the whole array?</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.xstart'</TD>
+<TD ALIGN=LEFT>X start (axis) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.xend'</TD>
+<TD ALIGN=LEFT>X end (axis) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.ystart'</TD>
+<TD ALIGN=LEFT>Y start (axis) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.yend'</TD>
+<TD ALIGN=LEFT>Y end (axis) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.istart'</TD>
+<TD ALIGN=LEFT>I start (pixel) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.iend'</TD>
+<TD ALIGN=LEFT>I end (pixel) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.jstart'</TD>
+<TD ALIGN=LEFT>J start (pixel) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.jend'</TD>
+<TD ALIGN=LEFT>J end (pixel) value for sub-array</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.histogram_bins'</TD>
+<TD ALIGN=LEFT>Number of histogram bins</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.hist_smooth'</TD>
+<TD ALIGN=LEFT>Smoothing box for histogram</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.histogram_xstep'</TD>
+<TD ALIGN=LEFT>Number of columns to step over</TD>
+</TR>
+<TR>
+<TD ALIGN=LEFT>(p4_nb_alias)&amp;'.port_<em>n</em>.histogram_ystep'</TD>
+<TD ALIGN=LEFT>Number of rows to step over</TD>
+</TR>
+</TABLE></CENTER>
+<P>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

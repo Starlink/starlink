@@ -1,0 +1,28 @@
+
+      Interface IRCAM3LIST
+
+         Parameter FILENAME
+            Position  1
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FIlename) Name of file(s) to be listed'
+         EndParameter
+
+         Parameter LISTING
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(LIsting) Name of listing file'
+         EndParameter
+
+         Parameter FULL
+            Position 3
+            Type '_LOGICAL'      
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FULL) Give 132 (rather than 80) char listing'
+         EndParameter
+
+      EndInterface

@@ -1,0 +1,49 @@
+<HEAD><TITLE>Sysman's Page</TITLE></HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node179.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node178.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+
+<H1>System Manager's Page</H1><P>
+
+Portable-CGS4DR is distributed using the Starlink mk/makefile paradigm.
+The system administrator will usually get a compressed tar file which
+must be unpacked and built for the appropriate architechture:
+
+<BLOCKQUOTE>
+  % setenv SYSTEM sun4_Solaris
+</BLOCKQUOTE>
+
+or
+
+<BLOCKQUOTE>
+  % setenv SYSTEM alpha_OSF1
+</BLOCKQUOTE>
+
+followed by:
+
+<BLOCKQUOTE>
+  % setenv INSTALL /star/bin <br>
+  % cd /star/cgs4dr <br>
+  % zcat cgs4dr.tar.Z | tar xvf - <br>
+  % ./mk check clean build strip install
+</BLOCKQUOTE>
+
+The full Portable-CGS4DR release takes about 7 Mb of disk space.
+The demo is installed by default but is optional and a saving of 
+6 Mb can be made if the demo data is deleted:
+
+<BLOCKQUOTE>
+  % rm -rf $CGS4DR_ROOT/demo
+</BLOCKQUOTE>
+
+<P><HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

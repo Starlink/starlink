@@ -1,0 +1,38 @@
+<HEAD>
+<TITLE> Running the Tasks Individually</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node131.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node128.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Running the Tasks Individually</H1>
+<P>
+In Portable-CGS4DR the software tasks have been de-coupled which allows each task to be
+run individually. Clearly this functionality is useful for debugging. Some tasks, however,
+are generic so that they can be used outside of Portable-CGS4DR. I am thinking particularly
+of the plotting task which can display DST or NDF data. If you wish to run the tasks
+separately, set up the symbolic links thus:
+<P>
+<blockquote>
+  %  ln -s  $CGS4DR_ROOT/tcl/cgs4dr_tcl  p4_tcl <BR> 
+  %  ln -s  $CGS4DR_ROOT/tcl/cgs4dr_tcl  q4_tcl <BR> 
+  %  ln -s  $CGS4DR_ROOT/tcl/cgs4dr_tcl  r4_tcl <BR> 
+  %  ln -s  $CGS4DR_ROOT/tcl/cgs4dr_tcl  c4_tcl <BR> 
+</blockquote>
+<P>
+One can then run the plotting task, like so:
+<P>
+<blockquote>
+  %  p4_tcl  &amp;
+</blockquote>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

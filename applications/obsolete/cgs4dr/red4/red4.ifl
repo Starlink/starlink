@@ -1,0 +1,4866 @@
+#+
+MONOLITH RED4
+#
+# Description :
+#   This is the interface file for the RED4 data reduction monolith
+#   for CGS4.
+#
+# Deficiencies :
+#
+# Authors :
+#   J Lightfoot (ROE::JFL)
+#   S M Beard   (ROE::SMB)
+#   P N Daly    (JACH::PND)
+#
+# History :
+#   September 1989 : Original version.                               (JFL)
+#   11-Oct-1989: Prologue added.                                     (SMB)
+#   26-Oct-1989: Minimal HELP entries added, missing PROMPTs added
+#                missing DEFAULTs added and POSITION entries added.
+#                Documentation added from document supplied by JFL.  (SMB)
+#    1-Feb-1990: Better HELP entries partially added. Documentation
+#                improved. Some VPATHs made more sensible.           (SMB)
+#    2-Feb-1990: VPATH of FF_DIVIDE parameter changed from
+#                PROMPT to CURRENT,DEFAULT                           (SMB)
+#    8-Feb-1990: VPATH of FF_DIVIDE parameter changed to
+#                CURRENT,PROMPT and PROMPT_FF parameter added.       (SMB)
+#   15-Feb-1990: CREATE_MASK interface added.                        (SMB)
+#   16-Feb-1990: MAKET_MASK interface added.                         (SMB)
+#   20-Feb-1990: Null mask changed from ' ' to '#', as it was
+#                difficult to process ' ' with an ICL variable.      (SMB)
+#    2-Mar-1990: DEBUG interface added.                              (SMB)
+#    9-Mar-1990: TLOW parameter added to CLEAN_OBS.                  (SMB)
+#   23-Apr-1990: FLAT_FIELD changed to FLAT.                         (SMB)
+#    1-May-1990: FF_NORM and ORDER parameters added to RED_OBS and
+#                RED_INT interfaces.                                 (SMB)
+#    2-May-1990: NORMALISE_FF interface added.                       (SMB)
+#    3-May-1990: FF_NORM and ORDER defaults changed.                 (SMB)
+#   17-May-1990: Bad pixel mask combination actions added.           (SMB)
+#   18-May-1990: APPLY_MASK and EXTRACT_MASK actions added.          (SMB)
+#   18-May-1990: Bug in default mask names fixed.                    (SMB)
+#   23-May-1990: CREATE_MASK renamed to CRE_THRESH_MASK, and
+#                CRE_WINDOW_MASK action added.                       (SMB)
+#   23-May-1990: EDIT_MASK action added.                             (SMB)
+#    5-Jul-1990: Prompt for COORDS parameter made more explicit, to
+#                allow unsuspecting users to get out of the endless
+#                loop in the MAKE_INT action.                        (SMB)
+#    9-Jul-1990: Mistakes in the definition of the GRATING_NAME
+#                and FILTERS parameter fixed. 'PROMPT, DEFAULT'
+#                fields changed to 'PROMPT'.                         (SMB)
+#    9-Jul-1990: STRIPES, WIDTH, UP and DOWN parameters added.       (SMB)
+#   10-Jul-1990: Parameters FF_NORM and FF_DIVIDE replaced with
+#                SUBTRACT_DARK, PROCEED_DARK, DIVIDE_BY_FF,
+#                PROCEED_FF, NORMALISE_FF, PROCEED_NORM and
+#                NORM_METHOD, to be more consistent with CRED4 and
+#                to allow DARK subtraction to be optional.           (SMB)
+#   11-Jul-1990: LIST_INDEX action added.                            (SMB)
+#   12-Jul-1990: FLAT_MATCH parameter added.                         (SMB)
+#   23-Jul-1990: RANGE added to INT_NUM and OBS_NUM parameters.      (SMB)
+#   30-Jul-1990: "yy" changed to "yyyy".                             (SMB)
+#   30-Jul-1990: IF_HITIME parameter added, to be compatible with
+#                the data acquisition system.                        (SMB)
+#   30-Jul-1990: ARCHIVE_OBS action added.                           (SMB)
+#   31-Jul-1990: "yyyy" changed back to "yy" !!!!!!!                 (SMB)
+#   14-Aug-1990: Entries for ADJOIN, BLACK and EXTRACT4 actions added,
+#                copied from JFL's RED3.IFL from the CGS3 software.  (SMB)
+#   17-Aug-1990: DEF and TEMPLATE parameters added to template-making
+#                actions for flexibility, and to allow different
+#                templates to be experimented with.                  (SMB)
+#   21-Aug-1990: KTC replaced by NDR.                                (SMB)
+#   29-Aug-1990: LINCOEFFS parameter added.                          (SMB)
+#    7-Sep-1990: BEAM parameter removed.                             (SMB)
+#   18-Sep-1990: CREATE_GRPRED action added, for testing.            (SMB)
+#   21-Sep-1990: ADD_OBS action added.                               (SMB)
+#   26-Sep-1990: NCOLUMNS, NROWS parameters added to CRE_WINDOW_MASK.(SMB)
+#   24-Oct-1990: FLAT_MATCH parameter changed to GRATING only, for
+#                engineering checks.                                 (SMB)
+#   24-Oct-1990: EFFICIENCY action added.                            (SMB)
+#   24-Oct-1990: FLAT_MATCH parameter changed to NONE, for
+#                engineering checks.                                 (SMB)
+#   30-Oct-1990: REMOVE_OBS action added.                            (SMB)
+#    5-Nov-1990: VARIANCE_WT and SKY_WT parameters added to ADD_OBS
+#                action.                                             (SMB)
+#   16-Nov-1990: POKE_FITS action added.                             (SMB)
+#   19-Nov-1990: SET_VERBOSE action added. OFORMAT parameter
+#                added to LIST_INDEX action.                         (SMB)
+#   21-Nov-1990: Wavelength calibration parameters added to ADD_INT,
+#                CREATE_OBSRED and RED_OBS actions.                  (SMB)
+#   21-Nov-1990: FILE_CALIB action added.                            (SMB)
+#   22-Nov-1990: RESTORE_CALIB action added. CHANGE_LABEL, NEWLABEL
+#                and NEWUNITS parameters added.                      (SMB)
+#   23-Nov-1990: ADAMBUG action added, to try and track down a bug
+#                in the ADAM parameter system.                       (SMB)
+#   23-Nov-1990: ADAMBUG removed.                                    (SMB)
+#   26-Nov-1990: Positions given to wavelength calibration parameters
+#                in CREATE_OBSRED action.                            (SMB)
+#    6-Dec-1990: MAKE_STANDARD action added.                         (SMB)
+#    7-Dec-1990: MAKE_STANDARD action modified.                      (SMB)
+#   12-Dec-1990: CALIB_MATCH, STANDARD_MATCH and AMTOLER parameters
+#                added. FLAT_MATCH changed to back to GRATING,SLIT
+#                as the engineering tests are over.                  (SMB)
+#   13-Dec-1990: DESTINATION, FILE and PRINTER parameters added to
+#                LIST_INDEX action.                                  (SMB)
+#   16-Dec-1990: FILE_STANDARD and DIVIDE_BY_STD actions added.      (SMB)
+#   18-Dec-1990: Typing mistake fixed.                               (SMB)
+#    2-Jan-1991: EXTRACT3 and MEND actions added.                    (SMB)
+#    3-Jan-1991: OPER and MEND parameters added to FILE_STANDARD and
+#                MAKE_STANDARD actions.                              (SMB)
+#   11-Jan-1991: IF_HITIME changed to TRUE.                          (SMB)
+#   14-Jan-1991: OPTEXRACT action added.                             (SMB)
+#   26-Jan-1991: ADD_PAIR action added.                              (SMB)
+#   31-Jan-1991: ERRORS and VARIANCE_WT parameters added to ADD_PAIR.(SMB)
+#    3-Feb-1991: Minor change to parameter prompts in FILE_STANDARD. (SMB)
+#    7-Feb-1991: STANDARD_MATCH parameter changed to 'NONE'
+#                to allow experimentation.                           (SMB)
+#   18-Feb-1991: REMOVE_PAIR action added.                           (SMB)
+#   24-Feb-1991: RESET action added. STANDARD_MATCH changed back.    (SMB)
+#   27-Feb-1991: CALIB_MATCH and STANDARD_MATCH changed to their
+#                normal settings. Some other settings included as
+#                examples.                                           (SMB)
+#   28-Feb-1991: The GLAMBDA test in STANDARD_MATCH didn't work.
+#                GLAMBDA removed.                                    (SMB)
+#   17-May-1991: FLAT_MATCH changed to `GRATING, GLAMBDA, SLIT'      (PND)
+#   17-May-1991: STANDARD_MATCH changed to `GRATING, GLAMBDA'        (PND)
+#   30-May-1991: Contents of EMLT interface added from Figaro.       (SMB)
+#   31-Jul-1991: BOXSIZE parameter included. 'SMOOTH' option added
+#                to NORM_METHOD parameter.                           (SMB)
+#   16-Aug-1991: Add POLYFIT enhanced sky subtraction parameters     (PND)
+#    2-Oct-1991: Add STATUS interface                                (PND)
+#    8-Oct-1991: Add BIAS_MODE, DARK_MODE, FLAT_MODE, CALIB_MODE,
+#                STANDARD_MODE, SPECIFIED_BIAS, SPECIFIED_DARK,
+#                SPECIFIED_FLAT, SPECIFIED_CALIB and SPECIFIED_STD
+#                parameters; to enable the index file to be searched
+#                either backwards or forwards in time, or both, and
+#                to enable the names of calibration observations to
+#                be specified explicitly when required (DRIMP/5.1
+#                and 5.2). Parameters initially set to 'PROMPT' for
+#                testing (will eventually become 'CURRENT,DEFAULT'). (SMB)
+#    9-Oct-1991: Misleading defaults changed.                        (SMB)
+#   10-Oct-1991: Parameters changed to 'DEFAULT' for release.        (SMB)
+#   20-Oct-1991: Add SET_GRPNUM parameters.                          (PND)
+#   21-Feb-1991: Add PF_POLYFIT to ADD_OBS and ADD_PAIR              (PND)
+#   21-Feb-1991: Add CRE_ERROR_MASK                                  (PND)
+#   14-Apr-1992: DRIMP/5.1 and DRIMP/5.2 parameters changed to
+#                'CURRENT,PROMPT'. POSITION values for parameters
+#                of ADD_INT, RED_INT, RED_OBS, DIVIDE_BY_STD and
+#                CREATE_OBSRED rationalised. The VALUE string is
+#                currently only just long enough to refer to these
+#                parameters by keyword. They may soon have to be
+#                passed by position. Positions of SKY_WT and
+#                VARIANCE_WT in ADD_PAIR and ADD_OBS also made
+#                consistent.                                         (SMB)
+#   11-May-1992: Add TEST_SEARCH action, so that the calibration
+#                observations which will be used to reduce a
+#                given observation may be verified. This action
+#                was produced to follow up a bug, reported on
+#                6-May-1992, in which incorrect calibration
+#                observations were being chosen.                     (SMB)
+#   14-May-1992: Add IRFLAT to RED4 action list                      (PND)
+#   22-Jun-1992: Modify POKE_FITS action to read a FITS item         (PND)
+#   30-Jun-1992: Add FITS_FILE to POKE_FITS                          (PND)
+#    1-Jul-1992: Add MODE parameter to POKE_FITS                     (PND)
+#   17-Jul-1992: Add SUBTRACT_BIAS option                            (PND)
+#   23-Jul-1992: Add XSTART, XEND to FILE_STANDARD                   (PND)
+#    2-Sep-1992: Add flux_calibrate                                  (PND)
+#    8-Nov-1993: Add nodextract4				     (KLK)
+#    6-Dec-1993: Add TYPE to file_observation                        (PND)
+#    8-Dec-1993: Modify NODEXTRACT to output image                   (PND)
+#   31-Mar-1994: Restore_calibration removed (redundant)             (PND)
+# endhistory
+#-
+
+#----------------------------------------------------------------------
+
+   INTERFACE ADD_INT
+
+      # This takes the reduced result of integration <INTFILE> from
+      # RIDIR:R<INTFILE>, interleaves it with the other integrations
+      # making up the parent observation and coadds it to the current
+      # numbers in the array. Pixel quality is propagated and the error 
+      # array of the coadd is calculated from the dispersion of the
+      # coadded numbers about the mean, any error array associated with
+      # the reduced integration itself is ignored.
+      # The name of the file holding the observation result is constructed
+      # from the name of the integration. If the reduced observation does
+      # not exist then one will be constructed before the coadd is
+      # performed (see CREATE_OBSRED below).
+      # For SPECTRA-type integrations, if the <TO_WAVELENGTH> parameter is
+      # set to 'YES' or 'ASK', the X axis in the observation file may be
+      # wavelength calibrated using the method specified in <LAMBDA_METHOD>.
+      # The name of the integration and brief details of its reduction
+      # sufficient to recreate it if need be are stored in the COADDS
+      # structure of the reduced observation file. If an attempt is made 
+      # to add the same integration twice this will be detected, a warning 
+      # will be issued and the coadd will not be performed.
+
+      PARAMETER INTFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration file'
+         HELP 'The DSA structure containing integration data to be added'
+         DEFAULT 'Iyymmdd_oooo_iiii'
+      ENDPARAMETER
+
+      PARAMETER TO_WAVELENGTH
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Calibrate data into wavelength (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when wavelength calibrating'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_LAMBDA
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength calibrate these data (Y or N) ?'
+         HELP 'Would you like the X axis calibrated into wavelength ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER LAMBDA_METHOD
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength calibration method'
+         HELP 'ESTIMATED from the grating equation or CALIBRATED from an arc'
+         DEFAULT 'ESTIMATED'
+         IN 'ESTIMATED', 'CALIBRATED'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MODE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for CALIB observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_CALIB
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIBRATION observation to be used'
+         HELP 'Name of CALIBATION observation to be used for wavelength calibration.'
+         DEFAULT 'CAyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIB settings to match'
+         HELP 'Settings which must match when searching for suitable CALIBRATION'
+         DEFAULT 'CNFINDEX'    # Strict setting necessary for good calibration
+#         DEFAULT 'GRATING, GLAMBDA'  # Alternate, less strict, setting
+#         DEFAULT 'GRATING'           # Lax setting, for testing.
+      ENDPARAMETER
+
+ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE ADD_OBS
+
+      # This action adds the data within observation <OBSFILE> to
+      # its corresponding reduced group. Only OBJECT and SKY observations
+      # are allowed. The observation data may be weighted according
+      # to its variance (if <VARIANCE_WT> is TRUE). SKY observations
+      # are multiplied by <SKY_WT> before being added.
+      # Data quality is propagated and the resultant variance array
+      # determined from the sum of the variances of the corresponding
+      # observations.
+      # The name of the file holding the reduced group is constructed
+      # from the name of the observation. If the reduced group file does
+      # not exist then one will be created before the coadd is performed.
+      # The name of the observation and brief details of its reduction
+      # sufficient to recreate it if need be are stored in the COADDS
+      # structure of the reduced group file. If an attempt is made 
+      # to add the same observation twice this will be detected, a warning 
+      # will be issued and the coadd will not be performed.
+
+      PARAMETER OBSFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The DSA structure containing observation data to be added'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER SKY_WT
+         POSITION 2
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'SKY observation weighting factor'
+         HELP 'SKY observations will be multiplied by this number.'
+         DEFAULT 1.0
+      ENDPARAMETER
+
+      PARAMETER VARIANCE_WT
+         POSITION 3
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Is variance weighting required (Y or N) ?'
+         HELP 'Should observations be weighted by variance when combined ?'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+      PARAMETER PF_POLYFIT
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of POLYFIT (NONE, OBJ-SKY, REDUCED_GRP or OBJECT only) ? '
+         HELP 'This option enables enhanced sky-subtraction for point sources'
+         DEFAULT 'NONE'
+         IN 'NONE', 'OBJ-SKY', 'REDUCED_GRP', 'OBJECT'
+      ENDPARAMETER
+
+      PARAMETER PF_WEIGHT
+         POSITION 5
+         TYPE '_LOGICAL'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'WEIGHT the data according to their errors ? '
+         HELP 'WEIGHT the data according to their errors'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+      PARAMETER PF_DEGREE
+         POSITION 6
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DEGREE of polynomial to be fitted ? '
+         HELP 'DEGREE of the polynomial to be fitted'
+         DEFAULT 1
+         RANGE 1,10
+      ENDPARAMETER
+
+      PARAMETER PF_NREJECT
+         POSITION 7
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of points to reject from fit? '
+         HELP 'NREJECT is the number of points to be omitted from the fit'
+         DEFAULT 0
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS1
+         POSITION 8
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of first sky area ? '
+         HELP 'SAYS1 delimits the start, in y, of the first sky area'
+         DEFAULT 20
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE1
+         POSITION 9
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of first sky area ? '
+         HELP 'SAYE1 delimits the end, in y, of the first sky area'
+         DEFAULT 25
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS2
+         POSITION 10
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of second sky area ? '
+         HELP 'SAYS2 delimits the start, in y, of the second sky area'
+         DEFAULT 35
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE2
+         POSITION 11
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of second sky area ? '
+         HELP 'SAYE2 delimits the end, in y, of the second sky area'
+         DEFAULT 40
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS3
+         POSITION 12
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of third sky area ? '
+         HELP 'SAYS3 delimits the start, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE3
+         POSITION 13
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of third sky area ? '
+         HELP 'SAYE3 delimits the end, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS4
+         POSITION 14
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of fourth sky area ? '
+         HELP 'SAYS4 delimits the start, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE4
+         POSITION 15
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of fourth sky area ? '
+         HELP 'SAYE4 delimits the end, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE ADD_PAIR
+
+      # This action constructs a pair of OBJECT and SKY observations,
+      # with the data within observation <OBSFILE> forming one member
+      # of the pair. Every alternate time this action is invoked,
+      # the SKY observation is subtracted from the OBJECT observation
+      # and the result co-added into the corresponding reduced group.
+      # SKY observations are multiplied by <SKY_WT> before being used.
+      # Data quality is propagated and the resultant variance array
+      # determined from the spread of values of the pairs of observations.
+      # This action may be used instead of ADD_OBS in cases where the
+      # variance needs to be derived from the observations instead of
+      # merely being propagated from them. (For example, if the 
+      # observations themselves do not contain error information).
+      # The name of the file holding the reduced group is constructed
+      # from the name of the observation. If the reduced group file does
+      # not exist then one will be created before the coadd is performed.
+      # The name of the observation and brief details of its reduction
+      # sufficient to recreate it if need be are stored in the COADDS
+      # structure of the reduced group file. If an attempt is made 
+      # to add the same observation twice this will be detected, a warning 
+      # will be issued and the coadd will not be performed.
+
+      PARAMETER OBSFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The DSA structure containing observation data to be added'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER ERRORS
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Error propagation required'
+         HELP 'FROM_INT=Use existing errors. FROM_OBS=Estimate new errors.'
+         IN 'FROM_INT', 'FROM_OBS'
+         DEFAULT 'FROM_OBS'
+      ENDPARAMETER
+
+      PARAMETER SKY_WT
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'SKY observation weighting factor'
+         HELP 'SKY observations will be multiplied by this number.'
+         DEFAULT 1.0
+      ENDPARAMETER
+
+      PARAMETER VARIANCE_WT
+         POSITION 4
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Is variance weighting required (Y or N) ?'
+         HELP 'Should observations be weighted by variance when combined ?'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+      PARAMETER PF_POLYFIT
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of POLYFIT (NONE, OBJ-SKY, REDUCED_GRP or OBJECT only) ? '
+         HELP 'This option enables enhanced sky-subtraction for point sources'
+         DEFAULT 'NONE'
+         IN 'NONE', 'OBJ-SKY', 'REDUCED_GRP', 'OBJECT'
+      ENDPARAMETER
+
+      PARAMETER PF_WEIGHT
+         POSITION 6
+         TYPE '_LOGICAL'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'WEIGHT the data according to their errors ? '
+         HELP 'WEIGHT the data according to their errors'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+      PARAMETER PF_DEGREE
+         POSITION 7
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DEGREE of polynomial to be fitted ? '
+         HELP 'DEGREE of the polynomial to be fitted'
+         DEFAULT 1
+         RANGE 1,10
+      ENDPARAMETER
+
+      PARAMETER PF_NREJECT
+         POSITION 8
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of points to reject from fit? '
+         HELP 'NREJECT is the number of points to be omitted from the fit'
+         DEFAULT 0
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS1
+         POSITION 9
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of first sky area ? '
+         HELP 'SAYS1 delimits the start, in y, of the first sky area'
+         DEFAULT 20
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE1
+         POSITION 10
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of first sky area ? '
+         HELP 'SAYE1 delimits the end, in y, of the first sky area'
+         DEFAULT 25
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS2
+         POSITION 11
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of second sky area ? '
+         HELP 'SAYS2 delimits the start, in y, of the second sky area'
+         DEFAULT 35
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE2
+         POSITION 12
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of second sky area ? '
+         HELP 'SAYE2 delimits the end, in y, of the second sky area'
+         DEFAULT 40
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS3
+         POSITION 13
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of third sky area ? '
+         HELP 'SAYS3 delimits the start, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE3
+         POSITION 14
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of third sky area ? '
+         HELP 'SAYE3 delimits the end, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS4
+         POSITION 15
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of fourth sky area ? '
+         HELP 'SAYS4 delimits the start, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE4
+         POSITION 16
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of fourth sky area ? '
+         HELP 'SAYE4 delimits the end, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE ADJOIN
+
+#   **********************************************************************
+#   *                          A D J O I N                               *
+#   *     ADJOIN is a Figaro routine whose primary function is to        *
+#   *     append one spectrum to another.  That is, given two spectra,   *
+#   *     it produces one output spectrum where the .X and .Z arrays     *
+#   *     are formed by appending the second spectrum data onto the end  *
+#   *     of the data from the first.  In detail, ADJOIN is a little     *
+#   *     more complex, since it produces a spectrum in which the        *
+#   *     X data (the contents of the data object .X.DATA) increase.     *
+#   *     This may involve the sorting of the various arrays, so ADJOIN  *
+#   *     can be regarded as a program that merges two spectra into      *
+#   *     increasing X order.                                            *
+#   **********************************************************************
+
+      PARAMETER  SPECTRUM
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First of the two spectra to be adjoined'
+#         TEXT    -------------------------------------------------------
+#                 ADJOIN appends the second of two spectra onto the
+#                 first.  SPECTRUM is the first of the two.  If neither
+#                 has any X information (ie no wavelength array), the
+#                 order will be first and then second.  If one or both
+#                 have X data, the resulting spectrum will be in order of 
+#                 X value. 
+#                 -------------------------------------------------------
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM1
+         POSITION 2
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  '2nd of the two spectra to be adjoined'
+#         TEXT    ---------------------------------------------------
+#                 SPECTRUM1 specifies the second of the two spectra.
+#                 Note that it is the structure of the first spectrum
+#                 that is copied to the output spectrum.  Only data
+#                 arrays will be copied from the second.
+#                 ---------------------------------------------------
+      ENDPARAMETER
+
+      PARAMETER  OUTPUT
+         POSITION 3
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of resulting spectrum'
+#         TEXT    ------------------------------------------------------
+#                 OUTPUT is the name of the resulting spectrum.  Note
+#                 that ADJOIN always produces a new file, even if OUTPUT
+#                 has the same name as one of the input spectra.  OUTPUT
+#                 will have essentially the same structure as the first
+#                 spectrum, but any data array found in the .X or .Z
+#                 structure of both input spectra, with the same length
+#                 as the .Z.DATA array in both spectra, will appear in
+#                 OUTPUT as an array whose length is the sum of the two
+#                 arrays.  (.Z.ERRORS, for example, would be adjoined).
+#                 ------------------------------------------------------
+      ENDPARAMETER 
+
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE ARCHIVE_OBS
+
+      # This action records an observation in the observation catalogue,
+      # as part of the CGS4 archive.
+
+      PARAMETER OBSERVATION
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation'
+         HELP 'Observation whose details are to be written to the catalogue'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CATFILE
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation catalogue'
+         HELP 'The ASCII file to which the observation details will be appended'
+         DEFAULT 'CGS4_ARCHIVE:CGS4.DAT' # Only 4 character file name allowed !
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE APPLY_MASK
+
+      # This action takes a bad pixel mask contained in the data array
+      # of one data structure and copies it to the data quality array
+      # of another structure.
+
+      PARAMETER MASK
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The DSA structure containing bad pixel mask to be applied'
+      ENDPARAMETER
+
+      PARAMETER DATA
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of data structure'
+         HELP 'The DSA structure whose data quality will be replaced'
+      ENDPARAMETER
+
+      PARAMETER OVERWRITE
+         POSITION 3
+         TYPE '_LOGICAL'
+         VPATH 'CURRENT,DEFAULT'
+         DEFAULT TRUE
+         PROMPT 'Overwrite existing data quality array ? (Y or N)'
+         HELP 'YES=Overwrite array; NO=Do not overwrite array'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE BLACK_BODY
+
+      # Calculates a normalised black body spectrum for the wavelengths
+      # defined by the x-axis of a template file.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of template structure'
+         HELP 'The DSA structure containing the template wavelength axis'
+      ENDPARAMETER
+
+      PARAMETER BB_TEMP
+         POSITION 2
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Temperature of black-body'
+         HELP 'Enter an effective temperature in Kelvin.'
+      ENDPARAMETER
+
+      PARAMETER REFWAVE
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength at which black-body is to be normalised'
+         HELP 'Enter a wavelength in microns.'
+      ENDPARAMETER
+
+      PARAMETER REFFLUX
+         POSITION 4
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Value to which reference wavelength should be set'
+         HELP ' '
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the black body spectrum'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CLEAN_OBS
+
+      # This sets the quality of any data whose signal to noise
+      # falls below a specified threshold to "bad". It is used
+      # for cleaning up the borders of flat field observations.
+
+      PARAMETER DATA
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of data file, including directory'
+         HELP 'The DSA structure containing observation data to be cleaned'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CUT
+         POSITION 2
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Signal to noise cut-off'
+         HELP 'Pixels below this S/N will be set "bad"'
+         DEFAULT 100.0
+      ENDPARAMETER
+
+      PARAMETER TLOW
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Minimum acceptable value'
+         HELP 'Values below this will be set "bad"'
+         DEFAULT 100.0
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CRE_ERROR_MASK
+
+      # This creates a bad pixel mask based on the input error array
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input file'
+         HELP 'The name of the DSA structure to be examined'
+      ENDPARAMETER
+
+      PARAMETER MASK
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 'CGS4_MASKS:MASK_yymmdd_TEMPLATE'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The name of the DSA structure to be created'
+      ENDPARAMETER
+
+   ENDINTERFACE 
+
+#----------------------------------------------------------------------
+
+   INTERFACE CRE_THRESH_MASK
+
+      # This creates a bad pixel mask based on a given input array.
+      # In all the places where the data values in the input array lie
+      # outside the given range, the mask is set to "bad".
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input file'
+         HELP 'The name of the DSA structure to be examined'
+      ENDPARAMETER
+
+      PARAMETER MASK
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 'BAD_PIXEL_MASK'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The name of the DSA structure to be created'
+      ENDPARAMETER
+
+      PARAMETER TLOW
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Minimum acceptable value'
+         HELP 'Values below this will be flagged "bad"'
+      ENDPARAMETER
+
+      PARAMETER THIGH
+         POSITION 4
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Maximum acceptable value'
+         HELP 'Values above this will be flagged "bad"'
+      ENDPARAMETER
+
+      PARAMETER GOOD
+         POSITION 5
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 0
+         RANGE 0, 127
+         PROMPT 'Data quality value for "good"'
+         HELP 'Value to write to mask when data within range'
+      ENDPARAMETER
+
+      PARAMETER BAD
+         POSITION 6
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         RANGE 0, 127
+         PROMPT 'Data quality value for "bad"'
+         HELP 'Value to write to mask when data outside range'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CRE_WINDOW_MASK
+
+      # This creates a bad pixel mask by setting all the pixels
+      # which are outside a specified window to "bad".
+
+      PARAMETER MASK
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 'BAD_PIXEL_MASK'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The name of the DSA structure to be created'
+      ENDPARAMETER
+
+      PARAMETER WINDOW_IMIN
+         POSITION 2
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         PROMPT 'Left hand column of window'
+         HELP 'The minimum column number of the range to be set to "good"'
+      ENDPARAMETER
+
+      PARAMETER WINDOW_IMAX
+         POSITION 3
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 256
+         PROMPT 'Right hand column of window'
+         HELP 'The maximum column number of the range to be set to "good"'
+      ENDPARAMETER
+
+      PARAMETER WINDOW_JMIN
+         POSITION 4
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         PROMPT 'Bottom row of window'
+         HELP 'The minimum row number of the range to be set to "good"'
+      ENDPARAMETER
+
+      PARAMETER WINDOW_JMAX
+         POSITION 5
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 256
+         PROMPT 'Top row of window'
+         HELP 'The maximum row number of the range to be set to "good"'
+      ENDPARAMETER
+
+      PARAMETER NCOLUMNS
+         POSITION 6
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 256
+         RANGE 0, 2048
+         PROMPT 'Number of columns'
+         HELP 'The number of columns in the corresponding data array'
+      ENDPARAMETER
+
+      PARAMETER NROWS
+         POSITION 7
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 256
+         RANGE 0, 2048
+         PROMPT 'Number of rows'
+         HELP 'The number of rows in the corresponding data array'
+      ENDPARAMETER
+
+      PARAMETER GOOD
+         POSITION 8
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 0
+         RANGE 0, 127
+         PROMPT 'Data quality value for "good"'
+         HELP 'Value to write to mask inside window'
+      ENDPARAMETER
+
+      PARAMETER BAD
+         POSITION 9
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         RANGE 0, 127
+         PROMPT 'Data quality value for "bad"'
+         HELP 'Value to write to mask outside window'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CREATE_GRPRED
+
+      # Constructs an empty reduced group file.
+
+      PARAMETER OBSRED
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of template reduced observation file'
+         HELP 'The name of the DSA structure to be used as a template'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER GRPNUM
+         POSITION 2
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Group number'
+         HELP 'The number associated with this group'
+         DEFAULT 1
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CREATE_OBSRED
+
+      # This creates a file to hold a reduced observation. It does this by
+      # looking at the observation held in <OBSFILE>, finding the size of
+      # the detector array and the number of detector positions being used
+      # in the observation, and making up a data array of the right size 
+      # hold the reduction. The quality array of the output data is 
+      # initialised as bad, the number of coadds set to 0.
+      # For SPECTRA-type observations, if the <TO_WAVELENGTH> parameter is
+      # set to 'YES' or 'ASK', the X axis in the observation file may be
+      # wavelength calibrated using the method specified in <LAMBDA_METHOD>.
+
+      PARAMETER OBSFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The name of the template observation file (no directory)'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER TO_WAVELENGTH
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Calibrate data into wavelength (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when wavelength calibrating'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER LAMBDA_METHOD
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength calibration method'
+         HELP 'ESTIMATED from the grating equation or CALIBRATED from an arc'
+         DEFAULT 'ESTIMATED'
+         IN 'ESTIMATED', 'CALIBRATED'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_LAMBDA
+        TYPE '_LOGICAL'
+        VPATH 'PROMPT'
+        PPATH 'DYNAMIC,CURRENT,DEFAULT'
+        PROMPT 'Wavelength calibrate these data (Y or N) ?'
+        HELP 'Would you like the X axis calibrated into wavelength ?'
+        DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER CALIB_MODE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for CALIB observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_CALIB
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIBRATION observation to be used'
+         HELP 'Name of CALIBATION observation to be used for wavelength calibration.'
+         DEFAULT 'CAyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIB settings to match'
+         HELP 'Settings which must match when searching for suitable CALIBRATION'
+         DEFAULT 'CNFINDEX'    # Strict setting necessary for good calibration
+#         DEFAULT 'GRATING, GLAMBDA'  # Alternate, less strict, setting
+#         DEFAULT 'GRATING'           # Lax setting, for testing.
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE DEBUG
+
+      # A dummy action which invokes the VAX/VMS debugger.
+      # It is only really useful if the RED4 monolith has been compiled
+      # and linked /DEBUG.
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE DIVIDE_BY_STD
+
+      # Divide a group by a suitable STANDARD frame, and write the
+      # result to the given output structure.
+
+      PARAMETER GROUP
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input group'
+         HELP 'The name of DSA structure of the form, RGyymmdd_gggg.'
+         DEFAULT 'RGyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output group'
+         HELP 'The name of DSA structure of the form, RGyymmdd_gggg.'
+         DEFAULT 'RGyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER STANDARD_MODE
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for STANDARD groups'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_STD
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'STANDARD group to be used'
+         HELP 'Name of reduced STANDARD group to be used in the reduction.'
+         DEFAULT 'STyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER STANDARD_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'STANDARD settings to match'
+         HELP 'Settings which must match when searching for suitable STANDARD'
+#        DEFAULT 'CNFINDEX, AIRMASS'         # Strictest setting
+#        DEFAULT 'GRATING, GLAMBDA, AIRMASS' # Normal setting (didn't work!)
+         DEFAULT 'GRATING, GLAMBDA'          # Cures bug DRBUG/2
+#        DEFAULT 'GRATING'                   # Test setting
+      ENDPARAMETER
+
+      PARAMETER AMTOLER
+         TYPE '_REAL'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Air mass % tolerance'
+         HELP 'Max. allowed % difference between OBJECT and STANDARD air mass'
+         DEFAULT 100.0
+         RANGE 0.0, 100.0
+      ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EDIT_MASK
+
+      # This action enables an existing bad pixel mask to be modified
+      # by poking data values into it. This action may be used to
+      # modify one value only by setting LOOP=FALSE (the default),
+      # or it may be used to modify several values at once by specifying
+      # LOOP=TRUE. (Note that in the latter case a user has to be present
+      # to answer all the prompts which are generated).
+
+      PARAMETER MASK
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 'BAD_PIXEL_MASK'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The name of the DSA structure to be edited'
+      ENDPARAMETER
+
+      PARAMETER IPOS
+         POSITION 2
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         PROMPT 'Column number of pixel to be modified'
+         HELP 'The element number in the first dimension of the mask array'
+      ENDPARAMETER
+
+      PARAMETER JPOS
+         POSITION 3
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         PROMPT 'Row number of pixel to be modified'
+         HELP 'The element number in the second dimension of the mask array'
+      ENDPARAMETER
+
+      PARAMETER QVAL
+         POSITION 4
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 0
+         RANGE 0, 127
+         PROMPT 'Quality value to be written'
+         HELP 'Value to be poked into the specified element of the mask array'
+      ENDPARAMETER
+
+      PARAMETER LOOP
+        POSITION 5
+        TYPE '_LOGICAL'
+        VPATH 'CURRENT,DEFAULT'
+        DEFAULT FALSE
+        PROMPT 'Should this action loop internally (Y or N) ?'
+        HELP 'YES=Loop internally to edit many values; NO=Execute only once'
+      ENDPARAMETER
+
+      PARAMETER AGAIN
+        TYPE '_LOGICAL'
+        VPATH 'PROMPT'
+        DEFAULT TRUE
+        PROMPT 'Modify another value (Y or N) ?'
+        HELP 'Do you wish to go back specify another IPOS,JPOS,QVAL ?'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EFFICIENCY
+
+      # This action determines the efficiency at which some CGS4 data
+      # has been observed and reports this as a percentage.
+
+      PARAMETER  DATA
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of data structure'
+         HELP 'The name of the data structure to be examined.'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+      Interface EMLT
+
+         # This is the Figaro command for analysing the emission lines
+         # in a spectrum. (The information is lifted straight from
+         # FIGARO.IFL and EMLT.INF, except I have put something more
+         # useful in the 'HELP' field.
+
+         Parameter SPECTRUM
+            # --------------------------------------------------------       
+            # SPECTRUM specifies the spectrum whose strongest emission       
+            # lines are to be fitted.  If the data is more than one-         
+            # dimensional, the analysis is repeated for each cross-          
+            # section (ie spectrum) in the data.                             
+            # --------------------------------------------------------       
+            Keyword 'SP'
+            Position  1
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SPectrum) Spectrum containing lines to be fitted'
+            Help   'The name of existing DSA structure containing spectrum'
+         EndParameter
+
+         Parameter XSTART
+            # -------------------------------------------------------        
+            # XSTART specifies the X-value (wavelength for calibrated        
+            # data, or pixel number for uncalibrated data) at which          
+            # the analysis is to start.                                      
+            # -------------------------------------------------------        
+            Keyword 'XS'
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(XStart) X-value at which analysis starts'
+            Help   'Left-most wavelength or pixel number of range.'
+         EndParameter
+
+         Parameter XEND
+            # -------------------------------------------------------        
+            # XEND specifies the X-value (wavelength for calibrated          
+            # data, or pixel number for uncalibrated data) at which          
+            # the analysis is to end.                                        
+            # -------------------------------------------------------        
+            Keyword 'XE'
+            Position  3
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(XEnd) X-value at which analysis ends'
+            Help   'Right-most wavelength or pixel number of range.'
+         EndParameter
+
+         Parameter LINES
+            # ------------------------------------------------------         
+            # If LINES is non-zero, it specifies that only the               
+            # indicated number of strongest lines are to be included         
+            # in the analysis.  If zero, all lines for which a               
+            # reasonable fit can be obtained are included.                   
+            # ------------------------------------------------------         
+            Keyword 'LI'
+            Position  4
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(LInes) Number of lines to fit (0 -> all lines)'
+            Help   'The LINES strongest lines will be found, 0 for all lines.'
+         EndParameter
+
+         Parameter FWHM
+            # ------------------------------------------------------         
+            # If FWHM is zero, the fits performed are unconstrained;         
+            # that is, the fit determines full width at half maximum         
+            # for each line independently.  If FWHM is non-zero, it          
+            # specifies a fullwidth at half maximum (in pixels) for          
+            # each line in the spectrum, and the fit is constrained          
+            # accordingly.                                                   
+            # ------------------------------------------------------         
+            Keyword 'F'
+            Position  5
+            Type 'LITERAL'       
+            Vpath 'CURRENT,DYNAMIC'               
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(Fwhm) Forced FWHM for fitted lines'
+            Help   'Enter 0.0 for unconstrained fits.'
+         EndParameter
+
+         Parameter MOMENTS
+            # -----------------------------------------------------          
+            # If MOMENTS is specified, a center of moment analysis           
+            # is performed (in addition to the gaussian fit) for             
+            # each line and the results included in the output.              
+            # This analysis is performed for each line found, not            
+            # just the LINES strongest lines.                                
+            # -----------------------------------------------------          
+            Keyword 'MOM'
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(MOMents) Include center of moment analysis?'
+            Help   'C. of M. analysis required as well as Gaussian fit ?'
+         EndParameter
+
+         Parameter SYNTH
+            # --------------------------------------------------------       
+            # If SYNTH is specified, a synthetic spectrum based on the       
+            # fitted positions, strengths and widths of the lines is         
+            # generated.                                                     
+            # --------------------------------------------------------       
+            Keyword 'SY'
+            Type '_LOGICAL'      
+            Vpath 'DYNAMIC,DEFAULT'               
+            Default FALSE   
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SYnth) Generate a synthetic spectrum from the fits?'
+            Help   'This is based on the parameters of the fitted lines.'
+         EndParameter
+
+         Parameter OUTPUT
+            # ---------------------------------------------------            
+            # OUTPUT is used to specify the name of the resulting            
+            # synthetic spectrum, if one is to be created.                   
+            # ----------------------------------------------------           
+            Keyword 'OUT'
+            Position  6
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(OUTput) Name of resulting synthetic spectrum'
+            Help   'The name of a DSA data structure to be created.'
+         EndParameter
+      EndInterface
+
+#----------------------------------------------------------------------
+
+   INTERFACE ENG_RESET
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE LOG_COMMENT
+     PARAMETER COMMENT
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PROMPT 'Comment'
+      HELP 'A comment to be entered into the log file'
+      DEFAULT ' '
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE LOG_EMLT
+     PARAMETER YCEN
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE LOG_SLIT
+     PARAMETER YCEN
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+     PARAMETER YCEN_P
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Previous Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE LOG_TYPE1
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CLOSE_LOG
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+    INTERFACE OPEN_LOG
+    ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+    INTERFACE COPY_TO_LOG
+     PARAMETER SOURCE_FILE
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PROMPT 'Source file for copying to log file'
+      HELP 'Enter a file name'
+      DEFAULT ' '
+     ENDPARAMETER
+    ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE REPORT_EMLT
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE REPORT_SLIT
+     PARAMETER YCEN
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+     PARAMETER YCEN_P
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Previous Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE CALC_SLIT_ANGLE
+     PARAMETER YCEN
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+     PARAMETER YCEN_P
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Previous Y-value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE READ_EMLT
+     PARAMETER XMIN
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Minimum value for line centre' 
+      HELP 'Enter a real value'
+     ENDPARAMETER
+     PARAMETER XMAX
+      TYPE '_REAL'
+      VPATH 'PROMPT'
+      PROMPT 'Maximum value for line centre'
+      HELP 'Enter a real value'
+     ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE READ_OBS
+      PARAMETER  OBSERVATION
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of reduced observation file'
+      ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EXTRACT3
+
+      # This action combines rows from a 2-D spectrum to form a 1-D 
+      # spectrum, taking data quality into account and calculating
+      # the mean and variance of the contributing rows (c.f. EXTRACT4
+      # which propagates the variances).
+
+      PARAMETER  IMAGE
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of image to extract data from'
+      ENDPARAMETER
+
+      PARAMETER  YSTART
+         POSITION 2
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First y-value to be used'
+         HELP    'The first (lowest) row to be extracted'
+      ENDPARAMETER
+
+      PARAMETER  YEND
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Last y-value to be used'
+         HELP    'The last (highest) row to be extracted'
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM
+         POSITION 4
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of spectrum to be generated'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EXTRACT4
+
+      # This action combines rows from a 2-D spectrum to form a 1-D 
+      # spectrum, taking data quality into account, calculating the
+      # the mean of the data values in the rows, and propagating the
+      # variances (c.f. EXTRACT3 which calculates new variances).
+
+      PARAMETER  IMAGE
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of image to extract data from'
+      ENDPARAMETER
+
+      PARAMETER  YSTART
+         POSITION 2
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First y-value to be used'
+         HELP    'The first (lowest) row to be extracted'
+      ENDPARAMETER
+
+      PARAMETER  YEND
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Last y-value to be used'
+         HELP    'The last (highest) row to be extracted'
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM
+         POSITION 4
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of spectrum to be generated'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE NODEXTRACT4
+
+      # This action combines rows from a 2-D spectrum to form a 1-D 
+      # spectrum, for nodded spectra (either three position nodding,
+      # two position nodding, or like EXTRACT4 above)
+
+      PARAMETER  IMAGE
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of image to extract data from'
+      ENDPARAMETER
+
+      PARAMETER INVERT_SPEC
+        POSITION 2
+        TYPE '_LOGICAL'
+        VPATH 'CURRENT,DEFAULT'
+        DEFAULT FALSE
+        PROMPT 'In case beams are backward, invert spectrum?'
+        HELP 'YES=turn spectrum upside down; NO=right side up spectrum'
+      ENDPARAMETER
+
+      PARAMETER  ALGORITHM
+         POSITION 3
+         TYPE    '_CHAR'
+         VPATH   'PROMPT,DEFAULT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Extract algorithm? '
+         IN 'BRIGHT', 'FAINT'
+         DEFAULT 'BRIGHT'
+      ENDPARAMETER
+
+      PARAMETER  ROW1S
+         POSITION 4
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 1 start position'
+         HELP    'The first (lowest) row to be extracted for position 1'
+      ENDPARAMETER
+
+      PARAMETER  ROW1E
+         POSITION 5
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 1 end position'
+         HELP    'The last (highest) row to be extracted for position 1'
+      ENDPARAMETER
+
+      PARAMETER  ROW2S
+         POSITION 6
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 2 start position'
+         HELP    'The first (lowest) row to be extracted for position 2'
+      ENDPARAMETER
+
+      PARAMETER  ROW2E
+         POSITION 7
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 2 end position'
+         HELP    'The last (highest) row to be extracted for position 2'
+      ENDPARAMETER
+
+      PARAMETER  ROW3S
+         POSITION 8
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 3 start position'
+         HELP    'The first (lowest) row to be extracted for position 3'
+      ENDPARAMETER
+
+      PARAMETER  ROW3E
+         POSITION 9
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'row 3 end position'
+         HELP    'The last (highest) row to be extracted for position 3'
+      ENDPARAMETER
+
+      PARAMETER  SPECT
+         POSITION 10
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of output spectrum file'
+      ENDPARAMETER
+
+      PARAMETER  ISPECT
+         POSITION 11
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of output (spectrum) image file'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE EXTRACT_MASK
+
+      # This action takes a data quality array contained in a data
+      # structure and creates a new bad pixel mask based on that
+      # data quality array.
+
+      PARAMETER DATA
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input structure'
+         HELP 'The DSA structure whose data quality is to be extracted'
+      ENDPARAMETER
+
+      PARAMETER MASK
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 'BAD_PIXEL_MASK'
+         PROMPT 'Name of bad pixel mask'
+         HELP 'The name of the DSA structure to be created'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE FILE_CALIB
+
+      # This converts the named observation into a CALIBRATION, and
+      # then adds it to the observation index in the same way as 
+      # FILE_OBS (below).
+
+      PARAMETER OBSERVATION
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The DSA structure whose name is to be filed as a CALIBRATION.'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CHANGE_LABEL
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Would you like to change the labels (Y or N) ?'
+         HELP 'If you have forgotten to change the labels, you can do so now.'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER NEWLABEL
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'New X axis label'
+         HELP 'The label for the X axis in the CALIBRATION observation.'
+         DEFAULT 'Wavelength'
+      ENDPARAMETER
+
+      PARAMETER NEWUNITS
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'New X axis units'
+         HELP 'The units for the X axis in the CALIBRATION observation.'
+         DEFAULT 'microns'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE FILE_OBS
+
+      # This adds the named observation to the observation index. All
+      # observations are added with their quality flag set to `good'.
+
+      PARAMETER OBSERVATION
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The DSA structure whose name is to be filed in the index.'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER TYPE
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'How would you  like to file this observation?'
+         HELP 'Enter BIAS, DARK, FLAT, OBJECT, SKY, ARC, WHATEVER_IT_IS or BAD'
+         IN 'BIAS', 'DARK', 'FLAT', 'OBJECT', 'SKY', 'ARC', 'WHATEVER_IT_IS', 'BAD'
+         DEFAULT 'WHATEVER_IT_IS'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE FILE_STANDARD
+
+      # Converts a group into a standard and files it in the index file.
+
+      PARAMETER GRPFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of group file'
+         HELP 'Name of group to be converted, RGyymmdd_gggg'
+         DEFAULT 'RGyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER TEFF
+         POSITION 2
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Temperature of black-body (in K)'
+         HELP 'The effective temperature of BB equivalent to star'
+         DEFAULT 1000.0
+         RANGE 0.0, 1.0E6
+      ENDPARAMETER
+
+      PARAMETER RFLAMBDA
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Reference wavelength (in microns)'
+         HELP 'The wavelength at which spectrum will be normalised to 1.0'
+         DEFAULT 2.0
+         RANGE 0.1, 100.0
+      ENDPARAMETER
+
+      PARAMETER WHOLE
+         POSITION 4
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Are all the rows to be extracted (Y or N) ?'
+         HELP 'YES=All the rows are to be extracted. NO=Prompt for range.'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER XSTART
+         POSITION 5
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'First row to be extracted'
+         HELP 'The lowest wavelength to be extracted'
+         DEFAULT 1
+      ENDPARAMETER
+
+      PARAMETER XEND
+         POSITION 6
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Last row to be extracted'
+         HELP 'The highest wavelength to be extracted'
+         DEFAULT 256
+      ENDPARAMETER
+
+      PARAMETER YSTART
+         POSITION 7
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'First row to be extracted'
+         HELP 'The lowest detector row to be extracted'
+         DEFAULT 1
+      ENDPARAMETER
+
+      PARAMETER YEND
+         POSITION 8
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Last row to be extracted'
+         HELP 'The highest detector row to be extracted'
+         DEFAULT 256
+      ENDPARAMETER
+
+      PARAMETER OPER
+         POSITION 9
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Logical operation for combining bad pixels'
+         HELP 'Extraction: AND=bad only if all rows bad. OR=bad if any row bad.'
+         IN 'AND', 'OR'
+         DEFAULT 'AND'
+      ENDPARAMETER
+
+      PARAMETER MEND
+         POSITION 10
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Mend bad pixels (Y or N) ?'
+         HELP 'Answer YES to patch bad pixels by interpolation'
+         DEFAULT F
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE FLUX_CALIBRATE
+
+      # This interface defines the parameters to flux calibrate a
+      # spectrum. It is assumed that the spectrum has been divided by
+      # a standard first (otherwise it aborts).
+ 
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input spectrum'
+         HELP 'The name of the input image'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the flux calibrated spectrum'
+      ENDPARAMETER
+
+      PARAMETER FLUX
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Reference flux or magnitude of standard'
+         HELP 'Enter a flux or magnitude at the reference wavelength'
+      ENDPARAMETER
+
+      PARAMETER BAND
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'The band for magnitude, flux or other'
+         HELP 'Enter a known band, flux or other'
+      ENDPARAMETER
+
+      PARAMETER INPUT_UNITS
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'The input units of reference flux'
+         HELP 'Enter a unit'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT_UNITS
+         POSITION 6
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'The output units for flux calibrated spectrum'
+         HELP 'Enter a unit from the choices given'
+         DEFAULT 'W/m2/um'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IADD4
+
+      # The data array of IMAGE1 is added to that of IMAGE2 and output to
+      # OUTPUT. Quality or magic values are taken into account if present
+      # in the data structures. Errors are propagated if present in both
+      # structures and if so specified by the ERRORS parameter. This can
+      # presently be set to NONE, no error propagation, or GAUSSIAN.
+      # One or more of the data structures can be the same.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first structure'
+         HELP 'The first DSA structure containing data to be added.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second structure'
+         HELP 'The second DSA structure containing data to be added.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the result of first+second'
+      ENDPARAMETER
+
+      PARAMETER ERRORS
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of error propagation to be used'
+         HELP 'Valid responses are NONE or GUASSIAN'
+         IN 'NONE','GAUSSIAN'
+         DEFAULT 'GAUSSIAN'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IDIV4
+
+      # This is the same as IADD4, but divides IMAGE2 into IMAGE1, writing
+      # the result to OUTPUT.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first structure'
+         HELP 'The first DSA structure to be used as numerator'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second structure'
+         HELP 'The second DSA structure to be used as denominator'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the result of first/second'
+      ENDPARAMETER
+
+      PARAMETER ERRORS
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of error propagation to be used'
+         HELP 'Valid responses are NONE or GUASSIAN'
+         IN 'NONE','GAUSSIAN'
+         DEFAULT 'GAUSSIAN'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IMULT4
+
+      # This is the same as IADD4, but multiplies IMAGE1 by IMAGE2 into
+      # OUTPUT.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first structure'
+         HELP 'The first DSA structure containing data to be multiplied.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second structure'
+         HELP 'The second DSA structure containing data to be multiplied.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the result of first*second'
+      ENDPARAMETER
+
+      PARAMETER ERRORS
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of error propagation to be used'
+         HELP 'Valid responses are NONE or GUASSIAN'
+         DEFAULT 'GAUSSIAN'
+         IN 'NONE','GAUSSIAN'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE ISUB4
+
+      # This is the same as IADD4, but subtracts IMAGE2 from IMAGE1 into
+      # OUTPUT.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first structure'
+         HELP 'The first DSA structure containing data to be subtracted.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second structure'
+         HELP 'The second DSA structure containing data to be subtracted.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'The DSA structure to contain the result of first-second'
+      ENDPARAMETER
+
+      PARAMETER ERRORS
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of error propagation to be used'
+         HELP 'Valid responses are NONE or GUASSIAN'
+         IN 'NONE','GAUSSIAN'
+         DEFAULT 'GAUSSIAN'
+      ENDPARAMETER
+
+   ENDINTERFACE
+   
+#----------------------------------------------------------------------
+
+   INTERFACE IAND4
+
+      # This action generates the logical AND of two bad pixel masks.
+      # The data array of IMAGE1 is ANDed with that of IMAGE2 and the
+      # result written to OUTPUT. 
+      # The resultant bad pixel mask will contain a BAD value only
+      # in positions where both IMAGE1 and IMAGE2 contain a BAD value,
+      # otherwise it will contain a GOOD value.
+      # Any error and quality arrays in both data sets will be ignored.
+      # One or more of the data structures can be the same.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first mask'
+         HELP 'The first DSA structure containing data to be ANDed.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second mask'
+         HELP 'The second DSA structure containing data to be ANDed.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output mask'
+         HELP 'The DSA structure to contain the result of first.AND.second'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE INOT4
+
+      # This action reverses a bad pixel mask. If the input mask 
+      # contains a GOOD value, the output mask will contain a bad
+      # value, and vice versa.
+      # Any error and quality arrays in both data sets will be ignored.
+      # One or more of the data structures can be the same.
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input mask'
+         HELP 'The DSA structure containing mask to be inverted.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output mask'
+         HELP 'The DSA structure to contain the result of .NOT.input'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IOR4
+
+      # This action generates the logical OR of two bad pixel masks.
+      # The data array of IMAGE1 is ORed with that of IMAGE2 and the
+      # result written to OUTPUT. 
+      # The resultant bad pixel mask will contain a BAD value in
+      # positions where either IMAGE1 or IMAGE2 contain a BAD value.
+      # If both the inputs contain GOOD values, the result will be a
+      # GOOD value.
+      # Any error and quality arrays in both data sets will be ignored.
+      # One or more of the data structures can be the same.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first mask'
+         HELP 'The first DSA structure containing data to be ORed.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second mask'
+         HELP 'The second DSA structure containing data to be ORed.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output mask'
+         HELP 'The DSA structure to contain the result of first.OR.second'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IEOR4
+
+      # This action generates the logical exclusive OR of two bad pixel masks.
+      # The data array of IMAGE1 is EORed with that of IMAGE2 and the
+      # result written to OUTPUT. 
+      # The resultant bad pixel mask will contain a BAD value in
+      # positions where either IMAGE1 or IMAGE2 contain a BAD value,
+      # but not where both IMAGE1 and IMAGE2 contain a bad value.
+      # If both the inputs contain GOOD or BAD values, the result will
+      # be a GOOD value.
+      # Any error and quality arrays in both data sets will be ignored.
+      # One or more of the data structures can be the same.
+
+      PARAMETER IMAGE1
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of first mask'
+         HELP 'The first DSA structure containing data to be EORed.'
+      ENDPARAMETER
+
+      PARAMETER IMAGE2
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of second mask'
+         HELP 'The second DSA structure containing data to be EORed.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output mask'
+         HELP 'The DSA structure to contain the result of first.EOR.second'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE INIT
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE IRFLAT
+
+      # Creates a de-rippled flat-field spectrum
+
+      PARAMETER  SPECTRUM
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of input spectrum'
+      ENDPARAMETER
+
+      PARAMETER  OUTPUT
+         POSITION 2
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of output flat-field spectrum'
+      ENDPARAMETER
+
+      PARAMETER  XSTART
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First X-value in data window'
+         HELP    'Enter a start value where the input spectrum is flat'
+      ENDPARAMETER
+
+      PARAMETER  XEND
+         POSITION 4
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Last X-value in data window'
+         HELP    'Enter an end value where the input spectrum is flat'
+      ENDPARAMETER
+
+      PARAMETER  MORE
+         POSITION 5
+         KEYWORD 'MORE'
+         TYPE    '_LOGICAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'MORE data ranges?'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE LIST_INDEX
+
+      # Lists the contents on an index file.
+
+      PARAMETER INDEX_FILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of index file'
+         HELP 'Name of index file to be listed, CGS4_yymmdd.INDEX'
+         DEFAULT 'cgs4_yymmdd.index'
+      ENDPARAMETER
+
+      PARAMETER OFORMAT
+         POSITION 2
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Output format type'
+         HELP 'Output may be in one of two formats: 1 or 2'
+         IN 1, 2
+         DEFAULT 1
+      ENDPARAMETER
+
+      PARAMETER DESTINATION
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Destination for output'
+         HELP 'Please enter SCREEN, FILE, or PRINTER.'
+         IN 'SCREEN', 'FILE', 'PRINTER'
+         DEFAULT 'SCREEN'
+      ENDPARAMETER
+
+      PARAMETER FILE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output file'
+         HELP 'The name of the file to be created containing the listing.'
+         DEFAULT 'cgs4_index.lis'
+      ENDPARAMETER
+
+      PARAMETER IF_HITIME
+
+         # A flag which is used to switch between systems running on Hawaii
+         # time and those running on UK time.
+         # If IF_HITIME is TRUE, the UT date is calculated assuming
+         # the system is running on Hawaii time.
+         # If IF_HITIME is FALSE, the UT date and system date are
+         # assumed to be the same.
+
+         TYPE '_LOGICAL'
+         VPATH 'DEFAULT'
+         PROMPT 'Is this system running with Hawaii time ? (Y or N)'
+         HELP 'Controls UT date calculation. YES=Hawaii time: NO=UK time'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKE_STANDARD
+
+      # Converts a group into a standard.
+
+      PARAMETER GRPFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of group file'
+         HELP 'Name of group to be converted, RGyymmdd_gggg'
+         DEFAULT 'RGyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER TEFF
+         POSITION 2
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Temperature of black-body (in K)'
+         HELP 'The effective temperature of BB equivalent to star'
+         DEFAULT 1000.0
+         RANGE 0.0, 1.0E6
+      ENDPARAMETER
+
+      PARAMETER RFLAMBDA
+         POSITION 3
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Reference wavelength (in microns)'
+         HELP 'The wavelength at which spectrum will be normalised to 1.0'
+         DEFAULT 2.0
+         RANGE 0.1, 100.0
+      ENDPARAMETER
+
+      PARAMETER WHOLE
+         POSITION 4
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Is the whole data set to be extracted (Y or N) ?'
+         HELP 'Answer YES if all the rows are to be used.'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER YSTART
+         POSITION 5
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'First row to be extracted'
+         HELP 'The lowest detector row to be extracted'
+         DEFAULT 1
+      ENDPARAMETER
+
+      PARAMETER YEND
+         POSITION 6
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Last row to be extracted'
+         HELP 'The highest detector row to be extracted'
+         DEFAULT 256
+      ENDPARAMETER
+
+      PARAMETER OPER
+         POSITION 7
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Logical operation for combining bad pixels'
+         HELP 'Extraction: AND=bad only if all rows bad. OR=bad if any row bad.'
+         IN 'AND', 'OR'
+         DEFAULT 'AND'
+      ENDPARAMETER
+
+      PARAMETER MEND
+         POSITION 8
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Mend bad pixels (Y or N) ?'
+         HELP 'Answer YES to patch bad pixels by interpolation'
+         DEFAULT F
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKET_INT
+
+     # Same as MAKET_OBS for a raw integration file. The definition
+     # file is INTEGRATION.DEF but the template name depends on the type
+     # of integration this is because the shape of the data array varies.
+     # For example, if the instrument was chopping, 
+     # and ADP sector statistics were enabled, then the data array will 
+     # have 3 planes; to hold phase A, phase B, and sum of 
+     # X squared. 
+     # The input parameters are:-
+     #       <DEF> Name of definition file.
+     #       <TEMPLATE> Name of template.
+     #       <NX> Size of array.
+     #       <NY>
+     #       <STARE_CHOP> Stare or Chop mode.
+     #       <NDR> True if non-destructive reads being used.
+     #       <STATS> True if sector statistics were enabled.
+     #       <WEIGHTED> True if weighted frames were enabled.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration template file'
+         HELP 'Name of DSA template structure to be created'
+         DEFAULT 'INTEGRATION_TEMPLATE'
+      ENDPARAMETER
+
+      PARAMETER DEF
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration definition file'
+         HELP 'Name of DSA structure definition file to be read'
+         DEFAULT 'INTEGRATION.DEF'
+      ENDPARAMETER
+
+      PARAMETER NDR
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Non-destructive reads (Y or N) ?'
+         HELP 'Are non-destructive (multiple) reads being used ?'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER NT
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Are NTs enabled (Y or N) ?'
+         HELP 'Is NT information being supplied by the ADP ?'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER NX
+         TYPE '_INTEGER'
+         DEFAULT 256
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'X-dimension of array'
+         HELP 'The number of columns in the data array'
+      ENDPARAMETER
+
+      PARAMETER NY
+         TYPE '_INTEGER'
+         DEFAULT 256
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Y-dimension of array'
+         HELP 'The number of rows in the data array'
+      ENDPARAMETER
+
+      PARAMETER STARE_CHOP
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Which mode (STARE or CHOP) ?'
+         HELP 'STARE or CHOP mode. See CGS4 documentation.'
+         DEFAULT 'STARE'
+         IN 'STARE','CHOP'
+      ENDPARAMETER
+
+      PARAMETER STATS
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Sector statistics enabled (Y or N) ?'
+         HELP 'Are sector statistics enabled? See CGS4 documentation.'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER WEIGHTED
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Weighted frames enabled (Y or N) ?'
+         HELP 'Are weighted frames enabled? See CGS4 documentation.'
+         DEFAULT F
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKET_INTRED
+
+      # Same as MAKET_OBS for a reduced integration file. The definition
+      # file is INTRED.DEF and the template INTRED_TEMPLATE.DST.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of reduced integration template file'
+         HELP 'Name of DSA template structure to be created'
+         DEFAULT 'INTRED_TEMPLATE'
+      ENDPARAMETER
+
+      PARAMETER DEF
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of reduced integration definition file'
+         HELP 'Name of DSA structure definition file to be read'
+         DEFAULT 'INTRED.DEF'
+      ENDPARAMETER
+
+      PARAMETER NX
+         POSITION 3
+         TYPE '_INTEGER'
+         DEFAULT 256
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'X-dimension of array'
+         HELP 'The number of columns in the data array'
+      ENDPARAMETER
+
+      PARAMETER NY
+         POSITION 4
+         TYPE '_INTEGER'
+         DEFAULT 256
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Y-dimension of array'
+         HELP 'The number of rows in the data array'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKET_MASK
+
+      # This reads in the structure definition file MASK.DEF
+      # (see the Figaro Programmer's Guide for an explanation structure 
+      # definition files) and the corresponding HDS template created in 
+      # MASK_TEMPLATE.DST.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of mask template file'
+         HELP 'Name of DSA template structure to be created'
+         DEFAULT 'MASK_TEMPLATE'
+      ENDPARAMETER
+
+      PARAMETER DEF
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of mask definition file'
+         HELP 'Name of DSA structure definition file to be read'
+         DEFAULT 'MASK.DEF'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKET_OBS
+
+      # This reads in the structure definition file OBSERVATION.DEF
+      # (see the Figaro Programmer's Guide for an explanation structure 
+      # definition files) and the corresponding HDS template created in 
+      # OBSERVATION_TEMPLATE.DST.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation template file'
+         HELP 'Name of DSA template structure to be created'
+         DEFAULT 'OBSERVATION_TEMPLATE'
+      ENDPARAMETER
+
+      PARAMETER DEF
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation definition file'
+         HELP 'Name of DSA structure definition file to be read'
+         DEFAULT 'OBSERVATION.DEF'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKET_OBSRED
+
+      # Likewise for the reduced observation file. The definition file
+      # is OBSRED.DEF and the output goes into OBSRED_TEMPLATE.DST.
+
+      PARAMETER TEMPLATE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of reduced Observation template file'
+         HELP 'Name of DSA template structure to be created'
+         DEFAULT 'OBSRED_TEMPLATE'
+      ENDPARAMETER
+
+      PARAMETER DEF
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of reduced observation definition file'
+         HELP 'Name of DSA structure definition file to be read'
+         DEFAULT 'OBSRED.DEF'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKE_INT
+
+      # Construct a fake integration file. Input parameters are:-     
+      #        <OBS_NUM> Observation number.
+      #        <INT_NUM> Integration number.
+      #        <INTFILE> The name of the integration file, defaults to
+      #                  Iyymmdd_obsnum_intnum. The file will be created
+      #                  in IDIR.
+      #        <INT_TEMP> The template file to be used as a basis for the
+      #                  integration. Subsequent parameter requests will
+      #                  depend on the type of integration catered for 
+      #                  by the template.
+      #        <OBJECT>  
+      #        <START_TIME> Time that integration started...
+      #        <END_TIME> and ended.
+      #        <START_AIRMASS>
+      #        <END_AIRMASS>
+      #        <DET_INDEX> The place of this integration in the detector
+      #                  sampling sequence.
+      #        <EXPOSURE_TIME> On-chip exposure time in seconds.
+      #        <N_EXPOSURES> The number of exposures coadded into this
+      #                  integration by the ADP.
+      #        <SIMULATOR> Read a simulator frame from a file into this
+      #                  plane of the integration array, Y or N.
+      #        <SIMFILE> Name of file containing simulator output. This
+      #                  data is assumed to be direct output from the
+      #                  simulator which is NOT in Figaro format.
+      #        <REALVAL> If not reading a simulator file, fill the array
+      #                  with this real number.
+      #        <COORDS>  Co-ordinates of point in array to be set to a
+      #                  particular value, -1 to ignore.
+      #        <PIXVAL>  The value to set that point to.
+      #        <STRIPES> Create artificial data with stripes, Y or N.
+      #        <WIDTH>   Width of stripes in pixels.
+      #        <UP>      Value to insert in "up" regions of stripes.
+      #        <DOWN>    Value to insert in "down" regions of stripes.
+      #        <COORD>   If calculating NTs, this is the coord of a point
+      #                  in the NT array to be set to a special value.
+      #                  The others are all set to 64.
+      #        <INTVAL>  The value to set that NT to.
+      #        <SECTOR1> Four values giving coords of corners of first
+      #                  sector where ADP calculates statistics, -1 to
+      #                  ignore.
+      #        <SECTOR2>                        "
+      #        <SECTOR3>                        "
+      #        <SECTOR4>                        "
+
+      PARAMETER INTFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration file'
+         HELP 'The name of the DSA structure to be created'
+         DEFAULT 'Iyymmdd_oooo_iiii'
+      ENDPARAMETER
+
+      PARAMETER COORD
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Coord of NT pixel to be given specific value'
+         HELP 'The element number in the NT array'
+         DEFAULT 1
+      ENDPARAMETER         
+
+      PARAMETER COORDS
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'X, Y coords of pixel ([0,0] to finish)'
+         HELP 'X, Y coords of pixel to be given specific value'
+         DEFAULT 0, 0
+      ENDPARAMETER         
+
+      PARAMETER DET_INDEX
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Index of detector position for this integration'
+         HELP 'Posn. of this integration in detector sampling sequence'
+         RANGE 1,1000
+         DEFAULT 1
+      ENDPARAMETER
+
+      PARAMETER DOWN
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Real number to fill down part of stripes ?'
+         HELP 'A number to fill the array in "down" stripes with'
+         DEFAULT 1.0
+      ENDPARAMETER
+
+      PARAMETER END_AIRMASS
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'End airmass'
+         HELP 'The airmass at the end of the integration.'
+         DEFAULT 1.0
+      ENDPARAMETER
+
+      PARAMETER END_TIME
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'End time'
+         HELP 'The universal time at the end of the integration.'
+         DEFAULT '12.3000'
+      ENDPARAMETER
+
+      PARAMETER EXPOSURE_TIME
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'On-chip exposure time in seconds'
+         HELP 'The actual time during which the chip was exposed to light'
+         DEFAULT 0.1
+      ENDPARAMETER
+
+      PARAMETER IF_HITIME
+
+         # A flag which is used to switch between systems running on Hawaii
+         # time and those running on UK time.
+         # If IF_HITIME is TRUE, the UT date is calculated assuming
+         # the system is running on Hawaii time.
+         # If IF_HITIME is FALSE, the UT date and system date are
+         # assumed to be the same.
+
+         TYPE '_LOGICAL'
+         VPATH 'DEFAULT'
+         PROMPT 'Is this system running with Hawaii time ? (Y or N)'
+         HELP 'Controls UT date calculation. YES=Hawaii time: NO=UK time'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER INTVAL
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Integer number'
+         HELP 'A number to place into the data array at the given X,Y position'
+         DEFAULT 0
+      ENDPARAMETER
+
+      PARAMETER INT_NUM
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of this integration'
+         HELP 'Which integration in the sequence making up an observation ?'
+         DEFAULT 1
+         RANGE 1,9999
+      ENDPARAMETER
+
+      PARAMETER N_EXPOSURES
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of coadded exposures'
+         HELP 'No. of on-chip exposures co-added into this integration'
+         DEFAULT 100
+      ENDPARAMETER
+
+      PARAMETER OBS_NUM
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of parent observation'
+         HELP 'Number of observation into which this integration is coadded'
+         DEFAULT 1
+         RANGE 1,9999
+      ENDPARAMETER
+
+      PARAMETER PIXVAL
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Real number'
+         HELP 'A number to place into the data array at the given X,Y position'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER REALVAL
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Real number to fill frame array'
+         HELP 'A number to fill the given array with'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER SIMFILE
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of simulator file'
+         HELP 'The file generated by the CGS4 data simulator.'
+      ENDPARAMETER
+
+      PARAMETER SIMULATOR
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Read a CGS4 simulator file (Y or N) ?'
+         HELP 'Take input from a simulator file ?'
+         DEFAULT T
+      ENDPARAMETER
+
+      PARAMETER START_TIME
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Start time'
+         HELP 'The universal time at the start of the integration.'
+         DEFAULT '12.0000'
+      ENDPARAMETER
+
+      PARAMETER START_AIRMASS
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Start airmass'
+         HELP 'The airmass at the start of the integration.'
+         DEFAULT 1.0
+      ENDPARAMETER
+
+      PARAMETER STRIPES
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Make artificial data with stripes (Y or N) ?'
+         HELP 'Stripey data can be used to test data reduction.'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER UP
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Real number to fill up part of stripes ?'
+         HELP 'A number to fill the array in "up" stripes with'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER WIDTH
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Width of stripes in pixels ?'
+         HELP 'The width of the stripes in pixels.'
+         DEFAULT 3
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MAKE_OBS
+
+      # Construct a fake observation file. Input parameters are:-
+      #        <OBS_NUM> the number of the observation
+      #        <OBSFILE> the name of the observation file, default
+      #                  Oyymmdd_obsnum. It will be created in ODIR.
+      #        <OBJECT>  The object being observed.
+      #        <OBS_TYPE> BIAS, DARK, FLAT, OBJECT, SKY or CALIBRATION
+      #        <EXPOSURE_TIME> The on-chip exposure time in seconds.
+      #        <DET_STEP> The distance moved by the detector between
+      #                  integrations, measured in pixels.
+      #        <DET_NSTEPS> The number of detector positions making
+      #                  up the sampling sequence for this observation.
+      #        <DET_SIZE> The size of the detector in pixels. It was
+      #                  intended that this be used when larger arrays
+      #                  come into use, but it could also be handy if
+      #                  only part of the current array is read-out.
+      #        <GRATING_NAME> The name of the grating to be used.
+      #        <GRATING_WVLNGTH> The wavelength it is set to, probably
+      #                  will be superseded by LPMM, ORDER and ANGLE
+      #                  so that the optical setup is more fully
+      #                  described.
+      #        <SLIT_ANGLE> In degrees.
+      #        <FILTERS> A string describing the filter set used.
+      #        There are some other parameters, describing the CVF
+      #        for example, that just use default values at present.
+
+      PARAMETER OBSFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'The name of the DSA structure to be created'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER DET_INCR
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Detector step in pixels'
+         HELP 'Distance moved by detector between integrations'
+         DEFAULT 0.2
+      ENDPARAMETER
+
+      PARAMETER DET_NINCR
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         DEFAULT 1
+         PROMPT 'How many detector positions wiil there be'
+         HELP 'No. of detector positions making up sampling sequence'
+      ENDPARAMETER
+
+      PARAMETER DET_SIZE
+         TYPE '_INTEGER'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Detector size'
+         HELP 'Number of column pixels, number of row pixels.'
+         DEFAULT 256,256
+      ENDPARAMETER
+
+      PARAMETER EXPOSURE_TIME
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'On-chip exposure time in secs'
+         HELP 'The actual time during which the chip was exposed to light'
+         DEFAULT 0.1
+      ENDPARAMETER
+
+      PARAMETER FILTERS
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Filters in use'
+         HELP 'Character description of filters in use (see documentation)'
+         DEFAULT 'N1'
+      ENDPARAMETER
+
+      PARAMETER GRATING_NAME
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Grating name'
+         HELP 'Enter "75_lpmm", "150_lpmm" or "echelle"'
+         DEFAULT '75_lpmm'
+         IN '75_lpmm', '150_lpmm', 'echelle'
+      ENDPARAMETER
+
+      PARAMETER GRATING_WVLNGTH
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Grating wavelength'
+         HELP 'The (central??) wavelength of the grating (in microns)'
+         DEFAULT 2.0
+      ENDPARAMETER
+
+      PARAMETER IF_HITIME
+
+         # A flag which is used to switch between systems running on Hawaii
+         # time and those running on UK time.
+         # If IF_HITIME is TRUE, the UT date is calculated assuming
+         # the system is running on Hawaii time.
+         # If IF_HITIME is FALSE, the UT date and system date are
+         # assumed to be the same.
+
+         TYPE '_LOGICAL'
+         VPATH 'DEFAULT'
+         PROMPT 'Is this system running with Hawaii time ? (Y or N)'
+         HELP 'Controls UT date calculation. YES=Hawaii time: NO=UK time'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER NDR
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Non-destructive reads (Y or N) ?'
+         HELP 'Are non-destructive (multiple) reads being used ?'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER NT
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Are NTs enabled (Y or N) ?'
+         HELP 'Is NT information being supplied by the ADP ?'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER OBJECT
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Object name'
+         HELP 'The name of the object being observed'
+         DEFAULT 'R_Monocerotis'
+      ENDPARAMETER
+
+      PARAMETER OBS_NUM
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Observation number'
+         HELP 'A sequential number to be assigned to the observation'
+         DEFAULT 1
+         RANGE 1, 9999
+      ENDPARAMETER
+
+      PARAMETER OBS_TYPE
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of observation'
+         IN 'BIAS', 'DARK', 'FLAT', 'CALIBRATION', 'SKY', 'OBJECT'
+         HELP 'Please enter BIAS, DARK, FLAT, CALIBRATION, SKY or OBJECT'
+         DEFAULT 'OBJECT'
+      ENDPARAMETER
+
+      PARAMETER SECTOR1
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Coords of sector 1, -1 to ignore'
+         HELP 'Sorry, no help info is available yet'
+         DEFAULT -1
+      ENDPARAMETER         
+
+      PARAMETER SECTOR2
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Coords of sector 2, -1 to ignore'
+         HELP 'Sorry, no help info is available yet'
+         DEFAULT -1
+      ENDPARAMETER         
+
+      PARAMETER SECTOR3
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Coords of sector 3, -1 to ignore'
+         HELP 'Sorry, no help info is available yet'
+         DEFAULT -1
+      ENDPARAMETER         
+
+      PARAMETER SECTOR4
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Coords of sector 4, -1 to ignore'
+         HELP 'Sorry, no help info is available yet'
+         DEFAULT -1
+      ENDPARAMETER         
+
+      PARAMETER SLIT_ANGLE
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Slit angle in degrees'
+         HELP 'The position angle of the slit on the sky'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER STARE_CHOP
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Which mode (STARE or CHOP) ?'
+         HELP 'STARE or CHOP mode. See CGS4 documentation.'
+         DEFAULT 'STARE'
+         IN 'STARE','CHOP'
+      ENDPARAMETER
+
+      PARAMETER STATS
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Stats enabled (Y or N) ?'
+         HELP 'Are sector statistics enabled? See CGS4 documentation.'
+         DEFAULT F
+      ENDPARAMETER
+
+      PARAMETER WEIGHTED
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Weighted frames enabled (Y or N) ?'
+         HELP 'Are weighted frames enabled? See CGS4 documentation.'
+         DEFAULT F
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE NORMALISE_FF
+
+      # Normalises a flat field and removes large-scale wavelength
+      # variations.
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input structure'
+         HELP 'DSA structure containing flat field to be normalised'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output structure'
+         HELP 'DSA structure for normalised flat field'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER NORM_METHOD
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'  # Change to PROMPT when there are other options
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Flat-field normalisation method'
+         HELP 'POLYFIT=Divide by polynomial fit, SMOOTH=Divide by smoothed data.'
+         DEFAULT 'POLYFIT'
+         IN 'NONE', 'POLYFIT', 'SMOOTH'
+      ENDPARAMETER
+
+      PARAMETER ORDER
+         POSITION 4
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Polynomial order for fit'
+         HELP 'Please enter an integer in the range 1-7.'
+         DEFAULT 3
+         RANGE 1, 7
+      ENDPARAMETER
+
+      PARAMETER BOXSIZE
+         POSITION 5
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Box size for smooth (in pixels)'
+         HELP 'Please enter an odd number in the range 1-31'
+         DEFAULT 7
+         IN 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE MEND
+
+      # This action "mends" a spectrum by interpolating across the
+      # bad pixels.
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input data structure'
+         HELP 'The name of the data structure to be mended.'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output data structure'
+         HELP 'The name of the data structure to contain result.'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE OPTEXTRACT
+
+      # This action combines rows from a 2-D spectrum to form a 1-D 
+      # spectrum, propagating the variances, using Bob Carswell's
+      # optimal extraction algorithm.
+
+
+      PARAMETER  IMAGE
+         POSITION 1
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of image to extract data from'
+      ENDPARAMETER
+
+      PARAMETER  YSTART
+         POSITION 2
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'First y-value in data window'
+         HELP    'Enter a row number below the region where the object lies.'
+      ENDPARAMETER
+
+      PARAMETER  YEND
+         POSITION 3
+         TYPE    '_REAL'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Last y-value in data window'
+         HELP    'Enter a row number above the region where the object lies.'
+      ENDPARAMETER
+
+      PARAMETER WIDTH
+         POSITION 4
+         TYPE    '_INTEGER'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Object width in pixels'
+         HELP    'Enter an estimate of the width of the object along the slit.'
+         DEFAULT 5
+      ENDPARAMETER
+
+      PARAMETER  SPECTRUM
+         POSITION 5
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Name of spectrum to be generated'
+      ENDPARAMETER
+
+      PARAMETER EXTRACT_METHOD
+         POSITION 6
+         TYPE    '_CHAR'
+         VPATH   'PROMPT'
+         PPATH   'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT  'Extraction method required'
+         HELP    'PROFILE=Profile weighted, OPTIMAL=Full optimal, SUM=Sum only'
+         IN 'PROFILE', 'OPTIMAL', 'SUM'
+         DEFAULT 'PROFILE'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE POKE_FITS
+
+      # This action pokes a value into the given FITS item in a data
+      # structure. If the FITS item does not exist, it is created.
+      # It can also peek an item if method='READ' is specified.
+
+      PARAMETER DATA
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of data structure'
+         HELP 'The name of the data structure to be modified.'
+      ENDPARAMETER
+
+      PARAMETER ITEM
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of FITS item'
+         HELP 'The name of the FITS item to be poked (max. 8 characters)'
+         DEFAULT 'OBJECT'
+      ENDPARAMETER
+
+      PARAMETER METHOD
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Access method READ or WRITE'
+         HELP 'Enter READ or WRITE'
+         IN 'READ', 'WRITE'
+         DEFAULT 'READ'
+      ENDPARAMETER
+
+      PARAMETER MODE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Report method VERBOSE or SILENT'
+         HELP 'Enter VERBOSE or SILENT'
+         IN 'VERBOSE', 'SILENT'
+         DEFAULT 'VERBOSE'
+      ENDPARAMETER
+
+      PARAMETER ACCESS
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of FITS item'
+         HELP 'C=Character, I=integer, R or F=real'
+         IN 'C', 'I', 'R', 'F'
+         DEFAULT 'C'
+      ENDPARAMETER
+
+      PARAMETER FITS_ITEM
+         TYPE   '_CHAR'
+         VPATH  'CURRENT,DYNAMIC,NOPROMPT'
+         ASSOCIATION '->GLOBAL.FITS_ITEM'
+         PPATH  'CURRENT,DYNAMIC'
+      ENDPARAMETER
+
+      PARAMETER FITS_VALUE
+         TYPE   'LITERAL'
+         VPATH  'CURRENT,DYNAMIC,NOPROMPT'
+         ASSOCIATION '->GLOBAL.FITS_VALUE'
+         PPATH  'CURRENT,DYNAMIC'
+      ENDPARAMETER
+
+      PARAMETER FITS_FILE
+         TYPE   'LITERAL'
+         VPATH  'CURRENT,DYNAMIC,NOPROMPT'
+         ASSOCIATION '->GLOBAL.FITS_FILE'
+         PPATH  'CURRENT,DYNAMIC'
+      ENDPARAMETER
+
+      PARAMETER CVALUE
+         TYPE 'LITERAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Character value required'
+         HELP 'The value to be written to the FITS item.'
+      ENDPARAMETER
+
+      PARAMETER IVALUE
+         TYPE '_INTEGER'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Integer value required'
+         HELP 'The value to be written to the FITS item.'
+      ENDPARAMETER
+
+      PARAMETER RVALUE
+         TYPE '_REAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Real value required'
+         HELP 'The value to be written to the FITS item.'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE POLYFIT
+
+      # Enhance the sky subtraction by fitting a polynomial
+
+      PARAMETER INPUT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of input group'
+         HELP 'The name of DSA structure'
+      ENDPARAMETER
+
+      PARAMETER OUTPUT
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of output group'
+         HELP 'The name of DSA structure'
+      ENDPARAMETER
+
+      PARAMETER PF_POLYFIT
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of POLYFIT (NONE, OBJ-SKY, REDUCED_GRP or OBJECT only) ? '
+         HELP 'This option enables enhanced sky-subtraction for point sources'
+         DEFAULT 'NONE'
+         IN 'NONE', 'OBJ-SKY', 'REDUCED_GRP', 'OBJECT'
+      ENDPARAMETER
+
+      PARAMETER PF_WEIGHT
+         POSITION 4
+         TYPE '_LOGICAL'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'WEIGHT the data according to their errors ? '
+         HELP 'WEIGHT the data according to their errors'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+      PARAMETER PF_DEGREE
+         POSITION 5
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DEGREE of polynomial to be fitted ? '
+         HELP 'DEGREE of the polynomial to be fitted'
+         DEFAULT 1
+         RANGE 1,10
+      ENDPARAMETER
+
+      PARAMETER PF_NREJECT
+         POSITION 6
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Number of points to reject from fit? '
+         HELP 'NREJECT is the number of points to be omitted from the fit'
+         DEFAULT 0
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS1
+         POSITION 7
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of first sky area ? '
+         HELP 'SAYS1 delimits the start, in y, of the first sky area'
+         DEFAULT 20
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE1
+         POSITION 8
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of first sky area ? '
+         HELP 'SAYE1 delimits the end, in y, of the first sky area'
+         DEFAULT 25
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS2
+         POSITION 9
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of second sky area ? '
+         HELP 'SAYS2 delimits the start, in y, of the second sky area'
+         DEFAULT 35
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE2
+         POSITION 10
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of second sky area ? '
+         HELP 'SAYE2 delimits the end, in y, of the second sky area'
+         DEFAULT 40
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS3
+         POSITION 11
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of third sky area ? '
+         HELP 'SAYS3 delimits the start, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE3
+         POSITION 12
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of third sky area ? '
+         HELP 'SAYE3 delimits the end, in y, of the third sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYS4
+         POSITION 13
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Ystart of fourth sky area ? '
+         HELP 'SAYS4 delimits the start, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+      PARAMETER PF_SAYE4
+         POSITION 14
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Yend of fourth sky area ? '
+         HELP 'SAYE4 delimits the end, in y, of the fourth sky area'
+         DEFAULT -1
+         RANGE -1,256
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE RED_INT
+
+      # This reduces the integration stored in IDIR:<INT_NAME>, putting the
+      # result in RIDIR:R<INT_NAME>. Currently BIAS, DARK, FLAT, ARC,
+      # CALIBRATION, SKY and OBJECT integrations can be reduced. The 
+      # reduction process is fully automatic.
+      # The subtraction of DARK frames can be controlled with the
+      # SUBTRACT_DARK parameter, and the division by a flat-field can
+      # be controlled by the DIVIDE_BY_FF parameter.
+      # If the integration is a FLAT, it can be normalised by
+      # specifying the NORMALISE_FF and NORM_METHOD parameters.
+      # The file named in MASK will hold the pixel quality map for a 
+      # particular detector as a byte data array. MASK defaults to '#'
+      # in which case the program assumes all pixels are good.
+
+      PARAMETER INT_NAME
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration structure'
+         HELP 'DSA structure containing integration to be reduced, Iyymmdd_o_i'
+         DEFAULT 'Iyymmdd_oooo_iiii'
+      ENDPARAMETER
+
+      PARAMETER MASK
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Structure containing bad pixel information'
+         HELP 'DSA structure containing bad pixel mask (# for none)'
+         DEFAULT '#'
+      ENDPARAMETER
+
+      PARAMETER LINCOEFFS
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Structure containing linearisation coeffs'
+         HELP 'DSA structure containing linearisation coefficients (# for none)'
+         DEFAULT '#'
+      ENDPARAMETER
+
+      PARAMETER SUBTRACT_BIAS
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract BIAS frame (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when subtracting BIAS frame from data'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_BIAS
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract BIAS frame (Y or N) ?'
+         HELP 'Would you like a BIAS frame subtracted from the data ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER BIAS_MODE
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for BIAS observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_BIAS
+         POSITION 6
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'BIAS observation to be used'
+         HELP 'Name of reduced BIAS observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER SUBTRACT_DARK
+         POSITION 7
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract DARK frame (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when subtracting DARK frame from data'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_DARK
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract DARK frame (Y or N) ?'
+         HELP 'Would you like a DARK frame subtracted from the data ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER DARK_MODE
+         POSITION 8
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for DARK observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_DARK
+         POSITION 9
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DARK observation to be used'
+         HELP 'Name of reduced DARK observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER NORMALISE_FF
+         POSITION 10
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Normalise and smooth flat field (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when normalising FLAT to remove wavelength variations'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_NORM
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Normalise flat-field (Y or N) ?'
+         HELP 'Would you like the flat-field normalised and smoothed ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+      
+      PARAMETER DIVIDE_BY_FF
+         POSITION 11
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Divide by flat field (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when dividing a SPECTRA observation by a FLAT'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_FF
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Divide by flat-field (Y or N) ?'
+         HELP 'Would you the data divided by a flat-field ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER NORM_METHOD
+         POSITION 12
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Flat-field normalisation method'
+         HELP 'POLYFIT=Divide by polynomial fit, SMOOTH=Divide by smoothed data.'
+         DEFAULT 'POLYFIT'
+         IN 'NONE', 'POLYFIT', 'SMOOTH'
+      ENDPARAMETER
+
+      PARAMETER ORDER
+         POSITION 13
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Polynomial order for fit'
+         HELP 'Please enter an integer in the range 1-7.'
+         DEFAULT 3
+         RANGE 1, 7
+      ENDPARAMETER
+
+      PARAMETER BOXSIZE
+         POSITION 14
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Box size for smooth (in pixels)'
+         HELP 'Please enter an odd number in the range 1-31'
+         DEFAULT 7
+         IN 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31
+      ENDPARAMETER
+
+      PARAMETER FLAT_MODE
+         POSITION 15
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for FLAT observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_FLAT
+         POSITION 16
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'FLAT observation to be used'
+         HELP 'Name of reduced FLAT observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER FLAT_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'FLAT settings to match'
+         HELP 'Settings which must match when searching for suitable flat-field'
+#        DEFAULT 'GRATING, CVF, FILTERS, SLIT'  # Strictest setting
+#        DEFAULT 'GRATING, SLIT'                # Normal setting
+         DEFAULT 'GRATING, GLAMBDA, SLIT'       # Cures bug DRBUG/8
+#        DEFAULT 'NONE'                         # Test setting (accepts anything)
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE RED_OBS
+
+      # This reduces the observation described in ODIR:<OBS_NAME>, putting the
+      # result in RODIR:R<OBS_NAME>. Using this action to reduce several
+      # integrations is a lot faster than reducing each one individually
+      # with RED_OBS, but NO reduced integration files will be created.
+      # The reduction process is fully automatic. 
+      # The subtraction of DARK frames can be controlled with the
+      # SUBTRACT_DARK parameter, and the division by a flat-field can
+      # be controlled by the DIVIDE_BY_FF parameter.
+      # If the integration is a FLAT, it can be normalised by
+      # specifying the NORMALISE_FF and NORM_METHOD parameters.
+      # For SPECTRA-type observations, if the <TO_WAVELENGTH> parameter is
+      # set to 'YES' or 'ASK', the X axis in the observation file may be
+      # wavelength calibrated using the method specified in <LAMBDA_METHOD>.
+      # The file named in MASK will hold the pixel quality map for a 
+      # particular detector as a byte data array. MASK defaults to ' '
+      # in which case the program assumes all pixels are good.
+
+      PARAMETER OBS_NAME
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation structure'
+         HELP 'DSA structure containing observation to be reduced, Oyymmdd_o'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER MASK
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Structure containing bad pixel information'
+         HELP 'DSA structure containing bad pixel mask (# for none)'
+         DEFAULT '#'
+      ENDPARAMETER
+
+      PARAMETER LINCOEFFS
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Structure containing linearisation coeffs'
+         HELP 'DSA structure containing linearisation coefficients (# for none)'
+         DEFAULT '#'
+      ENDPARAMETER
+
+      PARAMETER BIAS_MODE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for BIAS observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SUBTRACT_BIAS
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract BIAS frame (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when subtracting BIAS frame from data'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_BIAS
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract BIAS frame (Y or N) ?'
+         HELP 'Would you like a BIAS frame subtracted from the data ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_BIAS
+         POSITION 6
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'BIAS observation to be used'
+         HELP 'Name of reduced BIAS observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER SUBTRACT_DARK
+         POSITION 7
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract DARK frame (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when subtracting DARK frame from data'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_DARK
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Subtract DARK frame (Y or N) ?'
+         HELP 'Would you like a DARK frame subtracted from the data ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER DARK_MODE
+         POSITION 8
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for DARK observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_DARK
+         POSITION 9
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DARK observation to be used'
+         HELP 'Name of reduced DARK observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER NORMALISE_FF
+         POSITION 10
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Normalise and smooth flat field (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when normalising FLAT to remove wavelength variations'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_NORM
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Normalise flat-field (Y or N) ?'
+         HELP 'Would you like the flat-field normalised and smoothed ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+      
+      PARAMETER DIVIDE_BY_FF
+         POSITION 11
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Divide by flat field (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when dividing a SPECTRA observation by a FLAT'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_FF
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Divide by flat-field (Y or N) ?'
+         HELP 'Would you the data divided by a flat-field ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER NORM_METHOD
+         POSITION 12
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Flat-field normalisation method'
+         HELP 'POLYFIT=Divide by polynomial fit, SMOOTH=Divide by smoothed data.'
+         DEFAULT 'POLYFIT'
+         IN 'NONE', 'POLYFIT', 'SMOOTH'
+      ENDPARAMETER
+
+      PARAMETER ORDER
+         POSITION 13
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Polynomial order for fit'
+         HELP 'Please enter an integer in the range 1-7.'
+         DEFAULT 3
+         RANGE 1, 7
+      ENDPARAMETER
+
+      PARAMETER BOXSIZE
+         POSITION 14
+         TYPE '_INTEGER'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Box size for smooth (in pixels)'
+         HELP 'Please enter an odd number in the range 1-31'
+         DEFAULT 7
+         IN 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31
+      ENDPARAMETER
+
+      PARAMETER FLAT_MODE
+         POSITION 15
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for FLAT observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_FLAT
+         POSITION 16
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'FLAT observation to be used'
+         HELP 'Name of reduced FLAT observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER FLAT_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Settings to match'
+         HELP 'Settings which must match when searching for suitable flat-field'
+#        DEFAULT 'GRATING, CVF, FILTERS, SLIT'  # Strictest setting
+#        DEFAULT 'GRATING, SLIT'                # Normal setting
+         DEFAULT 'GRATING, GLAMBDA, SLIT'       # Cures bug DRBUG/8
+#        DEFAULT 'NONE'                         # Test setting (accepts anything)
+      ENDPARAMETER
+
+      PARAMETER TO_WAVELENGTH
+         POSITION 17
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Calibrate data into wavelength (YES, NO or ASK) ?'
+         HELP 'Tailors prompting when wavelength calibrating'
+         IN 'ASK', 'NO', 'YES'
+         DEFAULT 'YES'
+      ENDPARAMETER
+
+      PARAMETER PROCEED_LAMBDA
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength calibrate these data (Y or N) ?'
+         HELP 'Would you like the X axis calibrated into wavelength ?'
+         DEFAULT TRUE
+      ENDPARAMETER
+
+      PARAMETER LAMBDA_METHOD
+         POSITION 18
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Wavelength calibration method'
+         HELP 'ESTIMATED from the grating equation or CALIBRATED from an arc'
+         DEFAULT 'ESTIMATED'
+         IN 'ESTIMATED', 'CALIBRATED'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MODE
+         POSITION 19
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for CALIB observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_CALIB
+         POSITION 20
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIBRATION observation to be used'
+         HELP 'Name of CALIBATION observation to be used for wavelength calibration.'
+         DEFAULT 'CAyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MATCH
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIB settings to match'
+         HELP 'Settings which must match when searching for suitable CALIBRATION'
+         DEFAULT 'CNFINDEX'    # Strict setting necessary for good calibration
+#         DEFAULT 'GRATING, GLAMBDA'  # Alternate, less strict, setting
+#         DEFAULT 'GRATING'           # Lax setting, for testing.
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE REMOVE_INT
+
+      # This does the opposite to ADD_INT, subtracting a given integration
+      # from the observation result coadd. It will fail if there is no
+      # record of that integration having been added or if the reduced
+      # integration file cannot be found.
+
+      PARAMETER INTFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of integration file'
+         HELP 'DSA structure containing integration to be removed, Iyymmdd_o_i'
+         DEFAULT 'Iyymmdd_oooo_iiii'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE REMOVE_OBS
+
+      # This does the opposite to ADD_OBS, subtracting a given observation
+      # from its corresponding reduced group. It will fail if there is no
+      # record of that observation having been added or if the reduced
+      # observation file cannot be found.
+
+      PARAMETER OBSFILE
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'DSA structure containing observation to be removed, Oyymmdd_o'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE REMOVE_PAIR
+
+      # This does the opposite to ADD_PAIR, subtracting a given OBJECT/SKY
+      # pair of observations from their corresponding reduced group. It will
+      # fail if there is no record of that observation having been added
+      # or if the reduced observation files cannot be found.
+
+      PARAMETER OBJECTOBS
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of OBJECT observation file'
+         HELP 'DSA structure containing OBJECT observation to be removed'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER SKYOBS
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of SKY observation file'
+         HELP 'DSA structure containing SKY observation to be removed'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE RESET
+
+      # This action resets the common block pointers and virtual memory
+      # used to store the current BIAS, DARK, FLAT and STANDARD. The 
+      # action can be used to reset RED4 prior to changing to a new bad
+      # pixel mask. There are no parameters.
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE SET_FORMAT
+
+      # Sets the format for reduction files
+
+      PARAMETER FORMAT
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Format type (NDF or DST)'
+         HELP 'The type of the reduction file (NDF or DST)'
+         IN 'DST', 'NDF', 'EITHER'
+         DEFAULT 'EITHER'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE SET_OBSBAD
+
+      # This searches for the named observation in the index file and,
+      # if it finds it, sets its quality to `bad' so that it will be
+      # ignored in the search for reduction data. Quality can be reset to
+      # `good' just by FILE_OBSing the observation again.
+
+      PARAMETER OBSERVATION
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of observation file'
+         HELP 'Name of DSA structure containing observation, Oyymmdd_o'
+         DEFAULT 'Oyymmdd_oooo'
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE SET_VERBOSE
+
+      # This switches verbose messages on or off, according the
+      # parameter VERBOSE.
+
+      PARAMETER VERBOSE
+         POSITION 1
+         TYPE '_LOGICAL'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Would you like verbose messages (Y or N) ?'
+         HELP 'Answering YES will make RED4 produce more commentary.'
+         DEFAULT FALSE
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+    INTERFACE STATS
+ 
+      PARAMETER DATA
+        TYPE '_CHAR'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'Data structure'
+        HELP 'Name of DSA structure containing data to be plotted'
+      ENDPARAMETER
+ 
+      PARAMETER PLANE
+        TYPE '_CHAR'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'Data structure'
+        HELP 'Name of DSA structure containing data to be plotted'
+        IN 'DATA', 'ERRORS', 'VARIANCE', 'QUALITY'
+      ENDPARAMETER
+ 
+      PARAMETER WHOLE
+        TYPE '_LOGICAL'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'Use whole dataset (Y or N) ?'
+        HELP 'Would you like to use the whole data area in X and Y ?'
+        DEFAULT T
+      ENDPARAMETER
+ 
+      PARAMETER ISTART
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'I start required'
+        HELP 'The start position for including I columns'
+        RANGE 1, 256
+        DEFAULT 1
+      ENDPARAMETER
+ 
+      PARAMETER IEND
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'I end required'
+        HELP 'The end position for including I columns'
+        RANGE 1, 256
+        DEFAULT 256
+      ENDPARAMETER
+ 
+      PARAMETER IINCR
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'I step required'
+        HELP 'The increment factor for including I columns'
+        RANGE 1, 256
+        DEFAULT 1
+      ENDPARAMETER
+ 
+      PARAMETER JSTART
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'J start required'
+        HELP 'The start position for including J rows'
+        RANGE 1, 256
+        DEFAULT 1
+      ENDPARAMETER
+ 
+      PARAMETER JEND
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'J end required'
+        HELP 'The end position for including J rows'
+        RANGE 1, 256
+        DEFAULT 256
+      ENDPARAMETER
+ 
+      PARAMETER JINCR
+        TYPE '_INTEGER'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'J step required'
+        HELP 'The increment factor for including J rows'
+        RANGE 1, 256
+        DEFAULT 1
+      ENDPARAMETER
+ 
+      PARAMETER AUTOSCALE
+        TYPE '_LOGICAL'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'Autoscale array (Y or N) ?'
+        HELP 'Scale the max. and min. of the array to the data limits ?'
+        DEFAULT T
+      ENDPARAMETER
+ 
+      PARAMETER HIGH
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'High value required'
+        HELP 'The high value given and returned'
+      ENDPARAMETER
+ 
+      PARAMETER LOW
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,DEFAULT'
+        PROMPT 'Low value required'
+        HELP 'The low value given and returned'
+      ENDPARAMETER
+ 
+      PARAMETER MEAN
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,NOPROMPT'
+      ENDPARAMETER
+ 
+      PARAMETER SIGMA
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,NOPROMPT'
+      ENDPARAMETER
+ 
+      PARAMETER MEDIAN
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,NOPROMPT'
+      ENDPARAMETER
+ 
+      PARAMETER MODE
+        TYPE '_REAL'
+        VPATH 'CURRENT,DYNAMIC,NOPROMPT'
+      ENDPARAMETER
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE STATUS
+   ENDINTERFACE
+
+#----------------------------------------------------------------------
+
+   INTERFACE TEST_SEARCH
+
+      # This searches the specified index file to find the names of a
+      # calibration observation (BIAS, DARK, FLAT or CALIB) which would be
+      # used when reducing the observation described in ODIR:<OBS_OR_GRP>.
+      # It can also search the index file to find the name of a suitable
+      # STANDARD for the reduced group described in RGDIR:<OBS_OR_GRP>.
+      # The action is useful for determining what a particular calibration
+      # observation will be without having to reduce the observation. Its
+      # primary purpose is as a software check.
+
+      PARAMETER OBS_OR_GRP
+         POSITION 1
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Observation or reduced group'
+         HELP 'The observation or group to be checked, Oyymmdd_o or RGyymmdd_g'
+         DEFAULT 'Oyymmdd_o/RGyymmdd_g'
+      ENDPARAMETER
+
+      PARAMETER CALIB_TYPE
+         POSITION 2
+         TYPE '_CHAR'
+         VPATH 'PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Type of calibration to be searched for'
+         HELP 'Please enter BIAS, DARK, FLAT, CALIBRATION or STANDARD'
+         IN 'BIAS', 'DARK', 'FLAT', 'CALIBRATION', 'STANDARD'
+         DEFAULT 'BIAS'
+      ENDPARAMETER
+
+      PARAMETER INDEX_FILE
+         POSITION 3
+         TYPE '_CHAR'
+         VPATH 'DYNAMIC,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Name of index file'
+         HELP 'Name of index file to be searched, CGS4_yymmdd.INDEX'
+         DEFAULT 'CGS4_yymmdd.INDEX'
+      ENDPARAMETER
+
+      PARAMETER BIAS_MODE
+         POSITION 4
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for BIAS observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_BIAS
+         POSITION 5
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'BIAS observation to be used'
+         HELP 'Name of reduced BIAS observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER DARK_MODE
+         POSITION 6
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for DARK observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_DARK
+         POSITION 7
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'DARK observation to be used'
+         HELP 'Name of reduced DARK observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER FLAT_MODE
+         POSITION 8
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for FLAT observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_FLAT
+         POSITION 9
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'FLAT observation to be used'
+         HELP 'Name of reduced FLAT observation to be used in the reduction.'
+         DEFAULT 'ROyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER FLAT_MATCH
+         POSITION 10
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Settings to match'
+         HELP 'Settings which must match when searching for suitable flat-field'
+#        DEFAULT 'GRATING, CVF, FILTERS, SLIT'  # Strictest setting
+#        DEFAULT 'GRATING, SLIT'                # Normal setting
+         DEFAULT 'GRATING, GLAMBDA, SLIT'       # Cures bug DRBUG/8
+#        DEFAULT 'NONE'                         # Test setting (accepts anything)
+      ENDPARAMETER
+
+      PARAMETER CALIB_MODE
+         POSITION 11
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for CALIB observations'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_CALIB
+         POSITION 12
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIBRATION observation to be used'
+         HELP 'Name of CALIBATION observation to be used for wavelength calibration.'
+         DEFAULT 'CAyymmdd_oooo'
+      ENDPARAMETER
+
+      PARAMETER CALIB_MATCH
+         POSITION 13
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'CALIB settings to match'
+         HELP 'Settings which must match when searching for suitable CALIBRATION'
+         DEFAULT 'CNFINDEX'    # Strict setting necessary for good calibration
+#         DEFAULT 'GRATING, GLAMBDA'  # Alternate, less strict, setting
+#         DEFAULT 'GRATING'           # Lax setting, for testing.
+      ENDPARAMETER
+
+      PARAMETER STANDARD_MODE
+         POSITION 14
+         TYPE '_CHAR'
+         VPATH 'CURRENT,DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Search mode for STANDARD groups'
+         HELP 'Please enter FORWARDS, BACKWARDS, BOTH or SPECIFIED.'
+         IN 'FORWARDS', 'BACKWARDS', 'BOTH', 'SPECIFIED'
+         DEFAULT 'BOTH'
+      ENDPARAMETER
+
+      PARAMETER SPECIFIED_STD
+         POSITION 15
+         TYPE '_CHAR'
+         VPATH 'CURRENT,PROMPT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'STANDARD group to be used'
+         HELP 'Name of reduced STANDARD group to be used in the reduction.'
+         DEFAULT 'STyymmdd_gggg'
+      ENDPARAMETER
+
+      PARAMETER STANDARD_MATCH
+         POSITION 16
+         TYPE '_CHAR'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'STANDARD settings to match'
+         HELP 'Settings which must match when searching for suitable STANDARD'
+#        DEFAULT 'CNFINDEX, AIRMASS'         # Strictest setting
+#        DEFAULT 'GRATING, GLAMBDA, AIRMASS' # Normal setting (didn't work!)
+         DEFAULT 'GRATING, GLAMBDA'          # Cures bug DRBUG/2
+#        DEFAULT 'GRATING'                   # Test setting
+      ENDPARAMETER
+
+      PARAMETER AMTOLER
+         POSITION 17
+         TYPE '_REAL'
+         VPATH 'DEFAULT'
+         PPATH 'DYNAMIC,CURRENT,DEFAULT'
+         PROMPT 'Air mass % tolerance'
+         HELP 'Max. allowed % difference between OBJECT and STANDARD air mass'
+         DEFAULT 100.0
+         RANGE 0.0, 100.0
+      ENDPARAMETER
+
+   ENDINTERFACE
+
+ENDMONOLITH

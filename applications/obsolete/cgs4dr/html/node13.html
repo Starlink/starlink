@@ -1,0 +1,32 @@
+<HEAD>
+<TITLE> Reducing a Bias</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node14.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node12.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Reducing a Bias</H1>
+<P>
+To reduce a BIAS, Portable-CGS4DR reads the raw data from store in
+$idir/ and FITS header information from store in $odir/, applies a 
+bad pixel mask, writes the reduced data parameters
+into the index file and stores the reduced BIAS in $rodir/ as
+shown in figure 2.0.
+<P>
+<CENTER><IMG ALIGN=CENTER SRC="reduceBias.gif"><P>
+Figure 2.0: Reducing a BIAS</CENTER>
+<P>
+Note that BIAS frames are not subtracted when data is taken in NDR 
+(non-destructive read) mode-even if requested-since the NDR
+algorithm has already accounted for the bias level in the data.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

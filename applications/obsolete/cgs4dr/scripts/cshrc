@@ -1,0 +1,43 @@
+#!/bin/csh -f
+#+
+# File:      cgs4dr_cshrc
+# Type:      C-shell script
+# Author(s): Phil Daly
+# History:
+#  20-feb-95: original version (pnd@jach.hawaii.edu)
+# endhistory
+#
+# NB: Do NOT use echo statements as it breaks ICL!
+#
+#-
+
+#
+#   CGS4DR
+if ( -e /ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr ) then
+   alias cgs4dr         '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr'
+   alias cgs4dr_setup   'source /ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr_setup'
+   alias cgs4dr_kill    '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr_kill'
+   alias cgs4dr_demo    '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr_demo'
+   alias cgs4dr_tcldemo '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/tcl/cgs4dr_tcl ~/cgs4dr_demo 941011 ndf &'
+   alias cgs4dr_tcl     '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/tcl/cgs4dr_tcl \!* &'
+   alias cgs4dr_ukirt   '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/tcl/cgs4dr_tcl /UKIRT/vms/ukirtdata/cgs4_data/`/usr/bin/date -u +%Y%m%d` `/usr/bin/date -u +%y%m%d` ndf &'
+   alias cgs4dr_ukirtsetup   'source /ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr_setup /UKIRT/vms/ukirtdata/cgs4_data/`/usr/bin/date -u +%Y%m%d` `/usr/bin/date -u +%y%m%d` ndf'
+   alias cgs4dr_eng     '/ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/tcl/cgs4dr_tcl /UKIRT/vms/ukirtdata/cgs4_data/eng`/usr/bin/date -u +%Y%m%d` `/usr/bin/date -u +%y%m%d` ndf &'
+   alias cgs4dr_engsetup 'source /ukirt_sw/`/ukirt_sw/scr/which_system`/bin/cgs4dr/cgs4dr_setup /UKIRT/vms/ukirtdata/cgs4_data/eng`/usr/bin/date -u +%Y%m%d` `/usr/bin/date -u +%y%m%d` ndf'
+   alias list_index      /ukirt_sw/${system}/bin/cgs4dr/list_index
+else
+   alias cgs4dr            cat /star/etc/not_installed
+   alias cgs4dr_setup      cat /star/etc/not_installed
+   alias cgs4dr_kill       cat /star/etc/not_installed
+   alias cgs4dr_demo       cat /star/etc/not_installed
+   alias cgs4dr_tcldemo    cat /star/etc/not_installed
+   alias cgs4dr_tcl        cat /star/etc/not_installed
+   alias cgs4dr_ukirt      cat /star/etc/not_installed
+   alias cgs4dr_ukirtsetup cat /star/etc/not_installed
+   alias cgs4dr_eng        cat /star/etc/not_installed
+   alias cgs4dr_engsetup   cat /star/etc/not_installed
+   alias list_index        cat /star/etc/not_installed
+endif
+
+# Exit the script with status=OK
+exit 0

@@ -1,0 +1,74 @@
+<HEAD>
+<TITLE> A Typical User Session</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node33.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node30.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>A Typical User Session</H1>
+<P>
+The procedures available in Portable-CGS4DR are described in the
+following chapters but a typical user session appears below (where lines
+beginning `{' are comment lines that need not be typed in by the user).
+<P>
+<PRE>   $ cgs4dr  /scratch/pnd/19940811  940811  ndf
+      .
+      .
+      .
+   ICL&gt; { Check the current configurations
+   ICL&gt; get_reduction_sequence
+   ICL&gt; get_file_selection
+   ICL&gt; get_ff_normalisation
+   ICL&gt; get_wavelength_calib
+   ICL&gt; get_bad_pixel_mask
+   ICL&gt; get_extract_spectrum
+   ICL&gt; get_integration_display
+   ICL&gt; get_observation_display
+   ICL&gt; get_group_display
+   ICL&gt; get_spectrum_display
+      .
+      .
+      .
+   ICL&gt; { If necessary, set the reduction sequence etc
+   ICL&gt; set_reduction_sequence
+      .
+      .
+      .
+   ICL&gt; set_ff_normalisation
+      .
+      .
+      .
+   ICL&gt; { Enter observation numbers 2 through 5 to the tail of the queue
+   ICL&gt; enter_obs_range 2 5
+   ICL&gt; { Enter observation number 1 to the head of the queue
+   ICL&gt; enter_obs_range 1 1 newest
+   ICL&gt; { Check the queue
+   ICL&gt; list_queue
+      .
+      .
+      .
+   ICL&gt; { Start the automatic reduction
+   ICL&gt; start_autoreduce
+      .
+      .
+      .
+   ICL&gt; { Save the current config
+   ICL&gt; save_config myconfig
+   ICL&gt; { List the index file
+   ICL&gt; list_index
+   ICL&gt; { Stop automatic reduction and exit
+   ICL&gt; stop_autoreduce
+   ICL&gt; exit
+</PRE>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

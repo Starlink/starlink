@@ -1,0 +1,40 @@
+<HEAD>
+<TITLE> Types of Plot and Units</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node103.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node101.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Types of Plot and Units</H1>
+<P>
+P4 has the following types of plot available:
+<BLOCKQUOTE>
+<DL ><DT>IMAGE <DD> - Plots an image in colour or greyscale using the full dynamic range of the data and the display device.
+<DT>GRAPH <DD> - Plots 1-D lines graphics as summed through several rows (or columns) of the array.
+<DT>OVERGRAPH <DD> - A 1-D graph on the same scale as a previous graph with the overlay in a different colour.
+<DT>HISTOGRAM <DD> - Standard histogram using any number of bins. The data may be sampled with any number of steps 
+  in either direction.
+<DT>SURFACE <DD> - A sequence of 1-D plots offset to give the impression of a surface.
+<DT>CONTOUR <DD> - A contour map derived from linear scaling, n-Sigma about the mean or increment or decrement in magnitudes,
+  common logarithms or natural logarithms. The contour levels are written to <em> filename</em>_contours.lis for the plotted
+  <em> filename</em>.
+<P>
+</DL>
+</BLOCKQUOTE>
+The data may be plotted either in axis (x,y) units or pixel (i,j) units. For example, a spectrum of a source might
+be plotted  by an astronomer between, say, 2.1 - 2.5 &#181;m whereas an engineer might look at the same data from pixels
+20 - 50 to see if there is any noise on the detector. The natural units of P4 are axis units. 
+If you want to plot in pixel units, you must set any (or all) of the istart, iend, jstart, jend values to be
+non-negative. In the latter case, the labels are ignored and a default title is printed.
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

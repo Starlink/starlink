@@ -1,0 +1,54 @@
+<HEAD>
+<TITLE> Linearising the Data</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node15.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node13.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Linearising the Data</H1>
+<P>
+After BIAS subtraction, the signal from the detector array may be
+corrected for non-linearity by modifying it with a suitable polynomial of
+the form:
+<P>
+<BLOCKQUOTE><I> S(x) = Ax + Bx<SUP>2</SUP> + Cx<SUP>3</SUP> + Dx<SUP>4</SUP> + Ex<SUP>5</SUP></I></BLOCKQUOTE>
+<P>
+where <em>x</em> is the measured signal and <em>S(x)</em> is proportional to the light
+intensity falling on the detector. These coefficients may determined
+manually by examining FLAT fields taken at different exposure times
+as the software does not contain any automated way of doing this. Such
+coefficients are specified in ASCII text in a linearization file:
+<P>
+<PRE>! +
+! $CGS4_MASKS/fpa61_linear.dat
+! Linearization coefficients determined on 23-Jan-1991 by A CGS4 User
+! Order given is A, B, C, D, E vertically.
+! -
+0.9980
+0.0176
+-0.0037
+6.46E-5
+0.0000
+</PRE>
+<P>
+Note that this means that all pixels are calibrated with the same
+polynomial. The file type must be .dat and it is stored in the directory
+$cgs4_masks/. Note that, although every effort has been made to
+avoid arithmetic errors during linearization, floating point overflows can
+occur if the coefficients are set to ridiculous values. The higher order
+terms, in particular, should be <b>&lt;&lt;</b> 1.00 to avoid such problems.
+<P>
+For the arrays used in CGS4, no measurable non-linearity has been found to
+within 98% of full well. For these reasons, this facility is normally
+turned off by setting the value to #.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

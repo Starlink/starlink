@@ -1,0 +1,63 @@
+<HEAD>
+<TITLE> Extraction of Nodded Spectra</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node26.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node22.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Extraction of Nodded Spectra</H1>
+<P>
+Portable-CGS4DR now has the ability to extract up to 3 spectra nodded
+along the slit in an automated way. For one spectrum on the array, the
+result is analogous to the simple Figaro EXTRACT command. For two
+spectra, the upper row is assumed to be negative and the lower positive.
+For three spectra, the middle beam is assumed to be positive and is
+flanked by two negative beams. Note that in the two and three beam cases,
+a switch to invert the spectrum is included in case the beams are not in
+the sense expected.  Note that the number of rows over which the extraction
+occurs is <em> not</em> taken into account when combining multiple beams: just
+the total extracted flux is used.
+<P>
+Further, for three beam extraction, two algorithms are provided <em> i.e.
+viz.</em> for bright and faint sources. The fundamental difference is the
+weighting given to the outer beams. Let the signal from the star in one
+chop beam be <em>S</em>. Assuming that there is no beam
+imbalance, the final reduced group will contain three spectra in which the
+middle is the positive beam (P) and has twice the signal of the outer
+negative beams (<I>N<SUB>1</SUB></I> and <I>N<SUB>2</SUB></I>).
+<P>
+This reduced group is formed from the difference of two observations,
+namely an OBJECT and a SKY. These individual reduced
+observations will each have two spectra offset by the nodding distance.
+For the OBJECT observation, the upper beam with be negative and the
+lower beam positive. For the SKY frame the situation is reversed but
+the position on the array of the upper beam in the SKY matches the
+lower beam in the OBJECT.
+<P>
+For the bright source algorithm, the final signal is given by:
+<P>
+<BLOCKQUOTE><I> F<SUB>b</SUB> = { P - (N<SUB>1</SUB> + N<SUB>2</SUB> ) } / 4 </I></BLOCKQUOTE>
+<P>
+For the faint source algorithm, the final signal is given by:
+<P>
+<BLOCKQUOTE><I> F<SUB>f</SUB> = { P - (&#189;N<SUB>1</SUB> + &#189;N<SUB>2</SUB> ) } / 3 </I></BLOCKQUOTE>
+<P>
+The ratio of the errors in each method is then: 
+<P>
+<BLOCKQUOTE><I> { F<SUB>b</SUB> / dF<SUB>b</SUB> } / { F<SUB>f</SUB> / dF<SUB>f</SUB> } = 10<SUP>&#189;</SUP> / 3 </I></BLOCKQUOTE>
+<P>
+Note that the faint source algorithm will give better cancellation of any
+residual atmospheric lines on the array and a more representative error
+for the case where the dominant source of noise is the infra-red
+background.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,37 @@
+<HEAD>
+<TITLE> set_polyfit</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node48.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node46.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>set_polyfit</H1>
+<P>
+<blockquote> ICL<b>&gt;</b> set_polyfit p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 <BR> 
+Use: Sets the method and rows to extract for enhanced sky subtraction <BR> 
+p1 = Type of polyfit (NONE, REDUCED_GRP, OBJ--SKY, OBJECT) <BR> 
+p2 = Degree of polynomial to fit <BR> 
+p3 = Number of points to reject from fit <BR> 
+p4 = Use weights for fit? <BR> 
+p5 = Start of first sky area (-1 = ignore) <BR> 
+p6 = End of first sky area (-1 = ignore) <BR> 
+p7 = Start of second sky area (-1 = ignore) <BR> 
+p8 = End of second sky area (-1 = ignore) <BR> 
+p9 = Start of third sky area (-1 = ignore) <BR> 
+p10 = End of third sky area (-1 = ignore) <BR> 
+p11 = Start of fourth sky area (-1 = ignore) <BR> 
+p12 = End of fourth sky area (-1 = ignore) <BR> 
+<em> E.g:</em> set_polyfit REDUCED_GRP 3 0 TRUE 10 15 35 40 -1 -1 -1 -1
+</blockquote>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

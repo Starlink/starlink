@@ -1,0 +1,47 @@
+<HEAD>
+<TITLE> Initialising the Display</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node105.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node103.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Initialising the Display</H1>
+<P>
+The CGS4 data reduction plotting task has been de-coupled from the
+control task and now maintains its own noticeboard containing the
+details of the plotting capability on each port. This noticeboard can
+be manipulated by the user to tailor the display as required.
+<P>
+Note that, by default, the xwindows device is loaded the first time the
+software is created. If you do not wish to do this, execute the
+following commands, the first time only <em> e.g.</em> to set to device
+postscript_l:
+<P>
+<BLOCKQUOTE>
+<DL>
+<DT> % mkdir ~/cgs4dr_configs
+<DD> - Make a configs directory
+<DT> % cp $CGS4DR_ROOT/default.p4 ~/cgs4dr_configs/default.p4
+<DD> - Copy the default config over 
+<DT> % sed 's/xwindows/postscript_l/' ~/cgs4dr_configs/default.p4 <b>&gt;</b> $$tmp
+<DD> - Edit the config to reflect your preferred graphics device
+<DT> % mv $$tmp ~/cgs4dr_configs/default.p4
+<DD> - Rename the temporary config
+</DL>
+</BLOCKQUOTE>
+<P>
+Thereafter, whenever the software runs down cleanly, this 
+~/cgs4dr_configs/default.p4 file will be overwritten with the latest
+noticeboard contents.
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

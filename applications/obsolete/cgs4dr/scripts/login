@@ -1,0 +1,19 @@
+#!/bin/csh -f
+#+
+# File:      cgs4dr_login
+# Type:      C-shell script
+# Author(s): Phil Daly
+# History:
+#  20-feb-95: original version (pnd@jach.hawaii.edu)
+# endhistory
+#-
+
+#
+# CGS4DR
+setenv SYSTEM `uname -m`_`uname -s`
+if ( -e /ukirt_sw/${SYSTEM}/bin/cgs4dr/cgs4dr ) then
+   setenv CGS4DR_ROOT /ukirt_sw/${SYSTEM}/bin/cgs4dr
+endif
+
+# Exit the script with status=OK
+exit 0

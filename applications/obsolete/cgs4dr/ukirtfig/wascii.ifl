@@ -1,0 +1,20 @@
+
+      Interface WASCII
+
+         Parameter SPECTRUM
+            Position  1
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(SPectrum) File to be converted to ASCII file'
+         EndParameter
+
+         Parameter FILE
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FIle) Name of ASCII format file to be created'
+         EndParameter
+
+      EndInterface

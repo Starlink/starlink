@@ -1,0 +1,47 @@
+<HEAD>
+<TITLE> The Plotting Task</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node102.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node99.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>The Plotting Task</H1>
+<P>
+P4 is the generic plotting package. The lower
+layers of the software call PGPLOT routines and access to the data is via
+Figaro's DSA library. Thus P4 can handle either NDF or DST files
+and plots to any Starlink supported graphics device for which a PGPLOT driver
+is available.
+<P>
+A noticeboard is maintained in memory describing the attributes of the available 
+display surfaces, plotting devices open on each surface and some aspects of the data.
+This noticeboard can be manipulated directly by the user giving a wide-variety
+of options to tailor the display. Indeed, some users may find the range of 
+options too broad and confusing.
+<P>
+Although the package is quite generic and may be invoked separately from other
+items of software, it still retains some intelligence regarding CGS4 data and directory structures.
+<P>
+P4 can plot data as an image, a graph, an overgraph (over-laid graph upon
+a previous graph), a surface, a histogram or a contour map (with several
+algorithms to determine contour levels). Nearly seventy colour (look-up) tables are
+shipped with the software that should cater to most tastes.
+P4 also generates labels and titles from the contents of the data-file or
+as specified by the user.
+<P>
+Any number of users may run P4 concurrently. Each viewport (0 - 8)
+may have a separate plot device defined but a PGPLOT restriction is that only one may be
+open at any one time. Thus using multiple devices on different viewports may
+slow the software down.
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

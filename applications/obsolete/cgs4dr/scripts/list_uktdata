@@ -1,0 +1,79 @@
+#!/bin/csh -f
+
+#+
+# Name:        list_uktdata
+# Description: Unix interface to cgs4list/cgs3list/ircam3list
+# Type:        C-shell script
+# Usage:       list_uktdata [cgs4, cgs3, ircam3]
+# Options:     cgs4, cgs3 or ircam3
+# Author:      Phil Daly
+# History:
+#   17-mar-1995: original version (pnd@jach.hawaii.edu)
+# endhistory
+#-
+
+# Get or prompt for first argument
+if ( ${#argv} == 0 ) then
+  echo -n "UKIRT instrument?  /cgs4,cgs3,ircam3/  > "
+  set ins = $<
+else
+  set ins = "${argv[1]}"
+  setenv ODIR "${argv[2]}"
+endif
+
+# Lowercase it and check it's cosher
+set ins = "`echo ${ins} | tr '[A-Z]' '[a-z]'`"
+if ( "${ins}" != "cgs4" && "${ins}" != "cgs3" && "${ins}" != "ircam3" ) then
+  echo "${0}-f-noinst, ${ins} is not recognised\!"
+  exit 1
+else
+  echo -n "Searching for data taken with ${ins} ... "
+endif
+
+# Check ODIR is set
+if ( ${?ODIR} ) then
+
+  # Check if CGS4DR_ROOT is set
+  if ( ${?CGS4DR_ROOT} ) then
+
+    # Is it readable?
+    if ( -r ${ODIR} ) then
+
+      # Get parent directory of ODIR
+      set parent   = "`echo ${ODIR}`"
+      set parent   = "${parent:h}"
+      set root     = "${parent:t}"
+      set save_dir = "`echo $cwd`"
+      set output   = "${parent}/${ins}list_${root}.lis"
+      echo "to ${output}"
+
+      # Loop and do list
+      cd ${ODIR}
+      foreach file ( `ls o*.sdf o*.dst` )
+        if ( "${file}" != "." && "${file}" != ".." ) then
+          echo "Listing ${file}"
+          ${CGS4DR_ROOT}/${ins}list "${file}" temp.out Y
+        endif
+      end
+
+      # Now sort the output
+      ${CGS4DR_ROOT}/datasort
+      rm temp.out
+      mv ukirt_data.out ${output}
+      cd ${save_dir}
+      echo "${ins}list output is in ${output}"
+    else
+      echo "${0}-f-noread, ${ODIR} is not readable from `uname -n`\!"
+      exit 1
+    endif
+  else
+    echo "${0}-f-noroot, CGS4DR_ROOT environmental variable is not set\!"
+    exit 1
+  endif
+else
+  echo "${0}-f-nodir, ODIR environmental variable is not set\!"
+  exit 1
+endif
+
+# Exit script with status=OK
+exit 0

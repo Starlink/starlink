@@ -1,0 +1,399 @@
+#!STAR_BIN/awish -file
+#+
+# tcl/tk interface to the cgs4dr system.
+#-
+
+# Global variables
+    global env
+    global cgs4drBitmaps
+
+# Path and file names that may need to be cutomised
+    set tclAdamLib    STAR_LIB/tk/adam
+    set cgs4drTclLib  $env(CGS4DR_ROOT)/tcl
+    set cgs4drBitmaps $env(CGS4DR_ROOT)/tcl
+    set cgs4drHtml    STAR_DOCS/sun27.htx
+
+# Set up library search path (including the current directory)
+    lappend auto_path $tclAdamLib [exec /usr/bin/pwd] $cgs4drTclLib 
+
+# Create default directories
+    if {[file exists $env(HOME)/cgs4dr_configs]==0} {exec /usr/bin/mkdir $env(HOME)/cgs4dr_configs}
+    if {[file exists $env(HOME)/adam]==0}           {exec /usr/bin/mkdir $env(HOME)/adam}
+    if {[file exists /usr/bin/domainname]==1} {
+      set env(DOMAIN) [string tolower [string trim [exec /usr/bin/domainname]]]
+    } else {
+      set env(DOMAIN) unknown
+    }
+
+# Determine command to execute (must contain cgs4dr, p4_tcl, q4_tcl, r4_tcl or c4_tcl)
+    set cmd [string tolower [string trim $argv0]]
+
+# Set some widget defaults
+    option add *background                    wheat
+    option add *foreground                    black
+    option add *Scrollbar.background          khaki
+    option add *Scrollbar.activeBackground    palegreen
+    option add *Button.background             pink
+    option add *Button.activeBackground       palegreen
+    option add *Button.activeForeground       red
+    option add *Menubar.activeBackground      palegreen
+    option add *Menubar.activeForeground      red
+    option add *Menubutton.background         wheat
+    option add *Menubutton.foreground         black
+    option add *Menubutton.activeBackground   palegreen
+    option add *Menubutton.activeForeground   red
+    option add *Menu.background               wheat
+    option add *Menu.foreground               black
+    option add *Menu.activeBackground         palegreen
+    option add *Menu.activeForeground         red
+    option add *Radiobutton.background        wheat
+    option add *Radiobutton.activeBackground  palegreen
+    option add *Radiobutton.activeForeground  red
+    option add *Checkbutton.background        wheat
+    option add *Frame.background              wheat
+    option add *Label.background              wheat
+    option add *Listbox.background            wheat
+    option add *Listbox.selectbackground      palegreen
+    option add *Listbox.highlightcolor        palegreen
+    option add *Text.background               snow
+    option add *Entry.background              snow
+    option add *Button.width                  10
+    option add *Dialog.width                  60
+    option add *Radiobutton.width             12
+    option add *Radiobutton.relief            flat
+    option add *Entry.relief                  sunken
+    option add *Entry.width                   10
+    option add *Entry.font                    -adobe-helvetica-medium-o-normal--*-140-*
+    option add *Label.font                    -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Listbox.font                  -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Radiobutton.font              -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Checkbutton.font              -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Button.font                   -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menubar.font                  -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menu.font                     -adobe-helvetica-bold-r-normal--*-140-*
+    option add *Menubutton.font               -adobe-helvetica-bold-r-normal--*-140-*
+
+# Get arguments and set environmental variables
+    wm withdraw .
+    cgs4drGetArgs [lindex $argv 0] [lindex $argv 1] [lindex $argv 2]
+    wm deiconify .
+
+# Set global task variables
+    global QmanTask
+    set QmanTask "cgs4dr error : No such task"
+    global P4Task
+    set P4Task "cgs4dr error : No such task"
+    global Cred4Task
+    set Cred4Task "cgs4dr error : No such task"
+    global Red4Task
+    set Red4Task "cgs4dr error : No such task"
+
+# Use the top level for `traffic light' task load status
+    frame .tq4 -relief sunken -bd 2
+    frame .tp4 -relief sunken -bd 2
+    frame .tr4 -relief sunken -bd 2
+    frame .tc4 -relief sunken -bd 2
+    pack  .tq4 .tp4 .tr4 .tc4 -side left -padx 1m -pady 1m
+    label .tq4.box -bitmap @$cgs4drBitmaps/stop.xbm -bg orange -fg black
+    pack  .tq4.box -in .tq4
+    label .tp4.box -bitmap @$cgs4drBitmaps/stop.xbm -bg orange -fg black
+    pack  .tp4.box -in .tp4
+    label .tr4.box -bitmap @$cgs4drBitmaps/stop.xbm -bg orange -fg black
+    pack  .tr4.box -in .tr4
+    label .tc4.box -bitmap @$cgs4drBitmaps/stop.xbm -bg orange -fg black
+    pack  .tc4.box -in .tc4
+    update idletasks
+    .tq4.box configure -bitmap @$cgs4drBitmaps/stop.xbm  -bg red -fg black
+    .tp4.box configure -bitmap @$cgs4drBitmaps/stop.xbm    -bg red -fg black
+    .tr4.box configure -bitmap @$cgs4drBitmaps/stop.xbm  -bg red -fg black
+    .tc4.box configure -bitmap @$cgs4drBitmaps/stop.xbm -bg red -fg black
+    update idletasks
+
+    wm title      . "CGS4 Data Reduction VPKG_VERS Status of Loading Tasks"
+    wm iconbitmap . @$cgs4drBitmaps/cgs4dr.xbm
+    wm iconname   . "CGS4DR"
+    wm minsize    . 1 1
+
+    after 1000
+    update idletasks
+    .tq4.box configure -bitmap @$cgs4drBitmaps/qman.xbm  -bg red -fg black
+    .tp4.box configure -bitmap @$cgs4drBitmaps/p4.xbm    -bg red -fg black
+    .tr4.box configure -bitmap @$cgs4drBitmaps/red4.xbm  -bg red -fg black
+    .tc4.box configure -bitmap @$cgs4drBitmaps/cred4.xbm -bg red -fg black
+    update idletasks
+
+# CASE: qman
+    if {[string first cgs4dr $cmd]!=-1 || [string first q4_tcl $cmd]!=-1} {
+      set QmanTask [cgs4drLoadTask qman]
+
+# Create frame for qman 
+      toplevel .qman
+      wm withdraw .qman
+      frame .qman.mb -relief raised -bd 2
+      pack  .qman.mb -fill x
+      bind .qman.mb <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drMenubar.html"
+      menubutton .qman.mb.file -text File -menu .qman.mb.file.menu -underline 0
+      pack .qman.mb.file -side left
+      menu .qman.mb.file.menu
+      bind .qman.mb.file <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drFile.html"
+      menubutton .qman.mb.options -text Options -menu .qman.mb.options.menu -underline 0
+      pack .qman.mb.options -side left
+      menu .qman.mb.options.menu
+      menu .qman.mb.options.menu.enter
+      bind .qman.mb.options <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/qmanOptions.html"
+      menubutton .qman.mb.help -text Help -menu .qman.mb.help.menu -underline 0
+      pack .qman.mb.help -side right
+      menu .qman.mb.help.menu
+      bind .qman.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
+
+      .qman.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $QmanTask $cmd"
+      .qman.mb.options.menu add cascade -underline 0 -label "Enter / Remove ..." -menu .qman.mb.options.menu.enter
+      .qman.mb.options.menu.enter add command -underline 4 -label "End Group" -command "qmanEGroup $QmanTask"
+      .qman.mb.options.menu.enter add command -underline 4 -label "End Range" -command "qmanERange $QmanTask"
+      .qman.mb.options.menu.enter add command -underline 0 -label "Integration Range" -command "qmanIRange $QmanTask"
+      .qman.mb.options.menu.enter add command -underline 0 -label "String" -command "qmanMisc $QmanTask"
+      .qman.mb.options.menu add command -underline 0 -label "Set UT Date" -command "qmanSetUT"
+      .qman.mb.options.menu add separator
+      .qman.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable QmanWidgets(VERBOSE)
+      .qman.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $QmanTask"
+      .qman.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $QmanTask"
+      .qman.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $QmanTask"
+      .qman.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $QmanTask author"
+      .qman.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $QmanTask tcl/tk"
+      .qman.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $QmanTask cgs4dr"
+      .qman.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+   
+# Build the qman interface widget tree and bind to task
+      set qmanWidget [buildQmanWidgets .qman]
+      pack $qmanWidget -expand yes -fill both
+      bindQmanWidgets $QmanTask
+      grab $QmanWidgets(INTERRUPT)
+
+# Set the window and icon title
+      wm title      .qman "CGS4 Data Reduction VPKG_VERS Queue Manager (Qman)"
+      wm iconname   .qman Qman
+      wm iconbitmap .qman @$cgs4drBitmaps/cgs4dr.xbm
+      wm minsize    .qman 500 375
+      wm protocol   .qman WM_DELETE_WINDOW {.qman.mb.file.menu invoke Exit}
+      update idletasks
+
+# Initialise the qman task and change the traffic light colour
+      after 1000
+      initQman $QmanTask
+      .tq4.box configure -bitmap @$cgs4drBitmaps/qman.xbm -bg green -fg black
+      update idletasks
+    }
+
+# CASE: p4
+    if {[string first cgs4dr $cmd]!=-1 || [string first p4_tcl $cmd]!=-1} {
+      global P4NoticeBoard
+      set P4NoticeBoard p$env(PID)_plotnb
+      set P4Task [cgs4drLoadTask p4]
+
+# Create frame for p4
+      toplevel .p4
+      wm withdraw .p4
+      toplevel .p4_plot
+      wm withdraw .p4_plot
+      frame .p4.mb -relief raised -bd 2
+      pack .p4.mb -fill x
+      bind .p4.mb <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drMenubar.html"
+      menubutton .p4.mb.file -text File -menu .p4.mb.file.menu -underline 0
+      pack .p4.mb.file -side left
+      menu .p4.mb.file.menu
+      bind .p4.mb.file <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drFile.html"
+      menubutton .p4.mb.options -text Options -menu .p4.mb.options.menu -underline 0
+      pack .p4.mb.options -side left
+      menu .p4.mb.options.menu
+      menu .p4.mb.options.menu.colours
+      bind .p4.mb.options <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4Options.html"
+      menubutton .p4.mb.help -text Help -menu .p4.mb.help.menu -underline 0
+      pack .p4.mb.help -side right
+      menu .p4.mb.help.menu
+      bind .p4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
+
+      .p4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $P4Task $cmd"
+      .p4.mb.options.menu add cascade -underline 7 -label "Colour Manipulation" -menu .p4.mb.options.menu.colours
+      .p4.mb.options.menu.colours add command -underline 4 -label "Set Look-Up-Table" -command "p4Lut $P4Task"
+      .p4.mb.options.menu.colours add command -underline 4 -label "Set Widget Colours" -command "p4Colours $P4Task"
+      .p4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $P4Task $P4NoticeBoard"
+      .p4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $P4Task $P4NoticeBoard"
+      .p4.mb.options.menu add separator
+      .p4.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable P4Widgets(VERBOSE)
+      .p4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $P4Task"
+      .p4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $P4Task"
+      .p4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $P4Task"
+      .p4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $P4Task author"
+      .p4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $P4Task tcl/tk"
+      .p4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $P4Task cgs4dr"
+      .p4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+    
+# Build the p4 interface widget tree and bind actions to task
+      set p4Widget [buildP4Widgets1 .p4]
+      pack $p4Widget
+      set p4_plot [buildP4Widgets2 .p4_plot]
+      pack $p4_plot
+      bindP4Widgets $P4Task
+
+# Set window titles
+      wm title      .p4 "CGS4 Data Reduction VPKG_VERS Plotting Task (Plot4)"
+      wm iconname   .p4 Plot4
+      wm iconbitmap .p4 @$cgs4drBitmaps/cgs4dr.xbm
+      wm minsize    .p4 500 375
+      wm title      .p4_plot "CGS4 Data Reduction VPKG_VERS Display Widget (Disp4)"
+      wm iconname   .p4_plot Disp4
+      wm iconbitmap .p4_plot @$cgs4drBitmaps/plot4.xbm
+      wm minsize    .p4_plot 500 375
+      wm protocol   .p4 WM_DELETE_WINDOW {.p4.mb.file.menu invoke Exit}
+      wm protocol   .p4_plot WM_DELETE_WINDOW {.p4.mb.file.menu invoke Exit}
+      update idletasks
+
+# Initialise the p4 task
+      after 1000
+      initP4 $P4Task
+      .tp4.box configure -bitmap @$cgs4drBitmaps/p4.xbm -bg green -fg black
+      update idletasks
+    }
+
+# CASE: red4
+    if {[string first cgs4dr $cmd]!=-1 || [string first r4_tcl $cmd]!=-1} {
+      set Red4Task [cgs4drLoadTask red4]
+
+# Create red4 frame
+      toplevel .red4
+      wm withdraw .red4
+      frame .red4.mb -relief raised -bd 2
+      pack .red4.mb -fill x
+      bind .red4.mb <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drMenubar.html"
+      menubutton .red4.mb.file -text File -menu .red4.mb.file.menu -underline 0
+      pack .red4.mb.file -side left
+      menu .red4.mb.file.menu
+      bind .red4.mb.file <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drFile.html"
+      menubutton .red4.mb.options -text Options -menu .red4.mb.options.menu -underline 0
+      pack .red4.mb.options -side left
+      menu .red4.mb.options.menu
+      bind .red4.mb.options <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/red4Options.html"
+      menubutton .red4.mb.help -text Help -menu .red4.mb.help.menu -underline 0
+      pack .red4.mb.help -side right
+      menu .red4.mb.help.menu
+      bind .red4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
+
+      .red4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Red4Task $cmd"
+      .red4.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable Red4Widgets(VERBOSE)
+      .red4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $Red4Task"
+      .red4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $Red4Task"
+      .red4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $Red4Task"
+      .red4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Red4Task author"
+      .red4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Red4Task tcl/tk"
+      .red4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Red4Task cgs4dr"
+      .red4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+    
+# Build the red4 interface widget tree and bind actions to task
+      set red4Widget [buildRed4Widgets .red4]
+      pack $red4Widget
+      bindRed4Widgets $Red4Task
+
+# Set window titles
+      wm title      .red4 "CGS4 Data Reduction VPKG_VERS Monolith (Red4)"
+      wm iconname   .red4 Red4
+      wm iconbitmap .red4 @$cgs4drBitmaps/cgs4dr.xbm
+      wm minsize    .red4 500 375
+      wm protocol   .red4 WM_DELETE_WINDOW {.red4.mb.file.menu invoke Exit}
+      update idletasks
+
+# Initialise the red4 task
+      after 1000
+      initRed4 $Red4Task
+      .tr4.box configure -bitmap @$cgs4drBitmaps/red4.xbm -bg green -fg black
+      update idletasks
+    }
+
+# CASE: cred4
+    if {[string first cgs4dr $cmd]!=-1 || [string first c4_tcl $cmd]!=-1} {
+      global Cred4NoticeBoard
+      set Cred4NoticeBoard c$env(PID)_ctrlnb
+      set Cred4Task [cgs4drLoadTask cred4]
+
+# Create cred4 frame
+      toplevel .cred4
+      wm withdraw .cred4
+      frame .cred4.mb -relief raised -bd 2
+      pack .cred4.mb -fill x
+      bind .cred4.mb <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drMenubar.html"
+      menubutton .cred4.mb.file -text File -menu .cred4.mb.file.menu -underline 0
+      pack .cred4.mb.file -side left
+      menu .cred4.mb.file.menu
+      bind .cred4.mb.file <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drFile.html"
+      menubutton .cred4.mb.options -text Options -menu .cred4.mb.options.menu -underline 0
+      pack .cred4.mb.options -side left
+      menu .cred4.mb.options.menu
+      bind .cred4.mb.options <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cred4Options.html"
+      menubutton .cred4.mb.help -text Help -menu .cred4.mb.help.menu -underline 0
+      pack .cred4.mb.help -side right
+      menu .cred4.mb.help.menu
+      bind .cred4.mb.help <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/cgs4drHelp.html"
+
+      .cred4.mb.file.menu add command -underline 1 -label Exit -command "cgs4drExit $Cred4Task $cmd"
+      .cred4.mb.options.menu add command -underline 3 -label "Peek Noticeboard" -command "cgs4drPeeknbs $Cred4Task $Cred4NoticeBoard"
+      .cred4.mb.options.menu add command -underline 1 -label "Poke Noticeboard" -command "cgs4drPokenbs $Cred4Task $Cred4NoticeBoard"
+      .cred4.mb.options.menu add checkbutton -underline 9 -label "Pause on Error" -variable Cred4Widgets(POE)
+      .cred4.mb.options.menu add separator
+      .cred4.mb.options.menu add command -underline 11 -label "Load Demo #1" -command "cgs4drDemo"
+      .cred4.mb.options.menu add command -underline 11 -label "Load Demo #2" -command "cgs4drDemo2"
+      .cred4.mb.options.menu add separator
+      .cred4.mb.options.menu add checkbutton -underline 0 -label "Verbose Output" -variable Cred4Widgets(VERBOSE)
+      .cred4.mb.options.menu add command -underline 1 -label "Show Environment" -command "cgs4drShowEnv $Cred4Task"
+      .cred4.mb.options.menu add command -underline 0 -label "Clear Text Widget" -command "cgs4drClear $Cred4Task"
+      .cred4.mb.options.menu add command -underline 13 -label "Send Task an Action" -command "cgs4drTalk $Cred4Task"
+      .cred4.mb.help.menu add command -underline 0 -label "Author(s)" -command "cgs4drVersions $Cred4Task author"
+      .cred4.mb.help.menu add command -underline 0 -label "Tcl/tk Version" -command "cgs4drVersions $Cred4Task tcl/tk"
+      .cred4.mb.help.menu add command -underline 9 -label "Portable-CGS4DR Version" -command "cgs4drVersions $Cred4Task cgs4dr"
+      .cred4.mb.help.menu add command -underline 0 -label "Portable-CGS4DR WWW Page" -command {exec /star/bin/findme CGS4DR &}
+    
+# Build the cred4 interface widget tree and bind actions to task
+      set cred4Widget [buildCred4Widgets .cred4]
+      pack $cred4Widget
+      bindCred4Widgets $Cred4Task
+
+# Set window titles
+      wm title      .cred4 "CGS4 Data Reduction VPKG_VERS Mission Control (Cred4)"
+      wm iconname   .cred4 Cred4
+      wm iconbitmap .cred4 @$cgs4drBitmaps/cgs4dr.xbm
+      wm minsize    .cred4 500 375
+      wm protocol   .cred4 WM_DELETE_WINDOW {.cred4.mb.file.menu invoke Exit}
+      update idletasks
+
+# Initialise the cred4 task
+      after 1000
+      initCred4 $Cred4Task
+      .tc4.box configure -bitmap @$cgs4drBitmaps/cred4.xbm -bg green -fg black
+      update idletasks
+    }
+
+# Now de-iconify the tasks 
+    after 2000
+    .tq4.box configure -bitmap @$cgs4drBitmaps/go.xbm -bg green -fg black
+    .tp4.box configure -bitmap @$cgs4drBitmaps/go.xbm -bg green -fg black
+    .tr4.box configure -bitmap @$cgs4drBitmaps/go.xbm -bg green -fg black
+    .tc4.box configure -bitmap @$cgs4drBitmaps/go.xbm -bg green -fg black
+    update idletasks
+    cgs4drCursor arrow green black
+    wm withdraw .
+    update idletasks
+    if {[winfo exists .qman]==1}    {wm deiconify .qman}
+    if {[winfo exists .cred4]==1}   {wm deiconify .cred4}
+    if {[winfo exists .p4_plot]==1} {wm deiconify .p4_plot}
+    if {[winfo exists .p4]==1} {
+      if {[string first p4_tcl $cmd]!=-1} {
+        wm deiconify .p4
+      } else {
+        wm iconify .p4
+      }
+    }
+    if {[winfo exists .red4]==1} {
+      if {[string first r4_tcl $cmd]!=-1} {
+        wm deiconify .red4
+      } else {
+        wm iconify .red4
+      }
+    }

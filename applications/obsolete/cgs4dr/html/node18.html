@@ -1,0 +1,37 @@
+<HEAD>
+<TITLE> Reducing an Object, Sky or Arc</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node19.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node16.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Reducing an Object, Sky or Arc</H1>
+<P>
+To reduce an OBJECT, SKY or ARC, Portable-CGS4DR reads
+the raw data from store in $idir/ and FITS header information
+from store in $odir/, applies a bad pixel mask, optionally
+subtracts a reduced BIAS frame, linearises the data (if required),
+optionally subtracts a reduced DARK, optionally divides by a flat
+field and wavelength calibrates the data (if required), and writes the
+reduced data parameters into the index file and stores the reduced OBJECT, 
+SKY or ARC in $rodir/ as shown in figure 3.0.
+<P>
+Note that if the bad pixel mask is changed between the calibration frame
+and the astronomical data, the resultant quality array will contain the
+logical AND of the two masks until the calibration data is
+re-reduced with the new mask and the RED4 task is re-initialised to
+force it to memory map the new calibration frame. This has caused some
+confusion in the past.
+<P><CENTER><IMG ALIGN=CENTER SRC="reduceObject.gif"><P>
+Figure 3.0: Reducing an OBJECT, SKY or ARC</CENTER>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

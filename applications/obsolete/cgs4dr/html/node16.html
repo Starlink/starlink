@@ -1,0 +1,62 @@
+<HEAD>
+<TITLE> Reducing a Flat</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node18.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node15.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Reducing a Flat</H1>
+<P>
+To reduce a FLAT, Portable-CGS4DR reads the raw data from store in
+$idir/ and FITS header information from store in $odir/, applies a 
+bad pixel mask, optionally subtracts a reduced BIAS frame, linearises 
+the data (if required), optionally subtracts a
+reduced DARK (with the same on-chip exposure time), normalises the
+data (if required) and writes the reduced data parameters into the index
+file and stores the reduced FLAT in $rodir/ as shown in figure 2.2.
+<P>
+For normalisation a 1-D spectrum is extracted from within the window
+defined by the bad pixel mask and a polynomial is fitted to that spectrum.
+The order of the polynomial is defined by the user and the polynomial is
+grown along the slit to fill the array. Finally, the original flat field
+is divided by the polynomial frame to produce a normalised flat field.
+Normalisation also removes the spectrum of the black body calibration
+source used to generate the flat field.
+<P>
+An alternative method of normalising the data using a smoothing box is also
+available.
+<P>
+For spectral configurations, the flat field algorithm pre-supposes that
+the illumination from the black body source is uniform along the slit. 
+This does mean that if a very accurate photometric comparison of spectra
+at different points along the slit is required, the flat field will need
+to be checked for variations in illumination and refined to remove this
+variability.
+<P>
+It has also been discovered that at some wavelengths, the CVF acts
+like a Fabry-Perot and produces diagonal stripes in observations. These
+should be removed using oversampled FLAT fields although this has
+yet to be tried. An alternative strategy to remove these stripes is to
+take an OBJECT observation of the black body source at the same
+oversampling factor and normalise this particular observation to create a
+pseudo-FLAT field. Subsequently divide your real observation by this
+observation.
+<P>
+Finally, if the black body has not been allowed to warm up sufficiently,
+or the detector array temperature varies, or the detector is allowed to
+saturate resulting in ghost images and so forth, the spectrum generated
+may be too noisy. Observers should pay due care and attention to acquiring
+the data.
+<P><CENTER><IMG ALIGN=CENTER SRC="reduceFlat.gif"><P>
+Figure 2.2: Reducing a FLAT</CENTER>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

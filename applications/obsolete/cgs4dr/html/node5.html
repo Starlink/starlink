@@ -1,0 +1,51 @@
+<HEAD>
+<TITLE> Introduction to Portable-CGS4DR</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node6.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node2.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Introduction to Portable-CGS4DR</H1>
+<P>
+The fourth generation <i>cooled grating spectrometer</i>, CGS4, is designed to 
+operate on UKIRT in the 1-5 &#181;m region of the electromagnetic spectrum 
+at resolutions in the range 300-20000 (Mountain et al. 1990, Ramsay 1993). To reduce background noise, 
+it is maintained on the telescope in vacuum at cryogenic temperatures. It achieved first light
+at UKIRT on 4 February 1991 (Carswell et al. 1991). On 22 April 1995 a
+new InSb 256x256 array was commissioned into the instrument.
+The new array having a dark current of <b>&lt;&lt;</b> 1 electron/second and a
+read noise of around 40 electrons/integration, is much more sensitive
+than previous detectors. On any given spectroscopic night, an observer
+can expect to acquire and reduce ~100 Mb of high quality data with CGS4.
+<P>
+To an observer, the system appears as two black boxes: the data
+acquisition system and the data reduction system (Wright et al. 1994).
+Both are under the direct control of the observer and can be
+manipulated to deal with a wide variety of astronomical configurations.
+The data is, therefore, both acquired and reduced in real-time at the
+telescope.
+<P>
+This document describes the CGS4 data reduction system now called
+Portable-CGS4DR. The software has been carefully designed and tested
+under the Figaro (Shortridge 1993) and ADAM (Lawden &amp; Hartley 1992)
+environments under Unix.  The data files produced by Portable-CGS4DR
+are readable by standard Figaro applications although not all may
+handle the quality and error arrays correctly.
+<P>
+For best results, Portable-CGS4DR should be run on a single user
+workstation having at least 32 Mb of main memory and a colour monitor.
+It can, of course, run on a dumb terminal and display to any Starlink supported graphics device.
+<P>
+If you think you have discovered a bug, please report it by e-mail to
+ussc@star.rl.ac.uk.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

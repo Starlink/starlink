@@ -1,0 +1,221 @@
+INTERFACE QMAN
+
+  # Parameters for the QMAN task
+
+  PARAMETER STRING
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'String to write to queue or to search for record'
+    HELP 'Enter any character string up to the length of MSG_VAL_LEN'
+  ENDPARAMETER
+
+  PARAMETER OUTPUT
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'String returned from queue'
+    HELP 'A returned character string up to the length of MSG_VAL_LEN'
+  ENDPARAMETER
+
+  PARAMETER QPOSITION
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Queue position'
+    HELP 'Enter OLDEST or NEWEST for relevant timestamp'
+    IN 'NEWEST', 'OLDEST'
+    DEFAULT 'OLDEST'
+  ENDPARAMETER
+
+  PARAMETER PASSWORD
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Password'
+    HELP 'Specify a password for all operations'
+    DEFAULT ' '
+  ENDPARAMETER
+
+  PARAMETER LOCKWORD
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Lockword'
+    HELP 'Specify a lockword to lock or unlock the database'
+    DEFAULT ' '
+  ENDPARAMETER
+
+  PARAMETER FILE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'File to save and/or restore database'
+    HELP 'Enter a full file specification'
+  ENDPARAMETER
+
+  PARAMETER DESTRUCTIVE
+    TYPE '_LOGICAL'
+    VPATH 'INTERNAL'
+    PROMPT 'Read mode'
+    HELP 'T=DESTRUCTIVE, F=NON_DESTRUCTIVE'
+    DEFAULT T
+  ENDPARAMETER
+
+  PARAMETER DELETE_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to access records'
+    HELP 'Enter ALL, RANGE or SPECIFIED'
+    IN 'ALL', 'RANGE', 'SPECIFIED'
+    DEFAULT 'ALL'
+  ENDPARAMETER
+
+  PARAMETER LIST_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to access records'
+    HELP 'Enter ALL, RANGE or SPECIFIED'
+    IN 'ALL', 'RANGE', 'SPECIFIED'
+    DEFAULT 'ALL'
+  ENDPARAMETER
+
+  PARAMETER READ_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to access records'
+    HELP 'Enter NEWEST, OLDEST, SEARCH or SPECIFIED'
+    IN 'NEWEST', 'OLDEST', 'SEARCH', 'SPECIFIED'
+    DEFAULT 'OLDEST'
+  ENDPARAMETER
+
+  PARAMETER SORT_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to access records'
+    HELP 'Enter ASCENDING, DESCENDING'
+    IN 'ASCENDING', 'DESCENDING'
+    DEFAULT 'ASCENDING'
+  ENDPARAMETER
+
+  PARAMETER SEARCH_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to access records'
+    HELP 'Enter OLDEST or NEWEST'
+    IN 'NEWEST', 'OLDEST'
+    DEFAULT 'NEWEST'
+  ENDPARAMETER
+
+  PARAMETER SAVE_MODE
+    TYPE '_CHAR'
+    VPATH 'INTERNAL'
+    PROMPT 'Mode to open output file'
+    HELP 'Enter NEW, OLD or APPEND'
+    IN 'NEW', 'OLD', 'APPEND'
+    DEFAULT 'NEW'
+  ENDPARAMETER
+
+  PARAMETER NUMBER
+    TYPE '_INTEGER'
+    VPATH 'INTERNAL'
+    PROMPT 'Record number'
+    HELP 'Enter a record number'
+    RANGE 0, 1000
+  ENDPARAMETER
+
+  PARAMETER START
+    TYPE '_INTEGER'
+    VPATH 'INTERNAL'
+    PROMPT 'Record number'
+    HELP 'Enter a start record number'
+    RANGE 0, 1000
+  ENDPARAMETER
+
+  PARAMETER END
+    TYPE '_INTEGER'
+    VPATH 'INTERNAL'
+    PROMPT 'Record number'
+    HELP 'Enter an end record number'
+    RANGE 0, 1000
+  ENDPARAMETER
+
+  # Actions for the QMAN task
+
+  ACTION INIT
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION DELETE
+    OBEY
+      NEEDS DELETE_MODE
+    ENDOBEY
+  ENDACTION
+
+  ACTION READ
+    OBEY
+      NEEDS READ_MODE
+    ENDOBEY
+  ENDACTION
+
+  ACTION LOCK
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION UNLOCK
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION ORDER
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION RESTORE
+    OBEY
+      NEEDS FILE
+    ENDOBEY
+  ENDACTION
+
+  ACTION SAVE
+    OBEY
+      NEEDS FILE
+    ENDOBEY
+  ENDACTION
+
+  ACTION SORT
+    OBEY
+      NEEDS SORT_MODE
+    ENDOBEY
+  ENDACTION
+
+  ACTION WRITE
+    OBEY
+      NEEDS STRING
+    ENDOBEY
+  ENDACTION
+
+  ACTION LIST
+    OBEY
+      NEEDS LIST_MODE
+    ENDOBEY
+  ENDACTION
+
+  ACTION RESET
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION STATUS
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION VERBOSE
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+  ACTION NOVERBOSE
+    OBEY
+    ENDOBEY
+  ENDACTION
+
+ENDINTERFACE

@@ -1,0 +1,53 @@
+<HEAD><TITLE>Sysman's Page</TITLE></HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node127.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="cgs4drScroll.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+
+<H1>Invoking Dynamic Defaults and On-line Help</H1><P>
+The generic mouse supplied with workstations has three buttons labelled
+left-to-right as MB1, MB2 and MB3. The Portable-CGS4DR style is to use
+all three buttons:
+
+<BLOCKQUOTE>
+MB1 - Single Click - Invoke an action or dialogue box or similar <br>
+MB1 - Double Click - Invoke an action or dialogue box from a listbox widget <br>
+MB2 - Single Click - Invoke a dynamic default value <br>
+MB2 - Double Click - Reset a text entry widget to a null string (empty) <br>
+MB3 - Single Click - Invoke on-line help <br>
+</BLOCKQUOTE>
+
+In listboxes, the primary selection of text is made using a single click with MB1.
+This <em>must</em> be done prior to using MB3 for on-line help. Failure to do so will 
+either invoke the help text associated with the current selected item (which is 
+likely to be different from the one you want) or return the error dialogue box
+shown in figure 11.2 which says that no listbox item is currently selected.
+<P><CENTER><IMG ALIGN=CENTER SRC=red4Error.gif><P>
+Figure 11.2: Selection Get Error Script in Listbox </CENTER><P>
+<P>
+Also note that some in-line images may have an incorrect label (within the
+image). This is to save space as several functions use the same type of dialogue
+box and the displayed widgets are very similar to those shown.
+<P>
+Dynamic defaulting has been enabled, where appropriate, using MB2. The following
+scheme has been enabled: using MB2 within any particular data input widget will set the
+dynamic default for just that widget whereas using MB2 on any text label within
+that widget tree sets all defaults within that tree.
+<P>
+As an example, the CRED4 setup button invokes a dialogue box with the various
+data reduction sequences offerred via a series of radiobuttons. Using MB2
+within any horizontal level of radiobuttons will set just that value to some
+sensible default. If, however, you position the mouse over any text label
+(such as `Subtract BIAS Frame?', `Subtract DARK Frame?' etc), the all of the
+displayed values will be set to sensible defaults when MB2 is depressed.
+
+<P><HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

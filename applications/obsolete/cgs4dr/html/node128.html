@@ -1,0 +1,92 @@
+<HEAD>
+<TITLE> Common Problems Upon Startup</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node129.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node127.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Common Problems Upon Startup</H1>
+<P>
+<UL>
+<LI> <i> /star/bin/cgs4dr/tcl/cgs4dr_tcl: Command not found.</i>
+<P>
+  The awish program has not been found.
+<P>
+  By default, awish is installed in /star/bin/awish and this is reflected
+  in the first line of the file $CGS4DR_ROOT/tcl/cgs4dr_tcl:
+  <PRE>           #!/star/bin/awish -file
+</PRE>
+  If awish has been installed elsewhere, this line will need editing to reflect 
+  the correct location.
+<P>
+<LI> <i> Invalid command name "adamtask".</i>
+<P>
+  The ADAM extensions to tcl are not readable.
+<P>
+  The TCLADAM software specifies a series of extensions to tcl that allow
+  communications with the ADAM messaging system and, hence, the tasks. These
+  extensions are held in some directory in a file called adamtask.tcl (and others).
+  The GUI startup file $CGS4DR_ROOT/tcl/cgs4dr_tcl has a line thus:
+  <PRE>           set tclAdamLib /star/lib/tk/adam
+</PRE>
+  This needs to reflect the location of your site's copy of the TCLADAM software.
+<P>
+<LI> <i> cgs4dr_tcl aborting, failed creating task rendezvous file: File exists.</i>
+<P>
+  Task redezvous files were not deleted by previous shutdown.
+<P>
+  The task rendezvous files are located in the directory $HOME/adam and have the generic form 
+  <i>xxxx</i>_<em>task</em>_<i>yyyy</i> where <i>xxxx</i> and <i>yyyy</i> are unique numbers
+  and <em>task</em> is one of the Portable-CGS4DR tasks (cred4, red4, p4, qman and, possibly, ukirtfig).
+  There are also files called cgs4dr_tcl_relay_<i>zzzz</i> and the like where <i>zzzz</i>
+  is another unique identifier. These are the task rendezvous files. If the software is, 
+  for example, aborted (using % kill -9 <em>something</em>) rather than shutdown, these files may not be deleted.
+  Subsequent attempts to run the software will fail until these rendezvous files are
+  deleted. A list of current rendezvous files can be created thus:
+<P>
+  <PRE>           % ls -l ~/adam | grep 'p---'
+</PRE>
+<P>
+  Note that if you run the software more than once, some files are created with names such as
+  `cgs4dr_tcl #2_xxxx'. The quotes are deliberate as the filename contains a space character
+  which is completely legal under Unix. Such files must be deleted properly.
+<P>
+<LI> <i> grab failed: another application has grab while executing "grab $QmanWidgets(INTERRUPT)".</i>
+<P>
+  Tcl/tk can't grab the widget defining the interrupt.
+<P>
+  This occurs when another version of the queue manager task is running or a previous incantation was
+  not shut down properly. The solution is to run the cgs4dr_kill script before re-invoking the software.
+<P>
+<LI> <i>parameter prompt box appears.</i>
+<P>
+  The parameter prompt box shown, for example, in figure 11.4 appears.
+<P>
+<CENTER><IMG ALIGN=CENTER SRC="cgs4drParams.gif"><P>
+Figure 11.4: The Paramter Prompt Box</CENTER>
+<P>
+  This is a result of file corruption probably in the ADAM parameter file. There are two solutions.
+  The easier, and preferred, solution is to shut the software down using the commands in the section 
+  <A HREF="node178.html">How Do I Start from Scratch?</A>. If you wish to persevere, though, the parameter
+  prompt box appears due to character items having a missing end-quote as shown in the figure. You can
+  always just add the end-quote (or delete the start-quote) and click on OK for each item.
+<P>
+<LI> <i> Unable to allocate colour cells.</i>
+<P>
+  Software could not allocate enough colour cells.
+<P>
+  The number of colour cells is finite. Running too many (colour) applications (such as
+  netscape, xmosaic etc) can exhaust the number of colour cells resulting in a failure
+  to load the GUI. If this happens, you must delete some applications.
+</UL>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,76 @@
+<HEAD>
+<TITLE> Some Basic Definitions</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node9.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node7.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Some Basic Definitions</H1>
+<P>
+Preliminary reduction of array data is common to both spectroscopy and
+photometry and techniques describing the removal of instrumental
+effects are noted elsewhere (Daly 1987). Before starting to use
+Portable-CGS4DR, however, you should be familiar with the reduction of
+spectroscopic data (Puxley 1988).  It would also be advantageous to be
+familiar with Figaro data reduction (Bailey 1990, Bailey 1991).
+Portable-CGS4DR software knows about the following observation types:
+<P><BLOCKQUOTE>
+<DL ><DT>BIAS
+<DD>- A short blank observation.
+<DT>DARK
+<DD>- Blank observation with the same on-chip exposure time as 
+ another observation.
+<DT>FLAT
+<DD>- Observation of black-body source in calibration unit, 
+ the sky or the illuminated dome.
+<DT>OBJECT
+<DD>- Observation of an astronomical object.
+<DT>SKY
+<DD>- Observation to subtract from an OBJECT frame to 
+ perform first order sky subtraction. 
+<DT>ARC
+<DD>- Uncalibrated observation of the arc lamp or OH-lines from
+ the sky. 
+<DT>CALIBR
+<DD>- An ARC observation converted into a wavelength 
+ calibrated frame.
+<DT>STANDARD
+<DD>- A standard star observation divided by a model 
+ black-body.
+<P>
+ </DL>
+</BLOCKQUOTE>
+<P>
+In a common data reduction sequence the following operations would be
+carried out:
+<P>
+<OL><LI> Apply a bad pixel mask.
+<LI> Subtract a BIAS frame.
+<LI> Linearise the signal.
+<LI> Subtract a DARK frame.
+<LI> Divide by a FLAT field.
+<LI> Interlace integrations taken at different detector positions.
+<LI> Calibrate x-axis into wavelength.
+<LI> Co-add observations and subtract SKY frames.
+<LI> Divide by a STANDARD source.
+<LI> Extract up to 3 spectra nodded along the slit.
+</OL>
+<P>
+These steps are configurable to allow for a wide variety of astronomical
+configurations. When observations are reduced they are recorded in an
+index file of the form CGS4_yymmdd.INDEX, where <em>
+yyddmm</em> is the UT date on which the observations were made, in the
+directory $cgs4_index/. The system will try to replace the date
+string with an appropriate value whenever possible based upon universal
+time. The contents of the index file may also be manipulated.
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

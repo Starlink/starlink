@@ -1,0 +1,60 @@
+<HEAD>
+<TITLE> Starting the Software</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node128.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="helpage.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>Starting the Software</H1>
+<P>
+The Portable-CGS4DR GUI can be started with three optional command line
+parameters:
+<P>
+<blockquote> $1 is a data directory  /${home}/ <BR> 
+  $2 is a UT date  /current UT-date/ <BR> 
+  $3 is the file type DST or NDF  /ndf/
+</blockquote>
+<P>
+To start the software, source the Starlink login and cshrc files and
+use your local data directory. <em> E.g.:</em>
+<P>
+<blockquote> %  source   /star/etc/login <BR> 
+  %  source   /star/etc/cshrc <BR> 
+  %  cgs4dr_tcl   /scratch/pnd/19940811   940811   ndf
+</blockquote>
+<P>
+If any of the command line parameters are missing, a confirmation dialogue box
+is created. Items labelled in <em> red</em> script within this box are those that
+require confirmation.
+<P>
+Once started, as a background job, the window shown in figure 11.3 will appear.
+This has a red background to indicate `stop' whilst the tasks are loaded.
+As each task becomes available, the appropriate traffic light will change to
+green. When all four tasks are `go', the window disappears to be replaced by
+3 full-size windows (cred4, p4_disp and qman) and two iconic windows
+(red4 and p4 control). At this point, Portable-CGS4DR using TCLADAM is
+ready.
+<P>
+There is also a `setup' facility for defining environmental variables without
+starting the software:
+<P>
+<blockquote> %  source   /star/etc/login <BR> 
+  %  source   /star/etc/cshrc <BR> 
+  %  cgs4dr_setup   /scratch/pnd/19940811   940811   ndf <BR>
+      <tt> Setup Portable-CGS4DR V1.3-0 for /scratch/pnd/19940811 </tt> <BR>
+  %
+</blockquote>
+<P><CENTER><IMG ALIGN=CENTER SRC="cgs4drStart.gif"><P>
+Figure 11.3: The Startup Box</CENTER>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,20 @@
+
+      Interface CGS3LIST
+
+         Parameter FILENAME
+            Position  1
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(FIlename) Name of file(s) to be listed'
+         EndParameter
+
+         Parameter LISTING
+            Position  2
+            Type 'LITERAL'       
+            Vpath 'PROMPT'                        
+            Ppath 'CURRENT,DYNAMIC'
+            Prompt '(LIsting) Name of listing file'
+         EndParameter
+
+      EndInterface

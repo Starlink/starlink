@@ -1,0 +1,41 @@
+<HEAD>
+<TITLE> The Get Commands</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node107.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node105.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>The Get Commands</H1>
+<P>
+In a similar fashion, there are a suite of get_<em>item</em>n commands
+that are the inverse of the `set' commands shown in table 9.1.
+The get_<em>item</em> commands (<em> i.e.</em> without a
+specific port number attached) are treated as a special case and return
+the required value from <em> all</em> ports.
+<P>
+There is an important distinction, however, inasmuch as the get_<em>item</em>n 
+commands demand an empty variable into which to write the
+result. Failure to do so, may crash Unix-ICL.  Thus the correct way to
+enquire, for example, about the current plot device open port 4 would
+be to use the commands:
+<P>
+<blockquote> ICL<b>&gt;</b> junk = ' ' <BR> 
+  ICL<b>&gt;</b> get_device4 (junk) <BR> 
+  ICL<b>&gt;</b> print 'Port 4 plot device = ' &amp; (junk) <BR> 
+  <tt> Port 4 plot device = xwindows </tt>
+</blockquote>
+<P>
+There is a good chance that the user will forget do this so it is recommended that
+the get_<em>item</em> commands be used instead.
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,63 @@
+INTERFACE LIST_INDEX
+
+   # Lists the contents on an index file.
+
+   PARAMETER INDEX_FILE
+      POSITION 1
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,CURRENT,DEFAULT'
+      PROMPT 'Name of index file'
+      HELP 'Name of index file to be listed, CGS4_yymmdd.INDEX'
+      DEFAULT 'cgs4_yymmdd.index'
+   ENDPARAMETER
+
+   PARAMETER OFORMAT
+      POSITION 2
+      TYPE '_INTEGER'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,CURRENT,DEFAULT'
+      PROMPT 'Output format type'
+      HELP 'Output may be in one of two formats: 1 or 2'
+      IN 1, 2
+      DEFAULT 1
+   ENDPARAMETER
+
+   PARAMETER DESTINATION
+      POSITION 3
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,CURRENT,DEFAULT'
+      PROMPT 'Destination for output'
+      HELP 'Please enter SCREEN, FILE, or PRINTER.'
+      IN 'SCREEN', 'FILE', 'PRINTER'
+      DEFAULT 'SCREEN'
+   ENDPARAMETER
+
+   PARAMETER FILE
+      POSITION 4
+      TYPE '_CHAR'
+      VPATH 'PROMPT'
+      PPATH 'DYNAMIC,CURRENT,DEFAULT'
+      PROMPT 'Name of output file'
+      HELP 'The name of the file to be created containing the listing.'
+      DEFAULT 'cgs4_index.lis'
+   ENDPARAMETER
+
+   PARAMETER IF_HITIME
+
+      # A flag which is used to switch between systems running on Hawaii
+      # time and those running on UK time.
+      # If IF_HITIME is TRUE, the UT date is calculated assuming
+      # the system is running on Hawaii time.
+      # If IF_HITIME is FALSE, the UT date and system date are
+      # assumed to be the same.
+
+      TYPE '_LOGICAL'
+      VPATH 'DEFAULT'
+      PROMPT 'Is this system running with Hawaii time ? (Y or N)'
+      HELP 'Controls UT date calculation. YES=Hawaii time: NO=UK time'
+      DEFAULT TRUE
+   ENDPARAMETER
+
+ENDINTERFACE

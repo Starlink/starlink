@@ -1,0 +1,86 @@
+<HEAD>
+<TITLE> The Portable-CGS4DR Style</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="node123.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node120.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>The Portable-CGS4DR Style</H1>
+<P>
+The Portable-CGS4DR TCLADAM interface provides a window to each major
+task. Each window consists of a title bar, a menu bar, a text pane and a
+wigdet tree in some order. In addtion, TCLADAM also provides a GWM widget
+which includes the xdisplay plotting surface. Note that the style described
+below may change as users feedback their preferences.
+<P>
+It may also appear different if your ~/.Xdefaults file has been edited for any reason.
+In particular, if you use white or near-white as a foregound colour, the Portable-CGS4DR
+GUI may be unreadable. The way around this is to invoke the following command
+<em> before</em> invoking the GUI:
+<P>
+<blockquote> %  xrdb  <b>&lt;</b>  /dev/null <BR> 
+</blockquote>
+<P>
+The defaults for the Portable-CGS4DR interface are:
+<BLOCKQUOTE>
+<DL>
+<DT><i> OK Button</i>
+  <DD> - Performs some action <em> i.e.</em> it does something
+<DT><i> Cancel Button</i>
+  <DD> - Aborts without action <em> i.e.</em> does nothing
+<DT><i> Dismiss Button</i>
+  <DD> - Dismisses an informational dialogue box <em> i.e.</em> does nothing
+<DT><i> Background</i>
+  <DD> - wheat
+<DT><i> Text Pane</i>
+  <DD> - snow
+<DT><i> Scrollbars</i>
+  <DD> - lightyellow (inactive)
+  <DD> - palegreen (active) 
+<DT><i> Checkbuttons</i>
+  <DD> Used for binary choices (<em> e.g.</em> autoscaling in the plotting interface).
+  <DD> - wheat with grey border (inactive)
+  <DD> - all grey (active)
+<DT><i> Radiobuttons</i>
+  <DD> Used for multiple but restricted choices (<em> e.g.</em> <i> Yes</i>, <i> No</i> or <i> Ask</i>).
+  <DD> - wheat with grey border (inactive)
+  <DD> - palegreen with grey border (active)
+<DT><i> Actionbuttons</i>
+  <DD>  Used to invoke some action either by communicating directly with the task (<em> e.g.</em> Plot) 
+  or generating a dialogue box for further input (<em> e.g.</em> flux_calibrate).
+  <DD> - pink (inactive)
+  <DD> - palegreen (active)
+<DT><i> Menus</i>
+  <DD> - wheat (inactive)
+  <DD> - palegreen (active)
+<DT><i> Menu Items</i>
+  <DD> - wheat (inactive)
+  <DD> - palegreen (active)
+<DT><i> Cursor</i>
+  <DD> - green arrow (normal)
+  <DD> - orange pirate (a dialogue box is open)
+  <DD> - red wrist-watch (task busy)
+  <DD> - yellow pencil (help box open)
+<DT><i> Mouse Button 1</i>
+  <DD> - Single Click: Invokes action <i>e.g.</i> OK or Cancel
+  <DD> - Double Click: Invokes action in listbox
+<DT><i> Mouse Button 2</i>
+  <DD> - Single Click: Invokes dynamic default if appropriate
+  <DD> - Double Click: Clears entry widget
+<DT><i> Mouse Button 3</i>
+  <DD> - Invokes on-line help dialogue box
+<P>
+ </DL><BR> 
+</BLOCKQUOTE>
+
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,39 @@
+<HEAD>
+<TITLE> The Reduction Task Interface</TITLE>
+</HEAD>
+<BODY  BGCOLOR=#F0EBD0>
+<P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
+<MAP NAME=cgs4map>
+<AREA SHAPE=rect COORDS="32,126,138,155"  HREF="red4Options.html">
+<AREA SHAPE=rect COORDS="143,126,252,155" HREF="node129.html">
+<AREA SHAPE=rect COORDS="258,126,365,155" HREF="node1.html">
+<AREA SHAPE=default HREF="sun27.html">
+</MAP>
+<IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
+<P>
+<P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
+<H1>The Reduction Task Interface</H1>
+<P>
+The interface to the reduction task monolith, RED4, is shown in figure 12.0.
+The interface is the simplest of its kind being a suite of commands 
+contained within a listbox. An action is invoked by double clicking on a selected item using mouse
+button 1. Some actions are `direct' <em> i.e</em> they do something with no further
+input (<em> e.g.</em> status) whilst others display dialogue boxes for manipulation of the action
+parameters (<em> e.g.</em> add_two_images). Error and informational messages are displayed in the text pane.
+<P>
+<P><CENTER><IMG ALIGN=CENTER SRC="red4Interface.gif"><P>
+Figure 12.0: The RED4 Interface</CENTER>
+<P>
+Before any such action is invoked, however, the interface checks that the task is
+ready to execute commands and is not busy doing other things. If the task is busy the confirmation 
+dialogue box shown in figure 12.1 is returned. In this case, the <i> Cancel</i> button aborts the 
+action whereas the <i> OK</i> will continue 
+<em> and will wait until the task becomes free</em>.
+<P>
+<P><CENTER><IMG ALIGN=CENTER SRC="red4Busy.gif"><P>
+Figure 12.1: The RED4 Continue Action Dialogue Box</CENTER>
+<P>
+<P>
+<HR><P>
+<A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
+</BODY>

@@ -1,0 +1,86 @@
+MONOLITH UKIRTFIG
+   INTERFACE STATUS
+   ENDINTERFACE
+
+   INTERFACE CGS3LIST
+      PARAMETER FILENAME
+         POSITION  1
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FIlename) Name of file(s) to be listed'
+      ENDPARAMETER
+      PARAMETER LISTING
+         POSITION  2
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(LIsting) Name of listing file'
+      ENDPARAMETER
+   ENDINTERFACE
+
+   INTERFACE CGS4LIST
+      PARAMETER FILENAME
+         POSITION  1
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FIlename) Name of file(s) to be listed'
+      ENDPARAMETER
+      PARAMETER LISTING
+         POSITION  2
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(LIsting) Name of listing file'
+      ENDPARAMETER
+      PARAMETER FULL
+         POSITION 3
+         TYPE '_LOGICAL'      
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FULL) Give 132 (rather than 80) char listing'
+      ENDPARAMETER
+   ENDINTERFACE
+
+   INTERFACE IRCAM3LIST
+      PARAMETER FILENAME
+         POSITION  1
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FIlename) Name of file(s) to be listed'
+      ENDPARAMETER
+      PARAMETER LISTING
+         POSITION  2
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(LIsting) Name of listing file'
+      ENDPARAMETER
+      PARAMETER FULL
+         POSITION 3
+         TYPE '_LOGICAL'      
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FULL) Give 132 (rather than 80) char listing'
+      ENDPARAMETER
+   ENDINTERFACE
+
+   INTERFACE WASCII
+      PARAMETER SPECTRUM
+         POSITION  1
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(SPectrum) File to be converted to ASCII file'
+      ENDPARAMETER
+      PARAMETER FILE
+         POSITION  2
+         TYPE 'LITERAL'       
+         VPATH 'PROMPT'                        
+         PPATH 'CURRENT,DYNAMIC'
+         PROMPT '(FIle) Name of ASCII format file to be created'
+      ENDPARAMETER
+   ENDINTERFACE
+ENDMONOLITH

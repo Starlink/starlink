@@ -1,0 +1,96 @@
+#!/bin/csh -f
+
+#+
+# file:        CGS4DR_ROOT/cgs4dr_demo
+# type:        C-shell script
+# author:      Phil Daly
+# description: Invokes the Portable-CGS4DR demo software
+# history:
+#   30-mar-95: original version (pnd@jach.hawaii.edu)
+# endhistory
+#-
+
+# If CGS4DR_ROOT is not set, set it
+if ( ${?CGS4DR_ROOT} == 0 ) then
+  setenv CGS4DR_ROOT INSTALL_BIN
+endif
+
+# If no demo directory, abort
+if ( ! -e ${CGS4DR_ROOT}/demo ) then
+  echo "${0}-f-nodemo, the demo directory has not been installed\!"
+  exit 1
+endif
+
+# Issue a message
+echo "Creating ${HOME}/cgs4dr_demo directory and copying data ... please wait"
+if ( ! -e ${HOME}/cgs4dr_demo )    mkdir ${HOME}/cgs4dr_demo
+if ( ! -e ${HOME}/cgs4dr_configs ) mkdir ${HOME}/cgs4dr_configs
+if ( ! -e ${HOME}/adam )           mkdir ${HOME}/adam
+if ( ! -e ${HOME}/cgs4dr_configs/default.qman ) touch ${HOME}/cgs4dr_configs/default.qman
+cp -p ${CGS4DR_ROOT}/demo/cgs4dr_demo.cred4 ${HOME}/cgs4dr_demo/cgs4dr_demo.cred4
+cp -p ${CGS4DR_ROOT}/demo/cgs4dr_demo.p4    ${HOME}/cgs4dr_demo/cgs4dr_demo.p4
+cp -p ${CGS4DR_ROOT}/demo/cgs4dr_demo.icl   ${HOME}/cgs4dr_demo/cgs4dr_demo.icl
+cp -p ${CGS4DR_ROOT}/demo/cgs4dr_demo2.icl  ${HOME}/cgs4dr_demo/cgs4dr_demo2.icl
+
+# set some CGS4 environmental variables
+setenv PID `echo $$ | awk '{for (i=length($0);i>=1;i--) printf substr($0,i,1)}'`
+setenv CGS4_CT            ${CGS4DR_ROOT}/ndf
+setenv CGS4_MASKS         ${CGS4DR_ROOT}/ndf
+setenv CGS4_TEMPLATES     ${CGS4DR_ROOT}/ndf
+setenv CGS4_NDF_TEMPLATES ${CGS4DR_ROOT}/ndf
+setenv CGS4_DST_TEMPLATES ${CGS4DR_ROOT}/dst
+setenv CGS4_ARLINES       ${CGS4DR_ROOT}
+setenv CGS4_DOCS          ${CGS4DR_ROOT}/Docs
+setenv CGS4_EXE           ${CGS4DR_ROOT}
+setenv CGS4_ICL           ${CGS4DR_ROOT}
+setenv CGS4_CONFIG        ${HOME}/cgs4dr_demo
+setenv CGS4_HOME          ${HOME}
+setenv CGS4_ENG           ${HOME}
+setenv CGS4_INDEX         ${HOME}/cgs4dr_demo
+setenv CGS4_DATA          ${HOME}/cgs4dr_demo
+setenv CGS4_DATE          941011
+setenv CGS4_FORMAT        NDF
+
+# Set some P4 environmental variables
+setenv P4_ROOT   ${CGS4DR_ROOT}
+setenv P4_EXE    ${P4_ROOT}
+setenv P4_ICL    ${P4_ROOT}
+setenv P4_CT     ${P4_ROOT}/ndf
+setenv P4_HOME   ${HOME}
+setenv P4_CONFIG ${HOME}/cgs4dr_demo
+setenv P4_HC     "`pwd`"
+setenv P4_DATE   941011
+setenv P4_DATA   ${HOME}/cgs4dr_demo
+
+# Set some QMAN environmental variables
+setenv QMAN_ROOT   ${CGS4DR_ROOT}
+setenv QMAN_EXE    ${QMAN_ROOT}
+setenv QMAN_ICL    ${QMAN_ROOT}
+setenv QMAN_CONFIG ${HOME}/cgs4dr_demo
+setenv QMAN_DATE   941011
+setenv QMAN_PASS   "${PID}pass"
+setenv QMAN_LOCK   "${PID}lock"
+
+# Set the CGS4 data directories
+setenv IDIR  ${CGS4DR_ROOT}/demo
+setenv ODIR  ${CGS4DR_ROOT}/demo
+setenv RODIR ${HOME}/cgs4dr_demo
+setenv RIDIR ${HOME}/cgs4dr_demo
+setenv RGDIR ${HOME}/cgs4dr_demo
+
+# Print out a welcome message
+echo ""
+echo "      Welcome to Portable-CGS4DR Demo"
+echo ""
+echo "      Please type CGS4DR_DEMO when ready"
+echo ""
+
+# Start icl and invoke cgs4dr
+icl ${CGS4DR_ROOT}/cgs4dr.icl
+echo ""
+echo "To sure kill Portable-CGS4DR, use % cgs4dr_kill"
+
+# Delete the directories when done
+echo "Removing demo directory and data ... please wait"
+rm -r ${HOME}/cgs4dr_demo
+exit 0
