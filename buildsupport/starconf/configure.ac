@@ -10,8 +10,8 @@ dnl   The default installation location for this package is
 dnl   /star/buildsupport.  This is not the default location of
 dnl   components configured using this tool and the acinclude.m4 which
 dnl   it generates.  That location is specified below by the value of
-dnl   DEFAULT_STARLINK, which defaults to the value of STARLINK which is
-dnl   current at configuration time.
+dnl   STARCONF_DEFAULT_STARLINK, which defaults to the value of
+dnl   STARLINK which is current at configuration time.
 dnl
 dnl   Note that the default for _this_ component does _not_ depend on
 dnl   the STARLINK variable (because of the way that m4/autoconf moves
@@ -27,30 +27,38 @@ dnl   specified either by giving DEFAULT_STARLINK=xxx as a parameter to
 dnl   the ./configure command, or by letting it be defaulted from the
 dnl   current value of $DEFAULT_STARLINK, $STARLINK or "/star"
 dnl   (whichever is non-empty)
-AC_ARG_VAR(DEFAULT_STARLINK,
+AC_ARG_VAR(STARCONF_DEFAULT_STARLINK,
            [Default location of a currently installed Starlink tree])
-AC_MSG_CHECKING([for a defined or defaulted DEFAULT_STARLINK])
-for s in "$DEFAULT_STARLINK" "$STARLINK" /star
+AC_MSG_CHECKING([for a defined or defaulted STARCONF_DEFAULT_STARLINK])
+for s in "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
 do
-    test -n "$s" && DEFAULT_STARLINK=$s && break
+    test -n "$s" && STARCONF_DEFAULT_STARLINK=$s && break
 done
-AC_MSG_RESULT($DEFAULT_STARLINK)
+AC_MSG_RESULT($STARCONF_DEFAULT_STARLINK)
 
 dnl   Specify the default intallation prefix of components configured
 dnl   by this tool.  This can be specified either by giving
-dnl   DEFAULT_PREFIX=xxx as a parameter to the ./configure command, or
-dnl   by letting it be defaulted from the current value of
-dnl   DEFAULT_PREFIX, DEFAULT_STARLINK, STARLINK or "/star".  This
-dnl   need not be the same as the definition of AC_PREFIX_DEFAULT
-dnl   above.
-AC_ARG_VAR(DEFAULT_PREFIX,
+dnl   STARCONF_DEFAULT_PREFIX=xxx as a parameter to the ./configure
+dnl   command, or by letting it be defaulted from the current value of
+dnl   STARCONF_DEFAULT_PREFIX, STARCONF_DEFAULT_STARLINK,
+dnl   STARLINK or "/star".  This need not be the same as the
+dnl   definition of AC_PREFIX_DEFAULT above.
+AC_ARG_VAR(STARCONF_DEFAULT_PREFIX,
            [Default installation directory of components])
-AC_MSG_CHECKING([for a defined or defaulted DEFAULT_PREFIX])
-for s in "$DEFAULT_PREFIX" "$DEFAULT_STARLINK" "$STARLINK" /star
+AC_MSG_CHECKING([for a defined or defaulted STARCONF_DEFAULT_PREFIX])
+for s in "$STARCONF_DEFAULT_PREFIX" "$STARCONF_DEFAULT_STARLINK" "$STARLINK" /star
 do
-    test -n "$s" && DEFAULT_PREFIX="$s" && break
+    test -n "$s" && STARCONF_DEFAULT_PREFIX="$s" && break
 done
-AC_MSG_RESULT($DEFAULT_PREFIX)
+AC_MSG_RESULT($STARCONF_DEFAULT_PREFIX)
+
+# We do not use STAR_DEFAULTS, since it may not exist at the time we
+# configure this.
+
+# Set the STAR_MANIFEST_DIR variable, defaulting it from the environment.
+# This causes automake to include the `install-manifest' target in Makefile.in
+: ${STAR_MANIFEST_DIR='$(prefix)/manifests'}
+AC_SUBST(STAR_MANIFEST_DIR)
 
 dnl   Find working tools
 AC_PROG_INSTALL
