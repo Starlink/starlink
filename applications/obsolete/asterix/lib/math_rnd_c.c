@@ -1,27 +1,42 @@
 /*
-*+  MATH_RND - Package of random number routines
+*+
+*  Name:
+*     MATH_RND
+
+*  Purpose:
+*     Calculate a pseudo-random number in the range [0,1)
+
+*  Language:
+*     Starlink ANSI C
+
+*  Invocation:
+*     REALVAR = MATH_RND()
+
+*  Description:
+*     Return random real in range [0,1) using the current set of state
+*     information in the math random number package.
 *
-*    Description :
-*
-*     Provides a package of random number generators. The routines are,
-*
-*      MATH_IRND         - Return random integer between 0 and LONG_MAX.
-*      MATH_RND          - Return random real in range [0,1)
-*      MATH_INITRNDSTATE - Initialise new state information
-*      MATH_SETRND       - Set seed of a generator
-*      MATH_SETRNDSTATE  - Swap generator state information
-*
-*    Invokation :
-*
-*      INTEGER   MATH_IRND()
-*      REAL      MATH_RND()
-*      [INTEGER] MATH_INITRNDSTATE( INTEGER SEED, INTEGER STATEDATA,
-*                                   INTEGER NBYTES )
-*      [INTEGER] MATH_SETRNDSTATE( INTEGER SEED )
-*                MATH_SETRND( SEED )
-*
-*    Method :
-*
+*     Note that most of the code in this file is derived from code written
+*     by University of California, Berkeley, and their copyright/disclaimer
+*     appears at the end of this header.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     None.
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The MATH random number routines work on random number state information.
 *     There is a current set of state info defined globally which defines 32
 *     bytes of state data which provides a very good generator compared to
@@ -35,22 +50,83 @@
 *     MATH_SETRNDSTATE( statedata ) enables state info to be swapped. The old
 *     state data address is returned by this function.
 *
-*    Author :
-*
+*     An improved random number generation package. In addition to the standard
+*     rand()/srand() like interface, this package also has a special state info
+*     interface. The MATH_INITRNDSTATE() routine is called with a seed, an
+*     array of bytes, and a count of how many bytes are being passed in; this
+*     array is then initialized to contain information for random number
+*     generation with that much state information. Good sizes for the amount of
+*     state information are 32, 64, 128, and 256 bytes. The state can be
+*     switched by calling the MATH_SETRNDSTATE() function with the same array
+*     as was initiallized with MATH_INITRNDSTATE(). By default, the package
+*     runs with 128 bytes of state information and generates far better random
+*     numbers than a linear congruential generator. If the amount of state
+*     information is less than 32 bytes, a simple linear congruential R.N.G.
+*     is used. Internally, the state information is treated as an array of
+*     longs; the zeroeth element of the array is the type of R.N.G. being used
+*     (small integer); the remainder of the array is the state information for
+*     the R.N.G.  Thus, 32 bytes of state information will give 7 longs worth
+*     of state information, which will allow a degree seven polynomial.
+*     (Note: The zeroeth word of state information also has some other
+*     information stored in it; see MATH_SETRNDSTATE for details). The random
+*     number generation technique is a linear feedback shift register approach,
+*     employing trinomials (since there are fewer terms to sum up that way).
+*     In this approach, the least significant bit of all the numbers in the
+*     state table will act as a linear feedback shift register, and will have
+*     period 2^deg - 1 (where deg is the degree of the polynomial being used,
+*     assuming that the polynomial is irreducible and primitive). The higher
+*     order bits will have longer periods, since their values are also
+*     influenced by pseudo-random carries out of the lower bits. The total
+*     period of the generator is approximately deg*(2**deg - 1); thus doubling
+*     the amount of state information has a vast influence on the period of
+*     the generator.  Note: The deg*(2**deg - 1) is an approximation only good
+*     for large deg, when the period of the shift register is the dominant
+*     factor. With deg equal to seven, the period is actually much longer than
+*     the 7*(2**7 - 1) predicted by this formula.
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     math Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/math.html
+
+*  Keywords:
+*     package:math, usage:public, random numbers
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
 *     Roland McGrath (GNU)
-*     David J. Allan (BHVAD::DJA)
-*
-*    History :
-*
-*     13 Jul 93 : Added this header to the Berkeley code below. Changed names
-*                 of routines to match ASTERIX conventions. (DJA)
-*     18 Nov 93 : Long's changed to int's due to longs being 64-bit on
-*                 Alpha and probably other 64-bit machines (DJA)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*      7 Jun 1988:
+*        Version taken from Berkeley source archive.
+*     13 Jul 1993 (DJA):
+*        Added this header to the Berkeley code below. Changed names
+*        of routines to match ASTERIX conventions.
+*     18 Nov 1993 (DJA):
+*        Long's changed to int's due to longs being 64-bit on
+*        Alpha and probably other 64-bit machines.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
 *-
 */
-
-#include "f77.h"
-#include "sae_par.h"
 
 /*
  * Copyright (c) 1983 Regents of the University of California.
@@ -75,6 +151,13 @@
  * It was reworked for the GNU C Library by Roland McGrath.
  */
 
+
+
+/*
+ *  Include files
+ */
+#include "sae_par.h"
+#include "f77.h"
 #include <errno.h>
 
 #define	ULONG_MAX  ((unsigned int)(~0L))     /* 0xFFFFFFFF for 32-bits */
@@ -89,40 +172,43 @@
 #endif
 
 F77_INTEGER_FUNCTION(math_irnd)();
-F77_REAL_FUNCTION(math_rnd)();
 
-/* An improved random number generation package.  In addition to the standard
-   rand()/srand() like interface, this package also has a special state info
-   interface.  The MATH_INITRNDSTATE() routine is called with a seed, an array
-   of bytes, and a count of how many bytes are being passed in; this array is
-   then initialized to contain information for random number generation with
-   that much state information.  Good sizes for the amount of state
-   information are 32, 64, 128, and 256 bytes.  The state can be switched by
-   calling the MATH_SETRNDSTATE() function with the same array as was
-   initiallized with MATH_INITRNDSTATE(). By default, the package runs with
-   128 bytes of state information and generates far better random numbers than
-   a linear congruential generator.  If the amount of state information is
-   less than 32 bytes, a simple linear congruential R.N.G. is used. Internally,
-   the state information is treated as an array of longs; the zeroeth element
-   of the array is the type of R.N.G. being used (small integer); the remainder
-   of the array is the state information for the R.N.G.  Thus, 32 bytes of
-   state information will give 7 longs worth of state information, which will
-   allow a degree seven polynomial.  (Note: The zeroeth word of state
-   information also has some other information stored in it; see
-   MATH_SETRNDSTATE for details).  The random number generation technique is a
-   linear feedback shift register approach, employing trinomials (since there
-   are fewer terms to sum up that way).  In this approach, the least
-   significant bit of all the numbers in the state table will act as a linear
-   feedback shift register, and will have period 2^deg - 1 (where deg is the
-   degree of the polynomial being used, assuming that the polynomial is
-   irreducible and primitive). The higher order bits will have longer periods,
-   since their values are also influenced by pseudo-random carries out of the
-   lower bits.  The total period of the generator is approximately
-   deg*(2**deg - 1); thus doubling the amount of state information has a vast
-   influence on the period of the generator.  Note: The deg*(2**deg - 1) is an
-   approximation only good for large deg, when the period of the shift register
-   is the dominant factor.  With deg equal to seven, the period is actually
-   much longer than the 7*(2**7 - 1) predicted by this formula.  */
+
+
+/*
+ *  Body of code
+ */
+F77_REAL_FUNCTION(math_rnd)()
+  {
+  return ((float) F77_CALL(math_irnd)())/((float) LONG_MAX);
+  }
+
+
+
+
+/*
+*+  MATH_RND - Package of random number routines
+*
+*    Description :
+*
+*     Provides a package of random number generators. The routines are,
+*
+*      MATH_IRND         - Return random integer between 0 and LONG_MAX.
+*      MATH_RND          - Return random real in range [0,1)
+*      MATH_INITRNDSTATE - Initialise new state information
+*      MATH_SETRND       - Set seed of a generator
+*      MATH_SETRNDSTATE  - Swap generator state information
+*
+*    Invokation :
+*
+*      INTEGER   MATH_IRND()
+*      REAL      MATH_RND()
+*      [INTEGER] MATH_INITRNDSTATE( INTEGER SEED, INTEGER STATEDATA,
+*                                   INTEGER NBYTES )
+*      [INTEGER] MATH_SETRNDSTATE( INTEGER SEED )
+*                MATH_SETRND( SEED )
+*
+
 
 
 
@@ -237,8 +323,8 @@ static int *end_ptr = &randtbl[sizeof(randtbl) / sizeof(randtbl[0])];
    for default usage relies on values produced by this routine.  */
 
 F77_SUBROUTINE(math_setrnd)( INTEGER(rseed) )
-{
-GENPTR_INTEGER(rseed)
+  {
+  GENPTR_INTEGER(rseed)
 
   unsigned int x;
 
@@ -254,8 +340,9 @@ GENPTR_INTEGER(rseed)
       for (i = 0; i < 10 * rand_deg; ++i)
         (void) F77_CALL(math_irnd)();
     }
-}
-
+  }
+
+
 /* Initialize the state information in the given array of N bytes for
    future random number generation.  Based on the number of bytes we
    are given, and the break values for the different R.N.G.'s, we choose
@@ -272,7 +359,7 @@ GENPTR_INTEGER(rseed)
 PTR F77_EXTERNAL_NAME(math_initrndstate)( INTEGER(pseed),
                                           POINTER(arg_state),
                                           INTEGER(state_size) )
-{
+  {
   unsigned int seed;
   unsigned n;
 
@@ -331,8 +418,9 @@ PTR F77_EXTERNAL_NAME(math_initrndstate)( INTEGER(pseed),
     state[-1] = (MAX_TYPES * (rptr - state)) + rand_type;
 
   return ostate;
-}
-
+  }
+
+
 /* Restore the state from the given state array.
    Note: It is important that we also remember the locations of the pointers
    in the current state information, and restore the locations of the pointers
@@ -343,7 +431,7 @@ PTR F77_EXTERNAL_NAME(math_initrndstate)( INTEGER(pseed),
    Returns a pointer to the old state information.  */
 
 PTR F77_EXTERNAL_NAME(math_setrndstate)( PTR arg_state )
-{
+  {
   register int *new_state = (int *) arg_state;
   register int type = new_state[0] % MAX_TYPES;
   register int rear = new_state[0] / MAX_TYPES;
@@ -381,11 +469,12 @@ PTR F77_EXTERNAL_NAME(math_setrndstate)( PTR arg_state )
   end_ptr = &state[rand_deg];
 
   return ostate;
-}
-
+  }
+
+
 /* If we are using the trivial TYPE_0 R.N.G., just do the old linear
    congruential bit.  Otherwise, we do our fancy trinomial stuff, which is the
-   same in all ther other cases due to all the global variables that have been
+   same in all the other cases due to all the global variables that have been
    set up.  The basic operation is to add the number at the rear pointer into
    the one at the front pointer.  Then both pointers are advanced to the next
    location cyclically in the table.  The value returned is the sum generated,
