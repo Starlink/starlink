@@ -1,9 +1,10 @@
 interface IPOSIT
-  parameter LOAD
+  parameter ENTER
     type '_LOGICAL'
     default N
     vpath 'DEFAULT'
-    prompt 'Load a list of positions'
+    prompt 'Entry mode'
+    help 'Enter list of positions, individually or from a text or source file'
   endparameter
   parameter SEL
     type '_LOGICAL'
