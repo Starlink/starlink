@@ -2661,8 +2661,8 @@ static int Match( AstFrame *template_frame, AstFrame *target,
       if ( !astOK || !match ) {
          *template_axes = astFree( *template_axes );
          *target_axes = astFree( *target_axes );
-         *map = astAnnul( *map );
-         *result = astAnnul( result );
+         if( *map ) *map = astAnnul( *map );
+         if( *result ) *result = astAnnul( *result );
          match = 0;
       }
    }
