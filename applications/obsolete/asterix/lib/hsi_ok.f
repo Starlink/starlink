@@ -55,12 +55,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     HSI Subroutine Guide : http://www.sr.bham.ac.uk:8080/asterix-docs/Programmer/Guides/hsi.html
 
@@ -89,7 +83,6 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER			IFID			! Input dataset
@@ -99,17 +92,19 @@
 
 *  Status:
       INTEGER 			STATUS             	! Global status
-
-*  Local Variables:
-      CHARACTER*(DAT__SZLOC)	ILOC			! HDS dataset
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Simply invoke HDS routine for now
-      CALL ADI1_GETLOC( IFID, ILOC, STATUS )
-      CALL HIST_OK( ILOC, OK, STATUS )
+*  Invoke method
+      CALL ADI_EXEC( 'ChkHistory', 1, IFID, OARG, STATUS )
+
+*  Extract logical value
+      CALL ADI_GET0L( OARG, OK, STATUS )
+
+*  Destroy result
+      CALL ADI_ERASE( OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_OK', STATUS )
