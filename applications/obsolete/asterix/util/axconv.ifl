@@ -1,6 +1,6 @@
 interface AXCONV
   parameter INP
-    type 'UNIV'
+    type 'LITERAL'
     position 1
     prompt 'Input dataset'
     ppath  'current'
