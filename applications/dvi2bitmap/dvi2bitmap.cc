@@ -86,11 +86,15 @@ int bitmapW = -1;
 int resolution = PkFont::dpiBase();// in pixels-per-inch
 int oneInch = resolution;
 
+#define FONT_CMDS 4
+#define FONT_INCFOUND 2
+#define FONT_SHOW 1
+
 int main (int argc, char **argv)
 {
     string dviname;
     double magmag = 1.0;	// magnification of file magnification factor
-    int show_font_list = 0;
+    unsigned int show_font_list = 0;
     bitmap_info bm;
     bool do_process_file = true; // if true, then process DVI file
     bool process_options_only = false; // if true, exit after options
@@ -309,12 +313,21 @@ int main (int argc, char **argv)
 		while (*++*argv != '\0')
 		    switch (**argv)
 		    {
-		      case 'f':		// show missing fonts
-			show_font_list = 1;
+		      case 'F':		// show missing fonts
+			show_font_list = (FONT_SHOW | FONT_INCFOUND);
 			break;
 
-		      case 'F':	// show all fonts
-			show_font_list = 2;
+		      case 'f':
+			show_font_list = FONT_SHOW;
+			break;
+
+		      case 'G':
+			show_font_list
+			    = (FONT_SHOW | FONT_INCFOUND | FONT_CMDS);
+			break;
+
+		      case 'g':
+			show_font_list = (FONT_SHOW | FONT_CMDS);
 			break;
 
 		      case 't':	// show file types
@@ -484,7 +497,43 @@ int main (int argc, char **argv)
 	    }
 	    else		// flag at least one missing
 		all_fonts_present = false;
-	    if (show_font_list > 0)
+
+	    if (show_font_list & FONT_SHOW)
+		if (show_font_list & FONT_CMDS)
+		{
+		    if ((show_font_list & FONT_INCFOUND) || !f->loaded())
+		    {
+			// If f->loaded() is true, then we're here
+			// because FONT_INCFOUND was set, so indicate
+			// this in the output.
+			cout << (f->loaded() ? "QG " : "Qg ")
+			     << f->fontgenCommand()
+			     << '\n';
+		    }
+		}
+		else
+		    if ((show_font_list & FONT_INCFOUND) || !f->loaded())
+		    {
+			// If f->loaded() is true, then we're here
+			// because FONT_INCFOUND was set, so indicate
+			// this in the output.
+			cout << (f->loaded() ? "QF " : "Qf ");
+
+			// write out font name, dpi, base-dpi, mag and MF mode
+			cout << f->name() << ' '
+			     << f->dpiBase() << ' '
+			     << f->dpi() << ' '
+			     << magmag
+			     << " localfont";
+			if (f->loaded())
+			{
+			    string fn = f->fontFilename();
+			    string unk = "unknown";
+			    cout << ' ' << (fn.length() > 0 ? fn : unk);
+			}
+			cout << '\n';
+		    }
+#if 0
 		if (show_font_list > 1 || !f->loaded())
 		{
 		    if (f->loaded()) // show_font_list is >1
@@ -505,6 +554,7 @@ int main (int argc, char **argv)
 		    }
 		    cout << '\n';
 		}
+#endif
 	}
 
 
@@ -662,8 +712,10 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 			{
 			    b.ofile_type 
 				= BitmapImage::defaultBitmapImageFormat();
+			    /*
 			    cerr << "Warning: unspecified image format.  Selecting default ("
 				 << b.ofile_type << ")\n";
+			    */
 			}
 			if (b.ofile_name.length() == 0)
 			{
