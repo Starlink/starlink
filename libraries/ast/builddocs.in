@@ -44,6 +44,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/grismmap.c \
             ${srcdir}/interval.c \
             ${srcdir}/intramap.c \
+            ${srcdir}/keymap.c \
             ${srcdir}/lutmap.c \
             ${srcdir}/mapping.c \
             ${srcdir}/mathmap.c \

@@ -48,8 +48,8 @@ c     - astMapKey: Return the key name at a given index in the KeyMap
 c     - astMapType: Return the data type of a named entry in a map.
 f     - AST_MAPPUT0<X>: Add a new scalar entry to a KeyMap
 f     - AST_MAPPUT1<X>: Add a new vector entry to a KeyMap
-f     - AST_MAPGet0<X>: Get a named scalar entry from a KeyMap
-f     - AST_MAPGet1<X>: Get a named vector entry from a KeyMap
+f     - AST_MAPGET0<X>: Get a named scalar entry from a KeyMap
+f     - AST_MAPGET1<X>: Get a named vector entry from a KeyMap
 f     - AST_MAPREMOVE: Removed a named entry from a KeyMap
 f     - AST_MAPSIZE: Get the number of entries in a KeyMap
 f     - AST_MAPLENGTH: Get the length of a named entry in a KeyMap

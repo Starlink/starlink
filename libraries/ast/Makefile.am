@@ -129,6 +129,7 @@ AST_H_FILES = \
           pcdmap.h \
           permmap.h \
           polymap.h \
+          ratemap.h \
           shiftmap.h \
           slamap.h \
           specmap.h \

@@ -31,6 +31,13 @@
 *        output units (e.g. because fo the less than perfect simplication
 *        algorithm in SimplifyTree), try finding a Mapping from output to 
 *        input units and inverting the result.
+*     14-DEC-2004 (DSB):
+*        In CreateTree, move the invocation of FixConstants from after 
+*        InvertConstants to before InvertConstants. This is because
+*        InvertConstants ignores nodes which contain all constant
+*        arguments. This results in constants not being inverted in
+*        expressions such as "1/60 deg" (because all arguments are 
+*        constant in the the "1/60" node).
 */
 
 /* Module Macros. */
@@ -173,11 +180,11 @@ static void FindFactors( UnitNode *, UnitNode ***, double **, int *, double * );
 static const char *MakeExp( UnitNode *, int, int );
 
 /*  Debug functions... 
+*/
 static const char *DisplayTree( UnitNode *, int );
 static const char *OpSym( UnitNode * );
 static const char *OpName( Oper );
 static const char *TreeExp( UnitNode * );
-*/
 
 
 /* Function implementations. */
@@ -1023,6 +1030,10 @@ static UnitNode *CreateTree( const char *exp ){
    if( (*cleanex) ) {
       result = MakeTree( cleanex, strlen( cleanex ) );
 
+/* Replace each subtree which simply combines constants (i.e. which has no 
+   OP_LDVAR nodes) with a single OP_LDCON node. */
+      FixConstants( &result, 0 );
+
 /* Invert literal constant unit multipliers. */
       InvertConstants( &result );
 
@@ -1030,11 +1041,6 @@ static UnitNode *CreateTree( const char *exp ){
    a sub-tree which defines the derived unit in terms of known basic units.
    The LDVAR nodes in the resulting tree all refer to basic units. */
       RemakeTree( &result );
-
-/* Replace each subtree which simply combines constants (i.e. which has no 
-   OP_LDVAR nodes) with a single OP_LDCON node. */
-      FixConstants( &result, 0 );
-
    }
 
 /* Free resources. */
@@ -1365,7 +1371,7 @@ static void FixConstants( UnitNode **node, int unity ) {
 *     Unit member function.
 
 *  Description:
-*     Ths function replaces sub-trees which have a constant value by
+*     This function replaces sub-trees which have a constant value by
 *     a single OP_LDCON node which loads the appropriate constant.
 
 *  Parameters:
@@ -1750,7 +1756,7 @@ static KnownUnit *GetKnownUnits() {
       MakeKnownUnit( "pixel", "pixel", NULL );
       MakeKnownUnit( "pix", "pixel", NULL );
       MakeKnownUnit( "barn", "barn", "1.0E-28 m**2" );
-      MakeKnownUnit( "D", "Debye", "1.0E-29/3 C.m" );
+      MakeKnownUnit( "D", "Debye", "(1.0E-29/3) C.m" );
    }
 
 /* If succesful, return the pointer to the head of the list. */
@@ -1926,6 +1932,7 @@ static void InvertConstants( UnitNode **node ) {
             for( i = 0; i < 2; i++ ) {
                if( (*node)->arg[ i ]->con != AST__BAD ) {
                   if( (*node)->arg[ i ]->con != 0.0 ) {
+
                      (*node)->arg[ i ]->con = 1.0/(*node)->arg[ i ]->con;
                   } else {
                      astError( AST__BADUN, "Illegal zero constant encountered." );
@@ -3602,7 +3609,6 @@ static void RemakeTree( UnitNode **node ) {
       unit = (*node)->unit;
       if( unit && unit->head ) newnode = CopyTree( unit->head );
 
-
 /* If the LDVAR node has a multiplier associated with it, we need to
    introduce a OP_MULT node to perform the scaling. */ 
       if( (*node)->mult ) {
@@ -3651,7 +3657,6 @@ static void RemakeTree( UnitNode **node ) {
       FreeTree( *node );
       *node = newnode;
    }
-
 }
 
 static int ReplaceNode( UnitNode *target, UnitNode *old, UnitNode *new ) {
@@ -4623,7 +4628,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
 /* The rest of this file contains functions which are of use for debugging 
    this module. They are usually commented out. 
 
-
+*/
 
 static const char *DisplayTree( UnitNode *node, int ind ) {
    int i;
@@ -4793,4 +4798,3 @@ static const char *TreeExp( UnitNode *node ) {
 
    return astStore( NULL, buff, strlen( buff ) + 1 );
 }
-*/
