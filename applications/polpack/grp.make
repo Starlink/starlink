@@ -14,7 +14,7 @@ gaia2.eps gaia3.eps
 #  The fortran A-task files containing prologues to be included in the
 #  on-line help file.
 USER_TASKS = polcal.f polexp.f polhelp.f polimp.f polka.f \
-polvec.f polplot.f polbin.f polext.f
+polvec.f polplot.f polbin.f polext.f 
 
 #  The tasks visible within IRAF.
 IRAF_TASKS = polcal polexp polimp polka polvec polplot polbin polext
@@ -47,7 +47,7 @@ pthlpo.f rdndf.f rfeature.bit right_arrow.bit rvertex.bit sread.f \
 tick.bit vertex.bit wrndf.f pol1_dbeam.f pol1_blkwr.f pol1_sngvr.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f  pol1_snghd.f  \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_sngfl.f pol1_sngsi.f \
-pol1_sngsm.f pol1_hist2.f
+pol1_sngsm.f pol1_hist2.f polsim.f pol1_simcl.f polsim.ifl
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.

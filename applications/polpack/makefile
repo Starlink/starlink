@@ -436,7 +436,8 @@ polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
 polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f pol1_dbeam.f \
 pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
 pol1_sngsv.f pol1_dulbm.f pol1_fillr.f pol1_hist.f pol1_hist2.f \
-pol1_sngfl.f pol1_sngsi.f pol1_sngsm.f pol1_sngvr.f pol1_blkwr.f
+pol1_sngfl.f pol1_sngsi.f pol1_sngsm.f pol1_sngvr.f pol1_blkwr.f \
+polsim.f pol1_simcl.f 
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -475,7 +476,7 @@ TCLLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 #  List of applications/tasks in monolith.
 
 TASKS = polhelp polka datapic polcent polcal polimp polext \
-polexp polvec polplot polbin
+polexp polvec polplot polbin polsim
 
 #  Monolith routine source name.
 
@@ -493,7 +494,7 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polka.ifl polext.ifl \
 polcal.ifl polimp.ifl polexp.ifl polvec.ifl polplot.ifl \
-polbin.ifl 
+polbin.ifl polsim.ifl
 
 #  List of help library sources.
 
