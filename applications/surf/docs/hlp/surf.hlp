@@ -939,7 +939,7 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 BOXSZ
-BOXSZ = INTEGER (Given)
+BOXSZ = INTEGER (Read)
    Size of smoothing box in seconds. This is used to smooth
    the time series. Default is 2.0 seconds.
 3 IN
@@ -988,7 +988,7 @@ OUT_COORDS = CHAR (Read)
 
    For RD current epoch is taken from the first input file.
 3 REF
-REF = CHAR (Given)
+REF = CHAR (Read)
    The name of the first NDF to be processed. The name may also be the
    name of an ASCII text file containing NDF and parameter values.
    REF can include a SCUBA section. See REBIN for more information
@@ -1435,6 +1435,11 @@ Description:
 
 2 Parameters
 For information on individual parameters, select from the list below:
+3 CLEAR
+CLEAR = LITERAL (Read)
+   Determine whether the graphics device should be cleared prior
+   to plotting the despike information. Only used if DEVICE is
+   defined.
 3 DEFOUT
 DEFOUT = LOGICAL (Read)
    Determines whether output files should be written automatically
@@ -1444,7 +1449,7 @@ DEFOUT = LOGICAL (Read)
 DEVICE = DEVICE (Read)
    The device on which to display the binned data. Can be null (!)
 3 DMODE
-DMODE = CHAR (Given)
+DMODE = CHAR (Read)
    For display purposes the points in each cell are plotted
    sequentially on a 1-dimensional plot. This parameter governs
    the way in which the cells are extracted from the grid.
@@ -1477,9 +1482,11 @@ LOOP = LOGICAL (Read)
 MSG_FILTER = CHAR (Read)
    Message filter level. Default is NORM. In verbose mode the positions of
    detected spikes are reported.
-3 NSIGMA = REAL (Read)
+3 NSIGMA
+NSIGMA = REAL (Read)
    The sigma clipping level used for despiking each cell.
-3 SMODE = CHAR (Given)
+3 SMODE
+SMODE = CHAR (Read)
    This parameter controls the mode used for smoothing of the clipping
    envelope. If smoothing is selected, the extraction mode (DMODE) is used
    to determine the pixels that are adjacent to each other.
@@ -1489,7 +1496,10 @@ MSG_FILTER = CHAR (Read)
        o NONE: No smoothing
 
        o HANN: Hanning smoothing 
-
+3 STYLE
+STYLE = LITERAL (Read)
+   Style to use for the formatted axis values. See the KAPPA documentation
+   for more details on style parameters.
 3 OUT
 OUT = NDF (Write)
    This is the name of the NDF that will contain the despiked data. There
@@ -2615,7 +2625,7 @@ For information on individual parameters, select from the list below:
    A Unix-type switch which controls whether the 3 sigma lines are
    displayed or not.
 3 NDF
-NDF (Given)
+NDF (Read)
    The required dataset
 3 ADAM_parameters
 ADAM parameters = Any
@@ -4092,6 +4102,16 @@ NDF = NDF (Read)
 NAME = LOGICAL (Read)
    Label with bolometer name if true, else bolometer number. The default
    is true.
+3 STYLE
+STYLE = LITERAL (Read)
+   Plotting style to be used for the bolometers. The relevant key
+   to use for adjusting the plotting style is 'bolometer'. This
+   is a synonym for curve and can be abbreviated to 'bol'. The most
+   useful attribute to change is the colour. Explicit control
+   of the style of the text labels is provided using the 'text'
+   attribute. If this attribute is not supplied all plotting
+   styles are inherited from the 'bol' style. See the KAPPA manual 
+   for more information on styles.
 2 Examples
 scuover
    The bolometer names will be overlaid using the default colour.
@@ -4529,7 +4549,7 @@ For information on individual parameters, select from the list below:
 -h
    Help information
 3 NDF
-NDF (Given)
+NDF (Read)
    The input files to be modified.
 3 card
 card
@@ -4699,10 +4719,10 @@ Description:
 2 Parameters
 For information on individual parameters, select from the list below:
 3 NDF
-NDF (Given)
+NDF (Read)
    The required dataset
 3 SIGMA
-SIGMA = REAL (Given)
+SIGMA = REAL (Read)
    The clipping level
 2 Examples
 sigclip test 3.0
