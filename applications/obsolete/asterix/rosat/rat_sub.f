@@ -523,24 +523,14 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
 
-        call dat_valid(loc,valid,status)
-        print *,valid
-
-	print *,'finding ',object
-        call dat_name(loc,name,status)
-        print *,name
-        call dat_struc(loc,valid,status)
-        print *,'struc',valid
         call dat_ncomp(loc,ncomp,status)
 	print *,'ncomp',ncomp
         call dat_size(loc,dummy,status)
 	print *,'size',dummy
-        call dat_clone(loc,cloc,status)
-	print *,'cloned'
         name=' '
         i=1
         do while (name.ne.'HEAD'.and.i.le.ncomp.and.status.eq.sai__ok)
-          call dat_index(cloc,i,aloc,status)
+          call dat_index(loc,i,aloc,status)
           call dat_name(aloc,name,status)
           print *,i,name
           if (name.ne.'HEAD') then
