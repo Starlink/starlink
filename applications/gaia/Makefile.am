@@ -60,6 +60,8 @@ GAIA_TASKS = ardstat autocrop cat2tab tab2cat asc2tab tab2asc
 ##  Documentation.
 stardocs_DATA = @STAR_LATEX_DOCUMENTATION@ sun214fig.ps
 
+##  On-line help.
+starhelp_DATA = gaia.htx/*.html gaia.htx/*.gif
 
 ## Local rules for _configuring_ and building the sub-directories and
 ## extracting the required products. When developing you need to use the
