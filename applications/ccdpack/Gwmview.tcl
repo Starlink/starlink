@@ -250,7 +250,7 @@ class Gwmview {
 
 #  Add control groups to the control panel.
          addgroup zoom Zoom
-         addgroup marknum Markers
+         addgroup markers Markers
          addgroup action Control
 
 #  Construct control widgets.
@@ -261,6 +261,11 @@ class Gwmview {
                -max 12 \
                -value 1 \
                -valuevar zoom
+         }
+         itk_component add marktype {
+            marktypecontrol $panel.marktype \
+               -value "Colour=Red,Size=9,Thickness=3,Shape=Cross" \
+               -valuevar marktype
          }
          itk_component add marknum {
             marknumcontrol $panel.marknum
@@ -278,10 +283,10 @@ class Gwmview {
             keep -helptext
          }
 
-
 #  Add control widgets to the control panel.
          addcontrol $itk_component(zoom) zoom
-         addcontrol $itk_component(marknum) marknum
+         addcontrol $itk_component(marktype) markers
+         addcontrol $itk_component(marknum) markers
          addcontrol $itk_component(help) action
          addcontrol $itk_component(exit) action
 
@@ -314,9 +319,6 @@ class Gwmview {
          pack $itk_component(gwmchildsite) -side bottom -fill x -expand 0
          pack $itk_component(info) -side bottom -fill x -expand 0
          pack $itk_component(viewarea) -side bottom -fill both -expand 1
-
-#  Initialise marker type.
-         markertype 2 red 10
 
 #  Do requested configuration.
          eval itk_initialize $args
@@ -510,63 +512,11 @@ class Gwmview {
 
 
 #-----------------------------------------------------------------------
-      public method markertype { type colour size } {
-#-----------------------------------------------------------------------
-#  Set new values for the markconfig and markitem private variables based
-#  on the arguments.
-         set mitem ""
-         set mconfig ""
-         if { $type <= 4 } {
-            set s [ expr int( $size / 2 ) ]
-            set mitem "line 0 0  0 -$s  0 0  0 $s  0 0  -$s 0  0 0  $s 0   0 0"
-            switch $type {
-               1 { set mconfig "-width 2" }
-               2 { set mconfig "-width 3" }
-               3 { set mconfig "-width [ expr $scale / 10 ]" }
-               4 { set mconfig "-width [ expr $scale / 6 ]" }
-            }
-            lappend mconfig -fill $colour
-         } elseif { $type <= 8 } {
-            set s [ expr int( $size / 2 ) ]
-            set mitem "polygon -$s -$s  -$s $s  $s $s  $s -$s"
-            switch [ expr $type - 4 ] {
-               1 { set mconfig "-width 1" }
-               2 { set mconfig "-width 2" }
-               3 { set mconfig "-width [ expr $scale / 10 ]" }
-               4 { set mconfig "-width [ expr $scale / 6 ]" }
-            }
-            lappend mconfig -fill {} -outline $colour
-         }
-         if { $mitem == "" } {
-            error "Invalid marker specification (programming error)"
-            exit
-         }
-
-#  If the new values differ from the old ones, reconfigure the items to
-#  reflect the new values.
-         if { $markitem != "" } {
-            if { [ lindex $mitem 0 ] != [ lindex $markitem 0 ] } {
-               error "Different item types - not currently dealt with."
-            } elseif { $mitem != $markitem } {
-               error "Different item geometries - not currently dealt with."
-            } elseif { $mconfig != $markconfig } {
-               eval $canvas itemconfigure marker $mconfig
-            }
-         }
-
-#  Set instance variables to new values.
-         set markitem $mitem
-         set markconfig $mconfig
-         set markcolour $colour
-         set marksize $size
-      }
-
-
-#-----------------------------------------------------------------------
       public method refreshpoints {} {
 #-----------------------------------------------------------------------
+         $canvas delete marker
          foreach p $points {
-            marker [ lindex $p 1 ] [ lindex $p 2 ] [ lindex $p 3 ] \
+            marker [ lindex $p 1 ] [ lindex $p 2 ] "[ lindex $p 3 ] marker" \
                    [ lindex $p 0 ]
          }
       }
@@ -643,37 +593,28 @@ class Gwmview {
 #-----------------------------------------------------------------------
       private method marker { vx vy { tags "" } { label "" } } {
 #-----------------------------------------------------------------------
-         set mitem $markitem
-         set mitem [ lindex $markitem 0 ]
          set pos [ view2canv $vx $vy ]
-         set cx [ expr [ lindex $pos 0 ] + 0.5 ]
-         set cy [ expr [ lindex $pos 1 ] - 0.5 ]
-         for { set i 0 } { $i < [ expr [ llength $markitem ] - 2 ] } { } {
-            lappend mitem [ expr [ lindex $markitem [ incr i ] ] + $cx ]
-            lappend mitem [ expr [ lindex $markitem [ incr i ] ] + $cy ]
-         }
-         set taglist ""
          if { $tags != "" } {
             eval lappend taglist $tags
          }
-         set point [ eval $canvas create \
-                       $mitem $markconfig -tags \[ list $taglist \] ]
-         if { $label != "" && $uselabels } {
-            $canvas create \
-               text [ expr $cx + $marksize ] $cy \
-                  -tags $taglist \
-                  -anchor w \
-                  -font [ list Helvetica [ expr -2 * $marksize ] ] \
-                  -fill $markcolour \
-                  -text $label 
+         if { ! $uselabels } {
+            set label ""
          }
-         return $point
+         $itk_component(marktype) draw \
+             $canvas [ lindex $pos 0 ] [ lindex $pos 1 ] $taglist $label
       }
 
 
 ########################################################################
 #  Public variables.
 ########################################################################
+
+#-----------------------------------------------------------------------
+      public variable marktype "Colour=Red,Size=9,Thickness=3,Shape=Cross" {
+#-----------------------------------------------------------------------
+         refreshpoints
+      }
+
 
 #-----------------------------------------------------------------------
       public variable pixelsize 1 {
@@ -733,10 +674,10 @@ class Gwmview {
       public variable uselabels 1 {
 #-----------------------------------------------------------------------
          if { $uselabels } {
-            pack [ groupwin marknum ] -after [ groupwin zoom ] \
+            pack [ groupwin markers ] -after [ groupwin zoom ] \
                  -side left -fill y
          } else {
-            pack forget [ groupwin marknum ]
+            pack forget [ groupwin markers ]
          }
       }
 
