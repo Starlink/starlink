@@ -138,6 +138,10 @@
 #        happen however if you do a lot of chooser resizing.
 #     9-JUL-2001 (MBT):
 #        Added scrollbars to the tabsets, to accomodate many NDFs.
+#     13-AUG-2001 (MBT):
+#        Fixed size of info windows (i.e. prevented geometry propagation)
+#        which prevents some resizing problems.  Also set a minimum
+#        resizable size for the window.
 #-
 
 #  Inheritance.
@@ -880,7 +884,21 @@
 #  Store characteristics of this info window so that we know whether 
 #  subsequent info window requests are out of date.
             set noted($index,showfits) $showfits
+
+#  Set the height of the window, and turn off geometry propagation so that
+#  long labels cannot mess up the size of the parent window.
+            set vy 0
+            foreach lw $lws {
+               incr vy [ winfo reqheight $lw ]
+            }
+            $itk_component(info$index) configure -height $vy
+            pack propagate $itk_component(info$index) 0
          }
+
+#  Set the width of the window to that of the width of the NDF viewport.
+#  If these windows are not kept to the same width, a long label in 
+#  this window (the info window) can lead to problems when resizing.
+         $itk_component(info$index) configure -width [ lindex $viewport 0 ]
 
 #  Return the name of the window.
          return $itk_component(info$index)
@@ -944,7 +962,7 @@
          eval place [ ndfplotwindow $item ] \
             -in $itk_component(view$slot) $pos
          pack [ ndfinfowindow $item ] \
-            -in $itk_component(describe$slot) -anchor w
+            -in $itk_component(describe$slot) -anchor w -fill x
          if { [ isvalid ] } {
             $itk_component(gotpair) configure -state normal
          }
@@ -1131,6 +1149,15 @@
          }
          if { $status == "active" } {
             configure -viewport $viewport
+
+#  If we have not already done so, set a minimum size for the window.
+            if { [ wm minsize $itk_interior ] == {1 1} } {
+               set wnow [ winfo width $itk_interior ]
+               set hnow [ winfo height $itk_interior ]
+               wm minsize $itk_interior \
+                  [ expr $wnow - 2 * [ lindex $viewport 0 ] + 200 ] \
+                  [ expr $hnow - [ lindex $viewport 1 ] + 100 ]
+            }
          }
       }
 
@@ -1196,7 +1223,7 @@
       private variable wcsframecontrol ;# Frame control widgets for each image
       private variable xmax 0          ;# Largest image current coords X size
       private variable ymax 0          ;# Largest image current coords Y size
-      
+
 
       private common CCDdir $env(CCDPACK_DIR)
 
