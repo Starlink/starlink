@@ -452,8 +452,8 @@
 
         X=XC
         Y=YC
-        FLAG=0
-        DO WHILE (FLAG.EQ.0.AND.STATUS.EQ.SAI__OK)
+        FLAG=1
+        DO WHILE (FLAG.EQ.1.AND.STATUS.EQ.SAI__OK)
 
 
           IF (I_GUI) THEN
@@ -461,11 +461,11 @@
           ELSE
             CALL GFX_CURS(X,Y,LEFT,RIGHT,CH,STATUS)
             IF (RIGHT.OR.CH.EQ.'X'.OR.CH.EQ.'x') THEN
-              FLAG=1
+              FLAG=0
             ENDIF
           ENDIF
 
-          IF (FLAG.EQ.0) THEN
+          IF (FLAG.EQ.1) THEN
 
             CALL IMG_BOXTOBOX(X,Y,DX,DY,II1,II2,JJ1,JJ2,STATUS)
 
