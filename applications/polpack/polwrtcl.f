@@ -240,14 +240,14 @@
       IF( STATUS .EQ. SAI__OK ) THEN 
          IF( XCOL .EQ. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'POLWRTCL_ERR2', 'Input catalogue ''$IN'' has'//
-     :                    ' no ''X'' column.', STATUS )
+            CALL ERR_REP( 'POLWRTCL_ERR2', 'Input catalogue ''$IN'' '//
+     :                    'has no ''X'' column.', STATUS )
             GO TO 999
 
          ELSE IF( YCOL .EQ. 0 ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'POLWRTCL_ERR3', 'Input catalogue ''$IN'' has'//
-     :                    ' no ''Y'' column.', STATUS )
+            CALL ERR_REP( 'POLWRTCL_ERR3', 'Input catalogue ''$IN'' '//
+     :                    'has no ''Y'' column.', STATUS )
             GO TO 999
          END IF
       END IF

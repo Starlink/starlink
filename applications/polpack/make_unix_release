@@ -80,6 +80,7 @@
 #  Tar up the source files and then remove them.
       chmod 644 `grp unix_source`
       chmod 755 `find . -type d`
+      chmod 777 polpack_link_adam
       tar -cvh -f ${TEMPDIR}/polpack_source.tar `grp unix_source` 
       rm -f `grp unix_source` 
       mv ${TEMPDIR}/polpack_source.tar ${REL_DIR}

@@ -411,7 +411,7 @@ PRIVATE_INCLUDES = $(I_CTG) $(I_SUB1)
 
 I_CTG = ctg_const ctg_err
 
-I_SUB1 = hlpcmd ccd1_par ccd1_memcm 
+I_SUB1 = hlpcmd ccd1_par ccd1_memcm cat1_par cat3_fit_cmn cat1_cats_cmn 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -655,9 +655,9 @@ CCD1_PAR:    ccd1_par;                $(LINK) $? $@
 CCD1_MEMCM:  ccd1_memcm;              $(LINK) $? $@
 CTG_CONST:   ctg_const;               $(LINK) $? $@
 CTG_ERR:     ctg_err;                 $(LINK) $? $@
-CAT1_PAR:       cat1_par              $(LINK) $? $@
-CAT3_FIT_CMN:   cat3_fit_cmn          $(LINK) $? $@
-CAT1_CATS_CMN:  cat1_cats_cmn         $(LINK) $? $@
+CAT1_PAR:       cat1_par;             $(LINK) $? $@
+CAT3_FIT_CMN:   cat3_fit_cmn;         $(LINK) $? $@
+CAT1_CATS_CMN:  cat1_cats_cmn;        $(LINK) $? $@
 
 ast.h:   $(STAR_INC)/ast.h;   $(LINK) $? $@
 AST_PAR:   $(STAR_INC)/ast_par;   $(LINK) $? $@
