@@ -1,0 +1,3295 @@
+0 SURF
+
+This is the interactive help system for the SURF (SCUBA User 
+Reduction Facility) package.
+
+
+1 Classified_commands
+
+2 Alphabetic_list
+
+BOLREBIN        - Generate a separate regridded image from each bolometer
+CHANGE_DATA     - Change data (or variance) values in the data 
+CHANGE_FLAT     - Change the stored flatfield information
+CHANGE_POINTING - Change Az and El pointing offsets for map data
+CHANGE_QUALITY  - Change pixel quality
+DESPIKE         - Despike JIGGLE/MAP data
+DESPIKE2        - Despike SCAN/MAP data
+DSPBOL          - Interactive despiking and data inspection (requires Kappa)
+EXTINCTION      - Correct the data for atmospheric extinction
+EXTRACT_DATA    - Write bolometer positions and data to text file
+EXTRACT_FLAT    - Write flatfield information to a text file
+FLATFIELD       - Multiply the data array by the flatfield volumes
+INTREBIN        - Generate a separate regridded image for each integration
+MAPSUM          - Generate a summary of all map observations
+OBSSUM          - Generate a one-line summary of all observations
+PHOTSUM         - Generate a summary of all photometry observations
+PLTBOL          - Interactive data inspection (requires Kappa)
+POINTSUM        - Generate a summary of all pointing observations
+QDRAW           - Plot photometry data (requires Kappa)
+REBIN           - Regrid all data onto a rectangular grid.
+REDUCE_SWITCH   - Convert raw demodulated data to standard format and
+                  process individual switches.
+REMSKY          - Remove sky contribution from each jiggle
+RESTORE         - Remove dual-beam response from SCAN/MAP data
+RLINPLOT        - Interactive data inspection via MLINPLOT (requires Kappa)
+SCAN_RLB        - Remove linear baselines from SCAN/MAP data
+SCUCAT          - Concatenate photometry results into a single file
+SCUCLIP         - Perform sigma clipping of each bolometer
+SCUHELP         - This help system
+SCULOG          - Provide detailed descriptions of all observation data
+SCUOVER         - Overlay bolometer array on image
+SCUPA           - Show position angle of array (requires Kappa)
+SCUPHOT         - Process extinction corrected photometry data
+SCUPLOT         - Interactive despiking and data inspection (requires Kappa)
+SCUQUICK        - Script to automate SURF data reduction
+SDIP            - Script to reduce and display skydip data (requires Kappa)
+SIGCLIP         - Remove spikes from photometry data (requires Kappa)
+SKYDIP          - Process SKYDIP data in order to determine atmospheric
+                  extinction
+SKYSUM          - Generate a summary of skydip observations
+
+
+2 Observation_summaries
+
+SCULOG          - Generate log of all observations in a directory
+MAPSUM          - Generate a summary of all map observations
+OBSSUM          - Generate a one-line summary of all observations
+PHOTSUM         - Generate a summary of all photometry observations
+POINTSUM        - Generate a summary of all pointing observations
+SKYSUM          - Generate a summary of skydip observations
+
+2 General_Tasks
+
+EXTRACT_FLAT    - Write the flatfield information to a text file
+SCUHELP         - This help system
+SCUPA           - Show position angle of array (requires Kappa)
+SCUQUICK        - Script to automate SURF data reduction
+SDIP            - Script to reduce and display skydip data (requires Kappa)
+SKYDIP          - Process SKYDIP data in order to determine atmospheric
+                  extinction
+
+2 Initial_processing
+
+REDUCE_SWITCH - Convert raw demodulated data to standard format and
+                process individual switches.
+FLATFIELD     - Multiply the data array by the flatfield volumes.
+EXTINCTION    - Correct the data for atmospheric extinction
+
+2 JIGGLE_data_processing
+
+DESPIKE         - Despike JIGGLE data
+REMSKY          - Remove sky contribution from each jiggle
+SCUCLIP         - Sigma clip photometry data and maps of weak sources
+
+2 SCAN/MAP_data_processing
+
+DESPIKE2        - Despike SCAN/MAP data
+RESTORE         - Remove dual-beam response from SCAN/MAP data
+SCAN_RLB        - Remove linear baselines from scans
+
+2 Inspection
+
+PLTBOL          - Interactive bolometer display (requires Kappa)
+RLINPLOT        - Interactive display via MLINPLOT (requires Kappa)
+SCUPLOT         - Interactive display and despiking (requires Kappa)
+
+2 Modification
+
+CHANGE_DATA     - Change data (or variance) values in the data 
+CHANGE_FLAT     - Change the stored flatfield information
+CHANGE_POINTING - Change Az and El pointing offsets for map data
+CHANGE_QUALITY  - Change pixel quality
+DSPBOL          - Interactive despiking (requires Kappa)
+
+2 Mapping
+
+REBIN         - Regrid all data onto a rectangular grid.
+BOLREBIN      - Generate a map from each bolometer separately
+INTREBIN      - Generate a map of each integration separately
+EXTRACT_DATA  - Write bolometer positions and data to text file
+SCUOVER       - Overlay bolometer array on image
+
+2 Photometry
+
+SCUPHOT       - Process extinction corrected photometry data
+SCUCAT        - Concatenate photometry results into a single file
+QDRAW         - Kappa script to aid in the plotting of photometry data
+SIGCLIP       - Kappa script to mark spikes in photometry data.
+
+
+
+1 SCUBA_sections
+
+None of the SURF tasks can accept NDF sections (SUN/33). This is
+because all the tasks rely on information in the NDF extensions that
+must correspond to data in the main DATA_ARRAY.  Since on many
+occassions it is desirable to work on a subset of the observation
+(e.g. data from a specific exposure, integration or measurement) the
+SURF package has a concept of a 'SCUBA section.'
+
+A SCUBA section is indicated by using curly brackets after the file
+name (c.f. round brackets for NDF sections). The brackets then contain
+a specification that selects a certain part of the input data
+using the following format:
+
+   Specifier  Definition
+   ---------  ----------
+       {      Begins a SCUBA section
+       }      Ends a SCUBA section  
+       b      indicates that the following numbers 
+              describe bolometer numbers (ie X axis)
+       p      indicates data position (ie Y axis)
+       s      switches 
+       e      exposures 
+       i      integrations
+       m      measurements
+       ;      Separates components
+       ,      Separates numbers
+       :      indicates a range of values
+       -      Negates a section if placed after the last curly bracket
+
+2 Examples
+
+  Here are some example SCUBA sections:
+
+      test{i3}  
+          means select all bolometers in integration 3 for all
+          measurements
+
+      test{b3:5}
+          select bolometers 3 to 5 for all points
+ 
+      test{}     
+          select all points (good for resetting CHANGE_QUALITY
+          mask)
+ 
+      test{e3}
+          select the 3rd exposure in each integration
+ 
+      test{e3;i4}  
+          select the third exposure in integration 4
+ 
+      test{b5;p500:600} 
+          select points 500 to 600 for bolometer 5
+ 
+      test{b5:7,19}   
+          select bolometers 5 through 7 and bolometer 19
+ 
+      test{i2}-
+          select everything except integration 2.
+
+      test{i1:4,7}{b3}-
+          select everything except integrations 1,2,3,4 and 7 and the 
+          data for bolometer 3.
+
+      test{b2}{i3}
+          select bolometer 2 and integration 3. Note that this
+          is different to {b2;i3} which would only select the second
+          bolometer from integration 3.
+
+1 New_in_version_1_1
+
+  The changes can be grouped into three categories:
+
+2 General Changes
+
+  - Output files are now as small as possible. In version 1.0-0 output
+    files were the same size as the input file.
+
+  - Observation numbers, rather than the full filename, can now be
+    given to tasks that process the raw demodulated data (REDUCE_SWITCH,
+    SKYDIP, SDIP, SCUQUICK)
+    This feature requires the SCUBA_PREFIX environment variable.
+ 
+  - All tasks now supply a default output filename. The form of this
+    filename is governed by the SCUBA_SUFFIX environment variable.
+
+  - The MAP_X, MAP_Y and LOCAL_COORDS observing parameters are now
+    supported.
+
+2 New Tasks
+
+  - A despiking task has been added for JIGGLE/MAP data (DESPIKE).
+
+  - An experimental despiking task is available for SCAN/MAP data (DESPIKE2).
+
+  - The data clipping functionality has been moved from REMSKY to a
+    standalone task (SCUCLIP).
+
+  - There is now a task for extracting flatfield information from data
+    files (EXTRACT_FLAT).
+
+  - Data suffering from the `data shift' problem (mainly Semester 97a)
+    can be fixed with the SCUSHIFT task.
+
+  - The experimental task, SCAN_RLB, can be used to remove linear baselines
+    from SCAN/MAP data.
+
+  - The addition of some interactive despiking and data inspection tools
+    (DSPBOL, PLTBOL, RLINPLOT and SCUPLOT).
+
+2 Changes to Existing Tasks
+
+  - SKYSUM is now officially released with documentation.
+  
+  - SKYDIP data can now be processed with REDUCE_SWITCH and CHANGE_QUALITY.
+    This allows bad skydip points to be removed prior to fitting with SKYDIP.
+    This required changes to REDUCE_SWITCH (cold load temperatures are 
+    requested) and \skydip.
+
+  - REDUCE_SWITCH now creates axis information (instead of EXTINCTION).
+
+  - For SCAN/MAP data SCUOVER now displays the position of the array at the
+    start of a scan.
+
+  - SKYDIP now reads default values for \param{ETA\_TEL} from the observation 
+    header.
+
+  - EXTINCTION now reads default values for FIRST_TAU from the
+    observation header and supplies a default for SECOND_TAU (the value
+    accepted for FIRST_TAU.)
+
+  - REMSKY now adds the mean sky level back onto the data in order to
+    minimise the removal of flux from the image.
+
+  - REMSKY no longer despikes the data. This facility is now provided by
+    the  SCUCLIP/DESPIKE tasks.
+
+  - Bolometer groups (e.g. ring 1, ring 2, all) can now be used to specify
+    bolometer lists for REMSKY.
+
+  - The filenaming system used by SCUQUICK  has been modified slightly so
+    that it conforms with the SCUBA_SUFFIX=long mode. SCUQUICK now also
+    recognizes SKYDIP data.
+
+
+
+
+
+1 BOLREBIN
+Generate a separate regridded image for each bolometer.
+
+Usage:
+
+   rebin
+
+Description:
+
+   This routine rebins the demodulated data from SCUBA MAP observations
+   onto a rectangular mesh by a variety of methods.
+   Currently convolution by weighting functions and splines are
+   supported.
+
+   - Weighting functions:
+     Currently linear and bessel weighting functions are supported.
+     The width of the Bessel function is such that it should preserve all
+     spatial information obtained by the telescope at the wavelength of
+     observation, but suppress higher spatial frequencies. To minimise edge
+     effects the Bessel function is truncated at a radius of 10 half-widths
+     from the centre, and apodized over its outer third by a cosine
+     function. Viewed in frequency space the method consists of Fourier
+     transforming the input dataset(s), multiplying the transform by a
+     cylindrical top-hat (the F.T. of the Bessel function),
+     then transforming back into image space.
+     A linear weighting function is also available which works out
+     to one half-width - this has the advantage that it is much faster to
+     process and is much less susceptible to edge effects.
+
+   - Splines:
+     Additionally, spline interpolation and smoothing routines are also
+     available. Note that the spline routines work on each integration
+     in turn, whereas the weighting function routines work on all the input
+     data in one go. At present the spline routines are experimental and
+     comments are welcomed.
+
+   A separate map will be made of each bolometer. The output file will
+   contain an NDF for each bolometer.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = CHAR (Read)
+   The name of the input file to be rebinned. This parameter is requested
+   repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+   IN can include a SCUBA section.
+   Like the REF parameter this parameter accepts a text file.
+3 LAT_OUT
+LAT_OUT = CHAR (Read)
+   The latitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LONG_OUT
+LONG_OUT = CHAR (Read)
+   The longitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Task will ask for multiple input files if true. Only REF is read
+   if noloop.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   This is the name of the HDS container file that will contain the
+   rebinned images. The map for each bolometer is stored in an NDF
+   inside this NDF container. The maps can be accessed as 
+   `out.name' where `name' is the bolometer name (e.g. H7 or G1 etc.).
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+
+   For RD current epoch is taken from the first input file.
+3 OUT_OBJECT
+OUT_OBJECT = CHAR (Read)
+   The name of the object (ie the NDF title).
+3 PIXSIZE_OUT
+PIXSIZE_OUT = REAL (Read)
+   Size of pixels in the output map. Units are arcsec.
+3 REBIN_METHOD
+REBIN_METHOD = CHAR (Read)
+   The rebin method to be used. A number of regridding methods are
+   available:
+
+   - LINEAR:  Linear weighting function
+
+   - BESSEL:  Bessel weighting function
+
+   - SPLINE1: Interpolating spline (PDA_IDBVIP)
+
+   - SPLINE2: Smoothing spline (PDA_SURFIT)
+
+   - SPLINE3: Interpolating spline (PDA_IDSFFT)
+
+   Please refer to the PDA documentation (SUN/194) for more information
+   on the spline fitting algorithms.
+3 REF
+REF = CHAR (Read)
+   The name of the first NDF to be rebinned. The name may also be the
+   name of an ASCII text file containing NDF and parameter values.
+   See the notes. REF can include a SCUBA section.
+3 SHIFT_DX
+SHIFT_DX = REAL (Read)
+   The pointing shift (in X) to be applied that would bring the
+   maps in line. This is a shift in the output coordinte frame.
+3 SHIFT_DY
+SHIFT_DY = REAL (Read)
+   The pointing shift (in Y) to be applied that would bring the
+   maps in line. This is a shift in the output coordinate frame.
+3 WEIGHT
+WEIGHT = REAL (Read)
+   The relative weight that should be assigned to each dataset.
+2 Examples
+bolrebin rebin_method=LINEAR out_coords=RJ
+   Rebin the maps with LINEAR weighting function in J2000 RA/Dec
+   coordinates. You will be asked for input datasets until a null
+   value is given.
+
+bolrebin rebin_method=BESSEL out=map
+   Rebin the maps with Bessel weighting function. Each bolometer is
+   rebinned separately and placed in an NDF in the output container file
+   map.sdf. Bolometer H7 can be accessed by displaying map.h7.
+
+bolrebin noloop REF=test.bat
+   Rebin each bolometer using the data specified in the file test.bat.
+2 Notes
+For each file name that is entered, values for the parameters
+WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+- The application can read in up to 100 separate input datasets.
+
+- The output map will be large enough to include all data points.
+
+- Spline regridding may have problems with SCAN/MAP (since integrations
+contain lots of overlapping data points).
+
+- SCUBA sections can be given along with any input NDF
+
+- The relative weights associated with each point in the output map
+are stored in a WEIGHTS NDF in the REDS extension of the output
+data. For spline rebinning each point is equivalent to the number
+of integrations added into the final data point. For weight function
+regridding the situation is more complicated.
+2 ASCII_input_files
+   The REF and IN parameters accept ASCII text files as input. These
+   text files may contain comments (signified by a #), NDF names,
+   values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
+   and names of other ASCII files. There is one data file per line.
+   An example file is:
+
+       file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+       file2                        # Read file 2 but you will still be
+                                    # prompted fro WEIGHT, and shifts.
+       file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+       test.bat                     # Read in another text file
+
+   Note that the parameters are position dependent and are not necessary.
+   Missing parameters are requested. This means it is not possible to
+   specify SHIFT_DX (position 3) without specifying the WEIGHT.
+   If the file has the .txt extension the NDF system will attempt to
+   convert it to NDF format before processing -- this is probably not
+   what you want.
+2 Related_Applications
+   SURF: REBIN, INTREBIN, EXTRACT_DATA
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+
+1 CHANGE_DATA
+Set SCUBA data to any value.
+
+Usage:
+
+   change_data ndf{spec1}{spec2}{specn} value=??
+
+Description:
+
+   This application is used to set SCUBA data to any value by using
+   SCUBA sections to specify a subset of the full data. Data, Variance
+   and Quality arrays can be modified.
+
+     Once the data specification has been decoded the application will
+   read from parameter VALUE the value of the data that should be used.
+   All data specified by the section (or by the inverse of this section
+   if specified) will be set to this value.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COMP
+COMP = LITERAL (Read)
+   The name of the NDF array component which should be changed:
+   "Data","Error", "Quality" or "Variance" (where "Error" is the
+   alternative to "Variance" and causes the square root of the
+   variance values to be taken). The default component is always DATA.
+   If "Quality" is specified, then the quality values are treated
+   as numerical values (in the range 0 to 255).
+3 IN
+IN = CHAR (Read)
+   Name of data set and the specification of the data to be changed.
+   Usually of the form `ndf{spec1}{spec2}' where ndf is the filename
+   and spec1...n are the section specifications.
+   The section can be read from the SECTION parameter if the
+   SCUBA section is omitted.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   Name of the NDF that stores the modified data.
+3 SECTION
+SECTION() = CHAR (Read)
+   This parameter can be used to specify SCUBA sections.
+   Curly brackets must still be given. Since this is an array
+   parameter square brackets must be used to specify more than
+   one component:
+
+         SECTION > [ {b3} , {i2} ]
+
+   would supply two SECTIONS of {b3} and {i2}. Only {b3} will
+   be used if the square brackets are not used. Care must also
+   be taken when using commas in SCUBA sections - the parameter
+   system will split multiple entries on commas unless the entire
+   section is quoted:
+
+         SECTION > [ "{b3,5}" , {i2} ]
+
+   If necessary the negation character should come after a
+   section (ie after the closing curly bracket) and that
+   negation applies to the combined section and not just the string
+   containing the negation character:
+
+       SECTION > [ {b3}-, {i2} ]
+
+   implies that the section consists of everything except bolometer 3
+   and integration 2.
+
+   This parameter is only used when no SCUBA section was specified
+   via the IN parameter.
+3 VALUE
+VALUE = LITERAL (Read)
+   Value to which all selected data points should be set. A value
+   of `bad' will set the data point to VAL__BAD (Starlink bad data
+   value). For COMP=Quality only numbers 0 to 255 are allowed -
+   numbers outside this range are assumed to be bad values.
+2 Examples
+change_data 'ndf{b2}' value=bad out=changed
+   Copy all data in ndf.sdf to changed.sdf and change all data
+   in bolometer 2 to bad.
+
+change_data 'ndf{}' comp=variance value=0.0001
+   Copy ndf.sdf to the output file (asked for explicitly) and
+   set all variance values to 0.0001.
+
+change_data test  section='[{b47},{i3}]' value=1.02
+   Select data from bolometer 47 and integration 3 in test.sdf and set
+   this to a value of 1.02. This method of selecting a section is not
+   recommended given the complication using commas and square
+   brackets.
+
+change_data test2 section='["{b2,5}", {i2}-]' value=0.2 comp=err
+   Select everything except integration 2 and bolometers 2 and 5.
+   Set the error for this section to 0.2
+
+change_data 'phot{i2:6}{b3}' comp=quality value=8
+   Explicitly set the quality array to 8 for integrations 2 through
+   6 and bolometer 3. The task CHANGE_QUALITY is recommended in this
+   case since then only bit 3 is affected.
+
+change_data 'map{i2,5}-' value=0.0
+   Set everything except integrations 2 and 5 to zero.
+2 Notes
+- This software sets the actual value in the specified component
+  and so, unlike CHANGE_QUALITY, is not reversible. For this reason
+  a new output file is created.
+
+- This task does not attempt to create a component if the specified
+  component is missing. A Variance array can be created using the
+  KAPPA task SETVAR if necessary.
+
+- The SECTION parameter is not used if a SCUBA section was given
+  via the IN parameter.
+2 Related_Application
+   SURF: CHANGE_QUALITY, REBIN, SCUPHOT
+2 Authors
+JFL:  J.Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+
+1 CHANGE_FLAT
+Change the flatfield in a SCUBA datafile
+
+Usage:
+
+   change_flat in new_flat
+
+Description:
+
+   The flatfield information is stored inside each demodulated
+   data file and this task can be used to change the flatfield that is
+   stored internally. The new flatfield is read from a text file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   Name of NDF to change.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level (Default is NORM).
+3 NEW_FLAT
+NEW_FLAT = CHAR (Read)
+   Name of the new flatfield file.
+2 Examples
+change_flat test newflat.dat
+   This will change the flatfield stored in test.sdf to that stored
+   in newflat.dat.
+2 Related_Application
+   SURF: FLATFIELD, SCUQUICK
+2 Authors
+JFL:  J.Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+
+1 CHANGE_POINTING
+Change the pointing corrections to map data.
+
+Usage:
+
+   change_pointing in change_point
+
+Description:
+
+   This application is used to change the pointing corrections to map
+   data.
+
+      If the observing mode of the input datafile is `MAP' the
+   application will search for pointing corrections in the file and, if it
+   finds any, report them. You will be asked if you wish to change the
+   pointing correction data in the file. `No' will result in the data
+   remaining unaltered, `yes' will then ask you for the time of the
+   pointing offset (LST in hh mm ss.ss format) and the azimuth and
+   elevation correction (in arcseconds) that would have to be added to
+   the observation position to correct the pointing at that time. If
+   you supply no data the existing pointing corrections will be removed.
+   Corrections will be requested until a negative number is given
+   for the local sidereal time.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CHANGE_POINT
+CHANGE_POINT = CHAR (Read)
+   If true you will be prompted for pointing corrections otherwise
+   the program will exit after listing the current pointing
+   corrections.
+3 IN
+IN = NDF (Read)
+   Name of NDF to change.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. (Default is NORM)
+3 POINT_DAZ
+POINT_DAZ = REAL (Read)
+   The Azimuth pointing correction (arcsec).
+3 POINT_DEL
+POINT_DEL = REAL (Read)
+   The elevation pointing correction (arcsec).
+3 POINT_LST
+POINT_LST = CHAR (Read)
+   The sidereal time of the pointing correction. Pointing corrections
+   are asked for repeatedly until a NULL (!) or negative value are
+   given for POINT_LST.
+2 Notes
+- Pointing corrections are erased when new items are written.
+
+- Pointing corrections can be removed completely by issuing
+  null (!) in response to POINT_LST when first prompted.
+  (ie pointing corrections are removed if no corrections are given)
+
+- Use ABORT (!!) if you don't want to change the pointing corrections
+  once you have started entering values.
+
+- Pointing corrections must be given in LST order.
+2 Related_Application
+   SURF: REBIN
+2 Authors
+JFL:  J.Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+
+1 CHANGE_QUALITY
+Set SCUBA data quality bad or good.
+
+Usage:
+
+   change_quality ndf{spec1}{specn} bad_quality
+
+Description:
+
+   This application is used to set SCUBA data quality bad or good by
+   using SCUBA sections to specify a subset of the full data.
+
+     Once the data specification has been decoded the application will
+   read from parameter BAD_QUALITY whether quality should be set good
+   or bad. A `yes' answer will mark the area bad, a `no' answer will
+   mark the area good (an area will only be good if no other QUALITY
+   bits are set - CHANGE_QUALITY only uses QUALITY bit 3). The section
+   can be inverted by using the negation character at the end of the
+   section.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BAD_QUALITY
+BAD_QUALITY = LOGICAL (Read)
+   Set quality to BAD. Answering this question with a `yes' will
+   mean that the selected data will be set to BAD. `no'
+   will set them to good.
+3 IN
+IN = CHAR (Read)
+   Name of data set and the specification of the data to be changed.
+   Usually of the form `ndf{spec1}{spec2}' where ndf is the filename
+   and spec1...n are the section specifications.
+   The section can be read from the SECTION parameter if the
+   SCUBA section is omitted.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 SECTION
+SECTION() = CHAR (Read)
+   This array parameter can be used to specify SCUBA sections.
+   Curly brackets must still be given. Since this is an array
+   parameter square brackets must be used to specify more than
+   one component:
+
+       SECTION > [ {b3} , {i2} ]
+
+   would supply two SECTIONS of {b3} and {i2}. Only {b3} will
+   be used if the square brackets are not used. Care must also
+   be taken when using commas in SCUBA sections - the parameter
+   system will split multiple entries on commas unless the entire
+   section is quoted:
+
+       SECTION > [ "{b3,5}" , {i2} ]
+
+   If necessary the negation character should come after a
+   section (ie after the closing curly bracket) and that
+   negation applies to the combined section and not just the string
+   containing the negation character:
+
+       SECTION > [ {b3}-, {i2} ]
+
+   implies that the section consists of everything except bolometer 3
+   and integration 2.
+
+   This parameter is only used when no SCUBA section was specified
+   via the IN parameter.
+2 Examples
+change_quality 'ndf{}' BAD_QUALITY=false
+   Select the entire array and unset bit 3.
+
+change_quality 'ndf{b2}' BAD_QUALITY
+   Select the second bolometer and mark it bad.
+
+change_quality 'ndf{b2;i3}-' BAD_QUALITY
+   Select the third integration of bolometer two but set all
+   other data points bad by inverting the section.
+
+change_quality 'ndf{b16}{i2}' BAD_QUALITY
+   Select all of bolometer 16 and the whole of integration 2.
+
+change_quality 'ndf{e5,16:18}' MSG_FILTER=quiet
+   Select exposure 5 and 16 through 18. Messaging is turned off.
+
+change_quality ndf
+   Since no section has been specified, the user will be prompted
+   for a section later.
+
+change_quality test SECTION='["{b41,52}",{i3}]' BAD_QUALITY
+   Set bolometers 41 and 52 as well as integration 3 to bad quality.
+   Use of SECTION here is not recommended given the complication
+   when using commas and square brackets.
+
+change_quality test SECTION='[{b2;i2}-]' BAD_QUALITY
+   Set everything bad except bolometer 2 and integration 2.
+2 Notes
+Samples are marked bad by setting bit 3 of the quality array.
+The effects of CHANGE_QUALITY  can be removed by changing the
+value of the bad bit mask (with the KAPPA task SETBB or by running
+CHANGE_QUALITY on the entire array [section is {} for entire array]
+but with BAD_QUALITY=false) so that bit 3 (decimal value of 8) is
+no longer used as a masking bit.
+2 Related_Application
+   SURF: CHANGE_DATA, REBIN, SCUPHOT;
+   KAPPA: SETBB
+2 Authors
+JFL:  J.Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: T.Jenness   (timj@jach.hawaii.edu)
+
+1 DESPIKE
+Despike data by position
+
+Description:
+      This routine despikes demodulated data by comparing points
+      that lie in the same region of sky. Each point is placed in the
+      output grid (similar to REBIN but without the smoothing) depending
+      on its position. The points in each cell are then compared with each
+      other and spikes are detected if any points lie more than NSIGMA
+      from the mean.
+
+      Optionally, a plot is provided showing the points in each bin
+      along with the clipping level to
+      be used for despiking. In order to provide a 2-dimensional plot
+      of 3-dimensional data the grid is unwrapped such that all the cells
+      are plotted in one axis. The unwrapping order is governed by the
+      DMODE parameter.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FILE
+DEVICE = DEVICE (Read)
+   The device on which to display the binned data. Can be null (!)
+3 DMODE
+DMODE = CHAR (Given)
+   For display purposes the points in each cell are plotted
+   sequentially on a 1-dimensional plot. This parameter governs
+   the way in which the cells are extracted from the grid.
+   Allowed values are:
+
+     o SPIRAL: A Spiral outwards from the reference pixel
+
+     o XLINEAR: unfold each X strip in turn for each Y    
+
+     o YLINEAR:  unfold each Y strip in turn for each X    
+
+     o DIAG1:    diagonal strips starting at position (1,1)
+ 
+     o DIAG2:   diagonal strips starting at positions (nx,1)
+
+   This parameter is also required if SMODE is not equal to
+   'NONE' since the smoothing depends on the order that the points
+   are extracted from the grid.
+3 IN
+IN = CHAR (Read)
+   The name of the input file to be rebinned. This parameter is requested
+   repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+   IN can include a SCUBA section.
+   Like the REF parameter this parameter accepts a text file.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Task will ask for multiple input files if true. Only REF is read
+   if noloop.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM. In verbose mode the positions of
+   detected spikes are reported.
+3 NSIGMA = REAL (Read)
+   The sigma clipping level used for despiking each cell.
+3 SMODE = CHAR (Given)
+   This parameter controls the mode used for smoothing of the clipping
+   envelope. If smoothing is selected, the extraction mode (DMODE) is used
+   to determine the pixels that are adjacent to each other.
+
+   Allowed modes are:
+
+       o NONE: No smoothing
+
+       o HANN: Hanning smoothing 
+
+3 OUT
+OUT = NDF (Write)
+   This is the name of the NDF that will contain the despiked data. There
+   will be one prompt per input filename (assuming spikes were detected).
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+3 REF
+REF = CHAR (Read)
+   The name of the first NDF to be rebinned. The name may also be the
+   name of an ASCII text file containing NDF and parameter values.
+   See the notes. REF can include a SCUBA section.
+3 SHIFT_DX
+SHIFT_DX = REAL (Read)
+   The pointing shift (in X) to be applied that would bring the
+   maps in line. This is a shift in the output coordinte frame.
+3 SHIFT_DY
+SHIFT_DY = REAL (Read)
+   The pointing shift (in Y) to be applied that would bring the
+   maps in line. This is a shift in the output coordinate frame.
+3 WEIGHT
+WEIGHT = REAL (Read)
+   The relative weight that should be assigned to each dataset.
+3 XRANGE
+XRANGE = INTEGER (Read)
+   The X-range of the plot. This parameter loops indefinitely until a
+   null response is provided (!)
+2 Examples
+
+despike out_coords=RJ smode=none device=!
+   Despike the maps by placing points onto an RJ grid.
+   Do not plot the data points before despiking and do not smooth
+   the clipping envelope.
+   You will be asked for input datasets until a null
+   value is given.
+
+despike device=! out_coords=RB smode=hann dmode=sp nsigma=4.0
+   Despike on a RB grid with hanning smoothing. Use a 4.0 sigma clip 
+   and do not display. Note that the smoothing uses the spiral mode
+   for grid unwinding.
+
+despike device=xwindows dmode=x nsigma=3.0
+   Unwind with XLINEAR mode and display the data before despiking.
+
+despike noloop accept ref=test.bat
+   Despike the files specified in test.bat using an RJ grid.
+
+2 Notes
+For each file name that is entered, values for the parameters
+SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+- The application can read in up to 100 separate input datasets.
+
+- No data is returned if the DATA or positions are bad.
+  Data is still returned if Variance is bad.
+
+2 ASCII_input_files
+   The REF and IN parameters accept ASCII text files as input. These
+   text files may contain comments (signified by a #), NDF names,
+   values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
+   and names of other ASCII files. There is one data file per line.
+   An example file is:
+
+       file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+       file2                        # Read file 2 but you will still be
+                                    # prompted for WEIGHT, and shifts.
+       file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+       test.bat                     # Read in another text file
+
+   Note that the parameters are position dependent and are not necessary.
+   Missing parameters are requested. This means it is not possible to
+   specify SHIFT_DX (position 3) without specifying the WEIGHT.
+   Also note that SCUBA sections can be specified with any input NDF.
+2 Related_Applications
+   SURF: DESPIKE2, SCUCLIP, SIGCLIP, CHANGE_QUALITY, DSPBOL
+2 Authors
+TIMJ: Tim Jenness (JACH)
+
+
+1 DESPIKE2
+Remove spikes from SCAN/MAP observations
+
+Usage:
+
+   restore in out nsigma
+
+Description:
+
+   This routine removes spikes from SCAN/MAP observations.
+   The scan map differential despiking algorithm uses 2 criteria
+   to decide which points are spikes.
+
+   First, for each bolometer used a pass is made through each
+   scan calculating for each point:-
+
+     diff(i) = point(i) - (point(i-1) + point(i+1))
+
+                          -------------------------
+                                     2.0
+
+   Values of 'diff' for the first and last points in the scan are
+   calculated in a similar way but subtracting the mean of points
+   2 and 3 and points n-1 and n-2 respectively.
+
+   The mean and standard deviation of 'diff' are calculated by
+   coadding the 10 points at each end of the scan where,
+   hopefully, there is no source emission. Spikes in these
+   regions are handled by removing points from the coadd that lie
+   further than 3 sigma from the mean, then redoing the
+   calculation recursively until no further points need be
+   removed.
+
+   The first criterion for a spike is that it's 'diff' value
+   should be further from the mean of 'diff' by NSIGMA times the
+   sigma derived from the endpoints.
+
+   The problem with this simple approach is that bright sources
+   in the scan themselves lead to excursions in 'diff' that can
+   be wrongly identified as spikes. To prevent this happening a
+   second criterion is used. In this the scan values are
+   convolved with a 3 sample wide box so that each 'box' point is
+   the average of the point itself and the points on either side of
+   it. 'Box' is expected to increase faster for real sources than
+   for spikes because in them the increase will be spread over
+   all 3 averaged points rather than just 1.
+
+   The second criterion for a spike is met, therefore, if a
+   point's 'diff' is further from the 'diff' mean than the value
+   of 'box' at that point.
+
+   Fixed-up values for points that have identified as spikes are
+   calculated by interpolating between the closest healthy points
+   on either side.
+
+   The second spike criterion also means unfortunately that the
+   technique is less sensitive to spikes on bright sources than
+   elsewhere. In addition, it is still possible to clip bright
+   sources if too low a value for NSIGMA is used. It is
+   recommended to run despike several times with different values
+   of NSIGMA. Begin with NSIGMA=5, look at the result to see how
+   effective despiking has been, then repeat the process with
+   NSIGMA=4.5, 4.0 etc. until you start to clip source
+   information.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the input file containing demodulated SCUBA data.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM. No verbose messages are used.
+3 NSIGMA
+NSIGMA = REAL (Read)
+   Nsigma from mean at which 'spikes' begin.
+3 OUT
+OUT = NDF (Write)
+   The name of the output file to contain the processed data.
+   A default output name is suggested that is derived from the
+   input.
+2 Examples
+restore o37 o37_des 5.0
+   Despike o37.sdf at 5.0 sigma.
+
+restore o37 \
+   Despike using the default sigma level and writing to the
+   default output file.
+2 Notes
+Care must be taken when despiking bright sources.
+2 Related_Applications
+   SURF: DESPIKE, SCUCLIP, SIGCLIP, RESTORE
+2 Authors
+JFL: John Lightfoot (jfl@roe.ac.uk)
+
+1 DSPBOL
+
+Interactive despiking and data inspection (requires Kappa)
+
+See SCUPLOT for more information.
+
+1 EXTINCTION
+Remove the effect of atmospheric extinction from a SCUBA observation
+
+Usage:
+
+   extinction in sub_instrument first_tau first_lst
+              second_tau second_lst out
+
+Description:
+
+   This application extracts from a demodulated-data file data for a
+   specified SCUBA sub-instrument and corrects it for the effect of
+   atmospheric extinction. The airmass at which each bolometer measurement
+   was made is calculated, then multiplied by the zenith sky extinction at
+   the time of the measurement to give the extinction optical depth along
+   the line of sight. The data point in question is then multiplied by the
+   exponential of the optical depth to give the value that would have been
+   measured in the absence of the atmosphere.
+
+     The zenith optical depth is assumed to vary linearly with time between
+   the values input in parameters FIRST_TAU and LAST_TAU. If the measurement
+   was taken at a time outside the range covered by FIRST_TAU and LAST_TAU
+   then the value closest in time will be used.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FIRST_LST
+FIRST_LST = CHAR (Read)
+   The local sidereal time at which FIRST_TAU was
+   the zenith sky opacity, in hh mm ss.ss format.
+3 FIRST_TAU
+FIRST_TAU = REAL (Read)
+   The zenith sky opacity before the observation. The default value is the
+   zenith tau value accepted by the on-line system before the observation.
+3 IN
+IN = NDF (Read)
+   The name of the input file containing demodulated SCUBA data.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   The name of the output file to contain the
+   extinction corrected data for the specified
+   sub-instrument.
+3 SECOND_LST
+SECOND_LST = CHAR (Read)
+   The local sidereal time at which SECOND_TAU was
+   the zenith sky opacity, in hh mm ss.ss format. The default value is
+   that of FIRST_LST.
+3 SECOND_TAU
+SECOND_TAU = REAL (Read)
+   The zenith sky opacity after the observation. The default value is that
+   of FIRST_TAU.
+3 SUB_INSTRUMENT
+SUB_INSTRUMENT = CHAR (Read)
+   The name of the sub-instrument whose data are to
+   be selected from the input file and extinction
+   corrected. Permitted values are SHORT, LONG,
+   P1100, P1350 and P2000. This parameter is only used if
+   more than one sub-instrument is present in the file.
+2 Examples
+extinction flat long 0.24 '01 00 00' 0.3 '02 00 00' corr
+   Process the LONG sub-instrument from flat.sdf using the
+   knowledge that the 850 tau (assuming LONG refers to the 850
+   micron filter) was 0.24 at 1h LST and 0.3 at 2h LST. The
+   output is written to corr.sdf
+
+extinction test short 0.6 0 0.6 0 test2
+   Process the SHORT sub-instrument from test.sdf assuming
+   a constant tau of 0.6 (since FIRST_LST = SECOND_LST) and write
+   the result to test2.sdf
+2 Related_Applications
+   SURF: SCUQUICK, REBIN, SCUPHOT
+2 Authors
+JFL: John Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+
+
+1 EXTRACT_DATA
+Write bolometer positions and values to text file
+
+Description:
+
+   This routine writes the value, variance and position of each
+   data point to a ASCII file.
+   The interface is the same as that used in the REBIN task.
+   The data and variance are in volts. The positions are in radians.
+   The data are written out as columns: RA DEC DATA VAR
+2 Parameters
+For information on individual parameters, select from the list below:
+3 FILE
+FILE = FILENAME (Write)
+   The name of the ASCII file used for storing the data.
+3 IN
+IN = CHAR (Read)
+   The name of the input file to be rebinned. This parameter is requested
+   repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+   IN can include a SCUBA section.
+   Like the REF parameter this parameter accepts a text file.
+3 LAT_OUT
+LAT_OUT = CHAR (Read)
+   The latitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LONG_OUT
+LONG_OUT = CHAR (Read)
+   The longitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Task will ask for multiple input files if true. Only REF is read
+   if noloop.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+3 REF
+REF = CHAR (Read)
+   The name of the first NDF to be rebinned. The name may also be the
+   name of an ASCII text file containing NDF and parameter values.
+   See the notes. REF can include a SCUBA section.
+3 SHIFT_DX
+SHIFT_DX = REAL (Read)
+   The pointing shift (in X) to be applied that would bring the
+   maps in line. This is a shift in the output coordinte frame.
+3 SHIFT_DY
+SHIFT_DY = REAL (Read)
+   The pointing shift (in Y) to be applied that would bring the
+   maps in line. This is a shift in the output coordinate frame.
+3 WEIGHT
+WEIGHT = REAL (Read)
+   The relative weight that should be assigned to each dataset.
+2 Notes
+For each file name that is entered, values for the parameters
+SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+- The application can read in up to 100 separate input datasets.
+
+- No data is returned if the DATA or positions are bad.
+  Data is still returned if Variance is bad.
+
+2 ASCII_input_files
+   The REF and IN parameters accept ASCII text files as input. These
+   text files may contain comments (signified by a #), NDF names,
+   values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
+   and names of other ASCII files. There is one data file per line.
+   An example file is:
+
+       file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+       file2                        # Read file 2 but you will still be
+                                    # prompted for WEIGHT, and shifts.
+       file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+       test.bat                     # Read in another text file
+
+   Note that the parameters are position dependent and are not necessary.
+   Missing parameters are requested. This means it is not possible to
+   specify SHIFT_DX (position 3) without specifying the WEIGHT.
+   Also note that SCUBA sections can be specified with any input NDF.
+2 Related_Applications
+   SURF: REBIN, BOLREBIN, INTREBIN, CHANGE_QUALITY
+2 Authors
+TIMJ: Tim Jenness (JACH)
+
+1 EXTRACT_FLAT
+Extract a flatfield from a SCUBA demodulated data file
+
+Usage:
+
+   extract_flat in file
+
+Description:
+
+   This routine extracts the flatfield information from a SCUBA
+   demodulated data file and writes it out in a format suitable for
+   use by CHANGE_FLAT.
+   The full flatfield is extracted: Bolometer positions and relative
+   responsivities.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the NDF containing the demodulated data with the
+   required flatfield.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM. There are no verbose messages.
+3 FILE
+FILE = FILE (Write)
+   The name of the ascii file to which the flatfield information
+   will be written
+2 Examples
+extract_flat 19971017_dem_0002 oldflat.dat
+   This will read the flatfield from 19971017_dem_0002.sdf and
+   write it to a text file
+2 Related_Applications
+   SURF: CHANGE_FLAT, FLATFIELD
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (JACH)
+
+1 FLATFIELD
+Flatfield demodulated SCUBA data
+
+Usage:
+
+   flatfield in out
+
+Description:
+
+   This routine flatfields SCUBA demodulated data. The data must previously
+   have been processed by REDUCE_SWITCH.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the NDF containing the demodulated data to be
+   flatfielded. This file should already have been run through the
+   REDUCE_SWITCH application.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   The name of the NDF to which the flatfielded data are to be written.
+2 Examples
+flatfield redsw flat
+   This will flatfield the data from redsw.sdf and write it to flat.sdf
+2 Related_Applications
+   SURF: CHANGE_FLAT, SCUQUICK, EXTRACT_FLAT
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (JACH)
+
+1 INTREBIN
+Generate a separate regridded image for each integration
+
+Usage:
+
+   intrebin
+
+Description:
+
+   This routine rebins the demodulated data from SCUBA MAP observations
+   onto a rectangular mesh by a variety of methods.
+   Currently convolution by weighting functions and splines are
+   supported.
+
+   - Weighting functions:
+     Currently linear and bessel weighting functions are supported.
+     The width of the Bessel function is such that it should preserve all
+     spatial information obtained by the telescope at the wavelength of
+     observation, but suppress higher spatial frequencies. To minimise edge
+     effects the Bessel function is truncated at a radius of 10 half-widths
+     from the centre, and apodized over its outer third by a cosine
+     function. Viewed in frequency space the method consists of Fourier
+     transforming the input dataset(s), multiplying the transform by a
+     cylindrical top-hat (the F.T. of the Bessel function),
+     then transforming back into image space.
+     A linear weighting function is also available which works out
+     to one half-width - this has the advantage that it is much faster to
+     process and is much less susceptible to edge effects.
+
+   - Splines:
+     Additionally, spline interpolation and smoothing routines are also
+     available. Note that the spline routines work on each integration
+     in turn, whereas the weighting function routines work on all the input
+     data in one go. At present the spline routines are experimental and
+     comments are welcomed.
+
+   A separate map will be made of each integration. The output file
+   will contain an NDF for each integration.
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = CHAR (Read)
+   The name of the input file to be rebinned. This parameter is requested
+   repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+   IN can include a SCUBA section.
+   Like the REF parameter this parameter accepts a text file.
+3 LAT_OUT
+LAT_OUT = CHAR (Read)
+   The latitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LONG_OUT
+LONG_OUT = CHAR (Read)
+   The longitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Task will ask for multiple input files if true. Only REF is read
+   if noloop.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   This is the name of the HDS container file that will contain the
+   rebinned images. The map for each integration is stored in an NDF
+   inside this NDF container. The maps can be accessed as 
+   `out.name' where `name' is the integration name (i.e. i1, i2, i3, etc.).
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+
+   For RD current epoch is taken from the first input file.
+3 OUT_OBJECT
+OUT_OBJECT = CHAR (Read)
+   The name of the object (ie the NDF title).
+3 PIXSIZE_OUT
+PIXSIZE_OUT = REAL (Read)
+   Size of pixels in the output map. Units are arcsec.
+3 REBIN_METHOD
+REBIN_METHOD = CHAR (Read)
+   The rebin method to be used. A number of regridding methods are
+   available:
+
+   - LINEAR:  Linear weighting function
+
+   - BESSEL:  Bessel weighting function
+
+   - SPLINE1: Interpolating spline (PDA_IDBVIP)
+
+   - SPLINE2: Smoothing spline (PDA_SURFIT)
+
+   - SPLINE3: Interpolating spline (PDA_IDSFFT)
+
+   Please refer to the PDA documentation (SUN/194) for more information
+   on the spline fitting algorithms.
+3 REF
+REF = CHAR (Read)
+   The name of the first NDF to be rebinned. The name may also be the
+   name of an ASCII text file containing NDF and parameter values.
+   See the notes. REF can include a SCUBA section.
+3 SHIFT_DX
+SHIFT_DX = REAL (Read)
+   The pointing shift (in X) to be applied that would bring the
+   maps in line. This is a shift in the output coordinte frame.
+3 SHIFT_DY
+SHIFT_DY = REAL (Read)
+   The pointing shift (in Y) to be applied that would bring the
+   maps in line. This is a shift in the output coordinate frame.
+3 WEIGHT
+WEIGHT = REAL (Read)
+   The relative weight that should be assigned to each dataset.
+2 Examples
+intrebin rebin_method=LINEAR out_coords=RJ
+   Rebin the maps with LINEAR weighting function in J2000 RA/Dec
+   coordinates. You will be asked for input datasets until a null
+   value is given.
+
+intrebin rebin_method=BESSEL out=map
+   Rebin the maps with Bessel weighting function. Each integration is
+   rebinned separately and placed in an NDF in the output container file
+   map.sdf. Integration can be accessed by displaying map.i2
+
+intrebin noloop ref=test.bat
+   Rebin each integration using the data specified in the file test.bat.
+2 Notes
+For each file name that is entered, values for the parameters
+WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+- The application can read in up to 100 separate input datasets.
+
+- The output map will be large enough to include all data points.
+
+- Spline regridding may have problems with SCAN/MAP (since integrations
+contain lots of overlapping data points).
+
+- SCUBA sections can be given along with any input NDF
+
+- The relative weights associated with each point in the output map
+are stored in a WEIGHTS NDF in the REDS extension of the output
+data. For spline rebinning each point is equivalent to the number
+of integrations added into the final data point. For weight function
+regridding the situation is more complicated.
+2 ASCII_input_files
+   The REF and IN parameters accept ASCII text files as input. These
+   text files may contain comments (signified by a #), NDF names,
+   values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
+   and names of other ASCII files. There is one data file per line.
+   An example file is:
+
+       file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+       file2                        # Read file 2 but you will still be
+                                    # prompted fro WEIGHT, and shifts.
+       file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+       test.bat                     # Read in another text file
+
+   Note that the parameters are position dependent and are not necessary.
+   Missing parameters are requested. This means it is not possible to
+   specify SHIFT_DX (position 3) without specifying the WEIGHT.
+   If the file has the .txt extension the NDF system will attempt to
+   convert it to NDF format before processing -- this is probably not
+   what you want.
+2 Related_Applications
+   SURF: REBIN, BOLREBIN, EXTRACT_DATA
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+
+1 MAPSUM
+Produce a one-line summary of SCUBA map observations
+
+Usage:
+
+   mapsum [-h] [-demod] [-reduced] [-all|[-begin nn -end nn]]
+
+Description:
+
+   Mapsum goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and summarizes files containing map observations.
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp mapsum'.
+3 -all
+-all
+   List map files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+
+2 Examples
+mapsum
+   Ask for a range of scan numbers and then give a full listing
+   of every map file matching this criterion in DATADIR and the
+   current directory.
+
+mapsum -all
+   Generate a summary of all map files in the current and
+   DATADIR directory.
+
+mapsum --begin=5 -end 100
+   Generate a detailed log of all map data from scans 5 to 100 inclusive.
+
+mapsum -all -reduced
+   Produce a one line summary of all reduced (_red_) map files.
+
+mapsum -all -reduced > log.txt
+   Produce a one line summary of all the reduced map files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+mapsum -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   map data files (ie not files produced during off-line data reduction).
+
+
+2 Notes
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+2 Authors
+
+T. Jenness (JACH)
+
+1 OBSSUM
+Produce a one-line summary of SCUBA observations
+
+Usage:
+
+   sculog [-h] [-demod] [-reduced] [-mode ??]
+          [-all|[-begin nn -end nn]]
+
+Description:
+
+   Obssum goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and extracts information from any FITS entries that may  be
+   present. 
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp obssum'.
+3 -all
+-all
+   List all files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+3 -mode_obs
+-mode obs
+   Select only specified observation modes for listing.
+   The list should be comma separated. (same as --mode=obs)
+2 Examples
+obssum
+   Ask for a range of scan numbers and then give a full listing
+   of every sdf file matching this criterion in DATADIR and the
+   current directory.
+
+obssum -all
+   Generate a summary of all sdf files in the current and
+   DATADIR directory.
+
+obssum --begin=5 -end 100
+   Generate a detailed log of all data from scans 5 to 100 inclusive.
+
+obssum -all -reduced
+   Produce a one line summary of all reduced (_red_) files.
+
+obssum -all -reduced > log.txt
+   Produce a one line summary of all the reduced files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+obssum -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   data files (ie not files produced during off-line data reduction).
+
+obssum -all -mode pointing
+   Produce a one line summary of all pointing observations
+
+obssum -reduced --begin=100 --end=200 --mode=photom,skydip
+   Produce a one line summary of the photom and skydip observations
+   of reduced files with scan numbers 100 to 200. This is similar to
+   photsum except that the signal and signal-to-noise will not be
+   displayed even if reduced files are being listed.
+2 Notes
+- obssum only uses information stored in the FITS header of
+  reduced and raw data files and does not  provide summaries
+  of reduced (RO) data such as photometry results (essentially for
+  reasons of clarity). `photsum' must
+  be used to generate a summary of photometry observations that
+  includes reduced data.
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+2 Authors
+
+T. Jenness (JACH)
+
+
+
+1 PHOTSUM
+Produce a one-line summary of SCUBA pointing observations
+
+Usage:
+
+   photsum [-h] [-demod] [-reduced] [-all|[-begin nn -end nn]]
+
+Description:
+
+   Photsum goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and summarizes files containing photometry observations.
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp pointsum'.
+3 -all
+-all
+   List all photometry files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+
+2 Examples
+photsum
+   Ask for a range of scan numbers and then give a full listing
+   of every photometry file matching this criterion in DATADIR and the
+   current directory.
+
+photsum -all
+   Generate a summary of all photometry files in the current and
+   DATADIR directory.
+
+photsum --begin=5 -end 100
+   Generate a detailed log of all photometry data from scans 5 to 100 
+   inclusive.
+
+photsum -all -reduced
+   Produce a one line summary of all reduced (_red_) photometry files.
+   This will include the photometry results calculated by the on-line
+   system.
+
+photsum -all -reduced > log.txt
+   Produce a one line summary of all the reduced photometry files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+photsum -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   photometry  data files (ie not files produced during off-line data 
+   reduction).
+
+
+2 Notes
+
+- If the task is run on reduced data (`_red_' files) then the photometry 
+  results will be listed.
+
+- Skydip data is printed for convenience.
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+- It may be necessary to set the HDS_SCRATCH environment variable if 
+  files are being logged from directories for which write access is
+  denied (e.g. setenv HDS_SCRATCH /tmp)
+
+2 Authors
+
+T. Jenness (JACH)
+
+1 PLTBOL
+
+Interactive data inspection (requires Kappa)
+
+See SCUPLOT for more information.
+
+
+1 POINTSUM
+Produce a one-line summary of SCUBA pointing observations
+
+Usage:
+
+   pointsum [-h] [-demod] [-reduced] [-all|[-begin nn -end nn]]
+
+Description:
+
+   Pointsum goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and summarizes files containing pointing observations.
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp pointsum'.
+3 -all
+-all
+   List all pointing files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+
+2 Examples
+pointsum
+   Ask for a range of scan numbers and then give a full listing
+   of every pointing file matching this criterion in DATADIR and the
+   current directory.
+
+pointsum -all
+   Generate a summary of all pointing files in the current and
+   DATADIR directory.
+
+pointsum --begin=5 -end 100
+   Generate a detailed log of all pointing data from scans 5 to 100 inclusive.
+
+pointsum -all -reduced
+   Produce a one line summary of all reduced (_red_) pointing files.
+
+pointsum -all -reduced > log.txt
+   Produce a one line summary of all the reduced pointing files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+pointsum -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   pointing data files (ie not files produced during off-line data reduction).
+
+
+2 Notes
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+2 Authors
+
+T. Jenness (JACH)
+
+
+1 QDRAW
+Draw a data set with plus or minus 5 sigma range
+
+Usage:
+
+   qdraw [-noline] NDF [Linplot/Stats/Drawsig parameters]
+
+Description:
+
+   This program uses kappa routines to calculate mean and standard
+   deviation of an NDF. It then uses linplot to display the data with
+   a range of plus or minus 5 sigma. Optionally, DRAWSIG can be used
+   to overlay 3 sigma lines.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -noline
+-noline
+   A Unix-type switch which controls whether the 3 sigma lines are
+   displayed or not.
+3 NDF
+NDF (Given)
+   The required dataset
+3 ADAM_parameters
+ADAM parameters = Any
+   Any parameters accepted by the individual routines as long as they
+   use PARAM=VALUE format.
+2 Examples
+qdraw test
+   Draws test.sdf  with a scale of +/- 5 sigma and draws lines at +/- 3
+   sigma.
+
+qdraw -noline test
+   Same as above but without the 3 sigma lines
+
+qdraw mode=2 test
+   Plot the data using `+' symbols (LINPLOT mode 2)
+
+qdraw mode=2 sigcol=red test
+   Plot with `+' symbols and use red lines to show the +/- 3 sigma lines.
+2 Notes
+The $KAPPA_DIR environment variable must point to the location
+of the KAPPA binaries (this is usually done during a Starlink login).
+2 Related_Applications
+   SURF: SCUCAT, SCUPHOT;
+   KAPPA: STATS, LINPLOT, DRAWSIG
+
+1 REBIN
+Rebin demodulated SCUBA data onto output map
+
+Usage:
+
+   rebin
+
+Description:
+
+   This routine rebins the demodulated data from SCUBA MAP observations
+   onto a rectangular mesh by a variety of methods.
+   Currently convolution by weighting functions and splines are
+   supported.
+
+   - Weighting functions:
+     Currently linear and bessel weighting functions are supported.
+     The width of the Bessel function is such that it should preserve all
+     spatial information obtained by the telescope at the wavelength of
+     observation, but suppress higher spatial frequencies. To minimise edge
+     effects the Bessel function is truncated at a radius of 10 half-widths
+     from the centre, and apodized over its outer third by a cosine
+     function. Viewed in frequency space the method consists of Fourier
+     transforming the input dataset(s), multiplying the transform by a
+     cylindrical top-hat (the F.T. of the Bessel function),
+     then transforming back into image space.
+     A linear weighting function is also available which works out
+     to one half-width - this has the advantage that it is much faster to
+     process and is much less susceptible to edge effects.
+
+   - Splines:
+     Additionally, spline interpolation and smoothing routines are also
+     available. Note that the spline routines work on each integration
+     in turn, whereas the weighting function routines work on all the input
+     data in one go. At present the spline routines are experimental and
+     comments are welcomed.
+
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = CHAR (Read)
+   The name of the input file to be rebinned. This parameter is requested
+   repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
+   IN can include a SCUBA section.
+   Like the REF parameter this parameter accepts a text file.
+3 LAT_OUT
+LAT_OUT = CHAR (Read)
+   The latitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LONG_OUT
+LONG_OUT = CHAR (Read)
+   The longitude of the output map centre. The supplied default value
+   is that of the map centre of the first map.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Task will ask for multiple input files if true. Only REF is read
+   if noloop.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   This is the name of the NDF that will contain the rebinned map. 
+3 OUT_COORDS
+OUT_COORDS = CHAR (Read)
+   The coordinate system of the output map. Available coordinate
+   systems are:
+
+   - AZ:  Azimuth/elevation offsets
+
+   - NA:  Nasmyth offsets
+
+   - PL:  RA/Dec Offsets from moving centre (eg Planets)
+
+   - RB:  RA/Dec (B1950)
+
+   - RJ:  RA/Dec (J2000)
+
+   - RD:  RA/Dec (epoch of observation)
+
+   - GA:  Galactic coordinates (J2000)
+
+   For RD current epoch is taken from the first input file.
+3 OUT_OBJECT
+OUT_OBJECT = CHAR (Read)
+   The name of the object (ie the NDF title).
+3 PIXSIZE_OUT
+PIXSIZE_OUT = REAL (Read)
+   Size of pixels in the output map. Units are arcsec.
+3 REBIN_METHOD
+REBIN_METHOD = CHAR (Read)
+   The rebin method to be used. A number of regridding methods are
+   available:
+
+   - LINEAR:  Linear weighting function
+
+   - BESSEL:  Bessel weighting function
+
+   - SPLINE1: Interpolating spline (PDA_IDBVIP)
+
+   - SPLINE2: Smoothing spline (PDA_SURFIT)
+
+   - SPLINE3: Interpolating spline (PDA_IDSFFT)
+
+   Please refer to the PDA documentation (SUN/194) for more information
+   on the spline fitting algorithms.
+3 REF
+REF = CHAR (Read)
+   The name of the first NDF to be rebinned. The name may also be the
+   name of an ASCII text file containing NDF and parameter values.
+   See the notes. REF can include a SCUBA section.
+3 SHIFT_DX
+SHIFT_DX = REAL (Read)
+   The pointing shift (in X) to be applied that would bring the
+   maps in line. This is a shift in the output coordinte frame.
+3 SHIFT_DY
+SHIFT_DY = REAL (Read)
+   The pointing shift (in Y) to be applied that would bring the
+   maps in line. This is a shift in the output coordinate frame.
+3 WEIGHT
+WEIGHT = REAL (Read)
+   The relative weight that should be assigned to each dataset.
+2 Examples
+rebin rebin_method=LINEAR out_coords=RJ
+   Rebin the maps with LINEAR weighting function in J2000 RA/Dec
+   coordinates. You will be asked for input datasets until a null
+   value is given.
+
+rebin rebin_method=BESSEL out=map out_coords=NA
+   Rebin the maps with Bessel weighting function in Nasmyth coordinates.
+
+rebin noloop accept ref=test.bat out=rebin
+   Rebin the files specified in test.bat onto a rectangular
+   grid using linear interpolation, 3 arcsecond pixels and RJ
+   coordinates.
+2 Notes
+For each file name that is entered, values for the parameters
+WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+
+- The application can read in up to 100 separate input datasets.
+
+- The output map will be large enough to include all data points.
+
+- Spline regridding may have problems with SCAN/MAP (since integrations
+contain lots of overlapping data points).
+
+- SCUBA sections can be given along with any input NDF
+
+- The relative weights associated with each point in the output map
+are stored in a WEIGHTS NDF in the REDS extension of the output
+data. For spline rebinning each point is equivalent to the number
+of integrations added into the final data point. For weight function
+regridding the situation is more complicated.
+2 ASCII_input_files
+   The REF and IN parameters accept ASCII text files as input. These
+   text files may contain comments (signified by a #), NDF names,
+   values for the parameters WEIGHT, SHIFT_DX and SHIFT_DY,
+   and names of other ASCII files. There is one data file per line.
+   An example file is:
+
+       file1{b5}   1.0   0.5   0.0  # Read bolometer 5 from file1.sdf
+       file2                        # Read file 2 but you will still be
+                                    # prompted fro WEIGHT, and shifts.
+       file3{i3}-  1.0   0.0   0.0  # Use everything except int 3
+       test.bat                     # Read in another text file
+
+   Note that the parameters are position dependent and are not necessary.
+   Missing parameters are requested. This means it is not possible to
+   specify SHIFT_DX (position 3) without specifying the WEIGHT.
+   If the file has the .txt extension the NDF system will attempt to
+   convert it to NDF format before processing -- this is probably not
+   what you want.
+2 Related_Applications
+   SURF: BOLREBIN, INTREBIN, SCUQUICK, EXTRACT_DATA
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+1 REDUCE_SWITCH
+reduce the switch sequence for a SCUBA observation
+
+Usage:
+
+   reduce_switch in out
+
+Description:
+
+   This application takes a SCUBA demodulated data file and splits the
+   data array up into its various `planes'; data, variance and quality.
+   In addition, the application reduces the component switches of an
+   exposure to give the exposure result. Optionally, the routine will
+   divide the internal calibrator signal into the data before doing either
+   of these things. It is also possible to select a single switch
+   from the input data.
+
+   For skydip data this routine calculates the sky temperature for each 
+   integration and sub-instrument.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the demodulated data file. If $SCUBA_PREFIX is set this can
+   be the number of the observation rather than the full filename.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Read)
+   The name of the file to contain the output data.
+3 SPIKE_LEVEL
+SPIKE_LEVEL = INTEGER (Read)
+   Number of spikes tolerated before marking data point bad.
+   The default is that the sample should be marked bad if the
+   transputers detected more than 5 spikes during a 1 second
+   sample.
+3 SWITCH
+SWITCH = INTEGER (Read)
+   Parameter to indicate which switch to extract. A value of 0 means
+   that all switches should be reduced. Default is 0.
+3 T_COLD
+T_COLD = REAL (Read)
+   Temperature of the cold load when processing skydip data. The default 
+   value is taken from the input file.
+3 USE_CALIBRATOR
+USE_CALIBRATOR = LOGICAL (Read)
+   Yes, if you want the data for each bolometer measurement
+   divided by the corresponding internal calibrator signal.
+   The default is not to use the calibrator.
+2 Examples
+reduce_switch
+   All parameters will be requested.
+
+reduce_switch test nosw
+   This will reduce the switch from input file test.sdf without dividing
+   by the calibrator signal and tolerating up to 5 spikes in a 1 second
+   sample. The output data will be written to nosw.sdf.
+
+reduce_switch test nosw SWITCH=2
+   This will select switch 2 from test.sdf and write it to nosw.sdf
+2 Notes
+If the input file is not found in the current directory, the directory
+specified by the DATADIR environment variable is searched. This means
+that the raw data does not have to be in the working directory.
+2 Authors
+JFL: J.Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+1 REMSKY
+Remove sky noise and constant offsets from SCUBA jiggle data
+
+Usage:
+
+   remsky in out
+
+Description:
+
+   This task removes sky noise and constant offsets from SCUBA jiggle
+   data. It does this by requesting `sky' bolometers, calculating some
+   average value for each jiggle and then subtracts this off the
+   jiggle. Each jiggle is analysed in turn. The average value can be
+   calculated in two ways: either MEDIAN or MEAN.
+
+   After the calculation, the mean value removed from each jiggle can be 
+   added back on to the data - this should protect against removing 
+   flux from MAP data.   
+
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ADD
+ADD = LOGICAL (Read)
+   This parameter governs whether the average value removed from the 
+   data should be added back after sky removal. The default is for ADD
+   to be true for MAPs and false for other modes (the assumption being
+   that sky bolometers in PHOTOM observations are guaranteed to be
+   on sky).
+3 BOLOMETERS
+BOLOMETERS = CHAR (Read)
+   List of sky bolometers. The following options are now recognised for 
+   the BOLOMETERS parameter: 
+
+       Code       Description     Example
+       ----       -----------     -------
+        nn         A number       5 or 19
+        id         Bolometer id   H7 or C14
+        rn         Ring number    r1 (for the inner ring) and
+                                  r5 (for the outser ring of the SHORT array)
+        all        All bolometers all (select the entire array)
+
+    Each value must be comma separated but can be preceeded by a minus
+    sign to remove the bolometer(s) from the list. The definitions of
+    ring number and `all' are dependent on the selected
+    sub-instrument.
+
+    Here are some examples values for BOLOMETERS:
+
+     [17,18,19,20]                    Bolometers 17, 18, 19 and 20
+     [h6,h7,h8,h9]                    Bolometers H6, H7, H8, H9 
+     [all]                            Whole array 
+     [r0]                             Ring zero (central pixel)
+     [r0,-19]                         No bolometers (bol 19 of LONG is R0/H7)
+     [h7,r1]                          inner ring and H7
+     [r1,-h8]                         inner ring without H8
+     [r1,-18]                         inner ring without bolometer 18
+     [all,-r1,-h7]                    all pixels except the inner ring/H7
+     [all,-r3,g1]                     all pixels except ring 3 but with
+                                      G1 (which happens to be in r3)
+     [all,-r1,-r2,-r3,-r4,-r5]        Selects the central pixel          
+
+   Note that the bolometer sum is calculated sequentially so that
+   [all,-all,h7] would leave you with bolometer H7.
+3 IN
+IN = NDF (Read)
+   This is the name of the input demodulated data file
+3 ITER_SIGMA
+ITER_SIGMA = REAL (Read)
+   When using MEAN to calculate the average, this is the sigma clipping
+   level used. This is an iterative value - points will be removed
+   from the mean until the spread of data points is smaller than
+   this value. Supplying a negative value  will turn off clipping.
+3 MODE
+MODE = CHAR (Read)
+   Method to be used for calculating the average sky. There are
+   two methods available:
+
+   - Median - the median value for all the sky bolometers is taken
+              from each bolomoter signal.
+
+   - Mean   - the mean of the sky bolometers is used as the average.
+              This mean value is iterative - ie The mean and standard
+              deviation are calculated, any points greater than the
+              given distance from the mean are removed and the mean
+              and standard deviation are calculated.  This process
+              is repeated until no bolometers are dropped from the
+              mean.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message output level. Default is NORM. In VERBOSE mode a list of 
+   selected bolometers is returned along with the value of the sky offset
+   removed from each jiggle.
+3 OUT
+OUT = NDF (Write)
+   Output data file
+2 Examples
+remsky ndf sky_removed bolometers='[g1,g2,g3,g4,g5]' mode=median \
+   Use the median of bolometers g1,g2,g3,g4,g5 (not necessarily
+   the best choice) to calculate the sky signal and write the
+   output to sky_removed.sdf. No despiking is to be used.
+remsky o25_sho_ext bolometers=[r5] mode=mean iter_sigma=4 \
+  Use the outer ring of the short-wave array as the sky bolometers.
+  Calculate the sky contribution by using a clipped mean of each
+  jiggle and remove any points from the
+  calculation of the mean that are more than 4 sigma from the mean.
+  Write the output to the default output file.
+
+2 Notes
+- Source rotation is not accounted for so use only those bolometers
+  that always observe sky. This can be checked by using
+  SCUOVER to overlay the bolometer positions on a NAsmyth regridded
+  image (since NA shows the signal measured by each bolometer
+  throughout the observation without source rotation).
+
+- For weak sources (i.e. sources that are not obvious in a single 
+  integration) it is probably sufficient to choose BOLOMETERS=[all] and
+  MODE=median.
+
+2 Related_Applications
+   SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER;
+2 Authors
+TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+
+1 RESTORE
+remove the chopped beam response from SCAN/MAP observations
+
+Usage:
+
+   restore in out chop
+
+Description:
+
+   This routine removes the chopped beam response from SCAN/MAP
+   observations.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 CHOP
+CHOP = INTEGER (Read)
+   Chop throw in arcseconds. The defualt chop throw is read from
+   the FITS header of the input file.
+3 IN
+IN = NDF (Read)
+   The name of the input file containing demodulated SCUBA data.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = NDF (Write)
+   The name of the output file to contain the processed data.
+2 Examples
+restore input output \
+   Restore input.sdf to output.sdf using the default chop throw.
+
+restore resw restore 40.2
+   Restore resw.sdf to restore.sdf using a chop throw of 40.2
+   arcseconds.
+2 Notes
+Uses the Emerson, Klein and Haslam algorithm (1979, A&A, 76, 92).
+
+Currently this routine must be run on data before it has been extinction
+corrected.
+
+2 Related_applications
+
+SURF: DESPIKE2, REBIN
+JCMTDR: RESTORE
+
+2 Authors
+JFL: John Lightfoot (jfl@roe.ac.uk)
+
+TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+
+1 RLINPLOT
+
+Interactive data inspection via MLINPLOT (requires Kappa)
+
+See SCUPLOT for more information.
+
+
+1 SCUCAT
+Concatenate photometry datasets for further processing
+
+Usage:
+
+   scucat out in
+
+Description:
+
+   This routine reads in a list of user specified files and concatenates
+   their data, variance and quality arrays so that KAPPA routines like
+   STATS and KSTEST can analyse a complete set of photometry observations.
+   Data for each individual bolometer is written to a different file.
+   If a file contained data for H7 and H9 then two output files would
+   be created (eg test_h7 and test_h9 - if the OUT parameter was set to
+   `test'). For each new bolometer a new file is created (existing
+   files are overwritten) and data is appended to these files when
+   more data for these bolometers is supplied.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 BOL
+BOL = CHAR (Read)
+   If the input file is an NDF (and not an HDS container as
+   expected) then this parameter should be given to tell the software
+   the bolometer that should be associated with this data.
+3 IN
+IN = NDF (Read)
+   The input dataset(s). This parameter is requested repeatedly
+   until a NULL (!) value is given. The input dataset can either
+   be output from SCUPHOT or an NDF file.
+3 LOOP
+LOOP = LOGICAL (Read)
+   Turns the looping on (default is true) or off (false)
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = CHAR (Write)
+   The root name of the output NDF.
+2 Examples
+scucat test phot
+   This routine will copy the data from phot to test_<bol>,
+   reducing multiple bolometers to individual files.
+   If the input set contained data
+   for bolometer H7 the output file will be test_h7.sdf.
+   The program will then ask for another data set.
+
+scucat test ext_long noloop
+   This will copy all the data from ext_long.sdf to test_<bol>.sdf
+   and will then exit without asking further questions.
+2 Notes
+- SCUCAT can process output data from scuphot (eg file.sdf as an
+  HDS container containing NDF files with the names <bol>_peak) or
+  NDF files.
+
+- If given an NDF the data array is vectorized so that the output
+  is 1-dimensional regardless of the shape of the input file.
+
+- This task can also be used to simplify further processing of the
+  photometry data even if no data is to be concatenated (in this case
+  the task would be identical to the Kappa task NDFCOPY).
+2 Related_Applications
+   SURF: SCUPHOT;
+   KAPPA: NDFCOPY, KSTEST
+2 Authors
+TIMJ: Tim Jenness (JACH)
+
+2 Implementation_Status
+   - NDF sections can not be used
+
+   - All input pixels are propogated to the output file
+
+1 SCUCLIP
+Simple sigma clipping for each bolometer
+
+Usage:
+
+   scuclip in out
+
+Description:
+
+   Each bolometer is analysed independently, the mean and standard
+   deviation are calculated, any points greater than NSIGMA sigma
+   from the mean are treated as spikes and removed. Note that for mapping
+   this despiking algorithm is only useful for very weak
+   sources; bright sources will be removed (since a bolometer
+   jiggles on and off bright sources). Photometry observations
+   do not suffer from this problem as the bolometers are always on
+   source.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   This is the name of the input demodulated data file
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message output level. Default is NORM. If MSG_FILTER is set
+   to VERBOSE the number of spikes removed from each bolometer is
+   reported.
+3 NSIGMA
+NSIGMA = DOUBLE (Read)
+   Number of sigma beyond which data are thought to be spikes.
+3 OUT
+OUT = NDF (Write)
+   Output data file.
+2 Examples
+scuclip infile outfile nsigma=5
+   Clip any data points that are further than 5 sigma from the mean.
+   The clipping is done on a per bolometer basis.
+2 Notes
+- The despiking routine is very primitive and should not be used
+  with jiggle map data of bright sources. It can be used
+  on PHOTOM data since the jiggle pattern never moves off source
+  (although SIGCLIP can be used once the data has been processed
+   by SCUPHOT).
+2 Related_Applications
+   SURF: SCUQUICK, REBIN, SCUPHOT, SCUOVER, SIGCLIP, DESPIKE;
+   KAPPA: SETBB
+2 Authors
+TIMJ: Tim Jenness (timj@jach.hawaii.edu)
+
+2 Implementation_Status
+   The despiking routine sets QUALITY bit 5 to bad. It does not affect
+   the data. The effects of despiking can be removed by using the
+   Kappa task SETBB to unset quality bit 5.
+
+
+
+
+1 SCULOG
+Produce summary of SCUBA observations
+
+Usage:
+
+   sculog [-h] [-summary] [-demod] [-reduced] [-mode ??]
+          [-all|[-begin nn -end nn]]
+
+Description:
+
+   Sculog goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and extracts information from any FITS entries that may  be
+   present. If a HISTORY record is present (i.e. the data have
+   been partially reduced) the most recent application to
+   manipulate  the data is reported.
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp sculog'.
+3 -summary
+-summary
+   Return a one line summary of each observation file. No HISTORY
+   information is reported.
+3 -all
+-all
+   List all files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+3 -mode_obs
+-mode obs
+   Select only specified observation modes for listing.
+   The list should be comma separated. (same as --mode=obs)
+2 Examples
+sculog
+   Ask for a range of scan numbers and then give a full listing
+   of every sdf file matching this criterion in DATADIR and the
+   current directory.
+
+sculog -all
+   Generate a full listing of all sdf files in the current and
+   DATADIR directory.
+
+sculog --begin=5 -end 100
+   Generate a detailed log of all data from scans 5 to 100 inclusive.
+
+sculog -summary -all
+   Produce a one line summary of all files.
+
+sculog -summary -all -reduced
+   Produce a one line summary of all reduced (_red_) files.
+
+sculog -summary -all -reduced > log.txt
+   Produce a one line summary of all the reduced files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+sculog -summary -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   data files (ie not files produced during off-line data reduction).
+
+sculog -summary -all -mode pointing
+   Produce a one line summary of all pointing observations
+
+sculog -summary -reduced --begin=100 --end=200 --mode=photom,skydip
+   Produce a one line summary of the photom and skydip observations
+   of reduced files with scan numbers 100 to 200. This is similar to
+   photsum except that the signal and signal-to-noise will not be
+   displayed even if reduced files are being listed.
+2 Notes
+- sculog only uses information stored in the FITS header of
+  reduced and raw data files and does not  provide summaries
+  of reduced (RO) data such as photometry results (essentially for
+  reasons of clarity). `photsum' must
+  be used to generate a summary of photometry observations that
+  includes reduced data.
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+1 SCUOVER
+Routine to overlay the bolometer names onto a rebinned image
+
+Usage:
+
+   scuover
+
+Description:
+
+   This routine is used to overlay the array layout onto a rebinned
+   SCUBA image. The displayed image is read from the graphics database
+   unless a command line value is given. In order to calculate the bolometer
+   positions it is also necessary to read in the extinction corrected
+   data file that was used to regrid the data (in fact any extinction
+   corrected file can be used, possible with strange results).
+   By default the position of the bolometers at the start of
+   the first integration and zero jiggle offset is plotted. Optionally,
+   it is possible to plot the bolometer positions at any point during
+   the observation (still with zero jiggle offset).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 COL
+COL = LITERAL (Read)
+   Colour of overlay (by name or number). The previous value is used
+   by default.
+3 DEVICE
+DEVICE = DEVICE (Read)
+   The graphics device on which the bolometers are to be drawn.
+   The global default (set with Kappa GDSET) will be used unless
+   specified otherwise.
+3 EXPOSURE
+EXPOSURE = INTEGER (Read)
+   Ues the bolometer positions at the specified exposure within the
+   specified INTEGRATION and MEASUREMENT. For SCAN/MAP data the
+   middle of an exposure (ie scan) is used. Default is exposure 1.
+3 EXT
+EXT = NDF (Read)
+   The name of the extinction corrected data from which the bolometer
+   positions should be taken.
+3 INTEGRATION
+INTEGRATION = INTEGER (Read)
+   Use the bolometer positions at the specified integration. Default
+   is measuremnt 1.
+3 MEASUREMENT
+MEASUREMENT = INTEGER (Read)
+   Use the bolometer positions at the specified exposure. Default
+   is measurement 1.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 NDF
+NDF = NDF (Read)
+   The name of the regridded data set (taken from the AGI graphics
+   database).
+3 NAME
+NAME = LOGICAL (Read)
+   Label with bolometer name if true, else bolometer number. The default
+   is true.
+2 Examples
+scuover
+   The bolometer names will be overlaid using the default colour.
+
+scuover col=red noname
+   This command will overlay bolometer numbers over the image in red.
+
+scuover integration=2
+   Overlay the bolometer positions at the start of the second
+   integration.
+2 Notes
+- An image must have already been displayed before using SCUOVER.
+
+- The array position is always shown with zero jiggle offset.
+
+- This routine does not take into account the use of SHIFT_DX or
+SHIFT_DY in REBIN. (the relevant information is not stored in the
+rebinned image).
+
+- Pointing shifts are taken into account.
+2 Related_Applications
+   SURF: REBIN, SCUPA
+   KAPPA: DISPLAY, GDSET
+   FIGARO: IMAGE
+2 Authors
+JFL: J.Lightfoot (ROE)
+
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+1 SCUPHOT
+Reduce SCUBA PHOTOM data
+
+Usage:
+
+   scuphot analysis in out file
+
+Description:
+
+      This routine reduces the data for a single sub-instrument from a
+   PHOTOM observation. For each bolometer used to look at the source the
+   data will be analysed as follows:-
+
+    - An ndf called <bolname>_map (e.g. h7_map) will be created in the
+      OUT file to hold the coadded data from all the integrations. If the
+      jiggle pattern points fit a 2-d rectangular pattern then these data
+      will be arranged as a 2-d map suitable for plotting as an image. A
+      2-d parabola will be fitted to the coadded image and the results
+      written in ASCII form to FILE. If an irregular jiggle pattern is
+      used the map will take the form of a 1-D strip.
+
+    - Second, an ndf called <bolname>_peak (e.g. h7_peak) will be created
+      in the OUT file to hold the fit results to the data for each
+      integration. The results stored are the fit peak, its variance and
+      quality and they are held as a 1-d array suitable for plotting as
+      a graph. The fit results are also written in ASCII form to FILE, as
+      is the coadd of all the individual fits to the data.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 ALLBOLS
+ALLBOLS = LOGICAL (Read)
+   By default only the observed bolometers are processed (i.e. if you
+   observed with H7 only H7 data will be stored). If ALLBOLS is set
+   to true then all middle beam data is processed. This is useful
+   for examining sky noise. Note that for 2 and 3 bolometer photometry
+   ALLBOLS must be false to avoid weighting problems for the
+   bolometers that were observed in the left or right beams.
+3 ANALYSIS
+ANALYSIS = CHAR (Read)
+   The method used to detemine peak. Either average or parabola.
+   Parabola is not recommended at this time.
+3 FILE
+FILE = FILENAME (Write)
+   The name of the ASCII output file.
+3 IN
+IN = NDF (Read)
+   The name of the input file containing demodulated (extinction
+   corrected) SCUBA data.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message output level. Default is NORM.
+3 OUT
+OUT = CHAR (Write)
+   The name of the HDS output file to contain the NDFs described above.
+   This file will have the extension .sdf but this should not be
+   specified in the name.
+2 Notes
+- ALLBOLS must be false for 2 and 3 bolometer photometry unless you
+  know what you are doing.
+
+- SCUPHOT can process JIGGLE/MAP data. The output is the signal
+  for each integration for each bolometer. This is useful
+  for checking sky removal and should not be used for performing
+  on-source photometry on map data! This method can not be used
+  for SCAN/MAP data.
+2 Related_Applications
+   SURF: SCUCAT
+2 Authors
+JFL: John Lightfoot (ROE)
+
+TIMJ: Tim Jenness (JACH)
+
+2 Implementation_Status
+   Ideally SCUPHOT should process MAP data on a per exposure basis.
+   Currently only per integration is supported.
+
+1 SCUPLOT
+Interactive display and despiking
+
+Usage:
+
+   scuplot [-m mode ] [-f sdf_file] [-d sdf_file2] [-s min max] [-l #]
+             [bol [bol [bol] ... ]]
+
+Description:
+
+   Scuplot is a wrapper script around a number of kappa
+   utilities. Since it understands the Scuba NDF file format, it
+   hides most of the complicated syntax from the user.  Mode = `p'
+   and `r' are wrappers around plotting utilities and facilitate the
+   inspection of the data of each bolometer.  The utility allows
+   change to the plot scales via the menu but will keep the scales
+   the same for all bolometers which makes is easy to compare
+   bolometers. Mode = `d' allows for interactive despiking. Please
+   read the note below the description of the menu on the use of the
+   mouse.
+
+   Mode = `p' or pltbol (or any p* link to scuplot) is a wrapper
+   around the Kappa utility linplot. It allows plots of a whole series
+   of bolometers one by one, optionally overlaying them with the same
+   bolometer from a second file. Obvious overlays are despiked on
+   non-despiked data or data from different exposures to check the
+   noise.
+
+   Mode = `r' or rlinplot (or any r* link to scuplot) is a wrapper
+   around the Kappa utility mlinplot. It provides plots of sets of
+   bolometers in a single window with optionally data from a second
+   file in a second window.  Obvious files are despiked and
+   non-despiked data or data from different exposures to check the
+   noise.
+
+   Mode = `d' or dspbol (or any d* link to scuplot) can be used to
+   interactively despike bolometers. While it is not as fast as a
+   completely integrated routine would be, it makes interactive
+   despiking much easier by hiding the cycle between linplot and
+   change_quality for the user. The most common use is to zoom in on
+   the region with the spike via the `X' menu option (either typing
+   the input or using the cursor) and subsequently to flag the
+   offending point (just type the coordinate of the point, a range, or
+   use the cursor; IN GENERAL THE COORDINATE IS TO THE RIGHT OF THE
+   PLOTTED POINT). The routine will overlay the despiked data, prompt
+   the user to accept the new set and de-zoom to the original
+   scale. To reset a previously flagged point, flag the point again
+   but do NOT accept it: the point will be set to GOOD again.  Please
+   read the note below the derscription of the menu on the use of the
+   mouse.
+
+   For each mode the menu items are a subset of:
+
+     [M,H]                 Redisplay menu
+     [Q]                   Quit
+     [N]                   Next bolometer
+     [B#]                  Switch to bol #
+     [X min max], [X cen]  X-axis from min:max or cen+/-10
+                           Just `x' activates the cursor.
+     [R]                   Reset X-axis
+     [Y min max], [Y lim]  Y-axis from min:max or -lim:+lim
+     [U]                   Reset Y-axis
+     [#], [#:#], [#-#]     Despike point or range of points;
+                           Just `p' activates the cursor.
+
+     Option >
+
+   Note that a X center defined with the cursor or [X cen] defaults to
+   a 20 points window around cen, the position of the spike. Using the
+   CURSOR, the Left Mouse button always defines the point, the Right
+   Mouse button exits the cursor task while accepting the last point
+   clicked.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Print the help information.
+3 -m_mode:
+-m      mode:
+   Select usage mode:
+     p: plot bolometers one by one, optionally overlayed with
+        data from the second input file (equivalent to PLTBOL)
+     d: interactively despike the data for the bolometers in
+        specified file (equivalent to DSPBOL).
+     r: same as 'p' except that a whole set of bolometers is
+        plotted in a window (equivalent to RLINPLOT).
+3 -f_file
+-f file
+   name of SDF file (.sdf may be included in the name).
+3 -d_file2
+-d file2
+   name of a second file: e.g. the despiked version of the SDF
+   file. The same bolometers will be plotted in a second window or
+   overlayed for comparison.
+3 -s_min_max
+-s min max
+   Y-axis scales for plot (can be changed via menu).
+3 -l_#
+-l #
+   number of bolometers per window
+3 bol
+bol
+   list of bolometers to plot. Type 'all' for 1..37 and 'alls'
+   for 1..91. Can be added via menu if mode = 'r'.
+2 Examples
+scuplot
+   The user will be asked for a mode and input file before proceeding.
+
+scuplot -m d -f o39_lon_ext
+   Interactive despiking on o39_lon_ext.sdf (see also DSPBOL)
+
+scuplot  -m p -f s14_lon_ext 12 13 18 20 25 26 19
+   Enter p mode and use file s14_lon_ext.sdf. Plot bolometers 12,13,
+   18, 20, 25, 26 and 19.
+2 Notes
+- Can not handle blanked bolometers.
+
+- If the overlay comes up scrambled, delete the agi_xxx files
+  in your home directory and if that does not work also files like
+  linplot.sdf in the /home/you/adam subdirectory.
+2 Related_Applications
+   SURF: PLTBOL, DSPBOL, RLINPLOT, CHANGE_QUALITY
+   KAPPA: LINPLOT, MLINPLOT, CURSOR
+2 Authors
+R.P.J. Tilanus (JACH)
+
+2 Bugs
+   Freezes when asked to plot a bad bolometer.
+
+1 SCUQUICK
+automate the basic SCUBA data reduction
+
+Usage:
+
+   scuquick [-quick] [-tau|notau] NDF [PARAM=value]
+
+Description:
+
+   This script attempts to automate the first 3 steps of scuba data
+   reduction. This script runs REDUCE_SWITCH, CHANGE_FLAT (if
+   requested), FLATFIELD on the data. Then for each sub-instrument
+   EXTINCTION, SCUPHOT (if a photometry observation), REMSKY
+   (if requested) and REBIN (if requested) are used.
+   The output name for each task is related to the task and
+   current sub-instrument (see Notes).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -help
+-help
+   Print the help message.
+3 -quick
+-quick
+   This flag makes all of the SURF tasks run with the `accept'
+   flag (see SUN/95) so that default values are accepted for all
+   parameters unless specified on the command line.
+3 -quiet
+-quiet
+   Hide all messages generated by the script (note this is
+   not the same as using MSG_FILTER=quiet which hides messages
+   from the tasks)
+3 -tau_value
+-tau value
+   Run extinction with a tau of `value'. (the LST range is set
+   automatically since we are using a constant tau) Note that this
+   is dangerous when processing multiple sub-instruments. (Same
+   as --tau=value).
+3 -notau
+-notau
+   Run extinction with a zero value of tau (the LST range is set
+   for you). This is equivalent to using the --tau=0.0 option.
+3 -sub_sub_instrument
+-sub sub_instrument
+   Only process the specified sub instrument. This is equivalent
+   to setting the SUB_INSTRUMENT parameter explicitly. (same
+   as --sub=sub_instrument)
+3 -change_flat
+-change_flat
+   Invoke the CHANGE_FLATFIELD task after REDUCE_SWITCH
+3 -remsky
+-remsky
+   Invoke the REMSKY task after EXTINCTION
+3 -rebin
+-rebin
+   Invoke the REBIN package after EXTINCTION (or REMSKY)
+3 NDF
+NDF
+   The required dataset. This parameter is optional - REDUCE_SWITCH
+   will ask for an input file if no value is given.
+3 ADAM_parameters
+ADAM parameters = Any
+   Any parameters accepted by the individual routines as long as they
+   use PARAM=VALUE format.
+2 Examples
+scuquick
+   When run this way, REDUCE_SWITCH will ask for the input file name
+   and for the output root name. FLATFIELD will then run followed
+   by EXTINCTION on each sub-instrument. Each task will ask questions
+   as needed.
+
+scuquick -quick
+   Same as scuquick except that defaults will be assumed for all
+   parameters that have defaults.
+
+scuquick -rebin
+   Process as for scuquick except that REBIN is run on each
+   sub-instrument.
+
+scuquick -quick jun02_dem_0002
+   Process the input file jun02_dem_0002.sdf, accepting all defaults.
+
+scuquick -quick jun02_dem_0003 MSG_FILTER=QUIET
+   Process jun02_dem_0003.sdf, accepting all defaults and turning off
+   all but the most important messages from the SURF tasks.
+
+scuquick -quick -notau -rebin temp OUT=root
+   Process temp.sdf with zero extinction correction, accept all
+   defaults, use 'root' as the default filename and regrid.
+
+scuquick -remsky -change_flat --sub=long
+   Run the REMSKY and CHANGE_FLAT tasks in addition to the standard
+   tasks but only process the LONG sub-instrument.
+
+scuquick -rebin -quick MSG_FILTER=QUIET PIXSIZE_OUT=1 test OUT=temp
+   Process test.sdf. Accept all defaults. Use `temp' as the filename
+   root. Regrid all data onto a 1 arcsecond grid. Hide all messages
+   from the SURF tasks.
+2 Notes
+Given a rootname (specified with OUT=root)
+SCUQUICK produces the following files:
+
+- root.sdf  from REDUCE_SWITCH
+
+- root_flat.sdf from FLATFIELD
+
+- root_<sub>_ext.sdf from EXTINCTION (one for each sub)
+                
+- root_<sub>_sky.sdf from REMSKY (with the -remsky switch)
+                
+- root_<sub>_reb.sdf from REBIN (with the -rebin switch)
+                
+- root_<sub>_pht.sdf from SCUPHOT (if processing a PHOTOM observation)
+                
+- root_<sub>_pht.dat from SCUPHOT (if processing a PHOTOM observation)
+
+Where <sub> is the first three letters of the sub-instrument name.
+Using the -tau switch is dangerous when processing multiple
+sub-instruments since the extinction changes with wavelength.
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+- Skydip data are recognized.
+
+2 Prior_requirements
+   - The NDF perl module must exist (this should be installed by
+     your system administrator if it is missing).
+2 Related_Applications
+   SURF: REDUCE_SWITCH, CHANGE_FLAT, FLATFIELD, EXTINCTION, REBIN, REMSKY,
+         SCUPHOT
+
+1 SCUSHIFT
+Correct for data shift error in demodulated data files
+
+Usage:
+
+   scushift [-h] NDF card shift
+
+Description:
+
+   This script corrects for the DAQ communications error and shifts
+   the data from ADC cards along by a specified amount.
+   Since all channels are read from a particular ADC card but only some
+   of them are actually stored in the demodulated data file, the shift
+   may result in fewer bolometers being stored for a given sub-instrument.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h
+-h
+   Help information
+3 NDF
+NDF (Given)
+   The input files to be modified.
+3 card
+card
+   The letter identifying the A-to-D card (allowed values are A to I)
+3 shift
+shift
+   The number of bolometers to shift by. A negative shift moves
+   D1 to D16 (for example) and a positive shift D1 to D2. In most
+   cases a negative shift is required (usually -1).
+2 Examples
+scushift test i -2
+   Move the I card data of test.sdf by minus 2 bolometers
+
+scushift test2 h 1
+   Move the H-card data by plus 1 bolometer.
+2 Notes
+- EXTINCTION must not have been run on the input NDF.
+
+- Arguments are requested if they are missing from the command line
+
+- If the system stores channels 1,2,3,6,7,8,10 but we know that we
+  have a shift of -1 in the system (ie an extra byte is present).
+  This implies that we have actually stored channels 16,1,2,5,6,7,9
+  and if  only bolometers 1,2,6,7 are from the required sub-instrument
+  we have to throw away data from channels 15,5 and 9.
+
+- The DAQ hardware fault always introduced extra bytes and therefore
+  a negative shift should be used in scushift.
+
+- Currently PHOTOMETRY data is not corrected properly (the PHOT_BB
+  extension is not modified so the correct bolometer will not be
+  extracted by SCUPHOT). This can be overcome by using the
+  ALLBOLS parameter in SCUPHOT.
+2 Author
+   Tim Jenness (JACH)
+
+
+1 SDIP
+Reduces and displays skydip data
+
+Usage:
+
+   sdip [NDF]
+
+Description:
+
+   This script first runs the skydip task in order to fit the sky
+   parameters to the data. The sky data and model are written to files
+   and are then displayed using Kappa's linplot.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 NDF
+NDF = NDF (Read)
+   Name of raw data file, or if $SCUBA_PREFIX is set, the number of the
+   observation (raw demodulated data only). Can be located in $DATADIR. 
+   The filename will be requested if not specified on the command line.
+2 Examples
+sdip 19970623_dem_0008
+   Reduce the skydip data in 19970623_dem_008.sdf and plots the result.
+2 Related_Applications
+   SURF: SKYDIP;
+   KAPPA: LINPLOT
+2 Authors
+Tim Jenness (JACH)
+2 History
+ 1997 June 20 (TIMJ):
+    Original version
+
+ 1997 July 7 (TIMJ):
+    Make sure that the plot title from the second plot does not get in
+    in the way.
+2 Implementation_Status
+   - Requires Kappa.
+
+   - All files created by this task are removed.
+
+
+
+
+1 SIGCLIP
+Clip a dataset at n-sigma
+
+Usage:
+
+   sigclip NDF SIGMA
+
+Description:
+
+   This program uses kappa STATS to calculate mean and standard
+   deviation of an NDF. It then uses kappa THRESH to set the values at +/-
+   n-sigma to BAD. The clipped data are written to NDF_clip.sdf.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 NDF
+NDF (Given)
+   The required dataset
+3 SIGMA
+SIGMA = REAL (Given)
+   The clipping level
+2 Examples
+sigclip test 3.0
+   Clips test.sdf at +/-3.0 sigma and writes the data to
+   test_clip.sdf.
+2 Notes
+The $KAPPA_DIR environment variable must point to the location
+of the KAPPA binaries (this is usually done during a Starlink login).
+2 Related_Applications
+   SURF: SCUCAT, SCUPHOT;
+   KAPPA: STATS, THRESH
+2 Implementation_Status
+   - The program must have two arguments. Parameters are not requested
+     if an argument is omitted from the command line.
+
+1 SKYDIP
+calculate sky properties from SCUBA skydip data
+
+Usage:
+
+   skydip in sub_instrument t_cold eta_tel b_fit out model_out
+
+Description:
+
+   This application takes raw SKYDIP data and calculates tau, eta_tel
+   and B by fitting. Sky brightness temperatures are calculated for
+   different airmasses and then fitted with a model of the sky.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the raw skydip data file or, if $SCUBA_PREFIX is set,
+   the number of the observation (raw demodulated data only). Can be located
+   in $DATADIR.
+3 B_FIT
+B_FIT = REAL (Read)
+   The B parameter (filter transmission). This efficiency factor
+   must be between 0 and 1. A negative value allows this parameter
+   to be free.
+3 ETA_TEL
+ETA_TEL = REAL (Read)
+   The telescope efficiency. Must be between 0 and 1.0.
+   A negative value allows this parameter to be free. The default value
+   is taken from the header information associated with the observation.
+3 MODEL_OUT
+MODEL_OUT = CHAR (Write)
+   The name of the output file that contains the fitted sky
+   temperatures.
+3 MSG_FILTER
+MSG_FILTER = CHAR (Read)
+   Message filter level. Default is NORM.
+3 OUT
+OUT = CHAR (Write)
+   The name of the output file that contains the measured
+   sky temperatures.
+3 SUB_INSTRUMENT
+SUB_INSTRUMENT = CHAR (Read)
+   The name of the sub-instrument whose data are to be
+   selected from the input file and fitted. Permitted
+   values are SHORT, LONG, P1100, P1350 and P2000
+3 T_COLD
+T_COLD = REAL (Read)
+   Temperature of the cold load. The default value is
+   taken from the input file.
+2 Examples
+skydip jun10_dem_0002 short \
+   Process the short sub-instrument using the default value
+   for T_COLD and allowing ETA_TEL and B to be free parameters.
+   No output files are written.
+
+skydip 19970610_dem_0003 long eta_tel=0.9 out=sky model_out=model
+   Process the long wave sub-instrument with ETA_TEL fixed at 0.9
+   and B free. Write the sky temperature to sky.sdf and the fitted
+   model to model.sdf.
+2 Notes
+If the input file is not found in the current directory, the directory
+specified by the DATADIR environment variable is searched. This means
+that the raw data does not have to be in the working directory.
+2 Related_Applications
+   SURF: EXTINCTION, SDIP, SKYSUM
+2 Authors
+TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
+1 SKTSUM
+Produce a one-line summary of SCUBA skydip observations
+
+Usage:
+
+   skysum [-h] [-demod] [-reduced] [-all|[-begin nn -end nn]]
+
+Description:
+
+   Skysum goes through all the sdf files in the current  directory
+   and, optionally, DATADIR (defined in an environment  variable)
+   and summarizes files containing pointing observations.
+
+   In the absence of the -all flag, a  numeric range is
+   requested. This range only has an effect on raw data or reduced
+   files which have the run number embedded into the file
+   name. Filenames with no numbers are treated as scan 0.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 -h[elp]
+-h[elp]
+   Return a help message only. More help can be obtained by using
+   `showme sun216' or `scuhelp skysum'.
+3 -all
+-all
+   List all skydip files in the current directory and $DATADIR
+3 -demod
+-demod
+   Only list demodulated data files (signified by _dem_ file name)
+3 -reduced
+-reduced
+   Only list reduced data files (signified by _red_ file name)
+3 -begin_nn
+-begin nn
+   First scan number to be considered (same as --begin==nn)
+3 -end_nn
+-end nn
+   Final scan number to be considered (same as --end=nn)
+
+2 Examples
+skysum
+   Ask for a range of scan numbers and then give a full listing
+   of every skydip file matching this criterion in DATADIR and the
+   current directory.
+
+skysum -all
+   Generate a summary of all skydip files in the current and
+   DATADIR directory.
+
+skysum --begin=5 -end 100
+   Generate a detailed log of all skydip data from scans 5 to 100 inclusive.
+
+skysum -all -reduced
+   Produce a one line summary of all reduced (_red_) skydip files.
+
+skysum -all -reduced > log.txt
+   Produce a one line summary of all the reduced skydip files and store
+   the output in the text file log.txt (note this example is
+   shell specific).
+
+skysum -all -reduced -demod
+   Produce a summary of all reduced (_red_) and demodulated (_dem_)
+   skydip data files (ie not files produced during off-line data reduction).
+
+
+2 Notes
+
+- Files are drawn from the current working directory and the directory
+  indicated by the $DATADIR environment variable.
+
+- Data reduced by the off-line system will all be treated as
+  run 0 for the purposes of listing unless numbers are present
+  in the filename.
+
+- The output can be stored in a file by using unix redirection as
+  long as the search range is fully specified (either as `-all' or
+  with `-begin' and `-end').
+
+- Command line options can be abbreviated.
+
+- Options that take values can be used either as `-flag option' or
+  as `--flag=option'
+
+2 Authors
+
+T. Jenness (JACH)
