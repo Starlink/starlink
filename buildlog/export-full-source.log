@@ -522,11 +522,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1165 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1172 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 3 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 33 seconds
+Total time: 1 minute 58 seconds
