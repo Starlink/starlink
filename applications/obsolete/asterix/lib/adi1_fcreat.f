@@ -107,7 +107,6 @@
       INTEGER			FNCH			! 1st char of filename
       INTEGER			FSUBC, LSUBC		! Sub-struc char pos's
       INTEGER			LFILEC			! Last filename char
-      INTEGER			LUN			! Logical unit number
       INTEGER			NDIM			! Dimensionality
 *.
 
@@ -116,7 +115,6 @@
 
 *  Extract filename
       CALL ADI_GET0C( FILE, FNAME, STATUS )
-      FLEN = CHR_LEN( FNAME )
 
 *  Parse the file specification into file name and sub-structure
       CALL ADI1_PARSE( FNAME, LFILEC, FSUBC, LSUBC, STATUS )
