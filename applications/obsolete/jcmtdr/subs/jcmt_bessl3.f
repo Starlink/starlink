@@ -80,7 +80,7 @@
       INTEGER STATUS                             ! Global status
 
 *  External Functions:
-      DOUBLE PRECISION S17AFF                    ! NAG Bessel function
+      DOUBLE PRECISION PDA_DBESJ1                ! NAG Bessel function
 
 *  Local Constants:
       INTEGER WTRESOL                            ! number of subpixel 
@@ -95,7 +95,7 @@
       INTEGER ISTART
       INTEGER IOUT, JOUT                         ! loop counters
       INTEGER ICONV, JCONV                       ! loop counters
-      INTEGER IFAIL                              ! NAG routine IFAIL
+      INTEGER IFAIL                              ! PDA routine IFAIL
       DOUBLE PRECISION XINC                      ! x-axis pixel increment
       DOUBLE PRECISION YINC                      ! y-axis pixel increment
       DOUBLE PRECISION WTFN (WTPIXMAX * WTRESOL) ! weighting function
@@ -109,7 +109,7 @@
       INTEGER ICPIX                              ! position in convolution
                                                  ! function array corresponding
                                                  ! to RPIX
-      DOUBLE PRECISION XX                        ! argument of S17AFF
+      DOUBLE PRECISION XX                        ! argument of PDA_DBESJ1
       
 *   local data
 *.
@@ -137,7 +137,7 @@
       WTFN(1) = 1.0D0
       DO I = 2, WTPIXMAX*WTRESOL
          XX = DBLE(I-1) * DPI / DBLE(WTRESOL)
-         WTFN (I) = 2.0D0 * S17AFF(XX, IFAIL) / XX
+         WTFN (I) = 2.0D0 * PDA_DBESJ1(XX, IFAIL) / XX
       END DO
 
 *  ..apodization

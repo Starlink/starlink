@@ -71,7 +71,7 @@
 
 *  External functions:
 
-      DOUBLE PRECISION S17AFF                    ! NAG Bessel function
+      DOUBLE PRECISION PDA_DBESJ1                 ! NAG Bessel function
 
       
       CHARACTER*(*) FAKE_TYPE
@@ -90,13 +90,13 @@
 *  Local Variables:
 
       INTEGER IPIX                               ! DO loop
-      INTEGER IFAIL                              ! NAG routine IFAIL
+      INTEGER IFAIL                              ! PDA routine IFAIL
       INTEGER IGNORE                             !
       REAL WT                                    ! value of weighting function 
                                                  ! at output pixel
       DOUBLE PRECISION RPIX                      ! distance of current output
                                                  ! pixel from current input pixel
-      DOUBLE PRECISION XX                        ! argument of S17AFF
+      DOUBLE PRECISION XX                        ! argument of PDA_DBESJ1
 
 *.
 
@@ -128,7 +128,7 @@
             XX = RPIX * DPI / (2.0D0)
             IF (XX .NE. 0.0D0) THEN
                IFAIL = 0
-               WT = (2.0* S17AFF(XX, IFAIL) / XX) ** 2
+               WT = (2.0* PDA_DBESJ1(XX, IFAIL) / XX) ** 2
             ELSE
                WT = 1.0D0
             END IF
