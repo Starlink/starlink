@@ -97,6 +97,7 @@
 *  Authors:
 *     TJP: Trevor Ponman (University of Birmingham)
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
@@ -129,6 +130,9 @@
 *        Full ADI port. Only create quality if new bad points.
 *     10 Jan 1996 V2.0-1 (DJA):
 *        Changed to use USI_NAMES
+*     22 Aug 1997 V2.2-0 (RB):
+*        Properly create an output QUALITY structure to cope with VARIANCE
+*        Always calculate new VARIANCEs if present
 *     {enter_changes_here}
 
 *  Bugs:
@@ -156,6 +160,7 @@
       CHARACTER*6            	OPER                  	! Operator
       CHARACTER*80           	LABEL                 	! Data label
       CHARACTER*80           	STRING                	! Temp. String
+      CHARACTER*10		TYPE			! Data type
 
       DOUBLE PRECISION       	EVALUE                	! Manual error estimate
 
@@ -201,6 +206,7 @@
         CALL USI_NAMES( 'O', OFILES, STATUS )
       END IF
       CALL USI_NAMES( 'I', IFILES, STATUS )
+      CALL ADI_CGET0C( IFID, 'TYPE', TYPE, STATUS)
 
 *  Is input a structured data object?
       CALL ADI_DERVD( OFID, 'Array', PRIM, STATUS )
@@ -298,23 +304,23 @@
 
       ELSE IF ( OPER(1:5) .EQ. 'LOG10' ) THEN
         CALL OPERATE_LOG10( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                             MASK, %VAL(QPTR), NBAD, STATUS )
+     :                      MASK, %VAL(QPTR), NBAD, TYPE, STATUS )
 
       ELSE IF ( OPER(1:3) .EQ. 'LOG' )   THEN
         CALL OPERATE_LOG( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                           MASK, %VAL(QPTR), NBAD, STATUS )
+     :                    MASK, %VAL(QPTR), NBAD, TYPE, STATUS )
 
       ELSE IF ( OPER(1:4) .EQ. 'SQRT' )  THEN
         CALL OPERATE_SQRT( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                            MASK, %VAL(QPTR), NBAD, STATUS )
+     :                     MASK, %VAL(QPTR), NBAD, TYPE, STATUS )
 
       ELSE IF ( OPER(1:3) .EQ. 'EXP' )   THEN
         CALL OPERATE_EXP( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                           MASK, %VAL(QPTR), NBAD, STATUS )
+     :                    MASK, %VAL(QPTR), NBAD, TYPE, STATUS )
 
       ELSE IF ( OPER(1:4) .EQ. '10**' )  THEN
         CALL OPERATE_ANTILOG10( ERR, QOK, NELM, %VAL(DPTR), %VAL(VPTR),
-     :                                MASK, %VAL(QPTR), NBAD, STATUS )
+     :                          MASK, %VAL(QPTR), NBAD, TYPE, STATUS )
 
       END IF
 
@@ -435,7 +441,7 @@
 
 *+  OPERATE_LOG10 - Log to the base 10
       SUBROUTINE OPERATE_LOG10( VAROK, QOK, NDAT, DATA, VAR, MASK, QUAL,
-     :                                                  NEWBAD, STATUS )
+     :                          NEWBAD, TYPE, STATUS )
 *    Description :
 *     DATA(I) = LOG10(DATA(I))
 *     VAR(I)  = LOG10(e)**2 * (1.0/DATA(I)**2) * VAR(I)
@@ -446,6 +452,7 @@
 *    Bugs :
 *    Authors :
 *     Phil Andrews ( PLA_AST88@uk.ac.bham.sr/star)
+*     RB: Richard Beard (University of Birmingham)
 *    History :
 *     18/10/88:  original (PLA)
 *    Type definitions :
@@ -459,14 +466,16 @@
       LOGICAL                QOK                      ! Quality OK?
 
       INTEGER                NDAT                     ! Number of data points
+
+      CHARACTER*(*)          TYPE                     ! Input data type
 *    Import-Export :
       DOUBLE PRECISION       DATA(NDAT)               ! Data values
-      DOUBLE PRECISION       VAR(*)                   ! Variance values
+      DOUBLE PRECISION       VAR(NDAT)                ! Variance values
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
-      INTEGER                NEWBAD
 
+      INTEGER                NEWBAD
 *    Status :
       INTEGER                STATUS
 *    Functions :
@@ -475,6 +484,10 @@
       DOUBLE PRECISION       C                        ! C = ( LOG10(e)**2 )
          PARAMETER         ( C = 0.1886116969479110 )
 *    Local variables :
+      DOUBLE PRECISION       VAL__MINX                ! Minimum value for data type
+*    Functions :
+      DOUBLE PRECISION       OPERATE_SET_MIN
+
       INTEGER                I
       INTEGER                OLDBAD
       INTEGER                BAD
@@ -486,6 +499,7 @@
       OLDBAD = 0
       NEWBAD = 0
       BAD = 0
+      VAL__MINX = OPERATE_SET_MIN( TYPE, STATUS )
 
       DO I = 1, NDAT
         IF ( QOK ) THEN
@@ -498,24 +512,29 @@
 
             ELSE
               NEWBAD = NEWBAD + 1
-              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
-
+              QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
             END IF
+
           ELSE
             OLDBAD = OLDBAD + 1
-
           END IF
+
         ELSE
           IF ( DATA(I) .GT. 0.0 ) THEN
+            IF ( VAROK ) THEN
+              VAR(I) = VAR(I) * C / DATA(I)**2
+            END IF
             DATA(I) = LOG10( DATA(I) )
 
           ELSE
-            BAD     = BAD + 1
+            BAD = BAD + 1
             NEWBAD = NEWBAD + 1
-            DATA(I) = VAL__MIND
-
+            DATA(I) = VAL__MINX
+            QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
           END IF
+
         END IF
+
       END DO
 
       IF ( OLDBAD .GT. 0 ) THEN
@@ -539,7 +558,7 @@
 
 *+  OPERATE_LOG - Natural Log
       SUBROUTINE OPERATE_LOG( VAROK, QOK, NDAT, DATA, VAR,
-     :                                 MASK, QUAL, NEWBAD, STATUS)
+     :                        MASK, QUAL, NEWBAD, TYPE, STATUS)
 *    Description :
 *     DATA(I) = LOG(DATA(I))
 *     VAR(I)  = ( 1.0/DATA(I) )**2 * VAR(I)
@@ -550,6 +569,7 @@
 *    Bugs :
 *    Authors :
 *     Phil Andrews ( PLA_AST88@uk.ac.bham.sr/star)
+*     RB: Richard Beard (University of Birmingham)
 *    History :
 *     18/10/88:  original (PLA)
 *    Type definitions :
@@ -563,18 +583,25 @@
       LOGICAL                VAROK                    ! Variance OK?
 
       INTEGER                NDAT                     ! Number of data points
+
+      CHARACTER*(*)          TYPE                     ! Input data type
 *    Import-Export :
       DOUBLE PRECISION       DATA(NDAT)               ! Data values
-      DOUBLE PRECISION       VAR(*)                   ! Variance values
+      DOUBLE PRECISION       VAR(NDAT)                ! Variance values
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+
       INTEGER                NEWBAD
 *    Status :
       INTEGER                STATUS
 *    Functions :
       BYTE		     BIT_ORUB
 *    Local variables :
+      DOUBLE PRECISION       VAL__MINX                ! Minimum value for data type
+*    Functions :
+      DOUBLE PRECISION       OPERATE_SET_MIN
+
       INTEGER                I
       INTEGER                OLDBAD
       INTEGER                BAD
@@ -585,7 +612,8 @@
 
       OLDBAD = 0
       NEWBAD = 0
-      BAD        = 0
+      BAD = 0
+      VAL__MINX = OPERATE_SET_MIN( TYPE, STATUS )
 
       IF ( QOK ) THEN
         DO I = 1, NDAT
@@ -598,26 +626,34 @@
 
             ELSE
               NEWBAD = NEWBAD + 1
-              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
-
+              DATA(I) = VAL__MINX
+              IF ( VAROK ) VAR(I) = VAL__MINX
+              QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
             END IF
+
           ELSE
             OLDBAD = OLDBAD + 1
-
           END IF
+
         END DO
+
       ELSE
         DO I = 1, NDAT
           IF ( DATA(I) .GT. 0.0 ) THEN
+            IF ( VAROK ) THEN
+              VAR(I) = VAR(I) / ( DATA(I)**2 )
+            END IF
             DATA(I) = LOG( DATA(I) )
 
           ELSE
             NEWBAD = NEWBAD + 1
-            BAD     = BAD + 1
-            DATA(I) = VAL__MIND
-
+            BAD = BAD + 1
+            DATA(I) = VAL__MINX
+            QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
           END IF
+
         END DO
+
       END IF
 
       IF ( OLDBAD .GT. 0 ) THEN
@@ -641,7 +677,7 @@
 
 *+  OPERATE_SQRT - Square root
       SUBROUTINE OPERATE_SQRT( VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                         QUAL, BAD, STATUS )
+     :                         QUAL, BAD, TYPE, STATUS )
 *    Description :
 *     DATA(I) = SQRT(DATA(I)) if DATA(I) > 0.0
 *     DATA(I) = 0.0 otherwise
@@ -654,6 +690,7 @@
 *    Bugs :
 *    Authors :
 *     Phil Andrews ( PLA_AST88@uk.ac.bham.sr/star)
+*     RB: Richard Beard (University of Birmingham)
 *    History :
 *     18/10/88:  original (PLA)
 *    Type definitions :
@@ -665,12 +702,15 @@
       LOGICAL                VAROK                    ! Variance OK?
 
       INTEGER                NDAT                     ! Number of data points
+
+      CHARACTER*(*)          TYPE                     ! Input data type
 *    Import-Export :
       DOUBLE PRECISION       DATA(NDAT)               ! Data values
-      DOUBLE PRECISION       VAR(*)                   ! Variance values
+      DOUBLE PRECISION       VAR(NDAT)                ! Variance values
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+
       INTEGER                BAD
 *    Status :
       INTEGER                STATUS
@@ -685,7 +725,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
       OLDBAD = 0
-      BAD        = 0
+      BAD = 0
 
       IF ( QOK ) THEN
         DO I = 1, NDAT
@@ -693,24 +733,24 @@
             IF ( DATA(I) .GT. 0.0 ) THEN
               IF ( VAROK ) THEN
                 VAR(I) = VAR(I) / ( 4.0D0 * DATA(I) )
-
               END IF
               DATA(I) = SQRT( DATA(I) )
 
             ELSE
               IF ( VAROK ) THEN
-                TEMP = DATA(I) + ( VAR(I) / ( 4.0D0 * ABS(DATA(I)) ) )
-
-                IF ( TEMP .GT. 0 ) THEN
+                IF ( DATA(I) .NE. 0.0 ) THEN
+                  TEMP = DATA(I) + ( VAR(I) / ( 4.0D0 * ABS(DATA(I)) ) )
+                ELSE
+                  TEMP = 0.0
+                END IF
+                IF ( TEMP .GT. 0.0 ) THEN
                   VAR(I) = TEMP
-
                 ELSE
                   VAR(I) = 2.25D0 * VAR(I)
-
                 END IF
               END IF
               DATA(I) = 0.0D0
-              BAD     = BAD + 1
+              BAD = BAD + 1
 
             END IF
           ELSE
@@ -721,11 +761,26 @@
       ELSE
         DO I = 1, NDAT
           IF ( DATA(I) .GT. 0.0 ) THEN
+            IF ( VAROK ) THEN
+              VAR(I) = VAR(I) / ( 4.0D0 * DATA(I) )
+            END IF
             DATA(I) = SQRT(DATA(I))
 
           ELSE
+            IF ( VAROK ) THEN
+              IF ( DATA(I) .NE. 0.0 ) THEN
+                TEMP = DATA(I) + ( VAR(I) / ( 4.0D0 * ABS(DATA(I)) ) )
+              ELSE
+                TEMP = 0.0
+              END IF
+              IF ( TEMP .GT. 0.0 ) THEN
+                VAR(I) = TEMP
+              ELSE
+                VAR(I) = 2.25D0 * VAR(I)
+              END IF
+            END IF
             DATA(I) = 0.0D0
-            BAD     = BAD + 1
+            BAD = BAD + 1
 
           END IF
         END DO
@@ -747,7 +802,7 @@
 
 *+  OPERATE_EXP - e**(DATA)
       SUBROUTINE OPERATE_EXP( VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                                    QUAL, NEWBAD, STATUS )
+     :                        QUAL, NEWBAD, TYPE, STATUS )
 *    Description :
 *     DATA(I) = EXP(DATA(I)) for DATA(I) < 88.0288
 *     VAR(I)  = VAR(I) * EXP( 2.0 * DATA(I) ) for DATA(I) < 40
@@ -758,6 +813,7 @@
 *    Bugs :
 *    Authors :
 *     Phil Andrews ( PLA_AST88@uk.ac.bham.sr/star)
+*     RB: Richard Beard (University of Birmingham)
 *    History :
 *     18/10/88:  original (PLA)
 *    Type definitions :
@@ -771,9 +827,11 @@
       LOGICAL                VAROK                    ! Variance OK?
 
       INTEGER                NDAT                     ! Number of data points
+
+      CHARACTER*(*)          TYPE                     ! Input data type
 *    Import-Export :
       DOUBLE PRECISION       DATA(NDAT)               ! Data values
-      DOUBLE PRECISION       VAR(*)                   ! Variance values
+      DOUBLE PRECISION       VAR(NDAT)                ! Variance values
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
@@ -787,6 +845,10 @@
       DOUBLE PRECISION       MAX2
          PARAMETER         ( MAX2 = 1.3D19 )
 *    Local variables :
+      DOUBLE PRECISION       VAL__MAXX                ! Maximum value for data type
+*    Functions :
+      DOUBLE PRECISION       OPERATE_SET_MAX
+
       INTEGER                I
       INTEGER                OLDBAD
       INTEGER                NEWBAD
@@ -798,27 +860,26 @@
 
       OLDBAD = 0
       NEWBAD = 0
-      BAD        = 0
+      BAD = 0
+      VAL__MAXX = OPERATE_SET_MAX( TYPE, STATUS )
 
       IF ( QOK ) THEN
         DO I = 1, NDAT
           IF ( QUAL(I) .EQ. 0 ) THEN
             IF ( DATA(I) .LE. MAX1 ) THEN
               DATA(I) = EXP( DATA(I) )
-
               IF ( VAROK ) THEN
                 IF ( DATA(I) .LT. MAX2 / SQRT(VAR(I)) ) THEN
                   VAR(I) = VAR(I) * DATA(I) * DATA(I)
-
                 ELSE
+                  VAR(I) = VAL__MAXX
                   NEWBAD = NEWBAD + 1
-                  QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
-
+                  QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
                 END IF
               END IF
             ELSE
               NEWBAD = NEWBAD + 1
-              QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
+              QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
 
             END IF
           ELSE
@@ -830,9 +891,18 @@
         DO I = 1, NDAT
           IF ( DATA(I) .LE. MAX1 ) THEN
             DATA(I) = EXP( DATA(I) )
+            IF ( VAROK ) THEN
+              IF ( DATA(I) .LT. MAX2 / SQRT(VAR(I)) ) THEN
+                VAR(I) = VAR(I) * DATA(I) * DATA(I)
+              ELSE
+                VAR(I) = VAL__MAXX
+                BAD = BAD + 1
+                NEWBAD = NEWBAD + 1
+              END IF
+            END IF
 
           ELSE
-            DATA(I) = VAL__MAXD
+            DATA(I) = VAL__MAXX
             BAD = BAD + 1
             NEWBAD = NEWBAD + 1
 
@@ -862,7 +932,7 @@
 
 *+  OPERATE_ANTILOG10 - ANTILOG base 10
       SUBROUTINE OPERATE_ANTILOG10( VAROK, QOK, NDAT, DATA, VAR, MASK,
-     :                                          QUAL, NEWBAD, STATUS )
+     :                              QUAL, NEWBAD, TYPE, STATUS )
 *    Description :
 *     DATA(I) = 10**(DATA(I))
 *     VAR(I)  = VAR(I) * LOG10(e)**2 * 10**( 2.0 * DATA(I) )
@@ -873,6 +943,7 @@
 *    Bugs :
 *    Authors :
 *     Phil Andrews ( PLA_AST88@uk.ac.bham.sr/star)
+*     RB: Richard Beard (University of Birmingham)
 *    History :
 *     18/10/88:  original (PLA)
 *    Type definitions :
@@ -886,12 +957,15 @@
       LOGICAL                VAROK                    ! Variance OK?
 
       INTEGER                NDAT                     ! Number of data points
+
+      CHARACTER*(*)          TYPE                     ! Input data type
 *    Import-Export :
       DOUBLE PRECISION       DATA(NDAT)               ! Data values
-      DOUBLE PRECISION       VAR(*)                   ! Variance values
+      DOUBLE PRECISION       VAR(NDAT)                ! Variance values
 
       BYTE                   MASK                     ! Quality mask
       BYTE                   QUAL(NDAT)               ! Quality values
+
       INTEGER                NEWBAD
 *    Status :
       INTEGER                STATUS
@@ -907,6 +981,10 @@
       DOUBLE PRECISION       C3
          PARAMETER         ( C3 = 5.301898110478398 )
 *    Local variables :
+      DOUBLE PRECISION       VAL__MAXX                ! Maximum value for data type
+*    Functions :
+      DOUBLE PRECISION       OPERATE_SET_MAX
+
       INTEGER                I
       INTEGER                OLDBAD
       INTEGER                BAD
@@ -917,44 +995,59 @@
 
       OLDBAD = 0
       NEWBAD = 0
-      BAD        = 0
+      BAD = 0
+      VAL__MAXX = OPERATE_SET_MAX( TYPE, STATUS )
 
       IF ( QOK ) THEN
         DO I = 1, NDAT
           IF ( QUAL(I) .EQ. 0 ) THEN
             IF ( DATA(I) .LE. MAX1 ) THEN
               IF ( VAROK ) THEN
-                IF ( DATA(I) .LT. C1 - (LOG(VAR(I)) / C2) ) THEN
+                IF ( DATA(I) .LT. C1 - ( LOG( VAR(I) ) / C2 ) ) THEN
                   VAR(I) = C3 * VAR(I) * EXP( DATA(I) * C2 )
-
                 ELSE
+                  VAR(I) = VAL__MAXX
                   NEWBAD = NEWBAD + 1
-                  QUAL(I)    = BIT_ORUB(QUAL(I),QUAL__ARITH)
-
+                  QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
                 END IF
+
               END IF
               DATA(I) = 10**( DATA(I) )
 
             ELSE
               NEWBAD = NEWBAD + 1
-              QUAL(I) = BIT_ORUB(QUAL(I),QUAL__ARITH)
-
+              QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
             END IF
+
           ELSE
             OLDBAD = OLDBAD + 1
-
           END IF
+
         END DO
+
       ELSE
         DO I = 1, NDAT
           IF ( DATA(I) .LE. MAX1 ) THEN
+            IF ( VAROK ) THEN
+              IF ( DATA(I) .LT. C1 - ( LOG( VAR(I) ) / C2) ) THEN
+                VAR(I) = C3 * VAR(I) * EXP( DATA(I) * C2 )
+              ELSE
+                VAR(I) = VAL__MAXX
+                NEWBAD = NEWBAD + 1
+                QUAL(I) = BIT_ORUB( QUAL(I), QUAL__ARITH )
+              END IF
+
+            END IF
             DATA(I) = 10**( DATA(I) )
+
           ELSE
-            DATA(I) = VAL__MAXD
-            BAD     = BAD + 1
+            DATA(I) = VAL__MAXX
+            BAD = BAD + 1
             NEWBAD = NEWBAD + 1
           END IF
+
         END DO
+
       END IF
 
       IF ( OLDBAD .GT. 0 ) THEN
@@ -971,6 +1064,96 @@
         CALL MSG_SETI( 'BAD', BAD )
         CALL MSG_PRNT( '^BAD data points set to 1.7E38 '//
      :                                  '(data too big)' )
+      END IF
+
+      END
+
+
+
+*+  OPERATE_SET_MIN - Set minimum value for input data type
+      DOUBLE PRECISION FUNCTION OPERATE_SET_MIN( TYPE, STATUS )
+*    Description :
+
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     RB: Richard Beard (University of Birmingham)
+*    History :
+*     01/09/97:  original (PLA)
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      CHARACTER*(*)          TYPE                     ! Input data type
+*    Status :
+      INTEGER                STATUS
+*    Functions :
+      INTEGER                CHR_LEN
+       EXTERNAL               CHR_LEN
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( TYPE .EQ. 'INTEGER' ) THEN
+        OPERATE_SET_MIN = DBLE( VAL__MINI )
+      ELSE IF ( TYPE .EQ. 'REAL' ) THEN
+        OPERATE_SET_MIN = DBLE( VAL__MINR )
+      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+        OPERATE_SET_MIN = DBLE( VAL__MIND )
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'TYP', TYPE(1:CHR_LEN(TYPE)) )
+        CALL ERR_REP( ' ',
+     :                'Cannot set min/max values for data type ^TYP',
+     :                STATUS )
+      END IF
+
+      END
+
+
+
+*+  OPERATE_SET_MAX - Set maximum value for input data type
+      DOUBLE PRECISION FUNCTION OPERATE_SET_MAX( TYPE, STATUS )
+*    Description :
+
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     RB: Richard Beard (University of Birmingham)
+*    History :
+*     01/09/97:  original (PLA)
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'
+*    Import :
+      CHARACTER*(*)          TYPE                     ! Input data type
+*    Status :
+      INTEGER                STATUS
+*    Functions :
+      INTEGER                CHR_LEN
+       EXTERNAL               CHR_LEN
+
+*    Check status
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      IF ( TYPE .EQ. 'INTEGER' ) THEN
+        OPERATE_SET_MAX = DBLE( VAL__MAXI )
+      ELSE IF ( TYPE .EQ. 'REAL' ) THEN
+        OPERATE_SET_MAX = DBLE( VAL__MAXR )
+      ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+        OPERATE_SET_MAX = DBLE( VAL__MAXD )
+      ELSE
+        STATUS = SAI__ERROR
+        CALL MSG_SETC( 'TYP', TYPE(1:CHR_LEN(TYPE)) )
+        CALL ERR_REP( ' ',
+     :                'Cannot set min/max values for data type ^TYP',
+     :                STATUS )
       END IF
 
       END
