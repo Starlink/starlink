@@ -58,9 +58,57 @@ To reload a configuration choose the "Read configuration..." item.
 
 Each contour has its own thickness and colour. The menu associated
 with each level show the possible values, just select the one you
-want.
+want. Note these options are applied immediately, there is no need to
+redraw the contours.
 
 
    ---  Generate contours at magnitude intervals.
 
+Press the "Generate" tab, select the "Algorithm" menu and choose the
+"magnitude" item. Now enter the value of a reference point on your
+image and an increment in magnitudes. Finally press the "Generate"
+button. 
 
+I use this option by entering a value somewhat above the sky
+background and then setting the interval to say -0.5 (negative to get
+increasing data values).
+
+
+   ---  Contour the region right to the edge of the display.
+
+Select the "Region" tab and press the "Whole of image:" button, or
+alternatively increase the X and Y display fractions.
+
+NOTE: it is much quicker to contour part of an image, this also uses
+less memory.
+
+
+   ---  Add units to the contour key.
+
+Press the "Key" tab. This provides a range of options for changing the 
+key title, key position, colour etc. Note that the key setup is saved
+as part of the configuration, so can be restored.
+
+
+   ---  Move/remove the key.
+
+To move the key just place your pointer over it, press mouse button 1
+and hold it down, now move the pointer and the key will follow. 
+
+To remove the key select the "Key" tab and toggle the "Display key:"
+button.
+
+
+   ---  Add contours from more than one other image. 
+
+To do this you need to create a new contour toolbox. Just select the
+"File" menu and choose the "New window" item.
+
+
+   ---  Draw axes around the contours.
+
+To do this you use the axis grid toolbox. Just select the
+"Image-Analysis" menu in the main window and choose the "Overlay axes
+grid" item. To match the regions drawn choose the "Scaling" tab and
+select the "Whole of image:" button, now make the display fractions
+the same size as used in the contour toolbox.
