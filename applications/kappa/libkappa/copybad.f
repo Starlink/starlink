@@ -102,7 +102,6 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'                 ! Standard SAE constants
       INCLUDE 'NDF_PAR'                 ! NDF_ public constants
-      INCLUDE 'PRM_PAR'                 ! VAL__ constants
 
 *  Status:
       INTEGER STATUS                    ! Global status
