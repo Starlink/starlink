@@ -225,8 +225,8 @@
       }
 
 /* Allocate memory for frame indices. */
-      iframes[ 0 ] = malloc( min( 1, ndfset[ 0 ]->nmember ) * sizeof( int ) );
-      iframes[ 1 ] = malloc( min( 1, ndfset[ 1 ]->nmember ) * sizeof( int ) );
+      iframes[ 0 ] = malloc( max( 1, ndfset[ 0 ]->nmember ) * sizeof( int ) );
+      iframes[ 1 ] = malloc( max( 1, ndfset[ 1 ]->nmember ) * sizeof( int ) );
       if ( tclmemok( interp, iframes[ 0 ] ) != TCL_OK ||
            tclmemok( interp, iframes[ 1 ] ) != TCL_OK ) {
          return TCL_ERROR;
