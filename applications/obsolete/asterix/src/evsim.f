@@ -544,10 +544,12 @@
 *    Author:
 *
 *     Rob Jeffries (BHVAD::RDJ)
+*     Richard Beard (Birmingham)
 *
 *    History:
 *
 *     20 Jul 89 : Original (BHVAD::RDJ)
+*      4 Jul 97 : Use sensible width for Gaussian integration (RB)
 *
 *    Type Definitions:
 *
@@ -601,9 +603,6 @@
 *    Local Variables:
 *
       REAL             FWX, FWY                         ! Field full widths
-C      REAL             GAU(0:MAXPSF)                    ! Gaussian data
-C      REAL             GSIG                             ! Gaussian sigma in arcmin
-C      REAL             PGSIG                            ! Gaussian sigma in pix
       REAL             PSUM                             ! Psf normalisation
       REAL             RPW                              ! real(PW)-1.0
       REAL             PTW                              !
@@ -671,8 +670,9 @@ C      REAL             PGSIG                            ! Gaussian sigma in pix
 *          Make gaussian of this width
             SIGP = (WID(ISRC) / (2.0 * SQRT(2.0*ALOG(2.0))))
      :             / (ABS(DX)*MATH__RTOD*60.0)
+*          Use a sensible width (SDX/Y, not 1.0) (RB)
             CALL MATH_INTGAU2D( SIGP, SIGP, 0.0, 0.0, 0.0,
-     :                          0.0, 0.0, 1.0, 1.0, PW*2+1, PW*2+1,
+     :                          0.0, 0.0, SDX, SDY, PW*2+1, PW*2+1,
      :                          PKERN, STATUS )
 
 *          Make copy of psf
