@@ -110,7 +110,7 @@
           ELSEIF (MODE.EQ.'WHO') THEN
             CALL IREGION_WHOLE(STATUS)
           ELSEIF (MODE.EQ.'SLI') THEN
-            CALL IREGION_SLICE(EXCLUDE,STATUS)
+            CALL IREGION_SLICE(SUBMODE,EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'GTE') THEN
             CALL IREGION_GTE(EXCLUDE,STATUS)
           ELSEIF (MODE.EQ.'ARD') THEN
@@ -329,7 +329,7 @@
         CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 
-        TEXT='     .AND..NOT.(CIRCLE('
+        TEXT='     .AND..NOT.CIRCLE('
         L=CHR_LEN(TEXT)
 
         CALL MSG_SETR('XC',XC)
@@ -403,7 +403,7 @@
 
 
 *+
-      SUBROUTINE IREGION_SLICE(EXCLUDE,STATUS)
+      SUBROUTINE IREGION_SLICE(MODE,EXCLUDE,STATUS)
 *    Description :
 *    Deficiencies :
 *    Bugs :
@@ -418,13 +418,17 @@
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
+      CHARACTER*(*) MODE
       LOGICAL EXCLUDE
 *    Export :
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
+      CHARACTER*80 TEXT
+      INTEGER L
       REAL XC,YC,ANGLE,LENGTH,WIDTH
 *-
 
@@ -433,6 +437,38 @@
         CALL IMG_GETSLICE('XC','YC','ANGLE','LENGTH','WIDTH',
      :                           XC,YC,ANGLE,LENGTH,WIDTH,STATUS)
         CALL IMG_SETSLICE(XC,YC,ANGLE,LENGTH,WIDTH,EXCLUDE,STATUS)
+
+        IF (MODE.EQ.'AND') THEN
+          TEXT=' .AND.'
+          L=7
+        ELSE
+          TEXT=' '
+          L=1
+        ENDIF
+
+        IF (EXCLUDE) THEN
+          TEXT(L:)=' .NOT. (ROTBOX( '
+        ELSE
+          TEXT(L:)=' ROTBOX( '
+        ENDIF
+        L=CHR_LEN(TEXT)
+
+        CALL MSG_SETR('XC',XC)
+        CALL MSG_SETR('YC',YC)
+        CALL MSG_SETR('LN',LENGTH)
+        CALL MSG_SETR('WD',WIDTH)
+        CALL MSG_SETR('AN',ANGLE)
+        CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^LN , ^WD , ^AN ',
+     :                                                    TEXT,L)
+        IF (EXCLUDE) THEN
+          TEXT(L:)='))'
+          L=L+1
+        ELSE
+          TEXT(L:L)=')'
+        ENDIF
+
+        CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
+
 
 
         IF (STATUS.NE.SAI__OK) THEN
@@ -597,6 +633,7 @@
 
         CALL IMG_SETWHOLE(STATUS)
 
+        CALL ARX_PUT(I_ARD_ID,0,'WHOLE',STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IREGION_WHOLE',STATUS)
@@ -829,24 +866,24 @@
 
       IF (STATUS.EQ.SAI__OK) THEN
 
-        CALL USI_GET0L('MASK',MASK,STATUS)
-        IF (MASK) THEN
-          CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
-          DIMS(1)=I_NX
-          DIMS(2)=I_NY
-          CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
-          CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
-          CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
-          CALL BDA_COPAXES(I_LOC,LOC,STATUS)
-          CALL BDA_COPMORE(I_LOC,LOC,STATUS)
-          CALL BDA_RELEASE(LOC,STATUS)
-          CALL USI_ANNUL(LOC,STATUS)
-        ENDIF
+c        CALL USI_GET0L('MASK',MASK,STATUS)
+c        IF (MASK) THEN
+c          CALL USI_ASSOCO('OUT','REGION_MASK',LOC,STATUS)
+c          DIMS(1)=I_NX
+c          DIMS(2)=I_NY
+c          CALL BDA_CRETDATA(LOC,'_BYTE',2,DIMS,STATUS)
+c          CALL BDA_MAPTDATA(LOC,'_BYTE','W',PTR,STATUS)
+c          CALL ARR_COP1B(I_NX*I_NY,%val(I_REG_PTR),%val(PTR),STATUS)
+c          CALL BDA_COPAXES(I_LOC,LOC,STATUS)
+c          CALL BDA_COPMORE(I_LOC,LOC,STATUS)
+c          CALL BDA_RELEASE(LOC,STATUS)
+c          CALL USI_ANNUL(LOC,STATUS)
+c        ENDIF
 
-        CALL USI_GET0L('ARDFILE',ARDFILE,STATUS)
-        IF (ARDFILE) THEN
+c        CALL USI_GET0L('ARDFILE',ARDFILE,STATUS)
+c        IF (ARDFILE) THEN
           CALL ARX_WRITE('FILE',I_ARD_ID,STATUS)
-        ENDIF
+c        ENDIF
 
 
         IF (STATUS.NE.SAI__OK) THEN
