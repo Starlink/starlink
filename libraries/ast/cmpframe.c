@@ -109,6 +109,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        Over-ride astResolvePoints method.
 *     21-JAN-2005 (DSB):
 *        Over-ride the astGetActiveUnit and astSetActiveUnit methods.
+*     23-FEB-2005 (DSB):
+*        Modify GetDomain to avoid over-writing the static "buff" array
+*        if called recursively.
 *class--
 */
 
@@ -1943,8 +1946,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    this may change in the future. */
    if( 0 ) {
 
-
-
 /* If the attribute is not a CmpFrame specific attribute... */
    } else if( astOK ) {
 
@@ -2251,9 +2252,10 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 /* Local Variables: */
    AstCmpFrame *this;            /* Pointer to CmpFrame structure */
-   const char *dom1;             /* Pointer to first sub domain */
-   const char *dom2;             /* Pointer to second sub domain */
+   char *dom1;                   /* Pointer to first sub domain */
+   char *dom2;                   /* Pointer to second sub domain */
    const char *result;           /* Pointer value to return */
+   const char *t;                /* Temporary pointer */
    static char buff[ 100 ];      /* Buffer for returned domain name */
 
 /* Initialise. */
@@ -2272,14 +2274,28 @@ static const char *GetDomain( AstFrame *this_frame ) {
 
 /* Otherwise, provide a pointer to a suitable default string. */
    } else {
-      dom1 = astGetDomain( this->frame1 );
-      dom2 = astGetDomain( this->frame2 );
-      if( strlen( dom1 ) > 0 || strlen( dom2 ) > 0 ) {
-         sprintf( (char *) buff, "%s-%s", dom1, dom2 );
-         result = buff;         
-      } else {
-         result = "CMP";
+
+/* Get the Domain value for the two component Frames and store new
+   copies of them. This is necessary because the component Frames may
+   themselves be CmpFrames, resulting in this function being called
+   recursively and so causing the static "buff" array to be used in
+   multiple contexts. */
+      t = astGetDomain( this->frame1 );
+      dom1 = t ? astStore( NULL, t, strlen(t) + 1 ) : NULL;
+      t = astGetDomain( this->frame2 );
+      dom2 = t ? astStore( NULL, t, strlen(t) + 1 ) : NULL;
+
+      if( dom2 ) {
+         if( strlen( dom1 ) > 0 || strlen( dom2 ) > 0 ) {
+            sprintf( (char *) buff, "%s-%s", dom1, dom2 );
+            result = buff;         
+         } else {
+            result = "CMP";
+         }
       }
+
+      dom1 = astFree( dom1 );
+      dom2 = astFree( dom2 );
    }
 
 /* Return the result. */
