@@ -99,7 +99,10 @@
                                        ! space
       INTEGER          CONV_WEIGHT_PTR ! pointer to scratch space holding 
                                        ! sum of convolution weights
+      CHARACTER*10     CTYPE1          ! Coordinate type of output FITS
+      CHARACTER*10     CTYPE2          ! Coordinate type of output FITS
       INTEGER          DATA_OFFSET     ! offset within data array
+      CHARACTER*12     DATEOBS         ! Date of map obs
       REAL             DEC_START       ! Dec offset of scan start (arcsec)
       REAL             DEC_VEL         ! Dec velocity of scan (arcsec/sec)
       INTEGER          DIM (MAX_DIM)   ! array dimensions
@@ -257,6 +260,8 @@
                                        ! input file
       CHARACTER*40     OBJECT          ! name of object
       CHARACTER*40     OBSERVING_MODE  ! observing mode of input file
+      DOUBLE PRECISION OBSRA           ! RA of output map (degrees)
+      DOUBLE PRECISION OBSDEC          ! Dec of output map (degrees)
       CHARACTER*15     OFFSET_COORDS   ! coord system of OFFSET_X and OFFSET_Y
       REAL             OFFSET_X        ! x offset of measurement
       REAL             OFFSET_Y        ! y offset of measurement
@@ -322,7 +327,7 @@
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
                                        ! maps
-      CHARACTER*40     TELESCOPE       ! FITS telescope entry
+      CHARACTER*10     TELESCOPE       ! FITS telescope entry
       INTEGER          TOTAL_WEIGHT_END! pointer to end of TOTAL_WEIGHT_PTR
                                        ! space
       INTEGER          TOTAL_WEIGHT_PTR! pointer to scratch space holding 
@@ -1826,17 +1831,25 @@
          SCS = 'EQUATORIAL(1950.0)'
          OUT_EPOCH = 1950.0D0
          RADECSYS  = 'FK4'
+         CTYPE1 = 'RA---TAN'
+         CTYPE2 = 'DEC--TAN'
       ELSE IF (OUT_COORDS .EQ. 'RJ') THEN
          SCS = 'EQUATORIAL(2000.0)'
          OUT_EPOCH = 2000.0D0
          RADECSYS  = 'FK5'
+         CTYPE1 = 'RA---TAN'
+         CTYPE2 = 'DEC--TAN'
       ELSE IF (OUT_COORDS .EQ. 'EQ') THEN
          SCS = 'ECLIPTIC(2000.0)'
          OUT_EPOCH = 2000.D0
          RADECSYS  = 'GAPPT'
+         CTYPE1 = 'RA---TAN'
+         CTYPE2 = 'DEC--TAN'
       ELSE IF (OUT_COORDS .EQ. 'GA') THEN
          SCS = 'GALACTIC'
          OUT_EPOCH = 2000.0D0
+         CTYPE1 = 'GLON-TAN'
+         CTYPE2 = 'GLAT-TAN'
       END IF
 
       CALL NDF_XNEW (OUT_NDF, 'IRAS', 'IRAS_EXTENSION', 0, 0, OUT_LOC,
@@ -1884,15 +1897,61 @@
       CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD-OBS',
      :     MJD_STANDARD, 'MJD of first observation', STATUS)
 
-      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'I_CENTRE',
-     :  I_CENTRE, 'I of centre pixel', STATUS)
-      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'J_CENTRE',
-     :  J_CENTRE, 'J of centre pixel', STATUS)
-
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'TELESCOP',
      :  TELESCOPE, 'name of telescope', STATUS)
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'INSTRUME',
      :  INSTRUMENT, 'name of instrument', STATUS)
+
+* Put in a DATE-OBS field
+
+*     Convert MJD to DATE
+      CALL SLA_DJCL(MJD_STANDARD, IY, IM, ID, DTEMP, ITEMP)
+
+      ITEMP = 0
+      CALL CHR_PUTI(IY, DATEOBS, ITEMP)
+      CALL CHR_APPND('/',DATEOBS, ITEMP)
+      CALL CHR_PUTI(IM, DATEOBS, ITEMP)
+      CALL CHR_APPND('/',DATEOBS, ITEMP)
+      CALL CHR_PUTI(ID, DATEOBS, ITEMP)
+
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'DATE-OBS', DATEOBS, 'Date of first observation', STATUS)
+
+* Now need to calculate the FITS Axis info
+
+      OBSRA = OUT_LONG * 180.0D0 / PI
+      OBSDEC= OUT_LAT  * 180.0D0 / PI
+      OUT_PIXEL = OUT_PIXEL * REAL(180.0D0 / PI)
+
+      IF (OUT_COORDS.NE.'GA') THEN
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'OBSRA',
+     :        OBSRA, 'RA of map centre (degrees; deprecated)', STATUS)
+         CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS,N_FITS, FITS, 'OBSDEC',
+     :        OBSDEC, 'Dec. of map centre (degrees; deprecated)',STATUS)
+      END IF
+
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CTYPE1',
+     :  CTYPE1,'TAN projection used', STATUS)
+      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'CRPIX1',
+     :  I_CENTRE, 'I of centre (ref) pixel', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CRVAL1',
+     :  OBSRA, 'Map centre (degrees)', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CDELT1',
+     :  DBLE(-OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CUNIT1',
+     :  'deg','physical units of axis 1', STATUS)
+
+
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CTYPE2',
+     :  CTYPE2,'TAN projection used', STATUS)
+      CALL SCULIB_PUT_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 'CRPIX2',
+     :  J_CENTRE, 'J of centre (ref) pixel', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CRVAL2',
+     :  OBSDEC, 'Map centre (degrees)', STATUS)
+      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'CDELT2',
+     :  DBLE(OUT_PIXEL), 'increment per pixel (degrees)', STATUS)
+      CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'CUNIT2',
+     :  'deg','physical units of axis 2', STATUS)
 
 *  write out the FITS extension
 
