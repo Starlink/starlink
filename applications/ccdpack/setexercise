@@ -13,6 +13,13 @@
 #     The script creates a series of test frames using CCDGENERATE. It
 #     then executes various of the CCDPACK Atasks simulating a
 #     reduction sequence. Intermediary results are displayed (if requested)
+#
+#     Various attempts are made to mess up the images in gratuitous ways
+#     to test the CCDPACK commands as hard as possible.  Do not try
+#     to look for a sensible astronomical/data reduction motive in
+#     all the commands here, or use it indiscriminately as a template
+#     for reduction scripts.
+
 
 #  Authors:
 #     MBT: Mark Taylor (STARLINK)
@@ -183,21 +190,11 @@
 
 #  If display capability is enabled then display the data frames.
       if ( "$device" != "NONE" ) then
-         echo " "
-         echo "  Displaying raw target frames."
-         echo " "
-         picdef mode=array xpic=3 ypic=3 prefix=a accept
+         picgrid xpic=3 ypic=1 accept
          lutheat accept
-         picsel label=a1 accept
-         display data-a.i1 percentiles='[2,98]' accept
-         picsel label=a2 accept; display data-a.i2 accept
-         picsel label=a3 accept; display data-a.i3 accept
-         picsel label=a4 accept; display data-b.i1 accept
-         picsel label=a5 accept; display data-b.i2 accept
-         picsel label=a6 accept; display data-b.i3 accept
-         picsel label=a7 accept; display data-c.i1 accept
-         picsel label=a8 accept; display data-c.i2 accept
-         picsel label=a9 accept; display data-c.i3 accept
+         picsel 1; bounds data-a image nolabnum nolabname noorigin reset accept
+         picsel 2; bounds data-b
+         picsel 3; bounds data-c
       endif
 	 
 #  Make a bias frame.
@@ -208,6 +205,14 @@
          reset \
 	 accept
 
+#  Display the master bias frames.
+      if ( "$device" != "NONE" ) then
+         gdclear
+         lutheat
+         bounds master_bias image nolabnum nolabname noorigin \
+                style='"title=Master bias frames"' reset accept
+      endif
+
 #  Debias all frames (including flatfields)
       debias \
          in='"data-?,ff-?"' \
@@ -217,18 +222,13 @@
 
 #  Display all the debiassed frames.
       if ( "$device" != "NONE" ) then
-         gdclear accept
-         picdef mode=array xpic=3 ypic=3 prefix=a accept
-         lutheat accept
-         picsel label=a1 accept; display debias_data-a.i1 accept
-         picsel label=a2 accept; display debias_data-a.i2 accept
-         picsel label=a3 accept; display debias_data-a.i3 accept
-         picsel label=a4 accept; display debias_data-b.i1 accept
-         picsel label=a5 accept; display debias_data-b.i2 accept
-         picsel label=a6 accept; display debias_data-b.i3 accept
-         picsel label=a7 accept; display debias_data-c.i1 accept
-         picsel label=a8 accept; display debias_data-c.i2 accept
-         picsel label=a9 accept; display debias_data-c.i3 accept
+         gdclear
+         picgrid xpic=3 ypic=1
+         lutheat
+         picsel 1; 
+         bounds debias_data-a image nolabnum nolabname noorigin reset accept
+         picsel 2; bounds debias_data-b
+         picsel 3; bounds debias_data-c
       endif
 
 #  Create a flat field master
@@ -239,14 +239,12 @@
          reset \
 	 accept
 
-#  Display the master flatfield.
+#  Display the master flatfields.
       if ( "$device" != "NONE" ) then 
          gdclear accept
-         picdef mode=array xpic=3 ypic=1 prefix=a accept
          lutheat accept
-         picsel label=a1 accept; display master_flat.i1 accept
-         picsel label=a2 accept; display master_flat.i2 accept
-         picsel label=a3 accept; display master_flat.i3 accept
+         bounds master_flat image nolabnum nolabname noorigin \
+                style='"title=Master flat fields"' reset accept
       endif
 
 #  Flatfield all the data frames
@@ -258,17 +256,10 @@
 
       if ( "$device" != "NONE" ) then
          gdclear accept
-         picdef mode=array xpic=3 ypic=3 prefix=a accept
-         lutheat accept
-         picsel label=a1 accept; display reduced_data-a.i1 accept
-         picsel label=a2 accept; display reduced_data-a.i2 accept
-         picsel label=a3 accept; display reduced_data-a.i3 accept
-         picsel label=a4 accept; display reduced_data-b.i1 accept
-         picsel label=a5 accept; display reduced_data-b.i2 accept
-         picsel label=a6 accept; display reduced_data-b.i3 accept
-         picsel label=a7 accept; display reduced_data-c.i1 accept
-         picsel label=a8 accept; display reduced_data-c.i2 accept
-         picsel label=a9 accept; display reduced_data-c.i3 accept
+         picgrid xpic=3 ypic=1
+         picsel 1; bounds reduced_data-a nolabnum nolabname noorigin accept
+         picsel 2; bounds reduced_data-b
+         picsel 3; bounds reduced_data-c
       endif
 
 #  Now proceed to test out some alignment functionality.
@@ -330,28 +321,17 @@
          reset accept
 
 #  Locate all the objects on the frames
-      echo " " 
-      echo "  The first stage of the automated registration process is"
-      echo "  to detect the positions of objects (stars and galaxies)."
-      echo "  "
       findobj \
         in='"xdata-[abc]"' \
 	outlist='*.find' \
         percentile=95 \
 	accept
-      if ( "$device" != "NONE" ) then
 
 #  Display the objects located.
-         picsel label=a1 accept
-         plotlist inlist='xdata-a.i1' palnum=4 mtype=23 accept
-         picsel label=a2 accept; plotlist inlist='xdata-a.i2' accept
-         picsel label=a3 accept; plotlist inlist='xdata-a.i3' accept
-         picsel label=a4 accept; plotlist inlist='xdata-b.i1' accept
-         picsel label=a5 accept; plotlist inlist='xdata-b.i2' accept
-         picsel label=a6 accept; plotlist inlist='xdata-b.i3' accept
-         picsel label=a7 accept; plotlist inlist='xdata-c.i1' accept
-         picsel label=a8 accept; plotlist inlist='xdata-c.i2' accept
-         picsel label=a9 accept; plotlist inlist='xdata-c.i3' accept
+      if ( "$device" != "NONE" ) then
+         picsel 1; plotlist inlist=xdata-a palnum=4 mtype=23 reset accept
+         picsel 2; plotlist inlist=xdata-b
+         picsel 3; plotlist inlist=xdata-c
       endif
 
 #  Determine matches between the positions.
@@ -359,57 +339,90 @@
          inlist='"xdata-[abc]"' \
 	 ndfnames=true \
          usewcs=true \
-         restrict=true \
+         restrict=false \
          useset=true \
 	 outlist='*.off' \
 	 accept
 
 #  Display the objects located.
       if ( "$device" != "NONE" ) then
-         picsel label=a1 accept
-         plotlist inlist='xdata-a.i1' \
-                  palnum=3 mtype=-1 thick=2 msize=1.5 accept
-         picsel label=a2 accept; plotlist inlist='xdata-a.i2' accept
-         picsel label=a3 accept; plotlist inlist='xdata-a.i3' accept
-         picsel label=a4 accept; plotlist inlist='xdata-b.i1' accept
-         picsel label=a5 accept; plotlist inlist='xdata-b.i2' accept
-         picsel label=a6 accept; plotlist inlist='xdata-b.i3' accept
-         picsel label=a7 accept; plotlist inlist='xdata-c.i1' accept
-         picsel label=a8 accept; plotlist inlist='xdata-c.i2' accept
-         picsel label=a9 accept; plotlist inlist='xdata-c.i3' accept
+         picsel 1; plotlist inlist=xdata-a palnum=3 mtype=-1 thick=2 msize=1.5
+         picsel 2; plotlist inlist=xdata-b
+         picsel 3; plotlist inlist=xdata-c
       endif
+
+#  Add some linearly transformed coordinate frames in which to do the
+#  registration to give REGISTER a harder time.
+      wcsedit \
+         in=xdata-a \
+         mode=add \
+         frame=ccd_set \
+         domain=moved \
+         maptype=linear \
+         coeffs='[200,1,0,400,0,1]' \
+         reset accept
+      wcsedit \
+         in=xdata-b.i1 \
+         mode=add \
+         frame=ccd_set \
+         domain=moved \
+         maptype=unit \
+         reset accept
+      wcsedit \
+         in=xdata-b.i2 \
+         mode=add \
+         frame=ccd_set \
+         domain=moved \
+         maptype=linear \
+         coeffs='[0,0.2,0,0,0,0.2]' \
+         reset accept
+      wcsedit \
+         in=xdata-b.i3 \
+         mode=add \
+         frame=ccd_set \
+         domain=moved \
+         maptype=linear \
+         coeffs='[0,4,0,0,0,4]' \
+         reset accept
+      wcsedit \
+         in=xdata-c \
+         mode=add \
+         frame=ccd_set \
+         domain=moved \
+         maptype=linear \
+         coeffs='[-100,1,-1,-100,1,1]' \
+         reset accept
 
 #  Create registration frames.
       register \
          inlist='"xdata-[abc]"' \
-         fittype=2 \
+         fittype=4 \
          useset=true \
+         usewcs=true \
          accept reset
 
 #  Take a look at the alignment.
       if ( "$device" != "NONE" ) then
          gdclear
+         picgrid xpic=2 ypic=1
+         picsel 1
          bounds \
             in='"xdata-[abc]"' \
-            labmode='"index,dot"' \
+            labnum=true \
+            labname=false \
+            origin=true \
             penrot=true \
             useset=true \
-            clear \
+            image=false \
+            clear=true \
+            style='"colour(curves)=6"' \
             reset accept
-         plotlist \
-            inlist='"xdata-[abc]"' \
-            reset accept
+         plotlist inlist=xdata-a palnum=7 mtype=2 reset accept
+         plotlist inlist=xdata-b palnum=8 mtype=4 reset accept
+         plotlist inlist=xdata-c palnum=9 mtype=5 reset accept
       endif
 
 #  Resample the data.
-      echo " "
-      echo "  The reduced NDFs will now be resampled to the same coordinate"
-      echo "  system. After this is performed they can then be combined"
-      echo "  (after determining normalising scale and zero points which "
-      echo "  take into account any variations in sky transparency and "
-      echo "  exposure time) into a single frame which shows the complete"
-      echo "  data coverage for the target area."
-      echo " "
       tranndf \
          in='"xdata-[abc]"' \
          out='*|xdata|rxdata|' \
@@ -417,9 +430,6 @@
          accept
 
 #  Normalise it.
-      echo " "
-      echo "  Normalising and combining the aligned datasets."
-      echo " "
       makemos \
          in='"rxdata-[abc]"' \
 	 scale=false \
@@ -432,12 +442,12 @@
          echo " "
          echo "  Displaying the final mosaic."
          echo " "
-         gdclear \\
+         picsel 2
          display \
            in=mosaic \
            mode=percentiles \
            percentiles='[2,98]' \
-           accept
+           reset accept
       endif
 
 #  Exercise is completed.
