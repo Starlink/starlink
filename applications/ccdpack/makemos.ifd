@@ -46,7 +46,18 @@
             prompt {Use variance during inter-comparison?}
             helpkey *
           }
-
+          
+         parameter correct {
+                          #  File containing scale and zero pint information
+           type     LITERAL
+           access   READ
+           vpath    CURRENT DEFAULT
+           ppath    CURRENT DEFAULT
+           default  drizzle.dat
+           prompt   {File containing corrections}
+           helpkey  *
+         }
+         
          parameter genvar {
                            # Generate output variance information?
             type _LOGICAL
@@ -300,6 +311,17 @@
             default !
             size *
             prompt {NDF weighting factors}
+            helpkey *
+          }
+
+         parameter writesz {
+                           # Write scale and zero-point info to file?
+            type _LOGICAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default FALSE
+            prompt {Write scale and zero-point info to file?}
             helpkey *
           }
 
