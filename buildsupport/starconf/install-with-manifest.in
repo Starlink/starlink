@@ -1,0 +1,27 @@
+#! /bin/sh -
+#
+# This script wraps a BSD-compatible install program, appending the last
+# argument in a file MANIFEST.  This last argument is assumed to be
+# the name of the destination file.  There are two alternative formats
+# in which the last argument is the name of a directory (though these
+# appear not to be used in automake-generated Makefiles in fact); in
+# this case the script writes the directory name, with a trailing
+# slash.
+#
+# This must be configured with the actual installation script.
+
+if test $# = 0; then
+    echo "$0: Usage: $0 install-program arguments..."
+    exit 1
+fi
+
+install="@INSTALL@"
+
+eval lastarg=\${$#}
+if test -d $lastarg; then
+    echo "$lastarg/" >>MANIFEST
+else
+    echo "$lastarg" >>MANIFEST
+fi
+
+exec $install ${1+"$@"}
