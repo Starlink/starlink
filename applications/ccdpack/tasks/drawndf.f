@@ -288,6 +288,7 @@
       INTEGER MLW                ! Line width for drawing origin dot
       INTEGER NAXES              ! Number of axes (dimensions) in a frame
       INTEGER NDIM               ! Number of returned dimensions
+      INTEGER NFRM               ! Number of frames in frameset
       INTEGER NLAB               ! Number of labelling options
       INTEGER NNDF               ! Number of input NDFs in group
       INTEGER NPEN               ! Number of distinct pens for rotation
@@ -567,8 +568,8 @@
 *  Work out where the GRID-domain frame will be in relation to the
 *  common frame when it is added to the global frameset.
          JBAS = AST_GETI( IWCS, 'Base', STATUS )
-         JCUR = AST_GETI( FSET, 'Current', STATUS )
-         JGRID( I ) = JCUR + JBAS - JCOM
+         NFRM = AST_GETI( FSET, 'Nframe', STATUS )
+         JGRID( I ) = NFRM + JBAS - JCOM
 
 *  Add the new frameset into the global one.  It will have a unit 
 *  mapping from its Current frame to the common frame.
