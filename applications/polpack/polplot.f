@@ -149,14 +149,16 @@
 *        TRUE if a key indicating the vector scale is to be produced. [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key. The first value gives 
-*        the gap between the right hand edge of the contour map and the left 
-*        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The 
-*        second value gives the vertical position of the top of the key (1.0 
-*        for the highest position, 0.0 for the lowest). If the second value 
-*        is not given, the top of the key is placed level with the top of the 
-*        vector map. Both values should be in the range 0.0 to 1.0. If a
-*        key is produced, then the right hand margin specified by parameter 
-*        MARGIN is ignored. [current value]
+*        the gap between the right hand edge of the vector map and the left 
+*        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). A
+*        positive value will place the key to the right of (i.e. outside)
+*        the vector map, and a negative value will place the key inside
+*        the vector map. The second value gives the vertical position of the 
+*        top of the key (1.0 for the highest position, 0.0 for the lowest). 
+*        If the second value is not given, the top of the key is placed 
+*        level with the top of the vector map. Both values should be in the 
+*        range 0.0 to 1.0. If a key is produced, then the right hand margin 
+*        specified by parameter MARGIN is ignored. [current value]
 *     KEYSTYLE = GROUP (Read)
 *        A group of attribute settings describing the plotting style to use 
 *        for the key (see parameter KEY). 
@@ -181,6 +183,13 @@
 *        attributes. Any unrecognised attributes are ignored (no error is
 *        reported). 
 *
+*        By default the key starts with two lines of text, the first
+*        being "Vector scale:" and the second giving a numerical value
+*        for the scale in units per centimetre. These two lines may be
+*        replaced by assigning alternative text to the Title attribute 
+*        using this parameter. If no text is required, either assign a
+*        blank value for Title, or set the DrawTitle attribute to zero.
+*        
 *        The appearance of the text in the key is controlled using "String" 
 *        attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
 *        TEXT can be used in place of STRINGS). Note, the Size attribute 
@@ -361,6 +370,9 @@
 *     3-NOV-1999 (DSB):
 *        Margin changed to be a fraction of the current picture instead
 *        of the DATA picture.
+*     11-AUG-2000 (DSB):
+*        Modified to allow negative KEYPOS values and use of Title
+*        attribute in KEYSTYLE to set the key text.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -802,8 +814,12 @@
 
 *  Get the position required for the key. The margin between DATA and KEY 
 *  Frames is determined by the horizontal position requested for the key.
-         CALL PAR_GDRVR( 'KEYPOS', 2, 0.0, 1.0, KEYPOS, NKP, STATUS )
-         MARGIN( 2 ) = KEYPOS( 1 )
+         CALL PAR_GDRVR( 'KEYPOS', 2, -1.0, 1.0, KEYPOS, NKP, STATUS )
+         IF( KEYPOS( 1 ) .GE. 0 ) THEN
+            MARGIN( 2 ) = KEYPOS( 1 )
+         ELSE
+            MARGIN( 2 ) = KEYPOS( 1 ) - KW
+         END IF
 
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
