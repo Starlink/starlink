@@ -121,9 +121,11 @@ proc red4ArrayTests {taskname} {
     cgs4drInform $taskname "$message is NOMINAL"
   }
 
-# Write the results to the file
-  #set fid [open /UKIRT/vms/ukirtdata/cgs4_data/engineering/cgs4_array_tests.results a+]
-  #puts $fid [format "%d   %f   %f" $env(CGS4_DATE) $stare_rn $median_dc]
-  #close $fid
+# If at UKIRT, write the results to the file
+  if {$env(DOMAIN) == "ukirt.jach.hawaii.edu."} {
+    set fid   [open /ukirt_sw/logs/cgs4_array_tests.log a+]
+    puts $fid [format "%6d\t\t %8.4f\t %8.4f" $env(CGS4_DATE) $stare_rn $median_dc]
+    close $fid
+  }
   cgs4drCursor arrow green black
 }
