@@ -39,6 +39,7 @@ endif !%?SUBDIRS%
 
 if %?INSTALLMANIFEST%
 # Create an install manifest, and install it in the required manifest location
+if %?STANDARDMANIFEST%
 install-manifest.xml: all-am
 	rm -f $@
 	echo "<?xml version='1.0'?>"                            >$@
@@ -49,6 +50,26 @@ install-manifest.xml: all-am
 	env MANIFEST_FILE=`pwd`/$@ $(MAKE) install
 	echo "</files>"                                         >>$@
 	echo "</manifest>"                                      >>$@
+else !%?STANDARDMANIFEST%
+install-manifest.xml: all-am
+	STG=$${TMPDIR-/tmp}/starconf-$$$$ ; \
+	  rm -Rf $$STG ; \
+	  mkdir $$STG ; \
+	  ( %MANIFESTMAKEINSTALL% ) ; \
+	  rm -f $@ ; \
+	  echo "<?xml version='1.0'?>"                          >$@ ; \
+	  echo "<!DOCTYPE manifest SYSTEM 'componentinfo.dtd'>" >>$@ ; \
+	  echo "<manifest component='$(PACKAGE_NAME)'>"         >>$@ ; \
+	  echo "<version>$(PACKAGE_VERSION)</version>"          >>$@ ; \
+	  echo "<files>"                                        >>$@ ; \
+	  find $$STG -type f | sed "s,^$$STG,$(prefix),"        >>$@ ; \
+	  echo "</files>"                                       >>$@ ; \
+	  echo "</manifest>"                                    >>$@ ; \
+	  $(mkdir_p) $(DESTDIR)$(prefix) ; \
+	  (cd $$STG; tar cf - .) | (cd $(DESTDIR)$(prefix) && tar xBpf -) ; \
+	  echo rm -Rf $$STG
+endif !%?STANDARDMANIFEST%
+
 
 # Install the install-manifest.xml into the $(STAR_MANIFEST_DIR) directory.
 # We should respect $(DESTDIR), but needn't worry about $(srcdir),
@@ -59,6 +80,7 @@ install-manifest-am: install-manifest.xml
 	$(mkdir_p) $(DESTDIR)$(STAR_MANIFEST_DIR)
 	$(INSTALL_DATA) install-manifest.xml \
 		$(DESTDIR)$(STAR_MANIFEST_DIR)/$(PACKAGE)
+	rm -f install-manifest.xml
 else !%?INSTALLMANIFEST%
 install-manifest-am: # nothing to do
 endif !%?INSTALLMANIFEST%
