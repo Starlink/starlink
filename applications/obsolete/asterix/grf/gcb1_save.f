@@ -88,6 +88,14 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'
+      INCLUDE 'GCB_PAR'
+
+*  Global Variables:
+      INCLUDE 'GCB_CMN'
+*        G_MEMPTR = INTEGER (given)
+*           Active GCB data area
+*        G_VERSION = REAL (given)
+*           GCB version number
 
 *  Arguments Given:
       INTEGER                   NARG                    ! # arguments
@@ -99,21 +107,56 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			ADI1_GETLOC
-
 *  Local Variables:
-      CHARACTER*(DAT__SZLOC)	LOC			! File locator
+      CHARACTER*(DAT__SZLOC)	GCBLOC			! GRAFIX_CONTROL locator
+      CHARACTER*(DAT__SZLOC)	GLOC			! GRAFIX locator
+
+      INTEGER 			NBYTE,NSCAL,NSTRUC,BYTES
+      INTEGER 			GCBPTR
+
+      LOGICAL 			OK
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Extract locator and call HDS routine
-      CALL ADI1_GETLOC( ARGS(1), LOC, STATUS )
+*  Find size required
+      CALL GCB_CSIZE( NBYTE, NSCAL, NSTRUC, STATUS )
 
-*  Invoke the old routine
-      CALL GCB_SAVE( LOC, STATUS )
+*  Locate GRAFIX structure
+      CALL ADI1_LOCGRAF( ARGS(1), .TRUE., GLOC, STATUS )
+
+*  See if component already there
+      CALL DAT_THERE(GLOC,'GRAFIX_CONTROL',OK,STATUS)
+      IF ( OK ) THEN
+        CALL DAT_FIND(GLOC,'GRAFIX_CONTROL',GCBLOC,STATUS)
+        CALL DAT_SIZE(GCBLOC,BYTES,STATUS)
+
+*    Enlarge if necessary
+        IF ( BYTES .LT. NBYTE ) THEN
+          BYTES = NBYTE
+          CALL DAT_ALTER( GCBLOC, 1, NBYTE, STATUS )
+        END IF
+        CALL DAT_MAP( GCBLOC, '_BYTE', 'UPDATE', 1, BYTES, GCBPTR,
+     :                STATUS )
+
+*  if not then create it
+      ELSE
+        CALL DAT_NEW( GLOC, 'GRAFIX_CONTROL', '_BYTE', 1, NBYTE,
+     :                STATUS )
+        CALL DAT_FIND( GLOC, 'GRAFIX_CONTROL', GCBLOC, STATUS )
+        CALL DAT_MAP( GCBLOC, '_BYTE', 'WRITE', 1, NBYTE, GCBPTR,
+     :                STATUS )
+
+      END IF
+
+*  Copy semi-compressed notice board to output
+      CALL GCB_SAVE_SUB( NSCAL, NSTRUC, %val(G_MEMPTR), %val(GCBPTR),
+     :                                                       STATUS )
+
+*  Release output
+      CALL DAT_UNMAP( GCBLOC, STATUS )
+      CALL DAT_ANNUL( GCBLOC, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'GCB1_SAVE', STATUS )

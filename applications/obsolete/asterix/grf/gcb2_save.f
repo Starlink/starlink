@@ -105,10 +105,12 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      INTEGER			GCBHDU			! GCB hdu identifier
       INTEGER			GCBPTR
       INTEGER			NBYTE
       INTEGER			NSCAL
       INTEGER			NSTRUC
+      INTEGER			OLDSIZ			! Existing GCB size
 *.
 
 *  Check inherited global status.
@@ -124,18 +126,40 @@
       CALL GCB_SAVE_SUB( NSCAL, NSTRUC, %VAL(G_MEMPTR), %VAL(GCBPTR),
      :                                                       STATUS )
 
-*  Define an image extension
-      CALL ADI2_DEFIMG( ARGS(1), 'GCB', 1, NBYTE, 'BYTE', STATUS )
+*  Does GCB extension already exist?
+      CALL ADI2_FNDHDU( ARGS(1), 'GCB', GCBHDU, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Write keywords to define contents of HDU
-      CALL ADI2_PKEY0C( ARGS(1), 'GCB', 'CONTENT', 'GRAFIX CONTROL',
-     :                  'Contents of extension', STATUS )
-      CALL ADI2_PKEY0R( ARGS(1), 'GCB', 'GCBVERSN', G_VERSION,
-     :                  'Version of GCB description', STATUS )
+*    Get existing size
+        CALL ADI2_HGKYI( GCBHDU, 'NAXIS1', OLDSIZ, STATUS )
+
+*    If different change size of HDU
+        IF ( OLDSIZ .NE. NBYTE ) THEN
+          CALL ADI2_CHGIMG( GCBHDU, NBYTE-OLDSIZ, 1, NBYTE, STATUS )
+        END IF
+
+      ELSE
+
+*    Clear status
+        CALL ERR_ANNUL( STATUS )
+
+*    Define new extension
+        CALL ADI2_CREIMG( ARGS(1), 'GCB', 1, NBYTE, 'BYTE',
+     :                    GCBHDU, STATUS )
+
+*    Write some keywords
+        CALL ADI2_HPKYC( GCBHDU, 'CONTENT', 'GRAFIX CONTROL',
+     :                    'Contents of extension', STATUS )
+        CALL ADI2_HPKYR( GCBHDU, 'GCBVERSN', G_VERSION,
+     :                    'Version of GCB description', STATUS )
+
+      END IF
 
 *  Write the data to the HDU
-      CALL ADI2_PUTIMGB( ARGS(1), 'GCB', 1, NBYTE, %VAL(GCBPTR),
-     :                   STATUS )
+      CALL ADI2_PUTIMGB( GCBHDU, 1, NBYTE, %VAL(GCBPTR), STATUS )
+
+*  Release the GCB hdu
+      CALL ADI_ERASE( GCBHDU, STATUS )
 
 *  Free the workspace
       CALL DYN_UNMAP( GCBPTR, STATUS )
