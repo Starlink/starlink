@@ -1797,7 +1797,6 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Status :
 *
@@ -1899,7 +1898,6 @@ C         CALL CAL_CLOSE( IGNORE )
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Status :
 *
@@ -1909,16 +1907,12 @@ C         CALL CAL_CLOSE( IGNORE )
 *  Check inherited global status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  System already initialised?
-      IF ( .NOT. WF_CALOK ) THEN
-        CALL CAL_INIT( STATUS )
-        IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', 'Unable to open WFC calibration '/
+*  Initialise CAL
+      CALL CAL_INIT( STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_REP( ' ', 'Unable to open WFC calibration '/
      :         /'database. Check assignment of CAL_WFC_MASTER '/
      :         /'environment variable.', STATUS )
-        ELSE
-          WF_CALOK = .TRUE.
-        END IF
       END IF
 
       END
@@ -1959,7 +1953,6 @@ C         CALL CAL_CLOSE( IGNORE )
       INCLUDE 'DAT_PAR'
       INCLUDE 'MATH_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_WFC_CMN'
 *
 *    Status :
 *
@@ -2122,7 +2115,7 @@ C         CALL CAL_CLOSE( IGNORE )
 
 
 *+  PSF_RADIAL - 1D user supplied psf handler
-      SUBROUTINE PSF_RADIAL( SLOT, X0, Y0, QX, QY, DX, DY, INTEG, NX,
+      SUBROUTINE PSF_RADIAL( PSID, X0, Y0, QX, QY, DX, DY, INTEG, NX,
      :                                             NY, ARRAY, STATUS )
 *
 *    Description :
@@ -2156,7 +2149,6 @@ C         CALL CAL_CLOSE( IGNORE )
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
       INCLUDE 'MATH_PAR'
-      INCLUDE 'PSF_RADIAL_CMN'
 *
 *    Import :
 *
@@ -2196,6 +2188,8 @@ C         CALL CAL_CLOSE( IGNORE )
       INTEGER                  II, JJ                  ! Sub-pixel loops
       INTEGER                  MNX, MNY                ! Local calc bounds
       INTEGER                  XSUB, YSUB              ! Sub-pixel factors
+      INTEGER			NELM			! Length of profile
+      INTEGER			DPTR, APTR, WPTR	! Profile data?
 
       LOGICAL                  SYMMETRIC               ! Symmetric about centre?
 *-
@@ -2231,6 +2225,12 @@ C         CALL CAL_CLOSE( IGNORE )
         MNY = NY
 
       END IF
+
+*  Extract instance data
+      CALL PSF0_GETID0I( PSID, 'Dim', NELM, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Dptr', DPTR, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Aptr', APTR, STATUS )
+      CALL PSF0_GETID0I( PSID, 'Wptr', WPTR, STATUS )
 
 *    For each point requiring calculation
       DO J = 1, MNY
@@ -2270,9 +2270,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
               RPS = (XPS-X0)**2 + YPS2
 
 *            Value of gaussian
-              SUM = SUM + PSF_RADIAL_INT( SQRT(RPS), RD_DIM(SLOT),
-     :                RD_REG(SLOT), %VAL(RD_DPTR(SLOT)),
-     :                %VAL(RD_APTR(SLOT)), %VAL(RD_WPTR(SLOT)), STATUS )
+              SUM = SUM + PSF_RADIAL_INT( SQRT(RPS), NELM,
+     :                %VAL(DPTR), %VAL(APTR), %VAL(WPTR), STATUS )
 
 *            Next sub-pixel
               XPS = XPS + SDX
@@ -2314,7 +2313,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 
 *+  PSF_RADIAL_INT - 2D user supplied psf handler
-      REAL FUNCTION PSF_RADIAL_INT( R, N, REG, DAT, AX, WID, STATUS )
+      REAL FUNCTION PSF_RADIAL_INT( R, N, DAT, AX, WID, STATUS )
 *
 *    Description :
 *
@@ -2351,7 +2350,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       REAL                     R 		       ! Test radius in radians
-      LOGICAL                  REG                     ! Profile is regular?
       INTEGER                  N                       ! No. points in profile
       REAL                     DAT(*),AX(*),WID(*)     ! Profile data
 *
@@ -2365,22 +2363,18 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER                  JL, JM, JU              ! Used in binary search
 *-
 
-*    Regular values
-      IF ( REG ) THEN
-        CP = INT((R-AX(1)) / WID(1) + 0.5)+1
-      ELSE
-        JL = 1
-        JU = N
-        DO WHILE ( (JU-JL) .GT. 1 )
-          JM = (JL+JU)/2
-          IF ( R .GT. (AX(JM)+WID(JM)/2.0) ) THEN
-            JL = JM
-          ELSE
-            JU = JM
-          END IF
-        END DO
-        CP = JL
-      END IF
+*  Find radial bin
+      JL = 1
+      JU = N
+      DO WHILE ( (JU-JL) .GT. 1 )
+        JM = (JL+JU)/2
+        IF ( R .GT. (AX(JM)+WID(JM)/2.0) ) THEN
+          JL = JM
+        ELSE
+          JU = JM
+        END IF
+      END DO
+      CP = JL
 
 *    Interpolate about pixel CP
       IF ( CP .LE. N ) THEN
@@ -2436,8 +2430,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'ADI_PAR'
-      INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_RADIAL_CMN'
 *
 *    Import :
 *
@@ -2459,15 +2451,16 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       CHARACTER*80            TNAME             ! Table file name
       CHARACTER*40            UNITS             ! Axis units
 
-      REAL                    TOR               ! Conversion to radians
+      REAL                    	TOR               	! Conversion to radians
 
-      INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
-      INTEGER                 DPTR              ! Ptr to data
-      INTEGER                 NVAL,NDIM              ! Dimensionality
+      INTEGER                 	DIMS(1)  		! Size of data array
+      INTEGER                 	DPTR              	! Ptr to data
+      INTEGER                 	NVAL,NDIM              	! Dimensionality
       INTEGER			TFID			! Tabular dataset
+      INTEGER                 	TDPTR, TAPTR, TWPTR     ! Dynamic data
 
-      LOGICAL                 OK                ! General validity check
-      LOGICAL                 VALID             ! Have we a valid dataset?
+      LOGICAL                 	OK                	! General validity check
+      LOGICAL                 	VALID             	! Have we a valid dataset?
 *-
 
 *  Check status
@@ -2494,24 +2487,29 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
-          RD_DIM(SLOT) = DIMS(1)
-          CALL DYN_MAPR( 1, DIMS(1), RD_DPTR(SLOT), STATUS )
-          CALL ARR_COP1R( DIMS(1), %VAL(DPTR),
-     :                    %VAL(RD_DPTR(SLOT)), STATUS )
+
+*      Store size
+          CALL PSF0_SETID0I( PSID, 'Dim', DIMS(1), STATUS )
+
+*      Copy profile data
+          CALL DYN_MAPR( 1, DIMS(1), TDPTR, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Dptr', TDPTR, STATUS )
+          CALL ARR_COP1R( DIMS(1), %VAL(DPTR), %VAL(TDPTR), STATUS )
 
 *      Get axis info
           CALL BDI_AXCHK( TFID, 1, 'Data', OK, STATUS )
 
-*      Profile bin positions and widths
-          CALL DYN_MAPR( 1, DIMS(1), RD_APTR(SLOT), STATUS )
-          CALL DYN_MAPR( 1, DIMS(1), RD_WPTR(SLOT), STATUS )
-
-*      Read data
-          RD_REG(SLOT) = .FALSE.
+*      Copy axis data
+          CALL DYN_MAPR( 1, DIMS(1), TAPTR, STATUS )
           CALL BDI_AXGET1R( TFID, 1, 'Data', DIMS(1),
-     :                      %VAL(RD_APTR(SLOT)), NVAL, STATUS )
+     :                      %VAL(TAPTR), NVAL, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Aptr', TAPTR, STATUS )
+
+*      Copy axis widths
+          CALL DYN_MAPR( 1, DIMS(1), TWPTR, STATUS )
           CALL BDI_AXGET1R( TFID, 1, 'Width', DIMS(1),
-     :                      %VAL(RD_WPTR(SLOT)), NVAL, STATUS )
+     :                      %VAL(TWPTR), NVAL, STATUS )
+          CALL PSF0_SETID0I( PSID, 'Wptr', TWPTR, STATUS )
 
 *      Get axis units
           CALL BDI_AXGET0C( TFID, 1, 'Units', UNITS, STATUS )
@@ -2520,9 +2518,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
           CALL CONV_UNIT2R( UNITS, TOR, STATUS )
 
 *      Normalise the profile
-          CALL PSF_RADIAL_NORM( DIMS(1), %VAL(RD_DPTR(SLOT)),
-     :              %VAL(RD_APTR(SLOT)), %VAL(RD_WPTR(SLOT)),
-     :              TOR, STATUS )
+          CALL PSF_RADIAL_NORM( DIMS(1), %VAL(TDPTR),
+     :              %VAL(TAPTR), %VAL(TWPTR), TOR, STATUS )
 
         END IF
 
@@ -2535,7 +2532,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END IF
 
 *  Energy radii not present
-      RD_NLEV(SLOT) = 0
+      CALL PSF0_SETID0I( PSID, 'Nlev', 0, STATUS )
 
 *  Release from BDI
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
@@ -3397,9 +3394,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'PSF_WFC_CMN'
       INCLUDE 'PSF_ASCA_CMN'
-      INCLUDE 'PSF_RADIAL_CMN'
       INCLUDE 'PSF_RESPFILE_CMN'
       INCLUDE 'PSF_TABULAR_CMN'
       INCLUDE 'PSF_XRT_PSPC_CMN'
@@ -3444,8 +3439,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       AS_INIT = .TRUE.
       TB_INIT = .TRUE.
       RF_INIT = .TRUE.
-      RD_INIT = .TRUE.
-      WF_CALOK = .FALSE.
       RX_INIT = .TRUE.
       RX_CB_OPEN = .FALSE.
 
