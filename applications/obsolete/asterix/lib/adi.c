@@ -3351,7 +3351,7 @@ void adix_cell( ADIobj id, char *name, int nlen, int ndim,
   _chk_init_err; _chk_stat;
 
 /* Find data address */
-  ADIkrnlLocDat( &id, name, nlen, DA__ARRAY|DA__SET, &objreq, status );
+  ADIkrnlLocDat( &id, name, nlen, DA__ARRAY|DA__DEFAULT, &objreq, status );
 
   /* Check not accessed */
 
