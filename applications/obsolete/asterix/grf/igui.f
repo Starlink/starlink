@@ -20,6 +20,7 @@
 *    Local constants :
 *    Local variables :
       CHARACTER*132 ACTION,VALUE
+      INTEGER ID,SID
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'IGUI Version 1.8-0')
@@ -29,6 +30,24 @@
       CALL MSG_PRNT(VERSION)
 
       CALL USI_GET0C('ACTION',ACTION,STATUS)
+      CALL CHR_UCASE(ACTION)
+
+*  the GUI has just started up
+      IF (ACTION.EQ.'START') THEN
+
+*  get the name of the noticeboard that will pass information to GUI
+        CALL USI_GET0C('VALUE',VALUE,STATUS)
+
+*  create noticeboard
+        CALL NBS_BEGIN_DEFINITION(ID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'X','_REAL',0,4,SID,STATUS)
+        CALL NBS_DEFINE_PRIMITIVE(ID,'Y','_REAL',0,4,SID,STATUS)
+        CALL NBS_END_DEFINITION(VALUE,'CREATE_NOTICEBOARD',STATUS)
+        CALL NBS_FIND_NOTICEBOARD(VALUE,I_NBID,STATUS)
+
+        I_GUI=(STATUS.EQ.SAI__OK)
+
+      ENDIF
 
       CALL USI_CLOSE()
 
