@@ -5174,13 +5174,13 @@ f                      LBND_OUT, UBND_OUT, XL, XU, STATUS )
 c     This function allows you to find the "bounding box" which just
 c     encloses another box after it has been transformed by a Mapping
 c     (using either its forward or inverse transformation). A typical
-c     use might be to calculate the size which an image would have
-c     after being transformed by the Mapping.
+c     use might be to calculate the size of an image after being
+c     transformed by a Mapping.
 f     This routine allows you to find the "bounding box" which just
 f     encloses another box after it has been transformed by a Mapping
 f     (using either its forward or inverse transformation). A typical
-f     use might be to calculate the size which an image would have
-f     after being transformed by the Mapping.
+f     use might be to calculate the size of an image after being
+f     transformed by a Mapping.
 *
 c     The function works on one dimension at a time. When supplied
 c     with the lower and upper bounds of a rectangular region (box) of
@@ -5188,15 +5188,15 @@ c     input coordinate space, it finds the lowest and highest values
 c     taken by a nominated output coordinate within that
 c     region. Optionally, it also returns the input coordinates where
 c     these bounding values are attained. It should be used repeatedly
-c     if the extent of the bounding box is required in more than one
+c     to obtain the extent of the bounding box in more than one
 c     dimension.
 f     The routine works on one dimension at a time. When supplied with
 f     the lower and upper bounds of a rectangular region (box) of
 f     input coordinate space, it finds the lowest and highest values
 f     taken by a nominated output coordinate within that region. It
 f     also returns the input coordinates where these bounding values
-f     are attained. It should be used repeatedly if the extent of the
-f     bounding box is required in more than one dimension.
+f     are attained. It should be used repeatedly to obtain the extent
+f     of the bounding box in more than one dimension.
 
 *  Parameters:
 c     this
@@ -5206,22 +5206,22 @@ c     lbnd_in
 f     LBND_IN( * ) = DOUBLE PRECISION (Given)
 c        Pointer to an array of double, with one element for each
 c        Mapping input coordinate. This should contain the lower bound
-c        of the input box in each dimension.
+c        of the input box in each input dimension.
 f        An array with one element for each Mapping input
 f        coordinate. This should contain the lower bound of the input
-f        box in each dimension.
+f        box in each input dimension.
 c     ubnd_in
 f     UBND_IN( * ) = DOUBLE PRECISION (Given)
 c        Pointer to an array of double, with one element for each
 c        Mapping input coordinate. This should contain the upper bound
-c        of the input box in each dimension.
+c        of the input box in each input dimension.
 f        An array with one element for each Mapping input
 f        coordinate. This should contain the upper bound of the input
-f        box in each dimension.
+f        box in each input dimension.
 *
-*        Note that it is permissible for the lower bound to exceed the
-*        corresponding upper bound, as the values will simply be
-*        swapped before use.
+*        Note that it is permissible for the upper bound to be less
+*        than the corresponding lower bound, as the values will simply
+*        be swapped before use.
 c     forward
 f     FORWARD = LOGICAL (Given)
 c        If this value is non-zero, then the Mapping's forward
@@ -5235,17 +5235,21 @@ c        (If the inverse transformation is selected, then references
 c        to "input" and "output" coordinates in this description
 c        should be transposed. For example, the size of the "lbnd_in"
 c        and "ubnd_in" arrays should match the number of output
-c        coordinates, as given by the Mapping's Nout attribute.)
+c        coordinates, as given by the Mapping's Nout
+c        attribute. Similarly, the "coord_out" parameter, below,
+c        should nominate one of the Mapping's input coordinates.)
 f        (If the inverse transformation is selected, then references
 f        to "input" and "output" coordinates in this description
 f        should be transposed. For example, the size of the LBND_IN
 f        and UBND_IN arrays should match the number of output
-f        coordinates, as given by the Mapping's Nout attribute.)
+f        coordinates, as given by the Mapping's Nout attribute.
+f        Similarly, the COORD_OUT argument, below, should nominate one
+f        of the Mapping's input coordinates.)
 c     coord_out
 f     COORD_OUT = INTEGER (Given)
 *        The index of the output coordinate for which the lower and
-*        upper bounds are required. This should be at least one, and
-*        no larger than the number of Mapping output coordinates.
+*        upper bounds are required. This value should be at least one,
+*        and no larger than the number of Mapping output coordinates.
 c     lbnd_out
 f     LBND_OUT = DOUBLE PRECISION (Returned)
 c        Pointer to a double in which to return the lowest value taken
@@ -5272,9 +5276,9 @@ c
 c        If these coordinates are not required, a NULL pointer may be
 c        supplied.
 f        An array with one element for each Mapping input
-f        coordinate. This will be filled with the coordinates of an
-f        input point (although not necessarily a unique one) for which
-f        the nominated output coordinate attains the lower bound value
+f        coordinate. This will return the coordinates of an input
+f        point (although not necessarily a unique one) for which the
+f        nominated output coordinate attains the lower bound value
 f        returned in LBND_OUT.
 c     xu
 f     XU( * ) = DOUBLE PRECISION (Returned)
@@ -5288,9 +5292,9 @@ c
 c        If these coordinates are not required, a NULL pointer may be
 c        supplied.
 f        An array with one element for each Mapping input
-f        coordinate. This will be filled with the coordinates of an
-f        input point (although not necessarily a unique one) for which
-f        the nominated output coordinate attains the upper bound value
+f        coordinate. This will return the coordinates of an input
+f        point (although not necessarily a unique one) for which the
+f        nominated output coordinate attains the upper bound value
 f        returned in UBND_OUT.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
@@ -5298,32 +5302,32 @@ f        The global status.
 *  Notes:
 *     - Any input points which are transformed by the Mapping to give
 *     output coordinates containing the value AST__BAD are regarded as
-*     invalid and are ignored, They will make no contribution to
+*     invalid and are ignored. They will make no contribution to
 *     determining the output bounds, even although the nominated
 *     output coordinate might still have a valid value at such points.
 c     - An error will occur if the required output bounds cannot be
-c     found. Typically, this might occur if all the input points which
-c     the function considers turn out to be invalid (see above). The
-c     number of points considered before generating such an error is
-c     quite large, however, so this is unlikely to occur by accident
-c     unless valid points are restricted to a very small subset of the
-c     input coordinate space.
+c     found. Typically, this might happen if all the input points
+c     which the function considers turn out to be invalid (see
+c     above). The number of points considered before generating such
+c     an error is quite large, so this is unlikely to occur by
+c     accident unless valid points are restricted to a very small
+c     subset of the input coordinate space.
 f     - An error will occur if the required output bounds cannot be
-f     found. Typically, this might occur if all the input points which
-f     the routine considers turn out to be invalid (see above). The
-f     number of points considered before generating such an error is
-f     quite large, however, so this is unlikely to occur by accident
-f     unless valid points are restricted to a very small subset of the
-f     input coordinate space.
+f     found. Typically, this might happen if all the input points
+f     which the routine considers turn out to be invalid (see
+f     above). The number of points considered before generating such
+f     an error is quite large, so this is unlikely to occur by
+f     accident unless valid points are restricted to a very small
+f     subset of the input coordinate space.
 c     - The values returned via "lbnd_out", "ubnd_out", "xl" and "xu"
 c     will be set to the value AST__BAD if this function should fail
 c     for any reason. Their initial values on entry will not be
 c     altered if the function is invoked with the AST error status
 c     set.
 f     - The values returned via LBND_OUT, UBND_OUT, XL and XU will be
-f     set to the value AST__BAD if this function should fail for any
+f     set to the value AST__BAD if this routine should fail for any
 f     reason. Their initial values on entry will not be altered if the
-f     function is invoked with the AST error status set.
+f     routine is invoked with STATUS set to an error value.
 *--
 
 *  Implementation Notes:
