@@ -250,7 +250,7 @@
 
 *  Store details in private store
       CALL BDI1_STOMAP( PSID, ISDYN, SLOC, FPTR, PTR, TYPE,
-     :                  MODE, STATUS )
+     :                  NELM, MODE, STATUS )
 
 *  Report any errors
  99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'BDI1_ARYMAP', STATUS )
