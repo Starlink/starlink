@@ -1,0 +1,105 @@
+*+
+*  Name:
+*     IRQ_OPC
+
+*  Purpose:
+*     Defines all logical operations which can be used in evaluating a 
+*     quality expression,.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     Parameters and data are established which describe the logical 
+*     operations which can be used to evaluate the quality expression.
+*     IRQ_PAR must be included before this module is included.
+*     
+*     LDQ tests a single bit from a QUALITY value, and puts TRUE on the
+*     evaluation stack if the bit is set, and FALSE otherwise. The bit
+*     to be tested is defined by the next mask in an array of masks.
+*
+*     RET signals the end of the calculation. The value on the top of 
+*     the evaluation stack is returned as the expressions value.
+*
+*     LDF puts the value FALSE on the top of the evaluation stack.
+*
+*     LDT puts the value TRUE on the top of the evaluation stack.
+*
+*     CLS represents the end of a nesting level (eg a closing 
+*     parenthesis). This has no effect on the evaluation stack.
+*
+*     OPN represents the start of a nesting level (eg an opening
+*     parenthesis). This has no effect on the evaluation stack.
+*
+*     EQV removes two values from the evaluation stack. If they are the
+*     same, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     XOR removes two values from the evaluation stack. If they are 
+*     different, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     OR removes two values from the evaluation stack. If either one is
+*     TRUE, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     AND removes two values from the evaluation stack. If they are both
+*     true, the value TRUE is put back on the stack. Otherwise, the
+*     value FALSE is put back on the stack.
+*
+*     NOT removes one value from the evaluation stack. If it is TRUE, 
+*     the value FALSE is put back on the stack. Otherwise, the value 
+*     TRUE is put back on the stack.
+*
+*     LDQE tests two bits from a QUALITY value, and puts TRUE on the
+*     evaluation stack if both bits are in the same state, and FALSE 
+*     otherwise. The bits to be tested are defined by the next mask in
+*     an array of masks.
+*
+*     LDQX tests two bits from a QUALITY value, and puts FALSE on the
+*     evaluation stack if both bits are in the same state, and TRUE
+*     otherwise. The bits to be tested are defined by the next mask in
+*     an array of masks.
+*
+*     LDQO tests any number of bits from a QUALITY value, and puts TRUE
+*     on the evaluation stack if any bits are set, and FALSE otherwise.
+*     The bits to be tested are defined by the next mask in an array of
+*     masks.
+*
+*     LDQA tests any number of bits from a QUALITY value, and puts TRUE
+*     on the evaluation stack if all bits are set, and FALSE otherwise.
+*     The bits to be tested are defined by the next mask in an array of 
+*     masks.
+*
+*     LDQN tests a single bit from a QUALITY value, and puts FALSE on 
+*     the evaluation stack if the bit is set, and TRUE otherwise. The 
+*     bit to be tested is defined by the next mask in an array of 
+*     masks.
+*
+*     NULL does nothing. The evaluation stack is uneffected.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAY-1992 (DSB):
+*        Original version. 
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Include file which defines scalar parameters (OPC__).
+      INCLUDE 'IRQ_PAO'
+
+*  Include the definition of variables (OPC_) and common blocks used to 
+*  hold information about the operators.
+      INCLUDE 'IRQ_CMO'
+
+*  Declare the BLOCK DATA module which initialises the common blocks as 
+*  EXTERNAL. This causes the common block to be initialised.
+      EXTERNAL IRQ1_OPCIN
+*.

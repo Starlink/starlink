@@ -1,0 +1,163 @@
+*+
+*  Name:
+*     I90_DAT
+
+*  Purpose:
+*     Declare and initialise constants (both scalars and arrays)
+*     relating to the IRAS satellite and mission.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This module should be included by any application which wishes to
+*     access any of the "I90__" constants and variables which hold
+*     values related to the IRAS satellite and mission. See the "Notes"
+*     section for the constants which are defined by inclusion of this
+*     module.
+*
+*     Applications which include this module must be linked with the
+*     object module I90_INIT.
+
+*  Notes:
+*     -  I90__BANDS
+*     The number of different IRAS wavebands.
+*
+*     _  I90__DETS
+*     The total number of survey detectors.
+*
+*     _  I90__FAC
+*     The IRAS90 facility number (see SUN104 p33).
+*     
+*     _  I90__MAXDT
+*     Maximum number of detectors per waveband.
+*     
+*     _  I90__NDEAD
+*     Number of dead detectors.
+*     
+*     _  I90__NSMAL
+*     Number of small (less than 4 arcmins cross scan) detectors.
+*     
+*     _  I90__SPEED
+*     The nominal survey scan speed in arcmins per second.
+*     
+*     -  I90__BDETS( I90__MAXDT, I90__BANDS )
+*     Detectors in each band in cross scan order. First index is
+*     position within cross scan order (index 1 is detector with
+*     highest focal plane Z coordinate, index I90__MAXDT is detector
+*     with lowest Z coordinate), second index is waveband number (1-4).
+*
+*     -  I90__DBAND( I90__DETS )
+*     The waveband of each detector. First index is the detector
+*     number.
+*
+*     -  I90__DEAD( I90__NDEAD )
+*     Dead detector numbers. First index is a dead detector count, from
+*     1 to I90__NDEAD.
+*
+*     -  I90__DETGP( I90__DETS )
+*     Group number of each detector. Detectors are grouped into three
+*     groups according to their cross scan size and their waveband:
+*
+*     -  I90__NDETS( I90__BANDS )
+*     Exact no. of detectors per waveband.  First index is IRAS waveband
+*     number (1-4).
+*
+*     -  I90__SMALL( I90__NSMAL )
+*     Small (less than 4 arcmins cross scan) detector numbers. First
+*     index is a small detector count, from 1 to I90__NSMAL.
+*
+*     -  I90__SRATE( I90__BANDS )
+*     Sampling frequency (in Hz) for each waveband. First index is IRAS
+*     waveband number (1-4).
+*
+*     -  I90__WAVEL( I90__BANDS )
+*     Wavelength (in microns) of each band. First index is IRAS
+*     waveband number (1-4).
+*
+*     -  I90__XDETS( I90__DETS )
+*     Detectors in cross scan order regardless of their band. First
+*     index is cross scan order, i.e. element 1 stores the detector
+*     number for the detector with largest focal plane Z coordinate,
+*     etc.
+*
+*     -  I90__BANDW( I90__BANDS )
+*     Effective detector band widths (in Hz). From Exp. Supp. page X-13
+*     (2nd edition). First index is IRAS waveband number (1-4).
+*
+*     -  I90__BNEFD( I90__BANDS )
+*     Mean Noise Equivalent Flux Density in each waveband in Jy, from
+*     Exp. Supp. Fig.  IV.A.1. First index is IRAS waveband number
+*     (1-4).
+*
+*     -  I90__DETDY( I90__DETS )
+*     In-scan detector mask sizes in arcmins (Exp. Supp. table II.C.3).
+*     The first index is detector number.
+*
+*     -  I90__DETDZ( I90__DETS )
+*     Cross-scan detector mask sizes in arcmins (Exp.  Supp. table
+*     II.C.3). The first index is detector number.
+*
+*     -  I90__DETY( I90__DETS )
+*     Focal plane Y value at detector centres (Exp. Supp.  table
+*     II.C.3). The first index is detector number.
+*
+*     -  I90__DETZ( I90__DETS )
+*     Focal plane Z value at detector centres (Exp.  Supp.  table
+*     II.C.3). The first index is detector number.
+*
+*     -  I90__DNEFD( I90__DETS )
+*     Noise Equivalent  Flux Density for each detector (Jy), from Exp.
+*     Supp. Fig IV.A.1 ). The first index is detector number.
+*
+*     -  I90__DY( I90__BANDS )
+*     In-scan size of detectors in each band, in arcminutes.First index
+*     is IRAS waveband number (1-4).
+*
+*     -  I90__DZ( I90__BANDS )
+*     Max.  cross-scan size of detectors in each band, in
+*     arcminutes.First index is IRAS waveband number (1-4).
+*
+*     -  I90__JY( I90__BANDS )
+*     Factors for converting flux values in units of pico-W/(M**2) to
+*     flux density in Jy (based on I90__BANDW).First index is IRAS
+*     waveband number (1-4).
+*
+*     -  I90__OCT84( I90__BANDS )
+*     October 1984 IPAC flux calibration correction factors.First index
+*     is IRAS waveband number (1-4).
+*
+*     -  I90__SOLAN( I90__DETS )
+*     Effective solid angle of each detector in units of 1.0E-7 of a
+*     steradians. Calculated by M.  Moshir (see IPAC memo 701-88-54
+*     (1)). Dead detectors have a value of zero. The first index is
+*     detector number.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAY-1992 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Global Constants:
+      INCLUDE 'I90_PAR'          ! Scalar constants are defined by
+                                 ! PARAMETER statements within I90_PAR.
+
+*  Global Variables:
+      INCLUDE 'I90_COM'          ! Array constants are stored in
+                                 ! variable arrays which are held in
+                                 ! common.
+*  External References:
+      EXTERNAL I90_INIT          ! This statement forces the BLOCK DATA
+                                 ! module I90_INIT to be included in the
+                                 ! image, which assigns values to the
+                                 ! arrays declared within I90_COM.
+*.

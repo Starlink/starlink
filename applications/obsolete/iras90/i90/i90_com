@@ -1,0 +1,137 @@
+*+
+*  Name:
+*     I90_COM
+
+*  Purpose:
+*     Declare arrays and common blocks used to store constants relating
+*     to the IRAS satellite and mission.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This include file declares arrays used to store constants
+*     relating to the IRAS satellite and mission, and also declares the
+*     common blocks which hold these arrays. It does not assign values
+*     to the arrays; the BLOCK DATA module I90_INIT is used to set up
+*     the contents of the arrays.  Scalar parameters relating to the
+*     IRAS satellite or mission are defined within include file
+*     I90_PAR. Both arrays and scalars are made available to
+*     applications by including the file I90_DAT.
+*
+*     Note, the file I90_PAR must be included before this module.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAY-1992 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+
+*  Declaration of Arrays Holding Further Global Constants.
+
+      INTEGER I90__BDETS( I90__MAXDT, I90__BANDS ) ! Detectors in each
+                                       ! band in cross scan order.
+
+      INTEGER I90__CWVEL( I90__CBNDS ) ! Wavelength (in microns) of 
+                                       ! each band of CPC image.
+      INTEGER I90__DBAND( I90__DETS )  ! The waveband of each detector.
+
+      INTEGER I90__DEAD( I90__NDEAD )  ! Dead detector numbers.
+
+      INTEGER I90__DETGP( I90__DETS )  ! Group number of the group to
+                                       ! which each detector belongs
+
+      INTEGER I90__NDETS( I90__BANDS ) ! Exact no. of detectors per
+                                       ! waveband.
+
+      INTEGER I90__SMALL( I90__NSMAL ) ! Small (less than 4 arcmins
+                                       ! cross scan) detector numbers.
+
+      INTEGER I90__SRATE( I90__BANDS ) ! Sampling frequency (in Hz) for
+                                       ! each waveband.
+
+      INTEGER I90__WAVEL( I90__BANDS ) ! Wavelength (in microns) of
+                                       ! each band.
+
+      INTEGER I90__XDETS( I90__DETS )  ! Detectors in cross scan order
+                                       ! regardless of their band.
+
+
+
+
+
+      REAL    I90__BANDW( I90__BANDS ) ! Effective detector band widths
+                                       ! (in Hz). From Exp. Supp. page
+                                       ! X-13 (2nd edition).
+
+      REAL    I90__BNEFD( I90__BANDS ) ! Mean Noise Equivalent Flux
+                                       ! Density in each waveband in
+                                       ! Jy, from Exp. Supp. Fig.
+                                       ! IV.A.1.
+
+      REAL    I90__DETDY( I90__DETS )  ! In-scan detector mask sizes
+                                       ! in arcmins (Exp. Supp. table
+                                       ! II.C.3).
+
+      REAL    I90__DETDZ( I90__DETS )  ! Cross-scan detector mask sizes
+                                       ! in arcmins (Exp.  Supp. table
+                                       ! II.C.3).
+
+      REAL    I90__DETY( I90__DETS )   ! Focal plane Y value at
+                                       ! detector centres (Exp. Supp.
+                                       ! table II.C.3).
+
+      REAL    I90__DETZ( I90__DETS )   ! Focal plane Z value at
+                                       ! detector centres (Exp.  Supp.
+                                       ! table II.C.3).
+
+      REAL    I90__DNEFD( I90__DETS )  ! Noise Equivalent  Flux Density
+                                       ! for each detector (Jy), from
+                                       ! Exp.  Supp. Fig IV.A.1 ).
+
+      REAL    I90__DY( I90__BANDS )    ! In-scan size of detectors in
+                                       ! each band, in arcminutes.
+
+      REAL    I90__DZ( I90__BANDS )    ! Max.  cross-scan size of
+                                       ! detectors in each band, in
+                                       ! arcminutes.
+
+      REAL    I90__JY( I90__BANDS )    ! Factors for converting flux
+                                       ! values in units of
+                                       ! pico-W/(M**2) to flux density
+                                       ! in Jy (based on I90__BANDW).
+
+      REAL    I90__OCT84( I90__BANDS ) ! October 1984 IPAC flux
+                                       ! calibration correction
+                                       ! factors.
+
+      REAL    I90__SOLAN( I90__DETS )  ! Effective solid angle of each
+                                       ! detector in units of 1.0E-7 of
+                                       ! a steradians. Calculated by M.
+                                       ! Moshir (see IPAC memo
+                                       ! 701-88-54 (1) ). Dead
+                                       ! detectors have a value of
+                                       ! zero.
+
+
+*  Common Block Definitions (one per data type).
+
+      COMMON /I90_CMI/ I90__BDETS, I90__DBAND, I90__DEAD, I90__NDETS, 
+     :                 I90__SMALL, I90__SRATE, I90__WAVEL, I90__XDETS,
+     :                 I90__CWVEL, I90__DETGP
+
+
+      COMMON /I90_CMR/ I90__BANDW, I90__BNEFD, I90__DETDY, I90__DETDZ, 
+     :                 I90__DETY, I90__DETZ, I90__DNEFD, I90__DY, 
+     :                 I90__DZ, I90__JY, I90__OCT84, I90__SOLAN
+
+*.                                      

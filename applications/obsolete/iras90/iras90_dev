@@ -1,0 +1,122 @@
+#!/bin/csh
+
+#  Name:
+#     iras90_dev
+
+#  Purpose:
+#     Start up or shut down development of iras90 applications.
+
+#  Language:
+#     Unix C shell
+
+#  Description:
+#     The IRAS90 sourrce files are expected to reside in /star/iras90
+#     unless an environment variable IRAS90_SOURCE is defined, in which 
+#     case the value of IRAS90_SOURCE takes precidence over /star/iras90.
+#
+#     If no arguments are supplied, soft links to all IRAS90 and 
+#     starlink include files are created (with upper case names) in the 
+#     current directory. IRAS90_SOURCE is put onto PATH.
+#
+#     If the first argument is "remove", then the soft links are removed.
+
+#  Arguments:
+#     Argument 1
+#        This can be "remove" or can be omitted. If it is omitted, the 
+#        soft links and environment variables are created, if it is 
+#        "remove" they are removed. Any other value causes an error.
+
+#  Authors:
+#     PMA: Peter Allan (Starlink, RAL)
+#     DSB: David Berry (Starlink)
+#     BLY: Martin Bly (Starlink, RAL)
+
+#  History:
+#     5-MAR-1993 (DSB):
+#        Original version. A modified version of the star_dev script 
+#        written by PMA.
+#     24-OCT-1994 (BLY):
+#        Modifcations to use new iras90 system.
+#-
+#
+#  If the environment variable IRAS90_SOURCE does not exist, use a value
+#  of /star/iras90
+
+if !( ${?IRAS90_SOURCE} ) then
+   setenv IRAS90_SOURCE /star/iras90
+endif
+
+# If the source directory does not exist, abort.
+
+if !( -d ${IRAS90_SOURCE} ) then
+   echo "*** The IRAS90 source directory ${IRAS90_SOURCE} does not exist"
+   exit
+endif
+
+# First create (or remove) soft links to all IRAS90 include files
+# stored in the IRAS90 source directory.
+
+set include = ${IRAS90_SOURCE}
+
+foreach name ( \
+   i90_dat i90_par i90_com \
+   ira_com ira_err ira_par \
+   irc_com irc_err irc_par \
+   iri_err iri_par \
+   irm_com \
+   irq_com irq_cmo irq_opc irq_pao irq_err irq_par \
+   ndg_com ndg_const ndg_err ndf_const \
+   )
+   if ( $1 == "" ) then
+      ln -s $include/$name `echo $name | tr '[a-z]' '[A-Z]'`
+   else if ( $1 == "remove" ) then
+      rm `echo $name | tr '[a-z]' '[A-Z]'`
+   else
+      echo "${0}: Invalid argument"
+      break
+   endif
+end
+
+# Now create (or remove) soft links to all Starlink include files.
+set include = "/star/include"
+
+foreach name ( `ls $include` )
+   if ( $1 == "" ) then
+      ln -s $include/$name `echo $name | tr '[a-z]' '[A-Z]'`
+   else if ( $1 == "remove" ) then
+      rm `echo $name | tr '[a-z]' '[A-Z]'`
+   else
+      echo "${0}: Invalid argument"
+      break
+   endif
+end
+
+# check if PATH is set
+if ( ${?PATH} ) then
+
+#  Variable is set; check if it contains ${IRAS90_SOURCE}.
+#  Append ${IRAS90_SOURCE} if it is not already included.
+
+   set foundit = "no"
+   if (`echo ${PATH} | grep -c ':${IRAS90_SOURCE}'` != 0) set foundit = "yes"
+   if (`echo ${PATH} | grep -c '^${IRAS90_SOURCE}'` != 0) set foundit = "yes"
+   if ( $foundit == "no" ) setenv PATH ${PATH}:${IRAS90_SOURCE}
+   unset foundit
+#
+#  Variable is not set; set it to ${IRAS90_SOURCE}
+#
+else
+  setenv PATH ${IRAS90_SOURCE}
+endif
+#
+# Tell the user what has happened.
+#
+if ( $1 == "" ) then
+   echo ""
+   echo "   Logged in for development of IRAS90 applications"
+   echo " "
+else 
+   echo ""
+   echo "   Development of IRAS90 applications is now shut down"
+   echo " "
+endif

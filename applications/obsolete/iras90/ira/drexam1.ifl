@@ -1,0 +1,27 @@
+#+
+#  Name:
+#     DREXAM1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-MAR-1992 (DSB):
+#        Original version.
+#     {enter_changes_here}
+
+#-
+
+interface DREXAM1
+
+   parameter DEVICE
+      type     DEVICE
+      access   WRITE
+      prompt   'Graphics device'
+   endparameter
+
+endinterface

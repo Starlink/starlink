@@ -1,0 +1,1080 @@
+\documentstyle[11pt]{article}
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\stardoccategory}  {IRAS90 Document}
+\newcommand{\stardocinitials}  {ID}
+\newcommand{\stardocnumber}    {28.0}
+\newcommand{\stardocauthors}   {David S. Berry}
+\newcommand{\stardocdate}      {28th June 1993}
+\newcommand{\stardoctitle}     {IRAS90 -- Maintenance Guide}
+%------------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+
+% degrees symbol
+\newcommand{\dgs}{\hbox{$^\circ$}} 
+% centre an asterisk
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+% A kind of list item, like description, but with an easily adjustable
+% item separation.
+\newcommand{\menuitem}[2]
+  {{\bf #1}: \addtolength{\baselineskip}{-0.4ex}
+  \parbox[t]{128mm}{#2} \addtolength{\baselineskip}{0.4ex} \\ \hspace{-5pt}}
+% an environment for references
+\newenvironment{refs}{\goodbreak
+                      \vspace{3ex}
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                    }{\end{list}}
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \stardocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf IRAS90\\}
+{\large\bf \stardoccategory\ \stardocnumber}
+\begin{flushright}
+\stardocauthors\\
+\stardocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \stardoctitle}
+\end{center}
+\vspace{5mm}
+
+\setlength{\parskip}{0mm} \tableofcontents
+\setlength{\parskip}{\medskipamount} \markright{\stardocname}
+
+\section{Introduction}
+This document contains a brief description of the {\small IRAS90} directory
+trees on {\small VMS} and {\small UNIX}, and descriptions of how to perform some
+common maintenance tasks. 
+
+\section{Working with Two Versions of IRAS90}
+An {\small IRAS90} user at a typical Starlink site will only see one version of
+{\small IRAS90}, that is the version released as part of the Starlink Software
+Collection. However, the maintainer of {\small IRAS90} must have at least one
+other version (here called the ``master version'') from which the released
+version is derived. The master version should be subject to strict quality
+control, with protection measures taken to ensure that no-one (not even the
+maintainer) can accidentally or intentionally add un-tested items into it. Only
+thoroughly vetted modifications should be allowed into the master version. When
+a significant number of such modifications have been made, a copy of the master
+version should be submitted for release over Starlink so that the released
+version catches up with the master version. 
+
+It is an extremely good idea to have procedures for automatically generating
+both {\small UNIX} and {\small VMS} master systems from a {\em single} set of
+source files held in a {\small CMS} library (or several {\small CMS} libraries).
+\footnote{Since {\small CMS} is only available for {\small VMS} it may be worth
+looking into equivalent {\small UNIX} tools as the days of the {\small VAX} are
+numbered.} 
+
+Care must be taken by the maintainer of {\small IRAS90} to ensure that
+maintenance operations are performed on the correct version (the released
+version should {\em never} be modified by the maintainer). Exactly how to do
+this depends on the operating system being used: 
+
+\subsection{UNIX}
+On {\small UNIX} machines, files associated with the released version
+are usually stored in the directory {\bf /star/iras90}. However, it is not easy
+for the user to access them from this directory. To get round this, all
+essential files are copied (or ``installed'') into {\bf /star/bin/iras90}. In
+this context, ``essential files'' are all executable files and any other files
+needed for the executable system to function correctly (i.e. data files, help
+files, etc). Source files, subroutine libraries, etc, are not essential to the
+executable system and are therefore left in {\bf /star/iras90}. The idea is
+that, after installation, the contents of {\bf /star/iras90} could be deleted
+(to save disk space for instance) without effecting the behaviour of the {\small
+IRAS90} package. 
+
+There are two environment variables related to the ``source'' and the
+``executable'' directories; {\small IRAS90\_DIR} is used to refer to the
+directory containing the executable system, and {\small IRAS90\_SRC} is used to
+refer to the source directory. If these environment variables are not defined,
+then default values appropriate for the installed released version are used
+(i.e. {\bf /star/iras90} for {\small IRAS90\_SRC}, and {\bf /star/bin/iras90}
+for {\small IRAS90\_DIR}). A different version of {\small IRAS90} can be used by
+assigning appropriate values to these environment variables. The master version
+will usually contain both executable and source files in the same directory
+and so {\small IRAS90\_DIR} and {\small IRAS90\_SRC} should be given the same
+value. So for instance, if the master version (source {\em and} executables) is 
+stored in {\bf /home/dsb/iras90}, the commands:
+
+\small
+\begin{verbatim}
+   % setenv IRAS90_DIR /home/dsb/iras90
+   % setenv IRAS90_SRC /home/dsb/iras90
+\end{verbatim}
+\normalsize
+
+should be executed before starting any maintenance. Once these commands have
+been executed the master version (rather than the released version) is invoked
+by the command: 
+
+\small
+\begin{verbatim}
+   % iras90
+\end{verbatim}
+\normalsize
+
+and the command:
+
+\small
+\begin{verbatim}
+   % iras90_dev
+\end{verbatim}
+\normalsize
+
+then gives access to the utility libraries stored in the master version.
+
+\subsection{VMS}
+All files (source {\em and} executables) are stored in the directory pointed to 
+by logical name {\small IRAS90\_DIR}. This logical name usually points to the 
+released version, and should be re-defined to point to the master version before 
+performing any maintenance tasks.
+
+\section{IRAS90 Directory Trees}
+This section describes the directory trees in which the {\small IRAS90} system 
+is stored.
+
+\subsection{UNIX}
+The contents of the source directory depends on whether
+or not the system has been ``cleaned'' (i.e. intermediate files created during
+the build process have been deleted, see section \ref{SEC:BUILD}). After
+cleaning, the source directory contains: 
+
+\begin{itemize}
+
+\item The master archive {\bf iras90.a} containing all the files needed to build
+the system from source. 
+
+\item The {\small IRAS90} help library {\bf iras90\_help.shl}.
+
+\item The top-level {\small IRAS90} {\bf makefile} and the {\bf mk} script which 
+activates the {\bf make} utility (see section \ref{SEC:BUILD}).
+
+\item The data files needed by various applications (template profiles, detector 
+{\small PSF}s, spectral response files, etc).
+
+\item The executable files associated with {\small IRAS90},
+together with the individual application compiled interface files. 
+
+\item Various sub-directories as listed below.
+
+\end{itemize}
+
+After cleaning, the following sub-directories are left in the source directory:
+\begin{description}
+
+\item [bin] - Contains link scripts for the {\small IRAS90} utility 
+libraries.
+
+\item [doc] - Contains the documentation for the {\small IRAS90} utility 
+libraries.
+
+\item [include] - Contains the public {\small FORTRAN} include files associated
+with the {\small IRAS90} utility libraries. 
+
+\item [lib] - Contains the object libraries holding the
+compiled {\small IRAS90} utility routines. 
+\end{description}
+
+Before cleaning, the source directory also contains the following 
+subdirectories:
+\begin{description}
+\item [par] - Contains all the files associated with the {\small PAR\_} library
+written by Malcolm Currie. This library will shortly be released as an
+independent package on {\small UNIX} at which time it can be removed from the
+{\small IRAS90} system. 
+\item [ndg] - Contains all the files associated with the {\small NDG\_} library.
+This library will eventually be released as an independent package on {\small
+UNIX} at which time it can be removed from the {\small IRAS90} system. 
+\item [i90] - Contains all the files associated with the {\small I90\_DAT} file 
+which defines various {\small IRAS90} constants.
+\item [ira] - Contains all files associated with the {\small IRA\_} astrometry 
+library.
+\item [irc] - Contains all files associated with the {\small IRC\_ CRDD} handling
+library.
+\item [iri] - Contains all files associated with the {\small IRI\_} image handling
+library.
+\item [irm] - Contains all files associated with the {\small IRM\_} miscellaneous 
+routines library.
+\item [irq] - Contains all files associated with the {\small IRQ\_} quality
+library.
+\end{description}
+
+Each of these ``sub-system'' directories contains an archive file containing all the source 
+files, etc, for the relevant sub-system. They also contain a {\bf makefile} and
+{\bf mk} script for making the sub-system. The main {\small IRAS90} makefile
+(contained in the source directory)
+``calls'' these sub-system specific makefiles to make the sub-system. The
+necessary sub-system files are then moved to their permanent resting places
+(in the other sub-directories; {\bf bin}, {\bf lib}, etc), so that they are not
+deleted when the system is cleaned. 
+
+When the released system is ``installed'' all the executable files, interface
+files, data files, help files and scripts are moved into other sub-directories
+of {\bf /star}. Soft links to the moved files are left in the source directory,
+so it {\em looks} as if the files are still there. 
+
+
+\subsection{VMS}
+The main {\small IRAS90} directory contains:
+
+\begin{itemize}
+\item All the individual application executable files and compiled interface 
+files.
+\item Command procedures for building the system.
+\item The data files needed by various applications.
+\item The monolith executable image and compiled interface files.
+\item A file holding the {\small LSE} templates for all the utility routines.
+\item The help library (in Starlink help library format).
+\item Options files for linking with the {\small IRAS90} libraries.
+\item Text libraries holding all the source files.
+\item An object libraries holding the compiled application-specific routines.
+\item A sub-directory for each of the utility libraries {\small I90, NDG, IRA, 
+IRC, IRI, IRQ} and {\small IRM}.
+\end{itemize}
+
+\section{Building the System}
+\label{SEC:BUILD}
+This section describes how to build the {\small IRAS90} system. Building the
+system consists of creating an executable system from the source code. 
+
+\subsection{UNIX}
+The {\bf make} utility is used to build the {\small IRAS90} system on {\small 
+UNIX} systems. Before making {\small IRAS90}, the environment variable {\small 
+SYSTEM} must be defined holding a string which identifies the target machine. 
+At the moment, {\small SYSTEM} can take either of the values ``sun4'', or 
+``mips''. Thus if working on a DECstation, the command 
+
+\small
+\begin{verbatim}
+   % setenv SYSTEM mips
+\end{verbatim}
+\normalsize
+
+must be performed before using {\bf make}. The {\bf make} utility is not
+activated directly by the user, but by a script called {\bf mk}. This script
+checks the value of environment variable {\small SYSTEM} and sets up several
+other environment variables to appropriate values, before activating {\bf make}.
+What exactly {\bf make} does is determined by the first argument supplied on the 
+{\bf mk} command line. It can take various values; the most important ones are:
+
+\begin{description}
+\item [build] - This causes the executable files (etc) to be created from the
+source files. The created files are left in the source directory. Supplying no
+argument to the {\bf mk} command has the same effect. 
+
+\item [install] - This causes executable files and all related files to be moved
+to the installation directory. The released version is installed into {\bf
+/star/bin/iras90} but some other installation direcetory can be used if
+necessary by defining an environment variable {\small INSTALL}. The system is
+installed into a subdirectory called {\bf bin/iras90} within the directory
+specified by {\small INSTALL}. Soft links to the moved files are left in the
+source directory. 
+
+\item [clean] - This removes all intermediate files from the source directory 
+which were created by the build process.
+
+\item [deinstall] - This performs the reverse operation to ``install''; the soft
+links to the executable files are removed from the source directory and the
+actual files are moved back from the installation directory.
+
+\end{description}
+
+A typical build sequence on a DECstation would be (assuming the current default 
+directory is the source directory):
+
+\small
+\begin{verbatim}
+   % setenv SYSTEM mips
+   % mk build
+   % mk clean
+\end{verbatim}
+\normalsize
+
+The {\bf install} and {\bf deinstall} targets are not usually needed for
+maintenance purposes as they only related to the released system. 
+
+
+\subsection{VMS}
+The commands:
+
+\small
+\begin{verbatim}
+   $ SET DEF IRAS90_DIR
+   $ @BUILD
+\end{verbatim}
+\normalsize
+
+will compile and link all {\small IRAS90} sub-systems and applications using the
+source code contained in the various text libraries included in the system.
+Other command procedures exist in the {\small IRAS90\_DIR} directory for
+building individual sub-systems, individual applications, etc. The names of
+these command procedures all start with the string ``{\small BUILD\_}'' 
+
+\section{Modifying an Existing Application}
+The {\small IRAS90} programmers guide (SUN/165) contains a description of the 
+location of source code within the {\small IRAS90} system, which should be read 
+before this section.
+
+\subsection{UNIX}
+\begin{enumerate}
+\item Ensure that the environment variable {\small IRAS90\_DIR} points to the
+source directory for the {\em master} version of the system (i.e. {\em not} the
+released copy in {\bf /star/iras90}).
+\item Extract the source code modules to be modified. For instance, if a 
+modification is to be made to {\small TRACECRDD}, first extract the A-task 
+routine:
+
+\small
+\begin{verbatim}
+   % ar x $IRAS90_DIR/iras90.a tracecrdd.f
+\end{verbatim}
+\normalsize
+
+
+Examining {\bf tracecrdd.f} will show which other {\small TRACECRDD}-specific
+routines need to be modified. These can be extracted from the archive file {\bf
+iras90.a} using a similar {\bf ar} command. All routines associated with each
+application have the same first four letters in their names (assuming the
+programming conventions described in SUN/165 have been adhered to). Thus, to
+extract {\em all} files associated with {\small TRACECRDD} (which start
+with the string ``{\bf trac}'') the following command could be used: 
+
+\small
+\begin{verbatim}
+   % ar x $IRAS90_DIR/iras90.a `ar t $IRAS90_DIR/iras90.a | grep trac`
+\end{verbatim}
+\normalsize
+
+Note the use of left quotes (\verb+`+) rather than the more common right quotes 
+(\verb+'+).
+
+\item Edit the source files to include the required modifications.
+
+\item Compile and link the modified application following the instructions 
+in SUN/165.
+
+\item Test the modified application. Remedy any problems which are found.
+
+\item When you are happy that the modified files are correct, put them back into
+the archive file {\bf iras90.a}:
+
+\small 
+\begin{verbatim}
+   % ar r iras90.a traca0.f
+   % ar r iras90.a tracb3.f
+     ...
+     (etc, for all the modified files)
+\end{verbatim}
+\normalsize
+
+\item Build the entire system using the procedure described in section 
+\ref{SEC:BUILD}.
+
+\item Record the changes made in the ``system maintenance log file'' so that the
+current state of the system (compared with the released system) can always be
+determined. 
+
+\end{enumerate}
+
+\subsection{VMS}
+\begin{enumerate}
+
+\item Define a job logical name {\small IRAS90\_DIR} pointing to the
+{\em master} version of the system (i.e. {\em not} the
+released copy in the starlink tree).
+
+\item Extract the source code modules to be modified. For instance, if a 
+modification is to be made to {\small TRACECRDD}, first extract the A-task 
+routine:
+
+\small
+\begin{verbatim}
+   $ LIB/EXT=TRACECRDD/OUT=TRACECRDD.FOR IRAS90_DIR:IRAS90.TLB
+\end{verbatim}
+\normalsize
+
+Examining {\small TRACECRDD.FOR} will show which other {\small
+TRACECRDD}-specific routines need to be modified. These can be extracted from
+the text library {\small IRAS90\_DIR:IRAS90\_SUBS.TLB} using a similar {\small
+LIB} command. All routines associated with each application have the same first
+four letters in their names (assuming the programming conventions described in
+SUN/165 have been adhered to). Thus, to extract {\em all} files associated with
+{\small TRACECRDD} (which start with the string ``TRAC'') the following command
+procedure could be used (where the first parameter, P1, is given the value 
+``{\small TRAC}''): 
+
+\small
+\begin{verbatim}
+   $  IF P1 .EQS. "" THEN INQUIRE P1 "Subroutine prefix"
+   $  IF P1 .EQS. "" THEN EXIT
+   $  LIB/LIST=LIB.LIS IRAS90_DIR:IRAS90_SUB.TLB
+   $  SEA/OUT=ROUTINES.LIS LIB.LIS 'P1'
+   $  DELETE LIB.LIS;0
+   $  CLOSE/NOLOG FILE
+   $  OPEN FILE ROUTINES.LIS
+   $LOOP:
+   $  READ/END=NO_MORE FILE NAME
+   $  WRITE SYS$OUTPUT " Extracting ",NAME,".FOR"
+   $  LIB/EXT='NAME'/OUT='NAME'.FOR IRAS90_DIR:IRAS90_SUB.TLB
+   $  GOTO LOOP
+   $NO_MORE:
+   $  CLOSE FILE
+   $  DELETE ROUTINES.LIS;0
+   $  EXIT
+\end{verbatim}
+\normalsize
+
+\item Edit the source files to include the required modifications.
+
+\item Compile and link the modified application following the instructions in SUN/165.
+
+\item Test the modified application. Remedy any problems which are found.
+
+\item When you are happy that the modified files are correct, put them back into
+the text libraries {\small IRAS90\_DIR:IRAS90\_SUB.TLB} and {\small
+IRAS90\_DIR:IRAS90.TLB} (and {\small IRAS90\_DIR:IRAS90\_IFL.TLB} if the interface
+files has been modified): 
+
+\small 
+\begin{verbatim}
+   $ LIB IRAS90_DIR:IRAS90.TLB     TRACECRDD.FOR
+   $ LIB IRAS90_DIR:IRAS90_SUB.TLB TRACA0.FOR
+   $ LIB IRAS90_DIR:IRAS90_SUB.TLB TRACB3.FOR
+     ...
+     (etc, for all the modified files)
+     ...
+\end{verbatim}
+\normalsize
+
+\item Build the modified system. The command procedure {\small
+IRAS90\_DIR:BUILD\_USER\_SYS} can be used to do this. This builds the system
+{\em excluding} the utility routine sub-systems (which are not modified by the
+above steps and so don't need to be re-built). 
+
+\item Record the changes made in the ``system maintenance log file'' so that the
+current state of the system (compared with the released system) can 
+always be determined.
+
+\end{enumerate}
+
+\section{Adding a New Application}
+New applications can be written following the guide lines in SUN/165. They
+should be checked for conformity to the {\small IRAS90} programming conventions
+listed in that document, and should be thoroughly tested before including them
+in the {\small IRAS90} system as described below. 
+
+\subsection{UNIX}
+\begin{enumerate}
+\item Ensure that the environment variable {\small IRAS90\_DIR} points to the
+source directory for the {\em master} version of the system (i.e. {\em not} the
+released version).
+
+\item Put the interface file (in stream\_LF format) the A-task routine, and all
+the application-specific routines into the archive file {\bf iras90.a}. Thus, if
+the new applications is called {\bf newapp}: 
+
+\small
+\begin{verbatim}
+   % ar r iras90.a newapp.f
+   % ar r iras90.a newapp.ifl
+   % ar r iras90.a newaa0.f
+   % ar r iras90.a newaa1.f
+      ...
+     (etc, for all the applications source files)
+      ...
+\end{verbatim}
+\normalsize
+
+Note, application-specific include files should be included in {\bf iras90.a} but 
+should have no ``file type'', i.e. if the source code includes the line
+
+\small 
+\begin{verbatim}
+         INCLUDE 'NEW_COM'
+\end{verbatim}
+\normalsize
+
+then the include file should be called {\bf new\_com} (lower case) and should be 
+stored in {\bf iras90.a} with the other application-specific files.
+
+
+\item Extract four files from the master archive as follows:
+
+\small
+\begin{verbatim}
+   % ar x $IRAS90_DIR/iras90.a iras90_help.hlp
+   % ar x $IRAS90_DIR/iras90.a iras90_pm.f
+   % ar x $IRAS90_DIR/iras90.a makefile
+   % ar x $IRAS90_DIR/iras90.a iras90
+\end{verbatim}
+\normalsize
+
+\item Process the application using {\small PROHLP} (see SUN/110) to obtain
+a help module ({\bf newapp.hlp}) for the application.
+
+\item Edit the help file {\bf iras90\_help.hlp} by including the help module
+from the new application at the correct alphabetical position among the other
+application help modules. 
+
+\item Edit {\bf iras90\_pm.f} (the pseudo-monolith source file) to include an 
+IF-clause for the new application in the form:
+
+\small
+\begin{verbatim}
+         ELSE IF ( NAME .EQ. 'NEWAPP' ) THEN
+            CALL NEWAPP( STATUS )
+\end{verbatim}
+\normalsize
+
+\item Edit {\bf makefile}, making the following changes:
+\begin{itemize}
+\item Add the new application name to the list of applications
+assigned to the macro ``{\small APPLICATIONS}''. The name should be terminated
+with a period. 
+\item If the application has any private include files associated with it, add 
+them to the end of the list assigned to the macro ``{\small PRIVATE\_INCLUDES}'' 
+(in lower case). Also add them to the end of the list assigned to the macro 
+``{\small INCLUDE\_LINKS}'' (in upper case). Add a new target for each include 
+file, modelling it on an existing one such as the target for include file
+{\small TRA\_COM}:
+
+\small 
+\begin{verbatim}
+   #
+   #  IRAS90 application-specific include files.
+   TRA_COM:                      tra_com;   $(SYM_LINK)
+\end{verbatim}
+\normalsize
+
+\item Add the names of the A-task routine and all the applications specific 
+routines to the end of the macro ``{\small ROUTINES}''. The names should be in 
+lower case and should be terminated with a period.
+
+\item Add targets describing the dependencies of each routine on any include 
+files. These targets should be appended to the (long) list at the end of the 
+makefile.
+
+\small
+\begin{verbatim}
+   newapp.o:  SAE_PAR
+   newapp.o:  MSG_PAR
+   newapp.o:  PAR_ERR
+   newaa0.o:  SAE_PAR
+   newaa0.o:  DAT_PAR
+   newaa1.o:  SAE_PAR
+   newaa1.o:  IRA_PAR
+    ...
+    (etc, for all the applications source files)
+    ...
+\end{verbatim}
+
+\item A check should be made to ensure that all the include files referenced in 
+the list of dependencies at the end of the makefile have corresponding targets 
+of the form:
+
+\small 
+\begin{verbatim}
+   #
+   #  Starlink include files.
+   DAT_PAR:       $(STAR_INC)/dat_par;      $(SYM_LINK)
+   MSG_PAR:       $(STAR_INC)/msg_par;      $(SYM_LINK)
+   NDF_PAR:       $(STAR_INC)/ndf_par;      $(SYM_LINK)
+   ...
+   (etc, for all include files)
+   ...
+\end{verbatim}
+\normalsize
+
+\end{itemize}
+
+\item Edit the {\bf iras90} script to add two alias definitions for the new 
+application:
+
+\small
+\begin{verbatim}
+   alias newapps  $IRAS90_DIR/newapps
+   ...
+   alias iras90_newapps  $IRAS90_DIR/newapps
+\end{verbatim}
+\normalsize
+
+\item Replace all modified items back in the master archive file:
+
+\small
+\begin{verbatim}
+   % ar r $IRAS90_DIR/iras90.a iras90_help.hlp
+   % ar r $IRAS90_DIR/iras90.a iras90_pm.f
+   % ar r $IRAS90_DIR/iras90.a makefile
+   % ar r $IRAS90_DIR/iras90.a iras90
+\end{verbatim}
+\normalsize
+
+\item Build the entire system using the procedure described in section 
+\ref{SEC:BUILD}.
+
+\item Edit {\small SUN163.TEX} to include the new application in the following 
+sections:
+\begin{itemize}
+\item ``An Alphabetical Summary of {\small IRAS90} Commands''
+\item ``Classified {\small IRAS90} Commands''
+\item ``Specifications of {\small IRAS90} Applications'' - you will need to 
+generate {\small LATEX} source using {\small PROLAT} (see SUN/110).
+\end{itemize}
+
+\item Record the changes made in the ``system maintenance log file'' so that the
+current state of the system (compared with the released system) can 
+always be determined.
+
+\end{enumerate}
+
+\subsection{VMS}
+\begin{enumerate}
+\item Define a job logical name {\small IRAS90\_DIR} pointing to the
+{\em master} version of the system (i.e. {\em not} the
+released copy in the starlink tree).
+
+\item Put the interface file into text library {\small 
+IRAS90\_DIR:IRAS90\_IFL.TLB}.
+
+\item Put the A-task routine into text library {\small IRAS90\_DIR:IRAS90.TLB}.
+
+\item Put all the application-specific routines into text library 
+{\small IRAS90\_DIR:IRAS90\_SUB.TLB}.
+
+\item Any application-specific include files should be left ``loose'' (i.e. not
+stored in a text library) in {\small IRAS90\_DIR}.
+
+\item Edit the file {\small IRAS90\_DIR:BUILD\_ATASKS.COM}, adding a line of the 
+form:
+
+\small 
+\begin{verbatim}
+   $@BUILD_APPLICATION NEWAPP
+\end{verbatim}
+\normalsize
+
+(assuming the new application is called {\small NEWAPP}).
+
+\item Process the application using {\small PROHLP} (see SUN/110) to obtain
+a help module ({\small NEWAPP.HLP}) for the application .
+
+\item Edit the {\small IRAS90} help file {\small IRAS90\_DIR:IRAS90\_HELP.HLP}
+by including the help module from the new application 
+at the correct alphabetical position among the other application help modules.
+
+\item Edit {\small IRAS90\_DIR:IRAS90.FOR} (the monolith source file) to 
+include an IF-clause for the new application in the form:
+
+\small
+\begin{verbatim}
+         ELSE IF ( NAME .EQ. 'NEWAPP' ) THEN
+            CALL NEWAPP( STATUS )
+\end{verbatim}
+\normalsize
+
+\item Edit the file {\small IRAS90\_DIR:IRAS90.COM} to add two symbol 
+definitions for the new application:
+
+\small
+\begin{verbatim}
+   $      NEWAPP   :== $IRAS90_DIR:NEWAPP
+   ...
+   $      IRAS90_NEWAPP  :== $IRAS90_DIR:NEWAPP
+\end{verbatim}
+\normalsize
+
+\item Edit the file {\small IRAS90\_DIR:IRAS90.ICL} to add {\small ICL}
+command and help key definitions for the new application:
+
+\small
+\begin{verbatim}
+   define newapp   iras90_dir:iras90
+   ...
+   define i90_newapp   iras90_dir:iras90
+   ...
+   defhelp newapp   iras90_dir:iras90_help
+   ...
+   defhelp i90_newapp   iras90_dir:iras90_help newapp
+\end{verbatim}
+\normalsize
+
+\item Produce an edited version of file {\small SSC:ADAM\_PACKAGES.RNH} which 
+includes a summary of the new {\small IRAS90} application in the {\small IRAS90} 
+section (you will need to include a copy of this file in any Starlink-wide 
+release).
+
+\item Build the modified system. The command procedure {\small
+IRAS90\_DIR:BUILD\_USER\_SYS} can be used to do this. This builds the system
+{\em excluding} the utility routine sub-systems (which are not modified by the
+above steps and so don't need to be re-built). 
+
+\item Edit {\small SUN163.TEX} to include the new application in the following 
+sections:
+\begin{itemize}
+\item ``An Alphabetical Summary of {\small IRAS90} Commands''
+\item ``Classified {\small IRAS90} Commands''
+\item ``Specifications of {\small IRAS90} Applications'' - you will need to 
+generate {\small LATEX} source using {\small PROLAT} (see SUN/110).
+\end{itemize}
+
+\item Record the changes made in the ``system maintenance log file'' so that the
+current state of the system (compared with the released system) can 
+always be determined.
+
+\end{enumerate}
+
+\section{Modifying a Utility Routine}
+\label{SEC:UT}
+The first thing to note about all utility libraries is that they contain two 
+types of routines:
+\begin{itemize}
+\item User-callable routines. These are the routines which can be called from 
+application-specific code. They have names which are prefixed by the name of the 
+library (eg {\small IRA\_DRGRD}).
+\item Internal routines. These are routines which are used internally within 
+the library and which should not (indeed on {\small VMS}, {\em cannot}) be 
+called from application-specific routines. They have names which are prefixed by the name of the 
+library followed by the digit ``1'' (eg {\small IRA1\_IPROJ}).
+\end{itemize}
+
+Care should be taken to keep clean interfaces between the various libraries.
+There is a definite structure within this set of libraries. For instance,
+{\small IRA} routines should not call {\small IRM} routines because {\small IRA}
+is a ``lower level'' package than {\small IRM}. On the other hand, this means
+that {\small IRM} {\em can} call {\small IRA}. The reason for this is obvious.
+If there {\em were} connections in both directions then the system couldn't
+easily be built. {\small IRA} would need to be built before {\small IRM} was
+built so that the {\small IRA} routines called by {\small IRM} would be
+available. But on the other hand, {\small IRM} would need to be built before
+{\small IRA} was built so that the {\small IRM} routines called by {\small IRA}
+would be available. This wouldn't be a problem but for the use of sharable
+images (on {\small VMS}) and sharable libraries (on {\small UNIX}). Because of 
+this, the following restrictions are imposed upon inter-connections between the 
+various sub-systems:
+
+\begin{itemize}
+\item {\small NDG} cannot call routines from any other sub-systems.
+\item {\small IRA} cannot call routines from any other sub-systems.
+\item {\small IRQ} cannot call routines from any other sub-systems.
+\item {\small IRC} can call routines from any other sub-system except {\small 
+IRM} and {\small IRI}.
+\item {\small IRI} can call routines from any other sub-system except {\small 
+IRM} and {\small IRC}.
+\item {\small IRM} can call routines from any other sub-system.
+\end{itemize}
+
+The {\small I90\_DAT} module can be used within any utility routines.
+
+\subsection{UNIX}
+The source files for each utility library are stored in an archive file with the 
+same name as the library (with an extension of {\bf .a}). Thus the {\small IRA} 
+source files are in {\bf ira.a} which is itself stored within the master archive 
+file {\bf iras90.a}. So for instance, if a modification was to be made to the 
+routine {\small IRA\_DRGRD}, the following commands would be used to get the 
+top level fortran source code:
+
+\small
+\begin{verbatim}
+   % ar x iras90.a ira.a
+   % ar x ira.a ira_drgrd.f
+\end{verbatim}
+\normalsize
+
+The source file is then inspected and any necessary changes made. If changes are 
+required within any internal {\small IRA} routines ({\small IRA1\_BND} for 
+instance) you can get them out of {\bf ira.a} using commands like:
+
+\small
+\begin{verbatim}
+   % ar x ira.a ira1_bnd.f
+\end{verbatim}
+\normalsize
+
+The modified source files are then put back into {\bf ira.a} using the {\bf r} 
+option instead of the {\bf x} option on the {\bf ar} command, and finally {\bf
+ira.a} is put back into {\bf iras90.a}.
+
+Each sub-system has its own {\bf makefile} and {\bf mk} script with targets 
+similar to those described for the master makefile in section \ref{SEC:BUILD}. 
+Thus to build the modified system the following commands should be used:
+
+\small
+\begin{verbatim}
+   % cd $IRAS90_DIR/ira
+   % setenv SYSTEM mips
+   % setenv INSTALL $IRAS90_DEV
+   % mk deinstall
+   % mk build
+   % mk install
+\end{verbatim}
+\normalsize
+
+The environment variable {\small INSTALL} is used to specify that the subroutine
+library is to be installed into the {\small IRAS90} system rather than {\bf
+/star/lib}. 
+
+Note, these commands only re-builds the utility libraries. The entire {\small 
+IRAS90} system should be re-built to ensure that the modified utility routines
+are used by the applications rather than the original versions (see section 
+\ref{SEC:BUILD})
+
+Changes to utility routines should be recorded in the ``system maintenance log
+file'' so that the current state of the system (compared with the released
+system) can always be determined. They should also be recorded in the final
+section of the appendix of the ``{\small ID}'' document which describes the
+utility library. 
+
+\subsection{VMS}
+The source files for each utility library are stored in a text library with the
+same name as the library. Thus the {\small IRA} source files are in {\small
+IRA.TLB} which is stored within a sub-directory {\small [.IRA]} of the {\small
+IRAS90} source directory. This directory is pointed to be logical name {\small
+IRA\_DIR} (set up by the {\small IRAS90} initialisation command). So for
+instance, if a modification was to be made to the routine {\small IRA\_DRGRD},
+the following commands would be used to get the top level fortran source code: 
+
+\small
+\begin{verbatim}
+   $ IRAS90
+   $ IRAS90_DEV
+   $ LIB/EXT=IRA_DRGRD/OUT=IRA_DRGRD.FOR IRA_DIR:IRA.TLB
+\end{verbatim}
+\normalsize
+
+The source file is then inspected and any necessary changes made. If changes are
+required within any internal {\small IRA} routines ({\small IRA1\_BND} for
+instance) you can get them out of {\small IRA.TLB} using commands like: 
+
+\small
+\begin{verbatim}
+   $ LIB/EXT=IRA1_BND/OUT=IRA1_BND.FOR IRA_DIR:IRA.TLB
+\end{verbatim}
+\normalsize
+
+The modified source files are then thoroughly checked, and then put back into
+{\small IRA.TLB}: 
+
+\small
+\begin{verbatim}
+   $ LIB IRA_DIR:IRA.TLB IRA_DRGRD.FOR
+   $ LIB IRA_DIR:IRA.TLB IRA1_BND.FOR
+\end{verbatim}
+\normalsize
+
+To build the new system, use the procedure {\small BUILD.COM} within the 
+sub-system directory:
+
+\small
+\begin{verbatim}
+   $ SET DEF IRA_DIR
+   $ @BUILD
+\end{verbatim}
+\normalsize
+
+The {\small VMS} system is based on the use of sharable images (following
+the guide lines in SSN/8), and so the applications do not need to be re-linked 
+in order for the modified utility routines to take effect.
+
+\section{Adding a new Utility Routine}
+\begin{enumerate}
+\item The new routines should be thoroughly tested and checked for conformity 
+with the conventions described in SUN/165 before adding them to the
+utility libraries stored in the master version of {\small IRAS90}. 
+
+\item {\small PROLAT} (SUN/110) should be used to generate {\small LATEX}
+documentation describing the user-callable routines (i.e. not any internal
+routines). The documentation should be put through a spelling checker, and any
+spelling mistakes should be corrected in the fortran source file {\em as well}
+as the {\small .TEX} file. The corrected {\small .TEX} file should then be
+included in the ``{\small ID}'' document describing the utility library. Other
+sections in the document should be updated to take account of the new routines
+(eg alphabetical and classified lists of subroutines, etc). The changes made to 
+the utility library should be recorded in the final section of the appendix of 
+the {\small ID} document.
+
+\item Store the new source files in the master versions of the package's {\small
+VMS} text library and {\small UNIX} archive file. 
+
+\item On {\small VMS} systems only, use {\small PROHLP} (SUN/110) to generate 
+help modules from the new user-callable routines, and insert these help modules 
+into the utility package help library:
+
+\small
+\begin{verbatim}
+   $ PROHLP IRA_NEWR1.FOR IRA_NEWR1.HLP ATASK=F
+   $ PROHLP IRA_NEWR2.FOR IRA_NEWR2.HLP ATASK=F
+     ... 
+     (etc for all new user-callable routines)
+     ...
+   $ LIB IRA.HLB IRA_NEWR1.HLP
+   $ LIB IRA.HLB IRA_NEWR2.HLP
+     ... 
+     (etc for all new user-callable routines)
+     ... 
+\end{verbatim}
+\normalsize
+
+\item On {\small VMS} systems only, use {\small PROPAK} (SUN/110) to generate a
+new package definition file for use with {\small STARLSE}. Extract all the
+{\small .FOR} files containing the user callable routines (including the new
+ones) into an otherwise empty directory, and then do the following (using 
+{\small IRA} as an example):
+
+\small
+\begin{verbatim}
+   $ PROPAK IRA_*.FOR IRA.LSE IRA IRA_DIR:IRA.HLB
+\end{verbatim}
+\normalsize
+
+The last parameter is the name of the help library describing the utility
+package. This help library should already exist and should contain help on the
+new user-callable routines. 
+
+\item Modify the {\small VMS} file {\small BUILD\_LIBRARY.COM} stored in the 
+utility package sub-directory to include the new routines (user-callable {\em 
+and} internal).
+
+\item Modify the {\small VMS} file {\small BUILD\_IMAGE.MAR} stored in the
+utility package sub-directory to include any new user-callable routines which do
+not make any internal calls to any {\small ADAM} parameter system routines.
+Note, new routines should be added to the {\em end} of the list to avoid
+altering the transfer vectors for any existing routines. 
+
+\item Modify the {\small VMS} file {\small BUILD\_IMAGE\_ADAM.MAR} stored in the
+utility package sub-directory to include {\em all} new user-callable routines
+(including those which make internal calls to {\small ADAM} parameter system
+routines). Note, new routines should be added to the {\em end} of the list to
+avoid altering the transfer vectors for any existing routines. 
+
+\item Modify the {\small UNIX} file {\bf makefile} stored in the
+utility package archive file:
+
+\begin{itemize}
+\item Add all new routine names to the list assigned to the macro {\small ROUTINES}. 
+The routine names should be terminated with a period.
+
+\item Add descriptions of all include file dependencies in the new files to the 
+long list at the end of the makefile.
+
+\item Ensure that all include files referenced by the new routines have 
+corresponding targets of the form:
+
+\small
+\begin{verbatim}
+   MSG_PAR:       $(STAR_INC)/msg_par;      $(SYM_LINK)
+\end{verbatim}
+\normalsize
+
+\item Ensure that all include files are contained within the specification of 
+macro {\small INCLUDE\_LINKS}.
+
+\end{itemize}
+
+\item Check to see if the new routines need to be linked against any libraries 
+not already referenced by other routines. The following files should be checked 
+and any new libraries included in them ({\small IRA} is used as an example):
+
+\begin{itemize}
+\item {\small IRA\_DIR:BUILD\_IMAGE.COM ( VMS )}
+\item {\small IRA\_DIR:BUILD\_IMAGE\_ADAM.COM ( VMS )}
+\item {\bf ira\_link} ({\small UNIX})
+\item {\bf ira\_link\_adam} ({\small UNIX})
+\end{itemize}
+
+The {\small UNIX} files should be extracted from the relevant archive files (eg
+first get {\bf ira.a} out of {\bf iras90.a} and then get {\bf ira\_link} out of
+{\bf ira.a}) and should be replaced when modified (remembering to put {\bf 
+ira.a} back into {\bf iras90.a}). 
+
+Note, if new routines are being added to the {\small IRM} library then the first
+two {\small VMS} files should be replaced by {\small IRM\_LINK.OPT} and {\small
+IRM\_LINK\_ADAM.OPT}. This is because {\small IRM} is stored as an object
+library, whereas all other utility packages are stored as sharable images. 
+
+\item Re-build the package following the instructions in section \ref{SEC:UT}.
+
+\item Changes to utility packages should be recorded in the ``system maintenance log
+file'' so that the current state of the system (compared with the released
+system) can always be determined. 
+\end{enumerate}
+
+\section{Preparing a Release}
+User opinion seems to be that Starlink-wide releases should not be made too
+frequently, as it makes the users feel that ``the ground is constantly moving
+under their feet''. It has been suggested that releases be made about once every
+six months, although obviously it is sometimes necessary to do so more
+frequently than this.
+
+When a release is ready, a mail message should be sent to RLVAD::STAR giving the 
+following information:
+
+\begin{itemize}
+\item Why is the release being made? The ``system maintenance log file'' should 
+contain a list of all the changes that have been made to the system since the 
+last release, and so can be used to answer this question.
+\item The location of the modified Latex files containing the up-to-date 
+Starlink User Notes. Make sure that the changes introduced in the new release 
+have been incorporated in the documentation.
+\item The location of a compressed {\bf tar} file containing the source files
+for the {\small UNIX} system. This can be generated by changing directory to the
+source directory and then issuing the following commands: 
+
+\small
+\begin{verbatim}
+   % setenv SYSTEM mips
+   % setenv EXPORT $HOME
+   % mk export_source
+\end{verbatim}
+\normalsize
+
+This produces a compressed {\bf tar} file in your login directory called
+{\bf iras90.tar.Z} (this assumes you are working on a DECstation. If you are
+working on a {\small SUN} then ``mips'' should be replaced by ``sun4'').
+\item The location of a backup save-set containing the built {\small VMS} 
+system. This can be generated by setting the default directory to the master 
+source directory, and then issuing the commands:
+
+\small
+\begin{verbatim}
+   $ BACKUP/LOG [...] SYS$SCRATCH:IRAS90.BCK/SAVE
+   $ LZCMP -v SYS$SCRATCH:IRAS90.BCK SYS$SCRATCH:IRAS90_LZCMP.BCK
+   $ DEL IRAS90.BCK;*
+\end{verbatim}
+
+This creates the compressed save-set {\small SYS\$SCRATCH:IRAS90\_LZCMP.BCK},
+which can be uncompressed using the {\small LZDCM} command. 
+\item A new version of the file {\small SSC:ADAM\_PACKAGES.RNH} which includes a
+summary of each {\small IRAS90} application for use in {\small ICL}.
+\end{itemize}
+
+
+\end{document}

@@ -1,0 +1,228 @@
+#+
+#  Name:
+#     SKYBOX.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-FEB-1993 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface SKYBOX
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter BOXSIZE             # Box dimensions in arcmins or pixels
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  !
+      prompt   'Dimensions of box in arc-minutes or pixels'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LAT          # Sky latitude at box centre
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky latitude at box centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LON          # Sky longitude at box centre
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky longitude at box centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_XY           # Image coordinates at box centre
+      type     _REAL
+      access   READ
+      ppath    'CURRENT'
+      prompt   'Pixel coordinates (X,Y) at box centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CLEAR		 # Clear graphic surface flag
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  NO
+      prompt   'Clear the graphics window?'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DYNAMIC,DEFAULT '
+      ppath    'GLOBAL,DYNAMIC,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter COSYS		 # Type of coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'SKY'
+      prompt   'Type of coordinate system to use'
+      helpkey  '*'
+   endparameter
+
+   parameter CURSOR		 # True if cursor to be used
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  YES
+      prompt   'Should positions be given using the cursor?'
+      helpkey  '*'
+   endparameter
+
+  parameter DEVICE		 # Graphic device
+      position 1
+      ptype     'DEVICE'
+      vpath    'GLOBAL,PROMPT '
+      ppath    'GLOBAL,CURRENT '
+      association <-GLOBAL.IMAGE_OVERLAY
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Displayed NDF.
+      position 2
+      type     NDF
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      default  !
+      prompt   'The NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LAT1               # Sky latitude at a box corner
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky latitude at a box corner'
+      helpkey  '*'
+   endparameter
+
+   parameter LON1               # Sky longitude at a box corner
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky longitude at a box corner'
+      helpkey  '*'
+   endparameter
+
+   parameter LAT2               # Sky latitude at a box corner
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky latitude at opposite box corner'
+      helpkey  '*'
+   endparameter
+
+   parameter LON2               # Sky longitude at a box corner
+      type     LITERAL
+      access   UPDATE
+      ppath    'CURRENT'
+      prompt   'Sky longitude at opposite box corner'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OUTLINE		 # True if outline of box to be drawn
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC'
+      prompt   'Is the outline of the box to be drawn?'
+      helpkey  '*'
+   endparameter
+
+   parameter PEN		 # Pen number 
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'CURRENT,DEFAULT'
+      ppath    'CURRENT,DEFAULT'
+      default  2
+      prompt   'Pen number used to write text'
+      helpkey  '*'
+   endparameter
+
+   parameter PIC		 # True if picture to be added to database
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  NO
+      prompt   'Should a new picture be stored in the graphics database?'
+      helpkey  '*'
+   endparameter
+
+   parameter PICLAB		 # Label for new AGI picture
+      type     LITERAL
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  !
+      prompt   'A label to store with the new picture'
+      helpkey  '*'
+   endparameter
+
+   parameter PICNAM		 # Name for new AGI picture
+      type     LITERAL
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'DATA'
+      prompt   'A name to store with the new picture'
+      helpkey  '*'
+   endparameter
+
+   parameter XY1                # Image coordinates at a box corner
+      type     _REAL
+      access   READ
+      ppath    'CURRENT'
+      prompt   'Pixel coordinates (X,Y) at a box corner'
+      helpkey  '*'
+   endparameter
+
+   parameter XY2                # Image coordinates at a box corner
+      type     _REAL
+      access   READ
+      ppath    'CURRENT'
+      prompt   'Pixel coordinates (X,Y) at opposite box corner'
+      helpkey  '*'
+   endparameter
+
+endinterface

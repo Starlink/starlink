@@ -1,0 +1,39 @@
+*+
+*  Name:
+*     TRA_COM
+
+*  Purpose:
+*     Define common blocks used by application IRASTRACE.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This module defines the common blocks used to pass information
+*     between the A-Task routine IRASTRACE and the subroutine TRACA0
+*     which displays each line of text.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-OCT-1992 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global Variables:
+      INTEGER TRA_FD             ! File descriptor for log file.
+      INTEGER TRA_FILT           ! Current message filter level.
+      LOGICAL TRA_LOG            ! True if output is to be logged to a
+                                 ! text file.
+      INTEGER TRA_NBL            ! Number of leading blanks to add to
+                                 ! the text to be displayed.
+
+      COMMON /TRA_COM/ TRA_FD, TRA_LOG, TRA_NBL, TRA_FILT
+      

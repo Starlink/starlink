@@ -1,0 +1,263 @@
+#+
+#  Name:
+#     SKYPOS.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-JAN-1993 (DSB):
+#     	 Original version.
+#     1-OCT-1993 (DSB):
+#        Parameter INSIDE added.
+#     {enter_changes_here}
+
+#-
+
+interface SKYPOS
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE		 # Graphic device
+      ptype     'DEVICE'
+      vpath    'GLOBAL,PROMPT '
+      ppath    'GLOBAL,CURRENT '
+      association <-GLOBAL.GRAPHICS_DEVICE
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter EPOCH
+      type     _DOUBLE
+      access   READ
+      vpath    'PROMPT'
+      ppath    'DYNAMIC,CURRENT'
+      prompt   'Julian epoch of observations'
+      helpkey  '*'
+   endparameter
+
+   parameter FILE               # The input text file.
+      type     FILENAME
+      access   READ
+      vpath    'PROMPT'
+      prompt   'A text file containing input coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Input NDF.
+      type     NDF
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'GLOBAL '
+      default  !
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The NDF to which image coordinates refer'
+      helpkey  '*'
+   endparameter
+
+   parameter INSIDE              # Last position inside the NDF?
+      type     _LOGICAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'A dummy value to be replaced by the value of parameter INSIDE'
+      helpkey  '*'
+   endparameter
+
+   parameter INVERSE
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'Is an inverse transformation to be performed?'
+      helpkey  '*'
+   endparameter
+
+   parameter LAT          # Sky latitude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      prompt   'Sky latitude'
+      helpkey  '*'
+   endparameter
+
+   parameter LATOUT              # Last latitude value displayed.
+      type     _CHAR
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'xxxxxxxxxxxxxxxxxxx'
+      prompt   'A dummy value to be replaced by the value of parameter LATOUT'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE             # The log file.
+      type     FILENAME
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'A log file for storing displayed information'
+      helpkey  '*'
+   endparameter
+
+   parameter LON          # Sky longitude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      prompt   'Sky longitude'
+      helpkey  '*'
+   endparameter
+
+   parameter LONOUT              # Last longitude value displayed.
+      type     _CHAR
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'xxxxxxxxxxxxxxxxxxx'
+      prompt   'A dummy value to be replaced by the value of parameter LONOUT'
+      helpkey  '*'
+   endparameter
+
+   parameter LOOP
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'Are multiple operations to be performed?'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE		 # Mode of operation.
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT '
+      default  'CURSOR'
+      prompt   'Source of input coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OPTION 		 # Mode of operation.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      prompt   'Next operation'
+      helpkey  '*'
+   endparameter
+
+   parameter ORIENT            # Last orientation displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter ORIENT'
+      helpkey  '*'
+   endparameter
+
+   parameter PEN
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  3
+      prompt   'SGS pen number for graphics'
+      helpkey  '*'
+   endparameter
+
+   parameter PIXSIZE            # Last pixel dimensions displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0,0.0
+      prompt   'A dummy value to be replaced by the value of parameter PIXSIZE'
+      helpkey  '*'
+   endparameter
+
+   parameter PLOT		 # Type of graphics.
+      type     LITERAL
+      access   READ
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC '
+      prompt   'Type of graphics to mark cursor positions'
+      helpkey  '*'
+   endparameter
+
+   parameter SINGLE
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'Should the application exit after a single position?'
+      helpkey  '*'
+   endparameter
+
+   parameter X
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      prompt   'X image coordinate'
+      helpkey  '*'
+   endparameter
+
+   parameter XOUT              # Last X value displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter XOUT'
+      helpkey  '*'
+   endparameter
+
+   parameter Y
+      type     _REAL
+      access   READ
+      vpath    'PROMPT'
+      prompt   'Y image coordinate'
+      helpkey  '*'
+   endparameter
+
+   parameter YOUT              # Last Y value displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter YOUT'
+      helpkey  '*'
+   endparameter
+
+ endinterface

@@ -1,0 +1,188 @@
+#+
+#  Name:
+#     SKYALIGN.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     16-FEB-1993 (DSB):
+#     	 Original version.
+#     1-OCT-1993 (DSB):
+#        Suggested default for REF set to null value !
+#     {enter_changes_here}
+
+#-
+
+interface SKYALIGN
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter ACC                 # Positional accuracy.
+      type     _REAL
+      ppath    'DEFAULT '
+      vpath    'DEFAULT '
+      default  0.5
+      prompt   'Positional accuracy in pixels'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LAT          # Sky latitude of map centre.
+      type     LITERAL
+      prompt   'Sky latitude at projection centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LON          # Sky longitude of map centre.
+      type     LITERAL
+      prompt   'Sky longitude at projection centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_XY          # Image coordinates at map centre.
+      type     _REAL
+      ppath    'DEFAULT '
+      vpath    'DEFAULT '
+      default   0,0
+      prompt   'Image coordinates at projection centre'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter EPOCH
+      type     _DOUBLE
+      ppath    'DEFAULT '
+      default  1983.5
+      prompt   'Julian epoch of observations'
+      helpkey  '*'
+   endparameter
+
+   parameter HISTORY		 # True if HISTORY required in the output.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Input images.
+      position 1
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The input images'
+      helpkey  '*'
+   endparameter
+
+   parameter METHOD 		 # Interpolation method
+      type     LITERAL
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'NEAREST'
+      prompt   'Interpolation method'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining created
+      type     NDF    		 # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving sucessfully created output NDFs'
+   endparameter
+
+   parameter ORIENT		 # Orientation of output map.
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0.0
+      prompt   'Position angle of the second image axis (the "Y axis")'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # Output NDFs.
+      position 5
+      type     NDF
+      access   WRITE
+      prompt   'Output images'
+      helpkey  '*'
+   endparameter
+
+   parameter PIXSIZE             # Pixel dimensions in arcmins.
+      type     _REAL
+      access   READ
+      prompt   'Output pixel dimensions in arc-minutes'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJTYPE		 # Projection type.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'GNOMONIC'
+      prompt   'The map projection to use'
+      helpkey  '*'
+   endparameter
+
+   parameter REF                 # Reference image.
+      position 2
+      type     NDF
+      access   READ
+      ppath    'DEFAULT '
+      default  !
+      prompt   'The reference image'
+      helpkey  '*'
+   endparameter
+
+   parameter XY1                 # Bottom left corner.
+      position 3
+      type     _INTEGER
+      access   READ
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Pixel indices of the bottom left corner of the output images'
+      helpkey  '*'
+   endparameter
+
+   parameter XY2                 # Top right corner.
+      position 4
+      type     _INTEGER
+      access   READ
+      ppath    'DEFAULT '
+      default  !
+      prompt   'Pixel indices of the upper right corner of the output images'
+      helpkey  '*'
+   endparameter
+
+endinterface

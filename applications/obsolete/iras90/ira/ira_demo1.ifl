@@ -1,0 +1,85 @@
+#+
+#  Name:
+#     IRA_DEMO1.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-Jan-1991 (DSB):
+#        Original version.
+#     2-MAY-1991 (DSB);
+#        Modified for IRA version 2.
+#     {enter_changes_here}
+
+#-
+
+interface IRA_DEMO1
+
+   helplib ' '
+
+   parameter SCS
+      type     LITERAL
+      access   UPDATE
+      prompt   'Sky Coordinate System'
+   endparameter
+
+   parameter OUT
+      type     NDF
+      access   WRITE
+      prompt   'Output NDF'
+   endparameter
+
+   parameter PROJ
+      type     LITERAL
+      access   UPDATE
+      prompt   'Projection name'
+   endparameter
+
+   parameter ACENTRE
+      type     LITERAL
+      access   READ
+      prompt   'Sky longitude of image centre'
+   endparameter
+
+   parameter BCENTRE
+      type     LITERAL
+      access   READ
+      prompt   'Sky latitude of image centre'
+   endparameter
+
+   parameter SQUARE
+      type     _DOUBLE
+      access   READ
+      prompt   'Patch dimensions, in degrees'
+   endparameter
+
+   parameter SIZE
+      type     _DOUBLE
+      access   READ
+      prompt   'Image dimensions, in degrees'
+   endparameter
+
+   parameter ORIENT
+      type     _DOUBLE
+      access   READ
+      prompt   'Image Y axis position angle, in degrees'
+   endparameter
+
+   parameter TILT
+      type     _DOUBLE
+      access   READ
+      prompt   'Tilt to apply to celestial sphere before projection, in degrees'
+   endparameter
+
+   parameter PIXSIZE
+      type     _DOUBLE
+      access   READ
+      prompt   'Pixel dimensions, in degrees'
+   endparameter
+
+endinterface

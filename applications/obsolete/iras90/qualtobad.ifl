@@ -1,0 +1,87 @@
+#+
+#  Name:
+#     QUALTOBAD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     27-SEP-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface QUALTOBAD
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter HISTORY		 # True if HISTORY required in the
+				 # output NDFs.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Input NDFs.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'Input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining created
+      type     NDF    		 # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving sucessfully created output NDFs'
+   endparameter
+
+   parameter OUT                 # Output NDFs.
+      position 2
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter QEXP                # Quality expression.
+      position 3
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'ANY'
+      association <->GLOBAL.QUALITY_EXP
+      prompt   'Quality expression'
+      helpkey  '*'
+   endparameter
+
+endinterface

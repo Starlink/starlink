@@ -1,0 +1,237 @@
+#+
+#  Name:
+#     MAPCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-NOV-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface MAPCRDD
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter BOXSIZE             # Map dimensions in arcmins.
+      position 5
+      type     _REAL
+      access   READ
+      vpath    'PROMPT,DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'Dimensions of output image in arc-minutes'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LAT          # Sky latitude of map centre.
+      position 4
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Sky latitude at image centre'
+      helpkey  '*'
+   endparameter
+
+   parameter CENTRE_LON          # Sky longitude of map centre.
+      position 3
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Sky longitude at image centre'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter EXCLUDE		 # Detectors to exlude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'SMALL'
+      prompt   'A set of detectors to exclude from the map'
+      helpkey  '*'
+   endparameter
+
+   parameter FWHM       	 # Cross- and in-scan FWHMs of Gaussian weighting function.
+      type     _REAL
+      access   READ
+      vpath    'DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'Cross- and in- scan FWHMs of Gaussian weighting function (arc-minutes)'
+      helpkey  '*'
+   endparameter
+
+   parameter GAUSSIAN		 # True if Gaussian weighting required.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  TRUE
+      prompt   'True if Gaussian weighting is to be used'
+      helpkey  '*'
+   endparameter
+
+   parameter HISTORY		 # True if HISTORY required in the output.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Input CRDD files.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The input CRDD files'
+      helpkey  '*'
+   endparameter
+
+   parameter INCLUDE		 # Detectors to inlude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'The set of detectors to include in the map'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter ORIENT		 # Orientation of output map.
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0.0
+      prompt   'Position angle of the second image axis (the "Y axis")'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # The NDF containing the output map.
+      position 6
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'The output NDF containing the mapped CRDD'
+      helpkey  '*'
+   endparameter
+
+   parameter PIXSIZE             # Pixel dimensions in arcmins.
+      position 2
+      type     _REAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Output pixel dimensions in arc-minutes'
+      helpkey  '*'
+   endparameter
+
+   parameter PROJTYPE		 # Projection type.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'GNOMONIC'
+      prompt   'The map projection to use'
+      helpkey  '*'
+   endparameter
+
+   parameter QEXP                # Quality expression defining data to
+				 # be included in the output map.
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'ANY'
+      association ->GLOBAL.QUALITY_EXP
+      prompt   'Quality expression specifying usable CRDD'
+      helpkey  '*'
+   endparameter
+
+   parameter SECSIZE		 # Cross- and in- scan sizes of a sector.
+      type     _REAL
+      access   READ
+      vpath    'DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'Cross- and in- scan sizes of a "sector" in arc-miutes'
+      helpkey  '*'
+   endparameter
+
+   parameter TITLE		 # Title for output NDF.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC,DEFAULT '
+      ppath    'DYNAMIC,DEFAULT '
+      default  'Output from MAPCRDD'
+      prompt   'Title for output map'
+      helpkey  '*'
+   endparameter
+
+   parameter UNITS 		 # Units of output image.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'MJy/sr'
+      prompt   'Units for the output image'
+      helpkey  '*'
+   endparameter
+
+   parameter VAROUT		 # Type of output variances required.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC'
+      ppath    'DYNAMIC'
+      prompt   'Type of output VARIANCE values required'
+      helpkey  '*'
+   endparameter
+
+   parameter WEIGHT		 # True if each sample is given a 
+                                 # varying weight dependant on its 
+                                 # variance.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'True if more accurate samples are to be given greater weight'
+      helpkey  '*'
+   endparameter
+
+endinterface

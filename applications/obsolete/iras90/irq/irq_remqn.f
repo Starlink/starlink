@@ -1,0 +1,141 @@
+      SUBROUTINE IRQ_REMQN( LOCS, QNAME, STATUS )
+*+
+*  Name:
+*     IRQ_REMQN
+
+*  Purpose:
+*     Remove the definition of a specified quality name.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL IRQ_REMQN( LOCS, QNAME, STATUS )
+
+*  Description:
+*     The specified quality name is removed from the NDF specified
+*     by LOCS. Any associated bit in the QUALITY array is freed for
+*     future use. If the name is not defined an error is reported.
+*     A value of ANY for the quality names causes all defined quality
+*     names to be removed.
+*
+*     Note, an error is reported if only read access is available to the
+*     NDF.
+
+*  Arguments:
+*     LOCS(5) = CHARACTER * ( * ) (Given)
+*        An array of 5 HDS locators. These locators identify the NDF
+*        and the associated quality name information.  They should have
+*        been obtained using routine IRQ_FIND or routine IRQ_NEW.
+*     QNAME = CHARACTER * ( * ) (Given)
+*        The quality name to remove, or 'ANY' if all quality names are
+*        to be removed.
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     25-JUL-1991 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'          ! DAT__ constants
+      INCLUDE 'IRQ_PAR'          ! IRQ constants.
+      INCLUDE 'IRQ_ERR'          ! IRQ error values.
+
+*  Arguments Given:
+      CHARACTER LOCS(5)*(*)
+      CHARACTER QNAME*(*)
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER BIT                ! Bit in QUALITY component
+                                 ! corresponding to the supplied quality
+                                 ! name (if FIXED is false).
+      CHARACTER COMMNT*(IRQ__SZCOM)! Descriptive comment stored with
+                                 ! quality name.
+      INTEGER FIRST              ! Position of first non-blank character
+      LOGICAL FIXED              ! true if quality doesn't vary from
+                                 ! pixel to pixel.
+      INTEGER INDF               ! Identifier for the NDF containing the
+                                 ! quality names information.
+      INTEGER LAST               ! Position of last non-blank character.
+      INTEGER LUSED              ! Last used slot number.
+      CHARACTER LQNAME*(IRQ__SZQNM) ! Upper case copy of quality name.
+      INTEGER SLOT               ! Index into the QUAL structure at
+                                 ! which the name was found.
+      LOGICAL VALUE              ! True if quality is held by all
+                                 ! pixels. False if no pixels hold the
+                                 ! quality. Indeterminate if FIXED is
+                                 ! false.
+      LOGICAL WRITE              ! True if write access is available to
+                                 ! the NDF.
+
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Obtain the NDF identifier from LOCS, and check it is still valid.
+      CALL IRQ1_INDF( LOCS, INDF, STATUS )
+
+*  Check that write access is available to the NDF.
+      CALL NDF_ISACC( INDF, 'WRITE', WRITE, STATUS )
+      IF( .NOT. WRITE ) THEN
+         STATUS = IRQ__NOWRT
+         CALL ERR_REP( 'IRQ_REMQN_ERR1',
+     :   'IRQ_REMQN: Write access is not available to the NDF.',
+     :   STATUS )
+      END IF
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Produce an uppercase copy of the supplied quality name, exluding
+*  leading blanks.
+      CALL CHR_FANDL( QNAME, FIRST, LAST )
+      LQNAME = QNAME( FIRST : LAST )
+      CALL CHR_UCASE( LQNAME )
+
+*  If the name is "ANY" attempt to remove all slots.
+      IF( LQNAME .EQ. 'ANY' ) THEN
+         CALL DAT_GET0I( LOCS(3), LUSED, STATUS )
+         DO SLOT = 1, LUSED
+            CALL IRQ1_RESET( LOCS, SLOT, STATUS )
+         END DO
+
+*  If a single quality name is to be deleted, search for the supplied
+*  name.
+      ELSE
+         CALL IRQ1_SEARC( LOCS, LQNAME( : LAST - FIRST + 1 ), FIXED,
+     :                    VALUE, BIT, COMMNT, SLOT, STATUS )
+
+*  Reset the slot containing the supplied quality name.
+         CALL IRQ1_RESET( LOCS, SLOT, STATUS )
+
+      END IF
+
+*  If an error occur, give context information.
+ 999  CONTINUE
+      IF( STATUS .NE. SAI__OK ) THEN
+         CALL NDF_MSG( 'NDF', INDF )
+         CALL MSG_SETC( 'QN', QNAME )
+         CALL ERR_REP( 'IRQ_REMQN_ERR2',
+     :  'IRQ_REMQN: Unable to remove quality name ^QN from NDF ^NDF',
+     :                  STATUS )
+      END IF
+
+      END

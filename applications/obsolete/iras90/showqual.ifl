@@ -1,0 +1,65 @@
+#+
+#  Name:
+#     SHOWQUAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     26-SEP-1991 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface SHOWQUAL
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter COUNT               # True if pixel count required.
+      position 2
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  NO
+      prompt   'Is a count of pixels holding each quality required?'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Input NDFs.
+      position 1
+      type     NDF
+      access   READ 
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The input NDFs'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining accessed
+      type     NDF               # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving processed NDFs'
+   endparameter
+
+endinterface

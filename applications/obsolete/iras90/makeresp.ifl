@@ -1,0 +1,54 @@
+#+
+#  Name:
+#     MAKERESP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-OCT-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface MAKERESP
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter BAND                 # Wavelength of required band.
+      position 2
+      type     _INTEGER
+      access   READ
+      vpath    'PROMPT,DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'Wavelength of required IRAS survey band, in microns'
+      helpkey  '*'
+   endparameter
+
+   parameter HISTORY		 # True if HISTORY required in the output.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter OUT                 # The output NDF.
+      position 1
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'The output NDF'
+      helpkey  '*'
+   endparameter
+
+endinterface

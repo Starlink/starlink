@@ -1,0 +1,59 @@
+*  Parameter values used in IRC:
+*  (Note, I90_DAT must be included before this file)
+
+      CHARACTER IRC__CNAME*9  ! Name of CRDD_INFO component.
+      CHARACTER IRC__DNAME*7  ! Name of DETAILS component.
+      CHARACTER IRC__J*2      ! Units - JY
+      CHARACTER IRC__JPS*5    ! Units - JY/SR
+      CHARACTER IRC__GOING*9  ! Message to indicate that IRC is going.
+      CHARACTER IRC__F*9      ! Units - pW/(M**2)
+      CHARACTER IRC__FPS*12   ! Units - (pW/M**2)/SR
+      CHARACTER IRC__MJPS*6   ! Units - MJY/SR
+      CHARACTER IRC__SNAME*12 ! Name of SUPPORT_INFO component.
+      CHARACTER IRC__STOPT*9  ! Mesaage to indicate that IRC is stopped.
+      CHARACTER IRC__XNAME*4  ! Name of IRAS NDF extension.
+
+      DOUBLE PRECISION IRC__DTOR ! Degrees to radians conversion factor.
+      DOUBLE PRECISION IRC__PI   ! Pi
+      DOUBLE PRECISION IRC__PIBY2! Pi/2
+      DOUBLE PRECISION IRC__RTOD ! Radians to degrees conversion factor.
+
+      INTEGER   IRC__MAX      ! Max no. of  CRDD files which can be
+                              ! simultaneously accessed by IRC.
+      INTEGER   IRC__MXD2S    ! Max size of NDF 2nd dimension.
+      INTEGER   IRC__NOID     ! An invalid IRC identifier.
+      INTEGER   IRC__SZLAB    ! Max size of a legal LABEL value.
+      INTEGER   IRC__SZLLS    ! Size of character string required to
+                              ! hold list of legal LABEL values.
+      INTEGER   IRC__SZSTA    ! Size of character string IRC__GOING.
+      INTEGER   IRC__SZULS    ! Size of character string required to
+                              ! hold list of legal UNITS values.
+      INTEGER   IRC__SZUNI    ! Max size of a legal UNITS value.
+
+      PARAMETER (
+     : IRC__CNAME  = 'CRDD_INFO',
+     : IRC__DNAME  = 'DETAILS',
+     : IRC__DTOR   = 1.74532925199432957692D-2,
+     : IRC__F      = 'pW/(M**2)',
+     : IRC__FPS    = '(pW/M**2)/sr',
+     : IRC__GOING  = 'IRC GOING',
+     : IRC__J      = 'Jy',
+     : IRC__JPS    = 'Jy/sr',
+     : IRC__MAX    = 100,
+     : IRC__MJPS   = 'MJy/sr',
+     : IRC__MXD2S  = I90__MAXDT,
+     : IRC__NOID   = 0,
+     : IRC__PI     = 3.14159265358979323846D0,
+     : IRC__PIBY2  = 1.57079632679489661923D0,
+     : IRC__RTOD   = 5.72957795130823208768D1,
+     : IRC__SNAME  = 'SUPPORT_INFO',
+     : IRC__STOPT  = 'STOPPED',
+     : IRC__SZLAB  = 11 )
+
+
+      PARAMETER (
+     : IRC__SZLLS  = 11,
+     : IRC__SZSTA  = 9,
+     : IRC__SZULS  = 38,
+     : IRC__SZUNI  = 15,
+     : IRC__XNAME  = 'IRAS')

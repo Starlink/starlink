@@ -1,0 +1,570 @@
+*+
+*  Name:
+*     IRCOMN
+
+*  Purpose:
+*     Defines the Common blocks used in IRFIND. 
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*  
+*     This routine provides the common blocks used by IRFIND.
+*
+*     The notes section of the prolog describes:-
+*     The contents of the common blocks and how the data is entered
+*     into them.
+*     The contents of the output HDS file for EXCRDD and what data is
+*     needed to set this up.
+*     A summary of the processing carried out on each of the common
+*     blocks by each of the sections of IRASFIND
+*     
+*  Notes:
+*     IRASFIND uses three kinds of common records
+*        Source common records
+*        Scan common records
+*        Plate common records
+*  
+*     SOURCE COMMON
+*     There is one source common record for each source the user
+*     currently has in his source list.
+*     
+*     Source Common records contain details of
+*        1. The source name, and title.
+*        2. The source position in both the coordinate system in
+*        which it was entered, and in Equatorial(B1950), together
+*        with the name of the coordinate system in which the source was
+*        entered. The source position in users coordinate system is
+*        tidied to a normalised uniform output format.
+*        3. The region size and waveband requirements associated with
+*        the source.
+*        4. A flag to denote whether the source should be deleted
+*        from further processing.
+*        5. A pointer between the source and the plate common record
+*        for the plate from which EXCRDD will extract the data for the
+*        source.
+*        6. The number of scans for this source and a pointer for each
+*        scan to the position of the scan record in scan common.
+*        
+*     Items 1. and 2. are input by the user, or generated from his input
+*     data in the Input position option. Item 4, the delete source flag,
+*     is also used during deleting sources in this option. Item 3. data
+*     are input by the user in the add size and wavebands section of the
+*     Find survey data option. Item 4, the delete source flag, is used
+*     if the source is found to have insufficient data and yet
+*     processing of the remaining sources is to continue. Item 5. is
+*     set up during the find plate section of the Find survey data
+*     option. Item 6. is set up during the find scans section of the
+*     Find survey data option. 
+*
+*     SCAN COMMON
+*     There is one scan common record for each scan the program
+*     generates. In the Find survey data option the program looks at
+*     each source in source common that does not have its source
+*     should be deleted flag set true, and generates a scan record for
+*     each observation that comes close enough to the source position
+*     to be crossing its required region.
+*
+*     Scan common records contain details of
+*        1. A pointer to the associated source common record.
+*        2. Scan SOP and Observation number.
+*        3. Scan start and end time in UTCS.
+*        4. Scan cross scan value, ie an estimate of the distance
+*        between the nearest point on the scan and the source.
+*        5. Scan angle theta, and data for Satcal time, psi, and solar
+*        longitude at the start, end, and nearest point of the scan.
+*        6. Scan required flag (for future use).
+*        7. A pointer to the next scan record in scan common. A linked
+*        list of scans is formed to give Scans in start UTCS time order,
+*        and this pointer points to the next scan in this list.
+*        8. A scan overlap flag. This is set if the next scan's start
+*        time preceeds this scans end time, ie data overlap.
+*        9. Estimated size of output files from EXCRDD for this scan
+*        (for future use).
+*        10. A pointer to an index list of sources for this plate.
+*
+*     Items 1. to 5. are generated in the find scan section of the Find
+*     survey data option, and items 7. 8. and 10. are generated in the
+*     make output file section. Items 6. and 9. are at present unused
+*     but are reserved for future modifications to IRASFIND. Item 5. is
+*     prepared for drawing maps of the positions covered by the scan,
+*     again a future development of IRASFIND.
+*
+*     PLATE COMMON
+*     There is one plate record for each plate from which EXCRDD will
+*     extract data. If two or more source positions are found to lie
+*     within a plate boundary only one plate record is created and both
+*     sources data are associated with that plate.
+*     ( A future expansion of IRASFIND will allow a user to break a
+*     plate into two or more sub plates if he finds that too much
+*     EXCRDD data would be generated in one go for his file quota to
+*     handle. In this case two plate records will be generated and
+*     sources would be assigned to one or other of these subplates)
+*
+*     Plate common records contain details of
+*        1. Plate number.
+*        2. Sub plate identifier (for future use).
+*        3. Identifier of tape on which plate is too be found, and
+*        position of plate on tape.
+*        4. Indicator of whether the plate is north pole, south pole, or
+*        other.
+*        5. Plate boundaries given in Equatorial(B1950) in radians.
+*        6. The number of sources associated with this plate and a
+*        pointer to each source record in source common.
+*        7. The number of scans for the plate.
+*        8. A pointer to the first scan in the list sorted by UTCS start
+*        time.
+*
+*     Items 1. to 6. are generated in find plate section of the Find
+*     survey data option. Item 8. is generated in the make output file
+*     section of the Find survey data option.
+*
+*     OUTPUT HDS FILES
+*     One output HDS file is prepared for each plate record in plate
+*     common which contains some required scans. The HDS file is used to
+*     communicate the start and end times for each scan required from
+*     that plate to EXCRDD together with additional data for source
+*     identification etc.
+*
+*     The output HDS file consists of a top level containing
+*        1. Plate number.
+*        2. Identifier of tape on which plate is too be found.
+*        3. Position of plate on tape.
+*        4. A scan component described below.
+*        5. A source component described below.
+*        6. A history component at present empty.
+*
+*     The scan component consists of one "record" for each scan
+*     consisting of:-
+*        1. Scan's SOP number
+*        2. Scan's Obervation number
+*        3. Scan cross scan value, ie an estimate of the distance
+*        between the nearest point on the scan and the source.
+*        4. Scan start UTCS
+*        5. Scan end UTCS
+*        6. A pointer to the associated source in the source component.
+*        7. The scan overlap flag. This is set if the next scan's start
+*        time preceeds this scans end time, ie data overlap.
+*
+*     The source component consists of one "record" for each source
+*     consisting of:-
+*        1. Source name
+*        2. Source title
+*        3. Source coordinates in the coordinate system in which they
+*        were entered, and the coordinate system description.
+*        4. Source coordinates in Equatorial(B1950) coordinate system
+*        given in radians.
+*        5. Source in-scan and cross-scan size requirements given in
+*        radians.
+*        6. Flags set for each waveband to show whether it is required.
+*
+*     The make output file section of the Find survey data option first
+*     carries out two preprocessing tasks. Firstly since the scans in
+*     the HDS MUST be sorted into start time order this is done using a
+*     linked list technique. Secondly since the sources written to the
+*     HDS file will only be a subset of the complete source list an
+*     index array is generated to show which sources are to be written,
+*     and the data for each scan is augmented with the position of the
+*     associated source in the set of "records" written to the HDS.
+*     Further details of this is given in the MAKE OUTPUT FILE section
+*     below.
+*
+*     Item 1. in the top level of the HDS are obtained from item 1. of
+*     the plate common. 
+*     Items 2. and 3. in the top level of the HDS are obtained from
+*     item 3. of the plate common.
+*
+*     Details for the scan component of the HDS are taken from items 2.
+*     3. 4. 8. and 10. of the scan common.
+*
+*     Details for the source component of the HDS are taken from items
+*     1. to 3. of the source common.
+*     
+*        
+*     OPTION I - INPUT POSITION OPTION.
+*     
+*     The purpose of this option is to add name and position details
+*     for new sources, or to edit these details for existing sources, or
+*     to delete existing sources.
+*     The Input position option uses only the Source common records.
+*
+*     The Input positions option consists of two sections,
+*        Select data to use,
+*        Edit source list,
+*        At the end of edit source list the user can save his source
+*        list to a file.
+*
+*     The select data to use section allows the user to select whether
+*     to start his source list from
+*        1. By reading in a file of sources saved either in a previous
+*        run of IRASFIND or earlier in this IRASFIND session.
+*        2. The list of previously input sources currently available in
+*        the source common.
+*        3. An empty list.
+*
+*     Previously prepared source details can be read in from a file.
+*     The file only contains data for items 1. 2. and 3. described in
+*     Source Common above. Such a file can be prepared at the end of
+*     Input position option, or at the end of the add size and wavebands
+*     portion of the Find survey data option.
+*
+*     The contents of source common when the user selects the currently
+*     available source list depends on what processing he has carried
+*     out previously. If the source list has only been processed through
+*     Input source positions it will only contain data for items 1. and
+*     2. described in Source Common above. If the source list has been
+*     processed through the Find survey data option it will also contain
+*     valid data for item 3. and may contain invalid pointer data which
+*     will be rewritten when the data is processed through this option
+*     again.
+*
+*     If an empty list is selected the source common will be zeroised.
+*
+*     The Edit source list enables the user to
+*       1. Add new sources to the end of the currently used source
+*       common
+*       2. Edit data for sources already in the list.
+*       3. Delete sources in the list, and close up the source common to
+*       leave no gaps.
+*
+*     The details entered, or edited are only the source name, title,
+*     and position data.
+*       
+*     At the end of the Edit source list the source positions can be
+*     stored in a file. Any additional region size and wavebands data
+*     that have been input or retained at the Select data to use stage
+*     will be output to the file.
+*
+*     OPTION S - FIND SURVEY DATA.
+*     The purpose of this option is to add survey data specific
+*     information ie region size and wavebands, find the plate on which
+*     the source data is located, find all the scans which pass near
+*     enough to the source, prepare files for EXCRDD containg details
+*     of the data to be extracted from each plate.
+*     
+*     The Find Survey Data Option uses all three types of common
+*     records: Source, Scan, and Plate records, and prpares output HDS
+*     files.
+*
+*     The first section of the option allows the user to specify the
+*     size of the region and the wavebands he requires, either for all
+*     sources or for sources individually. By the time he leaves this
+*     section all sources should have both a non zero in-scan size and
+*     at least one waveband required this is checked. If any incomplete
+*     source is found the user is offered the option of reentering the
+*     size and wavebands section or continuing. If the user opts to
+*     continue the offending source will be marked 'to be deleted' ie
+*     no further processing will be done on it. The source positions,
+*     with their size and wavebands can then be stored in a file.
+*     
+*     The next section processes each source to find in which archive
+*     plate file the source data is to be found. As each plate is found,
+*     its number is checked against the plate common records, to find
+*     out whether an entry for this plate already exists. If it doesn't
+*     a new plate record is generated. Then, for both new and
+*     previously existing plate records, two way cross references
+*     between the plate record and the source record are set up.
+*
+*     At the end of this subroutine the plate record will have a count
+*     of all the sources found to be on that plate, and a list of the
+*     source record array indices for those sources. Each source record
+*     will contain the plate record array index for its plate.
+*
+*     The plate finding routine will also notify the user if it thinks
+*     some of the source data may fall off the edge of the plate. At the
+*     end of the section, if this has happened the user is offered the
+*     option of returning to the main menu to input dummy sources to
+*     pick up the missing data.
+*
+*     The next section compares the position of the scan track
+*     for each combination of SOP and observation in the SPFARCH file,
+*     with the position of each source. The subroutine sets up a scan
+*     record for each scan found close enough to a source. Two way
+*     cross references between the scan record and the source record
+*     are set up.
+*
+*     At the end of this subroutine the source record will have a
+*     count of all the scans found which are close enough to the source,
+*     and a list of the scan record array indices for those scans. Each
+*     scan record will contain the source record array index for its
+*     source.
+*
+*     MAKING OUTPUT FILES
+*     THe final section of the Find survey data option is to make output
+*     HDS files for EXCRDD.
+*
+*     Each file contains details of all the scans to be extracted from
+*     one plate by EXCRDD.
+*     
+*     We would like the order in which the scans are specified to be
+*     in the same order as that in which we find the data in the CRDD
+*     data file ie in UTCS time order.
+*
+*     The program first examines each source which uses the plate. The
+*     plate has a list of those sources as the set of pointers contained
+*     in the plate common record. Each pointer is the position in source
+*     common of a source whose data is to be taken from that plate.
+*     For each source the program then locates all the scans relating to
+*     that source. The source record in common has a set of pointers
+*     each of which points to a position in scan common which is
+*     occupied by a scan 'needed' for that source. ( In later versions
+*     of IRASFIND where the user can choose scans, scans may be marked
+*     as not required, these will be skipped as they are found)
+*     Each scan considered is inserted into a linked list for the plate.
+*     The list when written in order will give a list of scans sorted in
+*     start time order. The list is started by putting the first scan's
+*     position in scan common into the plate first scan pointer. Each
+*     scan common record contains a position in which the link to the
+*     next scan in the list can be put. As each scan is examined the
+*     position in the list at which its start time fits is found. The
+*     linked list is then broken at that point and the pointers,
+*     including that in the new scan are set up to link the previous
+*     scan to the new scan and the new scan to the subsequent scan.
+*     
+*     Having completed the list the next problem is to determine where
+*     overlapping scans occur. One of the problems in having
+*     multisource EXCRDD is that if sources are sufficiently close
+*     together, or their required regions are sufficiently large, part
+*     of the data required for one scan for one source may also be
+*     required for another scan for a different source. These scans are
+*     then said to be overlapping. If the scans are sorted by UTCS time
+*     it is easy to determine whether scans are overlapping; the first
+*     scan has an end UTCS after the start UTCS of the second. The
+*     first scan of an overlapping pair, or all the scans except the
+*     last of an overlapping set, have a scan overlap flag set.
+*     
+*     The final preprocessing problem is that of determining the
+*     source details to be written to the HDS file. and making sure that
+*     each scan correctly referrs to its own source in the newly formed
+*     sub list. Each scan in the plate linked list is examined and an
+*     index array of sources for this plate is generated. The index
+*     array contains pointers to the positions in source common for
+*     sources that will be neeeded. As each scan is processed a pointer
+*     is set up in the scan to the index array to ensure the scan points
+*     to the correct source when the HDS file is loaded in EXCRDD.
+*
+*     Finally the output HDS file is prepared for this plate. The header
+*     information is obtained from the plate record. The scan details
+*     are written to the file in the order specified by following the
+*     linked list. The source details are written in the order specified
+*     by the index array. In each case the order is important.
+*
+*     An HDS file is created for each plate record.
+*
+*     NB The sizes of the different types of common are controlled by
+*     the global constants given below.
+*     
+       
+*  Authors:
+*     DCP: Diana Parsons (IPMAF/RAL)
+*     {enter_new_authors_here}
+
+*  History:
+*     3-JAN-1991 (DCP):
+*        Original version.
+*     {enter_changes_here}
+*-
+
+*  Global constants:
+*  If you want to change number of sources, you should change:-
+*  MAXSO = Number of sources
+*  MAXSC = scans per source x number of sources,
+*  MAXPL = usually set equal to the number of sources  
+*  MAXPS = usually set equal to the number of sources  
+*  If you want to change the number of scans per source, you should
+*  change:-
+*  MAXSS = Number of scans per source
+*  MAXSC = scans per source x number of sources,
+*  The lenghts of the source name and source title are set up as
+*  parameters.
+*  For source common block 
+      INTEGER MAXSO              ! Maximum number of sources
+      PARAMETER ( MAXSO = 50 )
+      INTEGER MAXSS              ! Maximum number of scans per source
+      PARAMETER ( MAXSS = 100 )
+*  For Scan common block
+      INTEGER MAXSC              ! Maximum number of scans
+      PARAMETER ( MAXSC = 5000 )
+*  For Plate common block
+      INTEGER MAXPL              ! Maximum number of plates
+      PARAMETER ( MAXPL = 50 )
+      INTEGER MAXPS              ! Maximum number of sources per plate
+      PARAMETER ( MAXPS = 50 )
+*  Lengths of character variables
+      INTEGER NMLEN              ! Length of character string for source
+                                 ! name
+      PARAMETER ( NMLEN = 8 )
+      INTEGER TILEN              ! Length of character string for source
+                                 ! title
+      PARAMETER ( TILEN = 40 )
+*
+*  Global constants:
+*  Constant to translate arc minutes to radians
+      REAL AMTOR                 ! Arc minutes to radians
+      PARAMETER ( AMTOR = 2.908882086E-04)      
+*  Constant to translate degrees to radians
+      REAL DEGTOR                ! Degrees to radians
+      PARAMETER ( DEGTOR = 1.745329252E-02)      
+*  
+*  Global Variables:
+*
+*  Source common block for use in extracting boresight survey data
+*        Number of sources (S) 
+      INTEGER NOFSO
+*        Source name (S)(O)
+      CHARACTER * ( NMLEN ) SONAME( MAXSO ) 
+*        Source title(S)(O)
+      CHARACTER * ( TILEN ) SOTITL( MAXSO ) 
+*        Source first coordinate value see AST_ for length (S)(O)
+      CHARACTER * ( IRA__SZFSC ) SOCO1( MAXSO ) 
+*        Source second coordinate value see AST_ for length (S)(O)
+      CHARACTER * ( IRA__SZFSC ) SOCO2( MAXSO ) 
+*        Source coordinate system see AST_ (S)(O)
+      CHARACTER * ( IRA__SZSCS ) SOCOSY( MAXSO ) 
+*        Source RA in equinox 1950 (given in radians 0 to 2*pi) (S)(O)
+      REAL SORA( MAXSO ) 
+*        Source DEC in equinox 1950 (given in radians - pi to +pi)(S)(O)
+      REAL SODEC( MAXSO ) 
+*        Source size 1 for boresight this is Inscan in radians. (S)(O)
+      REAL SOINSZ( MAXSO ) 
+*        Source size 2 for boresight this is Crosscan in radians. (S)(O)
+      REAL SOCRSZ( MAXSO ) 
+*        Source waveband 1 required flag (S)(O)
+      LOGICAL SOWAB1( MAXSO ) 
+*        Source waveband 2 required flag (S)(O)
+      LOGICAL SOWAB2( MAXSO ) 
+*        Source waveband 3 required flag (S)(O)
+      LOGICAL SOWAB3( MAXSO ) 
+*        Source waveband 4 required flag (S)(O)
+      LOGICAL SOWAB4( MAXSO ) 
+*        Source - the array index for the boresight plate number
+      INTEGER SOBPLI( MAXSO ) 
+*        Source - number of scans for this source
+      INTEGER SONOSC( MAXSO )
+*        Source - the array indices for all scans for this source
+      INTEGER SOSCI( MAXSO,MAXSS )
+*        Source marked for deletion flag .TRUE.= delete
+      LOGICAL SOMADE(MAXSO)
+*
+*   Items marked (S) are stored by the save at the end of the
+*   Position Input Option
+*
+*   Items marked (O) are output to the file used as input to EXCRDD
+*   
+
+*
+*  Scan common block
+*        The total number of scans in the common block
+      INTEGER NOSCAN 
+*        Scan - the array index of the associated Source 
+      INTEGER SCSOI( MAXSC )
+*        Scan - the index of the associated Source in the source list
+*        for the plate
+      INTEGER SCSOLI( MAXSC )
+*        Scan crosscan value ie the minimum distance of the scan from
+*        the source given in radians (O)
+      REAL SCXSC( MAXSC ) 
+*        Scan SOP number (O)
+      INTEGER SCSOP( MAXSC ) 
+*        Scan observation number (O)
+      INTEGER SCOBS( MAXSC ) 
+*        Scan start UTCS time (O)
+      DOUBLE PRECISION SCSTUT( MAXSC ) 
+*        Scan end UTCS time (O)
+      DOUBLE PRECISION SCENUT( MAXSC )
+*        Scan overlap flag .TRUE. = overlapped (O)
+      LOGICAL SCOVFL( MAXSC )
+*        Scan required flag .TRUE. = required
+      LOGICAL SCRQFL( MAXSC )
+*        Scan Theta
+      REAL SCTH( MAXSC )
+*        Scan start psi
+      REAL SCSTPS( MAXSC )
+*        Scan end psi
+      REAL SCENPS( MAXSC )
+*        Scan psi at nearest point to source
+      REAL SCNPPS( MAXSC )
+*        Scan start solar longitude
+      REAL SCSTSL( MAXSC )
+*        Scan end solar longitude
+      REAL SCENSL( MAXSC )
+*        Scan solar longitude at nearest point to source
+      REAL SCNPSL( MAXSC )
+*        Scan start SATCAL time - start UCTS is not a translation of
+*        this as a constant is added for errors in translation
+      DOUBLE PRECISION SCSTST( MAXSC ) 
+*        Scan end SATCAL time - end UCTS is not a translation of
+*        this as a constant is added for errors in translation
+      DOUBLE PRECISION SCENST( MAXSC ) 
+*        Scan SATCAL time at nearest point to source
+      DOUBLE PRECISION SCNPST( MAXSC ) 
+*        Scan - the estimated blocks of data to be produced for this
+*        scan
+      INTEGER SCBLSZ( MAXSC ) 
+*        Scan - the position of next scan in start UCTS order scan
+*        common
+      INTEGER SCNSCP( MAXSC ) 
+*
+*   Items marked (O) are output to the file used as input to EXCRDD
+*      
+
+*  Plate common block
+*        Number of plates in common block
+      INTEGER NOPLAT
+*        Boresight plate number (O)
+      INTEGER PLNUM( MAXPL )
+*        Plate subsection identifier
+      CHARACTER * ( 1 ) PLSUBI( MAXPL )
+*        Plate archive tape id eg UKP102 (O)
+      CHARACTER * ( 6 ) PLID( MAXPL )
+*        Plate position of plate file on tape (O)
+      INTEGER PLPOTA( MAXPL )
+*        Plate - indicator of north pole (N), south pole (S),
+*        or other (O)
+      CHARACTER * ( 1 ) PLPOLE( MAXPL)
+*        Plate - Plate boundary low RA (in radians 0 to 2*pi)
+      REAL PLLORA( MAXPL)
+*        Plate - Plate boundary high RA (in radians 0 to 2*pi)
+      REAL PLHIRA( MAXPL)
+*        Plate - Plate boundary low Dec (in radians -pi/2  to +pi/2)
+      REAL PLLODE( MAXPL)
+*        Plate - Plate boundary high Dec (in radians -pi/2  to +pi/2)
+      REAL PLHIDE( MAXPL)
+*        Plate - number of scans for this plate
+      INTEGER PLNOSC( MAXPL )
+*        Plate - number of sources for this plate
+      INTEGER PLNOSO( MAXPL )
+*        Plate - the array indices for all sources for this plate
+      INTEGER PLSOI( MAXPL,MAXPS )
+*        Plate - first scan (in start UCTS order) position in scan
+*        common
+      INTEGER PLFSCP( MAXPL )
+*
+*   Items marked (O) are output to the file used as input to EXCRDD
+*      
+
+*  Common Blocks sorted into separate blocks for numeric and character
+*  and within numeric in the order double, real, integer, logical
+
+*  Source
+      COMMON /SOUNUM/SOCRSZ, SODEC, SOINSZ, SORA,
+     :               NOFSO, SOBPLI, SONOSC, SOSCI,
+     :               SOMADE, SOWAB1, SOWAB2, SOWAB3, SOWAB4
+      COMMON /SOUCHR/SOCO1,SOCO2,SOCOSY,SONAME,SOTITL
+
+*  Scan
+      COMMON /SCAN/SCENST, SCENUT, SCNPST, SCSTST, SCSTUT,
+     : SCENPS, SCENSL, SCNPPS, SCNPSL, SCSTPS, SCSTSL, SCTH, SCXSC,
+     : NOSCAN, SCBLSZ, SCNSCP, SCOBS, SCSOI, SCSOLI, SCSOP,
+     : SCOVFL, SCRQFL
+
+      
+*  Plate
+      COMMON /PLANUM/PLHIDE, PLHIRA, PLLODE, PLLORA, 
+     : NOPLAT, PLFSCP, PLNOSC, PLNOSO, PLNUM, PLPOTA, PLSOI
+      COMMON /PLACHR/PLID, PLPOLE, PLSUBI
+
+*  Saves for common blocks
+      SAVE /SOUNUM/, /SOUCHR/, /SCAN/, /PLANUM/, /PLACHR/
+*.

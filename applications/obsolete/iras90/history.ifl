@@ -1,0 +1,127 @@
+#+
+#  Name:
+#     HISTORY.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     17-JAN-1992 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface HISTORY
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter BEFORE 		 # Date and time of last record to be
+				 # displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC, PROMPT '
+      ppath    'DYNAMIC, CURRENT, DEFAULT '
+      default  !
+      prompt   'Date and time of last record to be displayed'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMAND 		 # Command which produced records to be
+				 # displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC, PROMPT '
+      ppath    'DYNAMIC, CURRENT, DEFAULT '
+      default  !
+      prompt   'Command which produced records to be displayed'
+      helpkey  '*'
+   endparameter
+
+   parameter FUNCTION		 # Operation to perform.
+      position 2
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC, PROMPT '
+      ppath    'DYNAMIC, CURRENT, DEFAULT '
+      default  'DISPLAY'
+      prompt   'Operation to perform'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE             # The log file.
+      position 3
+      type     FILENAME
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'A log file for storing displayed history information'
+      helpkey  '*'
+   endparameter
+
+   parameter LOOP		 # True if multiple operations required.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  FALSE
+      prompt   'More than one operation to perform on NDF history?'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NDF                 # Input NDFs.
+      position 1
+      type     NDF
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'DYNAMIC,GLOBAL,CURRENT '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'The NDF(s)'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining accessed
+      type     NDF               # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving processed NDFs'
+   endparameter
+
+   parameter SINCE		 # Date and time of first record to be
+				 # displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC, PROMPT '
+      ppath    'DYNAMIC, CURRENT, DEFAULT '
+      default  !
+      prompt   'Date and time of first record to be displayed'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXT		 # A line of text to be added to history.
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      prompt   'A line of new history text'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,30 @@
+#!/bin/csh
+#+
+#  Name:
+#     iras90_test
+
+#  Purpose:
+#     Test the installation of the iras90 package.
+
+#  Type of Module:
+#     C shell script.
+
+#  Invocation:
+#     iras90_test
+
+#  Description:
+
+#  Authors:
+#     D.S. Berry (STARLINK)
+#     {enter_new_authors_here}
+#
+#  History:
+#     3-SEP-1992 (DSB):
+#       Original Version
+#     {enter_changes_here}
+#
+#-
+#
+iras90
+irastrace $IRAS90_DIR/profiles
+#      End of shell script.

@@ -1,0 +1,3 @@
+echo `irma_link` `iria_link` `irca_link` `irqa_link` `iraa_link` `i90a_link` \
+`iras90_slink_adam` \
+| awk '{for(f=NF;f;f--)if(!w[$f]++)l=$f" "l;print l}'

@@ -1,0 +1,83 @@
+#+
+#  Name:
+#     IRA_DEMO2.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-Jan-1991 (DSB):
+#        Original version.
+#     2-MAY-1991 (DSB):
+#        Modified for IRA version 2.
+#     {enter_changes_here}
+
+#-
+
+interface IRA_DEMO2
+
+   helplib ' '
+
+   parameter FORWRD
+      type     _LOGICAL
+      access   READ
+      prompt   'Forward mapping?'
+   endparameter
+
+   parameter SCS
+      type     LITERAL
+      access   UPDATE
+      prompt   'Sky Coordinate System'
+   endparameter
+
+   parameter XNAME
+      type     LITERAL
+      access   READ
+      vpath    DEFAULT
+      default  'IRAS'
+      prompt   'NDF extension name containing astrometry structure'
+   endparameter
+
+   parameter ASNAME
+      type     LITERAL
+      access   READ
+      vpath    DEFAULT
+      default  'ASTROMETRY'
+      prompt   'Name of the astrometry structure'
+   endparameter
+
+   parameter IN
+      type     NDF
+      access   READ
+      prompt   'Input NDF'
+   endparameter
+
+   parameter A
+      type     LITERAL
+      access   READ
+      prompt   'Sky longitude value'
+   endparameter
+
+   parameter B
+      type     LITERAL
+      access   READ
+      prompt   'Sky latitude value'
+   endparameter
+
+   parameter XIMAGE
+      type     _DOUBLE
+      access   READ
+      prompt   'X image coordinate value'
+   endparameter
+
+   parameter YIMAGE
+      type     _DOUBLE
+      access   READ
+      prompt   'Y image coordinate value'
+   endparameter
+
+endinterface

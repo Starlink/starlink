@@ -1,0 +1,1147 @@
+#+
+#  Name:
+#     makefile
+
+#  Purpose:
+#     Build the ira library for UNIX.
+
+#  Type of Module:
+#     Description file for the UNIX "make" command.
+
+#  Description:
+#     This description file is used by the UNIX "make" command to build
+#     the ira library from the released source files, to install the 
+#     resulting system for use, and to perform other housekeeping tasks.
+
+#  Invocation:
+#     make check
+#	Performs a simple check that all necessary source files are 
+#	present.
+#     make [build]
+#	This is the default target. It results in compilation of the
+#	source files and creation of all files needed prior to
+#	installing the library for use. 
+#     make install
+#	Installs the library for use by putting the necessary files
+#	into sub-directories (bin, install and lib, by default) of the
+#	$INSTALL directory (the $HOME directory is used if the
+#	environment variable INSTALL is not defined). Symbolic links
+#	to the installed files are left in the source directory. 
+#     make deinstall
+#	Reverses the action of the install target, removing files from
+#	sub-directories of the $INSTALL directory and restoring them
+#	to the source directory (the $HOME directory is used by
+#	default if the environment variable INSTALL is not defined). 
+#     make test
+#	Builds and runs a simple test program to check for correct
+#	installation of the library.
+#     make export
+#	Produces an export copy of the built library suitable for
+#	passing to another user. A compressed tar file is created in
+#	the $EXPORT directory containing copies of the source files
+#	and built files for the library (the current directory is used
+#	by default if the environment variable EXPORT is not defined).
+#	The library should normally be built, installed and tested
+#	(see above) before using this target. After unpacking the 
+#	exported file on a similar machine, the recipient may simply 
+#	install it for use. 
+#     make export_source
+#	Produces an export copy of the source for the library suitable
+#	for passing to another user to build (possibly on on a
+#	different type of machine). A compressed tar file is created
+#	in the $EXPORT directory containing copies of just the source
+#	files for the library (the current directory is used by
+#	default if the environment variable EXPORT is not defined).
+#	After unpacking the exported file, the recipient must build 
+#	the library before installing it for use. 
+#     make clean
+#	Cleans up after building the library, removing all intermediate
+#	files created during the building process.
+#     make unbuild
+#	Reverses the building process, removing all built files and all
+#	intermediate files.
+#     make doc_can
+#       Causes make to produce the device dependant file holding
+#       document ID2 ready for printing on a Canon laser printer. This 
+#       target will fail to make succesfully if there is no GKS driver 
+#       for workstation 2611 installed on the system.
+#     make doc_ps
+#       Causes make to produce the device dependant file holding
+#       document ID2 ready for printing on a Postscript laser printer.
+#       This target will fail to make succesfully if there is no GKS
+#       driver for workstation 2702 installed on the system.
+#  
+#  Prior Requirements:
+#     The ira files are extracted from the ira subdirectory of a tar file 
+#     Modified by DCP  20-SEP-1993
+#
+#     This makefile uses a number of macros to allow it to be
+#     configured for different computer systems and file organisations.
+#     These macros all have defaults but, in general, specific values
+#     should be assigned to over-ride at least some of these. As a
+#     minimum, the SYSTEM macro should be defined externally (e.g. by
+#     defining an environment variable and invoking "make" with the
+#     "-e" option) in order to identify the computer system in use. The
+#     associated C shell script "mk" is provided to make the necessary
+#     external definitions and to invoke "make" for currently supported
+#     SYSTEM values. 
+
+#  External Dependencies:
+#     This library depends on the following external files and systems 
+#     which must previously have been installed in the appropriate 
+#     directories (by default these should be sub-directories of the 
+#     $STARLINK directory; /star is used if the environment variable 
+#     STARLINK is not defined).
+#        chr
+#           Character Handling Routines.
+#        ems
+#           Error and message routines.
+#        gks
+#           Graphics Kernel System.
+#        hds
+#           Hierarchical Data System.
+#        ndf
+#           NDF access routines.
+#        primdat
+#           Primitive Numerical Data Processing routines.
+#        psx
+#           POSIX Interface routines.
+#        sae_par
+#           Global include file 
+#        sgs
+#           Simple Graphics System.
+#        slalib
+#           Positional astronomy routines.
+
+#  Authors:
+#     DSB: D.S. Berry (STARLINK)
+#     DCP: D.C. Parsons (IPMAF/RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     18-AUG-1992 (DSB):
+#	Original version.
+#     20-SEP_1993 (DCP):
+#       Modified to work using iras90_source.tar rather than iras90.a file.
+#     {note_further_changes_here}
+
+#-
+
+#-----------------------------------------------------------------------
+
+#  Defaults.
+#  ========
+
+#  These default macro values should be over-ridden as necessary to 
+#  adapt to the local system setup (use environment variables and 
+#  invoke "make" with the "-e" option).
+
+#  Name of computer system.
+SYSTEM = unknown
+
+#  Top-level name of the directory where other Starlink software is 
+#  currently installed, and names of related sub-directories.
+STARLINK = /star
+STAR_BIN = $(STARLINK)/bin
+STAR_INC = $(STARLINK)/include
+STAR_LIB = $(STARLINK)/lib
+
+#  Top-level name of the directory where the built files should be 
+#  installed for use, and related sub-directories.
+INSTALL = $(HOME)
+INSTALL_BIN = $(INSTALL)/bin
+INSTALL_INC = $(INSTALL)/include
+INSTALL_LIB = $(INSTALL)/lib
+INSTALL_DOC = $(INSTALL)/doc
+
+#  Directory into which exported tar files will be placed.
+EXPORT = .
+
+#  Default Fortran compiler flags.
+FFLAGS = -O
+
+#  Command for "randomizing" a library. The default is appropriate for
+#  BSD based systems.
+#
+RANLIB = ranlib
+#-----------------------------------------------------------------------
+
+#  Define library contents.
+#  =======================
+
+#  These definitions will normally only need to change as the library is
+#  developed.
+
+#  Files comprising the distributed (source only) system.
+SOURCE_FILES = \
+mk makefile ../iras90_source.tar
+
+#  Files which must be built from the distributed source before the 
+#  library can be installed for use.
+BUILT_FILES = \
+$(DOCUMENTATION) $(PUBLIC_INCLUDES) $(LINK_FILES) $(OBJECT_LIBRARIES)
+
+#  Files required for linking with the library.
+LINK_FILES = \
+ira_link ira_link_adam
+
+#  Include files forming part of this library.
+PUBLIC_INCLUDES = \
+ira_err ira_par
+PRIVATE_INCLUDES = \
+ira_com
+
+#  Names of symbolic links used to access include files during 
+#  compilation.
+INCLUDE_LINKS = \
+IRA_COM IRA_ERR IRA_PAR DAT_ERR DAT_PAR SAE_PAR NDF_PAR PAR_ERR \
+PRM_PAR MSG_PAR
+
+#  Routines required for building the "standalone" library.
+ROUTINES = \
+ira1_aito. ira1_ascre. ira1_asdef. ira1_asndf. \
+ira1_asres. ira1_asset. ira1_axlm. ira1_axlp. ira1_bbox. \
+ira1_bgch. ira1_chprj. ira1_chscs. ira1_curve. ira1_decod. \
+ira1_delob. ira1_check. \
+ira1_drms. ira1_drps. ira1_ecec. ira1_eglb. ira1_egtk. \
+ira1_eqecl. ira1_eqeq. ira1_eqgal. ira1_fndb. ira1_fngp3. \
+ira1_fpars. ira1_ftol. ira1_galec. ira1_getid. ira1_gnom. \
+ira1_iconv. ira1_ictd1. ira1_idrva. ira1_idst2. \
+ira1_idtc1. ira1_ipaco. ira1_iprj. ira1_iscnm. ira1_ivald. \
+ira1_lacc. ira1_lamb. ira1_limit. ira1_llex. \
+ira1_map1. ira1_map2. ira1_map3. ira1_orth. \
+ira1_plot. ira1_plst. ira1_potl. ira1_potu. ira1_prec. \
+ira1_scac. ira1_sfld. ira1_shapp. ira1_shcal. ira1_sortd. \
+ira1_tpot. ira1_trab. ira1_tref. ira1_usym. \
+ira1_vaito. ira1_vgnom. ira1_vlamb. ira1_vorth. ira_annul. \
+ira_close. ira_convt. ira_creat. ira_ctod. ira_ctod1. ira_dist. \
+ira_dist2. ira_drbnd. ira_drgrd. ira_drgtc. ira_drmer. ira_drpar. \
+ira_drval. ira_dtoc.  ira_dtoc1. ira_exprt. ira_find. ira_geteq. \
+ira_imprt. ira_init. ira_iproj. ira_iscs. ira_locat. ira_norm.  \
+ira_offst. ira_pacon. ira_read. ira_scnam. ira_scsep. ira_seteq. \
+ira_shift. ira_trans. ira_valid. ira_write. ira_xylim. \
+ira1_nrval. ira_mag. ira_move. ira_rot. ira_trace. ira_dropt. \
+ira_drbrk. ira_drvpo. ira_pixsz. ira_drops. ira1_optid. ira_activ.
+
+#  Additional routines required for building the ADAM library.
+ADAM_ROUTINES = \
+ira1_igtc1. ira_gtscs. ira_getco. ira_gtco1.
+
+#  Block data routines.
+#
+BLOCK_DATA = \
+ira1_init.
+
+#  Documentation files.
+DOCUMENTATION = \
+id2.tex
+
+#  Applications included in IRA. These are demo's and  applications 
+#  needed to generate the graphics data files included in the 
+#  documentation.
+APPLICATIONS = \
+ira_demo1. ira_demo2. fig3d. drexam1. drexam2. drexam3. drexam4. \
+drexam5.
+
+#  A list of the figures in ID2.
+ID2_FIGS = \
+a. b. c. d. e. f. g. h. i. 
+
+#  Library files to be built.
+OBJECT_LIBRARIES = \
+libira.a libira_adam.a
+
+#-----------------------------------------------------------------------
+
+#  Primary targets.
+#  ===============
+
+#  These are the targets intended for normal external use.
+
+#  build: Build the system.
+#  -----------------------
+#  The default target. Compile the source and build the libraries, etc.,
+#  in the source directory.
+build: $(BUILT_FILES)
+	@ echo "   Build of ira library is complete"
+
+#  check: Check that necessary source files are present.
+#  ----------------------------------------------------
+check: $(SOURCE_FILES)
+	@ echo "   All essential source files are present"
+
+#  install: Install the library for use.
+#  ------------------------------------
+#  Copy the built files to their installation directories, from where 
+#  they may be accessed. First ensure that the installation directories
+#  exist.
+install: $(INSTALL_BIN) $(INSTALL_INC) $(INSTALL_LIB) $(INSTALL_DOC)
+#
+#  Copy each file from the source directory using "cp -p" to preserve 
+#  its date. Replace each original file by a link to the installed copy.
+	cp -p ira_err $(INSTALL_INC)
+	rm ira_err
+	ln -s $(INSTALL_INC)/ira_err ira_err
+#
+	cp -p ira_par $(INSTALL_INC)
+	rm ira_par
+	ln -s $(INSTALL_INC)/ira_par ira_par
+#
+	cp -p id2.tex $(INSTALL_DOC)
+	rm id2.tex
+	ln -s $(INSTALL_DOC)/id2.tex id2.tex
+#
+#  The following files need not have their dates preserved (nothing else
+#  depends on them), so use "mv" instead of "cp". Give execute access 
+#  to link files.
+	mv ira_link $(INSTALL_BIN)
+	chmod 755 $(INSTALL_BIN)/ira_link
+	ln -s $(INSTALL_BIN)/ira_link ira_link
+#
+	mv ira_link_adam $(INSTALL_BIN)
+	chmod 755 $(INSTALL_BIN)/ira_link_adam
+	ln -s $(INSTALL_BIN)/ira_link_adam ira_link_adam
+#
+	mv libira.a $(INSTALL_LIB)
+	ln -s $(INSTALL_LIB)/libira.a libira.a
+	$(RANLIB) $(INSTALL_LIB)/libira.a
+#
+	mv libira_adam.a $(INSTALL_LIB)
+	ln -s $(INSTALL_LIB)/libira_adam.a libira_adam.a
+	$(RANLIB) $(INSTALL_LIB)/libira_adam.a
+	@ echo "   ira library is now installed in directory $(INSTALL)"
+
+#  deinstall: Deinstall the library.
+#  --------------------------------
+#  This reverses the action of the install target, removing the
+#  installed files and returning them to the source directory. Use "cp
+#  -p" to preserve dates on include files and remove links from the
+#  source directory before copying. 
+deinstall:
+	@-rm ira_err 2>/dev/null
+	@-cp -p $(INSTALL_INC)/ira_err ./ 2>/dev/null
+	@-rm $(INSTALL_INC)/ira_err 2>/dev/null
+#
+	@-rm ira_par 2>/dev/null
+	@-cp -p $(INSTALL_INC)/ira_par ./ 2>/dev/null
+	@-rm $(INSTALL_INC)/ira_par 2>/dev/null
+#
+#
+	@-rm id2.tex 2>/dev/null
+	@-cp -p $(INSTALL_DOC)/id2.tex ./ 2>/dev/null
+	@-rm $(INSTALL_DOC)/id2.tex 2>/dev/null
+#
+#  The following files do not need their dates preserving, so use "mv".
+	@-rm ira_link 2>/dev/null
+	@-mv $(INSTALL_BIN)/ira_link ./ 2>/dev/null
+#
+	@-rm ira_link_adam 2>/dev/null
+	@-mv $(INSTALL_BIN)/ira_link_adam ./ 2>/dev/null
+#
+	@-rm libira.a 2>/dev/null
+	@-mv $(INSTALL_LIB)/libira.a ./ 2>/dev/null
+	@-$(RANLIB) libira.a 2>/dev/null
+#
+	@-rm libira_adam.a 2>/dev/null
+	@-mv $(INSTALL_LIB)/libira_adam.a ./ 2>/dev/null
+	@-$(RANLIB) libira_adam.a 2>/dev/null
+	@ echo "   ira library has been de-installed from directory $(INSTALL)"
+
+#  test: Perform an installation test.
+#  ----------------------------------
+#  This checks that installed files are in their correct places and that
+#  a simple test program will run correctly. It also builds the various
+#  other IRA applications.
+
+#  We depend on necessary links to the required external include files.
+test: IRA_PAR SAE_PAR NDF_PAR DAT_PAR $(APPLICATIONS:.=)
+#
+#  Extract the test program from the archive and set up new links for
+#  the include files which point at the installed versions. Remove any
+#  pre-existing links first if necessary. 
+	(cd ..;tar xf iras90_source.tar ira/ira_test.f)
+	-rm IRA_PAR 2>/dev/null
+	ln -s $(INSTALL_INC)/ira_par IRA_PAR
+
+#
+#  Build the test program, ensuring that the installed version of the 
+#  library and link files are used.
+	$(FC) $(FFLAGS) ira_test.f -L$(INSTALL_LIB) \
+	      -L$(STAR_LIB) `$(INSTALL_BIN)/ira_link`  \
+	      `err_link` -o ira_test
+#
+#  Remove the test program source and the include file links used to 
+#  build it.
+	rm ira_test.f
+	rm IRA_PAR
+	rm NDF_PAR
+	rm DAT_PAR
+	rm SAE_PAR
+#
+#  Execute the test program and remove the binary file when done.
+	./ira_test
+	rm ira_test
+
+#  export: Export the installed system.
+#  -----------------------------------
+#  Target for exporting the source plus all the built files. Since the
+#  result will contain (machine-specific) binary files, these are
+#  placed in a compressed tar file called ira_$(SYSTEM).tar.Z in the
+#  $EXPORT directory. The recipient must perform a "make install" to
+#  re-install the built files after unpacking this archive file. 
+export: $(EXPORT)/ira_$(SYSTEM).tar.Z
+$(EXPORT)/ira_$(SYSTEM).tar.Z:
+	tar cvhf $(EXPORT)/ira_$(SYSTEM).tar $(SOURCE_FILES) $(BUILT_FILES)
+	compress $(EXPORT)/ira_$(SYSTEM).tar
+	@ echo "   Export copy of the built ira library has been placed "
+	@ echo "   in the compressed tar file $(EXPORT)/ira_$(SYSTEM).tar.Z"
+
+#  export_source: Export the source for the library.
+#  ------------------------------------------------
+#  Target for exporting the library source to a new user. The original
+#  source files are inserted into a compressed tar file called
+#  ira.tar.Z in the $EXPORT directory. The recipient must unpack this
+#  and use the mk script to build the system. 
+export_source: $(EXPORT)/ira.tar.Z
+$(EXPORT)/ira.tar.Z:
+	tar cvhf $(EXPORT)/ira.tar $(SOURCE_FILES)
+	compress $(EXPORT)/ira.tar
+	@ echo "   Export copy of the ira library source files has been placed "
+	@ echo "   in the compressed tar file $(EXPORT)/ira.tar.Z"
+
+#  clean: Clean up the source directory.
+#  ------------------------------------
+#  Remove all intermediate files. Do not remove built files.
+clean:
+	@- rm $(INCLUDE_LINKS) 2>/dev/null
+	@- rm $(PRIVATE_INCLUDES) 2>/dev/null
+	@- rm $(ROUTINES:.=.o) $(ADAM_ROUTINES:.=.o) \
+	      $(BLOCK_DATA:.=.o) $(APPLICATIONS:.=.o) 2>/dev/null 
+	@- rm $(ROUTINES:.=.f) $(ADAM_ROUTINES:.=.f) \
+	      $(BLOCK_DATA:.=.f) 2>/dev/null
+	@ echo "   Intermediate files removed"
+
+#  unbuild: Reverse the build process.
+#  ----------------------------------
+#  Remove all intermediate files and all built files.
+unbuild: clean
+	@- rm $(BUILT_FILES) 2>/dev/null
+	@ echo "   Built files removed"
+
+#  DOC_CAN: Generate id2.dvi-can
+#  ----------------------------------
+doc_can: id2.dvi $(ID2_FIGS:.=.c)
+	cp a.c a.dat
+	cp b.c b.dat
+	cp c.c c.dat
+	cp d.c d.dat
+	cp e.c e.dat
+	cp f.c f.dat
+	cp g.c g.dat
+	cp h.c h.dat
+	cp i.c i.dat
+	dvican id2 -r
+	@- rm $(ID2_FIGS:.=.dat) 2>/dev/null
+	@ echo "   Build of Canon documentation (eg id2.dvi-can) complete"
+
+#  DOC_PS: Generate id2.dvi-ps
+#  ----------------------------------
+doc_ps: id2.dvi $(ID2_FIGS:.=.p)
+	cp a.p a.dat
+	cp b.p b.dat
+	cp c.p c.dat
+	cp d.p d.dat
+	cp e.p e.dat
+	cp f.p f.dat
+	cp g.p g.dat
+	cp h.p h.dat
+	cp i.p i.dat
+	dvips id2 
+	@- rm $(ID2_FIGS:.=.dat) 2>/dev/null
+	@ echo "   Build of Postscript documentation (eg id2.dvi-ps) complete"
+
+#-----------------------------------------------------------------------
+
+#  Secondary targets, etc.
+#  ======================
+
+#  These targets and rules are generally for internal rather than 
+#  external use.
+
+#  Rules for creating necessary sub-directories within the top-level
+#  installation directory.
+$(INSTALL_BIN):
+	mkdir $(INSTALL_BIN)
+$(INSTALL_INC):
+	mkdir $(INSTALL_INC)
+$(INSTALL_LIB):
+	mkdir $(INSTALL_LIB)
+$(INSTALL_DOC):
+	mkdir $(INSTALL_DOC)
+
+#  Rule for building the standalone object library.
+libira.a: $(ROUTINES:.=.o) $(BLOCK_DATA:.=.o)
+	ar r libira.a $(ROUTINES:.=.o) $(BLOCK_DATA:.=.o)
+	$(RANLIB) libira.a
+
+#  Rule for building the ADAM object library.
+libira_adam.a: $(ADAM_ROUTINES:.=.o)
+	ar r libira_adam.a $(ADAM_ROUTINES:.=.o)
+	$(RANLIB) libira_adam.a
+
+#  Rule for extracting source files from the source tar file.
+$(ROUTINES:.=.f) $(ADAM_ROUTINES:.=.f) $(BLOCK_DATA:.=.f) $(PUBLIC_INCLUDES) \
+$(PRIVATE_INCLUDES) $(LINK_FILES) $(DOCUMENTATION):
+	(cd ..;tar xf iras90_source.tar ira/$@)
+
+#  Rules to set up links to locate include files required for 
+#  compilation.
+SYM_LINK = -ln -s $? $@
+IRA_COM:       ira_com;		  $(SYM_LINK)
+IRA_ERR:       ira_err;		  $(SYM_LINK)
+IRA_PAR:       ira_par;		  $(SYM_LINK)
+DAT_ERR:       $(STAR_INC)/dat_err;      $(SYM_LINK)
+DAT_PAR:       $(STAR_INC)/dat_par;      $(SYM_LINK)
+PAR_ERR:       $(STAR_INC)/par_err;      $(SYM_LINK)
+PRM_PAR:       $(STAR_INC)/prm_par;      $(SYM_LINK)
+SAE_PAR:       $(STAR_INC)/sae_par;      $(SYM_LINK)
+NDF_PAR:       $(STAR_INC)/ndf_par;      $(SYM_LINK)
+MSG_PAR:       $(STAR_INC)/msg_par;      $(SYM_LINK)
+
+#  Object file dependencies on links to include files.
+ira1_aito.o:   SAE_PAR
+ira1_aito.o:   DAT_PAR
+ira1_aito.o:   PRM_PAR
+ira1_aito.o:   IRA_PAR
+ira1_aito.o:   IRA_ERR
+ira1_ascre.o:   SAE_PAR
+ira1_ascre.o:   DAT_PAR
+ira1_ascre.o:   IRA_PAR
+ira1_ascre.o:   IRA_ERR
+ira1_asdef.o:   SAE_PAR
+ira1_asdef.o:   IRA_PAR
+ira1_asndf.o:   SAE_PAR
+ira1_asndf.o:   DAT_PAR
+ira1_asndf.o:   IRA_PAR
+ira1_asndf.o:   IRA_ERR
+ira1_asndf.o:   IRA_COM
+ira1_asres.o:   SAE_PAR
+ira1_asres.o:   DAT_PAR
+ira1_asset.o:   SAE_PAR
+ira1_asset.o:   DAT_PAR
+ira1_axlm.o:   SAE_PAR
+ira1_axlm.o:   DAT_PAR
+ira1_axlm.o:   IRA_PAR
+ira1_axlm.o:   PRM_PAR
+ira1_axlp.o:   SAE_PAR
+ira1_axlp.o:   DAT_PAR
+ira1_axlp.o:   PRM_PAR
+ira1_axlp.o:   IRA_PAR
+ira1_bbox.o:   SAE_PAR
+ira1_bbox.o:   DAT_PAR
+ira1_bgch.o:   SAE_PAR
+ira1_bgch.o:   DAT_PAR
+ira1_check.o:   SAE_PAR
+ira1_check.o:   DAT_PAR
+ira1_check.o:   IRA_PAR
+ira1_check.o:   IRA_ERR
+ira1_chprj.o:   SAE_PAR
+ira1_chprj.o:   DAT_PAR
+ira1_chprj.o:   IRA_PAR
+ira1_chprj.o:   IRA_ERR
+ira1_chscs.o:   SAE_PAR
+ira1_chscs.o:   DAT_PAR
+ira1_chscs.o:   PRM_PAR
+ira1_chscs.o:   IRA_PAR
+ira1_chscs.o:   IRA_ERR
+ira1_curve.o:   SAE_PAR
+ira1_curve.o:   DAT_PAR
+ira1_curve.o:   PRM_PAR
+ira1_decod.o:   SAE_PAR
+ira1_decod.o:   DAT_PAR
+ira1_decod.o:   IRA_ERR
+ira1_delob.o:   SAE_PAR
+ira1_delob.o:   DAT_PAR
+ira1_drms.o:   SAE_PAR
+ira1_drms.o:   DAT_PAR
+ira1_drms.o:   IRA_PAR
+ira1_drps.o:   SAE_PAR
+ira1_drps.o:   DAT_PAR
+ira1_drps.o:   IRA_PAR
+ira1_ecec.o:   SAE_PAR
+ira1_ecec.o:   DAT_PAR
+ira1_ecec.o:   PRM_PAR
+ira1_eglb.o:   SAE_PAR
+ira1_eglb.o:   DAT_PAR
+ira1_eglb.o:   IRA_PAR
+ira1_egtk.o:   SAE_PAR
+ira1_egtk.o:   DAT_PAR
+ira1_eqecl.o:   SAE_PAR
+ira1_eqecl.o:   DAT_PAR
+ira1_eqecl.o:   PRM_PAR
+ira1_eqeq.o:   SAE_PAR
+ira1_eqeq.o:   DAT_PAR
+ira1_eqeq.o:   PRM_PAR
+ira1_eqgal.o:   SAE_PAR
+ira1_eqgal.o:   DAT_PAR
+ira1_eqgal.o:   PRM_PAR
+ira1_fndb.o:   SAE_PAR
+ira1_fndb.o:   DAT_PAR
+ira1_fndb.o:   PRM_PAR
+ira1_fngp3.o:   SAE_PAR
+ira1_fngp3.o:   DAT_PAR
+ira1_fngp3.o:   IRA_PAR
+ira1_fpars.o:   SAE_PAR
+ira1_fpars.o:   DAT_PAR
+ira1_fpars.o:   IRA_PAR
+ira1_fpars.o:   IRA_ERR
+ira1_ftol.o:   SAE_PAR
+ira1_ftol.o:   DAT_PAR
+ira1_galec.o:   SAE_PAR
+ira1_galec.o:   DAT_PAR
+ira1_galec.o:   PRM_PAR
+ira1_getid.o:   SAE_PAR
+ira1_getid.o:   DAT_PAR
+ira1_getid.o:   IRA_PAR
+ira1_getid.o:   IRA_ERR
+ira1_getid.o:   IRA_COM
+ira1_gnom.o:   SAE_PAR
+ira1_gnom.o:   DAT_PAR
+ira1_gnom.o:   PRM_PAR
+ira1_gnom.o:   IRA_PAR
+ira1_gnom.o:   IRA_ERR
+ira1_iconv.o:   SAE_PAR
+ira1_iconv.o:   DAT_PAR
+ira1_iconv.o:   PRM_PAR
+ira1_iconv.o:   IRA_PAR
+ira1_iconv.o:   IRA_ERR
+ira1_ictd1.o:   SAE_PAR
+ira1_ictd1.o:   DAT_PAR
+ira1_ictd1.o:   PRM_PAR
+ira1_ictd1.o:   IRA_PAR
+ira1_ictd1.o:   IRA_ERR
+ira1_idrva.o:   SAE_PAR
+ira1_idrva.o:   DAT_PAR
+ira1_idrva.o:   IRA_PAR
+ira1_idst2.o:   SAE_PAR
+ira1_idst2.o:   DAT_PAR
+ira1_idst2.o:   PRM_PAR
+ira1_idst2.o:   IRA_PAR
+ira1_idtc1.o:   SAE_PAR
+ira1_idtc1.o:   DAT_PAR
+ira1_idtc1.o:   PRM_PAR
+ira1_idtc1.o:   IRA_PAR
+ira1_idtc1.o:   IRA_ERR
+ira1_igtc1.o:   SAE_PAR
+ira1_igtc1.o:   DAT_PAR
+ira1_igtc1.o:   PRM_PAR
+ira1_igtc1.o:   IRA_PAR
+ira1_igtc1.o:   IRA_ERR
+ira1_igtc1.o:   PAR_ERR
+ira1_init.o:   SAE_PAR
+ira1_init.o:   DAT_PAR
+ira1_init.o:   IRA_PAR
+ira1_init.o:   PRM_PAR
+ira1_ipaco.o:   SAE_PAR
+ira1_ipaco.o:   DAT_PAR
+ira1_ipaco.o:   PRM_PAR
+ira1_ipaco.o:   IRA_PAR
+ira1_ipaco.o:   IRA_ERR
+ira1_iprj.o:   SAE_PAR
+ira1_iprj.o:   DAT_PAR
+ira1_iprj.o:   PRM_PAR
+ira1_iprj.o:   IRA_PAR
+ira1_iprj.o:   IRA_ERR
+ira1_iscnm.o:   SAE_PAR
+ira1_iscnm.o:   DAT_PAR
+ira1_iscnm.o:   IRA_PAR
+ira1_iscnm.o:   IRA_ERR
+ira1_ivald.o:   SAE_PAR
+ira1_ivald.o:   DAT_PAR
+ira1_ivald.o:   PRM_PAR
+ira1_ivald.o:   IRA_PAR
+ira1_ivald.o:   IRA_ERR
+ira1_lacc.o:   SAE_PAR
+ira1_lacc.o:   DAT_PAR
+ira1_lacc.o:   IRA_ERR
+ira1_lacc.o:   IRA_PAR
+ira1_lamb.o:   SAE_PAR
+ira1_lamb.o:   DAT_PAR
+ira1_lamb.o:   PRM_PAR
+ira1_lamb.o:   IRA_PAR
+ira1_lamb.o:   IRA_ERR
+ira1_limit.o:   SAE_PAR
+ira1_limit.o:   DAT_PAR
+ira1_limit.o:   PRM_PAR
+ira1_limit.o:   IRA_PAR
+ira1_limit.o:   IRA_ERR
+ira1_llex.o:   SAE_PAR
+ira1_llex.o:   DAT_PAR
+ira1_llex.o:   PRM_PAR
+ira1_llex.o:   IRA_PAR
+ira1_map1.o:   SAE_PAR
+ira1_map1.o:   DAT_PAR
+ira1_map1.o:   IRA_PAR
+ira1_map1.o:   IRA_COM
+ira1_map2.o:   SAE_PAR
+ira1_map2.o:   DAT_PAR
+ira1_map2.o:   IRA_PAR
+ira1_map2.o:   IRA_COM
+ira1_map3.o:   SAE_PAR
+ira1_map3.o:   DAT_PAR
+ira1_map3.o:   IRA_PAR
+ira1_map3.o:   IRA_COM
+ira1_nrval.o:   SAE_PAR
+ira1_nrval.o:   DAT_PAR
+ira1_nrval.o:   PRM_PAR
+ira1_optid.o:   SAE_PAR
+ira1_optid.o:   DAT_PAR
+ira1_optid.o:   IRA_PAR
+ira1_orth.o:   SAE_PAR
+ira1_orth.o:   DAT_PAR
+ira1_orth.o:   PRM_PAR
+ira1_orth.o:   IRA_PAR
+ira1_orth.o:   IRA_ERR
+ira1_plot.o:   SAE_PAR
+ira1_plot.o:   DAT_PAR
+ira1_plot.o:   PRM_PAR
+ira1_plst.o:   SAE_PAR
+ira1_plst.o:   DAT_PAR
+ira1_plst.o:   PRM_PAR
+ira1_potl.o:   SAE_PAR
+ira1_potl.o:   DAT_PAR
+ira1_potu.o:   SAE_PAR
+ira1_potu.o:   DAT_PAR
+ira1_potu.o:   PRM_PAR
+ira1_prec.o:   SAE_PAR
+ira1_prec.o:   DAT_PAR
+ira1_prec.o:   PRM_PAR
+ira1_scac.o:   SAE_PAR
+ira1_scac.o:   DAT_PAR
+ira1_sfld.o:   SAE_PAR
+ira1_sfld.o:   DAT_PAR
+ira1_sfld.o:   IRA_ERR
+ira1_shapp.o:   SAE_PAR
+ira1_shapp.o:   DAT_PAR
+ira1_shapp.o:   PRM_PAR
+ira1_shapp.o:   IRA_PAR
+ira1_shapp.o:   IRA_ERR
+ira1_shcal.o:   SAE_PAR
+ira1_shcal.o:   DAT_PAR
+ira1_shcal.o:   PRM_PAR
+ira1_shcal.o:   IRA_PAR
+ira1_shcal.o:   IRA_ERR
+ira1_sortd.o:   SAE_PAR
+ira1_sortd.o:   DAT_PAR
+ira1_sortd.o:   PRM_PAR
+ira1_tpot.o:   SAE_PAR
+ira1_tpot.o:   DAT_PAR
+ira1_trab.o:   SAE_PAR
+ira1_trab.o:   DAT_PAR
+ira1_tref.o:   SAE_PAR
+ira1_tref.o:   DAT_PAR
+ira1_usym.o:   SAE_PAR
+ira1_usym.o:   DAT_PAR
+ira1_vaito.o:   SAE_PAR
+ira1_vaito.o:   DAT_PAR
+ira1_vaito.o:   PRM_PAR
+ira1_vaito.o:   IRA_PAR
+ira1_vaito.o:   IRA_ERR
+ira1_vgnom.o:   SAE_PAR
+ira1_vgnom.o:   DAT_PAR
+ira1_vgnom.o:   PRM_PAR
+ira1_vgnom.o:   IRA_PAR
+ira1_vgnom.o:   IRA_ERR
+ira1_vlamb.o:   SAE_PAR
+ira1_vlamb.o:   DAT_PAR
+ira1_vlamb.o:   PRM_PAR
+ira1_vlamb.o:   IRA_PAR
+ira1_vlamb.o:   IRA_ERR
+ira1_vorth.o:   SAE_PAR
+ira1_vorth.o:   DAT_PAR
+ira1_vorth.o:   PRM_PAR
+ira1_vorth.o:   IRA_PAR
+ira1_vorth.o:   IRA_ERR
+ira_activ.o:   SAE_PAR
+ira_activ.o:   DAT_PAR
+ira_activ.o:   IRA_PAR
+ira_activ.o:   IRA_COM
+ira_annul.o:   SAE_PAR
+ira_annul.o:   DAT_PAR
+ira_annul.o:   IRA_PAR
+ira_annul.o:   IRA_COM
+ira_close.o:   SAE_PAR
+ira_close.o:   DAT_PAR
+ira_close.o:   IRA_PAR
+ira_close.o:   IRA_COM
+ira_convt.o:   SAE_PAR
+ira_convt.o:   DAT_PAR
+ira_convt.o:   IRA_PAR
+ira_creat.o:   SAE_PAR
+ira_creat.o:   DAT_PAR
+ira_creat.o:   PRM_PAR
+ira_creat.o:   IRA_PAR
+ira_creat.o:   IRA_ERR
+ira_creat.o:   IRA_COM
+ira_ctod.o:   SAE_PAR
+ira_ctod.o:   DAT_PAR
+ira_ctod.o:   IRA_PAR
+ira_ctod.o:   IRA_ERR
+ira_ctod1.o:   SAE_PAR
+ira_ctod1.o:   DAT_PAR
+ira_ctod1.o:   PRM_PAR
+ira_ctod1.o:   IRA_PAR
+ira_ctod1.o:   IRA_ERR
+ira_dist.o:   SAE_PAR
+ira_dist.o:   DAT_PAR
+ira_dist.o:   PRM_PAR
+ira_dist.o:   IRA_PAR
+ira_dist2.o:   SAE_PAR
+ira_dist2.o:   DAT_PAR
+ira_dist2.o:   PRM_PAR
+ira_dist2.o:   IRA_PAR
+ira_drbnd.o:   SAE_PAR
+ira_drbnd.o:   DAT_PAR
+ira_drbrk.o:   SAE_PAR
+ira_drbrk.o:   DAT_PAR
+ira_drbrk.o:   IRA_PAR
+ira_drbrk.o:   PRM_PAR
+ira_drgrd.o:   SAE_PAR
+ira_drgrd.o:   DAT_PAR
+ira_drgrd.o:   IRA_PAR
+ira_drgtc.o:   SAE_PAR
+ira_drgtc.o:   DAT_PAR
+ira_drgtc.o:   PRM_PAR
+ira_drgtc.o:   IRA_PAR
+ira_drgtc.o:   IRA_COM
+ira_drmer.o:   SAE_PAR
+ira_drmer.o:   DAT_PAR
+ira_drmer.o:   PRM_PAR
+ira_drmer.o:   IRA_PAR
+ira_drmer.o:   IRA_COM
+ira_dropt.o:   SAE_PAR
+ira_dropt.o:   IRA_COM
+ira_dropt.o:   DAT_PAR
+ira_dropt.o:   IRA_PAR
+ira_drops.o:   SAE_PAR
+ira_drops.o:   IRA_COM
+ira_drops.o:   DAT_PAR
+ira_drops.o:   IRA_PAR
+ira_drpar.o:   SAE_PAR
+ira_drpar.o:   DAT_PAR
+ira_drpar.o:   PRM_PAR
+ira_drpar.o:   IRA_PAR
+ira_drpar.o:   IRA_PAR
+ira_drpar.o:   IRA_COM
+ira_drval.o:   SAE_PAR
+ira_drval.o:   DAT_PAR
+ira_drval.o:   PRM_PAR
+ira_drval.o:   IRA_PAR
+ira_drval.o:   IRA_ERR
+ira_drvpo.o:   SAE_PAR
+ira_drvpo.o:   DAT_PAR
+ira_drvpo.o:   PRM_PAR
+ira_drvpo.o:   IRA_PAR
+ira_drvpo.o:   IRA_COM
+ira_dtoc.o:   SAE_PAR
+ira_dtoc.o:   DAT_PAR
+ira_dtoc.o:   IRA_PAR
+ira_dtoc.o:   IRA_ERR
+ira_dtoc1.o:   SAE_PAR
+ira_dtoc1.o:   DAT_PAR
+ira_dtoc1.o:   PRM_PAR
+ira_dtoc1.o:   IRA_PAR
+ira_dtoc1.o:   IRA_ERR
+ira_exprt.o:   SAE_PAR
+ira_exprt.o:   DAT_PAR
+ira_find.o:   SAE_PAR
+ira_find.o:   DAT_PAR
+ira_find.o:   IRA_PAR
+ira_find.o:   IRA_ERR
+ira_getco.o:   SAE_PAR
+ira_getco.o:   DAT_PAR
+ira_getco.o:   IRA_PAR
+ira_geteq.o:   SAE_PAR
+ira_geteq.o:   DAT_PAR
+ira_geteq.o:   PRM_PAR
+ira_geteq.o:   IRA_PAR
+ira_geteq.o:   IRA_ERR
+ira_gtco1.o:   SAE_PAR
+ira_gtco1.o:   DAT_PAR
+ira_gtco1.o:   IRA_PAR
+ira_gtco1.o:   IRA_ERR
+ira_gtscs.o:   SAE_PAR
+ira_gtscs.o:   DAT_PAR
+ira_gtscs.o:   IRA_PAR
+ira_gtscs.o:   IRA_ERR
+ira_imprt.o:   SAE_PAR
+ira_imprt.o:   DAT_PAR
+ira_imprt.o:   IRA_PAR
+ira_imprt.o:   IRA_COM
+ira_imprt.o:   IRA_ERR
+ira_init.o:   SAE_PAR
+ira_init.o:   DAT_PAR
+ira_init.o:   IRA_PAR
+ira_init.o:   IRA_COM
+ira_iproj.o:   SAE_PAR
+ira_iproj.o:   DAT_PAR
+ira_iproj.o:   IRA_PAR
+ira_iscs.o:   SAE_PAR
+ira_iscs.o:   DAT_PAR
+ira_iscs.o:   IRA_PAR
+ira_iscs.o:   IRA_ERR
+ira_locat.o:   SAE_PAR
+ira_locat.o:   DAT_PAR
+ira_locat.o:   IRA_PAR
+ira_locat.o:   IRA_COM
+ira_mag.o:   SAE_PAR
+ira_mag.o:   DAT_PAR
+ira_mag.o:   PRM_PAR
+ira_mag.o:   IRA_PAR
+ira_mag.o:   IRA_ERR
+ira_mag.o:   IRA_COM
+ira_move.o:   SAE_PAR
+ira_move.o:   DAT_PAR
+ira_move.o:   PRM_PAR
+ira_move.o:   IRA_PAR
+ira_move.o:   IRA_ERR
+ira_move.o:   IRA_COM
+ira_norm.o:   SAE_PAR
+ira_norm.o:   DAT_PAR
+ira_norm.o:   PRM_PAR
+ira_norm.o:   IRA_PAR
+ira_offst.o:   SAE_PAR
+ira_offst.o:   DAT_PAR
+ira_offst.o:   PRM_PAR
+ira_offst.o:   IRA_PAR
+ira_offst.o:   IRA_ERR
+ira_pacon.o:   SAE_PAR
+ira_pacon.o:   DAT_PAR
+ira_pacon.o:   IRA_PAR
+ira_pixsz.o:   SAE_PAR
+ira_pixsz.o:   DAT_PAR
+ira_pixsz.o:   IRA_PAR
+ira_pixsz.o:   IRA_COM
+ira_read.o:   SAE_PAR
+ira_read.o:   DAT_PAR
+ira_read.o:   IRA_PAR
+ira_read.o:   IRA_ERR
+ira_read.o:   IRA_COM
+ira_rot.o:   SAE_PAR
+ira_rot.o:   DAT_PAR
+ira_rot.o:   PRM_PAR
+ira_rot.o:   IRA_PAR
+ira_rot.o:   IRA_ERR
+ira_rot.o:   IRA_COM
+ira_scnam.o:   SAE_PAR
+ira_scnam.o:   DAT_PAR
+ira_scnam.o:   IRA_ERR
+ira_scsep.o:   SAE_PAR
+ira_scsep.o:   DAT_PAR
+ira_scsep.o:   IRA_PAR
+ira_scsep.o:   IRA_ERR
+ira_scsep.o:   IRA_COM
+ira_seteq.o:   SAE_PAR
+ira_seteq.o:   DAT_PAR
+ira_seteq.o:   PRM_PAR
+ira_seteq.o:   IRA_PAR
+ira_seteq.o:   IRA_ERR
+ira_shift.o:   SAE_PAR
+ira_shift.o:   DAT_PAR
+ira_shift.o:   PRM_PAR
+ira_shift.o:   IRA_PAR
+ira_shift.o:   IRA_ERR
+ira_trace.o:   MSG_PAR
+ira_trace.o:   SAE_PAR
+ira_trace.o:   DAT_PAR
+ira_trace.o:   IRA_PAR
+ira_trace.o:   IRA_ERR
+ira_trans.o:   SAE_PAR
+ira_trans.o:   DAT_PAR
+ira_trans.o:   IRA_PAR
+ira_trans.o:   IRA_ERR
+ira_trans.o:   IRA_COM
+ira_valid.o:   SAE_PAR
+ira_valid.o:   DAT_PAR
+ira_valid.o:   PRM_PAR
+ira_valid.o:   IRA_PAR
+ira_valid.o:   IRA_ERR
+ira_valid.o:   IRA_COM
+ira_write.o:   SAE_PAR
+ira_write.o:   DAT_PAR
+ira_write.o:   PRM_PAR
+ira_write.o:   IRA_PAR
+ira_write.o:   IRA_ERR
+ira_write.o:   IRA_COM
+ira_xylim.o:   SAE_PAR
+ira_xylim.o:   DAT_PAR
+ira_xylim.o:   PRM_PAR
+ira_xylim.o:   IRA_PAR
+ira_xylim.o:   IRA_ERR
+msg_loc.o:   SAE_PAR
+msg_loc.o:   DAT_PAR
+msg_loc.o:   DAT_ERR
+
+#
+#  Applications...
+
+#  The first demonstration program.
+ira_demo1: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/ira_demo1.ifl)
+	(cd ..;tar xf iras90_source.tar ira/ira_demo1.f)
+	alink ira_demo1.f -L$(STAR_LIB) -L./ `ira_link_adam`
+
+#  The second demonstration program.
+ira_demo2: IRA_PAR SAE_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/ira_demo2.ifl)
+	(cd ..;tar xf iras90_source.tar ira/ira_demo2.f)
+	alink ira_demo2.f -L$(STAR_LIB) -L./ `ira_link_adam`
+
+#  The program which generates 3D diagrams for inclusion in document 
+#  ID2.
+fig3d:
+	(cd ..;tar xf iras90_source.tar ira/fig3d.f)
+	$(FC) $(FFLAGS) fig3d.f -L$(STAR_LIB) `sgs_link` `sla_link` \
+	                `chr_link`  -o fig3d
+	rm fig3d.f
+
+#  The application which generates the first example sky grid.
+drexam1: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/drexam1.ifl)
+	(cd ..;tar xf iras90_source.tar ira/drexam1.f)
+	alink drexam1.f -L$(STAR_LIB) -L./ `ira_link_adam`
+	rm drexam1.f
+
+#  The application which generates the second example sky grid.
+drexam2: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/drexam2.ifl)
+	(cd ..;tar xf iras90_source.tar ira/drexam2.f)
+	alink drexam2.f -L$(STAR_LIB) -L./ `ira_link_adam`
+	rm drexam2.f
+
+#  The application which generates the third example sky grid.
+drexam3: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/drexam3.ifl)
+	(cd ..;tar xf iras90_source.tar ira/drexam3.f)
+	alink drexam3.f -L$(STAR_LIB) -L./ `ira_link_adam`
+	rm drexam3.f
+
+#  The application which generates the fourth example sky grid.
+drexam4: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/drexam4.ifl)
+	(cd ..;tar xf iras90_source.tar ira/drexam4.f)
+	alink drexam4.f -L$(STAR_LIB) -L./ `ira_link_adam`
+	rm drexam4.f
+
+#  The application which generates the fifth example sky grid.
+drexam5: IRA_PAR SAE_PAR NDF_PAR DAT_PAR
+	(cd ..;tar xf iras90_source.tar ira/drexam5.ifl)
+	(cd ..;tar xf iras90_source.tar ira/drexam5.f)
+	alink drexam5.f -L$(STAR_LIB) -L./ `ira_link_adam`
+	rm drexam5.f
+
+#  Rule for producing file id2.dvi
+id2.dvi: id2.tex
+	latex id2
+	latex id2
+	latex id2
+	rm -f id2.log
+	rm -f id2.lis
+	rm -f id2.aux
+	rm -f id2.toc
+    
+#  Rules for producing the Canon graphics data files.
+a.c:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figa_can)
+	echo id2_figa_can >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figa_can
+	mv -f a.dat a.c
+#
+b.c:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figb_can)
+	echo id2_figb_can >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figb_can
+	mv -f b.dat b.c
+#
+c.c:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figc_can)
+	echo id2_figc_can >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figc_can
+	mv -f c.dat c.c
+#
+d.c:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figd_can)
+	echo id2_figd_can >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figd_can
+	mv -f d.dat d.c
+#
+e.c:    drexam1
+	drexam1 device="2611;e.c"
+#
+f.c:    drexam2
+	drexam2 device="2611;f.c"
+#
+g.c:    drexam3
+	drexam3 device="2611;g.c"
+#
+h.c:    drexam4
+	drexam4 device="2611;h.c"
+#
+i.c:    drexam5
+	drexam5 device="2611;i.c"
+
+#  Rules for producing the Postscript graphics data files.
+a.p:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figa_ps)
+	echo id2_figa_ps >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figa_ps
+	mv -f a.dat a.p
+#
+b.p:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figb_ps)
+	echo id2_figb_ps >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figb_ps
+	mv -f b.dat b.p
+#
+c.p:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figc_ps)
+	echo id2_figc_ps >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figc_ps
+	mv -f c.dat c.p
+#
+d.p:    fig3d
+	(cd ..;tar xf iras90_source.tar ira/id2_figd_ps)
+	echo id2_figd_ps >stdin.tmp
+	fig3d <stdin.tmp >/dev/null
+	rm -f stdin.tmp
+	rm -f id2_figd_ps
+	mv -f d.dat d.p
+#
+e.p:    drexam1
+	drexam1 device="2702;e.p"
+#
+f.p:    drexam2
+	drexam2 device="2702;f.p"
+#
+g.p:    drexam3
+	drexam3 device="2702;g.p"
+#
+h.p:    drexam4
+	drexam4 device="2702;h.p"
+#
+i.p:    drexam5
+	drexam5 device="2702;i.p"

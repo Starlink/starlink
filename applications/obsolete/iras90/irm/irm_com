@@ -1,0 +1,99 @@
+*  Purpose:
+*     Declares common block used to communicate the IRM package global
+*     variables.
+
+*  Authors:
+*     WG: Wei Gong (IPMAF)
+*     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1991 August (WG):
+*        Original version.
+*     1992 March 16 (MJC):
+*        Added the prologue and removed the DATA statement (now in
+*        BLOCK DATA routine IRM_BLDAT).
+*     14-SEP-1992 (DSB):
+*        Added common blocks IRM_PAGE1 and IRM_PAGE2. Taken from
+*        KAPPA include file HLPCMD.FOR.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*
+* 1. Global variables for setting NCAR pen number:
+*
+
+*  Upper limit of the number of curves.
+      INTEGER MXCURV
+      PARAMETER( MXCURV = 50 )
+
+*  The original GKS polyline idex and text colour index.
+      INTEGER MCM_OLDPX
+      INTEGER MCM_OLDTX
+      COMMON / IRM_NPEN / MCM_OLDPX, MCM_OLDTX
+
+*  The flag to show whether the curves are drawn in solid lines.
+      LOGICAL MCM_SOCUR
+      COMMON / IRM_NPEN / MCM_SOCUR
+
+*  The number of curves which have been set pen number, 
+*  and pen number of each curve.
+      INTEGER MCM_NCURV       
+      INTEGER MCM_CRPN( MXCURV )
+      COMMON / IRM_NPEN / MCM_NCURV, MCM_CRPN
+
+*  Colour indices of the in-line labels.
+      INTEGER MCM_INCL( MXCURV )
+      COMMON / IRM_NPEN / MCM_INCL
+
+*  Pen number of axis lines and tick marks, and colour index
+*  of numeric labels.
+      INTEGER MCM_AXPN 
+      INTEGER MCM_TKPN
+      INTEGER MCM_NLBCL
+      COMMON / IRM_NPEN /MCM_AXPN, MCM_TKPN, MCM_NLBCL
+
+*  Colour indices of title and axes labels.
+      INTEGER MCM_TITCL
+      INTEGER MCM_ALBCL
+      COMMON / IRM_NPEN /MCM_TITCL, MCM_ALBCL
+
+*  Data setting flag
+      LOGICAL MCM_STDAT        ! True means that the variables have
+                               ! already been set, otherwise not yet.
+      COMMON / IRM_NPEN / MCM_STDAT
+
+*
+* 2. Global variables for controlling paged output on terminal screen.
+*
+
+*  Text entered in response to the "Press RETURN to continue..."
+*  prompt.
+      CHARACTER MCM_CMD*80
+
+*  Lines of text output this screenful
+      INTEGER MCM_LTEXT
+
+*  Text output enable/disable
+      LOGICAL MCM_TXTON
+
+*  Top and bottom line numbers for scrolling region
+      INTEGER MCM_LTOP,MCM_LBOT
+
+*  Flag: .TRUE. = ANSI terminal in use
+      LOGICAL MCM_ANSI
+
+*  Command input
+      INTEGER MCM_LUCMD
+
+*  Terminal output
+      INTEGER MCM_LUTER
+
+      COMMON /IRM_PAGE1/ MCM_CMD
+      COMMON /IRM_PAGE2/ MCM_LTEXT, MCM_TXTON, MCM_LTOP, MCM_LBOT,
+     :                   MCM_ANSI, MCM_LUCMD, MCM_LUTER
+*
+

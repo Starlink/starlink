@@ -1,0 +1,153 @@
+#+
+#  Name:
+#     iras90
+
+#  Purpose:
+#     Set up aliases for the IRAS90 package.
+
+#  Type of Module:
+#     C shell script.
+
+#  Invocation:
+#     source iras90
+
+#  Description:
+#     This procedure defines an alias for each IRAS90 command. If the
+#     environment variable IRAS90_DIR does not exist, it is defined
+#     with the value /star/bin/iras90.
+
+#  Authors:
+#     D.S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     2-SEP-1992 (DSB):
+#       Original Version
+#     2-JUN-1994 (DCP):
+#       Alias for history commented out (iras90_history remains)
+#     {enter_changes_here}
+
+#-
+
+#  Prepare to run ADAM applications if this has not been done already.
+#  ===================================================================
+#
+#  Here look to see if there is an ADAM_USER directory.  If there is not
+#  check whether or not there is an adam file that is not a directory.
+#  If there is, issue a warning and exit.  Otherwise create the required
+#  directory.
+#
+if (-d $HOME/adam) then
+   echo -n
+else
+   if (-f $HOME/adam) then
+      echo "You have a file called adam in your home directory.  Please rename "
+      echo "since adam must be a directory for ADAM files."
+      exit
+   else
+      mkdir $HOME/adam
+   endif
+endif
+#
+#  If there is currently no definition of the environment variable 
+#  IRAS90_DIR, set one up pointing to /star/bin/iras90.
+if !($?IRAS90_DIR) then
+   setenv IRAS90_DIR INSTALL_BIN
+endif
+#
+#  If there is currently no definition of the environment variable 
+#  IRAS90_HELP, set one up pointing to /star/help/iras90.
+if !($?IRAS90_HELP) then
+   setenv IRAS90_HELP INSTALL_HELP
+endif
+#
+#
+#  Define symbols for the applications.
+#  ====================================
+#
+alias backcrdd  ${IRAS90_DIR}/backcrdd
+alias colcorr   ${IRAS90_DIR}/colcorr
+alias coltemp   ${IRAS90_DIR}/coltemp
+alias coaddcrdd ${IRAS90_DIR}/coaddcrdd
+alias deglcrdd  ${IRAS90_DIR}/deglcrdd PROFILES=${IRAS90_DIR}/profiles
+alias destcrdd  ${IRAS90_DIR}/destcrdd
+alias findcrdd  ${IRAS90_DIR}/findcrdd SPFARCHFILE=${IRAS90_DIR}/newspfarch
+alias ffield    ${IRAS90_DIR}/ffield
+#alias history  ${IRAS90_DIR}/history
+alias i90help   ${IRAS90_DIR}/i90help library=${IRAS90_HELP}/iras90_help
+alias ifield    ${IRAS90_DIR}/ifield
+alias irastrace ${IRAS90_DIR}/irastrace
+alias makeprof  ${IRAS90_DIR}/makeprof
+alias makeresp  ${IRAS90_DIR}/makeresp
+alias mapcrdd   ${IRAS90_DIR}/mapcrdd
+alias newunits  ${IRAS90_DIR}/newunits
+alias pointcrdd ${IRAS90_DIR}/pointcrdd PROFILES=${IRAS90_DIR}/profiles
+alias poscrdd   ${IRAS90_DIR}/poscrdd
+alias prepare   ${IRAS90_DIR}/prepare
+alias pscont    'source ${IRAS90_DIR}/pscont'
+alias qualtobad ${IRAS90_DIR}/qualtobad
+alias remqual   ${IRAS90_DIR}/remqual
+alias setimage  ${IRAS90_DIR}/setimage
+alias setqual   ${IRAS90_DIR}/setqual
+alias simcrdd   ${IRAS90_DIR}/simcrdd PSF=${IRAS90_DIR}/psf
+alias skyalign  ${IRAS90_DIR}/skyalign
+alias skybox    ${IRAS90_DIR}/skybox
+alias skygrid   ${IRAS90_DIR}/skygrid
+alias skymark   ${IRAS90_DIR}/skymark
+alias skyline   ${IRAS90_DIR}/skyline
+alias skyphot   ${IRAS90_DIR}/skyphot
+alias skypos    ${IRAS90_DIR}/skypos
+alias skywrite  ${IRAS90_DIR}/skywrite
+alias showqual  ${IRAS90_DIR}/showqual
+alias tracecrdd ${IRAS90_DIR}/tracecrdd PROFILES=${IRAS90_DIR}/profiles
+#
+alias iras90_backcrdd  ${IRAS90_DIR}/backcrdd
+alias iras90_colcorr   ${IRAS90_DIR}/colcorr
+alias iras90_coltemp   ${IRAS90_DIR}/coltemp
+alias iras90_coaddcrdd ${IRAS90_DIR}/coaddcrdd
+alias iras90_deglcrdd  ${IRAS90_DIR}/deglcrdd PROFILES=${IRAS90_DIR}/profiles
+alias iras90_destcrdd  ${IRAS90_DIR}/destcrdd
+alias iras90_findcrdd  ${IRAS90_DIR}/findcrdd SPFARCHFILE=${IRAS90_DIR}/newspfarch
+alias iras90_ffield    ${IRAS90_DIR}/ffield
+alias iras90_history   ${IRAS90_DIR}/history
+alias iras90_i90help   ${IRAS90_DIR}/i90help library=${IRAS90_HELP}/iras90_help
+alias iras90_ifield    ${IRAS90_DIR}/ifield
+alias iras90_irastrace ${IRAS90_DIR}/irastrace
+alias iras90_makeprof  ${IRAS90_DIR}/makeprof
+alias iras90_makeresp  ${IRAS90_DIR}/makeresp
+alias iras90_mapcrdd   ${IRAS90_DIR}/mapcrdd
+alias iras90_newunits  ${IRAS90_DIR}/newunits
+alias iras90_pointcrdd ${IRAS90_DIR}/pointcrdd PROFILES=${IRAS90_DIR}/profiles
+alias iras90_poscrdd   ${IRAS90_DIR}/poscrdd
+alias iras90_prepare   ${IRAS90_DIR}/prepare
+alias iras90_pscont    '{source $IRAS90_DIR/pscont'
+alias iras90_qualtobad ${IRAS90_DIR}/qualtobad
+alias iras90_remqual   ${IRAS90_DIR}/remqual
+alias iras90_setimage  ${IRAS90_DIR}/setimage
+alias iras90_setqual   ${IRAS90_DIR}/setqual
+alias iras90_simcrdd   ${IRAS90_DIR}/simcrdd PSF=${IRAS90_DIR}/psf
+alias iras90_skyalign  ${IRAS90_DIR}/skyalign
+alias iras90_skybox    ${IRAS90_DIR}/skybox
+alias iras90_skygrid   ${IRAS90_DIR}/skygrid
+alias iras90_skyline   ${IRAS90_DIR}/skyline
+alias iras90_skymark   ${IRAS90_DIR}/skymark
+alias iras90_skyphot   ${IRAS90_DIR}/skyphot
+alias iras90_skypos    ${IRAS90_DIR}/skypos
+alias iras90_skywrite  ${IRAS90_DIR}/skywrite
+alias iras90_showqual  ${IRAS90_DIR}/showqual
+alias iras90_tracecrdd ${IRAS90_DIR}/tracecrdd PROFILES=${IRAS90_DIR}/profiles
+#
+#  Set up an alias for the command which sets things up for development
+#  of IRAS90 applications.
+#
+alias iras90_dev       'source ${IRAS90_DIR}/iras90_dev'
+#
+# Tell the user that IRAS90 commands are now available.
+#
+echo ""
+echo "   IRAS90 commands are now available -- (Version PKG_VERS)"
+echo " "
+echo "   Type i90help for help on IRAS90 commands"
+echo " "
+#
+# end

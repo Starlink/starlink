@@ -1,0 +1,23 @@
+*  Parameter values used in IRAS90 SKY* applications
+
+*  Default text attributes for SKYWRITE:
+      REAL SKY__DFDR1        ! X component of default text up direction vector
+      REAL SKY__DFDR2        ! Y component of default text up direction vector
+      REAL SKY__DFHT         ! Default text height
+      REAL SKY__DFRTO        ! Default text aspect ratio
+      CHARACTER*( 2 ) SKY__DFJST  ! Default text justification
+      REAL SKY__DFSPC        ! Default character space in text
+      INTEGER SKY__DFFNT     ! Default text font
+      INTEGER SKY__DFPEN     ! Default text pen
+
+      PARAMETER ( 
+     :  SKY__DFDR1 = 0.0, 
+     :  SKY__DFDR2 = 1.0,
+     :  SKY__DFHT = 0.02,
+     :  SKY__DFRTO = 0.66667,
+     :  SKY__DFJST = 'BC',
+     :  SKY__DFSPC = 0.0,
+     :  SKY__DFFNT = 1,
+     :  SKY__DFPEN = 3 )
+
+

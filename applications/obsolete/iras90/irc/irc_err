@@ -1,0 +1,61 @@
+*  Define the IRAS90 facility number.
+      INTEGER FAC90           ! IRAS90 facility number.
+      PARAMETER ( FAC90 = 1507 )
+
+*  Error values used by IRC:
+      INTEGER IRC__BADBN      ! Illegal IRAS band number.
+      INTEGER IRC__BADDB      ! Detector found from wrong band.
+      INTEGER IRC__BADDI      ! Detector index out of bounds.
+      INTEGER IRC__BADDN      ! Detector number out of bounds.
+      INTEGER IRC__BADDT      ! DET_NUMBERS component is wrong size.
+      INTEGER IRC__BADEX      ! Unable to use extrapolated sample
+                              ! numbers.
+      INTEGER IRC__BADLA      ! Illegal value found for LABEL.
+      INTEGER IRC__BADTY      ! Bad HDS type for DETAILS.
+      INTEGER IRC__BADUN      ! Illegal value found for UNITS.
+      INTEGER IRC__D2BIG      ! Second NDF dimension is too big.
+      INTEGER IRC__INVID      ! The given IRC identifier.
+      INTEGER IRC__MULDE      ! Detector found more than once.
+      INTEGER IRC__NAGER      ! An error has occured in a NAG routine.
+      INTEGER IRC__NOBSD      ! Insufficient good boresight data found.
+      INTEGER IRC__NOCCM      ! No CRDD_INFO component found.
+      INTEGER IRC__NOEXT      ! No IRAS extension found.
+      INTEGER IRC__NOLAB      ! Blank value found for LABEL.
+      INTEGER IRC__NOMOR      ! All IRC identifiers used.
+      INTEGER IRC__NOT2D      ! NDF is not 2 dimensional.
+      INTEGER IRC__NOUNI      ! Blank value found for UNITS.
+      INTEGER IRC__NVAL       ! Illegal number of values supplied.
+      INTEGER IRC__SBER1      ! Inconsistent DETAILS structure for
+                              ! survey boresight CRDD file.
+      INTEGER IRC__ZEROS      ! CRDD file claims to have zero scan
+                              ! speed.
+
+
+*  IRAS90 error numbers 91 to 120 are reserved for use by IRC.
+
+      PARAMETER (
+     :           IRC__BADTY  = 134250498 + 65536*FAC90 + 8*91,
+     :           IRC__INVID  = 134250498 + 65536*FAC90 + 8*92,
+     :           IRC__NOMOR  = 134250498 + 65536*FAC90 + 8*93,
+     :           IRC__D2BIG  = 134250498 + 65536*FAC90 + 8*94,
+     :           IRC__NOEXT  = 134250498 + 65536*FAC90 + 8*95,
+     :           IRC__NOCCM  = 134250498 + 65536*FAC90 + 8*96,
+     :           IRC__BADDT  = 134250498 + 65536*FAC90 + 8*97,
+     :           IRC__BADBN  = 134250498 + 65536*FAC90 + 8*98,
+     :           IRC__NOT2D  = 134250498 + 65536*FAC90 + 8*99,
+     :           IRC__BADDI  = 134250498 + 65536*FAC90 + 8*100,
+     :           IRC__BADDB  = 134250498 + 65536*FAC90 + 8*101,
+     :           IRC__MULDE  = 134250498 + 65536*FAC90 + 8*102,
+     :           IRC__BADDN  = 134250498 + 65536*FAC90 + 8*103,
+     :           IRC__NOUNI  = 134250498 + 65536*FAC90 + 8*104,
+     :           IRC__BADUN  = 134250498 + 65536*FAC90 + 8*105,
+     :           IRC__NOLAB  = 134250498 + 65536*FAC90 + 8*106)
+
+      PARAMETER (
+     :           IRC__BADLA  = 134250498 + 65536*FAC90 + 8*107,
+     :           IRC__NAGER  = 134250498 + 65536*FAC90 + 8*108,
+     :           IRC__ZEROS  = 134250498 + 65536*FAC90 + 8*109,
+     :           IRC__SBER1  = 134250498 + 65536*FAC90 + 8*110,
+     :           IRC__BADEX  = 134250498 + 65536*FAC90 + 8*111,
+     :           IRC__NOBSD  = 134250498 + 65536*FAC90 + 8*112,
+     :           IRC__NVAL   = 134250498 + 65536*FAC90 + 8*113)

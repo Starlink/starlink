@@ -1,0 +1,3182 @@
+\documentstyle{article} 
+\pagestyle{myheadings}
+
+%------------------------------------------------------------------------------
+\newcommand{\irasdoccategory}  {IRAS90 Document}
+\newcommand{\irasdocinitials}  {ID}
+\newcommand{\irasdocnumber}    {1.14}
+\newcommand{\irasdocauthors}   {D.S. Berry}
+\newcommand{\irasdocdate}      {25th August 1993}
+\newcommand{\irasdoctitle}     {IRC: A CRDD handling subroutine package}
+%------------------------------------------------------------------------------
+
+\newcommand{\numcir}[1]{\mbox{\hspace{3ex}$\bigcirc$\hspace{-1.7ex}{\small #1}}}
+\newcommand{\irasdocname}{\irasdocinitials /\irasdocnumber}
+\renewcommand{\_}{{\tt\char'137}}     % re-centres the underscore
+\markright{\irasdocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+%------------------------------------------------------------------------------
+% Add any \newcommand or \newenvironment commands here
+%------------------------------------------------------------------------------
+
+\begin{document}
+\thispagestyle{empty}
+SCIENCE \& ENGINEERING RESEARCH COUNCIL \hfill \irasdocname\\
+RUTHERFORD APPLETON LABORATORY\\
+{\large\bf IRAS90\\}
+{\large\bf \irasdoccategory\ \irasdocnumber}
+\begin{flushright}
+\irasdocauthors\\
+\irasdocdate
+\end{flushright}
+\vspace{-4mm}
+\rule{\textwidth}{0.5mm}
+\vspace{5mm}
+\begin{center}
+{\Large\bf \irasdoctitle}
+\end{center}
+\vspace{5mm}
+\setlength{\parskip}{0mm}
+\tableofcontents
+\setlength{\parskip}{\medskipamount}
+\markright{\irasdocname}
+\section {Introduction}
+The IRC\_ package comprises a set of utility subroutines which allow
+applications running under either VMS or UNIX to access IRAS CRDD (Calibrated
+Reconstructed Detector Data) in a way which makes as few assumptions as possible
+about how the information is stored in the NDF. The main body of this document
+is intended as a guide for {\em users } of the IRC\_ package, but a set of
+appendices will be included containing information needed by {\em maintainers }
+of the package. These appendices include specific details of the format in which
+CRDD of different types is stored, and notes on the implementation of the
+package. Users of IRC\_ should not need to know about these specific details, as
+all access to CRDD information (except the DATA array) should be done
+using IRC\_. Following Starlink programming standards, all the subroutines are
+identified by names of up to five characters, together with the prefix
+``IRC\_''. 
+
+The routines within IRC\_ all apply to {\em reading } CRDD files. New CRDD files
+can be created using the NDF\_ system, based on previously existing input CRDD
+files. Such input CRDD files will exist for most applications {\em with the
+exception of the application which extracts CRDD from the tape archives}. 
+
+Access to the sample values which form the bulk data in a CRDD file can be
+gained through the NDF\_ routines described in 
+SUN/33. The IRG\_ package (see ID/5 ) provides facilities for acquiring NDF 
+identifiers from a ``free format'' list of CRDD files, potentially including wild 
+cards, explicit multiple names, indirection through text file, etc.
+
+Throughout this document the term ``CRDD file'' is used to mean any file which 
+holds data in the form of time ordered data streams from separate detectors. 
+Technically, data is no longer true CRDD once any operation has been performed 
+on, since it is no longer in the original form distributed by IPAC.
+
+\section {CRDD Type Independency}
+\label {SEC:INDEP}
+Currently, most CRDD used in the UK is SURVEY data, and is distributed in a form
+in which the pointing information is stored as a set of samples of boresight
+angles. This may not always be true. The CRDD for Pointed Observations
+(POs) may eventually be available in a form known as ``footprints'', in
+which the pointing information is stored explicitly for each data sample. Other
+forms of CRDD may become available in the future. It would obviously be a large
+overhead if a new set of CRDD handling applications need to be written each 
+time this happens. 
+
+For this reason, a major design goal for the IRC\_ package was ``CRDD type
+independency''. This means that applications need not know what type of CRDD is
+being handled. Obviously, internally IRC\_ needs to know all the details of each
+specific CRDD type, but users of the package should make very sure that the
+applications they write {\em do not depend } on such information. This will be
+the case if {\em all} access to CRDD information is done using IRC\_. Applications
+should never use HDS to directly access the CRDD information held in the IRAS
+NDF extension (if IRC\_ doesn't provide the function you require, then IRC\_
+should be modified). If this rule is strictly adhered to, then future new types
+of CRDD can be accommodated simply by modifying the IRC\_ routines. For this
+reason, the main part of this document describes CRDD in terms of concepts
+common to {\em all} CRDD types. All specific details of individual CRDD types
+are contained in the appendices. 
+
+\section {CRDD Support Information}
+\label {SEC:SUPP}
+Some types of CRDD file may carry round with them extra information over and
+above that needed for the operation of IRC. This information is called ``support
+information'' within this document. Examples of support information may be the
+geographic longitude and latitude of the boresight at various times through the
+scan, or uncertainties in satellite coordinates. The exact items of support
+information available in a CRDD file will depend on the CRDD type, and they are
+listed in the relevant appendices at the end of this document. The only support
+provided by IRC for handling this information is the routine IRC\_SUPP which
+returns an HDS locator to a requested item of support information (if it
+exists). It is the responsibility of the calling application to ensure that this
+information is correctly interpreted. Access to this information should be kept
+to a minimum, as its use makes an application CRDD-type dependant. Applications 
+should always allow for the possibility that a required item of support 
+information may not be present in the supplied CRDD file.
+
+\section {Terms Used to Describe CRDD Files}
+\label {SEC:TERMS}
+This section aims to define terms needed to describe a CRDD file. Again, care
+has been taken to ensure that the concepts described are general enough
+as to be applicable to forseeable future CRDD types.
+
+For the purposes of the IRC\_ routines, a CRDD file is an NDF in which the DATA
+array holds the calibrated reconstructed detector data values from a single
+``scan''. The meaning of the word ``scan'' depends on the individual CRDD type
+and definitions are contained in the corresponding appendices. Two examples are
+a survey scan of arbitrary length, or a single leg of a pointed observation. The
+data values in a CRDD file must all relate to the same IRAS wave band, must come
+from the same Satellite Observation Plan (SOP), and must come from the same
+observation (OBS) within the SOP. The data array is two dimensional (a size of
+one for the second dimension is allowed). Each row of the array corresponds to
+the data stream from a single detector, and can have an arbitrary time offset
+relative to the other rows (in other words, the first sample from each detector
+were not necessarily taken at the same time). Thus the first dimension steps
+though sample numbers, and the second steps though detectors. Note, there is no
+need for the DATA array to have a row for {\em each} detector in the band, the
+number of rows can be less than the number of detectors in the band if some
+detectors are to be excluded. 
+
+Each element in the data array is called a ``sample'', not a pixel. The word
+``pixel'' means a ``picture element'', so ``sample'' is used to emphasise that
+the data is {\em not} a picture, but a set of time order data streams. Each 
+sample can be characterised by the following general properties: 
+
+\begin{description}
+
+\item [Sample value] - This would usually be a value in units of Pico-Watts
+($10^{-12}$ Watts) per square metre, but the UNITS component of the NDF should
+be checked to confirm this. The sample values could conceivably be divided by
+the effective detector solid angles to get a CRDD file in which the values were
+surface brightness estimates rather than flux estimates. In fact applications
+could in principle perform {\em any} operation on the sample values.
+Applications should check UNITS if the nature of the sample values effects the
+algorithm. Standard values for UNITS are listed in appendix \ref {APP:UNITS}. No
+calibration corrections are applied by applications which use these values. 
+
+\item [Sample number] - This is a value varying between the bounds of the
+first dimension of the data array. These bounds need not necessarily start at 1
+(see the NDF\_ system documentation, SUN/33). For instance, applications may
+create an NDF {\em section} (see SUN/33) from a CRDD file, containing a subset
+of the entire DATA array. In this case the first sample in the section retains
+the sample number it had in the original {\em base} NDF, which in general will
+not be 1. However, applications should always create {\em new} CRDD files 
+with a lower bound of 1 (except if they are propagated from input CRDD file, in
+which case they should inherit the bounds of the input CRDD file). 
+
+In order to index the data array, an {\em integer} sample number must obviously
+be used. However, several IRC routines use {\em floating point} sample numbers
+which can have fractional values. This allows positions to be specified to a
+greater accuracy. Applications can choose whether to just use the nearest
+integer to index the data array, or whether to use some form of interpolation
+between the sample values on either side of the fractional sample number. 
+
+Sample numbers may extend beyond the bounds of the first dimension of the NDF
+DATA array. Obviously in such situations, no actual {\em data values} are
+available for the sample, but IRC will provide {\em positional} information for
+such samples. This facility is often useful for positioning a scan relative to
+some given position on the sky. The position of a sample which lies outside the
+DATA array is obtained by extrapolation from the samples within the DATA array.
+If an accurate extrapolated position cannot be obtained, IRC will return an
+error status, and generate an error report. The calling application must then
+decide how to handle this situation. 
+
+\item [Time] - For each sample, this is the difference in UTC between the moment
+each sample was taken and the moment sample number 1 was taken, in seconds.
+The time of a given sample number can vary from detector to detector.
+
+\item [Detector index] - An integer varying between the bounds of the second
+dimension of the data array, and giving the row at which the detectors data
+is stored. Note, the detector {\em index } does not explicitly 
+identify a detector in terms of the detector {\em numbers } used in the 
+Explanatory Supplement. The detector {\em index } locates the detector
+within the NDF data array (i.e the row number holding the detectors data 
+stream), the detector {\em number} locates it within the IRAS focal plane.
+No assumptions are made about the order in which detectors are stored in the
+NDF.
+
+\item [Detector number] - Each of the 62 IRAS detectors was identified by a 
+``Detector number'', an integer varying from 1 to 62. These are shown in the 
+Explanatory Supplement figure II.C.6. The detector which gave rise to a
+particular sample can be identified by these numbers. A vector of
+detector numbers will be stored in the IRAS extension, giving an ``absolute''
+identity to each detector index value. Each detector can have a maximum of 
+one row of data in a CRDD file.
+
+\item [Position] - This is the position on the sky corresponding to the detector
+centre at the moment the sample was taken. All sky positions are given and
+returned as double precision Right Ascension and Declination values (FK4,
+B1950), in radians. If positions in other sky coordinate systems are required,
+the IRAS astrometry package (IRA\_, see ID/2) can be used to do the conversion. 
+
+\item [Scan angle] - This is the orientation of the path being traced across the
+sky by a detector, and can vary from sample to sample. Near the poles, it can
+also vary significantly from detector to detector. The angle is measured from
+equatorial north to a line passing through the detector centre in the direction
+of the positive focal plane Y axis. The angle is in radians and is measured
+positive in the same sense as rotation from north to east (this is the standard
+astronomical Position Angle (PA) of the positive Y axis). Scan angles are always
+double precision values. See appendix \ref {APP:FOCALP} for a description of the
+focal plane (Z,Y) coordinate system. 
+
+\item [Scan speed] - This is the speed at which a source is moving across the
+focal plane, in radians per second. This is a signed value to indicate if the
+motion is ``with-survey'' (i.e in the same sense as the all sky survey), or
+``anti-survey'' (i.e. in the opposite direction). With-survey motion is positive
+and corresponds to sources moving across the focal plane in the positive Y
+direction. Anti-survey motion is negative and corresponds to sources moving
+across the focal plane in the negative Y direction (see appendix \ref 
+{APP:FOCALP}).
+\end{description}
+
+\section {Using the IRC\_ Routines}
+See appendix \ref {APP:EXAMS} for some code fragments showing typical examples 
+of the use of IRC.
+
+\subsection {Assumptions to be Avoided when Using IRC}
+Applications which process CRDD files should be designed so that they relate to
+the CRDD in terms of the general properties listed above. Concepts which may not
+be defined for all types of CRDD should be avoided where ever possible (eg
+``plates'', ``frames'' etc). Care should be taken to avoid making unjustified
+assumptions about the relationship between data samples. Some particularly
+assumption which used to be valid for BDF CRDD files but which should now be
+avoided are:
+
+\begin {enumerate}
+
+\item {\em ``CRDD files always contain values in the same units''}. CRDD files
+may contain data in any of the units listed in appendix \ref {APP:UNITS}, and
+applications should check the UNITS component before deciding how to process the
+data. If the application cannot process data with the supplied units, then a
+suitable error should be reported. Applications which {\em write} CRDD files
+should always produce values in one of the supported units systems. 
+
+\item {\em ``Taking the same sample number from each row results in a set of
+simultaneous samples''}. This may not be the case for all types of CRDD (eg PO
+footprint data). However, substantial CPU savings can sometimes be made by an
+application if each column of samples {\em are} in fact obtained simultaneously.
+For this reason routine IRC\_SIMUL is provided which will return a logical value
+indicating if the detector data samples are simultaneous or not. 
+
+\item {\em ``Adjacent samples from a single detector are all equally spaced on 
+the sky''}. Again, this may not be the case for all types of CRDD (eg PO
+footprint data). It {\em can} be assumed that adjacent samples are equally
+spaced in {\em time}, but not in {\em position}. 
+
+\item {\em ``The first sample in the array is sample number 1''}. This need not 
+be true now that NDFs are being used to store the CRDD (see the description of 
+`` Sample Numbers'' in section \ref {SEC:TERMS} ).
+
+\item {\em ``The detectors are stored in cross-scan order''}. This need not be
+true, detectors can be stored in any order. The IRAS detectors numbers
+identifying the detectors from which the data in each row of the NDF was created
+are explicitly stored in CRDD file. The relationship between row numbers in the
+DATA array (or ``detector index'', see section \ref {SEC:TERMS}) and IRAS
+detector numbers can be obtained using IRC\_DETNO and IRC\_DETIN. 
+
+\item {\em ``The scan angle is constant''}. This also is not true. Scan angle
+(see section \ref{SEC:TERMS}) can vary along the length of a scan. {\em It can
+also vary from detector to detector at a given point in the scan.} This latter
+effect is only significant near the poles, but applications should not be
+written which rely on the scan angle being the same for all detectors. 
+
+\end {enumerate}
+
+\subsection {Constants and Error Values}
+The IRC package has associated with it various symbolic constants defining such
+things as the required length of various character variables. These values
+consist of a name of up to 5 characters prefixed by ``IRC\_\_''  (note the {\em
+double} underscore), and can be made available to an application by including
+the following lines at the start of the routines which uses them: 
+
+
+\begin{verbatim}
+      INCLUDE 'I90_DAT'
+      INCLUDE 'IRC_PAR'
+\end{verbatim}
+
+The values thus defined are described in the following sections, and also in the
+subroutine specifications. Another set of symbolic constants is made available
+by the statement 
+
+\begin{verbatim}
+      INCLUDE 'IRC_ERR'
+\end{verbatim}
+
+These values have the same format of those contained in IRC\_PAR, put define
+various error conditions which can be generated within the IRC package.
+Applications can compare the $STATUS$ argument with these values to check for
+specific error conditions. These values are described in appendix \ref
+{APP:ERRORS}. 
+
+\subsection {Initialising the IRC\_ System}
+A call to IRC\_INIT must be made before calling any other IRC\_ routines. This 
+routine initializes various common blocks.
+
+\subsection {Obtaining  NDF Identifiers for Input CRDD Files}
+The next step that most applications will need to do is to obtain a set of NDF 
+identifiers for all the input CRDD files. These identifiers are given as input
+to many NDF\_ routines and to IRC\_IMPRT, to identify the CRDD file to be 
+operated on.
+There is a finite limit to the number of NDF identifiers which can be 
+defined simultaneously. Therefore it is a good idea to process CRDD files one 
+at a time, rather than all together, so that resources can be released and 
+re-used. Obviously this may not always be possible, in which case the possibility 
+of hitting the limit should be born in mind. The actual value of the limit is 
+hard to define as it depends on many things, but it will probably be of the 
+order of one or two hundred, if the users open file quota does not impose a 
+lower limit. If this presents a problem, the facilities provided by the IRG\_ 
+(ID/5) package may be of help.
+
+NDF identifiers for existing CRDD files can be obtained by calling routine
+IRM\_CRDDF (see ID/8), followed by IRG\_NDFEX (see ID/5). IRM\_CRDDF uses the
+facilities of the IRG package to obtain the name of a single CRDD file or the
+names of a group of CRDD files. IRG\_NDFEX returns an NDF identifier for a
+specified name within the group of names returned by IRM\_CRDDF. A CRDD file
+must next be ``imported'' into the IRC\_ system by calling the IRC\_IMPRT
+routine. This routine checks that the NDF is in fact a CRDD file, and reads data
+from the CRDD\_INFO extension (see below) into various internal common blocks.
+Note, it is possible to import an NDF {\em section} into IRC as well as a base
+NDF. Indeed, there is nothing to stop the user specifying a section when giving
+the NDF name in reponse to the parameter prompt from IRM\_CRDDF. However, if 
+an NDF section is specified which is a {\em super}-set in the second dimension 
+(i.e. if the bounds of the second dimension of the section extend beyond the 
+bounds of the second dimension of the base NDF), then there will be no 
+detector numbers corresponding to the extra rows used to pad the section out to 
+the required size. In this case IRC\_IMPRT will report an error. No such error 
+is reported if the section is a {\em sub}-set of the base NDF in the second 
+dimension.
+
+\subsection{IRC identifiers}
+Routine IRC\_IMPRT returns an ``IRC identifier'' for the CRDD information 
+associated with the given NDF. This identifier is passed to other IRC\_ routines 
+to identify the CRDD file. IRC\_ANNUL should be called to annul the IRC 
+identifier when access to the CRDD information is no longer needed.
+
+\subsection {Accessing Sample Values}
+The CRDD sample values are stored in the standard DATA component of the NDF, and 
+can be accessed using the usual NDF\_ routines such as NDF\_MAP. Before 
+processing the CRDD, applications should first get the value of the UNITS 
+component using NDF\_CGET, and check that the data represents a physical 
+quantity which the application knows how to handle. The legality of both the
+UNITS and LABEL component values are checked by IRC\_IMPRT. If the stored values
+are not recognised then an error report is made (see appendices 
+\ref {APP:UNITS} and \ref {APP:LABEL} for lists of legal values).
+
+\subsection {Obtaining Pointing Information}
+Pointing information can be requested in several ways. IRC\_DPOS returns the sky
+positions, scan angles and scan speeds for a specified small set of detector
+samples. IRC\_BPOS is like IRC\_DPOS except that the returned position and scan
+angle refer to the boresight instead of any given detector. (Note, IRC does not
+impose the restriction that each column of the DATA array must contain
+simultaneously obtained detector samples. For this reason IRC\_BPOS requires a
+detector index as a given argument to establish the relationship between sample
+number and boresight position.) IRC\_POSMP returns three arrays of the same size
+and shape as the main data array, holding the two sky coordinates and scan 
+angle at every detector sample. 
+
+Positions of samples which lie outside the bounds of the data array can be
+estimated using IRC\_BPOS and IRC\_DPOS (but {\em not} IRC\_POSMP). These
+positions are based on extrapolation of the samples within the DATA array (for
+instance SURVEY scans with boresight pointing data are extrapolated by assuming
+constant cone angle and constant rate of change of clock angle. See the
+Explanatory Supplement, chapter III). If an accurate extrapolated position is
+not available, the subroutines inherited STATUS value is set to the symbolic
+value IRC\_\_BADEX (see appendix \ref {APP:ERRORS} ) and an error report is
+generated. The calling application can then decide how to handle this error. 
+
+Routine IRC\_IMCO combines the above routines with various IRA (see ID/2)
+routines, to provide the coefficients of a linear transformation which maps
+focal plane coordinates (relative to the detector centre) to the image
+coordinates system defined by a given ``IRA identifier''. This identifier
+defines the mapping between sky coordinates and image coordinates, and is
+usually obtained by calling one of the IRA routines IRA\_CREAT or IRA\_IMPRT.
+The returned coefficients can either be used directly to transform focal plane
+coordinates to image coordinates, or can be used to derive values such as the
+position angle of the focal plane Y axis, the pixel dimensions, etc. 
+
+If all that is required is a rough estimate of where abouts on the sky the data
+is, the routine IRC\_INFO can be called which returns (amongst other things) the
+position of the CRDD file ``reference point'', which is usually the
+field centre requested when the data was extracted from the tape archives. 
+
+\subsection {Transforming Between Focal Plane and Sky Coordinates}
+At the moment a given detector sample is taken, there exists a transformation
+between focal plane coordinates (see appendix \ref {APP:FOCALP}) and sky
+coordinates. This transformation obviously changes as the boresight moves across
+the sky. Routines IRC\_FPCO1 and IRC\_FPCO2 will perform the transformation from
+sky coordinates to focal plane coordinates using full spherical geometry,
+accurate for {\em any} point on the sky. The inverse transformation can be
+performed by IRC\_SKCO1 and IRC\_SKCO2. These routines can be used to find the
+in-scan or cross-scan distance (Y or Z focal plane values) from the boresight to
+any point on the sky. 
+
+\subsection {Moving Between Detector Samples}
+Routine IRC\_DIST will find the in-scan distance joining two specified detector
+samples. IRC\_OFFST will find the sample which is a given in-scan distance away
+from a specified sample. IRC\_DCLAP will find the sample number which
+corresponds to the closest approach of a given detector track to a specified sky
+position. IRC\_BCLAP will do the same for the boresight track.(Note, IRC\_BCLAP
+requires a detector index as a given argument to establish the relationship
+between sample number and boresight position, which can vary from detector to
+detector.) 
+
+\subsection {Accessing Detector Numbers and Detector Indices}
+The detector number corresponding to a given row in the DATA array can be found
+using IRC\_DETNO. This is an integer {\em function}, not a subroutine. The
+inverse of this operation is performed by function IRC\_DETIN which returns a
+detector index (i.e. row number) which corresponds to a given detector number.
+If the requested detector number is not included in the CRDD file then the
+Starlink ``BAD'' value (VAL\_\_BADI) is returned. In addition, the routine
+IRC\_DINDS will convert a list of detector numbers to the corresponding detector
+indices, ignoring any detector numbers for which there is no data in the CRDD
+file. 
+
+\subsection {Accessing Other Information}
+Other information is available by calling IRC\_INFO. This includes:
+
+\begin{itemize}
+
+\item The IRAS band number.
+
+\item The position of the reference position.
+
+\item The SOP number.
+
+\item The OBS number.
+
+\item A nominal scan speed.
+
+\end{itemize}
+
+These, and other values, are defined in section \ref {SEC:CRDD_INFO}. A locator
+to an item of ``support information'' (see section \ref{SEC:SUPP}) may be
+obtained using routine IRC\_SUPP. 
+
+\subsection {Other Functions}
+More routines are being added to IRC\_ to perform other functions. See
+the routine specifications contained in appendix \ref {APP:ROUTS} for
+a complete list.
+
+\section {Data Structures}
+A CRDD file makes use of some of the standard NDF components, but 
+needs extra information held in the IRAS extension.
+
+\subsection {NDF Components}
+The following meanings are attached to the standard NDF components.
+
+\begin{description}
+
+\item [DATA] - Holds the CRDD sample values as described above.
+
+\item [UNITS] - A character string describing the sample values held in the data
+array. See appendix \ref {APP:UNITS} for a list of legal values and their
+meanings. Applications need to check the UNITS value before deciding how to use
+the sample values. A check is made by IRC\_IMPRT that the value held in UNITS 
+corresponds to one of the legal values.
+
+\item [TITLE] - A string which usually names the object observed (eg "M51", 
+"NGC 5128" etc).
+
+\item [LABEL] - A string describing the type of data; ``Pointed Observation
+CRDD'' or ``Survey CRDD''. Legal values are listed in appendix \ref{APP:LABEL}.
+A check is made by IRC\_IMPRT that the value held in LABEL corresponds to one of
+the legal values. 
+
+\item [VARIANCE] - This is optional, but could be used to store the variance of
+each CRDD sample. General purpose Starlink software assume that these variance 
+values represent independent, Gaussian noise samples. The limitations imposed 
+by these assumptions are recognised, but this component can still be useful, 
+especially within the IRAS package, where the limitations will be understood.
+
+\item [QUALITY] - This is optional, but can be used to distinguish between 
+different samples. For instance, quality could be used to identify samples
+which are to be used when calculating destriping parameters. The IRQ\_ package 
+(see ID/6) provides facilities for handling quality values in IRAS90.
+
+\item [HISTORY] - This component is used to record any significant processes 
+performed on the CRDD, and any important numerical values used (eg solid angles, 
+bandwidths, etc). What goes into HISTORY is left to the discretion of each 
+application.
+
+\item [AXIS] - This component is left undefined within a CRDD file.
+
+\end{description}
+
+\subsection {Components of the CRDD\_INFO Structure}
+\label{SEC:CRDD_INFO}
+NDFs which contain CRDD have an extension with a {\em name} IRAS and
+an HDS {\em type} of IRAS. This is an HDS structure used to store IRAS specific
+information. It can potentially contain several components or sub-structures.
+The IRC\_ package is associated with a particular sub-structure {\em named} 
+``CRDD\_INFO''. CRDD\_INFO is an HDS object and has a {\em type} of
+``CRDD\_INFO''. This object stores all the information required by the IRC\_
+package. It contains the following components: 
+
+\begin {description}
+
+\item [DET\_NUMBERS] - A 1 dimensional \_INTEGER array. The size of this array
+must be equal to the size of the second dimension of the {\em base} NDF. Each
+element will hold the detector number of the corresponding row in the DATA
+array. Thus if the bounds of the second dimension of the base NDF were [-5,3]
+then DET\_NUMBERS(1) would hold the detector number corresponding to row -5,
+DET\_NUMBERS(2) would hold the detector number corresponding to row -4, etc. 
+
+\item [DET\_ORIGIN] - An \_INTEGER scalar giving the index within the 
+DET\_NUMBERS array corresponding to the origin of the second dimension of the 
+NDF. Thus if the bounds of the second dimension of the base NDF were [-5,3]
+so that DET\_NUMBERS(1) holds the detector number corresponding to row -5, then
+DET\_NUMBERS(6) would hold the detector number corresponding to row zero, and
+so DET\_ORIGIN should have the value 6.
+
+\item [BAND] - An \_INTEGER scalar in the range 1 to 4, giving the IRAS band 
+number. Storing the band {\em number} (rather than wavelength) allows the
+value of BAND to be used directly as an index into arrays holding band-specific 
+information. On the other hand, applications should always use wavelengths
+(12, 25, 60, 100 $\mu$m) rather than band numbers when communicating with the user.
+
+\item [REF\_RA] - A \_DOUBLE scalar giving the Right Ascension (equinox B1950.0)
+of a reference position in the vicinity of the sky region covered by the CRDD
+file, given in units of radians. The reference position will usually be the
+source position requested by the user when the CRDD file was created. 
+
+\item [REF\_DEC] - A \_DOUBLE scalar giving the Declination (equinox B1950.0) 
+of the reference position in radians.
+
+\item [SOP] - An \_INTEGER scalar giving the Satellite Observation Plan number 
+from which the data is derived.
+
+\item [OBS] - An \_INTEGER scalar giving the Observation number within the
+SOP from which the data is derived.
+
+\item [NOM\_SPEED] - A real value giving the scan speed on the sky at the 
+centre of the scan (see section \ref {SEC:TERMS}). This value will usually
+be the equivalent of 3.85 arc-minutes per second for survey data, but may be
+different for PO data. Also, the exact scan speed may vary with sample number
+in a PO scan. 
+
+\item [DETAILS] - All the above components are meaningful for any type of CRDD.
+However, there will be information which is only meaningful in the context of
+one particular type of CRDD (pointing data for instance). A set of HDS
+structures will be defined to hold such information. They have differing HDS
+{\em types} (restricted to 15 characters e.g. ``SURVEY\_BSIGHT'',
+``PO\_FOOTPRINT'', etc). The component named DETAILS within the CRDD\_INFO
+structure contains one (and only one) of these structures. The names and
+contents of each of these structure types are described in the relevant
+appendix. Any available support information is stored in a component of the 
+DETAILS structure named SUPPORT\_INFO.
+
+\end {description}
+\newpage
+
+The structure of a typical CRDD file is as follows:
+
+\setlength{\textwidth}{190mm}
+\setlength{\unitlength}{0.8mm}
+\begin{picture}(190,170)
+\put(5,150){\framebox(30,15){NDF}}
+\put(20,150){\line(0,-1){15}}
+\put(20,140){\line(1,0){150}}
+\put(5,120){\framebox(30,15){MORE}}
+\put(70,140){\line(0,-1){5}}
+\put(55,120){\framebox(30,15){DATA}}
+\put(120,140){\line(0,-1){5}}
+\put(105,120){\framebox(30,15){VARIANCE}}
+\put(170,140){\line(0,-1){5}}
+\put(155,120){\dashbox(30,15){(etc)}}
+\put(20,120){\line(0,-1){15}}
+\put(20,110){\line(1,0){100}}
+\put(5,90){\framebox(30,15){IRAS}}
+\put(70,110){\line(0,-1){5}}
+\put(55,90){\framebox(30,15){FITS}}
+\put(120,110){\line(0,-1){5}}
+\put(105,90){\dashbox(30,15){(etc)}}
+\put(20,90){\line(0,-1){15}}
+\put(20,80){\line(1,0){150}}
+\put(5,60){\framebox(30,15){CRDD\_INFO}}
+\put(70,80){\line(0,-1){5}}
+\put(55,60){\framebox(30,15){DESTRIPE}}
+\put(120,80){\line(0,-1){5}}
+\put(105,60){\framebox(30,15){MEMCRDD}}
+\put(170,80){\line(0,-1){5}}
+\put(155,60){\dashbox(30,15){(etc)}}
+\put(20,60){\line(0,-1){15}}
+\put(20,50){\line(1,0){150}}
+\put(5,30){\framebox(30,15){DETAILS}}
+\put(70,50){\line(0,-1){5}}
+\put(55,30){\framebox(30,15){BAND}}
+\put(120,50){\line(0,-1){5}}
+\put(105,30){\framebox(30,15){REF\_RA}}
+\put(170,50){\line(0,-1){5}}
+\put(155,30){\dashbox(30,15){(etc)}}
+\put(20,30){\line(0,-1){15}}
+\put(20,20){\line(1,0){50}}
+\put(5,0){\framebox(30,15){ }}
+\put(5,0){\shortstack{Type-specific\\details\\ \rule{0mm}{2mm}}}
+\put(70,20){\line(0,-1){5}}
+\put(55,0){\dashbox(30,15){ }}
+\put(55,0){\shortstack{Support\\information\\ \rule{0mm}{2mm}}}
+\end{picture}
+\setlength{\textwidth}{160mm}
+
+The IRC\_ routines access the components of the fifth and sixth rows, and 
+NDF\_ routines access components of the second and third rows.
+
+The {\bf DESTRIPE} and {\bf MEMCRDD} components are shown as examples of 
+components of the IRAS structure which may be created by CRDD handling 
+applications to store supplementary information about the CRDD file. Such 
+structures will be defined in the documentation of the relevant application and 
+{\em do not } form part of the standard structure of a CRDD file, as defined by this 
+document. Routines to access such structures will form part of the individual 
+application.
+
+\section {Compiling and Linking with IRC}
+\label{SEC:LINK}
+This section describes how to compile and link applications which use IRC
+subroutines, on both VMS and UNIX systems. It is assumed that the IRAS90 package
+is installed as part of the Starlink Software Collection. 
+
+\subsection{VMS}
+Each terminal session which is to include the compilation or linking of 
+applications which use the IRC package should start by issuing the commands:
+
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ IRAS90
+$ IRAS90_DEV
+\end{verbatim}
+
+These commands set up logical names related to all the IRAS90
+subsystems, including IRC. 
+
+To link a VMS ADAM application with the IRC package, the linker options file
+IRAS90\_LINK\_ADAM should be used. For example, to compile and link an ADAM
+application called PROG with the IRC library, the following commands should be
+used: 
+
+\begin{verbatim}
+$ ADAMSTART
+$ ADAMDEV
+$ IRAS90
+$ IRAS90_DEV
+$ FORT PROG
+$ ALINK PROG, IRAS90_LINK_ADAM/OPT 
+\end{verbatim}
+
+Stand-alone (i.e. non-ADAM) applications can be linked with the ``standalone''
+version of IRC. To do this the link options file IRAS90\_LINK should be used
+instead of IRAS90\_LINK\_ADAM. Thus to compile and link a stand-alone
+application with the IRC package, the following commands should be given: 
+
+\begin{verbatim}
+$ IRAS90
+$ IRAS90_DEV
+$ FORT PROG
+$ LINK PROG, IRAS90_LINK/OPT 
+\end{verbatim}
+
+\subsection{UNIX}
+
+Each terminal session which is to include the compilation or linking of 
+applications which use any IRAS90 sub-package should do the following:
+
+\begin{enumerate}
+\item Execute the {\bf iras90} command. This sets up an alias for the 
+{\bf iras90\_dev} command.
+
+\item Execute the {\bf iras90\_dev} command.  This creates soft links
+within the current directory to
+all the iras90 include files, defines an environment variable IRAS90\_SRC
+pointing to the IRAS90 source directory, adds the {\bf bin}
+sub-directory of IRAS90\_SRC on to the end of the current value for the
+environment variable PATH, and adds the {\bf lib} sub-directory of 
+IRAS90\_SRC on to the end of the current value for the environment 
+variable LD\_LIBRARY\_PATH. The command {\bf iras90\_dev star} will do
+the same but will also create soft links to all starlink include files
+(i.e. all files in the directory /star/include).
+
+\item If a UNIX application accesses any include files (such as
+IRC\_PAR) then they should be specified (within the source file) in upper case 
+without any directory
+path. The I90\_PAR file (for instance) can be included using the statement
+
+\verb+      INCLUDE 'I90_PAR'+\\
+
+\item Soft links can be deleted (using the {\bf rm} command) when no longer 
+needed.
+The command {\bf iras90\_dev remove} will remove all IRAS90 soft links from
+the current directory. The command {\bf iras90\_dev remove star} will
+remove all IRAS90 and Starlink soft links from the current directory.
+Note, soft links are only accessable in the directory from which the {bf ln} 
+or {\bf iras90\_dev} command was issued. 
+\item For ADAM applications the following {\bf alink} command should be used:
+
+\verb+% alink prog.f -L$IRAS90_SRC/lib `irc_link_adam`+\\
+
+where {\bf prog.f} is the fortran source file for the ATASK.
+Note the use of opening apostrophies (`) instead of the more usual closing
+apostrophy (') in the above {\bf alink} command.
+
+\item For a stand-alone program the following {\bf f77} command should be used:
+
+\verb+% f77 prog.f -o prog -L$IRAS90_SRC/lib `irc_link`+\\
+\end{enumerate}
+
+
+\appendix
+\section {Routine Descriptions}
+\label {APP:ROUTS}
+
+\subsection {Routine List}
+In this list, the term {\em sample} is used to refer to a combination of a {\em
+sample number} and a {detector index} (see section \ref{SEC:TERMS}).
+
+% Command for displaying routines in routine lists:
+% =================================================
+\newcommand{\noteroutine}[2]{{\small \bf #1} \\
+                              \hspace*{3em} {\em #2} \\[1.5ex]}
+\noteroutine{IRC\_ANNUL( IDC, STATUS )}
+   {Release a CRDD file from the IRC\_ system.}
+\noteroutine{IRC\_BCLAP( IDC, DETIND, RA, DEC, CLSAMP, CLZFP, STATUS )}
+   {Find the sample number corresponding to the closest approach of the 
+    boresight to a given sky position.}
+\noteroutine{IRC\_BPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED, 
+                        STATUS )}
+   {Returns the position, speed and scan angle of the boresight at a set of 
+    samples.}
+\noteroutine{IRC\_CLOSE( STATUS )}
+   {Close down the IRC\_ system.}
+\noteroutine{IRC\_DCLAP( IDC, DETIND, RA, DEC, CLSAMP, CLZFP, STATUS )}
+   {Find the sample number corresponding to the closest approach of a given
+    detector to a given sky position.}
+\noteroutine{IRC\_DETIN( IDC, DETNO, STATUS )}
+   {Return a detector index for a given detector number.}
+\noteroutine{IRC\_DETNO( IDC, DETIND, STATUS )}
+   {Return a detector number for a given detector index.}
+\noteroutine{IRC\_DINDS( IDC, NDETNO, DETNO, DETIN, NDETIN, STATUS )}
+   {Converts a list of detector numbers to the corresponding detector indices.}
+\noteroutine{IRC\_DIST( IDC, SAMP1, DETIN1, SAMP2, DETIN2, DIST, STATUS )}
+   {Return the in-scan distance between two samples within a scan.}
+\noteroutine{IRC\_DPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE, SPEED, 
+                        STATUS )}
+   {Returns the position, speed and scan angle of a given detector at a set 
+    of sample numbers.}
+\noteroutine{IRC\_FPCO1( IDC, SAMPLE, DETIND, NVAL, RA, DEC, ZFP, YFP, STATUS )}
+   {Return the focal plane coordinates of many sky positions at the time 
+    determined by a given sample.}
+\noteroutine{IRC\_FPCO2( IDC, NVAL, SAMPLE, DETIND, RA, DEC, W1, W2, W3, 
+                         W4, ZFP, YFP, STATUS )}
+    {Return the focal plane coordinates of a single sky position at a set of
+     times determined by the given set of samples.}
+\noteroutine{IRC\_ILAB( LIST, STATUS )}
+   {Return a list of legal values for NDF component LABEL.}
+\noteroutine{IRC\_IMCO( IDC, SAMP, DETIN, IDA, INIT, C, STATUS ))}
+   {Locate a detector sample within an image frame.}
+\noteroutine{IRC\_IMPRT( INDF, IDC, STATUS )}
+   {Imports a CRDD file into the IRC\_ system, given its NDF identifier.}
+\noteroutine{IRC\_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, SOP, OBS, STATUS )}
+   {Obtain values for the global properties of a CRDD file. }
+\noteroutine{IRC\_INIT( STATUS )}
+   {Initialises the IRC\_ system.}
+\noteroutine{IRC\_IUNIT( LIST, STATUS )}
+   {Return a list of legal values for NDF component UNITS.}
+\noteroutine{IRC\_LIMIT( IDC, NDETS, DETIND, TRUNC, IDA, LBND, UBND, STATUS )}
+   {Determine the image area covered by a CRDD file.}
+\noteroutine{IRC\_OFFST( IDC, SAMP1, DETIN1, DETIN2, DIST, SAMP2, STATUS )}
+   {Find a sample which is a given in-scan distance away from a given sample.}
+\noteroutine{IRC\_POSMP( IDC, NEWNDF, PNTR, STATUS )}
+   {Produce a mapped array holding the position and orientation of each sample.}
+\noteroutine{IRC\_SATCO( IDC, NVAL, SAMPLE, DETIND, PSI, THETA, SOLONG, UTCS,
+                        STATUS )}
+   {Returns the satellite coordinates, solar longitude and UTCS values at a 
+    set of samples.}
+\noteroutine{IRC\_SIMUL( IDC, SIMUL, STATUS )}
+   {See if the CRDD file contains simultaneous detector samples or not.}
+\noteroutine{IRC\_SKCO1( IDC, SAMPLE, DETIND, NVAL, ZFP, YFP, RA, DEC, STATUS )}
+   {Find sky coordinates for a set of focal plane positions at a time specified 
+    by the given sample.}
+\noteroutine{IRC\_SKCO2( IDC, NVAL, SAMPLE, DETIND, ZFP, YFP, RA, DEC, STATUS )}
+   {Find sky coordinates for a single focal plane position at a set of times
+    specified by a given set of samples.}
+\noteroutine{IRC\_SUPP( IDC, NAME, THERE, LOC, STATUS )}
+   {See if an item of support information exists, and if so, return an HDS 
+    locator to it.}
+\noteroutine{IRC\_TRACE( IDC, ROUTNE, STATUS )}
+   {Display the contents of the CRDD\_INFO structure.}
+\noteroutine{IRC\_TRUNC( IDC, NDETS, DETIND, SAMPLO, SAMPHI, STATUS )}
+   {Find section of scan which is covered by data from all detectors.}
+
+\subsection {Full Routine Specifications}
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+
+\font\ssttt=cmtt10 scaled 1095
+
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em} 
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.45pt}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+\newcommand{\sstusage}[1]{\item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+\newcommand{\sstinvocation}[1]{\item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstparameters}[1]{
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstexamples}[1]{
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+\newcommand{\sstsubsection}[1]{\item[{#1}] \mbox{} \\}
+
+\newcommand{\sstexamplesubsection}[1]{\item[{\ssttt #1}] \mbox{} \\}
+
+\newcommand{\sstnotes}[1]{\item[Notes:] \mbox{} \\[1.3ex] #1}
+
+\newcommand{\sstdiytopic}[2]{\item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+\newcommand{\sstimplementationstatus}[1]{
+   \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+\newcommand{\sstitem}{\item}
+
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{-5mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+\renewcommand{\_}{{\tt\char'137}}
+
+
+\sstroutine{
+   IRC\_ANNUL
+}{
+   Release a CRDD file from the IRC\_ system
+}{
+   \sstdescription{
+      The IRC identifier is annuled and all resources reserved by the
+      IRC\_ system for this CRDD file are released. NB, this routine does
+      not effect the associated NDF identifier.
+   }
+   \sstinvocation{
+      CALL IRC\_ANNUL( IDC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier of the CRDD file.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+         subsequently fails under these circumstances. In particular, it
+         will fail if the identifier supplied is not initially valid, but
+         this will only be reported if STATUS is set to SAI\_\_OK on entry.
+      }
+   }
+}
+\sstroutine{
+   IRC\_BCLAP
+}{
+   Find the sample number at the closest approach of the boresight
+   to a given sky position
+}{
+   \sstdescription{
+      The path of a detector centre as it passes over the sky is called
+      the {\tt "}detector track{\tt "}. The corresponding boresight positions form
+      the {\tt "}boresight track{\tt "}. The boresight track is the same for all
+      detectors, EXCEPT for a possible shift in sample number. Such a
+      shift will exist if the detector samples in a given column of the
+      NDF DATA array were not obtained simultaneously. This will depend
+      on what type of CRDD file is being processed. CRDD files of type
+      SURVEY\_BSIGHT (see ID1 Appendix F) do in fact have simultaneous
+      samples, but other types may not (See routine IRC\_SIMUL). For
+      this reason a detector index is needed to completely specify the
+      boresight track.
+
+      This routine finds the fractional sample number from a specified
+      detector which corresponds to the position of closest approach of
+      the boresight track to a given sky position. The focal plane z
+      coordinate (see ID1 Appendix E) of the given position, at the
+      moment at which the closest approach is reached, is also returned.
+      If the position of closest approach lies outside the bounds of the
+      first dimension of the NDF, then the sample number returned
+      represents an extrapolated position. If it is not possible to
+      produce a reliable extrapolated sample number, then STATUS is
+      returned with the value IRC\_\_BADEX, and an error report is made.
+      It is then the responsibility of the calling routine to handle
+      the situation.
+   }
+   \sstinvocation{
+      CALL IRC\_BCLAP( IDC, DETIND, RA, DEC, CLSAMP, CLZFP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         DETIND = INTEGER (Given)
+      }{
+         The detector index to which the returned sample number (CLSAMP)
+         should refer.
+      }
+      \sstsubsection{
+         RA = DOUBLE PRECISION (Given)
+      }{
+         The Right Ascension (B1950, FK4) of the given sky position.
+         If the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) is given then CLSAMP
+         and CLZFP are also returned with the bad value.
+      }
+      \sstsubsection{
+         DEC = DOUBLE PRECISION (Given)
+      }{
+         The Declination (B1950, FK4) of the given sky position.
+         If the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) is given then CLSAMP
+         and CLZFP are also returned with the bad value.
+      }
+      \sstsubsection{
+         CLSAMP = REAL (Returned)
+      }{
+         The fractional sample number at which the point of closest
+         approach of the boresight track to the given sky position is
+         reached. Accurate to about a tenth of a sample.
+      }
+      \sstsubsection{
+         CLZFP = REAL (Returned)
+      }{
+         The focal plane Z coordinate of the given position at the point
+         of closest approach. In radians.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_BPOS
+}{
+   Returns boresight positions at a set of samples
+}{
+   \sstdescription{
+      The calling routine specifies a list of samples by giving
+      the sample number and detector index of each sample. For
+      each such sample, various items of information about the boresight
+      position are returned, as listed in the argument list below. If a
+      sample number lies outside the bounds of the first dimension of
+      the NDF, then an extrapolated position is returned if possible.
+      If this is not possible, the STATUS value is set to IRC\_\_BADEX
+      and an error report is generated.
+   }
+   \sstinvocation{
+      CALL IRC\_BPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE,
+                     SPEED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of samples in the input and output lists.
+      }
+      \sstsubsection{
+         SAMPLE( NVAL ) = REAL (Given)
+      }{
+         A list of fractional sample numbers. If any sample number is
+         equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then the
+         corresponding elements of the returned arrays are set to the
+         bad value.
+      }
+      \sstsubsection{
+         DETIND( NVAL ) = INTEGER (Given)
+      }{
+         A list of detector indices.
+      }
+      \sstsubsection{
+         RA( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         An array holding the Right Ascension (B1950 FK4) of the
+         boresight at the moment each sample specified in the input
+         lists was taken (radians).
+      }
+      \sstsubsection{
+         DEC( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         An array holding the Declination (B1950 FK4) of the
+         boresight at the moment each sample specified in the input
+         lists was taken (radians).
+      }
+      \sstsubsection{
+         ANGLE( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The scan angle (see ID1 section 3) at the boresight. This is
+         measured from equatorial north to the positive focal plane Y
+         axis (see ID1 Appendix E).  The angle is in radians and is
+         measured positive in the same sense as rotation from north to
+         east.
+      }
+      \sstsubsection{
+         SPEED( NVAL ) = REAL (Returned)
+      }{
+         The scan speed in radians per second. Positive values imply
+         that sources move across the focal plane in the positive Y
+         direction (i.e in the {\tt "}with-survey{\tt "} direction). Negative
+         values imply that sources move in the negative Y direction
+         (i.e. {\tt "}anti-survey{\tt "}).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_CLOSE
+}{
+   Close down the IRC CRDD handling package
+}{
+   \sstdescription{
+      This routine should be called when all other IRC routines have
+      been finished with. It annuls any remaining valid IRC identifiers.
+   }
+   \sstinvocation{
+      CALL IRC\_CLOSE( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine attempts to execute even if STATUS is set on
+         entry, although no further error report will be made if it
+      }
+   }
+}
+\sstroutine{
+   IRC\_DCLAP
+}{
+   Find the position of closest approach of a detector track to a
+   given sky position
+}{
+   \sstdescription{
+      The path of a detector centre as it passes over the sky is called
+      the {\tt "}detector track{\tt "}. This routine finds the fractional sample
+      number (from the row specified by the given detector index) at
+      which the closest approach of the detector to a given sky
+      position is reached.  The focal plane z coordinate of the given
+      position, at the moment corresponding to the closest approach is
+      also returned.  If the position of closest approach lies outside
+      the bounds of the first dimension of the NDF, then the sample
+      number returned represents an extrapolated position. If it is not
+      possible to produce a reliable extrapolated sample number, then
+      STATUS is returned with the value IRC\_\_BADEX, and an error report
+      is made.  It is then the responsibility of the calling routine to
+      handle the situation.
+   }
+   \sstinvocation{
+      CALL IRC\_DCLAP( IDC, DETIND, RA, DEC, CLSAMP, CLZFP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         DETIND = INTEGER (Given)
+      }{
+         The detector index. The returned sample number (CLSAMP) refers
+         to this detector.
+      }
+      \sstsubsection{
+         RA = DOUBLE PRECISION (Given)
+      }{
+         The Right Ascension (B1950, FK4) of the given sky position.
+         If this has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then CLSAMP
+         and CLZFP are returned with the bad value.
+      }
+      \sstsubsection{
+         DEC = DOUBLE PRECISION (Given)
+      }{
+         The Declination (B1950, FK4) of the given sky position.
+         If this has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) then CLSAMP
+         and CLZFP are returned with the bad value.
+      }
+      \sstsubsection{
+         CLSAMP = REAL (Returned)
+      }{
+         The fractional sample number at which the point of closest
+         approach of the detector track to the given sky position is
+         reached. Accurate to about a tenth of a sample.
+      }
+      \sstsubsection{
+         CLZFP = REAL (Returned)
+      }{
+         The focal plane Z coordinate of the given position at the point
+         of closest approach. In radians.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_DETIN
+}{
+   Get the detector index for a given detector number
+}{
+   \sstdescription{
+      The detector index (if any) which corresponds to the given
+      detector number (in the range 1 to 62) is returned.  The detector
+      index is just the row number within the NDF DATA array, and
+      varies between the bounds of the second dimension of the NDF. If
+      the requested detector number is not included in the CRDD file,
+      the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADI) is returned, but no error is
+      reported. If an error state exists on entry, or if any error
+      occurs within the function, VAL\_\_BADI is returned.
+   }
+   \sstinvocation{
+      RESULT = IRC\_DETIN( IDC, DETNO, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         DETNO = INTEGER (Given)
+      }{
+         The detector number for which the corresponding detector index
+         is required.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         IRC\_DETIN = INTEGER
+      }{
+         The detector index corresponding to the given detector number.
+         This is set to VAL\_\_BADI if STATUS indicates an error on entry,
+         or if an error is generated within IRC\_DETIN.
+      }
+   }
+}
+\sstroutine{
+   IRC\_DETNO
+}{
+   Get the detector number for a given detector index
+}{
+   \sstdescription{
+      The detector number (in the range 1 to 62) of the detector which
+      generated the data held at the detector index given by argument
+      DETIND is found. The detector index is just the row number within
+      the NDF DATA array, and varies between the bounds of the second
+      dimension of the NDF. An error is reported if a detector index is
+      given outside this range. If any error occurs, the function
+      returns the Starlink {\tt "}BAD{\tt "} values (VAL\_\_BADI).
+   }
+   \sstinvocation{
+      RESULT = IRC\_DETNO( IDC, DETIND, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         DETIND = INTEGER (Given)
+      }{
+         The detector index for which the corresponding detector number
+         is required.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstreturnedvalue{
+      \sstsubsection{
+         IRC\_DETNO = INTEGER
+      }{
+         The detector number corresponding to the given detector index.
+         This is set to VAL\_\_BADI if STATUS indicates an error on entry,
+         or if an error is generated within IRC\_DETNO.
+      }
+   }
+}
+\sstroutine{
+   IRC\_DINDS
+}{
+   Convert a list of detector numbers to detector indices
+}{
+   \sstdescription{
+      The detector index corresponding to each supplied detector number
+      is found and returned in DETIN. If the CRDD file contains no data
+      for any of the supplied detector numbers, or if any of the
+      detector number are equal to the Starlink {\tt "}BAD{\tt "} value
+      (VAL\_\_BADI), then no corresponding value is stored in DETIN. The
+      number of values actually stored in DETIN is returned in NDETIN.
+      These values occupy elements 1 to NDETIN of the DETIN array.
+   }
+   \sstinvocation{
+      CALL IRC\_DINDS( IDC, NDETNO, DETNO, DETIN, NDETIN, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER  (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NDETNO = INTEGER (Given)
+      }{
+         The size of the DETNO and DETIN arrays.
+      }
+      \sstsubsection{
+         DETNO( NDETNO ) = INTEGER (Given)
+      }{
+         The array of detector numbers.
+      }
+      \sstsubsection{
+         DETIN( NDETNO ) = INTEGER (Returned)
+      }{
+         The list of detector indices corresponding to the detector
+         numbers in DETNO.
+      }
+      \sstsubsection{
+         NDETIN = INTEGER (Returned)
+      }{
+         The number of values returned in DETIN. This will be less than
+         DETNO if any {\tt "}BAD{\tt "} detector numbers are supplied, or if the
+         CRDD file contains no data for any of the supplied detectors.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_DIST
+}{
+   Find the in-scan distance between two samples
+}{
+   \sstdescription{
+      The in-scan distance from the sample specified by SAMP1 and DETIN1
+      to the sample specified by SAMP2 and DETIN2 is found. Positive
+      values imply that the displacement from the first sample to the
+      second sample is in the direction of the positive focal plane
+      Y axis (see ID1 Appendix E).
+   }
+   \sstinvocation{
+      CALL IRC\_DIST( IDC, SAMP1, DETIN1, SAMP2, DETIN2, DIST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SAMP1 = REAL (Given)
+      }{
+         The first fractional sample number. If this has the Starlink
+         {\tt "}BAD{\tt "} value (VAL\_\_BADR) then DIST is returned set to the bad
+         value.
+      }
+      \sstsubsection{
+         DETIN1 = INTEGER (Given)
+      }{
+         The detector index to which SAMP1 refers.
+      }
+      \sstsubsection{
+         SAMP2 = REAL (Given)
+      }{
+         The second fractional sample number. If this has the Starlink
+         {\tt "}BAD{\tt "} value (VAL\_\_BADR) then DIST is returned set to the bad
+         value.
+      }
+      \sstsubsection{
+         DETIN2 = INTEGER (Given)
+      }{
+         The detector index to which SAMP2 refers.
+      }
+      \sstsubsection{
+         DIST = REAL (Returned)
+      }{
+         The in-scan distance between the two samples, in radians.
+         Positive if the displacement from SAMP1 to SAMP2 is in the
+         same direction as the positive focal plane Y axis.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_DPOS
+}{
+   Returns positional information about a set of samples
+}{
+   \sstdescription{
+      The calling routine specifies a list of samples by giving
+      the sample number and detector index of each sample. For
+      each such sample, various items of information are returned, as
+      listed in the argument list below. Extrapolated values are
+      returned for samples which lie outside the bounds of the first
+      dimension of the NDF.
+   }
+   \sstinvocation{
+      CALL IRC\_DPOS( IDC, NVAL, SAMPLE, DETIND, RA, DEC, ANGLE,
+                     SPEED, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of samples in the input and output lists.
+      }
+      \sstsubsection{
+         SAMPLE( NVAL ) = REAL (Given)
+      }{
+         A list of fractional sample numbers. If any sample number has
+         the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then the corresponding
+         elements of the returned arrays are set to the bad value.
+      }
+      \sstsubsection{
+         DETIND( NVAL ) = INTEGER (Given)
+      }{
+         A list of detector indices.
+      }
+      \sstsubsection{
+         RA( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         An array holding the Right Ascension (B1950 FK4) of each
+         detector centre specified by the input lists (radians).
+      }
+      \sstsubsection{
+         DEC( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         An array holding the Declination (B1950 FK4) of each
+         detector centre specified by the input lists (radians).
+      }
+      \sstsubsection{
+         ANGLE( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The scan angle at each detector centre. This is measured from
+         equatorial north to a line parallel to the focal plane Y axis.
+         The angle is in radians and is measured positive in the same
+         sense as rotation from north to east.
+      }
+      \sstsubsection{
+         SPEED( NVAL ) = REAL (Returned)
+      }{
+         The scan speed in radians per second. Positive values imply
+         that sources move in the positive focal plane Y direction (i.e
+         in the {\tt "}with-survey{\tt "} direction). Negative values imply that
+         sources move in the negative Y direction (i.e. {\tt "}anti-survey{\tt "}).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_FPCO1
+}{
+   Find focal plane coordinates of many sky positions at a time
+   determined by a given sample
+}{
+   \sstdescription{
+      This routine returns the focal plane Z and Y coordinate
+      values (see ID1 Appendix E) of a list of sky positions, at the
+      moment the specified sample was taken.
+   }
+   \sstinvocation{
+      CALL IRC\_FPCO1( IDC, SAMPLE, DETIND, NVAL, RA, DEC, ZFP, YFP,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SAMPLE = REAL (Given)
+      }{
+         The fractional sample number. If this has the Starlink {\tt "}BAD{\tt "}
+         value, then all returned focal plane coordinates are set bad.
+      }
+      \sstsubsection{
+         DETIND = INTEGER (Given)
+      }{
+         The detector index to which the sample number refers.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of sky positions to be converted.
+      }
+      \sstsubsection{
+         RA( NVAL ) = DOUBLE PRECISION (Given)
+      }{
+         The Right Ascension values (B1950 FK4) of the sky positions,
+         in radians. If a Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) is found,
+         the corresponding element of array FPCO is set to the bad
+         value.
+      }
+      \sstsubsection{
+         DEC( NVAL ) = DOUBLE PRECISION (Given)
+      }{
+         The Declination values (B1950 FK4) of the sky positions, in
+         radians. If a Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD) is found, the
+         corresponding element of array FPCO is set to the bad value.
+      }
+      \sstsubsection{
+         ZFP( NVAL ) = REAL (Returned)
+      }{
+         The focal plane Z coordinate values, in radians.
+      }
+      \sstsubsection{
+         YFP( NVAL ) = REAL (Returned)
+      }{
+         The focal plane Y coordinate values, in radians.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_FPCO2
+}{
+   Find focal plane coordinates of a single sky position at a set of
+   different times
+}{
+   \sstdescription{
+      This routine returns the focal plane Z and Y coordinate
+      values of a given sky position, at a set of different times,
+      specified by a set of sample numbers and detector indices.
+   }
+   \sstinvocation{
+      CALL IRC\_FPCO2( IDC, NVAL, SAMPLE, DETIND, RA, DEC, DPW1,
+                      DPW2, DPW3, RW4, ZFP, YFP, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of samples at which to convert the given sky
+         position.
+      }
+      \sstsubsection{
+         SAMPLE( NVAL ) = REAL (Given)
+      }{
+         The fractional sample numbers at which to do the conversion.
+         If any sample number has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR),
+         then the corresponding element of the array FPCO is returned
+         bad.
+      }
+      \sstsubsection{
+         DETIND( NVAL ) = INTEGER (Given)
+      }{
+         The detector indices to which the sample numbers refer. These
+         must all be within the bounds of the second dimension of the
+         NDF.
+      }
+      \sstsubsection{
+         RA = DOUBLE PRECISION (Given)
+      }{
+         The Right Ascension (B1950 FK4) of the sky position, in
+         radians. If this is equal to the Starlink {\tt "}BAD{\tt "} value
+         (VAL\_\_BADD), then the FPCO array is returned full of bad
+         values.
+      }
+      \sstsubsection{
+         DEC = DOUBLE PRECISION (Given)
+      }{
+         The Declination (B1950 FK4) of the sky position. If this is
+         equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADD), then the FPCO
+         array is returned full of bad values.
+      }
+      \sstsubsection{
+         DPW1( NVAL ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         DPW2( NVAL ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         DPW3( NVAL ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         RW4( NVAL ) = REAL (Given and Returned)
+      }{
+         Real workspace.
+      }
+      \sstsubsection{
+         ZFP( NVAL ) = REAL (Returned)
+      }{
+         The focal plane Z coordinate values, in radians.
+      }
+      \sstsubsection{
+         YFP( NVAL ) = REAL (Returned)
+      }{
+         The focal plane Y coordinate values, in radians.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_ILAB
+}{
+   Return a list of legal values for NDF component LABEL
+}{
+   \sstdescription{
+      A string is returned containing a list of names identifying the
+      legal values of the NDF component LABEL. The values are separated
+      by commas. The currently recognised values are:
+
+      1) {\tt "}Survey CRDD{\tt "}
+   }
+   \sstinvocation{
+      CALL IRC\_ILAB( LIST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LIST = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The list of recognized values for NDF component LABEL. The
+         character variable supplied for this argument should have a
+         declared size equal to the value of parameter IRC\_\_SZLLS. If
+         the supplied string is not long enough to hold all the names, a
+         warning message is given, but no error status is returned.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_IMCO
+}{
+   Locate a given sample within an image frame
+}{
+   \sstdescription{
+      This routine finds the position and orientation of a given sample
+      within an image frame defined by an IRA identifier (see ID2). The
+      information is returned in the form of six values giving the
+      coefficients of a linear transformation which maps an offset from
+      the sample centre given in focal plane coordinates, to the
+      corresponding pixel coordinates within the image frame defined by
+      the supplied IRA identifier. Specifically, the returned vector C
+      holds values C(1) to C(6) where:
+
+         X = C(1) $+$ C(2)$*$DZfp $+$ C(3)$*$DYfp
+
+         Y = C(4) $+$ C(5)$*$DZfp $+$ C(6)$*$Dyfp
+
+      In these expressions, DZfp and DYfp are displacements (in
+      radians, NOT arc-minutes!) parallel to the focal plane Z and Y
+      axes, such that (DZfp,DYfp)=(0,0) corresponds to the detector
+      centre. (X,Y) are the image coordinates which correspond to the
+      position with focal plane offset (DZfp,DYfp). Thus C(1) and C(4)
+      are the image coordinates of the detector centre, and the
+      anticlockwise angle from the image Y axis to the focal plane Y
+      axis is ATAN2( C(5), C(6) ), or equivalently ATAN2( -C(3),C(2) ).
+      The tendency for pixel size to vary across a large image is taken
+      into account in the returned coefficients.
+
+      The use of a linear transformation is only valid for small
+      displacements away from the detector centre. This routine is
+      intended for situations in which the displacement is less than
+      an arc-degree.
+
+      Various forms of initialisation need to be performed each time a
+      new combination of CRDD file (as specified by IDC) and astrometry
+      information (as specified by IDA) is used. Setting the argument
+      INIT to .TRUE. causes this initialisation to be done, before
+      going on to calculate the returned information. On subsequent
+      calls to this routine INIT should set to .FALSE., until either a
+      new CRDD file or new astrometry information is used. Note, the
+      initialisation procedure is also performed (even if INIT is
+      false) if the supplied detector index is different to the value
+      supplied for the previous call to this routine. For this reason,
+      applications should use this routine to process all samples from
+      one detector before moving on to do another detector. The
+      alternative approach (processing the same sample from all
+      detectors before moving on to do another sample) would cause much
+      time to be wasted doing unnecessary initialisations.
+
+      ID2 should be consulted for information about setting up
+      astrometry information.
+   }
+   \sstinvocation{
+      CALL IRC\_IMCO( IDC, SAMP, DETIN, IDA, INIT, C, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SAMP = REAL (Given)
+      }{
+         The fractional sample number. If this has the Starlink {\tt "}BAD{\tt "}
+         value (VAL\_\_BADR) then the returned coefficients are all set to
+         the bad value.
+      }
+      \sstsubsection{
+         DETIN = INTEGER (Given)
+      }{
+         The detector index to which SAMP refers.
+      }
+      \sstsubsection{
+         IDA = INTEGER (Given)
+      }{
+         An IRA identifier for the astrometry information which defines
+         the mapping from sky coordinates to image coordinates (see
+         ID2).
+      }
+      \sstsubsection{
+         INIT = LOGICAL (Given)
+      }{
+         INIT should be set true on the first call to this routine, and
+         false on subsequent calls. If either a new CRDD file, or new
+         astrometry information is supplied, then INIT should be set
+         true again for one call to this routine.
+      }
+      \sstsubsection{
+         C( 6 ) = REAL (Returned)
+      }{
+         The six coefficients defining the linear transformation from
+         focal plane offsets (in radians) to image coordinates (in
+         pixels).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_IMPRT
+}{
+   Import an existing NDF containing CRDD into the IRC\_ system
+}{
+   \sstdescription{
+      This routine checks that the given NDF is two dimensional and
+      contains an IRAS extension, which in turn contains a CRDD\_INFO
+      component. If it doesn{\tt '}t, an error is reported. If it does, a
+      check is made that the NDF contains CRDD of a recognised type.  A
+      record is then made of the CRDD file in the IRC\_ common blocks
+      and an IRC identifier returned for this record. This identifier
+      can be passed to other IRC routines to access the CRDD
+      descriptive information. The bulk data values (contained in the
+      NDF DATA component) should be accessed using the normal NDF\_
+      routines (see SUN/33).
+   }
+   \sstinvocation{
+      CALL IRC\_IMPRT( INDF, IDC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         INDF = INTEGER (Given)
+      }{
+         The NDF identifier for the CRDD file. This can be an NDF
+         section so long as the bounds of the second dimension do not
+         extend beyond the bounds of the second dimension of the base
+         NDF.
+      }
+      \sstsubsection{
+         IDC  = INTEGER (Returned)
+      }{
+         The IRC identifier for the CRDD information.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_INFO
+}{
+   Obtain values for the global properties of a CRDD file
+}{
+   \sstdescription{
+      The values of various global parameters are returned for the CRDD
+      file identified by the given IRC identifier. Other global
+      properties (such as the size and shape of the data array) can be
+      obtained using the NDF\_ routines (see SUN/33).
+   }
+   \sstinvocation{
+      CALL IRC\_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, SOP, OBS,
+                     STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IRC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         BAND = INTEGER (Returned)
+      }{
+         The IRAS band number of the data, in the range 1 to 4.
+      }
+      \sstsubsection{
+         REFRA = DOUBLE PRECISION (Returned)
+      }{
+         The Right Ascension of the reference position, given in units
+         of radians (FK4 B1950.0).
+      }
+      \sstsubsection{
+         REFDEC = DOUBLE PRECISION (Returned)
+      }{
+         The Declination of the reference position, given in units of
+         radians (FK4 B1950.0).
+      }
+      \sstsubsection{
+         NOMSPD = REAL (Returned)
+      }{
+         The nominal scan speed in arcminutes per second (the exact
+         scan speed may vary slightly from sample to sample). Positive
+         values imply that sources move in the positive focal plane Y
+         direction (i.e in the {\tt "}with-survey{\tt "} direction). Negative values
+         imply that sources move in the negative Y direction (i.e.
+         {\tt "}anti-survey{\tt "}). See ID1 Appendix E for a description of the
+         focal plane coordinate system).
+      }
+      \sstsubsection{
+         SOP = INTEGER (Returned)
+      }{
+         The SOP number from which the crdd was derived.
+      }
+      \sstsubsection{
+         OBS  = INTEGER (Returned)
+      }{
+         The Observation number within the SOP from which the data was
+         derived.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_INIT
+}{
+   Initialise the IRC system
+}{
+   \sstdescription{
+      This routine should be called before calling any other IRC
+      routines.  If IRC has not previously been initialised, or has
+      been closed down (by calling IRC\_CLOSE), then all IRC identifiers
+      are released but no check is made to see if they are valid (since
+      such checks could give spurious results).  If IRC has previously
+      been initialised but has not yet been closed down then all data
+      structures associated with currently valid IRC identifiers are
+      annuled and the identifiers are released.
+   }
+   \sstinvocation{
+      CALL IRC\_INIT( STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_IUNIT
+}{
+   Return a list of legal values for NDF component UNITS
+}{
+   \sstdescription{
+      A string is returned containing a list of names identifying the
+      legal values of the NDF component UNITS. The values are separated
+      by commas. The currently recognised values are given by the
+      following symbolic constants:
+
+      IRC\_\_F      - Flux values in units of Pico-Watts (i.e. 1.0E-12 of
+                      a Watt) per square metre.
+ 
+      IRC\_\_J      - Flux density values in Janskys.
+
+      IRC\_\_JPS    - Surface brightness in Janskys per steradian.
+
+      IRC\_\_MJPS   - Surface brightness in Mega-Janskys per steradian.
+
+      IRC\_\_FPS    - Surface brightness in Pico-Watts per square metre,
+                      per steradian.
+   }
+   \sstinvocation{
+      CALL IRC\_IUNIT( LIST, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         LIST = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         The list of recognized values for NDF component UNITS. The
+         character variable supplied for this argument should have a
+         declared size equal to the value of parameter IRC\_\_SZULS. If
+         the supplied string is not long enough to hold all the names, a
+         warning message is given, but no error status is returned. Each
+         individual value within the string has a maximum length given
+         by the symbolic constant IRC\_\_SZUNI.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_LIMIT
+}{
+   Determine the image area covered by a CRDD file
+}{
+   \sstdescription{
+      The positions of selected boundary samples within the supplied
+      CRDD file are converted to image coordinates using the supplied
+      IRA identifier (see ID2). If any of the samples fall outside the
+      image area defined by the supplied bounds, then the bounds are
+      updated so that the data will just fit in. The calling routine
+      supplies a list of the detectors which are to be included in the
+      image area.  The detector data streams in a CRDD file usually
+      start and finish at different in-scan positions, giving a
+      `ragged{\tt '} end to a scan.  If the argument TRUNC is supplied true,
+      then a short section from each end of each data stream is
+      excluded from the process, so that all detector data streams
+      start and finish at the same in-scan position, resulting in a
+      `straight{\tt '} end to the scan.
+   }
+   \sstinvocation{
+      CALL IRC\_LIMIT( IDC, NDETS, DETIND, TRUNC, IDA, LBND, UBND,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NDETS = INTEGER (Given)
+      }{
+         The number of detector data streams to be included in the image
+         area.
+      }
+      \sstsubsection{
+         DETIND( NDETS ) = INTEGER (Given)
+      }{
+         A list of detector indices defining the detector data streams
+         to be included in the image area.
+      }
+      \sstsubsection{
+         TRUNC = LOGICAL (Given)
+      }{
+         True if the detector data streams are to be truncated so that
+         they all start and finish at the same in-scan position.  This
+         produces a `straight edge{\tt '} across each end of the scan. If
+         TRUNC is false, then all data is included in the image area
+         from each detector data stream. This will in general result in
+         `ragged edges{\tt '} across each end of the scan.
+      }
+      \sstsubsection{
+         IDA = INTEGER (Given)
+      }{
+         An IRA identifier for the astrometry information which is to be
+         used to define the projection from sky coordinates to image
+         coordinates. See ID2.
+      }
+      \sstsubsection{
+         LBND( 2 ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         On entry, LBND holds the lower bounds on the two image
+         axes of the current image area (as pixel coordinates, not
+         indices). On exit, these values are updated if the given CRDD
+         file could not be fitted into the image area defined by the
+         values of LBND on entry.
+      }
+      \sstsubsection{
+         UBND( 2 ) = DOUBLE PRECISION (Given and Returned)
+      }{
+         On entry, UBND holds the upper bounds on the two image
+         axes of the current image area (as pixel coordinates, not
+         indices). On exit, these values are updated if the given CRDD
+         file could not be fitted into the image area defined by the
+         values of UBND on entry.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_OFFST
+}{
+   Find a sample which is a given in-scan distance away from a given
+   sample
+}{
+   \sstdescription{
+      The calling routine specifies a detector index and sample number
+      (DETIN1 and SAMP1) to define a starting point, and a distance
+      (DIST) by which to move away from the starting point in the focal
+      plane Y direction (see ID1 appendix E). Firstly, the sample
+      number (from the same detector) is found which is the given
+      distance away from the starting point. If DETIN2 is the same as
+      DETIN1, this sample number is returned in SAMP2. If not, the
+      sample number from detector specified by DETIN2 is returned at
+      which that detector reaches the same in-scan position.
+   }
+   \sstinvocation{
+      CALL IRC\_OFFST( IDC, SAMP1, DETIN1, DETIN2, DIST, SAMP2, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SAMP1 = REAL (Given)
+      }{
+         A fractional sample number which gives the starting point of
+         the offset operation. If SAMP1 has the Starlink {\tt "}BAD{\tt "} value
+         (VAL\_\_BADR) then SAMP2 is returned bad.
+      }
+      \sstsubsection{
+         DETIN1 = INTEGER (Given)
+      }{
+         The detector index to which SAMP1 refers.
+      }
+      \sstsubsection{
+         DETIN2 = INTEGER (Given)
+      }{
+         The detector index to which SAMP2 should refer.
+      }
+      \sstsubsection{
+         DIST = REAL (Given)
+      }{
+         The arc-distance to offset away from SAMP1, in radians. A
+         positive offset moves in the focal plane Y direction. If
+         DIST has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then SAMP2 is
+         returned bad.
+      }
+      \sstsubsection{
+         SAMP2 = REAL (Returned)
+      }{
+         The fractional sample number from detector DETIN2 which is the
+         required in-scan distance away from SAMP1 from detector
+         DETIN1.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_POSMP
+}{
+   Get arrays containing sky coordinates and scan angles for
+   every sample
+}{
+   \sstdescription{
+      This routine produces a temporary double precision NDF in which
+      the data array is three dimensional, having three {\tt "}planes{\tt "} each
+      matching the 2D data array of the input NDF (a CRDD file). The
+      lower plane (index 1) holds the Right Ascension of the centre of
+      each detector sample (B1950 FK4), the middle plane (index 2) holds
+      the Declination, and the upper plane (index 3) holds the scan
+      angle (see ID1 section 3) at the detector centre. This routine
+      also maps the data array of the created temporary NDF, and returns
+      a pointer to it. The created NDF should be annulled (using
+      NDF\_ANNUL) when it is no longer required.
+
+      NOTE, unlike IRC\_BPOS and IRC\_DPOS extrapolated sample positions
+      cannot be found using IRC\_POSMP. The returned arrays only contain
+      information for samples lying within the bounds of the DATA array.
+   }
+   \sstinvocation{
+      CALL IRC\_POSMP( IDC, NEWNDF, PNTR, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NEWNDF = INTEGER (Returned)
+      }{
+         The NDF identifier for the created temporary NDF.
+      }
+      \sstsubsection{
+         PNTR = INTEGER (Returned)
+      }{
+         A pointer to the mapped double precision array holding the
+         position and orientation of each CRDD sample. The array bounds
+         for the first two dimensions are the same as those of the input
+         NDF. The third dimension has bounds (1:3). Note, many IRC
+         routines allow for {\tt "}extrapolated{\tt "} fractional sample number
+         (i.e. sample numbers which are outside the bound of the first
+         NDF dimension and which may not be whole numbers). The array
+         returned by this routine is ONLY defined for integer sample
+         numbers lying within the bounds of the second dimension of the
+         NDF.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_SATCO
+}{
+   Returns satellite coordinates at a set of samples
+}{
+   \sstdescription{
+      The calling routine specifies a list of samples by giving
+      the sample number and detector index of each sample. For
+      each such sample, various items of information about the boresight
+      position are returned, as listed in the argument list below. If a
+      sample number lies outside the bounds of the first dimension of
+      the NDF, then an extrapolated position is returned if possible.
+      If this is not possible, the STATUS value is set to IRC\_\_BADEX
+      and an error report is generated.
+   }
+   \sstinvocation{
+      CALL IRC\_SATCO( IDC, NVAL, SAMPLE, DETIND, PSI, THETA, SOLONG,
+                      UTCS, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of samples in the input and output lists.
+      }
+      \sstsubsection{
+         SAMPLE( NVAL ) = REAL (Given)
+      }{
+         A list of fractional sample numbers. If any sample number is
+         equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then the
+         corresponding elements of the returned arrays are set to the
+         bad value.
+      }
+      \sstsubsection{
+         DETIND( NVAL ) = INTEGER (Given)
+      }{
+         A list of detector indices.
+      }
+      \sstsubsection{
+         PSI( NVAL ) = REAL (Returned)
+      }{
+         An array holding the clock angle of the boresight at the
+         moment each sample specified in the input lists was taken
+         (radians).
+      }
+      \sstsubsection{
+         THETA( NVAL ) = REAL (Returned)
+      }{
+         An array holding the cone angle of the boresight at the moment
+         each sample specified in the input lists was taken (radians).
+      }
+      \sstsubsection{
+         SOLONG( NVAL ) = REAL (Returned)
+      }{
+         An array holding the solar longitude at the moment each sample
+         specified in the input lists was taken (radians). These values
+         are refered to the mean equator and equinox of the
+         corresponding time returned in UTCS.
+      }
+      \sstsubsection{
+         UTCS( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         An array holding the UTCS at the moment each sample specified
+         in the input lists was taken (seconds).
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The relationships between clock angle, cone angle, solar
+         longitude and UTCS are desribed in the ID/1 appendix, {\tt "}Satellite
+         Coordinates{\tt "}.
+
+         \sstitem
+         This routine uses PSI, not PHI, as the clock angle.
+         ( PSI=2.PI-PHI ).
+      }
+   }
+}
+\sstroutine{
+   IRC\_SIMUL
+}{
+   See if a CRDD file holds simultaneous detector samples
+}{
+   \sstdescription{
+      A column of data from the NDF DATA array consists of a set of
+      samples, one from each detector, which all have the same sample
+      number. This routine returns a true value for argument SIMUL if
+      the detector samples in each column were obtained simultaneously.
+      If this is true, it can be assumed that the boresight position at
+      a given sample number is the same for every detector (which can
+      reduce the amount of computation required by an application).
+   }
+   \sstinvocation{
+      CALL IRC\_SIMUL( IDC, SIMUL, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SIMUL = LOGICAL (Returned)
+      }{
+         True if all samples in each column of the DATA array were
+         obtained simultaneously.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_SKCO1
+}{
+   Find sky coordinates of a set of focal plane positions at
+   a time specified by a given sample
+}{
+   \sstdescription{
+      This routine returns the Right Ascension and Declination
+      of each point in a list of focal plane positions, at the
+      moment specified by the given sample number and detector index.
+      See ID1 Appendix E for a description of the focal plane (Z,Y)
+      coordinate system.
+   }
+   \sstinvocation{
+      CALL IRC\_SKCO1( IDC, SAMPLE, DETIND, NVAL, ZFP, YFP, RA, DEC,
+                      STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         SAMPLE = REAL (Given)
+      }{
+         The fractional sample number at which to do the conversion.
+         If this has the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then all
+         elements of the RA and DEC arrays are returned bad.
+      }
+      \sstsubsection{
+         DETIND = INTEGER (Given)
+      }{
+         The detector index to which the given sample number refers.
+         This must be within the bounds of the second dimension of the
+         NDF.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of focal plane positions to be converted.
+      }
+      \sstsubsection{
+         ZFP( NVAL ) = REAL (Given)
+      }{
+         The focal plane Z coordinate values, in radians. If any value
+         is equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then the
+         corresponding value in both the RA and DEC arrays are set to
+         the bad value VAL\_BADD.
+      }
+      \sstsubsection{
+         YFP( NVAL ) = REAL (Given)
+      }{
+         The focal plane Y coordinate values, in radians. If any value
+         is equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR) then the
+         corresponding value in both the RA and DEC arrays are set to
+         the bad value VAL\_\_BADD.
+      }
+      \sstsubsection{
+         RA( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The Right Ascension (B1950 FK4) of each focal plane positions,
+         in radians.
+      }
+      \sstsubsection{
+         DEC( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The Declination (B1950 FK4) of each focal plane positions,
+         in radians.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_SKCO2
+}{
+   Find sky coordinates of a single focal plane position, at a set
+   of different times
+}{
+   \sstdescription{
+      This routine returns the Right Ascension and Declination values
+      of the given focal plane position, at times specified by the
+      given sample numbers and detector indices. See ID1 Appendix E for
+      a description of the focal plane (Z,Y) coordinate system.
+   }
+   \sstinvocation{
+      CALL IRC\_SKCO2( IDC, NVAL, SAMPLE, DETIND, ZFP, YFP, DPW1,
+                      DPW2, DPW3, RW4, RA, DEC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NVAL = INTEGER (Given)
+      }{
+         The number of times at which the given focal plane position is
+         to be converted.
+      }
+      \sstsubsection{
+         SAMPLE( NVAL ) = REAL (Given)
+      }{
+         The fractional sample numbers at which to do the conversion.
+         If any sample is equal to the Starlink {\tt "}BAD{\tt "} value (VAL\_\_BADR)
+         then the corresponding elements of the RA and DEC arrays are
+         returned bad.
+      }
+      \sstsubsection{
+         DETIND( NVAL ) = INTEGER (Given)
+      }{
+         The detector indices to which the given sample numbers refer.
+         These must be within the bounds of the second dimension of the
+         NDF.
+      }
+      \sstsubsection{
+         ZFP = REAL (Given)
+      }{
+         The focal plane Z coordinate value, in radians. If this is
+         equal to the Starlink {\tt "}BAD{\tt "} data value (VAL\_\_BADR), then both
+         output arrays (RA and DEC) are filled with the bad value
+         VAL\_\_BADD.
+      }
+      \sstsubsection{
+         YFP = REAL (Given)
+      }{
+         The focal plane Y coordinate value, in radians. If this is
+         equal to the Starlink {\tt "}BAD{\tt "} data value (VAL\_\_BADR), then both
+         output arrays (RA and DEC) are filled with the bad value
+         VAL\_\_BADD.
+      }
+      \sstsubsection{
+         DPW1( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         DPW2( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         DPW3( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         Double precision workspace.
+      }
+      \sstsubsection{
+         RW4( NVAL ) = REAL (Returned)
+      }{
+         Real workspace.
+      }
+      \sstsubsection{
+         RA( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The Right Ascension (B1950 FK4) of the focal plane position,
+         (in radians) at each boresight position.
+      }
+      \sstsubsection{
+         DEC( NVAL ) = DOUBLE PRECISION (Returned)
+      }{
+         The Declination (B1950 FK4) of the focal plane position,
+         (in radians) at each boresight position.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_SUPP
+}{
+   Locate an item of support information
+}{
+   \sstdescription{
+      CRDD files may contain {\tt "}support information{\tt "}. This is information
+      which is supplied with the data but which is not actually needed
+      for the operation of any other IRC routine. The support
+      information available will in general depend on the type of CRDD
+      contained in the CRDD file, but may contain things like the
+      geographic longitude and latitude at various times throughout the
+      scan. The exact support information available is listed in the
+      appendices of ID1 describing each individual CRDD type. This
+      routine returns an HDS locator to a particular item of support
+      information. No error is reported if the item does not exist, but
+      the argument THERE is returned false. The correct interpretation
+      of the support information is the responsibility of the calling
+      application.
+   }
+   \sstinvocation{
+      CALL IRC\_SUPP( IDC, NAME, THERE, LOC, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         An IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NAME = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The HDS name of the required item of support information.
+      }
+      \sstsubsection{
+         THERE = LOGICAL (Returned)
+      }{
+         Returned true if the item of support information was found, and
+         false otherwise.
+      }
+      \sstsubsection{
+         LOC = CHARACTER $*$ ( $*$ ) (Returned)
+      }{
+         An HDS locator to the required item of support information. The
+         variable supplied for this argument should have a declared
+         length given by the symbolic constant DAT\_\_SZLOC.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_TRACE
+}{
+   Display information about a CRDD file
+}{
+   \sstdescription{
+      This routine displays information about a CRDD file, using the
+      supplied routine to display each line of text. The particular
+      information displayed will depend on the type of CRDD file.
+   }
+   \sstinvocation{
+      CALL IRC\_TRACE( IDC, ROUTNE, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the astrometry structure.
+      }
+      \sstsubsection{
+         ROUTNE = EXTERNAL (Given)
+      }{
+         A routine to which is passed each line of text for display.
+         It should have the same argument list as MSG\_\_OUTIF (see
+         SUN/104), and should be declared EXTERNAL in the calling
+         routine. This routine is called with a priority of MSG\_\_NORM
+         for the more commonly needed information, and MSG\_\_VERB for the
+         less commonly needed information.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   IRC\_TRUNC
+}{
+   Find the section of a scan containing data from all available
+   detectors
+}{
+   \sstdescription{
+      Each detector data stream starts and finishes at a different
+      in-scan position, resulting in there being a section at each end
+      of the scan which is not covered by data from all available
+      detectors. This routine returns the upper and lower sample number
+      limits (for each requested detector data stream) of the section
+      of the CRDD file for which there is data from all the requested
+      detectors.
+   }
+   \sstinvocation{
+      CALL IRC\_TRUNC( IDC, NDETS, DETIND, SAMPLO, SAMPHI, STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         IDC = INTEGER (Given)
+      }{
+         The IRC identifier for the CRDD file.
+      }
+      \sstsubsection{
+         NDETS = INTEGER (Given)
+      }{
+         The number of detector data streams to be included.
+      }
+      \sstsubsection{
+         DETIND( NDETS ) = INTEGER (Given)
+      }{
+         A list of detector indices defining the detector data streams
+         to be included.
+      }
+      \sstsubsection{
+         SAMPLO( NDETS ) = REAL (Returned)
+      }{
+         The sample numbers defining the start of a section from each
+         detector data stream for which there is corresponding data
+         from all the other included detectors.
+      }
+      \sstsubsection{
+         SAMPHI( NDETS ) = REAL (Returned)
+      }{
+         The sample numbers defining the end of a section from each
+         detector data stream for which there is corresponding data
+         from all the other included detectors.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\section {Templates for IRC Routines Within the VAX LSE Editor}
+The STARLSE package (see SUN/105) provides facilities for initialising the VAX
+Language Sensitive Editor (LSE) to simplify the generation of Fortran
+code conforming to the Starlink programming standard (see SGP/16). One of the
+facilities provided by LSE is the automatic production of argument lists for
+subroutine calls. Templates for all the subroutines in the IRC package can be 
+made available within LSE by performing the following steps (within LSE):
+\begin{enumerate}
+\item Issue the LSE command GOTO FILE/READ IRC\_DIR:IRC.LSE
+\item Issue the LSE command DO
+\item Issue the LSE command DELETE BUFFER.
+\item Move to a buffer holding a .FOR of a .GEN file in the usual way.
+\item IRC subroutine templates are then available by typing in the name of an 
+IRC subroutine (or an abbreviation) and expanding it (CTRL-E).
+\item Help on the subroutine and its arguments can be obtained by placing the
+cursor at a point in the buffer at which the subroutine name has been entered 
+and pressing GOLD-PF2.
+\end{enumerate}
+
+\section {Examples of Using IRC}
+\label{APP:EXAMS}
+\subsection {Accessing a Single CRDD File}
+This example shows the main code of a VMS program to display the coordinates of 
+the reference point of a CRDD file.
+
+\begin{quote}
+\begin{tabbing} % Not clear why this is needed, since tabs are not used,
+                % but the leading spaces get lost otherwise.
+
+\verb#*  Include ADAM and IRA symbolic constants.            #\\
+\verb#      INCLUDE 'SAE_PAR'                                #\\
+\verb#      INCLUDE 'IRA_PAR'                                #\\
+\verb#                                                       #\\
+\verb#*  Declare local INTEGER variables.                    #\\
+\verb#      INTEGER INDF, IDC, BAND, SOP, OBS, STATUS        #\\
+\verb#                                                       #\\
+\verb#*  Declare local REAL variables.                       #\\
+\verb#      REAL REFRA, REFDEC, NOMSPD                       #\\
+\verb#                                                       #\\
+\verb#*  Declare local CHARACTER variables.                  #\\
+\verb#      CHARACTER*(IRA__SZFSC) RATXT, DECTXT             #\numcir{1}\\
+\verb#                                                       #\\
+\verb#*  Obtain an NDF identifier for the CRDD file.         #\\
+\verb#      CALL NDF_ASSOC( 'IN', 'READ', INDF, STATUS )     #\numcir{2}\\
+\verb#                                                       #\\
+\verb#*  Initialise the IRC system.                          #\\
+\verb#      CALL IRC_INIT( STATUS )                          #\\
+\verb#                                                       #\\
+\verb#*  Import the CRDD file into the IRC system.           #\\
+\verb#      CALL IRC_IMPRT( INDF, IDC, STATUS )              #\numcir{3}\\
+\verb#                                                       #\\
+\verb#*  Get the coordinates of the CRDD file reference point.#\\
+\verb#      CALL IRC_INFO( IDC, BAND, REFRA, REFDEC, NOMSPD, #\numcir{4}\\
+\verb#     :               SOP, OBS, STATUS )                #\\
+\verb#                                                       #\\
+\verb#*  Convert the coordinates into character strings.     #\\
+\verb#      CALL IRA_DTOC( REFRA, REFDEC, 'EQUATORIAL(B1950)',#\\
+\verb#     :               1, RATXT, DECTXT, STATUS )        #\\
+\verb#                                                       #\\
+\verb#*  Display the coordinates.                            #\\
+\verb#      CALL NDF_MSG( 'FILE', INDF )                     #\\
+\verb#      CALL MSG_OUT( 'ROUTINE_MSG1',                    #\\
+\verb#     : ' The reference point of CRDD file ^FILE is:',  #\\
+\verb#     :               STATUS )                          #\\
+\verb#      CALL MSG_OUT( 'ROUTINE_MSG2', RATXT, STATUS )    #\\
+\verb#      CALL MSG_OUT( 'ROUTINE_MSG3', DECTXT, STATUS )   #\\
+\verb#                                                       #\\
+\verb#*  Release the CRDD file from the IRC and NDF systems. #\\
+\verb#      CALL IRC_ANNUL( IDC, STATUS )                    #\numcir{5}\\
+\verb#      CALL NDF_ANNUL( INDF, STATUS )                   #\\
+\verb#                                                       #\\
+\verb#*  Close down the IRC system.                          #\\
+\verb#      CALL IRC_CLOSE( STATUS )                         #\\
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item The symbolic constant IRA\_\_SZFSC is used to define the length of the
+character variables RATXT and DECTXT which hold the formatted sky coordinates of
+the reference point. This constant is defined in the included file `IRA\_PAR'. 
+
+\item The ADAM parameter system is used to obtain an NDF. The user may give the 
+name of the CRDD file in response to the prompt for parameter `IN'. At this
+point the CRDD file is known only to the NDF system, and is identified by its
+``NDF identifier'', INDF.
+
+\item The CRDD file is ``imported'' into the IRC system. The NDF identifier
+tells IRC which file is to be imported, and an ``IDC identifier'', IDC, is
+returned which is used to identify the CRDD file to other IRC routines.
+
+\item IRC\_INFO is called to get the coordinate for the CRDD file reference
+point (in 1950 equatorial coordinates). The IRC identifier tells IRC\_INFO which
+CRDD file is to be used. 
+
+\item The call to IRC\_ANNUL is not strictly needed since IRC\_CLOSE will
+ensure that all IRC identifiers are annuled.
+
+\end{enumerate}
+
+\subsection {Plotting Detector Data Streams}
+This example shows how plots of data value against in-scan distance may
+be produced for each detector in a CRDD file, with each plot aligned so that 
+an in-scan distance of zero refers to the closest approach to the CRDD file
+reference point. 
+
+\begin{quote}
+\begin{tabbing} 
+
+\verb#*  Get the bounds and size of the NDF.                 #\\
+\verb#      CALL NDF_BOUND( INDF, 2, LBND, UBND, NDIM,       #\numcir{1}\\
+\verb#     :                STATUS )                         #\\
+\verb#      SIZE1 = UBND(1) - LBND(1) +1                     #\\
+\verb#      SIZE2 = UBND(2) - LBND(2) +1                     #\\
+\verb#                                                       #\\
+\verb#*  Find the sample number (FSTSMP) at which the first  #\\
+\verb#*  detector reaches its closest approach to the        #\\
+\verb#*  reference point.                                    #\\
+\verb#      FSTDET = LBND(2)                                 #\\
+\verb#      CALL IRC_DCLAP( IDC, FSTDET, REFRA, REFDEC,      #\numcir{2}\\
+\verb#     :                FSTSMP, FSTZFP, STATUS )         #\\
+\verb#                                                       #\\
+\verb#*  Loop round each detector index.                     #\\
+\verb#      DO DETIN = LBND(2), UBND(2)                      #\numcir{3}\\
+\verb#                                                       #\\
+\verb#*  Loop round each sample in the current detector data #\\
+\verb#*  stream.                                             #\\
+\verb#         DO SAMPLE = LBND(1), UBND(1)                  #\\
+\verb#                                                       #\\
+\verb#*  Find the in-scan distance between the current sample#\\
+\verb#*  and the sample which defines the closest approach of#\\
+\verb#*  the first detector to the reference point.          #\\
+\verb#            CALL IRC_DIST( IDC, FSTSMP, FSTDET,        #\numcir{4}\\
+\verb#     :          REAL( SAMPLE ), DETIN, INSCAN, STATUS )#\\
+\verb#                                                       #\\
+\verb#*  Convert to arc minutes and store in an array which  #\\
+\verb#*  will be used to define the X coordinate of each     #\\
+\verb#*  point in the plot.                                  #\\
+\verb#            XDAT( SAMPLE ) = INSCAN*IRA__RTOD*60.0     #\numcir{5}\\
+\verb#                                                       #\\
+\verb#         END DO                                        #\\
+\verb#                                                       #\\
+\verb#*  Find the detector number corresponding to the       #\\
+\verb#*  current detector index.                             #\\
+\verb#         DETNO = IRC_DETNO( IDC, DETIN, STATUS )       #\numcir{6}\\
+\verb#                                                       #\\
+\verb#*  Plot the curve.                                     #\\
+\verb#         CALL PLOT( SIZE1, DATA( LBND(1), DETIN ),     #\numcir{7}\\
+\verb#     :              XDAT, DETNO, STATUS )              #\\
+\verb#                                                       #\\
+\verb#*  Do the next detector data stream.                   #\\
+\verb#      END DO                                           #\\
+
+\end{tabbing}
+\end{quote}
+
+Programming notes:
+
+\begin{enumerate}
+
+\item INDF is the NDF identifier for the CRDD file obtained previously. This
+call is made since neither axis is constrained to have a lower bound of 1. 
+
+\item IRC\_DCLAP is called to enable the different plots to be aligned with
+each other. The returned value FSTSMP gives the fractional sample number within 
+the first detector data stream at which the closest approach to the reference 
+point occurs. This sample number is defined as having an in-scan distance of 
+zero in all the plots. The choice of the first detector is arbitrary, any 
+detector would do.
+
+\item The {\em detector index} value gives the row number within the NDF, not 
+the IRAS detector {\em number}. Thus detector index values vary between the 
+lower and upper bounds of the second dimension of the NDF.
+
+\item IRC\_DIST gives a positive or negative in-scan distance depending on
+which side of FSTSMP the current sample is located. Note, SAMPLE is an 
+{\em integer} sample number, but IRC\_DIST requires {\em fractional} values, 
+therefore the REAL function must be used.
+
+\item XDAT is a REAL array which should have upper and lower bounds equal to the
+those of the first dimension of the NDF. IRC\_DIST returns INSCAN in radians,
+and is converted to degrees by multiplying it by the symbolic constant
+IRA\_\_RTOD (Radians TO Degrees) defined in the file IRA\_PAR. The factor of
+60.0 then converts the degrees value to arc-minutes. 
+
+\item IRC\_DETNO should be declared as an integer in the calling routine.
+
+\item The routine PLOT plots the detector data on some graphics device. More
+arguments would probably be needed for this routine in practice. The simple
+routine used here would have the following declarations: 
+
+\begin{quote}
+\begin{tabbing} 
+
+\verb#      SUBROUTINE PLOT( SIZE, YDATA, XDATA, DETNO,      #\\
+\verb#     :                 STATUS )                        #\\
+\verb#                                                       #\\
+\verb#      INTEGER SIZE, DETNO, STATUS                      #\\
+\verb#      REAL YDATA( SIZE ), XDATA( SIZE )                #\\
+
+\end{tabbing}
+\end{quote}
+
+Note, the YDATA and XDATA arrays now have a lower bound of 1 to make plotting
+easier. Y values which contained the Starlink ``BAD'' value should be excluded
+from the plot in some way. 
+
+\end{enumerate}
+\section {Legal Values for NDF Component UNITS}
+\label{APP:UNITS}
+The UNITS component of the NDF holds a character string which is used to 
+determine the physical quantity which the sample values represent. Applications 
+should always check the UNITS component by comparing its value with the 
+IRC symbolic constants (defined in IRC\_PAR) listed below. Using symbolic 
+constants rather than literal values reduces the chances of bugs being into 
+introduced into software due to errors in the spelling of literal units values.
+
+The following units systems are currently recognised:
+\begin{description}
+\item [IRC\_\_F] - Flux values in units of Pico-Watts ( i.e. $10^{-12}$ of a 
+Watt ) per square metre.
+\item [IRC\_\_J] - Flux density values in Janskys. 
+\item [IRC\_\_JPS] - Surface brightness values in Janskys per steradian. 
+\item [IRC\_\_MJPS] - Surface brightness values in Mega-Janskys per steradian. 
+\item [IRC\_\_FPS] - Surface brightness values in Pico-Watts per square metre,
+per steradian. 
+\end{description}
+
+\section {Legal Values for NDF Component LABEL}
+\label{APP:LABEL}
+Legal values for the LABEL component of the NDF are:
+\begin{description}
+\item [Pointed Observation CRDD] - The DATA array holds CRDD derived
+from a Pointed Observation (PO), using the main survey array (as opposed to the 
+CPC).
+\item [Survey CRDD] - The DATA array holds CRDD derived from the all sky survey.
+\end{description}
+
+\section {The IRAS focal plane coordinate system}
+\label{APP:FOCALP}
+Positions within the focal plane are described in the IRAS Catalogs and Atlases 
+Explanatory Supplement by a Cartesian coordinate system in which the two axes
+are labelled $Z$ and $Y$ ($X$ is normal to the focal plane in the direction of 
+the boresight). The origin of the $ZY$ system is at the focal plane position
+corresponding to boresight of the telescope. The Y axis is parallel to the scan 
+direction. As a point on the sky passes over the focal plane is moves in the
+positive Y direction. This is the opposite direction to that in which the 
+boresight moves as it passes over the sky. The difference can be thought in 
+terms of where a fictitious observer is placed. An observer ``sat on the focal 
+plane'' would see the stars moving in the positive Y direction. An observer
+``fixed to the sky'' would see the telescope boresight moving in the negative
+Y direction. IRC often uses the positive Y direction as a reference direction.
+
+The Z axis is in the cross-scan direction. Rotation from the positive Y 
+direction to the positive Z direction is in the same sense as rotation from
+east to north. In fact, the Z axis always points towards the Sun.
+
+The Explanatory Supplement contains a schematic diagram of the focal plane (fig.
+ II.C.6, page II-11 ) in which the Y axis is positive to the left, and Z is
+positive downwards. Table II.C.3 (pages II-12 and II-13) list the focal plane
+coordinates of the detector centres. These values, together with many other IRAS
+specific constants, are made available by including the file I90\_DAT.FOR, and
+should always be accessed by means of the symbolic values defined by that file. 
+
+\section {Survey Data with Boresight Pointing Information}
+
+This appendix holds the definition of the DETAILS component of the CRDD\_INFO
+structure, for the case of survey data with ``boresight'' pointing information.
+The HDS type of the DETAILS component is SURVEY\_BSIGHT. IRC assumes that such
+CRDD files have a constant scan speed equivalent to 3.85 arc-minutes per second,
+and that each column in the NDF DATA array corresponds to a set of {\em
+simultaneously obtained} detector samples. A ``scan'' in this context consists
+of a set of detector samples equally spaced in time (any detector samples for
+which no valid data is available are given the Starlink ``BAD'' value
+(VAL\_BADR), taken from a single observation within a given SOP. The scan length
+is thus restricted to being less than the total scan length of the observation, 
+but is otherwise arbitrary.
+
+\subsection{ The DETAILS structure}
+The DETAILS structure contains the following components:
+\begin {description}
+
+\item [BASE\_UTCS] - (A \_DOUBLE scalar) The UTCS of detector sample number 1.
+Note, this is not necessarily the {\em first} sample in the DATA array. For
+instance, if sample numbers start at -100 then sample 1 is actually the 102'nd
+sample. Zero UTCS is taken as 00.00 1-JAN-1981. 
+
+\item [BASE\_MJD] - (A \_DOUBLE scalar) The Modified Julian Date 
+corresponding to BASE\_UTCS. 
+
+\item [BORE\_POSNS] - (An \_INTEGER scalar) The number of boresight positions 
+stored in the following arrays. 
+
+\item [UTCS\_OFFSET(BORE\_POSNS)] -  (A \_REAL array) The difference in UTCS 
+between the associated boresight position and detector sample number 1. Note, 
+single precision is sufficient since only UTCS {\em differences} are stored.
+By contrast, storing {\em absolute} UTCS values require double precision.
+
+\item [PSI(BORE\_POSNS)] -  (A \_REAL array) The clock angle $\psi$, of the
+associated boresight position, in radians. See the IRAS Catalogs and Atlases
+Explanatory Supplement (Exp. Supp.) Fig. III.B.7,  for a description of the
+``satellite'' coordinate system, ${\psi,\theta}$. 
+
+\item [THETA(BORE\_POSNS)] -  (A \_REAL array) The cone angle $\theta$, of the 
+associated boresight position, in radians (see Exp. Supp. Fig. III.B.7).
+
+\item [LAMBDA\_SUN(BORE\_POSNS)] -  (A \_REAL array) The ecliptic longitude
+(1950) of the sun at the time of the associated boresight position, in radians. 
+
+\item [SUPPORT\_INFO] - (A structure with type SUPPORT\_INFO) Holds items of 
+support information (see section \ref {SEC:SUPP}) as listed below.
+
+\end{description}
+
+The SUPPORT\_INFO structure is used to store information contained in the
+Boresight Pointing History Files (BPHF) distributed by IPAC. These files are
+described in the IRAS SDAS Software Interface Specification, data set IR.BPHP.D
+(PR51) which should be consulted for more information. The following components
+are included in SUPPORT\_INFO: 
+
+\begin{description}
+
+\item [UNC\_PSI(BORE\_POSNS)] - (A \_REAL array) The uncertainty in $\psi$ at
+the associated boresight position, in radians, given as ``SIGPSI'' in the BPHF. 
+
+\item [UNC\_THETA(BORE\_POSNS)] - (A \_REAL array) The uncertainty in $\theta$
+at the associated boresight position, in radians, given as ``SIGNU'' in the 
+BPHF. SIGNU is actually the uncertainty in $\nu$, not $\theta$. But since 
+$\theta = \nu + \pi/2$ the uncertainty in $\theta$ will equal that in $\nu$.
+
+\item [GEOG\_LAT(BORE\_POSNS)] -  (A \_REAL array) The geographic latitude of 
+of the boresight at the associated boresight position, in radians, given as 
+``BETG'' in the BPHF.
+
+\item [GEOG\_LONG(BORE\_POSNS)] -  (A \_REAL array) The geographic longitude of 
+of the boresight at the associated boresight position, in radians, given as 
+``LAMG'' in the BPHF.
+
+\end {description}
+
+\subsection{Satellite Coordinates}
+The boresight position is often given in terms of the ``clock angle'', $\psi$
+and the ``cone angle'', $\theta$, described in the Exp. Supp. chapter 3. The
+satellite coordinates stored in the BPHF are currently used by IRC as the basis
+for position reconstruction. The reasons for using satellite coordinates rather
+than the stored elliptic coordinates are all related to the fact that, for
+survey scans, $\theta$ was held constant (see Exp. Supp. paragraph III.B.8), and
+the rate of change of $\psi$ with time was constant (see Exp. Supp. paragraph
+C.3). The ecliptic coordinates do not share this simple behaviour. Both ecliptic
+longitude and ecliptic latitude vary non-linearly with time in a complex manner.
+Since boresight position is recorded less frequently than detector data, it is
+necessary to interpolate between boresight positions to get the position of the
+boresight at detector samples between the stored positions. It is sometimes also
+necessary to extrapolate beyond the UTCS range stored in the components of
+DETAILS. Both interpolation and extrapolation are easier to perform in
+satellite coordinates than ecliptic coordinates. 
+
+Detector sample positions are reconstructed as follows:
+\begin{itemize}
+\item The solar longitude is precessed from mean 1950 to mean of date. 
+\item Least squares linear fits are made to the clock angle $\psi$, the cone
+angle $\theta$ and the solar longitude (mean of date). The independent variable 
+is the offset in UTCS since detector sample number 1.
+\item For each detector sample, the UTCS offset since detector sample number 1 is
+calculated assuming that all samples are equally spaced in time. 
+\item The clock and cone angles, and the solar longitude (mean of date) at the 
+moment the detector sample was taken are estimated using the linear fits 
+established earlier.
+\item The ecliptic coordinates $(\lambda,\beta)$ (mean of date) of the boresight
+are calculated from the clock and cone angles ($\psi$ and $\theta$), and solar
+longitude ($\lambda_{sun}$) using the following equations: 
+\begin{eqnarray*}
+\beta & = & \arcsin( \sin \theta. \cos \psi )\\
+\lambda & = & \lambda_{sun} + \arctan \left(\frac{-\sin \theta.\sin \psi}{\cos 
+\theta} \right)
+\end{eqnarray*}
+\item These ecliptic coordinates are then converted to equatorial coordinates 
+(B1950).
+\end{itemize}
+
+\section {Adding Support for New CRDD File Formats}
+IRC has been designed to enable the package to be modified to include support 
+for any future variations in CRDD file formats (see section \ref {SEC:INDEP}).
+This appendix describes the general outline of how such a modification can be 
+made. It should be noted that IRC does not {\em create} CRDD files from 
+scratch. An application must exist which will create the CRDD files (usually
+by reading a magnetic tape archive). This application must decide how to 
+assign values  to the components of the CRDD\_INFO structure (see section
+\ref{SEC:CRDD_INFO}. It must also decide on the HDS {\em type} of the DETAILS 
+structure (see SUN/92 for restrictions on HDS types), and on what information 
+is stored in that structure (and how). The
+information in DETAILS must be sufficient to allow sample positions, scan
+angles, and scan speeds to be determined (see section \ref{SEC:TERMS}).
+
+Once the structure and type of DETAILS has been defined, various IRC routines 
+need to be modified. IRC\_IMPRT reads the HDS type of the DETAILS structure 
+from the given CRDD file, checks it is a recognized type, and if so, stores it 
+in common (in array CCM\_TYPE). Other routines then check CCM\_TYPE to decide
+which lower level subroutine should be called to perform the required task. 
+Such lower level routines should exist for each CRDD type. The steps to
+including a new CRDD type (once the DETAILS structure is defined) are thus:
+
+\begin {enumerate}
+\item Modify IRC\_IMPRT to include the HDS type of the new DETAILS structure in 
+the list of recognised types.
+\item Modify the following subroutines to include the new type: IRC1\_BCLPI,
+IRC1\_BPOSI, IRC1\_CLPNT, IRC1\_DCLPI, IRC1\_DISTI, IRC1\_DPOSI, IRC1\_OFFSI,
+IRC\_SATSI, IRC\_TRACI, IRC\_POSMP, IRC\_SIMUL. Most of these routines just
+perform a check on the value of CCM\_TYPE and call a relevant lower level
+subroutine. 
+\item Write the new subroutines to perform the tasks required by the routines 
+modified in the previous step. The routines which process type SURVEY\_BSIGHT 
+can be examined as examples of such subroutines.
+\item Write applications to check that IRC functions correctly with the new CRDD 
+type.
+\item Modify ID1.TEX to incorporate the new CRDD type. This should include an
+appendix which describes the new CRDD format, and the related DETAILS structure.
+\end {enumerate}
+
+\section {Packages Called by IRC}
+IRC\_ makes calls to the following packages:
+\begin {description}
+\item [CHR\_] - The CHR character handling package; see SUN/40.
+\item [CMP\_] - HDS; see SUN/92.
+\item [DAT\_] - HDS; see SUN/92.
+\item [ERR\_] - The Starlink error reporting package; see SUN/104.
+\item [IRA\_] - The IRAS90 Astrometry package.
+\item [MSG\_] - The Starlink message reporting package; see SUN/104.
+\item [NAG] - Double precision NAG library.
+\item [NDF\_] - The NDF access package; see SUN/33.
+\item [PAR\_] - The ADAM parameter system; see SUN/114.
+\item [PSX\_] - POSIX interface.
+\item [SLA\_] - The SLA package; see SUN/67.
+\end{description}
+
+Access to these packages, together with packages called from within these 
+packages, is necessary to use IRC. 
+
+\section {IRC Error Codes}
+\label {APP:ERRORS}
+IRC routines can return any $STATUS$ value generated by the subroutine packages 
+which it calls. In addition it can return the following IRC-specific values:
+
+\begin{description}
+
+\item {\bf IRC\_\_BADBN     }\\
+An illegal IRAS band number was specified (outside the range 1 to 4). 
+
+\item {\bf IRC\_\_BADDB     }\\
+The CRDD file contained data from a detector which is not included in the band 
+specified by the BAND component of the CRDD\_INFO structure.
+
+\item {\bf IRC\_\_BADDI     }\\
+A detector index is out of bounds. Detector indices must lie within the bounds 
+of the second dimension of the NDF.
+
+\item {\bf IRC\_\_BADEX     }\\
+Unable to evaluate an accurate position for a detector sample lying outside the 
+bounds of the first dimension of the DATA array.
+
+\item {\bf IRC\_\_BADNC     }\\
+An illegal coordinate index was given. Coordinates have indices of 1 or 2 (eg
+in an equatorial sky coordinate system, Right Ascension has index 1 and 
+Declination has index 2).
+
+\item {\bf IRC\_\_BADDN     }\\
+A detector number is out of bounds. Detector numbers must lie in the range 
+1 to 62.
+
+\item {\bf IRC\_\_BADDT     }\\
+The DET\_NUMBERS component of CRDD\_INFO has the wrong size. It should have the 
+same size as the second dimension of the NDF.
+
+\item {\bf IRC\_\_BADLA     }\\
+An illegal value was found for the LABEL component of the NDF.
+
+\item {\bf IRC\_\_BADTY     }\\
+The DETAILS component of CRDD\_INFO has an unrecognised HDS type.
+
+\item {\bf IRC\_\_BADUN     }\\
+An illegal value was found for the UNITS component of the NDF.
+
+\item {\bf IRC\_\_D2BIG     }\\
+The second dimension of the NDF is too big. The second dimension is restricted 
+to 16 rows or less.
+
+\item {\bf IRC\_\_INVID     }\\
+An invalid IDC identifier was supplied.
+
+\item {\bf IRC\_\_MULDE     }\\
+Two or more rows of the DATA array contains data from the same detector.
+
+\item {\bf IRC\_\_NAGER     }\\
+A NAG routine has failed to run succesfully.
+
+\item {\bf IRC\_\_NOBSD     }\\
+The CRDD file has insufficient good boresight data to define the boresight
+track (at least 1 good sample per 10 seconds is needed).
+
+\item {\bf IRC\_\_NOCCM     }\\
+The NDF has no CRDD\_INFO component in the IRAS extension.
+
+\item {\bf IRC\_\_NOEXT     }\\
+The NDF has no IRAS extension.
+
+\item {\bf IRC\_\_NOLAB     }\\
+A blank value was found for the LABEL component of the NDF.
+
+\item {\bf IRC\_\_NOMOR     }\\
+The IRC system is full; all IRC identifiers are in use.
+
+\item {\bf IRC\_\_NOT2D     }\\
+The NDF is not two dimensional.
+
+\item {\bf IRC\_\_NOUNI     }\\
+A blank value was found for the UNITS component of the NDF.
+
+\item {\bf IRC\_\_NVAL      }\\
+An illegal number of values has been supplied.
+
+\item {\bf IRC\_\_ZEROS     }\\
+CRDD samples have been found which claim to have the same in-scan position 
+(i.e. zero scan speed). This will be caused by a programming error.
+
+\end{description}
+
+\section {Changes Introduced in the Current Version of this Document}
+\label {SEC:CHANGES}
+
+Changes introduced in version 14 of ID1:
+\begin {enumerate}
+\item New routine IRC\_SATCO
+\end {enumerate}
+
+Changes introduced in version 13 of ID1:
+\begin {enumerate}
+\item Description of the use of IRC on UNIX machines included.
+\item It is no longer necessary to include I90\_PAR before including
+IRC\_ERR.
+\item The names of symbolic constants (including STATUS values) which previously
+were longer than five characters (excluding the IRC\_\_ prefix) have been
+truncated to five characters. The actual {\em values} associated with each name 
+have not changed.
+\item The VMS version of IRC is now released in the form of a sharable image 
+rather than an object library. Applications linked with the sharable image have 
+the advantage that they will not need to be {\em re}-linked when IRC is upgraded 
+in future. Note, the object library has been removed from the IRC system.
+\item The linking and development procedures have been modified to bring them 
+into line with Starlink standards (see SSN/8).
+\item IRC subroutine templates and help can now be made available in the STARLSE
+editing environment.
+\item IRC is no longer directly dependant on the ARY\_ system (although it may
+still have {\em in}-direct dependencies on ARY\_, for example through the
+NDF\_ system).
+\item New routine IRC\_TRACE added.
+
+\end {enumerate}
+
+\end{document}

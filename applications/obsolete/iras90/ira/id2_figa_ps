@@ -1,0 +1,115 @@
+S                               ! Use Cartesian coordinates.
+45,20,200        		! Eye vector
+2702;a.dat              ! Graphics device
+15,12				! Diagram size
+-0.1,1.7,-0.3,1.9,-0.2,1.75	! 3D window
+7                               ! Supress menu display
+!
+! Sky X axis
+!
+3
+0,0,0
+0,0,1.7
+0.07
+16
+CC
+12
+0,-3,1.77
+x
+0.05
+!
+! Sky Y axis 
+!
+3
+0,0,0
+90,0,1.7
+0.07
+12
+90,-3,1.77
+y
+0.05
+!
+! Sky Z axis
+!
+3
+0,0,0
+0,90,1.7
+0.07
+12
+0,90,1.77
+z
+0.05
+!
+! Dashed XY sky arc
+!
+4
+0,0,1
+90,0,1
+0,0,0
+0.03
+!
+! arc in equatorial plane
+!
+1
+0,0,1
+30,0,1
+0,0,0
+!
+! arc going north from equator to local x axis.
+!
+1
+30,0,1
+30,30,1
+0,0,0
+!
+! Dashed line from origin to point on equator directly under local x axis
+!
+5
+0,0,0
+30,0,1
+0.03
+!
+! text "A0"
+!
+12
+10,0,0.3
+A
+0.04
+12
+18,-3,0.3
+0
+0.025
+1
+0,0,0.45
+30,0,0.45
+0,0,0
+!
+! text "B0"
+!
+12
+30,20,0.35
+B
+0.04
+12
+37,17,0.35
+0
+0.025
+1
+30,0,0.45
+30,30,0.45
+0,0,0
+!
+! Reference point (= final local x axis)
+!
+3
+0,0,0
+30,30,1
+0.05
+12
+30,33,1.07
+Ref. point
+0.05
+!
+! QUIT
+!
+19

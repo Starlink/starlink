@@ -1,0 +1,61 @@
+*+
+*  Name:
+*     I90_PAR
+
+*  Purpose:
+*     Define scalar constants associated with the IRAS satellite and
+*     mission.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This module defines scalar parameters holding constants related to
+*     the IRAS satellite and mission. It does not define any arrays of
+*     constants. Arrays are held in common blocks and are declared in
+*     module I90_COM. The values stored in these arrays are initialised
+*     within the BLOCK DATA module I90_INIT.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     15-MAY-1992 (DSB):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Constant declarations:
+
+      INTEGER I90__BANDS    ! No. of wavebands.
+      INTEGER I90__CBNDS    ! No. of wavebands of CPC images
+      INTEGER I90__DETS     ! Total no. of detectors.
+      INTEGER I90__FAC      ! IRAS90 facility number (see SUN104 p33).
+      INTEGER I90__MAXDT    ! Max. no. of detectors per waveband.
+      INTEGER I90__NDEAD    ! No. of dead detectors.
+      INTEGER I90__NSMAL    ! No. of small detectors.
+      REAL    I90__SMSIZ    ! Cross scan size of largest "small" 
+                            ! detector, in arc-mins.
+      REAL    I90__SPEED    ! Nominal survey scan speed (arcmins per
+                            ! second).
+
+*  Constant values:
+
+      PARAMETER (
+
+     : I90__BANDS = 4,
+     : I90__CBNDS = 2,
+     : I90__DETS  = 62,
+     : I90__FAC   = 1507,
+     : I90__MAXDT = 16,
+     : I90__NDEAD = 3,
+     : I90__NSMAL = 12,
+     : I90__SPEED = 3.85,
+     : I90__SMSIZ = 3.47 )
+
+*.

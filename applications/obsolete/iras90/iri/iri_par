@@ -1,0 +1,156 @@
+*+
+*  Name:
+*     IRI_PAR
+
+*  Purpose:
+*     Define global constants for the IRI_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants which are used
+*     by the IRI_ system and which may also be needed by software which
+*     calls routines from this system.
+
+*  Authors:
+*     DSB: D.S. Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     8-JUN-1992 (DSB):
+*        Original version.
+*     4-DEC-1992 (DSB):
+*        Values added for TYPE component.
+*     30-NOV-1994 (HM):
+*        Values added for new release of ISSA
+*     {enter_changes_here}
+
+*-
+
+
+
+*  Length of the INSTRUMENT component in IMAGE_INFO.
+      INTEGER IRI__SZINS
+      PARAMETER ( IRI__SZINS = 6 )
+
+*  Maximum length of a standard units string.
+      INTEGER IRI__SZUNI
+      PARAMETER ( IRI__SZUNI = 15 )
+
+*  String specifying Janksy's per steradian units.
+      CHARACTER IRI__JPS * 5
+      PARAMETER ( IRI__JPS = 'Jy/sr' )
+
+*  String specifying MageJansky's per staradian units.
+      CHARACTER IRI__MJPS * 6
+      PARAMETER ( IRI__MJPS = 'MJy/sr' )
+
+*  String specifying Jansky's per pixel units.
+      CHARACTER IRI__JPP * 8
+      PARAMETER ( IRI__JPP = 'Jy/PIXEL' )
+
+*  String specifying Pico-Watts per quare metre per steradian units.
+      CHARACTER IRI__FPS * 12
+      PARAMETER ( IRI__FPS = '(pW/M**2)/sr' )
+
+*  String specifying Pico-Watts per quare metre per pixel units.
+      CHARACTER IRI__FPP * 15
+      PARAMETER ( IRI__FPP = '(pW/M**2)/PIXEL' )
+
+*  String holding a concatenated list of all standard units.
+      CHARACTER IRI__UNITS * 50
+      PARAMETER ( IRI__UNITS = IRI__JPS//','//IRI__MJPS//','//
+     :                         IRI__JPP//','//IRI__FPS//','//IRI__FPP )
+
+*  Maximum length of the TYPE component.
+      INTEGER IRI__SZTYP
+      PARAMETER ( IRI__SZTYP = 8 )
+
+*  String specifying CPC images.
+      CHARACTER IRI__CPC*8
+      PARAMETER( IRI__CPC = 'IRAS-CPC' )
+
+*  String specifying SKYFLUX images.
+      CHARACTER IRI__SKYFL*8
+      PARAMETER( IRI__SKYFL = 'SKYPLATE' )
+
+*  String specifying galactic plane images.
+      CHARACTER IRI__GALPL*8
+      PARAMETER( IRI__GALPL = 'GALPLANE' )
+
+*  String specifying all sky images.
+      CHARACTER IRI__ALLSK*6
+      PARAMETER( IRI__ALLSK = 'ALLSKY' )
+
+*  String specifying DSCO images.
+      CHARACTER IRI__DSCO*7
+      PARAMETER( IRI__DSCO = 'DEEPSKY' )
+
+*  String specifying ISSA images.
+      CHARACTER IRI__ISSA*8
+      PARAMETER( IRI__ISSA = 'ISSA-FLD' )
+
+*  Alternative string specifying ISSA images.
+      CHARACTER IRI__ISFD*8
+      PARAMETER( IRI__ISFD = 'ISSA-FLD' )
+
+*  String specifying ISSA images (release I).
+      CHARACTER IRI__ISI*6
+      PARAMETER( IRI__ISI = 'ISSA-I')
+
+*  String specifying ISSA images (release II).
+      CHARACTER IRI__ISII*7
+      PARAMETER( IRI__ISII = 'ISSA-II')
+
+*  String specifying ISSA images (reject plates).
+      CHARACTER IRI__ISRJ*8
+      PARAMETER( IRI__ISRJ = 'ISSA-REJ')
+
+*  String specifying YORIC images.
+      CHARACTER IRI__YORIC*5
+      PARAMETER( IRI__YORIC = 'YORIC' )
+
+*  String specifying MAPCRDD images.
+      CHARACTER IRI__MAPCR*7
+      PARAMETER( IRI__MAPCR = 'MAPCRDD' )
+
+*  String specifying COLCORR  images.
+      CHARACTER IRI__COLC*7
+      PARAMETER( IRI__COLC = 'COLCORR' )
+
+*  String specifying any other type of images.
+      CHARACTER IRI__NONAM*7
+      PARAMETER( IRI__NONAM = 'UNKNOWN' )
+
+*  String holding a concatenated list of all standard types.
+      CHARACTER IRI__TYPES * 76
+      PARAMETER ( IRI__TYPES = IRI__CPC//','//IRI__SKYFL//','//
+     :            IRI__GALPL//','//IRI__ALLSK//','//IRI__DSCO//','//
+     :            IRI__ISSA//','//IRI__YORIC//','//IRI__MAPCR//','//
+     :            IRI__COLC//','//IRI__NONAM )
+
+*  Strings identifying different types of YORIC image.
+      INTEGER IRI__SZYOR               ! Length of YORIC image types.
+      PARAMETER ( IRI__SZYOR = 3 )
+
+      CHARACTER IRI__YOIMG*(IRI__SZYOR)
+      PARAMETER (IRI__YOIMG = 'IMG' )  ! Surface brightness map.
+
+      CHARACTER IRI__YOPHN*(IRI__SZYOR)
+      PARAMETER (IRI__YOPHN = 'PHN' )  ! Photometric noise map.
+
+      CHARACTER IRI__YOCVG*(IRI__SZYOR)
+      PARAMETER (IRI__YOCVG = 'CVG' )  ! Coverage map.
+
+      CHARACTER IRI__YOCFV*(IRI__SZYOR)
+      PARAMETER (IRI__YOCFV = 'CFV' )  ! Correction factor variance map.
+
+      CHARACTER IRI__YORES*(IRI__SZYOR)
+      PARAMETER (IRI__YORES = 'RES' )  ! Resolution map.
+
+*.
+

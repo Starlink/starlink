@@ -1,0 +1,153 @@
+#+
+#  Name:
+#     SETQUAL.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     31-JUL-1991 (DSB):
+#     	 Original version.
+#     12-DEC-1994 (DSB):
+#        Added ARDDESC.
+#     {enter_changes_here}
+
+#-
+
+interface SETQUAL
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter ARDDESC             # An ARD description identifying the
+                                 # selected pixels.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      prompt   'ARD description for selected pixels'
+      helpkey  '*'
+   endparameter
+
+   parameter COMMENT             # Comment describing the quality name.
+      position 3
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'CURRENT '
+      prompt   'A short description of the assigned quality'
+      helpkey  '*'
+   endparameter
+
+   parameter FUNCTION            # The operation to be performed on the
+				 # selected pixels.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'HS'
+      prompt   'Function to be performed by SETQUAL'
+      helpkey  '*'
+   endparameter
+
+   parameter HISTORY		 # True if HISTORY required in the output.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LIST                # List of selected pixel coordinates.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT '
+      prompt   'A list of pixel indices'
+      helpkey  '*'
+   endparameter
+
+   parameter MASK               # Mask NDF.
+      position 4
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      prompt   'NDFs which defines the selected pixels'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NDF                 # Input NDFs.
+      position 1
+      type     NDF
+      access   UPDATE
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'NDFs in which to store quality information'
+      helpkey  '*'
+   endparameter
+
+   parameter NDFLIST             # Group expression defining accessed
+      type     NDF               # NDFs.
+      access   WRITE
+      ppath    DYNAMIC
+      vpath    'DYNAMIC,NOPROMPT'
+      association ->GLOBAL.DATA_ARRAY
+      prompt   'Group expression giving processed NDFs'
+   endparameter
+ 
+   parameter QNAME               # Quality name.
+      position 2
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT'
+      ppath    'CURRENT '
+      prompt   'Quality name'
+      helpkey  '*'
+   endparameter
+
+   parameter SELECT		 # Method used to select pixels.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'MASK'
+      prompt   'How do you want to identified select pixels?'
+      helpkey  '*'
+   endparameter
+
+   parameter XNAME		 # The NDF extension name.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  'QUALITY_NAMES'
+      prompt   'NDF extension name'
+      helpkey  '*'
+   endparameter
+
+   parameter XTYPE		 # The NDF extension type.
+      type     LITERAL
+      access   UPDATE
+      vpath    'DYNAMIC '
+      ppath    'DYNAMIC '
+      prompt   'NDF extension type'
+      helpkey  '*'
+   endparameter
+
+endinterface

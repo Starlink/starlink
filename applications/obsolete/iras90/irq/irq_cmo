@@ -1,0 +1,61 @@
+*+
+*  Name:
+*     IRQ_CMO
+
+*  Purpose:
+*     Declares the variables and common blocks used to hold information
+*     about the logical operators supported by IRQ.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     The variables which are used to store information defining the 
+*     properties of the logical operators which can be used within
+*     IRQ quality expressions are declared, together with the common 
+*     blocks /IRQ_COI/ and /IRQ_COC/ which are used to store them.
+*
+*     Modules IRQ_PAO and IRQ_PAR must be included before this module.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     19-MAY-1992 (DSB):
+*        Original version. 
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Declare integer variables:
+      INTEGER OPC_DSTK( IRQ__MXINS )! Change in size of evaluation stack
+                                   ! as a result of each symbol.
+      INTEGER OPC_L( IRQ__MXINS )  ! No. of used characters in SYM.
+      INTEGER OPC_OPL( IRQ__MXINS )! If set to one, then an operand is
+                                   ! needed to the left of the symbol.
+      INTEGER OPC_OPR( IRQ__MXINS )! If set to one, then an operand is
+                                   ! needed to the right of the symbol.
+      INTEGER OPC_OPS( IRQ__MXINS )! The number of operands required by
+                                   ! the symbol.
+      INTEGER OPC_PRL( IRQ__MXINS )! Precedence (seen from the left).
+      INTEGER OPC_PRR( IRQ__MXINS )! Precedence (seen from the right).
+      INTEGER OPC_WRT( IRQ__MXINS )! Set to one if the symbol writes a 
+                                   ! value to the FILO evaluation stack.
+
+*  Delare common block:
+      COMMON /IRQ_COI/ OPC_L, OPC_OPL, OPC_OPR, OPC_PRL, OPC_PRR, 
+     :                 OPC_DSTK, OPC_WRT, OPC_OPS
+
+
+
+*  Declare character variables:
+      CHARACTER OPC_SYM( IRQ__MXINS )*(OPC__MXSSZ)! Recognised symbols
+                                   ! which can be included within the 
+                                   ! supplied expression.
+*  Delare common block:
+      COMMON /IRQ_COI/ OPC_SYM
+*.

@@ -1,0 +1,213 @@
+#+
+#  Name:
+#     SKYPHOT.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     15-JUL-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface SKYPHOT
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter BACKVAL
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  0.0
+      prompt   'Background surface brightness in MJy/sr'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE		 # Graphic device
+      ptype     'DEVICE'
+      vpath    'GLOBAL,PROMPT '
+      ppath    'GLOBAL,CURRENT '
+      association <-GLOBAL.GRAPHICS_DEVICE
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter FILE               # The input text file.
+      type     FILENAME
+      access   READ
+      vpath    'PROMPT'
+      prompt   'A text file containing input coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter FLUX              # Last flux density value displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter FLUX'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Input NDF.
+      type     NDF
+      access   READ
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'The input NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LAT          # Sky latitude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      prompt   'Sky latitude'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE             # The log file.
+      type     FILENAME
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  !
+      prompt   'A log file for storing displayed information'
+      helpkey  '*'
+   endparameter
+
+   parameter LON          # Sky longitude.
+      type     LITERAL
+      access   UPDATE
+      vpath    'PROMPT '
+      prompt   'Sky longitude'
+      helpkey  '*'
+   endparameter
+
+   parameter LOOP
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'Are multiple operations to be performed?'
+      helpkey  '*'
+   endparameter
+
+   parameter MEAN              # Last mean surface brightness value displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter MEAN'
+      helpkey  '*'
+   endparameter
+
+   parameter MODE		 # Mode of operation.
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DYNAMIC,DEFAULT '
+      default  'CURSOR'
+      prompt   'Source of input coordinates'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter OPTION 		 # Mode of operation.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT'
+      prompt   'Next operation'
+      helpkey  '*'
+   endparameter
+
+   parameter PEN
+      type     _INTEGER
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  3
+      prompt   'SGS pen number for graphics'
+      helpkey  '*'
+   endparameter
+
+   parameter PLOT		 # Type of graphics.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  'YES'
+      prompt   'Are graphics to be produced?'
+      helpkey  '*'
+   endparameter
+
+   parameter SHAPE 		 # Shape of aperture
+      type     LITERAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DYNAMIC,DEFAULT'
+      default  'ELLIPSE'
+      prompt   'Aperture shape'
+      helpkey  '*'
+   endparameter
+
+   parameter SIGMA             # Last standard deviation value displayed.
+      type     _REAL
+      access   WRITE
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.0
+      prompt   'A dummy value to be replaced by the value of parameter SIGMA'
+      helpkey  '*'
+   endparameter
+
+   parameter SINGLE
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  FALSE
+      prompt   'Should the application exit after a single position?'
+      helpkey  '*'
+   endparameter
+
+   parameter SIZE
+      type     _REAL
+      access   READ
+      ppath    'DYNAMIC,CURRENT'
+      prompt   'Aperture size in arc-minutes'
+      helpkey  '*'
+   endparameter
+
+ endinterface

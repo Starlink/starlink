@@ -1,0 +1,210 @@
+#+
+#  Name:
+#     SKYGRID.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     25-MAR-1992 (WG):
+#     	 Original version.
+#     18-JAN-1993 (DSB):
+#     	 Modified for inclusion in the IRAS90 package.
+#     {enter_further_changes_here}
+
+#-
+
+interface SKYGRID
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+   parameter CLEAR		 # Clear graphic surface flag
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  NO
+      prompt   'Clear the graphics window?'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS		 # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DYNAMIC,DEFAULT '
+      ppath    'GLOBAL,DYNAMIC,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDSIZE
+      type     '_REAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.01
+      prompt   'Size of text used for formatted coordinate values.'
+      helpkey  '*'
+   endparameter
+
+   parameter DEVICE		 # Graphic device
+      position 1
+      ptype     'DEVICE'
+      vpath    'GLOBAL '
+      ppath    'GLOBAL,CURRENT '
+      association <-GLOBAL.IMAGE_OVERLAY
+      prompt   'Name of display device'
+      helpkey  '*'
+   endparameter
+
+   parameter IN                 # Displayed NDF.
+      position 2
+      type     NDF
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      default  !
+      prompt   'The displayed NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter LABEL		 # Sky grid annotation flag 
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  YES
+      prompt   'Annotate the coordinate grid?'
+      helpkey  '*'
+   endparameter
+
+   parameter LATACC		 # Accuracy of displayed latitude values.
+      type     'LITERAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0
+      prompt   'Accuracy of displayed latitude values'
+      helpkey  '*'
+   endparameter
+
+   parameter LATINT		 # Latitude interval
+      type     'LITERAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0
+      prompt   'Interval between latitude lines'
+      helpkey  '*'
+   endparameter
+
+   parameter LINES		 # Sky grid annotation flag 
+      type     '_LOGICAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  NO
+      prompt   'Grid lines across the image?'
+      helpkey  '*'
+   endparameter
+
+   parameter LONACC		 # Accuracy of displayed longitude values.
+      type     'LITERAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0
+      prompt   'Accuracy of displayed longitude values'
+      helpkey  '*'
+   endparameter
+
+   parameter LONINT		 # Longitude interval
+      type     LITERAL
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0
+      prompt   'Interval between longitude lines'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter PENA
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  3
+      prompt   'Pen number used to draw boundary'
+      helpkey  '*'
+   endparameter
+
+   parameter PENB
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  3
+      prompt   'Pen number used to draw curves and tick marks'
+      helpkey  '*'
+   endparameter
+
+   parameter PENC
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  1
+      prompt   'Pen number used to draw text labels'
+      helpkey  '*'
+   endparameter
+
+   parameter PEND
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'CURRENT, DEFAULT'
+      ppath    'CURRENT, DEFAULT'
+      default  1
+      prompt   'Pen number used to draw coordinate labels'
+      helpkey  '*'
+   endparameter
+
+   parameter TEXTSIZE
+      type     '_REAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      default  0.02
+      prompt   'Size of annotation text.'
+      helpkey  '*'
+   endparameter
+
+   parameter TOLERANCE 		 # The accuracy of the sky grid lines
+      type     '_INTEGER'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  6
+      prompt   'Tolerance for the plotting of the grid lines'
+      helpkey  '*'
+   endparameter
+
+endinterface

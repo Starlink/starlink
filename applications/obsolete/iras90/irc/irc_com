@@ -1,0 +1,56 @@
+*  Common blocks used in IRC:
+*  (Note, IRC_PAR, I90_DAT and DAT_PAR must be included before this file).
+
+
+*  Character Variables...
+      CHARACTER CCM_CRDDL( IRC__MAX ) *( DAT__SZLOC )
+      CHARACTER CCM_IRASL( IRC__MAX ) *( DAT__SZLOC )
+      CHARACTER CCM_STATE * ( IRC__SZSTA )
+      CHARACTER CCM_TYPE( IRC__MAX ) * ( DAT__SZTYP )
+
+      COMMON /IRC_CMC/ CCM_CRDDL, CCM_IRASL, CCM_STATE, CCM_TYPE
+
+
+*  Double Precision Variables...
+      DOUBLE PRECISION CCM_REFDE( IRC__MAX )
+      DOUBLE PRECISION CCM_REFRA( IRC__MAX )
+      DOUBLE PRECISION CCM_RMAT( 9, IRC__MAX )
+      DOUBLE PRECISION CCM_UTCS1( IRC__MAX )
+
+      COMMON /IRC_CMD/ CCM_REFDE, CCM_REFRA, CCM_RMAT, CCM_UTCS1
+
+
+*  Integer Variables...
+      INTEGER   CCM_BAND( IRC__MAX )
+      INTEGER   CCM_DETIN( I90__DETS, IRC__MAX )
+      INTEGER   CCM_DETNO( IRC__MXD2S, IRC__MAX )
+      INTEGER   CCM_DETOR( IRC__MAX )
+      INTEGER   CCM_DHIGH( IRC__MAX )
+      INTEGER   CCM_DLOW( IRC__MAX )
+      INTEGER   CCM_OBS( IRC__MAX )
+      INTEGER   CCM_SHIGH( IRC__MAX )
+      INTEGER   CCM_SLOW( IRC__MAX )
+      INTEGER   CCM_SOP( IRC__MAX )
+
+      COMMON /IRC_CMI/ CCM_BAND, CCM_DETIN, CCM_DETNO, CCM_DETOR,
+     :                 CCM_DHIGH, CCM_DLOW, CCM_OBS, CCM_SHIGH,
+     :                 CCM_SLOW, CCM_SOP
+
+
+*  Logical Variables:
+      LOGICAL   CCM_POINT( IRC__MAX )
+      LOGICAL   CCM_VALID( IRC__MAX )
+
+      COMMON /IRC_CML/ CCM_POINT, CCM_VALID
+
+
+*  Real Variables.
+      REAL      CCM_CAGRD( IRC__MAX )
+      REAL      CCM_CAZER( IRC__MAX )
+      REAL      CCM_NOMSP( IRC__MAX )
+      REAL      CCM_SLGRD( IRC__MAX )
+      REAL      CCM_SLZER( IRC__MAX )
+      REAL      CCM_THETA( IRC__MAX )
+
+      COMMON /IRC_CMR/ CCM_CAGRD, CCM_CAZER, CCM_NOMSP, CCM_SLGRD,
+     :                 CCM_SLZER, CCM_THETA

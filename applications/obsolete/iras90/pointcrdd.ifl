@@ -1,0 +1,214 @@
+#+
+#  Name:
+#     POINTCRDD.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     WG: Wei Gong (IPMAF)
+#     DCP: Diana Parsons (FIIS/RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     9-MAR-1993 (WG):
+#     	 Original version.
+#     19-OCT-1994 (DCP):
+#        Completely rewritten
+#     {enter_changes_here}
+
+#-
+
+interface POINTCRDD
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+   
+   parameter AUTOMATIC
+      type     '_LOGICAL'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  Y
+      prompt   'Accept default source positions and search length (y/n)'
+      helpkey  '*'
+   endparameter
+
+   parameter COORDS              # Sky coordinate system to use.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      default  'EQUATORIAL(B1950)'
+      association <->GLOBAL.SKY_COORDS
+      prompt   'Sky coordinate system'
+      helpkey  '*'
+   endparameter
+
+   parameter DET_CHOICE          # method of selecting detectors
+      type     LITERAL
+      vpath    'PROMPT '
+      ppath    'CURRENT, DEFAULT'
+      prompt   'Choose detectors - all(A), nearest(N), user choice(C)'
+      default  'N'
+      in       'A','N','C','ALL','NEAREST','CHOOSE'
+      helpkey  '*'
+   endparameter
+
+   parameter DET_REQ             # User answers y or n to the question 
+                                 # do you want this detector
+      type     '_LOGICAL'
+      vpath    'PROMPT '
+      ppath    'DEFAULT'
+      prompt   'Search this detector (y/n)'
+      default  Y
+      helpkey  '*'
+   endparameter
+
+   parameter IN                  # Input CRDD file.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <->GLOBAL.DATA_ARRAY
+      prompt   'CRDD file(s) to search'
+      helpkey  '*'
+   endparameter
+
+   parameter LOGFILE             # Output position file
+      type     'FILENAME'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  pointcrdd.log
+      prompt   'Logfile name'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER          # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter NOISE_SMPL          # Number of samples required in calculating
+                                 # local noise
+      type     '_INTEGER'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  80
+      prompt   'Number of samples required for local noise estimate'
+      helpkey  '*'
+   endparameter
+
+   parameter PROFILES            # File name of point source template NDF file
+      type     'NDF'
+      vpath    'DEFAULT'
+      ppath    'DEFAULT'
+      prompt   'NDF containing point source templates:'
+      default   $IRAS90_DIR/PROFILES
+      helpkey  '*'
+   endparameter
+
+   parameter SCAN_NORTH	         # Length of the scan searched north
+                                 # of expected source position
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  40.0
+      prompt   'Length to be searched North of exp. source ( arcmin )'
+      helpkey  '*'
+   endparameter
+
+   parameter SCAN_SOUTH	         # Length of the scan searched north
+                                 # of expected source position
+      type     '_REAL'
+      access   'READ'
+      vpath    'PROMPT,DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default  40.0
+      prompt   'Length to be searched South of exp. source ( arcmin )'
+      helpkey  '*'
+   endparameter
+
+   parameter SOURCE_LAT          # Sky latitude of exp. source.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Latitude of expected source (in current coord. system)'
+      helpkey  '*'
+   endparameter
+
+   parameter SOURCE_LON          # Sky longitude of exp. source.
+      type     LITERAL
+      access   READ
+      vpath    'PROMPT '
+      ppath    'DYNAMIC '
+      prompt   'Longitude of expected source (in current coord. system)'
+      helpkey  '*'
+   endparameter
+
+
+   parameter THRESH_CORR	 # Correlation Coefficient threshold
+      type     '_REAL'
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  0.9
+      prompt   'Correlation coefficient threshold''
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH_FILTER       # Square wave filter signal to noise
+                                 # threshold
+      type     '_REAL '
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  1.0
+      prompt   'Filter threshold ( see ? for more info )'
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH_SD	         # Threshold for rejecting samples in
+                                 # noise calculations
+      type     '_REAL '
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'CURRENT,DEFAULT '
+      default  3.0
+      prompt   'Noise calculation - sample ommission threshold '
+      helpkey  '*'
+   endparameter
+
+   parameter THRESH_S2N          # Threshold of signal to local noise at
+				 # which a candidate point source will
+				 # be accepted or ! if do not apply
+				 # this test
+      type     '_REAL '
+      access   'READ'
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  2.5
+      prompt   'Signal to Noise threshold (! accept all candidate sources)'
+      helpkey  '*'
+   endparameter
+
+   parameter UNITS               # Units of the output
+      type     'LITERAL'
+      access   'READ'
+      vpath    'DEFAULT'
+      ppath    'CURRENT,DEFAULT '
+      default   'Jy'
+      prompt   'Output units:'
+      helpkey  '*'
+   endparameter
+
+endinterface
+ 

@@ -1,0 +1,136 @@
+#+
+#  Name:
+#     COLTEMP.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     23-APR-1993 (DSB):
+#     	 Original version.
+#     {enter_changes_here}
+
+#-
+
+interface COLTEMP
+
+   helplib '$IRAS90_HELP/iras90_help.shl'
+
+
+   parameter BETA               # Emmisivity spectral index.
+      position 3
+      type     _REAL
+      access   READ
+      ppath    'CURRENT,DEFAULT '
+      default  1
+      prompt   'The emissivity spectral index'
+      helpkey  '*'
+   endparameter
+
+   parameter HISTORY		 # True if HISTORY required in the
+				 # output NDF.
+      type     _LOGICAL
+      access   READ
+      vpath    'GLOBAL,DEFAULT'
+      ppath    'GLOBAL,DEFAULT'
+      default  FALSE
+      association <->GLOBAL.IRAS90_HISTORY
+      prompt   'True if HISTORY is to be added to the output NDF'
+      helpkey  '*'
+   endparameter
+
+   parameter IN1                  # First input NDF.
+      position 1
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      ppath    'GLOBAL '
+      association <-GLOBAL.DATA_ARRAY
+      prompt   'First input image'
+      helpkey  '*'
+   endparameter
+
+   parameter IN2                  # Second input NDF.
+      position 2
+      type     NDF
+      access   READ
+      vpath    'PROMPT '
+      prompt   'Second input image'
+      helpkey  '*'
+   endparameter
+
+   parameter LERR               # Wavelength shift.
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  0.0
+      prompt   'Spectral response wavelength shift, in microns'
+      helpkey  '*'
+   endparameter
+
+   parameter MSG_FILTER		 # Information level to be displayed.
+      type     LITERAL
+      access   UPDATE
+      vpath    'GLOBAL,DEFAULT '
+      ppath    'GLOBAL,DEFAULT '
+      association <->GLOBAL.MSG_FILTER
+      default  'NORMAL'
+      prompt   'Level of information to be displayed on the screen'
+      helpkey  '*'
+   endparameter
+
+   parameter RERR               # Response factor
+      type     _REAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  1.0
+      prompt   'Factor to apply to standard spectral response data'
+      helpkey  '*'
+   endparameter
+
+   parameter TAU                # Output NDF.
+      position 5
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output optical depth map'
+      helpkey  '*'
+   endparameter
+
+   parameter TEMP                # Output NDF.
+      position 4
+      type     NDF
+      access   WRITE
+      vpath    'PROMPT '
+      prompt   'Output temperature map'
+      association ->GLOBAL.DATA_ARRAY
+      helpkey  '*'
+   endparameter
+
+   parameter WAVEL             # Optical depth wavelength
+      position 6
+      type     _REAL
+      access   READ
+      ppath    'CURRENT,DEFAULT'
+      default  12
+      prompt   'Wavelength in microns at which optical depth is required'
+      helpkey  '*'
+   endparameter
+
+   parameter VAROUT            # True if output variances required.
+      type     _LOGICAL
+      access   READ
+      ppath    'DYNAMIC,DEFAULT'
+      vpath    'DYNAMIC,DEFAULT'
+      default  NO
+      prompt   'Wavelength in microns at which optical depth is required'
+      helpkey  '*'
+   endparameter
+
+endinterface

@@ -1,0 +1,36 @@
+*  Define the IRAS90 facility number.
+      INTEGER FAC90             ! IRAS90 facility number.
+      PARAMETER ( FAC90 = 1507 )
+
+*  Error values used by IRI:
+      INTEGER IRI__BADAS  ! Astrometry structure has wrong HDS type.
+      INTEGER IRI__BADBN  ! Waveband index is out of range.
+      INTEGER IRI__BADCM  ! Unknown IMAGE_INFO item found.
+      INTEGER IRI__BADII  ! The IMAGE_INFO structure has an illegal HDS
+                          ! type.
+      INTEGER IRI__BADIN  ! An illegal value for INSTRUMENT has been
+                          ! found.
+      INTEGER IRI__BADOB  ! OBSNO found when more than one SOP is
+                          ! present.
+      INTEGER IRI__BADSO  ! MAXSOP is less than MINSOP.
+      INTEGER IRI__BADTY  ! Bad value for TYPE.
+      INTEGER IRI__BADUN  ! Non-standard UNITS specified.
+      INTEGER IRI__INCOM  ! Incompatible items found in IMAGE_INFO.
+      INTEGER IRI__MISF   ! Missing field position items.
+      INTEGER IRI__NOT2D  ! NDF is not two dimensional.
+      
+*  IRAS90 error numbers 301 to 330 are reserved for use by IRI
+      PARAMETER (
+     :           IRI__BADAS = 134250498 + 65536*FAC90 + 8*301,
+     :           IRI__BADBN = 134250498 + 65536*FAC90 + 8*302,
+     :           IRI__BADCM = 134250498 + 65536*FAC90 + 8*303,
+     :           IRI__BADII = 134250498 + 65536*FAC90 + 8*304,
+     :           IRI__BADIN = 134250498 + 65536*FAC90 + 8*305,
+     :           IRI__BADOB = 134250498 + 65536*FAC90 + 8*306,
+     :           IRI__BADSO = 134250498 + 65536*FAC90 + 8*307,
+     :           IRI__BADTY = 134250498 + 65536*FAC90 + 8*308,
+     :           IRI__BADUN = 134250498 + 65536*FAC90 + 8*309,
+     :           IRI__INCOM = 134250498 + 65536*FAC90 + 8*310,
+     :           IRI__MISF  = 134250498 + 65536*FAC90 + 8*311,
+     :           IRI__NOT2D = 134250498 + 65536*FAC90 + 8*312 )
+*.
