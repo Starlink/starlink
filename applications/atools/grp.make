@@ -9,7 +9,7 @@
 TAR_FILES_A = atools_source  atools_iraf
 
 # The contents of the atools_source.tar file:
-ATOOLS_SOURCE = astcopy.f astaddframe.ifl astaddframe.f astclear.f \
+ATOOLS_SOURCE = astcopy.f astcopy.ifl astaddframe.ifl astaddframe.f astclear.f \
 astclear.ifl astcmpframe.ifl astcmpframe.f astcmpmap.f astcmpmap.ifl \
 astconvert.f astconvert.ifl astframe.f astframe.ifl astframeset.ifl \
 astframeset.f astget.f astget.ifl astgetframe.f astgetframe.ifl \

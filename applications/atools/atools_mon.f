@@ -120,6 +120,30 @@
       ELSE IF ( NAME .EQ. 'ASTCONVERT' ) THEN
          CALL ASTCONVERT( STATUS )
 
+      ELSE IF ( NAME .EQ. 'ASTLUTMAP' ) THEN
+         CALL ASTLUTMAP( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTPCDMAP' ) THEN
+         CALL ASTPCDMAP( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTWINMAP' ) THEN
+         CALL ASTWINMAP( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTCOPY' ) THEN
+         CALL ASTCOPY( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTFINDFRAME' ) THEN
+         CALL ASTFINDFRAME( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTPERMAXES' ) THEN
+         CALL ASTPERMAXES( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTPICKAXES' ) THEN
+         CALL ASTPICKAXES( STATUS )
+
+      ELSE IF ( NAME .EQ. 'ASTSIMPLIFY' ) THEN
+         CALL ASTSIMPLIFY( STATUS )
+
 *  If the action name is not recognised, then report an error.
       ELSE
          STATUS = SAI__ERROR

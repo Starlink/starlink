@@ -889,14 +889,6 @@ iraf! {
             helpkey *
           }
 
-         parameter start {
-            position 2
-            type _DOUBLE
-            prompt {Input coordinate value for first LUT entry}
-            ppath CURRENT 
-            helpkey *
-          }
-
       }
 
       action astwinmap {
