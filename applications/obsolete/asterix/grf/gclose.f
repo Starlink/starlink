@@ -20,6 +20,7 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
+      INTEGER N
 *    Version :
       CHARACTER*30 VERSION
       PARAMETER (VERSION = 'GCLOSE Version 1.7-0')
