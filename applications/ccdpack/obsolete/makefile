@@ -593,12 +593,10 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_lsfun1.f ccd1_lsfuns.f ccd1_imfit.f ccd1_ftgrp.f \
  ccd1_cfgrp.f fts1_gkeyc.f ccd1_knext.f ccd1_touch.f \
  ccd1_ckdeb.f ccd1_ckccl.f ccd1_ckflc.f ccd1_resta.f \
- ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f pda_covmat.f \
- pda_nscor.f pda_ppnd16.f pda_saacx.f pda_lmscx.f pda_iperm.f \
- pda_qsidd.f pda_rinpd.f pda_lsqr.f ccd1_calcj.f \
- ccd1_fcov.f pda_dsvdc.f pda_qsai.f pda_qsad.f \
+ ccd1_docmd.f ccd1_prin.f aif_antmp.f aif_temp.f \
+ ccd1_fcov.f ccd1_calcj.f pda_dsvdc.f \
  pda_drnor.f nag1_szprd.f nag1_szslv.f nag1_szlsf.f nag1_szlsm.f \
- ccd1_dqeds.f dqed.f dqed_dep.f ccd1_entrn.f ccd1_hdrrn.f \
+ ccd1_dqeds.f ccd1_entrn.f ccd1_hdrrn.f \
  ccd1_cat.f ccd1_ggeom.f ccd1_sdect.f ccd1_setpa.f ccd1_wrtpa.f
 
 IRGSRC = irg1_axlim.f irg1_brack.f irg1_check.f irg1_fspec.f \
@@ -918,20 +916,20 @@ check_source: makefile mk $(DOCUMENTATION) $(HELPTASK).tar \
 #  Rules for building release files from SCCS repository.
 
 $(PKG_NAME)_source.tar :
-	sccs get $(PRIVATE_INCLUDES)
-	sccs get $(MONO_SOURCE)
-	sccs get $(HELP_SOURCES)
-	sccs get $(STARTUP_SCRIPT)
-	sccs get $(IFL_FILES)
-	sccs get $(ICL_SCRIPT)
+	co $(PRIVATE_INCLUDES)
+	co $(MONO_SOURCE)
+	co $(HELP_SOURCES)
+	co $(STARTUP_SCRIPT)
+	co $(IFL_FILES)
+	co $(ICL_SCRIPT)
 	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(PRIVATE_INCLUDES) \
 		  $(STARTUP_SCRIPT) $(IFL_FILES) $(ICL_SCRIPT)
-	sccs get $(PUBLIC_SCRIPTS)
-	sccs get $(LINK_SCRIPT1)
-	sccs get $(LINK_SCRIPT2)
+	co $(PUBLIC_SCRIPTS)
+	co $(LINK_SCRIPT1)
+	co $(LINK_SCRIPT2)
 	chmod 700 $(LINK_SCRIPT1) $(LINK_SCRIPT2)
 	chmod 755 $(PUBLIC_SCRIPTS)
-	sccs get $(PRIVATE_SCRIPTS)
+	co $(PRIVATE_SCRIPTS)
 	cp $(HOME)/ccdpack/release/ccdwish.alpha_OSF1.gz \
 	   $(HOME)/ccdpack/release/ccdwish.sun4_Solaris.gz \
 	   $(HOME)/ccdpack/release/ccdwish.ix86_Linux.gz \
@@ -958,23 +956,23 @@ $(PKG_NAME)_source.tar :
 	        atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
 
 $(PKG_NAME)_tasks.tar:
-	sccs get $(TASKSRC)
+	co $(TASKSRC)
 	chmod 644 $(TASKSRC)
 	$(TAR_IN) $(PKG_NAME)_tasks.tar $(TASKSRC)
 	@- $(RM) $(TASKSRC)
 
 $(PKG_NAME).tar:
-	sccs get $(SUBSRC)
-	sccs get $(CSUBSRC)
+	co $(SUBSRC)
+	co $(CSUBSRC)
 	chmod 644 $(SUBSRC) $(CSUBSRC)
 	$(TAR_IN) $(PKG_NAME).tar $(SUBSRC) $(CSUBSRC)
 	@- $(RM) $(SUBSRC) $(CSUBSRC)
 
 $(PKG_NAME)_gen.tar:
-	sccs get $(GENSRC)
-	sccs get $(GENRDSRC)
-	sccs get $(GENLRDICSRC)
-	sccs get $(GENLRDISRC)
+	co $(GENSRC)
+	co $(GENRDSRC)
+	co $(GENLRDICSRC)
+	co $(GENLRDISRC)
 	chmod 644 $(GENSRC) $(GENRDSRC) $(GENLRDICSRC) \
 	         $(GENLRDISRC)
 	$(TAR_IN) $(PKG_NAME)_gen.tar $(GENSRC) $(GENRDSRC) \
@@ -983,39 +981,39 @@ $(PKG_NAME)_gen.tar:
 	         $(GENLRDISRC)
 
 $(PKG_NAME)_dgen.tar:
-	sccs get $(DGENSRC)
+	co $(DGENSRC)
 	chmod 644 $(DGENSRC)
 	$(TAR_IN) $(PKG_NAME)_dgen.tar $(DGENSRC)
 	@- $(RM) $(DGENSRC)
 
 irg.tar:
-	sccs get $(IRGSRC)
-	sccs get $(CIRGSRC)
+	co $(IRGSRC)
+	co $(CIRGSRC)
 	chmod 644 $(IRGSRC) $(CIRGSRC)
 	$(TAR_IN) irg.tar $(IRGSRC) $(CIRGSRC)
 	@- $(RM) $(IRGSRC) $(CIRGSRC)
 
 irh.tar:
-	sccs get $(IRHSRC)
+	co $(IRHSRC)
 	chmod 644 $(IRHSRC)
 	$(TAR_IN) irh.tar $(IRHSRC)
 	@- $(RM) $(IRHSRC)
 
 $(HELPTASK).tar:
-	sccs get $(HELPSRC)
+	co $(HELPSRC)
 	chmod 644 $(HELPSRC)
 	$(TAR_IN) $(HELPTASK).tar $(HELPSRC)
 	@- $(RM) $(HELPSRC)
 
 $(DOCUMENTATION):
-	sccs get $(LATEX_DOCS) $(PKG_NAME).news
+	co $(LATEX_DOCS) $(PKG_NAME).news
 	cp $(HOME)/ccdpack/documents/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) ./
 	cp $(HOME)/ccdpack/documents/$(HYPERTEXT_HELP:.htx=.htx_tar.gz) ./
 	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar.gz)
 	gunzip $(HYPERTEXT_HELP:.htx=.htx_tar.gz)
 
 $(DATA_FILES):
-	sccs get $(DATA_FILES)
+	co $(DATA_FILES)
 	chmod 644 $(DATA_FILES)
 
 #  Rules for extracting platform specific source files from the source
@@ -1149,21 +1147,21 @@ $(MONOLITH1): $(PKG_NAME)_red.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 	$(ALINK) $(PKG_NAME)_red.o -o $(PKG_NAME)_red \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
                 `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
-		$(OBJECT_LIBRARIES)
+		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH2): $(PKG_NAME)_reg.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
               $(LINK_SCRIPT2)
 	$(ALINK) $(PKG_NAME)_reg.o -o $(PKG_NAME)_reg \
 	        $(ADDLIBS) $(OBJECT_LIBRARIES) \
                 `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
-		$(OBJECT_LIBRARIES)
+		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH3): $(PKG_NAME)_res.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
               $(LINK_SCRIPT2)
 	$(ALINK) $(PKG_NAME)_res.o -o $(PKG_NAME)_res \
 	         $(ADDLIBS) $(OBJECT_LIBRARIES) \
                 `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
-		$(OBJECT_LIBRARIES)
+		$(OBJECT_LIBRARIES) -lpda
 
 $(MONOLITH4): $(PKG_NAME)_nag.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
               $(LINK_SCRIPT2)
@@ -1175,7 +1173,7 @@ $(MONOLITH4): $(PKG_NAME)_nag.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
         else \
 	   if test -f $(MONOLITH4) ; then $(RM) -f $(MONOLITH4) ; else :; fi;\
 	   echo "#!/bin/sh" > $(MONOLITH4);\
-	   echo "echo Sorry no NAG based routines are available on $(SYSTEM)." > \
+	   echo "echo Sorry no NAG based routines are available." > \
                 $(MONOLITH4);\
 	   chmod 755 $(MONOLITH4) ;\
 	fi
