@@ -52,13 +52,11 @@ configure: config/configure.in
 dvi2bitmap.mantext: dvi2bitmap.1
 	nroff -man dvi2bitmap.1 >dvi2bitmap.mantext
 
-dvi2bitmap.tar: configure dvi2bitmap.mantext 
+dvi2bitmap.tar: configure dvi2bitmap.mantext
 	rm -f Manifest
-	cd doc; $(MAKE) doc.tar
-	mv doc/doc.tar .
 	for i in *.cc *.h Makefile.in config.h.in README \
 			configure config/config* config/install-sh \
-			dvi2bitmap.1 dvi2bitmap.mantext LICENCE doc.tar; do \
+			dvi2bitmap.1 dvi2bitmap.mantext LICENCE; do \
 		echo dvi2bitmap/$$i >>Manifest; \
 	done
 	echo dvi2bitmap/Manifest >>Manifest
@@ -66,12 +64,19 @@ dvi2bitmap.tar: configure dvi2bitmap.mantext
 	rm -f Manifest
 	mv ../dvi2bitmap.tar .
 
+#  In Makefile.starlink, dvi2bitmap_doc.tar is listed as a SOURCE file, so
+#  this target should only ever be required in the distribuTION
+#  directory, and never in the distribuTED directory.
+dvi2bitmap_doc.tar:
+	cd doc; $(MAKE) doc.tar
+	mv doc/doc.tar ./dvi2bitmap_doc.tar
+
 # Housekeeping targets
 tidy:
 	rm -f *~ config/*~
 
 clean: tidy
 	rm -f *.o $(EXEC)
-	rm -f doc.tar dvi2bitmap.mantext
+	rm -f dvi2bitmap_doc.tar dvi2bitmap.mantext
 	rm -f dvi2bitmap.tar.Z dvi2bitmap_source.tar
 	cd doc; $(MAKE) clean
