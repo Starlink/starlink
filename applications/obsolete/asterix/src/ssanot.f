@@ -32,6 +32,7 @@
 *     27 Mar 92 : V1.6-0 Use ERR_ANNUL properly (DJA)
 *     16 Aug 93 : V1.7-0 Use new graphics routines and POI_INIT (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     15 Feb 95 : V1.8-1 Use BDI and WCI for coord stuff (DJA)
 *
 *    Type definitions :
 *
@@ -45,35 +46,26 @@
       INCLUDE 'PAR_ERR'
       INCLUDE 'MATH_PAR'
 *
-*    Structure definitions :
-*
-      INCLUDE 'POI_STR'
-*
 *    Status :
 *
       INTEGER STATUS
 *
 *    Local variables :
 *
-      RECORD /POINT_STR/    POINT                     ! Pointing info
-
       CHARACTER             GDLOC*(DAT__SZLOC)        ! Graph
       CHARACTER             GLOC*(DAT__SZLOC)         ! Graphics dataset
-      CHARACTER             SLOC*(DAT__SZLOC)         ! SSDS to dump
 
-      CHARACTER*80          XUNITS, YUNITS            ! X,Y axis units
-
-      DOUBLE PRECISION      RA, DEC                   ! Source position
+      DOUBLE PRECISION		EQUPOS(2)		! Source RA,DEC
 
       REAL                  XBASE, XSCALE             ! X axis values
       REAL                  XC, YC                    ! Image coordinates
       REAL                  YBASE, YSCALE             ! Y axis values
-      REAL                  XFAC, YFAC                ! X/Y axis to radians
       REAL                  XLO, XHI, YLO, YHI        ! Image boundaries
 
       INTEGER               BOLD                      ! Symbol boldness
-      INTEGER               CACHE_PTR                 ! GCB cache
       INTEGER               EPTR                      ! Error data
+      INTEGER			GID			! Graph to anotate
+      INTEGER			IFID			! Input dataset
       INTEGER               INDF                      ! Loop over selected graph
       INTEGER               IMARK                     ! Note number on graph
       INTEGER               ISRC                      ! Loop over objects
@@ -83,8 +75,10 @@
       INTEGER               NNDF                      ! # graphs in multi-plot
       INTEGER               NREJ                      ! # sources not plotted
       INTEGER               NSEL                      ! # of selected graphs
-      INTEGER               NSRC                      ! # of sources in SLOC
+      INTEGER               NSRC                      ! # of sources in SID
       INTEGER               RPTR, DPTR                ! Celestial pos ptr's
+      INTEGER			PIXID, PRJID, SYSID	! WCS info
+      INTEGER 			SID			! SSDS identifier
       INTEGER               SYMBOL                    ! Marker symbol to use
       INTEGER               XDIM, YDIM                ! Axis dimensions
 
@@ -98,7 +92,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSANOT Version 1.8-0' )
+        PARAMETER           ( VERSION = 'SSANOT Version 1.8-1' )
 *-
 
 *    Check status
@@ -108,21 +102,22 @@
       CALL MSG_PRNT( VERSION )
 
 *    Get Asterix going
-      CALL AST_INIT( STATUS )
+      CALL AST_INIT()
 
 *    Get input graphics object from user
-      CALL USI_ASSOCI( 'INP', 'UPDATE', GLOC, INPRIM, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL BDI_PRIM( IFID, INPRIM, STATUS )
       IF ( INPRIM .AND. ( STATUS .EQ. SAI__OK ) ) THEN
         STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'Cannot anotate primitive dataset', STATUS )
       END IF
 
 *    Get source list
-      CALL SSO_ASSOCI( 'LIST', 'READ', SLOC, IS_SET, STATUS )
+      CALL SSI_ASSOCI( 'LIST', 'READ', SID, IS_SET, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Check for POSIT structure, otherwise nothing much to report
-      CALL SSO_GETNSRC( SLOC, NSRC, STATUS )
+      CALL SSI_GETNSRC( SID, NSRC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         IF ( NSRC .EQ. 0 ) THEN
           CALL MSG_PRNT('No sources in this SSDS')
@@ -148,8 +143,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Map lists for positions
-      CALL SSO_MAPFLD( SLOC, 'RA', '_DOUBLE', 'READ', RPTR, STATUS )
-      CALL SSO_MAPFLD( SLOC, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
+      CALL SSI_MAPFLD( SID, 'RA', '_DOUBLE', 'READ', RPTR, STATUS )
+      CALL SSI_MAPFLD( SID, 'DEC', '_DOUBLE', 'READ', DPTR, STATUS )
 
 *    Use errors?
       CALL USI_GET0L( 'ERROR', ERR_OK, STATUS )
@@ -158,9 +153,9 @@
       IF ( ERR_OK ) THEN
 
 *      Check error
-        CALL SSO_CHKFLD( SLOC, 'ERRORS', ERR_OK, STATUS )
+        CALL SSI_CHKFLD( SID, 'ERRORS', ERR_OK, STATUS )
         IF ( ERR_OK ) THEN
-          CALL SSO_MAPFLD( SLOC, 'ERRORS', '_REAL', 'READ', EPTR,
+          CALL SSI_MAPFLD( SID, 'ERRORS', '_REAL', 'READ', EPTR,
      :                                                   STATUS )
         END IF
 
@@ -187,9 +182,7 @@
       END IF
 
 *    Cache current GCB if present
-      CALL GCB_CONNECT( STATUS )
-      CALL GCB_CRECACHE( CACHE_PTR, STATUS )
-      CALL GCB_CACHE( CACHE_PTR, STATUS )
+      CALL GCB_LCONNECT(STATUS)
 
 *    For each NDF to be anotated
       DO INDF = 1, NSEL
@@ -209,18 +202,13 @@
         IF ( .NOT. OK ) NMARK = 0
 
 *      Get pointing information
-        CALL POI_INIT( GDLOC, POINT, STATUS )
+        CALL ADI1_PUTLOC( GDLOC, GID, STATUS )
+        CALL WCI_READ( GID, PIXID, PRJID, SYSID, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      Get axis values for dataset, then units
-        CALL BDA_GETAXVAL( GDLOC, 1, XBASE, XSCALE, XDIM, STATUS )
-        CALL BDA_GETAXVAL( GDLOC, 2, YBASE, YSCALE, YDIM, STATUS )
-        CALL BDA_GETAXUNITS( GDLOC, 1, XUNITS, STATUS )
-        CALL BDA_GETAXUNITS( GDLOC, 2, YUNITS, STATUS )
-
-*      Get radian conversion factors
-        CALL CONV_UNIT2R( XUNITS, XFAC, STATUS )
-        CALL CONV_UNIT2R( YUNITS, YFAC, STATUS )
+        CALL BDI_GETAXVAL( GID, 1, XBASE, XSCALE, XDIM, STATUS )
+        CALL BDI_GETAXVAL( GID, 2, YBASE, YSCALE, YDIM, STATUS )
 
 *      Work out image boundaries
         XLO = MIN( XBASE, XBASE+(XDIM-1)*XSCALE )
@@ -236,14 +224,15 @@
           IMARK = NMARK + ISRC
 
 *        Get its position
-          CALL ARR_ELEM1D( RPTR, NSRC, ISRC, RA, STATUS )
-          CALL ARR_ELEM1D( DPTR, NSRC, ISRC, DEC, STATUS )
+          CALL ARR_ELEM1D( RPTR, NSRC, ISRC, EQUPOS(1), STATUS )
+          CALL ARR_ELEM1D( DPTR, NSRC, ISRC, EQUPOS(2), STATUS )
+          EQUPOS(1) = EQUPOS(1) * MATH__DDTOR
+          EQUPOS(2) = EQUPOS(2) * MATH__DDTOR
 
-*        Convert to image coords
-          CALL CONV_EQU2XY( RA, DEC, (XSCALE.LT.0.0), POINT.CTOS,
-     :                                           XC, YC, STATUS )
-          XC = XC / XFAC
-          YC = YC / YFAC
+*        Convert to image coords in axis units
+          CALL WCI_CNS2A( EQUPOS, PIXID, PRJID, AXPOS, STATUS )
+          XC = AXPOS(1)
+          YC = AXPOS(2)
 
 *        Skip if outside image
           IF ( ( XC .LT. XLO ) .OR. ( XC .GT. XHI ) .OR.
@@ -272,15 +261,12 @@
         CALL GCB_SETI( 'MARKER_N', IMARK, STATUS )
 
 *      Save GCB to file
-        CALL GCB_SAVE( GDLOC, STATUS )
-        CALL BDA_RELEASE( GDLOC, STATUS )
+        CALL GCB_FSAVE( GID, STATUS )
+        CALL GCB_DETACH( STATUS )
+        CALL BDI_RELEASE( GID, STATUS )
         CALL DAT_ANNUL( GDLOC, STATUS )
 
       END DO
-
-*    Restore existing NDF
-      CALL GCB_UNCACHE( CACHE_PTR, STATUS )
-      CALL GCB_DELCACHE( CACHE_PTR, STATUS )
 
 *    Report unplotted sources
       IF ( NREJ .GT. 0 ) THEN
@@ -289,7 +275,7 @@
       END IF
 
 *    Release files
-      CALL USI_ANNUL( SLOC, STATUS )
+      CALL USI_TANNUL( SID, STATUS )
       CALL USI_ANNUL( GLOC, STATUS )
 
 *    Shutdown sub-systems
