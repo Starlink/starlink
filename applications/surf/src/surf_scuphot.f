@@ -51,10 +51,20 @@
 *        ALLBOLS must be false to avoid weighting problems for the 
 *        bolometers that were observed in the left or right beams.
 *     ANALYSIS = CHAR (Read)
-*        The method used to detemine peak. Either average or parabola.
-*        Parabola is not recommended at this time.
+*        The method used to detemine peak. Allowed options are:
+*         AVERAGE: Determine the average of each integration.
+*         PARABOLA: Fit a parabola to each integration.
+*                   Parabola is not recommended at this time.
+*         SAMPLES:  Store ALL samples (ie do not combine at all)
+*                   No text file is written in this case. This option is
+*                   similar to AVERAGE (in that each sample is treated
+*                   as a measurement of the source flux) but sometimes
+*                   gives a better ERROR (same MEAN) since more data
+*                   points are available. Should be used when only a few
+*                   integrations are available.
 *     FILE = FILENAME (Write)
-*        The name of the ASCII output file.
+*        The name of the ASCII output file. No text file is written
+*        if ANALYSIS=SAMPLES
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated (extinction
 *        corrected) SCUBA data.
@@ -145,6 +155,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.21  1998/04/29 00:54:19  timj
+*     Add ANALYSIS=SAMPLES to simply propogate the data. Propogate input NDF to
+*     output NDFs so that FITS extension and HISTORY are copied automatically.
+*
 *     Revision 1.20  1997/11/06 23:43:20  timj
 *     Add the verbose suffix option.
 *
@@ -245,6 +259,7 @@ c
       INTEGER          ALL             ! Beam to use for ALLBOLS
       LOGICAL          ALL_BOLS        ! Select all bolometers
       CHARACTER*10     ANALYSIS        ! analysis mode
+      CHARACTER*10     ANALYSIS_METHOD ! analysis mode (first time)
       BYTE             BADBIT          ! bad bit mask
       INTEGER          BEAM            ! beam index in DO loop
       REAL             BEAM_WEIGHT (SCUBA__MAX_BEAM)
@@ -314,6 +329,7 @@ c
       INTEGER          IPOS (SCUBA__MAX_JIGGLE)
 				       ! i index of jiggle measurement in
 				       ! 2d map
+      INTEGER          IPOSN           ! Position in string
       LOGICAL          ISBAD           ! Are there bad output pixels
       INTEGER          ITEMP           ! scratch integer
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
@@ -393,6 +409,7 @@ c
       INTEGER          NELM            ! number of array elements mapped
       INTEGER          NERR            ! Number of errors from VEC_
       INTEGER          NREC            ! number of history records in input file
+      INTEGER          N_BITS          ! Number of integrations or samples
       INTEGER          N_BOLS          ! number of bolometers measured in input
                                        ! files
       INTEGER          N_EXPOSURES     ! number of exposures per integration
@@ -412,8 +429,6 @@ c
 				       ! output
       CHARACTER*132    OUT             ! name of output HDS container file
       CHARACTER*132    OUTFILE         ! Default name for out
-      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
-                                       ! locator to FITS extension in output
       INTEGER          OUT_OFFSET      ! offset in output array
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! pointer to REDS extension in output
@@ -452,6 +467,7 @@ c
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
+      INTEGER          SEC_NDF         ! NDF identifier to section
       LOGICAL          SKY_ERROR       ! .TRUE. if SKY_ERROR application has
                                        ! been run on the data
       INTEGER          START_BOL       ! First bolometer
@@ -678,17 +694,8 @@ c
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'UTSTART',
      :     UTSTART, STATUS)
 
-*     map the various components of the data array and check the data
-*     dimensions
-
+*     Check data dimensions
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
-
-      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ', IN_Q_PTR,
-     :     NELM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_D_PTR,
-     :     NELM, STATUS)
-      CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ', IN_V_PTR,
-     :     NELM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
@@ -723,6 +730,15 @@ c
       END IF
 
       N_POS = DIM (2)
+
+
+*     Map the input data
+      CALL NDF_MAP (IN_NDF, 'QUALITY', '_UBYTE', 'READ', IN_Q_PTR,
+     :     NELM, STATUS)
+      CALL NDF_MAP (IN_NDF, 'DATA', '_REAL', 'READ', IN_D_PTR,
+     :     NELM, STATUS)
+      CALL NDF_MAP (IN_NDF, 'VARIANCE', '_REAL', 'READ', IN_V_PTR,
+     :     NELM, STATUS)
 
 *     map the DEM_PNTR array and check its dimensions
 
@@ -882,15 +898,17 @@ c
       END IF
 
 *     Ask for the reduction method
-*     Do not ask this question if we are not allowed to fit
+*     Do not include PARABOLA if we are not allowed to fit
 *     parabolas (ie a zero offset jiggle is being used)
 
+      STEMP = 'Average,Samples'
       IF (PARABOLA) THEN
-         CALL PAR_CHOIC('ANALYSIS', 'AVERAGE','Average,Parabola',
-     :        .TRUE., ANALYSIS, STATUS)
-      ELSE
-         ANALYSIS = 'AVERAGE'
+         IPOSN = CHR_LEN(STEMP)
+         CALL CHR_APPND(',Parabola', STEMP, IPOSN)
       END IF
+
+      CALL PAR_CHOIC('ANALYSIS', 'AVERAGE', STEMP,
+     :        .TRUE., ANALYSIS_METHOD, STATUS)
 
 *     Generate a default name for the output file
       CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
@@ -969,6 +987,19 @@ c
 
       END IF
 
+*     If we are using SAMPLES analysis mode we want to keep all
+*     N_POS else numbers else we want to keep N_INTEGRATIONS
+
+      IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
+         N_BITS = N_POS
+         ANALYSIS = 'AVERAGE' ! So that bol_map works
+         USEFILE = .FALSE.   ! Dont write text file
+      ELSE
+         ANALYSIS = ANALYSIS_METHOD
+         N_BITS = N_INTEGRATIONS
+      END IF
+
+
 *     Now loop over the requisite number of bolometers
 
       COUNT = 0
@@ -1035,18 +1066,19 @@ c
      :                    BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
                      NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_map'
                      
+*     Get an identifier to an NDF section of the input file
+                     CALL NDF_SECT(IN_NDF, N_OBSDIM, LBND, UBND, 
+     :                    SEC_NDF, STATUS)
+
                      CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-                     CALL NDF_NEW('_REAL',N_OBSDIM, LBND, UBND, PLACE, 
-     :                    IBEAM, STATUS)
 
-*     probably should store the FITS header
-                     CALL NDF_XNEW(IBEAM, 'FITS','_CHAR*80',
-     :                    1, N_FITS, OUT_FITSX_LOC, STATUS)
-                     CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-                     CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+*     Propogate from input NDF
+                     CALL NDF_SCOPY(SEC_NDF, 
+     :                    'NOEXTENSION(SCUBA,SCUCD)', PLACE, IBEAM,
+     :                    STATUS)
 
-*     Create history 
-                     CALL NDF_HCRE(IBEAM, STATUS)
+*     Unmap the section
+                     CALL NDF_ANNUL(SEC_NDF, STATUS)
 
 *     Map the output data
                      CALL NDF_MAP (IBEAM, 'QUALITY', '_UBYTE', 'WRITE',
@@ -1114,18 +1146,14 @@ c
      :                 BOL_CHAN(PHOT_BB(BEAM)), NDF_NAME, STATUS)
                   NDF_NAME = NDF_NAME(:CHR_LEN(NDF_NAME))//'_peak'
 
+                  CALL NDF_SECT(IN_NDF, 1, 1, N_BITS, SEC_NDF, STATUS)
+
                   CALL NDF_PLACE (OUT_LOC, NDF_NAME, PLACE, STATUS)
-                  CALL NDF_NEW('_REAL',1,1,N_INTEGRATIONS, PLACE, 
-     :                 IPEAK, STATUS)
 
-*     probably should store the FITS header
-                  CALL NDF_XNEW(IPEAK, 'FITS','_CHAR*80',
-     :                 1, N_FITS, OUT_FITSX_LOC, STATUS)
-                  CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
-                  CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
+                  CALL NDF_SCOPY(SEC_NDF, 'NOEXTENSION(SCUBA,SCUCD)',
+     :                 PLACE, IPEAK, STATUS)
 
-*     Create history 
-                  CALL NDF_HCRE(IPEAK, STATUS)
+                  CALL NDF_ANNUL(SEC_NDF, STATUS)
 
 *     Map output data
                   CALL NDF_MAP (IPEAK, 'QUALITY', '_UBYTE', 'WRITE',
@@ -1135,18 +1163,12 @@ c
                   CALL NDF_MAP (IPEAK, 'VARIANCE', '_REAL','WRITE/ZERO',
      :                 PEAK_V_PTR, NELM, STATUS)
 
-*     initialise quality to bad
-
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
-                  END IF
-
 *     construct axis
 
                   CALL NDF_AMAP (IPEAK, 'CENTRE', 1, '_INTEGER',
      :                 'WRITE', TEMP_PTR, NELM, STATUS)
                   IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_NFILLI (N_INTEGRATIONS, %val(TEMP_PTR))
+                     CALL SCULIB_NFILLI (N_BITS, %val(TEMP_PTR))
                   END IF
                   CALL NDF_AUNMP (IPEAK, 'CENTRE', 1, STATUS)
 
@@ -1167,12 +1189,21 @@ c
                      CALL DAT_ANNUL (OUT_REDSX_LOC, STATUS)
                   END IF
 
+*     If samples then axes are different
+                  
+                  IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
+                     CALL NDF_ACPUT('Sample',IPEAK,'LABEL',1,STATUS)
+                     CALL NDF_CPUT('Signal',IPEAK, 'LAB', STATUS)
+                  ELSE
+                     CALL NDF_ACPUT('Integration',IPEAK,'LABEL',1,
+     :                    STATUS)
+                     CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
+                  END IF
+
 *     Put on some axis information and labels
 
-                  CALL NDF_ACPUT('Integration',IPEAK,'LABEL',1,STATUS)
                   CALL NDF_CPUT('Volts',IPEAK,'UNITS',STATUS)
                   CALL NDF_CPUT(OBJECT, IPEAK, 'Title', STATUS)
-                  CALL NDF_CPUT('Fitted peak',IPEAK, 'LAB', STATUS)
 
                   IF (WRITEMAP) THEN
                      IF (N_OBSDIM.GT.1) THEN
@@ -1186,6 +1217,12 @@ c
                      CALL NDF_CPUT(OBJECT, IBEAM, 'Title', STATUS)
                      CALL NDF_CPUT('Coadd jiggle map',IBEAM, 'LAB', 
      :                    STATUS)
+                  END IF
+
+*     initialise quality to bad
+
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_CFILLB (NELM, 1, %val(PEAK_Q_PTR))
                   END IF
 
 *     cycle through the integrations coadding them as required
@@ -1274,25 +1311,50 @@ c
                   END IF
 
 *     store the fitted peak values to the output ndf
+*     If we are storing samples then just copy the whole thing
 
-                  CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_D(1,BEAM),
-     :                 %val(PEAK_D_PTR), IERR, NERR, STATUS)
-                  CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_V(1,BEAM),
-     :                 %val(PEAK_V_PTR), IERR, NERR, STATUS)
-                  CALL VEC_UBTOUB(.FALSE., N_INTEGRATIONS, 
-     :                 PEAK_Q(1,BEAM), %val(PEAK_Q_PTR), IERR, NERR, 
-     :                 STATUS)
+                  IF (ANALYSIS_METHOD .EQ. 'SAMPLES') THEN
+
+                     CALL VEC_RTOR(.FALSE., N_BITS, 
+     :                    %VAL(INT_D_PTR(BEAM)),
+     :                    %val(PEAK_D_PTR), IERR, NERR, STATUS)
+                     CALL VEC_RTOR(.FALSE., N_BITS, 
+     :                    %VAL(INT_V_PTR(BEAM)),
+     :                    %val(PEAK_V_PTR), IERR, NERR, STATUS)
+                     CALL VEC_UBTOUB(.FALSE., N_BITS, 
+     :                    %VAL(INT_Q_PTR(BEAM)), 
+     :                    %val(PEAK_Q_PTR), IERR, NERR, STATUS)
+
+*     Now set the bad pixel mask from the input
+                     CALL NDF_SBB(BADBIT, IPEAK, STATUS)                      
+
+                  ELSE
+*     Store the fitted peak
+                     CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, 
+     :                    PEAK_D(1,BEAM),
+     :                    %val(PEAK_D_PTR), IERR, NERR, STATUS)
+                     CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, 
+     :                    PEAK_V(1,BEAM),
+     :                    %val(PEAK_V_PTR), IERR, NERR, STATUS)
+                     CALL VEC_UBTOUB(.FALSE., N_INTEGRATIONS, 
+     :                    PEAK_Q(1,BEAM), %val(PEAK_Q_PTR), IERR, NERR,
+     :                    STATUS)
 
 *     Write BIT MASK
-                  CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
+
+                     CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
+                     ISBAD = .FALSE.
+                     DO I = 1, N_INTEGRATIONS
+                        IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
+                     END DO
+                     
+                     CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
+
+
+
+                  END IF
+
                   IF (WRITEMAP) CALL NDF_SBB(OUTBAD, IBEAM, STATUS) 
-
-                  ISBAD = .FALSE.
-                  DO I = 1, N_INTEGRATIONS
-                     IF (PEAK_Q(I, BEAM).NE.0) ISBAD = .TRUE.
-                  END DO
-
-                  CALL NDF_SBAD(ISBAD, IPEAK, 'Data', STATUS)
 
 *     close the ndfs opened in this ndf context
                   CALL NDF_UNMAP(IPEAK, '*', STATUS)
