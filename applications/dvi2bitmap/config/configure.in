@@ -1,9 +1,15 @@
 dnl
 dnl   Configure script for dvi2bitmap
 dnl
+dnl   Copyright 1999, Particle Physics and Astronomy Research Council.
+dnl   See file LICENCE for conditions.
+dnl
 dnl   $Id$
 
 AC_INIT(dvi2bitmap.cc)
+
+dnl   Use a config file (the list of settings is getting too long)
+AC_CONFIG_HEADER(config.h)
 
 dnl   Say where the install-sh, config.guess and config.sub scripts are
 AC_CONFIG_AUX_DIR(config)
@@ -40,7 +46,7 @@ dnl   This is defined by default when the compiler is invoked with
 dnl   `-std strict_ansi', but that's a little harder to arrange in here.
 AC_CANONICAL_HOST
 case "$host" in
-  alpha*) test "$CXX" -eq "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
+  alpha*) test "$CXX" = "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
 esac
 
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
