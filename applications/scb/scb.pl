@@ -578,7 +578,7 @@ sub query_form {
       <br>
       <input type=submit value='Retrieve'>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href='$htxserver/sun225.htx/node17.html#xref_BROWSER-HELP'>Help</a>
+      <a href='http://www.star.bris.ac.uk/~mbt/docs/sun225.htx/node17.html#xref_BROWSER-HELP'>Help</a>
       </form>
       <hr>
    ";

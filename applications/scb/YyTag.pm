@@ -121,7 +121,7 @@ sub dotag {
    if ( $pid == 0 ) {
       close STDIN;
       open (STDIN, "<& " . fileno ($fhin)) or die "Failed to reopen file\n";
-      exec $tagprog;
+      exec $tagprog or die "Failed to exec $tagprog\n";
    }
 
 #  Return value is the catenation of the output.

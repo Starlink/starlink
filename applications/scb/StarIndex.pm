@@ -738,7 +738,7 @@ sub each {
 #        Logical pathname of the item's location.
 
 #  Notes:
-#     The iterator is based on Perl's native 'each' function, and is 
+#     The iterator is based on Perl's core 'each' function, and is 
 #     subject to the restrictions of that.  In particular the order in
 #     which the pairs are returned is undefined, only one iterator 
 #     can exist for each object, and new entries must not be added to
@@ -777,7 +777,7 @@ sub each {
 #     until one is found with an entry for the requested package (there
 #     is never more than one entry per package per record).
 
-      while (($key, $value) = each %$rlocate) {
+      while (($key, $value) = CORE::each %$rlocate) {
          foreach $loc (split ' ', $value) {
             return ($key, $loc) if ((starpack ($loc) || '') eq $package);
          }
@@ -796,7 +796,7 @@ sub each {
 #     a new record when @each_loc is empty.
 
       unless (@each_loc) {
-         (($each_key, $value) = each %$rlocate) || return ();
+         (($each_key, $value) = CORE::each %$rlocate) || return ();
          @each_loc = split ' ', $value;
       }
       return $each_key, shift (@each_loc);
@@ -938,7 +938,7 @@ sub duplicate {
 #  Copy records from old object to new object one by one.
 
    my ($key, $value);
-   while (($key, $value) = each (%$roldlocate)) {
+   while (($key, $value) = CORE::each (%$roldlocate)) {
       $rnewlocate->{$key} = $value;
    }
 

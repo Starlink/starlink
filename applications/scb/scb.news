@@ -26,4 +26,9 @@ v1.1-0 (December 1999):
    case it will only perform indexing for files which do not appear to have
    up to date indexes already.
 
+v1.1-1 (November 2001):
+   Some modifications to the makefile (new private targets) to facilitate 
+   CVS control of the source, and fixes to things which broke under perl/OS
+   upgrades.
+
 # $Id$
