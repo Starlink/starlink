@@ -33,6 +33,6 @@ STAR_LATEX_DOCUMENTATION(sun41)
 
 AC_CONFIG_SUBDIRS([aif aspker atlib goodies kergen kersub mapgl rapgen rapsub trace io2ro_f obsrap_f plt2d_f polrap_f rapi2d_f])
 
-AC_CONFIG_FILES(Makefile component.xml)
+AC_CONFIG_FILES(Makefile component.xml ircamdr)
 
 AC_OUTPUT
