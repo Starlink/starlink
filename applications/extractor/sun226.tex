@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.7}
+\newcommand{\stardocnumber}    {226.8}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {29th July 2003}
+\newcommand{\stardocdate}      {24th April 2004}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -28,7 +28,7 @@ popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 
-\newcommand{\sexversion}{2.2.2}
+\newcommand{\sexversion}{2.3.2}
 
 % -----------------------------------------------------------------------------
 
@@ -172,10 +172,11 @@ facilities and can handle images and catalogues in a variety of formats.}
 \newcommand{\EXTRACTOR}{\texttt{EXTRACTOR}}
 \newcommand{\CONVERT}{\texttt{CONVERT}}
 \newcommand{\SExtractor}{\texttt{SExtractor}}
-%\newcommand{\DUMMIESURL}{http://www-int.stsci.edu/~holwerda/se.html}
+\newcommand{\SExtractorURL}{http://terapix.iap.fr/soft/sextractor}
+\newcommand{\DUMMIESURL}{http://www-int.stsci.edu/~holwerda/se.html}
 \newcommand{\IRAFURL}{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
 \newcommand{\FITSURL}{http://fits.gsfc.nasa.gov/}
-\newcommand{\MUD}{mud165.ps}
+\newcommand{\nMUD}{mud165.ps}
 \newcommand{\dash}{--}
 \begin{htmlonly}
   \newcommand{\dash}{-}
@@ -503,10 +504,10 @@ facilities and can handle images and catalogues in a variety of formats.}
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
-      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.ac.uk/}
    \begin{rawhtml} </H2> \end{rawhtml}
    \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
-      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+      {http://www.starlink.ac.uk/cgi-bin/hcserver?\stardocsource}\\
 
 %  HTML document table of contents.
 %  ================================
@@ -573,15 +574,18 @@ SUN/55)} -- these include \htmladdnormallink{FITS}{\FITSURL} and
 An slightly modified version of \SExtractor\ \sexversion\ is also
 included in the distribution of \EXTRACTOR.
 You can find details of \SExtractor's operation, and how to configure
-it, in the \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is issued
-as a Starlink Miscellaneous User Document, MUD 165\footnote{Note this
+it, in the \htmladdnormallink{\SExtractor\ User's Guide}{\MUD} (which is
+issued as a Starlink Miscellaneous User Document, MUD 165\footnote{Note this
 document is still in draft, consequently you should read this in
 conjunction with the \htmladdnormallink{A\&AS paper}{sexpaper.ps}
 and the \htmladdnormallink{earlier SExtractor user document}{sex1_doc.ps}.})
 \dash\ you configure \EXTRACTOR\
 in much the same way, although with
 \htmlref{some restrictions}{implementation_notes}
-\latex{(see Section~\ref{implementation_notes})}.
+\latex{(see Section~\ref{implementation_notes})}. The \SExtractor\ home page
+-- \htmladdnormallink{\texttt{\SExtractorURL}}{\SExtractorURL} -- 
+offers more information, such as a link to the 
+\htmladdnormallink{\textit{SExtractor for Dummies}}{\DUMMIESURL}.
 
 This document describes how to run \EXTRACTOR, and includes
 \htmlref{instructions for running \SExtractor}{running_sextractor}
@@ -787,17 +791,16 @@ Note that if the \texttt{-c} option is omitted, file
 \dash\ if you want to use the installed default file, you will need to
 specify it explicitly.
 
-A patch has been applied to \SExtractor\ that allows it to read some
-types of MEF files. To process an image stored in the first extension
-you should use the format:
+A patch has been applied to \SExtractor\ that allows you to read a specific
+extension of an MEF file (normally you either process the whole file). 
+To process an image stored in the first extension you should use the format:
 \begin{quote}
 \texttt{\% sex \textit{image'[1]'} [-c \textit{configuration-file}]}
 \texttt{[-\textit{Parameter1 Value1}] [-\textit{Parameter2 Value2}] ...}
 \end{quote}
 the second extension is indicated by \texttt{\textit{image'[2]'}} and
 so on (note that the single quotes are only needed to protect the square
-brackets from the C-shell). MEF files that contain a primary image are
-not understood.
+brackets from the C-shell).
 
 \section{\xlabel{using_gaia_and_extractor}Using GAIA and \EXTRACTOR}
 The Graphical Astronomy and Image Analysis Tool (GAIA -
@@ -1069,6 +1072,20 @@ A minor update to \EXTRACTOR\ with the following changes:
  RA and Dec values (this effected \EXTRACTOR\ only, not \SExtractor).
 
  \EXTRACTOR\ is now released under the GNU General Public License.
+
+\subsection{Version 2.3}
+
+ \EXTRACTOR\ has been updated to work with \SExtractor\ 2.3.2. 
+ This updates the native \SExtractor\ command to include Large File Support
+ and full support for MEFs. The MEF support differs to that previously
+ available in that it now scans a complete MEF file in a single pass.
+
+ A error previously limited \EXTRACTOR\ input file names to 20 characters,
+ this has now been corrected.
+
+ The \EXTRACTOR\ major version number has been changed to reflect that of the
+ version of \SExtractor\ that it is based on.
+
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\
