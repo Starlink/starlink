@@ -105,7 +105,7 @@
         INTEGER			CHR_LEN
 
 *  Local Variables:
-      CHARACTER*12		STR			! IDX in string
+      CHARACTER*15		LPAR			! Local parameter name
 
       INTEGER			NDIG 			! Digits in STR
 *.
@@ -113,11 +113,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Copy in fixed part
+      LPAR = PAR
+
 *  Construct parameter index string
-      CALL CHR_ITOC( IDX, STR, NDIG )
+      CALL CHR_ITOC( IDX, STR(CHR_LEN(PAR)+1:), NDIG )
 
 *  Invoke lower level routine
-      CALL USI_ASSOC( PAR(:CHR_LEN(PAR))//STR(:NDIG), CLASS, ACCESS,
-     :                ID, STATUS )
+      CALL USI_ASSOC( LPAR, CLASS, ACCESS, ID, STATUS )
 
       END

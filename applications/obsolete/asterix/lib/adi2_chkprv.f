@@ -96,10 +96,6 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			CHR_LEN
-	INTEGER			CHR_LEN
-
 *  Local Variables:
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HDUTYPE			! Type of HDU

@@ -84,8 +84,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
-      EXTERNAL			ADI0_SETLNK
-
       EXTERNAL			ADI1_OPEN
       EXTERNAL			ADI1_FCLONE
       EXTERNAL			ADI1_FCLOSE
