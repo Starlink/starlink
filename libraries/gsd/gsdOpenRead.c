@@ -1,108 +1,114 @@
-/*+
- * Name:
- *    gsdOpenRead
+/*
+*+
+* Name:
+*    gsdOpenRead
 
- * Purpose:
- *    Open a GSD file for reading and map it.
+* Purpose:
+*    Open a GSD file for reading and map it.
 
- * Language:
- *    ANSI C
+* Language:
+*    ANSI C
 
- * Type of Module:
- *    C function.
+* Type of Module:
+*    C function.
 
- * Prototype:
- *    (available via #include "gsd.h")
+* Invocation:
+*    int gsdOpenRead( char *file, float *version, char *label, int *no_items,
+*       FILE **fptr, void **file_dsc, void **item_dsc, char **data_ptr );
+
+* Prototype:
+*    available via #include "gsd.h"
+
  *    int gsdOpenRead( char *file, float *version, char *label, int *no_items,
  *       FILE **fptr, void **file_dsc, void **item_dsc, char **data_ptr );
 
- * Description:
- *    This routine opens the named GSD file and reads its contents into memory.
- *    It returns a standard C file descriptor, a GSD file descriptor, a pointer
- *    to the array of GSD item descriptors, and a pointer to the collective
- *    data.
- *
- *    This routine allocates memory to accommodate the GSD file descriptor, the
- *    GSD item descriptors, and the data from the GSD file. It also leaves the
- *    GSD file open. Any call to this routine must be matched with a call to
- *    gsdClose with the information returned by this routine. gsdClose will
- *    close the file and release the memory allocated by this routine.
+* Description:
+*    This routine opens the named GSD file and reads its contents into memory.
+*    It returns a standard C file descriptor, a GSD file descriptor, a pointer
+*    to the array of GSD item descriptors, and a pointer to the collective
+*    data.
+*
+*    This routine allocates memory to accommodate the GSD file descriptor, the
+*    GSD item descriptors, and the data from the GSD file. It also leaves the
+*    GSD file open. Any call to this routine must be matched with a call to
+*    gsdClose with the information returned by this routine. gsdClose will
+*    close the file and release the memory allocated by this routine.
 
- * Arguments:
- *    char *file (Given)
- *       The name of the GSD file to be opened.
- *    float *version (Returned)
- *       The GSD file version number.
- *    char *label (Returned)
- *       The GSD file label. This is a null-terminated string. It should be
- *       declared by the calling routine with length 41.
- *    int *no_items (Returned)
- *       The number of items in the GSD file.
- *    FILE **fptr (Returned)
- *       The file descriptor for the GSD file opened.
- *    void **file_dsc (Returned)
- *       The GSD file descriptor. This routine allocates the memory necessary
- *       and fills it with the relevant information from the GSD file. A call
- *       to gsdClose will release this memory (given the pointer).
- *    void **item_dsc (Returned)
- *       The array of GSD item descriptors. This routine allocates the memory
- *       necessary and fills it with the relevant information from the GSD
- *       file. A call to gsdClose will release this memory (given the pointer).
- *       The number of array elements is returned in no_items.
- *    char **data_ptr (Returned)
- *       The buffer with all the data from the GSD file. This routine allocates
- *       the memory necessary and reads the data into it. A call to gsdClose
- *       will release this memory (given the pointer). The size of this buffer
- *       does not matter, but it can be calculated in bytes as
- *          file_dsc->end_data - file_dsc->str_data + 1
- *       if you know what a struct file_descriptor looks like.
+* Arguments:
+*    char *file (Given)
+*       The name of the GSD file to be opened.
+*    float *version (Returned)
+*       The GSD file version number.
+*    char *label (Returned)
+*       The GSD file label. This is a null-terminated string. It should be
+*       declared by the calling routine with length 41.
+*    int *no_items (Returned)
+*       The number of items in the GSD file.
+*    FILE **fptr (Returned)
+*       The file descriptor for the GSD file opened.
+*    void **file_dsc (Returned)
+*       The GSD file descriptor. This routine allocates the memory necessary
+*       and fills it with the relevant information from the GSD file. A call
+*       to gsdClose will release this memory (given the pointer).
+*    void **item_dsc (Returned)
+*       The array of GSD item descriptors. This routine allocates the memory
+*       necessary and fills it with the relevant information from the GSD
+*       file. A call to gsdClose will release this memory (given the pointer).
+*       The number of array elements is returned in no_items.
+*    char **data_ptr (Returned)
+*       The buffer with all the data from the GSD file. This routine allocates
+*       the memory necessary and reads the data into it. A call to gsdClose
+*       will release this memory (given the pointer). The size of this buffer
+*       does not matter, but it can be calculated in bytes as
+*          file_dsc->end_data - file_dsc->str_data + 1
+*       if you know what a struct file_descriptor looks like.
 
- * Returned Value:
- *    int gsdOpenRead();
- *       Status. Status is set to
- *        1: Failure to open named file,
- *        2: Failure to read file_dsc from file,
- *        3: Failure to allocate memory for item_dsc,
- *        4: Failure to read item_dsc from file,
- *        6: Failure to read data_ptr from file,
- *        7: Failure to allocate memory for data_ptr,
- *        0: Otherwise.
+* Returned Value:
+*    int gsdOpenRead();
+*       Status. Status is set to
+*        -[1:] Failure to open named file,
+*        -[2:] Failure to read file_dsc from file,
+*        -[3:] Failure to allocate memory for item_dsc,
+*        -[4:] Failure to read item_dsc from file,
+*        -[6:] Failure to read data_ptr from file,
+*        -[7:] Failure to allocate memory for data_ptr,
+*        -[0:] Otherwise.
 
- * Authors:
- *    jhf: Jon Fairclough (UKTH)
- *    rp: Rachael Padman (MRAO)
- *    hme: Horst Meyerdierks (UoE, Starlink)
- *    rpt: Remo Tilanus (JAC, Hilo)
- *    sec: Steve Cockayne (JAC, Hilo)
- *    timj: Tim Jenness (JAC, Hilo)
+* Authors:
+*    jhf: Jon Fairclough (UKTH)
+*    rp: Rachael Padman (MRAO)
+*    hme: Horst Meyerdierks (UoE, Starlink)
+*    rpt: Remo Tilanus (JAC, Hilo)
+*    sec: Steve Cockayne (JAC, Hilo)
+*    timj: Tim Jenness (JAC, Hilo)
 
- * History:
- *    08 Sep 1986 (jhf):
- *       Original.
- *    18 May 1987 (jhf):
- *       Extra OPEN keywords.
- *    03 Jun 1987 (jhf):
- *       Make global section name the same as the filename.
- *    06 Jul 1987 (jhf):
- *       Check status RMS returns.
- *    14 Jan 1988 (jhf):
- *       Improve modularity for OPEN routines.
- *    17 Jul 1994 (rp):
- *       Adaption to Remo's C code.
- *    02 Dec 1994 (hme):
- *       Translation to C. Renamed from GSD_OPEN_READ. Interface revised.
- *    01 Aug 1995 (rpt):
- *       Support for DATADIR variable and upper/lower case file suffix
- *    26 Jul 1996 (sec):
- *       Support for the actual given filename. 
- *    01 Apr 1997 (timj)
- *       Support for actual given filename in remote DATADIR
+* History:
+*    08 Sep 1986 (jhf):
+*       Original.
+*    18 May 1987 (jhf):
+*       Extra OPEN keywords.
+*    03 Jun 1987 (jhf):
+*       Make global section name the same as the filename.
+*    06 Jul 1987 (jhf):
+*       Check status RMS returns.
+*    14 Jan 1988 (jhf):
+*       Improve modularity for OPEN routines.
+*    17 Jul 1994 (rp):
+*       Adaption to Remo's C code.
+*    02 Dec 1994 (hme):
+*       Translation to C. Renamed from GSD_OPEN_READ. Interface revised.
+*    01 Aug 1995 (rpt):
+*       Support for DATADIR variable and upper/lower case file suffix
+*    26 Jul 1996 (sec):
+*       Support for the actual given filename. 
+*    01 Apr 1997 (timj)
+*       Support for actual given filename in remote DATADIR
 
- * Copyright:
- *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
- *    All Rights Reserved. 
- *-
- */
+* Copyright:
+*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+*    All Rights Reserved. 
+*-
+*/
 
 #include <stdio.h>
 #include <stdlib.h>

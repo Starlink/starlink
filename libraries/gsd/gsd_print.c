@@ -1,55 +1,56 @@
-/*+
- * Name:
- *    gsd_print(main)
+/*
+*+
+* Name:
+*    gsd_print(main)
 
- * Purpose:
- *    Print a GSD file.
+* Purpose:
+*    Print a GSD file.
 
- * Language:
- *    Starlink ANSI C
+* Language:
+*    Starlink ANSI C
 
- * Type of Module:
- *    Application.
+* Type of Module:
+*    Application.
 
- * Usage:
- *    gsd_print file
+* Usage:
+*    gsd_print file
 
- * Arguments:
- *    file:
- *       The name of the input GSD file.
+* Arguments:
+*    file:
+*       The name of the input GSD file.
 
- * Description:
- *    This routine prints the contents of a GSD file. It is a translation to C
- *    of the old GSD_PRINT Fortran programme. The details of the output
- *    formatting may differ. Also output goes to stdout and must be re-directed
- *    to a file by the user.
+* Description:
+*    This routine prints the contents of a GSD file. It is a translation to C
+*    of the old GSD_PRINT Fortran programme. The details of the output
+*    formatting may differ. Also output goes to stdout and must be re-directed
+*    to a file by the user.
 
- * Return Value:
- *    int main();
- *       Status.
- *        1: No file name given.
- *        2: Could not read file.
- *        3: Item access failed.
- *        4: Scalar data access failed.
- *        5: Array enquiry failed.
- *        6: Array access failed.
- *        0: Otherwise.
+* Return Value:
+*    int main();
+*       Status.
+*        -[1:] No file name given.
+*        -[2:] Could not read file.
+*        -[3:] Item access failed.
+*        -[4:] Scalar data access failed.
+*        -[5:] Array enquiry failed.
+*        -[6:] Array access failed.
+*        -[0:] Otherwise.
 
- * Authors:
- *    jhf: Jon Fairclough (UKTH)
- *    hme: Horst Meyerdierks (UoE, Starlink)
+* Authors:
+*    jhf: Jon Fairclough (UKTH)
+*    hme: Horst Meyerdierks (UoE, Starlink)
 
- * History:
- *    11 Nov 1986 (jhf):
- *       Original version.
- *    01 Dec 1994 (hme):
- *       Translation to C. Use Unix-ported GSD library.
+* History:
+*    11 Nov 1986 (jhf):
+*       Original version.
+*    01 Dec 1994 (hme):
+*       Translation to C. Use Unix-ported GSD library.
 
- * Copyright:
- *    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
- *    All Rights Reserved. 
+* Copyright:
+*    Copyright (C) 1986-1999 Particle Physics and Astronomy Research Council.
+*    All Rights Reserved. 
 
- *-
+*-
  */
 
 #include <stdio.h>

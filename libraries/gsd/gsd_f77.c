@@ -1,34 +1,35 @@
-/*+
- * Name:
- *    gsd_f77.c
+/*
+*+
+* Name:
+*    gsd_f77.c
 
- * Purpose:
- *    Fortran binding for GSD library.
+* Purpose:
+*    Fortran binding for GSD library.
 
- * Language:
- *    ANSI C
+* Language:
+*    ANSI C
 
- * Type of Module:
- *    Fortran-callable C function.
+* Type of Module:
+*    Fortran-callable C function.
 
- * Description:
- *    This file contains the Fortran binding of the GSD library.
+* Description:
+*    This file contains the Fortran binding of the GSD library.
 
- * Authors:
- *    hme: Horst Meyerdierks (UoE, Starlink)
- *    timj: Tim Jenness (JAC, Hawaii)
+* Authors:
+*    hme: Horst Meyerdierks (UoE, Starlink)
+*    timj: Tim Jenness (JAC, Hawaii)
 
- * History:
- *    05 Dec 1994 (hme):
- *       Original version.
- *    16 Dec 1999 (timj):
- *       Fix prototype warning in gsdGet1b
+* History:
+*    05 Dec 1994 (hme):
+*       Original version.
+*    16 Dec 1999 (timj):
+*       Fix prototype warning in gsdGet1b
 
- * Copyright:
- *    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
- *    All Rights Reserved. 
+* Copyright:
+*    Copyright (C) 1994-1999 Particle Physics and Astronomy Research Council.
+*    All Rights Reserved. 
 
- *-
+*-
  */
 
 #include <f77.h>
