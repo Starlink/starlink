@@ -159,8 +159,6 @@
       INTEGER IDB               ! Bias identifier
       INTEGER IDF               ! Flat identifier
       INTEGER IDO               ! Output identifier
-      INTEGER IDW               ! Workspace identifier
-      INTEGER IERR              ! Numeric error count
       INTEGER IPBIA             ! Pointer to bias data
       INTEGER IPDAT             ! Pointer to input data
       INTEGER IPELL             ! Ellipticities
@@ -168,12 +166,10 @@
       INTEGER IPIND             ! Pointer to identifiers
       INTEGER IPINT             ! Intensities
       INTEGER IPOBJ             ! Pointer to object data
-      INTEGER IPWRK             ! Pointer to workspace data
       INTEGER IPX               ! X positions
       INTEGER IPY               ! Y positions
       INTEGER LBND( 2, CCD1__MXNDF ) ! Bounds of NDF
       INTEGER NCHAR             ! Number of characters returned
-      INTEGER NERR              ! Number of numeric errors
       INTEGER NLOOP             ! Number of frame generating loops
       INTEGER NOBJ              ! Number of objects to generate
       INTEGER NRET              ! Number of returns
@@ -479,4 +475,4 @@ C            CALL NDF_HCRE( IDF, STATUS )
       CALL CCD1_END( STATUS )
 
       END
-* $Id: ccdbgen.f,v 1.5 1998/06/17 10:56:21 mbt Exp mbt $
+* $Id: ccdbgen.f,v 1.6 1998/06/17 11:14:54 mbt Exp mbt $
