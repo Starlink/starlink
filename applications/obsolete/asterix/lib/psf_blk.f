@@ -37,9 +37,12 @@
       INCLUDE 'PSF_CMN'			! PSF Initialisation Switches
 *        PSFINIT = LOGICAL (Returned)
 *           Psf subsystem initialised?
+*        PSFLIBINIT = LOGICAL (Returned)
+*           Psf library subsystem initialised?
 
 *  Global data:
       DATA PSFINIT/.FALSE./
+      DATA PSFLIBINIT/.FALSE./
 *.
 
       END
