@@ -107,7 +107,7 @@
       N=0
       FINI=.FALSE.
       DO WHILE (.NOT.FINI)
-        CA=INDEX(A,B(C1,C2))
+        CA=INDEX(A,B(C1:C2))
         IF (CA.NE.0) THEN
           N=N+1
           C1=CA+LENA
