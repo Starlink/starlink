@@ -127,22 +127,17 @@
       CALL AST_INIT()
 
 *    Associate input dataset
-      CALL USI_ASSOC( 'INP', '*', 'UPDATE', IFID, STATUS )
+      CALL USI_ASSOC( 'INP', 'SSDSset|SSDS', 'UPDATE', IFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*    Check input ok
-      CALL SSI_VALID( IFID, OK, STATUS )
-      IF ( .NOT. OK ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Dataset is not a results file!', STATUS )
-        GOTO 999
-      END IF
-
 *    Get number of sources
-      CALL SSI_GETNSRC( IFID, NSRC, STATUS )
+      CALL ADI_CGET0I( IFID, 'NSRC', NSRC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_REP( ' ', 'Error reading no. of sources from file',
      :                                                      STATUS )
+        GOTO 999
+      ELSE IF ( NSRC .EQ. 0 ) THEN
+        CALL MSG_PRNT( 'No sources in input dataset' )
         GOTO 999
       END IF
 

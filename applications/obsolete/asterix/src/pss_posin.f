@@ -124,7 +124,8 @@
         ELSE
 
 *        Try to open as HDS file
-          CALL ADI_FOPEN( PLIST(:PLEN), '*', 'READ', SID, STATUS )
+          CALL ADI_FOPEN( PLIST(:PLEN), 'SSDSset|SSDDS', 'READ',
+     :                    SID, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             SSDS_THERE = .TRUE.
             ALREADY_OPEN = .TRUE.
@@ -165,7 +166,7 @@
       IF ( SSDS_THERE ) THEN
 
 *      Associate into SSO system
-        CALL SSI_GETNSRC( SID, NSRC, STATUS )
+        CALL ADI_CGET0I( SID, 'NSRC', NSRC, STATUS )
 
 *      Abort if empty
         IF ( ( NSRC .EQ. 0 ) .AND. ( STATUS .EQ. SAI__OK ) ) THEN

@@ -3905,7 +3905,7 @@ c        REAL XX,XP,YP
         I_IY2=I_NY
 
         CALL ARR_INIT1B(ZERO,I_NX*I_NY,%val(I_REG_PTR),STATUS)
-        I_REG_TYPE='NONE'
+        I_REG_TYPE='WHOLE'
 
 
 *  if running from a GUI put stuff on noticeboard
@@ -3919,6 +3919,8 @@ c        REAL XX,XP,YP
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y1,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'REGYMAX',ID,STATUS)
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y2,STATUS)
+          CALL NBS_FIND_ITEM(I_NBID,'REGION',ID,STATUS)
+          CALL NBS_PUT_CVALUE(ID,0,I_REG_TYPE,STATUS)
         ENDIF
 
       ENDIF

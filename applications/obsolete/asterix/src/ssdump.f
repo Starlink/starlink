@@ -397,7 +397,7 @@
 *      Positional error data
         FN = SSDUMP_FN( 'ERRORS', NFLD, FLD )
         IF ( DOERR .AND. (FN.GT.0) ) THEN
-          CALL SSDUMP_EFMT( SLOC, 'ERRORS', STATUS )
+          CALL SSDUMP_EFMT( SFID, 'ERRORS', STATUS )
           CALL MSG_MAKE( 'Positional errors are at ^ELEVS confidence'/
      :                        /', units '//FLD(FN).UNITS, TEXT, MLEN )
           CALL AIO_WRITE( OCH, TEXT(:MLEN), STATUS )
@@ -407,7 +407,7 @@
         FN = SSDUMP_FN( 'FLUX', NFLD, FLD )
         IF ( FN .GT. 0 ) THEN
           IF ( FLD(FN).ETHERE ) THEN
-            CALL SSDUMP_EFMT( SLOC, 'FLUX', STATUS )
+            CALL SSDUMP_EFMT( SFID, 'FLUX', STATUS )
             CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
             CALL MSG_MAKE( 'Flux units are ^UNIT, errors are at ^ELEVS'/
      :                                      /' confidence', TEXT, MLEN )
@@ -422,7 +422,7 @@
         FN = SSDUMP_FN( 'BACK', NFLD, FLD )
         IF ( FN .GT. 0 ) THEN
           IF ( FLD(FN).ETHERE ) THEN
-            CALL SSDUMP_EFMT( SLOC, 'BACK', STATUS )
+            CALL SSDUMP_EFMT( SFID, 'BACK', STATUS )
             CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
             CALL MSG_MAKE( 'Bgnd units are ^UNIT, errors are at ^ELEVS'/
      :                                      /' confidence', TEXT, MLEN )

@@ -77,7 +77,7 @@
           ENDIF
         ENDIF
 
-        IF (EXCLUDE.AND.I_REG_TYPE.EQ.'NONE') THEN
+        IF (EXCLUDE.AND.I_REG_TYPE.EQ.'WHOLE') THEN
           CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
           I_REG_TYPE='COMPLEX'
         ENDIF
