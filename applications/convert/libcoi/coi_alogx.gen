@@ -1,0 +1,76 @@
+      SUBROUTINE COI_ALOG<T>( EL, ARRAY, STATUS )
+*+
+*  Name:
+*     COI_ALOGx
+
+*  Purpose:
+*     Exponentiates IRAF log-linear axis data in situ.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Invocation:
+*     CALL COI_ALOGX( EL, ARRAY, STATUS )
+
+*  Description:
+*     This routine takes an array of values and exponentiates at base
+*     10.  It offers no protect against overflows, as we assume that the
+*     IRAF axis data for which it is intended will be valid.
+
+*  Arguments:
+*     EL = INTEGER (Given)
+*        The number of elements to exponentiate.
+*     ARRAY( EL ) = ? (Given and Returned)
+*        On entry, the values to be exponentiated.  On exit, each value
+*        is 10**(input_value)
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Notes:
+*     - There is a routine for real and double precision data types:
+*     replace "x" in the routine name by R or D as appropriate.  The
+*     ARRAY argument must have this data type.
+
+*  [optional_subroutine_items]...
+*  Authors:
+*     MJC: Malcolm J. Currie (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     1997 July 27 (MJC):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+      
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER EL
+
+*  Arguments Given and Returned:
+      <TYPE> ARRAY( EL )
+
+*  Status:
+      INTEGER STATUS             ! Global status
+
+*  Local Variables:
+      INTEGER I                  ! Loop counter
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, EL
+         ARRAY( I ) = 10<CONST> ** ( ARRAY( I ) )
+      END DO
+
+      END
