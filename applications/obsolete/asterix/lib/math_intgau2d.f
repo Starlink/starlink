@@ -36,12 +36,14 @@
 *    Authors :
 *
 *     David J. Allan (BHVAD::DJA)
+*     Richard Beard (Birmingham)
 *
 *    History :
 *
 *     10 Mar 91 : Original (DJA)
 *     24 Jul 91 : Tests for symmetric case (DJA)
 *      1 Mar 94 : Back to single precision using MATH_EXPR routine (DJA)
+*     26 Jun 97 : Make SPIX a proper function (RB)
 *
 *    Type definitions :
 *
@@ -69,6 +71,7 @@
 *    Functions :
 *
       REAL			MATH_EXPR
+      INTEGER			SPIX
 *
 *    Local variables :
 *
@@ -86,13 +89,6 @@
       INTEGER                   XSUB, YSUB              ! Sub-pixel factors
 
       LOGICAL                   SYMMETRIC               ! Symmetric about centre?
-*
-*    Inline function :
-*
-      REAL                     DEL,SIG,PIX
-      INTEGER                  SPIX
-       SPIX(DEL,PIX,SIG) = MAX(1,NINT(abs(10.0*PIX)/SIG/MAX(1.0,
-     :                                SQRT(ABS(DEL/SIG)))))
 *-
 
 *    Check status
@@ -197,5 +193,17 @@
         END DO
 
       END IF
+
+      END
+
+
+
+      INTEGER FUNCTION SPIX( DEL, SIG, PIX )
+
+      REAL                     DEL,SIG,PIX
+
+      SPIX = MAX( 1,
+     :            NINT( ABS( 10.0 * PIX ) /
+     :                  SIG / MAX( 1.0, SQRT( ABS( DEL / SIG ) ) ) ) )
 
       END
