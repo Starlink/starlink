@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- LaTeX stylesheet for document elements
+  Starlink General DTD: LaTeX stylesheet for document elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,13 +12,14 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<func>
+<routine>
 <routinename>$latex-section$
 <description>Simple function which should be called for all sectioning
 commands.
 <returnvalue type=sosofo>Produces a sosofo which creates the section heading.
+<argumentlist>
 <parameter>section-cmd
   <type>string
   <description>LaTeX command to format the title
@@ -37,7 +38,7 @@ commands.
 	(process-children)
 	(empty-sosofo))))
 
-<misccode>
+<routine>
 <description>
 Section constructors
 

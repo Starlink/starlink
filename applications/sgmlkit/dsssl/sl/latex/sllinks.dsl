@@ -19,7 +19,7 @@ ignore the HyTime attributes!
 <title>Support cross references
 -->
 
-<misccode>
+<routine>
 <description>REF is a simple reference to another element in the same document.
 Check that the target is a member of the list <funcname/target-element-list/.
 If the `text' attribute is present, then use that as the link text,
@@ -31,11 +31,11 @@ presentation which has no links (the motivation for this was the fact that
 command stands out somewhat).
 <codebody>
 (element ref
-  (let ((target-id (attribute-string (normalize "id")
-				     (current-node)))
-	(target (node-list-or-false (element-with-id target-id)))
-	(linktext (attribute-string (normalize "text")
-				    (current-node))))
+  (let* ((target-id (attribute-string (normalize "id")
+				      (current-node)))
+	 (target (node-list-or-false (element-with-id target-id)))
+	 (linktext (attribute-string (normalize "text")
+				     (current-node))))
     (if (and target
 	     (member (gi target) (ref-target-element-list)))
 	(if linktext
@@ -54,7 +54,7 @@ command stands out somewhat).
 	    (error (string-append
 		    "Can't find element with ID " target-id))))))
 
-<misccode>
+<routine>
 <description>The <code/docxref/ element has a required attribute
 giving the document which is to be referred to, and an optional
 attribute giving an ID within that document.  The target of the link
@@ -131,7 +131,8 @@ it produces an <funcname/error/.
 				   (td (query-parse-fpi 'text-description
 							pfpi)))
 			      (if td
-				  (literal td)
+				  (literal
+				   (car (reverse (tokenise-string td))))
 				  (error (string-append
 				       "DOCXREF: couldn't make sense of FPI '"
 					  xrefent-pubid "'"))))))
@@ -158,7 +159,7 @@ it produces an <funcname/error/.
 	    (make command name: "textit"
 		  (process-node-list dtitle)))))))
 
-<misccode>
+<routine>
 <description><code/webref/ elements are simply transformed into 
 the element content followed by a footnote containing the URL.
 <code/url/ elements have the URL printed.

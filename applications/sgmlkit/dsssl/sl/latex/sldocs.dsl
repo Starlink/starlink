@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- LaTeX stylesheet for document elements
+  Starlink General DTD: LaTeX stylesheet for document elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,14 +12,13 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<func>
+<routine>
 <routinename>process-latex-document
 <description>Generates an entity to hold the LaTeX file.
 <returnvalue type=sosofo>A sosofo which generates logging output to
 stdout, then generates an entity which contains the entire LaTeX file.
-<argumentlist none>
 <codebody>
 (define (process-latex-document)
   (make sequence
@@ -34,7 +33,7 @@ stdout, then generates an entity which contains the entire LaTeX file.
 		(process-matching-children 'docinfo)
 		(process-matching-children 'docbody)))))
 
-<misccode>
+<routine>
 <description>These are the document element types.
 <codebody>
 (element sug (process-latex-document))
@@ -47,7 +46,7 @@ stdout, then generates an entity which contains the entire LaTeX file.
 (element mud (process-latex-document))
 
 
-<misccode>
+<routine>
 <description>Flow-object constructors for the document head
 <p>See the documentation of <funcname/%latex-document-preamble%/ for the 
 interface with the `style file' defined there.

@@ -1,7 +1,7 @@
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity slparams.dsl		system "slparams.dsl">
-  <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY slparams.dsl		SYSTEM "slparams.dsl">
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
 ]>
 <!-- $Id$ -->
 
@@ -38,14 +38,15 @@ empty output file.
 <p>Changes here might need corresponding changes in make-manifest-mode in
 sl.dsl
 
-<func>
+<routine>
 <routinename>get-maths
 <description>Create an external entity, and write out a document ready
   for post-processing.  Process all the elements with GIs which match
   elements in <code/maths-element-list/, spitting them out into this
   document accompanied by directives to the post-processor.
   <p>If there are no maths elements, return <code/(empty-sosofo)/.
-<returnvalue type=sosofo>
+<returnvalue type=sosofo>SOSOFO containing external maths document
+<argumentlist>
 <parameter optional default='(current-node)'>
   nd
   <type>singleton-node-list
@@ -63,7 +64,7 @@ sl.dsl
 	(make entity system-id: ($maths-extfile$ #t)
 	      (with-mode get-maths-mode (process-node-list mathels))))))
 
-<misccode>
+<routine>
 <description>Define the <code/get-maths-mode/ mode, which need only be defined
 for the elements in <funcname/maths-element-list/.  In it, the flow-object
 construction rules simply call the <code/img-equation/ function with
@@ -97,12 +98,13 @@ appropriate arguments
 %%imgmath eqnarray " (img-eqnref) "
 ")))))
 
-<func>
+<routine>
 <routinename>img-equation
 <description>Process a single maths element, writing out a fragment of
   LaTeX for the post-processor.  This will indicate what type of maths
   element this is.
-<returnvalue type=sosofo>
+<returnvalue type=sosofo>LaTeX fragment containing maths
+<argumentlist>
 <parameter>eqn-type
   <type>string
   <description>The type of equation, `inline', `equation' or
@@ -120,7 +122,7 @@ appropriate arguments
 %%imgmath " eqn-type " " (img-eqnref) "
 "))))
 
-<misccode>
+<routine>
 <description>
 <p>Handle the maths elements in the normal run of text.
 <codebody>
@@ -169,7 +171,7 @@ appropriate arguments
   (element mlabel
     (literal (string-append "Eqn.(" (get-equation-number) ")"))))
 
-<func>
+<routine>
 <routinename>img-equation-sysid
 <description>Extracts from the <code/img-eqlist/ document the sysid 
 of the image which corresponds to the current element.  The sysid refers to
@@ -192,7 +194,7 @@ equations's representation, or <code/#f/ if none can be found.
 	(attribute-string (normalize "sysid") eq))))
 
 
-<func>
+<routine>
 <routinename>get-img-equations
 <description>Obtain the grove which contains the equations which are
 to be inserted in the maths elements.  The document to be opened is
@@ -203,7 +205,6 @@ from the <funcname/$maths-extfile$/ function.
 <p>If the call to <funcname/document-element/ fails (presumably because
 the file doesn't exist) then signal an error.
 <returnvalue type=node-list>The document element of the grove.
-<argumentlist none>
 <codebody>
 (define (get-img-equations)
   (let* ((mfile ($maths-extfile$ #f))
@@ -213,12 +214,13 @@ the file doesn't exist) then signal an error.
     (or rde
 	(error (string-append "Can't find equations file: " mfile)))))
 
-<func>
+<routine>
 <routinename>$maths-extfile$
 <description>The name of the external file which is created by the
   <code/get-maths/ mode, to hold fragments of maths.  Uses
   <funcname/root-file-name/.
 <returnvalue type="string">filename
+<argumentlist>
 <parameter>img-input<type>boolean
 	<description>True if we want the name of the file which is
 	<em/input/ to the equation processor, false if we want the name of the
@@ -238,8 +240,7 @@ to format the maths.  This is nifty, but isn't a complete solution since (a)
 the browser needs some tweaking to show the results correctly, and (b) the
 browser can't print the results at all.
 
-<func>
-<codeprologue>
+<routine>
 <routinename>get-maths
 <description>
   <p>Create an external entity, and write out a LaTeX document ready for
@@ -249,7 +250,8 @@ browser can't print the results at all.
   <code/tth/.
   <p>If there are no maths elements in the document, then return
   <code/(empty-sosofo)/.
-<returnvalue type=sosofo>
+<returnvalue type=sosofo>SOSOFO containing document for <code/tth/
+<argumentlist>
 <parameter optional default="(current-node)">
   nd
   <type>singleton-node-list
@@ -277,7 +279,7 @@ browser can't print the results at all.
 ")
 	  ))))
 
-<misccode>
+<routine>
 <description>Define the <code/get-maths-mode/ mode, which need only be defined
 for the elements in <funcname/maths-element-list/.  In it, the flow-object
 construction rules simply call the <code/tth-equation/ function with
@@ -297,8 +299,7 @@ appropriate bracketing expressions.
   (element meqnarray
     (tth-equation "\\begin{eqnarray*}" "\\end{eqnarray*}")))
 
-<func>
-<codeprologue>
+<routine>
 <routinename>
 <name>tth-equation
 <description>
@@ -309,6 +310,7 @@ to have it, in turn, emit SGML fragments, ready for us to read in again.
 <returnvalue type=sosofo>A sosofo containing a fragment of LaTeX
 suitable for being parsed by tth.
 
+<argumentlist>
 <parameter>latex-before
   <type>string
   <description>
@@ -335,7 +337,7 @@ suitable for being parsed by tth.
 %%tth:\\begin{html}]]" ">&lt;/tth-eq>\\end{html}
 ")))))
 
-<func>
+<routine>
 <routinename>tth-eqnref
 <description>Returns a unique reference to an equation.
 <returnvalue type=string>String usable as an ID attribute value
@@ -350,8 +352,7 @@ suitable for being parsed by tth.
   (string-append "TTHEQ" (gi (current-node))
 		 (number->string (element-number nd))))
 
-<misccode>
-<miscprologue>
+<routine>
 <description>
 <p>Handle the maths elements in the normal run of text.
 <codebody>
@@ -367,7 +368,7 @@ suitable for being parsed by tth.
   (make element gi: "blockquote"
 	(insert-tth-equation)))
 
-<func>
+<routine>
 <routinename>insert-tth-equation
 <description>Extracts from the <code/tth/ output the equation which
 corresponds to the current element, and returns a SOSOFO
@@ -389,7 +390,7 @@ containing it.
 		(data eq)))))
 
 
-<func>
+<routine>
 <routinename>get-tth-equations
 <description>Obtain the grove which contains the equations which are
 to be inserted in the maths elements.  The document to be opened is
@@ -400,7 +401,6 @@ from the <funcname/$maths-extfile$/ function.
 <p>If the call to <funcname/document-element/ fails (presumably because
 the file doesn't exist) then signal an error.
 <returnvalue type=node-list>The document element of the grove.
-<argumentlist none>
 <codebody>
 (define (get-tth-equations)
   (let* ((mfile ($maths-extfile$ #f))
@@ -409,8 +409,7 @@ the file doesn't exist) then signal an error.
     (or rde
 	(error (string-append "Can't find equations file: " mfile)))))
 
-<func>
-<codeprologue>
+<routine>
 <routinename>
 <name>$maths-extfile$
 <description>
@@ -444,7 +443,7 @@ the file doesn't exist) then signal an error.
 <description>This codegroup is used as a standalone stylesheet, to extract
 the maths from a document without doing any further processing.
 
-<misccode>
+<routine>
 <description>
 Declare the Jade Transform extensions.
 <codebody>
@@ -459,7 +458,7 @@ Declare the Jade Transform extensions.
 
 &slparams.dsl;
 
-<misccode>
+<routine>
 <description>
 Simply supply a root rule, which calls the <funcname/get-maths/ function.
 Also emit the root file name, as described in <funcname/process-document/

@@ -1,7 +1,6 @@
-<![ ignore [
+<!-- 
 
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<!-- $Id$ -->
+$Id$ 
 
 <docblock>
 <title>HTML-specific support
@@ -23,9 +22,9 @@ Council.
 <codegroup id=code.html>
 <title>HTML-specific support
 
-]]>
+-->
 
-<func>
+<routine>
 <routinename>html-document
 <description>
 <p>Every element which is potentially a chunk should be passed to
@@ -34,6 +33,7 @@ be chunked, then this creates a new entity with that body as its
 contents, if not, it evaluates simply to body-sosofo.
 <returnvalue type="sosofo">Either a new entity, or <code/body-sosofo/,
 depending on whether the element is to be chunked.
+<argumentlist>
 <parameter>title-sosofo
   <type>sosofo
   <description>A sosofo which will form the title of the document, if it
@@ -84,7 +84,7 @@ depending on whether the element is to be chunked.
 	      doc-sosofo)
 	    doc-sosofo))))
 
-<func>
+<routine>
 <routinename>href-to
 <purpose>Return the HTML HREF for the given node.  If chunking has been
 turned off, just return the fragment identifier.
@@ -95,6 +95,7 @@ Each one of these at present consists of a call to a function
 <funcname/href-to-fragid-giname/, which returns a fragment prefixed by `#'.
 <returnvalue type="string">An HTML HREF which can be used to refer to
 the current node.
+<argumentlist>
 <parameter>target
   <type>node-list
   <description>The href returned refers to the node passed as <code/target/
@@ -105,18 +106,22 @@ the current node.
   <type>boolean
   <description>If full-url is true, prefix
   <code/%starlink-document-server%/ to the returned URL.
+<parameter keyword default='#f'>force-frag
+  <type>string
+  <description>If not <code/#f/, force the fragment id to be this string.
 <codebody>
-(define (href-to target #!key (reffrag #t) (full-url #f))
+(define (href-to target #!key (reffrag #t) (full-url #f) (force-frag #f))
   (let* ((id (attribute-string (normalize "id") target))
 	 (entfile (html-file target_nd: target))
 	 (url (string-append (if full-url %starlink-document-server% "")
 			     entfile))
-	 (fragid (case (gi target)
-		   (("MLABEL") (href-to-fragid-mlabel target))
-		   (else (if (or (chunk? target)
-				 (not id))
-			     ""
-			     (string-append "#xref_" id)))))
+	 (fragid (or force-frag
+		     (case (gi target)
+		       (("MLABEL") (href-to-fragid-mlabel target))
+		       (else (if (or (chunk? target)
+				     (not id))
+				 "#xref_"
+				 (string-append "#xref_" id))))))
 	 ;(fragid (if (or (chunk? target)
 		;	 (not id))
 		;     ""
@@ -134,12 +139,11 @@ the current node.
 ;	    url)
 ;	fragid))))
 
-<func>
+<routine>
 <routinename>$standard-html-header$
 <description>
 A hook function to add additional tags to the HEAD of your HTML files
 <returnvalue type=sosofo>Sosofo inserted in the head of HTML files
-<argumentlist none>
 <codebody>
 (define ($standard-html-header$)
   (let* (
@@ -218,7 +222,7 @@ A hook function to add additional tags to the HEAD of your HTML files
 
       )))
 
-<misccode>
+<routine>
 <description>
 <p>Various other hooks for inserting code within the HTML file
 <codebody>

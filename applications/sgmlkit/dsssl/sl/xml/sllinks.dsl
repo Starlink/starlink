@@ -1,6 +1,5 @@
-<![ ignore [
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<!-- $Id$ -->
+<!-- 
+$Id$ 
 
 <docblock>
 <title>Inter- and Intra-document cross references for XML
@@ -19,7 +18,7 @@ ignore the HyTime attributes!
 <codegroup id='code.links'>
 <title>Support cross references
 
-]]>
+-->
 
 <misccode>
 <description>

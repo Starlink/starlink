@@ -22,27 +22,27 @@
   this catalogue file early in the path.
 -->
 
-<func>
+<routine>
 <routinename>%latex-document-class%
 <description>The type of document generated.
-<returnvalue type='list of strings'>
-<argumentlist none>
+<returnvalue type='list of strings'>List of arguments to the
+documentclass command, including a required argument for the document
+class, preceded by an optional argument for the class options.
 <codebody>
 (define %latex-document-class%
   (list "?twoside,11pt,a4paper" "article"))
 
-<func>
+<routine>
 <routinename>show-element-ids
 <description>
 If true, then display exported IDs in section (etc) titles.  This is
 useful for preparing a version of a document which you refer to while
 working on it, or another which refers to it often.
-<returnvalue type=boolean>
-<argumentlist none>
+<returnvalue type=boolean>True if we are to display exported ids.
 <codebody>
 (define show-element-ids #f)
 
-<func>
+<routine>
 <routinename>%latex-document-preamble%
 <description>
 <p>Any definitions which are to be emitted as part of the LaTeX
@@ -72,8 +72,7 @@ After these, it must call <code/\\MakeTitle/, then create a
 <code/VersoTitlepage/ environment with any additional matter to go 
 on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 
-<returnvalue type=string>
-<argumentlist none>
+<returnvalue type=string>String with the LaTeX preamble in it.
 <codebody>
 (define %latex-document-preamble%
   (string-append
@@ -416,29 +415,27 @@ on the verso of the titlepage.  It may then call <code/\\TableOfContents/.
 % @(#)sst.tex   1.4   95/06/06 11:46:41   96/07/05 10:28:17
 "))
 
-<func>
+<routine>
 <routinename>%latex-manifest%
 <description>
 If not '#f' then the list of LaTeX files created by the
 stylesheet will be written to the file named by '%latex-manifest%'.
 <returnvalue type=string>Manifest filename
-<argumentlist none>
 <codebody>
 (define %latex-manifest%
 	"LaTeX.manifest"
 	)
 
-<func>
+<routine>
 <routinename>%short-crossrefs%
 <description>If true, this will make the down-converter generate shorter 
 link texts for cross-references.
-<returnvalue type=boolean>
-<argumentlist none>
+<returnvalue type=boolean>Return true to generate short references
 <codebody>
 (define %short-crossrefs%
   #t)
 
-<func>
+<routine>
 <routinename>suppress-manifest
 <description>
 If true, this will suppress the generation of a manifest, even if the variable 
@@ -446,7 +443,6 @@ If true, this will suppress the generation of a manifest, even if the variable
 (This option can conveniently be set with <code/-V suppress-manifest/ on the 
 Jade command line).
 <returnvalue type=boolean>True if the manifest is to be suppressed
-<argumentlist none>
 <codebody>
 (define suppress-manifest #f)
 

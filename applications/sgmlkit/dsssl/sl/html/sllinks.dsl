@@ -1,6 +1,6 @@
-<![ ignore [
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<!-- $Id$ -->
+<!-- 
+
+$Id$
 
 <docblock>
 <title>Inter- and Intra-document cross references for HTML
@@ -19,9 +19,9 @@ ignore the HyTime attributes!
 <codegroup id='code.links'>
 <title>Support cross references
 
-]]>
+-->
 
-<misccode>
+<routine>
 <description>
 <p>REF is a simple reference to another element in the same document.
 Check that the target is a member of the list <funcname/target-element-list/.
@@ -104,7 +104,7 @@ target in mode <code/section-reference/.
 				       ".htx/"
 				       (case-fold-down (car docparts))
 				       (cadr docparts)
-				       ".html")
+				       ".html#xref_")
 			#f))))
     (if href
 	(make element gi: "a"
@@ -112,7 +112,7 @@ target in mode <code/section-reference/.
 	      (literal (or linktext docnum)))
 	#f)))
 
-<misccode>
+<routine>
 <description>The <code/docxref/ element has a required attribute
 giving the document which is to be referred to, and an optional
 attribute giving an ID within that document.  The target of the link
@@ -180,9 +180,21 @@ it produces an <funcname/error/.
 			      (let ((url (attribute-string
 					  (normalize "urlpath") docelem)))
 				(if url
+				    ;; Add the #xref_ fragment which
+				    ;; hlink needs.  If this URL was
+				    ;; obtained from a urlpath
+				    ;; attribute, then this is
+				    ;; required.  If not, then we're
+				    ;; probably linking to a document
+				    ;; which originated as SGML, but
+				    ;; put in the fragment all the
+				    ;; same, since hlink will remain
+				    ;; in use in the medium term.
 				    (string-append %starlink-document-server%
-						   url)
-				    (href-to docelem reffrag: #f)))))
+						   url "#xref_")
+				    ;(href-to docelem reffrag: #f)
+				    (href-to docelem force-frag: "#xref_")
+				    ))))
 		  (if linktext
 		      (literal linktext)
 		      (with-mode mk-docxref
@@ -240,7 +252,7 @@ it produces an <funcname/error/.
 	    (make element gi: "CITE"
 		  (process-node-list dtitle)))))))
 
-<misccode>
+<routine>
 <description><code/webref/ elements are simply transformed into HTML
 <code/A/ elements, and <code/url/ elements into <code/A/ elements with
 the URL as link text

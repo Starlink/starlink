@@ -1,5 +1,5 @@
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity sl-gentext.dsl	system "sl-gentext.dsl">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY sl-gentext.dsl	SYSTEM "sl-gentext.dsl">
 ]>
 <!-- $Id$ -->
 
@@ -21,13 +21,14 @@ and
 <authorlist>
 <author id=ng affiliation='Glasgow'>Norman Gray
 
-<func>
+<routine>
 <routinename>getdocinfo
 <description>
 <p>Obtain the specified child of the docinfo element for the current grove.
 That is, <code>(getdocinfo 'title)</code> returns the current document's title
 <returnvalue type="node-list">Return a node-list consisting of the
   specified child, or false if there is no such child.
+<argumentlist>
 <parameter>type
   <type>symbol
   <description>
@@ -49,7 +50,7 @@ That is, <code>(getdocinfo 'title)</code> returns the current document's title
 	#f
 	dinl)))
 
-<func>
+<routine>
 <routinename>getdocbody
 <description>
 <p>Obtain the specified child of the docbody element for the current grove.
@@ -57,6 +58,7 @@ That is, <code>(getdocbody 'abstract)</code> returns the current document's
 abstract.
 <returnvalue type="node-list">Return a node-list consisting of the 
   specified child, or false if there is no such child.
+<argumentlist>
 <parameter optional default='#f'>type
   <type>symbol
   <description>
@@ -84,7 +86,7 @@ abstract.
 	#f
 	dinl)))
 
-<func>
+<routine>
 <routinename>getdocnumber
 <description>
 Return the current node's document number as a string.  If the second optional
@@ -92,6 +94,7 @@ argument is true, then return the document number as a longer description
 rather than a code.  That is, as `Starlink Cookbook n.m' rather than `SC/n.m'
 <returnvalue type=string>The document number as a string, or <code/#f/ 
 if <code/docnumber/ isn't defined.
+<argumentlist>
 <parameter optional default='(current-node)'>
   <name>nd
   <type>node-list
@@ -122,30 +125,32 @@ if <code/docnumber/ isn't defined.
 	#f	
 	)))
 
-<func>
+<routine>
 <routinename>code-to-string
 <description>Map a document code (SC, SUN, etc) to a string
 <returnvalue type=string>Document class
+<argumentlist>
 <parameter>doccode
   <type>string
   <description>One of the Starlink document codes
 <codebody>
 (define (code-to-string doccode)
   (case (normalize doccode)
-    (("SUN") "Starlink User Note")
-    (("SSN") "Starlink System Note")
-    (("MUD") "Miscellaneous User Document")
-    (("SC") "Starlink Cookbook")
-    (("SG") "Starlink Guide")
-    (("SGP") "Starlink General Paper")
-    (("SUG") "Starlink Users' Guide")
+    (("sun") "Starlink User Note")
+    (("ssn") "Starlink System Note")
+    (("mud") "Miscellaneous User Document")
+    (("sc") "Starlink Cookbook")
+    (("sg") "Starlink Guide")
+    (("sgp") "Starlink General Paper")
+    (("sug") "Starlink Users' Guide")
     (else (error (string-append "Unknown document code " doccode)))))
 
-<func>
+<routine>
 <routinename>stringlist->string
 <description>Turn a list of strings into one string, 
 with elements separated by a constant string.
 <returnvalue type=string>Concatenated string
+<argumentlist>
 <parameter>list
   <type>list of strings
   <description>List of strings to be joined
@@ -172,7 +177,7 @@ with elements separated by a constant string.
 				 end-string
 				 sep-string))))))
 
-<func>
+<routine>
 <routinename>make-section-reference
 <description>
 <p>Return a sosofo with the title of the given node,
@@ -197,6 +202,7 @@ keywords, you seem to be doing all the work.  You should still call this
 routine in that case, however, so that it can do any other processing
 required.
 <returnvalue type=sosofo>Name of section, prefixed by section number
+<argumentlist>
 <parameter keyword default='(current-node)'>target
   <type>singleton-node-list
   <description>The node we wish to generate a reference to
@@ -299,11 +305,12 @@ required.
 ; 	  ts
 ; 	  (process-first-descendant 'title)))))
 
-<func>
+<routine>
 <routinename>display-element-ids
 <description>Called (typically) when show-element-ids is true, this displays
 the ID of the indicated element.
 <returnvalue type=string>The ID, if available, or empty.
+<argumentlist>
 <parameter optional default='(current-node)'>nd
   <type>singleton-node-list<description>The node we want the IDs of
 <codebody>
@@ -316,7 +323,7 @@ the ID of the indicated element.
 	    (string-append " [[" (case-fold-down id) "]]"))
 	"")))
 
-<func>
+<routine>
 <routinename>section-element-list
 <purpose>List the elements classified as `sections'.
 <description>
@@ -334,7 +341,6 @@ function <funcname/make-section-reference/.
 there is a current-node so that normalize can know what declaration
 is in effect.
 <returnvalue type=list>List of GIs
-<argumentlist none>
 <codebody>
 (define (section-element-list)
   (list (normalize "sect")
@@ -349,8 +355,7 @@ is in effect.
 	;(normalize "bibliography")
 	))
 
-<misccode>
-<miscprologue>
+<routine>
 <description>
 <p>Section number formatting
 <p>Various routines for obtaining and formatting section headings.
@@ -435,9 +440,8 @@ is in effect.
 ;       ((equal? (gi nd) (normalize "subsubsect")) (section-title nd))
 ;       ((equal? (gi nd) (normalize "subsubsubsect")) (section-title nd))
 ;       (else (literal "UNKNOWN TITLE!")))))
-</misccode>
 
-<func>
+<routine>
 <routinename>get-caption-details
 <purpose>Return generated details for a caption.
 <description>
@@ -452,6 +456,7 @@ element's ID.
   which is usable as a link target, or <code/#f/ if the element's ID attribute
   is implied.  The figure/table number is returned separately so it
   can be put to different uses (eg, as an entry in a list of figures). 
+<argumentlist>
 <parameter optional default='(current-node)'>nd
   <type>singleton node-list<description>An element (typically the
   <code/TABLE/ or <code/FIGURE/ element the caption is a member of)
@@ -465,11 +470,12 @@ element's ID.
 	  num
 	  id)))
 
-<func>
+<routine>
 <routinename>case-fold-capitalise
 <description>Make all of a string lowercase, but with first char uppercase.
 Modelled after <funcname/(case-fold-down)/ and friends in dblib.dsl
-<returnvalue type=string>
+<returnvalue type=string>Capitalised version of argument
+<argumentlist>
 <parameter>str
   <type>string<description>string to be modified
 <codebody>
@@ -481,7 +487,7 @@ Modelled after <funcname/(case-fold-down)/ and friends in dblib.dsl
 	       (case-fold-down-charlist (cdr sl))))
       str))
 
-<misccode>
+<routine>
 <description>
 <p>A couple of functions for trimming strings.  I need these because,
 for example, I generate the output filename based on the document type
@@ -550,9 +556,8 @@ char-property - see notes at
 	 (rl (reverse (trim-leading-whitespace cl)))
 	 (rrl (reverse (trim-leading-whitespace rl))))
     (list->string (normalise-character-list rrl))))
-</misccode>
 
-<func>
+<routine>
 <routinename>root-file-name
 <purpose>Return a root filename.
 <description>
@@ -585,29 +590,29 @@ SGML property set.  This isn't, however, implemented in Jade.
 	docdate missing
 </history>
 <codebody>
-;; (define (root-file-name #!optional (nd (current-node)))
-;;   (let* ((dn (getdocinfo 'docnumber nd))
-;; 	 (docelemtype (case-fold-down
-;; 		       (if dn
-;; 			   (if (attribute-string (normalize "documenttype") dn)
-;; 			       (attribute-string (normalize "documenttype") dn)
-;; 			       (error "DOCNUMBER has no DOCUMENTTYPE"))
-;; 			   (gi (document-element)))))
-;; 	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
-;; 			       "unassigned" ; better alternative?
-;; 			       (trim-data dn)))
-;; 		       ((getdocinfo 'docdate nd)
-;; 			(trim-data (getdocinfo 'docdate nd)))
-;; 		       (else  ; if no date, at least it should have a history
-;; 			(let ((rel (document-release-info)))
-;; 			  (car rel)))))
-;; 	 )
-;;     (string-append docelemtype ;(gi (document-element))
-;; 		   (if docref docref ""))))
 (define (root-file-name #!optional (nd (current-node)))
-  "N")
+  (let* ((dn (getdocinfo 'docnumber nd))
+	 (docelemtype (case-fold-down
+		       (if dn
+			   (if (attribute-string (normalize "documenttype") dn)
+			       (attribute-string (normalize "documenttype") dn)
+			       (error "DOCNUMBER has no DOCUMENTTYPE"))
+			   (gi (document-element)))))
+	 (docref (cond (dn (if (attribute-string "UNASSIGNED" dn)
+			       "unassigned" ; better alternative?
+			       (trim-data dn)))
+		       ((getdocinfo 'docdate nd)
+			(trim-data (getdocinfo 'docdate nd)))
+		       (else  ; if no date, at least it should have a history
+			(let ((rel (document-release-info)))
+			  (car rel)))))
+	 )
+    (string-append docelemtype ;(gi (document-element))
+		   (if docref docref ""))))
+;;(define (root-file-name #!optional (nd (current-node)))
+;;  "N")
 
-<func>
+<routine>
 <routinename>document-release-info
 <purpose>Extract release numbers and dates from history
 <description>
@@ -694,7 +699,7 @@ element really does have the latest date).
 				 (cadr vers-and-change))))))
 
 
-<func>
+<routine>
 <routinename>get-link-policy-target
 <purpose>Check that the `link policy' is satisfied by a target element.
 <description>This function expresses the `link policy' we wish this
@@ -739,6 +744,7 @@ dummy values for these two variables).
 violated and the <code/car/ contains an error.  If <code/cdr/ is true,
 then a link should be made, using the URL in <code/cdr/.
 
+<argumentlist>
 <parameter>nd
   <type>singleton-node-list
   <description>The node we want to check.
@@ -767,10 +773,10 @@ then a link should be made, using the URL in <code/cdr/.
 					       (normalize "export"))))))
 	 (urlpolicy (attribute-string (normalize "urllinkpolicy")
 				      (document-element nd)))
-	 (urlpath (attribute-string (normalize "urlpath") nd)))
+	 (urlpath (attribute-string (normalize "urlpath") nd))
+	 (id (attribute-string (normalize "id") nd)))
     (if veto-export
-	(cons (string-append "The element with id "
-			     (attribute-string (normalize "id") nd)
+	(cons (string-append "The element with id " id
 			     " has not been exported, so may not be linked to")
 	      #f)
 	(case urlpolicy
@@ -780,15 +786,15 @@ then a link should be made, using the URL in <code/cdr/.
 	   (if urlpath
 	       (cons #f (or no-urls
 			    (string-append %starlink-document-server%
-				       urlpath)))
-	       (cons (string-append "element with id "
-				    (attribute-string (normalize "id") nd)
+					   urlpath
+					   ;; include xref for hlink
+					   "#xref_" id)))
+	       (cons (string-append "element with id " id
 				    " has no URLPATH attribute")
 		     #f)))
 	  (("AUTOMATIC")
 	   (if urlpath
-	       (cons (string-append "element with id "
-				    (attribute-string (normalize "id") nd)
+	       (cons (string-append "element with id " id
 				    " has an URLPATH attribute present")
 		     #f)
 	       (cons #f (or no-urls
@@ -796,7 +802,7 @@ then a link should be made, using the URL in <code/cdr/.
 	  (else
 	   (cons (string-append "Unknown URLPOLICY: " urlpolicy) #f))))))
 
-<func>
+<routine>
 <routinename>target-element-list
 <purpose>A list of elements which are allowable targets for a link.
 <description>
@@ -814,8 +820,7 @@ the first member of this list amongst the target element's ancestors.
 <funcname/make-section-reference/.
 
 <p>For example, the LABEL element in the DocumentSummary DTD requires this.
-<returnvalue type='list of strings'>
-<argumentlist none>
+<returnvalue type='list of strings'>List of allowable link targets
 <codebody>
 (define (target-element-list)
   (list (normalize "sect")
@@ -827,8 +832,8 @@ the first member of this list amongst the target element's ancestors.
 	(normalize "table")
 	(normalize "mlabel")))
 
-<func>
-<name>ref-target-element-list
+<routine>
+<routinename>ref-target-element-list
 <description>This is almost the same as
   <funcname/target-element-list/, except that it lists those elements
   which are an allowable target of a REF element.  The difference is
@@ -836,15 +841,14 @@ the first member of this list amongst the target element's ancestors.
   but the link that is generated is to the first ancestor of the P
   which is within <funcname/target-element-list/.  If there isn't
   this distinction, we get a processing loop.
-<returnvalue type='list of strings'>
-<argumentlist none>
+<returnvalue type='list of strings'>List of ref targets
 <codebody>
 (define (ref-target-element-list)
   (append (target-element-list)
 	  (list (normalize "p"))))
 
-<func>
-<name>document-element
+<routine>
+<routinename>document-element
 <description>
 <p>Returns the document element of the document containing the given
 node.
@@ -866,6 +870,7 @@ the grove is malformed because it resulted from a call to <funcname/sgml-parse/
 with a non-existent file.
 <returnvalue type="singleton-node-list">The document element, or
 <code/#f/ if not found.
+<argumentlist>
 <parameter optional default='(current-node)'>
   <name>node
   <type>node-list
@@ -879,13 +884,14 @@ with a non-existent file.
 	;; else we're in the root rule now
 	(node-property 'document-element node default: #f))))
 
-<func>
+<routine>
 <routinename>document-element-from-entity
 <description>
 Return the document element of the document referred to by the
 entity string passed as argument.  
 Uses <funcname/sgml-parse/: see 10179, 10.1.7.
 <returnvalue type="node-list">Document element, or <code/#f/ on error.
+<argumentlist>
 <parameter>
   ent-name
   <type>string
@@ -896,11 +902,12 @@ Uses <funcname/sgml-parse/: see 10179, 10.1.7.
     (and sysid
 	 (document-element (sgml-parse sysid)))))
 
-<func>
+<routine>
 <routinename>isspace?
 <description>Returns true if the argument is a whitespace character, or if
   it has the value <code/#f/.
 <returnvalue type=boolean>True if whitespace
+<argumentlist>
 <parameter>c<type>character<description>Character to be tested
 <codebody>
 (define (isspace? c)
@@ -909,7 +916,7 @@ Uses <funcname/sgml-parse/: see 10179, 10.1.7.
       (char=? c #\&#TAB)))
 
 
-<func>
+<routine>
 <routinename>format-date
 <description>
 <p>Returns a string with the formatted version of the date.  If the
@@ -919,6 +926,7 @@ function.  I'd like to use (error) at the end, rather
 than silently returning just d, but I cannot work out how to
 evaluate more than one expression one after another!
 <returnvalue type="string">Formatted into english</returnvalue>
+<argumentlist>
 <parameter>
   <name>d
   <type>string
@@ -961,8 +969,7 @@ evaluate more than one expression one after another!
 	  d))))
 
 
-<func>
-<codeprologue>
+<routine>
 <routinename>format-date-old
 <description>
 <p>Returns a string with the formatted version of the date, which
@@ -973,7 +980,8 @@ than silently returning just d, but I cannot work out how to
 evaluate more than one expression one after another!
 <p>Replaced by <code/(format-date)/, which parses dates in the form
 dd-MMM-yyyy.
-<returnvalue type="string">Formatted into english</returnvalue>
+<returnvalue type="string">Formatted into english
+<argumentlist>
 <parameter>d
   <type>string
   <description>
@@ -1009,10 +1017,11 @@ dd-MMM-yyyy.
 	  d))))
 
 
-<func>
+<routine>
 <routinename>tokenise-string
 <description>Tokenises a string, breaking at arbitrary character classes
 <returnvalue type=list>List of strings, each containing a single token
+<argumentlist>
 <parameter>str<type>String<description>String to be tokenised
 <parameter keyword default='break at spaces'>boundary-char?
   <type>function
@@ -1078,7 +1087,7 @@ dd-MMM-yyyy.
 		    (append currword (list (car charlist)))
 		    splits))))))
 
-<func>
+<routine>
 <routinename>parse-fpi
 <purpose>Parse a formal public identifier
 <description>Breaks an FPI into its component parts. 
@@ -1091,6 +1100,7 @@ dd-MMM-yyyy.
   <p>See productions 79--90 in ISO 8879.
 <returnvalue type='opaque object'>Object to be passed to
   <funcname/query-parse-fpi/.
+<argumentlist>
 <parameter>str<type>string<description>FPI to be parsed
 <codebody>
 (define (parse-fpi str)
@@ -1148,7 +1158,7 @@ dd-MMM-yyyy.
 	  )))
 
 
-<func>
+<routine>
 <routinename>query-parse-fpi
 <purpose>Query an FPI parsed using <funcname/parse-fpi/
 <description>
@@ -1156,6 +1166,7 @@ dd-MMM-yyyy.
   returns elements of it.
 <returnvalue type=string>Requested part of FPI, or <code/#f/ if not
   available.
+<argumentlist>
 <parameter>symbol
   <type>symbol
   <description>One of the symbols <code/'registered/ (`+', `-' or
@@ -1181,11 +1192,12 @@ dd-MMM-yyyy.
 
 
 
-<![ ignore [
-<func>
+<![ IGNORE [
+<routine>
 <routinename>tokenise-string
 <description>Tokenises a string, breaking at arbitrary character classes
 <returnvalue type=list>List of strings, each containing a single word
+<argumentlist>
 <parameter>str<type>String<description>String to be tokenised
 <parameter optional default='isspace?'>isbdy?
   <type>procedure<description>Character-class function, which takes
@@ -1215,7 +1227,7 @@ dd-MMM-yyyy.
 		    (append currword (list (car charlist)))))))))
 ]]>
 
-<func>
+<routine>
 <routinename>get-sysid-by-notation
 <purpose>Select an entity whose declared content is one of a set of
   different notations.
@@ -1230,6 +1242,7 @@ dd-MMM-yyyy.
   notation matches a notation in <code/req-not/.  Returns <code/#f/ if none
   can be found.  There is a potential problem here, when an entity is
   referenced using a public ID -- should that go in the manifest?
+<argumentlist>
 <parameter>ent-list-string
   <type>string<description>A string containing a list of entities (such
   as an attribute value with a value prescription of ENTITIES), each of which
@@ -1246,7 +1259,7 @@ dd-MMM-yyyy.
 	   (entity-system-id (car ent-list) (current-node)))
 	  (else (loop (cdr ent-list))))))
 
-<func>
+<routine>
 <routinename>get-best-figurecontent
 <purpose>Extract the `best' figure content.
 
@@ -1268,6 +1281,7 @@ dd-MMM-yyyy.
   collection of paragraphs that follow them.  Or <funcname/#f/ if
   <em/nothing/ works!
 
+<argumentlist>
 <parameter>nl
   <type>node-list
   <description>The list of FIGURECONTENT elements and paragraphs which is
@@ -1305,7 +1319,7 @@ dd-MMM-yyyy.
 	    nl				; return the trailing paragraphs
 	    ))))
 
-<func>
+<routine>
 <routinename>table-colno
 <purpose>Return a list of numbers, indicating the current column number and the
 total number of columns.
@@ -1319,6 +1333,7 @@ number of columns.
   then the current column number will be returned as zero.
   <p>If the node doesn't have a <code/TABLE/ in its ancestry,
   then return <code/#f/.
+<argumentlist>
 <parameter optional default='(current-node)'>nd
   <type>singleton node-list<description>Node we want the column number of.
   If this is not an <code/ENTRY/ element, then the column number will be
@@ -1337,13 +1352,12 @@ number of columns.
 	#f				; we're not in a table
 	)))
 
-<func>
+<routine>
 <routinename>get-updates
 <description>
 Scoop up all the update elements.
 <returnvalue type='node-list'>All the update elements in the document, or #f
   if that would be an empty-node-list
-<argumentlist none>
 <codebody>
 (define (get-updates)
   (let ((nl (select-elements (select-by-class (descendants (document-element))
@@ -1353,11 +1367,12 @@ Scoop up all the update elements.
 	#f
 	nl)))
 
-<func>
-<name>node-list-or-false
+<routine>
+<routinename>node-list-or-false
 <description>
 Return a non-empty node-list, or false
 <returnvalue type='node-list'>argument, if it's non-empty, <code/#f/ otherwise.
+<argumentlist>
 <parameter>nl
   <type>node-list
   <description>node-list to be tested
@@ -1367,14 +1382,15 @@ Return a non-empty node-list, or false
       #f
       nl))
 
-<func>
-<name>get-equation-number
+<routine>
+<routinename>get-equation-number
 <description>
 Return the equation number corresponding to the given equation node.
 The node may be either an MLABEL element, or an element which has an
 MLABEL child in the document instance.
 <returnvalue type='string'>Equation number, or <code/#f/ if the parameter
   is neither a MLABEL element, nor has an MLABEL child.
+<argumentlist>
 <parameter optional default='(current-node)'>nl
   <type>node-list
   <description>Equation to be numbered.
@@ -1389,13 +1405,14 @@ MLABEL child in the document instance.
 	(number->string (element-number mlabel))
 	#f)))
 
-<func>
+<routine>
 <routinename>img-eqnref
 <description>Returns a unique reference to an equation.  If the element does
   not have one of MEQUATION or MEQNARRAY in its ancestry (for example because
   it is an M element), then we won't need to refer to this label.  It must,
   however, be generated and be unique.
 <returnvalue type=string>String usable as an ID attribute value.
+<argumentlist>
 <parameter optional default='(current-node)'>nd
   <type>node-list
   <description>A singleton node-list containing the element which is
@@ -1411,13 +1428,14 @@ MLABEL child in the document instance.
 	)
     ))
 
-<func>
-<name>nl-to-pairs
+<routine>
+<routinename>nl-to-pairs
 <description>
 Transform a node-list into a list of pairs, where each pair consists of the 
 GI of the node, and the node.  This is useful when combinde with
 <funcname/assoc/.
 <returnvalue type='list of pairs'>List of pairs of GI plus node.
+<argumentlist>
 <parameter>nl
   <type>node-list
   <description>A node-list to be transformed.
@@ -1429,7 +1447,7 @@ GI of the node, and the node.  This is useful when combinde with
 		    '()))
 
 <!-- now scoop up the remaining common functions, from sl-gentext.dsl -->
-<misccode>
+<routine>
 <description>Various strings (document in more detail!)
 <codebody>
 &sl-gentext.dsl

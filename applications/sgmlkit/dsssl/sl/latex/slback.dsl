@@ -1,7 +1,7 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
-  <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity params.dsl		system "sl-html-parameters">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
 ]>
 <!-- $Id$ -->
 
@@ -21,7 +21,7 @@ in a separate Jade pass.
 <codegroup id=code.back>
 <title>Support backmatter
 
-<misccode>
+<routine>
 <description>Declare Jade extension
 <codebody>
 (define read-entity
@@ -29,7 +29,7 @@ in a separate Jade pass.
 (declare-flow-object-class fi
   "UNREGISTERED::James Clark//Flow Object Class::formatting-instruction")
 
-<misccode>
+<routine>
 <description>
 Support backmatter elements.
 <codebody>
@@ -45,7 +45,7 @@ Support backmatter elements.
   (element backmatter
     (make-section-reference title: (literal "Notes, etc..."))))
 
-<misccode>
+<routine>
 <description>
 Support notes very simply as footnotes.  Don't put them in the backmatter
 in fact
@@ -54,7 +54,7 @@ in fact
   (make command name: "footnote"
 	(process-children)))
 
-<misccode>
+<routine>
 <description>
 Bibliography support.  The citation can be handled very simply -- just
 emit the citation key, bracketed.  For the bibliography itself, simply
@@ -80,7 +80,7 @@ Jade pass.
 	  (make fi data: bibcontents))
 	(empty-sosofo))))
 
-<misccode>
+<routine>
 <description>
 Process the history element in the docbody.  Present it in reverse order
 (ie, newest first), including in the distribution and change elements any
@@ -173,7 +173,7 @@ Walsh's stylesheet, other parts from me
 to process a document and extract those parts of the document (such as 
 bibliography references) which require preprocessing.
 
-<misccode>
+<routine>
 <description>
 Extract the bibliography to a LaTeX .aux file, ready for processing
 by BibTeX.

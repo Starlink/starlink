@@ -1,4 +1,4 @@
-<![ ignore [
+<!--
 Title:
   Starlink stylesheet - miscellaneous functions
 
@@ -11,9 +11,9 @@ Revision history
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<misccode>
+<routine>
 <description>
 Support figures and figurecontent.
 Note that changes here might need corresponding changes to manifest-mode
@@ -122,7 +122,7 @@ within sl.dsl.
 ; 	(process-children))))
 
 
-<misccode>
+<routine>
 <description>
 Miscellaneous constructors.  These are constructors which don't really fit
 in anywhere else.  They're not necessarily unimportant, just simple enough not

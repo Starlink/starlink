@@ -1,6 +1,5 @@
-<![ ignore [
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<!-- $Id$ -->
+<!-- 
+$Id$ 
 
 <docblock>
 <title>HTML Tables
@@ -25,9 +24,9 @@ a required CAPTION; add implied ID and EXPORT attributes to the TABLE.
 <description>I've aimed to support all of the <em/structure/ of this table
 model below, but not necessarily to support all of the attributes at
 first.
-]]>
+-->
 
-<misccode>
+<routine>
 <description>All the flow-object constructors
 <codebody>
 (element table

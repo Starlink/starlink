@@ -1,7 +1,6 @@
 <!-- -*- mode: sgml; sgml-parent-document: ("sl\.dsl" "CODEGROUP" '("PROGRAMCODE" "CODEGROUP")); -*- -->
 
-<func>
-<codeprologue>
+<routine>
 <routinename>process-html-document
 <description>
 <p>As this stylesheet's sole direct output, produce a string
@@ -13,7 +12,6 @@ linked to.
 <funcname/html-document/
 <returnvalue type=sosofo>A sosofo which produces output to stdout,
 then generates an HTML file
-<argumentlist none>
 <codebody>
 (define (process-html-document)
   (make sequence
@@ -31,7 +29,7 @@ then generates an HTML file
      (process-node-list (getdocinfo 'title))
      (process-matching-children 'docbody))))
 
-<misccode>
+<routine>
 <description>
 These are the document element types.
 <codebody>
@@ -44,7 +42,7 @@ These are the document element types.
 (element mud (process-html-document))
 
 
-<misccode>
+<routine>
 <description>Flow-object constructors for the head
 
 <codebody>
@@ -101,7 +99,7 @@ These are the document element types.
 
 
 
-<misccode>
+<routine>
 <description>
 Flow-object constructors for the document body
 

@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- LaTeX stylesheet for document elements
+  Starlink General DTD: LaTeX stylesheet for document elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,7 +12,7 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
 <!--
   The following was an attempt to support equation numbering for maths
@@ -31,7 +31,7 @@ $Id$
   inefficient).
 -->
 
-<misccode>
+<routine>
 <description>
 Support for maths in LaTeX documents.  This is, obviously, very easy!
 Set the inherited characteristic <code/escape-tex?/ to <code/#f/, so that 

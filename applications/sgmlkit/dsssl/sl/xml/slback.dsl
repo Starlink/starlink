@@ -1,7 +1,7 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
-  <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity params.dsl		system "sl-html-parameters">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+  <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
 ]>
 <!-- $Id$ -->
 

@@ -1,7 +1,7 @@
-<![ ignore [
+<!--
 
 Title:
-  Starlink General DTD -- LaTeX stylesheet miscellaneous elements
+  Starlink General DTD: LaTeX stylesheet miscellaneous elements
 
 Author:
   Norman Gray, Glasgow (NG)
@@ -12,9 +12,9 @@ History:
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<misccode>
+<routine>
 <description>
 Support figures and figurecontent.
 Changes here might need matching changes in
@@ -104,7 +104,7 @@ mode make-manifest-mode in sl.dsl.
 	(process-node-list content)
 	(error "Can't process coverimage"))))
 
-<misccode>
+<routine>
 <description>
 Miscellaneous constructors.  These are constructors which don't really fit
 in anywhere else.  They're not necessarily unimportant, just simple enough not

@@ -1,7 +1,7 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
-  <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity params.dsl		system "sl-html-parameters">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
 ]>
 <!-- $Id$ -->
 
@@ -20,7 +20,7 @@ and support indexing (soon!) using makeindex.
 <codegroup id='code.back'>
 <title>Support back-matter
 
-<misccode>
+<routine>
 <description>Declare Jade extension
 <codebody>
 (define read-entity
@@ -30,7 +30,7 @@ and support indexing (soon!) using makeindex.
 ;;(define debug
 ;;  (external-procedure "UNREGISTERED::James Clark//Procedure::debug"))
 
-<misccode>
+<routine>
 <description>
 Support back-matter elements.  Changes here might need matching changes 
 in mode make-manifest-mode in sl.dsl
@@ -118,7 +118,7 @@ in mode make-manifest-mode in sl.dsl
   (element backmatter
     (make-section-reference title: (literal "Notes, etc..."))))
 
-<misccode>
+<routine>
 <description>
 Support notes as endnotes.  
 <codebody>
@@ -177,7 +177,7 @@ Support notes as endnotes.
 				 (process-node-list notelist))))
 		       system-id: (notes-sys-id)))))
 
-<misccode>
+<routine>
 <description>
 Bibliography support.  The bibliography preprocessor (BibTeX) produces
 an HTML DL element with entries referrable to by the bibkey, which is
@@ -222,7 +222,7 @@ the data of the CITATION element.
 		       system-id: (bibliography-sys-id))
 	(empty-sosofo))))
 
-<misccode>
+<routine>
 <description>
 Process the history element in the docbody.  Present it in reverse order
 (ie, newest first), including in the distribution and change elements any
@@ -351,8 +351,8 @@ update elements which refer to them.
 		(process-node-list selupdates))
 	  (empty-sosofo)))))
 
-<![ignore[
-<misccode>
+<![IGNORE[
+<routine>
 <description>
 Linking support.  Create a page listing all the exported IDs in the document,
 so that document authors can find them in once place.
@@ -377,7 +377,7 @@ Walsh's stylesheet, other parts from me
 to process a document and extract those parts of the document (such as 
 bibliography references) which require preprocessing.
 
-<misccode>
+<routine>
 <description>
 Extract the bibliography to a LaTeX .aux file, ready for processing
 by BibTeX.

@@ -1,4 +1,4 @@
-<![ ignore [
+<!--
 Title:
   Starlink stylesheet - routine list
 
@@ -11,9 +11,9 @@ Revision history
 Copyright 1999, Particle Physics and Astronomy Research Council
 
 $Id$
-]]>
+-->
 
-<misccode>
+<routine>
 <description>Constructors for the ROUTINELIST element (LaTeX)
 <codebody>
 (mode section-reference

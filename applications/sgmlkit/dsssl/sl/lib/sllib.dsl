@@ -1,5 +1,5 @@
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity dblib.dsl	system "dblib.dsl">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY dblib.dsl	SYSTEM "dblib.dsl">
 ]>
 
 <title>Library code for Starlink DSSSL stylesheets
@@ -23,33 +23,28 @@ such functions are defined here.
 the code of version 1.12 of Norm Walsh's DocBook stylesheets.  See
 <url>http://nwalsh.com/docbook/dsssl/</url>.
 
-<misccode>
-<miscprologue>
+<routine>
 <description>
 <p><code>dblib.dsl</code> contains useful functions lifted wholesale
 from Norm Walsh's DocBook stylesheet
-</description>
-</miscprologue>
 <codebody>
 &dblib.dsl
-</codebody>
-</misccode>
 
 
-<func>
-<name>ancestors
+<routine>
+<routinename>ancestors
 <description><p>
 Return the mapping over nl of the function on a node that returns
 the ancestors of the node, where the ancestors of a node are an
 empty node-list if the node is a tree root, and otherwise are the
 result of appending the ancestors of the parent of the node and the
 parent of the node.
-<returnvalue type="node-list">
+<returnvalue type="node-list">List of ancestors
+<argumentlist>
 <parameter>
   <name>nl
   <type>node-list
   <description>list of nodes we want the ancestors of
-</parameter>
 <authorlist>
 <authorref id=iso10179 note='10.2.3'>
 <codebody>
@@ -63,7 +58,7 @@ parent of the node.
 			       (node-list cur result)))))
 		 nl))
 
-<misccode>
+<routine>
 <description>The old favourites, beloved of Lisp folk
 <codebody>
 (define cadr (lambda (x) (car (cdr x))))
@@ -71,5 +66,4 @@ parent of the node.
 (define cadddr (lambda (x) (car (cdr (cdr (cdr x))))))
 (define caddddr (lambda (x) (car (cdr (cdr (cdr (cdr x)))))))
 (define cddr (lambda (x) (cdr (cdr x))))
-</codebody>
-</misccode>
+

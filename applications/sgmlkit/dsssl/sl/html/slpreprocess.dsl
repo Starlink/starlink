@@ -1,8 +1,8 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-  <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
-  <!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-  <!entity maths.dsl		system "slmaths.dsl" subdoc>
-  <!entity params.dsl		system "sl-html-parameters">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
+  <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY maths.dsl		SYSTEM "slmaths.dsl" SUBDOC>
+  <!ENTITY params.dsl		SYSTEM "sl-html-parameters">
 ]>
 <!-- $Id$ -->
 
@@ -33,13 +33,13 @@ Walsh's stylesheet, other parts from me
 <description>
 <p>Contains the get-maths function and supporting code
 
-<codegroup id=preprocess.main use="code.common code.lib code.maths">
+<codegroup id="preprocess.main" use="code.common code.lib code.maths">
 <title>Preprocess for HTML
 <description>This part of the stylesheet is standalone, and may be used
 to process a document and extract those parts of the document (such as 
 bibliography references) which require preprocessing.
 
-<misccode>
+<routine>
 <description>
 Extract the bibliography to a LaTeX .aux file, ready for processing
 by BibTeX.  Extract maths, ready for processing with LaTeX and

@@ -1,17 +1,17 @@
-<!doctype programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
-<!entity sldocs.dsl		system "sldocs.dsl">
-<!entity slsect.dsl		system "slsect.dsl">
-<!entity slmisc.dsl		system "slmisc.dsl">
-<!entity slroutines.dsl		system "slroutines.dsl">
-<!entity slmaths.dsl		system "slmaths.dsl">
-<!entity sllinks.dsl		system "sllinks.dsl">
-<!entity sltables.dsl		system "sltables.dsl">
+<!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.2//EN" [
+<!ENTITY sldocs.dsl		SYSTEM "sldocs.dsl">
+<!ENTITY slsect.dsl		SYSTEM "slsect.dsl">
+<!ENTITY slmisc.dsl		SYSTEM "slmisc.dsl">
+<!ENTITY slroutines.dsl		SYSTEM "slroutines.dsl">
+<!ENTITY slmaths.dsl		SYSTEM "slmaths.dsl">
+<!ENTITY sllinks.dsl		SYSTEM "sllinks.dsl">
+<!ENTITY sltables.dsl		SYSTEM "sltables.dsl">
 
-<!entity slparams.dsl		system "sl-latex-parameters">
+<!ENTITY slparams.dsl		SYSTEM "sl-latex-parameters">
 
-<!entity lib.dsl		system "../lib/sllib.dsl" subdoc>
-<!entity common.dsl		system "../common/slcommon.dsl" subdoc>
-<!entity slback.dsl		system "slback.dsl" subdoc>
+<!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+<!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
+<!ENTITY slback.dsl		SYSTEM "slback.dsl" SUBDOC>
 ]>
 
 <!-- $Id$ -->

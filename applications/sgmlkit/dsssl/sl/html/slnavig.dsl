@@ -1,6 +1,5 @@
-<![ ignore [
-<!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
-<!-- $Id$ -->
+<!-- 
+$Id$ 
 
 <docblock>
 <title>HTML navigation
@@ -21,9 +20,9 @@ DocBook stylesheet.
 
 <codegroup>
 <title>HTML navigation
-]]>
+-->
 
-<misccode>
+<routine>
 <description>
 <p>List of element types which should be broken into chunks.
 Because of the way that section-footer-navigation finds its
@@ -51,19 +50,18 @@ must be a subset of the return value of <funcname/section-element-list/.
 	;(normalize "bibliography")
 	))
 
-<func>
+<routine>
 <routinename>chunking?
 <description>
 Returns true if chunking is enabled.
 <p>Currently, this simply returns <code/ (not (or nochunks stream-output))/,
 but could be more general in future.
 <returnvalue type=boolean>True if chunking is enabled.
-<argumentlist none>
 <codebody>
 (define (chunking?)
   (not (or nochunks stream-output)))
 
-<func>
+<routine>
 <routinename>chunk?
 <description>
 Return <code/#t/ if the given node is a chunk, taking account of whether
@@ -81,7 +79,7 @@ node is a member of <funcname/chunk-element-list/.
   (and (chunking?)
        (member (gi nd) (chunk-element-list))))
 
-<func>
+<routine>
 <routinename>chunk-path
 <description>
 Return a string which describes the path to the given node through
@@ -116,7 +114,7 @@ elements on the way to the current chunk
 			     (number->string (child-number this-node))
 			     path-string)))))
 
-<func>
+<routine>
 <routinename>main-html-base
 <description>
 Return a string containing the name of the file which will hold the
@@ -144,11 +142,12 @@ which will hold this node
 		       "-"
 		       (case-fold-down node-name-suffix)))))
 
-<func>
+<routine>
 <routinename>html-file
 <description>
 Returns the filename of the html file that contains the given node.
 <returnvalue type=string>Complete filename
+<argumentlist>
 <parameter keyword default='(current-node)'>
   target_nd<type>node-list<description>Node whose file we want
 <parameter keyword default='#f'>
@@ -183,7 +182,7 @@ Returns the filename of the html file that contains the given node.
 		     (else "xxx1"))))
     (string-append base %html-ext%)))
 
-<func>
+<routine>
 <routinename>chunk-parent
 <description>
 Return the node-list for the element whose chunk nd is in, or an
@@ -202,7 +201,7 @@ of a particular chunk
 	p
 	(chunk-level-parent (parent p)))))
 
-<func>
+<routine>
 <routinename>chunk-level-parent
 <description>
 Return (a node-list containing) the nearest ancestor which is a
@@ -220,7 +219,7 @@ tests for membership of <funcname/chunk-element-list/.
 (define (chunk-level-parent #!optional (nd (current-node)))
   (ancestor-member nd (chunk-element-list)))
 
-<func>
+<routine>
 <routinename>chunk-children
 <description>
 Return the children of the current chunk, or an empty node-list if
@@ -235,7 +234,7 @@ there are none.
   (node-list-filter-by-gi (select-by-class (children nd) 'element)
 			  (chunk-element-list)))
 
-<func>
+<routine>
 <routinename>make-contents
 <description>
 Make a table of contents of the node argument, down to the specified depth.
@@ -243,6 +242,7 @@ This works by listing children of the current node which are
 members of <funcname/section-element-list/, and possibly recursing to
 list their children.  It does not supply any header.
 <returnvalue type=sosofo>TOC, currently formatted as a UL
+<argumentlist>
 <parameter optional default='(current-node)'>start-element
   <type>singleton-node-list
   <description>Node we want the contents of.  All the children of this
@@ -280,7 +280,7 @@ list their children.  It does not supply any header.
 	       (empty-sosofo))))))
 
 
-<misccode>
+<routine>
 <description>
 Various functions to provide the links which navigate between the various
 generated HTML documents.  
@@ -609,7 +609,7 @@ generated HTML documents.
     (nav-gen-link elemnode prev "Prev" (gentext-nav-prev prev))))
 
 
-<misccode>
+<routine>
 <description>
 The following functions are miscellaneous odds-and-ends, some of which I'm
 not sure if I still use!
