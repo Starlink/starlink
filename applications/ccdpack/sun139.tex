@@ -769,7 +769,7 @@ of the useful part of a CCD you might use a command like:
 \end{verbatim}
 \end{myquote}
 
-\section{Demonstrations and test data}
+\section{\xlabel{demos}\label{demos}Demonstrations and test data}
 
 If you want to get a feel for what CCDPACK can do before reading 
 further, you might like to run the demonstration scripts.
@@ -2295,9 +2295,8 @@ used in that order.
 \routine{FINDOFF} determines the
 correspondence of the image-features and \routine{REGISTER} produces the
 mappings from this information. This sequence is used in the
-CCDEXERCISE script. To see it in action change to a empty directory and
-issue the command ``\text{ccdexercise}''. You should delete any
-files produced by this script.
+demonstration script
+\hyperref{{\tt ccdexercise}}{{\tt ccdexercise} described in \S}{}{demos}.
 
 \routine{FINDOBJ} works by looking for pixels above a threshold value, 
 objects are
@@ -2481,8 +2480,19 @@ you have to do the following:
 \item Select a pair with features in common
 \item Align them by dragging and dropping
 \item Mark objects in the overlap region
-\item Repeat until the program stops asking you to do so
+\item Repeat until the program stops asking you to do so \\
+      {\em or\/}\\
+      Click the `Exit' button when you cannot make any more pairings
 \end{enumerate}
+If in the final step you select Exit yourself rather than pairing all
+the images, then \routine{PAIRNDF} will not be able to register
+all the datasets.  In this case it will behave the same as 
+\xroutine{FINDOFF}, which is to do all the alignment it can,
+and associate position lists with those files whose alignment it
+can work out.
+Running \routine{REGISTER} will then add coordinate systems only
+for those which you have paired, and you will have to align the
+others in a different way, perhaps with the help of \xroutine{WCSREG}.
 
 As with all graphically based interfaces it is difficult to 
 describe the advantages and ease of use, it's best to try them out.
@@ -3366,6 +3376,15 @@ can be applied to the overlapping frames:
 Note that unlike the previous example we do not use {\tt restrict=true} here,
 since although the orientations are now (about) right 
 the positionings may not be.
+If \routine{FINDOFF} has trouble or you would rather do the alignment
+by eye you could use \xroutine{PAIRNDF} instead of 
+\routine{FINDOBJ} and \routine{FINDOFF} like this:
+\begin{myquote}
+\begin{verbatim}
+% pairndf in='"1?,2?"' outlist='*.off'
+\end{verbatim}
+\end{myquote}
+before continuing with the \routine{REGISTER} command.
 
 To see what coordinate systems have now been attached we 
 can examine the images using \xroutine{WCSEDIT}:
@@ -3506,10 +3525,9 @@ combination as before:
 \end{verbatim}
 \end{myquote}
 
-To see this sort of procedure in action you can run the WCSEXERCISE
-script:
-change to an empty directory and issue the command ``\text{wcsexercise}''.
-You should delete any files produced by this script.
+To see this sort of procedure in action you can run the
+demonstration script
+\hyperref{{\tt wcsexercise}}{{\tt wcsexercise} described in \S}{}{demos}.
 
 
 
@@ -12094,7 +12112,7 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          outline in=a$*$ noclear nopenrot style={\tt "}colour=2{\tt "} 
-                 label=$\backslash$!
+                 label=!
       }{
          All the images beginning with `a{\tt '} will be outlined in colour 2,
          with no text labels or indication of the origin.
@@ -12304,18 +12322,6 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          [1280]
       }
       \sstsubsection{
-         NAMELIST = LITERAL (Read)
-      } {
-         The name of a file to contain the names of the output
-         position lists. The names written to this file are those
-         generated using the expression given to the OUTLIST parameter.
-         This file may be used in an indirection expression to input
-         all the position lists output from this routine into another
-         routine, if the associating position lists with images option is
-         not being used.
-         [PAIRNDF.LIS]
-      }
-      \sstsubsection{
          OUTLIST = LITERAL (Read)
       } {
          An expression which is either a list of names or expands to a
@@ -12351,6 +12357,22 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
          recommended that wildcards are also used for the position list
          names as the correspondence between these may be confusing.
          [$*$.DAT]
+      }
+      \sstsubsection{
+         OVERRIDE = \_LOGICAL (Read)
+      } {
+         This parameter controls whether to continue and create an
+         incomplete solution. Such solutions will result when only a
+         subset of the input position lists have been paired.
+
+         In this case, any images for which matching was not 
+         achieved will have their associated position lists removed
+         from their .MORE.CCDPACK extensions.  Thus after running 
+         \routine{PAIRNDF} with OVERRIDE set to TRUE, any position list associated
+         with an image is guaranteed to be one which has been matched, and 
+         not just one left over from the previously associated unmatched 
+         list.
+         [TRUE]
       }
       \sstsubsection{
          PERCENTILES( 2 ) = \_DOUBLE (Read)
@@ -16609,7 +16631,7 @@ This is a major update to CCDPACK.
   for use with the IMPORT task.
 \end{itemize}
 
-\subsection{This release 3.2-0}
+\subsection{This release 3.2-1}
 
   This is a minor update of CCDPACK, but provides greatly
   improved facilities for interactive registration:
