@@ -1,0 +1,150 @@
+#!/bin/csh 
+
+# Script to run scuquick on an observation, display and overlay array
+#   Tim Jenness (1997-06-19)
+
+# The prologue is at the end.
+
+# 1 Argument required: the demodulated data file
+
+# Start up Starlink just in case
+
+source /star/etc/login
+source /star/etc/cshrc
+
+# Switch off messages
+alias echo "echo > /dev/null"
+
+# First start up kappa
+kappa
+
+# Second start up surf
+
+surf
+
+# Unalias
+
+unalias echo
+
+# Set the output filename to something non-obvious that can be deleted
+
+set out = "scupa"
+
+# Ask for the input filename if necessary
+
+if ($#argv == 0) then
+   echo -n "Input data set > "
+   set in = $<
+else
+   set in = $1
+endif
+
+# Find out which sub-instrument we are talking about
+
+if (-e ${in}.sdf) then
+  set sub = `fitslist $in | grep SUB_1 | awk -F\' '{print $2}'`
+else if (-e $DATADIR/${in}.sdf) then
+  set sub = `fitslist $DATADIR/$in | grep SUB_1 | awk -F\' '{print $2}'`
+else
+  echo File not found in current directory or in DATADIR
+  exit
+endif
+
+# Run scuquick so that
+#   - no questions asked
+#   - AzEl regrid
+#   - no tau
+
+echo "Running data through SURF tasks..."
+
+scuquick -quick -notau -rebin -quiet --sub=$sub MSG_FILTER=quiet OUT_COORDS=AZ OUT=$out $in 
+
+# Now I have an output file which contains the subinstrument name!
+
+set smallsub = `echo $sub | cut -c -3 | tr 'A-Z' 'a-z'`
+
+set file = "${out}_reb_$smallsub"
+
+# Now display the file
+
+if (-e ${file}.sdf) then
+
+   echo "Data reduction complete. Now displaying..."
+
+   display axes clear $file device=xwindows accept
+
+# And overlay the bolometer names
+
+   scuover msg_filter=quiet device=xwindows name
+endif
+
+# Remove some of the intermediate files if necessary
+
+if (-e ${out}.sdf) \rm ${out}.sdf
+if (-e ${out}_flat.sdf) \rm ${out}_flat.sdf
+if (-e ${out}_ext_${smallsub}.sdf) \rm ${out}_ext_${smallsub}.sdf
+if (-e ${file}.sdf) \rm ${file}.sdf
+
+# and maybe even remove some photometry files
+
+if (-e ${out}_pht_${smallsub}.sdf) \rm ${out}_pht_${smallsub}.sdf
+if (-e ${out}_pht_${smallsub}.dat) \rm ${out}_pht_${smallsub}.dat
+
+exit
+
+# Prologue goes here until SST can use # as comments
+
+*+
+*  Name:
+*    SCUPA
+*
+*  Purpose:
+*    Show position angle of array
+*
+*  Type of Module:
+*    C-shell script
+*
+*  Usage:
+*    scupa [NDF]
+*
+*  Description:
+*    This script reduces the specified demodulated data file, displays
+*    the image using Az/El coordinates, and overlays the array in order to
+*    show the position angle of the array during the observation.
+*
+*  ADAM Parameters:
+*    NDF = NDF (Read)
+*       Name of raw data file. Can be located in $DATADIR. The filename
+*       will be requested if not specified on the command line.
+*
+*  Examples:
+*    scupa 19970623_dem_0012
+*       Reduce the data with scuquick, displays the image and overlays the
+*       array using SCUOVER.
+*
+*  Notes:
+*    Only JIGGLE/MAP, POINTING and PHOTOM observations can be used.
+*
+*  Related Applications:
+*    SURF: SCUQUICK, SCUOVER;
+*    KAPPA: DISPLAY
+*
+*  Implementation Status:
+*    - Requires KAPPA.
+*    - All files created by this task are removed.
+*
+*  Authors:
+*    Tim Jenness (JACH)
+*    {enter_new_authors_here}
+*
+*  History:
+*    1997 June 19 (TIMJ):
+*       Original version
+*     {enter_further_changes_here}
+*
+*  Bugs:
+*     {note_any_bugs_here}
+*
+*-
+
+
