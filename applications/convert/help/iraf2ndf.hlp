@@ -49,13 +49,15 @@ The rules for the conversion are as follows:
 header file) becomes the NDF title.  Likewise headers OBJECT and
 BUNIT become the NDF label and units respectively.
 
+-  The pixel origin is set if any LBOUNDn headers are present.
+
 -  Lines from the IRAF image header file may be transferred to
 the FITS extension of the NDF, when PROFITS=TRUE.  Any
 compulsory FITS keywords that are missing are added.  Certain
 other keywords are not propagated.  These are the IRAF "Mini
 World Coordinate System" (MWCS) keywords WCSDIM, DC_FLAG,
 WATd_nnn (d is dimension, nnn is the line number).  Certain
-NDF-style HISTORY lines in the header may also be ignored when
+NDF-style HISTORY lines in the header are also be ignored when
 PROHIS=TRUE (see two notes below).
 
 -  When PROFITS=TRUE, lines from the HISTORY section of the IRAF
@@ -131,6 +133,8 @@ RAHM: Rhys Morris (STARLINK, University of Wales, Cardiff)
 GJP: Grant Privett (STARLINK, University of Wales, Cardiff)
 
 MJC: Malcolm J. Currie (STARLINK)
+
+AJC: Alan Chipperfield (STARLINK)
 2 History
  20-SEP-1992 (RAHM):
     Original version.
@@ -176,11 +180,23 @@ MJC: Malcolm J. Currie (STARLINK)
     Added PROFITS and PROHIS facilities.  Now propagates axis
     information, and the NDF label and units.  Expanded and
     corrected the documentation, including a second example.
-    Improved the code structure.
+    Improved the code structure.  Removed the conversion of the
+    IRAF filename to lowercase.
 
  1997 September 25 (MJC):
     Protect against case where PROFITS=TRUE but there are no
     headers.
+
+ 13-NOV-1997 (AJC):
+    Set bounds of NDF according to LBOUNDn keywords if any.
+    Correct number of arguments to CON_CI2DW/CI2DR.
+
+ 1997 November 17 (MJC):
+    No longer attempts to close the IRAF file if the open-file
+    subroutine fails.  IMCLOS crashes otherwise.  Propagates all
+    IRAF history records (including blanks) to the FITS airlock
+    when PROFITS=TRUE.  IRAF HISTORY lines which are too long for
+    a FITS header are truncated with an ellipsis.
 2 Implementation_Status
    -  Only handles one-, two-, and three-dimensional IRAF files.
 
