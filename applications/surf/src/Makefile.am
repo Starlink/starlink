@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 noinst_LTLIBRARIES = libsurf.la
+dist_noinst_HEADERS = $(PRIVATE_INCLUDES)
 
 libsurf_la_SOURCES = $(F_ROUTINES)
 
