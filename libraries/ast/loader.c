@@ -47,6 +47,8 @@
 *        Added the IntraMap class.
 *     3-JUN-1999 (RFWS):
 *        Added the PcdMap class.
+*     17-AUG-1999 (RFWS):
+*        Added the MathMap class.
 *-
 */
 
