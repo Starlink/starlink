@@ -628,8 +628,12 @@ __END__
 
 =head1 SEE ALSO
 
-Starlink User Note 92 (SSN/92).
+Starlink User Note 92 (SUN/92).
 L<NDF>
+
+=head1 TODO
+
+Still need to add RENOBJ (renaming) and SETOBJ (setting values).
 
 =head1 REVISION
 
@@ -641,7 +645,7 @@ Tim Jenness (t.jenness@jach.hawaii.edu)
 
 =head1 COPYRIGHT
 
-Copyright (C) Particle Physics and Astronomy Research Council.
+Copyright (C) 1999-2001,2003 Particle Physics and Astronomy Research Council.
 All Rights Reserved.
 
 =cut
