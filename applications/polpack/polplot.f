@@ -726,9 +726,13 @@
                CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z, 
      :                          NVAL, STATUS )
 
-*  Use the third Mapping to transform the current Frame Z value into a
+*  Use any third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-               CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+               IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+                  CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+               ELSE
+                  Z = AST__BAD
+               END IF
 
 *  If the result was undefined, we need to get the Z value again, this
 *  time in the base Frame.
@@ -771,8 +775,12 @@
          IAT = IAT + 1
          CALL CHR_PUTR( ZUSE, ZBTEXT, IAT )
 
-         CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
-     :                   STATUS )
+         IF( MAPS( 3 ) .NE. AST__NULL ) THEN 
+            CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
+     :                      STATUS )
+         ELSE
+            Z = AST__BAD
+         END IF
 
          ZCTEXT = ' '
          IAT = 0

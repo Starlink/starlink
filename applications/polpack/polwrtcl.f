@@ -187,6 +187,8 @@
       INTEGER ITEMP              ! Temporary storage
       INTEGER IWCS               ! The WCS FrameSet from the input catalogue
       INTEGER MAP                ! AST Mapping used to create new RA/DEC values
+      INTEGER NAXB               ! No. of base frame axes
+      INTEGER NAXC               ! No. of current frame axes
       INTEGER NCIN               ! No. of columns in input catalogue
       INTEGER NCOL               ! No. of columns in output catalogue
       INTEGER NDIM               ! No. of dimensions in WCS Base Frame
@@ -350,13 +352,29 @@
       END IF
       CALL POL1_GTCTA( CI, NDIM, GA, IWCS, STATUS )
 
+*  Get the number of axes in the base and current Frames.
+      NAXB = AST_GETI( IWCS, 'NIN', STATUS )
+      NAXC = AST_GETI( IWCS, 'NOUT', STATUS )
+
 *  If a Z column is present, get the units strings from the 3rd axis in
 *  both base and current Frames.
       IF( ZCOL .GT. 0 ) THEN
-         ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, STATUS ),
-     :                      'UNIT(3)', STATUS )
-         ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
-     :                      'UNIT(3)', STATUS )
+
+         IF( NAXC .GT. 2 ) THEN 
+            ZAUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__CURRENT, 
+     :                                       STATUS ),
+     :                         'UNIT(3)', STATUS )
+         ELSE
+            ZAUNIT = ""
+         END IF
+
+         IF( NAXB .GT. 2 ) THEN 
+            ZCUNIT = AST_GETC( AST_GETFRAME( IWCS, AST__BASE, STATUS ),
+     :                         'UNIT(3)', STATUS )
+         ELSE
+            ZCUNIT = ""
+         END IF
+
       END IF
 
 *  Assume for the moment that the output catalogue will contain RA/DEC
