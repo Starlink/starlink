@@ -1,4 +1,5 @@
 	-- custom CATALOG to link versionless pub-id in
 	   starlink-everything.dtd to a DTD file --
 
-PUBLIC "-//Starlink//DTD Starlink General//EN"		../../dtd/starlink-0.6.dtd
+PUBLIC "-//Starlink//DTD Starlink General//EN"		../../dtd/starlink-0.7.dtd
+PUBLIC "-//W3C//DTD XSLT 1.0//EN" "/home/norman/s/src/sgml/w/sgml/dtd/xslt.dtd"
