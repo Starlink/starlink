@@ -147,7 +147,7 @@ void fillImageInfo(
 void rtdSleep(rtdIMAGE_EVT_HNDL& eventHndl, int msec)
 {
     struct timeval time;
-    struct fd_set readMask;
+    fd_set readMask;
     FD_ZERO(&readMask);
     FD_SET(eventHndl.socket, &readMask);
 
