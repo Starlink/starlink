@@ -76,14 +76,16 @@ the section title.
 <returnvalue type=sosofo>The section's title, including numbering if any
 <codebody>
 (define ($html-section-title$)
-  (let ((id (attribute-string (normalize "id") (current-node))))
+  (let (;(id (attribute-string (normalize "id") (current-node)))
+	(id (href-to (current-node) frag-only: #t))
+	)
     (make sequence
       (make element
-	gi: (string-append "H" (number->string (sectlevel)))
+	gi: (string-append "h" (number->string (sectlevel)))
 	(if id
 	    (make element
-	      gi: "A"
-	      attributes: (list (list "name" (string-append "xref_" id)))
+	      gi: "a"
+	      attributes: (list (list "name" id))
 	      (with-mode section-reference
 		(process-node-list (current-node))))
 	    (with-mode section-reference
