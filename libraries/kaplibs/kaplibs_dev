@@ -51,7 +51,7 @@ foreach name ( \
    if ( $1 == "" ) then
       ln -s $include/$name `echo $name | tr '[a-z]' '[A-Z]'`
    else if ( $1 == "remove" ) then
-      rm `echo $name | tr '[a-z]' '[A-Z]'`
+      rm -f `echo $name | tr '[a-z]' '[A-Z]'`
    else
       echo "${0}: Invalid argument"
       break
