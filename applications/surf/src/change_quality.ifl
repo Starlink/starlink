@@ -28,6 +28,8 @@
 #        Add USE_SECTION parameter
 #     1997 May 29 (TIMJ)
 #	 Add SECTION
+#     1997 June 19 (TIMJ)
+#        Remove USE_SECTION
 #     {enter_further_changes_here}
  
 #-
@@ -35,7 +37,7 @@
 
    INTERFACE CHANGE_QUALITY
 
-      HELPLIB 'SCUBA_HELP:'
+      HELPLIB 'SURF_HELP:'
 
       PARAMETER BAD_QUALITY
 	 POSITION 2
@@ -66,17 +68,10 @@
          TYPE '_CHAR'
          ACCESS 'READ'
          VPATH 'PROMPT'
+	 PPATH 'Current'
          PROMPT 'Please enter a section (including {})'
          HELPKEY '*'
       ENDPARAMETER
-
-      PARAMETER USE_SECTION
-        TYPE '_LOGICAL'
-        PROMPT 'Change this section (else change everything else)'
-        DEFAULT 'yes'
-        HELPKEY  '*'
-      ENDPARAMETER
-
 
    ENDINTERFACE
 
