@@ -2751,6 +2751,36 @@ if ( starversion('prog') lt v0.15.2 ) {
 \end{verbatim}
 \end{myquote}
 
+\item[starversion\_le] \mbox{}
+
+Test whether the version of the installed package is less than 
+or equal to a supplied version number. In other words, whether the installed
+package is newer than or same as the requested version.
+
+\begin{myquote}
+\begin{verbatim}
+if ( starversion_le('kappa', '0.15-2' ) {
+  ...
+}
+\end{verbatim}
+\end{myquote}
+
+The version string format is described in the description of
+\texttt{starversion\_cmp}
+
+
+
+In \perl\ 5.6.0 this command can be implemented directly using a 
+string literal:
+
+\begin{myquote}
+\begin{verbatim}
+if ( starversion('prog') le v0.15.2 ) {
+  ...
+}
+\end{verbatim}
+\end{myquote}
+
 \item[starversion\_eq] \mbox{}
 
 Test whether the version of the installed package is equal to a supplied
@@ -2805,6 +2835,36 @@ string literal:
 \begin{myquote}
 \begin{verbatim}
 if ( starversion('prog') gt v0.15.2 ) {
+  ...
+}
+\end{verbatim}
+\end{myquote}
+
+\item[starversion\_ge] \mbox{}
+
+Test whether the version of the installed package is greater than 
+or equal to a supplied version number. In other words, whether the installed
+package is newer than or same as the requested version.
+
+\begin{myquote}
+\begin{verbatim}
+if ( starversion_ge('kappa', '0.15-2' ) {
+  ...
+}
+\end{verbatim}
+\end{myquote}
+
+The version string format is described in the description of
+\texttt{starversion\_cmp}
+
+
+
+In \perl\ 5.6.0 this command can be implemented directly using a 
+string literal:
+
+\begin{myquote}
+\begin{verbatim}
+if ( starversion('prog') ge v0.15.2 ) {
   ...
 }
 \end{verbatim}
