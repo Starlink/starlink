@@ -2408,11 +2408,6 @@ directory in which POLKA stores intermediate files is attached to a remote
 computer. Try changing the directory to one on your local disk by setting
 the HDS\_SCRATCH environment variable before running POLKA.
 
-\item [``Odd messages appear when I run POLKA from ICL''] - When POLKA is
-run from ICL, you may get messages on start-up and exit about errors
-reading from sockets. These are currently being investigated, but appear
-not to prevent POLKA functioning correctly.
-
 \item [``No browser appears when I try to use hypertext help in POLKA''] -
 The scheme used to activate the hypertext browser may not work for all
 combinations of browsers and operating systems. You may be able to get
@@ -5956,6 +5951,9 @@ single-beam data.
 \item \htmlref{POLKA}{POLKA} will now allow rotation between images in
 single-beam mode.
 
+\item POLPACK (including \htmlref{POLKA}{POLKA}) may now be used from the
+ICL command language.
+
 \item The NEWCOLMAP parameter has been removed from \htmlref{POLKA}{POLKA}.
 POLKA will now use a private colour map automatically when necessary.
 
@@ -6008,11 +6006,6 @@ POLEXT from being able to change an IMGID value.
 
 \item Specifying the keyword STARTHELP when starting \htmlref{POLKA}{POLKA} 
 no longer requires POLKA to use a private colour map.
-
-\item \htmlref{POLKA}{POLKA} has been re-implemented so that the Tcl script
-which creates the GUI is executed in a different process to the POLKA
-A-task. This enables POLPACK to be run succesfully as a monolith, from
-the ICL or IRAF cl command languages for instance.
 
 \item A bug in \htmlref{POLKA}{POLKA} has been fixed which resulted in a
 Tcl error being reported when Saving or Exiting if any of the image names 
