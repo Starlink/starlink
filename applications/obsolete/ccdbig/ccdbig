@@ -63,24 +63,27 @@
             set keepard = TRUE
 
       # Do we want to use a bias frame? (TRUE or FALSE)?
-      # (else just interpolate)
+      # (else interpolate between bias strips)
             set biasframe = TRUE
 
       # Do we want to normalize the frames for scale and zero factors?
             set normalise = TRUE
 
-      # Set data type (_REAL, _WORD, _DOUBLE are sensible)
+      # Data type (_REAL, _WORD, _DOUBLE are sensible)
             set datatype = _REAL
 
-      # Set list of image sizes of frames (pixels along a side)
+      # List of image sizes for frames (pixels along a side)
             set image_sizes = ( 1000 2000 3000 4000 )
 
-      # Set list of object densities (objects per million pixels).
+      # List of object densities (objects per million pixels).
       # If this is set to ( 0 ) then min_objects will always be used.
             set object_densities = ( 50 )
 
-      # Set minimum number of objects per frame (can override object_densities)
+      # Minimum number of objects per frame (can override object_densities)
             set min_objects = 300
+
+      # Graphic display device ("xwindows" is GWM window, "NONE" is none)
+            set device = NONE
 
       # Set logging interval (seconds)
             set interval = 15
@@ -141,17 +144,6 @@
       if ( ! -e ccdbig_obj.dat ) then
         echo "Can't find file of objects ccdbig_obj.dat - aborting"
         goto EXIT
-      endif
-
-#  Does the user want to see image display activity?
-      echo -n "DISPLAY - Display device (! for none) > "
-      set device = $<
-      if ( "$device" == "$abort" || "$device" == "" ) then
-         goto EXIT
-      else
-         if ( "$device" == "$null" ) then
-            set device = "NONE"
-         endif
       endif
 
 #  Set up graphics device if necessary
