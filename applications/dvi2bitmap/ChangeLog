@@ -1,14 +1,20 @@
 2003-09-30  Norman Gray  <norman@astro.gla.ac.uk>
 
 	* Bitmap.cc, Bitmap.h : Added support for marks in bitmaps,
-	settable by Bitmap::mark() and retrievable by getMark()
+	settable by Bitmap::mark() and retrievable by getMark().
 
 	* dvi2bitmap.cc: add `mark' special, to use new functionality in
-	Bitmap.cc
+	Bitmap.cc.
 
 	* DviFile.cc, DviFile.h, dvi2bitmap.cc, dvireport.cc: Added
 	DviFileEvent::release method to release events, instead of using
 	`delete'.  Documented that this is correct practice.
+
+	* DviFile.cc: initialised resolution_ in constructor (how did I
+	get away without this for so long?)
+
+	* InputByteStream.cc (read_buf_): reread input when the read fails
+	due to an interrupted system call.
 
 	* all: released version 0.12b1
 
