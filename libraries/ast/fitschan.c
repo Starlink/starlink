@@ -426,8 +426,10 @@ static int current_indent;
 /* Text values used to represent Encoding values externally. */
 static const char *xencod[3] = { NATIVE_STRING, FITSWCS_STRING, DSS_STRING };
 
+#if 0
 /* Text values used to represent CDMatrix values externally. */
 static const char *xcdmat[3] = { "PCiiijjj", "CDiiijjj", "CDi_j" };
+#endif
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -497,7 +499,9 @@ static int EncodeFloat( char *, int, int, int, double );
 static int EncodeValue( AstFitsChan *, char *, int, int, const char * );
 static int KeyFields( AstFitsChan *, const char *, int, int *, int * );
 static int FindKeyCard( AstFitsChan *, const char *, const char *, const char * );
+#if FUNNY
 static int FindSkyAxes( AstFrame *, AstSkyFrame **, int *, int *);
+#endif
 static int FitsEof( AstFitsChan * );
 static int FitsGetCF( AstFitsChan *, const char *, double * );
 static int FitsGetCI( AstFitsChan *, const char *, int * );
@@ -533,13 +537,17 @@ static int WcsPrimary( AstFitsChan *, FitsStore * );
 static int WcsSecondary( AstFitsChan *, FitsStore * );
 static int WcsValues( AstFitsChan *, AstFrameSet *, int, int, int, int, FitsStore * );
 static int WcsWithWcs( AstFitsChan *, AstMapping *, AstMapping *, AstMapping *, AstFrame *, int, int, FitsStore * );
+#if FUNNY
 static int WrdSplit( const char *, int, const char *, int, const char *[], int [] );
+#endif
 static int Write( AstChannel *, AstObject * );
 static int WriteDSS( AstChannel *, AstObject * );
 static int WriteWcs( AstChannel *, AstObject * );
 static int astSplit_( const char *, char **, char **, char **, const char *, const char * );
 static void *CardData( AstFitsChan *, size_t * );
+#if FUNNY
 static void CheckFitsCard( int, const char *, const char *, const char * );
+#endif
 static void CheckZero( char *, double );
 static void CleanFits( FitsStore * );
 static void ClearAttrib( AstObject *, const char * );
@@ -868,6 +876,7 @@ static int CardType( AstFitsChan *this ){
 
 }
 
+#if FUNNY
 static void CheckFitsCard( int nc, const char *card, const char *method, 
                            const char *class ){
 /*
@@ -1075,6 +1084,7 @@ static void CheckFitsCard( int nc, const char *card, const char *method,
                 "header card:\n%s\n", method, class, card );
    }
 }
+#endif
 
 static int CheckFitsName( const char *name, const char *method, 
                           const char *class ){
@@ -1423,9 +1433,7 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Local Variables: */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
-   int idesc;                    /* WCS axis description index */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -1508,9 +1516,6 @@ static void ClearCard( AstFitsChan *this ){
 *     -  This function attempts to execute even if an error has occurred.
 *-
 */
-
-/* Local Variables: */
-   FitsCard *card;
 
 /* Check the supplied FitsChan. If its is empty, return. */
    if ( !this || !(this->head) ) return;
@@ -1711,7 +1716,6 @@ static int CnvType( int otype, void *odata, int osize, int type,
    static char text[ FITSCARDLEN + 1 ]; /* Buffer for returned text string */
    static char text0[ FITSCARDLEN + 1 ]; /* Buffer for real value */
    static char text1[ FITSCARDLEN + 1 ]; /* Buffer for imaginary value */
-   char *add;
 
 /* Check the global error status, and the supplied buffer. */
    if ( !astOK || !buff ) return 0; 
@@ -3202,11 +3206,11 @@ static int EncodeFloat( char *buf, int digits, int width, int maxwidth,
 
 /* If the formatted value includes an exponent, it will have 2 digits.
    If the exponent includes a leading zero, remove it. */
-      if( w = strstr( buf, "E-0" ) ) {
+      if( ( w = strstr( buf, "E-0" ) ) ) {
          w += 2;
-      } else if( w = strstr( buf, "E+0" ) ){
+      } else if( ( w = strstr( buf, "E+0" ) ) ){
          w += 2;
-      } else if( w = strstr( buf, "E0" ) ){
+      } else if( ( w = strstr( buf, "E0" ) ) ){
          w += 1;
       } 
 
@@ -4283,6 +4287,7 @@ static int FindKeyCard( AstFitsChan *this, const char *name,
 
 }
 
+#if FUNNY
 static int FindSkyAxes( AstFrame *frame, AstSkyFrame **sframe,
                         int *axlon, int *axlat ){
 /*
@@ -4428,6 +4433,7 @@ static int FindSkyAxes( AstFrame *frame, AstSkyFrame **sframe,
    return ret;
 
 }
+#endif
 
 static const char *FindWcs( AstFitsChan *this ){
 /*
@@ -4472,7 +4478,6 @@ static const char *FindWcs( AstFitsChan *this ){
    const char *class;       /* Pointer to string holding class of object */
    const char *method;      /* Pointer to string holding calling method name */
    const char *keyname;     /* Keyword name from current card */
-   const char *lastkey;     /* Last keyword name in the FitsChan */
    const char *ret;         /* Pointer to the last WCS keyword name */
    int icard;               /* Index of original current card */
    int nfld;                /* Number of fields in keyword template */
@@ -4707,11 +4712,8 @@ static int FitsGet##code( AstFitsChan *this, const char *name, ctype value ){ \
    char *lcom;            /* Supplied keyword comment */ \
    char *lname;           /* Supplied keyword name */ \
    char *lvalue;          /* Supplied keyword value */ \
-   char *psval;           /* Pointer to string copy */ \
-   int el;                /* Element index */ \
    int ret;               /* The returned value */ \
    size_t sz;                /* Data size */ \
-   static char sval[ FITSCARDLEN + 1 ]; /* Static text buffer */ \
 \
 /* Check the global error status. */ \
    if ( !astOK ) return 0; \
@@ -5555,10 +5557,8 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    const char *result;           /* Pointer value to return */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
-   int idesc;                    /* WCS axis description index */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
 
 /* Initialise. */
    result = NULL;
@@ -6326,7 +6326,6 @@ static void GetNextData( AstChannel *this_channel, int skip, char **name,
    int done;                     /* Data item found? */
    int i;                        /* Loop counter for keyword characters */
    int len;                      /* Length of current keyword */
-   int moved;                    /* Number of cards actually moved */
    int nc;                       /* Number of characters read by "sscanf" */
    int old_skipping;             /* Original value of external variable Skipping */
    int type;                     /* Data type code */
@@ -9200,7 +9199,6 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Local Variables: */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    const char *class;            /* Object class */
-   int idesc;                    /* WCS axis description index */
    int ival;                     /* Integer attribute value */
    int len;                      /* Length of setting string */
    int nc;                       /* Number of characters read by sscanf */
@@ -9641,7 +9639,6 @@ static int SkySys( int prim, AstFrame *skyfrm, int wcstype, FitsStore *store,
    const char *sys;         /* Celestal coordinate system */
    double ep;               /* Epoch of observation */
    double eq;               /* Epoch of reference equinox */
-   int i;                   /* Loop count */
    int isys;                /* Celestial coordinate system */
    int radecsys;            /* RA/DEC reference frame */
    int ret;                 /* Returned flag */
@@ -9839,7 +9836,6 @@ int astSplit_( const char *card, char **name, char **value,
    const char *v0;            /* Pointer to first non-blank value character */
    double fi, fr;             /* Values read from value string */
    int blank_name;            /* Is keyword name blank? */
-   int cmplx;                 /* Is the data type complex? */
    int i;                     /* Character index */
    int ii, ir;                /* Values read from value string */
    int iopt;                  /* Index of option within list */
@@ -10552,14 +10548,12 @@ static int StoreFits( AstFitsChan *this, int rep, int naxis, int *ialt,
    double keyval;         /* Keyword value */
    int cd;                /* Was a CD matrix supplied? */
    int cdeltrep;          /* Should absence of CDELT be reported? */
-   int dd, mm, yy;        /* Day, month & year from DATE-OBS */
    int eq_j;              /* Was Julian value specified by string EQUINOX? */
    int eq_type;           /* Type of equinox keyword */
    int hi[ 2 ];           /* Largest field values */
    int iaxis;             /* Axis index */
    int idesc;             /* Description index */
    int iprj;              /* Projection parameter index */
-   int j;                 /* SLALIB status */
    int jaxis;             /* Pixel axis index */
    int keylen;            /* Length of keyword name string */
    int lo[ 2 ];           /* Smallest field values */
@@ -11334,9 +11328,7 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
    int result;                   /* Result value to return */
-   int idesc;                    /* WCS axis description index */
    int len;                      /* Length of attrib string */
-   int nc;                       /* No. characters read by sscanf */
 
 /* Initialise. */
    result = 0;
@@ -11934,13 +11926,9 @@ static AstFrame *WcsFrame( FitsStore *store, const char *method,
    AstFrame *phyframe;            /* Non-celestial coords Frame */
    AstFrame *ret;                 /* Returned Frame */
    AstSkyFrame *skyframe;         /* Celestial coordinates Frame */
-   char *c;                       /* Pointer to start of next string */
-   char text[ 60 ];               /* Axis label text */
-   const char *ctype;             /* 4-char. description of projection */
    int *perm;                     /* Permuted axis indices */
    int axis;                      /* Axis index */
    int celsys;                    /* Celestial coordinate system type */
-   int ctype_len;                 /* Length of "ctype" string. */
    int inon;                      /* Index of next non-celestial axis */
    int noncel;                    /* Number of non-celestial axes */
    int naxis;                     /* No. of axes */
@@ -12280,9 +12268,7 @@ static AstMatrixMap *WcsMatrix( FitsStore *store, const char *method,
 */
 
 /* Local Variables: */
-   AstMatrixMap *delmat;    /* MatrixMap holding pixel sizes */
    AstMatrixMap *new;       /* The created MatrixMap */
-   AstMatrixMap *temp;      /* Pointer to a MatrixMap */
    double *dvals;           /* Pointer to pixel size array */
    double *mat;             /* Pointer to matrix rotation array */
    double *pc;              /* Pointer to next pc value */
@@ -13017,9 +13003,7 @@ static AstWinMap *WcsAddRef( FitsStore *store, int *outperm ){
 */
 
 /* Local Variables: */
-   AstPointSet *arg;               /* PointSet holding CRVAL values */
    AstWinMap *new;                 /* The created WinMap */
-   double **point;                 /* Pointer to arrays holding CRVAL values */
    int i;                          /* Axis index */
    double *c1_in;                  /* Input corner 1 */
    double *c2_in;                  /* Input corner 1 */
@@ -13164,7 +13148,6 @@ static int WcsNoWcs( AstFitsChan *this, AstMapping *map, AstFrame *phyfrm,
    double maxerr;           /* Max. allowed squared distance between positions */
    double pcval;            /* An element of the PC matrix. */
    double s2;               /* Sum of squared values */
-   int dineg;               /* Was the diagonal matrix element negative? */
    int i,j;                 /* Loop counts */
    int ok;                  /* Can the PC matrix be used? */
    int ret;                 /* Can the Mapping be described by FITS-WCS? */
@@ -13621,8 +13604,12 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store ){
 
 /* Format the keyword name and comment. */
             sprintf( keyname, fmt, i + 1, j + 1 );
-            sprintf( comment, "Axis rotation and scaling matrix",
+#ifdef FUNNY
+           sprintf( comment, "Axis rotation and scaling matrix",
                      i + 1, j + 1 );
+#else
+           sprintf( comment, "Axis rotation and scaling matrix" );
+#endif
 
 /* Get the CD element value, replacing missing PC values with their 
    defaults (1.0 for diagonal elements, 0.0 for others). */
@@ -13648,7 +13635,11 @@ static int WcsPrimary( AstFitsChan *this, FitsStore *store ){
          for( i = 0; i < store->naxis; i++ ){
             for( j = 0; j < store->naxis; j++ ){
                sprintf( keyname, "PC%.3d%.3d", i + 1, j + 1 );
+#ifdef FUNNY
                sprintf( comment, "Axis rotation matrix", i + 1, j + 1 );
+#else
+               sprintf( comment, "Axis rotation matrix" );
+#endif
                SetValue( this, keyname, (void *) (pc++), AST__FLOAT, comment );
             }
          }
@@ -13790,14 +13781,10 @@ static int WcsValues( AstFitsChan *this, AstFrameSet *fset, int ipixfrm,
 
 /* Local Variables: */
    AstFrame *phyfrm;        /* Physical coordinate Frame */
-   AstSkyFrame *skyfrm;     /* Celestial coordinate Frame */
    AstMapping *map;         /* Mapping from pixel to abs. physical coords */
    AstMapping *map1;        /* Mapping from pixel to rel. physical coords */
    AstMapping *map2;        /* Mapping from rel. physical to Nat. Sph. coords */
    AstMapping *map3;        /* Mapping from Nat. Sph. to abs. physical coords */
-   int axlat;               /* Index of latitude axis */
-   int axlon;               /* Index of longitude axis */
-   int cel;                 /* Is there a SkyFrame? */
    int ret;                 /* The returned flag */
    void *card;              /* Pointer to initial current card */
 
@@ -14253,9 +14240,7 @@ static AstWinMap *WcsShift( FitsStore *store ){
 */
 
 /* Local Variables: */
-   AstPointSet *arg;               /* PointSet holding CRPIX values */
    AstWinMap *new;                 /* The created WinMap */
-   double **point;                 /* Pointer to arrays holding CRPIX values */
    int i;                          /* Axis index */
    double *c1_in;                  /* Input corner 1 */
    double *c2_in;                  /* Input corner 1 */
@@ -14642,6 +14627,7 @@ static int WcsWithWcs( AstFitsChan *this, AstMapping *map1, AstMapping *map2,
 
 }
 
+#if FUNNY
 static int WrdSplit( const char *text, int n, const char *delim, int maxwrd, 
                      const char *pnt[], int nc[] ){
 /*
@@ -14763,6 +14749,7 @@ static int WrdSplit( const char *text, int n, const char *delim, int maxwrd,
    return nwrd;
 
 }
+#endif
 
 static int Write( AstChannel *this_channel, AstObject *object ) {
 /*
@@ -15776,7 +15763,6 @@ static int WriteDSS( AstChannel *this_channel, AstObject *object ) {
    char buffer[ FITSCARDLEN + 1 ]; /* A buffer for the keyword value */
    char card[ FITSCARDLEN + 1 ]; /* The current card */
    const char *class;            /* Pointer to class string */
-   const char *lkey;             /* Pointer to the last mandatory keyword name */
    const char *system;           /* The coordinate system in the current Frame */
    double ep;                    /* Epoch from current Frame */
    double eq;                    /* Equinox from current Frame */
@@ -16736,11 +16722,9 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 /* Local Variables: */
    const char *class;            /* Object class */
    AstFitsChan *this;            /* Pointer to the FitsChan structure */
-   FitsCard *card;               /* Pointer to next FitsCard structure */
    char buff[ KEY_LEN + 1 ];     /* Buffer for keyword string */
    int ncard;                    /* No. of cards dumped so far */
    int icard;                    /* Index of current card */
-   int idesc;                    /* WCS axis description index */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
    int type;                     /* Keyword data type */
@@ -17520,7 +17504,6 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
 
 /* Local Variables: */
    AstFitsChan *new;              /* Pointer to new FitsChan */
-   int idesc;                     /* WCS axis description index */
 
 /* Check the global status. */
    if ( !astOK ) return NULL;
@@ -17659,7 +17642,6 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
    char *text;                  /* Textual version of integer value */
    char buff[ KEY_LEN + 1 ];    /* Buffer for keyword string */
    double dval[2];              /* Double precision data values */
-   int idesc;                   /* WCS axis description index */
    int ival[2];                 /* Integer data values */
    int ncard;                   /* No. of FitsCards read so far */
    int del;                     /* Keyword deletion flag */

@@ -1059,7 +1059,6 @@ static char *GetNextText( AstChannel *this ) {
 /* Local Variables: */
    char *line;                   /* Pointer to line data to be returned */
    int c;                        /* Input character */
-   int i;                        /* Loop counter for line characters */
    int len;                      /* Length of input line */
    int readstat;                 /* "errno" value set by "getchar" */
    int size;                     /* Size of allocated memory */
@@ -1496,7 +1495,7 @@ static char *InputTextItem( AstChannel *this ) {
 
 /* Note the first non-space character and ignore everything before
    it. */
-         if ( nonspace = nonspace || !isspace( line[ i ] ) ) {
+         if ( ( nonspace = nonspace || !isspace( line[ i ] ) ) ) {
 
 /* Move each character to its new position in the string. */
             line[ j++ ] = line[ i ];
@@ -1592,7 +1591,7 @@ static Value *LookupValue( const char *name ) {
 
 /* Obtain the head of list pointer itself and check the list is not
    empty. */
-      if ( value = *head ) {
+      if ( ( value = *head ) ) {
 
 /* Loop to inspect each list element. */
          while ( 1 ) {
