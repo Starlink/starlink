@@ -182,6 +182,13 @@ AC_SUBST(STAR_MESSGEN_SOURCES)
 STAR_DOCUMENTATION=
 AC_SUBST([STAR_DOCUMENTATION])
 
+# Extra files to be distributed.  This is for files added to the
+# distribution list by starconf; files which the user wishes to add 
+# should be specified in the usual way, through the automake
+# EXTRA_DIST variable.
+STAR_EXTRA_DIST=
+AC_SUBST(STAR_EXTRA_DIST)
+
 # Create a PACKAGE_VERSION_INTEGER variable, which contains the
 # package's version number as an integer major*1e6+minor*1e3+release.
 eval [`echo $VERSION | sed -e 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/PACKAGE_VERSION_MAJOR=\1; PACKAGE_VERSION_MINOR=\2; PACKAGE_VERSION_RELEASE=\3;/'`]
@@ -660,17 +667,16 @@ AC_DEFUN([STAR_LATEX_DOCUMENTATION],
           m4_ifval([$2],
                    [dnl non-empty second argument -- just add to variable
                     _STAR_EXTRA_DIST($2)
-                    STAR_DOC_FILES($2)],
+                    STAR_DOCS_FILES($2)],
                    [dnl second arg empty -- use defaults
                     if $_star_build_docs; then
                         for d in $1
                         do
-                            docno=[`basename $d .tex`]
-                            _STAR_EXTRA_DIST(${docno}.tex ${docno}.ps ${docno}.htx_tar)
-                            STAR_DOC_FILES(${docno}.tex ${docno}.ps ${docno}.htx_tar)
+                            _STAR_EXTRA_DIST($d.tex $d.ps $d.htx_tar)
+                            STAR_DOCS_FILES($d.tex $d.ps $d.htx_tar)
                         done
                     else
-                        AC_MSG_WARN([not installing docs $docno])
+                        AC_MSG_WARN([not installing docs $1])
                     fi
                     STAR_DECLARE_DEPENDENCIES([sourceset], [star2html])
                     STAR_CHECK_PROGS([star2html])
@@ -1096,12 +1102,12 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 # _STAR_EXTRA_DIST(filelist)
 # --------------------------
 # Declare a space-separated list of files which should be included in
-# the distribution.  This has the same function as automake's
-# EXTRA_DIST rule.  This macro expands to nothing -- it is here so
-# that it can be traced by automake, and the arguments placed in the
-# generated Makefile.in as the value of the Makefile variable
-# STAR_EXTRA_DIST.
-AC_DEFUN([_STAR_EXTRA_DIST], [])
+# the distribution.  This has the same overall function as automake's
+# EXTRA_DIST rule, except that this is under the control of configure.
+AC_DEFUN([_STAR_EXTRA_DIST],
+    [m4_ifval([$1], [], [AC_FATAL([$0: no argument])])dnl
+     STAR_EXTRA_DIST="$STAR_EXTRA_DIST $1"
+])# _STAR_EXTRA_DIST
 
 
 # end of starconf macros
