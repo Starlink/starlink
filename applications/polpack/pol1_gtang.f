@@ -54,6 +54,8 @@
 *  History:
 *     8-APR-1999 (DSB):
 *        Original version.
+*     20-SEP-2000 (DSB):
+*        Report an error if neither ANGROT nor POLANAL Frame can be found.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -147,8 +149,16 @@
      :                       'MAXAXES=20', STATUS ), 'POLANAL', 
      :                       STATUS ) 
 
+*  Report an error if no POLANAL Frame was found.
+         IF( FS .EQ. AST__NULL ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POL1_GTANG_ERR1', 'The reference direction'//
+     :                    ' in the input data is undefined since the '//
+     :                    'WCS information does not contain a POLANAL'//
+     :                    ' Frame.', STATUS )
+        
 *  If a POLANAL Frame was found
-         IF( FS .NE. AST__NULL ) THEN
+         ELSE
 
 *  Get the number of axes in it.
             NPOL = AST_GETI( FS, 'NAXES', STATUS )  
