@@ -147,10 +147,6 @@
         GOTO 99
       END IF
 
-*  Energy profiling routine
-      CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_PFL',
-     :                  L_MOD_PFL(MID,LID), STATUS )
-
 *  Hint supplier routine
       CALL PSF_FINDRTN( LID, ROUT(:RLEN)//'_HINT',
      :                  L_MOD_H(MID,LID), STATUS )

@@ -477,6 +477,7 @@
       INTEGER                 CHR_LEN
       REAL                    PSF1_GETAXDR, PSF1_GETAXTOR
       LOGICAL                 STR_ABBREV, PSF1_GETAXOK
+      EXTERNAL			PSF_ANAL_HINT, PSF_ANAL_PFL
 *
 *    Local variables :
 *
@@ -706,9 +707,14 @@
       END IF
 
 *  Store instance data
+      CALL PSF0_SETID0C( PSID, 'Tag', 'ANALYTIC', STATUS )
       CALL PSF0_SETID0C( PSID, 'Form', CH3, STATUS )
       CALL PSF0_SETID0R( PSID, 'Width1', W1, STATUS )
       CALL PSF0_SETID0R( PSID, 'Width2', W2, STATUS )
+
+*  Set methods
+      CALL PSF0_SETRTN( PSID, 'Eprofile', PSF_ANAL_PFL, STATUS )
+      CALL PSF0_SETRTN( PSID, 'Hint', PSF_ANAL_HINT, STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -719,7 +725,7 @@
 
 
 *+  PSF_ANAL_PFL - Analytic psf energy profiling
-      SUBROUTINE PSF_ANAL_PFL( PSID, NFRAC, FRAC, RADII, STATUS )
+      SUBROUTINE PSF_ANAL_PFL( PSID, X0, Y0, NFRAC, FRAC, RADII, STATUS )
 *
 *    Description :
 *
@@ -775,7 +781,7 @@
 *    Import :
 *
       INTEGER                  PSID,NFRAC
-      REAL                     FRAC(*)
+      REAL                     FRAC(*), X0, Y0
 *
 *    Export :
 *
@@ -1549,6 +1555,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
       END IF
 
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'ASCA', STATUS )
+
 *    Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_ASCA_INIT', STATUS )
@@ -1803,6 +1812,9 @@ c            R = R + SQRT((FRAC(I)-FP)/(1.0-FP))
 
 *  Load data from dataset
       CALL PSF_WFC_LOADD( FID, .FALSE., PSID, STATUS )
+
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'PWFC', STATUS )
 
       END
 
@@ -2231,6 +2243,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
+
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'RADIAL', STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
@@ -2996,6 +3011,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *  Reset workspace
       CALL PSF0_SETID0I( PSID, 'Rptr', 0, STATUS )
 
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'RESPFILE', STATUS )
+
 *  Abort point
  99   CONTINUE
 
@@ -3420,7 +3438,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
-*    Tidy up
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'TABULAR', STATUS )
+
+*  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'PSF_TABULAR_INIT', STATUS )
       END IF
@@ -3428,7 +3449,8 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       END
 
 *+  PSF_TABULAR_PFL - Tabular energy profiling
-      SUBROUTINE PSF_TABULAR_PFL( PSID, NFRAC, FRAC, RADII, STATUS )
+      SUBROUTINE PSF_TABULAR_PFL( PSID, X0, Y0, NFRAC, FRAC, RADII,
+     :         STATUS )
 *
 *    Description :
 *
@@ -3458,7 +3480,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *    Import :
 *
       INTEGER                  PSID,NFRAC
-      REAL                     FRAC(*)
+      REAL                     FRAC(*), X0, Y0
 *
 *    Export :
 *
@@ -3733,6 +3755,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *  Load data from file
       CALL PSF_WFC_LOADD( FID, .TRUE., PSID, STATUS )
+
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'WFC', STATUS )
 
       END
 
@@ -5188,6 +5213,9 @@ c     :                           S2 = 4.0419,
 
 *  Store option
       CALL PSF0_SETID0C( PSID, 'Form', OPT, STATUS )
+
+*  Set the tag
+      CALL PSF0_SETID0C( PSID, 'Tag', 'XRT_PSPC', STATUS )
 
 *  Tidy up
  99   IF ( STATUS .NE. SAI__OK ) THEN

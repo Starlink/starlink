@@ -99,7 +99,9 @@
         INTEGER			UTIL_PLOC
 
 *  Local Variables:
-      CHARACTER*20		MNAME
+      CHARACTER*20		MNAME			! Method name
+
+      LOGICAL			THERE			! Method name ok
 *.
 
 *  Check inherited global status.
