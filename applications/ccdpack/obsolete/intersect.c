@@ -54,8 +54,7 @@
 typedef double  tPointi[DIM];   /* type integer point */
 typedef double  tPointd[DIM];   /* type double point */
 typedef tPointi tPolygoni[PMAX];/* type integer polygon */
-typedef enum { FALSE, TRUE } bool;
-bool    Left( tPointi a, tPointi b, tPointi c );
+int     Left( tPointi a, tPointi b, tPointi c );
 void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m, tPointd *Z, int *pnz );
 
 void preverse( int n, tPolygoni poly );
@@ -119,7 +118,6 @@ void preverse( int n, tPolygoni poly );
    the vertices.  We make the assumption that they are in fact convex. */
       for ( i = 0; i < 2; i++ ) {
          if ( ! Left( poly[ i ][ 0 ], poly[ i ][ 1 ], poly[ i ][ 2 ] ) ) {
-            printf( "reverse %d\n", i );
             preverse( nvertex[ i ], poly[ i ] );
          }
       }
@@ -200,15 +198,15 @@ double  Dot( tPointi a, tPointi b );
 int	AreaSign( tPointi a, tPointi b, tPointi c );
 char    SegSegInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q );
 char    ParallelInt( tPointi a, tPointi b, tPointi c, tPointi d, tPointd p, tPointd q );
-bool    Between( tPointi a, tPointi b, tPointi c );
+int     Between( tPointi a, tPointi b, tPointi c );
 void    Assigndi( tPointd p, tPointi a );
 void    SubVec( tPointi a, tPointi b, tPointi c );
-bool    LeftOn( tPointi a, tPointi b, tPointi c );
-bool    Left( tPointi a, tPointi b, tPointi c );
+int     LeftOn( tPointi a, tPointi b, tPointi c );
+int     Left( tPointi a, tPointi b, tPointi c );
 void    PrintPoly( int n, tPolygoni P );
 void    ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m, tPointd *Z, int *pnz );
 tInFlag InOut( tPointd p, tInFlag inflag, int aHB, int bHA );
-int     Advance( int a, int *aa, int n, bool inside, tPointi v );
+int     Advance( int a, int *aa, int n, int  inside, tPointi v );
 void	OutputPolygons( void );
 
 void firstpoint( tPointd p, tPointd dest );
@@ -230,13 +228,13 @@ void ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
    tPointd q;              /* second point of intersection */
    tInFlag inflag;         /* {Pin, Qin, Unknown}: which inside */
    int     aa, ba;         /* # advances on a & b indices (after 1st inter.) */
-   bool    FirstPoint;     /* Is this the first point? (used to initialize).*/
+   int     FirstPoint;     /* Is this the first point? (used to initialize).*/
    tPointd p0;             /* The first point. */
    int     code;           /* SegSegInt return code. */ 
 
    /* Initialize variables. */
    a = 0; b = 0; aa = 0; ba = 0;
-   inflag = Unknown; FirstPoint = TRUE;
+   inflag = Unknown; FirstPoint = 1;
    *pnz = 0;
 
    do {
@@ -256,7 +254,7 @@ void ConvexIntersect( tPolygoni P, tPolygoni Q, int n, int m,
       if ( code == '1' || code == 'v' ) {
          if ( inflag == Unknown && FirstPoint ) {
             aa = ba = 0;
-            FirstPoint = FALSE;
+            FirstPoint = 0;
             p0[X] = p[X]; p0[Y] = p[Y];
             firstpoint( p0, Z[(*pnz)++] );
          }
@@ -352,7 +350,7 @@ tInFlag InOut( tPointd p, tInFlag inflag, int aHB, int bHA )
 /*---------------------------------------------------------------------
    Advances and prints out an inside vertex if appropriate.
 ---------------------------------------------------------------------*/
-int     Advance( int a, int *aa, int n, bool inside, tPointi v )
+int     Advance( int a, int *aa, int n, int  inside, tPointi v )
 {
    (*aa)++;
    return  (a+1) % n;
@@ -362,17 +360,17 @@ int     Advance( int a, int *aa, int n, bool inside, tPointi v )
    Returns true iff c is strictly to the left of the directed
    line through a to b.
 */
-bool    Left( tPointi a, tPointi b, tPointi c )
+int     Left( tPointi a, tPointi b, tPointi c )
 {
         return  AreaSign( a, b, c ) > 0;
 }
 
-bool    LeftOn( tPointi a, tPointi b, tPointi c )
+int     LeftOn( tPointi a, tPointi b, tPointi c )
 {
         return  AreaSign( a, b, c ) >= 0;
 }
 
-bool    Collinear( tPointi a, tPointi b, tPointi c )
+int     Collinear( tPointi a, tPointi b, tPointi c )
 {
         return  AreaSign( a, b, c ) == 0;
 }
@@ -500,7 +498,7 @@ void	Assigndi( tPointd p, tPointi a )
 Returns TRUE iff point c lies on the closed segement ab.
 Assumes it is already known that abc are collinear.
 ---------------------------------------------------------------------*/
-bool    Between( tPointi a, tPointi b, tPointi c )
+int     Between( tPointi a, tPointi b, tPointi c )
 {
    tPointi      ba, ca;
 
