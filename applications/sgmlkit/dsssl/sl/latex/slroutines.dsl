@@ -392,7 +392,13 @@ $Id$
     (make environment name: "sstexamplesubsection"
 		(make environment name: "small"
                       (make environment
-		       name: "Verbatimlines"
+		       ;; Use the starred form, which does not respect
+		       ;; leading spaces -- this example likely comes
+		       ;; from a programcode prologue, and has some
+		       ;; spurious indentation.
+		       name: "Verbatimlines*"
+		       ;; Verbatimlines gets confused if `\end' and
+		       ;; `{Verbatimlines}' are on different lines.
 		       recontrol: "/-/" 
 		       (process-children)))))
   (element examplenote
