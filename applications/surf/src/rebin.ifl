@@ -10,6 +10,24 @@
          PROMPT  'Rebinning method to be used'
          DEFAULT 'BESSEL'
       ENDPARAMETER
+ 
+      PARAMETER SELECT_INTS
+	TYPE '_LOGICAL'
+	PROMPT 'Do you wish to select specific integrations'
+	DEFAULT 'no'
+      ENDPARAMETER
+
+      PARAMETER INTEGRATIONS
+         TYPE    '_INTEGER'
+         PROMPT  'The integrations with quality to change; 0 for all'
+	 DEFAULT 0
+      ENDPARAMETER
+
+      PARAMETER USE_INTS
+	TYPE '_LOGICAL'
+	PROMPT 'Keep only these (else discard)'
+	DEFAULT 'yes'
+      ENDPARAMETER
 
       PARAMETER WEIGHT
         TYPE     '_REAL'
