@@ -5,7 +5,7 @@
 *     PSF1_ASCA_DAT
 
 *  Purpose:
-*     Return 2-D probability array for GIS and SIS psfs
+*     Return 2-D probability array for the ASCA GIS
 
 *  Language:
 *     Starlink Fortran
@@ -95,7 +95,7 @@
 *     12 Jan 1994 (DJA)
 *        Original version.
 *      7 May 1996 (DJA):
-*        New header. Added SIS (DJA)
+*        New header (DJA)
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,12 +116,12 @@
       INCLUDE 'PSF_ASCA_CMN'
 
 *  Arguments Given:
-      REAL                     DX, DY, X0, Y0, QX, QY
-      INTEGER                  PSID, NX, NY
-      LOGICAL                  INTEG
+      REAL                      DX, DY, X0, Y0, QX, QY
+      INTEGER                   PSID, NX, NY
+      LOGICAL                   INTEG
 
 *  Arguments Returned:
-      REAL                     ARRAY(NX,NY)
+      REAL                      ARRAY(NX,NY)
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -129,24 +129,19 @@
 *  External References:
       EXTERNAL			PSF1_ASCA_CINT
         REAL                    PSF1_ASCA_CINT
+      EXTERNAL			PSF1_ASCA_E
+        REAL                    PSF1_ASCA_E
 
 *  Local Constants:
-      REAL			GIS_GAIN		! GIS PI gain
-        PARAMETER		( GIS_GAIN = 1.07E-2 )	! keV per PI channel
       REAL                      RTOM                    ! Radian to arcmin
         PARAMETER               ( RTOM = MATH__RTOD*60.0 )
-      REAL			SIS_GAIN		! SIS PI gain
-        PARAMETER		( SIS_GAIN = 3.65E-3 )	! keV per PI channel
       INTEGER			NRAD			!
         PARAMETER		( NRAD = 6 )
 
 *  Local Variables:
       CHARACTER*132		FNAME
-      CHARACTER*3		INS			! Instrument name
 
-      REAL			CSCALE			! Channel scaling
-      REAL                      ENERGY                  ! Mean photon energy
-      REAL                     	NORM                   ! Normalisation constant
+      REAL                     	NORM                    ! Normalisation constant
       REAL                      P_SCALE                 ! Scale size of psf
       REAL                      ROFF                    ! Off-axis angle
       REAL			ROTA			! Rotation angle
@@ -156,11 +151,6 @@
 
       INTEGER                   I, J                    ! Major pixel loops
       INTEGER			IENER, IRAD		! Indexing values
-      INTEGER			PHALO, PHAHI		! PHA band
-
-      LOGICAL			PHADEF			! PHA band defined
-      LOGICAL			SIS			! SIS detector?
-      LOGICAL                  	SYMMETRIC               ! Symmetric about X0,Y0?
 
 *  Local Data:
       REAL			RADS(NRAD)		! Radial bnds (arcmin)
@@ -176,42 +166,12 @@
       XP0 = ( - REAL(NX)/2.0 ) * DX + X0 + QX
       YP0 = ( - REAL(NY)/2.0 ) * DY + Y0 + QY
 
-*  Symmetric?
-      SYMMETRIC = ( ( X0 .EQ. 0.0 ) .AND. ( Y0 .EQ. 0.0 )
-     :        .AND. ( QX .EQ. 0.0 ) .AND. ( QY .EQ. 0.0 ) )
-
-*  Find PHA bounds
-      CALL ADI_CGET0L( PSID, 'PhaDef', PHADEF, STATUS )
-      CALL ADI_CGET0I( PSID, 'PhaLo', PHALO, STATUS )
-      CALL ADI_CGET0I( PSID, 'PhaHi', PHAHI, STATUS )
-
-*  Get instrument
-      CALL PSF0_GETID0C( PSID, 'Instr', INS, STATUS )
-      SIS = (INS .EQ. 'SIS' )
-
-*  Find energy in keV, and then energy bin number 1->2, 2->3 etc, and
-*  coerce into the range 0 to 10
-      IF ( PHADEF ) THEN
-
-*      Get channel scale
-        CALL PSF0_GETID0R( PSID, 'ChanScale', CSCALE, STATUS )
-
-*      Convert users PHA to raw PHA
-        IF ( SIS ) THEN
-          ENERGY = (REAL(PHALO) + REAL(PHAHI))*SIS_GAIN*CSCALE/2.0
-        ELSE
-          ENERGY = (REAL(PHALO) + REAL(PHAHI))*GIS_GAIN*CSCALE/2.0
-        END IF
-
-      ELSE
-        CALL PSF0_GETID0R( PSID, 'Energy', ENERGY, STATUS )
-
-      END IF
-      IENER = INT(ENERGY)
+*  Find energy bin
+      IENER = INT( PSF1_ASCA_E( PSID, STATUS ) )
       IENER = MAX( IENER, 1 )
       IENER = MIN( IENER, AS_NE )
 
-*    Find radial bin number
+*  Find radial bin number
       ROFF = SQRT( X0*X0 + Y0*Y0 ) * MATH__RTOD * 60.0
       IRAD = 1
       DO WHILE ( (IRAD.LE.NRAD) .AND. (ROFF.GT.RADS(IRAD)) )
@@ -219,7 +179,7 @@
       END DO
       IF ( IRAD .GT. NRAD ) IRAD = NRAD
 
-*    Rotation of requested psf position from calibration position
+*  Rotation of requested psf position from calibration position
       IF ( X0 .EQ. 0.0 ) THEN
         IF ( Y0 .GE. 0.0 ) THEN
           ROTA = 0.0
@@ -232,52 +192,38 @@
       IF ( ROTA .LT. 0.0 ) ROTA = ROTA + 360.0
       ROTA = (ROTA - REAL(AZIM(IRAD))+180.0) * MATH__DTOR
 
-*    Load the telescope and detector psfs
+*  Load the telescope and detector psfs
  10   FORMAT( A, I2.2, '_', I2.2, '.fits' )
-      IF ( SIS ) THEN
-        IF ( AS_SPTR(IENER,IRAD) .EQ. 0 ) THEN
-          WRITE( FNAME, 10 ) 'psf_', NINT(RADS(IRAD)), AZIM(IRAD)
-          CALL PSF1_ASCA_FLOAD( 'sis', FNAME, AS_SPTR(1,IRAD),
-     :                         AS_SPIX, STATUS )
-        END IF
-      ELSE
-        IF ( AS_GPTR(IENER,IRAD) .EQ. 0 ) THEN
-          WRITE( FNAME, 10 ) 'psf_', NINT(RADS(IRAD)), AZIM(IRAD)
-          CALL PSF1_ASCA_FLOAD( 'gis', FNAME, AS_GPTR(1,IRAD),
+      IF ( AS_GPTR(IENER,IRAD) .EQ. 0 ) THEN
+        WRITE( FNAME, 10 ) 'psf_', NINT(RADS(IRAD)), AZIM(IRAD)
+        CALL PSF1_ASCA_FLOAD( 'gis', FNAME, AS_GPTR(1,IRAD),
      :                         AS_GPIX, STATUS )
-        END IF
       END IF
 
-*    Scale size of psf
+*  Scale size of psf
       P_SCALE = (0.3/60.0) * MATH__DTOR
 
-*    Normalisation factor to account for difference in input pixel size
-*    to calibration pixel size
+*  Normalisation factor to account for difference in input pixel size
+*  to calibration pixel size
       NORM = ABS((DX*DY*RTOM*RTOM) / AS_GPIX**2)
 
-*    For each point requiring calculation
+*  For each point requiring calculation
       DO J = 1, NY
 
-*      Y coordinate of this pixel in arcmin
+*    Y coordinate of this pixel in arcmin
         YPS = (YP0 + (REAL(J)-0.5)*DY) * RTOM
 
         DO I = 1, NX
 
-*        X position of this pixel in arcmin
+*      X position of this pixel in arcmin
           XPS = (XP0 + (REAL(I)-0.5)*DX) * RTOM
 
-*        Enquire value of calibration array at this point
-          IF ( SIS ) THEN
-            SUM = PSF1_ASCA_CINT( AS_NXY, %VAL(AS_SPTR(IENER,IRAD)),
-     :                           ROTA, (XPS-X0*RTOM)/AS_SPIX,
-     :                           (YPS-Y0*RTOM)/AS_SPIX )
-          ELSE
-            SUM = PSF1_ASCA_CINT( AS_NXY, %VAL(AS_GPTR(IENER,IRAD)),
+*      Enquire value of calibration array at this point
+          SUM = PSF1_ASCA_CINT( AS_NXY, %VAL(AS_GPTR(IENER,IRAD)),
      :                           ROTA, (XPS-X0*RTOM)/AS_GPIX,
      :                           (YPS-Y0*RTOM)/AS_GPIX )
-          END IF
 
-*        Correct for differing pixel sizes
+*      Correct for differing pixel sizes
           ARRAY(I,J) = SUM * NORM
 
         END DO

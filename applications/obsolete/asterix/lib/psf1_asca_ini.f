@@ -103,6 +103,7 @@
       EXTERNAL			CHR_SIMLR
         LOGICAL                 CHR_SIMLR
       EXTERNAL			PSF1_ASCA_DAT
+      EXTERNAL			PSF1_ASIS_DAT
       EXTERNAL			PSF1_ASCA_EPF
       EXTERNAL			PSF1_ASCA_HNT
 
@@ -141,7 +142,13 @@
             AS_SPTR(J,I) = 0
           END DO
         END DO
+
+*    SIS grid not loaded
+        AS_SIS_LOADED = .FALSE.
+
+*    No longer first time
         FIRST = .FALSE.
+
       END IF
 
 *  Get directory containing FTOOLS calibrations
@@ -228,7 +235,11 @@
       END IF
 
 *  Store methods
-      CALL PSF0_SETRTN( PSID, 'Data', PSF1_ASCA_DAT, STATUS )
+      IF ( INS .EQ. 'SIS' ) THEN
+        CALL PSF0_SETRTN( PSID, 'Data', PSF1_ASIS_DAT, STATUS )
+      ELSE
+        CALL PSF0_SETRTN( PSID, 'Data', PSF1_ASCA_DAT, STATUS )
+      END IF
       CALL PSF0_SETRTN( PSID, 'Eprofile', PSF1_ASCA_EPF, STATUS )
       CALL PSF0_SETRTN( PSID, 'Hint', PSF1_ASCA_HNT, STATUS )
 

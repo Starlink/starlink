@@ -121,6 +121,10 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL			PSF1_ASCA_E
+        REAL			PSF1_ASCA_E
+
 *  Local Variables:
       REAL                      ENERGY                  ! Mean photon energy
 *.
@@ -129,7 +133,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Ensure the psf cube is loaded
-      IF ( .NOT. AS_SIS_LOAD ) THEN
+      IF ( .NOT. AS_SIS_LOADED ) THEN
 
 *    Load grid
         CALL PSF0_LDGRID( 'asca_sis_psfs', AS_SIS_DIMS, AS_SIS_NDIM,
@@ -138,7 +142,7 @@
      :                    STATUS )
 
 *    Mark as loaded
-        AS_SIS_LOAD = (STATUS.EQ.SAI__OK)
+        AS_SIS_LOADED = (STATUS.EQ.SAI__OK)
 
       END IF
 
