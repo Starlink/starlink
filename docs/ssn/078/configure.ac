@@ -12,7 +12,7 @@ STAR_DEFAULTS(docs-only)
 dnl AC_PATH_PROGS(JADE, [jade openjade], jade)
 dnl AC_PATH_PROGS(SGMLNORM, [sgmlnorm osgmlnorm], sgmlnorm)
 STAR_XML_DOCUMENTATION(ssn78)
-LATEX2DVI='$$LATEX $$1; makeindex $$1; $$LATEX $$1'
+LATEX2DVI='$$LATEX "\\batchmode\\input $$1" && makeindex $$1 && $$LATEX "\\batchmode\\input $$1"'
 AC_PATH_PROGS(METAPOST, [mp mpost])
 
 dnl  The default here isn't terribly reliable, since it relies on
