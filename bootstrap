@@ -175,7 +175,7 @@ for d in `autoconf --trace=AC_CONFIG_SUBDIRS:$% configure.ac` DUMMY
 do
     if test -n "$d" -a -d "$d"; then
         echo "BOOTSTRAPPING $d..."
-        (cd $d; ./bootstrap)
+        (cd $d && ./bootstrap)
     fi
 done
 
@@ -184,6 +184,28 @@ done
 
 # (Re)configure, installing missing files
 echorun autoreconf --install --symlink
+
+# autoreconf does _not_ add an install-sh link, because there's no
+# Makefile.am in this directory, so it thinks we don't need one.  We
+# do, however, because the child directories have Makefile.am's, and
+# want to refer to one here.  So copy the link that autoreconf _did_
+# put into the buildsupport directory.  Use a variety of options to
+# copy the link rather than its destination.  The options are
+# '--no-dereference' (GNU cp: doesn't support correct -P yet), 
+# '-R -P' (POSIX), '-R' (BSD?: doesn't have -P, though -R does the
+# wrong thing on SunOS) and '' (fallback: does copy of link target)
+get_install_sh=buildsupport/install-sh
+test -f $get_install_sh || {
+    echo "Ooops: ./bootstrap can't find $get_install_sh" >&2
+    exit 1
+}
+for o in --no-dereference '-R -P' -R ''
+do
+    if cp $o $get_install_sh . 2>/dev/null; then
+        echo cp $o $get_install_sh .
+        break
+    fi
+done
 
 # The default prefix in this configure file MUST be consistent with
 # that in starconf.  The configure.ac has the default prefix set to
