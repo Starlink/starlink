@@ -2,9 +2,6 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.5-9
-
-
 This is a beta release of the autoastrometry package.
 
 Documentation, including release notes, is in sun242.tar-htx
@@ -13,6 +10,8 @@ Changes
 -------
 
 Since 0.5: 
+  * In 0.5-10: Fix packaging bug -- 0.5-9 wouldn't build properly on
+    some machines.
   * In 0.5-9: Various stability improvements, and fixes to help
     autoastrom work with GAIA.  Autoastrom now has a GAIA toolbox!
   * In 0.5-8: Various stability improvements; added --ccdcatalogue and
