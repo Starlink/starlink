@@ -4,6 +4,7 @@
 # go into bin/
 
 noinst_LTLIBRARIES = libpgplot_base.la libpgplot_star_base.la
+noinst_HEADERS = $(PRIVATE_INCLUDES)
 
 libpgplot_base_la_SOURCES = $(F_ROUTINES) $(NATIVE_PGPLOT_ROUTINES)
 libpgplot_star_base_la_SOURCES = $(F_ROUTINES) $(STARLINK_PGPLOT_ROUTINES)

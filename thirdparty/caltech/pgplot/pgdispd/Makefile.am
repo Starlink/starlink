@@ -6,7 +6,7 @@
 bin_PROGRAMS = pgdisp
 pgdisp_SOURCES = $(C_ROUTINES)
 pgdisp_LDADD = $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
-
+dist_noinst_HEADERS = $(PRIVATE_INCLUDES)
 AM_CFLAGS = -DPGDISP
 
 C_ROUTINES = cleanup.c getcolors.c handlexevent.c initlock.c ntoh.c    \
