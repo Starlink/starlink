@@ -273,16 +273,16 @@
 *        the coordinates of each vector from columns X and Y. 
 *     polplot poltab style=^mystyle.dat
 *        As above, but the annotated axes and vectors are drawn according
-*        to the description given in text file \verb+mystyle.dat+. If this
+*        to the description given in text file mystyle.dat. If this
 *        files contains the following lines:
 *    
-*           title=My favorite colours
-*           grid=1
-*           minticklen=0
-*           colour(border)=green
-*           colour(grid)=blue
-*           colour(vec)=red
-*           width(border)=0.05
+*           title = My favorite colours
+*           grid = 1
+*           minticklen = 0
+*           colour(border) = green
+*           colour(grid) = blue
+*           colour(vec) = red
+*           width(border) = 0.05
 *
 *        then the title is set to "My favourite colours"; a grid is drawn
 *        across the plot instead of tick marks around the edge; the border,
