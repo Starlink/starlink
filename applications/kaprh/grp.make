@@ -12,7 +12,8 @@ TAR_FILES_A = kaprh_ifls kaprh_source kaprh_sub kapsub_sub kaprh_iraf
 KAPRH_SOURCE = kaprh.csh kaprh_link_adam kaprh.icl kaprh.hlp kaprh_mon.f 
 
 # The contents of the kaprh_iraf.tar file:
-KAPRH_IRAF = doc greyplot.par 
+KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
+_kaprh.hd kaprh.cl  kaprh.men kaprh_mon.tcl greyplot.par 
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
 IRAF_DOCS = greyplot.hlp 

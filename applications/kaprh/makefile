@@ -737,7 +737,7 @@ KAPRH_TASKS = $(KAPRH_F_ROUTINES:.f=)
 #  Give dependencies and rule for building the pseudo-monoliths.
 
 $(KAPRH_MON) : $(MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) $(LINK_SCRIPT)
-	$(ALINK) $(KAPRH_MONO_SOURCE:.f=.o) -o $(KAPRH_MON) $(OBJECT_LIBRARIES) \
+	$(ALINK) $(MONO_SOURCE:.f=.o) -o $(KAPRH_MON) $(OBJECT_LIBRARIES) \
 	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
