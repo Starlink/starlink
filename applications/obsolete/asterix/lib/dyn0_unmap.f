@@ -115,7 +115,7 @@
         CALL ADI1_GETLOC( DYS_FID(SLOT), LOC, STATUS )
 
 *    Unmap the memory
-        CALL DYN_UNMAP( LOC, STATUS )
+        CALL DAT_UNMAP( LOC, STATUS )
 
 *    Delete the file
         CALL HDS_ERASE( LOC, STATUS )
