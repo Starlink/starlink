@@ -1785,6 +1785,8 @@
       INTEGER			STATUS             	! Global status
 
 *  Local Variables:
+      REAL			TMP			! Swap value
+
       INTEGER			I			! Loop over inputs
 *.
 
@@ -1795,13 +1797,26 @@
       IF ( FORW ) THEN
         DO I = 1, N
           IF ( IDX(I) .GE. 0 ) THEN
+            TMP = MODEL(I)
             MODEL(I) = DATA(I) - MODEL(I)
+
+*        Store original model in prime data array
+            DATA(I) = TMP
+
           END IF
         END DO
       ELSE
         DO I = 1, N
           IF ( IDX(I) .GE. 0 ) THEN
-            MODEL(I) = DATA(I) - MODEL(I)
+
+*        Recover model value from data
+            TMP = DATA(I)
+
+*        Restore the prime data
+            DATA(I) = MODEL(I) + DATA(I)
+
+*        And copy the model value back
+            MODEL(I) = TMP
           END IF
         END DO
       END IF
