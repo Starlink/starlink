@@ -508,8 +508,8 @@ void	backstat(backstruct *backmesh, backstruct *wbackmesh,
       } 
       else {
          bm->npix = 0;
-         bm->mean = 0.0;
-         bm->sigma = 0.0;
+         bm->mean = -BIG;
+         bm->sigma = -BIG;
          bm->nlevels = 1;
          bm->qscale = 1.0;
          bm->qzero = 0.0;
