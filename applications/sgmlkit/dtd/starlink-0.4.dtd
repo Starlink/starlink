@@ -690,7 +690,7 @@
 	>
 
 <!-- Subhead and title are the header and title for (sub*)sections -->
-<!entity % subhead.model 'title, displaytitle? %update.pc'>
+<!entity % subhead.model 'title, %update.pc'>
 <!element SUBHEAD o o (%subhead.model;)>
 
 <!--
@@ -803,25 +803,24 @@
   The M element corresponds to $...$ in TeX.  MEQUATION in text
   corresponds to the equation environment.  MEQNARRAY corresponds to
   the eqnarray environment, but with each line of the alignment
-  specified in a MLINE element.  The content of each should be raw
-  LaTeX, appropriate to the context, so that the content of MLINE
-  within MEQNARRAY should have two & characters in it, but not when
-  it's within just MEQUATION.  There's therefore a slight ambiguity, but
-  resolving it (perhaps by specifying structure within the eqnarray
-  line corresponding to the three fields) would create more confusion
-  than light.  As well, there's an implementation advantage to having
-  the two display elements have the same GI, as this makes equation
-  numbering easier in DSSSL.
-
-  It might seem nice to have the MLINE attributes on the MEQUATION
-  element, and avoid having the intermediate MLINE element, but (a)
-  the MLINE is completely omissable unless you want to refer to the
-  equation, and (b) the symmetry makes implementation a lot easier.
+  specified in a MLINE element.  The content of that element should be raw
+  LaTeX appropriate to the context, so that the content of MLINE
+  within MEQNARRAY should have two & characters in it.
 
   In principle there are no restrictions on what LaTeX goes in here,
   other than that it be valid, but in practice, I expect that the
   author might need some slight awareness of any restrictions of the
   actual implementation.
+
+  The actual equation number, and the id which allows you to refer to
+  it, attach to the MLABEL element, one of which can be freely placed
+  within both the MLINE and MEQUATION elements.  This is not as
+  attractive, from the DTD point of view, as having the id attached to
+  the parent element.  However, that turns out (perfectly
+  unexpectedly) to be murder to implement in DSSSL (you have to work
+  out the position of the current element in a sequence composed of
+  those elements of two element types which have a particular
+  attribute present).
 
   Note that I'm declaring this as PCDATA content, accepting the force
   of the overwhelmingly negative discussion of CDATA/RCDATA at
