@@ -8936,7 +8936,6 @@ cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
 U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
 U java/source/topcat/src/lib/jel_g.jar
-U java/source/topcat/src/lib/plot.jar
 cvs checkout: Updating java/source/topcat/src/main
 cvs checkout: Updating java/source/topcat/src/main/uk
 cvs checkout: Updating java/source/topcat/src/main/uk/ac
@@ -8970,7 +8969,6 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/MirageHandler.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/OptionsListModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ParameterWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/PlasticStarTable.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/QueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RestrictedColumnComboBoxModel.java
@@ -9004,6 +9002,19 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/join/OutputRequirements.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterEditor.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/TupleSelector.java
+cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/plot
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/DumbPlotSurface.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/GraphicsSurface.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyle.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/OrderedSelectionRecorder.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotBox.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotState.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotSurface.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/Points.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PtPlotSurface.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/ScatterPlot.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/SurfaceListener.java
 cvs checkout: Updating java/source/topcat/src/resources
 cvs checkout: Updating java/source/topcat/src/resources/uk
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac
