@@ -62,6 +62,9 @@
 *        mappings from pixel to celestial coordinates? Otherwise, they are
 *        treated as celestial projections according to the conventions of
 *        the Greisen and Calabretta papers.
+*     CDMatrix
+*        If non-zero, use a CD matrix in FITS-WCS Encoding. If zero, use
+*        a PC matrix with associated CDELT values.
 *     Encoding
 *        This attribute specifies the system to use when encoding AST
 *        objects into FITS headers. A value of "Native" causes AST objects 
@@ -280,6 +283,7 @@ typedef struct AstFitsChan {
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int defb1950;    /* Use FK4 B1950 as defaults? */
+   int cdmatrix;    /* Use a CD matrix in FITS-WCS Encoding? */
    int carlin;      /* Use linear CAR mappings? */
    int clean;       /* Remove used cards even if an error occurs? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
@@ -362,6 +366,10 @@ typedef struct AstFitsChanVtab {
    int (* TestClean)( AstFitsChan * );
    void (* SetClean)( AstFitsChan *, int );
    void (* ClearClean)( AstFitsChan * );
+   int (* GetCDMatrix)( AstFitsChan * );
+   int (* TestCDMatrix)( AstFitsChan * );
+   void (* SetCDMatrix)( AstFitsChan *, int );
+   void (* ClearCDMatrix)( AstFitsChan * );
 
 } AstFitsChanVtab;
 #endif
@@ -446,6 +454,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, AstFitsChanVtab *,
    int astTestDefB1950_( AstFitsChan * );
    void astSetDefB1950_( AstFitsChan *, int );
    void astClearDefB1950_( AstFitsChan * );
+
+   int astGetCDMatrix_( AstFitsChan * );
+   int astTestCDMatrix_( AstFitsChan * );
+   void astSetCDMatrix_( AstFitsChan *, int );
+   void astClearCDMatrix_( AstFitsChan * );
 
    int astGetCarLin_( AstFitsChan * );
    int astTestCarLin_( AstFitsChan * );
@@ -612,6 +625,15 @@ astINVOKE(V,astGetDefB1950_(astCheckFitsChan(this)))
 astINVOKE(V,astSetDefB1950_(astCheckFitsChan(this),defb950))
 #define astTestDefB1950(this) \
 astINVOKE(V,astTestDefB1950_(astCheckFitsChan(this)))
+
+#define astClearCDMatrix(this) \
+astINVOKE(V,astClearCDMatrix_(astCheckFitsChan(this)))
+#define astGetCDMatrix(this) \
+astINVOKE(V,astGetCDMatrix_(astCheckFitsChan(this)))
+#define astSetCDMatrix(this,cdmatrix) \
+astINVOKE(V,astSetCDMatrix_(astCheckFitsChan(this),cdmatrix))
+#define astTestCDMatrix(this) \
+astINVOKE(V,astTestCDMatrix_(astCheckFitsChan(this)))
 
 #define astClearCarLin(this) \
 astINVOKE(V,astClearCarLin_(astCheckFitsChan(this)))

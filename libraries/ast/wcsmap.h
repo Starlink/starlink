@@ -38,6 +38,12 @@
 *        returned is in radians. A value of AST__BAD is returned if 
 *        no value is defined. This attribute is read only, and may change 
 *        if new values are assigned to the projection parameters.
+*     NatLon (double)
+*        This attribute gives the longitude of the reference point of 
+*        a FITS WCS projection, in the native coordinate system. The value 
+*        returned is in radians. A value of AST__BAD is returned if 
+*        no value is defined. This attribute is read only, and may change 
+*        if new values are assigned to the projection parameters.
 *     ProjP(i) (double)
 *        This attribute provides aliases for the PV attributes, which 
 *        specifies the projection parameter values to be used by a WcsMap 
@@ -90,6 +96,8 @@
 *           Clear a PVi_j attribute value for a WcsMap.
 *        astGetNatLat
 *           Get the NatLat attribute value for a WcsMap.
+*        astGetNatLon
+*           Get the NatLon attribute value for a WcsMap.
 *        astGetPV
 *           Get a PVi_j attribute value for a WcsMap.
 *        astGetWcsAxis
@@ -320,7 +328,6 @@ typedef struct AstWcsMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double natlat;                /* Native latitude of reference point */
    int type;                     /* Projection type */
    int wcsaxis[2];               /* Indices of lon and lat. axes */
    double **p;                   /* Pointer to array of projection parameter arrays */
@@ -345,6 +352,7 @@ typedef struct AstWcsMapVtab {
 
 /* Properties (e.g. methods) specific to this class. */
    double (* GetNatLat)( AstWcsMap * );
+   double (* GetNatLon)( AstWcsMap * );
    double (* GetPV)( AstWcsMap *, int, int );
    int (* GetWcsAxis)( AstWcsMap *, int );
    int (* GetWcsType)( AstWcsMap * );
@@ -390,6 +398,7 @@ AstWcsMap *astLoadWcsMap_( void *, size_t, AstWcsMapVtab *,
    const char *PrjDesc_( int );
    const char *PrjName_( int );
    double astGetNatLat_( AstWcsMap * );
+   double astGetNatLon_( AstWcsMap * );
    double astGetPV_( AstWcsMap *, int, int );
    int PrjType_( const char * );
    int astGetWcsAxis_( AstWcsMap *, int );
@@ -465,6 +474,9 @@ astINVOKE(V,astGetWcsType_(astCheckWcsMap(this)))
 
 #define astGetNatLat(this) \
 astINVOKE(V,astGetNatLat_(astCheckWcsMap(this)))
+
+#define astGetNatLon(this) \
+astINVOKE(V,astGetNatLon_(astCheckWcsMap(this)))
 
 #define astGetWcsAxis(this,index) \
 astINVOKE(V,astGetWcsAxis_(astCheckWcsMap(this),index))
