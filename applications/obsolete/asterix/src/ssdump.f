@@ -685,13 +685,13 @@ c     RECORD /ADATUM/       DATUM                     ! General data object
               IF ( FIELD_ETHERE(J) .AND. (L.LE.FIELD_ENELM(J)) ) THEN
 
 *              Get the value
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_DVAL, STATUS )
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_RVAL, STATUS )
-                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J)) +
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
      :                             ((I-1)*FIELD_ENELM(J) +
      :                             (L-1))*VAL__NBR), DATUM_IVAL, STATUS )
 
@@ -928,7 +928,7 @@ c     RECORD /FIELD/           FLD(*)                  ! Field data
             DO I = 1, DAT__MXDIM
               DIMS(I) = FIELD_DIMS(NFLD,I)
             END DO
-            CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM, DIMS
+            CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM, DIMS,
      :                      FIELD_NDIM(NFLD), STATUS )
             CALL ARR_SUMDIM( FIELD_NDIM(NFLD)-1, DIMS,
      :                       FIELD_NELM(NFLD) )
