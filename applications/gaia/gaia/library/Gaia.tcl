@@ -19,7 +19,7 @@
 #     of the GAIA package with a Starlink extended RTD.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK)
+#     PWD: Peter Draper (STARLINK)
 #     ALLAN: Allan Brighton (ESO)
 #     {enter_new_authors_here}
 
@@ -30,36 +30,36 @@
 #     Methods and configuration options of SkyCat (and Rtd).
 
 #  History:
-#     24-SEP-1997 (PDRAPER):
+#     24-SEP-1997 (PWD):
 #        Original version
-#     10-MAR-1998 (PDRAPER):
+#     10-MAR-1998 (PWD):
 #        Clone method now accepts a file name and additional options.
-#     06-APR-1998 (PDRAPER):
+#     06-APR-1998 (PWD):
 #        Added demo toolbox.
-#     07-APR-1998 (PDRAPER):
+#     07-APR-1998 (PWD):
 #        Moved temporary code to GaiaImageCtrl.
-#     09-APR-1998 (PDRAPER):
+#     09-APR-1998 (PWD):
 #        Changed clone method to not use TopLevelWidget::start.
 #        This simplifies passing on new options and makes it
 #        possible to wait for the window to appear (start blocks
 #        with a tkwait which means that it is impossible to
 #        work out when the clone is running).
-#     10-JUL-1998 (PDRAPER):
+#     10-JUL-1998 (PWD):
 #        Added changes to support cloning of toolboxes.
-#     10-SEP-1998 (PDRAPER):
+#     10-SEP-1998 (PWD):
 #        Added SExtractor toolbox.
-#     10-MAR-1999 (PDRAPER):
+#     10-MAR-1999 (PWD):
 #        Attempt merge of Allan's GAIA plugin differences...
-#     01-MAY-1999 (PDRAPER):
+#     01-MAY-1999 (PWD):
 #        Added contouring photometry toolbox.
-#     28-MAY-1999 (PDRAPER):
+#     28-MAY-1999 (PWD):
 #        Added optimal photometry toolbox.
-#     28-JUN-1999 (PDRAPER):
+#     28-JUN-1999 (PWD):
 #        Added ramp printing changes, hidden development code for now.
-#     22-NOV-1999 (PDRAPER):
+#     22-NOV-1999 (PWD):
 #        Added focus_follows_mouse option to stop funny effects
 #        with click-to-focus + autoraise under CDE.
-#     06-DEC-1999 (PDRAPER):
+#     06-DEC-1999 (PWD):
 #        Added Norman Gray's ESP toolbox. Commented out as not ready.
 #     {enter_changes_here}
 
@@ -167,9 +167,9 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  XXX Quit the application. Really.... Rtd doesn't have the exit.
+   #  Quit the application. Really.... Rtd doesn't have the exit.
    public method quit {} {
-      delete object $this
+      delete object $w_
       after idle exit
    }
 
@@ -340,15 +340,9 @@ itcl::class gaia::Gaia {
       lappend skycat_images $itk_component(image)
    }
    
-   #  Delete a window, needed to also clear up toolboxes, which
+   #  Delete a window, just destroy it really.
    #  are not removed correctly.
    public method delete_window {} {
-      foreach w [array name itk_component] {
-         if { [winfo exists $itk_component($w)] &&
-              [winfo toplevel $itk_component($w)] != "$w_" } {
-            destroy $itk_component($w)
-         }
-      }
       delete object $w_
    }
 
@@ -521,9 +515,9 @@ itcl::class gaia::Gaia {
 	 -accelerator {Control-h}
       bind $w_ <Control-h> [code $this make_toolbox contour]
 
-      #add_menuitem $m command "Surface photometry...  " \
-      #   {Perform interactive galaxy surface photometry} \
-      #   -command [code $this make_toolbox esp] \
+      add_menuitem $m command "Surface photometry...  " \
+         {Perform interactive galaxy surface photometry} \
+         -command [code $this make_toolbox esp] \
 
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
@@ -564,7 +558,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude aperture photometry toolbox.
    public method make_magphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom .\#auto 1 \
+         GaiaApPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -577,7 +571,7 @@ itcl::class gaia::Gaia {
    #  Make a counts aperture photometry toolbox.
    public method make_countphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaApPhotom .\#auto 0 \
+         GaiaApPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -590,7 +584,7 @@ itcl::class gaia::Gaia {
    #  Make a magnitude optimal photometry toolbox.
    public method make_magoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom .\#auto 1 \
+         GaiaOptPhotom $w_.\#auto 1 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -603,7 +597,7 @@ itcl::class gaia::Gaia {
    #  Make a counts optimal photometry toolbox.
    public method make_countoptphotom_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaOptPhotom .\#auto 0 \
+         GaiaOptPhotom $w_.\#auto 0 \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -616,7 +610,7 @@ itcl::class gaia::Gaia {
    #  Make an ARD toolbox.
    public method make_ard_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaArd .\#auto \
+         GaiaArd $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -630,7 +624,7 @@ itcl::class gaia::Gaia {
    #  Make an AST grid toolbox.
    public method make_astgrid_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstGrid .\#auto \
+         StarAstGrid $w_.\#auto \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
@@ -644,7 +638,7 @@ itcl::class gaia::Gaia {
    #  Make an AST reference WCS toolbox.
    public method make_astreference_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstReference .\#auto \
+         StarAstReference $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -659,7 +653,7 @@ itcl::class gaia::Gaia {
    #  Make an AST define WCS toolbox.
    public method make_astdefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstDefine .\#auto \
+         StarAstDefine $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -672,7 +666,7 @@ itcl::class gaia::Gaia {
    #  Make an AST copy WCS toolbox.
    public method make_astcopy_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstCopy .\#auto \
+         StarAstCopy $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -686,7 +680,7 @@ itcl::class gaia::Gaia {
    #  Make an AST refine WCS toolbox or make it visible.
    public method make_astrefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstRefine .\#auto \
+         StarAstRefine $w_.\#auto \
             -image $image_ \
             -rtdimage [$image_ get_image] \
             -canvas [$image_ get_canvas] \
@@ -701,7 +695,7 @@ itcl::class gaia::Gaia {
    #  Make an AST set celestial coordinates system toolbox.
    public method make_astsystem_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstSystem .\#auto \
+         StarAstSystem $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -711,10 +705,9 @@ itcl::class gaia::Gaia {
       }
    }
 
-   #  When image is flipped etc. we may want to redraw some items
-   #  that are to expense to flip via Tcl commands.
-   #  If auto is set 1 then the grid is only redrawn if automatic
-   #  redraws are on.
+   #  When image is flipped etc. we may want to redraw some items that
+   #  are too expensive to flip via Tcl commands.  If auto is set 1
+   #  then the grid is only redrawn if automatic redraws are on.
    protected method redraw_specials_ { {auto 0} } {
       if { [info exists itk_component(astgrid) ] &&
            [winfo exists $itk_component(astgrid) ] } {
@@ -738,7 +731,7 @@ itcl::class gaia::Gaia {
    #  Make a patch toolbox.
    public method make_patch_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarPatch .\#auto \
+         StarPatch $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image] \
@@ -752,7 +745,7 @@ itcl::class gaia::Gaia {
    public method make_blink_toolbox {name {cloned 0}} {
       if { [llength [SkyCat::get_skycat_images] ] > 1 } {
          itk_component add $name {
-            StarBlink .\#auto \
+            StarBlink $w_.\#auto \
                -transient $itk_option(-transient_tools) \
                -number $clone_ \
                -clone_cmd [code $this make_toolbox blink 1]
@@ -765,7 +758,7 @@ itcl::class gaia::Gaia {
    #  Make a sextractor toolbox.
    public method make_sextractor_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaSextractor .\#auto \
+         GaiaSextractor $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -780,7 +773,7 @@ itcl::class gaia::Gaia {
    #  Make a contour toolbox.
    public method make_contour_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaContour .\#auto \
+         GaiaContour $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -796,7 +789,7 @@ itcl::class gaia::Gaia {
    #  Make an ESP toolbox.
    public method make_esp_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaEsp .\#auto \
+         GaiaEsp $w_.\#auto \
             -canvasdraw [$image_ component draw] \
             -canvas [$image_ get_canvas] \
             -rtdimage [$image_ get_image]\
@@ -809,7 +802,7 @@ itcl::class gaia::Gaia {
    #  Start the demonstration toolbox.
    public method make_demo_toolbox {name {cloned 0}} {
       itk_component add $name {
-         GaiaDemo .\#auto \
+         GaiaDemo $w_.\#auto \
             -gaiamain $w_ \
             -rtdimage [$image_ get_image] \
             -gaiactrl $image_ \
