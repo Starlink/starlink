@@ -75,9 +75,9 @@
 #  all routines.
       set ans = `confirm "Re-create SUN238?\n\n$n"`
       if( "$ans" == "n" || "$ans" == "N" ) then
-         makesun = "no"
+         set makesun = "no"
       else
-         makesun = "yes"
+         set makesun = "yes"
       endif
 
       if( "$makesun" == "yes" ) then
