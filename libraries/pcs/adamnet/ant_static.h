@@ -210,7 +210,7 @@ void
 static void ant_exhdlr
 (
 int isig, 
-struct siginfo *info, 
+siginfo_t *info,
 void *dummy
 );
 
@@ -219,7 +219,7 @@ void *dummy
 void ant_sighdlr
 ( 
 int astparam,      /* the signal parameter (given) */
-struct siginfo *infop,
+siginfo_t *infop,
 void *ucp
 );
 
