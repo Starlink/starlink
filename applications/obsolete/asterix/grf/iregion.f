@@ -81,6 +81,11 @@
 *  otherwise save current region mask and get memory to store new stuff
             RPTR=I_REG_PTR
             CALL DYN_MAPB(1,I_NX*I_NY,I_REG_PTR,STATUS)
+            IF (EXCLUDE) THEN
+              CALL ARR_INIT1B('01'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
+            ELSE
+              CALL ARR_INIT1B('00'X,I_NX*I_NY,%val(I_REG_PTR),STATUS)
+            ENDIF
           ENDIF
         ENDIF
 
