@@ -46,6 +46,7 @@
 *    Local variables :
 *
       CHARACTER*(DAT__SZLOC)       FLOC          ! Field structure
+      CHARACTER*(DAT__SZLOC)       PLOC          ! POSIT structure
 
       INTEGER                      DIMS(DAT__MXDIM) ! Field dimensions
       INTEGER                      NDIM          ! Field dimensionality
@@ -58,7 +59,8 @@
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *      Number of sources
-        CALL SSO_GETNSRC( LOC, NSRC, STATUS )
+        CALL DAT_FIND( LOC, 'POSIT', PLOC, STATUS )
+        CALL CMP_GET0I( PLOC, 'NSRC', NSRC, STATUS )
 
 *      Locate the item
         CALL SSO_LOCFLD( LOC, FLD, FLOC, STATUS )
@@ -91,7 +93,7 @@
 
 *      Tidy up
         IF ( STATUS .NE. SAI__OK ) THEN
-          CALL ERR_REP( ' ', '...from SSO_MAPFLD', STATUS )
+          CALL AST_REXIT( 'SSO_MAPFLD', STATUS )
         END IF
 
       END IF

@@ -153,7 +153,6 @@
 
 *    Get Asterix going
       CALL AST_INIT( )
-      CALL SSO_INIT( )
 
 *    Get input file specifications
       NSPEC = 0
@@ -194,15 +193,19 @@
           CALL ADI_FOPEN( AFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
 
         ELSE
-          SLEN = CHR_LEN(SPEC(ISPEC))
-          LAST4 = SPEC(ISPEC)(MAX(1,SLEN-3):SLEN)
-          CALL CHR_UCASE( LAST4 )
-          IF ( LAST4 .NE. '.SDF' ) THEN
-            SPEC(ISPEC) = SPEC(ISPEC)(:SLEN)//'.sdf'
+          IF ( NEW_SPEC ) THEN
+            SLEN = CHR_LEN(SPEC(ISPEC))
+            LAST4 = SPEC(ISPEC)(MAX(1,SLEN-3):SLEN)
+            CALL CHR_UCASE( LAST4 )
+            IF ( LAST4 .NE. '.SDF' ) THEN
+              SPEC(ISPEC) = SPEC(ISPEC)(:SLEN)//'.sdf'
+            END IF
           END IF
           CALL UTIL_FINDFILE_INT( '.', SPEC(ISPEC), SCONTEXT,
      :                                        SFILE, STATUS )
           CALL ADI_FOPEN( SFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
+
+          NEW_SPEC = .FALSE.
           ANYWILD = .TRUE.
 
         END IF
@@ -217,6 +220,8 @@
             CALL ERR_ANNUL( STATUS )
             IF ( INDIR(ISPEC) ) THEN
               CALL FIO_CLOSE( FD, STATUS )
+            ELSE
+              CALL UTIL_FINDFILE_END( SCONTEXT, STATUS )
             END IF
             ISPEC = ISPEC + 1
             NEW_SPEC = .TRUE.
@@ -225,15 +230,14 @@
 *      Good input?
         ELSE IF ( STATUS .EQ. SAI__OK ) THEN
 
-*        Is it a set?
-          CALL ADI_DERVD( IFID, 'SSDSset', IS_SET(NFILE), STATUS )
-
 *        Get number of sources
           CALL ADI_CGET0I( IFID, 'NSRC', NSRC(NFILE), STATUS )
           TNSRC = TNSRC + NSRC(NFILE)
 
 *        Get number of components in BOOK structure
           CALL ADI_CGET0I( IFID, 'NFILE', NCOMP(NFILE), STATUS )
+          IS_SET(NFILE) = (NCOMP(IFILE) .NE. 0)
+          NCOMP(NFILE) = MAX(1,NCOMP(NFILE))
 
 *        Store origin for this file
           IF ( NFILE .EQ. 1 ) THEN
@@ -282,18 +286,16 @@
 
 *    Get output file
       CALL ADI_NEW0( 'SSDSset', SFID, STATUS )
+      CALL ADI_CPUT0I( SFID, 'NFILE', TNCOMP, STATUS )
       CALL USI_CREAT( 'OUT', SFID, OFID, STATUS )
       CALL ADI1_GETLOC( OFID, OLOC, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Create the book-keeping structure
-      CALL SSO_CREBOOK( OLOC, TNCOMP, STATUS )
-
 *    Create source info components in output
-      CALL SSO_PUTNSRC( OLOC, TNSRC, STATUS )
+      CALL SSI_PUTNSRC( OFID, TNSRC, STATUS )
       IF ( TNSRC .GT. 0 ) THEN
-        CALL SSO_CREFLD( OLOC, 'ID', '_INTEGER', STATUS )
-        CALL SSO_MAPFLD( OLOC, 'ID', '_INTEGER', 'WRITE',
+        CALL SSI_CREFLD( OFID, 'ID', '_INTEGER', STATUS )
+        CALL SSI_MAPFLD( OFID, 'ID', '_INTEGER', 'WRITE',
      :                                   OIDPTR, STATUS )
       END IF
 
@@ -325,18 +327,25 @@
           CALL UTIL_FINDFILE_INT( '.', SPEC(ISPEC), SCONTEXT,
      :                                        SFILE, STATUS )
           CALL ADI_FOPEN( SFILE, 'SSDSset|SSDS', 'READ', IFID, STATUS )
+          ANYWILD = .TRUE.
+          NEW_SPEC = .FALSE.
         END IF
 
-        IF ( (STATUS.EQ.PAR__NULL) .OR. (STATUS.EQ.FIO__EOF) ) THEN
+        IF ( (STATUS.EQ.SAI__ERROR) .OR. (STATUS.EQ.FIO__EOF) ) THEN
           CALL ERR_ANNUL( STATUS )
           IF ( INDIR(ISPEC) ) THEN
             CALL FIO_CLOSE( FD, STATUS )
+          ELSE
+            CALL UTIL_FINDFILE_END( SCONTEXT, STATUS )
           END IF
           ISPEC = ISPEC + 1
           NEW_SPEC = .TRUE.
+          GOTO 50
+
         END IF
 
 *      Copy book-keeping data
+        CALL ADI1_GETLOC( IFID, ILOC, STATUS )
         DO ICOMP = 1, NCOMP(IFILE)
           CALL SSO_LOCBOOK( ILOC, ICOMP, CSLOC, STATUS )
           CALL SSO_LOCBOOK( OLOC, CCOMP, CLOC, STATUS )
@@ -364,15 +373,15 @@
                 CALL HDX_TYPSIZ( FTYPE(I), SIZE(I), STATUS )
 
 *              Create field in output
-                CALL SSO_CREFLD( OLOC, FLD(I), FTYPE(I), STATUS )
+                CALL SSI_CREFLD( OFID, FLD(I), FTYPE(I), STATUS )
                 CALL SSO_LOCFLD( OLOC, FLD(I), OFLOC, STATUS )
 
 *              And map it
-                CALL SSO_MAPFLD( OLOC, FLD(I), FTYPE(I), 'WRITE',
+                CALL SSI_MAPFLD( OFID, FLD(I), FTYPE(I), 'WRITE',
      :                                          OPTR(I), STATUS )
 
 *              Symmetric errors?
-                CALL SSO_GETPAR0L( ILOC, 1, 'SYMMETRIC', SYMMETRIC,
+                CALL SSI_GETPAR0L( IFID, 1, 'SYMMETRIC', SYMMETRIC,
      :                                                     STATUS )
                 IF ( STATUS .NE. SAI__OK ) THEN
                   CALL ERR_ANNUL( STATUS )
@@ -381,12 +390,12 @@
 
 *              Copy field errors
                 IF ( I .GT. 5 ) THEN
-                  CALL SSO_CHKFLDERR( ILOC, FLD(I), ECOPY(I), STATUS )
+                  CALL SSI_CHKFLDERR( IFID, FLD(I), ECOPY(I), STATUS )
                   IF ( ECOPY(I) ) THEN
 
 *                  How many error items?
-                    CALL CMP_SHAPE( IFLOC, 'ERROR', DAT__MXDIM, EDIMS,
-     :                                                 ENDIM, STATUS )
+                    CALL SSI_SHPFLDERR( IFID, FLD(I), DAT__MXDIM, EDIMS,
+     :                                                   ENDIM, STATUS )
                     IF ( SYMMETRIC ) THEN
                       NEDAT = 1
                     ELSE
@@ -399,9 +408,9 @@
                     END IF
 
 *                  Create errors in output and map
-                    CALL SSO_CREFLDERR( OLOC, FLD(I), '_REAL', NEDAT,
+                    CALL SSI_CREFLDERR( OFID, FLD(I), '_REAL', NEDAT,
      :                                                NELEV, STATUS )
-                    CALL SSO_MAPFLDERR( OLOC, FLD(I), '_REAL', 'WRITE',
+                    CALL SSI_MAPFLDERR( OFID, FLD(I), '_REAL', 'WRITE',
      :                                               OEPTR(I), STATUS )
 
                   END IF
@@ -430,20 +439,20 @@
               END IF
 
 *            Map data in input file and copy
-              CALL SSO_MAPFLD( ILOC, FLD(I), FTYPE(I), 'READ',
+              CALL SSI_MAPFLD( IFID, FLD(I), FTYPE(I), 'READ',
      :                                          IPTR, STATUS )
               CALL ARR_COP1B( NSRC(IFILE)*SIZE(I), %VAL(IPTR),
      :                        %VAL(OPTR(I)+CSRC*SIZE(I)), STATUS )
-              CALL SSO_UNMAPFLD( ILOC, FLD(I), STATUS )
+              CALL SSI_UNMAPFLD( IFID, FLD(I), STATUS )
 
 *            And errors
               IF ( ECOPY(I) ) THEN
-                CALL SSO_MAPFLDERR( ILOC, FLD(I), '_REAL', 'READ',
+                CALL SSI_MAPFLDERR( IFID, FLD(I), '_REAL', 'READ',
      :                                              IPTR, STATUS )
                 CALL ARR_COP1R( NSRC(IFILE)*NEDAT, %VAL(IPTR),
      :                          %VAL(OEPTR(I)+CSRC*VAL__NBR*NEDAT),
      :                          STATUS )
-                CALL SSO_UNMAPFLDERR( ILOC, FLD(I), STATUS )
+                CALL SSI_UNMAPFLDERR( IFID, FLD(I), STATUS )
               END IF
 
             END IF
@@ -454,20 +463,20 @@
           IF ( IS_SET(IFILE) ) THEN
 
 *          Copy the sets id list
-            CALL SSO_MAPFLD( ILOC, 'ID', '_INTEGER', 'READ',
+            CALL SSI_MAPFLD( IFID, 'ID', '_INTEGER', 'READ',
      :                                       IDPTR, STATUS )
             CALL ARR_COP1I( NSRC(IFILE), %VAL(IDPTR),
      :                      %VAL(OIDPTR+CSRC*VAL__NBI), STATUS )
-            CALL SSO_UNMAPFLD( ILOC, 'ID', STATUS )
+            CALL SSI_UNMAPFLD( IFID, 'ID', STATUS )
 
           ELSE
-            CALL ARR_INIT1I( 1, NSRC(IFILE), %VAL(OIDPTR+CSRC*4),
+            CALL ARR_INIT1I( 1, NSRC(IFILE), %VAL(OIDPTR+CSRC*VAL__NBI),
      :                                                   STATUS )
           END IF
 
 *        Add offset
           CALL ARR_ADD1I( ORIG(IFILE)-1, NSRC(IFILE),
-     :                  %VAL(OIDPTR+CSRC*4), STATUS )
+     :                  %VAL(OIDPTR+CSRC*VAL__NBI), STATUS )
 
 *        Reset flag marking first file with sources
           FIRST_WITH_SRC = .FALSE.
@@ -484,7 +493,7 @@
       END DO
 
 *    Release output
-      CALL SSO_RELEASE( OLOC, STATUS )
+      CALL SSI_RELEASE( OFID, STATUS )
 
 *    Close wild-card stream
       IF ( ANYWILD ) THEN
@@ -493,7 +502,6 @@
 
 *    Tidy up
  99   CALL AST_CLOSE()
-      CALL SSO_CLOSE()
       CALL AST_ERR( STATUS )
 
       END
