@@ -313,7 +313,13 @@ ast.h: $(AST_H_FILES) ast_err.h makeh
 # it before it makes the `astbad' program it depends on.  Instead,
 # just rely on the dependencies expressed in the main body above to
 # have AST_PAR built before it is needed.
-BUILT_SOURCES = AST_ERR ast_err.h
+#
+# error.h doesn't _have_ to be built this early, but almost all of the 
+# modules depend on it, so it's more robust to list it here rather than
+# in each of the _SOURCES declarations above.
+BUILT_SOURCES = AST_ERR ast_err.h error.h
+
+object.c: version.h
 
 #  Form a second link to the main object library. This is used when a second
 #  pass through the library is needed during linking.
