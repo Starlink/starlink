@@ -39,28 +39,29 @@
 *     12 Jan 90: V1.0-3 Re-write to use ASTLIB! No longer generates negative
 *                       variances. Doesn't re-prompt after invalid input.
 *                       The TIM_ routines now use IMPLICIT NONE. (BHVAD::DJA)
-*     10 Apr 90: V1.0-4 Accepts nD data and folds each dimension over time. If
-*                       time is not the AXIS(1) then the axes are swapped so
-*                       that it is. (SRD)
+*     10 Apr 90 : V1.0-4 Accepts nD data and folds each dimension over time. If
+*                        time is not the AXIS(1) then the axes are swapped so
+*                        that it is. (SRD)
 *
-*     19 Jul 90: bug fixes in unweighted fold subroutine (AJN) :-
-*                BVAR & YBAR arrays now initialised in TIM_FOLDU subroutine
+*     19 Jul 90 : bug fixes in unweighted fold subroutine (AJN) :-
+*                 BVAR & YBAR arrays now initialised in TIM_FOLDU subroutine
 *
-*     24 Jul 90: bug fix - epochzero is carried over to subroutines
-*          	 as a number of days - now converts to seconds within
-*                the subroutines before calculation (AJN)
+*     24 Jul 90 : bug fix - epochzero is carried over to subroutines
+*          	  as a number of days - now converts to seconds within
+*                 the subroutines before calculation (AJN)
 *
-*     30 Sep 90: Converted to do range folding on a 1-D data set (AJN)
-*                Nb. not all of the code referring to n-D sets has been
-*                removed - it all works okay but is maybe a little untidy !
+*     30 Sep 90 : Converted to do range folding on a 1-D data set (AJN)
+*                 Nb. not all of the code referring to n-D sets has been
+*                 removed - it all works okay but is maybe a little untidy !
 *
-*     17 Jun 91: Rationalised to use the same input as the other time
-*                series routines. Fixed some bugs in parameter passing
-*                into the main subroutines  (RDS)
-*      7 Oct 92: V1.7-0 TIM_FOLDx routines renamed FOLDLOTS_FOLDx to avoid
-*                       confusion with incompatible versions in FOLDBIN (DJA)
-*     10 Apr 93: V1.7-1 Removed superfluous STATUS in call to MSG_SET (DJA)
-*     17 AUG 93: V1.7-2 Trivial changes to ARR_REG routines (DJA)
+*     17 Jun 91 : Rationalised to use the same input as the other time
+*                 series routines. Fixed some bugs in parameter passing
+*                 into the main subroutines  (RDS)
+*      7 Oct 92 : V1.7-0 TIM_FOLDx routines renamed FOLDLOTS_FOLDx to avoid
+*                        confusion with incompatible versions in FOLDBIN (DJA)
+*     10 Apr 93 : V1.7-1 Removed superfluous STATUS in call to MSG_SET (DJA)
+*     17 Aug 93 : V1.7-2 Trivial changes to ARR_REG routines (DJA)
+*     17 Apr 95 : V1.8-0 New data interfaces (DJA)
 *
 *    Type Definitions :
 *
@@ -69,9 +70,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Status :
 *
@@ -84,11 +83,6 @@
 *
 *    Local variables :
 *
-      CHARACTER          ILOC*(DAT__SZLOC)      ! Input object locator
-      CHARACTER          FLOC*(DAT__SZLOC)      ! Folded data object locator
-      CHARACTER		 CLOC*(DAT__SZLOC)      ! Chi-sq data object locator
-      CHARACTER          HEADER*(DAT__SZLOC)    ! Locator to HEADER
-
       CHARACTER*132      HTXT(MAXHTXT)          ! History text
       CHARACTER*80       UNITS                  ! Value of AXIS(1) UNITS.
 
@@ -109,6 +103,12 @@
       INTEGER            NGOOD                  ! Total no.of good data points
       INTEGER		 NPER			! No. of periods to fold at
       INTEGER            IERR                   ! Error flag from TIM_FOLD
+
+      INTEGER			CFID			! Chi-sq o/p dataset id
+      INTEGER			FFID			! Folded o/p dataset id
+      INTEGER			IFID			! Input dataset id
+      INTEGER			TIMID			! Timing info
+
       INTEGER            NBINS                  ! No. of phase bins
       INTEGER            NELM2
       INTEGER            DPNTR                  ! Pointer to data array
@@ -137,101 +137,91 @@
 *
 *    Version id
 *
-      CHARACTER*30       VERSION
-         PARAMETER       ( VERSION = 'FOLDLOTS Version 1.7-2')
-*
-*    Check status.
+      CHARACTER*30		VERSION
+        PARAMETER       	( VERSION = 'FOLDLOTS Version 1.8-0' )
+*-
+
+*  Check status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Initialise
+*  Initialise
       CALL AST_INIT()
 
-*    Version
+*  Version
       CALL MSG_PRNT( VERSION )
 
-*    Get input data
-      CALL TIM_GETDATA(ILOC, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
+*  Get input data
+      CALL TIM_GETDAT( IFID, NTOT, NGOOD, TPNTR, DPNTR, LVAR,
      :                                        VPNTR, STATUS )
-*
-*    Map axis widths. NB: this routine sets axis widths assuming
-*    bin boundaries are equidistant between bins if widths are
-*    missing.
-      CALL BDA_MAPAXWID( ILOC, 'READ', 1, TWPNTR, STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*    Create a folded data object.
-      CALL USI_ASSOCO( 'FOLD_OBJ', 'FOLDED_SERIES', FLOC, STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*    Create an object for the chi-squared array.
-      CALL USI_ASSOCO( 'CHI_OBJ', 'DISTRIBUTION', CLOC,STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*    If AXIS(1) UNITS are defined, then display them.
+
+*  Map axis widths. NB: this routine sets axis widths assuming bin
+*  boundaries are equidistant between bins if widths are missing
+      CALL BDI_MAPAXWID( IFID, 'READ', 1, TWPNTR, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
+*  Create a folded data object.
+      CALL USI_TASSOCO( 'FOLD_OBJ', 'FOLDED_SERIES', FFID, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
+*  Create an object for the chi-squared array.
+      CALL USI_TASSOCO( 'CHI_OBJ', 'DISTRIBUTION', CFID, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
+
+*  If AXIS(1) UNITS are defined, then display them.
       UNITS = 'Units'
-      CALL BDA_GETAXUNITS( ILOC, 1, UNITS, STATUS )
+      CALL BDI_GETAXUNITS( IFID, 1, UNITS, STATUS )
       CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
-*
-*    Find the axis array range
-      CALL BDA_MAPAXVAL(ILOC, 'READ', 1, DELPTR, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error accessing axis array')
-         GOTO 999
+
+*  Find the axis array range
+      CALL BDI_MAPAXVAL( IFID, 'READ', 1, DELPTR, STATUS)
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL MSG_PRNT('Error accessing axis array')
+        GOTO 99
       ENDIF
-*
       CALL ARR_RANG1R( NTOT, %val(DELPTR), TMIN, TMAX, STATUS )
 *
       TSCALE = (TMAX - TMIN) / REAL(NTOT - 1)
       CALL MSG_SETR('TS', TSCALE)
       CALL MSG_PRNT( 'Mean time increment : ^TS')
 *
-      IF (STATUS .NE. SAI__OK) STATUS = SAI__OK
-*
-*    Get start period
-      CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
-*
-      PSTART=PERIOD
+      IF (STATUS .NE. SAI__OK) THEN
+        CALL ERR_ANNUL( STATUS )
+      END IF
 
-*    Get period increment
+*  Get start period
+      CALL USI_GET0R( 'PERIOD', PERIOD, STATUS )
+      PSTART = PERIOD
+
+*  Get period increment
       CALL USI_GET0R( 'PINC', PINC, STATUS )
 
-*    Get number of periods to fold at
+*  Get number of periods to fold at
       CALL USI_GET0I( 'NPER', NPER, STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
-*    Define base epoch
-      CALL BDA_LOCHEAD( ILOC, HEADER, STATUS )
+      IF (STATUS .NE. SAI__OK) GOTO 99
 
-      CALL DAT_THERE(HEADER,'BASE_TAI',BOK,STATUS)
-
-      IF(BOK) THEN
-        CALL CMP_GET0D( HEADER, 'BASE_TAI', BASE_TAI, STATUS )
+*  Define base epoch
+      CALL TCI_GETID( IFID, TIMID, STATUS )
+      CALL ADI_THERE( TIMID, 'TAIObs', BOK, STATUS )
+      IF ( BOK ) THEN
+        CALL ADI_CGET0D( TIMID, 'TAIObs', BASE_TAI, STATUS )
       ELSE
         CALL MSG_PRNT( 'No atomic time: default epoch set to 0' )
-        BASE_TAI=0.0
+        BASE_TAI = 0D0
       ENDIF
-
       CALL USI_DEF0D( 'EPOCH', BASE_TAI, STATUS )
       CALL USI_GET0D( 'EPOCH', ZeroEpoch, STATUS )
-*
-      IF (STATUS .NE. SAI__OK) GOTO 999
-*
+      IF (STATUS .NE. SAI__OK) GOTO 99
       ZEROEPOCH = ZEROEPOCH - BASE_TAI
+
+*  Calculate default number of phase bins
+      IF ( (NTOT .GT. 1) .AND. (TMAX .NE. TMIN) ) THEN
 *
-* Calculate default number of phase bins
-      IF (NTOT .GT. 1 .AND. TMAX .NE. TMIN) THEN
-*
-         INBINS = INT(PERIOD / TSCALE)
+        INBINS = INT(PERIOD / TSCALE)
 *
       ELSE
          CALL MSG_PRNT('Error in data array or axis')
-         GOTO 999
+         GOTO 99
       ENDIF
 *
 C      CALL MSG_SETI('NB', INBINS)
@@ -249,73 +239,81 @@ C          NBINS = INBINS
      &               /' to the folding period')
       END IF
 
-*    Ask if weighted mean required
+*  Ask if weighted mean required
       CALL USI_GET0L('WEIGHTED',WEIGHT,STATUS)
-*
-      IF ( STATUS .NE. SAI__OK ) GOTO 999
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Map workspace
+*  Map workspace
       CALL DYN_MAPR(1,NBINS,WPTR,STATUS)
-*
-*    Set up and map components in output object - folded data
-      CALL BDA_CREDATA(FLOC,1,NBINS,STATUS)
-      CALL BDA_CREVAR(FLOC,1,NBINS,STATUS)
-      CALL BDA_CREAXES(FLOC,1,STATUS)
-      CALL BDA_CREAXVAL(FLOC,1,.FALSE.,NBINS,STATUS)
-      CALL BDA_CREQUAL(FLOC,1,NBINS,STATUS)
-      CALL BDA_MAPDATA(FLOC,'WRITE',FDPTR,STATUS)
-      CALL BDA_MAPVAR(FLOC,'WRITE',FVPTR,STATUS)
-      CALL BDA_MAPAXVAL(FLOC,'WRITE',1,FXPTR,STATUS)
-      CALL BDA_MAPQUAL(FLOC,'WRITE',FQPTR,STATUS)
-      CALL BDA_PUTMASK(FLOC,MASK,STATUS)
+
+*  Set up and map components in output object - folded data
+      CALL BDI_CREDATA(FFID,1,NBINS,STATUS)
+      CALL BDI_CREVAR(FFID,1,NBINS,STATUS)
+      CALL BDI_CREAXES(FFID,1,STATUS)
+      CALL BDI_CREAXVAL(FFID,1,.FALSE.,NBINS,STATUS)
+      CALL BDI_CREQUAL(FFID,1,NBINS,STATUS)
+      CALL BDI_MAPDATA(FFID,'WRITE',FDPTR,STATUS)
+      CALL BDI_MAPVAR(FFID,'WRITE',FVPTR,STATUS)
+      CALL BDI_MAPAXVAL(FFID,'WRITE',1,FXPTR,STATUS)
+      CALL BDI_MAPQUAL(FFID,'WRITE',FQPTR,STATUS)
+      CALL BDI_PUTMASK(FFID,MASK,STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL DAT_NEW(FLOC,'N_OCCUPANTS','_INTEGER',1,NBINS,STATUS)
-      CALL CMP_MAPN( FLOC, 'N_OCCUPANTS', '_INTEGER',
-     :                       'WRITE', 1, FNPTR,NBINS,STATUS)
-*    Set output quality to GOOD (as all bad data has been excluded)
+
+*  Workspace for occupancy
+      CALL DYN_MAPI( 1, NBINS, FNPTR, STATUS )
+
+*  Set output quality to GOOD (as all bad data has been excluded)
       CALL ARR_SUMDIM(1,NBINS,NELM2)
       CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
 
-*    Set up and map components in output object - chi-sq vs. period  data
-      CALL BDA_CREDATA(CLOC,1,NPER,STATUS)
-      CALL BDA_CREAXES(CLOC,1,STATUS)
-      CALL BDA_CREAXVAL(CLOC,1,.FALSE.,NPER,STATUS)
-      CALL BDA_CREQUAL(CLOC,1,NPER,STATUS)
-      CALL BDA_MAPDATA(CLOC,'WRITE',CDPTR,STATUS)
-      CALL BDA_MAPAXVAL(CLOC,'WRITE',1,CXPTR,STATUS)
-      CALL BDA_MAPQUAL(CLOC,'WRITE',CQPTR,STATUS)
-      CALL BDA_PUTMASK(CLOC,MASK,STATUS)
+*  Set up and map components in output object - chi-sq vs. period  data
+      CALL BDI_CREDATA(CFID,1,NPER,STATUS)
+      CALL BDI_CREAXES(CFID,1,STATUS)
+      CALL BDI_CREAXVAL(CFID,1,.FALSE.,NPER,STATUS)
+      CALL BDI_CREQUAL(CFID,1,NPER,STATUS)
+      CALL BDI_MAPDATA(CFID,'WRITE',CDPTR,STATUS)
+      CALL BDI_MAPAXVAL(CFID,'WRITE',1,CXPTR,STATUS)
+      CALL BDI_MAPQUAL(CFID,'WRITE',CQPTR,STATUS)
+      CALL BDI_PUTMASK(CFID,MASK,STATUS)
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-*    Set output quality to GOOD (as all bad data has been excluded)
-      CALL ARR_SUMDIM(1,NPER,NELM2)
-      CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(CQPTR),STATUS)
+
+*  Set output quality to GOOD (as all bad data has been excluded)
+      CALL ARR_SUMDIM( 1, NPER, NELM2 )
+      CALL ARR_INIT1B( QUAL__GOOD, NELM2, %VAL(CQPTR), STATUS )
+
+*  Copy other info from input to output files
+      CALL BDI_COPMORE( IFID, FFID, STATUS )
+      CALL BDI_COPMORE( IFID, CFID, STATUS )
 
 *  Fold the data
-      IF (WEIGHT)THEN
-*
-*       Weighted
+      IF ( WEIGHT ) THEN
 
+*     Weighted
          CALL FOLDLOTS_FOLDW(NGOOD, %VAL(TPNTR), %VAL(TWPNTR),
      :             %VAL(DPNTR), %VAL(VPNTR), PERIOD, PINC, NPER,
      :             REAL(ZEROEPOCH),NBINS,%VAL(WPTR),
      :             %VAL(FNPTR), %VAL(FDPTR), %VAL(FVPTR),
      :             NDOF, %VAL(CDPTR), IERR, CHISQ, STATUS)
+
       ELSE
 
-*       Unweighted
-
+*     Unweighted
          CALL FOLDLOTS_FOLDU(NGOOD, %VAL(TPNTR),%VAL(TWPNTR),
      :             %VAL(DPNTR), %VAL(VPNTR), PERIOD, PINC, NPER,
      :             REAL(ZEROEPOCH), NBINS, %VAL(WPTR),
      :             %VAL(FNPTR), %VAL(FDPTR), %VAL(FVPTR),
      :             NDOF, %VAL(CDPTR), IERR, CHISQ, STATUS)
-*
-      ENDIF
-*
+
+      END IF
+
+*  Write and release occupancy numbers
+      CALL AUI_PUT1I( FFID, 'N_OCCUPANTS', NBINS, %VAL(FNPTR), STATUS )
+      CALL DYN_UNMAP( FNPTR, STATUS )
+
 *   Nb. On returning from the subroutines, PERIOD contains the best
 *       period - ie. that with the highest chi-squared, and CHISQ
 *       contains this highest value.
@@ -325,52 +323,34 @@ C          NBINS = INBINS
           CALL MSG_PRNT( 'Bad phase bin - IERR = ^IERR' )
       END IF
 
-*   Put phase bin boundaries into an array
+*  Put phase bin boundaries into an array
       CALL ARR_REG1R( 0.5/REAL(NBINS), 1.0/REAL(NBINS), NBINS,
      :                                   %VAL(FXPTR), STATUS )
-*   Put period bin boundaries into an array
+
+*  Put period bin boundaries into an array
       CALL ARR_REG1R( PSTART, PINC, NPER, %VAL(CXPTR), STATUS )
 
-*    Unmap the Input data
-      CALL BDA_UNMAPDATA(ILOC,STATUS)
+*  Write components to output objects (2 files)
+      CALL AUI_PUT0R( FFID, 'CHISQUARED', CHISQ, STATUS )
+      CALL AUI_PUT0I( FFID, 'DEG_OF_FREEDOM', NDOF, STATUS )
 
-*    And the Output (2 files)
-      CALL BDA_UNMAPDATA(FLOC,STATUS)
-      CALL BDA_UNMAPVAR(FLOC,STATUS)
-      CALL BDA_UNMAPAXVAL(FLOC,1,STATUS)
-      CALL BDA_UNMAPQUAL(FLOC,STATUS)
-      CALL CMP_UNMAP(FLOC,'N_OCCUPANTS',STATUS)
-
-      CALL BDA_UNMAPDATA(CLOC,STATUS)
-      CALL BDA_UNMAPAXVAL(CLOC,1,STATUS)
-      CALL BDA_UNMAPQUAL(CLOC,STATUS)
-
-*    Write components to output objects (2 files)
-      CALL DAT_NEW0R(FLOC,'CHISQUARED',STATUS)
-      CALL CMP_PUT0R(FLOC,'CHISQUARED',CHISQ,STATUS)
-      CALL DAT_NEW0I(FLOC,'DEG_OF_FREEDOM',STATUS)
-      CALL CMP_PUT0I(FLOC,'DEG_OF_FREEDOM',NDOF,STATUS)
-
-      CALL BDA_COPTEXT( ILOC, FLOC, STATUS )
-      CALL BDA_COPTEXT( ILOC, CLOC, STATUS )
-      CALL BDA_PUTLABEL( CLOC, 'Chi-squared', STATUS )
-      CALL BDA_PUTUNITS( CLOC, ' ', STATUS )
+      CALL BDI_COPTEXT( IFID, FFID, STATUS )
+      CALL BDI_COPTEXT( IFID, CFID, STATUS )
+      CALL BDI_PUTLABEL( CFID, 'Chi-squared', STATUS )
+      CALL BDI_PUTUNITS( CFID, ' ', STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL BDA_PUTAXLABEL(FLOC,1,'Phase',STATUS)
-      CALL BDA_PUTAXNORM(FLOC,1,.TRUE.,STATUS)
-      CALL BDA_PUTAXLABEL(CLOC,1,'Period',STATUS)
-      CALL BDA_PUTAXNORM(CLOC,1,.TRUE.,STATUS)
-*    Copy other info from input to output files
-      CALL BDA_COPMORE( ILOC, FLOC, STATUS )
-      CALL BDA_COPMORE( ILOC, CLOC, STATUS )
+      CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
+      CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
+      CALL BDI_PUTAXLABEL(CFID,1,'Period',STATUS)
+      CALL BDI_PUTAXNORM(CFID,1,.TRUE.,STATUS)
 
 *    Add history records
-      CALL HIST_COPY( ILOC, FLOC, STATUS )
-      CALL HIST_ADD( FLOC, VERSION, STATUS )
-      CALL HIST_COPY( ILOC, CLOC, STATUS )
-      CALL HIST_ADD( CLOC, VERSION, STATUS )
+      CALL HSI_COPY( IFID, FFID, STATUS )
+      CALL HSI_ADD( FFID, VERSION, STATUS )
+      CALL HSI_COPY( IFID, CFID, STATUS )
+      CALL HSI_ADD( CFID, VERSION, STATUS )
 
       HTXT(1) = 'Input {INP}'
       HTXT(2) = 'Folded output {FOLD_OBJ}'
@@ -383,7 +363,7 @@ C          NBINS = INBINS
      :                                                       HLEN)
       USED = MAXHTXT
       CALL USI_TEXT( 4, HTXT, USED, STATUS )
-      CALL HIST_PTXT(FLOC,USED,HTXT,STATUS)
+      CALL HSI_PTXT(FFID,USED,HTXT,STATUS)
 
       HTXT(1) = 'Input {INP}'
       HTXT(2) = 'Chi-sq vs. period output {CHI_OBJ}'
@@ -402,7 +382,7 @@ C          NBINS = INBINS
      :                                                       HLEN)
       USED = MAXHTXT
       CALL USI_TEXT( 6, HTXT, USED, STATUS )
-      CALL HIST_PTXT(CLOC,USED,HTXT,STATUS)
+      CALL HSI_PTXT(CFID,USED,HTXT,STATUS)
 
 *    Output maximum CHISQ & best PERIOD values to user
       CALL MSG_SETR( 'PERIOD', PERIOD )
@@ -412,19 +392,13 @@ C          NBINS = INBINS
       CALL MSG_PRNT( 'Chi-sq value of best fit to mean = ^CHISQ')
 
 *    Release datasets
-      CALL BDA_RELEASE( ILOC, STATUS )
-      CALL BDA_RELEASE( FLOC, STATUS )
-      CALL BDA_RELEASE( CLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( FFID, STATUS )
+      CALL BDI_RELEASE( CFID, STATUS )
 
 *   Tidy up
-999   CONTINUE
-
-      CALL AST_CLOSE
-
-*    Exit
-      IF (STATUS.NE.SAI__OK) THEN
-         CALL ERR_REP('EXERR','Error report from FOLDLOTS',STATUS)
-      END IF
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
 
       END
 
@@ -466,8 +440,6 @@ C          NBINS = INBINS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
@@ -679,8 +651,6 @@ C          NBINS = INBINS
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *
 *    Import :
 *
