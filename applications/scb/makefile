@@ -239,6 +239,10 @@ INSTALL = $(HOME)
 
 EXPORT = .
 
+#  Default macro for Perl 5.
+
+PERL5 = /usr/local/bin/perl
+
 #  Default macros for compiling C and Fortran source code.
 
 CC = c89
@@ -270,6 +274,39 @@ AR_IN = ar -r
 SHARE = .so
 BLD_SHR = :
 
+#  The folllowing defaults affect the details of the local installation
+#  of the source code browser and indexer programs.  Again they should
+#  be overridden in the mk file, or as environment variables at build
+#  time.
+
+#  Directory for installing Perl modules
+
+PERL_MOD_DIR = $(INSTALL)/lib/perl5
+
+#  Default directory for storing source code index files.
+
+SCB_INDEX = $(INSTALL)/etc/$(PKG_NAME)
+
+#  Default location of source code to index.
+
+SCB_SOURCES = $(STARLINK)/sources
+
+#  Starlink document HTTP server.
+
+HTXSERVER_URL = http://star-www.rl.ac.uk/cgi-bin/htxserver/
+
+#  Location of mime.types file.
+
+MIMETYPES_FILE = /etc/mime.types
+
+#  Temporary directory used by browser program.
+
+SCB_BROWSER_TMP = /usr/tmp/scb
+
+#  Temporary directory used by indexer program.
+
+SCB_INDEXER_TMP = /usr/tmp/scbindexer
+
 #-------------------------------------------------------------------------------
 ################################################################################
 #
@@ -284,6 +321,7 @@ BLD_SHR = :
 PACK_NAME = SCB
 
 #  Prefix for the package in lower-case as used in filenames etc.
+
 PKG_NAME = scb
 
 #  Version number (as in the documentation - i.e. not the same thing
@@ -304,7 +342,8 @@ PKG_VERS = 0.1
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar $(PKG_NAME)_test.tar \
+               makefile mk $(DOCUMENTATION)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -379,8 +418,10 @@ $(PERL_MODULES):
 
 VAR_SUBST = sed \
             -e's%"$$STARLINK"%"$(STARLINK)"%' \
-            -e's%"$$INDEX_DIR"%"$(INDEX_DIR)"%' \
-            -e's%"$$SOURCES_DIR"%"$(SOURCES_DIR)"%' \
+            -e's%"$$SCB_INDEX"%"$(SCB_INDEX)"%' \
+            -e's%"$$SCB_SOURCES"%"$(SCB_SOURCES)"%' \
+            -e's%"$$SCB_BROWSER_TMP"%"$(SCB_BROWSER_TMP)"%' \
+            -e's%"$$SCB_INDEXER_TMP"%"$(SCB_INDEXER_TMP)"%' \
             -e's%"$$HTXSERVER_URL"%"$(HTXSERVER_URL)"%' \
             -e's%"$$MIMETYPES_FILE"%"$(MIMETYPES_FILE)"%'
 
@@ -412,7 +453,7 @@ INSTALL_CGI = $(INSTALL_BIN)/cgi
 #  those above) and rules to create them.
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_PERL_MOD) $(INSTALL_CGI) \
-               $(INDEX_DIR) \
+               $(SCB_INDEX) \
                $(INSTALL_DATES)
 
 $(INSTALL_DIRS): 
@@ -805,8 +846,26 @@ do_test:
 #  Note the test has not yet succeeded.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  The test is simply to echo the string that xdisplay returns.
-	echo 'Test not yet implemented'
+#  First of all it is checked that a Perl 5 executable exists in the 
+#  right place.
+#  The test proper is to build a small index in a temporary directory from
+#  a small source archive supplied with this package, and to extract files
+#  from that index. 
+	$(PERL5) -e 'require 5;'
+	SCB_INDEX=/usr/tmp/scb_test; \
+        export SCB_INDEX; \
+        echo SCB_INDEX: $$SCB_INDEX; \
+        rm -rf $$SCB_INDEX; \
+        mkdir $$SCB_INDEX; \
+        echo "scbindex.pl:  Indexing scb_test.tar"; \
+        echo " "; \
+        $(INSTALL_BIN)/scbindex.pl scb_test.tar; \
+        echo " "; \
+        echo "scb.pl:  Extracting fortran file"; \
+        echo " "; \
+        $(INSTALL_BIN)/scb.pl -html -exact cmp_struc_ type=func >/dev/null; \
+        $(INSTALL_BIN)/scb.pl -html -exact hds_copy_  type=func >/dev/null; \
+        rm -rf $$SCB_INDEXDIR
 #
 #  Note the test has been run.
 	@ touch .TESTED_$(SYSTEM)
