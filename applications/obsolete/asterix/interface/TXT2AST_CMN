@@ -7,10 +7,10 @@
       LOGICAL             USE_QUAL
       LOGICAL             USE_LOERR
       LOGICAL             USE_UPERR
-      LOGICAL             USE_AX_DATA(DAT__MXDIM)
-      LOGICAL             USE_AX_WID(DAT__MXDIM)
-      LOGICAL             USE_AX_AWIDLO(DAT__MXDIM)
-      LOGICAL             USE_AX_AWIDHI(DAT__MXDIM)
+      LOGICAL             USE_AX_DATA(ADI__MXDIM)
+      LOGICAL             USE_AX_WID(ADI__MXDIM)
+      LOGICAL             USE_AX_AWIDLO(ADI__MXDIM)
+      LOGICAL             USE_AX_AWIDHI(ADI__MXDIM)
 
 *    Column position
       INTEGER             POS_DATA
@@ -18,10 +18,10 @@
       INTEGER             POS_QUAL
       INTEGER             POS_LOERR
       INTEGER             POS_UPERR
-      INTEGER             POS_AX_DATA(DAT__MXDIM)
-      INTEGER             POS_AX_WID(DAT__MXDIM)
-      INTEGER             POS_AX_AWIDLO(DAT__MXDIM)
-      INTEGER             POS_AX_AWIDHI(DAT__MXDIM)
+      INTEGER             POS_AX_DATA(ADI__MXDIM)
+      INTEGER             POS_AX_WID(ADI__MXDIM)
+      INTEGER             POS_AX_AWIDLO(ADI__MXDIM)
+      INTEGER             POS_AX_AWIDHI(ADI__MXDIM)
 
 *    Column data pointer
       INTEGER             PTR_DATA
@@ -29,10 +29,10 @@
       INTEGER             PTR_QUAL
       INTEGER             PTR_LOERR
       INTEGER             PTR_UPERR
-      INTEGER             PTR_AX_DATA(DAT__MXDIM)
-      INTEGER             PTR_AX_WID(DAT__MXDIM)
-      INTEGER             PTR_AX_AWIDLO(DAT__MXDIM)
-      INTEGER             PTR_AX_AWIDHI(DAT__MXDIM)
+      INTEGER             PTR_AX_DATA(ADI__MXDIM)
+      INTEGER             PTR_AX_WID(ADI__MXDIM)
+      INTEGER             PTR_AX_AWIDLO(ADI__MXDIM)
+      INTEGER             PTR_AX_AWIDHI(ADI__MXDIM)
 
 *    Constants
       INTEGER             MAXCMT		! Max no. of comments
