@@ -114,7 +114,7 @@
       CHARACTER*10 RASTRING,DECSTRING
       DOUBLE PRECISION ENDMJD                 ! Last MJD of the obs.
       DOUBLE PRECISION SMJD,EMJD              ! Start and end MJDs of each slot
-      REAL EXPOS
+      DOUBLE PRECISION EXPOS
       REAL RA,DEC
       INTEGER LP
       INTEGER IND1A,IND1B,IND2A,IND2B
@@ -170,7 +170,7 @@
 *      Write list of ON/OFF times
         CALL AIO_WRITE( AID, '      ON        OFF     Duration',
      :                  STATUS )
-        EXPOS = 0.0
+        EXPOS = 0.0D0
         DO LP=1,HEAD.NTRANGE
           WRITE(SBUF,1020)HEAD.TSTART(LP),HEAD.TEND(LP),
      :                  (HEAD.TEND(LP)-HEAD.TSTART(LP))
@@ -181,7 +181,7 @@
         CALL AIO_BLNK( AID, STATUS )
 
 *      Write exposure time
-        WRITE( SBUF,1030) HEAD.TEND(HEAD.NTRANGE) / 86400.0
+        WRITE( SBUF,1030) HEAD.TEND(HEAD.NTRANGE) / 86400.0D0
  1030   FORMAT(1X,'Total elapsed time (days):',F7.2)
         CALL AIO_WRITE( AID, SBUF, STATUS )
         CALL MSG_SETR( 'EXP', EXPOS )
@@ -218,8 +218,8 @@
          OPEN(UNIT=MUNIT, FILE='XRT_TIMES.LIS', STATUS='NEW')
 *
          DO LP=1,HEAD.NTRANGE
-            SMJD = HEAD.BASE_MJD + HEAD.TSTART(LP)/86400.
-            EMJD = HEAD.BASE_MJD + HEAD.TEND(LP)/86400.
+            SMJD = HEAD.BASE_MJD + HEAD.TSTART(LP)/86400.0D0
+            EMJD = HEAD.BASE_MJD + HEAD.TEND(LP)/86400.0D0
 *
 *    Convert start and stop time to an MJD and put an M in front of it.
             WRITE(CSTRING1, FMT='(E23.15)')SMJD

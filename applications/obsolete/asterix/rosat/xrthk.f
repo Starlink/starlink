@@ -60,7 +60,7 @@
       REAL RMIN,RMAX                            ! Min and max array values
       REAL HKMIN,HKMAX                          ! User selected min and max
 *                                               ! values for this HK parameter.
-      REAL EXPO_TIM                             ! Total exposure time
+      DOUBLE PRECISION EXPO_TIM                             ! Total exposure time
       REAL INTERVAL                             ! Minimum length of GOOD window
       DOUBLE PRECISION TBAD(MAXRAN*2)           ! Times of BAD windows (S/C TIM)
       DOUBLE PRECISION TGOOD(MAXRAN*2)          ! Times of GOOD windows (MJD)
@@ -198,7 +198,7 @@
       CALL XRTHK_FILLTIM(HEAD, %val(OPNTR))
 *
 *   Calculate the total exposure time in the TIM_SEL structure
-      EXPO_TIM=0.0
+      EXPO_TIM=0.0D0
       DO LP=1,HEAD.NTRANGE
 *
          EXPO_TIM = EXPO_TIM + HEAD.TEND(LP) - HEAD.TSTART(LP)
@@ -776,7 +776,7 @@ D     WRITE(*,*) HEAD.TSTART(1),HEAD.TEND(HEAD.NTRANGE),HEAD.BASE_SCTIME
 *   Convert values to MJD
       DO LP=1,NGOOD*2
          TGOOD(LP) = HEAD.BASE_MJD + (TGOOD(LP) - HEAD.BASE_SCTIME)
-     &                             / 86400.0
+     &                             / 86400.0D0
       ENDDO
 *
       END

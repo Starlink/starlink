@@ -2179,7 +2179,7 @@ D          WRITE(1,*)HEAD.OFFAX
       IMPLICIT NONE
 *    Import :
       INTEGER NLIVE                   ! No of live time ranges
-      REAL ON(NLIVE),OFF(NLIVE)       ! On and OFF live times
+      DOUBLE PRECISION ON(NLIVE),OFF(NLIVE)       ! On and OFF live times
 *    Import-Export :
 *     <declarations and descriptions for imported/exported arguments>
 *    Export :
