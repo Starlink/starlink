@@ -309,7 +309,7 @@ with references to external routines presented as hyperlinks so
 that call chains can be followed conveniently.
 This second mode of use is clearly much more powerful than the first.
 
-There are two principle components of the system: an indexing program
+There are two principal components of the system: an indexing program
 which is run once to locate and store all the files and routine 
 definitions, and subsequently only when the source code is changed,
 and an extractor program which interrogates the index to locate 
@@ -325,7 +325,7 @@ or extract source files from the command line without using the
 WWW interface.  
 There are other possibilities however: the extractor need not be
 installed as a CGI script at all so that only command-line use
-is available, and users may have their own private indices 
+is available, and users may have their own private indexes 
 which combine some or all of the main source code collection 
 with their own development versions of packages.
 
@@ -346,7 +346,7 @@ The files comprising SCB should be obtained and installed into
 the Starlink tree in more or less the usual way.
 However, there are some environment variables which affect the
 installation, determining for instance the locations of the 
-indices, the Perl binary and temporary directories.  
+indexes, the Perl binary and temporary directories.  
 All default to sensible values, and the most important ones
 are described below, but the comments in the
 {\tt mk} script should be read and modifications made,
@@ -428,7 +428,7 @@ Note that the variables defining installation directories
 etc.\ must be defined at {\em build} time, 
 and not between building and installation.
 
-The program uses a DBM file to store the indices on disk.
+The program uses a DBM file to store the indexes on disk.
 There will always be at least one library available on your system
 which Perl can use to do this, and there may be 
 several --- different implementations each have their own pros and cons.  
@@ -541,7 +541,7 @@ in the SCB\_SOURCES directory
 \section{\xlabel{sec:indexing}\label{sec:indexing}Generating the index
          ({\tt scbindex.pl})}
 
-In order for the browser to work, indices of the source files must be
+In order for the browser to work, indexes of the source files must be
 generated.  This is done by the script {\tt scbindex.pl}, installed
 by default in {\tt /star/bin}.
 The following subsections explain how to use this program to
@@ -644,7 +644,7 @@ On some operating systems the index files may be
 sparse, and {\em appear} much bigger than they are,
 so that {\tt ls~-l} makes them look very large, 
 while {\tt du} or {\tt ls~-s} gives their true size.
-Copying the indices should be done using the supplied utility
+Copying the indexes should be done using the supplied utility
 {\tt scbcp.pl} (see section \ref{sec:scbcp}), 
 not the Unix {\tt cp} command; the latter would
 work, but may result in inefficient use of disk space.
@@ -675,7 +675,7 @@ you can do the following:
 % scbindex.pl ~/star/sources/figaro
 \end{verbatim}
 \end{quote}
---- first a private copy is made of the global indices using 
+--- first a private copy is made of the global indexes using 
 the supplied {\tt scbcp.pl} utility (see section \ref{sec:scbcp}),
 and then the Figaro parts are overwritten using {\tt scbindex.pl}.
 If the modified sources were 
@@ -698,7 +698,7 @@ the default at install time, the following must be done:
 \item[Command line use]
 For using the extractor program {\tt scb.pl} from the command line, 
 set the environment variable SCB\_INDEX to the directory containing
-the indices, in the same way as during the index build as described
+the indexes, in the same way as during the index build as described
 above.
 \item[CGI browser use]
 For using {\tt scb.pl} in HTML mode, then append 
@@ -1076,11 +1076,11 @@ given source code languages.
 
 This section is not required reading for users of the package.
 
-\subsection{\xlabel{sec:internals-indices}\label{sec:internals-indices}Index files}
+\subsection{\xlabel{sec:internals-indexes}\label{sec:internals-indexes}Index files}
 
-The indexing program {\tt scbindex.pl} builds disk-based indices, and the 
+The indexing program {\tt scbindex.pl} builds disk-based indexes, and the 
 extractor program, which is the same as the browser program  {\tt scb.pl}
-interrogates them.  There are three indices:
+interrogates them.  There are three indexes:
 \begin{description}
 \item[Tasks]
 For each package, a list of all the tasks which have been identified
@@ -1121,7 +1121,7 @@ Since it is plain text
 it can be examined using a normal text editor 
 (although some of the lines may be rather long).
 
-The File and Routine indices
+The File and Routine indexes
 each resemble a table which
 maps a key (name of the routine or file), and optionally a 
 Starlink package name, to a location in the source tree. 
@@ -1138,7 +1138,7 @@ browser program will never access the other.
 The same routine name may crop up in different packages without causing
 clashes however.
 
-The File and Routine indices are
+The File and Routine indexes are
 handled by the program as StarIndex 
 objects (named {\tt file} and {\tt func} respectively), 
 i.e.\ are of a type 
@@ -1151,10 +1151,10 @@ any given entry can be accessed by key very quickly.
 The design of these objects was dictated chiefly by the requirements
 of the browser program, as explained in 
 section \ref{sec:internals-extractor}).
-More detailed documentation of the implementation of these indices
+More detailed documentation of the implementation of these indexes
 can be found in the StarIndex.pm module itself.
 
-It is possible to examine the File and Routines indices 
+It is possible to examine the File and Routines indexes 
 directly from the command line by using the supplied {\tt dbmcat.pl}
 utility (see section \ref{sec:dbmcat}).
 
@@ -1211,7 +1211,7 @@ The function of the indexer program {\tt scbindex.pl}
 is to go through
 each of the Starlink packages in turn, writing the name and 
 location of each task, file and function into the appropriate 
-indices.
+indexes.
 
 For each package, the indexer program examines 
 every file in the package directory or tar archive, 
@@ -1349,10 +1349,10 @@ that is required is to move around in it.
 
 \section{\xlabel{sec:utilities}\label{sec:utilities}Additional utilities}
 
-As well as the principle programs in the package 
-{\tt scb.pl} (section \ref{sec:extract})
-and 
+As well as the principal programs
 {\tt scbindex.pl} (section \ref{sec:indexing})
+and 
+{\tt scb.pl} (section \ref{sec:extract}),
 a couple of additional utilities are supplied with the package.
 These are not necessary for normal operation 
 of the package but may prove useful to those making more 
@@ -1364,8 +1364,8 @@ involved use of it.
 \subsection{\xlabel{sec:dbmcat}\label{sec:dbmcat}{\tt dbmcat.pl}}
 
 The {\tt dbmcat.pl} utility directly examines the DBM files 
-in which the File and Routine indices are kept 
-(see section \ref{sec:internals-indices}.
+in which the File and Routine indexes are kept 
+(see section \ref{sec:internals-indexes}.
 
 Source documentation is as follows:
 \begin{verbatim}
@@ -1384,7 +1384,7 @@ Source documentation is as follows:
 
 #  Description:
 #     This utility is for examining the DBM files representing StarIndex
-#     objects used to store the indices used by the SCB package for
+#     objects used to store the indexes used by the SCB package for
 #     indexing files and routines.
 #
 #     It is not required for any part of the package operation, but is
@@ -1419,10 +1419,10 @@ no particular order):
 \begin{quote}
 \begin{verbatim}
 % dbmcat.pl $SCB_INDEX/file
-ary1_gt1d.f          =>  ary#ary_source.tar>ary1_gt1d.f
-test_abbrv.f         =>  chr#chr_source.tar>test_abbrv.f
-ech_read_type.f      =>  echomop#echomop_source.tar>ech_read_type.f
-optextract.hlp       =>  figaro#figaro_iraf.tar>doc/optextract.hlp
+ary1_gt1d.f          => ary#ary_source.tar>ary1_gt1d.f
+test_abbrv.f         => chr#chr_source.tar>test_abbrv.f
+ech_read_type.f      => echomop#echomop_source.tar>ech_read_type.f
+optextract.hlp       => figaro#figaro_iraf.tar>doc/optextract.hlp
     . . .
 \end{verbatim}
 \end{quote}
@@ -1439,8 +1439,8 @@ rec_unlock           => hds#hds_source.tar>rec_unlock.c
 
 \subsection{\xlabel{sec:scbcp}\label{sec:scbcp}{\tt scbcp.pl}}
 
-The {\tt scbcp.pl} utility copies all the indices which have
-been written by {\tt scbindex.pl} (see section \ref{sec:internals-indices})
+The {\tt scbcp.pl} utility copies all the indexes which have
+been written by {\tt scbindex.pl} (see section \ref{sec:internals-indexes})
 from one directory to another.
 
 Source documentation is as follows:
@@ -1473,16 +1473,18 @@ Source documentation is as follows:
 #     sparse can be determined by comparing the output of 'ls -l' and 
 #     'ls -s'.
 #
+#     During operation, the utility reports the copies being carried out.
+#
 #     This utility is not required for normal operation of the package,
 #     it is provided for optional use.
 
 #  Arguments:
-#     $dir1
-#        Source directory containing SCB indices.
-#     $dir2
-#        Target directory into which SCB indices are to be copied.
+#     dir1
+#        Source directory containing SCB indexes.
+#     dir2
+#        Target directory into which SCB indexes are to be copied.
 \end{verbatim}
-Thus to create a private copy of the SCB indices, for instance
+Thus to create a private copy of the SCB indexes, for instance
 in order to create a modified personal index, a command like the
 following would be used:
 \begin{quote}
