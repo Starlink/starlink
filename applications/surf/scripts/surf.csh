@@ -30,6 +30,8 @@
 #       Original for PHOTOM
 #     06-JUN-1997 (TIMJ);
 #       Converted for SURF
+#     01-JUL-1997
+#       Add SKYSUM alias
 #     {enter_changes_here}
 #
 #-
@@ -65,6 +67,7 @@ alias scuquick      ${SURF_DIR}/scuquick
 alias photsum       ${SURF_DIR}/photsum
 alias pointsum      ${SURF_DIR}/pointsum
 alias mapsum        ${SURF_DIR}/mapsum
+alias skysum        ${SURF_DIR}/skysum
 alias obssum        "${SURF_DIR}/sculog -summary"
 
 alias qdraw         ${SURF_DIR}/qdraw
@@ -75,9 +78,6 @@ alias scupa       ${SURF_DIR}/scupa.csh
 alias sdip        ${SURF_DIR}/sdip.csh
 
 
-# These are really kappa commands
-alias kstest        ${SURF_DIR}/kstest
-alias drawsig       ${SURF_DIR}/drawsig
 
 # Announce the availability of the SURF commands
 
