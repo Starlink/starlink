@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(figaro4, 5.6-2, ussc@star.rl.ac.uk)
+AC_INIT(figaro, 5.6-2, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -22,12 +22,6 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_FC
 AC_PROG_LIBTOOL
 STAR_MONOLITHS
-
-dnl    Conditional compile for missing symbols on Mac OSX. Using this in
-dnl    an odd way, essentially to check whether we're on a Mac. If we are
-dnl    we need to link against this library, it will be included by default
-dnl    if it exists in this case.
-AC_CHECK_LIB(cc_dynamic, restFP)
 
 dnl dependances on starlink packages
 dnl STAR_DECLARE_DEPENDENCIES(build, [ard fio grp ndf pda agi pgp gns gks])
