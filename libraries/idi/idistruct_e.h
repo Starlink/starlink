@@ -137,7 +137,7 @@ struct	    mem_data    /* memory data structure                */
                         /* -1 = free memory                     */
                         /* +1 = busy & cleared memory           */
                         /*  0 = busy memory                     */
-    int     mmbm;       /* main memory bitmap                   */
+    unsigned char *  mmbm;       /* main memory bitmap                   */
     int     attbm;      /* attribute descriptor                 */
     FILE    *feb;       /* external bitmap file descriptor      */
     int     ebdepth;    /* external bitmap depth                */

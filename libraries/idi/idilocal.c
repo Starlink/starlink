@@ -96,6 +96,8 @@
 # include    <string.h>
 # include    <math.h>
 
+# include    "gwm.h"
+
 /* Package definitions */
 
 # include    "device.dep"
@@ -851,7 +853,7 @@ bm1.y_coord = device[display].dev_ysiz - mem->y_v_size -
   
 
 
-curbm = (unsigned char*)( mem->mmbm );
+curbm = mem->mmbm;
 
 ima = XCreateImage( display_id, visual, dpth, ZPixmap,
                0, (char*)curbm, mem->x_size, mem->y_size, 8, mem->x_size);
@@ -973,7 +975,7 @@ tmpbm  = tmpbm0;
 /*for (i = 0; i < ys0; i++)*/
 for (i = ys0-1; i >= 0; i--)
    {
-   curbm0 = (unsigned char *) (mem->mmbm + (mem->y_size - bm0.y_coord - i - 1) *
+   curbm0 = (mem->mmbm + (mem->y_size - bm0.y_coord - i - 1) *
                                mem->x_size + bm0.x_coord);
    for (l = 0; l < zoom; l++)
       {
@@ -1116,7 +1118,7 @@ tmpbm  = tmpbm0;
 
 for (i = 0; i < ys0; i+= zoom)
    {
-   curbm = (unsigned char *) (mem->mmbm + (bm0.y_coord + i) *
+   curbm = (mem->mmbm + (bm0.y_coord + i) *
                                mem->x_size + bm0.x_coord);
    for (j = 0; j < xs0; j += zoom)
       *tmpbm++ = *(curbm + j);

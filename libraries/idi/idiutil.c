@@ -455,7 +455,7 @@ int    *x0, *y0, xm, ym;
 
 CONF_DATA  *conf;
 MEM_DATA   *mem;
-G_LIST     *curr_gel;
+G_LIST     *curr_gel = NULL;
 
 conf = device[display].config[confn];
 mem = conf->memory[memid];
@@ -526,7 +526,7 @@ char   text[80];
 
 CONF_DATA  *conf;
 MEM_DATA   *mem;
-T_LIST     *curr_tel;
+T_LIST     *curr_tel = NULL;
 
 conf = device[display].config[confn];
 mem = conf->memory[memid];
@@ -738,7 +738,7 @@ lut = device[display].lookup[mem->lut_id];
 
 ilen = mem->x_size * mem->y_size; 
 
-bitmap = (unsigned char *) mem->mmbm;
+bitmap = mem->mmbm;
 
 for (i=0; i<ilen; i++)
     *bitmap++ = (unsigned char) curlut.lutpix[lut->lutpix[bck]];
@@ -842,15 +842,15 @@ conf = device[display].config[confn];
 mem = conf->memory[memid];
 
 bmsize = mem->x_size * mem->y_size;
-curbm = (unsigned char *) malloc (bmsize);
-if (curbm == 0)
+curbm = malloc (bmsize);
+if (curbm == NULL)
    {
    *iierr = MEMALLERR;
    return;
    }
 
 
-mem->mmbm = (int) curbm;
+mem->mmbm = curbm;
 mem->mem_free = 1;
 
 cl_bitmap (display , confn , memid , 0);
@@ -897,9 +897,9 @@ MEM_DATA  *mem;
 conf = device[display].config[confn];
 mem = conf->memory[memid];
 
-free ((unsigned char*)mem->mmbm);
+free ( mem->mmbm );
 
-mem->mmbm = 0;
+mem->mmbm = NULL;
 mem->attbm = 0;
 mem->mem_free = 1;
 
@@ -964,7 +964,8 @@ MEM_DATA   *mem;
 ITT_DATA   *itt;
 
 unsigned char *curbm, *curbm0;
-#if defined (VAXC) || defined (ultrix)
+
+#if !HAVE_DECL_RINT
 double rint( double x );
 #endif
 
@@ -992,7 +993,7 @@ while (i < iy)
    for (k = 0; k < packf; k++)
       {
 /* Reverse word/byte order on SUNs */
-#if defined (sun)
+#if WORDS_BIGENDIAN
       pix = ((data[jj] >> ((packf - 1 - k) * nb)) & bl) >> dd;
 #else
       pix = ((data[jj] >> (k * nb)) & bl) >> dd;
@@ -1116,7 +1117,7 @@ while (i < iy)
 
 /* Pack the data into the output word */
 /* Reverse word/byte order on SUNs */
-#if defined (sun)
+#if WORDS_BIGENDIAN
       pix |= (dd>0)? ((im << dd) << ((packf - 1 - k) * nb)):
                      ((im >> dd) << ((packf - 1 - k) * nb));
 #else
@@ -2102,13 +2103,15 @@ int   xmin0, ymin0, xmax0, ymax0;
 int   xcur, ycur;
 
 CONF_DATA      *conf;
-MEM_DATA       *mem;
+MEM_DATA       *mem = NULL;
 INTER_DATA     *intdata;
 INT_DEV_DATA   *intdev;
 LOC_DATA       *loc;
 ROI_DATA       *roi;
 
 *err = II_SUCCESS;
+
+xmin = 0; xmax = 0; ymin = 0; ymax = 0;
 
 curconf = device[display].confid;
 conf = device[display].config[curconf];

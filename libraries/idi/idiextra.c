@@ -77,13 +77,16 @@
 
 #include    <stdlib.h>
 #include    <stdio.h>
+#include    <string.h>
 #include    <X11/Xlib.h>
 #include    <X11/Xatom.h>
 #include    <X11/keysym.h>
 #include    <math.h>
-#ifndef VAXC
+#if HAVE_UNISTD_H
 #include    <unistd.h>
 #endif
+
+#include    "gwm.h"
 
 /* Package definitions */
 
@@ -556,7 +559,7 @@ void int_mem_scroll ( int display, int nint, short ev_type, short ev_data,
 /* Local variables */
 unsigned char  *curbm, *curbm0;
 unsigned char  *filbm, *filbm0;
-unsigned char  *pacbm, *pacbm0;
+unsigned char  *pacbm, *pacbm0 = NULL;
 XImage         *ima;
 Visual         *visual;
 int curconf;
@@ -568,17 +571,16 @@ int pfact;
 int memid;
 int f0;
 int fsize, psize;
-int maxmem;
+unsigned char * maxmem;
 int bck;
 int i, j, k, n;
 int x_dst, x_src, y_dst, y_src;
 int x_off, y_off;
-int ydiff;
 int xd, ix0, jx0;
 int zoom;
 float mem_x_old;
 float mem_y_old;
-float x0, y0, yy;
+float x0 = 0.0, y0 = 0.0, yy;
 CONF_DATA *conf;
 MEM_DATA *mem;
 INTER_DATA *intdata;
@@ -734,8 +736,8 @@ if ( f0 == 1 )
          for (j = 0; j < bm[n].x_size; j++)
             {
             jx0 = ix0 + j / zoom;
-            *filbm++ = ( ( mem->mmbm <= (int)curbm ) &&
-                       ( (int)curbm < maxmem ) &&
+            *filbm++ = ( ( mem->mmbm <= curbm ) &&
+                       (  curbm < maxmem ) &&
                        ( jx0 >= 0 ) && ( jx0 < mem->x_size ) ) ? *curbm : bck;
             if ( ++k >= zoom )
                {
@@ -874,7 +876,7 @@ void int_dis_scroll ( int display, int nint, short ev_type, short ev_data,
 /* Local variables */
 unsigned char  *curbm, *curbm0;
 unsigned char  *filbm, *filbm0;
-unsigned char  *pacbm, *pacbm0;
+unsigned char  *pacbm, *pacbm0 = NULL;
 XImage         *ima;
 Visual         *visual;
 int curconf;
@@ -883,10 +885,10 @@ int interactor_id;
 int loc_id;
 unsigned int dpth;
 int pfact;
-int memid;
+int memid = 0;
 int f0;
 int fsize, psize;
-int maxmem;
+unsigned char * maxmem;
 int bck;
 int i, j, k, n;
 int x_dst, x_src, y_dst, y_src;
@@ -898,7 +900,7 @@ float dis_x_old;
 float dis_y_old;
 float dis_x_new;
 float dis_y_new;
-float x0, y0, yy;
+float x0 = 0.0, y0 = 0.0, yy;
 CONF_DATA *conf;
 MEM_DATA *mem;
 INTER_DATA *intdata;
@@ -1069,8 +1071,8 @@ if ( f0 == 1 )
          for (j = 0; j < bm[n].x_size; j++)
             {
             jx0 = ix0 + j / zoom;
-            *filbm++ = ( ( mem->mmbm <= (int)curbm ) &&
-                       ( (int)curbm < maxmem ) &&
+            *filbm++ = ( ( mem->mmbm <= curbm ) &&
+                       ( curbm < maxmem ) &&
                        ( jx0 >= 0 ) && ( jx0 < mem->x_size ) ) ? *curbm : bck;
             if ( ++k >= zoom )
                {
@@ -1194,8 +1196,8 @@ if ( f0 == 1 )
             for (j = 0; j < bm[n].x_size; j++)
                {
                jx0 = ix0 + j / zoom;
-               *filbm++ = ( ( mem->mmbm <= (int)curbm ) &&
-                            ( (int)curbm < maxmem ) &&
+               *filbm++ = ( ( mem->mmbm <= curbm ) &&
+                            ( curbm < maxmem ) &&
                          ( jx0 >= 0 ) && ( jx0 < mem->x_size ) ) ? *curbm : bck;
                if ( ++k >= zoom )
                   {
@@ -1316,7 +1318,7 @@ void imagrefr_p ( int display, int memid )
 /* Local variables */
 unsigned char  *curbm;
 unsigned char  *pacbm;
-unsigned char  *pacbm0;
+unsigned char  *pacbm0 = NULL;
 CONF_DATA      *conf;
 MEM_DATA       *mem;
 XImage         *image;
@@ -1477,7 +1479,7 @@ void imagrefr_z_p ( int display, int memid, int zoom, float x0, float y0,
 unsigned char  *curbm;
 unsigned char  *curbm0;
 unsigned char  *pacbm;
-unsigned char  *pacbm0;
+unsigned char  *pacbm0 = NULL;
 unsigned char  *tmpbm;
 unsigned char  *tmpbm0;
 CONF_DATA      *conf;
@@ -1688,7 +1690,7 @@ void imagrefr_uz_p ( int display, int memid, int zoom, float x0, float y0,
 /* Local variables */
 unsigned char  *curbm;
 unsigned char  *pacbm;
-unsigned char  *pacbm0;
+unsigned char  *pacbm0 = NULL;
 unsigned char  *tmpbm;
 unsigned char  *tmpbm0;
 CONF_DATA      *conf;
@@ -1870,7 +1872,7 @@ int *y0;
 int zoom;
 CONF_DATA  *conf;
 MEM_DATA   *mem;
-G_LIST     *curr_gel;
+G_LIST     *curr_gel = NULL;
 
 /* Get the location of the data from the global variables */
 conf = device[display].config[confn];
@@ -1962,7 +1964,7 @@ int zoom;
 char text[80];
 CONF_DATA *conf;
 MEM_DATA *mem;
-T_LIST *curr_tel;
+T_LIST *curr_tel = NULL;
 
 /* Get the location of the data from the global variables */
 conf = device[display].config[confn];
@@ -2644,7 +2646,7 @@ double        blue;
 int           curconf;
 int           first;
 double        green;
-int           height, height1;
+int           height, height1 = 0;
 int           i;
 int           j;
 int           k;
@@ -2661,19 +2663,19 @@ int           pix;
 double        red;
 int           status;
 int           val;
-int           width, width1;
-int           xorigin, xorigin1;
-int           yorigin, yorigin1;
+int           width, width1 = 0;
+int           xorigin, xorigin1 = 0;
+int           yorigin, yorigin1 = 0;
 int           xscroll, xscroll1;
 int           yscroll, yscroll1;
-int           xend1;
-int           yend1;
-int           xstart1;
-int           ystart1;
+int           xend1 = 0;
+int           yend1 = 0;
+int           xstart1 = 0;
+int           ystart1 = 0;
 CONF_DATA     *conf;
-MEM_DATA      *mem, *mem1;
+MEM_DATA      *mem, *mem1 = NULL;
 LUT_DATA      *lut, *lut1;
-XImage        *image, *image1;
+XImage        *image, *image1 = NULL;
 
 /* Conversion factors for 128 intensity levels */
 /* red = 127 * 0.30, green = 127 * 0.59, blue = 127 * 0.11 */
@@ -3396,7 +3398,7 @@ if (mem == II_NULL)
 conf->memory[*memid] = mem;
 
 mem->mem_free = -1;
-mem->mmbm = 0;
+mem->mmbm = NULL;
 mem->attbm = 0;
 mem->ebdepth = 0;
 mem->ebpackf = 0;
