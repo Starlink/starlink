@@ -3,7 +3,7 @@
 SUBDIRS = @subdirs@
 
 bin_SCRIPTS = xcatview cursa_test.csh cursa.csh xcatview catcdsin \
- catremote UrlReader.class UrlReader.java
+ catremote UrlReader.class UrlReader.java xcatviewLib/adamMessageRelay
 
 LOCAL_LINK = libcap/libcap.la `$(srcdir)/cursa_link_adam`
 
@@ -24,7 +24,7 @@ bin_PROGRAMS = geturl
 geturl_SOURCES = geturl.c
 
 ##  Name things to be built that are not named elsewhere.
-BUILT_SOURCES = xcatviewLib/adamMessageRelay
+##BUILT_SOURCES = 
 
 #  List of ancillary data files (all types). These need a home at some point.
 EXAMPLE_FILES = examples/*
