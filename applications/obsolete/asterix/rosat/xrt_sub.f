@@ -3502,6 +3502,8 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
       CALL CMP_GET1R(QLOC,'FACTOR',NQEMAX,FACTOR,NQE,STATUS)
       CALL HDS_CLOSE(QLOC,STATUS)
 
+	print *,offax
+
 *
 *    Set vignetting correction according to formula in HRI calibration
 *    report  (December 93)
@@ -3522,7 +3524,7 @@ c     &              (EPHA_BOUNDS(2) - EPHA_BOUNDS(1))
         QE=FACTOR(I-1)+(OFFAX-ANGLE(I-1))/(ANGLE(I)-ANGLE(I-1))*
      :                                          (FACTOR(I)-FACTOR(I-1))
       ELSE
-	print *,'C'
+	print *,'C',nqe
 
         QE=FACTOR(NQE)-(OFFAX-ANGLE(NQE))*
      :                           (FACTOR(NQE-1)-FACTOR(NQE))/
