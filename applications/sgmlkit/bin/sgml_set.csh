@@ -1,7 +1,7 @@
 #! /bin/csh -f
 #+
 #  Name:
-#    sgml_system.csh
+#    sgml_set.csh
 #
 #  Purpose:
 #    Set up the Starlink SGML system from the shell.
@@ -31,7 +31,7 @@
 
 setenv STARLINK_SGML_DIR ((STARLINK_SGML_DIR))
 
-setenv SGML_CATALOG_FILES ./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$STARLINK_SGML_DIR/documents/CATALOG
+setenv SGML_CATALOG_FILES ./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$SGML_CATALOG_FILES
 
 setenv PATH ((SGML_BINDIR)):$PATH
 

@@ -1,7 +1,7 @@
 #! /bin/sh -
 #+
 #  Name:
-#    sgml_system.sh
+#    sgml_set.sh
 #
 #  Purpose:
 #    Set up the Starlink SGML system from the shell.
@@ -32,7 +32,7 @@
 STARLINK_SGML_DIR=((STARLINK_SGML_DIR))
 export STARLINK_SGML_DIR
 
-SGML_CATALOG_FILES=./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$STARLINK_SGML_DIR/documents/CATALOG
+SGML_CATALOG_FILES=./CATALOG:$STARLINK_SGML_DIR/dtd/CATALOG:$SGML_CATALOG_FILES
 export SGML_CATALOG_FILES
 
 PATH=((SGML_BINDIR)):$PATH
