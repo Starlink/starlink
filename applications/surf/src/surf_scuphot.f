@@ -1,6 +1,25 @@
-*+  REDS_PHOTOM - routine to reduce SCUBA PHOTOM data
       SUBROUTINE REDS_PHOTOM (STATUS)
-*    Description :
+*+
+*  Name:
+*     REDS_SCUPHOT
+
+*  Purpose:
+*     routine to reduce SCUBA PHOTOM data
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_SCUPHOT( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+ 
+*  Description:
 *        This routine reduces the data for a single sub-instrument from a PHOTOM
 *     observation. For each bolometer used to look at the source the data will
 *     be analysed as follows:-
@@ -18,29 +37,32 @@
 *       quality and they are held as a 1-d array suitable for plotting as
 *       a graph. The fit results are also written in ASCII form to FILE, as
 *       is the coadd of all the individual fits to the data.
-*
-*     The parameters used are:-
-*
-*     IN                      The name of the input file containing 
-*                             demodulated SCUBA data.
-*
-*     ANALYSIS                Method used to determine peak
-*                             Either average or parabola
-*
-*     OUT                     The name of the HDS output file to contain
-*                             the ndfs described above. This file will have
-*                             the extension .sdf but this should not be
-*                             specified in the name.
-*
-*     FILE                    The name of the ASCII output file.
-*
-*
+
+*  Usage:
+*     scuphot [analysis=] [in=] [out=] [file=]
+
+*  ADAM Parameters:
+*     ANALYSIS = _CHAR (Read)
+*        The method used to detemine peak. Either average or parabola.
+*                                        [average]
+*     FILE = NDF (Write)
+*        The name of the ASCII output file.
+*     IN = NDF (Read)
+*        The name of the input file containing demodulated (extinction
+*       (corrected) SCUBA data. [global value]
+*     OUT = _CHAR (Write)
+*        The name of the HDS output file to contain the ndfs described above.
+*        This file will have the extension .sdf but this should not be
+*        specified in the name.
+
+*  Algorithm:
 *        In more detail the routine works as follows. If status is good on
 *     entry the routine opens the IN file, reads some FITS items describing
 *     the observation and reports them to the user. A check is made that the
 *     data does come from a PHOTOM observation. The file `history' is read
-*     and a check made that the REDUCE_SWITCH, EXTINCTION and FLATFIELD
-*     applications have been run on it but that PHOTOM has not. A note is
+*     and a check made that the REDUCE_SWITCH and EXTINCTION
+*     applications have been run on it but that PHOTOM has not. A warning is
+*     issued if EXTINCTION has not been run on the data. A note is
 *     taken if the SKY_ERROR application has been run to remove `sky noise'
 *     error from the data.
 *        Other FITS items are read, mainly so that they can be passed on to
@@ -87,41 +109,54 @@
 *     version of the results to the file whose name is given in parameter
 *     FILE.
 *        Lastly, the IN and OUT files are closed.
-*    Invocation :
-*     CALL REDS_PHOTOM (STATUS)
-*    Parameters :
-*     STATUS          = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     J.Lightfoot (JFL/ROE)
+
+*  Implementation status:
+*     Quality handling is used.
+
+*  Authors:
+*     JFL: John Lightfoot (ROE)
+*     TIMJ: Tim Jenness (JACH)
+*     {enter_new_authors_here}
+ 
 *    History :
 *     $Id$
 *     16-JUL-1995: Original version.
-*    endhistory
+*     $Log$
+*     Revision 1.3  1996/10/30 22:54:34  timj
+*     Add modern header.
+*     Replace SCULIB_COPY with VEC_
+*     Change size of OUT to 132 characters
+*     Probably lots of other things...
+*
+*     {enter_further_changes_here}
+ 
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
 *    Type Definitions :
       IMPLICIT NONE
+
 *    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'SAE_PAR'                ! SSE global definitions
+      INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'NDF_PAR'                ! for NDF__xxxx constants
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx constants
       INCLUDE 'REDS_SYS'               ! REDS constants
-*    Import :
-*    Import-Export :
-*    Export :
+
 *    Status :
       INTEGER STATUS
+
 *    External references :
       INTEGER CHR_LEN                  ! CHR used-string-length function
-*    Global variables :
+
 *    Local Constants :
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       BYTE        OUTBAD               ! Output bad pixel mask
       PARAMETER (OUTBAD = 1)
+
 *    Local variables :
       CHARACTER*10     ANALYSIS        ! analysis mode
       BYTE             BADBIT          ! bad bit mask
@@ -145,10 +180,9 @@
       CHARACTER*15     FILTER          ! the name of the filter being used
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
 				       ! array of FITS keywords
-      LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
-                                       ! has been run on the input file
       INTEGER          I               ! DO loop index
       INTEGER          IBEAM           ! ndf identifier
+      INTEGER          IERR            ! Pos of errors from VEC_
       INTEGER          INT             ! integration index in DO loop
       INTEGER          INT_D_END (SCUBA__MAX_BEAM)
                                        ! end of space holding integration data
@@ -270,6 +304,7 @@
       CHARACTER*15     NDF_NAME        ! name of ndf
       INTEGER          NDIM            ! the number of dimensions in an array
       INTEGER          NELM            ! number of array elements mapped
+      INTEGER          NERR            ! Number of errors from VEC_
       INTEGER          NREC            ! number of history records in input file
       INTEGER          N_BOLS          ! number of bolometers measured in input
                                        ! files
@@ -288,7 +323,7 @@
       CHARACTER*15     OFFSET_COORDS   ! coord system of MAP_X and MAP_Y
       CHARACTER*(DAT__SZLOC) OUT_LOC   ! locator of HDS container file for
 				       ! output
-      CHARACTER*80     OUT             ! name of output HDS container file
+      CHARACTER*132    OUT             ! name of output HDS container file
       INTEGER          OUT_OFFSET      ! offset in output array
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! pointer to REDS extension in output
@@ -341,9 +376,8 @@
       REAL             YMAX            ! maximum y jiggle offset
       REAL             YMIN            ! minimum y jiggle offset
       REAL             YSPACE          ! spacing between y jiggle offsets
-*    Internal References :
-*    Local data :
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -367,7 +401,7 @@
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_PHOTOM: input file '//
+            CALL ERR_REP (' ', 'REDS_SCUPHOT: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -398,7 +432,6 @@
 
          REDUCE_SWITCH = .FALSE.
          EXTINCTION = .FALSE.
-         FLATFIELD = .FALSE.
          SKY_ERROR = .FALSE.
          PHOTOM = .FALSE.
 
@@ -410,8 +443,6 @@
                   REDUCE_SWITCH = .TRUE.
                ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
-               ELSE IF (STEMP .EQ. 'FLATFIELD') THEN
-                  FLATFIELD = .TRUE.
                ELSE IF (STEMP .EQ. 'SKY_ERROR') THEN
                   SKY_ERROR = .TRUE.
                ELSE IF (STEMP .EQ. 'PHOTOM') THEN
@@ -423,7 +454,7 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: the file '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: the file '//
      :           'does not contain data from a PHOTOM observation',
      :           STATUS)
             END IF
@@ -432,28 +463,20 @@
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: the '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: the '//
      :           'REDUCE_SWITCH application has not been run '//
      :           'on the input file', STATUS)
             END IF
 
             IF (.NOT. EXTINCTION) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: the '//
-     :           'EXTINCTION application has not been run on '//
-     :           'the input file', STATUS)
-            END IF
-
-            IF (.NOT. FLATFIELD) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: the '//
-     :           'FLATFIELD application has not been run on '//
-     :           'the input file', STATUS)
+               CALL MSG_OUT (' ', 'REDS_SCUPHOT: Warning the '//
+     :              'input data has not been corrected for extinction',
+     :              STATUS)
             END IF
 
             IF (PHOTOM) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: the '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: the '//
      :           'PHOTOM application has already been run on '//
      :           'the input file', STATUS)
             END IF
@@ -541,7 +564,7 @@
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
             CALL MSG_SETI ('DIM3', DIM(3))
-            CALL ERR_REP (' ', 'REDS_PHOTOM: data array '//
+            CALL ERR_REP (' ', 'REDS_SCUPHOT: data array '//
      :        'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', STATUS)
          END IF
       END IF
@@ -562,27 +585,27 @@
          IF (NDIM .NE. 3) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETI ('NDIM', NDIM)
-            CALL ERR_REP (' ', 'REDS_PHOTOM: .SCUBA.DEM_PNTR '//
+            CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
      :        'array has bad number of dimensions', STATUS)
          ELSE
             IF (DIM(1) .LE. 0) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('DIM1',DIM(1))
-               CALL ERR_REP (' ', 'REDS_PHOTOM: .SCUBA.DEM_PNTR '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
      :           'array contains bad number of exposures - ^DIM1',
      :           STATUS)
             END IF
             IF (DIM(2) .LE. 0) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('DIM2',DIM(2))
-               CALL ERR_REP (' ', 'REDS_PHOTOM: .SCUBA.DEM_PNTR '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
      :           'array contains bad number of integrations - ^DIM2',
      :           STATUS)
             END IF
             IF (DIM(3) .LE. 0) THEN
                STATUS = SAI__ERROR
                CALL MSG_SETI ('DIM3',DIM(3))
-               CALL ERR_REP (' ', 'REDS_PHOTOM: .SCUBA.DEM_PNTR '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: .SCUBA.DEM_PNTR '//
      :           'array contains bad number of measurements - ^DIM3',
      :           STATUS)
             END IF
@@ -622,7 +645,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_PHOTOM: dimension '//
+            CALL ERR_REP (' ', 'REDS_SCUPHOT: dimension '//
      :        'of .SCUBA.BOL_CHAN does not match main data array',
      :        STATUS)
          END IF
@@ -636,7 +659,7 @@
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_PHOTOM: dimension '//
+            CALL ERR_REP (' ', 'REDS_SCUPHOT: dimension '//
      :        'of .SCUBA.BOL_ADC does not match main data array',
      :        STATUS)
          END IF
@@ -662,7 +685,7 @@
          IF (ITEMP .NE. JIGGLE_COUNT) THEN
             IF (STATUS .EQ. SAI__OK) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: mismatch between '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: mismatch between '//
      :           'JIGGLE_COUNT and number of X jiggle offsets read',
      :           STATUS)
             END IF
@@ -676,7 +699,7 @@
          IF (ITEMP .NE. JIGGLE_COUNT) THEN
             IF (STATUS .EQ. SAI__OK) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_PHOTOM: mismatch between '//
+               CALL ERR_REP (' ', 'REDS_SCUPHOT: mismatch between '//
      :           'JIGGLE_COUNT and number of Y jiggle offsets read',
      :           STATUS)
             END IF
@@ -746,15 +769,16 @@
      :               N_BOLS + (PHOT_BB(BEAM) - 1)
                    OUT_OFFSET = POS - 1
  
-		   CALL SCULIB_COPYR (1, %val(IN_D_PTR + IN_OFFSET *
-     :               VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET *
-     :               VAL__NBR))
-                   CALL SCULIB_COPYR (1, %val(IN_V_PTR + IN_OFFSET *
-     :               VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET *
-     :               VAL__NBR))
-		   CALL SCULIB_COPYB (1, %val(IN_Q_PTR + IN_OFFSET *
-     :               VAL__NBUB), %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
-     :               VAL__NBUB))
+                   CALL VEC_RTOR(.FALSE., 1, %val(IN_D_PTR + IN_OFFSET *
+     :                  VAL__NBR), %val(INT_D_PTR(BEAM) + OUT_OFFSET *
+     :                  VAL__NBR), IERR, NERR, STATUS)
+                   CALL VEC_RTOR(.FALSE., 1, %val(IN_V_PTR + IN_OFFSET *
+     :                  VAL__NBR), %val(INT_V_PTR(BEAM) + OUT_OFFSET *
+     :                  VAL__NBR), IERR, NERR, STATUS)
+                   CALL VEC_UBTOUB(.FALSE., 1, %val(IN_Q_PTR + IN_OFFSET
+     :                  *VAL__NBUB), %val(INT_Q_PTR(BEAM) + OUT_OFFSET *
+     :                  VAL__NBUB), IERR, NERR, STATUS)
+
                 END DO
              END IF
          END IF
@@ -767,7 +791,7 @@
 *  create the output file that will contain the reduced data in NDFs
 
       CALL PAR_GET0C ('OUT', OUT, STATUS)
-      CALL HDS_NEW (OUT, OUT, 'REDS_PHOTOM', 0, 0, OUT_LOC, STATUS)
+      CALL HDS_NEW (OUT, OUT, 'REDS_SCUPHOT', 0, 0, OUT_LOC, STATUS)
 
 *  cycle through the beams used in this sub-instrument
 
@@ -826,18 +850,14 @@
                ELSE IF (N_OBSDIM .EQ. 2) THEN
 		  CALL NDF_AMAP (IBEAM, 'CENTRE', 1, '_REAL',
      :              'WRITE', TEMP_PTR, NELM, STATUS)
-		  IF (STATUS .EQ. SAI__OK) THEN
-		     CALL SCULIB_COPYR (UBND(1), JIGGLE_2D_A1,
-     :                 %val(TEMP_PTR))
-		  END IF
+                  CALL VEC_RTOR(.FALSE., UBND(1), JIGGLE_2D_A1,
+     :                 %val(TEMP_PTR), IERR, NERR, STATUS)
 		  CALL NDF_AUNMP (IBEAM, 'CENTRE', 1, STATUS)
 
 		  CALL NDF_AMAP (IBEAM, 'CENTRE', 2, '_REAL',
      :              'WRITE', TEMP_PTR, NELM, STATUS)
-		  IF (STATUS .EQ. SAI__OK) THEN
-		     CALL SCULIB_COPYR (UBND(2), JIGGLE_2D_A2,
-     :                 %val(TEMP_PTR))
-		  END IF
+                  CALL VEC_RTOR(.FALSE., UBND(2), JIGGLE_2D_A2,
+     :                 %val(TEMP_PTR), IERR, NERR, STATUS)
 		  CALL NDF_AUNMP (IBEAM, 'CENTRE', 2, STATUS)
                END IF
 
@@ -1002,14 +1022,12 @@
 
 *  store the fitted peak values to the output ndf
 
-	       IF (STATUS .EQ. SAI__OK) THEN
-                  CALL SCULIB_COPYR (N_INTEGRATIONS, PEAK_D(1,BEAM),
-     :              %val(PEAK_D_PTR))
-                  CALL SCULIB_COPYR (N_INTEGRATIONS, PEAK_V(1,BEAM),
-     :              %val(PEAK_V_PTR))
-                  CALL SCULIB_COPYB (N_INTEGRATIONS, PEAK_Q(1,BEAM),
-     :              %val(PEAK_Q_PTR))
-               END IF
+               CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_D(1,BEAM),
+     :              %val(PEAK_D_PTR), IERR, NERR, STATUS)
+               CALL VEC_RTOR(.FALSE., N_INTEGRATIONS, PEAK_V(1,BEAM),
+     :              %val(PEAK_V_PTR), IERR, NERR, STATUS)
+               CALL VEC_UBTOUB(.FALSE., N_INTEGRATIONS, PEAK_Q(1,BEAM),
+     :              %val(PEAK_Q_PTR), IERR, NERR, STATUS)
 
 *     Write BIT MASK
                CALL NDF_SBB(OUTBAD, IPEAK, STATUS) 
