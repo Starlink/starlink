@@ -115,23 +115,28 @@
       CHARACTER*50		TARGET			!
 
       LOGICAL			DOK, FOK, IOK, MOK	! Things present?
-      LOGICAL			TOK, OOK
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise
-      OARG = ADI__NULLID
+*  The new object
+      CALL ADI_NEW0( 'MissionStrings', OARG, STATUS )
 
 *  Locate HEADER structure
       CALL ADI1_LOCHEAD( ARGS(1), .FALSE., HLOC, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+        GOTO 99
+      END IF
+
+*  Easily copied stuff
+      CALL ADI1_CCH2AC( HLOC, 'TARGET', OARG, 'Target', STATUS )
+      CALL ADI1_CCH2AC( HLOC, 'OBSERVER', OARG, 'Observer', STATUS )
 
 *  Look for the various header components
-      CALL ADI1_CGET0C( HLOC, 'OBSERVATORY', MOK, MISSION, STATUS )
+      CALL ADI1_CGET0C( HLOC, 'INSTRUMENT', MOK, MISSION, STATUS )
       CALL ADI1_CGET0C( HLOC, 'INSTRUMENT', IOK, INSTRUM, STATUS )
-      CALL ADI1_CGET0C( HLOC, 'TARGET', TOK, TARGET, STATUS )
-      CALL ADI1_CGET0C( HLOC, 'OBSERVER', OOK, OBSERVER, STATUS )
 
 *  If instrument was specified, look for detector and filter names
       IF ( IOK ) THEN
@@ -143,9 +148,6 @@
           CALL ERR_ANNUL( STATUS )
         END IF
       END IF
-
-*    The new object
-      CALL ADI_NEW0( 'MissionStrings', OARG, STATUS )
 
 *    Check for datasets without fullo info
       IF ( IOK ) THEN
@@ -176,14 +178,6 @@
       END IF
       IF ( FOK ) THEN
         CALL ADI_CPUT0C( OARG, 'Filter', FILT(:CHR_LEN(FILT)),
-     :                   STATUS )
-      END IF
-      IF ( TOK ) THEN
-        CALL ADI_CPUT0C( OARG, 'Target', TARGET(:CHR_LEN(TARGET)),
-     :                   STATUS )
-      END IF
-      IF ( OOK ) THEN
-        CALL ADI_CPUT0C( OARG, 'Observer', OBSERVER(:CHR_LEN(OBSERVER)),
      :                   STATUS )
       END IF
 
