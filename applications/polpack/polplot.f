@@ -1,0 +1,717 @@
+      SUBROUTINE POLPLOT( STATUS )
+*+
+*  Name:
+*     POLPLOT
+
+*  Purpose:
+*     Plots a 2-dimensional vector map.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     ADAM A-task
+
+*  Invocation:
+*     CALL POLPLOT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
+*     This application plots vectors defined by the values contained
+*     within four columns in a catalogue. These columns give the magnitude
+*     and orientation of each vector, and the (X,Y) position of each vector.
+*
+*     The plot is produced within the current graphics database picture. 
+*     If there is an existing DATA picture within the current picture, then
+*     the vector map can be aligned with the existing DATA picture (see 
+*     parameter CLEAR). If no DATA picture exists within the current picture, 
+*     then a new DATA picture is created.
+
+*  Usage:
+*     POLPLOT cat colx coly colmag colang [vscale] [arrow] [just] [device]
+
+*  ADAM Parameters:
+*     ANGROT = _REAL (Read)
+*        A rotation angle in degrees to be added to each vector
+*        orientation before plotting the vectors (see parameter COLANG).
+*        It should be in the range 0--360. [0.0]
+*     ARROW = LITERAL (Read)
+*        Vectors are drawn as arrows with the size of the arrow head
+*        specified by this parameter. Simple lines can be drawn by setting
+*        the arrow head size to zero. The value should be expressed as a 
+*        fraction of the largest dimension of the vector map. [0.0]
+*     AXES = _LOGICAL (Read)
+*        TRUE if labelled and annotated axes are to be drawn around the
+*        plot.  [TRUE]
+*     CAT = LITERAL (Read)
+*        The name of the input catalogue. This may be in any format
+*        supported by the CAT library (see SUN/181).
+*     CLEAR = _LOGICAL (Read)
+*        TRUE if the graphics device is to be cleared before displaying
+*        the vector map. This will result in the vector map being drawn
+*        in a new DATA picture. If you want the vector map to be drawn
+*        on top of an existing DATA picture, then set CLEAR to FALSE. The
+*        vector map will then be drawn in alignment with the displayed 
+*        data. If possible, alignment occurs within the coordinate Frame 
+*        specified by parameter COSYS. If this is not possible, (for instance 
+*        if suitable WCS information was not available when the existing DATA 
+*        picture was created), then a warning is issued, and alignment 
+*        occurs in pixel coordinates (again if possible). [TRUE]
+*     COLANG = LITERAL (Read)
+*        The name of the catalogue column holding the orientation of each 
+*        vector. The values are considered to be in units of degrees unless 
+*        the UNITS attribute of the column has the value "Radians" (case 
+*        insensitive).  The positive Y axis defines zero orientation, and 
+*        rotation from the X axis to the Y axis is considered positive. 
+*        A list of available column names is displayed if a non-existent
+*        column name is given.
+*     COLMAG = LITERAL (Read)
+*        The name of the catalogue column holding the magnitude of each 
+*        vector. A list of available column names is displayed if a 
+*        non-existent column name is given.
+*     COLX = LITERAL (Read)
+*        The name of the catalogue column holding the X coordinate at
+*        each vector. A list of available column names is displayed if 
+*        a non-existent column name is given. How the coordinates
+*        specified by COLX and COLY are used depends on whether or not
+*        the vector map is being drawn over a previously displayed 
+*        DATA picture (see parameter CLEAR). If not, then the coordinates 
+*        given by COLX and COLY will be mapped linearly onto a new DATA 
+*        picture.  If the vector map is being drawn over a previous DATA 
+*        picture, then an attempt will be made to map the coordinates given 
+*        by COLX and COLY so that the vectors are drawn aligned with the 
+*        existing picture (in the coordinate Frame given by parameter COSYS).
+*        This will only be possible if the catalogue contains information
+*        about coordinate Frames in the form of an AST FrameSet (see 
+*        SUN/210). 
+*     COLY = LITERAL (Read)
+*        The name of the catalogue column holding the Y coordinate at
+*        each vector (see COLX for additional information).
+*     COSYS = GROUP (Read)
+*        This gives the co-ordinate Frame to be displayed along annotated 
+*        axes. The supplied value will usually be a Domain name such as
+*        SKY, AXIS, PIXEL, etc, but more specific Frame descriptions can
+*        also be given by supplying a group of "name=value" strings where 
+*        "name" is the name of an AST Frame attribute (see SUN/210), and 
+*        "value" is the value to assign to it. In addition, IRAS90 Sky 
+*        Coordinate System (SCS) values (such as "EQUATORIAL(J2000)", 
+*        "GALACTIC", etc - see SUN/163) can be given. Domains "WORLD" and 
+*        "DATA" are taken as synonyms for "PIXEL" and "AXIS" (unless the 
+*        catalogue contains explicit definitons for the "WORLD" and "DATA" 
+*        Domains). The available coordinate Frames are defined by an AST 
+*        FrameSet (see SUN/210) in the supplied catalogue. If the catalogue 
+*        does not contain a FrameSet, then a default FrameSet is used 
+*        containing a single 2-dimensional Frame spanned by the axes defined 
+*        by parameters COLX and COLY. If a null (!) value is supplied for 
+*        COSYS, then the Current Frame in the FrameSet is used. If the vector 
+*        map is being drawn over an existing DATA picture (see parameter
+*        CLEAR), then the Frame specified by COSYS must exist in the FrameSet 
+*        associated with the existing picture, as well as in the supplied 
+*        catalogue. [!]
+*     DEVICE = DEVICE (Read)
+*        The plotting device. [Current graphics device]
+*     FILL = _LOGICAL (Read)
+*        The DATA picture containing the vector map is usually produced with 
+*        the same shape as the data. However, for maps with markedly different
+*        dimensions this default behaviour may not give the clearest result. 
+*        When FILL is TRUE, the smaller dimension of the picture is expanded
+*        to produce the largest possible picture within the current picture.  
+*        [FALSE]
+*     JUST = LITERAL (Read)
+*        The justification for each vector; it can take any of the
+*        following values:
+*
+*         "Centre" - the vectors are drawn centred on the
+*                    corresponding pixel coordinates.
+*
+*         "Start"  - the vectors are drawn starting at the
+*                    corresponding pixel coordinates.
+*
+*         "End"    - the vectors are drawn ending at the corresponding
+*                    pixel coordinates.
+
+*        ["Centre"]
+*     KEY = _LOGICAL (Read)
+*        TRUE if a key is to be produced. [TRUE]
+*     KEYPOS() = _REAL (Read)
+*        Two values giving the position of the key. The first value gives 
+*        the gap between the right hand edge of the vector map and the left 
+*        hand edge of the key. The second value gives the vertical position of
+*        the top of the key. If the second value is not given, the top of 
+*        the key is placed level with the top of the vector map. Both
+*        values should be in the range 0.0 to 1.0. [0.15]
+*     KEYSTYLE = GROUP (Read)
+*        The plotting style to use for the key (see parameter KEY). This 
+*        should be a group of comma-separated name=value strings where "name" 
+*        is the name of a Plot attribute and "value" is the value to assign 
+*        to the attribute. The text in the key is drawn as Plot "Strings"
+*        (using attributes COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+*        TEXT can be used in place of STRINGS). The example vector is drawn 
+*        as a Plot "Curve" (using attributes COLOUR(CURVES), etc - the
+*        synonym VECTOR can be used in place of CURVES). The numerical
+*        scale value is formatted as an axis 1 value (using attributes 
+*        FORMAT(1), DIGITS(1), etc - the synonym SCALE can be used in place 
+*        of the value 1). The length of the example vector is formatted as an
+*        axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
+*        can be used in place of the value 2). A null (!) value causes the 
+*        key style used on the previous invocation of contour to be 
+*        re-used. If no previous key style is available, or if the keyword 
+*        RESET is supplied, then the default key style established using 
+*        application SETSTYLE is used. [!]
+*     KEYVEC = _REAL (Read)
+*        Length of the vector to be displayed in the key, in data units.
+*        A default value is generated based on the spread of vector
+*        lengths in the plot. []
+*     PXSIZE = _REAL (Read)
+*        The length (x axis) of the plot in metres. [Maximum that can
+*        fit in the current picture whilst preserving square pixels]
+*     PYSIZE = _REAL (Read)
+*        The length (y axis) of the plot in metres. [Maximum that can
+*        fit in the current picture whilst preserving square pixels]
+*     STYLE = GROUP (Read)
+*        The plotting style to use for the annotated axes. This should be 
+*        a group of comma-separated name=value strings where "name" is the 
+*        name of a Plot attribute, and "value" is the value to assign to 
+*        the attribute. Vectors are drawn as "Curves" but may also be 
+*        refered to using the synonym "Vectors" when specifying Plot 
+*        attributes. Default values are supplied for any attributes 
+*        which are not specified. If the vectors are being drawn over an 
+*        existing DATA picture (see parameter CLEAR), then these defaults 
+*        come from the existing DATA picture. Otherwise, they are inherited 
+*        from the previous invocation of POLPLOT. If this is the first 
+*        invocation (or if the options database file has been deleted), or 
+*        if the keyword RESET is supplied, then the defaults used are those 
+*        established by KAPPA application SETSTYLE. A null (!) value causes 
+*        defaults to be used for all attributes. [!]
+*     VSCALE = _REAL (Read)
+*        The scale to be used for the vectors.  The supplied value
+*        should give the data value corresponding to a vector length of
+*        one centimetre.  []
+
+*  Examples:
+*     polplot poltab x y p theta 
+*        Produces a vector map on the current graphics device with
+*        vectors defined in the FITS binary table "poltab". The magnitudes
+*        are taken from column P, the orientations from column THETA, and
+*        the coordinates of each vector from columns X and Y. All 
+*        other settings are defaulted, so for example a key is plotted.
+*     polplot poltab ra dec p theta angrot=23.4 cosys=eq(B1950)
+*        Produces a vector map in which the primary axis of the vectors
+*        (as defined by the value zero in the column THETA) is at the
+*        position angle 23.4 degrees (measured anti-clockwise from the
+*        positive y axis) in the displayed map. The position of each vector
+*        is specified by columns "ra" and "dec". The annotated axes give
+*        equatorial (RA/DEC) coordinates refered to the equinox of B1950.
+*        If the vector map is displayed over an existing DATA picture,
+*        then the FrameSet associated with the existing picture (in the
+*        AGI database) must contain sky coordinate Frame so that the
+*        vectors can be aligned with the existing picture.
+*     polplot poltab x y p theta arrow=0.01 just=start nokey
+*        Produces a vector map in which each vector is represented by an 
+*        arrow, starting at the position of the corresponding pixel.  No key
+*        to the vector scale and justification is produced.
+
+*  Implementation Status:
+*     -  Only real data can be processed directly.  Other non-complex
+*     numeric data types will undergo a type conversion before the
+*     vector plot is drawn.
+
+*  Authors:
+*     DSB: David Berry (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     5-FEB-1998 (DSB):
+*        Original version, derived from kappa:vecplot.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+*  Type Definitions:
+      IMPLICIT NONE              ! no default typing allowed
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'CTM_PAR'          ! CTM_ Colour-Table Management constants
+      INCLUDE 'AST_PAR'          ! AST_ constants and function declarations
+      INCLUDE 'CAT_PAR'          ! CAT_ constants 
+
+*  Status:
+      INTEGER STATUS
+
+*  Local Constants:
+      INTEGER CUNITS             ! Maximum number of characters in units
+      PARAMETER( CUNITS = 30 )   ! string
+
+      REAL  DTOR                 ! Degrees to radians conversion factor
+      PARAMETER ( DTOR = 1.7453293E-2 )
+
+      REAL  NVEC0                ! Default no. of vectors along short
+      PARAMETER ( NVEC0 = 15.0 ) ! axis
+
+*  Local Variables:
+      CHARACTER DOMAIN*30        ! Domain containing vector positions
+      CHARACTER JUST*6           ! Vector justification: CENTRE or START
+      CHARACTER NAME*(CAT__SZCMP)! CAT column name
+      CHARACTER UNITS1*( CUNITS )! Units of the data
+      CHARACTER UNITS2*( CUNITS )! Units of the data
+      DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
+      DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
+      DOUBLE PRECISION DMAX      ! Max. value of pixels in array
+      DOUBLE PRECISION DMAXC     ! Max. pixel value after clipping
+      DOUBLE PRECISION DMIN      ! Min. value of pixels in array
+      DOUBLE PRECISION DMINC     ! Min. pixel value after clipping
+      DOUBLE PRECISION DX        ! Extension of X axis
+      DOUBLE PRECISION DY        ! Extension of Y axis
+      DOUBLE PRECISION MEAN      ! Mean of pixels in array
+      DOUBLE PRECISION MEANC     ! Mean of pixels after clipping
+      DOUBLE PRECISION STDEV     ! Standard devn. of pixels in array
+      DOUBLE PRECISION STDEVC    ! Std. devn. of pixels after clipping
+      DOUBLE PRECISION SUM       ! Sum of pixels in array
+      DOUBLE PRECISION SUMC      ! Sum of pixels after clipping
+      DOUBLE PRECISION SXHI      ! Upper bound of used region of X axis 
+      DOUBLE PRECISION SXLO      ! Lower bound of used region of X axis 
+      DOUBLE PRECISION SYHI      ! Upper bound of used region of Y axis 
+      DOUBLE PRECISION SYLO      ! Lower bound of used region of Y axis 
+      INTEGER CI                 ! CAT catalogue identifier
+      INTEGER GI                 ! CAT column identifier
+      INTEGER GIANG              ! CAT identifier for ANG column
+      INTEGER GIMAG              ! CAT identifier for MAG column
+      INTEGER GIS( 2 )           ! CAT identifiers for X,Y catalogue columns
+      INTEGER GIX                ! CAT identifier for X column
+      INTEGER GIY                ! CAT identifier for X column
+      INTEGER I                  ! Loop count
+      INTEGER ICAT               ! Index of (X,Y) Frame in IWCS and IPLOT
+      INTEGER IMAX               ! Vector index of max. pixel
+      INTEGER IMAXC              ! Vector index of max. clipped pixel
+      INTEGER IMIN               ! Vector index of min. pixel
+      INTEGER IMINC              ! Vector index of min. clipped pixel
+      INTEGER IPANG              ! Pointer to array holding vector angles
+      INTEGER IPICD              ! AGI id. for DATA picture
+      INTEGER IPICF              ! AGI id. for new FRAME picture
+      INTEGER IPICK              ! AGI id. for the KEY picture
+      INTEGER IPLOT              ! Pointer to AST Plot for DATA picture
+      INTEGER IPLOTK             ! Pointer to AST Plot for KEY picture
+      INTEGER IPMAG              ! Pointer to array holding vector magnitudes
+      INTEGER IPX                ! Pointer to array holding vector X positions
+      INTEGER IPY                ! Pointer to array holding vector Y positions
+      INTEGER IPX2               ! Pointer to array holding vector X positions
+      INTEGER IPY2               ! Pointer to array holding vector Y positions
+      INTEGER IWCS               ! Pointer to AST FrameSet read from catalogue
+      INTEGER MAXPOS             ! Position of maximum value
+      INTEGER MINPOS             ! Position of minimum value
+      INTEGER NBAD               ! No. of bad values
+      INTEGER NFRM               ! Frame index increment between IWCS and IPLOT
+      INTEGER NGANG              ! No. of good vector angle values
+      INTEGER NGMAG              ! No. of good vector magnitude values
+      INTEGER NGOOD              ! No. valid pixels in array
+      INTEGER NGOODC             ! No. valid pixels after clipping
+      INTEGER NGX                ! No. of good vector X values
+      INTEGER NGY                ! No. of good vector Y values
+      INTEGER NKP                ! No. of values supplied for parameter KEYPOS
+      INTEGER NVEC               ! No. of vectors in catalogue
+      INTEGER VCI                ! Vector colour index
+      LOGICAL AXES               ! Annotated axes to be drawn?
+      LOGICAL KEY                ! A key to vector scale to be plotted?
+      LOGICAL THERE              ! Was a FrameSet read fom the catalogue?
+      REAL AHSIZE                ! Arrowhead size in world co-ordinates
+      REAL AHSIZM                ! Arrowhead size in metres
+      REAL ANGFAC                ! NDF2 data to radians conversion factor
+      REAL ANGROT                ! Angle to add on to NDF2 values
+      REAL ASPECT                ! Aspect ratio for new DATA pictures
+      REAL CLIP( 4 )             ! Array of clipping limits
+      REAL DEFSCA                ! Default value for VSCALE
+      REAL DSCALE                ! Vector scale, viz. data units per pixel
+      REAL DUMMY                 ! Unused argument
+      REAL KEYOFF                ! Offset to top of key 
+      REAL KEYPOS( 2 )           ! Key position
+      REAL MARGIN( 4 )           ! Margins round DATA picture
+      REAL TYPDAT                ! A typical data value from 1st input NDF
+      REAL VECWID                ! Line thickness for vectors
+      REAL VSCALE                ! Vector scale, viz. data units per cm
+      REAL X1                    ! Lower x w.c. bound of picture
+      REAL X2                    ! Upper x w.c. bound of picture
+      REAL XM                    ! DATA zone x size in metres
+      REAL Y1                    ! Lower y w.c. bound of picture
+      REAL Y2                    ! Upper y w.c. bound of picture
+      REAL YKEY                  ! Vertical position at top of DATA picture
+      REAL YM                    ! DATA zone y size in metres
+
+*  Local Data:
+      DATA CLIP   / 4*4.0 /,
+     :     MARGIN / 4*0.1 /
+
+*.
+
+*  Check the inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AST context.
+      CALL AST_BEGIN( STATUS )
+
+*  Open the input catalogue, and get its name.
+      CALL CAT_ASSOC( 'CAT', 'READ', CI, STATUS )
+
+*  Get CAT identifiers for the columns which are to be used to define the 
+*  vector magnitudes, orientations, X and Y coordinates.
+      CALL KPG1_GTCTC( 'COLMAG', CI, CAT__FITYP, ' ', GIMAG, STATUS )
+      CALL KPG1_GTCTC( 'COLANG', CI, CAT__FITYP, ' ', GIANG, STATUS )
+      CALL KPG1_GTCTC( 'COLX', CI, CAT__FITYP, ' ', GIX, STATUS )
+      CALL KPG1_GTCTC( 'COLY', CI, CAT__FITYP, ' ', GIY, STATUS )
+
+*  Obtain the units of the magnitude column.
+      UNITS1 = ' '
+      CALL CAT_TIQAC( GIMAG, 'UNITS', UNITS1, STATUS )
+
+*  Obtain the units of the orientation column.
+      UNITS2 = ' '
+      CALL CAT_TIQAC( GIANG, 'UNITS', UNITS2, STATUS )
+
+*  Set up a factor which converts values stored in the orientation column
+*  into units of radians.  If the UNITS attribute does not have the value 
+*  "RADIANS" (case insensitive), then assume the data values are in degrees.
+      IF ( UNITS2 .NE. ' ' ) THEN
+         CALL CHR_RMBLK( UNITS2 )
+         CALL CHR_UCASE( UNITS2 )
+         IF ( UNITS2 .EQ. 'RADIANS' ) THEN
+            ANGFAC = 1.0
+         ELSE
+            ANGFAC = DTOR
+         END IF
+      ELSE
+         ANGFAC = DTOR
+      END IF
+
+*  Store the values of all 4 catalogue columns in 4 arrays.
+*  ========================================================
+*  Find the number of rows in the catalogue. This is the number of
+*  vectors to be plotted.
+      CALL CAT_TROWS( CI, NVEC, STATUS )
+
+*  Allocate workspace for 4 _REAL arrays each with NVEC elements.
+      CALL PSX_CALLOC( NVEC, '_REAL', IPMAG, STATUS )
+      CALL PSX_CALLOC( NVEC, '_REAL', IPANG, STATUS )
+      CALL PSX_CALLOC( NVEC, '_DOUBLE', IPX, STATUS )
+      CALL PSX_CALLOC( NVEC, '_DOUBLE', IPY, STATUS )
+      CALL PSX_CALLOC( NVEC, '_DOUBLE', IPX2, STATUS )
+      CALL PSX_CALLOC( NVEC, '_DOUBLE', IPY2, STATUS )
+
+*  Check the pointers can be used.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Copy each column into the corresponding array.
+      CALL KPG1_CPCTR( CI, GIMAG, NVEC, %VAL( IPMAG ), NGMAG, STATUS )
+      CALL KPG1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
+      CALL KPG1_CPCTD( CI, GIX, NVEC, %VAL( IPX ), NGX, STATUS )
+      CALL KPG1_CPCTD( CI, GIY, NVEC, %VAL( IPY ), NGY, STATUS )
+
+*  Check the global status.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Report an error if any of the columns contain no good data.
+      GI = CAT__NOID
+      IF( NGMAG .EQ. 0 ) THEN
+         GI = GIMAG
+         CALL MSG_SETC( 'COL', 'vector magnitude' )
+
+      ELSE IF( NGANG .EQ. 0 ) THEN
+         GI = GIANG
+         CALL MSG_SETC( 'COL', 'vector orientation' )
+
+      ELSE IF( NGX .EQ. 0 ) THEN
+         GI = GIX
+         CALL MSG_SETC( 'COL', 'X coordinate' )
+
+      ELSE IF( NGY .EQ. 0 ) THEN
+         GI = GIY
+         CALL MSG_SETC( 'COL', 'Y coordinate' )
+
+      END IF
+
+      IF( GI .NE. CAT__NOID ) THEN
+         CALL CAT_TIQAC( GI, 'NAME', NAME, STATUS )
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL ERR_REP( 'POLPLOT_1', 'The ^COL column '//
+     :                 '(^NAME) contains no data.', STATUS )
+      END IF
+
+*  Find the spatial bounds of the data in pixel coordinates.
+*  =========================================================
+*  Find the maximum and minimum X value.
+      CALL KPG1_MXMND( ( NGX < NVEC ), NVEC, %VAL( IPX ), NBAD, SXHI,
+     :                  SXLO, MAXPOS, MINPOS, STATUS )
+
+*  Find the maximum and minimum Y value.
+      CALL KPG1_MXMND( ( NGY < NVEC ), NVEC, %VAL( IPY ), NBAD, SYHI,
+     :                  SYLO, MAXPOS, MINPOS, STATUS )
+
+*  Extend these values slightly at each border.
+      DX = 0.005*( SXHI - SXLO )
+      DY = 0.005*( SYHI - SYLO )
+      BOX( 1 ) = SXLO - DX
+      BOX( 3 ) = SXHI + DX
+      BOX( 2 ) = SYLO - DY
+      BOX( 4 ) = SYHI + DY
+
+*  Get the aspect ratio of the box (assuming equal scales on each axis).
+      ASPECT = ( BOX( 4 ) - BOX( 2 ) )/( BOX( 3 ) - BOX( 1 ) )
+
+*  Find a representative data value.
+*  =================================
+*  Obtain a "typical" data value from the magnitude column. This will be
+*  used to define the default vector scaling. First, compute the
+*  statistics. Remove abberant values by sigma clipping 4 times.
+      CALL KPG1_STATR( ( NGMAG .LT. NVEC ), NVEC, %VAL( IPMAG ), 4, 
+     :                 CLIP, NGOOD, IMIN, DMIN, IMAX, DMAX, SUM, MEAN, 
+     :                 STDEV, NGOODC, IMINC, DMINC, IMAXC, DMAXC, SUMC, 
+     :                 MEANC, STDEVC, STATUS )
+
+*  Report an error if all data values are effectively zero.
+      IF ( ABS( DMAX ) .LE. VAL__SMLR .AND.
+     :     ABS( DMIN ) .LE. VAL__SMLR .AND.
+     :     STATUS .EQ. SAI__OK ) THEN 
+         CALL CAT_TIQAC( GIMAG, 'NAME', NAME, STATUS )
+         STATUS = SAI__ERROR
+         CALL MSG_SETC( 'NAME', NAME )
+         CALL ERR_REP( 'POLPLOT_2', 'All magnitude values are zero '//
+     :                 'in column ^NAME.', STATUS )
+         GO TO 999
+      END IF
+
+*  Calculate the "typical value". This is the mean value after clipping,
+*  plus one standard deviation.
+      IF ( MEANC .NE. VAL__BADD .AND. STDEVC .NE. VAL__BADD ) THEN
+         TYPDAT = MEANC + STDEVC
+      ELSE
+         TYPDAT = MEAN
+      END IF
+
+*  Prepare to produce graphics using AST and PGPLOT.
+*  =================================================
+
+*  Attempt to read an AST FrameSet from the catalogue. The Base Frame of 
+*  this FrameSet will be spanned by axes corresponding to the X and Y 
+*  catalogue columns. The Current Frame is set by the user, using
+*  parameter COSYS.
+      GIS( 1 ) = GIX
+      GIS( 2 ) = GIY
+      CALL KPG1_GTCTA( 'COSYS', CI, 2, GIS, THERE, IWCS, STATUS )
+
+*  Get the index of the Frame corresponding to the catalogue columns 
+*  specifying the vector positions (i.e. the Base Frame in the above
+*  FrameSet).
+      ICAT = AST_GETI( IWCS, 'BASE', STATUS )
+
+*  Get the Domain in which the vector positions are defined.
+      DOMAIN = AST_GETC( IWCS, 'DOMAIN', STATUS )
+
+*  Establish a synonym of VECTORS (minimum abbreviation VEC) for the AST 
+*  graphical element name CURVES.
+      CALL KPG1_ASPSY( '(VEC*TORS)', '(CURVES)', STATUS )
+
+*  See if a key to the vector magnitude scale is required.
+      CALL PAR_GTD0L( 'KEY', .TRUE., .TRUE., KEY, STATUS )
+
+*  Start up the graphics system, and create an AST Plot. Leave room for a
+*  key if required. A pointer to the Plot is returned, together with AGI
+*  identifiers for the FRAME, DATA and KEY pictures. Note, to get the index of 
+*  a Frame (eg ICAT) in the returned Plot, you add the returned value of 
+*  NFRM onto its index in IWCS.  The PGPLOT viewport is set up so that it
+*  corresponds to the DATA picture.
+      IF( KEY ) THEN
+
+*  Get the position required for the key. The margin between DATA and KEY 
+*  Frames is determined by the horizontal position requested for the key.
+         CALL PAR_GDRVR( 'KEYPOS', 2, 0.0, 1.0, KEYPOS, NKP, STATUS )
+         MARGIN( 2 ) = KEYPOS( 1 )
+
+*  Start up the graphics system, creating a KEY picture.
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK', 'POLPLOT', ' ', 
+     :                   MARGIN, 1, 'KEY', 'R', 0.25, ASPECT, DOMAIN, 
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, STATUS )
+
+*  Otherwise, start up the graphics system, creating no KEY picture.
+      ELSE
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK', 'POLPLOT', ' ', 
+     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, DOMAIN, 
+     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, STATUS )
+      END IF
+
+*  Find the index of the Frame within the Plot corresponding to the 
+*  catalogue columns specifying the vector positions. 
+      ICAT = ICAT + NFRM
+
+*  See if axes are required
+      CALL PAR_GET0L( 'AXES', AXES, STATUS )
+
+*  Obtain the vector-plot characteristics.
+*  =======================================
+
+*  Get the angle (in degrees) which is to be added to the values stored
+*  in the supplied catalogue, and convert to radians.  Do not set a dynamic 
+*  default. Constrain to 0 to 360 degrees.
+      CALL PAR_GDR0R( 'ANGROT', -1.0, 0.0, 360.0, .FALSE., ANGROT,
+     :                STATUS )
+      ANGROT = ANGROT * DTOR
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Establish the default value for the vector scaling factor such that
+*  a typical data value corresponds to a vector equal to one 15th of 
+*  the smallest DATA zone dimension, and then get a new (positive) value.  
+*  If a value of zero is supplied, use the default value.  XM is measured in 
+*  metres so 100 time converts to centimetres.
+      CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
+      DEFSCA = ABS( NVEC0 * TYPDAT / ( 100.0 * MIN( XM, YM ) ) )
+      CALL PAR_DEF0R( 'VSCALE', DEFSCA, STATUS )
+      CALL PAR_GET0R( 'VSCALE', VSCALE, STATUS )
+      VSCALE = ABS( VSCALE )
+      IF ( VSCALE .LE. VAL__SMLR ) VSCALE = DEFSCA
+
+*  Convert VSCALE so that it gives data units per unit distance in the
+*  graphics world coordinate system, rather than data units per centimetre.
+      DSCALE = VSCALE * 100.0 * XM / ( X2 - X1 )
+
+*  Get the vector justification to be used.
+      CALL PAR_CHOIC( 'JUST', 'CENTRE', 'CENTRE,START,END', .TRUE.,
+     :                JUST, STATUS )
+
+*  Get the arrow head size, and convert it to units of DATA zone world 
+*  coordinates.
+      CALL PAR_GET0R( 'ARROW', AHSIZE, STATUS )
+      AHSIZE = AHSIZE * MAX( X2 - X1, Y2 - Y1 )
+
+*  Get the arrowhead size in metres.
+      AHSIZM = AHSIZE * XM / ( X2 - X1 )
+
+*  Produce the plot.
+*  =================
+*  First draw the axes if required.
+      IF ( AXES ) CALL AST_GRID( IPLOT, STATUS )
+
+*  Modify the Plot so that the Current Frame corresponds to the coordinates
+*  specified in the X and Y catalogue columns.
+      CALL AST_SETI( IPLOT, 'CURRENT', ICAT, STATUS )
+
+*  Use the inverse of the Plot as a Mapping to transform the (x,y) positions 
+*  in the catalogue into graphics world coordinates.
+      CALL AST_TRAN2( IPLOT, NVEC, %VAL( IPX ), %VAL( IPY ), .FALSE.,
+     :                %VAL( IPX2 ), %VAL( IPY2 ), STATUS ) 
+
+*  Set the appearance of lines drawn using PGPLOT so that they mimic 
+*  curves produced using astCurves.
+      CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
+
+*  Plot the vectors.
+      CALL POL1_VECPL( NVEC, %VAL( IPX2 ), %VAL( IPY2 ), %VAL( IPMAG ),
+     :                 %VAL( IPANG ), ANGFAC, ANGROT, DSCALE, AHSIZE, 
+     :                 JUST, STATUS )
+
+*  Re-instate the previous PGPLOT attributes.
+      CALL KPG1_PGSTY( IPLOT, 'CURVES', .FALSE., ATTRS, STATUS )
+
+*  Plot the key.
+*  =============
+*  Now produce the key if required.
+      IF ( KEY .AND. STATUS .EQ. SAI__OK ) THEN
+
+*  If no value was supplied for the vertical position of the KEY using 
+*  parameter KEYPOS, find the value which puts the top of the key level 
+*  with the top of the DATA picture.
+         IF( NKP .LT. 2 ) THEN
+
+*  We need to know the position of the top of the DATA picture so that
+*  the top of the key can be put at the same height on the screen. Get
+*  the bounds of the current PGPLOT viewport, in mm. Only the vertical
+*  position at the top is needed.
+            CALL PGQVP( 2, DUMMY, DUMMY, DUMMY, KEYOFF )
+
+*  Activate the KEY picture. This returns a pointer to an AST Plot which
+*  can be used to draw in the KEY picture.
+            CALL KPG1_GDACT( IPICK, IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the vertical position in the key picture which corresponds to
+*  the top of the DATA picture, as a fraction of the height of the key
+*  picture.
+            CALL PGQVP( 2, DUMMY, DUMMY, Y1, Y2 )
+            KEYOFF = ( KEYOFF - Y1 )/( Y2 - Y1 )
+
+*  If the horizontal positions was given using parameter KEYPOS, just 
+*  activate the KEY picture. This returns a pointer to an AST Plot which
+*  can be used to draw in the KEY picture.
+         ELSE
+            KEYOFF = KEYPOS( 2 )
+            CALL KPG1_GDACT( IPICK, IPLOTK, STATUS )
+            IF( STATUS .NE. SAI__OK ) GO TO 999
+         END IF
+
+         IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Find the corresponding world Y value in the key picture.
+         CALL PGQWIN( X1, X2, Y1, Y2 )
+         YKEY = Y1 + KEYOFF*( Y2 - Y1 ) 
+
+*  Ensure that previous synonyms are cleared.
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*  Establish some synonyms for AST attribute names.
+         CALL KPG1_ASPSY( 'FORMAT(SCA*LE)', 'FORMAT(1)', STATUS )
+         CALL KPG1_ASPSY( 'FORMAT(VEC*TOR)', 'FORMAT(2)', STATUS )
+         CALL KPG1_ASPSY( '(VEC*TOR)', '(CURVES)', STATUS )
+         CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
+
+*  Set the style for plotting in the key picture.
+         CALL KPG1_GTSTY( 'KEYSTYLE', .FALSE., 
+     :                    'POLPACK.POLPLOT.KEYSTYLE', IPLOTK, STATUS )
+
+*  Now produce the key.
+         CALL KPS1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,
+     :                    ABS( TYPDAT ), UNITS1, JUST, STATUS )
+
+      END IF
+
+*  Closedown sequence.
+*  ===================
+
+*  Flush all graphics.
+      CALL PGUPDT
+
+*  Arrive here if an error occurs.
+ 999  CONTINUE
+      
+*  Release resources used to hold synonyms for AST attribute names.
+      CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*  Release work space.
+      CALL PSX_FREE( IPMAG, STATUS )
+      CALL PSX_FREE( IPANG, STATUS )
+      CALL PSX_FREE( IPX, STATUS )
+      CALL PSX_FREE( IPY, STATUS )
+      CALL PSX_FREE( IPX2, STATUS )
+      CALL PSX_FREE( IPY2, STATUS )
+
+*  Shut down the graphics database.
+      CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
+
+*  Release the catalogue identifier.
+      CALL CAT_TRLSE( CI, STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
+
+*  If an error occurred, then report a contextual message.
+      IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'POLPLOT_ERR', 'POLPLOT: Error producing a '//
+     :                 'vector map.', STATUS )
+      END IF
+
+      END

@@ -1,0 +1,196 @@
+#  Name:
+#     POLPLOT.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Authors:
+#     DSB: David S. Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     24-FEB-1998 (DSB):
+#     	 Original version.
+#     {enter_further_changes_here}
+
+#-
+
+interface POLPLOT
+
+   helplib        'POLPACK_HELP:'
+
+   parameter      ANGROT         # Angle to add on to vector orientations
+      type        '_REAL'
+      prompt      'Angle by which to rotate the vectors (in degrees)'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     0.0
+   endparameter
+
+   parameter      ARROW         # Size of arrow head.
+      type        '_REAL'
+      prompt      'Fractional size of arrow heads'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     0.0
+   endparameter
+
+   parameter      AXES           # Axes or no axes?
+      type        '_LOGICAL'
+      prompt      'Are annotated axes to be drawn?'
+      vpath       'DEFAULT'
+      default     T
+      helpkey     '*'
+   endparameter
+
+   parameter      CAT
+      position    1
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Input catalogue'
+      helpkey     '*'
+   endparameter
+
+   parameter      CLEAR          # Clear before plotting?
+      type        '_LOGICAL'
+      vpath       'DEFAULT'
+      prompt      'Is the current picture to be cleared before plotting?'
+      helpkey     '*'
+      default     Y
+   endparameter
+
+   parameter      COLANG
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Name of catalogue column holding vector angles'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLMAG
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Name of catalogue column holding vector lengths'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLX
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Name of catalogue column holding vector X position'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLY
+      type        LITERAL
+      ppath       'CURRENT'
+      prompt      'Name of catalogue column holding vector Y position'
+      helpkey     '*'
+   endparameter
+
+   parameter      COSYS          # Co-ordinate system
+      type        'LITERAL'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      prompt      'Co-ordinate system'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      DEVICE         # Graphics device
+      ptype       'DEVICE'
+      vpath       'GLOBAL,PROMPT'
+      ppath       'GLOBAL,CURRENT'
+      association '<-GLOBAL.GRAPHICS_DEVICE'
+      prompt      'Name of graphics device'
+      helpkey     '*'
+   endparameter
+
+   parameter      FILL           # Fill the plotting region?
+      type        '_LOGICAL'
+      prompt      'Fill the plotting area?'
+      vpath       'DEFAULT'
+      default     N
+      helpkey     '*'
+   endparameter
+
+   parameter      JUST           # Vector justification
+      type        'LITERAL'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      prompt      'Vector justification'
+      default     'CENTRE'
+      helpkey     '*'
+#     in          'CENTRE', 'START', 'END'
+   endparameter
+
+   parameter      KEY            # Plot a key?
+      type        '_LOGICAL'
+      prompt      'Do you want a key showing the vector scale?'
+      vpath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
+      default     Y
+      helpkey     '*'
+   endparameter
+
+   parameter      KEYPOS         # Horizontal and vertical position of key
+      type        '_REAL'
+      prompt      'Horizontal and vertical position of key'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      helpkey     '*'
+      default     0.15
+   endparameter
+
+   parameter      KEYSTYLE       # Style for key
+      type        'LITERAL'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      prompt      'Style attributes for the key'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      KEYVEC         # Key vector magnitude
+      type        '_REAL'
+      prompt      'Key vector magnitude'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      PXSIZE         # X size of plot
+      type        '_REAL'
+      prompt      'Size of the plot in the x-direction in metres'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      PYSIZE         # Y size of plot
+      type        '_REAL'
+      prompt      'Size of the plot in the y-direction in metres'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+   parameter      STYLE          # Plotting style
+      type        'LITERAL'
+      ppath       'DEFAULT'
+      vpath       'DEFAULT'
+      prompt      'Style attributes for vector map'
+      helpkey     '*'
+      default     !
+   endparameter
+
+   parameter      VSCALE         # Vector scale, centimetres per data unit
+      type        '_REAL'
+      prompt      'Data value for a 1-centimetre vector'
+      ppath       'DYNAMIC'
+      vpath       'DYNAMIC'
+      helpkey     '*'
+   endparameter
+
+endinterface
