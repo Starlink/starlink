@@ -1,0 +1,77 @@
+#!/bin/sh
+
+#+
+#  Name:
+#     extfc
+#
+#  Purpose:
+#     Invoke fortran compiler on EXTREME-modified source code
+#
+#  Description:
+#     This script preprocesses any source files named with a .f extension
+#     by invoking the command `extfpre' and then invokes the fortran 
+#     compiler.  It will typically be used as the value of the makefile/mk
+#     variable $(FC).
+#
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+#
+#  History:
+#     7-FEB-2000 (MBT):
+#        Original version.
+#-
+
+#  Set base filename for temporary files.
+      tmpname=".tmp.ext-"
+
+#  Set location of preprocessing script.
+      preproc=extfpre
+      if [ -x $preproc ]
+      then
+         :
+      else
+         echo 2>&1 "$0: Code preprocessor `$preproc' not found."
+         exit 1
+      fi
+
+#  Save original list of arguments.
+      args="$@"
+
+#  Initialise list of files which has been processed.
+      ffiles=""
+
+#  Go through arguments and preprocess the *.f ones, writing them to a 
+#  new file of the same name (the old ones are stored under a temporary
+#  name).
+      while [ "$1" ]
+      do
+         if [ `echo "$1" | grep '\.f$'` ]
+         then
+            tmpf=$tmpname$1
+            rm -f $tmpf
+            mv $1 $tmpf
+            $preproc <$tmpf >$1
+            ffiles="$ffiles $1"
+         else
+            :
+         fi
+         shift
+      done
+
+#  Run the compiler on the original list of arguments.
+      f77 $args
+
+#  Restore the modified files to their previous state.
+      for f in $ffiles ""
+      do
+         if [ "$f" ] 
+         then
+            orig=`echo $f | sed s/^$tmpname//`
+            mv $f $orig
+            rm -f $f
+         else
+            :
+         fi
+      done
+
+# $Id$

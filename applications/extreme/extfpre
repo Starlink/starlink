@@ -1,0 +1,58 @@
+#!/usr/bin/perl -w
+
+#+
+#  Name:
+#     extfpre
+#
+#  Purpose:
+#     Preprocess a fortran file prior to compiling it.
+#
+#  Description:
+#     This filter replaces any `INTEGER * 8' declarations by `INTEGER' ones.
+#     Additionally, it looks for INCLUDEd files, and appends a string
+#     to their filename.  If the file so named does not exist, one is 
+#     created by preprocessing the original filename in the same way
+#     as the rest of the output of this script.
+#
+#  Notes:
+#     - Should rewrite this in sed or awk probably rather than perl once 
+#       we know exactly what it has to do.
+#
+#     - As it stands, use of this script can result in extra *_EXTFPRE
+#       files being created in the build directory not under control of
+#       the makefile.  If the makefile is written to create such
+#       preprocessed INCLUDE files explicitly though, this can be avoided.
+#
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+#
+#  History:
+#     7-FEB-2000 (MBT):
+#        Original version.
+#-
+
+      my( $suffix ) = '_EXTFPRE';
+
+      my( $self ) = $0;
+      while( <> ) {
+         if ( /^ *INCLUDE *'([^']*)'(.*)/i ) {
+            my( $ofile ) = $1;
+            my( $nfile ) = $ofile . $suffix;
+            print( "      INCLUDE '$nfile'\n" );
+            if ( ! -e $nfile ) {
+               if ( -e $ofile ) {
+                  system( "$0 <$ofile >$nfile" ) and 
+                     die( "'$self: $0 <$ofile >$nfile' failed\n" );
+               }
+               else {
+                  die( "$self: Can't find INCLUDE file $ofile.\n" );
+               }
+            }
+         }
+         else {
+            s/^ *INTEGER *\* *8/      INTEGER /i;
+            print;
+         }
+      }
+
+# $Id$
