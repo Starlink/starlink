@@ -1,0 +1,431 @@
+%APN3_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TEMPLATE.TEX -- APN3 (2003) ASP Conference Proceedings template.
+%
+% Derived from ADASS VIII (98) ASP Conference Proceedings template
+% Updated by N. Manset for ADASS IX (99), F. Primini for ADASS 2000,
+% D.Bohlender for ADASS 2001, and H. Payne for ADASS XII and LaTeX2e.
+%
+% Use this template to create your proceedings paper in LaTeX format
+% by following the instructions given below.  Much of the input will
+% be enclosed by braces (i.e., { }).  The percent sign, "%", denotes
+% the start of a comment; text after it will be ignored by LaTeX.
+% You might also notice in some of the examples below the use of "\ "
+% after a period; this prevents LaTeX from interpreting the period as
+% the end of a sentence and putting extra space after it.
+%
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.  You should also consult the sample
+% LaTeX papers, sample1.tex and sample2.tex, for examples of including
+% figures, html links, special symbols, and other advanced features.
+%
+% If you do not have access to the LaTeX software or a laser printer
+% at your site, you can still prepare your paper following the
+% instructions in the User Guide.  In such cases, the editors will
+% process the file and make any necessary editorial adjustments.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\documentclass[11pt,twoside]{article}  % Leave intact
+\usepackage{adassconf}
+
+% If you have the old LaTeX 2.09, and not the current LaTeX2e, comment
+% out the \documentclass and \usepackage lines above and uncomment
+% the following:
+
+%\documentstyle[11pt,twoside,adassconf]{article}
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your
+% paper is the session number associated with your presentation as
+% published in the official conference proceedings.  You can
+% find this number locating your abstract in the printed proceedings
+% that you received at the meeting or on-line at the conference web
+% site; the ID code is the letter/number sequence proceeding the title
+% of your presentation.
+%
+% This will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.  Note that
+% you should only have one \paperID, and it should not include a
+% trailing period.
+%
+% EXAMPLE: \paperID{O4-1}
+% EXAMPLE: \paperID{P7-7}
+%
+
+\paperID{D-12}
+
+%-----------------------------------------------------------------------
+%		            Paper Title
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+%
+% If your title is so long as to fill the page header when you print it,
+% then please supply a short form as a \titlemark.
+%
+% EXAMPLE:
+%  \title{Rapid Development for Distributed Computing, with Implications
+%         for the Virtual Observatory}
+%  \titlemark{Rapid Development for Distributed Computing}
+%
+
+\title{Starlink Software Developments}
+%\titlemark{ }
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary (see example
+% below).  List each author by giving the first name or initials first
+% followed by the last name.  Authors with the same affiliations
+% should grouped together.
+%
+% EXAMPLE: \author{Raymond Plante, Doug Roberts,
+%                  R.\ M.\ Crutcher\altaffilmark{1}}
+%          \affil{National Center for Supercomputing Applications,
+%                 University of Illinois Urbana-Champaign, Urbana, IL
+%                 61801}
+%          \author{Tom Troland}
+%          \affil{University of Kentucky}
+%
+%          \altaffiltext{1}{Astronomy Department, UIUC}
+%
+% In this example, the first three authors, "Plante", "Roberts", and
+% "Crutcher" are affiliated with "NCSA".  "Crutcher" has an alternate
+% affiliation with the "Astronomy Department".  The fourth author,
+% "Troland", is affiliated with "University of Kentucky"
+
+\author{Peter W. Draper}
+\affil{Department of Physics, University of Durham, South Road, Durham,
+DH1 3LE, UK}
+
+\author{Alasdair Allan}
+\affil{University of Exeter, UK}
+
+\author{David S. Berry}
+\affil{University of Central Lancashire, UK}
+
+\author{Malcolm Currie, David Giaretta, Steve Rankin}
+\affil{Rutherford Appleton Laboratory, UK}
+
+\author{Norman Gray}
+\affil{University of Glasgow, UK}
+
+\author{Mark B. Taylor}
+\affil{University of Bristol, UK}
+
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+%
+% EXAMPLE:  \contact{Dennis Crabtree}
+%           \email{crabtree@cfht.hawaii.edu}
+%
+
+\contact{Peter Draper}
+\email{p.w.draper@durham.ac.uk}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following
+% syntax:
+%
+% SYNTAX:  \aindex{Lastname, F. M.}
+%
+% where F is the first initial and M is the second initial (if
+% used).  This guarantees that authors that appear in multiple papers
+% will appear only once in the author index.
+%
+% EXAMPLE: \paindex{Crabtree, D.}
+%          \aindex{Manset, N.}
+%          \aindex{Veillet, C.}
+%
+% NOTE: this information is also used to build the author list that
+% appears in the table of contents.  Authors will be listed in the order
+% of the \paindex and \aindex commmands.
+%
+
+\paindex{Draper, P. W.}
+\aindex{Allan, A.}
+\aindex{Berry, D. S.}
+\aindex{Currie, M.}
+\aindex{Giaretta, D.}
+\aindex{Rankin, S.}
+\aindex{Gray, N.}
+\aindex{Taylor, M. B.}
+
+%-----------------------------------------------------------------------
+%		      Author list for page header
+%-----------------------------------------------------------------------
+% Please supply a list of author last names for the page header. in
+% one of these formats:
+%
+% EXAMPLES:
+% \authormark{Lastname}
+% \authormark{Lastname1 \& Lastname2}
+% \authormark{Lastname1, Lastname2, ... \& LastnameN}
+% \authormark{Lastname et al.}
+%
+% Use the "et al." form in the case of seven or more authors, or if
+% the preferred form is too long to fit in the header.
+
+\authormark{Draper, Allan, Berry, Currie, Giaretta, Rankin, Gray, Taylor}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter a comma separated list of up to 6 keywords describing your
+% paper.  These will NOT be printed as part of your paper; however,
+% they will be used to generate the subject index for the proceedings.
+% There is no standard list; however, you can consult the indices
+% for past proceedings (http://adass.org/adass/proceedings/).
+%
+% EXAMPLE:  \keywords{visualization, astronomy: radio, parallel
+%                     computing, AIPS++, Galactic Center}
+%
+% In this example, the author noticed that "radio astronomy" appeared
+% in the ADASS VII Index as "astronomy" being the major keyword and
+% "radio" as the minor keyword.  The colon is used to introduce another
+% level into the index.
+
+\keywords{Starlink, software: applications, software: data analysis,
+software: pipeline, visualization, time series, catalogs,
+image: astrometry, Java, spectroscopy, Virtual Observatory, VOTable, WCS}
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting
+% special symbols). Do not leave a blank line between \begin{abstract}
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+% Place the text of your abstract here - NO BLANK LINES
+Various recent changes to the software produced by Starlink were
+demonstrated. These cover areas such as tables handling, time series analysis,
+pipeline processing, astrometric calibration, spectral and cube visualisation
+and ports to the Mac\,OS\,X and Cygwin environments. Particular emphasis
+was given to the applicability to the Virtual Observatory.
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically.
+%
+% EXAMPLE:  \section{Introduction}
+%           ...
+%           \subsection{Our View of the World}
+%           ...
+%           \section{A New Approach}
+%
+% It is recommended that you look at the sample papers, sample1.tex
+% and sample2.tex, for examples for formatting references, footnotes,
+% figures, equations, html links, lists, and other special features.
+
+\section{Changes to the Classic Starlink Software Collection}
+
+The
+\htmladdnormallink{Starlink Software Collection}{http://www.starlink.ac.uk}
+has very recently been converted to use a build system based on GNU Autotools,
+moved to a single CVS repository and re-licensed under the GPL. 
+These are seen as key developments in the move to a more open strategy for
+future support, and so that the whole system can be more easily ported to
+Unix-like operating systems (in particular
+\textsc{posix} systems which include an X~server).
+The details of this work are described in Gray et al. (2005).  
+Figure 1 shows some of our applications running under Mac\,OS\,X (similar screen
+shots of Cygwin/Windows, Solaris and various flavours of Linux have been
+omitted for space reasons).
+
+\begin{figure}
+\epsscale{0.8}\plotone{Draper_D-12_1.eps}
+\caption{GAIA and KAPPA running under Mac\,OS\,X, a development recently made
+possible by the introduction of a GNU Autotools-based build system.}
+\end{figure}
+
+\section{TOPCAT \& STIL, New Features}
+
+Starlink \htmladdnormallink{TOPCAT}{http://www.starlink.ac.uk/topcat} 
+is a user-friendly graphical program for viewing, analysing
+and editing tables in many different formats. It is based on STIL --
+the Starlink Tables Infrastructure Library -- a pure-Java class library for
+accessing and manipulating astronomical tables. Recent changes to
+TOPCAT include:
+\begin{itemize}
+\item New `activation actions', such as causing the display of region around
+      an object from an image cutout service. These are extensible.
+\item Many plotting improvements -- faster, tidier, flippable axes.
+\item Graphical selection of arbitrary shaped subsets.
+\item Faster, improved, matching.
+\item Support for more table formats (VOTable 1.1, CSV, FITS-plus).
+\end{itemize}
+
+\begin{figure}
+\epsscale{0.6}\plotone{Draper_D-12_2.eps}
+\caption{TOPCAT shown selecting an arbitrary region to create a subset}
+\end{figure}
+
+For more details of TOPCAT and STIL see Taylor (2005).
+
+\section{FROG, New Application}
+
+Starlink \htmladdnormallink{FROG}{http://www.starlink.ac.uk/frog} is a new
+time series analysis and display application written in Java. It has been
+designed to provide a simple user interface for astronomers wanting to do time
+domain astrophysics, but still have access to powerful features like those
+found in PERIOD. A full description of FROG can be found in Allan (2005).
+
+\section{ORAC-DR Pipelines}
+
+\htmladdnormallink{ORAC-DR}{http://www.jach.hawaii.edu/JACpublic/UKIRT/software/oracdr}
+is a generic pipeline system written by the Joint Astronomy Centre,
+Hawaii (Cavanagh et al. 2003), which uses Starlink applications to process
+data. As part of its support for UK astronomy Starlink has been developing new
+ORAC-DR recipes for some unsupported, or partly supported ESO instruments. A
+full description of one such recipe, and its comparison to the developing ESO
+equivalent is given in Currie (2005).
+
+\section{GAIA, New Features}
+
+\htmladdnormallinkfoot{GAIA}{http://www.starlink.ac.uk/gaia} is a classic
+Starlink application (Draper 2004a), based on the
+\htmladdnormallink{ESO Skycat}{http://archive.eso.org/skycat/} tool, for the
+visualisation and analysis of images and catalogues. 
+It offers many proto-VO features, such as remote catalogue and image
+downloads, which are widely used. 
+Recent changes (beyond its arrival on Mac\,OS\,X and Cygwin, along with the
+other Starlink applications) are the ability to display slices from cubes and
+to perform automated astrometric calibrations.
+
+\begin{figure}
+\epsscale{0.7}\plotone{Draper_D-12_3.eps}
+\caption{GAIA displaying a slice, along the third axis of an NDF cube. It is
+also possible to step automatically through a range of slices, and collapse
+a range into an image. Displayed images can be analysed like any other image.}
+\end{figure}
+
+\section{SPLAT, New Features}
+\htmladdnormallink{SPLAT}{http://www.starlink.ac.uk/splat}
+is a Java based tool for visualising and analysing spectra, which is
+described in Draper (2004b). Some of its more recent enhancements are:
+\begin{itemize}
+\item Tables access, including VOTable as provided by the STIL library
+(Taylor 2005).
+\item Graphic annotations and log axes.
+\item Interpolated backgrounds using hand-drawn splines.
+\item Hierarchical data browsing and access.
+\item Spectral line deblending (from the command-line only at present).
+\end{itemize}
+\begin{figure}
+\epsscale{0.7}\plotone{Draper_D-12_4.eps}
+\caption{SPLAT reading a FITS binary table and displaying the spectrum formed
+from the two selected columns. Note the use of log axes.}
+\end{figure}
+
+\section{Virtual Observatory Tie-ins}
+
+Several of the applications described here process VOTables and offer
+Web-service access to their functionality.
+They are also written in Java, so are ideally placed to quickly adapt and
+interact with VO services as they become available (importantly much of this is
+also from a desktop point of view). 
+This stance has recently been demonstrated by the extension of SPLAT (now
+SPLAT-VO) to include a Simple Spectral Access Protocol UI.
+The Starlink classic code base is now much more portable, and freely
+available, which makes it more attractive for processing data, and it comes
+with a well proven pipeline system, as well as also being wrappable in Java so
+that it can act as ready supply of web-services.
+For more about Starlink's efforts in the VO area see Giaretta et al. (2005).
+
+\section{Finding Out More About Starlink Applications}
+
+Information about Starlink applications and how to download them is available
+at \htmladdURL{http://www.starlink.ac.uk}.
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  Observe the following order when listing
+% bibliographical information for each reference:  author name(s),
+% publication year, journal name, volume, and page number for
+% articles.  Note that many journal names are available as macros; see
+% the User Guide listing "macro-ized" journals.
+%
+% EXAMPLE:  \reference Hagiwara, K., \& Zeppenfeld, D.\  1986,
+%                Nucl.Phys., 274, 1
+%           \reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
+%           \reference King, I.\ R.\  1966, \aj, 71, 276
+%           \reference King, I.\ R.\  1975, in Dynamics of Stellar
+%                Systems, ed.\ A.\ Hayli (Dordrecht: Reidel), 99
+%           \reference Tody, D.\  1998, \adassvii, 146
+%           \reference Zacharias, N.\ \& Zacharias, M.\ 2003,
+%                \adassxii, \paperref{P7.6}
+%
+% Note the following tricks used in the example above:
+%
+%   o  \& is used to format an ampersand symbol (&).
+%   o  \'e puts an accent agu over the letter e.  See the User Guide
+%      and the sample files for details on formatting special
+%      characters.
+%   o  "\ " after a period prevents LaTeX from interpreting the period
+%      as an end of a sentence.
+%   o  \aj is a macro that expands to "Astron. J."  See the User Guide
+%      for a full list of journal macros
+%   o  \adassvii is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS VII conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through XI.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the
+%      note in the "Paper ID Code" section above for details on how to
+%      determine the paper ID code for the paper you reference.
+%
+\begin{references}
+
+\reference Allan, A.\ 2005, \adassxiv \paperref{P1-2-2}
+\reference Cavanagh, B., Hirst, P., Jenness, T., Economou, F., Currie, M. J.,
+Todd, S., \& Ryder, S.  D.\ \adassxii, 237
+\reference Currie, M.\ 2005, \adassxiv \paperref{P2-2-2}
+\reference Draper, P. W.\  2004a, 
+\htmladdnormallink{Starlink User Note 243}{http://star-www.rl.ac.uk/cgi-bin/htxserver/sun243.htx/},
+Starlink Project CCLRC
+\reference Draper, P. W.\  2004b,
+\htmladdnormallink{Starlink User Note 214}{http://star-www.rl.ac.uk/cgi-bin/htxserver/sun214.htx/},
+Starlink Project CCLRC
+\reference Giaretta, D., Currie, M., Rankin, S., Taylor, M., Gray, N.,
+Draper, P., Berry, D., \& Allan, A.\ \adassxiv \paperref{O7-3}
+\reference Gray, N., Jenness, T., Allan, A., Berry, S. B., Currie, M. J.,
+Draper, P. W., Taylor, M. B., Cavanagh, B. C.\ 2005, \adassxiv \paperref{P2-1-10}
+\reference Taylor, M. B.\ 2005, \adassxiv \paperref{FM-3}
+
+
+\end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
