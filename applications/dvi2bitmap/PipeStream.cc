@@ -36,22 +36,28 @@
 #  include <cstdio>
 #  include <cctype>
 #  include <cerrno>
-#  ifdef HAVE_SIGNAL
-#    include <csignal>
+#  if HAVE_CASSERT 
+#    include <cassert>
 #  endif
 #else
 #  include <stdio.h>
 #  include <ctype.h>
 #  include <errno.h>
-#  ifdef HAVE_SIGNAL_H
-#    include <signal.h>
+#  if HAVE_ASSERT_H
+#    include <assert.h>
 #  endif
 #endif
+
+#if HAVE_SIGNAL_H
+#  include <signal.h>
+#endif
+
 #include <unistd.h>		// this is standard according to single-unix, 
 				// how POSIXy is that?  How C++?
 #ifdef HAVE_SYS_WAIT_H
-#include <sys/wait.h>
+#  include <sys/wait.h>
 #endif
+
 #include <map>
 
 #ifdef HAVE_STD_NAMESPACE

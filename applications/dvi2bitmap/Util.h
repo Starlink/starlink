@@ -32,15 +32,16 @@
 #include <string>
 
 #ifdef HAVE_STD_NAMESPACE
-//using std::vector;
-using std::list;
+#define STD std
+#else
+#define STD
 #endif
 
 #include "DviError.h"
 #include "Bitmap.h"
 #include "verbosity.h"
 
-typedef list<string> string_list;
+typedef STD::list<string> string_list;
 
 namespace Util
 {

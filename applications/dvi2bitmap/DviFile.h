@@ -37,9 +37,9 @@
 #include <map>
 
 #ifdef HAVE_STD_NAMESPACE
-using std::stack;
-using std::list;
-using std::map;
+#define STD std
+#else
+#define STD
 #endif
 
 
@@ -259,7 +259,7 @@ private:
     };
     PosStateStack *posStack_;
 #else
-    stack<PosState> posStack_;
+    STD::stack<PosState> posStack_;
 #endif
     static verbosities verbosity_;
 
@@ -274,7 +274,8 @@ private:
 	void add(int fnt_num, PkFont* newfont);
 	PkFont* get(int fnt_num);
 	friend class DviFile;
-	map<int,PkFont*> fontMap_;
+	typedef STD::map<int,PkFont*> FontMap;
+	FontMap fontMap_;
     public:
 	/**
 	 * Tests whether the FontSet is empty
@@ -289,6 +290,8 @@ private:
 	/**
 	 * Represents an iteration over all the fonts in this DVI file
 	 */
+	class const_iterator;
+	friend class DviFile::FontSet::const_iterator; /* so it sees FontMap */
 	class const_iterator {
 	public:
 	    const PkFont* operator*() const throw (DviError);
@@ -298,8 +301,8 @@ private:
 	    ~const_iterator();
 	private:
 	    const_iterator();
-	    const_iterator(map<int,PkFont*> m);
-	    list<PkFont*> fontlist_;
+	    const_iterator(FontMap m);
+	    STD::list<PkFont*> fontlist_;
 	    friend class DviFile::FontSet;
 	};
 	const_iterator begin() const;
@@ -340,15 +343,15 @@ private:
 	/* These should be implementable more compactly, since we're
 	   just using map's iterator, but there's some visibility
 	   subtlety that escapes me... */
-	const_iterator(map<int,PkFont*>::const_iterator m,
-		       map<int,PkFont*>::const_iterator me) {
+	const_iterator(FontMap::const_iterator m,
+		       FontMap::const_iterator me) {
 	    mapiter_ = m;
 	    endmapiter_ = me;
 	    finished_ = false;
 	};
 	const_iterator() : finished_(true) { }
-	map<int,PkFont*>::const_iterator mapiter_;
-	map<int,PkFont*>::const_iterator endmapiter_;
+	FontMap::const_iterator mapiter_;
+	FontMap::const_iterator endmapiter_;
 	bool finished_;
 	friend class DviFile;
     };

@@ -46,6 +46,9 @@
 #ifdef HAVE_STD_NAMESPACE
 using std::cerr;
 using std::endl;
+#define STD std
+#else
+#define STD
 #endif
 
 #include <DviFile.h>
@@ -1181,9 +1184,9 @@ DviFile::FontSet::const_iterator::const_iterator()
 {
     // empty
 }
-DviFile::FontSet::const_iterator::const_iterator(map<int,PkFont*> m)
+DviFile::FontSet::const_iterator::const_iterator(FontMap m)
 {
-    for (map<int,PkFont*>::const_iterator ci = m.begin();
+    for (FontMap::const_iterator ci = m.begin();
 	 ci != m.end();
 	 ++ci) {
 	fontlist_.push_back(ci->second);
