@@ -481,7 +481,7 @@ sub get {
       # start the monolith.
       carp 'Error determining name of monolith. ' . 
 	'Parameters cannot be retrieved from monoliths that were not started '.
-	  'by this process.';
+	  'by this object.';
       $status = &Starlink::ADAM::SAI__ERROR;
     }
 
