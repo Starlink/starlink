@@ -176,6 +176,7 @@
       INTEGER DU_ID              ! Index of the DU column in the GI array
       INTEGER DV_ID              ! Index of the DV column in the GI array
       INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping
+      INTEGER FRM                ! Default Frame
       INTEGER GI( MAX_ID )       ! CAT identifiers for columns to be read
       INTEGER GTTL               ! CAT identifier for TITLE parameter
       INTEGER IP                 ! Pointers to arrays to be filled
@@ -286,6 +287,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  See if the user wants verbose error messages.
       CALL KPG1_VERB( VERB, 'POLPACK', STATUS )
@@ -452,21 +456,48 @@
 
 *  Attempt to read an AST FrameSet from the input catalogue. This WCS
 *  information will be copied to the output catalogue when the
-*  output catalogue is closed. Report an error if no WCS information is
-*  available in the input catalogue.
+*  output catalogue is closed. 
       CALL POL1_GTCTW( CIIN, IWCS, STATUS )
-      IF( IWCS .EQ. AST__NULL .AND. STATUS .EQ. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'POLBIN_1', 'No usable WCS coordinate system '//
-     :                 'information is available in the input '//
-     :                 'catalogue.', STATUS )
-         GO TO 999
-      END IF
 
 *  Get the ACW angle from the X axis to the input reference direction 
 *  (ANGROT). This is defined by the POLANAL Frame in the WCS FrameSet.
-      ANGROT = 0.0
-      CALL POL1_GTANG( NDF__NOID, CIIN, IWCS, ANGROT, STATUS )
+      IF( IWCS .NE. AST__NULL ) THEN 
+         ANGROT = 0.0
+         CALL POL1_GTANG( NDF__NOID, CIIN, IWCS, ANGROT, STATUS )
+
+*  If no WCS is available...
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Warn the user that an ANGROT value of 90 is being assumed.
+         ANGROT = 90.0
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'POLBIN_1', 'No usable WCS information is '//
+     :                 'available in the input catalogue.', STATUS )
+         CALL ERR_REP( 'POLBIN_2', 'Assuming the reference '//
+     :                 'direction is parallel to the second pixel '//
+     :                 'axis.', STATUS )
+         CALL ERR_FLUSH( STATUS )
+
+*  Create a default FrameSet containing a single Frame describing the X and 
+*  Y columns. The Axis Symbols are assigned the column names.
+         FRM = AST_FRAME( NDIMO, ' ', STATUS )
+
+         CALL CAT_TIQAC( GI( X_ID ), 'NAME', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Symbol(1)', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Label(1)', NAME, STATUS )
+
+         CALL CAT_TIQAC( GI( Y_ID ), 'NAME', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Symbol(2)', NAME, STATUS )
+         CALL AST_SETC( FRM, 'Label(2)', NAME, STATUS )
+
+         IF( SPEC ) THEN
+            CALL CAT_TIQAC( GI( Z_ID ), 'NAME', NAME, STATUS )
+            CALL AST_SETC( FRM, 'Symbol(3)', NAME, STATUS )
+         END IF
+
+         IWCS =AST_FRAMESET( FRM, ' ', STATUS )
+
+      END IF
 
 *  Decide whether or not a bias correction is needed and possible.
 *  ===============================================================
@@ -889,7 +920,8 @@
 *  =======================================================================
 
 *  Get the reference direction for the output catalogue. This may be
-*  different to the reference direction for the input cube.
+*  different to the reference direction for the input cube. Use the +ve Y
+*  axis as the reference direction if no WCS information is available.
       CALL POL1_ANGRT( IWCS, XC, YC, ANGRT, STATUS )
 
 *  Get the units string from total intensity column of the input catalogue.
@@ -997,6 +1029,9 @@
 
 *  Release the input catalogue identifier.
       CALL CAT_TRLSE( CIIN, STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
