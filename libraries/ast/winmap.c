@@ -93,6 +93,7 @@ f     The WinMap class does not define any new routines beyond those
 #include "permmap.h"             /* Axis permutations */
 #include "mapping.h"             /* Coordinate mappings (parent class) */
 #include "channel.h"             /* I/O channels */
+#include "shiftmap.h"            /* Axis shift mappings */
 #include "winmap.h"              /* Interface definition for this class */
 
 /* Error code definitions. */
@@ -661,12 +662,14 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    AstMapping *smc0;     /* Simplied Mapping */
    AstMapping *smc1;     /* Simplied Mapping */
    AstWinMap *newwm;     /* Pointer to replacement WinMap */
+   AstShiftMap *newsm;   /* Pointer to replacement ShiftMap */
    AstMatrixMap *mtr;    /* Pointer to replacement MatrixMap */
    const char *class1;   /* Pointer to first Mapping class string */
    const char *class2;   /* Pointer to second Mapping class string */
    const char *nclass;   /* Pointer to neighbouring Mapping class */
    double *b;            /* Pointer to scale terms */
    int diag;             /* Is WinMap equivalent to a diagonal matrix? */
+   int shift;            /* Is WinMap equivalent to a ShiftMap? */
    int i1;               /* Index of first WinMap to merge */
    int i2;               /* Index of last WinMap to merge */
    int i;                /* Loop counter */
@@ -1139,6 +1142,39 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
             }
          }
+      }
+   }
+
+/* If the above did not result in any change to the Mapping list, we
+   consider converting the WinMap into a ShiftMap. A ShiftMap is a
+   specialised form of the WinMap which has all unity scaling factors. */
+   if( result == -1 ) {
+   
+      shift = 1;
+      newwm = (AstWinMap *) ( *map_list )[ where ];
+      for( i = 0; i < nin; i++ ){
+         if( !EQUAL( ( newwm->b )[ i ], 1.0 ) ){
+            shift = 0;
+            break;
+         }
+      }
+
+/* If all the scale terms are unity, create an equivalent ShiftMap... */
+      if( shift ){
+         newsm = astShiftMap( nin, newwm->a, "" );
+         astSetInvert( newsm, astGetInvert( newwm ) );
+
+/* Annul the supplied WinMap and replace it with the new ShiftMap. Note,
+   we do not change "result" from its current value of -1. This means
+   that no further attempt will be made to further simplify the new
+   ShiftMap. This is necessary, since the ShiftMap simplification method
+   just converts a ShiftMap into the equivalent WinMap and does another
+   simplification. So returning -1 from this function prevents an
+   infinite loop in which the WinMap class turns a WinMap into a
+   ShiftMap, and the ShiftMap class turns the ShiftMap back into a WinMap. */
+         (void) astAnnul( ( *map_list )[ where ] );
+         ( *map_list )[ where ] = (AstMapping *) newsm;
+
       }
    }
 

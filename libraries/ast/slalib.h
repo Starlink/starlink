@@ -260,6 +260,12 @@ void slaFk54z ( double r2000, double d2000, double bepoch,
                 double *r1950, double *d1950,
                 double *dr1950, double *dd1950 );
 
+void slaFk5hz ( double r5, double d5, double jepoch,
+                double *rh, double *dh );
+
+void slaHfk5z ( double rh, double dh, double jepoch,
+                double *r5, double *d5, double *dr5, double *dd5 );
+
 void slaFlotin ( char *string, int *nstrt, float *reslt, int *jflag );
 
 void slaGaleq ( double dl, double db, double *dr, double *dd );

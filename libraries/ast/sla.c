@@ -15,7 +15,7 @@
 *     library.
 
 *  Copyright:
-*     Copyright (C) 2001 Central Laboratory of the Research Councils
+*     <COPYRIGHT_STATEMENT>
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
@@ -35,6 +35,8 @@
 *     11-NOV-2002 (DSB):
 *        Added SLA_RVEROT, SLA_GMST, SLA_EQEQX, SLA_RVLSRK, SLA_RVLSRD, 
 *        SLA_RVLG, SLA_RVGALC.
+*     11-JUN-2003 (DSB):
+*        Added SLA_GEOC, SLA_HFK5Z and SLA_FK5HZ.
 */
 
 /* Macros */
@@ -1133,4 +1135,81 @@ void slaEvp ( double date, double deqx, double dvb[3], double dpb[3],
 
 }
 
+F77_SUBROUTINE(sla_fk5hz)( DOUBLE(R5),
+                           DOUBLE(D5),
+                           DOUBLE(JEPOCH),
+                           DOUBLE(RH),
+                           DOUBLE(DH) );
 
+void slaFk5hz ( double r5, double d5, double jepoch,
+                double *rh, double *dh ) {
+   DECLARE_DOUBLE(R5);
+   DECLARE_DOUBLE(D5);
+   DECLARE_DOUBLE(JEPOCH);
+   DECLARE_DOUBLE(RH);
+   DECLARE_DOUBLE(DH);
+   R5 = r5;
+   D5 = d5;
+   JEPOCH = jepoch;
+   F77_CALL(sla_fk5hz)( DOUBLE_ARG(&R5),
+                        DOUBLE_ARG(&D5),
+                        DOUBLE_ARG(&JEPOCH),
+                        DOUBLE_ARG(&RH),
+                        DOUBLE_ARG(&DH) );
+   *rh = RH;
+   *dh = DH;
+}
+
+F77_SUBROUTINE(sla_hfk5z)( DOUBLE(RH),
+                           DOUBLE(DH),
+                           DOUBLE(JEPOCH),
+                           DOUBLE(R5),
+                           DOUBLE(D5),
+                           DOUBLE(DR5),
+                           DOUBLE(DD5) );
+
+void slaHfk5z ( double rh, double dh, double jepoch,
+                double *r5, double *d5,
+                double *dr5, double *dd5 ) {
+   DECLARE_DOUBLE(RH);
+   DECLARE_DOUBLE(DH);
+   DECLARE_DOUBLE(JEPOCH);
+   DECLARE_DOUBLE(R5);
+   DECLARE_DOUBLE(D5);
+   DECLARE_DOUBLE(DR5);
+   DECLARE_DOUBLE(DD5);
+   RH = rh;
+   DH = dh;
+   JEPOCH = jepoch;
+   F77_CALL(sla_hfk5z)( DOUBLE_ARG(&RH),
+                        DOUBLE_ARG(&DH),
+                        DOUBLE_ARG(&JEPOCH),
+                        DOUBLE_ARG(&R5),
+                        DOUBLE_ARG(&D5),
+                        DOUBLE_ARG(&DR5),
+                        DOUBLE_ARG(&DD5) );
+   *r5 = R5;
+   *d5 = D5;
+   *dr5 = DR5;
+   *dd5 = DD5;
+}
+
+F77_SUBROUTINE(sla_geoc)( DOUBLE(P),
+                          DOUBLE(H),
+                          DOUBLE(R),
+                          DOUBLE(Z) );
+
+void slaGeoc ( double p, double h, double *r, double *z ) {
+   DECLARE_DOUBLE(P);
+   DECLARE_DOUBLE(H);
+   DECLARE_DOUBLE(R);
+   DECLARE_DOUBLE(Z);
+   P = p;
+   H = h;
+   F77_CALL(sla_geoc)( DOUBLE_ARG(&P),
+                       DOUBLE_ARG(&H),
+                       DOUBLE_ARG(&R),
+                       DOUBLE_ARG(&Z) );
+   *r = R;
+   *z = Z;
+}

@@ -15,7 +15,7 @@ f     AST_SKYFRAME
 *     celestial longitude/latitude coordinate systems. The particular
 *     celestial coordinate system to be represented is specified by
 *     setting the SkyFrame's System attribute (currently, the default
-*     is FK5) qualified, as necessary, by a mean Equinox value and/or
+*     is ICRS) qualified, as necessary, by a mean Equinox value and/or
 *     an Epoch.
 *
 *     All the coordinate values used by a SkyFrame are in
@@ -103,6 +103,9 @@ f     The SkyFrame class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitSkyFrameVtab
 *        method.
+*     11-JUN-2003 (DSB):
+*        Added ICRS option for System attribute, and made it the default
+*        in place of FK5.
 *class--
 */
 
@@ -1985,7 +1988,7 @@ static AstSystemType GetAlignSystem( AstFrame *this_frame ) {
 
 /* Otherwise, provide a suitable default. */
    } else {
-      result = AST__FK5;
+      result = AST__ICRS;
    }
 
 /* Return the result. */
@@ -2046,7 +2049,7 @@ static AstSystemType GetSystem( AstFrame *this_frame ) {
 
 /* Otherwise, provide a suitable default. */
    } else {
-      result = AST__FK5;
+      result = AST__ICRS;
    }
 
 /* Return the result. */
@@ -2165,6 +2168,14 @@ static const char *GetTitle( AstFrame *this_frame ) {
 	    pos = sprintf( buff,
                            "FK5 equatorial coordinates; mean equinox J%s",
                            astFmtDecimalYr( slaEpj( equinox ), 9 ) );
+	    break;
+
+/* ICRS coordinates. */
+/* ----------------- */
+/* ICRS is only like RA/Dec by co-incidence, it is not really an
+   equatorial system by definition. */
+	 case AST__ICRS:
+	    pos = sprintf( buff, "ICRS coordinates" );
 	    break;
 
 /* Geocentrc apparent equatorial coordinates. */
@@ -2539,9 +2550,13 @@ static int IsEquatorial( AstSystemType system ) {
 /* Check the global error status. */
    if ( !astOK ) return 0;
 
-/* Determine if the sky coordinate system is an equatorial one. */
+/* Determine if the sky coordinate system is an equatorial one. Note,
+   ICRS is not equatorial by definition, but is included here because it
+   is normally treated as an equatorial system in terms of the axis
+   labels, formats, etc. */
    result = ( ( system == AST__FK4 ) ||
               ( system == AST__FK4_NO_E ) ||
+              ( system == AST__ICRS ) ||
               ( system == AST__FK5 ) ||
               ( system == AST__GAPPT ) );
 
@@ -2610,6 +2625,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
    double target_epoch;          /* Target frame Epoch */
    double epoch;                 /* Epoch as Modified Julian Date */
    double epoch_B;               /* Besselian epoch as decimal years */
+   double epoch_J;               /* Julian epoch as decimal years */
    double equinox;               /* Equinox as Modified Julian Date */
    double equinox_B;             /* Besselian equinox as decimal years */
    double equinox_J;             /* Julian equinox as decimal years */
@@ -2692,6 +2708,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       equinox_B = slaEpb( equinox );
       equinox_J = slaEpj( equinox );
       epoch_B = slaEpb( epoch );
+      epoch_J = slaEpj( epoch );
 
 /* Formulate the conversion... */
 
@@ -2745,6 +2762,12 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( system == AST__GALACTIC ) {
          TRANSFORM_0( "GALEQ" )
+
+/* From ICRS. */
+/* ---------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( system == AST__ICRS ) {
+         TRANSFORM_1( "HFK5Z", epoch_J );
 
 /* From supergalactic coordinates. */
 /* ------------------------------- */
@@ -2820,6 +2843,12 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       } else if ( align_sys == AST__GALACTIC ) {
          TRANSFORM_0( "EQGAL" )
 
+/* Align in ICRS. */
+/* -------------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__ICRS ) {
+         TRANSFORM_1( "FK5HZ", epoch_J )
+
 /* Align in supergalactic coordinates. */
 /* ------------------------------------- */
 /* Convert to galactic coordinates and then to supergalactic. */
@@ -2854,6 +2883,7 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
       equinox_B = slaEpb( equinox );
       equinox_J = slaEpj( equinox );
       epoch_B = slaEpb( epoch );
+      epoch_J = slaEpj( epoch );
    }
 
 /* Check we need to do the conversion. */
@@ -2911,6 +2941,12 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( align_sys == AST__GALACTIC ) {
          TRANSFORM_0( "GALEQ" )
+
+/* From ICRS. */
+/* ---------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( align_sys == AST__ICRS ) {
+         TRANSFORM_1( "HFK5Z", epoch_J )
 
 /* From supergalactic coordinates. */
 /* ------------------------------- */
@@ -2985,6 +3021,12 @@ static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,
 /* This conversion is supported directly by SLALIB. */
       } else if ( system == AST__GALACTIC ) {
          TRANSFORM_0( "EQGAL" )
+
+/* To ICRS. */
+/* -------- */
+/* This conversion is supported directly by SLALIB. */
+      } else if ( system == AST__ICRS ) {
+         TRANSFORM_1( "FK5HZ", epoch_J )
 
 /* To supergalactic coordinates. */
 /* ----------------------------- */
@@ -4910,6 +4952,9 @@ static AstSystemType SystemCode( AstFrame *this, const char *system ) {
                astChrMatch( "Equatorial", system ) ) {
       result = AST__FK5;
 
+   } else if ( astChrMatch( "ICRS", system ) ) {
+      result = AST__ICRS;
+
    } else if ( astChrMatch( "GAPPT", system ) ||
                astChrMatch( "GEOCENTRIC", system ) ||
                astChrMatch( "APPARENT", system ) ) {
@@ -4997,6 +5042,10 @@ static const char *SystemString( AstFrame *this, AstSystemType system ) {
 
    case AST__FK5:
       result = "FK5";
+      break;
+
+   case AST__ICRS:
+      result = "ICRS";
       break;
 
    case AST__GAPPT:
@@ -5445,8 +5494,8 @@ f     used (e.g. by AST_FORMAT) for the celestial coordinate values
 *     the point on the sky that defines the coordinate origin (the
 *     intersection of the two planes termed the "mean equinox") move
 *     with time according to some model which removes the more rapid
-*     fluctuations. The SkyFrame class supports both the old FK4 and
-*     the current FK5 models.
+*     fluctuations. The SkyFrame class supports both the FK4 and
+*     FK5 models.
 *
 *     The position of a fixed source expressed in any of these
 *     coordinate systems will appear to change with time due to
@@ -5819,7 +5868,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestEquinox( this );
    dval = set ? GetEquinox( this ) : astGetEquinox( this );
 
-/* Decide whether the Equinox value is relevant to ths current
+/* Decide whether the Equinox value is relevant to the current
    coordinate system. */
    system = astGetSystem( this );
    helpful = ( ( system == AST__FK4 ) ||
@@ -6305,7 +6354,7 @@ f     RESULT = AST_SKYFRAME( OPTIONS, STATUS )
 *     celestial longitude/latitude coordinate systems. The particular
 *     celestial coordinate system to be represented is specified by
 *     setting the SkyFrame's System attribute (currently, the default
-*     is FK5) qualified, as necessary, by a mean Equinox value and/or
+*     is ICRS) qualified, as necessary, by a mean Equinox value and/or
 *     an Epoch.
 *
 *     All the coordinate values used by a SkyFrame are in
@@ -6345,12 +6394,11 @@ f     AST_SKYFRAME = INTEGER
 
 *  Examples:
 c     frame = astSkyFrame( "" );
-c        Creates a SkyFrame to describe the default FK5 celestial
-c        coordinate system, with the standard (default) mean Equinox of
-c        J2000.0.
-c     frame = astSkyFrame( "Equinox = J2005, Digits = 10" );
-c        Creates a SkyFrame to describe the default FK5 celestial
-c        coordinate system, but this time with a mean Equinox of J2005.0.
+c        Creates a SkyFrame to describe the default ICRS celestial
+c        coordinate system.
+c     frame = astSkyFrame( "System = FK5, Equinox = J2005, Digits = 10" );
+c        Creates a SkyFrame to describe the FK5 celestial
+c        coordinate system, with a mean Equinox of J2005.0.
 c        Because especially accurate coordinates will be used,
 c        additional precision (10 digits) has been requested. This will
 c        be used when coordinate values are formatted for display.
@@ -6364,12 +6412,11 @@ c        celestial coordinate system. The Epoch value, which specifies
 c        the date of observation, is obtained from a date/time string
 c        supplied via the string pointer "date".
 f     FRAME = AST_SKYFRAME( ' ', STATUS )
-f        Creates a SkyFrame to describe the default FK5 celestial
-f        coordinate system, with the standard (default) mean Equinox of
-f        J2000.0.
-f     FRAME = AST_SKYFRAME( 'Equinox = J2005, Digits = 10', STATUS )
-f        Creates a SkyFrame to describe the default FK5 celestial
-f        coordinate system, but this time with a mean Equinox of J2005.0.
+f        Creates a SkyFrame to describe the default ICRS celestial
+f        coordinate system.
+f     FRAME = AST_SKYFRAME( 'System = FK5, Equinox = J2005, Digits = 10', STATUS )
+f        Creates a SkyFrame to describe the FK5 celestial
+f        coordinate system, with a mean Equinox of J2005.0.
 f        Because especially accurate coordinates will be used,
 f        additional precision (10 digits) has been requested. This will
 f        be used when coordinate values are formatted for display.
@@ -6385,15 +6432,15 @@ f        contained in the character variable DATE.
 
 *  Notes:
 *     - Currently, the default celestial coordinate system is
-*     FK5. However, this default may change in future as new
+*     ICRS. However, this default may change in future as new
 *     astrometric standards evolve. The intention is to track the most
 *     modern appropriate standard. For this reason, you should use the
 *     default only if this is what you intend (and can tolerate any
 *     associated slight change in behaviour with future versions of
-*     this function). If you intend to use the FK5 system
+*     this function). If you intend to use the ICRS system
 *     indefinitely, then you should specify it explicitly using an
-c     "options" value of "System=FK5".
-f     OPTIONS value of "System=FK5".
+c     "options" value of "System=ICRS".
+f     OPTIONS value of "System=ICRS".
 *     - Whichever celestial coordinate system is represented, it will
 *     have two axes.  The first of these will be the longitude axis
 *     and the second will be the latitude axis. This order can be

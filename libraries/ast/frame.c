@@ -8858,7 +8858,7 @@ f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
 *        The AlignSystem attribute of a FrameSet is the same as that of its
 *        current Frame (as specified by the Current attribute).
 *     SkyFrame
-*        The default AlignSystem attribute for a SkyFrame is "FK5".
+*        The default AlignSystem attribute for a SkyFrame is "ICRS".
 *     SpecFrame
 *        The default AlignSystem attribute for a SpecFrame is "Wave"
 *        (wavelength).
@@ -8927,6 +8927,14 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        The SkyFrame class supports the following System values and 
 *        associated celestial coordinate systems:
 *
+*        - "ICRS": The Internation Celestial Reference System, realised
+*        through the Hipparcos catalogue. Whilst not an equatorial system
+*        by definition, the ICRS is very close to the FK5 (J2000) system
+*        and is usually treated as an equatorial system. The distinction
+*        between ICRS and FK5 (J2000) only becomes important when accuracies 
+*        of 50 milli-arcseconds or better are required. ICRS need not be 
+*        qualified by an Equinox value.
+*   
 *        - "FK4": The old FK4 (barycentric) equatorial coordinate system,
 *        which should be qualified by an Equinox value. The underlying
 *        model on which this is based is non-inertial and rotates slowly
@@ -8974,12 +8982,12 @@ astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
 *        Mapping can be created between a pair of SkyFrames if either of the
 *        SkyFrames has System set to "Unknown".
 *
-*        Currently, the default System value is "FK5". However, this
+*        Currently, the default System value is "ICRS". However, this
 *        default may change in future as new astrometric standards
 *        evolve. The intention is to track the most modern appropriate
 *        standard. For this reason, you should use the default only if
 *        this is what you intend (and can tolerate any associated slight
-*        change in future). If you intend to use the FK5 system
+*        change in future). If you intend to use the ICRS system
 *        indefinitely, then you should specify it explicitly.
 *     SpecFrame
 *        The SpecFrame class supports the following System values and 

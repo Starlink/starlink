@@ -4831,7 +4831,7 @@ astMAKE_SET(SpecFrame,AlignStdOfRest,AstStdOfRestType,alignstdofrest,(
 *     "-45.6", "S45.6". As indicated, the sign of the latitude can 
 *     optionally be indicated using characters "N" and "S" in place of the 
 *     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]dd:mm:ss.s" is used, when "[s]" is "N" or "S".
+*     format "[s]dd:mm:ss" is used, when "[s]" is "N" or "S".
 
 *  Applicability:
 *     SpecFrame
@@ -4873,7 +4873,7 @@ astMAKE_TEST(SpecFrame,GeoLat,(this->geolat!=AST__BAD))
 *     "-204.67689", "W204.67689". As indicated, the sign of the longitude can 
 *     optionally be indicated using characters "E" and "W" in place of the 
 *     usual "+" and "-". When converting the stored value to a string, the 
-*     format "[s]ddd:mm:ss.s" is used, when "[s]" is "E" or "W" and the 
+*     format "[s]ddd:mm:ss" is used, when "[s]" is "E" or "W" and the 
 *     numerical value is chosen to be less than 180 degrees.
 
 *  Applicability:

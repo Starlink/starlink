@@ -30,9 +30,9 @@
 *     at zero longitude and latitude, and the z-axis (axis 3) at the 
 *     positive latitude pole.
 *
-*     At either pole, the longitude is set arbitrarly to zero. If the 
-*     Cartesian coordinates are all zero, then the longitude and latitude
-*     values are set to AST__BAD.
+*     At either pole, the longitude is set to the value of the PolarLong
+*     attribute. If the Cartesian coordinates are all zero, then the 
+*     longitude and latitude values are set to AST__BAD.
 
 *  Inheritance:
 *     The SphMap class inherits from the Mapping class.
@@ -41,6 +41,11 @@
 *     None.
 
 *  New Attributes Defined:
+*     PolarLong (double)
+*        This attribute holds the longitude value, in radians, to be
+*        returned when a Cartesian position corresponding to either the north
+*        or south pole is transformed into spherical coordinates. The
+*        default value is zero.
 *     UnitRadius (integer)
 *        This is a boolean attribute which indicates whether the
 *        3-dimensional vectors which are supplied as input to a SphMap
@@ -92,6 +97,14 @@
 *           Set the UnitRadius attribute value for a SphMap.
 *        astTestUnitRadius
 *           Test if a UnitRadius attribute value has been set for a SphMap.
+*        astClearPolarLong
+*           Clear the PolarLong attribute value for a SphMap.
+*        astGetPolarLong
+*           Get the PolarLong attribute value for a SphMap.
+*        astSetPolarLong
+*           Set the PolarLong attribute value for a SphMap.
+*        astTestPolarLong
+*           Test if a PolarLong attribute value has been set for a SphMap.
 
 *  Other Class Functions:
 *     Public:
@@ -145,6 +158,8 @@
 *        Added UnitRadius attribute.
 *     8-JAN-2003 (DSB):
 *        Added protected astInitSphMapVtab method.
+*     11-JUN-2003 (DSB):
+*        Added PolarLong attribute.
 *-
 */
 
@@ -177,6 +192,7 @@ typedef struct AstSphMap {
    AstMapping mapping;           /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
+   double polarlong;             /* Longitude to assign to either pole */
    int unitradius;               /* Are input vectors always of unit length? */
 } AstSphMap;
 
@@ -198,6 +214,11 @@ typedef struct AstSphMapVtab {
    int (* TestUnitRadius)( AstSphMap * );
    void (* ClearUnitRadius)( AstSphMap * );
    void (* SetUnitRadius)( AstSphMap *, int );
+
+   double (* GetPolarLong)( AstSphMap * );
+   int (* TestPolarLong)( AstSphMap * );
+   void (* ClearPolarLong)( AstSphMap * );
+   void (* SetPolarLong)( AstSphMap *, double );
 } AstSphMapVtab;
 #endif
 
@@ -236,6 +257,11 @@ int astGetUnitRadius_( AstSphMap * );
 int astTestUnitRadius_( AstSphMap * );
 void astClearUnitRadius_( AstSphMap * );
 void astSetUnitRadius_( AstSphMap *, int );
+
+double astGetPolarLong_( AstSphMap * );
+int astTestPolarLong_( AstSphMap * );
+void astClearPolarLong_( AstSphMap * );
+void astSetPolarLong_( AstSphMap *, double );
 #endif
 
 /* Function interfaces. */
@@ -289,6 +315,11 @@ astINVOKE(O,astLoadSphMap_(mem,size,vtab,name,astCheckChannel(channel)))
 #define astGetUnitRadius(this)       astINVOKE(V,astGetUnitRadius_(astCheckSphMap(this)))
 #define astSetUnitRadius(this,value) astINVOKE(V,astSetUnitRadius_(astCheckSphMap(this),value))
 #define astTestUnitRadius(this)      astINVOKE(V,astTestUnitRadius_(astCheckSphMap(this)))
+
+#define astClearPolarLong(this)     astINVOKE(V,astClearPolarLong_(astCheckSphMap(this)))
+#define astGetPolarLong(this)       astINVOKE(V,astGetPolarLong_(astCheckSphMap(this)))
+#define astSetPolarLong(this,value) astINVOKE(V,astSetPolarLong_(astCheckSphMap(this),value))
+#define astTestPolarLong(this)      astINVOKE(V,astTestPolarLong_(astCheckSphMap(this)))
 #endif
 
 #endif

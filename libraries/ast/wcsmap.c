@@ -144,6 +144,9 @@ f     The WcsMap class does not define any new routines beyond those
 *        - Changed to allow a user-specified fiducial point to be stored
 *        in projection parameter PVi_1 and PVi_2 for the longitude axis.
 *        - Changed "PVj_m" to "PVi_m" for consistency with FITS-WCS paper II.
+*     18-AUG-2003 (DSB):
+*        In function Map, assign zero longitude to output positions which
+*        are very close to a pole.
 *class--
 */
 
@@ -2231,6 +2234,10 @@ static int Map( AstWcsMap *this, int forward, int npoint, double *in0,
             if( wcs_status == 0 ){
                if( longitude <= longhi && longitude >= longlo &&
                    fabs( latitude ) <= 90.0 ){
+
+/* Assign zero longitude to positions very close to a pole. */
+                  if( fabs( latitude ) > 89.999998 ) longitude = 0.0; 
+
                   out0[ point ] = AST__DD2R*longitude; 
                   out1[ point ] = AST__DD2R*latitude; 
 

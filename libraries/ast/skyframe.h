@@ -87,6 +87,9 @@
 *        "FK5" or "EQUATORIAL"
 *           The modern FK5 (barycentric) equatorial coordinate
 *           system.
+*        "ICRS" 
+*           The International Celestial Reference System, realised
+*           through the Hipparcos catalogue.
 *        "GAPPT", "APPARENT" or "GEOCENTRIC"
 *           The geocentric apparent equatorial coordinate system,
 *           which gives the apparent positions of objects relative to
@@ -325,7 +328,8 @@
 #define AST__ECLIPTIC      5
 #define AST__GALACTIC      6
 #define AST__SUPERGALACTIC 7
-#define AST__UNKNOWN       8
+#define AST__ICRS          8
+#define AST__UNKNOWN       9
 
 #endif
 

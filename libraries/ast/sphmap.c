@@ -28,6 +28,7 @@ f     AST_SPHMAP
 *     SphMap also has the following attributes:
 *
 *     - UnitRadius: SphMap input vectors lie on a unit sphere?
+*     - PolarLong: The longitude value to assign to either pole
 
 *  Functions:
 c     The SphMap class does not define any new functions beyond those
@@ -53,6 +54,8 @@ f     The SphMap class does not define any new routines beyond those
 *     8-JAN-2003 (DSB):
 *        Changed private InitVtab method to protected astInitSphMapVtab
 *        method.
+*     11-JUN-2003 (DSB):
+*        Added PolarLong attribute.
 *class--
 */
 
@@ -76,6 +79,7 @@ f     The SphMap class does not define any new routines beyond those
 #include "unitmap.h"             /* Unit (identity) Mappings */
 #include "sphmap.h"              /* Interface definition for this class */
 #include "slalib.h"              /* SLA transformations */
+#include "wcsmap.h"              /* For the AST__DPIBY2 (etc) constants */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -116,6 +120,11 @@ static int GetUnitRadius( AstSphMap * );
 static int TestUnitRadius( AstSphMap * );
 static void ClearUnitRadius( AstSphMap * );
 static void SetUnitRadius( AstSphMap *, int );
+
+static double GetPolarLong( AstSphMap * );
+static int TestPolarLong( AstSphMap * );
+static void ClearPolarLong( AstSphMap * );
+static void SetPolarLong( AstSphMap *, double );
 
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
@@ -174,6 +183,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* ---------- */
    if ( !strcmp( attrib, "unitradius" ) ) {
       astClearUnitRadius( this );
+
+/* PolarLong */
+/* --------- */
+   } else if ( !strcmp( attrib, "polarlong" ) ) {
+      astClearPolarLong( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -235,6 +249,7 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstSphMap *this;              /* Pointer to the SphMap structure */
    const char *result;           /* Pointer value to return */
+   double dval;                  /* Double precision attribute value */
    int ival;                     /* Int attribute value */
    static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
@@ -248,11 +263,20 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    this = (AstSphMap *) this_object;
 
 /* UnitRadius. */
-/* ------- */
+/* ----------- */
    if ( !strcmp( attrib, "unitradius" ) ) {
       ival = astGetUnitRadius( this );
       if ( astOK ) {
          (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
+/* PolarLong */
+/* --------- */
+   } else if ( !strcmp( attrib, "polarlong" ) ) {
+      dval = astGetPolarLong( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%.*g", DBL_DIG, dval );
          result = buff;
       }
 
@@ -330,6 +354,11 @@ void astInitSphMapVtab_(  AstSphMapVtab *vtab, const char *name ) {
    vtab->SetUnitRadius = SetUnitRadius;
    vtab->GetUnitRadius = GetUnitRadius;
    vtab->TestUnitRadius = TestUnitRadius;
+
+   vtab->ClearPolarLong = ClearPolarLong;
+   vtab->SetPolarLong = SetPolarLong;
+   vtab->GetPolarLong = GetPolarLong;
+   vtab->TestPolarLong = TestPolarLong;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -524,10 +553,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if ( astOK && !strcmp( class, "SphMap" ) ) {
 
 /* Check if the first SphMap is applied in the inverse direction and
-   the second in the forward direction. This combination can always 
-   be simplified. */
+   the second in the forward direction. This combination can be 
+   simplified if the PolarLongitude attributes are equal.. */
          if( ( *invert_list )[ imap1 ] && !( *invert_list )[ imap2 ] ) {
-            simpler = 1;
+            simpler = ( astGetPolarLong( ( *map_list )[ imap1 ] ) == 
+                        astGetPolarLong( ( *map_list )[ imap2 ] ) );
 
 /* If the first SphMap is applied in the forward direction and the second in 
    the inverse direction, the combination can only be simplified if the 
@@ -622,6 +652,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 
 /* Local Variables: */
    AstSphMap *this;              /* Pointer to the SphMap structure */
+   double dval;                  /* Double precision attribute value */
    int len;                      /* Length of setting string */
    int ival;                     /* Int attribute value */
    int nc;                       /* Number of characters read by astSscanf */
@@ -635,12 +666,19 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* UnitRadius. */
-/* ------- */
+/* UnitRadius */
+/* ---------- */
    if ( nc = 0,
         ( 1 == astSscanf( setting, "unitradius= %d %n", &ival, &nc ) )
         && ( nc >= len ) ) {
       astSetUnitRadius( this, ival );
+
+/* PolarLong */
+/* --------- */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "polarlong= %lf %n", &dval, &nc ) )
+        && ( nc >= len ) ) {
+      astSetPolarLong( this, dval );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -705,6 +743,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* ---------- */
    if ( !strcmp( attrib, "unitradius" ) ) {
       result = astTestUnitRadius( this );
+
+/* PolarLong */
+/* --------- */
+   } else if ( !strcmp( attrib, "polarlong" ) ) {
+      result = astTestPolarLong( this );
 
 /* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
@@ -781,6 +824,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    double *p2;                   /* Pointer to z axis value */
    double *q0;                   /* Pointer to longitude value */
    double *q1;                   /* Pointer to latitude value */
+   double mxerr;                 /* Largest value which is effectively zero */
+   double polarlong;             /* Longitude at either pole */
    double v[3];                  /* Vector for a single point */
 
 /* Check the global error status. */
@@ -816,6 +861,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* First deal with forward mappings from Cartesian to Spherical. */
       if( forward ){
 
+/* Get the longitude to return at either pole. */
+         polarlong = astGetPolarLong( this );
+
 /* Store pointers to the input Cartesian axes. */
          p0 = ptr_in[ 0 ];
          p1 = ptr_in[ 1 ];
@@ -831,12 +879,27 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                v[0] = *p0;
                v[1] = *p1;
                v[2] = *p2;
-               if( v[0] != 0.0 || v[1] != 0.0 || v[2] != 0.0 ){
-                  slaDcc2s( v, q0++, q1++ );
+
+/* At either pole, return the longitude equal to PolarLong attribute. */
+               mxerr = fabs( 1000.0*v[ 2 ] )*DBL_EPSILON;
+               if( fabs( v[ 0 ] ) < mxerr && fabs( v[ 1 ] ) < mxerr ) {
+                  if( v[ 2 ] < 0.0 ) {
+                     *(q0++) = polarlong;
+                     *(q1++) = -AST__DPIBY2;
+                  } else if( v[ 2 ] > 0.0 ) {
+                     *(q0++) = polarlong;
+                     *(q1++) = AST__DPIBY2;
+                  } else {
+                     *(q0++) = AST__BAD;
+                     *(q1++) = AST__BAD;
+                  }
+
+/* Otherwise use a SLALIB function to do the conversion (SLALIB always
+   returns zero at either pole which is why we make the above check). */
                } else {
-                  *(q0++) = AST__BAD;
-                  *(q1++) = AST__BAD;
+                  slaDcc2s( v, q0++, q1++ );
                }
+
             } else {
                *(q0++) = AST__BAD;
                *(q1++) = AST__BAD;
@@ -960,6 +1023,38 @@ astMAKE_GET(SphMap,UnitRadius,int,0,(this->unitradius == -1 ? 0 : this->unitradi
 astMAKE_SET(SphMap,UnitRadius,int,unitradius,( value ? 1 : 0 ))
 astMAKE_TEST(SphMap,UnitRadius,( this->unitradius != -1 ))
 
+/* PolarLong */
+/* --------- */
+/*
+*att++
+*  Name:
+*     PolarLong
+
+*  Purpose:
+*     The longitude value to assign to either pole
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Double precision.
+
+*  Description:
+*     This attribute holds the longitude value, in radians, to be
+*     returned when a Cartesian position corresponding to either the north
+*     or south pole is transformed into spherical coordinates. The
+*     default value is zero.
+
+*  Applicability:
+*     SphMap
+*        All SphMaps have this attribute.
+*att--
+*/
+astMAKE_CLEAR(SphMap,PolarLong,polarlong,AST__BAD)
+astMAKE_GET(SphMap,PolarLong,double,0.0,(this->polarlong == AST__BAD ? 0.0 : this->polarlong))
+astMAKE_SET(SphMap,PolarLong,double,polarlong,value)
+astMAKE_TEST(SphMap,PolarLong,( this->polarlong != AST__BAD ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -1050,6 +1145,7 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstSphMap *this;              /* Pointer to the SphMap structure */
+   double dval;                  /* Double precision attribute value */
    int ival;                     /* Integer value */
    int set;                      /* Attribute value set? */
 
@@ -1084,6 +1180,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    } else {
       astWriteInt( channel, "UntRd", set, 0, ival, "Input vectors do not all have unit length" );
    }
+
+/* PolarLong. */
+/* ---------- */
+   set = TestPolarLong( this );
+   dval = set ? GetPolarLong( this ) : astGetPolarLong( this );
+   astWriteDouble( channel, "PlrLg", set, 1, dval, "Polar longitude (rad.s)" );
 
 }
 
@@ -1161,7 +1263,8 @@ f     AST_SPHMAP = INTEGER
 *     latitude. The Cartesian coordinates are right-handed, with the x
 *     axis (axis 1) at zero longitude and latitude, and the z axis
 *     (axis 3) at the positive latitude pole.
-*     - At either pole, the longitude is set arbitrarily to zero.
+*     - At either pole, the longitude is set to the value of the
+*     PolarLong attribute.
 *     - If the Cartesian coordinates are all zero, then the longitude
 *     and latitude are set to the value AST__BAD.
 *     - A null Object pointer (AST__NULL) will be returned if this
@@ -1363,6 +1466,7 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
    no value has yet been set. This will cause a default value of 0 (no, i.e. 
    input vectors are not all of unit length) to be used. */
       new->unitradius = -1;
+      new->polarlong = AST__BAD;
 
    }
 
@@ -1499,6 +1603,11 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size,
 /* ----------- */
       new->unitradius = astReadInt( channel, "untrd", -1 );
       if ( TestUnitRadius( new ) ) SetUnitRadius( new, new->unitradius );
+
+/* PolarLong. */
+/* ---------- */
+      new->polarlong = astReadDouble( channel, "plrlg", AST__BAD );
+      if ( TestPolarLong( new ) ) SetPolarLong( new, new->polarlong );
 
    }
 

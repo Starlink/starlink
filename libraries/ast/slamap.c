@@ -70,6 +70,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 *        - Changed private InitVtab method to protected astInitSlaMapVtab
 *        method.
 *        - Included STP conversion functions.
+*     11-JUN-2003 (DSB):
+*        - Added HFK5Z and FK5HZ conversion functions.
 *class--
 */
 
@@ -100,6 +102,8 @@ f     - AST_SLAADD: Add a celestial coordinate conversion to an SlaMap
 #define AST__EQHPC      16       /* J2000.0 equatorial to Helioprojective-Cartesian */
 #define AST__HPREQ      17       /* Helioprojective-Radial to J2000.0 equatorial */
 #define AST__EQHPR      18       /* J2000.0 equatorial to Helioprojective-Radial */
+#define AST__SLA_HFK5Z  19       /* ICRS to FK5 J2000.0, no pm or parallax */
+#define AST__SLA_FK5HZ  20       /* FK5 J2000.0 to ICRS, no pm or parallax */
 
 /* Maximum number of arguments required by an SLALIB conversion. */
 #define MAX_SLA_ARGS 4
@@ -272,6 +276,12 @@ static void AddSlaCvt( AstSlaMap *this, int cvttype, const double *args ) {
 *           Convert galactic coordinates to J2000.0 equatorial.
 *        AST__SLA_EQGAL( )
 *           Convert J2000.0 equatorial to galactic coordinates.
+*        AST__SLA_HFK5Z( JEPOCH )
+*           Convert ICRS coordinates to J2000.0 equatorial (no proper
+*           motion or parallax).
+*        AST__SLA_FK5HZ( JEPOCH )
+*           Convert J2000.0 equatorial to ICRS coordinates (no proper
+*           motion or parallax).
 *        AST__SLA_GALSUP( )
 *           Convert galactic to supergalactic coordinates.
 *        AST__SLA_SUPGAL( )
@@ -431,6 +441,12 @@ static int CvtCode( const char *cvt_string ) {
 
    } else if ( astChrMatch( cvt_string, "EQGAL" ) ) {
       result = AST__SLA_EQGAL;
+
+   } else if ( astChrMatch( cvt_string, "FK5HZ" ) ) {
+      result = AST__SLA_FK5HZ;
+
+   } else if ( astChrMatch( cvt_string, "HFK5Z" ) ) {
+      result = AST__SLA_HFK5Z;
 
    } else if ( astChrMatch( cvt_string, "GALSUP" ) ) {
       result = AST__SLA_GALSUP;
@@ -608,6 +624,20 @@ static const char *CvtString( int cvt_code, const char **comment,
       result = "EQGAL";
       *comment = "J2000.0 equatorial (FK5) to galactic (IAU 1958)";
       *nargs = 0;
+      break;
+
+   case AST__SLA_FK5HZ:
+      result = "FK5HZ";
+      *comment = "J2000.0 FK5 to ICRS (no PM or parallax)";
+      arg[ 0 ] = "Julian epoch of FK5 coordinates";
+      *nargs = 1;
+      break;
+
+   case AST__SLA_HFK5Z:
+      result = "HFK5Z";
+      *comment = "ICRS to J2000.0 FK5 (no PM or parallax)";
+      arg[ 0 ] = "Julian epoch of FK5 coordinates";
+      *nargs = 1;
       break;
 
    case AST__SLA_GALSUP:
@@ -2172,6 +2202,11 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Exchange the transformation code for its inverse. */
                SWAP_CODES( AST__SLA_GALEQ, AST__SLA_EQGAL )
 
+/* ICRS coordinates to J2000.0 equatorial. */
+/* ------------------------------------------- */
+/* Exchange the transformation code for its inverse. */
+               SWAP_CODES( AST__SLA_HFK5Z, AST__SLA_FK5HZ )
+
 /* Galactic to supergalactic coordinates. */
 /* -------------------------------------- */
 /* Exchange the transformation code for its inverse. */
@@ -2263,6 +2298,17 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
    the same argument value and eliminate them both if possible. */
                } else if ( ( PAIR_CVT( AST__SLA_FK45Z, AST__SLA_FK54Z ) ||
                              PAIR_CVT( AST__SLA_FK54Z, AST__SLA_FK45Z ) ) &&
+                           EQUAL( cvtargs[ istep ][ 0 ], 
+                                  cvtargs[ istep + 1 ][ 0 ] ) ) {
+                  istep++;
+                  keep = 0;
+
+/* Eliminate redundant ICRS/FK5 conversions. */
+/* ----------------------------------------- */
+/* Similarly, check for a matching pair of ICRS/FK5 conversions with
+   the same argument value and eliminate them both if possible. */
+               } else if ( ( PAIR_CVT( AST__SLA_HFK5Z, AST__SLA_FK5HZ ) ||
+                             PAIR_CVT( AST__SLA_FK5HZ, AST__SLA_HFK5Z ) ) &&
                            EQUAL( cvtargs[ istep ][ 0 ], 
                                   cvtargs[ istep + 1 ][ 0 ] ) ) {
                   istep++;
@@ -2578,6 +2624,8 @@ f     these arguments should be given, via the ARGS array, in the
 *     - "EQECL" (DATE): Convert equatorial J2000.0 to ecliptic coordinates.
 *     - "GALEQ": Convert galactic coordinates to J2000.0 equatorial.
 *     - "EQGAL": Convert J2000.0 equatorial to galactic coordinates.
+*     - "HFK5Z" (JEPOCH): Convert ICRS coordinates to J2000.0 equatorial.
+*     - "FK5HZ" (JEPOCH): Convert J2000.0 equatorial coordinates to ICRS.
 *     - "GALSUP": Convert galactic to supergalactic coordinates.
 *     - "SUPGAL": Convert supergalactic coordinates to galactic.
 *
@@ -3089,6 +3137,47 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                                 slaDcc2s( vec2, alpha + point, delta + point );
                                 alpha[ point ] = slaDranrm ( alpha[ point ] );)
                   }
+	       }
+               break;
+
+/* Convert ICRS to J2000.0 equatorial. */
+/* ----------------------------------- */
+/* Apply the conversion to each point. */
+	    case AST__SLA_HFK5Z:
+               if ( forward ) {
+                  double dr5;
+                  double dd5;
+                  TRAN_ARRAY(slaHfk5z( alpha[ point ], delta[ point ],
+                                       args[ 0 ],
+                                       alpha + point, delta + point,
+                                       &dr5, &dd5 );)
+
+/* The inverse simply uses the inverse SLALIB function. */
+	       } else {
+                  TRAN_ARRAY(slaFk5hz( alpha[ point ], delta[ point ],
+                                       args[ 0 ],
+                                       alpha + point, delta + point );)
+	       }
+               break;
+
+/* Convert J2000.0 to ICRS equatorial. */
+/* ----------------------------------- */
+/* This is the same as above, but with the forward and inverse cases
+   transposed. */
+	    case AST__SLA_FK5HZ:
+               if ( forward ) {
+                  TRAN_ARRAY(slaFk5hz( alpha[ point ], delta[ point ],
+                                       args[ 0 ],
+                                       alpha + point, delta + point );)
+
+/* The inverse simply uses the inverse SLALIB function. */
+	       } else {
+                  double dr5;
+                  double dd5;
+                  TRAN_ARRAY(slaHfk5z( alpha[ point ], delta[ point ],
+                                       args[ 0 ],
+                                       alpha + point, delta + point,
+                                       &dr5, &dd5 );)
 	       }
                break;
 
