@@ -238,7 +238,7 @@
                in=$ndfs[$num] \
                mode=percentiles \
                percentiles='[2,98]' \
-               style="'colour(numlab)=cyan" \
+               style="'colour(numlab)=red'" \
                accept
 #           end display
          end
