@@ -7,11 +7,11 @@
 #     [incr Tk] Mega-Widget
  
 #  Purpose:
-#     Provide a window which can display an NDF.
+#     Provide a window which can display an ndf or ndfset object.
  
 #  Description.
 #     This class provides a mega-widget which is capable of displaying
-#     an NDF, zooming it, changing the colour maps etc. and also 
+#     an image, zooming it, changing the colour maps etc. and also 
 #     allowing the user to indicate a list of points which can be 
 #     marked and retrieved by the caller.
 
@@ -32,7 +32,7 @@
 #
 #     loadndf ndf ?maxcanv?
 #        This method loads an NDF into the viewer.
-#           - ndf      -- A Tcl ndf object.
+#           - ndf      -- A Tcl ndf or ndfset object.
 #           - maxcanv  -- If given and non-zero, the GWM widget will not be
 #                         more than maxcanv screen pixels in either direction.
 #
@@ -53,23 +53,31 @@
 #        This gives a title to show in the title bar which the window
 #        manager displays.  The following substitutions will be made
 #        before the title is displayed:
-#           - %N  -- Full name of the NDF
-#           - %n  -- Shortened name of the NDF (e.g. without full path)
-#           - %h  -- X dimension of the NDF in pixels
-#           - %w  -- Y dimension of the NDF in pixels
-#           - %b  -- Pixel bounds of the NDF ([X1:X2,Y1:Y2])
+#           - %N  -- Full name
+#           - %n  -- Shortened name (e.g. without full path)
+#           - %p  -- Number of pixels ('X x Y' (single) or 'N pixels' (Set))
+#           - %b  -- Pixel bounds ([X1:X2,Y1:Y2] (single) or '' (Set))
 #
 #     trackposition = string
 #        This gives a string which can display the current position of
 #        the cursor over an NDF image.  Before the text is displayed,
 #        the following substitutions will be made:
-#           - %x  -- X pixel coordinate of the cursor
-#           - %y  -- Y pixel coordinate of the cursor
+#           - %x  -- X coordinate of the cursor
+#           - %y  -- Y coordinate of the cursor
 #
 #        and the resulting string will be evaluated as a Tcl expression
 #        before being printed on the widget.
 #
 #     Ndfview also inherits all the public variables of Gwmview.
+
+#  Authors:
+#     MBT: Mark Taylor (STARLINK)
+
+#  History:
+#     10-NOV-2000 (MBT):
+#        Original version.
+#     5-APR-2001 (MBT):
+#        Upgraded for use with Sets.
 #-
 
 #  Inheritance.
@@ -165,40 +173,88 @@
       public method loadndf { ndfob { maxcanv 0 } } {
 #-----------------------------------------------------------------------
 
-#  Check that we are being asked to load a valid NDF.
-         if { [ catch { $ndfob validndf } valid ] } {
-            error "ndfview loadndf: \"$ndfob\" is not an ndf object."
-         } elseif { ! $valid } {
-            error "ndfview loadndf: \"$ndfob\" represents an invalid NDF."
-         }
-
-#  Get NDF bounds and ensure it is two-dimensional.
-         set bounds [ $ndfob bounds ]
-         if { [ llength $bounds ] != 2 } {
-            error "NDF should be an image but has $ndim dimensions."
+#  Check that we are being asked to load a valid NDF Set object.
+         if { ! [ catch { $ndfob validndfset } valid ] } {
+            if { $valid } {
+               set ndfsetob $ndfob
+            } else {
+               error "ndfview loadndf: \"$ndfob\" is an invalid ndf."
+            }
+         } elseif { ! [ catch { $ndfob validndf } valid ] } {
+            if { $valid } {
+               set ndfsetob [ ndfset "" [ $ndfob name ] ]
+            } else {
+               error "ndfview loadndf: \"$ndfob\" is an invalid ndfset."
+            }
+         } else {
+            error "ndfview loadndf: \"$ndfob\" is neither an nfd nor a ndfset."
          }
 
 #  Ensure that the GWM item is not currently occupied.
          removegwm
 
 #  Store the ndf object.
-         set ndf $ndfob
+         set ndfset $ndfsetob
+         set nndf [ $ndfsetob nndf ]
 
 #  Get the NDF name and make a shortened version.
-         set ndfname [ $ndf name ]
-         regsub {.*[./]} $ndfname {} ndfshort
+         set fullname [ $ndfset name ]
+         regsub {.*[./]} $fullname {} shortname
+
+#  Write info substitution variables and image bounds.  We take the 
+#  opportunity here to verify that all NDFs are two-dimensional.
+         set infodata(N) $fullname
+         set infodata(n) $shortname
+         if { $nndf == 1 } {
+            set viewframe PIXEL
+            set bounds [ $ndfsetob ndfdo 0 bounds ]
+            set ndim [ llength $bounds ]
+            if { $ndim != 2 } {
+               set name [ $ndfsetob ndfdo 0 name ]
+               error "NDF $name has $ndim dimensions instead of 2."
+            }
+            set x1 [ lindex [ lindex $bounds 0 ] 0 ]
+            set x2 [ lindex [ lindex $bounds 0 ] 1 ]
+            set y1 [ lindex [ lindex $bounds 1 ] 0 ]
+            set y2 [ lindex [ lindex $bounds 1 ] 1 ]
+            set infodata(b) "\[$x1:$x2,$y1:$y2\]"
+            set infodata(p) "[ expr $x2 - $x1 + 1 ] x [ expr $y2 - $y1 + 1 ]"
+            set xlo $x1
+            set xhi $x2
+            set ylo $y1
+            set yhi $y2
+         } else {
+            set viewframe CCD_SET
+            set infodata(b) ""
+            set npix 0
+            for { set i 0 } { $i < $nndf } { incr i } {
+               set bounds [ $ndfsetob ndfdo $i bounds ]
+               set ndim [ llength $bounds ]
+               if { $ndim != 2 } {
+                  set name [ $ndfsetob ndfdo $i name ]
+                  error "NDF $name has $ndim dimensions instead of 2."
+               }
+               set x1 [ lindex [ lindex $bounds 0 ] 0 ]
+               set x2 [ lindex [ lindex $bounds 0 ] 1 ]
+               set y1 [ lindex [ lindex $bounds 1 ] 0 ]
+               set y2 [ lindex [ lindex $bounds 1 ] 1 ]
+               incr npix [ expr ( $x2 - $x1 + 1 ) * ( $y2 - $y1 + 1 ) ]
+            }
+            set infodata(p) "$npix pixels"
+            set bbox [ $ndfsetob bbox $viewframe ]
+            set xlo [ lindex [ lindex $bbox 0 ] 0 ]
+            set xhi [ lindex [ lindex $bbox 0 ] 1 ]
+            set ylo [ lindex [ lindex $bbox 1 ] 0 ]
+            set yhi [ lindex [ lindex $bbox 1 ] 1 ]
+         }
+         set xdim [ expr $xhi - $xlo ]
+         set ydim [ expr $yhi - $ylo ]
 
 #  Configure the WCS frame widget.
-         $itk_component(wcsframe) configure -ndf $ndf
+         $itk_component(wcsframe) configure -ndf $ndfset
 
-#  Set useful geometry values.
-         set xbase [ expr [ lindex [ lindex $bounds 0 ] 0 ] - 1 ]
-         set ybase [ expr [ lindex [ lindex $bounds 1 ] 0 ] - 1 ]
-         set xdim [ expr [ lindex [ lindex $bounds 0 ] 1 ] - $xbase ]
-         set ydim [ expr [ lindex [ lindex $bounds 1 ] 1 ] - $ybase ]
-
-#  Set the approximate pixel size of the NDF.
-         configure -pixelsize [ $ndf pixelsize Pixel ]
+#  Get the size of an NDF pixel.
+         configure -pixelsize [ $ndfset pixelsize $viewframe ]
 
 #  Work out the size of the scrolledcanvas widget.
          wm deiconify $itk_interior
@@ -213,8 +269,8 @@
          set enlarge 0
          while { 1 } {
             set z [ zoominc $zoom [ expr $enlarge + 1 ] ]
-            set xsize [ expr $xdim * $z * $pixelsize ]
-            set ysize [ expr $ydim * $z * $pixelsize ]
+            set xsize [ expr $xdim * $z / $pixelsize ]
+            set ysize [ expr $ydim * $z / $pixelsize ]
             if { $xsize <= $xcanv && $ysize <= $ycanv } {
                incr enlarge 1
                if { [ zoominc $zoom [ expr $enlarge + 1 ] ] <= $z } { break }
@@ -229,8 +285,8 @@
          set shrink 0
          while { 1 && $enlarge <= 0 } {
             set z [ zoominc $zoom $shrink ]
-            set xsize [ expr $xdim * $z * $pixelsize ]
-            set ysize [ expr $ydim * $z * $pixelsize ]
+            set xsize [ expr $xdim * $z / $pixelsize ]
+            set ysize [ expr $ydim * $z / $pixelsize ]
             if { $maxcanv > 0 && [ max $xsize $ysize ] > $maxcanv } {
                incr shrink -1
                if { [ zoominc $zoom $shrink ] >= $z } { break }
@@ -241,7 +297,7 @@
          configure -zoom [ zoominc $zoom $shrink ]
 
 #  Map the NDF.
-         $ndf mapped 1
+         $ndfset mapped 1
 
 #  Finally display the NDF.
          display
@@ -290,14 +346,14 @@
 
 #  Only attempt any display if we are in the active status and have
 #  something to display.
-         if { $status != "active" || $ndfname == "" } { return }
+         if { $status != "active" || $fullname == "" } { return }
 
 #  Only attempt display if characteristics have changed from the last
 #  time they were displayed.  This is important for efficiency reasons
 #  since the method may get called, possibly quite often, just to be
 #  sure that the display is up to date.
          if { [ array exists displayed ] && \
-              $displayed(ndfname) == $ndfname && \
+              $displayed(fullname) == $fullname && \
               $displayed(percentiles) == $percentiles && \
               $displayed(zoomfactor) == $zoomfactor && \
               $displayed(displaystyle) == $displaystyle &&
@@ -306,19 +362,19 @@
          }
 
 #  Post a busy window.
-         waitpush "Drawing image $ndfname"
+         waitpush "Drawing image $fullname"
 
 #  If the NDF has not been displayed before (but not if only its display
 #  attributes have changed) then update the title bar and info panel.
          if { ! [ array exists displayed ] || \
-              $displayed(ndfname) != $ndfname } {
+              $displayed(fullname) != $fullname } {
             configure -title $title
             configure -info $info
          }
 
 #  Keep a record of the attributes currently being displayed so if we
 #  are called upon to do the same again we can skip it.
-         set displayed(ndfname) $ndfname
+         set displayed(fullname) $fullname
          set displayed(percentiles) $percentiles
          set displayed(zoomfactor) $zoomfactor
          set displayed(displaystyle) $displaystyle
@@ -328,15 +384,15 @@
          $canvas delete all
 
 #  Create the GWM viewing item.
-         makegwm $xbase $ybase $xdim $ydim
+         makegwm $xlo $ylo $xdim $ydim
 
 #  Display the NDF into the GWM item.
          set options {border=1 drawtitle=0 textlab=0 tickall=1 \
                       colour=3 colour(numlab)=5 colour(border)=4}
          lappend options $displaystyle
-         $ndf display "[ gwmname ]/GWM" \
-                      [ lindex $percentiles 0 ] [ lindex $percentiles 1 ] \
-                      $wcsframe [ join $options "," ]
+         $ndfset display "[ gwmname ]/GWM" \
+                          [ lindex $percentiles 0 ] [ lindex $percentiles 1 ] \
+                          $wcsframe [ join $options "," ]
 
 #  Draw any points which have already been selected onto the new display.
          refreshpoints
@@ -374,8 +430,8 @@
             } else {
                set viewpos [ canv2view [ $canvas canvasx $x ] \
                                        [ $canvas canvasy $y ] ]
-               set wcspos [ lindex [ $ndf wcstran -format \
-                                     pixel $wcsframe $viewpos ] 0 ]
+               set wcspos [ lindex [ $ndfset wcstran -format \
+                                     $viewframe $wcsframe $viewpos ] 0 ]
                set text $trackposition
                regsub -all %x $text [ lindex $viewpos 0 ] text
                regsub -all %y $text [ lindex $viewpos 1 ] text
@@ -393,12 +449,9 @@
 #  This method is used internally to substitute some information
 #  which relates to the current state of the object into a string.
 #  It is used to process, e.g., the title and info strings.
-
-         regsub {%N} $string $ndfname string
-         regsub {%n} $string $ndfshort string
-         regsub {%h} $string $xdim string
-         regsub {%w} $string $ydim string
-         regsub {%b} $string "[expr $xbase + 1]:[expr $xbase + $xdim],[expr $ybase + 1]:[expr $ybase + $ydim]" string
+         foreach key [ array names infodata ] {
+            regsub -all %$key $string $infodata($key) string
+         }
          return $string
       }
 
@@ -431,7 +484,7 @@
 
 
 #-----------------------------------------------------------------------
-      public variable info "%n (%w x %h)" {
+      public variable info "%n (%p)" {
 #-----------------------------------------------------------------------
          if { $status == "active" && $info != "" } {
             $itk_component(info) configure -text [ infostring $info ]
@@ -468,14 +521,17 @@
 
       private variable canvas ""       ;# Name of the canvas widget for display
       private variable displayed       ;# Array holding latest state of plot
-      private variable ndf ""          ;# Tcl ndf object
-      private variable ndfname ""      ;# Full name of NDF
-      private variable ndfshort ""     ;# Short name of NDF
-      private variable xbase 0         ;# Lower X pixel bound of NDF
-      private variable xdim 0          ;# X dimension of NDF in pixels
-      private variable ybase 0         ;# Lower Y pixel bound of NDF
-      private variable ydim 0          ;# Y dimension of NDF in pixels
-
+      private variable fullname ""     ;# Full name of NDF or ndfset
+      private variable infodata        ;# Array holding substitution string vals
+      private variable ndfset ""       ;# Tcl ndfset object
+      private variable shortname ""    ;# Short name of NDF
+      private variable viewframe PIXEL ;# View coordinate frame designator
+      private variable xdim 0          ;# X size in view coordinate units
+      private variable xlo 0           ;# Lower X bound in view coordinates
+      private variable xhi 0           ;# Upper X bound in view coordinates
+      private variable ydim 0          ;# Y size in view coordinate units
+      private variable ylo 0           ;# Lower Y bound in view coordinates
+      private variable yhi 0           ;# Upper Y bound in view coordinates
    }
 
 

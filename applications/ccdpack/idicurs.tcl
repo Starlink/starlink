@@ -13,6 +13,9 @@
 #     so that points on it may be indicated.
 #
 #  External Variables:
+#     DOMAIN = string (Given)
+#        The domain in which the ndfset is to be plotted, and in which
+#        the POINTS coordinates will be supplied and returned in.
 #     MARKSTYLE = string (Given and Returned)
 #        A string, in the form of comma-separated att=value pairs, 
 #        indicating how markers should be plotted on the image.
@@ -21,8 +24,10 @@
 #        NDF is to be displayed.  If zero, there is no limit.
 #     MAXPOS = integer (Given)
 #        The maximum number of points which the user may indicate.
-#     NDFNAME = string (Given)
-#        The name of the NDF to be examined.
+#     NDFSET = list of strings (Given)
+#        A list of strings of the form {setname ndfname ndfname ...}
+#        indicating which NDFs comprise the ndfset to be examined.
+#        The setname may be an empty string if there is only one NDF.
 #     PERCHI = real (Given and Returned)
 #        The percentile of the data above which all values should be 
 #        plotted as the same colour.  Must be between 0 and 100.
@@ -31,8 +36,11 @@
 #        plotted as the same colour.  Must be between 0 and 100.
 #     POINTS = list of pairs (Given and Returned)
 #        A list of the pixel coordinates indicated by the user on the NDF.
-#        Each element of the list is of the form {I X Y}, where I is a
-#        unique integer index and X and Y are the coordinates.
+#        Each element of the list is of the form {I X Y}, where I is an
+#        integer index and X and Y are the coordinates.
+#     VERBOSE = integer (Given)
+#        If non-zero then the positions of all the points will be written
+#        through the CCDPACK log system at the end.
 #     WINX = integer (Given and Returned)
 #        X dimension of the window used for NDF display.
 #     WINY = integer (Given and Returned)
@@ -47,13 +55,15 @@
 #  History:
 #     14-SEP-2000 (MBT):
 #        Original version.
+#     9-APR-2001 (MBT):
+#        Upgraded for use with Sets.
 #-
 
 #  Initialise screen.
       wm withdraw .
 
 #  Get the requested NDF object.
-      set ndf [ ndf $NDFNAME ]
+      set ndfset [ eval ndfset $NDFSET ]
 
 #  Create an NDF viewer widget.
       ndfview .viewer \
@@ -81,7 +91,7 @@
       .viewer configure -helptext [ join $helplines "\n" ]
 
 #  Load the NDF into the widget.
-      .viewer loadndf $ndf $MAXCANV
+      .viewer loadndf $ndfset $MAXCANV
 
 #  If there is an initial point list, plot the points.
       if { ! [ catch { set POINTS } ] } {
@@ -112,31 +122,36 @@
 #  and increasing to the number of points plotted.  Log the points to the
 #  user while we're at it.
       set POINTS {}
+      if { $VERBOSE } { ccdputs -log " " }
       if { [ llength [ .viewer points ] ] == 0 } {
-         ccdputs -log "    No points marked"
+         if { $VERBOSE } { ccdputs -log "    No points marked" }
       } else {
-         set frame [ .viewer cget -wcsframe ]
-         set fmt "      %5s   %16s %16s"
-         ccdputs -log "    Points marked (coordinate frame $frame):"
-         ccdputs -log [ format $fmt "Index" \
-                                    [ $ndf frameatt Symbol(1) $frame ] \
-                                    [ $ndf frameatt Symbol(2) $frame ] ]
+         if { $VERBOSE } {
+            set frame [ .viewer cget -wcsframe ]
+            set fmt "      %5s   %16s %16s"
+            ccdputs -log "    Points marked (coordinate frame $frame):"
+            ccdputs -log [ format $fmt "Index" \
+                                       [ $ndfset frameatt Symbol(1) $frame ] \
+                                       [ $ndfset frameatt Symbol(2) $frame ] ]
+         }
          set i 0
          foreach point [ .viewer points ] {
             set i [ lindex $point 0 ]
             set x [ lindex $point 1 ]
             set y [ lindex $point 2 ]
             lappend POINTS [ list $i $x $y ]
-            set fpos [ lindex \
-                       [ $ndf wcstran -format pixel $frame [ list $x $y ] ] 0 ]
-            set fx [ lindex $fpos 0 ]
-            set fy [ lindex $fpos 1 ]
-            ccdputs -log [ format $fmt $i $fx $fy ]
+            if { $VERBOSE } {
+               set fpos [ lindex [ $ndfset wcstran -format $DOMAIN $frame \
+                                                   [ list $x $y ] ] 0 ]
+               set fx [ lindex $fpos 0 ]
+               set fy [ lindex $fpos 1 ]
+               ccdputs -log [ format $fmt $i $fx $fy ]
+            }
          }
       }
       
 #  Free resources.
       destroy .viewer
-      $ndf destroy
+      $ndfset destroy
 
 # $Id$
