@@ -4,6 +4,8 @@ autom4te.cache
 libtool
 *.la
 *.lo
+*.f
+dgeneric
 starconf.status
 Makefile
 configure
