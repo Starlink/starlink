@@ -1,8 +1,8 @@
-      SUBROUTINE SCULIB_BESSEL_REGRID_1 (WEIGHT, X, Y, NPIX, PIXSPACE, 
-     :   NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
+      SUBROUTINE SCULIB_WTFN_REGRID_1 (WAVELENGTH, WEIGHT, X, Y, NPIX, 
+     :   PIXSPACE, NI, NJ, ICEN, JCEN, AV_WEIGHT, SCRATCH, STATUS)
 *+
 *  Name:
-*     SCULIB_BESSEL_REGRID_1
+*     SCULIB_WTFN_REGRID_1
 
 *  Purpose:
 
@@ -14,6 +14,10 @@
 *  Description:
 *
 *  Arguments:
+*     DIAMETER   = REAL (Given)
+*        Diameter of telescope
+*     WAVELENGTH = REAL (Given)
+*        Wavelength of the observation
 *     WEIGHT = REAL (Given)
 *        The weight of the input dataset.
 *     X( NPIX ) = DOUBLE PRECISION (Given)
@@ -55,6 +59,7 @@
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
 
 *  Arguments Given:
+      REAL DIAMETER
       REAL WEIGHT
       INTEGER NPIX
       DOUBLE PRECISION X(NPIX)
@@ -64,6 +69,7 @@
       INTEGER JCEN
       INTEGER NI
       INTEGER NJ
+      REAL WAVELENGTH
 
 *  Arguments Returned:
       REAL AV_WEIGHT (NI, NJ)
@@ -82,6 +88,11 @@
       INTEGER PIX                                ! current input pixel number
       DOUBLE PRECISION XINC                      ! the x-axis pixel increment
       DOUBLE PRECISION YINC                      ! the y-axis pixel increment
+      REAL DISTSQ                                ! Pixel distance squared
+      REAL RDIST                                 ! Size in pixels of res el
+      REAL RDIST_SQ                              ! RDIST squared
+      INTEGER PIX_RANGE                          ! Pixel range
+      REAL RES_ELEMENT                           ! Resolution element
       
 *   local data
 *.
@@ -93,6 +104,12 @@
       XINC = -PIXSPACE
       YINC = PIXSPACE
 
+*  find the size of the resolution element in pixels
+      RES_ELEMENT = WAVELENGTH * 1.0E-6 / (2.0 * DIAMETER)
+      RDIST = RES_ELEMENT / PIXSPACE
+      PIX_RANGE = INT (RDIST) + 1
+      RDIST_SQ = RDIST * RDIST
+
 *  initialise the scratch array
 
       DO JOUT = 1, NJ
@@ -102,24 +119,28 @@
       END DO
 
 *  go through the input pixels of this dataset, set all elements of
-*  the scratch array to xero that lie within one pixel space of an input 
+*  the scratch array to zero that lie within one pixel space of an input 
 *  point. 
 
       DO PIX = 1, NPIX
          IOUT = NINT (X(PIX)/XINC) + ICEN
          JOUT = NINT (Y(PIX)/YINC) + JCEN
-         DO J = -1, 1
+         DO J = -PIX_RANGE, PIX_RANGE
             IF ((JOUT+J .GE. 1) .AND. (JOUT+J .LE. NJ)) THEN
-               DO I = -1, 1
+               DO I = -PIX_RANGE, PIX_RANGE
                   IF ((IOUT+I .GE. 1) .AND. (IOUT+I .LE. NI)) THEN
-                     SCRATCH (IOUT+I, JOUT+J) = 0
+*                  Is this closer than  RDIST
+                     DISTSQ = I**2 + J**2
+                     IF (DISTSQ .LE. RDIST_SQ) THEN
+                        SCRATCH (IOUT+I, JOUT+J) = 0
+                     END IF
                   END IF
                END DO
             END IF
          END DO
       END DO
  
-*  go through the scratch array and, where it's pixels are not 0, increment
+*  go through the scratch array and, where it's pixels are  0, increment
 *  the corresponding `average weight' pixel by the weight of the input
 *  dataset
 
