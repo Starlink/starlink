@@ -330,6 +330,15 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 *     31-JAN-2002 (DSB):
 *       - Added RejectOOB to reject tick marks which are not in their primary 
 *       domain.
+*     14-FEB-2002 (DSB):
+*       - Relaxed the conditions for equality within the EQUALS macro.
+*       Guard aginst no ticks being found.
+*     18-FEB-2002 (DSB):
+*       - Make a permanent copy of any old axis format string in TickMarks.
+*       Previously a mere pointer into the astGet string buffer was stored, 
+*       which could be over-written after many calls to astGet.
+*       - If a user specifies an axis format, use it whether or not it
+*       results in any identical adjacent labels.
 *class--
 */
 
@@ -345,7 +354,7 @@ f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 #define MIN(aa,bb) ((aa)<(bb)?(aa):(bb))
 
 /* Macros to check for equality of floating point values. */
-#define EQUAL(aa,bb) (fabs((aa)-(bb))<=1.0E5*MAX((fabs(aa)+fabs(bb))*DBL_EPSILON,DBL_EPSILON))
+#define EQUAL(aa,bb) (fabs((aa)-(bb))<=1.0E8*DBL_EPSILON*MAX(fabs(aa)+fabs(bb),DBL_EPSILON*1.0E-7))
 
 /* Values for constants used in this class. */
 #define CRV_NSEG       14 /* No. of curve segments drawn by function Crv */
@@ -1432,7 +1441,7 @@ static int CGLineWrapper( AstPlot *, int, const float *, const float * );
 static int CGMarkWrapper( AstPlot *, int, const float *, const float *, int );
 static int CGTextWrapper( AstPlot *, const char *, float, float, const char *, float, float );
 static int CGTxExtWrapper( AstPlot *, const char *, float, float, const char *, float, float, float *, float * );
-static int CheckLabels( AstFrame *, int, double *, int, char ** );
+static int CheckLabels( AstFrame *, int, double *, int, int, char ** );
 static int ChrLen( const char * );
 static int Compare_LL( const void *, const void * );
 static int Compared( const void *, const void * );
@@ -4717,7 +4726,7 @@ static int CGTxExtWrapper( AstPlot *this, const char *text, float x, float y,
 }
 
 static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-                        char **list ){
+                        int force, char **list ){
 /*
 *  Name:
 *     CheckLabels
@@ -4731,18 +4740,18 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 *  Synopsis:
 *     #include "plot.h"
 *     int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks, 
-*                      char **list )
+*                      int force, char **list )
 
 *  Class Membership:
 *     Plot member function.
 
 *  Description:
 *     This function formats the supplied ticks mark values using the
-*     astFormat method for the supplied Frame. It then checks all pairs
-*     of adjacent labels. If a pair is found which are identical then the
-*     memory holding the labels is released, and a value of zero is
-*     returned. Otherwise, a value of one is returned, indicating that
-*     adjacent labels are all different and the labels are returned.
+*     astFormat method for the supplied Frame. Unless force is non-zero, it 
+*     then checks all pairs of adjacent labels. If a pair is found which are 
+*     identical then the memory holding the labels is released, and a value 
+*     of zero is returned. Otherwise, a value of one is returned, indicating 
+*     that adjacent labels are all different and the labels are returned.
 
 *  Parameters:
 *     frame
@@ -4753,6 +4762,9 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
 *        Pointer to an array holding the tick mark values.
 *     nticks
 *        The number of tick marks supplied by parameter "ticks".
+*     force
+*        If non-zero, then no check for identical adjacent labels is
+*        performed, and the labels are always considered to be OK.
 *     list 
 *        Pointer to the start of an array of pointers. Each of the
 *        elements in this array receives a pointer to a string holding a
@@ -4806,9 +4818,9 @@ static int CheckLabels( AstFrame *frame, int axis, double *ticks, int nticks,
       label = astFormat( frame, axis, ticks[ i ] );
       if( label ){
 
-/* Compare this label with the previous label. If they are identical clear
-   the returned flag. */
-         if( !strcmp( label, list[ i - 1 ] ) ) {
+/* Unless checks have been supressed, compare this label with the previous 
+   label. If they are identical clear the returned flag. */
+         if( !force && !strcmp( label, list[ i - 1 ] ) ) {
             ok = 0;
 
 /* Allocate memory holding a copy of the label, and store a
@@ -11793,12 +11805,18 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 
    }
 
+/* Report an error if no ticks can be found. */
+   if( *nmajor == 0 ) {
+      astError( AST__GRFER, "%s(%s): Cannot find any usable tick mark values. ", method, 
+                class );
+   }
+
 /* If an error has occurred, annul the memory used to hold tick data, and
    return zero ticks. */
    if( !astOK ) {
       *ticks = (double *) astFree( (void *) *ticks );
-      nmajor = 0;
-      nminor = 0;
+      *nmajor = 0;
+      *nminor = 0;
       used_gap = 0.0;
    }
 
@@ -19406,7 +19424,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* See if there are any adjacent labels which are identical. If there are
    not, the labels are formatted and returned in "labels". */
       fmt = astGetFormat( frame, axis );
-      ok = CheckLabels( frame, axis, ticks, nmajor, labels );
+      ok = CheckLabels( frame, axis, ticks, nmajor, 1, labels );
 
    }
 
@@ -19419,7 +19437,8 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Save a copy of the Frame's Format value, if set, and then clear it so
    that the Digits value will be used to determine the default format. */
       if( astTestFormat( frame, axis ) ) {
-         old_format = astGetFormat( frame, axis );
+         fmt = astGetFormat( frame, axis );
+         old_format = (const char *) astStore( NULL, (void *) fmt, strlen(fmt) + 1 );
          astClearFormat( frame, axis );
       } else {
          old_format = NULL;
@@ -19460,7 +19479,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
 /* Break out of the loop if a Digits value has been found which results
    in all adjacent labels being different. */
          fmt = astGetFormat( frame, axis );
-         if( CheckLabels( frame, axis, ticks, nmajor, labels ) ) {
+         if( CheckLabels( frame, axis, ticks, nmajor, 0, labels ) ) {
             ok = 1;
             top_digits = digits;
             break;
@@ -19533,7 +19552,7 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
             for( digits = bot_digits; digits < 1000; digits++ ){
                astSetAxisDigits( ax, digits );
                fmt = astGetFormat( frame, axis );
-               if( CheckLabels( frame, axis, ticks, nmajor, labels ) ) {
+               if( CheckLabels( frame, axis, ticks, nmajor, 0, labels ) ) {
                   ok = 1;
                   break;
                }

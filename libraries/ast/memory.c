@@ -36,6 +36,8 @@
 *        foreign language and graphics interfaces, etc.
 *     29-JAN-2002 (DSB):
 *        Added astChrLen and astSscanf.
+*     15-FEB-2002 (DSB):
+*        Removed use of non-ANSI vsscanf from astSscanf.
 */
 
 /* Module Macros. */
@@ -44,6 +46,9 @@
    implementation) to obtain access to the protected error handling
    functions. */
 #define astCLASS
+
+/* The maximum number of fields within a format string allowed by astSscanf. */
+#define VMAXFLD 20
 
 /* Include files. */
 /* ============== */
@@ -1038,17 +1043,20 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 */
 
 /* Local Variables: */
-   char *newfor;            /* Pointer to modified format string */
    char *c;                 /* Pointer to the next character to check */
+   char *newfor;            /* Pointer to modified format string */
    const char *d;           /* Pointer to the next character to check */
    int again;               /* Remove another space before the %n? */
+   int iptr;                /* Index into ptr array */
    int lfor;                /* No. of characters in format string */
    int lstr;                /* No. of characters in scanned string */
    int nc;                  /* No. of characters read from str */
    int nfld;                /* No. of counted field specifiers found so far */
+   int nptr;                /* Np. of pointers stored */
    int ret;                 /* The returned number of conversions */
    va_list args;            /* Variable argument list pointer */
    void *fptr;              /* The next supplied pointer */ 
+   void *ptr[ VMAXFLD ];    /* Array of supplied pointers */ 
 
 /* Initialise the variable argument list pointer. */
    va_start( args, fmt );
@@ -1058,6 +1066,53 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 
 /* Check a string and format have been supplied. */
    if( str && fmt ){
+
+/* Go through the format string, counting the number of field specifiers which
+   will return a value, and storing the corresponding points in the ptr
+   array. */
+      nptr = 0;
+      c = (char *) fmt;
+      while( *c ) {
+
+/* Field specifiers are marked by a % sign. */
+         if( *c == '%' ) {
+
+/* Look at the character following the % sign. Quit if the end of the string 
+   has been reached. */
+            c++;
+            if( *c ) {
+
+/* If the % sign is followed by a "*" or another "%", then there will be no
+   corresponding pointer in the variable argument list "args". Ignore such
+   field specifiers. */ 
+               if( *c != '*' && *c != '%' ) {
+
+/* If possible store the corresponding pointer from the variable argument
+   list supplied to this function. Report an error if there are too many. */
+                  if ( nptr < VMAXFLD ) {
+                     ptr[ nptr++ ] = va_arg( args, void *);
+
+	          } else {
+                     astError( AST__INTER, "astSscanf: Format string " 
+                               "'%s' contains more than %d fields "
+                               "(AST internal programming error).", 
+                               fmt, VMAXFLD );
+                     break;
+                  }
+               }
+
+/* Move on the first character following the field specifier. */
+               c++;
+            }
+
+/* If this is not the start of a field specifier, pass on. */
+         } else {
+            c++;
+         }
+      }
+
+/* Fill any unused pointers with NULL. */
+      for( iptr = nptr; iptr < VMAXFLD; iptr++ ) ptr[iptr] = NULL;
 
 /* Get the length of the string to be scanned. */
       lstr = strlen( str );
@@ -1069,7 +1124,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
    characters read (using a %n conversion) if there is a space before the
    %n. So check for this. Does the format string contain " %n"? */
       c = strstr( fmt, " %n" );
-      if( c ) {
+      if( c && astOK ) {
 
 /* Take a copy of the supplied format string (excluding any trailing spaces). */
          newfor = (char *) astStore( NULL, (void *) fmt, (size_t) lfor + 1 ); 
@@ -1086,14 +1141,20 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                c = strstr( newfor, " %n" );
             }
 
-/* Use the native sscanf with the modified format string. */
-            ret = vsscanf( str, newfor, args );
+/* Use the native sscanf with the modified format string. Note, we cannot
+   use vsscanf because it is not ANSI C. Instead, we list the pointers
+   explicitly. */
+            ret = sscanf( str, newfor, ptr[0], ptr[1], ptr[2], ptr[3],
+                          ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], 
+                          ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], 
+                          ptr[15], ptr[16], ptr[17], ptr[18], ptr[19] );
 
 /* Now look through the original format string for conversions specifiers.
    If any %n conversions are found which are preceeded by a space, then
    correct the returned character counts to include any spaces following the
    corresponding point in the scanned string. */
             nfld = 0;
+            iptr = 0;
             c = (char *) fmt;
 	    while( *c ) {
 
@@ -1111,7 +1172,7 @@ int astSscanf_( const char *str, const char *fmt, ...) {
                      if( *c != '*' && *c != '%' ) {
 
 /* Get the supplied pointer corresponding to this field specifier. */
-                        fptr = va_arg( args, void *);
+                        fptr = ptr[ iptr++ ];
 
 /* Increment the number of matched fields required. "%n" specifiers are not 
    included in the value returned by sscanf so skip over them. */
@@ -1160,8 +1221,11 @@ int astSscanf_( const char *str, const char *fmt, ...) {
 
 /* If the format string should not trigger any known problems, use sscanf
    directly. */
-      } else {
-         ret = vsscanf( str, fmt, args );
+      } else if( astOK ) {
+         ret = sscanf( str, fmt, ptr[0], ptr[1], ptr[2], ptr[3],
+                       ptr[4], ptr[5], ptr[6], ptr[7], ptr[8], ptr[9], 
+                       ptr[10], ptr[11], ptr[12], ptr[13], ptr[14], 
+                       ptr[15], ptr[16], ptr[17], ptr[18], ptr[19] );
       }      
    }
 
