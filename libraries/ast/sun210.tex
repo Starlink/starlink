@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.8}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {28th November 2000}
+\newcommand{\stardocdate}      {5th December 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -7838,7 +7838,7 @@ intend that the AST implementation should track it.
 finally seems to be stabilizing. The version currently implemented within
 AST -- based on the use of {\tt CDi\_j} keywords to describe axis scaling
 and rotation -- seems likely to be adopted as the official standard
-sometime during the year 2000, although obviously the possibility of
+sometime during the year 2001, although obviously the possibility of
 change before then cannot be ruled out.}
 
 \item[FITS-IRAF]\mbox{}\\
@@ -24300,6 +24300,13 @@ occurred in the AST library between versions V1.5 and V1.6 (the
 current version):
 
 \begin{enumerate}
+
+\item The FITS-WCS encoding used by the \htmlref{FitsChan}{FitsChan} class now includes the
+WCSNAME keyword. When creating a \htmlref{FrameSet}{FrameSet} from FITS headers, the values of 
+the WCSNAME keywords are now used as the \htmlref{Domain}{Domain} names for the corresponding 
+Frames in the returned FrameSet. When writing a FrameSet to a FITS header
+the Domain names of each \htmlref{Frame}{Frame} are stored in WCSNAME keywords in the
+header.
 
 \item A new ``interpolation'' scheme identified by the symbolic constant
 AST\_\_BLOCKAVE has been added to the \htmlref{AST\_RESAMPLE$<$X$>$}{AST_RESAMPLEX} set of
