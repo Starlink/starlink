@@ -159,8 +159,9 @@ itcl::class gaia::GaiaImageName {
    #  Get the filename as used by Starlink applications. This is the
    #  fullname without the ".sdf". Note we need single quotes to get
    #  any FITS extensions out to ADAM tasks. Also FITS files with
-   #  extensions use a different numbering scheme.
-   public method ndfname {} {
+   #  extensions use a different numbering scheme. If protect is false
+   #  then foreign names are not protected with single quotes.
+   public method ndfname {{protect 1}} {
       if { $type_ == ".sdf" } {
 	 set i1 [string first {.sdf} $fullname_]
 	 if { $i1 > -1 } {
@@ -176,10 +177,44 @@ itcl::class gaia::GaiaImageName {
       #  return these in single quotes to protect special characters.
       if { $fitshdu_ != 0 } {
          set extnum [expr $fitshdu_ -1]
-         return "'$diskfile_\[$extnum\]$slice_'"
+         if { $protect } {
+            return "'$diskfile_\[$extnum\]$slice_'"
+         } else {
+            return "$diskfile_\[$extnum\]$slice_"
+         }
       }
-      return "'$fullname_'"
+      if { $protect } {
+         return "'$fullname_'"
+      }
+      return "$fullname_"
    }
+
+
+   #  Create a modified name by either prefixing or postfixing a given
+   #  string to the name. This is equivalent to ndfname, not fullname.
+   public method modname {prefix value} {
+      set index [string first $type_ $diskfile_]
+      incr index -1
+      set shortname [string range $diskfile_ 0 $index]
+      if { $prefix } {
+         set dirname [file dirname $shortname]
+         set tail [file tail $shortname]
+         set shortname [file join $dirname "${value}${tail}"]
+      } else {
+         set shortname "${shortname}${value}"
+      }
+      set olddiskfile $diskfile_
+      set diskfile_ ${shortname}${type_}
+      get_fullname_
+
+      set result [ndfname 0]
+
+      set diskfile_ $olddiskfile
+      get_fullname_
+
+      return $result
+   }
+
 
    #  Check if diskfile exists, is readable and a plain file.
    public method exists {} {

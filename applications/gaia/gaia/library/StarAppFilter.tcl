@@ -25,26 +25,34 @@
 #     gaFilters must have the following format:
 #
 #        Filter replace_image filter_binary_name \
-#           command_qualifier_string output_image_name label
+#           command_qualifier_string use_prefix  
+#           output_image_name_modifier label
 #
 #     So for instance the KAPPA application BLOCK might be run
 #     using:
 #
 #        Filter 1 $env{KAPPA_DIR}/block \
-#           "in=$data box=[10,10] out=${data}_smooth accept" \
-#           ${data}_smooth "Smooth 10 by 10"
+#           "in=$indata box=[10,10] out=$outdata accept" \
+#           1 smooth_ "Smooth 10 by 10"
 #
-#      The symbol $data will be replaced with the name of the
-#      currently displayed image and $env{KAPPA_DIR} with the value of the
-#      environment variable. In this case since replace is set to 1 (true)
-#      the currently displayed image will be erased and the output
-#      of this command will be displayed instead. If replace had been
-#      0 (false) then a new display would have been created and
-#      the new image displayed in that.
+#      The symbol "$indata" will be replaced with the name of the
+#      currently displayed image as suitable for passing to a Starlink
+#      application. The variable "$outdata" will be constructed from
+#      the displayed image name, but will be modified using the
+#      "smooth_" as a prefix to the current image name (setting
+#      use_prefix to 0 would result in a postfix).
+#
+#      The $env{KAPPA_DIR} variable is changed to the value of the
+#      KAPPA_DIR environment variable.  
+#
+#      Since replace is set to 1 (true) the currently displayed image
+#      will be erased and the output of this command will be displayed
+#      instead. If replace had been 0 (false) then a new display would
+#      have been created and the new image displayed in that.
 
 #  Invocations:
 #
-#        StarAppFilter object_name rtdwidget [configuration options]
+#        StarAppFilter object_name gaia [configuration options]
 #
 #     This creates an instance of a StarAppFilter object. The return is
 #     the name of the object.
@@ -95,11 +103,13 @@ itcl::class gaia::StarAppFilter {
 
    #  Constructor:
    #  ------------
-   constructor {rtdwidget args} {
+   constructor {gaia args} {
       global env gaia_dir
       
-      #  Record the name of the Gaia widget.
-      set rtdwidget_ $rtdwidget
+      #  Record the name of the GAIA widget.
+      set gaia_ $gaia
+      set rtdimage_ [$gaia_ get_image]
+      set rtdimage_ [$rtdimage_ get_image]
       
       #  Evaluate any configuration options.
       eval configure $args
@@ -114,7 +124,7 @@ itcl::class gaia::StarAppFilter {
       }
       if { [file readable $env(HOME)/.gaFilters] } {
          if { ![catch {set ios [open $env(HOME)/.gaFilters]}] } {
-            process_filters $ios
+            process_filters_ $ios
             close $ios
          }
        }
@@ -122,11 +132,18 @@ itcl::class gaia::StarAppFilter {
       # Check that we have some filters and create the menu to run
       # them if so.
       add_menu
+
+      #  Create control object for image names.
+      set namer_ [GaiaImageName \#auto]
+
    }
    
    #  Destructor:
    #  -----------
    destructor  {
+      if { $namer_ != {} } {
+         catch {delete object $namer_}
+      }
    }
 
    #  Methods:
@@ -153,12 +170,13 @@ itcl::class gaia::StarAppFilter {
             } else {
                # Should have a complete description. Just check
                # number of elements and store it.
-               if { $nf == 6 } {
+               if { $nf == 7 } {
                   set info_($nf_,replace) $newinfo(2)
                   set info_($nf_,binary) $newinfo(3)
                   set info_($nf_,qualifier) $newinfo(4)
-                  set info_($nf_,output) $newinfo(5)
-                  set info_($nf_,label) $newinfo(6)
+                  set info_($nf_,prefix) $newinfo(5)
+                  set info_($nf_,output) $newinfo(6)
+                  set info_($nf_,label) $newinfo(7)
                   incr nf_
                } else {
                   error_dialog "Cannot interpret \"$whole\" as \
@@ -174,7 +192,7 @@ itcl::class gaia::StarAppFilter {
    #  Create the menu for the list of filters.
    method add_menu {} {
        if { $nf_ > 0 } {
-	   set m [$rtdwidget_ add_menubutton Filters]
+	   set m [$gaia_ add_menubutton Filters]
 	   for { set i 0 } { $i < $nf_ } { incr i } {
 	       $m add command -label $info_($i,label) \
 		       -command [code $this run $i]
@@ -184,26 +202,32 @@ itcl::class gaia::StarAppFilter {
 
    #  Run the command with the given index.
    method run {id} {
-      if { [info exists info_($id,replace) ] } {
+      set image [$rtdimage_ fullname]
+      if { $image == "" } {
+         error_dialog "No image to filter"
+         return
+      }
+      $namer_ configure -imagename $image
+
+      if { [info exists info_($id,replace)] } {
          incr nf_
-         if { ! [info exists info_($id,app)] } {
-            global env
-            set app [subst $info_($id,binary)]
-            set info_($id,app) [GaiaApp \#auto -application \
-                                   "$app" -show_output 0 \
-                                   -notify [code $this completed $id]]
-         }
-         set data [$rtdwidget_ open]
-         set datatype_ ""
-         lassign [fileName $data] data slice
-         if { [file extension $data] == ".sdf" } {
-            set data "[file rootname $data]${slice}"
-            set datatype_ ".sdf"
-         }
+         global env
+         set app [subst $info_($id,binary)]
+         set info_($id,app) [GaiaApp \#auto -application \
+                                "$app" -show_output 0 \
+                                -notify [code $this completed $id]]
+
+         #  Set name of the "indata" variable to the name used by
+         #  Starlink applications. Includes everything but the ".sdf"
+         #  extension. 
+         set indata [$namer_ ndfname 0]
+
+         #  Set the name of the "outdata" variable.
+         set outdata [$namer_ modname $info_($id,prefix) $info_($id,output)]
          
-         #  Need to substitute $data, but still protect [] and form a 
-         #  proper list as an argument to runwith! So use keep things
-         #  in a single string and do careful substitution.
+         #  Need to substitute $indata and $outdata, but still protect
+         #  [] and form a proper list as an argument to runwith! So
+         #  use keep things in a single string and do careful substitution.
          set qual [join $info_($id,qualifier)]
          set qual [subst -nocommands -nobackslashes $qual]
          $info_($id,app) runwiths "$qual"
@@ -215,9 +239,9 @@ itcl::class gaia::StarAppFilter {
    method completed {id} {
        if { [info exists info_($id,replace) ] } {
 	   if { $info_($id,replace) } {
-               eval $rtdwidget_ open $info_($id,output)${datatype_}
+               eval $gaia_ open $outdata
 	    } else {
-	       set w [$rtdwidget_ clone -file [subst $info_($id,output)${datatype_}]]
+	       set w [$gaia_ clone -file $outdata]
 	   }
        }
        set data_ {}
@@ -236,7 +260,10 @@ itcl::class gaia::StarAppFilter {
    #  --------------------
    #  Name of the main Gaia widget for placing the menu into and
    #  getting the image name from. Creating clones etc.
-   protected variable rtdwidget_ {.c}
+   protected variable gaia_ {.gaia1}
+
+   #  Name of rtdimage.
+   protected variable rtdimage_ {}
 
    #  Number of filters known.
    protected variable nf_ 0
@@ -248,7 +275,13 @@ itcl::class gaia::StarAppFilter {
    protected variable datatype_ ""
 
    #  Name of the file being processed.
-   protected variable data {}
+   protected variable indata {}
+
+   #  Name of the file being produced.
+   protected variable outdata {}
+
+   #  Object for image name nicities.
+   protected variable namer_ {}
    
    #  Common variables: (shared by all instances)
    #  -----------------
