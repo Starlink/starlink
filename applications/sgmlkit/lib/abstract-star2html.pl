@@ -1,5 +1,7 @@
 #! /usr/bin/perl -w 
 #
+# RCS $Id$
+#
 # This reads a file marked up using the Star2HTML
 # extensions, plus an HTX index file, and produces a summary of the
 # document marked up using the DocumentSummary DTD.  That includes the
@@ -85,6 +87,8 @@ while (defined($idxline = <IDX>))
 	{
 	    $labels{$key} = $node;
 	}
+    } elsif (($node) = ($idxline =~ /^T\s*(\S+)/)) {
+	$labels{TOP} = $node;
     }
 }
 close (IDX);
@@ -126,10 +130,9 @@ while (defined($line = <TF>))
 	    # the appropriate bit of the !~ regexp - $1 isn't set, and I'm
 	    # not quite sure why (something to do with the test failing?)
 	    $line =~ /(\\(sub)*section{([^{]*{[^{}]*})*[^{}]*})/;
-	    my $stitle = parse_section ($1);
-	    print $stitle;
-	    print STDERR "Possible markup in section $stitle\n"
-		if ($stitle =~ /(\\|~)/);
+	    my $ptitle = parse_section ($1);
+	    check_markup ('section title', $ptitle);
+	    print $ptitle;
 	    next;
 	};
     $line =~ /\\xlabel{(.*)}/ && do {
@@ -155,32 +158,41 @@ while (defined($line = <TF>))
 	my ($cmd,$arg) = 
 	    ($line =~ /\\newcommand\s*{([^}]*)}\s*{(([^{]*{[^{}]*})*[^{}]*)}/);
 
-	print STDERR "Possible markup in $cmd $arg\n"
-		if ($arg =~ /(\\|~)/ && $cmd ne '\stardocauthors');
+	#print STDERR "Warning: markup in $cmd $arg\n"
+	#	if ($arg =~ /(\\|~)/ && $cmd !~ /\\stardoc(authors|abstract)/);
 
-	$cmd eq '\stardocinitials' &&
-	    do { $documenttype = $arg; next; };
-	$cmd eq '\stardocnumber' &&
-	    do { $documentnumber = $arg; next; };
+	$cmd eq '\stardocinitials' && do {
+	    check_markup ('\stardocinitials', $arg);
+	    $documenttype = $arg;
+	    next; };
+	$cmd eq '\stardocnumber' && do {
+	    check_markup ('\stardocnumber', $arg);
+	    $documentnumber = $arg;
+	    next; };
 	$cmd eq '\stardocauthors' && do { 
 	    @documentauthlist = split (/\\\\/, $arg);
 	    for $a (@documentauthlist) {
-		print STDERR "Possible markup in author $a\n"
-		    if ($a =~ /(\\|~)/);
+		check_markup ('author', $a);
 	    }
 	    next;
 	};
-	$cmd eq '\stardoctitle' &&
-	    do { $documenttitle = $arg; next; };
+	$cmd eq '\stardoctitle' && do {
+	    check_markup ('\stardoctitle', $arg);
+	    $documenttitle = $arg;
+	    next; };
+	$cmd eq '\stardocabstract' && do {
+	    # don't bother to warn about markup in the abstract
+	    $documentabstract = $arg;
+	    next; };
         next;
     };
 
     $line =~ /\\begin\{document\}/ &&
 	do {
-	    print '<!doctype documentsummary public "-//Starlink//DTD Document Summary 0.1//EN">
-<documentsummary urllinkpolicy="explicit">
+	    print "<!doctype documentsummary public '-//Starlink//DTD Document Summary 0.1//EN'>
+<documentsummary urlpath='$urlprefix$labels{TOP}' urllinkpolicy='explicit'>
 <docinfo>
-';
+";
 	    print "<title>$documenttitle</title>\n<authorlist>\n";
 	    foreach $a (@documentauthlist)
 	    {
@@ -196,8 +208,10 @@ while (defined($line = <TF>))
 </docinfo>
 <docbody>
 ";
-	next; };  
-    print STDERR "Unmatched line: $line";
+	    print "<abstract>$documentabstract</abstract>\n"
+		if (defined($documentabstract));
+	    next; };
+   print STDERR "Unmatched line: $line";
 }
 
 print "</docbody>\n</documentsummary>\n";
@@ -260,7 +274,16 @@ sub parse_section {
     }
 }
 
-    
+# Check to see if there's any LaTeX markup in the argument, and warn if
+# there is.  It doesn't do anything with any it finds at present, but it could
+# be adapted to remove or transform it.
+sub check_markup {
+    my ($context,$arg) = @_;
+    if ($arg =~ /\\|~/) {
+	$arg =~ s/\s*$//;	# delete any trailing whitespace
+	print STDERR "Warning: markup in $context: $arg\n";
+    }
+}
 
 
 sub Usage {
