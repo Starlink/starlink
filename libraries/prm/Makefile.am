@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = prm_link prm_link_adam
+dist_bin_SCRIPTS = prm_link prm_link_adam
 lib_LTLIBRARIES = libprm.la libprm_a.la
 noinst_PROGRAMS = make-prm-par
 
