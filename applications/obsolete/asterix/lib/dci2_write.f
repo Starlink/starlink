@@ -114,8 +114,12 @@
 *  Write to SPECTRUM too
       CALL ADI2_GKEY0C( ARGS(1), ' ', 'CONTENT', .FALSE., .FALSE.,
      :                  CONTNT, ' ', STATUS )
-      IF ( CONTNT .EQ. 'SPECTRUM' ) THEN
-        CALL DCI2_WRITE1( NARG, ARGS, 'SPECTRUM', STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
+        IF ( CONTNT .EQ. 'SPECTRUM' ) THEN
+          CALL DCI2_WRITE1( NARG, ARGS, 'SPECTRUM', STATUS )
+        END IF
+      ELSE
+        CALL ERR_ANNUL( STATUS )
       END IF
 
 *  Report any errors
