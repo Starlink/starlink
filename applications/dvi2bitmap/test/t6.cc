@@ -403,6 +403,9 @@ int do_stream_tests()
 			  "-o", PIPE_NAME,
 			  "-g", "500",
 			  0);
+                    cerr << "Oh-oh: couldn't exec in child of "
+                         << getppid() << ": " << strerror(errno) << endl;
+                    exit(1);
 		} else {
 		    // parent
 		    InputByteStream IBS(PIPE_NAME);
@@ -582,15 +585,19 @@ int main (int argc, char **argv)
 		    argc--;
 		    argv++;
 		}
-		if (argc == 0 || **argv == '-')
+		if (argc == 0 || **argv == '-' || **argv == '\0')
 		    Usage();
-		if (**argv != '\0') {
-		    if ((output = fopen(*argv, "w")) == 0) {
-			cerr << "Can't open file " << *argv << " to write"
-			     << endl;
-			exit (1);
-		    }
+                if ((output = fopen(*argv, "w")) == 0) {
+                    fprintf(stderr, "Can't open file %s to write\n", *argv);
+                    exit (1);
 		}
+                // Sleep for a moment, in case the output file is a
+                // FIFO (that is, we are being called by the code
+                // below to write into a pipe), and in case our parent
+                // hasn't opened the pipe, yet.  This isn't the proper
+                // solution, since we should be catching SIGPIPE in
+                // generate_data below, but it'll do for the moment.
+                sleep(1);
 		break;
 
 	      default:
