@@ -671,8 +671,10 @@
           CALL MSG_PRNT( 'Warning, source ^N does not lie on'/
      :                   /' exposure map' )
         ELSE
-          DO LPX = MAX(1,XPIX-PIXRAD), MIN(EDIM1,XPIX+PIXRAD)
-            DO LPY = MAX(1,YPIX-PIXRAD), MIN(EDIM2,YPIX+PIXRAD)
+          DO LPX = MAX(1,INT(XPIX-PIXRAD)),
+     :                    MIN(EDIM1,INT(XPIX+PIXRAD))
+            DO LPY = MAX(1,INT(YPIX-PIXRAD)),
+     :                       MIN(EDIM2,INT(YPIX+PIXRAD))
               IF (SQRT ( REAL((XPIX-LPX)**2 + (YPIX-LPY)**2) )
      :                                          .LE. PIXRAD) THEN
                 SUM = SUM + EXDATA(LPX,LPY)
