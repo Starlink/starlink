@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.7  1999/02/27 04:24:29  timj
+#        Fix with new location
+#
 #        Revision 1.6  1998/12/10 21:51:40  timj
 #        Support new directory structure at JAC. (RPT)
 #
@@ -709,7 +712,7 @@ sub scandisk {
 	  $sem = find_sem($obsdate);
 	  $location = "${location}/${sem}/${obsdate}";
 	} elsif ($location =~ /^\/net/) {
-	  $location = "${location}/${obsdate}";
+	  $location = "${location}/${obsdate}/ro";
 	}
 
 	print "Trying directory '${location}/'..." if ($debug);
@@ -828,7 +831,7 @@ sub getfile {
               $sem = find_sem($obsdate);
 	      $location = "${location}/${sem}/${obsdate}";
 	    } elsif ($location =~ /^\/net/) {
-	      $location = "${location}/${obsdate}";
+	      $location = "${location}/${obsdate}/ro";
 	    }
 
 	    print "Trying ${location}/$rofile...\n" if ($debug);
