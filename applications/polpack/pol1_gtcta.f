@@ -61,6 +61,8 @@
 *     10-NOV-1998 (DSB):
 *        Added argument EPARAM. Change name from KPG1_ to POL1_. Call
 *        KPG1_ASFRM instead of KPG1_GTFRM to set current Frame.
+*     16-SEP-1999 (DSB):
+*        Added TOKEN argument to KPG1_ASFRM calls.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -312,7 +314,7 @@
 
 *  Give the user the chance to change the Current Frame. 
       CALL KPG1_ASFRM( PARAM, EPARAM, IWCS, 'PIXEL', 'AXIS', .TRUE.,
-     :                 STATUS )
+     :                 'catalogue', STATUS )
 
 *  If an error has occurred, annul the returned FrameSet pointer. Otherwise
 *  export the pointer (if it is not null) from the current AST context.
