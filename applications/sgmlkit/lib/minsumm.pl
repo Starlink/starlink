@@ -59,7 +59,7 @@
    my( $verbose ) = 1;
    my( $starlink ) = $ENV{ 'STARLINK' } || '/star';
    my( $docslisfile ) = "$starlink/docs/docs_lis";
-   my( $dtdname ) = "-//Starlink//DTD Document Summary 0.2//EN";
+   my( $dtdname ) = "-//Starlink//DTD Document Summary 0.7//EN";
 
 #  Read flags.
    while ( $_ = shift( @ARGV ) ) {
@@ -81,7 +81,7 @@
 #  Get the information about each document.
       %docatts = %{ $docs{ $doc } };
       $doc =~ /([a-z]*)(\d*)/i;
-      my( $doctype ) = uc( $1 );
+      my( $doctype ) = lc( $1 );
       my( $docnum ) = $2;
       my( $version, $date, $authinit, $pages, $title ) 
          = @docatts{ qw( version date authinit pages title ) };
@@ -99,14 +99,14 @@
       open( SUMM, ">$summfile" ) 
          or die( "Failed to open $summfile for writing.\n" );
       print( SUMM join( "\n",
-         "<!doctype documentsummary public '$dtdname'>",
+         "<!DOCTYPE documentsummary PUBLIC '$dtdname'>",
          "<documentsummary urlpath='$doc.htx/$doc.html' "
              . "urllinkpolicy='explicit'>",
          "<docinfo>",
          "<title>$title</title>",
          "<authorlist>",
          "<author id=$authkey affiliation='$authsite'>$authname</author>"
-             . ( $etal ? "\n<otherauthors>\n<author>others</author>" : "" ),
+             . ( $etal ? "\n<otherauthors>\n<author>others</author>\n</otherauthors>" : "" ),
          "</authorlist>",
          "<docnumber documenttype=$doctype>$docnumber</docnumber>",
          "</docinfo>\n",

@@ -36,13 +36,58 @@
 #  Arguments:
 #     None.
 #
+#  Options:
+#     --docdir dirname
+#          specify the source for the HTX files (default $STARLINK/docs).
+#     --summdir dirname
+#          specify the target directory for the summary files (default
+#          $STARLINK_SGML_DIR/documents).
+#
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
+#     NG: Norman Gray (Starlink, Glasgow)
 #
 #  History:
 #     25-AUG-1999 (MBT):
 #        Initial version.
+#     15-Jun-2000 (NG):
+#        Added --docdir and --summdir options.
 #-
+
+summdir=''
+docdir=''
+
+libdir=$STARLINK_SGML_DIR/lib
+HTX2SUMM=$libdir/htx2summ.pl
+MINSUMM="perl $libdir/minsumm.pl"
+STARDECL=$STARLINK_SGML_DIR/dtd/starlink.decl
+PERL5LIB=$libdir
+export PERL5LIB
+
+USAGE ()
+{
+      echo "Usage: $0 [--summdir summary-dir] [--docdir source-docs-dir]"
+      echo '   --summdir default: $STARLINK_SGML_DIR/documents'
+      echo '   --docdir  default: $STARLINK/docs'
+      exit 1
+}
+
+#  Parse options
+      while [ $# -gt 0 ]; do
+         case $1 in
+	    --summdir)
+		if test $# -ge 2; then shift; else USAGE; fi
+		summdir=$1
+		shift
+		;;
+	    --docdir)
+		if test $# -ge 2; then shift; else USAGE; fi
+		docdir=$1
+		shift
+		;;
+	    *) USAGE;;
+	 esac
+      done
 
 #  Set up directory locations.
       if [ "$STARLINK_SGML_DIR" = "" ]
@@ -55,9 +100,10 @@
          STARLINK=/star
          export STARLINK
       fi
-      summdir=$STARLINK_SGML_DIR/documents
-      docdir=$STARLINK/docs
+      test -n "$summdir" || summdir=$STARLINK_SGML_DIR/documents
+      test -n "$docdir"  || docdir=$STARLINK/docs
       warnfile=$summdir/mksumm.warnings
+
 
 #  Clear out files.
       rm -f $summdir/*.summary $summdir/CATALOG $warnfile
@@ -77,13 +123,13 @@
          else
             args="$htxfile"
          fi
-         if htx2summ.pl $args >$summfile 2>>$warnfile
+         if $HTX2SUMM $args >$summfile 2>>$warnfile
          then
             :
          else
             echo "Command failed:"
-            echo "   htx2summ.pl $args"
-            echo "see $warnfile."
+            echo "   $HTX2SUMM $args"
+            echo "see $warnfile"
             exit 1
          fi
       done
@@ -94,13 +140,13 @@
 #  Write summary files for those entries in docs_lis which weren't
 #  covered by the previous procedure.
       echo "Writing minimal summary files in $summdir using $docdir/docs_lis"
-      if minsumm.pl 2>>$warnfile
+      if $MINSUMM 2>>$warnfile
       then
          :
       else
          echo "Command failed:"
-         echo "   minsumm.pl"
-         echo "see $warnfile."
+         echo "   $MINSUMM"
+         echo "see $warnfile"
          exit 1
       fi
 
@@ -119,7 +165,7 @@
       for summ in *.summary
       do
          echo "   $summ"
-         nsgmls -s $summ
+         nsgmls -s $STARDECL $summ
       done 2>>$warnfile
-      echo "Non-conforming summary files logged in $warnfile."
+      echo "Non-conforming summary files logged in $warnfile"
 
