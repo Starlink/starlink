@@ -1408,6 +1408,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       YMIN=BASE(2)+REAL(JMIN-1)*SCALE(2)-0.5*SCALE(2)
       XMAX=BASE(2)+REAL(JMAX-1)*SCALE(2)+0.5*SCALE(2)
 
+	print*,xmin,xmax,ymin,ymax
 
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_REP(' ',' from XRTSORT_SCAN_MASK',STATUS)
