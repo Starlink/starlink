@@ -2978,7 +2978,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       INTEGER			X_AX, Y_AX, E_AX, T_AX	! Axis identifiers
 
       LOGICAL                 	IN_DATASET        	! Response found in dataset
-      LOGICAL                 	INPRIM        		! USI input primitive?
 *-
 
 *    Check status
