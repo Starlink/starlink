@@ -944,7 +944,8 @@
 
             ELSE
               SPACE_LEFT = .FALSE.
-              CALL TXT2AST_ERROR( 'TXT2AST has run out of space', CLINE )
+              CALL TXT2AST_ERROR( 'TXT2AST has run out of space',
+     :                            CLINE )
             END IF
 
           END IF
