@@ -160,8 +160,10 @@
       XUU = XLL + XSIZE - 1
       YUU = YLL + YSIZE - 1
 
+#ifdef HAVE_PGPLOT
 *  Buffer all PGPLOT output produced while drawing the contour.
       CALL PGBBUF 
+#endif
 
 *  Scan the rows and pixels of the sub-array to be contoured.
       DO J = 0, YSIZE 
@@ -409,8 +411,10 @@
 
  999  CONTINUE
 
+#ifdef HAVE_PGPLOT
 *  Flush the buffer holding PGPLOT output produced while drawing this contour.
       CALL PGEBUF 
+#endif
 
 *  Remove the Current Frame added by ARD1_ASSIM and re-instate the original 
 *  Current Frame.

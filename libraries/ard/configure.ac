@@ -17,7 +17,8 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
 
 dnl    Find required versions of the programs we need for configuration
-AC_PROG_F77
+AC_PROG_FC([],77)
+AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 dnl    Other options here, such as
@@ -26,6 +27,9 @@ STAR_CNF_COMPATIBLE_SYMBOLS
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES(build, [sae ast grp subpar])
 STAR_DECLARE_DEPENDENCIES(link,  [ast psx mers chr pgplot])
+
+dnl    Check for PGPLOT since there is a slight dependency on it.
+AC_CHECK_LIB(pgplot,pgbbuf_)
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
