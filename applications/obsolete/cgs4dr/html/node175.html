@@ -1,5 +1,5 @@
 <HEAD>
-<TITLE> How Do I Read Old Index Files from VMS?</TITLE>
+<TITLE> How Do I Read Old Index Files?</TITLE>
 </HEAD>
 <BODY  BGCOLOR=#F0EBD0>
 <P><CENTER><IMG ALIGN=CENTER SRC=hline.gif><P>
@@ -12,12 +12,16 @@
 <IMG ALIGN=CENTER SRC=cgs4map.gif USEMAP="#cgs4map">
 <P>
 <P><IMG ALIGN=CENTER SRC=hline.gif><P></CENTER>
-<H1>How Do I Read Old Index Files from VMS?</H1>
+<H1>How Do I Read Old Index Files?</H1>
 <P>
-Unfortunately, you can't. Under VMS the index file was maintained as an indexed sequential
+If you mean old index files generated under VMS, you can't. Under VMS the index file was maintained as an indexed sequential
 access method (ISAM) file. These files were DEC Fortran compiler extensions and, as such,
 were not portable between systems.
-
+<P>
+There is a similar problem under Unix: if you write an index file under, say, Solaris (as you do at UKIRT) then that file will 
+<em>not</em> be readable under Digital Unix and vice-versa. You can re-create the index file (from the reduced observations)
+by entering a series of `END oyymmdd_nnnn' commands into the queue using the `End Range' dialogue box in the Queue
+Manager options menu.
 <P>
 <HR><P>
 <A HREF="mailto:pnd@jach.hawaii.edu">Comments?</A>
