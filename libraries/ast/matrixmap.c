@@ -1257,8 +1257,8 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 /* Get the number of input and output axes for the MatrixMap. Swap these
    if the supplied invert flag is not the same as the Invert attribute of
    the Mapping. */
-   if(  invert && !( *invert_list )[ where ] || 
-       !invert && ( *invert_list )[ where ] ){
+   if( ( invert && !( *invert_list )[ where ] ) || 
+       ( !invert && ( *invert_list )[ where ] ) ) {
       nout = astGetNin( ( *map_list )[ where ] );
       nin = astGetNout( ( *map_list )[ where ] );
 
