@@ -272,6 +272,30 @@ $(MANIFEST)/fio: \
 	cd libraries/fio \
 	    && make>make.log && make install-manifest>>make.log
 
+$(MANIFEST)/gaia: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/cat \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/ndf \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd applications/extractor \
+	    && make>make.log && make install-manifest>>make.log
+
 $(MANIFEST)/generic: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/sae \
@@ -393,6 +417,28 @@ $(MANIFEST)/hdspar: \
 	cd libraries/pcs/hdspar \
 	    && make>make.log && make install-manifest>>make.log
 
+$(MANIFEST)/hdstrace: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar
+	cd applications/hdstrace \
+	    && make>make.log && make install-manifest>>make.log
+
 $(MANIFEST)/hlp: \
 		$(MANIFEST)/star2html
 	cd libraries/hlp \
@@ -434,6 +480,7 @@ $(MANIFEST)/img: \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
 		$(MANIFEST)/ems \
+		$(MANIFEST)/generic \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
