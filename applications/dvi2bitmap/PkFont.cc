@@ -805,10 +805,10 @@ string PkFont::fontgenCommand (void)
 #elif defined(MAKETEXPK)
 
     SSTREAM cmd;
-    cmd << MAKETEXPK	<< ' '
-	<< name		<< ' '
-	<< dpi()	<< ' '
-	<< dpiBase()	<< ' '
+    cmd << MAKETEXPK		<< ' '
+	<< name_		<< ' '
+	<< dpi()		<< ' '
+	<< dpiBase()		<< ' '
 	<< dvimag_/1000.0	<< ' '
 	<< missingFontMode_
 	<< '\0';
