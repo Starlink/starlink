@@ -124,9 +124,8 @@
             END IF
 
 *        Write axis data
-            CALL PSF1_PUTAX( PSID, IAX, .TRUE., -1, .TRUE.,
-     :                       .FALSE., 0, BASE, SCALE,
-     :                       TOR, LABEL, UNITS, STATUS )
+            CALL PSF1_PUTAX( PSID, IAX, .TRUE., -1, .TRUE., 0, BASE,
+     :                       SCALE, TOR, LABEL, UNITS, STATUS )
 
 *        Release the list
             CALL ADI_ERASE( LID, STATUS )
@@ -195,9 +194,8 @@
           END IF
 
 *      Write axis data
-          CALL PSF1_PUTAX( PSID, IAX, OK, DIMS(IAX), REG,
-     :                     .FALSE., PTR, BASE, SCALE,
-     :                     TOR, LABEL, UNITS, STATUS )
+          CALL PSF1_PUTAX( PSID, IAX, OK, DIMS(IAX), REG, PTR, BASE,
+     :                            SCALE, TOR, LABEL, UNITS, STATUS )
 
         END DO
 

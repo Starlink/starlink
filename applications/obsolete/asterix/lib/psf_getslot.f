@@ -87,6 +87,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
       INCLUDE 'AST_PKG'
       INCLUDE 'PSF_PAR'
 
