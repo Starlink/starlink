@@ -71,21 +71,25 @@
          s/cnf_pval\(([^)]*)\)/$1/ig;
       }
 
+#  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
+#  to INTEGER.
+#  Also removes EXT_PAR includes and undoes EXT__ comparison.
+      elsif ( $filter =~ /frepint/ ) {
+         s/^\t/      /mg;
+         s/^ *include *'ext_par' *(!.*)?\n//mig;
+         s/ *\+ *ext__0//ig;
+         s/ext__//ig;
+         s%^/\* *frepint:.*?\*/ *\n%%msg;
+         s/\n[^*cCdD!]....[^ 0]//g;
+         s/^([ \t]*integer) *\* *8/$1/mig;
+         s/[ \t]+/ /g;
+      }
+
 #  crepint: Changes INT_BIG back to int and collapses spaces.
       elsif ( $filter =~ /crepint/ ) {
          s%^/\* *crepint:.*?\*/ *\n%%msg;
          s/INT_BIG_(MIN|MAX)/INT_$1/g;
          s/INT_BIG/int/g;
-         s/  +/ /g;
-      }
-
-#  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
-#  to INTEGER.
-      elsif ( $filter =~ /frepint/ ) {
-         s/^\t/      /mg;
-         s%^/\* *frepint:.*?\*/ *\n%%msg;
-         s/\n[^*cCdD!]....[^ 0]//g;
-         s/^([ \t]*integer) *\* *8/$1/mig;
          s/[ \t]+/ /g;
       }
 
