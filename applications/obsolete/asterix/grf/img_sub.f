@@ -2712,9 +2712,15 @@ c        INTEGER STATUS
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,X,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'Y',ID,STATUS)
           CALL NBS_PUT_VALUE(ID,0,VAL__NBR,Y,STATUS)
+	print *,x,y
+	call flush(6)
           CALL IMG_WORLDTOCEL(X,Y,RA,DEC,STATUS)
+	print *,ra,dec
+	call flush(6)
           CALL CONV_DEGHMS(REAL(RA),RAS)
           CALL CONV_DEGDMS(REAL(DEC),DECS)
+	print *,ras,decs
+	call flush(6)
           CALL NBS_FIND_ITEM(I_NBID,'RA',ID,STATUS)
           CALL NBS_PUT_CVALUE(ID,0,RAS,STATUS)
           CALL NBS_FIND_ITEM(I_NBID,'DEC',ID,STATUS)
