@@ -140,7 +140,15 @@ proc buildRed4Widgets w {
     set Red4Widgets(SP) "\$RGDIR/rg$env(CGS4_DATE)_gggg_spc"
     set Red4Widgets(DDS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_dbs"
     set Red4Widgets(DS) "\$RGDIR/rg$env(CGS4_DATE)_gggg_dbs"
+    set Red4Widgets(IRO1) "\$RODIR/ro$env(CGS4_DATE)_oooo"
+    set Red4Widgets(IRO2) "\$RODIR/ro$env(CGS4_DATE)_oooo"
+    set Red4Widgets(IRO3) "\$RODIR/ro$env(CGS4_DATE)_oooo"
+    set Red4Widgets(MASK) "#"
     set Red4Widgets(AP_VARWT) 0
     set Red4Widgets(DSKYWT) 1.0
+    set Red4Widgets(FS_TEFF) 5000.0
+    set Red4Widgets(FS_REFW) 2.2
+    set Red4Widgets(FS_YST) 29.0
+    set Red4Widgets(FS_YEN) 29.0
     return $mainFrame
 }

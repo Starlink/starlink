@@ -29,22 +29,22 @@ proc red4FileStd {taskname} {
     set Red4Widgets(FS_LAB02) [label $mid.ml1 -text "Effective Temperature"]
     set Red4Widgets(FS_ENT02) [entry $mid.me1]
     pack $Red4Widgets(FS_LAB02) $Red4Widgets(FS_ENT02) -in $mid -side left
-    $Red4Widgets(FS_ENT02) insert end 00
+    $Red4Widgets(FS_ENT02) insert end $Red4Widgets(FS_TEFF)
 
     set Red4Widgets(FS_LAB03) [label $mid.ml2 -text "Reference Wavelength"]
     set Red4Widgets(FS_ENT03) [entry $mid.me2]
     pack $Red4Widgets(FS_ENT03) $Red4Widgets(FS_LAB03) -in $mid -side right
-    $Red4Widgets(FS_ENT03) insert end 2.2
+    $Red4Widgets(FS_ENT03) insert end $Red4Widgets(FS_REFW)
 
     set Red4Widgets(FS_LAB04) [label $bot.bl1 -text "Extract Row Start"]
     set Red4Widgets(FS_ENT04) [entry $bot.be1]
     pack $Red4Widgets(FS_LAB04) $Red4Widgets(FS_ENT04) -in $bot -side left
-    $Red4Widgets(FS_ENT04) insert end 1
+    $Red4Widgets(FS_ENT04) insert end $Red4Widgets(FS_YST)
 
     set Red4Widgets(FS_LAB05) [label $bot.bl2 -text "Extract Row End"]
     set Red4Widgets(FS_ENT05) [entry $bot.be2]
     pack $Red4Widgets(FS_ENT05) $Red4Widgets(FS_LAB05) -in $bot -side right
-    $Red4Widgets(FS_ENT05) insert end 256
+    $Red4Widgets(FS_ENT05) insert end $Red4Widgets(FS_YEN)
 
 # Bind the defaults to Button-2
     bind $Red4Widgets(FS_LAB01) <Button-2> "red4Update red4FileStd ALL"
@@ -67,19 +67,18 @@ proc red4FileStd {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue] 
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(FS_ENT01) get]]
-      set teff [string trim [$Red4Widgets(FS_ENT02) get]]
-      set rf [string trim [$Red4Widgets(FS_ENT03) get]]
-      set ys [string trim [$Red4Widgets(FS_ENT04) get]]
-      set ye [string trim [$Red4Widgets(FS_ENT05) get]]
-      if {$data=="" || $data==$Red4Widgets(DRG)} {
+      set Red4Widgets(RG)      [string trim [$Red4Widgets(FS_ENT01) get]]
+      set Red4Widgets(FS_TEFF) [string trim [$Red4Widgets(FS_ENT02) get]]
+      set Red4Widgets(FS_REFW) [string trim [$Red4Widgets(FS_ENT03) get]]
+      set Red4Widgets(FS_YST)  [string trim [$Red4Widgets(FS_ENT04) get]]
+      set Red4Widgets(FS_YEN)  [string trim [$Red4Widgets(FS_ENT05) get]]
+      if {$Red4Widgets(RG)=="" || $Red4Widgets(RG)==$Red4Widgets(DRG)} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4FileStd error : A dataset has not been specified properly!"
       } else {
-        set Red4Widgets(RG) $data
-        $taskname obey file_standard \
-          "grpfile=$data teff=$teff rflambda=$rf whole=F xstart=0 xend=256.0 ystart=$ys yend=$ye oper='OR' mend=T" \
-          -inform "cgs4drInform $taskname %V"
+        set params "grpfile=$Red4Widgets(RG) teff=$Red4Widgets(FS_TEFF) rflambda=$Red4Widgets(FS_REFW) whole=F"
+        set params "${params} xstart=0 xend=256.0 ystart=$Red4Widgets(FS_YST) yend=$Red4Widgets(FS_YEN) oper='OR' mend=T"
+        $taskname obey file_standard "${params}" -inform "cgs4drInform $taskname %V"
       }
     }
 

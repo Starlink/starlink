@@ -4,7 +4,6 @@ proc red4AppMask {taskname} {
 #-
     global env
     global Red4Widgets
-    global Cred4NoticeBoard
 
 # Check to see if task is busy
     set status [cgs4drCheckTask red4]
@@ -24,11 +23,7 @@ proc red4AppMask {taskname} {
     set Red4Widgets(AM_LAB01) [label $top.l1 -text "Mask"]
     set Red4Widgets(AM_ENT01) [entry $top.e1 -width 40]
     pack $Red4Widgets(AM_LAB01) $Red4Widgets(AM_ENT01) -in $top -side left
-    if {[info exists Cred4NoticeBoard]==1} {
-      $Red4Widgets(AM_ENT01) insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.mask]]
-    } else { 
-      $Red4Widgets(AM_ENT01) insert end #
-    }
+    $Red4Widgets(AM_ENT01) insert end $Red4Widgets(MASK)
  
     set Red4Widgets(AM_LAB02) [label $bot.l2 -text "Data"]
     set Red4Widgets(AM_ENT02) [entry $bot.e2 -width 40]
@@ -47,16 +42,15 @@ proc red4AppMask {taskname} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set mask [string trim [$Red4Widgets(AM_ENT01) get]]
-      set data [string trim [$Red4Widgets(AM_ENT02) get]]
-      if {$data=="" || $data==$Red4Widgets(DRO) || $mask=="#"} {
+      set Red4Widgets(MASK) [string trim [$Red4Widgets(AM_ENT01) get]]
+      set Red4Widgets(RO)   [string trim [$Red4Widgets(AM_ENT02) get]]
+      if {$Red4Widgets(RO)=="" || $Red4Widgets(RO)==$Red4Widgets(DRO) || $Red4Widgets(MASK)=="#"} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4AppMask error : A dataset has not been specified properly!"
       } else {
 
-# Remove observation
-        set Red4Widgets(RO) $data
-        $taskname obey apply_mask "mask=$mask data=$data" -inform "cgs4drInform $taskname %V"
+# Apply mask to observation
+        $taskname obey apply_mask "mask=$Red4Widgets(MASK) data=$Red4Widgets(RO)" -inform "cgs4drInform $taskname %V"
       }
     }
 

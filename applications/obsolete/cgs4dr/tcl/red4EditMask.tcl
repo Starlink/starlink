@@ -5,7 +5,6 @@ proc red4EditMask {taskname qval} {
     global env
     global cgs4drBitmaps
     global Red4Widgets
-    global Cred4NoticeBoard
     global P4NoticeBoard
     global P4Task
     global done_cval
@@ -35,11 +34,7 @@ proc red4EditMask {taskname qval} {
     set Red4Widgets(EM_LAB01) [label $top.l1 -text "Mask"]
     set Red4Widgets(EM_ENT01) [entry $top.e1 -width 60]
     pack $Red4Widgets(EM_LAB01) $Red4Widgets(EM_ENT01) -in $top -side left
-    if {[info exists Cred4NoticeBoard]==1} {
-      $Red4Widgets(EM_ENT01) insert end [string trim [nbs get ${Cred4NoticeBoard}.miscellaneous.mask]]
-    } else {
-      $Red4Widgets(EM_ENT01) insert end '#'
-    }
+    $Red4Widgets(EM_ENT01) insert end $Red4Widgets(MASK)
  
     set Red4Widgets(EM_LAB02) [label $bot.l3 -text "Port"]
     set p0 [radiobutton $bot.p0 -bitmap @$cgs4drBitmaps/port0.xbm -variable Red4Widgets(EM_RDISP) -value 0]
@@ -73,12 +68,12 @@ proc red4EditMask {taskname qval} {
     set bv [dialogShow .red4Dialogue .red4Dialogue]
     if {$bv==0} {
       cgs4drCursor watch red white
-      set data [string trim [$Red4Widgets(EM_ENT01) get]]
+      set Red4Widgets(MASK) [string trim [$Red4Widgets(EM_ENT01) get]]
       set port $Red4Widgets(EM_RDISP)
       destroy .red4Dialogue
 
 #   Return if no data specified
-      if {$data=="" || $data=="#"} {
+      if {$Red4Widgets(MASK)=="" || $Red4Widgets(MASK)=="#"} {
         cgs4drClear $taskname
         cgs4drInform $taskname "red4EditMask error : A dataset has not been specified properly!"
         cgs4drCursor arrow green black
@@ -86,10 +81,10 @@ proc red4EditMask {taskname qval} {
       }
 
 #   Display the dataset
-      if {[file exists ${data}*]==0} {set data \$CGS4_MASKS/${data}}
-      cgs4drInform $taskname "Plotting $data in port $port as an image"
+      if {[file exists $Red4Widgets(MASK)*]==0} {set Red4Widgets(MASK) \$CGS4_MASKS/$Red4Widgets(MASK)}
+      cgs4drInform $taskname "Plotting $Red4Widgets(MASK) in port $port as an image"
       nbs put ${P4NoticeBoard}.port_${port}.display_type IMAGE
-      set status [catch {$P4Task obey display "data=$data port=$port" -inform "cgs4drInform $taskname %V"}]
+      set status [catch {$P4Task obey display "data=$Red4Widgets(MASK) port=$port" -inform "cgs4drInform $taskname %V"}]
       if {$status!=0} {
         cgs4drCursor arrow green black
         return
@@ -120,7 +115,7 @@ proc red4EditMask {taskname qval} {
 
 #     Edit the mask
         if {$cursor_status==0} {
-          $taskname obey edit_mask "loop=FALSE mask=$data ipos=$mask_x jpos=$mask_y qval=$qval" -inform "cgs4drInform $taskname %V"
+          $taskname obey edit_mask "loop=FALSE mask=$Red4Widgets(MASK) ipos=$mask_x jpos=$mask_y qval=$qval" -inform "cgs4drInform $taskname %V"
         } else {
           cgs4drInform $taskname "Application terminated by non-zero cursor status"
           set loop_status 1
