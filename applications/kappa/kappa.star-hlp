@@ -2278,7 +2278,7 @@ ERRCLIP     - Removes pixels with large errors from an NDF.
 FFCLEAN     - Removes defects from a substantially flat 1- or
               2-dimensional NDF.
 FILLBAD     - Removes regions of bad values from a 2-dimensional NDF.
-GLITCH      - Replaces bad pixels in a 2-d data array with the local
+GLITCH      - Replaces bad pixels in a 2-dimensional NDF with the local
               median.
 NOMAGIC     - Replaces all occurrences of magic value pixels in an NDF
               array with a new value.
@@ -11672,168 +11672,121 @@ Look at help topic "Hints", and the sub-topics and references
 therein.
 
 1 GLITCH
-    Replaces bad pixels in a 2-d data array with the local median.
- 
-   This application removes bad pixels from a 2-d data array, stored
-   in the input IMAGE structure, and replaces them with the local
-   median of the eight (or less at the edges) neighbouring pixels.
-   At least three defined pixels must be in the neighbourhood,
-   otherwise the resultant pixel becomes bad.
- 
-   There are three modes of use:
- 
-   1. The application can be used interactively until the user is
-      finished cleaning his array. The user specifies the position of
-      `glitches' or bad pixels by their x and y pixel indices.
-   2. The user can give the name of a file which contains a free-
-      format list giving the x and y positions of the pixels to be
-      deglitched. The glitch list file should look like the following
-      example:
- 
-     Glitch list for SBRC FPA#005
-     22  45
-     19  56
-     2   30
-     .   .
-     .   .
-     .   .
-     <EOF>
- 
-      i.e. a header string that is output to the user, followed by
-      integer x-y pixel position pairs, terminated just by the
-      end-of-file marker. The header string is output to the user.
-   3. The bad (undefined/magic) pixels are automatically deglitched.
-      (Edge, especially corner pixels will need checking if the
-      density of bad pixels is high, because of the constraints
-      mentioned above. Such conditions may require a repeat dose of
-      this application, probably with option 1 or 2.)
- 
-   The magic-value method is used for processing bad data.
-2 AUTHORS
-   Mark McCaughrean UoE (REVA::MJM)
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 HISTORY
-   07-06-1985 : Started A-task implementation (REVA::MJM)
-   28-06-1985 : Changed to continually update the input array
-              : until no more deglitching done, then followed
-              : by request for output array, and copying over.
-              : (REVA::MJM)
-   09-12-1985 : Fixed error checking bug and implemented AIF
-              : dynamic defaulting/checking calls (UKTH::MARK)
-   11-12-1985 : Fixed bug caused by continuous updating of read
-              : only array - changed program order (UKTH::MARK)
-   11-04-1986 : Tidied up and increased error checking (REVA::MJM)
-   24-06-1986 : Included option to deglitch from a free-format list
-              : in a file (REVA::MJM)
-   1986 Aug 5 : Renamed algorithm subroutines (GLTCLT and GLTCSB).
-                Correctly ordered arguments in GLTCLT (2nd to 3rd)
-                and GLTCSB (2nd to 4th) (RAL::CUR).
-   1986 Aug 29: Added arguments section to the prologue, nearly
-                conformed to Starlink standards (RAL::CUR).
-   1987 Oct 15: Reordered tidying and extra status check
-                (RAL::CUR).
-   1988 Mar 17: Referred to `array' rather than `image'. Added
-                automatic removal of bad pixels (RAL::CUR).
-   1988 Jun 6 : More reporting of error context (RAL::CUR)
-   1988 Jun 30: Obtain filename in GLTCLT (RAL::CUR).
-   1989 Jun 13: Allow for processing primitive NDFs (RAL::CUR)
-   1989 Jul 27: Passed array dimensions as separate variables
-                to COPY2D, GLTBSB, GLTCLT and GLTCSB (RAL::CUR).
-   1991 Oct 25: Propagates AXIS, HISTORY, LABEL, and UNITS
-                (RAL::CUR).
-   1992 Feb 25: Limited processing of simple NDFs (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   INPIC  =  IMAGE( READ )
-       IMAGE structure containing the 2-d data array to be
-         deglitched.
-   OUTPIC  =  IMAGE( WRITE )
-       Output IMAGE structure containing the deglitched version of
-         the data array.
-   OTITLE  =  CHAR( READ )
-       Title for the output IMAGE structure.
-   WHERE  =  CHAR( READ )
-       Source of glitch positions: 'Interface' or 'File' or 'Bad'.
-   FILENAME  =  CHAR( READ )
-       File containing the free-format glitch list.
-   XCOORD  =  INTEGER( READ )
-       x pixel index of the pixel to be deglitched.
-   YCOORD  =  INTEGER( READ )
-       y pixel index of the pixel to be deglitched.
-   AGAIN  =  LOGICAL( READ )
-       Whether or not user is prompted for another pixel.
-3 INPIC
-  position    1
-  keyword     'INPIC'
-  type        'IMAGE'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'GLOBAL'
-  association '<-GLOBAL.DATA_ARRAY'
-  prompt      'Image to be deglitched'
-  help        'Name of the IMAGE structure containing the 2-d data 
-              array to be deglitched.'
-3 OUTPIC
-  position    2
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Image after being deglitched'
-  help        'Name given to the IMAGE structure to hold the data 
-              array after being deglitched.'
-3 OTITLE
-  position    3
-  keyword     'OTITLE'
-  type        'LITERAL'
-  vpath       'DEFAULT'
-  prompt      'Title for output image'
-  default     'KAPPA - Glitch'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
-3 WHERE
-  keyword     'WHERE'
-  type        'LITERAL'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Source of glitch positions'
-  help        'File for free-format file list, Interface for input
-              from environment, Bad for automatic removal of bad
-              (magic) pixels.'
- #in          'File', 'Interface', 'Bad'
-3 FILENAME
-  keyword     'FILENAME'
-  type        'FILENAME'
-  vpath       'PROMPT'
-  ppath       'DEFAULT'
-  prompt      'Glitch list file name'
-  default     GLITCH.LIS
-  help        'Give the name of the free-format file containing x,y 
-              positions of pixels.'
-3 XCOORD
-  keyword     'XCOORD'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'x pixel index of pixel to be replaced'
-  help        'Give the x pixel index of the pixel to be deglitched.'
-3 YCOORD
-  keyword     'YCOORD'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'y pixel index of pixel to be replaced'
-  help        'Give the y pixel index of the pixel to be deglitched.'
-3 AGAIN
-  keyword     'AGAIN'
-  type        '_LOGICAL'
-  vpath       'PROMPT'
-  ppath       'DEFAULT'
-  prompt      'Another pixel ?'
-  default     YES
-  help        'Whether or not another pixel is to be deglitched.'
+Replaces bad pixels in a 2-d NDF with the local median
+
+Usage:
+
+   glitch in out [title]
+
+Description:
+
+   This routine removes bad pixels from a 2-d NDF, replacing them with
+   the median of the eight (or less at the edges) neighbouring pixels.
+   At least three of these eight neighbouring pixels must have good
+   values (that is, they must not set to the bad value) otherwise the
+   resultant pixel becomes bad.
+
+   The positions of the pixels to be removed can be supplied in four
+   ways (see parameter MODE):
+
+   - In response to parameter prompts. A single bad pixel position is
+   supplied at each prompt, and the user is re-prompted until a null value
+   is supplied.
+
+   - Within a positions list such as produced by applications CURSOR,
+   LISTMAKE, etc.
+
+   - Within a simple text file. Each line contains the position of a
+   pixel to be replaced.
+
+   - Alternatively, each bad pixel in the input NDF can be used
+   (subject to the above requirement that at least three out of the
+   eight neighbouring pixels are not bad).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN  =  NDF (Read)
+   The input image.
+3 INCAT
+INCAT = FILENAME (Read)
+   A catalogue containing a positions list giving the pixels
+   to be replaced, such as produced by applications CURSOR, LISTMAKE,
+   etc. Only accessed if parameter MODE is given the value "Catalogue".
+3 INFILE
+INFILE = FILENAME (Read)
+   The name of a text file containing the positions of the pixels
+   to be replaced. The positions should be given in the current
+   co-ordinate Frame of the input NDF, one per line. Spaces or
+   commas can be used as delimiters between axis values. The file
+   may contain comment lines with the first character # or !. This
+   parameter is  only used if parameter MODE is set to "File".
+3 MODE
+MODE =  LITERAL (Read)
+   The method used to obtain the positions of the pixels to be
+   replaced. The supplied string can be one of the following:
+
+   - "Bad": The bad pixels in the input NDF are used.
+
+   - "Catalogue": positions are obtained from a positions list
+      using parameter INCAT.
+
+   - "File": The pixel positions are read from a text file specified
+      by parameter INFILE.
+
+   - "Interface": The position of each pixel is obtained using
+      parameter PIXPOS. The number of positions supplied must not
+      exceed 200.
+
+   [current value]
+3 OUT
+OUT  =  NDF (Write)
+   The output image.
+3 PIXPOS
+PIXPOS = LITERAL (Read)
+   The position of a pixel to be replaced, in the current
+   co-ordinate Frame of the input NDF. Axis values should be
+   separated by spaces or commas. This parameter is only used if
+   parameter MODE is set to "Interface". If a value is supplied on
+   the command line, then the application exits after processing the
+   single specified pixel. Otherwise, the application loops to
+   obtain multiple pixels to replace, until a null (!) value is
+   supplied. Entering a colon (":") will result in a description of
+   the required co-ordinate Frame being displayed, followed by a
+   prompt for a new value.
+3 TITLE
+TITLE  =  LITERAL (Read)
+   Title for the output image.  A null value (!) propagates the title
+   from the input image to the output image. [!]
+2 Examples
+glitch m51 cleaned mode=cat incat=badpix.FIT
+   Reads pixel positions from the positions list stored in the FITS
+   file badpix.FIT, and replaces the corresponding pixels in the
+   2-d NDF m51.sdf by the median of the surrounding neighbouring
+   pixels. The cleaned image is written to cleaned.sdf.
+2 Notes
+-  If the current co-ordinate Frame of the input NDF is not PIXEL,
+then the supplied positions are first mapped into the PIXEL Frame
+before being used.
+2 Related_Applications
+   KAPPA: ARDMASK, CHPIX, FILLBAD, ZAPLIN, NOMAGIC, SEGMENT,
+   SETMAGIC; Figaro: CSET, ICSET, NCSET, TIPPEX.
+2 Authors
+DSB: David S. Berry (STARLINK)
+2 History
+ 7-MAY-2000 (DSB):
+    First NDF version.
+2 Implementation_Status
+   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
+   input NDF and propagates all extensions.
+
+   -  Processing of bad pixels and automatic quality masking are
+   supported.
+
+   -  Only single and double precision floating point data can be
+   processed directly. All integer data will be converted to floating
+   point before being processed.
+
 1 GLOBALS
 Displays the values of the KAPPA global parameters.
 
@@ -29742,8 +29695,7 @@ GDCLEAR     - Clears a graphics device and purges its database
 GDNAMES     - Shows which graphics devices are available.
 GDSET       - Selects a current graphics device.
 GDSTATE     - Shows the current status of a graphics device.
-GLITCH      - Replaces bad pixels in a 2-d data array with the local
-              median.
+GLITCH      - Replaces bad pixels in a 2-d NDF with the local median.
 GLOBALS     - Displays the values of the KAPPA global parameters.
 GREYPLOT    - Produces a greyscale plot of a 1-d or 2-d NDF.
 HISCOM      - Adds commentary to the history of an NDF.
@@ -32846,37 +32798,41 @@ TR( ) = _DOUBLE (Read)
 
          W = TR(9) + TR(10)*X + TR(11)*Y + TR(12)*Z
 
-   If a null value (!) is given it is assumed that the pixel co-ordinates
-   of a given feature are identical in the two NDFs. [!]
+   If a null value (!) is given it is assumed that the pixel
+   co-ordinates of a given feature are identical in the two
+   NDFs. [!]
 2 Examples
+
 wcscopy m51_sim m51
-   This copies the WCS component from the NDF called m51 to the NDF
-   called m51_sim, which may hold the results of a numerical simulation
-   for instance. It is assumed that the two NDFs are aligned (i.e. the
-   pixel co-ordinates of any feature are the same in both NDFs).
+   This copies the WCS component from the NDF called m51 to the
+   NDF called m51_sim, which may hold the results of a
+   numerical simulation for instance. It is assumed that the
+   two NDFs are aligned (i.e. the pixel co-ordinates of any
+   feature are the same in both NDFs).
 
 wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
-   This example assumes that the application SQORST has previously
-   been used to change the size of a 2-dimensional NDF called m51,
-   producing a new NDF called m51_sqorst. Since SQORST has not yet
-   been updated to support the full NDF structure, the output NDF
-   m51_sqorst will not have a WCS component. More than this, SQORST
-   also throws away the pixel origin information, effectively
-   resetting the output origin to (1,1). This example shows how
-   WCSCOPY can be used to rectify this by copying the WCS component
-   from the original NDF m51 to the squashed NDF m51_sqorst,
-   modifying it in the process to take account of both the
-   squashing and the resetting of the pixel origin produced by
-   sqorst. To do this, you need to work out the transformation in
-   pixel co-ordinates produced by SQORST, and specify this when
-   running WCSCOPY using the TR parameter. Let's assume the first
-   axis of NDF m51 has pixel index bounds of I1:I2 (these values
-   can be found using NDFTRACE). If the first axis in the squashed
-   NDF m51_sqorst spans M pixels (where M is the value assigned to
-   SQORST parameter XDIM), then it will have pixel index bounds of
-   1:M. Note, the lower bound is 1 since the pixel origin has been
-   reset by SQORST. The squashing factor for the first axis is
-   then:
+   This example assumes that the application SQORST has
+   previously been used to change the size of a 2-dimensional
+   NDF called m51, producing a new NDF called m51_sqorst. Since
+   SQORST has not yet been updated to support the full NDF
+   structure, the output NDF m51_sqorst will not have a WCS
+   component. More than this, SQORST also throws away the pixel
+   origin information, effectively resetting the output origin
+   to (1,1). This example shows how WCSCOPY can be used to
+   rectify this by copying the WCS component from the original
+   NDF m51 to the squashed NDF m51_sqorst, modifying it in the
+   process to take account of both the squashing and the
+   resetting of the pixel origin produced by sqorst. To do
+   this, you need to work out the transformation in pixel
+   co-ordinates produced by SQORST, and specify this when
+   running WCSCOPY using the TR parameter. Let's assume the
+   first axis of NDF m51 has pixel index bounds of I1:I2 (these
+   values can be found using NDFTRACE). If the first axis in
+   the squashed NDF m51_sqorst spans M pixels (where M is the
+   value assigned to SQORST parameter XDIM), then it will have
+   pixel index bounds of 1:M. Note, the lower bound is 1 since
+   the pixel origin has been reset by SQORST. The squashing
+   factor for the first axis is then:
 
     FX = M/(I2 - I1 + 1)
 
@@ -32884,9 +32840,9 @@ wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
 
     SX = FX*( 1 - I1 )
 
-   Likewise, if the bounds of the second axis in m51 are J1:J2, and
-   SQORST parameter YDIM is set to N, then the squashing factor for
-   the second axis is:
+   Likewise, if the bounds of the second axis in m51 are J1:J2,
+   and SQORST parameter YDIM is set to N, then the squashing
+   factor for the second axis is:
 
     FY = N/(J2 - J1 + 1)
 
@@ -32894,39 +32850,40 @@ wcscopy m51_sqorst m51 [125,0.5,0.0,125,0.0,0.5]
 
     SY = FY*( 1 - J1 )
 
-   You would then use the following values for parameter TR when
-   running WCSCOPY:
+   You would then use the following values for parameter TR
+   when running WCSCOPY:
 
     TR = [SX, FX, 0.0, SY, 0.0, FY]
 
-   Note, the zero terms indicate that the axes are independent (i.e.
-   there is no rotation of the image). The numerical values in the
-   example are for an image with pixel index bounds of 52:251 on both
-   axes which was squashed by SQORST to produce an image with 100 pixels
-   on each axis.
+   Note, the zero terms indicate that the axes are independent
+   (i.e. there is no rotation of the image). The numerical
+   values in the example are for an image with pixel index
+   bounds of 52:251 on both axes which was squashed by SQORST
+   to produce an image with 100 pixels on each axis.
 
-wcscopy m51_glitch m51 [-51,1,0,-51,0,1]
-   The application GLITCH has been used to replace bad pixels in a
-   2-dimensional NDF called m51, producing a new NDF called
-   m51_glitch. Since GLITCH has not yet been updated to support the
-   full NDF structure, the output NDF m51_glitch will not have a WCS
-   component. More than this, GLITCH also throws away the pixel origin
-   information, effectively resetting the output origin to (1,1). You
-   can use WCSCOPY to rectify this by copying the WCS component from
-   the original NDF m51 to the de-glitched NDF m51_glitch, modifying it
-   in the process to take account of the resetting of the pixel origin
-   produced by GLITCH. To do this, you to work out the transformation
-   in pixel co-ordinates produced by GLITCH, and specify this when
-   running WCSCOPY using the TR parameter. Let's assume the first axis
-   of NDF m51 has pixel index bounds of I1:I2 (these values can be
-   found using NDFTRACE). GLITCH will produce an image with the
-   same number of pixels along the axis but the first pixel will have
-   index 1 instead of I1. Thus the shift in the pixel origin is:
+wcscopy m51_pow m51 [-51,1,0,-51,0,1]
+   The application POW has been used process a 2-dimensional
+   NDF called m51, producing a new NDF called m51_pow. Since
+   POW has not yet been updated to support the full NDF
+   structure, the output NDF m51_pow will not have a WCS
+   component. More than this, POW also throws away the pixel
+   origin information, effectively resetting the output origin
+   to (1,1). You can use WCSCOPY to rectify this by copying the
+   WCS component from the original NDF m51 to the processed NDF
+   m51_pow, modifying it in the process to take account of the
+   resetting of the pixel origin produced by POW. To do this,
+   you to work out the transformation in pixel co-ordinates
+   produced by POW, and specify this when running WCSCOPY using
+   the TR parameter. Let's assume the first axis of NDF m51 has
+   pixel index bounds of I1:I2 (these values can be found using
+   NDFTRACE). POW will produce an image with the same number of
+   pixels along the axis but the first pixel will have index 1
+   instead of I1. Thus the shift in the pixel origin is:
 
     SX = ( 1 - I1 )
 
    Likewise, the first pixel on the second axis will be reset to 1
-   by GLITCH, and so if the bounds of the second axis in m51 are J1:J2,
+   by POW, and so if the bounds of the second axis in m51 are J1:J2,
    the shift in the pixel origin for the second axis is:
 
     SY = ( 1 - J1 )
