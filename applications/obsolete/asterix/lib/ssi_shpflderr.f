@@ -116,6 +116,8 @@
       CALL DAT__ANULL( FLOC, STATUS )
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'SSI_SHPFLDERR', STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL AST_REXIT( 'SSI_SHPFLDERR', STATUS )
+      END IF
 
       END
