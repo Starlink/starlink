@@ -159,8 +159,7 @@
         CALL SFIT_GETZ( Z, STATUS )
 
 * Output dataset
-	CALL USI_DCREAT('OUT','SPECTRUM',0,0,STATUS)
-	CALL USI_DASSOC('OUT','WRITE',OLOC,STATUS)
+        CALL USI_ASSOCO( 'OUT', 'SPECTRUM', OLOC, STATUS )
 	IF(STATUS.NE.SAI__OK) GO TO 9000
 
 * Set up the only OBDAT component needed (no. of channels, taken from response)

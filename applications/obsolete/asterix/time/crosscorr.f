@@ -78,7 +78,6 @@
       INTEGER                ZVPTR           ! Pointer to Z variance array
       INTEGER                ZQPTR           ! Pointer to Z quality array
       INTEGER                XCPTR           ! Pointer to cross-correln values
-      INTEGER                LAGPTR          ! Pointer to array of lags
       INTEGER                NY              ! No. of points in Y array
       INTEGER                NZ              ! No. of points in Z array
       INTEGER                ND              ! No. of data points used
@@ -87,7 +86,6 @@
       INTEGER                NDIM            ! Dimensionality of data
       INTEGER                NBAD            ! No.of bad quality data
       INTEGER                NVAL            ! No.of values
-      INTEGER                NMAP            ! No.of values mapped
       INTEGER                BASEFILE        ! File # from which MORE/HIST taken
       INTEGER                QNDIM           ! Dimensionality of quality
       INTEGER                QDIM(ADI__MXDIM)! Quality dimensions
@@ -100,7 +98,6 @@
 
       LOGICAL                ANYBAD          ! Any bad quality points at all?
       LOGICAL                DENOISE         ! Noise variance removed?
-      LOGICAL                LOG
       LOGICAL                OK              ! Present & correct?
       LOGICAL                VARS            ! Variances available?
       LOGICAL                WEIGHT          ! Weighted cross-correlation?
