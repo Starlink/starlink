@@ -148,13 +148,13 @@ world: $(ALL_TARGETS)
 # componentset.xml here and remake Makefile.dependencies.
 #
 Makefile.dependencies:
-	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
-	echo '<componentset>' >>$@
+	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >componentset.xml
+	echo '<componentset>' >>componentset.xml
 	find . -name component.xml | sort | { \
 	    while read cname; do \
-		sed -e '/^<?/d' -e '/^<!DOCTYPE/d' $$cname >>$@; \
+		sed -e '/^<?/d' -e '/^<!DOCTYPE/d' $$cname >>componentset.xml; \
 	    done; }
-	echo '</componentset>' >>$@
+	echo '</componentset>' >>componentset.xml
 	if test $(JAVA) != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
 	    (cd buildsupport/starconf/java \
 	        && $(MAKE) GenerateDependencies.class) \
