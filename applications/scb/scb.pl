@@ -89,6 +89,9 @@
 #     run-time values of certain environment variables, as documented
 #     in the module Scb.pm.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -335,6 +338,9 @@ sub parse_args {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -425,6 +431,9 @@ sub query_form {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -535,6 +544,9 @@ sub package_list {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -775,6 +787,9 @@ sub search_keys {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -908,6 +923,9 @@ sub quasialph {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -964,6 +982,9 @@ sub get_module {
 #        True if file successfully located and output, else false.
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1086,6 +1107,9 @@ sub extract_file {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -1186,6 +1210,9 @@ sub output {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1414,6 +1441,9 @@ sub docurl {
 #     up this simply returns a reference to the document at HTX server
 #     at RAL.  Since a local copy probably exists, this is rather wasteful.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -1468,6 +1498,9 @@ sub tidyup {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1524,6 +1557,9 @@ sub error {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1601,6 +1637,9 @@ sub header {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -1661,6 +1700,9 @@ sub footer {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -1714,6 +1756,9 @@ sub mimetype {
 #  Notes:
 #     Subject of course to the completeness of the $mimetypes_file; these
 #     are not always very complete, especially on older systems.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1798,6 +1843,9 @@ sub demeta {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -1862,6 +1910,9 @@ sub hprint {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)

@@ -95,6 +95,9 @@ package StarIndex;
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -145,6 +148,9 @@ sub new {
 #     $index = StarIndex object.
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -214,6 +220,9 @@ sub finish {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -276,6 +285,9 @@ sub get {
 #     Location of the requested key (a virtual pathname).
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -357,6 +369,9 @@ sub tarlevel {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -408,6 +423,9 @@ sub put {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -498,6 +516,9 @@ sub delete {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -608,6 +629,9 @@ sub each {
 #     using NDBM_File, this seems to cause problems.  The 'delpack' 
 #     method is supplied instead for this purpose.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -694,6 +718,9 @@ sub delpack {
 #     doesn't seem to like mixing the each() and delete() functions.  
 #     Thus it is implemented here by separately assembling the list of 
 #     entries to delete and deleting them all at once.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)

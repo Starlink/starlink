@@ -85,6 +85,9 @@
 #     run-time values of certain environment variables, as documented
 #     in the module Scb.pm.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -141,6 +144,7 @@ $SIG{'INT'} = sub {tidyup; exit;};
 #  Initialise index objects.
 
 my $fmode = @ARGV ? 'update' : 'new';
+
 $func_index = StarIndex->new($func_indexfile, $fmode);
 $file_index = StarIndex->new($file_indexfile, $fmode);
 
@@ -241,6 +245,9 @@ sub index_pack {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -373,6 +380,9 @@ sub index_list {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -440,6 +450,9 @@ sub index_dir {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -502,6 +515,9 @@ sub index_tar {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -580,6 +596,9 @@ sub index_source {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -669,6 +688,9 @@ sub index_hlp {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -751,6 +773,9 @@ sub index_includes {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -810,6 +835,9 @@ sub write_entry {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -874,6 +902,9 @@ sub index_files {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -944,6 +975,9 @@ sub uniq {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -993,6 +1027,9 @@ sub tidyup {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -1045,6 +1082,9 @@ sub error {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)

@@ -32,6 +32,9 @@ package Scb;
 #
 #        sub error { die @_ }
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -220,6 +223,9 @@ sub tarxf {
 #     files is generated in a separate step from doing the extraction
 #     itself.  This may be somewhat wasteful.
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -307,6 +313,9 @@ sub starpack {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -376,6 +385,9 @@ sub rmrf {
 #     If an exception is generated, it is handled using die() rather
 #     than error(), since this routine may be called by error, and
 #     we don't want to get into an infinite loop.
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -451,6 +463,9 @@ sub pushd {
 
 #  Notes:
 
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
 #     {enter_new_authors_here}
@@ -503,6 +518,9 @@ sub popd {
 #  Return value:
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
@@ -584,6 +602,9 @@ sub parsetag {
 #        Parsed content of tag.  See above.
 
 #  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
