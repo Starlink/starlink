@@ -1,0 +1,8 @@
+The names used in GAIA are a bit odd. Originally GAIA was based on RTD
+and I didn't know what it would eventually be called. So some parts
+where called "Star..." and some "rtd...". Now that GAIA is called GAIA
+and is really based on Skycat (which is based on RTD), I intend to
+change all the names so that RTD and Star are replaced by GAIA, but
+only when routines are modified, so this may take sometime.
+
+Peter Draper (07-JAN-2000)
