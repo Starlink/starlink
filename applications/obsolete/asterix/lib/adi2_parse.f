@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_PARSE( FSPEC, LFILEC, HDU, KEYWRD, STATUS )
+      SUBROUTINE ADI2_PARSE( FSPEC, LFILEC, HDU, FPATH, FPLEN, STATUS )
 *+
 *  Name:
 *     ADI2_PARSE
@@ -10,7 +10,7 @@
 *     Fortran
 
 *  Invocation:
-*     CALL ADI2_PARSE( FSPEC, LFILEC, HDU, KEYWRD, STATUS )
+*     CALL ADI2_PARSE( FSPEC, LFILEC, HDU, FPATH, STATUS )
 
 *  Description:
 *     Attempts to open the named file object as an HDS file. If successful
@@ -24,8 +24,10 @@
 *        Index of last character in filemname proper
 *     HDU = INTEGER (Returned)
 *        HDU number, zero if none
-*     KEYWRD = CHAR (Returned)
-*        File access mode
+*     FPATH = CHARACTER*(*) (Returned)
+*        Sub-file path
+*     FPLEN = INTEGER
+*        Length of FPATH, or zero if none (Returned)
 *     STATUS = INTEGER (Given and returned)
 *        The global status.
 
@@ -51,12 +53,6 @@
 
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
-
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
 
 *  References:
 *     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
@@ -91,9 +87,8 @@
       CHARACTER*(*)		FSPEC
 
 *  Arguments Returned:
-      INTEGER			LFILEC
-      INTEGER			HDU
-      CHARACTER*(*)		KEYWRD
+      INTEGER			LFILEC, HDU, FPLEN
+      CHARACTER*(*)		FPATH
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -101,106 +96,109 @@
 *  External references:
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
+      EXTERNAL			CHR_ISDIG
+        LOGICAL			CHR_ISDIG
 
 *  Local Variables:
-      INTEGER                   CIP			! Position of ^
       INTEGER			FLEN			! Length of FSPEC
       INTEGER                   ICP			! Character index
       INTEGER                   NCP			! Character index
 *.
 
-*    Check inherited global status.
+*  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Length of FSPEC
+*  Length of FSPEC
       FLEN = CHR_LEN( FSPEC )
 
-*    Look for % delimiter, so that trailing representation can be ignored
+*  Look for % delimiter, so that trailing representation can be ignored
       ICP = FLEN
       DO WHILE ( (ICP.GT.0) .AND. (FSPEC(ICP:ICP).NE.'%') )
         ICP = ICP - 1
       END DO
       IF ( ICP .NE. 0 ) FLEN = ICP - 1
 
-*    Default values
+*  Default values
       LFILEC = FLEN
       HDU = 0
-      KEYWRD = ' '
+      FPLEN = 0
 
-*    HDU delimiter present?
+*  HDU delimiter present?
       ICP = INDEX( FSPEC, '[' )
       IF ( ICP .EQ. 0 ) THEN
         ICP = INDEX( FSPEC, '+' )
-      END IF
+        IF ( ICP .GT. 0 ) THEN
 
-*    Keyword delimiter present?
-      CIP = INDEX( FSPEC, '^' )
+*      Skip over digits of HDU number
+          ICP = ICP + 1
+          NCP = ICP
+          DO WHILE ( CHR_ISDIG( FSPEC(NCP:NCP) ) )
+            NCP = NCP + 1
+          END DO
+          NCP = NCP - 1
 
-*    Delimiter present, but in illegal position
-      IF ( (ICP .EQ. 1) .OR. (ICP.GE.FLEN) ) THEN
-        STATUS = SAI__ERROR
-        CALL ERR_REP( ' ', 'Illegal FITS filename specification',
-     :                STATUS )
-
-*    Does filename contain HDU specification?
-      ELSE IF ( ICP .GT. 1 ) THEN
-
-*      Adjust last filename character if HDU spec found
-        LFILEC = ICP - 1
-
-*      HDU bracketed syntax?
-        IF ( FSPEC(ICP:ICP) .EQ. '[' ) THEN
-
-*        Look for closing bracket
-          NCP = INDEX(FSPEC(ICP:),']')
-
-*        Not found?
-          IF ( NCP .EQ. 0 ) THEN
+*      If no digits signal error
+          IF ( NCP .LT. ICP ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Missing "]" in HDU extension '/
+            CALL ERR_REP( ' ', 'Missing HDU number in extension '/
      :                    /'specification', STATUS )
-
-          ELSE IF ( NCP .EQ. 2 ) THEN
-            STATUS = SAI__ERROR
-            CALL ERR_REP( ' ', 'Empty HDU extension '/
-     :                    /'specification', STATUS )
-
-          ELSE
-            NCP = ICP + NCP - 1
-            CALL CHR_CTOI( FSPEC(ICP+1:NCP-1), HDU, STATUS )
-            IF ( (STATUS .NE. SAI__OK) .OR. (HDU.LT.1) ) THEN
-              CALL MSG_SETC( 'NUM', FSPEC(ICP+1:NCP-1) )
-              CALL ERR_REP( ' ', 'Illegal HDU number /^NUM/', STATUS )
-            END IF
-
-          END IF
-
-*      Incremental syntax
-        ELSE
-
-*        The HDU number in incremental syntax is delimited to the right
-*        by either the end of the string, or the beginning of a keyword
-*        name.
-          NCP = CIP
-          IF ( NCP .EQ. 0 ) THEN
-            NCP = FLEN
-          ELSE
-            NCP = NCP - 1
-          END IF
-          CALL CHR_CTOI( FSPEC(ICP+1:NCP), HDU, STATUS )
-          IF ( (STATUS .NE. SAI__OK) .OR. (HDU.LT.1) ) THEN
-            CALL MSG_SETC( 'NUM', FSPEC(ICP+1:NCP) )
-            CALL ERR_REP( ' ', 'Illegal HDU number /^NUM/', STATUS )
           END IF
 
         END IF
 
-      END IF
+      ELSE
+        ICP = ICP + 1
+        NCP = INDEX( FSPEC, ']' )
+        IF ( NCP .EQ. 0 ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Missing "]" in HDU extension '/
+     :                  /'specification', STATUS )
 
-*    Look for keyword specification
-      IF ( (STATUS .EQ. SAI__OK) .AND. (CIP.GT.0) ) THEN
-        KEYWRD = FSPEC(CIP+1:)
-        LFILEC = MIN(LFILEC,CIP-1)
+        ELSE IF ( NCP .LE. ICP ) THEN
+          STATUS = SAI__ERROR
+          CALL ERR_REP( ' ', 'Misplaced "]" in HDU extension '/
+     :                  /'specification', STATUS )
+
+        ELSE
+          NCP = NCP - 1
+
+        END IF
+
       END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Sub-HDU structure may only appear after an HDU specification. NCP marks
+*  the last character of the HDU specification
+      IF ( ICP .GT. 0 ) THEN
+
+*    Last character in the filename proper
+        LFILEC = ICP - 2
+
+*    Extract HDU number
+        CALL CHR_CTOI( FSPEC(ICP:NCP), HDU, STATUS )
+        IF ( (STATUS .NE. SAI__OK) .OR. (HDU.LT.1) ) THEN
+          CALL MSG_SETC( 'NUM', FSPEC(ICP+1:NCP) )
+          CALL ERR_REP( ' ', 'Illegal HDU number /^NUM/', STATUS )
+        END IF
+
+*    Encode the HDU number into FPATH
+        CALL CHR_ITOC( HDU, FPATH(2:), FPLEN )
+        FPATH(1:1) = '+'
+        FPLEN = FPLEN + 1
+
+*    Remaining text after end of HDU spec?
+        IF ( FSPEC(NCP+1:NCP+1) .EQ. ']' ) THEN
+          FPATH(FPLEN+1:) = FSPEC(NCP+2:FLEN)
+          FPLEN = FPLEN + FLEN - NCP - 1
+        ELSE
+          FPATH(FPLEN+1:) = FSPEC(NCP+1:FLEN)
+          FPLEN = FPLEN + FLEN - NCP
+        END IF
+
+      END IF
+      IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Look for sub-file specification
+ 99   CONTINUE
 
       END

@@ -266,12 +266,12 @@
       ENDIF
 *
 *   Put SORT box into output files
-      CALL XRTSORT_WRISORT(LOCS, SRT, STATUS)
+      CALL XRTSORT_WRISORT(SID, SRT, STATUS)
 *
 
 *   Background sort box
       IF (SRT.BCKGND) THEN
-         CALL XRTSORT_WRISORT(LOCB, BSRT, STATUS)
+         CALL XRTSORT_WRISORT(BID, BSRT, STATUS)
       ENDIF
 
 *   History
@@ -3853,157 +3853,67 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
 
 
 
-*+XRTSORT_WRISORT    Writes the sorting conditions into a SORT box.
-      SUBROUTINE XRTSORT_WRISORT(LOC, ASRT, STATUS)
+*+XRTSORT_WRISORT    Writes the sorting conditions into selection structure
+      SUBROUTINE XRTSORT_WRISORT(ID, ASRT, STATUS)
 *    Description :
-*      Writes the sorting conditions used to produce the binned dataset into
-*     a .SORT box which it creates.
-*    Deficiencies :
 *    Bugs :
 *    Authors :
-*     R.D.Saxton   (LTVAD::RDS)
-*    History :
-*     7-Jul-1990           original  (LTVAD::RDS)
-*    17-Apr-1991           changed to handle just one sort box  (LTVAD::RDS)
-*    26-Apr-1991           spatial sort completely revised
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
 *    Global variables :
       INCLUDE 'INC_XRTSRT'
 *    Import :
-      CHARACTER*(DAT__SZLOC) LOC       ! Locator to file
+      INTEGER ID		       ! ID of file
 *
       RECORD /XRT_SCFDEF/ ASRT         ! Sort block for file
 *    Status :
       INTEGER STATUS
 *    Local constants :
-      REAL RTOD
-            PARAMETER (RTOD = 180.0 / 3.1415493)
 *    Local variables :
-      CHARACTER*(DAT__SZLOC) ILOC,LOCS,LOCSS,LOCSC
-      CHARACTER*(DAT__SZLOC) LOCX,LOCXC,LOCY,LOCYC
-      CHARACTER*(DAT__SZLOC) LOCT,LOCTC,LOCP,LOCPC
+      INTEGER SID
 *-
       IF (STATUS .NE. SAI__OK) RETURN
-*
-* Create SORT extension in file
-      CALL BDA_LOCINSTR(LOC, ILOC, STATUS)
-      CALL DAT_NEW(ILOC,'SORT','EXTN',0,0,STATUS)
-      CALL DAT_FIND(ILOC,'SORT',LOCS,STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error creating SORT extension',STATUS)
-         GOTO 999
-      ENDIF
-*
-* Create spatial box
-      CALL DAT_NEW(LOCS,'SPACE','SPACE',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'SPACE',LOCSS,STATUS)
-      CALL DAT_CELL(LOCSS,1,1,LOCSC,STATUS)
-*
-* Write shape element
-      CALL HDX_PUTC(LOCSC,'SHAPE',1,ASRT.SHAPE,STATUS)
-*
-* Write orientation
-      CALL HDX_PUTR(LOCSC,'PHI',1,ASRT.PHI*RTOD,STATUS)
-*
-* Write X and Y centre
-      CALL HDX_PUTR(LOCSC,'XCENT',1,ASRT.XCENT,STATUS)
-      CALL HDX_PUTR(LOCSC,'YCENT',1,ASRT.YCENT,STATUS)
-*
-* Write X and Y axis min and max radii. NB: This applies to every shape in
-* our limited book, i.e. rectangles,circles,annuli and ellipses
-      CALL HDX_PUTR(LOCSC,'XINNER',1,ASRT.ELAMIN * ASRT.PTOD,STATUS)
-      CALL HDX_PUTR(LOCSC,'XOUTER',1,ASRT.ELAMAX * ASRT.PTOD,STATUS)
-      CALL HDX_PUTR(LOCSC,'YINNER',1,ASRT.ELBMIN * ASRT.PTOD,STATUS)
-      CALL HDX_PUTR(LOCSC,'YOUTER',1,ASRT.ELBMAX * ASRT.PTOD,STATUS)
-*
-      CALL DAT_ANNUL(LOCSC, STATUS)
-      CALL DAT_ANNUL(LOCSS, STATUS)
-*
-* Check spatial region was written ok.
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error writing X and Y sort ranges',STATUS)
-         GOTO 999
-      ENDIF
 
-* Create X detector element and write it
-      CALL DAT_NEW(LOCS,'XDET','XDET',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'XDET',LOCX,STATUS)
+*  write spatial selection
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTARD(SID,'Spatial',ASRT.ARDID,STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
 
-      CALL DAT_CELL(LOCX,1,1,LOCXC,STATUS)
-      CALL HDX_PUTI(LOCXC,'START',1,ASRT.MIN_XD,STATUS)
-      CALL HDX_PUTI(LOCXC,'STOP',1,ASRT.MAX_XD,STATUS)
-*
-      CALL DAT_ANNUL(LOCXC, STATUS)
-      CALL DAT_ANNUL(LOCX, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error writing X det. sort range',STATUS)
-         GOTO 999
-      ENDIF
 
-* Create Y element and write it
-      CALL DAT_NEW(LOCS,'YDET','YDET',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'YDET',LOCY,STATUS)
+*  write detector coordinate selection
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'XDetector',1,ASRT.MIN_XD,ASRT.MAX_XD,
+     :                                                     STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'YDetector',1,ASRT.MIN_YD,ASRT.MAX_YD,
+     :                                                     STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
 
-      CALL DAT_CELL(LOCY,1,1,LOCYC,STATUS)
-      CALL HDX_PUTI(LOCYC,'START',1,ASRT.MIN_YD,STATUS)
-      CALL HDX_PUTI(LOCYC,'STOP',1,ASRT.MAX_YD,STATUS)
-*
-      CALL DAT_ANNUL(LOCYC, STATUS)
-      CALL DAT_ANNUL(LOCY, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL ERR_REP(' ','Error writing Y det. sort range',STATUS)
-         GOTO 999
-      ENDIF
 
-* Create Time element and write it
-      CALL DAT_NEW(LOCS,'TIME','TIME',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'TIME',LOCT,STATUS)
-*
-      CALL DAT_CELL(LOCT,1,1,LOCTC,STATUS)
-      CALL HDX_PUTR(LOCTC,'START',ASRT.NTIME,ASRT.MIN_T,STATUS)
-      CALL HDX_PUTR(LOCTC,'STOP',ASRT.NTIME,ASRT.MAX_T,STATUS)
-*
-      CALL DAT_ANNUL(LOCTC, STATUS)
+*  write time ranges
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'Time',ASRT.NTIME,
+     :             ASRT.MIN_T,ASRT.MAX_T,STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
       CALL DAT_ANNUL(LOCT, STATUS)
-*
-* Create Sumsig element and write it
-      CALL DAT_NEW(LOCS,'PH_CHANNEL','PH_CHANNEL',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'PH_CHANNEL',LOCP,STATUS)
 
-      CALL DAT_CELL(LOCP,1,1,LOCPC,STATUS)
-      CALL HDX_PUTI(LOCPC,'START',1,ASRT.MIN_PH,STATUS)
-      CALL HDX_PUTI(LOCPC,'STOP',1,ASRT.MAX_PH,STATUS)
-*
-      CALL DAT_ANNUL(LOCPC, STATUS)
-      CALL DAT_ANNUL(LOCP, STATUS)
-*
-*   Create corrected PH chanel element and write it
-      CALL DAT_NEW(LOCS,'ENERGY','ENERGY',1,1,STATUS)
-      CALL DAT_FIND(LOCS,'ENERGY',LOCP,STATUS)
 
-      CALL DAT_CELL(LOCP,1,1,LOCPC,STATUS)
-      CALL HDX_PUTI(LOCPC,'START',1,ASRT.MIN_EN,STATUS)
-      CALL HDX_PUTI(LOCPC,'STOP',1,ASRT.MAX_EN,STATUS)
-*
-      CALL DAT_ANNUL(LOCPC, STATUS)
-      CALL DAT_ANNUL(LOCP, STATUS)
-*
-      CALL DAT_ANNUL(LOCS, STATUS)
-*
-      IF (STATUS .NE. SAI__OK) THEN
-         CALL MSG_PRNT('Error writing SORT structure in '/
-     &                   /'background file')
-      ENDIF
-*
-999   CONTINUE
+*  write PH channel selection
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'PHChannel',1,ASRT.MIN_PH,ASRT.MAX_PH,
+     :                                                    STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
+
+*  write corrected PH channel selection
+      CALL SLN_NEWREC(ID,SID,STATUS)
+      CALL SLN_PUTRNGI(SID,'Energy',1,ASRT.MIN_EN,ASRT.MAX_EN,
+     :                                                    STATUS)
+      CALL SLN_PUTREC(ID,SID,STATUS)
+
 *
       IF (STATUS .NE. SAI__OK) THEN
           CALL MSG_OUT(' ','from XRTSORT_WRISORT',STATUS)

@@ -57,12 +57,6 @@
 *  Implementation Deficiencies:
 *     {routine_deficiencies}...
 
-*  {machine}-specific features used:
-*     {routine_machine_specifics}...
-
-*  {DIY_prologue_heading}:
-*     {DIY_prologue_text}
-
 *  References:
 *     ADI Subroutine Guide : http://www.sr.bham.ac.uk/asterix-docs/Programmer/Guides/adi.html
 
@@ -93,25 +87,24 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      INTEGER			FILE			! File name to open
-      INTEGER			ID			! Template object
+      INTEGER			FILE, ID
 
 *  Arguments Returned:
-      INTEGER			FID			! New file object
+      INTEGER			FID
 
 *  Status:
       INTEGER 			STATUS                  ! Global status
 
 *  Local Variables:
       CHARACTER*132		FNAME			! File name
-      CHARACTER*8 		KEYWRD			! Keyword name
+      CHARACTER*80 		FPATH			! Sub-file path stuff
 
       INTEGER			BSIZE			! Block size
+      INTEGER			FPLEN			! FPATH length
       INTEGER			FSTAT			! FITSIO status
       INTEGER			HDU			! HDU number
       INTEGER			LFILEC			! Last filename char
       INTEGER			LUN			! Logical unit number
-
 *.
 
 *  Check inherited global status.
@@ -121,7 +114,7 @@
       CALL ADI_GET0C( FILE, FNAME, STATUS )
 
 *  Parse the file specification into file, hdu and keyword names
-      CALL ADI2_PARSE( FNAME, LFILEC, HDU, KEYWRD, STATUS )
+      CALL ADI2_PARSE( FNAME, LFILEC, HDU, FPATH, FPLEN, STATUS )
 
 *  Grab logical unit from system
       CALL FIO_GUNIT( LUN, STATUS )
@@ -141,14 +134,16 @@
         CALL ADI_NEW0( 'FITSfile', FID, STATUS )
 
 *    Write HDU number
-        CALL ADI_CPUT0I( FID, '.HDU', HDU, STATUS )
+        CALL ADI_CPUT0I( FID, 'UserHDU', HDU, STATUS )
+
+*    Write sub-file structure
+        IF ( FPLEN .GT. 0 ) THEN
+          CALL ADI_CPUT0C( FID, 'Fpath', FPATH(:FPLEN), STATUS )
+        END IF
 
 *    Write extra info into the file handle object
         CALL ADI_CPUT0I( FID, 'Lun', LUN, STATUS )
         CALL ADI_CPUT0I( FID, 'BlockSize', BSIZE, STATUS )
-
-*    Initialise object
-        CALL ADI2_FOINIT( FID, STATUS )
 
       ELSE
 
