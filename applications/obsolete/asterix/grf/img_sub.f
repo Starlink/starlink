@@ -3181,11 +3181,13 @@ c      LOGICAL VOK,QOK
             CALL DYN_SIZE(I_QPTR_M,M,STATUS)
             IF (M.LT.N) THEN
               CALL DYN_UNMAP(I_QPTR_M,STATUS)
+              CALL DYN_MAPB(1,N,I_QPTR_M,STATUS)
             ENDIF
           ENDIF
         ENDIF
-        CALL GCB_CRECACHE(I_CACHE_M,STATUS)
-
+        IF (I_CACHE_M.EQ.0) THEN
+          CALL GCB_CRECACHE(I_CACHE_M,STATUS)
+        ENDIF
 
       ENDIF
 
@@ -3226,6 +3228,7 @@ c      LOGICAL VOK,QOK
           I_QPTR_M=0
         ENDIF
         CALL GCB_DELCACHE(I_CACHE_M,STATUS)
+        I_CACHE_M=0
         I_MEM=.FALSE.
 
       ENDIF

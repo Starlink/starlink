@@ -95,6 +95,12 @@
         IF (I_MEM) THEN
           MX=I_NX
           MY=I_NY
+        ELSE
+          I_DPTR_M=0
+          I_XPTR_M=0
+          I_YPTR_M=0
+          I_VPTR_M=0
+          I_QPTR_M=0
         ENDIF
 
         CALL MSG_PRNT(' ')
