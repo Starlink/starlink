@@ -106,11 +106,14 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.20  1996/12/13 02:38:51  timj
-*     Replace DAT_FIND with CMP_.
-*     Report number of good integrations. (not just total).
-*     Change PRINT to MSG_OUT for timing data.
+*     Revision 1.21  1996/12/17 21:09:49  timj
+*     Write SCUPROJ to output file. (for SCUOVER)
 *
+c Revision 1.20  1996/12/13  02:38:51  timj
+c Replace DAT_FIND with CMP_.
+c Report number of good integrations. (not just total).
+c Change PRINT to MSG_OUT for timing data.
+c
 c Revision 1.19  1996/12/12  01:18:02  timj
 c Remove CALC_AZNA_OFFSET (merged with CALC_BOL_COORDS)
 c
@@ -2221,6 +2224,10 @@ c
      :  TELESCOPE, 'name of telescope', STATUS)
       CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'INSTRUME',
      :  INSTRUMENT, 'name of instrument', STATUS)
+
+* Store SCUBA projection name
+      CALL SCULIB_PUT_FITS_C(SCUBA__MAX_FITS, N_FITS, FITS, 'SCUPROJ',
+     :     OUT_COORDS, 'SCUBA output coordinate system', STATUS)
 
 * Put in a DATE-OBS field
 
