@@ -12,7 +12,11 @@ Description:
    file. It has the capability of removing all the CCDPACK global
    parameters or just a named subset.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+BYNAME
 
 BYNAME = _LOGICAL (Read)
    This parameter controls how the parameters are cleared.
@@ -20,6 +24,9 @@ BYNAME = _LOGICAL (Read)
    If TRUE then a list of the names of the global parameters to
    clear is requested (see parameter NAMES).
    [FALSE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -29,6 +36,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -49,6 +59,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+NAMES
+
 NAMES = LITERAL (Read)
    Only used when BYNAME is TRUE. The response to this parameter
    should be a comma separated list of the names of the CCDPACK

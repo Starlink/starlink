@@ -11,7 +11,11 @@ Description:
    This routine shows the current value of any CCDPACK global
    parameters.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+LOGFILE
 
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -22,6 +26,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.

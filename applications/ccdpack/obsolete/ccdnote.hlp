@@ -14,7 +14,11 @@ Description:
    span more than one line if earlier lines are terminated by the
    continuation character '-'.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+LOGFILE
 
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -25,6 +29,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -45,6 +52,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+NOTE
+
 NOTE = LITERAL (Read)
    The comment to enter into the CCDPACK logfile. This may be
    continued on to other lines by using the continuation

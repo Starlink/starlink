@@ -45,7 +45,11 @@ Description:
    counts and the extraction of the useful area of the CCD are also
    performed.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ADC
 
 ADC = _DOUBLE (Read)
    The Analogue-to-Digital Conversion factor. This number converts
@@ -57,6 +61,9 @@ ADC = _DOUBLE (Read)
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.
    [1.0]
+
+BADBITS
+
 BADBITS = _INTEGER (Read)
    If the first input image has no quality component, and you have
    specified the SETBAD= FALSE option, you will be requested to
@@ -64,6 +71,9 @@ BADBITS = _INTEGER (Read)
    is 1. BADBITS is a byte value and hence can only be in the
    range 0-255.
    [1]
+
+BIAS
+
 BIAS = LITERAL (Read)
    Name of the image which contains the bias calibration data. This
    parameter may be specified as ! in which case either a
@@ -73,6 +83,9 @@ BIAS = LITERAL (Read)
    used master bias name or (if one exists) the name of the image
    produced by the last run of MAKEBIAS.
    [Global master bias or !]
+
+BOUNDS
+
 BOUNDS( 2 or 4 ) = _INTEGER (Read)
    The pixel indices (see notes) of the upper and lower bounds of
    the bias strip(s). These bounds can run in either the
@@ -84,10 +97,16 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
 
    If global values for these bounds have been set using
    CCDSETUP then those values will be used.
+
+BOXSIZE
+
 BOXSIZE( 2 ) = _INTEGER (Read)
    The sizes of the sides of the box to be used when smoothing the
    bias strips. Only used when CMODE="BOX".
    [15,15]
+
+CMODE
+
 CMODE = LITERAL (Read)
    The "clean-up" mode for the bias strips. This parameter may
    take values of "BOX", "SIGMA" or "WEIGHT". If CMODE="BOX" then
@@ -97,6 +116,9 @@ CMODE = LITERAL (Read)
    the weighting as indicated by the WMODE parameter is used to
    attempt to decrease the effects of erroneous pixel values.
    [BOX]
+
+DEFERRED
+
 DEFERRED = _DOUBLE (Read)
    The deferred charge value. This is also often known as the
    "fat" or "skinny" zero. It represents the amount of charge
@@ -106,6 +128,9 @@ DEFERRED = _DOUBLE (Read)
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.
    [0.0]
+
+DIRECTION
+
 DIRECTION = LITERAL (Read)
    The readout direction of the CCD. This parameter can take
    values of "X" or "Y". X indicates that the readout direction is
@@ -116,6 +141,9 @@ DIRECTION = LITERAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.
    [X]
+
+EXPAND
+
 EXPAND = _LOGICAL (Read)
    This value controls whether or not the output data should be
    multiplied by the ADC factor to convert the input ADUs to
@@ -128,6 +156,9 @@ EXPAND = _LOGICAL (Read)
 
    [Default is TRUE if input data is not an unsigned data type
    otherwise FALSE.]
+
+EXTENT
+
 EXTENT(4) = _INTEGER (Read)
    The extent of the useful CCD area. This should be given in
    pixel index values (see notes). The extent is restricted to
@@ -142,6 +173,9 @@ EXTENT(4) = _INTEGER (Read)
 
    If global values for these bounds have been set using
    CCDSETUP then those values will be used.
+
+FMODE
+
 FMODE = LITERAL (Read)
    The fit mode which will be used when interpolating bias values.
    May take values of "LINE" or "PLANE". This is used together
@@ -152,6 +186,9 @@ FMODE = LITERAL (Read)
    FMODE="PLANE", SMODE="LINEAR" fits a plane to the bias-strip
    data.
    [LINE]
+
+GENVAR
+
 GENVAR = _LOGICAL (Read)
    If variances are to be generated then this value is set
    TRUE. If variances are not to be generated then this value
@@ -162,14 +199,23 @@ GENVAR = _LOGICAL (Read)
    If a global value has been set up using CCDSETUP this value
    will be used.
    [FALSE]
+
+GETBIAS
+
 GETBIAS = _LOGICAL (Read)
    This parameter controls whether or not an attempt is to be made
    to access a master bias image.
    [TRUE]
+
+GETMASK
+
 GETMASK = _LOGICAL (Read)
    This parameter controls whether or not an attempt is to be made
    to access a defect mask using the parameter MASK.
    [TRUE]
+
+IN
+
 IN = LITERAL (Read)
    A list of the names of the images which contain the raw CCD
    data. Note that at present the input data must have a common
@@ -179,6 +225,9 @@ IN = LITERAL (Read)
 
    The image names should be separated by commas and may include
    wildcards.
+
+KEEPIN
+
 KEEPIN = _LOGICAL (Read)
    Whether to keep (i.e. not delete) the input images (parameter IN)
    or not. Deleting the input images has the advantage of saving
@@ -193,6 +242,9 @@ KEEPIN = _LOGICAL (Read)
    overridden except by assignment on the command line or in
    response to a forced prompt.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -202,6 +254,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -222,6 +277,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MASK
+
 MASK = LITERAL (Read)
    The name of an image or ASCII Regions Definition (ARD) file.
 
@@ -244,6 +302,9 @@ MASK = LITERAL (Read)
    The name of this file may be specified using indirection
    through a file.
    [!]
+
+NSIGMA
+
 NSIGMA = _REAL (Read)
    The number of standard deviations to clip the bias strips at.
    This is only used in CMODE="SIGMA". The actual clipping
@@ -251,6 +312,9 @@ NSIGMA = _REAL (Read)
    then the RNOISE value is estimated from the data values in
    the strips.
    [4.0]
+
+OFFSET
+
 OFFSET = _LOGICAL (Read)
    If TRUE then the input bias data array is offset
    by the mean value derived from the bias-strip areas. If FALSE
@@ -258,6 +322,9 @@ OFFSET = _LOGICAL (Read)
    disabled for unsigned data types as the bias data cannot have
    been previously zeroed.
    [TRUE]
+
+OUT
+
 OUT = LITERAL (Write)
    Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
@@ -278,6 +345,9 @@ OUT = LITERAL (Write)
       OUT > tmp_*|debias|flattened|
    this replaces the string debias with flattened in any of the
    output names tmp_*.
+
+PRESERVE
+
 PRESERVE = _LOGICAL (Read)
    If TRUE then the data type of the input images are used for
    processing and are preserved on exit from this routine. If
@@ -295,6 +365,9 @@ PRESERVE = _LOGICAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.
    [TRUE]
+
+RNOISE
+
 RNOISE = _DOUBLE (Read)
    The readout noise in input data units (ADUs). An estimate of
    the readout noise is shown for unweighted values in the bias
@@ -306,14 +379,23 @@ RNOISE = _DOUBLE (Read)
    If a global value has been set using CCDSETUP then this will
    be used.
    [Dynamic default or 1.0]
+
+SATURATE
+
 SATURATE = _LOGICAL (Read)
    This parameter controls whether the data are to be processed to
    detect saturated values or not. The actual saturation value is
    given using the SATURATION parameter.
    [FALSE]
+
+SATURATION
+
 SATURATION = _DOUBLE (Read)
    The data saturation value. Only used if SATURATE is TRUE.
    [1.0D6]
+
+SETBAD
+
 SETBAD = _LOGICAL (Read)
    If TRUE then the quality information will be transferred
    from the MASK image to the output images in the form of BAD
@@ -325,6 +407,9 @@ SETBAD = _LOGICAL (Read)
    quality component the BADBITS will be set by a logical OR of
    the current bits with the BADBITS value).
    [TRUE]
+
+SETSAT
+
 SETSAT = _LOGICAL (Read)
    This parameter controls how saturated data will be flagged.
    If it is set TRUE then saturated values will be replaced by
@@ -332,6 +417,9 @@ SETSAT = _LOGICAL (Read)
    used to detect saturated data). If it is FALSE then saturated
    values will be set to BAD (also known as invalid).
    [FALSE]
+
+SMODE
+
 SMODE = LITERAL (Read)
    The mode which will be used to perform any interpolation fit
    between the bias strips. Can take values of "CONSTANT" or
@@ -344,9 +432,15 @@ SMODE = LITERAL (Read)
    FMODE="PLANE", SMODE="LINEAR" fits a plane to the bias-strip
    data.
    [CONSTANT]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output image.
    [Output from DEBIAS]
+
+USECON
+
 USECON = _LOGICAL (Read)
    If TRUE then you can supply an estimate for the bias
    contribution (parameter ZERO). This value is then subtracted
@@ -355,6 +449,9 @@ USECON = _LOGICAL (Read)
    believe that the value you are supplying is accurate enough
    for your purposes.
    [FALSE]
+
+USEEXT
+
 USEEXT = _LOGICAL (Read)
    If TRUE then certain of the parameters of this program will not
    be used and the required values will be obtained from the
@@ -378,6 +475,9 @@ USEEXT = _LOGICAL (Read)
    Values obtained from the CCDPACK extension are identified in
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
+
+WMODE
+
 WMODE = LITERAL (Read)
    The weighting method which is to be used when deriving means
    or performing the least squares interpolation fits using any
@@ -387,6 +487,9 @@ WMODE = LITERAL (Read)
    the edges. "LINEAR" weighting gives zero weighting for the
    edge lines and so is the more robust.
    [LINEAR]
+
+ZERO
+
 ZERO = _DOUBLE (Read)
    If USECON=TRUE then this value is subtracted from the input
    image.
@@ -395,7 +498,7 @@ Examples
 
 debias r1 r1b bias '[2,10,400,415]' adc=1.1 rnoise=8
    This example debiasses the data array in image r1 writing the
-   result to image r1b. It uses the data component of image BIAS as
+   result to image r1b. It uses the data component of image bias as
    the bias estimator. The bias is offset by the mean value found
    within the ranges 2-10 and 400-415 pixels along the X axis.
    The data in the bias strips are smoothed by a box filter and

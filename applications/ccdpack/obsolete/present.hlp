@@ -11,14 +11,14 @@ Description:
 
    This routine enters reduction information into the CCDPACK
    extensions of a list of images. This information is required if an
-   automated reduction schedule is to be produced using SCHEDULE. 
+   automated reduction schedule is to be produced using SCHEDULE.
    Before using this routine you should set up the CCDPACK global
    parameters, describing the CCD characteristics, using the CCDSETUP
    application.
 
    If the input images have not already been categorised then this
    routine performs this task for the "frame types" BIAS, TARGET,
-   DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and 
+   DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and
    MASTER_FLASH (these are input as different groups of images).
 
 
@@ -29,7 +29,11 @@ Description:
    the minimum amount of information in their CCDPACK extensions to
    allow an automated scheduling.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ADC
 
 ADC = _DOUBLE (Read)
    The Analogue-to-Digital conversion factor. CCD readout values
@@ -51,22 +55,34 @@ ADC = _DOUBLE (Read)
    the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
+
+ADDDARK
+
 ADDDARK = _LOGICAL (Read)
    Whether or not to prompt for a dark exposure time for the input
    images which require one.
    [Dynamic default, TRUE if dark count frames are given, FALSE
    otherwise]
+
+ADDFLASH
+
 ADDFLASH = _LOGICAL (Read)
    Whether or not to prompt for a pre-flash exposure time for the
    input images which require one.
    [Dynamic default, TRUE if pre-flash frames are given, FALSE
    otherwise]
+
+BIAS
+
 BIAS = LITERAL (Read)
    A list of the names of the images which contain the raw bias
    data. These are the images which are to used to produce a
    "master" bias image. On exit these images will have their FTYPE
    extension item set to the value "BIAS".
    [!]
+
+BIASVALUE
+
 BIASVALUE = _DOUBLE (Read)
    If no raw bias frames exist and the data does not have any bias
    strips, then the only way to remove the bias contribution is
@@ -77,6 +93,9 @@ BIASVALUE = _DOUBLE (Read)
    prompted for so the only way that a value can be supplied is on
    the command-line or by using the PROMPT keyword.
    [!]
+
+BOUNDS
+
 BOUNDS( 2 or 4 ) = _INTEGER (Read)
    The bounds of the detector bias strips (if any exist). The
    bounds (if given) should be in pixel indices and be given in
@@ -99,12 +118,18 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
+
+DARK
+
 DARK = LITERAL (Read)
    A list of the names of the images which contain the raw dark
    count data. These are the images which are to used to produce a
    "master" dark counts image. On exit these images will have their
    FTYPE extension item set to the value "DARK".
    [!]
+
+DARKTIME
+
 DARKTIME = _DOUBLE (Read)
    The time for which the data in the current image collected dark
    count electrons. The dark count is basically charge which
@@ -122,6 +147,9 @@ DARKTIME = _DOUBLE (Read)
    no dark count should be given a DARKTIME of 0. This parameter
    is only used if ADDDARK is TRUE.
    [!]
+
+DEFERRED
+
 DEFERRED = _DOUBLE (Read)
    The deferred charge value. Often known as the "fat" or "skinny"
    zero (just for confusion). This is actually the charge which is
@@ -137,6 +165,9 @@ DEFERRED = _DOUBLE (Read)
    the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
+
+DIRECTION
+
 DIRECTION = LITERAL (Read)
    The readout direction of the detector. This may take the values
    X or Y.  A value of X indicates that the readout direction is
@@ -152,6 +183,9 @@ DIRECTION = LITERAL (Read)
    the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
+
+EXTENT
+
 EXTENT( 4 ) = _INTEGER (Read)
    The extent of the useful detector area in pixel indices.  The
    extent is defined as a range in X values and a range in Y
@@ -168,6 +202,9 @@ EXTENT( 4 ) = _INTEGER (Read)
    extension of the input images only if MODIFY is TRUE or the
    related extension item does not exist.
    [!]
+
+FILTER
+
 FILTER = LITERAL (Read)
    The filter name associated with the current image. The filter
    name is stored in the extension item FILTER and is used when
@@ -176,6 +213,9 @@ FILTER = LITERAL (Read)
    not use this parameter. The filter type is a case sensitive
    string.
    [Current value]
+
+FLASH
+
 FLASH = LITERAL (Read)
    A list of the names of the images which contain the raw
    pre-flash correction data. These are the images which are to
@@ -183,6 +223,9 @@ FLASH = LITERAL (Read)
    these images will have their FTYPE extension item set to the
    value "FLASH".
    [!]
+
+FLASHTIME
+
 FLASHTIME  = _DOUBLE (Read)
    The time for which the data in the current image was exposed to
    pre-flash.
@@ -194,6 +237,9 @@ FLASHTIME  = _DOUBLE (Read)
    no pre-flash should be given a FLASHTIME of 0. This parameter
    is only used if ADDFLASH is TRUE.
    [!]
+
+FLAT
+
 FLAT = LITERAL (Read)
    A list of the names of the images which contain the raw
    flatfield data. These are the images which are to used to
@@ -201,6 +247,9 @@ FLAT = LITERAL (Read)
    exit these images will have their FTYPE extension item set to
    the value "FLAT".
    [!]
+
+FTYPE
+
 FTYPE = LITERAL (Read)
    The "frame" type of the current image. Each image is processed in
    turn and if SIMPLE is TRUE and a frame type extension item does
@@ -209,15 +258,21 @@ FTYPE = LITERAL (Read)
    is TRUE regardless of whether the item already exists or not.
    If SIMPLE is FALSE then this parameter will not be used.
    [Current value]
+
+IN
+
 IN = LITERAL (Read)
    A list of the names of the images which contain the raw CCD
-   data. Images entered using this parameter must already have the
+   data. images entered using this parameter must already have the
    correct "frame type" information (extension item FTYPE)
    entered into their CCDPACK extensions. This parameter is only
    used if SIMPLE is TRUE.
 
    The image names should be separated by commas and may include
    wildcards.
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -227,6 +282,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -247,17 +305,26 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MASTERBIAS
+
 MASTERBIAS = LITERAL (Read)
    The name of a master bias frame. If this has been created by
    CCDPACK then there is no need to present it.  This parameter is
    designed for the import of frames created by other packages.
    [!]
+
+MASTERDARK
+
 MASTERDARK = LITERAL (Read)
    The name of a master dark counts frame. If this has been
    created by CCDPACK then there is no need to present it (unless
    for some reason it has been assigned the wrong frame type).
    This parameter is designed for the import of frames created
    by other packages.
+
+MASTERFLASH
+
 MASTERFLASH = LITERAL (Read)
    The name of a master pre-flash frame. If this has been
    created by CCDPACK then there is no need to present it (unless
@@ -265,6 +332,9 @@ MASTERFLASH = LITERAL (Read)
    This parameter is designed for the import of frames created
    by other packages.
    [!]
+
+MASTERFLAT
+
 MASTERFLAT = LITERAL (Read)
    The names of a set of master flatfield frames (one for each
    filter type used). If these have been created by CCDPACK then
@@ -274,17 +344,26 @@ MASTERFLAT = LITERAL (Read)
    packages (such as those that specifically process spectral
    data).
    [!]
+
+MASTERS
+
 MASTERS = _LOGICAL (Read)
    If this parameter is TRUE then prompts will be made for all the
-   master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT 
+   master calibration types (MASTERBIAS, MASTERDARK, MASTERFLAT
    and MASTERFLASH).
    [FALSE]
+
+MODIFY
+
 MODIFY = _LOGICAL (Read)
    If the input images already contain information in their CCDPACK
    extensions, then this parameter controls whether this
    information will be overwritten (if a new value exists) or
    not.
    [TRUE]
+
+MULTIENTRY
+
 MULTIENTRY = _LOGICAL (Read)
    Whether or not the names of the input images, their frame types,
    filters and related exposure factors are all given in response
@@ -334,29 +413,44 @@ MULTIENTRY = _LOGICAL (Read)
    overridden by assignment on the command line or in response to
    a forced prompt.
    [FALSE]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    The name of a file to contain a listing of the name of the
    input images. This is intended to be of use when using these
    same names with other applications (such as SCHEDULE).
    [!]
+
+ONEDARKTIME
+
 ONEDARKTIME = _LOGICAL (Read)
    If the input data have the same dark count exposure time then
    this parameter may be set to inhibit repeated prompting for an
    exposure for every frame. This parameter is of particular use
    when running from scripts.
    [FALSE]
+
+ONEFILTER
+
 ONEFILTER = _LOGICAL (Read)
    If the input data have only one filter type then this parameter
    may be set to inhibit repeated prompting for a filter name
-   for every frame (that is filter dependent). This parameter 
+   for every frame (that is filter dependent). This parameter
    is of particular use when running from scripts.
    [FALSE]
+
+ONEFLASHTIME
+
 ONEFLASHTIME = _LOGICAL (Read)
    If the input data have the same pre-flash exposure time then
    this parameter may be set to inhibit repeated prompting for an
    exposure for every frame. This parameter is of particular use
    when running from scripts.
    [FALSE]
+
+RNOISE
+
 RNOISE = _DOUBLE (Read)
    The readout noise of the detector (in ADUs). Usually the
    readout noise of a detector is estimated by the observatory at
@@ -372,6 +466,9 @@ RNOISE = _DOUBLE (Read)
    into the extension of the input images only if MODIFY is TRUE or
    the related extension item does not exist.
    [!]
+
+SATURATION
+
 SATURATION = _DOUBLE (Read)
    The saturation value of the detector pixels (in ADUs).
 
@@ -383,6 +480,9 @@ SATURATION = _DOUBLE (Read)
    the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
+
+SIMPLE
+
 SIMPLE = _LOGICAL (Read)
    Whether or not the input images already contain "frame type"
    (extension item FTYPE) information in their CCDPACK extensions
@@ -391,15 +491,21 @@ SIMPLE = _LOGICAL (Read)
    information using IMPORT, or the images have already been
    presented and this pass is to modify existing extension items.
    [FALSE]
+
+TARGET
+
 TARGET = LITERAL (Read)
    A list of the names of the images which contain the "target"
    data. These are the images which contain the images or spectra
    etc.  On exit these images will have their FTYPE extension item
    set to the value "TARGET".
    [!]
+
+ZEROED
+
 ZEROED = _LOGICAL (Read)
    If a master bias frame is given, then this parameter indicates
-   whether or not it has a mean value of zero. If SIMPLE and 
+   whether or not it has a mean value of zero. If SIMPLE and
    MULTIENTRY are TRUE then this value (TRUE or FALSE) can be entered
    as the fourth field to the IN parameter.
    [FALSE]

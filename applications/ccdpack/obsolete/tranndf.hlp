@@ -20,22 +20,35 @@ Description:
    extensions. Using these facilities allows many images to be aligned
    with one invocation.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CONSERVE
 
 CONSERVE = _LOGICAL (Read)
    If CONSERVE is TRUE, the output values are normalised by the
    ratio of the output-to-input pixel areas.  In other words this
    conserves flux.  If CONSERVE is FALSE, there is no
    normalisation.  [TRUE]
+
+IN
+
 IN = image (Read)
    A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
+
+INEXT
+
 INEXT = _LOGICAL (Read)
    If TRUE then the transformation which is to be applied to the
    image is stored in the image's CCDPACK extension
    (.MORE.CCDPACK.TRANSFORM). If FALSE then a transformation
    structure must be supplied via the parameter TRANSFORM. This
    transformation is then applied to the list of images.  [TRUE]
+
+LBOUND
+
 LBOUND() = _INTEGER (Read)
    If SHAPE is "SPECIFY" then this parameter specifies the lower
    pixel-index bounds of all the output images. The number of
@@ -46,6 +59,9 @@ LBOUND() = _INTEGER (Read)
    transformed data (of the first image) will appear in the output
    image.
    [Dynamic default]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -55,6 +71,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -75,11 +94,17 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+METHOD
+
 METHOD = LITERAL (Read)
    The interpolation method used to resample the input image data
    arrays. Permitted values are "NEAREST" for nearest-neighbour,
    and "LININT" for linear interpolation.
    [NEAREST]
+
+OUT
+
 OUT = LITERAL (Write)
    Names of the output -- transformed -- images. These may be
    specified as list of comma separated names, using indirection
@@ -100,6 +125,9 @@ OUT = LITERAL (Write)
       OUT > *|RAW|RES|
    this replaces the string RAW with RES in any of the output
    names.
+
+SHAPE
+
 SHAPE = LITERAL (Read)
    The method to be used to determine the SHAPE of the output
    images. Can take one of the values "AUTO", "SAME", "SPECIFY".
@@ -118,6 +146,15 @@ SHAPE = LITERAL (Read)
                    all the output images. (See the LBOUND and UBOUND
                    parameters.)
    [AUTO]
+
+TITLE
+
+TITLE = LITERAL (Read)
+   Title for the output images.
+   [Output from TRANNDF]
+
+TRANSFORM
+
 TRANSFORM = TRN (Read)
    If INEXT is FALSE then this parameter specifies the
    transformation structure.  This includes the file name and the
@@ -126,6 +163,9 @@ TRANSFORM = TRN (Read)
    Normally the object name is TRANSFORM.  The structure must
    contain both the forward and inverse mappings. This transform
    if supplied acts on all the input images.
+
+UBOUND
+
 UBOUND() = _INTEGER (Read)
    If SHAPE is "SPECIFY" then this parameter specifies the upper
    pixel-index bounds of all the output images. The number of
@@ -201,7 +241,7 @@ History
     Original version.
 
  18-JUN-1993 (PDRAPER):
-    Changed for use in CCDPACK pipe-line - Lists of NDFs,
+    Changed for use in CCDPACK pipe-line - Lists of images,
     information logging etc. Restricted functionality to that which
     is used by CCDPACK (no axes information).
 
@@ -222,8 +262,8 @@ Implementation_Status
       -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
          propagated.
 
-      -  QUALITY is not derived from the input NDF for a linearly
-         interpolated NDF. The DATA and VARIANCE arrays are
+      -  QUALITY is not derived from the input image for a linearly
+         interpolated image. The DATA and VARIANCE arrays are
          resampled.
 
    -  Bad pixels, including automatic quality masking, are supported.

@@ -9,11 +9,15 @@ Usage:
 Description:
 
    This routine applies a flat field correction to a series of images.
-   If the input data have been saturated using a saturation value
-   (instead of using BAD pixel flagging) then the saturation values
-   may be protected from modification.
+   If any of the input data have been flagged as saturated using a
+   saturation value (instead of being marked as BAD) then the
+   saturation values may be protected from modification.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+FLAT
 
 FLAT = LITERAL (Read)
    Name of the image which contains the normalised (mean of one)
@@ -23,10 +27,16 @@ FLAT = LITERAL (Read)
    The name of this file may be specified using indirection
    through a file.
    [Global flatfield]
+
+IN
+
 IN = LITERAL (Read)
    Names of the images containing the data which are to have the
    flatfield correction applied.  The image names should be
    separated by commas and may include wildcards.
+
+KEEPIN
+
 KEEPIN = _LOGICAL (Read)
    Whether to keep (i.e. not delete) the input images (parameter IN)
    or not. Deleting the input images has the advantage of saving
@@ -40,6 +50,9 @@ KEEPIN = _LOGICAL (Read)
    overridden except by assignment on the command line or in
    response to a forced prompt.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -49,6 +62,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -69,13 +85,16 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+OUT
+
 OUT = LITERAL (Write)
    Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, or,
    as a single modification element (of the input names).
    The simplest modification element is the asterisk "*" which
-   means call each of the output images the same name as the
-   corresponding input images. So,
+   means each of the output images the same name as the
+   corresponding images files. So,
       IN > *
       OUT > *
    signifies that all the images in the current directory should be
@@ -90,11 +109,17 @@ OUT = LITERAL (Write)
       OUT > tmp_*|debias|flattened|
    this replaces the string debias with flattened in any of the
    output names tmp_*.
+
+SATURATION
+
 SATURATION = _DOUBLE (Read)
    The value at which the input data has been saturated. This
    is only required if the saturation has been flagged using a
    non-BAD value.
    [1.0D6]
+
+SETSAT
+
 SETSAT = _LOGICAL (Read)
    If the input data has had a saturation value applied then this
    value should be set to TRUE. However, if the saturation has
@@ -104,6 +129,9 @@ SETSAT = _LOGICAL (Read)
    properties (i.e. saturation values) which have not been set
    within CCDPACK will require separate processing (see notes).
    [FALSE]
+
+PRESERVE
+
 PRESERVE = _LOGICAL (Read)
    If the input data types are to be preserved and used for
    processing then this parameter should be set TRUE [default].
@@ -118,6 +146,9 @@ PRESERVE = _LOGICAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then this will be used.
    [TRUE]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output images.
    [Output from FLATCOR]

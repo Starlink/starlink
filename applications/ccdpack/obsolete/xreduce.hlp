@@ -43,7 +43,7 @@ Configuration
         hypertext help. This may only be Mosaic or netscape (or
         whatever the names of these browsers are on your system)
         and should be the full path names if they are not located
-        on your PATH. 
+        on your PATH.
 
         This option can also be set using the environment variable
         HTX_BROWSER.
@@ -97,7 +97,7 @@ Configuration
 
    This sets the default browser to netscape, allows any .Xdefaults
    to override any internal preferences, makes the focus follow the
-   mouse and defines a local directory that contains setups and 
+   mouse and defines a local directory that contains setups and
    import tables.
 
 

@@ -22,11 +22,18 @@ Description:
    of functions containing many FITS keywords as well as the mapping
    of CCDPACK recognised character items to arbitrary strings.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+IN
 
 IN = LITERAL (Read)
    A list of image names which contain the raw bias frame data.
    The image names should be separated by commas and may include wildcards.
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -36,6 +43,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -56,11 +66,17 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    The name of a file to contain a listing of the name of the
    input images. This is intended to be of use when using these
    same names with other applications (such as SCHEDULE).
    [!]
+
+TABLE
+
 TABLE = LITERAL (Read)
    The name of the table containing the description of how FITS
    keyword values are to be translated into CCDPACK extension
@@ -122,7 +138,7 @@ Table_Format
       TIMES.DARK    _DOUBLE       (TAI1-TAI0)
 
    The function may use any of the usual Fortran operators; +, -, *,
-   /, ** and many others that are supported by the TRANSFORM package 
+   /, ** and many others that are supported by the TRANSFORM package
    (SUN/61).
 
    Functions are allowed to not contain any FITS-keywords in which
@@ -136,12 +152,26 @@ Table_Format
    In this way import tables could actually be used to set all the
    required values in the CCDPACK extension (but see PRESENT also).
 
-   Characters strings cannot be manipulated by functions so a single
-   special format for translating their values is provided. The name
-   of the destination extension item and (optionally) its type are
-   given as usual followed by a FITS-keyword which contains the
-   string to be translated. This is then followed by statements which
-   translate an "input" string into an "output" string. I.e.
+   Characters strings cannot be manipulated by functions so two
+   special formats for translating their values are provided.
+   The first form allows for the concatenation of keywords and
+   the second the translation from a known word to another
+   (which is usually one of the CCDPACK special names). The
+   concatenation form looks like:
+
+      _CHAR         FILTER
+      _CHAR         HWP
+      FILTER        _CHAR          FILTER//HWP
+
+   Which results in the FILTER extension item being set to the
+   concatenation of the values of the FITS keywords FILTER and
+   HWP (you can concatentate more than two values).
+
+   In the second special form the name of the destination extension
+   item and (optionally) its type are given as usual followed by a
+   FITS-keyword which contains the string to be translated. This is
+   then followed by statements which translate an "input" string
+   into an "output" string. I.e.
 
       FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
 

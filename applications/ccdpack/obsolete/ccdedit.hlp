@@ -27,7 +27,7 @@ Description:
    single position list to be associated with a range of images.
 
    Erase extension items is a safe way of deleting primitives and
-   structures from an image CCDPACK extension and removes the need to
+   structures from an NDF CCDPACK extension and removes the need to
    remember the exact object name and path.
 
    Add transform allows arbitrary transform structures to be added.
@@ -38,7 +38,11 @@ Description:
 
    Invert transform inverts the sense of the transformation.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CLASS
 
 CLASS( ) = LITERAL (Read)
    If CLASSIFY is TRUE then a list of classifications that
@@ -66,6 +70,9 @@ CLASS( ) = LITERAL (Read)
    See SUN/61 Appendix B for more details of transformation
    classification and a table of the classifications of common
    mappings.
+
+CLASSIFY
+
 CLASSIFY = _LOGICAL (Read)
    If TRTYPE="EXPRES" is chosen then this parameter decides
    whether or not a classification of the transformation
@@ -77,6 +84,9 @@ CLASSIFY = _LOGICAL (Read)
    transformations are classified by this routine using the
    FITTYPE parameter.
    [FALSE]
+
+FA-FZ
+
 FA-FZ = LITERAL (Read)
    These parameters supply the values of "sub-expressions" used in
    the expressions XFOR, YFOR, XINV and YINV. These parameters
@@ -91,6 +101,9 @@ FA-FZ = LITERAL (Read)
       FA > SQRT(X*X+Y*Y)
       PA > 100D0
       FB > SQRT(XX*XX+YY*YY)
+
+FITTYPE
+
 FITTYPE = _INTEGER (Read)
    The type of fit specified by coefficients supplied via the
    TR parameter. Appropriate values are.
@@ -109,10 +122,16 @@ FITTYPE = _INTEGER (Read)
    The value of this parameter is used to classify the
    transformation (see the CLASS parameter).
    [5]
+
+IN
+
 IN = image (Read)
    A list specifying the names of the images whose CCDPACK
    extensions are to be modified. The image names should be
    separated by commas and may include wildcards.
+
+INLIST
+
 INLIST = LITERAL (Read)
    A list specifying one or more position list names (only used
    if MODE = "ALIST" ). If a single name is given then this
@@ -125,6 +144,9 @@ INLIST = LITERAL (Read)
    separated list of explicit names should be used and/or the
    names should be read from indirection files (the indirection
    indicator is "^").
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -134,6 +156,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -154,6 +179,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MODE
+
 MODE = LITERAL (Read)
    The mode of operation. Can be one of
 
@@ -184,10 +212,16 @@ MODE = LITERAL (Read)
    The "INVERT" option inverts the sense of transformations in
    the images.
    [ALIST]
+
+NAME
+
 NAME = LITERAL (Read)
    If MODE = "ERASE" is chosen then the value of this parameter
-   names the CCDPACK extension item of the input images which is to
+   names the CCDPACK extension item of the input NDFs which is to
    be erased. Typical items are "CURRENT_LIST" and "TRANSFORM".
+
+PA-PZ
+
 PA-PZ = _DOUBLE (Read)
    These parameters supply the values of constants used in the
    expressions XFOR, YFOR, XINV and YINV. Using parameters allows
@@ -206,6 +240,9 @@ PA-PZ = _DOUBLE (Read)
       PA > X-centre-value
       PB > Y-centre-value
    This maps (X,Y) to (R,THETA) about a specified centre.
+
+TRANSFORM
+
 TRANSFORM = TRN (Read)
    If TRTYPE="STRUCT" is chosen then this parameter is used to
    access the HDS object which contains a transform structure
@@ -213,6 +250,9 @@ TRANSFORM = TRN (Read)
    transform structure (in CCDPACK) is
 
        - NDF_NAME.MORE.CCDPACK.TRANSFORM
+
+TR
+
 TR( 6 ) = _DOUBLE (Read)
    If TRTYPE="COEFF" is chosen then the values of this parameter
    are the 6 coefficients of a linear transformation of the
@@ -221,6 +261,9 @@ TR( 6 ) = _DOUBLE (Read)
          Y' = PD + PE*X + PF*Y
    The default is the identity transformation.
    [0,1,0,0,0,1] [PA,PB,PC,PD,PE,PF]
+
+TRTYPE
+
 TRTYPE = LITERAL (Read)
    If MODE = "TRANSFORM" is selected then this parameter specifies
    the type of transform which will be supplied. Valid returns are
@@ -254,6 +297,9 @@ TRTYPE = LITERAL (Read)
    independent offsets and scales in X and Y. The inverse
    transformation must be supplied.
    [COEFF]
+
+XFOR
+
 XFOR = LITERAL (Read)
    If TRTYPE="EXPRES" is chosen then this parameter's value is
    the transformation that maps to the new X coordinate. The
@@ -272,6 +318,9 @@ XFOR = LITERAL (Read)
       XFOR > 'XX=PA*ASIND(FA/PA)*X/FA'
    Note the single quotes. They are necessary to protect the
    equals sign.
+
+XINV
+
 XINV = LITERAL (Read)
    If TRTYPE="EXPRES" is chosen then this parameter's value is
    the transformation that maps to the old X coordinate - the
@@ -290,6 +339,9 @@ XINV = LITERAL (Read)
       XINV > 'X=PA*SIND(FB/PA)*XX/FB'
    Note the single quotes. They are necessary to protect the
    equals sign.
+
+YFOR
+
 YFOR = LITERAL (Read)
    If TRTYPE="EXPRES" is chosen then this parameter's value is
    the transformation that maps to the new Y coordinate. The
@@ -308,6 +360,9 @@ YFOR = LITERAL (Read)
       YFOR > 'YY=PA*ASIND(FA/PA)*Y/FA'
    Note the single quotes. They are necessary to protect the
    equals sign.
+
+YINV
+
 YINV = LITERAL (Read)
    If TRTYPE="EXPRES" is chosen then this parameter's value is
    the transformation that maps to the old Y coordinate - the

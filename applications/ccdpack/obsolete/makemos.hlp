@@ -48,7 +48,11 @@ Description:
    image, will best eliminate these observed differences and give a
    smooth mosaic.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ALPHA
 
 ALPHA = _REAL (Read)
    The fraction of extreme values to remove before combining
@@ -58,6 +62,9 @@ ALPHA = _REAL (Read)
    values is removed from each extreme. This may take values in
    the range 0 to 0.5.
    [0.2]
+
+CMPVAR
+
 CMPVAR = _LOGICAL (Read)
    This parameter controls the use of statistical error
    (variance) information contained in the input images when they
@@ -80,16 +87,32 @@ CMPVAR = _LOGICAL (Read)
    happen, for instance, if an input image is the result of a
    previous mosaic-ing process).
    [TRUE]
+
+GENVAR
+
 GENVAR = _LOGICAL (Read)
-   If GENVAR is set to TRUE and all the input images supplied
+   If GENVAR is set to TRUE and all the input NDFs supplied
    contain statistical error (variance) information, then
    variance information will also be calculated for the output
-   mosaic image, provided that USEVAR is also TRUE. Otherwise,
-   if GENVAR is set to FALSE (or if any input image does not
-   contain variance information), then no output variance values
-   will be generated.  This parameter is only used if all the
-   input images contain variance information.
-   [TRUE]
+   mosaic NDF, provided that USEVAR is also TRUE.
+
+   Otherwise if GENVAR is TRUE and either USEVAR is FALSE or
+   some of the input NDFs do not contain error information, then
+   output variances will be generated using the natural
+   variations in the input data. Obviously this method should
+   only be used if there are many input datasets, which also
+   provide good coverage of the output area. If this option is
+   chosen any regions of the output image that have only one
+   input value will have their associated variances set bad.
+
+   The default for this parameter depends on the presence of error
+   information in the input NDFs. If all have error information
+   then the default is TRUE, otherwise it is FALSE.
+
+   [DYNAMIC]
+
+IN
+
 IN = LITERAL (Read and [optionally] Write)
    A list of the names of the input images which are to be combined
    into a mosaic. The image names should be separated by commas
@@ -100,12 +123,18 @@ IN = LITERAL (Read and [optionally] Write)
    scale-factor or zero-point corrections are being calculated)
    then each of the "input" images will be modified by applying the
    calculated corrections.
+
+LISTIN
+
 LISTIN = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
    then the names of all the images supplied as input will be
    listed (and will be recorded in the logfile if this is
    enabled).  Otherwise, this listing will be omitted.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter, then no logfile will be written, regardless of
@@ -115,6 +144,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -135,10 +167,16 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAX
+
 MAX = _REAL (Read)
    Upper limit for input data values which may contribute to the
    output mosaic if the "threshold" data combination method is
    selected (see the METHOD parameter). [Maximum real value]
+
+MAXIT
+
 MAXIT = _INTEGER (Read)
    This parameter specifies the maximum number of iterations to
    be used when inter-comparing pairs of input image data arrays to
@@ -155,6 +193,9 @@ MAXIT = _INTEGER (Read)
    but the results will still be used. The value given for MAXIT
    must be at least one.
    [20]
+
+METHOD
+
 METHOD = LITERAL (Read)
    The method to be used to combine the input images' data values
    to form the output mosaic. This may be set to any unique
@@ -162,7 +203,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha of the values are removed from
@@ -181,12 +222,23 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
+
+MIN
+
 MIN = _REAL (Read)
    Lower limit for input data values which may contribute to the
    output mosaic if the "threshold" data combination method is
    selected (see the METHOD parameter).
    [Minimum real value]
+
+MODIFY
+
 MODIFY = _LOGICAL (Read)
    By default, the images supplied via the IN parameter are
    regarded as "input" images and will not be modified. However, if
@@ -209,10 +261,16 @@ MODIFY = _LOGICAL (Read)
    TRUE, as information about the uncorrected data values of the
    "input" images will not be retained.
    [FALSE]
+
+NITER
+
 NITER = _REAL (Read)
    Maximum number of refining iterations used if the "mode" data
    combination method is selected (see the METHOD parameter).
    [7]
+
+OPTOV
+
 OPTOV = _INTEGER (Read)
    This parameter specifies the "optimum number of overlaps"
    which an image should have with its neighbours and controls the
@@ -250,12 +308,18 @@ OPTOV = _INTEGER (Read)
 
    This parameter is only used if SCALE or ZERO is set to TRUE.
    [3]
+
+OUT
+
 OUT = image (Write)
    Name of the image to contain the output mosaic. This is normally
    mandatory. However, if the "input" images are being modified (by
    setting the MODIFY parameter to TRUE), then it may optionally
    be omitted by supplying a null value (!). In this case, no
    output mosaic will be formed.
+
+PRESERVE
+
 PRESERVE = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
    then the data type of the output mosaic image will be derived
@@ -274,6 +338,9 @@ PRESERVE = _LOGICAL (Read)
    If a global value has been set up for this parameter using
    CCDSETUP, then that value will be used.
    [TRUE]
+
+REF
+
 REF = image (Read)
    If scale-factor and/or zero-point corrections are being
    applied (see the SCALE and ZERO parameters) then, by default,
@@ -306,6 +373,9 @@ REF = image (Read)
    that the output mosaic is normalised to it). However, it will
    not itself contribute to the output mosaic in this case.
    [!]
+
+SCALE
+
 SCALE = _LOGICAL (Read)
    This parameter specifies whether MAKEMOS should attempt to
    adjust the input data values by applying scale-factor (i.e.
@@ -330,10 +400,16 @@ SCALE = _LOGICAL (Read)
    parameter). By default, no scale-factor corrections are
    applied.
    [FALSE]
+
+SIGMAS
+
 SIGMAS = _REAL (Read)
    Number of standard deviations at which to reject values if the
-   "mode" or "sigma" data combination methods are selected (see
-   the METHOD parameter). This value must be positive. [4.0]
+   "mode", "sigma" or "clipmed" data combination methods are selected
+   (see the METHOD parameter). This value must be positive. [4.0]
+
+SKYSUP
+
 SKYSUP = _REAL (Read)
    A positive "sky noise suppression factor" used to control the
    effects of sky noise when pairs of input images are
@@ -359,8 +435,14 @@ SKYSUP = _REAL (Read)
    value, say 100, may give slightly better results for star
    fields).
    [10**(n/2.0)]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output mosaic image. [Output from MAKEMOS]
+
+TOLS
+
 TOLS = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
    when inter-comparing pairs of input image data arrays to
@@ -375,6 +457,9 @@ TOLS = _REAL (Read)
    error in the estimation of the relative scale-factor between
    any pair of input images. This value must be positive.
    [0.001]
+
+TOLZ
+
 TOLZ = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
    when inter-comparing pairs of input image data arrays to
@@ -392,6 +477,9 @@ TOLZ = _REAL (Read)
    data range can tolerate a larger error in estimating its
    zero-point). The TOLS value supplied must be positive.
    [0.05]
+
+USEVAR
+
 USEVAR = _LOGICAL (Read)
    The value of this parameter specifies whether statistical
    error (variance) information contained in the input images
@@ -410,7 +498,15 @@ USEVAR = _LOGICAL (Read)
    scale-factor corrections are being applied. Alternatively,
    explicit weights may be given for each input image via the
    WEIGHTS parameter.
+
+   If you want to add estimated variances to the output image
+   (based on the natural variations of the input images) and all
+   your input images contain variances then you will need to set
+   this parameter FALSE (see GENVAR).
    [TRUE]
+
+WEIGHTS
+
 WEIGHTS( ) = _REAL (Read)
    A set of positive weighting factors to be used to weight the
    input images when they are combined. If this parameter is used,
@@ -429,6 +525,9 @@ WEIGHTS( ) = _REAL (Read)
    variance information. Otherwise, the input variance values are
    used to weight the input data when they are combined.
    [!]
+
+ZERO
+
 ZERO = _LOGICAL (Read)
    This parameter specifies whether MAKEMOS should attempt to
    adjust the input data values by applying zero-point (i.e.
@@ -596,6 +695,8 @@ Behaviour_of_parameters
 
       - SKYSUP  -- dynamically defaulted
 
+      - GENVAR  -- dynamically defaulted
+
       - SCALE   -- always FALSE
 
       - ZERO    -- always FALSE
@@ -619,11 +720,12 @@ Behaviour_of_parameters
 Copyright
 
    Copyright (C) 1992 Science & Engineering Research Council
+   Copyright (C) 1998-1999 Central Laboratory of the Research Councils
+
 
 Authors
 
 RFWS: R.F. Warren-Smith (STARLINK, RAL)
-
 PDRAPER: Peter Draper (STARLINK)
 
 History
@@ -654,10 +756,10 @@ Implementation_Status
      types, with arithmetic being performed using the appropriate
      floating point type. It can process images with any number of
      dimensions. The DATA, TITLE and VARIANCE components of an NDF
-     are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
+     are directly supported, with the AXIS, HISTORY, LABEL
      and UNITS components and all extensions being propagated from
      the first input NDF supplied (note that AXIS values, if
      present, will normally be extrapolated as a result of
      propagation to the output mosaic, which will typically have a
-     larger extent than any of the input images).
+     larger extent than any of the input NDFs).
 .endhelp

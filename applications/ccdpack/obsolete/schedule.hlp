@@ -45,7 +45,11 @@ Description:
    do this using the routines IMPORT or CCDSETUP and PRESENT or any
    combination of these which give the desired effect.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DARKEXT
 
 DARKEXT = LITERAL (Read)
    The extension which added to the names of any images processed by
@@ -56,6 +60,9 @@ DARKEXT = LITERAL (Read)
 
    form the names of the images output from CALCOR.
    [-dk]
+
+DEBIAS
+
 DEBIAS = _INTEGER (Read)
    The form of debiassing that should be used. This is an integer
    which represents one of the following:
@@ -75,6 +82,9 @@ DEBIAS = _INTEGER (Read)
 
    If the interpolation option is selected then the method is
    determined by the INTERP parameter.
+
+DEBIASEXT
+
 DEBIASEXT = LITERAL (Read)
    The extension which added to the names of any images processed by
    DEBIAS. This makes the parameter
@@ -83,6 +93,9 @@ DEBIASEXT = LITERAL (Read)
 
    form the names of the images output from DEBIAS.
    [-db]
+
+EXECUTE
+
 EXECUTE = _LOGICAL (Read)
    Whether to execute the output command script immediately or not.
    If the option to execute is chosen then a background
@@ -92,10 +105,16 @@ EXECUTE = _LOGICAL (Read)
    expect the reduction to take some time). This option does not
    work for ICL scripts at this time.
    [FALSE]
+
+EXELOGFILE
+
 EXELOGFILE = LITERAL (Read)
    If the reduction is started immediately then the output will be
    redirected to this file.
    [SCHEDULE.LOG]
+
+FLASHEXT
+
 FLASHEXT = LITERAL (Read)
    The extension which added to the names of any images processed by
    CALCOR when performing pre-flash correction. This makes the
@@ -105,6 +124,9 @@ FLASHEXT = LITERAL (Read)
 
    form the names of the images output from CALCOR.
    [-dk]
+
+FLATEXT
+
 FLATEXT = LITERAL (Read)
    The extension which added to the names of any images processed by
    FLATCOR. This makes the parameter
@@ -113,6 +135,9 @@ FLATEXT = LITERAL (Read)
 
    form the names of the images output from FLATCOR.
    [-flt]
+
+IN
+
 IN = LITERAL (Given)
    A list of the names of the images which contain the data to be
    reduced. All images must already have the correct "frame type"
@@ -123,6 +148,9 @@ IN = LITERAL (Given)
 
    The image names should be separated by commas and may include
    wildcards.
+
+INTERP
+
 INTERP = _INTEGER (Read)
    If the interpolation method is chosen using the DEBIAS parameter
    then this parameter controls how the interpolation should be
@@ -136,6 +164,9 @@ INTERP = _INTEGER (Read)
    The possible options given the input information about the
    presence of bias strips are shown before the value of this
    parameter is accessed.
+
+IRFLATS
+
 IRFLATS = _LOGICAL (Read)
    This parameter allows input frames of type TARGET to be also
    used as flatfields. This is designed for use when no real
@@ -145,10 +176,13 @@ IRFLATS = _LOGICAL (Read)
    exposures, so that taking the median of a stack of frames
    results in the rejection of any object data (leaving the
    equivalent of a map of a blank piece of sky).
- 
-   TARGET frames will only be used to create flatfields, if no 
+
+   TARGET frames will only be used to create flatfields, if no
    flatfields (of the correct colour) are present in the input list.
    [FALSE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -158,6 +192,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -177,23 +214,38 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MASTERBIAS
+
 MASTERBIAS = LITERAL (Read)
    The name which will be given to a master bias image if one is
    created.
    [MASTER_BIAS]
+
+MASTERDARK
+
 MASTERDARK = LITERAL (Read)
    The name which will be given to a master dark image if one is
    created.
    [MASTER_DARK]
+
+MASTERFLASH
+
 MASTERFLASH = LITERAL (Read)
    The name which will be given to a master flash image if one is
    created.
    [MASTER_FLASH]
+
+MASTERFLAT
+
 MASTERFLAT = LITERAL (Read)
    The prefix of the name which will be given to any master flat
    images which are created. The filter name will be appended to
    this.
    [MASTER_FLAT]
+
+SCRIPT
+
 SCRIPT = LITERAL (Read)
    The name of the output file which will contain the CCDPACK
    commands which need to be executed to perform the reduction. The
@@ -202,6 +254,9 @@ SCRIPT = LITERAL (Read)
    by the choice of STYPE. The extension of the script name should
    always be the same as STYPE.
    [schedule."stype"]
+
+SPACESAVE
+
 SPACESAVE = LITERAL (Read)
    This parameter controls if any disk space management should be
    used or not. It can take one of the values, "NONE", "SOME" or
@@ -220,6 +275,9 @@ SPACESAVE = LITERAL (Read)
    space required is one image. Using "SOME" preserves the original
    images. Calibration masters are never deleted.
    [NONE]
+
+STYPE
+
 STYPE = LITERAL (Read)
    The type of CCDPACK command procedure to be produced. This
    should be one of "CSH" or "ICL". Once a type has been

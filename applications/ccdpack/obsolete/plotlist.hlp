@@ -14,16 +14,26 @@ Description:
    output such as a contour image) must have been displayed using a
    suitable routine such as KAPPA DISPLAY (SUN/95).
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CLEAR
 
 CLEAR = _LOGICAL (Read)
    This parameter controls whether or not the display device
    is cleared before plotting the markers. Setting this TRUE could
    be useful if plotting in a device overlay.
    [FALSE]
+
+DEVICE
+
 DEVICE = DEVICE (Write)
    The name of the device on which to plot the markers.
    [Current display device]
+
+INLIST
+
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
@@ -39,6 +49,9 @@ INLIST = LITERAL (Read)
    processing routines will write the names of their results
    files into files suitable for use in this manner) the
    indirection character is "^".
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -48,6 +61,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -68,6 +84,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MSIZE
+
 MSIZE = _REAL (Read)
    The size of the marker which will be drawn as a multiple of
    the default value. So for instance doubling the value of this
@@ -75,6 +94,9 @@ MSIZE = _REAL (Read)
    two. The default marker size is around 1/40 of the lesser of
    the width or height of the plot.
    [2.5]
+
+MTYPE
+
 MTYPE = _INTEGER (Read)
    The type of marker to plot at the positions given in the input
    files. PGPLOT Graph Markers are drawn if the value lies in the
@@ -84,6 +106,9 @@ MTYPE = _INTEGER (Read)
    which are in column one of the input file, will be written over
    the objects.
    [2]
+
+NDFNAMES
+
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
    position lists are stored in the image CCDPACK extensions under
@@ -92,6 +117,9 @@ NDFNAMES = _LOGICAL (Read)
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
    [TRUE]
+
+PALNUM
+
 PALNUM = _INTEGER (Read)
    The pen number to use when drawing the markers.  The colours
    associated with these pens are the default PGPLOT pens (see
@@ -123,6 +151,9 @@ PALNUM = _INTEGER (Read)
    The KAPPA palette pen numbers correspond to PALNUM values
    (hence the parameter name).
    [3]
+
+THICK
+
 THICK = _INTEGER (Read)
    The thickness of the lines used to draw the markers. This may
    take any value in the range 1-21.

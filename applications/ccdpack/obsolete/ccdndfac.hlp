@@ -18,12 +18,19 @@ Description:
    existence of this file is a platform independent way of
    determining if the invocation has been successful.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ECHO
 
 ECHO = _LOGICAL (Read)
    If TRUE then the names of the images will be written to the
    terminal unless there is only one input image.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -33,6 +40,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -53,15 +63,24 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+IN
+
 IN = LITERAL (Read)
-   A list of image names. The image names should be separated by commas 
+   A list of image names. The image names should be separated by commas
    and may include wildcards.
    [!]
+
+MAXNDF
+
 MAXNDF = _INTEGER (Read)
    The maximum number of images which should be accessed. If a null
    return "!" is given for this parameter then the normal CCDPACK
    limit will be applied.
    [!]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    The name of the output file to contain the names of the
    accessed images.

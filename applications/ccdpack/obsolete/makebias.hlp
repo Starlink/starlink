@@ -11,11 +11,11 @@ Usage:
 
 Description:
 
-   This routine processes a series of bias frames, so as to produce 
-   a single "master bias" frame in which the noise levels are reduced. 
-   This master bias frame can then be used to de-bias other CCD frames 
-   (using DEBIAS). Using the given readout noise an, optional, variance 
-   component may be produced for the output data. The use of a variance 
+   This routine processes a series of bias frames, so as to produce
+   a single "master bias" frame in which the noise levels are reduced.
+   This master bias frame can then be used to de-bias other CCD frames
+   (using DEBIAS). Using the given readout noise an, optional, variance
+   component may be produced for the output data. The use of a variance
    component allows the effects of noise in bias subtraction to be
    properly monitored.
 
@@ -28,7 +28,11 @@ Description:
    combination. The combination methods offer a mixture of very
    robust (median) to very efficient (mean) estimators.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ALPHA
 
 ALPHA = _REAL (Read)
    The fraction of extreme values to remove before combining
@@ -36,6 +40,9 @@ ALPHA = _REAL (Read)
    extreme so can only take a value in the range 0 to 0.5.
    Only used if METHOD="TRIMMED"
    [0.2]
+
+GENVAR
+
 GENVAR = _LOGICAL (Read)
    If TRUE then a variance component representative of the
    readout noise will be generated. If FALSE then no variance
@@ -49,9 +56,15 @@ GENVAR = _LOGICAL (Read)
    If a global value has been set using CCDSETUP this value
    will be used, and will be shown as the default.
    [FALSE]
+
+IN
+
 IN = LITERAL (Read)
    A list of image names which contain the raw bias frame data.
    The image names should be separated by commas and may include wildcards.
+
+KEEPIN
+
 KEEPIN = _LOGICAL (Read)
    Whether to keep (i.e. not delete) the input images or not.
    Deleting the input images has the advantage of saving disk
@@ -64,6 +77,9 @@ KEEPIN = _LOGICAL (Read)
    overridden except by assignment on the command line or in
    response to a forced prompt.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -73,6 +89,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -93,6 +112,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAX
+
 MAX = _REAL (Read)
    If METHOD = "THRESH" then this value defines the upper limit
    for values which can be used when combining data. Note that the
@@ -101,6 +123,9 @@ MAX = _REAL (Read)
    maximum value should be a offset from zero (say some positive
    number 2 or 3 sigmas large). This could be used as a form of
    sigma clipping if no variances are to be generated.
+
+METHOD
+
 METHOD = LITERAL (Read)
    The method to be used to combine the data components of
    the input images. This may be set to any unique abbreviation of
@@ -108,7 +133,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha of the values are removed from
@@ -127,7 +152,15 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
+
+MIN
+
 MIN = _REAL (Read)
    If METHOD = "THRESH" then this value defines the lower limit
    for values which can be used when combining the data. Note that
@@ -136,18 +169,30 @@ MIN = _REAL (Read)
    minimum value should be a offset from zero (say some negative
    number 2 or 3 sigmas large). This could be used as a form of
    sigma clipping if no variances are to be generated.
+
+MINPIX
+
 MINPIX = _INTEGER (Read)
    The minimum number of good (i.e. not BAD) pixels required
    to contribute to the value of an output pixel. Output pixels
    not meeting this requirement are set BAD.
    [1]
+
+NITER
+
 NITER = _INTEGER (Read)
    The number of refining iterations performed if METHOD = "MODE".
    [7]
+
+OUT
+
 OUT = LITERAL (Read)
    Name of the output image. This has the master bias frame and
    the estimated variances. This name may be specified using
    indirection through a file.
+
+PRESERVE
+
 PRESERVE = _LOGICAL (Read)
    If TRUE then this indicates that the input data type is to be
    used for processing. If not then the output type will either
@@ -157,6 +202,9 @@ PRESERVE = _LOGICAL (Read)
    If a global value has been set using CCDSETUP then this will
    be used.
    [TRUE]
+
+RNOISE
+
 RNOISE = _DOUBLE (Read)
    The readout-noise standard deviation. This should be in the
    input data units (ADUs). A value for this will be worked out
@@ -179,15 +227,24 @@ RNOISE = _DOUBLE (Read)
    If a global value has been set up using CCDSETUP this value
    will be used, and will be shown as the default.
    [Dynamically derived value]
+
+SIGMAS
+
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
-   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-   deviation is estimated from the population of values. For
-   METHOD = "SIGMA" this value is the readout noise.
+   "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+   standard deviation is estimated from the population of values.
+   For METHOD = "SIGMA" this value is the readout noise.
    [4]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output image
    [Output from MAKEBIAS].
+
+USEEXT
+
 USEEXT = _LOGICAL (Read)
    If TRUE then the parameter RNOISE of this program will not
    be used and the required values will be obtained from the
@@ -199,6 +256,9 @@ USEEXT = _LOGICAL (Read)
    Values obtained from the CCDPACK extension are identified in
    the output log by the presence of a trailing asterisk (*).
    [FALSE]
+
+ZERO
+
 ZERO = _LOGICAL (Read)
    Flag indicating whether the output master bias is to have a
    mean value of zero or not. If TRUE the input data components
@@ -304,6 +364,6 @@ Implementation_Status
 
    - The routine supports BAD pixels and all numeric data types
      except COMPLEX.  All combinational arithmetic is performed using
-     floating values.  The UNITS, AXIS, TITLE and QUALITY components
+     floating values.  The UNITS, AXIS and TITLE components
      are correctly propagated. Any input variances are ignored.
 .endhelp

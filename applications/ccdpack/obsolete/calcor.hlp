@@ -21,7 +21,11 @@ Description:
    protecting them from modification. This protection is necessary
    if the saturated pixels are not to become differentiated.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+CAL
 
 CAL = LITERAL (Read)
    Name of the image containing the calibration data, this would
@@ -33,6 +37,9 @@ CAL = LITERAL (Read)
    The name of this file may be specified using indirection
    through a file.
    [Global calibration image]
+
+EXPOSE
+
 EXPOSE = LITERAL (Read)
    A list of (comma separated) values specifying the numbers by
    which the calibration data need to be multiplied before
@@ -53,6 +60,9 @@ EXPOSE = LITERAL (Read)
    one line is required to enter the information then a
    continuation line may be requested by adding "-" to the end of
    the last value.
+
+IN
+
 IN = LITERAL (Read)
    Names of the images to be processed. The calibration data will be
    scaled and subtracted from these.  The image names should be
@@ -62,6 +72,9 @@ IN = LITERAL (Read)
    unless the input images all have the same calibration exposure
    factors. The processing order of any wildcarded images cannot
    be guaranteed.
+
+KEEPIN
+
 KEEPIN = _LOGICAL (Read)
    Whether to keep (i.e. not delete) the input images (parameter IN)
    or not. Deleting the input images has the advantage of saving
@@ -75,6 +88,9 @@ KEEPIN = _LOGICAL (Read)
    overridden except by assignment on the command line or in
    response to a forced prompt.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -84,6 +100,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -104,6 +123,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+OUT
+
 OUT = LITERAL (Read)
    Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
@@ -129,6 +151,9 @@ OUT = LITERAL (Read)
    unless the input images all have the same calibration exposure
    factors. The order of processing of any wildcarded images cannot
    be guaranteed.
+
+PRESERVE
+
 PRESERVE = _LOGICAL (Read)
    If the input data type is to be preserved and used for
    processing then this parameter should be set TRUE.
@@ -143,9 +168,15 @@ PRESERVE = _LOGICAL (Read)
    Note if a global value for this parameter has been set, using
    CCDSETUP, then this will be used.
    [TRUE]
+
+SATURATION
+
 SATURATION = _DOUBLE (Read)
    The data saturation value, if it has been applied. See SETSAT.
    [1.0D6]
+
+SETSAT
+
 SETSAT = _LOGICAL (Read)
    If the input data have had a saturation value applied then
    this parameter should be given as TRUE. If the input data
@@ -156,6 +187,9 @@ SETSAT = _LOGICAL (Read)
    been set within CCDPACK will require separate processing
    (i.e. in groups with the same properties -- see notes).
    [FALSE]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output images.
    [Output from CALCOR].
@@ -171,7 +205,7 @@ calcor frame1 frame2 calibration 250
    automatically. The output data will be of the same type as the
    input data.
 
-calcor in=^frames.dat out='*_darksub' cal=dark_master 
+calcor in=^frames.dat out='*_darksub' cal=dark_master
        expose=^dark_exposures
    In this example a list of images are sequentially processed. The
    list of image names is stored in the file frames.dat. The output

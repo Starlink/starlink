@@ -33,26 +33,42 @@ Description:
    can then be used in a routine such as REGISTER to produce the
    actual transformation between the images.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+DEVICE
 
 DEVICE = DEVICE (Read)
    The name of the image display device.
    [Current image display device]
+
+FILLFRAC
+
 FILLFRAC = _DOUBLE (Read)
    The largest fraction of the display area which the images
    displayed in the scratch region (the part where they can be
    manipulated) may take. A value will always be in the
    range 0.05 to 0.95.
    [0.55]
+
+IN
+
 IN = LITERAL (Read)
    A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
+
+KEEPLUT
+
 KEEPLUT = _LOGICAL (Read)
    Whether to retain the current device look-up-table. If FALSE
    then a greyscale look-up-table is loaded. PAIRNDF loads the
    primary colours into the first few pens regardless of the
    value of this parameter.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -62,6 +78,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -82,6 +101,9 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAKEBIG
+
 MAKEBIG = _LOGICAL (Read)
    If TRUE then images will be scaled to fit into the whole of
    the FILLFRAC area. If FALSE then scaling will never exceed
@@ -89,14 +111,23 @@ MAKEBIG = _LOGICAL (Read)
    the time needed to process images from the display palette
    into the scratch region.
    [TRUE]
+
+MEMORY
+
 MEMORY = _INTEGER (Read)
    The memory of the device which is to be used. This can take
    the values 0 and 1. 0 means the base memory and 1 the overlay.
    [0]
+
+MSIZE
+
 MSIZE = _REAL (Read)
    Determines the size of the position marker. This is set as a
    fraction of the X dimension of the display.
    [0.03]
+
+NAMELIST
+
 NAMELIST = LITERAL (Read)
    The name of a file to contain the names of the output
    position lists. The names written to this file are those
@@ -106,6 +137,9 @@ NAMELIST = LITERAL (Read)
    routine, if the associating position lists with images option is
    not being used.
    [PAIRNDF.LIS]
+
+OUTLIST
+
 OUTLIST = LITERAL (Read)
    An expression which is either a list of names or expands to a
    list of names for the output position lists.
@@ -115,7 +149,7 @@ OUTLIST = LITERAL (Read)
    element (of the input names). The simplest modification
    element is the asterisk "*" which means call each of the
    output lists the same name as the corresponding input images.
-   So:
+   So,
       IN > *
       OUTLIST > *
    signifies that all the images in the current directory should be
@@ -134,11 +168,17 @@ OUTLIST = LITERAL (Read)
    recommended that wildcards are also used for the position list
    names as the correspondence between these may be confusing.
    [*.DAT]
+
+PALFRAC
+
 PALFRAC = _DOUBLE (Read)
    The fraction of display X-dimension which is reserved for the
    image palette. A value will always be in the range
    0.05 to 0.95.
    [0.25]
+
+PERCENTILES
+
 PERCENTILES( 2 ) = _DOUBLE (Read)
    The percentile data range to use as limits when displaying the
    images. Must be in the range 0 to 100. Using percentiles as
@@ -147,6 +187,9 @@ PERCENTILES( 2 ) = _DOUBLE (Read)
    combining the data using a mean as a crude normalisation has
    been performed.
    [2,98]
+
+THICK
+
 THICK = _INTEGER (Read)
    The thickness of the position marker in device pixels.
    [3]
@@ -157,8 +200,8 @@ pairndf '*'  '*.dat' xw '[1,99]'
   In this routine the positional nature of the parameters is
   shown. All the images in the current directory are displayed.
   Their output positions lists have the same name as the images
-  except that they have a file type of .dat. The images are 
-  displayed using the percentile limits 1,99 which shows bright 
+  except that they have a file type of .dat. The images are
+  displayed using the percentile limits 1,99 which shows bright
   detail well.
 
 pairndf msize=0.1 thick=7

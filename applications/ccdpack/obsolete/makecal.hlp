@@ -24,7 +24,11 @@ Description:
    give a mixture of very robust (median) to very efficient (mean)
    methods to suit the data.
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+ALPHA
 
 ALPHA = _REAL (Read)
    The fraction of extreme values to remove before combining
@@ -32,6 +36,9 @@ ALPHA = _REAL (Read)
    extreme so can only take a value in the range 0 to 0.5.
    Only used if METHOD="TRIMMED"
    [0.2]
+
+EXPOSE
+
 EXPOSE = LITERAL (Read)
    Either:
    An exact number of exposure factors for the input images. The
@@ -46,6 +53,9 @@ EXPOSE = LITERAL (Read)
    of the line.
 
    This parameter will not be used if USEEXT is set TRUE.
+
+IN
+
 IN = LITERAL (Read)
    A list of image names which contain the calibration data. The
    image names should be separated by commas and may include
@@ -55,6 +65,9 @@ IN = LITERAL (Read)
    unless the input images all have the same calibration exposure
    factors. The order of processing of any wildcarded images cannot
    be guaranteed.
+
+KEEPIN
+
 KEEPIN = _LOGICAL (Read)
    Whether to keep (i.e. not delete) the input images or
    not. Deleting the input images has the advantage of saving disk
@@ -66,6 +79,9 @@ KEEPIN = _LOGICAL (Read)
    overridden except by assignment on the command line or in
    response to a forced prompt.
    [TRUE]
+
+LOGFILE
+
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
    this parameter then no logfile will be written, regardless of
@@ -75,6 +91,9 @@ LOGFILE = FILENAME (Read)
    then the value specified there will be used. Otherwise, the
    default is "CCDPACK.LOG".
    [CCDPACK.LOG]
+
+LOGTO
+
 LOGTO = LITERAL (Read)
    Every CCDPACK application has the ability to log its output
    for future reference as well as for display on the terminal.
@@ -95,12 +114,18 @@ LOGTO = LITERAL (Read)
    then the value specified there will be used. Otherwise, the
    default is "BOTH".
    [BOTH]
+
+MAX
+
 MAX = _REAL (Read)
    If METHOD = "THRESH" then this value defines the upper limit
    for values which can be used when combining the data. This
    limit applies to the range of the output data (i.e. the values
    after the exposure factors have been divided into the input
    data).
+
+METHOD
+
 METHOD = LITERAL (Read)
    The method to be used to combine the data components of
    the input images. This may be set to any unique abbreviation of
@@ -108,7 +133,7 @@ METHOD = LITERAL (Read)
 
       -  MEAN      -- Mean of the input data values
 
-      -  MEDIAN    -- Median of the input data values
+      -  MEDIAN    -- Weighted median of the input data values
 
       -  TRIMMED   -- An "alpha trimmed mean" in which a fraction
                       alpha/2 of the values are removed from
@@ -127,40 +152,70 @@ METHOD = LITERAL (Read)
 
       -  BROADENED -- A broadened median (the mean of a small
                       number of central values)
+
+      -  CLIPMED   -- A sigma clipped median (like SIGMA except
+                      that the median of the clipped values is used)
+
+      -  FASTMED    -- Unweighted median of the input data values
    [MEDIAN]
+
+MIN
+
 MIN = _REAL (Read)
    If METHOD = "THRESH" then this value defines the lower limit
    for values which can be used when combining the data. This
    limit applies to the range of the output data (i.e. the values
    after the exposure factors have been divided into the input
    data).
+
+MINPIX
+
 MINPIX = _INTEGER (Read)
    The minimum number of good (ie. not BAD) pixels required
    to contribute to the value of an output pixel. Output pixels
    not meeting this requirement are set BAD.
    [1]
+
+NITER
+
 NITER = _INTEGER (Read)
    The number of refining iterations performed if METHOD = "MODE".
    [7]
+
+OUT
+
 OUT = LITERAL (Write)
    Name of the output image to contain the calibration data.
    Note this image will have a type of at least _REAL.
+
+SIGMAS
+
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
-   "MODE" and "SIGMA" methods. For METHOD = "MODE" the standard
-   deviation is estimated from the population of values, for
-   METHOD = "SIGMA" the variances are used. If no variances
-   exist then the inverse exposure factors are used.
+   "MODE", "SIGMA" and "CLIPMED" methods. For METHOD = "MODE" the
+   standard deviation is estimated from the population of values, for
+   METHOD = "SIGMA" and "CLIPMED" the variances are used. If no
+   variances exist then one is estimated from the population of
+   values.
    [4.0]
+
+TITLE
+
 TITLE = LITERAL (Read)
    Title for the output image.
    [Output from MAKECAL]
+
+TYPE
+
 TYPE = LITERAL (Read)
    The frame types of the input data. This should be a recognised
    name "FLASH", "DARK" or "NONE". The value of this parameter
    affects the output image frame type which will be set to
    "MASTER_FLASH" or "MASTER_DARK" or "MASTER_?".
    [NONE]
+
+USEEXT
+
 USEEXT = _LOGICAL (Read)
    If TRUE then the EXPOSE parameter of this program will not
    be used and the required values will be obtained from the
@@ -263,8 +318,7 @@ Implementation_Status
 
    - The routine supports BAD pixels and all data types except
      COMPLEX. All combinational arithmetic is performed in floating
-     point. The AXIS, TITLE and QUALITY components are correctly
-     propagated. The variances are propagated through the combination
-     processing, assuming that the input data have a normal
-     distribution.
+     point. The AXIS and TITLE components are correctly propagated.
+     The variances are propagated through the combination processing,
+     assuming that the input data have a normal distribution.
 .endhelp

@@ -1,6 +1,6 @@
 .help ccdfork Starlink ccdpack
 .nf
-   Creates a script for executing CCDPACK commands in a background 
+   Creates a script for executing CCDPACK commands in a background
    process.
 
 Usage:
@@ -14,21 +14,31 @@ Description:
 
    The input to it is a file that contains just the CCDPACK commands
    that you want to execute. This procedure then writes another
-   script that re-initializes CCDPACK and isolates any existing 
+   script that re-initializes CCDPACK and isolates any existing
    program parameters from your interactive processes.
 
    The output script should be executed as a nice priority
    background job (see the examples section).
 
-Parameters:
+Parameters
+
+For information on individual parameters, select from the list below:
+
+$1
 
 $1 = filename (read)
    The name of the script file which contains the
    CCDPACK commands which are to be run in the background.
+
+$2
+
 $2 = filename (write)
    The name of the output script which will re-establish
    the current ADAM context and execute your command
    file. [ccdpack_fork]
+
+$3
+
 $3 = directory (write)
    The name of a directory in which to store the current
    ADAM context. If no value is given then a sub-directory
