@@ -490,15 +490,6 @@ sub _GTxtEx {
       # Top left corner... 
       $$xb[ 3 ] = $xc - $vdx + $udx;
       $$yb[ 3 ] = $yc - $vdy + $udy;
-      
-      print "xb[0] = " . $$xb[ 0 ] ."\n";
-      print "yb[0] = " . $$yb[ 0 ] ."\n";
-      print "xb[1] = " . $$xb[ 1 ] ."\n";
-      print "yb[1] = " . $$yb[ 1 ] ."\n";
-      print "xb[2] = " . $$xb[ 2 ] ."\n";
-      print "yb[2] = " . $$yb[ 2 ] ."\n";
-      print "xb[3] = " . $$xb[ 3 ] ."\n";
-      print "yb[3] = " . $$yb[ 3 ] ."\n";
 
    }
    
