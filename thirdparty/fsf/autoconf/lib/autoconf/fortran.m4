@@ -550,6 +550,7 @@ fi
 #  fort: Compaq (now HP) Fortran 90/95 compiler for Tru64 and Linux/Alpha
 #  ifc: Intel Fortran 95 compiler for Linux/x86
 #  efc: Intel Fortran 95 compiler for IA64
+#  f77 -old_f77: DIGITAL Fortran 77 (as opposed to f90 in F77 mode)
 #
 # Must check for lf95 before f95 - some Lahey versions ship an f95 binary 
 # in the default path that must be avoided.
@@ -560,7 +561,7 @@ fi
 #
 m4_define([_AC_F95_FC], [lf95 f95 fort xlf95 ifc efc pgf95 gfortran])
 m4_define([_AC_F90_FC], [f90 xlf90 pgf90 epcf90])
-m4_define([_AC_F77_FC], [g77 f77 xlf frt pgf77 fort77 fl32 af77])
+m4_define([_AC_F77_FC], [g77 f77 xlf frt pgf77 fort77 fl32 af77 'f77 -old_f77'])
 AC_DEFUN([_AC_PROG_FC],
 [_AC_FORTRAN_ASSERT()dnl
 AC_CHECK_TOOLS([]_AC_FC[],
@@ -1705,7 +1706,7 @@ AC_DEFUN([AC_FC_RECL_UNIT],
 
          OPEN(UNIT = OUTUNIT,
      :        FILE = 'conftest.rcl1',
-     :        STATUS = 'REPLACE',
+     :        STATUS = 'NEW',
      :        FORM = 'UNFORMATTED',
      :        ACCESS = 'DIRECT',
      :        RECL = RECLEN,
@@ -1721,10 +1722,10 @@ AC_DEFUN([AC_FC_RECL_UNIT],
             GOTO 102
          END IF
 
-*      Error opening unit
+*      Error opening unit; close and delete the file
  101     CONTINUE
 
-         CLOSE(UNIT=OUTUNIT)
+         CLOSE(UNIT=OUTUNIT, STATUS='DELETE')
 
          RECLEN = RECLEN * 2
       END DO
@@ -1734,7 +1735,7 @@ AC_DEFUN([AC_FC_RECL_UNIT],
 
       OPEN(UNIT = OUTUNIT,
      :     FILE = 'conftest.rcl2',
-     :     STATUS = 'REPLACE',
+     :     STATUS = 'NEW',
      :     ERR = 103)
       WRITE(OUTUNIT,'(I3)') UNITLEN
       CLOSE(UNIT = OUTUNIT)
@@ -1751,7 +1752,7 @@ AC_DEFUN([AC_FC_RECL_UNIT],
                           else
                               ac_cv_fc_recl_unit=0
                           fi
-                          rm -f conftest.*])
+                          rm -f conftest*])
           if test -n "$ac_cv_fc_recl_unit" -a $ac_cv_fc_recl_unit -gt 0; then
               AC_DEFINE_UNQUOTED([FC_RECL_UNIT], $ac_cv_fc_recl_unit,
                         [Define to the length in bytes of the unit that OPEN RECL expects])
@@ -1887,6 +1888,8 @@ AC_DEFUN([_AC_LANG_PROGRAM_FPP_SIMPLE],
 # _AC_LANG_PROGRAM_FPP_ONLY
 # ---------------------------
 # Test program for pure preprocessing
+# Note that other macros test for literal strings within this, so check
+# for those if you have to change anything here.
 AC_DEFUN([_AC_LANG_PROGRAM_FPP_ONLY],
          [AC_LANG_PROGRAM([@%:@define OK], [dnl
 #ifdef OK
@@ -2005,19 +2008,34 @@ test $ac_fpp_need_CSTYLE = yes && ac_fpp_need_cstyle=no
 # A helper macro to test correct fpp behaviour
 # It sets ac_cv_prog_fpp and ac_fpp_out
 AC_DEFUN([_AC_TEST_FPP],
-[cat >conftest.$ac_ext << \_ACEOF
+[rm -f conftest*
+cat >conftest.$ac_ext << \_ACEOF
 _AC_LANG_PROGRAM_FPP_ONLY
 _ACEOF
 ac_fpp_command=$1
 if eval '$ac_fpp_command conftest.$ac_ext > conftest.log 2>/dev/null'; then
-  test -f conftest.f &&
-      cat conftest.f | grep '^      REAL A' >/dev/null 2>&1 &&
-      cat conftest.f | grep 'syntax error' >/dev/null 2>&1  ||
-    ac_cv_prog_fpp=$ac_fpp_command; ac_fpp_out=
-  test -f conftest.log &&
-      cat conftest.log | grep '^      REAL A' >/dev/null 2>&1 &&
-      cat conftest.log | grep 'syntax error' >/dev/null 2>&1  ||
-    ac_cv_prog_fpp=$ac_fpp_command; ac_fpp_out=' > conftest.f'
+  if test -f conftest.f; then
+    if cmp conftest.$ac_ext conftest.f; then
+      # ooops -- these two are the same file.  Ie, this is a 
+      # case-insensitive filesystem, so ignore this file
+      ac_tmp=
+    else
+      ac_tmp=conftest.f
+      ac_fpp_out=
+    fi
+  fi
+  if test -z "$ac_tmp"; then
+    ac_tmp=conftest.log
+    ac_fpp_out=' > conftest.f'
+  fi
+  if grep '^      REAL A' $ac_tmp >/dev/null 2>&1; then
+    # we have Fortran!  That worked...
+    ac_cv_prog_fpp=$ac_fpp_command
+  fi
+  if grep 'syntax error' $ac_tmp >/dev/null 2>&1; then
+    # ...oh no it didn't: this line should have been skipped
+    ac_cv_prog_fpp=
+  fi
 fi
 rm -f conftest*
 ])# _AC_TEST_FPP
@@ -2141,7 +2159,6 @@ else
 fi
 cp conftest.FPP_SRC_EXT conftest.$FPP_SRC_EXT
 ac_cmd='$FPP $FPPFLAGS conftest.$FPP_SRC_EXT '"$ac_tmp"
-echo "ac_cmd=$ac_cmd ; ac_link=$ac_link"
 ## use ac_link from the Fortran language
 if AC_TRY_EVAL(ac_cmd) &&
      AC_TRY_EVAL(ac_link) && test -s conftest${ac_exeext}; then
