@@ -12,7 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL COF_EXDIM( FUNIT, OBJECT, NAME, NDIM, DIMS, INDICE, STATUS )
+*     CALL COF_EXDIM( FUNIT, OBJECT, MAXDIM, NAME, NDIM, DIMS, INDICE,
+*                     STATUS )
 
 *  Description:
 *     The routine takes a string in the format produced by HDS_TRACE,
@@ -29,19 +30,19 @@
 *        It comprises a name with optional comma-separated indices of
 *        an element given between parentheses.  Index ranges, i.e.
 *        containing ':' are not permitted.
-*     NAME = CHARACTER * ( * ) (Given)
-*        The component name extracted from the OBJECT, i.e. all the
-*        characters before any leading left parenthesis.
 *     MAXDIM = INTEGER (Given)
 *        The maximum number of dimensions of the structure, and declared
 *        size of DIMS and INDICE arrays in the calling routine.  It is
 *        recommended to be set to DAT__MXDIM.
-*     NDIM = INTEGER (Given)
+*     NAME = CHARACTER * ( * ) (Returned)
+*        The component name extracted from the OBJECT, i.e. all the
+*        characters before any leading left parenthesis.
+*     NDIM = INTEGER (Returned)
 *        The number of dimensions of the structure.
-*     DIMS( MAXDIM ) = INTEGER (Given)
+*     DIMS( MAXDIM ) = INTEGER (Returned)
 *        The dimensions of the structure.  For dimensionalities greater
 *        than NDIM, the dimensions are set to 1.
-*     INDICE( MAXDIM ) = INTEGER (Given)
+*     INDICE( MAXDIM ) = INTEGER (Returned)
 *        The indices of the element of the structure.  For
 *        dimensionalities greater than NDIM, the indices are set to 1.
 *     STATUS = INTEGER (Given and Returned)
@@ -57,7 +58,10 @@
 *  History:
 *     1997 March 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 15 (MJC):
+*        Corrected some errors in the prologue, notably the accesses
+*        for the returned arguments.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -87,9 +91,6 @@
       INTEGER STATUS             ! Global status
 
 *  Local Constants:
-      INTEGER FITSOK             ! Good status for FITSIO library
-      PARAMETER( FITSOK = 0 )
-
       INTEGER MAXWRD             ! Maximum number of words in object
       PARAMETER( MAXWRD = DAT__MXDIM + 1 ) ! specification.
 
@@ -152,7 +153,7 @@
       END IF
 
 *  Replace the commas by spaces in the shape.
-      CALL CHR_TRCHR( ',', '  ', EXSHAP, STATUS )
+      CALL CHR_TRCHR( ',', ' ', EXSHAP, STATUS )
 
 *  Break the shape into words.
       CALL CHR_DCWRD( EXSHAP, MAXWRD, NWORD, START, END, WORDS, STATUS )
