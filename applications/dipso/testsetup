@@ -1,0 +1,14 @@
+#!/bin/csh
+#
+# These values are correct for the default installation (INSTALL=/star)
+#
+setenv DIPSODIR /pckg/dmills/dipso
+setenv LDIPSODIR /dev/null
+setenv DIPSOLIB /pckg/dmills/dipso
+alias dipso /pckg/dmills/dipso/dipso
+#
+#
+setenv SPECDAT /pckg/dmills/dipso/specdat
+setenv OWNERDIR ${HOME}
+alias my_dipso source /pckg/dmills/dipso/my_dipso
+echo "Dipso environment setup, type dipso to start task"

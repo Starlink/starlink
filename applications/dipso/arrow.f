@@ -1,0 +1,35 @@
+      SUBROUTINE ARROW(XC,YC,N,ANGLE,EXPAND,XYRATIO,XS,YS,NS)
+      REAL XS(NS), YS(NS)
+      PARAMETER (PI=3.14159265)
+
+      FRACT=0.01
+      N=3
+      NS=0
+      DTHETA = 2 * PI / N
+      DTHETA=0.5*DTHETA
+      THETA = ((7./3)*PI + DTHETA)/2 + ANGLE
+      XA = 2.*EXPAND*FRACT*COS(THETA) + XC
+      YA = 2.*EXPAND*FRACT*SIN(THETA)* XYRATIO + YC
+      NS=NS+1
+      XS(NS)=XA
+      YS(NS)=YA
+      NS=NS+1
+      XS(NS)=XC
+      YS(NS)=YC
+      DO  J = 1,N/2
+         THETA = THETA + DTHETA
+         XB = 2.*EXPAND*FRACT*COS(THETA) + XC
+         YB = 2.*EXPAND*FRACT*SIN(THETA) * XYRATIO+ YC
+         NS=NS+1
+         XS(NS)=XB
+         YS(NS)=YB
+      ENDDO
+      NS=5
+      HDTHETA=0.5*DTHETA
+      THETAMID=THETA-HDTHETA
+      XS(4) = 2.*COS(HDTHETA)*EXPAND*FRACT*COS(THETAMID) + XC
+      YS(4) = 2.*COS(HDTHETA)*EXPAND*FRACT*SIN(THETAMID)*
+     :                               XYRATIO + YC
+      XS(5) = 5.*EXPAND*FRACT*COS(THETAMID) + XC
+      YS(5) = 5.*EXPAND*FRACT*SIN(THETAMID)* XYRATIO + YC
+      END

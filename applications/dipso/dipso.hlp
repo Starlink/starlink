@@ -1,0 +1,17 @@
+
+To get a listing of available commands with brief descriptions,
+type "COMM -" (COMM can also be used to list commands in selected
+functional classes). 
+
+To get extended help on a specific command, type HELP <command>,
+where you should substitute the name of the command of interest
+for <command>.
+
+Full documentation is in /star/docs/sun50.tex or $DIPSODIR/help.lis. 
+It can be inspected without leaving DIPSO by typing "USEHTX" and then 
+"HELP". This uses a world-wide-web browser to display SUN/50 in a 
+hypertext format. Alternatively, you can use the "SHELL" command to 
+display the required file as plain text (eg "SHELL more $DIPSODIR/help.lis").
+
+To leave DIPSO, type QUIT or EXIT.
+

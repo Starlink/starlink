@@ -1,0 +1,156 @@
+
+      SUBROUTINE ELFSET(X,NINV)
+      COMMON/DAT1/FL,W,WS,WV,NF
+      COMMON/DAT2/A,B,P,S,FLX,INDX,IREL,LP,NL,IAB
+      COMMON/DAT5/NDIM,NDI2,NPAR,NUMFIT,NCUR,MAXFC
+      COMMON/DEBUG/NY
+      DIMENSION FL(1000),W(1000),X(40),INDX(80),IREL(80),LP(20)
+      DIMENSION A(80),B(80),C(70,70),D(30),FF(30),P(10),FLX(20)
+C
+C  PLACE VARIATIONAL PARAMETERS X IN CORRECT LOCATIONS IN ARRAY
+C  B FOR LATER USE BY SR. CALCFX
+C
+      NV=0
+      NDI3=3*NDIM
+      ND=-NDIM
+      IF(NL.NE.0) THEN
+        DO 20 I=1,4
+        ND=ND+NDIM
+        DO 10 J=1,NL
+        IF(INDX(J+ND).NE.1) GO TO 8
+        IF(I.EQ.3) GO TO 8
+        NV=NV+1
+        B(J+ND)=X(NV)
+        GO TO 10
+    8   IF(INDX(J+ND).NE.2) GO TO 10
+        B(J+ND)=A(J+ND)
+   10   CONTINUE
+        DO 18 J=1,NL
+        IF(INDX(J+ND).NE.3) GO TO 18
+        K=IREL(J+ND)
+        IF(I.EQ.3) GO TO 19
+        B(J+ND)=B(K+ND)+A(J+ND)
+        GO TO 18
+   19   B(J+ND)=B(K+ND)*A(J+ND)
+   18   CONTINUE
+   20   CONTINUE
+C  IN THE CASE OF ALL PARAMETERS SPECIFIED, RETURN
+C
+        DO I=1,3
+        DO J=1,NL
+        IP=NDIM*(I-1)+J
+        IF(INDX(IP).EQ.1) GO TO 21
+        ENDDO
+        ENDDO
+        RETURN
+      ENDIF
+C
+C*******************************************************************
+C  MAKE LEAST SQUARES FIT FOR PARAMETERS OF WHICH THE VARIANCE IS
+C  A LINEAR FUNCTION - BACKGROUND POLYNOMIAL COEFFICIENTS AND PEAK
+C  INTENSITIES
+C
+   21 NN=NL+NPAR
+      DO 76 I1=1,NN
+      D(I1)=0.
+      DO 76 I2=1,NN
+  76  C(I1,I2)=0.
+      WS=W(1)
+C
+C  LOOP OVER INPUT WAVELENGTH/FLUX POINTS
+C
+      DO 60 IF=1,NF
+      J1=0
+      WW=W(IF)
+C
+C  LOOP OVER ROWS
+C
+      DO 61 IP1=1,NN
+      IL1=IP1-NPAR
+      XX=FL(IF)
+      DD=1.
+      IF(IP1.GT.NPAR) GO TO 62
+      J1=J1+1
+      IF(IP1.GT.1) DD=DD*(WW-WS)**(IP1-1)
+      GO TO 63
+   62 IND1=INDX(IL1+NDI2)
+      IF(IND1.NE.1) GO TO 61
+      J1=J1+1
+      DD=ELFG(WW,B(IL1),B(NDIM+IL1),B(NDI3+IL1))
+      DO 31 J=1,NL
+      IF(INDX(J+NDI2).NE.3) GO TO 31
+       IF(IREL(J+NDI2).NE.IL1) GO TO 31
+      DD=DD+ELFG(WW,B(J),B(NDIM+J),B(NDI3+J))*A(J+NDI2)
+   31 CONTINUE
+   63 D(J1)=D(J1)+XX*DD
+      J2=0
+C
+C  LOOP OVER COLUMNS
+C
+      DO 66 IP2=1,NN
+      IL2=IP2-NPAR
+      IF(IP2.GT.NPAR) GO TO 64
+      YY=1.
+      IF(IP2.GT.1) YY=YY*(WW-WS)**(IP2-1)
+      J2=J2+1
+      GO TO 67
+   64 IND2=INDX(IL2+NDI2)
+      YY=ELFG(WW,B(IL2),B(NDIM+IL2),B(NDI3+IL2))
+      IF(IND2.EQ.3) GO TO 71
+      IF(IND2.EQ.2) GO TO 72
+      J2=J2+1
+      GO TO 67
+   72 D(J1)=D(J1)-YY*A(IL2+NDI2)*DD
+      GO TO 66
+   71 K=IREL(IL2+NDI2)
+      K=LP(K)
+      C(J1,K)=C(J1,K)+YY*DD*A(IL2+NDI2)
+      GO TO 66
+   67 C(J1,J2)=C(J1,J2)+DD*YY
+   66 CONTINUE
+   61 CONTINUE
+   60 CONTINUE
+C 
+      NINV=J1+NV
+C
+C
+      CALL ELFINV(C,J1)
+C
+C  OBTAIN SOLUTIONS FOR INDEPENDENT VARIABLES (FF) AND DERIVE
+C  VALUES OF DEPENDENT VARIABLES
+      DO 80 I=1,J1
+      FF(I)=0.
+      DO 85 J=1,J1
+   85 FF(I)=FF(I)+C(I,J)*D(J)
+   80 CONTINUE
+      J=0
+      DO 90 I=1,NN
+      IL=I-NPAR
+      IF(I.GT.NPAR) GO TO 93
+      J=J+1
+      P(I)=FF(I)
+      GO TO 90
+   93 IF(INDX(IL+NDI2).NE.1) GO TO 90
+      J=J+1
+      B(IL+NDI2)=FF(J)
+  90  CONTINUE
+      IF(NL.NE.0) THEN
+        DO 95 I=1,NL
+        IF(INDX(I+NDI2).NE.2) GO TO 95
+        B(I+NDI2)=A(I+NDI2)
+   95   CONTINUE
+        DO 96 I=1,NL
+        IF(INDX(I+NDI2).NE.3) GO TO 96
+        K=IREL(I+NDI2)
+        B(I+NDI2)=B(K+NDI2)*A(I+NDI2)
+   96   CONTINUE
+   97   DO 22 J=1,NL
+        IF(NY.GT.0) WRITE(6,100) J,B(J),B(J+NDIM),B(J+NDI2)
+  100   FORMAT(2X,I5,2F15.3,F15.5)
+   22   CONTINUE
+      ENDIF
+      IF(NPAR.EQ.0) RETURN
+      IF(NY.GT.0) WRITE(6,101) (P(J),J=1,NPAR)
+  101 FORMAT(2X,5F15.5)
+      RETURN
+      END

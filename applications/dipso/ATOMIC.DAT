@@ -1,0 +1,162 @@
+*
+*   Syntax for ATOMIC.DAT file is:
+*   Title (A40)
+*   Wavelength (in Angstroms);   statistical weight for the lower
+*   level;  statistical weight for the upper level;  oscillator strength
+*   (free format)
+*   Blank line to separate inputs
+*
+*   "Comment cards" can be inserted, with "*" or "!" in the first column
+*
+*   The data in this file are used by the DIPSO command ISATM, and
+*   are drawn from 
+*   Howarth, I.D., and Phillips, A.P., MNRAS 222, 809 (1986)
+*   and references therein.
+*   If these data do not suit your needs, then you should create
+*   an analogous ATOMIC.DAT file in a directory assigned the logical
+*   name OWNERDIR, which DIPSO will access by preference.
+*
+C I  1188.8
+1188.833 1 3 0.017
+
+C I  1194.0
+1193.996 1 3 0.0094
+
+C I  1260.7
+1260.736 1 3 0.0379
+
+C I  1276.5
+1276.482 1 3 0.012
+
+C I  1277.2
+1277.245 1 3 0.156
+
+C I  1280.1
+1280.135 1 3 0.0278
+
+C I  1328.8
+1328.833 1 3 0.0824
+
+C I  1560.3
+1560.310 1 3 0.0810
+
+C I  1656.9
+1656.928 1 3 0.136
+
+C II  1334.5
+1334.532 2 4 0.118
+
+C II* 1335.7
+1335.703 4 6 0.118
+
+C IV  1548.2
+1548.188 2 4 0.194
+
+C IV  1550.8
+1550.762 2 2 0.097
+
+N V  1238.8
+1238.808 2 4 0.152
+
+N V  1242.8
+1242.796 2 2 0.0757
+
+Na I  5889.94
+5889.939  2 4 0.244
+
+Na I  5889.96
+5889.958  2 4 0.406
+
+Na I  5895.91
+5895.911  2 2 0.122
+
+Na I  5895.93
+5895.932  2 2 0.203
+
+Mg I 2025.8
+2025.824 1 3 0.110
+
+Mg I 2852.1
+2852.127 1 3 1.77
+
+Mg II 1239.9
+1239.925 2 4 0.00027
+
+Mg II 1240.4
+1240.395 2 2 0.00013
+
+Mg II 2795.5
+2795.528 2 4 0.592
+
+Mg II 2802.7
+2802.704 2 2 0.295
+
+Al III  1854.7
+1854.716 2 4 0.539
+
+Al III  1862.8
+1862.790 2 2 0.268
+
+Si II*  1194.5
+1194.500 4 4 0.625
+
+Si II* 1264.7
+1264.737 4 6 0.860
+
+Si III 1206.5
+1206.510 1 3 1.66
+
+Si II  1190.4
+1190.416 2 4 0.29
+
+Si II  1193.3
+1193.289 2 2 0.58
+
+Si II 1260.4
+1260.421 2 4 1.12
+
+Si II 1304.4
+1304.372 2 2 0.093
+
+Si II 1526.7
+1526.708 2 2 0.12
+
+Si II 1808.0
+1808.012 2 4 0.0055
+
+Si IV 1393.8
+1393.755 2 4 0.528
+
+Si IV 1402.8
+1402.770 2 2 0.262
+
+S III 1190.2
+1190.206 1 3 0.0224
+
+Fe II 1608.5
+1608.456 10 8 0.0963
+
+Fe II 2343.5
+2343.495 10 8 0.150
+
+Fe II 2373.7
+2373.733 10 10 0.0419
+
+Fe II 2382.0
+2382.035 10 12 0.398
+
+Fe II 2585.9
+2585.878 10 8 0.0846
+
+Fe II 2599.4
+2599.396 10 10 0.294
+
+Zn II 2025.5
+2025.514 2 4 0.412
+
+Zn II 2062.0
+2062.016 2 2 0.202
+
+* End with null fields to purge ISATM contents if line not found
+
+0 0 0 0 

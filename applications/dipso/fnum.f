@@ -1,0 +1,55 @@
+      SUBROUTINE FNUM(F,KARD,K1,IF)
+
+      INCLUDE 'KARS_COM'  ! Declares common block /KARS/ holding KAR
+
+      COMMON/DEBUG/NY
+
+      DIMENSION KARD(80),NUM(20)
+      FS=1.
+      ID=0
+      IF=0
+      N=1
+    5 CALL ELFKJ(KARD(K1),IT,IN,IK)
+C  COMMAND OR VARIABLE IS ILLEGAL
+C  AS IS UNRECOGNISED CHARACTER
+      IF(IT.LE.2.OR.IN.EQ.0) GO TO 100
+C  NUMERIC CHARACTER
+      IF(IT.EQ.3) GO TO 10
+C  OPERATORS;  = IS ILLEGAL
+      IF(IN.EQ.6) GO TO 100
+C           ;  . IS OK IF THERE IS ONLY ONE
+      IF(IN.EQ.1) GO TO 15
+C  IF THIS IS THE FIRST CHARACTER, ONLY + AND - REMAIN
+      IF(N.EQ.1) THEN
+      IF(IN.EQ.2) FS=-1.
+      GO TO 12
+C  FOR SUBSEQUENT CHARACTERS, AN OPERATOR TERMINATES
+      ELSE
+      GO TO 20
+      ENDIF
+   10 NUM(N)=IN-1
+      N=N+1
+      GO TO 12
+   15 IF(ID.NE.0) GO TO 100
+      ID=N
+      GO TO 12
+   12 K1=K1+1
+      GO TO 5
+   20 IF(ID.EQ.0) ID=N
+      F=0.
+      N=N-1
+      DO J=1,N
+      ITEN=ID-J-1
+      IF(ITEN.EQ.0) THEN
+      F=F+NUM(J)
+      ELSE
+      F=F+NUM(J)*10.**ITEN
+      ENDIF
+      ENDDO
+      F=F*FS
+      IF(NY.GT.0) WRITE(6,200) N,ID,FS,(NUM(I),I=1,N)
+  200 FORMAT(1X,2I5,F6.1,10I2)
+      RETURN
+  100 IF=1
+      RETURN
+      END

@@ -1,0 +1,7 @@
+      SUBROUTINE DETEV (AI,AII,AIII,BI,BII,BIII,CI,CII,CIII,DET)
+
+       DET =
+     : (AI*((BII*CIII)-(CII*BIII)))+(BI*((CII*AIII)-(AII*CIII)))+
+     : (CI*((AII*BIII)-(BII*AIII)))
+
+      END

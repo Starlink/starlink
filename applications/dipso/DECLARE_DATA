@@ -1,0 +1,22 @@
+*
+*   An include file used by DIPSO (see sun50)
+*
+*
+*   Declare data areas:
+*
+      INTEGER MAXBRK
+      PARAMETER ( MAXBRK=1000 )
+
+      INTEGER BREAK( MAXBRK )
+      INTEGER BREAKS( MAXBRK )
+      INTEGER NBREAK
+      INTEGER NPOINT
+
+      REAL FLUX( ASIZE1 )
+      REAL WAVE( ASIZE1 )
+
+      EQUIVALENCE ( BREAKS( 1 ), BREAK( 1 ) ) ! Stops me making boo-boos
+
+      COMMON /DIPSO_DATA/ BREAK, FLUX, WAVE, NBREAK, NPOINT
+
+*

@@ -1,0 +1,2 @@
+      BYTE KAR(40)
+      COMMON /KARS/ KAR

@@ -1,0 +1,12 @@
+1     1     1     1       !Te/10000 corresponding to z = 1, 2, 3, 4
+1000                      !Ne (cm-3)
+
+-10  0                    !Log of observed H(beta) flux (and He 1640)
+0                         !Log of H(beta) extinction ('c')
+
+100   100                 !He 1+, 2+   [=1000*N(ion)/N(H+)]
+0     0     0     0       !N  1+, 2+, 3+, 4+
+0     0     0     0       !C  1+, 2+, 3+, 4+
+0     0     0     0       !O  1+, 2+, 3+, 4+
+0     0     0     0       !Ne 1+, 2+, 3+, 4+
+

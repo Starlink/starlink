@@ -1,0 +1,20 @@
+#!/bin/csh
+#
+# v3.3  25.12.95
+#
+setenv DIPSODIR INSTALL_BIN 
+setenv DIPSOLIB INSTALL_BIN
+setenv DIPSOSTARBIN STAR_BIN
+setenv SPECDAT  INSTALL_ETC
+setenv OWNERDIR ${HOME}
+#
+#
+alias dipso      INSTALL_BIN/dipso
+alias my_dipso INSTALL_BIN/mk -f \
+               INSTALL_BIN/makefile my_dipso
+alias dipso_link INSTALL_BIN/dipso_link
+#
+echo " "
+echo "Dipso environment setup, type dipso to start task"
+echo " "
+#

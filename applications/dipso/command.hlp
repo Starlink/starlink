@@ -1,0 +1,268 @@
+#+
+#  Name:
+#     command.lis
+
+#  Purpose:
+#     Classify the commands available within DIPSO, and give a brief
+#     description of each.
+   
+#  Description:
+#     This file is accessed by the DIPSO command "COMMANDS" which is used
+#     to identify commands which have a given purpose. Each command may be 
+#     assigned to several classes. Each class is identified by a single
+#     character identifier as listed below.
+
+#  File Format:
+#     The first word on each line must be the command name, and commands
+#     should ideally be stored in alphabetical order. The second word
+#     should be a list of class identifiers concatenated together into a
+#     single word. If a command cannot be classified, the second word
+#     should consist of the single character "-" (the null class). Any
+#     remaining words are taken as being a description of the command.
+#     Command names and class lists are case insensitive. Blank lines and
+#     lines starting with "#" are ignored.
+
+#  Class Identifiers:
+# 
+#     a = analysis, measurement
+#     c = setting of control variables, etc
+#     d = modelling
+#     e = data editing, selection, rejection
+#     f = fitting
+#     g = graphics
+#     h = help information
+#     i = reading, writing, moving and deleting data sets (including disk I/O)
+#     l = filtering
+#     m = manipulation (arithmetic, calibration, corrections, etc)
+#     q = inquiry (control variables, etc)
+#     r = re-gridding
+#     t = title manipulation
+#     y = system control tasks
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+
+#  History:
+#     3-MAY-1995 (DSB):
+#        Original version.
+#     2-APR-1997 (DSB):
+#        ENV added.
+#-
+
+
+@		y	Reads commands from a command file
+AADD		mr	Adds the Y values in two arrays
+ADIV		mr	Divides the Y values in two arrays
+ALASCHK		ic	Checks the lines and columns to be used by  ALASRD
+ALASCOLS	ic	Sets the columns to be read by ALASRD
+ALASLINS	ic	Sets the lines to be read by ALASRD
+ALASRD		i	Reads in data from a text file
+ALASWR		i	Writes the contents of the current arrays to a text file
+AMAX		mr	Takes the maximum of the Y values in two arrays
+AMIN		mr	Takes the minimum of the Y values in two arrays
+AMULT		mr	Multiplies the Y values in two arrays
+ANGLE		gc	Sets orientation of text and symbols plotted by PWRITE and MARK 
+ASUB		mr	Subtracts the Y values in two arrays
+ASWAP		mr	Swaps the Y values in two arrays
+ATLASRD		i	Reads in Kurucz model atmosphere fluxes
+ATLIST		iq	Lists the available Karucz model atmosphere data 
+ATNORM		gm	Normalises model atmosphere fluxes
+BBODY		d	Calculates black-body fluxes at the current X values
+BEEP		cy	Causes a beep after every error
+BIN		mrl	Bins the contents of the current arrays
+BOX		gc	Causes the plotting surface to be cleared between plots
+CDRAW		gdif	Draws a 'continuum' using the cursor or by fitting data in a file
+CLEAR		y	Clears the command window
+CLR		cy	Toggles command line recall on and off
+CLRBRK		e	Removes breaks from an array
+COMMANDS	hqy	Display classified lists of commands with brief descriptions
+CRASH		y	Induce an exception
+CREGD		gq	plots the regions selected for 'continuum' fitting using CREGS
+CREGL		q	Lists the current 'continuum' window selected with CREGS
+CREGS		ecg	Selects 'continuum' regions
+CROT		gc	Causes automatic rotation of plotting colours
+CSET		gc	Sets the plotting colour
+CXR		gc	Uses the cursor to define the X range to be plotted
+CXYR		gc	Uses the cursor to define the X and Y ranges to be plotted
+CYR		gc	Uses the cursor to define the Y range to be plotted
+DEL		i	Deletes stack entries
+DEV		gc	Selects a graphics device
+DRED		m	De-reddens data
+DRLINE		g	Draws a line between two points
+ECHO		cy	Controls echoing of commands within command files
+ELFCSL		fq	Summarises the entries in the ELF fit co-efficient stack
+ELFDELC		fc	Deletes entries in the ELF fit co-efficient stack
+ELFINP		fc	Sets starting values and constraints for fitting emission lines
+ELFLFIX		fgd	Fits an emission line manually using the cursor
+ELFNEWC		fc	Clears the ELF fit co-efficient stack
+ELFOPT		fa	Fits a set of emission lines
+ELFPIN		fc	Moves data from the DIPSO stack to the ELF profile stack
+ELFPL		fq	Lists the contents of the ELF profile stack
+ELFPOPC		fc	Pops an entry from the ELF fit co-efficient stack
+ELFPUSH		fc	Pushes a data array representing an ELF fit onto the DIPSO stack
+ELFPUSHC	fc	Pushes the current ELF co-efficients onto the co-efficient stack
+ELFRESTC	fi	Restores an ELF fit co-efficient stack from a binary file 
+ELFSAVEC	fi	Saves an ELF fit co-efficient stack to disk in a binary file
+ELFVUC		fq	Lists a single entry of the ELF fit co-efficient stack
+ELFWRC		fi	Writes an ELF fit co-efficient stack to disk in a text file
+ENV		qy	Displays the value being used for an environment variable
+ERASE		g	Erases a plotting zone created by TZONE
+EW		gla	Measures equivalent widths
+EWERR		a	Estimates the systematic errors in continuum and zero-level values
+EXIT		yi	Exits DIPSO, saving the stack in a binary file
+EXPAND		gc	Changes the sizes of individual components of a plot
+FILL		gc	Causes symbols created by MARK to be filled in
+FLUX		agi	Measures fluxes with respect to a linear 'continuum'
+FONT		gc	Selects font quality
+FORMWR		i	Writes the contents of the current arrays to a text file
+FRAME		gc	Sets up a plotting area of a given absolute size
+FRZONE		gc	Divides a plotting area (set up by FRAME) into several sub-frames
+FTFILTER	lm	Filters high frequency components from a Fourier transform
+FTINV		lm	Takes the inverse Fourier transform of two stack entries
+FTRANS		lm	Takes the forward Fourier transform of a stack entry
+GRID		dr	Creates an array of uniform wavelength values with zero Y values
+GRIDSTYLE	cg	Controls the axes, grids and labels used to produce a plot
+HANDLER		cy	Switches the DIPSO error handler on and off
+HC		d	Creates a theoretical profile for the Hydrogen Lyman-alpha line
+HELP		hqy	Displays full help on specified commands
+HIST		gc	Causes plots to be done in histogram-style
+HPROT		gc	Rotates between HIST and POLY plots on a given diagram
+INTEGRATE	a	Estimates the area under the current arrays
+INTERP		r	Re-grid current arrays onto a regular grid
+ISATM		dic	Reads atomic data from a disk file for use with ISCALC and ISCOG
+ISCALC		d	Creates a theoretical absorption profile for an interstellar cloud
+ISCOG		d	Calculates a Curve-Of-Growth for an interstellar cloud model
+ISINP		dc	Sets up an interstellar cloud model
+ISOPT		dc	Sets up options required by ISCALC
+IUECOR		m	Applies 'aging' corrections for the IUE cameras
+LABON		gc	Turns axis labelling back on
+LOGAXX		gc	Causes X axes to be plotted on a log10 scale
+LOGAXY		gc	Causes Y axes to be plotted on a log10 scale
+LOGX		m	Takes the base 10 logarithms of the current X values
+LOGY		m	Takes the base 10 logarithms of the current Y values
+LWEIGHT		gc	Sets the weight (heaviness) of all plotted lines
+MARK		gc	Causes plots to be done using symbols
+MEAN		a	Find the mean and standard deviation of the current Y values
+MERGE		mr	Merges two arrays 
+MONGOWR		gi	Writes a file which can be read by MONGO
+MROT		cg	Causes automatic rotation of plotting symbols
+MSET		cg	Selects the symbol to be used if MARK plots are being created
+NB		cg	Stops automatic clearing of the plotting frame between plots
+NCROT		cg	Stops automatic rotation of the colour table
+NEBCONT		id	Calculates a theoretical nebular re-combination continuum
+NECHO		cy	Stops the echoing of commands read from a command file
+NHPROT		cg	Stops rotating plots styles between HIST and POLY
+NLAB		cg	Turns off axis labelling
+NMROT		cg	Stops automatic rotation of MARK plotting symbols
+NOBEEP		cy	Stops the terminal beeping after every error
+NOFILL		cg	Causes MARK symbols to be plotted open (unfilled)
+NROT		cg	Stops rotating everything
+NTROT		cg	Stops automatic rotation of line attributes
+NX		cg	Returns to auto-scaling of the X axis
+NXY		cg	Returns to auto-scaling of the X and Y axis
+NY		cg	Returns to auto-scaling of the Y axis
+PAUSE		cy	Pauses until the <RETURN> key is hit
+PDGPEAK		a	Locates the peak of a data set
+PDGRAM		am	Takes the "unevenly spaced data periodogram" of the current arrays
+PDGWINDOW	am	Takes the "window function" of the current arrays
+PF		f	Fits a polynomial through the data in the windows defined by CREGS
+PLOTINV		cg	Causes the Y axis of subsequent plots to be inverted
+PLOTREV		cg	Causes the X axis of subsequent plots to be reversed
+PM		g	Plots a data array
+POLY		cg	Causes plots to be done 'join-the-dots' style
+POP		ie	Pops a stack entry into the current arrays
+PPROMPT		cg	Controls which prompts are issued by PM
+PS		g	Plots long stretches from a single spectrum
+PUSH		ie	Pushes the current arrays onto the stack
+PWRITE		g	Writes a character string at given co-ordinates
+QAREA		qg	Gives information about a plotting zone
+QSM		ml	Applies a 'quick' Gaussian smoothing to an array
+QUIT		cy	Quits dipso without saving the stack
+RDCAT		i 	Reads a table of X and Y values into the current arrays
+READ		i	Reads data from a disk file to the current arrays (see WRITE)
+RECA            cy      Recalls a previous command or prompt response
+RECALL		cy	Displays a previously RECORDed string (does not execute it)
+RECORD		cy	Records a string of commands for subsequent REPLAY
+REPLAY		cy	Substitutes a previously RECORDed string into the command buffer 
+REPORTING	cy	Controls the number of error messages displayed 
+RESTORE		i	Restores stack data previously saved to disk using SAVE
+RETITLE		t	Changes the title of a stack entry
+RXR		e	Throws away data outside a given X range 
+RYR		e	Throws away data outside a given Y range 
+SAVE		i	Saves stack data in a binary disk file
+SCREENRD	i	Reads data typed at the terminal into the current arrays
+SCROLLVT	cy	Causes text to be scrolled between specified lines
+SHELL		cy	Spawns a DCL shell (VMS only)
+SL		q	Lists the contents of the stack and current arrays
+SLWR		qi	As SL, but writes the information to a text file
+SM		ml	Applies Gaussian smoothing to an array
+SNIP		ge	Cuts out data from the current arrays
+SP0RD		i	Reads an IUE SPECTRUM format 0 file into the current arrays
+SP0WR		i	Writes the current arrays to an IUE SPECTRUM format 0 file
+SP1RD		i	Reads an IUE SPECTRUM format 1 file into the current arrays
+SP2RD		i	Reads an IUE SPECTRUM format 2 file into the current arrays
+SQRTX		m	Takes the square root of the X values in the current arrays
+SQRTY		m	Takes the square root of the Y values in the current arrays
+STATUS		qy	Displays the current device, X and Y ranges, etc
+TADD		t	Adds a string to the end of the current title
+TENX		m	Replaces the current array's X values by 10**X
+TENY		m	Replaces the current array's Y values by 10**Y
+TICKS		cg	Controls the appearance of tick marks
+TITLE		t	Changes the title stored with the current arrays
+TLINE		cg	Changes the style of all plotted lines
+TOFLAMBDA	m	Converts data to Angstroms and erg/cm2/s/A
+TOFNU		m	Converts data to Hz and erg/cm2/s/Hz
+TOV		m	Converts X values from wavelength to velocity
+TOW		m	Converts X values from velocity to wavelength 
+TPORT		cg	Defines a plotting sub-zone
+TPROMPT		ct	Determines if the TITLE command should prompt for a string
+TROT		cg	Switches on automatic rotation of line style (i.e. attributes)
+TSTRIP		t	Removes leading blanks from the current array's title
+TSWAP		t	Copies the title from a stack entry to the current arrays
+TWEIGHT		cg	Sets the weight (heaviness) of the data curve only
+TZONE		cg	Selects a particular zone for plotting
+UBVRD		m	Converts UBVRD magnitudes to fluxes
+USEHTX		chy	Selects hypertext or plain text help.
+USENDF		cy	Selects NDF or 'native DIPSO' binary file format
+USSPCLIP	e	Removes points from an IUE USSP spectrum based on 'epsilon' values
+USSPRD		i	Reads an IUE ULDA spectrum as produced by USSP 
+VCORR		m	Applies or removes a velocity shift to a set of X values
+WRITE		i	Write data to a disk file from the current arrays (see READ)
+XABS		m	Replaces X values in the current arrays with their absolute value
+XADD		m	Adds a constant to the X values in the current arrays
+XDEC		m	Replaces X values in the current arrays by X-INT(X)
+XDIV		m	Divides the X values in the current arrays by a constant
+XINT		m	Replaces X values in the current arrays by INT(X)
+XINV		m	Replaces X values in the current arrays by 1/X
+XJ		cg	Sets X limits to match exactly the range of the data being plotted
+XLAB		cg	Sets the label for the X axis
+XMAX		cg	Sets the maximum X value to be plotted
+XMIN		cg	Sets the minimum X value to be plotted
+XMULT		m	Multiplies the X values in the current arrays by a constant
+XNINT		m	Replaces X values in the current arrays by the nearest integers
+XR		cg	Sets the minimum and maximum X value to be plotted
+XREV		m	Reverses the ordering of data in the current arrays
+XSORT		m	Sorts the X values in the current arrays into ascending order
+XSUB		m	Subtracts a constant from the X values in the current arrays
+XT		cg	Trims the X range to the nearest tick marks
+XV		g	Obtains X values using the cursor
+XYSWAP		m	Swaps the contents of the X and Y arrays
+XYV		g	Obtains X and Y values using the cursor
+YABS		m	Replaces Y values in the current arrays with their absolute value
+YADD		m	Adds a constant to the Y values in the current arrays
+YDEC		m	Replaces Y values in the current arrays by X-INT(X)
+YDIV		m	Divides the Y values in the current array by a constant
+YINT		m	Replaces Y values in the current arrays by INT(X)
+YINV		m	Replaces Y values in the current arrays by 1/X
+YJ		cg	Sets Y limits to match exactly the range of the data being plotted
+YLAB		cg	Sets the label for the Y axis
+YMAX		cg	Sets the maximum Y value to be plotted
+YMIN		cg	Sets the minimum Y value to be plotted
+YMULT		m	Multiplies the Y values in the current arrays by a constant
+YNINT		m	Replaces Y values in the current arrays by the nearest integers
+YR		cg	Sets the minimum and maximum Y value to be plotted
+YSUB		m	Subtracts a constant from the Y values in the current arrays
+YT		cg	Trims the Y range to the nearest tick marks
+YV		g	Obtains Y values using the cursor
+YXN		m       Replaces Y values in the current arrays by Y*(X**power)
+ZANSTRA		gad	Calculates a Zanstra temperature given a re-combination line flux

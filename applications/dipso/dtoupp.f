@@ -1,0 +1,14 @@
+      SUBROUTINE DTOUPP(STRING)
+      CHARACTER STRING*(*)
+      INTEGER I
+      INTEGER LENSTR, NEWCH
+      CHARACTER CHA*1
+      LENSTR=LEN(STRING)
+      DO 1 I=1,LENSTR
+        CHA=STRING(I:I)
+        IF ( LGE(CHA,'a') .AND. LLE(CHA,'z') ) THEN
+          NEWCH=ICHAR(CHA)+ICHAR('A')-ICHAR('a')
+          STRING(I:I)=CHAR(NEWCH)
+        END IF
+    1 CONTINUE
+      END

@@ -1,0 +1,44 @@
+*
+*
+*   An include file used by DIPSO (see sun50)
+*
+*   Common area for stack arrays:
+*
+      INTEGER ASIZE1
+      PARAMETER ( ASIZE1 = 400000 )
+
+      INTEGER BSTSZE
+      PARAMETER ( BSTSZE = 5000 )
+
+      INTEGER MAXSTK
+      PARAMETER ( MAXSTK = 200 )
+
+      INTEGER STKSZE
+      PARAMETER ( STKSZE = 4*ASIZE1 )
+
+      INTEGER WORKSZ
+      PARAMETER ( WORKSZ = 4*ASIZE1 )
+
+      INTEGER BPOINT( MAXSTK )
+      INTEGER BSTACK( BSTSZE )
+      INTEGER BSTLST
+      INTEGER BSTNPT( MAXSTK )
+      INTEGER NONSTK
+      INTEGER POINTR( MAXSTK )
+      INTEGER STKLST
+      INTEGER STKNPT( MAXSTK )
+
+      REAL WORK( WORKSZ )
+      REAL WORVST( MAXSTK )
+      REAL XSTACK( STKSZE )
+      REAL YSTACK( STKSZE )
+
+      CHARACTER * ( 80 ) STITLE( MAXSTK )
+
+      COMMON /STAKGT1/ XSTACK, YSTACK, BSTACK, BSTNPT, BPOINT,
+     :                 POINTR, STKNPT, WORK, WORVST,
+     :                 NONSTK, STKLST, BSTLST
+
+      COMMON /STAKGT2/ STITLE
+
+*

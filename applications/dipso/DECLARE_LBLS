@@ -1,0 +1,19 @@
+*
+*   An include file used by DIPSO (see sun50)
+*
+*
+*   Labels for plots:
+*
+      INTEGER XLABLN
+      INTEGER YLABLN
+
+      CHARACTER * ( 100 ) XLAB
+      CHARACTER * ( 100 ) YLAB
+
+      COMMON /LABELS1/ XLABLN, YLABLN
+
+      COMMON /LABELS2/ XLAB
+
+      COMMON /LABELS3/ YLAB
+
+*

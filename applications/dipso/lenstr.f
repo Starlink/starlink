@@ -1,0 +1,14 @@
+      INTEGER FUNCTION LENSTR(STRING)
+      CHARACTER*(*) STRING
+      INTEGER FSLEN
+      IF ( STRING.NE.' ' ) THEN
+        FSLEN=LEN(STRING)
+        LENSTR=FSLEN
+10000   IF ( STRING(LENSTR:LENSTR).EQ.' ' ) THEN
+          LENSTR=LENSTR-1
+          GOTO 10000
+        END IF
+      ELSE
+        LENSTR=0
+      END IF
+      END

@@ -1,0 +1,2477 @@
+
+
+@filename[.typ] p1 p2 p3 ..... p9
+     Reads commands from a command file. Any prompts
+     for unspecified mandatory parameters are given at the
+     terminal. Command files can include blank lines and
+     `comment cards'; the latter must have an exclamation
+     mark [!] or asterisk [*] as the first character. (Com-
+     ments may not be flagged with a first-column "C",
+     because this could easily be the first character of a
+     command.)
+
+     On successful completion (or on failure to execute a
+     command) control returns to the terminal.
+
+     IMPORTANT: Command files may not contain refer-
+     ences to other command files (nor to themselves), for
+     fairly obvious reasons.
+
+     DIPSO first searches for a file of the given name in the
+     current directory (or whatever directory is given in the
+     file specification). If it fails to find it, it then looks for
+     a file $OWNERDIR/<filename>.  Thus you can keep a
+     set of frequently used command files in the directory
+     assigned the environment variable OWNERDIR (this as-
+     signment would normally be carried out in your login
+     scripts).
+
+     The default file type ([.typ]) is `.cmd'.
+
+AADD n
+     Adds the contents of the `current' Y array to the values
+     in STACK entry `n', leaving the result in the `current'
+     array. Both data sets must have monotonic X arrays
+     for sensible results to emerge. To perform the arith-
+     metic, the data in the `current' arrays are mapped onto
+     the STACK X grid. The addition is only performed at
+     X values where there are valid Y values in both data
+     sets.  In conjunction with GRID, the AADD command
+     can be used to remap data.
+
+ADIV n
+     Divides the Y values in STACK entry `n' by the Y val-
+     ues in the `current' arrays. In order to do this, the `cur-
+     rent' data are mapped onto the X grid of the STACK
+     data (both X grids must be monotonically changing).
+     The output data are left stored in the `current' arrays.
+
+     If both data sets are recognized by DIPSO as having
+     X units in velocity space (WORV not equal 1; see the
+     TOV command for details), then the output data are
+     corrected by the ratio of the WORVs (i.e. by the ratio
+     of the central wavelengths) to give true flux ratio as a
+     function of velocity. If only one data set is recognized
+     as having X units of velocity, the division is carried
+     out and an error is reported.
+
+AMAX n
+     At each X point, puts the larger of the STACK (entry
+     `n') and `current array' Y values into the current array.
+     To do this, the data in the current arrays are mapped
+     onto the STACK X grid. The function returns Y values
+     only at those X values where valid data occur in both
+     data sets. AMAX may be useful, when used with AMIN,
+     for displaying the envelope to a set of spectra of a given
+     object.
+
+AMIN n
+     At each X point, puts the smaller of the STACK (entry
+     `n') and `current array' Y values into the current array.
+     To do this the data in the current arrays are mapped
+     onto the STACK X grid. The function returns Y values
+     only at those X values where valid data occur in both
+     data sets. (See also AMAX).
+
+AMULT n
+     Multiply the Y values in STACK entry `n' by the val-
+     ues in the `current' arrays. The data in the `current'
+     arrays are mapped onto the X grid of the STACK data
+     in order to carry out this operation. (The X grids are
+     both required to be monotonic). Results are left in the
+     `current' arrays.
+
+ASUB n
+     Subtracts the `current' Y array from STACK entry
+     `n'. In order to carry out this operation, the `current'
+     data are mapped onto the X grid of the STACK data.
+     Subtraction is only carried out at X values where there
+     are valid Y data in both STACK and current arrays,
+     and both X arrays must be monotonic.  Results are
+     left stored in the `current' arrays.
+
+ASWAP (no parameters)
+     Swaps the `top' (i.e. numerically largest) STACK en-
+     try with the contents of the `current' arrays.
+
+ALASCHK (no parameters)
+     Checks the current defaults for the lines and columns
+     to be read in using ALASRD.
+
+ALASCOLS xcol ycol
+     Tells ALASRD to read X and Y data from the speci-
+     fied columns of a file. (A "column" is a string of al-
+     phanumeric characters separated from other columns
+     by spaces; of course, the columns which ALASRD actu-
+     ally acquires must contain exclusively numeric values.)
+     When DIPSO begins, these are set to 1 and 2 by de-
+     fault; they are not reset to these values after execution
+     of ALASRD.
+
+ALASLINS line1 line2
+     Tells ALASRD to read only lines line1 to line2 (inclusive)
+     of an input file.  If line2 is specified as zero, this is
+     interpreted to mean end-of-file.
+
+ALASRD filename[.typ] [brkval]
+     Reads data from a formatted file. The simplest struc-
+     ture which ALASRD (and DIPSO) can read is one pair of
+     X, Y values per record; this is the default file structure
+     expected by ALASRD. More elaborate files can be read
+     in through prior use of the ALASLINS and ALASCOLS
+     commands (q.v.).
+
+     Gaps in the data are assumed to be flagged by Y values
+     of zero, unless a different "brkval" is specified on the
+     command line.
+
+     The default file type ([.typ]) is `.DAT'.
+
+ALASWR filename[.typ] [brkval]
+     Writes the contents of the `current' arrays into a for-
+     matted file. The X data are output in column 1, and
+     the Y data in column 2; gaps in the data are flagged
+     with a Y value of zero, unless a different value for
+     "brkval" is specified on the command line.
+
+     The default file type ([.typ]) is `.DAT'.
+
+ANGLE Theta
+     Changes the angle at which PWRITE strings and MARK
+     symbols are plotted.  Theta is measured in degrees,
+     anticlockwise from the horizontal, and is initially set
+     to zero.
+
+ATLASRD Teff LogG [MODE]
+     Reads in Kurucz model atmosphere fluxes, from the
+     data base kept in the directory with environment vari-
+     able SPECDAT. The data are stored in the database
+     in the form of astrophysical fluxes; however, ATLASRD
+     multiplies them up by a factor ss to produce `actual'
+     fluxes. The x unit is Angstroms, and the y unit erg/cm2/s/A.
+
+     If MODE=0 (the default value) solar abundance mod-
+     els are acquired; otherwise the `low metal abundance'
+     models (1/30 solar) are read in.  A summary of the
+     available solar abundance models can be obtained us-
+     ing ATLIST, and the models normalised to cursor-selectable
+     X,Y values using ATNORM.
+
+     Other files in the SPECDAT database, including ex-
+     tended atmosphere and Non-LTE models (see $SPECDAT/info.lis
+     for details), can be read in using SP2RD $SPECDAT/file-
+     name.typ. The KHMEXT, MLTE and MNLT models
+     can all be ATNORMed if they are first subjected to
+     TENY, but the normalisation constant will be meaning-
+     less.
+
+     If you cannot access the model atmospheres, it may be
+     because you are not currently using NDF data format
+     (see command USENDF). Most of the data in SPECDAT
+     is only available in NDF format. Of course, your node
+     may not have the SPECDAT database installed, in
+     which case complain to your node manager.
+
+ATLIST (no parameters)
+     Lists the T(eff) and Log(g) values used to specify the
+     Kurucz solar abundance model atmosphere fluxes that
+     are accessible to ATLASRD.
+
+ATNORM [mode]
+     Normalises model atmosphere fluxes stored in the `cur-
+     rent' arrays to the cursor position. The angular diam-
+     eter implied by the normalising constant is printed at
+     the terminal. The normalised fluxes are left in the `cur-
+     rent' arrays, and are plotted if mode=1 (the default).
+     No plot is produced if mode=0.
+
+     If the cursor Y value is negative, the plot is assumed
+     to be of X v Log10(FLUX). In this case, the Y values
+     plotted (and left in the `current' arrays) are logs of
+     the normalised model atmosphere fluxes; however, the
+     unnormalised atmosphere data in the `current' arrays
+     MUST be linear in Y to start off with (i.e. in the form
+     resulting from an ATLASRD). ATNORM can also be used
+     to normalise black-body fluxes generated with BBODY.
+
+BBODY temp
+     Calculates black-body fluxes [pi times B(nu)] at the x
+     values of the grid in the `current' arrays, overwriting
+     the y values therein. (GRID can be used to initialise
+     appropriate x values.) The fluxes can be normalised to
+     observed data using the ATNORM command. The unit
+     of `temp' is Kelvin, the `x' values are assumed to be in
+     Angstroms, and B(nu) is in erg/cm-2/s/A.
+
+BEEP (no parameters)
+     Turns on the BEEP following NOBEEP (also tests your
+     terminal's beeper).
+
+BIN X1 DX
+     Bins the contents of the `current' arrays, which are
+     expected to be in monotonically increasing X order.
+     X1 is the start wavelength of the input data, and DX
+     the X range over which binning is to take place; thus
+     the first X value in the output data set will normally
+     be approximately:
+
+        X1 + 0.5*DX.
+
+     If you choose a value for DX which is less than the
+     typical separation of the input X points you will prob-
+     ably get an unsatisfactory result.  The binned data,
+     which are the unweighted averages of the input X and
+     Y values in each bin, are left in the `current' arrays.
+
+BOX (no parameters)
+     Automatic clearing of the plotting surface between
+     plots. This is the default option on starting up. The
+     inverse function is NB.
+
+CDRAW [filename or mode]
+     Allows you to draw a `continuum' using the cursor; the
+     input X values must be in increasing order (CDRAW is
+     terminated with an `X(N+1).LE.X(N)' type test). The
+     result is stored in the `current' arrays (so you should
+     first PUSH your spectrum so as not to lose it); sub-
+     sequent rectification of data can be carried out using
+     ADIV. (See also CREGD, CREGS and PF).
+     If MODE=0 (the default value), the data stored are
+     just those input with the cursor, giving a `join-the-
+     dots' spectrum. If MODE=1, a spline fit to the data
+     points is carried out, using the subroutine INTEP de-
+     scribed by Hill (Publ DAO). A smooth curve (which
+     is supposed to be like one you might draw by hand
+     through all the cursor points) is calculated on the grid
+     of `x' points of the arrays in the top (i.e. numerically
+     largest) stack entry.
+
+     It is possible to input data to this routine from a file,
+     rather than at the terminal.  The data are expected
+     to be in the form (NDF or native DIPSO) produced
+     by the WRITE command, and MODE is assumed to be
+     1 (MODE=0 would have the same effect as a simple
+     READ, and is therefore redundant). Thus, using this op-
+     tion makes CDRAW act essentially as a straightforward
+     spline interpolation routine.
+
+CLEAR (no parameters)
+     Clears the text surface. (Simply a PRINT *, ' ' loop;
+     it will not, therefore, work on a 4010-type device, for
+     which you should use ERASE).
+
+CLRBRK (no parameters)
+     Clears all breaks (i.e. gaps in the data) from the cur-
+     rent arrays. (The end-of-data is preserved, internally,
+     as a break point, however.)
+
+COMMANDS [clist/-word] [clist] [clist]
+     If no parameters are supplied, a listing of all available
+     commands is given. If a minus sign is given as the only
+     parameter, a one line description of each command
+     is also displayed.  If the minus sign is followed by a
+     word, then only those commands which contain the
+     given word in their descriptions (case insensitive) are
+     displayed. As an example:
+
+        > COMMANDS -CONTINUUM
+
+     would display all commands which contain the string
+     "continuum" in their descriptions.
+
+     Alternatively, commands for display can be selected by
+     their function. All commands are grouped into one or
+     more classes which are identified by single lower-case
+     letters as follows:
+
+        a - Analysis,measurement.
+        c - Setting of control variables, etc.
+        d - Modelling.
+        e - Data editing,selection,rejection.
+        f - Fitting.
+        g - Graphics.
+        h - Help information.
+        i - Reading, writing, moving and deleting data sets (including
+            disk I/O).
+        l - Filtering.
+        m - Manipulation (arithmetic,calibration,corrections,etc).
+        q - Inquiry (control variables, etc).
+        r - Re-gridding.
+        t - Title manipulation.
+        y - System control tasks.
+
+     Each parameter must be a word made up from a selec-
+     tion of these class identifiers. Commands must belong
+     to all the classes in at least one of these words to be
+     displayed. Classes can be negated (i.e. explicitly ex-
+     cluded) by specifying an upper case identifier (i.e. "A"
+     means "not in class "a""). As an example:
+
+        > COMMANDS gC t+
+
+     would list all commands which are to do with graph-
+     ics but which are not control commands, and also all
+     commands which are to do with title manipulation.
+
+     Note, if a file called $LDIPSODIR/comand.lis exists
+     then the contents of the file are displayed without
+     processing (all parameters are ignored).  It is recom-
+     mended that such files be re-formatted to use the new
+     system (see section??).
+
+CRASH n
+     Performs various illegal instructions with the object
+     of trying to crash the program!  It can be used to
+     test the behaviour of the signal/condition handler (see
+     command HANDLER). The following values of `n' causes
+     the corresponding condition:
+
+     0 - Divide by zero (an example of a floating point
+         exception).
+
+     1 - Access violation.
+
+     2 - Overflow.
+
+     3 - Underflow.
+
+CREGD [h]
+     `Continuum REGion Display':  plots the regions se-
+     lected for `continuum' fitting using CREGS.
+
+     The continuum windows are indicated by horizontal
+     bars, which are drawn a fraction `h' of the distance
+     from the bottom to the top of the plot (0<h<1, default
+     0.8).
+
+CREGL (no parameters)
+     `Continuum REGion List': lists the current continuum
+     windows selected with CREGS.
+
+CREGS [X1 X2 X3 X4 X5 X6 ... X49 X50]
+     `Continuum REGion Select':  select `continuum' re-
+     gions. These regions can be input as a parameter list;
+     if no values are provided, the cursor is activated for in-
+     teractive selection of continuum windows. When using
+     the cursor, the input `X' values must be in increasing
+     order.
+
+     The selected regions can be checked using CREGD. This
+     command will normally be used in conjunction with
+     PF. (See also CDRAW).
+
+CROT (no parameters)
+     Implements automatic rotation of colours (when used
+     with appropriate hardware).  Each plot begins with
+     the colour specified by the last call to CSET (or colour
+     1, if CSET hasn't been called).
+
+     To cancel, use NCROT.
+
+CSET n
+     Set colour for Ikon plotting; n = 1-12 (1 = white).
+     (See also CROT).
+
+CXR (no parameters)
+     `Cursor X range': define the X range for plotting using
+     the cursor.
+
+CXYR (no parameters)
+     `Cursor X & Y range': define the X and Y ranges for
+     plotting using the cursor.
+
+CYR (no parameters)
+     `Cursor Y range': define the Y range for plotting using
+     the cursor.
+
+DEL n1 [n2 n3 n4 ....... n48 n49 n50]
+     Deletes STACK entries. At least 1, and up to 50, stack
+     entries may be deleted; after deletion, the remaining
+     STACK entries are renumbered in sequence.  Ranges
+     of entries can be specified using the "-" operator; e.g.
+     DEL 2 4-6 8 will result in the deletion of entries 2, 4, 5,
+     6 and 8. DEL 1-50 will clear the stack.
+
+     You are recommended to develop the habit of typing
+     SL immediately after DEL, to check what has happened.
+
+DEV workstation
+     Opens a GKS workstation (plotting device). If the ar-
+     gument isn't provided then a table of legitimate work-
+     stations is listed, followed by a prompt. A full list of
+     available workstations is given in SUN/83.
+
+DRED E(B-V) [R MODE]
+     Dereddens data stored in the `current' arrays. Nega-
+     tive points are multiplied by -1, dereddened, and the
+     dereddened values again multiplied by -1.
+
+     The default value of R (=A(V)/E(B-V)) is 3.1.
+
+     The default value of MODE is 0, which results in a
+     `standard' Galactic-type law being used (Seaton 1979
+     for the UV, Howarth 1983 for optical-IR); any non-zero
+     value results in an LMC-type law being used (Howarth
+     1983).
+
+DRLINE x1 y1 x2 y2
+     Draws a poly line between two points on the current
+     graph.
+
+ECHO [mode]
+     Controls echoing, at the terminal, of commands (and
+     comments) read in from command files.  If mode=-1
+     (the default) there is no echoing, but you get a "Com-
+     mand sequence completed" message when the macro
+     file is closed; if mode=0 this message is suppressed.
+     Mode=1 results in commands being echoed; mode=2
+     echoes comment lines (i.e. those beginning with "!" or
+     "*"); and mode=3 echoes commands and comments.
+     All non-zero modes give a "Command sequence com-
+     pletedi" on completion.
+
+ELF (no parameters)
+     This is not a DIPSO command, but a suite of programs
+     accessed for Emission Line Fitting.
+
+     The available DIPSO/ELF commands are:
+        ELFINP   ELFOPT   ELFNEWC
+        ELFPUSH  ELFLFIX
+        ELFPUSHC ELFPOPC  ELFDELC ELFCSL ELFVUC
+        ELFSAVEC ELFRESTC ELFWRC
+        ELFPIN   ELFPL
+
+     The most important `core' commands are:
+
+        ELFINP ELFOPT ELFPUSH
+
+     which are sufficient to give you a fit to some data.
+
+ELFDELC [n1 n2 n3 n4 n5 n6 n7 n8 n9 n10]
+     "ELF DELete Coefficients". Deletes entries from the
+     stack of fit coefficients.  Remaining coefficient stack
+     entries are renumbered, so use of ELFCSL immediately
+     following ELFDELC is recommended.
+
+ELFNEWC (no parameters)
+     "ELF NEW Coefficients". Clears the current array of
+     fit coefficients (N.B. Not the DIPSO current arrays!).
+     The same result can be obtained using CLEAR inside
+     the ELFINP editor.
+
+ELFINP (no parameters)
+     "ELF INPut". Invokes the ELF command language;
+     you are alerted to this by a change of prompt. Return
+     to DIPSO by typing QELF.
+
+     The ELF command language allows starting values
+     and constraints to be entered prior to optimising line
+     fits. The language is similar to FORTRAN in the logi-
+     cal construction of commands; the following operators
+     are recognised:
+
+        : = + - / *
+
+     The last four have their conventional arithmetic mean-
+     ings.
+
+     Five variables are recognised:
+
+        C W I P D
+
+     These refer to the line centre position, line width (FWHM),
+     peak intensity, profile type, and degree of background
+     polynomial.  (If no value is specified for the profile
+     type, it is assumed to be a Gaussian; i.e. P=1). To
+     refer to a particular line, the variable must be followed
+     IMMEDIATELY by the appropriate index (i.e.  C1,
+     W5, I2 etc). Numerical constants can be input as in-
+     teger or decimal numbers, but exponents are not ac-
+     cepted. Blanks are permitted, but not within variable
+     names or numerical constants.
+
+     The ":" operator: Used to specify a starting value
+         for a variable quantity, e.g.:
+
+            C1:5000
+            w1: 2.5
+
+         Starting values for peak fluxes are not required.
+
+     The "=" operator:  Used to set a fixed quantity, or
+         relationship between two quantities; for example,
+
+            C2=5000
+            w2=w1
+            I3 = 2.486 * I2
+            C3 = c1 - 21.6
+            p1 = 6
+            d=0
+
+         The command W2=W1 constrains the width of
+         line 2 to be the same as that of line 1; P1=6 de-
+         fines the profile type _ in this case, to the first
+         `numerical' profile; D=0 fixes the background poly-
+         nomial to have degree zero.  (Note that the `='
+         operator is the only one allowed with the D and P
+         variables.) If D is undefined no background poly-
+         nomial is incorporated. (Note that least-squares
+         polynomials can be fitted to data by defining no
+         lines and an appropriate value of D. For reasons
+         of numerical stability, the polynomial coefficients
+         are computed using an x scale centred on the
+         mean x value of the data set; you are informed of
+         the value of this offset zero-point.) Other exam-
+         ples should be self-explanatory.
+
+     The "+" and "-" operators:  These may ONLY be
+         used with the variables C and W.
+
+     The "*" and "/" operators:  These may only be used
+         with the variable I.
+
+     The other commands available are:
+
+        HELP - gives a summary of options
+        CLEAR - clears the current model specification
+        QELF - return to DIPSO input
+        L - list the fit specification
+     There is no command for deleting the specifications for
+     a given line from the complete coefficient specification.
+     If you need to `remove' a line, it is necessary to define
+     (using the = operator) the line intensity to zero, and
+     the line width and position to suitable arbitrary values.
+
+ELFOPT [prmpt]
+     "ELF OPTimisation". Initiates optimisation of fit co-
+     efficients (in the sense of minimising the sum of the
+     squares of the deviations of the fit from the spectrum
+     data in the DIPSO `current' arrays).  In the case of
+     an analytical profile fit, the data may have velocity or
+     wavelength as the unit of the X axis. Provided WORV
+     is set correctly, the fitted flux will be in sensible units
+     (ie those of the Y axis). In the case of a `numerical'
+     profile, spectrum data must be in velocity units. Note
+     that line width is not permitted as a free parameter
+     when fitting `numerical' profiles.
+
+     ELFOPT may not be fast on a busy machine if there
+     are many free parameters and/or datum points. Also,
+     for complex fits, ELFOPT may not converge on the cor-
+     rect solution. You may therefore want to monitor the
+     progress of a fit on an iteration by iteration basis.
+     To do this, you should specify the optional parame-
+     ter "prmpt" to have a value of 1 or greater; you will
+     then be prompted after the first (and, optionally, sub-
+     sequent) iteration to give you the opportunity to exit
+     ELFOPT cleanly.
+
+     The output from a completed fit consists of the opti-
+     mised parameters and their errors (calculated in the
+     linear approximation, from the error matrix). The re-
+     sults may be stored for later inspection, or output,
+     using ELFPUSHC.
+
+ELFPUSHC (no parameters)
+     "ELFPUSH Coefficients".  Pushes the coefficients of
+     the current ELF fit onto the stack of fit coefficients.
+     These results may be inspected, printed out, or re-
+     covered to the status of current fit coefficients using
+     ELFCSL, ELFVUC, ELFWRC, and ELFPOPC.
+
+ELFPOPC n
+     "ELF POP Coefficients". Pops a set of fit coefficients
+     from the ELF fit coefficient stack into the `current'
+     coefficient arrays (where they can be modified with
+     ELFINP).
+
+ELFRESTC [filename[.typ]]
+     "ELF RESTore Coefficient stack".  Restores an ELF
+     fit coefficient stack previously saved using ELFSAVEC.
+     The SAVEd stack of numerical profiles is restored only
+     if there are no numerical profiles on the profile stack
+     at the time of the restore.  This is to avoid ambigu-
+     ity in definition of profile indices. The conditions and
+     features of the restore are the same as those for the
+     DIPSO stack restore (`RESTORE'), except that the
+     default filename and type are [ELFSAVE.ESTK].
+
+ELFSAVEC [filename[.typ]]
+     "ELF SAVE Coefficient stack". Saves the entire fit co-
+     efficient stack as an unformatted file that can be subse-
+     quently recovered using ELFRESTC. The stack of stored
+     numerical profiles (if any) is also saved. The default
+     filename and type are [ELFSAVE.ESTK]. The data
+     file created is not an NDF and may therefore not be
+     readable on operating systems other than the one on
+     which it was created.
+
+ELFCSL (no parameters)
+     "ELF Coefficient Stack List".  Gives a summary of
+     entries in the fit coefficient stack.  Individual entries
+     can be inspected in more detail using ELFVUC.
+
+ELFVUC n
+     "ELF View Coefficients". Gives a listing, at the ter-
+     minal, of entry 'n' of the ELF fit coefficient stack. An
+     overview of the stack can be obtained using ELFCSL.
+
+ELFWRC filename[.typ]
+     "ELF WRite Coefficients". Writes the contents of the
+     fit coefficient stack to a file (default type is .DAT). The
+     information given includes the starting specifications
+     for the fit, the results (if any), and the line fluxes in
+     units corresponding to the data stored in the DIPSO
+     stack.
+
+ELFLFIX n
+     "ELF Line FIX". Allows use of the cursor to define
+     a `fixed' (i.e.  non-optimisable) line in the data.  Its
+     principal use is to (in effect) take out features in the far
+     wings of lines that are being optimised; these features
+     might otherwise adversely affect the final fit.
+
+     Typing ELFLFIX brings up the cursor; two hits are then
+     required. The first locates the centre and peak flux of
+     the feature. (These data are added to the `current' fit
+     coefficients in the same way as using `=' in ELFINP.)
+     The second locates the half intensity point, on either
+     side of the feature, to fix the half-width at half max-
+     imum (from which the FWHM follows). (Hitting the
+     same point twice leaves the width undefined.)
+
+ELFPIN n
+     "ELF Profile INput".  Transfers a numerical profile
+     from DIPSO stack entry `n' to storage in the profile
+     stack. The data must have units of velocity along the
+     X axis; spectra to which numerical profiles are fitted
+     must also be in velocity space.
+
+ELFPL (no parameters)
+     "ELF Profile List".  Lists the contents of the profile
+     stack (by giving the title of the original DIPSO stack
+     entry).
+
+ELFPUSH [n1 n2]
+     "ELFPUSH fit". Pushes the result of an ELF fit onto
+     the DIPSO stack, as a continuous (i.e.  no breaks)
+     spectrum. If no arguments are specified, the complete
+     fit is pushed, into the next available DIPSO stack po-
+     sition.  If `n1' is specified, only the fit for line n1 is
+     pushed. If `n2' is also specified, the fits for lines n1 to
+     n2 inclusive are pushed.  If n1 is specified, the back-
+     ground polynomial (if any exists) is also pushed, before
+     the line(s).
+
+ENV name
+     The string value being used for the specified environ-
+     ment variable is displayed. An error is reported if the
+     no value is available.
+
+     DIPSO uses environment variables to specify various
+     directories (eg DIPSODIR), and also the prompt string
+     (DIPSOPROMPT). Default values for these environment
+     variables can be supplied on the DIPSO command
+     line in a comma separated list of "name=value" pairs.
+     These default values will be used if the corresponding
+     environment variables are not defined.
+
+ERASE [n]
+     Erases plotting zone "n" (c.f TZONE). This is done
+     rather slowly unless n=0 (the default).
+
+EW [mode]
+     Measures equivalent widths. The cursor is used to de-
+     fine two pairs of (X,Y)points, between which the equiv-
+     alent width is measured with respect to a linear `con-
+     tinuum'; if you need a more complex continuum, the
+     data can be preprocessed using CREGS together with
+     PF, or using CDRAW. To terminate the equivalent width
+     measuring session, define X2<X1.  Note that EW ex-
+     pects to measure spectra with monotonically increas-
+     ing X values.
+
+     Errors on the measured equivalent widths are calcu-
+     lated using the prescriptions given by Howarth and
+     Phillips (MNRAS 222, 809, 1986); these errors are
+     likely to make most sense for interstellar line measure-
+     ments. The assumed nature of the errors is controlled
+     by the value of MODE; the default for MODE is 0.
+     In this case, if the data have been processed with PF
+     immediately before using EW, an estimate of the con-
+     tinuum signal-to-noise is available. This results in au-
+     tomatic generation of `statistical' errors on the equiv-
+     alent width measurements, under the (conservative)
+     assumption that noise (rather than signal-to-noise) is
+     constant. Such an assumption is likely to be reason-
+     able for IUE data.  Note that on termination of the
+     EW command the `statistical' error is LOST. This is a
+     feature, not a bug, and is intended to stop you making
+     mistakes through oversight.  If, after terminating EW,
+     you find that you want to do further measurements on
+     the same data, then the sequence:
+
+        PUSH,PF 0,ADIV m,PM
+
+     (where `m' is the STACK entry into which the data
+     are PUSHed) will normally recover the error estimates.
+     (The CREGS continuum regions are remembered, and
+     PF 0 will fit a horizontal line to these regions in the
+     already rectified data, recomputing the error estimate.
+     The Y coordinate of this line should be 1.0).
+
+     If MODE is given a non-zero value, `statistical' er-
+     rors are calculated under the assumption of Poisson
+     statistics. Such an assumption may be considered by
+     some (though not necessarily the author of this doc-
+     ument) to be appropriate to IPCS data.  Since the
+     uncertainties on individual points are not stored, but
+     are calculated (on a square-root basis) during the EW
+     measurement, it is essential that unrectified data are
+     interrogated in this mode.  It may, of course, prove
+     convenient to overplot a `continuum' to assist inter-
+     pretation.
+
+     In addition to the `statistical' (i.e.  random) errors
+     calculated by EW, allowance for systematic errors in
+     setting the zero and continuum levels can be made,
+     using the EWERR command.
+
+     WARNING: EW operates on the data stored in the
+     `current' arrays. Be careful not to make the mistake
+     of plotting STACK data, and then trying to mea-
+     sure equivalent widths off of the data on the screen.
+     The calculated value of EW is multiplied by the factor
+     WORV.
+
+EWERR ErrC Err0
+     Provides the program with estimates of the system-
+     atic errors in continuum and zero-level placement (ex-
+     pressed as percentages of the continuum level). These
+     errors are then incorporated into subsequent error anal-
+     ysis when determining equivalent widths with EW.
+
+     These systematic errors are assumed to propagate quadrat-
+     ically (see MNRAS 222, 809, 1986).
+
+EXIT Exits DIPSO, saving the stack in a file called EXIT.STK,
+     or EXIT_STK.sdf.
+
+EXPAND Factor [clist]
+     Expands components of a plot by a factor "Factor"
+     with respect to the default size on a given device. (Fac-
+     tor is absolute, not relative; e.g. the sequence EXPAND
+     2, EXPAND 3 gives 3x enlargement, not 6x.)
+
+     If no value is supplied for clist, then the supplied
+     expansion factor applies to all the components of the
+     plot listed below. If a value is supplied for clist, it
+     must be a string containing some sub-set of the char-
+     acters A, I, N, T, M and P. Each character refers to a
+     different component of the plot as follows:
+
+     A  - M(A)jor tick marks.
+
+     I - M(I)nor tick marks.
+
+     N  - (N)umerical axis labels.
+
+     T  - (T)extual axis labels.
+
+     M  - (M)arkers.
+
+     P  - Text created using the (P)WRITE command.
+
+     The expansion factor is only applied to those compo-
+     nents of the plot for which the corresponding letters
+     are included in the clist parameter. The expansion
+     factor for all other components is left unchanged.
+
+FILL (no parameters)
+     Results in filled-in MARK symbols (c.f NOFILL).
+
+FLUX [filename[.typ]]
+     Measures fluxes with respect to (=above) a linear `con-
+     tinuum' defined using pairs of cursor hits. More com-
+     plex continua must be rectified out, using CDRAW, or
+     CREGS together with PF. To end a FLUX measuring ses-
+     sion, input X2<X1. Note that FLUX expects to mea-
+     sure spectra with monotonically increasing X values.
+
+     Fluxes are obtained by trapezoidal integration between
+     X,Y points. Linear interpolation is used across `breaks'
+     in the data (and a warning given).
+
+     If a file name is supplied (the default file type is .DAT)
+     then the x1, x2 and flux values are output to the file
+     for future reference.  The file remains open until (i)
+     you exit from the program; (ii) a new file name is
+     provided; or (iii) FLUX 0 is typed in. (The last option
+     closes any file that is open [but does not open a file
+     called 0.DAT].) This means that, for example, FLUX
+     can be exited, the X and Y ranges changed and a new
+     plot generated, then FLUX re-entered, and data will
+     continue to be output to the previously opened file.
+
+     WARNING: FLUX operates on the data stored in the
+     `current' arrays. Be careful not to make the mistake
+     of plotting STACK data, and then trying to measure
+     fluxes off the data on the screen. The integrated flux
+     is multiplied by the factor WORV.
+
+FONT n
+     Selects font quality.  Permitted values of `n' are 0
+     (hardware characters), 1 (SGS characters), and 2 (NCAR
+     characters). These are in increasing order of elegance,
+     and execution time! The resulting fonts are used for
+     all text on the plot (i.e. apply to XLAB, YLAB, PWRITE,
+     and TITLE when the title is plotted).
+
+     FONT 0 (the default) is not always elegant, and because
+     of problems with text rotation some devices will write
+     the Y axis label "upside down". If this really worries
+     you you can get round it with YLAB (e.g.  use YLAB
+     xulF).
+
+     The elaborate FONT 2 style gives access to a wide range
+     of special characters (Greek, italics, mathematical sym-
+     bols, etc.) These cannot be reproduced in this docu-
+     ment, but are given in full in SUN/90 (which docu-
+     ments the routines which DIPSO utilises).  The fol-
+     lowing formats serve to illustrate the possibilities:
+
+     'PGU'  gives uppercase Greek
+     'PGL'  gives lowercase Greek
+
+     'B' gives subscripts ("B"elow)
+
+     'S'gives superscripts
+
+     'N' gives normal (ie not sub- or super-script)
+
+     'PRU'  gives Roman characters
+
+     Thus to give the formula for the area of a circle as a
+     title:
+
+        TITLE "Area = 'PGL'P'PRU'r'S'2"
+
+     Note that the single quotes surrounding the style def-
+     inition strings are mandatory, as are the uppercase
+     specifications. Note, too, that the correspondence be-
+     tween Greek and Roman characters is not usually as
+     obvious as P="pi"; it is important to check a printed
+     (not line-printer!) copy of SUN/90 for details.
+
+     An angstrom symbol (A) is provided as a special char-
+     acter: `.A' (in `PRU' style). Other complex characters
+     can be constructed (see SUN/90); for example, a mass-
+     loss rate symbol (M surmounted by a dot) is obtained
+     using "'PRU'M'H:-85V105PRU'.'H:85V-105'".
+
+     Because the codes for special characters are flagged
+     by apostrophes, life gets complicated if you want to
+     include a normal apostrophe in a tring. But not too
+     complicated: you just give it twice.  For example, if
+     you want a title that says:
+
+                  Howarth's Fudged Data
+
+     you must specify:
+
+        TITLE "Howarth''s Fudged Data"
+
+     to get it (in font 2).
+
+FORMWR filename[.typ]
+     Results in a formatted write of the contents of the
+     `current' arrays. The resulting data are in a form suit-
+     able for output on a line printer. The default file type
+     ([.typ]) is '.DAT'.
+
+FRAME xsize ysize [locator index]
+     Defines a plotting area in absolute (device-independent)
+     terms. The xsize and ysize parameters are in cm; the
+     locator index follows the numeric keypad, i.e. 1=bot-
+     tom left, 9=top right etc. The locator index defaults
+     to 5 (centre of plotting zone).  To return to (device-
+     dependent) plotting zones use TZONE.
+
+     Subzones within the specified FRAME can be set using
+     FRZONE.
+
+FRZONE x1 x2 y1 y2
+     Defines subzones within a plotting area specified by
+     FRAME. The parameters x1 etc.  are in the range 0-1,
+     and define the fractional position of the subzone within
+     the frame. An example of the use of FRAME and FRZONE
+     can be found in DIPSODIR:DEMO2.CMD ($DIPSODIR/demo2.cmd.
+
+FTFILTER n1 [f1 f2 n2]
+     Filters high-frequency components (which you may iden-
+     tify with noise) from the real and imaginary parts of
+     a Fourier Transform (see FTRANS). FTFILTER expects
+     the real part of the FT to be in stack entry "n1", and
+     the imaginary part to be in entry "n2" (which defaults
+     to n1+1).
+
+     FTFILTER operates by constructing an "exponent-squared
+     edge function", and multiplying the FT by that filter
+     (see Bracewell, "The Fourier Transform and its Appli-
+     cations", for details). The filter has a value of unity up
+     to frequency f1, then drops like exp(D[nu]**2), where
+     D[nu] is the change in frequency. The e-folding scale
+     is determined by specifying f2, the frequency at which
+     the filter drops to a value of 0.01.
+
+     The filtered real and imaginary parts are pushed onto
+     the stack, together with the filter used.
+
+     The frequencies f1 and f2 will depend critically on
+     your application; defaults are provided merely to pro-
+     vide an illustration for first-time users. These defaults
+     are (Nu1+Nu2)/2 for f1, and MIN(Nu2,1.1*f1) for f2,
+     where Nu1 and Nu2 are the first and last frequencies
+     in the data set to be filtered.
+
+FTINV n1 [n2]
+     Computes the inverse fourier transform from the real
+     and imaginary parts of the FT, where the real part is in
+     stack entry n1, and the imaginary part is in stack entry
+     n2 (which defaults to n1+1). The result is pushed onto
+     the stack (and WORV=1 assumed).
+
+FTRANS n [p]
+     Computes the Fourier Transform of stack entry "n",
+     pushing the resulting real and imaginary parts onto the
+     stack, together with the power spectrum. A fraction
+     "p" of the data set is endmasked (at each end) with a
+     cosine bell; "p" defaults to 0.05. For best results you
+     should subtract a continuum (or at the very least the
+     mean value) from the data, in order to maximise the
+     effectiveness of the endmasking.
+
+     FTRANS does not use the Fast Fourier Transform algo-
+     rithm.  It does not, therefore, require the number of
+     datum points to be an integer power of two (at the
+     price of being slow for large data sets).  However, it
+     is necessary for the data to be uniformly sampled; if
+     FTRANS determines that your data set does not con-
+     tain regularly sampled X values it will automatically
+     perform a 4-point Laguerre interpolation in order to
+     simulate such data.  For applications where the data
+     sampling rate is very irregular, or where there are sub-
+     stantial gaps (e.g. in light-curves), it is recommended
+     that PDGRAM (and PDGWINDOW) be used for Fourier anal-
+     ysis applications.
+
+     The X values in any data set must be monotonically
+     increasing.
+
+     It is recommended that you familiarise yourself with
+     (e.g.)  Brault & White, A&A 13, 169 (1971) before
+     using FTRANS.
+
+GRID X1 X2 DX
+     Creates a grid of uniform wavelength points, starting
+     at Lambda(1)=MIN(X1,X2). The Y values are set to
+     zero. This command can be used with AADD to remap
+     data, or to set up a wavelength grid for (e.g.) NEBCONT.
+     Data are left in the `current' arrays.
+
+GRIDSTYLE mode
+     Controls the design of plots.
+
+       o Mode 1 is the "ordinary" (4 sides and labels) de-
+         sign;
+
+       o Mode 2 results in a grid drawn over the plot (like
+         course graph paper);
+
+       o Mode 3 gives just the bottom and left-hand axes;
+
+       o Mode 4 gives no box at all, and no labels;
+
+       o mode 5 gives bottom and left-hand axes but no
+         labels.
+
+HANDLER level
+     The DIPSO error handler makes the program uncrash-
+     able (in principle!). Setting level=0 results in the sys-
+     tem error handler being invoked; fatal errors will kill
+     the program. Any level greater than zero (such as the
+     default value of 1) causes the program to issue a warn-
+     ing message when an error occurs (including control-C
+     interupts). The current command is aborted and the
+     user is returned to the main DIPSO command prompt.
+
+     To familiarise yourself with the condition handler you
+     can type `CRASH'.
+
+HC N
+     Calculates a theoretical (fully damped) profile for the
+     Hydrogen Lyman-alpha line (1216 A), with a column
+     density `N'. The profile is calculated at the X grid in
+     the current arrays, with a continuum level of unity.
+     If the parameter N is less than 30 it is assumed to
+     represent log(N).
+
+     The most convenient way of using this function is to
+     calculate a theoretical profile, use ADIV to divide ob-
+     served data (in the STACK) by it, then plot the re-
+     sulting data.  The `best' value of the interstellar H
+     I column is that which gives the `flattest' continuum
+     around 1216. Of course, interpretation is your respon-
+     sibility, and the intrinsic stellar Lyman-alpha profile
+     should always be considered, together with the possi-
+     bility that the interstellar line is not fully damped.
+
+HELP [string]
+     If no value is supplied for `string' then general help in-
+     formation for the DIPSO package is displayed. More
+     verbose assistance on a particular command can be ob-
+     tained by typing `HELP <command name>'. The infor-
+     mation is displayed in one of two formats: plain text,
+     or hypertext. The hypertext information is taken from
+     SUN/50 and is displayed using a World-Wide-Web
+     browser. By default the Mosaic browser is used, but
+     this can be changed by assigning the required browser
+     command to the environment variable HTX_BROWSER
+     before entering DIPSO. For example, to use Netscape
+     issue the following command before starting DIPSO:
+
+        % setenv HTX_BROWSER netscape
+
+     If a browser of the requested variety has already been
+     fired-up prior to starting DIPSO, it is "hi-jacked" to
+     show the requested help information.  Otherwise, a
+     new browser is fired-up.
+
+     If this command fails, saying that the "showme" com-
+     mand cannot be found, try defining the showme com-
+     mand explicitly using USEHTX.
+
+     In plain text mode, the information is taken from $DIPSODIR/dipso.hlp
+     and $DIPSODIR/help.lis, and is displayed in the DIPSO
+     command window.
+
+     By default, the plain text format is used, but this can
+     be changed using the USEHTX command.
+
+     Typing an interrogative ("?" or "?<command name>")
+     has the same effect as typing HELP.
+
+HIST (no parameters)
+     Plots to be done histogram-style (as opposed to POLY
+     or MARK).
+
+HPROT [mode]
+     Rotates between Hist and Poly plots on a given di-
+     agram, starting with whichever style is currently in
+     force (selected with HIST or POLY command); can be
+     useful when comparing (e.g.) observations and mod-
+     els. If mode is 1 (default is 0) then the first data set
+     is plotted in the current style (i.e. histogram if HIST
+     is in force), and all subsequent data sets plotted on
+     the given diagram will appear in the alternative style.
+     The cycle can be re-initialised at any time with HIST
+     or POLY.
+
+     Negated with NHPROT.
+
+INTEGRATE (no parameters)
+     Estimates the area under the current arrays using sim-
+     ple trapezoidal integration (and will therefore only work
+     successfully for data sets with monotonically increas-
+     ing X values).
+
+INTERP n
+     Applies Laguerre interpolation to data in the current
+     arrays, to give a regularly sampled data set with the
+     same number of points as the original. The parameter
+     "n" controls the order of the interpolation.
+
+     INTERP does (n-1)th order interpolation, where `n' must
+     be an even number; thus only odd orders greater than
+     zero are handled.  For example, n=2 gives 1st or-
+     der (i.e.  linear) interpolation; n=4 gives 3rd order
+     (i.e. quartic) interpolation. (INTERP cannot supply
+     quadratic interpolation, since this would require n=3
+     and odd values of `n' are not allowed.)
+
+     The data must have monotonically increasing X val-
+     ues.
+
+     Note that spline interpolation can also be executed,
+     using the CDRAW command.
+
+ISATM [wavelength]
+     Supplies atomic data for use with ISCALC and ISCOG. If
+     a wavelength (in Angstroms) is provided, then DIPSO
+     searches for a file called ATOMIC.DAT in the current
+     directory; if it fails, it looks for one in a directory with
+     the environment variable OWNERDIR; and if it again
+     fails, it opens $DIPSODIR/ATOMIC.DAT. Once a file has
+     successfully been opened, DIPSO searches for a line
+     whose wavelength falls within 0.1A of the argument
+     wavelength to ISATM. If it finds it, it uploads the asso-
+     ciated atomic data.
+
+     The file $DIPSODIR/ATOMIC.DAT uses data based on
+     MNRAS 222, 809 (1986) and references therein, and
+     provides a model for the required format if you want
+     to set up your own file. "Comment cards" prefixed by
+     "*" or "!" are permitted.
+
+     If a wavelength is not provided, or if ISATM fails to
+     find a data set corresponding to a specified wavelength,
+     then a "data edit" mode is entered. This allows you to
+     change or input atomic data, or to carry out further
+     searches through an ATOMIC.DAT file; typing H in this
+     mode gives more information.
+
+     (Incidentally, in case you're wondering, ATOMIC.DAT
+     requires statistical weights in order to permit calcula-
+     tion of damping constants.)
+
+ISCALC (no parameters)
+     Calculates a theoretical absorption profile for an in-
+     terstellar cloud (or other plane-parallel slab of absorb-
+     ing material with negligible forward scattering and a
+     Gaussian line-of-sight velocity distribution for the ab-
+     sorbers), and pushes the result onto the stack.
+
+     Before this command can successfully be invoked, the
+     atomic data must already have been loaded (with ISATM),
+     a cloud model defined (with ISINP), and a set of cloud
+     `options' defined (with ISOPT).
+
+ISCOG (no parameters)
+     Calculates a Curve-Of-Growth for a cloud model de-
+     fined with ISINP, using atomic data input via ISATM.
+     The COG is pushed onto the stack, with X values
+     (N.f.lambda) in units of (cm-2.dimensionless.Angstroms)
+     and Y values (W[lambda]/lambda) assuming equiva-
+     lent width and wavelength to be measured in the same
+     unit.
+
+ISINP (no parameters)
+     Invokes a cloud "editor", which permits an interstellar
+     cloud model to be defined prior to calculating theo-
+     retical profiles with ISCALC. Up to 18 clouds are per-
+     mitted; each is specified by a velocity dispersion pa-
+     rameter, "b" (see, e.g., MNRAS 222, 809 [1986] for a
+     definition), a central velocity, V, and a column density,
+     N.
+
+     Typing HELP while in the cloud editor provides more
+     information.
+
+ISOPT [filename[.typ]]
+     Loads a variety of options required before ISCALC can
+     be successfully executed. These include specifications
+     for (optional) convolution with an instrumental reso-
+     lution function, blending with other lines, etc. ISOPT
+     invokes an option "editor"; typing H in this edit mode
+     gives more information. Alternatively, if a filename is
+     specified on the command line, an attempt is made to
+     read options from that file.  Such a file should con-
+     tain information matching the ISOPT editor input; for
+     example, if the file contains:
+
+        V1=-100
+        V2=+100
+
+     line profiles will be calculated over (at least) the range
+     -100 km/s to +100 km/s; default values for all other
+     options will be assumed.  (The default file name is
+     ISOPT, and the default extension is .DAT.)
+
+IUECOR camera year day [aperture]
+     Applies the `aging' corrections for the IUE cameras de-
+     scribed by Bohlin and Grillmair (Ap. J. Sup., 66, 209,
+     1988; SWP) and by Clavel et al. (ESA IUE Newsletter
+     No. 26, p. 65, 1986; LWR). The `camera' parameter is
+     2 for LWR and 3 for SWP; the `day' parameter is day
+     number in the year. The `aperture' parameter is rel-
+     evant only to SWP data, and is 1 for trailed spectra,
+     2 for small aperture spectra, and 3 (the default) for
+     large aperture point source spectra. IUECOR works on
+     data in the current arrays, replacing fluxes therein by
+     their corrected values.
+
+LABON (no parameters)
+     Turns axis labelling back on (after use of NLAB).
+
+LOGAXX t/f
+     If set `True', the X axis will be plotted on a log10 scale.
+
+LOGAXY t/f
+     If set `True', the Y axis will be plotted on a log10 scale.
+
+LOGX (no parameters)
+     Replaces the X values in the current arrays by their
+     base 10 logarithms.
+
+LOGY (no parameters)
+     Replaces Y values in the current arrays by their base
+     10 logarithms.
+
+LWEIGHT weight
+     Alters the weight (i.e. `heaviness') of all plotted lines,
+     on devices which support this feature.  The weight
+     must be 1-5 (initial setting is 1). See also TWEIGHT.
+
+MARK (no parameters)
+     Plots to be done using symbols, as opposed to HIST or
+     POLY. The symbols may be `designed' using MSET, and
+     expanded and rotated using EXPAND and ANGLE.
+
+MEAN (no parameters)
+     Calculates the mean and standard deviation of the Y
+     data stored in the `current' arrays.
+
+MERGE S1 S2 WT1 WT2 [MODE]
+     Merges STACK entries S1 and S2, with weights WT1
+     and WT2 respectively.  This function is an alterna-
+     tive to the AADD and YMULT commands, differing in the
+     respect that if there is a gap in one (but not both)
+     data sets being manipulated, then the MERGEd data
+     set will not have a gap. The data sets in the STACK
+     are both required to have monotonically increasing X
+     values.
+
+     If there is any region of overlap between the two data
+     sets, then the Y values of the data set associated with
+     the larger value of X(1) are mapped onto the X grid
+     of the other data set.  This remapping is done using
+     a triangular filter, so that some slight smoothing can
+     result if the sampling rates in the two data sets are
+     very different. Remapping is carried out ONLY in any
+     overlap region.
+     This function is intended for merging data sets with
+     (normally) overlapping, but not necessarily identical,
+     X ranges.  In particular, it can be used for merging
+     IUE SWP and LWR flux calibrated spectra, and UV
+     and optical data (e.g.  UBV fluxes; see UBVRD). Be-
+     cause remapping is done linearly, it is also suitable for
+     averaging similar spectra.
+
+     If MODE=zero (the default value) and the data look
+     like IUE SWP and LWR spectra (on the grounds of the
+     X ranges), a wavelength-dependent weighting is used
+     which reflects the inverse sensitivity function of IUE.
+     If you ARE dealing with IUE data, then inputting the
+     exposure times as the WTs and using MODE=0 will
+     result in (essentially) a MERGE at the 'FN' level, which
+     is probably more correct than one at the `absolute flux'
+     level. If MODE is positive, the additional IUE weight-
+     ing is switched off. (Note that if you are NOT working
+     with IUE data MODE=0 and MODE=1 will give the
+     same result).
+
+     If MODE=-1, a straight addition of data in the over-
+     lap region is carried out. This option may be useful for
+     (eg) combining emission line models with a zero back-
+     ground level. If MODE=-2 (or less), the two data sets
+     are multiplied in the overlap region. This option may
+     be useful for (e.g.) combining absorption line models
+     with a background level of unity. If MODE is negative,
+     `dummy' values of Wt1 and Wt2 MUST be supplied.
+
+     You should only merge data which you expect to have
+     similar Y values over any range of overlap.  Merging
+     dissimilar data sets (e.g. SWP and LWR IUE spectra
+     which have not been flux calibrated) will give unsatis-
+     factory results.
+
+MONGOWR filename [badval]
+     Writes a file which can subsequently be read into MONGO.
+     It is possible to make MONGO leave gaps in plots, cor-
+     responding to datum points with a notifiable `bad' y
+     value; the MONGOWR command inserts a `bad' point with
+     y value `badval' (default 0) into breaks in the data set
+     to facilitate use of this option.
+
+     Most of the more important MONGO functions are
+     reproduced in DIPSO - you shouldn't have to use this
+     command!
+
+MROT (no parameters)
+     Implements automatic rotation of plotting symbols.
+     Each plot begins with the symbol type specified by
+     the last use of MARK (or symbol 1, if MARK hasn't been
+     called).
+
+     NOT IMPLEMENTED AT PRESENT.
+
+     Turned off with NMROT.
+
+MSET style nvert
+     Selects the MARK plotting symbol.  `NVERT' is the
+     number of vertices the symbol has; `STYLE' takes on
+     values 1-4. Style=1 is a polygon, Style=2 a `star' de-
+     sign, style=3 is an asterix, Style=4 gives an arrow sym-
+     bol, for plotting lower or (with ANGLE) upper limits.
+
+NB (no parameters)
+     `No Box': switches off automatic clearing off the plot-
+     ting frame between plots.  (Inverse function is BOX).
+     On a device or zone change, the `box' is switched `on'
+     for the first plot, regardless of any NB call.
+
+NCROT (no parameters)
+     Stops automatic rotation of the colour table when Ikon
+     plotting and resets the colour index to 1 (white). (See
+     CROT and CSET).
+
+NEBCONT filename[.typ] [mode1 mode2 mode3]
+     Calculates a theoretical nebular recombination contin-
+     uum. The requisite data are comparatively numerous,
+     and so are accessed from a file.  The contents of the
+     file must be as follows:
+
+        Line 1: Te(1-4)
+        Line 2: Ne
+        Line 3: Log10 H(beta) flux [and Log10 He(1640) flux]
+        Line 4: C
+        Line 5: A[He(1+)] A[He(2+)]
+        Line 6: A[N(1+)] A[N(2+)] A[N(3+)] A[N(4+)]
+        Line 7: A[C(1+)] A[C(2+)] A[C(3+)] A[C(4+)]
+        Line 8: A[O(1+)] A[O(2+)] A[O(3+)] A[O(4+)]
+        Line 9: A[Ne(1+)] A[Ne(2+)] A[Ne(3+)] A[Ne(4+)]
+
+     where:
+
+         Te(i) is the electron temperature appropri-
+             ate to ions of charge i+, in units of 104K;
+
+         Ne  is the electron density in cm-3;
+
+         H(beta)  flux is the observed value, in cgs
+             units; if the flux is unknown, enter a
+             value of 0.0 and follow it (on the same
+             line) with the log of the He II (1640)
+             flux, in the same units;
+         C  is the logarithmic extinction at H(beta)
+             [C=1.44*E(B-V) for a standard extinc-
+             tion law];
+
+         A(X)  is the ionic abundance, in the form
+             1000*N(X)/N(H+).
+
+     A specimen file is given in $DIPSODIR/NEBCONT.DAT. If
+     NEBCONT fails to find the file in the current directory,
+     it tries to look in a directory assigned the environ-
+     ment variable OWNERDIR (which you can define in your
+     .login script or your LOGIN.COM procedure).
+
+     All data in the file are reproduced at the terminal. By
+     default, (mode1=mode2=mode3=0), new values are
+     prompted for (simply hit `return' to get the file val-
+     ues). By setting mode1=1, abundances are listed but
+     not prompted for (fluxes, C, temperatures and densi-
+     ties still prompted). Mode2=1 does the same for the
+     H(beta) flux and `C'; and mode3=1, the same for tem-
+     peratures and density.
+
+     The results are calculated at the X co-ordinates of data
+     in the `current' arrays, and pushed onto the stack. If
+     you are not modelling real data, GRID can be used to
+     set up an X array.
+
+     The default file type is .DAT.
+
+NECHO (no parameters)
+     Has the same effect as ECHO -1.
+
+NLAB [mode]
+     Selectively turns off axis labelling (modes not yet im-
+     plemented; NLAB currently turns off X and Y axis la-
+     bels, and title).
+
+NHPROT (no parameters)
+     Stops rotating plot style between Hist and Poly (after
+     HPROT).
+
+NMROT (no parameters)
+     Stops automatic rotation of plotting symbols and sets
+     the MARK index to 1. (See MROT and MARK).
+
+NOBEEP (no parameters)
+     Stops the terminal beeping every time you make a boo-
+     boo.
+
+NOFILL (no parameters)
+     Results in MARK symbols being plotted as open (un-
+     filled) figures; c.f. FILL.
+
+NTROT (no parameters)
+     Stops automatic rotation of line attributes and resets
+     the TLINE index to 1 (continuous lines). (See TROT and
+     TLINE).
+
+NROT (no parameters)
+     Stops rotating everything, resetting the colour, MARK
+     and TLINE indexes to 1 (i.e.  has the same effect as
+     NCROT,NMROT,NTROT).
+
+NX (no parameters)
+     Return to autoscaling of the X axis (after using XR,
+     XMIN, XMAX, CXR and/or CXYR).
+
+NXY (no parameters)
+     Return to autoscaling of the X & Y axes (after us-
+     ing XR, YR, XMIN, XMAX, YMIN, YMAX, CXR, CYR, and/or
+     CXYR).
+
+NY (no parameters)
+     Return to autoscaling of the Y axis (after using YR,
+     CYR and/or CXYR).
+
+PAUSE (no parameters)
+     Gives a BEEP (unless you've specified NOBEEP), and
+     causes nothing to happen until you hit the return key.
+     (You might find a use for this command in command
+     files.)
+
+PF n
+     `Poly fit': fits a polynomial of degree `n' through data
+     points in the HIGHEST (i.e. numerically largest) STACK
+     entry, using continuum windows defined using CREGS.
+     PF expects these data to be in order of increasing X
+     value. Y values, obtained from the parameters of the
+     `best fit', are calculated at the grid of X points of the
+     data in the highest STACK entry, between the first
+     and last `continuum window' X values. The resulting
+     curve is left in the `current' arrays (overwriting any-
+     thing there previously).
+
+     Because the `continuum window' data are stored inter-
+     nally, it is possible to carry out a sequence of trial fits
+     in an attempt to obtain a satisfactory polynomial rep-
+     resentation of the continuum. Thus a typical sequence
+     of commands to rectify data might be as follows:
+
+         POP n, PUSH       ! Put the  data  of  interest  into  the
+                           ! 'current'  arrays and onto the top  of
+                           ! the stack.
+         XR x1 x2,PM       ! Set the X range and plot the data.
+         CREGS,CREGD       ! Select & display  continuum windows.
+         PF 1              ! Fit  a  straight line to the  'window'
+                           ! data.
+         NB,PM             ! Plot the fit through the data.
+         PF 3              ! PF 1 unsatisfactory; try again.
+         PM                ! Plot the fit; it looks O.K.
+         ADIV m            ! Divide data in the top of the STACK by
+                           ! by the polynomial approximation to the
+                           ! continuum.
+         TITLE new title   ! Change the title appropriately.
+         BOX,PM            ! Plot the rectified data.
+         PUSH              ! Save the rectified data for later use.
+         POP j,PUSH        ! Prepare the next data set of interest.
+         PM,NB             ! Plot the data.
+         PF 3,PM           ! Fit & plot a polynomial; there is  no
+                           ! need  to  redefine  continuum  windows
+                           ! unless you want to change them.
+
+     (Then ADIV, TITLE, and so on).
+
+     Note that a slightly different approach to polynomial
+     fitting is possible using ELFINP and ELFOPT (which can
+     give you the coefficients of a least-squares fit).
+
+PDGPEAK (no parameters)
+     Locates the peak of the data set in the current ar-
+     rays (notionally, but not necessarily, produced with
+     PDGRAM). PDGPEAK does this by locating the largest Y
+     values, then fitting a parabola to the point and the
+     adjacent ones on either side.  The peak and central
+     values listed are those calculated from this parabola.
+
+PDGRAM [fl fh df p]
+     Replaces the data in the current arrays (which should
+     have monotonically increasing X values) with their
+     "unevenly spaced data periodogram", as defined by
+     Scargle (ApJ 263, 835, 1982).
+
+     The parameter fl is the lowest frequency at which the
+     periodogram is to be evaluated, and defaults to zero;
+     fh, the highest frequency, defaults to 0.5*(n-1)/(x[n]-
+     x[1]), where there are "n" points in the current arrays;
+     df, the frequency interval, defaults to 1.0/(x[n]-x[1]);
+     and p, the proportion of the data set endmasked at
+     each end (using a cosine bell), defaults to 0.05.
+
+     N.B. For large data sets the default frequency param-
+     eters may lead to very large numbers of points in the
+     periodogram, which will accordingly take a substantial
+     time to evaluate.
+
+     The periodogram has X units which are the inverse of
+     the original X units (ie will normally be in units of
+     spatial or temporal frequency).
+
+PDGWINDOW [fl fh df]
+     Replaces the data in the current arrays (which should
+     have monotonically increasing X values) with their
+     window function, as defined by Scargle (ApJ 263, 835,
+     1982).  The parameters fl, fh, and df have the same
+     meanings and default values as for the PDGRAM func-
+     tion, and the caution given for that function regarding
+     lengthy evaluation times applies also to PDGWINDOW.
+
+     One would normally calculate a data set's window
+     function in addition to its periodogram (PDGRAM)
+     to ensure that any peaks in the latter are not an arte-
+     fact of the sampling frequency.
+
+PLOTINV (no parameters)
+     Invert the Y axis on plotting (i.e. the `bottom' Y value
+     becomes the `top' value, and vice versa).
+
+PLOTREV (no parameters)
+     Reverse the X axis (ie the X value at the left-hand
+     edge of the plot becomes that at the right-hand edge,
+     and vice versa).
+
+PM [n1 n2 n3 ..... n48 n49 n50]
+     Plot data (`PM' comes about `for historical reasons').
+     If you haven't used the PPROMPT command, then PM
+     without any arguments will plot the data stored in the
+     `current' arrays; otherwise up to 50 STACK entries
+     can be plotted.  If you have set PPROMPT to TRUE,
+     then if you didn't provide any arguments for PM on the
+     command line DIPSO will prompt you for some when
+     it comes to do the plot.  In order to be able to plot
+     both `current' and `STACK' data, the `current' arrays
+     are awarded the `honorary' STACK entry number 0
+     for this command only.  Ranges of stack entries may
+     be specified using the "-" operator; e.g PM 1 3-5 will
+     result in entries 1, 3, 4 and 5 being plotted.
+
+     Even if the BOX is switched `on', all the data associated
+     with a single PM command are plotted in a single frame;
+     i.e. a command sequence like:
+
+        BOX,PM 1 2 0 4
+     will have a different result from:
+
+        BOX,PM 1,PM 2,PM 0,PM 4
+
+     WARNINGS:
+
+       o If you try to plot more than 50 spectra, numbers
+         51 et seq will not be plotted; moreover no error
+         message will be given. You will have to attempt
+         to plot the `current' arrays and the entire contents
+         of a completely full STACK (or multiply plot the
+         same data set) for this problem to arise.
+
+       o If autoscaling is in effect, the plotting frame is
+         autoscaled to the X,Y data in the first stack entry
+         specified. Thus a command like:
+
+            PM 1 2 3 4 5
+
+         may produce a different plot to:
+
+            PM 5 4 3 2 1
+
+POLY (no parameters)
+     Plotting to be done `join-the-dots' style (as opposed to
+     MARK or HIST).
+
+POP n
+     Pop STACK entry `n' into the `current' arrays.
+
+PPROMPT switch
+     PPROMPT governs the default action of PM. The value
+     of the `switch' argument is T(rue) or F(alse), and on
+     startup is set to F. If you set it to T, then the PM
+     command will prompt for an argument list if none is
+     provided on the command line. This could be useful
+     if, for example, you want to include PM in command
+     files where you may not know in advance which stack
+     entries you want to plot. If the switch is set to F, then
+     typing PM without any argument results in the data in
+     the current arrays being plotted.
+
+PS X1 X2 [DX] [n1 n2 n3...n50]
+     `Plot Spectrum':  this command, which acts on the
+     contents of the `current' arrays, is intended specifically
+     for plotting long stretches of a single spectrum (e.g.
+     high resolution IUE data) in sequential frames.  The
+     parameters are:
+         X1:  the X value at the left-hand edge of the
+             first frame;
+
+         X2:  the X value at the right-hand edge of
+             the first frame;
+
+         DX:  the amount by which X1 and X2 are
+             incremented in successive frames.  DX
+             defaults to (X2-X1).
+
+     Plots are alternated in zones 5 and 6. After each frame
+     is plotted, you are prompted as to whether or not you
+     want to continue plotting.
+
+     WARNING: On completion of this command the X
+     range and plotting zone in force will be those used for
+     the last frame; you will probably want to change them.
+
+PUSH (no parameters)
+     `Pushes' the contents of the `current' arrays onto the
+     top of the STACK.
+
+PWRITE x y i string
+     Writes a character string `string' at co-ordinates x,y. If
+     FONT 2 is active, the "locator index", `i', determines the
+     location of the string with respect to the x,y coords: if
+     i=1, the string is written to the lower left (i.e. the top
+     right corner of an imaginary box containing the string
+     ends at x,y); if i=2 the 'box' is horizontally centred on,
+     and vertically below, x,y; i=3 has the top left corner
+     of the 'box' at x,y; i=4,5,6 correspond to the `box'
+     vertically centred and to the left, centre, right of x,y,
+     respectively; i=7,8,9 are similar, but above x,y. These
+     locator indexes are chosen so that the numeric keypad
+     available on most keyboards acts as a mnemonic.
+
+     If the string contains commas, it must be enclosed in
+     double quotes ("). It is recommended that you develop
+     the habit of using such quotes in any case.
+
+     The ANGLE, EXPAND, and FONT commands can be used
+     to modify the appearance of the string on output.
+
+QAREA Zn
+     Reports the (relative) sizes of the grid and graph win-
+     dows for zone "Zn", together with the absolute area
+     of the plotting surface (if available).  See the TPORT
+     command for details.
+
+QSM Sigma
+     Applies a `quick' Gaussian smoothing (FWHM of fil-
+     ter = 2.354*Sigma) to Y values in the `current' arrays.
+     (Defines gaussian weights at a grid of delta(x) val-
+     ues, then linearly interpolates when smoothing). Much
+     faster, and scarcely less accurate, than SM.
+
+QUIT (no parameters)
+     Quit DIPSO, without saving the stack. Can be abbre-
+     viated to "Q".
+
+RDCAT file xcol ycol
+     Reads the values from two specified catalogue columns
+     in the the current arrays. The file containing the cat-
+     alogue is given by "file".  This must be a full path
+     name (no shell meta-characters such as ", $, etc can
+     be used here).  The file can be a FITS table (binary
+     or formatted), or an STL table (see SUN/190 ). The
+     names of the columns holding the X and Y values are
+     given by "xcol" and "ycol". A full list of available col-
+     umn names is displayed if an unknown column name
+     is supplied.
+
+READ file name or NDF name
+     Reads a disk file which has been written with WRITE.
+     This and RESTORE are the only input modes that pre-
+     serve ALL the information associated with a DIPSO
+     data set, and are the recommended options. The disk
+     data can be in either NDF or "native DIPSO" format,
+     depending on the flag established by the USENDF com-
+     mand. When specifying an NDF, do not include any
+     file type.
+
+RECA [/all] [string or integer]
+     Recalls a previous command line or prompt response,
+     putting it into the current keyboard input buffer for
+     acceptance (by pressing return) or further editing. The
+     RECA statement can be issued when-ever dipso prompts
+     the user for input. If no parameters or qualifiers are
+     given, the string which the user last typed in is re-
+     called. If a non-numeric parameter value is given, the
+     most recent string to be given by the user which starts
+     with the supplied string parameter is recalled. If a nu-
+     meric parameter is given, the corresponding string is
+     recalled where "1" is the last (i.e. previous) string, "2"
+     is the last-but-one, etc. If the /all qualifier is given
+     (i.e. "RECA/ALL" ), a list of the last 20 strings given by
+     the user is displayed, and the user is then re-prompted.
+
+RECALL (no parameters)
+     Lists a RECORDed string at the terminal (as a reminder!)
+
+RECORD "string"
+     Records a string of commands for subsequent REPLAY.
+     The string must be enclose in double quotes; it can it-
+     self contain double quotes, but must then be delimited
+     by pairs of double quotes. The string may not incorpo-
+     rate RECORD or REPLAY commands, but the syntax, and
+     general validity, of the string is otherwise not checked
+     until it is REPLAYed.
+
+     To cancel a current RECORDing, use a null string.
+
+REPLAY (no parameters)
+     If REPLAY is included in a command line, then it is
+     replaced in that command line by the contents of any
+     RECORDed command string.
+
+REPORTING level
+     This command can be used to reduce the number of
+     error messages displayed if one of the NDF accessing
+     commands fail.  The command takes a single integer
+     parameter. Level = 2 is the initial value and results in
+     all error messages being delivered to the screen. Level
+     = 1 replaces all errors deriving from a single failed
+     command with a single (less detailed) error message.
+     Level = 0 suppresses all error reports.
+
+RESTORE [file name or NDF name]
+     Restores STACK data previously dumped using SAVE.
+     RESTORE does not require the current stack to be empty;
+     however, if it is not then retrieval may not be complete,
+     depending on the available stack space. (Notification is
+     given of incomplete retrieval, of course). The data can
+     be in either NDF or "native DIPSO" format, depend-
+     ing on the flag established by the USENDF command.
+     When specifying an NDF, do not include any file type.
+     The default NDF name is `SAVE_STK'. If not using
+     NDFs, the default file name is `SAVE.STK'.
+
+RETITLE n string
+     Changes the title of stack entry "n". The string (which
+     may be null) must be enclosed in double quotes if it
+     contains commas. (The use of double quotes is in any
+     case recommended.) Special characters may be incor-
+     porated (see the FONT command).
+
+RXR X1 X2
+     Restrict the X range of data in the `current' arrays
+     (i.e.  throw away data outside the range X1 to X2).
+     Only works properly on data sets with monotonically
+     increasing or decreasing X values.
+
+RYR Y1 Y2 [X1 X2]
+     `Restrict Y range'; throws away datum points in the
+     current arrays which have Y values outside the limits
+     Y1 and Y2.  These limits apply to the entire arrays
+     unless X1 and X2 are supplied, in which case the op-
+     eration is carried out only within that X range.
+
+SAVE [file name or NDF name [n1-n2]]
+     Dumps the contents of the STACK in a form suit-
+     able for subsequent reacquisition using RESTORE. The
+     data can be in either NDF or "native DIPSO" format,
+     depending on the flag established by the USENDF com-
+     mand. When specifying an NDF, do not include any
+     file type. The default NDF name is `SAVE_STK'. If
+     not using NDFs, the default file name is `SAVE.STK'.
+
+     It is possible to specify subsets of the stack for saving,
+     but then a file or NDF name is mandatory. The entire
+     contents of the stack are saved by default.
+
+SCREENRD [brkval]
+     Input data from the terminal to the current arrays;
+     terminate with """. Each input line should contain a
+     pair of X and Y values but nothing else.  If a value
+     of "brkval" is specified on the command line, then Y
+     values matching it are assumed to flag gaps in the data.
+
+SCROLLVT [n1 n2]
+     When a VT emulant is being used, this command re-
+     sult in text being scrolled between lines n1 and n2 only.
+     Thus you can scroll text to, say, the bottom half of the
+     screen (SCROLLVT 14 25) while plotting on the top half
+     (TZONE 5). If specified, both n1 and n2 must be in the
+     range 1 to 25, an at least two lines must be allowed for.
+     Full screen scrolling results if no line range is given.
+
+SHELL command
+     The supplied command is executed within a Bourne
+     shell running in a child process which terminates when
+     the command is completed. Note, the command is as-
+     sumed to have failed if the status value returned by
+     the command is non-zero.  An alternative to using
+     the SHELL command is to suspend the process run-
+     ning DIPSO by pressing control-Z, issue the required
+     command, and then re-awaken the dipso process by
+     typing "fg". The SHELL command is provided for use
+     in DIPSO command files.
+
+SL [N1 [N2]]
+     Stack list: gives the entry number, number of points,
+     first and last X values, and the first characters of the
+     title associated with each STACK entry. By default,
+     the entire stack is listed (N1 = 1, N2 = no of stack
+     entries), otherwise the first (N1) and last (N2) entries
+     to be displayed can be specified. If N1=0, the contents
+     of the `current' arrays are also summarised. The "-"
+     operator can be used to separate N1 and N2.
+
+SLWR [N1 [N2]]
+     Stack List WRite. Operates identically to SL, but out-
+     puts results to a file STACK.LIS in the current direc-
+     tory, instead of to the terminal.
+
+SM Sigma
+     Smooths Y data in the `current' arrays with a Gaussian
+     filter (FWHM=2.354*Sigma). QSM gives a much faster,
+     and scarcely less accurate, result.
+
+SNIP [X1 X2 X3 X4 X5 X6 ... X49 X50]
+     Cuts out data from the `current' arrays.  Pairs of X
+     values can be provided as optional parameters; if no
+     parameters are given, the cursor is used to define re-
+     gions to be SNIPped. Each pair of X values, whether
+     input at the terminal or defined by cursor, must be in
+     order of increasing X (though this constraint does not
+     apply to successive pairs of values). To get out of SNIP
+     mode when using the cursor, define X2<X1.
+
+     WARNING: SNIP only works successfully on data sets
+     that have monotonically increasing X values. Remem-
+     ber, `snipping' is done on data held in the `current'
+     arrays. Be careful not to plot STACK data and mis-
+     takenly think that it is the plotted data that are be-
+     ing edited.  Furthermore, it is not possible to recall
+     snipped-out data points, so it is wise to maintain an
+     untouched data set on the STACK.
+
+SP0RD file name or NDF name [logical]
+     Reads a SPECTRUM format 0 file into the `current'
+     arrays.  This is the format that data output from
+     IUEDR are normally in (see SUN/37 for details); for
+     other purposes, READ (and WRITE) are recommended.
+     Maximum number of points allowed is 20,000. WORV
+     is assumed to be 1.0.
+
+     The data can be in either NDF or "native DIPSO" for-
+     mat, depending on the flag established by the USENDF
+     command. When specifying an NDF, do not include
+     any file type.
+
+     If YES (the default) is supplied for the second (op-
+     tional) logical parameter any zeros in the data file are
+     treated as gaps in the data.  If NO is supplied, any
+     zeros are treated as good data values.  This replaces
+     the undocumented PANICRD command.
+
+SP0WR file name or NDF name
+     Outputs a SPECTRUM format 0 file (see the IUEDR
+     documentation SUN/37 for a description of the SPEC-
+     TRUM formats). But you should be using WRITE! The
+     data output are those stored in the `current' arrays.
+
+     The data can be in either NDF or "native DIPSO" for-
+     mat, depending on the flag established by the USENDF
+     command. When specifying an NDF, do not include
+     any file type.
+
+SP1RD filename[.typ]
+     Reads a SPECTRUM format 1 file (see SUN/37 for
+     details) into the `current' arrays. Maximum number of
+     points allowed is 20,000. WORV is assumed to be 1.0.
+     The default file type ([.typ]) is `.DAT'. This command
+     cannot read NDFs.
+
+SP2RD filename[.typ]
+     Reads a SPECTRUM format 2 file (see SUN/37 for
+     details) into the `current' arrays. Maximum number of
+     points allowed is 20,000. WORV is assumed to be 1.0.
+     The default file type ([.typ]) is `.DAT'. This command
+     cannot read NDFs.
+
+SQRTX (no parameters)
+     Replaces the X values in the current arrays by their
+     square root (throwing away any negative values).
+
+SQRTY (no parameters)
+     Replaces the Y values in the current arrays by their
+     square root (throwing away any negative values).
+
+STATUS (no parameters)
+     Returns information on the current status (device num-
+     ber, X and Y ranges, etc.).
+
+TADD [string]
+     Adds a string to the end of the current title.
+
+TENX (no parameters)
+     Replaces the X values in the current arrays by 10.0**X.
+
+TENY (no parameters)
+     Replaces Y values in the current arrays by 10**Y
+
+TICKS [dx [dy [nx [ny]]]]
+     Controls the appearance of tickmarks on plots. The ar-
+     guments dx and dy control the spacing between major
+     (labelled) tickmarks on the x and y axes, respectively;
+     nx and ny control the number of spaces between major
+     ticks (i.e. no. of minor ticks = nx/y minus 1).
+
+     A zero for any argument results in the relevant as-
+     pect of the plot design returning to automatic control;
+     just typing TICKS (no arguments) returns to fully au-
+     tomatic tickmark design.  Negative arguments result
+     in no tickmarking.
+
+     If you supply grossly inappropriate arguments (e.g.
+     trying to squeeze too many numbered ticks onto an
+     axis) then you will certainly find the resulting plot not
+     to your satisfaction. Beware, in particular, of forget-
+     ting to scale by appropriate powers of ten (which may
+     be subsumed into the axis label). Unless you are very
+     familiar with the range of the data being plotted, it is
+     wise to do initial plots with autodesign in force.
+
+TITLE [string]
+     Change the title associated with data in the `current'
+     arrays. Null strings are accepted as such unless TPROMPT
+     has previously been set TRUE (q.v. TPROMPT). The
+     string must NOT contain any control characters (which
+     would probably cause a crash in the graphics library
+     routines).  Since a comma is normally interpreted as
+     the end of a string, it is necessary to enclose strings
+     containing commas in double quotes; e.g.
+
+        >SP0RD TEST,TITLE "Commas can, I think, be useful",PUSH
+        >SP0RD TEST,TITLE I have no commas, PUSH
+
+     gives:
+
+        Commas can, I think, be useful
+
+     and
+
+        I have no commas
+     respectively. It's a good idea to develop the habit of
+     using double quotes regularly, even if you don't use
+     commas often in strings.
+
+     The price paid for being able to include commas in
+     strings is that other usage of quotes in TITLE is forbid-
+     den. (Actually, it's not, but the rules are so complex
+     as to effectively forbid use of quotes.)
+
+TPROMPT logical
+     If "logical" is T or Y, then the command TITLE will
+     prompt for an input string if none is provided; if F or
+     N (the default), it won't.
+
+TLINE line
+     Change line attributes (continuous, dot-dash etc). The
+     index `line' must be in the range 1-5 (1 = continuous
+     lines). (See also TROT).
+
+TOFLAMBDA (no parameters)
+     If the X and Y data in the current arrays are in units
+     of Hz and
+     erg/cm2/s/Hz, TOFLAMBDA will convert to Angstroms
+     and erg/cm2/s/A.
+
+TOFNU (no parameters)
+     If the X and Y data in the current arrays are in units
+     of Angstroms and erg/cm2/s/A, TOFNU will convert to
+     Hz and erg/cm2/s/Hz.
+
+TOV wav0
+     Convert X values from wavelength to velocity (the in-
+     verse of TOW), where Wav0 is the appropriate rest wave-
+     length in Angstroms.
+
+     No changes are made to the Y array. This would nor-
+     mally mean that subsequent measurements made with
+     EW or FLUX would be in rather strange units (e.g. km/s,
+     or erg/cm2/s/[km/s]). To avoid this anomaly, an in-
+     ternal variable WORV (for Wavelength OR Velocity)
+     is associated with each data set.  This has the value
+     1.0 by default, but is reset to Wav0/c (where c is the
+     speed of light in km/s) on using TOV.
+
+     (If you are reading in data sets with velocity as the X
+     co-ordinate it is usually safest to convert to wavelength
+     [TOW] then back to velocity [TOV] in order to obtain
+     an appropriate WORV value.  This is unnecessary if
+     you use READ/WRITE or SAVE/RESTORE to move
+     data in and out of DIPSO.)
+     WARNING: If you have set the X range, you'll prob-
+     ably need to change it to get anything on the plotting
+     surface after using TOV or TOW!
+
+TOW wav0
+     Convert X values from velocity to wavelength (see TOV),
+     and resets WORV to 1.0.
+
+TROT (no parameters)
+     Implements automatic rotation of line attributes. Each
+     plot begins with the line style defined by the last use
+     of TLINE (or style 1, if TLINE hasn't been called).
+
+     Switched off with NTROT.
+
+TPORT Zn Xmin Xmax Ymin Ymax [WXmin WXmax
+     WYmin WYmax]
+
+     Defines a plotting subzone (no. "Zn", where 100>Zn>8).
+     The dimensions of the subzone (Xmin...Ymax) are nor-
+     malised such that the total dimensions available (re-
+     gardless of device) are 0 to 1 in both axes. (The corre-
+     sponding physical dimensions can be discovered using
+     QAREA.)
+
+     In general, a plot consists of axes, axis labels, and
+     a header, as well as the data.  Technically, the plot-
+     ting subzone is a "graph window"; within this graph
+     window a "grid window" is present.  The grid win-
+     dow is exactly filled by the axes, and so will normally
+     be smaller than the graph window (to leave room for
+     the labelling). DIPSO will normally work out default
+     grid window dimensions, but you can define your own
+     (WXmin...WYmax). This might be useful if you want
+     contiguous axes in different plots, for example.
+
+     Just as the graph window is defined in terms of frac-
+     tions of the available plotting area, so the grid window
+     is defined in terms of fractions of the available graph
+     window. Thus parameters WXmin etc. must also be
+     in the range 0 to 1 (regardless of the graph window
+     dimensions).
+
+     To access a given subzone, use TZONE.
+
+TSTRIP (no parameters)
+     Removes leading blanks from the title associated with
+     the `current' arrays.
+
+TSWAP n
+     Copies the title from STACK entry `n' to the `current'
+     arrays.
+
+TWEIGHT weight
+     Alters the weight (i.e. `heaviness') of data curves plot-
+     ted with PM, on devices which support this feature. No
+     other lines (axes, etc) are effected. The weight must
+     be 1-5 (initial setting is 1). See also LWEIGHT.
+
+TZONE zn
+     Selects zone "zn" for plotting. The zone numbers are:
+
+         0: entire surface
+
+         1: top left quarter
+
+         2: top right quarter
+
+         3: bottom left quarter
+
+         4: bottom right quarter
+
+         5: top half
+
+         6: bottom half
+
+         7: left half
+
+         8: right half
+
+     Additional zones can be user-defined if required (see
+     TPORT). When using such additional zones special care
+     is needed to avoid overplotting previous zones (use
+     ERASE to get a "page throw" on hard copy devices);
+     this is taken care of automatically with zones 0-8.
+
+UBVRD u b v [dx]
+     Converts UBV magnitudes to fluxes, and stores the
+     results in the `current' arrays. If the U, B and/or V
+     magnitude is unknown, 0 should be entered. (Should
+     you want to actually input a value of 0, I'm afraid that
+     you'll have to use something like 0.0001, or put in a
+     value of (e.g.) 5 and then carry out some arithmetic
+     using TENY, YMULT and LOGY).
+
+     The data are plotted at assumed wavelengths of 3600,
+     4400 and 5500 Angstroms using lines 2*dx wide (de-
+     fault value of dx:  50 Angstroms).  Conversion from
+     magnitudes to fluxes is carried out using
+
+        Mag = -C - 2.5*Log10(Flux)
+
+     where C is 20.94, 20.51 and 21.12 for U, B and V re-
+     spectively.  (These values are from the absolute flux
+     measurements of Vega made by Tug et al, Oke &
+     Schild, and Hayes & Latham, for V; and a normalised
+     Kurucz Vega model for U and B).
+
+USEHTX [logical] [showme]
+     If `logical' is Y, YES, T or TRUE, the HELP command
+     will display help information in hypertext format, us-
+     ing a World-Wide-Web browser. If N, NO, F or FALSE
+     is supplied for `logical', help information will be dis-
+     played in plain text format in the DIPSO command
+     window.  If no value is supplied for `logical', YES is
+     assumed.
+
+     If supplied, `showme' should contain a string giving the
+     unix command used to run the Starlink showme utility.
+     The supplied command string will be used to initiate
+     hypertext help sessions until a new value is supplied.
+     The command used initially is "<dir>/showme", where
+     <dir> is the path to the directory containing Starlink
+     executable files which was used when DIPSO was in-
+     stalled (typically /star/bin).
+
+USENDF [logical]
+     If `logical' is Y, YES, T or TRUE, data accessing com-
+     mands such as READ, WRITE, SAVE, RESTORE, etc, will
+     use NDF structures (see SUN/33) to store data in. If
+     N, NO, F or FALSE is supplied, they will use "DIPSO
+     native" files as used by DIPSO prior to version 3.0 (but
+     note, that these files will NOT be portable from one
+     operating system to another). If no value is supplied
+     for `logical', YES is assumed.
+
+USSPRD filename[.typ] [epsmin]
+     Reads data from the IUE `Uniform' Low Dispersion
+     Atlas, ULDA, which have been output using the USSP
+     (see SUN/20). The filename extension defaults to `.ULD'.
+     This command cannot read NDFs. Each point in the
+     USSP spectrum has an associated error index, called
+     epsilon, with the following meanings:
+
+      100 : No special conditions
+
+      -200 : Extrapolated at upper end of ITF
+
+      -220 : Microphonic noise
+
+      -250 : Filtered bright spot
+
+      -300 : Unfiltered bright spot
+
+      -800 : Reseau in extracted spectral region
+
+     -1600 :  Saturated
+
+     -3200 :  Not photometrically corrected
+
+     The epsilons are not necessarily reliable indicators of
+     data quality. DIPSO rejects points on input if they are
+     flagged with an epsilon less than or equal to `epsmin'
+     (which defaults to -251), leaving the spectrum in the
+     current arrays. It is forbidden to set epsmin less than
+     or equal -1600, since this would result in totally un-
+     flagged, certainly bad, data being acquired.
+
+     If epsmin is given a value greater than zero, then all
+     datapoints are read into the next available stack entry,
+     and the epsilon array into the subsequent stack entry.
+     More subtle doctoring of the data is then possible, us-
+     ing USSPCLIP (q.v.). However, it is recommended that
+     the default epsmin be accepted unless you really know
+     what you're doing, and have good reasons to choose a
+     different value.
+
+USSPCLIP epsmin n1 [n2 w1 w2]
+     Clips points out of IUE USSP spectra which have `ep-
+     silons' less than or equal to epsmin.  The data are
+     expected to have been previously read into the stack
+     using the USSPRD command (with its epsmin param-
+     eter given a positive value); `n1' is the stack entry of
+     the flux data, and `n2' (which defaults to n1+1) that
+     of the epsilon array.  The clipping is done over the
+     wavelength range w1<w<w2 (default: full wavelength
+     range).
+
+VCORR vel [mode]
+     If mode=1 (the default), VCORR `unshifts' X values
+     back to a zero-velocity reference frame by replacing
+     the values with
+
+        X2 = X1 / (1.0 + vel/C)
+
+     where C is the velocity of light in km/s.
+
+     If mode=2, VCORR applies a velocity shift to the data
+     by changing the X values:
+
+        X2 = X1 * (1.0 + vel/C).
+
+     If the mode=1 or 2 the Y values are not changed. If
+     mode=-1 or -2 the Y values are also adjusted such that
+     fX dX is constant - e.g. if mode=-1 then
+
+        Y2 = Y1 * (1.0 + vel/C)
+
+     and similarly, mutatis mutandis, for mode=-2.
+
+WRITE output file name or NDF name [model NDF name]
+     Writes the contents of the `current' arrays into a disk
+     file suitable for subsequent re-reading using READ. The
+     data can be in either NDF or "native DIPSO" format,
+     depending on the flag established by the USENDF com-
+     mand. When specifying an NDF, do not include any
+     file type.
+
+     If the name of an existing NDF is given for the second
+     (optional) parameter then the specified NDF is used as
+     a "model" for the output NDF. The output NDF is ini-
+     tialised to hold a copy of the model NDF (including all
+     extensions). The data values in the current array are
+     then inserted (if possible) into the output DATA array
+     at their correct wavelength positions. This provides a
+     mecahanism for creating NDFs which look like they
+     have been created by other packages. For instance, if
+     you want to use DIPSO to process the NDF "my_dat"
+     originally created by the JCMTDR package, then you
+     would use "read my_dat" to read it in as normal, and
+     then you could use "write new_dat my_dat" to write
+     the processed data to NDF "new_dat", copying all the
+     JCMTDR extension information (etc) from the origi-
+     nal "my_dat" NDF. The resulting NDF could then be
+     put straight back into JCMTDR.
+
+XABS (no parameters)
+     Replaces the X values in the current arrays with ABS(X).
+
+XADD c
+     Adds a constant, "c", to the X values in the current
+     arrays.
+
+XDEC Replaces the X values in the current arrays by [X-INT(X)].
+XDIV c
+     Divides the X values in the current arrays by a con-
+     stant, "c".
+
+XINT (no parameters)
+     Replaces values in the current X array with INT(X).
+
+XINV (no parameters)
+     Replaces the X values in the current arrays by their
+     inverse.
+
+XMULT c
+     Multiplies the X values in the current arrays by a con-
+     stant, "c".
+
+XNINT (no parameters)
+     Replaces X values in the current arrays by NINT(X).
+
+XSUB c
+     Subtracts a constant, "c" from the X values in the
+     current arrays.
+
+XCORR n1 n2 [lolag hilag p]
+     Cross-correlates the data set in stack entry n1 with
+     the data set in stack entry n2. (Autocorrelation func-
+     tions can be calculated by defining n1=n2.) Entry n1
+     contains the "stationary" data.
+
+     The range over which the cross-correlation function is
+     evaluated is controlled by the parameters lolag and
+     hilag, which must be in the same units as the stack
+     entries. The default lag is given by:
+
+        lag = MIN- (x[n]-x[1]), 100*(x[n]-x[1])/n "
+
+     where there are `n" datum points in stack entry n1,
+     with X values from x[1] to x[n]. Then lolag defaults to
+     -lag, and hilag to +lag. The parameter p is the fraction
+     of each data set endmasked (at each end, with a cosine
+     bell), and defaults to 0.05.
+
+     The cross-correlation is carried out in the units of the
+     X arrays (which have to be monotonically increasing,
+     in the same units for both data sets, and at least par-
+     tially overlapping if you want sensible results). This is
+     for generality. However, a typical application would be
+     to find velocity shifts between data sets in wavelength
+     space _ but a velocity shift is a function of wavelength
+     in wavelength space. The way to get round this is to
+     take logs of both data sets (LOGX), then evaluate the
+     correlation function. Then:
+
+        Delta(V) = [10**-Delta(LogLambda)" - 1] * C
+
+     where C is the speed of light (making sure that your
+     units all match up). The arithmetic can all be done in
+     DIPSO (TENX, XSUB, XMULT).
+
+     IMPORTANT: XCORR just does the cross-correlation;
+     it is not a `black box'. I can't think of a situation in
+     which you shouldn't first rectify your data (with CREGS
+     and PF, or CDRAW, followed by ADIV) then subtract the
+     continuum (YSUB 1), for both stack entries, in order to
+     minimise edge effects.
+
+XJ (no parameters)
+     "Justifies" the X range _ i.e. sets X limits to exactly
+     match the range of the data being plotted (c.p. XT).
+
+XLAB [string]
+     The label for the X axis; the default is `Wavelength'.
+     If the string contains commas it must be enclosed in
+     double quotes (c.f TITLE).
+
+XMAX x
+     Set the maximum X value for plotting to `x'. Negated
+     with NX.
+
+XMIN x
+     Set the minimum X value for plotting to `x'. Negated
+     with NX.
+
+XR x1 x2
+     Set the X range; x1 is the left-hand value for the plot,
+     x2 the right-hand value. Negated using NX.
+
+XREV (no parameters)
+     Reverses the ordering of the data in the current X
+     arrays, maintaining X-Y pairing
+
+XSORT (no parameters)
+     Sorts the X values in the current arrays into increasing
+     values, maintaining X-Y pairing. Breaks in the data
+     are lost.
+
+XT (no parameters)
+     "Trims" the X range of a plot _ i.e.  sets X limits
+     which are some integer multiple of the distance be-
+     tween tickmarks (c.p. XJ).
+
+XV (no parameters)
+     Obtain X values using the cursor. Do a cursor hit at
+     the same place twice to get out of XV mode.
+
+XYSWAP (no parameters)
+     Swaps the contents of the X and Y arrays, maintaining
+     the break arrays unchanged. (Use CLRBRK if this leads
+     to unwanted results.)
+
+XYV (no parameters)
+     Obtain X and Y values using the cursor. Hitting the
+     same place twice exits XYV mode.
+
+YABS (no parameters)
+     Replaces the Y values in the current arrays with ABS(Y).
+
+YADD c
+     Adds a constant, `c', to the Y values stored in the
+     `current' arrays.
+
+YDEC Replaces the Y values in the current arrays by [Y-INT(Y)].
+YDIV c
+     Divides the Y values in the `current' arrays by a con-
+     stant, `c'.
+
+YINT (no parameters)
+     Replaces Y values in the current arrays with INT(Y).
+
+YINV (no parameters)
+     Replaces the Y values in the current arrays by their
+     inverse.
+
+YMULT c
+     Multiplies the Y values in the `current' arrays by a
+     constant, `c'.
+
+YNINT (no parameters)
+     Replaces Y values in the `current' arrays with NINT(Y).
+
+YSUB c
+     Subtract a constant, `c', from the Y values stored in
+     the `current' arrays.
+
+YJ (no parameters)
+     "Justifies" the Y range _ i.e.  sets the Y limits to
+     exactly match the range of the data being plotted (c.p.
+     YT).
+
+YLAB [string]
+     Replaces the label for the Y axis; the default is `Flux'.
+     If the string contains commas it must be enclosed in
+     double quotes (c.f TITLE).
+
+YMAX y
+     Sets the maximum Y value for plotting; negated with
+     NY.
+
+YMIN y
+     Sets the minimum Y value for plotting; negated with
+     NY.
+
+YR y1 y2
+     Sets the Y range for plotting; y1 is the lower value for
+     the plotting frame, y2 the upper. Return to autoscal-
+     ing with NY or NXY.
+
+YT (no parameters)
+     "Trims" the Y range of a plot _ i.e.  sets Y limits
+     which are some integer multiple of the distance be-
+     tween tickmarks (c.p. YJ).
+
+YV [Xvalue]
+     Obtain Y value.  If an X value is supplied, then the
+     corresponding Y value is obtained (by linear interpo-
+     lation) from the data in the current arrays. Otherwise,
+     the graphics cursor is brought up to permit Y values
+     to be measured from the terminal; hit the same place
+     twice to get out of this mode.
+
+YXN power
+     Replaces values in the `current' Y arrays by Y*(X**power).
+     (Some people like to plot data as F*[Lambda**4], for
+     example.)
+
+ZANSTRA line F(obs) T(neb) [E(B-V)]
+     Calculates a (black-body) Zanstra temperature, using
+     the observed flux, F(obs)
+     (in erg/cm2/s), of a recombination line. The lines for
+     which this calculation can be performed are (H I) 4861;
+     (He I) 4471, 5876; and (He II) 1640, 4686. The `line'
+     parameter is the wavelength, in Angstroms, of the se-
+     lected line.
+
+     The calculation requires the location of a `continuum'
+     point longwards of the ionization edge of the ion con-
+     cerned. This is obtained from the cursor; thus a plot,
+     in erg/cm2/s/A vs Angstroms (or log10 thereof) is
+     mandatory.  Moreover, for a valid result the cursor
+     hit has to correspond to the dereddened stellar flux;
+     judicious prior use of NEBCONT, ASUB and DRED may
+     therefore be useful.
+
+     T(neb) is the electron temperature of the ionized neb-
+     ula, and may be input in units of K or 10,000K. This
+     parameter is required because of the (fairly weak) tem-
+     perature dependence of the ratio, R(line), of the effec-
+     tive recombination coefficients to the ion and line con-
+     cerned (for a discussion of the physics in the Zanstra
+     method, see e.g. Osterbrock, `Astrophysics of Gaseous
+     Nebulae'). The adopted temperature dependences of
+     R(line) are:
+        R(1640) = 2.00 x (t**0.10)
+        R(4471) = 19.61 x (t**0.27)
+        R(4686) = 4.37 x (t**0.29)
+        R(4861) = 8.49 x (t**0.06)
+        R(5876) = 5.39 x (t**0.39)
+
+     where the parameter t = T(neb)/(10,000K).
+
+     E(B-V) is used to deredden the line flux (only _ i.e.
+     not the continuum flux); a galactic reddening law with
+     R=3.1 is adopted.  If this is inappropriate to your
+     data, deredden F(obs) to your own prescription and
+     use E(B-V)=0 (which is the default value).
+
+     The output from this command consists of the Zanstra
+     temperature and a normalising constant, C(norm.).
+     The latter quantity is the number by which a black-
+     body spectrum calculated using BBODY must be mul-
+     tiplied (YMULT) to make it pass through the (X,Y)
+     co-ordinates selected using the cursor.
+

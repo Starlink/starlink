@@ -1,0 +1,30 @@
+      SUBROUTINE FINDIT(ARRAY,NINARR,VALUE,ELEMEN,MODE)
+      REAL VALUE, ARRAY(1)
+      INTEGER NINARR, ELEMEN, MODE
+      INTEGER LOWER, UPPER
+      IF ( VALUE.LE.ARRAY(1) ) THEN
+        LOWER=0
+        UPPER=1
+      ELSE IF ( VALUE.GT.ARRAY(NINARR) ) THEN
+        LOWER=NINARR
+        UPPER=NINARR
+      ELSE
+        LOWER=1
+        UPPER=NINARR
+        ELEMEN=(LOWER+UPPER)/2
+10000   IF ( (UPPER-LOWER).GT.1 ) THEN
+          IF ( ARRAY(ELEMEN).LT.VALUE ) THEN
+            LOWER=ELEMEN
+          ELSE
+            UPPER=ELEMEN
+          END IF
+          ELEMEN=(LOWER+UPPER)/2
+          GOTO 10000
+        END IF
+      END IF
+      IF ( ARRAY(UPPER).EQ.VALUE ) THEN
+        ELEMEN=UPPER-MODE
+      ELSE
+        ELEMEN=LOWER
+      END IF
+      END

@@ -1,0 +1,2 @@
+      CHARACTER*9 K1( 3 ), K2( 4 )
+      COMMON /KUSE/ K1, K2
