@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {139.15}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {22 October 2001}
+\newcommand{\stardocdate}      {6 November 2001}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
 \newcommand{\stardocversion}   {Version 4.0}
@@ -20011,7 +20011,19 @@ This is a major update to CCDPACK.
   for use with the IMPORT task.
 \end{itemize}
 
-\subsection{This release 4.0-8}
+\subsection{Release 3.1-1}
+
+  This is a bugfix update of CCDPACK, and incorporates the following change:
+\begin{itemize}
+\item
+  There has been a bugfix which affects median stacking in
+  \xroutine{MAKEBIAS} \xroutine{MAKECAL}, \xroutine{MAKEFLAT} and 
+  \xroutine{MAKEMOS}.  Previously when METHOD=MEDIAN and variances
+  were not being used, some pixels received the wrong weighting.
+  This has now been fixed.
+\end{itemize}
+
+\subsection{This release 4.0-10}
 
   This is a major update of CCDPACK; major new facilities have been
   added in these areas:
