@@ -80,11 +80,11 @@ kpg1_fracd.f kpg1_fraci.f kpg1_fracw.f kpg1_fracb.f kpg1_fracub.f \
 kpg1_fracuw.f kpg1_mixvr.f kpg1_mixvd.f kpg1_mixvi.f kpg1_mixvw.f \
 kpg1_mixvb.f kpg1_mixvub.f kpg1_mixvuw.f kpg1_hsdsd.f kpg1_hsdsr.f \
 kpg1_hstar.f kpg1_hstad.f kpg1_hstai.f kpg1_hstaw.f kpg1_hstab.f \
-kpg1_hstaub.f kpg1_hstauw.f 
+kpg1_hstaub.f kpg1_hstauw.f kpg1_hstfd.f kpg1_hstfr.f 
 
 # Generic source files needed for kapgen_sub.tar:
 KAPGEN_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
-kpg1_hsta.gen
+kpg1_hsta.gen kpg1_hstf.gen
 
 # Non-generic source files needed for kapgen_sub.tar:
 KAPGEN_NONGEN = agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f \
@@ -133,7 +133,7 @@ kpg1_gntit.f kpg1_gpcol.f kpg1_gtndf.f kpg1_hcond.f kpg1_hconr.f \
 kpg1_hmltd.f kpg1_hmltr.f kpg1_hmsg.f kpg1_hrcpr.f \
 kpg1_hsfld.f kpg1_hsflr.f kpg1_hsstp.f kpg1_hstab.f \
 kpg1_hstad.f kpg1_hstai.f kpg1_hstar.f kpg1_hstaub.f kpg1_hstauw.f \
-kpg1_hstaw.f kpg1_hstfd.f kpg1_hstfr.f kpg1_hstlo.f kpg1_hstqb.f \
+kpg1_hstaw.f kpg1_hstlo.f kpg1_hstqb.f \
 kpg1_hstqd.f kpg1_hstqi.f kpg1_hstqr.f kpg1_hstqub.f kpg1_hstquw.f \
 kpg1_hstqw.f kpg1_iderr.f kpg1_imprg.f kpg1_incod.f kpg1_incor.f \
 kpg1_isclb.f kpg1_iscld.f kpg1_iscli.f kpg1_isclr.f kpg1_isclw.f \

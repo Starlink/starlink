@@ -56,8 +56,7 @@
       ${CTG_SYS}/dev/bin/make_source.csh
 
 #  Ensure all files are accessable.
-      chmod 644 *
-      chmod 755 mk
+      chmod 777 *
 
 #  Create the on-line help file.
       foreach file (`grp user_tasks`)

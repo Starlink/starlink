@@ -94,12 +94,20 @@
 *        involving clipping fractions and made returned values double
 *        precision.
 *     2000 October 20 (MJC):
-*        Adjust the minimum binsize to be resolvable at the data type's
-*        precision.  This includes testing for floating-point integers
-*        which could lead to an artifically sparse histogram.  Use
-*        previous cycle's histogram for the case where the histogram is
-*        naturally sparse and the increased resolution made no
+*        Adjusted the minimum binsize to be resolvable at the data 
+*        type's precision.  This includes testing for floating-point 
+*        integers which could lead to an artifically sparse histogram.
+*        Use previous cycle's histogram for the case where the histogram
+*        is naturally sparse and the increased resolution made no
 *        difference to the clipping limits.
+*     2000 October 24 (MJC):
+*        Tested for extreme fractions and assign to the limiting values.
+*        Fixed comparison bug finding clipped limits.  Changed non-empty
+*        bin counting threshold from 1 to 0 (test is GT, not GE). 
+*        Remove initial experimental code introduced for previous fix.
+*        Some corrections to NUM_<func> and intrinisc-function usage.
+*        thus curing a potential divide-by-zero error if maximum were
+*        -1 times the minimum.
 *     {enter_further_changes_here}
 
 *-
@@ -157,6 +165,7 @@
       REAL FRALIM( NLIMIT )    ! Smallest and largest fractions
       REAL FRATOT( NLIMIT )    ! Number of counts corresponding to a
                                ! clipped fraction
+      REAL HALFIL              ! Minimum number of bins
       DOUBLE PRECISION HISLIM( NLIMIT ) ! Limits for fraction finding
       INTEGER HIST( NUMBIN )   ! Histogram for finding fractional 
                                ! values
@@ -164,9 +173,10 @@
       LOGICAL INTVAL           ! Data are integers?
       INTEGER J                ! Loop counter for lower histogram bins
       INTEGER K                ! Loop counter for upper histogram bins
+      DOUBLE PRECISION LIMITS( NLIMIT ) ! Limits beyond which
+                               ! percentiles are not computed only
+                               ! assigned the extreme values
       LOGICAL LOOP             ! Iterate to find limits for histogram
-      LOGICAL LOOPC            ! Clipping fractions changed?
-      LOGICAL LOOPT            ! Histogram trimmed?
       INTEGER LOWER            ! Index of lower limiting fraction
       INTEGER MAXBIN           ! Maximum number of histogram bins
       INTEGER MAXPOS           ! Position of the maximum (not used)
@@ -179,8 +189,6 @@
       INTEGER NUMBER           ! Number of non-zero histogram bins
       INTEGER NUMOUT           ! Number of outliers computed separately?
       INTEGER NUMVAL           ! Number of good values in input array
-      REAL OLDCLF( NLIMIT )    ! Previous bin contents clipped as fraction
-      <LTYPE> OLDDLM( NLIMIT ) ! Data limits for previous histogram
       <LTYPE> RANGE            ! Data range
       REAL SCALE               ! Fractional range after clipping
       DOUBLE PRECISION SUM     ! Sum of histogram count
@@ -239,8 +247,7 @@
                   I = I + 1
                   IF ( ARRAY( I ) .NE. VAL__BAD<T> ) THEN
                      INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                        NUM_ITO<T>( NUM_NINT<T>( ARRAY( I ) ) )
-     :                        ) ) .LT. FILLIM 
+     :                        NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
                   END IF
                END DO
 
@@ -249,8 +256,7 @@
                DO WHILE ( INTVAL .AND. I .LT. EL )
                   I = I + 1
                   INTVAL = NUM_<T>TOD( NUM_ABS<T>( ARRAY( I ) -
-     :                     NUM_ITO<T>( NUM_NINT<T>( ARRAY( I ) ) ) ) )
-     :                     .LT. FILLIM 
+     :                     NUM_NINT<T>( ARRAY( I ) ) ) ) .LT. FILLIM 
                END DO
             END IF
          END IF
@@ -280,6 +286,7 @@
 
 *  Avoid artificially sparse histogram for small array dimension.
       NBIN = MIN( NBIN, NUMVAL / 2 )
+      HALFIL = 0.5 / SNGL( FILLIM )
 
 *  Obtain the extreme fractions.
 *  =============================
@@ -297,6 +304,27 @@
       LOWER = 1
       UPPER = NFRAC
 
+*  Percentiles close to 0 or 100 can be assigned the extreme values
+*  and this also avoids problems trying to compute histogram fractions
+*  with fewer than two values.  
+      LIMITS( 1 ) = 1.0D0 / DNVAL
+      LIMITS( 2 ) = 1.0D0 - LIMITS( 1 )
+      DO I = 1, NFRAC
+         IF ( FRAC( I ) .LE. LIMITS( 1 ) ) THEN
+            VALUES( I ) = MINV
+            CLFRAC( I ) = FRAC( I )
+            LOWER = LOWER + 1
+
+         ELSE IF ( FRAC( I ) .GE. LIMITS( 2 ) ) THEN
+            VALUES( I ) = MAXV
+            CLFRAC( I ) = FRAC( I )
+            UPPER = UPPER - 1
+         END IF
+      END DO
+
+*  Exit if all the required fractions' values are known.
+      IF ( UPPER .LT. LOWER ) GO TO 999
+
 *  Obtain the extreme fractions.  If only one supplied, make both
 *  limits the same.  Constrain to be in the range 0 to 1.
       FRALIM( 1 ) = MAX( FRAC( LOWER ), 0.0 )
@@ -308,8 +336,8 @@
 
 *  Find number of elements corresponding to the initial limiting
 *  fractions.
-      FRATOT( 1 ) = INT( REAL( NUMVAL ) * FRALIM( 1 ) )
-      FRATOT( 2 ) = INT( REAL( NUMVAL ) * ( 1.0 - FRALIM( 2 ) ) )
+      FRATOT( 1 ) = REAL( NUMVAL ) * FRALIM( 1 )
+      FRATOT( 2 ) = REAL( NUMVAL ) * ( 1.0 - FRALIM( 2 ) )
 
 *  Initialise clipping sums and fractions modified in the iteration.
       CLIPSU( 1 ) = 0
@@ -337,24 +365,23 @@
 
 *  For floating point we have at least two bins.  The halving of the
 *  data limits prevents arithmetic overflow for data with a very large
-*  dynamic range.  Note the hardwired 10000 is parameter NUMBIM.  We
-*  cannot do a NUM_ITO<T>(NUMBIN) because it would cause UB and B data
-*  types to fail. 
+*  dynamic range.  
             ELSE
                RANGE = ABS( DATLIM( 2 ) / 2<CONST> -
      :                 DATLIM( 1 ) / 2<CONST> ) * 2<CONST>
-               AVELIM = ( ABS( ( DATLIM( 2 ) / 2<CONST> ) +
-     :                  ( DATLIM( 1 ) / 2<CONST> ) ) ) * 2<CONST>
 
-               MAXBIN = NUM_INT<T>( NUM_MIN<T>( 10000<CONST>,
-     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) )
+               AVELIM = ( ABS( DATLIM( 2 ) / 2<CONST> ) +
+     :                    ABS( DATLIM( 1 ) / 2<CONST> ) ) * 2<CONST>
+
+               MAXBIN = MIN( NUMBIN, NUM_<T>TOI( NUM_INT<T>( 
+     :                  RANGE / AVELIM / VAL__EPS<T> / 2<CONST> ) ) )
+            END IF
 
 *  Set the number of bins.  This is adjusted because the clipping itself
 *  may make the histogram sparse artificially.  Set a reasonable
 *  minimum number of bins subject to the MAXBIN limit.
-            END IF
             CLNBIN = MIN( MAXBIN, 
-     :               INT( MAX( 0.5 / FILLIM, REAL( NBIN ) * SCALE ) ) )
+     :               INT( MAX( HALFIL, REAL( NBIN ) * SCALE ) ) )
             DNBIN = DBLE( CLNBIN )
 
 *  Generate the histogram between the current data bounds.  Do not
@@ -366,7 +393,7 @@
          END IF
 
 *  Count the number of empty bins with the histogram.
-         CALL KPG1_NUMBI( .FALSE., .FALSE., .TRUE., CLNBIN, HIST, 1,
+         CALL KPG1_NUMBI( .FALSE., .FALSE., .TRUE., CLNBIN, HIST, 0,
      :                    NUMBER, STATUS )
 
 *  Is the histogram too sparse, suggesting outliers.
@@ -378,13 +405,6 @@
 
 *  Remove lower outliers.
 *  ======================
-
-*  Store the former clipping fractions, so later we can see if the trimming 
-*  has made any difference.
-            OLDCLF( 1 ) = CLIPFR( 1 )
-            OLDCLF( 2 ) = CLIPFR( 2 )
-            OLDDLM( 1 ) = DATLIM( 1 )
-            OLDDLM( 2 ) = DATLIM( 2 )
 
 *  Can only trim the lower data limit if the smaller fraction limit
 *  has not been reached.
@@ -457,10 +477,7 @@
 
 *  Need to exit the loop when further thinning of the histogram is not
 *  possible.
-            LOOPT = TRIMED( 1 ) .OR. TRIMED( 2 )
-            LOOPC = ABS( OLDCLF( 1 ) - CLIPFR( 1 ) ) .GT. STATIC .OR.
-     :              ABS( OLDCLF( 2 ) - CLIPFR( 2 ) ) .GT. STATIC
-            LOOP = LOOPC .AND. LOOPT              
+            LOOP = TRIMED( 1 ) .OR. TRIMED( 2 )
 
 *  The histogram may still be sparse but no trimming is possible.
 *  This could happen with a fraction close to 0.0 or 1.0 which locates
@@ -469,7 +486,7 @@
 *  and the next interior value used, to narrow the dynamic range.
 *  In fact both limits could be at extreme outliers, but for now deal
 *  with one at a time.
-            IF ( .NOT. LOOPT ) THEN
+            IF ( .NOT. LOOP ) THEN
 
 *  Determine which is the outlier.
 *  ===============================
@@ -496,17 +513,22 @@
 *  Estimate the value at the outlier fraction of the distribution.
 *  For best results we should compute a new histogram around the
 *  outlier bin to get a precise value, but in fractional terms, this
-*  should be adequate.
-                  CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
-     :                             HISLIM( 1 ), 1, CLFRAC( LOWER ), 
-     :                             VALUES( LOWER ), STATUS )
+*  should be adequate.  Protect against the bin limits being the
+*  same, although this should not occur.
+                  IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
+                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
+     :                                HISLIM( 1 ), 1, CLFRAC( LOWER ),
+     :                                VALUES( LOWER ), STATUS )
+                  ELSE
+                     VALUES( LOWER ) = HISLIM( 1 )
+                  END IF
 
 *  Increment the counter to exclude the computed value.
                   LOWER = LOWER + 1
 
 *  Set new lower limits.
                   FRALIM( 2 ) = MAX( FRAC( LOWER ), 0.0 )
-                  FRATOT( 1 ) = INT( REAL( NUMVAL ) * FRALIM( 1 ) )
+                  FRATOT( 1 ) = REAL( NUMVAL ) * FRALIM( 1 )
 
                ELSE
 
@@ -521,18 +543,22 @@
 *  Estimate the value at the outlier fraction of the distribution.
 *  For best results we should compute a new histogram around the
 *  outlier bin to get a precise value, but in fractional terms, this
-*  should be adequate.
-                  CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
-     :                             HISLIM( 1 ), 1, CLFRAC( UPPER ), 
-     :                             VALUES( UPPER ), STATUS )
+*  should be adequate.  Protect against the bin limits being the
+*  same, although this should not occur.
+                  IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
+                     CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), 
+     :                                HISLIM( 1 ), 1, CLFRAC( UPPER ),
+     :                                VALUES( UPPER ), STATUS )
+                  ELSE
+                     VALUES( UPPER ) = HISLIM( 1 )
+                  END IF
 
 *  Decrement the counter to exclude the computed value.
                   UPPER = UPPER - 1
 
 *  Set new upper limits.
                   FRALIM( 2 ) = MIN( FRAC( UPPER ), 1.0 )
-                  FRATOT( 2 ) = INT( REAL( NUMVAL ) *
-     :                          ( 1.0 - FRALIM( 2 ) ) )
+                  FRATOT( 2 ) = REAL( NUMVAL ) * ( 1.0 - FRALIM( 2 ) )
 
 *  Find number of elements corresponding to the initial limiting
 *  fractions.
@@ -545,24 +571,6 @@
 *  Note that the histogram for these limits is known.
                FINDHI = .FALSE.
 
-*  Looks like the histogram is naturally sparse rather being due to
-*  extreme outliers.
-            ELSE IF ( .NOT. LOOPC ) THEN
-
-*  Restore the previous cycle's limits and scale factor.
-               CLIPFR( 1 ) = OLDCLF( 1 )
-               CLIPFR( 2 ) = OLDCLF( 2 )
-               SCALE = 1.0 - CLIPFR( 1 ) - CLIPFR( 2 )
-               DATLIM( 1 ) = OLDDLM( 1 )
-               DATLIM( 2 ) = OLDDLM( 2 )
-               HISLIM( 1 ) = NUM_<T>TOD( DATLIM( 1 ) )
-               HISLIM( 2 ) = NUM_<T>TOD( DATLIM( 2 ) )
- 
-*  Generate the histogram between the current data bounds.
-               CLNBIN = INT( MAX( 0.5 / FILLIM, REAL( NBIN ) * SCALE ) )
-               CALL KPG1_GHST<T>( BAD, EL, ARRAY, CLNBIN, DATLIM( 2 ), 
-     :                            DATLIM( 1 ), HIST, STATUS )
-            
             END IF
 
 *  Histogram is not too sparse so the histogram limits are satisfactory
@@ -584,10 +592,17 @@
  
 *  Estimate the values at the fractions of the distribution, excluding
 *  those outliers already derived (hence the offsets in the fractions
-*  passed and the values returned.
-      CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), HISLIM( 1 ),
-     :                 UPPER - LOWER + 1, CLFRAC( LOWER ),
-     :                 VALUES( LOWER ), STATUS )
+*  passed and the values returned.  Protect against the bin limits being
+*  the same, although this should not occur.
+      IF ( HISLIM( 1 ) .NE. HISLIM( 2 ) ) THEN
+         CALL KPG1_HSTFD( CLNBIN, HIST, HISLIM( 2 ), HISLIM( 1 ),
+     :                    UPPER - LOWER + 1, CLFRAC( LOWER ),
+     :                    VALUES( LOWER ), STATUS )
+      ELSE
+         DO I = LOWER, UPPER
+            VALUES( I ) = HISLIM( 1 )
+         END DO   
+      END IF
 
  999  CONTINUE
 
