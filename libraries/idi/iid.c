@@ -2752,6 +2752,9 @@ return(iiderr);
 
 /******************************************************************************/
 
+#include "ems.h"
+#include "ems_par.h"
+
 void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 
 /*
@@ -2779,6 +2782,7 @@ void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 *     SANTIN: P. Santin (Trieste Astronomical Observatory)
 *     NE: Nick Eaton (Durham University)
 *     DLT: David Terrett (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
 *
 *  History :
 *     26-OCT-1988 (SANTIN):
@@ -2791,49 +2795,34 @@ void IIDERR_C ( int errn, char errtxt[], int* txtlen )
 *        Add default value for IDI_DIR
 *     26-MAR-1992 (DLT):
 *        Return error message if idi_err.htxt not found
+*     25-MAR-2004 (TIMJ):
+*        Give up on the .htxt idea and simply use the standard
+*        fac error message tables installed in any starlink system
+*        and generated from the .msg file during the build. This is
+*        fairly safe since IDI already ends up with EMS during its
+*        build anyway. Even if EMS is dumped in the future, it will
+*        be easier to copy the code that parses the fac file.
 */
 
 {
+  /* The old implemntation implied a maximum length of error text of 80
+     characters */
+  int maxlen = 80;
 
-/* Local Variables */
-char *errfile = "idi_err.htxt";
-char *fn , filename[256] , line[80];
-int  i , e , n , c;
-FILE *ferr;
+  /* Somewhere to receive the result */
+  char errstr[EMS__SZMSG];
 
-getfile (errfile, filename);
+  /* Decode the error code */
+  ems1Fcerr( errstr, &errn );
 
-ferr = fopen (filename , "r");
-if (ferr == II_NULL)
-   {
-   strcpy( errtxt, "Unable to open error message file" );
-   *txtlen = strlen( errtxt );
-   return;
-   }
-   
-i = 0;
-while ((e = fscanf (ferr , "%d", &n)) != EOF)
-   {
-   if (n == errn)
-      {
-      while ((c = getc(ferr)) != '=') ;
-    
-      while ((c = getc(ferr)) != '\n')  
-         errtxt[i++] = (char) c;
-      errtxt[i] = '\0';
-      *txtlen = strlen (errtxt);
-      return;
-      }
-   else
-      while (((c = getc(ferr)) != '\n') && (line[i] != EOF));
-   }
+  /* Copy the result into the output buffer up to maxlen characters. */
+  strncpy(errtxt, errstr, maxlen);
 
-errtxt[0] = '\0';
-*txtlen = strlen (errtxt);
-
-return;
+  /* Set the length */
+  *txtlen = strlen(errtxt);
+  return;
 }
-      
+
 /******************************************************************************/
 
 int IIDIAG_C ( int display, int outf )
