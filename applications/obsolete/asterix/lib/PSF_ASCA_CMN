@@ -1,6 +1,22 @@
 *+  PSF_ASCA_CMN - Common block definition for ASCA
 *-
 
+      INTEGER			AS_NE			! # energy bands
+	PARAMETER		( AS_NE = 10 )
+
+      INTEGER			AS_NXY			! # X and Y bins
+	PARAMETER		( AS_NXY = 63 )
+
+      INTEGER			AS_NE			! # energy bands
+	PARAMETER		( AS_NE = 10 )
+
+      INTEGER			AS_NSP			! # f.o.v samples
+	PARAMETER		( AS_NSP = 11 )
+
+      INTEGER			AS_GPTR(AS_NE,AS_NSP)
+      INTEGER			AS_SPTR(AS_NE,AS_NSP)
+      INTEGER			AS_XPTR(AS_NE,AS_NSP)
+
       LOGICAL                 AS_INIT 			! System initialised
       REAL                    AS_ENERGY(PSF_NMAX)	!
       INTEGER                 AS_PHALO(PSF_NMAX)        !
@@ -10,5 +26,7 @@
       CHARACTER*3	      AS_INSTR(PSF_NMAX)	! ASCA detector
 
       COMMON /PSF_ASCA_CMN/    AS_INIT, AS_ENERGY,
-     :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF
+     :                        AS_PHALO, AS_PHAHI, AS_PHA_DEF,
+     :                        AS_GPTR,AS_SPTR,AS_XPTR
+
       COMMON /PSF_ASCA_CMNC/   AS_INSTR
