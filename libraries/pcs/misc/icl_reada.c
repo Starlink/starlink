@@ -45,7 +45,11 @@
 #endif
 
 #include <stdlib.h>
+#if HAVE_TERM_H
 #include <term.h>
+#elif HAVE_NCURSES_TERM_H
+#include <ncurses/term.h>
+#endif
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -1445,12 +1449,16 @@ initscreen(int nolines)
 
 /* Now simulate a 'newline' */
         ch = '\n';
+/* Cygwin doesn't offer this, so just do nothing... */
+#if defined HAVE_DECL_TIOCSTI && HAVE_DECL_TIOCSTI
 	if (ioctl(fileno(stdin), TIOCSTI, &ch) < 0) /* Simulate \n tty input */
 	    perror("initscreen - ioctl  error");
 	else {
 	    keyboard_input();             /* Read type-ahead into buffer */
 	    decinbuf_rpos(); /* Forget forced \n */
 	}
+#endif
+
 /*
  * Any typeahead input will have had '\r' converted to '\n' as the tty
  * is still in normal buffered mode. Undo this conversion before we process

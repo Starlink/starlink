@@ -27,6 +27,13 @@ dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [cnf])
 dnl    No use dependencies
 
+dnl    Not all termio implementations have TIOCSTI.
+AC_CHECK_DECLS([TIOCSTI],,,[#include <termio.h>
+])
+
+dnl    Or ncurses term.h in /usr/include.
+AC_CHECK_HEADERS([term.h ncurses/term.h])
+
 dnl    Documented in SUN/144 in the parent directory
 
 AC_CONFIG_FILES(Makefile component.xml)
