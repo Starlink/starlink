@@ -18,12 +18,12 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {211.5}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {17th December 1999}
+\newcommand{\stardocdate}      {8th January 2000}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
                                 in Astronomy}
-\newcommand{\stardoccopyright} {Copyright (C) 1999 Central Laboratory of the Research Councils}
+\newcommand{\stardoccopyright} {Copyright (C) 2000 Central Laboratory of the Research Councils}
 \newcommand{\stardoctitlehtml} {AST - A Library for Handling World Coordinate
                                       Systems in Astronomy}
 \newcommand{\stardocversion}   {V1.4}
@@ -24499,6 +24499,10 @@ sky projections, such as the FITS ``CAR'' projection.
 \item A bug in the FitsChan class has been fixed which could result in
 the FITS sky projection parameters ProjP(0) to ProjP(9) being
 incorrectly named PROJP1 to PROJP10 when written out as FITS cards.
+
+\item A bug in the FitsChan class has been fixed which could cause
+confusion between the FITS-IRAF and FITS-WCS encoding schemes if both
+a CD matrix and a PC matrix are erroneously present in a FITS header.
 
 \item Some minor memory leaks have been fixed.
 
