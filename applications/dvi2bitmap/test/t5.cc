@@ -1,3 +1,5 @@
+// Testing Bitmap
+
 #include <config.h>
 #include <iostream>
 
@@ -37,13 +39,18 @@ using std::endl;
     if (iter != fs->end())				\
 	++iter;
 
-#define CHECKBB(context,idx,val)		\
-    if (bb[idx] != val) {			\
-	cerr << context				\
-	     << "Unexpected value of bb[" << idx << "]: expected "	\
-	     << val << ", got " << bb[idx] << endl;			\
-	nfails++;							\
+#define CHECKBB(context,bb0,bb1,bb2,bb3)				\
+    {									\
+	int exp[] = {bb0,bb1,bb2,bb3};					\
+	for (int ti=0; ti<4; ti++)					\
+	    if (bb[ti] != exp[ti]) {					\
+		cerr << context						\
+		     << ": unexpected value of bb[" << ti << "]: expected " \
+		     << exp[ti] << ", got " << bb[ti] << endl;		\
+		nfails++;						\
+	    }								\
     }
+
 #define CHECKINT(context,expected,actual) \
     if ((expected) != (actual)) {			\
 	cerr << context << ": expected " << (expected)	\
@@ -124,6 +131,13 @@ const char *pictureSmallCrop[4] = {
     "       ",
     " ***** ",
     " ***** ",
+    "       ",
+};
+const char *pictureSmallCropStrut[] = {
+    "  *****",
+    "  *****",
+    "       ",
+    "       ",
     "       ",
 };
 const Byte F[] = { 1,1,1,1,1,
@@ -220,10 +234,7 @@ int main (int argc, char** argv)
 	int* bb;
 	b->freeze();
 	bb = b->boundingBox();
-	CHECKBB("picture",0,0);
-	CHECKBB("picture",1,0);
-	CHECKBB("picture",2,NBITMAPCOLS);
-	CHECKBB("picture",3,NBITMAPROWS);
+	CHECKBB("picture", 0, 0, NBITMAPCOLS, NBITMAPROWS);
 	//     cerr << "BB: L=" << bb[0] << " T=" << bb[1]
 	// 	 << " R=" << bb[2] << " B=" << bb[3]
 	// 	 << endl;
@@ -236,10 +247,7 @@ int main (int argc, char** argv)
 	b->crop(Bitmap::Bottom, 6, true);
 	b->crop();
 	bb = b->boundingBox();
-	CHECKBB("postcrop",0,0);
-	CHECKBB("postcrop",1,0);
-	CHECKBB("postcrop",2,NBITMAPCOLS);
-	CHECKBB("postcrop",3,6);
+	CHECKBB("postcrop", 0, 0, NBITMAPCOLS, 6);
 	compareBitmaps(b, picturePostCrop, bw, 6);
 	//     cerr << "BB: L=" << bb[0] << " T=" << bb[1]
 	// 	 << " R=" << bb[2] << " B=" << bb[3]
@@ -258,27 +266,21 @@ int main (int argc, char** argv)
     
 	b = new Bitmap(bw, bh, 1, true, 2*bw);
 	b->rule(5, 5, 10, 2);
-	b->paint(1, 2, 5, 3, F);	// no need for expansion
-	b->paint(32, 2, 5, 3, F);	// bitmap needs to expand
-	b->paint(38, 4, 5, 3, F);	// ...but not by this much
+	b->paint(1, 2, 5, 3, F); // no need for expansion
+	b->paint(32, 2, 5, 3, F); // bitmap needs to expand
+	b->paint(38, 4, 5, 3, F); // ...but not by this much
 	b->rule(-2, 11, 5, 3);	// expand in y direction
 
 	b->freeze();
 	bb = b->boundingBox();
-	CHECKBB("large",0,0);
-	CHECKBB("large",1,2);
-	CHECKBB("large",2,40);
-	CHECKBB("large",3,12);
+	CHECKBB("large", 0, 2, 40, 12);
 	compareBitmaps(b, pictureLarge, 40, 15);
 
 	b->clear();
 	b->rule(3,5,5,2);
 	b->freeze();
 	bb = b->boundingBox();
-	CHECKBB("small",0,3);
-	CHECKBB("small",1,4);
-	CHECKBB("small",2,8);
-	CHECKBB("small",3,6);
+	CHECKBB("small", 3, 4, 8, 6);
 	CHECKINT("bb[2]-bb[0]", 5, bb[2]-bb[0]);
 	CHECKINT("bb[3]-bb[1]", 2, bb[3]-bb[1]);
 	compareBitmaps(b, pictureSmall, 20, 15);
@@ -287,13 +289,34 @@ int main (int argc, char** argv)
 	b->crop(Bitmap::All, 1);
 	b->crop();
 	bb = b->boundingBox();
-	CHECKBB("smallcrop",0,2);
-	CHECKBB("smallcrop",1,3);
-	CHECKBB("smallcrop",2,9);
-	CHECKBB("smallcrop",3,7);
+	CHECKBB("smallcrop", 2, 3, 9, 7);
 	CHECKINT("bb[2]-bb[0]", 7, bb[2]-bb[0]);
 	CHECKINT("bb[3]-bb[1]", 4, bb[3]-bb[1]);
 	compareBitmaps(b, pictureSmallCrop, bb[2]-bb[0], bb[3]-bb[1]);
+
+	// same picture -- `small' -- but this time with a strut
+	b->clear();
+	b->strut(3,5,0,5,2,0);
+	bb = b->boundingBox();
+	CHECKBB("smallStrut1", 3, 4, 8, 6); // same bb as rule(3,5,5,2)
+	b->rule(3,5,5,2);
+	bb = b->boundingBox();
+	CHECKBB("smallStrut2", 3, 4, 8, 6); // unchanged
+	b->strut(4,4,3,0,1,3);
+	b->freeze();
+	bb = b->boundingBox();
+	CHECKBB("smallStrut3", 1, 4, 8, 8);
+	CHECKINT("bb[2]-bb[0]", 7, bb[2]-bb[0]);
+	CHECKINT("bb[3]-bb[1]", 4, bb[3]-bb[1]);
+	compareBitmaps(b, pictureSmall, 20, 15);
+
+	b->crop();
+	bb = b->boundingBox();
+	CHECKBB("smallStrutCrop", 1, 4, 8, 8);
+	CHECKINT("bb[2]-bb[0]", 7, bb[2]-bb[0]);
+	CHECKINT("bb[3]-bb[1]", 4, bb[3]-bb[1]);
+	compareBitmaps(b, pictureSmallCropStrut, bb[2]-bb[0], bb[3]-bb[1]);
+
     } catch (DviError& e) {
 	cerr << "Caught DviError: " << e.problem() << endl;
     }
