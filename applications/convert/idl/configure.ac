@@ -21,6 +21,10 @@ AC_ENABLE_SHARED
 AC_LIBTOOL_DLOPEN
 AC_PROG_LIBTOOL
 
+AC_CHECK_HEADERS([limits.h])
+AC_CHECK_DECLS([PATH_MAX],,,[#include <limits.h>
+                         ])
+
 dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS(per-package-dirs)
 
