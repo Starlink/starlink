@@ -36,6 +36,7 @@ schedule        hlp = doc$schedule.hlp, src = schedule.f
 use_globals     hlp = doc$use_globals.hlp, src = use_globals.f
 tranlist        hlp = doc$tranlist.hlp, src = tranlist.f
 tranndf        hlp = doc$tranndf.hlp, src = tranndf.f
+wcsedit        hlp = doc$wcsedit.hlp, src = wcsedit.f
 wcsreg        hlp = doc$wcsreg.hlp, src = wcsreg.f
 xreduce        hlp = doc$xreduce.hlp, src = xreduce.f
 position_lists        hlp = doc$position_lists.hlp, src = position_lists.f
