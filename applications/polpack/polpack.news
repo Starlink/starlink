@@ -14,18 +14,3 @@
    have been brought into line with KAPPA V0.13.
 
  Various other bug fixes have been included.
-
-
-
-
-
-
-   o  alignment of intensity images on the sky.
-   o  extraction of O and E images from a single frame.
-   o  sky subtraction.
-   o  calculation of Stokes parameters.
-   o  binning of Stokes parameters.
-   o  creation of catalogues of polarization vectors.
-   o  graphical display of vector maps.
-
-See SUN/223 for details.
