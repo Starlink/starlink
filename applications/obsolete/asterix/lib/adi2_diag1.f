@@ -95,13 +95,18 @@ c      INCLUDE '{global_variables_file}' ! [global_variables_description]
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*20		HNAME			! HDU name
-      CHARACTER*2		STR			!
+      CHARACTER*80		CVAL			!
 
       INTEGER			HID			! HDU identifier
       INTEGER			IHDU			! Loop over HDUs
-      INTEGER			NDIG			! Digits used in STR
+      INTEGER			IKEY			! Key index
+      INTEGER			IVAL			! HDU name
+      INTEGER			KCID			! Key container id
+      INTEGER			KID			! Key identifier
       INTEGER			NHDU			! # HDU's in definition
+      INTEGER			NKEY			! # keywords in HDU
+
+      LOGICAL			LVAL			! Logical value
 *.
 
 *  Check inherited global status.
@@ -109,26 +114,72 @@ c      INCLUDE '{global_variables_file}' ! [global_variables_description]
 
 *  Get number of HDU's
       CALL ADI_CGET0I( ID, 'Nhdu', NHDU, STATUS )
-	call adi_print( id, status )
+
+*  Get top-level data
+      CALL ADI2_GETLUN( ID, IVAL, STATUS )
+      CALL MSG_SETI( 'LUN', IVAL )
+      CALL MSG_PRNT( '  Logical unit : ^LUN' )
+      CALL MSG_SETI( 'NHDU', NHDU )
+      CALL MSG_PRNT( '  No of HDUs   : ^NHDU' )
 
 *  Loop over HDUs
       DO IHDU = 1, NHDU
 
 *    Get property defining name of the IHDU'th HDU
-        IF ( IHDU .EQ. 1 ) THEN
-          CALL CHR_ITOC( IHDU, STR, NDIG )
-          CALL ADI_CGET0C( ID, '.HDU_'//STR(:NDIG), HNAME, STATUS )
-        ELSE
-          HNAME = 'PRIMARY'
-        END IF
+        CALL ADI2_LOCIHD( ID, IHDU, HID, STATUS )
 
 *    Locate the HDU
-        CALL ADI_FIND( ID, HNAME, HID, STATUS )
+        CALL MSG_PRNT( ' ' )
+        CALL ADI_CGET0C( HID, 'Name', CVAL, STATUS )
+        CALL MSG_PRNT( '  HDU '//CVAL )
+        CALL MSG_PRNT( ' ' )
+
+*    Extension type
+        CALL ADI_CGET0C( HID, 'Extension', CVAL, STATUS )
+        CALL MSG_PRNT( '    Extension type     : '//CVAL )
+
+*    Get flags
+        CALL ADI_CGET0L( HID, 'DefStart', LVAL, STATUS )
+        IF ( LVAL ) THEN
+          CALL MSG_PRNT( '    Definition started : Y' )
+        ELSE
+          CALL MSG_PRNT( '    Definition started : N' )
+        END IF
+        CALL ADI_CGET0L( HID, 'DefEnd', LVAL, STATUS )
+        IF ( LVAL ) THEN
+          CALL MSG_PRNT( '    Definition ended   : Y' )
+        ELSE
+          CALL MSG_PRNT( '    Definition ended   : N' )
+        END IF
+        CALL ADI_CGET0L( HID, 'Created', LVAL, STATUS )
+        IF ( LVAL ) THEN
+          CALL MSG_PRNT( '    Created on disk    : Y' )
+        ELSE
+          CALL MSG_PRNT( '    Created on disk    : N' )
+        END IF
+        CALL MSG_PRNT( ' ' )
+
+*    Locate the keywords structure
+        CALL ADI_FIND( HID, 'Keys', KCID, STATUS )
+
+*    How many components?
+        CALL ADI_NCMP( KCID, NKEY, STATUS )
+        DO IKEY = 1, NKEY
+          CALL ADI_INDCMP( KCID, IKEY, KID, STATUS )
+          CALL ADI_NAME( KID, CVAL, STATUS )
+          CALL MSG_PRNT( '    '//CVAL )
+          CALL ADI_ERASE( KID, STATUS )
+        END DO
+
+*    Release keywords structure
+        CALL ADI_ERASE( KCID, STATUS )
 
 *    Free HDU handle
         CALL ADI_ERASE( HID, STATUS )
 
       END DO
+
+      CALL MSG_PRNT( ' ' )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_DIAG1', STATUS )
