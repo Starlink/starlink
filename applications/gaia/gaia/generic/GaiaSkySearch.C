@@ -71,6 +71,48 @@ int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
     mid,
     cond;
 
+  //  XXX g++ bug (egcs 1.0.3a), it seems that using static references
+  //  to members functions doesn't work when these are virtual
+  //  functions inherited from a "public virtual" base class
+  //  (SkySearch inherits TclAstroCat this way). So use this following
+  //  code, which seems to fix things. Recheck when newer version of
+  //  egcs are produced.
+
+  if ( strcmp( name, "check" ) == 0 ) {
+    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+      return TCL_ERROR;
+    }
+    return checkCmd( argc, argv );
+  }
+
+  if ( strcmp( name, "csize" ) == 0 ) {
+    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+      return TCL_ERROR;
+    }
+    return csizeCmd( argc, argv );
+  }
+
+  if ( strcmp( name, "entry" ) == 0 ) {
+    if ( check_args( name, argc, 1, 4 ) != TCL_OK ) {
+      return TCL_ERROR;
+    }
+    return entryCmd( argc, argv );
+  }
+
+  if ( strcmp( name, "open" ) == 0 ) {
+    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+      return TCL_ERROR;
+    }
+    return openCmd( argc, argv );
+  }
+
+  if ( strcmp( name, "save" ) == 0 ) {
+    if ( check_args( name, argc, 1, 5 ) != TCL_OK ) {
+      return TCL_ERROR;
+    }
+    return saveCmd( argc, argv );
+  }
+
   while (low <= high) {
     mid = (low + high) / 2;
     if ((cond = strcmp(name, subcmds_[mid].name)) < 0)

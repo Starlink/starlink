@@ -161,20 +161,20 @@ public:
   int cloneCmd( int argc, char *argv[] );
 
   //  Draw a Skycat-like ellipse and rotbox
-  int draw_symbol(const char *shape,
+  virtual int draw_symbol(const char *shape,
                   double x, double y, const char *xy_units,
                   double radius, const char *radius_units,
                   const char *bg, const char *fg,
                   const char *symbol_tags,
                   double ratio = 1., double angle = 0.,
                   const char *label = NULL, const char *label_tags = NULL);
-  int draw_ellipse(double x, double y, const char *xy_units,
+  virtual int draw_ellipse(double x, double y, const char *xy_units,
                    double radius, const char *radius_units,
                    const char *bg, const char *fg,
                    const char *symbol_tags,
                    double ratio = 1., double angle = 0.0,
                    const char *label = NULL, const char *label_tags = NULL);
-  int draw_rotbox(double x, double y, const char *xy_units,
+  virtual int draw_rotbox(double x, double y, const char *xy_units,
                   double radius, const char *radius_units,
                   const char *bg, const char *fg,
                   const char *symbol_tags,

@@ -78,19 +78,22 @@ class gaia::GaiaSearch {
       $canvas_ bind $object_tag_  <Any-Enter> {}
       $canvas_ bind $object_tag_  <Any-Leave> {}
 
-      #  Add menu option to centre on selected row.
-      set m [get_menu Options]
-      $m add separator
-      add_menuitem $m command "Center on selected row" \
-         {Centre main image on selected object (also bound to {bitmap b2} in table)} \
-         -command [code $this centre_selected_object_]
+      #  Add menu option to centre on selected row. Only add these
+      #  options for catalogue windows, not image servers.
+      if { $iscat_ } {
+         set m [get_menu Options]
+         $m add separator
+         add_menuitem $m command "Center on selected row" \
+            {Centre main image on selected object (also bound to {bitmap b2} in table)} \
+            -command [code $this centre_selected_object_]
 
-      #  Add option for a some help on this window.
-      global env
-      set m [add_help_button $env(GAIA_DIR)/Catalogue.hlp "Catalogues Overview..." \
-                {General information about catalogues}   ]
-      set m [add_help_button $env(GAIA_DIR)/GaiaSearch.hlp "On Window..." \
-                {Display help on using this window}   ]
+      #  Add option for a some help on this window (not image servers).
+         global env
+         set m [add_help_button $env(GAIA_DIR)/Catalogue.hlp "Catalogues Overview..." \
+                   {General information about catalogues}   ]
+         set m [add_help_button $env(GAIA_DIR)/GaiaSearch.hlp "On Window..." \
+                   {Display help on using this window}   ]
+      }
 
       #  Check that the catalogue is opened.
       if { [$w_.cat url] == {} } {

@@ -83,7 +83,7 @@ class gaia::GaiaQuery {
    #  Override the get_image_center_radius method so we can change the 
    #  ispix result to always include the whole image by default,
    #  rather than just a center part (i.e. return diagonal).
-   method get_image_center_radius {wcs_flag} {
+   public method get_image_center_radius {wcs_flag} {
       if {[$image_ isclear]} {
          return
       }
@@ -114,81 +114,104 @@ class gaia::GaiaQuery {
    #  not processed using a forked process. This is necessary so that
    #  changes in the local catalogue internal state are seen (things
    #  like the modification dates and mapped contents).
-    public method search {args} {
-	set cmd "$astrocat query"
+   public method search {args} {
+      if {$iscat_} {
+         set cmd "$astrocat query"
+      } else {
+         set cmd "$astrocat getimage"
+      }
+      if {[$astrocat iswcs] || [$astrocat ispix]} {
+         set equinox ""
+         if {[$astrocat iswcs]} {
+            set name [$name_ get]
+            set x [$ra_ get]
+            set y [$dec_ get]
+            set equinox [$equinox_ get]
+         } elseif {[$astrocat ispix]} {
+            set name ""
+            set x [$x_ get]
+            set y [$y_ get]
+         }
 
-	if {[$astrocat iswcs] || [$astrocat ispix]} {
-	    set equinox ""
-	    if {[$astrocat iswcs]} {
-		set name [$name_ get]
-		set x [$ra_ get]
-		set y [$dec_ get]
-		set equinox [$equinox_ get]
-	    } elseif {[$astrocat ispix]} {
-		set name ""
-		set x [$x_ get]
-		set y [$y_ get]
-	    }
+         if {$iscat_} {
+            set rad1 [$rad1_ get]
+            set rad2 [$rad2_ get]
+         } else {
+            set width [$width_ get]
+            set height [$height_ get]
+         }
 
-	    set rad1 [$rad1_ get]
-	    set rad2 [$rad2_ get]
+         if {"$equinox" != ""} {
+            lappend cmd "-equinox" $equinox
+         }
+         if {"$name" != ""} {
+            lappend cmd "-nameserver" $namesvr "-name" $name
+         } elseif {"$x" != "" && "$y" != ""} {
+            lappend cmd "-pos" [list $x $y]
+         } else {
+            #warning_dialog "Please specify either an object name or a position in WCS" $w_
+         }
 
-	    if {"$equinox" != ""} {
-		lappend cmd "-equinox" $equinox
-	    }
-	    if {"$name" != ""} {
-		lappend cmd "-nameserver" $namesvr "-name" $name
-	    } elseif {"$x" != "" && "$y" != ""} {
-		lappend cmd "-pos" [list $x $y]
-	    } else {
-		#warning_dialog "Please specify either an object name or a position in WCS" $w_
-	    }
+         if {$iscat_} {
+            if {"$rad1" != "" || "$rad2" != ""} {
+               lappend cmd "-radius" "$rad1 $rad2"
+            }
+            set maxnum [$maxnum_ get]
+            if {"$maxnum" != ""} {
+               lappend cmd "-nrows" $maxnum
+            }
+            if {"[set sort_cols [$astrocat sortcols]]" != ""} {
+               lappend cmd "-sort" $sort_cols "-sortorder" [$astrocat sortorder] 
+            }
+         } else {
+            if {"$width" != "" || "$height" != ""} {
+               lappend cmd -width $width -height $height
+            }
+         }
+      }
 
-	    if {"$rad1" != "" || "$rad2" != ""} {
-		lappend cmd "-radius" "$rad1 $rad2"
-	    }
-	}
+      # add optional search columns
+      if {"$search_cols_" != ""} {
+         set minvalues {}
+         set maxvalues {}
+         set search_cols {}
+         foreach col $search_cols_ {
+            set min [$min_values_($col) get]
+            if {[catch {set max [$max_values_($col) get]}]} {
+               # if only one value, compare for equality, otherwise range
+               set max $min
+            }
+            if {"$min" == "" && "$max" != "" || "$max" == "" && "$min" != ""} {
+               error_dialog "Please specify min and max values for $col"
+               return
+            }
+            if {"$min" == ""} {
+               continue
+            }
+            lappend search_cols $col
+            lappend minvalues $min
+            lappend maxvalues $max
+         }
+         if {[llength $search_cols]} {
+            lappend cmd -searchcols $search_cols -minvalues $minvalues -maxvalues $maxvalues
+         }
+      }
+      
+      if {"$itk_option(-feedbackcommand)" != ""} {
+         eval $itk_option(-feedbackcommand) on
+      }
 
-	set maxnum [$maxnum_ get]
-	if {"$maxnum" != ""} {
-	    lappend cmd "-nrows" $maxnum
-	}
-	
-	if {"[set sort_cols [$astrocat sortcols]]" != ""} {
-	    lappend cmd "-sort" $sort_cols "-sortorder" [$astrocat sortorder] 
-	}
+      #  Local catalogues must be processed at this level so that
+      #  internal changes are retained.
+      if {"[$astrocat servtype]" == "local"} {
+         $w_.batch fg_eval [code $this do_query $cmd]
+      } else {
+         $w_.batch bg_eval [code $this do_query $cmd]
+      }
+   }
 
-	# add optional search columns
-	if {"$search_cols_" != ""} {
-	    set minvalues {}
-	    set maxvalues {}
-	    set search_cols {}
-	    foreach col $search_cols_ {
-		set min [$min_values_($col) get]
-		set max [$max_values_($col) get]
-		if {"$min" == "" && "$max" != "" || "$max" == "" && "$min" != ""} {
-		    error_dialog "Please specify min and max values for $col"
-		    return
-		}
-		if {"$min" == ""} {
-		    continue
-		}
-		lappend search_cols $col
-		lappend minvalues $min
-		lappend maxvalues $max
-	    }
-	    if {[llength $search_cols]} {
-		lappend cmd -searchcols $search_cols -minvalues $minvalues -maxvalues $maxvalues
-	    }
-	}
-	
-	#  Local catalogues must be processed at this level so that
-	#  internal changes are retained.
-	if {"[$astrocat servtype]" == "local"} {
-	    $w_.batch fg_eval [code $this do_query $cmd]
-	} else {
-	    $w_.batch bg_eval [code $this do_query $cmd]
-	}
-    }
 }
+
+
+
 

@@ -53,6 +53,7 @@ proc errexit_dialog {msg {parent ""}} {
 # error  message routine
 
 proc error_dialog {msg {parent ""}} {
+    
     if {"$parent" != ""} {
 	if {"[set parent [winfo toplevel $parent]]" == "."} {
 	    set parent ""

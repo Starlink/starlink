@@ -2025,7 +2025,9 @@ class gaia::GaiaSextractor {
       $astrocat delete
 
       #  Now open the catalogue window.
-      set astrocat [AstroCat::new_catalog $catalogue \
+#      set astrocat [AstroCat::new_catalog $catalogue \
+#                       [code $itk_option(-image)] $itk_option(-astrocat)]
+      set astrocat [AstroCat::open_catalog_window $catalogue \
                        [code $itk_option(-image)] $itk_option(-astrocat)]
 
       #  Now display the catalogue.
@@ -2094,6 +2096,7 @@ class gaia::GaiaSextractor {
    #  complete, so we can proceed. The number we should use here
    #  is 1000 or the size of the catalogue.
    protected method set_maxobjs_ {catalogue} {
+      
       set maxobjs [find_maxobjs_]
       set ok [$astrocatnames_($catalogue) set_maxobjs $maxobjs]
       if { ! $ok } {

@@ -2813,7 +2813,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
        << nx << " " << ny
        << " -outline " << bg
        << " -fill " << bg
-       << " -width 2 -stipple pat7 -tags " << symbol_tags
+       << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
        << endl;
   }
   os << canvasName_ << " create rtd_ellipse "
@@ -2822,7 +2822,7 @@ int StarRtdImage::draw_ellipse(double x, double y, const char *xy_units,
      << nx << " " << ny
      << " -outline " << bg
      << " -fill " << fg
-     << " -width 1 -stipple pat7 -tags " << symbol_tags
+     << " -width 1 -stipple pat7 -tags {" << symbol_tags << "}"
      << endl;
 
   if (label && strlen(label))
@@ -2863,7 +2863,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
        << nx << " " << ny
        << " -outline " << bg
        << " -fill " << bg
-       << " -width 2 -stipple pat7 -tags " << symbol_tags
+       << " -width 2 -stipple pat7 -tags {" << symbol_tags << "}"
        << endl;
   }
   os << canvasName_ << " create rtd_rotbox "
@@ -2872,7 +2872,7 @@ int StarRtdImage::draw_rotbox(double x, double y, const char *xy_units,
      << nx << " " << ny
      << " -outline " << bg
      << " -fill " << fg
-     << " -width 1 -stipple pat7 -tags " << symbol_tags
+     << " -width 1 -stipple pat7 -tags {" << symbol_tags <<  "}"
      << endl;
 
   if (label && strlen(label))

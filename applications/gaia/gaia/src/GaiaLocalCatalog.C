@@ -75,12 +75,22 @@ GaiaLocalCatalog::GaiaLocalCatalog( CatalogInfoEntry *e, Tcl_Interp *interp )
     interp_( interp )
 {
   convertTable_[0] = '\0';
+
+  //  If this catalogue is already known, then the url will be set to 
+  //  the temporary file instead of the actual file (which is stored
+  //  in longname), check that longname and url match, if not reset
+  //  filename_ to longName (was set to url).
+  if ( strcmp( e->longName(), filename_ ) != 0 ) { 
+    free( filename_ ) ;
+    filename_ = strdup( e->longName() );
+  }
+
   status_ = getInfo();
 }
 
 //
 //  Constructor for tab-tables that are already converted. In this case
-//  the names of the table and the destination file (of foreign type) are
+//  the name of the table and the destination file (of foreign type) are
 //  given.
 //
 GaiaLocalCatalog::GaiaLocalCatalog( CatalogInfoEntry *e,
@@ -145,6 +155,7 @@ int GaiaLocalCatalog::getInfo()
   //  If realname_ exists then a conversion has already been
   //  successful. We will only convert again if the modification time
   //  of the main catalogue is changed.
+  
   if ( realname_ ) {
     time_t curtime = modDate( realname_ );
     if ( difftime( curtime, timestamp_ ) != 0.0 ) {
@@ -241,7 +252,7 @@ int GaiaLocalCatalog::is_foreign( const char *name )
 //
 int GaiaLocalCatalog::convertTo( int now )
 {
-
+  
   //  If realname_ is defined then attempt to convert it into a tab
   //  table.
   if ( realname_ ) {
