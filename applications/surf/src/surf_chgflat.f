@@ -1,10 +1,10 @@
-      SUBROUTINE REDS_CHGFLAT (STATUS)
+      SUBROUTINE SURF_CHGFLAT (STATUS)
 *+
 *  Name:
 *     CHANGE_FLAT
 
 *  Purpose:
-*     Routine to change the flatfield in a SCUBA datafile
+*     Change the flatfield in a SCUBA datafile
 
 *  Language:
 *     Starlink Fortran 77
@@ -13,23 +13,16 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS_CHGFLAT( STATUS )
+*     CALL SURF_CHGFLAT( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
 *        The global status
  
 *  Description:
-*     This application is used to change the flatfield stored in a demodulated
-*     data file.
-
-*        The application will prompt for the name of the demodulated data file
-*     to be modified and check that the file does actually contain demodulated
-*     data; if it doesn't an error message will be output and the file will
-*     be closed unchanged. Otherwise, the type of observation and name of the
-*     observed object will be reported, together with the local sidereal times
-*     of the start and finish of the observation. The name of the flatfield 
-*     file will then be requested.
+*     The flatfield information is stored inside each demodulated
+*     data file and this task can be used to change the flatfield that is
+*     stored internally. The new flatfield is read from a text file.
 
 *  Usage:
 *     change_flat in new_flat
@@ -43,7 +36,7 @@
 *         Name of the new flatfield file.
 
 *  Related Application:
-*     FLATFIELD
+*     SURF: FLATFIELD, SCUQUICK
 
 *  Examples:
 *     change_flat test newflat.dat
@@ -69,7 +62,7 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'REDS_SYS'                         ! REDS constants
+      INCLUDE 'SURF_PAR'                         ! SURF constants
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
 
 *    Import :
