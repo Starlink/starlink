@@ -125,14 +125,28 @@
 *     ** and built-in functions (SIN, COS, TAN, LOG, etc). See SUN/61
 *     (appendix A) for complete details.
 *
-*     Characters strings cannot be manipulated by these functions so a single
-*     special format for translating their values is provided. The name
-*     of the destination extension item is given as usual followed by a 
-*     FITS-keyword which supplies the string to be translated. This is then 
-*     followed by statements which translate an "input" string into an 
-*     "output" string. So for instance if you wanted to translate waveplate 
-*     positions to the equivalent strings recognised by POLPACK you might 
-*     use something like:
+*     Characters strings cannot be manipulated by these functions so two
+*     special formats for translating their values are provided.
+*     The first form allows for the concatenation of keywords and
+*     the second the translation from a known word to another
+*     (which is usually one of the POLPACK special names). The
+*     concatenation form looks like:
+*
+*        _INTEGER      OBSNUM
+*        _INTEGER      IDATE
+*        IMGID        OBSNUM//IDATE
+*
+*     Which results in the IMGID extension item being set to the
+*     concatenation of the values of the FITS keywords OBSNUM and
+*     IDATE (you can concatentate more than two values). Note, conversion
+*     of numeric values to character strings occurs automatically.
+*
+*     In the second special form, the name of the destination extension item 
+*     is given as usual followed by a FITS-keyword which supplies the string 
+*     to be translated. This is then followed by statements which translate 
+*     an "input" string into an "output" string. So for instance if you 
+*     wanted to translate waveplate positions to the equivalent strings 
+*     recognised by POLPACK you might use something like:
 *
 *        WPLATE     WAVEPLT  A=0.0 -
 *                            B=22.5 -
