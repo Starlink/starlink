@@ -90,19 +90,20 @@ font-reading, when it always returned 10pt.</p>
 
 <title>Horizontal spacing wrong with 11pt option</title>
 
-<p>The following LaTeX document displays the problem:</p>
-<p>
+<p>The following LaTeX document displays the problem:
+<verbatim>
 \documentclass[11pt]{article}
 \thispagestyle{empty}
 \begin{document}
 \begin{tabular}{r|c|l}
-                  1 & 2   & 3   \\
-here are some words & 2   & 3   \\
-                    & 5   & 6   \\
-       other words  & 8   & 9   \\
-       other words  & 101 & 102 \\
+                  1 &amp; 2   &amp; 3   \\
+here are some words &amp; 2   &amp; 3   \\
+                    &amp; 5   &amp; 6   \\
+       other words  &amp; 8   &amp; 9   \\
+       other words  &amp; 101 &amp; 102 \\
 \end{tabular}
 \end{document}
+</verbatim>
 </p>
 
 <p>When you LaTeX that and run it through dvi2bitmap, the horizontal
