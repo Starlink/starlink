@@ -1,5 +1,5 @@
-      SUBROUTINE ADI2_DMAP( MODID, FITID, CACHEID, TYPE, MODE, ENDIM, EDIMS,
-     :                      PSID, PTR, NELM, STATUS )
+      SUBROUTINE ADI2_DMAP( MODID, FITID, CACHEID, TYPE, MODE, ENDIM,
+     :                      EDIMS, PSID, PTR, NELM, STATUS )
 *+
 *  Name:
 *     ADI2_DMAP
@@ -102,7 +102,8 @@
       INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
-      INTEGER			MODID, CACHEID, ENDIM, EDIMS(*), PSID, FITID
+      INTEGER			MODID, CACHEID, ENDIM, EDIMS(*)
+      INTEGER			PSID, FITID
       CHARACTER*(*)		TYPE, MODE
 
 *  Arguments Returned:
