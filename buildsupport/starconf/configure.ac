@@ -111,6 +111,7 @@ AC_CONFIG_FILES(Makefile starconf.m4 bootstrap.installed)
 AC_CONFIG_FILES(java/Makefile)
 AC_CONFIG_FILES(starconf-finder, [chmod +x starconf-finder])
 AC_CONFIG_FILES(starconf-validate, [chmod +x starconf-validate])
+AC_CONFIG_FILES(starconf-deinstall, [chmod +x starconf-deinstall])
 
 
 AC_OUTPUT

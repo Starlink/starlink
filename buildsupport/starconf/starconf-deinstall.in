@@ -1,0 +1,44 @@
+#! /bin/sh -
+# Simple program to deinstall a component, based on the manifest file
+
+myname=$0
+Usage () {
+    echo "Usage: $myname component ..." >&2
+    exit 1
+}
+
+manifestdir=@STARCONF_DEFAULT_PREFIX@/manifests
+
+test -d $manifestdir || {
+    echo "No manifest directory $manifestdir" >&2
+    exit 1
+}
+test "$#" -gt 0 || Usage
+
+## Add a -v option
+#while test "$#" -gt 0
+#do
+#    opt=`expr $1 : '\(-.*\)'`
+#xxx
+
+while test "$#" -gt 0
+do
+    if test -f $manifestdir/$1; then
+       sed -n '/^<files>/,/^<\/files>/p' $manifestdir/$1 \
+           | sed '/^</d' \
+           | while read f
+             do
+                 if test -f $f; then
+                     rm $f;
+                 else
+                     echo "File $f not found (ignored)" >&2
+                 fi
+            done
+        rm $manifestdir/$1
+    else
+        echo "Component $1 does not appear to be installed" >&2
+    fi
+    shift
+done
+
+exit 0
