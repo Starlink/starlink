@@ -73,7 +73,7 @@
       INTEGER CHR_LEN            ! Length of string
 
 *  Local Variables:
-      CHARACTER * ( 70 ) CVAL     ! Character value of selected FITS card
+      CHARACTER * ( 80 ) CVAL     ! Character value of selected FITS card
       INTEGER ICARD               ! Index of target card
       INTEGER IPFITS              ! Pointer to FITS array
       INTEGER LENGTH              ! Length of FITS array elements
@@ -146,11 +146,9 @@
 
 *  No conversion could be made.
       STATUS = SAI__ERROR
-      CALL NDF_MSG( 'NDF', INDF )
       CALL MSG_SETC( 'HEAD', FTSKEY )
       CALL ERR_REP( 'CCD1_FTVAL', 
-     :'  Failed to find value for FITS header ^HEAD in file ^NDF', 
-     :                 STATUS )
+     :'  Failed to find value for FITS header ^HEAD', STATUS )
 
 *  Release error context.
  1    CONTINUE
