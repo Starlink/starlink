@@ -88,6 +88,10 @@
       CALL FIO_OPEN( INNAM, 'READ', 'LIST', 0, IFD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
+*  CAT says a bit too much at times. Quiet it down (formatting warnings
+*  mostly). 
+      CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
+
 *  Now attempt to open the output catalogue. This will fail if the
 *  catalogue already exists.
       CALL PAR_GET0C( 'OUT', OUTNAM, STATUS )

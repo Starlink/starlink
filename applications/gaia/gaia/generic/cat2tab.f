@@ -104,6 +104,10 @@
 *  Get the name of the input catalogue.
       CALL PAR_GET0C( 'IN', INNAM, STATUS )
 
+*  CAT says a bit too much at times. Quiet it down (formatting warnings
+*  mostly). 
+      CALL CAT_TUNES( 'QUIET', 'YES', STATUS )
+
 *  And attempt to open it.
       CI = CAT__NOID
       CALL CAT_TOPEN( INNAM, 'OLD', 'READ', CI, STATUS )
