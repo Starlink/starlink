@@ -111,6 +111,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.18  2004/07/14 21:46:59  timj
+*     Remove obsolete GKS_PAR reference
+*
 *     Revision 1.17  2000/07/07 03:24:16  timj
 *     Doc fixes
 *
@@ -145,7 +148,6 @@
       INCLUDE 'PAR_PAR'                ! for PAR__ constants
       INCLUDE 'SURF_PAR'               ! SURF definitions
       INCLUDE 'SAE_PAR'                ! SSE global definitions
-      INCLUDE 'GKS_PAR'                ! GKS constants (e.g. GSET)
       INCLUDE 'MSG_PAR'                ! MSG__ constants
 
 *  Status:
