@@ -895,6 +895,22 @@
       CALL AST_TRAN2( IWCS, 1, GC( 1 ), GC( 2 ), .TRUE., CC( 1 ), 
      :                CC( 2 ), STATUS )
 
+*  Try to convert these back to grid. The current Frame is not suitable
+*  for specifying a centre position if any of the returned values are bad.
+      CALL AST_TRAN2( IWCS, 1, CC( 1 ), CC( 2 ), .FALSE., GC( 1 ), 
+     :                GC( 2 ), STATUS )
+      IF( GC( 1 ) .EQ. AST__BAD .OR. GC( 2 ) .EQ. AST__BAD ) THEN
+         IF( STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'DISPLAY_ERR4B', 'The Mapping from the '//
+     :                    'current WCS co-ordinate Frame to pixel '//
+     :                    'co-ordinates is undefined. Try changing '//
+     :                    'the current Frame to PIXEL using the '//
+     :                    'KAPPA wcsframe command.', STATUS )
+         END IF
+         GO TO 999
+      END IF
+
 *  If the centre pixel of the supplied NDF has no defined position then we
 *  only access the CENTRE parameter if a value was supplied on the command 
 *  line. Otherwise, just use the centre of the GRID frame as the centre for 
