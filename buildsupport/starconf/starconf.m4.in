@@ -3,7 +3,6 @@
 # DO NOT EDIT: it may be overwritten when starconf is next run
 
 
-
 # STAR_DEFAULTS(options='')
 # -------------------------
 # Defaults for Starlink configure.ac files.  The optional OPTIONS
@@ -20,6 +19,10 @@
 # documentation, or without due consideration of the package which use
 # the earlier behaviour.  Everything else is, in principle, private
 # (not that that's going to stop folk).
+#
+# At some point in this macro, invoke _STAR[]_ECHO on STARCONF_DEFAULT_PREFIX
+# and STARCONF_DEFAULT_STARLINK, so that starconf can trace them and confirm
+# the configure.ac is configured consistently.
 AC_DEFUN([STAR_DEFAULTS],
 [#
 _star_per_package_dirs=false
@@ -38,7 +41,7 @@ do
 done
 
 # Ensure that STARLINK has a value, defaulting to
-# !!STARCONF_DEFAULT_STARLINK!!.  Note that this directory may be
+# @STARCONF_DEFAULT_STARLINK@.  Note that this directory may be
 # different from /star, and reflects the value of
 # STARCONF_DEFAULT_STARLINK that the `starconf' package was configured
 # with before its installation. 
@@ -52,7 +55,7 @@ done
 # is possible to make a test version of a new package, using tools
 # from an old installation, but installing in a new place.
 #
-# However, we install software in !!STARCONF_DEFAULT_PREFIX!! by
+# However, we install software in @STARCONF_DEFAULT_PREFIX@ by
 # default.  This is so even if $STARLINK and STARCONF_DEFAULT_STARLINK
 # are different, because in this case we are planning to use a
 # previous installation in $STARLINK or $STARCONF_DEFAULT_STARLINK,
@@ -67,9 +70,11 @@ done
 # tools in one component before that component has been build and
 # installed. 
 
-AC_PREFIX_DEFAULT(!!STARCONF_DEFAULT_PREFIX!!)dnl
+AC_PREFIX_DEFAULT(_STAR_ECHO([STARCONF_DEFAULT_PREFIX],
+                             [@STARCONF_DEFAULT_PREFIX@]))dnl
 
-test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
+test -n "$STARLINK" || STARLINK=_STAR_ECHO([STARCONF_DEFAULT_STARLINK],
+                                           [@STARCONF_DEFAULT_STARLINK@])
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -81,7 +86,7 @@ test -n "$STARLINK" || STARLINK=!!STARCONF_DEFAULT_STARLINK!!
 # this case, the variable STARLINK is unset.
 AC_ARG_WITH(starlink,
             AS_HELP_STRING([--with-starlink],
-                           [Starlink tree to use (default ${STARLINK:=!!STARCONF_DEFAULT_STARLINK!!})]),
+                           [Starlink tree to use (default ${STARLINK:=@STARCONF_DEFAULT_STARLINK@})]),
             [if test -z "$withval" -o "$withval" = yes; then
                  : nothing needs to be done
              elif test "X$withval" = Xno; then
@@ -133,11 +138,11 @@ AC_SUBST(STARLINK)
 # to generate these.  However, we maintain FFLAGS also, so that we
 # allow both.  Avoid doing anything if $STARLINK was unset above.
 if test -n "$STARLINK"; then
-    if test "$STARLINK" != "!!STARCONF_DEFAULT_PREFIX!!"; then
-        FCFLAGS="$FCFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-        FFLAGS="$FFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-        CFLAGS="$CFLAGS -I!!STARCONF_DEFAULT_PREFIX!!/include"
-        LDFLAGS="$LDFLAGS -L!!STARCONF_DEFAULT_PREFIX!!/lib"
+    if test "$STARLINK" != "@STARCONF_DEFAULT_PREFIX@"; then
+        FCFLAGS="$FCFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
+        FFLAGS="$FFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
+        CFLAGS="$CFLAGS -I@STARCONF_DEFAULT_PREFIX@/include"
+        LDFLAGS="$LDFLAGS -L@STARCONF_DEFAULT_PREFIX@/lib"
     fi
     FCFLAGS="$FCFLAGS -I$STARLINK/include"
     FFLAGS="$FFLAGS -I$STARLINK/include"
@@ -578,7 +583,7 @@ _STAREOF
 #
 # In the latter case, the .tex -> htx_tar rule is still emitted, so
 # you can use it, but it requires the substitution variable
-# @STAR2HTML@, and so if you _do_ use it, you will have to make that
+# @STAR[]2HTML@, and so if you _do_ use it, you will have to make that
 # available, either through [STAR_CHECK_PROGS(star2html)] or otherwise.
 AC_DEFUN([STAR_LATEX_DOCUMENTATION],
          [m4_ifval([$1], [], [AC_FATAL([$0: called with no documentcode])])dnl
@@ -974,6 +979,13 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 # generated Makefile.in as the value of the Makefile variable
 # STAR_EXTRA_DIST.
 AC_DEFUN([_STAR_EXTRA_DIST], [])
+
+
+# _STAR_ECHO(name, value)
+# -----------------------
+# Private macro which echoes its second argument.  Used for tracing.
+AC_DEFUN([_STAR_ECHO],
+         [m4_ifval([$2], [$2], [AC_FATAL([$0: No second argument])])])
 
 
 # end of starconf macros
