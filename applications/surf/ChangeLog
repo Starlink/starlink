@@ -1,3 +1,9 @@
+1999-07-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib/surflib_remove_ip.f (SURFLIB_REMOVE_IP): Protect
+	division by zero on variance calculation. Correct part of the
+	calculation.
+
 1999-07-14  Tim Jenness  <t.jenness@jach.hawaii.edu>
 
 	* src/surf_add_dbm.f (SURF_ADD_DBM): Support 3 beams
