@@ -1009,7 +1009,7 @@
           CALL AIO_BLNK( OCH, STATUS )
 
 *      Get this record
-          CALL SLN_GETREC( IFID, I, SELID, STATUS )
+          CALL SLN_GETREC( IFID, '*', I, SELID, STATUS )
 
 *      Get program id
           CALL ADI_CGET0C( SELID, 'Version', CREATOR, STATUS )
