@@ -188,7 +188,7 @@
 #define	NDFQFSEEK(afile, offset, pos, fname) \
                   afile = offset
 
-#define	NDFQFTELL(pos, afile, fname) \
+#define	NDFQFTELL(afile, pos, fname) \
                   pos = afile
 
 #define	QCALLOC(ptr, typ, nel) \
