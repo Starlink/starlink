@@ -30,6 +30,7 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'FIT_PAR'
 *    Global variables :
 *    Structure definitions :
@@ -51,8 +52,9 @@
       CHARACTER*10		MTH			! Storage method
 
       INTEGER 			AXPTR			! Pointer to axis data
+      INTEGER			DIMS(ADI__MXDIM)	! Input dimensions
       INTEGER 			NCC			! # channel centres
-      INTEGER 			NAX			! # axis values
+      INTEGER			NDIM			! Input dimensionality
       INTEGER			RCPTR			! Channel bounds
 
       LOGICAL 			OK			! Present & correct?
@@ -74,9 +76,12 @@
         CALL BDI_AXCHK( ID, E_AX, 'Data', OK, STATUS )
 	IF ( OK ) THEN
 
+*    Get dataset dimensions
+          CALL BDI_GETSHP( ID, ADI__MXDIM, DIMS, NDIM, STATUS )
+
 *    Response dimensions must
           CALL ADI_CSIZE( INSTR.R_ID, 'ChannelSpec', NCC, STATUS )
-          IF ( NCC .NE. NAX ) THEN
+          IF ( NCC .NE. DIMS(E_AX) ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Number of dataset energy axis bins '/
      :                /'does not match response dimensions', STATUS )
