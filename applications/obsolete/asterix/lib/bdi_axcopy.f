@@ -103,6 +103,7 @@
 
 *  Local Variables:
       CHARACTER*2               ASTR,BSTR               ! Axis number strings
+      CHARACTER*20		LITEM1, LITEM2		! Local item names
 
       INTEGER                   C1, C2                  ! Character pointers
       INTEGER                   IITEM                   ! Item counter
@@ -123,10 +124,13 @@
         CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
         DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
+*    Construct the item names
+ 10       FORMAT( 'Axis_', A, '_', A )
+          WRITE( LITEM1, 10 ) ASTR(:NDIG1), ITEMS(C1:C2)
+          WRITE( LITEM2, 10 ) BSTR(:NDIG2), ITEMS(C1:C2)
+
 *      Copy the axis item
-          CALL BDI_COPY( ID, 'Axis_'//ASTR(:NDIG1)//'_'//ITEMS(C1:C2),
-     :                   OID, 'Axis_'//BSTR(:NDIG2)//'_'//ITEMS(C1:C2),
-     :                   STATUS )
+          CALL BDI_COPY( ID, LITEM1, OID, LITEM2, STATUS )
 
 *      Advance iterator to next item
           CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )

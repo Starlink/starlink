@@ -103,6 +103,7 @@
 
 *  Local Variables:
       CHARACTER*2		ASTR			! Axis number string
+      CHARACTER*20		LITEM			! Local item name
 
       INTEGER			C1, C2			! Character pointers
       INTEGER			IITEM			! Item counter
@@ -119,9 +120,12 @@
       CALL UDI0_CREITI( ITEMS, C1, C2, IITEM, STATUS )
       DO WHILE ( (C1.NE.0) .AND. (STATUS.EQ.SAI__OK) )
 
+*    Construct the item name
+ 10     FORMAT( 'Axis_', A, '_', A )
+        WRITE( LITEM, 10 ) ASTR(:NDIG), ITEMS(C1:C2)
+
 *    Check the axis item
-        CALL BDI_CHK( ID, 'Axis_'//ASTR(:NDIG)//'_'//ITEMS(C1:C2),
-     :                OKS(IITEM), STATUS )
+        CALL BDI_CHK( ID, LITEM, OKS(IITEM), STATUS )
 
 *    Advance iterator to next item
         CALL UDI0_ADVITI( ITEMS, C1, C2, IITEM, STATUS )
