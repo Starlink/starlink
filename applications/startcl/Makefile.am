@@ -70,13 +70,13 @@ libtclAdam_la_SOURCES = $(ADAM_ROUTINES)
 libtkGwm_la_SOURCES = $(GWM_ROUTINES)
 
 atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
-atclsh_LDADD = `nbs_link` `ams_link_adam` `ems_link_adam` \
-      libtclAdam.la @TCL_LIBS@ @FCLIBS@
+atclsh_LDADD = libtclAdam.la `nbs_link` `ams_link_adam` `ems_link_adam` \
+      @TCL_LIBS@ @FCLIBS@
 
 awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
-awish_LDADD = `nbs_link` `chr_link_adam` \
+awish_LDADD = libtclAdam.la libtkGwm.la `nbs_link` `chr_link_adam` \
         `gwm_link_adam` `ems_link_adam` `ams_link_adam` \
-	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
+	@TCL_LIBS@ @TK_LIBS@ @FCLIBS@ \
         `starX_link`
 
 # For some reason starX_link is different to the other _link scripts. 
