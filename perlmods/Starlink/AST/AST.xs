@@ -570,9 +570,7 @@ _new( class, sourcefunc, sinkfunc, options )
     fitschan = astFitsChanFor( (const char *(*)()) source, sourceWrap,
                              (void (*)( const char * )) sink, sinkWrap, options );
    )
-   printf("Got back from astChannelFor\n");
    if (astOK) setPerlAstObject( RETVAL, (AstObject*)fitschan );
-   printf("Got back from astChannelFor\n");
   } else if (strstr( class, "XmlChan") != NULL ) {
 #ifndef HASXMLCHAN   
    Perl_croak(aTHX_ "XmlChan: Please upgrade to AST V3.1 or greater");
