@@ -14,7 +14,7 @@
 
 *  Description:
 *     This routine checks if an NDF has an extension. If not and
-*     "WRITE" access is allowd then an extension will be created. If an
+*     "WRITE" access is allowed then an extension will be created. If an
 *     extension is created or located then an HDS locator to it is
 *     retained for future use.
 *

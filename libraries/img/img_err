@@ -45,3 +45,7 @@
       INTEGER IMG__BDBND
       PARAMETER ( IMG__BDBND = 239045034 )
 
+*     bad extension name
+      INTEGER IMG__BDEXT
+      PARAMETER ( IMG__BDEXT = 239045042 )
+

@@ -46,6 +46,7 @@ CONER           <conversion error>
 TRUNC           <string truncation>
 BDDIM           <bad dimension>
 BDBND           <bad bounds>
+BDEXT           <bad extension name>
 
 .END
 ! $Id$

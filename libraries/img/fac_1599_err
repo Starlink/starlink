@@ -10,3 +10,4 @@ FACILITY IMG
 307,TRUNC,string truncation
 308,BDDIM,bad dimension
 309,BDBND,bad bounds
+310,BDEXT,bad extension name

@@ -110,9 +110,6 @@
 
 *  External References:
       EXTERNAL IMG1_INIT        ! Initialise common blocks
-      EXTERNAL IMG1_NCEL
-      CHARACTER * ( DAT__SZLOC ) IMG1_NCEL ! Returns element from
-                                           ! character array
 
 *  Local variables:
       CHARACTER * ( DAT__SZLOC ) LOC ! Temporary locator
@@ -168,26 +165,7 @@
       ELSE
 
 *  Non-FITS extension. Clear the extension trace if this has been taken.
-         IF ( ECB_XNSTK( SLOT, ESLOT ) .GE. 0 ) THEN
-
-*  The count may be zero if a extension is traced but has no primitives,
-*  check for this state. If 0 locators are present memory still needs to
-*  be freed.
-            IF ( ECB_XNSTK( SLOT, ESLOT ) .GT. 0 ) THEN
-               DO 1 I = 1, ECB_XNSTK( SLOT, ESLOT )
-                  LOC = IMG1_NCEL(%VAL(CNF_PVAL(ECB_XPSTK(SLOT,ESLOT))),
-     :                            ECB_XNSTK( SLOT, ESLOT ), I,
-     :                            STATUS, %VAL( DAT__SZLOC ) )
-                  CALL DAT_ANNUL( LOC, STATUS )
- 1             CONTINUE
-            END IF
-
-*  Release the memory and reset the stack counter to show that this is
-*  now not in use.
-            CALL IMG1_CFREE( ECB_XPSTK( SLOT, ESLOT ), STATUS )
-            ECB_XNSTK( SLOT, ESLOT ) = -1
-            ECB_XNLEN( SLOT, ESLOT ) = 0
-         END IF
+         CALL IMG1_FRTRA( SLOT, ESLOT, STATUS )
       END IF
 
 *  Annul the extension locator and clear the extension name.

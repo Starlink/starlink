@@ -224,6 +224,9 @@
 #        Removed dependency on generic during build.
 #     4-JUN-1996 (PDRAPER):
 #        Added C interface routines.
+#     23-OCT-2000 (PDRAPER):
+#        Added HDR_COPY routine, check_source target now relies on
+#        CVS checkout. Version updated to 1.3.
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -411,7 +414,7 @@ PKG_NUM = 1599
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.2-1
+PKG_VERS = 1.2-2
 
 #  Library version number.
 #
@@ -476,8 +479,9 @@ EXTERNAL_INCLUDES = NDF_ERR NDF_PAR PAR_ERR DAT_PAR SAE_PAR CNF_PAR
 #  just a list of all the Fortran source files (excluding BLOCK DATA
 #  routines, which are treated separately).
 
-F_ROUTINES = hdr_delet.f hdr_in.f hdr_mod.f hdr_name.f hdr_numb.f \
- hdr_out.f img1_assoc.f img1_callo.f img1_cfree.f img1_ckey.f \
+F_ROUTINES = hdr_copy.f hdr_delet.f hdr_in.f hdr_mod.f hdr_name.f \
+ hdr_numb.f hdr_out.f \
+ img1_assoc.f img1_callo.f img1_cfree.f img1_ckey.f \
  img1_cnslt.f img1_cpy.f img1_creal.f img1_dcel.f img1_dkey.f \
  img1_dlex.f img1_dlft.f img1_exex.f img1_exft.f img1_exini.f \
  img1_fobj.f img1_frext.f img1_frslt.f img1_ftscp.f img1_gkeyc.f \
@@ -488,7 +492,8 @@ F_ROUTINES = hdr_delet.f hdr_in.f hdr_mod.f hdr_name.f hdr_numb.f \
  img_check.f img_delet.f img_free.f img_in.f img_in1.f img_in2.f \
  img_in3.f img_indf.f img_mod.f img_mod1.f img_mod2.f img_mod3.f \
  img_new.f img_new1.f img_new2.f img_new3.f img_out.f img_tmp.f \
- img_tmp1.f img_tmp2.f img_tmp3.f img_name.f
+ img_tmp1.f img_tmp2.f img_tmp3.f img_name.f img1_repft.f \
+ img1_frtra.f img1_repex.f
 
 GF_ROUTINES = \
  img_in1xB.f img_in1xW.f img_in1xb.f img_in1xd.f img_in1xi.f img_in1xr.f \
@@ -635,9 +640,10 @@ $(STARTUP_SCRIPT) $(FAC_ERRS) $(EXAMPLES):
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-#  Rules for creating the source archive from an RCS repository.
+#  Rules for creating the source archive from a CVS checkout.
 
 check_source: $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
+	$(MAKE) check
 
 RAW_SOURCE = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
  $(F_ROUTINES) $(BLOCK_DATA) $(STARTUP_SCRIPT) $(FAC_ERRS) \
@@ -646,13 +652,11 @@ RAW_SOURCE = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(PRIVATE_INCLUDES) \
 GEN_SOURCE = $(G_ROUTINES) $(GSD_ROUTINES) $(GSC_ROUTINES)
 
 $(PKG_NAME)_source.tar:
-	co $(RAW_SOURCE) $(GEN_SOURCE)
 	for f in $(GSD_ROUTINES) ""; do \
 	   if test -n "$$f"; then \
 	      source=`basename $$f .gsd`.gen; \
 	      $(LINK) $$f $$source; \
 	      $(GENERIC) -s $(GSDFLAGS) $$source; \
-	      $(RM) $$f $$source; \
 	   else :; fi;\
 	done
 	for f in $(GSC_ROUTINES) ""; do \
@@ -660,24 +664,15 @@ $(PKG_NAME)_source.tar:
 	      source=`basename $$f .gsc`.gen; \
 	      $(LINK) $$f $$source; \
 	      $(GENERIC) -s $(GSCFLAGS) $$source; \
-	      $(RM) $$f $$source; \
 	   else :; fi;\
 	done
 	for f in $(G_ROUTINES) ""; do \
 	   if test -n "$$f"; then \
 	      $(GENERIC) -s $(GFLAGS) $$f ;\
-	      $(RM) $$f ;\
 	   else :; fi;\
 	done
 	chmod 755 $(PUBLIC_SCRIPTS) $(STARTUP_SCRIPT)
 	$(TAR_IN) $(PKG_NAME)_source.tar $(RAW_SOURCE) $(GF_ROUTINES)
-	@ $(RM)  $(RAW_SOURCE) $(GF_ROUTINES)
-
-#  Rule for getting the documentation from an RCS repository.
-$(DOCUMENTATION):
-	co $(LATEX_DOCS) $(PKG_NAME).news
-	cp $(HOME)/img/html/$(HYPERTEXT_DOCS:.htx=.htx_tar.gz) .
-	gunzip $(HYPERTEXT_DOCS:.htx=.htx_tar.gz)
 
 #  Rules for extracting platform specific source files from the source
 #  archive.
@@ -1391,6 +1386,7 @@ unbuild: clean
 #  files).  These are normally generated automatically from the source
 #  files.
 
+hdr_copy.o: DAT_PAR IMG_CONST IMG_ERR SAE_PAR IMG_PCB NDF_PAR
 hdr_delet.o: DAT_PAR IMG_CONST IMG_ERR IMG_PCB NDF_PAR SAE_PAR
 hdr_in.o: SAE_PAR
 hdr_inxc.o: DAT_PAR IMG_CONST IMG_ERR SAE_PAR
@@ -1427,6 +1423,8 @@ img1_fobj.o: DAT_PAR SAE_PAR
 img1_frext.o: DAT_PAR IMG_CONST IMG_ECB IMG_ERR IMG_PCB NDF_PAR \
 	      SAE_PAR CNF_PAR
 img1_frslt.o: IMG_CONST IMG_ERR IMG_PCB NDF_PAR SAE_PAR
+img1_frtra.o: CNF_PAR DAT_PAR IMG_CONST IMG_ECB IMG_ERR NDF_PAR \
+              SAE_PAR 
 img1_ftscp.o: SAE_PAR
 img1_gkeyc.o: SAE_PAR
 img1_gkeyxd.o: IMG_ERR SAE_PAR
@@ -1470,6 +1468,8 @@ img1_rdftxl.o: DAT_PAR IMG_CONST IMG_ECB IMG_ERR IMG_PCB NDF_PAR \
                SAE_PAR CNF_PAR
 img1_rdftxr.o: DAT_PAR IMG_CONST IMG_ECB IMG_ERR IMG_PCB NDF_PAR \
                SAE_PAR CNF_PAR
+img1_repft.o: CNF_PAR IMG_ECB SAE_PAR NDF_PAR IMG_CONST DAT_PAR
+img1_repex.o: CNF_PAR DAT_PAR IMG_CONST IMG_ECB NDF_PAR SAE_PAR 
 img1_rkey.o: IMG_ERR SAE_PAR
 img1_tpndf.o: IMG_CONST IMG_ERR IMG_PCB NDF_PAR SAE_PAR
 img1_trace.o: DAT_PAR IMG_CONST IMG_ECB IMG_ERR IMG_PCB NDF_PAR SAE_PAR \
