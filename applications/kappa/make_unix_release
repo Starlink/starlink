@@ -124,7 +124,7 @@ cd iraf
 rm -rf kappa
 mkdir kappa
 cd kappa
-ftp -v starprog << FOO3
+ftp -v 193.61.251.100 << FOO3
 dsb
 ascii
 cd ${REL_DIR}
