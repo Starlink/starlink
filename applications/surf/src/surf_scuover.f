@@ -111,6 +111,10 @@
 
 *  History:
 *     $Log$
+*     Revision 1.22  2005/03/23 03:46:10  timj
+*     - Some variable initialisations when status is bad
+*     - Fix size of maximum filename read from fits header
+*
 *     Revision 1.21  2005/03/19 01:41:02  timj
 *     Propogate focal station from app level to calc_bol_coords
 *
@@ -226,7 +230,7 @@
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
       INTEGER          EXT_NDF         ! NDF id of extinction file
-      CHARACTER*40     FILENAME        ! default Name of extinction file
+      CHARACTER*80     FILENAME        ! default Name of extinction file
                                        ! names of input files read
       CHARACTER*80     FITS (SCUBA__MAX_FITS) 
                                        ! array of FITS keywords
@@ -652,9 +656,11 @@
      :     'RUN', RUN_NUMBER, STATUS)
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'OBJECT', OBJECT, STATUS)
+      OBSERVING_MODE = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :     'MODE', OBSERVING_MODE, STATUS)
       CALL CHR_UCASE (OBSERVING_MODE)
+      SAMPLE_MODE = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'SAM_MODE', SAMPLE_MODE, STATUS)
       CALL CHR_UCASE (SAMPLE_MODE)
@@ -667,7 +673,9 @@
 
 *     We know there can only be one sub instrument and that it is
 *     in the BOL_TYPE array
-      SUB_INSTRUMENT = BOL_TYPE( BOL_CHAN(1), BOL_ADC(1) )
+      IF (STATUS .EQ. SAI__OK) THEN
+         SUB_INSTRUMENT = BOL_TYPE( BOL_CHAN(1), BOL_ADC(1) )
+      END IF
 
 *     And calculate the focal station
       CALL SURFLIB_GET_FOCAL_STATION( TELESCOPE, INSTRUMENT,
@@ -675,6 +683,7 @@
       
 *     coords of telescope centre
 
+      IN_CENTRE_COORDS = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'CENT_CRD', IN_CENTRE_COORDS, STATUS)
       CALL CHR_UCASE (IN_CENTRE_COORDS)
@@ -690,6 +699,8 @@
      :        STATUS)
       END IF
 
+      IN_LONG_RAD = 0.0D0
+      IN_LAT_RAD = 0.0D0
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'LAT', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LAT_RAD, STATUS)
@@ -697,6 +708,8 @@
      :     'LONG', STEMP, STATUS)
       CALL SCULIB_DECODE_ANGLE (STEMP, IN_LONG_RAD, STATUS)
 
+      IN_LONG2_RAD = 0.0D0
+      IN_LAT2_RAD = 0.0D0
       IF (IN_CENTRE_COORDS .EQ. 'PLANET') THEN
          CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
      :        'LAT2', STEMP, STATUS)
@@ -720,7 +733,9 @@
       END IF
 
 *     offset from telescope centre
-
+      
+      MAP_X = 0.0
+      MAP_Y = 0.0
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 
      :     'MAP_X', MAP_X, STATUS)
       MAP_X = MAP_X / REAL (R2AS)
@@ -743,6 +758,7 @@
       END IF
 
 *     Read the latitude of the observatory
+      LAT_OBS = 0.0D0
       CALL SCULIB_GET_FITS_D (N_FITS, N_FITS, FITS,
      :     'LAT-OBS', LAT_OBS, STATUS)
       LAT_OBS = LAT_OBS * PI / 180.0D0
@@ -785,6 +801,7 @@
 
 *  see if the observation completed normally or was aborted
  
+      STATE = ' '
       CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 'STATE',
      :  STATE, STATUS)
       CALL CHR_UCASE (STATE)
