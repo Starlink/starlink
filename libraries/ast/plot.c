@@ -393,7 +393,7 @@ f     - Title: The Plot title drawn using AST_GRID
 *        the max number of decimal places when estimating label priorities.
 *        - Modified Overlap to ensure that axis labels are speced by at 
 *        least two spaces.
-*     22-JAN-2003 (DSN):
+*     22-JAN-2003 (DSB):
 *        - Modified PlotLabels so that labels are rejected in a regular
 *        pattern rather than semi-random.
 *        - Modified the way PlotLabels abbreviates leading fields.
@@ -401,6 +401,9 @@ f     - Title: The Plot title drawn using AST_GRID
 *        to provide some degree of protection against the Crv algorithm
 *        skipping over small sections of valid coordinates (such as when
 *        a curve crosses the plot very close to a corner of the plot).
+*     25-MAR-2003 (DSB):
+*        - Modified FindMajTicks to avoid losing tick marks when dealing
+*        with high precision data.
 *class--
 */
 
@@ -9983,18 +9986,19 @@ static int FindMajTicks( AstMapping *map, AstFrame *frame, int axis,
 /* Sort the tick values into increasing order. */
       qsort( (void *) ticks, (size_t) nticks, sizeof(double), Compared );
 
-/* Remove any duplicate or BAD tick values by shuffling the higher unique values
-   down to over-write them. */
+/* Remove any duplicate or BAD tick values by shuffling the higher unique 
+   values down to over-write them. We subtract the centre value of both
+   tick values before comparing them for equality in order to avoid 
+   unnecessarily removing tick marks in high precsion data. */
       r = ticks + 1;
       w = ticks;
       for( k = 1; k < nticks && astOK; k++ ){
-         if( !EQUAL( *r, *w ) && *r != AST__BAD ){
+         if( *r != AST__BAD && !EQUAL( *r-centre, *w-centre ) ){
             w++;
             *w = *r;
          }
          r++;
       }
-
 
 /* Modify the number of ticks to exclude the duplicate ones. */
       nticks = (int) ( w - ticks ) + 1;

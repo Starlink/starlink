@@ -56,6 +56,10 @@ introduces a scaling factor of 0.001 between the two axes.
 o Bugs have been fixed in the Plot class which caused problems with
 the placement and abbreviation of axis labels.
 
+o Bugs have been fixed in the Plot class which caused serious problems
+when plotting high precision data. These problems could range from the
+omission of some tick marks to complete failure to produce a plot.
+
 
    For further details of these changes, see the final appendix of
 Starlink User Note SUN/210 (Fortran version) or SUN/211 (C version).
