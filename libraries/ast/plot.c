@@ -13646,11 +13646,15 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
       if ( 1 ) {
          alpha = 1.0;
          beta = 1.0;
+         ux = 0.0;
+         uy = 0.0
+         vx = 0.0;
+         vy = 0.0
 
 /*
       GAxScale( this, &alpha, &beta, method, class );
-*/
 
+*/
 
 /* Ensure that the supplied up-vector refers to world coordinate axes in
    their correct senses. */
@@ -13703,7 +13707,12 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
    requested up-vector. */
 /*
       GQch( this, &chv, &chh, method, class );
+
+Remove the following assignments to chv and chh when this code is
+uncommented!
 */
+      chv = 0.0;
+      chh = 0.0;
       a = beta*chh*ux;
       b = alpha*chv*uy;
       nl = sqrt( a*a + b*b );

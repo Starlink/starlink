@@ -2764,6 +2764,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
       next_id = 0;
       nfield = 0;
       sep_used = '\0';
+      suffix_sep = 0;
       for ( ifield = 0; ifield < 3; ifield++ ) {
 
 /* Set the default field value. */
