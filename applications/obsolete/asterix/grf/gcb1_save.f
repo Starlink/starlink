@@ -121,7 +121,7 @@
 
 *  Locate the GCB object in the HDS file, make sure its at least NBYTES
 *  long and map it
-      CALL GCB1_SAVE_MAPGCB( ARGS(1), GCBLOC, GCBPTR, STATUS )
+      CALL GCB1_SAVE_MAPGCB( ARGS(1), NBYTE, GCBLOC, GCBPTR, STATUS )
 
 *  Copy semi-compressed notice board to output
       CALL GCB_SAVE_SUB( NSCAL, NSTRUC, %val(G_MEMPTR), %val(GCBPTR),
