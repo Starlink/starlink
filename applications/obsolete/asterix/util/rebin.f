@@ -460,8 +460,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
         END IF
 
 * output axis bounds
-	print *,'Map bounds'
-	call flush(6)
         CALL BDI_AXMAPR( OFID, I, 'Bounds', 'READ', AXBPO(I), STATUS )
 
       END DO
@@ -469,8 +467,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
       IF (STATUS.EQ.SAI__OK) THEN
         CALL MSG_PRNT('Rebinning...')
       ENDIF
-	print *,'Doing it..'
-	call flush(6)
 *  Perform rebinning
       IF (OPT.EQ.1) THEN
         CALL REBIN_DOIT_BYRATIO(
@@ -1033,7 +1029,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
                       ELSE
 
-	print *,i1,frbnd1(1,i1),frbnd1(2,i1)
 
                         LOFOUND=.FALSE.
                         IBIN=1
@@ -1074,7 +1069,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                         ENDDO
                         HIFOUND=.FALSE.
 
-	print *,'lo',ibin,tobnd1(1,ibin),tobnd1(2,ibin)
 
 *  upper receptor bin
                         DO WHILE (IBIN.LE.NBIN(IAX).AND..NOT.HIFOUND
@@ -1102,7 +1096,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
                             RTOP(IAX)=TOBND7(2,IBIN)
                           ENDIF
 
-	print *,'hi',ibin,tobnd1(1,ibin),tobnd1(2,ibin)
 
                           IF((DTOP(IAX)-RBOT(IAX))*DIR(IAX).GE.
      :                                            -0.000001 .AND.
@@ -1232,7 +1225,6 @@ c        CALL BDI_AXCHK( IFID, I, 'SpacedData', REG(I), STATUS )
 
                                     ENDDO
 
-	print *,'   ',dbot(1),dtop(1),rbot(1),rtop(1),fract
 
 *  add relevant bits to receptor bin
                                     IF (VOK.AND.QOK) THEN
