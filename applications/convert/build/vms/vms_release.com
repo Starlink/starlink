@@ -115,11 +115,12 @@ $!  Fetch the source files.
 $!  =======================
 $!
 $    CMS FETCH'CF' CON_C_ROUTINES,CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES
+$    CMS FETCH'CF' APPLIC,IRAF_SPP_FOR
 $!
 $!  Make the CONVERT source library.
 $!  ================================
 $!
-$!  Create the source and library.
+$!  Create the source library.
 $!
 $    LIBCRE CONVERT
 $!
@@ -130,8 +131,8 @@ $    CMS SHOW GENERATION'CF' APPLIC -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
 $!
 $!  Execute the procedure to insert all the modules into the CONVERT
-$!  source and object libraries.  The source code and object modules are
-$!  deleted as they are inserted in the libraries.
+$!  source library.  The source code modules are deleted as they are
+$!  inserted in the library.
 $!
 $    @VMSLIB.TMP
 $!
@@ -146,7 +147,7 @@ $!
 $!  Make the CONLIB source library.
 $!  ===============================
 $!
-$!  Create the source and library.
+$!  Create the source library.
 $!
 $    LIBCRE CONLIB
 $!
@@ -155,6 +156,12 @@ $!  command.
 $!
 $    CMS SHOW GENERATION'CF' CON_FORTRAN_ROUTINES,CON_GENERIC_ROUTINES,CON_C_ROUTINES -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
+$!
+$!  Execute the procedure to insert all the modules into the CONVERT
+$!  source library.  The source code modules are deleted as they are
+$!  inserted in the library.
+$!
+$    @VMSLIB.TMP
 $!
 $!  Delete the temporary files.
 $!
@@ -174,8 +181,14 @@ $!
 $!  Create a list of the SPP Fortran source code with the library-insertion
 $!  command.
 $!
-$    CMS SHOW GENERATION'CF' IRAF_SPP_FOR
+$    CMS SHOW GENERATION'CF' IRAF_SPP_FOR -
           /OUTPUT = VMSLIB.TMP /FORMAT = "$ INSERT #E"
+$!
+$!  Execute the procedure to insert all the modules into the CONVERT
+$!  source library.  The source code modules are deleted as they are
+$!  inserted in the library.
+$!
+$    @VMSLIB.TMP
 $!
 $!  Delete the temporary files.
 $!
