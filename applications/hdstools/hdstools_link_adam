@@ -1,0 +1,49 @@
+
+#  N.B. the previous line should be blank.
+
+#+
+#  Name:
+#     hdstools_link_adam
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking against adam hdstools.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building ADAM applications
+#     which use hdstools in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Satrlink standard makefiles, thus:
+#
+#         $(ALINK) $(MONO_OBJECT) -o $(MONOLITH) $(OBJECT_LIBRARIES) \
+#             -L$(STAR_LIB) `./hdstools_link_adam`
+
+#  Copyright:
+#     Copyright (C) 2004 Rutherford Appleton Laboratory
+
+#  Authors:
+#     DSB: David S. Berry (Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-2004 (DSB):
+#        Original version.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo `fio_link_adam` `one_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.
