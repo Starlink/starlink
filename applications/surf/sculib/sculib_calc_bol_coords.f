@@ -316,9 +316,9 @@
          HOUR_ANGLE = LST - RA_CENTRE
          SIN_E = SIN (LAT_OBS) * SIN (DEC_CENTRE) + 
      :     COS (LAT_OBS) * COS (DEC_CENTRE) * COS (HOUR_ANGLE)
-         E = ASIN (SIN_E)
+         E = ASIN (SIN_E) ! E is between 0 and 90
 
-         ELEVATION = E
+         ELEVATION = E  
 
 *  and the parallactic angle
 
@@ -332,7 +332,9 @@
             SIN_Q = SIN (HOUR_ANGLE) * COS (LAT_OBS) / COS (E)
             COS_Q = (SIN (LAT_OBS) - SIN (DEC_CENTRE) * SIN_E) /
      :        (COS (DEC_CENTRE) * COS(E))
-            PAR_ANGLE = ASIN(SIN_Q)
+
+*     Can be between 0 and 360 so use ATAN2
+            PAR_ANGLE = ATAN2(SIN_Q, COS_Q)
 
          END IF
       END IF
