@@ -20,6 +20,8 @@
 #        Add GLOBAL associations
 #     1996 November 1 (TIMJ)
 #        Add header and HELPLIB
+#     1997 April 29 (TIMJ)
+#        Add MSG_FILTER
 #     {enter_further_changes_here}
  
 #-
@@ -62,6 +64,14 @@
 	 HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+ 
       PARAMETER   SECOND_TAU
          POSITION 5
          PROMPT   'Second zenith sky opacity measured'
