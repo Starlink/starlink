@@ -15772,7 +15772,7 @@ default value.
          the plot as a label. The label is positioned so that its bottom
          left corner is close to the bottom left pixel in the NDF. The
          appearance of the label can be set by using the STYLE parameter
-         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [TRUE]}
+         (for instance {\tt "}Size(strings)=2{\tt "}). {\tt [current value]}
       }
       \sstsubsection{
          LENGTH() = \_REAL (Write)
@@ -32384,8 +32384,7 @@ plot (9k).
 }{
    \sstdescription{
       This application draws an outline of a 2-dimensional NDF on
-      the current graphics device, optionally aligning it with an
-      existing plot (see parameter CLEAR). 
+      the current graphics device, aligning it with any existing plot. 
 
       Annotated axes can be produced (see parameter AXES), and the appearance
       of the axes and curve can be controlled in detail (see parameter STYLE). 
@@ -32393,7 +32392,7 @@ plot (9k).
       supplied NDF.
 
       This command is a synonym for {\tt contour mode=bounds penrot=yes
-      labout=yes}.
+      labout=yes clear=no}.
    }
    \sstusage{
       outline 
@@ -32406,24 +32405,6 @@ plot (9k).
          plot, showing the current co-ordinate Frame of the
          supplied NDF. The appearance of the axes can be controlled using
          the STYLE parameter. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         CLEAR = \_LOGICAL (Read)
-      }{
-         TRUE if the graphics device is to be cleared before displaying
-         the outline. If you want the outline to be drawn over
-         the top of an existing DATA picture, then set CLEAR to FALSE. The
-         outline will then be drawn in alignment with the displayed
-         data. If possible, alignment occurs within the current co-ordinate
-         Frame of the NDF. If this is not possible, (for instance if
-         suitable WCS information was not stored with the existing DATA
-         picture), then alignment is attempted in PIXEL
-         co-ordinates. If this is not possible, then alignment is
-         attempted in GRID co-ordinates. If this is not possible, then
-         alignment is attempted in the first suitable Frame found in the NDF
-         irrespective of its domain. A message is displayed indicating the
-         domain in which alignment occurred. If there are no suitable Frames
-         in the NDF then an error is reported. {\tt [TRUE]}
       }
       \sstsubsection{
          DEVICE = DEVICE (Read)

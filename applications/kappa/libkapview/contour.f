@@ -164,7 +164,7 @@
 *        the plot as a label. The label is positioned so that its bottom
 *        left corner is close to the bottom left pixel in the NDF. The
 *        appearance of the label can be set by using the STYLE parameter
-*        (for instance "Size(strings)=2"). [TRUE]
+*        (for instance "Size(strings)=2"). [current value]
 *     LENGTH() = _REAL (Write)
 *        On exit this holds the total length in pixels of the contours at each 
 *        selected height.  These values are only computed when parameter STATS 

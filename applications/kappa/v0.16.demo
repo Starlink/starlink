@@ -77,10 +77,10 @@ demo v0.16-2 {
 
       command {Obey kapview gdclear ""}
       command {Obey kapview picdef "mode=array xpic=2 ypic=1 outline=no prefix=a"}
-      command {Obey kapview display "in=$KAPPA_DIR/m31 axes=yes mode=perc percentiles=[9,95] style=def accept"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31 axes=yes mode=perc percentiles=\[9,95\] style=def accept"}
       command {Obey kapview picsel "label=a2"}
-      command {Obey kapview display "in=$KAPPA_DIR/m31_issa_12 mode=perc percentiles=[9,95] style=def accept"}
-      command {Obey kapview contour "in=$KAPPA_DIR/m31 mode=bounds clear=no axes=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/m31_issa_12 mode=perc percentiles=\[9,95\] style=def accept"}
+      command {Obey kapview contour "ndf=$KAPPA_DIR/m31 mode=bounds clear=no axes=no"}
 
       text "New facilities have been introduced to allow curves to be
       drawn on a graphics device outlining either an entire data array or
@@ -94,22 +94,22 @@ demo v0.16-2 {
       right hand image is an IRAS image of a slightly larger area. The yellow 
       rectangle in the IRAS image is the outline of the optical image, and 
       was produced using the new <command outline> command which is an alias 
-      for\n\n% contour mode=bounds" 
+      for\n\n% <command contour> <command mode=bounds>" 
 
       pause 13
 
       command {Obey kapview gdclear ""}
       command {Obey kapview picdef "mode=array xpic=2 ypic=1 outline=no prefix=a"}
-      command {Obey kapview display "in=$KAPPA_DIR/scupol_i axes=yes mode=perc percentiles=[9,95] style=def accept"}
+      command {Obey kapview display "in=$KAPPA_DIR/scupol_i axes=yes mode=perc percentiles=\[9,95\] style=def accept"}
       command {Obey kapview picsel "label=a2"}
-      command {Obey kapview display "in=$KAPPA_DIR/scumos mode=perc percentiles=[9,95] style=def accept"}
-      command {Obey kapview contour "in=$KAPPA_DIR/scupol_i mode=good clear=no axes=no"}
+      command {Obey kapview display "in=$KAPPA_DIR/scumos mode=perc percentiles=\[9,95\] style=def accept"}
+      command {Obey kapview contour "ndf=$KAPPA_DIR/scupol_i mode=good clear=no axes=no"}
 
       text "The left hand picture above is a scuba image, and the right hand 
       image is a mosaic of scuba images from the same area. The red curve
       in the right hand image is the outline of the good pixels in the
-      left hand image, and was produced using the command\n\n% contour 
-      mode=good" 
+      left hand image, and was produced using the command\n\n% 
+      <command contour> <command mode=good clear=no>" 
 
       pause 13
 

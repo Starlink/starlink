@@ -2971,9 +2971,9 @@ package kappa {
          parameter labout {
             type _LOGICAL
             prompt {Label outlines in Good and Bounds modes?}
-            vpath DEFAULT
+            vpath CURRENT DEFAULT
             ppath CURRENT DEFAULT
-            default FALSE
+            default TRUE
             helpkey *
           }
 
@@ -18104,12 +18104,12 @@ iraf! {
    command outline {
       task contour {
          taskinherit axes
-         taskinherit clear
          taskinherit device
          taskinherit margin
          taskinherit ndf
          taskinherit pens
          taskinherit style
+         taskparam clear=n
          taskparam labout=y
          taskparam mode=bounds
          taskparam penrot=y
