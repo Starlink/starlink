@@ -144,10 +144,20 @@ c     - Grid: Grid lines drawn using astGridLine or astGrid
 f     - Grid: Grid lines drawn using AST_GRIDLINE or AST_GRID
 c     - Curves: Geodesic curves drawn using astCurve, astGenCurve or astPolyCurve
 f     - Curves: Geodesic curves drawn using AST_CURVE, AST_GENCURVE or AST_POLYCURVE
-c     - NumLab: Numerical axis labels drawn using astGrid
-f     - NumLab: Numerical axis labels drawn using AST_GRID
-c     - TextLab: Descriptive axis labels drawn using astGrid
-f     - TextLab: Descriptive axis labels drawn using AST_GRID
+c     - NumLab: Numerical axis labels drawn using astGrid (provides
+f     - NumLab: Numerical axis labels drawn using AST_GRID (provides
+      default values for NumLab1 and NumLab2)
+c     - NumLab1: Numerical labels for axis 1 drawn using astGrid 
+f     - NumLab1: Numerical labels for axis 1 drawn using AST_GRID
+c     - NumLab2: Numerical labels for axis 2 drawn using astGrid
+f     - NumLab2: Numerical labels for axis 2 drawn using AST_GRID
+c     - TextLab: Descriptive axis labels drawn using astGrid (provides
+f     - TextLab: Descriptive axis labels drawn using AST_GRID (provides
+      default values for TextLab1 and TextLab2)
+c     - TextLab1: Descriptive label for axis 1 drawn using astGrid
+f     - TextLab1: Descriptive label for axis 1 drawn using AST_GRID 
+c     - TextLab2: Descriptive label for axis 2 drawn using astGrid
+f     - TextLab2: Descriptive label for axis 2 drawn using AST_GRID 
 c     - Title: The Plot title drawn using astGrid
 f     - Title: The Plot title drawn using AST_GRID
 c     - Markers: Graphical markers (symbols) drawn using astMark
@@ -156,10 +166,18 @@ c     - Strings: Text strings drawn using astText
 f     - Strings: Text strings drawn using AST_TEXT
 c     - Ticks: Tick marks (both major and minor) drawn using astGrid
 f     - Ticks: Tick marks (both major and minor) drawn using AST_GRID
-c     - Axes: Axis lines drawn through tick marks within the plotting area
-c       using astGrid
-f     - Axes: Axis lines drawn through tick marks within the plotting area
-f     using AST_GRID
+        (provides default values for Ticks1 and Ticks2)
+c     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using astGrid
+f     - Ticks1: Tick marks (both major and minor) for axis 1 drawn using AST_GRID
+c     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using astGrid
+f     - Ticks2: Tick marks (both major and minor) for axis 2 drawn using AST_GRID
+      - Axes: Axis lines drawn through tick marks using
+c     astGrid (provides default values for Axis1 and Axis2)
+f     AST_GRID (rovides default values for Axis1 and Axis2)
+c     - Axis1: Axis line drawn through tick marks on axis 1 using astGrid
+f     - Axis1: Axis line drawn through tick marks on axis 1 using AST_GRID
+c     - Axis2: Axis line drawn through tick marks on axis 2 using astGrid
+f     - Axis2: Axis line drawn through tick marks on axis 2 using AST_GRID
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -300,6 +318,8 @@ f     using AST_GRID
 *        - Initialize baseframe to NULL in astInitPlot (prevents segvios).
 *        - Modified astInitPlot to allow the "frame" argument to the astPlot 
 *        constructor to be a Plot.
+*     10-JAN-2002 (DSB):
+*       - Added axis-specific graphical elements "axis1", "axis2", etc.
 *class--
 */
 
@@ -336,11 +356,24 @@ f     using AST_GRID
 #define MARKS_ID        6 /* Id for marks drawn by astMark */
 #define TEXT_ID         7 /* Id for text strings drawn by astText */
 #define TICKS_ID        8 /* Id for major and minor tick marks */
-#define AXIS_ID         9 /* Id for axes through interior tick marks */
+#define AXIS_ID         9 /* Id for both axes through interior tick marks */
+#define AXIS1_ID       10 /* Id for axis 1 through interior tick marks */
+#define AXIS2_ID       11 /* Id for axis 2 through interior tick marks */
+#define NUMLABS1_ID    12 /* Id for numerical labels */
+#define NUMLABS2_ID    13 /* Id for numerical labels */
+#define TEXTLAB1_ID    14 /* Id for textual axis labels */
+#define TEXTLAB2_ID    15 /* Id for textual axis labels */
+#define TICKS1_ID      16 /* Id for major and minor tick marks */
+#define TICKS2_ID      17 /* Id for major and minor tick marks */
 #define LEFT            0 /* Id for the left edge of the plotting area */
 #define TOP             1 /* Id for the top edge of the plotting area */
 #define RIGHT           2 /* Id for the right edge of the plotting area */
 #define BOTTOM          3 /* Id for the bottom edge of the plotting area */
+#define NOSTYLE      -999 /* A value which represents a null Style value */
+#define NOWIDTH     -99.9 /* A value which represents a null Style value */
+#define NOFONT       -999 /* A value which represents a null Style value */
+#define NOCOLOUR     -999 /* A value which represents a null Style value */
+#define NOSIZE      -99.9 /* A value which represents a null Style value */
 
 /*
 *
@@ -1186,7 +1219,7 @@ static CurveData Curve_data;
 /* Strings giving the label for the graphics items corresponding to
    BORDER_ID, GRIDLINE_ID, etc. */
 static char *GrfLabels = "Border Grid Curves NumLab TextLab Title "
-                         "Markers Strings Ticks Axes";
+                         "Markers Strings Ticks Axes Axis1 Axis2";
 
 /* Text values used to represent edges externally. */
 static const char *xedge[4] = { "left", "top", "right", "bottom" };
@@ -1373,6 +1406,8 @@ static char *GrfItem( int, const char * );
 static double **MakeGrid( AstPlot *, AstFrame *, AstMapping *, int, double, double, double, double, int, AstPointSet **, AstPointSet**, int, const char *, const char * );
 static double GetTicks( AstPlot *, int, double *, double, double **, int *, int *, int, int *, const char *, const char * );
 static double GoodGrid( AstPlot *, int *, AstPointSet **, AstPointSet **, const char *, const char * );
+static double UseSize( AstPlot *, int );
+static double UseWidth( AstPlot *, int );
 static int Border( AstPlot * );
 static int Boundary( AstPlot *, const char *, const char * );
 static int BoxCheck( float *, float *, float *, float * );
@@ -1400,6 +1435,9 @@ static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **,
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
 static int Overlap( AstPlot *, int, const char *, float, float, const char *, float, float, float **, const char *, const char *);
+static int UseColour( AstPlot *, int );
+static int UseFont( AstPlot *, int );
+static int UseStyle( AstPlot *, int );
 static int Ustrcmp( const char *, const char * );
 static int Ustrncmp( const char *, const char *, size_t );
 static int swapEdges( AstPlot *, TickInfo **, CurveData ** );
@@ -1425,9 +1463,9 @@ static void GText( AstPlot *, const char *, float, float, const char *, float, f
 static void GTxExt( AstPlot *, const char *, float , float, const char *, float, float, float *, float *, const char *, const char * );
 static void GenCurve( AstPlot *, AstMapping * );
 static void GraphGrid( int, double, double, double, double, double ** );
-static void GrfSet( AstPlot *, const char *,  AstGrfFun );
 static void GrfPop( AstPlot * );
 static void GrfPush( AstPlot * );
+static void GrfSet( AstPlot *, const char *,  AstGrfFun );
 static void GrfWrapper( AstPlot *, const char *,  AstGrfWrap );
 static void Grid( AstPlot * );
 static void GridLine( AstPlot *, int, const double [], double );
@@ -7361,17 +7399,21 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
    double *value;         /* Current tick value */
    double start[ 2 ];     /* The start of the curve in physical coordinates */
    int axis;              /* Current axis index */
+   int axisid;            /* ID value for current axis plotting attributes */
    int tick;              /* Current tick index */
 
 /* Check the global status. */
    if( !astOK ) return;
 
-/* Establish the correct graphical attributes as defined by attributes
-   with the supplied Plot. */
-   GrfAttrs( this, AXIS_ID, 1, GRF__LINE, method, class );
+/* Not the id value for the first axis. */
+   axisid = AXIS1_ID;
 
 /* Consider drawing a curve parallel to each axis in turn. */
    for( axis = 0; axis < 2; axis++ ){
+
+/* Establish the correct graphical attributes for this axis as defined by 
+   attributes with the supplied Plot. */
+      GrfAttrs( this, axisid, 1, GRF__LINE, method, class );
 
 /* Check the axis is required. */
       if( astGetDrawAxes( this, axis ) ){ 
@@ -7400,10 +7442,14 @@ static void DrawAxis( AstPlot *this, TickInfo **grid, double *labelat,
             }
          }
       }
-   }
 
 /* Re-establish the original graphical attributes. */
-   GrfAttrs( this, AXIS_ID, 0, GRF__LINE, method, class );
+      GrfAttrs( this, axisid, 0, GRF__LINE, method, class );
+
+/* Set up the id value for the next axis. */
+      axisid = AXIS2_ID;
+
+   }
 
 /* Return. */
    return;
@@ -12590,7 +12636,31 @@ static char *GrfItem( int item, const char *text ){
       desc = "Major and minor ticks";
 
    } else if ( item == AXIS_ID ) {         
-      desc = "Axis";
+      desc = "Default axis";
+
+   } else if ( item == AXIS1_ID ) {         
+      desc = "Axis 1";
+
+   } else if ( item == AXIS2_ID ) {         
+      desc = "Axis 2";
+
+   } else if ( item == NUMLABS1_ID ) {         
+      desc = "Axis 1 numerical labels";
+
+   } else if ( item == NUMLABS2_ID ) {         
+      desc = "Axis 2 numerical labels";
+
+   } else if ( item == TEXTLAB1_ID ) {         
+      desc = "Axis 1 textual label";
+
+   } else if ( item == TEXTLAB2_ID ) {         
+      desc = "Axis 2 textual label";
+
+   } else if ( item == TICKS1_ID ) {         
+      desc = "Axis 1 tick marks";
+
+   } else if ( item == TICKS2_ID ) {         
+      desc = "Axis 2 tick marks";
 
    } else {
       desc = NULL;
@@ -13306,19 +13376,7 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
 *     this
 *        A pointer to the Plot.
 *     id
-*        An integer specifying the graphical object to be drawn. The 
-*        following symbolic values should be used:
-*
-*        BORDER_ID   - The boundary curve drawn by astBorder.
-*        GRIDLINE_ID - Curves drawn by astGridLine.
-*        CURVE_ID    - Curves drawn by astCurve, astGenCurve or astPolyCurve.
-*        NUMLABS_ID  - Numerical labels.
-*        TEXTLABS_ID - Textual axis labels (not the title).
-*        TITLE_ID    - The grid title.
-*        MARKS_ID    - Marks drawn with astMark.
-*        TEXT_ID     - Text strings drawn with astText.
-*        TICKS_ID    - Major and minor tick marks 
-*        AXIS_ID     - Axes through interior tick marks 
+*        An integer specifying the graphical object to be drawn.
 *     set
 *        If non-zero then the attributes for the specified object are set
 *        to the values indicated by the corresponding Plot attributes,
@@ -13373,9 +13431,9 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
    if( set && nesting == 1 ){
 
 /* See if a value has been set in the Plot for the line style attribute for 
-   the specified object, If so, get the value. */
-      if( astTestStyle( this, id ) ){
-         ival = astGetStyle( this, id );      
+   the specified object, If so, use the value. */
+      ival = UseStyle( this, id );      
+      if( ival != NOSTYLE ){
 
 /* Save the current value, and establish the new value. */
          GAttr( this, GRF__STYLE, (double) ival, attr++, prim, method,
@@ -13388,32 +13446,32 @@ void GrfAttrs( AstPlot *this, int id, int set, int prim, const char *method, con
       }
 
 /* Do the same for the line width attribute. */
-      if( astTestWidth( this, id ) ){
-         dval = astGetWidth( this, id );      
+      dval = UseWidth( this, id );      
+      if( dval != NOWIDTH ){
          GAttr( this, GRF__WIDTH, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character size attribute. */
-      if( astTestSize( this, id ) ){
-         dval = astGetSize( this, id );      
+      dval = UseSize( this, id );      
+      if( dval != NOSIZE ) {
          GAttr( this, GRF__SIZE, dval, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the character font attribute. */
-      if( astTestFont( this, id ) ){
-         ival = astGetFont( this, id );      
+      ival = UseFont( this, id );      
+      if( ival != NOFONT ){
          GAttr( this, GRF__FONT, (double) ival, attr++, prim, method, class );
       } else {
          *(attr++) = AST__BAD;
       }
 
 /* Do the same for the colour attribute. */
-      if( astTestColour( this, id ) ){
-         ival = astGetColour( this, id );      
+      ival = UseColour( this, id );      
+      if( ival != NOCOLOUR ) {
          GAttr( this, GRF__COLOUR, (double) ival, attr++, prim, method,
                 class );
       } else {
@@ -20127,6 +20185,411 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 
 /* Return a pointer to the output PointSet. */
    return result;
+
+}
+
+static int UseColour( AstPlot *this, int id ) {
+/*
+*  Name:
+*     UseColour
+
+*  Purpose:
+*     Get the Colour value to use for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int UseColour( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This returns the Colour value for the graphical element specified by
+*     id. If an element related to a specific axis is requested, but is
+*     not set, a default value equal to the non-axis-specific element 
+*     is returned. For eaxmple, if the Colour for AXIS1_ID is requested
+*     but the user has not set a value for Colour(axis1), then the value
+*     of Colour(axes) is returned, or NOCOLOUR if Colour(axes) has not been
+*     set either.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Colour value to use or NOCOLOUR.
+
+*/
+
+/* Local Variables: */
+   int ret;
+  
+/* Check the global error status. */
+   ret = NOCOLOUR;
+   if ( !astOK ) return ret;
+
+/* Colour(axes) provides the default for Colour(axis1) and Colour(axis2),
+   so if Colour(axis1) or Colour(axis2) has been requested but is not set,
+   use Colour(axes) instead. */
+   if( id == AXIS1_ID || id == AXIS2_ID ) {
+      if( !astTestColour( this, id ) ) {
+         id = AXIS_ID;
+      }
+
+/* Likewise for NumLabs1 and NumLabs2 */
+   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
+      if( !astTestColour( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for TextLab1 and textLab2 */
+   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
+      if( !astTestColour( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for Ticks1 and Ticks2 */
+   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
+      if( !astTestColour( this, id ) ) {
+         id = TICKS_ID;
+      }
+   }
+
+/* If the requested value is set, get the value. Otherwise retain the
+   NOCOLOUR value set earlier. */
+   if( astTestColour( this, id ) ) ret = astGetColour( this, id );
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int UseFont( AstPlot *this, int id ) {
+/*
+*  Name:
+*     UseFont
+
+*  Purpose:
+*     Get the Font value to use for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int UseFont( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This returns the Font value for the graphical element specified by
+*     id. If an element related to a specific axis is requested, but is
+*     not set, a default value equal to the non-axis-specific element 
+*     is returned. For eaxmple, if the Font for AXIS1_ID is requested
+*     but the user has not set a value for Font(axis1), then the value
+*     of Font(axes) is returned, or NOFONT if Font(axes) has not been
+*     set either.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Font value to use or NOFONT.
+
+*/
+
+/* Local Variables: */
+   int ret;
+  
+/* Check the global error status. */
+   ret = NOFONT;
+   if ( !astOK ) return ret;
+
+/* Font(axes) provides the default for Font(axis1) and Font(axis2),
+   so if Font(axis1) or Font(axis2) has been requested but is not set,
+   use Font(axes) instead. */
+   if( id == AXIS1_ID || id == AXIS2_ID ) {
+      if( !astTestFont( this, id ) ) {
+         id = AXIS_ID;
+      }
+
+/* Likewise for NumLabs1 and NumLabs2 */
+   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
+      if( !astTestFont( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for TextLab1 and textLab2 */
+   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
+      if( !astTestFont( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for Ticks1 and Ticks2 */
+   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
+      if( !astTestFont( this, id ) ) {
+         id = TICKS_ID;
+      }
+   }
+
+/* If the requested value is set, get the value. Otherwise retain the
+   NOFONT value set earlier. */
+   if( astTestFont( this, id ) ) ret = astGetFont( this, id );
+
+/* Return the result. */
+   return ret;
+
+}
+
+static double UseSize( AstPlot *this, int id ) {
+/*
+*  Name:
+*     UseSize
+
+*  Purpose:
+*     Get the Size value to use for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     double UseSize( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This returns the Size value for the graphical element specified by
+*     id. If an element related to a specific axis is requested, but is
+*     not set, a default value equal to the non-axis-specific element 
+*     is returned. For eaxmple, if the Size for AXIS1_ID is requested
+*     but the user has not set a value for Size(axis1), then the value
+*     of Size(axes) is returned, or NOSIZE if Size(axes) has not been
+*     set either.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Size value to use or NOSIZE.
+
+*/
+
+/* Local Variables: */
+   double ret;
+  
+/* Check the global error status. */
+   ret = NOSIZE;
+   if ( !astOK ) return ret;
+
+/* Size(axes) provides the default for Size(axis1) and Size(axis2),
+   so if Size(axis1) or Size(axis2) has been requested but is not set,
+   use Size(axes) instead. */
+   if( id == AXIS1_ID || id == AXIS2_ID ) {
+      if( !astTestSize( this, id ) ) {
+         id = AXIS_ID;
+      }
+
+/* Likewise for NumLabs1 and NumLabs2 */
+   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
+      if( !astTestSize( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for TextLab1 and textLab2 */
+   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
+      if( !astTestSize( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for Ticks1 and Ticks2 */
+   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
+      if( !astTestSize( this, id ) ) {
+         id = TICKS_ID;
+      }
+   }
+
+/* If the requested value is set, get the value. Otherwise retain the
+   NOSIZE value set earlier. */
+   if( astTestSize( this, id ) ) ret = astGetSize( this, id );
+
+/* Return the result. */
+   return ret;
+
+}
+
+static int UseStyle( AstPlot *this, int id ) {
+/*
+*  Name:
+*     UseStyle
+
+*  Purpose:
+*     Get the Style value to use for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     int UseStyle( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This returns the Style value for the graphical element specified by
+*     id. If an element related to a specific axis is requested, but is
+*     not set, a default value equal to the non-axis-specific element 
+*     is returned. For eaxmple, if the Style for AXIS1_ID is requested
+*     but the user has not set a value for Style(axis1), then the value
+*     of Style(axes) is returned, or NOSTYLE if Style(axes) has not been
+*     set either.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Style value to use or NOSTYLE.
+
+*/
+
+/* Local Variables: */
+   int ret;
+  
+/* Check the global error status. */
+   ret = NOSTYLE;
+   if ( !astOK ) return ret;
+
+/* Style(axes) provides the default for Style(axis1) and Style(axis2),
+   so if Style(axis1) or Style(axis2) has been requested but is not set,
+   use Style(axes) instead. */
+   if( id == AXIS1_ID || id == AXIS2_ID ) {
+      if( !astTestStyle( this, id ) ) {
+         id = AXIS_ID;
+      }
+
+/* Likewise for NumLabs1 and NumLabs2 */
+   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
+      if( !astTestStyle( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for TextLab1 and textLab2 */
+   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
+      if( !astTestStyle( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for Ticks1 and Ticks2 */
+   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
+      if( !astTestStyle( this, id ) ) {
+         id = TICKS_ID;
+      }
+   }
+
+/* If the requested value is set, get the value. Otherwise retain the
+   NOSTYLE value set earlier. */
+   if( astTestStyle( this, id ) ) ret = astGetStyle( this, id );
+
+/* Return the result. */
+   return ret;
+
+}
+
+static double UseWidth( AstPlot *this, int id ) {
+/*
+*  Name:
+*     UseWidth
+
+*  Purpose:
+*     Get the Width value to use for a specified graphical element.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "plot.h"
+*     double UseWidth( AstPlot *this, int id )
+
+*  Class Membership:
+*     Plot member function.
+
+*  Description:
+*     This returns the Width value for the graphical element specified by
+*     id. If an element related to a specific axis is requested, but is
+*     not set, a default value equal to the non-axis-specific element 
+*     is returned. For eaxmple, if the Width for AXIS1_ID is requested
+*     but the user has not set a value for Width(axis1), then the value
+*     of Width(axes) is returned, or NOWIDTH if Width(axes) has not been
+*     set either.
+
+*  Parameters:
+*     this
+*        Pointer to the Plot.
+*     id
+*        An integer specifying the graphical element to be drawn.
+
+*  Returned Value:
+*     The Width value to use or NOWIDTH.
+
+*/
+
+/* Local Variables: */
+   double ret;
+  
+/* Check the global error status. */
+   ret = NOWIDTH;
+   if ( !astOK ) return ret;
+
+/* Width(axes) provides the default for Width(axis1) and Width(axis2),
+   so if Width(axis1) or Width(axis2) has been requested but is not set,
+   use Width(axes) instead. */
+   if( id == AXIS1_ID || id == AXIS2_ID ) {
+      if( !astTestWidth( this, id ) ) {
+         id = AXIS_ID;
+      }
+
+/* Likewise for NumLabs1 and NumLabs2 */
+   } else if( id == NUMLABS1_ID || id == NUMLABS2_ID ) {
+      if( !astTestWidth( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for TextLab1 and textLab2 */
+   } else if( id == TEXTLAB1_ID || id == TEXTLAB2_ID ) {
+      if( !astTestWidth( this, id ) ) {
+         id = NUMLABS_ID;
+      }
+
+/* Likewise for Ticks1 and Ticks2 */
+   } else if( id == TICKS1_ID || id == TICKS2_ID ) {
+      if( !astTestWidth( this, id ) ) {
+         id = TICKS_ID;
+      }
+   }
+
+/* If the requested value is set, get the value. Otherwise retain the
+   NOWIDTH value set earlier. */
+   if( astTestWidth( this, id ) ) ret = astGetWidth( this, id );
+
+/* Return the result. */
+   return ret;
 
 }
 

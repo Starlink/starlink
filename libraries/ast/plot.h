@@ -538,7 +538,7 @@ f     - Strings: Text strings drawn using AST_TEXT
 
 /* Macros. */
 /* ======= */
-#define AST__NPID      10   /* No. of different plot object id's */
+#define AST__NPID      18   /* No. of different plot object id's */
 
 #define AST__GATTR	0   /* Identifiers for GRF functions */
 #define AST__GFLUSH	1
