@@ -376,6 +376,7 @@
       INTEGER NKP                ! No. of values supplied for parameter KEYPOS
       INTEGER NVEC               ! No. of vectors in catalogue
       INTEGER VCI                ! Vector colour index
+      LOGICAL ALIGN              ! Was DATA pic aligned with an old DATA pic?
       LOGICAL AXES               ! Annotated axes to be drawn?
       LOGICAL F1, F2, F3         ! Were explicit text heights set?
       LOGICAL KEY                ! A key to vector scale to be plotted?
@@ -699,15 +700,15 @@
          MARGIN( 2 ) = KEYPOS( 1 )
 
 *  Start up the graphics system, creating a KEY picture.
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK', 'POLPLOT', ' ', 
-     :                   MARGIN, 1, 'KEY', 'R', 0.25, ASPECT, DOMAIN, 
-     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPLOT', ' ', MARGIN, 1, 
+     :                   'KEY', 'R', 0.25, ASPECT, DOMAIN, BOX, IPICD, 
+     :                   IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
 
 *  Otherwise, start up the graphics system, creating no KEY picture.
       ELSE
-         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK', 'POLPLOT', ' ', 
-     :                   MARGIN, 0, ' ', ' ', 0.0, ASPECT, DOMAIN, 
-     :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, STATUS )
+         CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPLOT', ' ', MARGIN, 0, 
+     :                   ' ', ' ', 0.0, ASPECT, DOMAIN, BOX, IPICD, 
+     :                   IPICF, IPICK, IPLOT, NFRM, ALIGN, STATUS )
       END IF
 
 *  Find the index of the Frame within the Plot corresponding to the 
@@ -873,8 +874,7 @@
          CALL KPG1_ASPSY( '(TEXT)', '(STRINGS)', STATUS )
 
 *  Set the style for plotting in the key picture.
-         CALL KPG1_GTSTY( 'KEYSTYLE', .FALSE., 
-     :                    'POLPACK.POLPLOT.KEYSTYLE', IPLOTK, STATUS )
+         CALL KPG1_ASSET( 'POLPLOT', 'KEYSTYLE', IPLOTK, STATUS )
 
 *  Now produce the key.
          CALL KPS1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,

@@ -433,15 +433,13 @@ kpg1_chscn.f kpg1_aschp.f kpg1_asffr.f kpg1_aspsy.f kpg1_asunt.f \
 kpg1_cpctd.f kpg1_cpctr.f kpg1_cshft.f kpg1_dsfrm.f kpg1_frmmk.f \
 kpg1_gdact.f kpg1_gddat.f kpg1_gddfp.f kpg1_gdfnd.f kpg1_gdfrm.f \
 kpg1_gdplt.f kpg1_gdqpc.f kpg1_gdsav.f kpg1_grpsz.f kpg1_gtcol.f \
-kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f kpg1_gtsty.f \
-kpg1_odadd.f kpg1_odasp.f kpg1_odast.f kpg1_oddel.f kpg1_odfil.f \
-kpg1_odfld.f kpg1_odget.f kpg1_odloc.f kpg1_odprs.f kpg1_odset.f \
-kpg1_odthr.f kpg1_odtrn.f kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f \
-kpg1_plot.f kpg1_prnth.f kpg1_rcatw.f kpg1_vect.f kpg1_wread.f \
+kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f \
+kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f \
+kpg1_prnth.f kpg1_rcatw.f kpg1_vect.f kpg1_wread.f \
 kpg1_wwrt.f kps1_vecky.f pol1_vecpl.f polplot.f kpg1_rdast.f kpg1_wrast.f \
 kpg1_short.f kpg1_isscs.f kpg1_h2ast.f kpg1_ast2h.f kpg1_chscs.f \
 kpg1_seteq.f kpg1_asget.f kpg1_wcatw.f pol1_squar.f pol1_clcnt.f \
-pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_odrst.f kpg1_asrep.f \
+pol1_stk2.f pol1_setd.f polbin.f pol1_ctclm.f kpg1_asrep.f \
 ccd1_repc.f pol1_rmbnd.f kpg1_gtctw.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
@@ -1530,23 +1528,9 @@ kpg1_gtctw.o:	SAE_PAR AST_PAR CAT_PAR
 kpg1_gtctc.o:	SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 kpg1_gtfrm.o:	SAE_PAR AST_PAR GRP_PAR NDF_PAR PAR_ERR
 kpg1_gtgrp.o:	SAE_PAR GRP_PAR PAR_ERR
-kpg1_gtsty.o:	SAE_PAR AST_PAR GRP_PAR PAR_ERR CTM_PAR
-kpg1_odadd.o:	SAE_PAR DAT_PAR
-kpg1_odasp.o:	SAE_PAR
-kpg1_odast.o:	SAE_PAR DAT_PAR AST_PAR
-kpg1_oddel.o:	SAE_PAR DAT_PAR
-kpg1_odfil.o:	SAE_PAR DAT_PAR DAT_ERR PSX_ERR
-kpg1_odfld.o:	SAE_PAR
-kpg1_odget.o:	SAE_PAR DAT_PAR
-kpg1_odloc.o:	SAE_PAR DAT_PAR
-kpg1_odprs.o:	SAE_PAR DAT_PAR AST_PAR
-kpg1_odset.o:	SAE_PAR DAT_PAR GRP_PAR
-kpg1_odthr.o:	SAE_PAR DAT_PAR
-kpg1_odtrn.o:	SAE_PAR GRP_PAR CTM_PAR
 kpg1_pgsht.o:	SAE_PAR
 kpg1_pgsty.o:	SAE_PAR AST_PAR
 kpg1_plcip.o:	SAE_PAR CTM_PAR
-kpg1_plot.o:	SAE_PAR PAR_ERR AST_PAR
 kpg1_prnth.o:	SAE_PAR
 kpg1_rcatw.o:	AST_PAR CAT_PAR DAT_PAR GRP_PAR KPG_AST KPG_PAR SAE_PAR
 kpg1_rfcor.o:	DAT_PAR     

@@ -47,10 +47,8 @@ kpg1_chscs.f kpg1_cpctd.f kpg1_cpctr.f kpg1_cshft.f kpg1_dsfrm.f \
 kpg1_frmmk.f kpg1_gdact.f kpg1_gddat.f kpg1_gddfp.f kpg1_gdfnd.f \
 kpg1_gdfrm.f kpg1_gdplt.f kpg1_gdqpc.f kpg1_gdsav.f kpg1_grpsz.f \
 kpg1_gtcol.f kpg1_gtcta.f kpg1_gtctc.f kpg1_gtfrm.f kpg1_gtgrp.f \
-kpg1_gtsty.f kpg1_h2ast.f kpg1_isscs.f kpg1_odadd.f kpg1_odasp.f \
-kpg1_odast.f kpg1_oddel.f kpg1_odfil.f kpg1_odfld.f kpg1_odget.f \
-kpg1_odloc.f kpg1_odprs.f kpg1_odset.f kpg1_odthr.f kpg1_odtrn.f \
-kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f kpg1_plot.f kpg1_prnth.f \
+kpg1_h2ast.f kpg1_isscs.f \
+kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f kpg1_prnth.f \
 kpg1_rcatw.f kpg1_rdast.f kpg1_seteq.f kpg1_short.f kpg1_vect.f \
 kpg1_wcatw.f kpg1_wrast.f kpg1_wread.f kpg1_wwrt.f kpg_ast kpg_par \
 kps1_vecky.f polplot.f polplot.ifl pol1_vecpl.f pol1_clcnt.f \
