@@ -173,6 +173,12 @@ f     - AST_REMOVEFRAME: Remove a Frame from a FrameSet
 *     24-JAN-2004 (DSB):
 *        o  Override the astFields method.
 *        o  Add argument "fmt" to Abbrev.
+*     24-AUG-2004 (DSB):
+*        - Override various methods inherited from Frame (astAngle,
+*	astAxAngle, astAxDistance, astAxOffset, astCheckPerm, astOffset2,
+*	astResolve, astSystemCode, astSystemString, astValidateSystem,
+*	astValidateAxisSelection). These should have been overridden a
+*       long time ago!
 *class--
 */
 
@@ -726,8 +732,13 @@ static const char *GetSymbol( AstFrame *, int );
 static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const int *GetPerm( AstFrame * );
+static double Angle( AstFrame *, const double[], const double[], const double[] );
+static double AxAngle( AstFrame *, const double[], const double[], int );
+static double AxDistance( AstFrame *, int, double, double );
+static double AxOffset( AstFrame *, int, double, double );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
+static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int ForceCopy( AstFrameSet *, int );
 static int GetBase( AstFrameSet * );
@@ -769,7 +780,11 @@ static int TestUnit( AstFrame *, int );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
 static int ValidateFrameIndex( AstFrameSet *, int, const char * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
+static AstSystemType SystemCode( AstFrame *, const char * );
+static const char *SystemString( AstFrame *, AstSystemType );
 static void AddFrame( AstFrameSet *, int, AstMapping *, AstFrame * );
+static void CheckPerm( AstFrame *, const int *, const char * );
 static void Clear( AstObject *, const char * );
 static void ClearAttrib( AstObject *, const char * );
 static void ClearBase( AstFrameSet * );
@@ -799,6 +814,7 @@ static void RecordIntegrity( AstFrameSet * );
 static void RemapFrame( AstFrameSet *, int, AstMapping * );
 static void RemoveFrame( AstFrameSet *, int );
 static void ReportPoints( AstMapping *, int, AstPointSet *, AstPointSet * );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void RestoreIntegrity( AstFrameSet * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxis( AstFrame *, int, AstAxis * );
@@ -819,6 +835,7 @@ static void SetSymbol( AstFrame *, int, const char * );
 static void SetTitle( AstFrame *, const char * );
 static void SetUnit( AstFrame *, int, const char * );
 static void TidyNodes( AstFrameSet * );
+static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static void VSet( AstObject *, const char *, va_list );
 
 static double GetBottom( AstFrame *, int );
@@ -1331,6 +1348,392 @@ f     Frame of the FRAME FrameSet. This latter Frame becomes the
          }
       }
    }
+}
+
+static double Angle( AstFrame *this_frame, const double a[],
+                     const double b[], const double c[] ) {
+/*
+*  Name:
+*     Angle
+
+*  Purpose:
+*     Calculate the angle subtended by two points at a third point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double Angle( AstFrame *this, const double a[], const double b[],
+*                   const double c[] )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astAngle
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function finds the angle at point B between the line joining points 
+*     A and B, and the line joining points C and B. These lines will in fact be
+*     geodesic curves appropriate to the Frame in use. For instance, in
+*     SkyFrame, they will be great circles.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     a
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the first point.
+*     b
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the second point.
+*     c
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the third point.
+
+*  Returned Value:
+*     astAngle
+*        The angle in radians, from the line AB to the line CB. If the
+*        Frame is 2-dimensional, it will be in the range $\pm \pi$,
+*        and positive rotation is in the same sense as rotation from
+*        the positive direction of axis 2 to the positive direction of
+*        axis 1. If the Frame has more than 2 axes, a positive value will
+*        always be returned in the range zero to $\pi$.
+
+*  Notes:
+*     - A value of AST__BAD will also be returned if points A and B are
+*     co-incident, or if points B and C are co-incident.
+*     - A value of AST__BAD will also be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astAngle method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astAngle( fr, a, b, c );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static double AxAngle( AstFrame *this_frame, const double a[], const double b[], int axis ) {
+/*
+*  Name:
+*     AxAngle
+
+*  Purpose:
+*     Returns the angle from an axis, to a line through two points.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double AxAngle( AstFrame *this, const double a[], const double b[], int axis )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astAxAngle
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function finds the angle, as seen from point A, between the positive
+*     direction of a specified axis, and the geodesic curve joining point
+*     A to point B.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     a
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the first point.
+*     b
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute) containing the coordinates of the second point.
+*     axis
+*        The number of the Frame axis from which the angle is to be
+*        measured.
+
+*  Returned Value:
+*        The angle in radians, from the positive direction of the
+*        specified axis, to the line AB. If the Frame is 2-dimensional,
+*        it will be in the range $\pm \pi$, and positive rotation is in
+*        the same sense as rotation from the positive direction of axis 2
+*        to the positive direction of axis 1. If the Frame has more than 2
+*        axes, a positive value will always be returned in the range zero
+*        to $\pi$.
+
+*  Notes:
+*     - The geodesic curve used by this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the require
+*     position angle is undefined.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, "astAxAngle" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astAxAngle method for this Frame. Annul the Frame pointer
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astAxAngle( fr, a, b, axis );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static double AxDistance( AstFrame *this_frame, int axis, double v1, double v2 ) {
+/*
+*  Name:
+*     AxDistance
+
+*  Purpose:
+*     Find the distance between two axis values.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double AxDistance( AstFrame *this, int axis, double v1, double v2 )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astAxDistance
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a signed value representing the axis increment
+*     from axis value v1 to axis value v2.
+*
+*     For a simple Frame, this is a trivial operation returning the
+*     difference between the two axis values. But for other derived classes
+*     of Frame (such as a SkyFrame) this is not the case.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
+*     v1
+*        The first axis value.
+*     v2
+*        The second axis value.
+
+*  Returned Value:
+*     The distance between the two axis values.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input vaues has this value.
+*     - A "bad" value will also be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, "astAxDistance" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astAxDistance method for this Frame. Annul the Frame pointer
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astAxDistance( fr, axis, v1, v2 );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static double AxOffset( AstFrame *this_frame, int axis, double v1, double dist ) {
+/*
+*  Name:
+*     AxOffset
+
+*  Purpose:
+*     Add an increment onto a supplied axis value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double AxOffset( AstFrame *this, int axis, double v1, double dist )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astAxOffset
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns an axis value formed by adding a signed axis
+*     increment onto a supplied axis value.
+*
+*     For a simple Frame, this is a trivial operation returning the
+*     sum of the two supplied values. But for other derived classes
+*     of Frame (such as a SkyFrame) this is not the case.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The index of the axis to which the supplied values refer. The
+*        first axis has index 1.
+*     v1
+*        The original axis value.
+*     dist
+*        The axis increment to add to the original axis value.
+
+*  Returned Value:
+*     The incremented axis value.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input vaues has this value.
+*     - A "bad" value will also be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Validate the axis index. */
+   (void) astValidateAxis( this, axis, "astAxOffset" );
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astAxOffset method for this Frame. Annul the Frame pointer
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astAxOffset( fr, axis, v1, dist );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
+}
+
+static void CheckPerm( AstFrame *this_frame, const int *perm, const char *method ) {
+/*
+*  Name:
+*     CheckPerm
+
+*  Purpose:
+*     Check that an array contains a valid permutation.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void CheckPerm( AstFrame *this, const int *perm, const char *method )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astCheckPerm
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function checks the validity of a permutation array that
+*     will be used to permute the order of a Frame's axes. If the
+*     permutation specified by the array is not valid, an error is
+*     reported and the global error status is set. Otherwise, the
+*     function returns without further action.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     perm
+*        Pointer to an array of integers with the same number of
+*        elements as there are axes in the Frame. For each axis, the
+*        corresponding integer gives the (zero based) axis index to be
+*        used to identify the information for that axis (using the
+*        un-permuted axis numbering). To be valid, the integers in
+*        this array should therefore all lie in the range zero to
+*        (naxes-1) inclusive, where "naxes" is the number of Frame
+*        axes, and each value should occur exactly once.
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate a permutation array. This method name is used
+*        solely for constructing error messages.
+
+*  Notes:
+*     - Error messages issued by this function refer to the external
+*     (public) numbering system used for axes (which is one-based),
+*     whereas zero-based axis indices are used internally.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astCheckPerm method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   astCheckPerm( fr, perm, method );
+   fr = astAnnul( fr );
+
 }
 
 static void Clear( AstObject *this_object, const char *attrib ) {
@@ -4015,6 +4418,11 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    mapping->Transform = Transform;
 
    frame->Abbrev = Abbrev;
+   frame->Angle = Angle;
+   frame->AxAngle = AxAngle;
+   frame->AxDistance = AxDistance;
+   frame->AxOffset = AxOffset;
+   frame->CheckPerm = CheckPerm;
    frame->ClearDigits = ClearDigits;
    frame->ClearDirection = ClearDirection;
    frame->ClearDomain = ClearDomain;
@@ -4054,10 +4462,12 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->Match = Match;
    frame->Norm = Norm;
    frame->Offset = Offset;
+   frame->Offset2 = Offset2;
    frame->Overlay = Overlay;
    frame->PermAxes = PermAxes;
    frame->PickAxes = PickAxes;
    frame->PrimaryFrame = PrimaryFrame;
+   frame->Resolve = Resolve;
    frame->SetAxis = SetAxis;
    frame->SetDigits = SetDigits;
    frame->SetDirection = SetDirection;
@@ -4073,6 +4483,8 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->SetTitle = SetTitle;
    frame->SetUnit = SetUnit;
    frame->SubFrame = SubFrame;
+   frame->SystemCode = SystemCode;
+   frame->SystemString = SystemString;
    frame->TestDigits = TestDigits;
    frame->TestDirection = TestDirection;
    frame->TestDomain = TestDomain;
@@ -4088,6 +4500,8 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->TestUnit = TestUnit;
    frame->Unformat = Unformat;
    frame->ValidateAxis = ValidateAxis;
+   frame->ValidateAxisSelection = ValidateAxisSelection;
+   frame->ValidateSystem = ValidateSystem;
 
    frame->GetActiveUnit = GetActiveUnit;
    frame->SetActiveUnit = SetActiveUnit;
@@ -4403,6 +4817,100 @@ static void Offset( AstFrame *this_frame, const double point1[],
    fr = astGetFrame( this, AST__CURRENT );
    astOffset( fr, point1, point2, offset, point3 );
    fr = astAnnul( fr );
+}
+
+static double Offset2( AstFrame *this_frame, const double point1[2], 
+                       double angle, double offset, double point2[2] ){
+/*
+*  Name:
+*     Offset2
+
+*  Purpose:
+*     Calculate an offset along a geodesic curve in a 2D Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     double Offset2( AstFrame *this, const double point1[2], double angle,
+*                     double offset, double point2[2] );
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astOffset2
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function finds the Frame coordinate values of a point which
+*     is offset a specified distance along the geodesic curve at a
+*     given angle from a specified starting point. It can only be
+*     used with 2-dimensional Frames.
+*
+*     For example, in a basic Frame, this offset will be along the
+*     straight line joining two points. For a more specialised Frame
+*     describing a sky coordinate system, however, it would be along
+*     the great circle passing through two sky positions.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This should contain the coordinates of the
+*        point marking the start of the geodesic curve.
+*     angle
+*        The angle (in radians) from the positive direction of the second
+*        axis, to the direction of the required position, as seen from
+*        the starting position. Positive rotation is in the sense of
+*        rotation from the positive direction of axis 2 to the positive
+*        direction of axis 1.
+*     offset
+*        The required offset from the first point along the geodesic
+*        curve. If this is positive, it will be in the direction of the
+*        given angle. If it is negative, it will be in the opposite
+*        direction.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the required point will be returned.
+
+*  Returned Value:
+*     The direction of the geodesic curve at the end point. That is, the
+*     angle (in radians) between the positive direction of the second
+*     axis and the continuation of the geodesic curve at the requested
+*     end point. Positive rotation is in the sense of rotation from
+*     the positive direction of axis 2 to the positive direction of axis 1.
+
+*  Notes:
+*     - The geodesic curve used by this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - An error will be reported if the Frame is not 2-dimensional.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   double result;                /* Value to return */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astOffset2 method for this Frame. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astOffset2( fr, point1, angle, offset, point2 );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BAD;
+
+/* Return the result. */
+   return result;
 }
 
 static void Overlay( AstFrame *template_frame, const int *template_axes,
@@ -5217,6 +5725,92 @@ static void ReportPoints( AstMapping *this_mapping, int forward,
 /* Annul the Frame pointers. */
    base_frame = astAnnul( base_frame );
    current_frame = astAnnul( current_frame );
+}
+
+static void Resolve( AstFrame *this_frame, const double point1[],
+                     const double point2[], const double point3[],
+                     double point4[], double *d1, double *d2 ){
+/*
+*  Name:
+*     Resolve
+
+*  Purpose:
+*     Resolve a vector into two orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void Resolve( AstFrame *this, const double point1[],
+*                   const double point2[], const double point3[],
+*                   double point4[], double *d1, double *d2 );
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astResolve
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function resolves a vector into two perpendicular components.
+*     The vector from point 1 to point 2 is used as the basis vector.
+*     The vector from point 1 to point 3 is resolved into components
+*     parallel and perpendicular to this basis vector. The lengths of the
+*     two components are returned, together with the position of closest
+*     aproach of the basis vector to point 3.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vector to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     point3
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the vector to be
+*        resolved.
+*     point4
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the point of closest approach of the
+*        basis vector to point 3 will be returned.
+*     d1
+*        The address of a location at which to return the distance from
+*        point 1 to point 4 (that is, the length of the component parallel
+*        to the basis vector). Positive values are in the same sense as
+*        movement from point 1 to point 2.
+*     d2
+*        The address of a location at which to return the distance from
+*        point 4 to point 3 (that is, the length of the component
+*        perpendicular to the basis vector). The value is always positive.
+
+*  Notes:
+*     - Each vector used in this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the required
+*     output values are undefined.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astResolve method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   astResolve( fr, point1, point2, point3, point4, d1, d2 );
+   fr = astAnnul( fr );
+
 }
 
 static void RestoreIntegrity( AstFrameSet *this ) {
@@ -6127,6 +6721,146 @@ static int SubFrame( AstFrame *this_frame, AstFrame *template,
    return match;
 }
 
+static AstSystemType SystemCode( AstFrame *this_frame, const char *system ) {
+/*
+*  Name:
+*     SystemCode
+
+*  Purpose:
+*     Convert a string into a coordinate system type code.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     AstSystemType SystemCode( AstFrame *this, const char *system )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astSystemCode
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function converts a string used for the external description of
+*     a coordinate system into a Frame coordinate system type code (System
+*     attribute value). It is the inverse of the astSystemString function.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        Pointer to a constant null-terminated string containing the
+*        external description of the coordinate system.
+
+*  Returned Value:
+*     The System type code.
+
+*  Notes:
+*     - A value of AST__BADSYSTEM is returned if the coordinate system
+*     description was not recognised. This does not produce an error.
+*     - A value of AST__BADSYSTEM is also returned if this function
+*     is invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   AstSystemType result;      /* Result value to return */
+   AstFrame *fr;              /* Pointer to FrameSet's current Frame */
+   AstFrameSet *this;         /* Pointer to the FrameSet structure */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astSystemCode method for this Frame. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astSystemCode( fr, system );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BADSYSTEM;
+
+/* Return the result. */
+   return result;
+}
+
+static const char *SystemString( AstFrame *this_frame, AstSystemType system ) {
+/*
+*  Name:
+*     SystemString
+
+*  Purpose:
+*     Convert a coordinate system type code into a string.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     const char *SystemString( AstFrame *this, AstSystemType system )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astSystemString
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function converts a Frame coordinate system type code
+*     (System attribute value) into a string suitable for use as an
+*     external representation of the coordinate system type.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The coordinate system type code.
+
+*  Returned Value:
+*     Pointer to a constant null-terminated string containing the
+*     textual equivalent of the type code supplied.
+
+*  Notes:
+*     - A NULL pointer value is returned if the coordinate system
+*     code was not recognised. This does not produce an error.
+*     - A NULL pointer value is also returned if this function is
+*     invoked with the global error status set or if it should fail
+*     for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to FrameSet's current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+   const char *result;           /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astSystemString method for this Frame. Annul the Frame pointer 
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astSystemString( fr, system );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = NULL;
+
+/* Return the result pointer. */
+   return result;
+
+}
+
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -6848,6 +7582,72 @@ static int ValidateAxis( AstFrame *this_frame, int axis, const char *method ) {
    return result;
 }
 
+static void ValidateAxisSelection( AstFrame *this_frame, int naxes, 
+                                   const int *axes, const char *method ) {
+/*
+*  Name:
+*     ValidateAxisSelection
+
+*  Purpose:
+*     Check that a set of axes selected from a Frame is valid.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     void ValidateAxisSelection( AstFrame *this, int naxes,
+*                                 const int *axes, const char *method )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astValidateAxisSelection
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function checks the validity of an array of (zero-based)
+*     axis indices that specify a set of axes to be selected from a
+*     Frame. To be valid, no axis should be selected more than
+*     once. In assessing this, any axis indices that do not refer to
+*     valid Frame axes (e.g. are set to -1) are ignored.
+*
+*     If the axis selection is valid, this function returns without further
+*     action. Otherwise, an error is reported and the global error status is
+*     set.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     naxes
+*        The number of axes to be selected (may be zero).
+*     axes
+*        Pointer to an array of int with naxes elements that contains the
+*        (zero based) axis indices to be checked.
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis selection. This method name is used
+*        solely for constructing error messages.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstFrameSet *this;            /* Pointer to the FrameSet structure */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke this
+   Frame's astValidateAxisSelection method. Annul the Frame pointer 
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   astValidateAxisSelection( fr, naxes, axes, method );
+   fr = astAnnul( fr );
+
+}
+
 static int ValidateFrameIndex( AstFrameSet *this, int iframe,
                                const char *method ) {
 /*
@@ -6937,6 +7737,80 @@ static int ValidateFrameIndex( AstFrameSet *this, int iframe,
          }
       }
    }
+
+/* Return the result. */
+   return result;
+}
+
+static int ValidateSystem( AstFrame *this_frame, AstSystemType system, const char *method ) {
+/*
+*  Name:
+*     ValidateSystem
+
+*  Purpose:
+*     Validate a value for a Frame's System attribute.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int ValidateSystem( AstFrame *this, AstSystemType system,
+*                         const char *method )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astValidateSystem
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function checks the validity of the supplied system value.
+*     If the value is valid, it is returned unchanged. Otherwise, an
+*     error is reported and a value of AST__BADSYSTEM is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The system value to be checked.
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis index. This method name is used solely
+*        for constructing error messages.
+
+*  Returned Value:
+*     The validated system value.
+
+*  Notes:
+*     - A value of AST_BADSYSTEM will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstSystemType result;      /* Validated system value */
+   AstFrame *fr;              /* Pointer to FrameSet's current Frame */
+   AstFrameSet *this;         /* Pointer to the FrameSet structure */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the FrameSet structure. */
+   this = (AstFrameSet *) this_frame;
+
+/* Obtain a pointer to the FrameSet's current Frame and invoke the
+   astValidateSystem method for this Frame. Annul the Frame pointer 
+   afterwards. */
+   fr = astGetFrame( this, AST__CURRENT );
+   result = astValidateSystem( this, system, method );
+   fr = astAnnul( fr );
+
+/* If an error occurred, clear the result value. */
+   if ( !astOK ) result = AST__BADSYSTEM;
 
 /* Return the result. */
    return result;
