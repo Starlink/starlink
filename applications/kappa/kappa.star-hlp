@@ -24840,8 +24840,9 @@ Description:
    `star' is a poor fit to model or it could not be located.
 
    An optional plot of the mean profile and the fitted function may
-   be produced.  The point-spread function may be stored in an NDF
-   for later use.
+   be produced.  The 2-dimensional point-spread function may be stored 
+   in an NDF for later use, as may the 1-dimensional fitted profile.
+
 2 Parameters
 For information on individual parameters, select from the list below:
 3 AMP1
@@ -24978,6 +24979,15 @@ OUT = NDF (Write)
    is added, and is made the current Frame. This Frame measures the
    distance from the PSF centre in the units in which the FWHM is
    reported. [!]
+3 PROFOUT
+PROFOUT = NDF (Write)
+   The NDF containing the 1-dimensional fitted profile as displayed
+   in the plot. If null, !, is entered no output NDF will be created. 
+   The DATA component of this NDF holds the fitted PSF value at each 
+   radial bin. The VARIANCE component holds the square of the residuals 
+   between the fitted values and the binned values derived from the 
+   input NDF. An AXIS component is included in the NDF containing the 
+   radial distance as displayed in the plot. [!]
 3 POSCOLS
 POSCOLS = _INTEGER (Read)
    Column positions of the co-ordinates (x then y) in an input record

@@ -14,9 +14,9 @@
 \newcommand{\stardocsource}    {sun95.17}
 \newcommand{\stardocnumber}    {95.17}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {13 June 2001}
+\newcommand{\stardocdate}      {10 July 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocversion}   {0.18}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -33644,8 +33644,8 @@ plot (9k).
       `star' is a poor fit to model or it could not be located.
 
       An optional plot of the mean profile and the fitted function may
-      be produced.  The point-spread function may be stored in an NDF
-      for later use.
+      be produced.  The 2-dimensional point-spread function may be stored 
+      in an NDF for later use, as may the 1-dimensional fitted profile.
    }
    \sstusage{
       psf in incat [device] [out] [cut] [range] [isize] [poscols]
@@ -33835,6 +33835,17 @@ plot (9k).
          will be requested.  Only accessed if INCAT is given a null ({\tt !})
          value. If a null ({\tt !}) value is supplied for POSCOLS, the values
          [1,2] will be used. {\tt [!]}
+      }
+      \sstsubsection{
+         PROFOUT = NDF (Write)
+      }{
+         The NDF containing the 1-dimensional fitted profile as displayed
+         in the plot. If null, {\tt !}, is entered no output NDF will be created. 
+         The DATA component of this NDF holds the fitted PSF value at each 
+         radial bin. The VARIANCE component holds the square of the residuals 
+         between the fitted values and the binned values derived from the 
+         input NDF. An AXIS component is included in the NDF containing the 
+         radial distance as displayed in the plot. {\tt [!]}
       }
       \sstsubsection{
          RANGE = \_REAL (Read)
@@ -44119,7 +44130,7 @@ The following new commands have been added:
        FrameSet so that they refer to the correct pixel axes.
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V1.0\label{se:changes}}
+\section{\xlabel{se_changes}Release Notes---V.18\label{se:changes}}
 
 \subsection{Removed Commands}
 The following obsolete commands have been removed from KAPPA -
@@ -44150,6 +44161,18 @@ The following applications have been modified:
                output pixel values. At the moment, it gives the choice of 
                a simple mean or a weighted mean, but other options may be
                added in the future.
+      \end{itemize}
+
+   \item [\htmlref{PSF}{PSF}] \mbox{}
+      \begin{itemize}
+         A new parameter called PROFOUT has been added. It which allows 
+         the displayed profile to be saved in a 1-dimensional NDF.
+      \end{itemize}
+
+   \item [\htmlref{PSF}{PSF}] \mbox{}
+      \begin{itemize}
+         A bug has been fixed which could cause bad values in the output
+         to be treated as good values.
       \end{itemize}
 
 \end{description}
