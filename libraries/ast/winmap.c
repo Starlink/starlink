@@ -149,6 +149,7 @@ static AstWinMap *WinUnit( AstWinMap *, AstUnitMap *, int, int );
 static AstWinMap *WinWin( AstMapping *, AstMapping *, int, int, int );
 static AstWinMap *WinZoom( AstWinMap *, AstZoomMap *, int, int, int, int );
 static const char *GetAttrib( AstObject *, const char * );
+static double Rate( AstMapping *, double *, int, int );
 static int CanSwap( AstMapping *, AstMapping *, int, int, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
@@ -562,6 +563,7 @@ void astInitWinMapVtab_(  AstWinMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->Rate = Rate;
 
 /* Declare the class dump, copy and delete functions.*/
    astSetDump( vtab, Dump, "WinMap", "Map one window on to another" );
@@ -1606,6 +1608,84 @@ static void PermGet( AstPermMap *map, int **outperm, int **inperm,
 
 /* Return. */
    return;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "winmap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     WinMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. 
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*/
+
+/* Local Variables: */
+   AstWinMap *map;
+   double result;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Get a pointer to the WinMap structure. */
+   map = (AstWinMap *) this;
+
+/* If the input and output axes are not equal the result is zero. */
+   if( ax1 != ax2 ) {
+      result = 0.0;
+
+/* Otherwise, return the scale factor for the axis, taking the reciprocal
+   if the WinMap has been inverted. */
+   } else {
+      result = ( map->b )[ ax1 ];
+      if( astGetInvert( map ) ) {
+         if( result != 0.0 && result != AST__BAD ) {
+            result = 1.0/result;
+         } else {
+            result = AST__BAD;
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
 }
 
 static void SetAttrib( AstObject *this_object, const char *setting ) {

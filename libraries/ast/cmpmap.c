@@ -135,6 +135,7 @@ AstCmpMap *astCmpMapId_( void *, void *, int, const char *, ... );
 static AstMapping *CombineMaps( AstMapping *, int, AstMapping *, int, int );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static double Rate( AstMapping *, double *, int, int );
 static int CountMappings( AstMapping * );
 static int PatternCheck( int, int, int **, int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -481,6 +482,7 @@ void astInitCmpMapVtab_(  AstCmpMapVtab *vtab, const char *name ) {
    mapping->Decompose = Decompose;
    mapping->MapMerge = MapMerge;
    mapping->Simplify = Simplify;
+   mapping->Rate = Rate;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -1377,6 +1379,168 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpmap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     CmpMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. 
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*/
+
+/* Local Variables: */
+   AstMapping *c1;
+   AstMapping *c2;
+   AstCmpMap *map;
+   double result;
+   int old_inv1;
+   int old_inv2;
+   int nin1;
+   int nin2;
+   double *at2;
+   double r1;
+   double r2;
+   int nout1;
+   int i;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Get a pointer to the CmpMap structure. */
+   map = (AstCmpMap *) this;
+
+/* Note the current Invert flags of the two component Mappings. */
+   old_inv1 = astGetInvert( map->map1 );
+   old_inv2 = astGetInvert( map->map2 );
+
+/* Temporarily reset them to the values they had when the CmpMap was 
+   created. */
+   astSetInvert( map->map1, map->invert1 );
+   astSetInvert( map->map2, map->invert2 );
+
+/* If the CmpMap itself has been inverted, invert the component Mappings.
+   Also note the order in which the Mappings should be applied if in series. */
+   if( !astGetInvert( this ) ) {
+      c1 = map->map1;
+      c2 = map->map2;
+   } else {
+      c1 = map->map2;
+      c2 = map->map1;
+      astInvert( c1 );
+      astInvert( c2 );
+   }
+
+/* First deal with Mappings in series. */
+   if( map->series ) {
+
+/* Get the number of inputs to the two component Mappings. */
+      nin1 = astGetNin( c1 );
+      nin2 = astGetNin( c2 );
+
+/* Allocate workspace to hold the result of transforming the supplied "at" 
+   position using the first component. */
+      at2 = astMalloc( sizeof( double )*(size_t) nin2 );
+
+/* Transform the supplied "at" position using the first component. */
+      astTranN( c1, 1, nin1, 1, at, 1, nin2, 1, at2 );
+
+/* The required rate of change is the sum of the products of the rate of
+   changes of the two component mappings, summed over all the output axes
+   of the first componment. */
+      result = 0.0;
+      for( i = 0; i < nin2; i++ ) {
+
+/* Find the rate of change of output "i" of the first component with
+   respect to input "ax2" at the supplied "at" position. */
+         r1 = astRate( c1, at, i, ax2 );
+
+/* Find the rate of change of output "ax1" of the second component with
+   respect to input "i" at the transformed "at2" position. */
+         r2 = astRate( c2, at2, ax1, i );
+
+/* If both are good, increment the ryunning total by the product of the
+   two rates. Otherwise, break. */
+         if( r1 != AST__BAD && r2 != AST__BAD ) {
+            result += r1*r2;
+         } else {
+            result = AST__BAD;
+            break;
+         }
+      }
+
+/* Free the workspace. */
+      at2 = astFree( at2 );
+
+/* Now deal with Mappings in parallel. */
+   } else {
+
+/* Get the number of inputs and outputs for the lower component Mappings. */
+      nin1 = astGetNin( map->map1 );
+      nout1 = astGetNout( map->map1 );
+
+/* If both input and output relate to the lower component Mappings, use its
+   astRate method. */
+      if( ax1 < nout1 && ax2 < nin1 ) {
+         result = astRate( map->map1, at, ax1, ax2 );
+         
+/* If both input and output relate to the upper component Mappings, use its
+   astRate method. */
+      } else if( ax1 >= nout1 && ax2 >= nin1 ) {
+         result = astRate( map->map2, at + nin1, ax1 - nout1, ax2 - nin1 );
+         
+/* If input and output relate to different component Mappings, return
+   zero. */
+      } else {
+         result = 0.0;
+      }         
+   }
+
+/* Reinstate the original Invert flags of the component Mappings .*/
+   astSetInvert( map->map1, old_inv1 );
+   astSetInvert( map->map2, old_inv2 );
 
 /* Return the result. */
    return result;

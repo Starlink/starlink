@@ -4160,6 +4160,7 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    int limit;              /* Maximum grid dimension */
    int nbndry;             /* No. of boundary cells with current flag value */
    int ncell;              /* No. of cells along each edge of coarse grid */
+   int rate_disabled;      /* Was the astRate method initially disabled? */
    int rdim;               /* No. of points along each edge of fine grid */
    int ret;                /* Any regions containing bad physical coords? */
    int rsize;              /* No. of points in fine grid */
@@ -4189,6 +4190,12 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
    power = -0.666666666;
    dim = (int) pow( tol, power ) + 10;
    if( dim > 400 ) dim = 400;
+
+/* Disable the astRate method in order to improve the speed of
+   evaluating the Mapping in cases where the Mapping includes an
+   AstRateMap. Note the original value of hte flag so that it can be
+   re-instated at the end. */
+   rate_disabled = astRateState( 1 );
 
 /* Create the grid. */
    ptr2 = MakeGrid( this, NULL, map, dim, this->xlo, this->xhi, this->ylo, 
@@ -4439,6 +4446,9 @@ static int Boundary( AstPlot *this, const char *method, const char *class ){
           }
        }
     }
+
+/* Re-instate the original setting of the "astRate disabled" flag. */
+   astRateState( rate_disabled );
 
 /* Release the remaining resources. */
    map = astAnnul( map );

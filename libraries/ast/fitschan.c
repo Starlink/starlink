@@ -10653,7 +10653,7 @@ static AstMapping *GrismSpecWcs( char *algcode, FitsStore *store, int i,
 
 /* Find the rate of change of grism parameter with respect to the S
    system at the reference point, dg/dS. */
-      dg = astRate( map1, &crv, 0, 0, NULL );
+      dg = astRate( map1, &crv, 0, 0 );
       if( dg != AST__BAD && dg != 0.0 ) {
 
 /* FITS-WCS paper II requires headers to be constructed so that dS/dw = 1.0 
@@ -17679,7 +17679,7 @@ static AstMapping *NonLinSpecWcs( AstFitsChan *this, char *algcode,
 
 /* Find the rate of change of S with respect to X (dS/dX) at the reference 
    point (x = crv). */
-      ds = astRate( map1, &crv, 0, 0, NULL );
+      ds = astRate( map1, &crv, 0, 0 );
       if( ds != AST__BAD && ds != 0.0 ) {
 
 /* FITS-WCS paper III says that dS/dw must be 1.0 at the reference point.
@@ -21933,7 +21933,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
 
 /* Also use it to get the rate of change of S with respect to X at the
    reference point. */
-                     dsbydx = astRate( tmap5, &xval, 0, 0, NULL );
+                     dsbydx = astRate( tmap5, &xval, 0, 0 );
 
 /* Create the Mapping which defines the spectral IWC axis. This is the
    Mapping from WCS to IWC - it first converts from S to X, then subtracts 
@@ -22052,7 +22052,7 @@ static AstMapping *SpectralAxes( AstFrameSet *fs, double *dim, int *wperm,
 
 /* Also use it to find the rate of change of grism parameter with respect 
    to "S" at the reference point. */
-                        dgbyds = astRate( tmap4, &crval, 0, 0, NULL );
+                        dgbyds = astRate( tmap4, &crval, 0, 0 );
 
 /* FITS-WCS paper III required ds/dw to be unity at the reference point.
    Therefore the rate of change of grism parameter with respect to IWC ("w") 

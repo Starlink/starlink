@@ -76,7 +76,11 @@
 
  20   continue
 
-      if( ok ) write(*,*) 'TestXmlChan: Test passed'
+      if( ok ) then
+         write(*,*) 'All XmlChan tests passed'
+      else
+         write(*,*) 'XmlChan tests failed'
+      end if
 
       end
 

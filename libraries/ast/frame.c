@@ -10010,6 +10010,21 @@ f        is .TRUE.
 *        its enclosing FrameSet in order to reflect the change in units
 c        (see astSetActiveUnit function for further information).
 f        (see AST_SETACTIVEUNIT routine for further information).
+*     FluxFrame
+*        The FluxFrame class supports the following System values and
+*        associated systems for measuring observed value:
+*
+*        - "FLUXDEN": Flux density in frequency units (W/m^2/Hz)
+*        - "FLUXDENW": Flux density in wavelength units (W/m^2/Angstrom)
+*
+*        The above lists specified the default units for each System. If an 
+*        explicit value is set for the Unit attribute but no value is set 
+*        for System, then the default System value is determined by the Unit 
+*        string (if the units are not appropriate for describing any of the 
+*        supported Systems then an error will be reported when an attempt is 
+*        made to access the System value). If no value has been specified for
+*        either Unit or System, then System=FLUXDEN and Unit=W/m^2/Hz are
+*        used.
 *att--
 */
 /* Clear the System value by setting it to AST__BADSYSTEM. */

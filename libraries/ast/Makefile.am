@@ -26,6 +26,7 @@ GRP_C_ROUTINES = \
     fellipse.c \
     ferror.c \
     ffitschan.c \
+    ffluxframe.c \
     fframe.c \
     fframeset.c \
     fgrismmap.c \
@@ -34,6 +35,7 @@ GRP_C_ROUTINES = \
     fitschan.c \
     fkeymap.c \
     flutmap.c \
+    fluxframe.c \
     fmapping.c \
     fmathmap.c \
     fmatrixmap.c \
@@ -47,10 +49,12 @@ GRP_C_ROUTINES = \
     fpolymap.c \
     frame.c \
     frameset.c \
+    fratemap.c \
     fregion.c \
     fshiftmap.c \
     fskyframe.c \
     fslamap.c \
+    fspecfluxframe.c \
     fspecframe.c \
     fspecmap.c \
     fsphmap.c \
@@ -79,11 +83,13 @@ GRP_C_ROUTINES = \
     pointset.c \
     polygon.c \
     polymap.c \
+    ratemap.c \
     region.c \
     shiftmap.c \
     skyaxis.c \
     skyframe.c \
     slamap.c \
+    specfluxframe.c \
     specframe.c \
     specmap.c \
     sphmap.c \
@@ -134,6 +140,8 @@ AST_H_FILES = \
           zoommap.h \
           frame.h \
              cmpframe.h \
+                specfluxframe.h \
+             fluxframe.h \
              frameset.h \
                 plot.h \
              skyframe.h \

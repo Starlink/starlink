@@ -451,18 +451,16 @@ F77_DOUBLE_FUNCTION(ast_rate)( INTEGER(THIS),
                                DOUBLE_ARRAY(AT),
                                INTEGER(AX1),
                                INTEGER(AX2),
-                               DOUBLE(D2),
                                INTEGER(STATUS) ) {
    GENPTR_INTEGER(THIS)
    GENPTR_INTEGER(AX1)
    GENPTR_INTEGER(AX2)
    GENPTR_DOUBLE_ARRAY(AT)
-   GENPTR_DOUBLE(D2)
    F77_DOUBLE_TYPE(RESULT);
 
    astAt( "AST_RATE", NULL, 0 );
    astWatchSTATUS(
-      RESULT = astRate( astI2P( *THIS ), AT, *AX1, *AX2, D2 );
+      RESULT = astRate( astI2P( *THIS ), AT, *AX1, *AX2 );
    )
    return RESULT;
 }

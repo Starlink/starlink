@@ -133,6 +133,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        CmpMaps in supplied Mapping.
 *     9-NOV-2004 (DSB):
 *        Override astEqual method.
+*     6-DEC-2004 (DSB):
+*        Remove the second derivative estimate from the astRate function
+*        since CmpMap has trouble calculating it.
 *class--
 */
 
@@ -234,6 +237,12 @@ static int (* parent_equal)( AstObject *, AstObject * );
    error messages. */
 static AstMapping *unsimplified_mapping;
 
+/* A flag which indicates if the astRate method should be disabled in
+   order to improve algorithm speed in cases where the rate value is not
+   significant. If astRate is disabled then it always returns a constant
+   value of 1.0. */
+static int rate_disabled = 0;
+
 /* Prototypes for private member functions. */
 /* ======================================== */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
@@ -252,7 +261,7 @@ static double MapFunction( const MapData *, const double [], int * );
 static double MaxD( double, double );
 static double NewVertex( const MapData *, int, double, double [], double [], int *, double [] );
 static double Random( long int * );
-static double Rate( AstMapping *, double *, int, int, double * );
+static double Rate( AstMapping *, double *, int, int );
 static double UphillSimplex( const MapData *, double, int, const double [], double [], double *, int * );
 static int Equal( AstObject *, AstObject * );
 static int GetInvert( AstMapping * );
@@ -588,6 +597,54 @@ static void Decompose( AstMapping *this, AstMapping **map1, AstMapping **map2,
    if( invert1 ) *invert1 = astGetInvert( this );
    if( invert2 ) *invert2 = 0;
 }
+
+int astRateState_( int disabled ) {
+/*
+*+
+*  Name:
+*     astRateState
+
+*  Purpose:
+*     Control whether the astRate method is disabled or not.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "mapping.h"
+*     int astRateState( int disabled )
+
+*  Class Membership:
+*     Mapping member function
+
+*  Description:
+*     Some algorithms which use use the astRate method do not actually need
+*     to know what the Rate value is. For instance, when the Plot class draws 
+*     a border it evaluates the GRAPHICS->Current Mapping hundreds of time.
+*     If the Mapping includes a RateMap then this can be very very slow
+*     (depending on how the astRate method is implemented). In fact the
+*     border drawing algorithm onlyneeds to know if the result is bad or
+*     not - the actual value produced by the Mappign does not matter.
+*
+*     Such algorithms can be speeded up by forcing the astRate method to
+*     return a constant value rather than actually doing the numerical
+*     differentiation. This can be accomplised by calling this method prior
+*     to implementing the algorithm. It should be called at the end in
+*     order to re-instate the original disabled flag.
+
+*  Parameters:
+*     disabled
+*        The new value for the astRate disabled flag.
+
+*  Returned Value:
+*     The original value of the astRate disabled flag.
+
+*-
+*/
+   int result = rate_disabled;
+   rate_disabled = disabled;
+   return result;
+}   
 
 static int Equal( AstObject *this_object, AstObject *that_object ) {
 /*
@@ -7105,7 +7162,7 @@ static double Random( long int *seed ) {
    return ( (double) ( *seed - 1 ) ) / (double) 2147483646;
 }
 
-static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
 /*
 *+
 *  Name:
@@ -7119,7 +7176,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 
 *  Synopsis:
 *     #include "mapping.h"
-*     result = astRate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
+*     result = astRate( AstMapping *this, double *at, int ax1, int ax2 )
 
 *  Class Membership:
 *     Mapping method.
@@ -7127,7 +7184,7 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 *  Description:
 *     This function evaluates the rate of change of a specified output of 
 *     the supplied Mapping with respect to a specified input, at a 
-*     specified input position. Also evaluates the second derivative.
+*     specified input position. 
 *
 *     The result is estimated by interpolating the function using a
 *     fourth order polynomial in the neighbourhood of the specified
@@ -7150,10 +7207,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 0 for the first 
 *        input).
-*     d2
-*        Address of a location at which to return an estimate of the
-*        second derivative of the Mapping function at the specified point.
-*        May be NULL.
 
 *  Returned Value:
 *     astRate()
@@ -7182,7 +7235,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 
 /* Initialise */
    ret = AST__BAD;
-   if( d2 ) *d2 = AST__BAD;
 
 /* Check the global error status. */
    if ( !astOK ) return ret;
@@ -7273,7 +7325,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
    return it. */
       if( ed2 <= 1.0E-10*fabs( s1/h ) ) {
          ret = s1;
-         if( d2 ) *d2 = ed2;
  
       } else {
 
@@ -7323,7 +7374,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
    values and break. */
                if( rms == 0.0 ) { 
                   ret = fit->coeff[ 1 ];
-                  if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
                   fit = astFree( fit );
                   break;
 
@@ -7388,7 +7438,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
 
                      if( rms == 0.0 ) { 
                         ret = fit->coeff[ 1 ];
-                        if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
                         fit = astFree( fit );
                         break;
 
@@ -7428,7 +7477,6 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
                fit = FitPN( this, at, ax1, ax2, x0, h0, &rms );
                if( fit ) {         
                   ret = fit->coeff[ 1 ];
-                  if( d2 ) *d2 = 2.0*fit->coeff[ 2 ];
                   fit = astFree( fit );
                }
             }
@@ -13570,9 +13618,26 @@ MAKE_RESAMPLE_(US,unsigned short int)
 MAKE_RESAMPLE_(B,signed char)
 MAKE_RESAMPLE_(UB,unsigned char)
 #undef MAKE_RESAMPLE_
-double astRate_( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+
+double astRate_( AstMapping *this, double *at, int ax1, int ax2 ){
    if ( !astOK ) return AST__BAD;
-   return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2, d2 );
+
+   if( ax1 < 0 || ax1 >= astGetNout( this ) ) {
+      astError( AST__AXIIN, "astRate(%s): Invalid output index (%d) "
+                "specified - should be in the range 1 to %d.",
+                astGetClass( this ), ax1 + 1, astGetNout( this ) );
+      
+   } else if( ax2 < 0 || ax2 >= astGetNin( this ) ) {
+      astError( AST__AXIIN, "astRate(%s): Invalid input index (%d) "
+                "specified - should be in the range 1 to %d.",
+                astGetClass( this ), ax2 + 1, astGetNin( this ) );
+   }
+
+   if( rate_disabled ) {
+      return ( at[ ax2 ] != AST__BAD ) ? 1.0 : AST__BAD;
+   } else {    
+      return (**astMEMBER(this,Mapping,Rate))( this, at, ax1, ax2 );
+   }   
 }
 AstMapping *astSimplify_( AstMapping *this ) {
    if ( !astOK ) return NULL;
@@ -13624,7 +13689,7 @@ int astLinearApprox_( AstMapping *this, const double *lbnd,
    within this module. */
 void DecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void MapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-double astRateId_( AstMapping *, double *, int, int, double * );
+double astRateId_( AstMapping *, double *, int, int );
 
 /* Special interface function implementations. */
 /* ------------------------------------------- */
@@ -13978,7 +14043,7 @@ f     routine is invoked with STATUS set to an error value.
                lbnd_out, ubnd_out, xl, xu );
 }
 
-double astRateId_( AstMapping *this, double *at, int ax1, int ax2, double *d2 ){
+double astRateId_( AstMapping *this, double *at, int ax1, int ax2 ){
 /*
 *++
 *  Name:
@@ -13993,8 +14058,8 @@ f     AST_RATE
 
 *  Synopsis:
 c     #include "mapping.h"
-c     double astRate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
-f     RESULT = AST_RATE( THIS, AT, AX1, AX2, D2 )
+c     double astRate( AstMapping *this, double *at, int ax1, int ax2 )
+f     RESULT = AST_RATE( THIS, AT, AX1, AX2 )
 
 *  Class Membership:
 *     Mapping method.
@@ -14034,14 +14099,6 @@ f     AX2 = INTEGER (Given)
 *        The index of the Mapping input which is to be varied in order to
 *        find the rate of change (input numbering starts at 1 for the first 
 *        input).
-c     d2
-f     D2 = DOUBLE PRECISION (Returned)
-c        Address of a location at which to return an estimate of the
-c        second derivative of the Mapping function at the specified point.
-c        May be NULL.
-f        An estimate of the second derivative of the Mapping function at the 
-f        specified point.
-
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 
@@ -14075,5 +14132,5 @@ f        calculated.
 
 /* Invoke the protected version of this function with the axis indices
    decremented. */
-   return astRate_( this, at, ax1 - 1, ax2 - 1, d2 );
+   return astRate_( this, at, ax1 - 1, ax2 - 1 );
 }

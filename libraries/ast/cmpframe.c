@@ -508,6 +508,7 @@ static const char *(* parent_getattrib)( AstObject *, const char * );
 static int (* parent_testattrib)( AstObject *, const char * );
 static void (* parent_clearattrib)( AstObject *, const char * );
 static void (* parent_setattrib)( AstObject *, const char * );
+static void (* parent_overlay)( AstFrame *, const int *, AstFrame * );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -594,6 +595,7 @@ static void SetMaxAxes( AstFrame *, int );
 static void SetMinAxes( AstFrame *, int );
 static void SetSymbol( AstFrame *, int, const char * );
 static void SetUnit( AstFrame *, int, const char * );
+static void Overlay( AstFrame *, const int *, AstFrame * );
 
 static const char *GetAttrib( AstObject *, const char * );
 static int TestAttrib( AstObject *, const char * );
@@ -2937,6 +2939,9 @@ void astInitCmpFrameVtab_(  AstCmpFrameVtab *vtab, const char *name ) {
    parent_getalignsystem = frame->GetAlignSystem;
    frame->GetAlignSystem = GetAlignSystem;
 
+   parent_overlay = frame->Overlay;
+   frame->Overlay = Overlay;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    frame->Abbrev = Abbrev;
@@ -3650,6 +3655,262 @@ static void Offset( AstFrame *this_frame, const double point1[],
    then set these in the output array. */
    if ( astOK && bad ) {
       for ( axis = 0; axis < naxes; axis++ ) point3[ axis ] = AST__BAD;
+   }
+}
+
+static void Overlay( AstFrame *template_frame, const int *template_axes,
+                     AstFrame *result ) {
+/*
+*  Name:
+*     Overlay
+
+*  Purpose:
+*     Overlay the attributes of a template CmpFrame on to another Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void Overlay( AstFrame *template, const int *template_axes,
+*                   AstFrame *result )
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the protected astOverlay
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function overlays attributes from a CmpFrame on to another Frame, 
+*     so as to over-ride selected attributes of that second Frame. Normally 
+*     only those attributes which have been specifically set in the template 
+*     will be transferred. This implements a form of defaulting, in which 
+*     a Frame acquires attributes from the template, but retains its
+*     original attributes (as the default) if new values have not previously 
+*     been explicitly set in the template.
+
+*  Parameters:
+*     template
+*        Pointer to the template CmpFrame, for whose current Frame
+*        values should have been explicitly set for any attribute
+*        which is to be transferred.
+*     template_axes
+*        Pointer to an array of int, with one element for each axis of
+*        the "result" Frame (see below). For each axis in the result
+*        frame, the corresponding element of this array should contain
+*        the (zero-based) index of the axis in the current Frame of
+*        the template CmpFrame to which it corresponds. This array is
+*        used to establish from which template Frame axis any
+*        axis-dependent attributes should be obtained.
+*
+*        If any axis in the result Frame is not associated with a
+*        template Frame axis, the corresponding element of this array
+*        should be set to -1.
+*     result
+*        Pointer to the Frame which is to receive the new attribute values.
+*/
+
+/* Local Variables: */
+   AstCmpFrame *res;             /* Pointer to the result CmpFrame structure */
+   AstCmpFrame *template;        /* Pointer to the template CmpFrame structure */
+   AstFrame *sub1;               /* Template subframe for 1st result subframe */
+   AstFrame *sub2;               /* Template subframe for 2nd result subframe */
+   const int *perm;              /* Template axis permutation array */
+   const int *rperm;             /* Result axis permutation array */
+   int *axes1;                   /* Axis associations with template frame1 */
+   int *axes2;                   /* Axis associations with template frame2 */
+   int done;                     /* Have attributes been overlayed yet? */
+   int i;                        /* Index of result axis */
+   int icmp;                     /* Internal template axis number */
+   int isfirst;                  /* Res. subframe -> 1st template subframe? */ 
+   int issecond;                 /* Res. subframe -> 2nd template subframe? */ 
+   int j;                        /* Index of template axis */
+   int nc1;                      /* Number of axes in template frame1 */
+   int nres1;                    /* Number of axes in first result subframe */
+   int nres2;                    /* Number of axes in second result subframe */
+   int nres;                     /* Number of axes in result Frame */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   template = (AstCmpFrame *) template_frame;
+
+/* Get the axis permutation array for the template CmpFrame. */
+   perm = astGetPerm( template );
+
+/* Get the number of axes in the first component Frame in the template
+   CmpFrame. */
+   nc1 = astGetNaxes( template->frame1 );
+
+/* Indicate we have not yet overlayed any attributes. */
+   done = 0;
+
+/* If the result Frame is a CmpFrame... */
+   if( astIsACmpFrame( result ) ) {
+
+/* Get the number of axes in the two component Frames of the result CmpFrame. */
+      res = (AstCmpFrame *) result;
+      nres1 = astGetNaxes( res->frame1 );
+      nres2 = astGetNaxes( res->frame2 );
+
+/* Get the total number of axes in the result CmpFrame. */
+      nres = nres1 + nres2;
+
+/* Get the axis permutation array for the result CmpFrame. */
+      rperm = astGetPerm( result );
+
+/* Allocate memory for two new axes arrays, one for each result sub-frame. */
+      axes1 = astMalloc( sizeof(int)*(size_t)nres1 );
+      axes2 = astMalloc( sizeof(int)*(size_t)nres2 );
+      if( astOK ) {
+
+/* Assume that there is a 1-to-1 correspondence between axes in the
+   subframes of the result and template CmpFrame. That is, all the axes
+   in each result sub-frame are overlayed from the same template sub-frame. */
+         done = 1;
+
+/* Loop round each axis in the first result sub-frame. */
+         isfirst = 0;
+         issecond = 0;
+         for( i = 0; i < nres1; i++ ) {
+
+/* Find the external result CmpFrame axis index (j) for internal axis i. */
+            for( j = 0; j < nres; j++ ) {
+               if( rperm[ j ] == i ) break;
+            }
+
+/* Get the internal axis number within the template CmpFrame which
+   provides attribute values for the current result axis. */
+            icmp = perm[ template_axes[ j ] ];
+
+/* If this template axis is in the first template subframe, store the 
+   corresponding internal frame axis index in "axes1" and set a flag
+   indicating that the first result subframe corresponds to the first
+   template subframe. If the correspondance has already been established, 
+   but is broken by this axis, then set "done" false and exit the axis
+   loop. */
+            if( icmp < nc1 ) { 
+               if( issecond ) {
+                  done = 0;
+                  break;
+               } else {
+                  isfirst = 1;
+                  axes1[ i ] = icmp;
+               }
+         
+            } else {
+               if( isfirst ) {
+                  done = 0;
+                  break;
+               } else {
+                  issecond = 1;
+                  axes1[ i ] = icmp - nc1;
+               }
+            }         
+         }
+
+/* Save a pointer to the template subframe which is associated with the first 
+   result subframe.*/
+         sub1 = isfirst ?  template->frame1 :template->frame2;
+
+/* Now do the same for the axes in the second result sub-frame. */
+         isfirst = 0;
+         issecond = 0;
+         for( i = 0; i < nres2; i++ ) {
+            for( j = 0; j < nres; j++ ) {
+               if( rperm[ j ] == i + nres1 ) break;
+            }
+
+            icmp = perm[ template_axes[ j ] ];
+
+            if( icmp < nc1 ) { 
+               if( issecond ) {
+                  done = 0;
+                  break;
+               } else {
+                  isfirst = 1;
+                  axes2[ i ] = icmp;
+               }
+         
+            } else {
+               if( isfirst ) {
+                  done = 0;
+                  break;
+               } else {
+                  issecond = 1;
+                  axes2[ i ] = icmp - nc1;
+               }
+            }         
+         }
+
+/* Save a pointer to the template subframe which is associated with the
+   second result subframe.*/
+         sub2 = isfirst ?  template->frame1 :template->frame2;
+
+/* If the two used template subframes are the same, something has gone
+   wrong. */
+         if( sub1 == sub2 ) done = 0;
+
+/* If all axes within each result subframe are associated with the same
+   template subframe we continue to use the subframe astOverlay methods. */
+         if( done ) {
+
+/* Overlay the first result subframe. */
+            astOverlay( sub1, axes1, res->frame1 );
+            astOverlay( sub2, axes2, res->frame2 );
+         }
+      }
+
+/* Free the axes arrays. */
+      axes1 = astFree( axes1 );
+      axes2 = astFree( axes2 );
+   }
+
+/* If we have not yet overlayed any attributes... */
+   if( !done ) {
+
+/* Get the number of axes in the result Frame. */
+      nres = astGetNaxes( result );
+
+/* Allocate memory for two new template_axes arrays. */
+      axes1 = astMalloc( sizeof(int)*(size_t)nres );
+      axes2 = astMalloc( sizeof(int)*(size_t)nres );
+      if( astOK ) {
+
+/* Set elements to -1 in "axes1" if they do not refer to the first component 
+   Frame in the template CmpFrame. Likewise, set elements to -1 in "axes2" if 
+   they do not refer to the second component Frame in the template CmpFrame. */
+         for( i = 0; i < nres; i++ ) {
+
+/* Get the internal axis number within the template CmpFrame which
+   provides attribute values for the current results axis. */
+            icmp = perm[ template_axes[ i ] ];
+
+/* If this template axis is in the first component Frame, store the 
+   corresponding internal frame axis index in "axes1" and set "axis2" to
+   -1. */
+            if( icmp < nc1 ) { 
+               axes1[ i ] = icmp;
+               axes2[ i ] = -1;
+         
+/* If this template axis is in the second component Frame, store the 
+   corresponding internal frame axis index in "axes2" and set "axis1" to
+   -1. */
+            } else {
+               axes1[ i ] = -1;
+               axes2[ i ] = icmp - nc1;
+            }         
+         }
+
+/* Now use the astOverlay methods of the two component Frames to overlay
+   attributes onto the appropriate axes of the results Frame. */
+         astOverlay( template->frame1, axes1, result );
+         astOverlay( template->frame2, axes2, result );
+      }
+
+/* Free the axes arrays. */
+      axes1 = astFree( axes1 );
+      axes2 = astFree( axes2 );
    }
 }
 

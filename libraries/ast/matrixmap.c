@@ -189,6 +189,7 @@ static AstMatrixMap *MtrMult( AstMatrixMap *, AstMatrixMap *);
 static AstMatrixMap *MtrRot( AstMatrixMap *, double, const double[] );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static double *InvertMatrix( int, int, int, double * );
+static double Rate( AstMapping *, double *, int, int );
 static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int Ustrcmp( const char *, const char * );
 static int GetTranForward( AstMapping * );
@@ -1041,6 +1042,7 @@ void astInitMatrixMapVtab_(  AstMatrixMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->Rate = Rate;
 
 /* Declare the destructor and copy constructor. */
    astSetDelete( (AstObjectVtab *) vtab, Delete );
@@ -3322,6 +3324,94 @@ static int PermOK( AstMapping *pm ){
    return astOK ? ret : 0;
 }
 
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "matrixmap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     MatrixMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. 
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*/
+
+/* Local Variables: */
+   AstMatrixMap *map;
+   double *matrix; 
+   double result;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Get a pointer to the MatrixMap structure. */
+   map = (AstMatrixMap *) this;
+
+/* Get a pointer to the array holding the required matrix elements, according 
+   to whether the MatrixMap has been inverted. */
+   if( !astGetInvert( this ) ) {
+      matrix = map->f_matrix;
+   } else {
+      matrix = map->i_matrix;
+   }
+
+/* First deal with full MatrixMaps in which all matrix elements are stored. */
+   if( map->form == FULL ){
+      result = matrix[ ax1*astGetNin( this ) + ax2 ];
+
+/* For unit matrices, the rate is unity if the input and output axes are
+   equal, and zero otherwise. */
+   } else if( map->form == UNIT ){
+      result = (ax1 == ax2 ) ? 1.0 : 0.0;
+
+/* For diagonal matrices, the rate is zero for off diagonal elements and
+   the matrix array stored the on-diagonal rates. */
+   } else if( ax1 == ax2 ) {
+      result = matrix[ ax1 ];
+
+   } else {
+      result = 0.0;
+   }      
+
+/* Return the result. */
+   return result;
+}
+
 static void SMtrMult( int post, int m, int n, const double *mat1, 
                         double *mat2, double *work ){
 /*
@@ -3751,7 +3841,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    first element of the matrix prior to processing each point. */
          for ( point = 0; point < npoint; point++ ) {
             matrix_element = matrix;
-
 
 /* Each output co-ordinate value is created by summing the product of the 
    corresponding input co-ordinates and the elements of one row of the 

@@ -113,6 +113,7 @@ AstZoomMap *astZoomMapId_( int, double, const char *, ... );
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );static double GetZoom( AstZoomMap * );
+static double Rate( AstMapping *, double *, int, int);
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int TestAttrib( AstObject *, const char * );
 static int TestZoom( AstZoomMap * );
@@ -353,6 +354,7 @@ void astInitZoomMapVtab_(  AstZoomMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->Rate = Rate;
 
 /* Declare the class dump function. There is no copy constructor or
    destructor. */
@@ -776,6 +778,82 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If an error occurred, clear the returned result. */
    if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "zoommap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     ZoomMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. 
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*/
+
+/* Local Variables: */
+   double result;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Result is zero if the axes differ */
+   if( ax1 != ax2 ) {
+      result = 0.0;
+
+/* Otherwise, get the zoom factor. */
+   } else {
+      result = astGetZoom( (AstZoomMap *) this );
+
+/* If the ZoomMap has been inverted, return the reciprocal of the zoom
+   factor. */
+      if ( astGetInvert( this ) ) {
+         if( result != AST__BAD && result != 0.0 ) {
+            result = 1.0/result;
+         } else {
+            result = AST__BAD;
+         }
+      }
+   }
 
 /* Return the result. */
    return result;

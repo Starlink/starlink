@@ -338,7 +338,7 @@ typedef struct AstMappingVtab {
 
    AstMapping *(* Simplify)( AstMapping * );
    AstPointSet *(* Transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
-   double (* Rate)( AstMapping *, double *, int, int, double * );
+   double (* Rate)( AstMapping *, double *, int, int );
    int (* GetInvert)( AstMapping * );
    int (* GetNin)( AstMapping * );
    int (* GetNout)( AstMapping * );
@@ -425,14 +425,15 @@ void astTranP_( AstMapping *, int, int, const double *[], int, int, double *[] )
 #if defined(astCLASS)            /* Protected */
 void astDecompose_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBox_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-double astRate_( AstMapping *, double *, int, int, double * );
+double astRate_( AstMapping *, double *, int, int );
 #else
 void astDecomposeId_( AstMapping *, AstMapping **, AstMapping **, int *, int *, int * );
 void astMapBoxId_( AstMapping *, const double [], const double [], int, int, double *, double *, double [], double [] );
-double astRateId_( AstMapping *, double *, int, int, double * );
+double astRateId_( AstMapping *, double *, int, int );
 #endif
 
 #if defined(astCLASS)            /* Protected */
+int astRateState_( int );
 AstPointSet *astTransform_( AstMapping *, AstPointSet *, int, AstPointSet * );
 int astGetInvert_( AstMapping * );
 int astGetNin_( AstMapping * );
@@ -533,18 +534,19 @@ astINVOKE(V,astTranP_(astCheckMapping(this),npoint,ncoord_in,ptr_in,forward,ncoo
 astINVOKE(V,astDecompose_(astCheckMapping(this),(AstMapping **)(map1),(AstMapping **)(map2),series,inv1,inv2))
 #define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
 astINVOKE(V,astMapBox_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
-#define astRate(this,at,ax1,ax2,d2) \
-astINVOKE(V,astRate_(astCheckMapping(this),at,ax1,ax2,d2))
+#define astRate(this,at,ax1,ax2) \
+astINVOKE(V,astRate_(astCheckMapping(this),at,ax1,ax2))
 #else
 #define astDecompose(this,map1,map2,series,inv1,inv2) \
 astINVOKE(V,astDecomposeId_(astCheckMapping(this),(AstMapping **)(map1),(AstMapping **)(map2),series,inv1,inv2))
 #define astMapBox(this,lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu) \
 astINVOKE(V,astMapBoxId_(astCheckMapping(this),lbnd_in,ubnd_in,forward,coord_out,lbnd_out,ubnd_out,xl,xu))
-#define astRate(this,at,ax1,ax2,d2) \
-astINVOKE(V,astRateId_(astCheckMapping(this),at,ax1,ax2,d2))
+#define astRate(this,at,ax1,ax2) \
+astINVOKE(V,astRateId_(astCheckMapping(this),at,ax1,ax2))
 #endif
 
 #if defined(astCLASS)            /* Protected */
+#define astRateState astRateState_
 #define astClearInvert(this) \
 astINVOKE(V,astClearInvert_(astCheckMapping(this)))
 #define astClearReport(this) \

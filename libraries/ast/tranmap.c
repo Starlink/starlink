@@ -99,6 +99,7 @@ AstTranMap *astTranMapId_( void *, void *, const char *, ... );
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
+static double Rate( AstMapping *, double *, int, int );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
@@ -175,6 +176,7 @@ void astInitTranMapVtab_(  AstTranMapVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
+   mapping->Rate = Rate;
 
 /* Declare the copy constructor, destructor and class dump function. */
    astSetCopy( vtab, Copy );
@@ -538,6 +540,93 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If an error occurred, clear the result value. */
    if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "tranmap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     TranMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. Also evaluates the second derivative.
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*/
+
+/* Local Variables: */
+   AstTranMap *map;
+   AstMapping *cmap;
+   double result;
+   int cinv;
+   int old_inv;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Get a pointer to the TranMap structure. */
+   map = (AstTranMap *) this;
+
+/* Choose the component Mapping to use, and get its original Invert
+   value. Invert this if the TranMap itself has been inverted (this is
+   because the astRate function has no "invert" argument so we need to
+   invert the Mapping before calling astRate). */
+   if( astGetInvert( this ) ) {
+      cmap = map->map2;
+      cinv = !(map->invert2);
+   } else {
+      cmap = map->map1;
+      cinv = map->invert1;
+   }
+
+/* Temporarily set the Invert flag of the component Mapping back to its
+   original value. */ 
+   old_inv = astGetInvert( cmap );
+   astSetInvert( cmap, cinv );
+
+/* Use the astRate method of the component Mapping. */
+   result = astRate( cmap, at, ax1, ax2 );
+
+/* Re-instate the Invert flag of the component Mapping. */
+   astSetInvert( cmap, old_inv );
 
 /* Return the result. */
    return result;

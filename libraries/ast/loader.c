@@ -10,6 +10,7 @@
 #include "dssmap.h"
 #include "ellipse.h"
 #include "fitschan.h"
+#include "fluxframe.h"
 #include "frame.h"
 #include "frameset.h"
 #include "grismmap.h"
@@ -30,11 +31,13 @@
 #include "pointset.h"
 #include "polygon.h"
 #include "polymap.h"
+#include "ratemap.h"
 #include "region.h"
 #include "shiftmap.h"
 #include "skyaxis.h"
 #include "skyframe.h"
 #include "slamap.h"
+#include "specfluxframe.h"
 #include "specframe.h"
 #include "specmap.h"
 #include "sphmap.h"
@@ -91,6 +94,7 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(DssMap);
    LOAD(Ellipse);
    LOAD(FitsChan);
+   LOAD(FluxFrame);
    LOAD(Frame);
    LOAD(FrameSet);
    LOAD(GrismMap);
@@ -110,11 +114,13 @@ if ( !strcmp( class, #name ) ) return (AstLoaderType *) astLoad##name##_
    LOAD(PointSet);
    LOAD(PolyMap);
    LOAD(Polygon);
+   LOAD(RateMap); 
    LOAD(Region);
    LOAD(ShiftMap);
    LOAD(SkyAxis);
    LOAD(SkyFrame);
    LOAD(SlaMap);
+   LOAD(SpecFluxFrame);
    LOAD(SpecFrame);
    LOAD(SpecMap);
    LOAD(SphMap);

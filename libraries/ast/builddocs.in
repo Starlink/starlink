@@ -38,6 +38,7 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/error.c \
             ${srcdir}/fchannel.c \
             ${srcdir}/fitschan.c \
+            ${srcdir}/fluxframe.c \
             ${srcdir}/frame.c \
             ${srcdir}/frameset.c \
             ${srcdir}/grismmap.c \
@@ -56,12 +57,14 @@ goodsource="${srcdir}/axis.c \
             ${srcdir}/pointset.c \
             ${srcdir}/polygon.c \
             ${srcdir}/polymap.c \
+            ${srcdir}/ratemap.c \
             ${srcdir}/region.c \
             ${srcdir}/shiftmap.c \
             ${srcdir}/skyaxis.c \
             ${srcdir}/skyframe.c \
             ${srcdir}/slamap.c \
             ${srcdir}/specframe.c \
+            ${srcdir}/specfluxframe.c \
             ${srcdir}/specmap.c \
             ${srcdir}/tranmap.c \
             ${srcdir}/unitmap.c \

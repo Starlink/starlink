@@ -15,9 +15,11 @@
       call checkNullRegion( status )
       call checkCmpRegion( status )
 
-      if( status .eq. sai__ok ) write(*,*) 'TestRegions: All Region '//
-     :                                     'tests passed'
-
+      if( status .eq. sai__ok ) then
+         write(*,*) 'All Region tests passed'
+      else
+         write(*,*) 'Region tests failed'
+      end if
 
       end
 

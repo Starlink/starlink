@@ -24,6 +24,20 @@ Region class include testing points to see if they are inside the
 Region, testing two Regions for overlap, transforming Regions from one
 coordinate system to another \emph{etc}.
 
+- A new class of 1-dimensional Frame called FluxFrame has been added which 
+can be used to describe various systems for describing ovserved value at a 
+single fixed spectral position. 
+
+- A new class of 2-dimensional Frame called SpecFluxFrame has been added which 
+can be used to describe a 2-d frame spanned by a spectral position axis
+and and an observed value axis.
+
+- A new class of Mapping called RateMap has been added. A RateMap encapsulates
+a previously created Mapping. The inputs of the RateMap correspond to the
+inputs of the encapsulated Mapping. All RateMaps have just a single
+output which correspond to the rate of change of a specified output of
+the encapsulated Mapping with respect to a specified input.
+
 - The SkyFrame class now supports a value of "J2000" for System. This
 system is an equatorial system based on the mean dynamical equator and
 equinox at J2000, and differs slightly from an FK5(J2000) system.
@@ -31,5 +45,9 @@ equinox at J2000, and differs slightly from an FK5(J2000) system.
 - Methods have been added to the FitsChan class to allow values for named
 keywords to be changed or added.
 
+- The parameter list for the astRate method of the Mapping class has been
+modified. It no longer returns a second derivative estimate. Existing
+code which uses the astRate (AST_RATE) method will need to be changed.
 
-17/11/04
+
+10/12/04

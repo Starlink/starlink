@@ -175,6 +175,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
+static double (* parent_rate)( AstMapping *, double *, int, int );
 
 /* Structure to hold parameters and intermediate values describing a
    reference frame */
@@ -209,6 +210,7 @@ static double GeoVel( double, double, FrameDef * );
 static double LgVel( double, double, FrameDef * );
 static double LsrdVel( double, double, FrameDef * );
 static double LsrkVel( double, double, FrameDef * );
+static double Rate( AstMapping *, double *, int, int );
 static double Refrac( double );
 static double TopoVel( double, double, FrameDef * );
 static double UserVel( double, double, FrameDef * );
@@ -1626,6 +1628,9 @@ void astInitSpecMapVtab_(  AstSpecMapVtab *vtab, const char *name ) {
    parent_transform = mapping->Transform;
    mapping->Transform = Transform;
 
+   parent_rate = mapping->Rate;
+   mapping->Rate = Rate;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    mapping->MapMerge = MapMerge;
@@ -2316,6 +2321,94 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
 
 /* If an error occurred, clear the returned value. */
    if ( !astOK ) result = -1;
+
+/* Return the result. */
+   return result;
+}
+
+static double Rate( AstMapping *this, double *at, int ax1, int ax2 ){
+/*
+*  Name:
+*     Rate
+
+*  Purpose:
+*     Calculate the rate of change of a Mapping output.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "specmap.h"
+*     result = Rate( AstMapping *this, double *at, int ax1, int ax2 )
+
+*  Class Membership:
+*     SpecMap member function (overrides the astRate method inherited
+*     from the Mapping class ).
+
+*  Description:
+*     This function returns the rate of change of a specified output of 
+*     the supplied Mapping with respect to a specified input, at a 
+*     specified input position. 
+
+*  Parameters:
+*     this
+*        Pointer to the Mapping to be applied.
+*     at
+*        The address of an array holding the axis values at the position 
+*        at which the rate of change is to be evaluated. The number of 
+*        elements in this array should equal the number of inputs to the 
+*        Mapping.
+*     ax1
+*        The index of the Mapping output for which the rate of change is to 
+*        be found (output numbering starts at 0 for the first output).
+*     ax2
+*        The index of the Mapping input which is to be varied in order to
+*        find the rate of change (input numbering starts at 0 for the first 
+*        input).
+
+*  Returned Value:
+*     The rate of change of Mapping output "ax1" with respect to input 
+*     "ax2", evaluated at "at", or AST__BAD if the value cannot be 
+*     calculated.
+
+*  Implementation Deficiencies:
+*     The initial version of this implementation only deals with
+*     frequency->wavelength conversions. This is because the slowness of
+*     the numerical differentiation implemented by the astRate method in 
+*     the parent Mapping class is cripples conversion between SpecFluxFrames.
+*     Such conversions only rely on rate of change of wavelength with
+*     respect to frequency. This implementation should be extended when
+*     needed.
+
+*/
+
+/* Local Variables: */
+   AstSpecMap *map;
+   double result;
+   int cvt;
+
+/* Check inherited status */
+   if( !astOK ) return AST__BAD;
+
+/* Get a pointer to the SpecMap structure. */
+   map = (AstSpecMap *) this;
+
+/* Store the type of the first conversion.*/
+   cvt = map->cvttype[ 0 ];
+
+/* If this is a 3D SpecMap or if it has more than one component, or if
+   that conversion is not between frequency and wavelength, use the
+   astRate method inherited form the parent Mapping class. */
+   if( astGetNin( map ) != 1 || map->ncvt != 1 || 
+       ( cvt != AST__WVTOFR && cvt != AST__FRTOWV ) ) {
+      result = (*parent_rate)( this, at, ax1, ax2 );
+
+/* Otherwise, evaluate the known analytical expressions for the rate of
+   change of frequency with respect to wavelength or wavelength with
+   respect to frequency. */
+   } else {
+      result = ( *at != AST__BAD ) ? -AST__C/((*at)*(*at)) : AST__BAD;
+   } 
 
 /* Return the result. */
    return result;
