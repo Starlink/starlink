@@ -62,26 +62,6 @@ set tk_strictMotif 1
 #  Decent precision is nice.
 set tcl_precision 17
 
-#  Define a useful procedure for handling image names with slices.
-proc fileName {image} {
-
-   # return the proper filename of an image and any slice information.
-   set i1 [string last {(} $image]
-   set i2  [string last {)} $image]
-   if { $i1 > -1 && $i2 > -1 } {
-      set slice [string range $image $i1 $i2]
-      incr i1 -1
-      set image [string range $image 0 $i1]
-   } else {
-      set slice ""
-   }
-   set image2 "$image"
-   if { [file extension $image] == "" } {
-      set image "${image}.sdf"
-   }
-   return [list $image $slice]
-}
-
 #  Check any command-line arguments that we've been passed. The first
 #  one is the name of the image and any others are configuration
 #  options. What we need to do is reconstruct an argv string with the
