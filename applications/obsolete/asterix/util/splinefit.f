@@ -29,6 +29,7 @@
 *
 *     11 Jun 91 : Original (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     20 Apr 95 : V1.8-1 New data interface (DJA)
 *
 *    Type definitions :
 *
@@ -37,7 +38,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
 *
 *    Status :
 *
@@ -45,54 +46,53 @@
 *
 *    Local constants :
 *
-      INTEGER                    MAXLINES
-         PARAMETER               ( MAXLINES = 6 )
-      CHARACTER*(DAT__SZTYP)     MAPTYPE
-         PARAMETER               ( MAPTYPE = '_DOUBLE' )
+      INTEGER                   MAXLINES
+        PARAMETER               ( MAXLINES = 6 )
+      CHARACTER*7     		MAPTYPE
+        PARAMETER               ( MAPTYPE = '_DOUBLE' )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)     ALOC                   ! Output dataset ASTERIX
-      CHARACTER*(DAT__SZLOC)     ILOC                   ! Input dataset
-      CHARACTER*(DAT__SZLOC)     OLOC                   ! Output dataset
-      CHARACTER*6                PREC                   ! Precision required
-      CHARACTER*80               TEXT(MAXLINES)         ! History text
+      CHARACTER*6               PREC                   ! Precision required
+      CHARACTER*80              TEXT(MAXLINES)         ! History text
 
-      REAL                       SQ_RES                 ! Spline fit control
-      REAL                       ACC                    ! Fit accuracy achieved
+      REAL                      SQ_RES                 ! Spline fit control
+      REAL                      ACC                    ! Fit accuracy achieved
 
-      INTEGER                    COEFF                  ! Spline coefficients
-      INTEGER                    I                      ! Loop over axes
-      INTEGER                    IDPTR, IVPTR, IQPTR    ! Input data
-      INTEGER                    IAPTR(DAT__MXDIM)      ! pointers
-      INTEGER                    LIWRK, IWRKPTR         ! NAG integer workspace
-      INTEGER                    DIMS(DAT__MXDIM)       ! Input data size
-      INTEGER                    KNOTPTR(DAT__MXDIM)    ! Knot position arrays
-      INTEGER                    MAXKNOT                ! Maximum no of knots
-      INTEGER                    NDIM                   ! Input dimensionality
-      INTEGER                    NELM                   ! Total no. of elements
-      INTEGER                    NEST(DAT__MXDIM)       ! Max # knots per dim
-      INTEGER                    NHREC                  ! # history recs used
-      INTEGER                    NKNOT(DAT__MXDIM)      ! Actual # of knots
-      INTEGER                    ODPTR, OVPTR           ! Output data pointers
-      INTEGER                    TDIMS(DAT__MXDIM)      ! Dummy dims array
-      INTEGER                    TLEN                   ! String length
-      INTEGER                    TNDIM                  ! Temp dimensionality
-      INTEGER                    WGTPTR                 ! Weights array
-      INTEGER                    LWRK,WRKPTR            ! NAG float workspace
+      INTEGER                   COEFF                  ! Spline coefficients
+      INTEGER                   I                      ! Loop over axes
+      INTEGER                   IDPTR, IVPTR, IQPTR    ! Input data
+      INTEGER			IFID			! Input dataset id
+      INTEGER                   IAPTR(ADI__MXDIM)      ! pointers
+      INTEGER                   LIWRK, IWRKPTR         ! NAG integer workspace
+      INTEGER                   DIMS(ADI__MXDIM)       ! Input data size
+      INTEGER                   KNOTPTR(ADI__MXDIM)    ! Knot position arrays
+      INTEGER                   MAXKNOT                ! Maximum no of knots
+      INTEGER                   NDIM                   ! Input dimensionality
+      INTEGER                   NELM                   ! Total no. of elements
+      INTEGER                   NEST(ADI__MXDIM)       ! Max # knots per dim
+      INTEGER                   NHREC                  ! # history recs used
+      INTEGER                   NKNOT(ADI__MXDIM)      ! Actual # of knots
+      INTEGER                   ODPTR, OVPTR           ! Output data pointers
+      INTEGER			OFID			! Output dataset id
+      INTEGER                   TDIMS(ADI__MXDIM)      ! Dummy dims array
+      INTEGER                   TLEN                   ! String length
+      INTEGER                   TNDIM                  ! Temp dimensionality
+      INTEGER                   WGTPTR                 ! Weights array
+      INTEGER                   LWRK,WRKPTR            ! NAG float workspace
 
-      LOGICAL                    ANYBAD                 ! Any bad quality data?
-      LOGICAL                    AFLIP(DAT__MXDIM)      ! Flipped axis
-      LOGICAL                    OK                     ! General validity
-      LOGICAL                    PRIM                   ! Input primitive
-      LOGICAL                    QUAL_OK, VAR_OK        ! Quality,variance ok?
-      LOGICAL                    REG                    ! Axis regular?
-      LOGICAL                    USE_WEIGHTS            ! Use variance & quality
+      LOGICAL                   ANYBAD                 ! Any bad quality data?
+      LOGICAL                   AFLIP(ADI__MXDIM)      ! Flipped axis
+      LOGICAL                   OK                     ! General validity
+      LOGICAL                   PRIM                   ! Input primitive
+      LOGICAL                   QUAL_OK, VAR_OK        ! Quality,variance ok?
+      LOGICAL                   REG                    ! Axis regular?
+      LOGICAL                   USE_WEIGHTS            ! Use variance & quality
 *
 *    Version :
 *
-      CHARACTER*30 VERSION
-        PARAMETER  (VERSION = 'SPLINEFIT Version 1.8-0')
+      CHARACTER*30		VERSION
+        PARAMETER  		( VERSION = 'SPLINEFIT Version 1.8-1' )
 *-
 
 *    Check status
@@ -103,48 +103,48 @@
       CALL AST_INIT()
 
 *    Get locators to input and output
-      CALL USI_ASSOC2( 'INP', 'OUT', 'READ', ILOC, OLOC, PRIM, STATUS )
+      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Copy input to output
-      CALL BDA_COPAXES( ILOC, OLOC, STATUS )
-      CALL BDA_COPMORE( ILOC, OLOC, STATUS )
-      CALL BDA_COPTEXT( ILOC, OLOC, STATUS )
+      CALL BDI_COPAXES( IFID, OFID, STATUS )
+      CALL BDI_COPMORE( IFID, OFID, STATUS )
+      CALL BDI_COPTEXT( IFID, OFID, STATUS )
 
 *    Check input
-      CALL BDA_CHKDATA( ILOC, OK, NDIM, DIMS, STATUS )
+      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
       IF ( .NOT. OK ) THEN
-        CALL MSG_PRNT('! invalid dataset')
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Invalid dataset', STATUS )
         GOTO 99
       END IF
-      CALL BDA_CHKVAR( ILOC, VAR_OK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKVAR( IFID, VAR_OK, TNDIM, TDIMS, STATUS )
       IF ( VAR_OK ) THEN
         CALL MSG_PRNT('Data errors present')
       ELSE
         CALL MSG_PRNT('No data errors')
       END IF
 
-      CALL BDA_CHKQUAL( ILOC, QUAL_OK, TNDIM, TDIMS, STATUS )
+      CALL BDI_CHKQUAL( IFID, QUAL_OK, TNDIM, TDIMS, STATUS )
       IF ( .NOT. QUAL_OK ) THEN
         CALL MSG_PRNT('No data quality')
       ELSE
         CALL MSG_PRNT('Data quality present')
-        CALL BDA_MAPLQUAL( ILOC, 'READ', ANYBAD, IQPTR, STATUS )
+        CALL BDI_MAPLQUAL( IFID, 'READ', ANYBAD, IQPTR, STATUS )
         IF ( .NOT. ANYBAD ) THEN
-          CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+          CALL BDI_UNMAPLQUAL( IFID, STATUS )
           QUAL_OK = .FALSE.
         END IF
       END IF
 
 *    Map input data
-      CALL BDA_MAPTDATA( ILOC, MAPTYPE, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPTDATA( IFID, MAPTYPE, 'READ', IDPTR, STATUS )
 
 *    Create and map output data
-      CALL BDA_CREDATA( OLOC, NDIM, DIMS, STATUS )
-      CALL BDA_MAPTDATA( OLOC, MAPTYPE, 'WRITE', ODPTR, STATUS )
+      CALL BDI_CREDATA( OFID, NDIM, DIMS, STATUS )
+      CALL BDI_MAPTDATA( OFID, MAPTYPE, 'WRITE', ODPTR, STATUS )
       IF ( VAR_OK ) THEN
-        CALL BDA_MAPTVAR( ILOC, MAPTYPE, 'READ', IVPTR, STATUS )
+        CALL BDI_MAPTVAR( IFID, MAPTYPE, 'READ', IVPTR, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -164,9 +164,9 @@
 *    Check and map axes if not primitive
       IF ( .NOT. PRIM ) THEN
         DO I = 1, NDIM
-          CALL BDA_CHKAXVAL( ILOC, I, OK, REG, TDIMS, STATUS )
+          CALL BDI_CHKAXVAL( IFID, I, OK, REG, TDIMS, STATUS )
           IF ( OK ) THEN
-            CALL BDA_MAPTAXVAL( ILOC, MAPTYPE, 'READ', I, IAPTR(I),
+            CALL BDI_MAPTAXVAL( IFID, MAPTYPE, 'READ', I, IAPTR(I),
      :                                                   STATUS )
           ELSE
             CALL MSG_SETI( 'N', I )
@@ -209,8 +209,8 @@
       END IF
 
 *    Unmap stuff no longer needed
-      IF ( VAR_OK ) CALL BDA_UNMAPVAR( ILOC, STATUS )
-      IF ( QUAL_OK ) CALL BDA_UNMAPLQUAL( ILOC, STATUS )
+      IF ( VAR_OK ) CALL BDI_UNMAPVAR( IFID, STATUS )
+      IF ( QUAL_OK ) CALL BDI_UNMAPLQUAL( IFID, STATUS )
 
 *    Map space for knots
       MAXKNOT = 1
@@ -265,11 +265,8 @@
       CALL DYN_UNMAP( WRKPTR, STATUS )
       CALL DYN_UNMAP( IWRKPTR, STATUS )
 
-*    Write spline coefficients to output
-      CALL BDA_LOCAST( OLOC, ALOC, STATUS )
-
 *    Write history
-      CALL HIST_ADD( OLOC, VERSION, STATUS )
+      CALL HSI_ADD( OFID, VERSION, STATUS )
       TEXT(1) = 'Input : {INP}'
       TEXT(2) = ' '
       CALL MSG_SETR( 'FP', ACC )
@@ -278,11 +275,11 @@
       CALL MSG_PRNT( TEXT(3)(:TLEN) )
       NHREC = MAXLINES
       CALL USI_TEXT( 3, TEXT, NHREC, STATUS )
-      CALL HIST_PTXT( OLOC, NHREC, TEXT, STATUS )
+      CALL HSI_PTXT( OFID, NHREC, TEXT, STATUS )
 
 *    Close files
-      CALL BDA_CLOSE( ILOC, STATUS )
-      CALL BDA_CLOSE( OLOC, STATUS )
+      CALL BDI_RELEASE( IFID, STATUS )
+      CALL BDI_RELEASE( OFID, STATUS )
 
 *    Tidy up
  99   CALL AST_CLOSE( )
@@ -309,7 +306,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Status :
 *
@@ -401,7 +397,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
@@ -503,7 +498,6 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *
 *    Import :
 *
