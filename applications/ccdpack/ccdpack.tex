@@ -6,8 +6,8 @@
 \newcommand{\stardocinitials}  {HRH}
 \newcommand{\stardocsource}    {ccdpack}
 \newcommand{\stardocnumber}    {1.0}
-\newcommand{\stardocauthors}   {P.W. Draper}
-\newcommand{\stardocdate}      {14th November 1995}
+\newcommand{\stardocauthors}   {P.W. Draper, M.B. Taylor}
+\newcommand{\stardocdate}      {July 2001}
 \newcommand{\stardoctitle}     {Hypertext help}
 % -----------------------------------------------------------------------------
 
@@ -125,20 +125,20 @@
 % -----------------------------------------------------------------------------
 %  Add any document specific \newcommand or \newenvironment commands here
 
-\newcommand{\butt}[1]{{\small \bf \tt #1}}
-\newcommand{\menu}[1]{{\small \bf \em #1}}
-\newcommand{\wlab}[1]{{\small \bf #1}}
-\newcommand{\text}[1]{{\small \tt #1}}
+\newcommand{\butt}[1]{{\bf \tt #1}}
+\newcommand{\menu}[1]{{\bf \em #1}}
+\newcommand{\wlab}[1]{{\bf #1}}
+\newcommand{\text}[1]{{\tt #1}}
 
 %  Don't use the fbox options as this breaks up the text line too much.
-%\newcommand{\butt}[1]{\fbox{\small \tt #1}}
-%\newcommand{\menu}[1]{\fbox{\small \bf \em #1}}
-%\newcommand{\wlab}[1]{\fbox{\small \bf #1}}
+%\newcommand{\butt}[1]{\fbox{\tt #1}}
+%\newcommand{\menu}[1]{\fbox{\bf \em #1}}
+%\newcommand{\wlab}[1]{\fbox{\bf #1}}
 
 %  Don't use the colour option as this looks dreadful in netscape.
 %\definecolor{lightgrey}{gray}{.82}
-%\newcommand{\butt}[1]{\colorbox{lightgrey}{\small #1}}
-%\newcommand{\menu}[1]{\colorbox{lightgrey}{\em \small #1}}
+%\newcommand{\butt}[1]{\colorbox{lightgrey}{#1}}
+%\newcommand{\menu}[1]{\colorbox{lightgrey}{\em #1}}
 % -----------------------------------------------------------------------------
 %  Title Page.
 %  ===========
@@ -514,7 +514,7 @@ you suspect that this will be the case for your data then select
 
 \end{itemize}
 
-Press \butt{OK} when you've happy with the values.
+Press \butt{OK} when you're happy with the values.
 
 \subsection{Menus \xlabel{CCDSetGenGlobalsMenu}}
 
@@ -586,7 +586,7 @@ must have to be saturated.
 \item \wlab{Bias level (ADUs):}. If you do not have any bias frames, or
 bias strips then it is possible to debias your data by subtracting a
 constant. If your data is already debiassed then you can get it
-reprocessed by supplying a zero ($0$) here (you may want to do this
+reprocessed by supplying a zero (0) here (you may want to do this
 if you want to generate data errors, and/or apply a defect mask).
 
 \end{itemize}
@@ -941,7 +941,7 @@ extracting the header values). The data types are called
 \wlab{HDS type} as these are the native forms that CCDPACK understands. If you
 click in the \wlab{HDS type:} entry a list of the known HDS types will
 appear. The meanings of the names are fairly obvious (\text{\_INTEGER}
-for integers, \text{_CHAR} for character strings etc.).
+for integers, \text{\_CHAR} for character strings etc.).
 
 To enter an item and its type, type its name into the \wlab{FITS
 item:} entry (or select one from the list extracted from your
