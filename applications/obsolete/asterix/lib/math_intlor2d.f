@@ -128,7 +128,7 @@
         SDY = DY / YSUB
 
 *      Y contribution to normalisation
-        YNOR = YWID/SDY
+        YNOR = SDY / YWID
 
         DO I = 1, MNX
 
@@ -140,7 +140,7 @@
           SDX = DX / XSUB
 
 *        X contribution to normalisation - hence total normalisation
-          XNOR = XWID/SDX
+          XNOR = SDX / XWID
           NORM = ABS( XNOR*YNOR/MATH__PI )
 
 *        Y position of first sub-pixel centre
