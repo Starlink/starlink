@@ -1,7 +1,7 @@
 Interface EVCSUBSET
    Parameter INP
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<-GLOBAL.EVDS'
       prompt      'Enter name of input dataset'
@@ -10,11 +10,17 @@ Interface EVCSUBSET
 
    Parameter OUT
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.EVDS'
       prompt      'Enter name of output dataset'
       help        'A new event dataset will be created'
    EndParameter
+
+   parameter LISTS
+      type 'LITERAL'
+      prompt 'Numbers of list to use for X,Y axes'
+      ppath' DYNAMIC'
+   endparameter
 
    Parameter ANNULUS
       type        '_LOGICAL'
