@@ -3474,15 +3474,15 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 *
 *    Local variables :
 *
-      CHARACTER*(DAT__SZLOC)  PLOC              ! PSF structure locator
-      CHARACTER*80            TNAME             ! Table file name
-      CHARACTER*40            UNITS             ! Spatial units
+      CHARACTER*(DAT__SZLOC)  	PLOC              	! PSF structure locator
+      CHARACTER*80            	TNAME             	! Table file name
+      CHARACTER*40            	UNITS             	! Spatial units
 
-      REAL                    BASE, SCALE       ! Axis quantities
+      REAL			SPARR(2)		! Axis definition
 
-      INTEGER                 DIMS(ADI__MXDIM)  ! Size of data array
-      INTEGER                 DPTR              ! Ptr to data
-      INTEGER                 NDIM              ! Dimensionality
+      INTEGER			IDUM			! Dummy argument
+      INTEGER                 	NDIM, DIMS(ADI__MXDIM)  ! Size of data array
+      INTEGER                 	DPTR              	! Ptr to data
       INTEGER			TFID			! Table identifier
 
       LOGICAL                 ELEVS_OK          ! Energy levels structure ok?
@@ -3501,11 +3501,12 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Try to open file
-      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), '*', 'READ', TFID,
+      CALL ADI_FOPEN( TNAME(:CHR_LEN(TNAME)), 'BinDS', 'READ', TFID,
      :                STATUS )
 
 *    Check the data
-      CALL BDI_CHKDATA( TFID, VALID, NDIM, DIMS, STATUS )
+      CALL BDI_CHK( TFID, 'Data', VALID, STATUS )
+      CALL BDI_GETSHP( TFID, 2, DIMS, NDIM, STATUS )
       IF ( VALID ) THEN
 
         IF ( NDIM .NE. 2 ) THEN
@@ -3514,10 +3515,10 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Map if ok
-        CALL BDI_MAPDATA( TFID, 'READ', DPTR, STATUS )
+        CALL BDI_MAPR( TFID, 'Data', 'READ', DPTR, STATUS )
 
 *      Get axis units
-        CALL BDI_GETAXUNITS( TFID, 1, UNITS, STATUS )
+        CALL BDI_AXGET0C( TFID, 1, 'Units', UNITS, STATUS )
         CALL CONV_UNIT2R( UNITS, TB_TOR(SLOT), STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_ANNUL( STATUS )
@@ -3525,8 +3526,9 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
         END IF
 
 *      Get axis values
-        CALL BDI_GETAXVAL( TFID, 1, BASE, SCALE, DIMS(1), STATUS )
-        TB_TOR(SLOT) = ABS(TB_TOR(SLOT)*SCALE)
+        CALL BDI_AXGET1R( TFID, 1, 'SpacedData', 2, SPARR, IDUM,
+     :                    STATUS )
+        TB_TOR(SLOT) = ABS(TB_TOR(SLOT)*SPARR(2))
 
 *      If ok then make a copy of this data and store
         IF ( STATUS .EQ. SAI__OK ) THEN
@@ -3545,7 +3547,7 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
       END IF
 
-*    Look for energy radii
+*  Look for energy radii
       TB_NLEV(SLOT) = 0
       CALL ADI1_LOCPSF( TFID, .FALSE., PLOC, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -3563,7 +3565,6 @@ C          XSUB = SPIX( XP0 + DX*REAL(I-1), DX )
 
 *    Release from BDA
       IF ( ( STATUS .EQ. SAI__OK ) .AND. VALID ) THEN
-        CALL BDI_RELEASE( TFID, STATUS )
         CALL ADI_FCLOSE( TFID, STATUS )
       END IF
 
