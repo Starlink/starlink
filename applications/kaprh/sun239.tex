@@ -1,0 +1,3273 @@
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
+\pagestyle{myheadings}
+
+% -----------------------------------------------------------------------------
+% ? Document identification
+\newcommand{\stardoccategory}  {Starlink User Note}
+\newcommand{\stardocinitials}  {SUN}
+\newcommand{\stardocsource}    {sun239.1}
+\newcommand{\stardocnumber}    {239.1}
+\newcommand{\stardocauthors}   {David S. Berry}
+\newcommand{\stardocdate}      {22 May 2001}
+\newcommand{\stardoctitle}     {KAPRH ---  A home for retired KAPPA applications}
+\newcommand{\stardocversion}   {1.0}
+\newcommand{\stardocmanual}    {User's Guide}
+% ? End of document identification
+% -----------------------------------------------------------------------------
+
+\newcommand{\stardocname}{\stardocinitials /\stardocnumber}
+\markboth{\stardocname}{\stardocname}
+%\markright{\stardocname}
+\setlength{\textwidth}{160mm}
+\setlength{\textheight}{230mm}
+\setlength{\topmargin}{-2mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\parindent}{0mm}
+\setlength{\parskip}{\medskipamount}
+\setlength{\unitlength}{1mm}
+
+% -----------------------------------------------------------------------------
+%  Hypertext definitions.
+%  ======================
+%  These are used by the LaTeX2HTML translator in conjunction with star2html.
+
+%  Comment.sty: version 2.0, 19 June 1992
+%  Selectively in/exclude pieces of text.
+%
+%  Author
+%    Victor Eijkhout                                      <eijkhout@cs.utk.edu>
+%    Department of Computer Science
+%    University Tennessee at Knoxville
+%    104 Ayres Hall
+%    Knoxville, TN 37996
+%    USA
+
+%  Do not remove the %\begin{rawtex} and %\end{rawtex} lines (used by 
+%  star2html to signify raw TeX that latex2html cannot process).
+%\begin{rawtex}
+\makeatletter
+\def\makeinnocent#1{\catcode`#1=12 }
+\def\csarg#1#2{\expandafter#1\csname#2\endcsname}
+
+\def\ThrowAwayComment#1{\begingroup
+    \def\CurrentComment{#1}%
+    \let\do\makeinnocent \dospecials
+    \makeinnocent\^^L% and whatever other special cases
+    \endlinechar`\^^M \catcode`\^^M=12 \xComment}
+{\catcode`\^^M=12 \endlinechar=-1 %
+ \gdef\xComment#1^^M{\def\test{#1}
+      \csarg\ifx{PlainEnd\CurrentComment Test}\test
+          \let\html@next\endgroup
+      \else \csarg\ifx{LaLaEnd\CurrentComment Test}\test
+            \edef\html@next{\endgroup\noexpand\end{\CurrentComment}}
+      \else \let\html@next\xComment
+      \fi \fi \html@next}
+}
+\makeatother
+
+\def\includecomment
+ #1{\expandafter\def\csname#1\endcsname{}%
+    \expandafter\def\csname end#1\endcsname{}}
+\def\excludecomment
+ #1{\expandafter\def\csname#1\endcsname{\ThrowAwayComment{#1}}%
+    {\escapechar=-1\relax
+     \csarg\xdef{PlainEnd#1Test}{\string\\end#1}%
+     \csarg\xdef{LaLaEnd#1Test}{\string\\end\string\{#1\string\}}%
+    }}
+
+%  Define environments that ignore their contents.
+\excludecomment{comment}
+\excludecomment{rawhtml}
+\excludecomment{htmlonly}
+%\end{rawtex}
+
+%  Hypertext commands etc. This is a condensed version of the html.sty
+%  file supplied with LaTeX2HTML by: Nikos Drakos <nikos@cbl.leeds.ac.uk> &
+%  Jelle van Zeijl <jvzeijl@isou17.estec.esa.nl>. The LaTeX2HTML documentation
+%  should be consulted about all commands (and the environments defined above)
+%  except \xref and \xlabel which are Starlink specific.
+
+\newcommand{\htmladdnormallinkfoot}[2]{#1\footnote{#2}}
+\newcommand{\htmladdnormallink}[2]{#1}
+\newcommand{\htmladdimg}[1]{}
+\newenvironment{latexonly}{}{}
+\newcommand{\hyperref}[4]{#2\ref{#4}#3}
+\newcommand{\htmlref}[2]{#1}
+\newcommand{\htmlimage}[1]{}
+\newcommand{\htmladdtonavigation}[1]{}
+
+%  Starlink cross-references and labels.
+\newcommand{\xref}[3]{#1}
+\newcommand{\xlabel}[1]{}
+
+%  LaTeX2HTML symbol.
+\newcommand{\latextohtml}{{\bf LaTeX}{2}{\tt{HTML}}}
+
+%  Define command to re-centre underscore for Latex and leave as normal
+%  for HTML (severe problems with \_ in tabbing environments and \_\_
+%  generally otherwise).
+\newcommand{\latex}[1]{#1}
+\newcommand{\setunderscore}{\renewcommand{\_}{{\tt\symbol{95}}}}
+\latex{\setunderscore}
+
+%  Redefine the \tableofcontents command. This procrastination is necessary 
+%  to stop the automatic creation of a second table of contents page
+%  by latex2html.
+\newcommand{\latexonlytoc}[0]{\tableofcontents}
+
+% -----------------------------------------------------------------------------
+%  Debugging.
+%  =========
+%  Remove % on the following to debug links in the HTML version using Latex.
+
+% \newcommand{\hotlink}[2]{\fbox{\begin{tabular}[t]{@{}c@{}}#1\\\hline{\footnotesize #2}\end{tabular}}}
+% \renewcommand{\htmladdnormallinkfoot}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\htmladdnormallink}[2]{\hotlink{#1}{#2}}
+% \renewcommand{\hyperref}[4]{\hotlink{#1}{\S\ref{#4}}}
+% \renewcommand{\htmlref}[2]{\hotlink{#1}{\S\ref{#2}}}
+% \renewcommand{\xref}[3]{\hotlink{#1}{#2 -- #3}}
+% -----------------------------------------------------------------------------
+% ? Document-specific \newcommand or \newenvironment commands.
+
+% Also define the html equivalents.
+
+% degrees symbol
+\newcommand{\dgs}{\hbox{$^\circ$}} 
+\begin{htmlonly}
+\renewcommand{\dgs}{{\rawhtml &deg;}} 
+\end{htmlonly}
+
+% arcminute symbol
+\newcommand{\arcm}{\hbox{$^\prime$}} 
+\begin{htmlonly}
+\renewcommand{\arcm}{{\rawhtml &acute;}} 
+\end{htmlonly}
+
+% arcsec symbol
+\newcommand{\arcsec}{\arcm\hskip -0.1em\arcm}
+\begin{htmlonly}
+\renewcommand{\arcsec}{{\rawhtml &quot;}} 
+\end{htmlonly}
+
+% hours symbol
+\newcommand{\hr}{\hbox{$^{\rm h}$}}
+\begin{htmlonly}
+\renewcommand{\hr}{~hours}
+\end{htmlonly}
+
+% minutes symbol
+\newcommand{\mn}{\hbox{$^{\rm m}$}}
+\begin{htmlonly}
+\renewcommand{\mn}{~minutes}
+\end{htmlonly}
+
+% seconds symbol
+\newcommand{\scn}{\hbox{$^{\rm s}$}}
+\begin{htmlonly}
+\renewcommand{\scn}{~seconds}
+\end{htmlonly}
+
+% decimal-minutes symbol
+\newcommand{\um}{\hskip-0.3em\hbox{$^{\rm m}$}\hskip-0.08em}
+\begin{htmlonly}
+\renewcommand{\um}{\mn} 
+\end{htmlonly}
+
+% decimal-degree symbol
+\newcommand{\udeg}{\hskip-0.3em\dgs\hskip-0.08em}
+\begin{htmlonly}
+\renewcommand{\udeg}{{\rawhtml &deg;}} 
+\end{htmlonly}
+
+% decimal-second symbol
+\newcommand{\us}{\hskip-0.27em\hbox{$^{\rm s}$}\hskip-0.06em}  
+\begin{htmlonly}
+\renewcommand{\us}{\scn} 
+\end{htmlonly}
+
+% decimal-arcminute symbol
+\newcommand{\uarcm}{\hskip-0.28em\arcm\hskip-0.04em}  
+\begin{htmlonly}
+\renewcommand{\uarcm}{{\rawhtml &acute;}} 
+\end{htmlonly}
+
+% decimal-arcsecond symbol
+\newcommand{\uarcs}{\hskip-0.27em\arcsec\hskip-0.02em}  
+\begin{htmlonly}
+\renewcommand{\uarcs}{{\rawhtml &quot;}}
+\end{htmlonly}
+
+% centre an asterisk
+\newcommand{\lsk}{\raisebox{-0.4ex}{\rm *}}
+
+% conditional text
+\newcommand{\latexelsehtml}[2]{#1}
+\begin{htmlonly}
+  \renewcommand{\latexelsehtml}[2]{#2}
+\end{htmlonly}
+
+\hyphenation{which-ever}
+
+% A kind of list item, like description, but with an easily adjustable
+% item separation.  Note that the paragraph and fount-size change are
+% needed to make the revised \baselinestretch work.
+\newlength{\menuwidth}
+\newlength{\menuindent}
+\newcommand{\menuitem}[2]
+  {{\bf #1} \settowidth{\menuwidth}{{\bf #1} }
+  \setlength{\menuindent}{-0.5em}
+  \addtolength{\menuwidth}{-2\menuwidth}
+  \addtolength{\menuwidth}{\textwidth}
+  \addtolength{\menuwidth}{\menuindent}
+  \hspace{\menuindent}\parbox[t]{\menuwidth}{
+  \renewcommand{\baselinestretch}{0.75}\small
+  #2 \par \vspace{1.0ex}
+  \renewcommand{\baselinestretch}{1.0}\normalsize} \\ }
+\begin{htmlonly}
+\newcommand{\menuitem}[2]
+  {\item [\htmlref{#1}{#1}] #2}
+\end{htmlonly}
+
+\newcommand{\classitem}[1]{\item [\htmlref{#1}{#1}]}
+
+% an environment for references (for the SST sstdiytopic command).
+\newenvironment{refs}{\vspace{-4ex} % normally 3ex
+                      \begin{list}{}{\setlength{\topsep}{0mm}
+                                     \setlength{\partopsep}{0mm}
+                                     \setlength{\itemsep}{0mm}
+                                     \setlength{\parsep}{0mm}
+                                     \setlength{\leftmargin}{1.5em}
+                                     \setlength{\itemindent}{-\leftmargin}
+                                     \setlength{\labelsep}{0mm}
+                                     \setlength{\labelwidth}{0mm}}
+                    }{\end{list}}
+
+% Lines for breaking up Appendices A and B.
+\newcommand{\jrule}{\noindent\rule{\textwidth}{0.45mm}}
+\newcommand{\krule}{\vspace*{-1.5ex}
+                    \item [\rm \rule{\textwidth}{0.15mm}]}
+
+% Shorthands for hypertext links.
+% -------------------------------
+\newcommand{\AGIref}{\xref{AGI}{sun48}{}}
+\newcommand{\ARDref}{\xref{ARD}{sun183}{}}
+\newcommand{\ASTERIXref}{\xref{{\footnotesize ASTERIX}}{sun98}{}}
+\newcommand{\CCDPACKref}{\xref{{\footnotesize CCDPACK}}{sun139}{}}
+\newcommand{\CGSDRref}{\xref{{\footnotesize CGS4DR}}{sun27}{}}
+\newcommand{\CONVERTref}{\xref{{\footnotesize CONVERT}}{sun55}{}}
+\newcommand{\ECHOMOPref}{\xref{{\footnotesize ECHOMOP}}{sun152}{}}
+\newcommand{\ESPref}{\xref{{\footnotesize ESP}}{sun180}{}}
+\newcommand{\Figaroref}{\xref{{\footnotesize FIGARO}}{sun86}{}}
+\newcommand{\FITSref}{\htmladdnormallink{FITS}{http://www.gsfc.nasa.gov/astro/fits/fits\_{}home.html}}
+\newcommand{\GAIAref}{\xref{GAIA}{sun214}{}}
+\newcommand{\GKSref}{\xref{GKS}{sun83}{}}
+\newcommand{\GWMref}{\xref{GWM}{sun130}{}}
+\newcommand{\HDSref}{\xref{HDS}{sun92}{}}
+\newcommand{\HDSTRACEref}{\xref{{\footnotesize HDSTRACE}}{sun102}{}}
+\newcommand{\ICLref}{\xref{{\footnotesize ICL}}{sg5}{}}
+\newcommand{\IDIref}{\xref{IDI}{sun65}{}}
+\newcommand{\IRCAMPACKref}{\xref{{\footnotesize IRCAMPACK}}{sun177}{}}
+\newcommand{\IRAFref}{\htmladdnormallink{{\footnotesize IRAF}}{http://iraf.noao.edu/iraf-homepage.html}}
+\newcommand{\IRASref}{\xref{{\footnotesize IRAS90}}{sun163}{}}
+\newcommand{\JCMTDRref}{\xref{{\footnotesize JCMTDR}}{sun132}{}}
+\newcommand{\NDFref}[1]{\htmlref{#1}{ap:NDFformat}}
+\newcommand{\NDFextref}[1]{\xref{#1}{sun33}{}}
+\newcommand{\PDAref}{\xref{PDA}{sun194}{}}
+\newcommand{\PGPLOTref}{\htmladdnormallink{PGPLOT}{http://astro.caltech.edu/\~{}tjp/pgplot/}}
+\newcommand{\PHOTOMref}{\xref{{\footnotesize PHOTOM}}{sun45}{}}
+\newcommand{\PISAref}{\xref{{\footnotesize PISA}}{sun109}{}}
+\newcommand{\PONGOref}{\xref{{\footnotesize PONGO}}{sun137}{}}
+\newcommand{\PSMERGEref}{\xref{{\footnotesize PSMERGE}}{sun164}{}}
+\newcommand{\SGSref}{\xref{SGS}{sun85}{}}
+\newcommand{\TSPref}{\xref{{\footnotesize TSP}}{sun66}{}}
+\newcommand{\TWODSPECref}{\xref{{\footnotesize TWODSPEC}}{sun16}{}}
+
+
+% SST definitions
+% ---------------
+
+% +
+%  Name:
+%     SST.TEX
+
+%  Purpose:
+%     Define LaTeX commands for laying out Starlink routine descriptions.
+
+%  Language:
+%     LaTeX
+
+%  Type of Module:
+%     LaTeX data file.
+
+%  Description:
+%     This file defines LaTeX commands which allow routine documentation
+%     produced by the SST application PROLAT to be processed by LaTeX and
+%     by LaTeX2html. The contents of this file should be included in the
+%     source prior to any statements that make of the sst commands.
+
+%  Notes:
+%     The commands defined in the style file html.sty provided with LaTeX2html 
+%     are used. These should either be made available by using the appropriate
+%     sun.tex (with hypertext extensions) or by putting the file html.sty 
+%     on your TEXINPUTS path (and including the name as part of the  
+%     documentstyle declaration).
+
+%  Authors:
+%     RFWS: R.F. Warren-Smith (STARLINK)
+%     PDRAPER: P.W. Draper (Starlink - Durham University)
+%     MJC: Malcolm J. Currie (STARLINK)
+
+%  History:
+%     10-SEP-1990 (RFWS):
+%        Original version.
+%     10-SEP-1990 (RFWS):
+%        Added the implementation status section.
+%     12-SEP-1990 (RFWS):
+%        Added support for the usage section and adjusted various spacings.
+%     8-DEC-1994 (PDRAPER):
+%        Added support for simplified formatting using LaTeX2html.
+%     1995 October 4 (MJC):
+%        Added goodbreaks and pagebreak[3] in various places to improve
+%        pages breaking before headings, not immediately after.
+%        Corrected banner width.
+%     2-DEC-1998 (DSB):
+%        Added sstattributetype (copied from sun210.tex).
+%     {enter_further_changes_here}
+
+%  Bugs:
+%     {note_any_bugs_here}
+
+% -
+
+%  Define length variables.
+\newlength{\sstbannerlength}
+\newlength{\sstcaptionlength}
+\newlength{\sstexampleslength}
+\newlength{\sstexampleswidth}
+
+%  Define a \tt font of the required size.
+\newfont{\ssttt}{cmtt10 scaled 1095}
+
+%  Define a command to produce a routine header, including its name,
+%  a purpose description and the rest of the routine's documentation.
+\newcommand{\sstroutine}[3]{
+   \goodbreak
+   \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+   \rule{\textwidth}{0.5mm}
+   \vspace{-7ex}
+   \newline
+   \settowidth{\sstbannerlength}{{\Large {\bf #1}}}
+   \setlength{\sstcaptionlength}{\textwidth}
+   \setlength{\sstexampleslength}{\textwidth}
+   \addtolength{\sstbannerlength}{0.5em}
+   \addtolength{\sstcaptionlength}{-2.0\sstbannerlength}
+   \addtolength{\sstcaptionlength}{-4.9pt}
+   \settowidth{\sstexampleswidth}{{\bf Examples:}}
+   \addtolength{\sstexampleslength}{-\sstexampleswidth}
+   \parbox[t]{\sstbannerlength}{\flushleft{\Large {\bf #1}}}
+   \parbox[t]{\sstcaptionlength}{\center{\Large #2}}
+   \parbox[t]{\sstbannerlength}{\flushright{\Large {\bf #1}}}
+   \begin{description}
+      #3
+   \end{description}
+}
+
+%  Format the description section.
+\newcommand{\sstdescription}[1]{\item[Description:] #1}
+
+%  Format the usage section.
+\newcommand{\sstusage}[1]{\pagebreak[3] \item[Usage:] \mbox{} \\[1.3ex] {\ssttt #1}}
+
+%  Format the invocation section.
+\newcommand{\sstinvocation}[1]{\sloppy \item[Invocation:]\hspace{0.4em}{\tt #1}}
+
+%  Format the attribute data type section.
+\newcommand{\sstattributetype}[1]{
+   \item[Type:] \mbox{} \\
+      #1
+}
+
+%  Format the arguments section.
+\newcommand{\sstarguments}[1]{
+   \item[Arguments:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the returned value section (for a function).
+\newcommand{\sstreturnedvalue}[1]{
+   \item[Returned Value:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the parameters section (for an application).
+\newcommand{\sstparameters}[1]{
+   \goodbreak 
+   \item[Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the output results parameters section (for an application).
+\newcommand{\sstresparameters}[1]{
+   \goodbreak 
+   \item[Results Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the graphics style parameters section (for an application).
+\newcommand{\sstgraphparameters}[1]{
+   \goodbreak 
+   \item[Graphics-style Parameters:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Format the examples section.
+\newcommand{\sstexamples}[1]{
+   \goodbreak
+   \item[Examples:] \mbox{} \\
+   \vspace{-3.5ex}
+   \begin{description}
+      #1
+   \end{description}
+}
+
+%  Define the format of a subsection in a normal section.
+\newcommand{\sstsubsection}[1]{ \item[{#1}] \mbox{} \\}
+
+%  Define the format of a subsection in the examples section.
+%\newcommand{\sstexamplesubsection}[2]{\sloppy
+%\item[\parbox{\sstexampleslength}{\ssttt #1}] \mbox{} \\ #2 }
+\newcommand{\sstexamplesubsection}[2]{\sloppy \item{\ssttt #1} \mbox{} \\ #2 }
+
+%  Define the format of a long-example subsection in the examples section.
+%\newcommand{\sstlongexamplesubsection}[3]{\sloppy
+%\item[\ssttt \hspace{-0.5em}#1] {\ssttt #2} \mbox{} \\ #3}
+\newcommand{\sstlongexamplesubsection}[3]{\sloppy \item{\ssttt #1} {\ssttt #2} \mbox{} \\ #3}
+
+%  Format the notes section.
+\newcommand{\sstnotes}[1]{\pagebreak[3] \item[Notes:] \mbox{} \\[1.3ex] #1}
+
+%  Provide a general-purpose format for additional (DIY) sections.
+\newcommand{\sstdiytopic}[2]{\goodbreak \item[{\hspace{-0.35em}#1\hspace{-0.35em}:}] \mbox{} \\[1.3ex] #2}
+
+%  Format the implementation status section.
+\newcommand{\sstimplementationstatus}[1]{
+   \pagebreak[3] \item[{Implementation Status:}] \mbox{} \\[1.3ex] #1}
+
+%  Format the bugs section.
+\newcommand{\sstbugs}[1]{\item[Bugs:] #1}
+
+%  Specify a variant of the itemize environment where the top separation
+%  is reduced.  It is needed because a \vspace is ignored in the
+%  \sstitemlist command.
+\newenvironment{sstitemize}{%
+  \vspace{-4.3ex}\begin{itemize}}{\end{itemize}}
+
+%  Format a list of items while in paragraph mode.
+\newcommand{\sstitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{sstitemize}
+     #1
+  \end{sstitemize}
+}
+
+%  Format a list of items while in paragraph mode, and where there
+%  is a heading, thus the negative vertical space is not needed.
+\newcommand{\ssthitemlist}[1]{
+  \mbox{} \\
+  \vspace{-3.5ex}
+  \begin{itemize}
+     #1
+  \end{itemize}
+}
+
+%  Define the format of an item.
+\newcommand{\sstitem}{\item}
+
+%  Now define html equivalents of those already set. These are used by
+%  latex2html and are defined in the html.sty files.
+\begin{htmlonly}
+
+%  Re-define \ssttt.
+   \newcommand{\ssttt}{\tt}
+
+%  sstroutine.
+   \renewcommand{\sstroutine}[3]{
+      \subsection{#1\xlabel{#1}-\label{#1}#2}
+      \begin{description}
+         #3
+      \end{description}
+   }
+
+%  sstdescription
+   \renewcommand{\sstdescription}[1]{\item[Description:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstusage
+   \renewcommand{\sstusage}[1]{\htmlref{\item[Usage:]}{ap:usage} \mbox{} \\ {\ssttt #1}}
+
+%  sstinvocation
+   \renewcommand{\sstinvocation}[1]{\item[Invocation:]
+      \begin{description}
+         {\ssttt #1}
+      \end{description}
+   }
+
+%  sstarguments
+   \renewcommand{\sstarguments}[1]{
+      \item[Arguments:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstreturnedvalue
+   \renewcommand{\sstreturnedvalue}[1]{
+      \item[Returned Value:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstparameters
+   \renewcommand{\sstparameters}[1]{
+      \htmlref{\item[Parameters:]}{se:param}
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstresparameters
+   \renewcommand{\sstresparameters}[1]{
+      \htmlref{\item[Results Parameters:]}{se:parout}
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstexamples
+   \renewcommand{\sstexamples}[1]{
+      \htmlref{\item[Examples:]}{ap:example}
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstsubsection
+   \renewcommand{\sstsubsection}[1]{\item[{#1}]}
+
+%  sstexamplesubsection
+   \renewcommand{\sstexamplesubsection}[2]{\item[{\ssttt #1}] \\ #2}
+
+%  sstnotes
+   \renewcommand{\sstnotes}[1]{\item[Notes:]
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstdiytopic
+   \renewcommand{\sstdiytopic}[2]{\item[{#1}]
+      \begin{description}
+         #2
+      \end{description}
+   }
+
+%  sstimplementationstatus
+   \renewcommand{\sstimplementationstatus}[1]{\item[Implementation Status:] 
+      \begin{description}
+         #1
+      \end{description}
+   }
+
+%  sstitemlist
+   \newcommand{\sstitemlist}[1]{
+      \begin{itemize}
+         #1
+      \end{itemize}
+   }
+\end{htmlonly}
+
+%  End of sst.tex layout definitions.
+%.
+
+% End of SST definitions
+% ----------------------
+
+%    Starlink definitions for \LaTeX\ macros used in MAN output
+%
+%  Description:
+%    As much as possible of the output from the MAN automatic manual generator
+%    uses calls to user-alterable macros rather than direct calls to built-in
+%    \LaTeX\ macros. This file is a version of the MAN default definitions for
+%    these macros modified for Starlink preferences.
+%
+%  Language:
+%    \LaTeX
+%
+%  Support:
+%    William Lupton, {AAO}
+%    Alan Chipperfield (RAL)
+%-
+%  History:
+%    16-Nov-88 - WFL - Add definitions to permit hyphenation to work on
+%		 words containing special characters and in teletype fonts.
+%    27-Feb-89 - AJC - Redefine \manroutine
+%                      Added \manheadstyle
+%                      Switch order of argument descriptors
+%    07-Mar-89 - AJC - Narrower box for parameter description
+%                      Remove Intro section and other unused bits
+%
+% permit hyphenation when in teletype font (support 9,10,11,12 point only -
+% could extend), define lccodes for special characters so that the hyphen-
+% ation algorithm is not switched off. Define underscore character to be
+% explicit underscore rather than lots of kerns etc.
+
+\typeout{Starlink MAN macros. Released 27th February 1989}
+
+%\hyphenchar\nintt=`-\hyphenchar\tentt=`-\hyphenchar\elvtt=`-\hyphenchar\twltt=`-
+
+\lccode`_=`_\lccode`$=`$
+
+%    Macros used in the .TEX_SUMMARY file
+%
+%  Description:
+%    There is a command to introduce a new section (mansection) and a list-like
+%    environment (mansectionroutines) that handles the list of routines in the
+%    current section. In addition a mansectionitem command can be used instead
+%    of the item command to introduce a new routine in the current section.
+%-
+
+\newcommand {\mansection}[2]{\subsection{#1 --- #2}}
+
+\newenvironment {mansectionroutines}{\begin{description}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mansectionitem}[1]{\item [#1:] \mbox{}}
+
+%    Macros used in the .TEX_DESCR file
+%
+%  Description:
+%    There is a command to introduce a new routine (manroutine) and a list-like
+%    environment (manroutinedescription) that handles the list of paragraphs
+%    describing the current routine. In addition a manroutineitem command can
+%    be used instead of the item command to introduce a new paragraph for the
+%    current routine.
+%
+%    Two-column tables (the ones that can occur anywhere and which are
+%    triggered by "=>" as the second token on a line) are bracketed by a
+%    new environment (mantwocolumntable). Other sorts of table are introduced
+%    by relevant  environments (manparametertable, manfunctiontable and
+%    manvaluetable). The definitions of these environments call various other
+%    user-alterable commands, thus allowing considerable user control over such
+%    tables... (to be filled in when the commands have been written)
+%-
+
+\newcommand {\manrule}{\rule{\textwidth}{0.5mm}}
+
+%\newcommand {\manroutine}[2]{\subsection{#1 --- #2}}
+\newlength{\speccaption}
+\newlength{\specname}
+\newcommand{\manroutine}[2]{\goodbreak
+                          \markboth{{\stardocname}~ --- #1}{{\stardocname}~ --- #1}
+                          \rule{\textwidth}{0.5mm}  % draw thick line
+                          \settowidth{\specname}{{\Large {\bf #1}}}
+                        % left and right box width is text width plus gap
+                          \addtolength{\specname}{4ex}
+                        % caption width is width of page less the two names
+                        % less than empirical fudge factor
+                          \setlength{\speccaption}{\textwidth}
+                          \addtolength{\speccaption}{-2.0\specname}
+                          \addtolength{\speccaption}{-4.9pt}
+                        % move text up the page because \flushleft environ-
+                        % ment creates a paragraph
+                          \vspace{-7mm}
+                          \newline
+                          \parbox[t]{\specname}{\flushleft{\Large {\bf #1}}}
+                          \parbox[t]{\speccaption}{\flushleft{\Large #2}}
+                          \parbox[t]{\specname}{\flushright{\Large {\bf #1}}}
+                          }
+
+\newenvironment {manroutinedescription}{\begin{description}}{\end{description}}
+
+\newcommand {\manroutineitem}[2]{\pagebreak[3]\item [#1:] #2\mbox{}}
+
+
+% parameter tables
+
+\newcommand {\manparametercols}{lllp{90mm}}
+
+\newcommand {\manparameterorder}[3]{#2 & #3 & #1 &}
+
+\newcommand {\manparametertop}{}
+
+\newcommand {\manparameterblank}{\gdef\manparameterzhl{}\gdef\manparameterzss{}}
+
+\newcommand {\manparameterbottom}{}
+
+\newenvironment {manparametertable}{\gdef\manparameterzss{}%
+\gdef\manparameterzhl{}\hspace*{\fill}\vspace*{-\partopsep}\begin{trivlist}%
+\item[]\begin{tabular}{\manparametercols}\manparametertop}{\manparameterbottom%
+\end{tabular}\end{trivlist}}
+
+\newcommand {\manparameterentry}[3]{\manparameterzss\gdef\manparameterzss{\\}%
+\gdef\manparameterzhl{\hline}\manparameterorder{#1}{#2}{#3}}
+
+
+% list environments
+
+\newenvironment {manenumerate}{\begin{enumerate}}{\end{enumerate}}
+
+\newcommand {\manenumerateitem}[1]{\item [#1]}
+
+\newenvironment {manitemize}{\begin{itemize}}{\end{itemize}}
+
+\newcommand {\manitemizeitem}{\item}
+
+\newenvironment
+{mandescription}{\begin{description}\item{~}\vspace*{-5.6ex}\begin{description}}%
+{\end{description}\end{description}}
+
+\newcommand {\mandescriptionitem}[1]{\item [#1]}
+
+\newcommand {\mantt}{\tt}
+
+% manheadstyle for Starlink
+\newcommand {\manheadstyle}{}
+
+%\catcode`\_=12
+
+% ? End of document specific commands
+%------------------------------------------------------------------------------
+%  Title Page.
+%  ===========
+\renewcommand{\thepage}{\roman{page}}
+\begin{document}
+\thispagestyle{empty}
+
+%  Latex document header.
+%  ======================
+\begin{latexonly}
+   CCLRC / {\sc Rutherford Appleton Laboratory} \hfill {\bf \stardocname}\\
+   {\large Particle Physics \& Astronomy Research Council}\\
+   {\large Starlink Project\\}
+   {\large \stardoccategory\ \stardocnumber}
+   \begin{flushright}
+   \stardocauthors\\
+   \stardocdate
+   \end{flushright}
+   \vspace{-4mm}
+   \rule{\textwidth}{0.5mm}
+   \vspace{5mm}
+   \begin{center}
+   {\Huge\bf  \stardoctitle \\ [2.5ex]}
+   {\LARGE\bf \stardocversion \\ [4ex]}
+   {\Huge\bf  \stardocmanual}
+   \end{center}
+   \vspace{5mm}
+
+% ? Heading for abstract if used.
+   \vspace{10mm}
+   \begin{center}
+      {\Large\bf Abstract}
+   \end{center}
+% ? End of heading for abstract.
+\end{latexonly}
+
+%  HTML documentation header.
+%  ==========================
+\begin{htmlonly}
+   \xlabel{}
+   \begin{rawhtml} <H1> \end{rawhtml}
+      \stardoctitle\\
+      \stardocversion\\
+      \stardocmanual
+   \begin{rawhtml} </H1> \end{rawhtml}
+
+% ? Add picture here if required.
+%  \htmladdimg{sun95_cover.gif}
+% ? End of picture
+
+   \begin{rawhtml} <P> <I> \end{rawhtml}
+   \stardoccategory \stardocnumber \\
+   \stardocauthors \\
+   \stardocdate
+   \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
+      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
+      \htmladdnormallink{Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{Particle Physics \& Astronomy Research Council}
+                        {http://www.pparc.ac.uk} \\
+   \begin{rawhtml} </H3> <H2> \end{rawhtml}
+      \htmladdnormallink{Starlink Project}{http://www.starlink.rl.ac.uk/}
+   \begin{rawhtml} </H2> \end{rawhtml}
+   \htmladdnormallink{\htmladdimg{source.gif} Retrieve hardcopy}
+      {http://www.starlink.rl.ac.uk/cgi-bin/hcserver?\stardocsource}\\
+
+%  HTML document table of contents. 
+%  ================================
+%  Add table of contents header and a navigation button to return to this 
+%  point in the document (this should always go before the abstract \section). 
+  \label{stardoccontents}
+  \begin{rawhtml} 
+    <HR>
+    <H2>Contents</H2>
+  \end{rawhtml}
+  \renewcommand{\latexonlytoc}[0]{}
+  \htmladdtonavigation{\htmlref{\htmladdimg{contents_motif.gif}}
+        {stardoccontents}}
+
+% ? New section for abstract if used.
+  \section{\xlabel{abstract}Abstract}
+% ? End of new section for abstract
+\end{htmlonly}
+
+% -----------------------------------------------------------------------------
+% ? Document Abstract. (if used)
+%   ==================
+{\footnotesize KAPRH} is an applications package containing commands 
+which have been ``retired'' from the KAPPA package (see SUN/95). They
+are retained within KAPRH to satisfy any occasional need there may be for
+them. 
+% ? End of document abstract
+% -----------------------------------------------------------------------------
+% ? Latex document Table of Contents (if used).
+%  ===========================================
+ \newpage
+ \begin{latexonly}
+   \setlength{\parskip}{0mm}
+   \latexonlytoc
+   \setlength{\parskip}{\medskipamount}
+   \markboth{\stardocname}{\stardocname}
+%  \markright{\stardocname}
+ \end{latexonly}
+% ? End of Latex document table of contents
+% -----------------------------------------------------------------------------
+% \newpage
+\cleardoublepage
+\renewcommand{\thepage}{\arabic{page}}
+\setcounter{page}{1}
+
+% The main text begins here.
+% -----------------------------------------------------------------------------
+
+\section{\xlabel{se_kaprhintro}Introduction\label{se:kaprhintro}}
+
+KAPRH forms a sort of ``rest home'' for old and worn-out KAPPA commands,
+that is, commands which have been removed from the KAPPA package for 
+various reasons. They are retained here in order to satisfy
+any occasional need there may be for them. It is not intended to spend
+any significant effort in the maintenance or development of these
+commands - they are presented ``as is''. 
+
+This document contains the reference information for these commands, but
+does not contain any general information about data structure,
+parameters, \emph{etc}. See SUN/95 for extra information. The one
+exception to this is that the appendix contains a description of the 
+old IMAGE format data structure which is used by some of the commands within 
+KAPRH.
+
+\newpage
+\appendix
+\begin{small}
+\section{\xlabel{ap_summary}An Alphabetical Summary of KAPRH Commands
+\label{ap:summary}}
+
+\begin{htmlonly}
+\begin{description}
+\end{htmlonly}
+\menuitem{CONTOVER}{
+ Contours a 2-d NDF overlayed on an image displayed previously.}
+\menuitem{GREYPLOT}{
+ Produces a greyscale plot of a 1-d or 2-d NDF.}
+\menuitem{INSPECT}{
+ Inspects a 2-d NDF in a variety of ways.}
+\menuitem{KRHHELP}{
+ Gives help about KAPRH.}
+\menuitem{MOSAIC}{
+ Merges several non-congruent  2-d data arrays into one output data array.}
+\menuitem{QUILT}{
+ Generates a mosaic from equally sized 2-d data arrays, optionally specified
+ from an ASCII file.}
+\menuitem{SNAPSHOT}{
+ Dumps an image-display memory to a graphics hardcopy and optionally to an NDF.}
+\begin{htmlonly}
+\end{description}
+\end{htmlonly}
+\end{small}
+
+\newpage
+\section{\xlabel{ap_full}Specifications of KAPRH applications\label{ap:full}}
+
+\sstroutine{
+   CONTOVER
+}{
+   Contours a 2-d NDF overlaid on an image displayed previously
+}{
+   \sstdescription{
+      This application draws a contour plot of a 2-dimensional NDF
+      using an efficient algorithm.  The array may be part or whole of
+      the data array, but also the variance or quality can be shown.
+
+      The contour plot is drawn over an existing image that is
+      displayed on the chosen graphics workstation or its overlay,
+      provided the displayed image has been recorded in the
+      graphics database.  (This will be the case for display routines
+      in KAPPA.)  The contour plotting occurs within the current picture
+      only if it is a DATA picture, otherwise contours are overlaid in
+      the last DATA picture within the current picture.  This
+      application assumes that the world co-ordinate systems of the data
+      array and the displayed image are both in pixel units, but not to
+      the same origins.  Pixel $x$-$y$ offsets may be given to match the
+      contour plot with the image, provided some contouring will be
+      visible.  These displacements are in the sense image co-ordinate
+      minus the data-array co-ordinate for an arbitrary fiducial point.
+
+      The contouring algorithm has only pixel resolution, and
+      so the contours are not smooth, but this makes the processing
+      much faster.  There are seven methods for selecting contours.
+
+      The best way to use this application is to first display an image
+      on the base plane of an image display, make this the current
+      picture, and then plot contours on the overlay plane, clearing
+      the overlay picture each time. This enables more than one attempt
+      at getting the correct contour heights.  The underlying image will
+      not be erased. (Note that if you do not make the underlying image
+      the current picture, the contour plot becomes the last DATA
+      picture, and so any subsequent $x$-$y$ offsets should be set to 0,0 to
+      prevent successive contour plots being incorrectly located.)
+   }
+   \sstusage{
+      contover ndf [comp] offset mode ncont [device]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                    firstcnt=? stepcnt=? \\
+                    heights=? \\
+                    percentiles=?
+                   \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small mode}
+   }
+   \sstparameters{
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         True if the graphics device is to be cleared before display
+         of the array. It should only be true for an overlay device.
+         {\tt [TRUE]}
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be contoured.  It may be {\tt "Data"},
+         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where
+         {\tt "Error"} is the alternative to {\tt "Variance"} and causes
+         the square root of the variance values to be taken before
+         plotting contours).  If {\tt "Quality"} is specified, then
+         the quality values are treated as numerical values (in the
+         range 0 to 255).  {\tt ["Data"]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device. The device must be in one of the following
+         GNS categories: IMAGE\_DISPLAY, IMAGE\_OVERLAY, WINDOW,
+         WINDOW\_OVERLAY, or MATRIX\_PRINTER.
+         {\tt [}Current image-display-overlay device{\tt ]}
+      }
+      \sstsubsection{
+         FIRSTCNT = \_REAL (Read)
+      }{
+         Height of the first contour (Linear and Magnitude modes).
+      }
+      \sstsubsection{
+         HEIGHTS() = \_REAL (Read)
+      }{
+         Contour levels (Free mode).  The suggested default is the
+         current value.
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The method used to select the contour levels.  The options are
+         described below.
+         \begin{description}
+         \item {\tt "Area"} --- The contours enclose areas of the array for
+                         which the equivalent radius increases by equal
+                         increments.  You specify the number of levels.
+         \item {\tt "Automatic"} --- The contour levels are equally spaced between the maximum
+                        the maximum and minimum pixel values in the
+                        array.  You supply the number of contour levels.
+         \item {\tt "Equalised"} --- You define the number of equally spaced
+                          percentiles.
+         \item {\tt "Free"} --- You specify a series of contour values
+                        explicitly.
+         \item {\tt "Linear"} --- You define the number of contours, the start
+                        contour level and linear step between contours.
+         \item {\tt "Magnitude"} --- You define the number of contours, the start
+                        contour level and step between contours.  The
+                        step size is in magnitudes so the $n^{\rm th}$
+                        contour is 10$^{-0.4*(n-1)*{\rm step}}$ times the
+                        start contour level.
+         \item {\tt "Percentiles"} --- You specify a series of percentiles.
+         \end{description}
+
+         The suggested default is the current value, which is initially
+         {\tt "Free"}.
+      }
+      \sstsubsection{
+         NCONT = \_INTEGER (Read)
+      }{
+         The number of contours required (all modes except Free and
+         Percentiles).  It must be between 1 and 50.  If the number is
+         large, the plot may be cluttered and take longer to produce.
+         {\tt 6}, the initial suggested default, gives reasonable results.
+         The current value becomes the suggested default.
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         NDF structure containing the 2-d image to be contoured.
+      }
+      \sstsubsection{
+         OFFSET( 2 ) = \_INTEGER (Read)
+      }{
+         $x$-$y$ offsets of the input data-array with respect to the
+         displayed image ({\it i.e.}\ $x_{\rm data} - x_{\rm image}$
+         followed by $y_{\rm data} - y_{\rm image}$ for any fiducial
+         point).   These are
+         constrained so that some part of the contour plot will be
+         overlaid on the displayed image.  The suggested default is
+         [0,0], {\it i.e.}\ no shift.
+      }
+      \sstsubsection{
+         PENROT = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the plotting pens are cycled through the contours to
+         aid identification of the contour heights.  It is ignored
+         when annotation is selected. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         STEPCNT = \_REAL (Read)
+      }{
+         Separation between contour levels, linear for Linear mode
+         and in magnitudes for Magnitude mode.
+      }
+   }
+   \sstgraphparameters{
+      \sstsubsection{
+         CONCOL = LITERAL (Read)
+      }{
+        The colour of the contour lines on devices that support colour.
+        The options are described below.
+
+         \begin{description}
+         \item {\tt "MAX"}  --- The maximum colour index in the image
+                          display colour lookup table.
+         \item {\tt "MIN"}  --- The minimum (non-reserved) colour index in
+                          the image-display colour lookup table.
+         \item {\bf An integer} --- The actual colour index.  It is
+                          constrained between 0 and the maximum colour
+                          index available on the device.
+         \item {\bf A named colour} --- Uses the named colour from the
+                          palette, and if it is not present, the nearest
+                          colour from the palette is selected.
+         \end{description}
+
+         If the colour is to remain unaltered as the lookup table is
+         manipulated choose an integer between 0 and 15, or a named
+         colour.  This parameter will be ignored if PENROT = {\tt TRUE}.
+         {\tt [}The current value, but equals {\tt 1} (the foreground
+         colour) if there is no current value.{\tt ]}
+      }
+      \sstsubsection{
+         DASHED = \_REAL (Read)
+      }{
+         The height below which the contours will be drawn with dashed
+         lines.  A null value ({\tt !}) means all contours are drawn with
+         solid lines.  This facility is only available when ANNOTA =
+         {\tt FALSE}. {\tt [!]}
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the lines and NCAR-fount characters in the plot, where
+         {\tt 1.0} is the normal thickness.  Currently, this is only available
+         on a few devices.  It must take a value in the range 0.5--10.0.
+         {\tt [1.0]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         contover myfile d [-20,7] $\backslash$
+      }{
+         Contours the data array in the NDF called myfile on the
+         current image-display overlay device; the overlay is displaced
+         such that pixel ($i$,~$j$) in myfile corresponds to pixel
+         ($i-20$,~$j+$7) in
+         the displayed image.  All other settings are defaulted, so for
+         example the current method for determining heights is used,
+         and as much of myfile will be contoured that fits into the
+         current picture.
+      }
+      \sstexamplesubsection{
+         contover ndf=ngc6872 mode=au ncont=5 offset=[0,0]
+      }{
+         Contours the data array in the NDF called ngc6872 on the
+         current image-display overlay device.  Five equally spaced
+         contours between the maximum and minimum data values are
+         drawn.  There is no offset between the contour plot and the
+         displayed image; this can be useful for comparing an NDF
+         before and after some processing, {\it e.g.}\ smoothing.
+      }
+      \sstexamplesubsection{
+         contover iras60(200:300,100:350) comp=d offset=[3,5] $\backslash$
+      }{
+         Contours the portion of the data array in the NDF called iras60
+         on the current image-display overlay using the current method
+         for height selection.  The maximum portion of the data array
+         that can be contoured goes from pixel (200,100) to (300,350).
+         The overlay is displaced such that pixel ($i$,~$j$) in the
+         data array corresponds to pixel ($i+$3,~$j+$5) in the displayed
+         image.
+      }
+      \sstexamplesubsection{
+         contover comp=v mode=fr heights=[10,20,40,80] device=xov $\backslash$
+      }{
+         Contours the variance array in the current NDF on the xov
+         device.  Contours at 10, 20, 40 and 80 are
+         drawn.  There is no displacement between the variance contour
+         plot and the displayed image.
+      }
+      \sstexamplesubsection{
+         contover mode=eq ncont=5 dashed=15 pencol=blue ndf=skyflux
+      }{
+         Contours the data array in the NDF called skyflux on the
+         current image-overlay device.  Contours at heights
+         corresponding to the 10, 30, 50, 70 and 90 percentiles are
+         drawn in blue (if available).  Those contours whose values less
+         than 15 will appear as dashed lines.  There is no displacement
+         between the contour plot and the displayed image.
+      }
+      \sstexamplesubsection{
+         contover xx1 mode=pe percentiles=[90,95,98,99] pencol=white
+         noclear device=epsf\_l
+      }{
+         Contours the data array in the NDF called xx1 on the epsf\_l
+         device.  White contours at heights corresponding to the 90, 95,
+         98, and 99 percentiles are drawn.  The display is not cleared.
+         There is no displacement.  The output file could be combined
+         with a DISPLAY plot (using PSMERGE) to make a hardcopy of a
+         contour plot on a dark image.
+      }
+  }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The application records the contour plot as a DATA picture
+         with world co-ordinates in units of data pixels in the graphics
+         database.  The DATA picture may also may have double-precision
+         data co-ordinates derived from the NDF axis components provided
+         these are linear and different from pixel co-ordinates; the data
+         co-ordinates are stored via a linear transformation.  The NDF
+         associated with the plot is stored by reference with the DATA
+         picture.  On exit the current database picture for the chosen
+         device reverts to the input picture.
+         picture for the chosen device reverts to the input picture.
+
+         \sstitem
+         There are some options for setting the characteristics of the
+         contour lines.  By default, solid lines are drawn with the same
+         colour as the axes and key, namely the foreground colour.  The
+         colour will depend on the graphics device chosen, but it is often
+         black for printers or white for terminals.  The alternatives to
+         override this default behaviour are listed below.
+
+         \begin{enumerate}
+         \item Set a colour for all contours using parameter CONCOL.
+               The choices may be quite restrictive on certain devices,
+               for example a window overlay only has one colour.  Use
+               the PALENTRY command to change this colour.
+         \item Request dashed contours below some threshold given by
+               parameter DASHED and solid lines for other heights.  All
+               contours have either the foreground colour or that
+               prescribed by parameter CONCOL.
+         \item Cycle the pens modulo 3 for each contour height actually
+               plotted by setting PENROT = {\tt TRUE}.  The characteristics of
+               the second and third line styles will depend on the chosen
+               graphics device.  An image display or pen plotter will draw
+               coloured lines using palette entries 1 to 3; whereas a
+               window overlay, or monochrome laser printer or terminal
+               will draw a variety of dashed or thicker lines.
+         \item Combine options 2 and 3.  However, palette colours 1 to 3
+               will always be used and CONCOL ignored.  The contours below
+               the threshold continue the cycle through the three colours.
+               There may be some confusion on devices that already use
+               dashed lines, so this is only suitable for devices
+               supporting at least three colours simultaneously.
+         \end{enumerate}
+
+         Pen rotation takes precedence over colour control through CONCOL. 
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: CONTOUR; Figaro: ICONT, SPECCONT.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Only real data can be processed directly.  Other data types
+         will undergo a type conversion before the contour plot is drawn.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are supported.
+
+      }
+   }
+}
+\sstroutine{
+   GREYPLOT
+}{
+   Produces a greyscale plot of a 1-d or 2-d NDF
+}{
+   \sstdescription{
+      This application produce a greyscale plot of a 1- or
+      2-dimensional NDF, especially for a hardcopy device.  The image
+      is usually the data array, but may also be the variance or
+      quality.  The plot appears in the current graphics-database
+      picture.
+
+      The greyscale plot resides within optional, annotated and
+      enumerated axes. An optional key may be drawn to the right of the
+      greyscale plot comprising a title and grey blocks annotated with
+      the corresponding array value.  There are a number of scaling
+      methods to map array values to grey levels in the plot.
+
+      The time to output to hardcopy devices can be quite lengthy
+      and generally depends on the size of the greyscale plot.
+      Therefore, there are parameters for controlling the size of
+      the plot.
+   }
+   \sstusage{
+      greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                    white=? black=? \\  
+                    percentiles=? \\
+                    sigmas=? 
+                  \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small mode}
+   }
+   \sstparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the plot abscissa, in which NCAR fancy founts
+         may be embedded when FONT = {\tt "}NCAR{\tt "}.  This parameter is only
+         used when the axes option is selected.  If axis information is
+         present the suggested default is the NDF{\tt '}s axis label followed
+         by the units, in parentheses.  If an error occurs obtaining
+         the label the suggested default is {\tt "}X{\tt "}. {\tt []}
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         TRUE if annotated axes are to be drawn around the displayed
+         image.  The annotations are either the data co-ordinates from
+         the NDF axis components, provided these are present and linear
+         and COSYS = {\tt "}Data{\tt "}; otherwise pixel co-ordinates are used.
+         {\tt [FALSE]}
+      }
+      \sstsubsection{
+         BADCOL = LITERAL (Read)
+      }{
+         The grey level to give a bad pixel in the display.  There are
+         a number of options described below.
+
+           {\tt "}MAX{\tt "}       - Black
+           {\tt "}MIN{\tt "}       - White
+           An integer  - The actual {\tt '}colour{\tt '} index.  It is constrained
+                         to be between 0 and the maximum colour index
+                         available on the device, and so gives a shade
+                         of grey.  0 gives the background colour.
+           A named     - Uses the named `colour{\tt '} from the palette, and
+           `colour{\tt '}      if it is not present, the nearest colour from
+                         the palette is selected.  The palette contains
+                         grey levels at percentages from black to white,
+                         \emph{e.g.} GREY50 is midway between black and white.
+
+         If this application is run on a device that supports colour
+         it is possible to mark the bad pixels in colour on the
+         greyscale provided BADCOL is an integer between 0 and 15, or
+         a named colour.  The bad pixels will remain unaltered if the
+         lookup table is manipulated.  The suggested default is the
+         current value. [The current value, but equals {\tt "}MIN{\tt "} if there
+         is no current value.]
+      }
+      \sstsubsection{
+         BLACK = \_DOUBLE (Read)
+      }{
+         The array value that scales to the black in the greyscale
+         colour table.  All smaller array values appear black when
+         BLACK is less than WHITE, otherwise all array values
+         smaller than BLACK appear white.  The dynamic default is the
+         minimum data value.   There is an efficiency gain when both
+         BLACK and WHITE are given on the command line, because the
+         extreme values need not be computed.  (Scale mode)
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be displayed.  It may be {\tt "}Data{\tt "},
+         {\tt "}Quality{\tt "}, {\tt "}Variance{\tt "}, or {\tt "}Error{\tt "} (where {\tt "}Error{\tt "} is the
+         alternative to {\tt "}Variance{\tt "} and causes the square root of the
+         variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
+         then the quality values are treated as numerical values (in
+         the range 0 to 255). {\tt [{\tt "}Data{\tt "}]}
+      }
+      \sstsubsection{
+         COSYS = LITERAL (Read)
+      }{
+         The co-ordinate system to be used.  This can be either {\tt "}World{\tt "}
+         or {\tt "}Data{\tt "}.  {\tt "}World{\tt "} makes pixel co-ordinates to appear on axes.
+         If COSYS = {\tt "}Data{\tt "} the NDF{\tt '}s axis information is used to
+         annotate axes.  {\tt [Current co-ordinate system]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device used to display the image.
+         The device must be in one of the following GNS categories:
+         IMAGE\_DISPLAY, IMAGE\_OVERLAY, MATRIX\_PRINTER, or WINDOW, and
+         have at least 24 greyscale intensities.
+         {\tt [Current image-display device]}
+      }
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
+         The greyscale plot normally has square pixels, in other words
+         a length along each axis corresponds to the same number of
+         pixels.  However, for images with markedly different
+         dimensions, such as two-dimensional spectra, this default
+         behaviour may not be suitable or give the clearest plot.  When
+         FILL is TRUE, the square-pixel constraint is relaxed and the
+         greyscale plot is the largest possible within the current
+         picture.  When FILL is FALSE, the pixels are square.  The
+         suggested default is the current value.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FONT = LITERAL (Read)
+      }{
+         The fount to be used for the line graphics.  It can be either
+         {\tt "}NCAR{\tt "} for the NCAR fancy characters and {\tt "}GKS{\tt "} for the standard
+         GKS san-serif fount.   The former is intended for hardcopy
+         publication-quality plots, since it is relatively slow; the
+         latter is intended for normal interactive graphics requiring
+         rapid plotting, and it is clearer on small plots. The
+         suggested default is the current value. {\tt [{\tt "}GKS{\tt "}]}
+      }
+      \sstsubsection{
+         FULL = \_LOGICAL (Read)
+      }{
+         If TRUE, the whole greyscale lookup table for the device is
+         used including the normally reserved pens.  Thus all but two
+         of the available intensities participate in the greyscale,
+         which improves the photographic quality of the image.  The
+         remaining pens are for the background, and for the key and
+         axes.  This option is only available for devices that reset
+         their `colour{\tt '} tables when the device is opened, such as
+         Laserprinters. (This restriction prevents problems on devices
+         that retain their {\tt "}colour tables{\tt "}, where using the normally
+         reserved pens would mean that either part of the greyscale
+         would be emphemeral---departing when the application
+         completes if the reserved pens are stored and reinstated on
+         completion, or earlier plots drawn by other applications would
+         be altered.)
+
+         If FULL = FALSE, only non-reserved intensities will form the
+         greyscale.  If a null (!) value is supplied, the value used is
+         TRUE when the non-reserved pens is less than 32, and FALSE
+         otherwise.  (This figure was chosen because it is roughly the
+         number of grey levels at which the eye will clearly detect the
+         quantisation in a complex scene.) {\tt [!]}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         Input NDF data structure containing the image to be displayed.
+      }
+      \sstsubsection{
+         KEY = \_LOGICAL (Read)
+      }{
+         A key of the greyscale versus pixel value and title is to be
+         produced when this is TRUE. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks
+         for the x and y axes.  (Number used is between MAJTIC$+$2 and
+         5$*$MAJTIC/2$+$4.)   A negative value for an axis makes the
+         graphics package decide an appropriate value.  This parameter
+         is only used when the axes option is selected. {\tt [3.,3.]}
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_REAL (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for the x and y axes.  A negative value forces the graphics
+         package to compute appropriate values.   This parameter is
+         only used when the axes option is selected. {\tt [-1.,-1.]}
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The type of scaling to be applied to the array.  There are a
+         number of options described below.
+           {\tt "}Faint{\tt "}       - The image is scaled from the mean minus one
+                           standard deviation to the mean plus seven
+                           standard deviations.  The scaling values are
+                           reported so that the faster Scale mode may be
+                           utilised later.
+           {\tt "}Flash{\tt "}       - The image is flashed onto the screen without
+                           any scaling at all.  This is the fastest
+                           option.  Since there is no longer a
+                           one-to-one mapping between data values and
+                           grey levels this scaling mode is not
+                           available with a key.
+           {\tt "}Percentiles{\tt "} - The image is scaled between the values
+                           corresponding to two percentiles.  The
+                           scaling values are reported so that the
+                           faster Scale mode may be utilised later.
+           {\tt "}Range{\tt "}       - The image is scaled between the minimum and
+                           maximum data values.
+           {\tt "}Scale{\tt "}       - You define the upper and lower limits
+                           between which the image is to be scaled.  The
+                           application reports the maximum and the
+                           minimum values for reference and makes these
+                           defaults respectively.
+           {\tt "}Sigmas{\tt "}      - The image is scaled between two standard-
+                           deviation limits.  The scaling values used
+                           are reported so that the faster Scale mode
+                           may be utilised later.
+      }
+      \sstsubsection{
+         NUMBIN  =  \_INTEGER (Read)
+      }{
+         The number of histogram bins used to compute percentiles for
+         scaling. (Percentiles mode) {\tt [2048]}
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the plot ordinate, in which NCAR fancy founts
+         may be embedded when FONT = {\tt "}NCAR{\tt "}.   This parameter is only
+         used when the axes option is selected.  If axis information is
+         present the suggested default is the NDF{\tt '}s axis label followed
+         by the units, in parentheses.  If an error occurs obtaining
+         the label the suggested default is {\tt "}Y{\tt "}. {\tt []}
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The scaled NDF that is displayed; it also does not have
+         values that equal the reserved portion of the colour table.
+         The output NDF is intended to be used as the input data in
+         conjunction with SCALE=FALSE.  It will be vertically
+         inverted with respect to the input array because of GKS
+         convention.  If it has a null value (!) no output NDF will be
+         created.  This parameter is ignored when SCALE=FALSE. {\tt [!]}
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         True if the axis tick marks are to appear on the outside of
+         the axes instead of inside.   This parameter is only used
+         when the axes option is selected. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         PERCENTILES( 2 ) = \_REAL (Read)
+      }{
+         The percentiles that define the scaling limits. For example,
+         {\tt [75,25]} would scale between the quartile values. (Percentile
+         mode)
+      }
+      \sstsubsection{
+         PLTITL = LITERAL (Read)
+      }{
+         The title of the plot.  Up to about 25 characters can be
+         accommodated when there are no axes, and about 40 otherwise.
+         NCAR fancy founts may be embedded (cf. SUN/90) when FONT =
+         {\tt "}NCAR{\tt "}.  This parameter is only used when either the axes or
+         key option is selected. {\tt [The NDF title]}
+      }
+      \sstsubsection{
+         PXSIZE = \_REAL (Read)
+      }{
+         The length (x axis) of the plot in metres.  [Maximum that can
+         fit in the current picture whilst preserving square pixels.]
+      }
+      \sstsubsection{
+         PYSIZE = \_REAL (Read)
+      }{
+         The length (y axis) of the plot in metres.  [Maximum that can
+         fit in the current picture whilst preserving square pixels.]
+      }
+      \sstsubsection{
+         REDUCT = \_REAL (Read)
+      }{
+         The reduction factor of the array, and must be in the range
+         1/MAX(NX,NY)--1.0, where NX and NY are the number of pixels
+         in the image along the x and y directions.  Since the output
+         to the hardcopy device may be long, the size of the image
+         with respect to the key can be reduced by lowering REDUCT.
+         The spooling time goes approximately proportional to the
+         square of REDUCT.  1.0 means the array fills the plotting zone.
+         {\tt [1.0]}
+      }
+      \sstsubsection{
+         SCAHIGH = \_DOUBLE (Write)
+      }{
+         The array value scaled to white in the greyscale display.
+         In Flash mode or when there is no scaling the colour index of
+         white is used.  The current display linear-scaling maximum is
+         set to this value.
+      }
+      \sstsubsection{
+         SCALE = \_LOGICAL (Read)
+      }{
+         If TRUE the input array is scaled according to the value of
+         parameter MODE.  If it is FALSE, MODE is ignored, and the input
+         array is displayed as is.  There is no scaling, inversion
+         or avoidance of annotation pens.  SCALE=FALSE is intended to
+         be used with arrays previously scaled by this or similar
+         applications which have already performed the scaling,
+         inversion and exclusion.  It provides the quickest method of
+         image display within this application. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         SCALOW = \_DOUBLE (Write)
+      }{
+         The array value scaled to black in the greyscale display.
+         In Flash mode or when there is no scaling the colour index of
+         black is used.  The current display linear-scaling minimum is
+         set to this value.
+      }
+      \sstsubsection{
+         SIGMAS( 2 ) = \_REAL (Read)
+      }{
+         The standard-deviation bounds that define the scaling limits.
+         To obtain values either side of the mean both a negative and
+         a positive value are required.  Thus {\tt [-2,3]} would scale
+         between the mean minus two and the mean plus three standard
+         deviations.  {\tt [3,-2]} would give the negative of that. (Sigmas
+         mode).
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the axes and annotations in the plot, where
+         1.0 is the normal thickness.  It should be between 0.5 and 5.
+         This feature is only available on some devices.   This
+         parameter is only used when the axes option is selected. {\tt [1.0]}
+      }
+      \sstsubsection{
+         WHITE = \_DOUBLE (Read)
+      }{
+         The array value that scales to white in the greyscale
+         colour table.  All larger array values appear white when
+         WHITE is greater than BLACK, otherwise all array values
+         larger than WHITE appear black.  The dynamic default is the
+         maximum data value.   There is an efficiency gain when both
+         BLACK and WHITE are given on the command line, because the
+         extreme values need not be computed.  (Scale mode)
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         greyplot sdor key mode=sc black=1 white=5.2
+      }{
+         Makes a greyscale display of the data component of the NDF
+         called sdor on the current image-display device, scaling
+         between 1 and 5.2.  Values up to 1.0 in the data array will
+         appear black in the plot, and values larger than 5.2 will be
+         white.  Intermediate values will a grey level determined by
+         linear interpolation.  A key is drawn to the right of the
+         greyscale.
+      }
+      \sstexamplesubsection{
+         greyplot in=sdor nokey mode=p percentiles=[10,90] badcol={\tt "}Black{\tt "}
+      }{
+         This makes a greyscale plot of the NDF called sdor on the
+         current image-display device. The scaling is between the 10 and
+         90 per cent percentiles of the image.  No key is drawn.  Bad
+         data appear black in the plot.
+      }
+      \sstexamplesubsection{
+         greyplot mode=fa axes out=video cosys=d $\backslash$
+      }{
+         Displays a greyscale of the current NDF data component with
+         annotated axes on the current image-display device.  The axes
+         take the axis labels and title from the NDF, and are annotated
+         in data co-ordinates.  The scaling is between the -1 and $+$7
+         standard deviations of the image around its mean.  A key is
+         drawn.  The scaled data are stored in an NDF called video.
+      }
+      \sstexamplesubsection{
+         greyplot video noscale $\backslash$
+      }{
+         Displays the data component of the NDF called video (created
+         in the previous example) without scaling within the current
+         picture on the current image-display device.
+      }
+      \sstexamplesubsection{
+         greyplot cgs4k v key mode=ra device=canon\_l
+      }{
+         Makes a greyscale display of the variance component of NDF
+         cgs4k on the Canon\_l device, scaling between the minimum and
+         maximum variance values.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The application stores a number of pictures in the graphics
+         database in the following order: a FRAME of the specified size
+         containing the title, annotated axes, and the image area
+         (provided AXES is TRUE), whose world co-ordinates are in pixels;
+         a DATA picture with world co-ordinates in units of data pixels;
+         and a KEY.  The DATA picture also may have double-precision data
+         co-ordinates derived from the NDF axis component provided these
+         are linear and different from pixel co-ordinates; the data
+         co-ordinates are stored via a linear transformation.  The NDF
+         associated with the plot is stored by reference with the DATA
+         picture.  On exit the current database picture for the chosen
+         device reverts to the input picture.
+
+         \sstitem
+         When axes are requested the axis annotations are defined by
+         their lower and upper bounds, \emph{i.e.} a regular array is assumed.
+         The bounds are in pixel or data co-ordinates.
+
+         \sstitem
+         The data type of the output NDF depends on the number of colour
+         indices: \_UBYTE for no more than 256, \_UWORD for 257 to 65535,
+         and \_INTEGER otherwise.   The output NDF will not contain any
+         extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
+         AXIS information are propagated from the input NDF.  The output
+         NDF does not become the new current data array.  It is a Simple
+         NDF (because the bad-pixel flag is set to false in order to
+         access the maximum grey level), therefore only NDF-compliant
+         applications can process it.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: DISPLAY; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         This routine correctly processes the AXIS, DATA, QUALITY,
+         VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.
+
+         \sstitem
+         This application will handle data in all numeric types, though
+         type conversion to integer will occur for unsigned byte and word
+         images.  However, when there is no scaling only integer data will
+         not be type converted, but this is not expensive for the expected
+         byte-type data.
+      }
+   }
+}
+\sstroutine{
+   INSPECT
+}{
+   Inspects a 2-d NDF in a variety of ways
+}{
+   \sstdescription{
+      This application provides an interactive facility to inspect the
+      details of whole or part of the 2-dimensional data array in an input NDF.
+      Briefly, the inspection options permit: a region to be selected
+      for which statistics may be calculated, its values written to a
+      text file, or an histogram be plotted and saved in an NDF; the
+      region itself may be saved in an NDF; the value of a pixel or a
+      region of pixels to be viewed; a slice between two pixels may be
+      calculated, plotted and saved in an NDF; text files containing
+      $x$-$y$-value of selected pixels may be created and extended, and
+      chosen pixels marked.
+
+      The application has two modes of interaction: cursor and
+      interface.  In cursor mode the selection of pixels, and the
+      definition of the region are made by moving a graphics cursor
+      over a previously displayed image or contour plot.  Since
+      instructional text showing the function of the mouse or
+      trackerball buttons is shown, the graphics device providing the
+      cursor must be an image-display overlay.  Also the name of the
+      NDF used to display the image or contour plot is known and need
+      not be entered.  This is the recommended interaction mode.  The
+      alternative, interface, means that the pixel indices of pixels
+      and regions to be inspected are specified in response to prompts.
+
+      The application is composed of two parts.  First the preliminaries
+      obtains the mode, the input NDF and graphics devices.  In cursor
+      mode this usually amounts to a single prompt, and but two in
+      interface mode.  The second stage is a loop where the inspection
+      option is selected and performed.
+   }
+   \sstusage{
+      inspect in [mode] gdevice option [overlay]
+        \newline\hspace*{1.5em}
+        $\left\{ {\begin{tabular}{l}
+                   numbin=? hirep=? histogram=? hititle=? \\
+                   filename=? \\
+                   peind=? \\
+                   lbound=? ubound=? \\
+                   out=? \\
+                   slstart=? slend=? slice=? sltitle=? \\
+                   vaind=? \\
+                   xycont=? xyfile=? xytitle=?
+                   \end{tabular} }
+        \right.$
+        \newline\hspace*{1.9em}
+        \makebox[0mm][c]{\small option}
+   }
+   \sstparameters{
+      \sstsubsection{
+         FILENAME = FILENAME (Write)
+      }{
+         Name of the text file to contain the Listing of image values.
+         The suggested default is {\tt inspect\_list.lis}.  This is only
+         required for the {\tt "List"} option.
+      }
+      \sstsubsection{
+         GDEVICE = DEVICE (Read)
+      }{
+         The name of the graphics device for line plots produced by the
+         {\tt "Histogram"} and {\tt "Slice"} options.  The device should
+         not be the image display, but it may be the image-display overlay
+         plane used in the cursor-interaction mode, {\it i.e.}\ the same
+         value as parameter OVERLAY (though this is not advisable for
+         X-windows).  In the latter case plotting occurs in the same
+         picture as the overlay annotations, namely the current
+         picture.  If the existing plot on the base plane of the image
+         display has text, {\it e.g.}\ annotated axes, a mess can of confused
+         lines can appear.  To avoid this the current picture should be
+         made the DATA picture rather than the FRAME around it.  If
+         null, {\tt !}, is given no line plots will be drawn unless the
+         {\tt "Device"} option is selected.
+      }
+      \sstsubsection{
+         HIREP = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the full Histogram is to be reported to you.  A
+         large number of bins may be required for the plot but need not
+         be listed in full.  This parameter provides a way of preventing
+         unwanted, tedious and long output.  The suggested default is
+         {\tt FALSE}.  HIREP is only required for the {\tt "Histogram"} option.
+      }
+      \sstsubsection{
+         HISTOGRAM = NDF (Read)
+      }{
+         Name of the NDF structure to save the Histogram in its data
+         array.  If null, {\tt !}, is entered, the histogram NDF is not
+         created.  This parameter is only required for the {\tt "Histogram"}
+         option.  The suggested default is {\tt !}.
+      }
+      \sstsubsection{
+         HITITLE = LITERAL (Read)
+      }{
+         Title for the output NDF containing the Histogram.  For the
+         first histogram saved this defaults to
+         {\tt "KAPPA - Inspect\_Histogram"}, and subsequently this becomes
+         the suggested default.   This parameter is only required for
+         the {\tt "Histogram"} option. {\tt []}
+      }
+      \sstsubsection{
+         IN = NDF (Read)
+      }{
+         NDF structure containing the 2-dimensional data array to be inspected.
+      }
+      \sstsubsection{
+         LBOUND( 2 ) = \_INTEGER (Read)
+      }{
+         Lower bounds in pixel indices of the Region.  The chosen pixel
+         must be different from that at the lower bound.  It is only
+         used in Interface mode with the {\tt "Region"} option.
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The interaction mode.  The options are {\tt "Cursor"} to use a
+         graphics cursor to select regions and pixels to inspect,
+         or {\tt "Interface"} where prompted ADAM parameters are used to
+         define those parts of the image to inspect. {\tt [}Current
+         interaction mode{\tt ]}
+      }
+      \sstsubsection{
+         NUMBIN = \_INTEGER (Read)
+      }{
+         Number of bins needed for the Histogram.  The suggested default
+         is the current value, which is 100 initially.  A value is the
+         range 2--5000 is required.  This parameter is only required
+         for the {\tt "Histogram"} option.
+      }
+      \sstsubsection{
+         OPTION = LITERAL (Read)
+      }{
+         Current inspection mode.  The options are:
+         \begin{description}
+         \item {\tt "Device"} --- This allows the selection and opening of a new
+                          line-plot graphics device, at the same time
+                          closing down the old one, whose last plot is
+                          stored in the graphics database.
+         \item {\tt "Exit"} --- Exit the application.
+         \item {\tt "Histogram"} --- This calculates the histogram of the current
+                          region. A summary and plot (if there is a
+                          graphics device available) of the histogram
+                          is produced.  The style of the plot may be
+                          adjusted via several parameters.  The full
+                          histogram may also be reported. The histogram
+                          data can be stored in a 1-d NDF.
+         \item {\tt "List"} --- This produces a formatted and headed listing
+                          of the chosen region to a text file.
+         \item {\tt "Peep"} --- Obtain a formatted listing of the 7$\times$7 section
+                          of the array data, centred on a pixel
+                          specified using the cursor or via prompting.
+         \item {\tt "Region"} --- To define the region of the array to be used
+                          by other options. If the image display
+                          is available, then the cursor is used to
+                          define the area, otherwise, the pixel bounds
+                          of the region come from the environment. Using
+                          the cursor, the functions of the choice-device
+                          buttons are drawn on the overlay.
+         \item {\tt "Save"} --- Writes the current region to a new NDF,
+                          propagating all the components.
+         \item {\tt "Slice"} --- Two points are defined via the cursor or from
+                          parameter prompting between which a slice ({\it i.e.}
+                          cross-section) is calculated.  Using the
+                          cursor, the functions of the trackerball or
+                          mouse buttons are drawn on the overlay. A plot
+                          is made to the graphics device if available.
+                          The style of the plot may be adjusted via
+                          several parameters.  The slice can be stored
+                          in a 1-d NDF.  The slice abscissa has units in
+                          true pixels (assuming pixels are square), thus
+                          a 45\dgs\ slice would have a length $\surd$2
+                          times its projected length in $x$ or $y$.
+         \item {\tt "Statistics"} --- The key statistical parameters of the current
+                          region are determined and reported.
+         \item {\tt "Value"} --- Obtain the value of a pixel at a point selected
+                          via the cursor or via prompting.
+         \item {\tt "XYcur"} --- A list of the co-ordinates and values of pixels
+                          selected by the image-display cursor are
+                          written to a text file with Fortran carriage
+                          control. The functions of the trackerball or
+                          mouse buttons are displayed.  Optionally, an
+                          existing file in the same format as produced
+                          by XYcur can be appended to, for example, when
+                          a session has been interrupted.  These stored
+                          pixels are displayed on the overlay plane as
+                          if there had been no interruption.  XYcur
+                          requires cursor mode.
+         \end{description}
+         The suggested default is {\tt "Region"}.
+
+         If the option is specified on the command line a single
+         inspection may be undertaken, {\it i.e.}\  there is no looping.  This
+         feature is intended for command procedures.
+      }
+      \sstsubsection{
+         OUT = NDF (Read)
+      }{
+         Name of the NDF structure to contain the Saved Region.  This
+         is only used in the {\tt "Save"} option.
+      }
+      \sstsubsection{
+         OVERLAY = DEVICE (Read)
+      }{
+         Name of the overlay-plane device used in the cursor interaction
+         mode.  It must have class IMAGE\_OVERLAY or WINDOW\_OVERLAY and
+         support colour.  It is ignored when MODE is not {\tt "Cursor"}.
+         {\tt [}Current image-display-overlay device{\tt ]}
+      }
+      \sstsubsection{
+         PEIND( 2 ) = \_INTEGER (Read)
+      }{
+         $x$-$y$ pixel index of the pixel about which the Peep is required.
+         The values must lie within their respective bounds of the
+         input image.  The suggested default is the image centre.  It
+         is only used in Interface mode with the {\tt "Peep"} option.
+      }
+      \sstsubsection{
+         SLEND( 2 ) = \_INTEGER (Read)
+      }{
+         The $x$-$y$ pixel index defining the end of the Slice.  It
+         must lie within the bounds of the array and be distinct from
+         the start of the slice.  The suggested default is the upper
+         bound of the input NDF.  It is only used in Interface mode
+         with the {\tt "Slice"} option.
+      }
+      \sstsubsection{
+         SLICE = NDF (Read)
+      }{
+         Name of the NDF structure to save the Slice in its data array.
+         If null, {\tt !}, is entered, the slice NDF is not created.
+         It is only required in the {\tt "Slice"} option.  The
+         suggested default is {\tt !}. 
+      }
+      \sstsubsection{
+         SLSTART( 2 ) = \_INTEGER (Read)
+      }{
+         The $x$-$y$ pixel index defining the start of the Slice.  It must
+         lie within the bounds of the array.  The suggested default is
+         the lower bound of the input NDF.  It is only used in
+         Interface mode with the {\tt "Slice"} option.
+      }
+      \sstsubsection{
+         SLTITLE = LITERAL (Read)
+      }{
+         Title for the Slice NDF.  Title for the Region NDF.  For the
+         first region saved this defaults to {\tt "KAPPA - Inspect\_Slice"},
+         and subsequently this becomes the suggested default.  It is
+         only required in the {\tt "Slice"} option. {\tt []}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title for the Region NDF.  For the first region saved this
+         defaults to {\tt "KAPPA - Inspect"}, and subsequently this becomes
+         the suggested default.  It is only used in the {\tt "Save"} option.
+         {\tt []}
+      }
+      \sstsubsection{
+         UBOUND( 2 ) = \_INTEGER (Read)
+      }{
+         Upper bounds in pixel indices of the Region.  The chosen pixel
+         must be different from that at the lower bound.  It is only
+         used in Interface mode with the {\tt "Region"} option.
+      }
+      \sstsubsection{
+         VAIND( 2 ) = \_INTEGER (Read)
+      }{
+         $x$-$y$ pixel index of pixel whose Value is required.  The values
+         must lie within their respective bounds of the input image.
+         The suggested default is the image centre.  It is only used in
+         Interface mode with the {\tt "Value"} option.
+      }
+      \sstsubsection{
+         XYCONT = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, an existing file is appended to in the XYcur option.
+         The suggested default is {\tt FALSE}.  It is only available in
+         cursor mode with the {\tt "XYcur"} option.
+      }
+      \sstsubsection{
+         XYFILE = FILENAME (Update)
+      }{
+         Name of the text file to which pixel data are written by
+         XYcur option.  The suggested default is {\tt xylist.lis}.  It is
+         only available in cursor mode with the {\tt "XYcur"} option.
+      }
+      \sstsubsection{
+         XYTITLE = LITERAL (Read)
+      }{
+         Title for the text file in XYcur option.  For the first file
+         created this defaults to {\tt "\# KAPPA - Inspect\_XYcur"}, and
+         subsequently this becomes the suggested default. It is not
+         accessed if XYCONT is {\tt TRUE}.   It is only available in cursor
+         mode with the {\tt "XYcur"} option. {\tt []}
+      }
+   }
+   \sstgraphparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the line-plot abscissa, in which NCAR fancy founts
+         may be embedded when FONT = {\tt "NCAR"}.  Note Slice and
+         Histogram have different defaults and these are stored separately.
+
+         For a slice plot the suggested default is the current value,
+         which is initially {\tt "Pixels"}.  If an error occurs obtaining the
+         label the default is {\tt "Pixels"}.
+
+         If axis information is present the suggested default for a
+         plot of an histogram is the NDF's axis label followed by the
+         units, in parentheses.  If an error occurs obtaining the label
+         or there is no axis information, the label takes its current
+         value, which initially is {\tt "Values"}.
+
+         For the first plot ABSLAB is defaulted to the suggested value
+         unless PLOTSTYLE is included on the command line, and
+         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
+         {\tt []}
+      }
+      \sstsubsection{
+         FONT = LITERAL (Read)
+      }{
+         The fount to be used for the line graphics.  It can be either
+         {\tt "NCAR"} for the NCAR fancy characters and {\tt "GKS"} for the standard
+         GKS san-serif fount.   The former is intended for hardcopy
+         publication-quality plots, since it is relatively slow; the
+         latter is intended for normal interactive graphics requiring
+         rapid plotting, and it is clearer on small plots. The
+         suggested default is the current value.
+
+         For the first plot FONT is defaulted to {\tt "GKS"}, and subsequently
+         will only be obtained whenever PLOTSTYLE is {\tt TRUE}. {\tt []}
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks
+         for the $x$ and $y$ axes in the slice or histogram plot.
+         (The number used is between MAJTIC$+$2 and 5$*$MAJTIC/2$+$4.).
+
+         By default, it is {\tt [4.,4.]}.  For the first plot MAJTIC is
+         defaulted, and subsequently will only be obtained whenever
+         PLOTSTYLE is {\tt TRUE}.  {\tt []}
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_REAL (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for linear $x$ and $y$ axes in the slice or histogram plot.  A
+         negative value forces the graphics package to compute
+         appropriate values.  The number of minor tick marks per major
+         tick is fixed (8) for a logarithmic axis.
+
+         By default, it is {\tt [-1.,-1.]}.  For the first plot MINTIC is
+         defaulted, and subsequently will only be obtained whenever
+         PLOTSTYLE is {\tt TRUE}.  {\tt []}
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the line-plot ordinate, in which NCAR fancy founts
+         may be embedded.  Note Slice and Histogram have different
+         defaults and these are stored separately.
+
+         For an histogram plot the suggested default is the current
+         value, which is initially {\tt "Number"}.  If an error occurs
+         obtaining the label the default is {\tt "Number"}.
+
+         If axis information is present the suggested default for a
+         plot of a slice is the NDF's axis label followed by the
+         units, in parentheses.  If an error occurs obtaining the label
+         or there is no axis information, the label takes its current
+         value, which initially is {\tt "Data values"}.
+
+         For the first plot ORDLAB is defaulted to the suggested value
+         unless PLOTSTYLE is included on the command line, and
+         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
+         {\tt []}
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the axis tick marks are to appear on the outside of
+         the axes instead of inside in the slice or histogram plots.
+         This eliminates intersections of ticks with the data locus.
+
+         By default, the tick marks are drawn inside the plot region.
+         For the first plot OUTTIC is defaulted, and subsequently will
+         only be obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
+      }
+      \sstsubsection{
+         PLOTSTYLE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the plotting style of line plots is to be altered from
+         the default for the first plot, or the existing values for
+         subsequent graphs.  Initially, it is defaulted to {\tt FALSE}, then
+         the suggested value is the current value.  Therefore to
+         override the plotting-style parameters on the first plot, new
+         values should be given on the command line, and along with the
+         PLOTSTYLE keyword for ABSLAB, ORDLAB, and PLTITL.
+         Subsequently, the plotting style may be
+         retained or modified via prompts.  {\tt []}
+      }
+      \sstsubsection{
+         PLTITL = LITERAL (Read)
+      }{
+         The title of a line plot, in which NCAR fancy founts may be
+         embedded.  Note Slice and Histogram have different defaults
+         and these are stored separately.  Both attempt to use the NDF's
+         title if present and no error occurs, otherwise the current
+         value becomes the suggested default.  For the histogram plot
+         this is initially {\tt "Histogram of current region"} and for the
+         slice plot it is initially {\tt "Slice plot"}.
+
+         For the first plot PLTITL is defaulted to the suggested value
+         unless PLOTSTYLE is included on the command line, and
+         subsequently will only be obtained whenever PLOTSTYLE is {\tt TRUE}.
+         {\tt []}
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the axes and annotations in the histogram and
+         line plots, where 1.0 is the normal thickness.  Currently,
+         this is only available on a few devices.  It must take a value
+         in the range 0.5--5.0.
+
+         By default the line thickness is 1.0.  For the first plot
+         THICK is defaulted to the suggested value, and subsequently
+         will only be obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
+      }
+      \sstsubsection{
+         XLOG = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the line-plot abscissa is to be logarithmic.  Note, for
+         Slice and Histogram options each has its own independent
+         switch.  It is unlikely that you would want to do this.  By
+         default, the abscissa is linear.  For the first plot XLOG is
+         defaulted, and subsequently will only be obtained whenever
+         PLOTSTYLE is {\tt TRUE}. {\tt []}
+      }
+      \sstsubsection{
+         YLOG = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the line-plot ordinate is to be logarithmic. Note, for
+         Slice and Histogram options each has its own independent
+         switch.  By default, the ordinate is linear.  For the first
+         plot YLOG is defaulted, and subsequently will only be
+         obtained whenever PLOTSTYLE is {\tt TRUE}.  {\tt []}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         Note:
+      }{
+         Since INSPECT is an interacting, graphical and self-contained
+         monolith of applications it is not straightforward to give
+         command-line examples.  Generally, the best way to run INSPECT
+         is in cursor mode after having displayed an image.  The
+         following examples use the prompting mode.
+      }
+      \sstexamplesubsection{
+         inspect rulupi i canon\_l sl slstart=[3,10] slend=[9,42] slice=!
+      }{
+         Plots a slice from pixel (3,10) to (9,42) of the NDF called
+         rulupi to the CANON\_L graphics device.
+      }
+      \sstexamplesubsection{
+         inspect rulupi i gdevice=x2w option=hi numbin=100 histogram=ru\_hg
+      }{
+         Calculates the histogram of the NDF called rulupi, reporting
+         a summary to you, and plots the histogram to the x2w
+         device.  The histogram has one hundred bins and is stored in
+         an NDF called ru\_hg.
+      }
+      \sstexamplesubsection{
+         inspect rulupi i ! option=hi numbin=100 hirep $\backslash$
+      }{
+         As above except no plot is made, no NDF is created, and
+         the full one hundred histogram values are reported.  In this
+         particular example the second parameter could equally well be
+         C for cursor mode since no co-ordinate information is
+         obtained.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         In cursor mode there must be an existing DATA picture for the
+         chosen image display stored in the graphics database.  Valid
+         cursor positions are bounded by the DATA picture.
+
+         \sstitem
+         On exit the input picture, if there was one, is made the
+         current picture on the overlay; and the last graphics plot is
+         stored in the database as a FRAME picture.  Also, if the
+         {\tt "Device"} option is used a FRAME picture is stored for
+         that device.
+
+         \sstitem
+         The Histogram NDF has an AXIS component whose the LABEL and
+         UNITS are those of the input NDF's data array; its centres are
+         in data value of the bin centre.  The NDF LABEL is {\tt "Number"}.
+
+         \sstitem
+         The Slice NDF has an AXIS component whose LABEL is {\tt "Pixel"} and
+         centres are pixel co-ordinates from 0.5; its LABEL and UNITS are
+         propagated from the input NDF.
+
+         \sstitem
+         The current palette entries 1 to 4 associated with the OVERLAY
+         are used as follows in the cursor mode for IMAGE\_OVERLAY devices.
+         A sample slice or region, and the associated button, are drawn
+         with palette index 1.  Similarly, index 3 is used to indicate an
+         accepted slice or region.  The exit button is drawn in the colour
+         of index 2.  Index 4 is used to draw the boxes representing the
+         mouse or trackerball buttons.  Use the PAL$\lsk$ commands to select
+         suitable complementary colours for the image's colour table,
+         especially for palette indices 1 and 3.
+
+         For WINDOW\_OVERLAY devices, all the above are drawn with the
+         colour of palette index 1, but the various colours are replaced
+         by different dashed-line patterns.  Use PALENTRY to change the
+         colour of the lines.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: CURSOR, HISTOGRAM, ELPROF, LOOK, NDFCOPY, STATS; ESP:
+      SECTOR; Figaro: HIST, ICUR, IGCUR, ILIST, ISTAT, SLICE; GAIA.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Only real data can be processed directly.  Other data types
+         will undergo a type conversion before processing occurs.
+
+         \sstitem
+         The routine correctly processes the AXIS, DATA, QUALITY, VARIANCE,
+         LABEL, TITLE, UNITS, and HISTORY components of an NDF, and
+         propagates the WCS component, plus all extensions, to the output 
+         Region NDF.
+
+         \sstitem
+         Processing of bad pixels and automatic quality masking are
+         supported.  Bad pixels are excluded from statistics and are
+         indicated in reports of data values by the word {\tt INVALID}.  In the
+         slice plot they appear as gaps, and they do not affect the limits
+         of the ordinate.  The same applies to zero or negative data
+         values if the plot is to have a logarithmic ordinate.  Similarly,
+         for the histogram abscissa.
+      }
+   }
+}
+\sstroutine{
+   KRHHELP
+}{
+   Gives help about KAPRH
+}{
+   \sstdescription{
+      Displays help about {\footnotesize KAPRH}.  The help information
+      describes individual commands in detail.
+
+      Here are some of the main options.
+      \begin{description}
+      \item {\tt krhhelp} \\
+         No parameter is given so the introduction and the top-level
+         help index is displayed.
+
+      \item {\tt krhhelp application/topic} \\
+         This gives help about the specified application or topic.
+
+      \item {\tt krhhelp application/topic subtopic} \\
+         This lists help about a subtopic of the specified application
+         or topic.  The hierarchy of topics has a maximum of four levels.
+
+      \item {\tt krhhelp Hints} \\
+         This gives hints for new and intermediate users.
+
+      \item {\tt krhhelp summary} \\
+         This shows a one-line summary of each application.
+
+      \item {\tt krhhelp classified classification} \\
+         This lists a one-line summary of each application in the
+         given functionality classification.
+      \end{description}
+
+      See the Section {\tt "}Navigating the Help Library{\tt "} for details
+      how to move around the help information, and to select the topics
+      you want to view.
+   }
+   \sstusage{
+      krhhelp [topic] [subtopic] [subsubtopic] [subsubsubtopic]
+   }
+   \sstparameters{
+      \sstsubsection{
+         TOPIC = LITERAL (Read)
+      }{
+         Topic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBTOPIC = LITERAL (Read)
+      }{
+         Subtopic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubtopic for which help is to be given. {\tt [" "]}
+      }
+      \sstsubsection{
+         SUBSUBSUBTOPIC = LITERAL (Read)
+      }{
+         Subsubsubtopic for which help is to be given. {\tt [" "]}
+      }
+   }
+   \sstdiytopic{
+      Navigating the Help Library
+   }{
+      The help information is arranged hierarchically.  You can
+      move around the help information whenever KRHHELP prompts.  This
+      occurs when it has either presented a screen's worth of text or
+      has completed displaying the previously requested help.  The
+      information displayed by KRHHELP on a particular topic includes
+      a description of the topic and a list of subtopics that further
+      describe the topic.
+
+      At a prompt you may enter:
+
+      \sstitemlist{
+
+         \sstitem
+         a topic and/or subtopic name(s) to display the help for that
+         topic or subtopic, so for example, {\tt block parameters box}
+         gives help on {\tt BOX}, which is a subtopic of {\tt Parameters},
+         which in turn is a subtopic of {\tt BLOCK};
+
+         \sstitem 
+         a {\tt $<$CR$>$} to see more text at a {\tt Press RETURN to
+         continue ...} request;
+
+         \sstitem
+         a {\tt $<$CR$>$} at topic and subtopic prompts to move up one
+         level in the hierarchy, and if you are at the top level it will
+         terminate the help session;
+
+         \sstitem
+         a {\tt CTRL/D }(pressing the CTRL and D keys simultaneously) in
+         response to any prompt will terminate the help session;
+
+         \sstitem
+         a question mark {\tt ?} to redisplay the text for the current topic,
+         including the list of topic or subtopic names; or
+ 
+         \sstitem
+         an ellipsis {\tt ...} to display all the text below the current
+         point in the hierarchy.  For example, {\tt BLOCK...} displays
+         information on the BLOCK topic as well as information on all the
+         subtopics under BLOCK.
+      }
+ 
+      You can abbreviate any topic or subtopic using the following rules.
+
+      \sstitemlist{
+
+         \sstitem
+         Just give the first few characters, {\it e.g.}\ {\tt PARA} for
+         {\tt Parameters}.
+ 
+         \sstitem
+         Some topics are composed of several words separated by
+         underscores.  Each word of the keyword may be abbreviated,
+         {\it e.g.}\ {\tt Colour\_Set} can be shortened to {\tt C\_S}.
+ 
+         \sstitem
+         The characters {\tt \%} and {\tt $\lsk$} act as wildcards, where
+         the percent sign matches any single character, and asterisk
+         matches any sequence of characters.  Thus to display information
+         on all available topics, type an asterisk in reply to a prompt.
+
+         \sstitem
+         If a word contains, but does end with an asterisk wildcard, it
+         must not be truncated.
+ 
+         \sstitem
+         The entered string must not contain leading or embedded spaces.
+      }
+
+      Ambiguous abbreviations result in all matches being displayed.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Uses the portable help system.
+
+      }
+   }
+}
+\manroutine {{\manheadstyle{MOSAIC}}}{ Merges several non-congruent
+  2-d data arrays into one output data array.}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+  Up to 20 non-congruent 2-d data arrays may be input, along with
+  their relative offsets from the first data array, and these are
+  then made into a mosaic into one (usually larger) output 2-d data
+  array. Where the frames overlap, either the mean value or just the
+  sum is inserted into the output data array. Normally averaging is
+  performed. All data arrays are stored in {\mantt{IMAGE}} structures.
+
+  The magic-value method is used for processing bad data.  Bad
+  pixels are excluded from the averaging in overlap areas. Output
+  pixels that have been mapped or correspond to one or more input
+  arrays, yet have no good pixels contributing, are set to bad.
+  Pixels in the output data array not mapped by any of the input
+  arrays are set to zero.
+
+\manroutineitem {Invocation }{}
+  MOSAIC
+
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{NUMBER}}  }{{\mantt{\_INTEGER}}}
+  Number of data arrays to be merged.
+\manparameterentry {{\mantt{READ}} }{{\mantt{AVERAGE}}  }{{\mantt{\_LOGICAL}}}
+  If true overlap regions are averaged, alternatively, they are
+  summed.  \mbox{{\mantt [TRUE]}}
+\manparameterentry {{\mantt{READ}} }{{\mantt{INPIC}}{$n$}  }{{\mantt{IMAGE}}}
+  {$n^{\rm th}$} {\mantt{IMAGE}} structure containing a data array to be a
+  constituent of a mosaic.
+\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
+  Output {\mantt{IMAGE}} structure containing the merged data array.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
+  Title for the output {\mantt{IMAGE}} structure. \mbox{{\mantt ['KAPPA - Mosaic']}}
+\end{manparametertable}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{XOFFSET}} }{{\mantt{\_INTEGER}}}
+  {$x$} offset of {$n^{\rm th}$} data array from the first, in the sense of the
+  {$x$} origin of the {$n^{\rm th}$} data array minus the {$x$} origin of the
+  first.
+\manparameterentry {{\mantt{READ}} }{{\mantt{YOFFSET}} }{{\mantt{\_INTEGER}}}
+  {$y$} offset of {$n^{\rm th}$} data array from the first, in the sense of the
+  {$y$} origin of the {$n^{\rm th}$} data array minus the {$y$} origin of the
+  first.
+\end{manparametertable}
+\manroutineitem {Bugs }{}
+  None known.
+
+\manroutineitem {Authors }{}
+  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
+  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
+\end{manroutinedescription}
+
+\manroutine {{\manheadstyle{QUILT}}}{ Generates a mosaic from equally sized
+  2-d data arrays, optionally specified from an ASCII file.}
+\begin{manroutinedescription}
+\manroutineitem {Description }{}
+  This routine provides a more-sophisticated version of the {\mantt{MOSAIC}}
+  application for combining many 2-d data arrays into one large
+  output data array. All the data arrays are stored in {\mantt{IMAGE}}
+  structures.  The pixels in overlapping regions may be averaged or
+  summed.
+
+  The names of {\mantt{IMAGE}} structures to be concatenated and their
+  respective offsets of their data arrays from a central
+  data array can be input either one by one from the interface, or
+  all at once from a free-format file.  The format of the file is
+  as follows:  \mbox {}
+
+  \begin{tabular}{@{\hspace{11mm}}l@{\hspace{24mm}}l}
+        \\
+        {\tt Mosaic title}     & ! header \\
+        {\tt central\_image}   & ! name of central {\mantt{IMAGE}} \\
+        {\tt 125}              & ! total number of frames \\
+        {\tt 345  229}         & ! maximum {$x$}-{$y$} offsets \\
+        {\tt -356  -232}       & ! minimum {$x$}-{$y$} offsets \\
+        {\tt image\_2}         & ! subsequent {\mantt{IMAGE}} and \\ 
+        {\tt 35  34}           & ! its {$x$}-{$y$} offsets \\
+        {\tt image\_3}         & \\
+        {\tt 36  -33}          & \\
+        {\tt .}                & \\
+        {\tt .}                & \\
+        {\tt .}                & \\
+        \\
+  \end{tabular}
+
+  Only like-sized data arrays may be input. The reason for this is
+  that it is difficult to work out how big the output data array
+  needs to be until all the input data arrays and their offsets have
+  been read in. By confining the data arrays to be the same size,
+  only the maximum and minimum {$x$} and {$y$} offsets from the central data
+  array need be input by the user, then the output image size can be
+  worked out from these numbers along with the size of the central
+  data array.
+
+  Bad pixels are processed by the magic-value method.
+
+\manroutineitem {Invocation }{}
+  QUILT
+
+\newpage
+\manroutineitem {Parameters }{}
+\begin{manparametertable}
+\manparameterentry {{\mantt{READ}} }{{\mantt{WHERE}}  }{{\mantt{\_CHAR}}}
+  Whether input comes from an ASCII {\mantt{'File'}} or from the
+  {\mantt{'Interface'}}.
+\manparameterentry {{\mantt{READ}} }{{\mantt{FNAME}}  }{{\mantt{\_CHAR}}}
+  Name of the ASCII file holding the input information to define 
+  the mosaic.
+\manparameterentry {{\mantt{READ}} }{{\mantt{NUMBER}}  }{{\mantt{\_INTEGER}}}
+  Number of data arrays to form the mosaic.
+\manparameterentry {{\mantt{READ}} }{{\mantt{INPICI}}  }{{\mantt{IMAGE}}}
+  {\mantt{IMAGE}} structure containing the central data array (offset 0, 0).
+\manparameterentry {{\mantt{READ}} }{{\mantt{MAXX}}  }{{\mantt{\_INTEGER}}}
+  Maximum {$x$} offset of any data array from the central data array
+  in {\mantt Interface} mode (must be {$\geq$}0).
+\manparameterentry {{\mantt{READ}} }{{\mantt{MAXY}}  }{{\mantt{\_INTEGER}}}
+  Maximum {$y$} offset of any data array from the central data array
+  in {\mantt Interface} mode (must be {$\geq$}0).
+\manparameterentry {{\mantt{READ}} }{{\mantt{MINX}}  }{{\mantt{\_INTEGER}}}
+  Minimum {$x$} offset of any data array from the central data array
+  in {\mantt Interface} mode (must be {$\leq$}0).
+\manparameterentry {{\mantt{READ}} }{{\mantt{MINY}}  }{{\mantt{\_INTEGER}}}
+  Minimum {$y$} offset of any data array from the central data array
+  in {\mantt Interface} mode (must be {$\leq$}0).
+\manparameterentry {{\mantt{READ}} }{{\mantt{AVERAGE}}  }{{\mantt{\_LOGICAL}}}
+  If true overlap regions are averaged, alternatively, they are
+  summed.
+\manparameterentry {{\mantt{WRITE}} }{{\mantt{OUTPIC}}  }{{\mantt{IMAGE}}}
+  Output {\mantt{IMAGE}} structure.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OTITLE}}  }{{\mantt{\_CHAR}}}
+  Title string for output {\mantt{IMAGE}} structure.
+ \mbox{{\mantt ['KAPPA - Quilt']}}
+\manparameterentry {{\mantt{READ}} }{{\mantt{CURPIC}}  }{{\mantt{IMAGE}}}
+  {\mantt{IMAGE}} containing the current data array being concatenated to
+  the mosaic.
+\manparameterentry {{\mantt{READ}} }{{\mantt{OFFSETX}}  }{{\mantt{\_INTEGER}}}
+  {$x$} offset of current data array from the central one
+  ({\mantt{Interface}} mode).
+\manparameterentry {{\mantt{READ}} }{{\mantt{OFFSETY}}  }{{\mantt{\_INTEGER}}}
+  {$y$} offset of current data array from the central one
+  ({\mantt{Interface}} mode).
+\end{manparametertable}
+\manroutineitem {Deficiencies }{}
+  Works with like-sized images only and uses Fortran i/o for getting
+  stuff from a file. 
+
+\manroutineitem {Bugs }{}
+  None known.
+
+\manroutineitem {Authors }{}
+  Mark McCaughrean UoE ( {\mantt REVA}::{\mantt MJM} )
+  Malcolm J. Currie ~STARLINK \mbox{( {\mantt RAL}::{\mantt CUR} )}
+\end{manroutinedescription}
+
+\sstroutine{
+   SNAPSHOT
+}{
+   Dumps an image-display memory to a graphics hardcopy and
+   optionally to an NDF
+}{
+   \sstdescription{
+      This routine captures the data in the memory of an image-display
+      device, and writes these data to a different GKS device.  For
+      example, the contents of an X-windows memory might be captured and
+      sent to a PostScript laser printer.
+
+      Various options are available:
+      \begin{itemize}
+         \item you may choose to capture a whole or part of what is visible
+           on the screen, or the entire contents of the memory.  For the
+           former you adjust a rubber-band region until the desired
+           area is enclosed. Instructions for controlling the
+           rubber-band are given at run time.
+         \item A title may be included in the output.
+         \item The array may be output to an NDF.
+      \end{itemize}
+   }
+   \sstusage{
+      snapshot odevice [out] [whole] [scale] [negativ] [title] [planes]
+   }
+   \sstparameters{
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         Input image-display device.  {\tt [}Current image-display 
+         device{\tt ]}
+      }
+      \sstsubsection{
+         NEGATIVE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the output hardcopy is a negative version of what is
+         stored in the image display.  On some output devices a
+         constant dark background can give a non-uniform result, and
+         so a negative representation is the default. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         ODEVICE = DEVICE (Read)
+      }{
+         Name of the output device.  The suggested default is the
+         graphics device last used in SNAPSHOT, and if there is not one,
+         the suggested default is the global current graphics device.
+         The device must be in the GNS category MATRIX\_PRINTER, and
+         have at least 24 greyscale intensities.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         Name given to the output NDF data structure used to store the
+         contents of the image-display memory.  If it is null ({\tt !}) no
+         NDF will be created. {\tt [!]}
+      }
+      \sstsubsection{
+         PLANES = \_INTEGER (Read)
+      }{
+         The numbers of the image memory planes not be output.  All
+         unspecified planes become visible.  If PLANES is null ({\tt !}), all
+         memory planes will be used to form the snapshot.  The base
+         memory is 0 and overlays are numbered consecutively from 1.
+         The value must be between 0 and the number of image memories
+         minus 1.  For an Ikon the only overlay plane is 1.  {\tt [!]}
+      }
+      \sstsubsection{
+         SCALE = \_REAL (Read)
+      }{
+         Scale factor for output.  Unity gives the largest possible
+         output, but it takes longest to compute and print (goes as the
+         square of the scale factor).  On the other hand unity does
+         provide maximum resolution. SCALE must be between 0 and 1.
+         {\tt [0.707]}
+      }
+      \sstsubsection{
+         TITLE = LITERAL (Read)
+      }{
+         Title of the plot and the output NDF.  There is only space on
+         the plot for about 25 characters in the title.  If it is null
+         ({\tt !}) no title will be plotted, and the title in the output NDF
+         becomes {\tt "KAPPA - Snapshot"}. {\tt [!]}
+      }
+      \sstsubsection{
+         WHOLE = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the whole image-display memory is recorded, otherwise
+         a selected region of what is visible on the screen is plotted.
+         Dumping the whole memory can require considerable disc space
+         for work arrays and the output NDF. {\tt [FALSE]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         snapshot whole odevice=canon\_l
+      }{
+         This will dump the whole of the current image display's 
+         memories to the canon\_l device.  The plot will occupy half 
+         of the maximum area available on the device, {\it i.e.}
+         $\surd2/2$ magnification.
+      }
+      \sstexamplesubsection{
+         snapshot scale=1.0 $\backslash$
+      }{
+         This will capture a the whole or part of what is visible on
+         the screen of the current image display and dump it to the
+         current snapshot device at the largest magnification.
+      }
+      \sstexamplesubsection{
+         snapshot postscript views device=xw whole
+      }{
+         This dumps the whole of the xw device's memories to the postscript
+         device, and also to a NDF called views.  The area magnification
+         is a half.
+      }
+      \sstexamplesubsection{
+         snapshot ps\_l device=ikon whole planes=0 title="Hardcopy Base"
+      }{
+         This dumps the whole of the Ikon's base memory to the ps\_l
+         device.  The plot is entitled {\tt "Hardcopy Base"}.  The entire
+         output plot occupies half of the maximum area available on the
+         device.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The whole of the screen and the whole of the memory may be
+         different, for example, the image may have been zoomed or panned.
+
+         \sstitem
+         Files are not spooled to laserprinters.  They must be printed
+         outside this application.
+      }
+   }
+   \sstdiytopic{
+       Related Applications
+   }{
+       KAPPA: DISPLAY.
+   }
+   \sstimplementationstatus{
+      No origin information is passed to the output NDF.
+   }
+}
+
+\sstroutine{
+   TURBOCONT
+}{
+   Contours a 2-d NDF quickly
+}{
+   \sstdescription{
+
+\vspace{5mm}
+\begin{quote}
+\begin{center}
+\emph{ Note, this application will be withdrawn at the next release of
+KAPPA. Use ``CONTOUR'' instead.} 
+\end{center}
+\end{quote}
+\vspace{5mm}
+
+      This application draws a contour plot of a 2-dimensional NDF on the
+      current graphics device via an efficient algorithm.  The image may be
+      part or whole of the data array, but also the variance or quality
+      can be shown.  The plot is situated within the current
+      graphics-database picture.
+
+      The contour plot resides within optional, annotated and enumerated
+      axes.  An optional, but recommended, key may be drawn to the
+      right of the contour plot.  It reports the NDF's units if there
+      are any, and only contour heights actually plotted are included.
+      There are seven methods for selecting contours.
+   }
+   \sstusage{
+      turbocont ndf [comp] mode ncont [key] [device]
+        $\left\{ {\begin{tabular}{l}
+                    firstcnt=? stepcnt=? \\
+                    heights=? \\
+                    percentiles=?
+                   \end{tabular} }
+        \right.$
+        \newline\hspace*{23.3em}
+        \makebox[0mm][c]{\small mode}
+   }
+   \sstparameters{
+      \sstsubsection{
+         ANNOTA = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the contour lines will be annotated with a contour
+         number corresponding to the key entry.  It is ignored and there
+         are no annotations when KEY = {\tt FALSE}.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         CLEAR = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the graphics device is to be cleared before display
+         of the array. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         COMP = LITERAL (Read)
+      }{
+         The NDF component to be contoured.  It may be {\tt "Data"},
+         {\tt "Quality"}, {\tt "Variance"}, or {\tt "Error"} (where
+         {\tt "Error"} is the alternative to {\tt "Variance"} and causes
+         the square root of the variance values to be taken before
+         plotting contours).  If {\tt "Quality"} is specified, then
+         the quality values are treated as numerical values (in the
+         range 0 to 255).  {\tt ["Data"]}
+      }
+      \sstsubsection{
+         COSYS = LITERAL (Read)
+      }{
+         The co-ordinate system to be used.  This can be either {\tt "World"}
+         or {\tt "Data"}.  {\tt "World"} makes pixel co-ordinates to appear on axes.
+         If COSYS = {\tt "Data"} the NDF's axis information is used to
+         annotate axes.  {\tt [}Current co-ordinate system{\tt ]}
+      }
+      \sstsubsection{
+         DEVICE = DEVICE (Read)
+      }{
+         The plotting device. {\tt [}Current image-display device{\tt ]}
+      }
+      \sstsubsection{
+         FILL = \_LOGICAL (Read)
+      }{
+         The contour plot normally has square pixels, in other words
+         a length along each axis corresponds to the same number of
+         pixels.  However, for images with markedly different
+         dimensions this default behaviour may not be suitable or give
+         the clearest plot.  When FILL is {\tt TRUE}, the square-pixel
+         constraint is relaxed and the contour plot is the largest
+         possible within the current picture.  When FILL is {\tt FALSE}, the
+         pixels are square.  The suggested default is the current
+         value.  {\tt [FALSE]}
+      }
+      \sstsubsection{
+         FIRSTCNT = \_REAL (Read)
+      }{
+         Height of the first contour (Linear and Magnitude modes).
+         The suggested value is the current value.
+      }
+      \sstsubsection{
+         HEIGHTS() = \_REAL (Read)
+      }{
+         Contour levels (Free mode).  The suggested default is the
+         current value.
+      }
+      \sstsubsection{
+         KEY = \_LOGICAL (Read)
+      }{
+         When KEY is {\tt TRUE}, a key of the contour level versus
+         pixel value is to be produced. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         MAXRES = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the contours are interpolated to the resolution of the
+         plotting device, {\it i.e.}\ provides sub-pixel resolution, otherwise
+         straight-line segments at pixel resolution are drawn.  The
+         latter does not give smooth contours, but this makes the
+         processing much faster.  The former draws smoother contours to
+         the resolution of the graphics workstation, but they still
+         have vertices.  If you require smooth well-rounded contours try
+         the slower CONTOUR. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         MODE = LITERAL (Read)
+      }{
+         The method used to select the contour levels.  The options are
+         described below.
+         \begin{description}
+         \item {\tt "Area"} --- The contours enclose areas of the array for
+                         which the equivalent radius increases by equal
+                         increments.  You specify the number of levels.
+         \item {\tt "Automatic"} --- The contour levels are equally spaced between the maximum
+                        the maximum and minimum pixel values in the
+                        array.  You supply the number of contour levels.
+         \item {\tt "Equalised"} --- You define the number of equally spaced
+                          percentiles.
+         \item {\tt "Free"} --- You specify a series of contour values
+                        explicitly.
+         \item {\tt "Linear"} --- You define the number of contours, the start
+                        contour level and linear step between contours.
+         \item {\tt "Magnitude"} --- You define the number of contours, the start
+                        contour level and step between contours.  The
+                        step size is in magnitudes so the $n^{\rm th}$
+                        contour is 10$^{-0.4*(n-1)*{\rm step}}$ times the
+                        start contour level.
+         \item {\tt "Percentiles"} --- You specify a series of percentiles.
+         \end{description}
+
+         The suggested default is the current value, which is initially
+         {\tt "Free"}.
+      }
+      \sstsubsection{
+         NCONT = \_INTEGER (Read)
+      }{
+         The number of contours required (all modes except Free and
+         Percentiles).  It must be between 1 and 50.  If the number is
+         large, the plot may be cluttered and take longer to produce.
+         {\tt 6}, the initial suggested default, gives reasonable results.
+         The current value becomes the suggested default.
+      }
+      \sstsubsection{
+         NDF = NDF (Read)
+      }{
+         NDF structure containing the 2-dimensional image to be contoured.
+      }
+      \sstsubsection{
+         PERCENTILES() = \_REAL (Read)
+      }{
+         Contour levels given as percentiles.  The values must lie
+         between 0.0 and 100.0. (Percentiles mode).  The suggested
+         default is the current value.
+      }
+      \sstsubsection{
+         PXSIZE = \_REAL (Read)
+      }{
+         The length ($x$ axis) of the plot in metres.  There is an upper
+         limit given by the $x$ size of the current picture.
+         {\tt [}Maximum that can fit in the current picture whilst
+         preserving square pixels{\tt ]}
+      }
+      \sstsubsection{
+         PYSIZE = \_REAL (Read)
+      }{
+         The length ($y$ axis) of the plot in metres.  There is an upper
+         limit given by the $y$ size of the current picture.
+         {\tt [}Maximum that can fit in the current picture whilst
+         preserving square pixels{\tt ]}
+      }
+      \sstsubsection{
+         RESOLUTION = \_REAL (Read)
+      }{
+         The resolution factor. The actual plotting resolution is this
+         times the $x$ and $y$ theoretical resolutions in world
+         co-ordinates.  In GKS, whether or not a given `lamp' is
+         illuminated or pen position is marked with ink cannot be
+         determined, so a factor of unity is too small for the most
+         efficient processing. It must lie between 2.0 and 10.0. {\tt [2.0]}
+      }
+      \sstsubsection{
+         STEPCNT = \_REAL (Read)
+      }{
+         Separation between contour levels, linear for Linear mode
+         and in magnitudes for Magnitude mode.  The suggested value is
+         the current value.
+      }
+   }
+   \sstgraphparameters{
+      \sstsubsection{
+         ABSLAB  =  LITERAL (Read)
+      }{
+         Label for the plot abscissa, in which NCAR fancy founts may be
+         embedded when FONT = {\tt "NCAR"}.  If axis information is
+         present the suggested default is the NDF's axis label
+         followed by the units, in parentheses.  If an error occurs
+         obtaining the label the suggested default is {\tt "X"}. {\tt []}
+      }
+      \sstsubsection{
+         AXES = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if labelled and annotated axes are to be drawn around the
+         contour plot.  The annotations are either the data
+         co-ordinates from the NDF axis components, provided these are
+         present and linear and COSYS = {\tt "Data"}; otherwise pixel
+         co-ordinates are used.  {\tt [TRUE]}
+      }
+      \sstsubsection{
+         BORDER = \_LOGICAL (Read)
+      }{
+         BORDER is {\tt TRUE} if a box is to be drawn about the contour
+         plot.  This is only accessed when there are no axes required.
+         {\tt [TRUE]}
+      }
+      \sstsubsection{
+         CONCOL = LITERAL (Read)
+      }{
+        The colour of the contour lines on devices that support colour.
+        The options are described below.
+
+         \begin{description}
+         \item {\tt "MAX"}  --- The maximum colour index in the image
+                          display colour lookup table.
+         \item {\tt "MIN"}  --- The minimum (non-reserved) colour index in
+                          the image-display colour lookup table.
+         \item {\bf An integer} --- The actual colour index.  It is
+                          constrained between 0 and the maximum colour
+                          index available on the device.
+         \item {\bf A named colour} --- Uses the named colour from the
+                          palette, and if it is not present, the nearest
+                          colour from the palette is selected.
+         \end{description}
+
+         If the colour is to remain unaltered as the lookup table is
+         manipulated choose an integer between 0 and 15, or a named
+         colour.  This parameter will be ignored if PENROT = {\tt TRUE}.
+         {\tt [}The current value, but equals {\tt 1} (the foreground
+         colour) if there is no current value.{\tt ]}
+      }
+      \sstsubsection{
+         DASHED = \_REAL (Read)
+      }{
+         The height below which the contours will be drawn with dashed
+         lines.  A null value ({\tt !}) means all contours are drawn with
+         solid lines.  This facility is only available when ANNOTA =
+         {\tt FALSE}. {\tt [!]}
+      }
+      \sstsubsection{
+         FONT = LITERAL (Read)
+      }{
+         The fount to be used for the line graphics.  It can be either
+         {\tt "NCAR"} for the NCAR fancy characters and {\tt "GKS"} for the standard
+         GKS san-serif fount.   The former is intended for hardcopy
+         publication-quality plots, since it is relatively slow; the
+         latter is intended for normal interactive graphics requiring
+         rapid plotting, and it is clearer on small plots. The
+         suggested default is the current value. {\tt ["GKS"]}
+      }
+      \sstsubsection{
+         LABELFREQ = \_INTEGER (Read)
+      }{
+         The frequency with which contour levels are annotated.  {\tt 1}
+         means every level will be labelled.  This may be excessive in
+         plots where the contours are closely packed.  This parameter
+         is ignored
+         unless contour annotation has been selected.  It must be between
+         one and the number of contour heights. {\tt [1]}
+      }
+      \sstsubsection{
+         MAJTIC( 2 ) = \_REAL (Read)
+      }{
+         The parameter controlling the numbers of major tick marks
+         for the $x$ and $y$ axes.  (Number used is between MAJTIC$+$2 and
+         5$*$MAJTIC/2$+$4.) {\tt [3.,3.]}
+      }
+      \sstsubsection{
+         MINTIC( 2 ) = \_REAL (Read)
+      }{
+         The number of minor tick marks between each major tick mark
+         for the $x$ and $y$ axes.  A negative value forces the graphics
+         package to compute appropriate values. {\tt [-1.,-1.]}
+      }
+      \sstsubsection{
+         NOISY = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE} the contour lines will alternately be annotated with
+         a contour number corresponding to the key entry, but at
+         twice the frequency.  It is ignored unless annotated contours
+         have been selected. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         ORDLAB  =  LITERAL (Read)
+      }{
+         Label for the plot ordinate, in which NCAR fancy founts may be
+         embedded when FONT = {\tt "NCAR"}.  If axis information is
+         present the suggested default is the NDF's axis label followed
+         by the units, in parentheses.  If an error occurs obtaining
+         the label the suggested default is {\tt "Y"}. {\tt []}
+      }
+      \sstsubsection{
+         OUTTIC = \_LOGICAL (Read)
+      }{
+         {\tt TRUE} if the axis tick marks are to appear on the outside of
+         the axes instead of inside.  By default, the tick marks are
+         drawn outside the contouring region to eliminate
+         intersections of ticks with the contours. {\tt [TRUE]}
+      }
+      \sstsubsection{
+         PENROT = \_LOGICAL (Read)
+      }{
+         If {\tt TRUE}, the plotting pens are cycled through the contours to
+         aid identification of the contour heights.  It is ignored
+         when annotation is selected. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         PLTITL = LITERAL (Read)
+      }{
+         The title of the plot.  Up to about 40 characters can be
+         accommodated, and NCAR fancy founts may be embedded when
+         FONT = {\tt "NCAR"}.  If an error occurs obtaining the title, it
+         is defaulted to {\tt "Contour plot"}. {\tt [}The NDF title{\tt ]}
+      }
+      \sstsubsection{
+         THICK = \_REAL (Read)
+      }{
+         The thickness of the lines and NCAR-fount characters in the plot, where
+         {\tt 1.0} is the normal thickness.  Currently, this is only available
+         on a few devices.  It must take a value in the range 0.5--10.0.
+         {\tt [1.0]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         turbocont myfile D $\backslash$
+      }{
+         Contours the data array in the NDF called myfile on the current
+         graphics device.  All other settings are defaulted, so for
+         example the current method for determining heights is used, and
+         a key is plotted.
+      }
+      \sstexamplesubsection{
+         turbocont taurus1(100:199,150:269,4) $\backslash$
+      }{
+         Contours a 2-dimensional portion of current array component in
+         the NDF cube called taurus1 on the current graphics device.
+         The portion extends from pixel (100,~150,~4) to pixel
+         (199,~269,~4).  All other settings are defaulted, so for example
+         coarse contours are drawn, using the current mode for
+         determining heights, and a key is plotted.
+      }
+      \sstexamplesubsection{
+         turbocont ndf=ngc6872 mode=au ncont=5 device=ps\_l concol=white
+      }{
+         Contours the data array in the NDF called ngc6872 on the
+         ps\_l graphics device.  Five equally spaced contours between
+         the maximum and minimum data values are drawn in white.  The
+         NDF's title adorns the plot.  A key is plotted.
+      }
+      \sstexamplesubsection{
+         turbocont ngc6872 mode=au ncont=5 annota labelfreq=2 cosys=w
+         device=ps\_l concol=white
+      }{
+         As above.  In addition the contours are annotated at
+         alternate heights.  The axes are annotated with pixel
+         co-ordinates.
+      }
+      \sstexamplesubsection{
+         turbocont ngc6872 mode=li firstcnt=10 stepcnt=2 ncont=4 noaxes
+      }{
+         Contours the data array in the NDF called ngc6872 on the
+         current graphics device.  Four contours at heights 10, 12, 14,
+         and 16 are drawn.  A key is plotted, but no axes surround the
+         contour plot.
+      }
+      \sstexamplesubsection{
+         turbocont ss443 mode=pe percentiles=[80,90,95,98,99,99.9] annota
+      }{
+         Contours the data array in the NDF called ss443 on the
+         current graphics device.  Annotated contours at heights
+         corresponding to the 80, 90, 95, 98, 99, and 99.9 percentiles
+         are drawn.  A key is plotted.
+      }
+      \sstexamplesubsection{
+         turbocont mode=eq ncont=5 dashed=0 pencol=red ndf=skyflux
+      }{
+         Contours the data array in the NDF called skyflux on the
+         current graphics device.  Contours at heights corresponding to
+         the 10, 30, 50, 70 and 90 percentiles are drawn in red.  Those
+         contours whose values are negative will appear as dashed
+         lines.  A key is plotted.
+      }
+      \sstexamplesubsection{
+         turbocont comp=d nokey penrot $\backslash$
+      }{
+         Contours the portion of the data array in the current NDF on
+         the current graphics device using the current method for height
+         selection.  The NDF's title adorns the plot.  No key is drawn.
+         The appearance of the contours cycles every third contour.
+      }
+      \sstexamplesubsection{
+         turbocont comp=v mode=fr heights=[10,20,40,80] title=Variance
+      }{
+         Contours the variance array in the current NDF on the
+         current graphics device.  Contours at 10, 20, 40 and 80 are
+         drawn.  {\tt "Variance"} is the title of the plot.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The application stores a number of pictures in the graphics
+         database in the following order: a FRAME of the specified size
+         containing the title, annotated axes, contours and key; a DATA
+         picture which is stored with world co-ordinates in units of data
+         pixels; and a KEY picture to store the key if present.  The DATA
+         picture also may have double-precision data co-ordinates derived
+         from the NDF axis components provided these are linear and
+         different from pixel co-ordinates; the data co-ordinates are
+         stored via a linear transformation.  The NDF associated with the
+         plot is stored by reference with the DATA picture.  On exit the
+         current database picture for the chosen device reverts to the
+         input picture.
+
+         \sstitem
+         There are some options for setting the characteristics of the
+         contour lines.  By default, solid lines are drawn with the same
+         colour as the axes and key, namely the foreground colour.  The
+         colour will depend on the graphics device chosen, but it is often
+         black for printers or white for terminals.  The alternatives to
+         override this default behaviour are listed below.
+
+         \begin{enumerate}
+         \item Set a colour for all contours using parameter CONCOL.
+         \item Request dashed contours below some threshold given by
+               parameter DASHED and solid lines for other heights.  All
+               contours have either the foreground colour or that
+               prescribed by parameter CONCOL.
+         \item Cycle the pens modulo 3 for each contour height actually
+               plotted by setting PENROT = {\tt TRUE}.  The characteristics of
+               the second and third line styles will depend on the chosen
+               graphics device.  An image display or pen plotter will draw
+               coloured lines using palette entries 1 to 3; whereas a
+               window overlay, or monochrome laser printer or terminal
+               will draw a variety of dashed or thicker lines.
+         \item Combine options 2 and 3.  However, palette colours 1 to 3
+               will always be used and CONCOL ignored.  The contours below
+               the threshold continue the cycle through the three colours.
+               There may be some confusion on devices that already use
+               dashed lines, so this is only suitable for devices
+               supporting at least three colours simultaneously.
+         \item Annotate the contours using the number of the contour height
+               corresponding to the key entries rather than the values
+               themselves.  (Set parameter ANNOTA = {\tt TRUE}.)  The frequency
+               of labelling may be defined (LABELFREQ).  The key option
+               must be chosen (KEY = {\tt TRUE}) in conjunction with annotated
+               contours.  Annotation is not recommended should the data
+               array have a large number of bad pixels, or if the contours
+               are closely packed.  There is an additional parameter
+               (NOISY) to select double annotations for short or noisy
+               contours in option 2.
+         \end{enumerate}
+
+         Annotation takes precedence over pen rotation, which in turn
+         overrides colour control through CONCOL. 
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: CONTOUR; Figaro: ICONT, SPECCONT.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Only real data can be processed directly.  Other non-complex
+         numeric data types will undergo a type conversion before the
+         contour plot is drawn.
+
+         \sstitem
+         Bad pixels and automatic quality masking are supported.
+      }
+   }
+}
+
+\newpage
+\section{\xlabel{ap_IMAGEformat}IMAGE data format\label{ap:IMAGEformat}}
+
+The IMAGE format as used by some of {\footnotesize KAPRH} is a simple
+\HDSref\ structure, comprising a floating-point data array, a character title,
+and the maximum and minimum data values.  It is variant of the
+original Wright-Giddings IMAGE structure.  There are others is use
+that contain more items. An example structure is shown schematically
+below using the \HDSTRACEref\latexonly{ (SUN/102)} notation; see
+\latexelsehtml{Appendix~\ref{ap:NDFformat}}{\htmlref{the NDF format}{ap:NDFformat}}.
+\begin{verbatim}
+   HORSEHEAD  <IMAGE>
+
+      DATA_ARRAY(384,512)  <_REAL>   100.5,102.6,110.1,109.8,105.3,107.6,
+                                     ... 123.1,117.3,119,120.5,127.3,108.4
+      TITLE          <_CHAR*72>      'KAPPA - Flip'
+      DATA_MIN       <_REAL>         28.513
+      DATA_MAX       <_REAL>         255.94
+
+   End of Trace.
+\end{verbatim}
+
+The DATA\_ARRAY may have up to seven dimensions.
+IMAGE structures are associated with parameters like INPIC and OUTPIC.
+The TITLE object of new IMAGE structures takes the value of the
+parameter OTITLE.  DATA\_MIN and DATA\_MAX are now ignored.
+
+The IMAGE format is not too dissimilar from a {\em primitive\/} NDF
+with no extensions.  Indeed if it did not have DATA\_MAX and DATA\_MIN
+it would be a {\it bona fide}\ NDF.  Thus applications that handle the
+IMAGE format can follow the rules of \xref{SGP/38}{sgp38}{} and
+process it like an NDF.  In effect this means that all extensions are
+propagated to output files, and a quality array is propagated where
+the processing does not invalidate its values.  IMAGE applications
+also handle most {\em simple\/} NDFs correctly (those where the data
+array is an array of numbers at the second level of the hierarchical
+structure).  This similarity in formats enables NDF and IMAGE
+applications to work in co-operation. Note that the primitive
+variant is no longer the norm for NDFs, since for example, it does not
+support origin information.
+
+\end{document}
