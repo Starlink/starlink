@@ -107,6 +107,7 @@ use StarIndex;
 
 sub index_list;
 sub index_pack;
+sub index_includes;
 sub index_dir;
 sub index_tar;
 sub index_hlp;
@@ -159,7 +160,7 @@ if (@ARGV) {
 #  under $srcdir, and include files under $incdir.
 
 else {
-   index_pack $incdir, "INCLUDE";
+   index_includes $incdir, "INCLUDE";
    foreach $package_file (glob "$srcdir/*") {
       index_pack $package_file;
    }
@@ -228,8 +229,7 @@ sub index_pack {
 #        Name of package.  If absent it will be inferred from $pack_file
 #        which is assumed to be of the form 'package', 'package.tar',
 #        'package.tar.Z' or 'package.tar.gz'.  If present the package 
-#        is forced to be named as given.  This can be used to index
-#        pseudopackages like INCLUDE.
+#        is forced to be named as given.
 
 #  Return value:
 
@@ -587,7 +587,7 @@ sub index_source {
 #  Tag source file using language-specific tagging routine.
 
    open SOURCE, $file or error "Failed to open $file in directory ".cwd."\n";
-   $tagged = &$rtagger (join '', <SOURCE>);
+   $tagged = &$rtagger (join ('', <SOURCE>), $ext);
    close SOURCE;
 
 #  Write index entries for all the "<a name=''>" type tags.
@@ -689,6 +689,68 @@ sub index_hlp {
 
 
 ########################################################################
+sub index_includes {
+
+#+
+#  Name:
+#     index_includes
+
+#  Purpose:
+#     Index all files in Starlink include directory.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     index_includes ($dir, $packname);
+
+#  Description:
+#     This routine goes through a named directory supposed to contain 
+#     a set of files to be indexed, and indexes them under the package
+#     name given.  It is designed to be used for the $incdir (typically
+#     /star/include) directory.
+
+#  Arguments:
+#     $dir = string.
+#        Name of directory containing files.
+#     $packname = string.
+#        Name of package under which to index them.
+
+#  Return value:
+
+#  Notes:
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     05-OCT-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+#  Get arguments.
+
+   my ($dir, $packname) = @_;
+
+#  Store location of directory in file StarIndex object.
+
+   $file_index->put("$packname#", $dir);
+
+#  Index all files in directory.
+
+   pushd $dir;
+   index_files "$packname#", glob "*";
+   popd;
+}
+
+
+#######################################################################
 sub write_entry {
 
 #+
