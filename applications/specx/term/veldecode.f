@@ -29,8 +29,22 @@
       IVDEF   = LSRFLG/16
       IVFRAME = LSRFLG - (16.*IVDEF)
 
-      VDEF   = VDEFS(IVDEF+1)
-      VFRAME = VFRAMES(IVFRAME+1)
+      IVDEF = IVDEF + 1
+      IVFRAME = IVFRAME + 1
+      IF (IVDEF .LT. 1 .OR. IVDEF .GT. 3) THEN
+         print *,'** veldecode: Error decoding velocity definition',
+     :        ' - assuming RADIO'
+         IVDEF = 1
+      END IF
+
+      IF (IVFRAME .LT. 1 .OR. IVFRAME .GT. 4) THEN
+         print *,'** veldecode: Error decoding velocity frame',
+     :        ' - assuming LSR'
+         IVDEF = 2
+      END IF
+
+      VDEF   = VDEFS(IVDEF)
+      VFRAME = VFRAMES(IVFRAME)
 
 D     PRINT *, ' -- veldecode --'
 D     PRINT *, '    input value of LSRFLG', LSRFLG
