@@ -17,7 +17,6 @@ pongo_mon_SOURCES = pongo_mon.f
 pongo_mon_LDADD = tasks/libpongo_tasks.la subs/libpongo.la \
 	`$(srcdir)/pongo_link_adam`
 
-
 #  Rule for building the help library from the help source.
 .hlp.shl:
 	@HLIB@ $<
@@ -43,3 +42,10 @@ edit = sed \
 	$(edit) \
 	    $(srcdir)/$< > $(srcdir)/$@.tmp
 	mv $(srcdir)/$@.tmp $(srcdir)/$@
+
+## The above rule can get confused about pongo.icl and looks for pongo.icl.in.
+pongo.icl: ;
+icl/pongo_proc.icl: ;
+
+## File not mentioned elsewhere that we need to distribute.
+EXTRA_DIST = PONGO_PAR PONGO_CMN

@@ -22,13 +22,15 @@ package.
       <name>Paul Rees</name>
     </person>
     <person>
-      <uname>pwd</uname>
       <name>Peter W. Draper</name>
+      <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
     </person>
     <person>
-      <uname>aa</uname>
       <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun137</documentation>
