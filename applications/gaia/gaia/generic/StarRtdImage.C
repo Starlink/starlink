@@ -1452,6 +1452,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                     value /= fact;
                     astSetF( plot, "gap(1)", value );
                 }
+                if ( !astOK ) astClearStatus;
             }
             if ( gap2 != NULL ) {
                 sscanf( gap2, "gap(2)=%f", &fact );
@@ -1461,6 +1462,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                     value /= fact;
                     astSetF( plot, "gap(2)", value );
                 }
+                if ( !astOK ) astClearStatus;
             }
 
             // Unset the number of digits used in the plot. These are set
@@ -1469,6 +1471,7 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
             // labelling).
             astClear( plot, "digits(1)" );
             astClear( plot, "digits(2)" );
+            if ( ! astOK ) astClearStatus;
 
             // Set all plot attributes to control the plot appearance.
             if ( listArgc > 0 ) {
@@ -1484,8 +1487,9 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
                          string != gap2 ) {
                         astSet( plot, string );
                         if ( !astOK ) {
-                            cerr << "plot options:" << string << 
-                                " is not a valid attribute" << endl;
+                            cerr << "plot options: " << string <<
+                                " is not a valid attribute (" <<
+                                astStatus << ")" << endl;
                             failed++;
                             //  Try to succeed by using any acceptable options.
                             astClearStatus;
@@ -6185,7 +6189,7 @@ int StarRtdImage::ndfCmd( int argc, char *argv[] )
                     free( error_mess );
                 }
             }
-            else if ( strcmp( "coord", argv[2] ) == 0 ) { 
+            else if ( strcmp( "coord", argv[2] ) == 0 ) {
                 // Next arguments are the axis that the coordinate it required
                 // for followed by a list of all the pixel coordinates that
                 // specify the position.
@@ -6218,7 +6222,7 @@ int StarRtdImage::ndfCmd( int argc, char *argv[] )
                         if ( result != TCL_ERROR ) {
                             char *coord;
                             result = gaiaSimpleQueryCoord( ndfid, axis,
-                                                           coords, trailed, 
+                                                           coords, trailed,
                                                            ncoords,
                                                            &coord,
                                                            &error_mess );
@@ -6257,7 +6261,6 @@ int StarRtdImage::ndfCmd( int argc, char *argv[] )
     }
     return result;
 }
-
 
 
 
