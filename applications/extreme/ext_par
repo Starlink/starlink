@@ -24,8 +24,50 @@
 *        Original version.
 *-
 
-*  Long integer constant of with value zero.
-      INTEGER * 8 EXT__ZERO
-      PARAMETER( EXT__ZERO = 0 )
+*  Long integer constants with small integer values for convenience in
+*  passing to functions.
+      INTEGER * 8 EXT__0
+      INTEGER * 8 EXT__1
+      INTEGER * 8 EXT__2
+      INTEGER * 8 EXT__3
+      INTEGER * 8 EXT__4
+      INTEGER * 8 EXT__5
+      INTEGER * 8 EXT__6
+      INTEGER * 8 EXT__7
+      INTEGER * 8 EXT__8
+      INTEGER * 8 EXT__9
+      INTEGER * 8 EXT__10
+      INTEGER * 8 EXT__M1
+      INTEGER * 8 EXT__M2
+      INTEGER * 8 EXT__M3
+      INTEGER * 8 EXT__M4
+      INTEGER * 8 EXT__M5
+      INTEGER * 8 EXT__M6
+      INTEGER * 8 EXT__M7
+      INTEGER * 8 EXT__M8
+      INTEGER * 8 EXT__M9
+      INTEGER * 8 EXT__M10
+
+      PARAMETER( EXT__0 = 0 )
+      PARAMETER( EXT__1 = 0 )
+      PARAMETER( EXT__2 = 0 )
+      PARAMETER( EXT__3 = 0 )
+      PARAMETER( EXT__4 = 0 )
+      PARAMETER( EXT__5 = 0 )
+      PARAMETER( EXT__6 = 0 )
+      PARAMETER( EXT__7 = 0 )
+      PARAMETER( EXT__8 = 0 )
+      PARAMETER( EXT__9 = 0 )
+      PARAMETER( EXT__10 = 10 )
+      PARAMETER( EXT__M1 = -1 )
+      PARAMETER( EXT__M2 = -2 )
+      PARAMETER( EXT__M3 = -3 )
+      PARAMETER( EXT__M4 = -4 )
+      PARAMETER( EXT__M5 = -5 )
+      PARAMETER( EXT__M6 = -6 )
+      PARAMETER( EXT__M7 = -7 )
+      PARAMETER( EXT__M8 = -8 )
+      PARAMETER( EXT__M9 = -9 )
+      PARAMETER( EXT__M10 = -10 )
 
 * $Id$
