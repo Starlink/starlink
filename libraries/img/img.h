@@ -20,6 +20,8 @@
  *       Added prologue and updated to final modules.
  *    10-JUN-1996 (PDRAPER):
  *       Added BAD data values.
+ *    24-OCT-2000 (PDRAPER):
+ *       Added hdrCopy prototype.
  *    {enter_further_changes_here}
  *    
  */
@@ -44,6 +46,12 @@ void hdrDelet( char *param,
                char *item,
                int comp,
                int *status );
+
+void hdrCopy( char *param1,
+              char *xname1,
+              char *param2,
+              char *xname2,
+              int *status );
 
 void hdrIn( char *param,
             char *xname,

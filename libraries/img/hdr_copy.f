@@ -87,19 +87,19 @@
 *  Local Variables:
       CHARACTER * ( DAT__SZNAM ) EXNAM1 ! Extension name
       CHARACTER * ( DAT__SZNAM ) EXNAM2 ! Extension name
+      CHARACTER * ( IMG__SZPAR ) VPAR2 ! Validated parameter name
+      CHARACTER * ( IMG__SZPAR ) VPAR1 ! Validated parameter name
       INTEGER ESLOT1            ! Extension slot number
       INTEGER ESLOT2            ! Extension slot number
-      INTEGER SLOT1             ! Parameter slot number
-      INTEGER SLOT2             ! Parameter slot number
-      LOGICAL WASNEW            ! TRUE when parameter not previously seen
-      LOGICAL CANMOD            ! NDF can be modified
       INTEGER F                 ! First character position
       INTEGER I1                ! Position of start of field
       INTEGER I2                ! Position of end of field
       INTEGER L                 ! Last character positiong
       INTEGER NPAR              ! Number of parameters
-      CHARACTER * ( IMG__SZPAR ) VPAR2 ! Validated parameter name
-
+      INTEGER SLOT1             ! Parameter slot number
+      INTEGER SLOT2             ! Parameter slot number
+      LOGICAL CANMOD            ! NDF can be modified
+      LOGICAL WASNEW            ! TRUE when parameter not previously seen
 
 *.
 
@@ -134,6 +134,17 @@
             GO TO 99
          END IF
       END IF
+
+*  Access the input image.  Validate the parameter and its slot number.
+      CALL IMG1_VPAR( PARAM1, VPAR1, STATUS )
+      CALL IMG1_GTSLT( VPAR1, .TRUE., SLOT1, WASNEW, STATUS )
+
+*  If a new parameter slot was allocated then we need to access an NDF.
+      IF ( WASNEW ) CALL IMG1_ASSOC( VPAR1, 'READ', SLOT1, STATUS )
+
+*  Access the extension that should be copied.
+      CALL IMG1_EXINI( SLOT1, EXNAM1, .FALSE., ESLOT1, STATUS )
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Initialise the character pointer to the start of the header
 *  destination parameter list. Then loop to extract each element from

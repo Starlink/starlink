@@ -89,7 +89,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Free the extension trace (if taken) of the destination slot.
-      CALL IMG1_FRTRA( SLOT2, ESLOT2 )
+      CALL IMG1_FRTRA( SLOT2, ESLOT2, STATUS )
 
 *  Now real work which is straight-forward, just erase any existing
 *  component and then use DAT_COPY to copy all the objects.
