@@ -1,0 +1,432 @@
+%ADASS_PROCEEDINGS_FORM%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% TEMPLATE.TEX -- ADASS VIII (98) ASP Conference Proceedings template
+% Updated by N. Manset for ADASS IX (99), F. Primini for ADASS 2000,
+% and D.Bohlender for ADASS 2001.
+%
+% Use this template to create your proceedings paper in LaTeX format
+% by following the instructions given below.  Much of the input will
+% be enclosed by braces (i.e., { }).  The percent sign, "%", denotes
+% the start of a comment; text after it will be ignored by LaTeX.  
+% You might also notice in some of the examples below the use of "\ "
+% after a period; this prevents LaTeX from interpreting the period as
+% the end of a sentence and putting extra space after it.  
+% 
+% You should check your paper by processing it with LaTeX.  For
+% details about how to run LaTeX as well as how to print out the User
+% Guide, consult the README file.  
+% You should also consult the sample LaTeX papers,
+% sample1.tex and sample2.tex, for examples of including figures, html
+% links, special symbols, and other advanced features.
+%
+% If you do not have access to the LaTeX software or a laser printer
+% at your site, you can still prepare your paper following the
+% instructions in the User Guide.  In such cases, the editors will
+% process the file and make any necessary editorial adjustments.
+% 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+\documentstyle[11pt,adassconf]{article}  % Leave intact
+
+\begin{document}   % Leave intact
+
+%-----------------------------------------------------------------------
+%			    Paper ID Code
+%-----------------------------------------------------------------------
+% Enter the proper paper identification code.  The ID code for your
+% paper is the session number associated with your presentation as
+% published in the official ADASS 2000 conference proceedings.  You can
+% find this number locating your abstract in the printed proceedings
+% that you received at the meeting or on-line via 
+% http://adass2002.stsci.edu; the ID code is the letter/number sequence 
+% proceeding the title of your presentation.  
+%
+% This will not appear in your paper; however, it allows different
+% papers in the proceedings to cross-reference each other.
+%
+% EXAMPLE: \paperID{O4.1}
+% EXAMPLE: \paperID{P7.7}
+%
+% Note that you should only have one \paperID, and it should not
+% include a trailing period.  
+
+\paperID{P8.2}
+
+%-----------------------------------------------------------------------
+%		            Paper Title 
+%-----------------------------------------------------------------------
+% Enter the title of the paper.
+%
+% EXAMPLE: \title{A Breakthrough in Astronomical Software Development}
+% 
+
+\title{Source Code Management and Software Distribution using Open Source Technologies}
+
+%-----------------------------------------------------------------------
+%		          Authors of Paper
+%-----------------------------------------------------------------------
+% Enter the authors followed by their affiliations.  The \author and
+% \affil commands may appear multiple times as necessary (see example
+% below).  List each author by giving the first name or initials first
+% followed by the last name.  Authors with the same affiliations
+% should grouped together. 
+%
+% EXAMPLE: \author{Raymond Plante, Doug Roberts, 
+%                  R.\ M.\ Crutcher\altaffilmark{1}}
+%          \affil{National Center for Supercomputing Applications, 
+%                 University of Illinois Urbana-Champaign, Urbana, IL
+%                 61801}
+%          \author{Tom Troland}
+%          \affil{University of Kentucky}
+%
+%          \altaffiltext{1}{Astronomy Department, UIUC}
+%
+% In this example, the first three authors, "Plante", "Roberts", and
+% "Crutcher" are affiliated with "NCSA".  "Crutcher" has an alternate 
+% affiliation with the "Astronomy Department".  The fourth author,
+% "Troland", is affiliated with "University of Kentucky"
+
+\author{Martin Bly}
+\affil{Rutherford Appleton Laboratory, Chilton, Didcot, Oxfordshire  OX11 0QX, United Kingdom}
+\author{Alasdiar Allan}
+\affil{School of Physics, University of Exeter, Stoker Road, Exeter  EX4 4QL, United Kingdom }
+\author{Tim Jenness}
+\affil{Joint Astronomy Center, 660 N. A`oh\=ok\=u Place, University Park, Hilo, HI 96720}
+
+%-----------------------------------------------------------------------
+%			 Contact Information
+%-----------------------------------------------------------------------
+% This information will not appear in the paper but will be used by
+% the editors in case you need to be contacted concerning your
+% submission.  Enter your name as the contact along with your email
+% address.
+% 
+% EXAMPLE:  \contact{Dennis Crabtree}
+%           \email{crabtree@cfht.hawaii.edu}
+%
+
+\contact{Martin Bly}
+\email{bly@star.rl.ac.uk}
+
+%-----------------------------------------------------------------------
+%		      Author Index Specification
+%-----------------------------------------------------------------------
+% Specify how each author name should appear in the author index.  The 
+% \paindex{ } should be used to indicate the primary author, and the
+% \aindex for all other co-authors.  You MUST use the following
+% syntax: 
+%
+% SYNTAX:  \aindex{LASTNAME, F. M.}
+% 
+% where F is the first initial and M is the second initial (if
+% used).  This guarantees that authors that appear in multiple papers
+% will appear only once in the author index.  
+%
+% EXAMPLE: \paindex{Crabtree, D.}
+%          \aindex{Manset, N.}        
+%          \aindex{Veillet, C.}        
+
+\paindex{Bly, M.J.}
+\aindex{Allan, A.}
+\aindex{Jenness, T.}
+
+%-----------------------------------------------------------------------
+%			Subject Index keywords
+%-----------------------------------------------------------------------
+% Enter up to 6 keywords describing your paper.  These will NOT be
+% printed as part of your paper; however, they will be used to
+% generate the subject index for the proceedings.  There is no
+% standard list; however, you can consult the indices for past ADASS
+% proceedings (http://iraf.noao.edu/ADASS/adass.html). 
+%
+% EXAMPLE:  \keywords{visualization, astronomy: radio, parallel
+%                     computing, AIPS++, Galactic Center}
+%
+% In this example, the author noticed that "radio astronomy" appeared
+% in the ADASS VII Index as "astronomy" being the major keyword and
+% "radio" as the minor keyword.
+
+\keywords{management: code, starlink, RPM}
+
+%-----------------------------------------------------------------------
+%			       Abstract
+%-----------------------------------------------------------------------
+% Type abstract in the space below.  Consult the User Guide and Latex
+% Information file for a list of supported macros (e.g. for typesetting 
+% special symbols). Do not leave a blank line between \begin{abstract} 
+% and the start of your text.
+
+\begin{abstract}          % Leave intact
+
+The Starlink Software Collection (USSC) runs on three separate
+platforms and contains approximately 130 separate software items,
+totalling over 6 million lines of code. Distribution of such large
+software systems and installation at multiple remote sites has always
+been problematic due to the complex web of inter-dependences such
+systems invariably generate.
+
+The rise of the Open Source movement has brought standard tools into
+common use to cope with such large and complex tasks.  The RedHat
+Package Manager (RPM) software is one such which is available for many
+platforms.  We have shown it is possible to automate the distribution
+and installation of the Starlink Software using RPM. We anticipate that
+this will vastly simplify installation and package management for
+Systems Administrators who must support the USSC in production data
+processing environments.
+
+\end{abstract}
+
+%-----------------------------------------------------------------------
+%			      Main Body
+%-----------------------------------------------------------------------
+% Place the text for the main body of the paper here.  You should use
+% the \section command to label the various sections; use of
+% \subsection is optional.  Significant words in section titles should
+% be capitalized.  Sections and subsections will be numbered
+% automatically. 
+%
+% EXAMPLE:  \section{Introduction}
+%           ...
+%           \subsection{Our View of the World}
+%           ...
+%           \section{A New Approach}
+%
+% It is recommended that you look at the sample papers, sample1.tex
+% and sample2.tex, for examples for formatting references, footnotes,
+% figures, equations, html links, lists, and other special features.  
+
+\section{Introduction}
+
+The \htmladdnormallinkfoot{Starlink Software
+Collection}{http://www.starlink.ac.uk/} (USSC) is a large collection of
+software packages comprising subroutine libraries, applications
+packages and utilities for astronomical data reduction and analysis.
+The whole collection is governed by a set of interdependencies which
+not only complicates the process of building the software but also
+which packages depend on which others at runtime.
+
+Each package has its own {\tt{makefile}} which contains the rules
+defining how and in what order the components should be built, and
+their dependencies on other packages.  However, none of the packages
+are able to trigger the building of another package - this is
+traditionally done by a master {\tt{makefile}} which builds the
+packages in the correct order.
+
+The master {\tt{makefile}} is maintained by the Software Manager but
+has two disadvantages - it does not express the package dependencies at
+run-time, and contains only a simple ordered-list of packages to build
+- making it difficult to slot a new package into a suitable place in
+the build sequence.  A new approach to managing the build and
+installation dependencies was needed.  We have investigated `wrapping'
+the USSC using the RedHat Package Manager (RPM) system and have shown
+it is possible to automate the building and distribution and simplify
+the installation and maintenance of the USSC for Systems Administrators
+and users.
+
+\section{Why Choose the RPM System}
+
+The \htmladdnormallinkfoot{RedHat Package Manager}{http://www.rpm.org/}
+is becoming ubiquitous in the Linux world, having been adopted by most
+of the major distributions.  It is also supported on may other Unix
+systems including those supported by Starlink.  The RPM system has
+several advantageous features:
+
+\begin{description}
+
+\item[Tracking mechanism] - it keeps track of installed packages and
+package version numbers, and all files associated with each package.
+
+\item[Dependency and dependents checking] - RPM checks dependencies of
+the packages it is processing and warns of conflicts and unfulfilled
+dependencies, and checks for packages that are dependent on those
+being processed.
+
+\item[Query capabilities] - it has a full suite of query capabilities
+that provide information about the package, its dependences and status.
+
+\item[Relocation] - RPM can install packages in locations other than the
+one they were intended to go (provided the set is re-locatable).
+
+\item[Adaptability] - the RPM system works with existing build systems,
+and can easily be used to provide a wrapping for existing package build
+systems, from the simple to the most complex of systems.
+
+\item[Ease of use] - installation of patches and updates can be automated.
+
+\item[Open-Source] - the RPM package is open-source and runs on many
+operating systems.
+
+\end{description}
+
+
+\section{Wrapping the Starlink Packages}
+
+Each Starlink package has its own makefile and documents which conform
+to a standard template, although the makefile and documents may have
+slight variations from the standard.  This makes them suitable for
+processing to provide RPM with the information it requires.
+
+RPM requires a `spec' file for a package, to define the various
+dependencies.  These can be generated by hand or automatically by
+processing a master dependency list.    A template dependency file
+{\tt{depend.ini}} was created by hand listing the software group,
+version, and list of SUNs (Starlink User Notes---the documents) and
+then a Perl script is used to extract summary and abstract information
+from the package documents.  The {\bf{buildrequires}} and {\bf{fixup}}
+lines are then added by hand examination of the {\tt{makefile}} to see
+which files are edited and it what way at installation time.
+{\bf{Buildrequires}} expresses the additional packages required at
+build time and {\bf{fixup}} expresses paths that have to be changed at
+installation.
+
+\begin{figure}
+\begin{verbatim}
+[ast]
+group=Starlink/Libraries 
+version=1.5.8 
+suns=sun210,sun211 
+requires=htx
+buildrequires=sla,ems,chr,sae 
+fixup=STARBIN/ast_dev 
+summary=AST - A Library for Handling World Coordinate\
+Systems in Astronomy 
+abstract=The AST library provides a comprehensive range\
+of facilities for attaching world coordinate systems to\
+astronomical data, for retrieving and interpreting that\
+information and for generating graphical output based on it.
+\end{verbatim}
+\caption{A typical {\tt{depend.ini}} dependency file expressing 
+build and installation dependencies.}
+\end{figure}
+
+A dependency file may contain details of more than one package---the
+abstract extraction script {\tt{getabst.pl}} processes all the package
+entries.  Where the document listed in the {\tt{depend.ini}} file has not have
+the appropriate LaTeX keywords, the keys are left blank.  Since this is 
+demonstrating the concept, the system depends on an existing Starlink
+installation with source files from which it extracts its data.
+
+Once a dependency file is ready, the RPM `spec' file(s) can be
+generated. This is the file that controls what RPM does when building
+and manipulating the package. A Perl script {\tt{mkspec.pl}} has been
+produced to interpret the dependency file and generate `spec' files
+based on a template for all packages listed in the dependency file.
+
+Existing Starlink installations do not have the source packaged in a
+single tarball though the makefiles can provide them via the 
+{\tt{export\_source}} target which generates a compressed tarball of the
+appropriate files.  The master {\tt{makefile}} can generate 
+tarballs for all the packages.  
+
+The next step is to create a set of links for each package from an
+existing USSC installation to the standard location for RPM build
+directories.  A Perl script {\tt{mklinks.pl}} does this for all the
+packages in the dependency file, creating links from
+{\tt{/usr/src/redhat/SOURCES}} to the source files.  Since the default
+location is {\tt{/usr}}, one has to be root for this and the remaining
+steps.  Once the links are in place, the `spec' files are copied to the
+{\tt{/usr/src/redhat/SPECS}} directory and the {\tt{rpm}} program can
+take over to build the RPMs, both source and installation sets.
+
+% \begin{figure}
+% \begin{verbatim}
+% # cd /usr/src/redhat/SOURCES/ 
+% # cp /work/rpm/htx-1.2.3.spec ../SPECS 
+% # rpm -ba ../SPECS/htx-1.2.3.spec
+% Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.1413
+%  + umask 022
+%  + cd /usr/src/redhat/BUILD
+%  + cd /usr/src/redhat/BUILD
+%  + rm -rf htx-1.2.3
+%  + /bin/mkdir -p htx-1.2.3
+% ...
+%  + rm -rf /var/tmp/starlink/htx-root
+%  + exit 0 
+% # ls RPMS/i386 SRPMS 
+% htx-1.2.3-1.i386.rpm 
+% htx-1.2.3-1.src.rpm
+% \end{verbatim}
+% \caption{Copying the spec file and building the RPMs}
+% \end{figure}
+
+\section{Results}
+
+The resulting RPM files are re-locatable so you don't have to install
+the packages in the default location ({tt{/star}}).  Using the
+{\tt{--relocate}} command line switch one can instead direct the
+package to any chosen path -- since the normal location is
+{\tt{/star}}, one has to be careful where there is an existing
+(non-RPM) USSC installation. Most packages are easily re-locatable and
+do not require special tricks to be detailed in the {\tt{depend.ini}} file.
+However, some packages do have complex installation requirements and
+these need to be carefully expressed.  The whole collection can be
+processed to build RPM sets and installations made based on them.
+
+\subsection{Problems}
+RPM itself requires access to the standard RPM database of dependencies
+needed to track all the files.  This is owned by {\tt{root}} so general
+users cannot create and install packages using the standard RPM
+distribution. At the time this work was undertaken, the facilities in
+RPM to allow alternative databases didn't work, however a distribution
+that can use a database elsewhere should be possible.
+
+This work is proof of concept. The technology for extracting
+dependencies and details from the existing build systems is rather
+basic, and some Starlink packages are under regular development which
+tends to change the dependencies. Stable packages such as libraries are
+easier to deal with.  Nevertheless we have demonstrated that RPM can be
+adapted to deal with an alien software management system.
+
+
+%-----------------------------------------------------------------------
+%			      References
+%-----------------------------------------------------------------------
+% List your references below within the reference environment
+% (i.e. between the \begin{references} and \end{references} tags).
+% Each new reference should begin with a \reference command which sets
+% up the proper indentation.  Observe the following order when listing
+% bibliographical information for each reference:  author name(s),
+% publication year, journal name, volume, and page number for
+% articles.  Note that many journal names are available as macros; see
+% the User Guide listing "macro-ized" journals.   
+%
+% EXAMPLE:  \reference Hagiwara, K., \& Zeppenfeld, D.\  1986, 
+%                Nucl.Phys., 274, 1
+%           \reference H\'enon, M.\  1961, Ann.d'Ap., 24, 369
+%           \reference King, I.\ R.\  1966, \aj, 71, 276
+%           \reference King, I.\ R.\  1975, in Dynamics of Stellar 
+%                Systems, ed.\ A.\ Hayli (Dordrecht: Reidel), 99
+%           \reference Tody, D.\  1998, \adassvii, 146
+%           \reference Zacharias, N.\ \& Zacharias, M.\ 2003,
+%                \adassxii, \paperref{P7.6}
+% 
+% Note the following tricks used in the example above:
+%
+%   o  \& is used to format an ampersand symbol (&).
+%   o  \'e puts an accent agu over the letter e.  See the User Guide
+%      and the sample files for details on formatting special
+%      characters.  
+%   o  "\ " after a period prevents LaTeX from interpreting the period 
+%      as an end of a sentence.
+%   o  \aj is a macro that expands to "Astron. J."  See the User Guide
+%      for a full list of journal macros
+%   o  \adassvii is a macro that expands to the full title, editor,
+%      and publishing information for the ADASS VII conference
+%      proceedings.  Such macros are defined for ADASS conferences I
+%      through XI.
+%   o  When referencing a paper in the current volume, use the
+%      \adassxii and \paperref macros.  The argument to \paperref is
+%      the paper ID code for the paper you are referencing.  See the 
+%      note in the "Paper ID Code" section above for details on how to 
+%      determine the paper ID code for the paper you reference.  
+%
+%% \begin{references}
+
+
+
+
+%% \end{references}
+
+% Do not place any material after the references section
+
+\end{document}  % Leave intact
