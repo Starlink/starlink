@@ -5007,8 +5007,7 @@ f     D2 = DOUBLE PRECISION (Returned)
 c        The address of a location at which to return the distance from
 f        The distance from
 *        point 4 to point 3 (that is, the length of the component
-*        perpendicular to the basis vector). Positive values are to the
-*        right of the basis vector when moving from point 1 to point 2.
+*        perpendicular to the basis vector). The value is always positive.
 f     STATUS = INTEGER (Given and Returned)
 f        The global status.
 

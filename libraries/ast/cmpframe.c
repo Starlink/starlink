@@ -4004,8 +4004,8 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *     d2
 *        The address of a location at which to return the distance from
 *        point 4 to point 3 (that is, the length of the component
-*        perpendicular to the basis vector). Positive values are to the
-*        right of the basis vector when moving from point 1 to point 2.
+*        perpendicular to the basis vector). The returned value is always
+*        positive.
 
 *  Notes:
 *     - Each vector used in this function is the path of

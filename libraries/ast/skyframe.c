@@ -3961,8 +3961,8 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 *     d2
 *        The address of a location at which to return the distance from
 *        point 4 to point 3 (that is, the length of the component
-*        perpendicular to the basis vector). Positive values are to the
-*        right of the basis vector when moving from point 1 to point 2.
+*        perpendicular to the basis vector). The returned value is always
+*        positive.
 
 *  Notes:
 *     - This function will return "bad" coordinate values (AST__BAD)
@@ -4063,9 +4063,8 @@ static void Resolve( AstFrame *this_frame, const double point1[],
 
 /* The dot product of v4 and v3 is the cos of the perpendicular distance,
    d2, whilst the dot product of n1 and v3 is the sin of the perpendicular
-   distance. Use these to get the perpendicular distance with the correct
-   sign, in the range -PI to +PI. */
-               *d2 = atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) );
+   distance. Use these to get the perpendicular distance. */
+               *d2 = fabs( atan2( slaDvdv( v3, n1 ), slaDvdv( v3, v4 ) ) );
 
 /* Convert the 3-vector representing the intersection of the two planes 
    back into spherical cooordinates and then constrain the longitude result 
