@@ -79,6 +79,13 @@ atclsh_LDADD = $(LDADD) `ams_link_adam` `nbs_link` -ladam
 awish_SOURCES = tkAppInit.c tclNbs.c
 awish_LDADD = $(LDADD) tkGwm.o tkGwmPrint.o tkGwmCanv.o libadam.la \
              `nbs_link` `ams_link_adam` `gwm_link_adam` `chr_link_adam`
+
+# Need to link awish statically so that the libgwm tcl interface
+# can access symbols in the libgwm library itself. This is because
+# awish (strangely) can dynamically link against libgwm.so and problems
+# ensue [I can't understand why we don't just statically link the tcl
+# interface library into awish since there is little saving involed (given 
+# that libgwm is already included - timj]
 awish_LDFLAGS = -static
 
 # Define what is to be done with which sets of files.
@@ -124,6 +131,8 @@ adamMessageRelay: Makefile $(srcdir)/adamMessageRelay.in
 	mv adamMessageRelay.tmp adamMessageRelay
 
 # Wish 8.4 needs explicit extension of shared library
+# This will be a problem on none .so systems but Makefile
+# does not publish the suffix
 tclIndex: $(LIBRARY_FILES)
 	echo 'auto_mkindex . *.tcl' | @TCLSH@
 	echo >> tclIndex ''
