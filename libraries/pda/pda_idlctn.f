@@ -44,11 +44,16 @@ c declaration statements
       dimension ntsc(9), idsc(9)
       common /idlc  / nit
       integer istat
+      save itipv,ntsc
  
 *   check the inherited error status.
       if ( istat.ne.0 ) return
  
 c preliminary processing
+      xs1 = 0.0
+      xs2 = 0.0
+      ys1 = 0.0
+      ys2 = 0.0
       ndp0 = ndp
       nt0 = nt
       nl0 = nl

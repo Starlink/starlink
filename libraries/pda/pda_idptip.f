@@ -42,7 +42,39 @@ c declaration statements
  
 *   check the inherited error status.
       if ( istat.ne.0 ) return
- 
+
+      do i = 1,3
+         x(i) = 0.0
+         y(i) = 0.0
+      end do
+
+      x0 = 0.0
+      y0 = 0.0
+      ap = 0.0
+      bp = 0.0
+      cp = 0.0
+      dp = 0.0
+      p00 = 0.0
+      p10 = 0.0
+      p01 = 0.0
+      p20 = 0.0
+      p11 = 0.0
+      p02 = 0.0
+      p30 = 0.0
+      p40 = 0.0
+      p03 = 0.0
+      p04 = 0.0
+      p05 = 0.0
+      p41 = 0.0
+      p14 = 0.0
+      p21 = 0.0
+      p31 = 0.0
+      p12 = 0.0
+      p13 = 0.0
+      p22 = 0.0
+      p32 = 0.0
+      p23 = 0.0
+
 c preliminary processing
       it0 = iti
       ntl = nt + nl

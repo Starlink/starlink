@@ -44,8 +44,9 @@ c declaration statements
  
 *   check the inherited error status.
       if ( istat.ne.0 ) return
- 
+
 c preliminary processing
+      iximn = 0
       nt0 = nt
       nl0 = nl
       nxi0 = nxi

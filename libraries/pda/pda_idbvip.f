@@ -64,6 +64,7 @@ c declaration statements
       common /idlc  / nit
       common /idpi  / itpv
       integer istat
+      save nt, nl
  
 c   Check the inherited global status.
       IF (STATUS.NE.0) RETURN   

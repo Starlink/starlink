@@ -68,10 +68,13 @@ c declaration statements
      :          iwk(13301), wk(500)
       common /idpi  / itpv
       integer istat
+
+*  these variables seem to require caching between calls - TIMJ
+      save nl, nt
  
 c   check the inherited error status.
       if (STATUS.NE.0) return
- 
+
 c setting of some input parameters to local variables.
 c (for md=1,2,3)
       md0 = md
