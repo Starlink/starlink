@@ -615,7 +615,8 @@
         CALL BDI_AXPUT0C( SID, 1, 'Label', 'Gaussian convolution',
      :                    STATUS )
         CALL BDI_AXPUT0C( SID, 1, 'Units', 'arcmin', STATUS )
-        CALL BDI_PUT0C( SID, 'Label', 'Significance', STATUS )
+        CALL BDI_PUT0C( SID, 'Label', 'Significance of extension',
+     :                  STATUS )
         CALL BDI_PUT0C( SID, 'Units', 'sigma', STATUS )
 
       END IF
