@@ -102,6 +102,8 @@
 
 *  Local Variables:
       CHARACTER*(DAT__SZTYP)	TYPE			! Type of HDS object
+
+      LOGICAL			THERE			! Object exists?
 *.
 
 *  Check inherited global status.
@@ -109,7 +111,12 @@
 
 *  Get HDS type
       IF ( CMP .GT. ' ' ) THEN
-        CALL CMP_TYPE( LOC, CMP, TYPE, STATUS )
+        CALL DAT_THERE( LOC, CMP, THERE, STATUS )
+        IF ( THERE )
+          CALL CMP_TYPE( LOC, CMP, TYPE, STATUS )
+        ELSE
+          GOTO 99
+        END IF
       ELSE
         CALL DAT_TYPE( LOC, TYPE, STATUS )
       END IF
@@ -154,6 +161,6 @@
       END IF
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_CCH2AT', STATUS )
+ 99   IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI1_CCH2AT', STATUS )
 
       END
