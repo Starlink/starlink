@@ -24,8 +24,10 @@ f     AST_SPHMAP
 *     The SphMap class inherits from the Mapping class.
 
 *  Attributes:
-*     The SphMap class does not define any new attributes beyond those
-*     which are applicable to all Mappings.
+*     In addition to those attributes common to all Mappings, every
+*     SphMap also has the following attributes:
+*
+*     - UnitRadius: SphMap input vectors lie on a unit sphere?
 
 *  Functions:
 c     The SphMap class does not define any new functions beyond those
@@ -46,6 +48,8 @@ f     The SphMap class does not define any new routines beyond those
 *        Tidied public prologues.
 *     24-MAR-1998 (RFWS):
 *        Override the astMapMerge method.
+*     4-SEP-1998 (DSB):
+*        Added UnitRadius attribute.
 *class--
 */
 
@@ -105,6 +109,11 @@ AstSphMap *astSphMapId_( const char *, ... );
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static int GetUnitRadius( AstSphMap * );
+static int TestUnitRadius( AstSphMap * );
+static void ClearUnitRadius( AstSphMap * );
+static void SetUnitRadius( AstSphMap *, int );
+
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static const char *GetAttrib( AstObject *, const char * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
@@ -159,10 +168,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain a pointer to the SphMap structure. */
    this = (AstSphMap *) this_object;
 
-/* At the moment the SphMap class has no attributes, so pass it on to the 
-   parent method for further interpretation. */
-   (*parent_clearattrib)( this_object, attrib );
+/* UnitRadius */
+/* ---------- */
+   if ( !strcmp( attrib, "unitradius" ) ) {
+      astClearUnitRadius( this );
 
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_clearattrib)( this_object, attrib );
+   }
 }
 
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
@@ -213,11 +228,13 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 */
 
 /* Local Constants: */
-#define BUFF_LEN 50              /* Max. characters in result buffer */
+#define BUFF_LEN 10              /* Max. characters in result buffer */
 
 /* Local Variables: */
-   AstSphMap *this;             /* Pointer to the SphMap structure */
+   AstSphMap *this;              /* Pointer to the SphMap structure */
    const char *result;           /* Pointer value to return */
+   int ival;                     /* Int attribute value */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for string result */
 
 /* Initialise. */
    result = NULL;
@@ -228,10 +245,21 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain a pointer to the SphMap structure. */
    this = (AstSphMap *) this_object;
 
-/* At the moment the SphMap class has no attributes, so pass it on to the 
-   parent method for further interpretation. */
-   result = (*parent_getattrib)( this_object, attrib );
+/* UnitRadius. */
+/* ------- */
+   if ( !strcmp( attrib, "unitradius" ) ) {
+      ival = astGetUnitRadius( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
 
+/* If the attribute name was not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      result = (*parent_getattrib)( this_object, attrib );
+   }
+   
 /* Return the result. */
    return result;
 
@@ -284,6 +312,10 @@ static void InitVtab( AstSphMapVtab *vtab ) {
 /* ------------------------------------ */
 /* Store pointers to the member functions (implemented here) that provide
    virtual methods for this class. */
+   vtab->ClearUnitRadius = ClearUnitRadius;
+   vtab->SetUnitRadius = SetUnitRadius;
+   vtab->GetUnitRadius = GetUnitRadius;
+   vtab->TestUnitRadius = TestUnitRadius;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -478,9 +510,18 @@ static int MapMerge( AstMapping *this, int where, int series, int *nmap,
       if ( astOK && !strcmp( class, "SphMap" ) ) {
 
 /* Check if the first SphMap is applied in the inverse direction and
-   the second in the forward direction. This is the only combination
-   we can usefully simplify. */
-         simpler = ( *invert_list )[ imap1 ] && !( *invert_list )[ imap2 ];
+   the second in the forward direction. This combination can always 
+   be simplified. */
+         if( ( *invert_list )[ imap1 ] && !( *invert_list )[ imap2 ] ) {
+            simpler = 1;
+
+/* If the first SphMap is applied in the forward direction and the second in 
+   the inverse direction, the combination can only be simplified if the 
+   input vectors to the first SphMap all have unit length (as indicated by 
+   the UnitRadius attribute). */
+         } else if( !( *invert_list )[ imap1 ] && ( *invert_list )[ imap2 ] ) {
+            simpler = astGetUnitRadius( ( *map_list )[ imap1 ] );
+         }
       }
 
 /* If the two SphMaps can be simplified, create a UnitMap to replace
@@ -566,8 +607,10 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 */
 
 /* Local Variables: */
-   AstSphMap *this;             /* Pointer to the SphMap structure */
+   AstSphMap *this;              /* Pointer to the SphMap structure */
    int len;                      /* Length of setting string */
+   int ival;                     /* Int attribute value */
+   int nc;                       /* Number of characters read by sscanf */
 
 /* Check the global error status. */
    if ( !astOK ) return;
@@ -578,10 +621,18 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Obtain the length of the setting string. */
    len = (int) strlen( setting );
 
-/* The SphMap class currently has no attributes, so pass it on to the parent
-   method for further interpretation. */
-   (*parent_setattrib)( this_object, setting );
+/* UnitRadius. */
+/* ------- */
+   if ( nc = 0,
+        ( 1 == sscanf( setting, "unitradius= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetUnitRadius( this, ival );
 
+/* If the attribute is still not recognised, pass it on to the parent
+   method for further interpretation. */
+   } else {
+      (*parent_setattrib)( this_object, setting );
+   }
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
@@ -636,9 +687,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain a pointer to the SphMap structure. */
    this = (AstSphMap *) this_object;
 
-/* The SphMap class currently has no attributes, so pass it on to the parent
+/* UnitRadius */
+/* ---------- */
+   if ( !strcmp( attrib, "unitradius" ) ) {
+      result = astTestUnitRadius( this );
+
+/* If the attribute is still not recognised, pass it on to the parent
    method for further interpretation. */
-   result = (*parent_testattrib)( this_object, attrib );
+   } else {
+      result = (*parent_testattrib)( this_object, attrib );
+   }
 
 /* Return the result, */
    return result;
@@ -818,6 +876,76 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    "object.h" file. For a description of each attribute, see the class
    interface (in the associated .h file). */
 
+/* UnitRadius */
+/* ---------- */
+/*
+*att++
+*  Name:
+*     UnitRadius
+
+*  Purpose:
+*     SphMap input vectors lie on a unit sphere?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This is a boolean attribute which indicates whether the
+*     3-dimensional vectors which are supplied as input to a SphMap
+*     are known to always have unit length, so that they lie on a unit
+*     sphere centred on the origin.
+*
+c     If this condition is true (indicated by setting UnitRadius
+c     non-zero), it implies that a CmpMap which is composed of a
+c     SphMap applied in the forward direction followed by a similar
+c     SphMap applied in the inverse direction may be simplified
+c     (e.g. by astSimplify) to become a UnitMap. This is because the
+c     input and output vectors will both have unit length and will
+c     therefore have the same coordinate values.
+f     If this condition is true (indicated by setting UnitRadius
+f     non-zero), it implies that a CmpMap which is composed of a
+f     SphMap applied in the forward direction followed by a similar
+f     SphMap applied in the inverse direction may be simplified
+f     (e.g. by AST_SIMPLIFY) to become a UnitMap. This is because the
+f     input and output vectors will both have unit length and will
+f     therefore have the same coordinate values.
+*
+*     If UnitRadius is zero (the default), then although the output
+*     vector produced by the CmpMap (above) will still have unit
+*     length, the input vector may not have. This will, in general,
+*     change the coordinate values, so it prevents the pair of SphMaps
+*     being simplified.
+
+*  Notes:
+*     - This attribute is intended mainly for use when SphMaps are
+*     involved in a sequence of Mappings which project (e.g.) a
+*     dataset on to the celestial sphere. By regarding the celestial
+*     sphere as a unit sphere (and setting UnitRadius to be non-zero)
+*     it becomes possible to cancel the SphMaps present, along with
+*     associated sky projections, when two datasets are aligned using
+*     celestial coordinates. This often considerably improves
+*     performance.
+*     - Such a situations often arises when interpreting FITS data and
+*     is handled automatically by the FitsChan class.
+*     - The value of the UnitRadius attribute is used only to control
+*     the simplification of Mappings and has no effect on the value of
+*     the coordinates transformed by a SphMap. The lengths of the
+*     input 3-dimensional Cartesian vectors supplied are always
+*     ignored, even if UnitRadius is non-zero.
+
+*  Applicability:
+*     SphMap
+*        All SphMaps have this attribute.
+*att--
+*/
+astMAKE_CLEAR(SphMap,UnitRadius,unitradius,-1)
+astMAKE_GET(SphMap,UnitRadius,int,0,(this->unitradius == -1 ? 0 : this->unitradius))
+astMAKE_SET(SphMap,UnitRadius,int,unitradius,( value ? 1 : 0 ))
+astMAKE_TEST(SphMap,UnitRadius,( this->unitradius != -1 ))
+
 /* Copy constructor. */
 /* ----------------- */
 static void Copy( const AstObject *objin, AstObject *objout ) {
@@ -905,6 +1033,43 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 *     channel
 *        Pointer to the Channel to which the data are being written.
 */
+
+/* Local Variables: */
+   AstSphMap *this;              /* Pointer to the SphMap structure */
+   int ival;                     /* Integer value */
+   int set;                      /* Attribute value set? */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the SphMap structure. */
+   this = (AstSphMap *) this_object;
+
+/* Write out values representing the instance variables for the
+   SphMap class.  Accompany these with appropriate comment strings,
+   possibly depending on the values being written.*/
+
+/* In the case of attributes, we first use the appropriate (private)
+   Test...  member function to see if they are set. If so, we then use
+   the (private) Get... function to obtain the value to be written
+   out.
+
+   For attributes which are not set, we use the astGet... method to
+   obtain the value instead. This will supply a default value
+   (possibly provided by a derived class which over-rides this method)
+   which is more useful to a human reader as it corresponds to the
+   actual default attribute value.  Since "set" will be zero, these
+   values are for information only and will not be read back. */
+
+/* UnitRadius. */
+/* ------- */
+   set = TestUnitRadius( this );
+   ival = set ? GetUnitRadius( this ) : astGetUnitRadius( this );
+   if( ival ) {
+      astWriteInt( channel, "UntRd", set, 0, ival, "All input vectors have unit length" );
+   } else {
+      astWriteInt( channel, "UntRd", set, 0, ival, "Input vectors do not all have unit length" );
+   }
 
 }
 
@@ -1176,6 +1341,16 @@ AstSphMap *astInitSphMap_( void *mem, size_t size, int init,
 /* If necessary, initialise the virtual function table. */
 /* ---------------------------------------------------- */
    if ( init ) InitVtab( vtab );
+   if ( astOK ) {
+
+/* Initialise the SphMap data. */
+/* --------------------------- */
+/* Are all input vectors of unit length? Store a value of -1 to indicate that 
+   no value has yet been set. This will cause a default value of 0 (no, i.e. 
+   input vectors are not all of unit length) to be used. */
+      new->unitradius = -1;
+
+   }
 
 /* Return a pointer to the new SphMap. */
    return new;
@@ -1307,6 +1482,19 @@ AstSphMap *astLoadSphMap_( void *mem, size_t size, int init,
 /* Request the input Channel to read all the input data appropriate to
    this class into the internal "values list". */
       astReadClassData( channel, "SphMap" );
+
+/* Now read each individual data item from this list and use it to
+   initialise the appropriate instance variable(s) for this class. */
+
+/* In the case of attributes, we first read the "raw" input value,
+   supplying the "unset" value as the default. If a "set" value is
+   obtained, we then use the appropriate (private) Set... member
+   function to validate and set the value properly. */
+
+/* UnitRadius. */
+/* ----------- */
+      new->unitradius = astReadInt( channel, "untrd", -1 );
+      if ( TestUnitRadius( new ) ) SetUnitRadius( new, new->unitradius );
 
    }
 

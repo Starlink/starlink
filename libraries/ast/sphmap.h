@@ -41,7 +41,25 @@
 *     None.
 
 *  New Attributes Defined:
-*     None.
+*     UnitRadius (integer)
+*        This is a boolean attribute which indicates whether the
+*        3-dimensional vectors which are supplied as input to a SphMap
+*        are known to always have unit length, so that they lie on a
+*        unit sphere centred on the origin.
+*
+*        If this condition is true (indicated by setting UnitRadius
+*        non-zero), it implies that a CmpMap which is composed of a
+*        SphMap applied in the forward direction followed by a similar
+*        SphMap applied in the inverse direction may be simplified
+*        (e.g. by astSimplify) to become a UnitMap. This is because
+*        the input and output vectors will both have unit length and
+*        will therefore have the same coordinate values.
+*
+*        If UnitRadius is zero (the default), then although the output
+*        vector produced by the CmpMap (above) will still have unit
+*        length, the input vector may not have. This will, in general,
+*        change the coordinate values, so it prevents the pair of
+*        SphMaps being simplified.
 
 *  Methods Over-Ridden:
 *     Public:
@@ -66,7 +84,14 @@
 *        None.
 *
 *     Protected:
-*        None.
+*        astClearUnitRadius
+*           Clear the UnitRadius attribute value for a SphMap.
+*        astGetUnitRadius
+*           Get the UnitRadius attribute value for a SphMap.
+*        astSetUnitRadius
+*           Set the UnitRadius attribute value for a SphMap.
+*        astTestUnitRadius
+*           Test if a UnitRadius attribute value has been set for a SphMap.
 
 *  Other Class Functions:
 *     Public:
@@ -114,6 +139,8 @@
 *        Original version.
 *     24-MAR-1998 (RFWS):
 *        Override the astMapMerge method.
+*     4-SEP-1998 (DSB):
+*        Added UnitRadius attribute.
 *-
 */
 
@@ -145,6 +172,8 @@ typedef struct AstSphMap {
 /* Attributes inherited from the parent class. */
    AstMapping mapping;           /* Parent class structure */
 
+/* Attributes specific to objects in this class. */
+   int unitradius;               /* Are input vectors always of unit length? */
 } AstSphMap;
 
 /* Virtual function table. */
@@ -161,6 +190,10 @@ typedef struct AstSphMapVtab {
    int *check;                   /* Check value */
 
 /* Properties (e.g. methods) specific to this class. */
+   int (* GetUnitRadius)( AstSphMap * );
+   int (* TestUnitRadius)( AstSphMap * );
+   void (* ClearUnitRadius)( AstSphMap * );
+   void (* SetUnitRadius)( AstSphMap *, int );
 } AstSphMapVtab;
 #endif
 
@@ -192,6 +225,10 @@ AstSphMap *astLoadSphMap_( void *, size_t, int, AstSphMapVtab *,
 /* Prototypes for member functions. */
 /* -------------------------------- */
 # if defined(astCLASS)           /* Protected */
+int astGetUnitRadius_( AstSphMap * );
+int astTestUnitRadius_( AstSphMap * );
+void astClearUnitRadius_( AstSphMap * );
+void astSetUnitRadius_( AstSphMap *, int );
 #endif
 
 /* Function interfaces. */
@@ -239,6 +276,10 @@ astINVOKE(O,astLoadSphMap_(mem,size,init,vtab,name,astCheckChannel(channel)))
    to the wrong sort of Object is supplied. */
 
 #if defined(astCLASS)            /* Protected */
+#define astClearUnitRadius(this)     astINVOKE(V,astClearUnitRadius_(astCheckSphMap(this)))
+#define astGetUnitRadius(this)       astINVOKE(V,astGetUnitRadius_(astCheckSphMap(this)))
+#define astSetUnitRadius(this,value) astINVOKE(V,astSetUnitRadius_(astCheckSphMap(this),value))
+#define astTestUnitRadius(this)      astINVOKE(V,astTestUnitRadius_(astCheckSphMap(this)))
 #endif
 
 #endif
