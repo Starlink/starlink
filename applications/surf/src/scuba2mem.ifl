@@ -1,0 +1,75 @@
+## SCUBA2MEM - Write out position information for SCUBA DBMEM
+
+#+
+#  Name:
+#      SCUBA2MEM.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1998 Jan 8 (TIMJ)
+#        Original Version
+#     {enter_further_changes_here}
+ 
+#-
+
+INTERFACE SCUBA2MEM
+
+   HELPLIB 'SURF_HELP:'
+
+      PARAMETER IN
+         POSITION  1
+         TYPE     '_CHAR'
+         PROMPT   'Name of input file containing demodulated data'
+         VPATH    'PROMPT'
+         PPATH    'CURRENT'
+         HELPKEY  '*'
+      ENDPARAMETER
+ 
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER NBEAMS
+        TYPE '_INTEGER'
+        PROMPT 'Required number of beams'
+        DEFAULT 3
+        VPATH 'PROMPT'
+        PPATH 'CURRENT,DEFAULT'
+        HELPKEY '*'
+      ENDPARAMETER
+ 
+      PARAMETER OUT
+         POSITION 2
+         TYPE     'FILENAME'
+         PROMPT   'Name of file to contain DBMEM information'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT_COORDS
+         TYPE    '_CHAR'
+         PROMPT  'Coordinate sys of output map; PL,AZ,NA,RB,RJ,RD or GA'
+#        IN      'RB','RJ','RD','GA', 'NA','AZ','PL'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER SHIFT
+        TYPE '_REAL'
+        PROMPT 'Tangent plane shifts (arcsec) [x,y]'
+        PPATH 'DYNAMIC,DEFAULT'
+        VPATH 'PROMPT'
+        HELPKEY '*'
+      ENDPARAMETER
+ 
+   ENDINTERFACE

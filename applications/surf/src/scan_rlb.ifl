@@ -1,0 +1,88 @@
+## SCAN_RLB - Remove linear baseline from SCAN/MAP data
+ 
+#+
+#  Name:
+#     SCAN_RLB.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1997 April (TIMJ)
+#        Add header and HELPLIB and CHOP and defaults
+#     1997 April 29 (TIMJ)
+#        Add GLOBAL association to 'IN' and MSG_FILTER
+#     1997 May 22 (TIMJ)
+#        Copy from RESTORE.IFL
+#     1997 December 31 (TIMJ)
+#        Add RLB parameter
+#     1998 April 7 (TIMJ)
+#        Add METHOD. Change max size of CHOP to 600. RLB defaults to TRUE
+#     {enter_further_changes_here}
+
+ 
+#-
+
+
+   INTERFACE SCAN_RLB
+
+      HELPLIB 'SURF_HELP:'
+
+     PARAMETER   CHOP
+        POSITION 3
+        PROMPT   'Size of chop'
+        TYPE     '_REAL'
+        RANGE    0, 600
+        HELPKEY '*'
+      ENDPARAMETER
+
+      PARAMETER IN
+         POSITION  1
+         TYPE     'FILENAME'
+         PROMPT   'Name of input file containing demodulated data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER METHOD
+        TYPE     '_CHAR'
+        PROMPT   'Method to use for baseline removal'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER MSG_FILTER
+        TYPE     '_CHAR'
+        PROMPT   'Messaging level'
+        DEFAULT  'NORM'
+        VPATH    'DEFAULT'
+        HELPKEY  '*'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         POSITION 2
+         TYPE     'FILENAME'
+         PROMPT   'Name of file to contain restored data'
+         VPATH    'PROMPT'
+         PPATH    'GLOBAL'
+         ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
+      ENDPARAMETER
+
+     PARAMETER   RLB
+        PROMPT   'Remove fitted baseline from output data'
+        TYPE     '_LOGICAL'
+	DEFAULT  TRUE
+        PPATH    CURRENT,DEFAULT
+        HELPKEY '*'
+      ENDPARAMETER
+
+
+   ENDINTERFACE
