@@ -48,6 +48,7 @@
 *      6 Dec 94 : V1.8-1  Use updated QUALITY routines (DJA)
 *     21 Feb 95 : V1.8-2  Don't die if axes unrecognised (DJA)
 *     13 Dec 1995 : V2.0-0 ADI port (DJA)
+*     26 Apr 96 : V2.0-1  Option to set outside circle (RJV)
 *
 *    Type Definitions :
 *
@@ -113,11 +114,12 @@
                                                     ! Value to modify?
       LOGICAL                Q_AND, Q_OR, Q_IGNORE  ! Quality modes
       LOGICAL                Q_RESTORE, Q_SET, Q_EOR, Q_NOT
+      LOGICAL OUTSIDE
 *
 *    Version id :
 *
       CHARACTER*30           VERSION
-        PARAMETER           (VERSION = 'CQUALITY Version 2.0-0')
+        PARAMETER           (VERSION = 'CQUALITY Version 2.0-1')
 *-
 
       CALL MSG_PRNT( VERSION )
@@ -182,6 +184,9 @@
         CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       END IF
       IF ( STATUS .NE. SAI__OK ) GOTO 99
+
+*  Take region outside circle?
+      CALL USI_GET0L('OUTSIDE',OUTSIDE,STATUS)
 
 *  Validate dataset
       CALL BDI_GETSHP( OFID, ADI__MXDIM, DIMS, NDIM, STATUS )
@@ -287,8 +292,8 @@
       DO I = 1, NXPTS
 
 *    Set elements of selection array
-        CALL CQUALITY_CIRSEL( TDIMS, XC(I), YC(I), RC(I), %VAL(XPTR),
-     :                       %VAL(YPTR), %VAL(TCPTR), NOTON, STATUS )
+        CALL CQUALITY_CIRSEL( TDIMS, XC(I), YC(I), RC(I), OUTSIDE,
+     :            %VAL(XPTR), %VAL(YPTR), %VAL(TCPTR), NOTON, STATUS )
         IF ( NOTON ) THEN
           CALL MSG_SETI( 'N', I )
           CALL MSG_PRNT( 'Point ^N is not within the bounds'/
@@ -403,8 +408,8 @@
 
 
 *+  CQUALITY_CIRSEL - Use circular ranges to select valid output pixels
-      SUBROUTINE CQUALITY_CIRSEL( DIMS, XC, YC, RC, XAX, YAX, SEL,
-     :                                             NOTON, STATUS )
+      SUBROUTINE CQUALITY_CIRSEL( DIMS, XC, YC, RC, OUTSIDE,
+     :                           XAX, YAX, SEL, NOTON, STATUS )
 *    Description :
 *    History :
 *    Type definitions :
@@ -420,6 +425,7 @@
       INTEGER                DIMS(*)            ! DATA_ARRAY dimensions
       REAL                   XC,YC,RC           ! Circle centre and radius
       REAL                   XAX(*), YAX(*)     ! Spatial axes
+      LOGICAL OUTSIDE
 *
 *    Export :
 *
@@ -433,8 +439,8 @@
       IF (STATUS.NE.SAI__OK) RETURN
 
       CALL CQUALITY_CIRSEL_INT(DIMS(1),DIMS(2),DIMS(3),DIMS(4),DIMS(5),
-     :                         DIMS(6),DIMS(7), XC, YC, RC, XAX, YAX,
-     :                                       SEL, NOTON, STATUS )
+     :                         DIMS(6),DIMS(7), XC, YC, RC,OUTSIDE,
+     :                            XAX, YAX, SEL, NOTON, STATUS )
 
       END
 
@@ -442,7 +448,7 @@
 
 *+  CQUALITY_CIRSEL_INT - Use circular ranges to select valid output pixels
       SUBROUTINE CQUALITY_CIRSEL_INT( D1,D2,D3,D4,D5,D6,D7, XC, YC,
-     :                     RC, XAX, YAX, SEL, NOTON, STATUS )
+     :            RC, OUTSIDE, XAX, YAX, SEL, NOTON, STATUS )
 *    Description :
 *     Loops over input data array setting SELECT = .TRUE. if values lie
 *     within circular region
@@ -460,6 +466,7 @@
       INTEGER                D1,D2,D3,D4,D5,D6,D7 ! DATA_ARRAY dimensions
       REAL                   XC,YC,RC             ! Circle centre and radius
       REAL                   XAX(D1), YAX(D2)     ! Spatial axes
+      LOGICAL OUTSIDE
 *
 *    Export :
 *
@@ -507,7 +514,11 @@
                   R2Y = (YAX(Y)-YC)**2
                   DO X = XLO, XHI
                     R2 = (XAX(X)-XC)**2 + R2Y
-                    IF ( R2 .LE. RC2 ) THEN
+                    IF (OUTSIDE) THEN
+                      IF (R2.GT.RC2) THEN
+                        SEL(X,Y,E,D,C,B,A) = .TRUE.
+                      ENDIF
+                    ELSEIF ( R2 .LE. RC2 ) THEN
                       SEL(X,Y,E,D,C,B,A) = .TRUE.
                     END IF
                   END DO
