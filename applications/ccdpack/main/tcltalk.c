@@ -228,6 +228,8 @@
       int tclrtn;
       char *c;
       static char retbuf[ BUFLENG ];
+      DECLARE_CHARACTER( fmsg, MSG__SZMSG );
+      DECLARE_CHARACTER( fname, MSG__SZMSG );
 
 /* Check inherited status. */
       if ( *status != SAI__OK ) return;
@@ -236,10 +238,9 @@
    the child process can execute it. */
       write( ofd, cmd, strlen( cmd ) + 1 );
 
-
 /* Loop until we get a return status which indicates the command has 
-   completed (i.e. not one which just requires output through the CCDPACK
-   logging system). */
+   completed (i.e. not one which just requires output through the ADAM
+   message system). */
       do {
 
 /* Read the Tcl return status from the upward pipe. */
@@ -267,28 +268,33 @@
             }
          } while ( *c != '\0' );
 
-/* If the Tcl return status was CCD_CCDMSG or CCD_CCDERR then what follows
-   are two strings, separated by a carriage return, to output via the 
-   CCDPACK logging system. */
-         if ( tclrtn == CCD_CCDMSG || tclrtn == CCD_CCDERR ) {
-            DECLARE_CHARACTER( fmsg, MSG__SZMSG );
-            DECLARE_CHARACTER( fname, MSG__SZMSG );
+/* If the Tcl return status was CCD_CCDMSG, CCD_CCDLOG or CCD_CCDERR then 
+   what follows are two strings, separated by a carriage return, to output
+   via the ADAM message system. */
+         if ( tclrtn == CCD_CCDLOG || tclrtn == CCD_CCDERR ||
+              tclrtn == CCD_CCDMSG ) {
             c = index( retbuf, '\n' );
             *(c++) = '\0';
             cnfExprt( retbuf, fname, MSG__SZMSG );
             cnfExprt( c, fmsg, MSG__SZMSG );
-            if ( tclrtn == CCD_CCDMSG ) {
+            if ( tclrtn == CCD_CCDLOG ) {
                F77_CALL(ccd1_msg)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
                                    INTEGER_ARG(status)
                                    TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
             }
-            else {
+            else if ( tclrtn == CCD_CCDERR ) {
                F77_CALL(ccd1_errep)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
                                      INTEGER_ARG(status)
                                      TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
             }
+            else if ( tclrtn == CCD_CCDMSG ) {
+               F77_CALL(msg_out)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
+                                  INTEGER_ARG(status)
+                                  TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+            }
          }
-      } while ( tclrtn == CCD_CCDMSG || tclrtn == CCD_CCDERR );
+      } while ( tclrtn == CCD_CCDLOG || tclrtn == CCD_CCDERR || 
+                tclrtn == CCD_CCDMSG );
 
 /* If the Tcl return status was not TCL_OK, then flag an error and write
    an error report. */
