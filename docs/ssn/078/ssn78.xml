@@ -1217,7 +1217,7 @@ hds_machine.txt: hds_machine
           
         </subsubsect>
 
-        <subsubsect indexkey="libtool!overview">
+        <subsubsect indexkey="libtool">
           <subhead>
             <title>Libtool</title>
           </subhead>
@@ -1270,7 +1270,7 @@ hds_machine.txt: hds_machine
 
         </subsubsect>
 
-        <subsubsect id="configure-script">
+        <subsubsect id="configure-script" indexkey="configure!running">
           <subhead>
             <title>Running ./configure</title>
           </subhead>
@@ -1292,7 +1292,7 @@ hds_machine.txt: hds_machine
 
           <p>The Starlink autoconf adds a couple of extra standard
             options.<dl>
-              <dt><code>--with-starlink[=location]</code><index>--with-starlink</index></dt>
+              <dt><code>--with-starlink[=location]</code><index>configure!options!--with-starlink</index></dt>
               <dd>
                 <p>If no <code>location</code> is provided, this does
                   nothing.  This is effectively the default.</p>
@@ -1304,7 +1304,7 @@ hds_machine.txt: hds_machine
                   Some packages might with to configure themselves
                   differently in this case.</p>
               </dd>
-              <dt><code>--without-stardocs</code><index>--without-stardocs</index></dt>
+              <dt><code>--without-stardocs</code><index>configure!options!--without-stardocs</index></dt>
               <dd>
                 <p>Controls whether documentation is built and
                 installed.  You might want to turn this off, since it
@@ -1842,7 +1842,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
 
       </subsect>
 
-      <subsect id="fortran" export="export" indexkey="fortran!preprocessable">
+      <subsect id="fortran" export="export" indexkey="fortran">
         <subhead>
           <title>Preprocessable Fortran</title>
         </subhead>
@@ -1890,7 +1890,7 @@ AC_PROG_FC([], 77)
         <p>Both the Sun and GNU Fortran compilers can handle cpp-style
           preprocessor constructs in a Fortran file, avoiding any
           separate preprocessing stage.  Sun have produced a Fortran
-          preprocessor, <em>fpp</em><index>fpp (Sun Fortran
+          preprocessor, <em>fpp</em><index>fortran!fpp (Sun Fortran
           preprocessor)</index>, which is available at 
           <url>http://www.netlib.org/fortran/</url>: it's freely
           available, but not open-source.  And more often than not we
@@ -1914,7 +1914,7 @@ AC_PROG_FC([], 77)
           <verbatim>
 AC_PROG_FC
 AC_PROG_FPP
-AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(readonly,[access='sequential',recl=1])
 </verbatim>
           and have in your <code>my_io.fpp</code> the lines
           <verbatim>
@@ -1926,6 +1926,9 @@ AC_FC_OPEN_SPECIFIERS(readonly)
       OPEN ( UNIT = LUCON, FILE = IFCNAM, STATUS = 'OLD',
 #ifdef HAVE_FC_OPEN_READONLY
      :       READONLY, 
+#endif
+#ifdef HAVE_FC_OPEN_ACCESSSEQUENTIALRECL1
+     :       ACCESS='SEQUENTIAL',RECL=1,
 #endif
      :       FORM = 'UNFORMATTED', IOSTAT = ISTAT )
 </verbatim></p>
@@ -3992,7 +3995,7 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
             </dd>
 
             <dt>I want to do odd things at clean/distribution time.
-            How?<index>makefile targets!clean</index></dt>
+            How?<index>make targets!clean</index></dt>
             <dd>
               <p>Odder than what is described in <ref
                   id="autodistrib"/>?</p>
@@ -4406,10 +4409,10 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             extensions which consiste of extra specifiers, several of
             which are useful when they are available.  For each of the
             specifiers in the (whitespace-separated) argument list,
-            define <code>HAVE_FC_OPEN_mungedspecifier</code> if the
+            define <code>HAVE_FC_OPEN_</code><em>mungedspecifier</em> if the
             specifier may be given as argument to the OPEN statement.
-            The <code>mungedspecifier</code> is the
-            <code>specifier</code> converted to uppercase and with all
+            The <em>mungedspecifier</em> is the
+            <em>specifier</em> converted to uppercase and with all
             characters outside <code>[a-zA-Z0-9_]</code> deleted.
             Note that this may include `specifiers' such as
             <code>access='append'</code> and
@@ -4450,7 +4453,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-prog-fc" export="export"
-          indexkey="AC_PROG_FC">
+          indexkey="autoconf macros!AC_PROG_FC">
           <subhead>
             <title>AC_PROG_FC</title>
           </subhead>
@@ -4473,12 +4476,12 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
         </subsect>
 
         <subsect id="macro-ac-prog-fpp" export="export"
-          indexkey="AC_PROG_FPP">
+          indexkey="autoconf macros!AC_PROG_FPP">
           <subhead>
             <title>AC_PROG_FPP</title>
           </subhead>
 
-          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>fortran!preprocessable</index></p> 
+          <p><strong><code>AC_PROG_FPP(required-features,[FPP-SRC-EXT=fpp])</code></strong><index>fortran</index></p> 
 
           <p><code>required-features</code> is a space-separated
             list of features that the Fortran preprocessor must
@@ -4649,8 +4652,9 @@ file.f: file.$(FPP_SRC_EXT)
             can be found.  Because of this default behaviour, this
             macro should _only_ be used for locating Starlink programs
             such as messgen or alink, and not as a general replacement
-            for <code>AC_CHECK_PROG</code><index>autoconf macros!AC_CHECK_PROG!and
-            STAR_CHECK_PROGS</index>.  Any characters in the 
+            for <code>AC_CHECK_PROG</code><index>autoconf
+            macros!AC_CHECK_PROG and STAR_CHECK_PROGS</index>.  Any
+            characters in the 
             program outside of the set of alphanumerics and
             underscores are normalised to underscores.</p>
 
@@ -4960,33 +4964,20 @@ file.f: file.$(FPP_SRC_EXT)
         </subsect>
 
         <subsect id="macro-fc-library-ldflags" export="export"
-          indexkey="starconf!macros!STAR_FC_LIBRARY_LDFLAGS">
+          indexkey="starconf!macros!STAR_FC_LIBRARY_LDFLAGS (obsolete)">
           <subhead>
             <title>STAR_FC_LIBRARY_LDFLAGS</title>
           </subhead>
 
           <p><strong><code>STAR_FC_LIBRARY_LDFLAGS</code></strong></p>
 
-          <p>This is a wrapper for AC_FC_LIBRARY_LDFLAGS, which adds
-            any platform-specific magic required.</p>
-
-          <p>The only place where this does anything different at
-            present is on OSX 10.3<index>OSX</index>.  There's a
-            library problem using 
-            gcc under OSX 10.3 (10.3.4 Panther = Darwin 7.4.0), which
-            results in the symbols restFP and saveFP being undefined
-            at link time.  There's a shortage of authoritative
-            explanations, but
-            <webref url="http://www.ccp4.ac.uk/problems/mac_4_2.html#29"/>
-            gives at least one resolution.  It's not clear (to Norman)
-            what the real cause of this is, but it apparently doesn't
-            affect OSX versions before 10.3, and will presumably be
-            fixed in versions soon after this.  The following isn't
-            terribly pretty, and will need maintainance.
-          </p>
+          <p>Obsolete: use standard <code>AC_FC_LIBRARY_LDFLAGS</code>
+            instead -- the extra functionality which this macro added
+            to the standard one is now handled automatically.</p>
         </subsect>
 
-        <subsect id='macro-have-fc-open-readonly' export='export'>
+        <subsect id='macro-have-fc-open-readonly' export='export'
+          indexkey="starconf!macros!STAR_HAVE_FC_OPEN_READONLY (obsolete)">
           <subhead>
             <title>STAR_HAVE_FC_OPEN_READONLY</title>
           </subhead>
@@ -4994,7 +4985,7 @@ file.f: file.$(FPP_SRC_EXT)
           <p><strong><code>STAR_HAVE_FC_OPEN_READONLY</code></strong></p>
 
           <p>Obsolete -- use <ref id="macro-ac-fc-open-specifiers"
-              ><code>AC_FC_OPEN_SPECIFIERS</code></ref> instead</p>
+              ><code>AC_FC_OPEN_SPECIFIERS(readonly)</code></ref> instead.</p>
 
         </subsect>
 
@@ -5256,7 +5247,7 @@ AC_SUBST(STAR_MANIFEST_DIR)
           <p>The macro searches first in the path, and then in a
             selection of platform-specific standard locations.  The
             configure option
-            <code>--with-tcl</code><index>--with-tcl</index> allows
+            <code>--with-tcl</code><index>configure!options!--with-tcl</index> allows
             you to 
             provide a path to a <code>tclsh</code> binary, which is
             put at the head of the list of locations to search.
