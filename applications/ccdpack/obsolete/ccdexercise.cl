@@ -131,7 +131,7 @@ begin
      print "  Displaying raw target frames."
      print " "
      picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
-     lutheat
+     # lutheat
      picsel ( label="a1" )
      display.xmagn=1.0
      display.ymagn=1.0
@@ -215,7 +215,7 @@ begin
      print " "
      gdclear
      picdef ( mode_="array", xpic=2, ypic=2, prefix="a" )
-     lutheat
+     # lutheat
      picsel ( label="a1" )
      display ( in="reduced_data1.imh", mode_="percentiles", percentiles="2,98" )
      picsel ( label="a2" )
