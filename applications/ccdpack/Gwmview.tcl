@@ -724,8 +724,8 @@ class Gwmview {
          }
          set device [ devname ]
          if { $state == "active" } {
-            taskrun lutable \
-               "coltab=$table mapping=$maptype device=$device reset"
+            # taskrun lutable \
+            #    "coltab=$table mapping=$maptype device=$device reset"
          }
       }
 
