@@ -2004,7 +2004,7 @@ values, cosmic rays etc.
 This release (3.0) of CCDPACK handles the registration process
 differently from previous versions --- instead of using TRANSFORM
 structures it now normally makes use of World Coordinate System
-components of the images.  For much of the time, and in particular
+(WCS) components of the images.  For much of the time, and in particular
 to do the things which CCDPACK used to do, it is not 
 necessary to be aware of this, but it opens the way to some new
 functionality.
@@ -2047,7 +2047,8 @@ When a number of images overlap and the same features
 appear in more than one of them, the relative positioning
 of the images can be determined by matching up the features.
 \end{description}
-Some of these sources may be more accurate or reliable than others.
+For a given set of data,
+some of these sources may be more accurate or reliable than others.
 
 It is possible to attach any number of these coordinate systems 
 to an image.  Once all the images that you are interested in
@@ -2061,16 +2062,17 @@ Some of these
 labels have special meaning, for instance a coordinate system labelled 
 `SKY' indicates
 positions on the sky itself and coordinates are usually reported in
-RA and Dec coordinates 
+RA and Dec
 (the other special labels are GRID, PIXEL and AXIS).
 Secondly, an image
 always has a {\em Current\/} coordinate system, which is the
 one in which positions are normally reported.
-These coordinate systems are understood by other Starlink applications
+These attached 
+coordinate systems are understood by other Starlink applications
 so that for instance using the KAPPA command
 \begin{myquote}
 \begin{verbatim}
-% display myimage axes accept
+% display myimage axes
 \end{verbatim}
 \end{myquote}
 will display {\tt myimage} with axes showing coordinates from
@@ -2091,7 +2093,7 @@ which can be aligned by identifying the same objects in different images.
 \routine{WCSEDIT} is decribed 
 \hyperref{here}{in \S}{}{wcsdirect} and
 can be used to examine coordinate systems attached to an image, 
-remove them, or change which one is Current for an image when 
+add them, remove them, or change which one is Current for an image when 
 it's necessary to do this manually.
 %
 \item[Dealing with externally stored coordinate systems:]
@@ -2157,9 +2159,9 @@ coordinate systems with the same domain do not exist by deleting all but one.
 In this case a warning will be issued, but it is not considered
 a fatal error.
 For instance, the \routine{REGISTER} program normally attaches a new
-coordinate system labelled `CCD\_REG' to the images on which it operates.
+coordinate system labelled `CCD\_REG' to the images on which it operates;
 If any of them already has a coordinate system labelled CCD\_REG,
-then the old one is deleted.
+then the old one gets deleted.
 \end{itemize}
 
 
@@ -2224,7 +2226,8 @@ in one go. So for instance if you have a set of position lists in which
 corresponding objects have been identified, you may pick any list as the
 reference set (the first is chosen by default) and all the mappings between
 this and the other datasets will be derived. 
-If the position lists are `associated' with images then a new frame, 
+If the position lists are `associated' with images then a new 
+coordinate system, 
 by default labelled `CCD\_REG', will be added to each image:
 the coordinates are the same as 
 the pixel coordinates of the reference image.
@@ -2233,16 +2236,13 @@ A general transformation between {\em two\/} datasets can also be
 determined. These are entered using suitably parameterised algebraic
 expressions. A general least squares fitting algorithm is used to find
 a solution which gives satisfactory values for the parameters.
-Currently, this cannot be done using the normal coordinate system method,
-and the older method using TRANSFORM structures must be used instead ---
-see \hyperref{this section}{appendix \S}{}{transformreg}.
 
 
 
 \subsubsection{\xlabel{automatedregistration}Automated registration}
 
 If the coordinates of your images are just offset from each other 
-(related by a geometric {\em translation})
+(related by a translation in X and Y)
 and they have image features in
 common it may be possible to register them with a minimum of effort and
 preparation.
@@ -2351,7 +2351,7 @@ with a median as opposed to a mean. This registration is then used to
 identify objects in all datasets, resulting in {\em labelled} position
 lists which are output for use by \routine{REGISTER}.
 
-Note it is not necessary that the datasets themselves are simply 
+Note it is not necessary that the pixel grids of the images are simply 
 related by an offset,
 just that their Current coordinate systems are.
 For instance you might have two images with reasonably accurate
@@ -2392,7 +2392,7 @@ and the object matching is just to improve the alignment,
 then \routine{FINDOFF} can be invoked with the `RESTRICT' parameter;
 this instructs it to look for matching objects only in the
 parts of the images which overlap according to the existing
-Current coordinate system, which decreases running time 
+Current coordinate system, which can dramatically decrease running time 
 and the likelihood of a false match.
 
 \routine{FINDOFF}'s other parameters are detailed in
@@ -2581,22 +2581,14 @@ are always GRID, PIXEL and AXIS.
 SKY is not always present but if it is, it should always represent 
 a celestial coordinate system.
 GRID and PIXEL always have units the same size as that of a pixel
-(the difference is that GRID is guaranteed to start at (1,1)), 
-so that if you want to treat an
-image as if it had no extra coordinate systems attached you can
-just run
-\begin{myquote}
-\begin{verbatim}
-% wcsedit myimage current pixel
-\end{verbatim}
-\end{myquote}
+(the difference is that GRID is guaranteed to start at (1,1)). 
 
 For the other modes (add, remove, current and set) of \routine{WCSEDIT}
 you need to specify a given coordinate system,
 the `target', for \routine{WCSEDIT} to work with.
 This is given using the FRAME parameter, and you can use one
 of the following formats:
-\begin{enumerate}
+\begin{itemize}
 \item
 The null value (`{\tt !}'), indicating the Current coordinate system
 \item
@@ -2607,14 +2599,20 @@ An integer giving the index of the coordinate system
 A \qt{Sky Co-ordinate System} (SCS) value such as EQUAT(J2000)
 (see section \xref{`Sky Co-ordinate Systems'}{sun95}{se_scs} in 
 \xref{SUN/95}{sun95}{}).
-\end{enumerate}
+\end{itemize}
 The first two options are usually the most appropriate.
-As you can see above, the output of {\tt wcsedit show} 
+As you can see above, the output of `{\tt wcsedit show}' 
 will show you what domains there are, what the index of each is, 
 and which coordinate system is Current for a given image.
 
-To change the coordinate frame to be used as the Current one
+To change the coordinate system to be used as the Current one
 therefore, simply write something like:
+\begin{myquote}
+\begin{verbatim}
+% wcsedit in='image*' mode=current frame=pixel
+\end{verbatim}
+\end{myquote}
+or just
 \begin{myquote}
 \begin{verbatim}
 % wcsedit 'image*' current pixel
@@ -2622,6 +2620,10 @@ therefore, simply write something like:
 \end{myquote}
 which will set the Current coordinate system of all the image files
 indicated to pixel coordinates.
+Since the PIXEL coordinates are in some sense the native ones,
+if you set Current to PIXEL in this way
+the images will behave in most respects as if they had no attached
+coordinate systems at all.
 
 Syntax for removing coordinate systems is much the same:
 \begin{myquote}
@@ -2633,13 +2635,13 @@ will remove the fourth (as listed by {\tt wcsedit show}) coordinate
 system from file {\tt image}.
 
 When adding a new 
-frame you must give the transformation which connects it 
+coordinate system you must give the transformation which connects it 
 to the target coordinate system.
 The transformation can be one of the following types:
 \begin{description}
 \item[UNIT:]
 No coordinate transformation is performed in this case.
-A copy of an existing coordinate system, but with a new domain,
+A copy of an existing coordinate system, but with a new domain (label),
 can thus be added in this way.
 \item[LINEAR:]
 A general linear tranformation can be specified by giving six
@@ -2675,8 +2677,8 @@ and an optical centre at coordinates (1000,1000):
 \end{verbatim}
 \end{myquote}
 
-It's also possible to make fine adjustments to the the coordinate
-systems attached to an image using the SET mode: for example
+It's also possible to make fine adjustments to the coordinate
+systems attached to an image using the SET mode, for example:
 \begin{myquote}
 \begin{verbatim}
 % wcsedit file1 set frame='!' set='domain=obs1'
@@ -2699,20 +2701,20 @@ KAPPA program \xref{PARGET}{sun95}{PARGET}, as in
 the following example:
 \begin{myquote}
 \begin{verbatim}
-% wcsedit 'data?' current ccd_gen
+% wcsedit 'data?' current focal
 
     WCSEDIT
     =======
   4 NDFs accessed using parameter IN
 
-data1: Current frame set to domain CCD_GEN
+data1: Current frame set to domain FOCAL
 
-data2: Target frame 'ccd_gen' not found
+data2: Target frame 'focal' not found
        NDF not modified
 
-data3: Current frame set to domain CCD_GEN
+data3: Current frame set to domain FOCAL
 
-data4: Current frame set to domain CCD_GEN
+data4: Current frame set to domain FOCAL
 
 % parget modified wcsedit
 data1,data3,data4
@@ -2757,7 +2759,7 @@ Thus applying the AST file to a set of images adds a new
 coordinate system to
 each of them, which can be used for the registration process.
 Where there are several images in a set, as in the case of 
-a mosaic camera, \routine{ASTIMP} can determine which frame to
+a mosaic camera, \routine{ASTIMP} can determine which coordinate frame to
 use for which image either by the order in which they are presented,
 or by usng FITS headers in the file, 
 according to how the AST file was constructed by \routine{ASTEXP}.
@@ -2772,17 +2774,17 @@ but the following gives an example.
 \end{verbatim}
 \end{myquote}
 The first command takes a set of 4 images, one from each chip of an array,
-which are aligned in their Current coordinate frame 
+which are aligned in their Current coordinate system, 
 (possibly by object matching)
 and constructs a file \text{inst.ast} from them;
 the parameters `\text{idtype=fitsid fitsid=chipname}' 
-mean that the AST file labels each coordinate frame with the
+mean that the AST file labels each coordinate system with the
 value of the `CHIPNAME' FITS header from the \text{reg\_data*} images,
 since this dentifies which CCD is which in the mosaic camera.
 The second command applies the file \text{inst.ast}
 to a set of (any number of) images from the same 
 instrument which have not yet been registered;
-for each one \routine{ASTIMP} works out which coordinate frame to 
+for each one \routine{ASTIMP} works out which coordinate system to 
 add by matching the `CHIPNAME' FITS header in the image with one of 
 the ones in the AST file.
 
@@ -2807,13 +2809,13 @@ use the routine
 
 It is not always possible to register a set of images in a single
 step, using one kind of procedure.  For instance you might have
-a large set of images, some of which overlap and some of which don't.
-The overlapping ones can be registered using the object-matching
-techniques described \hyperref{earlier}{in section \S}{}{object_matching},
-but the others contain an approximate SKY coordinate system
-inserted by the observing system.  In this case we would like
-to use the highly accurate object matching coordinates to do the
-alignment where we have them, but in their absence fall back to
+a large set of images with an approximate SKY coordinate system
+inserted by the observing system, 
+of which some but not all overlap with each other.
+In this case we would like to register the overlapping ones
+using the object-matching
+techniques described in section \ref{object_matching},
+but fall back to
 the tolerably accurate SKY coordinates to align the rest of the images. 
 
 \routine{WCSREG} can do just this.
@@ -2841,7 +2843,8 @@ you can align them in a pixel-sized coordinate system using
 \routine{WCSREG}. 
 For instance, if you want to use \xroutine{TRANNDF} 
 to resample a set of images
-which are aligned in a SKY coordinate system, you can first do
+which are aligned in a SKY coordinate system, you can first use the
+following trick:
 \begin{myquote}
 \begin{verbatim}
 % wcsreg 'skyimage*' '[sky]'
@@ -2867,7 +2870,7 @@ in \hyperref{the examples section}{\S }{}{regexamples}.
 
 \subsection{\xlabel{resampling}\label{resampling}Data resampling}
 
-Data resampling is performed by the application:
+Data resampling is normally performed by the application:
 \begin{itemize}
 \item \routine{TRANNDF}
 \end{itemize}
@@ -2877,11 +2880,15 @@ So if a set of images shares a common Current coordinate system
 (as added by any of the methods described earlier in this section)
 then running \routine{TRANNDF} on them all will enable them to
 be compared or combined pixel for pixel.
-The transformation represented by these frames can be of any kind,
+The transformation between pixel co-ordinates and the Current
+co-ordinate system can be of any kind,
 so the program has the capability of `rubber-sheeting'.
 A restriction is that both the forward and the inverse transformations
 must be available. This will only cause problems when using general
 transformations; a tractable inverse doesn't often exist.
+If you need to resample and you do not have an inverse transformation, 
+the \xroutine{DRIZZLE} program
+may be used instead.
 
 \routine{TRANNDF} resamples using 
 one of two different techniques, linear interpolation
@@ -2907,13 +2914,13 @@ appended to each output name.
 By default \routine{TRANNDF} will guess a size for
 the output image, interpolate using nearest neighbour and conserve flux.
 
-Note that \routine{TRANNDF} resamples into the Current coordinate frame,
+Note that \routine{TRANNDF} resamples into the Current coordinate system,
 so that each pixel in the output image is a $1.0 \times 1.0$ square 
-in those coordinates.  Thus the coordinate frame in question must be
-a suitable one for that purpose.  If the frame yields pixels of 
+in those coordinates.  Thus the coordinate system in question must be
+a suitable one for that purpose.  If the it has units of 
 the wrong size, then a suitable transformation can be made by
-adding a new frame with the \xroutine{WCSEDIT} or \xroutine{WCSREG} 
-programs.
+adding a new coordinate system with the
+\xroutine{WCSEDIT} or \xroutine{WCSREG} programs.
 In particular it's no good running \routine{TRANNDF} on a set of
 images which have SKY coordinates as Current, since they have
 units of radians, which are far too big.
@@ -2925,26 +2932,24 @@ for how to deal with this.
 \subsection{\xlabel{mosaic_normalise}\label{mos_norm}Mosaicing and 
             normalisation}
 
-The tasks of mosaicing and normalisation are performed by either of the:
+The tasks of mosaicing and normalisation are normally performed the:
 \begin{itemize}
 \item \xroutine{MAKEMOS}
-\item \xroutine{DRIZZLE}
 \end{itemize}
-programs.  To use \routine{MAKEMOS} the images must first have been
-resampled on to the same grid, using \routine{TRANNDF}; \routine{DRIZZLE}
-combines these two tasks in one.
-
+program.
 \routine{MAKEMOS} is a comprehensive program and has many
-capabilities. In its default mode \routine{MAKEMOS} just combines images using a
+capabilities. In its default mode \routine{MAKEMOS} 
+just combines images using a
 selected data combination method (\routine{MAKEMOS} supports the
 methods -- mean, median, trimmed mean etc.\ \S\ref{combinations}).
-In this it is similar to the \xroutine{MAKECAL} routine, but,
+In this it is similar to the \xroutine{MAKECAL} routine, but
 \routine{MAKEMOS} makes much more efficient use of
 memory (it is designed to deal with datasets which may not have much
 overlap and which might have a very large output extent, unlike with CCD
 calibration data where the overlap will usually be complete).
 
-The other capabilities of \routine{MAKEMOS} are concerned with data normalisation.
+The other capabilities of \routine{MAKEMOS} are concerned 
+with data normalisation.
 Normalisation is determined as two components, a scaling factor and a
 zero point factor. These may be controlled independently by the
 parameters \text{scale} and \text{zero}. So:
@@ -2965,74 +2970,21 @@ its algorithms are explained in R.F.~Warren-Smith, {\bf 1993},
 `The Calibration of Large-Field Mosaics', Proceedings of the 5th
 ESO/ST-ECF Data Analysis Workshop.
 
-In most cases \routine{MAKEMOS} should be used for data
-combination, but for some special purposes (see section \S\ref{drizzling})
-\xroutine{DRIZZLE} may be more superior.
-\routine{DRIZZLE} is a program with many of the capabilities
-of \routine{MAKEMOS},  but unlike \routine{MAKEMOS} it
-does not need to operate on images which have already been resampled
-to the same grid, and it supports only drizzling
-(described \hyperref{later}{in section \S}{}{drizzling}),
-as a data combination method. 
 
-The \routine{DRIZZLE} program supports the full range of normalisation
-capabilities described above for \routine{MAKEMOS}, however
-it also allows you to supply scaling and zero-point factors via a
-plain text input file.
-If you wish the \routine{DRIZZLE} program to carry out scaling and/or
-zero-point corrections this is controlled via the \text{scale} and
-\text{zero} parameters (as for \routine{MAKEMOS}) and, additionally,
-the \text{correct} parameter. So:
-\begin{myquote}
-\begin{verbatim}
-% drizzle in='*' out=mosaic scale zero correct='!'
-\end{verbatim}
-\end{myquote}
-would determine (and apply) both scale and zero-point corrections. However,
-\routine{DRIZZLE} also has the capability to read scale and zero-point
-corrections in from a (correctly) formatted file by setting the
-\text{correct} parameter to point to the file. So:
-\begin{myquote}
-\begin{verbatim}
-% drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
-\end{verbatim}
-\end{myquote}
-would read the corrections in from the file {\tt drizzle.dat}. 
-\routine{MAKEMOS} has the ability to generate this file,
-although it should be noted that it does so in the same manner as
-\routine{DRIZZLE} finds the corrections, so there is no advantage in
-doing it in two steps like this; the facility is provided 
-for users who wish to normalise their frames very accurately. 
+\subsection{\label{drizzling}\xlabel{drizzling}Combination by drizzling}
 
-Full descriptions of \xroutine{DRIZZLE}
-and \xroutine{MAKEMOS} are given in appendix \S\ref{descriptions}.
-Since \routine{DRIZZLE} does its own resampling, the remarks 
-about the units of the Current coordinate systems made about
-\routine{TRANNDF} apply here --- 
-see \hyperref{the section on resampling}{\S }{}{resampling}.
+In most cases resampling and mosaicing should be done using
+\routine{TRANNDF} and \routine{MAKEMOS}, but for certain specialised
+applications the
+\begin{itemize}
+\item \xroutine{DRIZZLE}
+\end{itemize}
+program may be superior. 
+It combines resampling and mosaicing in one task
+and the resampling is done using the Variable-Pixel Linear Reconstruction
+(or informally ``drizzling'') algorithm.
 
-
-\subsection{\xlabel{drizzling}The drizzling algorithm\label{drizzling}}
-
-The data combination algorithm used by the \routine{DRIZZLE} program
-is intended for specialised tasks, and if you intend to make
-use of \routine{DRIZZLE} it is
-recommended that you read the paper 
-A.S.~Fruchter and R.N.~Hook, {\bf 1998},
-``A Method for the Linear Reconstruction of Undersampled Images''
-(\htmladdnormallink{PASP, in
-press}{http://xxx.soton.ac.uk/abs/astro-ph/9808087}) which discusses the
-algorithm in depth. Further information can also be found on the web at
-\htmladdnormallink{
-{\tt http://www.stsci.edu/\%7Efruchter/dither/drizzle.html}
-}{http://www.stsci.edu/~fruchter/dither/drizzle.html}
-where the authors of the algorithm discuss its use in reconstructing
-the Hubble Deep Field.
-The rest of this section however summarises the description given
-in these references.
-
-The algorithm, known as Variable-Pixel Linear Reconstruction (or
-informally as ``drizzling''), was originally developed for the Hubble Deep
+This algorithm was originally developed for the Hubble Deep
 Field, a project whose purpose was to image an otherwise unexceptional
 region of the sky to depths beyond those of previous astronomical images.
 Its primary application is to provide a method for the linear
@@ -3069,7 +3021,7 @@ factor can for convenience be given using the \text{multi}
 parameter of DRIZZLE.  The ratio of the linear size of the
 drop to the size of the input pixel is controlled by the
 parameter \text{pixfrac}.  The default values for these
-parameters are 0.9 and 1.5 respectively.
+parameters are 1.5 and 0.9 respectively.
 
 The algorithm has a number of advantages over the resampling and
 combination methods provided by \routine{TRANNDF} and \routine{MAKEMOS}.
@@ -3094,9 +3046,58 @@ CCD images.  Unlike the resampling methods used by the \routine{TRANNDF}
 routine, drizzling requires the forward rather than the inverse
 mapping for the geometric transformation.
 
+If you intend to make use of \routine{DRIZZLE} it is
+recommended that you read the paper 
+A.S.~Fruchter and R.N.~Hook, {\bf 1998},
+``A Method for the Linear Reconstruction of Undersampled Images''
+(\htmladdnormallink{PASP, in
+press}{http://xxx.soton.ac.uk/abs/astro-ph/9808087}) which discusses the
+algorithm in depth. Further information can also be found on the web at
+\htmladdnormallink{
+{\tt http://www.stsci.edu/\%7Efruchter/dither/drizzle.html}
+}{http://www.stsci.edu/~fruchter/dither/drizzle.html}
+where the authors of the algorithm discuss its use in reconstructing
+the Hubble Deep Field.
+
+The \routine{DRIZZLE} program supports the full range of normalisation
+capabilities described above for \routine{MAKEMOS}, however
+it also allows you to supply scaling and zero-point factors via a
+plain text input file.
+If you wish the \routine{DRIZZLE} program to carry out scaling and/or
+zero-point corrections this is controlled via the \text{scale} and
+\text{zero} parameters (as for \routine{MAKEMOS}) and, additionally,
+the \text{correct} parameter. So:
+\begin{myquote}
+\begin{verbatim}
+% drizzle in='*' out=mosaic scale zero correct='!'
+\end{verbatim}
+\end{myquote}
+would determine (and apply) both scale and zero-point corrections. However,
+\routine{DRIZZLE} also has the capability to read scale and zero-point
+corrections in from a (correctly) formatted file by setting the
+\text{correct} parameter to point to the file. So:
+\begin{myquote}
+\begin{verbatim}
+% drizzle in='*' out=mosaic scale zero correct='drizzle.dat'
+\end{verbatim}
+\end{myquote}
+would read the corrections in from the file {\tt drizzle.dat}. 
+\routine{MAKEMOS} has the ability to generate this file,
+although it should be noted that it does so in the same manner as
+\routine{DRIZZLE} finds the corrections, so there is no advantage in
+doing it in two steps like this; the facility is provided 
+for users who wish to normalise their frames very accurately. 
+
+A full description of \xroutine{DRIZZLE} is
+given in appendix \S\ref{descriptions}.
+Since it does its own resampling, the remarks 
+about the units of the Current coordinate systems made about
+\routine{TRANNDF} apply here --- 
+see \hyperref{the section on resampling}{\S }{}{resampling}.
 
 
-\subsection{\xlabel{regexamples}\label{regexamples}Examples of registration}
+
+\subsection{\xlabel{regexamples}\label{regexamples}Some registration examples}
 
 \subsubsection{Registering images with SKY coordinates}
 
@@ -3124,9 +3125,9 @@ only in the regions which ought to overlap, which makes it faster
 and less prone to finding a false match.
 \begin{myquote}
 \begin{verbatim}
-% findobj in='data*' outlist='*.obj' accept
-% findoff inlist='data*' outlist='*.off' restrict=true accept
-% register inlist='*.off' accept
+% findobj in='data*' outlist='*.obj'
+% findoff inlist='data*' outlist='*.off' restrict=true
+% register inlist='*.off'
 \end{verbatim}
 \end{myquote}
 The REGISTER program adds a new pixel-like coordinate system
@@ -3143,7 +3144,7 @@ Finally, we set the Current coordinate system of the mosaic to SKY, so
 that when it is displayed RA and Dec coordinates will be shown.
 \begin{myquote}
 \begin{verbatim}
-wcsedit in=mosaic mode=current frame=sky
+% wcsedit in=mosaic mode=current frame=sky
 \end{verbatim}
 \end{myquote}
 
@@ -3260,7 +3261,7 @@ We can see that, because of the way the images overlap,
 \routine{REGISTER} has managed to add an aligning coordinate system 
 to \text{1b} and \text{1c}, but not \text{1a}.
 The following table summarises the coordinate systems that we have 
-added to these images (ignoring the ever-present GRID, PIXEL and AXIS):
+added to all the images (ignoring the ever-present GRID, PIXEL and AXIS):
 \begin{center}
 \begin{tabular}{l|c|c|c|c|}
            & OBS1     & OBS2     & OBS2-ROT & CCD\_REG \\
@@ -3366,7 +3367,7 @@ the file was constructed by the following command:
 \begin{verbatim}
 % astexp astfile=INT-WFC.ast in='"sb[1234]"' outdomain=INT-WFC
          outtitle='"INT wide field camera undistorted"'
-         idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA accept
+         idtype=fitsid fitsid=chipname fitsrot=rotskypa accept
 \end{verbatim}
 \end{myquote}
 The OUTDOMAIN and OUTTITLE parameters write labels indicating 
@@ -3422,8 +3423,9 @@ Since they now share a coordinate system they can now be, for instance,
 aligned with other images from the same instrument or resampled directly.
 
 The AST file can be found at {\tt \$CCDPACK\_DIR/INT-WFC.ast}.
-It's not perfect; there are still optical distortions at two
-corners and alignment of CCD 2 is poor.  
+It's not perfect; 
+compensation for the optical distortions is imperfect in two corners
+and alignment of CCD 2 is poor.  
 If you have data from the WFC then consider
 improving it as an exercise for the reader!
 
@@ -15225,12 +15227,8 @@ although by default the routines are now storing coordinate
 system information in a different way.
 Furthermore, all the TRANSFORM
 functionality is still available, 
-and can can be used for backward compatibility
+and can be used for backward compatibility
 with files which have already been partially processed by CCDPACK.
-Use of the old methods
-is also currently necessary for certain nonlinear kinds of transformations
-which cannot be handled by the new system,
-however this functionality will be added to the new system shortly.
 
 The applications 
 \routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, and 
@@ -15238,6 +15236,12 @@ The applications
 by default read and write coordinate system
 information using coordinate systems attached to images, but retain options
 which allow them to use the old TRANSFORM structures on request.
+
+All the things which can be done using TRANSFORM structures
+however can be as well or better done with attached coordinate systems,
+and the ability of CCDPACK programs
+to read and write TRANSFORM structures may be
+withdrawn altogether in a future release.
 
 
 \subsection{\xlabel{handlingtransforms}Handling TRANSFORM structures
@@ -15383,17 +15387,15 @@ list can be transformed using the routine:
 \end{itemize}
 \routine{TRANLIST} can use transformations expressed in four different forms:
 \begin{itemize}
-\item pairs of coordinate systems associated with an image
+\item pairs of coordinate systems attached to an image
 \item TRANSFORM structures
 \item linear transform coefficients
 \item general algebraic expressions.
 \end{itemize}
 The first method uses the usual format for passing transformation
 information between CCDPACK applications 
-(described \hyperref{here}{in \S}{}{regproc})
 and the second uses the format which served 
-that purpose in previous versions of CCDPACK 
-(described \hyperref{here}{in \S}{}{transformreg}).
+that purpose in previous versions of CCDPACK.
 The third uses the coefficients of a linear transform and the fourth
 allows you to transform a list using the algebraic expressions which are
 understood by the \xref{TRANSFORM package (SUN/61)}{sun61}{}.
