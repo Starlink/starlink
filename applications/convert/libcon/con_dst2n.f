@@ -1,4 +1,4 @@
-      SUBROUTINE CON_DST2N(FIGFIL, NDFFIL, STATUS)
+      SUBROUTINE CON_DST2N( FIGFIL, NDFFIL, STATUS )
 *+ 
 *  Name:
 *     CON_DST2N
@@ -162,6 +162,11 @@
 *        Corrected the closedown sequence of DTA-error reporting.
 *        Added message tokens for the filenames to clarify some error
 *        reports.
+*     1992 October 13 (MJC):
+*        Fixed a bug where given a DST that has a non-empty FITS
+*        structure, and an axis array that is missing from the first or
+*        second axis, the corresponding NDF axis-centre array is given
+*        a dimension equal to the number of FITS headers.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -213,6 +218,7 @@
       CHARACTER ERROR*64         ! Error description
       LOGICAL   EXIST            ! True if a FITS item has an comment
       REAL      FARRAY(100)      ! Used to read in FLOAT type data items
+      INTEGER   FDIMS(2)         ! Dimensions of FITS extension
       CHARACTER FITCOM*80        ! Object containing FITS comment
       CHARACTER FITNAM*90        ! Name of FITS item
       LOGICAL   FITS             ! True is a FITS structure is found
@@ -259,9 +265,9 @@
       INTEGER   NFITS            ! No. of FITS items
       INTEGER   NMSTAT           ! Status from 1st-level call to
                                  ! DTA_NMVAR
-      INTEGER   NMSTAT1          ! Status from 2nd-level call to
+      INTEGER   NMSTA1           ! Status from 2nd-level call to
                                  ! DTA_NMVAR
-      INTEGER   NMSTAT3          ! Status from call to DTA_NMVAR with
+      INTEGER   NMSTA3           ! Status from call to DTA_NMVAR with
                                  ! .MORE
       INTEGER   NSTR             ! Length of string
       INTEGER   NF               ! Length of string
@@ -292,7 +298,7 @@
 *   Open the input file.
       NSTR = CHR_LEN( FIGFIL )
       CALL DTA_ASFNAM( 'INPUT', FIGFIL(:NSTR), 'OLD', 0, FIGFIL, DSTAT )
-      IF ((DSTAT .NE. 0) .AND. (DSTAT .NE. DTA_EXIST)) THEN
+      IF ( ( DSTAT .NE. 0 ) .AND. ( DSTAT .NE. DTA_EXIST ) ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FILNAM', FIGFIL )
          CALL ERR_REP( 'DST2NDF_FNF',
@@ -302,13 +308,13 @@
       OBOPEN = .TRUE.
 
 *   Open output file with the extension .SDF.
-      NSTR = CHR_LEN(NDFFIL)
-      CALL DTA_ASFNAM ('OUTPUT', NDFFIL (:NSTR), 
-     :                 'NEW', 10, 'NDF', DSTAT)
+      NSTR = CHR_LEN( NDFFIL )
+      CALL DTA_ASFNAM( 'OUTPUT', NDFFIL( :NSTR ), 
+     :                 'NEW', 10, 'NDF', DSTAT )
       IF (DSTAT .NE. 0) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETC( 'FILNAM', NDFFIL )
-         CALL ERR_REP ('DST2NDF_FNF',
+         CALL ERR_REP( 'DST2NDF_FNF',
      :     'DST2NDF: Unable to open output NDF ^FILNAM.', STATUS )
          GOTO 500
       END IF
@@ -353,17 +359,17 @@
 *   The input structure is searched - the loop terminates
 *   once the DTA_NMVAR call fails and sets NMSTAT to a non-zero
 *   value indicating that no more data objects can be found.
-      DO WHILE (NMSTAT .EQ. 0)
+      DO WHILE ( NMSTAT .EQ. 0 )
          IPOSN = IPOSN + 1
          IPOSN1 = 0
-         NMSTAT1 = 0
+         NMSTA1 = 0
 
 *      Obtain the name of the IPOSNth object.
-         CALL DTA_NMVAR ('INPUT', IPOSN, NAME1, NMSTAT)
+         CALL DTA_NMVAR( 'INPUT', IPOSN, NAME1, NMSTAT )
 
 *      Create name of first-level object.
-         IF (NMSTAT.EQ.0) THEN
-            CALL DTA_CRNAM ('INPUT', NAME1, 0, 0, LEVEL1, DSTAT)
+         IF ( NMSTAT .EQ. 0 ) THEN
+            CALL DTA_CRNAM( 'INPUT', NAME1, 0, 0, LEVEL1, DSTAT )
 
 *          Test for an axis structure.
             IF (NAME1 .EQ. 'X' .OR. NAME1 .EQ. 'Y' .OR.
@@ -383,9 +389,9 @@
 *            If it is not a standard object, set logicals so that
 *            appropriate extensions can be created.
 
-               IF (.NOT. (NAME1 .EQ. 'Z' .OR. NAME1 .EQ. 'FITS' .OR.
-     :             NAME1 .EQ. 'COMMENTS' .OR. NAME1 .EQ. 'OBS' .OR.
-     :             NAME1 .EQ. 'MORE')) THEN
+               IF (.NOT. ( NAME1 .EQ. 'Z' .OR. NAME1 .EQ. 'FITS' .OR.
+     :              NAME1 .EQ. 'COMMENTS' .OR. NAME1 .EQ. 'OBS' .OR.
+     :              NAME1 .EQ. 'MORE')) THEN
                   MORE = .TRUE.
                   MOREFG = .TRUE.
 
@@ -411,42 +417,42 @@
                   DSTAT = 0
 
 *            Test for the object being the extension structure.
-               ELSE IF (NAME1 .EQ. 'MORE') THEN
+               ELSE IF ( NAME1 .EQ. 'MORE' ) THEN
                   MORE = .TRUE.
                END IF
             END IF
 
 *         Search through the second-level objects.
-            DO WHILE (NMSTAT1.EQ.0)
+            DO WHILE ( NMSTA1 .EQ. 0 )
                IPOSN1 = IPOSN1 + 1
 
 *            Obtain the IPOSN1th object's name.
-               CALL DTA_NMVAR (LEVEL1, IPOSN1, NAME2, NMSTAT1)
-               IF (NMSTAT1.EQ.0) THEN
+               CALL DTA_NMVAR( LEVEL1, IPOSN1, NAME2, NMSTA1 )
+               IF ( NMSTA1 .EQ. 0 ) THEN
 
 *               Create the composite name at level 2.
-                  CALL DTA_CRNAM (LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT)
+                  CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT )
 
 *               Check to determine if any second-level objects require
 *               OUTPUT.MORE or OUTPUT.MORE.FIGARO.
 
-                  IF ((.NOT.MOREFG .OR. .NOT.FITS) .AND.
-     :                 .NOT.ANAXIS) THEN
+                  IF ( ( .NOT. MOREFG .OR. .NOT. FITS ) .AND.
+     :                   .NOT. ANAXIS ) THEN
 
 *                  Test for the structure containing the data array.
-                     IF (NAME1 .EQ. 'Z') THEN
+                     IF ( NAME1 .EQ. 'Z' ) THEN
 
 *                     Data structure - only DATA, ERRORS, LABEL, 
 *                     UNITS, FLAGGED, QUALITY, and IMAGINARY are
 *                     standard objects, anything else goes into
 *                     .MORE.FIGARO.
-                        IF (.NOT. (NAME2 .EQ. 'DATA' .OR.
-     :                             NAME2 .EQ. 'ERRORS' .OR.
-     :                             NAME2 .EQ. 'LABEL' .OR.
-     :                             NAME2 .EQ. 'UNITS' .OR.
-     :                             NAME2 .EQ. 'FLAGGED' .OR.
-     :                             NAME2 .EQ. 'IMAGINARY'  .OR.
-     :                             NAME2 .EQ. 'QUALITY')) THEN
+                        IF ( .NOT. ( NAME2 .EQ. 'DATA' .OR.
+     :                               NAME2 .EQ. 'ERRORS' .OR.
+     :                               NAME2 .EQ. 'LABEL' .OR.
+     :                               NAME2 .EQ. 'UNITS' .OR.
+     :                               NAME2 .EQ. 'FLAGGED' .OR.
+     :                               NAME2 .EQ. 'IMAGINARY'  .OR.
+     :                               NAME2 .EQ. 'QUALITY' ) ) THEN
 
 *                        It is not a standard object. Therefore the
 *                        MORE.FIGARO structure must be created.
@@ -466,11 +472,11 @@
                         END IF
 
 *                  Test for the OBS structure.
-                     ELSE IF (NAME1 .EQ. 'OBS') THEN
+                     ELSE IF ( NAME1 .EQ. 'OBS' ) THEN
 
 *                     Only OBJECT is a standard object in the OBS
 *                     structure.
-                        IF (NAME2 .NE. 'OBJECT') THEN
+                        IF ( NAME2 .NE. 'OBJECT' ) THEN
                            MORE = .TRUE.
                            MOREFG = .TRUE.
                         END IF
@@ -506,21 +512,20 @@
 *   ===============================================
 
 *   Test whether or not an axis structure is required.
-      IF (NEEDAX) THEN
+      IF ( NEEDAX ) THEN
 
 *      Inquire the dimensions of the data array.  The number of axes
 *      must equal the dimensionality of the data array.
-         CALL DTA_SZVAR ('INPUT.Z.DATA',7, NDIM, DIMS, DSTAT)
+         CALL DTA_SZVAR( 'INPUT.Z.DATA',7, NDIM, DIMS, DSTAT )
          NAXIS = NDIM
 
 *      Create an axis structure of the appropriate dimensions, first
 *      generating the name.
-         CALL DTA_CRNAM ('OUTPUT', 'AXIS', 1, NAXIS, AXNAME, 
-     :                   DSTAT)
-         CALL DTA_CRVAR (AXNAME, 'AXIS', DSTAT)
+         CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, NAXIS, AXNAME, DSTAT )
+         CALL DTA_CRVAR( AXNAME, 'AXIS', DSTAT )
 
 *      Report what has happened should something have gone wrong.
-         IF (DSTAT .NE. 0) THEN
+         IF ( DSTAT .NE. 0 ) THEN
             STATUS = DSTAT
             CALL ERR_REP( 'DST2NDF_CRAXIS', 
      :        'DST2NDF: Unable to create the output axis structure.', 
@@ -531,9 +536,9 @@
 
 *   Create the .DATA_ARRAY structure, if necessary.
       IF ( .NOT. PRIM ) THEN
-         CALL DTA_CRVAR ('OUTPUT.DATA_ARRAY', 'ARRAY', DSTAT)
+         CALL DTA_CRVAR( 'OUTPUT.DATA_ARRAY', 'ARRAY', DSTAT )
       END IF
-      IF (DSTAT .NE. 0) THEN
+      IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
          CALL ERR_REP('DST2NDF_CR1',
      :     'DST2NDF: Unable to create output .DATA_ARRAY structure.',
@@ -542,10 +547,10 @@
       END IF
 
 *   Create the .MORE structure, if necessary.
-      IF (MORE) THEN
-         CALL DTA_CRVAR ('OUTPUT.MORE', 'EXT', DSTAT)
+      IF ( MORE ) THEN
+         CALL DTA_CRVAR( 'OUTPUT.MORE', 'EXT', DSTAT )
       END IF
-      IF (DSTAT .NE. 0) THEN
+      IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
          CALL ERR_REP('DST2NDF_CR2',
      :     'DST2NDF: Unable to create output .MORE structure.',
@@ -555,9 +560,9 @@
 
 *   Create the .MORE.FIGARO structure, if necessary.
       IF ( MOREFG ) THEN
-         CALL DTA_CRVAR ('OUTPUT.MORE.FIGARO', 'EXT', DSTAT)
+         CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO', 'EXT', DSTAT )
       END IF
-      IF (DSTAT .NE. 0) THEN
+      IF ( DSTAT .NE. 0 ) THEN
          STATUS = DSTAT
          CALL ERR_REP('DST2NDF_CR2',
      :     'DST2NDF: Unable to create output .MORE.FIGARO structure.',
@@ -572,43 +577,43 @@
 *   according to SGP/38. 
       NMSTAT = 0
       IPOSN = 0
-      DO WHILE (NMSTAT.EQ.0)
+      DO WHILE ( NMSTAT .EQ. 0 )
          IPOSN = IPOSN + 1
          IPOSN1 = 0
-         NMSTAT1 = 0
+         NMSTA1 = 0
          LEVEL2 = ' '
 
 *      Get the name of the the IPOSNth level-one object.
-         CALL DTA_NMVAR ('INPUT', IPOSN, NAME1, NMSTAT)
-         IF (NMSTAT.EQ.0) THEN
+         CALL DTA_NMVAR( 'INPUT', IPOSN, NAME1, NMSTAT )
+         IF ( NMSTAT .EQ. 0 ) THEN
 
 *         Generate its full name.
-            CALL DTA_CRNAM ('INPUT', NAME1, 0, 0, LEVEL1, DSTAT)
+            CALL DTA_CRNAM( 'INPUT', NAME1, 0, 0, LEVEL1, DSTAT )
 
 *         Deal with the Z structure.
 *         ==========================
-            IF (NAME1 .EQ. 'Z') THEN
+            IF ( NAME1 .EQ. 'Z' ) THEN
                IPOSN1 = IPOSN1 + 1
 
 *            Search through the objects within .Z.
-               DO WHILE (NMSTAT1.EQ.0)
+               DO WHILE ( NMSTA1 .EQ. 0 )
 
 *               Get the name of the level-two object.
-                  CALL DTA_NMVAR (LEVEL1, IPOSN1, NAME2, NMSTAT1)
-                  IF (NMSTAT1 .NE. 0) GOTO 111
+                  CALL DTA_NMVAR( LEVEL1, IPOSN1, NAME2, NMSTA1 )
+                  IF ( NMSTA1 .NE. 0 ) GOTO 111
                   IPOSN1 = IPOSN1 + 1
 
 *               Generate the full name of the component.
-                  CALL DTA_CRNAM (LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT)
+                  CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT )
 
 *               Test for the data array.
 *               ========================
-                  IF (NAME2 .EQ. 'DATA') THEN
+                  IF ( NAME2 .EQ. 'DATA' ) THEN
 
 *                  Inquire the data type and dimensions.
-                     CALL DTA_TYVAR (LEVEL2, TYPE, DSTAT)
-*                     IF (TYPE.EQ.'CSTRUCT') THEN
-                     CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, DSTAT)
+                     CALL DTA_TYVAR( LEVEL2, TYPE, DSTAT )
+*                     IF ( TYPE .EQ. 'CSTRUCT' ) THEN
+                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
 *                  Generate the name of the output object.  This will
 *                  depend on whether the NDF is simple or primitive. In
@@ -620,15 +625,15 @@
                         CALL DTA_CRNAM( 'OUTPUT', 'DATA_ARRAY', NDIM,  
      :                                   DIMS, NAMOUT, DSTAT )
                         CALL DTA_CYVAR( LEVEL2, 'OUTPUT.DATA_ARRAY',
-     :                                  DSTAT)
+     :                                  DSTAT )
                      ELSE
                         CALL DTA_CRNAM( 'OUTPUT.DATA_ARRAY', 'DATA',
      :                                  NDIM, DIMS, NAMOUT, DSTAT )
-                        CALL DTA_CYVAR( LEVEL2,
-     :                                  'OUTPUT.DATA_ARRAY.DATA', DSTAT)
+                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.'/
+     :                                  /'DATA_ARRAY.DATA', DSTAT )
                      END IF
 
-                     IF (DSTAT .NE. 0) GOTO 400
+                     IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Add the BAD_PIXEL flag in the simple NDF.
                      IF ( .NOT. PRIM ) THEN
@@ -640,32 +645,31 @@
 
 *               Test for the errors component.
 *               ===============================
-                  ELSE IF (NAME2 .EQ. 'ERRORS') THEN
+                  ELSE IF ( NAME2 .EQ. 'ERRORS' ) THEN
 
 *                  Inquire its type and dimensions.
-                     CALL DTA_TYVAR (LEVEL2, TYPE, DSTAT)
-                     CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, 
-     :                               DSTAT)
+                     CALL DTA_TYVAR( LEVEL2, TYPE, DSTAT )
+                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
 *                  Find the number of elements in the error array,
 *                  needed because the error values must be processed
 *                  to form variances.
                      NDATA = 1
                      DO K = 1, NDIM
-                       NDATA = NDATA*DIMS (K)
+                       NDATA = NDATA * DIMS( K )
                      END DO
 
 *                  Copy the error array to the variance.
-                     CALL DTA_CYVAR (LEVEL2, 'OUTPUT.VARIANCE', DSTAT)
-                     IF (DSTAT .NE. 0) GOTO 400
+                     CALL DTA_CYVAR( LEVEL2, 'OUTPUT.VARIANCE', DSTAT )
+                     IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Map the variance (still errors though).
-                     CALL DTA_MUVARF ('OUTPUT.VARIANCE', NDATA, 
-     :                                IPTR, DSTAT)
+                     CALL DTA_MUVARF( 'OUTPUT.VARIANCE', NDATA, 
+     :                                IPTR, DSTAT )
 
 *                  Report what has happened should something have gone
 *                  wrong.
-                     IF (DSTAT .NE. 0) THEN
+                     IF ( DSTAT .NE. 0 ) THEN
                         STATUS = DSTAT
                         CALL ERR_REP( 'DST2NDF_MAPVAR', 
      :                    'DST2NDF: Error mapping the output variance '/
@@ -675,16 +679,16 @@
                      
 *                  The errors in INPUT.Z.ERRORS are standard deviations.
 *                  Therefore square the values within OUTPUT.VARIANCE.
-                     CALL VEC_MULR (.TRUE., NDATA, %VAL (IPTR), 
-     :                              %VAL (IPTR), %VAL (IPTR), IERR, 
-     :                              NERR, STATUS)
+                     CALL VEC_MULR( .TRUE., NDATA, %VAL( IPTR ), 
+     :                              %VAL( IPTR ), %VAL( IPTR ), IERR, 
+     :                              NERR, STATUS )
 
 *                  Unmap the variance array.
-                     CALL DTA_FRVAR ('OUTPUT.VARIANCE', DSTAT)
+                     CALL DTA_FRVAR( 'OUTPUT.VARIANCE', DSTAT )
 
 *                  Report what has happened should something have gone
 *                  wrong.
-                     IF (DSTAT .NE. 0) THEN
+                     IF ( DSTAT .NE. 0 ) THEN
                         STATUS = DSTAT
                         CALL ERR_REP( 'DST2NDF_UMPVAR', 
      :                    'DST2NDF: Error unmapping the output '/
@@ -696,59 +700,59 @@
 *               =================
 *
 *               Only permit quality if there are no flagged data.
-                  ELSE IF (NAME2 .EQ. 'QUALITY' .AND. .NOT. FLAGGD) THEN
+                  ELSE IF ( NAME2 .EQ. 'QUALITY' .AND.
+     :                      .NOT. FLAGGD ) THEN
 
 *                  Create a structure .QUALITY of type QUALITY.
-                     CALL DTA_CRVAR ('OUTPUT.QUALITY', 'QUALITY', 
-     :                                DSTAT)  
+                     CALL DTA_CRVAR( 'OUTPUT.QUALITY', 'QUALITY',
+     :                               DSTAT )  
 
 *                  Create and assign a BADBITS item to indicate that 1
 *                  is the bad quality.
-                     CALL DTA_CRVAR ('OUTPUT.QUALITY.BADBITS', 
-     :                               'BYTE', DSTAT)  
-                     BARRAY (1) = 255
+                     CALL DTA_CRVAR( 'OUTPUT.QUALITY.BADBITS', 
+     :                               'BYTE', DSTAT )  
+                     BARRAY( 1 ) = 255
                      CALL DTA_WRVARB ('OUTPUT.QUALITY.BADBITS', 1, 
-     :                                BARRAY, DSTAT)
+     :                                BARRAY, DSTAT )
 
 *                  Inquire the type of the input QUALITY array.
-                     CALL DTA_TYVAR (LEVEL2, TYPE, DSTAT)
+                     CALL DTA_TYVAR( LEVEL2, TYPE, DSTAT )
 
 *                  The type must be BYTE.  If it is, merely copy the
 *                  QUALITY array to the NDF's QUALITY structure.
-                     IF (TYPE.EQ.'BYTE') THEN
-                        CALL DTA_CYVAR (LEVEL2, 
-     :                                  'OUTPUT.QUALITY.QUALITY', DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
-
+                     IF ( TYPE .EQ. 'BYTE' ) THEN
+                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.'/
+     :                                  /'QUALITY.QUALITY', DSTAT )
+                        IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  If type is not BYTE, it must be converted.
                      ELSE
-                        CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, DSTAT)
+                        CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
 *                     Generate a destination quality array of the
 *                     required dimensions and BYTE data type.
-                        CALL DTA_CRNAM ('OUTPUT.QUALITY', 'QUALITY', 
-     :                                  NDIM, DIMS, NAMOUT, DSTAT)
-                        CALL DTA_CRVAR (NAMOUT, 'BYTE', DSTAT)
+                        CALL DTA_CRNAM( 'OUTPUT.QUALITY', 'QUALITY', 
+     :                                  NDIM, DIMS, NAMOUT, DSTAT )
+                        CALL DTA_CRVAR( NAMOUT, 'BYTE', DSTAT )
 
 *                     Find the total number of elements in the quality
 *                     array.
                         NDATA = 1
                         DO K = 1, NDIM
-                          NDATA = NDATA*DIMS (K)
+                          NDATA = NDATA * DIMS( K )
                         END DO
 
 *                     Map the input quality array.
-                        CALL DTA_MRVARB (LEVEL2, NDATA, INQPTR, DSTAT)
+                        CALL DTA_MRVARB( LEVEL2, NDATA, INQPTR, DSTAT )
 
 *                     Report error conditions.
-                        IF (DSTAT .EQ. DTA_BADCON) THEN
+                        IF ( DSTAT .EQ. DTA_BADCON ) THEN
                            STATUS = DSTAT
                            CALL ERR_REP( 'DST2NDF_CNVQUA', 
      :                       'DST2NDF: Error converting the quality '/
      :                       /'array to BYTE.', STATUS )
                            GOTO 500
-                        ELSE IF (DSTAT .NE. 0) THEN
+                        ELSE IF ( DSTAT .NE. 0 ) THEN
                            STATUS = DSTAT
                            CALL ERR_REP( 'DST2NDF_REAQUA', 
      :                       'DST2NDF: Error reading the input '/
@@ -757,11 +761,11 @@
                         END IF
 
 *                     Map the output quality array.
-                        CALL DTA_MUVARB ('OUTPUT.QUALITY.QUALITY', 
-     :                                   NDATA, OTQPTR, DSTAT)
+                        CALL DTA_MUVARB( 'OUTPUT.QUALITY.QUALITY', 
+     :                                   NDATA, OTQPTR, DSTAT )
 
 *                     Report error conditions.
-                        IF (DSTAT .NE. 0) THEN
+                        IF ( DSTAT .NE. 0 ) THEN
                            STATUS = DSTAT
                            CALL ERR_REP( 'DST2NDF_MAPQUA', 
      :                       'DST2NDF: Error mapping the output '/
@@ -771,14 +775,14 @@
 
 *                     Copy the quality.
                         NBYTES = NDATA
-                        CALL CON_MOVE (NBYTES, %VAL (INQPTR), 
-     :                                 %VAL (OTQPTR), STATUS)
+                        CALL CON_MOVE (NBYTES, %VAL( INQPTR ), 
+     :                                 %VAL( OTQPTR ), STATUS )
 
 *                     Unmap the quality arrays.
-                        CALL DTA_FRVAR (LEVEL2, DSTAT)
-                        CALL DTA_FRVAR ('OUTPUT.QUALITY.QUALITY', 
-     :                                  DSTAT)
-                        IF (DSTAT .NE. 0) THEN
+                        CALL DTA_FRVAR( LEVEL2, DSTAT )
+                        CALL DTA_FRVAR( 'OUTPUT.QUALITY.QUALITY', 
+     :                                  DSTAT )
+                        IF ( DSTAT .NE. 0 ) THEN
                            CALL ERR_REP( 'DST2NDF_UMPQUA ', 
      :                      'DST2NDF: Error unmapping the output '/
      :                      /'quality array.', STATUS )
@@ -786,40 +790,40 @@
                         END IF
                      END IF
 
-                     IF (DSTAT .NE. 0) GOTO 400
+                     IF ( DSTAT .NE. 0 ) GOTO 400
 
 *               Test for the data label or units.
 *               =================================
-                  ELSE IF (NAME2 .EQ. 'LABEL' .OR.
-     :                     NAME2 .EQ. 'UNITS') THEN
+                  ELSE IF ( NAME2 .EQ. 'LABEL' .OR.
+     :                       NAME2 .EQ. 'UNITS' ) THEN
 
 *                  Inquire the dimensions and object name.  Generate the
 *                  full component name.
-                     CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, DSTAT)
-                     CALL DTA_CRNAM ('OUTPUT', NAME2, NDIM, DIMS, 
-     :                               NAMOUT, DSTAT)
-                     CALL DTA_CRVAR (NAMOUT, 'CHAR', DSTAT)
+                     CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
+                     CALL DTA_CRNAM( 'OUTPUT', NAME2, NDIM, DIMS, 
+     :                               NAMOUT, DSTAT )
+                     CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
 *                  The .Z.LABEL and .Z.UNITS are copied to .LABEL
 *                  and .UNITS in the output structure.  This is done by
 *                  reading the value, creating the named object in the
 *                  NDF, and writing the value to it.
-                     NDATA = DIMS (1)
-                     CALL DTA_RDVARC (LEVEL2, NDATA, STRING, DSTAT)
-                     CALL DTA_CRNAM ('OUTPUT', NAME2, 0, 0, 
-     :                               NAMOUT, DSTAT)
-                     CALL DTA_WRVARC (NAMOUT, NDATA, STRING, DSTAT)
+                     NDATA = DIMS( 1 )
+                     CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
+                     CALL DTA_CRNAM( 'OUTPUT', NAME2, 0, 0, 
+     :                               NAMOUT, DSTAT )
+                     CALL DTA_WRVARC( NAMOUT, NDATA, STRING, DSTAT )
 
 *               Test for the IMAGINARY component.
 *               =================================
-                  ELSE IF (NAME2 .EQ. 'IMAGINARY') THEN
+                  ELSE IF ( NAME2 .EQ. 'IMAGINARY' ) THEN
                      CALL MSG_OUT( ' ', 
      :                 'WARNING: Imaginary data are not copied.', 
      :                 STATUS )
-*                     CALL DTA_CYVAR (LEVEL2, 
+*                     CALL DTA_CYVAR( LEVEL2, 
 *     :                             'OUTPUT.DATA_ARRAY.IMAGINARY_DATA', 
-*     :                              DSTAT)
-                     IF (DSTAT .NE. 0) GOTO 400
+*     :                              DSTAT )
+                     IF ( DSTAT .NE. 0 ) GOTO 400
 
 *               Ignore FLAGGED as this information has been used
 *               already.
@@ -833,53 +837,53 @@
                   ELSE IF ( NAME2 .EQ. 'MAGFLAG' .OR.
      :                      NAME2 .EQ. 'RANGE' ) THEN
                      CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
-     :                               /NAME2, DSTAT)
+     :                               /NAME2, DSTAT )
 
 *               Must be a non-standard component.
                   ELSE
 
 *                  Create the extension for these non-standard objects,
 *                  if not already done so.
-                     IF (.NOT.MORFGZ) THEN
-                        CALL DTA_CRVAR ('OUTPUT.MORE.FIGARO.Z', 
-     :                                  'STRUCT', DSTAT)
+                     IF ( .NOT. MORFGZ ) THEN
+                        CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO.Z', 
+     :                                  'STRUCT', DSTAT )
                         MORFGZ = .TRUE.
                      END IF                                           
 
 *                  Copy the non-standard object to the FIGARO.Z
 *                  extension.
-                     CALL DTA_CYVAR (LEVEL2, 
-     :                              'OUTPUT.MORE.FIGARO.Z.'//NAME2, 
-     :                               DSTAT)
+                     CALL DTA_CYVAR( LEVEL2, 
+     :                               'OUTPUT.MORE.FIGARO.Z.'//NAME2, 
+     :                               DSTAT )
                   END IF
-                  IF (DSTAT .NE. 0) GOTO 400
+                  IF ( DSTAT .NE. 0 ) GOTO 400
 111               CONTINUE
                END DO
 
 *         Test for the OBS structure.
 *         ===========================
-            ELSE IF (NAME1 .EQ. 'OBS') THEN
+            ELSE IF ( NAME1 .EQ. 'OBS' ) THEN
 
 *            Loop through all the components of the OBS structure.
-               DO WHILE (NMSTAT1.EQ.0) 
+               DO WHILE ( NMSTA1 .EQ. 0 ) 
                   IPOSN1 = IPOSN1 + 1
 
 *               Inquire the IPOSN1th object's name.
-                  CALL DTA_NMVAR (LEVEL1, IPOSN1, NAME2, NMSTAT1)
-                  IF (NMSTAT1.EQ.0) THEN
+                  CALL DTA_NMVAR( LEVEL1, IPOSN1, NAME2, NMSTA1 )
+                  IF ( NMSTA1 .EQ. 0 ) THEN
 
 *                  Generate the full component name.
-                     CALL DTA_CRNAM (LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT)
+                     CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2,
+     :                               DSTAT )
 
 *                  Inquire whether or not the object is a structure.
-                     CALL DTA_STRUC (LEVEL2, STRUCT, DSTAT)
+                     CALL DTA_STRUC( LEVEL2, STRUCT, DSTAT )
 
 *                  INPUT.OBS.OBJECT is copied into OUTPUT.TITLE provided
 *                  it is not a structure.
-                     IF (NAME2 .EQ. 'OBJECT' .AND. .NOT. STRUCT) THEN
-                        CALL DTA_CYVAR (LEVEL2, 
-     :                                 'OUTPUT.TITLE', DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+                     IF ( NAME2 .EQ. 'OBJECT' .AND. .NOT. STRUCT ) THEN
+                        CALL DTA_CYVAR( LEVEL2, 'OUTPUT.TITLE', DSTAT )
+                        IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Test for the airmass or time.  These are not copied
 *                  to the .OBS structure within the extension, but go in
@@ -887,85 +891,86 @@
                      ELSE IF ( NAME2 .EQ. 'SECZ' .OR.
      :                         NAME2 .EQ. 'TIME' ) THEN
                         CALL DTA_CYVAR( LEVEL2, 'OUTPUT.MORE.FIGARO.'/
-     :                                  /NAME2, DSTAT)
+     :                                  /NAME2, DSTAT )
                            
                      ELSE
 
 *                     Create the Figaro OBS extension for other
 *                     ancillary data.
-                        IF (.NOT.MORFGO) THEN
-                           CALL DTA_CRVAR ('OUTPUT.MORE.FIGARO.OBS', 
-     :                                     'OBS', DSTAT)
+                        IF ( .NOT. MORFGO ) THEN
+                           CALL DTA_CRVAR( 'OUTPUT.MORE.FIGARO.OBS', 
+     :                                     'OBS', DSTAT )
                            MORFGO = .TRUE.
                         END IF
 
 *                     Any other items in the .OBS structure are copied
 *                     into the .MORE.FIGARO.OBS structure.
-                        CALL DTA_CYVAR (LEVEL2,
+                        CALL DTA_CYVAR( LEVEL2,
      :                                  'OUTPUT.MORE.FIGARO.OBS.'/
-     :                                  /NAME2, DSTAT)
+     :                                  /NAME2, DSTAT )
 
                      END IF
-                     IF (DSTAT .NE. 0) GOTO 400
+                     IF ( DSTAT .NE. 0 ) GOTO 400
                   END IF
                END DO
 
 *         Deal with axis structures.
 *         ==========================
-            ELSE IF (NAME1 .EQ. 'X'.OR. NAME1 .EQ. 'Y' .OR.
-     :               NAME1 .EQ. 'T'.OR. NAME1 .EQ. 'U' .OR.
-     :               NAME1 .EQ. 'V'.OR. NAME1 .EQ. 'W') THEN
+            ELSE IF ( NAME1 .EQ. 'X'.OR. NAME1 .EQ. 'Y' .OR.
+     :                NAME1 .EQ. 'T'.OR. NAME1 .EQ. 'U' .OR.
+     :                NAME1 .EQ. 'V'.OR. NAME1 .EQ. 'W' ) THEN
 
 *            Convert the axis name into an axis dimension.
-               IF (NAME1 .EQ. 'X') THEN
+               IF ( NAME1 .EQ. 'X' ) THEN
                   IAXIS = 1
-               ELSE IF (NAME1 .EQ. 'Y') THEN
+               ELSE IF ( NAME1 .EQ. 'Y' ) THEN
                   IAXIS = 2
-               ELSE IF (NAME1 .EQ. 'T') THEN
+               ELSE IF ( NAME1 .EQ. 'T' ) THEN
                   IAXIS = 3
-               ELSE IF (NAME1 .EQ. 'U') THEN
+               ELSE IF ( NAME1 .EQ. 'U' ) THEN
                   IAXIS = 4
-               ELSE IF (NAME1 .EQ. 'V') THEN
+               ELSE IF ( NAME1 .EQ. 'V' ) THEN
                   IAXIS = 5
-               ELSE IF (NAME1 .EQ. 'W') THEN
+               ELSE IF ( NAME1 .EQ. 'W' ) THEN
                   IAXIS = 6
                END IF
 
 *            Generate the full component name.
-               CALL DTA_CRNAM ('OUTPUT', 'AXIS', 1, IAXIS, AXOUT, DSTAT)
+               CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, IAXIS, AXOUT,
+     :                         DSTAT )
 
 *            Loop through all the components of the axis structure.
-               DO WHILE (NMSTAT1.EQ.0) 
+               DO WHILE ( NMSTA1 .EQ. 0 ) 
                   IPOSN1 = IPOSN1 + 1
 
 *               Inquire the IPOSN1th object's name.
-                  CALL DTA_NMVAR (LEVEL1, IPOSN1, NAME2, NMSTAT1)
+                  CALL DTA_NMVAR( LEVEL1, IPOSN1, NAME2, NMSTA1 )
 
 *               Generate the full component name.
-                  CALL DTA_CRNAM (LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT)
-                  IF (NMSTAT1.EQ.0) THEN
+                  CALL DTA_CRNAM( LEVEL1, NAME2, 0, 0, LEVEL2, DSTAT )
+                  IF ( NMSTA1 .EQ. 0 ) THEN
 
 *                  Inquire its dimensions.
                      CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
 *                  Deal with the axis centres.
 *                  ===========================
-                     IF (NAME2 .EQ. 'DATA') THEN
+                     IF ( NAME2 .EQ. 'DATA' ) THEN
 
 *                     Only 1-d axes are supported within NDFs.
                         IF ( NDIM .EQ. 1 ) THEN
 
 *                        Create the full name of the output axis array.
-                           CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 0, 0, 
-     :                                     AXOUTD, DSTAT)
+                           CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0, 
+     :                                     AXOUTD, DSTAT )
 
 *                        Copy the axis data array (axis centres).
-                           CALL DTA_CYVAR (LEVEL2, AXOUTD, DSTAT)
-                           IF (DSTAT .NE. 0) GOTO 400
+                           CALL DTA_CYVAR( LEVEL2, AXOUTD, DSTAT )
+                           IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                        Record that AXIS(IAXIS).DATA_ARRAY has been 
 *                        created.
-                           AXTHER(IAXIS) = .TRUE.
+                           AXTHER( IAXIS ) = .TRUE.
 
 *                     The axes are not 1-dimensional so move them to the
 *                     Figaro axis extension.
@@ -975,17 +980,17 @@
 *                        present in the NDF, by generating the full
 *                        component names of the input and output
 *                        objects.
-                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
-                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
-     :                                        AXMOR, DSTAT)
-                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
-                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
-     :                                        AXMORF, DSTAT)
-                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+                           IF ( .NOT. AXMFEX( IAXIS ) ) THEN
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT )
+                              CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT )
+                              CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX (IAXIS) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE. 
                            END IF
 
 *                        Copy the non-standard data to 
@@ -995,10 +1000,10 @@
 *                        false, the NDF axis centres will be filled
 *                        with pixel co-ordinates near the end of this
 *                        routine.
-                           CALL DTA_CRNAM (AXMORF, 'DATA', 0, 0,
-     :                                     AXOUTD, DSTAT)
-                           CALL DTA_CYVAR (LEVEL2, AXOUTD, DSTAT)
-                           IF (DSTAT .NE. 0) GOTO 400
+                           CALL DTA_CRNAM( AXMORF, 'DATA', 0, 0,
+     :                                     AXOUTD, DSTAT )
+                           CALL DTA_CYVAR( LEVEL2, AXOUTD, DSTAT )
+                           IF ( DSTAT .NE. 0 ) GOTO 400
                         END IF
 
 *                  Deal with axis errors.
@@ -1011,7 +1016,7 @@
 *                     2-dimensional axis arrays.
                         NDATA = 1
                         DO N = 1, NDIM
-                           NDATA = DIMS (N)*NDATA
+                           NDATA = DIMS( N ) * NDATA
                         END DO
 
 *                     Only 1-d axes are supported within NDFs.
@@ -1019,8 +1024,8 @@
 
 *                        Create the full name of the output axis
 *                        variance array.
-                           CALL DTA_CRNAM (AXOUT, 'VARIANCE', 0, 0, 
-     :                                     AXOUTV, DSTAT)
+                           CALL DTA_CRNAM( AXOUT, 'VARIANCE', 0, 0, 
+     :                                     AXOUTV, DSTAT )
 
 *                     The axis variance array is not 1-dimensional so
 *                     move it to the Figaro axis extension.
@@ -1030,39 +1035,39 @@
 *                        present in the NDF, by generating the full
 *                        component names of the input and output
 *                        objects.
-                           IF ( .NOT. AXMFEX (IAXIS) ) THEN
-                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
-     :                                        AXMOR, DSTAT)
-                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
-                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
-     :                                        AXMORF, DSTAT)
-                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+                           IF ( .NOT. AXMFEX( IAXIS ) ) THEN
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT )
+                              CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT )
+                              CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX (IAXIS) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE. 
                            END IF
 
 *                        Copy the non-standard variance to 
 *                        OUTPUT.AXIS(n).MORE.FIGARO.VARIANCE.
-                           CALL DTA_CRNAM (AXMORF, 'VARIANCE', 0, 0,
-     :                                     AXOUTV, DSTAT)
+                           CALL DTA_CRNAM( AXMORF, 'VARIANCE', 0, 0,
+     :                                     AXOUTV, DSTAT )
                         END IF
 
 *                     Create the output variance array and copy the
 *                     errors or variances to it.
-                        CALL DTA_CYVAR (LEVEL2, AXOUTV, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+                        CALL DTA_CYVAR( LEVEL2, AXOUTV, DSTAT )
+                        IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                     Convert standard deviations to variances.
 *                     =========================================
                         IF ( NAME2 .EQ. 'ERRORS' ) THEN
 
 *                        Map the variance array.
-                           CALL DTA_MUVARF (AXOUTV, NDATA, IPTR, DSTAT)
+                           CALL DTA_MUVARF( AXOUTV, NDATA, IPTR, DSTAT )
 
 *                        Report an error condition.
-                           IF (DSTAT .NE. 0) THEN
+                           IF ( DSTAT .NE. 0 ) THEN
                               STATUS = DSTAT
                               CALL MSG_SETI( 'AXNO', IAXIS )
                               CALL ERR_REP( 'DST2NDF_MAPAVA', 
@@ -1074,15 +1079,15 @@
 
 *                        Axis error arrays are converted from standard
 *                        deviations to variance in situ.
-                           CALL VEC_MULR( .TRUE., NDATA, %VAL (IPTR), 
-     :                                    %VAL (IPTR), %VAL (IPTR),
+                           CALL VEC_MULR( .TRUE., NDATA, %VAL( IPTR ), 
+     :                                    %VAL( IPTR ), %VAL( IPTR ),
      :                                    IERR, NERR, STATUS)
 
 *                        Unmap the axis variance.
-                           CALL DTA_FRVAR (AXOUTV, DSTAT)
+                           CALL DTA_FRVAR( AXOUTV, DSTAT )
 
 *                        Report an error condition.
-                           IF (DSTAT .NE. 0) THEN
+                           IF ( DSTAT .NE. 0 ) THEN
                               STATUS = DSTAT
                               CALL MSG_SETI( 'AXNO', IAXIS )
                               CALL ERR_REP( 'DST2NDF_UMPAVA', 
@@ -1096,18 +1101,18 @@
 *                  Deal with axis width.
 *                  =====================
 
-                     ELSE IF (NAME2 .EQ. 'WIDTH') THEN
+                     ELSE IF ( NAME2 .EQ. 'WIDTH' ) THEN
 
 *                     Only 1-d axes are supported within NDFs.
                         IF ( NDIM .EQ. 1 ) THEN
 
 *                        Create the full name of the output axis array.
-                           CALL DTA_CRNAM (AXOUT, 'WIDTH', 0, 0, 
-     :                                     AXOUTW, DSTAT)
+                           CALL DTA_CRNAM( AXOUT, 'WIDTH', 0, 0, 
+     :                                     AXOUTW, DSTAT )
 
 *                       Copy the axis width array.
-                           CALL DTA_CYVAR (LEVEL2, AXOUTW, DSTAT)
-                           IF (DSTAT .NE. 0) GOTO 400
+                           CALL DTA_CYVAR( LEVEL2, AXOUTW, DSTAT )
+                           IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                     The axis widths are not 1-dimensional so move
 *                     them to the Figaro axis extension.
@@ -1118,53 +1123,53 @@
 *                        component names of the input and output
 *                        objects.
                            IF ( .NOT. AXMFEX (IAXIS) ) THEN
-                              CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
-     :                                        AXMOR, DSTAT)
-                              CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
-                              CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
-     :                                        AXMORF, DSTAT)
-                              CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+                              CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+     :                                        AXMOR, DSTAT )
+                              CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
+                              CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+     :                                        AXMORF, DSTAT )
+                              CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                           Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                           structure is created.
-                              AXMFEX (IAXIS) = .TRUE. 
+                              AXMFEX( IAXIS ) = .TRUE. 
                            END IF
 
 *                        Copy the non-standard widths to 
 *                        OUTPUT.AXIS(n).MORE.FIGARO.WIDTH.
-                           CALL DTA_CRNAM (AXMORF, 'WIDTH', 0, 0,
-     :                                     AXOUTW, DSTAT)
-                           CALL DTA_CYVAR (LEVEL2, AXOUTW, DSTAT)
-                           IF (DSTAT .NE. 0) GOTO 400
+                           CALL DTA_CRNAM( AXMORF, 'WIDTH', 0, 0,
+     :                                     AXOUTW, DSTAT )
+                           CALL DTA_CYVAR( LEVEL2, AXOUTW, DSTAT )
+                           IF ( DSTAT .NE. 0 ) GOTO 400
                         END IF
 
 *                  Deal with other standard axis components.
 *                  =========================================
 
 *                  LABEL and UNITS are standard objects.
-                     ELSE IF (NAME2 .EQ. 'LABEL' .OR.
-     :                        NAME2 .EQ. 'UNITS') THEN
+                     ELSE IF ( NAME2 .EQ. 'LABEL' .OR.
+     :                         NAME2 .EQ. 'UNITS' ) THEN
 
 *                     Inquire the dimensions of the object.
-                        CALL DTA_SZVAR (LEVEL2, 7, NDIM, DIMS, DSTAT)
+                        CALL DTA_SZVAR( LEVEL2, 7, NDIM, DIMS, DSTAT )
 
 *                     Generate the full name of the output component.
-                        CALL DTA_CRNAM (AXOUT, NAME2, NDIM, DIMS, 
-     :                                  NAMOUT, DSTAT)
+                        CALL DTA_CRNAM( AXOUT, NAME2, NDIM, DIMS, 
+     :                                  NAMOUT, DSTAT )
 
 *                     Make the output structure.
-                        CALL DTA_CRVAR (NAMOUT, 'CHAR', DSTAT)
-                        NDATA = DIMS (1)
+                        CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
+                        NDATA = DIMS( 1 )
 
 *                     The .n.LABEL and .n.UNITS are copied to .LABEL
 *                     and .UNITS in the output axis structure.  This is
 *                     done by reading the value, creating the named
 *                     object in the NDF, and writing the value to it.
-                        CALL DTA_RDVARC (LEVEL2, NDATA, STRING, DSTAT)
-                        CALL DTA_CRNAM (AXOUT, NAME2, 0, 0, 
-     :                                 NAMOUT, DSTAT)
-                        CALL DTA_WRVARC (NAMOUT, NDATA, STRING, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+                        CALL DTA_RDVARC( LEVEL2, NDATA, STRING, DSTAT )
+                        CALL DTA_CRNAM( AXOUT, NAME2, 0, 0, 
+     :                                  NAMOUT, DSTAT )
+                        CALL DTA_WRVARC( NAMOUT, NDATA, STRING, DSTAT )
+                        IF ( DSTAT .NE. 0 ) GOTO 400
 
 *                  Deal with non-standard axis components.
 *                  =======================================
@@ -1173,25 +1178,25 @@
 *                     Create the Figaro axis extension if not already
 *                     present in the NDF, by generating the full
 *                     component names of the input and output objects.
-                        IF (.NOT.AXMFEX (IAXIS)) THEN
-                           CALL DTA_CRNAM (AXOUT, 'MORE', 0, 0, 
-     :                                     AXMOR, DSTAT)
-                           CALL DTA_CRVAR (AXMOR, 'STRUCT', DSTAT)
-                           CALL DTA_CRNAM (AXMOR, 'FIGARO', 0, 0, 
-     :                                     AXMORF, DSTAT)
-                           CALL DTA_CRVAR (AXMORF, 'STRUCT', DSTAT)
+                        IF ( .NOT. AXMFEX( IAXIS ) ) THEN
+                           CALL DTA_CRNAM( AXOUT, 'MORE', 0, 0, 
+     :                                     AXMOR, DSTAT )
+                           CALL DTA_CRVAR( AXMOR, 'STRUCT', DSTAT )
+                           CALL DTA_CRNAM( AXMOR, 'FIGARO', 0, 0, 
+     :                                     AXMORF, DSTAT )
+                           CALL DTA_CRVAR( AXMORF, 'STRUCT', DSTAT )
 
 *                        Record that the OUTPUT.AXIS(n).MORE.FIGARO
 *                        structure is created.
-                           AXMFEX (IAXIS) = .TRUE. 
+                           AXMFEX( IAXIS ) = .TRUE. 
                         END IF
 
 *                     Any non-standard objects are copied to 
 *                     OUTPUT.AXIS(n).MORE.FIGARO.
-                        CALL DTA_CRNAM (AXMORF, NAME2, 0, 0, NAMOUT, 
-     :                                 DSTAT)
-                        CALL DTA_CYVAR (LEVEL2, NAMOUT, DSTAT)
-                        IF (DSTAT .NE. 0) GOTO 400
+                        CALL DTA_CRNAM( AXMORF, NAME2, 0, 0, NAMOUT, 
+     :                                  DSTAT )
+                        CALL DTA_CYVAR( LEVEL2, NAMOUT, DSTAT )
+                        IF ( DSTAT .NE. 0 ) GOTO 400
                      END IF
 
                   END IF
@@ -1199,46 +1204,46 @@
 
 *         Deal with extensions.
 *         =====================
-            ELSE IF (NAME1 .EQ. 'MORE') THEN
+            ELSE IF ( NAME1 .EQ. 'MORE' ) THEN
 
 *            Loop through all the extensions.
                IKOUNT = 0
-               DO WHILE (NMSTAT3.EQ.0) 
+               DO WHILE ( NMSTA3 .EQ. 0 ) 
                   IKOUNT = IKOUNT + 1
 
 *               Obtain the component's name.
-                  CALL DTA_NMVAR ('INPUT.MORE', IKOUNT, MORNAM, NMSTAT3)
+                  CALL DTA_NMVAR( 'INPUT.MORE', IKOUNT, MORNAM, NMSTA3 )
 
 *               Items stored in FIGARO.MORE structure copied to
 *               NDF.MORE.
-                  IF (NMSTAT3.EQ.0) THEN
-                     CALL DTA_CYVAR ('INPUT.MORE.'//MORNAM, 
-     :                               'OUTPUT.MORE.'//MORNAM, DSTAT)
+                  IF ( NMSTA3 .EQ. 0 ) THEN
+                     CALL DTA_CYVAR( 'INPUT.MORE.'//MORNAM, 
+     :                               'OUTPUT.MORE.'//MORNAM, DSTAT )
                   END IF
                END DO
-               IF (DSTAT .NE. 0) GO TO 400
+               IF ( DSTAT .NE. 0 ) GO TO 400
 
 *         Deal with the TABLE.
 *         ====================
-            ELSE IF (NAME1 .EQ. 'TABLE') THEN
+            ELSE IF ( NAME1 .EQ. 'TABLE' ) THEN
 
 *            TABLE used for FIGARO SPIKETRUM routines. Copy this to 
 *            .MORE.FIGARO.TABLE.
 
 *            Obtain the type and dimensions of the structure.
-               CALL DTA_TYVAR (LEVEL1, TYPE, DSTAT)
-               CALL DTA_SZVAR (LEVEL1, 7, NDIM, DIMS, DSTAT)
+               CALL DTA_TYVAR( LEVEL1, TYPE, DSTAT )
+               CALL DTA_SZVAR( LEVEL1, 7, NDIM, DIMS, DSTAT )
 
 *            Copy it to the Figaro TABLE extension.
-               CALL DTA_CYVAR ('INPUT.TABLE', 
+               CALL DTA_CYVAR( 'INPUT.TABLE', 
      :                         'OUTPUT.MORE.FIGARO.TABLE', 
-     :                         DSTAT)
-               IF (DSTAT .NE. 0) GOTO 400
+     :                         DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 400
 
 *         Deal with FITS objects in the FITS and COMMENTS structures.
 *         ===========================================================
-            ELSE IF ( (NAME1 .EQ. 'FITS') .OR.
-     :                (NAME1 .EQ. 'COMMENTS') ) THEN
+            ELSE IF ( ( NAME1 .EQ. 'FITS' ) .OR.
+     :                ( NAME1 .EQ. 'COMMENTS' ) ) THEN
 
 *            FITS items dealt with below.
                CONTINUE
@@ -1246,9 +1251,9 @@
             ELSE
 
 *            Any other data objects are copied into .MORE.FIGARO
-               CALL DTA_CYVAR (LEVEL1, 'OUTPUT.MORE.FIGARO.'//NAME1, 
-     :                         DSTAT)
-               IF (DSTAT .NE. 0) GOTO 400
+               CALL DTA_CYVAR( LEVEL1, 'OUTPUT.MORE.FIGARO.'//NAME1, 
+     :                         DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 400
             END IF
          END IF
       END DO
@@ -1257,53 +1262,53 @@
 *     Deal with the FITS structure.
 *     =============================
 
-      IF (.NOT.FITS) GOTO 500
+      IF ( .NOT. FITS ) GOTO 500
 
 *   Count the number of FITS items, ending when the list of components
 *   has been exhausted.
       NFITS = 0
       IPOSN1 = 1
-      DO WHILE (NMSTAT1.EQ.0)
-         CALL DTA_NMVAR ('INPUT.FITS', IPOSN1, NAME2, NMSTAT1)
+      DO WHILE ( NMSTA1 .EQ. 0 )
+         CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
          IPOSN1 = IPOSN1 + 1
-         IF (NMSTAT1.EQ.0) THEN
+         IF ( NMSTA1 .EQ. 0 ) THEN
             NFITS = NFITS + 1
          END IF
       END DO
 
 *   Create a .MORE.FITS array of 80-character card images.
-      DIMS (1) = 80
-      DIMS (2) = NFITS
-      CALL DTA_CRNAM ('OUTPUT.MORE', 'FITS', 2, DIMS, NAMOUT, DSTAT) 
-      CALL DTA_CRVAR (NAMOUT, 'CHAR', DSTAT)
+      FDIMS( 1 ) = 80
+      FDIMS( 2 ) = NFITS
+      CALL DTA_CRNAM( 'OUTPUT.MORE', 'FITS', 2, FDIMS, NAMOUT, DSTAT )
+      CALL DTA_CRVAR( NAMOUT, 'CHAR', DSTAT )
 
 *   Now deal with the FITS items one by one.
       NFITS = 0
-      NMSTAT1 = 0
+      NMSTA1 = 0
       IPOSN1 = 1
-      DO WHILE (NMSTAT1.EQ.0)
+      DO WHILE ( NMSTA1 .EQ. 0 )
 
 *      Obtain the IPOSN1th object's name.
-         CALL DTA_NMVAR ('INPUT.FITS', IPOSN1, NAME2, NMSTAT1)
+         CALL DTA_NMVAR( 'INPUT.FITS', IPOSN1, NAME2, NMSTA1 )
          IPOSN1 = IPOSN1  +  1
-         IF (NMSTAT1.EQ.0) THEN
+         IF ( NMSTA1 .EQ. 0 ) THEN
 
 *         Generate the name of the FITS item.  This can be either a
 *         primitive item, or a structure.  If it is a structure, it
 *         contains the comment as well as the data.  If it is not, the
 *         comment may be in a separate .COMMENTS structure.
             FITNAM = 'INPUT.FITS.'//NAME2
-            LENAME = CHR_LEN (FITNAM)
-            CALL DTA_STRUC (FITNAM, STRUCT, DSTAT)
-            EXIST = DSTAT.EQ.0
+            LENAME = CHR_LEN( FITNAM )
+            CALL DTA_STRUC( FITNAM, STRUCT, DSTAT )
+            EXIST = DSTAT .EQ. 0
             NFITS = NFITS + 1      
-            IF (EXIST) THEN
-               IF (STRUCT) THEN
-                  NAME = FITNAM (:LENAME)//'.DATA'
+            IF ( EXIST ) THEN
+               IF ( STRUCT ) THEN
+                  NAME = FITNAM( :LENAME )//'.DATA'
                ELSE
                   NAME = FITNAM
                END IF
-               CALL DTA_TYVAR (NAME, TYPE, DSTAT)
+               CALL DTA_TYVAR( NAME, TYPE, DSTAT )
                EXIST = DSTAT.EQ.0
             END IF
 
@@ -1314,14 +1319,14 @@
 *         values in the .FITS.DATA structure and the comments in
 *         .FITS.DESCRIPTION.
  
-            LENAME = CHR_LEN (FITNAM)
+            LENAME = CHR_LEN( FITNAM )
             IF (STRUCT) THEN
-               FITCOM = FITNAM (:LENAME)//'.DESCRIPTION'
+               FITCOM = FITNAM( :LENAME )//'.DESCRIPTION'
             ELSE
                FITCOM = 'INPUT.COMMENTS.'//NAME2
             END IF
-            CALL DTA_RDVARC (FITCOM, 50, COMMENT, DSTAT)
-            IF (DSTAT .NE. 0) COMMENT = ' '
+            CALL DTA_RDVARC( FITCOM, 50, COMMENT, DSTAT )
+            IF ( DSTAT .NE. 0 ) COMMENT = ' '
 
 *         Initialise the FITS value as part of it may only be
 *         overwritten otherwise.
@@ -1334,39 +1339,39 @@
 *         values may be longer, and are left justified.
             NDATA = 1
             NVALS = 1
-            IF (TYPE.EQ.'BYTE') THEN    
-               CALL DTA_RDVARB (NAME, NDATA, BARRAY, DSTAT)
-               IF (DSTAT .NE. 0) GOTO 450
-               CALL CNV_FMTCNV (TYPE, 'CHAR', BARRAY, FITVAL( :20),
-     :                          NVALS, NBAD) 
+            IF ( TYPE .EQ. 'BYTE' ) THEN    
+               CALL DTA_RDVARB( NAME, NDATA, BARRAY, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
+               CALL CNV_FMTCNV( TYPE, 'CHAR', BARRAY, FITVAL( :20 ),
+     :                          NVALS, NBAD ) 
 
-            ELSE IF (TYPE.EQ.'CHAR') THEN    
-               CALL DTA_RDVARC (NAME, DIMS(1), FITVAL, DSTAT)
-               IF (DSTAT .NE. 0) GOTO 450
+            ELSE IF ( TYPE .EQ. 'CHAR' ) THEN    
+               CALL DTA_RDVARC( NAME, FDIMS( 1 ), FITVAL, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
 
-            ELSE IF (TYPE.EQ.'DOUBLE') THEN    
-               CALL DTA_RDVARD (NAME, NDATA, DARRAY, DSTAT)
-               IF (DSTAT .NE. 0) GOTO 450
-               CALL CNV_FMTCNV (TYPE, 'CHAR', DARRAY, FITVAL( :20),
-     :                          NVALS, NBAD)
+            ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN    
+               CALL DTA_RDVARD( NAME, NDATA, DARRAY, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
+               CALL CNV_FMTCNV( TYPE, 'CHAR', DARRAY, FITVAL( :20 ),
+     :                          NVALS, NBAD )
 
-            ELSE IF (TYPE.EQ.'FLOAT') THEN    
-               CALL DTA_RDVARF (NAME, NDATA, FARRAY, DSTAT)
-               IF (DSTAT .NE. 0) GOTO 450
-               CALL CNV_FMTCNV (TYPE, 'CHAR', FARRAY, FITVAL( :20),
-     :                          NVALS, NBAD)
+            ELSE IF ( TYPE .EQ. 'FLOAT' ) THEN    
+               CALL DTA_RDVARF( NAME, NDATA, FARRAY, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
+               CALL CNV_FMTCNV( TYPE, 'CHAR', FARRAY, FITVAL( :20 ),
+     :                          NVALS, NBAD )
 
-            ELSE IF (TYPE.EQ.'INT') THEN    
-               CALL DTA_RDVARI (NAME, NDATA, IARRAY, DSTAT)
-               IF (DSTAT .NE. 0) GOTO 450
-               CALL CNV_FMTCNV (TYPE, 'CHAR', IARRAY, FITVAL( :20),
-     :                          NVALS, NBAD)
+            ELSE IF ( TYPE .EQ. 'INT' ) THEN    
+               CALL DTA_RDVARI( NAME, NDATA, IARRAY, DSTAT )
+               IF ( DSTAT .NE. 0 ) GOTO 450
+               CALL CNV_FMTCNV( TYPE, 'CHAR', IARRAY, FITVAL( :20 ),
+     :                          NVALS, NBAD )
 
-            ELSE IF (TYPE.EQ.'SHORT') THEN    
-                CALL DTA_RDVARS (NAME, NDATA, SARRAY, DSTAT)
-                IF (DSTAT .NE. 0) GOTO 450
-                CALL CNV_FMTCNV (TYPE, 'CHAR', SARRAY, FITVAL( :20),
-     :                           NVALS, NBAD)
+            ELSE IF ( TYPE .EQ. 'SHORT' ) THEN    
+                CALL DTA_RDVARS( NAME, NDATA, SARRAY, DSTAT )
+                IF ( DSTAT .NE. 0 ) GOTO 450
+                CALL CNV_FMTCNV( TYPE, 'CHAR', SARRAY, FITVAL( :20 ),
+     :                           NVALS, NBAD )
             END IF
 
 *         Initialise the FITS card-image character string.
@@ -1391,28 +1396,28 @@
 *           o  Columns 31 and 33 are spaces.
 
 *         Find the lengths of the value and keyword.
-            NSTR = CHR_LEN (FITVAL)
-            NF = CHR_LEN (NAME2)
+            NSTR = CHR_LEN( FITVAL )
+            NF = CHR_LEN( NAME2 )
 
 *         Start to build the FITS card image.
-            FITSTR (1:NF) = NAME2 (1:NF)
-            FITSTR (9:10) = '= '
+            FITSTR( 1:NF ) = NAME2( 1:NF )
+            FITSTR( 9:10 ) = '= '
 
 *         Insert the value strings.
-            IF (TYPE.EQ.'CHAR') THEN
+            IF ( TYPE .EQ. 'CHAR' ) THEN
 
 *            Constrain the length of the character value.
                NSTR = MIN( 68, MAX( 8, NSTR ) )
 
 *            Insert the leading quote, the value, and then the trailing
 *            quote.
-               FITSTR (11:11) = ''''
-               FITSTR (12:11 + NSTR) = FITVAL (1:NSTR)
-               FITSTR (NSTR+12:NSTR+12) = ''''
+               FITSTR( 11:11 ) = ''''
+               FITSTR( 12:11 + NSTR ) = FITVAL( 1:NSTR )
+               FITSTR( NSTR+12:NSTR+12 ) = ''''
             ELSE
 
 *            Insert the non-character value, right justified.
-               FITSTR (31-NSTR:30) = FITVAL (1:NSTR)
+               FITSTR( 31-NSTR:30 ) = FITVAL( 1:NSTR )
 
 *            By definition the length of the value must be 20.
                NSTR = 20
@@ -1426,7 +1431,7 @@
             IF ( NSTR .LE. 61 ) THEN
 
 *            For numeric data the delimiter will occur in column 32.
-               IF (TYPE .NE. 'CHAR') THEN
+               IF ( TYPE .NE. 'CHAR' ) THEN
                   NCC = 32
 
 *            The furthest left the delimiter can go is column 32,
@@ -1436,27 +1441,27 @@
                END IF
 
 *            Write the delimiter to the card image.
-               FITSTR ( NCC:NCC+1 ) = '/ '
+               FITSTR( NCC:NCC+1 ) = '/ '
 
 *            The comment itself is copied into the remaining space,
 *            provided there is a comment.
-               NCOM = CHR_LEN (COMMENT)
+               NCOM = CHR_LEN( COMMENT )
                IF ( NCOM .GT. 0 ) THEN
-                  NCOM = MAX( CHR_LEN (COMMENT), 79 - NCC )
-                  FITSTR ( NCC + 2:NCC + 1 + NCOM) = COMMENT (1:NCOM)
+                  NCOM = MAX( CHR_LEN( COMMENT ), 79 - NCC )
+                  FITSTR( NCC + 2:NCC + 1 + NCOM ) = COMMENT( 1:NCOM )
                END IF
             END IF
 
 *         Obtain the name of the FITS extension.  (Why is this in the
 *         loop?---MJC.)
-            DIMS (1) = 1
-            DIMS (2) = NFITS
-            CALL DTA_CRNAM ('OUTPUT.MORE', 'FITS', 2, DIMS, 
-     :                      NAMOUT, DSTAT)
+            FDIMS( 1 ) = 1
+            FDIMS( 2 ) = NFITS
+            CALL DTA_CRNAM( 'OUTPUT.MORE', 'FITS', 2, FDIMS, 
+     :                      NAMOUT, DSTAT )
 
 *         Write the FITS card image to the FITS extension.
-            CALL DTA_WRVARC (NAMOUT, 80, FITSTR, DSTAT)
-            IF (DSTAT .NE. 0) GOTO 500
+            CALL DTA_WRVARC( NAMOUT, 80, FITSTR, DSTAT )
+            IF ( DSTAT .NE. 0 ) GOTO 500
          END IF
       END DO
 
@@ -1466,33 +1471,34 @@
 *   Make sure that an axis data array is present for each axis
 *   structure in the output NDF. If none is present an array filled
 *   with 0.5,1.5,2.5... is created.
-      CALL DTA_SZVAR ('OUTPUT.DATA_ARRAY', 7, NDIM, DIMS, DSTAT)
-      IF (NEEDAX .AND. NAXIS.GT.1) THEN
-         DO IAXIS=1, NAXIS
+      CALL DTA_SZVAR( 'OUTPUT.DATA_ARRAY', 7, NDIM, DIMS, DSTAT )
+      IF ( NEEDAX .AND. NAXIS .GT. 1 ) THEN
+         DO IAXIS = 1, NAXIS
 
 *         Check if axis data array has been created for each axis.
-            IF (.NOT. AXTHER(IAXIS)) THEN
+            IF ( .NOT. AXTHER( IAXIS ) ) THEN
 
 *            Generate the full name of the output axis data-array
 *            structure.
-               CALL DTA_CRNAM ('OUTPUT', 'AXIS', 1, IAXIS, AXOUT, DSTAT)
-               CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 1, DIMS(IAXIS), 
-     :                         AXOUTD, DSTAT)
+               CALL DTA_CRNAM( 'OUTPUT', 'AXIS', 1, IAXIS, AXOUT,
+     :                         DSTAT )
+               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 1, DIMS( IAXIS ), 
+     :                         AXOUTD, DSTAT )
 
 *            Create an axis data array of the appropriate size.
-               CALL DTA_CRVAR (AXOUTD, 'FLOAT', DSTAT)
+               CALL DTA_CRVAR( AXOUTD, 'FLOAT', DSTAT )
 
 *            Generate the full name of the output axis data-array
 *            primitive component.
-               CALL DTA_CRNAM (AXOUT, 'DATA_ARRAY', 0, 0, 
-     :                         AXOUTD, DSTAT)
+               CALL DTA_CRNAM( AXOUT, 'DATA_ARRAY', 0, 0, 
+     :                         AXOUTD, DSTAT )
 
 *            Map the newly created structure for update.
-               CALL DTA_MUVARF (AXOUTD(1:CHR_LEN(AXOUTD)), DIMS(IAXIS), 
-     :                          IPTR, DSTAT)
+               CALL DTA_MUVARF( AXOUTD( 1:CHR_LEN( AXOUTD ) ),
+     :                          DIMS( IAXIS ), IPTR, DSTAT )
 
 *            Report an error condition.
-               IF (DSTAT .NE. 0) THEN
+               IF ( DSTAT .NE. 0 ) THEN
                   STATUS = DSTAT
                   CALL MSG_SETI( 'AXNO', IAXIS )
                   CALL ERR_REP( 'DST2NDF_MAPACE', 
@@ -1504,14 +1510,14 @@
 *            Fill array with 0.5,1.5...
                START = 0.5
                INCREM = 1.0
-               CALL CON_FILL (DIMS(IAXIS), START, INCREM, %VAL(IPTR), 
-     :                        STATUS)
+               CALL CON_FILL( DIMS( IAXIS ), START, INCREM,
+     :                        %VAL( IPTR ), STATUS )
 
 *            Unmap the data array.
-               CALL DTA_FRVAR (AXOUTD, DSTAT)
+               CALL DTA_FRVAR( AXOUTD, DSTAT )
 
 *            Report an error condition.
-               IF (DSTAT .NE. 0) THEN
+               IF ( DSTAT .NE. 0 ) THEN
                   STATUS = DSTAT
                   CALL MSG_SETI( 'AXNO', IAXIS )
                   CALL ERR_REP( 'DST2NDF_UMPACE', 
@@ -1557,10 +1563,10 @@
       IF ( OUOPEN ) CALL DTA_FCLOSE( 'OUTPUT', DSTAT )
       IF ( OBOPEN ) CALL DTA_FCLOSE( 'INPUT', DSTAT )
 
-      IF (DSTAT .NE. 0) THEN
+      IF ( DSTAT .NE. 0 ) THEN
          IF ( STATUS .EQ. SAI__OK ) STATUS = DSTAT
          CALL DTA_ERROR( DSTAT, ERROR )
-         CALL ERR_REP ( 'CON_DST2N_DTAERR', ERROR, STATUS )
+         CALL ERR_REP(  'CON_DST2N_DTAERR', ERROR, STATUS )
       END IF
 
       END
