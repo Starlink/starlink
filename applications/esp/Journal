@@ -99,9 +99,21 @@ Oct-Nov 1999
 	Assorted tweaks and bug fixes were required by the GAIA
 	interface.  This takes ESP to 0.10-2.
 
+December 1999
 
+	Assorted documentation changes.  Corrected the documentation
+	for the autolt parameter (it was documented backwards before)
+
+December 1999
+
+	Further modifications and fixes required by GAIA.  Most
+	significantly, ELLPRO and ELLFOU now take an OUTCAT parameter,
+	which specifies a file to receive output in the form of a
+	catalogue, produced using the CAT library.  This was done to
+	facilitate the communication with the GAIA interface, but
+	should be more generally useful.
 
 Local Variables:
 mode: text
-fill-prefix: "  "
+fill-prefix: "	"
 End:

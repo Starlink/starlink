@@ -305,15 +305,25 @@
 *      Don't change the keywords here, as GAIA relies on them.  Feel
 *      free to change the order, though, and to include comments
 *      beginning with `#'
-         write (ounit,'("# HSUB output file")')
-         write (ounit,'("mode     ",F8.1)') MODEV
-         write (ounit,'("sd       ",F8.1)') STAND
-         write (ounit,'("kurtosis ",F8.3)') KURTO
-         write (ounit,'("skewness ",F8.3)') SKEWN
-         write (ounit,'("ngiven   ",I8)')   ELEMS
-         write (ounit,'("nused    ",I8)')   NUPOI
-         write (ounit,'("sfact    ",I8)')   SFACT
-         write (ounit,'("modetype ",I8)')   TYPE
+         write (ounit,'("! HSUB output file")')
+         write (ounit,'("P mode     REAL ",F8.1," EXFMT=E12.3")') MODEV
+         write (ounit,'("P sd       REAL ",F8.1," EXFMT=E12.3")') STAND
+         write (ounit,'("P kurtosis REAL ",F8.3," EXFMT=E12.3")') KURTO
+         write (ounit,'("P skewness REAL ",F8.3," EXFMT=E12.3")') SKEWN
+         write (ounit,'("P ngiven   INTEGER ",I8," EXFMT=I8")')   ELEMS
+         write (ounit,'("P nused    INTEGER ",I8," EXFMT=I8")')   NUPOI
+         write (ounit,'("P sfact    INTEGER ",I8," EXFMT=I8")')   SFACT
+         write (ounit,'("P modetype INTEGER ",I8," EXFMT=I8")')   TYPE
+
+c         write (ounit,'("# HSUB output file")')
+c         write (ounit,'("mode     =",F8.1)') MODEV
+c         write (ounit,'("sd       =",F8.1)') STAND
+c         write (ounit,'("kurtosis =",F8.3)') KURTO
+c         write (ounit,'("skewness =",F8.3)') SKEWN
+c         write (ounit,'("ngiven   =",I8)')   ELEMS
+c         write (ounit,'("nused    =",I8)')   NUPOI
+c         write (ounit,'("sfact    =",I8)')   SFACT
+c         write (ounit,'("modetype =",I8)')   TYPE
       endif
 
 ********************************************************************

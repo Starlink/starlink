@@ -161,6 +161,14 @@ interface ELLFOU
     helpkey '*'
   endparameter
 
+  parameter OUTCAT	# Are we to output a catalogue file?
+    type '_CHAR'
+    access 'read'
+    prompt 'Name of catalogue file'
+    ppath 'current'
+    vpath 'prompt'
+  endparameter
+
   parameter AUTOL       # Conduct search for a better origin?
     type '_LOGICAL'
     access 'read'

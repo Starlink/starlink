@@ -71,6 +71,9 @@
 *     Almost completely rewritten, to remove parsing code, and instead use
 *     the much more general esp1_farr routine.
 *
+*  RCS Id:
+*     $Id$
+*
 *  Bugs:
 *     None known.
 *
@@ -131,17 +134,17 @@
             yc(i) = pos(i,2)
             if (poslen(i) .ge. 3 .and. pos(i,3) .ge. 0.0) then
                backs(i) = pos(i,3)
-               if (poslen(i) .ge. 4) then
-                  rlims(i) = pos(i,4)
-               else
-                  rlims(i) = rlim
-               endif
             else
                call msg_fmtr('xv','f6.1',xc(i))
                call msg_fmtr('yv','f6.1',yc(i))
                call msg_out(' ','Default background used for'//
      :              ' object at ^xv, ^yv ',status) 
-               backs(i)=back
+               backs(i) = back
+            endif
+            if (poslen(i) .ge. 4) then
+               rlims(i) = pos(i,4)
+            else
+               rlims(i) = rlim
             endif
          enddo
       endif
@@ -152,6 +155,4 @@
      :        status)
       endif
           
-      end 
-
-* $Id$
+      end

@@ -38,7 +38,7 @@
 *     used for all input required by the application.
 
 *  Usage:
-*     ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT 
+*     ELLFOU MODE BACK SIGMA PSIZE ZEROP ARDFIL DEVICE OUT OUTCAT
 *            AUTOL AUTOLT FRZORI [CURSOR] [IN] [ORIGIN] (FINE) 
 *            [RLIM] (LIM1) (LIM2) [SAME] [AGAIN] [INFILE] 
 *            [IMGDEV] (COLOUR) (ANGCON) (ANGOFF) (FRACT)
@@ -116,6 +116,12 @@
 *     OUT=_CHAR (Read)
 *        File name for the output text file containing the profile 
 *        data.
+*     OUTCAT=_CHAR (Read)
+*        File name for an output file which is written using the CAT
+*        library.  See SUN/181.  The type of catalogue which is written
+*        depends on the file extension to the filename presented here.
+*        A file ending .txt will be written as a STL (Small Text List)
+*        file, and one ending .fits will be written as a FITS file.
 *     PSIZE=_REAL (Read)
 *        The size of each pixel in arc seconds.  If the image contains
 *        a SKY co-ordinate frame this value will be determined 
@@ -275,192 +281,6 @@
       CALL AST_END(STATUS)
 
       END 
-
-
-
-      SUBROUTINE ELF1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN,
-     :                      EXCLAIM,STATUS)
-*+
-*    Description :
-*
-*     This routine opens a sequential file via FIO_ASSOC.  Up to four
-*     attempts may be made to open the file.  If a null response is
-*     supplied the file is not opened, and the flag returned indicates
-*     this fact.
-*
-*    Invocation :
-*
-*      CALL ELF1_AIF_ASFIO (PNFILE,ACMODE,FORM,RECSZ,FD,OPEN, 
-*                      EXCLAIM,STATUS)
-
-*
-*    Arguments :
-*
-*     PNFILE=CHARACTER*(*)
-*         Parameter name by which file is to be opened
-*     ACMODE=CHARACTER*(*)
-*         Expression giving the required access mode.
-*           Valid modes are: 'READ', 'WRITE', 'UPDATE' and 'APPEND'.
-*           For details, see FIO_OPEN.
-*     FORM=CHARACTER*(*)( READ )
-*         Expression giving the required formatting of the file.
-*           Valid formats are: 'FORTRAN', 'LIST', 'NONE' and
-*           'UNFORMATTED'. For details, see FIO_OPEN.
-*     RECSZ=INTEGER( READ )
-*         Expression giving the maximum record size in bytes.
-*           Set it to zero if the Fortran default is required.
-*     FD=INTEGER( WRITE )
-*         Variable to contain the file descriptor.
-*     OPEN=LOGICAL( WRITE )
-*         If true the file has been opened.
-*     EXCLAIM=LOGICAL( WRITE )
-*         If true then the user input was '!'.
-*     STATUS=INTEGER( READ, WRITE )
-*         Global status value
-*
-*    Method :
-*
-*     Check for error on entry - return if not o.k.
-*     Initialise looping flag
-*     Do while no error obtaining the name and opening the output file
-*       and maximum number of attempts not exceeded
-*        Get file name and open file
-*        If null returned then
-*           Set flag so that a log file will not be created
-*           Annul the error
-*           Exit from the loop
-*        Else if error occurred then
-*           If abort requested, do so
-*           Increment loop counter
-*           If maximum number of attempts not exceeded then
-*              Report error
-*           Else
-*              Set looping flag to exit
-*           Endif
-*             Cancel parameter used to get filename
-*        Else
-*           Set flag to indicate that the file has been opened
-*           Set looping flag to false
-*        Endif
-*     Enddo
-*     If error then
-*        Report and abort
-*     Endif
-*     Return
-*
-*    Bugs :
-*
-*     None known.
-*-
-*    Authors :
-*
-*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
-*
-*    History :
-*
-*     1989 Jul 25: Original (RL.STAR::CUR).
-*     1990 Feb 20: Renamed from AIF_OPFIO (RAL::CUR).
-*     1994 Mar 1: Modified to return EXCLAIM (CARDIFF::GJP).
-*     1997 Feb 24: Modified for Linux (GJP).
-*
-*    Type definitions :
-
-      IMPLICIT  NONE           ! no implicit typing allowed
-
-*    Global constants :
-      INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'PAR_ERR'       ! parameter-system errors
-
-*    Import :
-      CHARACTER*(*) PNFILE     ! File Parameter Name
-      CHARACTER*(*) ACMODE     ! File access mode
-      CHARACTER*(*) FORM       ! Required form of carriagecontrol
-      INTEGER RECSZ            ! File record size
-
-*    Export :
-      LOGICAL OPEN             ! File opened successfully
-      LOGICAL EXCLAIM          ! File name was exclaimation
-      INTEGER FD               ! File descriptor
-
-*    Status :
-      INTEGER STATUS
-
-*    Local Constants :
-      INTEGER MXLOOP           ! Maximum number of attempts at
-                               ! opening a data file
-      PARAMETER ( MXLOOP=4 )
-
-      INTEGER LOOP             ! Number of attempts to open the file
-
-      LOGICAL LOOPAG           ! Loop again to open output file
-
-*.
-
-*    check status on entry - return if not o.k.
-
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-      LOOP=0
-      LOOPAG=.TRUE.
-      OPEN=.FALSE.
-      EXCLAIM=.FALSE.
-      DO WHILE ( LOOPAG )
-
-*       attempt to obtain and open a file to output listing
-
-         CALL FIO_ASSOC( PNFILE, ACMODE, FORM, RECSZ, FD, STATUS )
-
-         IF ( STATUS .EQ. PAR__NULL ) THEN
-            OPEN=.FALSE.
-            LOOPAG=.FALSE.
-            EXCLAIM=.TRUE.
-            CALL ERR_ANNUL( STATUS )
-         ELSE IF ( STATUS .NE. SAI__OK ) THEN
-
-            IF ( STATUS .EQ. PAR__ABORT ) GOTO 999
-
-*         Here if filename is not allowed or file is not opened
-*         - try again
-*         Need to flush error here, as not quitting routine
-
-            LOOP=LOOP + 1
-            IF ( LOOP .LE. MXLOOP ) THEN
-               CALL MSG_SETC( 'FILNAM', PNFILE )
-               CALL ERR_REP( 'ERR_AIF_ASFIO_NOFI',
-     :           'AIF_ASFIO: Could not open file $^FILNAM - try again',
-     :           STATUS )
-               CALL ERR_FLUSH( STATUS )
-            ELSE
-
-*             end looping as user is having serious problems
-
-               LOOPAG=.FALSE.
-            END IF
-
-            CALL PAR_CANCL( PNFILE, STATUS )
-
-         ELSE
-
-*          no problem, so exit loop
-
-            LOOPAG=.FALSE.
-            OPEN=.TRUE.
-
-*       end of file-opened-successfully check
-
-         END IF
-      END DO
-
-*    abort for repeated error
-
-      IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'ERR_AIF_ASFIO_NOOPEN',
-     :     'AIF_ASFIO: Repeatedly unable to open a file.', STATUS )
-      END IF
-
- 999  CONTINUE
-
-      END
 
       
       SUBROUTINE ELF1_AGICO(ONOFF,MODE,NEW,AGIID,STATUS)
@@ -1766,6 +1586,7 @@
       INCLUDE 'elf_par'               ! ELLFOU constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'PAR_ERR'		      ! PAR constants
 
          
 *  Status:     
@@ -2103,8 +1924,18 @@
          END IF     
       
 *      Output a text file containing results if required.
-         CALL ELF1_TEXTO(0,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACK,
-     :                   SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)
+         CALL ELP1_TEXTO(0,NDF1,VALIDP,ZEROP,
+     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
+
+         CALL ERR_MARK
+         CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
+     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :        SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL (STATUS)
+         ENDIF
+         CALL ERR_RLSE
 
 *      An appropriate place to exit to if the dynamic memory has already
 *      been allocated.
@@ -2872,6 +2703,7 @@
       INCLUDE 'elf_par'               ! ELLFOU constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'PAR_ERR'		      ! PAR constants
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -3060,7 +2892,7 @@
       CALL ELP1_FILER(FIOID,BACK,RLIMDEF,NDF1,NGALS,
      :     XC,YC,BACKS,RLIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-
+      
 *   Abort if the number of galaxies is zero.
       IF (NGALS.EQ.0) THEN
          CALL MSG_BLANK(STATUS)
@@ -3104,8 +2936,9 @@
       IF (STATUS.NE.SAI__OK) GOTO 9998
 
 *   Open a file.
-      CALL ELF1_TEXTO(1,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACK,SIGMA,
-     :                PSIZE,LBND,FIOD,EXCLAIM,STATUS)
+      CALL ELP1_TEXTO(1,NDF1,VALIDP,ZEROP,
+     :     RESULT,17,ELF__MXPOI,XCO,YCO,BACK,SIGMA,
+     :     PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9998                         
 
 *   Look at each of the image location found in the text file.
@@ -3128,7 +2961,8 @@
 
 *      Call the routine that profiles the galaxy and sets up the values
 *      in the results arrays.
-         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
+D         CALL ELF1_PRO(0,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
+         CALL ELF1_PRO(1,ANGCON,ANGOFF,FRZORI,FINE,LIM2,
      :                 PSIZE,RLIM(I),BACKS(I),SIGMA,ELEMS,POINT1,
      :                 PRANGE,XCO,YCO,VALIDP,RESULT,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
@@ -3136,8 +2970,9 @@
 *      Place in the opened file the heading, the co-ordinates of the galaxy 
 *      being considered and the profiling results.
          IF (.NOT.EXCLAIM) THEN
-            CALL ELF1_TEXTO(2,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACKS(I),
-     :                      SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)
+            CALL ELP1_TEXTO(2,NDF1,VALIDP,ZEROP,
+     :           RESULT,17,ELF__MXPOI,XCO,YCO,BACKS(I),
+     :           SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
             IF (STATUS.NE.SAI__OK) GOTO 9998                         
          END IF
 
@@ -3155,10 +2990,20 @@
      
 *   Close the opened file.
       IF (.NOT.EXCLAIM) THEN
-         CALL ELF1_TEXTO(3,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACKS(I),
-     :                   SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)
+         CALL ELP1_TEXTO(3,NDF1,VALIDP,ZEROP,
+     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACKS(I),
+     :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998                         
       END IF
+
+      CALL ERR_MARK
+      CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
+     :     RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :     SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+      IF (STATUS .EQ. PAR__NULL) THEN
+         CALL ERR_ANNUL (STATUS)
+      ENDIF
+      CALL ERR_RLSE
 
 *   An appropriate place to exit to if the dynamic memory has already
 *   been allocated.
@@ -4239,6 +4084,7 @@
       INCLUDE 'elf_par'               ! ELLFOU constants
       INCLUDE 'MSG_PAR'               ! MSG constants
       INCLUDE 'SUBPAR_PAR'            ! SUBPAR constants
+      INCLUDE 'PAR_ERR'		      ! PAR constants
          
 *  Status:     
       INTEGER STATUS                  ! Global status
@@ -4489,8 +4335,18 @@
 
 *      Create a text file containing the latest profile/fit results 
 *      (if required).
-         CALL ELF1_TEXTO(0,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACK,
-     :                   SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)
+         CALL ELP1_TEXTO(0,NDF1,VALIDP,ZEROP,
+     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :        SIGMA,PSIZE,LBND,.FALSE.,FIOD,EXCLAIM,STATUS)
+
+         CALL ERR_MARK
+         CALL ELP1_CATO(NDF1,VALIDP,ZEROP,
+     :        RESULT,17,ELF__MXPOI,XCO,YCO,BACK,
+     :           SIGMA,PSIZE,LBND,.TRUE.,FIOD,STATUS)
+         IF (STATUS .EQ. PAR__NULL) THEN
+            CALL ERR_ANNUL (STATUS)
+         ENDIF
+         CALL ERR_RLSE
 
 *      An appropriate place to exit to if the dynamic memory has already
 *      been allocated.
@@ -6674,360 +6530,6 @@
 
       END
 
-
-      SUBROUTINE ELF1_TEXTO(MODE,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACK,
-     :                      SIGMA,PSIZE,LBND,FIOD,EXCLAIM,STATUS)
-*+
-*  Name:
-*     ELF1_TEXTO
-
-*  Purpose:
-*     Puts the most recent galaxy 'fit' results into a text format 
-*     ASCII output file.
-      
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*      CALL ELF1_TEXTO(MODE,NDF1,VALIDP,ZEROP,RESULT,XCO,YCO,BACK,SIGMA,
-*                      PSIZE,LBND,FIOD,EXCLAIM,STATUS)    
-
-*  Description:
-*     Creates a text file (if required) and places in it data from the
-*     most recent galaxy profile/fit generated.
-*
-*     The parameter MODE is used as follows:
-*         MODE=0  Do all the actions described below.
-*         MODE=1  Open the file.
-*         MODE=2  Save the heading and profile data. 
-*         MODE=3  Close the file.
-*
-*     All radii values output are measured in pixels.
-
-*  Arguments:               
-*     MODE = INTEGER (Given)
-*        Used to show which part of the text file is to be created. 
-*     NDF1 = INTEGER (Given)
-*        NDF identifier for the image.
-*     VALIDP = INTEGER (Given)
-*        Number of ellipse radii fitted successfully.
-*     ZEROP = REAL (Given)
-*        Magnitude scale zero point. Units magnitudes.
-*     RESULT(17,ELF__MXPOI) = REAL (Given)
-*        Array containing the results.
-*     XCO = REAL (Given)
-*        The X index of the origin used. Units pixels.
-*     YCO = REAL (Given)
-*        The Y index of the origin used. Units pixels.
-*     BACK = REAL (Given)
-*        Image background value employed. Units counts.
-*     SIGMA = REAL (Given)
-*        Standard deviation of the background value. Units counts.
-*     PSIZE = REAL (Given)
-*        The image pixels size. Units arc secs.
-*     LBND(10) = INTEGER (Given)
-*        Lower limits of the image world co-ordinate system.
-*     FIOD = INTEGER (Given and Returned)
-*        Output file FIO descriptor.
-*     EXCLAIM = LOGICAL (Returned)
-*        Was the file name !?
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Authors:
-*     GJP: Grant Privett (STARLINK)
-
-*  History:
-*     12-MAR-1993 (GJP)
-*     (Original version)
-*     20-FEB-1997 (GJP)
-*     Output format modified.
-
-*  Bugs:
-*     None known.
-
-*-
-
-*  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
-                                                                        
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'elf_par'               ! ELLFOU constants
-      INCLUDE 'MSG_PAR'               ! Parameter system constants
-      INCLUDE 'NDF_PAR'               ! NDF public constants
-
-*  Arguments Given:                              
-      INTEGER LBND(NDF__MXDIM)        ! Lower limits of image world
-                                      ! co-ordinate system
-      INTEGER MODE                    ! Defines which part of the file saving
-                                      ! is to be performed.
-      INTEGER NDF1                    ! NDF indentifier
-      INTEGER VALIDP                  ! Number of radii fitted successfully
-      REAL BACK                       ! Background count value
-      REAL PSIZE                      ! The size of each pixel in
-                                      ! arc seconds
-      REAL RESULT(17,ELF__MXPOI)      ! Array containing the profiling results
-      REAL SIGMA                      ! Standard deviation of the background
-      REAL XCO                        ! X index of the origin
-      REAL YCO                        ! Y index of the origin
-      REAL ZEROP                      ! Magnitude scale zero point
-
-*  Arguments Given and Returned:
-      INTEGER FIOD                    ! Output file FIO descriptor
-      LOGICAL EXCLAIM                 ! Was the file name used !?
-
-*  Status:     
-      INTEGER STATUS                  ! Global status
-
-*  Local variables:
-      CHARACTER *(80) TEXT            ! A heading
-      CHARACTER *(80) LINE            ! FIO line output length
-      CHARACTER *(MSG__SZMSG) NAME    ! NDF name
-      LOGICAL OPENF                   ! Was the output file opened?
-      INTEGER I                       ! Temporary variable
-      INTEGER IWCS                    ! AST pointer to NDF's WCS frameset
-      INTEGER J                       ! Temporary variable
-      INTEGER NCHAR                   ! Length of output string
-
-*.
-
-*   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN
-
-*   Open the FIO file.
-      IF ((MODE.EQ.0).OR.(MODE.EQ.1)) THEN
-
-*      Determine the output text file name. If the file name chosen fails, 
-*      the user is reprompted
-         IF (MODE.EQ.0) CALL MSG_BLANK(STATUS)
-
-*      Determine the output text file name. If the file name chosen fails, 
-*      the user is reprompted
-         IF (MODE.EQ.0) CALL MSG_BLANK(STATUS)
-         OPENF=.FALSE.             
-         EXCLAIM=.FALSE.   
-         CALL ERR_MARK
-         DO WHILE((.NOT.OPENF).AND.(.NOT.EXCLAIM)
-     :             .AND.(STATUS.EQ.SAI__OK))
-            CALL ELF1_AIF_ASFIO('OUT','WRITE','LIST',80,FIOD,OPENF,
-     :                      EXCLAIM,STATUS)          
-            IF ((.NOT.OPENF).AND.(.NOT.EXCLAIM)) THEN
-               CALL ERR_REP(' ','Bad file name.',STATUS)
-               CALL ERR_REP(' ','For no file, type !',STATUS)
-               CALL ERR_ANNUL(STATUS)
-            END IF
-         END DO
-         CALL ERR_RLSE
-         IF (STATUS.NE.SAI__OK) GOTO 9999
-
-*      Inform the user if a difficulty was encountered and that an
-*      an output file will not be used. 
-         IF (EXCLAIM) THEN  
-            CALL MSG_BLANK(STATUS)
-            CALL MSG_OUT(' ','WARNING!!!',STATUS)
-            CALL MSG_OUT(' ','No output text file created.',STATUS)
-            CALL MSG_BLANK(STATUS)
-            GOTO 9999
-         END IF
-
-      END IF
-
-*   Output the heading, galaxy co-ordinates used and the profiling results.
-      IF ((MODE.EQ.0).OR.(MODE.EQ.2)) THEN
-
-*      Output a heading.
-         NCHAR=0
-         CALL CHR_PUTC('## ESP ELLFOU V1.1 OUTPUT FILE',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTC('##',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the file name.
-         NCHAR=0
-         CALL CHR_PUTC('## Filename: ',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL NDF_MSG('NAME',NDF1)
-         CALL MSG_LOAD(' ','^NAME',NAME,I,STATUS)
-         NAME=NAME(1:I)
-         CALL CHR_CLEAN(NAME)
-         CALL CHR_PUTC(NAME,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the standard deviation value that was used.
-         NCHAR=0
-         CALL CHR_PUTC('## Sigma (counts): ',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(SIGMA,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the image pixel size.
-         NCHAR=0
-         CALL CHR_PUTC('## Pixel size (arc secs): ',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(PSIZE,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output X and Y data co-ordinates.
-         NCHAR=0
-         CALL CHR_PUTC('## X/Y co-ordinates (Base):',
-     :                 LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(XCO,LINE,NCHAR)
-         CALL CHR_PUTC(' ',LINE,NCHAR)
-         CALL CHR_PUTR(YCO,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output X and Y world co-ordinates.
-         NCHAR=0
-         CALL NDF_GTWCS(NDF1,IWCS,STATUS)
-         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
-         CALL MSG_LOAD(' ','## X/Y co-ordinates (^DOM):',LINE,NCHAR,
-     :                 STATUS)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         CALL ESP1_XYFMT(IWCS,XCO,YCO,'X','Y','DOM',STATUS)
-         CALL MSG_LOAD(' ','^X ^Y',LINE,NCHAR,STATUS)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         CALL AST_ANNUL(IWCS,STATUS)
-
-*      Output the background value that was used.
-         NCHAR=0
-         CALL CHR_PUTC('## Background (counts): ',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(BACK,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the magnitude scale zero point.
-         NCHAR=0
-         CALL CHR_PUTC('## Zero point of magnitude:',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTR(ZEROP,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the number of points determined.
-         NCHAR=0
-         CALL CHR_PUTC('## Number of points:',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         CALL CHR_PUTI(VALIDP,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output the ellipse parameters heading.
-         NCHAR=0
-         CALL CHR_PUTC('## Ellipse Parameters:',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output an ellipse data description.
-         NCHAR=0
-         TEXT='X       Y     Points    Rad(a)     Count     '//
-     :    'PA     Ellipt     Dev   PPU'
-         CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
-
-*      Output the actual values.
-         DO 400 I=1,VALIDP
-
-*         Create an appropriately formatted output string.
-            CALL MSG_FMTR('X','F6.1',RESULT(1,I))
-            CALL MSG_FMTR('Y','F6.1',RESULT(2,I))
-            CALL MSG_FMTI('N','I3',INT(RESULT(8,I)))
-            CALL MSG_FMTR('RAD','F8.2',RESULT(4,I))
-            CALL MSG_FMTR('VAL','F12.1',RESULT(6,I))
-            CALL MSG_FMTR('POS','F6.1',RESULT(5,I))
-            CALL MSG_FMTR('ELL','F5.3',RESULT(3,I))
-            CALL MSG_FMTR('DEV','F9.1',RESULT(7,I))
-            CALL MSG_FMTR('POI','F4.0',RESULT(9,I))
-            TEXT='^X  ^Y    ^N   ^RAD ^VAL ^POS   ^ELL'//
-     :           '  ^DEV ^POI'
-
-*         Output the ellipse results in suitably formatted form.
-            NCHAR=0
-            CALL MSG_LOAD(' ',TEXT,NAME,J,STATUS)
-            NAME=NAME(1:J)
-            CALL CHR_CLEAN(NAME)
-            CALL CHR_PUTC(NAME,LINE,NCHAR)
-            CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
- 400     CONTINUE
-
-*      Output the Fourier descriptor heading.
-         NCHAR=0
-         CALL CHR_PUTC('## Fourier Descriptors:',LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Output an FD data description.
-         NCHAR=0
-         TEXT='Rad(a)    1xSin   1xCos   2xSin   2xCos   '//
-     :         '3xSin   3xCos   4xSin   4xCos'
-         CALL CHR_PUTC('!! '//TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(1:NCHAR),STATUS)
-
-*      Output the actual values.
-         DO 500 I=1,VALIDP
-
-*         Create an appropriately formatted output string.
-            CALL MSG_FMTR('RAD','F8.2',RESULT(4,I))
-            CALL MSG_FMTR('FDS1','F6.3',RESULT(10,I))
-            CALL MSG_FMTR('FDC1','F6.3',RESULT(11,I))
-            CALL MSG_FMTR('FDS2','F6.3',RESULT(12,I))
-            CALL MSG_FMTR('FDC2','F6.3',RESULT(13,I))
-            CALL MSG_FMTR('FDS3','F6.3',RESULT(14,I))
-            CALL MSG_FMTR('FDC3','F6.3',RESULT(15,I))
-            CALL MSG_FMTR('FDS4','F6.3',RESULT(16,I))
-            CALL MSG_FMTR('FDC4','F6.3',RESULT(17,I))
-            TEXT='   ^RAD  ^FDS1  ^FDC1  ^FDS2  ^FDC2'//
-     :           '  ^FDS3  ^FDC3  ^FDS4  ^FDC4 '
-
-*         Output the results in suitably formatted form.
-            NCHAR=0
-            CALL MSG_LOAD(' ',TEXT,NAME,J,STATUS)
-            NAME=NAME(1:J)
-            CALL CHR_CLEAN(NAME)
-            CALL CHR_PUTC(NAME,LINE,NCHAR)
-            CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
- 500     CONTINUE
-
-*      Add message describing storage units used for radius.
-         NCHAR=0
-         TEXT='!! NOTE: Radii values are stored on file as semi-'/
-     :        /'major axes length'
-         CALL CHR_PUTC(TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-         NCHAR=0
-         TEXT='!!       measured in pixels but on screen as '/
-     :        /'equivalent radii in arc secs.'
-         CALL CHR_PUTC(TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-*      Add message describing position angle.
-         NCHAR=0
-         TEXT='!! NOTE: Position angles are stored on file with'/
-     :        /' origin upward and clockwise rotation positive.' 
-         CALL CHR_PUTC(TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
- 
-*      Add file terminator.
-         NCHAR=0
-         TEXT='## END'
-         CALL CHR_PUTC(TEXT,LINE,NCHAR)
-         CALL FIO_WRITE(FIOD,LINE(:NCHAR),STATUS)
-
-      END IF
-
-*  Close down the file output.
-      IF ((MODE.EQ.0).OR.(MODE.EQ.3)) CALL FIO_CLOSE(FIOD,STATUS)
-
- 9999 CONTINUE
-
-      END 
 
 
       SUBROUTINE ELF1_TRANS(ELEMS,ARRAY0,ARRAY1,STATUS)    

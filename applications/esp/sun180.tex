@@ -6111,36 +6111,44 @@ from the command line.
 Descriptions of some of the abbreviations and headings used in the output files
 are shown below:
 
-\begin{myquote}
-\begin{verbatim}
-Angle      The angle of the major axis of a source (degrees).
-Count      Mean ellipse brightness above the background (counts). 
-Dev        Standard deviation of the ellipse brightness variation.
-ECSB       Elliptical model estimated central surface brightness.
-Ellipt     Ellipticity of the ellipse (1=circle).  
-Interp.    Modal value of smoothed histogram by fitting and interpolation.
-NxSin      1st to 4th sine component of the Fourier descriptor.
-NxCos      1st to 4th cosine component of the Fourier descriptor.
-PA         Position angle of the ellipse semi-major axis (degrees).
-Peak       Maximum count of the model source.
-Points     ELLPRO. The number of points in the trial ellipse employed.
-Points     ELLFOU. The number of image pixel employed.
-PPU        Percentage of trial ellipse pixels that were available.  
-Proj.      Modal value of smoothed histogram by taking chords.
-Rad(a)     Radius of the semi-major axis of the ellipse (pixels).  
-Raw        Modal value of unsmoothed count histogram.
-Sa         Standard deviation of source in major axis.
-Sb         Standard deviation of source in minor axis.
-SCSB       Spiral model estimated central surface brightness.
-Sdev.      Standard deviation of the pixel values.
-Sigma.     Width of the smoothed histogram peak.
-SLenS      Scale length (arc secs) of the spiral model fit.
-SLenE      Scale length (arc secs) of the elliptical model fit.
-Smoothed   Modal value of smoothed count histogram.
-X/Y        The x and y co-ordinate of the centre on the image (Base frame).
-Xc/Yc      The x and y co-ordinate of the centre on the image (Current frame).
-\end{verbatim}
-\end{myquote}
+%\begin{myquote}
+%\begin{verbatim}
+\begin{description}
+\item[Angle]The angle of the major axis of a source (degrees).
+\item[Count]Mean ellipse brightness above the background (counts). 
+%\item[Dev]Standard deviation of the ellipse brightness variation.
+\item[Dev]Estimated standard deviation of the mean ellipse brightness.
+\item[ECSB]Elliptical model estimated central surface brightness.
+\item[1/Ellipt]Reciprocal of the ellipticity of the ellipse
+(1=circle).  The ellipticity is the ratio
+of the semi-major to the semi-minor axis, and so is related to the
+eccentricity,~$e$, by $\mbox{ellipticity}=1/\sqrt(1-e^2)$.
+\item[Interp.]Modal value of smoothed histogram by fitting and interpolation.
+\item[MeanRad]`Mean radius' of the ellipse.  This is the square-root of
+the product of the semi-major and semi-minor axes, or the radius of a
+circle with the same area as the ellipse (arcsecs).
+\item[NxSin]1st to 4th sine component of the Fourier descriptor.
+\item[NxCos]1st to 4th cosine component of the Fourier descriptor.
+\item[PA]Position angle of the ellipse semi-major axis (degrees).
+\item[Peak]Maximum count of the model source.
+\item[Points]ELLPRO. The number of points in the trial ellipse employed.
+\item[Points]ELLFOU. The number of image pixel employed.
+\item[PPU]Percentage of trial ellipse pixels that were available.  
+\item[Proj.]Modal value of smoothed histogram by taking chords.
+\item[Raw]Modal value of unsmoothed count histogram.
+\item[Sa]Standard deviation of source in major axis.
+\item[Sb]Standard deviation of source in minor axis.
+\item[SCSB]Spiral model estimated central surface brightness.
+\item[Sdev.]Standard deviation of the pixel values.
+\item[Sigma.]Width of the smoothed histogram peak.
+\item[SLenS]Scale length (arc secs) of the spiral model fit.
+\item[SLenE]Scale length (arc secs) of the elliptical model fit.
+\item[Smoothed]Modal value of smoothed count histogram.
+\item[X/Y]The x and y co-ordinate of the centre on the image (Base frame).
+\item[Xc/Yc]The x and y co-ordinate of the centre on the image (Current frame).
+\end{description}
+%\end{verbatim}
+%\end{myquote}
 
 The output file examples are shown on the following pages.
 

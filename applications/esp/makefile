@@ -479,7 +479,8 @@ I_SUB2 =
 #  the files.
 
 EXTERNAL_INCLUDES = SAE_PAR NDF_PAR NDF_ERR GRP_PAR PRM_PAR PAR_ERR \
-PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR AST_PAR AST_ERR
+	PAR_PAR AGI_ERR FIO_ERR MSG_PAR SUBPAR_PAR DAT_PAR PSX_ERR \
+	AST_PAR AST_ERR CAT_PAR
 
 #  List of Fortran routines required for building the package.  This is
 #  just a list of all the Fortran source files (excluding BLOCK DATA
@@ -495,7 +496,7 @@ F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
 	selfc.f selfcw.f skew.f topped.f ards.f \
         esp1_asffr.f esp1_crpt.f esp1_dsfrm.f esp1_gtpos.f esp1_gtpsz.f \
         esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f esp1_farr.f \
-	elp1_filer.f \
+	elp1_filer.f elp1_texto.f elp1_aif_asfio.f elp1_cato.f \
         kpg1_pgesc.f
 
 F_SUB2 =
@@ -616,6 +617,7 @@ SAE_PAR:      $(STAR_INC)/sae_par;   $(LINK) $? $@
 PSX_ERR:      $(STAR_INC)/psx_err;   $(LINK) $? $@
 AST_ERR:      $(STAR_INC)/ast_err;   $(LINK) $? $@
 AST_PAR:      $(STAR_INC)/ast_par;   $(LINK) $? $@
+CAT_PAR:      $(STAR_INC)/cat_par;   $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 

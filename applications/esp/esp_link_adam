@@ -53,7 +53,7 @@
 
 
       echo `ndf_link_adam` `agi_link_adam` `fio_link_adam` \
-           `ard_link_adam` `psx_link_adam` `pda_link`  \
+           `ard_link_adam` `psx_link_adam` `pda_link` `cat_link_adam` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
