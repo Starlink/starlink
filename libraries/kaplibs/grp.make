@@ -15,7 +15,7 @@ kaplibs_test.f kaplibs_test.ifl
 
 # The source RCS files needed to create the kpg_source.tar file:
 KPG_SOURCES = $(KPG_NONGEN) $(KPG_GEN) kpg_ast kpg_par hlpcmd ctm_par \
-ctm_com grf.h
+ctm_com 
 
 # Generic source files needed for kpg_source.tar:
 KPG_GEN = kpg1_dara.gen kpg1_frac.gen kpg1_mixv.gen kpg1_hsds.gen \
@@ -188,7 +188,7 @@ AIF_SOURCE = aif_antmp.f aif_asfio.f aif_flnam.f aif_getvm.f aif_opfio.f \
 aif_ptfnm.f aif_temp.f
 
 # The contents of the kapgrf_source.tar file:
-KAPGRF_SOURCE = grf_kaplibs.c
+KAPGRF_SOURCE = grf_kaplibs.c grf.h
 
 # The contents of the ira_source.tar file:
 IRA_SOURCE = ira1_aito.f ira1_ascre.f ira1_asdef.f ira1_asndf.f ira1_asres.f \
