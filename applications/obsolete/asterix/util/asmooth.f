@@ -141,9 +141,7 @@
       INTEGER			OFID			! Output dataset id
       INTEGER                	OPTION                	! Level selection option
       INTEGER                	SDIMS(ADI__MXDIM)     	! Dimensions to smooth
-      INTEGER                	TDIMS(ADI__MXDIM)     	! Input variance dims
       INTEGER                	TLEN                  	! Length of char string
-      INTEGER                	TNDIM                 	! Input variance dim'ality
       INTEGER                	TRDIMS(ADI__MXDIM)    	! Transformed dimensions
       INTEGER                	TRORD(ADI__MXDIM)     	! Transformed axis numbers
       INTEGER                	TDPTR, TQPTR, TVPTR   	! Tranformed input data
@@ -151,7 +149,7 @@
       INTEGER                	WSTART                	! Width starting value
       INTEGER                	WMAXSZ                	! Max width dimension
 
-      LOGICAL                	IPRIM                 	! Input primitive?
+      LOGICAL                	ISDS                 	! Input structured?
       LOGICAL                	OK                    	! Input data ok?
       LOGICAL                	POISSON               	! Assume Poisson statistics
       LOGICAL                	REORDER               	! Reordered axes?
@@ -164,24 +162,23 @@
         PARAMETER            	( VERSION = 'ASMOOTH Version 1.8-1')
 *-
 
-*    Check status
+*  Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version
+*  Version
       CALL MSG_PRNT( VERSION )
 
-*    Initialise
+*  Initialise
       CALL AST_INIT()
 
-*    Get input and output files
-      CALL USI_TASSOC2( 'INP', 'OUT', 'READ', IFID, OFID, STATUS )
+*  Get input and output files
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', IFID, STATUS )
+      CALL USI_CLONE( 'INP', 'OUT', 'BinDS', OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Copy input to output
-      CALL ADI_FCOPY( IFID, OFID, STATUS )
-
-*    Check input data
-      CALL BDI_CHKDATA( IFID, OK, NDIM, DIMS, STATUS )
+*  Check input data
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIMS, NDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( .NOT. OK ) THEN
         STATUS = SAI__ERROR
@@ -193,16 +190,16 @@
      :                                                   STATUS )
         GOTO 99
       END IF
-      CALL BDI_MAPDATA( IFID, 'READ', IDPTR, STATUS )
+      CALL BDI_MAPR( IFID, 'Data', 'READ', IDPTR, STATUS )
 
-*    Count input elements
+*  Count input elements
       CALL ARR_SUMDIM( NDIM, DIMS, NELM )
 
-*    Input variance present?
-      CALL BDI_CHKVAR( IFID, VOK, TNDIM, TDIMS, STATUS )
+*  Input variance present?
+      CALL BDI_CHK( IFID, 'Variance', VOK, STATUS )
       IF ( VOK ) THEN
-        CALL BDI_MAPVAR( IFID, 'READ', IVPTR, STATUS )
-        CALL BDI_DELETE( OFID, 'Variance', STATUS )
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', IVPTR, STATUS )
+c        CALL BDI_DELETE( OFID, 'Variance', STATUS )
         POISSON = .FALSE.
       ELSE IF ( STATUS .EQ. SAI__OK ) THEN
         CALL MSG_OUT( ' ', '! Warning, no variance present, assuming'/
@@ -210,33 +207,34 @@
         POISSON = .TRUE.
       END IF
 
-*    Input quality present?
-      CALL BDI_CHKQUAL( IFID, QOK, TNDIM, TDIMS, STATUS )
+*  Input quality present?
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
-        CALL BDI_MAPMQUAL( IFID, 'READ', IQPTR, STATUS )
+        CALL BDI_MAPUB( IFID, 'MaskedQuality', 'READ', IQPTR, STATUS )
       END IF
 
-*    Map output array
-      CALL BDI_MAPDATA( OFID, 'WRITE', ODPTR, STATUS )
+*  Map output array
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', ODPTR, STATUS )
 
-*    Display list of axes
-      CALL BDI_PRIM( IFID, IPRIM, STATUS )
-      IF ( .NOT. IPRIM ) THEN
+*  Display list of axes
+      CALL ADI_DERVD( IFID, 'BinDS', ISDS, STATUS )
+      IF ( ISDS ) THEN
         CALL AXIS_TLIST( IFID, NDIM, STATUS )
       END IF
 
-*    Try to find X,Y axes and set default for SDIMS
-      CALL AXIS_TFINDXYT( IFID, NDIM, A_X, A_Y, A_T, STATUS )
-      IF ( (A_X .GT. 0) .AND. (A_Y.GT.0) ) THEN
+*  Try to find X,Y axes and set default for SDIMS
+      CALL BDI0_FNDAXC( IFID, 'X', A_X, STATUS )
+      CALL BDI0_FNDAXC( IFID, 'Y', A_Y, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
         SDIMS(1) = A_X
         SDIMS(2) = A_Y
         NSDIM = 2
         CALL USI_DEF1I( 'SDIMS', NSDIM, SDIMS, STATUS )
-      ELSE IF ( NDIM .EQ. 1 ) THEN
-        CALL USI_DEF0I( 'SDIMS', 1, STATUS )
+      ELSE
+        CALL ERR_ANNUL( STATUS )
       END IF
 
-*    Get dimensions to be smoothed
+*  Get dimensions to be smoothed
       CALL USI_GET1I( 'SDIMS', ADI__MXDIM, SDIMS, NSDIM, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( NSDIM .GT. 2 ) THEN
@@ -245,11 +243,11 @@
      :                                                    STATUS )
       END IF
 
-*    Get mode for selecting data levels
+*  Get mode for selecting data levels
       CALL USI_GET0I( 'OPT', OPTION, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get min & max in data
+*  Get min & max in data
       IF ( QOK ) THEN
         CALL ARR_RANG1RQ( NELM, %VAL(IDPTR), %VAL(IQPTR), QUAL__MASK,
      :                                           DMIN, DMAX, STATUS )
@@ -260,11 +258,11 @@
       CALL MSG_SETR( 'MAX', DMAX )
       CALL MSG_PRNT( 'Data range is from ^MIN to ^MAX' )
 
-*    Choose levels from option
+*  Choose levels from option
       BIAS = 0.0
       IF ( (OPTION.EQ.1) .OR. (OPTION.EQ.2) ) THEN
 
-*      Get number of levels
+*    Get number of levels
         CALL USI_GET0I( 'NLEV', NLEVEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
         IF ( (NLEVEL.LT.1) .OR. (NLEVEL.GT.ASM__MXLEV) ) THEN
@@ -275,7 +273,7 @@
           GOTO 99
         END IF
 
-*      Check for silly data range
+*    Check for silly data range
         IF ( (OPTION .EQ. 2) .AND. (DMIN.LE.0.0) ) THEN
           CALL MSG_PRNT( 'The data contains values <= zero - supply'/
      :  /' a bias value to make the minimum positive, or ! to quit' )
@@ -283,7 +281,7 @@
           CALL USI_GET0R( 'BIAS', BIAS, STATUS )
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*        Check bias big enough
+*      Check bias big enough
           IF ( (DMIN+BIAS) .LE. 0.0 ) THEN
             STATUS = SAI__ERROR
             CALL MSG_SETR( 'BIAS', DMIN )
@@ -298,13 +296,13 @@
 
         END IF
 
-*      Linearly spaced levels
+*    Linearly spaced levels
         IF ( OPTION .EQ. 1 ) THEN
           DO I = 1, NLEVEL
             LEVEL(I) = DMIN + (REAL(I)-0.5)*(DMAX-DMIN)/REAL(NLEVEL)
           END DO
 
-*      Logarithmically spaced levels
+*    Logarithmically spaced levels
         ELSE
 
           DO I = 1, NLEVEL
@@ -313,7 +311,7 @@
             LEVEL(I) = 10.0**LEVEL(I) - BIAS
           END DO
 
-*        RESTORE data min and max
+*      RESTORE data min and max
           DMIN = DMIN - BIAS
           DMAX = DMAX - BIAS
 
@@ -321,7 +319,7 @@
 
       ELSE IF ( OPTION .EQ. 3 ) THEN
 
-*      Read levels directly
+*    Read levels directly
         CALL USI_GET1R( 'LEVS', ASM__MXLEV, LEVEL, NLEVEL, STATUS )
         IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -332,8 +330,8 @@
         GOTO 99
       END IF
 
-*    Add the data maximum as the last level, and the minimum as the lower
-*    bound on the first
+*  Add the data maximum as the last level, and the minimum as the lower
+*  bound on the first
       NLEVEL = NLEVEL + 1
       LEVEL(NLEVEL) = DMAX
       DO I = NLEVEL, 1, -1
@@ -342,64 +340,64 @@
       LEVEL(1) = DMIN
       NLEVEL = NLEVEL + 1
 
-*    Filter choice
+*  Filter choice
       CALL USI_GET0I( 'FILTER', FILTER, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get smooth signal to noise
+*  Get smooth signal to noise
       CALL USI_GET0R( 'SNR', SNR, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Get smooth box max width
+*  Get smooth box max width
       CALL USI_GET0I( 'WSTART', WSTART, STATUS )
       CALL USI_GET0I( 'WMAXSZ', WMAXSZ, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
-*    Pad dimensions to 7D
+*  Pad dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
 
-*    Get list of axis numbers into string
+*  Get list of axis numbers into string
       CALL STR_DIMTOC( NSDIM, SDIMS, STR )
 
-*    Construct transformation matrix
+*  Construct transformation matrix
       CALL AXIS_TGETORD( IFID, STR(2:CHR_LEN(STR)-1), REORDER, TRORD,
      :                                        NSDIM, TRDIMS, STATUS )
 
-*    Transformation of axes required? If so create temporary space
-*    and unmap originals to save space
+*  Transformation of axes required? If so create temporary space
+*  and unmap originals to save space
       IF ( REORDER ) THEN
         CALL DYN_MAPR( NDIM, DIMS, TDPTR, STATUS )
         CALL AR7_AXSWAP_R( DIMS, %VAL(IDPTR), TRORD, TRDIMS,
      :                                 %VAL(TDPTR), STATUS )
-        CALL BDI_UNMAPDATA( IFID, STATUS )
+        CALL BDI_UNMAP( IFID, 'Data', IDPTR, STATUS )
         IDPTR = TDPTR
         IF ( QOK ) THEN
           CALL DYN_MAPB( NDIM, DIMS, TQPTR, STATUS )
           CALL AR7_AXSWAP_B( DIMS, %VAL(IQPTR), TRORD, TRDIMS,
      :                                   %VAL(TQPTR), STATUS )
-          CALL BDI_UNMAPQUAL( IFID, STATUS )
+          CALL BDI_UNMAP( IFID, 'Quality', IQPTR, STATUS )
           IQPTR = TQPTR
         END IF
         IF ( VOK ) THEN
           CALL DYN_MAPR( NDIM, DIMS, TVPTR, STATUS )
           CALL AR7_AXSWAP_R( DIMS, %VAL(IVPTR), TRORD, TRDIMS,
      :                                   %VAL(TVPTR), STATUS )
-          CALL BDI_UNMAPVAR( IFID, STATUS )
+          CALL BDI_UNMAP( IFID, 'Variance', IVPTR, STATUS )
           IVPTR = TVPTR
         END IF
       END IF
 
-*    Number of elements in each slice
+*  Number of elements in each slice
       CALL ARR_SUMDIM( NSDIM, TRDIMS, NSELEM )
 
-*    Find the number of slices
+*  Find the number of slices
       NSLICE = NELM / NSELEM
 
-*    Allocate workspace
+*  Allocate workspace
       CALL DYN_MAPR( 1, NSELEM*NSLICE, WDPTR, STATUS )
       CALL DYN_MAPB( 1, NSELEM*NSLICE, WQPTR, STATUS )
 
-*    Perform the smooth
+*  Perform the smooth
       CALL ASMOOTH_INT( NDIM, DIMS, NSDIM, NSLICE, NSELEM,
      :                  NLEVEL, LEVEL, %VAL(IDPTR), QOK,
      :                  %VAL(IQPTR), VOK, %VAL(IVPTR),
@@ -407,26 +405,25 @@
      :                  SNR, FILTER, WSTART, WMAXSZ, %VAL(ODPTR),
      :                  STATUS )
 
-*    Need to transform back the output data? If so, have to make a copy
-*    first.
+*  Need to transform back the output data? If so, have to make a copy first
       IF ( REORDER ) THEN
 
-*      Invert the axis transformation
+*    Invert the axis transformation
         CALL AXIS_ORDINV( NDIM, TRORD, INORDER )
 
-*      Swap the data
+*    Swap the data
         CALL ARR_COP1R( NELM, %VAL(ODPTR), %VAL(TDPTR), STATUS )
         CALL AR7_AXSWAP_R( TRDIMS, %VAL(TDPTR), INORDER, DIMS,
      :                                   %VAL(ODPTR), STATUS )
         CALL DYN_UNMAP( TDPTR, STATUS )
-        CALL BDI_UNMAPDATA( OFID, STATUS )
+        CALL BDI_UNMAP( OFID, 'Data', ODPTR, STATUS )
 
       END IF
 
-*    Update history
+*  Update history
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
-*    Create history text
+*  Create history text
       HTXT(1) = 'Input {INP}'
       CALL MSG_SETI( 'FILT', FILTER )
       CALL MSG_MAKE( 'Filter choice ^FILT', HTXT(2), TLEN )
@@ -450,12 +447,12 @@
         CALL MSG_MAKE( '^NLEV levels ^LEVS', HTXT(4), TLEN )
       END IF
 
-*    Process text
+*  Process text
       NLINES = MXLINES
       CALL USI_TEXT( 4, HTXT, NLINES, STATUS )
       CALL HSI_PTXT( OFID, NLINES, HTXT, STATUS )
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
