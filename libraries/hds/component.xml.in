@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/hds</path>
+  <description>Hierarchical Data System</description>
+  <abstract>
+    <p>HDS is a file-based hierarchical data system designed for the
+      storage of a wide variety of information. It is particularly
+      suited to the storage of large multi-dimensional arrays (with
+      their ancillary data) where efficient access is needed.</p>
+    <p>HDS organises data into hierarchies, broadly similar to the
+      directory structure of a hierarchical filing system, but
+      contained within a single HDS container file.  The
+      structures stored in these files are self-describing and
+      flexible; HDS supports modification and extension of structures
+      previously created, as well as deletion, copying, renaming, etc..</p>
+    <p>All information stored in HDS files is portable between the
+      machines on which HDS is implemented. Thus, there are no format
+      conversion problems when moving between machines.</p>
+    <p>The routines in this package may be used to perform operations
+      on any HDS data. In addition, HDS forms a toolkit for the
+      construction of higher level (more specialised) data structures
+      and the software which accesses them.  HDS routines are
+      therefore invoked indirectly by many other items of Starlink
+      software.</p>
+  </abstract>
+  <dependencies>
+    <build>@STAR_BUILD_DEPENDENCIES@</build>
+    <use>@STAR_USE_DEPENDENCIES@</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>R. F. Warren-Smith</name>
+    </person>
+    <person>
+      <name>M. D. Lawden</name>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

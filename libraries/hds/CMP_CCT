@@ -1,0 +1,62 @@
+*+
+*  Name:
+*     CMP_CCT
+
+*  Purpose:
+*     CMP_ Component Control Table.
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Description:
+*     This file defines the global variables which reside in the CMP_
+*     Component Control Table.
+
+*  Authors:
+*     JRG: J.R. Giddings (UCL)
+*     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+*     {enter_new_authors_here}
+
+
+*  History:
+*     ??? (JRG):
+*        Original version.
+*     19-APR-1991 (RFWS):
+*        Combined two include files into one and added prologue.
+*        Converted code to upper case and generally tidied. Common
+*        blocks merged and renamed.
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Whether CMP_ is asleep (not active).
+      LOGICAL CMPSLP
+
+*  Number of entries in Component Control Table.
+      INTEGER CMPCNT
+
+*  Structure Locators.
+      CHARACTER * ( DAT__SZLOC ) CMPSTR( CMP__MXCMP )
+
+*  Component Names.
+      CHARACTER * ( DAT__SZNAM ) CMPNAM( CMP__MXCMP )
+
+*  Component Locators.
+      CHARACTER * ( DAT__SZLOC ) CMPLOC( CMP__MXCMP )
+
+*  Whether a CCT slot is free.
+      LOGICAL CMPFRE( CMP__MXCMP )
+
+* Common blocks.
+      COMMON /CMP1_CCT1/ CMPCNT, CMPFRE, CMPSLP
+      COMMON /CMP1_CCT2/ CMPLOC, CMPNAM, CMPSTR
+      SAVE /CMP1_CCT1/
+      SAVE /CMP1_CCT2/
+
+*.

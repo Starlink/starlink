@@ -1,0 +1,380 @@
+#include "hds1_feature.h"	 /* Define feature-test macros, etc.	    */
+/*+DATFININD.C-*/
+
+#include "f77.h"		 /* F77 <-> C interface macros		    */
+#include "cnf.h"		 /* F77 <-> C string handling functions	    */
+#include "ems.h"		 /* EMS error reporting routines	    */
+#include "hds1.h"		 /* Global definitions for HDS		    */
+#include "rec.h"		 /* Public rec_ definitions		    */
+#include "str.h"		 /* Character string import/export macros   */
+#include "dat1.h"		 /* Internal dat_ definitions		    */
+#include "dat_err.h"		 /* DAT__ error code definitions	    */
+
+   F77_INTEGER_FUNCTION(dat_find)
+                       (locator1_str,name_str,locator2_str,status,
+	  locator1_lenarg,name_lenarg,locator2_lenarg)
+
+/*=================================*/
+/* DAT_FIND - Find named component */
+/*=================================*/
+
+struct STR	 	 *locator1_str;
+struct STR	 	 *name_str;
+struct STR	 	 *locator2_str;
+int			 *status;
+
+{
+struct DSC		  locator1;
+struct DSC		  name;
+struct DSC		  locator2;
+int			  locator1_len = locator1_lenarg;
+int			  name_len = name_lenarg;
+int			  locator2_len = locator2_lenarg;
+
+struct LCP    		 *lcp1;
+struct LCP_DATA		 *data1;
+struct LCP		 *lcp2;
+struct LCP_DATA		 *data2;
+unsigned char *srv;
+unsigned char *crv;
+char			  nambuf[DAT__SZNAM];
+int			 *axis;
+int			(*dbt)[2];
+struct PDD	 	 *obj;
+struct RCL		  rcl;
+struct ODL		  odl;
+struct HAN		  han;
+struct RID		  rid;
+int			  off;
+int			  ncomp;
+int			  i;
+char *name1;
+
+/* Import the source locator and name strings and export the destination    */
+/* locator string.							    */
+      _strimp( &locator1, locator1_str, &locator1_len );
+      _strimp( &name, name_str, &name_len );
+      _strexp( &locator2, locator2_str, &locator2_len );
+
+/* Check the inherited global status.					    */
+      hds_gl_status = *status;
+      if ( _ok( hds_gl_status ) )
+      {
+
+/* Import the input locator.						    */
+         dau_import_loc( &locator1, &lcp1 );
+         if ( _ok( hds_gl_status ) )
+         {
+            data1 = &lcp1->data;
+
+/* Report an error if the input locator points to anything other than a	    */
+/* single structure object.						    */
+            if ( ( !data1->struc ) || ( data1->naxes != 0 ) )
+	    {
+	       hds_gl_status = DAT__OBJIN;
+	       ems_rep_c( "DAT_FIND_1",
+	                  "Input object is not a scalar structure.",
+		          &hds_gl_status );
+	    }
+         }
+
+/* Validate the component name.						    */
+         dau_check_name( &name, nambuf );
+
+/* Locate the Structure Record Vector entry and extract the ID of the	    */
+/* component record.							    */
+         if ( _ok( hds_gl_status ) )
+         {
+            off = data1->offset * DAT__SZSRV;
+            rec_locate_data( &data1->han, DAT__SZSRV, off, 'R', &srv );
+            dat1_unpack_srv( srv, &rid );
+            if ( _ok( hds_gl_status ) )
+            {
+
+/* If the Record-ID is null, then no component record exists, so report an  */
+/* error.								    */
+               if ( ( rid.bloc == 0 ) && ( rid.chip == 0 ) )
+               {
+                  hds_gl_status = DAT__OBJNF;
+	          ems_setc_c( "NAME", nambuf, DAT__SZNAM );
+	          ems_rep_c( "DAT_FIND_2",
+		             "Object \'^NAME\' not found.",
+	                     &hds_gl_status );
+               }
+            }
+
+/* Release the structure record vector.					    */
+            rec_release_data( &data1->han, DAT__SZSRV, off, 'R', &srv );
+         }
+
+/* Stick a handle on the component record, get the Record Control Label and */
+/* determine the # of components in the list.				    */
+         if ( _ok( hds_gl_status ) )
+         {
+            rec_get_handle( &rid, &data1->han, &han );
+            rec_get_rcl( &han, &rcl );
+            dat1_get_ncomp( &han, &ncomp );
+
+/* Locate the Component Record Vector and search for the specified name. If */
+/* found, then extract the ID of the object record.			    */
+            rec_locate_data( &han, rcl.dlen, 0, 'R', &crv );
+            rid = rec_gl_ridzero;
+            for ( i = 0; ( i < ncomp ) && _ok( hds_gl_status ); i++ )
+            {
+               dat1_locate_name( crv, i, &name1 );
+               if ( _ok( hds_gl_status ) )
+	       {
+                  if ( _cheql( DAT__SZNAM, nambuf, name1 ) )
+                  {
+                     dat1_unpack_crv( crv, i, &rid );
+                     break;
+                  }
+               }
+            }
+            rec_release_data( &han, rcl.dlen, 0, 'R', &crv );
+
+/* Report an error if the object cannot be found.			    */
+	    if ( _ok( hds_gl_status ) )
+	    {
+               if ( ( rid.bloc == 0 ) && ( rid.chip == 0 ) )
+               {
+                  hds_gl_status = DAT__OBJNF;
+	          ems_setc_c( "NAME", nambuf, DAT__SZNAM );
+	          ems_rep_c( "DAT_FIND_3",
+		             "Object \'^NAME\' not found.",
+	                     &hds_gl_status );
+	       }
+            }
+         }
+
+/* Export the destination locator and stick a handle on the object record.  */
+         dau_export_loc( &locator2, &lcp2 );
+         if ( _ok( hds_gl_status ) )
+         {
+            data2 = &lcp2->data;
+            rec_get_handle( &rid, &han, &data2->han );
+            rec_get_rid( &han, &data2->parent );
+
+/* Save the component name, propagate the group specification and increment */
+/* the level counter.							    */
+            _chmove( DAT__SZNAM, nambuf, data2->name );
+            _chmove( DAT__SZGRP, data1->group, data2->group );
+            data2->level = data1->level + 1;
+
+/* Read the Object Descriptor Label from the object record's static domain  */
+/* and determine the object attributes.					    */
+            dat1_get_odl( &data2->han, &odl );
+            _chmove( DAT__SZTYP, odl.type, data2->type );
+            dat1_unpack_type( data2->type, &data2->obj );
+            obj = &data2->obj;
+
+/* Save the shape information in the LCP and calculate the total size of    */
+/* the object. (The Dimension Bounds Table is used to hold the 1st three    */
+/* axis sizes).								    */
+            if ( _ok( hds_gl_status ) )
+	    {
+               axis = odl.axis;
+               data2->naxes = odl.naxes;
+               dbt = data2->bounds;
+               data2->size = 1;
+               for ( i = 0; i < data2->naxes; i++ )
+	       {
+	          data2->size *= axis[ i ];
+	          if ( i < DAT__MXSLICE )
+	          {
+	             dbt[ i ][ LOWER ] = 1;
+	             dbt[ i ][ UPPER ] = axis[ i ];
+		  }
+               }
+
+/* Flag whether structure or primitive and note the access mode.	    */
+               data2->struc = ( obj->class == DAT__STRUCTURE );
+               data2->read = data1->read;
+	    }
+
+/* If successful, then mark the new LCP as valid.			    */
+            if ( _ok( hds_gl_status ) )
+            {
+               data2->valid = 1;
+            }
+
+/* Otherwise, defuse the new LCP.					    */
+            else
+            {
+               dau_defuse_lcp( &lcp2 );
+            }
+         }
+
+/* If an error occurred, then report contextual information.		    */
+         if ( !_ok( hds_gl_status ) )
+	 {
+	    ems_rep_c( "DAT_FIND_ERR",
+                       "DAT_FIND: Error finding a named component in an \
+HDS structure.",
+                       &hds_gl_status );
+         }
+      }
+
+/* If the routine will exit with status set, then nullify the output	    */
+/* locator.								    */
+      if ( !_ok( hds_gl_status ) )
+      {
+         cnf_expn( DAT__NOLOC, DAT__SZLOC, (char *) locator2.body,
+	           (int) locator2.length );
+      }
+
+/* Return the current global status value.				    */
+      *status = hds_gl_status;
+      return *status;
+   }
+
+   F77_INTEGER_FUNCTION(dat_index)
+                       (locator1_str,index,locator2_str,status,
+	   locator1_lenarg,locator2_lenarg)
+
+/*=======================================*/
+/* DAT_INDEX - Index into component list */
+/*=======================================*/
+
+struct STR	 	 *locator1_str;
+int			 *index;
+struct STR	 	 *locator2_str;
+int			 *status;
+int			  locator1_lenarg;
+int			  locator2_lenarg;
+
+{
+#undef context_name
+#undef context_message
+#define context_name "DAT_INDEX_ERR"
+#define context_message\
+        "DAT_INDEX: Error indexing into the component list of an HDS structure."
+
+struct DSC		  locator1;
+struct DSC		  locator2;
+int			  locator1_len = locator1_lenarg;
+int			  locator2_len = locator2_lenarg;
+
+struct LCP		 *lcp1;
+struct LCP_DATA		 *data1;
+struct LCP		 *lcp2;
+struct LCP_DATA		 *data2;
+unsigned char *srv;
+unsigned char *crv;
+char			  nambuf[DAT__SZNAM];
+int			 *axis;
+int			(*dbt)[2];
+struct PDD	 	 *obj;
+struct RCL		  rcl;
+struct ODL		  odl;
+struct HAN		  han;
+struct RID		  rid;
+int			  off;
+int			  ncomp;
+int			  i;
+char *name1;
+
+/* Enter routine.	*/
+
+if (!_ok(*status))
+	return *status;
+hds_gl_status	= DAT__OK;
+
+/* Import the source locator string and export the destination locator string.*/
+
+_strimp(&locator1,locator1_str,&locator1_len);
+_strexp(&locator2,locator2_str,&locator2_len);
+
+/* Import the source locator.	*/
+
+_call(dau_import_loc(&locator1, &lcp1))
+data1		= &lcp1->data;
+
+/* Return if the locator points to anything other than a single structure
+   object.	*/
+
+if (!data1->struc || data1->naxes != 0)
+	_call(DAT__OBJIN)
+
+/* Locate the Structure Record Vector entry and extract the ID of the component
+   record.	*/
+
+off		= data1->offset * DAT__SZSRV;
+_call(rec_locate_data(&data1->han, DAT__SZSRV, off, 'R', &srv))
+dat1_unpack_srv( srv, &rid );
+rec_release_data(&data1->han, DAT__SZSRV, off, 'R', &srv);
+
+/* If the Record-ID is null, then no component record exists.	*/
+
+if ( ( rid.bloc == 0 ) && ( rid.chip == 0 ) )
+	_call(DAT__OBJNF)
+
+/* Otherwise, stick a handle on the component record, get the Record Control
+   Label and determine the # of components in the list.	*/
+
+_call(rec_get_handle(&rid, &data1->han, &han))
+_call(rec_get_rcl(&han, &rcl))
+_call(dat1_get_ncomp(&han, &ncomp))
+
+/* Return if the index is positioned past the end of the component list or  */
+/* is invalid.								    */
+      if ( ( *index > ncomp ) || ( *index < 1 ) )
+         _call(DAT__OBJNF)
+
+/* Locate the required element of the Component Record Vector, save the	    */
+/* object name and extract the ID of the object record.			    */
+      _call( rec_locate_data( &han, DAT__SZCRV, ( *index - 1 ) * DAT__SZCRV,
+			      'R', &crv ) )
+      dat1_locate_name( crv, 0, &name1 );
+      _chmove( DAT__SZNAM, name1, nambuf );
+      dat1_unpack_crv( crv, 0, &rid );
+      rec_release_data( &han, DAT__SZCRV, ( *index - 1 ) * DAT__SZCRV, 'R',
+			&crv );
+
+/* Export the destination locator and stick a handle on the object record. */
+
+_call(dau_export_loc(&locator2, &lcp2))
+data2		= &lcp2->data;
+rec_get_handle(&rid, &han, &data2->han);
+rec_get_rid(&han, &data2->parent);
+
+/* Save the component name, propagate the group specification and increment
+   the level counter.	*/
+
+_chmove(DAT__SZNAM, nambuf, data2->name);
+_chmove(DAT__SZGRP, data1->group, data2->group);
+data2->level	= data1->level + 1;
+
+/* Read the Object Descriptor Label from the object record's static domain  */
+/* and determine the object attributes.					    */
+
+_call(dat1_get_odl(&data2->han, &odl))
+_chmove(DAT__SZTYP, odl.type, data2->type);
+_call(dat1_unpack_type(data2->type, &data2->obj))
+obj		= &data2->obj;
+
+/* Save the shape information in the LCP and calculate the total size
+   of the object. (The Dimension Bounds Table is used to hold the 1st
+   three axis sizes). 	*/
+
+axis		= odl.axis;
+data2->naxes	= odl.naxes;
+dbt		= data2->bounds;
+data2->size	= 1;
+for (i=0; i<data2->naxes; i++)
+	{
+	data2->size *= axis[i];
+	if (i<DAT__MXSLICE)
+		{
+		dbt[i][LOWER] = 1;
+		dbt[i][UPPER] = axis[i];
+		}
+	}
+
+/* Flag whether structure or primitive and mark the locator as valid.	*/
+
+data2->struc	= (obj->class == DAT__STRUCTURE);
+data2->read	= data1->read;
+data2->valid	= 1;
+return hds_gl_status;
+}

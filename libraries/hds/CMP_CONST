@@ -1,0 +1,36 @@
+*+
+*  Name:
+*     CMP_CONST
+
+*  Purpose:
+*     Define private (internal) constants for the CMP_ system.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file contains definitions of global constants used internally
+*     by routines in the CMP_ system, which are not needed by external
+*     users of this system.
+
+*  Authors:
+*     RFWS: R.F. Warren-Smith (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     5-JUN-1991 (RFWS):
+*        Added prologue and increased CMP__MXCMP to 128.
+*     16-FEB-1999 (RFWS):
+*        Increased CMP__MXCMP to 1024.
+*     {enter_changes_here}
+
+*-
+
+*  Global Constants:
+      INTEGER CMP__MXCMP	 ! Maximum number of mapped components
+      PARAMETER ( CMP__MXCMP = 1024 )
+
+*.

@@ -1,0 +1,59 @@
+#! /bin/sh -
+# original bootstrap file, installed by starconf 1.0, rnum=1000000
+# If you _need_ to change this file, delete or replace `original' above
+# or else starconf may overwrite it with an updated version
+
+# Run this script in a freshly checked-out directory to bring the
+# system to the point where you can just type ./configure;make
+#
+# The configuration script here works with automake versions 1.6.3 and
+# 1.7.5, and autoconf 2.57, and probably not much that's significantly
+# older than those.
+
+run_libtool=true
+run_autoheader=true
+
+# Echo a command then run it.
+echorun() { echo $*; eval $* || exit 1; }
+
+# Execute ./starconf.status if it exists, to bring the configuration
+# up-to-date.  This test is possibly temporary, and we may decide to
+# mandate a working starconf in future.
+if test -x $STARLINK/buildsupport/bin/starconf; then
+    echorun $STARLINK/buildsupport/bin/starconf
+elif test -x ./starconf.status; then
+    echorun ./starconf.status
+else
+    echo "No starconf found anywhere"
+    exit 1
+fi
+#echorun $STARLINK/buildsupport/bin/starconf
+
+echorun aclocal
+
+# If there is an AC_CONFIG_HEADERS line in configure.ac, then we need
+# to run autoheader to do its magic.  If there is no such macro in
+# configure.ac, then we must not invoke autoheader here.
+$run_autoheader && echorun autoheader
+
+# We need to explicitly run libtoolize only if ltmain.sh is not present
+# (it won't be, in the case when we really are bootstrapping, but it might
+# be if we're running bootstrap redundantly, which ought to be OK).
+# Generally, it's (re)run implicitly by automake.
+if $run_libtool; then
+    if test ! -e ltmain.sh; then
+        echorun libtoolize
+    fi
+fi
+
+# Generate Makefile.in, and add links to standard tools such as
+# install-sh, missing and friends.
+#
+# Use --foreign so automake doesn't check strict adherence
+# to GNU coding standards
+echorun automake --add-missing --foreign
+
+# Generate configure from configure.ac
+echorun autoconf
+
+exit 0
