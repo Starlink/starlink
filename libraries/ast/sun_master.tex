@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.11}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {23th October 2002}
+\newcommand{\stardocdate}      {28th January 2003}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -48,7 +48,7 @@ graphical output based on it.
 
 This programmer's manual should be of interest to anyone writing
 astronomical applications which need to manipulate coordinate system
-data, especially celestial coordinate systems. AST is portable and
+data, especially celestial or spectral coordinate systems. AST is portable and
 environment-independent.
 }
 % ? End of document identification
@@ -377,7 +377,8 @@ f-
 \section{Introduction}
 
 Welcome to the AST library. If you are writing software for astronomy
-and need to use celestial coordinates ({\em{e.g.}}\ RA and Dec) or
+and need to use celestial coordinates ({\em{e.g.}}\ RA and Dec), spectral
+coordinates ({\em{e.g.}}\ wavelength, frequency, {\em{etc.}), or
 other coordinate system information, then this library should be of
 interest. It provides solutions for most of the problems you will meet
 and allows you to write robust and flexible software.
@@ -392,10 +393,14 @@ provides:
 
 \begin{description}
 \item[1. The Variety of Coordinate Systems]\mbox{}\\
-There are a large number of celestial coordinate systems in use in
-astronomy. Understanding these, and knowing how to convert coordinates
-between them, requires considerable expertise. It can also be
-difficult to decide which of them your software should support.
+Astronomers use a wide range of differing coordinate systems to describe
+positions within a variety of physical domains. For instance, there are a 
+large number of celestial coordinate systems in use within astronomy to
+describe positions on the sky. Understanding these, and knowing how to 
+convert coordinates between them, can require considerable expertise. It 
+can also be difficult to decide which of them your software should support.
+The same applies to coordinate systems describing other domains, such as
+position within an electromagnetic spectrum.
 
 {\bf{Solution.}} AST has built-in knowledge of many coordinate systems
 and allows you to convert freely between them without specialist
@@ -628,6 +633,9 @@ following and, where appropriate, their inverses:
 \begin{itemize}
 \item Conversions between various celestial coordinate systems (the
 SlaMap).
+
+\item Conversions between various spectral coordinate systems (the
+SpecMap).
 
 \item Conversion between 2-dimensional spherical celestial coordinates
 (longitude and latitude) and a 3-dimensional vectorial positions (the SphMap).
@@ -888,14 +896,16 @@ text, calculating distances between points, interchanging axes,
 {\em{etc.}}
 f-
 
-A more specialised form of Frame, the SkyFrame
-(Figure~\ref{fig:frames}b,c), is provided to represent celestial
-coordinate systems, of which a wide range are supported.  These may be
-selected by setting appropriate SkyFrame attributes.  A SkyFrame
-provides the additional functionality required when handling celestial
-coordinates---such as sexagesimal formatting and great circle
-distances.  It also encapsulates knowledge of how to convert between
-any pair of celestial coordinate systems.
+There are several more specialised forms of Frame, which provide the
+additional functionality required when handling coordinates within some
+specific physical domain. This ranges from tasks such as formatting axis
+values, to complex tasks such as determining the transformation between
+any pair of related coordinate systems. For instance, the SkyFrame
+(Figure~\ref{fig:frames}b,c), represents celestial coordinate systems,
+and the SpecFrame represents spectral coordinate systems. Both provide a
+wide range of different systems for describing positions within their
+associated physical domain, and these may be selected by setting appropriate 
+attributes.  
 
 \begin{latexonly}
    As with compound Mappings (\secref{ss:cmpmapoverview}), it is possible
@@ -950,9 +960,9 @@ f-
 \end{htmlonly}
 
 {\bf{Further reading:}} For a more complete description of Frames see
-\secref{ss:frames} and for SkyFrames see \secref{ss:skyframes}.  Also
-see the Frame, SkyFrame and CmpFrame entries in
-\appref{ss:classdescriptions}.
+\secref{ss:frames}, for SkyFrames see \secref{ss:skyframes} and for 
+SpecFrames see \secref{ss:specframes}.  Also see the Frame, SkyFrame,
+SpecFrame and CmpFrame entries in \appref{ss:classdescriptions}.
 
 \subsection{Networks of Coordinate Systems}
 
@@ -1008,7 +1018,8 @@ context, the base Frame represents the ``native'' coordinate system
 (for example, the pixel coordinates of an image).  Similarly, one
 Frame is termed the {\em{current}} Frame and represents the
 ``currently-selected'' coordinates.  It might, typically, be a
-celestial coordinate system and would be used during interactions with
+celestial or spectral coordinate system and would be used during 
+interactions with
 a user, as when plotting axes on a graph or producing a table of
 results.  Other Frames within the FrameSet represent a library of
 alternative coordinate systems which a software user can select by
@@ -1624,6 +1635,24 @@ c-
 f+
 This will set ISSKY to .TRUE.\ if the WCS is a celestial coordinate
 system, and to .FALSE.\ otherwise.
+f-
+
+\subsection{\label{ss:howtotestforspectral}\ldots Test if a WCS is a Spectral Coordinate System}
+Testing for a spectral coordinate system is basically the same as testing
+for a celestial coordinate system (see the previous section). The one
+difference is that you use the 
+c+
+astIsASpecFrame function
+c-
+f+
+AST_ISASPECFRAME routine
+f-
+in place of the 
+c+
+astIsASkyFrame function.
+c-
+f+
+AST_ISASKYFRAME routine.
 f-
 
 \subsection{\label{ss:howtoformatcoordinates}\ldots Format Coordinates for Display}
@@ -4689,6 +4718,7 @@ as a whole and some of the sub-classes it contains:
       MatrixMap
       PermMap
       SlaMap
+      SpecMap
       UnitMap
       WcsMap
       ZoomMap
@@ -5861,9 +5891,10 @@ concepts are complementary and we will see how they work together in
 In this section we will discuss only basic Frames, which represent
 Cartesian coordinate systems. More specialised types of Frame
 ({\em{e.g.}}\ the SkyFrame, which represents celestial coordinate
-systems) are covered later (\secref{ss:skyframes}) and, naturally,
-inherit the properties and behaviour of the simple Frames discussed
-here.
+systems, and the SpecFrame, which represents spectral coordinate
+systems) are covered later (\secref{ss:skyframes} and \secref{ss:specframes}) 
+and, naturally, inherit the properties and behaviour of the simple Frames 
+discussed here.
 
 \subsection{The Frame Model}
 
@@ -7535,6 +7566,14 @@ coordinate systems. Because these are represented in AST by SkyFrames
 (\secref{ss:skyframes}), it should be no surprise that the default
 Domain value for a SkyFrame is SKY. Since there is only one sky, you
 probably won't need to change this very often.
+
+\item[SPECTRAL]\mbox{}\\
+Identifies the domain used to describe positions within an
+electromagnetic spectrum. The AST SpecFrame (\secref{ss:specframes})
+class describes positions within this domain, allowing a wide range of
+different coordinate systems to be used (frequency, wavelength,
+{\em{etc}}). The default Domain value for a SpecFrame is SPECTRAL.
+
 \end{description}
 \end{quote}
 
@@ -8206,18 +8245,21 @@ otherwise identified. This is the normal behaviour unless an explicit
 Format(axis) value has been set to override the default.
 
 %\cleardoublepage
+%\section{\label{ss:specframes}TBW - Spectral Coordinate Systems (SpecFrames)}
+
+%\cleardoublepage
 %\section{\label{ss:cmpframes}TBW - Compound Frames (CmpFrames)}
 
 \cleardoublepage
 \section{\label{ss:introducingconversion}An Introduction to Coordinate System Conversions}
 
 In this section, we start to look at techniques for converting between
-different coordinate systems.  At this stage, the tools we have
-available are Frames (\secref{ss:frames}), SkyFrames
-(\secref{ss:skyframes}) and various Mappings
+different coordinate systems.  At this stage, the tools we have available
+are Frames (\secref{ss:frames}), SkyFrames (\secref{ss:skyframes}),
+SpecFrames (\secref{ss:specframes}) and various Mappings
 (\secref{ss:mappings}). These are sufficient to allow us to begin
-examining the problem, but more sophisticated approaches will also
-emerge later (\secref{ss:framesetconverting}).
+examining the problem, but more sophisticated approaches will also emerge
+later (\secref{ss:framesetconverting}).
 
 \subsection{\label{ss:convertingskyframes}Converting between Celestial Coordinate Systems}
 
@@ -16732,31 +16774,33 @@ For a description of each class, you should consult
 
 \small
 \begin{verbatim}
-Object            - Base class for all AST Objects
-   Axis           - Store axis information
-      SkyAxis     - Store celestial axis information
-   Channel        - Basic (textual) I/O channel
-      FitsChan    - I/O Channel using FITS header cards
-   Mapping        - Inter-relate two coordinate systems
-      CmpMap      - Compound Mapping
-      DssMap      - Map points using Digitised Sky Survey plate solution
-      Frame       - Coordinate system description
-         CmpFrame - Compound Frame
-         FrameSet - Set of inter-related coordinate systems
-            Plot  - Provide facilities for graphical output
-         SkyFrame - Celestial coordinate system description
-      IntraMap    - Map points using a private transformation function
-      LutMap      - Transform 1-dimensional coordinates using a lookup table
-      MathMap     - Transform coordinates using mathematical expressions
-      MatrixMap   - Map positions by multiplying them by a matrix
-      PcdMap      - Apply 2-dimensional pincushion/barrel distortion
-      PermMap     - Coordinate permutation Mapping
-      SlaMap      - Sequence of celestial coordinate conversions
-      SphMap      - Map 3-d Cartesian to 2-d spherical coordinates
-      UnitMap     - Unit (null) Mapping
-      WcsMap      - Implement a FITS-WCS sky projection
-      WinMap      - Match windows by scaling and shifting each axis
-      ZoomMap     - Zoom coordinates about the origin
+Object             - Base class for all AST Objects
+   Axis            - Store axis information
+      SkyAxis      - Store celestial axis information
+   Channel         - Basic (textual) I/O channel
+      FitsChan     - I/O Channel using FITS header cards
+   Mapping         - Inter-relate two coordinate systems
+      CmpMap       - Compound Mapping
+      DssMap       - Map points using Digitised Sky Survey plate solution
+      Frame        - Coordinate system description
+         CmpFrame  - Compound Frame
+         FrameSet  - Set of inter-related coordinate systems
+            Plot   - Provide facilities for graphical output
+         SkyFrame  - Celestial coordinate system description
+         SpecFrame - Spectral coordinate system description
+      IntraMap     - Map points using a private transformation function
+      LutMap       - Transform 1-dimensional coordinates using a lookup table
+      MathMap      - Transform coordinates using mathematical expressions
+      MatrixMap    - Map positions by multiplying them by a matrix
+      PcdMap       - Apply 2-dimensional pincushion/barrel distortion
+      PermMap      - Coordinate permutation Mapping
+      SlaMap       - Sequence of celestial coordinate conversions
+      SpecMap      - Sequence of spectral coordinate conversions
+      SphMap       - Map 3-d Cartesian to 2-d spherical coordinates
+      UnitMap      - Unit (null) Mapping
+      WcsMap       - Implement a FITS-WCS sky projection
+      WinMap       - Match windows by scaling and shifting each axis
+      ZoomMap      - Zoom coordinates about the origin
 \end{verbatim}
 \normalsize
 
@@ -17725,12 +17769,10 @@ interacted with the corresponding generic element (e.g.
 \end{enumerate}
 
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.8-13}
+\subsection{Changes Introduced in V1.8-13}
 
-The following describes the most significant changes which have
-occurred in the AST library between versions V1.8-8 and V1.8-13 (the
-current version):
+The following describes the most significant changes which occurred
+in the AST library between versions V1.8-8 and V1.8-13:
 
 \begin{enumerate}
 
@@ -17803,10 +17845,86 @@ f-
 
 \end{enumerate}
 
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V2.0}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.8-13 and V2.0 (the
+current version):
+
+\begin{enumerate}
+
+\item Support for spectral coordinate systems has been introduced
+throught the addition of two new classes, SpecFrame and SpecMap.
+The SpecFrame is a 1-dimensional Frame which can be used to describe
+positions within an electromagnetic spectrum in various systems
+(wavelength, frequency, various forms of velocity,~{\em{etc.}}) and referred
+to various standards of rest (topocentric, geocentric, heliocentric
+LSRK,~{\em{etc.}}). The SpecMap is a Mapping which can transform spectral
+axis values between these various systems and standards of rest.
+
+\item Facilities have been added to the Frame class which allow
+differences in axis units to be taken into account when finding a Mapping
+between two Frames. In previous versions of AST, the Unit attribute was a
+purely descriptive item intended only for human readers - changing the
+value of Unit made no difference to the behavour of the Frame. As of
+version 2.0, the Unit attribute can influence the nature of the Mappings
+between Frames. For instance, if the 
+c+
+astFindrame or astConvert
+c-
+f+
+AST_FINDRAME or AST_CONVERT
+f-
+method is used to find the Mapping between an Axis with Unit set to ``m''
+and another Axis with Unit set to ``km'', then the method will return a 
+ZoomMap which introduces a scaling factor of 0.001 between the two axes.
+These facilities assume that units are specified following the rules
+included in FITS-WCS paper I ({\em Representation of World
+Coordinates in FITS}, Greisen \& Calabretta).
+
+In order to minimise the risk of breaking existing software, the default 
+behaviour for simple Frames is to ignore the Unit attribute ({\em{i.e.}}
+to retain the previous behaviour). However, the new Frame method 
+c+
+astSetActiveUnit
+c-
+f+
+AST_SETACTIVEUNIT
+f-
+may be used to ``activate'' (or deactivate) the new facilities within a 
+specific Frame. Note, the new SpecFrame class is different to the simple
+Frame class in that the new facilities for handling units are always active
+within a SpecFrame. 
+ 
+\item The System and Epoch attributes fo the SkyFrame class have been
+moved to the parent Frame class. This enables all sub-classes of Frame
+(such as the new SpecFrame class) to share these attributes, and to provide
+suitable options for each class.
+
+\item The Frame class has a new attribute called AlignSystem, which allows 
+control over the alignment process performed by the methods 
+c+
+astFindFrame and astConvert.
+c-
+f+
+AST_FINDFRAME and AST_CONVERT.
+f-
+
+\item The algorithms used by the Plot class for determining when to omit
+overlapping axis labels, and the abbreviation of redundant leading fields 
+within sexagesimal axis labels, have been improved to avoid some anomolous
+behaviour in previous versions.
+
+\item The curve drawing algorithm used by the Plot class has been
+modified to reduce the chance of it ``missing'' small curve sections,
+such as may be produced if a grid line cuts across the plot very close to
+a corner. Previously, these missed sections could sometimes result in 
+axis labels being omitted.
+
+\end{enumerate}
+
 Programs which are statically linked will need to be re-linked in
 order to take advantage of these new facilities.
-
-
-
 
 \end{document}
