@@ -70,7 +70,7 @@ javadoc_check:
 javadocs:
 
 dist:
-     [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
+     [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
     [chmod] Result: -1
 
@@ -78,7 +78,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/bin/jsky
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
     [mkdir] Created dir: /apps/cvsbuild/star/docs/jsky
-[loggedcopy] Copying 2 files to /apps/cvsbuild/star/bin
+[loggedcopy] Copying 3 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 11 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 434 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copied 17 empty directories to /apps/cvsbuild/star/docs
@@ -283,7 +283,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 6, 2003 4:15:15 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 7, 2003 4:14:50 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -674,7 +674,8 @@ dist:
      [copy] Copying 24 files to /apps/cvsbuild/java/source/splat/bin/splat
      [copy] Copying 55 files to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/splat/etc/splat
-     [copy] Copying 3 files to /apps/cvsbuild/java/source/splat/docs/splat
+     [copy] Copying 434 files to /apps/cvsbuild/java/source/splat/docs/splat
+    [chmod] Result: -1
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
 install:
@@ -684,7 +685,9 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
 [loggedcopy] Copying 24 files to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 10 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 285 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 492 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 224 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 55 files to /apps/cvsbuild/star/etc
 [loggedcopy] Copied 1 empty directory to /apps/cvsbuild/star/etc
      [echo] Executing Mirage target: install
@@ -841,10 +844,10 @@ execute_mk_script:
      [exec]          ar x $f; \
      [exec]       fi;\
      [exec] done)
-     [exec] g77: temp/*.o: No such file or directory
      [exec] Processing 
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/java/source/..//lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
+     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -869,4 +872,4 @@ install:
 [loggedcopy] Copying 132 files to /apps/cvsbuild/star/docs
 
 BUILD SUCCESSFUL
-Total time: 48 seconds
+Total time: 46 seconds
