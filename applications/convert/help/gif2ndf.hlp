@@ -1,0 +1,55 @@
+1 GIF2NDF
+Converts a GIF file into an NDF.
+
+Usage:
+
+   gif2ndf in [out]
+
+Description:
+
+   This Bourne shell script converts a Graphics Interchange Format (GIF)
+   file into a 256 grey-level Starlink NDF image format file.
+   One or two-dimensional images can be handled.
+   The script uses various PBMPLUS utilities to produce a FITS file
+   and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
+   final NDF. Error messages are converted into Starlink style (preceded
+   by !).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+   IN = FILENAME (Read)
+      The name of the GIF file to be converted (without the .gif extension,
+      which is assumed).
+3 OUT
+   OUT = NDF (Write)
+      The name of the NDF to be generated (without the .sdf extension).
+      If the OUT parameter is omitted, the value of the IN parameter
+      is used.
+2 Examples
+gif2ndf old new
+   This converts the GIF file old.gif into an NDF called new
+   (in file new.sdf).
+
+gif2ndf horse
+   This converts the GIF file horse.gif into an NDF called horse
+   (in file horse.sdf).
+2 Notes
+This initial version of the script generates images with at 256 grey
+levels.  It does not use the image colour lookup table.
+
+Input image filenames must have the extension .gif.
+
+The PBMPLUS utilities giftopnm, ppmtopgm and pgmtofits
+must be available on your PATH.
+2 Related_Applications
+   CONVERT: NDF2GIF
+2 Authors
+MJC: M.J.Currie (Starlink - RAL)
+
+GJP: G.J.Privett (Starlink - UWCC)
+
+AJC: A.J.Chipperfield (Starlink - RAL)
+2 History
+ 28-NOV-1995 (AJC):
+    Original version
+    Based on work by MJC and GJP

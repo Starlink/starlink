@@ -1,0 +1,47 @@
+1 NDF2PGM
+Converts an NDF into a PBMPLUS-style PGM-format file.
+
+Usage:
+
+   ndf2pgm in out
+
+Description:
+
+   This application converts an NDF to a PBMPLUS PGM-format file.
+   The programme first finds the brightest and darkest pixel values
+   in the image.  It then uses these to determine suitable scaling
+   factors convert the image into an 8-bit representation.  These
+   are then to a simple greyscale PBMPLUS PGM file.
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+IN = NDF (Read)
+   The name of the input NDF data structure (without the .sdf
+   extension).  The suggested default is the current NDF if one
+   exists, otherwise it is the current value.
+3 OUT
+OUT = _CHAR (Read)
+   The name of the PGM file be generated.  The .pgm name
+   extension is added to any output filename that does not
+   contain it.
+2 Examples
+ndf2pgm old new
+   This converts the NDF called old (in file old.sdf) to the
+   PGM file new.pgm.
+
+ndf2pgm in=spectre out=spectre.pgm
+   This converts the NDF called spectre (in file spectre.sdf)
+   to the PGM file spectre.pgm.
+2 Authors
+GJP: Grant Privett (STARLINK)
+
+MJC: Malcolm J. Currie (STARLINK)
+2 History
+ 22-Nov-1995 (GJP)
+    Original version.
+
+ 1996 February 12 (MJC):
+    Tidied to standard style.
+2 Implementation_Status
+   Bad values in the data array are replaced with zero in the output
+   PGM file.

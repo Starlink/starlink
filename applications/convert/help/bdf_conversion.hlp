@@ -1,0 +1,6 @@
+1 BDF_conversion
+Conversion between the old Starlink INTERIM environment's BDF format 
+files and NDFs is available in the VMS release which may still be run
+on Starlink's residual VMS service machine (STADAT).
+
+The applications, BDF2NDF and NDF2BDF will not be ported to Unix.

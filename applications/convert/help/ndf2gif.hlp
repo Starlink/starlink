@@ -1,0 +1,64 @@
+1 NDF2GIF
+Converts an NDF into a GIF file.
+
+Usage:
+
+   ndf2gif in [out]
+
+Description:
+
+   This Bourne shell script converts a one or two-dimensional NDF into a 
+   256 grey-level Graphics Interchange Format (GIF) file.
+   One or two-dimensional images can be handled.
+   The script uses the CONVERT utility NDF2TIFF to produce a TIFF file
+   and then various PBMPLUS utilities to convert the TIFF file into a
+   GIF file.
+   Error messages are converted into Starlink style (preceded by !).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+   IN = NDF (Read)
+      The name of the input NDF (without the .sdf extension).
+3 OUT
+   OUT = FILENAME (Write)
+      The name of the GIF file to be generated (without the .gif extension,
+      which is appended).
+      If this is omitted, the value of the IN parameter is used.
+2 Examples
+ndf2gif old new
+   This converts the NDF called old (in file old.sdf)
+   into a GIF file {\tt new.gif}
+
+ndf2gif horse
+   This converts the NDF called horse (in file old.sdf)
+   into a GIF file horse.gif.
+2 Notes
+This initial version of the script handles only 256 grey levels
+and does not use the image colour lookup table so absolutes data
+values may be lost.
+
+The PBMPLUS utilities {\tt tifftopnm} and {\tt ppmtogif}
+must be available on your PATH.
+2 Related_Applications
+   CONVERT: GIF2NDF
+2 Authors
+MJC: M.J.Currie (Starlink - RAL)
+
+GJP: G.J.Privett (Starlink - UWCC)
+
+AJC: A.J.Chipperfield (Starlink - RAL)
+2 History
+ 24-NOV-1995 (GJP):
+    Original version.
+
+ 13-NOV-1995 (AJC):
+    Add default output file
+    Add error reporting and exit at each stage.
+2 Bugs
+   At the time of writing, this utility does not work on alpha OSF/1
+   due to a problem with tifftopnm in the standard release of 
+   PBMPLUS. OSF/1 users should use a copy of tifftopnm obtained from 
+   Netpbm which is based on PBMPLUS but contains many improvements and
+   additions. A suitable version may be obtained via WWW at
+   http://www.astro.cf.ac.uk/pub/Grant.Privett/. Alternatively, contact
+   Grant Privet, gjp@astronomy.cardiff.ac.uk.

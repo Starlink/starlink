@@ -1,0 +1,73 @@
+1 TIFF2NDF
+Converts a TIFF format file into a 256 grey level NDF.
+
+Usage:
+
+   tiff2ndf in [out]
+
+Description:
+
+   This Bourne shell script converts a 256 grey-level or b/w dithered
+   Tag Image File Format (TIFF) into a Starlink NDF image format file.
+   One or two-dimensional images can be handled.
+   The script uses various PBMPLUS utilities to produce a FITS file
+   and then KAPPA applications FITSDIN, MATHS and FLIP to produce the
+   final NDF. Error messages are converted into Starlink style (preceded
+   by !).
+2 Parameters
+For information on individual parameters, select from the list below:
+3 IN
+   IN = FILENAME (Read)
+      The name of the TIFF file to be converted (without the .tif extension,
+      which is assumed).
+3 OUT
+   OUT = NDF (Write)
+      The name of the NDF to be generated (without the .sdf extension).
+      If the OUT parameter is omitted, the value of the IN parameter
+      is used.
+2 Examples
+tiff2ndf old new
+   This converts the TIFF file old.tif into an NDF called old
+   (in file old.sdf).
+
+tiff2ndf horse
+   This converts the TIFF file horse.tif into an NDF called horse
+   (in file horse.sdf).
+2 Notes
+   This initial version of the script handles only greyscale
+   or b/w dithered images. Users are responsible for conversion
+   of their images to this format prior to use. This ensures that
+   the user is responsible for converting RGB values to brightness
+   values.
+
+   Input image file names must have the extension .tif
+
+   The PBMPLUS utilities tifftopnm, ppmtopgm and pgmtofits must
+   be available on your PATH.
+2 Related_Applications
+   CONVERT: NDF2TIFF
+2 Authors
+MJC: M.J.Currie (Starlink - RAL)
+
+GJP: G.J.Privett (Starlink - UWCC)
+
+AJC: A.J.Chipperfield (Starlink - RAL)
+2 History
+ 10-AUG-1995 (MJC):
+    Original version (GIFs).
+
+ 02-NOV-1995 (GJP):
+    Converted to TIFF requirements from GIF.
+
+ 13-NOV-1995 (AJC):
+    Added fileout parameter.
+    Added error reporting and exit at each stage.
+    Use long temporary filenames.
+2 Bugs
+   At the time of writing, this utility does not work on alpha OSF/1
+   due to a problem with tifftopnm in the standard release of 
+   PBMPLUS. OSF/1 users should use a copy of tifftopnm obtained from 
+   Netpbm which is based on PBMPLUS but contains many improvements and
+   additions. A suitable version may be obtained via WWW at
+   http://www.astro.cf.ac.uk/pub/Grant.Privett/. Alternatively, contact
+   Grant Privet, gjp@astronomy.cardiff.ac.uk.
