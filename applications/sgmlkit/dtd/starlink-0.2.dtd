@@ -155,6 +155,23 @@
 -->
 <!entity % req.abstract "abstract?,"	-- optional abstract -->
 
+<!--
+  Express a link policy on certain elements.  Those elements which
+  have %export.id.required have both the ID element and the EXPORT as
+  required attributes.  ID is, of course, a unique ID for this
+  section, figure, or whatever.  If EXPORT is present, then the
+  document commits itself to maintaining this ID in future: that is,
+  it can safely be linked to from outside.
+
+  If an element has %export.id.optional in its attribute list, then it
+  may specify an ID, and it may export it, but neither is required.
+-->
+<!entity % export.id.required "
+	id id #required
+	export (export) #required">
+<!entity % export.id.optional "
+	id id #implied
+	export (export) #implied">
 
 <!--=========== Feature Switches ==========-->
 <!--
@@ -217,12 +234,13 @@
   There's a feature here I don't understand.  I had thought that the
   appropriate way to switch between entity sets (for LaTeX or HTML
   output) was to use SDATA entities.  However, when I do that - doing
-  something like <!entity copy   SDATA "(c)">, what comes out the back
-  of Jade is what looks like a multibyte character reference &#65533,
-  independently of what I have in the actual SDATA entity
-  declaration.  I can't find any enlightenment in Goldfarb, either.
-  The entities are therefore currently defined using CDATA character
-  entities.
+  something like <!entity copy SDATA "(c)">, what emerges from the
+  Jade Transform back-end is what looks like a multibyte character
+  reference &#65533, independently of what I have in the actual SDATA
+  entity declaration.  The LaTeX-Transform back-end I wrote emits
+  SDATA entity content verbatim.  I can't find any enlightenment in
+  Goldfarb, either; the HTML entities are therefore currently defined
+  using CDATA character entities.  
 -->
 
 <!entity % LaTeX.entities 'IGNORE'>
@@ -516,7 +534,7 @@
 			   text. -->
 
 <!--========== Document body ==========-->
-<!entity % body.content '(p | verbatim)*'>
+<!entity % body.content '(p | table | figure | verbatim)*'>
 
 <!--
   I'm don't think we need to have the bibliography, indexcontents
@@ -559,9 +577,6 @@
 
 <!--========== Sectioning ==========-->
 
-<!entity % section 
-	"sect | subsect | subsubsect | subsubsubsect">
-
 <!--
 <!element PART          - o (subhead, %body.content, sect*)>
 ...and add `part|' to the %section list
@@ -573,47 +588,18 @@
 
 <!element APPENDICES	- o (%appendix.content;)>
 
-<!--
-  The attributes listed here for %section are a minimal set.  Other
-  possibilities, which were used in the HYPAPER DTD which was a
-  precursor to this one, are
-	extname	cdata		#implied
-	- External name, which can be used to refer to this
-	place reliably from elsewhere.  It'll almost
-	certainly be a filename root!  This is, I hope, redundant, as
-	I expect to use something like HyTime to provide
-	inter-document cross references.
-
-	number	(nonumber)	#implied
-	- numbering can be explicitly turned off for certain
-	elements.  This is creeping presentationalism, and probably
-	best avoided, as my experience with HYPAPER suggests that I
-	only ever used it in a hacky way, to suggest some structure
-	which should be otherwise present in the DTD.
-
-	size	%body.sizes	#implied
-	- This controlled the number of subsections which were broken
-	off into separate pages, depending on whether
-	size=(vshort|thispage|short|onepage|long|vlong)
-	Calling it `size' is better than the explicit presentation
-	hint of a subpages=n attribute, but it's still seems to be a
-	presentational relic.  Depite that, there might still be some
-	need for something like this, bearing in mind the likely (HTML)
-	destination of the material.
--->
-<!attlist (%section)
-	id			-- unique ID for this section --
-		id
-		#implied
+<!attlist (sect | subsect)
+	%export.id.required;
 	indexkey 		-- contains the text of an index entry
 				   which points to this section -- 
 		cdata
 		#implied
-	export			-- if present, the document commits
-				   itself to maintaining this ID in
-				   future: that is, it can safely be
-				   linked to from outside --
-		(export)
+	>
+<!attlist (subsubsect | subsubsubsect)	
+	%export.id.optional;
+	indexkey 		-- contains the text of an index entry
+				   which points to this section -- 
+		cdata
 		#implied
 	>
 
@@ -650,10 +636,11 @@
 
 <!--========== Paragraphs, and the flow of text ==========-->
 
+<!-- see %body.content above -->
 <!entity % simplephrase	"em | strong | quote | code | kbd | cite">
 <!entity % references	"ref | docxref | webref | url">
 <!entity % special	"index | note | draftnote | citation">
-<!entity % structuring	"blockquote | table | figure | dl | ul | ol">
+<!entity % structuring	"blockquote | dl | ul | ol">
 <!entity % phrase	"%simplephrase | %references">
 <!--
   I think this is too general a definition for simpletext:
@@ -1071,9 +1058,10 @@
   the TABLE.
 -->
 <!entity % titles 'caption'>
+<!entity % tbl.entry.mdl '(#pcdata | %phrase)*'>
 <!entity % tbl.table.att 
 	'pgwide number	#implied
-	 id	id	#implied'>
+	%export.id.optional; '>
 <!entity % calstbls public "-//OASIS//DTD Exchange Table Model 19960430//EN">
 %calstbls;
 
@@ -1084,6 +1072,9 @@
   typically, will contain a list of entities, with associated notations.
   The down-converter should scan this list, and incorporate that image format
   which is most suitable.
+
+  The entities will be declared using a declaration such as:
+  <!entity figure.test system "file.eps" ndata eps>
 -->
 <!entity % figure.model '%update caption, figurecontent'>
 <!entity % figurecontent.model 'px+'>
@@ -1093,9 +1084,7 @@
 	float		-- may it be unanchored from its position? --
 		(float|nofloat)
 		nofloat
-	id		-- anchor for reference to this figure --
-		id
-		#implied
+	%export.id.optional;
 	>
 <!attlist FIGURECONTENT	
 	image		-- entity list for figure content --
