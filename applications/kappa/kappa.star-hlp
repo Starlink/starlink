@@ -7249,6 +7249,16 @@ INFO = _LOGICAL (Read)
    mouse prior to obtaining the first position. Note, these
    informational messages are not suppressed by setting parameter
    QUIET to TRUE. [TRUE]
+3 JUST 
+JUST = LITERAL (Read)
+   A string specifying the justification to be used when displaying text
+   strings at the supplied cursor positions. This parameter is only
+   accessed if parameter PLOT is set to "Text". The supplied string
+   should contain two characters; the first should be "B", "C" or "T",
+   meaning bottom, centre or top. The second should be "L", "C" or "R",
+   meaning left, centre or right. The text is displayed so that the
+   supplied position is at the specified point within the displayed text
+   string. [CC]
 3 LASTDIM
 LASTDIM = _INTEGER (Write)
    The number of axis values written to parameter LASTPOS.
@@ -7361,8 +7371,8 @@ PLOT = LITERAL (Read)
 
    - "Cross" -- A combination of "Vline" and "Hline".
 
-   - "Text" -- A text string is used to mark each position. The string
-   is drawn horizontally and is centred on the specified position.
+   - "Text" -- A text string is used to mark each position. The string is
+   drawn horizontally with the justification specified by parameter JUST.
    The strings to use for each position are specified using parameter
    STRINGS.
 
@@ -17200,6 +17210,15 @@ GEODESIC = LOGICAL (Read)
 INCAT = FILENAME (Read)
    A catalogue containing a positions list such as produced by
    applications LISTMAKE, CURSOR, etc.
+3 JUST 
+JUST = LITERAL (Read)
+   A string specifying the justification to be used when displaying text
+   strings at the supplied positions. This parameter is only accessed if
+   parameter PLOT is set to "Text". The supplied string should contain
+   two characters; the first should be "B", "C" or "T", meaning bottom,
+   centre or top. The second should be "L", "C" or "R", meaning left,
+   centre or right. The text is displayed so that the supplied position
+   is at the specified point within the displayed text string. [CC]
 3 LABEL
 LABEL = LOGICAL (Read)
    If TRUE the positions are labelled with the corresponding integer
@@ -17282,8 +17301,8 @@ PLOT = LITERAL (Read)
 
    - "Cross" -- A combination of "Vline" and "Hline".
 
-   - "Text" -- A text string is used to mark each position. The string
-   is drawn horizontally and is centred on the specified position.
+   - "Text" -- A text string is used to mark each position. The string is
+   drawn horizontally with the justification specified by parameter JUST.
    The strings to use for each position are specified using parameter
    STRINGS.
 
