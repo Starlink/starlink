@@ -1,7 +1,8 @@
 <!DOCTYPE programcode public "-//Starlink//DTD DSSSL Source Code 0.2//EN">
+<![ ignore [ $Id$ ]]>
 
 <docblock>
-<title>Tables
+<title>HTML Tables
 <description>The Starlink General DTD uses the OASIS Exchange Table
 Model subset of the CALS table model (see
 <url>http://www.oasis-open.org/html/a503.htm</url> for discussion and
