@@ -6,7 +6,7 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocnumber}    {55.5}
 \newcommand{\stardocauthors}   {Malcolm J. Currie}
-\newcommand{\stardocdate}      {1993 November 23}
+\newcommand{\stardocdate}      {1994 March 4}
 \newcommand{\stardoctitle}     {CONVERT --- A Format-conversion Package}
 %------------------------------------------------------------------------------
 
@@ -594,11 +594,9 @@ If the brackets contain a value in teletype-fount, this is the explicit
 default value.
 \end{description}
 
-\newpage
 \small
 \newpage
 
-\newpage
 \sstroutine{
    ASCII2NDF
 }{
@@ -1369,6 +1367,13 @@ default value.
       \sstitemlist{
 
          \sstitem
+         It is only available on VMS, SunOS, and Ultrix systems.  On
+         Solaris 2.3 systems the version built on SunOS can be used in
+         compatibility mode, but there is no guarantee that this will
+         work for all IRAF images.  At the time of writing there was no
+         working IRAF imfort library available for Alpha/OSF1.
+
+         \sstitem
          Only handles one-, two-, and three-dimensional IRAF files.
 
          \sstitem
@@ -1569,7 +1574,6 @@ default value.
    }
 }
 
-\newpage
 \newpage
 \sstroutine{
    NDF2ASCII
@@ -2355,6 +2359,13 @@ default value.
       \sstitemlist{
 
          \sstitem
+         It is only available on VMS, SunOS, and Ultrix systems.  On
+         Solaris 2.3 systems the version built on SunOS can be used in
+         compatibility mode, but there is no guarantee that this will
+         work for all NDFs.  At the time of writing there was no working
+         IRAF imfort library available for Alpha/OSF1.
+
+         \sstitem
          Only handles one-, two-, and three-dimensional NDFs.
 
          \sstitem
@@ -2378,7 +2389,6 @@ default value.
    }
 }
 
-\newpage
 \newpage
 \sstroutine{
    NDF2UNF
@@ -2569,7 +2579,6 @@ default value.
    }
 }
 
-\newpage
 \newpage
 \sstroutine{
    UNF2NDF
@@ -2810,7 +2819,9 @@ UNIX platforms.  There are four new commands.
 
      \item IRAF2NDF and NDF2IRAF are currently not available under OSF/1
            and Solaris, because at the time of development there were no
-           IRAF IMFORT libraries released for these platforms.
+           IRAF IMFORT libraries available for these platforms.  However,
+           the SunOS versions are provided for use in the compatibility
+           mode of Solaris 2.3.
   \end{itemize}
 
   \item  CONHELP runs an application on UNIX platforms and accesses a
