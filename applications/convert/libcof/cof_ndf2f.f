@@ -187,6 +187,7 @@
       INTEGER BPOUTU             ! Output array's BITPIX unsigned
                                  ! version
       DOUBLE PRECISION BSCALE    ! Block-integer scale factor
+      CHARACTER * ( 200 ) BUFFER ! Buffer for error messages
       DOUBLE PRECISION BZERO     ! Block-integer offset
       INTEGER DIMS( NDF__MXDIM ) ! NDF dimensions (axis length)
       INTEGER EL                 ! Number of elements in array
@@ -202,6 +203,7 @@
       DOUBLE PRECISION MINV      ! Min. value to appear in scaled array
       INTEGER NBYTES             ! Number of bytes per array value
       INTEGER NC                 ! Number of character in string
+      INTEGER NCF                ! Number of characters in filename
       INTEGER NDECIM             ! Number of decimal places in header
                                  ! value
       INTEGER NDIM               ! Number of dimensions
@@ -240,6 +242,9 @@
 *  Open the FITS file.
       CALL FTINIT( FUNIT, FILNAM, BLOCKF, FSTAT )
 
+*  Get the length of the filename.
+      NCF = CHR_LEN( FILNAM )
+
 *  Handle a bad status.  Negative values are reserved for non-fatal
 *  warnings.  To simplify the error message, test to see if the file
 *  exists, and if it does make a shorter report (note that the status
@@ -249,16 +254,17 @@
          INQUIRE( FILE=FILNAM, EXIST=FEXIST )
          IF ( FEXIST ) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'COF_NDF2F_FILEEXIST',
-     :        'Error creating the output FITS file '/
-     :        /FILNAM( :CHR_LEN( FILNAM ) )//' because it already '/
-     :        /'exists.', STATUS )
+            BUFFER = 'Error creating the output FITS file '/
+     :               /FILNAM( :NCF )//' because it already exists.'
+            CALL MSG_SETC( 'BUF', BUFFER )
+            CALL ERR_REP( 'COF_NDF2F_FILEEXIST', '^BUF', STATUS )
             CALL FTCMSG
 
          ELSE
+            BUFFER = 'Error creating the output FITS file '/
+     :               /FILNAM( :NCF )//'.'
             CALL COF_FIOER( FSTAT, 'COF_NDF2F_OPENERR', 'FTINIT',
-     :        'Error creating the output FITS file '/
-     :        /FILNAM( :CHR_LEN( FILNAM ) )//'.', STATUS )
+     :                      BUFFER, STATUS )
          END IF
          OPEN = .FALSE.
          GOTO 999
@@ -663,10 +669,11 @@
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
                NC = CHR_LEN( ARRNAM( ICOMP ) )
+               BUFFER = 'Error writing '//ARRNAM( ICOMP )( :NC )/
+     :                  /' array component to FITS file '/
+     :                  /FILNAM( :NCF )//'.'
                CALL COF_FIOER( FSTAT, 'COF_NDF2F_WRDATAERR', 'FTPPNx',
-     :           'Error writing '//ARRNAM( ICOMP )( :NC )//' array '/
-     :           /'component to FITS file '/
-     :           /FILNAM( :CHR_LEN( FILNAM ) )//'.', STATUS )
+     :                         BUFFER, STATUS )
                GOTO 999
             END IF
 
@@ -699,10 +706,11 @@
 *  warnings.
             IF ( FSTAT .GT. FITSOK ) THEN
                NC = CHR_LEN( ARRNAM( ICOMP ) )
+               BUFFER = 'Error writing '//ARRNAM( ICOMP )( :NC )/
+     :                  /' array component to FITS file '/
+     :                  /FILNAM( :NCF )//'.'
                CALL COF_FIOER( FSTAT, 'COF_NDF2F_WRDATAERR', 'FTPPRx',
-     :           'Error writing '//ARRNAM( ICOMP )( :NC )//' array '/
-     :           /'component to FITS file '/
-     :           /FILNAM( :CHR_LEN( FILNAM ) )//'.', STATUS )
+     :                         BUFFER, STATUS )
                GOTO 999
             END IF
 
@@ -774,9 +782,13 @@
       IF ( OPEN ) THEN
          CALL FTCLOS( FUNIT, FSTATC )
          IF ( FSTATC .GT. FITSOK ) THEN
-            CALL COF_FIOER( FSTATC, 'COF_NDF2F_CLOSE', 'FTCLOS',
-     :        'Error closing the FITS file '//FILNAM, STATUS )
+            BUFFER = 'Error closing the FITS file '//FILNAM( :NCF )//'.'
+            CALL COF_FIOER( FSTATC, 'COF_NDF2F_CLOSE', 'FTCLOS', BUFFER,
+     :                      STATUS )
          END IF
       END IF
+
+*  Release the logical-unit.
+      CALL FIO_GUNIT( FUNIT, STATUS )
 
       END
