@@ -36,6 +36,10 @@ ident_string='Starlink SGML Kit, release ((PKG_VERS))'
 #           directory called `my-dir'.
 #     <dt>--tarball my.tar<dd>bundle the package-dir into a tarball named `my.tar'
 #     <dt>--jadeflags flags<dd>add the given flags to the invocation of Jade.
+#     <dt>--ignore-manifest<dd>Do not use the generated manifest when
+#           bundling up files, but instead just bundle everything in
+#           sight.  You will need to use this only if there is some
+#           bug in the mechanism which generates the manifest.
 #     <dt>--options opt,opt,...<dd>set format-specific options.
 #     <dt>--help<dd>display usage and exit.
 #     <dt>--version<dd>display version and exit.
@@ -103,6 +107,7 @@ TARGETFORMAT=0			# html
 OPTIONS=
 
 DEBUGGING=false
+USEMANIFEST=true
 run=
 runn=
 tempdest=tmp.stamp
@@ -126,6 +131,7 @@ trap tidy-up 0
 
 USAGE="Usage: $0 [--latex] [--html] [--htmlsingle]\
 	[--packagedir directory] [--tarball file.tar] [--jadeflags flags]\
+	[--ignore-manifest]\
 	[--help] [--debug] [--version] [-n]\
 	[--options]\
 	sgml-file\
@@ -143,6 +149,8 @@ while [ $# -gt 0 ]; do
 	--jadeflags) JADEFLAGS="$JADEFLAGS $2"; shift ;;
 	--debug) DEBUGGING=true ;;
 	--options) OPTIONS=$2; shift ;;
+	--ignore-manifest) USEMANIFEST=false ;;
+	  # undocumented -- use when manifest-generation is buggy
 	--help) echo $USAGE; exit 0;;
 	--version) echo $ident_string; echo $RCSID; exit 0;;
 	-n) run=echo; runn=: ; tempdest=/dev/stdout; ;;
@@ -270,7 +278,13 @@ if [ $TARGETFORMAT -eq 0 ]; then
 
     # create the file named MANIFEST, removing duplicates (ie, some gifs)
     # from generated manifest file
-    test -r HTML.manifest && sort HTML.manifest | uniq > MANIFEST
+    if $USEMANIFEST; then
+	test -r HTML.manifest && sort HTML.manifest | uniq > MANIFEST
+    else
+	# just scoop everything up
+	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
+    fi
+	
 
 elif [ $TARGETFORMAT -eq 1 ]; then
     # Generate LaTeX
@@ -307,7 +321,11 @@ elif [ $TARGETFORMAT -eq 1 ]; then
 	    $DECL $SGMLSRC \
 	    > $tempdest
 
-    test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
+    if $USEMANIFEST; then
+	test -r LaTeX.manifest && ln -s LaTeX.manifest MANIFEST
+    else
+	find . -maxdepth 1 -type f ! -name MANIFEST > MANIFEST
+    fi
 
 else
 
