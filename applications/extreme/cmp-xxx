@@ -1,5 +1,62 @@
 #!/usr/bin/perl -w
 
+#+
+#  Name:
+#     cmp-xxx
+#
+#  Purpose:
+#     Compare filtered source with original for unwanted changes.
+#
+#  Usage:
+#     cmp-xxx file [ newfile ]
+#
+#  Language:
+#     Perl
+#
+#  Description:
+#     This script checks an original source code file against a version
+#     of it run through the one of the source code filter programs in
+#     the EXTREME package.  It should be invoked under the name `cmp-xxx'
+#     check the effects of the filter `xxx'.
+#
+#     The available filters xxx are:
+#        - inscnf -- Wrap %VAL invocations in CNF_PVAL calls
+#        - crepint -- Change int type to INT_BIG in C
+#        - frepint -- Change INTEGER to INTEGER * 8 in Fortran
+#
+#     If a file containing the filtered source code already exists, it 
+#     can be given as the second command-line argument, otherwise the
+#     file given as the first command-line argument will be run through
+#     the appropriate filter before the comparison is made.
+#
+#     The script uses its knowledge of the changes made by each of the 
+#     filters to identify changes which are unexpected.  The idea is to
+#     serve as a check that the the source code filter program itself 
+#     has not made a mistake.  The parsing done by this script is much 
+#     less careful than that done by the filters, so it may make 
+#     mistakes - apparent discrepancies reported by this script should
+#     be investigated, but may well not indicate genuine problems.
+#
+#     If an apparent discrepancy is found, the script prints the
+#     first line from each file in which a discrepancy exists.
+#     The text printed is not the text as it appears in the files, but 
+#     a version mangled by this program for comparison - whitespace, 
+#     formatting, and other things may have been changed.  The printed 
+#     text should however make it easy enough to find the relevant point 
+#     in the input file.
+#
+#     If there is an apparent discrepancy the exit status of the program
+#     will be non-zero; if the files match then there is no output and
+#     exit status is zero.
+#
+#  Authors:
+#     MBT: Mark Taylor (Starlink)
+#
+#  History:
+#     1-MAR-2000 (MBT):
+#        Initial version.
+#-
+
 #  Get filename.
       my( $name ) = $0;
       $name =~ s%^.*/%%;
@@ -7,7 +64,6 @@
 #  Get name of filter.
       my( $filter ) = $name;
       $filter =~ s/cmp-//;
-      $filter =~ s/\.pl//;
 
 #  Open.
       if ( @ARGV < 1 || @ARGV > 2 ) {
@@ -20,7 +76,8 @@
       }
       else {
          my( $cmd ) = "$filter $f1";
-         open( F2, "$cmd |" ) or die( "Failed to pipe from '$cmd'\n" );
+         open( F2, "$cmd 2>/dev/null |" ) 
+            or die( "Failed to pipe from '$cmd'\n" );
       }
 
 #  Get normalised text.
@@ -48,9 +105,6 @@
    exit;
 
 
-#  Fortran normalisation routine.  Gets rid of continuation lines, 
-#  spaces, and (most) CNF_PVAL invocations.
-
 
 #  Normalisation routine.  Depending on the name of the filter which 
 #  has operated on the file, it basically removes syntactically 
@@ -72,11 +126,12 @@
       }
 
 #  frepint: Gets rid of continuation lines, spaces, and changes INTEGER*8
-#  to INTEGER.
-#  Also removes INT__ local constant declarations and undoes INT__ use.
+#  to INTEGER.  Also removes INT__ local constant declarations and undoes 
+#  INT__ use.
       elsif ( $filter =~ /frepint/ ) {
-         s/\n\* *Local constants for use as actual arguments:*\n.*?\n *\n/\n/sig;
+         s/\n\* *Local constants for use as actual arguments:*\n(.*INT__.*\n)+//ig;
          s/^\t/      /mg;
+         s/\n[^\*cCdD!\n]....[^ 0] *(int__)?([0-9]+)/$2/ig;  # don't ask
          s/int__//ig;
          s/\n[^\*cCdD!\n]....[^ 0]//g;
          s/^([ \t]*integer) *\* *8/$1/mig;
