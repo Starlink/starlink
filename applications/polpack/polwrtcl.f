@@ -657,7 +657,7 @@
       IF( EPOCH .NE. ' ' ) THEN
          CALL CHR_APPND( EPOCH, TEXT, IAT )
       ELSE
-         CALL CHR_APPND( EPOCH, '" "', IAT )
+         CALL CHR_APPND( '""', TEXT, IAT )
       END IF
       CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
 
@@ -673,7 +673,7 @@
          IF( COLNM .NE. ' ' ) THEN
             CALL CHR_APPND( COLNM, TEXT, IAT )
          ELSE 
-            CALL CHR_APPND( COLNM, '""', IAT )
+            CALL CHR_APPND( '""', TEXT, IAT )
          END IF
          CALL FIO_WRITE( FD, TEXT( : IAT ), STATUS )
       END DO
