@@ -1,4 +1,4 @@
-#
+#  PWD: edits for various  set $variable $value" bugs
 # Calendar
 # ----------------------------------------------------------------------
 # Implements a calendar widget for the selection of a date.  It displays
