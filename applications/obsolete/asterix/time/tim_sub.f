@@ -1035,3 +1035,12 @@
       END IF
 
       END
+
+
+      BLOCK DATA TIM_BLK
+
+      INCLUDE 'TIM_CMN'
+
+      DATA T_OPEN/.FALSE./
+
+      END
