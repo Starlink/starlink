@@ -80,6 +80,8 @@
 *  History:
 *     14 Feb 1995 (DJA):
 *        Original version.
+*     24 Jul 1995 (DJA):
+*        Added test to see if input is primitive.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -110,6 +112,7 @@
       CHARACTER*(DAT__SZLOC)	ILOC			! Input object
       CHARACTER*(DAT__SZLOC)	OLOC			! Output object
 
+      LOGICAL			IPRIM			! Input is primitive?
       LOGICAL			THERE			! Exists in input?
 *.
 
@@ -122,24 +125,32 @@
 *  Extract first locator
       CALL ADI1_GETLOC( ARGS(1), ILOC, STATUS )
 
-*  History exists?
-      CALL DAT_THERE( ILOC, 'HISTORY', THERE, STATUS )
-      IF ( THERE ) THEN
+*  Is input primitive?
+      CALL DAT_PRIM( ILOC, IPRIM, STATUS )
+      IF ( .NOT. PRIM ) THEN
 
-*    Extract output locator
-        CALL ADI1_GETLOC( ARGS(2), OLOC, STATUS )
-
-*    Delete existing history in output
-        CALL DAT_THERE( OLOC, 'HISTORY', THERE, STATUS )
+*    History exists?
+        CALL DAT_THERE( ILOC, 'HISTORY', THERE, STATUS )
         IF ( THERE ) THEN
-          CALL DAT_ERASE( OLOC, 'HISTORY', STATUS )
+
+*      Extract output locator
+          CALL ADI1_GETLOC( ARGS(2), OLOC, STATUS )
+
+*      Delete existing history in output
+          CALL DAT_THERE( OLOC, 'HISTORY', THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL DAT_ERASE( OLOC, 'HISTORY', STATUS )
+          END IF
+
+*      Copy that component
+          CALL DAT_FIND( ILOC, 'HISTORY', HLOC, STATUS )
+          CALL DAT_COPY( HLOC, OLOC, 'HISTORY', STATUS )
+          CALL DAT_ANNUL( HLOC, STATUS )
+
+*    End of input history present test
         END IF
 
-*    Copy that component
-        CALL DAT_FIND( ILOC, 'HISTORY', HLOC, STATUS )
-        CALL DAT_COPY( HLOC, OLOC, 'HISTORY', STATUS )
-        CALL DAT_ANNUL( HLOC, STATUS )
-
+*  End of primitive test
       END IF
 
 *  Report any errors
