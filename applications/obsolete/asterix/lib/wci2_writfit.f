@@ -102,7 +102,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Write the keywords
-      CALL WCI2_WRITE_HDU( ARGS(2), ' ', ARGS(3), ARGS(4),
+      CALL WCI2_WRITE_HDU( ARGS(2), 'PRIMARY', ARGS(3), ARGS(4),
      :                     ARGS(5), STATUS )
 
 *  Result is null
@@ -257,32 +257,35 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Locate the named HDU
-      CALL ADI2_FNDHDU( FID, HDU, HDUID, STATUS )
+      CALL ADI2_FNDHDU( FID, HDU, .TRUE., HDUID, STATUS )
+      IF ( STATUS .EQ. SAI__OK ) THEN
 
-*  Get coordinate system details
-      IF ( SYSID .NE. ADI__NULLID ) THEN
+*    Get coordinate system details
+        IF ( SYSID .NE. ADI__NULLID ) THEN
 
-*    Get system name
-        CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
-        CALL ADI2_HPKYC( HDUID, 'RADECSYS', SYS,
-     :                    'World coordinate system', STATUS )
+*      Get system name
+          CALL ADI_CGET0C( SYSID, 'NAME', SYS, STATUS )
+          CALL ADI2_HPKYC( HDUID, 'RADECSYS', SYS,
+     :                     'World coordinate system', STATUS )
 
-*    Get equinox
-        CALL ADI_CGET0R( SYSID, 'EQUINOX', EQNX, STATUS )
-        CALL ADI2_HPKYR( HDUID, 'EQUINOX', EQNX,
+*      Get equinox
+          CALL ADI_CGET0R( SYSID, 'EQUINOX', EQNX, STATUS )
+          CALL ADI2_HPKYR( HDUID, 'EQUINOX', EQNX,
      :                    'Epoch of mean equator & equinox', STATUS )
 
-*    Epoch. Don't write if default was supplied
-        CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
-        IF ( EPOCH .NE. WCI__FLAG ) THEN
-          CALL ADI2_HPKYD( HDUID, 'MJD-OBS', SLA_EPJ2D( EPOCH ),
+*      Epoch. Don't write if default was supplied
+          CALL ADI_CGET0D( SYSID, 'EPOCH', EPOCH, STATUS )
+          IF ( EPOCH .NE. WCI__FLAG ) THEN
+            CALL ADI2_HPKYD( HDUID, 'MJD-OBS', SLA_EPJ2D( EPOCH ),
      :                      'MJD of observation', STATUS )
+          END IF
+
         END IF
 
-      END IF
+*    Release the HDU
+        CALL ADI_ERASE( HDUID, STATUS )
 
-*  Release the HDU
-      CALL ADI_ERASE( HDUID, STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) THEN
