@@ -136,36 +136,37 @@
         PARAMETER		( VERSION = 'CROSSCORR Version V2.0-0' )
 
 *  Local Variables:
-      CHARACTER*80           STRING          ! Text string
-      CHARACTER*80           TEXT(10)        ! History text
+      CHARACTER*80           	STRING          	! Text string
+      CHARACTER*80           	TEXT(10)        	! History text
 
-      REAL                   BASE            ! Axis base value
-      REAL                   OSCALE           ! Axis scale value
-      REAL                   SCALE(2)
+      REAL                   	BASE            	! Axis base value
+      REAL                   	OSCALE           	! Axis scale value
+      REAL                   	SCALE(2)
       REAL			SPARR(2)		! Spaced array data
       REAL                   	VMIN,VMAX       	! Min and max variance values
 
-      INTEGER                I
-      INTEGER                XCPTR           ! Pointer to cross-correln values
-      INTEGER                ND              ! No. of data points used
-      INTEGER                LMAX            ! Maximum lag to be computed
-      INTEGER                NL              ! Total number of lag values
-      INTEGER                NDIM            ! Dimensionality of data
-      INTEGER                NBAD            ! No.of bad quality data
-      INTEGER                NLINE           ! Line no. of HISTORY text
-      INTEGER                TEXTLEN         ! Length of text string
-
       LOGICAL			AOK(2)			! Axis data ok?
+      INTEGER			APTR			! Input axis data
       INTEGER                   BF                      ! The base file number
       INTEGER                   DPTR(2)                 ! Mapped input data
+      INTEGER                	I			!
       INTEGER                   IFID(2)                 ! Input identifiers
+      INTEGER                	LMAX            	! Maximum lag to be computed
+      INTEGER                	NBAD            	! No.of bad quality data
+      INTEGER                	ND              	! No. of data points used
+      INTEGER                	NDIM            	! Dimensionality of data
       INTEGER                   NELM(2)                 ! # points per input
+      INTEGER                	NL              	! Total number of lag values
+      INTEGER                	NLINE           	! Line no. of HISTORY text
       INTEGER                   QPTR                    ! Input quality pointer
+      INTEGER                	TEXTLEN         	! Length of text string
       INTEGER                   VPTR(2)                 ! Mapped input errors
       INTEGER			XCID			! Output dataset id
+      INTEGER                	XCPTR           	! Pointer to cross-correln values
 
       LOGICAL                   DENOISE                 ! Noise variance removed?
       LOGICAL                   OK                      ! Present & correct?
+      LOGICAL			REG			! Axis data is regular?
       LOGICAL                   VOK(2)                  ! Variances ok?
       LOGICAL                   WEIGHT                  ! Weighted cross-correlation?
 *.
@@ -277,7 +278,8 @@
           DO I = 1, 2
 
 *        Map the variances
-            CALL BDI_MAPR( IFID(I), 'Variance', 'READ', VPTR(I), STATUS )
+            CALL BDI_MAPR( IFID(I), 'Variance', 'READ', VPTR(I),
+     :                     STATUS )
 
 *        Get their range
             CALL ARR_RANG1R( ND, %VAL(VPTR(I)), VMIN, VMAX, STATUS )
