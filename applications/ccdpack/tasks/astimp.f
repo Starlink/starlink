@@ -29,7 +29,7 @@
 *     added domain is made the Current domain of the WCS components.
 *
 *     AST files for use by this application are intended to be those 
-*     written by the REGISTER application, but with care frameset files
+*     written by the ASTEXP application, but with care frameset files
 *     written from other applications or doctored by hand could be used.
 *
 *     If the WCS component of the NDF has a frame whose Domain has 
@@ -45,7 +45,7 @@
 *        relative coordinate systems of NDFs from different sources.  
 *
 *        It is intended that this file should be one written by the 
-*        REGISTER application when a successful registration is made,
+*        ASTEXP application when a successful registration is made,
 *        and the user need not be aware of its internal structure.
 *        The files are readable text however, and can in principle be
 *        written by other applications or doctored by hand, if this
@@ -96,6 +96,7 @@
 *        terminal only.
 
 *  Notes:
+*     ASTFILE Format:
 *        The AST file consists of a sequence of framesets.  Each frameset
 *        has an ID, and contains two frames (a Base frame and a Current
 *        frame) and a mapping between them.  The domain of each Base
