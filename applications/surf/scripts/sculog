@@ -94,9 +94,9 @@ if ($prog =~ /photsum|mapsum|pointsum|skysum/) {
 
 # Set up mode filter
 if ($prog eq "photsum") {
-  $whichmode = "photom,skydip";
+  $whichmode = "photom,skydip,polphot";
 } elsif ($prog eq "mapsum") {
-   $whichmode = "mapsum,skydip";
+   $whichmode = "map,skydip,polmap";
 
 } elsif ($prog eq 'pointsum') {
   $whichmode = "pointing";
@@ -197,73 +197,31 @@ foreach (@datalis) {
 
 # Now begin to read in FITS information
 
-
-# Open the NDF environment
-
-$status = &NDF::SAI__OK;
-
-ndf_begin;
-err_begin($status);
-
 foreach $scufile (@sortndf) {
 
   err_annul($status) if $status != &NDF::SAI__OK;
 
   # Go to the correct directory
-  chdir $location{$scufile};
+  chdir $location{$scufile} || 
+    die "Error changing to directory $location{$scufile}\n";
 
   # Is this an ro_ file
   $scufile =~ /^ro_|_red_/ && ($scufile .= $rohead);
 
-  # Open the file
-  ndf_find(&NDF::DAT__ROOT, $scufile, $indf, $status);
+  # Read the FITS header
+  my ($fitsref, $status) = fits_read_header($scufile);
 
   if ($status != &NDF::SAI__OK) {
+    err_rep('READERR',"$prog: Error reading header from $scufile", $status);
     err_flush($status);
-    print "Error opening $scufile\n";
     next;
   }
 
-  # Find the FITS extension
-  ndf_xloc($indf, 'FITS', 'READ', $xloc, $status);
+  # Copy the contents from the reference
+  %fitsitem = %$fitsref;
 
-  if ($status != &NDF::SAI__OK) {
-    err_annul($status);
-    ndf_annul($indf, $status);
-    print "Error finding FITS in $scufile\n";
-    next;
-  }
-
-
-
-  @fits = ();
-  #...and read it
-  dat_get1c($xloc, 200, @fits, $nfits, $status);
-
-  if ($status != &NDF::SAI__OK) {
-    err_annul($status);
-    dat_annul($xloc, $status);
-    ndf_annul($indf, $status);
-    print "Error reading FITS in $scufile\n";
-    next;
-  }
-
-
-  $i = 0;
-
-  %fitsitem = ();
-
-  # Set up the mode since $var =~ /undef/ returns true!
-  $fitsitem{'MODE'} = "undefined";
-
-# Read in all the FITS items and store in HASH
-  for ($i = 0; $i < $nfits; $i++) {
-    ($item, $value, $comment) = fits_get_nth_item(@fits,$i);
-    $fitsitem{$item} = $value;
-  }
-
-  # Skip if the observation mode is not defined
-  next if $fitsitem{'MODE'} eq "undefined";  
+  # next if the mode keyword does not exist
+  next unless exists $fitsitem{'MODE'};
 
   # Now check the observation mode against $whichmode
   # If whichmode is not specified run anyway
@@ -372,6 +330,15 @@ foreach $scufile (@sortndf) {
 	if ($fitsitem{'MODE'} eq 'SKYDIP') {
 	  $~ = SKYDIP_SUM;
 	} else {
+
+	  # For PHOTSUM we want to rewrite SAM_MODE to be POLJIGG or
+	  # POLRAST for polarimetry
+	  $IsPol = '';
+	  if ($fitsitem{'MODE'} eq 'POLPHOT')  {
+	    $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
+	    $IsPol = '*';  # Flag to indicate pol observation
+	  }
+
 	  $~ = PHOTSUM
 	}
       }
@@ -394,11 +361,18 @@ foreach $scufile (@sortndf) {
 
       # Only set if mode is recognised 
       # of course shouldnt be in here if that is the case since I
-      # am only processing photometry data
+      # am only processing map data
       if ($~ !~ /NOFITS/) {
 	if ($fitsitem{'MODE'} eq 'SKYDIP') {
 	  $~ = SKYDIP_SUM;
 	} else {
+
+	  # For MAPSUM we want to rewrite SAM_MODE to be POLJIGG or
+	  # POLRAST for polarimetry
+	  if ($fitsitem{'MODE'} eq 'POLMAP')  {
+	    $fitsitem{'SAM_MODE'} = 'POL' . substr($fitsitem{'SAM_MODE'},0,4);
+	  }
+
 	  $~ = MAPSUM;
 	}
       }
@@ -426,6 +400,16 @@ foreach $scufile (@sortndf) {
 
 	} else {
 
+	  # Have to rename MAP mode to RASTMAP or JIGGMAP
+	  # for clarity
+	  if ($fitsitem{'MODE'} eq 'MAP') {
+	    $fitsitem{'MODE'} = substr($fitsitem{'SAM_MODE'},0,4) .
+	      $fitsitem{'MODE'};
+	  } elsif ($fitsitem{'MODE'} eq 'POLMAP') {
+	    $fitsitem{'MODE'} .= lc(substr($fitsitem{'SAM_MODE'},0,1));
+	  }
+
+
 	  $~ = SHORT;
 	}
       }
@@ -436,35 +420,42 @@ foreach $scufile (@sortndf) {
 
     write;
     
-    # Read in HISTORY information (if present)
+    # Read in HISTORY information if present and if we are using SCULOG
+    if (!$summary && $prog eq 'sculog') {
 
-    ndf_hnrec($indf,$nrec,$status);
+      my $status = &NDF::SAI__OK;
 
-    # if there is history...
-    if (($status == &NDF::SAI__OK) && (!$summary) && ($prog eq 'sculog')) {
+      ndf_begin;
+      err_begin($status);
 
-      # Loop through the history components and find last "APPLICATION"
-      for ($i=$nrec; $i > 0; $i--) {
-	ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
-	last if $value !~ /<unknown>/;
+      # Open scufile again
+      ndf_find(&NDF::DAT__ROOT, $scufile, my $indf, $status);
+      ndf_hnrec($indf,my $nrec,$status);
+
+      # if there is history...
+      if ($status == &NDF::SAI__OK) {
+
+	# Loop through the history components and find last "APPLICATION"
+	for (my $i=$nrec; $i > 0; $i--) {
+	  ndf_hinfo($indf, 'APPLICATION', $i, $value, $status);
+	  last if $value !~ /<unknown>/;
+	}
+	# Get date as well
+	ndf_hinfo($indf, 'DATE', $i, $date, $status);
+	$~ = "HISTORY";
+	write;
       }
-      # Get date as well
-      ndf_hinfo($indf, 'DATE', $i, $date, $status);
-      $~ = "HISTORY";
-      write;
-    } else {
-      err_annul($status);    
+      # Close file
+      dat_annul($xloc,$status);
+      ndf_annul($indf,$status);
+
+      # End the error reporting and NDF
+      err_annul($status) if $status != &NDF::SAI__OK;
+      err_end($status);
+      ndf_end($status);
     }
   }
-  
-  # Close file
-  dat_annul($xloc, $status);
-  ndf_annul($indf,$status);
- 
 }
-
-# End the error reporting
-err_end($status);
 
 chdir $startdir;
 
@@ -873,7 +864,7 @@ $photom_result
 
 
 format SHORT =
-@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<< @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
+@<<< @<<<<<< @<<<<<<<< @<<<<<<<<< @>/@<< @<<<<   @<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<
 $fitsitem{'RUN'}, $hst, $fitsitem{'MODE'}, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $fitsitem{'BOLOMS'}
 .
 
@@ -896,8 +887,8 @@ format PHOTSUM_TOP =
 .
 
 format PHOTSUM =
-@<<< @<<<<<< @<<<<<<<<< @>/@<< @.## @<<<<<<< @<<<< @>>>>>>>> @<<<<  @<<<< @<<<<
-$fitsitem{'RUN'}, $hst, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $photom[0], $photom[1], $photom[2], $csotau, $seeing
+@<<< @<<<< @ @<<<<<<<<< @>/@<< @.## @<<<<<<< @<<<< @>>>>>>>> @<<<<  @<<<< @<<<<
+$fitsitem{'RUN'}, $hst, $IsPol, $fitsitem{'OBJECT'}, $fitsitem{'N_MEASUR'}, $fitsitem{'N_INT'}, $mean_air, $fitsitem{'FILTER'}, $photom[0], $photom[1], $photom[2], $csotau, $seeing
 ~                                            @<<<< @>>>>>>>> @<<<
 $photom[3], $photom[4], $photom[5]
 .
