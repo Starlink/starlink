@@ -5,4 +5,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/ant/build
 
 BUILD SUCCESSFUL
-Total time: 2 seconds
+Total time: 1 second
