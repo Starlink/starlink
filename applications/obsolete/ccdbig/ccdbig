@@ -11,11 +11,15 @@
 
 #  Description:
 #     The script creates a series of test frames using CCDGENERATE. It
-#     then executes various of the CCDPACK Atasks simulating a
-#     reduction sequence. Intermediary results are displayed (if requested)
+#     then executes various of the CCDPACK Atasks, as well as a few 
+#     KAPPA ones, simulating a data reduction sequence. 
+#     Intermediary results are displayed (if requested).
 #     The process is repeated for increasingly large images:
 #     both the size of the image in pixels and the number of objects
 #     per image is changed.
+#     By modifying the assignments at the head of the script some
+#     aspects of the reduction process and characteristics of the 
+#     synthetic data can be controlled.
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK)
@@ -30,13 +34,14 @@
 #     18-JUL-1995 (PDRAPER):
 #        Now references $CCDPACK_DIR instead of editting INSTALL at
 #        install time.
-#     22-APR-1998 (MBT):
-#        Modified to deal with increasingly large image sizes.
-#        Added options for cutting corners in some of the reduction.
+#     11-JUN-1998 (MBT):
+#        Added resource logging.
+#        Modified to deal with varying image sizes and numbers of objects.
+#        Added options for cutting corners in some of the reduction steps.
 #        Name changed to ccdbig from (ccdexercise).
 #     {enter_further_changes_here}
 #-
-#
+
 ###################################################################
 # Set up the parameters of the reduction sequences.
 # These can be changed to test behaviour of the programs under
@@ -147,7 +152,6 @@
       endif
 
 #  Write some startup info to the log file
-      set labelfile = reslog.label
       echo                                                >>$reslogfile
       uname -a                                            >>$reslogfile
       uptime                                              >>$reslogfile
@@ -163,9 +167,12 @@
       printf "\n%7s%7s%12s\n"   'Pixels ' Objects Command >>$reslogfile 
       echo                                                >>$reslogfile
 
-#  Set up aliases for logging run times to a file.
+#  Set up alias for logging run times to a file.
+      set labelfile = reslog.label
       alias log_start \
          'printf "%7d%7d%12s:  " $frame_pixels $objects \!\!:1 >$labelfile'
+
+#  Start logging process
       ./reslog -f $reslogfile -i $interval -l $labelfile  &
 
 #  Loop over sizes of images
@@ -296,7 +303,6 @@
                end
                echo " "
             endif
-
 
 #  If display capability is enabled then display one DATA frame.
             if ( "$device" != "NONE" ) then
@@ -429,9 +435,9 @@
 #             end display
            endif
 
-#  Apply masking directly to the master flatfield (it will get propagated
-#  from there to subsequent reduced frames), if we're not using the ARD file
-#  implicitly.
+#  If we're not using the ARD file implicitly, then apply masking directly
+#  to the master flatfield (it will get propagated from there to subsequent 
+#  reduced frames).
             if ( "$keepard" == "FALSE" ) then
                echo " "
                echo "  Use ARDMASK to apply ARD file directly to master flat."
@@ -444,7 +450,6 @@
 #              end ardmask
                mv masked_flat.sdf master_flat.sdf
             endif
-
 
 #  Flatfield all the DATA frames
            echo " "
@@ -554,8 +559,8 @@
 
 #  Resample the data.
            echo " "
-           echo "  The reduced NDFs will now be resampled to the same coordinate"
-           echo "  system. After this is performed they can then be combined"
+           echo "  The reduced NDFs will now be resampled to the same"
+           echo "  coordinate system.  They can then be combined"
            echo "  (after determining normalising scale and zero points which "
            echo "  take into account any variations in sky transparency and "
            echo "  exposure time) into a single frame which shows the complete"
@@ -580,6 +585,7 @@
               modify=true \
               out=\! \
               accept
+#          end makemos
 
 #  Combine to produce a mosaic.
            echo " "
