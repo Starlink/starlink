@@ -84,6 +84,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
       INTEGER                   LHS, RHS
@@ -96,6 +97,10 @@
         PARAMETER               ( BDICMP = '.BDI' )
 
 *  Local Variables:
+      CHARACTER*(DAT__SZLOC)	LOC			! Object locator
+      CHARACTER*6		MODE			! Access mode
+      CHARACTER*40		TYPE			! Data type
+
       INTEGER			BDIID			! Identifier of BDICMP
       INTEGER			ICMP			! Loop over BDICMP comps
       INTEGER			ITID			! Identifier of item
@@ -107,6 +112,35 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get mode
+      CALL ADI_CGET0C( RHS, 'MODE', MODE, STATUS )
+      IF ( (STATUS .EQ. SAI__OK) .AND. (MODE(1:1).EQ.'W') ) THEN
+
+*    Get locator and existing type
+        CALL ADI1_GETLOC( RHS, LOC, STATUS )
+        CALL DAT_TYPE( LOC, TYPE, STATUS )
+
+*    Type is unknown?
+        IF ( (STATUS .EQ. SAI__OK) .AND.
+     :       (TYPE(1:7) .EQ. 'UNKNOWN') ) THEN
+          CALL ADI_THERE( LHS, 'DatasetType', THERE, STATUS )
+          IF ( THERE ) THEN
+            CALL ADI_CGET0C( LHS, 'DatasetType', TYPE, STATUS )
+          ELSE
+            CALL ADI_TYPE( LHS, TYPE, STATUS )
+          END IF
+
+*     Retype the object
+          IF ( STATUS .EQ. SAI__OK ) THEN
+            CALL DAT_RETYP( LOC, TYPE, STATUS )
+          END IF
+
+        END IF
+      END IF
+      IF ( STATUS .NE. SAI__OK ) THEN
+        CALL ERR_ANNUL( STATUS )
+      END IF
 
 *  Look for BDI container
       CALL ADI_THERE( LHS, BDICMP, THERE, STATUS )
