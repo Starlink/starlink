@@ -117,9 +117,10 @@
       INTEGER			CID			! String array slice
       INTEGER			CURREC			! Current rec number
       INTEGER			I			! Loop over LINE
-      INTEGER			ILINE 			! Loop over lines
+      INTEGER			ILINE, JLINE 		! Loop over lines
       INTEGER			IPOS, NPOS		! String pointers
       INTEGER			IVERB			! Verbosity
+      INTEGER			LLEN			! Length of LINE
       INTEGER			NL 			! # existing lines
       INTEGER			NLINE 			! # lines to write
       INTEGER			NNUL			! # nulls in LINE
@@ -191,6 +192,7 @@
           CALL ADI_CELL( ARGS(2), 1, ILINE, CID, STATUS )
           CALL ADI_CLEN( CID, LLEN, STATUS )
           CALL ADI_GET0C( CID, LINE(:LLEN), STATUS )
+          LLEN = MIN( LLEN, LEN(LINE) )
           CALL ADI_ERASE( CID, STATUS )
 
 *      If the string contains nulls we need to split it into several
