@@ -1,0 +1,1044 @@
+1998-12-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_put_fits_d.f (SCULIB_PUT_FITS_D): Add fix to convert 'D'
+	to 'E' exponent.
+
+1998-12-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scunoise: Support new directory structure at the JAC (RPT)
+
+	* scuplot.csh: Make V0.13 KAPPA compliant
+
+	* surf_write_map_info.F (SURF_WRITE_MAP_INFO): Add WCS information 
+	to NDF
+
+	* surf_rebin.f (SURF_REBIN): Rename USEGRD to GUARD
+
+1998-12-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* remdbm.pl: Add axis propogation
+
+	* sdip.csh: Make sure that STYLE is reset to original value
+
+	* surf_write_map_info.F (SURF_WRITE_MAP_INFO): Fix the IRAS90
+	writer for J2000 (epoch was being stored as B2000!!)
+
+1998-12-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sdip.csh: Make V0.13 KAPPA compliant
+
+	* qdraw: Make V0.13 KAPPA compliant
+
+	* surf_rebin.f (SURF_REBIN): Add USEGRD with default of TRUE
+
+	* extract_data.ifl: Correct prompt for LONG_OUT
+
+	* intrebin.ifl: Correct prompt for LONG_OUT
+
+	* bolrebin.ifl: Correct prompt for LONG_OUT
+
+	* rebin.ifl: Correct prompt for LONG_OUT
+
+1998-12-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* rebin.ifl: Add USEGRD
+
+	* intrebin.ifl: Add USEGRD
+
+	* bolrebin.ifl: Add USEGRD.
+
+	* surf_reduce_noise.f (SURF_REDUCE_NOISE): Check for JIGL_DSCD in
+	the FITS header since old data does not contain this keyword.
+	(SURF_REDUCE_NOISE): Make sure output filename is zero-padded.
+
+1998-12-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Check that the number
+	of degrees of freedom is positive.
+
+	* sculib_skydip_var.f (SCULIB_SKYDIP_VAR): Check for STATUS on
+	entering routine. Tidy up header.
+
+1998-11-24  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_mon.f (SURF_MON): Add REDUCE_NOISE
+
+1998-11-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scunoise: Add Remo's fixes to allow it to work with the new Domain 
+	name at JCMT and to support the SURF REDUCE_NOISE output format.
+
+1998-11-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_reduce_noise.f (SURF_REDUCE_NOISE): New version
+
+	* sculib_noise_mean.f (SCULIB_NOISE_MEAN): First version inside
+	SURF. Modify from on-line so that it uses BYTE quality and has 
+	a modern header.
+
+1998-10-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculog (find_photom): Correct formatting for RA/Dec since they
+	have leading zeroes padded to sign and 3 integers. Remove the
+	leading zeroes and spurious sign for RA.
+
+1998-10-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scuphot.f (SURF_SCUPHOT): Check for aborted
+	observations. Modify N_INTEGRATIONS if aborted. 
+
+1998-10-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Check the index for 
+	JIGGLE_X -- aborted data can go exceed the array bounds
+
+1998-10-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Change MAX_FILE to 256 (Amy Barger
+	ran into the 100 file limit)
+
+1998-10-01  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Dont print errors when
+	the fit was bad (we know the errors are bad then)
+
+1998-07-25  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_write_map_info.F (SURF_WRITE_MAP_INFO): Initialise FILENAME
+	so that it is size * rather than 40 characters. Check for status
+	on entry.
+
+1998-07-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_reduce_switch.f (SCULIB_REDUCE_SWITCH): Check for bad pixels
+
+	* sculib_correct_extinction.f (SCULIB_CORRECT_EXTINCTION): Check
+	for bad pixels
+
+	* sculib_flatfield_data.f (SCULIB_FLATFIELD_DATA): Change to
+	BDATA. Check for bad pixels.
+
+1998-07-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_recurse_read.f (SURF_RECURSE_READ): Use FIO_CLOSE instead
+	of FIO_ANNUL (the file was not being closed properly)
+
+	* surf_reduce_switch.f (SURF_REDUCE_SWITCH): Annul the SECNDF
+	NDF identifier.
+
+
+	
+------------------SURF v1.2BETA released to Starlink: June 20th -----
+	
+1998-06-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* remdbm.pl: Add messaging support if it is available (for the
+	Starlink version). Add -noams flag.
+	Replace 0 with 0.00001 to fool Kappa DIV
+
+1998-06-17  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_make_weight.f (SURF_MAKE_WEIGHT): Change to support change
+	to SURFLIB_2DFT_CHOP.
+
+	* surflib_2dft_chop.f (SURFLIB_2DFT_CHOP): Replace IDIMS with NX
+	and NY since Linux (g77) can not handle  arrays that control
+	dimensions of other arrays. 
+
+1998-06-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_grid_calcsky.f (SURF_GRID_CALCSKY): Add documentation
+
+	* remdbm.pl: Include ORAC modules. Change so that it simply uses
+	the Shell interface. Add documentation.
+
+	* setbolwt.pl: Add documentation
+
+	* change_nacentre.pl: Add documentaion.
+
+	* scupa.csh: Check that Starlink login was performed.
+
+	* sdip.csh: Check for Starlink login. Reset LINPLOT colours to
+	original values after use (stops me from setting symbol colour
+	to white on a white background). Use GREEN for symbol colour.
+
+	* scuplot.csh: Use $KAPPA_DIR and $SURF_DIR. Add RPTs fix to -h
+
+1998-06-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* change_nacentre.pl: Add to RCS.
+
+1998-06-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_grid_calcsky.f (SURF_GRID_CALCSKY): Smooth the time series.
+
+	* surf_rebin.f (SURF_REBIN): Ask for smoothing size (CALCSKY)
+
+	* surf_scuphot.f: Propogate units to output data
+
+1998-06-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_skydip.f (SURF_SKYDIP): Add errors to output parameters.
+
+	* sculib_skydip_var.f (SCULIB_SKYDIP_VAR): Add in routine from
+	Nick Tothill
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Copy version with error 
+	determination from Nick Tothill.
+
+	* sculib_gauss_wtinit.f (SCULIB_GAUSS_WTINIT): Final tidy up
+
+	* sculib_wtfn_regrid_2.f (SCULIB_WTFN_REGRID_2): Add lots of docs
+
+	* sculib_wtfn_regrid_3.f (SCULIB_WTFN_REGRID_3): use of Guard ring is
+	configurable 
+
+	* sculib_wtfn_regrid_1.f (SCULIB_WTFN_REGRID_1): Add some
+	documentation to the header.
+
+	* sculib_wtfn_regrid.f (SCULIB_WTFN_REGRID): Handle configurable
+	scale length. Update docs.
+
+	* surf_rebin.f (SURF_REBIN): Use guard ring for BESSEL only.
+
+1998-06-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_2dft_chop.f (SURFLIB_2DFT_CHOP): Fix problem with half
+	pixel shift.
+
+	* sculib_wtfn_regrid_2.f (SCULIB_WTFN_REGRID_2): Configurable
+	SCALE length
+
+1998-06-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): DESPIKE can now be told to use the
+	default output filenames automatically.
+	(SURF_REBIN): Add the ability to configure size of weighting function.
+
+	* surf_grid_despike.f (SURF_GRID_DESPIKE): Free IJPOS_PTR. Add
+	GRID code (commented out) for writing the MEDIAN image - now done
+	in SURF_REBIN.
+
+	* despike.ifl: Add DEFOUT. Make posn 1 default to REF.
+	Remove GRID parameter.
+
+1998-05-29  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_rem_timeseries.f (SURFLIB_REM_TIMESERIES): Add variances 
+	rather than subtract.
+
+1998-05-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Add MEDIAN regridding
+
+	
+	* sculib_clip_bol.f (SCULIB_CLIP_BOL): Change so that iterative
+	clipping is used to calculate the statistics unless a negative
+	NSIGMA is specified.
+
+	* surflib_median_regrid.f (SURFLIB_MEDIAN_REGRID): Create.
+
+	* surflib_fill_grid.f (SURFLIB_FILL_GRID): Use SAI__WARN to warn
+	that the grid is to small but SAI__ERROR to warn that it is not
+	deep enough.
+	(SURFLIB_FILL_GRID): Make sure GE 1 and not GT 1 for index range
+	checking. 
+
+1998-05-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* polphot.pl: This was created ages ago.....
+
+1998-05-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Add CALCSKY
+	
+	* surf_remsky.f (SURF_REMSKY): Add support for reading SKY NDF
+	from input file.
+
+	* surflib_rem_timeseries.f (SURFLIB_REM_TIMESERIES): Created
+
+	* surf_mon.f (SURF_MON): Add CALCSKY
+
+	* surf_grid_despike.f (SURF_GRID_DESPIKE): Free IJPOS_PTR memory
+
+1998-05-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_grid_despike.f (SURF_GRID_DESPIKE): Free STATS memory.
+
+1998-05-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* change_nacent.pl: Create
+
+	* sculib_get_sub_inst.f (SCULIB_GET_SUB_INST): Make safe for bad
+	STATUS inside routine.
+
+1998-05-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_chgqual.f (SURF_CHGQUAL): Increase size of 'IN' parameter.
+
+	* surf_chgdata.f (SURF_CHGDATA): Increase size of 'IN' parameter.
+
+	* surf_rebin.f (SURF_REBIN): Increase size of 'IN' parameter.
+
+	* surf_scuba2mem.f (SURF_SCUBA2MEM): Increase size of 'IN' parameter.
+
+1998-05-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_make_weight.f (SURF_MAKE_WEIGHT): Fix problem when aborting 
+	from parameter request.
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Only try the fix
+	for 1.0 SCUCD when using RJ coords.
+
+1998-05-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_write_map_info.F (SURF_WRITE_MAP_INFO): Store pixel size in 
+	the FITS header.
+
+1998-04-28  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scuphot.f (SURF_SCUPHOT): Add ANALYSIS=SAMPLES to simply
+	propogate the data. Propogate input NDF to output NDFs so that
+	FITS extension and HISTORY are copied automatically.
+
+
+	* surf_scuba2mem.f (SURF_SCUBA2MEM): Support the return of FITS
+	information.
+
+	* surf_write_map_info.F (SURF_WRITE_MAP_INFO): Store the chop
+	information if necessary.
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Return the FITS array.
+
+	* surf_rebin.f (SURF_REBIN): Default output filename is derived
+	from the input filename if there is only one file.
+
+	* surf_recurse_read.f (SURF_PSEUDO_RECURSE): Pass through FITS
+	header for each file.
+
+	* surf_rebin.f (SURF_REBIN): Return FITS information to parent task.
+
+1998-04-27  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_2dft_chop.f (SURFLIB_2DFT_CHOP): Initial version
+
+	* surf_make_weight.f (SURF_MAKE_WEIGHT): Initial version
+
+	* sculib_add_chop.f (SCULIB_ADD_CHOP): Initial version (made a
+	while back but just completed)
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Fix bug in CHOP_PA
+	calculation (relevant for SCULIB_ADD_CHOP). Also ensure that LO
+	chopping is RJ for SCAN/MAP.
+
+
+1998-04-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scucat.f (SURF_SCUCAT): Add METHOD parameter to decide on
+	whether to keep bolometers separate or not. Start writing HISTORY.
+
+	* surf_mon.f (SURF_MON): Add bad status message to end and start.
+
+1998-04-20  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scucat.f (SURF_SCUCAT): Change to use GRP for filename input
+
+	* surf_link_adam: Add grp_link_adam
+
+1998-04-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_mon.f (SURF_MON): Add SCUMAKEWT
+
+1998-04-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_remove_dc_from_exp.f (SURFLIB_REMOVE_DC_FROM_EXP): First 
+	version (METHOD = MEDIAN and MEAN)
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Add MEDIAN and MEAN methods.
+
+	* scan_rlb.ifl: Add METHOD
+
+1998-03-31  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Add Gaussian weighting function
+
+1998-03-30  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Tidy the code for the dimension 
+	checking.
+
+	* sculib_remove_linear_baseline.f (SCULIB_REMOVE_LINEAR_BASELINE):
+	Make sure that the output array is set even if a baseline removal
+	fails due to lack of points.
+
+1998-03-23  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Add support for BOLWT
+	(SURF_REBIN): Fix memory leak that prevented BOLREBIN/INTREBIN
+	from running (OUT_WEIGHT_PTR was not freed). Also initialised all
+	pointers to 0 before MALLOC.
+
+1998-03-18  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_wtfn_regrid.f (SCULIB_WTFN_REGRID): Add support for BOLWT
+
+	* sculib_wtfn_regrid_2.f (SCULIB_WTFN_REGRID_2): Add support for a 
+	different weight for each pixel.
+
+	* surf_recurse_read.f (SURF_PSEUDO_RECURSE): Add BOLWT
+
+	* surf_scuba2mem.f (SURF_SCUBA2MEM): Add BOLWT
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Add BOLWT
+
+	* sculib_wtfn_regrid_2.f (SCULIB_WTFN_REGRID_2): Only add the
+	weight if it is within the required radius.
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Support for
+	multiple beams (added a long time ago but not logged).
+
+1998-03-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+      ----- Release v1.1-1 to Starlink
+
+1998-03-03  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_clip_bol.f (SCULIB_CLIP_BOL): Initialise pointers
+
+	* sculib_skydip_temperatures.F (SCULIB_SKYDIP_TEMPERATURES):
+	Missing argument to ERR_REP
+
+	* sculib_read_sky.f (SCULIB_READ_SKY): T_RUN should be an integer
+	rather than a real.
+
+	* surf_rebin.f (SURF_REBIN): Make sure that the weights array is
+	initialised to zero.
+
+1998-02-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_remsky.f (SCULIB_REM_SKY): Calculate the sky noise.
+
+	* sculib_statd.f (SCULIB_STATD): Create.
+
+	* sculib_statr.f (SCULIB_STATR): Add some D0 to 0.0. Change
+	comment about Kappa sort routine (now is PDA)
+
+1998-02-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_fix_scan_v10.f (SCULIB_FIX_SCAN_V10): Create to fix bug
+	in SCUCD version 1.0
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Add code to fix bug 
+	in SCUCD version 1.0
+
+	* sculib_scan_2_rd.f (SCULIB_SCAN_2_RD): Change VERSION to REAL.
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): SCUCD VERSION
+	should be a REAL not INTEGER.
+
+1998-02-02  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Increase largest map size
+
+	* surflib_calc_output_grid.f (SURFLIB_CALC_OUTPUT_GRID): Change
+	upper limit to 4096x4096 pixels.
+
+1998-01-26  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Only multiply data
+	by -1 if CHOP coords is SC
+	(SCULIB_PROCESS_BOLS): Change the order of the declaration of
+	N_POS_BEAMS. 
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Remove the check for 'SC' coords.
+
+1998-01-22  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* rebin.ifl: Add WEIGHTS and TIMES
+
+	* intrebin.ifl: Add SIZE, WEIGHTS and TIMES
+
+	* bolrebin.ifl: Add SIZE, WEIGHTS and TIMES
+
+	* surf_rebin.f (SURF_REBIN): Choose whether the WEIGHTS array is
+	stored or not. Use MALLOC instead of NDF_MAP for the output grid.
+	Write a histogram of the input data as a measure of the
+	integration time per regridded pixel.
+
+1998-01-21  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Allow the size of the output grid
+	to be changed.
+
+	* rebin.ifl: Add SIZE parameter
+
+	* sculib_wtfn_regrid_2.f (SCULIB_WTFN_REGRID_2): Check that INEAR
+	and JNEAR are within the regridding array.
+
+1998-01-16  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculog: Skip file if MODE is undefined.
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Divide chop by two
+	for SCAN/MAPS
+
+1998-01-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* skydip.ifl: Add T_HOT
+
+	* reduce_switch.ifl: Add T_HOT	
+
+	* sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS): Make
+	T_HOT into a ADAM parameter.
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Add support for
+	multiple beam positions.
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Return immediately if
+	the number of measurements to fit is zero.
+
+	* sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS): Deal with 
+	aborted data (ie DEM_PNTR array with zeros)
+
+1998-01-14  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_skydip.f (SURF_SKYDIP): Check for aborted skydips.
+	(SURF_SKYDIP): Always write the fit parameters even if the fit was 
+	not even attempted.
+
+1998-01-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_recurse_read.f (SURF_RECURSE_READ): Change arguments for
+	PROCESS_BOLS. 
+
+	* surf_scuover.f (SURF_SCUOVER): Change arguments for PROCESS_BOLS.
+
+	* sculib_mulcad.f (SCULIB_MULCAD): Create.
+
+1998-01-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_extinction.f (SURF_EXTINCTION): Upgrade PROCESS_BOLS call
+	for SCUBA2MEM support.
+
+	* surf_skydip.f (SURF_SKYDIP): Add output parameters and update
+	header to reflect this.
+
+	* skydip.ifl: Add output parameters
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Return the reduced chi
+	square. 
+
+1998-01-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_mon.f (SURF_MON): Add calls to SCUBA2MEM
+
+1998-01-07  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_skydip.f (SURF_SKYDIP): Make sure that the airmass range of 
+	the model matches that of the input data.
+
+1998-01-06  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* skydip.ifl: Add CVAR.
+
+	* surf_skydip.f (SURF_SKYDIP): Add the CVAR parameter for deciding 
+	whether or not the variance is a constant.
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Use the CVAR argument
+	to govern whether to use constant variance or not.
+
+1998-01-05  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_fit_skydip.f (SCULIB_FIT_SKYDIP): Use the mean variance
+	as the variance for each point.
+
+1997-12-31  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Add the RLB parameter.
+
+	* sculib_remove_linear_baseline.f (SCULIB_REMOVE_LINEAR_BASELINE):
+	Add the ability to save the fit itself.
+
+	* scan_rlb.ifl: Add the RLB parameter.
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Correct task name (should be
+	SCAN_RLB rather than RESTORE).
+
+Tue Dec 23 11:34:17 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_despike.f (SURF_DESPIKE): Set badbit mask for despiking.
+
+	* surflib_diff_despike.f (SURFLIB_DIFF_DESPIKE): SCULIB_BITON was
+	being called incorrectly. Also, the searching was not stopping
+	once a good point was found.
+	
+
+Mon Dec 22 13:56:14 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_despike.f (SURF_DESPIKE): Add note to documentation. Remove 
+	locator to SCUCD extension. Map input data after checking the data 
+	dimensions.
+
+Thu Dec 18 11:49:05 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_despike.f (SURF_DESPIKE): Write out the total number of
+	spikes removed.
+
+	* surflib_diff_despike.f (SURFLIB_DIFF_DESPIKE): Store the total
+	number of spikes removed. Tidy up header.
+
+Wed Dec 17 16:30:56 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_remove_linear_baseline.f (SCULIB_REMOVE_LINEAR_BASELINE):
+	Check that there are enough points to fit.
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Remove requirement of having to 
+	run EXTINCTION after SCAN_RLB.
+
+Tue Dec 16 11:20:10 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_chgqual.f (SURF_CHGQUAL): Stop cancelling the BAD_QUALITY
+	parameter!
+
+	* surf_restore.f (SURF_RESTORE): Change so that this task can be
+	run before or after extinction.
+
+Sun Nov 30
+
+        Release version 1.1b1
+
+Sun Nov 30 13:39:35 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_remsky.f (SCULIB_REM_SKY): Write a message even if we are 
+	not adding on the constant offset.
+
+Sat Nov 29 15:09:05 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_despike.f (SURF_DESPIKE): Add documentation to the header.
+
+	* remsky.ifl: Change VPATH for ADD to DYNAMIC
+
+	* surf_remsky.f (SURF_REMSKY): Make sure that ADD is true for MAP
+	observations and FALSE otherwise.
+
+Thu Nov 27 10:08:18 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scuover.f (SURF_SCUOVER): Fix bug when there was only one
+	bolometer.
+
+	* scupa.csh: Fix scupa so that it supports the new SCUQUICK file
+	format. 
+
+	* surflib_plot_grid.f (SURFLIB_PLOT_GRID): Protect against all
+	points being bad.
+
+	* scuquick: Add simple support for SKYDIPs (at least recognise them)
+	Fix filenaming convention for SCUPHOT, REMSKY and REBIN. 
+	Add SCUCLIP 
+
+	* surf_remsky.f (SURF_REMSKY): Update header documentation.
+
+Mon Nov 24 13:39:41 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_scan_2_rd.f (SCULIB_SCAN_2_RD): Create.
+
+Fri Nov 21 14:55:04 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Support
+	CENTRE_COORDS for SCAN/MAP calculation (the ends of scans were
+	always assumed to be RD)
+
+	* skydip.ifl: Fix prompt string for 'IN' so that it no longer asks
+	for an extinction correction. 
+
+	* sculog: Make sure that MODE is defined before reading FITS keys
+	in case it is missing. (patterns will match undef)
+
+Wed Nov 19 08:52:08 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_get_fits_c.f (SCULIB_GET_FITS_C): Decode string using
+	quotes rather than the comment '/' character.
+
+Tue Nov 18 16:23:44 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_rewrite_fits_c.f (SCULIB_REWRITE_FITS_C): Make sure there 
+	is a space.
+
+	* sculib_calc_apparent.f (SCULIB_CALC_APPARENT): Fix Az offsets
+	(needs a sign change)
+
+	* sculib_rewrite_fits_i.f (SCULIB_REWRITE_FITS_I): Make sure there 
+	is a space.
+
+	* sculib_rewrite_fits_r.f (SCULIB_REWRITE_FITS_R): Make sure there 
+	is a space between the equals sign and the number.
+
+	* sculib_apparent_2_mp.f (SCULIB_APPARENT_2_MP): Fix calculation
+	of Azimuth (use ATAN2)
+
+Mon Nov 17 17:26:39 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Fix some problems with the error
+	handling. Change 'is no data' to 'are no data'.
+
+Thu Nov 13 09:14:43 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS): Declare
+	integers before using them as array bounds.
+
+	* sculib_clip_bol.f (SCULIB_CLIP_BOL): Remove SCULIB_BITOFF
+	declaration. 
+
+Wed Nov 12 15:48:21 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_link_adam: Add the PGPLOT library.
+
+Tue Nov 11 13:57:51 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_stats_grid.f (SURFLIB_STATS_GRID): Create
+
+	* surflib_clip_grid.f (SURFLIB_CLIP_GRID): Pass clipping envelope
+	into subroutine.
+
+	* surflib_plot_grid.f (SURFLIB_PLOT_GRID): Pass the clipping
+	envelope into the subroutine.
+
+	* sculib_construct_out.f (SCULIB_CONSTRUCT_OUT): Make sure that
+	the output string can not be the same as the input string.
+
+	* despike.ifl: Add SMODE. Change default NSIGMA to 4.0
+
+Fri Nov  7 13:25:55 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scuquick: Make filenaming convention SCUBA_SUFFIX=long compliant.
+
+	* sculib_construct_out.f (SCULIB_CONSTRUCT_OUT): Add support for
+	the '!' chopping character.
+
+	* surf_extinction.f (SURF_EXTINCTION): Read default tau from the
+	FITS header.
+
+Thu Nov  6 12:19:05 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_par: Add a verbose suffix option (all tasks)
+
+	* surf_remsky.f (SURF_REMSKY): Decode the bolometer strings in a
+	subroutine. Report the number and bolometer list (if verbose). 
+
+	* surflib_decode_remsky_string.f (SURFLIB_DECODE_REMSKY_STRING):
+	Add and subtract bolometers sequentially rather than at the end. 
+
+Tue Nov  4 10:39:57 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_remsky.f (SURF_REMSKY): Remove unneeded mapping of data.
+
+	* sculib_apparent_2_mp.f (SCULIB_APPARENT_2_MP): Create
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): LOCAL_COORDS,MAPX/Y
+
+	* surf_extinction.f (SURF_EXTINCTION): LOCAL_COORDS,MAP_X,MAP_Y
+
+	* surf_scuover.f (SURF_SCUOVER): Fix for Map_x,y and local_coords.
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Add support for
+	MAP_X and MAP_Y and LOCAL_COORDS.
+
+	* sculib_calc_apparent.f (SCULIB_CALC_APPARENT): Support MAP_X
+	and MAP_Y
+
+Mon Oct 27 15:24:21 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_extflat.f (SURF_EXTFLAT): Wrote EXTRACT_FLAT task.
+
+	* surf_mon.f (SURF_MON): Add EXTRACT_FLAT
+
+Thu Oct 23 11:25:55 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_recurse_read.f (SURF_PSEUDO_RECURSE): Fix problem passing
+	in BADBITS mask.
+
+Tue Oct 21 09:26:14 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_fill_grid.f (SURFLIB_FILL_GRID): Create.
+
+	* surf_mon.f (SURF_MON): Add new DESPIKE and move old to despike2
+
+	* surflib_histogram_grid.f (SURFLIB_HISTOGRAM_GRID): Create.
+
+	* surflib_calc_ijpos.f (SURFLIB_CALC_IJPOS): Create.
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Read BADBITS
+
+	* surf_recurse_read.f (SURF_PSEUDO_RECURSE): Pass the bad bits
+	mask for each file.
+
+Mon Oct 20 11:12:31 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surflib_calc_output_grid.f (SURFLIB_CALC_OUTPUT_GRID): Move from 
+	SURF_REBIN.
+
+	* surf_rebin.f (SURF_REBIN): Use a subroutine for calculating the
+	range and number of pixels in the output grid. (us
+	surflib_calc_output_grid).
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Read in quality if
+	needed. Free memory associated with DUMMY_VARIANCE_PTR.
+
+	* surf_recurse_read.f (SURF_PSEUDO_RECURSE): Pass through quality
+	arrays if necessary.
+
+Thu Oct 16 09:48:59 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_remsky.f (SCULIB_REM_SKY): Add the constant offset back
+	onto the data.
+
+	* sculib_clip_bol.f (SCULIB_CLIP_BOL): Return the number of spikes 
+	and don't despike data with bad quality. Also allow for further
+	clipping by not reseting the despike bit every time this task
+	runs.
+
+	* surf_scuclip.f (SURF_SCUCLIP): Make a standalone clipping task.
+
+	* surf_remsky.f (SURF_REMSKY): Remove despiking completely and
+	add facility for adding on the constant level after sky removal.
+
+	* sculib_put_fits_c.f (SCULIB_PUT_FITS_C): Make sure the comment
+	character is written to the string. Must be merged (not copied)
+	with the on-line version before this is completely fixed.
+
+Wed Oct  8 08:44:11 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_reduce_switch.f (SURF_REDUCE_SWITCH): Fix 'no data' message
+	when using 2 switches (^PKG instead of PKG) 
+
+Mon Oct  6 21:04:36 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* makefile (FSOURCES): Add SCULIB_PAR_GET.F into makefile
+
+	* sculib_par_get.f (SCULIB_PAR_GET0?): Add into SCULIB 
+
+Tue Sep  9 12:20:43 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_scuover.f (SURF_SCUOVER): Fix 'PL' mode (not checked
+	for SCAN/MAP)
+
+Thu Sep  4 08:27:18 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib_get_filename.f (SCULIB_GET_FILENAME): Strip the path so
+	as to leave just the filename.
+
+	* sdip.csh: Make sure COSYS=DATA
+
+	* scucat.ifl: Change text of DUMMY
+
+	* extract_data.ifl: Change text of DUMMY.
+
+	* intrebin.ifl: Change text of DUMMY.
+
+	* bolrebin.ifl: Change text of DUMMY.
+
+	* rebin.ifl: Change text of DUMMY.
+
+	* surf_scucat.f (SURF_SCUCAT): Use SCULIB_GET_FILENAME
+
+	* surf_extinction.f (SURF_EXTINCTION): Automatically supply a 
+	output filename (string+wavelength).
+
+	* surf_scuphot.f (SURF_SCUPHOT): Automatically supply a 
+	output filename and fix NULL response to 'OUT'
+
+	* surf_scan_rlb.f (SURF_SCAN_RLB): Automatically supply a 
+	output filename + propogate units to output.
+
+	* surf_despike.f (SURF_DESPIKE): Automatically supply a 
+	output filename.
+
+	* surf_restore.f (SURF_RESTORE): Automatically supply a 
+	output filename.
+
+	* surf_remsky.f (SURF_REMSKY): Automatically supply a 
+	output filename.
+
+Wed Sep  3 08:14:39 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* surf_flatfield.f (SURF_FLATFIELD): Automatically supply a 
+	output filename.
+
+	* surf_reduce_switch.f (SURF_REDUCE_SWITCH): Supply a default for
+	the 'OUT' parameter.
+
+	* surf_rebin.f (SURF_REBIN): Use SCULIB_GET_FILENAME instead of
+	SUBPAR. Supply a default for the 'OUT' parameter based on object
+	name.
+
+	* sculib_get_filename.f (SCULIB_GET_FILENAME): Create
+
+	* surf_par: Add support for SUFFIX variables.
+
+	* sculib_construct_out.f (SCULIB_CONSTRUCT_OUT): Create routine to 
+	deal with default output name of files.
+
+Tue Sep  2 12:52:44 1997  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* extinction.ifl: Add defaults for the FIRST_TAU, FIRST_LST,
+	SECOND_TAU and SECOND_LST parameters.
+
+	* surf_extinction.f (SURF_EXTINCTION): Add defaults for the
+	FIRST_TAU, FIRST_LST, SECOND_TAU and SECOND_LST parameters.
+
+Mon Aug 11 15:16:28 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* surf_remsky.f (SURF_REMSKY): Don't cancel the BOLOMETERS
+	parameter. This was preventing the BOLOMETERS parameter from being 
+	entered into the HISTORY information.
+
+Thu Jul 31 09:39:23 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* surf_rebin.f (SURF_REBIN): Fix bug stopping the user specified
+	output object name being written to the NDF. Used OBJECT in the
+	PAR_GET and later used SOBJECT!
+
+Tue Jul 29 08:20:28 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* scuquick: Add a -noflat option.
+
+Mon Jul 28 10:57:03 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* surf_skydip.f (SURF_SKYDIP): Add support for ETATEL in the
+	FITS header.
+
+Fri Jul 25 15:29:48 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* sculib_search_datadir.f (SCULIB_SEARCH_DATADIR): Fix typo in
+	error message concerning undefined $SCUBA_PREFIX.
+
+Wed Jul 23 16:48:24 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* sculib_process_bols.f (SCULIB_PROCESS_BOLS): Remove (incorrect)
+	code that tried to display SCUOVER overlay for the middle of a
+	SCAN. Now leave it so that SCUOVER displays the bolometer
+	positions at the start of a SCAN.
+
+Tue Jul 22 15:29:48 1997  John Lightfoot  <jfl@luu.jach.hawaii.edu>
+
+	* surf_mon.f (SURF_MON): Added DESPIKE application.
+
+Tue Jul 22 07:51:08 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* surf_scuphot.f (SURF_SCUPHOT): Removed spurious reference to
+	IN_CENTRE_COORDS which should be CENTRE_COORDS.
+
+Sat Jul 19 16:58:42 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* surf_read_rebin_ndf.f (SURF_READ_REBIN_NDF): Make sure that the
+	last member of INT_LIST is set to 0 and not N_POS if the
+	preceeding entry is zero (ie for aborted data).
+
+	* sculib_spline_regrid.f (SCULIB_SPLINE_REGRID): Check that the
+	number of regrid points is greater than the minimum number of
+	points allowed. This is necessary for aborted data where the
+	number of points turns out to be negative in some cases!
+
+Fri Jul 18 14:16:55 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* sculib_malloc.f (SCULIB_MALLOC): Protect against a request for
+	negative memory.
+
+	* sculib_search_datadir.f (SCULIB_SEARCH_DATADIR): Add support for 
+	SCUBA_PREFIX so that numbers can be given instead of the full filename.
+	
+	* scuquick: Add support for SCUBA_PREFIX
+
+	* skydip.ifl:  Change IN to be a _CHAR to support the use of 
+	numbers as input files. 
+
+	* reduce_switch.ifl: Change IN to be a _CHAR to support the use of 
+	numbers as input files. 
+
+	* surf_skydip.f (SURF_SKYDIP): Pass PACKAGE into SCULIB_SEARCH_DATADIR.
+        Add documentation to describe SCUBA_PREFIX.
+	
+	* surf_reduce_switch.f (SURF_REDUCE_SWITCH): Pass PACKAGE into
+	SCULIB_SEARCH_DATADIR. Add documentation to describe SCUBA_PREFIX.
+
+Wed Jul 16 16:16:44 1997  Tim Jenness  <T.Jenness@jach.hawaii.edu>
+
+	* sdip.csh: Add touch to sdip_p2.eps to prevent an error report
+	when running on linux (when it tries to rm a non-existent
+	file). [v1.0-0]
+
+	* sculib_set_qual.f (SCULIB_SET_QUAL): Change BIT_VALUE (INT) to
+	BIT_SWITCH (LOGICAL) since it was being used as a LOGICAL
+	anyway. [v1.0-0]
+	
+	* sculib_mask_data.f (SCULIB_MASK_DATA): Fix bug when using PHOTOM 
+	observations. Had not allocated N_BEAM memory when creating bit
+	mask array. Also change the BTEMP argument to SCULIB_SET_QUAL so
+	that it is a logical called BIT_SWITCH. Put this fix into v1.0-0.
+
+Fri Jul 11 09:51:03 1997  Tim Jenness  <timj@lapaki.jach.hawaii.edu>
+
+	* sculog: Change the RA/DEC reporting so that it reports the
+ 	specified coordinates (LAT and LONG) instead of the observed
+ 	coordinates (except for planets). [released in v1.0-0]
+
+Tue Jul  8 09:09:31 1997  Tim Jenness  <timj@lapaki.jach.hawaii.edu>
+
+	* sdip.csh: Produces a hardcopy in file sdip.eps [rel to v1.0-0]
+
+	* surf.hlp: Add SDIP and SKYDIP (somehow they were missing)
+
+	* TODO: Create a TODO list.
+
+Jul  2 1997 TimJ
+
+	* surf_read_rebin_ndf.f: Fix bug in REBIN concerning MJDs.  Maps
+ 	taken at different MJDs were not begin converted to the epoch of
+ 	the first observation. 
+
+	This fix makes it into v1.0-0
+
+	* surf_reduce_switch.f: REDUCE_SWITCH now writes axes
+ 	information. This information is propogated to all tasks.
+
+	* surf_reduce_switch.f: REDUCE_SWITCH is now much more efficient
+ 	during file creation. A section of the input file is now
+ 	propogated to the output. This results in as much as a factor of 2
+ 	reduction in file size. The improvement is also seen when running
+ 	extinction (surf_extinction.f).
+
+Jul  4 1997 TimJ
+
+	* surf_reduce_switch.f: Notice that REDUCE_SWITCH has always been
+ 	attempting to write the REDS extension to the raw data. Of course
+ 	it has always failed since the input is opened read only.
+
+Jul  7 1997 TimJ
+
+	* sculib_statr.f: Bug when dealing with bad input data.  This
+ 	affects REMSKY but should have only been a problem when bolometers
+ 	were selected that contained bad pixels. This has been released to
+ 	Starlink and makes it into version 1.0-0. On a minor level MEAN
+ 	now returns bad if it has not been set. The good data was being
+	sorted as if it had all the points so the mean was wrong. [v1.0-0]
+	
+
+	* surf_reduce_switch.f: Can now process SKYDIP data.
+
+	* surf_skydip.f: Can now read the output from REDUCE_SWITCH.
+	Also made changes to the labeling on the output image.
+
+	* sdip: Changed so that the second overlay from LINPLOT does not
+	display a title. [v1.0-0]
+
+	* sculib_calc_skydip_temps.f: Created for use in surf_skydip.f and
+	surf_reduce_switch.f
+	
+Jul  1 1997 TimJ
+
+	* sculog: Add SKYSUM for summarizing Skydip data.[v1.0-0 but no docs]
+
+Jun 30 1997 TimJ
+
+	* v1.0-0: Release v1.0-0 to Starlink
+	
