@@ -284,6 +284,7 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -296,13 +297,18 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/convert \
 	  && $(MAKE_CPT)
 
@@ -331,7 +337,6 @@ $(MANIFEST)/cursa: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
@@ -581,6 +586,7 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -592,12 +598,16 @@ $(MANIFEST)/figaro: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sla \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/figaro \
 	  && $(MAKE_CPT)
 
@@ -627,7 +637,6 @@ $(MANIFEST)/findcoords: \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
-		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx
@@ -1674,6 +1683,7 @@ $(MANIFEST)/tsp: \
 		$(MANIFEST)/fio \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
@@ -1687,12 +1697,17 @@ $(MANIFEST)/tsp: \
 		$(MANIFEST)/par \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
-		$(MANIFEST)/starx
+		$(MANIFEST)/starx \
+		$(MANIFEST)/trn
 	cd applications/tsp \
 	  && $(MAKE_CPT)
 
