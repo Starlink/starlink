@@ -192,6 +192,7 @@ itcl::class gaia::GaiaStartup {
       set values_($this,min_scale) -10
       set values_($this,max_scale) 20
       set values_($this,zoom_factor) 4
+      set values_($this,default_cut) 100.0
       set values_($this,default_cmap) real
       set values_($this,default_itt) ramp
    }
@@ -203,7 +204,7 @@ itcl::class gaia::GaiaStartup {
                    with_zoom_window with_pan_window with_colorramp \
                    focus_follows_mouse scrollbars transient_tools \
                    quiet_exit min_scale max_scale zoom_factor \
-                   default_cmap default_itt" {
+                   default_cut default_cmap default_itt" {
          $props_ set_named_property Gaia $key $values_($this,$key)
       }
       $props_ save_properties
@@ -217,6 +218,8 @@ itcl::class gaia::GaiaStartup {
             $values_($this,extended_precision)
          $itk_option(-image) configure -show_hdu_chooser \
             $values_($this,show_hdu_chooser)
+         $itk_option(-image) configure -default_cut \
+            $values_($this,default_cut)
       }
       if { $itk_option(-gaia) != {} } {
          $itk_option(-gaia) configure -transient_tools \
@@ -412,6 +415,25 @@ itcl::class gaia::GaiaStartup {
       add_short_help $itk_component(zoomfactor) \
          {Zoom factor of zoomed window (requires restart)}
       pack $itk_component(zoomfactor) -side top -fill x
+
+      #  Default percentage cut used for new files.
+      itk_component add defaultcut {
+         LabelEntryScale $w_.defaultcut \
+            -text {Default cut:} \
+            -labelwidth $lwidth \
+            -valuewidth 4 \
+            -from 50 \
+            -to 100 \
+            -increment 0.5 \
+            -show_arrows 1 \
+            -resolution 0.5 \
+            -anchor w \
+            -value $values_($this,default_cut) \
+            -command [code $this set_value_ default_cut]
+      }
+      add_short_help $itk_component(defaultcut) \
+         {Default percentage cut used for new files}
+      pack $itk_component(defaultcut) -side top -fill x
 
       #  Default colormap
       itk_component add defaultcmap {

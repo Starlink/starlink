@@ -389,7 +389,8 @@ itcl::class gaia::Gaia {
             -ukirt_ql $itk_option(-ukirt_ql) \
             -appname $appname_ \
             -extended_precision $itk_option(-extended_precision) \
-            -show_hdu_chooser $itk_option(-show_hdu_chooser)
+            -show_hdu_chooser $itk_option(-show_hdu_chooser) \
+            -default_cut $itk_option(-default_cut)
       }
 
       #  Keep a list of SkyCat/GAIA instances.
@@ -1671,6 +1672,9 @@ window gives you access to this."
    #  Whether to attempt to show and control the HDU chooser. If 0
    #  then control is only attempted when the HDU already exists.
    itk_option define -show_hdu_chooser show_hdu_chooser Show_Hdu_Chooser 1
+
+   #  The default percentage cut used for new files.
+   itk_option define -default_cut default_cut Default_Cut 100.0
 
    # -- Protected variables --
 

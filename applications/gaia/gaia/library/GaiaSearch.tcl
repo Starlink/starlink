@@ -365,6 +365,38 @@ itcl::class gaia::GaiaSearch {
              -center 0]
    }
 
+   public proc apply_history {skycat filename defaultcut } {
+
+      if {"$filename" == "" || [string first /tmp $filename] == 0 \
+             || ! [file exists $filename]} {
+         # ignore temporary and non-existant files
+         return
+      }
+
+      set notset 0
+      set catalog $history_catalog_
+      set image [$skycat get_image]
+      if {[catch {$astrocat_ open $catalog}]} {
+         # no catalog yet
+         set notset 1
+      }
+
+      set list [$astrocat_ query -id [file tail $filename]]
+      if {[llength $list] == 0} {
+         # not in catalog
+         set notset 1
+      }
+
+      if { $notset } { 
+         if { $defaultcut != 100.0 } {
+            $image autocut -percent $defaultcut
+         }
+      } else {
+         #  Let SkySearch restore from catalogue.
+         SkySearch::apply_history $skycat $filename
+      }
+   }
+
    #  Configuration options (public variables):
    #  =========================================
 

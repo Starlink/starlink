@@ -650,6 +650,14 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   # Check if the given filename is in the history catalog, and if so, 
+   # apply the cut levels and color settings for the file. Overriden
+   # so that we can apply a default cut by usingh GaiaSearch instead of
+   # SkySearch. 
+   public method apply_history {filename} {
+      gaia::GaiaSearch::apply_history $this $filename $itk_option(-default_cut)
+   }
+
    #  Check if any other instance of this class is displaying the
    #  current image (used when deciding to delete file, shared
    #  temporary files are retained until all instances are released).
@@ -983,6 +991,10 @@ itcl::class gaia::GaiaImageCtrl {
       Extended_Precision 0 {
          set_readout_precision_
       }
+
+   #  Default percentage cut applied when displaying images for the
+   #  first time (or when not in history).
+   itk_option define -default_cut default_cut Default_Cut 100.0
 
    #  Whether to attempt to show and control the HDU chooser. If 0
    #  then control is only attempted when the HDU already exists.
