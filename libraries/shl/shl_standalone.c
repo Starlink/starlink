@@ -161,7 +161,7 @@ extern F77_SUBROUTINE(shl_trnvar)
        );
 
 extern F77_SUBROUTINE(shl_gethlp)
-     ( CHARACTER(libray), CHARACTER(topic), INTEGER(status)
+     ( CHARACTER(libray), CHARACTER(topic), LOGICAL(inter), INTEGER(status)
        TRAIL(libray) TRAIL(topic)
 );
 
@@ -181,6 +181,7 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
    DECLARE_CHARACTER(f77libra,LENSTR);  /* Library as f77 string       */
    DECLARE_CHARACTER(f77topic,LENSTR); /* Topic as f77 string         */
    DECLARE_LOGICAL(f77isenv);          /* F77 is this an env var? */
+   DECLARE_LOGICAL(f77inter);          /* Interative ? */
 
    int     retval;          /* Return status 0=good 1=bad */
    char    topic[LENSTR];   /* Topic as C string    */
@@ -258,8 +259,9 @@ int shl_standalone( char * help_library, int isenv, int argc, char **argv )
 
    /* Call the SHL fortran interface for the actual help 
       functionality */
+   f77inter = F77_TRUE;
    F77_CALL(shl_gethlp)(CHARACTER_ARG(f77libra),CHARACTER_ARG(f77topic),
-			INTEGER_ARG(&status)
+			LOGICAL_ARG(&f77inter), INTEGER_ARG(&status)
 			TRAIL_ARG(f77libra) TRAIL_ARG(f77topic));
 
 abort:

@@ -240,7 +240,7 @@
          END IF
 
 *  Get help text.
-         CALL SHL_GETHLP( LIBRAY, HLPTXT, STATUS )
+         CALL SHL_GETHLP( LIBRAY, HLPTXT, .TRUE., STATUS )
       END IF
 
       END

@@ -1,4 +1,4 @@
-      SUBROUTINE SHL_GETHLP( HELPLB, KEYWRD, STATUS )
+      SUBROUTINE SHL_GETHLP( HELPLB, KEYWRD, INTER, STATUS )
 *+
 *  Name:
 *     SHL_GETHLP
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL SHL_GETHLP( HELPLB, KEYWRD, STATUS )
+*     CALL SHL_GETHLP( HELPLB, KEYWRD, INTER, STATUS )
 
 *  Arguments:
 *     HELPLB = CHARACTER (Given)
@@ -19,6 +19,10 @@
 *     KEYWRD = CHARACTER (Given)
 *        Keyword to use to search help system. Space separated
 *        hierarchy. Can be blank.
+*     INTER = LOGICAL (Given)
+*        If true then an interactive help session is entered. Otherwise,
+*        control is returned to the calling routine when the help item
+*        specified by KEYWRD has been displayed.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -28,6 +32,7 @@
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David Berry (STARLINK)
 *     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
@@ -46,6 +51,10 @@
 *        Incorporate revisions to the portable help system.
 *     15 July 2004 (TIMJ):
 *        Import into shared SHL library
+*     14 August 2004 (TIMJ/DSB):
+*        Add INTER flag to disable interactivity (from IRCAMPACK)
+*     14 August 2004 (TIMJ):
+*        Use FIO to get unit number
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +87,7 @@
 *           Logical-unit number of the terminal output.
 
 *  Arguments Given:
+      LOGICAL   INTER
       CHARACTER * ( * )
      :  HELPLB,
      :  KEYWRD
@@ -95,8 +105,8 @@
 
       EXTERNAL
      :  SHL_GTHLPI,             ! Gets the help information
-     :  HLP_NAMETR,              ! Interactive help library-name
-                                 ! translation
+     :  HLP_NAMETR,             ! Interactive help library-name
+                                ! translation
      :  SHL_PTHLPO              ! Outputs the help information
 
 *  Local Variables:
@@ -143,16 +153,24 @@
 *  Get help.
 *  =========
 
-*  Set logical unit number for help.  This is hardware dependent.
-      LUHLP = 1
+*  Set logical unit number for help
+      CALL FIO_GUNIT( LUHLP, STATUS )
 
-*  Set the flags to enable prompting.
-      HFLAGS = 1
+*  Set the flags to enable prompting if required.
+      IF( INTER ) THEN
+         HFLAGS = 1
+      ELSE
+         HFLAGS = 0
+      END IF
 
 *  Initiate interactive help session.
       ISTAT = HLP_HELP( SHL_PTHLPO, WIDTH, KEYWRD( 1:KWRDLN ), LUHLP,
      :                  HELPLB( 1:HLPLEN ), HFLAGS, SHL_GTHLPI,
      :                  HLP_NAMETR )
+
+
+*  Return the unit number to the pool (before we check status from HLP)
+      CALL FIO_PUNIT( LUHLP, STATUS )
 
 *  Watch for an error status.
       IF ( ISTAT .NE. 1 ) THEN
