@@ -21,41 +21,90 @@
 {        Added NDF2IRAF.
 {     1992 September 30 (MJC):
 {        Added CONHELP and CONVERT help.
+{     1993 August 20 (MJC):
+{        Added new applications for version 0.5, and full command names.
 {     {enter_further_changes_here}
 
 {-
+{
+{   Define the CONVERT commands.
+{
 define   ascii2(ndf)   convert_dir:convert
 define   bdf2(ndf)     convert_dir:convert
 define   dipso2(ndf)   convert_dir:convert
 define   dst2(ndf)     convert_dir:convert
+define   gasp2(ndf)    convert_dir:convert
+define   iraf2(ndf)    convert_dir:convert
 define   ndf2a(scii)   convert_dir:convert
 define   ndf2b(df)     convert_dir:convert
 define   ndf2di(pso)   convert_dir:convert
 define   ndf2ds(t)     convert_dir:convert
+define   ndf2g(asp)    convert_dir:convert
 define   ndf2i(raf)    convert_dir:convert
 define   ndf2u(nf)     convert_dir:convert
 define   unf2(ndf)     convert_dir:convert
-
+{
+{   Define the CONVERT help.
+{
 defhelp  ascii2ndf     convert_dir:convert
 defhelp  bdf2ndf       convert_dir:convert
 defhelp  convert       convert_dir:convert help
 defhelp  dipso2ndf     convert_dir:convert
 defhelp  dst2ndf       convert_dir:convert
+defhelp  gasp2ndf      convert_dir:convert
+defhelp  iraf2ndf      convert_dir:convert
 defhelp  ndf2ascii     convert_dir:convert
 defhelp  ndf2bdf       convert_dir:convert
 defhelp  ndf2dipso     convert_dir:convert
 defhelp  ndf2dst       convert_dir:convert
+defhelp  ndf2gasp      convert_dir:convert
 defhelp  ndf2iraf      convert_dir:convert
 defhelp  ndf2unf       convert_dir:convert
 defhelp  unf2ndf       convert_dir:convert
-
+{
+{   Allow conhelp to work from ICL.
+{
 defstring conh(elp) help convert
+{
+{   Define the CONVERT full commands.
+{
+define   con_ascii2(ndf)   convert_dir:convert
+define   con_bdf2(ndf)     convert_dir:convert
+define   con_dipso2(ndf)   convert_dir:convert
+define   con_dst2(ndf)     convert_dir:convert
+define   con_gasp2(ndf)    convert_dir:convert
+define   con_iraf2(ndf)    convert_dir:convert
+define   con_ndf2a(scii)   convert_dir:convert
+define   con_ndf2b(df)     convert_dir:convert
+define   con_ndf2di(pso)   convert_dir:convert
+define   con_ndf2ds(t)     convert_dir:convert
+define   con_ndf2g(asp)    convert_dir:convert
+define   con_ndf2i(raf)    convert_dir:convert
+define   con_ndf2u(nf)     convert_dir:convert
+define   con_unf2(ndf)     convert_dir:convert
+{
+{   Define the CONVERT help using the full command names.
+{
+defhelp  con_ascii2ndf     convert_dir:convert
+defhelp  con_bdf2ndf       convert_dir:convert
+defhelp  con_dipso2ndf     convert_dir:convert
+defhelp  con_dst2ndf       convert_dir:convert
+defhelp  con_gasp2ndf      convert_dir:convert
+defhelp  con_iraf2ndf      convert_dir:convert
+defhelp  con_ndf2ascii     convert_dir:convert
+defhelp  con_ndf2bdf       convert_dir:convert
+defhelp  con_ndf2dipso     convert_dir:convert
+defhelp  con_ndf2dst       convert_dir:convert
+defhelp  con_ndf2gasp      convert_dir:convert
+defhelp  con_ndf2iraf      convert_dir:convert
+defhelp  con_ndf2unf       convert_dir:convert
+defhelp  con_unf2ndf       convert_dir:convert
 
 { print CONVERT initialisation message }
 
 print  " "
 print  " --    Initialised for Convert    -- "
-print  " --  Version 0.4, 1992 September  -- "
+print  " --  Version 0.5, 1992 September  -- "
 print  " "
 print  " Type HELP CONVERT for CONVERT help  "
 print  " "

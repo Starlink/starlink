@@ -30,6 +30,8 @@ $!     1992 September 29 (MJC):
 $!        Added NDF2IRAF.
 $!     1992 September 30 (MJC):
 $!        Added CONHELP.
+$!     1993 August 20 (MJC):
+$!        Added new applications for version 0.5, and full command names.
 $!     {enter_further_changes_here}
 $!
 $!  Bugs:
@@ -51,13 +53,34 @@ $ BDF2*NDF    :== $CONVERT_DIR:BDF2NDF
 $ CONH*ELP    :== HELP/NOLIBL @CONVERT HELP
 $ DIPSO2*NDF  :== $CONVERT_DIR:DIPSO2NDF
 $ DST2*NDF    :== $CONVERT_DIR:DST2NDF
+$ GASP2*NDF   :== $CONVERT_DIR:GASP2NDF
+$ IRAF2*NDF   :== $CONVERT_DIR:IRAF2NDF
 $ UNF2*NDF    :== $CONVERT_DIR:UNF2NDF
 $ NDF2A*SCII  :== $CONVERT_DIR:NDF2ASCII
 $ NDF2B*DF    :== $CONVERT_DIR:NDF2BDF
 $ NDF2DI*PSO  :== $CONVERT_DIR:NDF2DIPSO
 $ NDF2DS*T    :== $CONVERT_DIR:NDF2DST
+$ NDF2G*ASP   :== $CONVERT_DIR:NDF2GASP
 $ NDF2I*RAF   :== $CONVERT_DIR:NDF2IRAF
 $ NDF2U*NF    :== $CONVERT_DIR:NDF2UNF
+$!
+$!  Define symbols for the full application names.
+$!  ==============================================
+$!
+$ CON_ASCII2*NDF  :== $CONVERT_DIR:ASCII2NDF
+$ CON_BDF2*NDF    :== $CONVERT_DIR:BDF2NDF
+$ CON_DIPSO2*NDF  :== $CONVERT_DIR:DIPSO2NDF
+$ CON_DST2*NDF    :== $CONVERT_DIR:DST2NDF
+$ CON_GASP2*NDF   :== $CONVERT_DIR:GASP2NDF
+$ CON_IRAF2*NDF   :== $CONVERT_DIR:IRAF2NDF
+$ CON_UNF2*NDF    :== $CONVERT_DIR:UNF2NDF
+$ CON_NDF2A*SCII  :== $CONVERT_DIR:NDF2ASCII
+$ CON_NDF2B*DF    :== $CONVERT_DIR:NDF2BDF
+$ CON_NDF2DI*PSO  :== $CONVERT_DIR:NDF2DIPSO
+$ CON_NDF2DS*T    :== $CONVERT_DIR:NDF2DST
+$ CON_NDF2G*ASP   :== $CONVERT_DIR:NDF2GASP
+$ CON_NDF2I*RAF   :== $CONVERT_DIR:NDF2IRAF
+$ CON_NDF2U*NF    :== $CONVERT_DIR:NDF2UNF
 $!
 $!  Set up the help libraries.
 $!  ==========================
@@ -69,7 +92,7 @@ $!  =======================================
 $!
 $ WRITE SYS$OUTPUT  " "
 $ WRITE SYS$OUTPUT  " --    Initialised for CONVERT    -- "
-$ WRITE SYS$OUTPUT  " --  Version 0.4, 1992 September  -- "
+$ WRITE SYS$OUTPUT  " --  Version 0.5, 1993 September  -- "
 $ WRITE SYS$OUTPUT  " "
 $ WRITE SYS$OUTPUT  "    Type CONHELP for CONVERT help"
 $ WRITE SYS$OUTPUT  " "
