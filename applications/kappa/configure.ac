@@ -20,9 +20,11 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 STAR_MONOLITHS
-STAR_CHECK_PROGS([ifd2star])
-STAR_CHECK_PROGS([awish])
-STAR_CHECK_PROGS([atclsh])
+STAR_CHECK_PROGS(ifd2star)
+STAR_CHECK_PROGS(awish)
+STAR_CHECK_PROGS(atclsh)
+STAR_CHECK_PROGS(prohlp,sst)
+STAR_CHECK_PROGS(hlib)
 
 
 dnl    Build dependencies for this package.

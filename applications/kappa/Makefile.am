@@ -194,9 +194,36 @@ MONO_IFL = $(MONO_SOURCE:.f=.ifl)
 
 DYNSCRIPTS = kappa.csh kappa.icl
 
+#  Generate ifl and startup scripts from the ifd file and then do any 
+#  necessary post processing of the generated files to overcome 
+#  deficiencies in ifd2star
 $(IFL_FILES) $(DYNSCRIPTS): kappa.ifd
 	$(IFD2STAR) kappa
+	sed -e "s#picgrid 'picdef mode=array fraction=1.0#picgrid 'picdef array 1.0#g" kappa.csh > temp
+	mv temp kappa.csh
+	sed -e "s#picxy 'picdef mode=xy fraction=1.0#picxy 'picdef xy 1.0#g" kappa.csh > temp
+	mv temp kappa.csh
 
+	sed -e "s#picg(rid) picdef mode=array fraction=1.0#picg(rid) picdef array 1.0#g" kappa.icl > temp
+	mv temp kappa.icl
+	sed -e "s#picx(y) picdef mode=xy fraction=1.0#picx(y) picdef xy 1.0#g" kappa.icl > temp
+	mv temp kappa.icl
+      
+	sed -e 's#prefix=""#prefix=\\"\\"#g' kappa.csh > temp
+	mv temp kappa.csh
+
+
+# Help source file
+starhelp_DATA = kappa.shl
+
+.hlp.shl:
+	@HLIB@ $<
+
+kappa.hlp: $(KAPPA_F1_ROUTINES) $(KAPVIEW_F_ROUTINES) $(NDFPACK_F_ROUTINES) kappa_master.hlp
+	cat $(KAPPA_F1_ROUTINES) $(KAPVIEW_F_ROUTINES) $(NDFPACK_F_ROUTINES) > all.f
+	@PROHLP@ in=all.f out=all.hlp single=no
+	cat kappa_master.hlp all.hlp > kappa.hlp
+	-rm -f all.hlp
 
 # Fixup scripts with bin location
 # The scripts needs to have installation locations edited into them
