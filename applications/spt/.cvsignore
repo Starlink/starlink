@@ -1,5 +1,10 @@
-config.h
-config.h.in
+config.*
+depcomp
+install-sh
+ltmain.sh
+missing
+*.tar.gz
+forconv
 sun111.ps
 starconf.status
 *.lo
