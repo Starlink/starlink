@@ -72,6 +72,7 @@
 #        Added XY profiles toolbox.
 #     22-MAR-2001 (PWD):
 #        Added Polarimetry toolbox.
+#        Revealed ramp printing option.
 #     {enter_changes_here}
 
 #-
@@ -84,11 +85,12 @@ set about_gaia "\
 
 GAIA version $gaia_version
 
-Copyright (C) 1997-2000 Central Laboratory of the Research Councils (U.K.)
+Copyright (C) 1997-2001 Central Laboratory of the Research Councils (U.K.)
 
 Authors:
-Peter W. Draper (P.W.Draper@durham.ac.uk)
+Peter W. Draper (p.w.draper@durham.ac.uk)
 Norman Gray (norman@astro.gla.ac.uk)
+David S. Berry (dsb@ast.man.ac.uk)
 
 GAIA is derived from SkyCat version [skycat_version]
 Copyright (C) 1996-1999 ESO - European Southern Observatory
@@ -391,8 +393,21 @@ itcl::class gaia::Gaia {
          {Close this window, exit application if last}
       add_menu_short_help $m "New Window" \
          {Create a new main window}
-      $m entryconfigure "Print..." -accelerator {Control-p}
-      bind $w_  <Control-p> [code $image_ print]
+
+      set index [$m index "Print..."]
+      catch {$m delete "Print..."}
+      insert_menuitem $m $index cascade "Print..." \
+         {Print image or colour ramp to postscript file or printer} \
+         -menu [menu $m.print]
+      add_menuitem $m.print command "Image..." \
+         {Print image and graphics to postscript file or printer} \
+         -command [code $image_ print] \
+         -accelerator {Control-p}
+      bind $w_ <Control-p> [code $image_ print]
+      add_menuitem $m.print command "Ramp..." \
+         {Print annotated postscript copy of colour ramp to file or printer} \
+         -command [code $this print_ramp_]
+      
       bind $w_  <Control-n> [code $this clone]
       bind $w_  <Control-q> [code $this quit]
 
@@ -1227,7 +1242,7 @@ itcl::class gaia::Gaia {
       #  Set some application options
       tk appname GAIA
       set tk_strictMotif 1
-      set tcl_precision 17
+      set tcl_precision 15
 
       #  Insert some default options
       set argv [linsert $argv 0 -disp_image_icon 1]
@@ -1421,7 +1436,7 @@ itcl::class gaia::Gaia {
    itk_option define -panel_layout panel_layout Panel_layout reverse
 
    #  Show the print colorramp code.
-   itk_option define -ramp_print ramp_print Ramp_Print 0
+   itk_option define -ramp_print ramp_print Ramp_Print 1
 
    #  Set focus following policy (can only set once, then stuck with it).
    itk_option define -focus_follows_mouse focus_follows_mouse \
