@@ -387,7 +387,7 @@ PKG_LINK =
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.2-0
+PKG_VERS = 2.3-0
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -765,7 +765,8 @@ $(TCL_FILES): .tcl.built
 	touch .tcl.built
 
 #  Rule for building the rtd installation. Again we will actually only
-#  install part of this.
+#  install part of this. Note SKYCAT_WRAPPER_DIR works around need for 
+#  tclpro (et build succeeds, but produces an invalid binary).
 $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 
 .skycat.built: gaia_skycat.tar
@@ -775,7 +776,8 @@ $(SKYCAT_FILES) $(SKYCAT_COLORMAP_FILES): .skycat.built
 	pwd=`pwd`;\
 	(cd ./skycat; \
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
-	export INSTALL; unset INSTALL;\
+	export INSTALL; unset INSTALL; \
+	SKYCAT_WRAPPER_DIR=et; export SKYCAT_WRAPPER_DIR; \
 	./configure --prefix=$${pwd}/built --with-$(CC);\
 	make -e all install)
 	cp -p ./built/bin/rtdClient .

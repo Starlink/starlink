@@ -32,12 +32,12 @@ X_INCLUDE     	= @XINCSW@
 # ------------------------------------------------------------------------
 CPPSRCS         =  GaiaSkySearch.C StarRtdImage.C \
                    Gaia.C NDFIO.C StarWCS.C GaiaLocalCatalog.C  \
-                   StarFitsIO.C bitmaps.C
+                   StarFitsIO.C bitmaps.C Contour.C
 
 CSRCS           =  ast_tclerr.c patch.c rtdNDF.c writeslice.c \
                    centroid.c rotated.c rtdRotBoxEllipse.c \
                    gaiacat.c rtdDtrn.c rtdSegment.c \
-                   grf_tkcan.c rtdMark.c rtdWord.c
+                   grf_tkcan.c rtdMark.c rtdWord.c rtdPolyline.c
 
 
 FSRCS           =  rtd_rdndf.f rtd_wrndf.f rtd1_wndfh.f rtd1_crfit.f \
@@ -80,7 +80,10 @@ INCLUDES	= -I../include  \
                   -I../../skycat/cat/tclcat/include \
 	          $(TK_INCLUDE) $(TCL_INCLUDE) $(X_INCLUDE) -I$(STAR_INC)
 
-#DEFINES         = @DEFS@
+DEFINES         = \
+                -DGAIA_VERSION=\"@GAIA_VERSION@\" \
+                -DGAIA_LIBRARY=\"@STARLINK@/bin/gaia\"
+
 CC_SWITCHES	= $(CFLAGS) $(DEFINES) $(INCLUDES)
 DEPEND_FLAGS    = $(CC_SWITCHES) @CXX_INCLUDE@ @CXX_DEPEND_FLAGS@
 INSTALL  	= @INSTALL@

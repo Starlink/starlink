@@ -1672,6 +1672,12 @@ ArrowheadPostscript(interp, canvas, linePtr, arrowPtr)
 					 * describing arrowhead polygon. */
 {
     Tk_CanvasPsPath(interp, canvas, arrowPtr, PTS_IN_ARROW);
+    /* Modified by P.W. Draper to add colour to arrowheads with
+       stipple */
+
+    if (Tk_CanvasPsColor(interp, canvas, linePtr->fg) != TCL_OK) {
+        return TCL_ERROR;
+    }
     if (linePtr->fillStipple != None) {
 	Tcl_AppendResult(interp, "clip ", (char *) NULL);
 	if (Tk_CanvasPsStipple(interp, canvas, linePtr->fillStipple)

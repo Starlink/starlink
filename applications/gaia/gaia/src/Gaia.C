@@ -111,7 +111,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 	libDir = Tcl_GetVar2(interp, "env", "GAIA_LIBRARY", TCL_GLOBAL_ONLY);
     }
     if (libDir == NULL) {
-	libDir = "/star/bin/gaia"; //XXX GAIA_LIBRARY
+	libDir = "GAIA_LIBRARY";
     }
 
     // Set the global Tcl variables gaia_library and gaia_version 
