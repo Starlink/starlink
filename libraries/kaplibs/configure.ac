@@ -41,6 +41,7 @@ AC_CONFIG_FILES([Makefile component.xml
     ctg/Makefile  irq/Makefile     kpg/Makefile
     fts/Makefile  kapgrf/Makefile  lpg/Makefile])
 AC_CONFIG_FILES([kaplibs_link_adam],[chmod +x kaplibs_link_adam])
+AC_CONFIG_FILES([kaplibs_link],[chmod +x kaplibs_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT

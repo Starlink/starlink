@@ -8,13 +8,15 @@ applications (see SUN/238).
 
 Version 2.8
 
+   - kaplibs_link script now works without attempting to load ADAM
+     symbols
    - Can now be built as a shared library
    - Added kpg1_astcmn to provide access to KPG_AST private common block
    - The link script now accepts a -notk option so that no Tk dependencies
      will be included in the link
    - The HLP helper routines are no longer part of kaplibs. Use SHL
      library instead.
-   - kpg1_trmsz no longer present. Please use one_trmsz instead.
+   - kpg1_scrsz no longer present. Please use one_scrsz instead.
 
 Version 2.7. includes the following changes:
 

@@ -1,4 +1,6 @@
+kaplibs_noadam_test
 kaplibs_link_adam
+kaplibs_link
 sun238.ps
 *.lo
 *.la

@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libirq.la
+lib_LTLIBRARIES = libirq.la libirq_adam.la
 
 libirq_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -8,6 +8,8 @@ libirq_la_SOURCES = \
 	$(BLOCK_DATA_FILES) \
 	$(F_ROUTINES) \
         $(G_ROUTINES:.gen=.f)
+
+libirq_adam_la_SOURCES = $(ADAM_F_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 PUBLIC_INCLUDES = IRQ_ERR IRQ_PAR
@@ -23,11 +25,13 @@ irq1_qmsk.f irq1_qset.f irq1_rbit.f irq1_reset.f irq1_rslot.f \
 irq1_searc.f irq1_simpl.f irq1_sorti.f irq1_space.f \
 irq1_temp.f irq1_vtofx.f irq_addqn.f irq_annul.f irq_chkqn.f \
 irq_close.f irq_cntq.f irq_comp.f irq_find.f irq_getqn.f \
-irq_getqx.f irq_new.f irq_numqn.f irq_nxtqn.f irq_remqn.f \
+irq_new.f irq_numqn.f irq_nxtqn.f irq_remqn.f \
 irq_resq.f irq_resql.f irq_resqm.f irq_rlse.f \
 irq_setq.f irq_setql.f irq_setqm.f irq_syntx.f 
 
 G_ROUTINES = irq1_sbad1.gen irq_sbad.gen
+
+ADAM_F_ROUTINES = irq_getqx.f
 
 #  Run generic to get numeric types.
 GFLAGS = n

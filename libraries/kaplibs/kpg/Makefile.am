@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libkpg.la libkpgtk.la
+lib_LTLIBRARIES = libkpg.la libkpgtk.la libkpg_adam.la
 
 libkpg_la_SOURCES = \
 	$(PUBLIC_INCLUDES) \
@@ -9,12 +9,15 @@ libkpg_la_SOURCES = \
 	$(F_ROUTINES) \
 	$(C_ROUTINES) 
 
+libkpg_adam_la_SOURCES = \
+	$(ADAM_F_ROUTINES)
+
 libkpgtk_la_SOURCES = $(TK_ROUTINES)
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
-PUBLIC_INCLUDES = HLPCMD CTM_COM CTM_PAR
-PRIVATE_INCLUDES = KPG_PAR KPG_AST
+PUBLIC_INCLUDES = CTM_PAR
+PRIVATE_INCLUDES = KPG_PAR KPG_AST CTM_COM
 BLOCK_DATA_FILES = ctm_xcols.f
 
 C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
@@ -24,13 +27,18 @@ TK_ROUTINES = kpg1_tkast.c
 
 F_ROUTINES = $(KPG_NONGEN) $(GEN_F_ROUTINES)
 
+ADAM_F_ROUTINES = $(KPG_ADAM_NONGEN) $(ADAM_GEN_F_ROUTINES)
+
 # Need to make sure that a maintainer clean really removes the
 # output of generic
 GEN_F_ROUTINES = $(KPG_N_GEN:.gn=.f) $(KPG_DR_GEN:.gdr=.f) \
 	$(KPG_DIR_GEN:.gdir=.f) $(KPG_NXD_GEN:.gnxd=.f) \
 	$(KPG_BDIRW_GEN:.gbdirw=.f)
 
-MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
+ADAM_GEN_F_ROUTINES = $(KPG_ADAM_DR_GEN:.gdr=.f) \
+	$(KPG_ADAM_N_GEN:.gn=.f)
+
+MAINTAINERCLEANFILES = $(GEN_F_ROUTINES) $(ADAM_GEN_F_ROUTINES)
 
 # Numeric types except Double precision
 # Note that in this case the suffix is strange since a case insensitive
@@ -38,7 +46,7 @@ MAINTAINERCLEANFILES = $(GEN_F_ROUTINES)
 KPG_NXD_GEN = kpg1_cmul.gnxd
 
 # All numeric types
-KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
+KPG_N_GEN = kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
 kpg1_csub.gn kpg1_past.gn kpg1_tdli.gn kpg1_vasv.gn
 
@@ -47,7 +55,7 @@ KPG_BDIRW_GEN = kpg1_iscl.gbdirw
 
 # Double and REAL
 KPG_DR_GEN = kpg1_hsds.gdr kpg1_hstf.gdr kpg1_trig.gdr kpg1_pow.gdr \
-kpg1_mixv.gdr kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
+kpg1_stds.gdr kpg1_stfl.gdr kpg1_ssaz.gdr kpg1_ainb.gdr \
 kpg1_bloc.gdr kpg1_litn.gdr kpg1_ludc.gdr kpg1_mdet.gdr kpg1_trbo.gdr \
 kpg1_trpi.gdr
 
@@ -72,7 +80,6 @@ copy1d.f \
 copy2d.f \
 copy3d.f \
 cpsecr.f \
-creout.f \
 dimlst.f \
 elnmbi.f \
 elnmbr.f \
@@ -87,23 +94,17 @@ kpg1_aindd.f \
 kpg1_aindr.f \
 kpg1_akerd.f \
 kpg1_akerr.f \
-kpg1_arcog.f \
 kpg1_arcol.f \
 kpg1_asagd.f \
 kpg1_ascrv.f \
 kpg1_asdis.f \
 kpg1_asdsv.f \
 kpg1_asffr.f \
-kpg1_asfgt.f \
-kpg1_asfil.f \
 kpg1_asfix.f \
-kpg1_asfrm.f \
 kpg1_asgdp.f \
-kpg1_asget.f \
 kpg1_asgfr.f \
 kpg1_asgfw.f \
 kpg1_asgrd.f \
-kpg1_asgrp.f \
 kpg1_asira.f \
 kpg1_aslog.f \
 kpg1_asmrg.f \
@@ -112,20 +113,16 @@ kpg1_asplt.f \
 kpg1_asprp.f \
 kpg1_aspsy.f \
 kpg1_asptp.f \
-kpg1_asref.f \
 kpg1_asreg.f \
-kpg1_asset.f \
 kpg1_asshr.f \
 kpg1_assig.f \
 kpg1_assim.f \
-kpg1_assir.f \
 kpg1_assmp.f \
 kpg1_asspl.f \
 kpg1_assts.f \
 kpg1_assty.f \
 kpg1_ast2h.f \
 kpg1_astcmn.f \
-kpg1_avlut.f \
 kpg1_axano.f \
 kpg1_axbnd.f \
 kpg1_axbnr.f \
@@ -156,7 +153,6 @@ kpg1_bor2r.f \
 kpg1_bor2ub.f \
 kpg1_bor2uw.f \
 kpg1_bor2w.f \
-kpg1_ccpro.f \
 kpg1_ceil.f \
 kpg1_chaxd.f \
 kpg1_chaxr.f \
@@ -203,15 +199,7 @@ kpg1_cpndr.f \
 kpg1_cpndub.f \
 kpg1_cpnduw.f \
 kpg1_cpndw.f \
-kpg1_cpntb.f \
-kpg1_cpntd.f \
-kpg1_cpnti.f \
-kpg1_cpntr.f \
-kpg1_cpntub.f \
-kpg1_cpntuw.f \
-kpg1_cpntw.f \
 kpg1_cpsty.f \
-kpg1_crout.f \
 kpg1_cshft.f \
 kpg1_ctcpd.f \
 kpg1_ctcpi.f \
@@ -266,8 +254,6 @@ kpg1_flasd.f \
 kpg1_flasi.f \
 kpg1_flasr.f \
 kpg1_flasw.f \
-kpg1_flcod.f \
-kpg1_flcor.f \
 kpg1_flipb.f \
 kpg1_flipd.f \
 kpg1_flipi.f \
@@ -286,17 +272,12 @@ kpg1_gaufuw.f \
 kpg1_gaufw.f \
 kpg1_gausd.f \
 kpg1_gausr.f \
-kpg1_gaxlb.f \
 kpg1_gdare.f \
-kpg1_gdbnd.f \
 kpg1_gdget.f \
-kpg1_gdnew.f \
 kpg1_gdold.f \
 kpg1_gdput.f \
 kpg1_gdqpc.f \
 kpg1_gdwin.f \
-kpg1_getim.f \
-kpg1_getyp.f \
 kpg1_ghstb.f \
 kpg1_ghstd.f \
 kpg1_ghsti.f \
@@ -304,20 +285,6 @@ kpg1_ghstr.f \
 kpg1_ghstub.f \
 kpg1_ghstuw.f \
 kpg1_ghstw.f \
-kpg1_gilst.f \
-kpg1_gnlbu.f \
-kpg1_gntit.f \
-kpg1_gpcol.f \
-kpg1_graph.f \
-kpg1_grlm1.f \
-kpg1_grlm2.f \
-kpg1_grphw.f \
-kpg1_gtaxi.f \
-kpg1_gtaxv.f \
-kpg1_gtchv.f \
-kpg1_gtgrp.f \
-kpg1_gtndf.f \
-kpg1_gtpos.f \
 kpg1_gtwcs.f \
 kpg1_h2ast.f \
 kpg1_hcond.f \
@@ -338,8 +305,6 @@ kpg1_hstqub.f \
 kpg1_hstquw.f \
 kpg1_hstqw.f \
 kpg1_imprg.f \
-kpg1_incod.f \
-kpg1_incor.f \
 kpg1_is3d.f \
 kpg1_is3r.f \
 kpg1_isscs.f \
@@ -366,15 +331,12 @@ kpg1_logar.f \
 kpg1_logaub.f \
 kpg1_logauw.f \
 kpg1_logaw.f \
-kpg1_lstar.f \
 kpg1_ltget.f \
 kpg1_ltlod.f \
 kpg1_ltsav.f \
 kpg1_lutin.f \
 kpg1_lutk2.f \
-kpg1_lutk3.f \
 kpg1_lutk4.f \
-kpg1_lutky.f \
 kpg1_map.f \
 kpg1_meanb.f \
 kpg1_meand.f \
@@ -446,16 +408,13 @@ kpg1_numbuw.f \
 kpg1_numbw.f \
 kpg1_numfl.f \
 kpg1_orvar.f \
-kpg1_pacol.f \
 kpg1_pgclr.f \
-kpg1_pgcls.f \
 kpg1_pgcol.f \
 kpg1_pgcur.f \
 kpg1_pgcut.f \
 kpg1_pgesc.f \
 kpg1_pgloc.f \
 kpg1_pglut.f \
-kpg1_pgopn.f \
 kpg1_pgpix.f \
 kpg1_pgsht.f \
 kpg1_pgsty.f \
@@ -465,14 +424,8 @@ kpg1_pl2pu.f \
 kpg1_plcip.f \
 kpg1_plget.f \
 kpg1_pllod.f \
-kpg1_plota.f \
-kpg1_plot.f \
-kpg1_plotn.f \
-kpg1_plotp.f \
-kpg1_plots.f \
 kpg1_plput.f \
 kpg1_plsav.f \
-kpg1_pltln.f \
 kpg1_poisb.f \
 kpg1_poisd.f \
 kpg1_poisi.f \
@@ -513,7 +466,6 @@ kpg1_qsrtw.f \
 kpg1_r2nag.f \
 kpg1_rcatw.f \
 kpg1_rdast.f \
-kpg1_rdlst.f \
 kpg1_reprt.f \
 kpg1_retrb.f \
 kpg1_retrd.f \
@@ -525,7 +477,6 @@ kpg1_retrw.f \
 kpg1_rfcod.f \
 kpg1_rfcor.f \
 kpg1_rglmt.f \
-kpg1_rgndf.f \
 kpg1_rmapb.f \
 kpg1_rmapd.f \
 kpg1_rmapi.f \
@@ -533,10 +484,7 @@ kpg1_rmapr.f \
 kpg1_rmapub.f \
 kpg1_rmapuw.f \
 kpg1_rmapw.f \
-kpg1_satkc.f \
-kpg1_satkd.f \
 kpg1_sclof.f \
-kpg1_scrsz.f \
 kpg1_sdimp.f \
 kpg1_secsh.f \
 kpg1_seed.f \
@@ -578,7 +526,6 @@ kpg1_unz2r.f \
 kpg1_vec2n.f \
 kpg1_verb.f \
 kpg1_wcatw.f \
-kpg1_wgndf.f \
 kpg1_wmodb.f \
 kpg1_wmodd.f \
 kpg1_wmodi.f \
@@ -588,8 +535,6 @@ kpg1_wmoduw.f \
 kpg1_wmodw.f \
 kpg1_wrast.f \
 kpg1_wread.f \
-kpg1_wrls2.f \
-kpg1_wrlst.f \
 kpg1_wtm3d.f \
 kpg1_wtm3r.f \
 kpg1_wwrt.f \
@@ -604,6 +549,75 @@ powarr.f \
 zero1d.f \
 zero2d.f
 
+# All ADAM routines (parameter access)
+
+KPG_ADAM_NONGEN = \
+creout.f \
+kpg1_arcog.f \
+kpg1_asfgt.f \
+kpg1_asfil.f \
+kpg1_asfrm.f \
+kpg1_asget.f \
+kpg1_asgrp.f \
+kpg1_asref.f \
+kpg1_asset.f \
+kpg1_assir.f \
+kpg1_avlut.f \
+kpg1_ccpro.f \
+kpg1_cpntb.f \
+kpg1_cpntd.f \
+kpg1_cpnti.f \
+kpg1_cpntr.f \
+kpg1_cpntub.f \
+kpg1_cpntuw.f \
+kpg1_cpntw.f \
+kpg1_crout.f \
+kpg1_flcod.f \
+kpg1_flcor.f \
+kpg1_gaxlb.f \
+kpg1_gdbnd.f \
+kpg1_gdnew.f \
+kpg1_getim.f \
+kpg1_getyp.f \
+kpg1_gilst.f \
+kpg1_gnlbu.f \
+kpg1_gntit.f \
+kpg1_gpcol.f \
+kpg1_graph.f \
+kpg1_grlm1.f \
+kpg1_grlm2.f \
+kpg1_grphw.f \
+kpg1_gtaxi.f \
+kpg1_gtaxv.f \
+kpg1_gtchv.f \
+kpg1_gtgrp.f \
+kpg1_gtndf.f \
+kpg1_gtpos.f \
+kpg1_incod.f \
+kpg1_incor.f \
+kpg1_lstar.f \
+kpg1_lutky.f \
+kpg1_lutk3.f \
+kpg1_pacol.f \
+kpg1_pgcls.f \
+kpg1_pgopn.f \
+kpg1_plot.f \
+kpg1_plota.f \
+kpg1_plotp.f \
+kpg1_plotn.f \
+kpg1_plots.f \
+kpg1_pltln.f \
+kpg1_rdlst.f \
+kpg1_rgndf.f \
+kpg1_satkc.f \
+kpg1_satkd.f \
+kpg1_wgndf.f \
+kpg1_wrlst.f \
+kpg1_wrls2.f
+
+KPG_ADAM_DR_GEN = kpg1_mixv.gdr
+
+KPG_ADAM_N_GEN = kpg1_dara.gn
 
 .gn.f:
 	cp $< $(<:.gn=.gen)
