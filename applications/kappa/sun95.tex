@@ -42161,6 +42161,9 @@ section \ref{se:style} the use of graphical style parameters.
 \item DISPLAY now uses independant compression factors for both axes.
     Previously, an inappropriate compression factor could be used for 
     one of the axes if the lengths of the two axes were very different.
+    Also, the default value for MARGIN used when annotated axes are 
+    produced, has been changed from 0.16 to 0.2 in order to avoid 
+    clipping of labels on certain devices.
 
 \item Trailing spaces are now stripped from the Title attribute of the 
     current WCS Frame.
