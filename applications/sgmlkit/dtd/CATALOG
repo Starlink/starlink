@@ -83,10 +83,12 @@ PUBLIC "-//Starlink//DTD Document Summary 0.5//EN"	summary-0.5.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.2//EN"	summary-0.2.dtd
 PUBLIC "-//Starlink//DTD Document Summary 0.1//EN"	summary-0.1.dtd
 
+PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.5//EN"	paracontent-0.5.dtd
+
 	-- The part of the DTD dealing with the notation declarations	--
 	-- is broken off into a separate entity.  See the main DTD	--
 	-- for discussion						--
-PUBLIC "-//Starlink//DTD Notation Declarations//EN"	notations.text
+PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"	notations.text
 
 	-- Program source code DTDs --
 
