@@ -5382,25 +5382,29 @@ target: dependency
                   to be built (perhaps because it uses include files
                   installed by the component <em>D</em>), then that
                   second component has a <em>build</em> dependency on
-                  <em>D</em>:
+                  <em>D</em>: <em>C</em>'s <code>configure.ac</code>
+                  should contain
                   <code>STAR_DECLARE_DEPENDENCIES(build,D)</code>.</p>
               </li>
+
+              <li>
+                <p>If <em>C</em> is a library which depends on functions
+                  from another library <em>D</em>, then <em>D</em>
+                  does not have to be present in order to build
+                  <em>C</em>, but it does have to be present, at some
+                  later stage, in order to link against it:
+                  <code>STAR_DECLARE_DEPENDENCIES(link,D)</code></p>
+              </li>
+
               <li>
                 <p>If <em>D</em> is a library which we need to link
-                  against in order to build our component <em>C</em>, then
+                  against in order to build our component <em>C</em>
+                  (which is almost certainly an application), then
                   this is still a build dependency on <em>D</em>, but
                   we must indicate that we depend on all of
                   <em>D</em>'s link dependencies also:
                   <code>STAR_DECLARE_DEPENDENCIES(build,D,link)</code>.
                 </p>
-              </li>
-              <li>
-                <p>Where do these link dependencies come from?  If
-                  <em>C</em> is a library which depends on functions
-                  from another library <em>D</em>, then <em>D</em>
-                  does not have to be present in order to build
-                  <em>C</em>, but it does have to be present, at some
-                  later stage, in order to link against it.</p>
               </li>
             </ul>
           </p>
@@ -5409,24 +5413,28 @@ target: dependency
             <dl>
               <dt>Sourceset dependencies</dt>
               <dd>
-                <p>These are the components
-                  which must be installed in order to build the complete
-                  set of sources, either for building or for
-                  distribution.  This includes documentation, so it
-                  would include <code>star2html</code> as well as
-                  <code>messgen</code>.</p>
+                <p>These are the components which must be installed in
+                  order to build the complete set of sources, either
+                  for building or for distribution.  This includes
+                  building documentation, so it would include
+                  <code>star2html</code> as well as
+                  <code>messgen</code>.  These dependencies are
+                  generally added for you, by the
+                  <code>STAR_LATEX_DOCUMENTATION</code> or
+                  <code>STAR_MESSGEN</code> macros.</p>
               </dd>
 
               <dt>Build dependencies</dt>
               <dd>
-                <p>These are the dependencies which are required
-                  in order to build this component.  This typically
-                  means include files, but if part of the component is
-                  an executable file (such as <code>compifl</code>
-                  within the <code>parsecon</code> component), then
-                  that's a build dependence also (but see the
-                  discussion of `option', below).  You may not have
-                  two components which have a build dependency on each
+                <p>These are the dependencies which are required in
+                  order to build this component.  This is typically
+                  because you require include files installed by the
+                  other component, but it might also be because you
+                  require an executable built by it (such as the
+                  <code>compifl</code> tool within the
+                  <code>parsecon</code> component).  See also the
+                  discussion of `option', below.  You may not have two
+                  components which have a build dependency on each
                   other, since that would mean that each would have to
                   be built before the other, which is impossible.</p>
               </dd>
@@ -5464,9 +5472,11 @@ target: dependency
                   link dependencies.  We expect that such use
                   dependencies will become more important when we
                   start using this dependency information to build
-                  distribution packages, and have to articular
-                  (minimal?) dependencies between them; until then,
-                  use dependencies will be rather rare.</p>
+                  distribution packages, or to assemble
+                  <code>.rpm</code> or <code>.deb</code> packages.
+                  You should add any use dependencies you are aware
+                  of, even though we cannot really debug them until a
+                  distribution system is in place.</p>
               </dd>
 
               <dt>Test dependencies</dt>
@@ -5500,21 +5510,25 @@ target: dependency
             refine these into link or use dependencies when things
             won't work otherwise.</p>
 
-          <p>All these relationships are transitive: if A has a
-            build dependency on B, and B has one on C, then A has a
-            build dependency on C.  You can augment this by using the
-            final `option' argument: if, in component A's declaration
-            element, you say <code>STAR_DECLARE_DEPENDENCIES(build, B,
-              link)</code>, then you declare that A has a build-time
-            dependency on B, but that (presumably because you are
-            building an application within a component which is mostly
-            libraries) you need to link against B, so component A has
-            a dependency on all of B's <em>link</em> dependencies, not just
-            its build dependencies.  This is (I believe) the only case
-            where this `option' attribute is useful, though it is
-            legal for each of the dependency types.</p>
+          <p>All these relationships are transitive: if A has a build
+            dependency on B, and B has one on C, then A has a build
+            dependency on C.  You can augment this by using the final
+            `option' argument: if, in component A's
+            <code>configure.ac</code>, you say
+            <code>STAR_DECLARE_DEPENDENCIES(build, B, link)</code>,
+            then you declare that A has a build-time dependency on B,
+            but that (presumably because B is a component consisting
+            entirely or mostly of libraries) you need to link against
+            B, so component A has a dependency on all of B's
+            <em>link</em> dependencies, not just its build
+            dependencies.  An application component should generally
+            declare such a dependency for each of the libraries it
+            depends on.  This is (I believe) the only case where this
+            `option' attribute is useful, though it is legal for each
+            of the dependency types.</p>
 
-          <p>You need only declare direct dependencies.  If package
+          <p>Because of the transitivity, you need only declare direct
+            dependencies.  If package
             A depends on package B, which depends in turn on package
             C, then package A need not declare a dependency on C.</p>
 
