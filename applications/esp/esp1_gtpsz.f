@@ -201,8 +201,8 @@
             PSIZE=1D0/DISTY
 
 *         Inform the user what size the pixels are.
-            CALL MSG_FMTR('PSIZE','G9.2',PSIZE)
-            CALL MSG_OUT(' ','Using info from SkyFrame - pixels are '
+            CALL MSG_FMTR('PSIZE','G10.3',PSIZE)
+            CALL MSG_OUT(' ','Using info from SKY frame - pixels are '
      :                   //'^PSIZE arcseconds square.',STATUS)
             CALL MSG_BLANK(STATUS)
 
