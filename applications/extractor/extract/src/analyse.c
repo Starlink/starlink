@@ -12,6 +12,10 @@
 *
 *	Last modify:	12/11/99: (EB)
 *	Last modify:	09/02/00: (PWD)
+*                         Added test for BIG (i.e. missing or BAD)
+*                         values in measurement image that do not
+*                         correspond to such values in the detection
+*                         image (leading to numeric errors on Alphas).
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -140,6 +144,9 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
   for (pixt=pixel+obj->firstpix; pixt>=pixel; pixt=pixel+PLIST(pixt,nextpix))
     {
     pix = PLIST(pixt,value);
+    if (  pix < -BIG ) continue; /* PWD: trap BAD value in
+                                    measurement image that are not
+                                    in detection image */
     if (pix>peak)
       peak = pix;
 
