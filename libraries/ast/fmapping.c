@@ -190,7 +190,7 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
                                        INTEGER(INTERP), \
                                        F77_INTEGER_TYPE (* UINTERP)(), \
                                        DOUBLE(TOL), \
-                                       DOUBLE(LINSCALE), \
+                                       INTEGER(MAXPIX), \
                                        INTEGER(FLAGS), \
                                        Ftype(BADVAL), \
                                        DOUBLE_ARRAY(PARAMS), \
@@ -210,7 +210,7 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
    GENPTR_##Ftype##_ARRAY(IN_VAR) \
    GENPTR_INTEGER(INTERP) \
    GENPTR_DOUBLE(TOL) \
-   GENPTR_DOUBLE(LINSCALE) \
+   GENPTR_INTEGER(MAXPIX) \
    GENPTR_INTEGER(FLAGS) \
    GENPTR_##Ftype(BADVAL) \
    GENPTR_DOUBLE_ARRAY(PARAMS) \
@@ -253,7 +253,7 @@ F77_INTEGER_FUNCTION(ast_resample##f)( INTEGER(THIS), \
       } \
       RESULT = astResample##X( astI2P( *THIS ), *NDIM_IN, \
                                LBND_IN, UBND_IN, IN, in_var, \
-                               interp, *TOL, *LINSCALE, \
+                               interp, *TOL, *MAXPIX, \
                                *FLAGS, *BADVAL, PARAMS, \
                                *NDIM_OUT, LBND_OUT, UBND_OUT, \
                                LBND, UBND, OUT, out_var ); \

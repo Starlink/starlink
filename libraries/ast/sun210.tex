@@ -29,13 +29,15 @@
 \newcommand{\stardocmanual}    {Programmer's Guide\\(Fortran Version)}
 \newcommand{\stardocmanualhtml}{Programmer's Guide (Fortran Version)}
 \newcommand{\stardocabstract}  {
-The AST library may be used for attaching world coordinate systems to
-astronomical data, for retrieving and interpreting that information
-and for generating graphical output based on it.
+The AST library provides a comprehensive range of facilities for
+attaching world coordinate systems to astronomical data, for
+retrieving and interpreting that information and for generating
+graphical output based on it.
 
-This programmer's manual should be of interest to anyone writing astronomical
-applications which need to manipulate coordinate system data, especially
-celestial coordinate systems. AST is portable and environment-independent.
+This programmer's manual should be of interest to anyone writing
+astronomical applications which need to manipulate coordinate system
+data, especially celestial coordinate systems. AST is portable and
+environment-independent.
 }
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -4298,7 +4300,7 @@ use recommended below should be carefully observed:
 \begin{quote}
 \begin{description}
 \item[GRAPHICS]\begin{latexonly}\mbox{}\\ \end{latexonly} Identifies
-the coordinate system used by an underlying computer graphics system
+the coordinate space used by an underlying computer graphics system
 to specify plotting operations. Typically, when performing graphical
 operations, AST is used to define additional coordinate systems which
 are related to these ``native'' graphical coordinates.  Plotting may
@@ -4353,11 +4355,11 @@ probably won't need to change this very often.
 
 Although we have drawn a necessary distinction here between the GRID
 and PIXEL domains, we will continue to refer in general terms to image
-``pixel coordinates'' whenever this distinction is not important. This
-should not be taken to imply that the GRID convention for numbering
-pixels is excluded---in fact, it is usually to be preferred (at the
-level of data handling being discussed in this document) and we
-recommend it.
+``pixels'' and ``pixel coordinates'' whenever this distinction is not
+important. This should not be taken to imply that the GRID convention
+for numbering pixels is excluded---in fact, it is usually to be
+preferred (at the level of data handling being discussed in this
+document) and we recommend it.
 
 \cleardoublepage
 %docstatus skyframes:        I(cf)
@@ -7795,7 +7797,7 @@ FITS headers, which we call {\em{encodings.}} Here, we are concerned
 with those encodings defined by software systems other than AST, which
 we term {\em{foreign encodings.}}
 
-Currently, AST supports two foreign encodings, which may be selected
+Currently, AST supports three foreign encodings, which may be selected
 by setting the \htmlref{Encoding}{Encoding} attribute of a \htmlref{FitsChan}{FitsChan} to one of the
 following (character string) values:
 
@@ -7817,7 +7819,7 @@ information using this encoding and then to write it back out again,
 so long as only minor changes have been made.
 
 \item[FITS-WCS]\begin{latexonly}\mbox{}\\ \end{latexonly}
-This encoding is particularly important because it is based on a
+This encoding is potentially very important because it is based on a
 proposed new FITS standard which should, for the first time, address
 the problem of celestial coordinate systems in a proper manner, by
 considerably extending the original FITS standard.
@@ -7837,19 +7839,28 @@ necessarily be guaranteed to read FITS-WCS encoded data written with
 the current version.  At present, therefore, you should write WCS
 information using this encoding only with great caution and should not
 use it for archiving data.}}\footnote{The likelihood of further
-substantial changes to the FITS-WCS proposal has come as something of
-a surprise to many onlookers, given that the paper by Greisen \&
-Calabretta has changed very little for several years. The present
-uncertain situation is clearly not satisfactory and we intend to
-provide an interim solution in a forthcoming version of AST. Most
-probably, this will take the form of support for additional unofficial
-(but stable) encodings based on the original FITS standard.}
+substantial changes to the FITS-WCS proposal came as something of a
+surprise to many onlookers, given that the paper by Greisen \&
+Calabretta had changed very little for several years. At present,
+therefore, the situation is somewhat uncertain, although there are
+hopes that final agreement on a FITS-WCS standard may now be close.
+Meanwhile, a suitable (stable) interim standard can be found in the
+form of the FITS-IRAF encoding.}
 
-The main value of this encoding at present is that the WCS convention
-incorporated in the original (1981) FITS standard forms a stable
-subset of the new proposals. The FITS-WCS encoding is therefore able
-to read information stored using this original convention, which has
-been quite widely used despite its limitations.
+\item[FITS-IRAF]\begin{latexonly}\mbox{}\\ \end{latexonly}
+This encoding is based on the conventions described in the document
+"World Coordinate Systems Representations Within the FITS Format" by
+R.J. Hanisch and D.G. Wells, 1988.\footnote{Available by ftp from
+fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z} It is currently
+employed by the IRAF data analysis facility, so its use will
+facilitate data exchange with IRAF.
+
+Given the current lack of final agreement on the FITS-WCS standard
+(above), the FITS-IRAF encoding provides a suitable interim solution,
+because it approximates to a subset of the propsed FITS-WCS standard.
+This means that it is slightly more restrictive, but in practice its
+limitations are often unimportant. Conversion of data from FITS-IRAF
+to the final form of FITS-WCS is likely to be well supported.
 \end{description}
 \end{quote}
 
@@ -8291,21 +8302,20 @@ relieving you of the need to understand the details and limitations of
 each encoding yourself. When this attempt fails, however, you must
 consider what alternative encoding to use.
 
-Unfortunately, at present this is a slightly difficult question to
-answer. Ideally, you would probably want to try a sequence of
-alternative encodings, using an approach such as the following:
+Ideally, you would probably want to try a sequence of alternative
+encodings, using an approach such as the following:
 
 \small
 \begin{verbatim}
-*  1:
-      CALL AST_SET( FITSCHAN, 'Card=1, Encoding=FITS-WCS', STATUS )
+*  1.
+      CALL AST_SET( FITSCHAN, 'Card=1, Encoding=FITS-IRAF', STATUS )
       IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
-*  2:
+*  2.
          CALL AST_SETC( FITSCHAN, "Encoding", ENCODE, STATUS )
          IF ( AST_WRITE( FITSCHAN, WCSINFO, STATUS ) .EQ. 0 ) THEN
 
-*  3:
+*  3.
             CALL AST_SET( FITSCHAN, 'Encoding=NATIVE', STATUS )
             NOBJ = AST_WRITE( FITSCHAN, WCSINFO, STATUS )
          END IF
@@ -8316,13 +8326,17 @@ alternative encodings, using an approach such as the following:
 That is:
 
 \begin{enumerate}
-\item Start by trying the FITS-WCS encoding, on the grounds that FITS
+\item Start by trying the FITS-IRAF encoding, on the grounds that FITS
 should provide a universal interchange standard in which all WCS
-information should be expressed if possible.
+information should be expressed if possible. (In the fullness of time,
+when the FITS-WCS standard becomes stable, you should change to using
+this instead. For now, however, the FITS-IRAF encoding is a practical
+alternative.)
 
 \item If that fails, then try the original encoding used for the input
-WCS information, on the grounds that you are at least not making the
-information any harder for others to read than it originally was.
+WCS information (which might even be FITS-WCS), on the grounds that
+you are at least not making the information any harder for others to
+read than it originally was.
 
 \item If that also fails, then you are probably trying to store fairly
 complex information for which you need the native encoding. Only other
@@ -8331,21 +8345,20 @@ probably the only programs that will be able to do anything sensible
 with it anyway.
 \end{enumerate}
 
-However, since the FITS-WCS encoding is not yet based on a stable FITS
-standard (\secref{ss:foreignencodings}), attempting to write using
-this encoding cannot currently be recommended, in case the final
-standard differs significantly from the current draft.  Therefore, the
-only sensible option at present is probably to omit step (A) above and
-to attempt only steps (B) and (C).
-
 An alternative approach might be to encode the WCS information in
 several ways, since this gives the maximum chance that other software
-will be able to read it. This approach is possible because currently
-there is no conflict between the FITS keywords used by the different
-encodings which AST supports, although conflicts between new encodings
-introduced in future obviously cannot be ruled out.  Adopting this
-approach would simply require multiple calls to AST\_WRITE, rewinding
-the FitsChan and changing its Encoding value before each one.
+will be able to read it. This approach is possible because there is
+currently little conflict between the FITS keywords used by the
+different encodings which AST supports,\footnote{There is some risk
+that clashes between the FITS-IRAF and FITS-WCS encodings may occur,
+since they share some keywords, although they use them for the same
+purposes. This makes it possible, in theory, to mix them safely, but
+in practice other software might be confused by the presence of both
+conventions at once.} although the possibility of new conflicts
+arising between encodings introduced in future obviously cannot be
+ruled out. Adopting this approach would simply require multiple calls
+to AST\_WRITE, rewinding the FitsChan and changing its Encoding value
+before each one.
 
 Unfortunately, however, there is a drawback to duplicating WCS
 information in the FITS header in this way, because any program which
@@ -11862,10 +11875,10 @@ Object            - Base class for all AST Objects
       represent, in the number of Object descriptions that can coexist
       in the same FitsChan, and in their accessibility to other
       (external) astronomy applications (see the Encoding attribute
-      for details). Encodings are not mutually exclusive and it is
-      possible to describe the same Object in several ways within a
-      particular set of FITS header cards by using several different
-      encodings.
+      for details). Encodings are not necessarily mutually exclusive
+      and it may sometimes be possible to describe the same Object in
+      several ways within a particular set of FITS header cards by
+      using several different encodings.
 
       The detailed behaviour of AST\_READ and AST\_WRITE, when used with
       a FitsChan, depends on the encoding in use. In general, however,
@@ -16647,12 +16660,12 @@ Object            - Base class for all AST Objects
       external applications which can potentially read and interpret
       the FITS header cards produced.
 
-      The encoding options available are not mutually exclusive, and
-      it is possible to store multiple Objects (or the same Object
-      several times) using different encodings within the same set of
-      FITS header cards. This possibility increases the likelihood of
-      other applications being able to read and interpret the
-      information.
+      The encoding options available are not necessarily mutually
+      exclusive, and it may sometimes be possible to store multiple
+      Objects (or the same Object several times) using different
+      encodings within the same set of FITS header cards. This
+      possibility increases the likelihood of other applications being
+      able to read and interpret the information.
 
       By default, a FitsChan will attempt to determine which encoding
       system is already in use, and will set the default Encoding
@@ -16687,23 +16700,32 @@ Object            - Base class for all AST Objects
          see the section {\tt{"}}The DSS Encoding{\tt{"}} below.
 
          \sstitem
-         {\tt{"}}FITS-IRAF{\tt{"}}: Encodes coordinate system information in FITS
-         header cards using the conventions described in the document
-         {\tt{"}}World Coordinate Systems Representations Within the FITS Format{\tt{"}}
-         by R.J. Hanisch and D.G. Wells, 1988, available by ftp from
-         fits.cv.nrao.edu /fits/documents/wcs/wcs88.ps.Z. The main advantage
-         of this encoding is that it is currently in use by IRAF. For further
-         details, see the section {\tt{"}}The FITS-IRAF Encoding{\tt{"}} below.
-
-         \sstitem
          {\tt{"}}FITS-WCS{\tt{"}}: Encodes coordinate system information in FITS
-         header cards using the convention described in the (draft) FITS
-         world coordinate system (FITS-WCS) paper by E.W.Greisen and
-         M.Calabretta (A \& A, in preparation). The main advantages of
+         header cards using the conventions described in the (draft) FITS
+         world coordinate system (FITS-WCS) paper by E.W. Greisen and
+         M. Calabretta (A \& A, in preparation). The main advantages of
          this encoding are that it should be understood by any FITS-WCS
          compliant application and is likely to be adopted widely for
-         FITS data in future. For further details, see the section {\tt{"}}The
-         FITS-WCS Encoding{\tt{"}} below.
+         FITS data in future. At present, however, it suffers from the
+         disadvantage that the FITS-WCS standard is only a draft (and is
+         not stable), so it cannot yet be recommended for regular
+         use. For further details, see the section {\tt{"}}The FITS-WCS
+         Encoding{\tt{"}} below.
+
+         \sstitem
+         {\tt{"}}FITS-IRAF{\tt{"}}: Encodes coordinate system information in FITS
+         header cards using the conventions described in the document
+         {\tt{"}}World Coordinate Systems Representations Within the FITS
+         Format{\tt{"}} by R.J. Hanisch and D.G. Wells, 1988.  This encoding is
+         currently employed by the IRAF data analysis facility, so its
+         use will facilitate data exchange with IRAF. Its main advantages
+         are that it is a stable convention which approximates to a
+         subset of the propsed FITS-WCS encoding (above). This makes it
+         suitable as an interim method for storing coordinate system
+         information in FITS headers until the FITS-WCS encoding becomes
+         stable. Since many datasets currently use the FITS-IRAF
+         encoding, conversion of data from FITS-IRAF to the final form of
+         FITS-WCS is likely to be well supported.
 
          \sstitem
          {\tt{"}}NATIVE{\tt{"}}: Encodes AST Objects in FITS header cards using a
@@ -16734,9 +16756,9 @@ Object            - Base class for all AST Objects
          string {\tt{"}}BEGAST{\tt{"}}, then NATIVE encoding is used,
 
          \sstitem
-         Otherwise, if the FitsChan contains a keyword of the form {\tt{"}}CDi\_j{\tt{"}}
-         or {\tt{"}}CDiiijjj{\tt{"}}, where i and j are single digits, then FITS-IRAF
-         encoding is used,
+         Otherwise, if the FitsChan contains a keyword of the form
+         {\tt{"}}CDi\_j{\tt{"}} or {\tt{"}}CDiiijjj{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits, then
+         FITS-IRAF encoding is used,
 
          \sstitem
          Otherwise, if the FitsChan contains the {\tt{"}}CRVAL1{\tt{"}} keyword, then
@@ -16758,8 +16780,9 @@ Object            - Base class for all AST Objects
       Note that when writing information to a FitsChan, the choice of
       encoding will depend greatly on the type of application you
       expect to be reading the information in future. If you do not
-      know this, there may be an advantage in writing the information
-      several times, using a different encoding on each occasion.
+      know this, there may sometimes be an advantage in writing the
+      information several times, using a different encoding on each
+      occasion.
    }
    \sstdiytopic{
       The DSS Encoding
@@ -16882,30 +16905,37 @@ Object            - Base class for all AST Objects
    \sstdiytopic{
       The FITS-IRAF Encoding
    }{
-      The FITS-IRAF encoding is to all intents and purposes a subset of the
-      FITS-WCS encoding. The main differences are:
+      The FITS-IRAF encoding can, for most purposes, be considered as
+      a subset of the FITS-WCS encoding (above), although it differs
+      in the details of the FITS keywords used. It is used in exactly
+      the same way and has the same restrictions, but with the
+      addition of the following:
 
       \sstitemlist{
 
          \sstitem
-         Secondary axis descriptions are not supported by the FITS-IRAF
-         encoding. When writing a FrameSet, only the \htmlref{Base}{Base} and \htmlref{Current}{Current} Frames
-         will be stored in the FitsChan.
+         The only celestial coordinate systems that may be represented
+         are equatorial, galactic and ecliptic,
 
          \sstitem
-         The range of sky projections which can be described by the
-         FITS-IRAF encoding is considerably smaller.
+         The range of sky projections which can be represented is
+         considerably smaller than FITS-WCS,
 
          \sstitem
-         The FITS-IRAF encoding can only describe equatorial, galactic and
-         ecliptic sky coordinates.
+         Secondary axis descriptions are not supported, so when writing
+         a FrameSet to a FitsChan, only information from the base and
+         current Frames will be stored.
 
       }
-      When writing a FrameSet using the FITS-IRAF encoding, the axis
-      rotations are specified by a matrix of keywords of the form CDi\_j
-      where {\tt{"}}i{\tt{"}} is the index of a pixel axis and {\tt{"}}j{\tt{"}} is the axis of a
-      physical axis. The alternative form CDiiijjj is recognised when
+      When writing a FrameSet using the FITS-IRAF encoding, axis
+      rotations are specified by a matrix of FITS keywords of the form
+      {\tt{"}}CDi\_j{\tt{"}}, where {\tt{"}}i{\tt{"}} and {\tt{"}}j{\tt{"}} are single digits. The alternative
+      form {\tt{"}}CDiiijjj{\tt{"}}, which is also in use, is recognised when
       reading an Object, but is never written.
+
+      You should not normally attempt to mix the FITS-IRAF and
+      FITS-WCS encodings within the same FitsChan, since there is a
+      risk that keyword clashes may occur.
    }
    \sstdiytopic{
       The NATIVE Encoding
@@ -19649,10 +19679,10 @@ Object            - Base class for all AST Objects
       represent, in the number of Object descriptions that can coexist
       in the same FitsChan, and in their accessibility to other
       (external) astronomy applications (see the Encoding attribute
-      for details). Encodings are not mutually exclusive and it is
-      possible to describe the same Object in several ways within a
-      particular set of FITS header cards by using several different
-      encodings.
+      for details). Encodings are not necessarily mutually exclusive
+      and it may sometimes be possible to describe the same Object in
+      several ways within a particular set of FITS header cards by
+      using several different encodings.
 
       The detailed behaviour of AST\_READ and AST\_WRITE, when used with
       a FitsChan, depends on the encoding in use. In general, however,
@@ -19661,7 +19691,7 @@ Object            - Base class for all AST Objects
       removed from the FitsChan.
 
       If the encoding in use allows only a single Object description
-      to be stored in a FitsChan (e.g. the DSS, FITS-WCS, FITS-IRAF and
+      to be stored in a FitsChan (e.g. the DSS, FITS-WCS and FITS-IRAF
       encodings), then write operations using AST\_WRITE will
       over-write any existing Object description using that
       encoding. Otherwise (e.g. the NATIVE encoding), multiple Object
@@ -21218,9 +21248,15 @@ with the standard (or ``native'') version of PGPLOT.
 quickly, although this has been achieved at the cost of some loss of
 robustness when used with difficult Mappings.
 
+\item A new value of ``FITS-IRAF'' has been introduced for the
+\htmlref{Encoding}{Encoding} attribute of a \htmlref{FitsChan}{FitsChan}. This new encoding provides an
+interim solution to the problem of storing coordinate system
+information in FITS headers, until the proposed new FITS-WCS standard
+becomes stable.
+
 \item \htmlref{AST\_FINDFITS}{AST_FINDFITS} now ignores trailing spaces in its keyword template.
 
-\item The \htmlref{FitsChan}{FitsChan} class is now more tolerant of common minor
+\item The FitsChan class is now more tolerant of common minor
 violations of the FITS standard.
 
 \item The FitsChan class now incorporates an improved test for the

@@ -75,6 +75,9 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        simplify a single Mapping where possible.
 *     29-MAY-1998 (RFWS):
 *        Added the MapBox method.
+*     13-NOV-1998 (RFWS):
+*        Made default MapBox convergence accuracy larger (i.e. less
+*        accurate).
 *class--
 */
 
@@ -201,7 +204,7 @@ static int InterpolatePixelNearestUL( int, const int *, const int *, const unsig
 static int InterpolatePixelNearestUS( int, const int *, const int *, const unsigned short int *, const unsigned short int *, int, const int *, double *, int, unsigned short int, unsigned short int *, unsigned short int * );
 static int MapMerge( AstMapping *, int, int, int *, AstMapping ***, int ** );
 static int MinI( int, int );
-static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), double, double, int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
+static int ResampleAdaptively( AstMapping *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), double, int, int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int ResampleSection( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int ResampleWithBlocking( AstMapping *, const double *, int, const int *, const int *, const void *, const void *, DataType, int (*)(), int, const void *, const double *, int, const int *, const int *, const int *, const int *, void *, void * );
 static int TestAttrib( AstObject *, const char * );
@@ -238,7 +241,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
                         const int lbnd_in[], const int ubnd_in[], \
                         const Xtype in[], const Xtype in_var[], \
                         AstInterpolate##X interp, double tol, \
-                        double linscale, int flags, Xtype badval, \
+                        int maxpix, int flags, Xtype badval, \
                         const double params[], \
                         int ndim_out, const int lbnd_out[], \
                         const int ubnd_out[], const int lbnd[], \
@@ -279,7 +282,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    type we have obscured. */ \
    result = ResampleAdaptively( simple, ndim_in, lbnd_in, ubnd_in, \
                                 (const void *) in, (const void *) in_var, \
-                                TYPE_##X, (int (*)()) interp, tol, linscale, \
+                                TYPE_##X, (int (*)()) interp, tol, maxpix, \
                                 flags, (const void *) &badval, params, \
                                 ndim_out, lbnd_out, ubnd_out, \
                                 lbnd, ubnd, \
@@ -838,6 +841,7 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 */
 
 /* Local Constants: */
+   const double default_acc = 3.0e-5; /* Default convergence accuracy */
    const int maxiter = 10000;    /* Maximum number of iterations */
    const int minsame = 3;        /* Minimum no. consistent extrema required */
    const int nbatch = 32;        /* No. function samples obtained per batch */
@@ -1033,23 +1037,23 @@ static void GlobalBounds( MapData *mapdata, double *lbnd, double *ubnd,
 
 /* If we have no current estimate of either global extremum, we assume
    the values we eventually obtain will be of order unity and required
-   to machine single precision. */
-      acc = (double) FLT_EPSILON;
+   to the default accuracy. */
+      acc = default_acc;
 
 /* If we already have an estimate of both global extrema, we set the
-   accuracy so that the difference between them will be known to
-   machine single precision. */
+   accuracy level so that the difference between them will be known to
+   the default accuracy. */
       if ( ( *lbnd != AST__BAD ) && ( *ubnd != AST__BAD ) ) {
-         acc = fabs( *ubnd - *lbnd ) * (double) FLT_EPSILON;
+         acc = fabs( *ubnd - *lbnd ) * default_acc;
 
 /* If we have an estimate of only one global extremum, we assume that
    the difference between the two global extrema will eventually be of
    the same order as the estimate we currently have, so long as this
    is not less than unity. */
       } else if ( *lbnd != AST__BAD ) {
-         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * (double) FLT_EPSILON;
+         if ( fabs( *lbnd ) > 1.0 ) acc = fabs( *lbnd) * default_acc;
       } else if ( *ubnd != AST__BAD ) {
-         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * (double) FLT_EPSILON;
+         if ( fabs( *ubnd ) > 1.0 ) acc = fabs( *ubnd) * default_acc;
       }
 
 /* Search for a new local minimum. */
@@ -3284,8 +3288,8 @@ static double LocalMaximum( const MapData *mapdata, double acc, double fract,
 */
 
 /* Local Constants: */
-   const int maxcall = 2500;     /* Maximum number of function evaluations */
-   const int maxiter = 10;       /* Maximum number of iterations */
+   const int maxcall = 1500;     /* Maximum number of function evaluations */
+   const int maxiter = 5;        /* Maximum number of iterations */
 
 /* Local Variables: */
    double *dx;                   /* Pointer to array of step lengths */
@@ -4356,7 +4360,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
                                const int *lbnd_in, const int *ubnd_in,
                                const void *in, const void *in_var,
                                DataType type, int (* interp)(),
-                               double tol, double linscale, int flags,
+                               double tol, int maxpix, int flags,
                                const void *badval_ptr, const double *params,
                                int ndim_out, const int *lbnd_out,
                                const int *ubnd_out, const int *lbnd,
@@ -4377,7 +4381,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *                             const int *lbnd_in, const int *ubnd_in,
 *                             const void *in, const void *in_var,
 *                             DataType type, int (* interp)(),
-*                             double tol, double linscale, int flags,
+*                             double tol, int maxpix, int flags,
 *                             const void *badval_ptr, params,
 *                             int ndim_out, const int *lbnd_out,
 *                             const int *ubnd_out, const int *lbnd,
@@ -4478,29 +4482,32 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 *        If linear approximation is not required, a "tol" value of
 *        zero may be given. This will ensure that the Mapping is used
 *        without any approximation.
-*     linscale
-*        A value which specifies the approximate scale size on which
-*        to search for non-linearities in the Mapping supplied. This
-*        value should be expressed in terms of pixels in the output
-*        grid.
-*
-*        If the value given is very large (the normal recommendation),
-*        the function will initially search for non-linearity on a
-*        scale determined by the size of the output grid (or the
-*        section of it to which resampled values are being written, if
-*        this is smaller). This arrangement is almost always
+*     maxpix
+*        A value which specifies the largest scale size on which to
+*        search for non-linearities in the Mapping supplied. This
+*        value should be expressed as a number of pixels in the output
+*        grid. The function will break the output section specified
+*        into smaller sub-sections (if necessary), each no larger than
+*        "maxpix" pixels in any dimension, before it attempts to
+*        approximate the Mapping by a linear function over each
+*        sub-section.
+* 
+*        If the value given is larger than the largest dimension of
+*        the output section (the normal recommendation), the function
+*        will initially search for non-linearity on a scale determined
+*        by the size of the output section.  This is almost always
 *        satisfactory. Very occasionally, however, a Mapping may
 *        appear linear on this scale but nevertheless have smaller
-*        irregularities (e.g. "holes") in it.  In such cases,
-*        "linscale" may be set to a suitably smaller value so as to
-*        ensure this non-linearity is not overlooked. Typically, a
-*        value of 50 to 100 pixels might be suitable and would have
-*        little effect on performance.
+*        irregularities (e.g. "holes") in it.  In such cases, "maxpix"
+*        may be set to a suitably smaller value so as to ensure this
+*        non-linearity is not overlooked. Typically, a value of 50 to
+*        100 pixels might be suitable and should have little effect on
+*        performance.
 *
-*        If too small a value is given, it will have the effect of
-*        preventing linear approximation occurring at all (equivalent
-*        to setting "tol" to zero).  Although this may degrade
-*        performance, accurate results will still be obtained.
+*        If too small a value is given, however, it will have the
+*        effect of preventing linear approximation occurring at all
+*        (equivalent to setting "tol" to zero).  Although this may
+*        degrade performance, accurate results will still be obtained.
 *     flags
 *        The bitwise OR of a set of flag values which control the
 *        operation of the function. Currently, only the flag
@@ -4643,7 +4650,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
 
 /* Note if the maximum dimension of the output section exceeds the
    user-supplied scale factor. */
-   toobig = ( linscale < (double) mxdim );
+   toobig = ( maxpix < mxdim );
 
 /* Assume the Mapping is significantly non-linear before deciding
    whether to sub-divide the output section. */
@@ -4713,7 +4720,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
    of this function. */
             result = ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
                                          in, in_var, type, interp, tol,
-                                         linscale, flags, badval_ptr, params,
+                                         maxpix, flags, badval_ptr, params,
                                          ndim_out, lbnd_out, ubnd_out,
                                          lo, hi, out, out_var );
 
@@ -4727,7 +4734,7 @@ static int ResampleAdaptively( AstMapping *this, int ndim_in,
             if ( lo[ dimx ] <= hi[ dimx ] ) {
                result += ResampleAdaptively( this, ndim_in, lbnd_in, ubnd_in,
                                              in, in_var, type, interp, tol,
-                                             linscale, flags, badval_ptr,
+                                             maxpix, flags, badval_ptr,
                                              params,
                                              ndim_out, lbnd_out, ubnd_out,
                                              lo, hi, out, out_var );
@@ -8392,7 +8399,7 @@ void astReportPoints_( AstMapping *this, int forward,
 int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
                        const int *ubnd_in, const Xtype *in, \
                        const Xtype *in_var, AstInterpolate##X interp, \
-                       double tol, double linscale, int flags, Xtype badval, \
+                       double tol, int maxpix, int flags, Xtype badval, \
                        const double *params, int ndim_out, \
                        const int *lbnd_out, const int *ubnd_out, \
                        const int *lbnd, const int *ubnd, Xtype *out, \
@@ -8400,7 +8407,7 @@ int astResample##X##_( AstMapping *this, int ndim_in, const int *lbnd_in, \
    if ( !astOK ) return 0; \
    return (**astMEMBER(this,Mapping,Resample##X))( this, ndim_in, lbnd_in, \
                                                    ubnd_in, in, in_var, \
-                                                   interp, tol, linscale, \
+                                                   interp, tol, maxpix, \
                                                    flags, badval, params, \
                                                    ndim_out, lbnd_out, \
                                                    ubnd_out, lbnd, ubnd, out, \
