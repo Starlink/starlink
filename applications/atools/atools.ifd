@@ -651,7 +651,7 @@ iraf! {
          parameter matrix {
             position 4
             type _DOUBLE
-            prompt {The matrix elements (1st row, followed by 2nd row, etc)}
+            prompt {The matrix elements}
             ppath CURRENT DEFAULT
             default 0
             helpkey *
