@@ -1,48 +1,133 @@
-*+  KSTAT - Calculates Kendall's K statistic for a 1D data array class object
       SUBROUTINE KSTAT( STATUS )
-*    Description :
+*+
+*  Name:
+*     KSTAT
+
+*  Purpose:
+*     Calculates Kendall's K statistic for a 1D data array
+
+*  Language:
+*     Starlink Fortran
+
+*  Type of Module:
+*     ASTERIX task
+
+*  Invocation:
+*     CALL KSTAT( STATUS )
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status.
+
+*  Description:
 *     Calculates Kendall's K statistic (a measure of correlation) for the
-*     DATA_ARRAY and AXIS(1) data of a 1D dataset.
+*     data array and axis data of a 1D dataset.
 *     The statistic is unit normal to a good approximation (so long as each
 *     array contains at least 10 elements) if the two arrays are uncorrelated.
 *     Significant +ve values indicate correlation, and negative values
 *     correspond to anticorrelation.
-*     Can also be used to find the correlation between any two arrays of the same length.
-*    Parameters :
-*     INP   'UNIV' input data object
-*     INP2  'UNIV' input data object - must be primative
-*    Method :
+*     Can also be used to find the correlation between any two arrays of the
+*     same length.
+
+*  Usage:
+*     kstat {parameter_usage}
+
+*  Environment Parameters:
+*     INP = CHAR (read)
+*        Input data object
+*     INP2 = CHAR (read)
+*        Optional input data object
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
 *     The K statistic is a distribution-free test for correlation - see
 *     Ponman, MNRAS, 201, p769, 1982.
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     Trevor Ponman  (BHVAD::TJP)
-*     Phil Andrews   (pla_ast88@uk.bham.sr.star)
-*    History :
-*     14 Jul 86 : V0.5-1  Original (TJP)
-*     16 Jul 86 : V0.5-2  Double precision accumulation (TJP)
-*     13 Sep 88 : V1.0-1  Rewritten for ASTERIX88 BDA_ etc...
-*     24 Nov 94 : V1.8-0  Now use USI for user interface (DJA)
-*     15 Jan 95 : V1.8-1  Use new data interfaces (DJA)
-*
-*    Type Definitions :
-*
-      IMPLICIT NONE
-*
-*    Global constants :
-*
-      INCLUDE 'SAE_PAR'
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  Implementation Status:
+*     {routine_implementation_status}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     kstat, usage:public
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     TJP: Trevor Ponman (University of Birmingham)
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     14 Jul 1986 V0.5-1 (TJP):
+*        Original version.
+*     16 Jul 1986 V0.5-2 (TJP):
+*        Double precision accumulation
+*     13 Sep 1988 V1.0-1 (TJP):
+*        Rewritten for ASTERIX88 BDA_ etc...
+*     24 Nov 1994 V1.8-0 (TJP):
+*        Now use USI for user interface
+*     15 Jan 1995 V1.8-1 (DJA):
+*        Use new data interfaces
+*     16 Nov 1995 V2.0-0 (DJA):
+*        Full ADI port
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
-*    Status :
-      INTEGER STATUS
-*    External references :
-*    Local variables :
-      LOGICAL                OK                  ! Component present & filled?
-      LOGICAL                QOK                 ! Data quality available?
-      LOGICAL                CONTINUE            ! Used to control input
-      LOGICAL                INPRIM              ! Is input object primitive?
-      LOGICAL                BAD                 ! Any bad QUALITY points?
+
+*  Status:
+      INTEGER			STATUS             	! Global status
+
+*  External References:
+      [external_declaration]
+      {data_type} {external_name} ! [external_description]
+
+*  Local Constants:
+      CHARACTER*30		VERSION
+        PARAMETER		( VERSION = 'KSTAT Version V2.0-0' )
+
+*  Local Variables:
+      DOUBLE PRECISION		K                   	! Kendall's K statistic
 
       INTEGER			IFID			! Input file identifier
       INTEGER			IFID2			! Input file identifier
@@ -62,68 +147,68 @@
       INTEGER                XPTR                ! Pointer to AXIS1 data
       INTEGER                QPTR                ! Pointer to data quality
 
-      DOUBLE PRECISION       K                   ! Kendall's K statistic
+      LOGICAL                OK                  ! Component present & filled?
+      LOGICAL                QOK                 ! Data quality available?
+      LOGICAL                CONTINUE            ! Used to control input
+      LOGICAL                INPRIM              ! Is input object primitive?
+      LOGICAL                BAD                 ! Any bad QUALITY points?
+*.
 
-* Version :
-      CHARACTER*22 VERSION
-         PARAMETER         ( VERSION = ' KSTAT version 1.8-1' )
-*-
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
 
-*    Version announcement
+*  Version id
       CALL MSG_PRNT( VERSION )
 
-*    Initialize ASTERIX
-      CALL AST_INIT
+*  Initialise ASTERIX
+      CALL AST_INIT()
 
-*    Obtain data object, access and check it
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
-      CALL BDI_PRIM( IFID, INPRIM, STATUS )
-      CALL BDI_CHKDATA (IFID, OK, NDIMS, DIM, STATUS)
+*  Obtain data object, access and check it
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
+      CALL ADI_DERVD( IFID, 'Array', INPRIM, STATUS )
+      INPRIM = (.NOT.INPRIM)
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, DIM, NDIMS, STATUS )
       NDAT = DIM(1)
 
       IF ( OK ) THEN
         IF (NDIMS .EQ. 1) THEN
-          CALL BDI_MAPDATA (IFID, 'READ', DPTR, STATUS )
+          CALL BDI_MAPR(IFID, 'Data', 'READ', DPTR, STATUS )
 
           IF (.NOT. INPRIM) THEN
-            CALL BDI_CHKQUAL (IFID, QOK, QNDIMS, QDIM, STATUS)
 
+*        Quality present?
+            CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
             IF ( QOK ) THEN
-              CALL BDI_MAPLQUAL (IFID, 'READ', BAD, QPTR, STATUS)
-
-              IF (.NOT. BAD) THEN
-                CALL BDI_UNMAPLQUAL (IFID, STATUS)
-                QOK = .FALSE.
-
-              END IF
+              CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR,
+     :                       STATUS )
             END IF
 
-            CALL BDI_CHKAXIS (IFID, 1, OK, STATUS)
-
+            CALL BDI_CHK( IFID, 'Axis_1_Data', OK, STATUS )
             IF ( OK ) THEN
-              CALL BDI_MAPAXVAL (IFID, 'READ', 1, XPTR, STATUS)
-
+              CALL BDI_AXMAPR(IFID, 1, 'Data', 'READ', XPTR, STATUS )
             ELSE
               CALL MSG_PRNT ('FATAL ERROR: No axis information')
-
             END IF
 
           ELSE ! Primitive
             CONTINUE = .TRUE.
 
             DO WHILE ( CONTINUE )
-              CALL USI_TASSOCI( 'INP2', '*', 'READ', IFID2, STATUS )
-              CALL BDI_PRIM( IFID2, INPRIM, STATUS )
-
+              CALL USI_ASSOC( 'INP2', 'BinDS|Array', 'READ', IFID2, STATUS )
+              CALL ADI_DERVD( IFID2, 'Array', INPRIM, STATUS )
+              INPRIM = (.NOT.INPRIM)
               IF (STATUS .NE. SAI__OK) GOTO 99
 
               IF ( INPRIM ) THEN
-                CALL BDI_CHKDATA (IFID2, OK, NDIMS2, DIM2, STATUS)
+                CALL BDI_CHK( IFID2, 'Data', OK, STATUS )
+                CALL BDI_GETSHP( IFID2, ADI__MXDIM, DIM2, NDIMS2,
+     :                           STATUS )
                 NDAT2 = DIM2(1)
 
                 IF ( OK ) THEN
                   IF (NDIMS2 .EQ. 1) THEN
-                    CALL BDI_MAPDATA (IFID2, 'READ', XPTR, STATUS)
+                    CALL BDI_MAPR( IFID2, 'Data', 'READ', XPTR, STATUS )
 
                     IF (NDAT2 .EQ. NDAT ) THEN
                       CONTINUE = .FALSE.
@@ -228,7 +313,7 @@
      :                                     ' interpretation required !')
       END IF
 
-*    Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 

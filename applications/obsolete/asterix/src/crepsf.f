@@ -116,7 +116,7 @@
       CALL BDI_AXPUT0C( BID, 2, 'Label', 'Y position', STATUS )
       CALL BDI_AXPUT0C( BID, 1, 'Units', UNITS, STATUS )
       CALL BDI_AXPUT0C( BID, 2, 'Units', UNITS, STATUS )
-      CALL BDI_PUT0C( OFID, 'Units', 'Probability/pixel', STATUS )
+      CALL BDI_PUT0C( BID, 'Units', 'Probability/pixel', STATUS )
 
 *    Image position
       CALL USI_GET0R( 'X0', X0, STATUS )
@@ -142,7 +142,7 @@
         CALL TCI0_INIT( STATUS )
         CALL ADI_NEW0( 'TimingInfo', TIMID, STATUS )
         CALL ADI_CPUT0D( TIMID, 'MJDObs', MJD, STATUS )
-        CALL TCI_PUTID( OFID, TIMID, STATUS )
+        CALL TCI_PUTID( BID, TIMID, STATUS )
       END IF
 
 *    Create axis values
@@ -154,10 +154,10 @@
       CALL BDI_AXPUT1R( BID, 2, 'SpacedData', 2, SPARR, STATUS )
 
 *    Create PSF structure and associate with PSF system
-      CALL PSF_ASSOCO( OFID, PSLOT, STATUS )
+      CALL PSF_ASSOCO( BID, PSLOT, STATUS )
 
 *    Map data
-      CALL BDI_MAPR( OFID, 'Data', 'WRITE', DPTR, STATUS )
+      CALL BDI_MAPR( BID, 'Data', 'WRITE', DPTR, STATUS )
 
 *    Get psf <-> grid offsets
       CALL USI_GET0R( 'DX', DX, STATUS )
