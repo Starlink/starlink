@@ -78,6 +78,8 @@
 *  History:
 *     9-JUN-1998 (DSB):
 *        Original version.
+*     14-SEP-1998 (DSB):
+*        Changed to report the first 3 bad header cards.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -104,7 +106,13 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
+      INTEGER MXBADH             ! Max. no. of bad header card indices to save
+      PARAMETER (MXBADH = 3)    
+
+*  Local Variables:
+      INTEGER BADH( MXBADH )     ! Indices of bad header cards
       INTEGER FC                 ! Identifier for AST FitsChan
+      INTEGER I                  ! Loop counter for bad headers
       INTEGER IHEAD              ! Loop counter for headers
       INTEGER NBAD               ! Number of bad header cards
 
@@ -134,6 +142,7 @@
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             NBAD = NBAD + 1
+            IF( NBAD .LE. MXBADH ) BADH( NBAD ) = IHEAD 
          END IF
 
       END DO
@@ -142,12 +151,41 @@
       IF ( ( STATUS .EQ. SAI__OK ) .AND. ( NBAD .NE. 0 ) ) THEN
          CALL ERR_MARK
          STATUS = SAI__ERROR
-         CALL MSG_SETI( 'NBAD', NBAD )
-         CALL ERR_REP( 'FTS1_FTWCS_WARN', 'WARNING: ^NBAD FITS header'//
-     :                 ' cards could not be read and were not used.', 
-     :                 STATUS )
+
+         IF( NBAD .EQ. 1 ) THEN
+            CALL ERR_REP( 'FTS1_FTWCS_W1', 'WARNING: The following '//
+     :                    'FITS header card could not be read and '//
+     :                    'will be ignored:', STATUS )
+            CALL MSG_SETC( 'CARD', HEADER( BADH( 1 ) ) )
+            CALL ERR_REP( 'FTS1_FTWCS_W2', '^CARD', STATUS )
+
+         ELSE IF( NBAD .LE. MXBADH ) THEN
+            CALL ERR_REP( 'FTS1_FTWCS_W3', 'WARNING: The following '//
+     :                    'FITS header cards could not be read and '//
+     :                    'will be ignored:', STATUS )
+            DO I = 1, NBAD
+               CALL MSG_SETI( 'CARD', HEADER( BADH( I ) ) )
+               CALL ERR_REP( 'FTS1_FTWCS_W4', '^CARD', STATUS )
+            END DO
+
+         ELSE
+            CALL MSG_SETI( 'NBAD', NBAD )
+            CALL MSG_SETI( 'MXBADH', MXBADH )
+            CALL ERR_REP( 'FTS1_FTWCS_W5', 'WARNING: ^NBAD FITS '//
+     :                    'header cards could not be read and will be'//
+     :                    ' ignored. The first ^MXBADH such cards '//
+     :                    'were:', STATUS )
+
+            DO I = 1, MXBADH
+               CALL MSG_SETI( 'CARD', HEADER( BADH( I ) ) )
+               CALL ERR_REP( 'FTS1_FTWCS_W6', '^CARD', STATUS )
+            END DO
+
+         END IF
+
          CALL ERR_FLUSH( STATUS )
          CALL ERR_RLSE
+
       END IF
 
 *  Rewind the FitsChan by clearing the Card attribute so that the first
