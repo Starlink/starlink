@@ -90,4 +90,10 @@ OCLUK           <Object class unknown>
 UNFER           <error while unformatting a coordinate value>
 URITF           <unregistered IntraMap transformation function>
 
+!  New codes introduced for V1.2.
+GBDIN           <grid bounds invalid>
+MPIIN           <maximum pixel interval invalid>
+NGDIN           <number of grid dimensions invalid>
+PATIN           <positional accuracy tolerance invalid>
+
 .END

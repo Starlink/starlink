@@ -234,7 +234,245 @@ static void ValidateMapping( AstMapping *, int, int, int, int, const char * );
 
 /* Member functions. */
 /* ================= */
-/* Define macros to implement the function for a specific data
+/*
+*++
+*  Name:
+c     astResample<X>
+f     AST_RESAMPLE<X>
+
+*  Purpose:
+*     Resample a section of a data grid.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "mapping.h"
+c     int astResample<X>( AstMapping *this, int ndim_in,
+c                         const int lbnd_in[], const int ubnd_in[],
+c                         const <Xtype> in[], const <Xtype> in_var[],
+c                         AstInterpolate<X> interp, double tol,
+c                         int maxpix, int flags, <Xtype> badval,
+c                         const double params[],
+c                         int ndim_out,
+c                         const int lbnd_out[], const int ubnd_out[],
+c                         const int lbnd[], const int ubnd[],
+c                         <Xtype> out[], <Xtype> out_var[] );
+f     AST_RESAMPLE<X>( THIS, NDIM_IN, LBND_IN, UBND_IN, IN, IN_VAR,
+f                      INTERP, UINTERP, TOL, MAXPIX, FLAGS, BADVAL,
+f                      PARAMS, NDIM_OUT, LBND_OUT, UBND_OUT,
+f                      LBND, UBND, OUT, OUT_VAR, STATUS )
+
+*  Class Membership:
+*     Mapping method.
+
+*  Description:
+*     This is a set of functions, each of which resamples a
+*     rectangular grid of data (with any number of dimensions) into a
+*     specified section of another rectangular grid (with a possibly
+*     different number of dimensions). The coordinate transformation
+*     used to convert output pixel coordinates into positions in the
+*     input grid is given by the inverse transformation of the Mapping
+*     which is supplied.  Several pixel interpolation schemes may be
+*     specified for interpolating between the pixels of the input
+*     grid, or you may supply your own.
+*
+*     These functions attempt to adapt to the Mapping supplied and to
+*     sub-divide the section being resampled into smaller sections
+*     within which a linear approximation to the Mapping may be used.
+*     This reduces the number of Mapping evaluations, thereby
+*     improving efficiency particularly when complicated Mappings are
+*     involved.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to a Mapping, whose inverse transformation may be
+*        used to transform the coordinates of pixels in the output
+*        grid into associated positions in the input grid, from which
+*        the output pixel values should be derived (by interpolation
+*        if necessary).
+*
+*        The number of input coordintes for the Mapping (Nin
+*        attribute) should match the value of "ndim_in" (below), and
+*        the number of output coordinates (Nout attribute) should
+*        match the value of "ndim_out".
+c     ndim_in
+f     NDIM_IN = INTEGER (Given)
+*        The number of dimensions in the input grid. This should be at
+*        least one.
+c     lbnd_in
+f     LBND_IN( NDIM_IN ) = INTEGER (Given)
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the input data grid along each dimension.
+c     ubnd_in
+f     UBND_IN( NDIM_IN ) = INTEGER (Given)
+*        Pointer to an array of integers, with "ndim_in" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the input data grid along each dimension.
+*
+*        Note that "lbnd_in" and "ubnd_in" together define the shape
+*        and size of the input data grid, its extent along a
+*        particular (i'th) dimension being (ubnd_in[i] - lbnd_in[i] +
+*        1). They also define the input grid's coordinate system, with
+*        each pixel being of unit extent along each dimension with
+*        integral coordinate values at its centre.
+c     in
+f     IN( * ) = <Xtype> (Given)
+*        Pointer to the input array of data to be resampled (with one
+*        element for each pixel in the input grid). The numerical type
+*        of these data should match the "type" value (below). The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+c     in_var
+f     IN_VAR( * ) = <Xtype> (Given)
+*        An optional pointer to a second array of positive numerical
+*        values (with the same size and data type as the "in" array),
+*        which represent estimates of the statistical variance
+*        associated with each element of the "in" array. If this
+*        second array is given (along with the corresponding "out_var"
+*        array), then estimates of the variance of the resampled data
+*        will also be returned.
+*
+*        If no variance estimates are required, a NULL pointer should
+*        be given.
+f     INTERP
+f        Flag to select built-in interpolation scheme.
+c     interp
+f     INTERP = FUNCTION (Given)
+*        This parameter may take one of the constant values
+*        AST__NEAREST or AST__LINEAR (or, equivalently, NULL),
+*        specifying the sub-pixel interpolation method to be used when
+*        obtaining values from the input grid.  Alternatively, it may
+*        be a pointer to a user-supplied function which will perform
+*        this sub-pixel interpolation itself.
+c     tol
+f     TOL = DOUBLE PRECISION (Given)
+*        The maximum permitted positional error in transforming output
+*        pixel positions into the input grid in order to resample
+*        it. This should be expressed as a displacement in pixels in
+*        the input grid's coordinate system. If the Mapping's inverse
+*        transformation can be approximated by piecewise linear
+*        functions to this accuracy, then such functions may be used
+*        instead of the Mapping in order to improve
+*        performance. Otherwise, every output pixel position will be
+*        transformed individually using the Mapping.
+*
+*        If linear approximation is not required, a "tol" value of
+*        zero may be given. This will ensure that the Mapping is used
+*        without any approximation.
+c     maxpix
+f     MAXPIX = INTEGER (Given)
+*        A value which specifies the largest scale size on which to
+*        search for non-linearities in the Mapping supplied. This
+*        value should be expressed as a number of pixels in the output
+*        grid. The function will break the output section specified
+*        into smaller sub-sections (if necessary), each no larger than
+*        "maxpix" pixels in any dimension, before it attempts to
+*        approximate the Mapping by a linear function over each
+*        sub-section.
+* 
+*        If the value given is larger than the largest dimension of
+*        the output section (the normal recommendation), the function
+*        will initially search for non-linearity on a scale determined
+*        by the size of the output section.  This is almost always
+*        satisfactory. Very occasionally, however, a Mapping may
+*        appear linear on this scale but nevertheless have smaller
+*        irregularities (e.g. "holes") in it.  In such cases, "maxpix"
+*        may be set to a suitably smaller value so as to ensure this
+*        non-linearity is not overlooked. Typically, a value of 50 to
+*        100 pixels might be suitable and should have little effect on
+*        performance.
+*
+*        If too small a value is given, however, it will have the
+*        effect of preventing linear approximation occurring at all
+*        (equivalent to setting "tol" to zero).  Although this may
+*        degrade performance, accurate results will still be obtained.
+c     flags
+f     FLAGS = INTEGER (Given)
+*        The bitwise OR of a set of flag values which control the
+*        operation of the function. Currently, only the flag
+*        AST__USEBAD is significant and indicates whether there are
+*        "bad" (i.e. missing) data in the input array(s) which must be
+*        recognised and propagated to the output array(s).  If this
+*        flag is not set, all input values are treated literally.
+*     badval_ptr
+*        If the AST__USEBAD flag is set (above), this parameter is a
+*        pointer to a value which is used to identify bad data and/or
+*        variance values in the input array(s). The referenced value's
+*        data type must match that of the "in" (and "in_var")
+*        arrays. The same value will also be used to flag any output
+*        array elements for which resampled values could not be
+*        obtained.  The output arrays(s) may be flagged with this
+*        value whether or not the AST__USEBAD flag is set (the
+*        function return value indicates whether any such values have
+*        been produced).
+*     params
+*        Pointer to an optional array of parameters that may be passed
+*        to the interpolation function, if required. If no parameters
+*        are required, a NULL pointer should be supplied.
+*     ndim_out
+*        The number of dimensions in the output grid. This should be
+*        at least one.
+*     lbnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the first
+*        pixel in the output data grid along each dimension.
+*     ubnd_out
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the centre of the last
+*        pixel in the output data grid along each dimension.
+*
+*        Note that "lbnd_out" and "ubnd_out" together define the shape
+*        and size of the output data grid in the same way as "lbnd_in"
+*        and "ubnd_in" define the shape and size of the input grid
+*        (see above).
+*     lbnd
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the first pixel in the
+*        section of the output data grid for which a value is
+*        required.
+*     ubnd
+*        Pointer to an array of integers, with "ndim_out" elements.
+*        This should give the coordinates of the last pixel in the
+*        section of the output data grid for which a value is
+*        required.
+*
+*        Note that "lbnd" and "ubnd" define the shape and position of
+*        the section of the output grid for which resampled values are
+*        required. This section should lie wholly within the extent of
+*        the output grid (as defined by the "lbnd_out" and "ubnd_out"
+*        arrays). Regions of the output grid lying ouside this section
+*        will not be modified.
+*     out
+*        Pointer to an array with the same data type as the "in"
+*        array, into which the resampled data will be returned.  The
+*        storage order should be such that the coordinate of the first
+*        dimension varies most rapidly and that of the final dimension
+*        least rapidly (i.e. Fortran array storage order is used).
+*     out_var
+*        An optional pointer to an array with the same data type and
+*        size as the "out" array, into which variance estimates for
+*        the resampled values may be returned. This array will only be
+*        used if the "in_var" array has been given.
+*
+*        If no output variance estimates are required, a NULL pointer
+*        should be given.
+
+*  Returned Value:
+*     The number of output grid points to which a data value (or a
+*     variance value if relevant) equal to "badval" has been assigned
+*     because no valid output value could be obtained.
+
+*  Notes:
+*     - A value of zero will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*--
+*/
+/* Define a macro to implement the function for a specific data
    type. */
 #define MAKE_RESAMPLE(X,Xtype) \
 static int Resample##X( AstMapping *this, int ndim_in, \
@@ -249,7 +487,9 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 \
 /* Local Variables: */ \
    AstMapping *simple;           /* Pointer to simplified Mapping */ \
-   int coord_out;                /* Loop counter for output coordinates */ \
+   int idim;                     /* Loop counter for coordinate dimensions */ \
+   int nin;                      /* Number of Mapping input coordinates */ \
+   int nout;                     /* Number of Mapping output coordinates */ \
    int npix;                     /* Number of pixels in output section */ \
    int result;                   /* Result value to return */ \
 \
@@ -259,19 +499,120 @@ static int Resample##X( AstMapping *this, int ndim_in, \
 /* Check the global error status. */ \
    if ( !astOK ) return result; \
 \
-/* Loop to determine how many pixels require resampled values. */ \
-   npix = 1; \
-   for ( coord_out = 0; coord_out < ndim_out; coord_out++ ) { \
-      npix *= ubnd[ coord_out ] - lbnd[ coord_out ] + 1; \
+/* Obtain values for the Nin and Nout attributes of the Mapping. */ \
+   nin = astGetNin( this ); \
+   nout = astGetNin( this ); \
+\
+/* If OK, check that the number of input grid dimensions matches the \
+   number required by the Mapping. Report an error if these numbers do \
+   not match. */ \
+   if ( astOK && ( ndim_in != nin ) ) { \
+      astError( AST__NGDIN, "astResample"#X"(%s): Bad number of input grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_in ); \
+      astError( AST__NGDIN, "The %s given requires %d coordinate value%s " \
+                "to specify an input position.", astGetClass( this ), nin, \
+                ( nin == 1 ) ? "" : "s" ); \
    } \
+\
+/* If OK, also check that the number of output grid dimensions matches \
+   the number required by the Mapping. Report an error if these \
+   numbers do not match. */ \
+   if ( astOK && ( ndim_out != nout ) ) { \
+      astError( AST__NGDIN, "astResample"#X"(%s): Bad number of output grid " \
+                "dimensions (%d).", astGetClass( this ), ndim_out ); \
+      astError( AST__NGDIN, "The %s given generates %s%d coordinate value%s " \
+                "for each output position.", astGetClass( this ), \
+                ( nout < ndim_out ) ? "only " : "", nout, \
+                ( nout == 1 ) ? "" : "s" ); \
+   } \
+\
+/* Check that the lower and upper bounds of the input grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_in; idim++ ) { \
+         if ( lbnd_in[ idim ] > ubnd_in[ idim ] ) { \
+            astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
+                      "input grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), lbnd_in[ idim ], \
+                      ubnd_in[ idim ] ); \
+            astError( AST__GBDIN, "Error in input dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Check that the positional accuracy tolerance supplied is valid and \
+   report an error if necessary. */ \
+   if ( astOK && ( tol < 0.0 ) ) { \
+      astError( AST__PATIN, "astResample"#X"(%s): Invalid positional " \
+                "accuracy tolerance (%.*g pixel).", astGetClass( this ), \
+                DBL_DIG, tol ); \
+      astError( AST__PATIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the maximum pixel interval supplied is valid and report \
+   an error if necessary. */ \
+   if ( astOK && ( maxpix < 0 ) ) { \
+      astError( AST__MPIIN, "astResample"#X"(%s): Invalid maximum pixel " \
+                "interval (%d).", astGetClass( this ), maxpix ); \
+      astError( AST__MPIIN, "This value should not be less than zero." ); \
+   } \
+\
+/* Check that the lower and upper bounds of the output grid are \
+   consistent. Report an error if any pair is not. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd_out[ idim ] > ubnd_out[ idim ] ) { \
+            astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
+                      "output grid (%d) exceeds corresponding upper bound " \
+                      "(%d).", astGetClass( this ), lbnd_out[ idim ], \
+                      ubnd_out[ idim ] ); \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* Similarly check the bounds of the outout section. */ \
+   if ( astOK ) { \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         if ( lbnd[ idim ] > ubnd[ idim ] ) { \
+            astError( AST__GBDIN, "astResample"#X"(%s): Lower bound of " \
+                      "output section (%d) exceeds corresponding upper " \
+                      "bound (%d).", astGetClass( this ), lbnd[ idim ], \
+                      ubnd[ idim ] ); \
+            astError( AST__GBDIN, "Error in output dimension %d.", \
+                      idim + 1 ); \
+            break; \
+         } \
+      } \
+   } \
+\
+/* If OK, loop to determine how many pixels require resampled values. */ \
+   if ( astOK ) { \
+      npix = 1; \
+      for ( idim = 0; idim < ndim_out; idim++ ) { \
+         npix *= ubnd[ idim ] - lbnd[ idim ] + 1; \
+      } \
 \
 /* If there are sufficient pixels to make it worthwhile, simplify the \
    Mapping supplied to improve performance. Otherwise, just clone the \
    Mapping pointer. */ \
-   if ( npix > 100 ) { \
-      simple = astSimplify( this ); \
-   } else { \
-      simple = astClone( this ); \
+      if ( npix > 100 ) { \
+         simple = astSimplify( this ); \
+      } else { \
+         simple = astClone( this ); \
+      } \
+   } \
+\
+/* Report an error if the inverse transformation of this simplified \
+   Mapping is not defined. */ \
+   if ( !astGetTranInverse( simple ) && astOK ) { \
+      astError( AST__TRNND, "astResample"#X"(%s): An inverse coordinate " \
+                "transformation is not defined by the %s supplied.", \
+                astGetClass( this ), astGetClass( this ) ); \
    } \
 \
 /* Perform the resampling. Note that we pass all gridded data, the \
@@ -298,7 +639,7 @@ static int Resample##X( AstMapping *this, int ndim_in, \
    return result; \
 }
 
-/* Expand the above macros to generate a function for each required
+/* Expand the above macro to generate a function for each required
    data type. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
 MAKE_RESAMPLE(LD,long double)
@@ -5404,7 +5745,7 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                result = ( *( (AstInterpolate##X) interp ) ) \
                            ( ndim_in, lbnd_in, ubnd_in, \
                              (Xtype *) in, (Xtype *) in_var, npoint, \
-                             offset, ptr_in[ 0 ], \
+                             offset, (const double *const *) ptr_in, \
                              flags, *( (Xtype *) badval_ptr ), params, \
                              (Xtype *) out, (Xtype *) out_var ); \
                break;

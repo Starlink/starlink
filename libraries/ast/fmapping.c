@@ -79,14 +79,16 @@ static int ast_resample_interp##X( int ndim, \
                                    const int lbnd[], const int ubnd[], \
                                    const Xtype in[], const Xtype in_var[], \
                                    int npoint, const int offset[], \
-                                   const double coord[], int flags, \
+                                   const double *const coord[], int flags, \
                                    Xtype badval, const double params[], \
                                    Xtype *out, Xtype *out_var ) { \
    DECLARE_INTEGER(STATUS); \
    int result; \
 \
 /* Obtain the C status and then invoke the FORTRAN 77 interpolation \
-   function via the stored pointer. */ \
+   function via the stored pointer. Note that the "coord" array we \
+   pass to FORTRAN has to be a contiguous 2-d array, so we must \
+   de-reference one level of pointer compared to the C case. */ \
    STATUS = astStatus; \
    result = ( *ast_resample_UINTERP )( INTEGER_ARG(&ndim), \
                                        INTEGER_ARRAY_ARG(lbnd), \
@@ -95,7 +97,7 @@ static int ast_resample_interp##X( int ndim, \
                                        Ftype##_ARRAY_ARG(in_var), \
                                        INTEGER_ARG(&npoint), \
                                        INTEGER_ARRAY_ARG(offset), \
-                                       DOUBLE_ARRAY_ARG(coord), \
+                                       DOUBLE_ARRAY_ARG(coord[ 0 ]), \
                                        INTEGER_ARG(flags), \
                                        Ftype##_ARG(&badval), \
                                        DOUBLE_ARRAY_ARG(params), \

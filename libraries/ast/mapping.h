@@ -259,19 +259,19 @@
    "interp" argument. There is a separate function pointer type for
    each type of gridded data to be resampled. */
 #if defined(AST_LONG_DOUBLE)     /* Not normally implemented */
-typedef int (* AstInterpolateLD)( int, const int [], const int [], const long double [], const long double [], int, const int [], const double [], int, long double, const double [], long double [], long double [] );
+typedef int (* AstInterpolateLD)( int, const int [], const int [], const long double [], const long double [], int, const int [], const double *const [], int, long double, const double [], long double [], long double [] );
 #endif
 
-typedef int (* AstInterpolateB)( int, const int [], const int [], const signed char [], const signed char [], int, const int [], const double [], int, signed char, const double [], signed char [], signed char [] );
-typedef int (* AstInterpolateD)( int, const int [], const int [], const double [], const double [], int, const int [], const double [], int, double, const double [], double [], double [] );
-typedef int (* AstInterpolateF)( int, const int [], const int [], const float [], const float [], int, const int [], const double [], int, float, const double [], float [], float [] );
-typedef int (* AstInterpolateI)( int, const int [], const int [], const int [], const int [], int, const int [], const double [], int, int, const double [], int [], int [] );
-typedef int (* AstInterpolateL)( int, const int [], const int [], const long int [], const long int [], int, const int [], const double [], int, long int, const double [], long int [], long int [] );
-typedef int (* AstInterpolateS)( int, const int [], const int [], const short int [], const short int [], int, const int [], const double [], int, short int, const double [], short int [], short int [] );
-typedef int (* AstInterpolateUB)( int, const int [], const int [], const unsigned char [], const unsigned char [], int, const int [], const double [], int, unsigned char, const double [], unsigned char [], unsigned char [] );
-typedef int (* AstInterpolateUI)( int, const int [], const int [], const unsigned int [], const unsigned int [], int, const int [], const double [], int, unsigned int, const double [], unsigned int [], unsigned int [] );
-typedef int (* AstInterpolateUL)( int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, const int [], const double [], int, unsigned long int, const double [], unsigned long int [], unsigned long int [] );
-typedef int (* AstInterpolateUS)( int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, const int [], const double [], int, unsigned short int, const double [], unsigned short int [], unsigned short int [] );
+typedef int (* AstInterpolateB)( int, const int [], const int [], const signed char [], const signed char [], int, const int [], const double *const [], int, signed char, const double [], signed char [], signed char [] );
+typedef int (* AstInterpolateD)( int, const int [], const int [], const double [], const double [], int, const int [], const double *const [], int, double, const double [], double [], double [] );
+typedef int (* AstInterpolateF)( int, const int [], const int [], const float [], const float [], int, const int [], const double *const [], int, float, const double [], float [], float [] );
+typedef int (* AstInterpolateI)( int, const int [], const int [], const int [], const int [], int, const int [], const double *const [], int, int, const double [], int [], int [] );
+typedef int (* AstInterpolateL)( int, const int [], const int [], const long int [], const long int [], int, const int [], const double *const [], int, long int, const double [], long int [], long int [] );
+typedef int (* AstInterpolateS)( int, const int [], const int [], const short int [], const short int [], int, const int [], const double *const [], int, short int, const double [], short int [], short int [] );
+typedef int (* AstInterpolateUB)( int, const int [], const int [], const unsigned char [], const unsigned char [], int, const int [], const double *const [], int, unsigned char, const double [], unsigned char [], unsigned char [] );
+typedef int (* AstInterpolateUI)( int, const int [], const int [], const unsigned int [], const unsigned int [], int, const int [], const double *const [], int, unsigned int, const double [], unsigned int [], unsigned int [] );
+typedef int (* AstInterpolateUL)( int, const int [], const int [], const unsigned long int [], const unsigned long int [], int, const int [], const double *const [], int, unsigned long int, const double [], unsigned long int [], unsigned long int [] );
+typedef int (* AstInterpolateUS)( int, const int [], const int [], const unsigned short int [], const unsigned short int [], int, const int [], const double *const [], int, unsigned short int, const double [], unsigned short int [], unsigned short int [] );
 
 /* Mapping structure. */
 /* ------------------ */
