@@ -8890,6 +8890,7 @@ U java/source/topcat/src/docs/Ptplot-licence
 U java/source/topcat/src/docs/avalon-framework-cvs-20020806.jar
 U java/source/topcat/src/docs/batik.jar
 U java/source/topcat/src/docs/docs.dtd
+U java/source/topcat/src/docs/epsgraphics.jar
 U java/source/topcat/src/docs/fop.jar
 U java/source/topcat/src/docs/sun253.xml
 U java/source/topcat/src/docs/toFo.xslt
@@ -8935,6 +8936,7 @@ U java/source/topcat/src/etc/demo/votable/vizier.xml.gz
 cvs checkout: Updating java/source/topcat/src/etc/demo/wdc
 U java/source/topcat/src/etc/demo/wdc/sunspots.wdc
 cvs checkout: Updating java/source/topcat/src/lib
+U java/source/topcat/src/lib/epsgraphics_classes.jar
 U java/source/topcat/src/lib/jel_g.jar
 cvs checkout: Updating java/source/topcat/src/main
 cvs checkout: Updating java/source/topcat/src/main/uk
@@ -9004,8 +9006,8 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/join/ParameterPanel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/join/TupleSelector.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/plot
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/DumbPlotSurface.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/GraphicsSurface.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyle.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/MarkStyleProfile.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/OrderedSelectionRecorder.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotBox.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/plot/PlotState.java
@@ -9087,6 +9089,8 @@ U java/source/topcat/src/testcases/uk/ac/starlink/topcat/DocTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/HelpTest.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/LinkChecker.java
 U java/source/topcat/src/testcases/uk/ac/starlink/topcat/ResourceTest.java
+cvs checkout: Updating java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot
+U java/source/topcat/src/testcases/uk/ac/starlink/topcat/plot/MarkerTest.java
 cvs checkout: Updating java/source/treeview
 U java/source/treeview/.properties
 U java/source/treeview/build.xml
