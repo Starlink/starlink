@@ -85,7 +85,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          			! SAE constants
-      INCLUDE 'HDS_PAR'					! HDS constants
+      INCLUDE 'DAT_PAR'					! HDS constants
 
 *  Arguments Given:
       INTEGER			ID			! Dataset id
