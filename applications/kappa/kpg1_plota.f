@@ -188,6 +188,11 @@
          CALL ERR_END( STATUS )
       END IF
 
+*  PGPLOT resets the colour palette when the device is opened. Therefore we
+*  need to re-instate the colour palette set by the user, reading it from
+*  the HDS file kappa-palette.sdf in the users adam directory.
+      CALL KPG1_PLLOD( STATUS )
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 

@@ -68,6 +68,9 @@
 *  History:
 *     1991 July 19 (MJC):
 *        Original version.
+*     30-OCT-1998 (DSB):
+*        Modified to save current palette in the adam directory so that
+*        subsequent PGPLOT applications can read it back in again.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -184,6 +187,13 @@
      :              PALETT( 3, I ) )
       END DO
       CALL GKS_GSTAT( STATUS )
+
+*    Save the supplied section of the palette in the adam directory so that 
+*    it can be read back again by subsequent applications (PGPLOT resets the 
+*    colour palette when it opens a device, so the palette then needs to be 
+*    re-instated).
+      CALL KPG1_PLSAV( 0, MIN( DIMS( 2 ), CTM__RSVPN ) - 1, .FALSE., 
+     :                 STATUS )
 
 *    If an error occurred, then report a contextual message.
 

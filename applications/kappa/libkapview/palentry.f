@@ -82,6 +82,9 @@
 *        library.
 *     1992 December 1 (MJC):
 *        Made to work with WINDOW_OVERLAY devices.
+*     30-OCT-1998 (DSB):
+*        Modified to save current palette in the adam directory so that
+*        subsequent PGPLOT applications can read it back in again.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -184,6 +187,13 @@
 *    See whether GKS had an internal error.
 
          CALL GKS_GSTAT( STATUS )
+
+*    Save the modified palette entry in the adam directory so that it can be 
+*    read back again by subsequent applications (PGPLOT resets the colour 
+*    palette when it opens a device, so the palette then needs to be 
+*    re-instated). Other elements in the saved palette are left unchanged.
+         CALL KPG1_PLSAV( PALNUM, PALNUM, .FALSE., STATUS )
+
       END IF
 
 *    If an error occurred, then report a contextual message.

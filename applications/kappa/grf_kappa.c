@@ -19,10 +19,15 @@
 *  History:
 *     3-MAR-1998 (DSB):
 *        Original version, based on grf_pgplot.c distributed with AST.
-*        The KAPPA version include the GRF_GATTR routine for controlling
+*        The KAPPA version includes the GRF_GATTR routine for controlling
 *        PGPLOT attributes from Fortran. It also uses the actual PGPLOT
 *        character size on entry as the default character size (rather than
 *        the default PGPLOT character size).
+*     28-OCT-1998 (DSB):
+*        o  Changed interpretation of the Width attribute from inches, to
+*        a multiple of the default line width (1/500 of the view surface
+*        diagonal).
+*        o  Wrapper for pgplot F77 subroutine PGQVSZ added.
 */
 
 /* Macros */
@@ -63,6 +68,7 @@ static void ccpgqlw(int *lw);
 static void ccpgqtbg(int *tbci);
 static void ccpgqtxt(float x, float y, float angle, float fjust, char *text, float xbox[], float ybox[]);
 static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2);
+static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2);
 static void ccpgqwin(float *x1, float *x2, float *y1, float *y2);
 static void ccpgscf(int cf);
 static void ccpgsch(float ch);
@@ -843,14 +849,31 @@ int astGAttr( int attr, double value, double *old_value, int prim ){
       }
 
 /* If required retrieve the current line width, and set a new line width. 
-   Line width is stored in Plot in inches, but pgplot stores it in units of 
-   0.005 of an inch. */
+   Line width is stored in Plot as a scale factor (1.0 for the default line
+   width which is a fixed fraction of the diagonal of the view surface), but 
+   pgplot stores it in units of 0.005 of an inch. */
    } else if( attr == GRF__WIDTH ){
-      ccpgqlw( &ival );
-      if( old_value ) *old_value = (double)( ival )/200.0;
 
+/* Get the bounds of the view surface in inches. */
+      ccpgqvsz( 1, &x1, &x2, &y1, &y2 );
+
+/* Find the default line width in inches (i.e. 0.0005 of the length
+   of the view surface diagonal). */
+      dx = ( x1 - x2 );
+      dy = ( y1 - y2 );
+      deflw = 0.0005*sqrt( (double )( dx*dx + dy*dy ) );
+
+/* Get the current pgplot line width in units of 0.005 of an inch. */
+      ccpgqlw( &ival );
+
+/* If required, return the factor by which this exceeds the default line
+   width found above. */
+      if( old_value ) *old_value = (double)( ival )/( 200.0 * deflw );
+
+/* If a new line width has been provided, the pgplot line width needs to
+   be set to the corresponding absolute value. */
       if( value != AST__BAD ){
-         ival = (int) ( 200.0*value );
+         ival = (int) ( 200.0*value*deflw );
          if( ival < 1 ) {
             ival = 1;
          } else if( ival > 201 ){
@@ -1103,6 +1126,22 @@ static void ccpgqvp(int units, float *x1, float *x2, float *y1, float *y2){
    
    UNITS = (F77_INTEGER_TYPE) units;
    F77_CALL(pgqvp)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
+                    REAL_ARG(&Y1), REAL_ARG(&Y2) );
+   *x1 = (float) X1;
+   *x2 = (float) X2;
+   *y1 = (float) Y1;
+   *y2 = (float) Y2;
+}
+
+static void ccpgqvsz(int units, float *x1, float *x2, float *y1, float *y2){
+   F77_INTEGER_TYPE UNITS;
+   F77_REAL_TYPE X1;
+   F77_REAL_TYPE X2;
+   F77_REAL_TYPE Y1;
+   F77_REAL_TYPE Y2;
+   
+   UNITS = (F77_INTEGER_TYPE) units;
+   F77_CALL(pgqvsz)( INTEGER_ARG(&UNITS), REAL_ARG(&X1), REAL_ARG(&X2),
                     REAL_ARG(&Y1), REAL_ARG(&Y2) );
    *x1 = (float) X1;
    *x2 = (float) X2;

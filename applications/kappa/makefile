@@ -637,7 +637,8 @@ kpg1_wrlst.f kpg1_wwrt.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f \
 normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f \
 kpg1_cshft.f kpg1_ctcpd.f kpg1_ctcpi.f kpg1_rcatw.f kpg1_snkta.f \
-kpg1_wcatw.f kpg1_srcta.f gropen.f kpg1_ctass.f kpg1_ctcre.f
+kpg1_wcatw.f kpg1_srcta.f kpg1_ctass.f kpg1_ctcre.f \
+kpg1_pllod.f kpg1_plsav.f kpg1_plget.f kpg1_plput.f
 
 KAPVIEW_F_ROUTINES = \
 contour.f contover.f \
@@ -1238,19 +1239,19 @@ $(MEMTASKS) : $(MEM_F_ROUTINES:.f=.o) opus.o tropus.o uput.o uget.o grf_kappa.o 
 
 #  Give dependencies and rule for building the pseudo-monoliths.
 
-$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o $(LINK_SCRIPT)
+$(KAPPA_MON) : $(KAPPA_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPPA_MONO_SOURCE:.f=.o) -o $(KAPPA_MON) $(OBJECT_LIBRARIES) \
-	         gropen.o $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
+	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
-$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o $(LINK_SCRIPT)
+$(KAPVIEW_MON) : $(KAPVIEW_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o $(LINK_SCRIPT)
 	$(ALINK) $(KAPVIEW_MONO_SOURCE:.f=.o) -o $(KAPVIEW_MON) $(OBJECT_LIBRARIES) \
-	         gropen.o $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
+	         $(STAR_LIB)/agpwritx.o $(STAR_LIB)/agchnlz.o \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` 
 
-$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) gropen.o grf_kappa.o lsfun1.o $(LINK_SCRIPT)
+$(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o lsfun1.o $(LINK_SCRIPT)
 	$(ALINK) $(NDFPACK_MONO_SOURCE:.f=.o) -o $(NDFPACK_MON) \
-	         lsfun1.o gropen.o $(OBJECT_LIBRARIES) \
+	         lsfun1.o $(OBJECT_LIBRARIES) \
 	         $(ADDLIBS) `./$(LINK_SCRIPT)` $(TCLLIBS) $(LDFLAGS)
 
 #  List of the interface files to be built and rules for compiling them.
@@ -2549,7 +2550,6 @@ gltclt.o:	 SAE_PAR FIO_ERR
 gltcsb.o:	 SAE_PAR PRM_PAR
 greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR GNS_PAR NUM_DEC_CVT NUM_DEF_CVT
 grf_kappa.o:     grf.h
-gropen.o:        grecom.inc grerr GKS_PAR
 gthlpi.o:	 SAE_PAR HLPCMD
 hiscom.o:	 SAE_PAR NDF_PAR MSG_PAR PAR_PAR PAR_ERR FIO_ERR
 hislist.o:	 SAE_PAR NDF_PAR
@@ -2974,11 +2974,15 @@ kpg1_pgtxt.o:	 SAE_PAR
 kpg1_pl2ge.o:	 SAE_PAR DAT_PAR PRM_PAR
 kpg1_pl2pu.o:	 SAE_PAR DAT_PAR PRM_PAR
 kpg1_plcip.o:	 SAE_PAR CTM_PAR
+kpg1_plget.o:	 SAE_PAR
+kpg1_pllod.o:	 SAE_PAR CTM_PAR DAT_PAR DAT_ERR
 kpg1_plot.o:	 SAE_PAR AST_PAR
 kpg1_plota.o:	 SAE_PAR PAR_ERR AST_PAR
 kpg1_plotn.o:	 SAE_PAR AST_PAR
 kpg1_plotp.o:	 SAE_PAR
 kpg1_plots.o:	 SAE_PAR AST_PAR
+kpg1_plput.o:	 SAE_PAR CTM_PAR
+kpg1_plsav.o:	 SAE_PAR CTM_PAR DAT_PAR DAT_ERR
 kpg1_pltln.o:	 SAE_PAR AST_PAR
 kpg1_poisr.o:	 SAE_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 kpg1_pqvid.o:	 SAE_PAR CTM_PAR GNS_PAR
@@ -3134,13 +3138,13 @@ kps1_cntur.o:	 SAE_PAR PRM_PAR
 kps1_cnvfp.o:	 SAE_PAR
 kps1_cnvlv.o:	 SAE_PAR PRM_PAR
 kps1_cnvrp.o:	 SAE_PAR
-kps1_cpbd.o:	 SAE_PAR PRM_PAR
-kps1_cpbr.o:	 SAE_PAR PRM_PAR
-kps1_cpbi.o:	 SAE_PAR PRM_PAR
-kps1_cpbw.o:	 SAE_PAR PRM_PAR
 kps1_cpbb.o:	 SAE_PAR PRM_PAR
-kps1_cpbuw.o:	 SAE_PAR PRM_PAR
+kps1_cpbd.o:	 SAE_PAR PRM_PAR
+kps1_cpbi.o:	 SAE_PAR PRM_PAR
+kps1_cpbr.o:	 SAE_PAR PRM_PAR
 kps1_cpbub.o:	 SAE_PAR PRM_PAR
+kps1_cpbuw.o:	 SAE_PAR PRM_PAR
+kps1_cpbw.o:	 SAE_PAR PRM_PAR
 kps1_curfm.o:	 SAE_PAR AST_PAR
 kps1_discl.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR SUBPAR_PAR NUM_DEC_CVT NUM_DEF_CVT
 kps1_dsclb.o:	 SAE_PAR PRM_PAR PAR_ERR NUM_DEC_CVT NUM_DEC_B NUM_DEF_CVT NUM_DEF_B

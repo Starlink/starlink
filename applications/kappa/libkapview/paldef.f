@@ -27,9 +27,18 @@
 *     graphs etc. that are unaffected by changes to the lookup table
 *     used for images.
 
-*     The standard palette is as follows
-*       0: Black     1: White     2: Red       3: Green     4: Blue
-*       5: Yellow    6: Magenta   7: Cyan      8--15: Black
+*     Pen 0 (the background colour) and pen 1 (the foreground colour) are 
+*     set to the default values for the specified graphics device. Thus
+*     they may be white on black for an X window, but black on white for
+*     a printer. The other colours in the standard palette are:
+*
+*     - 2: Red
+*     - 3: Green
+*     - 4: Blue
+*     - 5: Yellow 
+*     - 6: Magenta
+*     - 7: Cyan
+*     - 8 to 15: Black
 
 *  Usage:
 *     paldef [device]
@@ -62,6 +71,9 @@
 *        Original version.
 *     1994 January 24 (MJC):
 *        Allowed the device to be a MATRIX_PRINTER.
+*     30-OCT-1998 (DSB):
+*        Modified to save current palette in the adam directory so that
+*        subsequent PGPLOT applications can read it back in again.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -149,6 +161,15 @@
      :              PALETT( 3, I ) )
       END DO
       CALL GKS_GSTAT( STATUS )
+
+*    Save the palette in the adam directory so that it can be read back
+*    again by subsequent applications (PGPLOT resets the colour palette
+*    when it opens a device, so the palette then needs to be re-instated).
+*    The first two pens ( 0 and 1, the background and foreground colours) 
+*    are not saved, but reset to their default (unspecified) values. This
+*    means (for instance), that foreground text will be white on black 
+*    on an xwindow, but black on white on a printer.
+      CALL KPG1_PLSAV( 2, 0, .TRUE., STATUS )
 
 *    If an error occurred, then report a contextual message.
 

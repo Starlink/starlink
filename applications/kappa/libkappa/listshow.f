@@ -193,7 +193,7 @@
 *  Examples:
 *     listshow stars pixel
 *        This displays the pixel co-ordinates of all the positions
-*        stored in the FITS binary catalogue stars.FIT. They are all written 
+*        stored in the FITS binary catalogue stars.fit. They are all written 
 *        to the output parameter POSNS as well as to the screen.
 *     listshow stars.fit equat(J2010) first=3 last=3 quiet
 *        This extracts position 3 from the catalogue stars.fit transforming
@@ -216,7 +216,7 @@
 *  Notes:
 *     -  This application uses the conventions of the CURSA package (SUN/190)
 *     for determining the formats of input and output catalogues. If a file 
-*     type of .fit is given, then the catalogue is assumed to be a FITS 
+*     type of .fits is given, then the catalogue is assumed to be a FITS 
 *     binary table. If a file type of .txt is given, then the catalogue is 
 *     assumed to be stored in a text file in "Small Text List" (STL) format. 
 *     If no file type is given, then ".fit" is assumed. 
@@ -526,6 +526,11 @@
             CALL AGP_DEASS( 'DEVICE', .TRUE., STATUS )
             CALL ERR_BEGIN( STATUS )
          END IF
+
+*  PGPLOT resets the colour palette when the device is opened. Therefore we
+*  need to re-instate the colour palette set by the user, reading it from
+*  the HDS file kappa-palette.sdf in the users adam directory.
+         CALL KPG1_PLLOD( STATUS )
 
 *  KPS1_LSHPL may need work space to hold the GRAPHICS positions.
          CALL PSX_CALLOC( 2*NDISP, '_DOUBLE', IPW3, STATUS )
