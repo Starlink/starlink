@@ -378,6 +378,9 @@
         CALL WCI_NEWSYS( 'ECL', EQNX, EPOCH, I_ECLSYS, STATUS )
         CALL WCI_NEWSYS( 'GAL', EQNX, EPOCH, I_GALSYS, STATUS )
 
+*    Create description of FK4 coordinate system
+        CALL WCI_NEWSYS( 'FK4', 1950.0, EPOCH, I_FK4SYS, STATUS )
+
       END IF
 
       END
