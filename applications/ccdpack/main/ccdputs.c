@@ -49,6 +49,7 @@
 #include "tcl.h"
 #include "cnf.h"
 #include "mers.h"
+#include "msg_par.h"
 
 /**********************************************************************/
    int CcdlogCmd( ClientData clientData, Tcl_Interp *interp, int objc,
@@ -58,8 +59,11 @@
       int errmsg;
       int mleng;
       int nleng;
+      int status[ 1 ];
       char *msg;
       char *name;
+      DECLARE_CHARACTER( fmsg, MSG__SZMSG );
+      DECLARE_CHARACTER( fname, MSG__SZMSG );
 
 /* Process flags. */
       errmsg = 0;
@@ -86,44 +90,38 @@
          nleng = 1;
       }
 
-      {
 /* Turn string arguments into fortran-friendly strings. */
-         int status[ 1 ];
-         DECLARE_CHARACTER( fmsg, mleng );
-         DECLARE_CHARACTER( fname, nleng );
-         cnfExprt( msg, fmsg, mleng );
-         cnfExprt( name, fname, nleng );
-
+      cnfExprt( msg, fmsg, mleng );
+      cnfExprt( name, fname, nleng );
 
 /* Begin an error context in a clean state. */
-         errMark();
-         *status = SAI__OK;
+      errMark();
+      *status = SAI__OK;
 
 /* Call the appropriate routine. */
-         if ( errmsg ) {
-            F77_CALL(ccd1_errep)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
-                                  INTEGER_ARG(status)
-                                  TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
-         }
-         else {
-            F77_CALL(ccd1_msg)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
-                                INTEGER_ARG(status)
-                                TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
-         }
+      if ( errmsg ) {
+         F77_CALL(ccd1_errep)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
+                               INTEGER_ARG(status)
+                               TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+      }
+      else {
+         F77_CALL(ccd1_msg)( CHARACTER_ARG(fname), CHARACTER_ARG(fmsg),
+                             INTEGER_ARG(status)
+                             TRAIL_ARG(fname) TRAIL_ARG(fmsg) );
+      }
 
 /* The call failed - this is probably because the CCDPACK messaging system
    was not enabled (ccdwish was freestanding rather than this being called
    somewhere within a CCDPACK Atask).  In any case, we arrange to output
    the error to the screen and assume that this will be enough.  This 
    strategy could result in a duplicated error message.  So kill me. */
-         if ( *status != SAI__OK ) {
-            errAnnul( status );
-            printf( "%s\n", msg );
-         }
+      if ( *status != SAI__OK ) {
+         errAnnul( status );
+         printf( "%s\n", msg );
+      }
 
 /* Release the error context. */
-         errRlse();
-      }
+      errRlse();
 
 /* Set result and exit successfully. */
       Tcl_SetObjResult( interp, Tcl_NewStringObj( "", 0 ) );
