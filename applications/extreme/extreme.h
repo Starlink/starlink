@@ -1,3 +1,5 @@
+#if !defined(STAR_EXT_INCLUDED)
+#define STAR_EXT_INCLUDED
 /*
 *+
 *  Name:
@@ -15,13 +17,9 @@
 *  Description:
 *     This file may be included in C code which uses the INT_BIG identifier
 *     as an integer type.  It defines the value of INT_BIG if it is not
-*     already defined (e.g. on the compiler command line) as `int', and
-*     if the system include file limits.h has already been included it 
+*     already defined (e.g. on the compiler command line), and it
 *     sets up constants for the maximum and minimum values of the
 *     resulting integral types.
-*
-*     This file should therefore be included after limits.h, if the
-*     constants INT_BIG_MAX etc are required.
 *
 *  Author:
 *     MBT: Mark Taylor (Starlink)
@@ -32,33 +30,43 @@
 *-
 */
 
-/* Define the INT_BIG macro if it has not already been defined. */
-#ifdef INT_BIG
-#else
+/* Define the INT_BIG macro if it has not already been defined.  This line
+   differs for different source variant versions of this include file:
+   for 32-bit systems the definition will be 'int' and for 64-bit systems
+   it will be 'long'. */
+
+#if !defined(INT_BIG)
 #define INT_BIG int
 #endif
 
-/* If the system header file limits.h has been included, define new maximum
-   and minimum constants INT_BIG_MAX, INT_BIG_MIN and UINT_BIG_MAX as 
-   appropriate. */
-#ifdef INT_MAX
+/* Include the system header file limits.h, which contains the maximum
+   and minimum constants for int type: INT_MAX, INT_MIN and UINT_MAX. */
+
+#include <limits.h>
+
+/* Define new maximum and minimum constants INT_BIG_MAX, INT_BIG_MIN and 
+   UINT_BIG_MAX as appropriate. */
 
 #define int 1
 #define long 2
 
 #if INT_BIG == int
+
 #define INT_BIG_MAX INT_MAX
 #define INT_BIG_MIN INT_MIN
 #define UINT_BIG_MAX UINT_MAX
+
 #elif INT_BIG == long
+
 #define INT_BIG_MAX LONG_MAX
 #define INT_BIG_MIN LONG_MIN
 #define UINT_BIG_MAX ULONG_MAX
+
 #endif
 
 #undef int
 #undef long
 
-#endif
+#endif   /* STAR_EXT_INCLUDED */
 
 /* $Id$ */
