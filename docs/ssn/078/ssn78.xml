@@ -764,11 +764,15 @@ AC_INIT(...)
           <p>The resulting <code>Makefile</code> has rules to do all
             the required building and installation in a very portable
             fashion, as well as targets to make distributions
-            (<kbd>make dist</kbd>), clean up (<kbd>make clean</kbd>,
+            (<kbd>make dist</kbd>), do tests (<kbd>make
+              check</kbd>), clean up (<kbd>make clean</kbd>,
             <kbd>make distclean</kbd> and <kbd>make
               maintainer-clear</kbd>) and, in the case of Starlink
-            automake, make an installation manifest (<kbd>make
-              install-manifest</kbd>).</p>
+            automake, do an install along with an installation
+            manifest (<kbd>make install-manifest</kbd>), which is the
+            command you should normally use to do the installation,
+            instead of the more usual <kbd>make
+              install</kbd>.</p>
 
           <p>The <code>Makefile.am</code> script consists, in its
             simplest form, of a sequence of declarations of the
@@ -1813,15 +1817,23 @@ Directory /cvs/libraries/pcs/adam added to the repository
           from this message file.  Thus it is neither
           <code>adam_err</code> nor <code>ADAM_ERR</code> which we
           should check in, but the source file <code>adam_err.msg</code>
-          which we reconstruct using <em>cremsg</em>.  The file
-          <code>adam_defns</code> is similar, but this is genuinely a
-          source file, so we need do nothing more elaborate than rename
-          it to <code>ADAM_DEFNS</code> before checking it in.  Also,
-          CVS preserves access modes when it stores files, so we should
-          make sure that the script <code>adam_link_adam</code> is
-          executable before checking it in, and we need not bother to
-          make it executable as part of the build process.
+          which we reconstruct using <em>cremsg</em>.  Thus with error
+          files, it is the (probably reconstructed) <code>.msg</code>
+          file which should be checked in to the repository, and
+          <em>not</em> the <code>_err</code>, <code>_err.h</code> or
+          <code>fac_xxx_err</code> files which you may have found in
+          the old-style distribution.</p>
 
+        <p>The file <code>adam_defns</code> is similar, but this is
+          genuinely a source file, so we need do nothing more elaborate
+          than rename it to <code>ADAM_DEFNS</code> before checking it
+          in.  Many packages have one or two <code>xxx_par</code> files,
+          and these should be similarly renamed to <code>XXX_PAR</code>
+          before checking.  Also, CVS preserves access modes when it
+          stores files, so we should make sure that the script
+          <code>adam_link_adam</code> is executable <em>before</em>
+          checking it in, and we need not bother to make it executable
+          as part of the build process.
 <verbatim>
 % tar xf /star/sources/pcs/adam/adam_source.tar
 % mv adam_defns ADAM_DEFNS
@@ -2007,6 +2019,77 @@ configure.ac: installing `./missing'
           have a skeleton <code>configure.ac</code> which includes a
           <code>AC_CONFIG_SUBDIRS</code> line, to which you should add
           your newly working directory.</p>
+
+      </subsect>
+
+      <subsect id="regressiontests" export="export">
+        <subhead>
+          <title>Regression tests</title>
+        </subhead>
+
+        <p>Automake provides some simple support for regression tests.
+          There is a (terse) description of these in the automake
+          manual, in the section <webref
+            url="&automakehtml;/Tests.html">Support for test
+            suites</webref>, but it lacks any example.  You run the tests
+          with <kbd>make check</kbd>, after the build, but before the
+          component is installed.</p>
+
+        <p>You can set up tests as follows.
+          <verbatim>
+TESTS = test1 test2
+check_PROGRAMS = test1 test2
+
+test1_SOURCES = test1.f
+test1_LDADD = libemsf.la libems.la `cnf_link`
+
+test2_SOURCES = test2.c
+</verbatim></p>
+
+        <p>The <code>TESTS</code> variable lists a set of programs
+          which are run in turn.  Each should be a program which returns
+          zero on success, and if all the programs return zero, the test
+          is reported as a success overall.  If a non-portable test
+          makes no sense on a particular platform, the program should
+          return the magic value 77; such a program will not be counted
+          as a failure (so it's actually no different from `success',
+          and the difference seems rather pointless to me).  A
+          <code>PROGRAMS</code> `primary' (see <ref
+            id="automakeoverview"/> for this term) indicates that
+          these are programs to be built, but the `prefix'
+          <code>check</code> indicates that they need be built only at
+          `make check' time, and are not to be installed.</p>
+
+        <p>The <code>SOURCES</code> primary is as usual, but while the
+          <code>test2</code> program is standalone (it's not clear quite
+          how this will test anything, but let that pass), the
+          <code>test1</code> program needs to be linked against two
+          libraries, presumably part of the build.  We specify these
+          with a <code>LDADD</code> primary, but note that we specify
+          them as two <em>libtool libraries</em>, with the extension
+          <code>.la</code>, rather than using <code>`ems_link`</code>
+          (this example comes from the <code>ems</code> component).
+          That tells libtool to use the libraries in this directory,
+          rather than any which have been installed.</p>
+
+        <p>The fact that test programs must return non-zero on error
+          is problematic, since Fortran has no standardised way of
+          controlling the exit code.  Many Fortran compilers will let
+          you use the <code>exit</code> intrinsic:
+          <verbatim>
+rval = 1
+call exit(rval)
+</verbatim>
+          to return a status.  Since this is test code, it doesn't
+          really matter that this <em>might</em> fail on some
+          platforms, but if this worries you, then write the test code
+          as a function which returns a non-zero integer value on
+          error, and wrap it in a dummy C program:
+          <verbatim>
+test1_SOURCES = test1.f test1_wrap.c
+test1_wrap.c:
+	echo "int main() { exit (test1_()); }" >test1_wrap.c
+</verbatim></p>
 
       </subsect>
 
