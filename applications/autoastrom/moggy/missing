@@ -38,12 +38,20 @@ else
   configure_ac=configure.in
 fi
 
+# Allow MISSING_ALLOW_RUN to be defaulted from the environment.
+# If MISSING_ALLOW_RUN is false, then ignore any --run option.
+: ${MISSING_ALLOW_RUN:=true}
+
 case "$1" in
 --run)
-  # Try to run requested program, and just exit if it succeeds.
-  run=
-  shift
-  "$@" && exit 0
+  if $MISSING_ALLOW_RUN; then
+    # Try to run requested program, and just exit if it succeeds.
+    run=
+    shift
+    "$@" && exit 0
+  else
+    shift
+  fi
   ;;
 esac
 
