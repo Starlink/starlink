@@ -14,12 +14,14 @@
 *     CALL COF_FT2NE( FUNIT, NDF, STATUS )
 
 *  Description:
-*     The routine recreates an NDF extension's structure from a FITS
-*     ASCII or binary table written by NDF2FITS.  It uses the EXTNAME
-*     and EXTTYPE keywords to determine the structure's path and data
-*     type.  EXTNAME also has the element indices if the extension or
-*     sub-structure is an array; the dimensions of such a structure
-*     are taken from the EXTSHAPE keyword.  It creates the extension or
+*     The routine recreates an NDF extension from a FITS ASCII or
+*     binary table written by NDF2FITS.  The extension can be a
+*     structure, sub-structure, structure-array element or a primitive
+*     component.  It uses the EXTNAME and EXTTYPE keywords to determine
+*     the extensions's path and data type.  EXTNAME also has the
+*     element indices if the extension or sub-structure is an array;
+*     the dimensions of such a structure or a primitive array are taken
+*     from the EXTSHAPE keyword.  The routine creates the extension or
 *     structure only if it does not exist.
 
 *  Arguments:
@@ -40,7 +42,12 @@
 *  History:
 *     1997 March 21 (MJC):
 *        Original version.
-*     {enter_changes_here}
+*     1997 November 14 (MJC):
+*        Fixed bug: routine was not obtaining a cell locator for a
+*        structure array.
+*     1997 November 15 (MJC):
+*        Allow for extensions which are primitive arrays.
+*     {enter_further_changes_here}
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -62,6 +69,9 @@
 *  Status:
       INTEGER STATUS             ! Global status
 
+*  External References:
+      LOGICAL CHR_SIMLR          ! Compare character strings
+
 *  Local Constants:
       INTEGER FITSOK             ! Good status for FITSIO library
       PARAMETER( FITSOK = 0 )
@@ -80,7 +90,10 @@
       CHARACTER * ( DAT__SZLOC ) LOC ! Locator to full structure
       CHARACTER * ( DAT__SZNAM ) NAME ! Extension or structure name
       INTEGER NDIM               ! Number of dimensions of the structure
+      CHARACTER * ( DAT__SZLOC ) NLOC ! Locator to NDF
       INTEGER NWORD              ! Number of words in HISTORY card
+      LOGICAL PRIMEX             ! Extension is a primitive?
+      CHARACTER * ( DAT__SZLOC ) SALOC ! Locator to structure array
       INTEGER START( MAXWRD )    ! Start columns of words (not used)
       CHARACTER * ( DAT__SZLOC ) SXLOC( MAXWRD - 2 ) ! Locators to
                                  ! nested structures or cells thereof
@@ -119,6 +132,16 @@
 *  data type.
       IF ( EXTYPE .EQ. ' ' ) EXTYPE = 'STRUCT'
 
+*  See if the data type is primitive.
+      PRIMEX = CHR_SIMLR( EXTYPE, '_REAL' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_DOUBLE' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_INTEGER' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_WORD' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_UWORD' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_BYTE' ) .OR.
+     :         CHR_SIMLR( EXTYPE, '_UBYTE' ) .OR.
+     :         CHR_SIMLR( EXTYPE( 1:5 ), '_CHAR' )
+
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
 *  Replace the dots in the path by spaces.
@@ -135,11 +158,22 @@
 *  The extensions begin at level 3.
       CALL NDF_XSTAT( NDF, NAME, THERE, STATUS )
 
-*  If it exists, obtain an HDS locator to the structure.  This can be
-*  done directly if the extension is not an array, but for an array of
-*  extensions we have to obtain a locator to the current element of the
-*  extension.
-      IF ( THERE ) THEN
+*  Deal with a primitive extension.  This can only be written if there
+*  is no exisiting component of the same name.
+      IF ( PRIMEX ) THEN
+         IF ( .NOT. THERE ) THEN
+
+*  Obtain a locator to the NDF, thence the NDF extension container.
+            CALL NDF_LOC( NDF, 'UPDATE', NLOC, STATUS )
+            CALL DAT_FIND( NLOC, 'MORE', SXLOC( NWORD - 2 ), STATUS )
+            CALL DAT_ANNUL( NLOC, STATUS )
+         END IF
+
+*  If the structure exists, obtain an HDS locator to the structure.
+*  This can be done directly if the extension is not an array, but for
+*  an array of extensions we have to obtain a locator to the current
+*  element of the extension.
+      ELSE IF ( THERE ) THEN
          IF ( NDIM .EQ. 0 ) THEN
             CALL NDF_XLOC( NDF, NAME, 'UPDATE', SXLOC( 1 ), STATUS )
          ELSE
@@ -203,8 +237,18 @@
             END IF
 
 *  Obtain the locator to the structure.
-            CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME,
-     :                     SXLOC( LEVEL ), STATUS )
+            IF ( NDIM .EQ. 0 ) THEN
+               CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME,
+     :                        SXLOC( LEVEL ), STATUS )
+            ELSE
+
+*  Obtain the locator to the cell of the structure array via the
+*  structure locator.
+               CALL DAT_FIND( SXLOC( LEVEL - 1 ), NAME, SALOC, STATUS )
+               CALL DAT_CELL( SALOC, NDIM, INDICE, SXLOC( LEVEL ),
+     :                        STATUS )
+               CALL DAT_ANNUL( SALOC, STATUS )
+            END IF
 
          END DO
       END IF
