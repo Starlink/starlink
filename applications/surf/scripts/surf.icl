@@ -90,7 +90,7 @@ define surf_restore         $SURF_DIR/surf_mon restore
 
 print " "
 print "   SURF - SCUBA User Reduction Facility"
-print "     Commands are now available -- (Version 1.0-0)"
+print "     Commands are now available -- (Version PKG_VERS)"
 print " "
 print "     Type `help kappa` or `scuhelp` for help on SURF commands."
 print " "
