@@ -1,0 +1,427 @@
+<![ ignore [
+  DTD for program source code structure.
+
+  This DTD was not designed to be used on its own, but instead
+  included at the end of a language-specific DTD, which defines a
+  notation, and sets up shortref maps to make inputting the source
+  file easier - for example, the Fortran DTD makes `^*+' a shortref
+  for the CODEPROLOGUE start tag, and ignores `^*' within the
+  CODEPROLOGUE.  However, since it _is_ intended to be used as an
+  architecture, it _could_ be used on its own, if you have an
+  application which can benefit from that.  I would recommend not
+  doing that, however, until there's a clear benefit: the present
+  practice of making different `editions' of this for different
+  languages forces me to think a little about the different languages'
+  requirements, and which features might need to be restricted or expanded.
+
+  Additions to the list of supported languages requires at least
+  modifying the %notationlist entity, and adding appropriate notation
+  definitions.
+
+  Invoke with something like:
+
+    <!entity % DTD.Version "DTD Starlink Fortrancode 0.6">
+    <!entity % language.attr	-- language name --
+	 "language notation (FORTRAN77) #fixed FORTRAN77">
+    <!entity % generalcode.dtd
+	public "-//Starlink//DTD Program Source Code 0.6//EN">
+    %generalcode.dtd;
+
+  The definition of the %language.attr entity is required.
+  The %direction.attr entity may also be predefined, and if the DTD
+  which calls this one wishes to do other architectural remapping
+  (only the DSSSL one does at present), then it can define further
+  attributes as noted below.
+
+  Author: 
+    NG: Norman Gray (Glasgow)
+
+  History: 
+    March 1999 (NG):
+      Original version
+
+  Copyright 1999, Particle Physics and Astronomy Research Council.
+
+  $Id$
+]]>
+
+<!entity % DTD.Programcode.Version "DTD Programcode 0.6">
+<!entity % DTD.Version "UNKNOWN"	-- client DTD should specify this -->
+
+
+<!--============================== Entities ==============================
+  Collect parameter entities here.  These could be overridden by the
+  invoking DTD.
+-->
+
+<!-- The %direction.attr entity is attached to function arguments, and
+     indicates which direction the argument is moving.  Calling DTDs may
+     modify this as appropriate, as long as the modified version is a
+     subset of this list.
+     -->
+<!entity % direction.attr 
+	"direction (given|returned|givenandreturned) #required"
+	-- input or output to function -->
+
+<!-- %language.attr entity must be declared by the DTD which includes
+     this one.  That DTD should declare the entity as something like
+
+       <!entity % language.attr
+	 "language notation (fortran77) #fixed fortran77">
+
+     using one of the notations declared here.
+     -->
+<!entity % notationlist "fortran77 | dsssl">
+<!entity % language.attr
+        "language notation (%notationlist;) #required">
+
+<!-- Just for convenience, also define a LT entity -->
+<!entity lt "<">
+
+<!-- Language notations are declared here.  The DTDs which include
+     this one may declare attributes to these notations (for example, the
+     DSSSLCODE DTD uses the DSSSL notation to declare the DSSSL DTD as an
+     architecture).  See ``ISO/IEC JTC1/WG4 N1958, Information technology
+     - Text and office systems - Using SGML Public Identifiers for
+     Specifying Data Notations''
+     <http://www.ornl.gov/sgml/wg4/document/1958.htm>.
+
+     Note that the DSSSL notation declaration mentioned in the above
+     document is different from this (unimportantly, I believe).
+
+     Note also that I've changed the name of the Fortran notation to
+     Fortran77, to support a future distinction of this from Fortran 90.
+     -->
+<!notation dsssl      public 
+                      "ISO/IEC 10179:1996//NOTATION
+                         DSSSL Architecture Definition Document//EN"
+                      -- A document architecture conforming to the
+                         Architectural Form Definition Requirements of
+                         ISO/IEC 10744.     --
+	>
+<!NOTATION FORTRAN77  PUBLIC 
+                      "ISO/IEC 1539:1991//NOTATION
+                         Information technology - Programming languages -
+                         FORTRAN//EN"
+	>
+<!NOTATION C		PUBLIC 
+			"ISO/IEC 9899:1990//NOTATION
+                         Programming languages - C//EN"
+	>
+
+<!--==================== Element structure ====================-->
+<!element programcode	o o (docblock, (codegroup | codereference)+)
+		-- Document element -->
+<!element codegroup	- o (docblock, routine+)
+		-- A codegroup is a collection of functions or other
+		   code which can sensibly be grouped together.
+		   There's no particular semantics implied by the
+		   grouping, as far as this DTD is (currently)
+		   concerned. -->
+<!element codereference	- o (docblock)
+		-- A codereference is a rather vague thing, at
+		   present.  It's intended to document some
+		   relationship with code in another document.  The
+		   only use I've put it to so far is to have the
+		   DSSSLCODE DTD make this architectural, and map to
+		   the EXTERNAL-SPECIFICATION element in DSSSL.
+		   However, it could sensibly also document the fact
+		   that a fortran file might depend on an include
+		   file.
+
+		   The document referred to should be marked up using
+		   the programcode DTD. -->
+
+<!element docblock	o o (title, description?, authorlist?,
+			     copyright?, history?)>
+
+<!element routine	o o (codeopener, routineprologue, codebody)
+		-- The specification of one function, or procedure or
+		   other code.  At one time, we distinguished
+		   functions from `miscellaneous' code, but the only
+		   difference was that the `func' had a longish list
+		   of required elements, while the `misccode' element
+		   didn't.  Now that most of these elements are
+		   optional, the distinction is unnecessary. -->
+<![ ignore [
+<!element misccode	o o (miscprologue, codebody)
+		-- Other code, not reasonably
+		   categorised as a function -->
+]]>
+<!element codeopener	o o (#pcdata)
+		-- Contains any program code between the <routine>
+		   start-tag and the routineprologue.  This
+		   accomodates the usual Starlink way of laying out
+		   source files, with a one-line function declaration
+		   preceding the function documentation, which in turn
+		   precedes the function body. -->
+<!element codebody	o o (#pcdata)
+		-- The actual code -->
+
+<!entity % gversion.attr 
+	"generalversion cdata #fixed '%DTD.Programcode.Version;'">
+<!entity % version.attr
+	"version cdata #fixed '%DTD.Version;'">
+
+<!attlist programcode
+	%gversion.attr;
+	%version.attr;
+	>
+
+<!-- Attributes for codegroup and codebody.  Add architectural control
+     attributes here.  If they are defined before this, both
+     %funcbody.arch.atts and %codebody.arch.atts must be set to something
+     sensible.  This isn't terribly flexible as it stands, but that's OK,
+     since it's really only used by the DSSSL programcode DTD.
+     -->
+
+<!entity % codegroup.arch.atts '' >
+<!entity % codebody.arch.atts '' >
+<!entity % codereference.arch.atts ''>
+<!attlist codegroup
+	%language.attr;
+	%codegroup.arch.atts;
+	>
+<!attlist codereference
+	doc	 	-- the document containing the code being
+			   referred to --
+		entity #required
+	docid		-- an id within the above document, if needed
+			   to further distinguish the target --
+		name #implied
+	%codereference.arch.atts;
+	>
+<!attlist codebody
+	empty		-- Is element empty?  The application
+			   _currently_ ignores the element content,
+			   but if something generates a document
+			   conforming to this DTD directly (as opposed
+			   to one of its clients), then this attribute
+			   should be present (for neatness if nothing
+			   else) if the body doesn't actually contain
+			   anything. --
+		(empty) #implied
+	%codebody.arch.atts;
+	>
+
+<!--========== Paragraph content ==========-->
+<!-- This inclusion declares the P and PX elements, and their content.
+     We don't want any cross-references.
+     -->
+<!entity % Feature.Paracontent.References 'ignore'>
+
+<!entity % paragraph.elements 
+	public "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN">
+%paragraph.elements;
+
+<![ ignore [
+<!-- The elements in %para.markup are as follows
+       code     : verbatim program code
+       em       : emphasis
+       url      : a URL - the stylesheet might make a link here
+       funcname : the name of a function, presumably in the same broad
+                  collection of code.  The stylesheet may make a link
+                  here, if there's some clever way of finding the
+                  referenced function.
+     -->
+<!entity % para.markup 'code | em | url | funcname'>
+<!entity % para.content '(#pcdata | %para.markup | ul)*'>
+]]>
+
+<!entity % paralist 'p, (p | tabular)*'>
+
+<!-- The code prologue is the documentation of the routine.  I'd consider
+     making the connectors here into `&'; that can be done in future if
+     we decide that's necessary.
+
+     Make these AND connectors rather than SEQ (,), even though this
+     probably makes some tags (argumentlist?) non-omissable.
+
+     The list of elements here is related to the list of SST elements
+     which were used by the (now more-or-less defunct) SST tool (see
+     SUN/110).  The mapping is:
+
+	routinename	sstroutine
+	purpose		[none]
+	description	sstdescription
+	returnvalue	sstreturnedvalue
+	argumentlist	sstarguments/sstparameters
+	authorlist	[none]
+	history		[none]
+	usage		sstusage
+	invocation	sstinvocation
+	examplelist	sstexamples
+	[none]		sstnotes	(subsumed within notelist)
+	notelist	sstdiytopic
+	implementationstatus	sstimplementationstatus
+	bugs	sstbugs
+     -->
+<!element routineprologue o o (routinename & purpose? & description & 
+				returnvalue? & argumentlist? &
+				parameterlist? & authorlist? & history? &
+				usage? & invocation? & examplelist? &
+				notelist? & implementationstatus? & bugs?)>
+<![ ignore [
+<!element miscprologue	o o (description, history?)
+				-- content model needs future expansion? -->
+]]>
+
+<!element routinename	o o (name, othernames?)
+				-- some routines have a generic name
+				   like `proc_<type>', plus other
+				   names like `proc_real'. -->
+<!element name		o o (#pcdata)>
+<!element othernames	- o (name+)>
+
+<!element purpose	- o (%p.model)
+				-- brief (one line?) description -->
+<!element title		o o (#pcdata)>
+<!element description	- o (%paralist;)
+				-- longer discursive description -->
+<!element returnvalue	- o (%paralist;)
+				-- If there's no return value, there
+				   needn't be any explanatory text -->
+<!element (argumentlist | parameterlist)
+			o o (parameter*)
+				-- In Starlink usage, `arguments' are
+				   the things passed to functions, and are
+				   distinct from `parameters', which
+				   are the arguments for ADAM
+				   applications. -->
+<!element examplelist	o o (example,description)+>
+<!element example	- o (#pcdata) 
+				-- text of the example, set in tt font -->
+
+
+<!attlist argumentlist
+	none		-- Attribute present if there are no
+			   arguments.  There shouldn't be any
+			   PARAMETER content in this case. --
+		(none)
+		#implied
+	>
+<!attlist returnvalue
+	none		-- Attribute present if there is no
+			   return value. --
+		(none)
+		#implied
+	type		-- Type of returned value --
+		cdata
+		#implied
+	>
+
+<!-- The AUTHOR element includes full details about an author and has
+     a required ID attribute, the AUTHORREF element simply refers to an
+     AUTHOR element elsewhere using an IDREF.  We need the distinction
+     since it follows that a document can have only one AUTHOR element
+     per author.  If the actual text of a document is scattered amongst
+     several source-code files, then it would be appropriate for the
+     scattered files to have AUTHORREF elements, and for the
+     corresponding AUTHOR element to be in a CODEGROUPHEAD element in a
+     `master' file which collects together the source-code files for
+     documentation purposes.  It might be appropriate to let the
+     AUTHORREF element have some content, so that a suitable note can go
+     in the source-code file, to make it more nearly standalone.
+     -->
+<!element authorlist	o o ((author+ | authorref+), otherauthors?)>
+<!element otherauthors	- o (author+ | authorref+)
+				-- other authors who have contributed -->
+<!element history	o o (change+)
+				-- the changes should be in
+				   chronological order, with newest last -->
+<!element copyright	- o (%paralist;)
+				-- Copyright message -->
+
+<!element type		- o (#pcdata)>
+<!element author	- o (name, authornote?)
+				-- name child contains the author name -->
+<!element authornote	- o (%paralist;)
+				-- Other information/notes about this
+				   author -->
+<!element authorref	- o EMPTY>
+<!element change	- o (%paralist;)>
+<!element parameter	- o (name, type, description)>
+
+<!element (usage | invocation | examples | implementationstatus | bugs)
+			- o (%paralist;)>
+<!element notelist	o o (othernote+)>
+<!element othernote	- o (title, %paralist;)>
+
+
+<!attlist parameter
+	optional 	-- is the parameter optional?  Optional means that
+			   the parameter will be defaulted if omitted,
+			   and keyword means that the parameter is
+			   specified with a keyword.  Both mechanisms
+			   are used in both DSSSL and IDL (for
+			   example). --
+		(optional|keyword) #implied
+	default		-- The default value of an optional parameter,
+			   if omitted --
+		cdata #implied
+	%direction.attr;
+	>
+
+<!attlist author
+	id		-- identify author --
+		id
+		#required
+	affiliation	-- where based --
+		cdata
+		#implied
+	email		-- author's email address --
+		cdata
+		#implied
+	webpage		-- author's URL --
+		cdata
+		#implied
+	-- etc... add further author details --
+	>
+<!attlist authorref
+	id		-- refer to author --
+		idref
+		#required
+	note		-- Author ref's content can be any
+			   note giving further information.
+			   For example, ISO10179 was listed as
+			   an `author' of some of the routines
+			   in the DSSSL stylesheet, and the
+			   authorref note attribute was used to list
+			   the section where the code was
+			   listed there. --
+		cdata
+		#implied
+	>
+<!attlist change
+	author		-- who made this mod? --
+		idref
+		#required
+	date		-- ... and when? --
+		cdata
+		#required
+	>
+
+
+
+<!--========== Tables ==========-->
+<!-- Use the OASIS Exchange Table Model subset of the CALS table model.
+     See http://www.oasis-open.org/html/a503.htm for discussion, and
+     http://www.oasis-open.org/html/publtext.htm for public texts.
+
+     The Exchange Table Model can be customised.  Adjust the table entry
+     model, and remove the %titles entity
+
+     Also rename the table element to `tabular'.  This fits in well with
+     the LaTeX model folk will be familiar with, and allows us to
+     separate the floating plus captioning plus id stuff from the
+     lining-it-up-in-columns of tabular layouts.
+
+     This Programcode DTD uses the same TABULAR element as the General
+     DTD, but does not use the TABLE element.
+     -->
+<!entity % tbl.table.name 'TABULAR'>
+<!entity % tbl.table-titles.mdl ''>
+<!entity % tbl.entry.mdl '(%phrase)*'>
+<!entity % calstbls 
+	public "-//OASIS//DTD Exchange Table Model 19960430//EN">
+%calstbls;
