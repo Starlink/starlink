@@ -40,6 +40,9 @@
 *  History:
 *     4-DEC-2001 (MBT):
 *        Original version.
+*     8-MAY-2002 (DSB):
+*        Modified to use N-1 instead of N when calculating
+*        standard deviation.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -97,14 +100,23 @@
          END DO
 
 *  If we have found at least one good pixel, calculate and store the
-*  mean and variance.
+*  mean.
          IF ( NUSE<T> .GT. 0<CONST> ) THEN
             OMEAN( I ) = SUM / NUSE<T>
-            OVAR( I ) = SUM2 / NUSE<T> - OMEAN( I ) * OMEAN( I )
 
-*  Otherwise store bad values.
+*  Otherwise store a bad value.
          ELSE
             OMEAN( I ) = VAL__BAD<T>
+         END IF
+
+*  If we have found at least two good pixels, calculate and store the
+*  mean.
+         IF ( NUSE<T> .GT. 1<CONST> ) THEN
+            OVAR( I ) = 1<CONST> / ( NUSE<T> - 1<CONST> ) *
+     :                  ( SUM2 - NUSE<T> * OMEAN( I ) * OMEAN( I ) ) 
+
+*  Otherwise store a bad value. 
+         ELSE
             OVAR( I ) = VAL__BAD<T>
          END IF
 
