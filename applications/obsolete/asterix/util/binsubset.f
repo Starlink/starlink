@@ -719,10 +719,7 @@
 *    Status :
       INTEGER STATUS
 *    Local variables :
-      REAL UPBOUND,OFFSET
       INTEGER JR
-      INTEGER IDIM,JDIM
-      LOGICAL MATCHLO,MATCHUP
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN

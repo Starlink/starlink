@@ -398,10 +398,10 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
      +              ITECNT,ITEFLG, DIST1, DIST2
 
          REAL       T(N), X(N), W(N), CLNLIM, WIDTH, MAXFR, MINFR,
-     +              FREQST, NFREQ, POWR, WI, CNST,
+     +              FREQST, WI, CNST,
      +              MAXFRE, TLRG, TSML, RK
 
-         DOUBLEPRECISION  GAIN, FREQ, FRSTEP, FRSTP, ANGLE,
+         DOUBLEPRECISION  GAIN, FRSTEP, FRSTP, ANGLE,
      +                    NUFREQ(0:NN+4),
      +                     POWER(0:NN+4), PPHASE(0:NN+4),
      +                    WINDOW(0:NN+4), WPHASE(0:NN+4),
@@ -411,14 +411,14 @@ C        IF(LGXFL.EQ.1)XMIN =0.5*NUFREQ(1)
      +                    DSINTR(0:NN+4), DCOSTR(0:NN+4),
      +                    CLLOC(10000),
      +                    REC(10000), IMC(10000),
-     +                    SUMT,SUMX, SUMW, AVET, AVEX, AVEW, NRW,
+     +                    SUMT,SUMX, SUMW, AVET, AVEX, NRW,
      +                    NRWSQ, NR, MAXF, MAXOLD, MXOLDR, WINDO2,
-     +                    DSII, DCII, DSWI, DCWI, DSI, DCI, DELTS,
+     +                    DSII, DCII, DSWI, DCWI, DSI, DELTS,
      +                    DELTC, DSTR, DCTR, DC1, DC2, WINFLG, DD1,
      +                    DD2, DS1, DS2, DCT, DST, DWI, DXI, DPOWR,
      +                    PI, TWOPI, LN2,
      +                    DDC1, DDS1, DNC1, DNC2, SUMNOM,
-     +                    GAINRE, GAINIM
+     +                    GAINRE
 
 *                Version August 15, 1990.  Harry Lehto
 *

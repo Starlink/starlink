@@ -46,10 +46,10 @@
       REAL PMAX                   !Best fit period
       REAL DIFF
       INTEGER IDF1,IDF2
-      INTEGER I,J,H,II,JJ,N
+      INTEGER I,J,II,JJ,N
       INTEGER IPH,NMAX
-      CHARACTER CH
-*
+*-
+
 * Find appropriate degrees of freedom for F DISTRIBUTION.
 * also find DATA MEAN and VARIANCE (AVEVAR IS FROM NUMERICAL
 * RECIPES). TREF is a reference epoch.

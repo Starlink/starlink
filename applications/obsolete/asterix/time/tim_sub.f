@@ -367,7 +367,6 @@
 *    Function declarations :
 *    Local constants :
 *    Local variables :
-      INTEGER IVAL
       INTEGER ISECT
 *-
       T_NSECT=0
@@ -826,7 +825,6 @@
 *  Local variables :
       INTEGER ID
       INTEGER DPTR,VPTR,QPTR,APTR,WPTR
-      INTEGER NVAL
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
