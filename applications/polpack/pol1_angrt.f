@@ -90,8 +90,8 @@
       INTEGER IBASE              ! Index of original Base Frame
       INTEGER ICURR              ! Index of original Current Frame
       INTEGER ISKY               ! Index of SkyFrame
-      INTEGER SKYFM1             ! Pointer to the IWCS SKyFrame
-      INTEGER SKYFM2             ! Pointer to a new SKyFrame
+      INTEGER SKYF1              ! Pointer to the IWCS SKyFrame
+      INTEGER SKYF2              ! Pointer to a new SKyFrame
 *.
 
 *  Check the inherited global status.
@@ -150,7 +150,7 @@
                P1( 2 ) = YOUT( 1 )
                P2( 1 ) = XOUT( 2 )
                P2( 2 ) = YOUT( 2 )
-               ARC = AST__DISTANCE( IWCS, P1, P2, STATUS )
+               ARC = AST_DISTANCE( IWCS, P1, P2, STATUS )
 
 *  If the returned value is bad, or zero, return +90 (i.e. the +ve Y axis) 
 *  for the reference direction.

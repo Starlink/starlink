@@ -100,6 +100,7 @@
       INTEGER IGRP2
       INTEGER LBNDO( 3 )
       INTEGER UBNDO( 3 )
+      REAL ANGRT
 
 *  Status:
       INTEGER STATUS             ! Global status

@@ -77,7 +77,7 @@
 
 #  Edit in the current package version number into any required source files.
       set vers = `grep "PKG_VERS = " makefile`
-      if ( $vers == "" ) then
+      if ( "$vers" == "" ) then
          echo "Can't get package version number from makefile."
          exit
       endif

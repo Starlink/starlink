@@ -142,7 +142,7 @@
      :              'POLPACK: Identifiers for planes of data',
      :              'POLPACK: Analyser transmission factor',
      :              'POLPACK: Analyser efficiency factor',
-     :              'POLPACK: Analyser angle'.
+     :              'POLPACK: Analyser angle',
      :              'POLPACK: Version number'/
 
 *.
