@@ -21,6 +21,10 @@ dnl    Find required versions of the programs we need for configuration
 AC_PROG_CC
 AC_PROG_LIBTOOL
 
+AC_HEADER_STDC
+AC_PATH_XTRA
+
+
 dnl    Grab the F77 runtime libraries into FLIBS variable
 AC_F77_LIBRARY_LDFLAGS
 

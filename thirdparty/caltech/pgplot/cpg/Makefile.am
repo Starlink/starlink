@@ -23,10 +23,13 @@ include_HEADERS = $(PUBLIC_INCLUIDES)
 
 # Build the test
 
+PGXLIBS = $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
+PGPNGLIBS = -lpng -lz
+
+
 TESTS = cpgdemo
 check_PROGRAMS = cpgdemo
 cpgdemo_SOURCES = $(DEMO_ROUTINES)
 DEMO_ROUTINES = cpgdemo.c
-cpgdemo_LDADD = @FLIBS@ \
-  libcpgplot.la ../src/libpgplot_base.la ../drivers/libpgplot_drivers.la
+cpgdemo_LDADD = @FLIBS@ libcpgplot.la ../libpgplot.la $(PGXLIBS) $(PGPNGLIBS)
 
