@@ -47,6 +47,9 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Initialised?
+      IF ( .NOT. PSFLIBINIT ) CALL PSF_LINIT( STATUS )
+
 *    Display header for table
       CALL MSG_PRNT( 'PSF system options : ' )
       CALL MSG_PRNT( ' ' )
