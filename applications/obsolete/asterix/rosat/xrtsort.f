@@ -95,7 +95,7 @@
       INTEGER                 TOTEV_BCK         ! Number of events in bckgnd box
 
       REAL                    MRES		! Resolution of spatial mask
-*
+
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -1008,7 +1008,7 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         CHARACTER*100 FILE(MAXRAW)              ! Names of files in dir.
         INTEGER NFILES                          ! No of files in dir.
         LOGICAL LISTDIR                         ! List files on directory ?
-*
+        LOGICAL CURR				! use current directory
         INTEGER K
         INTEGER LP
 *
@@ -1022,11 +1022,14 @@ C     CALL BDA_ANNUL(LIV, STATUS)
         IF (STATUS .NE. SAI__OK) CALL ERR_ANNUL(STATUS)
 *
 * Get directory name
+        CALL USI_GET0L('CURR',CURR,STATUS)
+        IF (.NOT.CURR) THEN
+          CALL MSG_BLNK()
+          CALL USI_DEF0C('RAWDIR', RAWDIR, STATUS)
+          CALL USI_GET0C('RAWDIR', RAWDIR, STATUS)
+        ENDIF
         CALL MSG_BLNK()
-	CALL USI_DEF0C('RAWDIR', RAWDIR, STATUS)
-	CALL USI_GET0C('RAWDIR', RAWDIR, STATUS)
-        CALL MSG_BLNK()
-*
+
 	IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *
@@ -2818,7 +2821,7 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
 
 
 
-*+XRTSORT_SORT_BIN- Sorts rationalised XRT raw data into a binned data array
+*+XRTSORT_SORT_BIN- Sorts XRT raw data into a binned data array
       SUBROUTINE XRTSORT_SORT_BIN(HEAD, SRT, BSRT, SDIM1, SDIM2,
      &           SDIM3, SDIM4, SDIM5, SDIM6, SDIM7, BDIM1,
      &           BDIM2, BDIM3, BDIM4, BDIM5, BDIM6, BDIM7,
@@ -3390,20 +3393,11 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
             ELSEIF (SRT.SHAPE.EQ.'I') THEN
 
 *  find position within spatial mask
-              IF (SRT.IMAGE) THEN
-                MEL1=INT((XEV-SRT.MIN_X)/XWIDTH) + 1
-                IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                  MEL2=SDIM2 - INT((YEV-SRT.MIN_Y)/YWIDTH)
-                ELSE
-                  MEL2=INT((YEV-SRT.MIN_Y)/YWIDTH) + 1
-                ENDIF
+              MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+              IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
               ELSE
-                MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                  MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                ELSE
-                  MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                ENDIF
+                MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
               ENDIF
               SOK=(SMASK(MEL1,MEL2).NE.0)
               IF (SRT.BCKGND) THEN
