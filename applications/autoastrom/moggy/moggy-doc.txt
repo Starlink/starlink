@@ -121,12 +121,16 @@ STATUS
   e: 501 Syntax error
 
 TYPE <type>
-         [ Type can be `BOX', `RADIUS' or
-         `RADIUS2', which mean, in turn, that the search should be
-         in the box between the points COORD1 and COORD2, within a
-         circle centred on COORD1 with radius given by the RADIUS
-         command, or a circle centred on COORD1 with radius given by
-         COORD1-COORD2.  ]
+         [ Type can be `BOX', `RADIUS' or `RADIUS2', which mean, in
+         turn, that the search should be in the box between the points
+         COORD1 and COORD2, within a circle centred on COORD1 with
+         radius given by the RADIUS command, or a circle centred on
+         COORD1 with radius given by COORD1-COORD2.  Note that,
+         because of the way that individual catalogue handlers
+         implement this, it is not actually guaranteed that there will
+         be no results returned outside the specified area, so if it
+         matters, the results should be checked by the caller, or
+         otherwise post-processed. ]
   s: 250 Parameter set successfully.
   e: 501 Wrong number or type of parameters.
   e: 502 Unrecognised search type
