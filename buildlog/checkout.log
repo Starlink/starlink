@@ -9062,6 +9062,7 @@ U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharacters.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersEvent.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersListener.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectCharactersModel.java
+U java/source/util/src/main/uk/ac/starlink/util/gui/SelectStringDialog.java
 U java/source/util/src/main/uk/ac/starlink/util/gui/SelectTextField.java
 cvs checkout: Updating java/source/util/src/main/uk/ac/starlink/util/images
 U java/source/util/src/main/uk/ac/starlink/util/images/ImageHolder.java

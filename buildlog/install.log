@@ -136,7 +136,7 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/etc
-[loggedcopy] Copying 64 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 65 files to /apps/cvsbuild/starjava/docs
      [echo] Executing Task target: install
 
 prepare:
@@ -319,7 +319,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jan 15, 2004 5:13:13 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jan 16, 2004 5:24:14 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -644,7 +644,6 @@ webstart:
 dist:
      [copy] Copying 3 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
-    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/starjava/bin/jsky
@@ -1025,9 +1024,9 @@ execute_mk_script:
      [exec]       fi;\
      [exec] done)
      [exec] Processing 
+     [exec] g77: temp/*.o: No such file or directory
      [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
      [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
 
 jars:
       [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
@@ -1056,4 +1055,4 @@ install:
 [loggedcopy] Copying 134 files to /apps/cvsbuild/starjava/docs
 
 BUILD SUCCESSFUL
-Total time: 3 minutes 26 seconds
+Total time: 4 minutes 49 seconds
