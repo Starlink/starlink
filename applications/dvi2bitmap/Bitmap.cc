@@ -69,9 +69,10 @@ Bitmap::const_iterator Bitmap::endIterator_;
 // Indecision: Within scaleDown, it seems sensible to average the
 // pixel values over the complete factor*factor square, even when
 // we've strayed out of the bounding box.  However, this sometimes makes
-// the edges of images look too faint.  If SCALEDOWN_COMPLETE_AVERAGE is 1,
-// then go for consistency, rather than this fudge.
-#define SCALEDOWN_COMPLETE_AVERAGE 1
+// the edges of images look too faint.  If SCALEDOWN_COMPLETE_AVERAGE
+// is 1, then average over the whole square; if it's 0, then average
+// only over those pixels which are actually on the bitmap.
+#define SCALEDOWN_COMPLETE_AVERAGE 0
 
 /**
  * Create a new bitmap with the given parameters.
@@ -125,23 +126,6 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 	    maxH_ = h*maxW_/w + 1; // round up
     }
 
-//     bbL = bbT = INT_MAX;	// numeric_limits<int>::max();
-//     bbR = bbB = INT_MIN;	// numeric_limits<int>::min();
-
-//     cropL = 0;
-//     cropR = W;
-//     cropT = 0;
-//     cropB = H;
-
-//     cropMargin[Left]      = cropMarginDefault[Left];
-//     cropMargin[Right]     = cropMarginDefault[Right];
-//     cropMargin[Top]       = cropMarginDefault[Top];
-//     cropMargin[Bottom]    = cropMarginDefault[Bottom];
-//     cropMarginAbs[Left]   = cropMarginAbsDefault[Left];
-//     cropMarginAbs[Right]  = cropMarginAbsDefault[Right];
-//     cropMarginAbs[Top]    = cropMarginAbsDefault[Top];
-//     cropMarginAbs[Bottom] = cropMarginAbsDefault[Bottom];
-
     if (def_customRGB_)
     {
 	fg_.red   = def_fg_.red;
@@ -161,16 +145,14 @@ Bitmap::Bitmap (const int w, const int h, const int bpp,
 	customRGB_ = true;
     }
 
-//     cropped_ = false;
-
     if (bpp_ > 8)
 	// too big for a Byte...
 	bpp_ = 8;
     max_colour_ = static_cast<Byte>((1<<bpp_) - 1);
 
     if (verbosity_ > normal)
-	cerr << "Bitmap::new Bitmap("
-	     << W << ',' << H << ',' << bpp_ << ")" << endl;
+	cerr << "Bitmap::new Bitmap(W="
+	     << W << ", H=" << H << ", bpp=" << bpp_ << ")" << endl;
 }
 
 Bitmap::~Bitmap()
@@ -183,8 +165,11 @@ Bitmap::~Bitmap()
  * setting all the pixels to white, unfreezing it, and resetting the
  * bounding box and crops to their initial states.  It does not
  * deallocate any memory, however, so if the bitmap has expanded in
- * the past, the reset bitmap is the same size.  Also, it does not
- * reset the transparency flag or adjust the colour settings.
+ * the past, the reset bitmap is the same size.
+ *
+ * <p>It does not reset the transparency flag or adjust the colour
+ * setting, or reset the pixel depth.  This latter behaviour
+ * <em>may</em> change in future.
  */
 void Bitmap::clear()
 {
@@ -383,7 +368,6 @@ void Bitmap::rule(const int x, const int y, const int w, const int h)
     if (frozen_)
 	throw BitmapError ("rule() called after freeze()");
 
-    //usesBitmapArea_(x, y, x+w, y+h);
     usesBitmapArea_(x, y-h+1, x+w-1, y+h-1);
 
     // OR everything in a block between [row1,row2-1] and [col1,col2-1]
@@ -396,10 +380,6 @@ void Bitmap::rule(const int x, const int y, const int w, const int h)
 	for (int col=col1; col<col2; col++)
 	    B[row*W+col] = max_colour_;
 
-//     if (x   < bbL) bbL = x;
-//     if (x+w > bbR) bbR = x+w;
-//     if (y   < bbT) bbT = y;
-//     if (y+h > bbB) bbB = y+h;
     if (col1 < bbL) bbL = col1;
     if (col2 > bbR) bbR = col2;
     if (row1 < bbT) bbT = row1;
@@ -801,15 +781,15 @@ void Bitmap::scaleDown (const int factor)
 	// No - this is surely an error on the user's part.
 	throw BitmapError ("attempt to scale an empty bitmap");
 
-    // Create a new bitmap which is smaller than the original by the
-    // given factor.  
-    // The original bounding box
-    // may not have been an exact multiple of the target one.  
-    // Take careful account of the `extra' rows and columns on the
-    // right/bottom.
+    // We don't create a new bitmap.  Instead, we pack the scaled-down
+    // bitmap into the small-index corner of the original, and reset
+    // the bounding-box to respect this.  Because of this, we don't
+    // have to clear the old bitmap surrounding it, since this is now ignored.
+    //
+    // The original bounding box may not have been an exact multiple
+    // of the target one.  Take careful account of the `extra' rows
+    // and columns on the right/bottom.
 
-    int newW = (W+(factor-1))/factor;
-    int newH = (H+(factor-1))/factor;
     int newbbL = bbL/factor;
     // complete_bbR is the rightward boundary of the `complete' pixels
     int complete_bbR = newbbL + (bbR-bbL)/factor;
@@ -832,11 +812,9 @@ void Bitmap::scaleDown (const int factor)
     int newbpp = (bpp_ < 6 ? 6 : bpp_);
     Byte new_max_colour = static_cast<Byte>((1<<newbpp) - 1);
 #if SCALEDOWN_COMPLETE_AVERAGE
-    double scale = (double)new_max_colour/(double)(factor*factor);
+    double scale = (double)new_max_colour
+        /(double)(factor*factor*max_colour_);
 #endif
-
-    Byte *newB = new Byte[newW*newH];
-    memset ((void*)newB, 0, newW*newH);
 
     // We stay within the region
     //   (bbL/factor*factor) <= x < bbR
@@ -864,18 +842,15 @@ void Bitmap::scaleDown (const int factor)
 		    tot += B[row2*W+col2];
 		}
 #if SCALEDOWN_COMPLETE_AVERAGE
-	    newB[row1*newW+col1] = static_cast<Byte>(tot*scale);
+	    B[row1*W+col1] = static_cast<Byte>(tot*scale);
 #else
-	    newB[row1*newW+col1]
-		= static_cast<Byte>(tot*new_max_colour/(double)count);
+	    B[row1*W+col1]
+		= static_cast<Byte>(tot*new_max_colour
+                                    /(double)(count*max_colour_));
 #endif
 	}
     }
 
-    delete[] B;
-    B = newB;
-    W = newW;
-    H = newH;
     bbL = newbbL;
     bbR = newbbR;
     bbT = newbbT;
@@ -895,7 +870,9 @@ void Bitmap::scaleDown (const int factor)
     if (verbosity_ > normal)
 	cerr << "Bitmap::scaleDown: factor=" << factor
 	     << ". BB now [" << bbL << ':' << bbR << "), ["
-	     << bbT << ':' << bbB << ")" << endl;
+	     << bbT << ':' << bbB
+             << "); bpp=" << bpp_ << ", max_colour=" << max_colour_
+             << endl;
 }
 
 /**
@@ -964,8 +941,6 @@ void Bitmap::write(const string filename, const string format)
 
 	for (const_iterator it = begin(); it != end(); ++it)
 	    bi->setBitmapRow(*it);
-// 	for (int row=cropT; row<cropB; row++)
-// 	    bi->setBitmapRow(&B[row*W+cropL]);
     }
     else
 	bi->setBitmap (B);
@@ -993,7 +968,6 @@ void Bitmap::write(const string filename, const string format)
 	if (extlen > outfilename.length() ||
 	    outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;
-	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<endl;
     }
     bi->write (outfilename);
 
