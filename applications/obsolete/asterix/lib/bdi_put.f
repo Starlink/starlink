@@ -281,7 +281,9 @@
 
       INTEGER			ARGS(4)			! Function args
       INTEGER			DIMS(ADI__MXDIM)	! Dataset dimensions
+      INTEGER			DPTR			! Mapped dummy data
       INTEGER			IAX			! Axis number
+      INTEGER			IDUM			! Ignored return value
       INTEGER			LDATA			! Local data copy
       INTEGER			LITL			! Used length of LITEM
       INTEGER			NDIM			! Dimensionality
@@ -310,7 +312,7 @@
         CALL ADI_NEW1( LTYPE, DIMS(IAX), LDATA, STATUS )
 
 *    Extract spaced parameters
-        CALL ADI_GET1D( DATA, 2, SPARR, NDAT, STATUS )
+        CALL ADI_GET1D( DATA, 2, SPARR, IDUM, STATUS )
 
 *    Map temporary object
         CALL ADI_MAPD( LDATA, 'WRITE', DPTR, STATUS )
