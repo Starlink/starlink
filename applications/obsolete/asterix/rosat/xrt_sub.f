@@ -975,9 +975,9 @@ C         ENDIF
          CALL CMP_SIZE(CLOC, 'START', HEAD.NTRANGE, STATUS)
 *
          IF (HEAD.NTRANGE .GT. 1) THEN
-            CALL CMP_GET1R(CLOC, 'START', MAXRNG, HEAD.TMIN,
+            CALL CMP_GET1R(CLOC, 'START', MAXtRNG, HEAD.TMIN,
      &                                     HEAD.NTRANGE, STATUS)
-            CALL CMP_GET1R(CLOC, 'STOP', MAXRNG, HEAD.TMAX,
+            CALL CMP_GET1R(CLOC, 'STOP', MAXtRNG, HEAD.TMAX,
      &                                     HEAD.NTRANGE, STATUS)
          ELSE
             CALL CMP_GET0R(CLOC, 'START', HEAD.TMIN(1), STATUS)
