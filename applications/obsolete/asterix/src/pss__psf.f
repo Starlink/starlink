@@ -310,7 +310,7 @@
         END DO
 
 *      Next radius
-        X0 = X0 + MAXOFF/REAL(NIPOS)
+        IF ( NIPOS .GT. 1 ) X0 = X0 + MAXOFF/REAL(NIPOS-1)
 
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
