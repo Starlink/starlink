@@ -951,132 +951,132 @@ document by including as much element and attribute detail as you can.
 <entry>
 <ref id=str.structure></>
 <entry>
-<ref id='el.sun.abstract' text='abstract'></>,
-<ref id='el.sun.appendices' text='appendices'></>,
-<ref id='el.sun.author' text='author'></>,
-<ref id='el.sun.authorlist' text='authorlist'></>,
-<ref id='el.sun.copyright' text='copyright'></>,
-<ref id='el.sun.coverimage' text='coverimage'></>,
-<ref id='el.sun.docbody' text='docbody'></>,
-<ref id='el.sun.docinfo' text='docinfo'></>,
-<ref id='el.sun.docnumber' text='docnumber'></>,
-<ref id='el.sun.editors' text='editors'></>,
-<ref id='el.sun.keyword' text='keyword'></>,
-<ref id='el.sun.otherauthors' text='otherauthors'></>,
-<ref id='el.sun.sun' text='sun'></>,
-<ref id='el.sun.title' text='title'></>,
-<ref id='el.sun.mapidlist' text='mapidlist'></>,
-<ref id='el.sun.mapid' text='mapid'></>
+<ref id='el.sun.abstract' >abstract</ref>,
+<ref id='el.sun.appendices' >appendices</ref>,
+<ref id='el.sun.author' >author</ref>,
+<ref id='el.sun.authorlist' >authorlist</ref>,
+<ref id='el.sun.copyright' >copyright</ref>,
+<ref id='el.sun.coverimage' >coverimage</ref>,
+<ref id='el.sun.docbody' >docbody</ref>,
+<ref id='el.sun.docinfo' >docinfo</ref>,
+<ref id='el.sun.docnumber' >docnumber</ref>,
+<ref id='el.sun.editors' >editors</ref>,
+<ref id='el.sun.keyword' >keyword</ref>,
+<ref id='el.sun.otherauthors' >otherauthors</ref>,
+<ref id='el.sun.sun' >sun</ref>,
+<ref id='el.sun.title' >title</ref>,
+<ref id='el.sun.mapidlist' >mapidlist</ref>,
+<ref id='el.sun.mapid' >mapid</ref>
 
 <row>
 <entry>
 <ref id=str.sect></>
 <entry>
-<ref id='el.sun.sect' text='sect'></>,
-<ref id='el.sun.subhead' text='subhead'></>,
-<ref id='el.sun.subsect' text='subsect'></>,
-<ref id='el.sun.subsubsect' text='subsubsect'></>,
-<ref id='el.sun.subsubsubsect' text='subsubsubsect'></>
-<ref id='el.sun.title' text='title'></>
+<ref id='el.sun.sect' >sect</ref>,
+<ref id='el.sun.subhead' >subhead</ref>,
+<ref id='el.sun.subsect' >subsect</ref>,
+<ref id='el.sun.subsubsect' >subsubsect</ref>,
+<ref id='el.sun.subsubsubsect' >subsubsubsect</ref>
+<ref id='el.sun.title' >title</ref>
 
 <row>
 <entry>
 <ref id=str.backmatter></>
 <entry>
-<ref id='el.sun.backmatter' text='backmatter'></>,
-<ref id='el.sun.citation' text='citation'></>,
-<ref id='el.sun.index' text='index'></>,
-<ref id='el.sun.note' text='note'></>
+<ref id='el.sun.backmatter' >backmatter</ref>,
+<ref id='el.sun.citation' >citation</ref>,
+<ref id='el.sun.index' >index</ref>,
+<ref id='el.sun.note' >note</ref>
 <!--
-<ref id='el.sun.bibliography' text='bibliography'></>,
-<ref id='el.sun.indexcontents' text='indexcontents'></>,
-<ref id='el.sun.notecontents' text='notecontents'></>
+<ref id='el.sun.bibliography' >bibliography</ref>,
+<ref id='el.sun.indexcontents' >indexcontents</ref>,
+<ref id='el.sun.notecontents' >notecontents</ref>
 -->
 
 <row>
 <entry>
 <ref id=str.code></>
 <entry>
-<ref id='el.sun.codecollection' text='codecollection'></>,
-<ref id='el.sun.routinelist' text='routinelist'></>
+<ref id='el.sun.codecollection' >codecollection</ref>,
+<ref id='el.sun.routinelist' >routinelist</ref>
 
 <row>
 <entry>
 <ref id=str.history></>
 <entry>
-<ref id='el.sun.change' text='change'></>,
-<ref id='el.sun.distribution' text='distribution'></>,
-<ref id='el.sun.docdate' text='docdate'></>,
-<ref id='el.sun.history' text='history'></>,
-<ref id='el.sun.update' text='update'></>,
-<ref id='el.sun.version' text='version'></>
+<ref id='el.sun.change' >change</ref>,
+<ref id='el.sun.distribution' >distribution</ref>,
+<ref id='el.sun.docdate' >docdate</ref>,
+<ref id='el.sun.history' >history</ref>,
+<ref id='el.sun.update' >update</ref>,
+<ref id='el.sun.version' >version</ref>
 
 <row>
 <entry>
 <ref id=str.xrefs></>
 <entry>
-<ref id='el.sun.docxref' text='docxref'></>,
-<ref id='el.sun.ref' text='ref'></>,
-<ref id='el.sun.url' text='url'></>,
-<ref id='el.sun.webref' text='webref'></>
+<ref id='el.sun.docxref' >docxref</ref>,
+<ref id='el.sun.ref' >ref</ref>,
+<ref id='el.sun.url' >url</ref>,
+<ref id='el.sun.webref' >webref</ref>
 
 <row>
 <entry>
 <ref id=str.figures></>
 <entry>
-<ref id='el.sun.caption' text='caption'></>,
-<ref id='el.sun.figure' text='figure'></>,
-<ref id='el.sun.figurecontent' text='figurecontent'></>
+<ref id='el.sun.caption' >caption</ref>,
+<ref id='el.sun.figure' >figure</ref>,
+<ref id='el.sun.figurecontent' >figurecontent</ref>
 
 <row>
 <entry>
 <ref id=str.tables></>
 <entry>
-<ref id='el.sun.caption' text='caption'></>,
-<ref id='el.sun.colspec' text='colspec'></>,
-<ref id='el.sun.entry' text='entry'></>,
-<ref id='el.sun.row' text='row'></>,
-<ref id='el.sun.table' text='table'></>,
-<ref id='el.sun.tabular' text='tabular'></>,
-<ref id='el.sun.tbody' text='tbody'></>,
-<ref id='el.sun.tgroup' text='tgroup'></>,
-<ref id='el.sun.thead' text='thead'></>
+<ref id='el.sun.caption' >caption</ref>,
+<ref id='el.sun.colspec' >colspec</ref>,
+<ref id='el.sun.entry' >entry</ref>,
+<ref id='el.sun.row' >row</ref>,
+<ref id='el.sun.table' >table</ref>,
+<ref id='el.sun.tabular' >tabular</ref>,
+<ref id='el.sun.tbody' >tbody</ref>,
+<ref id='el.sun.tgroup' >tgroup</ref>,
+<ref id='el.sun.thead' >thead</ref>
 
 <row>
 <entry>
 <ref id=str.text></>
 <entry>
-<ref id='el.sun.angle' text='angle'></>,
-<ref id='el.sun.attribution' text='attribution'></>,
-<ref id='el.sun.blockquote' text='blockquote'></>,
-<ref id='el.sun.cite' text='cite'></>,
-<ref id='el.sun.code' text='code'></>,
-<ref id='el.sun.dd' text='dd'></>,
-<ref id='el.sun.dl' text='dl'></>,
-<ref id='el.sun.draftnote' text='draftnote'></>,
-<ref id='el.sun.dt' text='dt'></>,
-<ref id='el.sun.em' text='em'></>,
-<ref id='el.sun.kbd' text='kbd'></>,
-<ref id='el.sun.li' text='li'></>,
-<ref id='el.sun.line' text='line'></>,
-<ref id='el.sun.linespecific' text='linespecific'></>,
-<ref id='el.sun.ol' text='ol'></>,
-<ref id='el.sun.p' text='p'></>,
-<ref id='el.sun.px' text='px'></>,
-<ref id='el.sun.quote' text='quote'></>,
-<ref id='el.sun.strong' text='strong'></>,
-<ref id='el.sun.ul' text='ul'></>,
-<ref id='el.sun.verbatim' text='verbatim'></>
+<ref id='el.sun.angle' >angle</ref>,
+<ref id='el.sun.attribution' >attribution</ref>,
+<ref id='el.sun.blockquote' >blockquote</ref>,
+<ref id='el.sun.cite' >cite</ref>,
+<ref id='el.sun.code' >code</ref>,
+<ref id='el.sun.dd' >dd</ref>,
+<ref id='el.sun.dl' >dl</ref>,
+<ref id='el.sun.draftnote' >draftnote</ref>,
+<ref id='el.sun.dt' >dt</ref>,
+<ref id='el.sun.em' >em</ref>,
+<ref id='el.sun.kbd' >kbd</ref>,
+<ref id='el.sun.li' >li</ref>,
+<ref id='el.sun.line' >line</ref>,
+<ref id='el.sun.linespecific' >linespecific</ref>,
+<ref id='el.sun.ol' >ol</ref>,
+<ref id='el.sun.p' >p</ref>,
+<ref id='el.sun.px' >px</ref>,
+<ref id='el.sun.quote' >quote</ref>,
+<ref id='el.sun.strong' >strong</ref>,
+<ref id='el.sun.ul' >ul</ref>,
+<ref id='el.sun.verbatim' >verbatim</ref>
 
 <row>
 <entry>
 <ref id=str.maths></>
 <entry>
-<ref id='el.sun.m' text='m'></>,
-<ref id='el.sun.meqnarray' text='meqnarray'></>,
-<ref id='el.sun.mequation' text='mequation'></>,
-<ref id='el.sun.mlabel' text='mlabel'></>,
-<ref id='el.sun.mline' text='mline'></>
+<ref id='el.sun.m' >m</ref>,
+<ref id='el.sun.meqnarray' >meqnarray</ref>,
+<ref id='el.sun.mequation' >mequation</ref>,
+<ref id='el.sun.mlabel' >mlabel</ref>,
+<ref id='el.sun.mline' >mline</ref>
 
 </tbody>
 </tgroup>
@@ -1086,26 +1086,26 @@ document by including as much element and attribute detail as you can.
 <subsect id=str.structure export>Overall structure
 
 <p>Includes
-<ref id='el.sun.sun' text='sun'></> (or whatever top-level element is
+<ref id='el.sun.sun' >sun</ref> (or whatever top-level element is
 appropriate for the document type), which contains 
-<ref id='el.sun.docinfo' text='docinfo'></> and
-<ref id='el.sun.docbody' text='docbody'></>.  The former contains
-<ref id='el.sun.abstract' text='abstract'></>,
-<ref id='el.sun.author' text='author'></>,
-<ref id='el.sun.authorlist' text='authorlist'></>,
-<ref id='el.sun.copyright' text='copyright'></>,
-<ref id='el.sun.coverimage' text='coverimage'></>,
-<ref id='el.sun.docnumber' text='docnumber'></>,
-<ref id='el.sun.editors' text='editors'></>,
-<ref id='el.sun.keyword' text='keyword'></>,
-<ref id='el.sun.manualtype' text='manualtype'></>,
-<ref id='el.sun.otherauthors' text='otherauthors'></>,
-<ref id='el.sun.softwareversion' text='softwareversion'></>,
-<ref id='el.sun.mapidlist' text='mapidlist'></>,
-<ref id='el.sun.mapid' text='mapid'></>,
-<ref id='el.sun.title' text='title'></>; and the latter contains the body
+<ref id='el.sun.docinfo' >docinfo</ref> and
+<ref id='el.sun.docbody' >docbody</ref>.  The former contains
+<ref id='el.sun.abstract' >abstract</ref>,
+<ref id='el.sun.author' >author</ref>,
+<ref id='el.sun.authorlist' >authorlist</ref>,
+<ref id='el.sun.copyright' >copyright</ref>,
+<ref id='el.sun.coverimage' >coverimage</ref>,
+<ref id='el.sun.docnumber' >docnumber</ref>,
+<ref id='el.sun.editors' >editors</ref>,
+<ref id='el.sun.keyword' >keyword</ref>,
+<ref id='el.sun.manualtype' >manualtype</ref>,
+<ref id='el.sun.otherauthors' >otherauthors</ref>,
+<ref id='el.sun.softwareversion' >softwareversion</ref>,
+<ref id='el.sun.mapidlist' >mapidlist</ref>,
+<ref id='el.sun.mapid' >mapid</ref>,
+<ref id='el.sun.title' >title</ref>; and the latter contains the body
 text, the backmatter, and the
-<ref id='el.sun.appendices' text='appendices'></>.
+<ref id='el.sun.appendices' >appendices</ref>.
 
 <p>An SGML document always starts with a doctype declaration.  There
 are seven document types defined at present:
@@ -1216,14 +1216,14 @@ appendix, but in a separate backmatter element (see
 <subsect id=str.sect export>Sectioning
 
 <p>Includes
-<ref id='el.sun.sect' text='sect'></>,
-<ref id='el.sun.subsect' text='subsect'></>,
-<ref id='el.sun.subsubsect' text='subsubsect'></>
+<ref id='el.sun.sect' >sect</ref>,
+<ref id='el.sun.subsect' >subsect</ref>,
+<ref id='el.sun.subsubsect' >subsubsect</ref>
 and
-<ref id='el.sun.subsubsubsect' text='subsubsubsect'></>,
+<ref id='el.sun.subsubsubsect' >subsubsubsect</ref>,
 which contain the section contents, preceded by 
-<ref id='el.sun.subhead' text='subhead'></>, which contains the section
-<ref id='el.sun.title' text='title'></>.
+<ref id='el.sun.subhead' >subhead</ref>, which contains the section
+<ref id='el.sun.title' >title</ref>.
 
 <p>The sect element and friends contain the section content (note
 that this is different to the behaviour of &latex and HTML, in both of
@@ -1263,18 +1263,18 @@ Removed mention of the deleted backmatter content elements</update>
 unless backmatter element is present</update>
 
 <p>The
-<ref id='el.sun.backmatter' text='backmatter'></> element
+<ref id='el.sun.backmatter' >backmatter</ref> element
 <!--
 includes the
-<ref id='el.sun.bibliography' text='bibliography'></>,
-<ref id='el.sun.indexcontents' text='indexcontents'></> and
-<ref id='el.sun.notecontents' text='notecontents'></>
+<ref id='el.sun.bibliography' >bibliography</ref>,
+<ref id='el.sun.indexcontents' >indexcontents</ref> and
+<ref id='el.sun.notecontents' >notecontents</ref>
 elements, stocked by
 -->
 is stocked by the 
-<ref id='el.sun.citation' text='citation'></>,
-<ref id='el.sun.index' text='index'></> and
-<ref id='el.sun.note' text='note'></>
+<ref id='el.sun.citation' >citation</ref>,
+<ref id='el.sun.index' >index</ref> and
+<ref id='el.sun.note' >note</ref>
 elements.
 
 <p>Within your document you may refer to books and articles using the
@@ -1310,9 +1310,9 @@ yet any application support for it.  It is likely to use the
 <subsect id=str.code export>Documenting code
 
 <p>The 
-<ref id='el.sun.routinelist' text='routinelist'></>
+<ref id='el.sun.routinelist'>routinelist</>
 element contains one or more
-<ref id='el.sun.codecollection' text='codecollection'></>
+<ref id='el.sun.codecollection'>codecollection</>
 elements.
 
 <p>The routinelist element must be the first child of the 
@@ -1327,12 +1327,12 @@ general documentation and a specific file marked up using the
 <subsect id=str.history export>History
 
 <p>Includes
-<ref id='el.sun.change' text='change'></>,
-<ref id='el.sun.distribution' text='distribution'></>,
-<ref id='el.sun.docdate' text='docdate'></>,
-<ref id='el.sun.history' text='history'></>,
-<ref id='el.sun.update' text='update'></>,
-<ref id='el.sun.version' text='version'></>.
+<ref id='el.sun.change' >change</ref>,
+<ref id='el.sun.distribution' >distribution</ref>,
+<ref id='el.sun.docdate' >docdate</ref>,
+<ref id='el.sun.history' >history</ref>,
+<ref id='el.sun.update' >update</ref>,
+<ref id='el.sun.version' >version</ref>.
 
 <p>In a large document which will be revised in future, it is
 important to preserve some document history.  This means that readers
@@ -1411,11 +1411,11 @@ generate a change log, or a `new in this release' section.
 with missing FPIs</update>
 
 <p>Includes
-<ref id='el.sun.docxref' text='docxref'></>,
-<ref id='el.sun.ref' text='ref'></>,
-<ref id='el.sun.url' text='url'></>
+<ref id='el.sun.docxref' >docxref</ref>,
+<ref id='el.sun.ref' >ref</ref>,
+<ref id='el.sun.url' >url</ref>
 and
-<ref id='el.sun.webref' text='webref'></>.
+<ref id='el.sun.webref' >webref</ref>.
 
 <p>Writing a document, you frequently wish to refer to other parts of
 the same or other documents, or else to documents scattered around the
@@ -1501,9 +1501,9 @@ element would often be useful here, but url and webref might be.
 <update versionid=v0-4>Rewrote section to match new figures structure</update>
 
 <p>Includes
-<ref id='el.sun.figure' text='figure'></>,
-<ref id='el.sun.caption' text='caption'></> and
-<ref id='el.sun.figurecontent' text='figurecontent'></>.
+<ref id='el.sun.figure' >figure</ref>,
+<ref id='el.sun.caption' >caption</ref> and
+<ref id='el.sun.figurecontent' >figurecontent</ref>.
 
 <p>You may include images and other figures within your document using
 the figure element.  A figure consists of a caption, optionally
@@ -1528,15 +1528,15 @@ Principal table attributes now supported in &latex; down-converter.</update>
 
 
 <p>Includes
-<ref id='el.sun.caption' text='caption'></>,
-<ref id='el.sun.colspec' text='colspec'></>,
-<ref id='el.sun.entry' text='entry'></>,
-<ref id='el.sun.row' text='row'></>,
-<ref id='el.sun.table' text='table'></>,
-<ref id='el.sun.tabular' text='tabular'></>,
-<ref id='el.sun.tbody' text='tbody'></>,
-<ref id='el.sun.tgroup' text='tgroup'></>,
-<ref id='el.sun.thead' text='thead'></>.
+<ref id='el.sun.caption' >caption</ref>,
+<ref id='el.sun.colspec' >colspec</ref>,
+<ref id='el.sun.entry' >entry</ref>,
+<ref id='el.sun.row' >row</ref>,
+<ref id='el.sun.table' >table</ref>,
+<ref id='el.sun.tabular' >tabular</ref>,
+<ref id='el.sun.tbody' >tbody</ref>,
+<ref id='el.sun.tgroup' >tgroup</ref>,
+<ref id='el.sun.thead' >thead</ref>.
 
 <p>The table element contains a tabular element.  The distinction
 between the two is that the tabular is the object which contains data
@@ -1549,7 +1549,7 @@ element, but it is also permissible within ordinary paragraphs.  Note,
 however, that the tabular element does not necessarily have a
 linebreak before and after it in this case.  If you want the tabular
 to go on a line by itself (which will usually be the case, you should
-include it within a <ref id='el.sun.blockquote' text='blockquote'></>
+include it within a <ref id='el.sun.blockquote' >blockquote</ref>
 element.
 
 <p><update versionid="post-0.2">Corrected Oasis URL</update>
@@ -1635,8 +1635,8 @@ to above.
 <update versionid="v0.6">Added paragraph describing ANGLE element</update>
 
 <p>Paragraphing
-(<ref id='el.sun.p' text='p'></> and
-<ref id='el.sun.px' text='px'></>): element p is the normal paragraph,
+(<ref id='el.sun.p' >p</ref> and
+<ref id='el.sun.px' >px</ref>): element p is the normal paragraph,
 element px is a restricted paragraph used in the abstract, for
 example.  The restricted paragraph is just like the normal one except
 that there are a few elements (index, note and draftnote) which may
@@ -1651,19 +1651,19 @@ make few assumptions about how elements are rendered, when you are
 authoring a document.
 
 <p>Text style
-(<ref id='el.sun.em' text='em'></>,
-<ref id='el.sun.strong' text='strong'></>,
-<ref id='el.sun.cite' text='cite'></>,
-<ref id='el.sun.draftnote' text='draftnote'></>): em and strong indicate
+(<ref id='el.sun.em' >em</ref>,
+<ref id='el.sun.strong' >strong</ref>,
+<ref id='el.sun.cite' >cite</ref>,
+<ref id='el.sun.draftnote' >draftnote</ref>): em and strong indicate
 degrees of emphasis; cite refers to the title of something such as a
 book; and draftnote is a reminder usable whilst drafting a document,
 which should be prominently displayed in some way.
 
 <p>Verbatim text
-(<ref id='el.sun.code' text='code'></>,
-<ref id='el.sun.verbatim' text='verbatim'></>,
-<ref id='el.sun.kbd' text='kbd'></>,
-<ref id='el.sun.linespecific' text='linespecific'></>):
+(<ref id='el.sun.code' >code</ref>,
+<ref id='el.sun.verbatim' >verbatim</ref>,
+<ref id='el.sun.kbd' >kbd</ref>,
+<ref id='el.sun.linespecific' >linespecific</ref>):
 The `code' and `kbd' elements are verbatim text, displayed using a
 fixed-width font in 
 the line of a paragraph; the distinction is that kbd text might be
@@ -1689,24 +1689,24 @@ text is not otherwise verbatim; the canonical example is that of
 verse.  It consists of a sequence of `line' elements.
 
 <p>Quotations
-(<ref id='el.sun.quote' text='quote'></>,
-<ref id='el.sun.blockquote' text='blockquote'></>,
-<ref id='el.sun.attribution' text='attribution'></>): a short quotation
+(<ref id='el.sun.quote' >quote</ref>,
+<ref id='el.sun.blockquote' >blockquote</ref>,
+<ref id='el.sun.attribution' >attribution</ref>): a short quotation
 may be enclosed in a quote element, and a longer one in a blockquote
 element. In both cases, the content may start with an attribution
 element, which notes the source of the quotation.
 
 <p>Lists
-(<ref id='el.sun.ol' text='ol'></>,
-<ref id='el.sun.ul' text='ul'></>,
-<ref id='el.sun.dl' text='dl'></>,
-<ref id='el.sun.dt' text='dt'></>,
-<ref id='el.sun.dd' text='dd'></>,
-<ref id='el.sun.li' text='li'></>): These are the ordered, unordered and
+(<ref id='el.sun.ol' >ol</ref>,
+<ref id='el.sun.ul' >ul</ref>,
+<ref id='el.sun.dl' >dl</ref>,
+<ref id='el.sun.dt' >dt</ref>,
+<ref id='el.sun.dd' >dd</ref>,
+<ref id='el.sun.li' >li</ref>): These are the ordered, unordered and
 description lists familiar from HTML.  Unlike HTML, however, the dt
 and dd elements within the description list must be paired.
 
-<p>Angles (<ref id='el.sun.angle' text='angle'></>): as appropriate for a
+<p>Angles (<ref id='el.sun.angle' >angle</ref>): as appropriate for a
 DTD designed to document astronomical software, there is a special
 element for referring to astronomical angles.  This is an empty
 element, with the components of the angle specified as attributes.
@@ -1716,11 +1716,11 @@ element, with the components of the angle specified as attributes.
 elements</update>
 
 <p>Includes
-<ref id='el.sun.m' text='m'></>,
-<ref id='el.sun.mequation' text='mequation'></>,
-<ref id='el.sun.meqnarray' text='meqnarray'></>,
-<ref id='el.sun.mlabel' text='mlabel'></>,
-<ref id='el.sun.mline' text='mline'></>.
+<ref id='el.sun.m' >m</ref>,
+<ref id='el.sun.mequation' >mequation</ref>,
+<ref id='el.sun.meqnarray' >meqnarray</ref>,
+<ref id='el.sun.mlabel' >mlabel</ref>,
+<ref id='el.sun.mline' >mline</ref>.
 
 <p>All the maths in Starlink documents uses &latex;
 notation.<note>MathML was considered, but is neither well-supported in
@@ -1979,16 +1979,16 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.purpose>purpose</ref>       - O (%p.model)>
 &lt;!ELEMENT <ref id=el.programcode.title>title</ref>         O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.description>description</ref>   - O (%paralist;)>
-&lt;!ELEMENT (<ref id=el.programcode.userkeywords>userkeywords</ref> | <ref id=el.programcode.softwarekeywords text='softwarekeywords'></>)
+&lt;!ELEMENT (<ref id=el.programcode.userkeywords>userkeywords</ref> | <ref id=el.programcode.softwarekeywords >softwarekeywords</ref>)
                                 - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.returnvalue>returnvalue</ref>   - O (%paralist;)>
-&lt;!ELEMENT (<ref id=el.programcode.argumentlist>argumentlist</ref> | <ref id=el.programcode.parameterlist text='parameterlist'></>)
+&lt;!ELEMENT (<ref id=el.programcode.argumentlist>argumentlist</ref> | <ref id=el.programcode.parameterlist >parameterlist</ref>)
                         O O (parameter*)>
 &lt;!ELEMENT <ref id=el.programcode.parameter>parameter</ref>     - O (name, type, description)>
 &lt;!ELEMENT <ref id=el.programcode.type>type</ref>          - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.examplelist>examplelist</ref>   O O ((example,description)+)>
 &lt;!ELEMENT <ref id=el.programcode.example>example</ref>       - O (#PCDATA)>
-&lt;!ELEMENT (<ref id=el.programcode.usage>usage</ref> | <ref id=el.programcode.invocation text='invocation'></> | <ref id=el.programcode.implementationstatus text='implementationstatus'/> | bugs)
+&lt;!ELEMENT (<ref id=el.programcode.usage>usage</ref> | <ref id=el.programcode.invocation >invocation</ref> | <ref id=el.programcode.implementationstatus >implementationstatus</> | bugs)
                         - O (%paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.diytopic>diytopic</ref>     - O (title, %paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.copyright>copyright</ref>     - O (%paralist;)>
@@ -2046,7 +2046,7 @@ for brief notes on this.
 &lt;!ELEMENT <ref id=el.programcode.history>history</ref>       O O (change+)>
 &lt;!ELEMENT <ref id=el.programcode.change>change</ref>        - O (p+)>
 
-&lt;!ENTITY % para.markup '<ref id=el.programcode.code>code</ref> | <ref id=el.programcode.em text='em'></> | <ref id=el.programcode.url text='url'/> | <ref id=el.programcode.funcname text='funcname'/>'>
+&lt;!ENTITY % para.markup '<ref id=el.programcode.code>code</ref> | <ref id=el.programcode.em >em</ref> | <ref id=el.programcode.url >url</ref> | <ref id=el.programcode.funcname >funcname</ref>'>
 &lt;!ENTITY % para.content '(#PCDATA | %para.markup | ul)*'>
 &lt;!ELEMENT <ref id=el.programcode.p>p</ref>             O O (%para.content;)>
 &lt;!ELEMENT (%para.markup;) - - (#PCDATA)>
@@ -2196,16 +2196,17 @@ module is a <code>&lt;moduletype>Perl script</code>, for example.
 &lt;!ELEMENT <ref id=el.programcode.purpose>purpose</ref>       - O (%p.model)>
 &lt;!ELEMENT <ref id=el.programcode.title>title</ref>         O O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.description>description</ref>   - O (%paralist;)>
-&lt;!ELEMENT (<ref id=el.programcode.userkeywords>userkeywords</ref> | <ref id=el.programcode.softwarekeywords text='softwarekeywords'></>)
+&lt;!ELEMENT (<ref id=el.programcode.userkeywords>userkeywords</ref> | <ref id=el.programcode.softwarekeywords >softwarekeywords</ref>)
                                 - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.returnvalue>returnvalue</ref>   - O (%paralist;)>
-&lt;!ELEMENT (<ref id=el.programcode.argumentlist>argumentlist</ref> | <ref id=el.programcode.parameterlist text='parameterlist'></>)
+&lt;!ELEMENT (<ref id=el.programcode.argumentlist>argumentlist</ref> | <ref id=el.programcode.parameterlist >parameterlist</ref>)
                         O O (parameter*)>
 &lt;!ELEMENT <ref id=el.programcode.parameter>parameter</ref>     - O (name, type, description)>
 &lt;!ELEMENT <ref id=el.programcode.type>type</ref>          - O (#PCDATA)>
 &lt;!ELEMENT <ref id=el.programcode.examplelist>examplelist</ref>   O O ((example,description)+)>
 &lt;!ELEMENT <ref id=el.programcode.example>example</ref>       - O (#PCDATA)>
-&lt;!ELEMENT (<ref id=el.programcode.usage>usage</ref> | <ref id=el.programcode.invocation text='invocation'></> | <ref id=el.programcode.implementationstatus text='implementationstatus'/> | bugs)
+&lt;!ELEMENT (<ref id=el.programcode.usage>usage</ref> | <ref
+id=el.programcode.invocation >invocation</ref> | <ref id=el.programcode.implementationstatus>implementationstatus</ref> | bugs)
                         - O (%paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.diytopic>diytopic</ref>     - O (title, %paralist;)>
 &lt;!ELEMENT <ref id=el.programcode.copyright>copyright</ref>     - O (%paralist;)>
@@ -2614,7 +2615,7 @@ rearrangement).
 
 
 <p>The command <code/sgml2hlp/ can be used to process an SGML document
-conforming to the <ref id=appx.programcode.dtd text=programcode></> DTD,
+conforming to the <ref id=appx.programcode.dtd >programcode</ref> DTD,
 which will typically contain the marked up prologues of a set of
 user-level tasks in a package,
 into a <code/.hlp/ file, which can be processed into a Starlink help library
@@ -3030,8 +3031,8 @@ You will almost certainly have to recode these by hand.
 
 <dt>LATEX-notation NDATA
 <dd>Maths is embedded in the final document within 
-<ref id=el.sun.m text=m></>, <ref id=el.sun.mequation text=mequation/> or
-<ref id=el.sun.meqnarray text=meqnarray></> elements, 
+<ref id=el.sun.m >m</ref>, <ref id=el.sun.mequation >mequation</ref> or
+<ref id=el.sun.meqnarray >meqnarray</ref> elements, 
 and ought to produce the same result as the original.
 However, all user-defined macros (<code>\newcommand</code>s) 
 are expanded before being put into the output, which can lead to
@@ -3047,9 +3048,9 @@ to cut and paste source from the original document.
 <p>Conversely, &latex; lengths are not expanded, so that when a length
 is reset somewhere in a document and used later, this setting will 
 be wrong.  This most frequently causes problems in <code>picture</code>
-environments -- a <ref id=el.sun.figure text=figure></> 
+environments -- a <ref id=el.sun.figure >figure</ref> 
 with a 
-&lt;<ref id=el.sun.figurecontent text=figurecontent></> notation=latexgraphics&gt;
+&lt;<ref id=el.sun.figurecontent >figurecontent</ref> notation=latexgraphics&gt;
 child may come out with <em>entirely</em> the wrong dimensions.  
 In this case it is necessary to identify by hand where the relevant
 lengths are set in the &latex; source and put them into each
@@ -3060,8 +3061,8 @@ messed up in long latex-notation math elements.
 This is a bug, but I currently don't know how to fix it.
 
 <dt>History and author information
-<dd>The upconverter constructs basic <ref id=el.sun.history text=history></> and 
-<ref id=el.sun.authorlist text=authorlist></> elements
+<dd>The upconverter constructs basic <ref id=el.sun.history >history</ref> and 
+<ref id=el.sun.authorlist >authorlist</ref> elements
 but doesn't try to be too clever.  You may wish to modify these.
 
 <dt>Line breaks
@@ -3074,7 +3075,7 @@ which can result in overlong lines if long tags have been inserted.
 
 <dt>Extraneous P elements
 <dd>The upconverter, although it tries to avoid it, sometimes writes
-more <ref id=el.sun.p text=p></> elements than necessary -- 
+more <ref id=el.sun.p >p</ref> elements than necessary -- 
 it is never reasonable to have two &lt;p> 
 start tags separated only by whitespace.
 This is a bug and may be fixed in the future.
@@ -3120,8 +3121,8 @@ will turn subroutine or command descriptions within a normal
 SUN into 
 SGML like the rest of the text in them, but does not make
 an especially pretty job of it; the proper way is to 
-mark these up using the <ref id=appx.programcode.dtd text=programcode></> DTD 
-referenced via a <ref id=el.sun.codecollection text=codecollection></> 
+mark these up using the <ref id=appx.programcode.dtd >programcode</ref> DTD 
+referenced via a <ref id=el.sun.codecollection >codecollection</ref> 
 element, as described in <ref id=doccode></>.
 
 <p>If the corresponding source files are written with prologues 
@@ -3200,7 +3201,7 @@ and in the proper place the entity reference
 &lt;/routinelist>
 </verbatim>
 The same document can be processed using
-the <ref id=proc.sgml2hlp text=sgml2hlp></> downconverter to produce
+the <ref id=proc.sgml2hlp >sgml2hlp</> downconverter to produce
 Starlink help files.
 
 <p>The configuration file supplied by the <code>-c</code> flag 
