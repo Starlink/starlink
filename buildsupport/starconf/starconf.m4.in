@@ -44,11 +44,13 @@ AC_PREFIX_DEFAULT(!!DEFAULT_STARLINK!!)dnl
 # Always create a manifest-install target
 _STAR_MAKE_MANIFEST
 
-# FFLAGS="$FFLAGS -I$STARLINK/include"
-# CFLAGS="$CFLAGS -I$STARLINK/include"
-# XXX check below
-FFLAGS="$FFLAGS "'-I$(prefix)/include'
-CFLAGS="$CFLAGS "'-I$(includedir)'
+# Note that the following imply that we are expecting to find
+# pre-installed versions of includes and libraries in the same
+# locations we plan to install new ones.  That is, I think, what we
+# expect.
+FFLAGS="$FFLAGS -I${includedir}"
+CFLAGS="$CFLAGS -I${includedir}"
+LDFLAGS="$LDFLAGS -L${libdir}"
 
 # Dependencies declarations and checks (see macros
 # [STAR_DECLARE_BUILD_DEPENDENCIES] and [STAR_DECLARE_USE_DEPENDENCIES])
@@ -143,8 +145,8 @@ AC_DEFUN([STAR_MESSGEN],
               # Format is `.FACILITY name,code/PREFIX=xxx'
               AC_MSG_CHECKING([facility and code in $infile])
               eval [`sed -n '/\.FACILITY/{s/.*\.FACILITY[ 	]*\([a-zA-Z]*\) *, *\([0-9]*\).*/_s_facname=\1; _s_faccode=\2;/p;q;}' $infile`]
-              _s_facname=`echo $_s_facname | tr '[A-Z]' '[a-z]'`
-              _s_FACNAME=`echo $_s_facname | tr '[a-z]' '[A-Z]'`
+              _s_facname=[`echo $_s_facname | tr '[A-Z]' '[a-z]'`]
+              _s_FACNAME=[`echo $_s_facname | tr '[a-z]' '[A-Z]'`]
               AC_MSG_RESULT([$_s_facname/$_s_faccode])
               cat >>$STAR_BOILERPLATE <<EOD
 #  Rules for generating files built by the error message system.
@@ -254,6 +256,10 @@ AC_DEFUN([STAR_FPP_SOURCES],
               # Preprocessor must be run separately before invoking the
               # F77 compiler, and we need to declare that the objects
               # depend on the generated .f files
+	      cat >>$STAR_BOILERPLATE <<\_EOD
+# Build rules for compiling .fpp files indirectly,
+# by calling the preprocessor separately
+_EOD
               for _t in $1
               do
                   cat >>$STAR_BOILERPLATE <<EOD
@@ -268,10 +274,11 @@ _EOD
           else
               # The compiler can handle .fpp files directly, so add rules
               # expressing this.  Add DEFAULT_INCLUDES to the compile
-              # flags so that -I. is added -- is this OK (this really
+              # flags so that -I. is added -- is this OK? (this really
               # would be better fixed by automake patches...)
               dnl Use quadrigraph for dollar, to avoid m4 interpreting $[]@
               cat >>$STAR_BOILERPLATE <<\_EOD
+# Build rules for compiling .fpp files direct to objects
 .fpp.o:
 	$(F77COMPILE) $(DEFAULT_INCLUDES) -c -o @S|@@ `test -f '$<' || echo '$(srcdir)/'`$<
 .fpp.obj:
@@ -303,8 +310,45 @@ AC_DEFUN([STAR_HAVE_F77_OPEN_READONLY],
                         [Define to 1 if F77 OPEN has the READONLY specifier])
           fi
 ])
-          
 
+
+dnl # STAR_F77_C_SYMBOLS
+dnl # ------------------
+dnl AC_DEFUN([STAR_F77_C_SYMBOLS],
+dnl 	 [AC_REQUIRE([AC_PROG_F77])dnl
+dnl           AC_REQUIRE([AC_PROG_CC])dnl
+dnl AC_MSG_CHECKING([how to make Fortran produce C-compatible symbols])
+dnl AC_LANG_PUSH([C])
+dnl AC_LANG_CONFTEST(
+dnl   [AC_LANG_SOURCE([void testfunc() {}])])
+dnl if (eval $ac_compile) 2>&5; then
+dnl   mv conftest.$ac_objext c-conftest.$ac_objext
+dnl else
+dnl   AC_MSG_ERROR([cannot compile a C program!])
+dnl fi
+dnl AC_LANG_POP([C])
+dnl AC_LANG_PUSH([Fortran 77])
+dnl AC_LANG_CONFTEST(
+dnl   [AC_LANG_PROGRAM([], [      CALL testfunc])])
+dnl star_f77_c_symbols=X
+dnl for opt in "" "-fno-second-underscore"
+dnl do
+dnl   echo "Trying opt=$opt"
+dnl   if $F77 $opt -o conftest conftest.f c-conftest.$ac_objext 2>&5; then
+dnl     star_f77_c_symbols=$opt
+dnl     break
+dnl   else
+dnl     echo "opt=$opt didn't work"
+dnl   fi
+dnl done
+dnl if test "$star_f77_c_symbols" = X; then
+dnl         for x in conftest*; do cp $x saved-$x;done
+dnl   AC_MSG_ERROR([cannot work out how])
+dnl else
+dnl   AC_MSG_RESULT([option <$star_f77_c_symbols>])
+dnl fi
+dnl AC_LANG_POP([Fortran 77])
+dnl ])# STAR_F77_C_SYMBOLS
 
 # _STAR_MAKE_MANIFEST
 # ------------------
@@ -575,11 +619,13 @@ AC_DEFUN([STAR_DECLARE_USE_DEPENDENCIES],
 
 
 
-# STAR_PLATFORM_SOURCES(target-file, platform-list)
-# -------------------------------------------------
+# STAR_PLATFORM_SOURCES(target-file-list, platform-list)
+# ------------------------------------------------------
 #
-# Generate the given target-file, by selecting the appropriate
-# platform-list based on the value of [AC_CANONICAL_BUILD].
+# Generate the given target-file for each of the files in the list
+# TARGET-FILE-LIST, by selecting the appropriate element of the
+# PLATFORM-LIST based on the value of [AC_CANONICAL_BUILD].  Both
+# lists are space-separated lists.
 #
 # For each of the platforms, p, in platform-list, there should be a
 # file `<target-file>p'.  There should always be a file
@@ -599,21 +645,27 @@ AC_DEFUN([STAR_DECLARE_USE_DEPENDENCIES],
 # cpu-vendor-os, such as `i686-pc-linux-gnu' (OS=linux-gnu),
 # `sparc-sun-solaris2.9', or `alphaev6-dec-osf5.1'
 #
-# The extensions in platform-list should all have the form
+# The extensions <p> in platform-list should all have the form
 # `cpu_vendor[_os]', where each of the components `cpu', `vendor' and
 # `os' may be blank.  If not blank, they are matched as a prefix of
 # the corresponding part of the config.guess value.  Thus
 # `_sun_solaris' would match `sparc-sun-solaris2.9' but not
-# `sparc-sun-sunos', and `_sun' would match both.
+# `sparc-sun-sunos', and `_sun' would match both.  For a <target-file>
+# file foo.c, this would result in `ln -s foo.c_sun foo.c'
+#
+# Calls AC_LIBSOURCE for each of the implied platform-specific files.
 #
 AC_DEFUN([STAR_PLATFORM_SOURCES],
          [
 AC_REQUIRE([AC_CANONICAL_BUILD])dnl
 AC_REQUIRE([AC_PROG_LN_S])dnl
-m4_ifval([$1], [], [AC_FATAL([$0: no target-file given])])dnl
+m4_ifval([$1], [], [AC_FATAL([$0: no target-file-list given])])dnl
 m4_ifval([$2], [], [AC_FATAL([$0: no platform-list given])])dnl
-AC_MSG_CHECKING([platform-specific source for $1])
-_star_tmp=default
+AC_FOREACH([TargetFile], [$1],
+  [AC_FOREACH([Ext], [$2], 
+    [m4_if(Ext, [NONE], , [AC_LIBSOURCE(TargetFile[]Ext)])])])dnl
+AC_MSG_CHECKING([platform-specific source for file(s) $1])
+_star_tmp=
 for platform in $2
 do
     if test $platform = NONE; then
@@ -621,23 +673,33 @@ do
         _star_tmp=NONE
         break;
     fi
+    if test $platform = default; then
+        _star_tmp=default
+        break;
+    fi
     if expr $build : `echo $platform | sed 's/_/.*-/g'` >/dev/null; then
         _star_tmp=$platform
         break;
     fi
 done
+if test -z "$_star_tmp"; then
+    # Use default, but it wasn't listed in the platform-list
+    # (though it should have been)
+    AC_MSG_WARN([build platform $build does not match any of ($2): using `default'])
+    _star_tmp=default
+fi    
+AC_MSG_RESULT([using $_star_tmp])
 if test $_star_tmp = NONE; then
     AC_MSG_RESULT([none required])
 else
-    if test -e $srcdir/$1$_star_tmp; then
-        AC_MSG_RESULT([using $1$_star_tmp])
-        (cd $srcdir; rm -f $1; $LN_S $1$_star_tmp $1)
-    else
-        AC_MSG_ERROR([platform $_star_tmp matched, but no file $1$_star_tmp found])
-    fi
-    if test $_star_tmp = default; then
-        AC_MSG_WARN([build platform $build does not match any of ($2): using `default'])
-    fi
+    for _t in $1
+    do
+        if test -e $srcdir/$_t$_star_tmp; then
+            (cd $srcdir; rm -f $_t; $LN_S $_t$_star_tmp $_t)
+        else
+            AC_MSG_ERROR([platform $_star_tmp matched, but no file $_t$_star_tmp found])
+        fi
+    done
 fi
 ])# STAR_PLATFORM_SOURCES
 
