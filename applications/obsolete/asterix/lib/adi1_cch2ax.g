@@ -100,7 +100,13 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*(DAT__SZLOC)	CLOC			! Component locator
+
       <TYPE>			VALUE			! Intermediate value
+
+      INTEGER			DIMS(DAT__MXDIM)	! Dimensions
+      INTEGER			NDIM			! Dimensionality
+      INTEGER			VPTR			! Mapped data
 
       LOGICAL			THERE			! Object exists?
 *.
@@ -114,15 +120,43 @@
 *  Try to copy if it exists
       IF ( THERE ) THEN
 
+*    Locate HDS object
+        CALL DAT_FIND( LOC, CMP, CLOC, STATUS )
+
+*    Get shape of DHS data
+        CALL DAT_SHAPE( CLOC, DAT__MXDIM, DIMS, NDIM, STATUS )
+
 *    Read the HDS data
-        CALL CMP_GET0<T>( LOC, CMP, VALUE, STATUS )
+        IF ( NDIM .EQ. 0 ) THEN
+          CALL DAT_GET0<T>( LOC, VALUE, STATUS )
+        ELSE
+          CALL DAT_MAPV( CLOC, '<HTYPE>', 'READ', VPTR, NELM, STATUS )
+        END IF
 
 *    Write to ADI
         IF ( MEMBER .GT. ' ' ) THEN
-          CALL ADI_CNEWV0<T>( ID, MEMBER, VALUE, STATUS )
+          IF ( NDIM .EQ. 0 ) THEN
+            CALL ADI_CNEW0<T>( ID, MEMBER, VALUE, STATUS )
+          ELSE
+            CALL ADI_CNEWV( ID, MEMBER, NDIM, DIMS, %VAL(VPTR), STATUS )
+          END IF
+
+*    Simple object
         ELSE
-          CALL ADI_NEWV0<T>( VALUE, ID, STATUS )
+          MID = ID
+          IF ( NDIM .EQ. 0 ) THEN
+            CALL ADI_NEWV0<T>( VALUE, ID, STATUS )
+          ELSE
+            CALL ADI_NEWV( NDIM, DIMS, %VAL(VPTR), ID, STATUS )
+          END IF
+
         END IF
+
+*    Free HDS object
+        IF ( NDIM .GT. 0 ) THEN
+          CALL DAT_UNMAP( CLOC, STATUS )
+        END IF
+        CALL DAT_ANNUL( CLOC, STATUS )
 
       END IF
 
