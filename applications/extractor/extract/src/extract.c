@@ -10,7 +10,7 @@
 *	Contents:	functions for extraction of connected pixels from
 *			a bitmap.
 *
-*	Last modify:	08/10/97
+*	Last modify:	28/11/98
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -92,13 +92,12 @@ int	lutz(objliststruct *objlistroot, int nroot, objstruct *objparent,
    pliststruct		*plist,*pixel, *plistin, *plistint;
 
    char			newmarker;
-   int			i,cn, co, luflag, objnb, pstop, xl,xl2,yl,
-			out, posx,posy, minarea, stx,sty,enx,eny, step,
+   int			cn, co, luflag, objnb, pstop, xl,xl2,yl,
+			out, minarea, stx,sty,enx,eny, step,
 			nobjm = NOBJ,
 			inewsymbol, *iscan;
    short		trunflag;
    PIXTYPE		thresh;
-   FLAGTYPE		*fscan;
    status		cs, ps;
 
   out = RETURN_OK;

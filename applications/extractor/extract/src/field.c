@@ -11,13 +11,14 @@
 *
 *	Contents:	Handling of field structures.
 *
-*	Last modify:	02/02/98
+*	Last modify:	02/02/98 (EB):
 *                       27/10/98 (AJC)
 *                          Use AFPRINTF not fprintf
 *                       06/01/99 (PWD)
 *                          Changed use of field->file member. This is
 *                          used differently in NDF interface (was
 *                          being closed!). 
+*	Last modify:	28/11/98 (EB):
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
@@ -30,6 +31,7 @@
 #include	"define.h"
 #include	"globals.h"
 #include	"assoc.h"
+#include	"astrom.h"
 #include	"back.h"
 #include	"field.h"
 #include	"filter.h"
@@ -98,8 +100,15 @@ picstruct	*newfield(char *filename, int flags)
     field->nback = field->nbackx * field->nbacky;
     field->nbackfx = field->nbackx>1 ? prefs.backfsize[0] : 1;
     field->nbackfy = field->nbacky>1 ? prefs.backfsize[1] : 1;
+/*--  Set the back_type flag if absolute background is selected */
+    if (((flags & DETECT_FIELD) && prefs.back_type[0]==BACK_ABSOLUTE)
+	|| ((flags & MEASURE_FIELD) && prefs.back_type[1]==BACK_ABSOLUTE))
+      field->back_type = BACK_ABSOLUTE;
 /*-- Now make the background map */
     makeback(field);
+/*-- If asked for, force the backmean parameter to the supplied value */
+    if (field->back_type == BACK_ABSOLUTE)
+      field->backmean = (float)prefs.back_val[(flags&DETECT_FIELD)?0:1];
     }
 
 /* Prepare the image buffer */
@@ -138,7 +147,6 @@ picstruct	*newfield(char *filename, int flags)
 
   if ((flags & DETECT_FIELD) || (flags & MEASURE_FIELD))
     {
-
     if (prefs.ndthresh > 1)
       {
        double	dval;
@@ -150,8 +158,10 @@ picstruct	*newfield(char *filename, int flags)
       field->dthresh = field->pixscale*field->pixscale
 		*pow(10.0, -0.4*dval);
       }
+    else if (prefs.thresh_type[0]==THRESH_ABSOLUTE)
+        field->dthresh = prefs.dthresh[0];
     else
-      field->dthresh = prefs.dthresh[0]*field->backsig;
+        field->dthresh = prefs.dthresh[0]*field->backsig;
     if (prefs.nthresh > 1)
       {
        double	dval;
@@ -163,8 +173,11 @@ picstruct	*newfield(char *filename, int flags)
       field->thresh = field->pixscale*field->pixscale
 	*pow(10.0, -0.4*dval);
       }
+    else if (prefs.thresh_type[1]==THRESH_ABSOLUTE)
+        field->thresh = prefs.thresh[0];
     else
       field->thresh = prefs.thresh[0]*field->backsig;
+
     if (prefs.verbose_type != QUIET)
       AFPRINTF(OUTPUT, "    Background: %-10g RMS: %-10g / Threshold: %-10g \n",
 	field->backmean, field->backsig, (flags & DETECT_FIELD)?
