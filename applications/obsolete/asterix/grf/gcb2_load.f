@@ -116,30 +116,25 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Attempt to move to GCB extension
-      CALL ADI2_MOVHDU( ARGS(1), 'GCB', STATUS )
+*  Get dimensions of of data in HDU
+      CALL ADI2_ISHAPE( ARGS(1), 'GCB', 1, NBYTE, NDIM, STATUS )
 
 *  If no error, attempt to load data
       OK = (STATUS.EQ.SAI__OK)
       IF ( OK ) THEN
 
-*    Get dimensions of of data in HDU
-        CALL ADI2_ISHAPE( ARGS(1), 1, NBYTE, NDIM, STATUS )
-
 *    Map some workspace
-        IF ( STATUS .EQ. SAI__OK ) THEN
-          CALL DYN_MAPB( 1, NBYTE, GCBPTR, STATUS )
+        CALL DYN_MAPB( 1, NBYTE, GCBPTR, STATUS )
 
-*      Load the image data
-          CALL ADI2_GETIMGB( ARGS(1), 1, NBYTE, %VAL(GCBPTR), STATUS )
+*    Load the image data
+        CALL ADI2_GETIMGB( ARGS(1), 'GCB', 1, NBYTE,
+     :                          %VAL(GCBPTR), STATUS )
 
-*      Unpack it
-          CALL GCB_LOAD_SUB( %VAL(GCBPTR), %VAL(G_MEMPTR), STATUS )
+*    Unpack it
+        CALL GCB_LOAD_SUB( %VAL(GCBPTR), %VAL(G_MEMPTR), STATUS )
 
-*      Free workspace
-          CALL DYN_UNMAP( GCBPTR, STATUS )
-
-        END IF
+*    Free workspace
+        CALL DYN_UNMAP( GCBPTR, STATUS )
 
       END IF
 

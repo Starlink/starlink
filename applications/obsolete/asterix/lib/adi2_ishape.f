@@ -127,7 +127,7 @@
       CALL FTGHPR( LUN, MAXDIM, SIMPLE, BITPIX, NDIM, DIMS,
      :             PCOUNT, GCOUNT, EXTEND, FSTAT )
       IF ( FSTAT .NE. 0 ) THEN
-        CALL ADI2_FITREP( FSTAT, STATUS )
+        CALL ADI2_FITERP( FSTAT, STATUS )
       END IF
 
 *  Free the buffer
