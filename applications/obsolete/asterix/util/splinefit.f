@@ -48,8 +48,8 @@
 *
       INTEGER                   MAXLINES
         PARAMETER               ( MAXLINES = 6 )
-      CHARACTER*6     		MAPTYPE
-        PARAMETER               ( MAPTYPE = 'DOUBLE' )
+      CHARACTER*6     		MTYPE
+        PARAMETER               ( MTYPE = 'DOUBLE' )
 *
 *    Local variables :
 *
@@ -157,7 +157,7 @@
         END IF
 
 *    Map regardless, this routine will invent valuers
-        CALL BDI_AXMAP( IFID, I, 'Data', MAPTYPE, 'READ', IAPTR(I),
+        CALL BDI_AXMAP( IFID, I, 'Data', MTYPE, 'READ', IAPTR(I),
      :                  STATUS )
 
       END DO
@@ -178,7 +178,7 @@
 
 *    Map weights array and calculate from variances
       IF ( USE_WEIGHTS ) THEN
-        CALL DYN_MAPT( 1, NELM, MAPTYPE, WGTPTR, STATUS )
+        CALL DYN_MAPT( 1, NELM, MTYPE, WGTPTR, STATUS )
         CALL SPLINEFIT_WGTD( NELM, VAR_OK, %VAL(IVPTR), QUAL_OK,
      :                       %VAL(IQPTR), %VAL(WGTPTR), STATUS )
       END IF
@@ -189,13 +189,13 @@
         NEST(I) = DIMS(I) + 4
         MAXKNOT = MAXKNOT * NEST(I)
       END DO
-      CALL DYN_MAPT( 1, MAXKNOT, MAPTYPE, KNOTPTR(1), STATUS )
+      CALL DYN_MAPT( 1, MAXKNOT, MTYPE, KNOTPTR(1), STATUS )
       DO I = 2, NDIM
         KNOTPTR(I) = KNOTPTR(I-1) + (NEST(I-1)-1)*8
       END DO
 
 *  Workspace for spline coefficients
-      CALL DYN_MAPT( 1, MAXKNOT, MAPTYPE, COEFF, STATUS )
+      CALL DYN_MAPT( 1, MAXKNOT, MTYPE, COEFF, STATUS )
 
 *  Floating point workspace
       IF ( NDIM .EQ. 1 ) THEN
@@ -204,7 +204,7 @@
         LWRK = 4*(DIMS(1)+DIMS(2)) + 11*(NEST(1)+NEST(2)) +
      :        NEST(1)*DIMS(1) + MAX( DIMS(2), NEST(1)) + 54
       END IF
-      CALL DYN_MAPT( 1, LWRK, MAPTYPE, WRKPTR, STATUS )
+      CALL DYN_MAPT( 1, LWRK, MTYPE, WRKPTR, STATUS )
 
 *  Get integer workspace
       IF ( NDIM .EQ. 1 ) THEN
