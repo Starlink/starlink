@@ -5,4 +5,3 @@ AST.o
 Makefile
 pm_to_blib
 *.bck
-t/*.bck
