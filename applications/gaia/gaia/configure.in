@@ -72,6 +72,8 @@ if test "$CXX" = "c++" ; then
 fi
 AC_SUBST(CXX)
 
+AC_CHECK_PROGS(LIBTOOL,libtool)
+
 # -----------------------------------------------------------------------
 #
 # Read the Rtd and Catlib config file to find out where the X and Tcl/Tk

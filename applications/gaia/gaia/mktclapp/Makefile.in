@@ -15,6 +15,10 @@ CC 	     = @CC@
 #  C++ compiler
 CXX          = @CXX@
 
+#  Libtool link command.
+LIBTOOL      = @LIBTOOL@
+LTLINK       = $(LIBTOOL) --mode=link $(CXX) $(CFLAGS)
+
 # Static/dynamic non-atask linker flags
 LDFLAG1 =
 LDFLAG2 =
@@ -141,7 +145,7 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
 	- @RANLIB@ $(LIBDIR)/libskycat.a
-	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
+	$(LTLINK) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
 	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
@@ -149,7 +153,7 @@ $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 
 $(TCLPROG): $(MKTCLAPP) gaia_stcl.o tclAppInit.o FORCE
 	@echo "linking \"$(TCLPROG)\"..."
-	$(CXX) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
+	$(LTLINK) $(CC_SWITCHES) tclAppInit.o gaia_stcl.o -o $(TCLPROG)  \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) \
 	       $(LDFLAG1) $(ADDLIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
 	       $(LDFLAG2) $(EXTRA_LIBS)

@@ -24,6 +24,10 @@ CC           = @CC@
 # C++ compiler
 CXX          = @CXX@
 
+# Libtool linking.
+LIBTOOL      = @LIBTOOL@
+LTLINK       = $(LIBTOOL) --mode=link $(CXX) $(CFLAGS)
+
 # Fortran and atask linker command
 FC           = @FC@
 FFLAGS       = @FFLAGS@
@@ -156,7 +160,7 @@ all: $(DEMO_WISH) $(DEMO_TCL) $(GAIAMON)
 $(DEMO_WISH): normallib tkAppInit.o FORCE
 	@echo "linking \"$(DEMO_WISH)\"..."
 	- @RANLIB@ $(LIBDIR)/libskycat.a
-	$(CXX) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
+	$(LTLINK) $(CC_SWITCHES) tkAppInit.o -o $(DEMO_WISH)  \
 	       $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
 	       $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	       $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(AST_LIBS) $(TCLTKLIBS) \
@@ -164,7 +168,7 @@ $(DEMO_WISH): normallib tkAppInit.o FORCE
 
 $(DEMO_TCL): normallib tclAppInit.o FORCE
 	@echo "linking \"$(DEMO_TCL)\"..."
-	$(CXX) $(CC_SWITCHES)  tclAppInit.o -o $(DEMO_TCL) \
+	$(LTLINK) $(CC_SWITCHES)  tclAppInit.o -o $(DEMO_TCL) \
 	       $(LD_SEARCH_FLAGS) $(LOCAL_LIBRARY) $(LDFLAG1) \
 	       $(ADDLIBS) $(ADAM_LIBS) \
 	       $(TCLTKLIBS) $(LDFLAG2) $(EXTRA_LIBS)
