@@ -1,14 +1,14 @@
       SUBROUTINE SURF_READ_REBIN_NDF( IN_NDF, MAX_FILE, NSPEC, 
      :     DATA_SPEC, OUT_COORDS, N_FILE, USE_SECTION,
-     :     N_BOL, N_POS, N_INTS, N_BEAMS, MJD_STANDARD, IN_UT1,
+     :     N_BOL, N_POS, N_INTS, N_MEAS, N_BEAMS, MJD_STANDARD, IN_UT1,
      :     OUT_RA_CEN, OUT_DEC_CEN, FITS, N_FITS, WAVELENGTH, 
      :     SUB_INSTRUMENT, SOBJECT, SUTDATE, SUTSTART,
      :     BOL_ADC, BOL_CHAN,
      :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
      :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
      :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
-     :     USE_LST, LST_PTR, INT_LIST, BOLWT,
-     :     STATUS)
+     :     USE_LST, LST_PTR, ANG_INT, ANG_MEAS,INT_LIST, MEAS_LIST, 
+     :     BOLWT, STATUS)
 *+
 *  Name:
 *     SURF_READ_REBIN_NDF
@@ -26,7 +26,7 @@
 *     :     BOL_RA_PTR, BOL_RA_END, BOL_DEC_PTR, 
 *     :     BOL_DEC_END, DATA_PTR, DATA_END, VARIANCE_PTR, VARIANCE_END,
 *     :     QMF, QUALITY_PTR, QUALITY_END, BADBITS, 
-*     :     USE_LST, LST_PTR, INT_LIST, BOLWT,
+*     :     USE_LST, LST_PTR, ANG_INT, ANG_MEAS, INT_LIST, MEAS_LIST, BOLWT,
 *     :     STATUS)
 
  
@@ -39,14 +39,14 @@
 *     IN_NDF = INTEGER (Given)
 *        NDF identifier of input NDF
 *     MAX_FILE = INTEGER (Given)
-*        Max number of files allowed [used for INT_LIST only]
+*        Max number of files allowed [used for INT_LIST/MEAS only]
 *     NSPEC = INTEGER (Given)
 *        Number of SCUBA sections in DATA_SPEC
 *     DATA_SPEC( NSPEC ) = CHAR (Given)
 *        SCUBA sections
 *     OUT_COORDS = CHAR (Given)
 *        Output coordinates system. (Passed into SURF_READ_REBIN_NDFS)
-*     N_FILE = INTEGER (Given & Returned)
+*     N_FILE = INTEGER (Given)
 *        Current file number (less than MAX_FILE and greater than 0).
 *     USE_SECTION = LOGICAL (Given)
 *        Determines whether we are using the section or the invers
@@ -55,7 +55,9 @@
 *     N_POS = INTEGER (Returned)
 *        Number of samples in observation
 *     N_INTS = INTEGER (Returned)
-*        Number of integrations in observation
+*        Total Number of integrations in observation (INT*MEAS)
+*     N_MEAS = INTEGER (Returned)
+*        Number of measurements in observation
 *     N_BEAMS = INTEGER (Given & Returned)
 *        Number of beams requested in the positions arrays.
 *        N_BEAMS = 1  will return the middle-beam (standard position)
@@ -121,8 +123,16 @@
 *        Governs whether we want an LST array returned
 *     LST_PTR( 2 ) = INTEGER (Returned)
 *        Array of pointers (begin and end)  to array of LSTs
-*     INT_LIST( MAX_FILE, MAX_INTS+1) = INTEGER (Returned)
+*     ANG_INT( MAX_FILE, SCUBA__MAX_INT,2)  = REAL (Returned)
+*        Array containing the polarimetry angles for each integration
+*        The 2 dimensions are for WPLATE and ANGROT
+*     ANG_MEAS( MAX_FILE, SCUBA__MAX_MEAS,2) = REAL (Returned)
+*        Array containing the pol angles for each measurement
+*        The 2 dimensions are for WPLATE and ANGROT
+*     INT_LIST( MAX_FILE, SCUBA__MAX_INT+1) = INTEGER (Returned)
 *        Position of integrations in each data file
+*     MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS+1) = INTEGER (Returned)
+*        Position of measurements in each data file
 *     BOLWT ( N_BOL ) = REAL (Returned)
 *        Relative weights of each bolometer
 *     STATUS = INTEGER (Given and Returned)
@@ -138,6 +148,10 @@
 *     1997 May 12 (TIMJ)
 *       Initial version removed from reds_wtfn_rebin.f
 *     $Log$
+*     Revision 1.16  1999/02/27 04:39:00  timj
+*     Read polarimeter extensions.
+*     Return back pointers to measurements as well as integrations.
+*
 *     Revision 1.15  1998/04/28 20:03:12  timj
 *     Return the FITS array.
 *
@@ -180,6 +194,7 @@
       CHARACTER*(*)    DATA_SPEC(SCUBA__MAX_SECT)
       INTEGER          IN_NDF
       INTEGER          MAX_FILE
+      INTEGER          N_FILE
       INTEGER          NSPEC
       CHARACTER*(*)    OUT_COORDS
       LOGICAL          QMF
@@ -193,6 +208,8 @@
       REAL             WAVELENGTH
 
 *  Arguments Returned:
+      REAL             ANG_INT(MAX_FILE,SCUBA__MAX_INT, 2)
+      REAL             ANG_MEAS(MAX_FILE,SCUBA__MAX_MEAS, 2)
       BYTE             BADBITS
       INTEGER          BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
       INTEGER          BOL_CHAN (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -207,10 +224,11 @@
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
       DOUBLE PRECISION IN_UT1
       INTEGER          LST_PTR( 2 )
+      INTEGER          MEAS_LIST(MAX_FILE, SCUBA__MAX_MEAS + 1)
       INTEGER          N_BOL
-      INTEGER          N_FILE
       INTEGER          N_FITS
       INTEGER          N_INTS
+      INTEGER          N_MEAS
       INTEGER          N_POS
       DOUBLE PRECISION OUT_RA_CEN
       DOUBLE PRECISION OUT_DEC_CEN
@@ -228,6 +246,7 @@
 *  Local Variables:
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
+      INTEGER          ANG_PTR         ! Mapped ANGROT NDF (for POL data)
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! dU3 Nasmyth coord of bolometers
       REAL             BOL_DU4 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
@@ -245,6 +264,7 @@
                                        ! Pointer to dummy variance
       LOGICAL          EXTINCTION      ! .TRUE. if EXTINCTION application has
                                        ! been run on input file
+      REAL             FAST_AXIS       ! Fast axis direction (POL data)
       INTEGER          FILE_DATA_PTR   ! pointer to main data array in input
                                        ! file
       INTEGER          FILE_QUALITY_PTR ! pointer to quality array in input file
@@ -358,8 +378,12 @@
       LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       LOGICAL          SWITCH_EXPECTED ! Should the section include SWITCH(NO)
+      LOGICAL          THERE           ! Is a component present
+      INTEGER          TNDF(2)         ! Temporary NDF identifiers
       INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
       LOGICAL          USE_INTS        ! How to use the specified ints
+      INTEGER          WP_PTR          ! Mapped WPLATE NDF (for POL data)
+
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
@@ -389,13 +413,14 @@
       CALL NDF_XLOC (IN_NDF, 'SCUCD', 'READ', 
      :     IN_SCUCDX_LOC, STATUS)
 
-      IF (STATUS .EQ. SAI__OK) THEN
+*     The REDS extension may not be present
+      CALL NDF_XSTAT(IN_NDF, 'REDS', THERE, STATUS)
+
+      IF (THERE) THEN
          CALL NDF_XLOC (IN_NDF, 'REDS', 'READ', IN_REDSX_LOC,
      :        STATUS)
-         IF (STATUS .NE. SAI__OK) THEN
-            CALL ERR_ANNUL (STATUS)
-            IN_REDSX_LOC = DAT__NOLOC
-         END IF
+      ELSE
+         IN_REDSX_LOC = DAT__NOLOC
       END IF
 
       CALL DAT_SIZE (IN_FITSX_LOC, ITEMP, STATUS)
@@ -1047,7 +1072,7 @@
 *     Loop through bolometers and find apparent RA/Dec
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_PROCESS_BOLS(.FALSE., .FALSE.,1, N_BOL,
+         CALL SURFLIB_PROCESS_BOLS(TSKNAME,1, N_BOL,
      :        N_POS, N_BEAMS, N_SWITCHES, N_EXPOSURES, 
      :        N_INTEGRATIONS, N_MEASUREMENTS,
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1,N_MEASUREMENTS,
@@ -1067,11 +1092,14 @@
      :        BOL_DU3, BOL_DU4, SCAN_REVERSAL, 0.0D0, 0.0D0, 0.0, 0.0,
      :        %VAL(BOL_DEC_PTR), %VAL(BOL_RA_PTR),
      :        %VAL(DATA_PTR), 0, USE_LST, %VAL(LST_PTR(1)),
-     :        STATUS)
+     :        0, 0, STATUS)
 
       END IF
 
 *     Store pointers to start of each integration in this map
+*     This will crash if SCUBA__MAX_INT is defined as the
+*     maximum number of integrations *PER* measurement
+*     rather than the total number of integrations.
 
       N_INTS = N_MEASUREMENTS * N_INTEGRATIONS
 
@@ -1101,6 +1129,98 @@
             INT_LIST(N_FILE, DATA_OFFSET) = 0
          END IF
       END IF
+
+
+*     Store pointers to start of each measurement in this map (for MEASREBIN)
+
+      N_MEAS = N_MEASUREMENTS
+
+      DATA_OFFSET = 1
+
+      DO MEASUREMENT = 1, N_MEASUREMENTS
+
+            CALL SCULIB_FIND_SWITCH(%VAL(IN_DEM_PNTR_PTR),
+     :           1, N_EXPOSURES, N_INTEGRATIONS, N_MEASUREMENTS,
+     :           N_POS, 1, 1, 1, MEASUREMENT,
+     :           MEAS_LIST(N_FILE, DATA_OFFSET), ITEMP, STATUS)
+
+            DATA_OFFSET = DATA_OFFSET + 1
+
+      END DO
+
+      MEAS_LIST(N_FILE, DATA_OFFSET) = N_POS + 1
+
+*     Now look for the polarimetry arrays in the REDS extension
+
+*     Note that at some point we may decide that it is easier to:
+*       1 - Read the WPLATE data directly from the SCUCD extension
+*           (ie run SURFLIB_FILL_WPLATE again)
+*       2 - Read ANGROT directly from SURFLIB_PROCESS_BOLS and
+*           average it here rather than reading it from the
+*           file again.
+*     I still think it is somewhat easier to rely on REMIP
+*     being run first and storing the values there
+
+*     Only fill in the arrays if the WPLATE and ANGROT arrays
+*     are present
+
+      IF (IN_REDSX_LOC .NE. DAT__NOLOC) THEN
+
+*     Search for a WPLATE NDF
+         CALL DAT_THERE(IN_REDSX_LOC, 'WPLATE', THERE, STATUS)
+
+         IF (THERE) THEN
+
+*     Search for the fast axis
+            FAST_AXIS = 0.0
+            CALL DAT_THERE(IN_REDSX_LOC, 'FAST_AXIS', THERE, STATUS)
+            IF (THERE) THEN
+               CALL CMP_GET0R(IN_REDSX_LOC, 'FAST_AXIS', FAST_AXIS, 
+     :              STATUS)
+            ELSE
+               CALL MSG_OUTIF(MSG__QUIET, ' ','WARNING! Waveplate '//
+     :              'angle is present without a fast axis offset. '//
+     :              'Using an offset of 0.0 degrees', STATUS)
+            END IF
+
+*     Search for the ANGROT NDF
+
+            CALL DAT_THERE(IN_REDSX_LOC, 'ANGROT', THERE, STATUS)
+
+            IF (THERE) THEN
+
+*     Okay, we have found WPLATE and ANGROT.
+*     Get NDF identifiers
+               CALL NDF_FIND(IN_REDSX_LOC, 'WPLATE', TNDF(1), STATUS)
+               CALL NDF_FIND(IN_REDSX_LOC, 'ANGROT', TNDF(2), STATUS)
+
+*     Map the data arrays
+               CALL NDF_MAP(TNDF(1), 'DATA','_REAL','READ',
+     :              WP_PTR, ITEMP, STATUS)
+               CALL NDF_MAP(TNDF(2), 'DATA','_REAL','READ',
+     :              ANG_PTR, ITEMP, STATUS)
+
+*     Call the routine to copy the data from the NDFs to the
+*     ANG_INT,ANG_MEAS arrays (because of all the pointers)
+
+               CALL SURFLIB_FILL_POLPACK_ANGLES(MAX_FILE,
+     :              SCUBA__MAX_INT, SCUBA__MAX_MEAS, N_FILE,
+     :              N_INTEGRATIONS,
+     :              N_MEASUREMENTS, %VAL(WP_PTR), %VAL(ANG_PTR),
+     :              FAST_AXIS, ANG_INT, ANG_MEAS, STATUS)
+
+*     Shut down
+               CALL NDF_UNMAP(TNDF(1),'*', STATUS)
+               CALL NDF_UNMAP(TNDF(2),'*', STATUS)
+               CALL NDF_ANNUL(TNDF(1), STATUS)
+               CALL NDF_ANNUL(TNDF(2), STATUS)
+
+            END IF
+
+         END IF
+
+      END IF
+
 
 *     annul locators and array identifiers and close the file
 
