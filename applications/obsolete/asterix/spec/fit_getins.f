@@ -51,7 +51,7 @@
       CHARACTER*10		MTH			! Storage method
 
       INTEGER 			AXPTR			! Pointer to axis data
-      INTEGER 			NCB			! # channel bounds
+      INTEGER 			NCC			! # channel centres
       INTEGER 			NAX			! # axis values
       INTEGER			RCPTR			! Channel bounds
 
@@ -76,8 +76,8 @@
 	IF ( OK ) THEN
 
 *    Response dimensions must
-          CALL ADI_CSIZE( INSTR.R_ID, 'Channels', NCB, STATUS )
-          IF ( NCB .NE. (NAX+1) ) THEN
+          CALL ADI_CSIZE( INSTR.R_ID, 'ChannelSpec', NCC, STATUS )
+          IF ( NCC .NE. NAX ) THEN
             STATUS = SAI__ERROR
             CALL ERR_REP( ' ', 'Number of dataset energy axis bins '/
      :                /'does not match response dimensions', STATUS )
@@ -95,7 +95,7 @@
               CALL BDI_MAPAXVAL( ID, 'READ', E_AX, AXPTR, STATUS )
 
 *      And check against dataset channels...
-	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCB-1,
+	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCB,
      :                                %VAL(RCPTR), STATUS )
 
 *      Release the axis and spec array
