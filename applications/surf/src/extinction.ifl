@@ -1,46 +1,89 @@
+## EXTINCTION - Correct scuba data for extinction
+ 
+#+
+#  Name:
+#     EXTINCTION.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 August (TIMJ)
+#	Use PAR_CHOIC for sub_instrument
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     {enter_further_changes_here}
+ 
+#-
+
+
    INTERFACE EXTINCTION
+
+      HELPLIB 'SCUBA_HELP:'
 
       PARAMETER   IN
          POSITION 1
          PROMPT   'Name of NDF containing demodulated data'
          TYPE     'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   SUB_INSTRUMENT
          POSITION 2
          PROMPT   'Name of sub-instrument to be extinction corrected'
          TYPE     '_CHAR'
+#	 IN       'LONG', 'SHORT', 'P2000', 'P1300', 'P1100'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   FIRST_TAU
          POSITION 3
          PROMPT   'First zenith sky opacity measured'
          TYPE     '_REAL'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   FIRST_LST
          POSITION 4
          PROMPT   'Sidereal time of first opacity measurement; hh mm ss.ss'
          TYPE     '_CHAR'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   SECOND_TAU
          POSITION 5
          PROMPT   'Second zenith sky opacity measured'
          TYPE     '_REAL'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   SECOND_LST
          POSITION 6
          PROMPT   'Sidereal time of second opacity measurement; hh mm ss.ss'
          TYPE     '_CHAR'
+	 HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   OUT
          POSITION 7
          PROMPT   'Name of output NDF'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
          TYPE     'FILENAME'
+	 HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE
-
