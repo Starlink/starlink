@@ -2067,7 +2067,7 @@ itcl::class gaia::GaiaSextractor {
       } else {
          #  Catalogue already known. If also already created by this
          #  interface then check the state of the coordinates. If
-         #  these have changed then we need to off the window and
+         #  these have changed then we need to remove the window and
          #  recreate it.
          if { [info exists astrocatnames_($catalogue)] &&
               [winfo exists $astrocatnames_($catalogue)] } {
@@ -2116,6 +2116,14 @@ itcl::class gaia::GaiaSextractor {
                destroy $catwin
                create_entry_ $astrocat $catalogue
             }
+         } else {
+            #  Catalogue known (from a previous time), but doesn't
+            #  exist yet. The problem here is that when it is created
+            #  it might have RA/Dec ranging (which will mess up
+            #  plotting using X and Y coordinates), so we need to
+            #  remove this reference and recreate it from scratch.
+            $astrocat entry remove $catalogue
+            create_entry_ $astrocat $catalogue
          }
       }
 
