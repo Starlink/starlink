@@ -13,16 +13,141 @@ $VERSION = '0.01';
 
 bootstrap Starlink::AST $VERSION;
 
-1;
-
 =head1 NAME
 
 Starlink::AST - Interface to the Starlink AST library
 
 =head1 SYNOPSIS
 
+  use Starlink::AST;
+
+  my $zmap = new Starlink::AST::ZoomMap( 2, 5, "" );
+  $zmap->Set( Zoom => 5 );
+
+  my ($xout, $yout ) = $zmap->Tran2( [1,2], [4,6], 1);
+
+  my $fchan = new Starlink::AST::FitsChan();
+  for (<DATA>) {
+   $fchan->PutFits( $_, 0);
+  }
+  $fchan->Clear( "Card" );
+
+  $wcs = $fchan->Read();
 
 =head1 DESCRIPTION
+
+C<Starlink::AST> provides a perl wrapper to the Starlink AST library.
+The Starlink AST library provides facilities for transforming coordinates
+from one system to another in an object oriented manner. Multiple coordinate
+frames can be associated with a data set and it is also possible to generate
+automatic mappings between frames.
+
+Coordinate frame objects can be imported from FITS headers and from NDF files.
+
+=head1 CALLING CONVENTIONS
+
+In general the method names used in the Perl interface match the
+function names in the C library with the "ast" prefix
+dropped. Functions that require C arrays, should take references to
+Perl arrays. AST functions that return values/arrays now return these
+values/arrays onto the perl stack rather than the argument stack.
+
+The constructor functions are now replaced with C<new> methods in the
+relevant class. e.g rather than calling astZoomMap(), the Perl
+interface uses the C<new> method in the C<Starlink::AST::ZoomMap>
+namespace.
+
+=head2 Constructors
+
+The following constructors are available. Currently, these
+constructors match the C constructors fairly closely. 
+
+This is one area which may change when the class comes out of alpha
+release. The main problem with the constructors is the options string
+(a standard AST option string with comma-separated keyword value
+pairs). It would make more sense to replace these constructors with
+hash constructors that take the mandatory arguments in the correct
+order and hash arguments for the options.
+
+=over 4
+
+=item B<Starlink::AST::Frame>
+
+Instantiate an astFrame() object.
+
+  $frame = new Starlink::AST::Frame( $naxes, $options );
+
+=item B<Starlink::AST::FrameSet>
+
+  $frameSet = new Starlink::AST::FrameSet( $frame, $options );
+
+=item B<Starlink::AST::CmpFrame>
+
+  $cmpFrame = new Starlink::AST::CmpFrame( $frame1, $frame2, $options );
+
+=item B<Starlink::AST::CmpMap>
+
+  $cmpMap = new Starlink::AST::CmpMap( $map1, $map2, $series, $options );
+
+=item B<Starlink::AST::Channel>
+
+The astChannel contructor takes a hash argument. There are no
+mandatory keys to the hash. Sink and Source callbacks for the channel
+can be supplied using the keys "sink" and "source". All other keys are
+expected to correspond to attributes of the channel object
+(e.g. Comment, Full and Skip for astChannel).
+
+  $chann = new Starlink::AST::Channel( %options );
+
+  $chann = new Starlink::AST::Channel( sink => sub { print "$_[0]\n"; } );
+
+The "sink" callback expects to be given a single argument as a string.
+The "source" callback takes no arguments and should return a single string.
+
+=item B<Starlink::AST::FitsChan>
+
+Same calling signature as C<Starlink::AST::Channel>.
+
+=item B<Starlink::AST::XmlChan>
+
+Same calling signature as C<Starlink::AST::Channel>. Note that xmlChan
+is only available for AST v3.1 and newer.
+
+=item B<Starlink::AST::GrisMap>
+
+Only available in AST v3.0 and newer.
+
+  $grismMap = new Starlink::AST::GrisMap( $options );
+
+=item B<Starlink::AST::IntraMap>
+
+Not Yet Implemented.
+
+ $intraMap = new Starlink::AST::IntraMap( $name, $nin, $nout, $options );
+
+=back
+
+=head2 Base class methods
+
+These methods will work on all classes of AST objects.
+
+
+
+=head2 Mapping methods
+
+=head2 FrameSet methods
+
+=head1 EXCEPTIONS
+
+Rather than using the C<astOK> function provided to the C interface (which
+is not thread safe) AST errors are converted to Perl exceptions which can
+be caught with an eval.
+
+=head1 TODO
+
+ + Convert AST croaks to true exceptions of class Starlink::AST::Error
+
+ + Provide interface to the plotting routines
 
 =head1 AUTHOR
 
@@ -178,7 +303,6 @@ sub Read {
   my $self = shift;
   my $new = $self->_Read();
   return if !defined $new;
-  return if !Starlink::AST::OK();
   my $ast_class = $new->GetC( "Class" );
   my $perl_class = "Ast" . $ast_class . "Ptr";
   return bless $new, $perl_class;
