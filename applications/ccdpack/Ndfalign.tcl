@@ -377,7 +377,7 @@
                                 [ lindex [ lindex $bb 1 ] 0 ] ]
          }
          set xsize [ expr ( $x(A) + $x(B) ) * $zoomfactor + $pixgap ]
-         set ysize [ max $y(A) $y(B) ]
+         set ysize [ expr [ max $y(A) $y(B) ] * $zoomfactor ]
          return [ expr [ max $xsize $ysize ] * 1.4 ]
       }
 
