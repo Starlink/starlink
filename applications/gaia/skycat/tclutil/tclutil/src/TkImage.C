@@ -12,6 +12,8 @@
  * Peter W. Draper 13/10/97  Added makeGC call to constructor.
  * Allan Brighton  10/03/98  Pass config options to constructor as pointer
  *                           instead of reference.
+ * Peter W. Draper 12/06/98  Removed explicit depth and visual, these 
+ *                           are now left at window defaults.
  */
 static const char* const rcsId="@(#) $Id: TkImage.C,v 1.5 1998/03/12 20:19:41 abrighto Exp $";
 
@@ -200,8 +202,9 @@ TkImage* TkImage::getImage(Tk_Window tkwin)
     // Make a new instance of the image.
     tkwin_ = tkwin;
     display_ = Tk_Display(tkwin_);
-    visual_ = Tk_Visual(tkwin_);
-    depth_ = 8;
+    // PWD: leave these at defaults.
+    // visual_ = Tk_Visual(tkwin_);
+    // depth_ = 8;
 
     // make the graphics context now that we have the window
     Tk_MakeWindowExist(tkwin_);	// allan: 14.2.96: fix problem reported by 

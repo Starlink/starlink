@@ -14,6 +14,7 @@
  * who             when       what
  * --------------  --------   ----------------------------------------
  * Allan Brighton  26 Sep 95  Created
+ * Peter W. Draper 21 Jan 99  Moved constructor into public interface.
  */
 
 
@@ -55,12 +56,13 @@ protected:
     // generate a new temp filename to hold an image or preview data
     void newTempFile();
 
+public:
+
     // constructor - create catalog class instance
     // note: public interface uses AstroCatalog::open().
     // The argument represents the entry in the catalog config file for this catalog
     AstroCatalog(CatalogInfoEntry*);
 
-public:
     // destructor - close catalog and free any resources
     virtual ~AstroCatalog();
 

@@ -820,7 +820,12 @@ int RtdImage::initColors(Tcl_Interp* interp)
     int min_colors = 30, max_colors = 60;
     
     // Use the default visual for now...
-    Visual* visual = Tk_GetVisual(interp, tkwin, "default", &depth, &colormap);
+    //    Visual* visual = Tk_GetVisual(interp, tkwin, "default", &depth, &colormap);
+
+    //  PWD: use "." here as "default" returns screen visual, not the
+    //  "-visual" command-line option. Making this function static has 
+    //  somw drawbacks (the tkwin was previously the parent of the image?).
+    Visual* visual = Tk_GetVisual(interp, tkwin, ".", &depth, &colormap);
     if (! visual)
       return TCL_ERROR;
     
