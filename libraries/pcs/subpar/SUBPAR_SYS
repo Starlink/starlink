@@ -13,6 +13,9 @@
 *       Original version separated from SUBPAR_CMN 
 *     21-DEC-1994 (AJC):
 *       Add SUBPAR__STRLEN
+*     01-FEB-2004 (Norman Gray, Starlink/Glasgow)
+*       Checked into CVS repository cvs.starlink.ac.uk.  See there for any
+*       further changes.
 *-
 
 *
@@ -32,7 +35,7 @@
       PARAMETER ( SUBPAR__MAXNEEDS = 300 )
 
       INTEGER SUBPAR__MAXLIMS          ! size of storage for constraints
-      PARAMETER ( SUBPAR__MAXLIMS = 500 )
+      PARAMETER ( SUBPAR__MAXLIMS = 1500 )
 
       INTEGER SUBPAR__STRLEN           ! size of Character values
       PARAMETER ( SUBPAR__STRLEN = 256 )
