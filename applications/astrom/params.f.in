@@ -1,10 +1,11 @@
       BLOCK DATA ASTROM_PARAMS
+*   @configure_input@
       
       INCLUDE 'params.inc'
       
       DATA UNITIN/@FUNITIN@/
       DATA UNITOUT/@FUNITOUT@/
-      DATA DEFWCSSTYLE/'@DEFWCSSTYLE@'/
+      DATA DEFWCSSTYLE/'@ASTROMWCSSTYLE@'/
       DATA ASTROMVERSION/'@PACKAGE_VERSION@'/
 
       END
