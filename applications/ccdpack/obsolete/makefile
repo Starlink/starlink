@@ -115,6 +115,7 @@
 #        The following ADAM UNIX software libraries and their
 #        dependencies.
 #           AGI ARD AST CHR FIO GRP IDI NDF PGPLOT PRM PSX TRN PDA NDG
+#           TCLSYS STARTCL
 #        HTX
 #           The hypertext linker.
 #        GENERIC
@@ -534,7 +535,7 @@ PRIVATE_SCRIPTS = dgeneric
 
 PRIVATE_INCLUDES = ccd1_fdcm ccd1_fitcm ccd1_memcm ccd1_moscm \
  ccd1_mospr ccd1_tmpcm fio1_clog hlpcmd.inc ira_err ira_par \
- ndf_const user_err slv.h
+ ndf_const user_err slv.h ccdtcl.h tclndf.h grp_par.h
 
 #  Package include file which will be edited at build time to contain
 #  the package version number.
@@ -596,7 +597,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
  ccd1_lxyt2.f ccd1_lxyt3.f ccd1_mall.f ccd1_maskd.f \
  ccd1_match.f ccd1_mean.f ccd1_mfree.f ccd1_mkbc.f \
- ccd1_mkhis.f ccd1_mktmp.f ccd1_mlspg.f ccd1_mptmp.f \
+ ccd1_mkhis.f ccd1_mkimg.f ccd1_mktmp.f ccd1_mlspg.f ccd1_mptmp.f \
  ccd1_mtchl.f ccd1_mtind.f ccd1_mvdat.f ccd1_mxyl.f \
  ccd1_mxyo.f ccd1_mxyo2.f ccd1_nabv.f ccd1_ndfab.f \
  ccd1_ndfac.f ccd1_ndfck.f ccd1_ndfgb.f \
@@ -696,9 +697,10 @@ PLATFORM_F =
 #  C routines required for building the package.  This is just a list of
 #  all the C source files.
 
-C_ROUTINES = $(CSUBSRC)
+C_ROUTINES = $(CSUBSRC) $(WISH_SOURCE)
 
-CSUBSRC = ccd1_exec.c slv.c find_file.c
+CSUBSRC = ccd1_exec.c slv.c find_file.c \
+ tcltalk.c ndf.c ndfdrawpair.c ndfcentroffset.c ccdlog.c ccdAppInit.c
 
 #  List of applications/tasks in monoliths.
 
@@ -767,6 +769,14 @@ IRAF_HELP = calcor.hlp makebias.hlp ccdalign.hlp makecal.hlp \
 
 HELPTASK = ccdhelp
 
+#  Name of the Tcl windowing shell binary.
+
+WISH = ccdwish
+
+#  Name of the Tcl windowing shell source file.
+
+WISH_SOURCE = $(WISH).c
+
 #  List of ancilliary data files.
 
 DATA_FILES = ccdtest.ard ccdtest_obj.dat ccdtest2_obj.dat ccdtest.ast \
@@ -785,11 +795,6 @@ HYPERTEXT_HELP = ccdpack.htx
 DOCUMENTATION = $(LATEX_DOCS) $(HYPERTEXT_DOCS:.htx=.htx_tar) \
                 $(HYPERTEXT_HELP:.htx=.htx_tar) $(PKG_NAME).news
 
-#  List of platform specific binary files for Tcl. These are distributed
-#  pre-built as no methods are currently in place for trivially adding
-#  extensions.
-
-PLATFORM_TCLBINARIES = ccdwish atclsh
 
 ################################################################################
 #-------------------------------------------------------------------------------
@@ -814,7 +819,7 @@ PLATFORM_TCLBINARIES = ccdwish atclsh
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
  $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
  $(HELP_FILES) $(ICL_STARTUP_SCRIPT) $(STARTUP_SCRIPT) \
- $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(PLATFORM_TCLBINARIES) \
+ $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(WISH) \
  $(IRAF_SCRIPTS) $(MONO_TCL) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
@@ -883,7 +888,7 @@ USER_ERR:	user_err;	          $(LINK) $? $@
 
 #  Rules for extracting source files from the source archive.
 
-$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) $(IFD_FILES):
+$(PRIVATE_INCLUDES) $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) $(IFD_FILES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
@@ -957,7 +962,7 @@ CCDPACK_HOME = /mbt/support/ccdpack
 
 RCSFILES = makefile mk $(LATEX_DOCS) $(PKG_NAME).news $(HELPSRC) \
            $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) $(HELP_SOURCES) \
-           $(IFD_FILES) $(PUBLIC_SCRIPTS) \
+           $(WISH_SOURCE) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
            $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
            $(SUBSRC) $(CSUBSRC) $(DGENSRC) $(GENSRC) $(GENRDSRC) \
            $(GENLRDICSRC) $(GENLRDISRC) $(TASKSRC) \
@@ -998,38 +1003,23 @@ $(PKG_NAME)_source.tar :
 	co $(PRIVATE_INCLUDES)
 	co $(PKG_INCLUDE)
 	co $(MONO_SOURCE)
+	co $(WISH_SOURCE)
 	co $(HELP_SOURCES)
 	co $(IFD_FILES)
-	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(PRIVATE_INCLUDES) \
-		  $(PKG_INCLUDE) $(IFD_FILES)
+	chmod 644 $(HELP_SOURCES) $(MONO_SOURCE) $(WISH_SOURCE) \
+                  $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(IFD_FILES)
 	co $(PUBLIC_SCRIPTS)
 	co $(LINK_SCRIPT1)
 	co $(LINK_SCRIPT2)
 	chmod 700 $(LINK_SCRIPT1) $(LINK_SCRIPT2)
 	chmod 755 $(PUBLIC_SCRIPTS)
 	co $(PRIVATE_SCRIPTS)
-	cp $(CCDPACK_HOME)/release/ccdwish.alpha_OSF1.gz \
-	   $(CCDPACK_HOME)/release/ccdwish.sun4_Solaris.gz \
-	   $(CCDPACK_HOME)/release/ccdwish.ix86_Linux.gz \
-	   $(CCDPACK_HOME)/release/atclsh.alpha_OSF1.gz \
-	   $(CCDPACK_HOME)/release/atclsh.sun4_Solaris.gz \
-	   $(CCDPACK_HOME)/release/atclsh.ix86_Linux.gz ./
-	gunzip ccdwish.alpha_OSF1.gz
-	gunzip ccdwish.sun4_Solaris.gz
-	gunzip ccdwish.ix86_Linux.gz
-	gunzip atclsh.alpha_OSF1.gz
-	gunzip atclsh.sun4_Solaris.gz
-	gunzip atclsh.ix86_Linux.gz
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PRIVATE_INCLUDES) $(PKG_INCLUDE) \
-	   $(MONO_SOURCE) $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
-	   $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
-	   ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
-	   atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
+	   $(MONO_SOURCE) $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) \
+           $(PUBLIC_SCRIPTS) $(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS)
 	@- $(RM) $(PRIVATE_INCLUDES) $(PKG_INCLUDE) $(MONO_SOURCE) \
-		$(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
-		$(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS) \
-	        ccdwish.alpha_OSF1 ccdwish.sun4_Solaris ccdwish.ix86_Linux \
-	        atclsh.alpha_OSF1 atclsh.sun4_Solaris atclsh.ix86_Linux
+                $(WISH_SOURCE) $(HELP_SOURCES) $(IFD_FILES) $(PUBLIC_SCRIPTS) \
+		$(LINK_SCRIPT1) $(LINK_SCRIPT2) $(PRIVATE_SCRIPTS)
 
 $(PKG_NAME)_tasks.tar:
 	co $(TASKSRC)
@@ -1100,17 +1090,11 @@ $(PLATFORM_F) dummy_target1:
            else echo $@_$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
 	mv $@_$(SOURCE_VARIANT) $@
 
-$(PLATFORM_TCLBINARIES):
-	$(TAR_OUT) $(PKG_NAME)_source.tar $@.$(SOURCE_VARIANT)
-	@ if test -f $@.$(SOURCE_VARIANT); then :;\
-           else echo $@.$(SOURCE_VARIANT) is not in the tar file; exit 1; fi
-	mv $@.$(SOURCE_VARIANT) $@
-
 #  List of object files produced by compiling the source code and rules
 #  for performing the compilations.
 
 OBJECT_FILES = $(TASKOBJ) $(SUBOBJ) $(CSUBOBJ) $(GENOBJ) $(GENRDOBJ) \
- $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) $(HELPOBJ) $(MONO_OBJECT)
+ $(GENLRDIOBJ) $(GENCOBJ) $(DGENOBJ) $(HELPOBJ) $(MONO_OBJECT) $(WISH_OBJECT)
 
 TASKOBJ = $(TASKSRC:.f=.o)
 
@@ -1132,6 +1116,8 @@ $(DGENOBJ): $(PRIVATE_SCRIPTS)
 HELPOBJ = $(HELPSRC:.f=.o)
 
 MONO_OBJECT = $(MONO_SOURCE:.f=.o)
+
+WISH_OBJECT = $(WISH_SOURCE:.c=.o)
 
 .gen.o:
 	$(GENERIC) -t n $<
@@ -1222,6 +1208,31 @@ $(MONOLITH4): $(PKG_NAME)_scr.o $(OBJECT_LIBRARIES) $(LINK_SCRIPT1) \
 	         $(ADDLIBS) $(OBJECT_LIBRARIES) \
                 `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
 		$(OBJECT_LIBRARIES)
+
+#  Versions of Tcl and [incr Tcl] to use.
+
+TCL_VERS = 8.2
+ITCL_VERS = 3.1
+
+#  Location of libraries required for linking to Tcl.
+
+TCL_LIBRARIES = -litcl$(ITCL_VERS) -litk$(ITCL_VERS) \
+                -ltk$(TCL_VERS) -ltcl$(TCL_VERS)
+
+#  Location of object files for linking to Startcl.
+
+STARTCL_OBJ = $(STAR_LIB)/tkGwm.o $(STAR_LIB)/tkGwmCanv.o \
+              $(STAR_LIB)/tkGwmPrint.o $(STAR_LIB)/tclAdam.o -ljpeg
+
+#  Rule for building the Tcl shell.
+
+$(WISH): $(OBJECT_LIBRARIES) $(WISH).o
+	$(FC) $(FFLAGS) -o $(WISH) $(WISH).o \
+              -L$(STAR_LIB) $(ADDLIBS) $(OBJECT_LIBRARIES) \
+              $(STARTCL_OBJ) $(TCL_LIBRARIES) $(LDFLAGS) \
+              `./$(LINK_SCRIPT1)` `./$(LINK_SCRIPT2)` \
+              $(OBJECT_LIBRARIES) \
+              -lpar_adam `dtask_link_adam`
 
 #  Rule for creating HELPTASK.
 
@@ -1492,7 +1503,7 @@ install:
 	done
 #
 #  Install the tcl binaries, giving them world execute permission.
-	for f in $(PLATFORM_TCLBINARIES) ""; do \
+	for f in $(WISH) ""; do \
 	   if test -n "$$f"; then \
 	      $(CP) $$f $(INSTALL_BIN);\
 	      chmod 755 $(INSTALL_BIN)/$$f;\
@@ -1736,7 +1747,7 @@ do_deinstall:
         done
 #
 #  Deinstall the tcl binaries, if an installed version exists.
-	- for f in $(PLATFORM_TCLBINARIES) ""; do \
+	- for f in $(WISH) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               $(RM) $$f;\
               $(CP) $(INSTALL_BIN)/$$f .;\
@@ -2074,11 +2085,11 @@ unbuild: clean
 	@ echo '*** Built files removed'
 	@ echo
 
-#  strip: strip the monoliths of debug information.
-#  -----------------------------------------------
+#  strip: strip the binary executables of debug information.
+#  --------------------------------------------------------
 
 strip:
-	strip $(MONOLITHS)
+	strip $(MONOLITHS) $(WISH)
 	@ echo '*** Monoliths stripped'
 
 #-------------------------------------------------------------------------------
@@ -2090,7 +2101,13 @@ strip:
 #  files).  These are normally generated automatically from the source
 #  files.
 
+ccdAppInit.o:
+ccdlog.o:
+ndf.o: tclndf.h
+ndfdrawpair.o: tclndf.h
+ndfcentroffset.o: tclndf.h
 slv.o: slv.h
+tcltalk.o: ccdtcl.h
 
 aif_antmp.o: DAT_PAR SAE_PAR
 aif_asfio.o: PAR_ERR SAE_PAR
@@ -2237,6 +2254,7 @@ ccd1_mean.o: SAE_PAR
 ccd1_mfree.o: CCD1_MEMCM CCD1_PAR
 ccd1_mkbc.o: SAE_PAR
 ccd1_mkhis.o: SAE_PAR
+ccd1_mkimg.o: SAE_PAR AST_PAR PRM_PAR
 ccd1_mktmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR SAE_PAR
 ccd1_mlspg.o: SAE_PAR
 ccd1_mptmp.o: CCD1_PAR CCD1_TMPCM DAT_PAR SAE_PAR
