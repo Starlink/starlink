@@ -16,6 +16,7 @@
 /* include all common definitions */
 # include    <stdio.h>
 # include    <string.h>
+# include    <stdlib.h>
                                  /* ERRORS & CONSTANTS definitions */
 # include    "device.dep"
 # include    "kwm.h"
@@ -23,7 +24,7 @@
 # include    "idi_err.h"
 # include    "idifuncs.h"
 
-main()
+int main()
 
 {
 char    ic[2] , dev[5] , fildat[256] , fildct[256];
@@ -46,7 +47,7 @@ kws_xtr (fildct , "DESCR" , &nit , sarg);
 if (nit == 0)
    {
    dcterr = DCTFILERR;
-   return;
+   exit(dcterr);
    }
 printf ("%s\n", sarg[0]);
 printf (" Device OK [y/n] ? ");
