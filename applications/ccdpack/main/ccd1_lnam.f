@@ -1,4 +1,4 @@
-      SUBROUTINE CCD1_LNAM( PARAM, INDXLO, INDXHI, TITLE, GRPID,
+      SUBROUTINE CCD1_LNAM( PARAM, INDXLO, INDXHI, TITLE, GRPID, COMGID,
      :                      COMMEN, STATUS )
 *+
 *  Name:
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CCD1_LNAM( PARAM, INDXHI, INDXLO, TITLE, GRPID, COMMEN,
-*                     STATUS )
+*     CALL CCD1_LNAM( PARAM, INDXHI, INDXLO, TITLE, GRPID, COMGID, 
+*                     COMMEN, STATUS )
 
 *  Description:
 *     This routine writes the names of the elements in the input GRP
@@ -21,6 +21,13 @@
 *     parameter PARAM.  The names in the group are taken from the index
 *     range INDXLO to INDXHI. A title is written to the first line of
 *     the file.
+*
+*     If the COMGID argument is not equal to GRP__NOID then it indicates
+*     a GRP group which contains comment strings to be written 
+*     alongside the names.  These comments will be appended to each
+*     line following a comment character (the GRP COMMENT character 
+*     for GRPID, which by default is '#').  If COMGID is GRP__NOID, no
+*     comment will be written.
 
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
@@ -36,6 +43,11 @@
 *        character # first (i.e. '#  then the actual comment').
 *     GRPID = INTEGER (Given)
 *        The GRP identifier of the group.
+*     COMGID = INTEGER (Given)
+*        The GRP identifier for a group giving a comment string to 
+*        append to each line of the output.  It should have the same
+*        number of elements as the GRPID group.  If supplied equal to
+*        GRP__NOID, no comments will be written.
 *     COMMEN = _LOGICAL (Given)
 *        Whether to write a comment to the user about the name of the
 *        output file or not.
@@ -54,6 +66,8 @@
 *        Added COMMEN argument as $PARAMETER does not return name.
 *     29-JUN-2000 (MBT):
 *        Replaced use of IRH/IRG with GRP/NDG.
+*     19-JUN-2001 (MBT):
+*        Added COMGID parameter.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -68,6 +82,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'FIO_PAR'          ! FIO parameters
       INCLUDE 'GRP_PAR'          ! GRP sysetem constants
+      INCLUDE 'CCD1_PAR'         ! CCDPACK private constants
 
 *  Arguments Given:
       CHARACTER *  ( * ) PARAM
@@ -75,6 +90,7 @@
       INTEGER INDXHI
       CHARACTER * ( * ) TITLE
       INTEGER GRPID
+      INTEGER COMGID
       LOGICAL COMMEN
 
 *  Status:
@@ -87,14 +103,23 @@
 *  Local Variables:
       CHARACTER * ( GRP__SZNAM ) NAME ! Buffer for name
       CHARACTER * ( FIO__SZFNM ) FNAME ! Buffer for file name
-      INTEGER I                  ! Loop variable
+      CHARACTER * ( CCD1__BLEN ) COMTXT ! Buffer for comment text
+      CHARACTER * ( CCD1__BLEN ) LINE ! Buffer for output line
+      CHARACTER * ( 1 ) COMCHR   ! Comment character
       INTEGER FD                 ! File descriptor
+      INTEGER I                  ! Loop variable
+      INTEGER LENG               ! Line length
       LOGICAL OPEN               ! File is open flag
 
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Get the group's COMMENT character if we will need it.
+      IF ( COMGID .NE. GRP__NOID ) THEN
+         CALL GRP_GETCC( GRPID, 'COMMENT', COMCHR, STATUS )
+      END IF
 
 *  Open the file via the named adam parameter.
       OPEN = .FALSE.
@@ -104,14 +129,32 @@
 *  Write the title
       CALL FIO_WRITE( FD, TITLE( : CHR_LEN( TITLE ) ), STATUS )
 
-*  Loop over the required index extracting the names and then writting
+*  Loop over the required index extracting the names and then writing
 *  them into the file.
       DO 1 I = INDXLO, INDXHI
          NAME = ' '
-         CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
 
-*  Now write out the name.
-         CALL FIO_WRITE( FD, NAME( : CHR_LEN( NAME ) ), STATUS )
+*  Get the item name.
+         CALL GRP_GET( GRPID, I, 1, NAME, STATUS )
+         CALL MSG_SETC( 'NAME', NAME )
+
+*  Construct the output line.
+         IF ( COMGID .EQ. GRP__NOID ) THEN
+
+*  No comments to write - just use the name.
+            CALL MSG_LOAD( ' ', '^NAME', LINE, LENG, STATUS )
+         ELSE
+
+*  If we have comments to write, extract them from the comment group.
+            CALL MSG_SETC( 'COMMENTCHR', COMCHR )
+            CALL GRP_GET( COMGID, I, 1, COMTXT, STATUS )
+            CALL MSG_SETC( 'COMMENT', COMTXT )
+            CALL MSG_LOAD( ' ', '^NAME ^COMMENTCHR ^COMMENT', LINE,
+     :                     LENG, STATUS )
+         END IF
+
+*  Now write out the constructed line.
+         CALL FIO_WRITE( FD, LINE( 1:LENG ), STATUS )
  1    CONTINUE
 
       IF ( COMMEN .AND. STATUS .EQ. SAI__OK ) THEN 
