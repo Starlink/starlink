@@ -1,16 +1,19 @@
 *+  RONAME  - Converts filename to various forms
-      SUBROUTINE RONAME( DATE_OBS, INAME, ONAME, RNAME, STATUS )
+      SUBROUTINE RONAME( DATE_OBS, INAME, ONAME, RNAME, RODIR, OBSNUM,
+     :                   STATUS )
 *    Description :
 *     Converts filename to various forms
 *    Invocation :
-*     CALL ACVT_CNAME( DATE_OBS, INAME, ONAME, RNAME, STATUS )
+*     CALL RONAME( DATE_OBS, INAME, ONAME, RNAME, RODIR, OBSNUM, STATUS )
 *    Authors :
 *     P. N. Daly (PND@JACH.HAWAII.EDU)
-*     
+*     MJC: Malcolm J. Currie
 *    History :
-*     18-May-1994: Original version                                      (PND)
+*     18-May-1994: Original version                               (PND)
 *     02-Aug-1994: Changed input string and manipulation slightly (SKL@JACH)
 *     23-Sept-1994 Changed slightly for UNIX (']',':' -> '/') (SKL@JACH)
+*     1999 Sept 29: Added to new return arguments, RODIR and OBSNO.
+*                   (MJC)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -25,12 +28,16 @@
       CHARACTER*(*) DATE_OBS        ! The input filename
       CHARACTER*(*) INAME           ! The output integration filename
       CHARACTER*(*) ONAME           ! The output observation filename
-      CHARACTER*(*) RNAME           ! The output reduced observation filename
+      CHARACTER*(*) RNAME           ! The output reduced observation
+                                    ! filename
+*    Export :
+      CHARACTER * (80) RODIR        ! RO image directory name 
+      CHARACTER * (5) OBSNUM        ! Observation number
+
 *    Local Constants :
-*    Local variables :
+*    Local Variables :
       CHARACTER*80 IDIR            ! I image directory name 
       CHARACTER*80 ODIR            ! O image directory name 
-      CHARACTER*80 RODIR           ! RO image directory name 
       INTEGER DASH                 ! location of '_' in DATE_OBS string
       INTEGER LEN                  ! Length of string
       INTEGER LENI                 ! Length of dir string 
@@ -47,6 +54,8 @@
       INAME = ' '
       ONAME = ' '
       RNAME = ' '
+      OBSNUM = ' '
+      RODIR = ' '
       LEN = 0
       LENI = 0
       LENO = 0      
@@ -84,6 +93,9 @@ D     write (6,*) 'RONAME:date_obs, len, dash: ', date_obs, len, dash
         RETURN
 
       ELSE
+
+*     Extract the observation number.
+        OBSNUM = DATE_OBS( DASH+1: )
 
 *     get names of directories and do some checking -
 *     if the directory name doesn't end in a '/' add one 
