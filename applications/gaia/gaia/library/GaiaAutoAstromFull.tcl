@@ -190,6 +190,30 @@ itcl::class gaia::GaiaAutoAstromSimple {
          {Only attempt a linear fit (otherwise attempt distortion)}
       set values_(linear) 1
 
+      #  Select a telescope.
+#       itk_component add telescope {
+#          LabelMenu $w_.telescope \
+#             -text "Telescope:" \
+#             -relief raised \
+#             -labelwidth $lwidth \
+#             -variable [scope values_(telescope)]
+#       }
+#       add_short_help $itk_component(invert) \
+#          {Telescope that the observation was taken on}
+#       fill_telescope_menu_
+#       set values_(telescope) 0
+
+#       #  Define the observation wavelength.
+#       itk_component add wavelength {
+#          LabelEntry $w_.wavelength \
+#             -text "Wavelength (nm):" \
+#             -labelwidth $lwidth \
+#             -textvariable [scope values_(wavelength)]
+#       }
+#       add_short_help $itk_component(wavelength) \
+#          {Wavelength of the observation}
+#       set values_(wavelength) "500.0"
+
       #  Choose an calibration catalogue. This should contain
       #  all the remote reference RA and Dec catalogues.
       itk_component add refcat {
@@ -255,6 +279,8 @@ itcl::class gaia::GaiaAutoAstromSimple {
       pack $itk_component(angle) -side top -fill x -pady 5 -padx 5
       pack $itk_component(invert) -side top -fill x -pady 5 -padx 5
       pack $itk_component(linear) -side top -fill x -pady 5 -padx 5
+      #pack $itk_component(telescope) -side top -fill x -pady 5 -padx 5
+      #pack $itk_component(wavelength) -side top -fill x -pady 5 -padx 5
       pack $itk_component(refcat) -side top -fill x -pady 5 -padx 5
       pack $itk_component(status) -side top -fill both -expand 1 -pady 5 -padx 5
 
@@ -365,6 +391,14 @@ itcl::class gaia::GaiaAutoAstromSimple {
                append wcssource ",angle=[string trim $values_(angle)]"
                append wcssource ",invert=[string trim $values_(invert)]"
             }
+
+            #  Telescope.
+            #if { $values_(telescope) != "Unknown" } {
+            #   append wcssource ",obs=$values_(telescope)"
+            #}
+
+            #  Wavelength
+            #append wcssource ",col=[expr int($values_(wavelength))]"
 
             #  Level of fit.
             if { $values_(linear) } {
@@ -491,6 +525,48 @@ itcl::class gaia::GaiaAutoAstromSimple {
       }
       $astrocatname_ search
    }
+
+   #  Fill the telescope menu with a list of possible telescopes.
+   protected method fill_telescope_menu_ {} {
+
+      #  Undefined option.
+      $itk_component(telescope) add \
+         -label "Undefined" \
+         -value 0
+
+      #  Use a temporary image, so we don't actually need one.
+      set tmpimage [::image create rtdimage]
+
+      #  Extract the names of all known telescopes. Break the menu
+      #  into parts so that we can see the whole thing.
+      set more 1
+      set n 0
+      set ccount 0
+      while { $more } {
+         puts "more"
+         incr n
+         if { $ccount > 35 } {
+            set cbreak 1
+            set ccount 0
+         } else {
+            set cbreak 0
+            incr ccount
+         }
+         lassign [$tmpimage slalib slaobs $n] name description w p h
+         if { "$description" != "?" } {
+            $itk_component(telescope) add \
+               -label "$description" \
+               -value "$name" \
+               -columnbreak $cbreak \
+               -command [code $this set_value_ telescope "$name"]
+         } else {
+            set more 0
+         }
+
+      }
+      image delete $tmpimage
+   }
+
 
    #  Configuration options: (public variables)
    #  ----------------------
