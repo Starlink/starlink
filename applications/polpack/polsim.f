@@ -332,7 +332,7 @@
 
 *  Obtain a section from the output NDF with bounds equal to the input
 *  Stokes cube.
-         CALL NDF_SECT( NDFOUT, 2, UBND, LBND, INDFS, STATUS )
+         CALL NDF_SECT( NDFOUT, 2, LBND, UBND, INDFS, STATUS )
 
 *  Map the DATA and (if required) VARIANCE components of the output section.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'WRITE', IPDOUT, EL, 
