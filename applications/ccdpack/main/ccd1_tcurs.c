@@ -6,7 +6,7 @@
 #include "tcl.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "ccdtcl.h"
+#include "tcltalk.h"
 
 
 

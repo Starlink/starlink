@@ -4,7 +4,7 @@
 #include "mers.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "ccdtcl.h"
+#include "tcltalk.h"
 #include "ccdaux.h"
 #include "grp_par.h"
 

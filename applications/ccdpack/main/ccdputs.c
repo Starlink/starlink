@@ -66,7 +66,7 @@
 #include "cnf.h"
 #include "mers.h"
 #include "msg_par.h"
-#include "ccdtcl.h"
+#include "tcltalk.h"
 
    extern int ccdofd;
 

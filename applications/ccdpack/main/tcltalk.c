@@ -50,7 +50,7 @@
 #include <fcntl.h>
 #include "tcl.h"
 #include "sae_par.h"
-#include "ccdtcl.h"
+#include "tcltalk.h"
 #include "mers.h"
 #include "msg_par.h"
 #include "cnf.h"
