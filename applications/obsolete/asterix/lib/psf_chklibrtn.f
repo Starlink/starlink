@@ -63,6 +63,9 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Initialised?
+      IF ( .NOT. PSFLIBINIT ) CALL PSF_LINIT( STATUS )
+
       LID = 0
       RID = 0
 
@@ -80,13 +83,14 @@
 *      No library found?
         IF ( NMATCH .EQ. 0 ) THEN
           CALL MSG_SETC( 'LIB', LIB )
-          CALL MSG_PRNT( 'No such library ^LIB' )
           STATUS = SAI__ERROR
+          CALL ERR_RPE( ' ', 'No such library ^LIB', STATUS )
 
 *      Check for ambiguous definition
         ELSE IF ( NMATCH .GT. 1 ) THEN
-          CALL MSG_PRNT( 'WARNING : Ambiguous library specification' )
           STATUS = SAI__ERROR
+          CALL MSG_PRNT( ' ',
+     :      'WARNING : Ambiguous library specification', STATUS )
 
         END IF
 
