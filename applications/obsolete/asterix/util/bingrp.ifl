@@ -1,0 +1,99 @@
+INTERFACE BINGRP
+
+  PARAMETER INP
+    POSITION 1
+    TYPE    'LITERAL'
+    PROMPT  'Name of input file'
+    PPATH   'GLOBAL,CURRENT'
+    VPATH   'PROMPT'
+    ASSOCIATION '<->GLOBAL.BINDS'
+    HELP    'Without the .SDF extension'
+  ENDPARAMETER
+
+  PARAMETER CANCEL
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PROMPT 'Delete existing group information'
+  ENDPARAMETER
+
+  PARAMETER POLAR
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PROMPT 'Perform radial [and azimuthal] spatial groouping'
+  ENDPARAMETER
+
+  PARAMETER ARD
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PROMPT 'Perform spatial groouping using an ARD file'
+  ENDPARAMETER
+
+  PARAMETER UPDATE
+    TYPE '_LOGICAL'
+    DEFAULT N
+    VPATH 'DEFAULT'
+    PROMPT 'Update rather than overwrite grouping data'
+    HELP 'The default creates 2 spatial groups, one inside the region and one outside'
+  ENDPARAMETER
+
+  PARAMETER XCENT
+    TYPE    '_REAL'
+    PROMPT  'Centre of polar in horizontal axis'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'PROMPT'
+    HELP    'X value of centre in axis units'
+  ENDPARAMETER
+
+  PARAMETER YCENT
+    TYPE    '_REAL'
+    PROMPT  'Centre of polar in vertical axis'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'PROMPT'
+    HELP    'Y value of centre in axis units'
+  ENDPARAMETER
+
+  PARAMETER IGRP
+    TYPE    '_INTEGER'
+    PROMPT  'New group number'
+    PPATH   'DYNAMIC'
+    VPATH   'PROMPT'
+    HELP    'Default is offered would create a new spatial group'
+  ENDPARAMETER
+
+  PARAMETER RBIN
+    TYPE    '_REAL'
+    PROMPT  'Radial binsize'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'PROMPT'
+    HELP    'Enter in axis units'
+  ENDPARAMETER
+
+  PARAMETER NRAD
+    TYPE '_INTEGER'
+    PROMPT 'Number of radial bins'
+    HELP 'Default is maximum possible'
+    PPATH 'DYNAMIC'
+  ENDPARAMETER
+
+  PARAMETER ABIN
+    TYPE    '_REAL'
+    PROMPT  'Azimuthal binsize'
+    PPATH   'CURRENT,DEFAULT'
+    VPATH   'PROMPT'
+    DEFAULT 360.0
+    HELP    'Enter in degrees'
+  ENDPARAMETER
+
+  PARAMETER AZSTART
+    TYPE    '_REAL'
+    PROMPT  'Azimuthal start position (degrees)'
+    PPATH   'DEFAULT'
+    VPATH   'DEFAULT'
+    DEFAULT  0.0
+    HELP 'Enter in degrees. Right is 0.0, Top is 90.0, bottom is -90.0'
+  ENDPARAMETER
+
+ENDINTERFACE
