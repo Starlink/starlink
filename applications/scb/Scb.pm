@@ -18,7 +18,8 @@ require Exporter;
 
 @EXPORT = qw/tarxf popd pushd starpack rmrf parsetag
              $incdir $srcdir $bindir 
-             $func_indexfile $file_indexfile $taskfile/;
+             $func_indexfile $file_indexfile $taskfile
+             %tagger/;
 
 #  Includes.
 
@@ -41,6 +42,18 @@ $func_indexfile = cwd . "/func";
 $file_indexfile = cwd . "/file";
 $taskfile  = cwd . "/tasks";
 
+#  Language-specific tagging routines.
+
+use CTag;
+use FortranTag;
+
+%tagger = ( 
+            c   => \&CTag::tag,
+            h   => \&CTag::tag,
+
+            f   => \&FortranTag::tag,
+            gen => \&FortranTag::tag,
+          );
 
 ########################################################################
 #  Local variables.
