@@ -178,7 +178,7 @@ sub new {
    my $fmode = { 'read'    => O_RDONLY,
                  'update'  => O_RDWR | O_CREAT,
                  'new'     => O_RDWR | O_CREAT | O_TRUNC
-                                                       }->{$access};
+                                                         }->{$access};
 
 #  Tie the StarIndex object, which is a hash, to the DBM file.
 
@@ -201,8 +201,6 @@ sub new {
          grep /^$indexfile(\.(db\w*|dir|pag))?$/, glob ("$indexfile*");
       $indexfile =~ m%(.*)/%;
       my $indexdir = $1 || '.';
-
-   print join "\n", @indexfiles, $indexdir, "\n";
 
       if (@indexfiles == 0) {
 
@@ -322,11 +320,16 @@ sub get {
 #  Description:
 #     Retrieves a value from a StarIndex object given the key and,
 #     optionally, a required or a hinted Starlink package name.
-#     If only the name is supplied, then an entry for that key in any
-#     package is returned (or undef if the key does not exist).
+#
+#     If only the name is supplied, then in array context a list of 
+#     the entries for that name in all packages is returned, and in 
+#     scalar context just one of them (effectively at random). 
+#     undef is returned if the key does not exist).
+#
 #     If the 'packmust => $package' option is given, then if a value
 #     in the specified package exists for the specified key, it is
 #     returned, else undef is returned.
+#
 #     If the 'packpref => $package' option is given, then if a value
 #     in the specified package exists for the specified key it is 
 #     returned, if it only exists in some other package then that is
@@ -370,10 +373,10 @@ sub get {
    my $locations = $rlocate->{$name} || return undef;
    my @locations = split ' ', $locations;
 
-#  If any package will do, just return the first one we find.
+#  If no package is specified, return a list of them all.
 
    if (!$options{'packmust'} && !$options{'packpref'}) {
-      return shift @locations;
+      return (wantarray ? @locations : shift (@locations));
    }
 
 #  Otherwise look through all of them, returning if we find a suitable one.
@@ -477,9 +480,16 @@ sub put {
 #     $location = string.
 #        Logical pathname of item's location.
 
-#  Return value:
-
 #  Notes:
+#     Depending on the implementation the of DBM library underlying 
+#     the Perl tie() function, writing records can generate an error
+#     if the size of the key plus value exceeds a block size. 
+#     This limiting size is 1024 bytes for genuine NDBM (used on 
+#     Solaris and Digital Unix).  There is no limit for the GNU 
+#     implementation GDBM, which underlies the NDBM implementation on
+#     Linux.  If GDBM were used on the other platforms this would not
+#     be a problem, but it does not exist by default on Solaris and 
+#     Digital Unix.
 
 #  Copyright:
 #     Copyright (C) 1998 Central Laboratory of the Research Councils
@@ -538,6 +548,7 @@ sub put {
 
       $rlocate->{$name} = $location;
    }
+
 }
 
 
@@ -816,6 +827,76 @@ sub delpack {
 #  Delete package location entry.
 
    $rlocate->delete("$package#");
+}
+
+
+########################################################################
+sub duplicate {
+
+#+
+#  Name:
+#     StarIndex::duplicate
+
+#  Purpose:
+#     Copy a StarIndex object to a new one.
+
+#  Language:
+#     Perl 5
+
+#  Invocation:
+#     $newindex = $oldindex->duplicate($newfile);
+
+#  Description:
+#     Create a new StarIndex object which is a copy of an old one.
+#     This may be better than simply copying the files which hold them,
+#     since (depending on the DBM implementation) these files may be
+#     sparse, and a normal copy will probably fail to retain the holes
+#     as holes, making a destination file which is very much larger.
+
+#  Arguments:
+#     $newfile = string.
+#        Name of the disk file for storing the data (possibly excluding
+#        file extension - this depends on the implementation of the DBM).
+
+#  Return value:
+#     $newindex = StarIndex object.
+#        The index will have been opened with access mode 'new'.
+
+#  Notes:
+
+#  Copyright:
+#     Copyright (C) 1998 Central Laboratory of the Research Councils
+
+#  Authors:
+#     MBT: Mark Taylor (IoA, Starlink)
+#     {enter_new_authors_here}
+
+#  History:
+#     03-DEC-1998 (MBT):
+#       Initial revision.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#  Get arguments.
+
+   my ($roldlocate, $newfile) = @_;
+
+#  Create new (empty) object with the right file name.
+
+   my $rnewlocate = new (ref ($roldlocate), $newfile, 'new');
+
+#  Copy records from old object to new object one by one.
+
+   my ($key, $value);
+   while (($key, $value) = each (%$roldlocate)) {
+      $rnewlocate->{$key} = $value;
+   }
+
+#  Return (already blessed) object.
+
+   return $rnewlocate;
 }
 
 
