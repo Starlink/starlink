@@ -33,10 +33,18 @@
 *        scan ends. This region should be as large as possible but should
 *        only include baseline regions -- any scan that includes a source 
 *        detection within CHOP arcseconds of the scan ends will be rendered
-*        useless.
+*        useless. Only used for METHOD=LINEAR.
 *        The default value is the chop throw.
 *     IN = NDF (Read)
 *        The name of the input file containing demodulated SCUBA data.
+*     METHOD = CHAR (Read)
+*        Baseline removal method. Options are:
+*           LINEAR:  Remove a linear baseline using the ends of the scan
+*           MEDIAN:  Remove a DC level calculated from the median of each 
+*                    scan
+*           MEAN:    Remove the mean level from each scan (data further
+*                    than 3 sigma from the mean are ignored and the MEAN
+*                    recalculated)
 *     MSG_FILTER = CHAR (Read)
 *        The messaging level. Default is NORM. There are no verbose messages.
 *     OUT = NDF (Write)
@@ -120,6 +128,7 @@
       INTEGER      LAST_EXP             ! exposure where abort occurred
       INTEGER      LAST_INT             ! integration where abort occurred
       INTEGER      LAST_MEAS            ! measurement where abort occurred
+      CHARACTER*10 METHOD               ! Baseline removal method
       INTEGER      NDIM                 ! the number of dimensions in an array
       INTEGER      NREC                 ! number of history records in file
       INTEGER      N_BOL                ! number of bolometers measured 
@@ -275,10 +284,19 @@
       CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS, 'CHOP_THR',
      :  CHOP_THROW, STATUS)
 
-*     Ask for the chop throw
+*     Ask for the baseline removal mode
+      CALL PAR_CHOIC('METHOD', 'LINEAR','LINEAR,MEDIAN,MEAN', .TRUE.,
+     :     METHOD, STATUS)
 
-      CALL PAR_DEF0R('CHOP', CHOP_THROW, STATUS)
-      CALL PAR_GET0R('CHOP', CHOP_THROW, STATUS)
+
+*     Ask for the chop throw (only needed for METHOD=LINEAR)
+
+      IF (METHOD .EQ. 'LINEAR') THEN
+
+         CALL PAR_DEF0R('CHOP', CHOP_THROW, STATUS)
+         CALL PAR_GET0R('CHOP', CHOP_THROW, STATUS)
+
+      END IF
 
 *  find out if the observation was aborted
 
@@ -397,18 +415,43 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CHOP_SIZE = INT(CHOP_THROW / SAMPLE_DX)
+*     Method = linear
+
+         IF (METHOD .EQ. 'LINEAR') THEN
+            
+            CHOP_SIZE = INT(CHOP_THROW / SAMPLE_DX)
 
 
-*       Remove a linear baseline
+*     Remove a linear baseline
 
-         CALL SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
-     :        N_INTEGRATIONS, N_MEASUREMENTS,
-     :        %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
-     :        %val(IN_DATA_PTR), %VAL(IN_VARIANCE_PTR),
-     :        %val(IN_QUALITY_PTR), CHOP_SIZE, CHOP_SIZE,
-     :        %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
-     :        %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+            CALL SCULIB_REMOVE_LINEAR_BASELINE(DORLB, N_EXPOSURES,
+     :           N_INTEGRATIONS, N_MEASUREMENTS,
+     :           %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
+     :           %val(IN_DATA_PTR), %VAL(IN_VARIANCE_PTR),
+     :           %val(IN_QUALITY_PTR), CHOP_SIZE, CHOP_SIZE,
+     :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+
+         ELSE IF (METHOD .EQ. 'MEAN' .OR. METHOD .EQ. 'MEDIAN') THEN
+
+            CALL SURFLIB_REMOVE_DC_FROM_EXP(DORLB, N_EXPOSURES,
+     :           N_INTEGRATIONS, N_MEASUREMENTS, METHOD,
+     :           %val(IN_DEM_PNTR_PTR), N_BOL, N_POS, 
+     :           %val(IN_DATA_PTR), %VAL(IN_VARIANCE_PTR),
+     :           %val(IN_QUALITY_PTR),
+     :           %val(OUT_DATA_PTR), %val(OUT_VARIANCE_PTR),
+     :           %val(OUT_QUALITY_PTR), BADBIT, STATUS)
+            
+         ELSE
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TSK',TSKNAME)
+            CALL MSG_SETC('MTD',METHOD)
+            CALL ERR_REP(' ','^TSK: Method ^MTD not recognised',
+     :           STATUS)
+
+         END IF
+
 
       END IF
 
