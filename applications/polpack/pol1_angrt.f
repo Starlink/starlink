@@ -168,13 +168,13 @@
 *  the default axis order (longitude,latitude).
                   SKYF1 = AST_GETFRAME( IWCS, ISKY, STATUS )
                   SKYF2 = AST_SKYFRAME( ' ', STATUS )
-                  CALL SET_SETD( SKYF2, 'EPOCH', AST_GETD( SKYF1,
+                  CALL AST_SETD( SKYF2, 'EPOCH', AST_GETD( SKYF1,
      :                                           'EPOCH', STATUS ),
      :                           STATUS )
-                  CALL SET_SETD( SKYF2, 'EQUINOX', AST_GETD( SKYF1,
+                  CALL AST_SETD( SKYF2, 'EQUINOX', AST_GETD( SKYF1,
      :                                           'EQUINOX', STATUS ),
      :                           STATUS )
-                  CALL SET_SETC( SKYF2, 'SYSTEM', AST_GETC( SKYF1,
+                  CALL AST_SETC( SKYF2, 'SYSTEM', AST_GETC( SKYF1,
      :                                           'SYSTEM', STATUS ),
      :                           STATUS )
 
