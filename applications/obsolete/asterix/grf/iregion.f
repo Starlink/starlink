@@ -926,8 +926,8 @@
         YEND = YSPOKE + SLENGTH * COS(THETA)
 
 *  get geometric centre of spoke
-        XSC=XSPOKE+(SLENGTH/2.0)*SIN(THETA)
-        YSC=YSPOKE+(SLENGTH/2.0)*COS(THETA)
+        XSC=XC+(RAD+SLENGTH/2.0)*SIN(THETA)
+        YSC=YC+(RAD+SLENGTH/2.0)*COS(THETA)
 
         XSP(3) = XEND + DELTAX
         XSP(4) = XEND - DELTAX
@@ -968,11 +968,8 @@
 
       ENDDO
 
-      IF (EXCLUDE) THEN
-        L=L+1
-        TEXT(L:)=')'
-      ENDIF
-
+      L=L+1
+      TEXT(L:)=')'
       CALL ARX_PUT(I_ARD_ID,0,TEXT(:L),STATUS)
 
 *  invert the mask if necessary
