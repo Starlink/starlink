@@ -10167,10 +10167,14 @@ NAMELIKE = LITERAL (Read)
 3 NAMELIST
 NAMELIST = LITERAL (Read)
    The name of an output file in which to write the names of
-   the images selected for output.  Only the image names and not
-   the Set attributes will be written to this file, so it
-   can be used as an indirection file for input to other
-   CCDPACK commands.
+   the images selected for output.  The (non-comment) lines of 
+   this file are of the form:
+
+      ndf-name # set-index set-name
+
+   since the set-index and set-name values appear to the right
+   of a comment character, the file can thus be used as an
+   indirection file for input to other CCDPACK commands.
    [showset.lis]
 3 PICKINDEX
 PICKINDEX = LITERAL (Read)
