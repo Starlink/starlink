@@ -160,6 +160,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.29  2000/06/28 01:10:50  timj
+*     Reset MEAS_Q each time round loop
+*
 *     Revision 1.28  1999/08/03 20:01:43  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -1146,8 +1149,12 @@ c
                MEAS_1_Q (BEAM) = 1
                MEAS_2_N (BEAM) = 0
 
+*     Reset the coadd count and the coadd quality, else
+*     SCULIB_COADD will get confused. Do not need to reset
+*     MEAS_V and MEAS_D since MEAS_N=0 indicates no input data
                DO POS = 1, SCUBA__MAX_JIGGLE
                   MEAS_N (POS,BEAM) = 0
+                  MEAS_Q (POS,BEAM) = 0
                END DO
 
                IF (PHOT_BB(BEAM) .NE. 0) THEN
