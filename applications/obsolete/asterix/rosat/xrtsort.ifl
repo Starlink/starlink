@@ -24,6 +24,14 @@
                VPATH   'PROMPT'
      ENDPARAMETER
 
+     PARAMETER ORIGIN
+               TYPE     '_CHAR'
+               PROMPT   'Origin of datafiles (MPE,US,RDF)'
+               vpath    'DEFAULT'
+               DEFAULT  'AUTO'
+               IN       'MPE','US','RDF','AUTO'
+     ENDPARAMETER
+
      PARAMETER TYPE
                TYPE    '_CHAR'
                PROMPT  'Output data type - Event(E) Binned(B)'
@@ -83,15 +91,6 @@
                HELP '1=high 2=medium 3=low'
                DEFAULT 2
      ENDPARAMETER
-
-     PARAMETER QCHANGE
-               TYPE    '_LOGICAL'
-               PROMPT  'Change the default quality limits'
-               PPATH   'DEFAULT'
-               HELP    '%ASTHELP A XSORT HELP QCHANGE'
-               VPATH   'DEFAULT'
-               DEFAULT  NO
-            ENDPARAMETER
 
      PARAMETER PROPERTY
                TYPE    '_CHAR'
@@ -517,6 +516,25 @@
                DEFAULT  0.0
      ENDPARAMETER
 
+     PARAMETER FITSROOT
+               TYPE     '_CHAR'
+               PROMPT   'Rootname of FITS files'
+               PPATH    'CURRENT'
+               VPATH    'DEFAULT'
+     ENDPARAMETER
 
- ENDINTERFACE
+     PARAMETER ALL
+               TYPE     '_LOGICAL'
+               PROMPT   'Process all files associated with the observation'
+               PPATH    'DEFAULT'
+               VPATH    'DEFAULT'
+               DEFAULT  'TRUE'
+     ENDPARAMETER
 
+     PARAMETER HOTSPOTS
+               TYPE     '_LOGICAL'
+               VPATH    'DEFAULT'
+               DEFAULT  'TRUE'
+     ENDPARAMETER
+
+ENDINTERFACE

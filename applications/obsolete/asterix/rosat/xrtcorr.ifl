@@ -203,4 +203,12 @@ HELP 'The angle used in determining the vignetting correction (arcmins)'
                VPATH   'PROMPT'
             ENDPARAMETER
 
+     PARAMETER ORIGIN
+               TYPE     '_CHAR'
+               PROMPT   'Origin of datafiles (MPE,US,RDF)'
+               vpath    'DEFAULT'
+               DEFAULT  'AUTO'
+               IN       'MPE','US','RDF','AUTO'
+     ENDPARAMETER
+
  ENDINTERFACE

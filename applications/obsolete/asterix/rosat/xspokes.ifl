@@ -1,5 +1,20 @@
  INTERFACE XSPOKES
 
+             PARAMETER ORIGIN
+               TYPE     '_CHAR'
+               PROMPT   'Origin of datafiles (MPE,US,RDF)'
+               vpath    'DEFAULT'
+               DEFAULT  'RDF'
+               IN       'MPE','US','RDF','AUTO'
+            ENDPARAMETER
+
+            PARAMETER FITSROOT
+               TYPE     '_CHAR'
+               PROMPT   'Rootname of FITS files'
+               PPATH    'CURRENT'
+               VPATH    'DEFAULT'
+            ENDPARAMETER
+
             PARAMETER NEW
                TYPE    '_LOGICAL'
                PROMPT  'Create a new file (Y) or append to an old file (N)'

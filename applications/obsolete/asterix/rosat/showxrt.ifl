@@ -1,5 +1,27 @@
 INTERFACE SHOWXRT
 
+    PARAMETER ORIGIN
+              TYPE     '_CHAR'
+              PROMPT   'Origin of datafiles (MPE,US,RDF)'
+              VPATH    'DEFAULT'
+              DEFAULT  'AUTO'
+              IN       'MPE','US','RDF','AUTO'
+    ENDPARAMETER
+
+    PARAMETER FITSROOT
+              TYPE     '_CHAR'
+              PROMPT   'Rootname of FITS files'
+              PPATH    'CURRENT'
+              VPATH    'DEFAULT'
+    ENDPARAMETER
+
+    PARAMETER CURR
+              TYPE '_LOGICAL'
+              VPATH 'DEFAULT'
+              DEFAULT Y
+              PROMPT 'Use current directory'
+    ENDPARAMETER
+
     PARAMETER RAWDIR
               POSITION 1
               TYPE    '_CHAR'
