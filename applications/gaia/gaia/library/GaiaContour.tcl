@@ -135,6 +135,9 @@ itcl::class gaia::GaiaContour {
       #  Add controls for line attributes.
       add_att_controls_
 
+      #  Add controls for level generation.
+      add_gen_controls_
+
       #  Create the button bar
       itk_component add actionframe {frame $w_.action}
 
@@ -148,7 +151,7 @@ itcl::class gaia::GaiaContour {
       #  Add a button to clear all contour levels.
       itk_component add clear {
          button $itk_component(actionframe).clear -text {Clear levels} \
-            -command [code $this clear_levels 0]
+            -command [code $this clear_levels]
       }
       add_short_help $itk_component(clear) {Clear all contour levels}
 
@@ -302,6 +305,11 @@ itcl::class gaia::GaiaContour {
    #  Add the controls for the contour levels and attributes.
    protected method add_att_controls_ {} {
 
+      itk_component add attrule {
+         LabelRule $w_.attrule -text "Contour levels & attributes:"
+      }
+      pack $itk_component(attrule) -side top -fill x
+
       #  Use a scrolled frame to get all these in a small amount of
       #  real estate.
       itk_component add atframe {
@@ -393,18 +401,28 @@ itcl::class gaia::GaiaContour {
       #  Locate and add all images. The current image is "$target_".
       set images [skycat::SkyCat::get_skycat_images]
 
+      #  Add the local rtdimage, this needs to be selected
+      #  first.
+      set name [$itk_option(-image) cget -file]
+      $itk_component(targets) add \
+         -label "$name ($itk_option(-number))" \
+         -value "$itk_option(-image)" \
+         -command [code $this set_target_ "$itk_option(-image)"]
+
       #  And add to the menu.
       foreach w $images {
-         set name [$w cget -file]
-         set clone [[winfo toplevel $w] cget -number]
-         $itk_component(targets) add \
-            -label "$name ($clone)" \
-            -value "$w" \
-            -command [code $this set_target_ "$w"]
+         if { $w != $itk_option(-image) } {
+            set name [$w cget -file]
+            set clone [[winfo toplevel $w] cget -number]
+            $itk_component(targets) add \
+               -label "$name ($clone)" \
+               -value "$w" \
+               -command [code $this set_target_ "$w"]
+         }
       }
 
       #  Contour self first.
-      set_target_ [lindex $images 0]
+      set_target_ $itk_option(-image)
    }
 
    #  Set the "target" image.
@@ -446,8 +464,7 @@ itcl::class gaia::GaiaContour {
          set x0 [expr $x0+$dw]
          set y0 [expr $y0+$dh]
          set bounds [list $x0 $y0 $x1 $y1]
-         puts "region set to: $x0 $y0 $x1 $y1"
-         
+
          #  Set the tag used to control clear etc.
          $itk_option(-rtdimage) configure -grid_tag $itk_option(-contour_tag)
 
@@ -470,7 +487,7 @@ itcl::class gaia::GaiaContour {
       if { $levels != {} } {
          return $levels
       } else {
-         warning_dialog "You must give some valid contour levels"
+         info_dialog "You must give some valid contour levels"
          return {}
       }
    }
@@ -490,6 +507,15 @@ itcl::class gaia::GaiaContour {
       return $atts
    }
 
+   #  Clear the attributes and levels.
+   public method clear_levels {} {
+      for {set i 1} {$i <= $itk_option(-maxcnt)} {incr i} {
+         $itk_component(value$i) configure -value {}
+         $itk_component(colour$i) configure -value $coldefault_($i)
+         $itk_component(width$i) configure -value 1
+      }
+   }
+
    #  Get the rtdimage that is needed for contouring. This can be the
    #  current image, a one displayed elsewhere or an image in a disk
    #  file. A filename takes preference over a one displayed already.
@@ -497,8 +523,8 @@ itcl::class gaia::GaiaContour {
       if { $imagefile_ != {} } {
 
          #  Displayed on disk, create an rtdimage and return this.
-         if { [catch {image create rtdimage -file $imagefile_} rtdimage] == 0} {
-            error_dialog "Failed to access image: $imagefile_, for contouring"
+         if { [catch {image create rtdimage -file $imagefile_} rtdimage] != 0} {
+            error_dialog "Failed to access image: $imagefile_, for contouring ($rtdimage)"
             set rtdimage {}
          }
 
@@ -506,13 +532,13 @@ itcl::class gaia::GaiaContour {
 
          #  Name of an rtdimage, just check that this isn't the
          #  current one and that it exists.
-         if { [catch {$target_ get_image} rtdimage] == 0 }  {
+         if { [catch {$target_ get_image} rtdimage] != 0 }  {
+            error "Failed to locate the displayed image for contouring"
+            set rtdimage {}
+         } else {
             if { $rtdimage == $itk_option(-rtdimage) } {
                set rtdimage {}
             }
-         } else {
-            error "Failed to locate the displayed image for contouring"
-            set rtdimage {}
          }
       }
       return $rtdimage
@@ -522,6 +548,89 @@ itcl::class gaia::GaiaContour {
    protected method remove_contours_ {} {
       $itk_option(-canvas) delete $itk_option(-contour_tag)
       set drawn_ 0
+   }
+
+   #  Level generation commands. XXX Just use simple generation commands,
+   #  no need to look at image data levels.
+   protected method add_gen_controls_ {} {
+
+      #  Add section header and frame to contain generation commands
+      #  in a line.
+      itk_component add genrule {
+         LabelRule $w_.genrule -text "Contour generation:"
+      }
+      pack $itk_component(genrule) -side top -fill x
+      itk_component add gframe1 {
+         frame $w_.gframe1
+      }
+      itk_component add gframe2 {
+         frame $w_.gframe2
+      }
+
+      #  Number of contours to generate.
+      itk_component add ncont {
+         util::LabelMenu $itk_component(gframe1).ncont \
+            -relief raised \
+            -text {Number:}
+      }
+      pack $itk_component(ncont) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(ncont) \
+         {Number of contour levels to generate}
+      for {set i 0} {$i < $itk_option(-maxcnt)} {incr i} {
+         $itk_component(ncont) add \
+            -label $i \
+            -value $i
+      }
+      $itk_component(ncont) configure -value 10
+
+      #  Starting value.
+      itk_component add start {
+         LabelEntry $itk_component(gframe1).start \
+            -validate real \
+            -text "Start:"
+      }
+      pack $itk_component(start) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(start) \
+         {Starting point for level generation}
+
+      #  Increment.
+      itk_component add incre {
+         LabelEntry $itk_component(gframe1).incre \
+            -validate real \
+            -text "Increment:"
+      }
+      pack $itk_component(incre) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(incre) \
+         {Increment between generated levels}
+
+      #  Type of generation.
+      itk_component add ctype {
+         util::LabelMenu $itk_component(gframe2).ctype \
+            -relief raised \
+            -text {Algorithm:}
+      }
+      pack $itk_component(ctype) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(ctype) \
+         {Algorithm to use for contour generation}
+      foreach type {linear magnitude} {
+         $itk_component(ctype) add \
+            -label $type \
+            -value $type
+      }
+      $itk_component(ctype) configure -value linear
+
+      #  Button to generate contours.
+      itk_component add generate {
+         button $itk_component(gframe2).gen \
+            -text "Generate" \
+            -command [code $this generate_contours_]
+      }
+      pack $itk_component(generate) -side left -fill x -ipadx 1m -ipady 1m
+      add_short_help $itk_component(generate) \
+         {Generate contours}
+
+      pack $itk_component(gframe1) -side top -fill x -ipadx 1m -ipady 1m
+      pack $itk_component(gframe2) -side top -fill x -ipadx 1m -ipady 1m
    }
 
    #  Configuration options: (public variables)

@@ -51,7 +51,7 @@ itk::usual GaiaImageMBand {}
 # GaiaImageMBand is an itcl widget class used to display a "measure
 # band" showing the distance between two points in world coordinates.
 
-class rtd::GaiaImageMBand {
+itcl::class gaia::GaiaImageMBand {
     inherit util::FrameWidget
 
     # create a new object (the frame only ensures that this class
@@ -69,7 +69,7 @@ class rtd::GaiaImageMBand {
     
     # start displaying the measure band
 
-    method start {x y} {
+    public method start {x y} {
 	$canvas_ delete mband
 
 	if {"[$image_ wcscenter]" == ""} {
@@ -111,8 +111,7 @@ class rtd::GaiaImageMBand {
 		-tags "mband mband_${i}_text"
 	}
 
-	# save and set cursor
-	set saved_cursor_ [$canvas_ cget -cursor]
+	# set cursor
 	$canvas_ config -cursor $itk_option(-cursor)
 
 	# save and set bindings
@@ -125,7 +124,8 @@ class rtd::GaiaImageMBand {
 	bind $tag <Shift-Motion> { }
 	bind $tag <Control-Motion> [code $this mband %x %y 0]
 	bind $tag <Shift-B3-Motion> [code $this mband %x %y 0]
-	bind $tag <Control-B3-Motion> [code $this mband %x %y 0]
+	#bind $tag <Control-B3-Motion> [code $this mband %x %y 0]
+        bind $tag <Control-B3-Motion> { }
 
 	# make arrow keys move mouse pointer by one pixel
 	bind $tag <Left> "$image_ warp -1 0"
@@ -139,9 +139,9 @@ class rtd::GaiaImageMBand {
     
     # stop displaying the measure band and restore cursor and bindings
 
-    method stop {} {
+    public method stop {} {
 	$canvas_ delete mband
-	$canvas_ config -cursor $saved_cursor_
+	$canvas_ config -cursor $itk_option(-defaultcursor)
 	bindtags $canvas_ $saved_bindtags_
     }
 
@@ -198,6 +198,8 @@ class rtd::GaiaImageMBand {
     # default cursor when drawing
     itk_option define -cursor cursor Cursor {draft_small}
 
+    # default cursor when not drawing
+    itk_option define -defaultcursor defaultCursor DefaultCursor {}
 
     # -- protected vars -- 
 
@@ -212,9 +214,6 @@ class rtd::GaiaImageMBand {
 
     # Y starting point of line .. image coordinates
     protected variable y_ 0
-
-    # saved cursor, restored after drawing
-    protected variable saved_cursor_ 
 
     # saved canvas bindings, restored later
     protected variable saved_bindtags_ 

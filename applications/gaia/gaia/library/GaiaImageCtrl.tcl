@@ -95,6 +95,19 @@ itcl::class gaia::GaiaImageCtrl {
       }
    }
 
+   #  This method is called from the base class (TopLevelWidget) after all
+   #  the options have been evaluated
+   protected method init {} {
+      skycat::SkyCatCtrl::init
+
+      #  Add image band control (overrides Rtd version by resetting
+      #  the image bindings).
+      gaia::GaiaImageMBand $w_.newmband \
+         -image $this \
+         -defaultcursor $itk_option(-cursor)
+   }
+
+
    #  Make the panel info subwindow. Override to use GaiaImagePanel,
    #  rather than RtdImagePanel. Also remove the make_grid_item capability.
    protected method make_panel_info {panel} {
