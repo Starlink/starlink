@@ -82,13 +82,13 @@
 
 *  Add a header to the textual information.
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
-         CALL CAT_PUTXT( CI, 'COMMENT', '>>>>> Coordinate system '//
+         CALL CAT_PUTXT( CI, 'COMMENT', '      Coordinate system '//
      :                   'information follows, stored ', STATUS )
-         CALL CAT_PUTXT( CI, 'COMMENT', '>>>>> as an AST FrameSet '//
+         CALL CAT_PUTXT( CI, 'COMMENT', '      as an AST FrameSet '//
      :                   '(see Starlink User Note 210).', STATUS )
-         CALL CAT_PUTXT( CI, 'COMMENT', '>>>>> The coordinates '//
+         CALL CAT_PUTXT( CI, 'COMMENT', '      The coordinates '//
      :                   'stored in columns X and Y of the', STATUS )
-         CALL CAT_PUTXT( CI, 'COMMENT', '>>>>> table refer to the '//
+         CALL CAT_PUTXT( CI, 'COMMENT', '      table refer to the '//
      :                   'PIXEL Frame within this FrameSet.', STATUS )
          CALL CAT_PUTXT( CI, 'COMMENT', ' ', STATUS )
 
