@@ -113,15 +113,6 @@
 *    Ask if an event dataset is wanted rather than a list of HDS arrays.
       CALL USI_GET0L( 'EVENT', EVENT, STATUS )
 
-*    Open output file
-      IF ( EVENT ) THEN
-        CALL ADI_NEW0( 'EventDS', OFID, STATUS )
-        CALL USI_CREAT( 'OUTFILE', OFID, OFILID, STATUS )
-      ELSE
-        CALL USI_TASSOCO( 'OUTFILE', 'EventDS', OFID, STATUS )
-        CALL ADI1_GETLOC( OFID, LOCO, STATUS )
-      END IF
-
 *  Get a description of the file either from the user or from the SCAR
 *  descriptor file
       IF ( SCAR ) THEN
@@ -155,11 +146,18 @@
 
       END IF
 
+*    Open output file
+      IF ( EVENT ) THEN
+        CALL ADI_NEW0( 'EventDS', OFID, STATUS )
+        CALL ADI_CPUT0I( OFID, 'NEVENT', NROWS, STATUS )
+        CALL USI_CREAT( 'OUTFILE%hds', OFID, OFILID, STATUS )
+      ELSE
+        CALL USI_CREAT( 'OUTFILE%hds', ADI__NULLID, OFID, STATUS )
+        CALL ADI1_GETLOC( OFID, LOCO, STATUS )
+      END IF
+
 *  Create output arrays and map them
       IF ( EVENT ) THEN
-
-*    Set maximum number of events
-        CALL ADI_CPUT0I( OFID, 'NEVENT', NROWS, STATUS )
 
 *    Create lists in output file
         DO LP = 1, NCOLS
