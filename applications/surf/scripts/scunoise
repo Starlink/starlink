@@ -30,6 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
+#        Revision 1.4  1998/06/17 03:51:51  timj
+#        Correct docs
+#
 #        Revision 1.3  1998/06/15 21:30:43  timj
 #        Use __END__ correctly!
 #
@@ -1598,9 +1601,9 @@ __END__
 *    colour.
 
 *  Usage:
-     scunoise [-h | -v | -d] [obsdate] [runnr]
+*     scunoise [-h | -v | -d] [obsdate] [runnr]
 
-*  ADAM Parameter:
+*  ADAM Parameters:
 *    -h
 *      Return a help message only.
 *    -v
