@@ -38,6 +38,7 @@ $libs = "$starlibs $nbslibs $fortranlibs ";
 # the contents of the Makefile that is written.
 WriteMakefile(
     'NAME'      => 'Starlink::NBS',
+    'PREREQ_PM' => { 'Starlink::EMS' => undef },
     'VERSION_FROM' => 'NBS.pm', # finds $VERSION
     'LIBS'      => [ "$libs"],   # e.g., '-lm' 
     'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING' 
