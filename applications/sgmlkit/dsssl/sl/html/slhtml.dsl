@@ -64,8 +64,15 @@ depending on whether the element is to be chunked.
 						      (navbars? #t)
 						      (uplink #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
+	 (chunk-it? (or force-chunk?
+			(chunk?)	;if this is a chunk
+			is-de?		;or this is the document-element 
+			(and (chunking?) system-id) ;or we've specified a
+					;sysid (and we haven't
+					;turned off chunking)
+			))
 	 (doc-sosofo 
-	  (if (or force-chunk? (chunk?) is-de?)
+	  (if chunk-it? ; (or force-chunk? (chunk?) is-de?)
 	      (make element gi: "html"
 		    (make element gi: "head"
 			  (make element gi: "title" title-sosofo)
@@ -91,13 +98,7 @@ depending on whether the element is to be chunked.
 		public-id: %html-pubid%)
 	      (empty-sosofo))
 	  doc-sosofo)
-	(if (or force-chunk?
-		(chunk?)		;if this is a chunk
-		is-de?			;or this is the document-element
-		(and (chunking?) system-id) ;or we've specified a
-					    ;sysid (and we haven't
-					    ;turned off chunking)
-		)
+	(if chunk-it?
 	    (make entity system-id: (or system-id (html-file))
 	      (make document-type
 		name: "html"

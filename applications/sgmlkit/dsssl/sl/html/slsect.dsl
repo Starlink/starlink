@@ -47,7 +47,8 @@ section ready to flow into whatever contains this.
 				 (normalize "title"))))
     (if title
 	(html-document (make formatting-instruction data: (data title))
-		       bod)
+		       bod
+		       navbars?: (not suppress-navig))
 	(error "Can't find title of section"))))
 
 <routine>

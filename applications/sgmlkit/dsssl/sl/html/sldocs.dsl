@@ -27,7 +27,9 @@ then generates an HTML file
 	  (literal (string-append (root-file-name) ":" extlist ":"))))
     (html-document
      (process-node-list (getdocinfo 'title))
-     (process-matching-children 'docbody))))
+     (process-matching-children 'docbody)
+     ;; don't respect suppress-navig here, or we lose the TOC
+     )))
 
 <routine>
 <description>

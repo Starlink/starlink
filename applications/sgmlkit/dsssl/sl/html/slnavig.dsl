@@ -693,12 +693,33 @@ generated HTML documents.
 ;; contents.  This is the only place we need to worry about this --
 ;; the section-footer-navigation functions will be invoked only if
 ;; we're chunking.
+
 (define (root-footer-navigation elemnode)
   (if (chunking?)
-      (make sequence
-         (make element gi: "h2"
-           (literal "Contents"))
-         (make-contents (getdocbody) 4 #t))
-      (empty-sosofo)))
+      (if separate-toc
+	  (let ((tocfname (string-append %toc-file-root% %html-ext%)))
+	    (make sequence
+	      (make element gi: "a"
+		    attributes: `(("HREF" ,tocfname))
+		    (literal "Table of Contents"))
+	      (html-document
+	       (literal "Table of Contents")
+	       (make sequence
+		 (make element gi: "h1"
+		       (literal "Table of Contents"))
+		 (make-contents (getdocbody) 4 #t))
+	       system-id: tocfname
+	       navbars?: #f		; This is essential.  If not
+					; present, we get into an
+					; infinite loop, since
+					; html-document calls
+					; footer-navigation if
+					; navbars? is true 
+	       )))
+	  (make sequence
+	    (make element gi: "h2"
+		  (literal "Contents"))
+	    (make-contents (getdocbody) 4 #t)))
+    (empty-sosofo)))
 
 

@@ -228,6 +228,9 @@ PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN"	../dsssl/sl/common/
 PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN"	../dsssl/sl/html/slparams.dsl
 PUBLIC "-//Starlink//TEXT DSSSL LaTeX Parameterisation//EN"	../dsssl/sl/latex/slparams.dsl
 
+	-- Back door for hacky extra code.  See the file for explanation --
+PUBLIC "-//Starlink//TEXT DSSSL HTML Special Code//EN"		../dsssl/sl/html/slspecial.dsl
+
 	-- Following public-ids are for non-Starlink entities --
 
 	-- HTML 4 --

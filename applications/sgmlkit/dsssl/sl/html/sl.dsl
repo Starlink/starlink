@@ -10,6 +10,7 @@
 
 <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
 <!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
+<!ENTITY slspecial.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Special Code//EN">
 
 <!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
 <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
@@ -82,10 +83,38 @@ Imposes the link policy.
 ]]>
 
 
-<codegroup 
+<!--codegroup 
   use="code.lib code.common code.maths code.back" 
-  id=html>
+  id=code.html-->
+<codegroup 
+  id=code.html>
 <title>HTML-specific stylesheet code
+<description>
+This codegroup includes most of the stylesheet code.  This code is in
+a separate codegroup so that the `main' codegroup below (id=html) can
+include any definitions of other functions, which will override
+definitions included here.
+
+
+<!-- include the other parts by reference -->
+
+
+&slroutines.dsl
+&sldocs.dsl
+&slsect.dsl
+&slmisc.dsl
+&commonparams.dsl
+&slparams.dsl
+&slhtml.dsl
+&slnavig.dsl
+&sltables.dsl
+&sllinks.dsl
+
+
+<codegroup
+  use="code.lib code.common code.maths code.back code.html" 
+  id=html>
+<title>HTML stylesheet
 <description>
 This is the DSSSL stylesheet for converting the Starlink DTD to HTML.
 
@@ -113,18 +142,17 @@ transformation extensions of Jade.</description>
   (external-procedure "UNREGISTERED::James Clark//Procedure::all-element-number"))
 
 
-<!-- include the other parts by reference -->
+<routine>
+<description>
+Include the list of hacks/overrides.  Since these are in the `main'
+style-specification element (codegroup in DSSSLCODE terms) which
+calls the other style-specifications and external-specifications
+(codegroup and codereference), and so definitions here override
+definitions elsewhere.
+<codebody>
+&slspecial.dsl;
 
-&slroutines.dsl
-&sldocs.dsl
-&slsect.dsl
-&slmisc.dsl
-&commonparams.dsl
-&slparams.dsl
-&slhtml.dsl
-&slnavig.dsl
-&sltables.dsl
-&sllinks.dsl
+
 
 <routine>
 <description>

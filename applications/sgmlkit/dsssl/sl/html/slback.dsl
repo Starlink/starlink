@@ -68,6 +68,12 @@ in mode make-manifest-mode in sl.dsl
 
 (define (make-manifest-backmatter)
   (make sequence
+    (if separate-toc
+	;; Not really _back_matter, but a special case which is most
+	;; conveniently handled here.
+	(make fi data: (string-append %toc-file-root% %html-ext% "
+"))
+	(empty-sosofo))
     (if (hasbackmatter?)
 	(make fi data: (string-append (backmatter-sys-id) "
 "))

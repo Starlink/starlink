@@ -87,6 +87,37 @@ generated HTML file.
 (define stream-output #f)
 
 <routine>
+<routinename>suppress-navig
+<description>
+<p>If true, then the navigation bars at the top and bottom of pages
+should be suppressed.
+<p>Set this with the Jade option <code>-V suppress-navig</code>
+<returnvalue type=boolean>False if navigation bars are to be included
+in output pages.
+<codebody>
+(define suppress-navig #f)
+
+<routine>
+<routinename>separate-toc
+<description>
+<p>If true, then the front-page TOC will be put on a separate page
+from the front page.  The page will have the name
+<code>(append-string %toc-file-root% %html-ext%)</code>.
+<p>Set this with the Jade option <code>-V separate-toc</code>
+<returnvalue type=boolean>True if the TOC is to be on a separate page.
+<codebody>
+(define separate-toc #f)
+
+<routine>
+<routinename>%toc-file-root%
+<description>
+<p>The root of the name of the TOC file, used if
+<code>separate-toc</code> is true.
+<returnvalue type=string>Root of TOC file name.
+<codebody>
+(define %toc-file-root% "TOC")
+
+<routine>
 <routinename>%override-root-file-name%
 <description>
 If not <code>#f</>, then this is the name of a file which is to become the 
