@@ -29,16 +29,16 @@ if %?HAVEDOCS%
 # have to be predist-only.
 .tex.dvi:
 	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi $<
+	  latex2dvi ${<:.tex=}
 .dvi.ps:
 	dvips -o $@ $<
 .tex.ps:
 	LATEX=latex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi $<
+	  latex2dvi ${<:.tex=}
 	dvips -o $@ $(<:.tex=.dvi)
 .tex.pdf:
 	LATEX=pdflatex; latex2dvi () { $(LATEX2DVI); }; \
-	  latex2dvi $<
+	  latex2dvi ${<:.tex=}
 endif %?HAVEDOCS%
 if %?LATEXDOCS%
 # Don't express a dependency via the directory .htx, or else Make
