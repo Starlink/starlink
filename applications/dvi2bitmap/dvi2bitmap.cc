@@ -428,8 +428,6 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 
     while (! end_of_file)
     {
-	PkGlyph *glyph;
-
 	if (skipPage)
 	    ev = dvif->getEndOfPage();
 	else
@@ -445,13 +443,15 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	    initialisedInch = true;
 	}
 
-	if (DviFilePage *page = dynamic_cast<DviFilePage*>(ev))
-	    if (page->isStart)
+	if (DviFilePage *test = dynamic_cast<DviFilePage*>(ev))
+	{
+	    DviFilePage &page = *test;
+	    if (page.isStart)
 	    {
 		pagenum++;
 
 		// Are we to print this page?
-		if (! PR.isSelected(pagenum, page->count))
+		if (! PR.isSelected(pagenum, page.count))
 		    skipPage = true;
 		else
 		{
@@ -469,13 +469,13 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			int last, i;
 			// find last non-zero count
 			for (last=9; last>=0; last--)
-			    if (page->count[last] != 0)
+			    if (page.count[last] != 0)
 				break;
 			
 			SSTREAM pageind;
-			pageind << '[' << page->count[0];
+			pageind << '[' << page.count[0];
 			for (i=1; i<=last; i++)
-			    pageind << '.' << page->count[i];
+			    pageind << '.' << page.count[i];
 			pageind << '\0';
 			string ostr = pageind.str();
 			if (outcount + ostr.length() > 78)
@@ -553,17 +553,19 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 		    }
 		}
 	    }
-	else if (DviFileSetChar *sc = dynamic_cast<DviFileSetChar*>(ev))
+	}
+	else if (DviFileSetChar *test = dynamic_cast<DviFileSetChar*>(ev))
 	{
 	    if (curr_font == 0 || bitmap == 0)
-		throw DviBug ("curr_font or bitmap not initialised setting char");
-	    glyph = curr_font->glyph(sc->charno);
+		throw DviBug ("font or bitmap not initialised setting char");
+	    DviFileSetChar& sc = *test;
+	    PkGlyph& glyph = *curr_font->glyph(sc.charno);
 	    if (verbosity > normal)
 	    {
-		cerr << "glyph `" << glyph->characterChar()
-		     << "\' (" << glyph->characterCode() << ')';
+		cerr << "glyph `" << glyph.characterChar()
+		     << "\' (" << glyph.characterCode() << ')';
 		if (verbosity > debug)
-		    cerr << " size " << glyph->w() << 'x' << glyph->h()
+		    cerr << " size " << glyph.w() << 'x' << glyph.h()
 			 << " at position ("
 			 << dvif->currH() << ',' << dvif->currV()
 			 << ") plus oneInch=" << oneInch;
@@ -572,31 +574,34 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	    // calculate glyph positions, taking into account the
 	    // offsets for the bitmaps, and the (1in,1in)=(72pt,72pt)
 	    // = (resolution px,resolution px) offset of the TeX origin.
-	    int x = dvif->currH() + glyph->hoff() + oneInch;
-	    int y = dvif->currV() + glyph->voff() + oneInch;
+	    int x = dvif->currH() + glyph.hoff() + oneInch;
+	    int y = dvif->currV() + glyph.voff() + oneInch;
 	    bitmap->paint (x, y,
-			   glyph->w(), glyph->h(),
-			   glyph->bitmap());
+			   glyph.w(), glyph.h(),
+			   glyph.bitmap());
 	}
-	else if (DviFileSetRule *sr = dynamic_cast<DviFileSetRule*>(ev))
+	else if (DviFileSetRule *test = dynamic_cast<DviFileSetRule*>(ev))
 	{
+	    DviFileSetRule& sr = *test;
 	    int x = dvif->currH() + oneInch;
 	    int y = dvif->currV() + oneInch;
-	    bitmap->rule (x,y,sr->w, sr->h);
+	    bitmap->rule (x,y,sr.w, sr.h);
 	}
-	else if (DviFileFontChange *fc =
+	else if (DviFileFontChange *test =
 		 dynamic_cast<DviFileFontChange*>(ev))
 	{
-	    const PkFont *f = fc->font;
+	    DviFileFontChange& fc = *test;
+	    const PkFont *f = fc.font;
 	    curr_font = (f->loaded() ? f : fallback_font);
 	}
-	else if (DviFileSpecial* special =
+	else if (DviFileSpecial* test =
 		 dynamic_cast<DviFileSpecial*>(ev))
 	{
-	    if (!process_special (special->specialString, bitmap, b))
+	    DviFileSpecial& special = *test;
+	    if (!process_special (special.specialString, bitmap, b))
 		if (verbosity > silent)
 		    cerr << "Warning: unrecognised special: "
-			 << special->specialString
+			 << special.specialString
 			 << '\n';
 	}
 	else if (DviFilePostamble *post
