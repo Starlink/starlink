@@ -4,7 +4,7 @@
 *     frepint
 *
 *  Purpose:
-*     Replace INTEGER declarations with INTEGER*8 in Fortran source.
+*     Replace INTEGER by INTEGER*8 in Fortran.
 *
 *  Usage:
 *     frepint [ in [ out ] ] 
@@ -18,17 +18,24 @@
 *
 *     Attention is paid to fortran 77 source format, so that lines are
 *     more than 72 characters long are avoided (unless they were there
-*     in the first place.
+*     in the first place).
 *
 *     Some effort is made to make the output aesthetically pleasing:
 *     line breaks are done, where possible, following the usage in, e.g.,
 *     KAPPA.  An attempt is made copy the style of case usage and bracket 
 *     spacing from the input.
 *
-*     The program will warn if any INTEGER*X declarations already exist
-*     in the code, and will not modify these.
+*     The program will write a warning on standard error for certain 
+*     constructions in the code which are likely to cause trouble after
+*     the mass redeclaration of INTEGER as INTEGER*8 has occurred.
+*     These constructions are:
+*        - INTEGER * n declarations which already exist in the code 
+*          (these are not modified)
+*        - The IOSTAT keyword in I/O statements
+*        - EQUIVALENCE statements
 *
-*     Note: although this program behaves as a filter, it is written on
+*  Notes:
+*     Although this program behaves as a filter, it is written on
 *     the assumption that it will be run on a file of a finite length:
 *     it may buffer large amounts of input before writing output, and
 *     it may not free up memory.
@@ -67,8 +74,7 @@
 *     Main routine of C program.
 *
 *  Description:
-*     This routine provides a monolith for the filter programs in the
-*     EXTREME package.
+*     Invokes the appropriate filter function.
 *-
 */
 
@@ -124,7 +130,6 @@
       int j;
       int k;
       int leng;
-      int linend;
       int nc;
       int nspc;
       int skipspc;
@@ -137,7 +142,9 @@
 
 /* Get characters from the lex tokeniser.  As well as the token id which
    is the return value of yylex, the global yylval points to the 
-   characters which constituted this token. */
+   characters which constituted this token, and the global ymatst points
+   to the part of yylval where the syntactically significant part of
+   that token begins. */
       leng = 0;
       while ( ( tok = yylex() ) || ( yylval != NULL ) ) {
          if ( leng + 1 >= tbufsiz ) {
@@ -196,7 +203,6 @@
    possible if we have the chance. */
                      if ( col + nc + ( pc - tbuf[ j ].string ) 
                               - MIN( nspc, skipspc ) <= 73 ) {
-                        linend = 0;
                         for ( k = i + 1; k <= j; k++ ) {
                            for ( qc = tbuf[ k ].string; c = *qc; qc++ ) {
                               if ( c == ' ' && skipspc && 
@@ -208,13 +214,12 @@
                                  switch( c ) {
                                     case '\n':
                                        col = 1;
-                                       linend = 1;
+                                       skipspc = 0;
                                        break;
                                     case '\t':
                                        col += 8;
                                        break;
                                     case '!':
-                                       linend = 1;
                                        col++;
                                        break;
                                     default:
@@ -266,9 +271,19 @@
 /* Any other token. */
          else {
             if ( tbuf[ i ].tokval == INTEGER && tbuf[ i + 1 ].tokval == '*' ) {
-               fprintf( stderr, "%s: INTEGER*%s declaration found\n", 
+               fprintf( stderr, "%s: INTEGER*%s declaration not changed\n", 
                                 name, tbuf[ i + 2 ].strmat );
             }
+            if ( tbuf[ i ].tokval == EQUIVALENCE ) {
+               fprintf( stderr, "%s: EQUIVALENCE statement found\n", name );
+            }
+            if ( tbuf[ i ].tokval == IOSTAT && 
+                 tbuf[ i + 1 ].tokval == '=' &&
+                 tbuf[ i + 2 ].tokval == IDENTIFIER ) {
+               fprintf( stderr, "%s: IOSTAT used with variable %s\n", name, 
+                        tbuf[ i + 2 ].strmat );
+            }
+
          }
       }
 
