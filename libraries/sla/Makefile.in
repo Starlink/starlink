@@ -398,11 +398,10 @@ SCRIPTS = $(bin_SCRIPTS)
 DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
 depcomp = $(SHELL) $(top_srcdir)/../../depcomp
 am__depfiles_maybe = depfiles
-@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/gresid.fpp__win \
-@AMDEP_TRUE@	$(DEPDIR)/gresid.fpp_dec_osf \
+@AMDEP_TRUE@DEP_FILES = $(DEPDIR)/gresid.fpp__vms \
+@AMDEP_TRUE@	$(DEPDIR)/gresid.fpp__win \
 @AMDEP_TRUE@	$(DEPDIR)/gresid.fppdefault \
-@AMDEP_TRUE@	$(DEPDIR)/random.fpp__win \
-@AMDEP_TRUE@	$(DEPDIR)/random.fpp_dec_osf \
+@AMDEP_TRUE@	$(DEPDIR)/random.fpp__vms $(DEPDIR)/random.fpp__win \
 @AMDEP_TRUE@	$(DEPDIR)/random.fppdefault \
 @AMDEP_TRUE@	$(DEPDIR)/rtl_random.Plo $(DEPDIR)/wait.f__vms \
 @AMDEP_TRUE@	$(DEPDIR)/wait.f__win $(DEPDIR)/wait.fdefault
@@ -423,10 +422,10 @@ DIST_COMMON = $(srcdir)/Makefile.starconf ../../config.guess \
 	../../config.sub ../../depcomp ../../install-sh ../../ltmain.sh \
 	../../missing ../../mkinstalldirs Makefile.am Makefile.in \
 	acinclude.m4 aclocal.m4 component.xml.in config.h.in configure \
-	configure.ac gresid.fpp__win gresid.fpp_dec_osf \
-	gresid.fppdefault install-with-manifest.in random.fpp__win \
-	random.fpp_dec_osf random.fppdefault rtl_random.c wait.f__vms \
-	wait.f__win wait.fdefault
+	configure.ac gresid.fpp__vms gresid.fpp__win gresid.fppdefault \
+	install-with-manifest.in random.fpp__vms random.fpp__win \
+	random.fppdefault rtl_random.c wait.f__vms wait.f__win \
+	wait.fdefault
 SOURCES = $(libsla_la_SOURCES)
 
 all: $(BUILT_SOURCES) config.h
@@ -528,11 +527,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gresid.fpp__vms@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gresid.fpp__win@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gresid.fpp_dec_osf@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/gresid.fppdefault@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/random.fpp__vms@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/random.fpp__win@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/random.fpp_dec_osf@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/random.fppdefault@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/rtl_random.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/wait.f__vms@am__quote@

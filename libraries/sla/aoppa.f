@@ -96,15 +96,32 @@
 *   7)  Repeated, computationally-expensive, calls to sla_AOPPA for
 *       times that are very close together can be avoided by calling
 *       sla_AOPPA just once and then using sla_AOPPAT for the subsequent
-*       times.  Fresh calls to sla_AOPPA will be needed only when changes
-*       in the precession have grown to unacceptable levels or when
-*       anything affecting the refraction has changed.
+*       times.  Fresh calls to sla_AOPPA will be needed only when
+*       changes in the precession have grown to unacceptable levels or
+*       when anything affecting the refraction has changed.
 *
 *  Called:  sla_GEOC, sla_REFCO, sla_EQEQX, sla_AOPPAT
 *
-*  P.T.Wallace   Starlink   23 May 2002
+*  P.T.Wallace   Starlink   24 October 2003
 *
-*  Copyright (C) 2002 P.T.Wallace and CCLRC
+*  Copyright (C) 2003 P.T.Wallace and CCLRC
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the 
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+*    Boston, MA  02111-1307  USA
+*
 *-
 
       IMPLICIT NONE

@@ -61,9 +61,26 @@
 *     sla_DVN         normalize vector
 *     sla_PRENUT      precession/nutation matrix
 *
-*  P.T.Wallace   Starlink   17 September 2001
+*  P.T.Wallace   Starlink   24 October 2003
 *
-*  Copyright (C) 2001 Rutherford Appleton Laboratory
+*  Copyright (C) 2003 Rutherford Appleton Laboratory
+*
+*  License:
+*    This program is free software; you can redistribute it and/or modify
+*    it under the terms of the GNU General Public License as published by
+*    the Free Software Foundation; either version 2 of the License, or
+*    (at your option) any later version.
+*
+*    This program is distributed in the hope that it will be useful,
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*    GNU General Public License for more details.
+*
+*    You should have received a copy of the GNU General Public License
+*    along with this program (see SLA_CONDITIONS); if not, write to the 
+*    Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
+*    Boston, MA  02111-1307  USA
+*
 *-
 
       IMPLICIT NONE
@@ -74,7 +91,7 @@
       DOUBLE PRECISION CR
       PARAMETER (CR=499.004782D0)
 
-*  Gravitational radius of the sun x 2 (2*mu/c**2, AU)
+*  Gravitational radius of the Sun x 2 (2*mu/c**2, AU)
       DOUBLE PRECISION GR2
       PARAMETER (GR2=2D0*9.87063D-9)
 
