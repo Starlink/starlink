@@ -154,7 +154,9 @@ itcl::class gaia::GaiaImageSpectrum {
       ::Blt_ActiveLegend $graph_
       ::Blt_Crosshairs $graph_
       ::Blt_ClosestPoint $graph_
-      bind bltCrosshairs <Any-Motion> [code $this dispXY %x %y]
+      bind bltCrosshairs$this <Any-Motion> [code $this dispXY %x %y]
+      blt::AddBindTag $graph_ bltCrosshairs$this
+
 
       # Tk frame for X,Y positions.
       itk_component add fpos {
