@@ -27,7 +27,8 @@ AC_PROG_FC
 AC_PROG_LIBTOOL
 
 dnl    Declare the build dependencies for this package
-STAR_DECLARE_DEPENDENCIES(build, [ast ndf sae cat])
+STAR_DECLARE_DEPENDENCIES(build, [ast ndf sae cat], link)
+STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 dnl    List the sun/ssn/... numbers which document this package and
 dnl    which are present as .tex files in this directory.
