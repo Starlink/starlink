@@ -100,11 +100,13 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*14		ATYPE			! ADI type of object
       CHARACTER*(DAT__SZLOC)	CLOC			! Component locator
       CHARACTER*(DAT__SZLOC)	MLOC			! ARRAY mapped object
 
       INTEGER			DIMS(DAT__MXDIM)	! Dimensions
       INTEGER			NDIM			! Dimensionality
+      INTEGER			NELM			! Product of DIMS
       INTEGER			VPTR			! Mapped data
 
       LOGICAL			THERE			! Object exists?
@@ -138,7 +140,8 @@
         CALL ADI1_ARYSHP( CLOC, DAT__MXDIM, DIMS, NDIM, ATYPE, STATUS )
 
 *    Map the HDS data
-        CALL ADI1_ARYMAP( CLOC, ATYPE, MLOC, VPTR, STATUS )
+        CALL ADI1_ARYMAP( CLOC, ATYPE, 'READ', MLOC, VPTR, NELM,
+     :                    STATUS )
 
 *    Write to ADI
         IF ( MEMBER .GT. ' ' ) THEN
