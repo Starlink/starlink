@@ -258,10 +258,10 @@
           END IF
           IF ( FSTAT .NE. 0 ) THEN
             CALL ADI2_FITERP( FSTAT, STATUS )
-            CALL MSG_SETC( 'KEY', STATUS )
+            CALL MSG_SETC( 'KEY', KEY )
             CALL ERR_REP( ' ', 'Error comitting keyword ^KEY to disk',
      :                    STATUS )
-            FSTAT = 0
+            GOTO 99
           END IF
           CALL ADI_CPUT0L( KID, '.COMMITTED', .TRUE., STATUS )
         END IF
@@ -269,7 +269,7 @@
       END DO
 
 *  Report any errors
-      IF ( STATUS .NE. SAI__OK ) THEN
+ 99   IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'ADI2_FCOMIT_HDU', STATUS )
       END IF
 
