@@ -841,7 +841,7 @@ sub twodarray2ndf (\@$) {
     my $ndfstatus = &NDF::SAI__OK;
 
     # Initialise the NDF system
-    ndf_begin;
+    ndf_begin();
 
     # Create a new container file, and map the array
     my ($place, $indf, $pntr, $el);
@@ -879,7 +879,7 @@ sub ndf2twodarray ($) {
 
     # Open the file
     $ndfstatus = &NDF::SAI__OK;
-    ndf_begin;
+    ndf_begin();
     ndf_find (NDF::DAT__ROOT(), $NDFname, $indf, $ndfstatus);
 
     # Check the dimensions.  If there are more than two dimensions,
