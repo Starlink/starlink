@@ -5986,7 +5986,11 @@ will no longer write them.
 control table used by \htmlref{POLIMP}{POLIMP} have been expanded.
 Concatenation and replacement can now be combined together, using
 parentheses to indicate the order in which sub-expressions should be
-evaluated.
+evaluated. References to keywords may be included in a replacement
+specification (on either side of the equals sign) by enclosing the name 
+in parentheses. In fact such parentheses may include any general
+character expression, containing nested replacement specifications,
+concatentation, \emph{etc.}
 
 \item The choice of default vector scale in \htmlref{POLPLOT}{POLPLOT}
 has been improved. It now uses the 90\% percentile point, so that 10\% of 
@@ -6001,6 +6005,14 @@ could be processed by \htmlref{POLIMP}{POLIMP} when run as a monolith.
 
 \item A bug in \htmlref{POLEXT}{POLEXT} has been fixed which prevented 
 POLEXT from being able to change an IMGID value. 
+
+\item Specifying the keyword STARTHELP when starting \htmlref{POLKA}{POLKA} 
+no longer requires POLKA to use a private colour map.
+
+\item \htmlref{POLKA}{POLKA} has been re-implemented so that the Tcl script
+which creates the GUI is executed in a different process to the POLKA
+A-task. This enables POLPACK to be run succesfully as a monolith, from
+the ICL or IRAF cl command languages for instance.
 
 \item A bug in \htmlref{POLKA}{POLKA} has been fixed which resulted in a
 Tcl error being reported when Saving or Exiting if any of the image names 
