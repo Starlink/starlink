@@ -99,8 +99,11 @@
             if { [ catch { $menu index "custom" } ] } {
                $menu add command \
                   -label "custom" \
-                  -command [ code "$this configure -value \
-                             \[ $itk_component(percentiledialog) activate \]" ]
+                  -command [ code "\
+                           $itk_component(percentiledialog) setvec \
+                                                  \[ $this cget -value \]; \
+                           $this configure -value \
+                            \[ $itk_component(percentiledialog) activate \]" ]
             }
 
 #  If we are being asked to withdraw the option, simply remove it from the
@@ -152,13 +155,10 @@
 #-----------------------------------------------------------------------
          set lo [ lindex $value 0 ]
          set hi [ lindex $value 1 ]
-         if { $lo < 0 || $lo > $hi } { 
+         if { $lo < 0 || $lo >= $hi || $hi > 100 } { 
             set lo 0 
+            set hi 100
             configure -value [ list $lo $hi ] 
-         }
-         if { $hi > 100 || $hi < $lo } { 
-            set hi 100 
-            configure -value [ list $lo $hi ]
          }
          $menubutton configure -text [ present $lo $hi ]
       }
