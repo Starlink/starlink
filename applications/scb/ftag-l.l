@@ -1,6 +1,6 @@
 
 CONT			(\n[^cCdD!*\n]....[^ 0\n])
-BLANK			([ \t]|!.*|{CONT})*
+BLANK			([ \t]|!.*|{CONT}|\n[ \t]*!.*)*
 LETTER			[A-Za-z$_%]
 DIGIT			[0-9]
 A			[Aa]
@@ -76,6 +76,7 @@ void count();
 {DIGIT}+{BLANK}				{ count(); return( INTEGER_CONSTANT ); }
 \'(''|[^'\n]|{CONT})*\'{BLANK}		{ count(); return( STRING_CONSTANT ); }
 
+{LETTER}({LETTER}|{DIGIT})*{BLANK}/\(	{ count(); return( TOKEN_BRAC ); }
 {LETTER}({LETTER}|{DIGIT})*{BLANK}	{ count(); return( TOKEN ); }
 
 ":"{BLANK}				{ count(); return( ':' ); }
@@ -87,6 +88,7 @@ void count();
 "/"{BLANK}				{ count(); return( '/' ); }
 "."{BLANK}				{ count(); return( '.' ); }
 ","{BLANK}				{ count(); return( ',' ); }
+"="{BLANK}				{ count(); return( '=' ); }
 
 .([ \t]|{CONT}){BLANK}			{ count(); return( ILLEGAL_CHAR ); }
 [^'\n]{BLANK}				{ count(); return( ILLEGAL_CHAR ); }
