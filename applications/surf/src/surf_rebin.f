@@ -198,6 +198,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.58  1998/10/02 18:55:31  timj
+*     Change MAX_FILE to 256 (was 100)
+*
 *     Revision 1.57  1998/06/09 21:59:21  timj
 *     Ask for smoothing size in calcsky. Calculate smoothing size in pixels
 *     and pass to CALCSKY routine.
@@ -405,7 +408,7 @@ c
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
       INTEGER     MAX_FILE             ! max number of input files
-      PARAMETER (MAX_FILE = 100)
+      PARAMETER (MAX_FILE = 256)
       BYTE BADBIT                      ! Bad bit mask
       PARAMETER (BADBIT = 1)
       
