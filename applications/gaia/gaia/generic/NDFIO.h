@@ -75,8 +75,7 @@ public:
    
    //  Read an NDF and return a pointer to an allocated NDFIO object
    //  NULL if an error occurred.
-   static NDFIO *read( const char *filename, const char *component,
-                       int useShr = 0 );
+   static NDFIO *read( const char *filename, const char *component );
    
    //  Return true if this class uses native byte ordering (The ndf
    //  library does the swapping already, so return 1 here).
