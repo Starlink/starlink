@@ -983,6 +983,9 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* Obtain a pointer to the WcsMap structure. */
    this = (AstWcsMap *) this_object;
 
+/* Obtain the length of the attrib string. */
+   len = strlen( attrib );
+
 /* Check the attribute name and clear the appropriate attribute. */
 
 /* ProjP. */
@@ -2967,6 +2970,9 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
 
 /* Obtain a pointer to the WcsMap structure. */
    this = (AstWcsMap *) this_object;
+
+/* Obtain the length of the attrib string. */
+   len = strlen( attrib );
 
 /* Check the attribute name and test the appropriate attribute. */
 

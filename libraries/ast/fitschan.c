@@ -10141,6 +10141,9 @@ static void LinearSky( AstFrame *phyfrm, int npix, FitsStore *store, char s,
    if( skyfrm ){
       if( SkySys( skyfrm, AST__CAR, store, axlon, axlat, s, method, class ) ){
 
+/* Get the number of Frame axes. */
+         nwcs = astGetNaxes( phyfrm );
+
 /* The CRVAL and CD values need to be converted from radians to degrees
    on the latitude and longitude axes. */
          val = GetItem( &(store->crval), axlat, 0, s, NULL, method, class );

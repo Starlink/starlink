@@ -47,7 +47,7 @@
 
 double astCosd(angle)
 
-double angle;
+const double angle;
 
 {
    double resid;
@@ -70,7 +70,7 @@ double angle;
 
 double astSind(angle)
 
-double angle;
+const double angle;
 
 {
    double resid;
@@ -93,7 +93,7 @@ double angle;
 
 double astTand(angle)
 
-double angle;
+const double angle;
 
 {
    double resid;
@@ -114,7 +114,7 @@ double angle;
 
 double astACosd(v)
 
-double v;
+const double v;
 
 {
    if (v >= 1.0) {
@@ -132,7 +132,7 @@ double v;
 
 double astASind(v)
 
-double v;
+const double v;
 
 {
    if (v <= -1.0) {
@@ -150,7 +150,7 @@ double v;
 
 double astATand(v)
 
-double v;
+const double v;
 
 {
    if (v == -1.0) {

@@ -72,7 +72,8 @@ struct AstPrjPrm *prj;
 
 int astTPNfwd(phi, theta, prj, xx, yy)
 
-double phi, theta, *xx, *yy;
+const double phi, theta;
+double *xx, *yy;
 struct AstPrjPrm *prj;
 
 {
@@ -275,7 +276,8 @@ struct AstPrjPrm *prj;
 
 int astTPNrev(x, y, prj, phi, theta)
 
-double x, y, *phi, *theta;
+const double x, y;
+double *phi, *theta;
 struct AstPrjPrm *prj;
 
 {
