@@ -28,7 +28,6 @@
 #include <config.h>
 
 #include <iostream>
-#include <assert.h>
 #include <string>
 
 #include <unistd.h>		// for STDIN_FILENO
@@ -38,8 +37,10 @@
 
 #ifdef HAVE_CSTD_INCLUDE
 #include <cmath>		// for fabs()
+#include <cassert>
 #else
 #include <math.h>
+#include <assert.h>
 #endif
 
 using STD::cerr;
@@ -1005,6 +1006,7 @@ string DviFile::unitString(DviFile::DviUnits unit)
     }
     assert(false);		// shouldn't happen -- the above
 				// should be all possible unit values
+    return "";			// Keeps the compiler happy
 }
 
 
