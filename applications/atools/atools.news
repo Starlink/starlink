@@ -1,6 +1,6 @@
 1 ATOOLS
 
- Version 1.0 of ATOOLS is now available. It is fully documented in SUN/???.
+ Version 2.0 of ATOOLS is now available. It is fully documented in SUN/???.
 
  ATOOLS is a package of applications which manipulate descriptions
  of coordinate frames, mappings, etc, in the form of AST Objects (see
@@ -8,3 +8,8 @@
  to one of the functions within the AST library. ATOOLS thus provides a
  high-level interface to the AST library. 
 
+  Changes in this release:
+
+  - astfindframe has an extra output parameter called IFRAME 
+  to which is written the index of the closest matching Frame 
+  in the TARGET, or zero if no matching Frame is found.
