@@ -28,7 +28,7 @@ interface IRCAM2NDF
       vpath       'DEFAULT'
       ppath       'CURRENT,DEFAULT'
       prompt      'Data-array configuration to copy'
-      default     'STARE'
+      default     'stare'
       helpkey     '*'
    endparameter
 
