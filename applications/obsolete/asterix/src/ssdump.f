@@ -96,7 +96,7 @@
 *
 *    Local variables :
 *
-      RECORD /FIELD/        FLD(MXCOL)                ! Field display info
+c     RECORD /FIELD/        FLD(MXCOL)                ! Field display info
 
       CHARACTER             CLOC*(DAT__SZLOC)         ! POSIT component
       CHARACTER*(DAT__SZLOC)EQLOC                     ! Equinox component
@@ -132,7 +132,7 @@
       INTEGER               NSRC                      ! # sources in SSDS
       INTEGER               NFLD                      ! # fields to display
       INTEGER               NFLDF                     ! Filtered NFLD
-      INTEGER			SFID			! Input file id
+      INTEGER	            SFID			! Input file id
 
       LOGICAL               DOERR                     ! Output field errors?
       LOGICAL               HEADER                    ! Display a header?
@@ -143,7 +143,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSDUMP Version 2.2-0' )
+        PARAMETER           ( VERSION = 'SSDUMP Version 2.2-1' )
 *-
 
 *    Check status
@@ -197,25 +197,25 @@
 *      Special structures?
         IF ( NAME(1:10) .EQ. 'IMG_COORDS' ) THEN
           CALL SSDUMP_FIND( SLOC, 'X_CORR', DOERR, CCOL, NFLD,
-     :                                           FLD, STATUS )
+     :                                           STATUS )
           CALL SSDUMP_FIND( SLOC, 'Y_CORR', DOERR, CCOL, NFLD,
-     :                                           FLD, STATUS )
+     :                                           STATUS )
 
         ELSE IF ( NAME(1:10) .EQ. 'CEL_COORDS' ) THEN
 
 *        Celestial coordinates
-          CALL SSDUMP_FIND( SLOC, 'RA', DOERR, CCOL, NFLD, FLD,
+          CALL SSDUMP_FIND( SLOC, 'RA', DOERR, CCOL, NFLD,
      :                                                 STATUS )
-          CALL SSDUMP_FIND( SLOC, 'DEC', DOERR, CCOL, NFLD, FLD,
+          CALL SSDUMP_FIND( SLOC, 'DEC', DOERR, CCOL, NFLD,
      :                                                  STATUS )
-          POINT_OK = ( ( FLD(NFLD-1).FLD(1:2) .EQ. 'RA' ) .AND.
-     :                 ( FLD(NFLD).FLD(1:3) .EQ. 'DEC' ) )
+          POINT_OK = ( ( FIELD_FLD(NFLD-1)(1:2) .EQ. 'RA' ) .AND.
+     :                 ( FIELD_FLD(NFLD)(1:3) .EQ. 'DEC' ) )
 
 *        Display in hms?
           IF ( POINT_OK ) THEN
             CALL USI_GET0L( 'HMS', HMS, STATUS )
-            FLD(NFLD-1).HMS = HMS
-            FLD(NFLD).HMS = HMS
+            FIELD_HMS(NFLD-1) = HMS
+            FIELD_HMS(NFLD) = HMS
           END IF
           IF ( STATUS .NE. SAI__OK ) GOTO 99
 
@@ -226,7 +226,7 @@
           IF ( (TYPE(1:4) .EQ. 'LIST') .OR.
      :         (TYPE(1:9).EQ.'EXTENSION') ) THEN
             CALL SSDUMP_FIND( SLOC, NAME(:CHR_LEN(NAME)), DOERR,
-     :                                 CCOL, NFLD, FLD, STATUS )
+     :                                 CCOL, NFLD, STATUS )
           END IF
 
         END IF
@@ -240,11 +240,11 @@
 *    Construct field list string
       DO I = 1, NFLD
         IF ( I .EQ. 1 ) THEN
-          FLIST = FLD(I).FLD
+          FLIST = FIELD_FLD(I)
           FLEN = CHR_LEN(FLIST)
         ELSE
           CALL MSG_SETC( 'REST', FLIST )
-          CALL MSG_SETC( 'FLD', FLD(I).FLD )
+          CALL MSG_SETC( 'FLD', FIELD_FLD(I) )
           CALL MSG_MAKE( '^REST,^FLD', FLIST, FLEN )
         END IF
       END DO
@@ -263,18 +263,19 @@
 *      Check presence of each field
         NFLDF = 0
         DO I = 1, NFLD
-          IF ( CHR_INSET(FLIST(:FLEN),FLD(I).FLD) ) THEN
+          IF ( CHR_INSET(FLIST(:FLEN),FIELD_FLD(I)) ) THEN
             NFLDF = NFLDF + 1
-            FLD(NFLDF) = FLD(I)
+c           FLD(NFLDF) = FLD(I)					! What to do!
+	    print*, 'Fix me!'
           ELSE IF ( I .LT. NFLD ) THEN
-            CDIF = FLD(I+1).COL - FLD(I).COL
-            IF ( DOERR .AND. FLD(I).ETHERE ) THEN
-              CDIF = CDIF + FLD(I+1).ECOL - FLD(I).ECOL
+            CDIF = FIELD_COL(I+1) - FIELD_COL(I)
+            IF ( DOERR .AND. FIELD_ETHERE(I) ) THEN
+              CDIF = CDIF + FIELD_ECOL(I+1) - FIELD_ECOL(I)
             END IF
             DO J = I + 1, NFLD
-              FLD(J).COL = FLD(J).COL - CDIF
-              IF ( DOERR .AND. FLD(I).ETHERE ) THEN
-                FLD(J).ECOL = FLD(J).ECOL - CDIF
+              FIELD_COL(J) = FIELD_COL(J) - CDIF
+              IF ( DOERR .AND. FIELD_ETHERE(I) ) THEN
+                FIELD_ECO(J)L = FIELD_ECOL(J) - CDIF
               END IF
             END DO
             CCOL = CCOL - CDIF
@@ -295,19 +296,19 @@
         CDIF = 0
         NPAGE = 1
         DO I = 1, NFLD
-          IF ( DOERR .AND. FLD(I).ETHERE ) THEN
-            CRHS = FLD(I).ECOL + FLD(I).EWID
+          IF ( DOERR .AND. FIELD_ETHERE(I) ) THEN
+            CRHS = FIELD_ECOL(I) + FIELD_EWID(I)
           ELSE
-            CRHS = FLD(I).COL + FLD(I).WID
+            CRHS = FIELD_COL(I) + FIELD_WID(I)
           END IF
           IF ( CRHS .GT. 132 ) THEN
             IF ( CRHS .GT. 132*NPAGE ) THEN
-              CDIF = CDIF + FLD(I).COL + (NPAGE-1)*132 - FFCOL
+              CDIF = CDIF + FIELD_COL(I) + (NPAGE-1)*132 - FFCOL
               NPAGE = NPAGE + 1
             END IF
-            FLD(I).COL = FLD(I).COL - CDIF
-            IF ( DOERR .AND. FLD(I).ETHERE ) THEN
-              FLD(I).ECOL = FLD(I).ECOL - CDIF
+            FIELD_COL(I) = FIELD_COL(I) - CDIF
+            IF ( DOERR .AND. FIELD_ETHERE(I) ) THEN
+              FIELD_ECOL(I) = FIELD_ECOL(I) - CDIF
             END IF
           END IF
         END DO
@@ -394,46 +395,46 @@
         END IF
 
 *      Positional error data
-        FN = SSDUMP_FN( 'ERRORS', NFLD, FLD )
+        FN = SSDUMP_FN( 'ERRORS', NFLD )
         IF ( DOERR .AND. (FN.GT.0) ) THEN
           CALL SSDUMP_EFMT( SFID, 'ERRORS', STATUS )
           CALL MSG_MAKE( 'Positional errors are at ^ELEVS confidence'/
-     :                        /', units '//FLD(FN).UNITS, TEXT, MLEN )
+     :                        /', units '//FIELD_UNITS(FN), TEXT, MLEN )
           CALL AIO_WRITE( OCH, TEXT(:MLEN), STATUS )
         END IF
 
 *      Tell user about flux units
-        FN = SSDUMP_FN( 'FLUX', NFLD, FLD )
+        FN = SSDUMP_FN( 'FLUX', NFLD )
         IF ( FN .GT. 0 ) THEN
-          IF ( FLD(FN).ETHERE ) THEN
+          IF ( FIELD_ETHERE(FN) ) THEN
             CALL SSDUMP_EFMT( SFID, 'FLUX', STATUS )
-            CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
+            CALL MSG_SETC( 'UNIT', FIELD_UNITS(FN) )
             CALL MSG_MAKE( 'Flux units are ^UNIT, errors are at ^ELEVS'/
      :                                      /' confidence', TEXT, MLEN )
           ELSE
-            CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
+            CALL MSG_SETC( 'UNIT', FIELD_UNITS(FN) )
             CALL MSG_MAKE( 'Flux units are ^UNIT', TEXT, MLEN )
           END IF
           CALL AIO_WRITE( OCH, TEXT(:MLEN), STATUS )
         END IF
 
 *      Tell user about bgnd units
-        FN = SSDUMP_FN( 'BACK', NFLD, FLD )
+        FN = SSDUMP_FN( 'BACK', NFLD )
         IF ( FN .GT. 0 ) THEN
-          IF ( FLD(FN).ETHERE ) THEN
+          IF ( FIELD_ETHERE(FN) ) THEN
             CALL SSDUMP_EFMT( SFID, 'BACK', STATUS )
-            CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
+            CALL MSG_SETC( 'UNIT', FIELD_UNITS(FN) )
             CALL MSG_MAKE( 'Bgnd units are ^UNIT, errors are at ^ELEVS'/
      :                                      /' confidence', TEXT, MLEN )
           ELSE
-            CALL MSG_SETC( 'UNIT', FLD(FN).UNITS )
+            CALL MSG_SETC( 'UNIT', FIELD_UNITS(FN) )
             CALL MSG_MAKE( 'Bgnd units are ^UNIT', TEXT, MLEN )
           END IF
           CALL AIO_WRITE( OCH, TEXT(:MLEN), STATUS )
         END IF
 
 *      Extension test
-        IF ( SSDUMP_FN( 'EXTEN', NFLD, FLD ) .NE. 0 ) THEN
+        IF ( SSDUMP_FN( 'EXTEN', NFLD ) .NE. 0 ) THEN
           CALL AIO_WRITE( OCH, 'Extension in arcmin, error '/
      :                         /'at 68% confidence', STATUS )
         END IF
@@ -446,7 +447,7 @@
 
 *    Do output
       IF ( NSRC .GT. 0 ) THEN
-        CALL SSDUMP_INT( OCH, NPAGE, NSRC, NFLD, FLD, SYMMETRIC,
+        CALL SSDUMP_INT( OCH, NPAGE, NSRC, NFLD, SYMMETRIC,
      :                                                  STATUS )
       END IF
 
@@ -464,7 +465,7 @@
 
 
 *+  SSDUMP_INT - Performs output for SSDUMP
-      SUBROUTINE SSDUMP_INT( OCH, NPAGE, NSRC, NFLD, FLD, SYMMETRIC,
+      SUBROUTINE SSDUMP_INT( OCH, NPAGE, NSRC, NFLD, SYMMETRIC,
      :                                                      STATUS )
 *
 *    Description :
@@ -494,19 +495,19 @@
 *
       INCLUDE 'SSDUMP_STR'
 
-      STRUCTURE /ADATUM/
-       UNION
-        MAP
-         REAL               RVAL
-        END MAP
-        MAP
-         DOUBLE PRECISION   DVAL
-        END MAP
-        MAP
-         INTEGER            IVAL
-        END MAP
-       END UNION
-      END STRUCTURE
+c     STRUCTURE /ADATUM/
+c      UNION
+c       MAP
+c        REAL               RVAL
+c       END MAP
+c       MAP
+c        DOUBLE PRECISION   DVAL
+c       END MAP
+c       MAP
+c        INTEGER            IVAL
+c       END MAP
+c      END UNION
+c     END STRUCTURE
 *
 *    Status :
 *
@@ -527,12 +528,15 @@
       INTEGER               NPAGE                     ! Number of pages
       INTEGER               NSRC                      ! No. of sources in SSDS
       INTEGER               NFLD                      ! Number of fields
-      RECORD /FIELD/        FLD(*)                    ! Field data
+c     RECORD /FIELD/        FLD(*)                    ! Field data
       LOGICAL               SYMMETRIC                 ! Error data symmetric?
 *
 *    Local variables :
 *
-      RECORD /ADATUM/       DATUM                     ! General data object
+c     RECORD /ADATUM/       DATUM                     ! General data object
+      DOUBLE PRECISION      DATUM_DVAL
+      REAL                  DATUM_RVAL
+      INTEGER               DATUM_IVAL
 
       CHARACTER*20          ESTR                      ! Error value string
       CHARACTER*132         LINE                      ! Output line
@@ -552,6 +556,8 @@
       LOGICAL               ANYERR                    ! Any errors present?
       LOGICAL               FIRST_CEL                 ! First of RA,DEC
       LOGICAL               FOUND                     ! Found last field on page
+
+      COMMON /ADATUM/       DATUM_DVAL, DATAUM_RVAL, DATAUM_IVAL
 *
 *    Local data :
 *
@@ -576,7 +582,7 @@
         FOUND = .FALSE.
         DO WHILE ( (JFLD.LE.NFLD) .AND. .NOT. FOUND )
           IF ( JFLD .GT. 1 ) THEN
-            IF ( FLD(JFLD).COL .GT. FLD(JFLD-1).COL ) THEN
+            IF ( FIELD_COL(JLFD) .GT. FIELD_COL(JFLD-1) ) THEN
               JFLD = JFLD + 1
             ELSE
               FOUND = .TRUE.
@@ -591,25 +597,25 @@
 *      Do any of the fields on this page have errors?
         ANYERR = .FALSE.
         DO J = IFLD, JFLD
-          ANYERR = ( ANYERR .OR. FLD(J).ETHERE )
+          ANYERR = ( ANYERR .OR. FIELD_ETHERE(J) )
         END DO
 
 *      Rightmost column
-        IF ( FLD(JFLD).ETHERE ) THEN
-          CRHS = FLD(JFLD).ECOL
+        IF ( FIELD_ETHERE(JFLD) ) THEN
+          CRHS = FIELD_ECOL(JFLD)
         ELSE
-          CRHS = FLD(JFLD).COL
+          CRHS = FIELD_COL(JFLD)
         END IF
 
 *      Construct column headings
         CALL CHR_FILL( ' ', LINE )
         DO J = IFLD, JFLD
-          HLEN = CHR_LEN(FLD(J).HEAD)
-          IF ( FLD(J).ETHERE ) THEN
-            LINE(FLD(J).COL+(FLD(J).WID+2+FLD(J).EWID-
-     :            HLEN)/2:) = FLD(J).HEAD
+          HLEN = CHR_LEN(FIELD_HEAD(J))
+          IF ( FIELD_ETHERE(J) ) THEN
+            LINE(FIELD_COL(J)+(FIELD_WID(J)+2+FIELD_EWID(J)-
+     :            HLEN)/2:) = FIELD_HEAD(J)
           ELSE
-            LINE(FLD(J).COL+(FLD(J).WID-HLEN)/2:) = FLD(J).HEAD
+            LINE(FIELD_COL(J)+(FIELD_WID(J)-HLEN)/2:) = FIELD_HEAD(J)
           END IF
         END DO
         CALL AIO_WRITE( OCH, LINE(:MAX(131,CRHS)), STATUS )
@@ -617,7 +623,7 @@
 *      Lines per source
         LPS = 1
         DO J = IFLD, JFLD
-          LPS = MAX( LPS, FLD(J).NELM, FLD(J).ENELM )
+          LPS = MAX( LPS, FIELD_NELM(J), FIELD_ENELM(J) )
         END DO
 
 *      Loop over data and output source data
@@ -640,44 +646,57 @@
             DO J = IFLD, JFLD
 
 *            Field datum to do?
-              IF ( L .LE. FLD(J).NELM ) THEN
+              IF ( L .LE. FIELD_NELM(J) ) THEN
 
 *              Get the value
-                CALL ARR_COP1B( FLD(J).SIZE, %VAL(FLD(J).PTR +
-     :               ((I-1)*FLD(J).NELM+(L-1))*FLD(J).SIZE),
-     :                          DATUM, STATUS )
+                CALL ARR_COP1B( FIELD_SIZE(J), %VAL(FIELD_PTR(J) +
+     :               ((I-1)*FIELD_NELM(J)+(L-1))*FIELD_SIZE(J)),
+     :                          DATUM_DVAL, STATUS )
+                CALL ARR_COP1B( FIELD_SIZE(J), %VAL(FIELD_PTR(J) +
+     :               ((I-1)*FIELD_NELM(J)+(L-1))*FIELD_SIZE(J)),
+     :                          DATUM_RVAL, STATUS )
+                CALL ARR_COP1B( FIELD_SIZE(J), %VAL(FIELD_PTR(J) +
+     :               ((I-1)*FIELD_NELM(J)+(L-1))*FIELD_SIZE(J)),
+     :                          DATUM_IVAL, STATUS )
 
 *              Write the value
-                IF ( FLD(J).HMS ) THEN
+                IF ( FIELD_HMS(J) ) THEN
                   IF ( FIRST_CEL ) THEN
                     FIRST_CEL = .FALSE.
-                    CALL STR_DRADTOC( DBLE(DATUM.DVAL*MATH__DTOR),
-     :                 'HH MM SS.SS', LINE(FLD(J).COL:), STATUS )
+                    CALL STR_DRADTOC( DBLE(DATUM_DVAL*MATH__DTOR),
+     :                 'HH MM SS.SS', LINE(FIELD_COL(J):), STATUS )
                   ELSE
-                    CALL STR_DRADTOC( DBLE(DATUM.DVAL*MATH__DTOR),
-     :                  'SDD MM SS.S', LINE(FLD(J).COL:), STATUS )
+                    CALL STR_DRADTOC( DBLE(DATUM_DVAL*MATH__DTOR),
+     :                  'SDD MM SS.S', LINE(FIELD_COL(J):), STATUS )
                   END IF
                 ELSE
-                  IF ( FLD(J).TYPE(1:5) .EQ. '_REAL' ) THEN
-                    WRITE( LINE(FLD(J).COL:), '('//
-     :                   FLD(J).DFMT//')', IOSTAT=FSTAT ) DATUM.RVAL
-                  ELSE IF ( FLD(J).TYPE(1:7) .EQ. '_DOUBLE' ) THEN
-                    WRITE( LINE(FLD(J).COL:), '('//
-     :                   FLD(J).DFMT//')', IOSTAT=FSTAT ) DATUM.DVAL
+                  IF ( FIELD_TYPE(J)(1:5) .EQ. '_REAL' ) THEN
+                    WRITE( LINE(FIELD_COL(J):), '('//
+     :                   FIELD_DFMT(J)//')', IOSTAT=FSTAT ) DATUM_RVAL
+                  ELSE IF ( FIELD_TYPE(1:7) .EQ. '_DOUBLE' ) THEN
+                    WRITE( LINE(FIELD_COL(J):), '('//
+     :                   FIELD_DFMT(J)//')', IOSTAT=FSTAT ) DATUM_DVAL
                   ELSE
-                    WRITE( LINE(FLD(J).COL:), '('//
-     :                   FLD(J).DFMT//')', IOSTAT=FSTAT ) DATUM.IVAL
+                    WRITE( LINE(FIELD_COL(J):), '('//
+     :                   FIELD_DFMT(J)//')', IOSTAT=FSTAT ) DATUM_IVAL
                   END IF
                 END IF
 
               END IF
 
 *            Write the error value
-              IF ( FLD(J).ETHERE .AND. (L.LE.FLD(J).ENELM) ) THEN
+              IF ( FIELD_ETHERE(J) .AND. (L.LE.FIELD_ENELM(J)) ) THEN
 
 *              Get the value
-                CALL ARR_COP1R( 1, %VAL(FLD(J).EPTR +((I-1)*FLD(J).ENELM
-     :                                +(L-1))*VAL__NBR), DATUM, STATUS )
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+     :                             (I-1)*FIELD_ENELM(J) +
+     :                             (L-1))*VAL__NBR), DATUM_DVAL, STATUS )
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+     :                             (I-1)*FIELD_ENELM(J) +
+     :                             (L-1))*VAL__NBR), DATUM_RVAL, STATUS )
+                CALL ARR_COP1R( 1, %VAL(FIELD_EPTR(J) +
+     :                             (I-1)*FIELD_ENELM(J) +
+     :                             (L-1))*VAL__NBR), DATUM_IVAL, STATUS )
 
 *              Error item
                 IF ( SYMMETRIC ) THEN
@@ -694,12 +713,12 @@
                 IF ( DATUM.RVAL .EQ. NULLERROR ) THEN
                   ESTR = ' *NA*'
                 ELSE
-                  WRITE( ESTR, '('//FLD(J).EFMT//')',
-     :                       IOSTAT=FSTAT ) DATUM.RVAL
+                  WRITE( ESTR, '('//FIELD_EFMT(J)//')',
+     :                       IOSTAT=FSTAT ) DATUM_RVAL
                 END IF
 
 *              Write to buffer
-                WRITE( LINE(FLD(J).ECOL:), '(2A)', IOSTAT=FSTAT )
+                WRITE( LINE(FIELD_ECOL(J):), '(2A)', IOSTAT=FSTAT )
      :                               EB(IEB),ESTR(:CHR_LEN(ESTR))
 
               END IF
@@ -729,7 +748,7 @@
 
 *+  SSDUMP_FIND - Locate and map a field if present
       SUBROUTINE SSDUMP_FIND( SLOC, FNAME, DO_ERRORS, CCOL, NFLD,
-     :                                              FLD, STATUS )
+     :                                              STATUS )
 *
 *    Description :
 *
@@ -768,7 +787,7 @@
 *
       INTEGER                  CCOL                    ! Current printing column
       INTEGER                  NFLD                    ! Number of fields
-      RECORD /FIELD/           FLD(*)                  ! Field data
+c     RECORD /FIELD/           FLD(*)                  ! Field data
 *
 *    Local constants :
 *
@@ -886,21 +905,21 @@
 
 *          Store data
             NFLD = NFLD + 1
-            FLD(NFLD).FLD = FNAME
-            FLD(NFLD).TYPE = TYPE
-            FLD(NFLD).PTR = PTR
-            FLD(NFLD).DFMT = DFMT
-            FLD(NFLD).COL = CCOL
-            FLD(NFLD).SIZE = SIZE
-            FLD(NFLD).WID = WID
-            FLD(NFLD).HMS = .FALSE.
+            FIELD_FLD(NFLD) = FNAME
+            FIELD_TYPE(NFLD) = TYPE
+            FIELD_PTR(NFLD) = PTR
+            FIELD_DFMT(NFLD) = DFMT
+            FIELD_COL(NFLD) = CCOL
+            FIELD_SIZE(NFLD) = SIZE
+            FIELD_WID(NFLD) = WID
+            FIELD_HMS(NFLD) = .FALSE.
             CCOL = CCOL + WID + 2
 
 *          Store field heading
             IF ( FOUND ) THEN
-              FLD(NFLD).HEAD = FHEAD(I)
+              FIELD_HEAD(NFLD) = FHEAD(I)
             ELSE
-              FLD(NFLD).HEAD = FNAME
+              FIELD_HEAD(NFLD) = FNAME
             END IF
 
 *          Locate field structure
@@ -908,18 +927,18 @@
 
 *          Get field data dimensions
             CALL CMP_SHAPE( FLOC, 'DATA_ARRAY', DAT__MXDIM,
-     :                        FLD(NFLD).DIMS, FLD(NFLD).NDIM, STATUS )
-            CALL ARR_SUMDIM( FLD(NFLD).NDIM-1, FLD(NFLD).DIMS,
-     :                                        FLD(NFLD).NELM )
+     :                      FIELD_DIMS(NFLD), FIELD_NDIM(NFLD), STATUS )
+            CALL ARR_SUMDIM( FIELD_NDIM-1, FIELD_DIMS(NFLD),
+     :                                        FIELD_NELM(NFLD) )
 
 *          Field units present?
             CALL DAT_THERE( FLOC, 'UNITS', OK, STATUS )
             IF ( OK ) THEN
-              CALL CMP_GET0C( FLOC, 'UNITS', FLD(NFLD).UNITS, STATUS )
-              IF ( FLD(NFLD).UNITS .LE. ' ' )
-     :                          FLD(NFLD).UNITS = 'UNDEFINED'
+              CALL CMP_GET0C( FLOC, 'UNITS', FIELD_UNITS(NFLD), STATUS )
+              IF ( FIELD_UNITS(NFLD) .LE. ' ' )
+     :                          FIELD_UNITS(NFLD) = 'UNDEFINED'
             ELSE
-              FLD(NFLD).UNITS = 'UNDEFINED'
+              FLD(NFLD).UNITS(NFLD) = 'UNDEFINED'
             END IF
 
 *          Field errors?
@@ -927,25 +946,26 @@
 
 *            Map error
               CALL SSO_MAPFLDERR( SLOC, FNAME, '_REAL', 'READ',
-     :                                 FLD(NFLD).EPTR, STATUS )
+     :                                 FIELD_EPTR(NFLD), STATUS )
 
 *            Find column
-              FLD(NFLD).EFMT = FEFMT(I)
-              CALL UTIL_FMTWID( FEFMT(I), FLD(NFLD).EWID, STATUS )
-              FLD(NFLD).ECOL = CCOL - 2
-              CCOL = CCOL + FLD(NFLD).EWID + 2
+              FLD(NFLD).EFMT(NFLD) = FEFMT(I)
+              CALL UTIL_FMTWID( FEFMT(I), FIELD_EWID(NFLD), STATUS )
+              FIELD_ECOL(NFLD) = CCOL - 2
+              CCOL = CCOL + FIELD_EWID(NFLD) + 2
 
             END IF
-            FLD(NFLD).ETHERE = ( GOT_ERRORS .AND. (STATUS.EQ.SAI__OK) )
+            FIELD_ETHERE(NFLD) = ( GOT_ERRORS .AND.
+     :                             (STATUS .EQ. SAI__OK) )
 
 *          Field error data
-            IF ( FLD(NFLD).ETHERE ) THEN
+            IF ( FIELD_ETHERE(NFLD) ) THEN
               CALL CMP_SHAPE( FLOC, 'ERROR', DAT__MXDIM,
-     :                        FLD(NFLD).EDIMS, FLD(NFLD).ENDIM, STATUS )
-              CALL ARR_SUMDIM( FLD(NFLD).ENDIM-1, FLD(NFLD).EDIMS,
-     :                                           FLD(NFLD).ENELM )
+     :                        FIELD_EDIMS(NFLD), FIELD_ENDIM(NFLD), STATUS )
+              CALL ARR_SUMDIM( FIELD_ENDIM(NFLD)-1, FIELD_EDIMS(NFLD),
+     :                                           FIELD_ENELM(NFLD) )
             ELSE
-              FLD(NFLD).ENELM = 0
+              FIELD_ENELM(NFLD) = 0
             END IF
 
 *          Free field
@@ -967,7 +987,7 @@
 
 
 *+  SSDUMP_FN - Look up field in field table
-      INTEGER FUNCTION SSDUMP_FN( FNAME, NFLD, FLD )
+      INTEGER FUNCTION SSDUMP_FN( FNAME, NFLD )
 *
 *    Description :
 *
@@ -999,7 +1019,7 @@
 *
       CHARACTER*(*)            FNAME                   ! Field to map
       INTEGER                  NFLD                    ! Number of fields
-      RECORD /FIELD/           FLD(*)                  ! Field data
+c     RECORD /FIELD/           FLD(*)                  ! Field data
 *
 *    Local variables :
 *
@@ -1012,7 +1032,7 @@
       I = 1
       FOUND = .FALSE.
       DO WHILE ( ( I .LE. NFLD ) .AND. .NOT. FOUND )
-        IF ( FNAME .EQ. FLD(I).FLD(1:LEN(FNAME)) ) THEN
+        IF ( FNAME .EQ. FIELD_FLD(I)(1:LEN(FNAME)) ) THEN
           FOUND = .TRUE.
         ELSE
           I = I + 1
