@@ -52,7 +52,7 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
 #endif
 
     // set up Tcl package
-    if (Tcl_PkgProvide(interp, "Gaia", "2.3") != TCL_OK) { //XXX GAIA_VERSION
+    if (Tcl_PkgProvide(interp, "Gaia", GAIA_VERSION ) != TCL_OK) {
 	return TCL_ERROR;
     }
 
@@ -95,11 +95,6 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     }
 
 
-    // create the namespaces used by the itcl/itk classes
-    // (This is just a convenience so you don't have to always call some init proc)
-    if (Tcl_Eval(interp, "namespace ::gaia {}; import add gaia") != 0)
-	return TCL_ERROR;
-
     // The gaia_library path can be found in several places.  Here is the order
     // in which the are searched.
     //		1) the variable may already exist
@@ -116,11 +111,28 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
     // Set the global Tcl variables gaia_library and gaia_version 
     // and add gaia_library to the auto_path.
     Tcl_SetVar(interp, "gaia_library", libDir, TCL_GLOBAL_ONLY);
-    Tcl_SetVar(interp, "gaia_version", "2.3", TCL_GLOBAL_ONLY); //XXX GAIA_VERSION
+    Tcl_SetVar(interp, "gaia_version", GAIA_VERSION, TCL_GLOBAL_ONLY);
 
     char cmd[1048];
     sprintf(cmd, "lappend auto_path %s", libDir);
-    int status = Tcl_Eval(interp, cmd);
-    return status; 
+    if (Tcl_Eval(interp, cmd) != TCL_OK)
+	return TCL_ERROR; 
+
+    // set up the namespaces used by the itcl/itk classes
+    if (Tcl_Eval(interp, 
+#if (TCL_MAJOR_VERSION >= 8)
+		 "namespace eval gaia {namespace export *};"
+		 "namespace import -force gaia::*;"
+		 "package require Iwidgets;"
+		 "namespace import -force iwidgets::*;"
+#else
+		 "namespace ::gaia {}; import add gaia;"
+		 "package require Iwidgets;"
+		 "namespace ::iwidgets; import add ::iwidgets"
+#endif
+	) != TCL_OK)
+	return TCL_ERROR;
+
+    return TCL_OK; 
 }
 

@@ -31,8 +31,6 @@ extern int Itcl_Init(Tcl_Interp *interp);
 extern int Itk_Init(Tcl_Interp *interp);
 extern int Tclx_Init(Tcl_Interp *interp);
 #if SHARED == 0
-extern int Rtd_Init(Tcl_Interp *interp);
-extern int Cat_Init(Tcl_Interp *interp);
 extern int Skycat_Init(Tcl_Interp *interp);
 extern int Gaia_Init(Tcl_Interp *interp);
 #endif
@@ -127,17 +125,6 @@ Tcl_AppInit(Tcl_Interp *interp)
     Tcl_StaticPackage (interp, "Tclx", Tclx_Init, (Tcl_PackageInitProc *) NULL);
 
 #if SHARED == 0
-    /* install the Cat package */
-    if (Cat_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Cat", Cat_Init, (Tcl_PackageInitProc *) NULL);
-
-    /* install the Rtd package */
-    if (Rtd_Init(interp) == TCL_ERROR) {
-	return TCL_ERROR;
-    }
-    Tcl_StaticPackage (interp, "Rtd", Rtd_Init, (Tcl_PackageInitProc *) NULL);
 
     /* install the Skycat package */
     if (Skycat_Init(interp) == TCL_ERROR) {

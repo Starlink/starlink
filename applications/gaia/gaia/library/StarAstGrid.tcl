@@ -162,7 +162,7 @@ itcl::class gaia::StarAstGrid {
 
    #  Inheritances:
    #  -------------
-   inherit TopLevelWidget
+   inherit util::TopLevelWidget
 
    #  Constructor:
    #  ------------

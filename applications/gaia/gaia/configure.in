@@ -686,5 +686,5 @@ directory containing SkyCat library files    => $SKYCAT_LIBRARY
 #--------------------------------------------------------------------
 #	Generate the Makefiles etc...
 #--------------------------------------------------------------------
-AC_OUTPUT(Makefile library/Makefile library/Gaia.tcl src/Makefile colormaps/Makefile, sh makelinks)
+AC_OUTPUT(Makefile library/Makefile library/gaia_version.tcl src/Makefile colormaps/Makefile, sh makelinks)
 

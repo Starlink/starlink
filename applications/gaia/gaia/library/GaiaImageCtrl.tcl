@@ -70,9 +70,9 @@ itcl::class gaia::GaiaImageCtrl {
       bindtags $canvas_ $tags
 
       #  Remove options we're overriding from base classes.
-      itk_option remove RtdImage::show_object_menu
-      itk_option remove RtdImage::drag_scroll
-      itk_option remove RtdImage::file
+      itk_option remove rtd::RtdImage::show_object_menu
+      itk_option remove rtd::RtdImage::drag_scroll
+      itk_option remove rtd::RtdImage::file
 
       #  Initialise all options.
       eval itk_initialize $args
@@ -163,7 +163,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  This method is redefined here to also rescale pixel-width
    #  objects correctly.
    public method scale {x y} {
-      RtdImageCtrl::scale $x $y
+      rtd::RtdImageCtrl::scale $x $y
       $itk_component(draw) pixel_width_changed
    }
 
@@ -171,7 +171,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  astrometry grid update.
    public method rotate {bool} {
       if {$bool != [$image_ rotate]} {
-         RtdImage::rotate $bool
+         rtd::RtdImage::rotate $bool
 
          #  Notify the astrometry grid to re-display itself if
          #  asked.
@@ -186,7 +186,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  update.
    public method flip {xy bool} {
       if {$bool != [$image_ flip $xy]} {
-         RtdImage::flip $xy $bool
+         rtd::RtdImage::flip $xy $bool
 
          #  Notify the astrometry grid to re-display itself if
          #  asked.
@@ -234,7 +234,7 @@ itcl::class gaia::GaiaImageCtrl {
         set user [id user]
         set app [lindex [winfo name .] 0]
         set date [clock format [clock seconds] -format {%b %d, %Y at %H:%M:%S}]
-        utilReUseWidget RtdImagePrint $w_.print \
+        utilReUseWidget rtd::RtdImagePrint $w_.print \
             -image $this \
             -show_footer 1 \
             -whole_canvas 0 \
@@ -449,7 +449,7 @@ itcl::class gaia::GaiaImageCtrl {
       delete_temporary_
 
       #  Really clear.
-      rtd::SkyCatCtrl::clear
+      skycat::SkyCatCtrl::clear
    }
 
    #  Load a FITS file (internal version: use -file option/public
@@ -559,7 +559,7 @@ itcl::class gaia::GaiaImageCtrl {
    #  which is often what is really required).
    public method center {} {
       if { $center_ok_ } {
-         RtdImage::center
+         rtd::RtdImage::center
       }
    }
 

@@ -48,8 +48,8 @@ itcl::class gaia::GaiaImagePanel {
    constructor {args} {
 
       #  Remove fonts as we want to override these.
-      itk_option remove RtdImagePanel::labelfont
-      itk_option remove RtdImagePanel::valuefont
+      itk_option remove rtd::RtdImagePanel::labelfont
+      itk_option remove rtd::RtdImagePanel::valuefont
       eval itk_initialize $args
       
       #  OK to proceed now as all set up (including image_ variable?).

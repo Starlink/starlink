@@ -344,7 +344,7 @@ itcl::class gaia::StarBlink {
    #  displayed.
    private method add_views_ {menu} {
       set n_ 0
-      foreach w [SkyCat::get_skycat_images] {
+      foreach w [skycat::SkyCat::get_skycat_images] {
          itk_component add image$n_ {
             RtdImage $itk_component(Frame).image$n_ -graphics 0 \
                -scrollbars 0

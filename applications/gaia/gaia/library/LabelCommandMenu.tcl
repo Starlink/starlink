@@ -13,8 +13,8 @@ itk::usual LabelCommandMenu {}
 # associated commands. This can be used as a means of providing access 
 # to many commands from a single button.
 
-itcl::class util::LabelCommandMenu {
-   inherit FrameWidget
+itcl::class gaia::LabelCommandMenu {
+   inherit util::FrameWidget
 
    #  Constructor:
    constructor {args} {

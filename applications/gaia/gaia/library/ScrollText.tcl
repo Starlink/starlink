@@ -96,7 +96,7 @@ itk::usual ScrollText {}
 itcl::class gaia::ScrollText {
                        
    #  Inheritances:
-   inherit FrameWidget
+   inherit util::FrameWidget
 
    #  Constructor.
    #  ------------
