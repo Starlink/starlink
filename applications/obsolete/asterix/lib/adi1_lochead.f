@@ -97,7 +97,7 @@
 
 *  Local Constants:
       CHARACTER*10		HPROPN			! Name of property
-        PARAMETER		( HPROPN = 'HEADER_LOC'
+        PARAMETER		( HPROPN = 'HEADER_LOC' )
 
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Object locator
