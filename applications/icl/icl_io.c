@@ -2408,7 +2408,7 @@ struct sigaction act;
  * (by simulating a '\n' typed on the terminal) and transfer the characters to
  * our own type-ahead buffer
  */
-
+#if HAVE_DECL_TIOCSTI
 /* Firstly turn off echo so our additional newline is not visible */
         init_tty.c_lflag &= ~ECHO;
         tcsetattr(fileno(stdin), TCSANOW, &init_tty);
@@ -2423,6 +2423,7 @@ struct sigaction act;
 	    keyboard_input();             /* Read type-ahead into buffer */
 	    decinbuf_rpos(); /* Forget forced \n */
 	}
+#endif 
 /*
  * Any typeahead input will have had '\r' converted to '\n' as the tty
  * is still in normal buffered mode. Undo this conversion before we process

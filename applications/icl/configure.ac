@@ -49,6 +49,11 @@ AC_CHECK_DECLS([finite],,,[#include <math.h>])
 AC_CHECK_LIB([m],[sin])
 AC_CHECK_FUNCS([nint rint])
 
+dnl   TIOCSTI terminal function
+AC_CHECK_DECLS([TIOCSTI],,,[#include <termio.h>
+])
+
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 # Link against fortran libraries
