@@ -587,6 +587,7 @@ itcl::class gaia::GaiaApPhotom {
          }
          #set image [$itk_option(-rtdimage) cget -file]
          set image [$itk_option(-rtdimage) fullname]
+         puts "image = $image"
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
@@ -613,14 +614,15 @@ itcl::class gaia::GaiaApPhotom {
             blt::busy hold $w_
             update idletasks
             catch {file delete GaiaPhotomOut.Dat}
-            eval $autophotom_ runwith \
+            # XXX changes here  .... eval
+            $autophotom_ runwiths "\
                in=$image \
                infile=GaiaPhotomIn.Dat \
                outfile=GaiaPhotomOut.Dat \
                optima=false \
                skymag=$skymag_ \
                usemags=$ok \
-               $more
+               $more"
 	    
          } else {
             error_dialog "No image is displayed"

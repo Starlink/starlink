@@ -558,6 +558,10 @@ itcl::class gaia::Gaia {
          {Select or identify object positions and properties} \
          -command [code $this make_toolbox positions] \
 
+      add_menuitem $m command "Show XY profile...  " \
+         {Show X and Y averaged profiles of a rectangular region} \
+         -command [code $this make_toolbox xyprofile] \
+
       if { $itk_option(-demo_mode) } {
 	 add_menuitem $m command "Demonstration mode..." \
 	       {See a demonstration of GAIA (needs an empty directory)} \
@@ -833,6 +837,35 @@ itcl::class gaia::Gaia {
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
             -clone_cmd [code $this make_toolbox positions 1] \
+            -really_die $cloned
+      }
+   }
+
+   #  Make XY profiles toolbox. Slightly different as need to get
+   #  rectangle on canvas first. Move this to GaiaImageCtrl after
+   #  testing. 
+   public method make_xyprofile_toolbox {name {cloned 0}} {
+      if {[$image_ isclear]} {
+         warning_dialog "No image is currently loaded" $w_
+         return
+      }
+      if {[action_dialog "Press OK and then drag out a \
+                          rectangle over the image with button 1" $w_]} {
+         [$image_ component draw] set_drawing_mode rectangle \
+            [code $this make_xyprofile_ $name $cloned]
+      }
+   }
+   public method make_xyprofile_ {name cloned rect_id x0 y0 x1 y1} {
+      itk_component add $name {
+         GaiaXYProfile $w_.\#auto \
+            -image $image_ \
+            -rtdimage [$image_ get_image] \
+            -canvasdraw [$image_ component draw] \
+            -canvas [$image_ get_canvas] \
+            -transient 1 \
+            -number $clone_ \
+            -clone_cmd [code $this make_toolbox xyprofile 1] \
+            -rect_id $rect_id \
             -really_die $cloned
       }
    }

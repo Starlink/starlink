@@ -227,6 +227,9 @@ class StarRtdImage : public Skycat {
    //  Get any AST warning issued when image WCS was read.
    int astwarningsCmd( int argc, char *argv[] );
 
+   //  Create X and Y profiles of rectangular region.
+   int xyProfileCmd( int argc, char *argv[] );
+
  protected:
 
    //  Pointer to structure that holds the image configuration options.

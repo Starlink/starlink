@@ -15,11 +15,13 @@
 #
 #     These names may be simple disk file names, such as the top-level
 #     containers of NDFs and FITS, or more complex ones that include
-#     NDF slices and possibly HDS component paths.
+#     NDF slices, FITS extensions and possibly HDS component paths.
 #
 #     So the sort of names that we might get for images are:
 #
 #        file.fits         FITS may also be .fit .fits.gz .fits.Z etc.
+#
+#        file.fits[1]      first FITS extension.
 #
 #        file              an NDF, which is expanded to file.sdf
 #
@@ -117,6 +119,11 @@ itcl::class gaia::GaiaImageName {
       return $slice_
    }
 
+   #  Get the FITS extension number.
+   public method fitsext {} {
+      return $fitsext_
+   }
+
    #  Get the HDS path.
    public method path {} {
       return $path_
@@ -170,6 +177,7 @@ itcl::class gaia::GaiaImageName {
    protected method parse_name_ {} {
       reset_
       get_slice_
+      get_fitsext_
       get_type_
       if { ! [check_type_] } {
 	 get_path_
@@ -186,6 +194,17 @@ itcl::class gaia::GaiaImageName {
 	 set slice_ [string range $imagename $i1 $i2]
       } else {
 	 set slice_ ""
+      }
+   }
+
+   #  Get any FITS extension information from the image name.
+   protected method get_fitsext_ {} {
+      set i1 [string last {[} $imagename]
+      set i2  [string last {]} $imagename]
+      if { $i1 > -1 && $i2 > -1 } {
+	 set fitsext_ [string range $imagename $i1 $i2]
+      } else {
+	 set fitsext_ ""
       }
    }
 
@@ -226,7 +245,7 @@ itcl::class gaia::GaiaImageName {
       set i1 [string first $type_ $imagename]
       if { $i1 > -1 } {
 	 incr i1 -1
-	 set diskfile_ "[string range $imagename 0 $i1]$type_"
+	 set diskfile_ "[string range $imagename 0 $i1]$type_$fitsext_"
       } else {
 
 	 #  Type not in imagename, so fallback to path_.
@@ -250,7 +269,7 @@ itcl::class gaia::GaiaImageName {
 
    #  Construct the full name from the various parts.
    protected method get_fullname_ {} {
-      set fullname_ "$diskfile_$path_$slice_"
+      set fullname_ "$diskfile_$path_$slice_$fitsext_"
    }
 
    #  Get the path component from the name. Assumes a check_type_ has
@@ -286,6 +305,7 @@ itcl::class gaia::GaiaImageName {
       set fullname_ {}
       set diskfile_ {}
       set slice_ {}
+      set fitsext_ {}
       set path_ {}
       set type_ {.sdf}
    }
@@ -311,6 +331,9 @@ itcl::class gaia::GaiaImageName {
 
    #  NDF slice.
    protected variable slice_ {}
+
+   #  FITS extension specification ([int]).
+   protected variable fitsext_ {}
 
    #  HDS path
    protected variable path_ {}

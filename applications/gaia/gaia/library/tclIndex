@@ -160,3 +160,4 @@ set auto_index(::gaia::GaiaPosTable) [list source [file join $dir GaiaPosTable.t
 set auto_index(::gaia::GaiaTabStops) [list source [file join $dir GaiaTabStops.tcl]]
 set auto_index(::gaia::GaiaAstReference) [list source [file join $dir GaiaAstReference.tcl]]
 set auto_index(::gaia::GaiaAstTransform) [list source [file join $dir GaiaAstTransform.tcl]]
+set auto_index(::gaia::GaiaXYProfile) [list source [file join $dir GaiaXYProfile.tcl]]

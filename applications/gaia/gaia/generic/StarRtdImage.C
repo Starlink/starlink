@@ -13,7 +13,7 @@
 //     Allan Brighton, ESO (ALLAN)
 //
 //  Copyright:
-//     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
+//     Copyright (C) 1997-2000 Central Laboratory of the Research Councils
 //
 //  History:
 //     15-FEB-1996 (PWD):
@@ -142,6 +142,8 @@
 //     23-MAY-2000 (PWD):
 //        Added astwarnings command. These return the content of any
 //        ASTWARN cards produced when the WCS is set up.
+//     10-JUL-2000 (PWD):
+//        Added XY profile command.
 //-
 
 #include <string.h>
@@ -163,6 +165,7 @@
 #include "ImageData.h"
 #include "StarRtdImage.h"
 #include "Contour.h"
+#include "XYProfile.h"
 #include "HTTP.h"
 #include "ast.h"
 #include "grf_tkcan.h"
@@ -230,7 +233,8 @@ public:
    { "remotetcl",     &StarRtdImage::remoteTclCmd,    1,  1},
    { "slice",         &StarRtdImage::sliceCmd,       11, 11},
    { "urlget",        &StarRtdImage::urlgetCmd,       1, 1 },
-   { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 }
+   { "usingxshm",     &StarRtdImage::usingxshmCmd,    0, 0 },
+   { "xyprofile",     &StarRtdImage::xyProfileCmd,   12, 12}
 };
 
 //+
@@ -4778,7 +4782,7 @@ int StarRtdImage::fullNameCmd( int argc, char *argv[] )
          set_result( file() );
       } else {
          char buffer[1024];
-         sprintf( buffer, "%s{%d}", file(), hdu );
+         sprintf( buffer, "%s[%d]", file(), hdu );
          set_result( buffer );
       }
    }
@@ -5211,5 +5215,129 @@ int StarRtdImage::astwarningsCmd( int argc, char *argv[] )
          set_result( warnings );
       }
    }
+   return TCL_OK;
+}
+
+
+//+
+//   StarRtdImage::xyProfileCmd
+//
+//   Purpose:
+//      Creates BLT vectors that contain the average values along the
+//      X and Y directions of a rectangular region of the displayed
+//      image. Essentially the X and Y profile equivalent of the
+//      interactive "slice" command.
+//
+//   Arguments:
+//
+//      <bltGraph> is the path name of a BLT graph widget to display
+//                 the X average pixel intensities.
+//
+//      <bltGraph> is the path name of a BLT graph widget to display
+//                 the Y average pixel intensities.
+//
+//      <bltElem>  is the name of the element used in the graphs for
+//                 that should receive the data.
+//
+//      x0, y0,    are the end points of a rectangle in the
+//      x1, y1     given coordinate system (canvas, image, screen,
+//                 wcs, deg).
+//
+//      xy_units   units of the rectangle coordinates.
+//
+//      xxVector   (returned) name of a BLT vector to receive the X
+//                 profile X axes indices.
+//
+//      xyVector   (returned) name of a BLT vector to receive the X
+//                 profile data values.
+//
+//      yxVector   (returned) name of a BLT vector to receive the Y
+//                 profile X axes indices.
+//
+//      yyVector   (returned) name of a BLT vector to receive the Y
+//                 profile data values.
+//
+//
+//   Return:
+//      A list of two values, the number of positions written to the X 
+//      and Y profiles.
+//-
+
+int StarRtdImage::xyProfileCmd(int argc, char *argv[])
+{
+#ifdef _DEBUG_
+   cout << "Called StarRtdImage::xyProfileCmd (" << argc << ")" << endl;
+#endif
+   if ( !image_ ) {
+       return TCL_OK;
+   }
+
+   //  Convert extent to image coords.
+   double rx0, ry0, rx1, ry1;
+   if (convertCoordsStr(0, argv[3], argv[4], NULL, NULL,
+                        rx0, ry0, argv[7], "image") != TCL_OK
+       || convertCoordsStr(0, argv[5], argv[6], NULL, NULL,
+                           rx1, ry1, argv[7], "image") != TCL_OK) {
+       return TCL_ERROR;
+   }
+
+   //  Get X and Y dimensions.
+   int x0 = int( rx0 ), y0 = int( ry0 ), x1 = int( rx1 ), y1 = int( ry1 );
+   int w = abs( x1 - x0 ) + 1;
+   int h = abs( y1 - y0 ) + 1;
+
+   //  Allocate space for results.
+   double* xvalues = new double[w*2];
+   double* yvalues = new double[h*2];
+
+   //  And get the profile information. Do this by creating a suitable 
+   //  profiling object and passing it a reference to the image data
+   //  values.
+   ImageIO imageIO = image_->image();
+   XYProfile xyProfile( imageIO );
+
+   //  Tell the profile object if it needs to byte swap the image
+   //  data. This is only necessary if the image is FITS on a non
+   //  bigendian machine.
+   ImageIO *imptr = &imageIO;
+   int swap = 0;
+   if ( imptr->nativeByteOrder() ) {
+       swap = 0;
+   } else {
+       int dsize = abs( imptr->bitpix() ) / 8;
+       FITS_LONG l = 1;
+       if ( (FITS_LONG)ntohl( l ) == l || dsize == 1 ) {
+           swap = 0;
+       } else {
+           swap = 1;
+       }
+   }
+   xyProfile.setSwap( swap );
+
+   //  Set the region of image to extract the profiles from.
+   xyProfile.setRegion( x0, y0, x1, y1 );
+
+   //  Get the profiles.
+   int numValues[2];
+   xyProfile.extractProfiles( xvalues, yvalues, numValues );
+
+   //  Convert the index/value pairs into BLT vectors.
+   if ( Blt_GraphElement( interp_, argv[0], argv[2], numValues[0]*2 ,
+                          xvalues, argv[8], argv[9]) != TCL_OK ) {
+       delete xvalues;
+       delete yvalues;
+       return TCL_ERROR;
+   }
+   if (Blt_GraphElement( interp_, argv[1], argv[2], numValues[1]*2,
+                         yvalues, argv[10], argv[11]) != TCL_OK ) {
+       delete xvalues;
+       delete yvalues;
+       return TCL_ERROR;
+   }
+   delete xvalues;
+   delete yvalues;
+   
+   set_result( numValues[0] );
+   append_element( numValues[1] );
    return TCL_OK;
 }

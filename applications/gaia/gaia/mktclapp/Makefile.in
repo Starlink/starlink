@@ -142,10 +142,10 @@ gaia_stcl.c: $(MKTCLAPP) library/gaia_stcl.tcl
 #  well, but the names of these routines no longer clash.
 $(TKPROG): $(MKTCLAPP) gaia_swish.o tkAppInit.o FORCE
 	@echo "linking \"$(TKPROG)\"..."
-	ar d $(LIBDIR)/libskycat.a proj.o
+	- ar d $(LIBDIR)/libskycat.a proj.o
 	$(CXX) $(CC_SWITCHES) tkAppInit.o gaia_swish.o -o $(TKPROG)  \
-	   $(LDFLAG1) $(ADDLIBS) $(AST_LIBS) \
-	   $(LD_SEARCH_FLAGS) $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
+	   $(LDFLAG1) $(ADDLIBS) $(LD_SEARCH_FLAGS) $(AST_LIBS) \
+	   $(SKYCAT_LIB) $(LOCAL_LIBRARY) \
 	   $(ADDLIBS) $(AST_LIBS) $(ADAM_LIBS) $(TCLTKLIBS) \
 	   $(X_LIB) $(LDFLAG2) $(EXTRA_LIBS)
 
