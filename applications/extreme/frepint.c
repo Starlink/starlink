@@ -12,33 +12,33 @@
 *  Description:
 *     This program is a filter which takes FORTRAN 77 source code
 *     and modifies it so that INTEGER declarations are rewritten as
-*     'INTEGER * 8'.  It also attempts to warn if there are usages which
+*     `INTEGER * 8'.  It also attempts to warn if there are usages which
 *     might cause trouble given this change. 
 *
 *     Additionally, if there appear to be actual arguments to subroutines
 *     or functions which are literal integers, the program will attempt
 *     to replace them with symbolic constants, and to define these 
-*     constants in the declaration section of the module.
-*     This aspect of the processing is not foolproof.
-*     It can misidentify an array reference as a function call - if
-*     the 'function' name contains an underscore it assumes that it is
-*     a function name and not an array name.  Only single literal integers
-*     as actual arguments are thus replaced, so that, e.g. the code
+*     constants in the declaration section of the module.  Thus the line
 *
-*        L = PKG1_FUNC( X, Y, Z, 0, 3 * 5, STATUS )
+*        CALL SUB( X, 5, STATUS )
 *
-*     will be replaced by 
+*     will be replaced by
 *
-*        L = PKG1_FUNC( X, Y, Z, INT__0, 3 * 5, STATUS )
+*        CALL SUB( X, INT__5, STATUS )
 *
-*     and the corresponding statements will be inserted at an appropriate
-*     place:
+*     and the corresponding declaration statements
 *
-*        INTEGER * 8 INT__0
+*        INTEGER * 8 INT__5
 *
 *     and
 *
-*        PARAMETER ( INT__0 = 0 )
+*        PARAMETER ( INT__5 = 5 )
+*
+*     will be inserted in the declaration section of the module.
+*     The program will attempt to insert these declarations near an 
+*     INCLUDE statement, and if it cannot find one, it will write a 
+*     warning to standard error, including the text of the declarations
+*     that it would have made.
 *
 *     Attention is paid to fortran 77 source format, so that lines
 *     more than 72 characters long are avoided (unless they were there
@@ -51,7 +51,10 @@
 *
 *     No changes are made to comment lines so that, for instance, the 
 *     Arguments stanza of subroutine prologues will not have argument
-*     types modified from 'INTEGER' to 'INTEGER * 8'.
+*     types modified from `INTEGER' to `INTEGER * 8'.
+*
+*     No change is made to references to INTEGER type in IMPLICIT 
+*     statements.
 *
 *     The program will write a warning on standard error for certain 
 *     constructions in the code which are likely to cause trouble after
@@ -67,11 +70,21 @@
 *        - Any module (SUBROUTINE, FUNCTION or BLOCK DATA) which does not
 *          include an IMPLICIT NONE statement.
 *
-*  Bugs:
-*     In some cases, the line breaks are not made in very beautiful places.
+*  Notes:
+*     The program is not infallible at identifying function calls, which 
+*     it needs to do in order to replace integer literals, since they 
+*     look like array references.  It uses the rule of thumb that it if
+*     the would-be function name contains an underscore it is a function,
+*     otherwise it is an array.
+*
+*     It will also not identify an INTEGER-type expression as such unless
+*     it is a single integer literal; for instance the expression `3 * 5'
+*     as actual argument of a subroutine/function ought to be retyped,
+*     but will not be spotted.
+*
+*     In a few cases, the line breaks are not made in very beautiful places.
 *     They should, however, always be correct.
 *
-*  Notes:
 *     Although this program behaves as a filter, it is written on
 *     the assumption that it will be run on a file of a finite length:
 *     it may buffer large amounts of input before writing output, and
@@ -524,7 +537,7 @@
 
 /* Start of module - record the name. */
          else if ( ( t == FUNCTION || t == SUBROUTINE || t == BLOCKDATA ) 
-                 && ( t1 == IDENTIFIER ) ) {
+                && ( t1 == IDENTIFIER ) ) {
             strcpy( modname, tbuf[ i + 1 ].strmat );
          }
 
@@ -536,18 +549,21 @@
 /* Include line - mark it for interpolating our own local constant 
    definitions later.  If it includes a '*_DEC' or '*_DEF' file it is 
    probably too late for constant declarations and definitions, so 
-   rely on earlier ones.  We require a blank line immediately following,
+   rely on earlier ones.  We prefer a blank line immediately following,
    so it should end up at the end of the first stanza of include files. */
-         else if ( i > 2 
-                && ! dclok 
-                && ( tbuf[ i - 2 ].tokval == INCLUDE 
-                  && tbuf[ i - 1 ].tokval == STRING_CONSTANT
-                  && tbuf[ i     ].tokval == LINE_END 
-                  && tbuf[ i + 1 ].tokval == BLANK_LINE )
-                && strstr( tbuf[ i - 1 ].strmat, "_DEC" ) == NULL 
-                && strstr( tbuf[ i - 1 ].strmat, "_DEF" ) == NULL ) {
-            outmark( &dclbuf );
-            dclok = 1;
+         else if ( i > 2 && tbuf[ i - 2 ].tokval == INCLUDE
+                         && tbuf[ i - 1 ].tokval == STRING_CONSTANT
+                         && tbuf[ i     ].tokval == LINE_END
+                         && strstr( tbuf[ i - 1 ].strmat, "_DEC" ) == NULL 
+                         && strstr( tbuf[ i - 1 ].strmat, "_DEF" ) == NULL ) {
+            if ( dclok ) {
+               if ( tbuf[ i + i ].tokval == BLANK_LINE ) 
+                  outmark( &dclbuf );
+            }
+            else {
+               dclok = 1;
+               outmark( &dclbuf );
+            }
          }
 
 /* End of module - tidy up. */
@@ -556,78 +572,81 @@
 /* Insert local constant definitions if appropriate. */
             if ( nconstarg ) {
 
-/* Local constant definitions are required, and there is a suitable place
-   to put them.  Write the declaration and definition statements at the 
-   end of the marked token. */
-               if ( dclok ) {
-
 /* Write the new text, and the existing text of the token into which we 
    will insert it, into a newly allocated buffer.  The address of a 
    pointer to this buffer has already been indicated to the output routines
    so that it will be interpolated into the output stream at the right
    place. */
-                  char *leading;
-                  char *intstmt;
-                  char *parstmt;
-                  char *cmnt = 
-                     "\n*  Local constants for use as actual arguments:\n";
-                  int dblen = strlen( cmnt ) + nconstarg * 160;
+               char *leading;
+               char *intstmt;
+               char *parstmt;
+               char *cmnt = 
+                  "\n*  Local constants for use as actual arguments:\n";
+               int dblen = strlen( cmnt ) + nconstarg * 160;
 
 /* Set format templates for INTEGER and PARAMETER statements.  We follow
    the format (case usage etc) of the last INTEGER statement we found in
    the unmodified source code. */
-                  if ( inttok != NULL ) {
-                     leading = inttok[ -1 ].string;
-                     intstmt = inttok->string;
-                     parstmt = memok( malloc( strlen( intstmt ) + 3 ) );
-                     qc = parstmt;
-                     for ( pc = inttok->string; pc < inttok->strmat; pc++ ) 
-                        *(qc++) = *pc;
-                     if ( isupper( *pc ) && isupper( *(pc + 1) ) )
-                        strcpy( qc, "PARAMETER" );
-                     else if ( isupper( *pc ) )
-                        strcpy( qc, "Parameter" );
-                     else
-                        strcpy( qc, "parameter" );
-                  }
-                  else {
-                     leading = "      ";
-                     intstmt = "INTEGER";
-                     parstmt = "PARAMETER";
-                  }
+               if ( inttok != NULL ) {
+                  leading = inttok[ -1 ].string;
+                  intstmt = inttok->string;
+                  parstmt = memok( malloc( strlen( intstmt ) + 3 ) );
+                  qc = parstmt;
+                  for ( pc = inttok->string; pc < inttok->strmat; pc++ ) 
+                     *(qc++) = *pc;
+                  if ( isupper( *pc ) && isupper( *(pc + 1) ) )
+                     strcpy( qc, "PARAMETER" );
+                  else if ( isupper( *pc ) )
+                     strcpy( qc, "Parameter" );
+                  else
+                     strcpy( qc, "parameter" );
+               }
+               else {
+                  leading = "      ";
+                  intstmt = "INTEGER";
+                  parstmt = "PARAMETER";
+               }
                   
 /* Allocate the buffer for the declaration statements. */
-                  dclbuf = memok( malloc( dblen ) );
-                  qc = dclbuf;
+               dclbuf = memok( malloc( dblen ) );
+               qc = dclbuf;
 
 /* Write an INTEGER declaration statement for each INT__ constant used. */
-                  qc += sprintf( qc, "%s", cmnt );
-                  for ( j = 0; j < nconstarg; j++ )
-                     qc += sprintf( qc, "%s%s * 8 %s%ld\n", 
-                                        leading, intstmt, constpref, 
-                                        (long) constarg[ j ] );
+               qc += sprintf( qc, "%s", cmnt );
+               for ( j = 0; j < nconstarg; j++ )
+                  qc += sprintf( qc, "%s%s * 8 %s%ld\n", 
+                                     leading, intstmt, constpref, 
+                                     (long) constarg[ j ] );
 
 /* Write a PARAMETER statement for each INT__ constant used. */
-                  for ( j = 0; j < nconstarg; j++ )
-                     qc += sprintf( qc, "%s%s ( %s%ld = %ld )\n",
-                                        leading, parstmt, constpref, 
-                                        (long) constarg[ j ], 
-                                        (long) constarg[ j ] );
+               for ( j = 0; j < nconstarg; j++ )
+                  qc += sprintf( qc, "%s%s ( %s%ld = %ld )\n",
+                                     leading, parstmt, constpref, 
+                                     (long) constarg[ j ], 
+                                     (long) constarg[ j ] );
 
 /* Safety check - ought not to happen. */
-                  if ( qc - dclbuf > dblen ) {
-                     fprintf( stderr, "%s: Overflowed buffer - aborting\n", 
-                                      name );
-                     exit( 1 );
-                  }
+               if ( qc - dclbuf > dblen ) {
+                  fprintf( stderr, "%s: Overflowed buffer - aborting\n", 
+                                   name );
+                  exit( 1 );
+               }
+
+/* Local constant definitions are required, and there is a suitable place
+   to put them.  Write the declaration and definition statements at the 
+   end of the marked token. */
+               if ( dclok ) {
                }
 
 /* Local constant definitions are required, but there is nowhere suitable
-   to place them.  Issue a warning. */
+   to place them.  Issue a warning, including the text which could not
+   be inserted. */
                else {
-                  fprintf( stderr, 
-                           "%s: Nowhere to declare local %s constants\n", 
-                           name, constpref );
+                  fprintf( stderr, "%s: Nowhere to declare %s's", 
+                                   name, constpref );
+                  if ( *modname ) fprintf( stderr, " in module %s", modname );
+                  fprintf( stderr, "\n%s", dclbuf );
+                  dclbuf = NULL;
                }
             }
             
