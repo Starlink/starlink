@@ -100,3 +100,14 @@
 
   The -catalog command-line option now accepts a list of catalogues to 
   display immediately.
+
+  SIRTF distortions are now accomodated (need AST3).
+
+  The polarimetry toolbox now correctly processes selection expressions
+  when column names are short forms of other names (i.e. when P and PI, 
+  DP and DPI etc. are used). Previously an attempt to interpret $PI as
+  $P would be made and subsequently fail.
+
+  Making name queries using the RedHat 9 build of GAIA failed
+  completely, sometimes causing a core dump from a child process. 
+  This problem has now been resolved.
