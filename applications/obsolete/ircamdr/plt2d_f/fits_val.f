@@ -46,9 +46,10 @@
 	CHARACTER*(80)  STRING     
 	CHARACTER*(1)  CHR
 
-        PARAMETER  ( CHR = CHAR(39) )      ! Force char string = '
-
 *-
+*      Force char string =
+	CHR = CHAR(39)
+
 *      check status on entry - return if not o.k.
 	IF ( STATUS .NE. SAI__OK ) THEN
            STRING = ' '     
