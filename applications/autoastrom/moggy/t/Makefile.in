@@ -1,0 +1,23 @@
+# Test directory makefile
+#
+# This doesn't express _all_ the dependencies within this directory:
+# test scripts which have dependencies, such as t3 on t3.run, run make
+# internally.
+#
+# $Id$
+
+CXX=@CXX@
+CXXFLAGS=@CXXFLAGS@
+PERLBIN=@PERL@
+
+test: local.config ../moggy
+	PERLBIN=$(PERLBIN) ./runtests && touch test
+
+t3.run: t3.C ../util.o
+	$(CXX) $(CXXFLAGS) -o $@ t3.C ../util.o
+
+clean:
+	rm -f *~ *.run *.stderr *.stdout *.tmp *.diff test
+
+local.config: local.config.in
+	sed s+\$$PWD+$$PWD+ local.config.in >local.config

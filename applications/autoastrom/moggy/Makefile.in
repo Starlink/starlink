@@ -94,7 +94,7 @@ $(CATLIBINSTALLDIR)/lib/libcat.a:
 	cd $(CATLIBTOP); make; make install
 
 test: $(EXEC)
-	cd test; $(MAKE) test
+	cd t; $(MAKE) test
 
 # Distribution
 configure: config/configure.in

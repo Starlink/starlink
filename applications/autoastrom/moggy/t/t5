@@ -1,0 +1,14 @@
+# Test two-point radius search on local catalogue
+test -n "$MOGGY" || MOGGY=../moggy
+
+$MOGGY <<EOD
+catconfig file://$PWD/local.config
+coord1  17 27  9.5      74 20  8
+coord2  17 37  9.5      74 20  8
+type radius2
+nrow 10
+name dummy@home
+columns ALL
+search
+quit
+EOD

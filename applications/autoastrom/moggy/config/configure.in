@@ -218,4 +218,4 @@ dnl       AC_DEFINE(ENABLE_CAT)
 dnl       LIBS="$LIBS -lcat")))
 
 
-AC_OUTPUT(Makefile test/Makefile)
+AC_OUTPUT(Makefile t/Makefile)
