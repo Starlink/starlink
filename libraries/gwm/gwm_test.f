@@ -16,6 +16,7 @@
 *  Authors:
 *     NE: Nick Eaton (Durham University)
 *     BLY: M.J.Bly  (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC)
 *     {enter_new_authors_here}
 
 *  History:
@@ -23,6 +24,8 @@
 *        Original version.
 *     26-FEB-1998 (BLY):
 *        Initialise STATUS to SAI__OK.
+*     13-MAR-2004 (TIMJ):
+*        Exit with bad shell status is STATUS not SAI__OK
 *     {enter_changes_here}
 
 *  Bugs:
