@@ -18,7 +18,7 @@ my $rancb;
 					 } );
   $ch->Write( $obj );
 }
-ok($rancb, "Write callback complete");
+is($rancb, 1, "Write callback complete");
 
 # Try again, but storing to an array
 my @cards;
