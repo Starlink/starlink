@@ -160,6 +160,9 @@
 *        sizes.  
 *     1-APR-1999 (MBT):
 *        Modified to use WCS components.
+*     19-MAY-2000 (MBT):
+*        Added a call to IDI_ASSOC to ensure that no attempt is made to
+*        use an unsupported visual.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -209,6 +212,7 @@
       CHARACTER * ( 30 ) KAPVIE ! Message system name for kapview_mon
       INTEGER CCDGID            ! Id for CCDPACK_REG monolith
       INTEGER CCDRID            ! Id for CCDPACK_RES monolith
+      INTEGER DEVID             ! IDI Id for graphics device
       INTEGER FD                ! File identifier
       INTEGER FDOUT             ! File identifier
       INTEGER FITTYP            ! Transformation type
@@ -287,11 +291,15 @@
      :     '  An interactive aid for aligning groups of NDFs.', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Get the display device.
+*  Get the display device, and do a dummy open of IDI using this device.
+*  This is a hack to enable IDI to spot whether we are running on an
+*  unsupported visual.
       CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( ' ',
      :     '  Give the name of an image display device', STATUS )
       CALL MSG_BLANK( STATUS )
+      CALL IDI_ASSOC( 'DEVICE', 'READ', DEVID, STATUS )
+      CALL IDI_ANNUL( DEVID, STATUS )
       CALL PAR_GET0C( 'DEVICE', DEVICE, STATUS )
       CMD = 'DEVICE='//DEVICE
       CALL SLV_OBEYW( KAPVIE, 'idset', CMD, ' ', STATUS )

@@ -195,6 +195,7 @@
 *  Authors:
 *     NE: Nick Eaton  (Durham University)
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -211,6 +212,9 @@
 *        Updated for CCDPACK 2.0.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator controls (foreign data access upgrade).
+*     19-MAY-2000 (MBT):
+*        Added a call to IDI_ASSOC to ensure that no attempt is made to
+*        use an unsupported visual.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -334,6 +338,13 @@
 
 *  Start an NDF context.
       CALL NDF_BEGIN
+
+*  Do a dummy open of IDI.  This is a hack to enable IDI to spot whether
+*  we are running on an unsupported visual - AGI_ASSOC does not make 
+*  this check.
+      CALL IDI_ASSOC( 'DEVICE', 'READ', BASEID, STATUS )
+      CALL IDI_ANNUL( BASEID, STATUS )
+      IF ( STATUS .NE. IDI__OK ) GOTO 99
                      
 *  Open AGI, IDI and the device.
       CALL AGI_ASSOC( 'DEVICE', 'READ', BASEID, STATUS )
