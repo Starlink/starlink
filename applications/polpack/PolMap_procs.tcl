@@ -2879,6 +2879,7 @@ proc GwmCreate {frmname size colours gwmname} {
    global GWM_DEVICE
    global GWM_DISPLAY_NCONT
    global GWM_DISPLAY_DATA
+   global GWM_DISPLAY_VDATA
    global GWM_DISPLAY_LOCK
    global GWM_DISPLAY_PHI
    global GWM_DISPLAY_PLO
@@ -2918,6 +2919,7 @@ proc GwmCreate {frmname size colours gwmname} {
    set GWM_CURRENT_LIST ""
    set GWM_DISPLAY_NCONT 0
    set GWM_DISPLAY_DATA ""
+   set GWM_DISPLAY_VDATA ""
    set GWM_DISPLAY_LOCK 0
    set GWM_DISPLAY_PHI 	""
    set GWM_DISPLAY_PLO 	""
@@ -5851,6 +5853,7 @@ proc SetColours {var} {
    global GWM_VECCOL
    global GWM_CAN
    global GWM_DEVICE
+   global GWM_DISPLAY_VDATA
    global GWM_DISPLAY_NCONT
    global GWM_POLCOL
    global GWM_SELCOL
@@ -5868,9 +5871,12 @@ proc SetColours {var} {
    } elseif { $var == "GWM_CONCOL" } {
       Obey kapview palentry "device=$GWM_DEVICE palnum=1 colour=$GWM_CONCOL" 1
 
-# Re-draw the vector map if the vector colour changes.
+# Re-draw the vector map if the vector colour changes (but only if a
+# vector map has already been displayed).
    } elseif { $var == "GWM_VECCOL" } {
-      VectorMap
+      if { $GWM_DISPLAY_VDATA != "" } {
+         VectorMap
+      }
 
 # Re-draw the polygons if their colour has changed.
    } elseif { $var == "GWM_POLCOL" } {
@@ -7620,6 +7626,7 @@ proc VectorMap {} {
    global GWM_SECTION
    global GWM_SIZE
    global GWM_DISPLAY_VDATA
+   global GWM_VECCOL
    global IMAGE
    global VEC_CAT
 
@@ -7711,7 +7718,7 @@ proc MakeCat {} {
 
 # Create the vector catalogue. If succesful, replace any old vector
 # catalogue with the new one.
-   if { [Obey polpack polvec "$pars"] } {
+   if { [Obey polpack polvec "$pars" 1] } {
       if { [info exists VEC_CAT] } {
          catch "exec rm -f ${VEC_CAT}.*"
       }
