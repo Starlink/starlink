@@ -495,7 +495,7 @@ int main (int argc, char **argv)
 	exit (0);
 }
 
-void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
+void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		       const PkFont *fallback_font, PageRange& PR)
 {
     DviFileEvent *ev;
@@ -520,7 +520,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 	if (! initialisedInch)
 	{
 	    // can't do this any earlier, as it's set in the preamble
-	    oneInch = static_cast<int>(resolution * dvif->magnification());
+	    oneInch = static_cast<int>(fileResolution * dvif->magnification());
 	    initialisedInch = true;
 	}
 
@@ -625,9 +625,9 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int resolution,
 			}
 			if (b.ofile_name.length() == 0)
 			{
-			    char fn[100];
-			    sprintf (fn, b.ofile_pattern.c_str(), pagenum);
-			    string output_filename = fn;
+			    char fnb[100];
+			    sprintf (fnb, b.ofile_pattern.c_str(), pagenum);
+			    string output_filename = fnb;
 			    bitmap->write (output_filename, b.ofile_type);
 			}
 			else

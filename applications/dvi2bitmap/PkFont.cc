@@ -541,7 +541,7 @@ void PkFont::read_font (InputByteStream& pkf)
 		}
 		break;
 	      case 244:		// pk_yyy
-		for (int i=0; i<4; i++) (void) pkf.getByte();
+		for (int ti=0; ti<4; ti++) (void) pkf.getByte();
 		break;
 	      case 245:		// pk_post
 		end_of_scan = true;
@@ -695,8 +695,8 @@ void PkRasterdata::construct_bitmap()
 
 	while (nbits_req >= 8)
 	{
-	    for (int i=7, b=*r; i>=0; i--, b>>=1)
-		p[i] = static_cast<Byte>(b&1);
+	    for (int i=7, bb=*r; i>=0; i--, bb>>=1)
+		p[i] = static_cast<Byte>(bb&1);
 	    p += 8;
 	    r++;
 	    nbits_req -= 8;

@@ -684,9 +684,9 @@ void DviFile::read_postamble()
     if (getByte() != 248)
 	throw DviError ("DviFile::read_postamble: expected post command");
     // Read and discard four integers
-    unsigned int unused_int4 = dvif_->getUIU(4); // final bop
-    unused_int4 = dvif_->getUIU(4);	// numerator
-    unused_int4 = dvif_->getUIU(4);	// denominator
+    (void) dvif_->getUIU(4); // final bop
+    (void) dvif_->getUIU(4);	// numerator
+    (void) dvif_->getUIU(4);	// denominator
     unsigned int dvimag = dvif_->getUIU(4);	// mag
     // immediately multiply it by magmag
     postamble_.mag = dvimag;
