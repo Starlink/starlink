@@ -32,7 +32,7 @@ install-data-local: l2h_source.tar
 	else :; fi
 
 sun199.htx_tar: sun199.tex star2html latex2html
-	env CURRENT_L2H=`pwd`/l2h/current PATH=`pwd`/${PATH} ./star2html sun199.tex
+	env CURRENT_L2H=`pwd`/l2h/current PATH=`pwd`/"${PATH}" ./star2html sun199.tex
 	tar cf sun199.htx_tar sun199.htx
 
 # The latex2html and star2html files contain references to the installation
