@@ -105,7 +105,7 @@ func_sname(void)
 {
     char buf[ICL_BUFSIZE], *w;
     int num, width;
-    node *arg0, *arg1, *arg2;
+    node *arg0, *arg1, *arg2 = NULL;
     value val, varg, varg1, varg2;
 
     arg0 = arglist[0];
@@ -1110,6 +1110,8 @@ hexdecoct(int func)
     int num, width, sig, m, maxbuf, j;
     char *buf, *buf1;
     node *aarg1, *aarg2, *aarg3;
+    width = 0;
+    sig = 0;
 
     aarg1 = arglist[0];
     aarg2 = arglist[1];

@@ -44,16 +44,15 @@
  ******************************************************************************
  */
 
+#include <stdio.h>
+#include <unistd.h>
 #include "icl.h"
 #include "symtab.h"
 #include "expr.h"
 #include "interp.h"
 #include "node.h"
-#ifdef DEBUG
-#include <stdio.h>
-#endif
+#include "output.h"
 
-extern void outfpstring(char *mess);				/* output.c */
 
 /******************************************************************************
  * The structure of symbol table entries
@@ -1015,7 +1014,7 @@ fileaproc(char *procname, char *filename, char *comm)
 {
     extern value iclopenasoutfp (char *whofor, char *filename);	/* output.c */
     extern value iclcloseasoutfp(char *whofor, char *filename);	/* output.c */
-    node *proc;
+    node *proc = NULL;
     value val;
 
     if (procname != CHARNIL) {				/* Named procedure */

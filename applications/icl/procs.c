@@ -21,14 +21,15 @@
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include "icl.h"
 #include "interp.h"
 #include "node.h"
 #include "procs.h"
 #include "symtab.h"
 #include "icl_io.h"
-#include "f77.h"
-#include "cnf.h"
+#include "output.h"
 #include "ems.h"
 
 extern void sendtoiosubsystem(int command, int info, char *message);
