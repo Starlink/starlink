@@ -15,4 +15,5 @@ bin_SCRIPTS = gks_link gks1_link_adam
 ## and call/libgks_call.la
 lib_LTLIBRARIES = libgks.la
 
-libgks_la_SOURCES = base/libgks_base.la
+libgks_la_SOURCES = 
+libgks_la_LIBADD = base/libgks_base.la
