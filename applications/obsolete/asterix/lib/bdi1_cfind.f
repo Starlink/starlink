@@ -168,7 +168,7 @@
         IF ( TYPE .EQ. 'DOUBLE' ) THEN
           RTYPE = TYPE
         ELSE
-          TYPE = 'REAL'
+          RTYPE = 'REAL'
         END IF
 
       END IF
