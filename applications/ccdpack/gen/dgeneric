@@ -1,4 +1,4 @@
-#!/bin/csh -xv
+#!/bin/csh
 #+
 #  Name:
 #     dgeneric
