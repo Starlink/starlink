@@ -17,7 +17,7 @@ PUBLIC_INCLUDES = HLPCMD CTM_COM CTM_PAR
 PRIVATE_INCLUDES = KPG_PAR KPG_AST
 BLOCK_DATA_FILES = ctm_xcols.f
 
-C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c  kpg1_trmsz.c \
+C_ROUTINES = kpg1_ieeed.c  kpg1_isfind.c  kpg1_memry.c \
 kpg1_ieeer.c  kpg1_isfinr.c
 
 TK_ROUTINES = kpg1_tkast.c
@@ -57,7 +57,7 @@ KPG_NONGEN = bad2db.f bad2dd.f bad2di.f \
 bad2dr.f bad2dub.f bad2duw.f bad2dw.f chvalb.f chvali.f \
 chvalr.f chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f \
 cpsecr.f creout.f dimlst.f elnmbi.f elnmbr.f \
-exparr.f gethlp.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_agfnd.f \
+exparr.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_agfnd.f \
 kpg1_agref.f kpg1_aindd.f kpg1_aindr.f \
 kpg1_akerd.f kpg1_akerr.f kpg1_arcol.f kpg1_asref.f \
 kpg1_avlut.f kpg1_axano.f kpg1_axbnd.f kpg1_axbnr.f kpg1_axcod.f \
@@ -146,7 +146,7 @@ kpg1_vec2n.f kpg1_wmodb.f \
 kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
 kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
 ld2ar.f logarr.f normal.f \
-nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f kpg1_nbadd.f \
+nxtnam.f powarr.f zero1d.f zero2d.f kpg1_nbadd.f \
 kpg1_asprp.f \
 kpg1_map.f kpg1_wgndf.f kpg1_rgndf.f \
 kpg1_arcog.f kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f \
