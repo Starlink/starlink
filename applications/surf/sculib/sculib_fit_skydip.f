@@ -1,8 +1,22 @@
-*+  SCULIB_FIT_SKYDIP - fit the SKYDIP data
       SUBROUTINE SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
      :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
      :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
-*    Description :
+*+
+*  Name:
+*     SCULIB_FIT_SKYDIP
+
+*  Purpose:
+*     Fit the skydip data
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Invocation:
+*     CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, J_MEASURED,
+*    :  J_VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
+*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
+
+*  Description:
 *     This routine fits a sub-instrument's measurements of the sky 
 *     brightness at a range of airmasses to obtain the sky opacity, ETAtel
 *     and `b' parameters. The fit is to the function:-
@@ -45,11 +59,8 @@
 *     value is greater than zero then the routine will fix it at
 *     that for the fit.
 *
-*    Invocation :
-*     CALL SCULIB_FIT_SKYDIP (N_MEASUREMENTS, AIRMASS, DATA,
-*    :  VARIANCE, SUB_WAVELENGTH, SUB_INSTRUMENT, SUB_FILTER, T_TEL,
-*    :  T_AMB, ETA_TEL_IN, B_IN, ETA_TEL_FIT, B_FIT, TAUZ_FIT, STATUS)
-*    Parameters :
+
+*  Arguments:
 *     N_MEASUREMENTS            = INTEGER (Given)
 *              the number of SKYDIP measurements
 *     AIRMASS (N_MEASUREMENTS)  = REAL (Given)
@@ -82,27 +93,51 @@
 *              the fitted result for tauz
 *     STATUS                    = INTEGER (Given and returned)
 *              Global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     T.Jenness (timj@jach.hawaii.edu) & J.Lightfoot (REVAD::JFL)
-*    History :
+
+*  Method:
+
+*  Deficiencies:
+
+*  Bugs:
+
+*  Notes:
+*     Uses the Mean input VARIANCE as the VARIANCE for every point.
+
+*  Authors:
+*     T.Jenness (timj@jach.hawaii.edu)
+*     J.Lightfoot (REVAD::JFL)
+
+*  History:
 *     $Id$
-*      7-FEB-1996: split off from SCUDR_SKYDIP_SWITCH.
-*     23-JUL-1996: renamed SCULIB_ from SCUDR_ and made to fit the correct
-*                  function (JFL).
-*     10-MAR-1997: new version, using LSQ_FIT rather than NAG routine (TIMJ).
-*     11-MAR-1997: try again, using Bevington LSQ fit routine (JFL).
-*    endhistory
-*    Type Definitions :
+*     $Log$
+*     Revision 1.8  1998/01/06 00:34:16  timj
+*     Modernise header
+*
+*     11-MAR-1997 (JFL): 
+*        try again, using Bevington LSQ fit routine (JFL).
+*     10-MAR-1997 (TIMJ): 
+*        new version, using LSQ_FIT rather than NAG routine (TIMJ).
+*     23-JUL-1996 (JFL): 
+*        renamed SCULIB_ from SCUDR_ and made to fit the correct
+*        function (JFL).
+*      7-FEB-1996 (JFL): 
+*        split off from SCUDR_SKYDIP_SWITCH.
+
+*-
+
+*  Type Definitions:
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants:
       INCLUDE 'SAE_PAR'
       INCLUDE 'PRM_PAR'              ! for VAL__NBx
+
+*  Global Constants (for COMMON):
       INTEGER MAX_FIT_DATA           ! max number of measurements
       PARAMETER (MAX_FIT_DATA = 100)
-*    Import :
+
+
+*  Arguments Given:
       INTEGER N_MEASUREMENTS
       REAL    AIRMASS (N_MEASUREMENTS)
       REAL    J_MEASURED (N_MEASUREMENTS)
@@ -114,17 +149,20 @@
       REAL    T_AMB
       REAL    ETA_TEL_IN
       REAL    B_IN
-*    Import-Export :
-*    Export :
+
+*  Arguments Returned:
       REAL    B_FIT
       REAL    TAUZ_FIT
       REAL    ETA_TEL_FIT
-*    Status :
+
+*  Status:
       INTEGER STATUS
-*    External references :
+
+*  External references:
       REAL     SCULIB_JNU            ! brightness temperature function
       EXTERNAL SCULIB_SKYDIP_XISQ    ! Skydip chi-squared function
-*    Global variables :
+
+*  Global variables:
       DOUBLE PRECISION C_AIRMASS (MAX_FIT_DATA)
       DOUBLE PRECISION C_B_HI
       DOUBLE PRECISION C_B_LO
@@ -147,10 +185,12 @@
      :                                  C_J_MEASURED,
      :                                  C_J_TEL,
      :                                  C_J_VARIANCE
-*    Local Constants :
+
+*  Local Constants:
       REAL             LIGHT         ! velocity of light
       PARAMETER (LIGHT = 2.997929E8)
-*    Local variables :
+
+*  Local variables:
       DOUBLE PRECISION ALPHA (3,3)   ! scratch used by SCULIB_FIT_FUNCTION
       DOUBLE PRECISION BETA (3)
       CHARACTER*80     BUFFER        ! buffer to hold results of fit
@@ -174,9 +214,8 @@
                                      ! will be performed
       DOUBLE PRECISION XIOLD         ! chi-squared of fit
       DOUBLE PRECISION XISQ          ! chi-squared of fit
-*    Internal References :
-*    Local data :
-*-
+
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
