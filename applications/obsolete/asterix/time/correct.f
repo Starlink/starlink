@@ -148,6 +148,7 @@
 *  Local Variables:
       CHARACTER*80		HTXT(MAXHTEXT)		! History text
       CHARACTER*80		TEXT			!
+      CHARACTER*80		WHERE			! Where does the time come from?
 
       REAL                      DEADC        		! Dead time correction
       REAL                      TEXP         		! Exposure time
@@ -285,7 +286,7 @@
 
 *      Set flags
           T_RESOLVED = (STATUS.EQ.SAI__OK)
-          CALL MSG_SETC( 'WHERE', 'LIVE_TIME slots' )
+          WHERE = 'LIVE_TIME slots'
 
         END IF
 
@@ -295,7 +296,7 @@
           CALL ADI_CGET0R( TIMID, 'EffExposure', TEXP, STATUS )
           IF ( STATUS .EQ. SAI__OK ) THEN
             IF ( .NOT. LIVE_OK ) THEN
-              CALL MSG_SETC( 'WHERE', 'effective exposure time' )
+              WHERE = 'effective exposure time'
             END IF
             GOT_TEXP = .TRUE.
           END IF
@@ -308,7 +309,7 @@
             CALL ADI_CGET0R( TIMID, 'Exposure', TEXP, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
               IF ( .NOT. LIVE_OK ) THEN
-                CALL MSG_SETC( 'WHERE', 'exposure time in header' )
+                WHERE = 'exposure time in header'
               END IF
               GOT_TEXP = .TRUE.
             END IF
@@ -396,6 +397,7 @@
 *  Inform user of where we got the exposure time
       IF ( GOT_TEXP ) THEN
         CALL MSG_SETR( 'T', TEXP )
+        CALL MSG_SETC( 'WHERE', WHERE )
         CALL MSG_PRNT( 'Exposure of ^T seconds derived from ^WHERE' )
 
       ELSE
@@ -457,11 +459,11 @@
 
       END IF
 
-*  Adjust the data label
-      CALL BDI_GET0C( OFID, 'Label', TEXT, STATUS )
+*  Adjust the data units
+      CALL BDI_GET0C( OFID, 'Units', TEXT, STATUS )
       IF ( TEXT .GT. ' ' ) THEN
-        CALL BDI_PUT0C( OFID, 'Label', '('//TEXT(:CHR_LEN(TEXT))/
-     :                  /') / s', STATUS )
+        CALL BDI_PUT0C( OFID, 'Units', TEXT(:CHR_LEN(TEXT)) //
+     :                  ' / second', STATUS )
       END IF
 
 *  Flag dataset as corrected
