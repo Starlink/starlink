@@ -1,0 +1,165 @@
+\sstroutine{
+   BDF2NDF
+}{
+   Converts a Starlink Interim BDF file into an NDF
+}{
+   \sstdescription{
+      This application converts data files from the Bulk Data Frame
+      (BDF) format used by the INTERIM Environment (see SUN/4) to the
+      Starlink standard NDF format (see SUN/33 or SGP/38).  Type
+      conversion may be performed at the same time.
+   }
+   \sstusage{
+      BDF2NDF IN OUT [TYPE] [DESCRIP]
+   }
+   \sstparameters{
+      \sstsubsection{
+         IN = BDF (Read)
+      }{
+         The BDF to be converted to an NDF.  A file extension must not
+         be given since {\tt "}.BDF{\tt "} is assumed.
+      }
+      \sstsubsection{
+         OUT = NDF (Write)
+      }{
+         The name of NDF converted from the BDF.  It becomes the new
+         current NDF.
+      }
+      \sstsubsection{
+         TYPE = LITERAL (Read)
+      }{
+         The data type of the output NDF.  It must be one of the
+         following HDS types: {\tt "\_BYTE"}, {\tt "\_WORD"},
+         {\tt "\_REAL"}, {\tt "\_INTEGER"}, {\tt "\_DOUBLE"},
+         {\tt "\_UBYTE"}, {\tt "\_UWORD"} corresponding to signed byte,
+         signed word, real, integer, double precision, unsigned byte,
+         and unsigned word.  See SUN/92 for further details.  An
+         unambiguous abbreviation may be given.  The default is the
+         type corresponding to that of the BDF.  {\tt []}
+      }
+      \sstsubsection{
+         DESCRIP = \_LOGICAL (Read)
+      }{
+         If true the descriptors in the BDF are reported as they are
+         copied to the FITS extension within the output NDF. {\tt [FALSE]}
+      }
+      \sstsubsection{
+         CONNECT = FILENAME (Write)
+      }{
+         The Interim connection file.  It is deleted when the
+         application terminates.  {\tt [NDF2BDF.TMP]}
+      }
+      \sstsubsection{
+         COMMAND = FILENAME (Write)
+      }{
+         The Interim command file.  It is deleted when the application
+         terminates.  {\tt [USERCOM.TMP]}
+      }
+   }
+   \sstexamples{
+      \sstexamplesubsection{
+         BDF2NDF OLD NEW
+      }{
+         This converts the BDF called OLD (in file OLD.BDF) to the NDF
+         called NEW (in file NEW.SDF).  NEW's data array will have
+         the same data type as that of OLD.  Descriptors are copied
+         to the FITS extension but are not reported.
+      }
+      \sstexamplesubsection{
+         BDF2NDF OLD NEW DESCRIP
+      }{
+         This converts the BDF called OLD (in file OLD.BDF) to the NDF
+         called NEW (in file NEW.SDF).  NEW's data array will have
+         the same data type as that of OLD.  Descriptors are copied
+         to the FITS extension and are reported.
+      }
+      \sstexamplesubsection{
+         BDF2NDF HORSE HORSE TYPE="\_WORD"
+      }{
+         This converts the BDF called HORSE (in file HORSE.BDF) to the
+         NDF also called HORSE (in file HORSE.SDF).  The NDF's data
+         array will contain signed 2-byte integers.  Descriptors are
+         copied to the FITS extension but are not reported.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         The conversion rules can be summarised as follow:
+         \begin{itemize}
+            \item the BDF data array is copied to the NDF main data array;
+            by default the output data array has the data type
+            corresponding to that of the BDF.
+            \item The BLANK descriptor is not used to flag pixels in the NDF
+            with the bad value.  Use KAPPA's SETMAGIC to flag another
+            value.
+            \item The BDF descriptors are written to the NDF FITS extension.
+            Long values may be truncated, 65 for characters and 20 for
+            numbers.  The formating adheres to the FITS standard.
+            Descriptors already in the FITS format are copied as is, so
+            La Palma ING-format headers can be propagated.
+            \item If the BDF descriptors contain the FITS keywords CRVALn,
+            CDELTn, the appropriate axis structures are generated in
+            the output NDF. In addition should CRTYPEn also be present
+            the labels are added to these structures.
+            \item If the BDF descriptors contain the FITS keywords TITLE or
+            LABEL or BUNITS, the associated character string value is
+            written to the NDF TITLE, LABEL or UNITS component as
+            appropriate.
+            \item HISTORY descriptors are not used to make an HISTORY
+            component in the NDF.
+         \end{itemize}
+
+         \sstitem
+         WARNING: the BDF size may grow when TYPE is specified due to
+         an incarnation being created.  See below and SUN/4 for more
+         details.
+      }
+   }
+   \sstdiytopic{
+      Incarnations
+   }{
+      A BDF contains one or more `incarnations' of the data array.  An
+      incarnation of a data array is simply a copy of that data array
+      stored with a particular data type.  For example, a BDF may
+      contain incarnations of the same data array stored as a REAL
+      array, and an INTEGER array.  This rather strange behaviour is a
+      consequence of the way the INTERIM environment deals with data
+      access.  For example, if an application attempts to map a BDF data
+      array of INTEGER type as a REAL array, type conversion must take
+      place.  Instead of doing this in virtual memory, a second
+      incarnation of the data, this time of type REAL is created and
+      stored in the original file (causing perhaps a doubling of the
+      file size).  This second incarnation of the data array is stored
+      to avoid performing the same type conversion in the future.  (It
+      is perhaps significant that no such scheme has been employed with
+      subsequent data systems.)  One consequence of this behaviour is
+      that a BDF data array may not have a unique type.  BDF2NDF will
+      use the first type it finds as the default.  Specify the
+      TYPE parameter explicitly to ensure that the correct data type is
+      created within the NDF.
+
+      To prevent the BDF growing, just remove write access from the
+      file.
+   }
+   \sstimplementationstatus{
+      \sstitemlist{
+
+         \sstitem
+         Note the data array in the NDF is of the primitive form.
+      }
+   }
+   \sstbugs{
+      \sstitemlist{
+
+         \sstitem
+         May give spurious error messages if running under ICL.  This
+         happens if a non-existent BDF is given as the input file.  A
+         subsequent invocation of the application may result in a repeat of
+         the error message although the conversion is carried out
+         correctly.
+      }
+   }
+}
+\end{document}
