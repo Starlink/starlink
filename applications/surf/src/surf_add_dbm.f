@@ -78,6 +78,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.5  1999/06/17 03:24:31  timj
+*     Rewrite fits entries if they already exist.
+*
 *     Revision 1.4  1999/03/08 20:57:31  timj
 *     Change arguments to call to CALC_DUAL_BEAM
 *
@@ -139,6 +142,7 @@
       CHARACTER * (DAT__SZLOC) OUT_FITSX_LOC ! Locator to output FITS array
       INTEGER OUT_VARIANCE_PTR  ! Pointer to output variance
       REAL    PIXSIZE           ! Pixel size (arcsec)
+      REAL    RTEMP             ! Temporary real
       LOGICAL STATE             ! Is there a  variance array?
       CHARACTER * 80 STEMP      ! Scratch string
       CHARACTER * 15 SUFFIX_STRINGS(SCUBA__N_SUFFIX)
@@ -315,12 +319,49 @@
       END IF
 
 *     Now write the position angle and throw (converted to arcsec)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'CHOP_PA', DBLE(CHOP_PA), 
-     :     'Position angle of chop', STATUS)
-      CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'CHOP_THR', DBLE(CHOP_THROW * PIXSIZE), 
-     :     'Size of chop throw (arcsec)', STATUS)
+*     Need to check whether the keyword exists already. If it does,
+*     we need to rewrite it. Else we put the new entry in.
+
+*     CHOP POSITION ANGLE
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CHOP_PA', RTEMP, STATUS)
+
+         IF (STATUS .EQ. SAI__OK) THEN
+*     Rewrite the fits entry
+            CALL SCULIB_REWRITE_FITS_R(SCUBA__MAX_FITS, N_FITS,
+     :           FITS, 'CHOP_PA', CHOP_PA, STATUS)
+         ELSE
+*     Annul the bad status and put the new value in
+            CALL ERR_ANNUL(STATUS)
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'CHOP_PA', DBLE(CHOP_PA), 
+     :           'Position angle of chop', STATUS)
+
+         END IF
+
+      END IF
+
+*     CHOP THROW
+      IF (STATUS .EQ. SAI__OK) THEN
+         CALL SCULIB_GET_FITS_D( SCUBA__MAX_FITS, N_FITS, FITS,
+     :        'CHOP_THR', RTEMP, STATUS)
+
+         IF (STATUS .EQ. SAI__OK) THEN
+*     Rewrite the fits entry
+            CALL SCULIB_REWRITE_FITS_R(SCUBA__MAX_FITS, N_FITS,
+     :           FITS, 'CHOP_THR', CHOP_THROW*PIXSIZE, STATUS)
+         ELSE
+*     Annul the bad status and put the new value in
+            CALL ERR_ANNUL(STATUS)
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'CHOP_THR', DBLE(CHOP_THROW * PIXSIZE), 
+     :           'Size of chop throw (arcsec)', STATUS)
+
+         END IF
+
+      END IF
+
 
 *     Create a new FITS extension (since it may have changed size
 *     when CHOP_PA and THROW were added
