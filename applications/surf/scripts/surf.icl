@@ -32,9 +32,11 @@
 {     12-NOV-1997 (TIMJ):
 {        Add new commands for release v1.1
 {        extract_flat, scuclip, despike, despike2, scan_rlb
-{     15-Jun-1997 (TIMJ):
+{     15-Jun-1998 (TIMJ):
 {        Add commands for releas v1.2
 {          CALCSKY, SCUBA2MEM, SCUMAKEWT
+{     20-Nov-1998 (TIMJ):
+{        Add REDUCE_NOISE
 {
 {  Bugs:
 {     {note_any_bugs_here}
@@ -56,6 +58,7 @@ define extract_flat    $SURF_DIR/surf_mon
 define flatfield       $SURF_DIR/surf_mon
 define intrebin        $SURF_DIR/surf_mon
 define rebin           $SURF_DIR/surf_mon
+define reduce_noise    $SURF_DIR/surf_mon
 define reduce_switch   $SURF_DIR/surf_mon
 define remsky          $SURF_DIR/surf_mon
 define restore         $SURF_DIR/surf_mon
@@ -83,6 +86,7 @@ defhelp extract_flat    $SURF_HELP
 defhelp flatfield       $SURF_HELP
 defhelp intrebin        $SURF_HELP
 defhelp rebin           $SURF_HELP
+defhelp reduce_noise    $SURF_HELP
 defhelp reduce_switch   $SURF_HELP
 defhelp remsky          $SURF_HELP
 defhelp restore         $SURF_HELP
@@ -111,6 +115,7 @@ define surf_extract_flat    $SURF_DIR/surF_mon extract_flat
 define surf_flatfield       $SURF_DIR/surf_mon flatfield
 define surf_intrebin        $SURF_DIR/surf_mon intrebin
 define surf_rebin           $SURF_DIR/surf_mon rebin
+define surf_reduce_noise    $SURF_DIR/surf_mon reduce_noise
 define surf_reduce_switch   $SURF_DIR/surf_mon reduce_switch
 define surf_remsky          $SURF_DIR/surf_mon remsky
 define surf_restore         $SURF_DIR/surf_mon restore
