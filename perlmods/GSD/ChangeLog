@@ -1,3 +1,7 @@
+2000-05-15  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* gsdprint: Add ability to be gsdformat
+
 2000-05-12  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* gsdprint: Update to use GSD objects
