@@ -593,6 +593,9 @@ f     - AST_PUTCARDS: Stores a set of FITS header card in a FitsChan
 *        Completed initial attempt at a FITS-CLASS encoding.
 *     9-SEP-2004 (DSB):
 *        Fixed usage of uninitialised values within ReadCrval.
+*     13-SEP-2004 (DSB):
+*        Check the "text" pointer can be used safely before using it in
+*        DSSToStore.
 *class--
 */
 
@@ -6596,9 +6599,11 @@ static void DSSToStore( AstFitsChan *this, FitsStore *store,
 
 /* Copy the first 10 non-blank characters from the PLTDECSN keyword. */
    GetValue( this, "PLTDECSN", AST__STRING, &text, 1, 1, method, class );
-   text += strspn( text, " " );
-   text[ strcspn( text, " " ) ] = 0;
-   strncpy( pltdecsn, text, 10 );
+   if( astOK ) {
+      text += strspn( text, " " );
+      text[ strcspn( text, " " ) ] = 0;
+      strncpy( pltdecsn, text, 10 );
+   }
 
 /* Read other related keywords. We do not need these, but we read them
    so that they are not propagated to any output FITS file. */
