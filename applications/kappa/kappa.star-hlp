@@ -19068,7 +19068,7 @@ TITLE = LITERAL (Read)
 TYPE = LITERAL (Read)
    Data type for the new NDF, if LIKE=! and no input NDFs are
    referenced in the expression.  It must be one either
-   "_DOUBLE" or "_REAL". ["_REAL"]
+   "_DOUBLE" or "_REAL". 
 3 UBOUND
 UBOUND( ) = _INTEGER (Read)
    Upper bounds of new NDF, if LIKE=! and there is no input NDF

@@ -120,7 +120,7 @@
 *     TYPE = LITERAL (Read)
 *        Data type for the new NDF, if LIKE=! and no input NDFs are
 *        referenced in the expression.  It must be one either
-*        "_DOUBLE" or "_REAL". ["_REAL"]
+*        "_DOUBLE" or "_REAL". 
 *     UBOUND( ) = _INTEGER (Read)
 *        Upper bounds of new NDF, if LIKE=! and there is no input NDF
 *        referenced in the expression.  These must not be smaller
