@@ -23,6 +23,11 @@
      
 *     Modifications:
 
+*     2  Feb 04 : TIMJ- Fix TT vs UT confusion. RJDATE now returns TT MJD
+*                       since that is the most common variant. LST calculation
+*                       now (correctly) uses UT but all other SLA routines
+*                       use TT. LST calculation factored out into separate
+*                       function.
 *     4  Dec 98 : TIMJ- Fix problems with linux port: Have to use
 *                       BLOCK DATA to initialise COMMON. Fix MSG_FMTD
 *                       (concerning SIGN variable) since SIGN is
