@@ -34,9 +34,9 @@
 *     change_quality ndf{spec1}{spec} bad_quality
 
 *  ADAM Parameters:
-*     BAD_QUALITY = _LOGICAL (Read)
-*         Set quality to BAD. Answering this question with a 'yes' will
-*         mean that the selected data will be set to BAD. 'no'
+*     BAD_QUALITY = LOGICAL (Read)
+*         Set quality to BAD. Answering this question with a `yes' will
+*         mean that the selected data will be set to BAD. `no'
 *         will set them to good.
 *     IN = CHAR (Read)
 *         Name of data set and the specification of the data to be changed.
@@ -66,8 +66,8 @@
 *         via the IN parameter.
 *     USE_SECTION = LOGICAL (Read)
 *         This parameter specified whether the specified SCUBA section
-*         should be changed (.TRUE.) or the data not specified by the
-*         section (.FALSE.). Default is .TRUE.
+*         should be changed (TRUE) or the data not specified by the
+*         section (FALSE). Default is TRUE.
 
 *  Examples:
 *     change_quality 'ndf{}' BAD_QUALITY=false
@@ -98,7 +98,7 @@
 *     no longer used as a masking bit.
 
 *  Related Application:
-*     SURF: CHANGE_DATA; REBIN, SCUPHOT
+*     SURF: CHANGE_DATA, REBIN, SCUPHOT;
 *     KAPPA: SETBB
 
 
