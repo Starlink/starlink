@@ -157,7 +157,7 @@ nonexecutable_item
 	: declaration_word
 		{ $$ = $1; }
 	| FUNC_NAME '(' nonexecutable_code ')'
-		{ $$ = scat( 4, canchor( "href", $1, 0 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	| ';'
 	;
 
