@@ -453,10 +453,17 @@ Available on CTAN, in directory
 .I /tex-archive/dviware/driv-standard.
 This incorporates sections of the DVItype documentation.
 .SH BUGS
+When you form a bitmap containing only a character which
+doesn't sit on the baseline, such as a minus character, the bounding
+box of the bitmap will, in general, be such that the bitmap will
+appear in the HTML sitting on the text baseline, which isn't right.
+One response to this is `don't do that'; another response is for me to
+find some more cunning way to calculate the bounding box.
+.PP
 If the program doesn't conform to the DVI Driver Standard, please let
 me know.
 .PP
-There's probably too many options, but the program is designed to sit
+There are probably too many options, but the program is designed to sit
 inside layers of scripting as one element in a complicated toolbox, so
 maybe it's defensible.
 .PP

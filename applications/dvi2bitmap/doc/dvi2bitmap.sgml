@@ -803,9 +803,20 @@ and build it as usual, ignoring the warnings about the missing main
 
 <sect id=developments export>Further developments
 
+<p>Bugs:
+<ul>
+<li>When you form a bitmap containing only a character which
+doesn't sit on the baseline, such as a minus character, the bounding
+box of the bitmap will, in general, be such that the bitmap will
+appear in the HTML sitting on the text baseline, which isn't right.
+One response to this is `don't do that'; another response is for me to
+find some more cunning way to calculate the bounding box.
+
+</ul>
+
 <p>Things I'd like to do sometime:
 <ul>
-<li>There is an <em/awful/ lot of options, isn't there.
+<li>There are an <em/awful/ lot of options, aren't there.
 <li>Support PBM graphics.
 <li>Support for different colours of output, controllable through specials.
 <li>Ermmm, any suggestions?
