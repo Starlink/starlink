@@ -432,7 +432,7 @@ PKG_VERS = 0.14
 #  script and any documentation files).
 
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
-               aif_sub.tar fts_sub.tar irm_sub.tar ira_sub.tar kapgen_sub.tar \
+               aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar \
                ndg_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
                ndfpack_sub.tar $(PKG_NAME)_ifls.tar $(PKG_NAME)_iraf.tar \
                $(PKG_NAME)_data_alpha_OSF1.tar \
@@ -472,7 +472,7 @@ ICL_SCRIPT = $(PKG_NAME).icl
 #  which form part of the package and are required in order to build
 #  it, but which are not required by users of it.
 
-PRIVATE_INCLUDES = c1_com me_com irm_com ira_par ira_com ira_err ctm_com \
+PRIVATE_INCLUDES = c1_com me_com ira_par ira_com ira_err ctm_com \
                    ctm_par fts_par hlpcmd sft_com ndg_const ndg_err \
                    kpg_ast kpg_par grf.h grecom.inc grerr
 
@@ -497,7 +497,7 @@ EXTERNAL_INCLUDES = SAE_PAR AGI_ERR CHR_ERR DAT_ERR DAT_PAR FIO_ERR \
 #  routines and the main routine, which are treated separately).
 
 F_ROUTINES = $(AIF_F_ROUTINES) $(FITS_F_ROUTINES) $(NDG_F_ROUTINES) \
-             $(IRM_F_ROUTINES) $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
+             $(IRA_F_ROUTINES) $(KAPGEN_F_ROUTINES) \
              $(KAPPA_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
              $(KAPVIEW_F_ROUTINES) $(MEM_F_ROUTINES) \
              $(NDFPACK_F_ROUTINES) $(KAPVIEW_MONO_SOURCE) \
@@ -540,13 +540,8 @@ ndg1_appen.f ndg_crexp.f ndg1_hcut.f ndg_delet.f ndg1_hfind.f \
 ndg1_ndfch.f ndg_annul.f ndg_ndfas.f ndg1_pshdb.f ndg_asexp.f \
 ndg_ndfcr.f ndg1_sdfex.f ndg1_ndfdl.f
 
-IRM_F_ROUTINES = \
-irm1_rglmt.f irm_mline.f irm_stats.f \
-irm_staxs.f irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f \
-irm_stnul.f irm_stpen.f irm_stpha.f irm_table.f   
-
 KAPGEN_F_ROUTINES = \
-agchax.f agchcu.f agchil.f bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
+bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalr.f copad.f copar.f copy1d.f copy2d.f \
 copy3d.f cpsecr.f creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f \
 elnmbr.f exparr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f \
@@ -969,7 +964,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
 #  code.
 
 INCLUDE_LINKS = $(EXTERNAL_INCLUDES) C1_COM ME_COM CTM_COM CTM_PAR \
-                FTS_PAR HLPCMD IRM_COM SFT_COM IRA_COM IRA_PAR \
+                FTS_PAR HLPCMD SFT_COM IRA_COM IRA_PAR \
                 IRA_ERR NDG_ERR NDG_CONST KPG_PAR KPG_AST
 
 #
@@ -1000,7 +995,6 @@ IDI_PAR:     $(STAR_INC)/idi_par;     $(LINK) $? $@
 IRA_COM:     ira_com;                 $(LINK) $? $@
 IRA_ERR:     ira_err;                 $(LINK) $? $@
 IRA_PAR:     ira_par;                 $(LINK) $? $@
-IRM_COM:     irm_com;                 $(LINK) $? $@
 KPG_AST:     kpg_ast;                 $(LINK) $? $@
 KPG_PAR:     kpg_par;                 $(LINK) $? $@
 MAG_ERR:     $(STAR_INC)/mag_err;     $(LINK) $? $@
@@ -1073,11 +1067,6 @@ $(NDG_F_ROUTINES) $(NDG_C_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(IRM_F_ROUTINES) :
-	$(TAR_OUT) irm_sub.tar $@
-	@ if test -f $@; then :;\
-           else echo $@ is not in the tar file; exit 1; fi
-
 $(KAPGEN_F_ROUTINES) $(KAPGEN_C_ROUTINES) $(KAPGEN_BLOCK_DATA) \
 $(GRF_C_ROUTINES):
 	$(TAR_OUT) kapgen_sub.tar $@
@@ -1140,7 +1129,7 @@ $(IRAF_DEMO) :
 
 
 OBJECT_FILES = $(AIF_OBJECT_FILES) $(FITS_OBJECT_FILES) $(NDG_OBJECT_FILES) \
-               $(IRA_OBJECT_FILES) $(IRM_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
+               $(IRA_OBJECT_FILES) $(KAPGEN_OBJECT_FILES) \
                $(KAPPA_OBJECT_FILES) $(KAPSUB_OBJECT_FILES) \
                $(KAPVIEW_OBJECT_FILES) $(NDFPACK_OBJECT_FILES)
 
@@ -1149,8 +1138,6 @@ AIF_OBJECT_FILES = $(AIF_F_ROUTINES:.f=.o)
 FITS_OBJECT_FILES = $(FITS_F_ROUTINES:.f=.o) $(FITS_C_ROUTINES:.c=.o)
 
 IRA_OBJECT_FILES = $(IRA_F_ROUTINES:.f=.o) $(IRA_BLOCK_DATA:.f=.o) 
-
-IRM_OBJECT_FILES = $(IRM_F_ROUTINES:.f=.o)
 
 NDG_OBJECT_FILES = $(NDG_F_ROUTINES:.f=.o) $(NDG_C_ROUTINES:.c=.o)
 
@@ -1178,7 +1165,7 @@ NDFPACK_OBJECT_FILES = $(NDFPACK_F_ROUTINES:.f=.o)
 
 OBJECT_LIBRARIES = \
 libkappa.a libkapview.a libndfpack.a libkapsub.a libkapgen.a libfits.a \
-libirm.a libaif.a libira.a libndg.a
+libaif.a libira.a libndg.a
 
 #
 libaif.a: $(AIF_OBJECT_FILES)
@@ -1190,10 +1177,6 @@ libfits.a: $(FITS_OBJECT_FILES)
 	$(RANLIB) $@
 #
 libira.a: $(IRA_OBJECT_FILES)
-	$(AR_IN) $@ $?
-	$(RANLIB) $@
-#
-libirm.a: $(IRM_OBJECT_FILES)
 	$(AR_IN) $@ $?
 	$(RANLIB) $@
 #
@@ -1351,7 +1334,7 @@ $(INSTALL_DIRS):
 #  This is for development use.  It enables the source tar file to be
 #  created and updated(?).
 
-archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar irm_sub.tar \
+archive: $(PKG_NAME)_source.tar aif_sub.tar fts_sub.tar \
          kapgen_sub.tar kappa_sub.tar kapsub_sub.tar kapview_sub.tar \
          ndfpack_sub.tar $(PKG_NAME)_ifls.tar ira_sub.tar ndg_sub.tar \
          $(PKG_NAME)_data_alpha_OSF1.tar $(PKG_NAME)_data_sun4_Solaris.tar
@@ -2363,9 +2346,6 @@ aif_sub.tar:
 fts_sub.tar:
 	$(TAR_IN) fts_sub.tar $(FITS_F_ROUTINES) $(FITS_C_ROUTINES)
 
-irm_sub.tar:
-	$(TAR_IN) irm_sub.tar $(IRM_F_ROUTINES) 
-
 ndg_sub.tar:
 	$(TAR_IN) ndg_sub.tar $(NDG_F_ROUTINES) $(NDG_C_ROUTINES)
 
@@ -2407,9 +2387,6 @@ $(PKG_NAME)_data_sun4_Solaris.tar:
 #  files.
 
 add.o:	         SAE_PAR NDF_PAR
-agchax.o:	 IRM_COM
-agchcu.o:	 SAE_PAR IRM_COM
-agchil.o:	 IRM_COM
 aif_antmp.o:	 SAE_PAR DAT_PAR
 aif_asfio.o:	 SAE_PAR PAR_ERR
 aif_flnam.o:	 SAE_PAR
@@ -2641,18 +2618,6 @@ ira_read.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
 ira_seteq.o:	 SAE_PAR DAT_PAR PRM_PAR IRA_PAR IRA_ERR
 ira_trans.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_COM
 ira_write.o:	 SAE_PAR DAT_PAR IRA_PAR IRA_ERR IRA_COM
-irm1_rglmt.o:	 SAE_PAR
-irm_mline.o:	 SAE_PAR
-irm_stats.o:	 SAE_PAR PRM_PAR
-irm_staxs.o:	 SAE_PAR
-irm_stgrd.o:	 SAE_PAR
-irm_stlmt.o:	 SAE_PAR
-irm_stlog.o:	 SAE_PAR
-irm_stmap.o:	 SAE_PAR
-irm_stnul.o:	 SAE_PAR PRM_PAR
-irm_stpen.o:	 SAE_PAR GKS_PAR IRM_COM
-irm_stpha.o:	 SAE_PAR
-irm_table.o:	 SAE_PAR
 kap_div.o:	 SAE_PAR NDF_PAR
 kap_log10.o:	 SAE_PAR DAT_PAR PAR_ERR
 kap_pow.o:	 SAE_PAR DAT_PAR PAR_ERR
@@ -3487,7 +3452,7 @@ medwv.o:	 SAE_PAR PRM_PAR
 mem2d.o:	 SAE_PAR PRM_PAR NDF_PAR NDF_ERR PAR_ERR C1_COM ME_COM
 mfnext.o:	 SAE_PAR DAT_PAR
 mfopen.o:	 SAE_PAR DAT_PAR
-mlinplot.o:	 SAE_PAR DAT_PAR PRM_PAR NDF_PAR NDF_ERR IRM_COM
+mlinplot.o:	 SAE_PAR AST_PAR PRM_PAR NDF_PAR 
 mosaic.o:	 SAE_PAR DAT_PAR PAR_ERR
 moscad.o:	 SAE_PAR PRM_PAR
 moscdv.o:	 SAE_PAR PRM_PAR

@@ -6,7 +6,7 @@
 #           Thu Nov 27 14:08:35 GMT 1997
 
 # The names of all the tar files containing system-independant files:
-TAR_FILES_A = kappa_source  aif_sub fts_sub irm_sub ira_sub kapgen_sub \
+TAR_FILES_A = kappa_source  aif_sub fts_sub ira_sub kapgen_sub \
 kappa_ifls kappa_source kappa_sub kapsub_sub kapview_sub ndfpack_sub \
 kappa_iraf ndg_sub
 
@@ -18,7 +18,7 @@ kappa_data_sun4_Solaris
 KAPPA_SOURCE = fitsedit.csh fitshead.csh lutread.csh multiplot.csh \
 colstar.icl fancylook.icl flatfield.icl kappa_proc.icl multistat.icl \
 unsharpmask.icl irg_wild nfi.awk kappa.csh kappa_link_adam kappa.icl \
-c1_com me_com irm_com ctm_com ctm_par fts_par hlpcmd grecom.inc grerr \
+c1_com me_com ctm_com ctm_par fts_par hlpcmd grecom.inc grerr \
 sft_com kappa.hlp kappa_mon.f kapview_mon.f ndfpack_mon.f ira_com ira_par \
 ira_err ndg_const ndg_err kpg_ast kpg_par grf.h style.def tkast.tcl
 
@@ -40,12 +40,6 @@ fts1_wkeyc.f fts1_wkeyd.f fts1_wkeyi.f fts1_wkeyl.f fts1_wkeyr.f \
 fts1_findf.c fts1_rnand.c fts1_rnanr.c fts1_ftwcs.f fts1_wcsim.f \
 fts1_fndfs.f fts1_wcsax.f fts1_wcsut.f fts1_wcsdf.f \
 fts1_chvai.f fts1_chvaub.f fts1_chvaw.f 
-
-# The contents of the irm_sub.tar file:
-IRM_SUB = irm1_rglmt.f irm1_split.f irm1_wrtbx.f irm_bldat.f irm_chkob.f \
-irm_delob.f irm_gropn.f irm_hmenu.f irm_mline.f irm_stats.f irm_staxs.f \
-irm_stgrd.f irm_stlmt.f irm_stlog.f irm_stmap.f irm_stnul.f irm_stpen.f \
-irm_stpha.f irm_table.f irm_tmenu.f irm_vmenu.f 
 
 # The contents of the ndg_sub.tar file:
 NDG_SUB = ndg1_chscn.f ndg1_hsplt.f ndg1_pshde.f ndg_assoc.f ndg_ndfpr.f \
@@ -448,7 +442,7 @@ sun95_pixco.eps sun95_gridco.eps kappa.news sun221.tex sun95_gd9.eps
 #  All files which need to be extracted from the RCS repository in order
 #  to make a UNIX release. 
 UNIX_RELEASE =  $(UNIX_OTHERS) kappa.star-hlp \
-$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(IRM_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
+$(KAPPA_SOURCE) $(AIF_SUB) $(FTS_SUB) $(KAPGEN_SUB) $(IRA_SUB) \
 $(KAPPA_DATA_ALPHA_OSF1) $(KAPPA_DATA_IX86_LINUX) $(KAPPA_DATA_SUN4_SOLARIS) \
 $(KAPPA_IFLS) $(KAPPA_SOURCE) $(KAPPA_SUB) $(KAPSUB_SUB) $(KAPVIEW_SUB) \
 $(NDFPACK_SUB) $(KAPPA_IRAF) $(IRAF_DOCS) $(NDG_SUB)
@@ -458,7 +452,7 @@ UNIX_TOTAL = kappa_source.tar makefile mk sun95.tex sun95_gd1.eps \
 sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps sun95_gd5.eps sun95_gd9.eps \
 sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps sun95_ardwork.eps sun95.htx_tar \
 sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps kappa.news \
-aif_sub.tar fts_sub.tar ira_sub.tar irm_sub.tar kapgen_sub.tar kappa_sub.tar \
+aif_sub.tar fts_sub.tar ira_sub.tar kapgen_sub.tar kappa_sub.tar \
 ndg_sub.tar kapsub_sub.tar kapview_sub.tar ndfpack_sub.tar kappa_ifls.tar \
 kappa_data_alpha_OSF1.tar kappa_data_ix86_Linux.tar \
 kappa_data_sun4_Solaris.tar sun221.tex sun221.htx_tar kappa_iraf.tar
