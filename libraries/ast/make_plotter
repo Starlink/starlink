@@ -1,0 +1,5 @@
+ast_dev
+g77 -fno-second-underscore -g -o plotter plotter.f -L$INSTALL/lib \
+-L/star/lib `ast_link -pgp` `pgplot_link`
+#/usr/local/lib/libcpgplot.a `ast_link -pgp` 
+ast_dev remove
