@@ -102,11 +102,13 @@ Process the history element in the docbody.  Present it in reverse order
 update elements which refer to them.
 <codebody>
 (define (make-updatelist)
-  (make sequence
-    (make empty-command name: "section"
-	  parameters: '("Change history"))
-    (with-mode extract-updatelist
-      (process-node-list (getdocinfo 'history)))))
+  (if (getdocinfo 'history)
+      (make sequence
+	(make empty-command name: "section"
+	      parameters: '("Change history"))
+	(with-mode extract-updatelist
+	  (process-node-list (getdocinfo 'history))))
+      (empty-sosofo)))
 
 
 (mode extract-updatelist
