@@ -6,17 +6,14 @@
                PROMPT  'Name of source file'
                PPATH   'GLOBAL,CURRENT'
                ASSOCIATION '<->GLOBAL.BINDS'
-               VPATH   'PROMPT'
                HELP 'Enter dataset name without an extension'
             ENDPARAMETER
 
      PARAMETER RESPFILE
                POSITION 2
                TYPE    '_CHAR'
-               PROMPT  'Name of instrument response matrix file'
-               PPATH   'DYNAMIC,DEFAULT'
-               VPATH   'PROMPT'
-               DEFAULT  XRTCAL:DRMPSPC
+               PROMPT  Response matrix file'
+               PPATH   'DYNAMIC'
                HELP 'Enter dataset name without the .SDF extension'
             ENDPARAMETER
 
