@@ -241,6 +241,16 @@ PUBLIC "-//W3C//ENTITIES Latin1//EN//HTML"		html4/HTMLlat1.ent
 PUBLIC "-//W3C//ENTITIES Special//EN//HTML"		html4/HTMLspecial.ent
 PUBLIC "-//W3C//ENTITIES Symbols//EN//HTML"		html4/HTMLsymbol.ent
 
+	-- XHTML 1.0 --
+	-- See http://www.w3.org/TR/xhtml1 --
+PUBLIC  "-//W3C//DTD XHTML 1.0 Strict//EN"		xhtml1/xhtml1-strict.dtd
+PUBLIC  "-//W3C//DTD XHTML 1.0 Transitional//EN"	xhtml1/xhtml1-transitional.dtd
+PUBLIC  "-//W3C//DTD XHTML 1.0 Frameset//EN"		xhtml1/xhtml1-frameset.dtd
+PUBLIC	"-//W3C//ENTITIES Latin 1 for XHTML//EN"	xhtml1/xhtml-lat1.ent
+PUBLIC	"-//W3C//ENTITIES Symbols for XHTML//EN"	xhtml1/xhtml-symbol.ent
+PUBLIC	"-//W3C//ENTITIES Special for XHTML//EN"	xhtml1/xhtml-special.ent
+
+
 	-- OASIS exchange table model.
 	   See http://www.oasis-open.org/html/a503.htm
 	   and http://www.oasis-open.org/html/publtext.htm
