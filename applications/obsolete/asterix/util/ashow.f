@@ -118,7 +118,7 @@
       INTEGER			IC_LNK
         PARAMETER ( IC_LNK = 8 )
       INTEGER			IC_SEL
-        PARAMETER ( IC_LNK = 16 )
+        PARAMETER ( IC_SEL = 16 )
       INTEGER			IC_ALL
         PARAMETER ( IC_ALL = IC_WCS+IC_MIS+IC_TIM+IC_LNK+IC_SEL )
 
@@ -971,6 +971,7 @@
 
       INTEGER			I			! Loop over selections
       INTEGER			ICMP			! Loop over selectors
+      INTEGER			NCMP			! # selectors
       INTEGER			NREC			! # selection records
       INTEGER			SELID			! Selection identifier
       INTEGER			SID			! Selector identifier
