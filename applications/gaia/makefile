@@ -673,7 +673,6 @@ $(TCL_FILES): .tcl.built
 	export TK_LIBRARY; unset TK_LIBRARY;\
 	./configure --prefix=$${pwd}/built;\
 	make -e World)
-	cp -p ./built/bin/atclsh .
 	for f in $(SCRIPT_PLACES) ""; do \
 	   if test -f "$$f"; then \
 	      cp -p $$f . ;\
