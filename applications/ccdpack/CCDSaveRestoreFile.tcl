@@ -32,11 +32,14 @@
 
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
 
 #  History:
 #     22-FEB-1994 (PDRAPER):
 #     	 Original version.
+#     4-JUL-2001 (MBT):
+#        Prevented it from saving ZEROED.  What is ZEROED?
 #     {enter_changes_here}
 
 #-
@@ -60,8 +63,9 @@
          puts $fileid "#"
 
 #  Now add the global contents.
-         foreach param [array names CCDglobalpars ] {
-            if { $CCDglobalpars($param) != "" } { 
+         foreach param [lsort -dictionary [array names CCDglobalpars ]] {
+            if { $CCDglobalpars($param) != "" &&
+                 ![string match *ZEROED $param] } { 
                puts $fileid "$param = $CCDglobalpars($param)"
             }
          }
