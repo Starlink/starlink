@@ -38,20 +38,26 @@ $(MANIFEST)/adamnet: \
 
 $(MANIFEST)/agi: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
 		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/agi \
 	    && make>make.log && make install>>make.log
@@ -155,12 +161,14 @@ $(MANIFEST)/atools: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/sst \
@@ -205,21 +213,27 @@ $(MANIFEST)/automake: \
 
 $(MANIFEST)/cat: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
 		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/cat \
 	    && make>make.log && make install>>make.log
@@ -257,6 +271,7 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/nbs \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
@@ -267,6 +282,7 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/ref \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/sock \
 		$(MANIFEST)/star2html \
@@ -319,8 +335,7 @@ $(MANIFEST)/chr: \
 	cd libraries/chr \
 	    && make>make.log && make install>>make.log
 
-$(MANIFEST)/cnf: \
-		$(MANIFEST)/star2html
+$(MANIFEST)/cnf:
 	cd libraries/cnf \
 	    && make>make.log && make install>>make.log
 
@@ -349,11 +364,13 @@ $(MANIFEST)/convert: \
 		$(MANIFEST)/misc \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
@@ -426,6 +443,58 @@ $(MANIFEST)/daophot: \
 	cd applications/daophot \
 	    && make>make.log && make install>>make.log
 
+$(MANIFEST)/datacube: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/agi \
+		$(MANIFEST)/ams \
+		$(MANIFEST)/ard \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/cat \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/convert \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/figaro \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
+		$(MANIFEST)/gns \
+		$(MANIFEST)/grp \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
+		$(MANIFEST)/kaplibs \
+		$(MANIFEST)/kappa \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/ncar \
+		$(MANIFEST)/ndf \
+		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgplot \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/snx \
+		$(MANIFEST)/starx \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/tcl \
+		$(MANIFEST)/tk
+	cd applications/datacube \
+	    && make>make.log && make install>>make.log
+
 $(MANIFEST)/dipso: \
 		$(MANIFEST)/adam \
 		$(MANIFEST)/agi \
@@ -491,6 +560,57 @@ $(MANIFEST)/dtask: \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/subpar
 	cd libraries/pcs/dtask \
+	    && make>make.log && make install>>make.log
+
+$(MANIFEST)/echomop: \
+		$(MANIFEST)/adam \
+		$(MANIFEST)/agi \
+		$(MANIFEST)/ams \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/cat \
+		$(MANIFEST)/cfitsio \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
+		$(MANIFEST)/gns \
+		$(MANIFEST)/graphpar \
+		$(MANIFEST)/grp \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
+		$(MANIFEST)/kaplibs \
+		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/ncar \
+		$(MANIFEST)/ndf \
+		$(MANIFEST)/ndg \
+		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/pgp \
+		$(MANIFEST)/pgplot \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/ref \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/sgs \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/snx \
+		$(MANIFEST)/starx \
+		$(MANIFEST)/string \
+		$(MANIFEST)/subpar \
+		$(MANIFEST)/tcl \
+		$(MANIFEST)/tk \
+		$(MANIFEST)/trn
+	cd applications/echomop \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/echwind: \
@@ -768,23 +888,29 @@ $(MANIFEST)/gns: \
 
 $(MANIFEST)/graphpar: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/gks \
 		$(MANIFEST)/gns \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
 		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pgp \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
+		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/graphpar \
 	    && make>make.log && make install>>make.log
@@ -1119,12 +1245,14 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/kaplibs \
 		$(MANIFEST)/lex \
+		$(MANIFEST)/mag \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pgplot \
@@ -1132,6 +1260,7 @@ $(MANIFEST)/kappa: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
@@ -1170,12 +1299,14 @@ $(MANIFEST)/kaprh: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
@@ -1319,23 +1450,29 @@ $(MANIFEST)/ndf: \
 
 $(MANIFEST)/ndg: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
 		$(MANIFEST)/ary \
 		$(MANIFEST)/ast \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/grp \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/par \
+		$(MANIFEST)/parsecon \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/ndg \
 	    && make>make.log && make install>>make.log
@@ -1357,17 +1494,23 @@ $(MANIFEST)/one: \
 
 $(MANIFEST)/par: \
 		$(MANIFEST)/adam \
+		$(MANIFEST)/ams \
 		$(MANIFEST)/chr \
 		$(MANIFEST)/cnf \
+		$(MANIFEST)/dtask \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/messys \
+		$(MANIFEST)/misc \
+		$(MANIFEST)/parsecon \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/star2html \
+		$(MANIFEST)/string \
 		$(MANIFEST)/subpar
 	cd libraries/par \
 	    && make>make.log && make install>>make.log
@@ -1478,12 +1621,14 @@ $(MANIFEST)/pisa: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
 		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pda \
 		$(MANIFEST)/prm \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/string \
@@ -1519,6 +1664,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/ncar \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
+		$(MANIFEST)/one \
 		$(MANIFEST)/par \
 		$(MANIFEST)/parsecon \
 		$(MANIFEST)/pgplot \
@@ -1526,6 +1672,7 @@ $(MANIFEST)/polpack: \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
 		$(MANIFEST)/sgs \
+		$(MANIFEST)/shl \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
 		$(MANIFEST)/star2html \
