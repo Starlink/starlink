@@ -10112,7 +10112,7 @@ iraf! {
             helpkey *
          }
 
-         parameter lbnd {
+         parameter lbound {
             type _INTEGER
             access READ
             vpath PROMPT
@@ -10142,7 +10142,7 @@ iraf! {
             helpkey *
          }
 
-         parameter ubnd {
+         parameter ubound {
             type _INTEGER
             access READ
             vpath PROMPT

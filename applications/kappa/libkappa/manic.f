@@ -63,7 +63,8 @@
 *     OUT = NDF (Write)
 *        The output NDF.
 *     TITLE = LITERAL (Read)
-*        Title for the output NDF. ["KAPPA - Manic"]
+*        Title for the output NDF. A null (!) mean suse the title fo the
+*        input NDF. [!]
 *     UBOUND( ) = _INTEGER (Read)
 *        An array holding the upper pixel bounds of any new axes in the
 *        output NDF (that is, output axes which have a zero value in the
@@ -137,7 +138,7 @@
 *        than LBOUND values.
 *     11-JAN-2002 (DSB):
 *        Added "Implementation Status" to prologue. Correct the
-*        annullment of LOC5.
+*        annullment of LOC5. Changed TITLE default to null.
 *     {enter_further_changes}
 
 *  Bugs:

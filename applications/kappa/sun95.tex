@@ -27264,7 +27264,6 @@ plot (6k).
       }
    }
 }
-
 \sstroutine{
    MANIC
 }{
@@ -27276,7 +27275,7 @@ plot (6k).
       \emph{etc}.) by averaging the pixels in perpendicular directions, or grown
       into new dimensions by duplicating an existing N-dimensional
       surface. The order of the axes can also be changed at the same time.
-      Any combination of these abilities is also possible.
+      Any combination of these operations is also possible.
 
       The shape of the output NDF is specified using parameter AXES. This
       is a list of integers, each element of which identifies the source
@@ -27293,7 +27292,7 @@ plot (6k).
    }
    \sstparameters{
       \sstsubsection{
-         AXES( $*$ ) = \_INTEGER (Read)
+         AXES( ) = \_INTEGER (Read)
       }{
          An array of integers which define the pixel axes of the output
          NDF. The array should contain one value for each pixel axis in
@@ -27301,17 +27300,17 @@ plot (6k).
          zero. If positive, it is taken to be the index of a pixel axis
          within the input NDF which is to be used as the output axis. If
          zero, the output axis will be formed by replicating the entire
-         output NDF a specified number of times (see parameters LBND and
-         UBND). At least one non-zero value must appear in the list, and
-         no input axis can be used more than once.
+         output NDF a specified number of times (see parameters LBOUND and
+         UBOUND). At least one non-zero value must appear in the list, and
+         no input axis may be used more than once.
       }
       \sstsubsection{
-         IN  = NDF (Read)
+         IN = NDF (Read)
       }{
          The input NDF.
       }
       \sstsubsection{
-         LBND( $*$ ) = \_INTEGER (Read)
+         LBOUND( ) = \_INTEGER (Read)
       }{
          An array holding the lower pixel bounds of any new axes in the
          output NDF (that is, output axes which have a zero value in the
@@ -27328,11 +27327,11 @@ plot (6k).
       \sstsubsection{
          TITLE = LITERAL (Read)
       }{
-         Title for the output NDF.  A null value (!) propagates the title
-         from the input NDF to the output NDF. {\tt [!]}
+         Title for the output NDF. A null (!) means use the title of the input
+         NDF. {\tt [!]}
       }
       \sstsubsection{
-         UBND( $*$ ) = \_INTEGER (Read)
+         UBOUND( ) = \_INTEGER (Read)
       }{
          An array holding the upper pixel bounds of any new axes in the
          output NDF (that is, output axes which have a zero value in the
@@ -27352,20 +27351,20 @@ plot (6k).
          the Domain of the current Frame is PIXEL or AXES. For instance,
          if the current Frame has Domain {\tt "}SKY{\tt "}, with axis 1 being RA and
          axis 2 being DEC, then these will be unchanged in the output NDF.
-         However, the Mapping which is used to related (RA,DEC) positions
+         However, the Mapping which is used to relate (RA,DEC) positions
          to pixel positions will be modified to take the permutation of
          the pixel axes into account.
       }
       \sstexamplesubsection{
-         manic cube summ [3]
+         manic cube summ 3
       }{
          This creates a one dimensional output NDF called summ, in which
-         the single pixel axis correspinds to the Z (third) axis in an input
+         the single pixel axis corresponds to the Z (third) axis in an input
          NDF called (cube). Each element in the output is equal to the
          average data value in the corresponding XY plane of the input.
       }
       \sstexamplesubsection{
-         manic line plane [0,1] lbnd=1 ubnd=25
+         manic line plane [0,1] lbound=1 ubound=25
       }{
          This takes a 1-dimensional NDF called line and expands it into a
          2-dimensional NDF called plane.  The second pixel axis of the output
@@ -27374,7 +27373,7 @@ plot (6k).
          the input NDF 25 times.
       }
       \sstexamplesubsection{
-         manic line plane [1,0] lbnd=1 ubnd=25
+         manic line plane [1,0] lbound=1 ubound=25
       }{
          This does the same as the last example except that the output
          NDF is transposed. That is, the input NDF is copied into the
@@ -27382,7 +27381,7 @@ plot (6k).
          output NDF, instead of pixel axis 2 (Y) as before.
       }
       \sstexamplesubsection{
-         manic cube hyper [1,0,0,0,0,0,3] ubnd=[2,4,2,2,1] accept
+         manic cube hyper [1,0,0,0,0,0,3] ubound=[2,4,2,2,1] accept
       }{
          This manic example projects the second dimension of an input
          3-dimensional NDF onto the plane formed by its first and third
