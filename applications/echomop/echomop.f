@@ -107,6 +107,7 @@
       CHARACTER*8 REF_STR1
       CHARACTER*( ECH__MNMSIZ ) SUBOPT_MODULE
       CHARACTER*( ECH__MNMSIZ ) SUBOPT_TEXT
+      CHARACTER CVALUECLASS
 
 *  Functions Called:
       LOGICAL ECH_FATAL_ERROR
@@ -518,90 +519,62 @@
           IF ( CVALUE( :1 ) .EQ. '$' ) THEN
              SYS_COMMAND = CVALUE( 2: )
 
-*      Try to read integer sub-option number (EG. 12.3 - suboption is 3)
           ELSE
-           DO i = 1, CHR_LEN( cvalue )
-             IF ( cvalue(i:i) .EQ. '.' ) THEN
-                READ ( cvalue(i+1:CHR_LEN(cvalue)),
-     :                            '(I)',IOSTAT=istat ) suboption
-                cvalue = cvalue(1:i-1)//' '
-             END IF
-           END DO
-
-*          If no option present then use default option number
-*          Else read an integer option number
-*          Endif
-           IF ( cvalue(1:) .EQ. 'y' .OR. cvalue(1:) .EQ. 'Y' .OR.
-     :          cvalue(1:) .EQ. '/' .OR.
-     :          cvalue(1:) .EQ. '+' ) THEN
-             ivalue = default_option
-           ELSE IF ( cvalue(2:) .EQ. ' ' ) THEN
-             READ ( cvalue, '(I1)', IOSTAT=istat ) ivalue
-           ELSE IF ( cvalue(3:) .EQ. ' ' ) THEN
-             READ ( cvalue, '(I2)', IOSTAT=istat ) ivalue
-           ELSE
-             READ ( cvalue, '(I3)', IOSTAT=istat ) ivalue
-           END IF
-
-*          If unable to obtain an option number then
-*            Check for keywords or single key specifiers
-*              (HELP,EXIT,MENU,ADJUST,PLOT, or DISABLE)
-*            and default to HELP if no match found
-*          Endif
-           IF ( istat .NE. 0 ) THEN
-             IF ( cvalue .EQ. 'HELP' .OR. cvalue .EQ. 'help' .OR.
-     :            cvalue .EQ. 'H' .OR. cvalue .EQ. 'h' ) THEN
-                ivalue = 0
-
-             ELSE IF ( cvalue .EQ. 'HYPER' .OR.
-     :                 cvalue .EQ. 'hyper') THEN
-                ivalue = 0
-                hyper = .TRUE.
-
-             ELSE IF ( cvalue .EQ. 'EXIT' .OR. cvalue .EQ. 'exit' .OR.
-     :                 cvalue .EQ. 'E' .OR. cvalue .EQ. 'e' ) THEN
-                ivalue = options_in_use
-
-             ELSE IF ( cvalue .EQ. 'QUIT' .OR. cvalue .EQ. 'quit' .OR.
-     :                 cvalue .EQ. 'Q' .OR. cvalue .EQ. 'q' ) THEN
-                ivalue = options_in_use
-
-             ELSE IF ( cvalue .EQ. 'MENU' .OR. cvalue .EQ. 'menu'.OR.
-     :                 cvalue .EQ. 'M' .OR. cvalue .EQ. 'm' ) THEN
-                full_menu = .TRUE.
-                ivalue = menu_option
-
-             ELSE IF ( cvalue .EQ. 'ADJUST' .OR.
-     :                 cvalue .EQ. 'adjust' .OR.
-     :                 cvalue .EQ. 'A' .OR. cvalue .EQ. 'a' ) THEN
-                ivalue = adjust_option
-
-             ELSE IF ( cvalue .EQ. 'PLOT' .OR. cvalue .EQ. 'plot'.OR.
-     :                 cvalue .EQ. 'P' .OR. cvalue .EQ. 'p' ) THEN
-                ivalue = plot_option
-
-             ELSE IF ( cvalue .EQ. 'DISABLE' .OR.
-     :                 cvalue .EQ. 'disable'.OR.
-     :                 cvalue .EQ. 'D' .OR. cvalue .EQ. 'd' ) THEN
-                ivalue = disable_option
-
-             ELSE
-                ivalue = 0
+*          Parse the string in cvalue (it might be good to consolidate
+*          rather more of the above ad-hoc parsing into a routine such
+*          as this, but this is probably complicated enough as it is)
+             call ech_parse_option (cvalue, cvalueclass, i1, i2)
+             
+             if (cvalueclass .eq. 'y') then ! default
+                option = default_option
+                
+             else if (cvalueclass .eq. '1') then ! single option
+                option = i1
+                
+             else if (cvalueclass .eq. '2') then ! option plus suboption
+                option = i1
+                suboption = i2
+                
+             else if (cvalueclass .eq. 'h') then ! help
+                option = 0
+                
+             else if (cvalueclass .eq. 'Y') then ! hyper
+                option = 0
+                hyper = .true.
+                
+             else if (cvalueclass .eq. 'q') then ! quit/exit
+                option = options_in_use
+                
+             else if (cvalueclass .eq. 'm') then ! menu
+                full_menu = .true.
+                option = menu_option
+                
+             else if (cvalueclass .eq. 'a') then ! adjust
+                option = adjust_option
+                
+             else if (cvalueclass .eq. 'p') then ! plot
+                option = plot_option
+                
+             else if (cvalueclass .eq. 'd') then ! disable
+                option = disable_option
+                
+             else               ! errors
+                option = 0
                 suboption = 0
-             END IF
-           END IF
-           IF ( IVALUE .EQ. 99 ) IVALUE = OPTIONS_IN_USE
+             end if
+
+*          Option 99 means the same as `q', so special-case this
+             if ( option .eq. 99 ) option = options_in_use
 
 *          Check for negative option number indicating that `preview' of
 *          option parameters is what is required
-           preview = .FALSE.
-           IF ( ivalue .LT. 0 ) THEN
-             option = - ivalue
-             preview = .TRUE.
-           ELSE
-             option =  ivalue
-           END IF
-          END IF
+             preview = .false.
+             if ( option .lt. 0 ) then
+                option = - option
+                preview = .true.
+             end if
+
+          end if
 
         ELSE
 
@@ -632,6 +605,11 @@
              option = next_1d_option ( option )
           END IF
         END IF
+       
+*        write (report_string, '("DBG:1:option=",i2," suboption=",i3,"
+*     :       subopt_module=",a," option_module()=",a)') 
+*     :       option, suboption, subopt_module, option_module(option)
+*        call ech_report (0, report_string)
 
 *       If a suboption number has been specified then
 *          Locate main option for which it is specified
