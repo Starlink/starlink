@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_CHKPRV( FID, CHDU, STATUS )
+      SUBROUTINE ADI2_CHKPRV( FID, CHDU, WRKEYS, STATUS )
 *+
 *  Name:
 *     ADI2_CHKPRV
@@ -10,7 +10,7 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_CHKPRV( FID, CHDU, STATUS )
+*     CALL ADI2_CHKPRV( FID, CHDU, WRKEYS, STATUS )
 
 *  Description:
 *     Commit any changes to keywords or data to the FITS file on disk. The
@@ -21,6 +21,8 @@
 *        ADI identifier of the FITSfile object
 *     CHDU = INTEGER (given)
 *        The HDU being worked on
+*     WRKEYS = LOGICAL (given)
+*        Commit keywords to file?
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -89,6 +91,7 @@
 *  Arguments Given:
       INTEGER			FID			! FITSfile identifier
       INTEGER			CHDU			! Current HDU
+      LOGICAL			WKEYS			! Write keywords?
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -108,6 +111,7 @@
       LOGICAL			CREATED			! HDU already created?
       LOGICAL			DEFBEG			! Definition started?
       LOGICAL			DEFEND			! Definition ended?
+      LOGICAL			MOVED			! Moved to HDU yet?
 *.
 
 *  Check inherited global status.
@@ -121,6 +125,10 @@
 
 *  Loop over all previous HDU's, ensuring they have defined data areas
       DO IHDU = 1, NHDU
+
+*    Initialise for this HDU
+        FSTAT = 0
+        MOVED = .FALSE.
 
 *    Locate an HDU by its consecutive number
         IF ( IHDU .EQ. 1 ) THEN
@@ -154,6 +162,7 @@
                 CALL FTCRHD( LUN, FSTAT )
               END IF
               CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
+              MOVED = .TRUE.
               CALL ADI_CPUT0L( OHID, '.CREATED', .TRUE., STATUS )
 
 *          Reserve some keyword space too
@@ -169,6 +178,24 @@
 
 *        Mark as defined
             CALL ADI_CPUT0L( OHID, '.DEF_END', .TRUE., STATUS )
+
+          END IF
+
+        END IF
+
+*    Still ok?
+        IF ( STATUS .EQ. SAI__OK ) THEN
+
+*      Write keywords?
+          IF ( WKEYS ) THEN
+
+*        Move to HDU unless already there
+            IF ( .NOT. MOVED ) THEN
+              CALL FTMAHD( LUN, IHDU, HDUTYPE, FSTAT )
+            END IF
+
+*        Write the keywords
+            CALL ADI2_FCOMIT_HDU( FID, OHID, STATUS )
 
           END IF
 
