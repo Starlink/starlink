@@ -439,7 +439,8 @@
       CALL BDI_MAP( OFID, 'Quality', 'UBYTE', 'WRITE', OQPTR, STATUS )
 
 *  Write in badbits mask
-      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS, STATUS )
+      CALL BDI_PUT( OFID, 'QualityMask', 'UBYTE', 0, 0, BADBITS,
+     :              STATUS )
       IF (STATUS .NE. SAI__OK) THEN
         CALL MSG_PRNT('Error creating output data, variance'/
      :                   /' and quality')
