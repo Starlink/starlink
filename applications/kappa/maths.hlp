@@ -351,6 +351,8 @@ MJC: Malcolm Currie (STARLINK)
 
 RFWS: R.F. Warren-Smith (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1989 August 20 (MJC):
@@ -372,10 +374,13 @@ History
     examples.  Enabled use of variance and co-ordinates in the
     expression.  Examples changed to lowercase.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDFs.  HISTORY and extensions are propagated from both the
    primary NDF and template NDF.
 

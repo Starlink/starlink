@@ -286,10 +286,13 @@ History
     calls.  Used PSX for workspace.  Made the Usage and Examples
     lowercase.  Added Related Applications.  Title propagated.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
    and propagates all extensions to the output NDF.  All propagated
    components come from the NDF to be normalised.
 

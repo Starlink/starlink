@@ -172,6 +172,8 @@ RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  7-AUG-1990 (RFWS):
@@ -205,10 +207,13 @@ History
     Added Related Applications and additional commentary.  Changed
     default of TITLE to null.  Used PSX to obtain workspace.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

@@ -97,6 +97,12 @@ FITTYPE = LITERAL (Read)
    Chebyshev polynomial or "Spline" for a bi-cubic spline.  The
    default is the current value, which initially is "Spline". []
 
+LOGFILE
+
+LOGFILE = FILENAME (Read)
+   Name of the file to log the binned array and errors before and
+   after fitting.  If null, there will be no logging. [!]
+
 IN
 
 IN = NDF (Read)
@@ -106,23 +112,16 @@ KNOTS
 
 KNOTS( 2 ) = _INTEGER (Read)
    The number of interior knots used for the bi-cubic-spline fit
-   along the x and y axes.  These knots are equally spaced
-   within the image.  Both values must be in the range 0 to
-   11.  If you supply a single value, it applies to both axes.
-   Thus 1 creates one interior knot, [5,4] gives 5 along the x
-   axis and 4 along the y direction.  Increasing this
-   parameter values increases the flexibility of the surface.
-   Normally, 4 is a reasonable value.  The upper limit of
-   acceptable values will be reduced along each axis when its
-   binned array dimension is less than 29.  KNOTS is only
-   accessed when FITTYPE="Spline".  The default is the current
-   value, which is 4 initially. []
-
-LOGFILE
-
-LOGFILE = FILENAME (Read)
-   Name of the file to log the binned array and errors before and
-   after fitting.  If null, there will be no logging. [!]
+   along the x and y axes.  These knots are equally spaced within
+   the image.  Both values must be in the range 0 to 11.  If you
+   supply a single value, it applies to both axes.  Thus 1
+   creates one interior knot, [5,4] gives 5 along the x axis and
+   4 along the y direction.  Increasing this parameter values
+   increases the flexibility of the surface.  Normally, 4 is a
+   reasonable value.  The upper limit of acceptable values will
+   be reduced along each axis when its binned array dimension is
+   less than 29.  KNOTS is only accessed when FITTYPE="Spline".
+   The default is the current value, which is 4 initially. []
 
 ORDER
 
@@ -212,15 +211,20 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK).
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1996 October 23 (MJC):
     Original NDF version.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, and HISTORY components of the input NDF.
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the input NDF.
    There is no support for VARIANCE processing.
 
    -  Processing of bad pixels and automatic quality masking are

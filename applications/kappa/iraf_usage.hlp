@@ -8,4 +8,5 @@ Assuming that the required software has been installed as recommended,
 KAPPA is loaded by typing kappa at the cl> prompt.  Applications are
 invoked and parameter values generally given as for normal IRAF tasks.
 There are a few anomalies and these are described in SUN/217.
+
 .endhelp

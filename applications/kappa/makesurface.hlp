@@ -77,7 +77,7 @@ VARIANCE
 VARIANCE = _LOGICAL (Read)
    If TRUE, a variance array is created in the output NDF
    provided the SURFACEFIT.FIT structure contains variance
-   information.  [FALSE]
+   information.
 
 XLIMIT
 
@@ -142,6 +142,8 @@ SMB: Steven M. Beard (ROE)
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  11-May-1993 (SMB):
@@ -167,10 +169,13 @@ History
     Added support for creating a variance array.  Obtained
     workspace by PSX for efficiency.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.  However, neither
    QUALITY nor a SURFACEFIT extension is propagated when LIKE is not
    null.

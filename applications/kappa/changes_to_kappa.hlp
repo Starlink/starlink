@@ -1791,8 +1791,49 @@ Modified_applications
 
 V0.11
 
+
 This release includes the package-specific files required to run
 KAPPA applications from IRAF CL.  For general advice on running
 Starlink applications from IRAF, see SUN/217.
+
+
+V0.12
+
+No new features or applications have been introduced with V0.12, which
+is mainly a bug-fix release. The following modifications have been made:
+
+  o  DISPLAY changed to avoid a spurious error previously reported if 
+     double precision data is displayed which requires compression to fit 
+     in the display.
+
+  o  DRAWSIG changed to avoid spurious clearing of X displays when using 
+     two or more GWM windows under ICL.
+
+  o  FFCLEAN bug fixed which caused parameter THRESH to be ignored when 
+     using a _DOUBLE data array.
+
+  o  FILLBAD now ignores any input VARIANCE component if all the variances 
+     are bad or zero. Also added protection against division by zero which 
+     occurred if the variance array contained any isolated zeros.
+
+  o  FITSEDIT now creates a new FITS extension if the specified NDF does 
+     not already contain a FITS extension.
+
+  o  LINPLOT changed to avoid spurious clearing of X displays when using 
+     two or more GWM windows under ICL.
+
+  o  PARGET bug fixed which caused the application to terminate if the 
+     specified parameter is an array with only a single element.
+
+  o  TRANMAKE no longer reports a compilation error if a null value is given 
+     for parameter CLASS.
+
+The following applications now propagate the WCS component of an NDF
+structure: 
+
+   ADD ARDMASK BLOCK CADD CALPOL CDIV CHPIX CMULT CONVOLVE CSUB DISPLAY
+   ERRCLIP FFCLEAN FILLBAD GAUSMOOTH GREYPLOT HISTEQ INSPECT DIV LUCY
+   MAKESURFACE MATHS MEDIAN MEM2D MULT NDFCOPY NOMAGIC NORMALIZE PASTE RIFT
+   SEGMENT SETMAGIC SHADOW SUB SUBSTITUTE SURFIT THRESH WIENER ZAPLIN
 
 .endhelp

@@ -310,10 +310,13 @@ History
     declarations.  Added Related Applications.  Corrected typo's
     and made stylistic changes.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of the
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

@@ -194,16 +194,25 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1995 April 16 (MJC):
     Original version.  Some of the documentation was derived from
     R.F. Warren-Smith's EDRS manual.
 
+ 21-MAY-1998 (DSB):
+    Check that input variances are not all bad or zero, and ignore
+    them if they are.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

@@ -91,6 +91,8 @@ RFWS: R.F. Warren-Smith (STARLINK, RAL)
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  27-FEB-1991 (RFWS):
@@ -105,10 +107,13 @@ History
  1995 April 24 (MJC):
     Made usage and examples lowercase.  Added Related Applications.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    If present, an NDF's TITLE, LABEL, UNITS, DATA, VARIANCE,
-   QUALITY, AXIS and HISTORY components are copied by this routine,
+   QUALITY, AXIS WCS and HISTORY components are copied by this routine,
    together with all extensions.  The output NDF's title may be
    modified, if required, by specifying a new value via the TITLE
    parameter.

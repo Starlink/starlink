@@ -11,6 +11,8 @@ Description:
    This procedure allows you to use your favourite editor to
    modify the FITS headers stored in an NDF's FITS extension.
    There is limited validation of the FITS headers after editing.
+   A FITS extension is created if the NDF does not already have 
+   one.
 
 Parameters
 
@@ -42,6 +44,7 @@ Related_Applications
 Authors
 
 Malcolm J. Currie (STARLINK)
+David S. Berry (DSB):
 
 History
 
@@ -50,4 +53,12 @@ History
 
  1994 November 4 (MJC):
     Added ADAM-like help and abort facility for the parameter.
+
+ 1996 January 16 (MJC):
+    Added suggested default and search path for foreign data
+    formats.
+
+ 5-JUN-1998 (DSB):
+    Added facility to create a new FITS extension if there is no 
+    existing FITS extension in the NDF.
 .endhelp

@@ -514,6 +514,8 @@ Authors
 
 MJC: Malcolm Currie  (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1991 June 11 (MJC)
@@ -543,13 +545,16 @@ History
     a note describing the roles of the palette colours used.
     Inserted the "Save" option into the description of OPTION.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  Only real data can be processed directly.  Other data types
    will undergo a type conversion before processing occurs.
 
    -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF,
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF,
    and propagates all extensions to the output Region NDF.
 
    -  Processing of bad pixels and automatic quality masking are

@@ -514,6 +514,8 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1990 July 12 (MJC):
@@ -581,10 +583,13 @@ History
  1997 May 28 (MJC):
     QUALITY and HISTORY no longer propagated to the OUT NDF.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, and UNITS components of the input NDF.
+   VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
 
    -  Processing of bad pixels and automatic quality masking are
    supported.

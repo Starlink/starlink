@@ -101,19 +101,29 @@ Authors
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  1995 April 25 (MJC):
     Original NDF version.
 
+ 27-FEB-1998 (DSB):
+    Use NUM_ functions to convert lower precision integer values to
+    _INTEGER when calling PAR_MIX0I.
+
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
+ {enter_any_changes_here}
+
 Implementation_Status
 
-   -  The routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF;
-   and propagates all extensions.
+   -  The routine correctly processes the AXIS, DATA, QUALITY, LABEL,
+   TITLE, UNITS, HISTORY, WCS and VARIANCE components of an NDF; and
+   propagates all extensions.  Bad pixels and all non-complex
+   numeric data types can be handled.
 
-   -  Processing of bad pixels and automatic quality masking are
-   supported.
-
-   -  All non-complex numeric data types can be handled.
+   -  The HISTORY component, if present, is simply propagated without
+   change.
 .endhelp

@@ -63,6 +63,8 @@ RFWS: R.F. Warren-Smith (STARLINK)
 
 MJC: Malcolm J. Currie (STARLINK)
 
+DSB: David S. Berry (STARLINK)
+
 History
 
  4-APR-1990 (RFWS):
@@ -76,9 +78,12 @@ History
     Title inherited by default.  Usage and examples to lowercase.
     Added Related Applications.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of WCS component.
+
 Implementation_Status
 
-   -  This routine correctly processes the AXIS, DATA, QUALITY,
+   -  This routine correctly processes the WCS, AXIS, DATA, QUALITY,
    LABEL, TITLE, HISTORY, and VARIANCE components of an NDF data
    structure and propagates all extensions.
 

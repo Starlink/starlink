@@ -252,10 +252,13 @@ History
     stylistic changes, shortened long lines, and made message
     reporting conditional.
 
+ 5-JUN-1998 (DSB):
+    Added propagation of the WCS component.
+
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   LABEL, TITLE, UNITS, and HISTORY components of the
+   LABEL, TITLE, UNITS, WCS and HISTORY components of the
    input NDF and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are

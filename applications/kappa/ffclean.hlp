@@ -181,7 +181,7 @@ History
 Implementation_Status
 
    -  This routine correctly processes the AXIS, DATA, QUALITY,
-   VARIANCE, LABEL, TITLE, UNITS, and HISTORY components of an NDF
+   VARIANCE, LABEL, TITLE, UNITS, WCS and HISTORY components of an NDF
    data structure and propagates all extensions.
 
    -  Processing of bad pixels and automatic quality masking are
