@@ -71,28 +71,42 @@ itcl::class gaia::GaiaSearch {
    #  Init method, called after the options have been evaluated.
    public method init {} {
       SkySearch::init
-
+      
       #  Remove the "Save with image" menu option. This is not
       #  available.
       if { $iscat_ } { 
 	 set m [get_menu File] 
 	 $m delete "Save with image" 
       }
-
+      
       #  Remove <Enter> binding as this slows down the zoom window a lot.
       $canvas_ bind $object_tag_  <Any-Enter> {}
       $canvas_ bind $object_tag_  <Any-Leave> {}
 
-      #  Add menu option to centre on selected row. Only add these
-      #  options for catalogue windows, not image servers.
+      #  Add menu options that we want. Only add these options for
+      #  catalogue windows, not image servers.
       if { $iscat_ } {
+
+         #  Add centre on selected object option.
          set m [get_menu Options]
          $m add separator
          add_menuitem $m command "Center on selected row" \
             {Centre main image on selected object (also bound to {bitmap b2} in table)} \
             -command [code $this centre_selected_object_]
 
-      #  Add option for a some help on this window (not image servers).
+
+         #  Add interpret X and Y coordinates as pixel coordinate option.
+         $m add checkbutton  -label {Use NDF origins} \
+            -variable [scope itk_option(-use_origin)] \
+            -onvalue 1 \
+            -offvalue 0 \
+            -command [code $this set_origin]
+         $short_help_win_ add_menu_short_help $m \
+            {Use NDF origins} \
+            {X and Y are NDF pixel coordinates and need correcting for NDF origins}
+         set_origin
+
+         #  Add option for a some help on this window (not image servers).
          global gaia_dir
          set m [add_help_button $gaia_dir/Catalogue.hlp "Catalogues Overview..." \
                    {General information about catalogues}   ]
@@ -178,8 +192,11 @@ itcl::class gaia::GaiaSearch {
 
    #  Redefine search method. Do this so we can inhibit automatic
    #  searching on local catalogues (we need to change the default
-   #  behaviour, before doing a search).
+   #  behaviour, before doing a search). Also set the origin so that
+   #  this works for the first invocation (otherwise region may be 
+   #  still be image based at this point).
    public method search {args} {
+      set_origin
       if { $allow_searches_ } {
          AstroCat::search $args
       }
@@ -235,6 +252,17 @@ itcl::class gaia::GaiaSearch {
       SkySearch::plot
       if { ! $itk_option(-plot_wcs) } {
          $image_ configure -plot_wcs 1
+      }
+   }
+
+   #  Set or reset the origin used when plotting positions and
+   #  grabbing regions from the image.
+   public method set_origin {args} {
+      if { $itk_option(-use_origin) } {
+         $image_ origin xo yo
+         $w_.cat origin [expr $xo-1.5] [expr $yo-1.5]
+      } else {
+         $w_.cat origin 0.0 0.0
       }
    }
 
@@ -301,6 +329,11 @@ itcl::class gaia::GaiaSearch {
    #  symbols (this can speed up plotting a lot), but you need X and Y 
    #  positions in the catalogue.
    itk_option define -plot_wcs plot_wcs Plot_Wcs 1 {}
+
+   #  Set whether to correct the any NDF origin information when
+   #  plotting. This allows X and Y coordinates which are displayed in
+   #  NDF pixel coordinates to be plotted correctly.
+   itk_option define -use_origin use_origin Use_Origin 1
 
    #  Common variables (shared between all instances):
    #  ================================================

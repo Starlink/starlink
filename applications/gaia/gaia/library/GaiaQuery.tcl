@@ -41,15 +41,17 @@
 #     skycat::SkyQuery
 
 #  Copyright:
-#     Copyright (C) 1998 Central Laboratory of the Research Councils
+#     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     14-SEP-1998 (PDRAPER):
+#     14-SEP-1998 (PWD):
 #        Original version.
+#     21-AUG-2000 (PWD):
+#        Added origin corrections to image center.
 #     {enter_further_changes_here}
 
 #-
@@ -76,9 +78,30 @@ itcl::class gaia::GaiaQuery {
       return 0
    }
 
-   #  Override the get_image_center_radius method so we can change the 
-   #  ispix result to always include the whole image by default,
-   #  rather than just a center part (i.e. return diagonal).
+   #  Override the set_from_image and get_image_center_radius method
+   #  so we can change the ispix result to always include the whole
+   #  image by default, rather than just a center part (i.e. return
+   #  diagonal). Also need to add in NDF origins.
+   public method set_from_image {} {
+      set iswcs [$astrocat iswcs]
+      if {$iscat_} {
+         if { $iswcs } { 
+            set_pos_radius [get_image_center_radius $iswcs] 
+         } else {
+            lassign [$astrocat origin] xo yo
+            lassign [get_image_center_radius $iswcs] x y rad
+            set_pos_radius [list [expr $x+$xo] [expr $y+$yo] $rad]
+         }
+      } else {
+         if { $iswcs } { 
+            set_pos_width_height [get_image_center_width_height $iswcs] 
+         } else {
+            lassign [$astrocat origin] xo yo
+            lassign [get_image_center_width_height $iswcs] x y w h
+            set_pos_width_height [list [expr $x+$xo] [expr $y+$yo] $w $h]
+         }
+      }
+   }
    public method get_image_center_radius {wcs_flag} {
       if {[$image_ isclear]} {
          return
@@ -101,6 +124,29 @@ itcl::class gaia::GaiaQuery {
          set y [format "%.2f" [expr $h/2.]]
          set radius [format "%.2f" [expr sqrt($w*$w+$h*$h)/2.]]
          return [list $x $y $radius]
+      }
+   }
+
+   #  Override the select image area method so that we can adjust for
+   #  the NDF origin information is needed.
+   public method select_area {} {
+      set iswcs [$astrocat iswcs]
+      if {$iscat_} {
+         if { $iswcs } {
+            set_pos_radius [select_image_area $iswcs]
+         } else {
+            lassign [$astrocat origin] xo yo
+            lassign [select_image_area $iswcs] x y rad
+            set_pos_radius [list [expr $x+$xo] [expr $y+$yo] $rad]
+         }
+      } else {
+         if { $iswcs } {
+            set_pos_width_height [select_image_area $iswcs] 
+         } else {
+            lassign [$astrocat origin] xo yo
+            lassign [select_image_area $iswcs] x y w h
+            set_pos_width_height [list [expr $x+$xo] [expr $y+$yo] $w $h]
+         }
       }
    }
 

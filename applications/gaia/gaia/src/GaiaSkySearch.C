@@ -1,36 +1,39 @@
-//+
-//  Name:
-//     GaiaSkySearch
-//
-//  Language:
-//     C++
-//
-//  Purpose:
-//     Defines the members of the GaiaSkySearch class.
-//
-//  Description:
-//     This class extends the SkySearch class (and thereby
-//     TclAstroCat) to use an external filter scheme to convert
-//     catalogues into "tab table" format. Keeping the names
-//     consistent and disposing of the intermediary files etc. These
-//     foreign catalogues are controlled by the GaiaLocalCatalog
-//     class.
-//
-//     A special override of the plot_objects function is added to
-//     sort out problems with catalogues that have both WCS and X-Y
-//     coordinates.
-//
-//  Authors:
-//     P.W. Draper (PWD)
-//
-//  Copyright:
-//     Copyright (C) 1998 Central Laboratory of the Research Councils
-//
-//  History:
-//     25-SEP-1998 (PWD):
-//        Original version.
-//     {enter_new_authors_here}
-//-
+/**
+ *  Name:
+ *     GaiaSkySearch
+ *
+ *  Language:
+ *     C++
+ *
+ *  Purpose:
+ *     Defines the members of the GaiaSkySearch class.
+ *
+ *  Description:
+ *     This class extends the SkySearch class (and thereby
+ *     TclAstroCat) to use an external filter scheme to convert
+ *     catalogues into "tab table" format. Keeping the names
+ *     consistent and disposing of the intermediary files etc. These
+ *     foreign catalogues are controlled by the GaiaLocalCatalog
+ *     class.
+ *
+ *     A special override of the plot_objects function is added to
+ *     sort out problems with catalogues that have both WCS and X-Y
+ *     coordinates.
+ *
+ *  Authors:
+ *     P.W. Draper (PWD)
+ *
+ *  Copyright:
+ *     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
+ *
+ *  History:
+ *     25-SEP-1998 (PWD):
+ *        Original version.
+ *     21-AUG-2000 (PWD):
+ *        Added changes to support NDF origins.
+ *     {enter_new_authors_here}
+ *
+ */
 
 #include <stdlib.h>
 #include <iostream.h>
@@ -61,85 +64,92 @@ public:
   {"entry",  &GaiaSkySearch::entryCmd,        1,  4},
   {"open",   &GaiaSkySearch::openCmd,         1,  1},
   {"save",   &GaiaSkySearch::saveCmd,         1,  5},
+  {"origin", &GaiaSkySearch::originCmd,       0,  2}
 };
 
-//
-//  Call the given method in this class with the given arguments
-//
+/**
+ *  Call the given method in this class with the given arguments
+ */
 int GaiaSkySearch::call(const char* name, int len, int argc, char* argv[])
 {
-  //  Since this tcl command may have a lot of subcommands, we do a
-  //  binary search on the method table.
-  int low = 0,
-    high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
-    mid,
-    cond;
-
-  //  XXX g++ bug (egcs 1.0.3a), it seems that using static references
-  //  to members functions doesn't work when these are virtual
-  //  functions inherited from a "public virtual" base class
-  //  (SkySearch inherits TclAstroCat this way). So use this following
-  //  code, which seems to fix things. Recheck when newer version of
-  //  egcs are produced.
-
-  if ( strcmp( name, "check" ) == 0 ) {
-    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-      return TCL_ERROR;
+    //  Since this tcl command may have a lot of subcommands, we do a
+    //  binary search on the method table.
+    int low = 0,
+        high = sizeof(subcmds_)/sizeof(*subcmds_) - 1,
+        mid,
+        cond;
+    
+    //  XXX g++ bug (egcs 1.0.3a), it seems that using static references
+    //  to members functions doesn't work when these are virtual
+    //  functions inherited from a "public virtual" base class
+    //  (SkySearch inherits TclAstroCat this way). So use this following
+    //  code, which seems to fix things. Recheck when newer version of
+    //  egcs are produced.
+    
+    if ( strcmp( name, "check" ) == 0 ) {
+        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return checkCmd( argc, argv );
     }
-    return checkCmd( argc, argv );
-  }
-
-  if ( strcmp( name, "csize" ) == 0 ) {
-    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-      return TCL_ERROR;
+    
+    if ( strcmp( name, "csize" ) == 0 ) {
+        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return csizeCmd( argc, argv );
     }
-    return csizeCmd( argc, argv );
-  }
-
-  if ( strcmp( name, "entry" ) == 0 ) {
-    if ( check_args( name, argc, 1, 4 ) != TCL_OK ) {
-      return TCL_ERROR;
+    
+    if ( strcmp( name, "entry" ) == 0 ) {
+        if ( check_args( name, argc, 1, 4 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return entryCmd( argc, argv );
     }
-    return entryCmd( argc, argv );
-  }
-
-  if ( strcmp( name, "open" ) == 0 ) {
-    if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
-      return TCL_ERROR;
+    
+    if ( strcmp( name, "open" ) == 0 ) {
+        if ( check_args( name, argc, 1, 1 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return openCmd( argc, argv );
     }
-    return openCmd( argc, argv );
-  }
-
-  if ( strcmp( name, "save" ) == 0 ) {
-    if ( check_args( name, argc, 1, 5 ) != TCL_OK ) {
-      return TCL_ERROR;
+    
+    if ( strcmp( name, "save" ) == 0 ) {
+        if ( check_args( name, argc, 1, 5 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return saveCmd( argc, argv );
     }
-    return saveCmd( argc, argv );
-  }
-
-  while (low <= high) {
-    mid = (low + high) / 2;
-    if ((cond = strcmp(name, subcmds_[mid].name)) < 0)
-      high = mid - 1;
-    else if (cond > 0)
-      low = mid + 1;
-    else {
-      GaiaSkySearchSubCmds& t = subcmds_[mid];
-      if (check_args(name, argc, t.min_args, t.max_args) != TCL_OK)
-        return TCL_ERROR;
-      return (this->*t.fptr)(argc, argv);
+    
+    if ( strcmp( name, "origin" ) == 0 ) {
+        if ( check_args( name, argc, 0, 2 ) != TCL_OK ) {
+            return TCL_ERROR;
+        }
+        return originCmd( argc, argv );
     }
-  }
-
-  //  Not found, so extend search to parent class.
-  return SkySearch::call(name, len, argc, argv);
+    
+    while (low <= high) {
+        mid = (low + high) / 2;
+        if ((cond = strcmp(name, subcmds_[mid].name)) < 0)
+            high = mid - 1;
+        else if (cond > 0)
+            low = mid + 1;
+        else {
+            GaiaSkySearchSubCmds& t = subcmds_[mid];
+            if (check_args(name, argc, t.min_args, t.max_args) != TCL_OK)
+                return TCL_ERROR;
+            return (this->*t.fptr)(argc, argv);
+        }
+    }
+    
+    //  Not found, so extend search to parent class.
+    return SkySearch::call(name, len, argc, argv);
 }
 
 //
 //  A call to this function can be made from the tkAppInit file at
 //  startup to install the Tcl extended "astrocat" command.
 //
-
 extern "C" {
   int GaiaCat_Init(Tcl_Interp* interp)
   {
@@ -149,10 +159,11 @@ extern "C" {
   }
 }
 
-//
-//  Implementation of the tcl extended command "astrocat". This creates
-//  a new instance of the astrocat command.
-//
+/**
+ *  Implementation of the tcl extended command "astrocat". This creates
+ *  a new instance of the astrocat command.
+ *
+ */
 int GaiaSkySearch::astroCatCmd( ClientData, Tcl_Interp *interp,
                                 int argc, char* argv[] )
 {
@@ -166,35 +177,37 @@ int GaiaSkySearch::astroCatCmd( ClientData, Tcl_Interp *interp,
   return cmd->status();
 }
 
-//
-//  Constructor -
-//
-//  Create an astrocat object in tcl for accessing the contents of
-//  local and remote catalogues, including CAT catalogues.
-//
-//  Note that the tcl command for this object is created in the
-//  parent class constructor.
-//
+/**
+ *  Constructor -
+ *
+ *  Create an astrocat object in tcl for accessing the contents of
+ *  local and remote catalogues, including CAT catalogues.
+ *
+ *  Note that the tcl command for this object is created in the
+ *  parent class constructor.
+ */
 GaiaSkySearch::GaiaSkySearch( Tcl_Interp *interp,
                               const char *cmdname,
                               const char *instname )
-  : SkySearch( interp, cmdname, instname ),
-    TclAstroCat(interp, cmdname, instname) //  Needed as SkySearch
-                                           //  inherits TclAstroCat
-                                           // as "public virtual"!
+    : xOrigin_(0.0),
+      yOrigin_(0.0),
+      SkySearch( interp, cmdname, instname ),
+      TclAstroCat(interp, cmdname, instname) //  Needed as SkySearch
+                                             //  inherits TclAstroCat
+                                             // as "public virtual"!
 {
 }
 
-//
-//  Destructor -
-//
+/**
+ *  Destructor -
+ */
 GaiaSkySearch::~GaiaSkySearch()
 {
 }
 
-//
-//  Open the given astronomical catalogue.
-//
+/**
+ *  Open the given astronomical catalogue.
+ */
 int GaiaSkySearch::openCmd(int argc, char* argv[])
 {
   if ( cat_ ) {
@@ -232,11 +245,16 @@ int GaiaSkySearch::openCmd(int argc, char* argv[])
     cat_->feedback( feedback_ );
   }
 
+  //  Reset origins.
+  xOrigin_ = 0.0;
+  yOrigin_ = 0.0;
+
   return TCL_OK;
 }
 
-//  Check that the given filename is a valid local catalog.
-//
+/**
+ *  Check that the given filename is a valid local catalog.
+ */
 int GaiaSkySearch::checkCmd(int argc, char* argv[])
 {
   if ( GaiaLocalCatalog::is_foreign( argv[0] ) ) {
@@ -246,11 +264,11 @@ int GaiaSkySearch::checkCmd(int argc, char* argv[])
   }
 }
 
-//
-//  Override the "entry" command to make sure url and longname are
-//  the same for foreign catalogues when written into the skycat.cfg
-//  file.
-//
+/**
+ *  Override the "entry" command to make sure url and longname are
+ *  the same for foreign catalogues when written into the skycat.cfg
+ *  file.
+ */
 int GaiaSkySearch::entryCmd( int argc, char* argv[] )
 {
   CatalogInfoEntry* e;
@@ -303,10 +321,10 @@ int GaiaSkySearch::entryCmd( int argc, char* argv[] )
   return ret;
 }
 
-//
-//  Save command. Override so we can get foreign catalogues to
-//  do their conversion correctly.
-//
+/**
+ *  Save command. Override so we can get foreign catalogues to
+ *  do their conversion correctly.
+ */
 int GaiaSkySearch::saveCmd( int argc, char* argv[] )
 {
 
@@ -371,12 +389,12 @@ int GaiaSkySearch::saveCmd( int argc, char* argv[] )
   return ret;
 }
 
-//
-//  Determine the maximum size of character strings needed to store
-//  the columns of a tab-table. The tab-table is passed as a Tcl list
-//  of lists and the return is a list of the number of characters
-//  needed. This is implemented in C++ for speed reasons only.
-//
+/**
+ *  Determine the maximum size of character strings needed to store
+ *  the columns of a tab-table. The tab-table is passed as a Tcl list
+ *  of lists and the return is a list of the number of characters
+ *  needed. This is implemented in C++ for speed reasons only.
+ */
 int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
 {
   char **mainArgv;
@@ -454,10 +472,10 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
 }
 
 
-//
-//  Override plot_objects to sort out problems with plotting when
-//  have both pixel coordinates and sky coordinates.
-//
+/**
+ *  Override plot_objects to sort out problems with plotting when
+ *  have both pixel coordinates and sky coordinates.
+ */
 int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
                                  const char* cols, const char* symbol,
                                  const char* expr )
@@ -537,6 +555,10 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 		x = pos.x();
 		y = pos.y();
 		strcpy(xy_units, "image");
+
+                //  Subtract the origins.
+                x -= xOrigin_;
+                y -= yOrigin_;
 	    }
 	    else if (r.isWcs()) {
 		x = pos.ra_deg();
@@ -565,4 +587,42 @@ int GaiaSkySearch::plot_objects( Skycat* image, const QueryResult& r,
 	free(exprList);
 
     return status;
+}
+
+
+/**
+ *  Set or get the values used to offset image coordinates when
+ *  plotted.  These are the NDF origin values and are used to
+ *  transform between image coordinate and pixel coordinates.
+ *
+ *  Arguments are none, in which case the current origins are returned 
+ *  as the result, or two doubles, which are added to any image
+ *  coordinates before plotting (note if any 0.5 corrections are
+ *  required then you must add these here, the origin supplied are
+ *  subtracted from the X and Y coordinates).
+ */
+GaiaSkySearch::originCmd( int argc, char *argv[] )
+{
+    if ( argc < 2 ) {
+
+        // Return the current origin.
+        Tcl_ResetResult( interp_ );
+        char buf[80];
+        sprintf( buf, "%f %f", xOrigin_, yOrigin_ );
+        set_result( buf );
+        return TCL_OK;
+    } else {
+
+        double xo;
+        double yo;
+        if ( Tcl_GetDouble( interp_, argv[0], &xo ) != TCL_OK ) {
+            return error( argv[0], " is not a floating point value");
+        } else {
+            if ( Tcl_GetDouble( interp_, argv[1], &yo ) != TCL_OK ) {
+                return error( argv[1], " is not a floating point value");
+            }
+        }
+        xOrigin_ = xo;
+        yOrigin_ = yo;
+    }
 }
