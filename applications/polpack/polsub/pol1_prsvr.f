@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_PRSVR( VERS, M, N, R, STATUS )
+      SUBROUTINE POL1_PRSVR( SVERS, M, N, R, STATUS )
 *+
 *  Name:
 *     POL1_PRSVR
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PRSVR( VERS, M, N, R, STATUS )
+*     CALL POL1_PRSVR( SVERS, M, N, R, STATUS )
 
 *  Description:
 *     This routine extracts the fields from a version number string of 
@@ -20,7 +20,7 @@
 *     totally blank.
 
 *  Arguments:
-*     VERS = CHARACTER*(*) (Given)
+*     SVERS = CHARACTER*(*) (Given)
 *        The version number string.
 *     M = LOGICAL (Returned)
 *        The major version number.
@@ -55,7 +55,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER VERS*(*)
+      CHARACTER SVERS*(*)
 
 *  Arguments Returned:
       INTEGER M
@@ -69,8 +69,11 @@
       INTEGER CHR_LEN            ! Used length of string
 
 *  Local Variables:
+      CHARACTER VERS*30          ! Version string stripped of parentheses
       INTEGER DOT                ! Index of first dot
+      INTEGER F                  ! Index of first non-blank character
       INTEGER HYP                ! Index of first hyphen
+      INTEGER L                  ! Index of last non-blank character
       INTEGER LM                 ! Length of major version field
       INTEGER LN                 ! Length of minor version field
       INTEGER LR                 ! Length of revision field
@@ -79,6 +82,16 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  If the string has delimiting parentheses, remove them.
+      VERS = SVERS
+      CALL CHR_FANDL( SVERS, F, L )
+      IF( F + 1 .LE. L - 1 ) THEN
+
+         IF( SVERS( F : F ) .EQ. '(' .AND. 
+     :       SVERS( L : L ) .EQ. ')' ) VERS = SVERS( F + 1 : L - 1 )
+
+      END IF
 
 *  Find the used length of the version string.
       LV = CHR_LEN( VERS ) 

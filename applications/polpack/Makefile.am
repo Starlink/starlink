@@ -23,11 +23,11 @@ version.dat:
 starhelp_DATA = polpack.shl
 
 .hlp.shl:
-        @HLIB@ $<
+	@HLIB@ $<
 
 polpack.hlp: $(POLPACK_F1_ROUTINES) polpack_master.hlp
 	cat $(POLPACK_F1_ROUTINES) > all.f
-	prohlp in=all.f out=all.hlp single=no
+	@PROHLP@ in=all.f out=all.hlp single=no
 	cat polpack_master.hlp all.hlp > polpack.hlp
 	-rm -f all.hlp
 
