@@ -285,7 +285,7 @@
 
                DO K = 1, COUNT
 
-                 IF (REPEAT_WORD(K) .EQ. .FALSE.) THEN
+                 IF (.NOT.REPEAT_WORD(K)) THEN
 
 *  check for defined strings first
 
