@@ -128,7 +128,7 @@
 *  reset the value, enclosing the string in quotes, truncating it or padding
 *  it out with blanks as necessary
 
-                        IF (CHR_LEN(VALUE) .LE. JPOS-IPOS-3) THEN
+                        IF (CHR_LEN(VALUE) .LE. JPOS-IPOS-4) THEN
                            IF (CHR_LEN(VALUE) .NE. 0) THEN
                               STEMP = ''''//VALUE(:CHR_LEN(VALUE))//''''
                            ELSE
@@ -136,9 +136,9 @@
                            END IF
                            CALL CHR_TERM (JPOS-IPOS-1, STEMP)
                         ELSE
-                           STEMP = ''''//VALUE(:JPOS-IPOS-3)//''''
+                           STEMP = ''''//VALUE(:JPOS-IPOS-4)//''''
                         END IF
-                        FITS (I)(IPOS+1:JPOS-1) = STEMP (:JPOS-IPOS-1)
+                        FITS (I)(IPOS+2:JPOS-1) = STEMP (:JPOS-IPOS-2)
                      END IF
                   END IF
                END IF
