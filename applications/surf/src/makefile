@@ -8,7 +8,7 @@ SURF_SUB = ../surflib
 
 # Libraries
 
-LIBS = -L$(SCULIB) -lsculib -L$(SURF_SUB) -lsurf_sub 
+LIBS = -L$(SURF_SUB) -lsurf_sub -L$(SCULIB) -lsculib 
 IRAS = -L/star/iras90 -lira -L/jcmt_sw/scuba/surf_kap -lsurf_kap
 # -L/star/kappa -lkapsub -lkapgen
 IRAS = -L/jcmt_sw/scuba/surf_kap -lsurf_kap
@@ -47,16 +47,19 @@ FSOURCES= surf_mon.f surf_extinction.f surf_flatfield.f \
 	surf_chgpnt.f surf_chgflat.f surf_chgqual.f \
 	surf_scuhelp.f surf_remsky.f surf_scuover.f surf_chgdata.f\
 	surf_recurse_read.f surf_write_photom_header.f surf_scan_rlb.f\
-	surf_despike.f
+	surf_despike.f surf_scuclip.f surf_extflat.f \
+	surf_grid_despike.f surf_scuba2mem.f surf_make_weight.f \
+	surf_grid_calcsky.f surf_reduce_noise.f
 
 FCPP=	surf_write_map_info.F
 
-IFL=    surf.ifl extinction.ifl reduce_switch.ifl flatfield.ifl \
+IFL=    surf_mon.ifl extinction.ifl reduce_switch.ifl flatfield.ifl \
 	rebin.ifl scucat.ifl scuphot.ifl skydip.ifl drawsig.ifl \
 	change_pointing.ifl change_flat.ifl change_quality.ifl\
 	intrebin.ifl change_data.ifl extract_data.ifl scan_rlb.ifl\
 	scuhelp.ifl remsky.ifl scuover.ifl bolrebin.ifl restore.ifl\
-	despike.ifl
+	despike.ifl scuclip.ifl extract_flat.ifl scuba2mem.ifl \
+	calcsky.ifl reduce_noise.ifl
 
 OBJS = ${FSOURCES:.f=.o}
 FCPPOBJ = ${FCPP:.F=.o}
@@ -79,7 +82,7 @@ all:	surf ifc
 objects: ${OBJS} ${FCPPOBJ}
 
 surf:	${OBJS} ${FCPPOBJ} ${SCULIB}/libsculib.a ${SURF_SUB}/libsurf_sub.a
-	${LINK} ${OBJS} ${FCPPOBJ} ${LDFLAGS} ${LIBS} ${ADAMLIBS}
+	${LINK} ${OBJS} NoHand.o ${FCPPOBJ} ${LDFLAGS} ${LIBS} ${ADAMLIBS}
 
 ifc:	${IFC}
 
