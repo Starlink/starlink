@@ -80,11 +80,17 @@ be declared <em>somewhere</>: the default is declared in the General DTD.
 
 <routine>
 <routinename>%copyright-string%
-<description>Standard copyright string, unless overridden.
+<description>Standard copyright string, unless overridden.  This
+defaults to a copyright statement which includes the current year.
 <returnvalue type=string>Text of copyright string.
 <codebody>
 (define %copyright-string%
-  "Copyright 1999, Central Laboratories for the Research Councils")
+  (let* (;; time->string returns ISO 8601 year: yyyy-mm-ddThh:mm:ss
+	 (thisyear (substring (time->string (time))
+			      0 4)))
+    (string-append "Copyright "
+		   thisyear
+		   ", Central Laboratories for the Research Councils")))
 
 <routine>
 <routinename>%display-programcode-elements%
