@@ -8735,6 +8735,19 @@ f     interpreted by the AST_FORMAT function and determines the
 *     supplied instead. This is based on the value of the Digits, or
 *     Digits(axis), attribute and is chosen so that it displays the
 *     requested number of digits of precision.
+*
+*     If a Format value is set which does not explicitly specify the 
+*     number of digits of precision, then the supplied Format is modified 
+*     before use in order to produce the number of digits specified by the 
+*     Digits, or Digits(axis), attribute. For example, a SkyFrame Format
+*     of "dms" does not include an explicit statement of precision of the
+*     final field (the seconds field). Therefore, the number of decimal
+*     places in the seconds field will be chosen so that the total number
+*     of digits in the formatted value equals the value of the Digits(axis)
+*     attribute. If a format of "dms.1" had been used, then the
+*     Digits(axis) attribute would be ignored, and the seconds field
+*     would contain one decimal place. To get zero decimal places,
+*     specify an explicit precision of zero, "dms.0".
 
 *  Applicability:
 *     Frame
@@ -8814,7 +8827,10 @@ c        this.
 *     final field in the formatted string (whichever field this
 *     is). The "." should be followed immediately by an unsigned
 *     integer which gives the number of decimal places required. By
-*     default, no decimal places are given.
+*     default, the number of decimal places is chosen so that the total
+*     number of digits in the formated value is equal to the value of the 
+*     Digits(axis) attribute. To get zero decimal places, include ".0"
+*     explicitly in the format string.
 *
 *     All of the above format specifiers are case-insensitive. If
 *     several characters make conflicting requests (e.g. if both "i"

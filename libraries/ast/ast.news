@@ -15,6 +15,16 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+o  A change has been made to the interpretation of Format strings which
+specify how celestial axis values should be formatted for display. If
+no precision specifier is included to specify the number of trailing
+decimal places, then a default precision is now used which results in the
+total number of digits being equal to the value of the Digits attribute.
+Previously, zero decimal places were produced if the Format string
+did not include a precision specifier. To get zero decimal places in the
+new scheme, the Format value must specify explicitly that no decimal
+places are required (e.g. "dms.0" rather than "dms").
+
 o  Addition of a new FITS encoding, "FITS-CLASS", which uses the
 conventions of the CLASS package (see
 http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html).

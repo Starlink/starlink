@@ -49,6 +49,10 @@ f     only within textual output (e.g. from AST_WRITE).
 *     3-FEB-2004 (DSB):
 *        - Added "log" formatting using the "&" flag character in the
 *        Format string.  
+*     15-SEP-2004 (DSB):
+*        - If a format string is set which does not include an explicit
+*        precision value, then use the Digits value to determine the precision 
+*        to be used.
 *class--
 */
 
@@ -129,7 +133,7 @@ static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
 static const char *GetAxisSymbol( AstAxis * );
 static const char *GetAxisUnit( AstAxis * );
-static char *ParseAxisFormat( const char *, int *, int *, int * );
+static char *ParseAxisFormat( const char *, int, int *, int *, int *, int * );
 static double AxisDistance( AstAxis *, double, double );
 static double AxisGap( AstAxis *, double, int * );
 static double AxisOffset( AstAxis *, double, double );
@@ -394,6 +398,7 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
    const char *p;                /* Pointer to next character */
    double value;                 /* Equivalent radians value */
    int ifld;                     /* Field index */
+   int integ;                    /* Cast axis value to integer before printing? */
    int len;                      /* Length of formatted string */
    int log;                      /* Format as "10**x"? */
    int n;                        /* Number of characters read */
@@ -423,7 +428,8 @@ static int AxisFields( AstAxis *this, const char *fmt0, const char *str,
    if a sign should always be included infront of the "10", and "space"
    which indicates if a leading space should be included infronyt of "10" if
    no sign is included. */
-   fmt = ParseAxisFormat( fmt0, &log, &sign, &space );
+   fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign,
+                          &space, &integ );
    fmt = astFree( (void *) fmt );
 
    if( astOK ) {
@@ -585,6 +591,7 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    const char *fmt;             /* Pointer to parsed Format string */
    const char *result;          /* Pointer to formatted value */
    double x;                    /* The value to be formatted by sprintf */
+   int integ;                   /* Cast axis value to integer before printing? */
    int log;                     /* Format as "10**x"? */
    int nc;                      /* Total number of characters written */
    int ncc;                     /* Number of characters written */
@@ -628,8 +635,10 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    "x" as a superscript of "10", "sign" which is used with log to indicate 
    if a sign should always be included infront of the "10", and "space"
    which indicates if a leading space should be included infronyt of "10" if
-   no sign is included. */
-      fmt = ParseAxisFormat( fmt0, &log, &sign, &space );
+   no sign is included. It also ensures that the format specifier
+   includes an explicit precision field. */
+      fmt = ParseAxisFormat( fmt0, astGetAxisDigits( this ), &log, &sign, 
+                             &space, &integ );
       if( astOK ) {
 
 /* Format zero normally. */
@@ -651,10 +660,10 @@ static const char *AxisFormat( AstAxis *this, double value ) {
             }
    
             if( value > 0 ) {
-               x = log10( value );
+               x = log10( integ ? (int) value : value );
    
             } else {
-               x = log10( -value );
+               x = log10( integ ? (int) -value : -value );
                buff[ 0 ] ='-';
                nc = 1;
             }
@@ -668,7 +677,11 @@ static const char *AxisFormat( AstAxis *this, double value ) {
    a standard "sprintf" format. */
       if ( astOK ) {
          errno = 0;
-         ncc = sprintf( buff + nc, fmt, x );
+         if( integ ) {
+            ncc = sprintf( buff + nc, fmt, (int) x );
+         } else {
+            ncc = sprintf( buff + nc, fmt, x );
+         }
          nc += ncc;
 
 /* If log format is being used, terminate the string with an escape
@@ -1425,8 +1438,8 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    astSetDump( vtab, Dump, "Axis", "Coordinate axis" );
 }
 
-static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
-                              int *lspace ){
+static char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign,
+                              int *lspace, int *integ ){
 /*
 *  Name:
 *     ParseAxisFormat
@@ -1439,8 +1452,8 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
 
 *  Synopsis:
 *     #include "axis.h"
-*     char *ParseAxisFormat( const char *fmt0, int *log, int *sign, 
-*                            int *lspace )
+*     char *ParseAxisFormat( const char *fmt0, int digs, int *log, int *sign, 
+*                            int *lspace, int *integ )
 
 *  Class Membership:
 *     Axis member function 
@@ -1454,6 +1467,12 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
 *  Parameters:
 *     fmt0
 *        The value of the Format attribute.
+*     digs 
+*        The default number of digits of precision to use. This is used
+*        if the given format specifier does not specify the precision. In 
+*        this case, the returned format specifier will be modified to
+*        include an explicit precision value equal to the supplied value
+*        of "digs".
 *     log
 *        Pointer to an integer in which to store a flag indicating if the 
 *        if the axis value should be formatted as "10**x" using the graphical 
@@ -1478,12 +1497,18 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
 *        "lspace" will be returned if the supplied Format string has a ' ' 
 *        character in its printf <flags> field (that is, between the leading 
 *        '%' sign and the optional printf field width).
+*     lspace
+*        Pointer to an integer in which to store a flag indicating if the
+*        returned format specifier includes an integer conversion code
+*        (e.g. %d) or floating point conversion code (e.g. "%.7G").
 
 *  Returned Value:
 *     - Pointer to a dynamically allocated null-terminated string containing 
 *     the modified Format string. This will be a copy of the supplied
 *     Format string, but with any '&' flag removed. Any '+' or ' ' flag will
-*     also be removed if "log" is returned as non-zero.
+*     also be removed if "log" is returned as non-zero. An explicit
+*     precision field will be included if the supplied format does not
+*     include one.
 
 *  Notes:
 *     - A NULL pointer will be returned if this function is invoked
@@ -1493,6 +1518,9 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
 
 /* Local Variables: */
    char *a;             /* Pointer to next char read from original format */
+   char *b;             /* Pointer to next char to write to new format */
+   char *c;             /* Pointer to next char read from original format */
+   char *new;           /* Pointer to new returned string */
    char *perc;          /* Pointer to percent sign */
    char *result;        /* Pointer to the returned string */
    int hash;            /* Was a '#' flag found? */
@@ -1506,6 +1534,7 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
    *log = 0;
    *sign = 0;
    *lspace = 0;
+   *integ = 0;
 
 /* Check the global error status. */   
    if ( !astOK ) return result;
@@ -1567,6 +1596,63 @@ static char *ParseAxisFormat( const char *fmt0, int *log, int *sign,
          }
       }
    }
+
+/* If the format specifier being returned does not include a precision,
+   add one now. */
+   if( result ) {
+
+/* Find the first percent sign. Do nothing if none is found. */
+      a = strchr( result, '%' );
+      if( a ) {   
+ 
+/* Check each character following the percent sign until one is found
+   which is not a legal printf flag. */
+         while( ++a ){
+            if( *a != '-' && *a != '+' && *a != ' ' && *a != '#' ) break;
+         }
+
+/* Skip any field width (a decimal integer) following the flags. */
+         a--;
+         while( ++a ) { 
+            if( !isdigit( *a ) ) break;
+         }
+
+/* Get a pointer to the next alphabetic character. This will be the
+   conversion code. If it an integer code, return *integ non-zero. */
+         c = a - 1;
+         while( ++c ) { 
+            if( isalpha( *c ) ) {
+               if( *c == 'd' || *c == 'i' || *c == 'u' || *c == 'o' || 
+                   *c == 'x' || *c == 'X' || *c == 'c' ) *integ = 1;
+               break;
+            }
+         }
+
+/* Go back to the end of the field width. If the next character is a "." the 
+   format specifier already includes a precision and so we do not need to 
+   modify it. */
+         if( *a != '.' ) {
+
+/* Otherwise, allocate memory to hold the extended format string (allowing 
+   20 characters for formatting the digs value - just in case something like
+   INT_MAX is supplied by mistake), and store the existing string in it. */
+            new = astStore( NULL, result, strlen( result ) + 22 );
+
+/* Put the precision into the new string, following thre field width. */
+            b = new + ( a - result );
+            b += sprintf( b, ".%d", digs );
+
+/* Copy the remainder of the original format string to the new format
+   string. */
+            strcpy( b, a );
+
+/* Use the new format string in place of the old.*/
+            astFree( result );
+            result = new;
+         }
+      }
+   }
+
 
 /* Return the result. */
    return result;

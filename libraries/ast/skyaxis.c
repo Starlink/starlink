@@ -74,6 +74,12 @@ f     only within textual output (e.g. from AST_WRITE).
 *     13-SEP-20904 (DSB):
 *        Modify AxisFields to correct usage of the "p" pointer in the
 *        case that the first and only field begins with a minus sign.
+*     15-SEP-2004 (DSB):
+*        Modified ParseDHmsFormat so that the number of decimal places
+*        is specified by Digits if the given format string does not include 
+*        an explicit precision. To get the old interpretation of a
+*        precision-less format string effect (i.e. no decimal places), the
+*        format string should now explicitly include ".0" (i.e. "dms.0").
 *class--
 */
 
@@ -161,12 +167,12 @@ static const char *GetAxisFormat( AstAxis * );
 static const char *GetAxisLabel( AstAxis * );
 static const char *GetAxisSymbol( AstAxis * );
 static const char *GetAxisUnit( AstAxis * );
-static const char *DHmsFormat( const char *, double );
-static const char *DHmsUnit( const char *, int );
+static const char *DHmsFormat( const char *, int, double );
+static const char *DHmsUnit( const char *, int, int );
 static double AxisGap( AstAxis *, double, int * );
 static double AxisDistance( AstAxis *, double, double );
 static double AxisOffset( AstAxis *, double, double );
-static double DHmsGap( const char *, double, int * );
+static double DHmsGap( const char *, int, double, int * );
 static double GetAxisTop( AstAxis * );
 static double GetAxisBottom( AstAxis * );
 static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
@@ -187,7 +193,7 @@ static void ClearAxisIsLatitude( AstSkyAxis * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void ParseDHmsFormat( const char *, char *, int *, int *, int *, int *, int *, int *, int * );
+static void ParseDHmsFormat( const char *, int, char *, int *, int *, int *, int *, int *, int *, int * );
 static void SetAttrib( AstObject *, const char * );
 static void SetAxisAsTime( AstSkyAxis *, int );
 static void SetAxisFormat( AstAxis *, const char * );
@@ -461,8 +467,8 @@ static int AxisFields( AstAxis *this_axis, const char *fmt, const char *str,
    if( val ) *val = AST__BAD;
 
 /* Parse the format specifier. */
-   ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
-                   &ndp );
+   ParseDHmsFormat( fmt, astGetAxisDigits( this_axis ), &sep, &plus, &lead_zero,
+                    &as_time, &dh, &min, &sec, &ndp );
 
 /* Only proceed if the format was parsed succesfully, and the supplied arrays 
    are not of zero size. */
@@ -735,7 +741,7 @@ static const char *AxisFormat( AstAxis *this_axis, double value ) {
    fmt = GetAxisFormat( this_axis );
 
 /* Format the value and obtain a pointer to the result string. */
-   if ( astOK ) result = DHmsFormat( fmt, value );
+   if ( astOK ) result = DHmsFormat( fmt, astGetAxisDigits( this ), value );
 
 /* Return the result. */
    return result;
@@ -811,7 +817,7 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
    fmt = GetAxisFormat( this_axis );
 
 /* Obtain the closest "nice" gap size. */
-   if ( astOK ) result = DHmsGap( fmt, gap, ntick );
+   if ( astOK ) result = DHmsGap( fmt, astGetAxisDigits( this ), gap, ntick );
 
 /* Return the result. */
    return result;
@@ -1122,7 +1128,7 @@ static void ClearAxisFormat( AstAxis *this_axis ) {
    this->skyformat = astFree( this->skyformat );
 }
 
-static const char *DHmsFormat( const char *fmt, double value ) {
+static const char *DHmsFormat( const char *fmt, int digs, double value ) {
 /*
 *  Name:
 *     DHmsFormat
@@ -1135,7 +1141,7 @@ static const char *DHmsFormat( const char *fmt, double value ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *DHmsFormat( const char *fmt, double value )
+*     const char *DHmsFormat( const char *fmt, int digs, double value )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -1150,6 +1156,13 @@ static const char *DHmsFormat( const char *fmt, double value ) {
 *     fmt
 *        Pointer to a null terminated string containing the format
 *        specifier.
+*     digs 
+*        The default number of digits of precision to use. This is used
+*        if the given format specifier does not specify the number of decimal 
+*        places to attach to the final field. In this case, the returned
+*        value for "ndp" will be set to produce the number of digits of
+*        precision given by "digs". To produce no decimal places, the
+*        format specifier should include ".0" explicitly.
 *     double
 *        The value to be formatted (in radians).
 
@@ -1279,8 +1292,8 @@ static const char *DHmsFormat( const char *fmt, double value ) {
    } else {
 
 /* Parse the format specifier. */
-      ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
-                       &ndp );
+      ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, 
+                       &as_time, &dh, &min, &sec, &ndp );
 
 /* Break the value into fields. */
 /* ---------------------------- */
@@ -1515,7 +1528,7 @@ static const char *DHmsFormat( const char *fmt, double value ) {
 #undef BUFF_LEN
 }
 
-static double DHmsGap( const char *fmt, double gap, int *ntick ) {
+static double DHmsGap( const char *fmt, int digs, double gap, int *ntick ) {
 /*
 *  Name:
 *     DHmsGap
@@ -1528,7 +1541,7 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     double DHmsGap( const char *fmt, double gap, int *ntick )
+*     double DHmsGap( const char *fmt, int digs, double gap, int *ntick )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -1545,7 +1558,14 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 *        Pointer to a constant null-terminated string containing the
 *        format specifier which will be used to format the SkyAxis
 *        values.
-*     double
+*     digs 
+*        The default number of digits of precision to use. This is used
+*        if the given format specifier does not specify the number of decimal 
+*        places to attach to the final field. In this case, the returned
+*        value for "ndp" will be set to produce the number of digits of
+*        precision given by "digs". To produce no decimal places, the
+*        format specifier should include ".0" explicitly.
+*     gap
 *        The target gap size.
 *     ntick
 *        Address of an int in which to return a convenient number of
@@ -1614,8 +1634,8 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
    if ( gap != 0.0 ) {
    
 /* Parse the format specifier. */
-      ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
-                       &ndp );
+      ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min,
+                       &sec, &ndp );
 
 /* If OK, calculate the value of each formatted field in radians. */
       if ( astOK ) {
@@ -1815,7 +1835,7 @@ static double DHmsGap( const char *fmt, double gap, int *ntick ) {
 #undef BUFF_LEN
 }
 
-static const char *DHmsUnit( const char *fmt, int output ) {
+static const char *DHmsUnit( const char *fmt, int digs, int output ) {
 /*
 *  Name:
 *     DHmsUnit
@@ -1828,7 +1848,7 @@ static const char *DHmsUnit( const char *fmt, int output ) {
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     const char *DHmsUnit( const char *fmt, int output )
+*     const char *DHmsUnit( const char *fmt, int digs, int output )
 
 *  Class Membership:
 *     SkyAxis member function.
@@ -1845,6 +1865,13 @@ static const char *DHmsUnit( const char *fmt, int output ) {
 *        Pointer to a null terminated string containing the format
 *        specifier used to format coordinate values. For details of
 *        the syntax of this string, see the DHmsFormat function.
+*     digs 
+*        The default number of digits of precision to use. This is used
+*        if the given format specifier does not specify the number of decimal 
+*        places to attach to the final field. In this case, the returned
+*        value for "ndp" will be set to produce the number of digits of
+*        precision given by "digs". To produce no decimal places, the
+*        format specifier should include ".0" explicitly.
 *     output
 *        If non-zero, the returned string will be in a form suitable
 *        for describing the units/format of output produced using
@@ -1893,8 +1920,8 @@ static const char *DHmsUnit( const char *fmt, int output ) {
    if ( !astOK ) return result;
 
 /* Parse the format specifier. */
-   ParseDHmsFormat( fmt, &sep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
-                    &ndp );
+   ParseDHmsFormat( fmt, digs, &sep, &plus, &lead_zero, &as_time, &dh, &min, 
+                    &sec, &ndp );
 
 /* If the units string is required to describe formatted output and
    the field separators are letters (e.g. giving "01h23m45s" or
@@ -2362,15 +2389,15 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
    appropriate Format string and obtain a pointer to it. */
          if ( as_time ) {
             if ( digits <= 2 ) {
-               result = "h";
+               result = "h.0";
 	    } else if ( digits == 3 ) {
-               result = "hm";
+               result = "hm.0";
 	    } else if ( digits == 4 ) {
-               result = "hm";
+               result = "hm.0";
 	    } else if ( digits == 5 ) {
-               result = "hms";
+               result = "hms.0";
 	    } else if ( digits == 6 ) {
-               result = "hms";
+               result = "hms.0";
 
 /* Construct the Format string in a buffer if necessary. */
             } else {
@@ -2381,15 +2408,15 @@ static const char *GetAxisFormat( AstAxis *this_axis ) {
 /* Similarly, select a Format for expressing an angle if necessary. */
          } else {
             if ( digits <= 3 ) {
-               result = "d";
+               result = "d.0";
    	    } else if ( digits == 4 ) {
-               result = "dm";
+               result = "dm.0";
    	    } else if ( digits == 5 ) {
-               result = "dm";
+               result = "dm.0";
    	    } else if ( digits == 6 ) {
-               result = "dms";
+               result = "dms.0";
    	    } else if ( digits == 7 ) {
-               result = "dms";
+               result = "dms.0";
             } else {
                (void) sprintf( buff, "dms.%d", digits - 7 );
                result = buff;
@@ -2644,7 +2671,7 @@ static const char *GetAxisUnit( AstAxis *this_axis ) {
 
 /* Use the format specifier to generate a matching default Unit string and
    obtain a pointer to it. */
-      if ( astOK ) result = DHmsUnit( fmt, 1 );
+      if ( astOK ) result = DHmsUnit( fmt, astGetAxisDigits( this_axis ), 1 );
    }
 
 /* Return the result. */
@@ -2777,7 +2804,7 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    piby2 = 0.5*pi;
 }
 
-static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
+static void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
                              int *lead_zero, int *as_time, int *dh, int *min,
                              int *sec, int *ndp ) {
 /*
@@ -2792,7 +2819,7 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
 
 *  Synopsis:
 *     #include "skyaxis.h"
-*     void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
+*     void ParseDHmsFormat( const char *fmt, int digs, char *sep, int *plus,
 *                           int *lead_zero, int *as_time, int *dh, int *min,
 *                           int *sec, int *ndp )
 
@@ -2809,6 +2836,13 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
 *        Pointer to a null terminated string containing the format
 *        specifier.  For details of the syntax of this string, see the
 *        DHmsFormat function.
+*     digs 
+*        The default number of digits of precision to use. This is used
+*        if the given format specifier does not specify the number of decimal 
+*        places to attach to the final field. In this case, the returned
+*        value for "ndp" will be set to produce the number of digits of
+*        precision given by "digs". To produce no decimal places, the
+*        format specifier should include ".0" explicitly.
 *     sep
 *        Pointer to a location in which a single character will be
 *        returned to indicate which separator should be used to
@@ -2845,7 +2879,7 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
 *        Pointer to an int in which to return the number of digits
 *        required following the decimal point in the final field. A
 *        value of zero indicates that the decimal point should be
-*        omitted.
+*        omitted. See parameter "digs".
 
 *  Returned Value:
 *     void
@@ -2949,13 +2983,28 @@ static void ParseDHmsFormat( const char *fmt, char *sep, int *plus,
    the minutes field is not. */
    if ( *dh && !*min ) *sec = 0;
 
+/* Determine the default number of decimal places following the final field. 
+   This is the number which will be used if the format specifier does not 
+   indicate how many decimal places should be produced. It is shosen to
+   produce the requested total number of digits of precision. */
+   *ndp = digs;
+   if( *as_time ) {
+      *ndp = ( digs > 2 ) ? digs : 2;
+      if( *dh ) *ndp -= 2;
+   } else {
+      *ndp = ( digs > 3 ) ? digs : 3;
+      if( *dh ) *ndp -= 3;
+   }
+   if( *min ) *ndp -= 2;
+   if( *sec ) *ndp -= 2;
+   if( *ndp < 0 ) *ndp = 0;
+
 /* If decimal places are required, attempt to read the integer value
-   following the decimal point which specifies how many. If
-   successful, and a valid (positive) result was obtained, note its
-   value. */
+   following the decimal point which specifies how many. If successful, 
+   and a valid (positive or zero) result was obtained, note its value. */
    if ( ( decpos >= 0 ) && ( decpos < ( i - 1 ) ) ) {
       if ( astSscanf( fmt + decpos + 1, "%d", &ndpval ) == 1 ) {
-         if ( ndpval > 0 ) *ndp = ndpval;
+         if ( ndpval >= 0 ) *ndp = ndpval;
       }
    }
 }
@@ -3298,6 +3347,7 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    int as_time;                  /* Value is a time (else an angle)? */
    int decimal;                  /* Decimal point in field? */
    int dh;                       /* Hours field required? */
+   int digs;                     /* Default no. of digits of precision */
    int field_id[ 3 ];            /* Field identification (0 = don't know) */
    int final;                    /* Final field read? */
    int good_sep;                 /* Separator character valid? */
@@ -3349,8 +3399,9 @@ static int AxisUnformat( AstAxis *this_axis, const char *string,
    Format string, in case the syntax has been over-ridden by a derived
    class. */
    fmt = GetAxisFormat( this_axis );
-   ParseDHmsFormat( fmt, &fmtsep, &plus, &lead_zero, &as_time, &dh, &min, &sec,
-                    &ndp );
+   digs = astGetAxisDigits( this_axis );
+   ParseDHmsFormat( fmt, digs, &fmtsep, &plus, &lead_zero, &as_time, &dh, &min,
+                    &sec, &ndp );
 
 /* Initialise a pointer into the string and advance it to the first
    non-white space character. Save a copy of this pointer. */

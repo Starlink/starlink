@@ -1,4 +1,4 @@
-AST version  3.4- 0
+AST version  3.4- 4
 PutCards Ncards =  7
 PutCards Card =  1
 PutCards Card =  8
@@ -2596,6 +2596,14 @@ REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '120'
      84.0       57.1     TC  0.798      0.602    
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  2
+REG_SCALES: 
+REG_QCH: 
+REG_CAP:  0
+REG_CAP:  0
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
@@ -6599,14 +6607,6 @@ REG_CAP:  0
 REG_CAP:  0
 REG_TEXT: '10'
      42.5      -158.     TC -0.978      0.210    
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  2
-REG_SCALES: 
-REG_QCH: 
-REG_CAP:  0
-REG_CAP:  0
 REG_CAP:  2
 REG_SCALES: 
 REG_QCH: 
