@@ -30,11 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
-#        Revision 1.16  2002/01/15 00:12:58  timj
-#        RPT: Fix uninit warning and change dir search order
-#
-#        Revision 1.15  2001/12/13 21:42:29  timj
-#        Fix from RPT to use UT rather than HST
+#        Revision 1.17  2002/03/22 01:09:38  timj
+#        - work around bug in Tk 800.024
+#        - Change default noise level
 #
 #        Revision 1.14  2000/04/18 04:26:42  timj
 #        Now works on WinNT
@@ -188,7 +186,7 @@ my $xplot   = 660;
 my $yplot   = 300;
 my $xleft   =  50;
 my $xright  = 610;
-my $ytop    =  50;  
+my $ytop    =  50;
 my $ybottom = 250;
 
 # Default plot variable (from @col) and Canvas message
@@ -511,15 +509,17 @@ sub mk_runfield {
 sub plot_frame {
 
     # Delete Obsdate window/frame if it exists.
-    if (defined $OP) {
-       $OP->destroy;
-    }
+    $MW->withdraw;
+#    if (defined $OP) {
+#       $OP->destroy;
+#       undef $OP;
+#    }
 
     # Create lot Canvas if it does not yet exist.
     unless (defined $PW) {
-	$PW = $MW->Frame(
+	$PW = $MW->Toplevel(
 			 -takefocus => 1
-			 )->grid(qw/-sticky nsew/);
+			 );#->grid(qw/-sticky nsew/);
 
 	# Create a cancas 
 	$C = $PW->Canvas(
@@ -610,6 +610,7 @@ sub plot_frame {
 	$w_autoscale->pack(-side=>'right');
 
     }
+
 }
 
 #----------------------------------------------------------------------------
@@ -1265,16 +1266,16 @@ sub plot {
     }
 
     if ($newplot && $plotvar == 2) {
-       $y = $ybottom - (60-$ylo) * ($ybottom-$ytop)/$yr;
-       $cutoff_line = 
-       $C->create('line', $xleft, $y, $xright, $y, -width => 1, 
+       $y = $ybottom - (105-$ylo) * ($ybottom-$ytop)/$yr;
+       $cutoff_line =
+       $C->create('line', $xleft, $y, $xright, $y, -width => 1,
 		   -fill => $qc);
     }
 
     if (defined $cutoff_line && defined $flatvar && $flatvar eq $plotvar) {
        $yp = $ybottom - ($cutoff-$ylo) * ($ybottom-$ytop)/$yr;
        $cutoff_line = 
-       $C->create('line', $xleft, $yp, $xright, $yp, -width => 2, 
+       $C->create('line', $xleft, $yp, $xright, $yp, -width => 2,
 		   -fill => $dc);
     }
 
@@ -1308,8 +1309,8 @@ sub show_lwsw {
 
     # Make line on noise plot
     $C->delete($cutoff_line) if (defined $BW);
-    $cutoff_line = 
-      $C->create('line', $xleft, $yp, $xright, $yp, -width => 2, 
+    $cutoff_line =
+      $C->create('line', $xleft, $yp, $xright, $yp, -width => 2,
 		   -fill => $dc);
     &plot_lwsw
 }
@@ -1450,9 +1451,9 @@ sub plot_lwsw {
     }
 
     $BC->create('text', $xleft+100, $mbottom, 
-		-text => "Gold: $col[$flatvar] >= $cutoff", 
+		-text => "Gold: $col[$flatvar] >= $cutoff",
 		-font => $lgpltfont, -fill => $tc);
-    $BC->create('text', $xleft+100, $mbottom+25, 
+    $BC->create('text', $xleft+100, $mbottom+25,
 		-text => "$run:$source",   
                 -font => $lgpltfont, -fill => $tc);
     
@@ -1487,9 +1488,9 @@ sub item_off {
     if (defined $BW && $bw_point[$i] != -1) {
 	my $val = ${$noiseentry[$i]}{"$col[$flatvar]"};
 	if ($val < $cutoff ) {
-	    $BC->itemconfigure($bw_point[$i], -fill => $bc) 
+	    $BC->itemconfigure($bw_point[$i], -fill => $bc)
        } else {
-	   $BC->itemconfigure($bw_point[$i], -fill => $dc) 
+	   $BC->itemconfigure($bw_point[$i], -fill => $dc)
        }
     };
 #    $iteminfo = $C->create('text', $xplot-125, 25, -text => "$defmess",
