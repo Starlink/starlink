@@ -93,6 +93,8 @@
 *        VERB = LOGICAL (Read)
 *           A flag indicating if the values used for each multi-valued 
 *           parameter should be displayed each time the parameter is accessed.
+*           Also produces more verbose error messages if an input NDF
+*           cannot be acessed.
 *        DISAB = (Read)
 *           A flag indicating if looping is currently disabled.
 
@@ -169,8 +171,8 @@
 *  flag character.
          FLAG = .TRUE.
          DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK ) 
-            CALL NDG_ASSOC( UPAR, IGRP( NPAR ), SIZE( NPAR ), FLAG, 
-     :                      STATUS )
+            CALL NDG_ASSOC( UPAR, VERB, IGRP( NPAR ), SIZE( NPAR ), 
+     :                      FLAG, STATUS )
             IF( FLAG ) THEN
                CALL PAR_CANCL( UPAR, STATUS )
                CALL MSG_SETC( 'P', UPAR )

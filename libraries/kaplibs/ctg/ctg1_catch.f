@@ -1,4 +1,4 @@
-      SUBROUTINE CTG1_CATCH( IGRP1, START, IGRP2, STATUS )
+      SUBROUTINE CTG1_CATCH( VERB, IGRP1, START, IGRP2, STATUS )
 *+
 *  Name:
 *     CTG1_CATCH
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CTG1_CATCH( IGRP1, START, IGRP2, STATUS )
+*     CALL CTG1_CATCH( VERB, IGRP1, START, IGRP2, STATUS )
 
 *  Description:
 *     Names stored in the supplied group with indices greater than or
@@ -24,6 +24,12 @@
 *     happens the name of each bad file is stoed in IGRP2.
 
 *  Arguments:
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        are flushed so that the user can see them before re-prompting for
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the group containing the catalogue names
 *        (potentially containing wild cards).
@@ -49,6 +55,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -66,6 +74,7 @@
       INCLUDE 'CTG_ERR'          ! CAT error constants
 
 *  Arguments Given:
+      LOGICAL VERB
       INTEGER IGRP1
       INTEGER START
       INTEGER IGRP2
@@ -118,7 +127,7 @@
 
 *  Expand the name into separate file names, appending them to the 
 *  truncated input group.
-         CALL CTG1_EXPAN( NAME, IGRP1, NFMT, FMT, FOUND, STATUS )
+         CALL CTG1_EXPAN( VERB, NAME, IGRP1, NFMT, FMT, FOUND, STATUS )
 
 *  If no files were found matching the name, add the name to the group
 *  containing bad catalogue names.

@@ -1,4 +1,4 @@
-      SUBROUTINE NDG_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )
+      SUBROUTINE NDG_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
 *+
 *  Name:
 *     NDG_ASSO1
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG_ASSO1( PARAM, MODE, INDF, FIELDS, STATUS )
+*     CALL NDG_ASSO1( PARAM, VERB, MODE, INDF, FIELDS, STATUS )
 
 *  Description:
 *     This routine is equivalent to NDF_ASSOC except that it allows the 
@@ -24,6 +24,12 @@
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied NDFs
+*        are flushed so that the user can see them before re-prompting for
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     MODE = CHARACTER * ( * ) (Given)
 *        Type of NDF access required: 'READ', 'UPDATE' or 'WRITE'.
 *     INDF = INTEGER (Returned)
@@ -48,6 +54,8 @@
 *  History:
 *     24-AUG-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -65,6 +73,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
+      LOGICAL   VERB
       CHARACTER MODE*(*)
 
 *  Arguments Returned:
@@ -90,7 +99,7 @@
 *  There is no need to loop if a group expression is given which is 
 *  terminated by a flag character since we only want one NDF.
       IGRP = GRP__NOID
-      CALL NDG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+      CALL NDG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 
 *  Get the supplemental fields for the first NDF in the group.
       CALL NDG_GTSUP( IGRP, 1, FIELDS, STATUS )

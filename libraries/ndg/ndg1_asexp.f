@@ -1,4 +1,5 @@
-      SUBROUTINE NDG1_ASEXP( GRPEXP,  IGRP1, IGRP2, SIZE, FLAG, STATUS )
+      SUBROUTINE NDG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, 
+     :                       STATUS )
 *+
 *  Name:
 *     NDG1_ASEXP
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_ASEXP( GRPEXP, IGRP1, IGRP2, SIZE, FLAG, STATUS )
+*     CALL NDG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
 
 *  Description:
 *     The supplied group expression is parsed (using the facilities of 
@@ -30,6 +31,12 @@
 *     GRPEXP = CHARACTER * ( * ) (Given)
 *        The group expression specifying the NDF names to be stored 
 *        in the group.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied NDFs
+*        are flushed so that the user can see them before re-prompting for
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        The identifier of a group to which the names of any 
 *        inaccessable NDFs will be appended. The group should already
@@ -123,6 +130,8 @@
 *        Modified to work with automatic NDF data conversion.
 *     9-9-1999 (DSB):
 *        Improved prologue.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,6 +150,7 @@
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
+      LOGICAL   VERB
       INTEGER   IGRP1
 
 *  Arguments Given and Returned:
@@ -207,7 +217,7 @@
 *  of wild-cards, etc). These are appended to the end of the group and the
 *  original name deleted. An error is reported if no accessable NDFs can
 *  be found matching any one of the supplied names.
-      CALL NDG1_NDFCH( IGRP2, SIZE0 + 1, IGRP1, STATUS )
+      CALL NDG1_NDFCH( VERB, IGRP2, SIZE0 + 1, IGRP1, STATUS )
 
 *  Update the SIZE argument to take account of the new group
 *  members produced as a result of the expansion of any wild cards. This

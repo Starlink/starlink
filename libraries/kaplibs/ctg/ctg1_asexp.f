@@ -1,4 +1,5 @@
-      SUBROUTINE CTG1_ASEXP( GRPEXP,  IGRP1, IGRP2, SIZE, FLAG, STATUS )
+      SUBROUTINE CTG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, 
+     :                       STATUS )
 *+
 *  Name:
 *     CTG1_ASEXP
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CTG1_ASEXP( GRPEXP, IGRP1, IGRP2, SIZE, FLAG, STATUS )
+*     CALL CTG1_ASEXP( GRPEXP, VERB, IGRP1, IGRP2, SIZE, FLAG, STATUS )
 
 *  Description:
 *     The supplied group expression is parsed (using the facilities of
@@ -30,6 +31,12 @@
 *     GRPEXP = CHARACTER * ( * ) (Given)
 *        The group expression specifying the catalogue names to be stored 
 *        in the group.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        are flushed so that the user can see them before re-prompting for
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        The identifier of a group to which the names of any 
 *        inaccessable catalogues will be appended. The group should already
@@ -57,6 +64,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -75,21 +84,22 @@
 
 *  Arguments Given:
       CHARACTER GRPEXP*(*)
-      INTEGER   IGRP1
+      INTEGER VERB
+      INTEGER IGRP1
 
 *  Arguments Given and Returned:
-      INTEGER   IGRP2
+      INTEGER IGRP2
       
 *  Arguments Returned:
-      INTEGER   SIZE
-      LOGICAL   FLAG
+      INTEGER SIZE
+      LOGICAL FLAG
 
 *  Status:
-      INTEGER   STATUS             ! Global status
+      INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      INTEGER   ADDED              ! No. of names added to group
-      INTEGER   SIZE0              ! Size of group on entry to this routine
+      INTEGER ADDED              ! No. of names added to group
+      INTEGER SIZE0              ! Size of group on entry to this routine
 *.
 
 *  Ensure a .FALSE. value for FLAG is returned if an error has already 
@@ -138,7 +148,7 @@
 *  of wild-cards, etc). These are appended to the end of the group and the
 *  original name deleted. An error is reported if no accessable catalogues can
 *  be found matching any one of the supplied names.
-      CALL CTG1_CATCH( IGRP2, SIZE0 + 1, IGRP1, STATUS )
+      CALL CTG1_CATCH( VERB, IGRP2, SIZE0 + 1, IGRP1, STATUS )
 
 *  Update the SIZE argument to take account of the new group
 *  members produced as a result of the expansion of any wild cards. This

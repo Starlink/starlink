@@ -50,6 +50,8 @@
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -94,6 +96,8 @@
 *        VERB = LOGICAL (Read)
 *           A flag indicating if the values used for each multi-valued 
 *           parameter should be displayed each time the parameter is accessed.
+*           Also produces more verbose error messages when catalogues
+*           cannot be accessed.
 *        DISAB = (Read)
 *           A flag indicating if looping is currently disabled.
 
@@ -128,7 +132,7 @@
 
 *  If looping is currently disabled, just call CAT_ASSOC and exit.
       IF( DISAB ) THEN
-         CALL CAT_ASSOC( PARAM, MODE, CI, STATUS )
+         CALL CAT_ASSOC( PARAM, VERB, MODE, CI, STATUS )
          GO TO 999
       END IF
 
@@ -171,8 +175,8 @@
 *  flag character.
          FLAG = .TRUE.
          DO WHILE( FLAG .AND. STATUS .EQ. SAI__OK ) 
-            CALL CTG_ASSOC( UPAR, IGRP( NPAR ), SIZE( NPAR ), FLAG, 
-     :                      STATUS )
+            CALL CTG_ASSOC( UPAR, VERB, IGRP( NPAR ), SIZE( NPAR ), 
+     :                      FLAG, STATUS )
             IF( FLAG ) THEN
                CALL PAR_CANCL( UPAR, STATUS )
                CALL MSG_SETC( 'P', UPAR )
@@ -212,7 +216,7 @@
 *  result in the user being prompted for a new parameter value.
          CALL PAR_STATE( UPAR, STATE, STATUS )
          IF( STATE .EQ. SUBPAR__CANCEL ) THEN
-            CALL CTG_ASSO1( PARAM, MODE, CI, FIELDS, STATUS )
+            CALL CTG_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
             
 *  Store the new value in the group, replacing the old value, and store
 *  the new list of names as the parameter's current value.

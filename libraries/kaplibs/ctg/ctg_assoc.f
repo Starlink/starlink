@@ -1,4 +1,4 @@
-      SUBROUTINE CTG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+      SUBROUTINE CTG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 *+
 *  Name:
 *     CTG_ASSOC
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CTG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+*     CALL CTG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 
 *  Description:
 *     A group expression is obtained from the environment using the
@@ -26,6 +26,12 @@
 *  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The parameter with which to associate the group expression.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        are flushed so that the user can see them before re-prompting for
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP = INTEGER (Given and Returned)
 *        The identifier of the group in which the catalogue names are to be
 *        stored. A new group is created if the supplied value is GRP__NOID.
@@ -106,6 +112,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,6 +133,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
+      LOGICAL VERB
 
 *  Arguments Given and Returned:
       INTEGER   IGRP
@@ -203,12 +212,16 @@
 
 *  Expand the group expression into a list of catalogue names and append
 *  them to the end of the specified group.
-      CALL CTG1_ASEXP( GRPEXP, IGRP2, IGRP, SIZE, FLAG, STATUS )
+      CALL CTG1_ASEXP( GRPEXP, VERB, IGRP2, IGRP, SIZE, FLAG, STATUS )
 
-*  If some of the files were not valid catalogues, annul the error and then
-*  re-report a more friendly message for each bad catalogue.
+*  If some of the files were not valid catalogues, FLUSH OR annul the error 
+*  and then re-report a more friendly message for each bad catalogue.
       IF( STATUS .EQ. CTG__NOFIL ) THEN
-         CALL ERR_ANNUL( STATUS )
+         IF( VERB ) THEN
+            CALL ERR_FLUSH( STATUS )
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+         END IF
 
 *  Set up a temporary bad inherited status which can be passed to 
 *  ERR_REP.

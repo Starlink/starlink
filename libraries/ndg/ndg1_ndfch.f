@@ -1,4 +1,4 @@
-      SUBROUTINE NDG1_NDFCH( IGRP1, START, IGRP2, STATUS )
+      SUBROUTINE NDG1_NDFCH( VERB, IGRP1, START, IGRP2, STATUS )
 *+
 *  Name:
 *     NDG1_NDFCH
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_NDFCH( IGRP1, START, IGRP2, STATUS )
+*     CALL NDG1_NDFCH( VERB, IGRP1, START, IGRP2, STATUS )
 
 *  Description:
 *     Names stored in the supplied group with indices greater than or
@@ -24,6 +24,12 @@
 *     happens the name of each bad file is stoed in IGRP2.
 
 *  Arguments:
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied NDFs
+*        are flushed so that the user can see them before re-prompting for
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP1 = INTEGER (Given)
 *        An identifier for the group containing the NDF names
 *        (potentially containing wild cards).
@@ -52,6 +58,8 @@
 *        Original version.
 *     29-AUG-1997 (DSB):
 *        Modified to use NDF automatic data conversion facilities.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -70,6 +78,7 @@
       INCLUDE 'PSX_ERR'          ! PSX error constants
 
 *  Arguments Given:
+      LOGICAL VERB
       INTEGER IGRP1
       INTEGER START
       INTEGER IGRP2
@@ -136,7 +145,7 @@
 
 *  Expand the name into separate file names, appending them to the 
 *  truncated input group.
-         CALL NDG1_EXPAN( NAME, IGRP1, NFMT, FMT, FOUND, STATUS )
+         CALL NDG1_EXPAN( NAME, VERB, IGRP1, NFMT, FMT, FOUND, STATUS )
 
 *  If no files were found matching the name, add the name to the group
 *  containing bad NDF names.

@@ -1,4 +1,5 @@
-      SUBROUTINE NDG1_EXPAN( TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
+      SUBROUTINE NDG1_EXPAN( TEMPLT, VERB, IGRP, NFMT, FMT, FOUND,
+     :                       STATUS )
 *+
 *  Name:
 *     NDG1_EXPAN
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG1_EXPAN( TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
+*     CALL NDG1_EXPAN( TEMPLT, VERB, IGRP, NFMT, FMT, FOUND, STATUS )
 
 *  Description:
 *     The supplied wild-card template is expanded into a list of file 
@@ -33,6 +34,12 @@
 *  Arguments:
 *     TEMPLT = CHARACTER * ( * ) (Given)
 *        The wild card template.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied NDFs
+*        are flushed so that the user can see them before re-prompting for
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP = INTEGER (Given)
 *        An identifier for the group to which the expanded names should
 *        be appended. On exit, this group is at the end of a chain of 
@@ -73,6 +80,8 @@
 *        HDS container file.
 *     30-NOV-1999 (DSB):
 *        Check that nothing is written beyond the end of SEARCH string.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *-
@@ -85,9 +94,11 @@
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'DAT_PAR'          ! HDS constants.
       INCLUDE 'NDG_CONST'        ! NDG private constants.
+      INCLUDE 'NDG_ERR'          ! NDG error constants.
 
 *  Arguments Given:
       CHARACTER TEMPLT*(*)
+      LOGICAL VERB
       INTEGER IGRP
       INTEGER NFMT
       CHARACTER FMT( * )*(*)
@@ -218,7 +229,7 @@
 *  Otherwise, split the template into directory, basename, suffix and
 *  section.
       ELSE
-        CALL NDG1_FPARS( TEMPLT, DIR, BN, SUF, SEC, STATUS )
+         CALL NDG1_FPARS( TEMPLT, DIR, BN, SUF, SEC, STATUS )
 
 *  First of all look for any ".sdf" files with the given directory path
 *  and file basename. Ignore the file suffix since "fred.fit" could refer
@@ -290,6 +301,14 @@
 
 *  Get the number of potentially matching files.
       CALL GRP_GRPSZ( IGRP2, NMATCH, STATUS )
+
+*  Report an error if no matching files were found in verbose mode.
+      IF( VERB .AND. NMATCH .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = NDG__NOFIL
+         CALL MSG_SETC( 'T', TEMPLT )
+         CALL ERR_REP( 'NDG1_EXPAN_ERR1', 'No files found matching '//
+     :                 '''^T''.', STATUS )
+      END IF
 
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
@@ -374,7 +393,11 @@
 *  If the file could not be opened as an HDS container file, annul the
 *  error.
          ELSE     
-            CALL ERR_ANNUL( STATUS )
+            IF( TYP .EQ. '.sdf' .AND. VERB ) THEN
+               CALL ERR_FLUSH( STATUS )
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
 
 *  Initialise the stored string to be the full file spec.
             STORED = SPEC
@@ -434,9 +457,15 @@
             END IF
          END IF
 
-*  Annul any error which has occurred so that any remaining names can be
-*  checked.
-         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+*  Annul or flush any error which has occurred so that any remaining names 
+*  can be checked.
+         IF( STATUS .NE. SAI__OK ) THEN
+            IF( VERB ) THEN
+               CALL ERR_FLUSH( STATUS )
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
+         END IF
 
       END DO
 

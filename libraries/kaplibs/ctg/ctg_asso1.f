@@ -1,4 +1,4 @@
-      SUBROUTINE CTG_ASSO1( PARAM, MODE, CI, FIELDS, STATUS )
+      SUBROUTINE CTG_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
 *+
 *  Name:
 *     CTG_ASSO1
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CTG_ASSO1( PARAM, MODE, CI, FIELDS, STATUS )
+*     CALL CTG_ASSO1( PARAM, VERB, MODE, CI, FIELDS, STATUS )
 
 *  Description:
 *     This routine is equivalent to CAT_ASSOC except that it allows the 
@@ -24,6 +24,12 @@
 *  Arguments:
 *     PARAM = CHARACTER * ( * ) (Given)
 *        Name of the ADAM parameter.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        are flushed so that the user can see them before re-prompting for
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     MODE = CHARACTER * ( * ) (Given)
 *        Type of catalogue access required: 'READ', 'UPDATE' or 'WRITE'.
 *     CI = INTEGER (Returned)
@@ -47,6 +53,8 @@
 *  History:
 *     13-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -64,6 +72,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
+      LOGICAL VERB
       CHARACTER MODE*(*)
 
 *  Arguments Returned:
@@ -89,7 +98,7 @@
 *  There is no need to loop if a group expression is given which is 
 *  terminated by a flag character since we only want one catalogue.
       IGRP = GRP__NOID
-      CALL CTG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+      CALL CTG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 
 *  Get the supplemental fields for the first catalogue in the group.
       CALL CTG_GTSUP( IGRP, 1, FIELDS, STATUS )

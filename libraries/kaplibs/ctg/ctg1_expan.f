@@ -1,4 +1,5 @@
-      SUBROUTINE CTG1_EXPAN( TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
+      SUBROUTINE CTG1_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND, 
+     :                       STATUS )
 *+
 *  Name:
 *     CTG1_EXPAN
@@ -10,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL CTG1_EXPAN( TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
+*     CALL CTG1_EXPAN( VERB, TEMPLT, IGRP, NFMT, FMT, FOUND, STATUS )
 
 *  Description:
 *     The supplied wild-card template is expanded into a list of file 
@@ -21,6 +22,12 @@
 *     the start of CAT_FORMATS_IN).
 
 *  Arguments:
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied catalogues 
+*        are flushed so that the user can see them before re-prompting for
+*        a new catalogue ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     TEMPLT = CHARACTER * ( * ) (Given)
 *        The wild card template.
 *     IGRP = INTEGER (Given)
@@ -56,6 +63,8 @@
 *  History:
 *     10-SEP-1999 (DSB):
 *        Original version.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     12-APR-2000 (DSB):
 *        Corrected code which chooses whether to pruge duplicate file
 *        names.
@@ -70,8 +79,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'GRP_PAR'          ! GRP constants.
       INCLUDE 'CTG_CONST'        ! CTG private constants.
+      INCLUDE 'CTG_ERR'          ! CTG error constants.
 
 *  Arguments Given:
+      LOGICAL VERB
       CHARACTER TEMPLT*(*)
       INTEGER IGRP
       INTEGER NFMT
@@ -237,6 +248,14 @@
 *  Get the number of potentially matching files.
       CALL GRP_GRPSZ( IGRP2, NMATCH, STATUS )
 
+*  Report an error if no matching files were found in verbose mode.
+      IF( VERB .AND. NMATCH .EQ. 0 .AND. STATUS .EQ. SAI__OK ) THEN
+         STATUS = CTG__NOFIL
+         CALL MSG_SETC( 'T', TEMPLT )
+         CALL ERR_REP( 'CTG1_EXPAN_ERR1', 'No files found matching '//
+     :                 '''^T''.', STATUS )
+      END IF
+
 *  Abort if an error has occurred.
       IF( STATUS .NE. SAI__OK ) GO TO 999
 
@@ -285,9 +304,15 @@
          CALL CAT_TRLSE( CI, STATUS ) 
          CALL ERR_END( STATUS )
 
-*  Annul any error which has occurred so that any remaining names can be
-*  checked.
-         IF( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
+*  Annul or flush any error which has occurred so that any remaining names 
+*  can be checked.
+         IF( STATUS .NE. SAI__OK ) THEN
+            IF( VERB ) THEN 
+               CALL ERR_FLUSH( STATUS )
+            ELSE
+               CALL ERR_ANNUL( STATUS )
+            END IF
+         END IF
 
       END DO
 

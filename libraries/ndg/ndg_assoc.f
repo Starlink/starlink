@@ -1,4 +1,4 @@
-      SUBROUTINE NDG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+      SUBROUTINE NDG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 *+
 *  Name:
 *     NDG_ASSOC
@@ -10,7 +10,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL NDG_ASSOC( PARAM, IGRP, SIZE, FLAG, STATUS )
+*     CALL NDG_ASSOC( PARAM, VERB, IGRP, SIZE, FLAG, STATUS )
 
 *  Description:
 *     A group expression is obtained from the environment using the
@@ -25,6 +25,12 @@
 *  Arguments:
 *     PARAM = CHARACTER*(*) (Given)
 *        The parameter with which to associate the group expression.
+*     VERB = LOGICAL (Given)
+*        If TRUE then errors which occur whilst accessing supplied NDFs
+*        are flushed so that the user can see them before re-prompting for
+*        a new NDF ("verbose" mode). Otherwise, they are annulled and 
+*        a general "Cannot access file xyz" message is displayed before 
+*        re-prompting.
 *     IGRP = INTEGER (Given and Returned)
 *        The identifier of the group in which the NDF names are to be
 *        stored. A new group is created if the supplied value is GRP__NOID.
@@ -122,6 +128,8 @@
 *        expression by terminating the group expression with a colon.
 *     9-9-1999 (DSB):
 *        Improved the prologue.
+*     10-APR-2000 (DSB):
+*        Added argument VERB.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -141,6 +149,7 @@
 
 *  Arguments Given:
       CHARACTER PARAM*(*)
+      LOGICAL   VERB
 
 *  Arguments Given and Returned:
       INTEGER   IGRP
@@ -219,12 +228,16 @@
 
 *  Expand the group expression into a list of NDF names and append
 *  them to the end of the specified group.
-      CALL NDG1_ASEXP( GRPEXP, IGRP2, IGRP, SIZE, FLAG, STATUS )
+      CALL NDG1_ASEXP( GRPEXP, VERB, IGRP2, IGRP, SIZE, FLAG, STATUS )
 
 *  If some of the files were not valid NDFs, annul the error and then
 *  re-report a more friendly message for each bad NDF.
       IF( STATUS .EQ. NDG__NOFIL ) THEN
-         CALL ERR_ANNUL( STATUS )
+         IF( VERB ) THEN
+            CALL ERR_FLUSH( STATUS )
+         ELSE
+            CALL ERR_ANNUL( STATUS )
+         END IF
 
 *  Set up a temporary bad inherited status which can be passed to 
 *  ERR_REP.
