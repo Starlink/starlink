@@ -15,10 +15,10 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {226.6}
+\newcommand{\stardocnumber}    {226.7}
 \newcommand{\stardocauthors}   {A.J. Chipperfield\\
                                 P.W. Draper}
-\newcommand{\stardocdate}      {4th September 2002}
+\newcommand{\stardocdate}      {29th July 2003}
 \newcommand{\stardoctitle}     {EXTRACTOR\\
                                 An Astronomical Source Detection Program}
 \newcommand{\stardocmanual}    {User Manual}
@@ -28,7 +28,7 @@ popular \SExtractor\ program, has very flexible configuration
 facilities and can handle images and catalogues in a variety of formats.}
 % ? End of document identification
 
-\newcommand{\sexversion}{2.2.1}
+\newcommand{\sexversion}{2.2.2}
 
 % -----------------------------------------------------------------------------
 
@@ -172,6 +172,7 @@ facilities and can handle images and catalogues in a variety of formats.}
 \newcommand{\EXTRACTOR}{\texttt{EXTRACTOR}}
 \newcommand{\CONVERT}{\texttt{CONVERT}}
 \newcommand{\SExtractor}{\texttt{SExtractor}}
+%\newcommand{\DUMMIESURL}{http://www-int.stsci.edu/~holwerda/se.html}
 \newcommand{\IRAFURL}{http://www.starlink.rl.ac.uk/iraf/web/iraf-homepage.html}
 \newcommand{\FITSURL}{http://fits.gsfc.nasa.gov/}
 \newcommand{\MUD}{mud165.ps}
@@ -1056,6 +1057,18 @@ A minor update to \EXTRACTOR\ with the following changes:
  \end{quote}
  would process the first extension. MEF files input to 
  \SExtractor\ should contain a primary image.
+
+\subsection{Version 1.4-2}
+
+ This is a minor release of \EXTRACTOR. The most significant change
+ is an update to SExtractor version 2.2.2. 
+
+\subsection{Version 1.4-3}
+
+ This is a minor release of \EXTRACTOR\ to fix a problem writing out 
+ RA and Dec values (this effected \EXTRACTOR\ only, not \SExtractor).
+
+ \EXTRACTOR\ is now released under the GNU General Public License.
 
 \section{\xlabel{references}References}
 Bailey, J.A. : \xref{SG/5}{sg5}{} : ICL \dash\ The Interactive Command Language for ADAM.\\

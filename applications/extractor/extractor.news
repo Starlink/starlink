@@ -1,12 +1,14 @@
 1 Update to EXTRACTOR
 
- This is a minor release of EXTRACTOR fixing a bug in the native
- version of SExtractor that caused a lockup when writing ASCII_SKYCAT
- files.
+ This is a minor release of EXTRACTOR to fix a problem writing out 
+ RA and Dec values (this effected EXTRACTOR only, not SExtractor).
+
+ Recent changes to EXTRACTOR include an update of SExtractor to
+ version 2.2.2 and the change of its license terms to GPL.
 
  EXTRACTOR is described in SUN/226, which can be viewed on-line by the
  command:
 
     % showme sun226
 
- Peter W. Draper 8th January 2003 (extractor@star.rl.ac.uk).
+ Peter W. Draper 29th July 2003 (extractor@star.rl.ac.uk).
