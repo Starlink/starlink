@@ -10,8 +10,16 @@ icl_LDADD = `ams_link_adam` `hds_link_adam` `hlp_link_adam` `cnf_link_adam` `nbs
 # to be created from parse.y
 AM_YFLAGS = -d
 
+# It seems that ICL simply refuses to work correctly unless we
+# use the -l flag for maximum compatibility with the original lex
+# Note that we will probably need to worry about this on non-Gnu
+# flex.
+AM_LFLAGS = -l
+
+# Need to find curses library using configure.ac
+
 icl_io_SOURCES = icl_io.c
-icl_io_LDADD = `ams_link_adam` `subpar_link_adam`
+icl_io_LDADD = `ams_link_adam` -lncurses
 
 BUILT_SOURCES = UFACE_ERR
 
