@@ -29,7 +29,8 @@ STAR_LATEX_DOCUMENTATION(ssn21)
 
 dnl    If you wish to configure extra files, you can add them to this
 dnl    declaration.
-AC_CONFIG_FILES(Makefile component.xml starX_link, [chmod +x starX_link])
+AC_CONFIG_FILES([Makefile component.xml])
+AC_CONFIG_FILES(starX_link, [chmod +x starX_link])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
