@@ -1270,12 +1270,12 @@ hds_machine.txt: hds_machine
             obviously), you would put <code>/opt/SUNWspro/bin</code>
             in your path, and set the <code>CXX</code> variable:
             <verbatim>
-% export CXX=CC
+% export CXX=CC   # best avoided
 % ./configure
 </verbatim>
             or
             <verbatim>
-% env CXX=CC ./configure
+% env CXX=CC ./configure   # best avoided
 </verbatim>
             where the latter is probably preferable, inasmuch as it
             does not leave this important variable set, in such a way
@@ -1287,8 +1287,8 @@ hds_machine.txt: hds_machine
 </verbatim>
             This doesn't set <code>CXX</code> as an environment
             variable, but sets it in a similar-looking way as one of the
-            <code>./configure</code> arguments.  This second way is
-            preferable for two reasons: firstly, it does not leave the
+            <code>./configure</code> arguments.  This way is
+            preferable to either of the above for two reasons: firstly, it does not leave the
             variable set; secondly this way <code>./configure</code>
             `knows' that the compiler has been overridden, so that if
             you are using a configure cache, and
@@ -1312,6 +1312,10 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
             <code>config.cache</code> file, check that the environment
             variable is indeed set as you wish, and rerun
             <code>./configure</code>.</p>
+
+          <p>You can pass options to the compiler using the
+            <code>CFLAGS</code> variable, for example in the form
+            <code>CFLAGS=-g</code>.</p>
 
           <p>The down-side of this is that these environment variables
             <em>do matter</em>, and implicitly <em>change the
@@ -1565,7 +1569,7 @@ configure: error: run `make distclean' and/or `rm config.cache' and start over
                   should not be adjusted by hand.</p>
               </dd>
 
-              <dt>developers</dt>
+             <dt>developers</dt>
               <dd>
                 <p>This is a non-exhaustive list of those who have
                   worked on this package.  Little use is made of
@@ -3436,6 +3440,18 @@ M Makefile.dependencies
                 See <ref id="automakeoverview"/>.</p>
             </dd>
 
+            <dt>How do I control which compiler and compiler options I
+              use?</dt>
+            <dd>
+              <p>You can control the compiler at configure time by
+              specifying the variable <code>F77</code>,
+              <code>FC</code>, <code>CC</code> or <code>CXX</code>, as
+              appropriate; and you add compiler options with the
+              <code>FFLAGS</code>, <code>FCFLAGS</code> or
+                <code>CFLAGS</code> variables.  For details and
+              warnings, see <ref id="configure-script"/>.</p>
+            </dd>
+
             <dt>What's the best way to generate files at build
               time?</dt>
             <dd>
@@ -3549,6 +3565,32 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
                 (IEEE Std 1003.1) and ISO/IEC 9945:2003.
               </p>
             </dd>
+
+            <dt>I've just been told that libtool is ``unable to infer
+              tagged configuration''.  What on earth does that
+              mean?</dt>
+
+            <dd>
+              <p>I'm not what this is supposed to mean
+                <em>exactly</em>, but what it seems to mean in
+                practice is that libtool has become terribly confused
+                about your compiler.  Very probably, you forced
+                <code>./configure</code> to use a particular compiler
+                by specifying one of the <code>F77</code>,
+                <code>FC</code> or <code>CC</code> environment
+                variables at configure time.  You may have forgotten
+                that you have that variable set.  Alternatively, you
+                may be unaware that that variable is set: a known
+                manifestation of this problem is that the IRAF startup
+                script sets <code>F77</code> to be an IRAF-specific
+                script, which works OK from the command-line (given
+                that you want to use IRAF), but which leaves libtool
+                in a confused heap.</p>
+
+              <p>See <ref id="configure-script"/> for more discussion
+                of these variables.</p>
+            </dd>
+
           </dl>
         </p>
         
