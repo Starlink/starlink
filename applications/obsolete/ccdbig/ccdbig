@@ -200,6 +200,12 @@
             sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
           | awk 'NR <= '$objects' { print $1, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
           > ccdtest_obj.dat
+            if ( `wc -l ccdtest_obj.dat` < $objects ) then
+               echo " "
+               echo " Insufficient test objects in data file ccdbig_obj.dat."
+               echo " Using only "`wc -l ccdtest_obj.dat`" instead of $objects."
+               echo " "
+            endif
 
 #  Set up geometry of CCD.
 #  This matches (and must match) the prescription used in ccdbgen.
