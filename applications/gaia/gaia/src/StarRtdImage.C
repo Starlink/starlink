@@ -129,7 +129,7 @@
 #include "StarRtdForeignCmds.h"
 
 //  Size of buffer used for Tcl commands.
-static const eval_buf_size_ = 1024;
+static const int eval_buf_size_ = 1024;
 
 //  Trig conversion factors.
 static const double pi_ = 3.14159265358979323846;
