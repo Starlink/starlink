@@ -21,6 +21,15 @@ AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
 
+dnl   Test what features the OPEN command can support
+AC_FC_OPEN_SPECIFIERS(readonly)
+AC_FC_OPEN_SPECIFIERS(access='append')
+AC_FC_OPEN_SPECIFIERS(blocksize=0)
+AC_FC_OPEN_SPECIFIERS(organization='RELATIVE')
+AC_FC_OPEN_SPECIFIERS(carriagecontrol='NONE')
+AC_FC_OPEN_SPECIFIERS([access='sequential',recl=1])
+
+
 dnl   Tests require access to monoliths
 dnl   This may be a problem if alink has not yet been installed
 STAR_MONOLITHS
