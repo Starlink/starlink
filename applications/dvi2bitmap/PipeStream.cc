@@ -36,16 +36,17 @@
 #  include <cstdio>
 #  include <cctype>
 #  include <cerrno>
-#  if HAVE_CASSERT 
-#    include <cassert>
-#  endif
 #else
 #  include <stdio.h>
 #  include <ctype.h>
 #  include <errno.h>
-#  if HAVE_ASSERT_H
-#    include <assert.h>
-#  endif
+#endif
+
+// the assert headers appear to be slightly less predictable...
+#if HAVE_CASSERT 
+#  include <cassert>
+#elif HAVE_ASSERT_H
+#  include <assert.h>
 #endif
 
 #if HAVE_SIGNAL_H
@@ -65,9 +66,6 @@ using std::ostream;
 using std::ends;
 using std::endl;
 using std::cerr;
-#define STD std
-#else
-#define STD
 #endif
 
 #include <stringstream.h>
@@ -118,16 +116,7 @@ PipeStream::PipeStream (string cmd, string envs)
      * Implementation here follows useful example in
      * <http://www.erack.de/download/pipe-fork.c> 
      */
-    if (procs == 0) {
-	// first time
-	procs = new struct process_status[nprocs];
-	for (int i=0; i<nprocs; i++) {
-	    procs[i].pid = 0;
-	    procs[i].status = -1; // sentinel value
-	}
-	signal(SIGCHLD, &PipeStream::childcatcher_);
-	signal(SIGALRM, &PipeStream::childcatcher_); // for pause()
-    }
+    PipeStreamSignalHandling::init();
 
     int fd[2];
 
@@ -257,7 +246,7 @@ void PipeStream::close(void)
 	bool keep_waiting = true;
 	int status = -1;
 	for (int i=0; keep_waiting; i++) {
-	    keep_waiting = !got_status_(pid_, &status);
+	    keep_waiting = !PipeStreamSignalHandling::got_status(pid_, &status);
 	    
 	    int sigtosend;
 	    if (keep_waiting) {
@@ -389,8 +378,27 @@ int PipeStream::getTerminationStatus(void)
  * All this is a rather simple-minded version of the pattern described in 
  * <http://www.cs.wustl.edu/~schmidt/signal-patterns.html>
  */
-struct PipeStream::process_status *PipeStream::procs = 0;
-const int PipeStream::nprocs = 8; // max no of children we can wait for
+
+
+struct PipeStreamSignalHandling::process_status*
+	PipeStreamSignalHandling::procs = 0;
+int PipeStreamSignalHandling::nprocs
+	= 8; // max no of children we can wait for
+
+bool PipeStreamSignalHandling::init()
+{
+    if (procs == 0) {
+	// first time
+	procs = new struct process_status[nprocs];
+	for (int i=0; i<nprocs; i++) {
+	    procs[i].pid = 0;
+	    procs[i].status = -1; // sentinel value
+	}
+	signal(SIGCHLD, &PipeStreamSignalHandling::childcatcher);
+	signal(SIGALRM, &PipeStreamSignalHandling::childcatcher); // for pause()
+    }
+    return true;
+}
 
 /**
  * Checks to see if the given process has exited.  If there's an entry
@@ -402,7 +410,7 @@ const int PipeStream::nprocs = 8; // max no of children we can wait for
  * @return true if the status was in fact available, and is now in
  * <code>*status</code>; false otherwise
  */
-bool PipeStream::got_status_(pid_t pid, int* status)
+bool PipeStreamSignalHandling::got_status(pid_t pid, int* status)
 {
     assert(status != 0);
     for (int i=0; i<nprocs; i++) {
@@ -416,7 +424,7 @@ bool PipeStream::got_status_(pid_t pid, int* status)
     return false;
 }
 
-void PipeStream::childcatcher_(int signum)
+void PipeStreamSignalHandling::childcatcher(int signum)
 {
     switch (signum) {
       case SIGCHLD:
@@ -444,5 +452,3 @@ void PipeStream::childcatcher_(int signum)
 	break;
     }
 }
-
-
