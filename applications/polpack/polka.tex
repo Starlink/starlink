@@ -9,11 +9,11 @@
 \newcommand{\stardocsource}    {}
 \newcommand{\stardocnumber}    {}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {23rd June 1998}
+\newcommand{\stardocdate}      {19th April 1999}
 \newcommand{\stardoctitle}     {POLKA \\ [1ex]
                                 A Tool for Image Registration, Sky Subtraction,
                                 and Calculation of Stokes Parameters}
-\newcommand{\stardocversion}   {Version 1.0}
+\newcommand{\stardocversion}   {Version 1.1}
 \newcommand{\stardocmanual}    {Hypertext Help}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -270,8 +270,7 @@ single-beam mode each input frame contains only one image (the $O$ ray
 image), and the GUI controls related to the $E$ ray image are
 disabled. In dual-beam mode each input frame contains two images (the $O$
 and the $E$ ray images), either side-by-side or interlaced. If you are
-aligning non-polarimetric data, use single beam mode. {\em Note,
-currently Stokes vectors cannot be produced in single-beam mode}.
+aligning non-polarimetric data, use single beam mode. 
 
 In either mode, use of POLKA is divided into two stages. In the first
 stage, the user supplies all the information required to produce the
@@ -291,16 +290,17 @@ consisting of one or more disconnected areas in the input frame. The user
 identifies each of the two masks by drawing a polygon around the
 disconnected areas forming the mask.
 
+In single-beam mode, each input frame contains only one image (the $O$
+ray image). A single mask can still be supplied, however, to specify the
+usable area of the image. If not supplied, the mask area defaults to the 
+whole image.
+
 It is usually only necessary to identify the masks explicitly on a single
 input frame. Default masks for the other images are created automatically 
 on the assumption that they are identical for all input Frames (i.e. that
 they do not move relative to the detector between frames). However, these 
 default masks can be edited if necessary by dragging, adding or deleting 
 vertices.
-
-In single-beam mode, each input frame contains only one image (the $O$
-ray image). A single mask is still required, however, to determine the
-usable area of the image.
 
 \subsection {\mylabel{POLKA_SKYSUB}Sky Subtraction}
 By default, POLKA estimates and removes the sky background from each
@@ -325,13 +325,13 @@ specified within the GUI.
 within each of the input object frames (this is done in a similar way to
 the identification of the $O$ and $E$ ray masks).\footnote{In dual beam
 mode, separate sky areas must be identified for the $O$ and $E$ ray
-pictures. In single-beam mode, only $O$-ray sky areas need be supplied.}
+pictures. In single-beam mode, only $O$-ray sky areas are supplied.}
 Upon completion, these sky areas are extracted and cleaned by removing
-any small bright features. The KAPPA application SURFIT is then used to
-fit a polynomial surface to the sky areas for each ray (the
-order of this surface may be controlled by the user), and
-extrapolated to cover the rest of the output image. Finally, this fitted
-surface is subtracted from the output image.
+any small bright features. The \xref{KAPPA}{sun95}{} application 
+\xref{SURFIT}{sun95}{SURFIT} is then used to fit a polynomial surface 
+to the sky areas for each ray (the order of this surface may be controlled 
+by the user), and extrapolated to cover the rest of the output image. 
+Finally, this fitted surface is subtracted from the output image.
 
 \end{enumerate}
 
@@ -343,15 +343,11 @@ The effect of sky subtraction on an image can be previewed using the
 Alignment of the extracted, sky-subtracted images is based on the
 position of stars identified by the user within the images. The mapping
 between any pair of images is assumed to be a shift of origin plus an
-optional magnification. When dealing with polarimeter data these mapping
-types will suffice since any rotation between the images modifies the 
-plane of polarisation reaching the analyser and so confuses the
-estimation of the Stokes parameters.
+optional magnification. A rotation may also be included if POLKA is being
+run in single-beam mode. 
 
-However, for non-polarimeter data, more flexible mappings can often be
-useful. For this reason options are provided in single-beam mode to allow
-the mapping to include rotation and shear, but these options SHOULD NOT
-BE USED for polarimeter data.
+For non-polarimeter data, a full six co-efficient linear mapping may be
+used which can produce shift, magnification, rotation and shear.
 
 In all cases, the coefficients of the mappings are determined by
 performing a least squares fit between the positions in the two images.
@@ -392,9 +388,9 @@ Single-beam mode is very similar to dual-beam mode. The only real
 difference is that no features, masks or sky areas related to the $E$-ray
 need be given (consequently, the controls related to the $E$ ray are
 disabled in single-beam mode). The required areas in each input frame are
-referred to as the ``$O$-ray image``. An $O$-ray mask is still required,
-since it defines the areas of each input frame to be copied to the
-corresponding output frame.
+referred to as the ``$O$-ray image``. An $O$-ray mask can still be
+supplied, in order to define the areas of each input frame to be copied
+to the corresponding output frame.
 
 For further details, see the \htmlref{Dual-beam tutorial}{POLKA_DBEAM_TUT}.
 
@@ -402,8 +398,7 @@ For further details, see the \htmlref{Dual-beam tutorial}{POLKA_DBEAM_TUT}.
 
 \subsubsection {Specifying the input and output images.}
 The first thing to do is to activate POLKA, specifying the input and
-output images, and the operation mode. In fact dual-beam mode is the
-default so you do not need to specify it explicitly. For instance, if you
+output images, and the operation mode. For instance, if you
 want to process all images in the current directory matching the wild-card 
 template {\bf m101\_?}, putting the output $O$-ray intensity images
 in {\bf m101\_a\_O}, {\bf m101\_b\_O}, etc, the output $E$-ray intensity
@@ -505,6 +500,10 @@ black and white will then be frozen at their current values until the
 button is de-selected.
 
 \subsubsection {Identifying $E$-ray features in the first image.}
+This section is only applicable to dual-beam data. If you have
+single-beam data pass on to section ``\htmlref{Identifying the O-ray Areas}
+{TUT_O_RAY_AREAS}''.
+
 Once the $O$-ray features have been identified, you need to identify the
 corresponding $E$-ray features. To do this, select the {\em E-ray
 features} button in the box labelled ``\htmlref{{\em
@@ -541,6 +540,10 @@ previously been identified in any picture, then the {\em New} button
 should be pressed, and an unused label will be assigned to the feature.
 
 \subsubsection {Verifying the $OE$ mapping.}
+This section is only applicable to dual-beam data. If you have
+single-beam data pass on to section ``\htmlref{Identifying the O-ray Areas}
+{TUT_O_RAY_AREAS}''.
+
 Once the $O$ and $E$ ray features have been identified, it is a good idea
 to press the \htmlref{{\em Draw Aligned}}{POLKA_DRAW_ALIGNED} button in
 the box labelled ``\htmlref{{\em Reference:}}{POLKA_REFERENCE}''. This
@@ -561,11 +564,14 @@ Draw Aligned} button). Another possible cause is that you have selected
 an inappropriate mapping type from the \htmlref{{\em
 Options}}{POLKA_OPTIONS_MENU} menu.
 
-\subsubsection {Identifying the $O$-ray areas.}
+\subsubsection {\mylabel{TUT_O_RAY_AREAS}Identifying the $O$-ray areas.}
 You now need to draw a mask over the image to define the areas containing
 the $O$-ray picture. A mask consists of one or more polygonal areas, each
 being given by positioning the cross-hair at each vertex in turn and
 clicking the left mouse button.
+
+In single-beam mode, this step is optional. If no mask is supplied, a
+default mask will be used which encloses the entire image.
 
 Select {\em O-ray mask} from the box labelled ``\htmlref{{\em
 Current:}}{POLKA_CURRENT}''. Position the cross-hair at a point on the
@@ -603,6 +609,10 @@ a text file. On each subsequent run, you can restore these masks using the
 menu. 
 
 \subsubsection {Identifying the $E$-ray areas.}
+This section is only applicable to dual-beam data. If you have
+single-beam data pass on to section ``\htmlref{Identifying the Sky Areas}
+{TUT_SKY_AREAS}''.
+
 Once the $O$-ray areas have been identified, you can click on the {\em
 E-ray mask} button in the box labelled \htmlref{{\em
 Current:}}{POLKA_CURRENT}. This will cause a default $E$-ray mask to be
@@ -613,7 +623,7 @@ same techniques as for the $O$-ray mask. Note, default masks are created
 using the current mappings. No attempt is made to modify these masks to
 take account of any subsequently changes in the mappings.
 
-\subsubsection {Identifying the sky areas.}
+\subsubsection {\mylabel{TUT_SKY_AREAS}Identifying the sky areas.}
 The next step is to identify the areas in which the sky background will
 be estimated.\footnote{This tutorial assumes that the input object frames
 contain some suitable sky areas. If this is not the case, then you may
@@ -649,12 +659,12 @@ subtracted data. Click on the
 \htmlref{{\em Effects}}{POLKA_EFFECTS_MENU} menu to restore the original
 displayed image.
 
-Once the $O$-ray sky areas have been identified, you can click on the
-{\em E-ray sky areas} button in the box labelled \htmlref{{\em
-Current:}}{POLKA_CURRENT}. This will cause default $E$-ray sky areas to
-be created by transforming the $O$-ray sky areas using the current
-mapping between the $O$ and $E$ ray pictures. You can then
-\htmlref{edit}{POLKA_EDITING_POLYGONS} these
+If you have dual-beam data, then once the $O$-ray sky areas have been
+identified, you can click on the {\em E-ray sky areas} button in the box
+labelled \htmlref{{\em Current:}}{POLKA_CURRENT}. This will cause default
+$E$-ray sky areas to be created by transforming the $O$-ray sky areas
+using the current mapping between the $O$ and $E$ ray pictures. You can
+then \htmlref{edit}{POLKA_EDITING_POLYGONS} these
 areas, if necessary. Note, default sky areas are created using the
 current mappings. No attempt is made to modify these areas to take
 account of any subsequently changes in the mappings.
@@ -724,6 +734,10 @@ Re-draw}}{POLKA_REDRAW} button again, to check that the final mapping
 looks reasonable.
 
 \subsubsection {Identifying $E$-ray features in the next input image.}
+This section is only applicable to dual-beam data. If you have
+single-beam data pass on to section ``\htmlref{Identifying masks and sky areas in the next input image}
+{TUT_NEXT_MASK}''.
+
 In general, you will not need to identify any $E$-ray features in the new
 image. This is because the $OE$ mapping for each image is assumed to be
 the same as for the first image. If this is not the case, then some
@@ -743,7 +757,7 @@ reference markers line up well with features in the $E$ ray picture, then
 you can simply press the \htmlref{{\em Accept}}{POLKA_ACCEPT} button to
 identify the features automatically.
 
-\subsubsection {Identifying masks and sky areas in the next input image.}
+\subsubsection {\mylabel{TUT_NEXT_MASK}Identifying masks and sky areas in the next input image.}
 In general, you will not need to identify any masks or sky areas in the
 other images. Default $O$ and $E$ ray masks are created on the assumption
 that they are identical for all input frames (i.e. that the masks do not
@@ -1019,12 +1033,13 @@ combinations of shift, rotation and magnification, but no shear (i.e. the
 rotation is the same for both axes). In addition, the magnification
 produced by these constrained mappings is always the same on both axes.
 
-NOTE, for polarimeter data, you should choose a mapping type which does
-not allow rotation. This is because any rotation between images
-effectively changes the analyser angle and confuses the Stokes parameter
-calculations. For this reason, the more general mapping types are only
-available in single-beam mode, which is the mode which will be used to
-align non-polararimeter data.
+NOTE, for polarimeter data, any rotation between images
+effectively changes the analyser angle. The algorithm used by
+\xref{POLCAL}{sun223}{POLCAL} to create Stokes vectors can take account
+of this rotation, but only in single-beam mode. For this reason, mappings
+which include rotation are not available in dual-beam mode. The full,
+unrestricted six co-efficiwent fit can produce shear and should only
+be used with non-polarimetric data.
 
 The constrained mappings are specified in terms of the shift, rotation and
 magnification which they produce. Using this description, the original
@@ -1066,7 +1081,8 @@ aligned reference features or creating the output images).
 \subsubsection {\mylabel{POLKA_POLMODE}{\em polarimetry Mode}} This is used 
 to select circular or linear polarimetry mode, and it controls the
 contents of the final Stokes cube created when the output data files are
-saved. It is disabled if Stokes vectors are not being produced. 
+saved. Note, circular polarization can only be measured in dual-beam mode.
+This option is disabled if Stokes vectors are not being produced. 
 
 \subsubsection {\mylabel{POLKA_SKYORDER}{\em Sky Order}} This is used to control
 the flexibility of the surfaces fitted to the sky background areas. It is
@@ -1977,7 +1993,7 @@ generated automatically). The simplest way to do this is to click on
 the corresponding reference marker. The new feature will then inherit the
 label of the reference marker.
 
-\subsection {\mylabel{POLKA_STOP_START}Use the Same Mask for Several Runs}
+\subsection {\mylabel{POLKA_SAME_MASKS}Use the Same Mask for Several Runs}
 Create the $O$ and $E$ ray masks for the first (reference) image, and
 then use the \htmlref{{\em Dump}}{POLKA_DUMP}/{\em Mask Only} and
 \htmlref{{\em Restore}}{POLKA_RESTORE}/{\em Mask Only} commands in the
