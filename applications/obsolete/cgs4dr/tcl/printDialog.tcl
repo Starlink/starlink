@@ -38,63 +38,78 @@ proc gwm_printDialog {w gwm c} {
     if [catch {set gwm_priv($w,background_opt)}] {
 	set gwm_priv($w,background_opt) colour
     }
+    if [catch {set gwm_priv($w,print_foreground)}] {
+	set gwm_priv($w,print_foreground) Black
+    }
+    if [catch {set gwm_priv($w,foreground_opt)}] {
+	set gwm_priv($w,foreground_opt) colour
+    }
 
 # Create and pack three frames one above the other and divide the top frame
 # into two side by side.
-    pack [frame $w.top] [frame $w.file] [frame $w.bot] -fill x -pady 3m
-    pack [frame $w.top.l] [frame $w.top.pad -width 10] [frame $w.top.r] \
-	-side left -fill y
+    pack [frame $w.top] [frame $w.file] [frame $w.bot] -fill x -pady 2m
+    pack [frame $w.top.l] -side left -fill y -expand y
+    pack [frame $w.top.r] -side right -fill y  -expand y
 
 # Create a label and a stack or radio buttons for selecting the print
 # format and pack them into the top left frame.
-    label $w.top.l.label -text Format:
+    label $w.top.l.label -fg blue -text "Output Format:"
     radiobutton $w.top.l.ps -text "B/W PostScript" -relief flat \
-	-variable gwm_priv($w,print_format) -value ps
+	-variable gwm_priv($w,print_format) -value ps  -anchor w -width 20
     radiobutton $w.top.l.colour_ps -text "Colour PostScript" -relief flat \
-	-variable gwm_priv($w,print_format) -value colour_ps
+	-variable gwm_priv($w,print_format) -value colour_ps -anchor w -width 20
     radiobutton $w.top.l.eps -text "Encapsulated PS" -relief flat \
-	-variable gwm_priv($w,print_format) -value eps
+	-variable gwm_priv($w,print_format) -value eps -anchor w -width 20
     radiobutton $w.top.l.colour_eps -text "Encap Colour PS" -relief flat \
-	-variable gwm_priv($w,print_format) -value colour_eps
+	-variable gwm_priv($w,print_format) -value colour_eps -anchor w -width 20
     radiobutton $w.top.l.inkjet -text "HP Inkjet" -relief flat \
-	-variable gwm_priv($w,print_format) -value HPinkjet
+	-variable gwm_priv($w,print_format) -value HPinkjet -anchor w -width 20
     pack $w.top.l.label $w.top.l.ps $w.top.l.colour_ps $w.top.l.eps \
-	$w.top.l.colour_eps $w.top.l.inkjet -anchor w
+	$w.top.l.colour_eps $w.top.l.inkjet -side top 
 
 # Create a label, radio buttons for selecting the back ground colour and
 # an entry widget for entering a colour name.
-    label $w.top.r.lab -text "Background colour"
+    label $w.top.r.blab -fg blue -text "Background:"
     radiobutton $w.top.r.bg -text "As window" -relief flat \
-	-variable gwm_priv($w,background_opt) -value window
-    radiobutton $w.top.r.col -text "Colour:" -relief flat \
-	-variable gwm_priv($w,background_opt) -value colour
-
-    pack $w.top.r.lab $w.top.r.bg $w.top.r.col -anchor e
-    pack [entry $w.top.r.name -relief sunken -bd 2 -width 14] -pady 5
+	-variable gwm_priv($w,background_opt) -value window -anchor w
+    radiobutton $w.top.r.bcol -text "Colour:" -relief flat \
+	-variable gwm_priv($w,background_opt) -value colour -anchor w
+    entry $w.top.r.bname -relief sunken -bd 2 -width 15
+    pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname -side top 
+    #label $w.top.r.flab -fg blue -text "Foreground:"
+    #radiobutton $w.top.r.fg -text "As window" -relief flat \
+    #  -variable gwm_priv($w,foreground_opt) -value window -anchor w
+    #radiobutton $w.top.r.fcol -text "Colour:" -relief flat \
+    #  -variable gwm_priv($w,foreground_opt) -value colour -anchor w
+    #entry $w.top.r.fname -relief sunken -bd 2 -width 15
+    #pack $w.top.r.blab $w.top.r.bg $w.top.r.bcol $w.top.r.bname \
+    #$w.top.r.flab $w.top.r.fg $w.top.r.fcol $w.top.r.fname -side top 
 
 # Initialise the entry widget.
-    $w.top.r.name insert 0 $gwm_priv($w,print_background)
+    $w.top.r.bname insert 0 $gwm_priv($w,print_background)
+    #$w.top.r.fname insert 0 $gwm_priv($w,print_foreground)
 
-# Pack a label and an entry widget for entering a file name into the
-# middle frame.
+# Pack a label and an entry widget for entering a file name into the middle frame.
     global printOption
+    global printCommand
+    global printFile
+    set printOption file
+    set printCommand "/usr/bin/lp -c"
+    set printFile "$env(HOME)/gwm.ps"
+
     pack [frame $w.file.t] [frame $w.file.m] [frame $w.file.b]
-    label $w.file.t.wlab -text "Print To:"
-    radiobutton $w.file.t.pbut -text "Printer" -relief flat -variable printOption -value printer
-    radiobutton $w.file.t.fbut -text "File" -relief flat -variable printOption -value file
-    pack $w.file.t.wlab $w.file.t.pbut $w.file.t.fbut -side left
+    label $w.file.t.wlab -fg blue -text "Output Options:" 
+    pack $w.file.t.wlab
 
-    label $w.file.m.plab -text "Print Command:"
-    pack $w.file.m.plab -side left
-    entry $w.file.m.pname -width 30 -relief sunken -bd 2 
-    pack $w.file.m.pname -side right
-    if {[$w.file.m.pname get] == ""} {$w.file.m.pname insert 0 "/usr/bin/lp -c"}
+    radiobutton $w.file.m.pbut -text "Printer" -width 15 -relief flat -variable printOption -value printer 
+    label $w.file.m.plab -text "Command:" -width 15  
+    entry $w.file.m.pname -width 30 -relief sunken -bd 2 -textvariable printCommand
+    pack $w.file.m.pbut $w.file.m.plab $w.file.m.pname -side left -anchor w
 
-    label $w.file.b.flab -text "Filename:"
-    pack $w.file.b.flab -side left
-    entry $w.file.b.fname -width 30 -relief sunken -bd 2
-    if {[$w.file.b.fname get] == ""} {$w.file.b.fname insert 0 "$env(HOME)/gwm.ps"}
-    pack $w.file.b.fname -side right
+    radiobutton $w.file.b.fbut -text "File" -width 15 -relief flat -variable printOption -value file 
+    label $w.file.b.flab -text "Filename:" -width 15  
+    entry $w.file.b.fname -width 30 -relief sunken -bd 2 -textvariable printFile
+    pack $w.file.b.fbut $w.file.b.flab $w.file.b.fname -side left -anchor w
 
 # Create an "OK" and a "Cancel" button.
     button $w.bot.ok -text OK -width 6 -command {set gwm_priv(button) "ok"}
@@ -144,8 +159,13 @@ proc gwm_printDialog {w gwm c} {
 	    if [string compare $gwm_priv($w,background_opt) colour] {
 		$gwm configure -printbg [$gwm get colour 0]
 	    } {
-		$gwm configure -printbg [$w.top.r.name get]
+		$gwm configure -printbg [$w.top.r.bname get]
 	    }
+	    #if [string compare $gwm_priv($w,foreground_opt) colour] {
+	    #  $gwm configure -printfg [$gwm get colour 1]
+    	    #} {
+	    #  $gwm configure -printfg [$w.top.r.fname get]
+	    #}
 
 	# Set the variable to be used to signal completion of the print to zero
 	    $gwm configure -printvariable gwm_printvar
@@ -154,9 +174,7 @@ proc gwm_printDialog {w gwm c} {
 
 	# Set a trace on gwm_printvar that re-enables the control that
 	# popped up the dialog box.
-            global printFile
             set printFile [string trim [$w.file.b.fname get]]
-            global printCommand
             set printCommand [string trim [$w.file.m.pname get]]
 	    trace variable gwm_printvar w "gwm_printComplete $c"
 
@@ -165,7 +183,7 @@ proc gwm_printDialog {w gwm c} {
 
 	    # Report the error and re-grab the pointer
 		set message "The file $printFile could not be opened \
-for printing. Please check the file and directory name"
+for printing. Please check the file and directory name."
 		tk_dialog .error Error $message error 0 OK
 		grab $w
 	    } {
@@ -205,7 +223,10 @@ proc gwm_printComplete {c name1 name2 op} {
     global printOption
     global printFile
     global printCommand
-    if {$printOption == "printer"} {exec $printCommand $printFile &}
+    if {[string tolower $printOption] == "printer"} {
+      set message [exec /usr/bin/csh -c "$printCommand $printFile"]
+      tk_dialog .error Info "$message $printFile" info 0 OK
+    }
 
 # Delete ourself.
     trace vdelete $name1 $op "gwm_printComplete $c"
