@@ -4738,7 +4738,7 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 
 
 *+  IMG_GETARD - define region described by ARD
-      SUBROUTINE IMG_GETARD(PAR1,RMASK,I1,I2,J1,J2,STATUS)
+      SUBROUTINE IMG_GETARD(PAR1,RMASK,STATUS)
 *    Description :
 *    Method :
 *    Deficiencies :
@@ -4751,9 +4751,6 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
-      INCLUDE 'GRP_PAR'
-      INCLUDE 'PRM_PAR'
-      INCLUDE 'FIO_ERR'
 *    Global Variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -4761,114 +4758,35 @@ c          CALL ARR_COP1B(NVAL,%VAL(QPTR),%VAL(I_QPTR),STATUS)
 *    Import-Export :
 *    Export :
       INTEGER RMASK(I_NX,I_NY)
-      INTEGER I1,I2,J1,J2
 *    Status :
       INTEGER STATUS
 *    External references :
 *    Local Constants :
 *    Local variables :
-      CHARACTER*132 ARDIN
-      REAL TR(6)
-      INTEGER GRPID,FID
-      INTEGER LBND(2),LBNDI(2),LBNDE(2)
-      INTEGER UBND(2),UBNDI(2),UBNDE(2)
-      INTEGER REGVAL
-      INTEGER INDEX
-      LOGICAL FILE
-      LOGICAL THERE
+      INTEGER GRPID
+      INTEGER DIMS(2)
+      REAL BASE(2),SCALE(2)
+      CHARACTER*(*) UNITS(2)
 *-
       IF (STATUS.EQ.SAI__OK) THEN
 
 *  get ARD input
-        CALL USI_GET0C(PAR1,ARDIN,STATUS)
-
-*  look for indirection symbol
-        IF (ARDIN(1:1).EQ.'^') THEN
-          FILE=.TRUE.
-          ARDIN=ARDIN(2:)
-          INQUIRE(FILE=ARDIN,EXIST=THERE)
-          IF (.NOT.THERE) THEN
-            CALL MSG_SETC('FIL',ARDIN)
-            CALL MSG_PRNT('AST_ERR: file ^FIL does not exist')
-            STATUS=SAI__ERROR
-          ENDIF
-        ELSE
-*  if not see if there is a file of that name
-          INQUIRE(FILE=ARDIN,EXIST=THERE)
-          FILE=THERE
-        ENDIF
-
-        IF (STATUS.EQ.SAI__OK) THEN
-
-          CALL GRP_NEW('ARD input',GRPID,STATUS)
-
-          IF (FILE) THEN
-*  read from file
-            CALL FIO_OPEN(ARDIN,'READ','NONE',0,FID,STATUS)
-            INDEX=0
-            DO WHILE (STATUS.EQ.SAI__OK)
-              CALL FIO_READF(FID,ARDIN,STATUS)
-              IF (STATUS.EQ.SAI__OK) THEN
-                INDEX=INDEX+1
-                CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
-              ENDIF
-            ENDDO
-            IF (STATUS.EQ.FIO__EOF) THEN
-              CALL ERR_ANNUL(STATUS)
-            ENDIF
-            CALL FIO_CLOSE(FID,STATUS)
-*  read from environment
-          ELSE
-            INDEX=1
-            DO WHILE (ARDIN.GT.' '.AND.STATUS.EQ.SAI__OK)
-              CALL GRP_PUT(GRPID,1,ARDIN,INDEX,STATUS)
-              INDEX=INDEX+1
-              CALL USI_CANCL(PAR1,STATUS)
-              ARDIN=' '
-              CALL USI_GET0C(PAR1,ARDIN,STATUS)
-              IF (ARDIN(1:1).EQ.CHAR(0)) THEN
-                ARDIN=' '
-              ELSEIF (STATUS.EQ.PAR__NULL) THEN
-                CALL ERR_ANNUL(STATUS)
-                ARDIN=' '
-              ENDIF
-            ENDDO
-          ENDIF
-
-        ENDIF
+        CALL ARX_OPEN(PAR1,GRPID,STATUS)
 
 
-C        CALL ARD_GROUP(PAR1,GRP__NOID,GRPID,STATUS)
+*  convert to mask
+        DIMS(1)=I_NX
+        DIMS(2)=I_NY
+        BASE(1)=I_XBASE
+        BASE(2)=I_YBASE
+        SCALE(1)=I_XSCALE
+        SCALE(2)=I_YSCALE
+        UNITS(1)=I_XYUNITS
+        UNITS(2)=I_XYUNITS
+        CALL ARX_MASK(GRPID,DIMS,BASE,SCALE,UNITS,RMASK,STATUS)
 
-*  set image dimensions
-        LBND(1)=1
-        LBND(2)=1
-        UBND(1)=I_NX
-        UBND(2)=I_NY
-*  set pixel to world transformation - see Sec.4 of ARD manual
-        TR(1)=1.0-I_XBASE/I_XSCALE
-        TR(2)=1.0/I_XSCALE
-        TR(3)=0.0
-        TR(4)=1.0-I_YBASE/I_YSCALE
-        TR(5)=0.0
-        TR(6)=1.0/I_YSCALE
-        REGVAL=2
-*  interpret ARD
-        CALL ARD_WORK(GRPID,2,LBND,UBND,TR,.FALSE.,REGVAL,RMASK,
-     :                           LBNDI,UBNDI,LBNDE,UBNDE,STATUS)
-*  set encompassing box
-        I1=LBNDE(1)
-        I2=UBNDE(1)
-        J1=LBNDE(2)
-        J2=UBNDE(2)
-        IF (I1.GT.I2.OR.J1.GT.J2) THEN
-          I1=1
-          I2=I_NX
-          J1=1
-          J2=I_NY
-        ENDIF
 
-        CALL GRP_DELET(GRPID,STATUS)
+        CALL ARX_CLOSE(GRPID,STATUS)
 
         IF (STATUS.NE.SAI__OK) THEN
           CALL ERR_REP(' ','from IMG_GETARD',STATUS)
