@@ -165,6 +165,9 @@
 *  Initially assume that the Object should be displayed in the GUI.
       QUIET = .FALSE.
 
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
 *  Get an NDF identifier.
       CALL NDF_ASSOC( 'NDF', 'UPDATE', INDF, STATUS )
 
