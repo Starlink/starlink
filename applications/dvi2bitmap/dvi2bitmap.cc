@@ -80,6 +80,8 @@ main (int argc, char **argv)
     kpathsea::init (progname, resolution);
 #endif
 
+    bool absCrop = false;
+
     for (argc--, argv++; argc>0; argc--, argv++)
 	if (**argv == '-')
 	    switch (*++*argv)
@@ -100,6 +102,42 @@ main (int argc, char **argv)
 		    break;
 		}
 		break;
+	      case 'C':		// absolute crop
+		absCrop = true;
+		// FALL THROUGH
+	      case 'c':		// crop
+	      {
+		  char c = *++*argv;
+		  argc--, argv++; if (argc <= 0) Usage();
+		  int cropmargin = atoi (*argv);
+		  switch (c)
+		  {
+		    case 'l':
+		      Bitmap::crop(Bitmap::Left,   cropmargin, absCrop);
+		      break;
+		    case 'r':
+		      Bitmap::crop(Bitmap::Right,  cropmargin, absCrop);
+		      break;
+		    case 't':
+		      Bitmap::crop(Bitmap::Top,    cropmargin, absCrop);
+		      break;
+		    case 'b':
+		      Bitmap::crop(Bitmap::Bottom, cropmargin, absCrop);
+		      break;
+		    case '\0':
+		      if (absCrop) // don't want this!
+			  Usage();
+		      Bitmap::crop(Bitmap::Left,   cropmargin, false);
+		      Bitmap::crop(Bitmap::Right,  cropmargin, false);
+		      Bitmap::crop(Bitmap::Top,    cropmargin, false);
+		      Bitmap::crop(Bitmap::Bottom, cropmargin, false);
+		      break;
+		    default:
+		      Usage();
+		  }
+		  break;
+	      }
+
 	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
@@ -586,7 +624,7 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-lLqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
+    cerr << "Usage: " << progname << " [-lLqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-[Cc][lrtb]] [-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
