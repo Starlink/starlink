@@ -2230,37 +2230,8 @@ do_test:
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
 	@ echo
-	@ echo "$(PACK_NAME) does not have a make-driven installation test"
-	@ echo
-	@ echo "To test $(PACK_NAME), you do the following (where % is the shell prompt)."
-	@ echo
-	@ echo " a) set up the environment variables and alias."
-	@ echo
-	@ echo " % setenv KAPPA_DIR $(INSTALL)/bin/kappa"
-	@ echo " % setenv KAPPA_HELP $(INSTALL)/help/kappa/kappa"
-	@ echo " % alias kappa 'source" '$$KAPPA_DIR'"/kappa.csh'"
-	@ echo
-	@ echo " b) You must have access to an X-windows graphics device and issued any"
-	@ echo " required xhost command and assigned the DISPLAY environment variable "
-	@ echo " (perhaps through the xdisplay command) to display remotely.  "
-	@ echo " In any directory:"
-	@ echo
-	@ echo " # Set up command for $(PACK_NAME)."
-	@ echo " # You should see a banner to say that KAPPA is available."
-	@ echo " % $(PKG_NAME)"
-	@ echo
-	@ echo " # Test the help system.  Enter CTRL/D to exit the help library."
-	@ echo " % kaphelp display"
-	@ echo
-	@ echo " # Display an image of Comet West on the workstation."
-	@ echo " % idset xwindows"
-	@ echo " % display" '$$KAPPA_DIR'"/comwest mode=ra"
-	@ echo
-	@ echo " # Load a pretty colour table."
-	@ echo " % lutheat"
-	@ echo
-	@ echo " # Rotate the colour table by moving the mouse as instructed."
-	@ echo " % lutrot"
+	KAPPA_DIR='$(INSTALL_BIN)';export KAPPA_DIR; \
+           $(INSTALL_BIN)/stardemo.tcl v$(PKG_VERS)
 	@ echo
 #
 #  Note the test has been run.
