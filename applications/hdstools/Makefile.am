@@ -29,7 +29,6 @@ FSRC = aio_assoco.f aio_blnk.f aio_cancl.f aio_close.f aio_ctoc.f \
          arr_prang1.f arr_sumdim.f \
          hdx_clear.f hdx_copy.f hdx_find.f hdx_numeric.f \
          hdx_sameshape.f hdx_sametype.f hdx_typint.f \
-         gethlp.f gthlpi.f pthlpo.f sread.f \
          prs_getslice.f \
          str_abbrev.f str_ctodim.f str_dimtoc.f str_item.f str_obdesc.f \
          str_obval.f str_parse.f
