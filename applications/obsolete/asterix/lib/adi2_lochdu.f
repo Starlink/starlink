@@ -19,7 +19,7 @@
 *  Arguments:
 *     FID = INTEGER (given)
 *        ADI identifier of FITSfile object
-*     HDU = CHARSCTER*(*) (given)
+*     HDU = CHARACTER*(*) (given)
 *        Logical HDU whose keyword this is. Blank for primary
 *     ID = INTEGER (returned)
 *        ADI identifier of FITSfile object
@@ -100,41 +100,17 @@
 *  Local Variables:
       CHARACTER*2		STR			! NHDU in chars
 
-      INTEGER			EID			! EXTENSIONS identifier
       INTEGER			NDIG			! Chars used in STR
       INTEGER			NHDU			! HDU number
 
       LOGICAL			CREATED			! Did we create object?
-      LOGICAL			THERE			! Object exists
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Initialise
-      CREATED = .FALSE.
-
-*  Locate the approriate place depending on the HDU value. Blank means
-*  primary HDU
-      IF ( HDU(1:1) .EQ. ' ' ) THEN
-        CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
-        CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
-        CREATED = (NHDU.EQ.0)
-
-*  Otherwise named HDU in the EXTENSIONS structure
-      ELSE
-        CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
-        CALL ADI_THERE( EID, HDU, THERE, STATUS )
-        IF ( .NOT. THERE ) THEN
-          CALL ADI_CNEW0( EID, HDU, 'STRUC', STATUS )
-          CREATED = .TRUE.
-        END IF
-        CALL ADI_FIND( EID, HDU, ID, STATUS )
-
-*  Remove temporary
-        CALL ADI_ERASE( EID, STATUS )
-
-      END IF
+*  Locate the HDU
+      ADI2_LOCHDU1( FID, HDU, .TRUE., ID, CREATED, STATUS )
 
 *  Did we create the structure?
       IF ( CREATED ) THEN
@@ -161,5 +137,149 @@
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_LOCHDU', STATUS )
+
+      END
+
+
+
+      SUBROUTINE ADI2_LOCHDU1( FID, HDU, CANCRE, ID, CREATED, STATUS )
+*+
+*  Name:
+*     ADI2_LOCHDU1
+
+*  Purpose:
+*     Locate HDU buffer structure in FITSfile object
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ADI2_LOCHDU1( FID, HDU, CANCRE, ID, CREATED, STATUS )
+
+*  Description:
+*     Locates (and creates if necessary) the buffer structures for storing
+*     FITS keyword data in FITSfile derived classes
+
+*  Arguments:
+*     FID = INTEGER (given)
+*        ADI identifier of FITSfile object
+*     HDU = CHARSCTER*(*) (given)
+*        Logical HDU whose keyword this is. Blank for primary
+*     ID = INTEGER (returned)
+*        ADI identifier of FITSfile object
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {routine_references}...
+
+*  Keywords:
+*     package:adi, usage:private, FITS
+
+*  Copyright:
+*     {routine_copyright}
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     2 Feb 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER                   FID                     ! File identifier
+      CHARACTER*(*)             HDU                     ! HDU name
+      LOGICAL			CANCRE			! Can create?
+
+*  Arguments Returned:
+      INTEGER                   ID                      ! Structure identifier
+      LOGICAL			CREATED			! Did we create object?
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Variables:
+      CHARACTER*2		STR			! NHDU in chars
+
+      INTEGER			EID			! EXTENSIONS identifier
+      INTEGER			NHDU			! HDU number
+
+      LOGICAL			THERE			! Object exists
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Initialise
+      IF ( CANCRE ) CREATED = .FALSE.
+
+*  Locate the approriate place depending on the HDU value. Blank means
+*  primary HDU
+      IF ( HDU(1:1) .EQ. ' ' ) THEN
+        CALL ADI_FIND( FID, 'PRIMARY', ID, STATUS )
+        IF ( CANCRE ) THEN
+          CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+          CREATED = (NHDU.EQ.0)
+        END IF
+
+*  Otherwise named HDU in the EXTENSIONS structure
+      ELSE
+        CALL ADI_FIND( FID, 'EXTENSIONS', EID, STATUS )
+        CALL ADI_THERE( EID, HDU, THERE, STATUS )
+        IF ( CANCRE .AND. .NOT. THERE ) THEN
+          CALL ADI_CNEW0( EID, HDU, 'STRUC', STATUS )
+          CREATED = .TRUE.
+        END IF
+        CALL ADI_FIND( EID, HDU, ID, STATUS )
+
+*  Remove temporary
+        CALL ADI_ERASE( EID, STATUS )
+
+      END IF
 
       END

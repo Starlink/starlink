@@ -136,7 +136,7 @@
           WRITE( STR, '(A,I1.1)' ) '.HDU', IHDU
           CALL ADI_CGET0C( FID, STR, HDU, STATUS )
         END IF
-        CALL ADI2_LOCHDU( FID, HDU, OHID, STATUS )
+        CALL ADI2_LOCHDU1( FID, HDU, .FALSE., OHID, 0, STATUS )
 
 *    Is the definition incomplete?
         CALL ADI_CGET0L( OHID, '.DEF_END', DEFEND, STATUS )
