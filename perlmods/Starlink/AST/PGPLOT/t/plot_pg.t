@@ -16,8 +16,7 @@ Starlink::AST::Begin();
 
 # FITS File
 # ---------
-#my $file = File::Spec->catfile( "PGPLOT", "t", "m31.fit" );
-my $file = File::Spec->catfile( "t", "m31.fit" );
+my $file = File::Spec->catfile( File::Spec->updir(), "data", "m31.fit" );
 
 # Get FITS Header
 # ---------------
@@ -38,10 +37,10 @@ is( PGPLOT::pgbegin(0,"/xserve",1,1), 1, "Result from the PGBEGIN() call" );
 my $nx = $header->value("NAXIS1");
 my $ny = $header->value("NAXIS2");
 pgpage();
-pgwnad( 0.1, 0.9, 0.1, 0.9 );
+pgwnad( 0,1,0,1 );
 
-my ( $x1, $x2, $y1, $y2 );
-pgqwin( $x1, $x2, $y1, $y2 );
+my ( $x1, $x2, $y1, $y2 ) = (0,1,0,1);
+
  
 my $xscale = ( $x2 - $x1 ) / $nx;
 my $yscale = ( $y2 - $y1 ) / $ny;
@@ -60,7 +59,7 @@ pggray( $array, $nx, $ny, 1, $nx, 1, $ny, 10000, 0,
 
 # Change FrameSet
 # ---------------
-$wcsinfo->Set( System => "GALACTIC" );
+#$wcsinfo->Set( System => "GALACTIC" );
 
 # AST axes
 # --------
@@ -74,6 +73,10 @@ is( $status, 1, "Result from registering PGPLOT with AST" );
 #$plot->Set( Colour => 2, Width => 5 );
 $plot->Grid();
 
+$plot->Set( "Current=1" );
+$plot->Text("Test Text 1", [0.4,0.4],[0.0,1.0],"CC");
+$plot->Text("Test Text 2", [0.5,0.5],[0.0,1.0],"CC");
+$plot->Text("Test Text 2", [0.6,0.6],[0.0,1.0],"CC");
 # Done!
 exit;
 

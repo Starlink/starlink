@@ -4,6 +4,7 @@ use strict;
 use Test::More tests => 5;
 use Data::Dumper;
 use Tk;
+use Tk::JPEG;
 
 require_ok("Starlink::AST");
 require_ok("Starlink::AST::Tk");
@@ -17,7 +18,9 @@ Starlink::AST::Begin();
 # FITS File
 # ---------
 #my $file = File::Spec->catfile( "PGPLOT", "t", "m31.fit" );
+#my $jpeg = File::Spec->catfile( "Tk", "t", "m31.jpg" );
 my $file = File::Spec->catfile( "..", "PGPLOT", "t", "m31.fit" );
+my $jpeg = File::Spec->catfile( "t", "m31.jpg" );
 
 # Get FITS Header
 # ---------------
@@ -37,9 +40,30 @@ isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 # ----------------------
 my $c = create_window();
 
+# Read data 
+# ---------
+my $x1 = 0.1*$c->cget( '-width' );
+my $y1 = 0.9*$c->cget( '-height' );
+my $x2 = 0.9*$c->cget( '-width' );
+my $y2 = 0.1*$c->cget( '-height' );
+
+my $xzoom = ($x2-$x1)/300;
+my $yzoom = ($y1-$y2)/300;
+print "$xzoom, $yzoom";
+my $jpg = $c->Photo( -format => 'jpeg', -file => $jpeg );
+
+#my $zoom = $c->Photo();
+#$zoom->copy( $jpg, -zoom => (2,2) );
+#1.70666666666667, 1.28
+ 
+# Plot image
+# ---------
+
+$c->createImage( $x1, $y1, -image => $jpg, -anchor => 'sw' );
+
 # Change FrameSet
 # ---------------
-$wcsinfo->Set( System => "GALACTIC" );
+#$wcsinfo->Set( System => "GALACTIC" );
 
 # AST axes
 # --------
@@ -92,6 +116,23 @@ sub create_window {
    $button->pack( -side => 'right' );
    
    return $canvas;
+}
+
+# read FITS file
+sub read_file {
+   my $file = shift;
+
+   my $status = 0;
+   my $fptr = Astro::FITS::CFITSIO::open_file(
+             $file, Astro::FITS::CFITSIO::READONLY(), $status);
+
+   my ($array, $nullarray, $anynull);
+   $fptr->read_pixnull( 
+     Astro::FITS::CFITSIO::TLONG(), [1,1], $nx*$ny, $array, $nullarray, 
+     $anynull ,$status);
+   $fptr->close_file($status);
+
+   return $array;
 }
 
 1;   
