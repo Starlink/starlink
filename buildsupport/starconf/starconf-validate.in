@@ -26,51 +26,6 @@ $version = '@PACKAGE_VERSION@';
 $force = 0;
 $srcdir = undef;
 
-while ($#ARGV >= 0) {
-    my $arg = shift(@ARGV);
-    $arg eq '--force' && do {
-        $force = 1;
-        next;
-    };
-
-    $arg eq '--help' && do {
-        print <<EOD;
-Usage: $progname [option] [srcdir]
-
-  Check that the [srcdir] conforms to the conventions of a Starlink
-  source directory.  [srcdir] defaults to '.'.  The exit status of the program
-  is the number of errors and warnings found.
-
-  Options:
-    --force    If present, the exit status represents only the number of
-               outright errors.
-    --help     Prints this message and exits
-    --version  Prints version number and exits
-EOD
-        exit(0);
-    };
-
-    $arg eq '--version' && do {
-        print "$progname $version\n";
-        exit(0);
-    };
-
-    $arg =~ /^-/ && do {
-        Usage();
-        next;
-    };
-
-    if (defined($srcdir)) {
-        Usage();
-    } else {
-        $srcdir = $arg;
-    }
-}
-
-defined($srcdir) || do { $srcdir = '.'; };
-
-
-
 # The `definitely_required' files must exist, or else we exit with a
 # non-zero status.  The `required_files' must exist, or we give a
 # warning and, if $force is not true, exit non-zero.  The
@@ -103,6 +58,75 @@ defined($srcdir) || do { $srcdir = '.'; };
                             mkinstalldirs
                             starconf.status.local
                           };
+while ($#ARGV >= 0) {
+    my $arg = shift(@ARGV);
+    $arg eq '--force' && do {
+        $force = 1;
+        next;
+    };
+
+    $arg eq '--help' && do {
+        print <<EOD;
+Usage: $progname [option] [srcdir]
+
+  Check that the [srcdir] conforms to the conventions of a Starlink
+  source directory.  [srcdir] defaults to '.'.  The exit status of the program
+  is the number of errors and warnings found.
+
+  Options:
+    --force    If present, the exit status represents only the number of
+               outright errors.
+    --help     Prints this message and exits
+    --version  Prints version number and exits
+
+  The following files must exist and be checked in:
+EOD
+        $line = '   ';
+        foreach my $item ((@definitely_required, @required_files, @extra_checkins)) {
+            if (length($line . $item) > 75) {
+                print $line, "\n";
+                $line = "    $item";
+            } else {
+                $line .= ' '. $item;
+            }
+        }
+        print $line, "\n";
+
+        print "  The following files may exist or not, but must not be checked in:\n";
+        $line = '   ';
+        foreach my $item (@non_checkins) {
+            if (length($line . $item) > 75) {
+                print $line, "\n";
+                $line = "    $item";
+            } else {
+                $line .= ' '. $item;
+            }
+        }
+        print $line, "\n";
+        exit(0);
+    };
+
+    $arg eq '--version' && do {
+        print "$progname $version\n";
+        exit(0);
+    };
+
+    $arg =~ /^-/ && do {
+        Usage();
+        next;
+    };
+
+    if (defined($srcdir)) {
+        Usage();
+    } else {
+        $srcdir = $arg;
+    }
+}
+
+defined($srcdir) || do { $srcdir = '.'; };
+
+
+
 $nwarnings = 0;
 $nerrors = 0;
 
