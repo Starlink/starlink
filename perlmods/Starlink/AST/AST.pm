@@ -407,8 +407,7 @@ sub new {
   my $class = shift;
   my @args = @_;
  
-  my ($xlo, $xhi, $ylo, $yhi);
-  my $gbox = @args[1];
+  my $gbox = $args[1];
   my $xlo = $$gbox[0];
   my $xhi = $$gbox[1];
   my $ylo = $$gbox[2];
@@ -417,8 +416,6 @@ sub new {
   # Call the underlying routine
   my $self = $class->_new( @args );
 
-  # Kluge - retain reference to the callback [inc ref count]
-  # Currently not used directly by the callback routine
   $self->{_xlo} = $xlo if defined $xlo;
   $self->{_xhi} = $xhi if defined $xhi;
   $self->{_ylo} = $ylo if defined $ylo;
