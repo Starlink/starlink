@@ -15,7 +15,9 @@ $Id$
 
 <misccode>
 <description>
-Support figures and figurecontent
+Support figures and figurecontent.
+Note that changes here might need corresponding changes to manifest-mode
+within sl.dsl.
 <codebody>
 (element figure
   (let* ((caption-details (get-caption-details (current-node)))
@@ -24,7 +26,7 @@ Support figures and figurecontent
 	 (content (get-best-figurecontent
 		   (node-list (select-elements kids (normalize "figurecontent"))
 			      (select-elements kids (normalize "px")))
-		   '("GIF89A" "JPEG" "LATEXGRAPHICS"))))
+		   '("GIF89A" "JPEG"))))
     (make element gi: "table"
 	  attributes: '(("align" "center") ("border" "1"))
       (make element gi: "tr"
@@ -32,7 +34,6 @@ Support figures and figurecontent
 		  (if content
 		      (process-node-list content)
 		      (literal "No processable content"))
-		  ;(process-matching-children 'figurecontent)
 		  ))
       (make element gi: "tr"
 	    attributes: '(("align" "left"))
