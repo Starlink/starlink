@@ -66,7 +66,7 @@
       REAL                  LCON	  ! Lower confidence limit
       REAL                  UCON	  ! Upper confidence limit
 
-      INTEGER               J		  ! Parameter index
+      INTEGER               J,K		  ! Parameter index
       INTEGER               NC		  ! Model component number
 
       LOGICAL               FIRST         ! First pegged parameter met?
