@@ -69,13 +69,20 @@ DEPDIR = @DEPDIR@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LN_S = @LN_S@
 PACKAGE = @PACKAGE@
+PERL = @PERL@
 STRIP = @STRIP@
 VERSION = @VERSION@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
-bin_SCRIPTS = starconf
-data_DATA = componentinfo.dtd
+bin_SCRIPTS = starconf starconf-validate
+data_DATA = \
+	componentinfo.dtd \
+	template-bootstrap \
+	template-Makefile.am \
+	template-configure.ac \
+	template-component.xml.in
+
 
 # The above files aren't automatically included in clean targets.
 # Files starconf and starconf.m4 should be, however, since they're both
@@ -101,14 +108,15 @@ edit = sed \
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES = starconf.m4
+CONFIG_CLEAN_FILES = starconf.m4 Makefile.starconf starconf-validate
 SCRIPTS = $(bin_SCRIPTS)
 
 DIST_SOURCES =
 DATA = $(data_DATA)
 
-DIST_COMMON = Makefile.am Makefile.in aclocal.m4 configure configure.ac \
-	install-sh missing mkinstalldirs starconf.m4.in
+DIST_COMMON = Makefile.am Makefile.in Makefile.starconf.in aclocal.m4 \
+	configure configure.ac install-sh missing mkinstalldirs \
+	starconf-validate.in starconf.m4.in
 all: all-am
 
 .SUFFIXES:
@@ -129,6 +137,10 @@ $(srcdir)/configure:  $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENC
 $(ACLOCAL_M4):  configure.ac 
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 starconf.m4: $(top_builddir)/config.status starconf.m4.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+Makefile.starconf: $(top_builddir)/config.status Makefile.starconf.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
+starconf-validate: $(top_builddir)/config.status starconf-validate.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 install-binSCRIPTS: $(bin_SCRIPTS)
@@ -342,12 +354,27 @@ uninstall-am: uninstall-binSCRIPTS uninstall-dataDATA uninstall-info-am
 	uninstall-info-am
 
 
+# Include (possibly) required files in the starconf script.
+#     acinclude.m4              to add Starlink autoconf macros;
+#     install-with-manifest.in  since the STAR_DEFAULTS macro depends on it;
+#     Makefile.starconf         included in Makefile.am
+#
+# make-starconf allows filenames to be preceded by a question mark '?':
+# files which are _not_ thus prefixed are always unpacked; others are
+# unpacked only if starconf detects certain features in the configure.ac
+# (the latter is an empty set currently).
+#
+# Filenames preceded with `!' are always unpacked, overwriting any more
+# recent file in the directory; those without are only
+# unpacked if there is no file present (again, this is now an empty set).
 starconf: make-starconf \
-		install-with-manifest.in starconf.m4 component.xml.template
-	./make-starconf \
 		install-with-manifest.in \
-		acinclude.m4:starconf.m4 \
-		component.xml:component.xml.template
+		starconf.m4 \
+		Makefile.starconf
+	./make-starconf \
+		!install-with-manifest.in \
+		!acinclude.m4:starconf.m4 \
+		!Makefile.starconf
 make-starconf: make-starconf.in
 	rm -f make-starconf.tmp make-starconf
 	$(edit) $(srcdir)/make-starconf.in >make-starconf.tmp
