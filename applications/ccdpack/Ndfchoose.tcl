@@ -637,14 +637,15 @@
                                      [ lindex [ lindex $bbox 0 ] 0 ] ]
                      set ydim [ expr [ lindex [ lindex $bbox 1 ] 1 ] - \
                                      [ lindex [ lindex $bbox 1 ] 0 ] ]
-                     if { [ expr $xmax / $ymax ] > [ expr $width / $height ] } {
-                        set fraction [ expr $xdim / $xmax ]
+                     if { [ expr 1.0 * $xmax / $ymax ] > \
+                          [ expr 1.0 * $width / $height ] } {
+                        set fraction [ expr 1.0 * $xdim / $xmax ]
                         set gwidth [ expr $width * $fraction ]
-                        set gheight [ expr $gwidth * $ydim / $xdim ]
+                        set gheight [ expr $gwidth * 1.0 * $ydim / $xdim ]
                      } else {
-                        set fraction [ expr $ydim / $ymax ]
+                        set fraction [ expr 1.0 * $ydim / $ymax ]
                         set gheight [ expr $height * $fraction ]
-                        set gwidth [ expr $gheight * $xdim / $ydim ]
+                        set gwidth [ expr $gheight * 1.0 * $xdim / $ydim ]
                      }
                   }
 
