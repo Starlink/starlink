@@ -688,7 +688,7 @@ itcl::class gaia::Gaia {
    #  Make an AST define WCS toolbox.
    public method make_astdefine_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstDefine $w_.\#auto \
+         GaiaAstDefine $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \
@@ -701,7 +701,7 @@ itcl::class gaia::Gaia {
    #  Make an AST copy WCS toolbox.
    public method make_astcopy_toolbox {name {cloned 0}} {
       itk_component add $name {
-         StarAstCopy $w_.\#auto \
+         GaiaAstCopy $w_.\#auto \
             -rtdimage [$image_ get_image] \
             -transient $itk_option(-transient_tools) \
             -number $clone_ \

@@ -1,6 +1,6 @@
 #+
 #  Name:
-#     StarAstDefine
+#     GaiaAstDefine
 
 #  Type of Module:
 #     [incr Tk] class
@@ -26,9 +26,9 @@
 
 #  Invocations:
 #
-#        StarAstDefine object_name [configuration options]
+#        GaiaAstDefine object_name [configuration options]
 #
-#     This creates an instance of a StarAstDefine object. The return is
+#     This creates an instance of a GaiaAstDefine object. The return is
 #     the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -53,20 +53,22 @@
 #     Copyright (C) 1997 Central Laboratory of the Research Councils
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     08-DEC-1997 (PDRAPER):
+#     08-DEC-1997 (PWD):
 #        Original version.
+#     23-MAY-2000 (PWD):
+#        Renamed GaiaAstDefine.
 #     {enter_further_changes_here}
 
 #-
 
 #.
 
-itk::usual StarAstDefine {}
-itcl::class gaia::StarAstDefine {
+itk::usual GaiaAstDefine {}
+itcl::class gaia::GaiaAstDefine {
 
    #  Inheritances:
    #  -------------
@@ -130,7 +132,7 @@ itcl::class gaia::StarAstDefine {
       #  Add window help.
       global env gaia_dir
       add_help_button $gaia_dir/GaiaAst.hlp "Astrometry Overview..."
-      add_help_button $gaia_dir/StarAstDefine.hlp "On Window..."
+      add_help_button $gaia_dir/GaiaAstDefine.hlp "On Window..."
       add_short_help $itk_component(menubar).help \
          {Help menu: get some help about this window}
 
