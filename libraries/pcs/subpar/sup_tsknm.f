@@ -36,6 +36,7 @@
 *  [optional_subroutine_items]...
 *  Authors:
 *     AJC: A J Chipperfield (STARLINK)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -49,6 +50,11 @@
 *        Improve interface file not found report
 *     12-MAR-1995 (AJC):
 *        Trap error from SUBPAR_ADMUS now it tries to create directory
+*     27-JUL-2004 (TIMJ):
+*        Recognize if we are running from libtool build directory.
+*        Important for testing purposes so that A-task tests can run
+*        from a libtool/autoconf build. Should be harmless unless an
+*        A-task really does start with lt- !
 *     {enter_changes_here}
 
 *  Bugs:
@@ -130,6 +136,18 @@
 
 *     Save the task name
          TSKNAM = EXENAM(STNM:ENDNM)
+
+*     If we are running from a libtool build directory, this
+*     file name may well be adorned with a leading 'lt-' string.
+*     Assume that any task name beginning with 'lt-' falls in this
+*     category and clean up the task name so that we can find
+*     IFL files.
+*     Note that the discovery that we are running as a libtool
+*     executable should probably lead us to automatically searching
+*     ../ for the ifc file...
+         IF (TSKNAM(1:3) .EQ. 'lt-') THEN
+            TSKNAM = TSKNAM(4:CHR_LEN(TSKNAM))
+         ENDIF
 
 *     Construct the parameter file name
 *     First find the directory to be used
