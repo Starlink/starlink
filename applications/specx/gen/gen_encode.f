@@ -53,6 +53,7 @@
 
 *  Do it
 
+      ISTAT = 0
       IERR = 0
 
 *     Initialize the output line

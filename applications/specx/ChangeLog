@@ -1,5 +1,14 @@
 2002-11-19  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* gen/gen_encode.f: Fix warning when doing string printing:
+
+	>>declare string c4
+	>>string = 'abcd'
+	>>print string
+	-- gen_encode --
+	 --- FORTRAN i/o run-time error # **** ---
+	abcd
+
 	* Merged Alan Chipperfield's linux patches into CVS version
 
 2000-08-28  Remo Tilanus  <rpt@menehune.jach.hawaii.edu>
