@@ -11,6 +11,8 @@ class TestGSD {
 	    GSDObject gsd = new GSDObject( "/stardev/bin/specx/obs_das_0011.dat" );
 
 	    gsd.print();
+            System.out.println( gsd );
+            System.out.println( gsd.itemByName("C1PID") );
 
 	} catch ( edu.hawaii.jach.gsd.GSDException e ) {
 	    System.out.println(e);
