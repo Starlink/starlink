@@ -278,16 +278,15 @@
         MAXOFF = 1.0*MATH__DTOR
       END IF
 
+*    Use centre of f.o.v
+      X0 = 0.0
+      Y0 = 0.0
+
 *    Perform energy profiling
       DO IPOS = 1, NIPOS
 
 *      Choose image position
-        IF ( IPOS .EQ. 1 ) THEN
-          X0 = BDS_SCEN(1)
-          Y0 = BDS_SCEN(2)
-        ELSE
-          X0 = X0 + MAXOFF*FLOAT(IPOS-1)*0.5
-        END IF
+        X0 = MAXOFF*FLOAT(IPOS-1)*0.5
         PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
 
 *      Get profile
