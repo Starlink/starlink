@@ -1213,7 +1213,8 @@
             IF (LUX.GT.0) WRITE (LUX, 1008)
  1007       FORMAT (/
      :       1X,'Observation data were incomplete and will be ignored'/)
- 1008       FORMAT ('ERROR 014 Observation data were incomplete')
+ 1008       FORMAT
+     :       ('WARNING 014 Observation data were incomplete: ignored')
          END IF
       ELSE
 
@@ -1872,7 +1873,8 @@
                WRITE (LUS,1050) J
                IF (LUX.GT.0) WRITE (LUX, 1051) J
  1050          FORMAT (/1X,'sla_SVD warning',I3)
- 1051          FORMAT ('WARNING 003 sla_SVD warning',I3)
+ 1051          FORMAT
+     :            ('WARNING 003 sla_SVD warning (probably harmless)',I3)
             END IF
 
 *        Edit singular values of W matrix
@@ -2292,8 +2294,9 @@
 
 *               Write a comment, summarising the transformation matrix.
 *               Reuse the results of the sla_DCMPF call above.
-                  WRITE (FTWS,'("Mean scale",F6.2,"arcsec, nonperp",
-     :                 F6.2,", angle",F6.2,", inv? ",L1)') 
+                  WRITE (FTWS,'("ASTROM scale=",F6.2,
+     :                 "as/px, nonperp=",
+     :                 F6.2,", angle=",F6.2,", inv=",L1)') 
      :                 SCALE, PERP/D2R, ORIENT/D2R,
      :                 (XSCALE*YSCALE.LT.0D0)
                   CALL FTPCOM (FTUNIT, FTWS, FTSTAT)
