@@ -21,7 +21,7 @@ use Symbol;
 use IPC::Open2;
 
 my $DefaultCatalogue = 'usno@eso';
-my $MoggyCommand = '$AUTOASTROM_DIR/moggy';
+my $MoggyCommand = '$AUTOASTROM_DIR/moggy/moggy';
 #my $MoggyCommand = '$AUTOASTROM_DIR/test/dummy-slave.pl';
 my $MoggyRCSId = '$Id$ ';
 # %%VERSION%%
@@ -336,7 +336,7 @@ sub astinformation {
     my @astarray = (@_ ? @_ : undef);
 
     if (defined($domain)) {
-	if (defined(@astarray)) {
+	if (@astarray) {
 	    $self->send_command_to_slave_ ("AST FRAMESET", $domain);
 
 	    $self->status_continue() || return undef;
@@ -422,9 +422,12 @@ sub query {
     $nrows =~ s/\s*//g;
     $self->{NROWS} = $nrows;
     my $rowlist = [];
-    my @row;
     while ($nrows > 0) {
-	@row = split(' ',<$RDR>);
+	# NB difference between `my @row' here, and `my @row' outside
+	# the loop.  The former creates a _new_ array each time round,
+	# the latter reuses the same array, losing the results of
+	# previous times round.
+	my @row = split(' ',<$RDR>);
 	push (@$rowlist, \@row);
 	$nrows--;
     }
@@ -472,6 +475,47 @@ sub result {
 sub resultcolumns {
     my $self = shift;
     return $self->{RESULTCOLUMNS};
+}
+
+#+
+# <routinename>resulthascolumn
+# <description>Does the result have a column with the specified name?
+# <argumentlist>
+#   <parameter>
+#     <name>colname
+#     <type>string
+#     <description>Name of a column, matched case-insensitively.
+#       If the first character of the column
+#       name is a slash, then it and any trailing slash, is removed, and 
+#       the string is interpreted as a regular expression.
+# <returnvalue type=integer>
+#   If the column is present, returns the (zero-offset) column number
+#   corresponding to that column.  If the column is not present, or
+#   if no successful query has been made, returns negative.
+#-
+sub resulthascolumn {
+    my $self = shift;
+    my $colname = shift;
+
+    defined($colname) || return -1;
+    $colname = lc($colname);
+    if ($colname =~ m{^/}) {
+	$colname =~ s+^/++;
+	$colname =~ s+/$++;
+    } else {
+	$colname = '^'.$colname.'$';
+    }
+
+    my $cols = $self->{RESULTCOLUMNS};
+    defined ($cols) || return -1;
+
+    my $i;
+    for ($i=0; $i <= $#{$cols}; $i++) {
+	if (lc(${$cols}[$i]) =~ $colname) {
+	    return $i;
+	}
+    }
+    return -1;
 }
 
 #+
