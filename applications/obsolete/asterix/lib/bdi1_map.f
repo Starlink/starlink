@@ -111,10 +111,11 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	CLOC			! New component
 
-      CHARACTER*20		ITEM
-      CHARACTER*6		MODE
-      CHARACTER*7		TYPE
+      CHARACTER*20		ITEM			! Item to map
+      CHARACTER*6		MODE			! Mapping mode
+      CHARACTER*7		TYPE			! Mapping type
 
+      INTEGER			ITID			! Invented data item
       INTEGER			NELM			! # mapped items
       INTEGER			PSID			! Private item storage
       INTEGER			PTR			! Mapped data address

@@ -1,5 +1,5 @@
-      SUBROUTINE BDI1_STOMAP( PSID, ISINV, LOC, FPTR, PTR, TYPE,
-     :                        NELM, MODE, STATUS )
+      SUBROUTINE BDI1_STOMAP( PSID, MSYS, LOC, FPTR, PTR,
+     :                        NELM, WBPTR, TYPE, MODE, STATUS )
 *+
 *  Name:
 *     BDI1_STOMAP
@@ -11,7 +11,8 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL BDI1_STOMAP( PSID, ISINV, LOC, FPTR, PTR, TYPE, NELM, MODE, STATUS )
+*     CALL BDI1_STOMAP( PSID, MSYS, LOC, FPTR, PTR, NELM, WBPTR,
+*                       TYPE, MODE, STATUS )
 
 *  Description:
 *     {routine_description}
@@ -19,18 +20,20 @@
 *  Arguments:
 *     PSID = INTEGER (given)
 *        Item's private storage
-*     ISINV = LOGICAL (given)
-*        Does mapped memory belong to an invented object
+*     MSYS = CHARACTER*(*) (given)
+*        Mapping system, 'loc', 'dyn' or 'inv'
 *     LOC = CHARACTER*(DAT__SZLOC) (given)
 *        Locator to object
 *     FPTR = INTEGER (given)
 *        Address of mapped file object, or identifier of invented object
 *     PTR = INTEGER (given)
 *        Address of item mapped memory
-*     TYPE = CHARACTER*(*) (given)
-*        Data access type
 *     NELM = INTEGER (given)
 *        Number of elements mapped
+*     WBPTR = INTEGER (given)
+*        WriteBack procedure address
+*     TYPE = CHARACTER*(*) (given)
+*        Data access type
 *     MODE = CHARACTER*(*) (given)
 *        Memory access mode
 *     STATUS = INTEGER (given and returned)
@@ -99,10 +102,9 @@
       INCLUDE 'DAT_PAR'
 
 *  Arguments Given:
-      INTEGER			PSID, FPTR, PTR, NELM
-      LOGICAL			ISINV
+      INTEGER			PSID, FPTR, PTR, NELM, WBPTR
       CHARACTER*(DAT__SZLOC)	LOC
-      CHARACTER*(*)		TYPE, MODE
+      CHARACTER*(*)		TYPE, MODE, MSYS
 
 *  Status:
       INTEGER 			STATUS             	! Global status
@@ -119,7 +121,10 @@
       CALL ADI_CNEWV0C( PSID, 'Locator', LOC, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Ptr', PTR, STATUS )
       CALL ADI_CNEWV0I( PSID, 'Nelm', NELM, STATUS )
-      CALL ADI_CNEWV0L( PSID, 'Invented', ISINV, STATUS )
+      IF ( WBPTR .NE. 0 ) THEN
+        CALL ADI_CNEWV0I( PSID, 'WriteBack', WBPTR, STATUS )
+      END IF
+      CALL ADI_CNEWV0L( PSID, 'MapSystem', MSYS, STATUS )
       IF ( ISINV ) THEN
         CALL ADI_CNEWREF( PSID, 'InvObj', FPTR, STATUS )
       ELSE
