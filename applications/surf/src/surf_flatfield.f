@@ -63,6 +63,10 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.9  1997/04/30 02:31:08  timj
+*     Rationalise calling.
+*     Add MSG_OUTIF, PKG and TSKNAME.
+*
 *     Revision 1.8  1997/03/06 20:03:05  timj
 *     tweak header
 *
@@ -89,6 +93,7 @@ c
       INCLUDE 'SAE_PAR'                ! SSE global definitions
       INCLUDE 'DAT_PAR'                ! Data-system constants
       INCLUDE 'REDS_SYS'               ! REDS constants
+      INCLUDE 'MSG_PAR'                ! MSG__ constants
 
 *    Status :
       INTEGER STATUS
@@ -96,6 +101,8 @@ c
 *    Local Constants :
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
+      CHARACTER * 9    TSKNAME         ! Name of this task
+      PARAMETER (TSKNAME = 'FLATFIELD')
 
 *    Local variables :
       BYTE             BADBIT          ! Bad bit mask
@@ -121,7 +128,6 @@ c
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
                                        ! file
-      CHARACTER*(DAT__SZLOC) IN_LOC    ! locator of item in input file
       INTEGER          IN_NDF          ! NDF index of input file
       CHARACTER*(DAT__SZLOC) IN_SCUBAX_LOC
                                        ! locator to SCUBA extension in input
@@ -152,6 +158,10 @@ c
 
       IF (STATUS .NE. SAI__OK) RETURN
 
+*     Set the MSG output level (for use with MSG_OUTIF)
+      CALL MSG_IFGET('MSG_FILTER', STATUS)
+
+
 *  start up the NDF system and read in the input demodulated file
 
       CALL NDF_BEGIN
@@ -172,7 +182,8 @@ c
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_FLATFIELD: input file contains '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file contains '//
      :        'too many FITS items', STATUS)
          END IF
       END IF
@@ -191,8 +202,10 @@ c
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETC ('MODE', OBSERVING_MODE)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a ^MODE observation '//
-     :  'of ^OBJECT', STATUS)
+      CALL MSG_SETC ('PKG', PACKAGE)
+      CALL MSG_OUTIF (MSG__NORM,' ', 
+     :     '^PKG: run ^RUN was a ^MODE observation of ^OBJECT',
+     :     STATUS)
 
 *  check that the history of the file is OK
 
@@ -222,14 +235,16 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_FLATFIELD: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'REDUCE_SWITCH application has not been run on '//
      :           'the input file', STATUS)
             END IF
 
             IF (FLATFIELD) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_FLATFIELD: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'FLATFIELD application has already been run on '//
      :           'the input file', STATUS)
             END IF
@@ -258,7 +273,8 @@ c
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
                CALL MSG_SETI ('DIM3', DIM(3))
-               CALL ERR_REP (' ', 'REDS_FLATFIELD: main data '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data '//
      :           'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2 '//
      :           '^DIM3', STATUS)
             END IF
@@ -270,7 +286,8 @@ c
                CALL MSG_SETI ('NDIM', NDIM)
                CALL MSG_SETI ('DIM1', DIM(1))
                CALL MSG_SETI ('DIM2', DIM(2))
-               CALL ERR_REP (' ', 'REDS_FLATFIELD: main data '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: main data '//
      :           'array has bad dimensions (^NDIM) ^DIM1, ^DIM2', 
      :           STATUS)
             END IF
@@ -286,12 +303,12 @@ c
 
 *  get the bolometer description arrays
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_CALB', IN_LOC, STATUS)
       NDIM = 2
       DIMX (1) = SCUBA__NUM_CHAN
       DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNR (IN_LOC, NDIM, DIMX, BOL_CALB, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+
+      CALL CMP_GETNR (IN_SCUBAX_LOC, 'BOL_CALB', NDIM, DIMX, BOL_CALB, 
+     :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2)                 .OR.
@@ -301,18 +318,15 @@ c
             CALL MSG_SETI ('NDIM', NDIM)
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_FLATFIELD: .SCUBA.BOL_CALB '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: .SCUBA.BOL_CALB '//
      :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2',
      :        STATUS)
          END IF
       END IF
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_QUAL', IN_LOC, STATUS)
-      NDIM = 2
-      DIMX (1) = SCUBA__NUM_CHAN
-      DIMX (2) = SCUBA__NUM_ADC
-      CALL DAT_GETNI (IN_LOC, NDIM, DIMX, BOL_QUAL, DIM, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+      CALL CMP_GETNI (IN_SCUBAX_LOC, 'BOL_QUAL', NDIM, DIMX, BOL_QUAL, 
+     :     DIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF ((NDIM .NE. 2)                 .OR.
@@ -322,35 +336,35 @@ c
             CALL MSG_SETI ('NDIM', NDIM)
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
-            CALL ERR_REP (' ', 'REDS_FLATFIELD: .SCUBA.BOL_QUAL '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: .SCUBA.BOL_QUAL '//
      :        'array has bad dimensions - (^NDIM) ^DIM1 ^DIM2',
      :        STATUS)
          END IF
       END IF
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_CHAN', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_CHAN, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOL) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_FLATFIELD: dimension of '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension of '//
      :        '.SCUBA.BOL_CHAN does not match main data array',
      :        STATUS)
          END IF
       END IF
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_ADC', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_ADC, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOL) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_FLATFIELD: dimension of '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension of '//
      :        '.SCUBA.BOL_ADC does not match main data array',
      :        STATUS)
          END IF
@@ -376,8 +390,10 @@ c
 
 *  flatfield the data 
 
+      CALL MSG_SETC ('PKG', PACKAGE)
       CALL MSG_SETC ('FLAT', FLAT)
-      CALL MSG_OUT (' ', 'REDS: applying flatfield from ^FLAT', STATUS)
+      CALL MSG_OUTIF (MSG__NORM, ' ', 
+     :     '^PKG: applying flatfield from ^FLAT', STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          CALL SCULIB_FLATFIELD_DATA (N_BOL, N_POS, N_BEAM,
