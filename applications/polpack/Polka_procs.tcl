@@ -14,7 +14,7 @@
 #     22-JUN-1998 (DSB):
 #        Modified Save to avoid long integer image identifiers (i.e. IMGID
 #        values) producing "integer value too large to represent" message.
-#        Added procedures DumpImage and RestoreImage.
+#        Added RestoreMask and DumpMask procedures.
 #---------------------------------------------------------------------------
 
 proc Accept {} {
@@ -2768,8 +2768,8 @@ proc DrawGwm {} {
 
       } {
          if { [Obey kappa stats "ndf=$data"] } {
-            regsub -nocase -all D [GetParam kappa stats:maximum] E maxm
-            regsub -nocase -all D [GetParam kappa stats:minimum] E minm
+            set maxm [GetParamED kappa stats:maximum] 
+            set minm [GetParamED kappa stats:minimum]
 
             if { abs( $maxm/2.0 - $minm/2.0 ) < 
                  2.0E-4 * ( abs($maxm)/2.0 + abs($minm)/2.0 ) } {
@@ -2792,8 +2792,8 @@ proc DrawGwm {} {
 # Get the used scaling limits (replace D exponents with E). If the data
 # range was too small to display, use the values established earlier.
          if { $pars != "mode=flash" } {
-            regsub -nocase -all D [GetParam kapview display:scalow] E scalow
-            regsub -nocase -all D [GetParam kapview display:scahigh] E scahigh
+            set scalow [GetParamED kapview display:scalow]
+            set scahigh [GetParamED kapview display:scahigh]
          }
          set SCALOW [format "%.5g" $scalow]
          set SCAHIGH [format "%.5g" $scahigh]
@@ -2802,7 +2802,7 @@ proc DrawGwm {} {
 # normalised device coordinates and NDF pixels. These NDC values extend
 # from 0 to 1 on both axes (and in general are therefore not square).
          Obey polpack datapic "device=$DEVICE" 1
-         regsub -nocase -all D [GetParam polpack datapic:result] E result
+         set result [GetParamED polpack datapic:result]
          scan $result "' %f %f %f %f %f %f %f %f '" ncx1 ncx2 ncy1 ncy2 \
                                                     wcx1 wcx2 wcy1 wcy2
       
@@ -3373,15 +3373,15 @@ proc Dump {file} {
    return $ret
 }
 
-proc DumpImage {file} {
+proc DumpMask {file} {
 #+
 #  Name:
-#     DumpImage
+#     DumpMask
 #
 #  Purpose:
-#     Dump the current positions lists, masks, and mappings related to
-#     the currently displayed image to a text file which can be restored 
-#     later (using procedure RestoreImage).
+#     Dump the current O-ray mask, together with the O-E mapping from the 
+#     first (reference) image, to a text file which can be restored 
+#     later (using procedure RestoreMask).
 #
 #  Arguments:
 #     file 
@@ -3394,90 +3394,81 @@ proc DumpImage {file} {
 #     1 if a succesful dump was performed, zero otherwise.
 #
 #-
-   global E_RAY_FEATURES 
-   global E_RAY_MASK
-   global IMAGE_DISP
-   global O_RAY_FEATURES 
+   global DBEAM
+   global IMAGES
    global O_RAY_MASK 
-   global O_RAY_SKY
-   global E_RAY_SKY
-   global IMMAP
    global OEMAP
    global PNTPX
    global PNTPY
    global PNTNXT
    global PNTLBL
    global PNTTAG
-   global PROT_OEMAP
-   global PROT_IMMAP
 
 # Assume no dump is made.
    set ret 0
 
-# Open the supplied file, or open a file specified by the user.
+# Indicate that no dump has yet been specified.
+   set ok 0
+
+# Store the name of the first (reference) image.
+   set im0 [lindex $IMAGES 0]
+
+# If this procedure was entered in order to create a backup dump for
+# RestoreMask ( i.e. if a file was specified in the argument list)...
    if { $file != "" } {
-      if { [catch { set fd [open $file "w"]} ] } {
-         set ok 0
-      } {
+
+# Open the supplied file without checking that there is anything to dump.
+      if { ![catch { set fd [open $file "w"]} ] } {
          set ok 1
       }
 
+# Otherwise, check that there is something to dump.
    } {
-      set ok [OpenFile "w" "Dump output file" \
-                           "Give name of dump file to create:" file fd] 
+
+# Check that an O-ray mask is available for the reference image.
+      if { ![CreateMask $im0 $O_RAY_MASK] } {
+         Message "The mask defining the O-ray areas in $im0 has not yet been supplied."
+
+# If we are in dual-beam mode, check that the O-E mapping is available for the 
+# reference image
+      } elseif { [OEMapping $im0] == "" && $DBEAM } {
+         Message "The mapping between the E and O rays cannot yet be found."
+
+# If these checks were passed, open a file specified by the user.
+      } {
+         set ok [OpenFile "w" "Dump output file" \
+                              "Give name of dump file to create:" file fd] 
+      }
    }
 
 # Only proceed if a file was opened.
    if { $ok } {
 
 # Tell the user what is happening.
-      set told [SetInfo "Dumping current positions lists, etc, to disk..." 0]
+      set told [SetInfo "Dumping current mask to disk..." 0]
 
-# Dump the name of the currently displayed image.
-      set image $IMAGE_DISP
-      puts $fd "Image $image"
+# Store a string in the text file indicating that it only contains a mask.
+      puts $fd "Mask only"
 
-# Write the OE Mapping to the output file.
-      if { [info exists OEMAP($image)] && [llength $OEMAP($image)] == 6 } {
-         puts $fd $OEMAP($image)
-      } {
-         puts $fd ""
-      }
-
-# Write the image Mapping to the output file.
-      if { [info exists IMMAP($image)] && [llength $IMMAP($image)] == 6 } {
-         puts $fd $IMMAP($image)
-      } {
-         puts $fd ""
-      }
-
-# Dump the mapping protection flags.
-      if { [info exists PROT_OEMAP($image)] } {
-         puts $fd $PROT_OEMAP($image)
-      } {
-         puts $fd ""
-      }
-         
-      if { [info exists PROT_IMMAP($image)] } {
-         puts $fd $PROT_IMMAP($image)
+# If in Dual-beam mode write the OE Mapping to the output file.
+      if { $DBEAM } {
+         puts $fd [OEMapping $im0] 
       } {
          puts $fd ""
       }
 
 # Loop round each object type...
-      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
-                           $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+      set object $O_RAY_MASK 
 
-# Write out the number of posisions in this list.
-         puts $fd [llength $PNTPX($image,$object)]
+# Write out the number of positions in the O-ray mask list.
+      puts $fd [llength $PNTPX($im0,$O_RAY_MASK)]
 
 # Write out the arrays holding information describing the list.
-         puts $fd $PNTPX($image,$object)
-         puts $fd $PNTPY($image,$object)
-         puts $fd $PNTNXT($image,$object)
-         puts $fd $PNTLBL($image,$object)
-         puts $fd $PNTTAG($image,$object)
-      }
+      puts $fd $PNTPX($im0,$O_RAY_MASK)
+      puts $fd $PNTPY($im0,$O_RAY_MASK)
+      puts $fd $PNTNXT($im0,$O_RAY_MASK)
+      puts $fd $PNTLBL($im0,$O_RAY_MASK)
+      puts $fd $PNTTAG($im0,$O_RAY_MASK)
 
 # Close the output dump file.
       close $fd
@@ -4269,7 +4260,7 @@ proc Effects {im effect nodisp} {
 # See if there are any bad pixels left in the smoothed image.
             if { $ok } {
                if { [Obey kappa stats "ndf=$a5"] } {
-                  set numbad [GetParam kappa stats:numbad]
+                  set numbad [GetParamED kappa stats:numbad]
                } {
                   set ok 0
                }
@@ -4553,13 +4544,13 @@ proc Effects {im effect nodisp} {
 # Run KAPPA:STATS and display the output if succesful.
             if { [Obey kappa stats "ndf=${image}${section}"] } {
                set mess "\nPixel statistics within section $section:\n"
-               append mess "Total data sum     \t\t:  [format "%.5g" [GetParam kappa stats:total]]\n"
-               append mess "Mean value         \t\t:  [format "%.5g" [GetParam kappa stats:mean]]\n"
-               append mess "Standard deviation \t:  [format "%.5g" [GetParam kappa stats:sigma]]\n"
-               append mess "Maximum value      \t:  [format "%.5g" [GetParam kappa stats:maximum]]\n"
-               append mess "Minimum value      \t:  [format "%.5g" [GetParam kappa stats:minimum]]\n"
-               append mess "No. of good pixels \t\t:  [GetParam kappa stats:numgood]\n"
-               append mess "Total no. of pixels\t\t:  [GetParam kappa stats:numpix]\n"
+               append mess "Total data sum     \t\t:  [format "%.5g" [GetParamED kappa stats:total]]\n"
+               append mess "Mean value         \t\t:  [format "%.5g" [GetParamED kappa stats:mean]]\n"
+               append mess "Standard deviation \t:  [format "%.5g" [GetParamED kappa stats:sigma]]\n"
+               append mess "Maximum value      \t:  [format "%.5g" [GetParamED kappa stats:maximum]]\n"
+               append mess "Minimum value      \t:  [format "%.5g" [GetParamED kappa stats:minimum]]\n"
+               append mess "No. of good pixels \t\t:  [GetParamED kappa stats:numgood]\n"
+               append mess "Total no. of pixels\t\t:  [GetParamED kappa stats:numpix]\n"
                Message $mess
             }
 
@@ -4693,7 +4684,7 @@ proc Effects {im effect nodisp} {
          if { [Obey kappa stats "ndf=$image"] } {
 
 # Convert D exponents (as used by HDS) to E (as used by Tcl).
-            regsub -nocase -all D [GetParam kappa stats:minimum] E dmin
+            set dmin [GetParamED kappa stats:minimum]
 
 # Decide on the output image name.
             set file [UniqueFile]
@@ -8663,6 +8654,29 @@ proc MotionBind {x y} {
       }
    }
 }
+
+proc GetParamED {task param} {
+#+
+#  Name:
+#     GetParamED
+#
+#  Purpose:
+#     Returns the value of an ATASK parameter substituing "E" exponents for 
+#     "D" exponents.
+#
+#  Arguments:
+#     task
+#        The name of the task
+#     param
+#        The name of the parameter, in the form "<application>:<parameter>"
+#
+#  Returned Value:
+#     The parameter value.
+#
+#-
+   regsub -nocase -all D [GetParam $task $param] E res
+   return $res
+}
     
 proc NDFToCan { px py } {
 #+
@@ -9378,8 +9392,8 @@ proc PixIndSection {imsec} {
    Obey ndfpack ndftrace "ndf=\"$imsec\" quiet" 1
 
 # Get the lower and upper bounds.
-   regsub -nocase -all D [GetParam ndfpack ndftrace:lbound] E lbound
-   regsub -nocase -all D [GetParam ndfpack ndftrace:ubound] E ubound
+   set lbound [GetParamED ndfpack ndftrace:lbound] 
+   set ubound [GetParamED ndfpack ndftrace:ubound] 
 
 # Extract the individual bounds.
    set ok 0
@@ -10226,15 +10240,14 @@ proc Restore {file} {
 
 }
 
-proc RestoreImage {file} {
+proc RestoreMask {file} {
 #+
 #  Name:
-#     RestoreImage
+#     RestoreMask
 #
 #  Purpose:
-#     Restore positions lists, masks, and options from a text file 
-#     previously created using procedure DumpImage. The properties
-#     read from the file are assigned to the currently displayed image.
+#     Restore O and E ray masks and O-E mappings from a dump file created
+#     by DumpMask. Current masks and O-E mappings are first cleared.
 #
 #  Arguments:
 #     file 
@@ -10244,14 +10257,10 @@ proc RestoreImage {file} {
 #  Returned Value:
 #     1 if a succesful dump was performed, zero otherwise.
 #-
-   global E_RAY_FEATURES 
    global E_RAY_MASK
-   global IMAGE_DISP
-   global O_RAY_FEATURES 
+   global DBEAM
+   global IMAGES
    global O_RAY_MASK 
-   global O_RAY_SKY
-   global E_RAY_SKY
-   global IMMAP
    global OEMAP
    global PNTCY
    global PNTCX
@@ -10259,24 +10268,22 @@ proc RestoreImage {file} {
    global PNTNXT
    global PNTVID
    global PNTLBL
-   global PROT_OEMAP
-   global PROT_IMMAP
 
 # Open an existing dump file, either the supplied one, or one specified by
 # the user.
    if { $file != "" } {
       set backup 1
       if { [catch {set fd [open $file "r"]} mess] } {
-         Message "Could not restored original positions lists, etc.\n\n\"$mess\"."
+         Message "Could not restored original mask.\n\n\"$mess\"."
          set ok 0
       } {
          set ok 1
       }
-      set info "Restoring original positions lists, etc."
+      set info "Restoring original mask."
    } {
       set backup 0
-      set ok [OpenFile "r" "Dump file" "Give name of dump file to read:" file fd]
-      set info "Restoring positions lists, etc, from disk."
+      set ok [OpenFile "r" "Dump file" "Give name of mask dump file to read:" file fd]
+      set info "Restoring mask from disk."
    }
 
 # Only proceed if a file was opened.
@@ -10288,33 +10295,51 @@ proc RestoreImage {file} {
 # Set a flag indicating that the supplied file is a valid dump file.
       set bad 0
 
-# If the user supplied the dump file, dump the current positions, masks, etc, 
-# so that they can be restored if anything goes wrong. Abort if the dump fails.
+# If the user supplied the dump file, dump the current mask so that it 
+# can be restored if anything goes wrong. If the dump fails (for instance
+# because the mask has not yet been set up), then continue anyway.
       if { !$backup } {
          set safefile [UniqueFile]
-         if { ![DumpImage $safefile] } {
-            Message "Unable to create backup dump of current positions."
-            set bad 1
+         if { ![DumpMask $safefile] } {
+            set safefile ""
          }
       }
 
-# Save the name of the currently displayed image.
-      foreach image $IMAGE_DISP {
+# Clear the O-E mapping, and the O and E ray masks for all images.
+      foreach image $IMAGES {
+         catch { unset OEMAP($image) }
 
-# Check that this is the start of a new image. If no more images are
-# contained in the given file, break out of the image loop.
+         while { [NumPosn "" $image $O_RAY_MASK] > 0 } {
+            DelPosn 0 0 $image $O_RAY_MASK
+         }
+
+         while { [NumPosn "" $image $E_RAY_MASK] > 0 } {
+            DelPosn 0 0 $image $E_RAY_MASK
+         }
+
+      }
+
+# Save the name of the first (reference) image. Use a foreach loop so that we 
+# can use a break command to jump to the end.
+      foreach image [lindex $IMAGES 0] {
+
+# The first line should be "Mask only". Check that this is the case.
          if { [gets $fd line] == -1 } {
             set bad 1
             break
          } 
-         if { ![regexp {^Image } $line] } { break }
+  
+         if { ![regexp {^Mask only} $line] } { 
+            set bad 1
+            break
+         }
 
 # Restore the the OE Mapping.
          if { [gets $fd line] == -1 } {
             set bad 1
             break
          } 
-
+   
          if { $line != "" } {
             if { [llength $line] == 6 } {
                set OEMAP($image) $line
@@ -10322,106 +10347,55 @@ proc RestoreImage {file} {
                set bad 1
                break
             } 
-         } {
-            catch { unset OEMAP($image) }
          }
 
-# Restore the the Image Mapping.
-         if { [gets $fd line] == -1 } {
+# Get the number of positions in the supplied O-ray mask ($npnt).
+         if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
             set bad 1
-            break
          } 
 
-         if { $line != "" } {
-            if { [llength $line] == 6 } {
-               set IMMAP($image) $line
-            } {
-               set bad 1
-               break
-            } 
-         } {
-            catch { unset IMMAP($image) }
-         }
+# Read the arrays from the text file holding information describing the list.
+         foreach item "PX PY NXT LBL TAG" {
+            set aryname "PNT${item}"
+            upvar #0 $aryname ary 
 
-# Restore the mapping protection flags.
-         if { [gets $fd line] == -1 } {
-            set bad 1
-            break
-         } 
-
-         if { $line != "" } {
-            set PROT_OEMAP($image) $line
-         } {
-            catch { unset PROT_OEMAP($image) }
-         }
-         
-         if { [gets $fd line] == -1 } {
-            set bad 1
-            break
-         } 
-
-         if { $line != "" } {
-            set PROT_IMMAP($image) $line
-         } {
-            catch { unset PROT_IMMAP($image) }
-         }
-
-# Loop round each object type...
-         foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
-                              $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
-
-# Delete the existing positions.
-            while { [NumPosn "" $image $object] > 0 } {
-               DelPosn 0 0 $image $object
-            }
-
-# Get the number of positions in this list ($npnt).
-            if { [gets $fd line] == -1 || [scan $line "%d" npnt] != 1 } {
+            if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
                set bad 1
             } 
-
-# Read the arrays holding information describing the list.
-            foreach item "PX PY NXT LBL TAG" {
-               set aryname "PNT${item}"
-               upvar #0 $aryname ary 
-
-               if { $bad || [gets $fd line] == -1 || [llength $line] != $npnt } {
-                  set bad 1
-               } 
 
 # Store the new array values.
-               if { !$bad } {
-                  set ary($image,$object) $line
-               } {
-                  set ary($image,$object) ""
-               }
-            }
-
-#  The rest is only done if the Object was restored succesfully.
             if { !$bad } {
+               set ary($image,$O_RAY_MASK) $line
+            } {
+               set ary($image,$O_RAY_MASK) ""
+            }
+         }
+
+#  The rest is only done if the O-ray mask was restored succesfully.
+         if { !$bad } {
 
 #  Set up the arrays holding the number of times each label is used.
-               foreach lbl $PNTLBL($image,$object) {
-                  Labels $lbl 1
-               }
+            foreach lbl $PNTLBL($image,$O_RAY_MASK) {
+               Labels $lbl 1
+            }
 
 # Initialise the other required arrays to indicate that nothing is
 # currently drawn.
-               catch { unset PNTID($image,$object) }
-               catch { unset PNTCX($image,$object) }
-               catch { unset PNTCY($image,$object) }
-               catch { unset PNTVID($image,$object) }
-               foreach nxt $PNTNXT($image,$object) {
-                  lappend PNTID($image,$object) -1
-                  lappend PNTCX($image,$object) ""
-                  lappend PNTCY($image,$object) ""
-                  if { $nxt == "" } {
-                     lappend PNTVID($image,$object) ""
-                  } {
-                     lappend PNTVID($image,$object) -1
-                  }
-               }            
-            }
+            catch { unset PNTID($image,$O_RAY_MASK) }
+            catch { unset PNTCX($image,$O_RAY_MASK) }
+            catch { unset PNTCY($image,$O_RAY_MASK) }
+            catch { unset PNTVID($image,$O_RAY_MASK) }
+
+            foreach nxt $PNTNXT($image,$O_RAY_MASK) {
+               lappend PNTID($image,$O_RAY_MASK) -1
+               lappend PNTCX($image,$O_RAY_MASK) ""
+               lappend PNTCY($image,$O_RAY_MASK) ""
+               if { $nxt == "" } {
+                  lappend PNTVID($image,$O_RAY_MASK) ""
+               } {
+                  lappend PNTVID($image,$O_RAY_MASK) -1
+               }
+            }            
          }
       }
 
@@ -10431,15 +10405,15 @@ proc RestoreImage {file} {
 # Cancel the informative text set earlier in this procedure.
       if { $told } { SetInfo "" 0 }
 
-#  If the specified file was bad, try restoring the dump saved at the start
-#  of this procedure. Do not do this if we are already restoring a saved
-#  "backup" dump.
+# If the specified file was bad, try restoring the dump saved at the start
+# of this procedure. Do not do this if we are already restoring a saved
+# "backup" dump.
       if { $bad && !$backup } { 
-         Message "Syntax error encountered restoring positions from \"$file\". Last line read was:\n\n\"$line\""
-         RestoreImage $safefile
+         Message "Syntax error encountered restoring mask from \"$file\". Last line read was:\n\n\"$line\""
+         if { $safefile != "" } { RestoreMask $safefile }
       }
 
-#  Re-display the reference and current objects.
+# Re-display the reference and current objects.
       UpdateDisplay ref
 
    }
