@@ -241,7 +241,7 @@
       CALL SSI_FINDDS( IFID, 1, SFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
-        CALL USI_TASSOCI( 'SEARCHED', '*', 'READ', SFID, STATUS )
+        CALL USI_TASSOCI( 'AUX', '*', 'READ', SFID, STATUS )
       END IF
 
 *  Get detector details
@@ -453,11 +453,8 @@
 *    Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
-      INCLUDE 'PAR_ERR'
-*    Global variables :
-*     <global variables held in named COMMON>
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *     <specification of FORTRAN structures>
 *    Import :
       CHARACTER*(DAT__SZLOC) RLOC    ! Locator to response file
@@ -720,7 +717,7 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE 'XRTLIB(INC_CORR)'
+      INCLUDE 'INC_CORR'
 *     <specification of FORTRAN structures>
 *    Import :
       INTEGER NSRC                ! Number of sources
