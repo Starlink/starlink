@@ -1,0 +1,17 @@
+1 KAPLIBS_library
+                                             Expires: ???
+
+KAPLIBS is a new package containing several Fortran subroutine
+libraries previously distributed as part of the KAPPA package. These
+libraries contain general purpose subroutines which may be of use to
+anyone developing their own KAPPA-like applications. SUN/xx contains
+brief documentation, but users of KAPLIBS will probably find it
+useful to examine the source code of relevant KAPPA commands.
+
+   These libraries are being actively developed to support
+   further improvements in KAPPA. Whilst the argument lists
+   and functionality of existing KAPLIBS routines will almost
+   certainly not change, the possibility cannot be ruled out
+   if it is deemed necessary by Starlink to support work on
+   KAPPA.
+
