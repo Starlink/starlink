@@ -243,9 +243,9 @@
             DO I = 1, NREC
                CALL NDF_HINFO (INDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'RESTORE') THEN
+               ELSE IF (STEMP(:7) .EQ. 'RESTORE') THEN
                   RESTORE = .TRUE.
                END IF
             END DO

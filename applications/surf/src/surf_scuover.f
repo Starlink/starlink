@@ -468,13 +468,13 @@
                CALL NDF_HINFO (EXT_NDF, 'APPLICATION', 
      :              I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
+               ELSE IF (STEMP(:10) .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
-               ELSE IF (STEMP .EQ. 'FLATFIELD') THEN
+               ELSE IF (STEMP(:9) .EQ. 'FLATFIELD') THEN
                   FLATFIELD = .TRUE.
-               ELSE IF (STEMP .EQ. 'REBIN') THEN
+               ELSE IF (STEMP(:5) .EQ. 'REBIN') THEN
                   REBIN = .TRUE.
                END IF
             END DO

@@ -205,13 +205,13 @@
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'FLATFIELD') THEN
+               IF (STEMP(:9) .EQ. 'FLATFIELD') THEN
                   FLATFIELD = .TRUE.
-               ELSE IF (STEMP .EQ. 'PHOTOM') THEN
+               ELSE IF (STEMP(:6) .EQ. 'PHOTOM') THEN
                   PHOTOM = .TRUE.
-               ELSE IF (STEMP .EQ. 'REBIN') THEN
+               ELSE IF (STEMP(:5) .EQ. 'REBIN') THEN
                   REBIN = .TRUE.
-               ELSE IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               ELSE IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
                END IF
             END DO
@@ -382,7 +382,8 @@
       N_POS = DIM (2)
  
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             N_BEAM = DIM (3)
             IF ((NDIM .NE. 3)                  .OR.
      :           (DIM(1) .NE. N_BOLS)           .OR.

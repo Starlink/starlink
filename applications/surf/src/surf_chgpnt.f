@@ -196,11 +196,11 @@
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'PHOTOM') THEN
+               IF (STEMP(:6) .EQ. 'PHOTOM') THEN
                   PHOTOM = .TRUE.
-               ELSE IF (STEMP .EQ. 'REBIN') THEN
+               ELSE IF (STEMP(:5) .EQ. 'REBIN') THEN
                   REBIN = .TRUE.
-               ELSE IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               ELSE IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
                END IF
             END DO

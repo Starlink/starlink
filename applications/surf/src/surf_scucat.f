@@ -103,6 +103,12 @@
 *  History:
 *     $Id$
 *     $Log$
+*     Revision 1.24  1999/05/15 01:48:42  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.23  1998/04/23 04:03:44  timj
 *     Add METHOD parameter to decide on
 *     whether to keep bolometers separate or not. Start writing HISTORY.
@@ -217,6 +223,7 @@ c
       PARAMETER (TSKNAME = 'SCUCAT')
 
 *     Local variables:
+      CHARACTER*80  AXLABEL     ! Axis label
       LOGICAL       ADDED       ! Did we add members to the group
       BYTE          BADBIT      ! Bad bit mask
       CHARACTER*3   BOL(MAXCMP) ! Name of bolometers present in NDF
@@ -238,6 +245,7 @@ c
       INTEGER       IN_QUAL_PTR ! Pointer to Q array
       INTEGER       IPOSN       ! Position in string
       INTEGER       ITEMP       ! Temporary integer
+      CHARACTER*80  LABEL       ! data label
       INTEGER       LBND(MAXBOLS) ! Lower bound of output array
       CHARACTER*(DAT__SZLOC) LOC ! Locator to root HDS file
       LOGICAL       LOOP        ! value of loop parameter
@@ -270,6 +278,7 @@ c
       LOGICAL       THERE       ! A bolometer has already been catted
       CHARACTER*(DAT__SZTYP) TYPE ! Type of structure associated with locator
       INTEGER       UBND(MAXBOLS) ! Upper bound of output array
+      CHARACTER*80  UNITS       ! units
       LOGICAL       USE_OUT     ! Have I opened an output file
 *.
 
@@ -577,19 +586,27 @@ c
 
                         IF (NUM_NDF .EQ. 1) THEN
 
-*     Name of source
+*     Name of source, label and units
                            CALL NDF_CGET(IN_NDF(NUM_NDF), 'Title', 
      :                          TITLE, STATUS)
-                           
+                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Units', 
+     :                          UNITS, STATUS)
+                           CALL NDF_CGET(IN_NDF(NUM_NDF), 'Label', 
+     :                          LABEL, STATUS)
+                           CALL NDF_ACGET(IN_NDF(NUM_NDF), 'Label', 
+     :                          1,AXLABEL, STATUS)
+
 *     Number of integrations
                            CALL MSG_SETI('NINT', EL)
                            CALL MSG_SETC('TITLE', TITLE)
+                           CALL MSG_SETC('UNT', UNITS)
+                           CALL MSG_SETC('LAB', AXLABEL)
                            CALL MSG_SETC('PKG', PACKAGE)
                            
                            CALL MSG_OUTIF(MSG__NORM, ' ',
      :                          '^PKG: This is a PHOTOM '//
      :                          'observation of ^TITLE. There are '//
-     :                          '^NINT integrations', STATUS)
+     :                          '^NINT ^LAB. (units=^UNT)', STATUS)
                         END IF
 
 *     Current index of bolometer in full bolometer list
@@ -657,16 +674,20 @@ c
                            CALL NDF_HCRE(OUT_NDF, STATUS)
 
 *     Setup the axis and title labels
-                           CALL NDF_ACPUT('Integration', OUT_NDF, 
+*     These should be propagated from the first input
+*     image since the data may have been calibrated
+*     Do not want to check that units are consistent...
+                           CALL NDF_ACPUT(AXLABEL, OUT_NDF, 
      :                          'LABEL', 1, STATUS)
-                           CALL NDF_CPUT('Volts', OUT_NDF, 'UNITS', 
+                           CALL NDF_CPUT(UNITS, OUT_NDF, 'UNITS', 
      :                          STATUS)
                            CALL NDF_CPUT(TITLE, OUT_NDF, 'Title', 
      :                          STATUS)
-                           CALL NDF_CPUT('Signal', OUT_NDF, 'LAB', 
+                           CALL NDF_CPUT(LABEL, OUT_NDF, 'LAB', 
      :                          STATUS)
                            
-                           BADBIT = 1
+*     Set all bits to bad
+                           BADBIT = VAL__BADUB
                            CALL NDF_SBB(BADBIT, OUT_NDF, STATUS)
 *     Just in case
                            CALL NDF_SBAD(.TRUE., OUT_NDF,

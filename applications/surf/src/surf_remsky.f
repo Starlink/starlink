@@ -132,6 +132,12 @@
 *     3 Nov 1996: TIMJ
 *        Original version
 *     $Log$
+*     Revision 1.16  1999/05/15 01:48:41  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.15  1998/06/03 21:57:38  timj
 *     Add support for reading SKY NDF from input file.
 *
@@ -358,9 +364,9 @@
             DO I = 1, NREC
                CALL NDF_HINFO (INDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
+               ELSE IF (STEMP(:10) .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
                END IF
             END DO
@@ -460,7 +466,8 @@
       CALL NDF_DIM (INDF, MAXDIM, DIM, NDIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             IF ((NDIM .NE. 3)                  .OR.
      :          (DIM(1) .NE. N_BOLS)         .OR.
      :          (DIM(2) .LT. 1)                .OR.
@@ -510,7 +517,8 @@
 
 *  now open the output NDF, propagating it from the input file
 
-      CALL NDF_PROP (INDF, 'Data,Var,Qual,Axis', 'OUT', OUTNDF, STATUS)
+      CALL NDF_PROP (INDF, 'Units,Data,Var,Qual,Axis', 'OUT', 
+     :     OUTNDF, STATUS)
 
 *     Check for a 'SKY' extension in REDS.
 *     If there is one then we will simply use it
@@ -690,7 +698,8 @@
 
 * Loop through beams if this is a photometry
 
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          N_BEAMS = SCUBA__MAX_BEAM
          NDIM = 3
       ELSE

@@ -425,9 +425,9 @@
             DO I = 1, NREC
                CALL NDF_HINFO (INDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'EXTINCTION') THEN
+               ELSE IF (STEMP(:10) .EQ. 'EXTINCTION') THEN
                   EXTINCTION = .TRUE.
                END IF
             END DO
@@ -526,7 +526,8 @@
 
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             IF ((NDIM .NE. 3)                  .OR.
      :          (DIM(1) .NE. N_BOL_IN)         .OR.
      :          (DIM(2) .LT. 1)                .OR.
@@ -701,7 +702,8 @@
 
 *  for a PHOTOM observation read the PHOT_BB array and check its dimensions
 
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          DIMX (1) = SCUBA__MAX_BEAM
          DIMX (2) = SCUBA__MAX_SUB
          CALL CMP_GETNI (IN_SCUBAX_LOC, 'PHOT_BB', 2, DIMX, 
@@ -819,7 +821,8 @@
       LBND (2) = 1
       UBND (1) = N_BOL_OUT
       UBND (2) = N_POS
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          N_BEAM = SCUBA__MAX_BEAM
          NDIM = 3
          LBND (3) = 1
@@ -976,27 +979,30 @@
 *  for a PHOTOM observation recalculate the PHOT_BB array for the bolometers
 *  in the selected sub-instrument
 
-      IF ((OBSERVING_MODE.EQ.'PHOTOM') .AND. (STATUS.EQ.SAI__OK)) THEN
-	 DO BEAM = 1, SCUBA__MAX_BEAM
-            ITEMP = IN_PHOT_BB(BEAM,SUB_POINTER)
-            IF (ITEMP .EQ. 0) THEN
-               OUT_PHOT_BB(BEAM,1) = 0
-            ELSE
-               DO I = 1, N_BOL_OUT
-                  IF ((IN_BOL_CHAN(ITEMP) .EQ. OUT_BOL_CHAN(I)) .AND.
-     :                (IN_BOL_ADC(ITEMP) .EQ. OUT_BOL_ADC(I)))  THEN
-                     OUT_PHOT_BB(BEAM,1) = I
-                  END IF
-               END DO
-            END IF
-         END DO
-
-         DIM (1) = SCUBA__MAX_BEAM
-         DIM (2) = 1
-         CALL CMP_MOD (OUT_SCUBAX_LOC, 'PHOT_BB', '_INTEGER',
-     :     2, DIM, STATUS)
-	 CALL CMP_PUTVI (OUT_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
-     :     OUT_PHOT_BB, STATUS)
+      IF (STATUS .EQ. SAI__OK) THEN
+         IF (OBSERVING_MODE.EQ.'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
+            DO BEAM = 1, SCUBA__MAX_BEAM
+               ITEMP = IN_PHOT_BB(BEAM,SUB_POINTER)
+               IF (ITEMP .EQ. 0) THEN
+                  OUT_PHOT_BB(BEAM,1) = 0
+               ELSE
+                  DO I = 1, N_BOL_OUT
+                     IF ((IN_BOL_CHAN(ITEMP) .EQ. OUT_BOL_CHAN(I)) .AND.
+     :                    (IN_BOL_ADC(ITEMP) .EQ. OUT_BOL_ADC(I)))  THEN
+                        OUT_PHOT_BB(BEAM,1) = I
+                     END IF
+                  END DO
+               END IF
+            END DO
+            
+            DIM (1) = SCUBA__MAX_BEAM
+            DIM (2) = 1
+            CALL CMP_MOD (OUT_SCUBAX_LOC, 'PHOT_BB', '_INTEGER',
+     :           2, DIM, STATUS)
+            CALL CMP_PUTVI (OUT_SCUBAX_LOC, 'PHOT_BB', SCUBA__MAX_BEAM,
+     :           OUT_PHOT_BB, STATUS)
+         END IF
       END IF
 
 *  now go through the various exposures in the observation

@@ -140,6 +140,12 @@
 *  History :
 *     $Id$
 *     $Log$
+*     Revision 1.29  1999/05/15 01:48:43  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.28  1999/03/24 00:28:55  timj
 *     Initial release of RASTER skydip mode.
 *
@@ -511,9 +517,9 @@ c
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'SKYDIP') THEN
+               IF (STEMP(:6) .EQ. 'SKYDIP') THEN
                   SKYDIP = .TRUE.
-               ELSE IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               ELSE IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   RESW = .TRUE.
                END IF
             END DO

@@ -127,6 +127,12 @@
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
 *     $Log$
+*     Revision 1.28  1999/05/15 01:48:40  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.27  1998/07/21 02:11:58  timj
 *     Annull SECNDF
 *
@@ -359,6 +365,7 @@ c
       INTEGER      SWITCH2_START       ! index of first point in switch 2
       INTEGER      SWITCH3_END         ! index of last point in switch 3
       INTEGER      SWITCH3_START       ! index of first point in switch 3
+      LOGICAL      THERE               ! Is extension present
       INTEGER      UBND (MAXDIM)       ! upper bounds of array
       LOGICAL      USE_CALIBRATOR      ! .TRUE. if internal calibrator signal
                                        ! is be divided into the data
@@ -442,7 +449,7 @@ c
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
                END IF
             END DO
@@ -719,7 +726,8 @@ c
       UBND (2) = 1     ! N_POS
       LBND(3)  = 1
       UBND(3)  = 1
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          NDIM = 3
          LBND (3) = 1
          UBND (3) = SCUBA__MAX_BEAM
@@ -925,7 +933,8 @@ c
      :                    %val(DEMOD_CALIBRATOR_PTR +
      :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                    %val(DEMOD_QUALITY_PTR + 
-     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB))
+     :                    (SWITCH1_START - 1) * N_BOLS * VAL__NBUB),
+     :                       STATUS)
 
                         IF (N_SWITCHES .GE. 2) THEN
                            CALL SCULIB_DIV_CALIBRATOR_2 (N_BOLS,
@@ -937,7 +946,8 @@ c
      :                       %val(DEMOD_CALIBRATOR_PTR +
      :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                       %val(DEMOD_QUALITY_PTR + 
-     :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBUB))
+     :                       (SWITCH2_START - 1) * N_BOLS * VAL__NBUB),
+     :                          STATUS)
                         END IF
 
                         IF (N_SWITCHES .GE. 3) THEN
@@ -950,13 +960,15 @@ c
      :                       %val(DEMOD_CALIBRATOR_PTR +
      :                       (SWITCH1_START - 1) * N_BOLS * VAL__NBR),
      :                       %val(DEMOD_QUALITY_PTR + 
-     :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBUB))
+     :                       (SWITCH3_START - 1) * N_BOLS * VAL__NBUB),
+     :                          STATUS)
                         END IF
                      END IF
 
 *  set up the number of `beams' to be reduced
 
-                     IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+                     IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :                    OBSERVING_MODE .EQ. 'POLPHOT') THEN
                         START_BEAM = 1
                         END_BEAM = SCUBA__MAX_BEAM
                      ELSE
@@ -1108,13 +1120,23 @@ c
 
       IF (STATUS .EQ. SAI__OK) THEN
 
+*     make sure we have some data
+         IF (EXP_POINTER .EQ. 1) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP( ' ','^TASK: There seems to be no valid '//
+     :           'data in this file - ABORTING',
+     :           STATUS)
+         END IF
+
          NDIM = 2
          LBND (1) = 1
          LBND (2) = 1
          UBND (1) = N_BOLS
          UBND (2) = EXP_POINTER - 1
          UBND (3) = 1
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             NDIM = 3
             LBND (3) = 1
             UBND (3) = SCUBA__MAX_BEAM
@@ -1148,14 +1170,16 @@ c
 
 
       IF (OBSERVING_MODE .NE. 'SKYDIP') THEN
-         IF (STATUS .EQ. SAI__OK) THEN
+
+*     Look for the REDS extension
+         CALL NDF_XSTAT(OUT_NDF, 'REDS', THERE, STATUS)
+
+         IF (THERE) THEN
             CALL NDF_XLOC (OUT_NDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
      :           STATUS)
-            IF (STATUS .NE. SAI__OK) THEN
-               CALL ERR_ANNUL (STATUS)
-               CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
-     :              0, 0, OUT_REDSX_LOC, STATUS)
-            END IF
+         ELSE
+            CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
+     :           0, 0, OUT_REDSX_LOC, STATUS)
          END IF
          CALL CMP_MOD (OUT_REDSX_LOC, 'BEAM_WT', '_REAL', 1,
      :        SCUBA__MAX_BEAM, STATUS)
@@ -1182,7 +1206,8 @@ c
 
 *     Deal with BEAM if necessary
 
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
 
          CALL NDF_AMAP(OUT_NDF, 'CENTRE', 3, '_INTEGER', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)

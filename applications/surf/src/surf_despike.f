@@ -116,6 +116,12 @@
 
 *    History :
 *     $Log$
+*     Revision 1.7  1999/05/15 01:48:39  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.6  1997/12/23 21:44:16  timj
 *     Set badbit mask for despiking.
 *
@@ -307,7 +313,7 @@
             DO I = 1, NREC
                CALL NDF_HINFO (INDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
                END IF
             END DO

@@ -93,6 +93,12 @@
  
 *  History:
 *     $Log$
+*     Revision 1.5  1999/05/15 01:48:42  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.4  1998/05/06 18:29:58  timj
 *     Increase size of 'IN' parameter.
 *
@@ -396,7 +402,7 @@
       CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
 
 *     Propogate to the output NDF
-      CALL NDF_PROP (SECNDF, ' ', 'OUT', OUTNDF, STATUS)
+      CALL NDF_PROP (SECNDF, 'Units', 'OUT', OUTNDF, STATUS)
 
 *     Close the input file
       CALL NDF_ANNUL(SECNDF, STATUS)

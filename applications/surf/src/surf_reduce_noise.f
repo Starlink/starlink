@@ -70,6 +70,12 @@
 *     November 1998
 *       Converted to SURF (TIMJ)
 *     $Log$
+*     Revision 1.3  1999/05/15 01:48:40  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.2  1999/03/08 20:57:42  timj
 *     Initalise SCRATCH_PTR
 *
@@ -268,7 +274,7 @@
             DO I = 1, NREC
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP, STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_NOISE') THEN
+               IF (STEMP(:12) .EQ. 'REDUCE_NOISE') THEN
                   REDUCE_NOISE = .TRUE.
                END IF
             END DO

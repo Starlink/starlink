@@ -69,6 +69,12 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.14  1999/05/15 01:48:40  timj
+*     Finalise support for POLMAP/POLPHOT observing modes.
+*     Only check first few characters of history app name
+*     now that we are writing version number to this string.
+*     POLPHOT is synonym for PHOTOM.
+*
 *     Revision 1.13  1997/11/06 23:20:07  timj
 *     Add the verbose suffix option.
 *
@@ -254,9 +260,9 @@ c
                CALL NDF_HINFO (IN_NDF, 'APPLICATION', I, STEMP,
      :           STATUS)
                CALL CHR_UCASE (STEMP)
-               IF (STEMP .EQ. 'REDUCE_SWITCH') THEN
+               IF (STEMP(:13) .EQ. 'REDUCE_SWITCH') THEN
                   REDUCE_SWITCH = .TRUE.
-               ELSE IF (STEMP .EQ. 'FLATFIELD') THEN
+               ELSE IF (STEMP(:9) .EQ. 'FLATFIELD') THEN
                   FLATFIELD = .TRUE.
                END IF
             END DO
@@ -293,7 +299,8 @@ c
       CALL NDF_DIM (IN_NDF, MAX_DIM, DIM, NDIM, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
-         IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+         IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :        OBSERVING_MODE .EQ. 'POLPHOT') THEN
             IF ((NDIM .NE. 3)                  .OR.
      :          (DIM(1) .NE. N_BOL)            .OR.
      :          (DIM(2) .LT. 1)                .OR.
@@ -325,7 +332,8 @@ c
       END IF
 
       N_POS = DIM (2)
-      IF (OBSERVING_MODE .EQ. 'PHOTOM') THEN
+      IF (OBSERVING_MODE .EQ. 'PHOTOM' .OR.
+     :     OBSERVING_MODE .EQ. 'POLPHOT') THEN
          N_BEAM = SCUBA__MAX_BEAM
       ELSE
 	 N_BEAM = 1
