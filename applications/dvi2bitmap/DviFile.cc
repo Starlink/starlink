@@ -31,7 +31,7 @@ DviFile::DviFile (string s, int res, double magmag)
 
     try
     {
-	dvif_ = new InputByteStream (s, false, ".dvi");
+	dvif_ = new InputByteStream (fileName_, false, ".dvi");
 	read_postamble();
 	//posStack_ = new PosStateStack(postamble_.s);
 	dvif_->seek(0);		// return to beginning
