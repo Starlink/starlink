@@ -1,4 +1,4 @@
-      SUBROUTINE KPG1_TDLIUW( NDIMI, IDIMS, INARR, VAR, INVAR, TRID,
+      SUBROUTINE KPG1_TDLI<T>( NDIMI, IDIMS, INARR, VAR, INVAR, TRID,
      :                         FLUX, AXES, OEL, NDIMO, OLBND, ODIMS,
      :                         OUTARR, OUTVAR, COIN, COOUT, INDICE,
      :                         STATUS )
@@ -190,15 +190,15 @@
       INTEGER ODIMS( NDIMO )
  
       LOGICAL VAR
-      INTEGER*2 INARR( * )
-      INTEGER*2 INVAR( * )
+      <TYPE> INARR( * )
+      <TYPE> INVAR( * )
  
       DOUBLE PRECISION AXES( * )
       DOUBLE PRECISION FLUX
  
 *  Arguments Returned:
-      INTEGER*2 OUTARR( * )
-      INTEGER*2 OUTVAR( * )
+      <TYPE> OUTARR( * )
+      <TYPE> OUTVAR( * )
  
       DOUBLE PRECISION COIN( OEL, NDIMI )
       DOUBLE PRECISION COOUT( OEL, NDIMO )
@@ -235,7 +235,7 @@
                                ! transformation
       INTEGER NCOUT            ! Number of values in the forward
                                ! transformation
-      INTEGER*2 NEIGH( 2 ** NDF__MXDIM ) ! Vector of input data values
+      <TYPE> NEIGH( 2 ** NDF__MXDIM ) ! Vector of input data values
                                ! about a transformed point
       INTEGER OFFSET           ! Offset within the first dimension
                                ! of the output array
@@ -246,7 +246,7 @@
                                ! and search region
       INTEGER STRIDO( NDF__MXDIM ) ! Dimension strides for output arrays
                                ! and co-ordinates
-      INTEGER*2 VNEIGH( 2 ** NDF__MXDIM ) ! Vector of input variance
+      <TYPE> VNEIGH( 2 ** NDF__MXDIM ) ! Vector of input variance
                                ! values about a transformed point
       LOGICAL VALDET           ! Current output data value determined
                                ! when true
@@ -468,8 +468,8 @@
          DO IAXIS = 1, NDIMI
             I = MOD( K - 1, ODIMS( 1 ) ) + 1
             IF ( INDICE( I, IAXIS ) .EQ. VAL__BADD ) THEN
-               OUTARR( K ) = VAL__BADUW
-               IF ( VAR ) OUTVAR( K ) = VAL__BADUW
+               OUTARR( K ) = VAL__BAD<T>
+               IF ( VAR ) OUTVAR( K ) = VAL__BAD<T>
                GO TO 80
  
 *   Use INT rather than NINT for efficiency for certain compilers.  The
@@ -490,21 +490,21 @@
 *   does not, just set the values to be bad and go to the next output
 *   element.
          IF ( VO .LT. 1 .OR. VO .GT. IEL ) THEN
-            OUTARR( K ) = VAL__BADUW
-            IF ( VAR ) OUTVAR( K ) = VAL__BADUW
+            OUTARR( K ) = VAL__BAD<T>
+            IF ( VAR ) OUTVAR( K ) = VAL__BAD<T>
             GO TO 80
          END IF
  
 *   Test for a bad input data value.
-         IF ( INARR( VO ) .EQ. VAL__BADUW ) THEN
-            OUTARR( K ) = VAL__BADUW
+         IF ( INARR( VO ) .EQ. VAL__BAD<T> ) THEN
+            OUTARR( K ) = VAL__BAD<T>
             VALDET = .TRUE.
          END IF
  
 *   Test for a bad input variance value.
          IF ( VAR ) THEN
-            IF ( INVAR( VO ) .EQ. VAL__BADUW ) THEN
-               OUTVAR( K ) = VAL__BADUW
+            IF ( INVAR( VO ) .EQ. VAL__BAD<T> ) THEN
+               OUTVAR( K ) = VAL__BAD<T>
                VARDET = .TRUE.
             END IF
          ELSE
@@ -594,8 +594,8 @@
 *   does not, just set the neighbour to be bad to prevent it being
 *   used in the interpolation.
                IF ( VO .LT. 1 .OR. VO .GT. IEL ) THEN
-                  NEIGH( M ) = VAL__BADUW
-                  IF ( VAR ) VNEIGH( M ) = VAL__BADUW
+                  NEIGH( M ) = VAL__BAD<T>
+                  IF ( VAR ) VNEIGH( M ) = VAL__BAD<T>
                ELSE
                   NEIGH( M ) = INARR( VO )
                   IF ( VAR ) VNEIGH( M ) = INVAR( VO )
@@ -660,7 +660,7 @@
  
 *   Loop around the neighbourhood elements either side of the point.
             DO J = 1, 2 ** NDIMI
-               IF ( NEIGH( J ) .NE. VAL__BADUW ) THEN
+               IF ( NEIGH( J ) .NE. VAL__BAD<T> ) THEN
  
 *   Form the weight for the current element.
                   W = 1.0D0
@@ -671,16 +671,16 @@
  
 *   Integrate the weights and the weighted value.
                   WSUM = WSUM + W
-                  ASUM = ASUM + NUM_UWTOD( NEIGH( J ) ) * W
+                  ASUM = ASUM + NUM_<T>TOD( NEIGH( J ) ) * W
                END IF
             END DO
  
 *   Validate that the output element has been computed using sufficient
 *   weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTARR( K ) = NUM_DTOUW( ASUM / WSUM )
+               OUTARR( K ) = NUM_DTO<T>( ASUM / WSUM )
             ELSE
-               OUTARR( K ) = VAL__BADUW
+               OUTARR( K ) = VAL__BAD<T>
             END IF
          END IF
  
@@ -693,7 +693,7 @@
  
 *   Loop around the neighbourhood elements either side of the point.
             DO J = 1, 2 ** NDIMI
-               IF ( VNEIGH( J ) .NE. VAL__BADUW ) THEN
+               IF ( VNEIGH( J ) .NE. VAL__BAD<T> ) THEN
  
 *   Form the weight for the current variance element.
                   W = 1.0D0
@@ -704,16 +704,16 @@
  
 *   Integrate the weights and the weighted value.
                   WSUM = WSUM + W
-                  ASUM = ASUM + NUM_UWTOD( VNEIGH( J ) ) * W
+                  ASUM = ASUM + NUM_<T>TOD( VNEIGH( J ) ) * W
                END IF
             END DO
  
 *   Validate that the output variance element has been computed using
 *   sufficient weight.
             IF ( WSUM .GT. VAL__SMLD ) THEN
-               OUTVAR( K ) = NUM_DTOUW( ASUM / WSUM )
+               OUTVAR( K ) = NUM_DTO<T>( ASUM / WSUM )
             ELSE
-               OUTVAR( K ) = VAL__BADUW
+               OUTVAR( K ) = VAL__BAD<T>
             END IF
          END IF
  

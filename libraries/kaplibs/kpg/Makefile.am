@@ -30,7 +30,7 @@ KPG_NXD_GEN = kpg1_cmul.gnxd
 # All numeric types
 KPG_N_GEN = kpg1_dara.gn kpg1_frac.gn kpg1_hsta.gn kpg1_thrs.gn \
 kpg1_bl1d.gn kpg1_stat.gn kpg1_medu.gn kpg1_mani.gn kpg1_cadd.gn \
-kpg1_csub.gn kpg1_past.gn
+kpg1_csub.gn kpg1_past.gn kpg1_tdli.gn
 
 # All except unsigned types
 KPG_BDIRW_GEN = kpg1_iscl.gbdirw
@@ -125,9 +125,8 @@ kpg1_sclof.f kpg1_scrsz.f kpg1_sdimp.f kpg1_secsh.f \
 kpg1_seed.f kpg1_sgdim.f kpg1_sgdig.f kpg1_slice.f \
 kpg1_sqsud.f kpg1_sqsui.f kpg1_sqsur.f \
 kpg1_sscof.f kpg1_storb.f kpg1_stord.f kpg1_stori.f \
-kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f kpg1_tdlib.f \
-kpg1_tdlid.f kpg1_tdlii.f kpg1_tdlir.f kpg1_tdliub.f kpg1_tdliuw.f \
-kpg1_tdliw.f kpg1_trald.f kpg1_tralr.f \
+kpg1_storr.f kpg1_storub.f kpg1_storuw.f kpg1_storw.f \
+kpg1_trald.f kpg1_tralr.f \
 kpg1_trbod.f kpg1_trbor.f kpg1_trlib.f kpg1_trlid.f kpg1_trlii.f \
 kpg1_trlir.f kpg1_trliub.f kpg1_trliuw.f kpg1_trliw.f kpg1_trpid.f \
 kpg1_trpir.f kpg1_trspb.f kpg1_trspd.f kpg1_trspi.f kpg1_trspr.f \
