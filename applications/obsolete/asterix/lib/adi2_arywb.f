@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_ARYWB( MODID, FILID, PSID, STATUS )
+      sUBROUTINE ADI2_ARYWB( MODID, FILID, PSID, STATUS )
 *+
 *  Name:
 *     ADI2_ARYWB
@@ -71,11 +71,14 @@
 
 *  Authors:
 *     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     RB: Richard Beard (ROSAT, University of Birmingham)
 *     {enter_new_authors_here}
 
 *  History:
-*     9 Aug 1995 (DJA):
+*      9 Aug 1995 (DJA):
 *        Original version.
+*     15 May 1997 (RB):
+*        Actually write some code!
 *     {enter_changes_here}
 
 *  Bugs:
@@ -88,6 +91,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
+      INCLUDE 'ADI_PAR'
 
 *  Arguments Given:
       INTEGER                   MODID,FILID,PSID
@@ -96,8 +100,13 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
+      CHARACTER*20		TYPE
+
       INTEGER			CACHEID			! Cache object
-      INTEGER			PTR			! Item data address
+      INTEGER			PTR, PTR2		! Item data address
+      INTEGER			NDIM, DIMS(ADI__MXDIM), NELM
+
+      LOGICAL			MODIFIED, THERE
 *.
 
 *  Check inherited global status.
@@ -106,6 +115,41 @@
 *  Extract information required to free cache object
       CALL ADI_CGET0I( PSID, 'CacheID', CACHEID, STATUS )
       CALL ADI_CGET0I( PSID, 'Ptr', PTR, STATUS )
+
+*  Is the object an array?
+      CALL ADI_THERE( CACHEID, 'SHAPE', THERE, STATUS )
+      IF ( .NOT. THERE ) RETURN
+
+*  Copy the data back into the cache
+      CALL ADI_CGET0L( CACHEID, 'Modified', MODIFIED, STATUS )
+      IF ( MODIFIED ) THEN
+
+*    Find out the new shape and type
+        CALL BDI_GETSHP( PSID, ADI__MXDIM, DIMS, NDIM, STATUS )
+        CALL ARR_SUMDIM( NDIM, DIMS, NELM )
+        CALL ADI_CGET0C( PSID, 'Type', TYPE, STATUS )
+
+*    Destroy the old value and create a new holder
+        CALL ADI_CERASE( CACHEID, 'Value', STATUS )
+        CALL ADI_CNEW( CACHEID, 'Value', TYPE, NDIM, DIMS, STATUS )
+        CALL ADI_CMAP( CACHEID, 'Value', TYPE, 'WRITE', PTR2, STATUS )
+
+*    Copy over the data
+        IF ( TYPE .EQ. 'REAL' ) THEN
+          CALL ARR_COP1R( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF ( TYPE .EQ. 'DOUBLE' ) THEN
+          CALL ARR_COP1D( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF ( TYPE .EQ. 'INTEGER' ) THEN
+          CALL ARR_COP1I( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF ( TYPE .EQ. 'LOGICAL' ) THEN
+          CALL ARR_COP1L( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF ( TYPE .EQ. 'WORD' .OR. TYPE .EQ. 'UWORD' ) THEN
+          CALL ARR_COP1W( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        ELSE IF ( TYPE .EQ. 'BYTE' .OR. TYPE .EQ. 'UBYTE' ) THEN
+          CALL ARR_COP1B( NELM, %VAL(PTR), %VAL(PTR2), STATUS )
+        END IF
+
+      END IF
 
 *  Unmap the data
       CALL ADI_CUNMAP( CACHEID, 'Value', PTR, STATUS )
