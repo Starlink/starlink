@@ -2906,6 +2906,39 @@ STAR_PREDIST_SOURCES(error.h.in version.h.in)
         <p>This is admittedly a rather crude technique, but it is a
           lot less fragile than the more elegant alternatives.</p>
 
+        <subsubsect id="rolldistribution">
+          <subhead>
+            <title>Making a distribution</title>
+          </subhead>
+
+          <p>In general, the details of making distributions are
+            outside the (current) scope of this document.  However
+            there is one error we can usefully mention.</p>
+
+          <p>Normally, when you <code>./bootstrap</code> a directory,
+            it arranges to install it by default in a location
+            governed by starconf (see <ref id="starconf"/> for
+            details).  Since this default is a location on your local
+            machine, it might not be appropriate for a distribution
+            tarball.  Thus when you have checked out the appropriate
+            version of your software (probably via a CVS export of a
+            particular tag), you should configure it in the following
+            way:
+<verbatim>
+% STARCONF_DEFAULT_PREFIX=/star STARCONF_DEFAULT_STARLINK=/star ./bootstrap 
+</verbatim>
+            (or <kbd>env ...</kbd> on csh-type shells).  This will
+            make the default installation prefix <code>/star</code>
+            (perhaps <code>/stardev</code> would be appropriate in
+            some circumstances).  After that, the sequence
+<verbatim>
+% ./configure
+% make dist
+</verbatim>
+            will make the distribution properly.</p>
+
+        </subsubsect>
+
       </subsect>
 
       <subsect id="regressiontests" export="export">
@@ -3325,12 +3358,22 @@ cd /path/to/link; rm -f LINK; $(LN_S) /path/to/target/TARGET LINK
 
             <dt>I want to do odd things at clean/distribution time.  How?</dt>
             <dd>
+              <p>Odder than what is described in <ref
+                  id="autodistrib"/>?</p>
+
               <p>Automake also has support for extending what is cleaned
                 and what is included in the distribution, though this
                 does not have to be as elaborate as the support for
                 extended installation above.  See the
                 documentation on <code>CLEANFILES</code> and
                 <code>EXTRA_DIST</code> in the Automake manual.</p>
+            </dd>
+
+            <dt>I want to make distribution tarballs install into
+              <code>/star</code>.  How?</dt>
+            <dd>
+              <p>See the description of <code>./bootstrap</code> in
+                <ref id="rolldistribution"/>.</p>
             </dd>
 
             <dt>How do I write portable Makefiles and shell scripts?</dt>
