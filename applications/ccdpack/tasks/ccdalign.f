@@ -228,8 +228,6 @@
       LOGICAL OK                ! OK to loop
       REAL PERCEN( 2 )          ! The display percentiles
 
-      INTEGER STATE             ! Debug
-
 *.
 
 *  Check inherited global status.
@@ -256,7 +254,7 @@
          GO TO 99
       END IF
 
-*   CCDPACK_REG
+*  CCDPACK_REG
       CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
       CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
       CCDREG = 'ccdpack_reg'//PID
@@ -578,7 +576,8 @@ C      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
      :                  OPLEN, STATUS )
          CMD = 'in=^'//NAMLST( :OPLEN )//' '//
      :         'ndfnames=true '//
-     :         'outlist=*.acc accept'
+     :         'outlist=*.acc '//
+     :         'autoscale=true accept'
          CALL SLV_OBEYW( CCDREG, 'findcent', CMD, ' ', STATUS )
          GRPOFF = GRPOFF + 1
          GO TO 5
