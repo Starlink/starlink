@@ -2779,327 +2779,28 @@ C      END IF
 
 
 
-      SUBROUTINE ELP1_FILER(FIOID,BACK,INDF,NGALS,XC,YC,BACKS,STATUS)
-*+
-*  Name:
-*     ELP1_FILER
-
-*  Purpose:
-*     Opens a user specified text file and reads from it a list of co-ordinates
-*     indicating the locations where galaxies may exist in the image. Each of
-*     these is to be profiled.
-*
-*     The co-ordinates obtained are returned in the arrays XC and YC. the
-*     number of co-ordinate pairs defined is assigned to NGALS. If the 
-*     co-ordinates are legal (i.e. within the image) then another value is read
-*     from the line (if available) and this is used as the local background 
-*     count value when the profile is calculated. 
-      
-*  Language:
-*     Starlink Fortran 77
-
-*  Invocation:
-*      CALL ELP1_FILER(FIOID,BACK,INDF,NGALS,XC,YC,BACKS,STATUS)    
-
-*  Description:
-*     Looks at each line of the required file in turn.
-*     Ignores blank lines and those starting with # or ! since these
-*     are assumed to be comments. Others it examines for the presence
-*     of two numbers. If these are found it looks for a further number.
-*
-*     The first two are taken as representing x and y co-ordinates on 
-*     an image (in Current co-ordinates of INDF) and are checked to 
-*     ensure that they lie within the bounds of the image.
-*
-*     If it is found that the a co-ordinate pair is not within the 
-*     bounds of the image, the values are not retained, otherwise the
-*     counter is incremented and the values stored in arrays XC and YC.
-*     The line is then examined to determine if a further value is present.
-*     If a value is found it is to used as the background count value.
-
-*  Arguments:               
-*     FIOID = INTEGER (Given)
-*        FIO identifier for the input file.
-*     BACK = REAL (Given)
-*        The image global background value. Units counts.
-*     INDF = INTEGER (Given)
-*        NDF identifier for the image.
-*     NGALS = INTEGER (Returned)
-*        Number of galaxies to be profiled.
-*     XC(ELP__NGALS) = REAL (Returned)
-*        X co-ordinates (for galaxies) obtained from the text file.
-*     YC(ELP__NGALS) = REAL (Returned)
-*        Y co-ordinates (for galaxies) obtained from the text file.
-*     BACKS(ELP__NGALS) = REAL (Returned)
-*        The local background value at each of the co-ordinates.
-*        Units counts.
-*     STATUS = INTEGER (Given and Returned)
-*        The global status.
-
-*  Authors:
-*     GJP: Grant Privett (STARLINK)
-*     MBT: Mark Taylor (STARLINK)
-
-*  History:
-*     9-JUL-1993 (GJP)
-*     (Original version)
-*     26-OCT-1999 (MBT):
-*     Modified to deal with COSYS=C.
-*     8-NOV-1999 (MBT):
-*     Removed COSYS altogether.
-
-*  Bugs:
-*     None known.
-
-*-
-
-*  Type Definitions:                  ! No implicit typing
-      IMPLICIT NONE
-                                                                        
-*  Global Constants:
-      INCLUDE 'SAE_PAR'               ! Standard SAE constants
-      INCLUDE 'FIO_ERR'               ! FIO error definitions
-      INCLUDE 'elp_par'               ! ELLPRO constants
-      INCLUDE 'NDF_PAR'              ! NDF public constants
-
-*  Arguments Given:                              
-      INTEGER FIOID                   ! FIO identifier for the input file
-      INTEGER INDF                    ! NDF identifier for image
-      REAL BACK                       ! Global background count value
-
-*  Arguments returned:
-      INTEGER NGALS                   ! The number of galaxies to be profiled
-      REAL BACKS(ELP__NGALS)          ! The local background values
-      REAL XC(ELP__NGALS)             ! X co-ordinates of the galaxy positions
-                                      ! found from the file
-      REAL YC(ELP__NGALS)             ! Y co-ordinates of the galaxy positions
-                                      ! found from the file
-
-*  Status:     
-      INTEGER STATUS                  ! Global status
-
-*  Local variables:
-      LOGICAL ABORT                   ! Has the maximum permitted number of
-                                      ! galaxies been exceeded?
-      LOGICAL FAIL
-      CHARACTER *(80) BUFFER          ! Character string input from the file
-      CHARACTER *(80) STRING          ! Input string
-      INTEGER FAILN                   ! Number of failures found
-      INTEGER I                       ! A loop counter
-      INTEGER J                       ! A loop counter
-      INTEGER INDEX(2,3)              ! Indices of the words within the 
-                                      ! input string
-      INTEGER INDEXE                  ! End of a word in the buffer string
-      INTEGER INDEXS                  ! Start of a word in the buffer string
-      INTEGER NCHAR                   ! Number of characters
-      REAL VALUE(3)                   ! Temporary storage of co-ordinates and
-                                      ! background value.
-*.
-      
-*   Check the inherited global status.
-      IF (STATUS.NE.SAI__OK) RETURN   
-
-*   Initialise the galaxy counter
-      NGALS=0
-
-*   Start an error context.   
-      CALL ERR_MARK
-      
-*   Read from a file. Stop if the end of file is reached or if the maximum
-*   permitted number of galaxies is exceeded.
-      ABORT=.FALSE.
-
-      DO WHILE ((STATUS.NE.FIO__EOF).AND.(.NOT.ABORT))
-                      
-*       Read a line from the steering file.
-         CALL FIO_READ(FIOID,BUFFER,NCHAR,STATUS)
-         IF (STATUS.EQ.SAI__OK) THEN
-
-*       Parse the buffer read from the file.
-
-*         Check for comment (lines starting # or !) or blank line.
-            STRING=BUFFER(1:1)
-            IF ((BUFFER.NE.' ').AND.(STRING.NE.'#').AND.
-     :         (STRING.NE.'!')) THEN
-                  
-*             Find the x and y co-ordinates by looking for words in the BUFFER.
-               FAIL=.FALSE.
-               FAILN=0
-               INDEXE=-1
-               DO 10 I=1,3
-                  
-*               Identify the start and end indices of the words in the buffer.
-*               If either fails there are not enough words in the buffer.
-
-*               Start a new error context.
-                  CALL ERR_MARK
-
-*               Look for the words.
-                  INDEXS = INDEXE + 1
-                  CALL CHR_FIWS(BUFFER,INDEXS,STATUS)
-                  INDEXE = INDEXS
-                  CALL CHR_FIWE(BUFFER,INDEXE,STATUS)
-
-*               Store the locations of the words in the string.
-                  INDEX(1,I)=INDEXS
-                  INDEX(2,I)=INDEXE
-
-*               Set the fail flag if the word extraction failed.
-*               Increment times failed counter.
-                 IF (STATUS.NE.SAI__OK) THEN
-                     FAIL=.TRUE.
-                     FAILN=FAILN+1
-                     CALL ERR_ANNUL(STATUS)
-                 END IF
-
-*               End error context.
-                  CALL ERR_RLSE
-        
- 10            CONTINUE
-
-*            Stop looking at this line of text since two words are not
-*            present.
-               IF (FAILN.GT.1) THEN 
-
-*               Indicate that the line of text did not contain two numbers.
-                  CALL MSG_OUT(' ','Bad text line.',STATUS)
-                  GOTO 666
-
-               END IF
-
-*            Decode the background value if there were three strings.
-               IF (FAILN.EQ.0) THEN
-
-*               Enter new error context.
-                  CALL ERR_MARK
-
-*               Perform conversion of third string to background value.
-                  STRING=BUFFER(INDEX(1,3):INDEX(2,3))
-                  CALL CHR_CTOR(STRING,VALUE(3),STATUS)
-
-*               If there was an error warn and cease to consider this
-*               line.
-                  IF (STATUS.NE.SAI__OK) THEN
-                     FAIL=.TRUE.
-                     CALL ERR_FLUSH(STATUS)
-                     CALL MSG_OUT(' ','Background not a number',STATUS)
-                     CALL ERR_RLSE
-                     GO TO 666
-                  END IF
-
-*               Exit error context.
-                  CALL ERR_RLSE
-               END IF
-
-*            Get coordinates.
-
-*            Start new error context.
-               FAIL=.FALSE.
-               IF (STATUS.NE.SAI__OK) GO TO 666
-               CALL ERR_MARK
-
-*            Change strings in character buffer into numeric coordinate
-*            values.
-               CALL ESP1_S2PR(INDF,BUFFER(INDEX(1,1):INDEX(2,1)),
-     :                        BUFFER(INDEX(1,2):INDEX(2,2)),VALUE(1),
-     :                        VALUE(2),STATUS)
-
-*            If there was an error in the conversion, warn and cease to
-*            consider this line.
-               IF (STATUS.NE.SAI__OK) THEN
-                  CALL ERR_FLUSH(STATUS)
-                  CALL MSG_OUT(' ','Bad text line.',STATUS)
-                  CALL ERR_RLSE
-                  GOTO 666
-               END IF
-
-*            Exit error context.
-               CALL ERR_RLSE
-
-*            Assign the values to the arrays and increment the
-*            counter.
-               NGALS=NGALS+1
-               XC(NGALS)=VALUE(1)
-               YC(NGALS)=VALUE(2)
-               IF (FAILN.EQ.0) THEN          
-                  BACKS(NGALS)=VALUE(3)  
-               ELSE
-                  CALL MSG_FMTR('XV','F6.1',XC(NGALS))
-                  CALL MSG_FMTR('YV','F6.1',YC(NGALS))
-                  CALL MSG_OUT(' ','Default background used for'//
-     :                         ' object at ^XV, ^YV ',STATUS) 
-                  BACKS(NGALS)=BACK
-               END IF
-
-*            Stop any further points being taken from the file 
-               IF (NGALS.EQ.ELP__NGALS) THEN
-                  ABORT=.TRUE.  
-                  FAIL=.TRUE.
-               END IF
-
-            END IF
-                  
- 666     END IF
-      
-      END DO
- 217  continue
-     
-*   Display the error message if necessary. Also, tidy up the error system.
-      IF ((STATUS.NE.SAI__OK).AND.(STATUS.NE.FIO__EOF)) THEN
-         CALL ERR_REP( ' ','Errors found when reading the data file.',
-     :                STATUS)
-         CALL ERR_FLUSH( STATUS )
-      ELSE
-         CALL ERR_ANNUL( STATUS )
-      END IF
-          
-*   End the error context.
-      CALL ERR_RLSE
-
-*   Indicate that the file was flawed.
-      IF (FAIL) THEN
-         CALL MSG_BLANK(STATUS)
-         CALL MSG_OUT(' ','Problems found reading the file.',
-     :                STATUS)
-         CALL MSG_BLANK(STATUS)
-      END IF
-
-*   Indicate if the maximum permitted number of galaxies was exceeded.
-      IF (ABORT) THEN
-         CALL MSG_BLANK(STATUS)
-         CALL MSG_OUT(' ','Too many co-ordinate pairs were found.',
-     :                STATUS)
-         CALL MSG_OUT(' ','Proceeding with the maximum number'/
-     :                /' allowed.',STATUS)
-         CALL MSG_BLANK(STATUS)
-      END IF
-
- 9999 CONTINUE
-
-      END 
-
 
       SUBROUTINE ELP1_FMODE(STATUS)
 *+
 *  Name:
 *     ELP1_FMODE
-
+*
 *  Purpose:
 *     The routine obtains the user inputs required to perform 
 *     galaxy profiling for a given image. The co-ordinates of the 
 *     points on the image denoting the suggested galaxy centres are
 *     defined via an ASCII text file.
-
+*
 *  Language:
 *     Starlink Fortran 77
-
+*
 *  Invocation:
 *     CALL ELP1_FMODE(STATUS)
-
+*
 *  Arguments:   
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
-
+*
 *  Description: 
 *     Information such as pixel size, background count value and its
 *     standard deviation etc are input.
@@ -3123,21 +2824,24 @@ C      END IF
 *     The initial estimate of the galaxy position may be improved by 
 *     modifying the AUTOL option which calculate the centroid.
 *     of the image area immediately surrounding the input value.
-
+*
 *  Implementation Status:
 *     Under development
-
+*
 *  Authors:
 *     GJP: Grant Privett (STARLINK)
+*     NG: Norman Gray (Starlink, Glasgow)
 *     {enter_new_authors_here}
-
+*
 *  History:
 *     17-May-1992 (GJP)
-*     (Original version)
-
+*       (Original version)
+*     21-Nov-1999 (NG)
+*       Use new elp1_filer instead of (identical!) elf1_filer
+*
 *  Bugs:
 *     None known.
-
+*
 *-
 
 *  Type Definitions:                  ! No implicit typing
@@ -3202,7 +2906,8 @@ C      END IF
                                       ! frozen
       REAL PSIZE                      ! Size of the image pixels in arc sec
       REAL RESULT(ELP__NRES,ELP__RESUL)      ! Ellipse parameters
-      REAL RLIM                       ! Maximum ellipse radius
+      REAL DEFRLIM                    ! Default maximum ellipse radius
+      REAL RLIM(ELP__NGALS)           ! Maximum ellipse radii
       REAL SIGMA                      ! Std. dev. of the background value
       REAL XC(ELP__NGALS)             ! X co-ordinates of the galaxy positions
                                       ! found from the file
@@ -3305,9 +3010,9 @@ C      END IF
       IF (STATUS.NE.SAI__OK) GOTO 9999 
       
 *   Get the maximum profile radius.
-      CALL PAR_GET0R('RLIM',RLIM,STATUS)
+      CALL PAR_GET0R('RLIM',DEFRLIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
-      IF (RLIM.LE.PSIZE) RLIM=ELP__RLIM
+      IF (DEFRLIM.LE.PSIZE) DEFRLIM=ELP__RLIM
 
 *   Get the zero point for the surface brightness scale/graphs.
       CALL PAR_GET0R('ZEROP',ZEROP,STATUS)
@@ -3383,7 +3088,8 @@ C      END IF
       IF (STATUS.NE.SAI__OK) GOTO 9999
       
 *   Obtain the co-ordinates of the galaxies required.
-      CALL ELP1_FILER(FIOID,BACK,NDF1,NGALS,XC,YC,BACKS,STATUS)
+      CALL ELP1_FILER(FIOID,BACK,DEFRLIM,NDF1,NGALS,
+     :     XC,YC,BACKS,RLIM,STATUS)
       IF (STATUS.NE.SAI__OK) GOTO 9999
     
 *   Abort if the number of galaxies is zero.
@@ -3455,7 +3161,7 @@ C      END IF
 *      in the results arrays.
          CALL ELP1_PRO(0,MINMOD,ANGCON,ANGOFF,FRZORI,FINE,
      :                 LIM1,LIM2,LIM3,
-     :                 FRACT,PSIZE,FAST,RLIM,BACKS(I),SIGMA,ELEMS,
+     :                 FRACT,PSIZE,FAST,RLIM(I),BACKS(I),SIGMA,ELEMS,
      :                 POINT1,PRANGE,XCO,YCO,VALIDP,RESULT,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 9998
         
@@ -10429,3 +10135,4 @@ c functions
       END 
  
 
+* $Id$

@@ -494,7 +494,8 @@ F_SUB1 = corr.f ellfou.f ellpro.f esphelp.f fastmed.f gaufit.f \
 	graphs.f histpeak.f hsub.f loback.f mask.f mixup.f sector.f \
 	selfc.f selfcw.f skew.f topped.f ards.f \
         esp1_asffr.f esp1_crpt.f esp1_dsfrm.f esp1_gtpos.f esp1_gtpsz.f \
-        esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f \
+        esp1_inpos.f esp1_pr2s.f esp1_s2pr.f esp1_xyfmt.f esp1_farr.f \
+	elp1_filer.f \
         kpg1_pgesc.f
 
 F_SUB2 =
@@ -1431,6 +1432,7 @@ esp1_inpos.o: AST_PAR SAE_PAR
 esp1_pr2s.o: AST_PAR SAE_PAR
 esp1_s2pr.o: AST_PAR SAE_PAR
 esp1_xyfmt.o: AST_PAR SAE_PAR
+esp1_farr.o: SAE_PAR FIO_ERR
 esp_mon.o:  PAR_PAR SAE_PAR
 esphelp.o:  DAT_PAR PAR_ERR PAR_PAR SAE_PAR hlpcmd.inc
 fastmed.o:  NDF_PAR PRM_PAR SAE_PAR fas_par
@@ -1450,6 +1452,7 @@ selfc.o:    NDF_PAR PRM_PAR SAE_PAR sel_par
 selfcw.o:   NDF_PAR PRM_PAR SAE_PAR sel_par
 skew.o:     NDF_PAR PRM_PAR SAE_PAR ske_par
 topped.o:   NDF_PAR PRM_PAR SAE_PAR top_par
+
 
 #--------------------------------------------------------------------------
 #
