@@ -505,7 +505,7 @@
         END IF
 
 *      Introduce Poisson noise into source and background
-        IF ( PDEV ) THEN
+        IF ( PDEV .AND. (ONBACK.GT.0) ) THEN
           NBACK = MATH_POISS(FLOAT(ONBACK))
         ELSE
           NBACK = ONBACK
