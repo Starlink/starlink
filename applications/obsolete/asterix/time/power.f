@@ -120,7 +120,7 @@
       CALL AST_INIT()
 
 *    Obtain data object, access and check it.
-      CALL USI_TASSOCI( 'INP', 'READ', IFID, STATUS )
+      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
 
 *    Create a POWER_SPECTRUM object.
       CALL USI_TASSOCO( 'OUT', 'POWER_SPECTRUM', OFID, STATUS )
