@@ -12,6 +12,8 @@
 # who         when       what
 # --------   ---------   ----------------------------------------------
 # A.Brighton 11 Oct 95   created
+# P.W.Draper 19 Jan 00   added concat to bindtags, itk ones were
+#                        being lost.
 
 set skycat_usage {
 Usage: skycat ?fitsFile? ?-option value ...?
@@ -132,7 +134,8 @@ itcl::class skycat::SkyCat {
 	
 	# check the main window size to make sure it is not too large
 	bind SkyCat::resize <Configure> [code $this resize %w %h]
-	bindtags $w_ SkyCat::resize
+	bindtags $w_ [concat SkyCat::resize [bindtags $w_]]
+	#bindtags $w_ SkyCat::resize
     }
 
 
