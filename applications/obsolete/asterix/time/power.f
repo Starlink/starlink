@@ -151,7 +151,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'POWER Version 2.1-0b' )
+        PARAMETER		( VERSION = 'POWER Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*80           	UNITS        		! Data/axis units

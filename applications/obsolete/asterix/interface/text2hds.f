@@ -47,7 +47,7 @@
          PARAMETER (MAXCOL=40)
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TEXT2HDS Version 2.1-0b')
+      PARAMETER (VERSION = 'TEXT2HDS Version 2.2-0')
 *    Local variables :
       CHARACTER*3 STRING
       CHARACTER*40 CNAME(MAXCOL)

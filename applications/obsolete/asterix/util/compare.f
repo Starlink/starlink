@@ -129,7 +129,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'COMPARE Version 2.1-0b' )
+        PARAMETER		( VERSION = 'COMPARE Version 2.2-0' )
 
 *  Local Variables:
       REAL                   	FACTOR          ! Renormalization factor for model

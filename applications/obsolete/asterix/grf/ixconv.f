@@ -121,7 +121,7 @@
 *    Version :
 *
       CHARACTER*30		VERSION
-        PARAMETER 		( VERSION = 'IXCONV Version 2.1-0b' )
+        PARAMETER 		( VERSION = 'IXCONV Version 2.2-0' )
 *-
 
 *  Version announcement

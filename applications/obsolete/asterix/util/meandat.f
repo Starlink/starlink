@@ -117,7 +117,7 @@
         PARAMETER 		( MAXFIL = 20 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'MEANDAT Version 2.1-0b' )
+        PARAMETER		( VERSION = 'MEANDAT Version 2.2-0' )
 
 *  Local Variables:
       INTEGER LP,AXLP

@@ -29,7 +29,7 @@
       LOGICAL OFF
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPIXEL Version 2.1-0b')
+      PARAMETER (VERSION = 'IPIXEL Version 2.2-0')
 *-
       CALL USI_INIT()
 

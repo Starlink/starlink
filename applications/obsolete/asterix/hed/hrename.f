@@ -26,7 +26,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='HRENAME Version 2.1-0b')
+      PARAMETER (VERSION='HRENAME Version 2.2-0')
 *    Local variables :
       CHARACTER*(DAT__SZLOC) LOC
       CHARACTER*(DAT__SZNAM) NEW

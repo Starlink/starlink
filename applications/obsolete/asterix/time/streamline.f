@@ -107,7 +107,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'STREAMLINE Version 2.1-0b' )
+        PARAMETER		( VERSION = 'STREAMLINE Version 2.2-0' )
 
 *  Local Variables:
       LOGICAL 			LVAR     		! I/p variance present?

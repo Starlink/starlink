@@ -20,7 +20,7 @@
       INTEGER STATUS
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='PLOTXY Version 2.1-0b')
+      PARAMETER (VERSION='PLOTXY Version 2.2-0')
 *    Local variables :
       CHARACTER*30 		DEV			! Plot device
       CHARACTER*80 		XLBL,YLBL,TITLE

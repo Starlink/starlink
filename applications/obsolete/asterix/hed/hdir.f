@@ -54,7 +54,7 @@
 *    Version id :
 *
       CHARACTER*30 		VERSION
-        PARAMETER 		( VERSION = 'HDIR Version 2.1-0b' )
+        PARAMETER 		( VERSION = 'HDIR Version 2.2-0' )
 *-
 
 *    Version number

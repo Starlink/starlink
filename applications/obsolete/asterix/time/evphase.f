@@ -133,7 +133,7 @@
         PARAMETER               ( MJDORG = 2400000.5D0 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVPHASE Version 2.1-0b' )
+        PARAMETER		( VERSION = 'EVPHASE Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*80           	EPHEMERIS(3)            ! History entry

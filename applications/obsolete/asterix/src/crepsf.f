@@ -77,7 +77,7 @@
 *    Version id :
 *
       CHARACTER*30      VERSION
-         PARAMETER      ( VERSION = 'CREPSF Version 2.1-0b' )
+         PARAMETER      ( VERSION = 'CREPSF Version 2.2-0' )
 *-
 
 *    Check status

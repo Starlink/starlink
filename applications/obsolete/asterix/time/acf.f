@@ -131,7 +131,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ACF Version 2.1-0b' )
+        PARAMETER		( VERSION = 'ACF Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*80           	TEXT(2)

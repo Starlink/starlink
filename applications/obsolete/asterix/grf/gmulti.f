@@ -34,7 +34,7 @@
       INCLUDE 'GMD_CMN'
 *    Local Constants :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='GMULTI Version 2.1-0b')
+      PARAMETER (VERSION='GMULTI Version 2.2-0')
       INTEGER MAXGRAF
       PARAMETER (MAXGRAF=24)
 *    Local variables :

@@ -38,7 +38,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='ISEP Version 2.1-0b')
+      PARAMETER (VERSION='ISEP Version 2.2-0')
 *-
       CALL USI_INIT()
 

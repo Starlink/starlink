@@ -53,7 +53,7 @@
 *    Version id :
 *
       CHARACTER*30            VERSION
-         PARAMETER           (VERSION = 'VARTEST Version 2.1-0b')
+         PARAMETER           (VERSION = 'VARTEST Version 2.2-0')
 *-
 
 *    Check status.

@@ -109,7 +109,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'GROW Version 2.1-0b' )
+        PARAMETER		( VERSION = 'GROW Version 2.2-0' )
 
 *  Local Variables:
       INTEGER			AXIS			! Axis to grow along

@@ -73,7 +73,7 @@
 *    Version :
 *
       CHARACTER*30 		VERSION
-	PARAMETER		(VERSION = 'TIE Version 2.1-0b')
+	PARAMETER		(VERSION = 'TIE Version 2.2-0')
 *-
 
 *    Version id

@@ -54,7 +54,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-        PARAMETER (VERSION='HFILL Version 2.1-0b')
+        PARAMETER (VERSION='HFILL Version 2.2-0')
 *-
 
       CALL MSG_PRNT(VERSION)

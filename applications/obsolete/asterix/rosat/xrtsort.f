@@ -64,7 +64,7 @@
         PARAMETER		( ELISTS = 'X_CORR,Y_CORR,X_DET,'/
      :           /'Y_DET,RAW_TIMETAG,PULSE_HEIGHT_CH,CORR_PH_CH' )
       CHARACTER*30            VERSION
-         PARAMETER          ( VERSION = 'XSORT Version 2.1-0b' )
+         PARAMETER          ( VERSION = 'XSORT Version 2.2-0' )
 
 *    Local variables :
       RECORD /XRT_HEAD/ HEAD                    ! Observation header information

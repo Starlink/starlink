@@ -133,7 +133,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'CROSSCORR Version 2.1-0b' )
+        PARAMETER		( VERSION = 'CROSSCORR Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*80           	HTXT(2)			! History text

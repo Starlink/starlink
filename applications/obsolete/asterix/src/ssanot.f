@@ -90,7 +90,7 @@
 *    Version id :
 *
       CHARACTER*30          VERSION
-        PARAMETER           ( VERSION = 'SSANOT Version 2.1-0b' )
+        PARAMETER           ( VERSION = 'SSANOT Version 2.2-0' )
 *-
 
 *  Check status

@@ -31,7 +31,7 @@ c     REAL XR,YR
       INTEGER I,ITER
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICENTROID Version 2.1-0b')
+      PARAMETER (VERSION = 'ICENTROID Version 2.2-0')
 *-
       CALL USI_INIT()
 

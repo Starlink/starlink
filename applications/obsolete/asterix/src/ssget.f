@@ -96,7 +96,7 @@
 *    Version id :
 *
       CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='SSGET Version 2.1-0b' )
+        PARAMETER            ( VERSION='SSGET Version 2.2-0' )
 *-
 
 *    Check status

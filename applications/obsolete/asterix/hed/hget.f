@@ -80,7 +80,7 @@
      :                         TYP_REAL = 4, TYP_DP = 5 )
 
       CHARACTER*40           VERSION
-        PARAMETER            ( VERSION='HGET Version 2.1-0b' )
+        PARAMETER            ( VERSION='HGET Version 2.2-0' )
 *
 *    Local variables :
 *

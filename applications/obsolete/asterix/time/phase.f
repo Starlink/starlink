@@ -78,7 +78,7 @@
 *    Version :
 *
       CHARACTER*22		VERSION
-        PARAMETER         	( VERSION = 'PHASE Version 2.1-0b' )
+        PARAMETER         	( VERSION = 'PHASE Version 2.2-0' )
 *-
 
 *    Version Announcement

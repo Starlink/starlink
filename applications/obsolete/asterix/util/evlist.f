@@ -132,7 +132,7 @@
         PARAMETER		( MAXCOLS = 7 )		! display on page
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVLIST Version 2.1-0b' )
+        PARAMETER		( VERSION = 'EVLIST Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*14		C(MAXCOLS)      	! Formatted list values

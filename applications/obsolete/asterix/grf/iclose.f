@@ -28,7 +28,7 @@
       LOGICAL ACTIVE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'ICLOSE Version 2.1-0b')
+      PARAMETER (VERSION = 'ICLOSE Version 2.2-0')
 *-
       CALL USI_INIT()
 

@@ -102,7 +102,7 @@
 
 *  Local Constants:
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'MAGIC Version 2.1-0b' )
+        PARAMETER		( VERSION = 'MAGIC Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*8               MSTR			! Mask string

@@ -37,7 +37,7 @@
       LOGICAL PLOT
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IRADIAL Version 2.1-0b')
+      PARAMETER (VERSION = 'IRADIAL Version 2.2-0')
 *-
       CALL USI_INIT()
 

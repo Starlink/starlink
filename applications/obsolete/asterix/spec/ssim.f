@@ -124,7 +124,7 @@
 
 *  Version :
       CHARACTER*30 		VERSION
-	PARAMETER		( VERSION = 'SSIM Version 2.1-0b' )
+	PARAMETER		( VERSION = 'SSIM Version 2.2-0' )
 *-
 
 *  Version

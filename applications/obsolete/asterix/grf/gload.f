@@ -28,7 +28,7 @@
       LOGICAL MULTI
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'GLOAD Version 2.1-0b')
+      PARAMETER (VERSION = 'GLOAD Version 2.2-0')
 *-
       CALL MSG_PRNT(VERSION)
 

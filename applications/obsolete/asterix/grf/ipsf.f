@@ -42,7 +42,7 @@
       LOGICAL NEW
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPSF Version 2.1-0b')
+      PARAMETER (VERSION = 'IPSF Version 2.2-0')
 *-
       CALL USI_INIT()
 

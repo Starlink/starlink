@@ -62,7 +62,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'SLOTMRG Version 2.1-0b')
+      PARAMETER (VERSION = 'SLOTMRG Version 2.2-0')
 *-
       MFLAG = .FALSE.
 *

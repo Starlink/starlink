@@ -21,7 +21,7 @@
 *    Local variables :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IUNDO Version 2.1-0b')
+      PARAMETER (VERSION = 'IUNDO Version 2.2-0')
 *-
       CALL USI_INIT()
 

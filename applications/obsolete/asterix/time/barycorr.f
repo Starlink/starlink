@@ -144,7 +144,7 @@
         PARAMETER               ( S2_REF_MJD = 47892.0D0 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'BARYCORR Version 2.1-0b' )
+        PARAMETER		( VERSION = 'BARYCORR Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*40             	INSTRUM     		! Instrument string

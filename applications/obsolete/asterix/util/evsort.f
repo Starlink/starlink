@@ -110,7 +110,7 @@
         PARAMETER            	( MXLIN = 8 )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVSORT Version 2.1-0b' )
+        PARAMETER		( VERSION = 'EVSORT Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*20		MTYPE			! List mapping type

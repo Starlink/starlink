@@ -86,7 +86,7 @@
 *    Version :
 *
       CHARACTER*30         VERSION
-        PARAMETER          ( VERSION = 'HDS2TEXT Version 2.1-0b' )
+        PARAMETER          ( VERSION = 'HDS2TEXT Version 2.2-0' )
 *-
 
 *    Check status

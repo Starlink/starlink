@@ -140,7 +140,7 @@
         PARAMETER            	(MXBNDS = 1000)       	! => 500 ranges
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'EVSUBSET Version 2.1-0b' )
+        PARAMETER		( VERSION = 'EVSUBSET Version 2.2-0' )
 
 *  Local Variables:
       CHARACTER*20  		NAME(MXSEL)    		! Names of selected lists

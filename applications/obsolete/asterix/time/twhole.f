@@ -21,7 +21,7 @@
 *    Local variables :
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TWHOLE Version 2.1-0b')
+      PARAMETER (VERSION = 'TWHOLE Version 2.2-0')
 *-
       CALL MSG_PRNT(VERSION)
 

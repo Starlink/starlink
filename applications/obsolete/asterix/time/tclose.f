@@ -23,7 +23,7 @@
       LOGICAL ACTIVE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'TCLOSE Version 2.1-0b')
+      PARAMETER (VERSION = 'TCLOSE Version 2.2-0')
 *-
       CALL MSG_PRNT(VERSION)
 

@@ -24,7 +24,7 @@
       INTEGER status
 *    local Constants :
 	CHARACTER*30 VERSION		! Version number
-        PARAMETER ( VERSION='HREAD Version 2.1-0b')
+        PARAMETER ( VERSION='HREAD Version 2.2-0')
 *    local variables :
 	CHARACTER*80 FILNAM		! name of FORTRAN file
 	CHARACTER*(DAT__SZTYP) type	! type descriptor

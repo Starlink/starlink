@@ -86,7 +86,7 @@
 *    Version id:
 *
       CHARACTER*21		VERSION
-	PARAMETER	        ( VERSION='SLICE Version 2.1-0b' )
+	PARAMETER	        ( VERSION='SLICE Version 2.2-0' )
 *-
 
 *    Check status

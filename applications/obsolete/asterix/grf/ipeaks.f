@@ -24,7 +24,7 @@
       REAL THRESH
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IPEAKS Version 2.1-0b')
+      PARAMETER (VERSION = 'IPEAKS Version 2.2-0')
 *-
       CALL USI_INIT()
 

@@ -57,7 +57,7 @@
 
 *    Version :
       CHARACTER*30	 	VERSION
-        PARAMETER 		( VERSION = 'FOLDAOV Version 2.1-0b' )
+        PARAMETER 		( VERSION = 'FOLDAOV Version 2.2-0' )
 *-
 
 *  Version
