@@ -89,10 +89,10 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
 
 *  Arguments Given:
-      CHARACTER*(*)		FNAME			! File to rename
+      CHARACTER*(*)		FNAME
 
 *  Status:
-      INTEGER STATUS             ! Global status
+      INTEGER 			STATUS             	! Global status
 
 *  External References:
       EXTERNAL			CHR_LEN
@@ -102,6 +102,7 @@
       CHARACTER*20              SYSNAME, NODENAME,	! Operating system
      :                          RELEASE, VERSION, 	! description
      :                          MACHINE
+      CHARACTER*200		LFILE			! Local file name
       INTEGER			FLEN			! File name length
 
       LOGICAL			THERE			! File exists?
@@ -110,34 +111,31 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*-
-
-*    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
-
-*    Don't bother with this on VMS
+*  Don't bother with this on VMS
       CALL PSX_UNAME( SYSNAME, NODENAME, RELEASE, VERSION, MACHINE,
      :                STATUS )
       IF ( (INDEX(SYSNAME,'VMS').EQ.0) .AND.
      :     (INDEX(SYSNAME,'vms').EQ.0) ) THEN
 
-*    Get length of filename
+*    Make local copy of file
+        LFILE = FNAME
         FLEN = CHR_LEN(FNAME)
+        LFILE(FLEN+1:FLEN+1) = '~'
 
 *    Does file exist?
         INQUIRE( FILE=FNAME(:FLEN), EXIST=THERE )
         IF ( THERE ) THEN
 
 *      Does a backup file already exist?
-          INQUIRE( FILE=FNAME(:FLEN)//'~', EXIST=THERE )
+          INQUIRE( FILE=LFILE(:FLEN+1), EXIST=THERE )
 
 *      If so, delete it
           IF ( THERE ) THEN
-            CALL UTIL_DELETE( FNAME(:FLEN)//'~', STATUS )
+            CALL UTIL_DELETE( LFILE(:FLEN+1), STATUS )
           END IF
 
 *      Rename old file
-          CALL UTIL_RENAME( FNAME(:FLEN), FNAME(:FLEN)//'~', STATUS )
+          CALL UTIL_RENAME( LFILE(:FLEN), LFILE(:FLEN+1), STATUS )
 
         END IF
 
