@@ -1,5 +1,13 @@
 2000-10-27  Tim Jenness  <timj@jach.hawaii.edu>
 
+	* sculib/sculib_skydip_temperatures.F
+	(SCULIB_SKYDIP_TEMPERATURES): Check return value of SCULIB_JNU
+
+	* sculib/sculib_calc_skydip_temps.f (SCULIB_CALC_SKYDIP_TEMPS):
+	Initialise T_HOT array
+
+	* sculib/sculib_jnu.f (SCULIB_JNU): Trap division by zero
+
 	* src/makefile (ADAMLIBS): Add -L/star/lib
 
 	* src/surf_link_adam: Remove explicit -L/star/lib to prevent clash

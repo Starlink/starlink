@@ -15,7 +15,8 @@
 *           exp(X) - 1                    k * T
 *
 *     If the absolute value of X is less than 1e-4 JNU = T, or if the absolute
-*     value of X is greater than 20 JNU = 0.
+*     value of X is greater than 20 JNU = 0. JNU is also zero if
+*     KT is close to zero (to prevent division by zero errors)
 
 *  Invocation:
 *     JNU = SCULIB_JNU (NU, T, STATUS)
@@ -84,6 +85,7 @@
 
 *  Local variables:
       REAL X
+      REAL KT
 
 *  Internal References:
 
@@ -97,7 +99,17 @@
 *     Now we can return safely if status is bad
       IF (STATUS .NE. SAI__OK) RETURN
 
-      X = (H * NU) / (K * T)
+*     Calculate denominator
+      KT = K * T
+
+*     If denominator is almost zero (< 1E-99) then JNU is 0
+      IF (KT .LT. 1E-32) THEN
+         SCULIB_JNU = 0.0
+         RETURN
+      END IF
+
+*     Calculate exponent
+      X = (H * NU) / KT
 
       IF (ABS(X) .LT. 1.0E-4) THEN
          SCULIB_JNU = T

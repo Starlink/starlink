@@ -100,6 +100,9 @@
 *     1997 March 21 (TIMJ)
 *        Original version
 *     $Log$
+*     Revision 1.8  2000/10/28 03:06:27  timj
+*     Catch division by zero error in SCULIB_JNU
+*
 *     Revision 1.7  2000/06/16 01:26:30  timj
 *     - Correct for new format SCULIB_GET_MJD
 *     - Correct < to .LT. typo
@@ -207,6 +210,14 @@
 *     First need to find out the wavelengths and sub-instrument name
 
       N_SUB = N_BOLS
+
+*     Initialise T_HOT and T_COLD so that we can track errors
+*     The zero will deliberately cause error lower down when converted
+*     to J temp if not trapped
+      DO I = 1, N_SUB
+         T_HOT(N_SUB) = 0.0
+         T_COLD(N_SUB) = 0.0
+      END DO
 
 *     Get the instrument name
       CALL SCULIB_GET_FITS_C( N_FITS, N_FITS, FITS,
