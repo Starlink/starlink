@@ -186,7 +186,8 @@
 *    Scalar object?
         IF ( SCALAR ) THEN
 
-*      Create HDSfile object]
+*      Create HDSfile object
+          CALL ADI_INIT( STATUS )
           CALL ADI1_MKFILE( TLOC, 'READ', TFID, STATUS )
 
 *      Link to requested data class object

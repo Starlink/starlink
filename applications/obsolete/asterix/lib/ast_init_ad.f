@@ -11,7 +11,11 @@
       INCLUDE 'SAE_PAR'
 *    Local Constants :
 *    Local variables :
+       INTEGER STATUS
 *-
+
+      STATUS = SAI__OK
+      CALL ADI_INIT( STATUS )
 
 *    Initialize USI_CMN
       CALL USI_INIT()
