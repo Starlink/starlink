@@ -183,9 +183,9 @@
 
 *  Otherwise if number of elements differ we report an error
       ELSE IF ( ENELM .NE. NELM ) THEN
-        STATUS = SAI__ERROR
         CALL ADI_NAME( PSID, ITEM, STATUS )
         CALL MSG_SETC( 'IT', ITEM )
+        STATUS = SAI__ERROR
         CALL ERR_REP( ' ', 'The dimensions of item ^IT differ '/
      :                /'from those expected - check the program '/
      :                /'which created this file', STATUS )
