@@ -19,36 +19,8 @@
 *  Psf system initialised
       LOGICAL                   PSFAUTO                 ! Automatic mode
 
-*  Spatial model
-      LOGICAL		        SM_SIZEDEF(PSF_NMAX) 	! Model extent defined?
-      INTEGER                   SM_NX(PSF_NMAX)   	! Model extent
-      INTEGER                   SM_NY(PSF_NMAX)   	! Model extent
-      INTEGER                   SM_NELM(PSF_NMAX) 	! Product of NX and NY
-      LOGICAL		        SM_GOTDATA(PSF_NMAX) 	! DATA allocated yet?
-      INTEGER                   SM_DATA(PSF_NMAX) 	! The model psf ptr
-      INTEGER                   SM_FLAG(PSF_NMAX) 	! The model psf flag array
-      INTEGER                   SM_TYPE(PSF_NMAX) 	! The model type
-      INTEGER                   SM_NMOD(PSF_NMAX) 	! # model psfs in DATA
-      INTEGER                   SM_P_NA(PSF_NMAX)	! Polar pars
-      INTEGER                   SM_P_NR(PSF_NMAX)	!   "    "
-      LOGICAL		        SM_P_REG(PSF_NMAX)	!   "    "
-      REAL		        SM_P_DR(PSF_NMAX)	!   "    "
-      REAL		        SM_P_RUP(PGRID_MAXR,    !   "    "
-     :                                 PSF_NMAX)
-      INTEGER                   SM_R_NX(PSF_NMAX)	! Rectangular pars
-      INTEGER                   SM_R_NY(PSF_NMAX)	!      "       "
-      REAL		        SM_R_DX(PSF_NMAX)	!      "       "
-      REAL		        SM_R_DY(PSF_NMAX)	!      "       "
-
 *  Psf list
       INTEGER			P_PLIST			! ADI structure
 
 *  Non-character common block
-      COMMON /PSF_CMN/
-     :          SM_SIZEDEF, SM_NX, SM_NY,  		! Spatial model
-     :            SM_NELM, SM_GOTDATA, SM_DATA,
-     :            SM_FLAG, SM_TYPE, SM_NMOD,
-     :            SM_P_NA, SM_P_NR, SM_P_REG,
-     :            SM_P_DR, SM_P_RUP, SM_R_NX,
-     :            SM_R_NY, SM_R_DX, SM_R_DY,
-     :          PSFAUTO
+      COMMON /PSF_CMN/ P_PLIST, PSFAUTO
