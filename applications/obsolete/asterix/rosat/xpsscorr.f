@@ -663,10 +663,10 @@
         CNT=0
 
 *      Trap case where point doesn't lie on exposure image
-        IF ( (XPIX+PIXRAD) .LT. 1 ) .OR.
-     :       (XPIX-PIXRAD) .GT. EDIM1 ) .OR.
-     :       (YPIX+PIXRAD) .LT. 1 ) .OR.
-     :       (YPIX-PIXRAD) .GT. EDIM2 ) ) THEN
+        IF ( ( (XPIX+PIXRAD) .LT. 1 ) .OR.
+     :       ( (XPIX-PIXRAD) .GT. EDIM1 ) .OR.
+     :       ( (YPIX+PIXRAD) .LT. 1 ) .OR.
+     :       ( (YPIX-PIXRAD) .GT. EDIM2 ) ) THEN
           CALL MSG_SETI( 'N', SLP )
           CALL MSG_PRNT( 'Warning, source ^N does not lie on'/
      :                   /' exposure map' )
