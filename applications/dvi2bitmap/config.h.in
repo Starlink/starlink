@@ -33,9 +33,16 @@
    here. */
 #undef __USE_STD_IOSTREAM
 
-/* Define as 1 if you want to enable use of the kpathsea library.  The
-   following options have an effect only if this is enabled. */
+/* Define as 1 if you want to enable use of the kpathsea library for
+   font-searching.  The font _generation_ programs (usually) use this
+   library when they work their magic, but that's entirely separate,
+   and controlled only by ENABLE_FONT_GEN.  */
 #define ENABLE_KPATHSEA 0
+
+/* Define ENABLE_FONT_GEN to be 1 if you wish fonts to be generated
+   automatically.  One of MKTEXPK or MAKETEXPK must additionally be
+   defined, before font-generation will happen. */
+#define ENABLE_FONT_GEN 0
 
 /* Define MKTEXPK to be the path to the mktexpk program, or some other
    program with the same interface.  Leave undefined if not known, not
@@ -49,11 +56,6 @@
    known, not available, or we should not use it.  The mktexpk program
    is newer (I think), and should be used in preference. */
 #undef MAKETEXPK
-
-/* Define ENABLE_FONT_GEN to be 1 if you wish fonts to be generated
-   automatically.  This works only if the use of the kpathsea library
-   is enabled. */
-#define ENABLE_FONT_GEN 0
 
 /* Define DEFAULT_MFMODE and DEFAULT_RESOLUTION to be the default
    Metafont mode and resolution which should be used when generating
@@ -70,7 +72,9 @@
    not necessary to set this if the program will be installed
    alongside the other dvi-ware (if they use kpathsea), since the
    kpathsea library can find its own configuration file relative to
-   that location. */
+   that location.  This affects only the kpathsea font-searching parts
+   of this program (and so has an effect only if ENABLE_KPATHSEA is
+   1), and does not affect font-generation. */
 #undef DEFAULT_TEXMFCNF
 
 /* The texmf.cnf file uses the value of variables SELFAUTO..., and
@@ -81,5 +85,5 @@
    dvi-ware binaries.  If you have such a configuration file, and you
    can't or don't want to install the program with the other dvi-ware,
    then you can define this variable to the location of a binary that
-   is in the `correct' place. */
+   is in the `correct' place.  Has an effect only if ENABLE_KPATHSEA is 1. */
 #undef FAKE_PROGNAME

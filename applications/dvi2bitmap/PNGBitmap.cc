@@ -87,6 +87,10 @@ void PNGBitmap::write (const string filename)
 	    throw BitmapError ("Can't create PNG info_ptr");
 	}
 
+	// Call png_set_write_user_transform_fn to install a function
+	// to invert the greyscale on output.  This function is not
+	// present in libpng 0.96 -- should I work around this or just
+	// require newer versions?
 	png_set_write_user_transform_fn (png_ptr_, &png_invert_greyscale);
 
 	/* not needed since I use custom error functions above

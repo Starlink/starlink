@@ -106,8 +106,25 @@ AC_ARG_ENABLE(texmfcnf,
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"))
 fi
 
-dnl   --enable-mktexpk.  See also --enable-fontgen
-if $usekpse; then
+dnl   Do we enable automatic font-generation?
+dnl   If kpathsea is enabled, then the default is yes, otherwise no.
+AC_ARG_ENABLE(fontgen,
+[  --enable-fontgen[=mode,res]
+                          Enable automatic font gen., opt. giving mode,res],
+  if test "$enableval" = "yes"
+    then AC_DEFINE(ENABLE_FONT_GEN,1)
+  elif test "$enableval" = "no"
+    then AC_DEFINE(ENABLE_FONT_GEN,0)
+  else
+    [eval `echo $enableval | awk -F, '{printf "GENMODE=%s GENRES=%s",$1,$2}'`]
+    AC_DEFINE(ENABLE_FONT_GEN,1)
+    AC_DEFINE_UNQUOTED(DEFAULT_MFMODE,"$GENMODE")
+    test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,$GENRES)
+  fi,
+  $usekpse && AC_DEFINE(ENABLE_FONT_GEN,1))
+
+dnl   --enable-mktexpk.  See also --enable-fontgen.  If
+dnl   ENABLE_FONT_GEN is not set then these values will not be used.
 AC_PATH_PROG(MKTEXPK_PATH, mktexpk)
 AC_ARG_ENABLE(mktexpk,
 [  --enable-mktexpk[=prog] Enable mktexpk (default), giving optional program],
@@ -118,10 +135,8 @@ AC_ARG_ENABLE(mktexpk,
   fi
   test -n "$MKTEXPK_PATH" && AC_DEFINE_UNQUOTED(MKTEXPK, "${MKTEXPK_PATH}"),
   test -n "$MKTEXPK_PATH" && AC_DEFINE_UNQUOTED(MKTEXPK, "${MKTEXPK_PATH}"))
-fi
 
 dnl   Use MakeTeXPK.  Don't use this if mktexpk was found
-if $usekpse; then
 AC_PATH_PROG(MAKETEXPK_PATH, MakeTeXPK)
 AC_ARG_ENABLE(maketexpk,
 [  --enable-maketexpk[=prog] Enable MakeTeXPK, giving optional alternative],
@@ -132,7 +147,6 @@ AC_ARG_ENABLE(maketexpk,
   fi
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"),
   test -z "$MKTEXPK_PATH" && test -n "MAKETEXPK_PATH" && AC_DEFINE_UNQUOTED(MAKETEXPK, "${MAKETEXPK_PATH}"))
-fi
 
 dnl   Do we want to use the fake_progname feature in kpathsea.cc?
 if $usekpse; then
@@ -147,34 +161,18 @@ AC_ARG_ENABLE(fake-progname,
   fi)
 fi
 
-dnl   Do we enable automatic font-generation?
-if $usekpse; then
-AC_ARG_ENABLE(fontgen,
-[  --enable-fontgen[=mode,res]
-                          Enable automatic font gen., opt. giving mode,res],
-  if test "$enableval" = "yes"
-    then AC_DEFINE(ENABLE_FONT_GEN,1)
-  elif test "$enableval" = "no"
-    then AC_DEFINE(ENABLE_FONT_GEN,0)
-  else
-    [eval `echo $enableval | awk -F, '{printf "GENMODE=%s GENRES=%s",$1,$2}'`]
-    AC_DEFINE(ENABLE_FONT_GEN,1)
-    AC_DEFINE_UNQUOTED(DEFAULT_MFMODE,"$GENMODE")
-    test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,$GENRES)
-  fi,
-  AC_DEFINE(ENABLE_FONT_GEN,1))
-fi
-
-dnl   Specify support for PNG output
+dnl   Specify support for PNG output.  We need a PNG library which has
+dnl   the function png_set_write_user_transform_fn (which means later
+dnl   than version 0.96)
 AC_SUBST(PNGOBJ)
 AC_ARG_ENABLE(png,
 [  --enable-png            Enable output of PNG files],
   AC_CHECK_HEADER(png.h,
-    AC_CHECK_LIB(png, png_check_sig,
+    AC_CHECK_LIB(png, png_set_write_user_transform_fn,
         AC_DEFINE(ENABLE_PNG)
         PNGOBJ="PNGBitmap.o"
         LIBS="$LIBS -lpng -lz",
-      echo "png library not found -- not including PNG support",
+      echo "png library not found, or too old -- not including PNG support",
       -lz)))
 
 dnl   Specify support for GIF output

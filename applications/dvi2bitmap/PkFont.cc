@@ -119,12 +119,14 @@ PkFont::PkFont(unsigned int dvimag,
 		// try again...
 		got_path = find_font (pk_file_path);
 		if (! got_path)
-		    throw InputByteStreamError ("can't make font file");
+		    throw InputByteStreamError ("tried but failed to make font");
 	    }
 	    else
-		throw InputByteStreamError ("can't find font file");
+		throw InputByteStreamError
+		    ("can't find font file, and instructed not to mke fonts");
 #else
-	    throw InputByteStreamError ("can't find font file");
+	    throw InputByteStreamError
+		("can't find font file, and don't know how to make fonts");
 #endif
 	}
 	path_ = pk_file_path;
