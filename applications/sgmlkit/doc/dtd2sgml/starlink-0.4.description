@@ -277,6 +277,8 @@ worthwhile including a reference to such a `source' format, since the
 declaration will help keep the source for a figure associated with its
 result.  If there are other formats you think should be declared here,
 please do suggest them.
+<p>For an example, see the documentation for the <elemref
+gi=figurecontent> element.
 <attribute name='id'>
 <p>An ID which may be used to refer to this figure in references.
 <attribute name='export'>
@@ -473,7 +475,7 @@ font.
 
 <element gi='meqnarray'>
 <p>Displayed maths equation.  It consists of a sequence of <elemref
-id=mline> elements, each of which is a line of a LaTeX
+gi=mline> elements, each of which is a line of a LaTeX
 <code/\\begin{eqnarray}...\\end{eqnarray}/ environment, and which
 must, therefore, have two ampersands within it.
 
