@@ -42,6 +42,11 @@ presumably because that was generated using a _slightly_ different
 version of makeinfo.  It seems best, therefore, to remake m4.info from
 scratch (cd doc;rm m4.info; make m4.info).
 
+Finally, be careful to commit the regenerated ./configure AFTER
+committing the other changes.  This means that the committed configure
+will have a later timestamp, in the repository, than the other files,
+so it won't be spuriously regenerated after a checkout.
+
 The problem is as follows:
 When m4 is being built as part of the Starlink build system, it is
 built in a context which does not have any of the autotools available,
@@ -51,7 +56,6 @@ in, therefore, must be checked out in such a way that stamp-h.in is no
 older than configure.in, aclocal.m4 and acconfig.h, and configure no
 older than configure.in and aclocal.m4.  Note that CVS appears to use
 the one-second-resolution _commit_ time as a timestamp in the
-repository.  What's currently in the repository (2005 January 26)
+repository.  What's currently in the repository (2005 February 11)
 appears to work, but it would be nice to feel this was less fragile.
 
-Perhaps update these instructions when this is next updated.
