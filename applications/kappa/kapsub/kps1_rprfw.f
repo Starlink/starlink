@@ -6,7 +6,7 @@
      :                        GAMMA, STATUS )
 *+
 *  Name:
-*     KPS1_RPRFx
+*     KPS1_RPRFW
 
 *  Purpose:
 *     Fits a radial profile to a set of star images.
@@ -15,7 +15,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_RPRFx( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
+*     CALL KPS1_RPRFW( DIM1, DIM2, ARRAY, LBND, SIG0, AXISR, THETA,
 *                      RANGE, GAUSS, NXY, POS, WT, RSCALE, RSCL2, NBIN1,
 *                      NBIN2, BINPTS, DMODE, R, LSTART, NPTS, DATA,
 *                      IADR, NXTADR, PROFIL, PROFR, PROFWT, FWHM, AMP,
@@ -32,9 +32,9 @@
 *        The number of pixels per line of the array.
 *     DIM2 = INTEGER (Given)
 *        The number of lines in the array.
-*     ARRAY( DIM1, DIM2 ) = ? (Given)
+*     ARRAY( DIM1, DIM2 ) = INTEGER*2 (Given)
 *        The input array in which the star images lie.
-*     LBND( 2 ) = ? (Given)
+*     LBND( 2 ) = INTEGER (Given)
 *        The lower bounds of the input array.
 *     SIG0 = REAL (Given)
 *        The star 'sigma' across the minor axis.
@@ -51,7 +51,7 @@
 *        2; in other words the best-fitting two-dimensional Gaussian is
 *        evaluated.  If .FALSE., gamma is a free parameter of the fit,
 *        and the derived value is returned in argument GAMMA.
-*     POS( 2, NXY ) = REAL (Given)
+*     POS( NXY, 2 ) = DOUBLE PRECISION (Given)
 *        Each line comprises the accurate x then y positions of a 
 *        star centre.
 *     NXY = INTEGER (Given)
@@ -108,26 +108,13 @@
 *        The global status.
 
 *  Notes:
-*     -  There is a routine for each numeric data type: replace "x" in
-*     the routine name by D, R, I, W, UW, B, UB as appropriate.  The
-*     arrays ARRAY and DATA supplied to the routine must have the data
-*     type specified.
-*     -  This is a server routine for PSF via KPS1_SPARMx.
-
-*  Algorithm:
-*     -  For each star, put the data into bins representing isophotal
-*     zones, allowing for image ellipticity.
-*     -  Form a linked list of all the pixels in each zone, then process
-*     the contents of each zone using the mode to reject erroneous data.
-*     -  Fit a Gaussian to each binned star and normalise the data to
-*     unit central amplitude.
-*     -  Put the normalised data into a set of bins filled with data
-*     for all stars.  Fit a radial profile to these combined data.
-*     -  Print the results.
+*     -  There is a routine for each numeric data type. The arrays ARRAY 
+*     and DATA supplied to the routine must have the data type specified.
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -150,6 +137,8 @@
 *     1998 May 26 (MJC):
 *        Added GAUSS argument.  Used modern style of variable ordering.
 *        Flipped the order of NXY and POS.
+*     20-SEP-1999 (DSB):
+*        Swapped order of POS indices and made it _DOUBLE for use with AST.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -175,7 +164,7 @@
       REAL RANGE
       LOGICAL GAUSS
       INTEGER NXY
-      REAL POS( 2, NXY )
+      DOUBLE PRECISION POS( NXY, 2 )
       REAL WT( NXY )
       REAL RSCALE
       REAL RSCL2
@@ -318,8 +307,8 @@
 *  bounds which are both one, but the positions may not.  Therefore
 *  correct the positions to what they would be given lower bounds of
 *  one.
-            XC = POS( 1,  STAR ) - REAL( LBND( 1 ) - 1 )
-            YC = POS( 2,  STAR ) - REAL( LBND( 2 ) - 1 )
+            XC = REAL( POS( STAR, 1 ) ) - REAL( LBND( 1 ) - 1 )
+            YC = REAL( POS( STAR, 2 ) ) - REAL( LBND( 2 ) - 1 )
         
             I0 = NINT( MIN( MAX( -1.0E8, XC ), 1.0E8 ) )
             J0 = NINT( MIN( MAX( -1.0E8, YC ), 1.0E8 ) )

@@ -2,7 +2,7 @@
      :                         SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
 *+
 *  Name:
-*     KPS1_STPAx
+*     KPS1_STPAW
  
 *  Purpose:
 *     Finds the mean axis ratio, seeing disk size and orientation
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPS1_STPAx( DIM1, DIM2, ARRAY, LBND, NXY, ISIZE, POS,
+*     CALL KPS1_STPAW( DIM1, DIM2, ARRAY, LBND, NXY, ISIZE, POS,
 *    :                 SIG0, AXISR, THETA, NGOOD, SIG, STATUS )
  
 *  Description:
@@ -46,7 +46,7 @@
 *     ISIZE = INTEGER (Given)
 *        The length of the search square side used in finding stars
 *        and calculating their ellipticity.
-*     POS( 2, NXY ) = REAL (Given & Returned)
+*     POS( NXY, 2 ) = DOUBLE PRECISION (Given & Returned)
 *        Each line comprises the x then y positions of a star centre.
 *        On entry these are approximate centroids.  On exit they are
 *        accurate, fitted centroids.
@@ -79,6 +79,7 @@
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Durham Univ.)
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
  
 *  History:
@@ -94,6 +95,8 @@
 *        Reordered the ARRAY argument to its normal location after the
 *        dimensions.  Added LBND argument and corrected the x-y
 *        positions as if the lower bounds were both one.
+*     20-SEP-1999 (DSB):
+*        Reversed order of POS indices and made it _DOUBLE for use with AST.
 *     {enter_further_changes_here}
  
 *  Bugs:
@@ -118,8 +121,8 @@
       INTEGER*2
      :  ARRAY( DIM1, DIM2 )
  
-      REAL
-     :  POS( 2, NXY )
+      DOUBLE PRECISION
+     :  POS( NXY, 2 )
  
 *  Arguments Returned:
       REAL
@@ -235,8 +238,8 @@
 *       positions may not.  Therefore correct the positions to what they
 *       would be given lower bounds of one.
  
-         X = POS( 1,  STAR ) - REAL( LBND( 1 ) - 1 )
-         Y = POS( 2,  STAR ) - REAL( LBND( 2 ) - 1 )
+         X = REAL( POS( STAR, 1 ) ) - REAL( LBND( 1 ) - 1 )
+         Y = REAL( POS( STAR, 2 ) ) - REAL( LBND( 2 ) - 1 )
  
 *       Perform the iterations, each time centering the search area on
 *       the previous estimate of the star centre.
@@ -281,7 +284,7 @@
  
 *                     If the pixel is valid, find the p,q coordinates.
  
-                        IF ( ARRAY( I, J ) .NE. VAL__BADW ) THEN
+                        IF ( ARRAY( I, J ) .NE. VAL__BADI ) THEN
                            BINP = BINI + BINJ
                            BINQ = BINJ - BINI
  
@@ -411,13 +414,13 @@
  
             SIGP = 0.7071068 * SIGP
             SIGQ = 0.7071068 * SIGQ
-            POS( 1, STAR ) = X + REAL( LBND( 1 ) - 1 )
-            POS( 2, STAR ) = Y + REAL( LBND( 2 ) - 1 )
-            SIG( STAR, 1 ) = SIGX
-            SIG( STAR, 2 ) = SIGP
-            SIG( STAR, 3 ) = SIGY
-            SIG( STAR, 4 ) = SIGQ
-            SIG( STAR, 5 ) = AP + AQ + AX + AY
+            POS( STAR, 1 ) = DBLE( X ) + DBLE( LBND( 1 ) - 1 )
+            POS( STAR, 2 ) = DBLE( Y ) + DBLE( LBND( 2 ) - 1 ) 
+            SIG( STAR, 1 ) = SIGX 
+            SIG( STAR, 2 ) = SIGP 
+            SIG( STAR, 3 ) = SIGY 
+            SIG( STAR, 4 ) = SIGQ 
+            SIG( STAR, 5 ) = AP + AQ + AX + AY 
  
 *          If the centre was not found successfully, record the
 *          weight as zero.

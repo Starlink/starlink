@@ -773,7 +773,8 @@ kps1_cpbb.f kps1_cpbuw.f kps1_cpbub.f kps1_curfm.f kps1_cenab.f \
 kps1_cenad.f kps1_cenai.f kps1_cenar.f kps1_cenaub.f kps1_cenauw.f \
 kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f kps1_censg.f kps1_censh.f \
 kps1_mlpcp.f kps1_mlpcv.f kps1_mlpfs.f kps1_mlpky.f kps1_mlplb.f \
-kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f
+kps1_mlpml.f kps1_mlpmp.f kps1_mlpnd.f kps1_mlpng.f kps1_mlppn.f \
+kps1_elmap.f kps1_pswcs.f
 
 MEM_F_ROUTINES = 
 

@@ -1,19 +1,18 @@
-      SUBROUTINE KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, DIM1, DIM2,
-     :                       ARRAY, STATUS )
+      SUBROUTINE KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND1, UBND1,
+     :                       LBND2, UBND2, ARRAY, STATUS )
 *+
 *  Name:
 *     KPS1_PSEVL
 
 *  Purpose:
-*     Finds the dimensions of a 2-d point-spread function array to a
-*     given threshold.
+*     Evaluates a model 2-d point-spread function over an array.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, DIM1, DIM2, ARRAY,
-*                      STATUS )
+*     CALL KPS1_PSEVL( AXISR, THETA, FWHM, GAMMA, LBND1, UBND1,
+*                      LBND2, UBND2, ARRAY, STATUS )
 
 *  Description:
 *     This routine evaluates within an array a point-spread function
@@ -23,7 +22,7 @@
 *     centre allowing for image ellipticity, sigma is the Gaussian
 *     precision constant or profile width.  The point-spread function
 *     may be oriented at an arbitrary angle.  The centre of the
-*     point-spread function is at the centre of the array.
+*     point-spread function is at pixel co-ordinates (0.0,0.0).
 
 *  Arguments:
 *     AXISR = REAL (Given)
@@ -36,21 +35,22 @@
 *        the minor-axis direction.
 *     GAMMA = REAL (Given)
 *        The exponent in the radial point-spread function.
-*     DIM1 = INTEGER (Given)
-*        The first dimension of the array to be filled.  It should be
-*        odd numbered.
-*     DIM2 = INTEGER (Given)
-*        The second dimension of the array to be filled.  It should be
-*        odd numbered.
-*     ARRAY( DIM1, DIM2 ) = REAL (Returned)
+*     LBND1 = INTEGER (Given)
+*        The lower bound on the first pixel axis.
+*     UBND1 = INTEGER (Given)
+*        The upper bound on the first pixel axis. 
+*     LBND2 = INTEGER (Given)
+*        The lower bound on the second pixel axis.
+*     UBND2 = INTEGER (Given)
+*        The upper bound on the second pixel axis.
+*     ARRAY( LBND1 : UBND1, LBND2 : UBND2 ) = REAL (Returned)
 *        The point spread function evaluated at each element.
-*        The centre of the PSF is within the central element.
 *     STATUS = INTEGER (Given)
 *        The global status.
 
-*  [optional_subroutine_items]...
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
+*     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -59,6 +59,8 @@
 *     1995 April 5 (MJC):
 *        Used the modern style of variable declaration and comment
 *        indentation.
+*     21-SEP-1999 (DSB):
+*        Re-written to put PSF centre at pixel co-ords (0.0,0.0).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -71,19 +73,19 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'PRM_PAR'          ! PRIMDAT public constants
 
 *  Arguments Given:
       REAL AXISR
       REAL FWHM
       REAL GAMMA
       REAL THETA
-
-      INTEGER DIM1
-      INTEGER DIM2
+      INTEGER LBND1
+      INTEGER UBND1
+      INTEGER LBND2
+      INTEGER UBND2
 
 *  Arguments Returned:
-      REAL ARRAY( DIM1, DIM2 )
+      REAL ARRAY( LBND1:UBND1, LBND2:UBND2 )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -102,16 +104,10 @@
       REAL PSI                   ! Angle of pixel with respect to the
                                  ! centre of the PSF and x direction
       REAL RAD                   ! Distance from the centre of the PSF
-      REAL RADSQ                 ! Squared distance from the centre of
-                                 ! the PSF
       REAL SIGMA                 ! The Gaussian width along the minor
                                  ! axis
-      INTEGER XC                 ! X centre of the array
-      INTEGER XD                 ! X distance of pixel from the centre
-                                 ! of the array
-      INTEGER YC                 ! Y centre of the array
-      INTEGER YD                 ! Y distance of pixel from the centre
-                                 ! of the array
+      REAL XD                    ! X distance from PSF centre to pixel centre
+      REAL YD                    ! Y distance from PSF centre to pixel centre
 *.
 
 *  Check the inherited global status.
@@ -120,64 +116,47 @@
 *  Convert from FWHM to sigma.
       SIGMA = ( 0.5 * FWHM ) / 1.38629 ** ( 1.0 / GAMMA )
 
-*  Find the central pixel.
-      XC = DIM1 / 2 + 1
-      YC = DIM2 / 2 + 1
+*  Loop for each line.
+      DO J = LBND2, UBND2
 
-*  Loop for each line to the centre.  The remaining lines are filled
-*  by symmetry.
-      DO J = 1, YC
-
-*  Find the relative position with respect to the centre of the array
-*  in y.
-         YD = YC - J
+*  Find the pixel co-ordinate at the centre of this line.
+         YD = REAL( J ) - 0.5
 
 *  Loop for each pixel.
-         DO I = 1, DIM1
+         DO I = LBND1, UBND1
 
-*  Find the relative position with respect to the centre of the array
-*  in x.
-            XD = XC - I
+*  Find the pixel co-ordinate at the centre of this line.
+            XD = REAL( I ) - 0.5
 
-*  Find the squared distance from the centre of the PSF.
-            RADSQ = REAL( XD * XD +  YD * YD )
+*  Find the distance from the centre of the PSF to the centre of
+*  this pixel.
+            RAD = SQRT( XD * XD +  YD * YD )
 
-*  If we are at the centre the pixel value is by definition 1.
-            IF ( RADSQ .LT. VAL__SMLR ) THEN
-               ARRAY( I, J ) = 1.0
-            ELSE
-
-*  It is now safe to find the radius in polar co-ordinates.
-               RAD = SQRT( RADSQ )
-
-*  Compute the co-ordinate angle with respect to the centre
-               PSI = ATAN2( REAL( YD ), REAL( XD ) )
+*  Compute the co-ordinate angle with respect to the centre. Since the 
+*  centre of the PSF is at the corner of a pixel (bottom left of
+*  pixel (1,1) - i.e. pixel co-ords (0.0,0.0) ) the radial distance
+*  from the PSF centre to the centre of the current pixel can never be 
+*  zero. Therefore we do not need to check this.
+            PSI = ATAN2( YD, XD )
 
 *  The polar angular co-ordinate is the difference between the apparent
 *  angle and the orientation of the major axis of the point-spread
 *  function.
-               PHI = PSI - THETA
+            PHI = PSI - THETA
 
 *  Form the components along the major and minor axes.
-               MAJOR = ABS( RAD * COS( PHI ) )
-               MINOR = ABS( RAD * SIN( PHI ) )
+            MAJOR = ABS( RAD * COS( PHI ) )
+            MINOR = ABS( RAD * SIN( PHI ) )
 
 *  Evaluate the PSF function allowing for the difference sigma along
 *  the major axis.
-               ARRAY( I, J ) = EXP( -0.5 * ( MINOR /
-     :                         MAX( 0.001, SIGMA ) ) ** GAMMA ) *
-     :                         EXP( -0.5 * ( MAJOR / AXISR /
-     :                         MAX( 0.001, SIGMA ) ) ** GAMMA )
+            ARRAY( I, J ) = EXP( -0.5 * ( MINOR /
+     :                      MAX( 0.001, SIGMA ) ) ** GAMMA ) *
+     :                      EXP( -0.5 * ( MAJOR / AXISR /
+     :                      MAX( 0.001, SIGMA ) ) ** GAMMA )
 
-*  Due to the symmetry the other pixel with the same value may be
-*  assigned, thereby improving efficiency.  For the last line these
-*  will be determined in full in order to make the algorithm easier to
-*  follow.
-               IF ( J .LT. YC ) THEN
-                  ARRAY( XC + XD, YC + YD ) = ARRAY( I, J )
-               END IF
-            END IF
          END DO
+
       END DO
 
       END
