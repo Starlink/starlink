@@ -1,5 +1,5 @@
       SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, 
-     :                       KDATA, UNITS, JUST, STATUS )
+     :                       KDATA, UNITS, JUST, HGTFAC, STATUS )
 *+
 *  Name:
 *     POL1_VECKY
@@ -12,7 +12,7 @@
 
 *  Invocation:
 *     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS, 
-*                      JUST, STATUS )
+*                      JUST, HGTFAC, STATUS )
 
 *  Description:
 *     The key consists of a text string describing the scale in terms
@@ -54,6 +54,9 @@
 *        'START' causes vectors to be drawn starting at the
 *        corresponding pixel.  'END' causes vectors to be drawn ending
 *        at the corresponding pixel.
+*     HGTFAC = REAL (Given)
+*        The PGPLOT text height scaling factor corresponding to an keystyle
+*        Size attribute value of 1.0.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -103,6 +106,7 @@
       REAL KEYOFF
       CHARACTER * ( * ) UNITS
       CHARACTER * ( * ) JUST
+      REAL HGTFAC
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -111,26 +115,17 @@
       INTEGER CHR_LEN            ! Used length of a string.
 
 *  Local Constants:
-      REAL AR                    ! A `normal' text aspect ratio
-      PARAMETER ( AR = 0.66667 )
-
       REAL CIRAD                 ! Radius of circle marking vector posn.
       PARAMETER ( CIRAD = 0.015 )
 
       REAL DTOR                  ! Degress-to-radians conversion factor
       PARAMETER ( DTOR = 1.7453293E-2 )
 
-      REAL TXTHGT                ! Nominal text height
-      PARAMETER ( TXTHGT = 0.025 )
-
       REAL VECMAX                ! Max. vector len. as fraction of picture width
       PARAMETER ( VECMAX = 0.8 )
 
       REAL VECMIN                ! Min. vector len. as fraction of picture width
       PARAMETER ( VECMIN = 0.4 )
-
-      REAL XWIDTH                ! Max. text length as fraction of picture 
-      PARAMETER ( XWIDTH = 0.9 ) ! width
 
 *  Local Variables:
       CHARACTER KEYTXT*80        ! Text describing the key vector
@@ -144,7 +139,8 @@
       INTEGER VSCNC              ! Significant length of VSCTXT
       REAL AHSIZE                ! Arrowhead size in world coordinates
       REAL BASE                  ! Power of ten just less than KEYDAT
-      REAL HGT                   ! Height for key text
+      REAL GAP                   ! Vertical spacing factor
+      REAL HGT                   ! Character height in world co-ordinates
       REAL KEYDAT                ! Data value for key vector
       REAL KEYLEN                ! Vector length in centimetres
       REAL RADIUS                ! Used radius of the circle
@@ -263,14 +259,17 @@
 *  Find the maximum number of characters per line in the key.
       MAXNC = MAX( 13, KEYNC, VSCNC )
 
-*  A text height equal to a fixed fraction of the vertical size of the
-*  picture is used, unless this would result in the text being wider than
-*  XWIDTH of the picture width, in which case a smaller text height is
-*  used. This is a default character height which will be over-ridden if an
-*  explicit character height has been set in the supplied Plot.
-      HGT = MIN( TXTHGT * ( Y2 - Y1 ),
-     :           XWIDTH * ( X2 - X1 ) / ( AR * REAL( MAXNC ) ) )
-      CALL KPG1_PGSHT( HGT, STATUS )
+*  Store the textlabgap value specified by the key style. Use 1.0 if no
+*  value has been specified.
+      IF( AST_TEST( IPLOT, 'TEXTLABGAP', STATUS ) ) THEN
+         GAP = AST_GETR( IPLOT, 'TEXTLABGAP', STATUS )
+      ELSE
+         GAP = 1.0
+      END IF
+
+*  Set the required PGPLOT character height. The actually text height
+*  used will be "Size(strings)" (specified by KEYSTYLE) times this value.
+      CALL PGSCH( HGTFAC )
 
 *  Establish the style requested by the user for text.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTS, STATUS )
@@ -281,12 +280,11 @@
 *  Set the Y world co-ordinate at the top of the key.
       YC = Y1 + KEYOFF*( Y2 - Y1 ) 
 
-*  Produce text describing the vector scale in words.  Left justify
-*  to allow room for the text to spill over the XWIDTH fraction.
+*  Produce text describing the vector scale in words.  Left justify.
       XL = X1 + 0.01 * ( X2 - X1 )
       CALL PGTEXT( XL, YC - 0.5*HGT, 'Vector scale:' )
 
-      YC = YC - 2.0 * HGT
+      YC = YC - GAP * 2.0 * HGT
       CALL PGTEXT( XL, YC - 0.5*HGT, VSCTXT( : VSCNC ) )
 
 *  Find the length of the key vector, in the world co-ordinate system
@@ -306,7 +304,7 @@
 *  indiciating the justification.  Draw the vector justified to the
 *  left, but allowing room for the circle when the justification is
 *  left justified too.
-      YC = YC - 4.0 * HGT
+      YC = YC - GAP * 3.0 * HGT
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
       IF ( JUST .EQ. 'START' ) THEN
@@ -337,7 +335,7 @@
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTS, STATUS )
 
 *  Plot the text below the vector.
-      CALL PGTEXT( XL, YC - 2.0 * HGT, KEYTXT( : KEYNC ) )
+      CALL PGTEXT( XL, YC - GAP * 2.0 * HGT, KEYTXT( : KEYNC ) )
 
 *  Revert to the previous PGPOLOT attribute settings.
       CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTS, STATUS )

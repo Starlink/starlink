@@ -160,17 +160,17 @@ interface POLPLOT
    parameter      KEYPOS         
       type        '_REAL'
       prompt      'Horizontal and vertical position of key'
-      vpath       'DEFAULT'
-      ppath       'DEFAULT'
+      vpath       'CURRENT,DEFAULT'
+      ppath       'CURRENT,DEFAULT'
       helpkey     '*'
-      default     0.03
+      default     0.05
    endparameter
 
    parameter      KEYSTYLE       
       type        'LITERAL'
-      ppath       'DEFAULT'
-      vpath       'DEFAULT'
-      prompt      'Style attributes for the key'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'CURRENT,DEFAULT'
+      prompt      'Plotting style for the key'
       helpkey     '*'
       default     !
    endparameter
@@ -189,6 +189,14 @@ interface POLPLOT
       vpath       'DEFAULT'
       ppath       'DEFAULT'
       default     !
+      helpkey     '*'
+   endparameter
+
+   parameter      MARGIN
+      type        '_REAL'
+      prompt      'Widths of margins around DATA picture'
+      vpath       'DYNAMIC'
+      ppath       'DYNAMIC'
       helpkey     '*'
    endparameter
 
@@ -219,9 +227,9 @@ interface POLPLOT
 
    parameter      STYLE          
       type        'LITERAL'
-      ppath       'DEFAULT'
-      vpath       'DEFAULT'
-      prompt      'Style attributes for vector map'
+      ppath       'CURRENT,DEFAULT'
+      vpath       'CURRENT,DEFAULT'
+      prompt      'Plotting style for the annotated axes and vectors'
       helpkey     '*'
       default     !
    endparameter

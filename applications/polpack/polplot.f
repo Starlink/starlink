@@ -138,28 +138,53 @@
 *        TRUE if a key is to be produced. [TRUE]
 *     KEYPOS() = _REAL (Read)
 *        Two values giving the position of the key. The first value gives 
-*        the gap between the right hand edge of the vector map and the left 
-*        hand edge of the key. The second value gives the vertical position of
-*        the top of the key. If the second value is not given, the top of 
-*        the key is placed level with the top of the vector map. Both
-*        values should be in the range 0.0 to 1.0. [0.03]
+*        the gap between the right hand edge of the contour map and the left 
+*        hand edge of the key (0.0 for no gap, 1.0 for the largest gap). The 
+*        second value gives the vertical position of the top of the key (1.0 
+*        for the highest position, 0.0 for the lowest). If the second value 
+*        is not given, the top of the key is placed level with the top of the 
+*        vector map. Both values should be in the range 0.0 to 1.0. If a
+*        key is produced, then the right hand margin specified by parameter 
+*        MARGIN is ignored. [current value]
 *     KEYSTYLE = GROUP (Read)
-*        The plotting style to use for the key (see parameter KEY). This 
-*        should be a group of comma-separated name=value strings where "name" 
-*        is the name of a Plot attribute and "value" is the value to assign 
-*        to the attribute. The text in the key is drawn as Plot "Strings"
-*        (using attributes COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
-*        TEXT can be used in place of STRINGS). The example vector is drawn 
-*        as a Plot "Curve" (using attributes COLOUR(CURVES), etc - the
-*        synonym VECTOR can be used in place of CURVES). The numerical
-*        scale value is formatted as an axis 1 value (using attributes 
-*        FORMAT(1), DIGITS(1), etc - the synonym SCALE can be used in place 
-*        of the value 1). The length of the example vector is formatted as an
-*        axis 2 value (using attribute FORMAT(2), etc - the synonym VECTOR
-*        can be used in place of the value 2). A null (!) value causes the 
-*        key style used on the previous invocation of POLPLOT to be 
-*        re-used. If no previous key style is available, or if the keyword 
-*        RESET is supplied, then a default key style is used. [!]
+*        A group of attribute settings describing the plotting style to use 
+*        for the key (see parameter KEY). 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the text in the key is controlled using "String" 
+*        attributes (e.g. COLOUR(STRINGS), FONT(STRINGS), etc - the synonym
+*        TEXT can be used in place of STRINGS). The appearance of the example 
+*        vector is controlled using "Curve" attributes (e.g. COLOUR(CURVES), 
+*        etc - the synonym VECTOR can be used in place of CURVES). The
+*        numerical scale value is formatted as an axis 1 value (using 
+*        attributes FORMAT(1), DIGITS(1), etc - the synonym SCALE can be 
+*        used in place of the value 1). The length of the example vector is 
+*        formatted as an axis 2 value (using attribute FORMAT(2), etc - the 
+*        synonym VECTOR can be used in place of the value 2). The vertical 
+*        space between lines in the key can be controlled using attribute
+*        TextLabGap. A value of 1.0 is used if no value is set for this
+*        attribute, and produces default vertical spacing. Values larger
+*        than 1.0 increase the vertical space, and values less than 1.0
+*        decrease the vertical space. [current value] 
 *     KEYVEC = _REAL (Read)
 *        Length of the vector to be displayed in the key, in data units.
 *        A default value is generated based on the spread of vector
@@ -169,6 +194,17 @@
 *        area, in the coordinates system specified by parameters COLX and
 *        COLY. If a null value is supplied then an area is used which just 
 *        encloses all the data in the supplied catalogue. [!]
+*     MARGIN( 4 ) = _REAL (Read)
+*        The widths of the margins to leave around the vector map for axis 
+*        annotation. The widths should be given as fractions of the 
+*        corresponding dimension of the DATA picture. 
+*        The actual margins used may be increased to preserve the aspect 
+*        ratio of the DATA picture. Four values may be given, in the order;
+*        bottom, right, top, left. If fewer than four values are given, 
+*        extra values are used equal to the first supplied value. If these 
+*        margins are too narrow any axis annotation may be clipped. The
+*        dynamic default is 0.18 (for all edges) if annotated axes are being 
+*        produced, and zero otherwise. See also parameter KEYPOS. []
 *     PXSIZE = _REAL (Read)
 *        The length (x axis) of the plot in metres. [Maximum that can
 *        fit in the current picture while preserving square pixels]
@@ -181,16 +217,32 @@
 *        specified by parameter COLANG) are negated before adding on any 
 *        value specified by parameter ANGROT. [FALSE]
 *     STYLE = GROUP (Read)
-*        The plotting style to use for the annotated axes. This should be 
-*        a group of comma-separated name=value strings where "name" is the 
-*        name of a Plot attribute, and "value" is the value to assign to 
-*        the attribute. Vectors are drawn as "Curves" but may also be 
-*        referred to using the synonym "Vectors" when specifying Plot 
-*        attributes. Default values are supplied for any attributes which 
-*        are not specified. These are obtained from the WCS information 
-*        in the supplied catalogue, or inherited from the previous 
-*        invocation of POLPLOT. A null (!) value causes defaults to be used 
-*        for all attributes. [!]
+*        A group of attribute settings describing the plotting style to use 
+*        for the contours and annotated axes. 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        The appearance of the vectors is controlled by the attributes
+*        Colour(Curves), Width(Curves), etc (the synonym Vectors may be
+*        used in place of Curves). [current value]
 *     UBND(2) = _REAL (Read)
 *        The coordinates to put at the top right corner of the plotting 
 *        area, in the coordinates system specified by parameters COLX and
@@ -378,6 +430,7 @@
       INTEGER NGY                ! No. of good vector Y values
       INTEGER NIN                ! No. of positions in user-specified bounds
       INTEGER NKP                ! No. of values supplied for parameter KEYPOS
+      INTEGER NMARG              ! No. of margin values given
       INTEGER NVEC               ! No. of vectors in catalogue
       INTEGER VCI                ! Vector colour index
       LOGICAL ALIGN              ! Was DATA pic aligned with an old DATA pic?
@@ -397,6 +450,7 @@
       REAL DEFSCA                ! Default value for VSCALE
       REAL DSCALE                ! Vector scale, viz. data units per pixel
       REAL DUMMY                 ! Unused argument
+      REAL HGT                   ! Character height scale factor
       REAL KEYOFF                ! Offset to top of key 
       REAL KEYPOS( 2 )           ! Key position
       REAL MARGIN( 4 )           ! Margins round DATA picture
@@ -411,8 +465,7 @@
       REAL YM                    ! DATA zone y size in metres
 
 *  Local Data:
-      DATA CLIP   / 4*4.0 /,
-     :     MARGIN / 0.1, 0.15, 0.1, 0.15 /
+      DATA CLIP   / 4*4.0 /
 
 *.
 
@@ -694,6 +747,24 @@
 *  graphical element name CURVES.
       CALL KPG1_ASPSY( '(VEC*TORS)', '(CURVES)', STATUS )
 
+*  Set the dynamic defaults for MARGIN.
+      IF( AXES ) THEN
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.18, STATUS )
+      ELSE
+         CALL PAR_DEF1R( 'MARGIN', 1, 0.0, STATUS )
+      END IF
+
+      CALL PAR_GDRVR( 'MARGIN', 4, -0.49, 10.0, MARGIN, NMARG, STATUS )
+      NMARG = MIN( 4, NMARG )
+
+*  Abort if an error has occurred.
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+
+*  Use the first value for any unspecified edges.
+      DO I = NMARG + 1, 4      
+         MARGIN( I ) = MARGIN( 1 )
+      END DO
+
 *  See if a key to the vector magnitude scale is required.
       CALL PAR_GTD0L( 'KEY', .TRUE., .TRUE., KEY, STATUS )
 
@@ -823,6 +894,12 @@
             GO TO 999
          END IF
 
+*  Get the PGPLOT character height scale factor used for strings in the main 
+*  vector map area.
+         CALL KPG1_PGSTY( IPLOT, 'STRINGS', .TRUE., ATTRS, STATUS )
+         CALL PGQCH( HGT )
+         CALL KPG1_PGSTY( IPLOT, 'STRINGS', .FALSE., ATTRS, STATUS )
+
 *  If no value was supplied for the vertical position of the KEY using 
 *  parameter KEYPOS, find the value which puts the top of the key level 
 *  with the top of the DATA picture.
@@ -871,7 +948,7 @@
 
 *  Now produce the key.
          CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, KEYOFF,
-     :                    ABS( TYPDAT ), UNITS1, JUST, STATUS )
+     :                    ABS( TYPDAT ), UNITS1, JUST, HGT, STATUS )
 
       END IF
 
