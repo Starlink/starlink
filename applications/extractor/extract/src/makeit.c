@@ -50,8 +50,6 @@ void	makeit()
   {
    checkstruct		*check;
    picstruct		*dfield, *field,*pffield[MAXFLAG], *wfield,*dwfield;
-   catstruct		*imacat;
-   tabstruct		*imatab;
    static time_t        thetime1, thetime2;
    int			i, nok, ntab, next;
 
@@ -343,7 +341,6 @@ void	makeit()
   if (nok<0)
      error(EXIT_FAILURE, "Not enough valid FITS image extensions in ",
            prefs.image_name[0]);
-  free_cat(&imacat, 1);
 
   NFPRINTF(OUTPUT, "Closing files");
 
