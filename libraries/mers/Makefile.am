@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_SCRIPTS = err_link err_link_adam
+dist_bin_SCRIPTS = err_link err_link_adam
 include_HEADERS = \
 	ERR_ERR ERR_PAR \
 	MSG_ERR MSG_PAR \
