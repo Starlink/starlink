@@ -44,6 +44,8 @@
 
 C     Declare arrayS
 
+      IMPLICIT NONE
+
       REAL*4 CLEANEDARRAY(45,45),ANULUS(3000),
 !     >       NEWANULUS(3000),
      >       AN1(3000),AN2(3000)
@@ -58,8 +60,11 @@ C     Declare other stuff
 !     >       CUT,
      >       XSQUARE,YSQUARE,
      >       XSQUAREOLD,YSQUAREOLD,APERRAD_THETA,
-!     >       APERRAD_THETAOLD,
-     >       PA,AXRAT
+     >       APERRADOLD_THETA,
+     >       PA,AXRAT,THETA
+      REAL*4 MAG                ! Never set in this program!!!
+
+      MAG = 0.0
 
 C     Tidy up anulus array
 
