@@ -1,4 +1,4 @@
-#!/usr/local/bin/perl -w
+#!/local/bin/perl -w
 ########################################################################
 ####             J C M T   S O F T W A R E   G R O U P              ####
 #                -------------------------------------
@@ -17,9 +17,9 @@
 #
 #   SCCS Data           : @(#)
 #       Module Name     : scunoise
-#       Version Number  : 1.5
+#       Version Number  : 2.0
 #       Release Number  : 1
-#       Last Updated    : 02/03/98
+#       Last Updated    : 01/12/03
 #
 #   Programmer(s):      Remo Tilanus (JAC)
 #
@@ -30,8 +30,8 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
-#        Revision 1.20  2002/08/14 11:09:01  timj
-#        jcmtdata is vax-like
+#        Revision 1.21  2003/04/01 00:11:47  timj
+#        Major enhancements from Remo
 #
 #        Revision 1.19  2002/08/02 01:19:54  frossie
 #        Look at /jmctdata at the summit
@@ -97,12 +97,13 @@ use Sys::Hostname; # For hostname
  
 # use Tk::widgets qw/Dialog ErrorDialog/;
 use subs qw/inswt/;
-use vars qw/$MW $PW $OP $OM $CP $C $FONT $BW $BC $rf $mr $accept/;
+use vars qw/$MW $PW $OM $CP $C $FONT/;
+use vars qw/$BW $BMB $SF $MB $BF $AF $BC/;
 
 #---------------------------------------------------------------------------
 
 my ($prog, $rest) = reverse(split(/\//,"$0",2));
-my $version = "1.5";
+my $version = "2.0";
 
 # Get host name (although it is not used)
 my $host = hostname;
@@ -169,21 +170,30 @@ my $idsk = -1;
 
 # Noise file variables:
 
-my $run = "";
+my ($run, $source) = ("", "");
+my $prevrun = "";
+my $nextrun = "";
 my $hst = "00:00:00.0";
 my $ut =  "00:00:00.0";
 my (@runlist, @noiseentry, %bol, %xybol, @pw_point, @bw_point);
-my ($source, %min, %max, $varinfo, $iteminfo);
+my (%min, %max, %defmin, %defmax, $varinfo, $iteminfo);
 my ($cutoff, $cutoff_line);
 my $location;
 
-# Columns in file
+# Columns in file and fault min/max plot scaling
 my @col = ( "Bolometer", "Chop", "Chop error", "Cal", "Cal error", "Quality" );
+$defmin{"$col[0]"} =      0; $defmax{"$col[0]"} =   140;
+$defmin{"$col[1]"} =   -100; $defmax{"$col[1]"} =   100;
+$defmin{"$col[2]"} =      0; $defmax{"$col[2]"} =   400;
+$defmin{"$col[3]"} =   1000; $defmax{"$col[3]"} = 13000;
+$defmin{"$col[4]"} =      0; $defmax{"$col[4]"} =  1000;
+$defmin{"$col[5]"} =  -0.02; $defmax{"$col[5]"} =  1.02;
 
 # Widget colors and variables
 my ($wbg, $wfg, $bbg, $bfg, $tc, $fc, $pc, $qc, $cc, $bc, $dc);
 my ($listfont, $plotfont, $labelfont, $newplot, $op_message, %pinfo);
 my ($w_control, $w_obsdate, $w_chop, $w_choperr, $w_cal, $w_calerr);
+my ($w_autoscale, $as_text, $as_val, $w_rf, $w_mr, $w_next, $w_prev);
 my $bwmode;
 my $plot_id;
 my $flat_id; 
@@ -200,11 +210,12 @@ my $ybottom = 250;
 my $plotvar = 2;
 my $flatvar = undef;
 my $newmode;
-my $defmess = "Point to dot for info\nDouble-click for flat-field\nLeft button for area define";
+my $defmess = "Point on dot for info\nDouble-click for flat-field\nLeft button for area define";
 my $ffmode = "names";
 
-# Plot limits
-my ($xlo, $xhi, $ylo, $yhi, $xr, $yr, $xp, $yp);
+# Plot limits (default to autoscaling)
+my ($xlo, $xhi, $ylo, $yhi) = ('d', 'd', 'd', 'd');
+my ($xr, $yr, $xp, $yp);
 my ($alo, $ahi, $blo, $bhi);
 
 # Override defaults with command-line parameters!
@@ -214,7 +225,6 @@ $run     = $ARGV[1] if ($#ARGV > 0);
 &fill_bol;
 
 @noiseentry = ();
-%min = %max = ();
 %pinfo = ();
 if ($^O eq 'MSWin32') {
   $pinfo{'prcmd'} = File::Spec->catfile(File::Spec->tmpdir, 'scunoise.ps');
@@ -222,11 +232,11 @@ if ($^O eq 'MSWin32') {
   $pinfo{'prcmd'} = '| lpr';   
 }
 
-$newplot = 1;
+$newplot = 1;     # Note: -1 is used to clear the canvas without a new plot
 $op_message = "";
 
 $xlo = $xhi = $ylo = $yhi = 0;
-$alo = $ahi = $blo = $bhi = "a";
+$alo = $ahi = $blo = $bhi = "d";
 
 #-----------------------------A E S T H E T I C S----------------------------
 
@@ -253,7 +263,6 @@ $dc =  'Gold';               #     ,,     noisy bol. color
 # Now open a Tk window
 
 #----------------------------------------------------------------------------
-# Now open a Tk window
 $MW = MainWindow->new;
 $MW->title('Scuba Noise Data');
 $MW->configure(
@@ -261,24 +270,18 @@ $MW->configure(
 	       -foreground=>$bfg
 	       );
 
-# Open user input window if needed, else plot data.
-if ($obsdate eq "" or $run eq "") {
-    &obsdir_panel;
-} else { 
+# Open root plot frame
+&plot_frame;
 
-    &plot_frame;
-    if ($op_message eq "") {
-	&getdata;
-	if ($op_message eq "") {
-	    &plot;
-	} else {
-	    &obsdir_panel;
-	}
-    } else {
-	&obsdir_panel;
-    }
+# Try populate runlist
+&scandisk;
 
-}
+# Read data
+&getdata;
+
+# Plot data
+&plot;
+
 
 #----------------------------------------------------------------------------
 # Start the event handler
@@ -303,173 +306,24 @@ sub set_disks {
   push(@disk,File::Spec->curdir);
   if ($domain eq "jach" || $domain eq "Hilo") {
     push(@disk,"/net/luu/scubadata");
-#    push(@disk,"/net/ieie/jcmtarchive");
+    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
-#    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
   } elsif ($domain eq "jcmt") {
     push(@disk,"/jcmtdata/raw/scuba");
-#    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
     push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/luu/scubadata");
   } elsif ($^O eq 'MSWin32') {
     push(@disk, "\\\\Ola\\scuba-data\\");
-
   }
 
   if ($debug) {
     my $i = 0;
     foreach my $disk (@disk) {
-      print "Location $i: $disk[$i]\n";
+      print "DEBUG: Location $i: $disk[$i]\n";
       $i++;
     }
   }
-
-}
-
-#----------------------------------------------------------------------------
-# Do the Directory and File
-sub obsdir_panel {
-
-    $mr = undef;
-
-    # Open new window for obsdir if plot_frame exists, else use frame.
-    if (defined $PW) {
-	$OP = $MW->Toplevel(
-			    -takefocus => 1
-			    );
-	$OP->title('Directory and File');
-    } else {
-	$OP = $MW->Frame(
-			    -takefocus => 1
-			    )->grid(qw/-sticky ew/);
-    }
-
-    # Message window: define here for accept but pack at bottom
-    $OM = $OP->Text(
-		       -wrap       => 'word',
-		       -relief     => 'flat',
-		       -foreground => 'Indianred',
-		       -height     => 4,
-		       -width      => 30,
-		       -takefocus  => 0,
-		       );
-
-    # Add frame for buttons
-    my $menubar = $OP->Frame(
-			     -background => $bbg
-			     );
-    $menubar->grid(qw/-sticky ew/);
-
-    # Exit
-    $menubar->Button(-text=>'    Exit    ',
-		     -relief=>'raised',
-		     -command=>sub{destroy $MW})
-                             ->grid(qw/-sticky e -row 1 -column 1 -ipadx 2/);
-
-    # Accept
-    $accept = $menubar->Button(-text=>'  Accept  ',
-		     -relief=>'raised',
-		     -command=>sub{
-			 if ($obsdate =~ /^\d/ && $run =~ /^[1-9]/) {
-			     $op_message = "";
-			     $OM->delete('1.0','end');
-			     &getdata; 
-			     &plot if ($op_message eq "");
-			 } else {
-			     $OM->delete('1.0','end');
-    $OM->insert('end',"Error: Obsdate and Run must be set before Accept!\n");
-			 }
-		     })->grid(qw/-sticky ns -row 1 -column 2 -ipadx 2/);
-
-    # Dismiss
-    my $dismiss = $menubar->Button(-text=>' Dismiss ',
-				   -relief=>'raised',
-				   -command=>sub{
-				     $w_obsdate->configure( -state => 'active')
-                                     if (defined $PW);
-				     destroy $OP; $OP = undef;})
-                              ->grid(qw/-sticky w -row 1 -column 3 -ipadx 2/);
-    $dismiss->configure( -state => 'disabled') unless (defined $PW);
-
-    # Open frame text
-    my $OT = $OP->Text(
-		       -wrap       => 'word',
-		       -relief     => 'flat',
-		       -foreground => 'midnightblue',
-                       -height     => 5,
-                       -width      => 30,
-		       -takefocus  => 0,
-		       )->grid(qw/-sticky nsew/);
-
-    $OT->insert('end',"First enter the directory and obs. date (YYYYMMDD), then ");
-    $OT->insert('end',"hit the scan button to find noise files or enter run nr directly.\n");
-
-    # Open frame for Inputs and Scan
-
-    # Datdir Entry
-    my $of = $OP->Frame(
-                        -borderwidth => 5,                
-			-takefocus => 1
-			)->grid(qw/-sticky nsew/);
-    my $de = $of->Entry(-relief => "sunken", -width => 32,
-			 -textvariable => \$datadir);
-    my $dl = $of->Label(-text => "Datadir:");
-    $dl->grid(qw/-sticky e -row 1 -column 1/);
-    $de->grid(qw/-sticky w -row 1 -column 2/);
-
-    # Obsdate Entry
-    my $oe = $of->Entry(-relief => "sunken", -width => 12,
-			 -textvariable => \$obsdate);
-    my $ol = $of->Label(-text => "Obsdate:");
-    $ol->grid(qw/-sticky e -row 2 -column 1/);
-    $oe->grid(qw/-sticky w -row 2 -column 2/);
-
-    # Scan button frame, but setup button after $mr to enable configure
-    my $bf = $OP->Frame()->grid(qw/-sticky nsew/);
-
-    # Run Menubutton and Entry
-    $rf = $OP->Frame(
-		     -borderwidth => 5
-		    )->grid(qw/-sticky nsew/);
-
-    my $re = $rf->Entry(-relief => "sunken", -width => 5,
-		     -textvariable => \$run);
-    $re->grid(qw/-sticky w -row 1 -column 2/);
-    &mk_runfield;
-
-    my $scan = $bf->Button(-text=>'Scan for Noise files',
-			   -relief=>'raised',
-		     -command=>sub{
-			 $OM->delete('1.0','end');
-                         $OM->insert('end',"Scanning...");
-                         &set_disks;
-			 &scandisk;
-			 &mk_runfield;
-		     })->pack();
-
-    # Finally pack message window at bottom
-    $OM->grid(qw/-sticky nsew/);
-    $OM->insert('end',"$op_message") unless ($op_message eq "");
-
-    $oe->bind('<Return>' => [$scan => 'invoke']);
-    $re->bind('<Return>' => [$accept => 'invoke']);
-
-#    $scan->configure( -state => 'disabled' ) if ($obsdate eq "");
-#
-#    $oe->bind('Any-Enter' =>
-#	      [sub{$scan->configure( -state => 'normal' );}]);
-#    $oe->bind('Any-Leave' => 
-#	      [sub{$scan->configure( -state => 'disabled' ) 
-#		       unless ($obsdate =~ /^\d/);}]);
-
-    # Find scans in case $obsdate specified upon entry but $run not.
-    if ($obsdate =~ /^\d/ && !defined $run && $run == 0 && $#runlist < 0) {
-	$scan->invoke;
-    }
-
-    # Disable main window control button
-    $w_obsdate->configure( -state => 'disabled') if (defined $PW);
-
 
 }
 
@@ -478,169 +332,332 @@ sub obsdir_panel {
 
 sub mk_runfield {
 
-  if (defined $mr) {
-    destroy $mr;
-    $mr = undef;
+  if (defined $w_mr) {
+    destroy $w_mr;
+    $w_mr = undef;
   }
+
   if ($#runlist > -1) {
-    $mr = $rf->Menubutton(
+    $w_mr = $w_rf->Menubutton(
 			-text => 'Run', 
 			-relief => 'raised',
 			-state => 'disabled'
 			 );
-    $mr->configure(-state=> 'active');
+    $w_mr->configure(-state=> 'active');
     my $i;
     for ( $i = 0; $i <= $#runlist; $i++ ) {
       my $irun = $runlist[$i];
-      $mr->command( -label => "$irun",
+      $w_mr->command( -label => "$irun",
 		    -command =>sub{$run = $irun;
-                                   if (defined $OP) {
-                                       $accept->invoke;
-                                   } else {
-                                       &getdata; 
-                                       &plot if ($op_message eq "");
-                                   };
+				   &getdata;
+				   &plot;
                                });
     }
-    $OM->delete('1.0','end');
-    $OM->insert('end',"Click 'RUN' to see list of noise files ");
-    $OM->insert('end',"found in $location.");
+
   } else {
-    $mr = $rf->Label(-text => "Run: ");
+    $w_mr = $w_rf->Label(-text => "Run: ");
   }
-  $mr->grid(qw/-sticky e -row 1 -column 1/);
+  $w_mr->grid(qw/-sticky e -row 1 -column 1/);
 }
 
 #----------------------------------------------------------------------------
 # Create a plot frame
 sub plot_frame {
 
-    # Delete Obsdate window/frame if it exists.
+    # Delete window/frame if it exists.
     $MW->withdraw;
-#    if (defined $OP) {
-#       $OP->destroy;
-#       undef $OP;
-#    }
 
-    # Create lot Canvas if it does not yet exist.
+    print "DEBUG: ...Entered plot_frame\n" if ($debug);
+    # Create plot Canvas if it does not yet exist.
     unless (defined $PW) {
+        print "DEBUG: ...Creating plot window in MW\n" if ($debug);
 	$PW = $MW->Toplevel(
 			 -takefocus => 1
-			 );#->grid(qw/-sticky nsew/);
-
-	# Create a cancas 
-	$C = $PW->Canvas(
-			 -relief => 'raised', 
-			 -width  => "$xplot", 
-			 -height => "$yplot",
-			 -cursor => 'top_left_arrow',
 			 );
-	$PW->Advertise('canvas' => $C);
-	$C->pack(-side => 'top', -fill => 'x');
-	
-	# Add "Chop Error" button on left below canvas
-	$w_choperr = $PW->Button(
-				    -text         => "$col[2]",
-				    -command      => sub{$plotvar=2;
-							 $newplot=1;
-				    $alo = $ahi = $blo = $bhi = "a";
-							 &plot}
-				    );
-	$PW->Advertise('Choperr_button' => $w_choperr);
-	$w_choperr->pack(-side=>'left');
-	
-	# Add "Chop" button on left below canvas
-	$w_chop = $PW->Button(
-				 -text         => "$col[1]",
-				 -command      => sub{$plotvar=1;
-						      $newplot=1;
-				 $alo = $ahi = $blo = $bhi = "a";
-						      &plot}
-				 );
-	$PW->Advertise('Chop_button' => $w_chop);
-	$w_chop->pack(-side=>'left');
-	
-	# Add "Cal" button on left below canvas
-	$w_cal = $PW->Button(
-				-text         => "$col[3]",
-				-command      => sub{$plotvar=3;
-						     $newplot=1;
-				$alo = $ahi = $blo = $bhi = "a";
-						     &plot}
-				);
-	$PW->Advertise('Cal_button' => $w_cal);
-	$w_cal->pack(-side=>'left');
-	
-	# Add "Cal error" button on left below canvas
-	$w_calerr = $PW->Button(
-				   -text         => "$col[4]",
-				   -command      => sub{$plotvar=4;
-							$newplot=1;
-				   $alo = $ahi = $blo = $bhi = "a";
-							&plot}
-				   );
-	$PW->Advertise('Calerr_button' => $w_calerr);
-	$w_calerr->pack(-side=>'left');
-	
-	# Add "Exit" button on right below canvas
-	my $w_exit = $PW->Button(
-				 -text         => 'Exit',
-				 -command      => sub{destroy $MW}
-				 );
-	$PW->Advertise('Exit_button' => $w_exit);
-	$w_exit->pack(-side=>'right');
-	
-	# Add "Control Panel" button on left below canvas
-	$w_control = $PW->Button(
-				    -text         => 'Control Panel',
-				    -command      => sub{&control_panel}
-				    );
-	$PW->Advertise('Control_button' => $w_control);
-	$w_control->pack(-side=>'right');
-	
-	# Add "Dir/File" button on left below canvas
-	$w_obsdate = $PW->Button(
-				   -text         => 'Dir&File',
-				   -command      => sub{&obsdir_panel}
-				   );
-	$PW->Advertise('Obsdate_button' => $w_obsdate);
-	$w_obsdate->pack(-side=>'right');
-	
-	# Add "Autoscale" button on left below canvas
-	my $w_autoscale = $PW->Button(
-				      -text         => "Autoscale",
-				      -command      => sub{$newplot=1;
-				      $alo = $ahi = $blo = $bhi = "a";
-							   &plot}
-				      );
-	$PW->Advertise('Autoscale_button' => $w_autoscale);
-	$w_autoscale->pack(-side=>'right');
+        $PW->title('Scuba Noise Data');
 
+        &top_menu_bar;
+
+        &message_frame;
+
+        &plot_canvas;
+
+        &bottom_menu_bar;
     }
 
 }
 
+sub top_menu_bar {
+
+    # Create top menu bar frame
+    $MB = $PW->Frame(
+		     -borderwidth => 0
+		     );
+    $MB->pack(-side => 'top', -fill => 'x');
+
+    # Add "Options" button above canvas
+    $w_control = $MB->Button(
+			     -text         => 'Options',
+			     -command      => sub{&options_panel}
+			     );
+    $MB->Advertise('Control_button' => $w_control);
+    $w_control->pack(-side => 'left', -fill => 'y');
+    
+    # Make Auto/Default button in frame so that text can be flipped.
+    # Add "Autoscale" button above canvas
+    $AF = $MB->Frame(
+                     -background => $bbg,
+                     -relief => 'flat',
+		     );
+    $AF->pack(-side => 'left', -fill => 'y');
+
+    &autoscale_button;
+
+    # Create Scan and Date frame in menubar 
+    $SF = $MB->Frame(
+                     -background => $bbg,
+                     -relief => 'groove',
+		     -borderwidth => 3
+		     );
+    $SF->pack(-side => 'left', -fill => 'y');
+    
+    my $scan = $SF->Button(-text=>'Scan for:',
+			   -relief=>'raised',
+			   -command=>sub{
+			       $OM->delete('1.0','end');
+			       $OM->insert('end',"Scanning...");
+			       $OM->update('idletasks');
+			       &set_disks;
+			       $run ="";
+			       &scandisk;
+			       &getdata; 
+			       &plot;
+			   })->pack(-side => 'left', -fill => 'y');;
+    
+    # Obsdate Entry
+    my $oe = $SF->Entry(-relief => "sunken", -width => 9,
+			-textvariable => \$obsdate);
+    $oe->pack(-side => 'left', -fill => 'y');
+    $oe->bind('<Return>' => [$scan => 'invoke']);
+
+    my $scan2 = $SF->Button(-text=>'noise files',
+			    -relief=>'raised',
+			    -command=>sub{
+				$OM->delete('1.0','end');
+				$OM->insert('end',"Scanning...");
+				&set_disks;
+				$run ="";
+				&scandisk;
+				&getdata; 
+				&plot;
+			    })->pack(-side => 'left', -fill => 'y');;
+    
+    # Add "Exit" button on above canvas
+    my $w_exit = $MB->Button(
+			     -text         => 'Exit',
+			     -command      => sub{destroy $MW}
+			     );
+    $MB->Advertise('Exit_button' => $w_exit);
+    $w_exit->pack(-side => 'right', -fill => 'y');
+}
+
+sub autoscale_button {
+
+    if (defined $w_autoscale) {
+      destroy $w_autoscale;
+      $w_autoscale = undef;
+    }
+
+    $as_text = "Autoscale";
+    $as_val  = "a";
+
+    if ("$bhi" ne "d") {
+	$as_text = "Def scale";
+        $as_val = "d";
+    }
+
+    $w_autoscale = $AF->Button(
+				  -text         => $as_text,
+				  -command      => sub{$alo = $ahi = $as_val;
+						       $blo = $bhi = $as_val;
+                                                       &autoscale_button;
+						       $newplot=1;
+						       &plot;
+
+						      }
+				  );
+    $MB->Advertise('Autoscale_button' => $w_autoscale);
+    $w_autoscale->pack(-side => 'left', -fill => 'y');
+}
+
+sub message_frame {
+
+    # Text message window
+    $OM = $PW->Text(
+		    -wrap       => 'word',
+		    -relief     => 'groove',
+		    -background => $bbg,
+		    -foreground => 'Indianred',
+		    -height     => 2,
+		    -width      => 50,
+		    -takefocus  => 0,
+		    );
+    $PW->Advertise('Message_window' => $OM);
+    $OM->pack(-side => 'top', -fill => 'x');
+
+    if ($op_message ne "") {
+	$OM->delete('1.0','end');
+	$OM->insert('end',"$op_message");
+	$OM->update('idletasks');
+        $op_message = "";
+    }
+}
+
+sub plot_canvas {
+
+    # Create a canvas 
+    $C = $PW->Canvas(
+		     -relief => 'groove',
+		     -border => 3, 
+		     -background => 'White',
+		     -width  => "$xplot", 
+		     -height => "$yplot",
+		     -cursor => 'top_left_arrow',
+		     );
+    $PW->Advertise('canvas' => $C);
+    $C->pack(-side => 'top', -fill => 'x');	
+
+}
+
+sub bottom_menu_bar {
+ 
+    # Create bottom button bar
+    $BF = $PW->Frame(
+		     -borderwidth => 0
+		     );
+    $BF->pack(-side => 'top', -fill => 'x');
+
+    # Bottom bar:       
+    # Create sub-button frames
+    
+    # Add "Chop Error" button on left below canvas
+    $w_choperr = $BF->Button(
+			     -text         => "$col[2]",
+			     -command      => sub{$plotvar=2;
+						  $newplot=1;
+						  $alo = $ahi = "d";
+						  $blo = $bhi = "d";;
+						  &plot}
+			     );
+    $BF->Advertise('Choperr_button' => $w_choperr);
+    $w_choperr->pack(-side => 'left', -fill => 'y');
+    
+    # Add "Chop" button on left below canvas
+    $w_chop = $BF->Button(
+			  -text         => "$col[1]",
+			  -command      => sub{$plotvar=1;
+					       $newplot=1;
+					       $alo = $ahi = "d";
+					       $blo = $bhi = "d";
+					       &plot}
+			  );
+    $BF->Advertise('Chop_button' => $w_chop);
+    $w_chop->pack(-side => 'left', -fill => 'y');
+    
+    # Add "Cal" button on left below canvas
+    $w_cal = $BF->Button(
+			 -text         => "$col[3]",
+			 -command      => sub{$plotvar=3;
+					      $newplot=1;
+					      $alo = $ahi = "d";
+					      $blo = $bhi = "d";
+					      &plot}
+			 );
+    $BF->Advertise('Cal_button' => $w_cal);
+    $w_cal->pack(-side => 'left', -fill => 'y');
+
+    # Add "Cal error" button on left below canvas
+    $w_calerr = $BF->Button(
+			    -text         => "$col[4]",
+			    -command      => sub{$plotvar=4;
+						 $newplot=1;
+						 $alo = $ahi = "d";
+						 $blo = $bhi = "d";
+						 &plot}
+			    );
+    $BF->Advertise('Calerr_button' => $w_calerr);
+    $w_calerr->pack(-side => 'left', -fill => 'y');
+    
+    # Add "Next" button on right below canvas
+    my $w_next = $BF->Button(
+			     -text         => "-next->",
+			     -command      => sub{$newplot=1;
+						  &prevnext;
+						  $run = $nextrun;
+						  &getdata;
+						  &plot}
+			     );
+    $BF->Advertise('Next_button' => $w_next);
+    $w_next->pack(-side => 'right', -fill => 'y');
+    
+    # Add "Run" button on right below canvas
+    $w_rf = $BF->Frame(
+		     -borderwidth => 0
+		     );
+    $BF->Advertise('Run_button' => $w_rf);
+    $w_rf->pack(-side => 'right', -fill => 'y');
+    
+    # Add "Prev" button on right below canvas
+    my $w_prev = $BF->Button(
+			     -text         => "<-prev-",
+			     -command      => sub{$newplot=1;
+						  &prevnext;
+						  $run = $prevrun;
+						  &getdata;
+						  &plot}
+				      );
+    $BF->Advertise('Prev_button' => $w_prev);
+    $w_prev->pack(-side => 'right', -fill => 'y');
+	
+}
+
+sub prevnext {
+      my $i;
+      for ($i = 0; $i <= $#runlist; $i++ ) {
+	  last if ($runlist[$i] == $run);
+      }
+      $i = -1 if ($i > $#runlist);
+      if ($i > 0 ) { 
+        $prevrun = $runlist[$i-1];
+      } else {
+        $prevrun = $runlist[$#runlist];
+      }
+      if ($i < $#runlist ) {
+        $nextrun = $runlist[$i+1];
+      } else {
+	$nextrun = $runlist[0];
+      }
+}
+
 #----------------------------------------------------------------------------
 # Do the Control Panel
-sub control_panel {
+sub options_panel {
 
-    # Open new window for Control Panel
+    # Open new window for Control/Options Panel
     my $CP = $MW->Toplevel(
 	     -takefocus => 1
 			   );
     $CP->title('Control Panel');
 
     # Add frame for buttons
-    my $menubar = $CP->Frame(
-			     -background => $bbg
-			     );
+    my $menubar = $CP->Frame();
     $menubar->grid(qw/-sticky ew/);
     $menubar->gridColumnconfigure(qw/0 -weight 1/);
 
     # Dismiss
     my $dismiss = $menubar->Button(-text=>'Dismiss',
-				 -relief=>'raised',
-	 			 -command=>sub{
+				   -relief=>'raised',
+				   -command=>sub{
 				   $w_control->configure( -state => 'active')
 				   if (defined $PW);
 				   destroy $CP})->pack(-side=>'right');
@@ -650,23 +667,31 @@ sub control_panel {
 #		     -relief=>'raised',
 #		     -command=>sub{destroy $MW})->pack(-side=>'right');
 
+
     # Open frame for plot limit entries
     my $CT = $CP->Text(
 		       -wrap       => 'word',
-		       -relief     => 'flat',
+		       -relief     => 'groove',
 		       -foreground => 'midnightblue',
+                       -background => $bbg,
                        -height     => 3,
                        -width      => 30,
 		       -takefocus  => 0,
 		       )->grid(qw/-sticky nsew/);
-
     $CT->insert('end',"Bolometer: use names or numbers\n");
     $CT->insert('end',"   (LW bolometers are  101-137)\n");
-    $CT->insert('end',"Autoscaling: set value to 'a'.\n");
-#    $CT->insert('end',
-#		"Specify a range from opposite limit as a negative value.\n");
-#    $CT->insert('end',
-#		"e.g. Xmin: -5   Xmax: 0 for 5 days before lastest data\n");
+    $CT->insert('end',"Default/Auto scaling: set value to 'd'/'a'.\n");
+
+    # Datdir Entry
+    my $of = $CP->Frame(
+                        -borderwidth => 5,                
+			-takefocus => 1
+			)->grid(qw/-sticky nsew/);
+    my $de = $of->Entry(-relief => "sunken", -width => 32,
+			 -textvariable => \$datadir);
+    my $dl = $of->Label(-text => "Datadir:");
+    $dl->grid(qw/-sticky e -row 1 -column 1/);
+    $de->grid(qw/-sticky w -row 1 -column 2/);
 
     # Open frame for plot limit entries
     my $CF = $CP->Frame(
@@ -675,18 +700,18 @@ sub control_panel {
 			)->grid(qw/-sticky nsew/);
 
     # X limits
-    my $ex1 = $CF->Entry(-relief => "sunken", -width => 6,
+    my $ex1 = $CF->Entry(-relief => "sunken", -width => 7,
 			 -textvariable => \$alo);
     my $lx1 = $CF->Label(-text => "Bolometer min:");
-    my $ex2 = $CF->Entry(-relief => "sunken", -width => 6,
+    my $ex2 = $CF->Entry(-relief => "sunken", -width => 7,
 			 -textvariable => \$ahi);
     my $lx2 = $CF->Label(-text => "max:");
 
     # Y limits
-    my $ey1 = $CF->Entry(-relief => "sunken", -width => 6,
+    my $ey1 = $CF->Entry(-relief => "sunken", -width => 7,
 			 -textvariable => \$blo);
     my $ly1 = $CF->Label(-text => "Y-axis min:");
-    my $ey2 = $CF->Entry(-relief => "sunken", -width => 6,
+    my $ey2 = $CF->Entry(-relief => "sunken", -width => 7,
 			 -textvariable => \$bhi);
     my $ly2 = $CF->Label(-text => "max:");
 
@@ -702,7 +727,6 @@ sub control_panel {
 
     # Open frame for Replot and Print section
     my $CB = $CP->Frame();
-
     $CB->grid(qw/-sticky ew/);
 
     # Replot button
@@ -712,10 +736,16 @@ sub control_panel {
 		                    ->grid(qw/-sticky w -row 1 -column 1/);
 
     # Clear limits button
-    $CB->Button(-text=>'Clear limits',
+    $CB->Button(-text=>'Default scaling',
+		     -relief=>'raised',
+		     -command=>sub{$alo=$ahi=$blo=$bhi='d';})
+		                    ->grid(qw/-sticky e -row 1 -column 2/);
+
+    # Autoscaling button
+    $CB->Button(-text=>'Autoscaling',
 		     -relief=>'raised',
 		     -command=>sub{$alo=$ahi=$blo=$bhi='a';})
-		                    ->grid(qw/-sticky e -row 1 -column 2/);
+		                    ->grid(qw/-sticky e -row 1 -column 3/);
 
     # Print button with printer command
     my $w_print = $CB->Button(
@@ -741,8 +771,7 @@ sub control_panel {
 #----------------------------------------------------------------------------
 sub getdata {
 
-    &getfile;
-    if ($op_message eq "") {
+    if ($op_message eq "" && $newplot != -1) {
 	&rddata;
     }
 
@@ -754,7 +783,9 @@ sub scandisk {
     my ($i, $line, @files, $file, $rofile);
     my $found = 0;
     $idsk = -1;
+    $newplot = 1;
     $op_message = "";
+    @runlist = ();
 
     ($obsdate =~ /^\d/)  or
 	die "Programming error obsdate not set! : $!\n";
@@ -768,14 +799,14 @@ sub scandisk {
 	@runlist = ();
 
         if ($disk[$i] =~ /mwt/i && ($domain eq "jach" || $domain eq "Hilo")
-				    && defined $OP) {
+                         && defined $OM) {
             $OM->delete('1.0','end');
-	    $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
+	    $OM->insert('end',"Trying VAX disks at summit. Be patient for automount to complete...\n");
             $OM->update('idletasks');
         }
-        elsif ($disk[$i] =~ /luu/i && $domain eq "jcmt" && defined $OP) {
+        elsif ($disk[$i] =~ /luu/i && $domain eq "jcmt" && defined $OM) {
             $OM->delete('1.0','end');
-	    $OM->insert('end',"Trying LUU disk at JAC.\nBe patient for automount to complete...\n");
+	    $OM->insert('end',"Trying LUU disk at JAC. Be patient for automount to complete...\n");
             $OM->update('idletasks');
         }
 
@@ -784,40 +815,39 @@ sub scandisk {
 	  # Both these are luu
 	  my $sem = find_sem($obsdate);
 	  $location = File::Spec->catdir($location, $sem, $obsdate);
-	} elsif ($location =~ /ieie/) {
-	  # ieie version of data disk
-	  $location = File::Spec->catdir($location, $obsdate);
-	} elsif ($location =~ /^\/net/ || $location =~ /jcmtdata/) {
+	} elsif ($location =~ /raw/) {
+	  # summit linux version of data disk
+	  $location = File::Spec->catdir($location, $obsdate, 'ro');
+	} elsif ($location =~ /\/mwt/) {
 	  # This is deemed to be a vax disk
-          # or a hard-mounted vax disk on the unix system
 	  $location = File::Spec->catdir($location, $obsdate, 'ro');
 	}
 
-	print "Trying directory '${location}'..." if ($debug);
+	print "DEBUG: Trying directory '${location}'..." if ($debug);
 	@files = ();
         $op_message = "";
 	if (-e "${location}") {
 	    $found = 1;
-	    print "found\n" if ($debug);
+	    print " found\n" if ($debug);
 
 	    # Read directory
 	    opendir( DIR, "$location") or
-		do {$op_message = "Can't open directory $location! : $!"; };
+		do {$found = 0; $op_message = "Can't open directory $location! : $!"; };
 
             my $odate = substr($obsdate,2,99);
-	    if ($op_message eq "") {
+	    if ($found && $op_message eq "") {
     	        push(@files,grep(/$odate/,grep(/^noise/i, readdir(DIR))));
 		closedir(DIR);
 	    }
 
-            print "Found " if ($debug);
+            print "DEBUG: Found " if ($debug);
             print $#files+1 if ($debug);
             print " noise files for ${odate}.\n" if ($debug);
 	    # if any noise files
 	    if ($op_message eq "" && $#files >= 0) {
 
 		# prompt used
-		print "Run numbers of noise files: " if ($debug);
+		print "DEBUG: Run numbers of noise files: " if ($debug);
 		foreach $file (@files) {
 		    ($j1, $j2, $j3) = split(/\_/,$file,3);
 		    ($j1, $j2) = split(/\./,$j3,2);
@@ -833,116 +863,30 @@ sub scandisk {
 	    }
       
 	} else {
-	    print "not found\n" if ($debug);
+	    print "DEBUG: not found\n" if ($debug);
 	    $i++;
 	}
 
     }
 
-    $run = $runlist[0] if ($#runlist == 0);
-    @runlist = sort { $a <=> $b } @runlist if ($#runlist > -1);
+    if ($#runlist > -1) {
+      @runlist = sort { $a <=> $b } @runlist ;
+      $run = $runlist[$#runlist] if ("$run" eq "");
+    }
+    &mk_runfield;
 
     if ($found) {
 	$idsk = $i;
     } elsif ( $op_message eq "" ) {
+        $newplot = -1;
 	$op_message = 
-	  "Error: can not find $obsdate noise files any location.";
+	  "Error: can not find $obsdate noise files at any location.";
     }
 
-    if ($op_message ne "" && defined $OM) {
-            $OM->delete('1.0','end');
-	    $OM->insert('end',"$op_message");
-            $OM->update('idletasks');
-    }
-
-}
-
-#----------------------------------------------------------------------------
-sub getfile {
-
-    my ($i, $line, @files, $file, $rofile);
-    $op_message = "";
-
-    ($obsdate =~ /^\d/ && $run =~ /^[1-9]/)  or
-	die "Programming error obsdate not set! : $!\n";
-
-    # Construct the name of the noise file
-    $rofile = "noise_" . substr($obsdate,2,99) . "_" . $run . ".dat";
-
-    # Now this is a little bit naughty, if $run not in @runlist we
-    # assume that a disk scan is (still) required. Either scandisk has not
-    # happened or user want to force another disk location with e.g. a 
-    # newly created file. Normally the 'current' data directory should 
-    # only exist in one place, but...
-
-    my $rescan = 1;
-    my $found = 0;
-    foreach $i (@runlist) {
-	if ( $run == $i ) {
-            $rescan = 0;
-            $found = 1;
-            last;
-	}
-    }
-
-    if ($rescan) {
-
-	# Try find the name the noise file in one of the directories
-	# Try find the file local first
-	$i = 0;
-	while ($found == 0 && $i <= $#disk) {
-
-	    if ($disk[$i] =~ /mwt/i && ($domain eq "jach" || $domain eq "Hilo")
-		&& defined $OP) {
-	      $OM->delete('1.0','end');
-	      $OM->insert('end',"Trying VAX disks at summit.\nBe patient for automount to complete...\n");
-	      $OM->update('idletasks');
-	    }
-	    elsif ($disk[$i] =~ /luu/i && $domain eq "jcmt" && defined $OP) {
-	      $OM->delete('1.0','end');
-	      $OM->insert('end',"Trying LUU disk at JAC.\nBe patient for automount to complete...\n");
-	      $OM->update('idletasks');
-	    }
-
-	    $location = $disk[$i];
-	    if ($location =~ /luu/ || $location =~ /Ola/) {
-	      # Luu data disk
-              my $sem = find_sem($obsdate);
-	      $location = File::Spec->catdir($location, $sem, $obsdate);
-	    } elsif ($location =~ /ieie/) {
-	      # IEIE copy of data
-	      $location = File::Spec->catdir($location, $obsdate);
-	    } elsif ($location =~ /^\/net/) {
-	      # Vax location
-	      $location = File::Spec->catdir($location, $obsdate, 'ro');
-	    }
-
-	    my $noise_file = File::Spec->catfile($location, $rofile);
-
-	    print "Trying $noise_file...\n" if ($debug);
-	    if (-e "$noise_file") {
-		print "found\n" if ($debug);
-		$found = 1;
-		last;
-	    } else {
-		print "not found\n"  if ($debug); 
-		$i++;
-	    }
-	}
-    }
-
-    if ($found) {
-	$idsk = $i if ($idsk < 0);
-    } else {
-	$op_message = 
-	    "Error: can not find noise_${obsdate}_${run}.dat anywhere";
-    }
-
-    if ($op_message ne "" && defined $OP) {
-            $OM->delete('1.0','end');
-	    $OM->insert('end',"$op_message");
-            $OM->update('idletasks');
-    }
+    $OM->delete('1.0','end');
+    $OM->insert('end',"$op_message");
+    $OM->update('idletasks');
+    $op_message= "";
 }
 
 #----------------------------------------------------------------------------
@@ -954,27 +898,31 @@ sub rddata {
 
     $rofile = "noise_" . substr($obsdate,2,99) . "_" . $run . ".dat";
 
-    print "Reading $rofile...\n" if ($debug);
+    print "DEBUG: Reading $rofile...\n" if ($debug);
 
     # Open the file and read
     my @log = ();
 
     my $noise_file = File::Spec->catfile($location, $rofile);
 
-    open(NOISE,"< $noise_file")
-	or do { 
-	    $op_message =
-       "Error: could not open $noise_file! : $!";
-	    if (defined $OM) {
-		$OM->delete('1.0','end');
-		$OM->insert('end',"$op_message");
-		$OM->update('idletasks');
-		$op_message = "";
-	    }
+    open(NOISE,"< $noise_file") or do { 
+
+	# Try one more time
+        print "DEBUG: ...Failed to open file $location/$rofile: re-scanning...\n" if ($debug);
+        &scandisk;
+
+        my $noise_file = File::Spec->catfile($location, $rofile);
+	open(NOISE,"< $noise_file") or do { 
+	    $OM->delete('1.0','end');
+	    $OM->insert('end', "Error: could not open $rofile! : $!");
+	    $OM->update('idletasks');
+	    $op_message = "";
+            $newplot = -1;   # Force clearing of plot canvas
 	    return;
 	};
+    };
 
-    print "okay\n" if ($debug);
+    print "DEBUG: okay\n" if ($debug);
 
     @log = <NOISE>; 
     close(NOISE);
@@ -1072,7 +1020,7 @@ sub rddata {
 	for ( $j = 0; $j < 5; $j++ ) {
 	    $mmin = $min{"$col[$j]"};
 	    $mmax = $max{"$col[$j]"};
-	    print "${col[$j]}: from $mmin to $mmax\n";
+	    print "DEBUG: ${col[$j]}: from $mmin to $mmax\n";
 	}
     }
 
@@ -1081,18 +1029,32 @@ sub rddata {
 #----------------------------------------------------------------------------
 sub plot {
 
-     # Create a  top-level window containing a canvas displaying a simple 
-     # graph.
+    # Create a  graph on the canvas
 
     my($i, $x, $y, $point, $xe, $ye, $val);
 
+    print "DEBUG: ...Entered plot\n" if ($debug);
     unless (defined $PW) {
+        print "DEBUG: ...Creating new plot_frame\n" if ($debug);
 	&plot_frame;
     }
 
     $pinfo{'lastX'} = 0;
     $pinfo{'lastY'} = 0;
     $pinfo{'areaX2'} = -1;
+
+    # Special: just add to message  and clear window
+    if ($newplot == -1) {
+        if ($#runlist > -1) {
+	    $OM->insert('end',"\nClick 'RUN' to see list of noise files ");
+	    $OM->insert('end',"found in $location.");
+	}
+	$OM->update('idletasks');
+        if (defined $C) {
+	    $C->delete('all');
+	}
+        return;
+    }
 
     # If a new plot needs to be made, set new boundaries
     if ($newplot) {
@@ -1105,13 +1067,20 @@ sub plot {
         # Set plot Id
         $plot_id = "${obsdate}_${run}_${plotvar}";
 
-        # Re-activate buttons
-	$w_choperr->configure( -state => 'active');
-	$w_chop->configure( -state => 'active');
-	$w_cal->configure( -state => 'active');
-	$w_calerr->configure( -state => 'active');
+        # Re-activate buttons and basic message
+	$w_choperr->configure( -state => 'active') if (defined $w_choperr);
+	$w_chop->configure( -state => 'active') if (defined $w_choperr);
+	$w_cal->configure( -state => 'active') if (defined $w_choperr);
+	$w_calerr->configure( -state => 'active') if (defined $w_choperr);
 
-	# Adopt scaling from control panel
+	$OM->delete('1.0','end');
+        if ($#runlist > -1) {
+	    $OM->insert('end',"Click 'RUN' to see list of noise files ");
+	    $OM->insert('end',"found in $location.");
+	}
+	$OM->update('idletasks');
+
+	# Copy base scaling from saved values
         $xlo = $alo;
         $xlo = $bol{"\U$alo"} if ($alo =~ /^[a-zA-Z]\d/);
 	$xhi = $ahi; 
@@ -1119,48 +1088,44 @@ sub plot {
         $ylo = $blo;
         $yhi = $bhi;
 
-        # Use auto-scaling if 0
-	$xlo = 0 if ($xlo =~ /^a/i);
-	$xhi = 140 if ($xhi =~ /^a/i);
+        # If not 0 will extend x(y)axis by 2*xe(ye)*axis;
+        $xe = 0;
+        $ye = 0;
+
+        # Auto and Default scaling for X-axis: just use default
+	$xlo = $defmin{"$col[0]"} if ($xlo =~ /^[a-zA-Z]/);
+	$xhi = $defmax{"$col[0]"} if ($xhi =~ /^[a-zA-Z]/);
+
+        # Default scaling Y axis
+	$ylo = $defmin{"$col[$plotvar]"} if ($ylo =~ /^d/i);
+	$yhi = $defmax{"$col[$plotvar]"} if ($yhi =~ /^d/i);
+
+        # Auto-scaling if 'a': based on min/max y-value + small extent
+        $ye  = 0.025 if ($yhi =~ /^a/i);
 	$ylo = $min{"$col[$plotvar]"} if ($ylo =~ /^a/i);
 	$yhi = $max{"$col[$plotvar]"} if ($yhi =~ /^a/i);
 
-        if ($xlo > $xhi) {
-	  $val = $xhi;
-	  $xhi = $xlo;
-	  $xlo = $val;
-        }
-        if ($ylo > $yhi) {
-	  $val = $yhi;
-	  $yhi = $ylo;
-	  $ylo = $val;
-        }
+        # Guard against zero-length axes
+        $xlo = $xhi = "d" if ($xlo eq $xhi);
+        $ylo = $yhi = "d" if ($ylo eq $yhi);
 
-# Can not do: negative values allowed
-#        # Set range from opposite limit if value < 0.
-#	$xlo = 132+$xlo  if ($xlo < 0);
-#	$xhi = $xlo-$xhi if ($xhi < 0);
-#	$ylo = $max{"$col[$plotvar]"}+$ylo if ($ylo < 0);
-#	$yhi = $ylo-$yhi if ($yhi < 0);
+        if ($xlo > $xhi) { $val = $xhi; $xhi = $xlo; $xlo = $val; }
+        if ($ylo > $yhi) { $val = $yhi; $yhi = $ylo; $ylo = $val; }
 
         # Round to integer
 	$ylo = int($ylo-0.5);
 	$yhi = int($yhi+0.5);
     }
 
-    # Add some slop to both ends Y-axis
-    $xe = 0;
-    $ye = 0.05*($yhi-$ylo);
+    #  If $xe, $ye not zero adds extends axes some (auto-scaling)
+    $xe = $xe*($yhi-$ylo);
+    $ye = $ye*($yhi-$ylo);
 
     # Plot range 
-    $xhi = $xhi+$xe;
-    $xlo = $xlo-$xe;
-    $xr = ($xhi-$xlo);
-    $yhi = $yhi+$ye;
-    $ylo = $ylo-$ye;
-    $yr = ($yhi-$ylo);
+    $xhi = $xhi+$xe; $xlo = $xlo-$xe; $xr = ($xhi-$xlo);
+    $yhi = $yhi+$ye; $ylo = $ylo-$ye; $yr = ($yhi-$ylo);
 
-    print "X-axis: $xlo -- $xhi ($xr)\nY-axis: $ylo -- $yhi ($yr)\n" 
+    print "DEBUG: X-axis: $xlo -- $xhi ($xr)\nDEBUG: Y-axis: $ylo -- $yhi ($yr)\n"
       if ($debug);
 
     if ($newplot){
@@ -1226,7 +1191,7 @@ sub plot {
 		       -fill => $tc)
 		unless ($i == 0 || $i == $ytick);
 	    $C->create('text', $xleft-4, $y, 
-		       -text => 0.1*int(10.0*($ylo+$i*$yr/$ytick)), 
+		       -text => (int(($ylo+$i*$yr/$ytick)+0.5)),
 		       -anchor => 'e',
 		       -font => $labelfont, -fill => $fc);
 	} # forend
@@ -1242,25 +1207,41 @@ sub plot {
     my $r = 1.5*140/$xr;
     $r = ($r < 2.5 ? 2.5 : $r);
     $r = ($r > 6 ? 6 : $r);
+    my $rr = 2*$r;   
     my $ibol;
     @pw_point = ();
     for ($i = 0; $i <= $np; $i++) {
 	$x = $xleft  + (${$noiseentry[$i]}{'bolnr'}-$xlo) * 
 	    ($xright-$xleft)/$xr;
-	$y = $ybottom - (${$noiseentry[$i]}{"$col[$plotvar]"}-$ylo) *
-                         ($ybottom-$ytop)/$yr;
+        $val = ${$noiseentry[$i]}{"$col[$plotvar]"};
+	$y = $ybottom - ($val-$ylo) * ($ybottom-$ytop)/$yr;
         $pw_point[$i] = -1;
-        if ( $x  >= $xleft && $x  <= $xright && 
-	     $y  >= $ytop && $y  <= $ybottom ) {
-	  my $dtag = "d$i";
-	  $pw_point[$i] = 
-	      $C->create('oval', $x-$r, $y-$r, $x+$r, $y+$r, -width => 1, 
-			 -fill => $pc, -tags => "$dtag");
-	  if ($newplot) {
-	    $C->bind("$dtag", '<Any-Enter>' => [sub{item_on("$dtag")}]);
-	    $C->bind("$dtag", '<Any-Leave>' => [sub{item_off("$dtag")}]);
-	  }
-	}
+        if ( $x  >= $xleft && $x  <= $xright ) {
+
+	   my $dtag = "d$i";
+	   if ( $val  >= $ylo && $val  <= $yhi ) {
+	       $pw_point[$i] = 
+		   $C->create('oval', $x-$r, $y-$r, $x+$r, $y+$r, -width => 1, 
+			      -fill => $pc, -tags => "$dtag");
+	   } elsif ($val > $yhi ) {
+	      $pw_point[$i] = 
+		  $C->create('poly', $x-$r, $ytop+$rr, $x, $ytop, 
+			     $x+$r, $ytop+$rr, $x-$r, $ytop+$rr,
+			     -width => 1, -outline => 'black',
+			     -fill => $cc, -tags => "$dtag");
+           } elsif ($val < $ylo) {
+	       $pw_point[$i] = 
+		   $C->create('poly', $x-$r, $ybottom-$rr, $x, $ybottom, 
+			      $x+$r, $ybottom-$rr, $x-$r, $ybottom-$rr, 
+			      -width => 1,  -outline => 'black',
+			      -fill => $cc, -tags => "$dtag");
+	   }
+
+           if ($newplot) {
+	       $C->bind("$dtag", '<Any-Enter>' => [sub{item_on("$dtag")}]);
+	       $C->bind("$dtag", '<Any-Leave>' => [sub{item_off("$dtag")}]);
+	   }
+       }
     }
 
     if ($plotvar == 1) {
@@ -1272,7 +1253,7 @@ sub plot {
     } elsif ($plotvar == 4) {
       $w_calerr->configure( -state => 'disabled');
     }
-
+   
     if ($newplot && $plotvar == 2) {
        $y = $ybottom - (105-$ylo) * ($ybottom-$ytop)/$yr;
        $cutoff_line =
@@ -1296,8 +1277,8 @@ sub plot {
       $C->Tk::bind('<1>' => [sub {area_down(@ARG)}, \%pinfo]);
       $C->Tk::bind('<Double-1>' => [sub {show_lwsw(@ARG)}, \%pinfo]);
       $C->Tk::bind('<B1-Motion>' => [sub {area_move(@ARG)}, \%pinfo]);
-      $C->Tk::bind('<2>' => [sub {area_release(@ARG)}, \%pinfo]);
-      $C->Tk::bind('<3>' => [sub {area_cancel(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<2>' => [sub {area_cancel(@ARG)}, \%pinfo]);
+      $C->Tk::bind('<3>' => [sub {area_release(@ARG)}, \%pinfo]);
     }
 
 } # end Plot
@@ -1357,17 +1338,16 @@ sub plot_lwsw {
     if (defined $BC) {
 	    $BC->delete('all');
     } else {
-      $BC = $BW->Canvas(
-			-relief => 'raised', 
-			-width  => "$lplot", 
-			-height => "$mplot",
-			-cursor => 'top_left_arrow',
-		       );
-      $BW->Advertise('canvas' => $BC);
-      $BC->pack(-side => 'top', -fill => 'x');
-    
-      # Add "Dismiss" button on right below canvas
-      my $bwdismiss = $BW->Button(
+
+      # Create top menu bar frame
+      $BMB = $BW->Frame(
+		     -borderwidth => 0
+		    );
+      $BMB->pack(-side => 'top', -fill => 'x');
+
+
+      # Add "Dismiss" button on right above canvas
+      my $bwdismiss = $BMB->Button(
 				-text         => 'Dismiss',
 				-command      => sub{
 				  $C->delete($cutoff_line);
@@ -1377,8 +1357,8 @@ sub plot_lwsw {
       $BW->Advertise('Dismiss_button' => $bwdismiss);
       $bwdismiss->pack(-side=>'right');
 
-      # Add "Mode" menubutton on right below canvas
-      $bwmode = $BW->Button(
+      # Add "Mode" menubutton on left above canvas
+      $bwmode = $BMB->Button(
 			     -text         => "$newmode",
 			     -command      => sub{
 			       $bwmode->configure(-text => "$ffmode");
@@ -1387,7 +1367,18 @@ sub plot_lwsw {
 			     }
 			    );
       $BW->Advertise('Mode_button' => $bwmode);
-      $bwmode->pack(-side=>'right');
+      $bwmode->pack(-side=>'left');
+
+      $BC = $BW->Canvas(
+			-relief => 'groove',
+			-border => 3, 
+			-background => 'White',
+			-width  => "$lplot", 
+			-height => "$mplot",
+			-cursor => 'top_left_arrow',
+		       );
+      $BW->Advertise('canvas' => $BC);
+      $BC->pack(-side => 'top', -fill => 'x');
     }
 
     # flatfield scaling
@@ -1491,8 +1482,10 @@ sub item_off {
     
     my $i   = substr("$ARG[0]",1,999);
     my $val = ${$noiseentry[$i]}{"$col[$plotvar]"};
+    my $offc = $pc;
+    $offc = $cc if ($val < $ylo || $val > $yhi);
     $C->delete($iteminfo);
-    $C->itemconfigure($pw_point[$i], -fill => $pc) if ($pw_point[$i] != -1);
+    $C->itemconfigure($pw_point[$i], -fill => $offc) if ($pw_point[$i] != -1);
     if (defined $BW && $bw_point[$i] != -1) {
 	my $val = ${$noiseentry[$i]}{"$col[$flatvar]"};
 	if ($val < $cutoff ) {
@@ -1512,7 +1505,7 @@ sub area_down {
 
     $C->delete($iteminfo) if (defined $iteminfo);
     $iteminfo = $C->create('text', $xplot-100, 22, -text =>
-       "Left:   Area define\nMiddle: Replot area\nRight:  Cancel",
+       "Left:   Area define\nRight:  Replot area\nMiddle: Cancel",
 			   -font => $listfont, -fill => $cc);
 
     my $e = $w->XEvent;
@@ -1552,8 +1545,8 @@ sub area_release {
        $pinfo->{'areaY1'} != $pinfo->{'areaY2'} &&
        $pinfo->{'areaX2'} != -1 && $pinfo->{'areaY2'} != -1 ) {
       $alo = ($pinfo->{'areaX1'}-$xleft)  *$xr/($xright-$xleft)+$xlo;
-      $blo = ($ybottom-$pinfo->{'areaY1'})*$yr/($ybottom-$ytop)+$ylo;
       $ahi = ($pinfo->{'areaX2'}-$xleft)  *$xr/($xright-$xleft)+$xlo;
+      $blo = ($ybottom-$pinfo->{'areaY1'})*$yr/($ybottom-$ytop)+$ylo;
       $bhi = ($ybottom-$pinfo->{'areaY2'})*$yr/($ybottom-$ytop)+$ylo;
       $w->delete('area');
       $newplot = 1;
@@ -1615,7 +1608,7 @@ sub find_sem {
 
    my $obsdate = shift;
 
-   print "DEBUG: find_sem obsdate is ${obsdate}\n" if $debug;
+   print "DEBUG: find_sem obsdate is ${obsdate}\n" if ($debug);
 
 
    my $sem = "unknown";
@@ -1631,7 +1624,7 @@ sub find_sem {
      $sem = "m${year}b";
    }
 
-   print "DEBUG: ..... is mapped to semester ${sem}\n" if $debug;
+   print "DEBUG: ..... is mapped to semester ${sem}\n" if ($debug);
 
    return $sem;
 
