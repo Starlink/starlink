@@ -512,22 +512,24 @@ itcl::class gaia::GaiaImageCtrl {
    #  Get filename using fileselection dialog. This is created once and
    #  retains the current name and filters when repeatably accessed.
    protected method get_file_ {dir pattern types} {
-       if { ! [winfo exists $fileselect_] } {
-	   set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
-				-transient 1 -withdraw 1 -filter_types $types]
-	   wm transient $fileselect_ [winfo toplevel $w_]
-       } else {
+      if { ! [winfo exists $fileselect_] } {
+         set fileselect_ [FileSelect $w_.select -dir $dir -filter $pattern \
+                             -transient 1 -withdraw 1 -filter_types $types]
+         wm transient $fileselect_ [winfo toplevel $w_]
+      } else {
 
-          #  It's a transient so shouldn't need to do this... but CDE
-          #  needs it.
-          wm deiconify $fileselect_
-          raise $fileselect_
-       }
-       if {[$fileselect_ activate]} {
-	   return [$fileselect_ get]
-       }
+         #  Now a transient of this window, not one that created it.
+         wm transient $fileselect_ [winfo toplevel $w_]
+
+         #  Also deiconfy and raise in case previous parent is iconised.
+         wm deiconify $fileselect_
+         raise $fileselect_
+      }
+      if {[$fileselect_ activate]} {
+         return [$fileselect_ get]
+      }
    }
-
+   
    #  Set the cut levels.
    public method set_cut_levels {} {
       if {[$image_ isclear]} {
