@@ -65,8 +65,13 @@
           CALL ICOLOUR_GUI_UPDATE(STATUS)
         ELSEIF (MODE.EQ.'INVERT'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_INVERT(STATUS)
+          CALL GFX_SETCOLS(STATUS)
+        ELSEIF (MODE.EQ.'NEGATIVE'.AND.I_GUI) THEN
+          CALL ICOLOUR_GUI_NEGATIVE(STATUS)
+          CALL GFX_SETCOLS(STATUS)
         ELSEIF (MODE.EQ.'ROTATE'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_ROTATE(STATUS)
+          CALL GFX_SETCOLS(STATUS)
         ELSEIF (MODE.EQ.'SAVE'.AND.I_GUI) THEN
           CALL ICOLOUR_GUI_SAVE(STATUS)
         ELSEIF (MODE.EQ.'READ') THEN
@@ -1137,6 +1142,51 @@
 
       END
 
+
+*+  ICOLOUR_GUI_NEGATIVE
+      SUBROUTINE ICOLOUR_GUI_NEGATIVE(STATUS)
+*    Description :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     BHVAD::RJV
+*    Type definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'DAT_PAR'
+*    Status :
+      INTEGER STATUS
+*    Function declarations :
+*    Local constants :
+*    Global variables :
+      INCLUDE 'IMG_CMN'
+      REAL COL(3,16)
+      INTEGER NCOL,NSHADE,FIRST,LAST
+      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
+*    Local variables :
+      INTEGER I,J
+*-
+      IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
+
+        DO I=1,3
+          DO J=1,16
+            COL(I,J)=1.0-COL(I,J)
+          ENDDO
+        ENDDO
+
+        DO J=1,16
+          CALL GCB_SET1R('COLOUR_RED',J,1,COL(1,J),STATUS)
+          CALL GCB_SET1R('COLOUR_GREEN',J,1,COL(2,J),STATUS)
+          CALL GCB_SET1R('COLOUR_BLUE',J,1,COL(3,J),STATUS)
+        ENDDO
+
+      ENDIF
+
+      END
+
+
+
 *+  ICOLOUR_GUI_INVERT
       SUBROUTINE ICOLOUR_GUI_INVERT(STATUS)
 *    Description :
@@ -1159,20 +1209,28 @@
       INTEGER NCOL,NSHADE,FIRST,LAST
       COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
 *    Local variables :
-      REAL RED,GREEN,BLUE
-      REAL REDHUE,GREENHUE,BLUEHUE
-      INTEGER CJ
-      INTEGER I,J,K
+      REAL COL2(3,16)
+      INTEGER I,J
 *-
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
-        DO I=1,3
-          DO J=1,16
-            COL(I,J)=1.0-COL(I,J)
+        DO I=1,16
+          DO J=1,3
+            COL2(J,I)=COL(J,17-I)
           ENDDO
         ENDDO
 
-        CALL ICOLOUR_GUI_SET(STATUS)
+        DO I=1,16
+          DO J=1,3
+            COL(J,I)=COL2(J,I)
+          ENDDO
+        ENDDO
+
+        DO J=1,16
+          CALL GCB_SET1R('COLOUR_RED',J,1,COL(1,J),STATUS)
+          CALL GCB_SET1R('COLOUR_GREEN',J,1,COL(2,J),STATUS)
+          CALL GCB_SET1R('COLOUR_BLUE',J,1,COL(3,J),STATUS)
+        ENDDO
 
       ENDIF
 
@@ -1202,9 +1260,7 @@
       COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
 *    Local variables :
       REAL RED,GREEN,BLUE
-      REAL REDHUE,GREENHUE,BLUEHUE
-      INTEGER CJ
-      INTEGER I,J,K
+      INTEGER I
 *-
       IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
 
@@ -1215,80 +1271,15 @@
           COL(2,I)=RED
           COL(3,I)=GREEN
           COL(1,I)=BLUE
+          CALL GCB_SET1R('COLOUR_RED',I,1,COL(1,I),STATUS)
+          CALL GCB_SET1R('COLOUR_GREEN',I,1,COL(2,I),STATUS)
+          CALL GCB_SET1R('COLOUR_BLUE',I,1,COL(3,I),STATUS)
         ENDDO
 
-        CALL ICOLOUR_GUI_SET(STATUS)
 
       ENDIF
 
       END
-
-
-*+  ICOLOUR_GUI_SET
-      SUBROUTINE ICOLOUR_GUI_SET(STATUS)
-*    Description :
-*    Deficiencies :
-*    Bugs :
-*    Authors :
-*     BHVAD::RJV
-*    Type definitions :
-      IMPLICIT NONE
-*    Global constants :
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
-*    Status :
-      INTEGER STATUS
-*    Function declarations :
-*    Local constants :
-*    Global variables :
-      INCLUDE 'IMG_CMN'
-      REAL COL(3,16)
-      INTEGER NCOL,NSHADE,FIRST,LAST
-      COMMON /ICOLOUR_GUI_CMN/ COL,NCOL,NSHADE,FIRST,LAST
-*    Local variables :
-      REAL RED,GREEN,BLUE
-      REAL REDHUE,GREENHUE,BLUEHUE
-      INTEGER CJ
-      INTEGER I,J,K
-*-
-      IF (STATUS.EQ.SAI__OK.AND.NCOL.GE.16) THEN
-
-
-        CJ=FIRST
-
-
-        DO J=1,15
-          CALL GCB_SET1R('COLOUR_RED',J,1,COL(1,J),STATUS)
-          CALL GCB_SET1R('COLOUR_GREEN',J,1,COL(2,J),STATUS)
-          CALL GCB_SET1R('COLOUR_BLUE',J,1,COL(3,J),STATUS)
-          RED=COL(1,J)
-          REDHUE=(COL(1,J+1)-RED)/REAL(NSHADE+1)
-          GREEN=COL(2,J)
-          GREENHUE=(COL(2,J+1)-GREEN)/REAL(NSHADE+1)
-          BLUE=COL(3,J)
-          BLUEHUE=(COL(3,J+1)-BLUE)/REAL(NSHADE+1)
-          CALL PGSCR(CJ,RED,GREEN,BLUE)
-          DO K=1,NSHADE
-            CJ=CJ+1
-            RED=RED+REDHUE
-            GREEN=GREEN+GREENHUE
-            BLUE=BLUE+BLUEHUE
-            CALL PGSCR(CJ,RED,GREEN,BLUE)
-          ENDDO
-          CJ=CJ+1
-        ENDDO
-        RED=COL(1,16)
-        GREEN=COL(2,16)
-        BLUE=COL(3,16)
-        CALL PGSCR(16,RED,GREEN,BLUE)
-        CALL GCB_SET1R('COLOUR_RED',16,1,COL(1,16),STATUS)
-        CALL GCB_SET1R('COLOUR_GREEN',16,1,COL(2,16),STATUS)
-        CALL GCB_SET1R('COLOUR_BLUE',16,1,COL(3,16),STATUS)
-
-      ENDIF
-
-      END
-
 
 
 *+  ICOLOUR_GUI_SAVE
