@@ -307,7 +307,7 @@
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
 
 *  Add the POLANAL Frame into the FrameSet.
-      CALL POL1_PTPOL( ANGROT, IWCS, STATUS )
+      CALL POL1_PTANG( ANGROT, IWCS, STATUS )
 
 *  Store the new FrameSet back in the NDF.
       CALL NDF_PTWCS( IWCS, INDF, STATUS )
