@@ -897,7 +897,7 @@ void DviFile::read_postamble()
 {
     const int tailbuflen = 64;
     // get final 64 bytes of file
-    const Byte *dviBuf = dvif_->getBlock(-1, tailbuflen);
+    const Byte *dviBuf = dvif_->getBlock(-tailbuflen, tailbuflen);
     const Byte *p;
     for (p=dviBuf+tailbuflen-1; p>=dviBuf; p--)
 	if (*p != 223)
