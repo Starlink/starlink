@@ -13,7 +13,8 @@
 *     CALL SLN1_GETREC( NARG, ARGS, OARG, STATUS )
 
 *  Description:
-*     {routine_description}
+*     Reads a selection record from an HDS file. Caters for the new style
+*     (written by SLN_) and the old XRT format.
 
 *  Arguments:
 *     NARG = INTEGER (given)
@@ -101,10 +102,14 @@
 *  External References:
       EXTERNAL			CHR_INSET
         LOGICAL			CHR_INSET
+      EXTERNAL			CHR_LEN
+        INTEGER			CHR_LEN
 
 *  Local Variables:
       CHARACTER*132		ARDIN			! ARD text line
       CHARACTER*80		QNAMS			! Quantities needed
+      CHARACTER*1		SCODE			! Space box shape code
+      CHARACTER*(DAT__SZLOC)	SECLOC			! Cell of SELOC
       CHARACTER*(DAT__SZLOC)	SELOC			! Sort box selector
       CHARACTER*(DAT__SZLOC)	SLOC			! Sort box
       CHARACTER*20		SNAME			! Selector name
@@ -114,6 +119,11 @@
       CHARACTER*(DAT__SZLOC)	TLOC			! Text box for ARD
       CHARACTER*(DAT__SZTYP)	TYPE			! Component type
       CHARACTER*20		VARIANT			! Selector variant
+
+      DOUBLE PRECISION		DVAL			! Range pair value
+
+      REAL			XCENT, XIN, XOUT, PHI	! SPACE box contents
+      REAL			YCENT, YIN, YOUT	! SPACE box contents
 
       INTEGER			DIM, NDIM		! Sort box dimensions
       INTEGER			GRPID			! GRP identifier
@@ -191,6 +201,148 @@
 
 *      Didn't have program id
           CALL ADI_CPUT0C( OARG, 'Version', '*unknown*', STATUS )
+
+*      Loop through components, everything is a selector in this format
+          CALL DAT_NCOMP( SSLOC, NCMP, STATUS )
+          DO ICMP = 1, NCMP
+
+*        Locate this component
+            CALL DAT_INDEX( SSLOC, ICMP, SELOC, STATUS )
+            CALL DAT_NAME( SELOC, SNAME, STATUS )
+
+*        Does user want this selector
+            IF ( QNAMS(1:1) .EQ. '*' ) THEN
+              WANTED = .TRUE.
+            ELSE
+              WANTED = CHR_INSET( QNAMS, SNAME )
+            END IF
+            IF ( WANTED ) THEN
+
+*          Locate first and only cell of component
+              CALL DAT_CELL( SELOC, 1, 1, SECLOC, STATUS )
+
+*          Create new selector structure for export
+              CALL ADI_NEW0( 'STRUC', SELID, STATUS )
+
+*          Trap the SPACE form
+              IF ( SNAME .EQ. 'SPACE' ) THEN
+
+*            Get the shape code
+                CALL CMP_GET0C( SECLOC, 'SHAPE', SCODE, STATUS )
+
+*            Create new group id
+                CALL GRP_NEW( 'ARD selection', GRPID, STATUS )
+
+*            Get common values
+                CALL CMP_GET0R( SECLOC, 'XCENT', XCENT, STATUS )
+                CALL CMP_GET0R( SECLOC, 'YCENT', YCENT, STATUS )
+                CALL CMP_GET0R( SECLOC, 'XINNER', XIN, STATUS )
+                CALL CMP_GET0R( SECLOC, 'YINNER', YIN, STATUS )
+                CALL CMP_GET0R( SECLOC, 'XOUTER', XOUT, STATUS )
+                CALL CMP_GET0R( SECLOC, 'YOUTER', YOUT, STATUS )
+
+*            Switch on shape code. Simple circle first
+                IF ( STATUS .NE. SAI__OK ) THEN
+                  CALL ERR_REP( 'SLN1_GETREC', 'Error reading sort '/
+     :                          /'spatial area description', STATUS )
+
+                ELSE IF ( SCODE .EQ. 'C' ) THEN
+
+                  IF ( (XIN.EQ.0.0) .AND. (YIN.EQ.0.0) ) THEN
+                    CALL ARX_CIRCLE( GRPID, 1, ' ', .FALSE., XCENT,
+     :                               YCENT, ABS(XOUT-XIN), STATUS )
+                  ELSE
+                    CALL ARX_ANNULUS( GRPID, 1, ' ', .FALSE., XCENT,
+     :                          YCENT, ABS(XIN), ABS(XOUT), STATUS )
+                  END IF
+
+*            Ellipse
+                ELSE IF ( SCODE .EQ. 'E' ) THEN
+
+*              Get rotation angle
+                  CALL CMP_GET0R( SECLOC, 'PHI', PHI, STATUS )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                    CALL ERR_ANNUL( STATUS )
+                    PHI = 0.0
+                  END IF
+
+*              Write outer ellipse
+                  CALL ARX_ELLIPSE( GRPID, 1, ' ', .FALSE., XCENT,
+     :                              YCENT, MAX(XOUT,YOUT),
+     :                              MIN(XOUT,YOUT), PHI, STATUS )
+
+*              And trap where inner radii specified
+                  IF ( (XIN.GT.0.0) .AND. (YIN.GT.0.0) ) THEN
+                    CALL ARX_ELLIPSE( GRPID, 1, 'AND', .TRUE., XCENT,
+     :                              YCENT, MAX(XIN,YIN),
+     :                              MIN(XIN,YIN), PHI, STATUS )
+                  END IF
+
+*            Rectangular box
+                ELSE IF ( SCODE .EQ. 'R' ) THEN
+
+                  CALL ARX_BOX( GRPID, 1, ' ', .FALSE., XCENT, YCENT,
+     :                          ABS(XOUT*2.0), ABS(YOUT*2.0), STATUS )
+
+                END IF
+
+*            Write group id
+                CALL ADI_CPUT0I( SELID, 'GRPID', GRPID, STATUS )
+
+*            Write the variant
+                VARIANT = 'AREA_DESCRIPTION'
+
+              ELSE
+
+*            Good old HDX_ routines wrote this structure so if there was
+*            only one range a scalar was written, otherwise a vector. What
+*            a pain.
+                CALL CMP_SHAPE( SECLOC, 'START', 1, DIM, NDIM, STATUS )
+                IF ( NDIM .EQ. 0 ) THEN
+
+*              Query data type of these pairs
+                  CALL CMP_TYPE( SECLOC, 'START', TYPE, STATUS )
+
+*              Create start and stop arrays
+                  CALL ADI_CNEW1( SELID, 'START', TYPE(2:), 1, STATUS )
+                  CALL ADI_CNEW1( SELID, 'STOP', TYPE(2:), 1, STATUS )
+
+*              Copy values
+                  CALL CMP_GET0D( SECLOC, 'START', DVAL, STATUS )
+                  CALL ADI_CPUT1D( SELID, 'START', 1, DVAL, STATUS )
+                  CALL CMP_GET0D( SECLOC, 'STOP', DVAL, STATUS )
+                  CALL ADI_CPUT1D( SELID, 'STOP', 1, DVAL, STATUS )
+
+                ELSE
+
+                  CALL ADI1_CCH2AT( SELOC, 'START', SELID, 'START',
+     :                              STATUS )
+                  CALL ADI1_CCH2AT( SELOC, 'STOP', SELID, 'STOP',
+     :                              STATUS )
+
+                END IF
+
+*            Write the variant
+                VARIANT = 'RANGE_PAIRS'
+
+              END IF
+
+*          Write the variant
+              CALL ADI_CPUT0C( SELID, 'Variant',
+     :                         VARIANT(:CHR_LEN(VARIANT)), STATUS )
+
+*          Write the selector
+              CALL ADI_CPUTID( SID, SNAME, SELID, STATUS )
+
+*          Release the cell
+              CALL DAT_ANNUL( SECLOC, STATUS )
+
+            END IF
+
+*        Release component
+            CALL DAT_ANNUL( SELOC, STATUS )
+
+          END DO
 
         ELSE
 
