@@ -1,20 +1,31 @@
-*+  REDS_REDUCE_SWITCH - reduce the switch sequence for a SCUBA observation
       SUBROUTINE REDS_REDUCE_SWITCH (STATUS)
-*    Description :
+*+  
+*  Name:
+*     REDS_REDUCE_SWITCH
+
+*  Purpose:
+*     reduce the switch sequence for a SCUBA observation
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_REDUCE_SWITCH (STATUS)
+
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+
+*  Description:
 *     This application takes a SCUBA demodulated data file and splits the 
 *     data array up into its various `planes'; data, variance and quality.
 *     In addition, the application reduces the component switches of an
 *     exposure to give the exposure result. Optionally, the routine will
 *     divide the internal calibrator signal into the data before doing either
-*     of these things. The parameters used are:-
-*
-*     IN              - The name of the demodulated data file
-*     USE_CALIBRATOR  - Yes, if you want the data for each bolometer measurement
-*                       divided by the corresponding internal calibrator
-*                       signal.
-*     SPIKE_LEVEL     - level at which pixels should be marked bad
-*     OUT             - The name of the file to contain the output data.
-*
+*     of these things. 
 *     If status is good on entry, the routine reads the USE_CALIBRATOR
 *     parameter and opens the IN file. 
 *        Some FITS items describing the observation are read from the
@@ -56,14 +67,33 @@
 *     the results are placed in seperate planes of the output data array.
 *        Finally, the IN and OUT files are closed and all virtual memory
 *     freed.
-*    Invocation :
-*     CALL REDS_REDUCE_SWITCH (STATUS)
-*    Parameters :
-*     STATUS           = INTEGER (Given and returned)
-*           global status
-*    Method :
-*    Deficiencies :
-*    Bugs :
+
+*  Parameters:
+*     IN = NDF (Read)
+*        The name of the demodulated data file.
+*     OUT = NDF (Read)
+*        The name of the file to contain the output data.
+*     SPIKE_LEVEL = _INTEGER (Read)
+*        Number of spikes tolerated before marking data point bad.
+*     USE_CALIBRATOR = _LOGICAL (Read)
+*        Yes, if you want the data for each bolometer measurement
+*        divided by the corresponding internal calibrator signal.
+
+*  Examples:
+*     reduce_switch IN=test USE_CALIBRATOR=no SPIKE_LEVEL=0 OUT=nosw
+*        This will reduce the switch from input file test.sdf without dividing
+*        by the calibrator signal and no toleration of any spikes detected by the
+*        transputers. The output data will be written to nosw.sdf.
+
+*  Notes:
+
+*  Implementation status:
+*      - Deals with QUALITY arrays
+
+*  Authors :
+*     JFL: J.Lightfoot (jfl@roe.ac.uk)
+*     TIMJ: T. Jenness (timj@jach.hawaii.edu)
+
 *    Authors :
 *     J.Lightfoot (jfl@roe.ac.uk)
 *    History :
@@ -72,10 +102,22 @@
 *     10-JUN-1996: modified to handle PHOTOM mode (JFL).
 *      9-JUL-1996: modified to handle v200 data with 5 data per demodulated
 *                  point (JFL).
+*     $Log$
+*     Revision 1.8  1996/10/30 03:01:39  timj
+*     Use VEC_ITOI instead of SCULIB_COPYI.
+*     Rewrite header to new Starlink standard.
+*
 *    endhistory
-*    Type Definitions :
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+
+*  Type Definitions :
       IMPLICIT NONE
-*    Global constants :
+
+*  Global constants :
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'                ! for DAT__SZLOC
       INCLUDE 'PRM_PAR'                ! for VAL__xxxx
@@ -136,6 +178,7 @@
       INTEGER I                        ! DO loop index
       INTEGER      IARY1               ! ARY array identifier
       INTEGER      IARY2               ! ARY array identifier
+      INTEGER      IERR                ! Location of error returned from VEC_ITOI
       INTEGER      IN_NDF              ! NDF identifier of input file
       INTEGER      INTEGRATION         ! integration index in DO loop
       INTEGER      IN_DATA_PTR         ! pointer to data array of input file
@@ -147,6 +190,7 @@
       CHARACTER*(DAT__SZLOC) LOC2      !
       INTEGER      MEASUREMENT         ! measurement index in DO loop
       INTEGER      NDIM                ! the number of dimensions in an array
+      INTEGER      NERR                ! Number of errors returned from VEC_ITOI
       INTEGER      NREC                ! number of history records in file
       INTEGER      N_BOLS              ! number of bolometers measured
       INTEGER      N_EXPOSURES         ! number of exposures per integration
@@ -674,9 +718,10 @@
 *  increment the output offset
 
                   ITEMP = ((MEASUREMENT-1) * N_INTEGRATIONS +
-     :              INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
-                  CALL SCULIB_COPYI (1, EXP_POINTER, 
-     :              %val(OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI))
+     :                 INTEGRATION-1) * N_EXPOSURES + EXPOSURE-1
+                  CALL VEC_ITOI(.FALSE., 1, EXP_POINTER,
+     :                 %val(OUT_DEM_PNTR_PTR + ITEMP * VAL__NBI), IERR,
+     :                 NERR, STATUS)
                   EXP_POINTER = EXP_POINTER + N_SWITCH_POS
                END DO
             END DO
