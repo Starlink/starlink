@@ -8447,202 +8447,227 @@ package kappa {
       }
 
       action creframe {
-         alias {cref(rame)}
 
-         parameter logfile {
-            type FILENAME
-            vpath DEFAULT
-            ppath DEFAULT
-            prompt {Log file for results}
-            default !
+         parameter background {
+            type _REAL
+            ppath CURRENT DEFAULT
+            prompt {Background value}
+            default 0
             helpkey *
-         }
+          }
 
-         parameter xdim {
-            position 1
+         parameter badcol {
             type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {x dimension of output array}
-            help "Give the x dimension of the array to contain the generated data"
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Number of bad columns to include}
+            default 0
+            helpkey *
           }
 
-         parameter ydim {
-            position 2
+         parameter badpix {
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Bad pixels to be included?}
+            helpkey *
+            default FALSE
+          }
+
+         parameter badrow {
             type _INTEGER
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {y dimension of output array}
-            help "Give the y dimension of the array to contain the generated data"
-          }
-
-         parameter typed {
-            position 4
-            type LITERAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Type of data to be generated}
-            help "Current allowable types : GS,RR,RL,RP,RA,FL,BL,GN - see full help or paper documentation for further details"
-          }
-
-         parameter low {
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Lower limit for data}
-            help "Give the lower intensity limit for the generated data array"
-          }
-
-         parameter high {
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Upper limit for data}
-            help "Give the upper intensity limit for the generated data array"
-          }
-
-         parameter mean {
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Mean intensity}
-            help "Give the mean intensity figure for the generated data array"
-          }
-
-         parameter sigma {
-            type _REAL
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {Standard deviation of the noise.}
-            help "Give the standard deviation of the noise about the mean for the generated data array"
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Number of bad rows to include}
+            default 0
+            helpkey *
           }
 
          parameter dirn {
             type _INTEGER
-            vpath PROMPT
-            ppath DYNAMIC
+            ppath CURRENT DEFAULT
             prompt {Direction of ramping}
-            help "1 = L-R : 2 = R-L : 3 = B-T : 4 = T-B, where L is left, R is right, B is bottom and T is top."
+            default 1
+            helpkey *
+          }
+
+         parameter distrib {
+            type LITERAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Type of radial distribution (RSQ,FIX)}
+            default FIX
+            helpkey *
+          }
+
+         parameter fraction {
+            type _REAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Fraction of bad pixels}
+            default 0.01
+            helpkey *
+          }
+
+         parameter high {
+            type _REAL
+            ppath CURRENT DEFAULT
+            prompt {Upper limit for data}
+            default 1000
+            helpkey *
+          }
+
+         parameter lbound {
+            position 3
+            type _INTEGER
+            vpath DEFAULT
+            prompt {Lower bounds of the output NDF}
+            ppath CURRENT DEFAULT
+            default 1
+            helpkey *
+          }
+
+         parameter like {
+            type NDF
+            access READ
+            vpath DEFAULT
+            prompt {Template NDF}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter logfile {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Name for log file}
+            default !
+            helpkey *
+          }
+
+         parameter low {
+            type _REAL
+            ppath DEFAULT
+            prompt {Lower limit for data}
+            default 0.0
+            helpkey *
           }
 
          parameter max {
             type _REAL
             access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            ppath CURRENT
             prompt {Maximum peak intensity for Gaussians}
-            help "Give the value to be used as the upper limit to Gaussians' peak values"
+            helpkey *
+          }
+
+         parameter mean {
+            type _REAL
+            ppath CURRENT
+            prompt {Mean intensity}
+            helpkey *
           }
 
          parameter min {
             type _REAL
             access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            ppath CURRENT
             prompt {Minimum peak intensity for Gaussians}
-            help "Give the value to be used as the lower limit to Gaussians' peak values"
+            helpkey *
           }
 
-         parameter background {
-            type _REAL
-            access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
-            prompt {Background value}
-            help "Give the value to be taken for the background in the data array"
+         parameter mode {
+            position 2
+            type LITERAL
+            prompt {Form of data to be generated}
+            ppath CURRENT DEFAULT
+            default GS
+            helpkey *
           }
 
          parameter ngauss {
             type _INTEGER
             access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            ppath CURRENT
             prompt {Number of Gaussians}
-            help "Give the number of Gaussians to be generated by the application"
+            helpkey *
+          }
+
+         parameter out {
+            position 1
+            type NDF
+            access WRITE
+            vpath PROMPT
+            prompt {Output NDF structure}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+
+         parameter outcat {
+            type LITERAL
+            access WRITE
+            vpath DEFAULT
+            prompt {Output positions list}
+            ppath CURRENT DEFAULT
+            default !
+            association ->GLOBAL.CATALOGUE
+            helpkey *
+          }
+
+         parameter quiet {
+            type _LOGICAL
+            access READ
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Suppress reporting of Gaussian parameters to the screen?}
+            default TRUE
+            helpkey *
           }
 
          parameter seeing {
             type _REAL
             access READ
-            vpath PROMPT
-            ppath CURRENT DYNAMIC
+            ppath CURRENT
             prompt {Full-width half-maximum of Gaussians in pixels}
-            help "FWHM is equivalent to the seeing or 2.354 standard deviations"
+            helpkey *
           }
 
-         parameter distrib {
-            type LITERAL
-            vpath DYNAMIC
-            ppath CURRENT DYNAMIC
-            prompt {Type of radial distribution (RSQ,FIX)}
-            help "Give the radial distribution type - 1/r-squared or fixed"
-          }
-
-         parameter badpix {
-            type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath CURRENT DYNAMIC DEFAULT
-            prompt {Bad pixels to be included ?}
-            help "Whether or not bad pixels are to be included in the array"
-            default FALSE
-          }
-
-         parameter fraction {
+         parameter sigma {
             type _REAL
-            access READ
-            vpath DYNAMIC
-            ppath CURRENT DYNAMIC
-            prompt {Fraction of bad pixels}
-            help "Give the fraction of pixels in the data array to be set to bad-pixel value"
+            ppath CURRENT
+            prompt {Standard deviation of the noise.}
+            helpkey *
           }
 
-         parameter badcol {
-            type _LOGICAL
-            access READ
+         parameter title {
+            type LITERAL
             vpath DEFAULT
-            ppath CURRENT DYNAMIC DEFAULT
-            prompt {Bad column to be included ?}
-            help "Whether or not a bad column is to be placed in the data array"
-            default FALSE
+            ppath CURRENT DEFAULT
+            prompt {Title for output NDF}
+            default {KAPPA - Creframe}
+            helpkey *
           }
 
-         parameter screen {
+         parameter ubound {
+            position 4
+            type _INTEGER
+            vpath DEFAULT
+            prompt {Upper bounds of the output NDF}
+            ppath CURRENT DEFAULT
+            default 64
+            helpkey *
+          }
+
+         parameter variance {
             type _LOGICAL
-            access READ
-            vpath DYNAMIC
-            ppath CURRENT DYNAMIC DEFAULT
-            prompt {Report Gaussian parameters?}
-            default FALSE
-            help "If yes, the Gaussian parameters will be printed on the screen. Otherwise in a file"
-          }
-
-         parameter filename {
-            type FILENAME
             access READ
             vpath DEFAULT
             ppath CURRENT DEFAULT
-            prompt {Filename for output}
+            prompt {Create a VARIANCE component?}
             default !
-            help "Name of the ASCII file to be used for storing the Gaussian parameters"
-          }
-
-         parameter outpic {
-            position 3
-            type IMAGE
-            access WRITE
-            vpath PROMPT
-            association ->GLOBAL.DATA_ARRAY
-            prompt {Image for output data}
-            help "Name given to the IMAGE data structure to hold the generated data array"
-          }
-
-         parameter otitle {
-            type _CHAR
-            vpath DEFAULT
-            prompt {Title for output array}
-            default {KAPPA - Creframe}
-            help "Character string used as a title for the output IMAGE structure."
+            helpkey *
           }
 
       }

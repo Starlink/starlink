@@ -1,7 +1,7 @@
       SUBROUTINE KPS1_CREMG( IDIM1, IDIM2, MAX, MIN, BCKGRD, NGAUSS, 
      :                       FWHM, DISTRB, BADPIX, FRACTN, BADCOL, 
-     :                       BADROW, SCREEN, FILNAM, IMAGE, ERROR, 
-     :                       VARS, STATUS )
+     :                       BADROW, SCREEN, PARAM1, PARAM2, VARS, 
+     :                       IMAGE, ERROR, WORK, STATUS )
 *+
 *  Name:
 *     KPS1_CREMG
@@ -15,7 +15,7 @@
 *  Invocation:
 *     CALL KPS1_CREMG( IDIM1, IDIM2, MAX, MIN, BCKGRD, NGAUSS, FWHM,
 *                      DISTRB, BADPIX, FRACTN, BADCOL, BADROW, SCREEN, 
-*                      FILNAM, IMAGE,  ERROR, VARS, STATUS )     
+*                      PARAM1, PARAM2, VARS, IMAGE, ERROR, WORK, STATUS )     
 
 *  Description :
 *     This routine generates a specified number of 2-D Gaussian images
@@ -25,44 +25,49 @@
 *     parameters may be output via the screen or into a file.
 
 *  Arguments :
-*     IDIM1 = INTEGER ( Given )
+*     IDIM1 = INTEGER (Given)
 *         First dimension of array to be created
-*     IDIM2 = INTEGER ( Given )
+*     IDIM2 = INTEGER (Given)
 *         Second dimension of array to be created
-*     MAX = REAL ( Given )
+*     MAX = REAL (Given)
 *         Maximum stellar intensity
-*     MIN = REAL ( Given )
+*     MIN = REAL (Given)
 *         Minimum stellar intensity
-*     BCKGRD = REAL ( Given )
+*     BCKGRD = REAL (Given)
 *         Background value to be used
-*     NGAUSS = INTEGER ( Given )
+*     NGAUSS = INTEGER (Given)
 *         Number of stars to be generated
-*     FWHM = REAL ( Given )
+*     FWHM = REAL (Given)
 *         Full Width Half Maximum of Gaussian (equivalent to seeing)
 *         in pixels
-*     DISTRB = CHARACTER*3 ( Given )
+*     DISTRB = CHARACTER*3 (Given)
 *         Radial distribution of Gaussians - default (RSQ) gives
 *         1-over-r squared; FIX gives fixed distance
-*     BADPIX = LOGICAL ( Given )
+*     BADPIX = LOGICAL (Given)
 *         True if bad pixels are to be included
-*     FRACTN = REAL ( Given )
+*     FRACTN = REAL (Given)
 *         Fraction of pixels that are to be made bad
-*     BADCOL = INTEGER ( Given )
+*     BADCOL = INTEGER (Given)
 *         Number of bad columns to be included
-*     BADROW = INTEGER ( Given )
+*     BADROW = INTEGER (Given)
 *         Number of bad rows to be included
-*     SCREEN = LOGICAL ( Given )
+*     SCREEN = LOGICAL (Given)
 *         True if Gaussian parameters are to be reported
-*     FILNAM = CHARACTER*(*) ( Given )
-*         Parameter name for the filename to be used for the output of
+*     PARAM1 = CHARACTER*(*) (Given)
+*         Parameter name for the name of the log file to receive the
 *         Gaussian parameters
-*     IMAGE( IDIM1, IDIM2 ) = REAL ( Returned )
-*         Created image.
-*     ERROR( IDIM1, IDIM2 ) = REAL ( Returned )
-*         Created variances.
-*     VARS = LOGICAL ( Given )
+*     PARAM2 = CHARACTER*(*) (Given)
+*         Parameter name for the name of the catalogue to receive a
+*         list of the Gaussian positions.
+*     VARS = LOGICAL (Given)
 *         Whether the variance component should be populated
-*     STATUS = INTEGER ( READ, WRITE )
+*     IMAGE( IDIM1, IDIM2 ) = REAL (Returned)
+*         Created image.
+*     ERROR( IDIM1, IDIM2 ) = REAL (Returned)
+*         Created variances.
+*     WORK( NGAUSS, 2 ) = DOUBLE PRECISION (Returned)
+*         Work array.
+*     STATUS = INTEGER (Given and Returned)
 *         Global status value
 
 *  Authors:
@@ -114,6 +119,7 @@
 *        Changed prologue to conform to Starlink standards
 *     11-SEP-2001 (DSB):
 *        Changed layout of code comments, and variable declarations.
+*        Added args PARAM2 and WORK.
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -126,6 +132,7 @@
       INCLUDE 'SAE_PAR'        ! SSE global definitionsffssdaw
       INCLUDE 'PAR_ERR'        ! Parameter-system errors
       INCLUDE 'PRM_PAR'        ! Magic-value constants
+      INCLUDE 'AST_PAR'        ! AST constants and functions
 
 *  Arguments Given:
       INTEGER IDIM1
@@ -141,12 +148,14 @@
       INTEGER BADCOL
       INTEGER BADROW
       LOGICAL SCREEN
-      CHARACTER FILNAM*(*)
+      CHARACTER PARAM1*(*)
+      CHARACTER PARAM2*(*)
       LOGICAL VARS
 
 *  Arguments Returned:
       REAL IMAGE( IDIM1, IDIM2 )
       REAL ERROR( IDIM1, IDIM2 )
+      DOUBLE PRECISION WORK( NGAUSS, 2 )
      
 *  Global Status :
       INTEGER  STATUS
@@ -166,6 +175,7 @@
       INTEGER CURBAD           ! number of pixels currently set bad
       INTEGER FD               ! file description
       INTEGER I                ! General counter
+      INTEGER IWCS             ! Temporary FrameSet defining pixel coords
       INTEGER J                ! General counter
       INTEGER K                ! General counter
       INTEGER L                ! General counter
@@ -198,7 +208,7 @@
 *  Start by checking to see if output of the Gaussian parameters
 *  is required, and act accordingly
       LOGGP = .FALSE.
-      CALL FIO_ASSOC( FILNAM, 'WRITE', 'FORTRAN', NCHLIN, FD, STATUS )
+      CALL FIO_ASSOC( PARAM1, 'WRITE', 'FORTRAN', NCHLIN, FD, STATUS )
 
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
@@ -208,19 +218,13 @@
       END IF
 
       IF( LOGGP ) THEN
-         CALL MSG_SETC( 'FILNAM', FILNAM )
-         CALL MSG_OUT( 'LOG', 'Logging to $^FILNAM', STATUS )
+         CALL MSG_SETC( 'PARAM', PARAM1 )
+         CALL MSG_OUT( 'LOG', 'Logging to $^PARAM', STATUS )
       END IF
 
-*  Write caption if the Gaussians used are to be reported to the user.
-      IF( SCREEN ) THEN
-         BUFFER = '  Number   x centre  y centre      Peak'
-
-*  Write to the user directly.
-         CALL MSG_SETC( 'BUFFER', BUFFER )
-         CALL MSG_OUT( 'RESULT', BUFFER, STATUS )
-
-      END IF
+*  Write caption.
+      CALL KPG1_REPRT( '  Number   x centre  y centre      Peak',
+     :                 .NOT. SCREEN, LOGGP, FD, STATUS )
 
 *  Work out the interval between max and min
       INTRVL  =  MAX - MIN
@@ -238,7 +242,7 @@
 
 *  Populate the variance component if required
             IF( VARS ) THEN
-               ERROR( I, J ) = SQRT( IMAGE( I, J ) )
+               ERROR( I, J ) = IMAGE( I, J )
             ENDIF        
          END DO
       END DO
@@ -258,6 +262,10 @@
          XPOS   =  VALUE * REAL( IDIM1 )
          VALUE  =  SLA_RANDOM( SEED )
          YPOS   =  VALUE * REAL( IDIM2 )
+
+*  Store the position.
+         WORK( N, 1 ) = DBLE( XPOS )
+         WORK( N, 2 ) = DBLE( YPOS )
 
 *  Now get a random peak intensity within the specified range,
 *  and according to the specified radial distribution
@@ -319,7 +327,7 @@
                      IMAGE( K, L )  =  IMAGE( K, L ) + INTENS
 
 *  Populate the variance component if required
-                     IF( VARS ) ERROR( K, L ) = SQRT( IMAGE( K, L ) )
+                     IF( VARS ) ERROR( K, L ) = IMAGE( K, L )
 
                   END IF
                END DO
@@ -330,20 +338,7 @@
          IF( SCREEN .OR. LOGGP ) THEN
             WRITE( BUFFER, '( I6,2X,2F10.3,E15.6 )' ) N, XPOS, YPOS,
      :             PEAK
-         END IF
-
-         IF( SCREEN ) THEN
-
-*  Write to the user directly.
-            CALL MSG_SETC( 'BUFFER', BUFFER )
-            CALL MSG_OUT( 'RESULT', BUFFER, STATUS )
-         END IF
-
-         IF( LOGGP ) THEN
-
-*  Write to file
-            CALL FIO_WRITE( FD, BUFFER, STATUS )
-
+            CALL KPG1_REPRT( BUFFER, .NOT. SCREEN, LOGGP, FD, STATUS )
          END IF
 
 *  Bottom of loop for Gaussians
@@ -351,6 +346,15 @@
 
 *  Close any open units at this point
       IF( LOGGP ) CALL FIO_ANNUL( FD, STATUS )
+
+*  Create any output catalogue.
+      CALL AST_BEGIN( STATUS )
+      IWCS = AST_FRAMESET( AST_FRAME( 2, 'DOMAIN=PIXEL', STATUS ),
+     :                     ' ', STATUS )
+      CALL KPG1_WRLST( PARAM2, NGAUSS, NGAUSS, 2, WORK, 1, IWCS,
+     :                 'Centres of Gaussians created by CREFRAME', 1, 
+     :                 0, .TRUE., STATUS )
+      CALL AST_END( STATUS )
 
 *  We have created the background and the Gaussians, we can add
 *  the pseudo-Poissonian noise.  The routine KPG1_POISR takes the

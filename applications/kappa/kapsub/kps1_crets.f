@@ -85,11 +85,11 @@
 *        Changed prologue to conform to Starlink standards
 *     11-SEP-2001 (DSB):
 *        Changed layout of code comments, and variable declarations.
+*        Re-wrote variances estimations.
 
 *  Deficiencies :
 *     Poissonian noise is artificial. No checks are made that the ramps
-*     or random limits will not generate bad pixels. Variance data is
-*     simple sqrt(N).
+*     or random limits will not generate bad pixels. 
 
 *  Bugs:
 *     {note_any_bugs_here}
@@ -133,6 +133,7 @@
       REAL INTER               ! Intensity interval per line/col in ramp
       REAL SEED                ! Random number generator seed
       REAL VALUE               ! Value given by random subroutine
+      REAL VAR                 ! Constant variance
 
 *.
  
@@ -150,20 +151,23 @@
 *  Random between 0 and 1
       IF( TYPED .EQ. 'RR' ) THEN            
 
+         VAR = 1.0/12.0
+
          DO  J  =  1, DIM2
             DO  I  =  1, DIM1
                VALUE = SLA_RANDOM( SEED )
                ARRAY( I, J ) = VALUE
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = VAR
+
             END DO
          END DO
 
 *  Random between limits
       ELSE IF( TYPED .EQ. 'RL' ) THEN       
+
+         VAR =  ( HIGH - LOW )**2/12.0
 
          DO  J  =  1, DIM2
             DO  I  =  1, DIM1
@@ -172,9 +176,8 @@
                ARRAY( I, J ) = VALUE
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = VAR
+
             END DO
          END DO
 
@@ -188,9 +191,8 @@
                ARRAY( I, J ) = DATA
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = MEAN
+
             END DO
          END DO
 
@@ -205,9 +207,8 @@
                   ARRAY( I, J ) = LOW + ( INTER *  ( I - 1 ) )
 
 *  Populate the variance component if required
-                  IF ( VARS ) THEN
-                     ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-                  ENDIF
+                  IF ( VARS ) ERROR( I, J ) = 0.0
+
                END DO
             END DO
 
@@ -219,9 +220,8 @@
                   ARRAY( I, J ) = HIGH - ( INTER * ( I - 1 ) )
 
 *  Populate the variance component if required
-                  IF ( VARS ) THEN
-                     ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-                  ENDIF
+                  IF ( VARS ) ERROR( I, J ) = 0.0
+
                END DO
             END DO
 
@@ -233,9 +233,8 @@
                   ARRAY( I, J ) = LOW + ( INTER * ( J - 1 ) )
 
 *  Populate the variance component if required
-                  IF ( VARS ) THEN
-                     ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-                  ENDIF
+                  IF ( VARS ) ERROR( I, J ) = 0.0
+
                END DO
             END DO
 
@@ -247,9 +246,8 @@
                   ARRAY( I, J ) = HIGH - ( INTER * ( J - 1 ) )
 
 *  Populate the variance component if required
-                  IF ( VARS ) THEN
-                     ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-                  ENDIF
+                  IF ( VARS ) ERROR( I, J ) = 0.0
+
                END DO
             END DO
 
@@ -263,9 +261,8 @@
                ARRAY( I, J ) = MEAN
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = 0.0
+
             END DO
          END DO
 
@@ -277,14 +274,15 @@
                ARRAY( I, J ) = 0.0
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = 0.0
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = 0.0
+
             END DO
          END DO
 
 *  Gaussian noise around a fixed mean
       ELSE IF ( TYPED .EQ. 'GN' ) THEN
+
+         VAR = SIGMA*SIGMA
 
          DO  J  =  1, DIM2
             DO  I  =  1, DIM1
@@ -292,9 +290,8 @@
                ARRAY( I, J ) = DATA
 
 *  Populate the variance component if required
-               IF ( VARS ) THEN
-                  ERROR( I, J ) = SQRT( ARRAY( I, J ) )
-               ENDIF
+               IF ( VARS ) ERROR( I, J ) = VAR
+
             END DO
          END DO
 

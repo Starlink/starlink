@@ -5221,306 +5221,182 @@ TDCA: Tim D.C. Ash(STARLINK)
    -  All non-complex numeric data types can be handled.
 
 1 CREFRAME
-    Generates a test 2-d data array from a selection of several
-    types
- 
-   This routine allows you to generate several different types of
-   2-d data array for test purposes. The data array is written to an
-   output IMAGE structure.  The types of array are summarised as
-   follows:
-     [Random]   - between 0 and 1, or specified limits
-     [Constant] - 0 or at a specified value
-     [Noisy]    - Poissonian or Gaussian noise about a specified mean
-     [Ramped]   - between specified minimum and maximum values and a
-                  choice of four directions
-     [Gaussian] - a random distribution of 2-d Gaussians of defined
-                  FWHM and range of maximum peak values on a specified
-                  background, with optional invalid pixels and bad
-                  column. There is a choice of distributions for the
-                  Gaussians: fixed, or inverse square radially from the
-                  array centre. (In essence it is equivalent to a
-                  simulated star field.) The x-y position and peak
-                  value of each Gaussian may be stored in a Fortran
-                  formatted file, or reported to you. Magic-value
-                  bad data may be included randomly, and/or in a column
-                  or line of the array.
- 
-2 AUTHORS
-   Mark McCaughrean UoE (REVA::MJM)
-   Malcolm Currie  STARLINK (RAL::CUR)
-2 BUGS
-   None known.
-2 HISTORY
-   29-07-1985 : First implementation, explicitly for testing
-              : of A-tasks. (REVA::MJM)
-   14-10-1985 : Added simulated starfield option (REVA::MJM)
-   09-01-1986 : Added blank option (again) (REVA::MJM)
-   14-01-1986 : Added option to display or store the star
-              : parameters if GS option chosen (REVA::MJM)
-   1986 Aug 5 : Renamed algorithm subroutine (CRFRSB), correctly
-                ordered arguments in MANYG (2nd to 7th) and in
-                CRFRSB (2nd to penultimate). Added list of options
-                to the prologue (RAL::CUR).
-   1986 Aug 28: Completed the prologue and nearly conformed to
-                Starlink programming standards (RAL::CUR).
-   1987 Oct 13: Modified status check of output array mapping
-                (RAL::CUR)
-   1988 Mar 17: Referred to `array' rather than `image'
-                (RAL::CUR)
-   1988 May 23: Added Gaussian noise option (RAL::CUR).
-   1988 Jun 7 : More error reporting (RAL::CUR).
-   1988 Jun 30: File name obtained in MANYG (RAL::CUR).
-   1988 Aug 5 : Removed lingering astronomical references and
-                SCALE parameter (RAL::CUR).
-   1989 Jul 25: Altered MANYG argument list; removed DISPLAY
-                parameter and reordered alternatives of DISTRIB
-                parameter (RAL::CUR)
-   1989 Aug  7: Passed array dimensions as separate variables
-                to CRFRSB (RAL::CUR).
-   1992 Mar  3: Replaced AIF parameter-system calls by the extended
-                PAR library (RAL::CUR).
-2 PARAMETERS
-   OUTPIC   =  IMAGE( WRITE )
-       Output IMAGE structure for the generated data array
-   OTITLE   =  CHAR( READ )
-       Label for the output IMAGE structure
-   IDIMS    =  INTEGER( READ )
-       x and y dimensions of the output data array
-   TYPED    =  CHAR( READ )
-       Type of data to be generated. The options are GS - Gaussian;
-         RR - random 0 -- 1; RP - random Poisson noise about mean;
-         RL - random with set limits; FL - flat; BL - zeroes;
-         RA - ramps; and GN - Gaussian noise about mean.
-   HIGH     =  REAL( READ )
-       High value used in the generated data array (RA and RL types)
-   LOW      =  REAL( READ )
-       Low value used in the generated data array (RA and RL types)
-   DIRN     =  INTEGER( READ )
-       Direction of the ramp. 1 means left to right, 2 is right to
-         left, 3 is bottom to top, and 4 is top to bottom. (RA type)
-   MEAN     =  REAL( READ )
-       Mean value used in the generated data array (FL and RP types)
-   SIGMA    =  REAL( READ )
-       Standard deviation of noise to be used in the generated data
-         array (GN type)
-   MAX      =  REAL( READ )
-       Peak Gaussian intensity to be used in the generated data array
-         (GS type)
-   MIN      =  REAL( READ )
-       Lowest Gaussian intensity to be used in the generated data
-         array (GS type)
-   BACKGROUND  =  REAL( READ )
-       Background intensity to be used in the generated data array
-         (GS type)
-   NGAUSS   =  INTEGER( READ )
-       Number of Gaussian star-like images to be generated (GS type)
-   SEEING   =  REAL( READ )
-       Seeing (FWHM) in pixels (not the same as the standard
-         deviation) (GS type)
-   DISTRIB  =  CHAR( READ )
-       Radial distribution of the Gaussians to be used; alternatives
-         weightings are FIX = fixed distance; and RSQ = one over
-         radius squared. (GS type)
-   BADPIX   =  LOGICAL( READ )
-       Whether or not bad pixels are to be included (GS type)
-   FRACTION =  REAL( READ )
-       Fraction of bad pixels to be included (GS type)
-   BADCOL   =  LOGICAL( READ )
-       Whether or not a bad column is to be included (GS type)
-   SCREEN   =  LOGICAL( READ )
-       True if the Gaussian parameters are reported to you (GS type)
-   FILENAME =  CHAR( READ )
-       Filename for the output of the Gaussian parameters (GS type)
-3 XDIM
-  position    1
-  keyword     'XDIM'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'x dimension of output array'
-  help        'Give the x dimension of the array to contain the 
-              generated data'
-3 YDIM
-  position    2
-  keyword     'YDIM'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'y dimension of output array'
-  help        'Give the y dimension of the array to contain the 
-              generated data'
-3 TYPED
-  position    4
-  keyword     'TYPED'
-  type        'LITERAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Type of data to be generated'
-  help        'Current allowable types : GS,RR,RL,RP,RA,FL,BL,GN - 
-              see full help or paper documentation for further 
-              details'
- #in          'GS', 'RR', 'RL', 'RP', 'RA', 'FL', 'BL', 'GN'
-3 LOW
-  keyword     'LOW'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Lower limit for data'
-  help        'Give the lower intensity limit for the generated data 
-              array'
-3 HIGH
-  keyword     'HIGH'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Upper limit for data'
-  help        'Give the upper intensity limit for the generated data 
-              array'
-3 MEAN
-  keyword     'MEAN'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Mean intensity'
-  help        'Give the mean intensity figure for the generated data 
-              array'
-3 SIGMA
-  keyword     'SIGMA'
-  type        '_REAL'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Standard deviation of the noise.'
-  help        'Give the standard deviation of the noise about the 
-              mean for the generated data array'
-3 DIRN
-  keyword     'DIRN'
-  type        '_INTEGER'
-  vpath       'PROMPT'
-  ppath       'DYNAMIC'
-  prompt      'Direction of ramping'
-  help        '1 = L-R : 2 = R-L : 3 = B-T : 4 = T-B, where L is 
-              left, R is right, B is bottom and T is top'
- #in          1, 2, 3, 4
-3 MAX
-  keyword     'MAX'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Maximum peak intensity for Gaussians'
-  help        'Give the value to be used as the upper limit to 
-              Gaussians" peak values'
-3 MIN
-  keyword     'MIN'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Minimum peak intensity for Gaussians'
-  help        'Give the value to be used as the lower limit to 
-              Gaussians" peak values'
+Generates a test 2-d NDF with a selection of several forms.
+
+Usage:
+
+   creframe out mode [lbound] [ubound]
+
+Description:
+
+   This application creates a 2-dimensional output NDF containing
+   artificial data of various forms (see parameter MODE). The output
+   NDF can, optionally, have a Variance component describing the noise
+   in the Data array (see parameter VARIANCE), and additionally a
+   randomly generated pattern of bad pixels (see parameter BADPIX).
+   Bad columns or rows of pixels can also be generated
+2 Parameters
+For information on individual parameters, select from the list below:
 3 BACKGROUND
-  keyword     'BACKGROUND'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Background value'
-  help        'Give the value to be taken for the background in the 
-              data array'
-3 NGAUSS
-  keyword     'NGAUSS'
-  type        '_INTEGER'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Number of Gaussians'
-  help        'Give the number of Gaussians to be generated by the 
-              application'
-3 SEEING
-  keyword     'SEEING'
-  type        '_REAL'
-  access      'READ'
-  vpath       'PROMPT'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Full-width half-maximum of Gaussians in pixels'
-  help        'FWHM is equivalent to the seeing or 2.354 standard 
-              deviations'
-3 DISTRIB
-  keyword     'DISTRIB'
-  type        'LITERAL'
-  vpath       'DYNAMIC'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Type of radial distribution (RSQ,FIX)'
-  help        'Give the radial distribution type - 1/r-squared or fixed'
- #in          'RSQ', 'FIX'
-3 BADPIX
-  keyword     'BADPIX'
-  type        '_LOGICAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  ppath       'CURRENT,DYNAMIC,DEFAULT'
-  prompt      'Bad pixels to be included ?'
-  help        'Whether or not bad pixels are to be included in the 
-              array'
-  default     N
-3 FRACTION
-  keyword     'FRACTION'
-  type        '_REAL'
-  access      'READ'
-  vpath       'DYNAMIC'
-  ppath       'CURRENT,DYNAMIC'
-  prompt      'Fraction of bad pixels'
-  help        'Give the fraction of pixels in the data array to be 
-              set to bad-pixel value'
+BACKGROUND = _REAL (Read)
+   Background intensity to be used in the generated data array.
+   Must not be negative. (GS mode).
 3 BADCOL
-  keyword     'BADCOL'
-  type        '_LOGICAL'
-  access      'READ'
-  vpath       'DEFAULT'
-  ppath       'CURRENT,DYNAMIC,DEFAULT'
-  prompt      'Bad column to be included ?'
-  help        'Whether or not a bad column is to be placed in the 
-              data array'
-  default     N
-3 SCREEN
-  keyword     'SCREEN'
-  type        '_LOGICAL'
-  access      'READ'
-  vpath       'DYNAMIC'
-  ppath       'CURRENT,DYNAMIC,DEFAULT'
-  prompt      'Report Gaussian parameters?'
-  default     NO
-  help        'If yes, the Gaussian parameters will be printed on the 
-              screen. Otherwise in a file'
-3 FILENAME
-  keyword     'FILENAME'
-  type        'FILENAME'
-  access      'READ'
-  vpath       'DEFAULT'
-  ppath       'CURRENT,DEFAULT'
-  prompt      'Filename for output'
-  default     !
-  help        'Name of the ASCII file to be used for storing the 
-              Gaussian parameters'
-3 OUTPIC
-  position    3
-  keyword     'OUTPIC'
-  type        'IMAGE'
-  access      'WRITE'
-  vpath       'PROMPT'
-  association '->GLOBAL.DATA_ARRAY'
-  prompt      'Image for output data'
-  help        'Name given to the IMAGE data structure to hold the 
-              generated data array'
-3 OTITLE
-  keyword     'OTITLE'
-  type        '_CHAR'
-  vpath       'DEFAULT'
-  prompt      'Title for output array'
-  default     'KAPPA - Creframe'
-  help        'Character string used as a title for the output IMAGE 
-              structure.'
+BADCOL = _INTEGER (Read)
+   The number of bad columns to include. Only accessed if
+   parameter BADPIX is TRUE. The bad columns are distributed
+   at random using a uniform distribution. [0]
+3 BADPIX
+BADPIX  = _LOGICAL (Read)
+   Whether or not bad pixels are to be included. See also
+   parameters FRACTION, BADCOL and BADROW. [FALSE]
+3 BADROW
+BADROW = _INTEGER (Read)
+   The number of bad rows to include. Only accessed if
+   parameter BADPIX is TRUE. The bad rows are distributed
+   at random using a uniform distribution. [0]
+3 DIRN
+DIRN = _INTEGER (Read)
+   Direction of the ramp. 1 means left to right, 2 is right to
+   left, 3 is bottom to top, and 4 is top to bottom. (RA mode)
+3 DISTRIB
+DISTRIB  =  _CHAR (Read)
+   Radial distribution of the Gaussians to be used (GS mode).
+   Alternatives weightings are:
+
+   - FIX: Fixed distance.
+
+   - RSQ: One over radius squared.
+
+   ["FIX"]
+3 FRACTION
+FRACTION = _REAL (Read)
+   Fraction of bad pixels to be included. Only accessed if BADPIX
+   is TRUE. [0.01]
+3 HIGH
+HIGH = _REAL (Read)
+   High value used in the generated data array (RA and RL modes).
+3 LBOUND
+LBOUND( 2 ) = _INTEGER (Read)
+   Lower pixel bounds of the output NDF. Only accessed if parameter
+   LIKE is set to null (!). [1,1]
+3 LIKE
+LIKE = NDF (Read)
+   An optional template NDF which, if specified, will be used to
+   define the bounds for the output NDF. If a null value (!) is
+   given the bounds are obtained via parameters LBOUND and
+   UBOUND. [!]
+3 LOGFILE
+LOGFILE = LITERAL (Read)
+   Name of a log file in which to store details of the Gaussians
+   added to the output NDF (GS mode). If a null value is supplied
+   no log file is created. [!]
+3 LOW
+LOW  = _REAL (Read)
+   Low value used in the generated data array (RA and RL modes).
+3 MAX
+MAX = _REAL (Read)
+   Peak Gaussian intensity to be used in the generated data
+   array (GS mode).
+3 MEAN
+MEAN = _REAL (Read)
+   Mean value used in the generated data array (FL, RP and GN modes).
+3 MIN
+MIN = _REAL (Read)
+   Lowest Gaussian intensity to be used in the generated data
+   array (GS mode).
+3 MODE
+MODE = LITERAL (Read)
+   The form of the data to be generated. The options are:
+
+   - RR: Uniform noise between 0 and 1.
+
+   - RL: Uniform noise between specified limits.
+
+   - BL: A constant value of zero.
+
+   - FL: A specified constant value.
+
+   - RP: Poisson noise about a specified mean
+
+   - GN: Gaussian noise about a specified mean
+
+   - RA: Ramped between specified minimum and maximum values and a
+         choice of four directions.
+
+   - GS: A random distribution of 2-d Gaussians of defined
+         FWHM and range of maximum peak values on a specified
+         background, with Poissonian noise. There is a choice of
+         spatial distributions for the Gaussians: fixed, or inverse
+         square radially from the array centre. (In essence it is
+         equivalent to a simulated star field.) The x-y position and
+         peak value of each Gaussian may be stored in a log file,
+         a positions list catalogue, or reported on the screen.
+         Bad pixels may be included randomly, and/or in a column
+         or line of the array.
+3 NGAUSS
+NGAUSS  = _INTEGER (Read)
+   Number of Gaussian star-like images to be generated (GS mode).
+3 OUT
+OUT = NDF (Write)
+   The output NDF.
+3 OUTCAT
+OUTCAT = FILENAME (Write)
+   An output catalogue in which to store the pixel co-ordinates of
+   the Gausians in the output NDF (GS mode). If a null value is
+   supplied, no output positions list is produced. [!]
+3 QUIET
+QUIET = _LOGICAL  (Read)
+   If FALSE, the Gaussian parameters are reported to you on the
+   screen (GS mode) [TRUE]
+3 SEEING
+SEEING = _REAL (Read)
+   Seeing (FWHM) in pixels (not the same as the standard deviation)
+   (GS mode).
+3 SIGMA
+SIGMA = _REAL (Read)
+   Standard deviation of noise to be used in the generated data
+   array (GN mode).
+3 TITLE
+TITLE = LITERAL (Read)
+   Title for the output NDF ["KAPPA - Creframe"]
+3 UBOUND
+UBOUND( 2 ) = _INTEGER (Read)
+   Upper pixel bounds of the output NDF. Only accessed if parameter
+   LIKE is set to null (!). [64,64]
+3 VARIANCE
+VARIANCE = _LOGICAL (Read)
+   If TRUE, a Variance component is added to the output NDF
+   representing the noise added to the field. If a null (!) value is
+   supplied, a default is used which is TRUE for modes which include
+   noise, and FALSE for modes which do not include any noise. [!]
+2 Examples
+creframe out=file ubound=[128,128] mode=gs ngauss=5 badpix badcol=2
+         max=200 min=20 background=20 seeing=1.5
+   Produces a 128x128 pixel data array with 5 gaussians with peak
+   values of 200 counts and a background of 20 counts. There will
+   be two bad columns added to the resulting data.
+2 Authors
+MJM: Mark McCaughrean
+
+MJC: Malcolm Currie (Starlink, RAL)
+
+AALLAN: Alasdair Allan (Starlink, University of Exeter)
+
+DSB: David S. Berry (STARLINK)
+2 History
+ 01-SEP-2001 (AALLAN):
+    Original NDF version, based on earlier version by MJM and MJC.
+
+ 11-SEP-2001 (DSB):
+    Removed nested status checks, standardize layout of local variable
+    declarations, remove unused variables and include files, etc.
+2 Implementation_Status
+   - The Data and Variance components of the output NDF have a numerical
+   type of "_REAL" (single precision floating point).
+
+   - This routine does not assign values to any of the following
+   components in the output NDF: LABEL, UNITS, QUALITY, AXIS, WCS.
 
 1 CRELUT
 Creates or manipulates an image-display lookup table using a
