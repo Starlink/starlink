@@ -300,19 +300,11 @@
          out='*|reduced_data|xdata|' \
          reset accept
       wcsedit \
-         in='"reduced_data-b.i1,reduced_data-b.i2"' \
+         in='"reduced_data-b"' \
          mode=add \
-         frame=pixel \
+         frame=ccd_gen \
          maptype=linear \
          coeffs='[500,1,0,1000,0,1]' \
-         domain=shifted \
-         reset accept
-      wcsedit \
-         in='"reduced_data-b.i3"' \
-         mode=add \
-         frame=pixel \
-         maptype=linear \
-         coeffs='[500,1,0,-1000,0,1]' \
          domain=shifted \
          reset accept
       tranndf \
@@ -388,22 +380,7 @@
          coeffs='[200,1,0,400,0,1]' \
          reset accept
       wcsedit \
-         in=xdata-b.i1 \
-         mode=add \
-         frame=ccd_set \
-         domain=moved \
-         maptype=unit \
-         reset accept
-      wcsedit \
-         in=xdata-b.i2 \
-         mode=add \
-         frame=ccd_set \
-         domain=moved \
-         maptype=linear \
-         coeffs='[0,0.2,0,0,0,0.2]' \
-         reset accept
-      wcsedit \
-         in=xdata-b.i3 \
+         in=xdata-b \
          mode=add \
          frame=ccd_set \
          domain=moved \
