@@ -45,11 +45,13 @@ static const char RCSID[] =
 #include <cstdio>
 #include <cstdlib>
 #include <cstdarg>
+#include <cassert>
 #include <cctype>
 #else
 #include <stdio.h>		// for vsprintf
 #include <stdlib.h>
 #include <stdarg.h>
+#include <assert.h>
 #include <ctype.h>
 #endif
 
@@ -57,13 +59,9 @@ static const char RCSID[] =
 #include <unistd.h>		// for getsubopt
 #include "getopt_long.h"
 
-#ifdef HAVE_STD_NAMESPACE
-using std::cout;
-using std::cerr;
-using std::endl;
-using std::vector;
-using std::bitset;
-#endif
+using STD::cout;
+using STD::cerr;
+using STD::endl;
 
 #include "DviFile.h"
 #include "PkFont.h"
@@ -100,18 +98,19 @@ struct bitmap_info {
     string ofile_type;
 };
 
-void process_dvi_file (DviFile *, bitmap_info&, int resolution,
-		       PageRange&);
-bool process_special (DviFile *, string specialString,
-		      Bitmap*, bitmap_info&);
-string substitute_ofn_pattern(string pattern, int pagenum);
-string get_ofn_pattern (string dviname);
-bool parse_boolean_string(char *s, bool *ok=0);
-void Usage (const char*);
-void Usage (string msg);
-void Usage (bool);
-void show_help();
-char *progname;
+static void process_dvi_file (DviFile *, bitmap_info&, int resolution,
+                              PageRange&);
+static bool process_special (DviFile *, string specialString,
+                             Bitmap*, bitmap_info&);
+static string substitute_ofn_pattern(string pattern, int pagenum);
+static string get_ofn_pattern (string dviname);
+static bool valid_ofile_pattern (string& patt);
+static bool parse_boolean_string(char *s, bool *ok=0);
+static void Usage (const char*);
+static void Usage (string msg);
+static void Usage (bool);
+static void show_help();
+static char *progname;
 
 #if !HAVE_DECL_GETSUBOPT
 extern "C" {
@@ -135,14 +134,14 @@ int main (int argc, char **argv)
     bool dviname_is_seekable = true;
     double magmag = 1.0;	// magnification of file magnification factor
     enum { font_show, font_incfound, font_cmds, font_long_display } fontflags;
-    bitset<8> show_font_info;	// all zero
+    STD::bitset<8> show_font_info;	// all zero
     bitmap_info bm;
     // Which elements of the DVI file should we process.  process_dvi
     // indicates that we should process the body of the DVI file, and
     // process_preamble and process_postamble indicate that we should
     // process the corresponding element.
     enum { process_dvi, process_preamble, process_postamble } processflags;
-    bitset<8> processing_;
+    STD::bitset<8> processing_;
     processing_.set(process_dvi);
     processing_.set(process_preamble);
     processing_.set(process_postamble);
@@ -1232,6 +1231,8 @@ bool process_special (DviFile *dvif, string specialString,
 		    stringOK = false;
 		else {
                     if (setDefault) {
+                        // Build up the ofile_pattern, making sure that 
+                        // we end up with precisely one %d in the result.
                         bool seenPageCount = false; // seen %d or #
                         b.ofile_pattern = "";
                         int imax = s->length()-1;
@@ -1283,6 +1284,7 @@ bool process_special (DviFile *dvif, string specialString,
                             b.ofile_pattern += '%';
                             b.ofile_pattern += 'd';
                         }
+                        assert(valid_ofile_pattern(b.ofile_pattern));
                         if (verbosity > normal)
                             cerr << "special: ofile_pattern="
                                  << b.ofile_pattern << endl;
@@ -1481,15 +1483,19 @@ string substitute_ofn_pattern(string pattern, int pagenum)
     static char *buf = 0;
     static int buflen = 50;
 
+    assert (valid_ofile_pattern(pattern));
+
     if (buf == 0)
 	buf = new char[buflen];
 #ifdef HAVE_SNPRINTF
-    int wanted = snprintf(buf, buflen, pattern.c_str(), pagenum);
+    // snprintf is in the global namespace, not std::, and some compilers
+    // require this to be explicit.
+    int wanted = ::snprintf(buf, buflen, pattern.c_str(), pagenum);
     if (wanted >= buflen) {
 	delete[] buf;
-	buflen = wanted+10;	// ...just because
+	buflen = wanted+1;      // include space for trailing null
 	buf = new char[buflen];
-	snprintf(buf, buflen, pattern.c_str(), pagenum);
+        ::snprintf(buf, buflen, pattern.c_str(), pagenum);
     }
 #else
     if (pattern.length() + 12 > buflen) {
@@ -1498,7 +1504,7 @@ string substitute_ofn_pattern(string pattern, int pagenum)
 	buflen = pattern.length() + 20;	// be generous
 	buf = new char[buflen];
     }
-    sprintf(buf, pattern.c_str(), pagenum);
+    STD::sprintf(buf, pattern.c_str(), pagenum);
 #endif
     return buf;
 }
@@ -1518,6 +1524,39 @@ string get_ofn_pattern (string dviname)
 
     return dvirootname + "-page%d";
 }
+
+// Validate an ofile_pattern, returning true if there is precisely one
+// %-format in the string, and it is "%d" (format %% is harmless,
+// so allow that, too).  We're paranoid here, because this is input
+// obtained from the user.
+static bool valid_ofile_pattern (string& patt)
+{
+    int nd = 0;
+    if (verbosity > normal)
+        cerr << "valid_ofile_pattern: examining :" << patt << endl;
+    for (string::const_iterator ci = patt.begin();
+         ci != patt.end();
+         ++ci) {
+        char c = *ci;
+        if (c == '%') {
+            ++ci;
+            if (ci == patt.end()) // unexpected
+                return false;
+            c = *ci;
+            switch (c) {
+              case '%':         // OK, allow that
+                break;
+              case 'd':         // the one we're after
+                nd++;
+                break;
+              default:          // oops
+                return false;
+            }
+        }
+    }
+    return (nd == 1);
+}
+
 
 // Return true if the string is "yes", "true", "on",
 // false if "no", "false", "off".  
