@@ -474,12 +474,14 @@ vector<int>* CatalogueHandler::mag_cols()
     //
     // There's no standardisation mentioned in the documentation, so
     // the best we can do, I think, is search through the list of
-    // column titles finding those which include a substring `mag'.
+    // column titles finding those which include a substring `MAG'.
+    // PWD: but not "IMAGE" (which is often an x/y coordinate).
     for (int col=0; col<cat_->numCols(); col++)
     {
 	string ucol(cat_->colName(col));
 	Util::uppercaseString(ucol);
-	if (ucol.find("MAG") != string::npos)
+	if (ucol.find("MAG") != string::npos &&
+            ucol.find("IMAGE") == string::npos)
 	    colnums->push_back(col);
     }
     if (verbosity_ > normal)
