@@ -71,7 +71,7 @@ void adix_unlnk( ADIobj id, ADIstatus status )
   adix_execi( DnameUnLink, 1, &id, status );
   }
 
-ADIboolean adix_isfile( ADIobj id )
+ADIboolean adix_isfile( ADIobj id, ADIstatus status )
   {
   ADIclassDefPtr tdef = _DTDEF(id);
 
@@ -98,7 +98,7 @@ void adix_getfile( ADIobj id, ADIobj *root, ADIstatus status )
 
   while ( (lid!=ADI__nullid) && _ok(status) )
     {
-    if ( adix_isfile(lid) )
+    if ( adix_isfile(lid,status) )
       found = ADI__true;
     else
       lid = adix_getlink( lid, status );
