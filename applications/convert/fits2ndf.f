@@ -910,7 +910,7 @@
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'FITS2NDF_ERR',
-     :     'FITS2NDF: Error converting an NDF into a FITS file.',
+     :     'FITS2NDF: Error converting a FITS file into an NDF.',
      :     STATUS )
       END IF
 
