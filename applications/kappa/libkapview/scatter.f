@@ -199,6 +199,9 @@
 *     26-OCT-1999 (DSB):
 *        Made MARGIN a fraction of the current picture, not the DATA
 *        picture.
+*     19-SEP-2001 (DSB):
+*        Ensure that none of the compression factors are bigger than the 
+*        number of pixels on the corresponding axis.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -369,6 +372,12 @@
       IF ( STATUS .NE. SAI__OK ) GO TO 999
       DO I = NVAL + 1, NDIM
          CMPRS( I ) = CMPRS( NVAL )
+      END DO
+
+*  Ensure that none of the compression factors are bigger than the number
+*  of pixels on the corresponding axis.
+      DO I = 1, NDIM
+         CMPRS( I ) = MIN( CMPRS( I ), DIM( I ) )
       END DO
 
 *  See if block averaging is required.
