@@ -120,6 +120,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
+     [echo] Executing Pal target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
@@ -168,12 +174,6 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
-     [echo] Executing Pal target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing Coco target: deinstall
 
 deinstall:

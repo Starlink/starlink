@@ -74,6 +74,9 @@ javadoc-sources:
      [echo] Executing FITS target: javadoc-sources
 
 javadoc-sources:
+     [echo] Executing Pal target: javadoc-sources
+
+javadoc-sources:
      [echo] Executing VOTable target: javadoc-sources
 
 javadoc-sources:
@@ -96,9 +99,6 @@ javadoc-sources:
 
 javadoc-sources:
      [echo] Executing Treeview target: javadoc-sources
-
-javadoc-sources:
-     [echo] Executing Pal target: javadoc-sources
 
 javadoc-sources:
      [echo] Executing Coco target: javadoc-sources

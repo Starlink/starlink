@@ -120,6 +120,12 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/fits/.fits.install
+     [echo] Executing Pal target: deinstall
+
+deinstall:
+
+real_deinstall:
+   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing VOTable target: deinstall
 
 deinstall:
@@ -168,12 +174,6 @@ deinstall:
 
 real_deinstall:
    [delete] Deleting: /apps/cvsbuild/java/source/treeview/.treeview.install
-     [echo] Executing Pal target: deinstall
-
-deinstall:
-
-real_deinstall:
-   [delete] Deleting: /apps/cvsbuild/java/source/pal/.pal.install
      [echo] Executing Coco target: deinstall
 
 deinstall:
@@ -300,6 +300,12 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/build
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/docs
+     [echo] Executing Pal target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing VOTable target: clean
 
 clean:
@@ -357,12 +363,6 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
-     [echo] Executing Pal target: clean
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing Coco target: clean
 
 clean:
@@ -488,6 +488,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 11 files to /apps/cvsbuild/java/source/fits/build/java
+     [echo] Executing Pal target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/java
+     [copy] Copying 15 files to /apps/cvsbuild/java/source/pal/build/java
      [echo] Executing VOTable target: javadoc-sources
 
 javadoc-sources:
@@ -516,18 +521,13 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 27 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 30 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copying 87 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
-     [echo] Executing Pal target: javadoc-sources
-
-javadoc-sources:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/java
-     [copy] Copying 15 files to /apps/cvsbuild/java/source/pal/build/java
      [echo] Executing Coco target: javadoc-sources
 
 javadoc-sources:
@@ -542,11 +542,11 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/build/java
-     [copy] Copying 1258 files to /apps/cvsbuild/java/source/build/java
+     [copy] Copying 1267 files to /apps/cvsbuild/java/source/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/build/java
      [copy] Copying 1 file to /apps/cvsbuild/java/source/build/java
       [zip] Building zip: /apps/cvsbuild/export/starjava-src.zip
    [delete] Deleting directory /apps/cvsbuild/java/source/build/java
 
 BUILD SUCCESSFUL
-Total time: 1 minute 33 seconds
+Total time: 1 minute 34 seconds

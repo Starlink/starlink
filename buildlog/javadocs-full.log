@@ -101,6 +101,11 @@ javadoc-sources:
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/java
      [copy] Copying 11 files to /apps/cvsbuild/java/source/fits/build/java
+     [echo] Executing Pal target: javadoc-sources
+
+javadoc-sources:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/java
+     [copy] Copying 15 files to /apps/cvsbuild/java/source/pal/build/java
      [echo] Executing VOTable target: javadoc-sources
 
 javadoc-sources:
@@ -129,18 +134,13 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/java
-     [copy] Copying 27 files to /apps/cvsbuild/java/source/topcat/build/java
+     [copy] Copying 30 files to /apps/cvsbuild/java/source/topcat/build/java
      [echo] Executing Treeview target: javadoc-sources
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copying 87 files to /apps/cvsbuild/java/source/treeview/build/java
      [copy] Copied 4 empty directories to /apps/cvsbuild/java/source/treeview/build/java
-     [echo] Executing Pal target: javadoc-sources
-
-javadoc-sources:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/java
-     [copy] Copying 15 files to /apps/cvsbuild/java/source/pal/build/java
      [echo] Executing Coco target: javadoc-sources
 
 javadoc-sources:
@@ -453,4 +453,4 @@ javadoc-sources:
   [javadoc] 86 warnings
 
 BUILD SUCCESSFUL
-Total time: 5 minutes 26 seconds
+Total time: 5 minutes 25 seconds

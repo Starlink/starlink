@@ -228,7 +228,7 @@ build:
 prepare:
 
 check_packages:
-[available] Jun 2, 2003 4:06:10 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 3, 2003 4:05:31 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -365,6 +365,16 @@ check_packages:
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/fits/build/classes
     [javac] Compiling 11 source files to /apps/cvsbuild/java/source/fits/build/classes
+     [echo] Executing Pal target: build
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/pal/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/lib/pal
      [echo] Executing VOTable target: build
 
 prepare:
@@ -430,7 +440,7 @@ execute_mk_script:
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e build
      [exec] gcc -I.  -I/apps/j2sdk1.4.1_02/jre/../include -I/apps/j2sdk1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
-     [exec] In file included from NDFJImpl.c:1420:
+     [exec] In file included from NDFJImpl.c:1425:
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
      [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
@@ -476,7 +486,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 27 source files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 30 source files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
@@ -502,16 +512,6 @@ build:
      [copy] Copying 12 files to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/treeview/build/classes
      [copy] Copying 65 files to /apps/cvsbuild/java/source/treeview/build/classes
-     [echo] Executing Pal target: build
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/classes
-    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/pal/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/lib/pal
      [echo] Executing Coco target: build
 
 prepare:

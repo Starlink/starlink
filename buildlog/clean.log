@@ -110,6 +110,12 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/build
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/fits/docs
+     [echo] Executing Pal target: clean
+
+clean:
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
+   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing VOTable target: clean
 
 clean:
@@ -167,12 +173,6 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/lib
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/docs
    [delete] Deleting directory /apps/cvsbuild/java/source/treeview/etc
-     [echo] Executing Pal target: clean
-
-clean:
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/build
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/lib
-   [delete] Deleting directory /apps/cvsbuild/java/source/pal/docs
      [echo] Executing Coco target: clean
 
 clean:
@@ -195,4 +195,4 @@ clean:
    [delete] Deleting directory /apps/cvsbuild/java/source/frog/etc
 
 BUILD SUCCESSFUL
-Total time: 8 seconds
+Total time: 7 seconds

@@ -129,6 +129,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -415,7 +416,7 @@ install:
 prepare:
 
 check_packages:
-[available] Jun 2, 2003 4:35:50 AM uk.ac.starlink.util.Loader starjavaDirectory
+[available] Jun 3, 2003 4:35:31 AM uk.ac.starlink.util.Loader starjavaDirectory
 [available] WARNING: Loader.class location file:/apps/cvsbuild/java/source/util/build/classes/uk/ac/starlink/util/Loader.class unexpected
 
 build:
@@ -1053,6 +1054,41 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/fits
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 21 files to /apps/cvsbuild/star/docs
+     [echo] Executing Pal target: install
+
+prepare:
+
+check_packages:
+
+build:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/classes
+    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/pal/build/classes
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/lib/pal
+
+jars:
+      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
+
+javadoc_check:
+
+javadocs:
+    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/docs/pal/javadocs
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Loading source files for package uk.ac.starlink.pal...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.4.1
+
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+
+dist:
+
+install:
+    [mkdir] Created dir: /apps/cvsbuild/star/lib/pal
+    [mkdir] Created dir: /apps/cvsbuild/star/docs/pal
+[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
+[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
      [echo] Executing VOTable target: install
 
 prepare:
@@ -1332,7 +1368,7 @@ execute_mk_script:
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e build
      [exec] gcc -I.  -I/apps/j2sdk1.4.1_02/jre/../include -I/apps/j2sdk1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c NDFJImpl.c
-     [exec] In file included from NDFJImpl.c:1420:
+     [exec] In file included from NDFJImpl.c:1425:
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet2DInt':
      [exec] NDFJImplGet.h:147: warning: passing arg 5 of pointer to function from incompatible pointer type
      [exec] NDFJImplGet.h: In function `Java_uk_ac_starlink_splat_imagedata_NDFJ_nGet1DInt':
@@ -1397,16 +1433,18 @@ javadocs:
   [javadoc] "Make name absolute (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Make name absolute (i.e. start with leading "/")."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:118: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:121: warning - Tag @see: can't find accepts in javax.swing.filechooser.FileFilter
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/imagedata/NDFJ.java:22: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:65: warning - Tag @see: malformed: "DivaPlot, SplatBrowser."
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:63: warning - Tag @see: malformed: "DivaPlot, SplatBrowser."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/XGraphicsRangesView.java:61: warning - Tag @see: malformed: "DivaPlot, XGraphicsRange, XGraphicsRangesModel."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find GlobalSpecPlotList in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find SplatSelectedProperties in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find SplatPlotTable in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @see: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitFrame.java:74: warning - Tag @see: can't find PlotControlFrame in uk.ac.starlink.splat.iface.LineFitFrame
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java:61: warning - Tag @see: can't find PolynomialFitter in uk.ac.starlink.splat.iface.PolyFitFrame
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find GlobalSpecPlotList in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find SplatSelectedProperties in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find SplatPlotTable in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @see: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecCutterFrame.java:48: warning - Tag @see: can't find SpecCutter in uk.ac.starlink.splat.iface.SpecCutterFrame
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/PlotPannerFrame.java:34: warning - Tag @see: malformed: "PlotControl, PlotControlFrame, Plot, PlotPanner."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/plot/DivaPlotGraphicsPane.java:36: warning - Tag @see: malformed: "Plot, PlotConfigurator"
@@ -1448,7 +1486,7 @@ javadocs:
   [javadoc]  any changes, i.e. figure creation, removal and transformations.
 
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:73: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The SplatBrowser that is a parent to this (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The SplatBrowser that is a parent to this (i.e. invokes it). "
@@ -1471,7 +1509,7 @@ javadocs:
   [javadoc] "This class describes a theme using gray colors.
 
   [javadoc]  1.3 07/22/99"
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:762: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:779: warning - The first sentence is interpreted to be:
   [javadoc] "Colourize, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Colourize, i.e. automatically set the colour of all spectra.
@@ -1484,6 +1522,9 @@ javadocs:
   [javadoc]  of the plot (i.e. labels etc.)."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/plot/XRangeFigure.java:27: warning - Tag @see: malformed: "BasicPlotFigure, BasicFigure"
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.java:35: warning - Tag @see: malformed: "#DataLimits, #PlotConfigFrame."
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:38: warning - Tag @see: can't find SpecDataImpl in uk.ac.starlink.splat.data.SpecDataFactory
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:38: warning - Tag @see: can't find SpecData in uk.ac.starlink.splat.data.SpecDataFactory
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:38: warning - Tag @see: can't find InputNameParser in uk.ac.starlink.splat.data.SpecDataFactory
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:667: warning - The first sentence is interpreted to be:
   [javadoc] "Create a new (memory-resident) spectrum from the given data and
   [javadoc]  coordinates (looses WCS as new coords are assumed no longer
@@ -1515,26 +1556,26 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e. moved or transformed)."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/FITSHeaderSource.java:17: warning - Tag @see: malformed: "SpecDataImpl, NDFSpecDataImpl, FITSSpecDataImpl"
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:580: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:596: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup interpolated physical values (i.e. wavelength and data value)
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1556: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1560: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return interpolated physical values (i.e. wavelength and data value)
   [javadoc]  that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:563: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:579: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value)
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1534: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1538: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
@@ -1630,7 +1671,7 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "See if a spectrum is already present using its specification
   [javadoc]  (i.e. file name)."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:546: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:562: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value)
@@ -1642,7 +1683,7 @@ javadocs:
   [javadoc] "Lookup the physical values (i.e. wavelength and data value)
   [javadoc]   that correspond to a graphics X coordinate.
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1434: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1438: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
@@ -1657,7 +1698,7 @@ javadocs:
   [javadoc]  any changes, i.e. figure creation, removal and transformations.
 
   [javadoc]  "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:876: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:815: warning - The first sentence is interpreted to be:
   [javadoc] "Sent when a plot property is changed (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Sent when a plot property is changed (i.e. spectrum added/removed?)."
@@ -1714,7 +1755,7 @@ javadocs:
   [javadoc] "Cause the plot to redraw itself, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Cause the plot to redraw itself, i.e. apply our changes. "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:388: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:316: warning - The first sentence is interpreted to be:
   [javadoc] "Update (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Update (i.e. change) the short name of all the selected spectra."
@@ -1888,12 +1929,12 @@ javadocs:
   [javadoc]  coordinates (looses WCS as new coords are assumed no longer
   [javadoc]  directly related, i.e. indices of data do not map to proper
   [javadoc]  coordinates using the WCS)."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1556: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1560: warning - The first sentence is interpreted to be:
   [javadoc] "Return interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return interpolated physical values (i.e. wavelength and data value)
   [javadoc]  that correspond to a graphics X coordinate."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1534: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1538: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
@@ -1912,7 +1953,7 @@ javadocs:
   [javadoc] "Get references to spectrum Y data errors (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get references to spectrum Y data errors (i.e. the data errors)."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1434: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:1438: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value) that
@@ -1920,7 +1961,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:728: warning - Tag @link: missing #: "getAst()"
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:728: warning - Tag @link: missing #: "getAst()"
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecData.java:728: warning - Tag @link: missing #: "getAst()"
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:580: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:596: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/data/SpecDataComp.html...
   [javadoc] "Lookup interpolated physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -1928,14 +1969,14 @@ javadocs:
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:563: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:579: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value)
   [javadoc]   that correspond to a graphics X coordinate, returned in
   [javadoc]   formatted strings (could be hh:mm:ss.ss for instance).
   [javadoc]   "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:546: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataComp.java:562: warning - The first sentence is interpreted to be:
   [javadoc] "Lookup the physical values (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Lookup the physical values (i.e. wavelength and data value)
@@ -1945,7 +1986,7 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:127: warning - Tag @link: missing #: "get(String)"
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:127: warning - Tag @link: missing #: "get(String)"
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:127: warning - Tag @link: missing #: "get(String)"
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:331: warning - Tag @link: reference not found: EditableSpecData.setData
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecDataFactory.java:336: warning - Tag @link: reference not found: EditableSpecData.setData
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecList.java:36: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/data/SpecList.java:221: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/data/SpecList.html...
@@ -1965,8 +2006,6 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Sent when a plot property is changed (i.e. spectrum added/removed?)."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecListener.java:14: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/ConfigFontField.java:37: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/ConfigTextField.java:32: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/DecimalComboBoxEditor.java:34: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/DecimalComboBoxEditor.html...
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/DecimalComboBoxEditor.java:34: Tag @see: Malformed: BasicComboBoxEditor, DecimalField
@@ -1983,7 +2022,6 @@ javadocs:
   [javadoc] "See if a spectrum is already known by a specification (i.e. filename)."
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/HelpFrame.java:49: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/JFontChooser.java:39: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitFrame.java:72: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitViewModel.java:19: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/LineFitViewModel.html...
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitViewModel.java:19: Tag @see: Malformed: LineFitView, MultiTableView
@@ -2021,9 +2059,7 @@ javadocs:
   [javadoc] "React to a plot change, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "React to a plot change, i.e. a spectrum added. "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/PolyFitFrame.java:59: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/ProxySetupFrame.java:66: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SelectTextField.java:34: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/ProxySetupFrame.java:65: warning - @copyright is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleBinaryMaths.java:46: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/SimpleDataLimitControls.html...
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleDataLimitControls.java:35: Tag @see: Malformed: #DataLimits, #PlotConfigFrame.
@@ -2033,12 +2069,12 @@ javadocs:
   [javadoc] "Cause the plot to redraw itself, i.e. apply our changes. "
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SimpleUnaryMaths.java:49: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/SpecAnimatorFrame.html...
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:65: Tag @see: Malformed: DivaPlot, SplatBrowser.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:73: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:63: Tag @see: Malformed: DivaPlot, SplatBrowser.
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:71: warning - The first sentence is interpreted to be:
   [javadoc] "The SplatBrowser that is a parent to this (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The SplatBrowser that is a parent to this (i.e. invokes it). "
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:876: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpecAnimatorFrame.java:815: warning - The first sentence is interpreted to be:
   [javadoc] "Sent when a plot property is changed (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Sent when a plot property is changed (i.e. spectrum added/removed?)."
@@ -2063,36 +2099,35 @@ javadocs:
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Returns the number of records managed by the data source
   [javadoc]   object (i.e. the number of plots)."
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:163: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:163: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:163: warning - Tag @see: reference not found: isExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:201: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:201: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:201: warning - Tag @see: reference not found: isExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:218: warning - Tag @see: reference not found: getDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:218: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:218: warning - Tag @see: reference not found: isExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:235: warning - Tag @see: reference not found: getDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:235: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:235: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:108: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:762: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:166: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:166: warning - Tag @see: reference not found: setExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:166: warning - Tag @see: reference not found: isExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:204: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:204: warning - Tag @see: reference not found: setExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:204: warning - Tag @see: reference not found: isExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:221: warning - Tag @see: reference not found: getDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:221: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:221: warning - Tag @see: reference not found: isExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:238: warning - Tag @see: reference not found: getDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:238: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SpectralFileFilter.java:238: warning - Tag @see: reference not found: setExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControlFrame in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find PlotControl in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:107: warning - Tag @link: can't find DivaPlot in uk.ac.starlink.splat.iface.SplatBrowser
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatBrowser.java:779: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/SplatBrowser.html...
   [javadoc] "Colourize, i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Colourize, i.e. automatically set the colour of all spectra.
   [javadoc]   "
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatPlotTable.java:41: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:41: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:388: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/iface/SplatSelectedProperties.java:316: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/uk/ac/starlink/splat/iface/SplatSelectedProperties.html...
   [javadoc] "Update (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -2223,16 +2258,18 @@ javadocs:
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServer.java:61: warning - Tag @link: can't find setSplatBrowser() in uk.ac.starlink.splat.util.SplatSOAPServer
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/SplatSOAPServer.java:61: warning - Tag @link: can't find setSplatBrowser() in uk.ac.starlink.splat.util.SplatSOAPServer
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java:20: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java:270: warning - Tag @link: reference not found: saveLocation
-  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java:302: warning - Tag @link: reference not found: setLocation
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java:282: warning - Tag @link: reference not found: saveLocation
+  [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/Utilities.java:314: warning - Tag @link: reference not found: setLocation
   [javadoc] /apps/cvsbuild/java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtFitter.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/splat/docs/splat/javadocs/stylesheet.css...
-  [javadoc] 272 warnings
+  [javadoc] 271 warnings
 
 dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/bin/splat
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 1 file to /apps/cvsbuild/java/source/splat/bin/splat
+     [copy] Copying 50 files to /apps/cvsbuild/java/source/splat/etc/splat
+     [copy] Copied 2 empty directories to /apps/cvsbuild/java/source/splat/etc/splat
      [copy] Copying 2 files to /apps/cvsbuild/java/source/splat/docs/splat
     [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/splat/lib. It is empty.
 
@@ -2242,7 +2279,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/splat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 8 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 280 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 283 files to /apps/cvsbuild/star/docs
      [echo] Executing Mirage target: install
 
 prepare:
@@ -2289,7 +2326,7 @@ check_packages:
 
 build:
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/build/classes
-    [javac] Compiling 27 source files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] Compiling 30 source files to /apps/cvsbuild/java/source/topcat/build/classes
      [copy] Copying 47 files to /apps/cvsbuild/java/source/topcat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/topcat/lib/topcat
      [copy] Copying 3 files to /apps/cvsbuild/java/source/topcat/lib/topcat
@@ -2321,7 +2358,7 @@ install:
     [mkdir] Created dir: /apps/cvsbuild/star/docs/topcat
 [loggedcopy] Copying 1 file to /apps/cvsbuild/star/bin
 [loggedcopy] Copying 4 files to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 39 files to /apps/cvsbuild/star/docs
+[loggedcopy] Copying 43 files to /apps/cvsbuild/star/docs
      [echo] Executing Treeview target: install
 
 prepare:
@@ -2414,41 +2451,6 @@ install:
 [loggedcopy] Copying 2 files to /apps/cvsbuild/star/lib
 [loggedcopy] Copying 97 files to /apps/cvsbuild/star/docs
 [loggedcopy] Copying 14 files to /apps/cvsbuild/star/etc
-     [echo] Executing Pal target: install
-
-prepare:
-
-check_packages:
-
-build:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/build/classes
-    [javac] Compiling 15 source files to /apps/cvsbuild/java/source/pal/build/classes
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/lib/pal
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/pal/lib/pal/pal.jar
-
-javadoc_check:
-
-javadocs:
-    [mkdir] Created dir: /apps/cvsbuild/java/source/pal/docs/pal/javadocs
-  [javadoc] Generating Javadoc
-  [javadoc] Javadoc execution
-  [javadoc] Loading source files for package uk.ac.starlink.pal...
-  [javadoc] Constructing Javadoc information...
-  [javadoc] Standard Doclet version 1.4.1
-
-  [javadoc] Building tree for all the packages and classes...
-  [javadoc] Building index for all the packages and classes...
-  [javadoc] Building index for all classes...
-
-dist:
-
-install:
-    [mkdir] Created dir: /apps/cvsbuild/star/lib/pal
-    [mkdir] Created dir: /apps/cvsbuild/star/docs/pal
-[loggedcopy] Copying 1 file to /apps/cvsbuild/star/lib
-[loggedcopy] Copying 30 files to /apps/cvsbuild/star/docs
      [echo] Executing Coco target: install
 
 prepare:
