@@ -5,7 +5,7 @@
 *
 *     Returns the deviate associated with the lower tail probability
 *     found by subtracting the given confidence level from unity.
-*     Accuracy for the G01CCF routine is quoted at 5 significant places.
+*     Accuracy for the G01FCF routine is quoted at 5 significant places.
 *
 *    Method :
 *    Deficiencies :
@@ -40,7 +40,7 @@
 *
 *    Function declarations :
 *
-      DOUBLE PRECISION             G01CCF
+      DOUBLE PRECISION             G01FCF
 *
 *    Local variables :
 *
@@ -56,6 +56,6 @@
 
 *    Get deviate
       IFAIL = 0
-      DEVIATE = G01CCF( PROB, NDOF, IFAIL )
+      DEVIATE = G01FCF( PROB, REAL(NDOF), IFAIL )
 
       END
