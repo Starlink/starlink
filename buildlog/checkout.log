@@ -8241,7 +8241,6 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/FuzzyBooleanCellRenderer
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GenerateFromInterpFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/GlobalSpecPlotList.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/HelpFrame.java
-U java/source/splat/src/main/uk/ac/starlink/splat/iface/InterpolateFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LabelFloatJSlider.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitFrame.java
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/LineFitView.java
@@ -8623,13 +8622,15 @@ U java/source/table/src/main/uk/ac/starlink/table/join/CartesianMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/CombinedMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/HTMMatchEngine.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchEngine.java
-U java/source/table/src/main/uk/ac/starlink/table/join/MatchSet.java
 U java/source/table/src/main/uk/ac/starlink/table/join/MatchStarTables.java
+U java/source/table/src/main/uk/ac/starlink/table/join/NullProgressIndicator.java
+U java/source/table/src/main/uk/ac/starlink/table/join/ProgressIndicator.java
+U java/source/table/src/main/uk/ac/starlink/table/join/RangeModelProgressIndicator.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowLink.java
-U java/source/table/src/main/uk/ac/starlink/table/join/RowLink2.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowMatcher.java
 U java/source/table/src/main/uk/ac/starlink/table/join/RowRef.java
 U java/source/table/src/main/uk/ac/starlink/table/join/SphericalPolarMatchEngine.java
+U java/source/table/src/main/uk/ac/starlink/table/join/TextProgressIndicator.java
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 cvs checkout: Updating java/source/table/src/resources
 cvs checkout: Updating java/source/table/src/resources/uk
@@ -8900,6 +8901,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/handle2.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/hide1.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/match1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif

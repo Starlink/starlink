@@ -79,7 +79,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/table/build/java
-     [copy] Copying 88 files to /apps/cvsbuild/java/source/table/build/java
+     [copy] Copying 90 files to /apps/cvsbuild/java/source/table/build/java
      [copy] Copied 1 empty directory to /apps/cvsbuild/java/source/table/build/java
      [echo] Executing NDTools target: javadoc-sources
 
@@ -135,7 +135,7 @@ javadoc-sources:
 
 javadoc-sources:
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/build/java
-     [copy] Copying 156 files to /apps/cvsbuild/java/source/splat/build/java
+     [copy] Copying 155 files to /apps/cvsbuild/java/source/splat/build/java
      [echo] Executing Mirage target: javadoc-sources
 
 javadoc-sources:
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 22 seconds
+Total time: 1 minute 33 seconds

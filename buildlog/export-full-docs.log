@@ -1121,27 +1121,27 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/View.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/MultipageModel.html...
   [javadoc] "Get the index of the given page."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the index of the given page. -1 if it is not known."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/JShadePane.java:352: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/JTreePane.java:337: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/ListDataModel.java:26: warning - @rating is an unknown tag.
@@ -1865,7 +1865,7 @@ dist:
 install:
 [loggedcopy] Copying 4 files to /apps/cvsbuild/starjava/lib
 [loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 112 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 114 files to /apps/cvsbuild/starjava/docs
      [echo] Executing NDTools target: install
 
 prepare:
@@ -1961,6 +1961,7 @@ javadocs:
 webstart:
 
 dist:
+    [chmod] Result: -1
 
 install:
 [loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/bin
@@ -2191,157 +2192,13 @@ build_demo:
       [tar] Nothing to do: /apps/cvsbuild/java/source/topcat/build/classes/uk/ac/starlink/topcat/demo/demo.tar.bz2 is up to date.
 
 build:
+    [javac] Compiling 16 source files to /apps/cvsbuild/java/source/topcat/build/classes
+    [javac] /apps/cvsbuild/java/source/topcat/src/main/uk/ac/starlink/topcat/TopcatModel.java:852: uk.ac.starlink.topcat.TopcatModel.SortSelectionModel should be declared abstract; it does not define acceptColumn(uk.ac.starlink.table.ColumnInfo) in uk.ac.starlink.topcat.RestrictedColumnComboBoxModel
+    [javac]     private class SortSelectionModel extends RestrictedColumnComboBoxModel {
+    [javac]             ^
+    [javac] 1 error
 
-docs_check:
+BUILD FAILED
+file:/apps/cvsbuild/java/source/topcat/build.xml:394: Compile failed; see the compiler error output for details.
 
-docs:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/jel_g.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/plot.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/topcat/lib/topcat/topcat.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 1 file to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 124 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 41 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing Treeview target: install
-
-prepare:
-
-really_check_packages:
-
-check_packages:
-
-build_demo:
-     [gzip] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/votable/vizier.xml.gz is up to date.
-      [tar] Nothing to do: /apps/cvsbuild/java/source/treeview/build/etc/demo/tar/demo.tar.gz is up to date.
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/commons-net-1.0.0.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/treeview/lib/treeview/treeview.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 5 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 131 files to /apps/cvsbuild/starjava/docs
-[loggedcopy] Copying 14 files to /apps/cvsbuild/starjava/etc
-     [echo] Executing Coco target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/coco/lib/coco/coco.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing RV target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/rv/lib/rv/rv.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-
-install:
-[loggedcopy] Copying 3 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 18 files to /apps/cvsbuild/starjava/docs
-     [echo] Executing FROG target: install
-
-prepare:
-
-check_packages:
-
-build:
-
-execute_mk_script:
-     [echo] java.home=/apps/j2sdk1.4.1_06/jre
-     [exec] Running MK script...
-     [exec] mk: Environment variables defined for ix86_Linux system
-     [exec] make -e build
-     [exec] mkdir temp
-     [exec] (cd temp; \
-     [exec]    for f in `../frog_libraries` ""; do \
-     [exec]       echo "Processing $f"; \
-     [exec]       if test -n "$f"; then \
-     [exec]          ar x $f; \
-     [exec]       fi;\
-     [exec] done)
-     [exec] Processing 
-     [exec] f() { g77 -shared -o $1 $2 -lg2c -lm -lgcc -lc;}; f /apps/cvsbuild/java/source/frog/lib/libfrog.so 'Dummy.o temp/*.o -L/apps/cvsbuild/starjava/lib -L/apps/cvsbuild/java/source/jniast/lib -ljniast' '';\
-     [exec] rm -r -f temp
-     [exec] g77: temp/*.o: No such file or directory
-
-jars:
-      [jar] Building jar: /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jama.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog_help.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/jhall.jar
-  [signjar] Signing Jar : /apps/cvsbuild/java/source/frog/lib/frog/frog.jar
-
-javadoc_check:
-
-javadocs:
-
-webstart:
-
-dist:
-    [chmod] Skipping fileset for directory /apps/cvsbuild/java/source/frog/lib. It is empty.
-
-install:
-[loggedcopy] Copying 2 files to /apps/cvsbuild/starjava/bin
-[loggedcopy] Copying 6 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 152 files to /apps/cvsbuild/starjava/docs
-
-export-full-docs:
-      [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
-
-BUILD SUCCESSFUL
-Total time: 11 minutes 5 seconds
+Total time: 6 minutes 0 seconds
