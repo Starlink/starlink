@@ -213,10 +213,6 @@ public:
 
   // Return a value formatted for the Dec axis.
   const char *formatDecValue( double value );
-
-  // Return 1 if the RA and Dec axes are "swapped".
-  int swapped();
-
 };
 
 #endif /* _StarWCS_h_ */
