@@ -55,7 +55,7 @@ AM_CONDITIONAL(HAVE_ITCL, [test -n "$have_itcl"])
 # this is, but it seems unavoidable for what we want to do (for instance,
 # itcl uses the same ones).
 # Dependencies must be on one line
-STAR_DECLARE_DEPENDENCIES([build], [ard ast chr cnf fio generic grp hds idi itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
+STAR_DECLARE_DEPENDENCIES([build], [ard ast chr cnf fio generic grp hds idi ifd itcl ndf ndg one par pcs pgplot prm psx tcl tk trn])
 STAR_DECLARE_DEPENDENCIES([build], [agi graphpar img pda ref shl sla startcl],[link])
 STAR_DECLARE_DEPENDENCIES(configure, [itcl tcl tk])
 
