@@ -856,7 +856,9 @@ $(MANIFEST)/icl: \
 		$(MANIFEST)/ems \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/mers \
 		$(MANIFEST)/messgen \
+		$(MANIFEST)/nbs \
 		$(MANIFEST)/pcs \
 		$(MANIFEST)/psx \
 		$(MANIFEST)/sae \
