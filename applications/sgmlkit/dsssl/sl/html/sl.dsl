@@ -11,6 +11,7 @@
 <!entity common.dsl		system "../common/slcommon.dsl" subdoc>
 <!entity slnavig.dsl		system "slnavig.dsl" subdoc>
 <!entity maths.dsl		system "slmaths.dsl" subdoc>
+<!entity tables.dsl		system "sltables.dsl" subdoc>
 ]>
 
 <docblock>
@@ -63,9 +64,13 @@ Code to support HTML generation
 <description>
 Miscellaneous parameters, which control detailed behaviour of the stylesheet.
 
+<codereference doc="tables.dsl" id=code.tables>
+<title>Tables support
+<description>
+Simple support for tables.
 
 <codegroup 
-  use="code.lib code.common code.maths code.html code.navig code.params" 
+  use="code.lib code.common code.maths code.html code.navig code.params code.tables" 
   id=html>
 <title>HTML-specific stylesheet code
 <description>
