@@ -29,6 +29,7 @@ ALL_TARGETS = \
 	$(MANIFEST)/cnf \
 	$(MANIFEST)/coco \
 	$(MANIFEST)/convert \
+	$(MANIFEST)/datacube \
 	$(MANIFEST)/daophot \
 	$(MANIFEST)/dipso \
 	$(MANIFEST)/docfind \
