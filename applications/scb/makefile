@@ -453,7 +453,7 @@ INSTALL_CGI = $(INSTALL_BIN)/cgi
 #  those above) and rules to create them.
 
 INSTALL_DIRS = $(INSTALL_BIN) $(INSTALL_PERL_MOD) $(INSTALL_CGI) \
-               $(INSTALL_DOCS) $(INSTALL_DATES) \
+               $(INSTALL_DOCS) $(INSTALL_HELP) $(INSTALL_DATES) \
                $(SCB_INDEX)
 
 $(INSTALL_DIRS): 
