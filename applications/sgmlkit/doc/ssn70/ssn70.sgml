@@ -1,4 +1,4 @@
-<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.2//EN" [
+<!doctype ssn public "-//Starlink//DTD Starlink SSN 0.3//EN" [
   <!entity sgp28
 	public "-//Starlink//DOCUMENT Summary SGP/28//EN" subdoc
 	-- How to write good documents for Starlink -->
@@ -45,6 +45,10 @@
 First real release to other programmers.  Distribution contains only
 SGML lib stuff: Jade has to be built separately.
 </distribution>
+<change date="06-JUN-1999" author="ng" versionid="post-0.2">
+Various edits.  I received comments from Mark Taylor, arising from the
+DR-0.2 distribution.
+</change>
 </history>
 
 <copyright>
@@ -509,7 +513,7 @@ entities.  For more details about the DTD subset, see <ref
 id=sgml.dtdsubset>.
 
 <p>The DTD subset is the only place you can define entities -- the
-<code>&lt;entity...></code> declaration is forbidden in the body of
+<code>&lt;!entity...></code> declaration is forbidden in the body of
 the document.  While this is occasionally inconvenient, it helps keep
 all the document's monkey-business in one place.
 
@@ -651,6 +655,90 @@ for completeness.</note>
 <code/&amp;nbsp;/, and <code><![cdata[--]]></code> (two hyphens) turns
 into <code/&amp;endash;/.  Such `short reference' characters are used
 a little more in the programcode DTD (see <ref id=doccode>).
+
+<subsect id=markup.ms export>Marked sections
+
+<update versionid="post-0.2" author="ng">Section added, with text
+relocated from appendix. 
+
+<p>A feature you will occasionally use in documents is the `marked
+section'.  As an author, you will most likely only ever use the
+<code/cdata/ marked section, but the <code/ignore/ and <code/include/
+marked sections might also be useful, as well as being common within DTDs.
+
+<p>A marked section is a construction such as
+<verbatim>
+Here is some text &lt;![ cdata [ with &lt;odds&gt; &amp sods &rsqbrack;]>
+</verbatim>
+and
+<verbatim>
+Here is some text &lt;![ ignore [ and here is some ignored text &rsqbrack;]>
+</verbatim>
+Along with <code/ignore/ there is <code/include/.
+
+<p>The marked section ends at the sequence of characters
+<code/&rsqbrack;&rsqbrack;&gt;/, which is therefore the one sequence
+which cannot appear within the marked section.
+
+<p>There are some further technical details in <ref id=sgml.ms>.
+
+<subsubsect id=markup.ms.cdata>CDATA marked sections
+
+<p>Within the <code/cdata/ marked section, parsing is switched off, so
+that angle brackets, <code/&lt/, and ampersands, <code/&amp/, are no
+longer recognised as introducing markup and entity references.
+
+<p>You will typically use a <code/cdata/ marked section to delimit
+verbatim text.  The <code/code/ and <code/verbatim/ elements (see <ref
+id=el.sun.code> and <ref id=el.sun.verbatim>) do not make any
+provision to switch off parsing of the text within them.  If the text
+would be significant to the parser -- that is, if it contains angle
+brackets or ampersands -- you must either escape those characters by
+giving them as entity references <code/&amp;lt;/ or <code/&amp;amp;/,
+or else enclose the contents in a <code/cdata/ marked section as
+follows.
+<verbatim>
+&lt;verbatim>&lt;![ cdata [
+Here is some &lt;em>marked-up&lt/em> text
+which will be skipped &amp; ignored
+&rsqbrack;&rsqbrack>&lt;/verbatim>
+</verbatim>
+Within a CDATA marked section, no markup is recognised except the
+<code/&rsqbrack;]>/ which closes the marked section; thus element
+start- and end-tags are not parsed, and entity references not expanded.
+
+<subsubsect id=markup.ms.variants>Paper-only and web-only variants
+
+<p>Text within <code/include/ and <code/ignore/ marked sections is
+parsed or skipped by the parser, as appropriate.  They are <em/not/
+often used outside of DTDs, but the <code/ignore/ marked section
+is occasionally useful as a way of `commenting out' large sections of
+text which might itself include SGML comments <code><![cdata[<!--
+... -->]]></code>.
+
+<p>Sometimes, it is necessary to have parts of your document which
+vary depending on whether the document is to be viewed on paper or
+online.  The Starlink general DTD defines two parameter entities
+<code/&percent;Only.paper/ and <code/&percent;Only.web/, which you can
+use to include or ignore text in a marked section.  By default, both
+of these are set to the string 
+`ignore', but the common Makefile (in
+<code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, see <ref
+id=proc.makefile>) sets one or other of these to `include', as
+appropriate for the type of file being generated.
+
+<p>You would use this facility as follows:
+<verbatim>
+&lt;p>Here is some text.
+&lt;![ %Only.web [ And here is some which would appear
+only in webpages. &rsqbrack;&rsqbrack;>
+</verbatim>
+
+<p>It is, I hope, clear that you could get yourself in a terrible mess
+here, and create a document which is only valid for some settings of
+the entities.  Take care that your document remains valid for all
+settings, including the case where both entities are set to `ignore'.
+
 
 <subsect id=markup.try export>Try it yourself -- running the SGML parser
 
@@ -1318,7 +1406,7 @@ would be of significance to the SGML parser (such as <code/&amp/ or
 <code/&lt/), they should either be escaped with entity references
 (<code/&amp;amp;/ or <code/&amp;lt;/) or else the content should be
 enclosed in a CDATA marked section as follows (see also <ref
-id=sgml.ms.cdata>).
+id=markup.ms.cdata>).
 <verbatim>
 &lt;verbatim>&lt;![ cdata [
 Here is some &lt;em>marked-up&lt/em> text
@@ -1491,6 +1579,15 @@ element could be represented as:
       (function source code goes here)
 ]]></verbatim>
 
+<p><update versionid="post-0.2" author=ng>Added a note pointing out
+that returnvalue and argumentlist have optional `none'
+attributes.</update>
+Note that the <ref id=el.programcode.returnvalue
+text='returnvalue'> element is not omissable.  When there is <em/no/
+return value, in the case of a subroutine, you can give the
+returnvalue element the attribute `none'.  The same is true of the
+<ref id=el.programcode.argumentlist text='argumentlist'> element.
+
 <subsubsect id=doccode.elements>The programcode element structure
 
 <p>In the case of the Starlink General DTD, described in <ref
@@ -1606,14 +1703,54 @@ A <code/func/ element documents a function, with arguments, a return
 value, and the like, whereas the <code/misccode/ element documents
 `other' code (again, deliberately vague).
 
-<p>The <code/codebody/ element is ignored by the processing system,
+<p><update versionid="post-0.2" author="ng">
+Paragraph rewritten to suggest using a CDATA marked section, instead
+of code edits.</update>
+The <code/codebody/ element is ignored by the processing system,
 but is still scanned by the parser.  This could cause you a problem if
 there's anything in there which looks like something the parser would
-be interested in, namely an element start-tag or an entity reference.
+be interested in, namely an element start-tag, an entity reference, or
+something that looks like markup.
 The ampersand and left angle-bracket are only recognised as markup if
 they are immediately followed by a name-start character (upper- or
-lowercase letter).  If the parser trips up on something, you should
-either make minor edits to your source code, or do some preprocessing.
+lowercase letter); markup is something starting with the string
+<code>&lt;!...</code>.
+If the parser trips up on something, there are two
+things you can do.  You can make minor edits 
+to your source code (adding a space character
+will always be enough), to stop things looking like markup:
+<code>&lt;a</code> is the beginning of an element start-tag, but
+<code>&lt; a</code>, with an interpolated space, is not.
+Alternatively, you can bracket the code in a CDATA marked section
+(<ref id=markup.ms.cdata>) as follows
+<verbatim>
+* ... end of code prologue
+*-&lt;![cdata[
+      ...fortran code including &lt;ignored &amp;markup...
+*&rsqbrack;]>
+</verbatim>
+Which of these alternatives you prefer is largely a matter of taste, I
+think, but remember that you'll only have to do this for those
+source-code files which you include within your documentation.  It is
+undeniable that these strategies are ugly, but something like this is
+fairly inevitable as the downside of having your source processable by
+more than one system at once.  If both of these are unacceptable to
+you (on aesthetic grounds if nothing else), then you can always
+preprocess your sources to strip the code out and leave a `pure' SGML
+document.<note>Note for SGML initiates: it does
+seem a little disappointing that none of SGML's various escaping
+mechanisms could help here, but the fact that the code text has to
+remain pretty much inviolate (apart from the possibility of a few
+spaces here and there) is rather restrictive.  Another possibility I
+considered was making the <code/codebody/ element have CDATA content,
+even though that's generally deprecated in the most lurid terms.  Far from
+solving the problem, this would make things worse, however: the
+<code>&lt;/</code> which ends the element would still be magic, you'd
+have to have an explicit <code>&lt;/codebody></code> closing the
+element (no entities recognised), and you'd have to have an explicit
+<code>&lt;codebody></code> starting the element, since the
+<code>*-</code> short reference doesn't seem to permit the element to
+be ended with the <code>&lt;/codebody></code> end-tag.</note>
 
 <p>Note: If the <code/codebody/ element actually contains no code at all
 (perhaps because the document has been generated by a preprocessor
@@ -1856,7 +1993,7 @@ and, in the present case, transformation.  The difference is that
 printed, or otherwise readable, form, and `transformation' refers to
 the processing of an SGML document into another SGML document.  Thus
 the conversion to HTML is really `transformation', but since HTML is
-not much kop as a high-level markup language, the HTML transformation
+not much cop as a high-level markup language, the HTML transformation
 is much more akin to a formatting step; likewise the `formatting' into
 &latex;.  In fact, DSSSL has a transformation language as well as a
 formatting language; Jade implements only the formatting language, but
@@ -2408,7 +2545,7 @@ abbreviate.
 can be referenced only within markup declarations, and hence are
 effectively restricted to the DTD.  The only time you'd use them in a
 document instance would be within a marked section (<ref
-id=sgml.ms>).  The point of parameter entities is that a document
+id=markup.ms.variants>).  The point of parameter entities is that a document
 author can define any entities they want in the declaration subset,
 without having to worry that they might conflict with declarations in
 the DTD.
@@ -2440,60 +2577,23 @@ make your document unreadable and, a much more heinous crime, invalid.
 
 <subsect id=sgml.ms export>Marked sections
 
-<p>Another feature you will commonly find in DTDs is the `marked
-section'.  As an author, you will most likely only ever use the
-<code/cdata/ marked section, but the <code/ignore/ and <code/include/
-marked sections are very commonly used within DTDs.
+<update versionid="post-0.2" author="ng">This section trimmed, and the
+discussion of the `author-visible' uses of MSs moved to the `Marking
+up...' section.
 
-<p>A marked section is a construction such as
-<verbatim>
-Here is some text &lt;![ cdata [ with &lt;odds&gt; &amp sods &rsqbrack;]>
-</verbatim>
-and
-<verbatim>
-Here is some text &lt;![ ignore [ and here is some ignored text &rsqbrack;]>
-</verbatim>
-Along with <code/ignore/ there is <code/include/.
-
-<p>The marked section ends at the sequence of characters
-<code/&rsqbrack;&rsqbrack;&gt;/, which is therefore the one sequence
-which cannot appear within the marked section.
-
-<subsubsect id=sgml.ms.cdata>CDATA marked sections
-
-<p>Within the <code/cdata/ marked section, parsing is switched off, so
-that angle brackets, <code/&lt/, and ampersands, <code/&amp/, are no
-longer recognised as introducing markup and entity references.
-
-<p>You will typically use a <code/cdata/ marked section to delimit
-verbatim text.  The <code/code/ and <code/verbatim/ elements (see <ref
-id=el.sun.code> and <ref id=el.sun.verbatim>) do not make any
-provision to switch off parsing of the text within them.  If the text
-would be significant to the parser -- that is, if it contains angle
-brackets or ampersands -- you must either escape those characters by
-giving them as entity references <code/&amp;lt;/ or <code/&amp;amp;/,
-or else enclose the contents in a <code/cdata/ marked section as
-follows.
-<verbatim>
-&lt;verbatim>&lt;![ cdata [
-Here is some &lt;em>marked-up&lt/em> text
-which will be skipped &amp; ignored
-&rsqbrack;&rsqbrack>&lt;/verbatim>
-</verbatim>
-Within a CDATA marked section, no markup is recognised except the
-<code/&rsqbrack;]>/ which closes the marked section; thus element
-start- and end-tags are not parsed, and entity references not expanded.
+<p>As described in <ref id=markup.ms>, SGML includes the notion of a
+`marked section'.  These are used only rather occasionally by authors,
+but are very frequently used within DTDs, particularly the
+<code/ignore/ and <code/include/ marked sections.
 
 <subsubsect>IGNORE and INCLUDE marked sections
 
-<p>Text within <code/include/ and <code/ignore/ marked sections is
-parsed or skipped by the parser, as appropriate.  They are <em/not/
-typically used outside of DTDs, but the <code/ignore/ marked section
-is occasionally useful as a way of `commenting out' large sections of
-text which might itself include SGML comments <code/&lt;!--
-... --&gt;/. 
+<p>About the only use of the <code/ignore/ and <code/include/ marked
+sections in documents is to delimit variant sections of text (see <ref
+id=markup.ms.variants>).  They are, however, very common within DTD.
 
-<p>Why on earth would you want to do this?  Because the ignore/include
+<p>Why on earth would you want to include or exclude text in DTDs?
+Because the ignore/include 
 keyword can be the expansion of an entity.  We could have defined our
 HTML-like document type as follows:
 <!-- can't use marked section when I'm illustrating one! -->
@@ -2535,31 +2635,6 @@ a useful way of parameterising DTDs.
 particular document's DTD-subset (see <ref id=markup.dtdsubset>), or
 completely externally to the document in a command-line option to the
 parser.
-
-<subsubsect>Paper-only and web-only variants
-
-<p>Sometimes, it is necessary to have parts of your document which
-vary depending on whether the document is to be viewed on paper or
-online.  The Starlink general DTD defines two parameter entities
-<code/&percent;Only.paper/ and <code/&percent;Only.web/, which you can
-use to include or ignore text in a marked section (see <ref
-id=sgml.ms>).  By default, both of these are set to the string
-`ignore', but the common Makefile (in
-<code>$STARLINK_SGML_DIR/lib/Makefile.common</code>, see <ref
-id=proc.makefile>) sets one or other of these to `include', as
-appropriate for the type of file being generated.
-
-<p>You would use this facility as follows:
-<verbatim>
-&lt;p>Here is some text.
-&lt;![ %Only.web [ And here is some which would appear
-only in webpages. &rsqbrack;&rsqbrack;>
-</verbatim>
-
-<p>It is, I hope, clear that you could get yourself in a terrible mess
-here, and create a document which is only valid for some settings of
-the entities.  Take care that your document remains valid for all
-settings, including the case where both entities are set to `ignore'.
 
 <sect id=appx.general.dtd export>The Starlink General DTD
 
