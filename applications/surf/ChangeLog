@@ -1,3 +1,50 @@
+1999-07-13  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_add_chop.f (SCULIB_ADD_CHOP): Calculate SC chop
+	positions correctly by converting positions of start to tangent
+	plane before calculating angle.
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Pass
+	RA/Dec centre to sculib_add_chop
+
+1999-07-12  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_scan_2_rd.f (SCULIB_SCAN_2_RD): Pass LAT_OBS as an 
+	argument
+
+	* sculib/sculib_apparent_2_mp.f (SCULIB_APPARENT_2_MP): Pass
+	LAT_OBS in as an argument.
+
+	* surflib/surflib_process_bols.f (SURFLIB_PROCESS_BOLS): Add
+	support for CHOP tracking bug in SCUBA2MEM
+
+1999-07-11  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_calc_apparent.f (SCULIB_CALC_APPARENT): Remove
+	undesired Az sign change
+
+1999-07-10  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_add_chop.f (SCULIB_ADD_CHOP): Use real tangent
+	plane offsets to spherical conversion for SC (and use DBLE rather than
+	mixture). Now really seems to work for SC.
+
+1999-07-09  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* sculib/sculib_add_chop.f (SCULIB_ADD_CHOP): Fix SC chops (I hope)
+
+	* scripts/setbolwt.pl: Check start of history entry rather than
+	match full entry.
+
+1999-07-08  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* scripts/scuquick: Support POLPHOT
+
+1999-07-04  Tim Jenness <timj@jach.hawaii.edu>
+
+	* surf_scuba2mem.f: Fix argument passing to SURF_READ_REBIN_NDF
+	* starlink/mk + makefile: Remove IRAS90 and sculib_linux.c
+
 1999-06-20  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Release v1.4-0 to Starlink for Beta testing 
