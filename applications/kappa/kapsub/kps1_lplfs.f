@@ -140,6 +140,10 @@
 *        Replaced YLOG parameter by XMAP and YMAP parameters.
 *     2004 September 3 (TIMJ):
 *        Use CNF_PVAL
+*     10-DEC-2004 (DSB):
+*        Use a SpecFluxFrame instead of a CmpFrame for the "what we want"
+*        Frame if the data units correspond to a known flux system and the 
+*        X axis is described by a SpecFrame.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -153,6 +157,7 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'AST_PAR'          ! AST constants 
+      INCLUDE 'AST_ERR'          ! AST error constants 
       INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 
 *  Arguments Given:
@@ -602,14 +607,59 @@
 *  the X axis is being annotated with distance along the curve, the first 
 *  axis is still copied from the specified axis in the Current Frame but only 
 *  if all axes have the same units - otherwise a new default Axis is used.
-*  The second (data) axis is a default 1-D Axis.
       IF( DIST ) THEN
          FR1 = AST_CLONE( FRM0, STATUS )
       ELSE
          FR1 = AST_CLONE( FRMI, STATUS )
       END IF
-      FR2 = AST_FRAME( 1, "", STATUS ) 
-      WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+
+*  The second (data) axis will be a FluxFrame is possible. Otherwise it
+*  will be a default 1-D Axis. We can use a FluxFrame if the units of the
+*  NDF data array can be used to describe any of the flux systems
+*  supported by the AST FluxFrame class. To test this create a new
+*  FluxFrame and set its units to the supplied data units.
+      FR2 = AST_FLUXFRAME( AST__BAD, AST__NULL, ' ', STATUS )
+      CALL AST_SETC( FR2, 'Unit(1)', DUNIT, STATUS )
+
+*  Get the default System value from the FluxFrame. This will depend on
+*  the units. If the units do not correspond to any of the supported flux
+*  systems, then an error (AST__BADUN) will be reported. Check for this
+*  error and annul it if it occurs, create a default simple Frame to
+*  use instead of the FluxFrame, and combine it with the X axis Frame
+*  into a CmpFrame. 
+      IF( STATUS .NE. SAI__OK ) GO TO 999
+      TEXT = AST_GETC( FR2, 'System', STATUS )
+      IF( STATUS .EQ. AST__BADUN ) THEN
+         CALL ERR_ANNUL( STATUS )
+         CALL AST_ANNUL( FR2, STATUS )
+         FR2 = AST_FRAME( 1, "", STATUS ) 
+         WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+
+*  If the data units can be used with one of the flux systems supported by 
+*  the AST FluxFrame class...
+      ELSE IF( STATUS .EQ. SAI__OK ) THEN
+
+*  Fix the System value explicit to the value determined by the supplied
+*  data units, and then clear the units (they are re-instated below). 
+         CALL AST_SETC( FR2, 'System', AST_GETC( FR2, 'System', 
+     :                                           STATUS ), STATUS )
+         CALL AST_CLEAR( FR2, 'Unit(1)', STATUS )
+
+*  If the X axis Frame is a SpecFrame, create a SpecFluxFrame rather than
+*  a CmpFrame to describe the combination of flux and spectral position.
+*  This has the advantage that it supports automatic scaling of the Y
+*  axis into other flux systems.
+         IF( AST_ISASPECFRAME( FR1, STATUS ) ) THEN
+            WWWANT = AST_SPECFLUXFRAME( FR1, FR2, "", STATUS )
+
+*  If the X axis Frame is not a SpecFrame, create a CmpFrame combining
+*  the axes.
+         ELSE
+            WWWANT = AST_CMPFRAME( FR1, FR2, "", STATUS )
+         END IF
+
+      END IF
+
       CALL AST_ANNUL( FR1, STATUS )
       CALL AST_ANNUL( FR2, STATUS )
 
@@ -633,9 +683,14 @@
          END IF
 
          CALL AST_SETC( WWWANT, 'LABEL(2)', TEXT( : IAT ), STATUS )
-         IF( DUNIT .NE. ' ' ) CALL AST_SETC( WWWANT, 'UNIT(2)', 
-     :                                      DUNIT( : CHR_LEN( DUNIT ) ), 
-     :                                       STATUS )
+         IF( DUNIT .NE. ' ' ) THEN
+            TEXT = ' '
+            IAT = 0
+            CALL CHR_APPND( 'Log(', TEXT, IAT )
+            CALL CHR_APPND( DUNIT, TEXT, IAT )
+            CALL CHR_APPND( ')', TEXT, IAT )
+            CALL AST_SETC( WWWANT, 'UNIT(2)', TEXT( : IAT ), STATUS )
+         END IF
 
       ELSE
          TEXT = ' '

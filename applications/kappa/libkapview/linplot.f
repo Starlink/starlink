@@ -1512,12 +1512,9 @@
       CALL KPG1_ASSPL( IPLOT, 2, AXMAPS, STATUS )
 
 *  Map all the required axis values from "what we want" into GRAPHICS.
-      CALL AST_TRAN1( AXMAPS( 1 ), DIM, %VAL( CNF_PVAL( IPXCEN ) ), 
-     :                .FALSE.,
-     :                %VAL( CNF_PVAL( IPXCEN ) ), STATUS )
-
-      CALL AST_TRAN1( AXMAPS( 2 ), DIM, %VAL( CNF_PVAL( IPYCEN ) ), 
-     :                .FALSE.,
+      CALL AST_TRAN2( IPLOT, DIM, %VAL( CNF_PVAL( IPXCEN ) ), 
+     :                %VAL( CNF_PVAL( IPYCEN ) ), .FALSE., 
+     :                %VAL( CNF_PVAL( IPXCEN ) ), 
      :                %VAL( CNF_PVAL( IPYCEN ) ), STATUS )
 
       IF( XVAR ) CALL AST_TRAN1( AXMAPS( 1 ), 2*DIM, 
