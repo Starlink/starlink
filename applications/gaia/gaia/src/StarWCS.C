@@ -184,7 +184,7 @@ StarWCS::StarWCS( const char *header, const int lheader )
                 }
             }
 
-	    astSet(fitschan, "CarLin=1" );
+	    //astSet(fitschan, "CarLin=1" );
 
             //  Establish which error conditions we'd like to see mentioned
             //  in the ASTWARN cards. These should be shown to the user when
