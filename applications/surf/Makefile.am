@@ -9,6 +9,8 @@ bin_SCRIPTS = $(DYNSCRIPTS)
 bin_MONOLITHS = surf_mon
 surf_mon_SOURCES = surf_mon.f surf_set_app_name.f
 
+starnewsdir = $(datadir)/doc/surf-@PACKAGE_VERSION@
+starnews_DATA = SURF_CONDITIONS surf.news
 
 # Tasks
 surf_mon_TASKS = bolrebin calcsky change_data change_flat change_pointing \

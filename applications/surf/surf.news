@@ -1,7 +1,7 @@
 1 SURF - SCUBA User Reduction Facility -update
                                                      Expires: ????.??.??
 
-  This is the release V1.6-11 of SURF. It will be 
+  This is the release V1.6-12 of SURF. It will be 
   distributed on the Summer 2003 Starlink CD-ROM.
 
   The SCUBA User Reduction Facility (SURF) is a collection of applications
@@ -34,6 +34,10 @@
   The list is at scubadr@jach.hawaii.edu.
   To subscribe please send a message to majordomo@jach.hawaii.edu with
   an empty subject and containing the message 'subscribe scubadr <your email>'
+
+2 New_in_version_1_6_12
+
+  - Brand new build system based on Gnu autoconf.
 
 2 New_in_version_1_6_11
 
