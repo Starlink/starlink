@@ -1,6 +1,6 @@
       SUBROUTINE POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN,
      :                     NSTATE, VAR, TOLS, TOLZ, MAXIT, SKYSUP,
-     :                     IMGID, ID, ILEVEL, F, ETOL, WEIGHT,  IPDOU,
+     :                     ID, IMGID, ILEVEL, F, ETOL, WEIGHT,  IPDOU,
      :                     IPVOU, EEST, ZEST, VE, VZ, DE, TI1, TI2,
      :                     STATUS )
 *+
@@ -16,7 +16,7 @@
 
 *  Invocation:
 *     CALL POL_CALE( NEL, NSET, NPOS, NPAIR, IPDIN, IPVIN, NSTATE, VAR,
-*                    TOLS, TOLZ,  MAXIT, SKYSUP, IMGID, ID, ILEVEL, F, 
+*                    TOLS, TOLZ,  MAXIT, SKYSUP, ID, IMGID, ILEVEL, F, 
 *                    ETOL, WEIGHT, IPDOU, IPVOU, EEST, ZEST, VE, VZ, DE, 
 *                    TI1, TI2, STATUS )
 
@@ -73,10 +73,10 @@
 *     SKYSUP = REAL (Given)
 *        Sky level suppression factor to use when performing image
 *        intercomparisons. Also used here for the E factor refinement.
-*     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
-*        Image identifiers.
 *     ID( NPAIR ) = CHARACTER * ( * ) (Given)
 *        Image Identifiers.
+*     IMGID( 4, NSET ) = CHARACTER * ( * ) (Given)
+*        Image identifiers.
 *     ILEVEL = INTEGER (Given)
 *        Specifies the level of information to be output.
 *        ILEVEL=0 (no output); ILEVEL=1 (normal output); ILEVEL=2
@@ -131,7 +131,9 @@
 *        Correctly dimension IPDIN, IPVIN, IMGID, IPVOUT, IPDOUT. Add extra
 *        passed array ID.
 *     4-JUN-1998 (DSB):
-*        Removed 10 character restriction on image identifiers.
+*        Removed 10 character restriction on image identifiers. Swapped 
+*        order of arguments ID and IMGID to use of mapped dyanmic memory
+*        for ID.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -164,8 +166,8 @@
       REAL ETOL
       INTEGER IPDIN( 8, NSET )
       INTEGER IPVIN( 8, NSET )
-      CHARACTER * ( * ) IMGID( 4, NSET )
       CHARACTER * ( * ) ID( NPAIR )
+      CHARACTER * ( * ) IMGID( 4, NSET )
       DOUBLE PRECISION WEIGHT( NPAIR )
       INTEGER ILEVEL
       

@@ -170,7 +170,8 @@
 *     4-JUN-1998 (DSB):
 *        Modified allocation of IPID workspace to include length of each
 *        character identifier. Extended image identifiers from max of 10
-*        characters to 30 characters.
+*        characters to 30 characters. Modified call to POL_CALE to include
+*        trailing length specifier for IPID strings.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -745,12 +746,12 @@ c      CHARACTER * ( DAT__SZLOC ) TSPLOC,ILOC,SLOC,QLOC,ULOC
 *  gives the relative efficiency of the instrument between exposures.
 *  This routine also produces E and F factor corrected output images.
       CALL POL_CALE( NEL, NSET, NPOS, NPAIR,  IPDIN, IPVIN, NSTATE,
-     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, ID, %VAL( IPID ),
+     :               VAR, TOLS, TOLZ, MAXIT, SKYSUP, %VAL( IPID ), ID, 
      :               ILEVEL, F,
      :               ETOL, %VAL( IPWEIGHT ), IPDCOR, IPVCOR,
      :               %VAL( IPEEST ), %VAL( IPZEST ), %VAL( IPVEEST ),
      :               %VAL( IPVZEST ), %VAL( IPDE ), %VAL( IPTI1 ),
-     :               %VAL( IPTI2 ), STATUS )
+     :               %VAL( IPTI2 ), STATUS, %VAL( IDLEN ) )
 
 *   Release unwanted workspace. Keep the weight array (if defined) for
 *   use when calculating the stokes parameters.
