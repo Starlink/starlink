@@ -26,7 +26,7 @@ AC_PATH_XTRA
 
 
 dnl    Grab the F77 runtime libraries into FLIBS variable
-AC_F77_LIBRARY_LDFLAGS
+STAR_FC_LIBRARY_LDFLAGS
 
 dnl    Should investigate whether we really need this for a non-starlink
 dnl    encumbered pgplot

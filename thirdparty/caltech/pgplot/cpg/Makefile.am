@@ -31,5 +31,5 @@ TESTS = cpgdemo
 check_PROGRAMS = cpgdemo
 cpgdemo_SOURCES = $(DEMO_ROUTINES)
 DEMO_ROUTINES = cpgdemo.c
-cpgdemo_LDADD = @FLIBS@ libcpgplot.la ../libpgplot.la $(PGXLIBS) $(PGPNGLIBS)
+cpgdemo_LDADD = libcpgplot.la ../libpgplot.la $(PGXLIBS) $(PGPNGLIBS) @FCLIBS@ 
 
