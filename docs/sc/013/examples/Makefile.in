@@ -112,7 +112,7 @@ sc13-examples.tar: configure
 		done; \
 		sed s/%%VERSION%%/$(VERSION)/ README.in >$$DIRNAME/README; \
 		tar cf $$DIRNAME.tar $$DIRNAME; \
-		ln -s $$DIRNAME.tar $@; \
+		ln $$DIRNAME.tar $@; \
 		rm -Rf $$DIRNAME
 
 %.gz: %
