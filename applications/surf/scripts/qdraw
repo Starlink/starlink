@@ -180,7 +180,7 @@ sub bad_status {
 __END__
 *+
 *  Name:
-*    qdraw
+*    QDRAW
 
 *  Purpose:
 *    Draw a data set with plus or minus 5 sigma range
@@ -217,6 +217,10 @@ __END__
 *        Plot the data using `+' symbols (LINPLOT mode 2)
 *     qdraw mode=2 sigcol=red test
 *        Plot with `+' symbols and use red lines to show the +/- 3 sigma lines.
+
+*  Notes:
+*     The $KAPPA_DIR environment variable must point to the location
+*     of the KAPPA binaries (this is usually done during a Starlink login).
 
 *  Related Applications:
 *    SURF: SCUCAT, SCUPHOT;

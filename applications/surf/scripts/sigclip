@@ -92,7 +92,7 @@ if (-e "$out.sdf") {
 __END__
 *+
 *  Name:
-*    sigclip
+*    SIGCLIP
 
 *  Purpose:
 *    Clip a dataset at n-sigma
@@ -111,13 +111,17 @@ __END__
 *  ADAM Parameters:
 *    NDF (Given)
 *      The required dataset
-*    SIGMA (Given)
+*    SIGMA = REAL (Given)
 *      The clipping level
 
 *  Examples:
 *     sigclip test 3.0
 *        Clips test.sdf at +/-3.0 sigma and writes the data to
 *        test_clip.sdf.
+
+*  Notes:
+*     The $KAPPA_DIR environment variable must point to the location
+*     of the KAPPA binaries (this is usually done during a Starlink login).
 
 *  Related Applications:
 *     SURF: SCUCAT, SCUPHOT;
