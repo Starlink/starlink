@@ -22,7 +22,7 @@ AC_PROG_FPP
 AC_PROG_LIBTOOL
 
 STAR_CNF_COMPATIBLE_SYMBOLS
-STAR_HAVE_FC_OPEN_READONLY
+AC_FC_OPEN_SPECIFIERS(readonly)
 
 dnl    Declare the build and use dependencies for this package
 STAR_DECLARE_DEPENDENCIES([build], [chr hds ems sae subpar])
