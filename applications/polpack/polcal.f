@@ -186,13 +186,13 @@
 *
 *        Single beam mode can take account of imperfections in the analyser.
 *        The transmission (i.e. the overall throughput) and efficiency
-*        (i.e. the ability to reject light polarised across the axis) of the 
+*        (i.e. the ability to reject light polarized across the axis) of the 
 *        analyser are read from the POLPACK extension. If not found, values 
 *        of 1.0 are used for both. These values are appropriate for a
-*        perfect analyser. A pefectly bad analyser (a piece of high quality 
+*        perfect analyser. A perfectly bad analyser (a piece of high quality 
 *        glass for instance) would have a transmission of 2.0 and an
 *        efficiency of zero. The extension items named T and EPS hold the
-*        tranmission and efficiency.
+*        transmission and efficiency.
 *
 *        Single beam mode can handle data taken by polarimeters containing
 *        a number of fixed analysers, or a single rotating analyser, in
@@ -214,7 +214,7 @@
 
 *  The Dual-beam Algorithm:
 *        In dual-beam mode, Q and U are estimated by taking the difference
-*        between pairs of orthoganally polarized images (i.e. the O and E
+*        between pairs of orthogonally polarized images (i.e. the O and E
 *        ray images extracted from a single dual-beam image). The total
 *        intensity I is estimated by summing such pairs of images. The
 *        various estimates of these quantities provided by different pairs 

@@ -430,7 +430,9 @@ pol1_plvec.f pol1_rmbnd.f pol1_setd.f pol1_setft.f pol1_squar.f \
 pol1_stbin.f pol1_stk.f pol1_stk2.f pol1_vecky.f pol1_vecpl.f \
 pol1_vect.f pol_cale.f pol_calf.f pol_calp.f pol_calti.f polbin.f \
 polcal.f polcent.f polexp.f polext.f polhelp.f polimp.f polka.f \
-polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f 
+polplot.f polvec.f pthlpo.f rdndf.f sread.f wrndf.f \
+pol1_sngad.f  pol1_sngcl.f  pol1_sngrj.f pol1_sngbm.f pol1_snghd.f \
+pol1_sngsv.f pol1_dulbm.f pol1_fillr.f
 
 #  Routines which may be logical,real,double,integer or character (storage)
 GENLRDICSRC = pol1_sto0.glrdic pol1_stoc.glrdic
@@ -1456,6 +1458,8 @@ pol1_cpctd.o:	 SAE_PAR PRM_PAR
 pol1_cpctr.o:	 SAE_PAR PRM_PAR
 pol1_ctclm.o:	 SAE_PAR PRM_PAR
 pol1_deftb.o:	 SAE_PAR GRP_PAR
+pol1_dulbm.o:	 SAE_PAR PRM_PAR NDF_PAR DAT_PAR PAR_ERR
+pol1_fillr.o:	 SAE_PAR
 pol1_gtcta.o:	 SAE_PAR AST_PAR CAT_PAR
 pol1_gtctc.o:	 SAE_PAR CAT_PAR CAT_ERR PAR_ERR
 pol1_gtctw.o:	 SAE_PAR AST_PAR CAT_PAR
@@ -1469,6 +1473,11 @@ pol1_prwcs.o:	 SAE_PAR NDF_PAR
 pol1_rmbnd.o:	 SAE_PAR PRM_PAR
 pol1_setd.o:	 SAE_PAR
 pol1_setft.o:	 SAE_PAR DAT_PAR
+pol1_sngad.o:	 SAE_PAR PRM_PAR
+pol1_sngcl.o:	 SAE_PAR PRM_PAR
+pol1_snghd.o:	 SAE_PAR DAT_PAR
+pol1_sngrj.o:	 SAE_PAR PRM_PAR
+pol1_sngsv.o:	 SAE_PAR GRP_PAR
 pol1_squar.o:	 SAE_PAR PRM_PAR
 pol1_stats.o:	 SAE_PAR PRM_PAR
 pol1_stbin.o:	 SAE_PAR
