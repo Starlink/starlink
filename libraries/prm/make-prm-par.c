@@ -502,11 +502,20 @@ int main (int argc, char **argv)
                     FLINE("INTEGER*8 XII")
                     FLINE("REAL*4 X1")
                     FLINE("REAL*8 X2")
+#if !FC_HAVE_TYPE_KIND
+                    FLINE("INTEGER*8 L1")
+#endif
                     FLINE("INTEGER*4 X1I")
                     FLINE("INTEGER*8 X2I")
                     FLINE("EQUIVALENCE (X1, X1I)")
                     FLINE("EQUIVALENCE (X2, X2I)")
+                    "\n\n");
+
+            fprintf(TestOutput,
                     FLINE("NFAILS=0")
+#if !FC_HAVE_TYPE_KIND
+                    FLINE("L1=1")
+#endif
                     "\n\n");
     }
 #endif /* TEST_CODE */
@@ -746,8 +755,9 @@ const char *tolongint(Number *n)
     char sign;
     int64_t i = (n->nbytes == 4 ? n->v.i : n->v.i8);
     int parts[3];
-    int64_t mult;
+    int mult;
     int64_t mask;
+    const char *type_kind = "x";
 
     if (i > 0) {
         sign = '+';
@@ -765,17 +775,31 @@ const char *tolongint(Number *n)
     /* use the type-kind notation to indicate that the integers are
        to be treated as long integers (how many Fortrans support this? --
        ought I to test for this?) */
+#if FC_HAVE_TYPE_KIND
+    type_kind = "_8";
+#else
+    type_kind = "*l1";
+#endif
+    printf("sign=%c, mult=%d, parts[0,1,2]=%d,%d,%d, type_kind=%s\n",
+           sign, mult, parts[0], parts[1], parts[2], type_kind);
     if (parts[0] == 0 && parts[1] == 0) {
         sprintf(b, "%c%d", sign, parts[2]);
     } else if (parts[0] == 0) {
-        sprintf(b, "%c(%d * %d_8 + %d)",
-                sign, parts[1], mult, parts[2]);
+        sprintf(b, "%c(%d * (%d%s) + %d)",
+                sign, parts[1], mult, type_kind, parts[2]);
     } else {
-        sprintf(b, "%c(((%d * %d_8 + %d) * %d_8) + %d)",
-                sign, parts[0], mult, parts[1], mult, parts[2]);
+        sprintf(b, "%c(((%d * (%d%s) + %d) * (%d%s)) + %d)",
+                sign, parts[0], mult, type_kind,
+                parts[1], mult, type_kind,
+                parts[2]);
     }
     {
-        int64_t x = (((parts[0]*mult + parts[1]) * mult) + parts[2]);
+        /* Check decomposition -- multiply parts[0,1,2] carefully */
+        int64_t x = parts[0];
+        x *= mult;
+        x += parts[1];
+        x *= mult;
+        x += parts[2];
 
         if (i != x)
 	    fprintf(stderr, "FAIL: tolongint: i=%lld = %s = %lld\n", i, b, x);
@@ -846,6 +870,16 @@ void par_fp(const int size, const char* name, void* valp)
 
 #if TEST_CODE
     if (TestOutput) {
+        /* 
+         * Write out a few lines of Fortran to the test file, which
+         * check that the value in varname, when parsed by the
+         * configured Fortran, do in fact turn into the correct bit
+         * pattern.  To do this, use tolongint to generate a Fortran
+         * expression which should produce this bit pattern by
+         * integer arithmetic.  This test doesn't work with the
+         * VAL__BADU<X> values, since we can't get Fortran to parse
+         * unsigned values usefully.
+         */
         int precision = (issingle ? float_precision : double_precision);
         const char *varname;
         const char *testint;
@@ -861,17 +895,20 @@ void par_fp(const int size, const char* name, void* valp)
         t = tolongint(&N);
         fprintf(TestOutput,
                 FLINE("%s = %s")
-                FLINE("%s = %s")
+                FLINE("%s =")
+                FLIN2("%s"),
+                varname, name,
+                testint, t);
+        fprintf(TestOutput,
                 FLINE("print*, \"%s: \", %s, %s,")
-		FLIN2("%s")
+                FLIN2("%s"),
+                name, varname, testint, t);
+        fprintf(TestOutput,
                 FLINE("if (%si .ne. %s) then")
                 FLINE("    write(*,'(\"Fail: %.*lE\",")
                 FLIN2("      \" (%s) != \",F30.20,I20)') %s, %si")
                 FLINE("    nfails = nfails+1")
                 FLINE("endif"),
-                varname, name,
-                testint, t,
-                name, varname, testint, t,
                 varname, testint,
                 precision, (issingle ? N.v.f : N.v.d),
                 name, varname, varname);
