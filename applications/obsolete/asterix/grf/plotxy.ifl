@@ -1,13 +1,13 @@
  INTERFACE PLOTXY
    parameter X
-     type 'UNIV'
+     type 'LITERAL'
      position 1
      ppath 'CURRENT'
      prompt 'X-array'
      help 'Primitive array to be plotted along x-axis'
    endparameter
    parameter Y
-     type 'UNIV'
+     type 'LITERAL'
      position 2
      ppath 'CURRENT'
      prompt 'Y-array'
