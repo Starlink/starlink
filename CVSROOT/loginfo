@@ -29,11 +29,11 @@
 # These regexps match the directory being committed
 #
 # Commits to the top-level and buildsupport directories are sent to stardev
-^\.*$			mail -s "[CVS top level] "%1s stardev@jiscmail.ac.uk
-^buildsupport/starconf	mail -s "[CVS buildsupport] "%1s stardev@jiscmail.ac.uk
+^\.*$			mail -s "CVS commit: top level" stardev@jiscmail.ac.uk
+^buildsupport/starconf	mail -s "CVS commit: buildsupport" stardev@jiscmail.ac.uk
 # Toby White is working on autoconf, too
-^thirdparty/fsf/autoconf	mail -s "[CVS autotools] "%1s stardev@jiscmail.ac.uk, tow21@cam.ac.uk
-^thirdparty/fsf		mail -s "[CVS autotools] "%1s stardev@jiscmail.ac.uk
+^thirdparty/fsf/autoconf	mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk, tow21@cam.ac.uk
+^thirdparty/fsf		mail -s "CVS commit: autotools" stardev@jiscmail.ac.uk
 #
 ^java/source/hdx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk p.w.draper@durham.ac.uk aa@astro.ex.ac.uk
 ^java/source/ndx	mail -s %1s norman@astro.gla.ac.uk M.B.Taylor@bristol.ac.uk
@@ -43,4 +43,6 @@
 ^java			mail -s %1s ussc@star.rl.ac.uk d.giaretta@rl.ac.uk
 ^applications/autoastrom	mail -s %1s norman@astro.gla.ac.uk p.w.draper@durham.ac.uk
 ^applications/sgmlkit	mail -s %1s norman@astro.gla.ac.uk
-^libraries/ast		mail -s %1s dsb@ast.man.ac.uk norman@astro.gla.ac.uk
+# CVS manual doesn't make it clear whether this %p inside quotes also
+# generates a separate argument.  So have to experiment.
+^libraries/ast		mail -s "CVS commit: %p" dsb@ast.man.ac.uk norman@astro.gla.ac.uk
