@@ -50,21 +50,21 @@ depending on whether the element is to be chunked.
   <p>If this is present, and chunking has not been turned off
   completely, then the document <em/will/ be chunked, because it
   wouldn't make much sense otherwise.
-<parameter keyword default='#f'>force-chunk
+<parameter keyword default='#f'>force-chunk?
   <type>boolean
   <description>If true, then treat the body as a chunk, even if it
   wouldn't otherwise be taken to be one.
 <codebody>
 (define (html-document title-sosofo body-sosofo #!key (system-id #f)
-						      (force-chunk #f))
+						      (force-chunk? #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
 	 (doc-sosofo 
-	  (if (or force-chunk (chunk?) is-de?)
-	      (make element gi: "HTML"
-		    (make element gi: "HEAD"
-			  (make element gi: "TITLE" title-sosofo)
+	  (if (or force-chunk? (chunk?) is-de?)
+	      (make element gi: "html"
+		    (make element gi: "head"
+			  (make element gi: "title" title-sosofo)
 			  ($standard-html-header$))
-		    (make element gi: "BODY" 
+		    (make element gi: "body" 
 			  attributes: %body-attr%
 			  (header-navigation (current-node))
 			  body-sosofo
@@ -75,11 +75,12 @@ depending on whether the element is to be chunked.
 	(make sequence
 	  (if is-de?
 	      (make document-type
-		name: "HTML"
+		name: "html"
 		public-id: %html-pubid%)
 	      (empty-sosofo))
 	  doc-sosofo)
-	(if (or (chunk?)		;if this is a chunk
+	(if (or force-chunk?
+		(chunk?)		;if this is a chunk
 		is-de?			;or this is the document-element
 		(and (chunking?) system-id) ;or we've specified a
 					    ;sysid (and we haven't
@@ -87,7 +88,7 @@ depending on whether the element is to be chunked.
 		)
 	    (make entity system-id: (or system-id (html-file))
 	      (make document-type
-		name: "HTML"
+		name: "html"
 		public-id: %html-pubid%)
 	      doc-sosofo)
 	    doc-sosofo))))
@@ -127,8 +128,8 @@ the current node.
 		  (force-frag force-frag)
 		  ((node-list=? target (document-element))
 		   "#xref_")
-		  (else (case (gi target)
-			  (("MLABEL") (href-to-fragid-mlabel target))
+		  (else (case (case-fold-down (gi target))
+			  (("mlabel") (href-to-fragid-mlabel target))
 			  (else (if (or (chunk? target)
 					(not id))
 				    ""
@@ -170,9 +171,9 @@ A hook function to add additional tags to the HEAD of your HTML files
 	 )
     (make sequence
       ;; Add the META NAME=GENERATOR tag
-      (make empty-element gi: "META"
-	    attributes: (list (list "NAME" "GENERATOR")
-			      (list "CONTENT" %stylesheet-version%)))
+      (make empty-element gi: "meta"
+	    attributes: (list (list "name" "generator")
+			      (list "content" %stylesheet-version%)))
 
       (with-mode make-html-author-links
 	(process-node-list (getdocinfo 'authorlist)))
@@ -180,25 +181,25 @@ A hook function to add additional tags to the HEAD of your HTML files
 ;      ;; Add the LINK REL=PREVIOUS tag
 ;      (if (node-list-empty? prev)
 ;	  (empty-sosofo)
-;	  (make empty-element gi: "LINK"
-;		attributes: (list (list "REL" "PREVIOUS")
-;				  ;;(list "TITLE"  (element-title prev))
-;				  (list "HREF" (href-to prev)))))
+;	  (make empty-element gi: "link"
+;		attributes: (list (list "rel" "previous")
+;				  ;;(list "title"  (element-title prev))
+;				  (list "href" (href-to prev)))))
 
       ;; Add the LINK REL=NEXT tag
       (if (node-list-empty? next)
 	  (empty-sosofo)
-	  (make empty-element gi: "LINK"
-		attributes: (list (list "REL" "NEXT")
-				  (list "TITLE" (car onpair))
-				  (list "HREF" (href-to next)))))
+	  (make empty-element gi: "link"
+		attributes: (list (list "rel" "next")
+				  (list "title" (car onpair))
+				  (list "href" (href-to next)))))
 
 ;      ;; Add the LINK REL=HOME tag
 ;      (if (nav-home? (current-node))
-;	  (make empty-element gi: "LINK"
-;		attributes: (list (list "REL" "HOME")
-;				  ;;(list "TITLE"  (element-title home))
-;				  (list "HREF" (href-to home))))
+;	  (make empty-element gi: "link"
+;		attributes: (list (list "rel" "home")
+;				  ;;(list "title"  (element-title home))
+;				  (list "href" (href-to home))))
 ;	  (empty-sosofo))
 
       ;; Add the LINK REL=UP tag
@@ -206,9 +207,9 @@ A hook function to add additional tags to the HEAD of your HTML files
 	  (if (or (node-list-empty? up)
 		  (node-list=? up (document-element)))
 	      (empty-sosofo)
-	      (make empty-element gi: "LINK"
-		    attributes: (list (list "REL" "UP")
-				      (list "HREF" (href-to up)))))
+	      (make empty-element gi: "link"
+		    attributes: (list (list "rel" "up")
+				      (list "href" (href-to up)))))
 	  (empty-sosofo))
 
       ;; Add META NAME=KEYWORD tags
@@ -216,17 +217,17 @@ A hook function to add additional tags to the HEAD of your HTML files
 	(if (node-list-empty? nl)	; nl=empty-node-list if no keywords
 	    (empty-sosofo)
 	    (make sequence
-	      (make empty-element gi: "META"
-		    attributes: (list (list "NAME" "KEYWORD")
-				      (list "CONTENT" (data (node-list-first nl)))))
+	      (make empty-element gi: "meta"
+		    attributes: (list (list "name" "keyword")
+				      (list "content" (data (node-list-first nl)))))
 	      (loop (node-list-rest nl)))))
 
 ;      ;; Add LINK REL=STYLESHEET tag
 ;      (if %stylesheet%
-;	  (make empty-element gi: "LINK"
-;		attributes: (list (list "REL" "STYLESHEET")
-;				  (list "TYPE" %stylesheet-type%)
-;				  (list "HREF" %stylesheet%)))
+;	  (make empty-element gi: "link"
+;		attributes: (list (list "rel" "stylesheet")
+;				  (list "type" %stylesheet-type%)
+;				  (list "href" %stylesheet%)))
 ;	  (empty-sosofo))
 
 ;      ($user-html-header$ home up prev next)
