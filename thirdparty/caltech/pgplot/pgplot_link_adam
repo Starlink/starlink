@@ -48,7 +48,7 @@
 
 #-
 
-      echo -lpgppar_adam  -lpgplot_adam -lpng -lz `gwm_link_adam`
+      echo -lpgppar_adam  -lpgplot_adam -lpng -lz `gwm_link_adam` \
            `psx_link_adam` `chr_link_adam`   \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
