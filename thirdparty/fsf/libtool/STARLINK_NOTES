@@ -3,13 +3,13 @@ This is GNU libtool 1.5 with a couple of patches.
 
 There are no functional changes to libtool as such, however, it has
 also had component.xml added to it, and it has had its Makefile.in's
-modified by the automake patched for Starlink.  The procedure for that
-is:
+modified by the automake patched for Starlink.  With the _Starlink_
+autotools in the path, the procedure for updating that, after an
+import of a new libtool version, is:
     
     rm missing
-    aclocal
-    automake --add-missing      # Adds patched `missing'
-    autoconf
-    ./configure --prefix=/export3/sun/buildsupport
-    make
-    install-manifest
+    aclocal  # probably redundant, but does no harm
+    autoreconf --install --symlink
+
+(then ./configure;make;make install should work as usual)
+
