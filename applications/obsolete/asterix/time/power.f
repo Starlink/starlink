@@ -306,7 +306,7 @@
         IF ( ISDS ) THEN
 
 *      The data units
-          CALL BDI_GETUNITS( IFID, UNITS, STATUS )
+          CALL BDI_GET0C( IFID, 'Units', UNITS, STATUS )
           IF ( UNITS .GT. ' ' ) THEN
             CALL MSG_SETC( 'UN', UNITS )
             CALL MSG_MAKE( '(^UN)**2', UNITS, ULEN )

@@ -690,11 +690,13 @@
 *    Loop over all possible axes
         DO IAX = 1, ADI__MXDIM
           IF (SEL(IAX)) THEN
-            CALL BDI_MAPAXVAL(FID,'R',IAX,APTR,STATUS)
-            CALL BDI_MAPAXWID(FID,'R',IAX,WPTR,STATUS)
+            CALL BDI_AXMAPR( FID, IAX, 'Data', 'READ', APTR, STATUS )
+            CALL BDI_AXMAPR( FID, IAX, 'Width', 'READ', WPTR, STATUS )
             CALL BINSUBSET_AXRAN_AXISN(%VAL(APTR),%VAL(WPTR),DIMS(IAX),
      :           DIR(IAX),NRANGE(IAX),RANGES(1,1,IAX),AXRANGE(1,1,IAX),
      :                                                          STATUS)
+            CALL BDI_AXUNMAP( FID, IAX, 'Data', APTR, STATUS )
+            CALL BDI_AXUNMAP( FID, IAX, 'Width', WPTR, STATUS )
           END IF
         END DO
 
