@@ -669,7 +669,7 @@
       DATA VALUES(11) /'   :    :ASPECT :EXTNAME  _att' /
       DATA VALUES(12) /'US :    :EVRATE :EXTNAME  _evrat' /
       DATA VALUES(13) /'RDF:    :EVRATE :EXTNAME  _evrate' /
-      DATA VALUES(14) /'   :    :EVRATE :EXTNAME  _evr' /
+      DATA VALUES(14) /'MPE:    :EVRATE :EXTNAME  _evr' /
       DATA VALUES(15) /'US :    :ORBIT  :EXTNAME  _sporb' /
       DATA VALUES(16) /'RDF:    :ORBIT  :EXTNAME  _ephem' /
       DATA VALUES(17) /'   :    :ORBIT  :EXTNAME  _orb' /
@@ -760,9 +760,9 @@
       DATA VALUES(97) /'US :PSPC:EVRATE :A1_AL    ia1_evr' /
       DATA VALUES(98) /'RDF:PSPC:EVRATE :A1_AL    a1_al' /
       DATA VALUES(99) /'   :PSPC:EVRATE :A1_AL    ee_a1ll' /
-      DATA VALUES(100)/'US :HRI :EVRATE :PS_VALID ps_valid' /
-      DATA VALUES(101)/'   :    :       :TIME     time' /
       DATA VALUES(102)/'RDF:HRI :EVRATE :PS_VALID secondary' /
+      DATA VALUES(100)/'   :HRI :EVRATE :PS_VALID ps_valid' /
+      DATA VALUES(101)/'   :    :       :TIME     time' /
       DATA VALUES(103)/'   :    :       :TIME     time' /
 *-
 *
