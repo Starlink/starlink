@@ -211,7 +211,8 @@ there are none.
   children of.
 <codebody>
 (define (chunk-children #!optional (nd (current-node)))
-  (node-list-filter-by-gi (children nd) (chunk-element-list)))
+  (node-list-filter-by-gi (select-by-class (children nd) 'element)
+			  (chunk-element-list)))
 
 <func>
 <routinename>make-contents
@@ -232,7 +233,9 @@ list their children.  It does not supply any header.
   return immediately.
 <codebody>
 (define (make-contents #!optional (start-element (current-node)) (depth 1))
-  (let ((subsects (node-list-filter-by-gi (children start-element)
+  (let ((subsects (node-list-filter-by-gi (select-by-class
+					   (children start-element)
+					   'element)
 					  (section-element-list))))
     (if (or (node-list-empty? subsects)
 	    (<= depth 0))

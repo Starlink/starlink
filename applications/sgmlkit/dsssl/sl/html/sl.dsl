@@ -150,8 +150,10 @@ name of a file to hold the manifest.
 	      (with-mode make-manifest-mode
 		(process-node-list
 		 (node-list rde		;include current file
-			    (node-list-filter-by-gi (descendants rde)
-						    (chunk-element-list))))))
+			    (node-list-filter-by-gi
+			     (select-by-class (descendants rde)
+					      'element)
+			     (chunk-element-list))))))
 	(empty-sosofo))))
 
 (mode make-manifest-mode

@@ -55,7 +55,8 @@ Support back-matter elements
 Support notes as endnotes.  
 <codebody>
 (element notecontents
-  (let ((notelist (select-elements (descendants (getdocbody))
+  (let ((notelist (select-elements (select-by-class (descendants (getdocbody))
+						    'element)
 				   (normalize "note"))))
     (if (node-list-empty? notelist)
 	(error "Have NOTECONTENTS but no NOTEs")
@@ -68,8 +69,10 @@ Support notes as endnotes.
     (make-section-reference title: (literal "Notes"))))
 
 (element note
-  (let ((notecontents-el (select-elements (descendants (getdocbody))
-					  (normalize "notecontents")))
+  (let ((notecontents-el (select-elements
+			  (select-by-class (descendants (getdocbody))
+					   'element)
+			  (normalize "notecontents")))
 	(en (number->string (element-number (current-node)))))
     (make element gi: "small"
       (literal "[")
@@ -104,7 +107,8 @@ an HTML DL element with entries referrable to by the bibkey, which is
 the data of the CITATION element.
 <codebody>
 (element citation
-  (let ((bib-el (select-elements (descendants (getdocbody))
+  (let ((bib-el (select-elements (select-by-class (descendants (getdocbody))
+						  'element)
 				 (normalize "bibliography")))
 	(cit-data (trim-data (current-node))))
     (if (node-list-empty? bib-el)
@@ -118,7 +122,7 @@ the data of the CITATION element.
 
 (element bibliography
   (let ((bibcontents (read-entity (string-append (root-file-name)
-						 ".bibliography.bbl"))))
+						 ".htmlbib.bbl"))))
     ($html-section$ (if bibcontents
 			(make fi data: bibcontents)
 			(literal "No bibliography found")))))
@@ -163,13 +167,13 @@ by BibTeX.
       (get-bibliography)))
 
 (define (get-bibliography)
-  (let* ((kids (descendants (document-element)))
+  (let* ((kids (select-by-class (descendants (document-element)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
 	 (bibelement (select-elements kids (normalize "bibliography"))))
     (if (node-list-empty? citations)
 	(empty-sosofo)
 	(make entity system-id: (string-append (root-file-name)
-					       ".bibliography.aux")
+					       ".htmlbib.aux")
 	      (make fi data: "\\relax
 ")
 	      (process-node-list citations)

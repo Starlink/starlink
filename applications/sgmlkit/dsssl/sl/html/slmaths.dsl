@@ -51,7 +51,8 @@ difficult in DSSSL.
 <codebody>
 (define (get-maths #!optional (nd (current-node)))
   (let* ((rde (document-element nd))
-	 (mathels (node-list-filter-by-gi (descendants rde)
+	 (mathels (node-list-filter-by-gi (select-by-class (descendants rde)
+							   'element)
 					  (maths-element-list))))
     (if (node-list-empty? mathels)
 	(empty-sosofo)
@@ -225,7 +226,8 @@ browser can't print the results at all.
 <codebody>
 (define (get-maths #!optional (nd (current-node)))
   (let* ((rde (document-element nd))
-	 (mathels (node-list-filter-by-gi (descendants rde)
+	 (mathels (node-list-filter-by-gi (select-by-class (descendants rde)
+							   'element)
 					  (maths-element-list))))
     (if (node-list-empty? mathels)
 	(empty-sosofo)
