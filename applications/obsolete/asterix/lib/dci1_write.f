@@ -161,7 +161,7 @@
         CALL ADI1_LOCINSTR( ARGS(1), .TRUE., INLOC, STATUS )
 
 *    Loop over components
-        CALL ADI_NCMP( MID, NCMP, STATUS )
+        CALL ADI_NCMP( IPID, NCMP, STATUS )
         DO ICMP = 1, NCMP
 
 *      Index the component
