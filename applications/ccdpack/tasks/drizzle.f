@@ -1242,10 +1242,41 @@
 *  located in the CCDPACK_EXT NDF extension
          CALL NDF_DIM( NDF(I), NDF__MXDIM, IDIMS, NDIMI, STATUS )
 
-
-*  We have a _REAL output array
-         IF( OTYPE .EQ. '_REAL' ) THEN
-
+*  Byte array
+         IF ( OTYPE .EQ. '_BYTE' ) THEN
+            CALL CCG1_DODIZB( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS ) 
+          
+*  Double-precision array
+         ELSE IF ( OTYPE .EQ. '_DOUBLE' ) THEN
+            CALL CCG1_DODIZD( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS )      
+     
+*  Integer array
+         ELSE IF ( OTYPE .EQ. '_INTEGER' ) THEN
+            CALL CCG1_DODIZI( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS ) 
+     
+*  Single-precision array
+         ELSE IF ( OTYPE .EQ. '_REAL' ) THEN
             CALL CCG1_DODIZR( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
      :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
@@ -1254,19 +1285,41 @@
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
      :                        %VAL(VWHT), STATUS )
-
-*  We have a _DOUBLE output array     
-         ELSE IF( OTYPE .EQ. '_DOUBLE' ) THEN
-
-            CALL CCG1_DODIZD( NDF(I), WEIGHT(I), NPXIN(I), 
+     
+*  Unsigned-byte array
+         ELSE IF ( OTYPE .EQ. '_UBYTE' ) THEN
+            CALL CCG1_DODIZUB( NDF(I), WEIGHT(I), NPXIN(I), 
      :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
      :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
      :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
      :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
      :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
      :                        SCALE(I), ZERO(I), VARFAC, VAR,
-     :                        %VAL(VWHT), STATUS )         
-         ENDIF
+     :                        %VAL(VWHT), STATUS ) 
+     
+     
+*  Unsigned-word array
+         ELSE IF ( OTYPE .EQ. '_UWORD' ) THEN
+            CALL CCG1_DODIZUW( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS )
+      
+*  Word array
+         ELSE IF ( OTYPE .EQ. '_WORD' ) THEN
+            CALL CCG1_DODIZW( NDF(I), WEIGHT(I), NPXIN(I), 
+     :                        ITYPE, %VAL(ODAT), %VAL(OWHT), 
+     :                        %VAL(OCNT), %VAL(OVAR), FRCUR(I), 
+     :                        MAPN(I),  IDIMS(1), IDIMS(2), NDIMI, 
+     :                        ODIM(1), ODIM(2), NVOUT, ILBND, LBNDX,
+     :                        PIXFRAC, GETV, GETS, GETZ, GETM, 
+     :                        SCALE(I), ZERO(I), VARFAC, VAR,
+     :                        %VAL(VWHT), STATUS )
+         END IF                        
      
          IF ( STATUS .NE. SAI__OK ) GOTO 940
      
