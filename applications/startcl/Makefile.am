@@ -71,12 +71,12 @@ libtkGwm_la_SOURCES = $(GWM_ROUTINES)
 
 atclsh_SOURCES = tclAppInit.c $(NBS_ROUTINES)
 atclsh_LDADD = `nbs_link` `ams_link_adam` `ems_link_adam` \
-      libtclAdam.la @TCL_LIBS@
+      libtclAdam.la @TCL_LIBS@ @FCLIBS@
 
 awish_SOURCES = tkAppInit.c $(NBS_ROUTINES)
 awish_LDADD = `nbs_link` `chr_link_adam` \
         `gwm_link_adam` `ems_link_adam` `ams_link_adam` \
-	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@
+	libtclAdam.la libtkGwm.la @TCL_LIBS@ @TK_LIBS@ @FCLIBS@
 
 # Define what is to be done with which sets of files.
 

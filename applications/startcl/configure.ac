@@ -14,6 +14,10 @@ AC_PROG_LIBTOOL
 AC_STDC_HEADERS
 AC_CHECK_HEADERS(malloc.h)
 
+dnl    Uses C compiler to link against Fortran libraries, so we need
+dnl    this.
+AC_FC_LIBRARY_LDFLAGS
+
 STAR_CNF_COMPATIBLE_SYMBOLS
 
 AC_CHECK_LIB(jpeg,jpeg_start_compress)
