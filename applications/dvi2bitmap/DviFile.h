@@ -229,7 +229,7 @@ private:
     void updateH_ (int hup, int hhup);
     void updateV_ (int y);
     struct PosState {
-	int h, v, w, x, y, z, hh, vv;
+	const int h, v, w, x, y, z, hh, vv;
 	PosState(int h, int v, int w, int x, int y, int z, int hh, int vv)
 	    : h(h),v(v),w(w),x(x),y(y),z(z),hh(hh),vv(vv) { }
     };
