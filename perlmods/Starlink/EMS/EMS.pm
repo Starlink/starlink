@@ -146,4 +146,9 @@ $Id$
 
 Tim Jenness (t.jenness@jach.hawaii.edu)
 
+=head1 COPYRIGHT
+
+Copyright (C) Particle Physics and Astronomy Research Council 1998,1999.
+All Rights Reserved.
+
 =cut

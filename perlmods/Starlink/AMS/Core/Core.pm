@@ -1021,7 +1021,11 @@ value) and should return the required value.
 =head1 AUTHOR
 
 Tim Jenness (t.jenness@jach.hawaii.edu)
-Copyright (C) 1997.
+
+=head1 COPYRIGHT
+
+Copyright (C) Particle Physics and Astronomy Research Council 1997, 1998.
+All Rights Reserved
 
 =head1 ACKNOWLDEGMENTS
 

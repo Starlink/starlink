@@ -1208,7 +1208,8 @@ Starlink can be contacted at http://star-www.rl.ac.uk/
 =head1 AUTHOR
 
 T. Jenness (t.jenness@jach.hawaii.edu). Copyright T. Jenness and 
-PPARC 1997/1998.
+Particle Physics and Astronomy Research Council 1997, 1998.
+All Rights Reserved.
 
 =head1 SEE ALSO
 

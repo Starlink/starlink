@@ -1030,6 +1030,11 @@ fits_construct_string par_get
 Module created by T. Jenness, timj@jach.hawaii.edu
 (with help from F. Economou, frossie@jach.hawaii.edu)
 
+=head1 COPYRIGHT
+
+Copyright (C) Tim Jenness, Frossie Economou 1997-1999.
+All Rights Reserved.
+
 =head1 STARLINK
 
 The NDF library is by Rodney Warren-Smith and is part of the Starlink

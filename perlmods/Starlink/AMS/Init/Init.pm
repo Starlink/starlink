@@ -559,7 +559,11 @@ sub __adamtask_exit {
 =head1 AUTHOR
 
 Tim Jenness (t.jenness@jach.hawaii.edu).
-Copyright (C) 1998.
+
+=head1 COPYRIGHT
+
+Copyright (C) Particle Physics and Astronomy Research Council 1998, 1999.
+All Rights Reserved.
 
 =head1 REQUIREMENTS
 

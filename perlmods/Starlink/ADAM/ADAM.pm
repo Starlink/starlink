@@ -780,7 +780,8 @@ perl(1). L<Starlink::EMS>, L<Starlink::AMS::Task>
 
 =head1 AUTHOR
 
-Tim Jenness (timj@jach.hawaii.edu), 
-Copyright (c) PPARC and Tim Jenness 1997, 1998.
+Tim Jenness (t.jenness@jach.hawaii.edu), 
+Copyright (c) Particle Physics and Research Council
+and Tim Jenness 1997, 1998. All Rights Reserved.
 
 =cut

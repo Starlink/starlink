@@ -388,8 +388,8 @@ The perl NDF module must be available.
 
 =head1 AUTHOR
 
-This module was written by Tim Jenness, t.jenness@jach.hawaii.edu.
-Copyright (C) Tim Jenness 1997-1999.
+This module was written by Tim Jenness <t.jenness@jach.hawaii.edu>.
+Copyright (C) Tim Jenness 1997-1999. All Rights Reserved.
 
 =head1 SEE ALSO
 

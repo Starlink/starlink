@@ -157,6 +157,11 @@ the state of the environment variables at that moment.
 
 Tim Jenness (t.jenness@jach.hawaii.edu)
 
+=head1 COPYRIGHT
+
+Copyright (C) Particle Physics and Astronomy Research Council 1999.
+All Rights Reserved.
+
 =cut
 
 
