@@ -2,12 +2,25 @@
 AutoAstrometry of Mosaics
 -------------------------
 
-%%VERSION%%    0.5
+%%VERSION%%    0.5-1
 
 
 This is a developers' release of the autoastrometry package.
 
 Documentation, including release notes, is in sun242.tar-htx
+
+Changes
+-------
+
+Since 0.5: 
+  * Fixed typo in function name which made some informational
+    messages fatal.
+  * Extractor sometimes claims to detect objects with a negative flux
+    -- such objects are now silently ignored.
+  * Assorted changes to configuration to make it more robust.
+
+Notes
+-----
 
 At present, you'll probably need to define the STARLINK environment
 variable to point to the /stardev tree.  If you have CCDPACK_DIR and
