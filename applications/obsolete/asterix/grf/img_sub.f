@@ -411,11 +411,7 @@
         LWORLD(1) = X
         LWORLD(2) = Y
 
-	print *,i_pixid,i_prjid,x,y
-	call flush(6)
         CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, LCEL, STATUS )
-	print *,lcel(1),lcel(2)
-	call flush(6)
 
         RA = LCEL(1) * MATH__DRTOD
         DEC = LCEL(2) * MATH__DRTOD
@@ -496,7 +492,7 @@
         CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, FILESYS, STATUS )
 
 *    Convert to ecliptic
-        CALL WCI_CNS2S( FILESYS, I_SYSID, I_ECLSYS, LECL, STATUS )
+        CALL WCI_CNS2S( I_SYSID, FILESYS, I_ECLSYS, LECL, STATUS )
 
 *    Export in degrees
         LON = LECL(1) * MATH__DRTOD
@@ -536,7 +532,7 @@
         LECL(2) = LAT * MATH__DDTOR
 
 *    Convert to file system
-        CALL WCI_CNS2S( LECL, I_SYSID, I_ECLSYS, FILESYS, STATUS )
+        CALL WCI_CNS2S( I_SYSID, LECL, I_ECLSYS, FILESYS, STATUS )
 
 *    Perform conversion to world
         CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
@@ -585,7 +581,7 @@
         CALL WCI_CNA2S( LWORLD, I_PIXID, I_PRJID, FILESYS, STATUS )
 
 *    Convert to ecliptic
-        CALL WCI_CNS2S( FILESYS, I_SYSID, I_GALSYS, LCEL, STATUS )
+        CALL WCI_CNS2S( I_SYSID, FILESYS, I_GALSYS, LCEL, STATUS )
 
 *    Export in degrees
         L = LCEL(1) * MATH__DRTOD
@@ -625,7 +621,7 @@
         LECL(2) = B * MATH__DDTOR
 
 *    Convert to file system
-        CALL WCI_CNS2S( LECL, I_SYSID, I_GALSYS, FILESYS, STATUS )
+        CALL WCI_CNS2S( I_SYSID, LECL, I_GALSYS, FILESYS, STATUS )
 
 *    Perform conversion to world
         CALL WCI_CNS2A( FILESYS, I_PIXID, I_PRJID, LWORLD, STATUS )
