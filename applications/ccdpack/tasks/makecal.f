@@ -245,6 +245,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -271,6 +272,8 @@
 *        padded to match bounds (regions of BAD quality are introduced).
 *     18-NOV-1998 (PDRAPER):
 *        Added FASTMED combination option.
+*     23-FEB-1999 (MBT):
+*        Modified to propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -493,7 +496,7 @@
 *  longer apply. Do NOT propagate the CCDPACK extension (the
 *  information in this only applies to the input NDF) or the QUALITY.
       CALL CCD1_NDFPR( 'OUT', STACK( 1 ),
-     :                 'Axis,Units,Noext(CCDPACK)', NDFOUT,
+     :                 'Axis,Units,WCS,Noext(CCDPACK)', NDFOUT,
      :                  STATUS )
 
 *  Make sure that its data are in the processing precision.

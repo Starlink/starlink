@@ -191,6 +191,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -207,6 +208,8 @@
 *        bug). 
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator controls (foreign data access upgrade).
+*     23-FEB-1999 (MBT):
+*        Modified to propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -474,8 +477,8 @@
 *  Get a name for the output NDF. Propagate everything except the Data.
 *  If the variance is only available for the input NDF then it is
 *  propagated unchanged as a best estimate.
-         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 'Axis,Quality,Variance',
-     :                   IDOUT, STATUS )
+         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 
+     :                   'Axis,Quality,Variance,WCS', IDOUT, STATUS )
 
 *  Make sure that output data is in the intended type.
          CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )

@@ -252,6 +252,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -278,6 +279,8 @@
 *     27-JAN-1999 (PDRAPER):
 *        Added the GENVAR and USEVAR parameters. GENVAR controls the
 *        generation of output variances from the spread in the data stack.
+*     23-FEB-1999 (MBT):
+*        Modified to propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -509,7 +512,7 @@
 *  propagate the CCDPACK extension (the information in this only
 *  applies to the input NDF) or the QUALITY.
       CALL CCD1_NDFPR( 'OUT', STACK( 1 ),
-     :                 'Axis,Nounits,Noext(CCDPACK)', NDFOUT,
+     :                 'Axis,Nounits,WCS,Noext(CCDPACK)', NDFOUT,
      :                 STATUS )
 
 *  Set the output types (as explained above) to the processing

@@ -253,6 +253,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -266,6 +267,8 @@
 *        Removed AIF_ calls.
 *     26-FEB-1997 (PDRAPER):
 *        Modified to use foreign data access IRG.
+*     23-FEB-1999 (MBT):
+*        Modified to propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -527,8 +530,8 @@
 
 *  Get the output NDF. Propagate everything except the Data.
 *  The variance will be unchanged if the calibration frame has none.
-         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 'Axis,Quality,Variance',
-     :                   IDOUT, STATUS )
+         CALL IRG_NDFPR( GIDOUT, INDEX, IDIN, 
+     :                   'Axis,Quality,Variance,WCS', IDOUT, STATUS )
 
 *  Make sure that data is in the intended output form
          CALL NDF_STYPE( DTYPE, IDOUT, 'Data,Variance', STATUS )

@@ -536,6 +536,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -559,6 +560,8 @@
 *     3-MAR-1997 (PDRAPER):
 *        Removed all top-level locator control (foreign data access
 *        changes).
+*     23-FEB-1999 (MBT):
+*        Modified to propagate WCS component.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -1287,7 +1290,7 @@
 
 *  Propagate this section to the output NDF.
          CALL IRG_NDFPR( GIDOUT, INDEX, IDSUB,
-     :                   'Data,Variance,Quality,Axis,Units', IDSOUT,
+     :                   'Data,Variance,Quality,Axis,Units,WCS', IDSOUT,
      :                   STATUS )
 
 ************************************************************************
