@@ -448,7 +448,7 @@ F_ROUTINES = $(KAPRH_F_ROUTINES) $(KAPSUB_F_ROUTINES) \
 
 KAPRH_F1_ROUTINES = crelut.f greyplot.f contover.f snapshot.f turbocont.f inspect.f \
 mosaic.f quilt.f lutflip.f luthilite.f lutrot.f luttweak.f idinvisible.f \
-idpazo.f idset.f idclear.f idstate.f
+idpazo.f idset.f idclear.f idstate.f ovset.f ovclear.f
 
 #  Kappa f files for which there are no corresponding iraf .par files.
 KAPRH_F2_ROUTINES = krhhelp.f
@@ -1682,10 +1682,10 @@ greyplot.o:	 SAE_PAR DAT_PAR PAR_ERR SUBPAR_PAR PRM_PAR NDF_PAR NDF_ERR CTM_PAR 
 hstdsp.o:	 SAE_PAR
 hstlo.o:	 SAE_PAR
 hstrep.o:	 SAE_PAR
+idclear.o:	 SAE_PAR 
 idinvisible.o:	 SAE_PAR IDI_ERR PAR_ERR
 idpazo.o:	 SAE_PAR IDI_PAR IDI_ERR
 idset.o:	 SAE_PAR CTM_PAR
-idclear.o:	 SAE_PAR 
 idstate.o:	 SAE_PAR DAT_PAR AST_PAR
 imlst.o:	 SAE_PAR PRM_PAR
 inhi.o:	 SAE_PAR DAT_PAR PAR_ERR
@@ -1734,6 +1734,8 @@ mosaic.o:	 SAE_PAR DAT_PAR PAR_ERR
 moscad.o:	 SAE_PAR PRM_PAR
 moscdv.o:	 SAE_PAR PRM_PAR
 ncraxs.o:	 SAE_PAR
+ovclear.o:	 SAE_PAR 
+ovset.o:	 SAE_PAR CTM_PAR
 peepsb.o:	 SAE_PAR PRM_PAR
 quilt.o:	 SAE_PAR DAT_PAR PAR_ERR
 slc2t1.o:	 SAE_PAR PRM_PAR

@@ -4,10 +4,54 @@ package kaprh {
 
    executable kaprh_mon {
 
+      action ovclear {
+         alias {ovcl(ear)}
+
+         helplib {$KAPRH_HELP}
+
+         parameter current {
+            position 2
+            type _LOGICAL
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Clear just the current picture?}
+            default FALSE
+            helpkey *
+          }
+
+         parameter device {
+            ptype DEVICE
+            position 1
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_OVERLAY
+            prompt {Name of overlay device}
+            helpkey *
+          }
+
+      }
+
+      action ovset {
+         alias {ovse(t)}
+
+         helplib {$KAPRH_HELP}
+
+         parameter device {
+            position 1
+            ptype DEVICE
+            access READ
+            vpath PROMPT
+            prompt {Image-display overlay}
+            helpkey *
+            association ->GLOBAL.IMAGE_OVERLAY
+          }
+
+      }
+
       action idclear {
          alias {idcl(ear)}
 
-         helplib {$KAPPA_HELP}
+         helplib {$KAPRH_HELP}
 
          parameter current {
             position 2
@@ -35,7 +79,7 @@ package kaprh {
       action idset {
          alias {idse(t)}
 
-         helplib {$KAPPA_HELP}
+         helplib {$KAPRH_HELP}
 
          parameter device {
             position 1
@@ -52,7 +96,7 @@ package kaprh {
       action idstate {
          alias {idst(ate)}
 
-         helplib {$KAPPA_HELP}
+         helplib {$KAPRH_HELP}
 
          parameter comment {
             type LITERAL

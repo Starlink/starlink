@@ -151,6 +151,12 @@
          ELSE IF ( NAME .EQ. 'MOSAIC' ) THEN
             CALL MOSAIC ( STATUS )
 
+         ELSE IF ( NAME .EQ. 'OVCLEAR' ) THEN
+            CALL OVCLEAR ( STATUS )
+
+         ELSE IF ( NAME .EQ. 'OVSET' ) THEN
+            CALL OVSET ( STATUS )
+
          ELSE IF ( NAME .EQ. 'QUILT' ) THEN
             CALL QUILT ( STATUS )
 

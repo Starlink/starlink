@@ -16,24 +16,26 @@ KAPRH_IRAF = doc helpdb.mip kaprh.hd  kaprh.par kaprh_mon.ifl root.hd \
 _kaprh.hd kaprh.cl kaprh.men kaprh_mon.tcl crelut.par greyplot.par \
 contover.par mosaic.par quilt.par snapshot.par turbocont.par \
 inspect.par lutflip.par luthilite.par lutrot.par luttweak.par \
-idinvisible.par idpazo.par idset.par idstate.par idclear.par
+idinvisible.par idpazo.par idset.par idstate.par idclear.par \
+ovset.par ovclear.par
 
 #  Contents of the doc/ directory in kaprh_iraf.tar
 IRAF_DOCS = crelut.hlp greyplot.hlp contover.hlp mosaic.hlp quilt.hlp \
 snapshot.hlp turbocont.hlp inspect.hlp lutflip.hlp luthilite.hlp \
 lutrot.hlp luttweak.hlp idinvisible.hlp idpazo.hlp idset.hlp idclear.hlp \
-idstate.glp
+idstate.hlp ovset.hlp ovclear.hlp
 
 # The contents of the kaprh_ifls.tar file:
 KAPRH_IFLS = crelut.ifl greyplot.ifl krhhelp.ifl kaprh_mon.ifl \
 contover.ifl mosaic.ifl quilt.ifl snapshot.ifl turbocont.ifl \
 inspect.ifl lutflip.ifl luthilite.ifl lutrot.ifl luttweak.ifl \
-idinvisible.ifl idpazo.ifl idset.ifl idclear.ifl idstate.ifl
+idinvisible.ifl idpazo.ifl idset.ifl idclear.ifl idstate.ifl \
+ovset.ifl ovclear.ifl
 
 # The contents of the kaprh_sub.tar file:
 KAPRH_SUB = crelut.f greyplot.f krhhelp.f contover.f mosaic.f quilt.f snapshot.f \
 turbocont.f inspect.f lutflip.f luthilite.f lutrot.f luttweak.f \
-idinvisible.f idpazo.f idset.f idstate.f idclear.f
+idinvisible.f idpazo.f idset.f idstate.f idclear.f ovset.f ovclear.f
 
 # The source RCS files needed to create the kapsub_sub.tar file:
 KAPSUB_SOURCES = $(KAPSUB_NONGEN) $(KAPSUB_GEN)
