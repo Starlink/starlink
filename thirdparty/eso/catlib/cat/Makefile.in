@@ -1,5 +1,5 @@
 # ESO/Archive
-# $Id: Makefile.in,v 1.18 2001/08/27 10:10:27 abrighto Exp $
+# $Id: Makefile.in,v 1.1.1.1 2001/08/29 13:46:14 norman Exp $
 #
 # Component level Makefile
 
@@ -54,13 +54,12 @@ LD_SEARCH_FLAGS=@LD_SEARCH_FLAGS@
 LIB_RUNTIME_DIR=$(LIBDIR)
 
 # tcl/tk and related libraries
-TCLTKLIBS = \
-	@ITK_LIB_SPEC@ \
-	@TK_LIB_SPEC@ \
-	@BLT_LIB_SPEC@ \
-	@TCLX_LIB_SPEC@ \
-	@ITCL_LIB_SPEC@ \
-	@TCL_LIB_SPEC@
+# (this must be on one line, since _all_ of these variables expand to
+# blank if --with-notcl is specified: if that's the case, and this
+# line ends up as `TCLTKLIBS = \', then OSF1 (Tru64) make erroneously
+# continues the line past the following blank lines and includes the
+# following comment, which causes an error when the variable is used)
+TCLTKLIBS = @ITK_LIB_SPEC@ @TK_LIB_SPEC@ @BLT_LIB_SPEC@ @TCLX_LIB_SPEC@ @ITCL_LIB_SPEC@ @TCL_LIB_SPEC@
 
 # This flag is set to 1 by configure if a shared library should be made
 SHARED  = @SHARED@
