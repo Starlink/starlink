@@ -1,0 +1,9 @@
+SCB
+---
+
+SCB has been autoconfed and tested on Linux, and has a working check
+target.  However, it currently only indexes a classic-style source tree!
+So it's currently not much use with the autoconf/CVS build system.
+
+Mark Taylor
+8-JUL-2004
