@@ -495,7 +495,7 @@ PKG_LINK = SURF
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.6-8
+PKG_VERS = 1.6-9
 
 #  List of files comprising the distributed source-only system.  This
 #  defines the minimum set of files required to rebuild completely the
@@ -1173,16 +1173,6 @@ install:
 #  package is installed (at least in part).
 	@ echo $(INSTALL) > .INSTALLED_$(SYSTEM)
 #
-#  Install the public scripts, giving them world execute permission.
-	for f in $(PUBLIC_SCRIPTS) ""; do \
-           if test -n "$$f"; then \
-              cp -p $$f $(INSTALL_BIN);\
-              chmod 755 $(INSTALL_BIN)/$$f;\
-              rm -f $$f;\
-              $(LINK) $(INSTALL_BIN)/$$f $$f;\
-           else :; fi;\
-        done
-#
 #  Setup the soft links to sculog
 	for f in $(SCULOG_SCRIPTS) ""; do \
            if test -n "$$f"; then \
@@ -1275,10 +1265,24 @@ install:
 #
 #  Install the NDFPERL scripts. The location of the NDFPERL binary
 #  is taken to be $STAR_BIN. The original file is left in place.
+#  In most cases this is not important because an alias is used to run
+#  the perl programs.
 	for f in $(NDFPERL_SCRIPTS) ""; do \
            if test -n "$$f"; then \
               sed -e s#STAR_BIN#$(STAR_BIN)# \
                   -e s#STAR_PERL#$(PERL)# \
+                $$f > $(INSTALL_BIN)/$$f ;\
+              chmod 755 $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+
+#
+#  Install the CSH scripts. Mainly to find where Starlink apps are.
+#  The original file is left in place.
+	for f in $(PUBLIC_SCRIPTS) ""; do \
+           if test -n "$$f"; then \
+              sed -e s#STAR_BIN#$(STAR_BIN)# \
+                  -e s#STAR_ETC#$(STAR_ETC)# \
                 $$f > $(INSTALL_BIN)/$$f ;\
               chmod 755 $(INSTALL_BIN)/$$f;\
            else :; fi;\
@@ -1377,15 +1381,6 @@ do_deinstall:
 #  Note the package will need to be tested again.
 	@- if test -f .TESTED_$(SYSTEM); then rm -f .TESTED_$(SYSTEM); else :; fi
 #
-#  Deinstall the public script files, if installed versions exist.
-	- for f in $(PUBLIC_SCRIPTS) ""; do \
-           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
-              rm -f $$f;\
-              cp -p $(INSTALL_BIN)/$$f .;\
-              rm -f $(INSTALL_BIN)/$$f;\
-           else :; fi;\
-        done
-#
 #  Deinstall the soft links to $(SCULOG)
 	- for f in $(SCULOG_SCRIPTS) ""; do \
              if test -n "$$f"; then \
@@ -1479,7 +1474,18 @@ do_deinstall:
            $(MAKE) $$f;\
           else :; fi \
          done
-
+#
+#  Deinstall the CSH scripts.  Since it will have been edited
+#  during installation, we remove the installed copy, if present, and
+#  then ensure that the original exists
+	- for f in $(PUBLIC_SCRIPTS) ""; do \
+	  if test -n "$$f"; then \
+           if test -f $(INSTALL_BIN)/$$f; then \
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi ;\
+           $(MAKE) $$f;\
+          else :; fi \
+         done
 #
 #  Deinstall the Latex documentation, if installed versions exist.
 	- for f in $(LATEX_DOCS) ""; do \

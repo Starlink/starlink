@@ -14,8 +14,8 @@ if !($?STAR_LOGIN) then
 # note that should probably put in something that gets
 # updated during INSTALLation.
 
-  if (-e /star/etc/login) then
-    source /star/etc/login
+  if (-e STAR_ETC/login) then
+    source STAR_ETC/login
   else
     echo 'Error: Starlink system not initialised'
     exit 1
@@ -23,6 +23,15 @@ if !($?STAR_LOGIN) then
 
 endif
 
+
+# This is the location of the psmerge command on the starlink system
+# Need to make sure we do not use the non-starlink version
+# Allow us to fallback to /star
+if ( -d STAR_BIN ) then
+    set starbin = STAR_BIN
+else
+    set starbin = /star/bin
+endif
 
 # Switch off messages
 alias echo "echo > /dev/null"
@@ -110,13 +119,20 @@ if (-e ${out}.sdf) then
 
 	linplot ${out}_m mode=line noclear $kapargs device='epsfcol_l;sdip_p2.eps'
 
+	# Remove the old output file so that we can tell if we really
+	# created one here
+        if (-e ${out}.eps) \rm ${out}.eps
+
         # And merge them - for the old kappa we want sdip_p1.eps.1
 	# for the new kappa we can use sdip_p1.eps
-
-	if ($newkappa == 0) then
-          if (-e sdip_p1.eps.1 && -e sdip_p2.eps) psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
-	else
-	  if (-e sdip_p1.eps && -e sdip_p2.eps) psmerge -e sdip_p1.eps sdip_p2.eps >! ${out}.eps
+	if ( -x ${starbin}/psmerge) then
+	  if ($newkappa == 0) then
+            if (-e sdip_p1.eps.1 && -e sdip_p2.eps) ${starbin}/psmerge -e sdip_p1.eps.1 sdip_p2.eps >! ${out}.eps
+	  else
+	    if (-e sdip_p1.eps && -e sdip_p2.eps) ${starbin}/psmerge -e sdip_p1.eps sdip_p2.eps >! ${out}.eps
+          endif
+        else
+          echo Unable to locate Starlink psmerge command in directory ${starbin}.
         endif
 
    else

@@ -11,11 +11,9 @@
 if !($?STAR_LOGIN) then
 
 # Start up Starlink (if possible)
-# note that should probably put in something that gets
-# updated during INSTALLation.
 
-  if (-e /star/etc/login) then
-    source /star/etc/login
+  if (-e STAR_ETC/login) then
+    source STAR_ETC/login
   else
     echo 'Error: Starlink system not initialised'
     exit 1
