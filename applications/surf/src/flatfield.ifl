@@ -1,15 +1,52 @@
+## FLATFIELD - Divide data by SCUBA flatfield
+ 
+#+
+#  Name:
+#     FLATFIELD.IFL
+ 
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+ 
+#  History:
+#     1995 (JFL)
+#        Original Version
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     {enter_further_changes_here}
+ 
+#-
+ 
    INTERFACE FLATFIELD
+
+      HELPLIB 'SCUBA_HELP:'
+
 
       PARAMETER   IN
          POSITION 1
          PROMPT   'Name of input file'
          TYPE     'FILENAME'
+	 ACCESS   'READ'
+	 VPATH    'PROMPT'
+	 PPATH    'GLOBAL'
+	 ASSOCIATION '<-GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
       ENDPARAMETER
 
       PARAMETER   OUT
          POSITION 2
          PROMPT   'Name of output file'
          TYPE     'FILENAME'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
+         HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE
+
