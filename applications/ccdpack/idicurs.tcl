@@ -66,6 +66,8 @@
                       -maxpoints $MAXPOS \
                       -geometry ${WINX}x${WINY}
 
+      [ .viewer component exit ] configure -balloonstr "Finish adding points"
+
 #  Load the NDF into the widget.
       .viewer loadndf $ndf $MAXCANV
 
