@@ -501,7 +501,8 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  EEV7STANDARD.DAT GEC7QUICK.DAT GEC7STANDARD.DAT TEK1QUICK.DAT \
  TEK1STANDARD.DAT TEK2QUICK.DAT TEK2STANDARD.DAT TEK3QUICK.DAT \
  TEK3STANDARD.DAT TEK4QUICK.DAT TEK4STANDARD.DAT TEK5QUICK.DAT \
- TEK5STANDARD.DAT WHTFLAT.DAT WHTSKY.DAT
+ TEK5STANDARD.DAT WHTFLAT.DAT WHTSKY.DAT \
+ INT-WFC.ast
 
 #  List of IRAF script files. These will be installed in
 #  $(INSTALL_BIN_IRAF). This also includes any other miscellaneous
@@ -581,7 +582,7 @@ SUBSRC = ccd1_achan.f ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f \
  ccd1_ffcor.f ccd1_filas.f ccd1_fiohd.f ccd1_fitg.f \
  ccd1_fitlm.f ccd1_flnms.f ccd1_frdm.f ccd1_frtmp.f ccd1_ftval.f ccd1_ftypi.f \
  ccd1_ftypl.f ccd1_gafit.f ccd1_gastc.f ccd1_gastd.f \
- ccd1_gefp.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
+ ccd1_gefp.f ccd1_ggmap.f ccd1_giseq.f ccd1_gmdcp.f ccd1_gmid.f \
  ccd1_gmmp.f ccd1_grapc.f ccd1_groff.f ccd1_grpth.f ccd1_grrep.f ccd1_gtbds.f \
  ccd1_gtcmp.f ccd1_gtcpb.f ccd1_gtcpc.f ccd1_gtdir.f \
  ccd1_gtlig.f ccd1_gtlis.f ccd1_gtmlg.f ccd1_gtmli.f \
@@ -2226,6 +2227,7 @@ ccd1_gastc.o: CCD1_PAR SAE_PAR
 ccd1_gastd.o: CCD1_PAR SAE_PAR
 ccd1_gefp.o: SAE_PAR
 ccd1_ggeom.o: FIO_ERR SAE_PAR
+ccd1_ggmap.o: AST_PAR CCD1_PAR PRM_PAR SAE_PAR 
 ccd1_giseq.o: SAE_PAR
 ccd1_gmdcp.o: PAR_ERR PRM_PAR SAE_PAR
 ccd1_gmid.o: PRM_PAR SAE_PAR
