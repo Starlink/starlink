@@ -5459,8 +5459,6 @@ TDCA: Tim D.C. Ash(STARLINK)
                   bad data may be included randomly, and/or in a column
                   or line of the array.
  
-   The maximum size of generated array is 4096-by-4096 pixels,
-   though generally test data should be much smaller.
 2 AUTHORS
    Mark McCaughrean UoE (REVA::MJM)
    Malcolm Currie  STARLINK (RAL::CUR)

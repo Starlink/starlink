@@ -27,9 +27,6 @@
 *                  bad data may be included randomly, and/or in a column
 *                  or line of the array.
 *
-*     The maximum size of generated array is 4096-by-4096 pixels,
-*     though generally test data should be much smaller.
-*
 *    Invocation :
 *
 *     CALL CREFRAME( STATUS )
@@ -235,8 +232,10 @@
 
 *    get size of array to be generated 
 
-      CALL PAR_GDR0I( 'XDIM', 64, 1, 4096, .FALSE., IDIMS( 1 ), STATUS )
-      CALL PAR_GDR0I( 'YDIM', 64, 1, 4096, .FALSE., IDIMS( 2 ), STATUS )
+      CALL PAR_GDR0I( 'XDIM', 64, 1, 1000000, .FALSE., IDIMS( 1 ), 
+     :                STATUS )
+      CALL PAR_GDR0I( 'YDIM', 64, 1, 1000000, .FALSE., IDIMS( 2 ), 
+     :                STATUS )
 
       IF ( STATUS .EQ. SAI__OK ) THEN
 
