@@ -3832,74 +3832,78 @@ the string is drawn as part of a plot.\footnote{When displayed in a
 non-graphical environment (for instance, on an alpha-numeric terminal)
 the characters forming an escape sequence are stripped out of the string
 before the string is displayed.} Escape sequences are introduced using a
-percent character. Any unrecognised, illegal or incomplete escape
+percent character. For instance, if the string ``\verb=10%^50+%^s50+Z=''
+was used as an axis label in a plot, it would produce a string similar to
+``$10^{Z}$''---that is, the character ``Z'' would be displayed as a small
+super-script character. Any unrecognised, illegal or incomplete escape
 sequences are printed literally. The following escape sequences are
 currently recognised (``...'' represents a string of one or more decimal
 digits):
-\begin{description}
-\item[\%\%] - Print a literal ``\%'' character.
 
-\item[\%$^...+$]  - Draw subsequent characters as super-scripts. The digits
+\begin{itemize}
+\item \verb=kk= :  Print a literal ``\%'' character.
+
+\item \verb=%^...+= :   Draw subsequent characters as super-scripts. The digits
            ``...'' give the distance from the base-line of ``normal'' 
            text to the base-line of the super-script text, scaled 
            so that a value of ``100'' corresponds to the height of 
            ``normal'' text.
-\item[\%$^+$]     - Draw subsequent characters with the normal base-line.
+\item \verb=%^+= :      Draw subsequent characters with the normal base-line.
 
-\item[\%$v...+$]  - Draw subsequent characters as sub-scripts. The digits
+\item \verb=%v...+= :   Draw subsequent characters as sub-scripts. The digits
            ``...'' give the distance from the base-line of ``normal'' 
            text to the base-line of the sub-script text, scaled 
            so that a value of ``100'' corresponds to the height of 
            ``normal'' text.
 
-\item[\%$v+$]  - Draw subsequent characters with the normal base-line
-           (equivalent to \%$^+$).
+\item \verb=%v+= :   Draw subsequent characters with the normal base-line
+           (equivalent to \verb=%^+=).
 
-\item[\%$>...+$]  - Leave a gap before drawing subsequent characters.
+\item \verb=%>...+= :   Leave a gap before drawing subsequent characters.
            The digits ``...'' give the size of the gap, scaled 
            so that a value of ``100'' corresponds to the height of 
            ``normal'' text.
 
-\item[\%$<...+$]  - Move backwards before drawing subsequent characters.
+\item \verb=%<...+= :   Move backwards before drawing subsequent characters.
            The digits ``...'' give the size of the movement, scaled 
            so that a value of ``100'' corresponds to the height of 
            ``normal'' text.
 
-\item[\%$s...+$]  - Change the Size attribute for subsequent characters. The
+\item \verb=%s...+= :   Change the Size attribute for subsequent characters. The
            digits ``...'' give the new Size as a fraction of the 
            ``normal'' Size, scaled so that a value of ``100'' corresponds 
            to 1.0;
 
-\item[\%$s+$]  - Reset the Size attribute to its ``normal'' value.
+\item \verb=%s+= :   Reset the Size attribute to its ``normal'' value.
 
-\item[\%$w...+$]  - Change the Width attribute for subsequent characters. The
+\item \verb=%w...+= :   Change the Width attribute for subsequent characters. The
            digits ``...'' give the new width as a fraction of the 
            ``normal'' Width, scaled so that a value of ``100'' corresponds 
            to 1.0;
 
-\item[\%$w+$]     - Reset the Wize attribute to its ``normal'' value.
+\item \verb=%w+= :      Reset the Wize attribute to its ``normal'' value.
 
-\item[\%$f...+$]  - Change the Font attribute for subsequent characters. The
+\item \verb=%f...+= :   Change the Font attribute for subsequent characters. The
            digits ``...'' give the new Font value.
 
-\item[\%$f+$] - Reset the Font attribute to its ``normal'' value.
+\item \verb=%f+= :  Reset the Font attribute to its ``normal'' value.
 
-\item[\%$c...+$]  - Change the Colour attribute for subsequent characters. The
+\item \verb=%c...+= :   Change the Colour attribute for subsequent characters. The
            digits ``...'' give the new Colour value.
 
-\item[\%$c+$]  - Reset the Colour attribute to its ``normal'' value.
+\item \verb=%c+= :   Reset the Colour attribute to its ``normal'' value.
 
-\item[\%$t...+$]  - Change the Style attribute for subsequent characters. The
+\item \verb=%t...+= :   Change the Style attribute for subsequent characters. The
            digits ``...'' give the new Style value.
 
-\item[\%$t+$]  - Reset the Style attribute to its ``normal'' value.
+\item \verb=%t+= :   Reset the Style attribute to its ``normal'' value.
 
-\item[\%$-$]  - Push the current graphics attribute values onto the top of 
-           the stack (see ``\%+'').
+\item \verb=%-= :   Push the current graphics attribute values onto the top of 
+           the stack (see \verb=%+=).
 
-\item[\%$+$]  - Pop attributes values of the top the stack (see ``\%-''). If
+\item \verb=%+= :   Pop attributes values of the top the stack (see \verb=%-=). If
            the stack is empty, ``normal'' attribute values are restored.
-\end{description}
+\end{itemize}
 
 PGPLOT escape sequences may also be included in strings which are to be drawn.
 
