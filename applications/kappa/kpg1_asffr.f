@@ -13,9 +13,9 @@
 *     CALL KPG1_ASFFR( TARGET, DOMAIN, IFRM, STATUS )
 
 *  Description:
-*     This routine finds a Frame with a given Domain within a FrameSet,
-*     and returns its index. The Current Frame in the FrameSet is not
-*     changed.
+*     This routine finds the last Frame with a given Domain within a 
+*     FrameSet, and returns its index. The Current Frame in the FrameSet 
+*     is not changed.
 *
 *     The first and last component Frames within CmpFrames are included 
 *     in the search (component Frames in the middle of a CmpFrame cannot 
@@ -44,6 +44,9 @@
 *  History:
 *     13-AUG-1998 (DSB):
 *        Original version.
+*     16-DEC-1998 (DSB):
+*        Modified to return the index of the last matching Frame rather
+*        than the first matching Frame.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -97,8 +100,9 @@
 *  Get the number of Frames in the Target FrameSet.
       NFRM = AST_GETI( TARGET, 'NFRAME', STATUS )
 
-*  Loop round each Frame in the target FrameSet.
-      DO I = 1, NFRM
+*  Loop round each Frame in the target FrameSet. Work backwards through
+*  the Frames in order to find the last matching Frame in the FrameSet.
+      DO I = NFRM, 1, -1
 
 *  Get a pointer to the Frame.
          FRM = AST_GETFRAME( TARGET, I, STATUS )
@@ -120,7 +124,7 @@
       IF( IFRM .EQ. AST__NOFRAME ) THEN
 
 *  Loop round each Frame in the Target FrameSet.
-         DO I = 1, NFRM
+         DO I = NFRM, 1, -1
 
 *  Get a pointer to the Frame.
             FRM = AST_GETFRAME( TARGET, I, STATUS )

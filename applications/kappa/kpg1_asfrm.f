@@ -72,6 +72,9 @@
 
 *  Notes:
 *     -  This routine may add a new co-ordinate Frame into the FrameSet.
+*     -  If the FrameSet contains more than one Frame with the requested 
+*        Domain, then the last matching Frame in the FrameSet will be 
+*        used (i.e. the one with highest index).
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
@@ -80,6 +83,9 @@
 *  History:
 *     13-AUG-1998 (DSB):
 *        Original version.
+*     16-DEC-1998 (DSB):
+*        Ensure each Domain is only included once in the list of available
+*        Domains.
 *     {enter_further_changes_here}
 
 *-
@@ -115,6 +121,7 @@
       CHARACTER FRAME*30         ! Co-ordinate Frame specification
       CHARACTER DOM*15           ! Domain name
       CHARACTER SCSNAM*(IRA__SZSCS) ! IRAS90 name for sky coordinate system
+      CHARACTER T1*16            ! Terminated domain name
       CHARACTER TEXT*50          ! Text 
       DOUBLE PRECISION DEFEP     ! Epoch of observation
       DOUBLE PRECISION EPOCH     ! Epoch of observation
@@ -123,10 +130,12 @@
       INTEGER FRM                ! Pointer to matching Frame
       INTEGER IAT	         ! Current length of string
       INTEGER IFRM               ! Sub-Frame index
+      INTEGER JAT	         ! Current length of string
       INTEGER LSTAT              ! CHR status 
       INTEGER MAP                ! Pointer to mapping
       INTEGER SF2                ! Copy of SkyFrame
       LOGICAL ISSCS              ! Is FRAME an IRAS90 SCS?
+      LOGICAL THERE              ! Is the Domain already in the list?
 *.
 
 *  Check the inherited global status.
@@ -152,12 +161,45 @@
 *  Annul the pointer to this Frame.
          CALL AST_ANNUL( FRM, STATUS )
 
-*  Append the Domain value to the current list if it is not blank.
-*  Separate list items by ", ".
+*  Append the Domain value to the current list if it is not blank, and
+*  if it is not already there. Separate list items by ", ".
          IF( DOM .NE. ' ' ) THEN
-            IF( IAT .NE. 0 ) CALL CHR_APPND( ',', AVDOMS, IAT )
-            IAT = IAT + 1            
-            CALL CHR_APPND( DOM, AVDOMS, IAT )
+
+*  If this is the first domain, it cannot already be in the list.
+            IF( IAT .EQ. 0 ) THEN
+               THERE = .FALSE.
+
+*  Otherwise, we do the check.
+            ELSE
+
+*  Terminate the existing list with a comma.
+               CALL CHR_APPND( ',', AVDOMS, IAT )
+
+*  Get a copy of the Domain name, also terminated with a comma. We need
+*  to include the comma to avoid the new Domain name being matched by a
+*  sub-string within a Domain already in the list.
+               T1 = DOM
+               JAT = CHR_LEN( DOM )
+               CALL CHR_APPND( ',', T1, JAT )
+
+*  Set the flag if the terminated domain name is already in the list,
+*  and remove the comma appended above to the end of the list.
+               IF( INDEX( AVDOMS( : IAT ), T1( : JAT ) ) .NE. 0 ) THEN
+                  THERE = .TRUE.
+                  AVDOMS( IAT : ) = ' '
+                  IAT = IAT - 1
+               ELSE
+                  THERE = .FALSE.
+               END IF
+
+            END IF
+
+*  If the domain is not already in the list, append it to the end.
+            IF( .NOT. THERE ) THEN
+               IAT = IAT + 1            
+               CALL CHR_APPND( DOM, AVDOMS, IAT )
+            END IF
+
          END IF
 
       END DO
