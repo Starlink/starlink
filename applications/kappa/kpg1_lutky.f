@@ -1,5 +1,6 @@
       SUBROUTINE KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, 
-     :                       LP, UP, F, WORK, STATUS )
+     :                       LP, UP, F, GAP1, GAP2, JUST, WORK, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_LUTKY
@@ -12,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPG1_LUTKY( IPIC, PARAM, HIGH, LOW, LABEL, APP, LP, UP, F,
-*                      WORK, STATUS )
+*                      GAP1, GAP2, JUST, WORK, STATUS )
 
 *  Description:
 *     The key consists of a ramp of colour covering the specified range
@@ -46,6 +47,18 @@
 *        annotation "comfortably" into the Plot. A value of 0.0 will 
 *        result in the annotation being hard up against the edge of the 
 *        plot.
+*     GAP1 = REAL (Given)
+*        A gap, in millimetres, to place between the bottom or right edge
+*        of the supplied picture, and the nearest edge of the colour ramp.
+*     GAP2 = REAL (Given)
+*        A gap, in millimetres, to place between the top or left edge
+*        of the supplied picture, and the nearest edge of the colour ramp.
+*     JUST = CHARACTER*2 (Given)
+*        Indicates the justification of the new plot within the specified
+*        area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 'TC' or 'TR',
+*        where B is Bottom, C is Centre, T is Top, L is Left and R is
+*        Right. Only used if ASP > 0. Must be upper case. Unrecognised
+*        values are treated as "C".
 *     WORK( LP : UP ) = REAL (Returned)
 *        Work space.
 *     STATUS = INTEGER (Given and Returned)
@@ -85,12 +98,19 @@
       INTEGER LP
       INTEGER UP
       REAL F
+      REAL GAP1
+      REAL GAP2
+      CHARACTER JUST*2
 
 *  Arguments Returned:
       INTEGER WORK( LP : UP )
 
 *  Status:
       INTEGER STATUS             ! Global status
+
+*  Local Constants:
+      REAL ASPNOM                ! Nominal aspect ratio for the colour ramp
+      PARAMETER ( ASPNOM = 10.0 )
 
 *  Local Variables:
       CHARACTER EDGE1*6          ! Default edge for data value labels
@@ -109,6 +129,7 @@
       INTEGER WMAP               ! Pointer to an AST WinMap
       LOGICAL OK                 ! Could small Plot be made?
       LOGICAL UPDATA             ! Use vertical edges for data axis?
+      REAL ASPRAT                ! Aspect ratio for colour ramp
       REAL LBND( 2 )             ! Lower LUTKEY bounds
       REAL UBND( 2 )             ! Upper LUTKEY bounds 
       REAL X1, X2, Y1, Y2        ! Bounds of PGPLOT window
@@ -116,6 +137,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Begin an AGI context.
+      CALL AGI_BEGIN
 
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
@@ -147,13 +171,20 @@
 *  Set up the default edge for labelling. If the viewport is short and 
 *  wide, axis 1 of the annotation Frame (the data value axis) is displayed 
 *  horizontally by default. It is displayed vertically by default if the 
-*  viewport is tall and thin. 
+*  viewport is tall and thin. Also change the area to include the required 
+*  gaps at each end of the colour ramp.
       IF( ABS( Y1 - Y2 ) .GT. ABS( X2 - X1 ) ) THEN
          EDGE1 = 'LEFT'
          EDGE2 = 'BOTTOM'
+         Y1 = MIN( Y2, Y1 + GAP1 )
+         Y2 = MAX( Y1, Y2 - GAP2 )
+         ASPRAT = ASPNOM
       ELSE
          EDGE1 = 'BOTTOM'
          EDGE2 = 'LEFT'
+         X1 = MIN( X2, X1 + GAP1 )
+         X2 = MAX( X1, X2 - GAP2 )
+         ASPRAT = 1.0/ASPNOM
       ENDIF
 
 *  Store the default edge in the Plot.
@@ -237,7 +268,8 @@
 
 *  Replace the Plot with a new Plot covering a smaller area so that there
 *  is room for the annotation within the current viewport.
-      CALL KPG1_ASSHR( .FALSE., F, IPLOT, OK, STATUS )
+      CALL KPG1_ASSHR( ASPRAT, F, X1, X2, Y1, Y2, JUST, IPLOT, OK, 
+     :                 STATUS )
 
 *  Report an error if there was insufficient room to create the shrunken
 *  Plot.
@@ -295,5 +327,8 @@
 
 *  End the AST context.
       CALL AST_END( STATUS )
+
+*  End the AGI context.
+      CALL AGI_END( -1, STATUS )
 
       END

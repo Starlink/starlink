@@ -786,11 +786,11 @@
 *  Now find the aspect ratio of the available space (i.e. the current
 *  picture minus the margins). 
       IF( KEY ) THEN
-         ASP0 = ( ( Y2 - Y1 )*( 1.0 + MARGIN( 2 ) + MARGIN( 4 ) ) ) /
-     :          ( ( X2 - X1 )*( 1.0 + MARGIN( 1 ) + MARGIN( 3 ) + KW ) ) 
+         ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
+     :          ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) - KW ) ) 
       ELSE
-         ASP0 = ( ( Y2 - Y1 )*( 1.0 + MARGIN( 2 ) + MARGIN( 4 ) ) ) /
-     :          ( ( X2 - X1 )*( 1.0 + MARGIN( 1 ) + MARGIN( 3 ) ) ) 
+         ASP0 = ( ( Y2 - Y1 )*( 1.0 - MARGIN( 1 ) - MARGIN( 3 ) ) ) /
+     :          ( ( X2 - X1 )*( 1.0 - MARGIN( 2 ) - MARGIN( 4 ) ) ) 
       END IF
 
 *  Get the aspect ratio of the supplied data array.
@@ -1115,8 +1115,7 @@
          CALL KPG1_ASGRD( IPLOT, IPICF, .FALSE., STATUS )
       END IF
 
-
-*  Now create the key if required.
+*  First create the key if required.
       IF( KEY ) THEN
 
 *  Create a label, nidicating the array component and NDF name (without 
@@ -1136,6 +1135,7 @@
 *  Create the key.
          CALL KPG1_LUTKY( IPICK, 'KEYSTYLE', REAL( DHI ), REAL( DLO ), 
      :                    LABEL( : NC ), 'KAPPA_DISPLAY', LP, UP, 0.1,
+     :                    ( Y2 - Y1 )*0.1, ( Y2 - Y1 )*0.1, 'CL',
      :                    %VAL( IPWORK ), STATUS )
 
 *  Deallocate the work array.

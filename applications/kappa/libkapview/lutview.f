@@ -485,8 +485,8 @@
 
 *  Create the LUT key within the KEY Picture.
       CALL KPG1_LUTKY( IPICK, 'STYLE', HIGH, LOW, LABEL, 
-     :                 'KAPPA_LUTVIEW', LP, UP, 0.0, %VAL( IPWORK ), 
-     :                 STATUS ) 
+     :                 'KAPPA_LUTVIEW', LP, UP, 0.0, 0.0, 0.0, 'CC',
+     :                 %VAL( IPWORK ), STATUS ) 
 
 *  Free the memory.
       CALL PSX_FREE( IPWORK, STATUS )

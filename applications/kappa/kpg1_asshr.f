@@ -1,17 +1,18 @@
-      SUBROUTINE KPG1_ASSHR( FIXAR, F, IPLOT, OK, STATUS )
+      SUBROUTINE KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, IPLOT, OK, 
+     :                       STATUS )
 *+
 *  Name:
 *     KPG1_PLOT
 
 *  Purpose:
 *     Shrink a Plot so that it covers an area which allows all annotation 
-*     to fit within the current PGPLOT viewport.
+*     to fit within the specified area.
 
 *  Language:
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG1_ASSHR( FIXAR, F, IPLOT, OK, STATUS )
+*     CALL KPG1_ASSHR( ASP, F, X1, X2, Y1, Y2, JUST, IPLOT, OK, STATUS )
 
 *  Description:
 *     This routine creates a new Plot covering the same window as the 
@@ -22,9 +23,10 @@
 *     within the current PGPLOT viewport. 
 
 *  Arguments:
-*     FIXAR = LOGICAL (Given)
-*        Should the aspect ratio of the window be retained? If not, the 
-*        largest possible area is used for the new window.
+*     ASP = LOGICAL (Given)
+*        The aspect ratio of the required plotting area (i.e. excluding
+*        annotation) after shrinking. If this is zero or negative, the 
+*        largest possible area is used for the plotting area.
 *     F = REAL (Given)
 *        An amount by which to extend the margins left for annotation,
 *        expressed as a factor of the height or width of the plotting 
@@ -32,6 +34,24 @@
 *        annotation "comfortably" into the Plot. A value of 0.0 will 
 *        result in the annotation being hard up against the edge of the 
 *        plot.
+*     X1 = REAL (Given)
+*        The GRAPHICS X co-ordinate at the left edge of the area into
+*        which the annotation is to fit.
+*     X2 = REAL (Given)
+*        The GRAPHICS X co-ordinate at the right edge of the area into
+*        which the annotation is to fit.
+*     Y1 = REAL (Given)
+*        The GRAPHICS Y co-ordinate at the bottom edge of the area into
+*        which the annotation is to fit.
+*     Y2 = REAL (Given)
+*        The GRAPHICS Y co-ordinate at the top edge of the area into
+*        which the annotation is to fit.
+*     JUST = CHARACTER*2 (Given)
+*        Indicates the justification of the new plot within the specified
+*        area.  'BL', 'BC', 'BR', 'CL', 'CC', 'CR', 'TL', 'TC' or 'TR',
+*        where B is Bottom, C is Centre, T is Top, L is Left and R is
+*        Right. Only used if ASP > 0. Must be upper case. Unrecognised
+*        values are treated as "C".
 *     IPLOT = INTEGER (Given and Returned)
 *        The Plot. The supplied Plot is annulled and a new one is
 *        returned in its place. The new Plot contains all the Frames of
@@ -66,8 +86,13 @@
       INCLUDE 'AST_PAR'          ! AST constants and function declarations
 
 *  Arguments Given:
-      LOGICAL FIXAR
+      REAL ASP
       REAL F
+      REAL X1
+      REAL X2
+      REAL Y1
+      REAL Y2
+      CHARACTER JUST*2
 
 *  Arguments Given and Returned:
       INTEGER IPLOT
@@ -112,7 +137,7 @@
       LOGICAL TKALL              ! Draw tick marks on all edges?
       LOGICAL TXTLB1             ! Are textual labels drawn for axis 1
       LOGICAL TXTLB2             ! Are textual labels drawn for axis 2
-      REAL AR                    ! Original window aspect ratio
+      REAL ASP0                  ! Aspect ratio of supplied area
       REAL CEN                   ! Position of window centre
       REAL GBOX( 4 )             ! Bounds of new window
       REAL HGT                   ! Height of window 
@@ -132,6 +157,8 @@
       REAL NLGAP2                ! Gap between axis 2 and numerical labels
       REAL NLSIZE                ! Character size for numerical labels
       REAL OBOX( 4 )             ! Bounds of old window
+      REAL RF                    ! Reduction factor to fit in available area
+      REAL TBOX( 4 )             ! Bounds of total box including annotation
       REAL TKLEN                 ! Max (-ve) length of tick marks
       REAL TKLEN1                ! Longest exterior tick length for axis 1
       REAL TKLEN2                ! Longest exterior tick length for axis 2
@@ -143,7 +170,6 @@
       REAL VTHGT                 ! Height of text with vertical baseline
       REAL VTWID                 ! Char. width of text with vertical baseline
       REAL WID                   ! Width of window 
-      REAL X1, X2, Y1, Y2    	 ! GRAPHICS bounds of PGPLOT viewport
 *.
 
 *  Initialise.
@@ -155,21 +181,30 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Get the bounds of the current PGPLOT window, in the GRAPHICS Frame 
-*  (millimetres from the bottom left corner of the view surface).
-*  The supplied Plot is assumed to cover this area (i.e. the annotation
-*  produced by AST_GRID would fall outside this area).
-      CALL PGQWIN( X1, X2, Y1, Y2 )
-
-*  If required, store the original aspect ratio of the plotting area.
-      IF( FIXAR ) AR = ABS( Y1 - Y2 )/ABS( X1 - X2 )
-
 *  Get the nominal text height and width in PGPLOT world co-ordinates.
 *  This could be different for vertical and horizontal text. Assume a
 *  nominal aspect ratio of ARAT for each character.
       CALL PGQCS( 4, VTHGT, HTHGT )
       HTWID = HTHGT/ARAT
       VTWID = VTHGT/ARAT
+
+*  Store the aspect ratio of the available area.
+      ASP0 = ( Y2 - Y1 )/( X2 - X1 )
+
+*  Transform the centre position of the specified area (in GRAPHICS 
+*  co-ordinates)  into the current Frame.
+      CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ), 
+     :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS ) 
+
+*  Find the number of characters in a formatted axis 1 value. This will
+*  not necessarily be the same as the number of digits which actually appear
+*  in the grid annotations, because the Plot Class removes any un-necessary
+*  trailing zeros, for instance. But it will be a conservative estimate
+*  anyway.
+      NC1 = CHR_LEN( AST_FORMAT( IPLOT, 1, XC, STATUS ) )
+
+*  Find the number of characters in a formatted axis 2 value.
+      NC2 = CHR_LEN( AST_FORMAT( IPLOT, 2, YC, STATUS ) )
 
 *  If required, attributes controlling the size of annotations will be 
 *  reduced in value in an attempt to fit the annotation and plotting area 
@@ -206,32 +241,53 @@
       TLSIZE = AST_GETR( IPLOT, 'Size(TextLab)', STATUS )
       TTSIZE = AST_GETR( IPLOT, 'Size(Title)', STATUS )
 
-*  Transform the centre position of the current PGPLOT viewport (in
-*  GRAPHICS co-ordinates)  into the current Frame.
-      CALL AST_TRAN2( IPLOT, 1, 0.5*DBLE( X1 + X2 ), 
-     :                0.5*DBLE( Y1 + Y2 ), .TRUE., XC, YC, STATUS ) 
+*  Start off with the plotting area being the maximum size (as if no
+*  margins were required).
+      IF( ASP .LE. 0.0  ) THEN
+         WID = X2 - X1
+         HGT = Y2 - Y1
 
-*  Find the number of characters in a formatted axis 1 value. This will
-*  not necessarily be the same as the number of digits which actually appear
-*  in the grid annotations, because the Plot Class removes any un-necessary
-*  trailing zeros, for instance. But it will be a conservative estimate
-*  anyway.
-      NC1 = CHR_LEN( AST_FORMAT( IPLOT, 1, XC, STATUS ) )
+*  If the required window is taller than the available space, use the 
+*  full height, and find the corresponging width.
+      ELSE IF( ASP .GT. ASP0 ) THEN
+         HGT = Y2 - Y1
+         WID = HGT/ASP
 
-*  Find the number of characters in a formatted axis 2 value.
-      NC2 = CHR_LEN( AST_FORMAT( IPLOT, 2, YC, STATUS ) )
+*  If the required window is wider than the available space, use the 
+*  full width, and find the corresponding height.
+      ELSE 
+         WID = X2 - X1
+         HGT = WID*ASP
+      END IF
 
-*  Assume for the moment that the graphics box will be the entire 
-*  current viewport. This will mean that the annotation goes outside the 
-*  current viewport. This is not what we want, but it is a starting point.
-      GBOX( 1 ) = X1
-      GBOX( 3 ) = X2
-      GBOX( 2 ) = Y1
-      GBOX( 4 ) = Y2
+*  Anchor the required corner.
+      IF( JUST( 1:1 ) .EQ. 'B' ) THEN
+         GBOX( 2 ) = Y1
+         GBOX( 4 ) = Y1 + HGT
+      ELSE IF( JUST( 1:1 ) .EQ. 'T' ) THEN
+         GBOX( 4 ) = Y2 
+         GBOX( 2 ) = Y2 - HGT
+      ELSE
+         CEN = 0.5*( Y1 + Y2 )
+         GBOX( 2 ) = CEN - 0.5*HGT
+         GBOX( 4 ) = CEN + 0.5*HGT
+      END IF
+
+      IF( JUST( 2:2 ) .EQ. 'L' ) THEN
+         GBOX( 1 ) = X1
+         GBOX( 3 ) = X1 + WID
+      ELSE IF( JUST( 2:2 ) .EQ. 'R' ) THEN
+         GBOX( 3 ) = X2 
+         GBOX( 1 ) = X2 - WID
+      ELSE
+         CEN = 0.5*( X1 + X2 )
+         GBOX( 1 ) = CEN - 0.5*WID
+         GBOX( 3 ) = CEN + 0.5*WID
+      END IF
 
 *  Loop round reducing the size of the plotting area until all the
-*  annotation falls within the current PGPLOT viewport. This loop only
-*  changes the size of the plotting area, NOT the size of the annotation.
+*  annotation falls within the specified area. This loop only changes 
+*  the size of the plotting area, NOT the size of the annotation.
       MORE = .TRUE.
       DO WHILE( MORE .AND. STATUS .EQ. SAI__OK )
 
@@ -415,45 +471,60 @@
          MBOT = MBOT + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
          MTOP = MTOP + MIN( F*ABS( GBOX( 4 ) - GBOX( 2 ) ), MAXEXT )
 
+*  Find the width and height of the area including annotation.
+         WID = GBOX( 3 ) - GBOX( 1 ) + MLEFT + MRIGHT
+         HGT = GBOX( 4 ) - GBOX( 2 ) + MTOP + MBOT
+
+*  Find the factor required to scale this box to fit within the available
+*  space.
+         RF = MIN( 1.0, MIN( ( Y2 - Y1 )/HGT, ( X2 - X1 )/WID ) )
+
+*  Scale the width, height and margins by this value.
+         WID = WID*RF
+         HGT = HGT*RF
+
+         MLEFT = MLEFT*RF
+         MRIGHT = MRIGHT*RF
+         MTOP = MTOP*RF
+         MBOT = MBOT*RF
+
+*  Anchor the required corner. TBOX is the box enclosing the plotting
+*  area and the annotation.
+         IF( JUST( 1:1 ) .EQ. 'B' ) THEN
+            TBOX( 2 ) = Y1
+            TBOX( 4 ) = Y1 + HGT
+         ELSE IF( JUST( 1:1 ) .EQ. 'T' ) THEN
+            TBOX( 4 ) = Y2 
+            TBOX( 2 ) = Y2 - HGT
+         ELSE
+            CEN = 0.5*( Y1 + Y2 )
+            TBOX( 2 ) = CEN - 0.5*HGT
+            TBOX( 4 ) = CEN + 0.5*HGT
+         END IF
+   
+         IF( JUST( 2:2 ) .EQ. 'L' ) THEN
+            TBOX( 1 ) = X1
+            TBOX( 3 ) = X1 + WID
+         ELSE IF( JUST( 2:2 ) .EQ. 'R' ) THEN
+            TBOX( 3 ) = X2 
+            TBOX( 1 ) = X2 - WID
+         ELSE
+            CEN = 0.5*( X1 + X2 )
+            TBOX( 1 ) = CEN - 0.5*WID
+            TBOX( 3 ) = CEN + 0.5*WID
+         END IF
+
 *  Save the old graphics box.
          OBOX( 1 ) = GBOX( 1 )
          OBOX( 2 ) = GBOX( 2 )
          OBOX( 3 ) = GBOX( 3 )
          OBOX( 4 ) = GBOX( 4 )
 
-*  Find the bounds to use for the plotting area. If no aspect ratio
-*  has been specified, use the whole of the available space, excluding
-*  the margins found above.
-         IF( .NOT. FIXAR ) THEN
-            GBOX( 1 ) = X1 + MLEFT
-            GBOX( 3 ) = X2 - MRIGHT
-            GBOX( 2 ) = Y1 + MBOT
-            GBOX( 4 ) = Y2 - MTOP
-
-*  If the original window had an aspect ratio greater than 1 (a tall
-*  thin window), use the full height, and centre the area horizontally
-*  between the left and right margins.
-         ELSE IF( AR .GT. 1.0 ) THEN
-            GBOX( 2 ) = Y1 + MBOT
-            GBOX( 4 ) = Y2 - MTOP
-   
-            CEN = 0.5*( ( X1 + MLEFT ) + ( X2 - MRIGHT ) )
-            WID = ( Y2 - Y1 )/AR
-            GBOX( 1 ) = CEN - 0.5*WID
-            GBOX( 3 ) = CEN + 0.5*WID
-
-*  If the original window had an aspect ratio less than 1 (a short
-*  wide window), use the full width, and centre the area vertically
-*  between the top and bottom margins.
-         ELSE 
-            GBOX( 1 ) = X1 + MLEFT
-            GBOX( 3 ) = X2 - MRIGHT
-   
-            CEN = 0.5*( ( Y1 + MBOT ) + ( Y2 - MTOP ) )
-            HGT = ( X2 - X1 )*AR
-            GBOX( 2 ) = CEN - 0.5*HGT
-            GBOX( 4 ) = CEN + 0.5*HGT
-         END IF
+*  Set up the new graphics box.
+         GBOX( 1 ) = TBOX( 1 ) + MLEFT
+         GBOX( 2 ) = TBOX( 2 ) + MBOT
+         GBOX( 3 ) = TBOX( 3 ) - MRIGHT
+         GBOX( 4 ) = TBOX( 4 ) - MTOP
 
 *  Leave the loop if none of the box corners moved by more than 0.1
 *  millimetre.
@@ -510,7 +581,7 @@
 
 *  Create the new Plot holding the Base (GRAPHICS) Frame from the supplied 
 *  Plot. The new Plot covers the screen area found above. This area is 
-*  mapped into the entire area covered by the old Plot.
+*  mapped into the specified area.
          BBOX( 1 ) = DBLE( X1 )
          BBOX( 2 ) = DBLE( Y1 )
          BBOX( 3 ) = DBLE( X2 )
