@@ -18,8 +18,8 @@
 *  Description:
 *     This routine provides a wrapper for the PDA_IDSFFT spline interpolation
 *     routine. The quirks of the algorithm are dealt with here so that
-*     SCULIB_SPLINE_REGRID does not have to know anything about the interpolation
-*     routine.
+*     SCULIB_SPLINE_REGRID does not have to know anything about the 
+*     interpolation routine.
 
 *  Arguments:
 *     NDP = INTEGER (Given)
@@ -62,8 +62,8 @@
       INCLUDE 'PRM_PAR'                          ! VAL__ constants
 
 *  Arguments Given:
-      REAL    DATA_IN ( NDP )
       INTEGER NDP
+      REAL    DATA_IN ( NDP )
       INTEGER NX_OUT
       INTEGER NY_OUT
       REAL    X_IN ( NDP )
