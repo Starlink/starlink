@@ -92,6 +92,7 @@
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  NUMSEL,
@@ -149,7 +150,8 @@
 *          appropriate.
 
             CALL CAT1_CRTAR (NUMSEL, '_INTEGER', SELPTR, STATUS)
-            CALL CAT1_CATRA (CI, NUMSEL, SELIST, %VAL(SELPTR), STATUS)
+            CALL CAT1_CATRA (CI, NUMSEL, SELIST, %VAL(CNF_PVAL(SELPTR)), 
+     :                       STATUS)
 
 *
 *          Create a selection identifier.
@@ -171,14 +173,15 @@
                CALL CAT1_CRTAR (ROWS, '_INTEGER', WKPTR1, STATUS)
                CALL CAT1_CRTAR (ROWS, '_INTEGER', WKPTR2, STATUS)
 
-               CALL CAT1_RJLST (NUMSEL, SELIST, ROWS, %VAL(WKPTR1),
-     :           NUMREJ, %VAL(WKPTR2), STATUS)
+               CALL CAT1_RJLST (NUMSEL, SELIST, ROWS, 
+     :                          %VAL(CNF_PVAL(WKPTR1)),
+     :           NUMREJ, %VAL(CNF_PVAL(WKPTR2)), STATUS)
 
                IF (NUMREJ .GT. 0) THEN
                   CALL CAT1_CRTAR (ROWS, '_INTEGER', REJPTR, STATUS)
 
-                  CALL CAT1_CATRA (CI, NUMREJ, %VAL(WKPTR2),
-     :              %VAL(REJPTR), STATUS)
+                  CALL CAT1_CATRA (CI, NUMREJ, %VAL(CNF_PVAL(WKPTR2)),
+     :              %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                Create the selection of rejected rows.

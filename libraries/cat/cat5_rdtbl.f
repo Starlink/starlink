@@ -104,6 +104,7 @@
       INCLUDE 'CAT_ERR'          ! CAT error codes.
 *  Global Variables:
       INCLUDE 'CAT5_STL_CMN'     ! Small text list common block.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *  Arguments Given:
       CHARACTER
      :  FILE*(*)
@@ -210,7 +211,8 @@ C5001                   format(1x, 'CAT5_RDTBL - fldlst(curfld): ', a )
      :                      FLDLST(CURFLD) .EQ. '<NULL>'  .OR.
      :                      FLDLST(CURFLD) .EQ. '?') THEN
                            CALL CAT5_STAEL (ROWS,
-     :                       ROW, .TRUE., %VAL(FPTRNA(CURCOL)), STATUS)
+     :                       ROW, .TRUE., 
+     :                       %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                         ELSE
 
 *
@@ -232,7 +234,7 @@ C5001                   format(1x, 'CAT5_RDTBL - fldlst(curfld): ', a )
 *                      in the field; set the null value flag.
 
                         CALL CAT5_STAEL (ROWS, ROW, .TRUE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                      END IF
                   END DO
                END IF

@@ -81,6 +81,7 @@
       INCLUDE 'CAT1_PAR'          ! Internal CAT constants.
 *  Global Variables:
       INCLUDE 'CAT5_ANG_CMN'      ! STL angles common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       CHARACTER
      :  FIELD*(*)
@@ -212,28 +213,40 @@
 
          IF (CONVOK) THEN
             IF (FDTYPE .EQ. CAT__TYPEB) THEN
-               CALL CAT5_STAEB (ROWS, ROW, BVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEB (ROWS, ROW, BVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-               CALL CAT5_STAEW (ROWS, ROW, WVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEW (ROWS, ROW, WVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-               CALL CAT5_STAEI (ROWS, ROW, IVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEI (ROWS, ROW, IVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-               CALL CAT5_STAER (ROWS, ROW, RVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAER (ROWS, ROW, RVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-               CALL CAT5_STAED (ROWS, ROW, DVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAED (ROWS, ROW, DVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-               CALL CAT5_STAEL (ROWS, ROW, LVAL, %VAL(PTR), STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, LVAL, %VAL(CNF_PVAL(PTR)), 
+     :                          STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                IF (CVAL(1 : 1) .EQ. ''''  .OR.
@@ -248,16 +261,20 @@
                   END IF
                END IF
 
-               CALL CAT5_STCAE (ROWS, FCSIZE, ROW, CVAL, %VAL(PTR),
+               CALL CAT5_STCAE (ROWS, FCSIZE, ROW, CVAL, 
+     :                          %VAL(CNF_PVAL(PTR)),
      :           STATUS)
-               CALL CAT5_STAEL (ROWS, ROW, .FALSE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .FALSE., 
+     :                          %VAL(CNF_PVAL(PTRN)), STATUS)
 
             ELSE
-               CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(PTRN), STATUS)
+               CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)), 
+     :                          STATUS)
 
             END IF
          ELSE
-            CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(PTRN), STATUS)
+            CALL CAT5_STAEL (ROWS, ROW, .TRUE., %VAL(CNF_PVAL(PTRN)), 
+     :                       STATUS)
 
          END IF
 

@@ -128,6 +128,7 @@
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -229,7 +230,8 @@
 *                      Select the rows which satisfy the criterion.
 
                         CALL CAT1_SELCT (EI, REJFLG, CI, ROWS, NUMSEL,
-     :                    %VAL(WSPTR), NUMREJ, %VAL(WRPTR), STATUS)
+     :                    %VAL(CNF_PVAL(WSPTR)), NUMREJ, 
+     :                    %VAL(CNF_PVAL(WRPTR)), STATUS)
 
 *
 *                      Proceed if some objects were selected.
@@ -247,8 +249,9 @@
 
                            CALL CAT1_CRTAR (NUMSEL, '_INTEGER', 
      :                       SELPTR, STATUS)
-                           CALL CAT1_CPYAR (NUMSEL, %VAL(WSPTR), 
-     :                       %VAL(SELPTR), STATUS)
+                           CALL CAT1_CPYAR (NUMSEL, 
+     :                                      %VAL(CNF_PVAL(WSPTR)),
+     :                       %VAL(CNF_PVAL(SELPTR)), STATUS)
                            CALL CAT_TIQAC (EI, 'EXPR', EXPR, STATUS)
                            CALL CAT1_CRTSL (CIC, EXPR, .TRUE., NUMSEL,
      :                       SELPTR, SI, STATUS)
@@ -257,8 +260,9 @@
                               IF (NUMREJ .GT. 0) THEN
                                  CALL CAT1_CRTAR (NUMREJ, '_INTEGER',
      :                             REJPTR, STATUS)
-                                 CALL CAT1_CPYAR (NUMREJ, %VAL(WRPTR), 
-     :                             %VAL(REJPTR), STATUS)
+                                 CALL CAT1_CPYAR (NUMREJ, 
+     :                                            %VAL(CNF_PVAL(WRPTR)),
+     :                             %VAL(CNF_PVAL(REJPTR)), STATUS)
                                  CALL CAT1_CRTSL (CIC, EXPR, .FALSE.,
      :                             NUMREJ, REJPTR, SIR, STATUS)
                               ELSE

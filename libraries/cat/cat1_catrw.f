@@ -57,6 +57,7 @@
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  GI,
@@ -105,7 +106,8 @@
 
                IF (ROWNO .GE. 1  .AND.  ROWNO .LE. NUMSEL) THEN
                   CALL CAT_TIQAI (GI, 'PTR', PTR, STATUS)
-                  CALL CAT1_GTSRW (NUMSEL, %VAL(PTR), ROWNO, CATROW, 
+                  CALL CAT1_GTSRW (NUMSEL, %VAL(CNF_PVAL(PTR)), 
+     :                             ROWNO, CATROW,
      :              STATUS)
                ELSE
                   STATUS = CAT__INVRW

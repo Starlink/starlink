@@ -84,6 +84,7 @@
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -214,30 +215,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -276,38 +285,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -433,6 +451,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -563,30 +582,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -625,38 +652,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -782,6 +818,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -912,30 +949,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -974,38 +1019,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -1131,6 +1185,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -1261,30 +1316,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -1323,38 +1386,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -1480,6 +1552,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -1610,30 +1683,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -1672,38 +1753,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -1829,6 +1919,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -1959,30 +2050,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -2021,38 +2120,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 
@@ -2178,6 +2286,7 @@ C4200       format(1x, 'rows: ', i5)
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       LOGICAL
      :  IOFLG
@@ -2308,30 +2417,38 @@ C4200       format(1x, 'rows: ', i5)
 *             If the value is not null then get the actual datum,
 *             otherwise substitute the appropriate null value.
 
-               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTRN), NULFLG, STATUS)
+               CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTRN)), 
+     :                          NULFLG, STATUS)
 
                IF (.NOT. NULFLG) THEN
 
                   IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(PTR), BVALI,
+                     CALL CAT5_GTAEB (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                BVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(PTR), WVALI,
+                     CALL CAT5_GTAEW (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                WVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(PTR), IVALI,
+                     CALL CAT5_GTAEI (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                IVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(PTR), RVALI,
+                     CALL CAT5_GTAER (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                RVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(PTR), DVALI,
+                     CALL CAT5_GTAED (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                DVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(PTR), LVALI,
+                     CALL CAT5_GTAEL (ROWS, ROWNO, %VAL(CNF_PVAL(PTR)), 
+     :                                LVALI,
      :                 STATUS)
                   ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, %VAL(PTR),
+                     CALL CAT5_GTCAE(ROWS, FCSIZE, ROWNO, 
+     :                               %VAL(CNF_PVAL(PTR)),
      :                 CVALI, STATUS)
                   ELSE
                      STATUS = CAT__INVDT
@@ -2370,38 +2487,47 @@ C4200       format(1x, 'rows: ', i5)
 
                   IF (CONVOK) THEN
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, %VAL(PTR),
+                        CALL CAT5_STAEB (ROWS, ROWNO, BVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, %VAL(PTR),
+                        CALL CAT5_STAEW (ROWS, ROWNO, WVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, %VAL(PTR),
+                        CALL CAT5_STAEI (ROWS, ROWNO, IVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, %VAL(PTR),
+                        CALL CAT5_STAER (ROWS, ROWNO, RVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, %VAL(PTR),
+                        CALL CAT5_STAED (ROWS, ROWNO, DVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, %VAL(PTR),
+                        CALL CAT5_STAEL (ROWS, ROWNO, LVALO, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    STATUS)
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
                         CALL CAT5_STCAE(ROWS, FCSIZE, ROWNO, CVALO,
-     :                    %VAL(PTR), STATUS)
+     :                    %VAL(CNF_PVAL(PTR)), STATUS)
                      ELSE
                         STATUS = CAT__INVDT
                      END IF
 
-                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .FALSE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   ELSE
-                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                     CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                                %VAL(CNF_PVAL(PTRN)),
      :                 STATUS)
                   END IF
                ELSE
-                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., %VAL(PTRN),
+                  CALL CAT5_STAEL (ROWS, ROWNO, .TRUE., 
+     :                             %VAL(CNF_PVAL(PTRN)),
      :              STATUS)
                END IF
 

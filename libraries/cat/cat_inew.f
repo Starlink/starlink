@@ -83,6 +83,7 @@
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  FI,
@@ -171,9 +172,11 @@ C                 print2000, ci, fi, rows, status
 C2000             format(1x, 'before call to CAT1_GNSRT ' /
 C    :              1x, 'ci, fi, rows, status: ', i5, i5, i5, i20)
 
-                  CALL CAT1_GNSRT (CI, FI, ROWS, ORDER, %VAL(NULPTR),
-     :              %VAL(VALPTR), %VAL(COLPTR), %VAL(SEQPTR),
-     :              %VAL(SORPTR), STATUS)
+                  CALL CAT1_GNSRT (CI, FI, ROWS, ORDER, 
+     :                             %VAL(CNF_PVAL(NULPTR)),
+     :              %VAL(CNF_PVAL(VALPTR)), %VAL(CNF_PVAL(COLPTR)), 
+     :              %VAL(CNF_PVAL(SEQPTR)),
+     :              %VAL(CNF_PVAL(SORPTR)), STATUS)
 
 C                 print2001, ci, fi, rows, status
 C2001             format(1x, 'after call to CAT1_GNSRT ' /

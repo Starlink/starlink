@@ -151,6 +151,7 @@
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -330,8 +331,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -671,6 +673,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -850,8 +853,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -1191,6 +1195,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -1370,8 +1375,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -1711,6 +1717,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -1890,8 +1897,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -2231,6 +2239,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -2410,8 +2419,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -2751,6 +2761,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -2930,8 +2941,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the
@@ -3271,6 +3283,7 @@ C           call chr_putc ('maxrng', expr, lexpr)
 *  Global Constants:
       INCLUDE 'CAT_PAR'           ! External CAT constants.
       INCLUDE 'CAT_ERR'           ! CAT error codes.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -3450,8 +3463,9 @@ C    :                    i10, i10, i10)
 *                         rows.
 
                            CALL CAT1_RNGLS (ROWS, BEGROW, ENDROW,
-     :                       LRJFLG, NUMSEL, NUMREJ, %VAL(SELPTR),
-     :                       %VAL(REJPTR), STATUS)
+     :                       LRJFLG, NUMSEL, NUMREJ, 
+     :                       %VAL(CNF_PVAL(SELPTR)),
+     :                       %VAL(CNF_PVAL(REJPTR)), STATUS)
 
 *
 *                         Generate the expression specifying the

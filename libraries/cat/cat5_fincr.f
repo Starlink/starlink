@@ -70,6 +70,7 @@
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI
@@ -266,7 +267,8 @@ C5004             format(1x, 'after WRCOL')
 *
 *                   Set the null value flags for all the rows.
 
-                     CALL CAT5_STNUL (.TRUE., ROWS, %VAL(PTRN), STATUS)
+                     CALL CAT5_STNUL (.TRUE., ROWS, 
+     :                                %VAL(CNF_PVAL(PTRN)), STATUS)
 
 *
 *                   Save the common block details.
@@ -305,7 +307,8 @@ C5004             format(1x, 'after WRCOL')
 *
 *                      Set the null value flags for all the rows.
 
-                        CALL CAT5_STNUL (.TRUE., ROWS, %VAL(PTRN),
+                        CALL CAT5_STNUL (.TRUE., ROWS, 
+     :                                   %VAL(CNF_PVAL(PTRN)),
      :                    STATUS)
 
 *

@@ -64,6 +64,7 @@
       INCLUDE 'CAT1_CATS_CMN'     ! Catalogues common block.
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT6_TST_CMN'      ! Tab-separated table common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI
@@ -247,7 +248,8 @@ C5003             format(1x, 'after CINQ')
 *
 *                   Set the null value flags for all the rows.
 
-                     CALL CAT6_STNUL (.TRUE., ROWS, %VAL(PTRN), STATUS)
+                     CALL CAT6_STNUL (.TRUE., ROWS, 
+     :                                %VAL(CNF_PVAL(PTRN)), STATUS)
 
 *
 *                   Save the common block details.
@@ -284,7 +286,8 @@ C5003             format(1x, 'after CINQ')
 *
 *                      Set the null value flags for all the rows.
 
-                        CALL CAT6_STNUL (.TRUE., ROWS, %VAL(PTRN),
+                        CALL CAT6_STNUL (.TRUE., ROWS, 
+     :                                   %VAL(CNF_PVAL(PTRN)),
      :                    STATUS)
 
 *

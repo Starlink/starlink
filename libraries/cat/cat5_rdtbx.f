@@ -111,6 +111,7 @@
 *  Global Variables:
       INCLUDE 'CAT5_STL_CMN'     ! Small text list common block.
       INCLUDE 'CAT5_ANG_CMN'     ! STL angles common block.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  SKIP,
@@ -247,7 +248,8 @@ C4002                   format(a)
      :                      CFIELD .EQ. '<NULL>'  .OR.
      :                      CFIELD .EQ. '?') THEN
                            CALL CAT5_STAEL (ROWS,
-     :                       ROW, .TRUE., %VAL(FPTRNA(CURCOL)), STATUS)
+     :                       ROW, .TRUE., 
+     :                       %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                         ELSE
 
 *
@@ -269,7 +271,7 @@ C4002                   format(a)
 *                      in the field; set the null value flag.
 
                         CALL CAT5_STAEL (ROWS, ROW, .TRUE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                      END IF
                   END DO
                END IF

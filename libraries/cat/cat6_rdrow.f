@@ -90,6 +90,7 @@
       INCLUDE 'CAT_ERR'          ! CAT error codes.
 *  Global Variables:
       INCLUDE 'CAT6_TST_CMN'     ! Tab-separated table common block.
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  RACOL,
@@ -192,12 +193,12 @@
      :              STATUS)
                   IF (CONVOK) THEN
                      CALL CAT6_STAED (ROWS, ROW, DVAL,
-     :                 %VAL(FPTRA(CURCOL)), STATUS)
+     :                 %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                      CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                 %VAL(FPTRNA(CURCOL)), STATUS)
+     :                 %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                   ELSE
                      CALL CAT6_STAEL (ROWS, ROW, .TRUE.,
-     :                 %VAL(FPTRNA(CURCOL)), STATUS)
+     :                 %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
                   END IF
 
                ELSE
@@ -219,55 +220,55 @@
                   IF (CONVOK) THEN
                      IF (FDTYPA(CURCOL) .EQ. CAT__TYPEB) THEN
                         CALL CAT6_STAEB (ROWS, ROW, BVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEW) THEN
                         CALL CAT6_STAEW (ROWS, ROW, WVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEI) THEN
                         CALL CAT6_STAEI (ROWS, ROW, IVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPER) THEN
                         CALL CAT6_STAER (ROWS, ROW, RVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPED) THEN
                         CALL CAT6_STAED (ROWS, ROW, DVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEL) THEN
                         CALL CAT6_STAEL (ROWS, ROW, LVAL,
-     :                    %VAL(FPTRA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE IF (FDTYPA(CURCOL) .EQ. CAT__TYPEC) THEN
                         CALL CAT6_STCAE (ROWS, FCSIZA(CURCOL), ROW,
-     :                    CVAL, %VAL(FPTRA(CURCOL)), STATUS)
+     :                    CVAL, %VAL(CNF_PVAL(FPTRA(CURCOL))), STATUS)
                         CALL CAT6_STAEL (ROWS, ROW, .FALSE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      ELSE
                         CALL CAT6_STAEL (ROWS, ROW, .TRUE.,
-     :                    %VAL(FPTRNA(CURCOL)), STATUS)
+     :                    %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                      END IF
 
                   ELSE
                      CALL CAT6_STAEL (ROWS, ROW, .TRUE.,
-     :                 %VAL(FPTRNA(CURCOL)), STATUS)
+     :                 %VAL(CNF_PVAL(FPTRNA(CURCOL))), STATUS)
 
                   END IF
 
@@ -278,7 +279,8 @@
 *
 *             The field was null in the table; set the null value flag.
 
-               CALL CAT6_STAEL (ROWS, ROW, .TRUE., %VAL(FPTRNA(CURCOL)),
+               CALL CAT6_STAEL (ROWS, ROW, .TRUE., 
+     :                          %VAL(CNF_PVAL(FPTRNA(CURCOL))),
      :           STATUS)
             END IF
          END DO

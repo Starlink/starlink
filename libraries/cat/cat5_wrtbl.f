@@ -63,6 +63,7 @@
 *  Global Variables:
       INCLUDE 'CAT1_IDS_CMN'      ! Identifiers common block.
       INCLUDE 'CAT5_STL_CMN'      ! STL back-end common block.
+      INCLUDE 'CNF_PAR'           ! For CNF_PVAL function
 *  Arguments Given:
       INTEGER
      :  CI,
@@ -202,7 +203,8 @@
 *
 *                Check that the value is not null.
 
-                  CALL CAT5_GTAEL (ROWS, ROW, %VAL(PTRN), NULFLG,
+                  CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTRN)), 
+     :                             NULFLG,
      :              STATUS)
                   IF (.NOT. NULFLG) THEN
 
@@ -219,7 +221,8 @@
                      PTR = FPTR__CAT5(FIELD)
 
                      IF (FDTYPE .EQ. CAT__TYPEB) THEN
-                        CALL CAT5_GTAEB (ROWS, ROW, %VAL(PTR), BVAL,
+                        CALL CAT5_GTAEB (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   BVAL,
      :                    STATUS)
                         IVAL = BVAL
 
@@ -234,7 +237,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEW) THEN
-                        CALL CAT5_GTAEW (ROWS, ROW, %VAL(PTR), WVAL,
+                        CALL CAT5_GTAEW (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   WVAL,
      :                    STATUS)
                         IVAL = WVAL
 
@@ -249,7 +253,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEI) THEN
-                        CALL CAT5_GTAEI (ROWS, ROW, %VAL(PTR), IVAL,
+                        CALL CAT5_GTAEI (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   IVAL,
      :                    STATUS)
 
                         WRITE(FLDBUF, '(' // FFMT // ')',
@@ -263,7 +268,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPER) THEN
-                        CALL CAT5_GTAER (ROWS, ROW, %VAL(PTR), RVAL,
+                        CALL CAT5_GTAER (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   RVAL,
      :                    STATUS)
 
                         WRITE(FLDBUF, '(' // FFMT // ')',
@@ -277,7 +283,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPED) THEN
-                        CALL CAT5_GTAED (ROWS, ROW, %VAL(PTR), DVAL,
+                        CALL CAT5_GTAED (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   DVAL,
      :                    STATUS)
 
                         WRITE(FLDBUF, '(' // FFMT // ')',
@@ -291,7 +298,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEL) THEN
-                        CALL CAT5_GTAEL (ROWS, ROW, %VAL(PTR), LVAL,
+                        CALL CAT5_GTAEL (ROWS, ROW, %VAL(CNF_PVAL(PTR)), 
+     :                                   LVAL,
      :                    STATUS)
 
                         WRITE(FLDBUF, '(' // FFMT // ')',
@@ -305,7 +313,8 @@
                         END IF
 
                      ELSE IF (FDTYPE .EQ. CAT__TYPEC) THEN
-                        CALL CAT5_GTCAE (ROWS, FCSIZE, ROW, %VAL(PTR),
+                        CALL CAT5_GTCAE (ROWS, FCSIZE, ROW, 
+     :                                   %VAL(CNF_PVAL(PTR)),
      :                    CVAL, STATUS)
 
                         FLDPOS = 0
