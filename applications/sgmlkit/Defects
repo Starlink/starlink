@@ -6,6 +6,11 @@
 #
 # These are in no particular order, and some have a higher priority
 # than others.
+#
+#                            $Revision$ 
+#                      $Date$
+#
+
 
 ### General DTD
 
@@ -40,14 +45,13 @@ cross-references to CODECOLLECTIONs (Mark, 15 Sep)
 
 ### Programcode DTD
 
-allow `&' in codeprologue (prog meeting)
-	More flexibility in content models
+allow `&' in codeprologue (prog meeting) [DTD, 19 Sept]
+	[ Supported in HTML DTD as of 19 Sept, but not yet in LaTeX
+	(but that'll be easy) ]
 
-programcode content modifications (Mark, and prog meeting)
-	Use SST elements.
-
-func opener, notelist (Mark, 3/5 Aug and Norman, 4 Aug)
-	Embedding comments in the body of a routine
+programcode content modifications (Mark, and prog meeting) [DTD, 19 Sept]
+	Use SST elements.  [ Supported in HTML DTD as of 19 Sept, but
+	not yet in LaTeX.  Not hard, nor even particularly time-consuming. ]
 
 shortrefs in programcode DTD (Mark)
 	Shortrefs to make lists in prologues tidier.  Nice, but I'm
@@ -60,9 +64,16 @@ AUTHORREF element (Mark, 14 Sept)
 	`The AUTHORLIST element is a nasty example of SGML forcing one
 	to write something which one otherwise wouldn't want to'.
 
-DL/DD/DT/BLOCKQUOTE/VERBATIM/M in prologues (Mark, 14 Sept)
+DL/DD/DT/BLOCKQUOTE/VERBATIM/M in prologues (Mark, 14 Sept) [DTD+DC]
 	Easy, I think.
+	[ Implemented by restructuring the General and Programcode
+	DTDs so that they both include a common set of para-level
+	elements.  No additional DC support needed, since the DC
+	support for the General DTD takes care of this. ]
 
+| func opener (Mark, 3/5 Aug and Norman, 4 Aug) [DTD+DC+DOC, 19 Sept]
+|	[ `opener' element named `codeopener' in DTD.  Neither DC support
+|	nor documentation needed.]
 
 ### Down-converters
 
@@ -85,7 +96,7 @@ DT element in LaTeX (Norman)
 REF/maths in DT in LaTeX doesn't insert text (Mark, mail of 9 Sept)
 	Haven't investigated
 
-LaTeX pages are smaller than standard, and different positioning (Mark)
+LaTeX pages are smaller than standard, and positioned differently (Mark)
 
 KBD in VERBATIM doesn't work (Mark)
 
@@ -117,8 +128,6 @@ Document templates (Mark, 15 Sep)
 	`Some hints and tips, in the form of examples, might be useful
 	too (for instance creative use of entities)'.  Oooh, I don't
 	know we ought to be encouraging `creative' use of entities....
-
-$Revision$ $Date$
 
 # Local Variables:
 # mode:text
