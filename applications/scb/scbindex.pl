@@ -69,13 +69,21 @@
 #     package-location = string (optional).
 #        Each package-location is either a directory called by the 
 #        name of the package, or a tarfile called 'package.tar', 
-#        'package.tar.Z' or 'package.tar.gz'.
+#        'package.tar.Z' or 'package.tar.gz'.  For each package 
+#        indexed in this way, any existing index entries concerning
+#        it are first erased from the indices, and new entries are
+#        written for all files and routines found.  Index entries
+#        for other packages are not affected.
 #
-#     If no arguments are specified, the program indexes all the packages
-#     under the default source directory $srcdir as specified in Scb.pm 
-#     (typically /star/sources).  
+#     If no arguments are given, the indices are erased entirely and
+#     built again for scratch from all the packages in $srcdir 
+#     (typically /star/sources).  Additionally all the files in the 
+#     include directory $incdir (typically /star/include) are indexed.
 
 #  Notes:
+#     Operation of this script will be affected by the build-time and 
+#     run-time values of certain environment variables, as documented
+#     in the module Scb.pm.
 
 #  Authors:
 #     MBT: Mark Taylor (IoA, Starlink)
