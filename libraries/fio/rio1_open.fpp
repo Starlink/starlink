@@ -116,7 +116,7 @@
 #elif FC_RECL_UNIT == 4
             RECLEN = ( RECSZ + 3 ) / 4
 #else
-#           error "Unrecognized FC_RECL_UNIT"
+ error "Unrecognized FC_RECL_UNIT"
 #endif
          ELSE
             RECLEN = RECSZ
