@@ -47,6 +47,17 @@
 # Yes, we are indeed more cunning than a nest of monkeys.
 #
 #
+# The starconf.status file that results from the above gymnastics
+# contains configuration files that are required for the build, but
+# since it is checked in, it should not contain any configuration
+# paths.  Therefore after it unpacks the files, starconf.status
+# configures the unpacked files by substituting variables indicated by
+# !!variable_name!!, using values given either on the starconf.status
+# command line or in the environment.  The starconf script handles
+# this by invoking the starconf.status script with arguments whose
+# values come from the installation-time configuration of starconf.
+#
+#
 # Dependencies:
 #   - the starconf.m4.in file defines a macro STAR_DEFAULTS:
 #     that macro relies on us including install-with-manifest.in here.
@@ -79,12 +90,17 @@ do
     fi
 done
 
+# Find all the !!variables!! which are to be substituted.  For the
+# moment, just hard-wire this, but for full generality we should grep
+# the input files for strings matching !!\([A-Za-z0-9_]*\)!!
+allconfsubs="DEFAULT_STARLINK"
+
 
 # Start generating the output -- open FD 3 for the generated script
 outputscript=starconf
 exec 3>$outputscript
 
-cat >&3 <<\_STARCONF_EOD
+cat >&3 <<\_STARCONF3_EOD
 #! /bin/sh -
 #
 # This is starconf, version @PACKAGE_VERSION@
@@ -94,11 +110,12 @@ bindir=@bindir@
 datadir=@datadir@
 ln_s="@LN_S@"
 curr_starconf_version="@PACKAGE_VERSIONINT@"
+default_starlink=@DEFAULT_STARLINK@
 
 # Always include the following files:
-_STARCONF_EOD
+_STARCONF3_EOD
 echo "defaultchunks=\"$defaultchunklist\"" >&3
-cat >&3 <<\_STARCONF_EOD
+cat >&3 <<\_STARCONF3_EOD
 # Extra chunks should be added to this variable, according to logic below
 extrachunks=""
 
@@ -131,11 +148,11 @@ if test -e bootstrap; then
     # is `original'.  If it is, then unpack the bootstrap file, overwriting
     # any bootstrap file that's already there.
     eval `sed -e '1d' -e '2{s/^[^a-z]*\([a-z]*\).*rnum=\([0-9]*\)/original=\1; bootstrap_version=\2;/;q;}' bootstrap`
-    # echo "original=$original  v=$bootstrap_version"
+    # echo "XXX original=$original  rnum=$bootstrap_version curr=$curr_starconf_version"
     if test "X$original" != Xoriginal; then
         : do nothing -- file has been modified
     elif test $bootstrap_version -lt $curr_starconf_version; then
-        extrachunks="$extrachunks !bootstrap"
+        extrachunks="$extrachunks !*bootstrap"
     else
         : do nothing -- file is up to date
     fi
@@ -203,11 +220,50 @@ cat >&4 <<EOF
 EOF
 for f in $filelist
 do
-_STARCONF_EOD
+_STARCONF3_EOD
 echo "    echo \$f | sed \"s/^[$optchars]*\([^:]*\).*/#    \1/\" >&4"    >&3
 echo 'done'                                                              >&3
 echo 'echo "" >&4'                                                       >&3
+
+echo "echo 'allconfsubs=\"$allconfsubs\"' >&4"                           >&3
+cat >&3 <<\_STARCONF3_EOD
+cat >&4 <<\_STARCONF4_EOD
+sedsubsts=
+# Process the arguments, which are variable=value pairs, processing
+# then into a collection of sed substitutions.  No spaces in the `value'!
+while test $# -gt 0
+do
+    expr "$1" : '.*=' >/dev/null || \
+        { echo "Usage: $0 [variable=value...]"; exit 1; }
+    sedsubsts="$sedsubsts "`echo $1 | sed 's/\(.*\)=\(.*\)/-e s,!!\1!!,\2,/'`
+    shift
+done
+if test -n "$allconfsubs"; then
+    for s in $allconfsubs
+    do
+        if expr "x$sedsubsts" : "x.*!!$s!!" >/dev/null; then
+            : OK
+        else
+            eval sval='${'$s'}'
+            if test -n "$sval"; then
+                sedsubsts="$sedsubsts -e s,!!$s!!,$sval,"
+            else
+                echo "$0: no value for config variable $s, supply one with 'starconf.status $s=xxx' or 'env $s=xxx starconf.status'"
+                exit 1
+            fi
+        fi
+    done
+fi
+if test -n "$sedsubsts"; then
+    sedsubsts="sed $sedsubsts"
+fi
+# echo "XXX sedsubsts=$sedsubsts"
+_STARCONF4_EOD
+_STARCONF3_EOD
+
+# Start the extraction of the files
 echo 'echo "allm4=" >&4'                                                 >&3
+echo 'echo "allextracted=" >&4'                                          >&3
   
 for ch in $allconfchunks
 do
@@ -251,11 +307,25 @@ do
     echo "echo '    echo \"File $filename already exists, not overwriting\"'>&4 ">&3
     echo "echo 'fi'                                      >&4"            >&3
     echo "echo 'expr $filename : \".*m4\$\" >/dev/null && allm4=\"\$allm4 $filename\"' >&4" >&3
+    echo "echo 'allextracted=\"\$allextracted $filename\"' >&4"          >&3
 #    echo 'fi'                                                            >&3
 done
 
-cat >&3 <<\_STARCONF_EOD
+cat >&3 <<\_STARCONF3_EOD
 cat >&4 <<\_STARCONF4_EOD
+if test -n "$allextracted"; then
+    # There were at least some files extracted
+    if test -n "$sedsubsts"; then
+        for f in $allextracted
+        do
+            rm -f $f.tmp
+            $sedsubsts $f >$f.tmp
+            # retain any execute bit
+            test -x $f && chmod +x $f.tmp
+            mv $f.tmp $f
+        done
+    fi
+fi
 if test -n "$allm4"; then
     echo "Creating acinclude.m4 from$allm4"
     cat $allm4 >acinclude.m4
@@ -267,8 +337,8 @@ exec 4>&-
 # ...and make it executable
 chmod +x starconf.status
 # Finally, exec the new script
-exec ./starconf.status
-_STARCONF_EOD
+exec ./starconf.status DEFAULT_STARLINK=$default_starlink
+_STARCONF3_EOD
 
 echo "exit 0" >&3
 
