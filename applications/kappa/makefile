@@ -977,14 +977,12 @@ IRAF_DATA =
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = 
-HYPERTEXT_DOCS = 
-#LATEX_DOCS = sun95.tex \
-#             sun95_gd1.eps sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps \
-#             sun95_gd5.eps sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps \
-#             sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps \
-#             sun95_ardwork.eps sun221.tex sun95_gd9.eps
-#HYPERTEXT_DOCS = sun95.htx sun221.htx
+LATEX_DOCS = sun95.tex \
+             sun95_gd1.eps sun95_gd2.eps sun95_gd3.eps sun95_gd4.eps \
+             sun95_gd5.eps sun95_gd6.eps sun95_gd7.eps sun95_gd8.eps \
+             sun95_pixind.eps sun95_pixco.eps sun95_gridco.eps \
+             sun95_ardwork.eps sun221.tex sun95_gd9.eps
+HYPERTEXT_DOCS = sun95.htx sun221.htx
 
 #  List of documentation files.
 
@@ -1915,13 +1913,6 @@ do_deinstall:
            else :; fi;\
         done
 #
-#  Remove the links to applications whose name clashes with the C run-time 
-#  library.  Also remove their corresponding compiled interface file links.
-	-rm -f $(INSTALL_BIN)/div
-	-rm -f $(INSTALL_BIN)/pow
-	-rm -f $(INSTALL_BIN)/div.ifc
-	-rm -f $(INSTALL_BIN)/pow.ifc
-#
 #  Deinstall the monoliths, if installed versions exist.
 	- for f in $(MONOLITH) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
@@ -2041,11 +2032,6 @@ do_deinstall:
               rm -f $(INSTALL_IRAF)/$$f;\
            else :; fi;\
         done
-#
-#  Remove the links to the .par files of applications whose name clashes 
-#  with the C run-time library.
-	-rm -f $(INSTALL_IRAF)/div.par
-	-rm -f $(INSTALL_IRAF)/pow.par
 #
 #  Deinstall the IRAF-special interface files, if installed versions exist.
 	- for f in $(IRAF_IFC_FILES) ""; do \
