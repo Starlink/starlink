@@ -14,6 +14,7 @@
 #include "dat1.h"
 
 #include <prm_par.h>
+#include <config.h>
 
 /* Helper function */
 typedef unsigned char byte;
@@ -53,6 +54,13 @@ int main(int argc, char** argv)
                tohex(stringize(ifd),                                    \
                      (byte*)&dat_gl_ndr[DAT__ ## type].num));           \
         nerrs++;                                                        \
+    }
+
+    /* temp debugging/check printout */
+    {
+        int t=1;
+        char *s = "f";
+        printf("1=%s\n", tohex(s, &t));
     }
 
     /* 
@@ -140,32 +148,31 @@ int main(int argc, char** argv)
 }
 
 /*
- * Crude tohex function.  Represents the 4 or 8 bytes (depending on whether
- * `longint' is false or true) pointed to by `p' as hex values in a
- * char array, and returns a pointer to it.  Doesn't care about
- * endianness, as it's only reporting problems, and whoever has to fix
- * these is going to have to care about endianness anyway.
+ * Write out a number in hex.  Write out the 4 or 8 bytes pointed to by `bp'
+ * as a hex string.  If `*typep' is 'd', it's 8 bytes, otherwise 4.
+ *
+ * Only used for reporting problems in error messages.
  */
-const char* tohex(const char* typep, byte*p)
+const char* tohex(const char* typep, byte* bp)
 {
     static char c[17];
-    char* cp = &c[0];
-    int nb;
+    const char *hexdigits = "0123456789ABCDEF";
+    const int nbytes = (*typep == 'd' ? 8 : 4);
+    int i;
 
-    for (nb = (*typep == 'd' ? 8 : 4); nb>0; nb--, p++) {
-        int i = (*p & 0xf0) >> 4;
-        if (i < 10)
-            *cp = '0' + i;
-        else
-            *cp = 'A' - 10 + i;
-        cp++;
-        i = *p & 0xf;
-        if (i < 10)
-            *cp = '0' + i;
-        else
-            *cp = 'A' - 10 + i;
-        cp++;
+#if WORDS_BIGENDIAN
+    for (i=0; i<2*nbytes; bp++) {
+        c[i++] = hexdigits[(*bp & 0xf0) >> 4];
+        c[i++] = hexdigits[*bp & 0x0f];
     }
-    *cp = '\0';
+    c[i] = '\0';
+#else /* WORDS_BIGENDIAN */
+    c[2*nbytes] = '\0';
+    for (i=2*nbytes-1; i>=0; bp++) {
+        c[i--] = hexdigits[*bp & 0x0f];
+        c[i--] = hexdigits[(*bp & 0xf0) >> 4];
+    }
+#endif /* WORDS_BIGENDIAN */
+
     return c;
 }
