@@ -440,12 +440,8 @@ extern TIX_DECLARE_CMD(Tix_CreateWidgetCmd);
 
 #ifdef NO_STRDUP
 #define strdup tixStrDup
-
-#if 0
 EXTERN char * 		tixStrDup _ANSI_ARGS_((
 			    CONST char * s));
-#endif
-
 #endif
 
 #ifdef _WINDOWS
