@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/snx</path>
+  <description>Starlink extensions to the NCAR Graphics Utilities</description>
+  <abstract><p> The NCAR graphics suite (SUN/88) consists of a set of
+  subprograms which can be used to produce complete graphs in a
+  variety of formats.  The package has been in wide use for some
+  years; the latest version employs the ISO standard GKS interfaces
+  for its low-level plotting, giving it access to all Starlink
+  graphics devices, present and future.</p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+      <uname>pctr</uname>
+    </person>
+    <person>
+      <name>Martin J Bly</name>
+      <uname>mjb</uname>
+    </person>
+    <person>
+      <name>Pat Wallace</name>
+      <uname>ptw</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

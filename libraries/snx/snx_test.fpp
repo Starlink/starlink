@@ -23,8 +23,13 @@
 
 *  Open input file
       PRINT *,'Filename?'
-      READ (*,'(Q,A)') N,FNAME
-      OPEN (UNIT=1,STATUS='OLD',FILE=FNAME(:N),READONLY)
+      READ (*,'(A)') FNAME
+      N = LEN( FNAME )
+      OPEN (UNIT=1,STATUS='OLD',
+#if HAVE_FC_OPEN_READONLY
+     :     READONLY,
+#endif
+     :     FILE=FNAME(:N))
 
 *  Read label text
       READ (1,'(A)',END=9000) GLAB
