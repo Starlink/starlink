@@ -7,9 +7,8 @@ modified by the automake patched for Starlink.  With the _Starlink_
 autotools in the path, the procedure for updating that, after an
 import of a new libtool version, is:
     
-    rm missing
+    rm -f missing
     aclocal  # probably redundant, but does no harm
     autoreconf --install --symlink
 
 (then ./configure;make;make install should work as usual)
-
