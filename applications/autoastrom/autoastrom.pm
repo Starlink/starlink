@@ -1,12 +1,42 @@
+#   This file is part of autoastrom.
 #
+#   Copyright 2001, 2003, Council for the Central Laboratory of the Research Councils
+#   except where otherwise indicated.
+#
+#   Portions copyright 1995, Patrick Wallace: The routine
+#   decompose_transform is a direct port from the SLALIB routine
+#   dcmpf.c.  All rights to this routine are reserved by Patrick
+#   Wallace.
+#
+#   This program is part of the Starlink Software Distribution: see
+#   http://www.starlink.ac.uk
+#
+#   autoastrom is free software (except as indicated above); you can
+#   redistribute it and/or modify it under the terms of the GNU
+#   General Public License as published by the Free Software
+#   Foundation; either version 2 of the License, or (at your option)
+#   any later version.
+#
+#   autoastrom is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with autoastrom; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#   The General Public License is distributed along with this
+#   program in the file LICENCE.
+#
+#   Author: Norman Gray <norman@astro.gla.ac.uk>
+#   $Id$
+
 # Subroutines for autoastrom.pl
 #
 # Broken into a separate file (a) in case I want to reuse them, and
 # (b) so that I can run regression tests on them.
 #
-# Copyright 2001, Council for the Central Laboratory of the Research Councils,
-# except where otherwise indicated.
-# Portions copyright 1995, Patrick Wallace.
 #
 # $Id$
 

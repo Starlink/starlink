@@ -18,6 +18,11 @@ Since 0.5:
   * Extractor sometimes claims to detect objects with a negative flux
     -- such objects are now silently ignored.
   * Assorted changes to configuration to make it more robust.
+  * All of autoastrom that originates purely within Starlink has been
+    released under the GPL.  This does NOT include the bundled version
+    of ASTROM, nor the decompose_transform routine in autoastrom.pm,
+    both of which are Copyright 1995 Patrick Wallace.  See
+    README.Licence.
 
 Notes
 -----

@@ -6,11 +6,14 @@
 
 <p>Changes since version 0.5:
 <ul>
-  <li>Fixed typo in function name which made some informational
-    messages fatal.</li>
-  <li>Extractor sometimes claims to detect objects with a negative flux
-    -- such objects are now silently ignored.</li>
-  <li>Assorted changes to configuration to make it more robust.</li>
+  <li><p>The bulk of the code is now under the terms of the GPL.
+    However, not all of it is: see the notes in
+    <code>README.Licence</code>.</p></li>
+  <li><p>Fixed typo in function name which made some informational
+    messages fatal.</p></li>
+  <li><p>Extractor sometimes claims to detect objects with a negative flux
+    -- such objects are now silently ignored.</p></li>
+  <li><p>Assorted changes to configuration to make it more robust.</p></li>
 </ul>
 </p>
 </subsect>

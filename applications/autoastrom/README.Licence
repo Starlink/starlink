@@ -1,0 +1,30 @@
+
+Autoastrom is Copyright 2001, 2003, Council for the Central Laboratory of the
+Research Councils ("CCLRC"), except where otherwise indicated, and is
+released under the GNU General Public License, which is included in
+the distribution in the file LICENCE.
+
+However, there is a complication.  Autoastrom is essentially a wrapper
+for (in the sense that it cannot be used without) the application
+ASTROM, and that application is Copyright, 1994--98, P T Wallace and,
+as far as I am aware, released under the `old' Starlink licence,
+available at <http://www.starlink.rl.ac.uk/store/conditions.html>, and
+a copy of which is included in the file LICENCE.Starlink.  There is
+one routine in the module autoastrom.pm (decompose_transform) which is
+a direct port to Perl of the SLALIB routine dcmpf.c, also copyright
+Patrick Wallace, and also (again, as far as I am aware) under the
+terms of the original licence.
+
+The standalone application moggy is entirely new Starlink code, and is
+fully GPLed.
+
+What all this means is that, although things may change in future,
+Autoastrom is not at present usable unless you fit into the `no
+commercial use' terms of the original Starlink licence, or you contact
+Starlink, or indeed Patrick Wallace, directly.
+
+(Mind you, how many megacorps is that going to exclude...?)
+
+Norman Gray
+2003 February 21
+
