@@ -1235,10 +1235,17 @@ hds_machine.txt: hds_machine
 
           <p>The Starlink autoconf adds a couple of extra standard
             options.<dl>
-              <dt><code>--with-starlink</code></dt>
+              <dt><code>--with-starlink[=location]</code></dt>
               <dd>
-                <p>Overrides the STARLINK environment variable which
-                will be used.  Very rarely needed.</p>
+                <p>If no <code>location</code> is provided, this does
+                  nothing.  This is effectively the default.</p>
+                <p>If a <code>location</code> is provided, it
+                  overrides the STARLINK environment variable which will
+                  be used.  Very rarely needed.</p>
+                <p>Option <code>--without-starlink</code> causes the
+                  <code>STARLINK</code> shell variable to be unset.
+                  Some packages might with to configure themselves
+                  differently in this case.</p>
               </dd>
               <dt><code>--without-stardocs</code></dt>
               <dd>
