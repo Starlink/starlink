@@ -29,7 +29,7 @@ F_GEN_FILES = $(DR_GEN_ROUTINES:.gen=.f) $(WR_GEN_ROUTINES:.gwr=.f) \
  $(N_GEN_ROUTINES:.gn=.f) $(DL_GEN_ROUTINES:.gdl=.f) \
  $(WIR_GEN_ROUTINES:.gwir=.f) $(I_GEN_ROUTINES:.gi=.f) $(D_GEN_ROUTINES:.gd=.f)
 
-INCLUDE_FILES = DTACODES DYNAMIC_MEMORY HLPCMD
+INCLUDE_FILES = DTACODES DYNAMIC_MEMORY
 
 ##  Double and real.
 DR_GEN_ROUTINES = con_axbnx.gen con_axcox.gen con_axgvx.gen con_ssazx.gen \
