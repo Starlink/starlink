@@ -808,7 +808,7 @@
 *        Grouping specified?
             IF ( OBDAT(NDS).GFLAG ) THEN
               CALL UTIL_GRPVR( OBDAT(NDS).NDAT, %VAL(OBDAT(NDS).DPTR),
-     :                 (OBDAT(NDS).WPTR.NE.0), %VAL(OBDAT(NDS).WPTR),
+     :                 (OBDAT(NDS).VPTR.NE.0), %VAL(OBDAT(NDS).VPTR),
      :                 OBDAT(NDS).QFLAG, %VAL(OBDAT(NDS).QPTR),
      :                 %VAL(OBDAT(NDS).GPTR), OBDAT(NDS).NGDAT,
      :                 %VAL(OBDAT(NDS).GDPTR), %VAL(OBDAT(NDS).GVPTR),
