@@ -1213,11 +1213,6 @@ DviFile::FontSet::~FontSet()
 void DviFile::FontSet::add(int fnt_num, PkFont* newfont)
 {
     fontMap_[fnt_num] = newfont;
-    if (verbosity_ > normal)
-	cerr << "FontSet: added font " << fnt_num << ", "
-	     << newfont->fontFilename()
-	     << ", now n=" << fontMap_.size()
-	     << endl;
 }
 PkFont* DviFile::FontSet::get(int fnt_num)
 {
@@ -1230,9 +1225,7 @@ DviFile::FontSet::const_iterator DviFile::FontSet::begin()
 	delete myIter_;
 	myIter_ = 0;
     }
-    //cerr << "FontSet::begin: fontMap_ size=" << fontMap_.size() << endl;
     myIter_ = new const_iterator(fontMap_);
-    //cerr << "   ... size=" << fontMap_.size() << endl;
     return *myIter_;
 }
 DviFile::FontSet::const_iterator DviFile::FontSet::end()
