@@ -23,7 +23,9 @@ than others.</p>
      those numbers correct.
      -->
 
-<defect status="open" originator="Eitan Gurari, gurari@cis.ohio-state.edu">
+<defect status="open" 
+	originator="Eitan Gurari, gurari@cis.ohio-state.edu"
+	date='13-May-2000'>
 <title>dvi2bitmap crashes/hangs when given non-existent input file</title>
 <p>Most mysterious.  The problem seems to be confined to versions of
 the program build with gcc.  It builds OK using Sun's and Compaq's C++
@@ -32,6 +34,25 @@ Sparc and it dumped core; I tried building with apparently the same
 compiler on a Sparc (hermes), and it didn't dump core, but it did seem
 to hang.  Poking around with gdb suggests it's hanging somewhere in a
 library destructor, but this is still a little obscure.</p>
+
+<resolution status="deferred"
+	author="Norman"
+	date="12-Jun-2000"
+	note="DviFile.cc, revision 1.31">
+
+<p>On further investigation (12-Jun-2000) I found it crashing at a
+variety of places when invoked with a non-existent file as argument.
+It seemed to be getting itself confused about thrown
+exceptions (which is what happens when it can't open an input file),
+executing bits of code it shouldn't, and understandably, therefore,
+getting itself in a terrible mess.  By making some code a little more
+paranoid, I've made the problem go away, but this is unsatisfying, as
+I haven't really explained what was going wrong in the first place.
+It's quite possible I'm doing something illegitimate with the
+exceptions, but I'm also wondering if it's not gcc 2.8.1 which is at
+fault, especially as the code has survived the much fussier
+examination of the Sun and Compaq compilers.</p>
+</resolution>
 </defect>
 
 <defect status="open" originator="Norman">
