@@ -188,7 +188,7 @@ Makefile.dependencies:
 	  echo '<componentset>' >&5; \
 	  find . -name component.xml | sort | \
 	    { while read c; do cat $$c; done } | \
-	    sed '/^<?/d;/^<!DOCTYPE/d' >&5; \
+	    sed '/^<?/d;/^<!DOCTYPE/d;/^ *<!--.*--> *$$/d' >&5; \
 	  echo '</componentset>' >&5
 	if test "$(JAVA)" != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
 	  (cd buildsupport/starconf/java \
@@ -211,6 +211,16 @@ Makefile.dependencies:
 	  echo "and then remake Makefile.dependencies"; \
 	  false; \
 	fi
+
+# Create the componentset.html summary of the componentset.xml file.
+# Depends on Makefile.dependencies => componentset.xml.
+# Probably only used by USSC maintainer, so limited error recovery.
+componentset.html: Makefile.dependencies
+	test $(JAVA) != NOJAVA -a -f componentset.xml
+	(cd buildsupport/starconf/java && $(MAKE) Transformer.class)
+	$(JAVA) -classpath buildsupport/starconf/java \
+	  Transformer componentset.xml \
+	    buildsupport/misc/summarise-components.xslt $@
 
 # Make a link to an installed componentinfo.dtd file.  This will not
 # work at bootstrap time (so the bootstrap file takes care of this
