@@ -14,7 +14,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Status :
@@ -173,7 +172,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -215,7 +213,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -257,7 +254,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -299,7 +295,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
 *    Import :
@@ -345,7 +340,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -410,7 +404,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -475,7 +468,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
@@ -540,7 +532,6 @@
       IMPLICIT NONE
 *    Global constants :
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Global variables :
       INCLUDE 'IMG_CMN'
