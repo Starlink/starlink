@@ -432,10 +432,6 @@
       INTEGER KPG1_CEIL          ! Most negative integer .GE. a given real
       EXTERNAL AST_ISAMAPPING
 
-*  Local Constants:
-      INTEGER NSTFRM             ! Number of statutory Frames in WCS FrameSet
-      PARAMETER ( NSTFRM = 3 )   ! (GRID, PIXEL, AXIS)
-
 *  Local Variables:
       CHARACTER DTYPE * ( NDF__SZFTP ) ! Full data type name
       CHARACTER ITYPE * ( NDF__SZTYP ) ! HDS Data type name
@@ -448,29 +444,22 @@
       DOUBLE PRECISION PT1O( NDF__MXDIM ) ! First output point
       DOUBLE PRECISION PT2I( NDF__MXDIM ) ! Second input point
       DOUBLE PRECISION PT2O( NDF__MXDIM ) ! Second output point
-      DOUBLE PRECISION S2        ! Sum of squares of displacements
       DOUBLE PRECISION SCALE( NDF__MXDIM ) ! Axis scale factors
       DOUBLE PRECISION SCVAL     ! Value of a single axis scale factor
-      DOUBLE PRECISION SIZEB     ! Measure of pixel size in base Frame
-      DOUBLE PRECISION SIZEC     ! Measure of pixel size in current Frame
-      DOUBLE PRECISION SRATIO    ! Ratio of base to current pixel size
       DOUBLE PRECISION TOL       ! Tolerance for linear transform approximation
       DOUBLE PRECISION UPO       ! Upper bound in output array
-      DOUBLE PRECISION XL        ! Extreme lower value
-      DOUBLE PRECISION XU        ! Extreme upper value
+      DOUBLE PRECISION XL( NDF__MXDIM ) ! Position of lowest value
+      DOUBLE PRECISION XU( NDF__MXDIM ) ! Position of highest value
       INTEGER BMAX( NDF__MXDIM ) ! Maximum values for array bounds
-      INTEGER CURFRM             ! Index of current Frame
       INTEGER ELI                ! Number of elements in input NDF
       INTEGER ELO                ! Number of elements in output NDF
       INTEGER FLAGS              ! Flags sent to AST_RESAMPLE<X>
       INTEGER I                  ! Loop variable
-      INTEGER IFRM               ! Frame index within FrameSet
       INTEGER INTERP             ! Resampling scheme identifier
       INTEGER IPDATI             ! Pointer to input Data array
       INTEGER IPDATO             ! Pointer to output Data array
       INTEGER IPVARI             ! Pointer to input Variance array
       INTEGER IPVARO             ! Pointer to output Variance array
-      INTEGER IWCS               ! WCS FrameSet of input NDF
       INTEGER JFRM               ! Index of Frame for joining FrameSets
       INTEGER LBDEF( NDF__MXDIM ) ! Default value for LBOUND
       INTEGER LBNDI( NDF__MXDIM ) ! Lower bounds of input NDF pixel co-ordinates
@@ -479,9 +468,7 @@
       INTEGER MAPHIO             ! Mapping with half-pixel shifts at both ends
       INTEGER MAPHO              ! Half-pixel shift Mapping at output end
       INTEGER MAPIO              ! Mapping from input to output NDF
-      INTEGER MAPJ               ! Mapping which produces required axis scaling
-      INTEGER MAPOI              ! Inverse of MAPIO
-      INTEGER MAPP               ! Mapping to non-statutory Frame
+      INTEGER MAPJ               ! Mapping to perform extra scalings
       INTEGER MAPX               ! Basic Mapping to use (without extra scaling)
       INTEGER MAXPIX             ! Max size of linear approximation region
       INTEGER NBAD               ! Number of bad pixels
@@ -489,13 +476,13 @@
       INTEGER NDFO               ! NDF identifier of output NDF
       INTEGER NDIMI              ! Number of dimensions of input NDF
       INTEGER NDIMO              ! Number of dimensions of output NDF
-      INTEGER NFRM               ! Number of Frames in a FrameSet
       INTEGER NPARAM             ! Number of parameters required for resampler
       INTEGER NSCALE             ! Number of supplied scale factors
-      INTEGER OWCS               ! WCS FrameSet of the output NDF
       INTEGER UBDEF( NDF__MXDIM ) ! Default value for UBOUND
       INTEGER UBNDI( NDF__MXDIM ) ! Upper bounds of input NDF pixel co-ordinates
       INTEGER UBNDO( NDF__MXDIM ) ! Upper bounds of output NDF
+      INTEGER WCSI               ! WCS FrameSet of input NDF
+      INTEGER WCSO               ! WCS FrameSet of the output NDF
       LOGICAL BAD                ! May there be bad pixels?
       LOGICAL CURENT             ! Resample into current Frame?
       LOGICAL HASVAR             ! Does the input NDF have Variance component?
@@ -524,18 +511,39 @@
       CALL NDF_STATE( NDFI, 'VARIANCE', HASVAR, STATUS )
 
 *  Obtain its WCS component.
-      CALL KPG1_GTWCS( NDFI, IWCS, STATUS )
+      CALL KPG1_GTWCS( NDFI, WCSI, STATUS )
 
 *  Attempt to get an externally supplied Mapping - read it from a file.
-*  If a null value is supplied, annul the error and indicate that the 
-*  NDF Is to be mapped into its own current Frame.
+*  N.B. do not tell ATL1_GTOBJ to look for a Mapping, since in this 
+*  case it will extract the Mapping from a FrameSet for us, which
+*  we need to do for ourselves if it is going to be done. If a null 
+*  value is supplied, annul the error and indicate that the NDF is 
+*  to be mapped into its own current Frame.
       IF( STATUS .NE. SAI__OK ) GO TO 999
-      CALL ATL1_GTOBJ( 'MAPPING', 'Mapping', AST_ISAMAPPING, MAPX,
-     :                 STATUS )
+      CALL ATL1_GTOBJ( 'MAPPING', ' ', AST_NULL, MAPX, STATUS )
       IF( STATUS .EQ. PAR__NULL ) THEN
          CALL ERR_ANNUL( STATUS )
          CURENT = .TRUE.
-         MAPX = IWCS
+         MAPX = WCSI
+
+*  In the event of any other error, write an explanatory comment (ATL1_GTOBJ
+*  does not generate very user-friendly messages) and bail out.
+      ELSE IF ( STATUS .NE. SAI__OK ) THEN
+         CALL ERR_REP( 'RESAMPLE_ERR1', 'RESAMPLE: $MAPPING does not '//
+     :                 'contain an AST Object.', STATUS )
+         GO TO 999
+
+*  If an external Object was obtained succesfully, report an error if it
+*  is not a Mapping (it may be a FrameSet, which is-a Mapping).
+      ELSE IF( .NOT. AST_ISAMAPPING( MAPX, STATUS ) ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'RESAMPLE_ERR2', 'RESAMPLE: File $MAPPING does'//
+     :                 ' not contain an AST Mapping or FrameSet.', 
+     :                 STATUS )
+         GO TO 999
+
+*  A usable external Mapping has been supplied. Indicate that we will
+*  not be mapping the NDF into its own current Frame.
       ELSE
          CURENT = .FALSE.
       END IF
@@ -562,9 +570,9 @@
          CALL MSG_SETI( 'NAX', AST_GETI( MAPX, 'Nin', STATUS ) )
          CALL MSG_SETI( 'NDIM', NDIMI )
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'RESAMPLE_ERR1',
-     :                 'RESAMPLE: Mapping has ^NAX input axes '//
-     :                 'and NDF has ^NDIM dimensions', STATUS )
+         CALL ERR_REP( 'RESAMPLE_ERR3', 'RESAMPLE: Mapping has ^NAX '//
+     :                 'input axes and NDF has ^NDIM dimensions', 
+     :                 STATUS )
          GO TO 999
       END IF
 
@@ -578,9 +586,8 @@
          CALL MSG_SETI( 'NDIM', NDIMO )
          CALL MSG_SETI( 'MAX', NDF__MXDIM )
          STATUS = SAI__ERROR
-         CALL ERR_REP( 'RESAMPLE_ERR2', 
-     :                 'RESAMPLE: Output Frame has ^NDIM '//
-     :                 'dimensions - maximum is ^MAX.', STATUS )
+         CALL ERR_REP( 'RESAMPLE_ERR4', 'RESAMPLE: Output Frame has '//
+     :                 '^NDIM dimensions - maximum is ^MAX.', STATUS )
          GO TO 999
       END IF
 
@@ -659,9 +666,6 @@
             SCVAL = 1.0
             SCEQU = .TRUE.
          ELSE
-
-
-
 
 *  Work out the 'size' of a pixel in the input and output arrays.  
 *  The purpose of this is just to decide whether they are about the 
@@ -783,7 +787,7 @@
       DO I = 1, NDIMO
          CALL AST_MAPBOX( MAPIO, DLBNDI, DUBNDI, .TRUE., I, LPO, UPO,
      :                    XL, XU, STATUS )
-         LBDEF( I ) = KPG1_FLOOR( REAL( LPO ) )
+         LBDEF( I ) = KPG1_FLOOR( REAL( LPO ) ) + 1
          UBDEF( I ) = KPG1_CEIL( REAL( UPO ) )
          BMAX( I ) = VAL__MAXI
       END DO
@@ -795,6 +799,19 @@
       CALL PAR_GRM1I( 'UBOUND', NDIMO, UBDEF, LBNDO, BMAX, .TRUE.,
      :                UBNDO, STATUS )
 
+*  Do a check that there is some overlap between the requested range
+*  and the resampled image of the NDF.
+      DO I = 1, NDIMO
+         IF ( UBNDO( I ) .LT. LBDEF( I ) .OR. 
+     :        LBNDO( I ) .GT. UBDEF( I ) ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'RESAMPLE_ERR5', 'RESAMPLE: Requested '//
+     :                    'bounds are entirely outside resampled '//
+     :                    'region', STATUS )
+            GO TO 999
+         END IF
+      END DO
+
 *  Create and configure the output NDF.
 *  ====================================
 
@@ -802,7 +819,7 @@
       CALL LPG_PROP( NDFI, 'WCS,UNIT', 'OUT', NDFO, STATUS )
 
 *  Get a title for the new NDF from the parameter system.
-      CALL KPG1_CCPRO( 'TITLE', 'TITLE', NDFI, NDFO, STATUS )
+      CALL NDF1_CINP( 'TITLE', NDFO, 'TITLE', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 999
 
 *  Set the shape of the output NDF.
@@ -820,92 +837,14 @@
          CALL NDF_STYPE( ITYPE, NDFO, 'VARIANCE', STATUS )
       END IF
       
-*  Write the correct WCS FrameSet to the output NDF.
-*  =================================================
+*  Get the propagated WCS FrameSet from the output NDF.
+      CALL KPG1_GTWCS( NDFO, WCSO, STATUS )
 
-*  See if the input WCS FrameSet contained more than the statutory
-*  three Frames; if so, we need doctor the output WCS FrameSet by 
-*  grafting the non-statutory parts of the input FrameSet onto it.
-      IF ( AST_GETI( IWCS, 'Nframe', STATUS ) .GT. NSTFRM ) THEN
+*  Fix it up according to the changes we will make.
+      CALL KPG1_FXWCS( MAPIO, 'PIXEL', WCSO, STATUS )
 
-*  Get the WCS component of the output NDF.  This has been propagated
-*  from the input NDF (if you don't do this it might try to create it
-*  from FITS headers within the .MORE.FITS extension or something), 
-*  but we are only interested in the statutory Frames (GRID, PIXEL, AXIS).
-*  These are correct because they have been generated, or at least
-*  checked for consistency with the NDF, by NDF_GTWCS.
-         CALL KPG1_GTWCS( NDFO, OWCS, STATUS )
-
-*  Remove the excess Frames to leave us with just the statutory ones
-*  (GRID, PIXEL, AXIS).  Since the AXIS component has not been 
-*  propagated, it will be a copy of the PIXEL one and so not wrong.
-         NFRM = AST_GETI( OWCS, 'Nframe', STATUS )
-         IF ( NFRM .GT. NSTFRM ) THEN
-            DO I = NFRM, NSTFRM + 1, -1
-               CALL AST_REMOVEFRAME( OWCS, I, STATUS )
-            END DO
-         END IF
-
-*  Create the Mapping with which to attach the interesting part of the
-*  input FrameSet onto the output one.  Do this differently according
-*  to whether we are resampling into the current Frame or using an
-*  externally supplied Mapping.
-         IF ( CURENT ) THEN
-
-*  Get the index of the Frame in the output FrameSet to which we will
-*  attach the remainder of the input one.  We use the pixel Frame.
-            CALL KPG1_ASFFR( OWCS, 'PIXEL', JFRM, STATUS )
-
-*  Get the Mapping which will connect the pixel Frame of the output 
-*  FrameSet to the current Frame of the remainder of the input one.  
-*  It is the inverse of the scaling Maping we constructed earlier.
-            CALL AST_INVERT( MAPJ, STATUS )
-         ELSE
-
-*  Store the current Frame index of the input FrameSet, since we will
-*  have to alter it and restore it later.
-            CURFRM = AST_GETI( IWCS, 'Current', STATUS )
-
-*  Get the index of the Frame in the output FrameSet to which we will 
-*  attach the remainder of the input one.  We use the base Frame. 
-            JFRM = AST_GETI( OWCS, 'Base', STATUS )
-
-*  Get the Mapping which will connect the base Frame of the output 
-*  FrameSet to the first non-statutory Frame of the input one.
-*  It is the inverse of the transformation Mapping followed by the
-*  Mapping from the base to first non-statutory Frame of the input
-*  FrameSet.
-            MAPP = AST_GETMAPPING( IWCS, JFRM, NSTFRM + 1, STATUS )
-            MAPOI = AST_COPY( MAPIO, STATUS )
-            CALL AST_INVERT( MAPOI, STATUS )
-            MAPJ = AST_CMPMAP( MAPOI, MAPP, .TRUE., ' ', STATUS )
-
-*  Set the current Frame of the input FrameSet to the first non-statutory
-*  one; this is necessary so that AST_ADDFRAME will use it as the
-*  target of the Mapping when merging the FrameSets.
-            CALL AST_SETI( IWCS, 'Current', NSTFRM + 1, STATUS )
-         END IF
-
-*  Remove the statutory, and now incorrect, Frames (GRID, PIXEL, AXIS) 
-*  from the input FrameSet.
-         DO I = NSTFRM, 1, -1
-            CALL AST_REMOVEFRAME( IWCS, I, STATUS )
-         END DO
-
-*  Add the remainder of the input FrameSet to the statutory three-Frame
-*  output FrameSet.
-         CALL AST_ADDFRAME( OWCS, JFRM, MAPJ, IWCS, STATUS )
-
-*  Restore the current Frame to its previous value if necessary (we have
-*  removed and added NSTFRM Frames so it will have the same index as before).
-         IF ( .NOT. CURENT ) THEN
-            CALL AST_SETI( OWCS, 'Current', CURFRM, STATUS )
-         END IF
-
-*  Write this modified FrameSet back as the WCS component of the 
-*  new NDF.
-         CALL NDF_PTWCS( OWCS, NDFO, STATUS )
-      END IF
+*  Write the modified FrameSet back.
+      CALL NDF_PTWCS( WCSO, NDFO, STATUS )
 
 *  Map the array components.
 *  =========================
@@ -949,7 +888,7 @@
 *  by integers (the LBND and UBND arrays) it is necessary to add a 
 *  half-pixel shift onto both ends of the Mapping prior to executing
 *  the resample.  First construct a Mapping which transforms minus a 
-*  half pixel in every dimension.
+*  half pixel in every input dimension.
       DO I = 1, NDIMI
          PT1I( I ) = 0D0
          PT2I( I ) = 1D0
@@ -958,7 +897,7 @@
       END DO
       MAPHI = AST_WINMAP( NDIMI, PT1I, PT2I, PT1O, PT2O, ' ', STATUS )
 
-*  Then one which transforms plus a half-pixel in every dimension.
+*  Then one which transforms plus a half-pixel in every output dimension.
       DO I = 1, NDIMO
          PT1I( I ) = 0D0
          PT2I( I ) = 1D0
@@ -1057,9 +996,8 @@
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
-         CALL ERR_REP( 'RESAMPLE_ERR3',
-     :                 'RESAMPLE: Unable to transform the NDF.',
-     :                 STATUS )
+         CALL ERR_REP( 'RESAMPLE_ERR6', 'RESAMPLE: Unable to '//
+     :                 'transform the NDF.', STATUS )
       END IF
 
       END
