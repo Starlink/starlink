@@ -8,7 +8,7 @@
 \newcommand{\stardocsource}    {sun183.4}
 \newcommand{\stardocnumber}    {183.4}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {9th August 2001}
+\newcommand{\stardocdate}      {12th September 2001}
 \newcommand{\stardoctitle}     {ARD \\ [1ex]
                                 A Textual Language for Describing \\
                                 Regions within a Data Array}
@@ -456,7 +456,7 @@ NDFs of any dimensionality up to the limit imposed by the NDF\_ system.
 
 *  Indicate that positions within the ARD description can be given in
 *  any coordinate Frame included in the above WCS FrameSet.
-      CALL ARD_WCS( IWCS, STATUS )                              [11]
+      CALL ARD_WCS( IWCS, ' ', STATUS )                              [11]
 
 *  Indicate that the value 2 should be used to represent      
 *  pixels specified by the first keyword in the ARD           
@@ -1434,8 +1434,7 @@ within the mask if the point is specified in pixel co-ordinates. If, in
 addition, it can also locate points specified in one or more other
 coordinate systems, then it should create a FrameSet describing all the
 co-ordinate systems which it nows about, one of which must be pixel
-co-ordinates within the mask\footnote{ARD recognizes this Frame by the
-fact that its Domain attribute is set to ``PIXEL''.}. It then passes this
+co-ordinates within the mask. It then passes this
 FrameSet to the ARD system by calling routine ARD\_WCS (this must be done
 prior to calling ARD\_WORK)\footnote{You may be wondering why a separate
 routine is used instead of simply passing the information to ARD\_WORK as
@@ -2357,8 +2356,7 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
 }{
    \sstdescription{
       This routine can be used to specify the cooordinate systems
-      which can be used in subsequent calls to ARD\_WORK. The supplied
-      FrameSet must include a Frame with Domain {\tt "}PIXEL{\tt "}. ARD expressions
+      which can be used in subsequent calls to ARD\_WORK. ARD expressions
       passed to subsequent calls to ARD\_WORK can include positions in any
       of the Frames included in the supplied FrameSet (the ARD expression
       should include suitable COFRAME or WCS statements to indicate which
@@ -2379,13 +2377,22 @@ stand-alone version does not contain the routine \htmlref{ARD\_GROUP}{ARD_GROUP}
       until a new FrameSet is specified by calling ARD\_WCS again.
    }
    \sstinvocation{
-      CALL ARD\_WCS( IWCS, STATUS )
+      CALL ARD\_WCS( IWCS, DOMAIN, STATUS )
    }
    \sstarguments{
       \sstsubsection{
          IWCS = INTEGER (Given)
       }{
          An AST pointer to a FrameSet, or AST\_\_NULL.
+      }
+      \sstsubsection{
+         DOMAIN = CHARACTER $*$ ( $*$ ) (Given)
+      }{
+         The Domain name corresponding to pixel co-ordinates within the
+         mask array passed to routine ARD\_WORK. If a blank value is
+         supplied, {\tt "}PIXEL{\tt "} will be used. The IWCS FrameSet (if supplied)
+         must contain a Frame with this Domain. If the supplied string is
+         longer than 40 characters, the trailing characters are ignored.
       }
       \sstsubsection{
          STATUS = INTEGER (Given and Returned)
