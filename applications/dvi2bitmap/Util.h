@@ -44,8 +44,6 @@ typedef list<string> string_list;
 
 namespace Util
 {
-    string runCommandPipe (string cmd, string envs = "", int *status = 0)
-	    throw (DviError);
     string_list& tokenise_string (string str);
     char** string_list_to_array(string_list& l);
     void delete_string_array(char** sl);

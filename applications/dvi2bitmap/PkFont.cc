@@ -55,6 +55,7 @@ using std::ios;
 
 #include <DviError.h>
 #include <FileByteStream.h>
+#include <PipeStream.h>
 #include <PkFont.h>
 #include <Util.h>
 #include <stringstream.h>
@@ -175,18 +176,20 @@ PkFont::PkFont(double fontmag,
 		    throw InputByteStreamError
 			("can't generate fontgen command");
 
-		string fontpath = Util::runCommandPipe (cmd);
-		if (fontpath.length() == 0)
+		PipeStream *PS = new PipeStream(cmd);
+		string fontpath = PS->getResult();
+		if (PS->getStatus() != 0)
 		    throw InputByteStreamError ("unable to generate font");
+		delete PS;
 		// Try searching again, rather than relying on the
-		// return value from runCommandPipe (there's no reason
+		// return value from the pipe (there's no reason
 		// to expect it to be unreliable, but re-using
 		// find_font() seems more consistent).
 		got_path = find_font (pk_file_path);
 		if (! got_path)
 		{
 		    // We didn't find it, for some reason, but
-		    // `fontpath' returned from runCommandPipe()
+		    // `fontpath' returned from the pipe
 		    // should have the string.  Use that instead, but
 		    // warn about it.  I _think_ there's a
 		    // race-condition which sometimes makes the
@@ -360,12 +363,16 @@ bool PkFont::find_font (string& path)
 	    cerr << "PkFont::find_font: running cmd <"
 		 << cmd << ">..." << endl;
 
-	string font_found = Util::runCommandPipe(cmd);
+	PipeStream *PS = new PipeStream(cmd);
+	string font_found = PS->getResult();
+	int status = PS->getStatus();
+	delete PS;
 
 	if (verbosity_ > normal)
 	    cerr << "    ...produced <" << font_found << '>' << endl;
 
-	if (font_found.length() > 0)
+	//if (font_found.length() > 0)
+	if (status == 0)
 	{
 	    path = font_found;
 	    got_it = true;
