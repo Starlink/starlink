@@ -128,7 +128,7 @@
         SLOT = I
       ELSE
         STATUS = SAI__ERROR
-        CAL MSG_SETI( 'PTR', PTR )
+        CALL MSG_SETI( 'PTR', PTR )
         CALL ERR_REP( ' ', 'Invalid dynamic memory address /^PTR/ - '/
      :                        /'not allocated by DYN', STATUS )
       END IF
