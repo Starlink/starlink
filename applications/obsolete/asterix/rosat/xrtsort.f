@@ -209,10 +209,8 @@
          CALL XRTSORT_PHOTONCNT(HEAD, SRT, BSRT, MAPLIM, STATUS)
 *
 *   Create & map the output Event data set.
-	print *,1
          CALL XRTSORT_CRE_EVENT(HEAD, SRT , MAPLIM, LOCS,
      &                                       ELOCS, SEVPTR, STATUS )
-	print *,2
          IF ( STATUS .NE. SAI__OK ) GOTO 999
 *
 *   Create background file if wanted
@@ -232,7 +230,6 @@
          ENDIF
 *
 *   Do the sort
-	print *,3
          CALL XRTSORT_SORT_EVE(HEAD, SRT, BSRT, MAPLIM,
      &          %val(SEVPTR(1)), %val(SEVPTR(2)), %val(SEVPTR(3)),
      &          %val(SEVPTR(4)), %val(SEVPTR(5)), %val(SEVPTR(6)),
@@ -242,7 +239,6 @@
      &          MDIM(1),MDIM(2),MRES,%val(SMPTR),%val(BMPTR),
      &          TOTEV_SRC,TOTEV_BCK, STATUS )
 *
-	print *,4
 
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -940,7 +936,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
      &           DATAPTR(7), DATALOC(7), STATUS)
 *
 *
-	print *,'x'
 *   Initialise lists
       CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(1)),STATUS)
       CALL ARR_INIT1R(0.0, MAPLIM, %val(DATAPTR(2)),STATUS)
@@ -950,7 +945,6 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(6)),STATUS)
       CALL ARR_INIT1I(0, MAPLIM, %val(DATAPTR(7)),STATUS)
 *
-	print *,'y'
 *   Write the title and units
       CALL BDA_PUTTITLE (OUTLOC, HEAD.TITLE, STATUS)
       CALL BDA_PUTUNITS (OUTLOC, 'Counts', STATUS)
@@ -1354,13 +1348,8 @@ C     CALL BDA_ANNUL(LIV, STATUS)
       UNITS(1)='degrees'
       UNITS(2)='degrees'
 *
-	print *,mdim(1),mdim(2)
-	print *,base(1),scale(1)
-	print *,base(2),scale(2)
       CALL DYN_MAPI(2,MDIM,SMPTR,STATUS)
-	print *,'masking'
       CALL ARX_MASK(SRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(SMPTR),STATUS)
-	print *,'done'
       IF (SRT.BCKGND) THEN
         CALL DYN_MAPI(2,MDIM,BMPTR,STATUS)
         CALL ARX_MASK(BSRT.ARDID,MDIM,BASE,SCALE,UNITS,%val(BMPTR),
@@ -3514,7 +3503,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      NELEMS,STATUS)
          IF (STATUS.NE.SAI__OK) GOTO 999
 
-	print *,'a'
 ***      Check them against the sort parameters
          CALL XRTSORT_DOIT_EVE(HEAD, SRT, BSRT,%val(PTRA(1)),
      &      %val(PTRA(2)),
@@ -3524,7 +3512,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &      BEVE_T, BEVE_P, BEVE_E, MDIM1,MDIM2,MRES,SMASK,BMASK,
      &      TOTEV_SRC, TOTEV_BCK, SRT.QUAL_MORE,
      &      MAXBAD, NBAD, STBAD, ENBAD, BADEV)
-	print *,'b'
 
 ***      unmap the arrays & memory
          CALL RAT_UNMAPEVE(SLOCA, STATUS)
@@ -3600,7 +3587,6 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
      &              BADEV)
 *    Description :
 *    History :
-*     date:  original (LTVAD::RDS)
 *    Type definitions :
       IMPLICIT NONE
 *    Structure definitions :
@@ -3667,8 +3653,7 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       REAL HPIX60                            ! Pixel size in arcmins
 *
       LOGICAL LHRI                           ! Is detector the HRI ?
-      LOGICAL TOK                            ! Is this event within time ranges?
-      LOGICAL OK
+      LOGICAL OK,SOK,BOK
       INTEGER IX
       INTEGER MEL1,MEL2
 *-
@@ -3678,190 +3663,186 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
          LHRI = .FALSE.
       ENDIF
 
-***   Calculate the box pixel centres
+*  Calculate the box pixel centres
       SCEN_X = (SRT.MIN_X + SRT.MAX_X) / 2.0
       SCEN_Y = (SRT.MIN_Y + SRT.MAX_Y) / 2.0
       BCEN_X = (BSRT.MIN_X + BSRT.MAX_X) / 2.0
       BCEN_Y = (BSRT.MIN_Y + BSRT.MAX_Y) / 2.0
 
-***   Calculate pixel size in arcmins
+*  Calculate pixel size in arcmins
       HPIX60 = HEAD.PIXEL / 60.0
 
-***   Calculate the squares of the elliptical axis - if any
+*  Calculate the squares of the elliptical axis - if any
       IF (INDEX('CAE', SRT.SHAPE) .NE. 0) THEN
-         SAMIN2 = SRT.ELAMIN **2
-         SAMAX2 = SRT.ELAMAX **2
-         SBMIN2 = SRT.ELBMIN **2
-         SBMAX2 = SRT.ELBMAX **2
-         BAMIN2 = BSRT.ELAMIN **2
-         BAMAX2 = BSRT.ELAMAX **2
-         BBMIN2 = BSRT.ELBMIN **2
-         BBMAX2 = BSRT.ELBMAX **2
+        SAMIN2 = SRT.ELAMIN **2
+        SAMAX2 = SRT.ELAMAX **2
+        SBMIN2 = SRT.ELBMIN **2
+        SBMAX2 = SRT.ELBMAX **2
+        BAMIN2 = BSRT.ELAMIN **2
+        BAMAX2 = BSRT.ELAMAX **2
+        BBMIN2 = BSRT.ELBMIN **2
+        BBMAX2 = BSRT.ELBMAX **2
 
-***      Calculate the product of the squares of the two elliptical axes
-         SA2B2I = SAMIN2 * SBMIN2
-         SA2B2O = SAMAX2 * SBMAX2
-         BA2B2I = BAMIN2 * BBMIN2
-         BA2B2O = BAMAX2 * BBMAX2
-
-***      Set a local cos and sin of the orientation angle for speed
-         SCPHI = SRT.COSPHI
-         SSPHI = SRT.SINPHI
-         BCPHI = BSRT.COSPHI
-         BSPHI = BSRT.SINPHI
+*  Calculate the product of the squares of the two elliptical axes
+        SA2B2I = SAMIN2 * SBMIN2
+        SA2B2O = SAMAX2 * SBMAX2
+        BA2B2I = BAMIN2 * BBMIN2
+        BA2B2O = BAMAX2 * BBMAX2
+*  Set a local cos and sin of the orientation angle for speed
+        SCPHI = SRT.COSPHI
+        SSPHI = SRT.SINPHI
+        BCPHI = BSRT.COSPHI
+        BSPHI = BSRT.SINPHI
       ENDIF
 
-***   Loop over each input record
+*  Loop over each input record
       DO IX = 1, NELEMS
 
-***      Copy event to simpler variables
-         TEV=TIME(IX) - HEAD.BASE_SCTIME
-         XEV=XPIX(IX)
-         YEV=YPIX(IX)
-         XDEV=XDET(IX)
-         YDEV=YDET(IX)
-         AEV=AMPL(IX)
-         CEV=CAMPL(IX)
-***      Fix for HRI no corrected events. set to value '1'
-         IF (LHRI) CEV = 1
+*  Copy event to simpler variables
+        TEV=TIME(IX) - HEAD.BASE_SCTIME
+        XEV=XPIX(IX)
+        YEV=YPIX(IX)
+        XDEV=XDET(IX)
+        YDEV=YDET(IX)
+        AEV=AMPL(IX)
+        CEV=CAMPL(IX)
+*  Fix for HRI no corrected events. set to value '1'
+        IF (LHRI) CEV = 1
 
-***      Test if this is from an HRI hotspot or deadspot
-         IF (.NOT. LHRI .OR. XRT_HSPOT(HEAD, XEV, YEV)) THEN
+*  Test if this is from an HRI hotspot or deadspot
+        IF (LHRI .AND..NOT. XRT_HSPOT(HEAD, XEV, YEV)) THEN
 
-***         If the source box is circular, annular or elliptical, calculate
-***         various numbers.
-            IF (INDEX('CAE', SRT.SHAPE) .NE. 0) THEN
+          BADEV = BADEV + 1
 
-***            calculate the offset in X and Y celestial pixels from the
-***            source box centre
-               SDIFFX = XEV - SCEN_X
-               SDIFFY = YEV - SCEN_Y
+        ELSE
 
-***            calculate the offset in X and Y celestial pixels from the
-***            background box centre
-               BDIFFX = XEV - BCEN_X
-               BDIFFY = YEV - BCEN_Y
+*  If the source box is circular, annular or elliptical, calculate
+*  various numbers.
+          IF (INDEX('CAE', SRT.SHAPE) .NE. 0) THEN
 
-***            calculate the position in elliptical coordinates - source box
-***            NB: This also handles circles
-               SELPX2 = (SDIFFX * SCPHI + SDIFFY * SSPHI) ** 2
-               SELPY2 = (SDIFFX * SSPHI + SDIFFY * SCPHI) ** 2
+*  calculate the offset in X and Y celestial pixels from the
+*  source box centre
+            SDIFFX = XEV - SCEN_X
+            SDIFFY = YEV - SCEN_Y
 
-***            calculate the position in elliptical coordinates - backgnd box
-               BELPX2 = (BDIFFX * BCPHI + BDIFFY * BSPHI) ** 2
-               BELPY2 = (BDIFFX * BSPHI + BDIFFY * BCPHI) ** 2
+*  calculate the offset in X and Y celestial pixels from the
+*  background box centre
+            BDIFFX = XEV - BCEN_X
+            BDIFFY = YEV - BCEN_Y
 
-            ENDIF
+*  calculate the position in elliptical coordinates - source box
+*  NB: This also handles circles
+            SELPX2 = (SDIFFX * SCPHI + SDIFFY * SSPHI) ** 2
+            SELPY2 = (SDIFFX * SSPHI + SDIFFY * SCPHI) ** 2
 
-***         Check if each event is within the ranges selected
-***         Time range:
-            TOK = .FALSE.
-            DO TLP=1,SRT.NTIME
-               IF (SRT.MIN_T(TLP) .LE. TEV .AND. SRT.MAX_T(TLP)
-     &                      .GE. TEV) TOK = .TRUE.
+*  calculate the position in elliptical coordinates - backgnd box
+            BELPX2 = (BDIFFX * BCPHI + BDIFFY * BSPHI) ** 2
+            BELPY2 = (BDIFFX * BSPHI + BDIFFY * BCPHI) ** 2
+
+          ENDIF
+
+*  Check if each event is within the  selected time range:
+          OK = .FALSE.
+          TLP=1
+          DO WHILE (.NOT.OK.AND.TLP.LE.SRT.NTIME)
+            OK=(SRT.MIN_T(TLP).LE.TEV.AND.SRT.MAX_T(TLP).GE. TEV)
+            TLP=TLP+1
+          ENDDO
+
+          IF (OK) THEN
+
+*  Check various other limits
+            OK=((SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) .AND.
+     :          (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) .AND.
+     :          (SRT.MIN_XD .LE. XDEV .AND.SRT.MAX_XD .GE. XDEV) .AND.
+     :          (SRT.MIN_YD .LE. YDEV .AND.SRT.MAX_YD .GE. YDEV))
+          ENDIF
+
+*  If quality limits have been made more strict then check quality
+          IF (QCHECK) THEN
+*  See if this time is within one of the bad times
+            BLP=1
+            DO WHILE (OK.AND.BLP.LE.NBAD)
+              IF (TEV.GE.STBAD(BLP).AND.TEV.LE.ENBAD(BLP)) THEN
+                OK=.FALSE.
+              ENDIF
             ENDDO
 
-            IF (TOK) THEN
+          ENDIF
 
-            IF (SRT.MIN_PH .LE. AEV .AND.SRT.MAX_PH .GE. AEV) THEN
+          IF (OK) THEN
 
-            IF (SRT.MIN_EN .LE. CEV .AND.SRT.MAX_EN .GE. CEV) THEN
+*  Check if event is within the selected spatial region
 
-            IF (SRT.MIN_XD .LE. XDEV .AND.SRT.MAX_XD .GE. XDEV) THEN
-
-            IF (SRT.MIN_YD .LE. YDEV .AND.SRT.MAX_YD .GE. YDEV) THEN
-
-***            If quality limits have been made more strict then check quality
-               OK = .TRUE.
-
-               IF (QCHECK) THEN
-
-***               See if this time is within one of the bad times
-                  DO BLP=1,NBAD
-                     IF (TEV.GE.STBAD(BLP).AND.TEV.LE.ENBAD(BLP)) THEN
-***                    Set flag false and exit loop
-                       OK=.FALSE.
-                       GOTO 10
-                     ENDIF
-                  ENDDO
-
-10                CONTINUE
-
-               ENDIF
-
-***            Is quality ok ?
-               IF (OK) THEN
-
-***               Check if event is within the source box
-                  IF ( SRT.SHAPE .EQ. 'R' ) THEN
-                    OK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
+*  Rectangle
+            IF ( SRT.SHAPE .EQ. 'R' ) THEN
+              SOK=((SRT.MIN_X .LE. XEV .AND. SRT.MAX_X .GE. XEV)
      &                                  .AND.
-     &                 (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
-                  ELSEIF (INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
-                    OK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
+     &            (SRT.MIN_Y .LE. YEV .AND. SRT.MAX_Y .GE. YEV))
+              IF (SRT.BCKGND) THEN
+                BOK=((BSRT.MIN_X.LE.XEV .AND. BSRT.MAX_X.GE.XEV)
      &                                  .AND.
-     &               (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
-                  ELSEIF (SRT.SHAPE .EQ. 'I') THEN
-                    MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
-                    IF (HEAD.ORIGIN.EQ.'MPE') THEN
-                      MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
-                    ELSE
-                      MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
-                    ENDIF
-                    OK=(SMASK(MEL1,MEL2).NE.0)
+     &             (BSRT.MIN_Y.LE.YEV .AND. BSRT.MAX_Y.GE.YEV))
+              ENDIF
 
-                  ENDIF
-
-                  IF (OK) THEN
-
-                     TOTEV_SRC=TOTEV_SRC+1
-
-                     EVE_X(TOTEV_SRC)=-(XEV - HEAD.SKYCX)*HPIX60
-                     EVE_Y(TOTEV_SRC)=-(YEV - HEAD.SKYCY)*HPIX60
-                     EVE_XD(TOTEV_SRC)=XDEV
-                     EVE_YD(TOTEV_SRC)=YDEV
-                     EVE_T(TOTEV_SRC)=TEV
-                     EVE_P(TOTEV_SRC)=AEV
-                     EVE_E(TOTEV_SRC)=CEV
-
-***               Check if event is within the bckgnd box
-                  ELSEIF ( SRT.BCKGND ) THEN
-                    IF (BSRT.SHAPE .EQ. 'R') THEN
-                      OK=((BSRT.MIN_X.LE.XEV .AND. BSRT.MAX_X.GE.XEV)
+*  Circle, annulus or ellipse (all treated as ellipse)
+            ELSEIF (INDEX( 'CAE', SRT.SHAPE ) .NE. 0 ) THEN
+              SOK=((SELPX2*SBMIN2 + SELPY2*SAMIN2) .GE. SA2B2I
      &                                  .AND.
-     &                   (BSRT.MIN_Y.LE.YEV .AND. BSRT.MAX_Y.GE.YEV))
-                    ELSEIF (INDEX( 'CAE', BSRT.SHAPE ) .NE. 0) THEN
-                      OK=((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I
+     &            (SELPX2*SBMAX2 + SELPY2*SAMAX2) .LE. SA2B2O)
+              IF (SRT.BCKGND) THEN
+                BOK=((BELPX2*BBMIN2 + BELPY2*BAMIN2).GE.BA2B2I
      &                                  .AND.
-     &                   (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O)
-                    ELSEIF (BSRT.SHAPE.EQ.'I') THEN
-                      OK=(BMASK(MEL1,MEL2).NE.0)
-                    ENDIF
+     &             (BELPX2*BBMAX2 + BELPY2*BAMAX2).LE.BA2B2O)
+              ENDIF
 
-                    IF (OK) THEN
+*  ARD description
+            ELSEIF (SRT.SHAPE .EQ. 'I') THEN
+              MEL1=INT((XEV-HEAD.XSTART)/MRES)+1
+              IF (HEAD.ORIGIN.EQ.'MPE') THEN
+                MEL2=INT((-YEV-HEAD.YSTART)/MRES)+1
+              ELSE
+                MEL2=INT((YEV-HEAD.YSTART)/MRES)+1
+              ENDIF
+              SOK=(SMASK(MEL1,MEL2).NE.0)
+              IF (SRT.BCKGND) THEN
+                OK=(BMASK(MEL1,MEL2).NE.0)
+              ENDIF
+            ENDIF
 
-                      TOTEV_BCK=TOTEV_BCK+1
+          ENDIF
 
-                      BEVE_X(TOTEV_BCK)=-XEV*HPIX60
-                      BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
-                      BEVE_XD(TOTEV_BCK)=XDEV
-                      BEVE_YD(TOTEV_BCK)=YDEV
-                      BEVE_T(TOTEV_BCK)=TEV
-                      BEVE_P(TOTEV_BCK)=AEV
-                      BEVE_E(TOTEV_BCK)=CEV
+*  Add to source event list
+          IF (SOK) THEN
 
-                    ENDIF
+            TOTEV_SRC=TOTEV_SRC+1
 
-                  ENDIF
-               ENDIF
-            ENDIF
-            ENDIF
-            ENDIF
-            ENDIF
-            ENDIF
-         ELSE
-           BADEV = BADEV + 1
-         ENDIF
+            EVE_X(TOTEV_SRC)=-(XEV - HEAD.SKYCX)*HPIX60
+            EVE_Y(TOTEV_SRC)=-(YEV - HEAD.SKYCY)*HPIX60
+            EVE_XD(TOTEV_SRC)=XDEV
+            EVE_YD(TOTEV_SRC)=YDEV
+            EVE_T(TOTEV_SRC)=TEV
+            EVE_P(TOTEV_SRC)=AEV
+            EVE_E(TOTEV_SRC)=CEV
+
+          ENDIF
+
+*  Add to background event list
+          IF ( SRT.BCKGND.AND.BOK ) THEN
+
+            TOTEV_BCK=TOTEV_BCK+1
+            BEVE_X(TOTEV_BCK)=-XEV*HPIX60
+            BEVE_Y(TOTEV_BCK)=-YEV*HPIX60
+            BEVE_XD(TOTEV_BCK)=XDEV
+            BEVE_YD(TOTEV_BCK)=YDEV
+            BEVE_T(TOTEV_BCK)=TEV
+            BEVE_P(TOTEV_BCK)=AEV
+            BEVE_E(TOTEV_BCK)=CEV
+
+          ENDIF
+
+        ENDIF
+
       ENDDO
 
 999   CONTINUE
