@@ -50,7 +50,7 @@ These are the document element types.
 <codebody>
 
 ;(element title
-;  (literal (normalise-string (data (current-node)))))
+;  (literal (normalize-string (data (current-node)))))
 (element title
   (process-children))
 ;(element displaytitle
@@ -115,8 +115,8 @@ These are the document element types.
       (if link
 	  (make element gi: "a"
 		attributes: (list (list "href" link))
-		(literal (normalise-string (data (current-node)))))
-	  (literal (normalise-string (data (current-node)))))))
+		(literal (trim-data (current-node))))
+	  (literal (trim-data (current-node))))))
 
 
 

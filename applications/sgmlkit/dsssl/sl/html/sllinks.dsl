@@ -398,7 +398,7 @@ the URL as link text
   (make element gi: "a"
     attributes: (list (list "href" (attribute-string (normalize "url")
 						     (current-node)))
-		      (list "title" (normalise-string (data (current-node)))))
+		      (list "title"  (trim-data (current-node))))
     (process-children)))
 
 ; (mode section-reference
