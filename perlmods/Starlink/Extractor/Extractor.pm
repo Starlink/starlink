@@ -51,7 +51,7 @@ use strict;
 use File::Spec;
 use Starlink::AMS::Init;
 use Starlink::AMS::Task;
-use Starlink::ADAM;
+use Starlink::EMS qw/ :sai /;
 use Astro::Catalog;
 
 use base qw/Exporter/;
@@ -247,7 +247,7 @@ sub extract {
            -e "/star/bin/extractor/extractor" ) {
     $extractor_bin = "/star/bin/extractor/extractor";
   } else {
-    croak "Could not find EXTRACTOR binary.\n";
+    croak "Could not find EXTRACTOR binary";
   }
   print "EXTRACTOR binary is in $extractor_bin\n" if $DEBUG;
 
@@ -266,7 +266,13 @@ sub extract {
     $TASK = new Starlink::AMS::Task("extractor", $extractor_bin );
   }
   my $STATUS = $TASK->contactw;
-  $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
+  if( ! $STATUS ) {
+    croak "Could not contact EXTRACTOR monolith";
+  }
+  $STATUS = $TASK->obeyw("extract", "image=$ndf config=" . $self->_config_file_name );
+  if( $STATUS != SAI__OK ) {
+    croak "Error in running EXTRACTOR: $STATUS";
+  }
 
 # Form a catalogue from Astro::Catalog.
   my $catalog = new Astro::Catalog( Format => 'SExtractor',
@@ -826,7 +832,7 @@ Brad Cavanagh E<lt>b.cavanagh@jach.hawaii.eduE<gt>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004 Particle Physics and Astronomy Research
+Copyright (C) 2004-2005 Particle Physics and Astronomy Research
 Council.  All Rights Reserved.
 
 =cut
