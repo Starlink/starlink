@@ -1,4 +1,7 @@
 
+#  Echo the IRAF support libraries that are available for this platform.
+#  Needs to be run after the configure test STAR_PLATFORM_SOURCES has been
+#  performed in the iraf sub-directory.
 IRAFLIBS=
 for f in iraf/libimfort.a iraf/libsys.a iraf/libvops.a iraf/libos.a iraf/libcompat.a ; do
   if test -f $f; then
