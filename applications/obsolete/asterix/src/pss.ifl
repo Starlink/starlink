@@ -44,6 +44,12 @@ INTERFACE PSS
     HELP    'Filename containing list of images & backgrounds'
   ENDPARAMETER
 
+  PARAMETER SREGION
+    TYPE '_CHAR'
+    PROMPT 'ARD input'
+    HELP '^filename or direct text input'
+  ENDPARAMETER
+
   PARAMETER MODE
     TYPE '_CHAR'
     DEFAULT 'SEARCH'
