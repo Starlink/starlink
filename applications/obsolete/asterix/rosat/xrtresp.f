@@ -179,7 +179,8 @@
 * If NR > 10 issue a warning
         IF (NR .GT. 10) THEN
            CALL MSG_SETI('SIZ',NR*3000)
-           CALL MSG_PRNT( Warning: the output file will be ^SIZ blocks')
+           CALL MSG_PRNT(
+     :               'Warning: the output file will be ^SIZ blocks')
 *
 *    Ask if user wants to continue
            CALL USI_GET0L('CONTINUE', LCONT, STATUS)
