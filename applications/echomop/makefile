@@ -456,7 +456,7 @@ PKG_VERS = 3.3-6b1
 SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION) \
    $(TEST_FILES_ARCHIVE) $(DEMO_FILES_ARCHIVE) $(PKG_NAME)_data.tar \
    $(ARC_FILES_ARCHIVE) $(PKG_NAME)_inc.tar $(PKG_NAME)_ifl.tar \
-   $(HYPERTEXT_ARCHIVE) $(PKG_NAME)_def.tar $(PKG_NAME)_demo.tar
+   $(HYPERTEXT_ARCHIVE) $(PKG_NAME)_def.tar
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -1664,8 +1664,20 @@ export_run: $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 #  The compressed tar file is up to date if it exists and is more
 #  recent than all the source files and the date stamp file (which
 #  records the time of the last build which modified any files).
-
-$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
+#
+#  The dependency indicated here is the list of files tarred up
+#  _minus_ $(DEMO_FILES_ARCHIVE).  That has a dependency on
+#  ech_demo.txt and hence on ech_demo.csh, correctly, since it is a
+#  generated file.  However, if you build export_run in a directory
+#  unpacked from an export_source tarball (as might be the case after
+#  distribution), then $(DEMO_FILES_ARCHIVE) exists, but ech_demo.csh
+#  doesn't (since it's obtained then by unpacking the tarball), and
+#  the build falls over.  Therefore omit the tarball from the list of
+#  dependencies, but include an explicit test for it in the script.
+$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: \
+	$(DOCUMENTATION) $(BUILT_FILES) \
+	$(ARC_FILES_ARCHIVE) $(HYPERTEXT_ARCHIVE) $(TEST_FILES_ARCHIVE) \
+	$(DATE_STAMP)
 #
 #  Issue a warning if the package has not been tested.
 	@ if test ! -f .TESTED_$(SYSTEM); then \
@@ -1674,17 +1686,19 @@ $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z: $(SOURCE_FILES) $(DATE_STAMP)
            echo;\
         else :; fi
 #
+#  Check that we do in fact have $(DEMO_FILES_ARCHIVE) (see note above)
+	test -f $(DEMO_FILES_ARCHIVE) || make $(DEMO_FILES_ARCHIVE)
+#
 #  Remove any pre-existing tar files before creating new ones.
 	test ! -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
+	  rm -f $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	$(TAR_IN) - mk makefile $(DOCUMENTATION) $(BUILT_FILES) \
-		$(ARCHIVE_FILES) $(DATE_STAMP) .BUILT \
-		| compress -v \
-			> $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
+	  $(ARCHIVE_FILES) $(DATE_STAMP) .BUILT \
+	  | compress -v > $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z
 	test ! -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z || \
-		rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+	  rm -f $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 	$(LINK) $(EXPORT)/$(PKG_NAME)-$(PKG_VERS)_$(SYSTEM)_run.tar.Z \
-		$(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
+	  $(EXPORT)/$(PKG_NAME)_$(SYSTEM)_run.tar.Z
 
 #  export_source: Export the source.
 #  --------------------------------
@@ -1752,7 +1766,7 @@ $(PKG_NAME)_def.tar:
 
 # ech_demo.txt is assembled from the files mentioned in ech_demo.csh
 # (has to exist because it's mentioned in the documentation)
-$(PKG_NAME)_demo.tar: ech_demo.txt
+$(DEMO_FILES_ARCHIVE): ech_demo.txt
 	$(TAR_IN) $@ $(DEMO_FILES) ech_demo.txt
 
 ech_demo.txt: ech_demo.csh
@@ -1764,7 +1778,7 @@ ech_demo.txt: ech_demo.csh
 		cat $$f		>> $@; \
 	done
 
-$(PKG_NAME)_hyper.tar:
+$(HYPERTEXT_ARCHIVE):
 	(cd doc; $(MAKE) PKG_NAME=$(PKG_NAME) $@)
 	test -f doc/$@ && ln -f doc/$@ ./$@
 
