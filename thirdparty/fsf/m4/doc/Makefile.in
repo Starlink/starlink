@@ -48,7 +48,7 @@ m4.dvi: m4.texinfo version.texi
 	$(TEXI2DVI) $(srcdir)/m4.texinfo
 
 version.texi: stamp-vti
-stamp-vti: m4.texinfo ../configure.in
+stamp-vti: m4.texinfo # ../configure.in
 	echo "@set EDITION $(VERSION)" > version.tmp
 	echo "@set UPDATED `date '+%B %Y'`" >> version.tmp
 	echo "@set VERSION $(VERSION)" >> version.tmp
