@@ -3214,7 +3214,7 @@ void adix_unmap_n( ADIobj id, char *name, int nlen,
 /* Find data address */
   adix_locdat( &id, name, nlen, DA__DEFAULT, &lid, NULL, NULL, status );
 
-  lobj = adix_loc_mapctrl( id, 0, vptr, &ipoint, status );
+  lobj = adix_loc_mapctrl( *lid, 0, vptr, &ipoint, status );
 
   if ( _valid_q(lobj) ) {
     ADImapCtrl  *mctrl = _mapctrl_data(lobj);
