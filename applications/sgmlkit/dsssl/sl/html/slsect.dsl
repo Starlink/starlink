@@ -50,6 +50,39 @@ section ready to flow into whatever contains this.
 		       bod)
 	(error "Can't find title of section"))))
 
+<routine>
+<routinename>$html-other-unit$
+<description>Function to be called for any elements which might be 
+chunked, but which are not sections in the sense of having the
+normal subhead structure.
+<returnvalue type=sosofo>Either an HTML document, or else the contents of the
+unit ready to flow into whatever contains this.
+<argumentlist>
+<parameter>title
+  <type>string
+  <description>The string to be used for the title and heading.
+<parameter keyword default="h3">heading-gi
+  <type>string
+  <description>The body will be preceded by the title wrapped in the
+    element given by this string.
+<codebody>
+(define ($html-other-unit$ title #!key (heading-gi "h2"))
+   (let ((id (href-to (current-node) frag-only: #t)))
+     (html-document
+       (literal title)
+       (make sequence
+         ($html-section-separator$)
+         (make element gi: heading-gi
+           (if id 
+              (make element gi: "a"
+                    attributes: (list (list "name" id))
+                    (with-mode section-reference
+                       (process-node-list (current-node))))
+              (with-mode section-reference
+                 (process-node-list (current-node)))))
+         (process-children)))))
+         
+
 ;(define ($html-section$ #!optional (bod ($html-section-body$)))
 ;   (html-document (with-mode section-reference
 ;                  (process-node-list (current-node)))
@@ -94,6 +127,7 @@ the section title.
 <routine>
 <description>Rules for the various section elements in the DTD
 <codebody>
+(element abstract ($html-other-unit$ "Abstract"))
 (element sect ($html-section$))
 (element subsect ($html-section$))
 (element subsubsect ($html-section$))
