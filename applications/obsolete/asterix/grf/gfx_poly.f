@@ -31,8 +31,8 @@
       LOGICAL FIRST			! first point of a continuous segment
 *    Statement function :
       LOGICAL INBOX
-      REAL X,Y
-      INBOX(X,Y)=(X.GE.X1.AND.X.LE.X2.AND.Y.GE.Y1.AND.Y.LE.Y2)
+      REAL A,B
+      INBOX(A,B)=(A.GE.X1.AND.A.LE.X2.AND.B.GE.Y1.AND.B.LE.Y2)
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
