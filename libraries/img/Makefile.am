@@ -70,10 +70,38 @@ G_ROUTINES = img_in1x.gen img_in2x.gen img_in3x.gen img_inx.gen \
  img_outx.gen img_tmp1x.gen img_tmp2x.gen img_tmp3x.gen \
  img_tmpx.gen img_mod1x.gen img_mod2x.gen img_mod3x.gen img_modx.gen
 
+img_in1x.o: img_in1x.f 
+img_in2x.o: img_in2x.f 
+img_in3x.o: img_in3x.f 
+img_inx.o: img_inx.f
+img_new1x.o: img_new1x.f
+img_new2x.o:img_new2x.f
+img_new3x.o:img_new3x.f
+img_newx.o: img_newx.f
+img_outx.o: img_outx.f
+img_tmp1x.o: img_tmp1x.f
+img_tmp2x.o: img_tmp2x.f
+img_tmp3x.o: img_tmp3x.f
+img_tmpx.o: img_tmpx.f
+img_mod1x.o: img_mod1x.f 
+img_mod2x.o: img_mod2x.f
+img_mod3x.o: img_mod3x.f
+img_modx.o: img_modx.f
+
 GNP_ROUTINES = img1_gkeyx.gnp
+
+img1_gkeyx.o: img1_gkeyx.f
 
 GCP_ROUTINES = hdr_inx.gcp hdr_outx.gcp img1_rdexx.gcp img1_rdftx.gcp \
  img1_wkeyx.gcp img1_wrexx.gcp img1_wrftx.gcp
+
+hdr_inx.o: hdr_inx.f
+hdr_outx.o: hdr_outx.f
+img1_rdexx.o: img1_rdexx.f
+img1_rdftx.o: img1_rdftx.f
+img1_wkeyx.o: img1_wkeyx.f
+img1_wrexx.o: img1_wrexx.f
+img1_wrftx.o: img1_wrftx.f
 
 ## Note that we cannot call this variable just BLOCK_DATA, since automake
 ## interprets this as a `primary' DATA
