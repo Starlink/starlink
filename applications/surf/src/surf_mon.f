@@ -31,9 +31,12 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
-*     Revision 1.8  1996/11/01 22:15:46  timj
-*     Change PHOTOM to SCUPHOT
+*     Revision 1.9  1996/11/18 02:25:49  timj
+*     Add REMSKY
 *
+c Revision 1.8  1996/11/01  22:15:46  timj
+c Change PHOTOM to SCUPHOT
+c
 c Revision 1.7  1996/11/01  21:18:13  timj
 c Add SCUHELP
 c Update header.
@@ -113,6 +116,9 @@ c
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
          CALL REDS_REDUCE_SWITCH (STATUS)
+      ELSE IF (NAME .EQ. 'REMSKY') THEN
+
+         CALL REDS_REMSKY (STATUS)
 
       ELSE IF (NAME .EQ. 'RESTORE') THEN
 
