@@ -35,23 +35,20 @@ ssn78-single.htx_tar: ssn78.xml ssn78-1.eps
 		$(SGML2DOCS) --htmlsingle --tarball=$@ \
 		ssn78.xml
 
-# # The following target will work ONLY if the JADE which is configured is one
-# # which has Norman's LaTeX patch applied.
-# ssn78.latex_tar: ssn78.xml ssn78-1.eps
-# 	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
-# 		STARLINK_SGML_DIR=$(STARLINK_SGML_DIR) \
-# 		SGML_CATALOG_FILES=$(STARLINK_SGML_DIR)/dtd/CATALOG-override \
-# 		$(STARLINK_SGML_DIR)/bin/sgml2docs --latex --tarball=$@ \
-# 		ssn78.xml
+ssn78.texml_tar: ssn78.xml ssn78-1.eps
+	JADE=$(JADE) SGMLNORM=$(SGMLNORM) \
+		SGML_CATALOG_FILES=$(STARLINK_SGML_DIR)/dtd/CATALOG-override \
+		$(SGML2DOCS) --texml --tarball=$@ \
+		ssn78.xml
 
-#ssn78.ps: ssn78.latex
-#	cd ssn78.latex; latex ssn78; dvips -o ssn78.ps ssn78
-#	cp ssn78.latex/ssn78.ps .
-#ssn78.pdf: ssn78.latex
-#	cd ssn78.latex; pdflatex ssn78
-#	cp ssn78.latex/ssn78.pdf .
-#ssn78.latex: ssn78.latex_tar
-#	tar xf ssn78.latex_tar
+ssn78.ps: ssn78.texml
+	cd ssn78.texml; latex ssn78; latex ssn78; dvips -o ssn78.ps ssn78
+	cp ssn78.texml/ssn78.ps .
+ssn78.pdf: ssn78.texml
+	cd ssn78.texml; pdflatex ssn78; pdflatex ssn78
+	cp ssn78.texml/ssn78.pdf .
+ssn78.texml: ssn78.texml_tar
+	tar xf ssn78.texml_tar
 
 # Though the following rule uses a configured pstoimg, it will fail if
 # epstopdf doesn't happen to be in the path
