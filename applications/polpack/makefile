@@ -350,8 +350,8 @@ SOURCE_FILES = $(PKG_NAME)_source.tar ndg.tar makefile mk $(DOCUMENTATION)
 #  installed in the $(INSTALL_BIN) directory with execute permission
 #  set.
 
-PUBLIC_SCRIPTS = PolReg.tcl PolReg_procs.tcl CCDShowHelp.tcl dialog.tcl \
-adamtask.tcl adamMessageRelay 
+PUBLIC_SCRIPTS = PolMap.tcl PolMap_procs.tcl PolReg.tcl PolReg_procs.tcl \
+CCDShowHelp.tcl dialog.tcl adamtask.tcl adamMessageRelay 
 
 # List of StarTcl files which must reside in the POLPACK binary directory.
 # These should be in the STARTCL_DIR directory.
@@ -411,7 +411,8 @@ ndg_crexp.f ndg_delet.f ndg_ndfas.f ndg_ndfcr.f ndg_ndfpr.f
 F_SUB2 =  ccg1_cenr.f ccg1_is4d.f datapic.f gethlp.f gthlpi.f kpg1_chaxd.f \
 kpg1_flcor.f kpg1_rfcor.f kpg1_scrsz.f kps1_flxyr.f kps1_inxyr.f kps1_plcpx.f \
 kps1_plcpy.f kps1_plmsk.f kps1_retr.f kps1_stor.f kps1_xyd2w.f pda_qsiai.f \
-polcent.f polhelp.f polreg.f pthlpo.f rdndf.f segment.f sread.f wrndf.f
+polcent.f polhelp.f polmap.f polreg.f pthlpo.f rdndf.f segment.f sread.f \
+wrndf.f
 
 #  List of platform specific Fortran routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -427,7 +428,7 @@ C_ROUTINES = $(C_SUB1) $(C_SUB2)
 
 C_SUB1 = 
 
-C_SUB2 = doplrg.c kpg1_trmsz.c
+C_SUB2 = polpack.c kpg1_trmsz.c
 
 #  List of platform specific C routines.  The source tar file will
 #  contain a version of these files for each set of platforms.  The names
@@ -446,7 +447,7 @@ ADDLIBS = -ltk$(TK_VERS) -ltcl$(TCL_VERS)
 
 #  List of applications/tasks in monolith.
 
-TASKS = polhelp polreg datapic polcent segment
+TASKS = polhelp polmap polreg datapic polcent segment
 
 #  Monolith routine source name.
 
@@ -462,7 +463,8 @@ MONO_IFL = $(PKG_NAME)_mon.ifl
 
 #  List of task interface files.
 
-IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polreg.ifl segment.ifl
+IFL_FILES = datapic.ifl polcent.ifl polhelp.ifl polmap.ifl polreg.ifl \
+segment.ifl
 
 #  List of help library sources.
 
@@ -479,9 +481,9 @@ TEST_SCRIPT = $(PKG_NAME)_test
 
 #  Lists of Latex and hypertext documents.
 
-LATEX_DOCS = polreg.tex
+LATEX_DOCS = polreg.tex polmap.tex
 HYPERTEXT_DOCS = 
-HYPERTEXT_HELP = polreg.htx
+HYPERTEXT_HELP = polreg.htx polmap.htx
 
 #  List of documentation files.
 
@@ -1351,6 +1353,8 @@ polcent.f: PAR_ERR
 polcent.f: SAE_PAR
 polhelp.f: PAR_ERR
 polhelp.f: SAE_PAR
+polmap.f: PAR_ERR
+polmap.f: SAE_PAR
 polreg.f: PAR_ERR
 polreg.f: SAE_PAR
 polreg.f: GRP_PAR

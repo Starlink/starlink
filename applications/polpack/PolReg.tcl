@@ -164,7 +164,7 @@
    set XHAIR 0
    set XHAIR_IDH ""
    set XHAIR_IDV ""
-   set XHRCOL "LemonChiffon"
+   set XHRCOL "yellow"
 
 # Get the name of the directory containing the PolReg files. This TCL
 # variable should have been set in the calling ADAM A-task, but if it
@@ -518,11 +518,12 @@
    $helpmenu add separator
    $helpmenu add command -label "Pointer..." -command {ShowHelp "pointer"}
 
-   MenuHelp $helpmenu "Contents" ".  Display the main table of contents for the PolReg documentation."
-   MenuHelp $helpmenu "Menus" ".  Display help on the buttons in the menu-bar."
-   MenuHelp $helpmenu "Usage Guide Lines" ".  Display a simple step-by-step guide to the use of PolReg."
-   MenuHelp $helpmenu "Using Help" ".  Display help on how to use the PolReg help system."
-   MenuHelp $helpmenu "Pointer..." ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
+   MenuHelp $helpmenu "Contents"    ".  Display the main table of contents for the PolReg documentation."
+   MenuHelp $helpmenu "Controls"    ".  Display help on the controls in the GUI."
+   MenuHelp $helpmenu "How do I..." ".  Display answers to some common questions."
+   MenuHelp $helpmenu "Tutorial"    ".  Display a simple step-by-step guide to the use of PolReg."
+   MenuHelp $helpmenu "Using Help"  ".  Display help on how to use the PolReg help system."
+   MenuHelp $helpmenu "Pointer..."  ".  Select this menu item, and then click with the pointer over a widget to see help on the widget."
 
 # Add menu items to the File menu.
    $filemenu add command -label "Save        " -command Save

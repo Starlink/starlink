@@ -2402,7 +2402,7 @@ proc DrawGwm {} {
             regsub -nocase D [GetParam kappa stats:sigma] E sigma
 
             if { $sigma == 0.0 || (
-                 $mean != 0.0 && [expr $sigma/$mean] < 1.0E-4
+                 $mean != 0.0 && [expr abs($sigma/$mean)] < 1.0E-4
                  ) } {
                set pars "mode=flash"
                regsub -nocase D [GetParam kappa stats:minimum] E scalow
@@ -7005,7 +7005,7 @@ proc LoadOptions {} {
      set XHRCOL [string trim $ATASK_XHRCOL]
      set ATASK 1
    } {
-     set XHRCOL "LemonChiffon"
+     set XHRCOL "yellow"
    }
 
    if { [info exists ATASK_VIEW] } {
@@ -9594,7 +9594,7 @@ proc ScreenSec {section} {
 
 # Otherwise, if the width is greater than the height, adjust the y bounds 
 # to make the section square.
-      } elseif { $width < $height } {
+      } elseif { $width > $height } {
          set yl [expr floor( $yc - 0.5 * $width ) ]
          set yu [expr $yl + $width - 1 ]
       }
