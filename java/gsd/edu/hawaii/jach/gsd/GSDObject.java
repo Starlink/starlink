@@ -61,13 +61,11 @@ public class GSDObject {
     /**
      * Constructs a GSDObject given the name of a GSD file.
      *
-     * @param filename Name of the GSD file.
-     * @throws GSDException when ....
+     * @param filename Name of the GSD file on disk.
      * @throws FileNotFoundException if the specified file can not be found 
      *         or opened.
      */
-    public GSDObject( String filename ) throws GSDException, 
-	FileNotFoundException, IOException {
+    public GSDObject( String filename ) throws FileNotFoundException, IOException {
 
 	// Need to open the file
 	RandomAccessFile fptr = new RandomAccessFile( filename, "r" );
@@ -101,7 +99,7 @@ public class GSDObject {
      *
      * @param contents ByteBuffer representing the GSD file.
      */
-    public GSDObject( ByteBuffer contents ) throws GSDException, IOException {
+    public GSDObject( ByteBuffer contents ) throws IOException {
 	// Reset the position of the buffer
 	contents.rewind();
 
@@ -172,8 +170,7 @@ public class GSDObject {
     }
 
     /**
-     * Return item contents by GSD item number. Throws a GSDException
-     * exception if the item is not present.
+     * Return item contents by GSD item number.
      *
      * @param itemno The item number (starting at 1, maximum value defined
      *               by getNumItems)
@@ -216,7 +213,7 @@ public class GSDObject {
      * without special formatting. Equivalent to the gsdprint
      * command.
      */
-    public void print() throws IOException, GSDException {
+    public void print() throws IOException {
         System.out.println("-----------------------------------------------------");
 	System.out.println(" G S D   P R I N T");
 	System.out.println("-----------------------------------------------------");
@@ -253,7 +250,7 @@ public class GSDObject {
 
     /* I N T E R N A L   I O   R O U T I N E S */
 
-    private void parseBuffer( ByteBuffer buf ) throws IOException, GSDException {
+    private void parseBuffer( ByteBuffer buf ) throws IOException {
 
 	// First read the file header
 	this.readFileDesc( buf );
@@ -264,18 +261,13 @@ public class GSDObject {
 	// Now map the data array and close the file
 	this.attachData( buf );
 
-	// Now associate correct dimension information with each
-	// array item (since they are specified by scalar items)
-	this.fillDimItems();
-
 	// and populate the look up table for fast by-name access
 	this.fillItemMap();
 
     }
 
 
-    private void readFileDesc ( ByteBuffer buf ) throws IOException, 
-	GSDException {
+    private void readFileDesc ( ByteBuffer buf ) throws IOException {
 	// Read the first few bytes for the general file description
 
 	/**
@@ -354,7 +346,7 @@ public class GSDObject {
     };
 
 
-    private void readItemDesc (ByteBuffer buf) throws IOException, GSDException {
+    private void readItemDesc (ByteBuffer buf) throws IOException {
 
 	// For each of the no_items items in the file the next
 	// block of the file contains the information associated
@@ -483,11 +475,28 @@ public class GSDObject {
 	    int[] dimnumbers = GSDVAXBytes.tointArray(byteArray, 
 						      offset, GSD__MAXDIMS);
 
+
+	    // Construct an array of items that can be used for the
+	    // GSDItem constructor.
+	    // Must force ndims to zero
+	    if (ndims < 0 ) { ndims = 0; }
+	    GSDItem[] dimitems = new GSDItem[ ndims ];
+	    if (isArray) {
+		for (int k = 0; k < ndims; k++ ) {
+		    // remember to offset by 1
+		    dimitems[k] = items[ dimnumbers[k] - 1 ];
+		    if ( dimitems[k] == null ) {
+			throw new NullPointerException( "An attempt was made to read a scalar item [#"+ dimnumbers[k]  
+		       +"] that has not been read from the file yet!" );
+		    }
+		}
+	    }
+
 	    // and create the actual object
 	    GSDItem curritem = new GSDItem( i+1, start_byte, nbytes,
 					    ndims, itemname, itemunit, 
 					    GSD__TYPES[type-1],
-					    dimnumbers );
+					    dimitems );
 
 	    // and place the item in context
 	    items[i] = curritem;
@@ -496,44 +505,7 @@ public class GSDObject {
 
     }
 
-    // Attach dimension information to array data
-    private void fillDimItems() throws GSDException, IOException {
-
-	// Attach the dimensional information from dimnumbers
-	for (int i = 0; i< this.no_items; i++) {
-	    GSDItem item = items[i];
-	    if ( item.isArray() ) {
-		// Only relevant for array items
-		// Might want to think about simply storing
-		// the items and then providing wrappers for
-		// dimnames and dimunits???
-		int ndims = item.ndims();
-
-		// Make the arrays the right size
-		String[] dimunits = new String[ndims];
-		String[] dimnames = new String[ndims];
-		int[] dimensions = new int[ndims];
-
-		int[] dimnumbers = item.dimnumbers();
-		for (int j=0; j<ndims; j++) {
-		    // The item number is one off from the index
-		    GSDItem dimitem = items[ dimnumbers[j]-1 ];
-
-		    dimunits[j] = dimitem.unit();
-		    dimnames[j] = dimitem.name();
-		    Integer dim = (Integer)dimitem.getData();
-		    dimensions[j] = dim.intValue();
-		}
-		
-		// And store
-		item.dimunits( dimunits );
-		item.dimnames( dimnames );
-		item.dimensions( dimensions );
-	    }
-	}
-
-    }
-
+    // Associated each item with its name.
     private void fillItemMap() {
 	// use HashMap for now
 	itemmap = new HashMap( getNumItems() );

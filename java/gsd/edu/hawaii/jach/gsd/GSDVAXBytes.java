@@ -302,13 +302,18 @@ class GSDVAXBytes {
      * @param bytes Array of bytes assumed to represent characters. All the
      *              bytes are converted to characters in the output string.
      * @return Java string
+     * @throws IllegalStateException if the character set used by this
+     * routine is no longer supported by the String constructor. This
+     * should never happen (unless US-ASCII is suddenly deprecated).
      */
-    public static String tostring( byte[] bytes ) throws GSDException {
+    public static String tostring( byte[] bytes ) {
 	String buf;
+	String charset = "US-ASCII";
 	try {
-	    buf = new String( bytes, "US-ASCII" );
+	    buf = new String( bytes, charset );
 	} catch ( UnsupportedEncodingException e ) {
-	    throw new GSDException("This should not happen");
+	    throw new IllegalStateException("Somehow char set " + charset +
+					    " is no longer supported by the String constructor");
 	}
 	return buf;
     }
@@ -405,7 +410,7 @@ class GSDVAXBytes {
      * @param nchars Number of characters to read from the array
      * @return A single Java string.
      */
-    public static String tostring( byte[] bytes, int offset, int nchars ) throws GSDException{
+    public static String tostring( byte[] bytes, int offset, int nchars ) {
 	return tostring( bytecopy(bytes, offset, nchars) );
     }
 
@@ -555,7 +560,7 @@ class GSDVAXBytes {
      * @return Array of strings.
      */
     public static String[] tostringArray( byte[] bytes, int offset, int nelem,
-				    int nchars) throws GSDException {
+				    int nchars) {
 	
 	// array to receive
 	String[] output = new String[ nelem ];
@@ -778,8 +783,7 @@ class GSDVAXBytes {
      * @return An array of strings.
      */
     public static String[] tostringArray( ByteBuffer buffer, int offset,
-					int nelem, int nchar ) 
-	throws GSDException {
+					int nelem, int nchar ) {
 
 	// array to receive
 	String[] output = new String[ nelem ];
@@ -927,8 +931,7 @@ class GSDVAXBytes {
      * @return Array of strings.
      */
     public static String[] tostringArrayNB( ByteBuffer buffer, int offset,
-				       int nbytes, int nchar ) 
-	throws GSDException {
+				       int nbytes, int nchar ) {
 	return tostringArray( buffer, offset, nbytes/nchar, nchar);
     }
 

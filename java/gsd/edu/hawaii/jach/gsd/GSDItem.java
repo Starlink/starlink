@@ -37,17 +37,14 @@ public class GSDItem {
     private final String unit;
     private final char type;
 
-    // For array items
-    private String[] dimnames;
-    private String[] dimunits;
-    private int[]    dimensions;
-    private int[]    dimnumbers; // The item numbers corresponding to dims
+    // For the dimensional information we simply extract that from
+    // other scalar items (if we are an array item)
+    private final GSDItem[] dimitems;
 
     // This is the actual data.
     // Note that we must cast to the correct type
     // Do not yet know enough java to do this with a single Object
     private Object data;
-
 
     // The following information is required to find the
     // item in the byte stream. These have public setter methods
@@ -81,7 +78,7 @@ public class GSDItem {
      */
     GSDItem(int itemnum, int start_byte, int nbytes,
 	    int ndims, String item_name, String item_unit, char type,
-	    int[] dimnums ) {
+	    GSDItem[] dimitems ) {
 
 	// Nothing clever
 	this.number = itemnum;
@@ -95,7 +92,7 @@ public class GSDItem {
 	this.name = item_name.toUpperCase();
 	this.unit = item_unit;
 	this.type = type;
-	this.dimnumbers = dimnums;
+	this.dimitems = dimitems;
     }
 
 
@@ -106,21 +103,6 @@ public class GSDItem {
      *
      */
     void contents( ByteBuffer buf ) {this.contents = buf; }
-
-    /**
-     * Set the size of each of the data dimensions.
-     */
-    void dimensions( int[] dims ) { this.dimensions = dims; };
-
-    /**
-     * Set the name of each dimensions.
-     */
-    void dimnames( String[] dimnam ) { this.dimnames = dimnam; };
-
-    /**
-     * Set the units of each dimension.
-     */
-    void dimunits( String[] dimunt ) { this.dimunits = dimunt; };
 
     /**
      * Store the actual data associated with this item. Should only
@@ -147,11 +129,21 @@ public class GSDItem {
 
     /**
      * For array items, each dimension in the data array is described
-     * by a corresponding scalar item. This method returns the item numbers
-     * associated with each dimension in the data. The item information
-     * can then be retrieved by using the GSDObject.itemByNum() method.
+     * by a corresponding scalar item. This method returns the GSDItem
+     * object items associated with each dimension in the
+     * data. Returns an empty array for a scalar item.
+     *
+     * @return An array of GSDItem object corresponding to each dimension.
      */
-    public int[] dimnumbers() { return this.dimnumbers; }
+    public GSDItem[] dimitems() { 
+	if (isArray() ) {
+	    // if we are an array item, return a clone of the actual dimitems.
+	    // It must be a clone to enfore immutability on this class
+	    return (GSDItem[])this.dimitems.clone();
+	} else {
+	    return new GSDItem[0];
+	}
+    }
 
     /**
      * The item number in the original GSD file.
@@ -196,18 +188,58 @@ public class GSDItem {
 
     /**
      * If an array, this is the dimensionality of the data array.
+     *
+     * @throws IllegalStateException if the data associated with the
+     * item can not be read due to some problem in the sub-item.
      */
-    public int[] dimensions() { return this.dimensions; }
+    public int[] dimensions()  { 
+	int[] dims = new int[ ndims ];
+	for (int i = 0; i < ndims; i++ ) {
+	    // put try block inside for loop so that we can raise
+	    // an error specific to the item.
+	    try {
+		Integer val = (Integer)dimitems[i].getData();
+		dims[i] = val.intValue();
+	    } catch ( IOException e ) {
+		throw new IllegalStateException("Error extracting data value for dimension "+ i + " from underlying item #" + dimitems[i].number() );
+	    }
+	}
+	return dims;
+    }
 
     /**
      * If an array, this is the name of each axis.
      */
-    public String[] dimnames() { return this.dimnames; }
+    public String[] dimnames() {
+	String[] names = new String[ ndims ];
+	for (int i = 0; i < ndims; i++ ) {
+	    names[i] = dimitems[i].name();
+	}
+	return names;
+    }
 
     /**
      * If an array, this is the units associated with each axis.
      */
-    public String[] dimunits() { return this.dimunits; }
+    public String[] dimunits() {
+	String[] units = new String[ ndims ];
+	for (int i = 0; i < ndims; i++ ) {
+	    units[i] = dimitems[i].unit();
+	}
+	return units;
+    }
+
+    /**
+     * If an array, this is the item numbers associated with each axis.
+     * Use the dimitems() method to return the actual items.
+     */
+    public int[] dimnumbers() {
+	int[] nums = new int[ ndims ];
+	for (int i = 0; i < ndims; i++ ) {
+	    nums[i] = dimitems[i].number();
+	}
+	return nums;
+    }
 
     /**
      * Returns an object representing the data. If the data have not
@@ -218,7 +250,7 @@ public class GSDItem {
      * object as objects.
      
      */
-    public Object getData() throws IOException, GSDException { 
+    public Object getData() throws IOException  { 
 	if (this.data == null) {
 	    // try to read
 	    this.attachItemData();
@@ -230,11 +262,12 @@ public class GSDItem {
      * Return the number of data elements associated with the item.
      * Calculated from the dimensions and so does not force a read
      * of the item data.
+     *
      */
     public int size() {
 	int nelm = 1;
 	if (this.isArray() ){
-	    int[] dims = this.dimensions;
+	    int[] dims = this.dimensions();
 	    for (int i=0; i<this.ndims; i++) {
 		nelm *= dims[i];
 	    }
@@ -261,8 +294,6 @@ public class GSDItem {
 		header = header + data;
 	    } catch (IOException e) {
 		header = header + "<undefined>";
-	    } catch (GSDException e) {
-		header = header + "<undefined>";
 	    }
         }
 	return header;
@@ -272,7 +303,7 @@ public class GSDItem {
      * Print the contents of the Item to standard output regardless
      * of the size of the item.
      */
-    public void dumpIt() throws IOException, GSDException {
+    public void dumpIt() throws IOException  {
 	// Simply call dumpIt with a negative value
 	dumpIt( -1 );
     }
@@ -287,7 +318,7 @@ public class GSDItem {
      *                 dumped regardless of size.
      */
 
-    public void dumpIt( long maxsize ) throws IOException, GSDException {
+    public void dumpIt( long maxsize ) throws IOException  {
 
 	String header = this.name() + "      " + this.unit() +
 	    "     " + this.type();
@@ -304,12 +335,14 @@ public class GSDItem {
 	
 	if (this.isArray()) {
 	    // dimensions
-	    int[] dims = this.dimensions;
+	    int[] dims = this.dimensions();
 	    if ( dims != null ) {
-		for(int i=0;i<this.dimensions.length;i++){
-		    System.out.println(" > " + this.dimnames[i] +
-				       " " +  this.dimensions[i] +
-				       " [" + this.dimunits[i] + "] ");
+		String[] dimnames = this.dimnames();
+		String[] dimunits = this.dimunits();
+		for(int i=0;i<dims.length;i++){
+		    System.out.println(" > " + dimnames[i] +
+				       " " +  dims[i] +
+				       " [" + dimunits[i] + "] ");
 		}
 	    } else {
 		System.out.println(" > Dimensions not defined ");
@@ -350,7 +383,7 @@ public class GSDItem {
      * automatically when the GSDItem.getData() method is invoked if
      * the data has not previously been read from file. 
      */
-    private void attachItemData() throws IOException, GSDException {
+    private void attachItemData() throws IOException {
 	// First we need to read the bytes from the file
 	// This may not be the most memory efficient approach
 	// for really large buffers
