@@ -97,8 +97,7 @@
 *      7 Nov 91 (RMJ):
 *        Allows binned up data from XRT to be handled (XMV::RMJ)
 *        Jun 92 (RDS):
-*        Takes a slice from a spectral_series and
-*        works on EXOSAT LE data
+*        Takes a slice from a spectral_series and works on EXOSAT LE data
 *        Aug 92 (RDS):
 *        Fixed a bug in the slicing
 *        Apr 93 (RDS,RMJ):
@@ -109,6 +108,10 @@
 *     14 Jun 95 V1.8-1 (DJA):
 *        Rewrite for XANADU FITS formats. No longer needs
 *        linking against XANADU.
+*      6 Aug 95 V1.8-2 (DJA):
+*        Don't write AREASCAL keyword. Handle spectra with bins more than
+*        one channel wide properly. Removed ignoring channels 1..7 for
+*        XRT data.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -162,13 +165,12 @@
 *     Relate to HDS files.
         INTEGER DIMS(4),ODIMS(4),AMIN(4),AMAX(4),ORD(4)
 
-      REAL			BASEAXAR, SCALAXAR	! Axis origin/spacing
       REAL			EXTIME			! Exposure time
       REAL			GEOMAREA		! Geometric area
 
-      INTEGER			EAPTR			! Energy axis data
       INTEGER			DETID			! Detector configuration
       INTEGER			E_AX			! Energy axis number
+      INTEGER			EAPTR			! Energy axis data
       INTEGER			EDIM			! Size of energy axis
       INTEGER			ERRCOL			! Error column number
       INTEGER			I,J			! Loop variables
@@ -325,35 +327,12 @@
       CALL ERI_GETIDS( IFID, SLICE, RMFID, ARFID, STATUS )
 
 * Get the base and scale values of the PHA axis
-      CALL BDI_GETAXVAL( IFID, E_AX, BASEAXAR, SCALAXAR, EDIM, STATUS )
+      CALL BDI_MAPAXVAL( IFID, 'READ', E_AX, EAPTR, STATUS )
       IF (STATUS .NE. SAI__OK) THEN
-        CALL MSG_PRNT('Error checking Asterix file')
+        CALL ERR_REP( ' ', 'Error reading spectral axis values',
+     :                STATUS )
         GOTO 99
       END IF
-
-
-* RMJs bit...
-*
-* BASE and SCALE are the binning pars of the PHA file
-*
-* If we have an XRT PHA file, then the matrix came from XRTRESP and
-* will be binned as for the PHA file. There is no need for a grouping card.
-* The BASE and SCALE factors are written into the DETID field to make
-* sure that mismatches of detector and response don't happen.
-*
-* For other instruments I don't know what form the matrix is, so restrict
-* prog to working on unbinned data. May need to write a proper grouping
-* card in this case.
-*
-*
-	IF (INDEX(INSTMNT,'XRT') .EQ. 0) THEN
-	   IF ( BASEAXAR .GT. 1.0 .OR. SCALAXAR .GT. 1.0 ) THEN
-	     WRITE(*,*) 'BASE is ',BASEAXAR,'  Should be 1.0'
-	     WRITE(*,*) 'SCALE is ',SCALAXAR,' Should be 1.0'
-	     WRITE(*,*) 'Regenerate HDS file using these vaules.'
-             GOTO 99
-	   ENDIF
-	END IF
 
 *  Check if instrument is ROSAT XRT, WFC, EXOSAT ME or LE.
       NIGNORE = 0
@@ -364,13 +343,12 @@
 	  GEOMAREA = 1141.0
 
 *      Standard ignores for XRT/PSPC are channels 1-7
-          NIGNORE = 1
-          IGSTART(1) = 1
-          IGEND(1) = 7
+C          NIGNORE = 1
+C          IGSTART(1) = 1
+C          IGEND(1) = 7
 
         END IF
 
-*
 C	   CALL DAT_FIND(LOCSRT, 'TIME', LOCTIME, STATUS)
 C*
 C           IF (STATUS .NE. SAI__OK) THEN
@@ -501,7 +479,7 @@ C	  STPTIME = 1.1E6
      :             'Creator of this file', STATUS )
       CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'EXPOSURE', EXTIME,
      :             'Exposure time', STATUS )
-      CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'AREASCAL', GEOMAREA,
+      CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'AREASCAL', 1.0,
      :             'Area scaling factor', STATUS )
       CALL ADI2_PKEY0R( OPHA, 'SPECTRUM', 'BACKSCAL', 1.0,
      :             'Background scaling factor', STATUS )
@@ -556,15 +534,14 @@ C	  STPTIME = 1.1E6
       CALL ADI2_PKEY0C( OPHA, 'SPECTRUM', 'PHAVERSN', '1992a',
      :             'OGIP classification of FITS format style', STATUS )
 
-*  Write astrometry
+*  Write astrometry, detector info and timing
       CALL WCI_PUTIDS( OPHA, PIXID, PRJID, SYSID, STATUS )
       CALL DCI_PUTID( OPHA, DETID, STATUS )
+      CALL TCI_PUTID( OPHA, TIMID, STATUS )
       CALL ADI2_DEFBTB( OPHA, 'SPECTRUM', EDIM, NFIELDS, TTYPE,
      :                  TFORM, TUNIT, 0, STATUS )
 
 *  Write the spectrum
-      CALL DYN_MAPR( 1, EDIM, EAPTR, STATUS )
-      CALL ARR_REG1R( BASEAXAR, SCALAXAR, EDIM, %VAL(EAPTR), STATUS )
       CALL ADI2_GETLUN( OPHA, LUN, STATUS )
       CALL FTPCLE( LUN, 1, 1, 1, EDIM, %VAL(EAPTR), STATUS )
       CALL FTPCLE( LUN, 2, 1, 1, EDIM, %VAL(IDPTR), STATUS )
