@@ -287,7 +287,7 @@
       END DO
 
 *  Get the group of output images.
-      CALL WRNDF( 'OUT', IGRP2, NOUT, NOUT, '  Give more image '//
+      CALL WRNDF( 'OUT', IGRP2, NOUT, 1, '  Give more image '//
      :            'names...', IGRP3, NOUT, STATUS )
 
 *  Space the screen output.
