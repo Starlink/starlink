@@ -112,18 +112,36 @@
 #  Set the return variable to contain the list of points selected.  If 
 #  If we were displaying the indices then return the list with the indices
 #  as plotted, otherwise return the list with indices starting from unity
-#  and increasing to the number of points plotted.
-      if { $SHOWIND } {
-         set POINTS [ .viewer points ]
+#  and increasing to the number of points plotted.  Log the points to the
+#  user while we're at it.
+      set POINTS {}
+      if { [ llength [ .viewer points ] ] == 0 } {
+         ccdputs -log "    No points marked"
       } else {
-         set POINTS {}
+         set frame [ .viewer cget -wcsframe ]
+         set fmt "      %5s   %16s %16s"
+         ccdputs -log "    Points marked (coordinate frame $frame):"
+         ccdputs -log [ format $fmt "Index" \
+                                    [ $ndf frameatt Symbol(1) $frame ] \
+                                    [ $ndf frameatt Symbol(2) $frame ] ]
          set i 0
          foreach point [ .viewer points ] {
-            lappend POINTS [ list [ incr i ] [ lindex $point 1 ] \
-                                             [ lindex $point 2 ] ]
+            set x [ lindex $point 1 ]
+            set y [ lindex $point 2 ]
+            if { $SHOWIND } {
+               set i [ lindex $point 0 ]
+            } else {
+               incr i
+            }
+            lappend POINTS [ list $i $x $y ]
+            set fpos [ lindex \
+                       [ $ndf wcstran -format pixel $frame [ list $x $y ] ] 0 ]
+            set fx [ lindex $fpos 0 ]
+            set fy [ lindex $fpos 1 ]
+            ccdputs -log [ format $fmt $i $fx $fy ]
          }
       }
-
+      
 #  Free resources.
       destroy .viewer
       $ndf destroy
