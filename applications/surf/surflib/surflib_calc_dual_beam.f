@@ -1,4 +1,4 @@
-      SUBROUTINE SURFLIB_CALC_DUAL_BEAM( CHOP_THR, CHOP_PA, DIMS,
+      SUBROUTINE SURFLIB_CALC_DUAL_BEAM( CHOP_THR, CHOP_PA, DIM1, DIM2,
      :     IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR, STATUS)
 *+
 *  Name:
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL SURFLIB_CALC_DUAL_BEAM( CHOP_THR, CHOP_PA, DIMS,
+*     CALL SURFLIB_CALC_DUAL_BEAM( CHOP_THR, CHOP_PA, DIM1, DIM2,
 *    :     IN_DATA, OUT_DATA, USEVAR, IN_VAR, OUT_VAR, STATUS)
 
 *  Description:
@@ -30,8 +30,11 @@
 *        Chop throw in pixels
 *     CHOP_PA  = REAL (Given)
 *        Chop position angle (east of north) in degrees
-*     DIMS ( 2 ) = INTEGER (Given)
-*        Dimensions of image
+*     DIM1 = INTEGER (Given)
+*        First dimension of image
+*     DIM2 = INTEGER (Given)
+*        Second dimension of image [can not use DIMS as an array
+*        since the linux fortran compiler doesnt like it]
 *     IN_DATA = REAL (Given)
 *        Input single-beam image
 *     OUT_DATA = REAL (Returned)
@@ -50,6 +53,11 @@
 
 *  History:
 *     $Log$
+*     Revision 1.2  1999/03/08 20:58:24  timj
+*     Fixes for linux compiler:
+*      - Use DIM1 and DIM2 rather than DIMS(2)
+*      - use COS/SIN rather than COSD/SIND
+*
 *     Revision 1.1  1999/01/12 02:52:01  timj
 *     First version
 *
@@ -66,17 +74,22 @@
 *  Arguments Given:
       REAL    CHOP_THR
       REAL    CHOP_PA
-      INTEGER DIMS(2)
-      REAL    IN_DATA( DIMS(1), DIMS(2) )
-      REAL    IN_VAR ( DIMS(1), DIMS(2) )
+      INTEGER DIM1
+      INTEGER DIM2
+      REAL    IN_DATA( DIM1, DIM2 )
+      REAL    IN_VAR ( DIM1, DIM2 )
       LOGICAL USEVAR
 
 *  Arguments returned:
-      REAL    OUT_DATA( DIMS(1), DIMS(2) )
-      REAL    OUT_VAR ( DIMS(1), DIMS(2) )
+      REAL    OUT_DATA( DIM1, DIM2 )
+      REAL    OUT_VAR ( DIM1, DIM2 )
 
 *  Status:
       INTEGER STATUS
+
+*  Local Constants:
+      REAL    PI
+      PARAMETER (PI = 3.14159265359)
  
 *  Local variables:
       INTEGER DX                ! X Chop offset
@@ -103,13 +116,13 @@
 *     (This is constant for a given pa and throw)
 *     This has to be to the nearest pixel
 
-      DY = NINT( COSD( CHOP_PA ) * CHOP_THR / 2.0 )
-      DX = NINT( SIND( CHOP_PA ) * CHOP_THR / 2.0 )
+      DY = NINT( COS( CHOP_PA * PI / 180.0) * CHOP_THR / 2.0 )
+      DX = NINT( SIN( CHOP_PA * PI / 180.0) * CHOP_THR / 2.0 )
 
 *     Start looping over X and Y
 
-      DO Y = 1, DIMS(2)
-         DO X = 1, DIMS(1)
+      DO Y = 1, DIM2
+         DO X = 1, DIM1
 
 *     Calculate the pixel numbers for the Left and Right beams
             LX = X - DX
@@ -122,8 +135,8 @@
 *     and variance zero
 
 *     Left flux
-            IF (LX .LT. 1 .OR. LX .GT. DIMS(1) .OR.
-     :           LY .LT. 1 .OR. LY .GT. DIMS(2) ) THEN
+            IF (LX .LT. 1 .OR. LX .GT. DIM1 .OR.
+     :           LY .LT. 1 .OR. LY .GT. DIM2 ) THEN
                L_FLUX = 0.0 
                L_VAR  = 0.0
             ELSE
@@ -138,8 +151,8 @@
 
 *     Right flux
 
-            IF (RX .LT. 1 .OR. RX .GT. DIMS(1) .OR.
-     :           RY .LT. 1 .OR. RY .GT. DIMS(2) ) THEN
+            IF (RX .LT. 1 .OR. RX .GT. DIM1 .OR.
+     :           RY .LT. 1 .OR. RY .GT. DIM2 ) THEN
                R_FLUX = 0.0 
                R_VAR  = 0.0
             ELSE
