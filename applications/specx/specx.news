@@ -1,20 +1,46 @@
+1 SPECX - v6.8-1
+ Fixes a bug in the DATE-OBS parser on Linux.
+ 
+ Compares the size of the POSN array with the number of spectra specified
+ in the map header and corrects things if there is an inconsistency.
+ 
+ Also traps the case where a spectrum is requested that is higher than
+ the number of spectra in the map.
+
+1 SPECX - v6.8
+ New Command: SET-DATA-DIRECTORY
+ to change $DATADIR without restarting SPECX
+ 
+ New Command: SWITCH-DATE
+ to change a date part of the DATADIR environment variable and/or a GSD file
+ prefix.
+ 
+ WRITE-ASCII-SPECTRUM now includes more significant figures for the frequency
+ scale.
+ 
+ SET-GSD-FILENAME can now support a prefix up to 100 characters.
+ 
+ Bugs fixed.
+ -----------
+ Problem on Linux with interactive plotting mode where the cursor would
+ move to random position after selecting a point on the spectrum.
+ 
+ READ_GSD ensure variable state retained between calls
+ 
+ SETX Only copy required quadrants.
+ 
+ XSNART Prevent infinite loop on Linux (addressing 0th element of array).
+ 
+ FSW.SPX Use '!' instead of 'or' in IF statement.
+ 
 1 SPECX - v6.7-13
-
-  o Add new command: SET-DATA-DIRECTORY to change $DATADIR without 
-    restarting SPECX
-
-  o Fix problem on linux with interactive plotting mode where the cursor
-    would move to random position after selecting a point on the spectrum
-
-  o WRITE-ASCII-SPECTRUM now includes more significant figures for the
-    frequency scale
-
-  o SET-GSD-FILENAME can now support a prefix up to 100 characters.
-
+ An improved fix for the bug in file-merge fixed in v6.7-12.
+ The TOFITS and GSD2FITS macros have been extended to support wideband spectra.
+ 
 1 SPECX - v6.7-12
 
  Fixes a bug causing false Fortran I/O error reports on Linux.
- Fixes a bug causing file-merge not to work on Linux 
+ Fixes a bug causing file-merge not to work on Linux. 
  Improves startup messages.
  
 1 SPECX - v6.7-11
