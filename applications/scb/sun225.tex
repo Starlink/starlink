@@ -830,6 +830,10 @@ sculib_fit_2d_gaussian_  => surf#surf_sculib.tar>sculib_fit_2d_gaussian.f
 fit_mgauss_              => twodspec#twodspec_opt.tar>opt/fit_mgauss.f
 \end{verbatim}
 \end{quote}
+If the {\tt package} argument is given as well as the {\tt type=regex}
+argument, then only the package specified will be searched.
+
+
 
 
 \subsubsection{\xlabel{sec:extract-flags}\label{sec:extract-flags}Command line flags}
@@ -915,7 +919,9 @@ in the package specified, then that one will be presented.
 If it is not in that package, or if no package is specified, 
 then any such item in the whole source tree will be presented.
 In particular, this means that even when one package is specified here,
-a routine from another package may be presented.
+a routine from another package may be presented.\\
+If the Type of item is ``Search term'' however, then filling in this
+field will restrict the search to the named package.
 \end{description}
 
 Instead of entering the name of the file or routine you wish to
