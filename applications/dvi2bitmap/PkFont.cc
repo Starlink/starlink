@@ -195,11 +195,14 @@ void PkFont::verbosity (const verbosities level)
 // the kpathsea library.
 //
 // Return true if we found a file to open, and return the path in the
-// argument, which is unchanged otherwise.  Return false on error.  
-// Success doesn't guarantee 
-// that the file exists, just that it was constructed without problems
-// (in fact, in both cases, success _does_ mean that
-// the file was found, but this is not guaranteed by this routine).
+// argument, which is unchanged otherwise.  Return false on error.
+// Success doesn't guarantee that the file exists, just that it was
+// constructed without problems (in fact, in both cases, success
+// _does_ mean that the file was found, but this is not guaranteed by
+// this routine).
+//
+// XXX honour an option -M (like dvips and xdvi) to suppress
+// generating a font file and sticking to missfont.log instead.
 bool PkFont::find_font (string& path)
 {
     bool got_it = false;
@@ -208,7 +211,7 @@ bool PkFont::find_font (string& path)
     /// ((double)font_header_.d * 1000.0);
 
     if (verbosity_ > normal)
-	cerr << "Font file: " << name_
+	cerr << "PkFont::find_font: " << name_
 	     << ", checksum=" << font_header_.c
 	     << ", res " << resolution_
 	     << '*' << magnification()
@@ -237,11 +240,16 @@ bool PkFont::find_font (string& path)
     if (pkpath.length() != 0)
     {
 	string& found_file = search_pkpath (pkpath, name_, scaled_res);
+
 	if (found_file.length() > 0)
 	{
 	    path = found_file;
 	    got_it = true;
 	}
+
+        if (verbosity_ > normal)
+            cerr << "PkFont::find_font: search_pkpath produced "
+                 << (got_it ? path : "...nothing!") << endl;
     }
 
 #if ENABLE_KPATHSEA
@@ -257,6 +265,12 @@ bool PkFont::find_font (string& path)
 	    path = kpse_file;
 	    got_it = true;
 	}
+
+        if (verbosity_ > normal)
+            cerr << "PkFont::find_font: kpathsea::find("
+                 << name_ << "," << static_cast<int>(scaled_res) << ") = "
+                 << (got_it ? path : "...nothing!") << endl;
+
     }
 #endif
 
@@ -285,6 +299,8 @@ bool PkFont::find_font (string& path)
 	}
     }
 #endif /* defined(FONT_SEARCH_SCRIPT) */
+
+    // XXX write substitute_font_string to missfont.log
 
     return got_it;
 }
@@ -368,7 +384,10 @@ string& PkFont::search_pkpath (string path, string name, double resolution)
 	}
     }
 
-    return fname;	
+    if (!found)
+        fname = "";
+    
+    return fname;
 }
 
 // Given a format string, return a reference to a string with format
