@@ -17,6 +17,8 @@ DviFile::DviFile (string s)
     {
 	dvif_ = new InputByteStream (s);
 	read_postamble();
+	posStack_ = new PosStateStack(postamble_.s);
+	dvif_->seek(0);		// return to beginning
     }
     catch (InputByteStreamError& e)
     {
@@ -128,35 +130,28 @@ DviFileEvent *DviFile::getEvent()
 		page.isStart = true;
 		gotEvent = &page;
 		h_ = v_ = w_ = x_ = y_ = z_ = 0;
+		posStack_->clear();
 		break;
 	      case 140:		// eop
 		page.isStart = false;
 		gotEvent = &page;
-		if (!posStack_.empty())
+		if (!posStack_->empty())
 		    throw DviBug("EOP: position stack not empty");
 		break;
 	      case 141:		// push
 		{
-		    // const PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
-		    // posStack_.push(*ps);
-		    PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
-		    posStack_.push(ps);
+		    const PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
+		    posStack_->push(ps);
+		    //PosState *ps = new PosState(h_,v_,w_,x_,y_,z_);
+		    //posStack_.push(ps);
 		    if (debug_)
 			cerr << ">>ps=" << ps << '\n';
 		}
 		break;
 	      case 142:		// pop
 		{
-		    PosState *ps = posStack_.top();
-		    posStack_.pop();
-		    h_ = ps->h;
-		    v_ = ps->v;
-		    w_ = ps->w;
-		    x_ = ps->x;
-		    y_ = ps->y;
-		    z_ = ps->z;
-		    delete ps;
-		    //PosState *ps = posStack_.pop();
+		    //PosState *ps = posStack_.top();
+		    //posStack_.pop();
 		    //h_ = ps->h;
 		    //v_ = ps->v;
 		    //w_ = ps->w;
@@ -164,6 +159,14 @@ DviFileEvent *DviFile::getEvent()
 		    //y_ = ps->y;
 		    //z_ = ps->z;
 		    //delete ps;
+		    const PosState *ps = posStack_->pop();
+		    h_ = ps->h;
+		    v_ = ps->v;
+		    w_ = ps->w;
+		    x_ = ps->x;
+		    y_ = ps->y;
+		    z_ = ps->z;
+		    delete ps;
 		    if (debug_)
 			cerr << "<<ps=" << ps << '\n';
 		}
@@ -433,6 +436,8 @@ bool DviFile::eof()
 
 void DviFile::read_postamble()
 {
+    const tailbuflen = 64;
+    /*
     dvif_->gotoEnd();
     Byte dviB;
     while ((dviB = dvif_->getByte(0)) == 223)
@@ -444,11 +449,33 @@ void DviFile::read_postamble()
     if (dvif_->getByte() != 249)
 	throw DviError
 	    ("DviFile::read_postamble: post_post not in correct place");
-    unsigned int q = dvif_->getUIU(4);
+    */
+    // get final 64 bytes of file
+    const Byte *dviBuf = dvif_->getBlock(-1, tailbuflen);
+    const Byte *p;
+    for (p=dviBuf+tailbuflen-1; p>=dviBuf; p--)
+	if (*p != 223)
+	    break;
+    if (p < dviBuf+5)
+	// buffer doesn't contain post opcode plus q plus id byte
+	throw DviError ("DviFile::read_postamble: can't find post_post");
+    if (*p != 2)
+	// should be identification byte, 2
+	throw DviError ("DviFile::read_postamble: identification byte not 2");
+    p -= 5;			// should now be pointing at post_post opcode
+    if (*p != 249)
+	throw DviError
+	    ("DviFile::read_postamble: post_post not in correct place");
+    p++;
+    unsigned int q = InputByteStream::getUIU(4, p);
     if (debug_)
 	cerr << "Postamble address=" << q << '\n';
+
     dvif_->seek(q);
-    unsigned int int4 = dvif_->getUIU(4); // numerator
+    if (getByte() != 248)
+	throw DviError ("DviFile::read_postamble: expected post command");
+    unsigned int int4 = dvif_->getUIU(4); // final bop
+    int4 = dvif_->getUIU(4);	// numerator
     int4 = dvif_->getUIU(4);	// denominator
     int4 = dvif_->getUIU(4);	// mag
     postamble_.l = dvif_->getUIU(4);    
@@ -517,24 +544,31 @@ const
 	comment << "\'\n";
 }
 
-/*
-void DviFile::PosStateStack::push(PosState *p)
+void DviFile::PosStateStack::push(const PosState *p)
 {
     if (i == size)
-	// call it a bug
+	// call it a bug, though it might be the DVI file at fault, since
+	// the stack size should be set from the s parameter in the postamble
 	throw DviBug("Stack overflow");
     s[i++] = p;
 }
-DviFile::PosState *DviFile::PosStateStack::pop()
+const DviFile::PosState *DviFile::PosStateStack::pop()
 {
     if (i == 0)
 	// the DVI file's at fault, here
 	throw DviError("Stack underflow");
     return s[--i]; 
 }
-DviFile::PosStateStack::PosStateStack()
-	: size(100),i(0) 
+DviFile::PosStateStack::PosStateStack(int size)
+	: size(size),i(0) 
 {
-    s = new (PosState*)[size];
+    s = new (const PosState*)[size];
 }
-*/
+void DviFile::PosStateStack::clear()
+{
+    if (i == 0)
+	return;
+    do
+	delete s[--i];
+    while (i != 0);
+}
