@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- component.xml.  Generated from component.xml.in by configure. -->
+
+<component id="mers">
+  <version>1.8</version>
+  <path>libraries/mers</path>
+  <description>Message and Error Reporting Systems</description>
+  <abstract><p>This package contains two Fortran subroutine libraries,
+      MSG and ERR, which can be used to provide informational text to
+      the user from any application program.  It also contains a
+      preliminary C interface for the two libraries -- this may be
+      subject to change in the light of experience.</p>
+    <p>The Message Reporting System, MSG, is used for reporting
+      non-error information and the Error Reporting System, ERR, is
+      used specifically for reporting error messages.</p>
+  </abstract>
+  <dependencies>
+    <build> ems sae cnf messgen messgen</build>
+    <use> chr psx subpar</use>
+  </dependencies>
+  <developers>
+    <person>
+      <name>P C T Rees</name>
+    </person>
+    <person>
+      <name>Alan J Chipperfield</name>
+      <uname>ajc</uname>
+      <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation> 
+  <bugreports>ussc@star.rl.ac.uk</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>

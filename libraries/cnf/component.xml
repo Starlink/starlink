@@ -14,7 +14,7 @@
       character strings, logical values and pointers to dynamically
       allocated memory.</p></abstract>
   <dependencies>
-    <build>starconf star2html</build>
+    <build></build>
     <use></use>
   </dependencies>
   <developers>
@@ -32,7 +32,7 @@
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
   </developers>
-  <documentation> sun209</documentation>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

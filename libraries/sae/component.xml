@@ -12,7 +12,7 @@
       in the Starlink environment, and for building the USSC.</p>
   </abstract>
   <dependencies>
-    <build>starconf star2html messgen</build>
+    <build> messgen</build>
     <use></use>
   </dependencies>
   <developers>
@@ -22,7 +22,7 @@
       <email>NONE</email>
     </person>
   </developers>
- <documentation> sun191</documentation> 
+ <documentation>@STAR_DOCUMENTATION@</documentation> 
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

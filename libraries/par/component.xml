@@ -21,7 +21,7 @@
       library -- this may be subject to change in the light of experience.</p>
   </abstract>
   <dependencies>
-    <build>starconf cnf sae mers subpar star2html messgen</build>
+    <build> cnf sae mers subpar messgen</build>
     <use> chr</use>
   </dependencies>
   <developers>
@@ -36,7 +36,7 @@
       <email>A.J.Chipperfield@rl.ac.uk</email>
     </person>
   </developers>
-  <documentation> sun114</documentation>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
