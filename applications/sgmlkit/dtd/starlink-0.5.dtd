@@ -284,6 +284,22 @@
 
 
 <!--======== Shortrefs ==========-->
+<!--
+  Have double-dash as a shortref for &endash, but don't define a
+  separate shortref for emdash.  This way, we could switch between
+  endash and emdash by changing this declaration. -->
+<!shortref textabbrevsmap	"--"	endash
+				"_"	underscore
+				"~"	nbsp>
+<!-- 
+    Enable this map in the following elements.  This means it's
+    enabled in all of %body.content, plus miscellaneous other places
+    like the abstract, plus section and other titles
+-->
+<!usemap textabbrevsmap (p | px | table | figure | title)>
+<!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
+<!usemap #empty (m|mequation|meqnarray|verbatim|code|kbd)>
+
 <![ ignore [
 <!-- The quote shortref achieves little, and leads to puzzling errors --
   -- when you use a quote character in <verbatim> for example. -->
@@ -298,16 +314,6 @@
 <!usemap textabbrevsmap (p | px)>
 <!usemap Qmap           quote>
 ]]>
-<!--
-  Have double-dash as a shortref for &endash, but don't define a
-  separate shortref for emdash.  This way, we could switch between
-  endash and emdash by changing this declaration. -->
-<!shortref textabbrevsmap	"--"	endash
-				"_"	underscore
-				"~"	nbsp>
-<!usemap textabbrevsmap (p | px)>
-<!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
-<!usemap #empty (m|mequation|meqnarray|verbatim|code|kbd)>
 
 <!--========== Abbreviations ==========-->
 
