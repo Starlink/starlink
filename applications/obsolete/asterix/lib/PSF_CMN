@@ -12,6 +12,8 @@
 *      10 Mar 94 : Last structures removed (DJA)
 *      23 Mar 95 : Split initialisation in two (DJA)
 *      27 Jul 95 : Added AUTO flag (DJA)
+*       1 May 1996 (DJA):
+*         Removed library stuff
 *-
 
       INTEGER                   PSF_E_NONE        	! Energy modes
@@ -24,12 +26,11 @@
       INTEGER                   PGRID_MAXR		! Max bins in polar model
         PARAMETER               ( PGRID_MAXR = 30 )
 
-*    Psf system initialised
+*  Psf system initialised
       LOGICAL                 	PSFINIT			! System initialised?
-      LOGICAL                 	PSFLIBINIT		! Library system init?
       LOGICAL                   PSFAUTO                 ! Automatic mode
 
-*    Spatial model
+*  Spatial model
       LOGICAL		        SM_SIZEDEF(PSF_NMAX) 	! Model extent defined?
       INTEGER                   SM_NX(PSF_NMAX)   	! Model extent
       INTEGER                   SM_NY(PSF_NMAX)   	! Model extent
@@ -50,36 +51,17 @@
       REAL		        SM_R_DX(PSF_NMAX)	!      "       "
       REAL		        SM_R_DY(PSF_NMAX)	!      "       "
 
-*    Energy model
+*  Energy model
       INTEGER                   EM_MODE(PSF_NMAX)
       INTEGER                   EM_NBIN(PSF_NMAX)
       INTEGER                   EM_CBPTR(PSF_NMAX)
       LOGICAL                   EM_OK(PSF_NMAX)
 
-*    Library data
-      CHARACTER*80              L_NAME(PSF_LMAX)  	! Library names
-      CHARACTER*15              L_MODN(PSF_NMAX,  	! Module names
-     :                               PSF_LMAX)
-      INTEGER                   L_MOD_I(PSF_NMAX, 	! Psf init routines
-     :                                PSF_LMAX)
-      INTEGER                   L_MOD_D(PSF_NMAX, 	! Psf data routines
-     :                                PSF_LMAX)
-      INTEGER                   L_MOD_H(PSF_NMAX, 	! Psf hint routines
-     :                                PSF_LMAX)
-      INTEGER                   L_MOD_C(PSF_NMAX, 	! Psf closure routines
-     :                                PSF_LMAX)
-      INTEGER                   L_NLEN(PSF_LMAX)  	! Library name lengths
-      INTEGER                   L_NMOD(PSF_LMAX)  	! No of modules in library
-      INTEGER                   L_HAN(PSF_LMAX)   	! Library handle
-      INTEGER                   L_NLIB			! Number of active libraries
-
-*   Psf list
+*  Psf list
       INTEGER			P_PLIST			! ADI structure
 
-*    Psf instance data
+*  Psf instance data
       LOGICAL                   P_USED(PSF_NMAX)  	! Slot in use
-      INTEGER                   P_LIBID(PSF_NMAX) 	! Psf library id
-      INTEGER                   P_MODID(PSF_NMAX) 	! Psf module id
       LOGICAL                   P_EVDS(PSF_NMAX)  	! File is an event dataset
       LOGICAL                   P_MODEL(PSF_NMAX) 	! Psf is a model
       LOGICAL                   P_EOK(PSF_NMAX)   	! Psf energy dependent?
@@ -88,15 +70,12 @@
       INTEGER			P_FID(PSF_NMAX)		! Dataset identifiers
       INTEGER			P_PSID(PSF_NMAX)	! Psf description
 
-*    Time and energy bands
+*  Time and energy bands
       LOGICAL                   TE_INIT           	! Initialised yet?
       INTEGER                   TE_ELO, TE_EHI    	! Energy bands
       DOUBLE   PRECISION        TE_TLO, TE_THI    	! Time bands
 
-*    Character common block
-      COMMON /PSF_CMN_C/	L_NAME, L_MODN 		! Library stuff
-
-*    Non-character common block
+*  Non-character common block
       COMMON /PSF_CMN/
      :          SM_SIZEDEF, SM_NX, SM_NY,  		! Spatial model
      :            SM_NELM, SM_GOTDATA, SM_DATA,
@@ -106,11 +85,8 @@
      :            SM_R_NY, SM_R_DX, SM_R_DY,
      :          TE_TLO, TE_THI, TE_ELO, TE_EHI,		! Time/energy bands
      :            TE_INIT,
-     :          L_NLIB, L_NLEN, L_NMOD,	L_HAN,  	! Library stuff
-     :            L_MOD_I, L_MOD_D,
-     :            L_MOD_C, L_MOD_H,
-     :          P_USED, P_LIBID, P_MODID, P_EOK, 	! Psf instances
+     :          P_USED, P_EOK, 				! Psf instances
      :            P_EVDS, P_MODEL, P_INST, P_GOTAX,
      :            P_FID, P_PSID, P_PLIST,
      :          EM_MODE,EM_NBIN,EM_CBPTR,EM_OK, 	! Energy model specs
-     :          PSFAUTO,PSFLIBINIT,PSFINIT			! System initialised flag
+     :          PSFAUTO,PSFINIT				! System initialised flag
