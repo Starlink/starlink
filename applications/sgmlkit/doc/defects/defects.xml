@@ -4,7 +4,7 @@
 
 <defectslist>
 
-<title>SGML project defect list</title>
+<title>SGML project issues list</title>
 
 <version>$Revision$</version>
 <date>$Date$</date>
@@ -218,13 +218,13 @@ of us wants to tidy it up at all, we can.</p>
 <title>Down-converters</title>
 
 <defect status="open" originator="Mark">
-<title>Nested CODE elements</title>
+<title>LaTeX: Nested CODE elements</title>
 <p>CODE elements within other elements like STRONG don't always
 come out in tt-type.</p>
 </defect>
 
 <defect status="open" originator="Mark">
-<title>Process picture environments with maths in DC</title>
+<title>LaTeX: Process picture environments with maths in DC</title>
 <p>Should be fairly easy.  Can I do metapost at the same time?</p>
 </defect>
 
@@ -236,23 +236,24 @@ when I can do it properly.</p>
 </defect>
 
 <defect status="open" originator="Norman">
-<title>DT element in LaTeX </title>
+<title>LaTeX: DT element</title>
 <p>Tweak the generated LaTeX so that {description} \item s are
 cleverer about spacing.</p>
 </defect>
 
 <defect status="open" originator="Mark" date="9-Sep-1999">
-<title>REF/maths in DT in LaTeX doesn't insert text</title>
+<title>LaTeX: REF/maths in DT in LaTeX doesn't insert text</title>
 <p>Haven't investigated</p>
 </defect>
 
 <defect status="open" originator="Mark">
-<title>LaTeX pages are smaller than standard, and positioned differently</title>
+<title>LaTeX: pages are smaller than standard, and positioned differently</title>
 <p>Should need only the most minor tweaking.</p>
 </defect>
 
 <defect status="open" originator="Mark">
 <title>KBD in VERBATIM doesn't work</title>
+<p>Haven't investigated</p>
 </defect>
 
 <defect status="closed" originator="Rodney, Mark">
@@ -272,7 +273,7 @@ DC does better.</p>
 </defect>
 
 <defect status="open" originator="Mark" date="15-Sep-1999">
-<title>TeX global declarations</title>
+<title>LaTeX: global declarations</title>
 <p>A collection of \newcommands at the head of the document.</p>
 <p>Mmm, I've now forgotten what this means.  I can't remember if we
 discussed this and decided it was probably a bad idea.  There's
@@ -283,7 +284,7 @@ because it's arcane).</p>
 </defect>
 
 <defect status="closed" originator="Mark" date="15-Sep-1999">
-<title>LaTeX programcode formatting</title>
+<title>LaTeX: programcode formatting</title>
 <p>The results are very ugly at present.</p>
 <resolution status="fixed" author="Norman" date="15-May-2000">
 <p>Use an adapted version of the SST macros in the generated LaTeX.
@@ -293,7 +294,7 @@ redesign of the output in future.</p>
 </defect>
 
 <defect status="closed" originator="Mark">
-<title>HTML programcode formatting</title>
+<title>HTML: programcode formatting</title>
 <p>This is still pretty hideous.  Should be made to look more like the
 current star2html output.</p>
 <resolution status="fixed" author="Norman" date="29-May-2000">
@@ -306,7 +307,7 @@ redesign of both the formatters and the format.</p>
 </defect>
 
 <defect status="open" originator="Norman" date="29-May-2000">
-<title>programcode next/previous and TOC occasionally wrong</title>
+<title>HTML: programcode next/previous and TOC occasionally wrong</title>
 <p>At great effort, the HTML formatting of programcode documents now
 both splits routines into separate files (not toooo hard) and manages
 `up' links to the rest of the document (damn hard, as it turns out).
@@ -322,6 +323,13 @@ of the big reasons supporting a redesign of the down-converters, so
 that they work via an intermediate XML file, so that the messy
 business of fixing up cross-references can be done more sanely.</p>
 </resolution>
+</defect>
+
+<defect status="open" originator="Mark" date='29-May-2000'>
+<title>LaTeX: underscore and angle-brackets wrongly formatted</title>
+<p>Underscore appears in generated LaTeX as \char95, which comes out
+funny.  Left and right angle brackets appear unescaped, so come out
+like upside-down punctuation.</p>
 </defect>
 
 </defectgroup>
