@@ -6,7 +6,7 @@ libpolsub_la_SOURCES = $(F_ROUTINES) $(C_ROUTINES)
 
 F_ROUTINES = pol1_ctclm.f  pol1_hist2.f  pol1_sngad.f  pol1_stkim.f \
 pol1_ctprp.f  pol1_hist.f   pol1_sngbm.f  pol1_stknm.f \
-gethlp.f      pol1_dbeam.f  pol1_imfit.f  pol1_sngcl.f  pol1_stksm.f \
+gethlp.f      pol1_dbeam.f  pol1_sngcl.f  pol1_stksm.f \
 gthlpi.f      pol1_deftb.f  pol1_imprt.f  pol1_sngct.f  pol1_subst.f \
 pol1_dftab.f  pol1_knext.f  pol1_sngfl.f  pol1_tiqac.f \
 pol1_3dwcs.f  pol1_dulbm.f  pol1_lnam.f   pol1_snghd.f  pol1_vecky.f \
