@@ -23,7 +23,7 @@ f+
 \newcommand{\stardocnumber}    {210.10}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {11th September 2001}
+\newcommand{\stardocdate}      {1th September 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -7098,7 +7098,7 @@ c-
 f+
 Routines 
 f-
-are avilable to find the distance between two points, and to offset a 
+can be used to find the distance between two points, and to offset a 
 specified distance along a line joining two points, {\em{etc.}} In essence, 
 these define the metric of the coordinate space which the Frame represents. In
 the case of a basic Frame, this is a Cartesian metric.
@@ -7245,16 +7245,21 @@ f+
 The AST\_OFFSET2 routine is similar to AST\_OFFSET, but instead of using the
 f-
 geodesic which passes through two positions, it uses the geodesic which
-passes at a given position angle through the starting position. For
-SkyFrames, the position angle is the angle from north to the required
-geodesic, with positive rotation in the same sense as rotation from north
-to east. Any permutation of the axes in a SkyFrame is taken into
-account when interpreting position angles. For simple Frames, axis
-permutations are ignored, and the position angle is always the angle 
-between the positive direction of the second Frame axis to the required
-line, with positive angles being in the same sense as rotation from the 
-positive direction of the second axis to the positive direction of the 
-first Frame axis. 
+passes at a given position angle through the starting position. 
+
+Position angles are always measured from the positive direction of the 
+second Frame axis to the required line, with positive angles being in the 
+same sense as rotation from the positive direction of the second axis to 
+the positive direction of the first Frame axis. This definition applies
+to all classes of Frame, including SkyFrame. The default ordering of axes
+in a SkyFrame makes the second axis equivalent to north, and so the
+definition of position angle given above corresponds to the normal 
+astronomical usage, ``from north, through east''. However, it should be
+remembered that it is posible to permute the axes of a SkyFrame (or
+indeed any Frame), so that north becomes axis 1. In this case, an AST
+``position angle'' would be the angle ``from east, through north''. 
+Always take the axis ordering into account when deriving an astronomical 
+position angle from an AST position angle.
 
 Within a Cartesian coordinate system, the position angle of a geodesic
 ({\em{i.e.}}\ a straight line) is constant along its entire length, but
@@ -7293,19 +7298,17 @@ calculates the angle subtended by two points, at a third point.
 If used with a 2-dimensional Frame the returned angle
 is signed to indicate the sense of rotation (clockwise or anticlockwise)
 in taking the ``shortest route'' from the first point to the second.
-If used with a 3-dimensional Frame the result is un-signed. Other
-dimensionalities cause a value of AST\_\_BAD to be returned.
+If the Frame has more than 2 axes, the result is un-signed and is always
+in the range zero to $\pi$. 
 
 c+
-The astBear function 
+The astAxAngle function is similar to astAngle,
 c-
 f+
-The AST\_BEAR routine 
+The AST\_AXANGLE routine is similar to AST_AXANGLE,
 f-
-calculates the position angle of one point as seen from a second point
-within a 2 dimensional Frame (an error is reported if the Frame is not
-2 dimensional). Again, the algorithm used is appropriate to the class of
-the Frame.
+but the ``reference direction'', from which angles are measured, is 
+a specified axis. 
 
 c+
 The astResolve function
