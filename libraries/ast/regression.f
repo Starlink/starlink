@@ -359,13 +359,20 @@
       IMPLICIT NONE
 
       CHARACTER TEXT*(*), JUST*(*)
-      REAL X, Y, UPX, UPY, XB, YB
+      REAL X, Y, UPX, UPY, XB(4), YB(4)
 
 c      WRITE(*,*) 'REG_TXEXT: ''', TEXT,''''
 c      WRITE(*,*) '   ', X, Y, ' ''', JUST,''' ', UPX, UPY
 
-      XB = LEN( TEXT )*0.5
-      YB = 0.5
+      XB( 1 ) = X - LEN( TEXT )*0.5
+      XB( 2 ) = X + LEN( TEXT )*0.5
+      XB( 3 ) = XB( 2 )
+      XB( 4 ) = XB( 1 )
+
+      YB( 1 ) = Y - 0.5
+      YB( 2 ) = YB( 1 )
+      YB( 3 ) = Y + 0.5
+      YB( 4 ) = YB( 3 )
 
       REG_TXEXT = 1
       END

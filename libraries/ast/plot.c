@@ -18005,6 +18005,13 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
       }
    }
 
+/* If all the labels overlapped labels on a previous axis, arbitrarily
+   use the middle label as the root label (this should never happen but
+   is included to avoid segmentation violations occurring in error
+   conditions such as the txExt function being buggy and cuasing spurious
+   overlaps). */
+   if( root == -1 ) root = nlab/2;   
+
 /* Assign a priority higher than any other priority to the root label. */
    list[ root ].priority = nzmax + 1;
    list[ root ].saved_prio = nzmax + 1;
