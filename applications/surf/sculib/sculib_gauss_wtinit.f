@@ -37,38 +37,38 @@
 *     STATUS = INTEGER (Given & Returned)
 *        Global status
 
-*    Authors:
+*  Authors:
 *     T. Jenness (timj@jach.hawaii.edu)
 
+*  History:
+*     $Log$
+*     Revision 1.2  1999/07/29 21:51:06  timj
+*     Add History: tag to header.
+*
 
 *-
 
-*    Type definitions
+*  Type definitions
       IMPLICIT NONE
 
-*    External constants:
+*  External constants:
       INCLUDE 'SAE_PAR'
-*    External functions:
 
-*    Local constants
-
-*    Import:
+*  Arguments Given:
       INTEGER RES                    ! Number of resolution elements
       INTEGER RADIUS                 ! Radius (in scale lengths)
       INTEGER STATUS
 
-*    Import-Export:
+*  Arguments Given & Returned:
       REAL WTFN(RES * RES * RADIUS * RADIUS + 1)
 
-*    Local variables:
+*  Local variables:
       INTEGER I                          ! Counter
       INTEGER SIZE                       ! Number of points in WTFN
       INTEGER FILTER_SQ                  ! RES squared
       INTEGER FILTRAD_SQ                 ! RADIUS squared
       REAL    POS                        ! Distance from centre **2
       REAL    SCAL_LENGTH_SQ             ! Scale length
-
-*    Local Data:
 *.
 
 
