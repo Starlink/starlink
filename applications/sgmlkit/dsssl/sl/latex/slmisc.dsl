@@ -262,11 +262,10 @@ to need explanation or elaboration.
     (make fi data: "\\\\")))
 
 (element verbatim
-  (make environment name: "small"
-	(make environment
-	  name: "Verbatimlines"
-	  recontrol: "/-/"
-	  (process-children))))
+  (make environment
+    name: "Verbatimlines"
+    recontrol: "/-/"
+    (process-children)))
 
 (element attribution
   (make command name: "textit"
