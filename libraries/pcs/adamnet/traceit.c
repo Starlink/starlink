@@ -6,11 +6,12 @@
 #include <signal.h>
 #include <errno.h>
 #include <unistd.h>
+
 #include "sae_par.h"
-#include "adamdefns.h"
-#include "mesdefns.h"
+#include "adam_defns.h"
 #include "dtask_err.h"             /* dtask error codes */
 
+#include "messys_len.h"
 #include "messys_err.h"
 #include "messys_par.h"
 
