@@ -16,9 +16,9 @@
 \newcommand{\stardocsource}    {sun\stardocnumber}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {214.5}
+\newcommand{\stardocnumber}    {214.6}
 \newcommand{\stardocauthors}   {Peter W. Draper}
-\newcommand{\stardocdate}      {23 June 1999}
+\newcommand{\stardocdate}      {12 November 1999}
 \newcommand{\stardoctitle}     {GAIA -- Graphical Astronomy and
                                 Image Analysis Tool}
 \newcommand{\stardocversion}   {2.3}
@@ -222,7 +222,7 @@ catalogues.}
 
 % ? Add picture here if required.
    \begin{center}
-   \htmladdimg{sun214.gif}
+   \htmladdimg{sun214.jpg}
    \end{center}
 % ? End of picture
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -230,9 +230,8 @@ catalogues.}
    \stardocauthors \\
    \stardocdate
    \begin{rawhtml} </I> </P> <H3> \end{rawhtml}
-      \htmladdnormallink{CCLRC}{http://www.cclrc.ac.uk} /
-      \htmladdnormallink{Rutherford Appleton Laboratory}
-                        {http://www.cclrc.ac.uk/ral} \\
+      \htmladdnormallink{CCLRC / Rutherford Appleton Laboratory}
+                        {http://www.cclrc.ac.uk} \\
       \htmladdnormallink{Particle Physics \& Astronomy Research Council}
                         {http://www.pparc.ac.uk} \\
    \begin{rawhtml} </H3> <H2> \end{rawhtml}
@@ -892,7 +891,7 @@ Other minor changes in this release include:
   considerably speeded up.
 \end{itemize}
 
-\subsection{This release - 2.3}
+\subsection{Release - 2.3}
   This release includes two new toolboxes and many other enhancements.
 
   The new toolboxes are:
@@ -953,10 +952,44 @@ Other minor changes in this release include:
 
     \item Many others too numerous to mention.
 \end{itemize}
-
 Internally there have been many changes to GAIA, one consequence of
 which is that most of the keyboard shortcuts are changed. Most
 notably the interactive slice is now bound to \mytt{<control-a>}.
+
+\subsection{This release 2.3-2}
+This is a minor update to GAIA with the following fixes:
+\begin{itemize}
+  \item A percentiles option has been added to automatic contour
+      generation.
+
+  \item The \mytt{automatic} and \mytt{percent} generation options now
+        correctly use the image to be contoured not the displayed image.
+
+  \item The measure band can now display pixels and non-celestial
+        coordinate system offsets.
+
+  \item The SExtractor toolbox increment and decrement arrows now work 
+        the obvious way around.
+
+  \item Automatic NDF history recording should be working again.
+
+  \item NDFs stored within container files are now supported.
+
+  \item Floating point images of size $35000*2048$ pixels are now 
+        known to display (if you have sufficient VM). Bigger images
+        may also now work.
+
+  \item Pixel coordinates (which include the NDF origin) can now be
+        selected as the \mytt{celestial} coordinate system (see the
+        \mytt{Celestial coordinates...} toolbox)
+
+  \item Blank pixels in unsigned word NDFs should be be handled 
+        correctly.
+
+  \item The on-line help for the photometry toolbox should be
+        available again. 
+\end{itemize}
+
 
 \section{\xlabel{acknowledgements}Acknowledgements}
 
