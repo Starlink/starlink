@@ -1,5 +1,5 @@
 package PDL::IO::NDF;
- 
+
 =head1 NAME
 
 PDL::IO::NDF - PDL Module for reading and writing Starlink
