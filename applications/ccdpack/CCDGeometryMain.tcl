@@ -71,14 +71,7 @@
 #  Set the HTML docs installation points.
    if { [ info exists env(CCDPACK_HTML) ] } {
       set CCDstarhtml $env(CCDPACK_HTML)
-   } else {
-      if { [info exists env(STARLINK)] } {
-         set CCDstarhtml "$env(STARLINK)/docs:$env(STARLINK)/help"
-      } else {
-
-#  Use a relative offset to CCDdir.
-         set CCDstarhtml "$CCDdir/../../docs:$CCDdir/../../help"
-      }
+      set CCDstarhtml "$CCDdir/../../help:$CCDdir/../../docs:$CCDdir"
    }
 
 #  Set the help browser. This is either set by the HTX_BROWSER variable,
