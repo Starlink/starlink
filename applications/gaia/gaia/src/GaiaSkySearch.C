@@ -444,9 +444,13 @@ int GaiaSkySearch::csizeCmd( int argc, char *argv[] )
     os << ends;
     set_result(os.str());
     delete os.str();
+    delete [] sizes;
   }
   if ( mainArgc > 0 ) {
     Tcl_Free( (char *) mainArgv );
+  }
+  if ( rowArgc > 0 ) {
+    Tcl_Free( (char *) rowArgv );
   }
   return TCL_OK;
 }

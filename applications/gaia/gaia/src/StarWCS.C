@@ -62,8 +62,8 @@ extern "C" {
                            int indim, const double (*in)[1], int forward,
                            int ncoord_out, int outdim, double (*out)[1] )
   {
-    astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in, 
-              forward, ncoord_out, outdim, (double (*)[])out); 
+    astTranN( map, npoint, ncoord_in, indim, (const double (*)[])in,
+              forward, ncoord_out, outdim, (double (*)[])out);
   }
 }
 
@@ -122,21 +122,23 @@ StarWCS::StarWCS(const char* header)
       nxpix_ = 1;
       astClear( fitschan, "Card" );
       if ( astFindFits( fitschan, "NAXIS1", card, 1) ) {
-        if ( ptr = strstr( card, "=" ) )
+        if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
           sscanf( ++ptr, "%d", &nxpix_ );
+	}
       }
       nypix_ = 1;
       astClear( fitschan, "Card" );
       if ( astFindFits( fitschan, "NAXIS2", card, 1) ) {
-        if ( ptr = strstr( card, "=" ) )
+        if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
           sscanf( ++ptr, "%d", &nypix_ );
+	}
       }
 
       // Record axis rotation.
       rotate_ = 0.0;
       astClear( fitschan, "Card" );
       if ( astFindFits( fitschan, "CROTA1", card, 1) ) {
-        if ( ptr = strstr( card, "=" ) ) {
+        if ( ( ptr = strstr( card, "=" ) ) != (char *)NULL ) {
           float value;
           sscanf( ++ptr, "%g", &value );
           rotate_ = (double) value;
@@ -256,11 +258,75 @@ int StarWCS::astWCSReplace( AstFrameSet *newwcs )
 //
 void StarWCS::setSecPix()
 {
-  // Note the WCS width and height
-  xSecPix_ = width()*60./pixWidth();
-  ySecPix_ = height()*60./pixHeight();
-}
+  if (!isWcs()) {
+    xSecPix_ = 0.0;
+    ySecPix_ = 0.0;
+  }
 
+  double point1[2], point2[2];
+  double xin[2], yin[2], xout[2], yout[2];
+  double dist;
+  double xcen, ycen;
+
+  //  Compute the scales the the sizes of a pixel near the centre of
+  //  the image.
+  xcen = 0.5 * ( (double) nxpix_ );
+  ycen = 0.5 * ( (double) nypix_ );
+  xin[0] = xcen - 0.5;
+  xin[1] = xcen + 0.5;
+  yin[0] = yin[1] = ycen;
+  
+  // Transform these image positions into sky coordinates.
+  astTran2( wcs_, 2, xin, yin, 1, xout, yout );
+
+  // And now get the distance between these positions in degrees.
+  if ( raIndex_ == 1 ) {
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+  } else {
+    point1[1] = xout[0];
+    point1[0] = yout[0];
+    point2[1] = xout[1];
+    point2[0] = yout[1];
+  }
+  dist = astDistance( wcs_, point1, point2 );
+  if ( ! astOK ) astClearStatus;
+  if ( dist == AST__BAD ) {
+    xSecPix_ = 0.0;
+  } else {
+    xSecPix_ = dist * R2D * 3600.0;
+  }
+
+  //  Same procedure for Y.
+  xin[0] = xin[1] = xcen;
+  yin[0] = ycen - 0.5;
+  yin[1] = ycen + 0.5;
+  
+  // Transform these image positions into sky coordinates.
+  astTran2( wcs_, 2, xin, yin, 1, xout, yout );
+
+  // And now get the distance between these positions in degrees.
+  if ( raIndex_ == 1 ) {
+    point1[0] = xout[0];
+    point1[1] = yout[0];
+    point2[0] = xout[1];
+    point2[1] = yout[1];
+  } else {
+    point1[1] = xout[0];
+    point1[0] = yout[0];
+    point2[1] = xout[1];
+    point2[0] = yout[1];
+  }
+  dist = astDistance( wcs_, point1, point2 );
+  if ( ! astOK ) astClearStatus;
+  if ( dist == AST__BAD ) {
+    ySecPix_ = 0.0;
+  } else {
+    ySecPix_ = dist * R2D * 3600.0;
+  }
+}
 
 //
 //  Utility method to set the equinox value and its character representation.
@@ -448,12 +514,13 @@ int StarWCS::wcs2pix(double ra, double dec, double &x, double &y) const
 //-
 int StarWCS::pix2wcsDist(double x, double y, double& ra, double& dec) const
 {
-    double xDegPix = xSecPix()/3600.;
-    double yDegPix = ySecPix()/3600.;
-    if (xDegPix == 0. || yDegPix == 0.)
+    double xDegPix = xSecPix() / 3600.;
+    double yDegPix = ySecPix() / 3600.;
+    if ( xDegPix == 0.0 || yDegPix == 0.0 ) {
 	return error("can't convert image to world coordinate distance");
-    ra = fabs(x*xDegPix);
-    dec = fabs(y*yDegPix);
+    }
+    ra = fabs( x * xDegPix );
+    dec = fabs( y * yDegPix );
     return 0;
 }
 
@@ -463,8 +530,9 @@ int StarWCS::pix2wcsDist(double x, double y, double& ra, double& dec) const
 //
 int StarWCS::wcs2pixDist(double ra, double dec, double &x, double &y) const
 {
-  if (!isWcs())
+  if ( !isWcs() ) {
     return 0;
+  }
 
   //  Method is to get a scale factor for x,y to ra,dec at the image
   //  origin and then use these values to scale the ra and decs.
@@ -587,7 +655,16 @@ double StarWCS::width() const
     if ( dist == AST__BAD ) {
       return 0.0;
     }
-    return dist * 60.0 * R2D;
+
+    //  Check that distance isn't 0 or very small, this indicates that
+    //  edge of image is same coordinate. If so use arcsec per pixel
+    //  estimate.
+    if ( dist == 0.0 || dist < DBL_EPSILON ) {
+      dist = xSecPix_ * nxpix_;
+    } else {
+      dist *= 60.0 * R2D;
+    }
+    return dist;
 }
 
 //
@@ -629,7 +706,15 @@ double StarWCS::height() const
     if ( dist == AST__BAD ) {
       return 0.0;
     }
-    return dist * 60.0 * R2D;
+
+    //  Check that distance isn't 0, this indicates that edge of image
+    //  is same coordinate. If so use arcsec per pixel estimate.
+    if ( dist == 0.0 || dist < DBL_EPSILON ) {
+      dist = ySecPix_ * nypix_;
+    } else {
+      dist *= 60.0 * R2D;      
+    }
+    return dist;
 }
 
 
@@ -672,10 +757,18 @@ double StarWCS::radius() const
       return 0.0;
     }
 
-    //  Return value is converted into arcminutes.
-    return dist * 60.0 * R2D;
+    //  Check that distance isn't 0, this indicates that edge of image
+    //  is same coordinate as centre! If so use arcsec per pixel
+    //  estimates.
+    if ( dist == 0.0 || dist < DBL_EPSILON ) {
+      dist = sqrt ( 0.25 * xSecPix_ * nxpix_ * xSecPix_ * nxpix_
+                  + 0.25 * ySecPix_ * nypix_ * ySecPix_ * nypix_ );
+      
+    } else {
+      dist *= 60.0 * R2D;
+    }
+    return dist;
 }
-
 
 //
 //  Create a frameset for the WCS mapping from information supplied.
@@ -694,13 +787,13 @@ double StarWCS::radius() const
 // 	epoch   = Epoch of coordinates, used for FK4/FK5 conversion no effect if 0
 // 	proj    = Projection
 //
-int StarWCS::set(double ra, double dec,
-		double secpix,
-		double xrefpix, double yrefpix,
-		int nxpix, int nypix,
-		double rotate,
-		int equinox, double epoch,
-		const char* proj)
+int StarWCS::set( double ra, double dec,
+		  double secpix,
+		  double xrefpix, double yrefpix,
+		  int nxpix, int nypix,
+		  double rotate,
+		  int equinox, double epoch,
+		  const char* proj )
 {
     if ( wcs_ ) {
 	wcs_ = (AstFrameSet *) astAnnul( wcs_ );
@@ -941,10 +1034,12 @@ int StarWCS::make2D()
   newframe = (AstFrame *) astAnnul( newframe );
   map = (AstMapping *) astAnnul( map );
 
-  // If the above went well then assume we're in the clear, otherwise
-  // indicate an error.
+  //  Release local frames.
   baseframe = (AstFrame *) astAnnul( baseframe );
   skyframe = (AstFrame *) astAnnul( skyframe );
+
+  // If the above went well then assume we're in the clear, otherwise
+  // indicate an error.
   if ( !astOK ) {
     return 0;
   } else {

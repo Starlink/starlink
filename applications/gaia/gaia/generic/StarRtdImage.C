@@ -1171,15 +1171,19 @@ int StarRtdImage::plotgridCmd( int argc, char *argv[] )
       astTk_Tag( NULL );
     }
 
-    // Free the list.
-    if ( listArgc > 0 ) {
-      Tcl_Free( (char *) listArgv );
-    }
-
     // Free the WCS copy.
     wcs = (AstFrameSet *) astAnnul( wcs );
   }
 
+  // Free the lists.
+  if ( listArgc > 0 ) {
+    Tcl_Free( (char *) listArgv );
+  }
+  if ( coordArgc > 0 ) {
+    Tcl_Free( (char *) coordArgv );
+  }
+  
+  //  Do not exit with AST still in error.
   if ( inerror || ! astOK ) {
     if ( !astOK ) {
       astClearStatus;
@@ -2491,8 +2495,14 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
   char result[TCL_DOUBLE_SPACE*5 + 5];
   sprintf( result, "%f %f %f %f", meanra, meandec, xscale, yscale );
   set_result( result );
+
+  //  Release memory.
   Tcl_Free( (char *) listArgv1 );
   Tcl_Free( (char *) listArgv2 );
+  delete [] ra;
+  delete [] dec;
+  delete [] x;
+  delete [] y;
   return TCL_OK;
 }
 

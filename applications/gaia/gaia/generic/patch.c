@@ -354,7 +354,9 @@ int patchCmd( struct StarImageInfo *info, char *args, char **errStr )
                                                   (void *)qualPtr,
                                                   nx, xs1, ys1, xs2,
                                                   ys2 );
-        }
+        } else {
+	  q = (F77_POINTER_TYPE) NULL;
+	}
 
         /* Work out new image size and increment ranges to Fortran
            style (start at 1). */
