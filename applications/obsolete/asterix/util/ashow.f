@@ -648,10 +648,6 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*50		STR
-
-      REAL			RVAL			!
-
       INTEGER			TIMID			! TCI info
 *.
 
@@ -673,15 +669,199 @@
       CALL AIO_IWRITE( OCH, 4, 'Observation Dates & Exposure Times :',
      :                  STATUS )
       CALL AIO_BLNK( OCH, STATUS )
-      CALL ADI_CGET0C( TIMID, 'DateObs', STR, STATUS )
-      CALL MSG_SETC( 'DATE', STR )
-      CALL AIO_IWRITE( OCH, 6, 'Date at start   : ^DATE', STATUS )
-      CALL ADI_CGET0R( TIMID, 'ObsLength', RVAL, STATUS )
-      CALL MSG_SETR( 'OBSL', RVAL )
-      CALL AIO_IWRITE( OCH, 6, 'Obs. length     : ^OBSL seconds',
-     :           STATUS )
+
+      CALL ASHOW_OB( TIMID, 'DateObs', 'C', 'Date at start', ' ',
+     :                'np', STATUS )
+      CALL ASHOW_OB( TIMID, 'ObsLength', 'R', 'Obs. length', 'seconds',
+     :                'np', STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ASHOW_TIM', STATUS )
+
+      END
+
+
+
+      SUBROUTINE ASHOW_OB( OBJ, MEMBER, TYPE, DESCRIP, UNITS, IMODE,
+     :                      OCH, STATUS )
+*+
+*  Name:
+*     ASHOW_OB
+
+*  Purpose:
+*     Format an ADI item
+
+*  Language:
+*     Starlink Fortran
+
+*  Invocation:
+*     CALL ASHOW_OBI( OBJ, MEMBER, TYPE, DESCRIP, UNITS, IMODE, OCH, STATUS )
+
+*  Description:
+*     {routine_description}
+
+*  Arguments:
+*     OBJ = INTEGER (given)
+*        ADI object to extract data from
+*     MEMBER = CHARACTER*(*) (given)
+*        Name of data member to extract
+*     TYPE = CHARACTER*(*) (given)
+*        Type code for item
+*     DESCRIP = CHARACTER*(*)
+*        Description of the object
+*     UNITS = CHARACTER*(*)
+*        Units of the object
+*     IMODE = CHARACTER*(*)
+*        How to handle missing data members
+*     OCH = INTEGER (given)
+*        Output channel identifier
+*     STATUS = INTEGER (given and returned)
+*        The global status.
+
+*  Examples:
+*     {routine_example_text}
+*        {routine_example_description}
+
+*  Pitfalls:
+*     {pitfall_description}...
+
+*  Notes:
+*     {routine_notes}...
+
+*  Prior Requirements:
+*     {routine_prior_requirements}...
+
+*  Side Effects:
+*     {routine_side_effects}...
+
+*  Algorithm:
+*     {algorithm_description}...
+
+*  Accuracy:
+*     {routine_accuracy}
+
+*  Timing:
+*     {routine_timing}
+
+*  External Routines Used:
+*     {name_of_facility_or_package}:
+*        {routine_used}...
+
+*  Implementation Deficiencies:
+*     {routine_deficiencies}...
+
+*  References:
+*     {task_references}...
+
+*  Keywords:
+*     ashow, usage:private
+
+*  Copyright:
+*     Copyright (C) University of Birmingham, 1995
+
+*  Authors:
+*     DJA: David J. Allan (Jet-X, University of Birmingham)
+*     {enter_new_authors_here}
+
+*  History:
+*     13 Apr 1995 (DJA):
+*        Original version.
+*     {enter_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Type Definitions:
+      IMPLICIT NONE              ! No implicit typing
+
+*  Global Constants:
+      INCLUDE 'SAE_PAR'          ! Standard SAE constants
+
+*  Arguments Given:
+      INTEGER			OBJ			! ADI object
+      CHARACTER*(*)		MEMBER, TYPE
+      CHARACTER*(*)		DESCRIP, UNITS
+      CHARACTER*(*)		IMODE
+      INTEGER			OCH			! Output channel
+
+*  Status:
+      INTEGER 			STATUS             	! Global status
+
+*  Local Constants:
+      INTEGER			IND			! Indentation
+        PARAMETER		( IND = 6 )
+
+*  Local Variables:
+      CHARACTER*15		LDESCRIP
+      CHARACTER*80		CVALUE
+
+      DOUBLE PRECISION		DVALUE
+
+      REAL			RVALUE
+
+      INTEGER			IVALUE
+
+      LOGICAL			OK			! Data is ok?
+      LOGICAL			THERE			! Member exists?
+*.
+
+*  Check inherited global status.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Local copy of description
+      LDESCRIP = DESCRIP
+
+*  Does member exist?
+      CALL ADI_THERE( OBJ, MEMBER, THERE, STATUS )
+      OK = .FALSE.
+      IF ( THERE ) THEN
+
+*    Extract data
+        IF ( TYPE .EQ. 'C' ) THEN
+          CALL ADI_CGET0C( OBJ, MEMBER, CVALUE, STATUS )
+        ELSE IF ( TYPE .EQ. 'D' ) THEN
+          CALL ADI_CGET0D( OBJ, MEMBER, DVALUE, STATUS )
+        ELSE IF ( TYPE .EQ. 'R' ) THEN
+          CALL ADI_CGET0R( OBJ, MEMBER, DVALUE, STATUS )
+        ELSE IF ( TYPE .EQ. 'I' ) THEN
+          CALL ADI_CGET0I( OBJ, MEMBER, IVALUE, STATUS )
+        END IF
+
+*    Trap errors
+        IF ( STATUS .NE. SAI__OK ) THEN
+          CALL ERR_ANNUL( STATUS )
+        ELSE
+          OK = .TRUE.
+        END IF
+
+      END IF
+
+      IF ( OK ) THEN
+
+*    Set tokens
+        IF ( TYPE .EQ. 'C' ) THEN
+          CALL MSG_SETC( 'VAL', CVALUE )
+        ELSE IF ( TYPE .EQ. 'R' ) THEN
+          CALL MSG_SETR( 'VAL', RVALUE )
+        ELSE IF ( TYPE .EQ. 'D' ) THEN
+          CALL MSG_SETD( 'VAL', DVALUE )
+        ELSE IF ( TYPE .EQ. 'I' ) THEN
+          CALL MSG_SETI( 'VAL', IVALUE )
+        END IF
+        CALL MSG_SETC( 'UNITS', UNITS )
+        CALL AIO_IWRITE( OCH, IND, LDESCRIP//' : ^VAL ^UNITS', STATUS )
+
+      ELSE IF ( IMODE .EQ. 'np' ) THEN
+        IF ( THERE ) THEN
+          CALL AIO_IWRITE( OCH, IND, LDESCRIP//' : * unreadable *',
+     :           STATUS )
+        ELSE
+          CALL AIO_IWRITE( OCH, IND, LDESCRIP//' : * not present *',
+     :           STATUS )
+        END IF
+
+      END IF
 
       END
