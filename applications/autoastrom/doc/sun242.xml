@@ -107,8 +107,8 @@
       <p>The options available are described in <ref id="tab.opts"/>.
 	Values can be specified in the form <code>&ddash;catalogue
 	  usno@eso</code> or <code>&ddash;catalogue=usno@eso</code>;
-	booleans can be specified as either <code>&ddash;insert</code> or
-	<code>&ddash;noinsert</code>.</p>
+	booleans can be specified as either <code>&ddash;insert</code>
+	(meaning true) or <code>&ddash;noinsert</code> (false).</p>
 
       <table id="tab.opts">
 	<caption>
@@ -130,11 +130,13 @@
 		<entry>string</entry>
 		<entry>SkyCat name of online catalogue to use</entry>
 	      </row>
+<!--
 	      <row>
-		<entry><ref id="opt.extractorcat">&ddash;extractorcat</ref></entry>
+		<entry><ref id="opt.ccdcat">&ddash;ccdcat</ref></entry>
 		<entry>string</entry>
-		<entry>SExtractor catalogue</entry>
+		<entry>CCD catalogue</entry>
 	      </row>
+-->
 	      <row>
 		<entry><ref id="opt.help">&ddash;help</ref></entry>
 		<entry></entry>
@@ -146,7 +148,12 @@
 		<entry>insert WCS info into NDF at end?</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.keep">&ddash;keep</ref></entry>
+		<entry><ref id="opt.keepfits">&ddash;keepfits</ref></entry>
+		<entry>string</entry>
+		<entry>retain WCS in this file (default if empty)</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.keeptemps">&ddash;keeptemps</ref></entry>
 		<entry>boolean</entry>
 		<entry>keep temporary files?</entry>
 	      </row>
@@ -159,6 +166,11 @@
 		<entry><ref id="opt.messages">&ddash;messages</ref></entry>
 		<entry>boolean</entry>
 		<entry>show messages from monoliths?</entry>
+	      </row>
+	      <row>
+		<entry><ref id="opt.obsdata">&ddash;wcs</ref></entry>
+		<entry>string</entry>
+		<entry>provide observation information</entry>
 	      </row>
 	      <row>
 		<entry><ref id="opt.skycatconfig">&ddash;skycatconfig</ref></entry>
@@ -181,9 +193,9 @@
 		<entry>verbosity</entry>
 	      </row>
 	      <row>
-		<entry><ref id="opt.wcs">&ddash;wcs</ref></entry>
-		<entry>opt'l.&nbsp;string</entry>
-		<entry>retain WCS in this file (default if empty)</entry>
+		<entry><ref id="opt.version">&ddash;version</ref></entry>
+		<entry>boolean</entry>
+		<entry>if true, print version number and exit</entry>
 	      </row>
 	    </tbody>
 	  </tgroup>
@@ -195,13 +207,20 @@
 	  <title>Specifying positions</title>
 	</subhead>
 
-	<p>To work, &autoastrom; requires an initial
-	  estimate of the centre of the CCD frame.  At present, the
-	  only way it obtains this is from a WCS component in the NDF, 
-	  so you need to do at least some initial calibration,
-	  possibly using GAIA, to do this.</p>
+	<p>To work, &autoastrom; requires some initial estimate of the 
+	  centre of the CCD frame.  You can provide this with a WCS
+	  component in the NDF, or with a FITS (NDF-) extension, or with
+	  approximate astrometry given on the command line.  By
+	  default, &autoastrom; searches for a WCS component, then a
+	  FITS extension, and fails if it finds neither.</p>
 
-	<p>Discuss how accurate this initial calibration has to be.</p>
+	<p>You control this process using the <ref id="opt.obsdata">obsdata
+	    option</ref>.</p>
+
+	<p>If you wish to insert an initial approximate WCS component
+	  in the NDF, you can best do this using GAIA.</p>
+
+	<p>XXX Discuss how accurate this initial calibration has to be.</p>
       </subsect>
 
       <subsect id="usage.results" export="export">
@@ -211,13 +230,43 @@
 
 	<p>Results can be inserted into the input NDF (see <ref
 	    id="opt.insert"/>), or else retained as a standalone
-	  FITS-WCS file (see <ref id="opt.wcs"/>).  You can choose
+	  FITS-WCS file (see <ref id="opt.keepfits"/>).  You can choose
 	  both, either, or even choose neither and throw the results
 	  away (strange person!).</p>
 
-	<p>Discussion of the various FITS standards, and a reference
-	  to the A&amp;A article, when it appears.  Mention importing
-	  FITS WCS information into AST.</p>
+	<p>XXX Discussion of the various FITS standards,
+	<citation>nost-100-2</citation>, <citation>fitswcs1</citation>
+	and <citation>fitswcs2</citation>, possibly including pointers
+	to the FITS handbook.  Mention importing FITS WCS information
+	into AST.</p>
+      </subsect>
+
+      <subsect id="usage.proxy" export="export">
+	<subhead>
+	  <title>Web proxies</title>
+	</subhead>
+
+	<p>In order to perform catalogue lookups, &autoastrom; needs
+	  to make HTTP (Web) queries.  If your site enforces the use
+	  of proxies to get access to the web, these lookups will
+	  fail, and &autoastrom; will simply wait uselessly until its
+	  queries time out.</p>
+
+	<p>You can tell &autoastrom; how to use the proxies by using the
+	  standard <code>http_proxy</code> environment variable, which 
+	  you set through something like
+	  <verbatim>csh% setenv http_proxy http://wwwcache.example.ac.uk:8080/</verbatim>
+	  or
+	  <verbatim>
+	    sh% http_proxy=http://www.example.ac.uk:8080/; export http_proxy
+	  </verbatim>
+	  depending on whether you use a csh-like (tcsh) or sh-like
+	  (bash, zsh) shell.</p>
+
+	<p>Your local computing service can advise you on the
+	  appropriate value for this environment variable, or you can
+	  examine the appropriate part of the configuration of your
+	  web browser.</p>
       </subsect>
 
       <subsect id="usage.opts" export="export">
@@ -241,27 +290,35 @@
 	  <p>Default (presently): `usno@eso'</p>
 	</subsubsect>
 
-	<subsubsect id="opt.extractorcat">
+<!--  This option is for testing/debugging only
+	<subsubsect id="opt.ccdcat">
 	  <subhead>
-	    <title>--extractorcat</title>
+	    <title>ccdcat</title>
 	  </subhead>
 
 	  <p>This indicates a pre-existing catalogue of objects in the
-	  CCD frame.  This is a catalogue in the format required by
-	  CCDPACK's &findoff; application, with the
-	  exception that the first field, the identification, must be
-	  repeated in the fourth column.</p>
+	    CCD frame.  This is a catalogue in the format required by
+	    CCDPACK's &findoff; application, with extra fields.  That
+	    is, there must be five columns: an integer identifier, the 
+	    X and Y pixel positions of an object, the integer
+	    identifier <em>repeated</em> and some measure of the flux
+	    due to the object.  The objects must be in decreasing
+	    order of the flux (the units don't matter: this is purely
+	    for sorting purposes).</p>
 
 	  <p>If this catalogue does not exist, it will be generated
-	    from the image in the NDF; this option is present
-	    principally because this extraction step is one of the
-	    more time-consuming steps in the astrometry process, and
-	    so allowing the catalogue to be specified can speed things 
-	    up in the case where you are analysing an image several
+	    from the image in the NDF using the SExtractor application;
+	    this option is present (a) so that you can provide a
+	    catalogue of objects by some other means if you wish, and
+	    (b) because this extraction step is one of the more
+	    time-consuming steps in the astrometry process, and so
+	    allowing the catalogue to be specified can speed things up
+	    in the case where you are analysing an image several
 	    times.</p>
 
 	  <p>Default: absent</p>
 	</subsubsect>
+-->
 
 	<subsubsect id="opt.help">
 	  <subhead>
@@ -280,15 +337,29 @@
 	    the input NDF as an AST WCS component.  If false
 	    (<code>--noinsert</code>), the insertion is not done, so
 	    presumably you have decided to handle the WCS information in
-	    a different way, and have set the <ref id="opt.wcs">--wcs
+	    a different way, and have set the <ref id="opt.keepfits">--keepfits
 	      option</ref> to retain the WCS information.</p>
 
 	  <p>Default: true</p>
 	</subsubsect>
 
-	<subsubsect id="opt.keep">
+	<subsubsect id="opt.keepfits">
 	  <subhead>
-	    <title>--keep</title>
+	    <title>--keepfits</title>
+	  </subhead>
+
+	  <p>The normal mode of operation is for the script to insert
+	    the final astrometry into the input NDF, as an AST WCS
+	    component (see <ref id="opt.insert"/>).  Instead, or
+	    additionally, you can save this 
+	    information as a FITS-WCS file, named by this option.</p>
+
+	  <p>Default: absent</p>
+	</subsubsect>
+
+	<subsubsect id="opt.keeptemps">
+	  <subhead>
+	    <title>--keeptemps</title>
 	  </subhead>
 
 	  <p>If true, temporary files will not be deleted at the end
@@ -328,6 +399,144 @@
 	    be suppressed with <code>--nomessages</code>.</p>
 
 	  <p>Default: true</p>
+	</subsubsect>
+
+	<subsubsect id="opt.obsdata">
+	  <subhead>
+	    <title>--obsdata</title>
+	  </subhead>
+
+	  <p>Specifies a source for the observation data, including
+	    WCS information.  The keyword 
+	    value can be
+	    <code>source=AST</code>, indicating that the information should
+	    come from the AST WCS component of the NDF; or
+	    <code>source=FITS</code>, indicating that it should come from any 
+	    FITS extension in the file; or a list of keyword-value
+	    pairs giving the approximate astrometry explicitly.  If
+	    the option is not present, then &autoastrom; attempts to
+	    find AST information, then FITS.  If the option is
+	    present, and the corresponding information is not present,
+	    the program stops.
+	  </p>
+
+	  <p>As well, this option allows you to specify observation
+	    data for passing to ASTROM.</p>
+
+	  <p>Do not specify a keyword more than once with distinct
+	    values.</p>
+
+	  <p>The value of the <code>--obsdata</code> option can specify
+	    approximate astrometry through a comma-separated list of
+	    <code>key=value</code> pairs.  For example, you might
+	    write 
+	    <verbatim>--obsdata=ra=14:24:00,dec=-12.34</verbatim>The
+	    available astrometry keywords are
+	    <tabular>
+	      <tgroup cols="2">
+		<tbody>
+		  <row>
+		    <entry>ra</entry>
+		    <entry>Right ascention of the centre of the pixel
+		      grid, in colon-separated HMS or decimal
+		      degrees.  Required.</entry>
+		  </row>
+		  <row>
+		    <entry>dec</entry>
+		    <entry>Declination of the centre of the pixel
+		      grid, in colon-separated DMS or decimal
+		      degrees.  Required.</entry>
+		  </row>
+		  <row>
+		    <entry>pa</entry>
+		    <entry>Position angle of the pixel grid.  This is
+		      the rotation, in
+		      degrees anti-clockwise, of the declination or
+		      latitude axis with respect to the 2-axis of the
+		      data array.  Default: 0.
+		    </entry>
+		  </row>
+		  <row>
+		    <entry>scale</entry>
+		    <entry>The plate scale, in units of arcsec/pixel.
+		    Default: 1.</entry>
+		  </row>
+		  <row>
+		    <entry>invert</entry>
+		    <entry>If true (ie, non-zero), the axes are
+		      inverted.  Default: 0.</entry>
+		  </row>
+		</tbody>
+	      </tgroup>
+	    </tabular>
+	    The position angle is the same as the AIPS
+	    <code>CROTA2</code> convention.  Specifically (and by
+	    definition), these definitions map to 
+	    the <code>CDn_n</code> conventions of
+	    <citation>fitswcs2</citation> through
+	    <meqnarray>
+	      <mline>\mbox{\texttt{CD1\_1}} &=& \pm s\cos(\phi)</mline>
+	      <mline>\mbox{\texttt{CD1\_2}} &=& \pm s\sin(\phi)</mline>
+	      <mline>\mbox{\texttt{CD2\_1}} &=& - s\sin(\phi)</mline>
+	      <mline>\mbox{\texttt{CD2\_2}} &=& s\cos(\phi),</mline>
+	    </meqnarray>
+	    where <m>s</m> is <code>scale</code>/3600 (ie, the scale
+	    in units of degrees/pixel), <m>\phi</m> is the position
+	    angle <code>pa</code>, and <m>\pm</m> is <m>+</m> when
+	    <code>invert</code> is false, and <m>-</m> when
+	    <code>invert</code> is true.
+	  </p>
+
+	  <p>Additionally, there are keywords which specify observation 
+	    data: time, station coordinates, meteorological data and
+	    colour.  For fuller details on these, see the &astrom;
+	    documentation, SUN/5.  In the specifications below,
+	    <code>i</code> represents an integer, <code>r</code> a
+	    real, optional entries are in <code>[...]</code>, and the
+	    separator <code>:</code> may be either a colon or
+	    whitespace.
+	    <tabular>
+	      <tgroup cols="2">
+		<tbody>
+		  <row>
+		    <entry>time</entry>
+		    <entry>An observation time, given as a Julian
+		      epoch (a single double), or a local sidereal
+		      time (format <code>i:i</code>) or UT
+		      (<code>i:i:i:i:i</code> specifying four-digit
+		      year, month, day, hours minutes).</entry>
+		  </row>
+		  <row>
+		    <entry>obs</entry>
+		    <entry>An observation station, given either as one 
+		    of the SLALIB observatory codes; or else latitude,
+		      longitude and height, in the format
+		      <code>i:r:i:r[:r]</code>, giving longitude,
+		      latitude and optional height.
+		      Longitudes are east longitudes -- west
+		      longitudes may be given either as minus degrees or
+		      longitudes greater than 180.</entry>
+		  </row>
+		  <row>
+		    <entry>met</entry>
+		    <entry>Temperature and pressure at the telescope,
+		      in degrees Kelvin and millibars.
+		      Format <code>r[:r]</code>.</entry>
+		  </row>
+		  <row>
+		    <entry>col</entry>
+		    <entry>The effective colour of the observations,
+		      as a wavelength in nanometres.  The default is
+		      500nm.</entry> 
+		  </row>
+		</tbody>
+	      </tgroup>
+	    </tabular>
+	  </p>
+
+	  <!-- How about 'FITS?' indicating that FITS is
+	  preferred, but the program should fail over to AST if that's 
+	  not there?  How about 'FITS:AST' to specify a sequence? -->
 	</subsubsect>
 
 	<subsubsect id="opt.skycatconfig">
@@ -398,22 +607,17 @@
 	  <p>Default: false</p>
 	</subsubsect>
 
-	<subsubsect id="opt.wcs">
+	<subsubsect id="opt.version">
 	  <subhead>
-	    <title>--wcs</title>
+	    <title>--version</title>
 	  </subhead>
 
-	  <p>The normal mode of operation is for the script to insert
-	    the final astrometry into the input NDF, as an AST WCS
-	    component (see <ref id="opt.insert"/>).  Instead, or
-	    additionally, you can save this 
-	    information as a FITS-WCS file, named by this option.</p>
+	  <p>If true, write the version number to the standard output
+	    and exit; if false, don't.</p>
 
-	  <p>If the argument is missing, or specified as the empty
-	    string, this file is not created.</p>
-
-	  <p>Default: absent</p>
+	  <p>Default: false.</p>
 	</subsubsect>
+
 
       </subsect>
 
@@ -435,7 +639,7 @@
 	  /stardev</code>.  If you need to use more than one Starlink
 	tree (perhaps because you have installed updated versions of 
 	some software outside the main tree; specifically, note that
-	autoastrom requires AST version 1.8-1 or better), then use the
+	&autoastrom; requires AST version 1.8-1 or better), then use the
 	<code>STARLINKS</code> variable, setting it to a
 	colon-separated list of directories: for example <code>setenv
 	  STARLINKS /path/to/my/star:/star</code>.</p>
@@ -457,12 +661,14 @@
       <p>The pattern matching facilities which the script depends on
 	come from the &findoff; application within CCDPACK.  There are
 	further details in SUN/139.  Need version 4.0-1 or
-	better.</p>
+	better (the program searches for this in
+	<code>CCDPACK_DIR</code>).</p>
 
       <p>The WCS information is largely handled by ATOOLS.  This does
-	not have a SUN yet.   Need ATOOLS 1.3 or better.</p>
+	not have a SUN yet.   Need ATOOLS 1.3 or better
+	(<code>ATOOLS_DIR</code>).</p>
 
-      <p>Autoastrom requires AST 1.8-1 or better to build.  Depending
+      <p>&autoastrom; requires AST 1.8-1 or better to build.  Depending
 	on precisely which earlier version of AST you have, the moggy
 	tool will fail to compile, or if it compiles, fail to link.
 	If you have AST installed in a non-standard place, you should
@@ -603,6 +809,8 @@
 
       &releasenotes;
     </sect>
+
+    <backmatter bibliography="sun242"/>
 
   </docbody>
 </sun>
