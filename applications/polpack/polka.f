@@ -142,7 +142,7 @@
 *        is continuously updated to describe the control or area currently 
 *        under the mouse pointer. [TRUE]
 *     IN = NDF (Read)
-*        A group of input intensity frames. This may take the form of a 
+*        A group of 2-d input intensity frames. This may take the form of a 
 *        comma separated list, or any of the other forms described in the 
 *        help on "Group Expressions". Note, the input frames cannot be 
 *        specified within the GUI.
@@ -358,9 +358,10 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-      INCLUDE 'GRP_PAR'          ! GRP public constants
+      INCLUDE 'GRP_PAR'          ! GRP_ constants
       INCLUDE 'PAR_ERR'          ! PAR_ error constants
-      INCLUDE 'PRM_PAR'          ! VAL_ public constants
+      INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'NDF_PAR'          ! NDF_ constants
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -384,6 +385,7 @@
      :        VIEW*8,            ! The view requried for new images
      :        XHRCOL*7           ! Colour for the cross-hair
       INTEGER
+     :        DIM( NDF__MXDIM ), ! Dimension in input image
      :        DPI,               ! Dots per inch to use
      :        FIT,               ! Fit type for aligning images
      :        I,                 ! Index for curent input object frame
@@ -393,6 +395,7 @@
      :        IGRP4,             ! Identifier for output Stokes NDF group
      :        IGRPS,             ! Identifier for input sky frames group
      :        INDF,              ! NDF identifier for input object frame
+     :        NDIM,              ! No. of dimension in input image
      :        OEFIT,             ! Fit type for aligning the O and E rays
      :        PSF,               ! Size of feature to search for
      :        SIZE,              ! Total size of the object frame group
@@ -510,9 +513,20 @@
      :                      MODE, STATUS )
 
 *  Check that all of the input object frames have POLPACK extensions 
-*  containing WPLATE values. 
+*  containing WPLATE values. Also check the image is 2d.
             DO I = 1, SIZE
                CALL NDG_NDFAS( IGRP1, I, 'READ', INDF, STATUS )
+
+               CALL NDF_DIM( INDF, NDF__MXDIM, DIM, NDIM, STATUS )
+               IF( STATUS .EQ. SAI__OK .AND. NDIM .NE. 2 ) THEN
+                  STATUS = SAI__ERROR
+                  CALL MSG_SETI( 'NDIM', NDIM )
+                  CALL NDF_MSG( 'NDF', INDF )
+                  CALL ERR_REP( 'POLKA_ERR3a', 'POLKA: ''^NDF'' is '//
+     :                          '^NDIM dimensional. Polka can only '//
+     :                          'handle 2 dimensional images.', STATUS )
+               END IF
+
                WPLATE = VAL__BADR
                CALL NDF_XGT0R( INDF, 'POLPACK', 'WPLATE', WPLATE,
      :                         STATUS )            
