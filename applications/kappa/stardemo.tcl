@@ -79,6 +79,7 @@
    set BADCOL "cyan"
    set CANCEL_OP 0
    set COM ""
+   set CHECK_DEMO 0
    set DEMO_INFO ""
    set DOING ""
    set ENV_VARS ""
