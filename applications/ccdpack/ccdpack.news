@@ -1,6 +1,6 @@
 1 CCDPACK_bugfix_update
 
-  Release v4.0-15 is a bugfix update of CCDPACK.
+  Release v4.0-16 is a bugfix update of CCDPACK.
 
   Changes since v4.0-14
   ---------------------
@@ -11,6 +11,9 @@
 
    - In TRANNDF a bug in which flux conservation was lost when using
      flipped images has been fixed.
+
+  Changes since v4.0-15
+  ---------------------
 
    - A MAKEMOS bug has been fixed.
 
