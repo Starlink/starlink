@@ -325,7 +325,7 @@ LIB_VERS =
 #  package from source (including this makefile, the associated mk
 #  script and any documentation files).
 
-SOURCE_FILES = $(PKG_NAME)_source.tar makefile.in mk $(DOCUMENTATION)
+SOURCE_FILES = $(PKG_NAME)_source.tar makefile mk $(DOCUMENTATION)
 
 #  List of public script files.  These are scripts which form part of
 #  the package and will be required by users of it.  They will be
@@ -345,7 +345,7 @@ STARTUP_SCRIPT = astrom
 #  part of the package and may be required by users of it.  They will be
 #  installed in the $(INSTALL_INC) directory.
 
-PUBLIC_INCLUDES =
+PUBLIC_INCLUDES = params.inc
 
 #  List of private include files.  These are additional include files
 #  which form part of the package and are required in order to build
