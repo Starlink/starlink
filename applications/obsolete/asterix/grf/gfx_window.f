@@ -30,8 +30,6 @@
       LOGICAL SCLD
 *-
 
-*  initialize
-      SCALED=.FALSE.
 
       IF (STATUS.EQ.SAI__OK) THEN
 

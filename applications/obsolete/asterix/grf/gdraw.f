@@ -436,6 +436,7 @@
 	  ENDIF
 
 *  set axis ranges
+          SCALED=.FALSE.
 	  CALL GFX_WINDOW(XW1,XW2,YW1,YW2,SCALED,STATUS)
 
 
