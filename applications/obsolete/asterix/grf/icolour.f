@@ -1025,7 +1025,7 @@
 
 *  convert to colour index within full range
         J1=MAX(1,ICOL-1)
-        J2=MIN(15,ICOL+1)
+        J2=MIN(16,ICOL+1)
         CI=FIRST+(J1-1)*(NSHADE+1)
 
 *  get new primary colours
