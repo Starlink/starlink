@@ -252,7 +252,7 @@ itcl::class gaia::Gaia {
       set m [add_help_button $gaia_dir/Gaia.hlp "On Window..." \
                 {Display help on this window and general features}   ]
 
-      add_menuitem $m command "About GAIA/SkyCat..." \
+      add_menuitem $m command "About GAIA::SkyCat..." \
          {Display a window with information about this GAIA/SkyCat version} \
          -command [code $itk_component(image) about]
 
@@ -754,7 +754,7 @@ itcl::class gaia::Gaia {
    #  and to gain access to an existing clone (by number).
    public method noblock_clone {name {file ""} args} {
       global ::argv ::argc ::gaia_usage
-      set argv $args
+      set argv [concat $argv $args]
       set argc [llength $argv]
 
       #  If given the file replaces the one in the command-line args or
@@ -800,10 +800,12 @@ itcl::class gaia::Gaia {
    #  using a given name.
    method clone {args} {
       global ::argv ::argc ::gaia_usage
-      set argv $args
-      set argc [llength $argv]
+      if { $args != {} } {
+         set argv [concat $argv $args]
+         set argc [llength $argv]
+      }
       # use the -noop option to avoid reloading the main image (part of $argv list)
-      after 0 [code util::TopLevelWidget::start gaia::Gaia "-file" "$gaia_usage"]
+      after 0 [code util::TopLevelWidget::start gaia::Gaia "-noop" "$gaia_usage"]
       return $prefix_[expr $clone_+1]
    }
 

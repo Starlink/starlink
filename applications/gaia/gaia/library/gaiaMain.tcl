@@ -46,33 +46,28 @@ if { [info exists env(GAIA_DIR)] } {
 
 #  Check any command-line arguments that we've been passed. The first
 #  one is the name of the image and any others are configuration
-#  options. What we need to do is reconstruct an argv string with the
-#  correct format (i.e. -file blah other options).
+#  options. What we need to do is add the file type (.sdf) if missing.
 if { $argc >= 1 } {
    set image [lindex $argv 0]
-
+   
    #  If first argument doesn't start with a '-' then its an image,
    #  otherwise no image has been given and we just get on with it.
    if { ! [string match {-*} $image] } {
-
-      #  Just as a convenience check the image exists and if not the
-      #  name for a file type.  If it has none then add ".sdf".
       if { ! [file readable $image] } {
-
+         
          #  First we must allow for any trailing slice specification.
-	 #  The format for this is a group of numbers in () at the end
-	 #  of the string.
+         #  The format for this is a group of numbers in () at the end
+         #  of the string.
          lassign [fileName $image] image slice
          if { ! [file readable $image] } {
             gaia::setXdefaults
             error_dialog "Cannot read image \"${image}${slice}\""
             exit 1
          } else {
-	    append image $slice
+            append image $slice
             set argv [lreplace $argv 0 0 $image]
          }
       }
-      set argv "-file $argv"
    }
 }
 
