@@ -218,6 +218,9 @@
         DO I = 1, NDIM
           TDIMS(I) = DIMS(I)
         END DO
+        DO I = NDIM+1, DAT__MXDIM
+          TDIMS(I) = 1
+        END DO
       END IF
 
 *    Find length of array
@@ -270,11 +273,11 @@
       CALL USI_GET1R( 'CY', MX_PTS, YC, NYPTS, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
       IF ( NXPTS .LT. 1 ) THEN
-        CALL MSG_PRNT( '! No X values supplied' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'No X values supplied', STATUS )
       ELSE IF ( NXPTS .NE. NYPTS ) THEN
-        CALL MSG_PRNT( '! Numbers of X and Y values differ' )
         STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'Numbers of X and Y values differ', STATUS )
       END IF
       CALL USI_GET1R( 'CR', MX_PTS, RC, NRPTS, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
