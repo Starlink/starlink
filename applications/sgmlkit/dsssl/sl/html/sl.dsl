@@ -11,7 +11,7 @@
 <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
 <!ENTITY slparams.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
 
-<!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+<!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
 <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
 <!ENTITY maths.dsl		SYSTEM "slmaths.dsl" SUBDOC>
 <!ENTITY slback.dsl		SYSTEM "slback.dsl" SUBDOC>
@@ -29,7 +29,7 @@ Mark Burton's dbtohtml.dsl style file, and Norm Walsh's DocBook DSSSL
 stylesheets. 
 
 <authorlist>
-<author id=ng affiliation='Glasgow'>Norman Gray
+<author id=ng affiliation='Starlink, University of Glasgow'>Norman Gray
 
 <copyright>Copyright 1999, Particle Physics and Astronomy Research Council
 <history>

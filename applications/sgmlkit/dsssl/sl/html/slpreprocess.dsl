@@ -1,6 +1,6 @@
 <!DOCTYPE programcode PUBLIC "-//Starlink//DTD DSSSL Source Code 0.6//EN" [
   <!ENTITY common.dsl		SYSTEM "../common/slcommon.dsl" SUBDOC>
-  <!ENTITY lib.dsl		SYSTEM "../lib/sllib.dsl" SUBDOC>
+  <!ENTITY lib.dsl		SYSTEM "../lib/sllib-jade-1.2.1.dsl" SUBDOC>
   <!ENTITY maths.dsl		SYSTEM "slmaths.dsl" SUBDOC>
   <!ENTITY commonparams.dsl	PUBLIC "-//Starlink//TEXT DSSSL Common Parameterisation//EN">
   <!ENTITY params.dsl		PUBLIC "-//Starlink//TEXT DSSSL HTML Parameterisation//EN">
@@ -10,7 +10,7 @@
 <docblock>
 <title>Preprocessing for HTML
 <description>
-SGML documents need some preprocessing before the run which generates
+<p>SGML documents need some preprocessing before the run which generates
 the final HTML, to deal with bibliography information, maths, and
 other LaTeX-notation material.  This stylesheet collects together this
 processing.
