@@ -1,0 +1,197 @@
+#!/bin/csh
+#+
+#  Name:
+#     SXConv
+
+#  Purpose:
+#     Converts a disk file into a DX general array or native file
+
+#  Language:
+#     C shell
+
+#  Invocation:
+#     SXConv type input dep [> output]
+
+#  Description:
+#     SXConv can convert either fortran binary data files or NDFs into
+#     a form readable by DX. The "type" argument specifies the format of the 
+#     input data file.
+#
+#     If "type" is "f77", then "input" should be a DX general array header 
+#     file, describing binary data written by a fortran program. The data 
+#     should be in a separate file, identified by the usual "file" keyword 
+#     in the supplied header file. The "format" keyword should be appropriate 
+#     for binary data (i.e. it should include one of the strings "ieee" or 
+#     "binary"). This script copies the supplied header file to standard 
+#     output, removing the "file" keyword and adding an "end" keyword at the 
+#     end (unless there is already one in the file). It then copies the binary
+#     data to standard output, stripping out the fortran record control bytes
+#     as it does so. 
+#
+#     If "type" is "ndf", then "input" should be an NDF data structure. It
+#     is converted to DX native format using the "$SX_DIR/ndf2dx" application 
+#     and this native DX file is written to standard output. The "dep" 
+#     argument specified whether the NDF data is dependant on positions or 
+#     connections.
+#
+#     This script can be invoked using the DX modules "SXReadFortran" or
+#     "SXReadNDF".
+
+#  Arguments:
+#     type   = format of input; "ndf" or "f77"
+#     input  = the DX header file (if type=f77) or NDF (if type=ndf)
+#     dep    = "connections" or "positions" (only accessed if type=ndf)
+#     output = standard output should be re-directed if the output is 
+#              required to go to a file.
+
+#  Authors:
+#     DSB: David Berry (STARLINK)
+#     {enter_new_authors_here}
+
+#  History:
+#     13-OCT-1995 (DSB):
+#        Original version
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+
+#  Process fortran binary files first.
+
+      if( "$1" == "f77" ) then
+
+
+#  Report an error if the supplied DX header file is not readable.
+#  The message is sent to standard error, not standard output, so that
+#  it is not interpreted as part of the output file.
+
+         if( "$2" == "" ) then
+            sh -c 'echo "" >&2'
+            sh -c 'echo "SXReadFortran: No DX header file given. " >&2'
+            sh -c 'echo "" >&2'
+            exit(2);
+         endif
+
+         if( ! -r "$2" ) then
+            sh -c 'echo "" >&2'
+            sh -c 'echo "SXReadFortran: Cannot access DX header file \"'$2'\"." >&2'
+            sh -c 'echo "" >&2'
+            exit(2);
+         endif
+
+
+#  Extract the data format from the header file. Report an error if the data 
+#  is not binary
+
+         set format = `awk -F= '{if($1=="format")print $2}' $2`
+
+         if( "$format" == "" || "$format" == "text" || "$format" == "ascii" ) then
+            sh -c 'echo "" >&2'
+            sh -c 'echo "SXReadFortran: DX header file \"'$2'\" specifies ASCII data." >&2'
+            sh -c 'echo "" >&2'
+            exit(2);
+         endif
+
+
+#  Extract the name of the data file from the "file" keyword in the header 
+#  file. Report an error if there is no "file" keyword.
+
+         set file = `awk -F= '{if($1=="file")print $2}' $2`
+ 
+         if( "$file" == "" ) then
+            sh -c 'echo "" >&2'
+            sh -c 'echo "SXReadFortran: DX header file \"'$2'\" does not contain a 'file' keyword." >&2'
+            sh -c 'echo "" >&2'
+            exit(2);
+         endif
+  
+
+#  Write the header file upto the "end" keyword to standard output, excluding 
+#  the "file" keyword.
+
+         awk -F= '{if($1=="end")exit;if($1!="file")print $0}' $2
+
+
+#  Add an "end" keyword
+
+         echo "end"
+
+
+#  Remove fortran record control bytes from the bainary data file and
+#  write it to standard output.
+
+         SXUnfort "$file"
+
+
+#  Now deal with ndf inputs
+
+      else
+
+         if( "$1" == "ndf" ) then
+
+
+#  Strip any trailing ".sdf" suffix from the supplied ndf name.
+
+            set ndf = "`echo "$2" | sed "s/.sdf//"`"
+
+
+#  Report an error if the supplied NDF is not readable.
+
+            if( "$ndf" == "" ) then
+               sh -c 'echo "" >&2'
+               sh -c 'echo "SXReadNDF: No NDF given. " >&2'
+               sh -c 'echo "" >&2'
+               exit(2);
+            endif
+
+            if( ! -r "$ndf.sdf" ) then
+               sh -c 'echo "" >&2'
+               sh -c 'echo "SXReadNDF: Cannot access NDF \"'$ndf'\"." >&2'
+               sh -c 'echo "" >&2'
+               exit(2);
+            endif
+
+
+#  Check that the "dep" argument holds a valid value.
+
+            if( "$3" == "" ) then
+               sh -c 'echo "" >&2'
+               sh -c 'echo "SXReadNDF: No data dependancy supplied." >&2'
+               sh -c 'echo "" >&2'
+               exit(2);
+            endif
+
+            if( "$3" != "positions" && "$3" != "connections" ) then
+               sh -c 'echo "" >&2'
+               sh -c 'echo "SXReadNDF: Bad dependancy supplied: \"'$3'\"." >&2'
+               sh -c 'echo "" >&2'
+               exit(2);
+            endif
+
+
+#  Convert the ndf
+
+            $SX_DIR/ndf2dx in="$ndf" dep="$3" out=SXReadNDF.tmp.dx
+
+
+#  Write the DX file to standard output, and delete the file.   
+
+            cat SXReadNDF.tmp.dx
+            rm -f SXReadNDF.tmp.dx
+
+
+#  Report an error if an unknown input format was given.
+
+         else
+            sh -c 'echo "" >&2'
+            sh -c 'echo "SXConv: Incorrect input format type \"'$1'\" specified." >&2'
+            sh -c 'echo "" >&2'
+            exit(2);
+         endif
+
+      endif
+
+      exit

@@ -1,0 +1,519 @@
+//
+// time: Fri Oct 20 17:40:45 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXSubset
+// CATEGORY Import and Export
+// DESCRIPTION Creates a rectangular or arbitrary subset of a field
+// INPUT input; field; (none); the field to be subsetted
+// INPUT object; field; (the object assigned to "input"); Object to define corners of subset
+// INPUT lower; vector; (lower bounds of "object"); lower bounds of subset
+// INPUT upper; vector; (upper bounds of "object"); upper bounds of subset
+// INPUT expression; string; (null); A "Compute" expression specifying the subset
+// OUTPUT output; field; The subset
+// End MDF
+// workspace: width = 1214, height = 1581
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXSubset(
+ input
+,object
+,lower
+,upper
+,expression
+) -> (
+ output
+) {
+    // 
+    // node Input[9]: x = 357, y = 3, inputs = 0, label = Input
+    // parameter: position = 5, name = 'expression', value = '(null)', descriptive = 1, description = 'A "Compute" expression specifying the subset', required = 0, visible = 1
+    //
+SXSubset_Input_9_out_1 = expression;
+    // 
+    // node Inquire[17]: x = 182, y = 74, inputs = 3, label = Should  the "expression" parameter be ignored?
+    //
+SXSubset_Inquire_17_out_1 = 
+    Inquire(
+    SXSubset_Input_9_out_1,
+    NULL,
+    NULL
+    ) [instance: 17, cache: 1];
+    // 
+    // node Compute[10]: x = 184, y = 144, inputs = 2, label = Convert the [0,1] range produced by "Inquire" to [1,2] for use by "Route"
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXSubset_Compute_10_out_1 = 
+    Compute(
+    "$0+1",
+    SXSubset_Inquire_17_out_1
+    ) [instance: 10, cache: 1];
+    // 
+    // node Input[7]: x = 499, y = 2, inputs = 0, label = Input
+    // parameter: position = 1, name = 'input', value = '(none)', descriptive = 1, description = 'the field to be subsetted', required = 1, visible = 1
+    //
+SXSubset_Input_7_out_1 = input;
+    // 
+    // node Route[2]: x = 484, y = 212, inputs = 2, outputs = 2, label = Route the input to either the rectangular subsetting bit, or the  Compute expression subsetting bit
+    //
+SXSubset_Route_2_out_1,
+SXSubset_Route_2_out_2 = 
+    Route(
+    SXSubset_Compute_10_out_1,
+    SXSubset_Input_7_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Mark[5]: x = 292, y = 322, inputs = 2, label = Mark the positions of the input field foruse by "Compute"
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXSubset_Mark_5_out_1 = 
+    Mark(
+    SXSubset_Route_2_out_1,
+    "positions"
+    ) [instance: 5, cache: 1];
+    // 
+    // node SXEnum[1]: x = 356, y = 322, inputs = 3, label = Put an enumeration of the positions into the data component of the input field
+    // input[2]: visible = 0
+    // input[3]: visible = 0
+    //
+SXSubset_SXEnum_1_out_1 = 
+    SXEnum(
+    SXSubset_Route_2_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute2[1]: x = 256, y = 409, inputs = 5, label = Put 1 into the data component at every selected position 
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "field"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "index"
+    //
+SXSubset_Compute2_1_out_1 = 
+    Compute2(
+    SXSubset_Input_9_out_1,
+    "field",
+    SXSubset_Mark_5_out_1,
+    "index",
+    SXSubset_SXEnum_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Route[3]: x = 206, y = 479, inputs = 2, outputs = 2, label = Stop "Include" executing if no "expression" was given (This shoudn't be necessary - but is!)
+    //
+SXSubset_Route_3_out_1,
+SXSubset_Route_3_out_2 = 
+    Route(
+    SXSubset_Compute_10_out_1,
+    SXSubset_Compute2_1_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Include[2]: x = 179, y = 570, inputs = 5, label = Exclude positions which don't satisfy the given expression (i.e have 0 in the data component)
+    // input[2]: defaulting = 0, visible = 1, type = 5, value = 0.0
+    // input[3]: defaulting = 0, visible = 1, type = 5, value = 0.0
+    // input[4]: defaulting = 0, visible = 1, type = 3, value = 1
+    //
+SXSubset_Include_2_out_1 = 
+    Include(
+    SXSubset_Route_3_out_1,
+    0.0,
+    0.0,
+    1,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Rename[1]: x = 211, y = 647, inputs = 3, label = Re-instate the original data values (saved in "saved data" by Mark) at the remaining positions
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "saved data"
+    //
+SXSubset_Rename_1_out_1 = 
+    Rename(
+    SXSubset_Include_2_out_1,
+    "saved data",
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Transmitter[4]: x = 500, y = 332, inputs = 1, label = Rectangle_in
+    //
+Rectangle_in = SXSubset_Route_2_out_2;
+    // 
+    // node Receiver[1]: x = 947, y = 9, inputs = 1, label = Rectangle_in
+    //
+SXSubset_Receiver_1_out_1 = Rectangle_in;
+    // 
+    // node Receiver[5]: x = 595, y = 1001, inputs = 1, label = Rectangle_in
+    //
+SXSubset_Receiver_5_out_1 = Rectangle_in;
+    // 
+    // node Mark[4]: x = 624, y = 1070, inputs = 2, label = Mark the positions of the input field for use by "Include"
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXSubset_Mark_4_out_1 = 
+    Mark(
+    SXSubset_Receiver_5_out_1,
+    "positions"
+    ) [instance: 4, cache: 1];
+    // 
+    // node Input[8]: x = 779, y = 391, inputs = 0, label = Input
+    // parameter: position = 3, name = 'lower', value = '(lower bounds of "object")', descriptive = 1, description = 'lower bounds of subset', required = 0, visible = 1
+    //
+SXSubset_Input_8_out_1 = lower;
+    // 
+    // node Inquire[13]: x = 715, y = 472, inputs = 3, label = Should a default value for "lower" be used?
+    //
+SXSubset_Inquire_13_out_1 = 
+    Inquire(
+    SXSubset_Input_8_out_1,
+    NULL,
+    NULL
+    ) [instance: 13, cache: 1];
+    // 
+    // node Compute[7]: x = 717, y = 541, inputs = 2, label = Convert [0,1] range returned by "inquire" to [1,2] range for use by "switch"
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXSubset_Compute_7_out_1 = 
+    Compute(
+    "$0+1",
+    SXSubset_Inquire_13_out_1
+    ) [instance: 7, cache: 1];
+    // 
+    // node Input[4]: x = 830, y = 8, inputs = 0, label = Input
+    // parameter: position = 2, name = 'object', value = '(the object assigned to "input")', descriptive = 1, description = 'Object to define corners of subset', required = 0, visible = 1
+    //
+SXSubset_Input_4_out_1 = object;
+    // 
+    // node Inquire[11]: x = 840, y = 166, inputs = 3, label = Has a null object been supplied for "object"?
+    // input[2]: defaulting = 1, visible = 1, type = 32, value = "is field"
+    //
+SXSubset_Inquire_11_out_1 = 
+    Inquire(
+    SXSubset_Input_4_out_1,
+    NULL,
+    NULL
+    ) [instance: 11, cache: 1];
+    // 
+    // node Compute[6]: x = 842, y = 229, inputs = 2, label = Convert [0,1] range from "Inquire" to [1,2] range for "switch"
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXSubset_Compute_6_out_1 = 
+    Compute(
+    "$0+1",
+    SXSubset_Inquire_11_out_1
+    ) [instance: 6, cache: 1];
+    // 
+    // node Switch[3]: x = 933, y = 297, inputs = 3, label = Select "object" to define corners if supplied, and "input" otherwise
+    //
+SXSubset_Switch_3_out_1 = 
+    Switch(
+    SXSubset_Compute_6_out_1,
+    SXSubset_Input_4_out_1,
+    SXSubset_Receiver_1_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXBounds[2]: x = 930, y = 373, inputs = 1, label = Get the bounds of the "object" field
+    //
+SXSubset_SXBounds_2_out_1,
+SXSubset_SXBounds_2_out_2 = 
+    SXBounds(
+    SXSubset_Switch_3_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Switch[6]: x = 763, y = 610, inputs = 3, label = Select lower bounds ("lower" or "object")
+    //
+SXSubset_Switch_6_out_1 = 
+    Switch(
+    SXSubset_Compute_7_out_1,
+    SXSubset_Input_8_out_1,
+    SXSubset_SXBounds_2_out_1
+    ) [instance: 6, cache: 1];
+    // 
+    // node Input[6]: x = 1089, y = 375, inputs = 0, label = Input
+    // parameter: position = 4, name = 'upper', value = '(upper bounds of "object")', descriptive = 1, description = 'upper bounds of subset', required = 0, visible = 1
+    //
+SXSubset_Input_6_out_1 = upper;
+    // 
+    // node Inquire[14]: x = 1028, y = 457, inputs = 3, label = Should a default value for "upper" be used?
+    //
+SXSubset_Inquire_14_out_1 = 
+    Inquire(
+    SXSubset_Input_6_out_1,
+    NULL,
+    NULL
+    ) [instance: 14, cache: 1];
+    // 
+    // node Compute[8]: x = 1028, y = 525, inputs = 2, label = Convert [0,1] range from "inquire" to [1,2]  range for use by  "switch"
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXSubset_Compute_8_out_1 = 
+    Compute(
+    "$0+1",
+    SXSubset_Inquire_14_out_1
+    ) [instance: 8, cache: 1];
+    // 
+    // node Switch[7]: x = 1073, y = 595, inputs = 3, label = Select upper bounds ("upper" or "object")
+    //
+SXSubset_Switch_7_out_1 = 
+    Switch(
+    SXSubset_Compute_8_out_1,
+    SXSubset_Input_6_out_1,
+    SXSubset_SXBounds_2_out_2
+    ) [instance: 7, cache: 1];
+    // 
+    // node Inquire[22]: x = 655, y = 679, inputs = 3, label = Find no. of dimensions
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "shape"
+    //
+SXSubset_Inquire_22_out_1 = 
+    Inquire(
+    SXSubset_Switch_6_out_1,
+    "shape",
+    NULL
+    ) [instance: 22, cache: 1];
+    // 
+    // node Switch[10]: x = 939, y = 752, inputs = 4, label = Select correct Compute expression to get lower bound on  each dimension
+    // input[2]: defaulting = 0, visible = 1, type = 16777248, value = {"min(a,b)"}
+    // input[3]: defaulting = 0, visible = 1, type = 67108863, value = "[min(a.x,b.x),min(a.y,b.y)]"
+    // input[4]: defaulting = 0, visible = 1, type = 67108863, value = "[min(a.x,b.x),min(a.y,b.y),min(a.z,b.z)]"
+    //
+SXSubset_Switch_10_out_1 = 
+    Switch(
+    SXSubset_Inquire_22_out_1,
+    {"min(a,b)"},
+    "[min(a.x,b.x),min(a.y,b.y)]",
+    "[min(a.x,b.x),min(a.y,b.y),min(a.z,b.z)]"
+    ) [instance: 10, cache: 1];
+    // 
+    // node Compute2[5]: x = 1002, y = 843, inputs = 5, label = Get upper bound on each axis
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "a"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "b"
+    //
+SXSubset_Compute2_5_out_1 = 
+    Compute2(
+    SXSubset_Switch_10_out_1,
+    "a",
+    SXSubset_Switch_6_out_1,
+    "b",
+    SXSubset_Switch_7_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node Switch[9]: x = 658, y = 756, inputs = 4, label = Select correct Compute expression to get upper bound on  each dimension
+    // input[2]: defaulting = 0, visible = 1, type = 16777248, value = {"max(a,b)"}
+    // input[3]: defaulting = 0, visible = 1, type = 67108863, value = "[max(a.x,b.x),max(a.y,b.y)]"
+    // input[4]: defaulting = 0, visible = 1, type = 67108863, value = "[max(a.x,b.x),max(a.y,b.y),max(a.z,b.z)]"
+    //
+SXSubset_Switch_9_out_1 = 
+    Switch(
+    SXSubset_Inquire_22_out_1,
+    {"max(a,b)"},
+    "[max(a.x,b.x),max(a.y,b.y)]",
+    "[max(a.x,b.x),max(a.y,b.y),max(a.z,b.z)]"
+    ) [instance: 9, cache: 1];
+    // 
+    // node Compute2[4]: x = 743, y = 849, inputs = 5, label = Get upper bound on each axis
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "a"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "b"
+    //
+SXSubset_Compute2_4_out_1 = 
+    Compute2(
+    SXSubset_Switch_9_out_1,
+    "a",
+    SXSubset_Switch_6_out_1,
+    "b",
+    SXSubset_Switch_7_out_1
+    ) [instance: 4, cache: 1];
+    // 
+    // node Include[1]: x = 636, y = 1156, inputs = 5, label = Remove all positions outside the supplied bounds 
+    //
+SXSubset_Include_1_out_1 = 
+    Include(
+    SXSubset_Mark_4_out_1,
+    SXSubset_Compute2_5_out_1,
+    SXSubset_Compute2_4_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Unmark[1]: x = 665, y = 1227, inputs = 2, label = Re-instate the "data" component, saved by the previous use of "Mark"
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXSubset_Unmark_1_out_1 = 
+    Unmark(
+    SXSubset_Include_1_out_1,
+    "positions"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Inquire[23]: x = 478, y = 1296, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "is empty"
+    //
+SXSubset_Inquire_23_out_1 = 
+    Inquire(
+    SXSubset_Unmark_1_out_1,
+    "is empty",
+    NULL
+    ) [instance: 23, cache: 1];
+    // 
+    // node Compute[13]: x = 480, y = 1361, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXSubset_Compute_13_out_1 = 
+    Compute(
+    "$0+1",
+    SXSubset_Inquire_23_out_1
+    ) [instance: 13, cache: 1];
+    // 
+    // node Switch[11]: x = 536, y = 1439, inputs = 3, label = If subset field is empty, return the original field
+    //
+SXSubset_Switch_11_out_1 = 
+    Switch(
+    SXSubset_Compute_13_out_1,
+    SXSubset_Unmark_1_out_1,
+    SXSubset_Receiver_5_out_1
+    ) [instance: 11, cache: 1];
+    // 
+    // node Transmitter[2]: x = 531, y = 1518, inputs = 1, label = Rectangle_out
+    //
+Rectangle_out = SXSubset_Switch_11_out_1;
+    // 
+    // node Receiver[4]: x = 403, y = 633, inputs = 1, label = Rectangle_out
+    //
+SXSubset_Receiver_4_out_1 = Rectangle_out;
+    // 
+    // node Collect[1]: x = 350, y = 723, inputs = 2, label = Collect  the "rectangular" or "Compute  expression" subset into a group (the Collect module is not killed by Route)
+    //
+SXSubset_Collect_1_out_1 = 
+    Collect(
+    SXSubset_Rename_1_out_1,
+    SXSubset_Receiver_4_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Select[1]: x = 356, y = 797, inputs = 3, label = Select the first (and only) object to be returned as the output field
+    // input[2]: defaulting = 1, visible = 1, type = 1, value = NULL
+    //
+SXSubset_Select_1_out_1 = 
+    Select(
+    SXSubset_Collect_1_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[2]: x = 353, y = 871, inputs = 1, label = Output
+    // parameter: position = 1, name = 'output', value = ' ', descriptive = 0, description = 'The subset', required = 0, visible = 1
+    //
+output = SXSubset_Select_1_out_1;
+    // 
+    // node SXDummy[4]: x = 339, y = 79, inputs = 10, label = Force "expression" to be a string
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXSubset_Input_9_out_1,
+    NULL
+    ) [instance: 4, cache: 1];
+    // 
+    // node SXDummy[3]: x = 819, y = 477, inputs = 10, label = Force "lower" to be a vector
+    // input[3]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    SXSubset_Input_8_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXDummy[2]: x = 1136, y = 462, inputs = 10, label = Force "upper" to be a vector
+    // input[3]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    SXSubset_Input_6_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node SXDummy[1]: x = 760, y = 102, inputs = 10, label = Force "object" to be a field
+    // input[1]: visible = 1
+    //
+    SXDummy(
+    SXSubset_Input_4_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+// network: end of macro body
+}
+SXSubset_Input_9_out_1 = NULL;
+SXSubset_Inquire_17_out_1 = NULL;
+SXSubset_Compute_10_out_1 = NULL;
+SXSubset_Input_7_out_1 = NULL;
+SXSubset_Route_2_out_1 = NULL;
+SXSubset_Route_2_out_2 = NULL;
+SXSubset_Mark_5_out_1 = NULL;
+SXSubset_SXEnum_1_out_1 = NULL;
+SXSubset_Compute2_1_out_1 = NULL;
+SXSubset_Route_3_out_1 = NULL;
+SXSubset_Include_2_out_1 = NULL;
+SXSubset_Rename_1_out_1 = NULL;
+SXSubset_Transmitter_4_out_1 = NULL;
+SXSubset_Receiver_1_out_1 = NULL;
+SXSubset_Receiver_5_out_1 = NULL;
+SXSubset_Mark_4_out_1 = NULL;
+SXSubset_Input_8_out_1 = NULL;
+SXSubset_Inquire_13_out_1 = NULL;
+SXSubset_Compute_7_out_1 = NULL;
+SXSubset_Input_4_out_1 = NULL;
+SXSubset_Inquire_11_out_1 = NULL;
+SXSubset_Compute_6_out_1 = NULL;
+SXSubset_Switch_3_out_1 = NULL;
+SXSubset_SXBounds_2_out_1 = NULL;
+SXSubset_SXBounds_2_out_2 = NULL;
+SXSubset_Switch_6_out_1 = NULL;
+SXSubset_Input_6_out_1 = NULL;
+SXSubset_Inquire_14_out_1 = NULL;
+SXSubset_Compute_8_out_1 = NULL;
+SXSubset_Switch_7_out_1 = NULL;
+SXSubset_Inquire_22_out_1 = NULL;
+SXSubset_Switch_10_out_1 = NULL;
+SXSubset_Compute2_5_out_1 = NULL;
+SXSubset_Switch_9_out_1 = NULL;
+SXSubset_Compute2_4_out_1 = NULL;
+SXSubset_Include_1_out_1 = NULL;
+SXSubset_Unmark_1_out_1 = NULL;
+SXSubset_Inquire_23_out_1 = NULL;
+SXSubset_Compute_13_out_1 = NULL;
+SXSubset_Switch_11_out_1 = NULL;
+SXSubset_Transmitter_2_out_1 = NULL;
+SXSubset_Receiver_4_out_1 = NULL;
+SXSubset_Collect_1_out_1 = NULL;
+SXSubset_Select_1_out_1 = NULL;

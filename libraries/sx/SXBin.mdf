@@ -1,0 +1,7 @@
+MODULE SXBin
+CATEGORY Realization
+DESCRIPTION Bins points into a supplied grid
+INPUT input; group or field;  (none); Field or group with positions to bin
+INPUT grid; field;  (none); grid to use as template
+INPUT type     [visible:0]; integer;  0; type of output values required
+OUTPUT output; field or  group;  binned field

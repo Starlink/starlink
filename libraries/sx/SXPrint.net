@@ -1,0 +1,403 @@
+//
+// time: Wed Nov 29 11:49:22 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXPrint
+// CATEGORY Import and Export
+// DESCRIPTION Produce a postscript file
+// INPUT object; value list or string list or object; (none); object to be rendered
+// INPUT camera; camera; (none); camera to use
+// INPUT file; string; (none); output file name
+// INPUT width; scalar; 8; width of printed image in inches
+// INPUT dpi[visible:0]; integer; 300; dots per inch
+// INPUT length[visible:0]; value list or field; 1.0; a length at old resolution
+// INPUT encapsulated[visible:0]; integer; 0; produce an epsf file?
+// INPUT input; object; (no default); <<< Dummy parameter (do not edit) >>>
+// INPUT colour[visible:0]; integer; 1; produce a colour file?
+// INPUT portrait[visible:0]; integer; 0; use portrait mode?
+// OUTPUT outlen; value or value list or field; length at new resolution
+// End MDF
+// workspace: width = 1136, height = 932
+// layout: snap = 0, width = 50, height = 50, align = NN
+//
+macro SXPrint(
+ object
+,camera
+,file
+,width = 8
+,dpi = 300
+,length = 1.0
+,encapsulated = 0
+,input
+,colour = 1
+,portrait = 0
+) -> (
+ outlen
+) {
+    // 
+    // node Input[3]: x = 238, y = 419, inputs = 0, label = Input
+    // parameter: position = 3, name = 'file', value = '(none)', descriptive = 1, description = 'output file name', required = 1, visible = 1
+    //
+SXPrint_Input_3_out_1 = file;
+    // 
+    // node Inquire[1]: x = 192, y = 508, inputs = 3, label = Inquire
+    // input[2]: visible = 0
+    // input[3]: visible = 0
+    //
+SXPrint_Inquire_1_out_1 = 
+    Inquire(
+    SXPrint_Input_3_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[6]: x = 187, y = 581, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "1-$0"
+    // expression: value = 1-a
+    // name[2]: value = a
+    //
+SXPrint_Compute_6_out_1 = 
+    Compute(
+    "1-$0",
+    SXPrint_Inquire_1_out_1
+    ) [instance: 6, cache: 1];
+    // 
+    // node Input[1]: x = 7, y = 28, inputs = 0, label = Input
+    // parameter: position = 1, name = 'object', value = '(none)', descriptive = 1, description = 'object to be rendered', required = 1, visible = 1
+    //
+SXPrint_Input_1_out_1 = object;
+    // 
+    // node Route[3]: x = 26, y = 674, inputs = 2, outputs = 2, label = Route
+    //
+SXPrint_Route_3_out_1,
+SXPrint_Route_3_out_2 = 
+    Route(
+    SXPrint_Compute_6_out_1,
+    SXPrint_Input_1_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Input[2]: x = 73, y = 20, inputs = 0, label = Input
+    // parameter: position = 2, name = 'camera', value = '(none)', descriptive = 1, description = 'camera to use', required = 1, visible = 1
+    //
+SXPrint_Input_2_out_1 = camera;
+    // 
+    // node Input[4]: x = 240, y = 20, inputs = 0, label = Input
+    // parameter: position = 4, name = 'width', value = '8', descriptive = 0, description = 'width of printed image in inches', required = 0, visible = 1
+    //
+SXPrint_Input_4_out_1 = width;
+    // 
+    // node Input[5]: x = 401, y = 11, inputs = 0, label = Input
+    // parameter: position = 5, name = 'dpi', value = '300', descriptive = 0, description = 'dots per inch', required = 0, visible = 0
+    //
+SXPrint_Input_5_out_1 = dpi;
+    // 
+    // node Compute[1]: x = 344, y = 198, inputs = 3, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "int($0*$1)"
+    // expression: value = int(a*b)
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+SXPrint_Compute_1_out_1 = 
+    Compute(
+    "int($0*$1)",
+    SXPrint_Input_4_out_1,
+    SXPrint_Input_5_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node UpdateCamera[1]: x = 74, y = 352, inputs = 10, label = UpdateCamera
+    //
+SXPrint_UpdateCamera_1_out_1 = 
+    UpdateCamera(
+    SXPrint_Input_2_out_1,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Compute_1_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Render[1]: x = 30, y = 790, inputs = 3, label = Render
+    //
+SXPrint_Render_1_out_1 = 
+    Render(
+    SXPrint_Route_3_out_1,
+    SXPrint_UpdateCamera_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Route[1]: x = 224, y = 679, inputs = 2, outputs = 2, label = Route
+    //
+SXPrint_Route_1_out_1,
+SXPrint_Route_1_out_2 = 
+    Route(
+    SXPrint_Compute_6_out_1,
+    SXPrint_Input_3_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Input[7]: x = 645, y = 7, inputs = 0, label = Input
+    // parameter: position = 7, name = 'encapsulated', value = '0', descriptive = 0, description = 'produce an epsf file?', required = 0, visible = 0
+    //
+SXPrint_Input_7_out_1 = encapsulated;
+    // 
+    // node Compute[3]: x = 674, y = 190, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXPrint_Compute_3_out_1 = 
+    Compute(
+    "$0+1",
+    SXPrint_Input_7_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Switch[1]: x = 698, y = 291, inputs = 3, label = Switch
+    // input[2]: defaulting = 0, visible = 1, type = 16777248, value = {"ps"}
+    // input[3]: defaulting = 0, visible = 1, type = 16777248, value = {"eps"}
+    //
+SXPrint_Switch_1_out_1 = 
+    Switch(
+    SXPrint_Compute_3_out_1,
+    {"ps"},
+    {"eps"}
+    ) [instance: 1, cache: 1];
+    // 
+    // node Input[9]: x = 864, y = 22, inputs = 0, label = Input
+    // parameter: position = 9, name = 'colour', value = '1', descriptive = 0, description = 'produce a colour file?', required = 0, visible = 0
+    //
+SXPrint_Input_9_out_1 = colour;
+    // 
+    // node Compute[4]: x = 838, y = 205, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXPrint_Compute_4_out_1 = 
+    Compute(
+    "$0+1",
+    SXPrint_Input_9_out_1
+    ) [instance: 4, cache: 1];
+    // 
+    // node Switch[2]: x = 834, y = 307, inputs = 3, label = Switch
+    // input[2]: defaulting = 0, visible = 1, type = 16777248, value = {"grey"}
+    // input[3]: defaulting = 0, visible = 1, type = 16777248, value = {"color"}
+    //
+SXPrint_Switch_2_out_1 = 
+    Switch(
+    SXPrint_Compute_4_out_1,
+    {"grey"},
+    {"color"}
+    ) [instance: 2, cache: 1];
+    // 
+    // node Input[10]: x = 1036, y = 39, inputs = 0, label = Input
+    // parameter: position = 10, name = 'portrait', value = '0', descriptive = 0, description = 'use portrait mode?', required = 0, visible = 0
+    //
+SXPrint_Input_10_out_1 = portrait;
+    // 
+    // node Compute[5]: x = 1009, y = 222, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXPrint_Compute_5_out_1 = 
+    Compute(
+    "$0+1",
+    SXPrint_Input_10_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node Switch[3]: x = 1005, y = 324, inputs = 3, label = Switch
+    // input[2]: defaulting = 0, visible = 1, type = 16777248, value = {"orient=landscape"}
+    // input[3]: defaulting = 0, visible = 1, type = 16777248, value = {"orient=portrait"}
+    //
+SXPrint_Switch_3_out_1 = 
+    Switch(
+    SXPrint_Compute_5_out_1,
+    {"orient=landscape"},
+    {"orient=portrait"}
+    ) [instance: 3, cache: 1];
+    // 
+    // node Format[1]: x = 773, y = 500, inputs = 5, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "%s %s %s page=8.25x11.125 dpi=%d"
+    //
+SXPrint_Format_1_out_1 = 
+    Format(
+    "%s %s %s page=8.25x11.125 dpi=%d",
+    SXPrint_Switch_1_out_1,
+    SXPrint_Switch_2_out_1,
+    SXPrint_Switch_3_out_1,
+    SXPrint_Input_5_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node WriteImage[1]: x = 199, y = 869, inputs = 4, label = WriteImage
+    //
+    WriteImage(
+    SXPrint_Render_1_out_1,
+    SXPrint_Route_1_out_1,
+    SXPrint_Format_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXDummy[2]: x = 293, y = 502, inputs = 10, label = SXDummy
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_3_out_1,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node SXDummy[3]: x = 297, y = 99, inputs = 10, label = SXDummy
+    // input[4]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_4_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXDummy[4]: x = 421, y = 96, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_5_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 4, cache: 1];
+    // 
+    // node SXDummy[5]: x = 695, y = 103, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_7_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 5, cache: 1];
+    // 
+    // node Inquire[2]: x = 128, y = 100, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "camera resolution"
+    // input[3]: visible = 0
+    //
+SXPrint_Inquire_2_out_1 = 
+    Inquire(
+    SXPrint_Input_2_out_1,
+    "camera resolution",
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Input[6]: x = 529, y = 11, inputs = 0, label = Input
+    // parameter: position = 6, name = 'length', value = '1.0', descriptive = 0, description = 'a length at old resolution', required = 0, visible = 0
+    //
+SXPrint_Input_6_out_1 = length;
+    // 
+    // node Compute[2]: x = 498, y = 288, inputs = 4, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$2*(float($1)/float($0))"
+    // expression: value = c*(float(b)/float(a))
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    //
+SXPrint_Compute_2_out_1 = 
+    Compute(
+    "$2*(float($1)/float($0))",
+    SXPrint_Inquire_2_out_1,
+    SXPrint_Compute_1_out_1,
+    SXPrint_Input_6_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Output[1]: x = 502, y = 743, inputs = 1, label = Output
+    // parameter: position = 1, name = 'outlen', value = ' ', descriptive = 0, description = 'length at new resolution', required = 0, visible = 1
+    //
+outlen = SXPrint_Compute_2_out_1;
+    // 
+    // node SXDummy[8]: x = 914, y = 118, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_9_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 8, cache: 1];
+    // 
+    // node SXDummy[9]: x = 1058, y = 135, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXPrint_Input_10_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 9, cache: 1];
+// network: end of macro body
+}
+SXPrint_Input_3_out_1 = NULL;
+SXPrint_Inquire_1_out_1 = NULL;
+SXPrint_Compute_6_out_1 = NULL;
+SXPrint_Input_1_out_1 = NULL;
+SXPrint_Route_3_out_1 = NULL;
+SXPrint_Input_2_out_1 = NULL;
+SXPrint_Input_4_out_1 = NULL;
+SXPrint_Input_5_out_1 = NULL;
+SXPrint_Compute_1_out_1 = NULL;
+SXPrint_UpdateCamera_1_out_1 = NULL;
+SXPrint_Render_1_out_1 = NULL;
+SXPrint_Route_1_out_1 = NULL;
+SXPrint_Input_7_out_1 = NULL;
+SXPrint_Compute_3_out_1 = NULL;
+SXPrint_Switch_1_out_1 = NULL;
+SXPrint_Input_9_out_1 = NULL;
+SXPrint_Compute_4_out_1 = NULL;
+SXPrint_Switch_2_out_1 = NULL;
+SXPrint_Input_10_out_1 = NULL;
+SXPrint_Compute_5_out_1 = NULL;
+SXPrint_Switch_3_out_1 = NULL;
+SXPrint_Format_1_out_1 = NULL;
+SXPrint_Inquire_2_out_1 = NULL;
+SXPrint_Input_6_out_1 = NULL;
+SXPrint_Compute_2_out_1 = NULL;

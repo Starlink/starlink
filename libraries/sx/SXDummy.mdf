@@ -1,0 +1,13 @@
+MODULE SXDummy
+CATEGORY Special
+DESCRIPTION a dummy module which does nothing
+INPUT field [visible:0]; field; (none); an input field
+INPUT group [visible:0]; group; (none); an input group
+INPUT vector [visible:0]; vector; (none); an input vector
+INPUT scalar [visible:0]; scalar; (none); an input scalar
+INPUT integer [visible:0];  integer; (none); an input integer
+INPUT vectorlist [visible:0]; vector list; (none); an input vector list
+INPUT scalarlist [visible:0]; scalar list; (none); an input scalar list
+INPUT integerlist [visible:0];  integer list; (none); an input integer list
+INPUT string [visible:0];  string; (none); an input string
+INPUT camera [visible:0];  camera; (none); an input camera

@@ -1,0 +1,9 @@
+MODULE SXConstruct
+CATEGORY Realization
+DESCRIPTION constructs a regular field with regular connections
+INPUT object; field;  (no default); object to define extent of new field
+INPUT lower; vector;  (no default); explicit lower bounds of new field
+INPUT upper; vector;  (no default); explicit upper bounds of new field
+INPUT deltas; scalar or vector;  (no default); increment for each axis
+INPUT counts; integer or vector;  (no default); number of positions along each axis
+OUTPUT output; field; output field

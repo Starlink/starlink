@@ -1,0 +1,155 @@
+//
+// time: Wed Oct 18 11:49:38 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXBounds
+// CATEGORY Structuring
+// DESCRIPTION Finds the corners of a fields bounding box
+// INPUT input; value list or string list or object; (none); input field 
+// OUTPUT lower; object; lower bounds
+// OUTPUT upper; object; upper bounds
+// End MDF
+// workspace: width = 509, height = 676
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXBounds(
+ input
+) -> (
+ lower
+,upper
+) {
+    // 
+    // node Input[7]: x = 219, y = 10, inputs = 0, label = Input
+    // parameter: position = 1, name = 'input', value = '(none)', descriptive = 1, description = 'input field ', required = 1, visible = 1
+    //
+SXBounds_Input_7_out_1 = input;
+    // 
+    // node Inquire[15]: x = 103, y = 81, inputs = 3, label = Is the input a group?
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "is group"
+    //
+SXBounds_Inquire_15_out_1 = 
+    Inquire(
+    SXBounds_Input_7_out_1,
+    "is group",
+    NULL
+    ) [instance: 15, cache: 1];
+    // 
+    // node Compute[9]: x = 105, y = 144, inputs = 2, label = Convert [0,1] range produced by "Inquire" to [1,2] range usable by "Route"
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXBounds_Compute_9_out_1 = 
+    Compute(
+    "$0+1",
+    SXBounds_Inquire_15_out_1
+    ) [instance: 9, cache: 1];
+    // 
+    // node Route[1]: x = 202, y = 214, inputs = 2, outputs = 2, label = If input is a group route flow to SXError
+    //
+SXBounds_Route_1_out_1,
+SXBounds_Route_1_out_2 = 
+    Route(
+    SXBounds_Compute_9_out_1,
+    SXBounds_Input_7_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Extract[1]: x = 144, y = 303, inputs = 2, label = Extract the bounding box from "input"
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "box"
+    //
+SXBounds_Extract_1_out_1 = 
+    Extract(
+    SXBounds_Route_1_out_1,
+    "box"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Inquire[12]: x = 132, y = 383, inputs = 3, label = Get the number of elements in the "box" array
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "count"
+    //
+SXBounds_Inquire_12_out_1 = 
+    Inquire(
+    SXBounds_Extract_1_out_1,
+    "count",
+    NULL
+    ) [instance: 12, cache: 1];
+    // 
+    // node Compute[5]: x = 134, y = 451, inputs = 2, label = Convert number of  elements, to offset of last element
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0-1"
+    // expression: value = a-1
+    // name[2]: value = a
+    //
+SXBounds_Compute_5_out_1 = 
+    Compute(
+    "$0-1",
+    SXBounds_Inquire_12_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node Select[2]: x = 263, y = 523, inputs = 3, label = Extract the last element from "box" (this will be the upper bounds)
+    //
+SXBounds_Select_2_out_1 = 
+    Select(
+    SXBounds_Extract_1_out_1,
+    SXBounds_Compute_5_out_1,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Output[3]: x = 260, y = 612, inputs = 1, label = Output
+    // parameter: position = 2, name = 'upper', value = ' ', descriptive = 0, description = 'upper bounds', required = 0, visible = 1
+    //
+upper = SXBounds_Select_2_out_1;
+    // 
+    // node Inquire[16]: x = 435, y = 301, inputs = 3, label = Inquire
+    //
+SXBounds_Inquire_16_out_1 = 
+    Inquire(
+    SXBounds_Route_1_out_2,
+    NULL,
+    NULL
+    ) [instance: 16, cache: 1];
+    // 
+    // node Format[1]: x = 436, y = 394, inputs = 3, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "Input is a group. Should be a field"
+    //
+SXBounds_Format_1_out_1 = 
+    Format(
+    "Input is a group. Should be a field",
+    SXBounds_Inquire_16_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXError[1]: x = 443, y = 489, inputs = 1, label = SXError
+    //
+    SXError(
+    SXBounds_Format_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Select[1]: x = 31, y = 526, inputs = 3, label = Select the first element from "box" (this will be the lower bounds)
+    //
+SXBounds_Select_1_out_1 = 
+    Select(
+    SXBounds_Extract_1_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[2]: x = 26, y = 613, inputs = 1, label = Output
+    // parameter: position = 1, name = 'lower', value = ' ', descriptive = 0, description = 'lower bounds', required = 0, visible = 1
+    //
+lower = SXBounds_Select_1_out_1;
+// network: end of macro body
+}
+SXBounds_Input_7_out_1 = NULL;
+SXBounds_Inquire_15_out_1 = NULL;
+SXBounds_Compute_9_out_1 = NULL;
+SXBounds_Route_1_out_1 = NULL;
+SXBounds_Route_1_out_2 = NULL;
+SXBounds_Extract_1_out_1 = NULL;
+SXBounds_Inquire_12_out_1 = NULL;
+SXBounds_Compute_5_out_1 = NULL;
+SXBounds_Select_2_out_1 = NULL;
+SXBounds_Inquire_16_out_1 = NULL;
+SXBounds_Format_1_out_1 = NULL;
+SXBounds_Select_1_out_1 = NULL;

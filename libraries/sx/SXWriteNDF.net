@@ -1,0 +1,147 @@
+//
+// time: Wed Oct 18 11:52:17 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXWriteNDF
+// CATEGORY Import and Export
+// DESCRIPTION writes a field to an NDF structure
+// INPUT input; field; (none); The input field
+// INPUT ndf; string; (none); The output NDF
+// End MDF
+// workspace: width = 522, height = 618
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXWriteNDF(
+ input
+,ndf
+) -> (
+) {
+    // 
+    // node Input[6]: x = 479, y = 47, inputs = 0, label = Input
+    // parameter: position = 2, name = 'ndf', value = '(none)', descriptive = 1, description = 'The output NDF', required = 1, visible = 1
+    //
+SXWriteNDF_Input_6_out_1 = ndf;
+    // 
+    // node Input[2]: x = 200, y = 37, inputs = 0, label = Input
+    // parameter: position = 1, name = 'input', value = '(none)', descriptive = 1, description = 'The input field', required = 1, visible = 1
+    //
+SXWriteNDF_Input_2_out_1 = input;
+    // 
+    // node Inquire[2]: x = 210, y = 141, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "is field"
+    //
+SXWriteNDF_Inquire_2_out_1 = 
+    Inquire(
+    SXWriteNDF_Input_2_out_1,
+    "is field",
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[1]: x = 212, y = 215, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXWriteNDF_Compute_1_out_1 = 
+    Compute(
+    "$0+1",
+    SXWriteNDF_Inquire_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Route[1]: x = 278, y = 304, inputs = 2, outputs = 2, label = Route
+    //
+SXWriteNDF_Route_1_out_1,
+SXWriteNDF_Route_1_out_2 = 
+    Route(
+    SXWriteNDF_Compute_1_out_1,
+    SXWriteNDF_Input_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXExport[1]: x = 370, y = 381, inputs = 3, label = SXExport
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "SXWriteNDF.tmp"
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "dx text follows"
+    //
+SXWriteNDF_SXExport_1_out_1 = 
+    SXExport(
+    SXWriteNDF_Route_1_out_2,
+    "SXWriteNDF.tmp",
+    "dx text follows"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[2]: x = 444, y = 468, inputs = 3, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "csh -c 'convert;eval dx2ndf in=SXWriteNDF.tmp.dx out=%s;rm -f SXWriteNDF.tmp.dx'>/dev/null"
+    //
+SXWriteNDF_Format_2_out_1 = 
+    Format(
+    "csh -c 'convert;eval dx2ndf in=SXWriteNDF.tmp.dx out=%s;rm -f SXWriteNDF.tmp.dx'>/dev/null",
+    SXWriteNDF_Input_6_out_1,
+    SXWriteNDF_SXExport_1_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node System[1]: x = 454, y = 555, inputs = 1, label = System
+    //
+    System(
+    SXWriteNDF_Format_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[1]: x = 96, y = 382, inputs = 3, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "SXWriteNDF: Input should contain a single field"
+    //
+SXWriteNDF_Format_1_out_1 = 
+    Format(
+    "SXWriteNDF: Input should contain a single field",
+    SXWriteNDF_Route_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXError[1]: x = 102, y = 468, inputs = 1, label = SXError
+    //
+    SXError(
+    SXWriteNDF_Format_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXDummy[3]: x = 355, y = 126, inputs = 10, label = SXDummy
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXWriteNDF_Input_6_out_1,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXDummy[2]: x = 115, y = 141, inputs = 10, label = SXDummy
+    // input[1]: visible = 1
+    //
+    SXDummy(
+    SXWriteNDF_Input_2_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+// network: end of macro body
+}
+SXWriteNDF_Input_6_out_1 = NULL;
+SXWriteNDF_Input_2_out_1 = NULL;
+SXWriteNDF_Inquire_2_out_1 = NULL;
+SXWriteNDF_Compute_1_out_1 = NULL;
+SXWriteNDF_Route_1_out_1 = NULL;
+SXWriteNDF_Route_1_out_2 = NULL;
+SXWriteNDF_SXExport_1_out_1 = NULL;
+SXWriteNDF_Format_2_out_1 = NULL;
+SXWriteNDF_Format_1_out_1 = NULL;

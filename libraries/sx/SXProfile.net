@@ -1,0 +1,322 @@
+//
+// time: Wed Oct 18 11:50:44 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXProfile
+// CATEGORY Realization
+// DESCRIPTION creates a 1-dimensional profile through a field between 2 points
+// INPUT input; field; (none); input data field
+// INPUT start; vector; (lower bounds of input field); starting point of line
+// INPUT end; vector; (upper bounds of input field); ending point of line
+// INPUT density; integer; 30; number of points along line
+// OUTPUT line; geometry field; A Geomtry field describing the line
+// OUTPUT profile; field; 1D field holding data values along the line
+// End MDF
+// workspace: width = 711, height = 1095
+// layout: snap = 0, width = 50, height = 50, align = CC
+//
+macro SXProfile(
+ input
+,start
+,end
+,density = 30
+) -> (
+ line
+,profile
+) {
+    // 
+    // node Input[1]: x = 25, y = 16, inputs = 0, label = Input
+    // parameter: position = 2, name = 'start', value = '(lower bounds of input field)', descriptive = 1, description = 'starting point of line', required = 0, visible = 1
+    //
+SXProfile_Input_1_out_1 = start;
+    // 
+    // node Inquire[4]: x = 12, y = 107, inputs = 3, label = Inquire
+    //
+SXProfile_Inquire_4_out_1 = 
+    Inquire(
+    SXProfile_Input_1_out_1,
+    NULL,
+    NULL
+    ) [instance: 4, cache: 1];
+    // 
+    // node Compute[8]: x = 14, y = 177, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXProfile_Compute_8_out_1 = 
+    Compute(
+    "$0+1",
+    SXProfile_Inquire_4_out_1
+    ) [instance: 8, cache: 1];
+    // 
+    // node Input[4]: x = 501, y = 9, inputs = 0, label = Input
+    // parameter: position = 1, name = 'input', value = '(none)', descriptive = 1, description = 'input data field', required = 1, visible = 1
+    //
+SXProfile_Input_4_out_1 = input;
+    // 
+    // node SXBounds[1]: x = 506, y = 164, inputs = 1, label = SXBounds
+    //
+SXProfile_SXBounds_1_out_1,
+SXProfile_SXBounds_1_out_2 = 
+    SXBounds(
+    SXProfile_Input_4_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Switch[2]: x = 52, y = 278, inputs = 3, label = Select the supplied "start" value, or the lower bounds of "input" if no value was supplied for "start".
+    //
+SXProfile_Switch_2_out_1 = 
+    Switch(
+    SXProfile_Compute_8_out_1,
+    SXProfile_Input_1_out_1,
+    SXProfile_SXBounds_1_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Input[2]: x = 231, y = 13, inputs = 0, label = Input
+    // parameter: position = 3, name = 'end', value = '(upper bounds of input field)', descriptive = 1, description = 'ending point of line', required = 0, visible = 1
+    //
+SXProfile_Input_2_out_1 = end;
+    // 
+    // node Inquire[17]: x = 207, y = 103, inputs = 3, label = Inquire
+    //
+SXProfile_Inquire_17_out_1 = 
+    Inquire(
+    SXProfile_Input_2_out_1,
+    NULL,
+    NULL
+    ) [instance: 17, cache: 1];
+    // 
+    // node Compute[10]: x = 209, y = 174, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXProfile_Compute_10_out_1 = 
+    Compute(
+    "$0+1",
+    SXProfile_Inquire_17_out_1
+    ) [instance: 10, cache: 1];
+    // 
+    // node Switch[3]: x = 258, y = 269, inputs = 3, label = Select the supplied "end" value, or the upper bounds of "input" if no value was supplied for "end".
+    //
+SXProfile_Switch_3_out_1 = 
+    Switch(
+    SXProfile_Compute_10_out_1,
+    SXProfile_Input_2_out_1,
+    SXProfile_SXBounds_1_out_2
+    ) [instance: 3, cache: 1];
+    // 
+    // node Compute[1]: x = 101, y = 411, inputs = 3, label = Compute--finds the midpoint between start and end
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "($1 - $0)/2.0 + $0"
+    // expression: value = (end - start)/2.0 + start
+    // name[2]: value = start
+    // name[3]: value = end
+    //
+SXProfile_Compute_1_out_1 = 
+    Compute(
+    "($1 - $0)/2.0 + $0",
+    SXProfile_Switch_2_out_1,
+    SXProfile_Switch_3_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[2]: x = 214, y = 412, inputs = 3, label = Compute--finds the distance from start (or end) to the midpoint
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "($1 - $0)/2.0"
+    // expression: value = (end - start)/2.0
+    // name[2]: value = start
+    // name[3]: value = end
+    //
+SXProfile_Compute_2_out_1 = 
+    Compute(
+    "($1 - $0)/2.0",
+    SXProfile_Switch_2_out_1,
+    SXProfile_Switch_3_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Input[3]: x = 589, y = 10, inputs = 0, label = Input
+    // parameter: position = 4, name = 'density', value = '30', descriptive = 0, description = 'number of points along line', required = 0, visible = 1
+    //
+SXProfile_Input_3_out_1 = density;
+    // 
+    // node Grid[1]: x = 146, y = 504, inputs = 4, label = Grid--constructs a line from start to end with the specified number of points along it
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "line"
+    //
+SXProfile_Grid_1_out_1 = 
+    Grid(
+    SXProfile_Compute_1_out_1,
+    "line",
+    SXProfile_Compute_2_out_1,
+    SXProfile_Input_3_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Map[1]: x = 384, y = 625, inputs = 4, label = Map--map the data field onto the contstructed line
+    //
+SXProfile_Map_1_out_1 = 
+    Map(
+    SXProfile_Grid_1_out_1,
+    SXProfile_Input_4_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Mark[1]: x = 383, y = 695, inputs = 2, label = Mark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXProfile_Mark_1_out_1 = 
+    Mark(
+    SXProfile_Map_1_out_1,
+    "positions"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[3]: x = 373, y = 778, inputs = 3, label = Compute--computes the distance along the line from the starting point
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[sqrt(($0.x -$1.x)^2 + ($0.y - $1.y)^2 + ($0.z - $1.z)^2)]"
+    // expression: value = [sqrt((a.x -start.x)^2 + (a.y - start.y)^2 + (a.z - start.z)^2)]
+    // name[2]: value = a
+    // name[3]: value = start
+    //
+SXProfile_Compute_3_out_1 = 
+    Compute(
+    "[sqrt(($0.x -$1.x)^2 + ($0.y - $1.y)^2 + ($0.z - $1.z)^2)]",
+    SXProfile_Mark_1_out_1,
+    SXProfile_Switch_2_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Unmark[1]: x = 378, y = 853, inputs = 2, label = Unmark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXProfile_Unmark_1_out_1 = 
+    Unmark(
+    SXProfile_Compute_3_out_1,
+    "positions"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[2]: x = 14, y = 383, inputs = 2, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "%.3g"
+    //
+SXProfile_Format_2_out_1 = 
+    Format(
+    "%.3g",
+    SXProfile_Switch_2_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Format[3]: x = 461, y = 357, inputs = 2, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "%.3g"
+    //
+SXProfile_Format_3_out_1 = 
+    Format(
+    "%.3g",
+    SXProfile_Switch_3_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Options[1]: x = 360, y = 938, inputs = 5, label = Options
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "profile_start"
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "profile_end"
+    //
+SXProfile_Options_1_out_1 = 
+    Options(
+    SXProfile_Unmark_1_out_1,
+    "profile_start",
+    SXProfile_Format_2_out_1,
+    "profile_end",
+    SXProfile_Format_3_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[5]: x = 392, y = 1014, inputs = 1, label = Output
+    // parameter: position = 2, name = 'profile', value = ' ', descriptive = 0, description = '1D field holding data values along the line', required = 0, visible = 1
+    //
+profile = SXProfile_Options_1_out_1;
+    // 
+    // node Output[4]: x = 168, y = 1032, inputs = 1, label = Output
+    // parameter: position = 1, name = 'line', value = ' ', descriptive = 0, description = 'A Geomtry field describing the line', required = 0, visible = 1
+    //
+line = SXProfile_Grid_1_out_1;
+    // 
+    // node SXDummy[4]: x = 633, y = 98, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXProfile_Input_3_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 4, cache: 1];
+    // 
+    // node SXDummy[3]: x = 326, y = 96, inputs = 10, label = SXDummy
+    // input[3]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    SXProfile_Input_2_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXDummy[2]: x = 102, y = 103, inputs = 10, label = SXDummy
+    // input[3]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    SXProfile_Input_1_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node SXDummy[1]: x = 456, y = 99, inputs = 10, label = SXDummy
+    // input[1]: visible = 1
+    //
+    SXDummy(
+    SXProfile_Input_4_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+// network: end of macro body
+}
+SXProfile_Input_1_out_1 = NULL;
+SXProfile_Inquire_4_out_1 = NULL;
+SXProfile_Compute_8_out_1 = NULL;
+SXProfile_Input_4_out_1 = NULL;
+SXProfile_SXBounds_1_out_1 = NULL;
+SXProfile_SXBounds_1_out_2 = NULL;
+SXProfile_Switch_2_out_1 = NULL;
+SXProfile_Input_2_out_1 = NULL;
+SXProfile_Inquire_17_out_1 = NULL;
+SXProfile_Compute_10_out_1 = NULL;
+SXProfile_Switch_3_out_1 = NULL;
+SXProfile_Compute_1_out_1 = NULL;
+SXProfile_Compute_2_out_1 = NULL;
+SXProfile_Input_3_out_1 = NULL;
+SXProfile_Grid_1_out_1 = NULL;
+SXProfile_Map_1_out_1 = NULL;
+SXProfile_Mark_1_out_1 = NULL;
+SXProfile_Compute_3_out_1 = NULL;
+SXProfile_Unmark_1_out_1 = NULL;
+SXProfile_Format_2_out_1 = NULL;
+SXProfile_Format_3_out_1 = NULL;
+SXProfile_Options_1_out_1 = NULL;

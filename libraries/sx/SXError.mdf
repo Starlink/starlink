@@ -1,0 +1,4 @@
+MODULE SXError
+CATEGORY Debugging
+DESCRIPTION reports an error message
+INPUT message; string;(none); the error message 

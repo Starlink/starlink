@@ -1,0 +1,7 @@
+MODULE SXMerge
+CATEGORY Flow Control
+DESCRIPTION pass the first non-NULL input to the output
+INPUT n; integer; (none); number of inputs to check
+INPUT input; object;  (no default); input 
+REPEAT 1
+OUTPUT output; object;  output object

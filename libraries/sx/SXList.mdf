@@ -1,0 +1,9 @@
+MODULE SXList
+CATEGORY Import and Export
+DESCRIPTION write values from a field or list to a text file
+FLAGS SIDE_EFFECT
+INPUT input; field or value or value list or string or string list;  (none); input object
+INPUT file; string;  (Message Window); text file
+INPUT append; integer;  0; append to existing file?
+INPUT names; string or string list;  ("data"); field components to list
+OUTPUT nrec; integer; number of records written to the file

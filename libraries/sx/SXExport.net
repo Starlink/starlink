@@ -1,0 +1,57 @@
+//
+// time: Wed Oct 18 11:54:15 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXExport
+// DESCRIPTION Used by SXWriteNDF to export a field and wait until finished
+// INPUT object; object; (none);  
+// INPUT name; string; (none);  
+// INPUT format; string; (no default);  
+// OUTPUT output; object;  
+// End MDF
+// workspace: width = 305, height = 407
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXExport(
+ object
+,name
+,format
+) -> (
+ output
+) {
+    // 
+    // node Input[3]: x = 143, y = 111, inputs = 0, label = Input
+    // parameter: position = 1, name = 'object', value = '(none)', descriptive = 1, description = ' ', required = 1, visible = 1
+    //
+SXExport_Input_3_out_1 = object;
+    // 
+    // node Input[4]: x = 201, y = 110, inputs = 0, label = Input
+    // parameter: position = 2, name = 'name', value = '(none)', descriptive = 1, description = ' ', required = 1, visible = 1
+    //
+SXExport_Input_4_out_1 = name;
+    // 
+    // node Input[5]: x = 262, y = 108, inputs = 0, label = Input
+    // parameter: position = 3, name = 'format', value = '(no default)', descriptive = 1, description = ' ', required = 0, visible = 1
+    //
+SXExport_Input_5_out_1 = format;
+    // 
+    // node Export[1]: x = 194, y = 229, inputs = 3, label = Export
+    //
+    Export(
+    SXExport_Input_3_out_1,
+    SXExport_Input_4_out_1,
+    SXExport_Input_5_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[1]: x = 201, y = 344, inputs = 1, label = Output
+    // parameter: position = 1, name = 'output', value = ' ', descriptive = 0, description = ' ', required = 0, visible = 1
+    //
+output = NULL;
+// network: end of macro body
+}
+SXExport_Input_3_out_1 = NULL;
+SXExport_Input_4_out_1 = NULL;
+SXExport_Input_5_out_1 = NULL;

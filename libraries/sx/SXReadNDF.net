@@ -1,0 +1,110 @@
+//
+// time: Wed Oct 18 11:52:02 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXReadNDF
+// CATEGORY Import and Export
+// DESCRIPTION reads an NDF data file
+// INPUT ndf; string; (none); name of ndf
+// INPUT positions; integer; 1; is ndf data dependant on positions? (0 for no, 1 for yes)
+// OUTPUT data; object; object containing requested variables
+// End MDF
+// workspace: width = 459, height = 405
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXReadNDF(
+ ndf
+,positions = 1
+) -> (
+ data
+) {
+    // 
+    // node Input[1]: x = 99, y = 25, inputs = 0, label = Input
+    // parameter: position = 1, name = 'ndf', value = '(none)', descriptive = 1, description = 'name of ndf', required = 1, visible = 1
+    //
+SXReadNDF_Input_1_out_1 = ndf;
+    // 
+    // node Input[6]: x = 416, y = 17, inputs = 0, label = Input
+    // parameter: position = 2, name = 'positions', value = '1', descriptive = 0, description = 'is ndf data dependant on positions? (0 for no, 1 for yes)', required = 0, visible = 1
+    //
+SXReadNDF_Input_6_out_1 = positions;
+    // 
+    // node Select[1]: x = 401, y = 90, inputs = 3, label = Select
+    // input[1]: defaulting = 0, visible = 1, type = 16777248, value = {"connections","positions"}
+    //
+SXReadNDF_Select_1_out_1 = 
+    Select(
+    {"connections","positions"},
+    SXReadNDF_Input_6_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[1]: x = 215, y = 194, inputs = 3, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "!SXConv ndf %s %s "
+    //
+SXReadNDF_Format_1_out_1 = 
+    Format(
+    "!SXConv ndf %s %s ",
+    SXReadNDF_Input_1_out_1,
+    SXReadNDF_Select_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Import[1]: x = 225, y = 271, inputs = 6, label = Import
+    // input[3]: defaulting = 0, visible = 0, type = 32, value = "dx"
+    //
+SXReadNDF_Import_1_out_1 = 
+    Import(
+    SXReadNDF_Format_1_out_1,
+    NULL,
+    "dx",
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[1]: x = 223, y = 342, inputs = 1, label = Output
+    // parameter: position = 1, name = 'data', value = ' ', descriptive = 0, description = 'object containing requested variables', required = 0, visible = 1
+    //
+data = SXReadNDF_Import_1_out_1;
+    // 
+    // node SXDummy[2]: x = 311, y = 88, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXReadNDF_Input_6_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node SXDummy[1]: x = 81, y = 100, inputs = 10, label = SXDummy
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXReadNDF_Input_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+// network: end of macro body
+}
+SXReadNDF_Input_1_out_1 = NULL;
+SXReadNDF_Input_6_out_1 = NULL;
+SXReadNDF_Select_1_out_1 = NULL;
+SXReadNDF_Format_1_out_1 = NULL;
+SXReadNDF_Import_1_out_1 = NULL;

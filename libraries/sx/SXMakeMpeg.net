@@ -1,0 +1,437 @@
+//
+// time: Thu Oct 26 12:18:15 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXMakeMpeg
+// CATEGORY Import and Export
+// DESCRIPTION Construct an Mpeg animation
+// INPUT image; field; (no default); rendered image holding next frame
+// INPUT save; integer; 0; 1 to save current frames into an mpeg,   0 to add another frame.
+// INPUT mpeg; string; (no default); name of output mpeg file (including .mpg suffix if required)
+// End MDF
+// workspace: width = 1306, height = 708
+// layout: snap = 0, width = 50, height = 50, align = NN
+//
+macro SXMakeMpeg(
+ image
+,save = 0
+,mpeg
+) -> (
+) {
+    // 
+    // node Input[1]: x = 113, y = 4, inputs = 0, label = Input
+    // parameter: position = 2, name = 'save', value = '0', descriptive = 0, description = '1 to save current frames into an mpeg,   0 to add another frame.', required = 0, visible = 1
+    //
+SXMakeMpeg_Input_1_out_1 = save;
+    // 
+    // node Get[1]: x = 100, y = 83, inputs = 3, label = Get the no. of frames written so far from the "Set" cache. Use "0" if  this is the first execution.
+    // input[1]: defaulting = 0, visible = 1, type = 67108863, value = 0
+    //
+SXMakeMpeg_Get_1_out_1,
+SXMakeMpeg_Get_1_out_2 = 
+    Get(
+    0,
+    SXMakeMpeg_Input_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[2]: x = 1, y = 163, inputs = 2, label = Increment the frame number
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_2_out_1 = 
+    Compute(
+    "$0+1",
+    SXMakeMpeg_Get_1_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Transmitter[1]: x = 13, y = 395, inputs = 1, label = frame
+    //
+frame = SXMakeMpeg_Compute_2_out_1;
+    // 
+    // node Receiver[2]: x = 730, y = 129, inputs = 1, label = frame
+    //
+SXMakeMpeg_Receiver_2_out_1 = frame;
+    // 
+    // node Get[3]: x = 694, y = 13, inputs = 3, label = Get the number of the last frame written
+    // input[1]: defaulting = 0, visible = 1, type = 67108863, value = 0
+    //
+SXMakeMpeg_Get_3_out_1,
+SXMakeMpeg_Get_3_out_2 = 
+    Get(
+    0,
+    NULL,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node Set[3]: x = 739, y = 208, inputs = 3, label = Save the number of the last frame written in another "Set" cache
+    //
+    Set(
+    SXMakeMpeg_Receiver_2_out_1,
+    SXMakeMpeg_Get_3_out_2,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node Receiver[1]: x = 1035, y = 429, inputs = 1, label = frame
+    //
+SXMakeMpeg_Receiver_1_out_1 = frame;
+    // 
+    // node Compute[1]: x = 194, y = 83, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_1_out_1 = 
+    Compute(
+    "$0+1",
+    SXMakeMpeg_Input_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Input[2]: x = 377, y = 3, inputs = 0, label = Input
+    // parameter: position = 1, name = 'image', value = '(no default)', descriptive = 1, description = 'rendered image holding next frame', required = 0, visible = 1
+    //
+SXMakeMpeg_Input_2_out_1 = image;
+    // 
+    // node Route[1]: x = 363, y = 225, inputs = 2, outputs = 2, label = If "Save" is 0 dump the supplied frame to a PPM file
+    //
+SXMakeMpeg_Route_1_out_1,
+SXMakeMpeg_Route_1_out_2 = 
+    Route(
+    SXMakeMpeg_Compute_1_out_1,
+    SXMakeMpeg_Input_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Transmitter[2]: x = 354, y = 398, inputs = 1, label = image
+    //
+image = SXMakeMpeg_Route_1_out_1;
+    // 
+    // node Receiver[3]: x = 1166, y = 14, inputs = 1, label = image
+    //
+SXMakeMpeg_Receiver_3_out_1 = image;
+    // 
+    // node SXBounds[2]: x = 1103, y = 107, inputs = 1, label = Get the size of the image
+    //
+SXMakeMpeg_SXBounds_2_out_1,
+SXMakeMpeg_SXBounds_2_out_2 = 
+    SXBounds(
+    SXMakeMpeg_Receiver_3_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[11]: x = 1058, y = 194, inputs = 2, label = Extract the number of pixels per row in the image
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "int( $0.x+1 )"
+    // expression: value = int( a.x+1 )
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_11_out_1 = 
+    Compute(
+    "int( $0.x+1 )",
+    SXMakeMpeg_SXBounds_2_out_2
+    ) [instance: 11, cache: 1];
+    // 
+    // node Compute[10]: x = 1144, y = 195, inputs = 2, label = Extract the number of rows in the image
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "int( $0.y+1 )"
+    // expression: value = int( a.y+1 )
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_10_out_1 = 
+    Compute(
+    "int( $0.y+1 )",
+    SXMakeMpeg_SXBounds_2_out_2
+    ) [instance: 10, cache: 1];
+    // 
+    // node Format[4]: x = 1096, y = 288, inputs = 3, label = Format the header of a PPM file describing the data file produced by SXWriteImage
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "P6\n%d %d\n255"
+    //
+SXMakeMpeg_Format_4_out_1 = 
+    Format(
+    "P6\n%d %d\n255",
+    SXMakeMpeg_Compute_11_out_1,
+    SXMakeMpeg_Compute_10_out_1
+    ) [instance: 4, cache: 1];
+    // 
+    // node SXList[3]: x = 1083, y = 367, inputs = 4, label = Create the header file
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "SX_header"
+    // input[4]: visible = 0
+    //
+SXMakeMpeg_SXList_3_out_1 = 
+    SXList(
+    SXMakeMpeg_Format_4_out_1,
+    "SX_header",
+    NULL,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node SXWriteImage[1]: x = 1202, y = 108, inputs = 4, label = Write the image data to an "rgb" format disk file
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "SX_data"
+    // input[3]: defaulting = 0, visible = 0, type = 32, value = "rgb"
+    // input[4]: defaulting = 0, visible = 1, type = 1, value = 0
+    //
+SXMakeMpeg_SXWriteImage_1_out_1 = 
+    SXWriteImage(
+    SXMakeMpeg_Receiver_3_out_1,
+    "SX_data",
+    "rgb",
+    0
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[5]: x = 1103, y = 499, inputs = 4, label = Format a command to concatenate the header and data files into a PPM file, including a frame number
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "cat SX_header SX_data.rgb > SX_frame.%d.ppm; rm -f SX_data.* SX_header"
+    //
+SXMakeMpeg_Format_5_out_1 = 
+    Format(
+    "cat SX_header SX_data.rgb > SX_frame.%d.ppm; rm -f SX_data.* SX_header",
+    SXMakeMpeg_Receiver_1_out_1,
+    SXMakeMpeg_SXList_3_out_1,
+    SXMakeMpeg_SXWriteImage_1_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node System[3]: x = 1123, y = 565, inputs = 1, label = Create the PPM file holding the current frames image
+    //
+    System(
+    SXMakeMpeg_Format_5_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Input[3]: x = 534, y = 2, inputs = 0, label = Input
+    // parameter: position = 3, name = 'mpeg', value = '(no default)', descriptive = 1, description = 'name of output mpeg file (including .mpg suffix if required)', required = 0, visible = 1
+    //
+SXMakeMpeg_Input_3_out_1 = mpeg;
+    // 
+    // node Route[5]: x = 523, y = 225, inputs = 2, outputs = 2, label = If "Save" is 1, create a new mpeg from the current collection of frames
+    //
+SXMakeMpeg_Route_5_out_1,
+SXMakeMpeg_Route_5_out_2 = 
+    Route(
+    SXMakeMpeg_Compute_1_out_1,
+    SXMakeMpeg_Input_3_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node Transmitter[3]: x = 538, y = 396, inputs = 1, label = mpeg
+    //
+mpeg = SXMakeMpeg_Route_5_out_2;
+    // 
+    // node Receiver[4]: x = 868, y = 5, inputs = 1, label = mpeg
+    //
+SXMakeMpeg_Receiver_4_out_1 = mpeg;
+    // 
+    // node Inquire[1]: x = 806, y = 77, inputs = 3, label = Inquire
+    //
+SXMakeMpeg_Inquire_1_out_1 = 
+    Inquire(
+    SXMakeMpeg_Receiver_4_out_1,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[4]: x = 808, y = 144, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "1+$0"
+    // expression: value = 1+a
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_4_out_1 = 
+    Compute(
+    "1+$0",
+    SXMakeMpeg_Inquire_1_out_1
+    ) [instance: 4, cache: 1];
+    // 
+    // node Route[2]: x = 830, y = 223, inputs = 2, outputs = 2, label = If no mpeg name has been given, delete the intermediate files, otherwise create an mpeg
+    //
+SXMakeMpeg_Route_2_out_1,
+SXMakeMpeg_Route_2_out_2 = 
+    Route(
+    SXMakeMpeg_Compute_4_out_1,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Format[3]: x = 881, y = 320, inputs = 2, label = Format a command to delete all the intermediate  files 
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "rm -f  SX_frame.*.ppm SX_header  sx_mpeg.param 2>/dev/null"
+    //
+SXMakeMpeg_Format_3_out_1 = 
+    Format(
+    "rm -f  SX_frame.*.ppm SX_header  sx_mpeg.param 2>/dev/null",
+    SXMakeMpeg_Route_2_out_2
+    ) [instance: 3, cache: 1];
+    // 
+    // node System[2]: x = 880, y = 407, inputs = 1, label = Delete the tiff files
+    //
+    System(
+    SXMakeMpeg_Format_3_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[24]: x = 625, y = 123, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0>0"
+    // expression: value = a>0
+    // name[2]: value = a
+    //
+SXMakeMpeg_Compute_24_out_1 = 
+    Compute(
+    "$0>0",
+    SXMakeMpeg_Get_3_out_1
+    ) [instance: 24, cache: 1];
+    // 
+    // node Route[13]: x = 668, y = 222, inputs = 2, outputs = 2, label = Kill the rest of the macro if no frames have been saved
+    //
+SXMakeMpeg_Route_13_out_1,
+SXMakeMpeg_Route_13_out_2 = 
+    Route(
+    SXMakeMpeg_Compute_24_out_1,
+    SXMakeMpeg_Get_3_out_1
+    ) [instance: 13, cache: 1];
+    // 
+    // node SXList[1]: x = 758, y = 315, inputs = 4, label = Write the mpeg_encode parameters file
+    // input[1]: defaulting = 0, visible = 1, type = 16777248, value = {"PATTERN IBBPBBPBBPBBPBB","FORCE_ENCODE_LAST_FRAME","OUTPUT SX.mpg","BASE_FILE_FORMAT PPM","GOP_SIZE 30","SLICES_PER_FRAME 1","PIXEL HALF","RANGE 10","PSEARCH_ALG LOGARITHMIC","BSEARCH_ALG CROSS2","IQSCALE 1","PQSCALE 1","BQSCALE 1","REFERENCE_FRAME DECODED","INPUT_CONVERT *","INPUT_DIR .","INPUT"}
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "sx_mpeg.param"
+    // input[3]: defaulting = 1, visible = 1, type = 1, value = NULL
+    //
+SXMakeMpeg_SXList_1_out_1 = 
+    SXList(
+    {"PATTERN IBBPBBPBBPBBPBB","FORCE_ENCODE_LAST_FRAME","OUTPUT SX.mpg","BASE_FILE_FORMAT PPM","GOP_SIZE 30","SLICES_PER_FRAME 1","PIXEL HALF","RANGE 10","PSEARCH_ALG LOGARITHMIC","BSEARCH_ALG CROSS2","IQSCALE 1","PQSCALE 1","BQSCALE 1","REFERENCE_FRAME DECODED","INPUT_CONVERT *","INPUT_DIR .","INPUT"},
+    "sx_mpeg.param",
+    NULL,
+    SXMakeMpeg_Route_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Format[1]: x = 746, y = 411, inputs = 3, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "SX_frame.*.ppm  [1-%d] \nEND_INPUT"
+    //
+SXMakeMpeg_Format_1_out_1 = 
+    Format(
+    "SX_frame.*.ppm  [1-%d] \nEND_INPUT",
+    SXMakeMpeg_Route_13_out_1,
+    SXMakeMpeg_SXList_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXList[2]: x = 734, y = 498, inputs = 4, label = SXList
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "sx_mpeg.param"
+    // input[3]: defaulting = 0, visible = 1, type = 1, value = 1
+    //
+SXMakeMpeg_SXList_2_out_1 = 
+    SXList(
+    SXMakeMpeg_Format_1_out_1,
+    "sx_mpeg.param",
+    1,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Format[2]: x = 896, y = 569, inputs = 3, label = Format the command to activate mpeg_encode and delete the individual frame files
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "mpeg_encode sx_mpeg.param;mv -f SX.mpg %s;rm -f sx_mpeg.param SX_frame.*.ppm"
+    //
+SXMakeMpeg_Format_2_out_1 = 
+    Format(
+    "mpeg_encode sx_mpeg.param;mv -f SX.mpg %s;rm -f sx_mpeg.param SX_frame.*.ppm",
+    SXMakeMpeg_Receiver_4_out_1,
+    SXMakeMpeg_SXList_2_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node System[1]: x = 911, y = 645, inputs = 1, label = Activate mpeg_encode
+    //
+    System(
+    SXMakeMpeg_Format_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXDummy[3]: x = 451, y = 78, inputs = 10, label = SXDummy
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXMakeMpeg_Input_3_out_1,
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node Switch[1]: x = 51, y = 299, inputs = 3, label = If resetting, store zero in the cache instead of the frame number
+    //
+SXMakeMpeg_Switch_1_out_1 = 
+    Switch(
+    SXMakeMpeg_Compute_1_out_1,
+    SXMakeMpeg_Compute_2_out_1,
+    SXMakeMpeg_Get_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Set[1]: x = 98, y = 394, inputs = 3, label = Place the current frame number in the "Set" cache, to be retrieved by "Get"
+    //
+    Set(
+    SXMakeMpeg_Switch_1_out_1,
+    SXMakeMpeg_Get_1_out_2,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXDummy[2]: x = 310, y = 82, inputs = 10, label = SXDummy
+    // input[1]: visible = 1
+    //
+    SXDummy(
+    SXMakeMpeg_Input_2_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node SXDummy[1]: x = 6, y = 81, inputs = 10, label = SXDummy
+    // input[5]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXMakeMpeg_Input_1_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+// network: end of macro body
+}
+SXMakeMpeg_Input_1_out_1 = NULL;
+SXMakeMpeg_Get_1_out_1 = NULL;
+SXMakeMpeg_Get_1_out_2 = NULL;
+SXMakeMpeg_Compute_2_out_1 = NULL;
+SXMakeMpeg_Transmitter_1_out_1 = NULL;
+SXMakeMpeg_Receiver_2_out_1 = NULL;
+SXMakeMpeg_Get_3_out_1 = NULL;
+SXMakeMpeg_Get_3_out_2 = NULL;
+SXMakeMpeg_Receiver_1_out_1 = NULL;
+SXMakeMpeg_Compute_1_out_1 = NULL;
+SXMakeMpeg_Input_2_out_1 = NULL;
+SXMakeMpeg_Route_1_out_1 = NULL;
+SXMakeMpeg_Transmitter_2_out_1 = NULL;
+SXMakeMpeg_Receiver_3_out_1 = NULL;
+SXMakeMpeg_SXBounds_2_out_2 = NULL;
+SXMakeMpeg_Compute_11_out_1 = NULL;
+SXMakeMpeg_Compute_10_out_1 = NULL;
+SXMakeMpeg_Format_4_out_1 = NULL;
+SXMakeMpeg_SXList_3_out_1 = NULL;
+SXMakeMpeg_SXWriteImage_1_out_1 = NULL;
+SXMakeMpeg_Format_5_out_1 = NULL;
+SXMakeMpeg_Input_3_out_1 = NULL;
+SXMakeMpeg_Route_5_out_2 = NULL;
+SXMakeMpeg_Transmitter_3_out_1 = NULL;
+SXMakeMpeg_Receiver_4_out_1 = NULL;
+SXMakeMpeg_Inquire_1_out_1 = NULL;
+SXMakeMpeg_Compute_4_out_1 = NULL;
+SXMakeMpeg_Route_2_out_1 = NULL;
+SXMakeMpeg_Route_2_out_2 = NULL;
+SXMakeMpeg_Format_3_out_1 = NULL;
+SXMakeMpeg_Compute_24_out_1 = NULL;
+SXMakeMpeg_Route_13_out_1 = NULL;
+SXMakeMpeg_SXList_1_out_1 = NULL;
+SXMakeMpeg_Format_1_out_1 = NULL;
+SXMakeMpeg_SXList_2_out_1 = NULL;
+SXMakeMpeg_Format_2_out_1 = NULL;
+SXMakeMpeg_Switch_1_out_1 = NULL;

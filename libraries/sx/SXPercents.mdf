@@ -1,0 +1,8 @@
+MODULE SXPercents
+CATEGORY Transformation
+DESCRIPTION searches a histogram of data values for requested percentiles
+INPUT input; field; (none); field containing the histogram
+INPUT percents; scalar list; {5.0 95.0}; required percentiles
+OUTPUT outputlist; scalar list; list of the data values at all the requested percentiles
+OUTPUT output; scalar; data value at a single requested percentile
+REPEAT 1

@@ -1,0 +1,109 @@
+//
+// time: Wed Oct 18 11:51:44 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXReadFortran
+// CATEGORY Import and Export
+// DESCRIPTION reads a fortran binary data file
+// INPUT header; string; (none); general  format header file
+// INPUT variable; string or string list; (everything); variables to be read
+// INPUT start; integer; (first frame); starting data frame
+// INPUT end; integer; (last frame); ending data frame
+// INPUT delta; integer; 1; increment between frames
+// OUTPUT data; object; object containing requested variables
+// End MDF
+// workspace: width = 495, height = 459
+// layout: snap = 0, width = 50, height = 50, align = UL
+//
+macro SXReadFortran(
+ header
+,variable
+,start
+,end
+,delta = 1
+) -> (
+ data
+) {
+    // 
+    // node Input[1]: x = 219, y = 76, inputs = 0, label = Input
+    // parameter: position = 1, name = 'header', value = '(none)', descriptive = 1, description = 'general  format header file', required = 1, visible = 1
+    //
+SXReadFortran_Input_1_out_1 = header;
+    // 
+    // node Format[1]: x = 216, y = 152, inputs = 2, label = Format
+    // input[1]: defaulting = 0, visible = 1, type = 32, value = "!SXConv  f77 %s"
+    //
+SXReadFortran_Format_1_out_1 = 
+    Format(
+    "!SXConv  f77 %s",
+    SXReadFortran_Input_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Input[2]: x = 282, y = 77, inputs = 0, label = Input
+    // parameter: position = 2, name = 'variable', value = '(everything)', descriptive = 1, description = 'variables to be read', required = 0, visible = 1
+    //
+SXReadFortran_Input_2_out_1 = variable;
+    // 
+    // node Input[3]: x = 340, y = 78, inputs = 0, label = Input
+    // parameter: position = 3, name = 'start', value = '(first frame)', descriptive = 1, description = 'starting data frame', required = 0, visible = 1
+    //
+SXReadFortran_Input_3_out_1 = start;
+    // 
+    // node Input[4]: x = 397, y = 78, inputs = 0, label = Input
+    // parameter: position = 4, name = 'end', value = '(last frame)', descriptive = 1, description = 'ending data frame', required = 0, visible = 1
+    //
+SXReadFortran_Input_4_out_1 = end;
+    // 
+    // node Input[5]: x = 452, y = 76, inputs = 0, label = Input
+    // parameter: position = 5, name = 'delta', value = '1', descriptive = 0, description = 'increment between frames', required = 0, visible = 1
+    //
+SXReadFortran_Input_5_out_1 = delta;
+    // 
+    // node Import[1]: x = 286, y = 297, inputs = 6, label = Import
+    // input[3]: defaulting = 0, visible = 1, type = 32, value = "general"
+    // input[4]: visible = 1
+    // input[5]: visible = 1
+    // input[6]: visible = 1
+    //
+SXReadFortran_Import_1_out_1 = 
+    Import(
+    SXReadFortran_Format_1_out_1,
+    SXReadFortran_Input_2_out_1,
+    "general",
+    SXReadFortran_Input_3_out_1,
+    SXReadFortran_Input_4_out_1,
+    SXReadFortran_Input_5_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Output[1]: x = 331, y = 396, inputs = 1, label = Output
+    // parameter: position = 1, name = 'data', value = ' ', descriptive = 0, description = 'object containing requested variables', required = 0, visible = 1
+    //
+data = SXReadFortran_Import_1_out_1;
+    // 
+    // node SXDummy[1]: x = 123, y = 155, inputs = 10, label = SXDummy
+    // input[9]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXReadFortran_Input_1_out_1,
+    NULL
+    ) [instance: 1, cache: 1];
+// network: end of macro body
+}
+SXReadFortran_Input_1_out_1 = NULL;
+SXReadFortran_Format_1_out_1 = NULL;
+SXReadFortran_Input_2_out_1 = NULL;
+SXReadFortran_Input_3_out_1 = NULL;
+SXReadFortran_Input_4_out_1 = NULL;
+SXReadFortran_Input_5_out_1 = NULL;
+SXReadFortran_Import_1_out_1 = NULL;

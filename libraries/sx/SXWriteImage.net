@@ -1,0 +1,66 @@
+//
+// time: Thu Oct 19 12:14:07 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXWriteImage
+// DESCRIPTION Calls WriteImage and waits. Used in SXMakeMpeg
+// INPUT image; image or image series; (none); WriteImage "image" parameter
+// INPUT name; string; ("image"); WrtiteImage "name" parameter
+// INPUT format; string; ("rgb" or input dependant); WriteImage "format" parameter
+// INPUT frame; integer; (format dependant); WriteImage "frame" parameter
+// OUTPUT dummy; object; A dummy output to tell other modules when WriteImage has completed
+// End MDF
+// workspace: width = 425, height = 390
+// layout: snap = 0, width = 50, height = 50, align = NN
+//
+macro SXWriteImage(
+ image
+,name
+,format
+,frame
+) -> (
+ dummy
+) {
+    // 
+    // node Input[8]: x = 113, y = 56, inputs = 0, label = Input
+    // parameter: position = 1, name = 'image', value = '(none)', descriptive = 1, description = 'WriteImage "image" parameter', required = 1, visible = 1
+    //
+SXWriteImage_Input_8_out_1 = image;
+    // 
+    // node Input[9]: x = 206, y = 51, inputs = 0, label = Input
+    // parameter: position = 2, name = 'name', value = '("image")', descriptive = 1, description = 'WrtiteImage "name" parameter', required = 0, visible = 1
+    //
+SXWriteImage_Input_9_out_1 = name;
+    // 
+    // node Input[10]: x = 288, y = 55, inputs = 0, label = Input
+    // parameter: position = 3, name = 'format', value = '("rgb" or input dependant)', descriptive = 1, description = 'WriteImage "format" parameter', required = 0, visible = 1
+    //
+SXWriteImage_Input_10_out_1 = format;
+    // 
+    // node Input[11]: x = 382, y = 52, inputs = 0, label = Input
+    // parameter: position = 4, name = 'frame', value = '(format dependant)', descriptive = 1, description = 'WriteImage "frame" parameter', required = 0, visible = 1
+    //
+SXWriteImage_Input_11_out_1 = frame;
+    // 
+    // node WriteImage[3]: x = 226, y = 221, inputs = 4, label = WriteImage
+    //
+    WriteImage(
+    SXWriteImage_Input_8_out_1,
+    SXWriteImage_Input_9_out_1,
+    SXWriteImage_Input_10_out_1,
+    SXWriteImage_Input_11_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Output[4]: x = 248, y = 327, inputs = 1, label = Output
+    // parameter: position = 1, name = 'dummy', value = '(NULL)', descriptive = 1, description = 'A dummy output to tell other modules when WriteImage has completed', required = 0, visible = 1
+    //
+dummy = NULL;
+// network: end of macro body
+}
+SXWriteImage_Input_8_out_1 = NULL;
+SXWriteImage_Input_9_out_1 = NULL;
+SXWriteImage_Input_10_out_1 = NULL;
+SXWriteImage_Input_11_out_1 = NULL;

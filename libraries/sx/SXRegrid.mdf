@@ -1,0 +1,12 @@
+MODULE SXRegrid
+CATEGORY Realization
+DESCRIPTION Regrids points onto a supplied grid
+INPUT input; group or field;  (none); Field or group with positions to regrid
+INPUT grid; field;  (none); grid to use as template
+INPUT nearest  [visible:0]; integer or string;  1; number of nearest neighbours to use
+INPUT radius   [visible:0]; scalar or string;  ("infinity"); radius from grid point to consider
+INPUT scale    [visible:0]; scalar or vector or scalar list;  1.0; scale length for weights
+INPUT exponent [visible:0]; scalar;  1.0; weighting exponent
+INPUT coexp    [visible:0]; scalar;  0.0; exponential co-efficient for weights
+INPUT type     [visible:0]; integer;  0; type of output values required
+OUTPUT output; field or  group;  regridded field

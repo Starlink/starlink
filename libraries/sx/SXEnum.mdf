@@ -1,0 +1,7 @@
+MODULE SXEnum
+CATEGORY Realization
+DESCRIPTION enumerating the positions or connections in a field
+INPUT input; group or field;  (none); input field
+INPUT name; string;  ("data"); name of component to store the enumeration 
+INPUT dep; string;  ("positions"); object to be enumerated; "positions" or "connections"
+OUTPUT output; field or  group;  output field

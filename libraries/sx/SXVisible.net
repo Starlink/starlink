@@ -1,0 +1,504 @@
+//
+// time: Fri Nov 17 12:42:32 1995
+//
+// version: 3.0.0 (format), 3.1.0 (DX)
+//
+//
+// Begin MDF
+// MODULE SXVisible
+// CATEGORY Transformation
+// DESCRIPTION Identify visible positions
+// INPUT field; field; (no default); input field 
+// INPUT list; vector list; (no default); input positions list
+// INPUT camera; camera; (none); camera
+// OUTPUT outfield; field; output field
+// OUTPUT flags; value or value list or field; position visibility flags
+// End MDF
+// workspace: width = 1086, height = 1282
+// layout: snap = 1, width = 20, height = 20, align = CC
+//
+macro SXVisible(
+ field
+,list
+,camera
+) -> (
+ outfield
+,flags
+) {
+    // 
+    // node Input[2]: x = 649, y = 19, inputs = 0, label = Input
+    // parameter: position = 3, name = 'camera', value = '(none)', descriptive = 1, description = 'Camera', required = 1, visible = 1
+    //
+SXVisible_Input_2_out_1 = camera;
+    // 
+    // node SXDummy[1]: x = 552, y = 119, inputs = 10, label = SXDummy
+    // input[10]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXVisible_Input_2_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Input[1]: x = 89, y = 19, inputs = 0, label = Input
+    // parameter: position = 1, name = 'field', value = '(no default)', descriptive = 1, description = 'Input field ', required = 0, visible = 1
+    //
+SXVisible_Input_1_out_1 = field;
+    // 
+    // node Inquire[1]: x = 483, y = 119, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "camera matrix"
+    // input[3]: visible = 0
+    //
+SXVisible_Inquire_1_out_1 = 
+    Inquire(
+    SXVisible_Input_2_out_1,
+    "camera matrix",
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[1]: x = 356, y = 219, inputs = 2, label = Extract the first column of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.0"
+    // expression: value = a.0
+    // name[2]: value = a
+    //
+SXVisible_Compute_1_out_1 = 
+    Compute(
+    "$0.0",
+    SXVisible_Inquire_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Compute[2]: x = 436, y = 219, inputs = 2, label = Extract the second column of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.1"
+    // expression: value = a.1
+    // name[2]: value = a
+    //
+SXVisible_Compute_2_out_1 = 
+    Compute(
+    "$0.1",
+    SXVisible_Inquire_1_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[3]: x = 516, y = 219, inputs = 2, label = Extract the third column of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.2"
+    // expression: value = a.2
+    // name[2]: value = a
+    //
+SXVisible_Compute_3_out_1 = 
+    Compute(
+    "$0.2",
+    SXVisible_Inquire_1_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Compute[5]: x = 354, y = 339, inputs = 4, label = Construct a vector holding the first row of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.x,$1.x,$2.x]"
+    // expression: value = [a.x,b.x,c.x]
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    //
+SXVisible_Compute_5_out_1 = 
+    Compute(
+    "[$0.x,$1.x,$2.x]",
+    SXVisible_Compute_1_out_1,
+    SXVisible_Compute_2_out_1,
+    SXVisible_Compute_3_out_1
+    ) [instance: 5, cache: 1];
+    // 
+    // node Compute[6]: x = 434, y = 339, inputs = 4, label = Construct a vector holding the second row of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.y,$1.y,$2.y]"
+    // expression: value = [a.y,b.y,c.y]
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    //
+SXVisible_Compute_6_out_1 = 
+    Compute(
+    "[$0.y,$1.y,$2.y]",
+    SXVisible_Compute_1_out_1,
+    SXVisible_Compute_2_out_1,
+    SXVisible_Compute_3_out_1
+    ) [instance: 6, cache: 1];
+    // 
+    // node Compute[7]: x = 514, y = 339, inputs = 4, label = Construct a vector holding the third row of the rotation matrix
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.z,$1.z,$2.z]"
+    // expression: value = [a.z,b.z,c.z]
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    //
+SXVisible_Compute_7_out_1 = 
+    Compute(
+    "[$0.z,$1.z,$2.z]",
+    SXVisible_Compute_1_out_1,
+    SXVisible_Compute_2_out_1,
+    SXVisible_Compute_3_out_1
+    ) [instance: 7, cache: 1];
+    // 
+    // node Compute[4]: x = 596, y = 219, inputs = 2, label = Extract the offset vector
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0.3"
+    // expression: value = a.3
+    // name[2]: value = a
+    //
+SXVisible_Compute_4_out_1 = 
+    Compute(
+    "$0.3",
+    SXVisible_Inquire_1_out_1
+    ) [instance: 4, cache: 1];
+    // 
+    // node Inquire[6]: x = 23, y = 119, inputs = 3, label = Inquire
+    // input[2]: visible = 0
+    // input[3]: visible = 0
+    //
+SXVisible_Inquire_6_out_1 = 
+    Inquire(
+    SXVisible_Input_1_out_1,
+    NULL,
+    NULL
+    ) [instance: 6, cache: 1];
+    // 
+    // node Compute[17]: x = 16, y = 199, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0+1"
+    // expression: value = a+1
+    // name[2]: value = a
+    //
+SXVisible_Compute_17_out_1 = 
+    Compute(
+    "$0+1",
+    SXVisible_Inquire_6_out_1
+    ) [instance: 17, cache: 1];
+    // 
+    // node Extract[2]: x = 143, y = 119, inputs = 2, label = Extract
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "positions"
+    //
+SXVisible_Extract_2_out_1 = 
+    Extract(
+    SXVisible_Input_1_out_1,
+    "positions"
+    ) [instance: 2, cache: 1];
+    // 
+    // node Input[3]: x = 249, y = 19, inputs = 0, label = Input
+    // parameter: position = 2, name = 'list', value = '(no default)', descriptive = 1, description = 'Input positions list', required = 0, visible = 1
+    //
+SXVisible_Input_3_out_1 = list;
+    // 
+    // node Switch[2]: x = 174, y = 319, inputs = 3, label = Switch
+    //
+SXVisible_Switch_2_out_1 = 
+    Switch(
+    SXVisible_Compute_17_out_1,
+    SXVisible_Extract_2_out_1,
+    SXVisible_Input_3_out_1
+    ) [instance: 2, cache: 1];
+    // 
+    // node Compute[8]: x = 410, y = 459, inputs = 6, label = Transform supplied positions into a camera-centred 3D Cartesian co-ordinate system
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[ dot($1,$0)+$4.x , dot($2,$0)+$4.y , dot($3,$0)+$4.z ]"
+    // expression: value = [ dot(b,a)+e.x , dot(c,a)+e.y , dot(d,a)+e.z ]
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    // name[5]: value = d
+    // name[6]: value = e
+    //
+SXVisible_Compute_8_out_1 = 
+    Compute(
+    "[ dot($1,$0)+$4.x , dot($2,$0)+$4.y , dot($3,$0)+$4.z ]",
+    SXVisible_Switch_2_out_1,
+    SXVisible_Compute_5_out_1,
+    SXVisible_Compute_6_out_1,
+    SXVisible_Compute_7_out_1,
+    SXVisible_Compute_4_out_1
+    ) [instance: 8, cache: 1];
+    // 
+    // node Compute[9]: x = 796, y = 559, inputs = 2, label = Perspective cameras - Calculate the pixel offset from the image centre for each position
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "(1/$0.z)*[$0.x,$0.y]"
+    // expression: value = (1/a.z)*[a.x,a.y]
+    // name[2]: value = a
+    //
+SXVisible_Compute_9_out_1 = 
+    Compute(
+    "(1/$0.z)*[$0.x,$0.y]",
+    SXVisible_Compute_8_out_1
+    ) [instance: 9, cache: 1];
+    // 
+    // node Inquire[3]: x = 823, y = 119, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "camera resolution"
+    // input[3]: visible = 0
+    //
+SXVisible_Inquire_3_out_1 = 
+    Inquire(
+    SXVisible_Input_2_out_1,
+    "camera resolution",
+    NULL
+    ) [instance: 3, cache: 1];
+    // 
+    // node Compute[11]: x = 776, y = 219, inputs = 2, label = Calculate lower bound for x offset from image centre in pixels
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "-$0/2"
+    // expression: value = -a/2
+    // name[2]: value = a
+    //
+SXVisible_Compute_11_out_1 = 
+    Compute(
+    "-$0/2",
+    SXVisible_Inquire_3_out_1
+    ) [instance: 11, cache: 1];
+    // 
+    // node Compute[12]: x = 856, y = 219, inputs = 2, label = Calculate upper bound for x offset from image centre in pixels
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0/2"
+    // expression: value = a/2
+    // name[2]: value = a
+    //
+SXVisible_Compute_12_out_1 = 
+    Compute(
+    "$0/2",
+    SXVisible_Inquire_3_out_1
+    ) [instance: 12, cache: 1];
+    // 
+    // node Inquire[4]: x = 923, y = 119, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "camera aspect"
+    // input[3]: visible = 0
+    //
+SXVisible_Inquire_4_out_1 = 
+    Inquire(
+    SXVisible_Input_2_out_1,
+    "camera aspect",
+    NULL
+    ) [instance: 4, cache: 1];
+    // 
+    // node Compute[13]: x = 936, y = 219, inputs = 3, label = Calculate lower bound for y offset from image centre in pixels
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "-$0*$1/2"
+    // expression: value = -a*b/2
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+SXVisible_Compute_13_out_1 = 
+    Compute(
+    "-$0*$1/2",
+    SXVisible_Inquire_3_out_1,
+    SXVisible_Inquire_4_out_1
+    ) [instance: 13, cache: 1];
+    // 
+    // node Compute[14]: x = 1016, y = 219, inputs = 3, label = Calculate upper bound for Y offset from image centre in pixels
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "$0*$1/2"
+    // expression: value = a*b/2
+    // name[2]: value = a
+    // name[3]: value = b
+    //
+SXVisible_Compute_14_out_1 = 
+    Compute(
+    "$0*$1/2",
+    SXVisible_Inquire_3_out_1,
+    SXVisible_Inquire_4_out_1
+    ) [instance: 14, cache: 1];
+    // 
+    // node Inquire[7]: x = 683, y = 119, inputs = 3, label = Inquire
+    // input[2]: defaulting = 0, visible = 0, type = 32, value = "is camera perspective"
+    // input[3]: visible = 0
+    //
+SXVisible_Inquire_7_out_1 = 
+    Inquire(
+    SXVisible_Input_2_out_1,
+    "is camera perspective",
+    NULL
+    ) [instance: 7, cache: 1];
+    // 
+    // node Compute[19]: x = 676, y = 219, inputs = 2, label = Compute
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "1+$0"
+    // expression: value = 1+a
+    // name[2]: value = a
+    //
+SXVisible_Compute_19_out_1 = 
+    Compute(
+    "1+$0",
+    SXVisible_Inquire_7_out_1
+    ) [instance: 19, cache: 1];
+    // 
+    // node Compute[18]: x = 716, y = 559, inputs = 2, label = Orthographic cameras - Extract x and y pixel offsets from image centre
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "[$0.x,$0.y]"
+    // expression: value = [a.x,a.y]
+    // name[2]: value = a
+    //
+SXVisible_Compute_18_out_1 = 
+    Compute(
+    "[$0.x,$0.y]",
+    SXVisible_Compute_8_out_1
+    ) [instance: 18, cache: 1];
+    // 
+    // node Switch[3]: x = 694, y = 639, inputs = 3, label = Switch
+    //
+SXVisible_Switch_3_out_1 = 
+    Switch(
+    SXVisible_Compute_19_out_1,
+    SXVisible_Compute_18_out_1,
+    SXVisible_Compute_9_out_1
+    ) [instance: 3, cache: 1];
+    // 
+    // node Compute[15]: x = 850, y = 719, inputs = 6, label = Assign 1 to each position which is within the image bounds
+    // input[1]: defaulting = 0, visible = 0, type = 32, value = "sbyte( $0.x>=$1 && $0.x<=$2 && $0.y >=$3 && $0.y<=$4 )"
+    // expression: value = sbyte( a.x>=b && a.x<=c && a.y >=d && a.y<=e )
+    // name[2]: value = a
+    // name[3]: value = b
+    // name[4]: value = c
+    // name[5]: value = d
+    // name[6]: value = e
+    //
+SXVisible_Compute_15_out_1 = 
+    Compute(
+    "sbyte( $0.x>=$1 && $0.x<=$2 && $0.y >=$3 && $0.y<=$4 )",
+    SXVisible_Switch_3_out_1,
+    SXVisible_Compute_11_out_1,
+    SXVisible_Compute_12_out_1,
+    SXVisible_Compute_13_out_1,
+    SXVisible_Compute_14_out_1
+    ) [instance: 15, cache: 1];
+    // 
+    // node Transmitter[2]: x = 93, y = 459, inputs = 1, label = field
+    //
+field = SXVisible_Input_1_out_1;
+    // 
+    // node Receiver[1]: x = 593, y = 639, inputs = 1, label = field
+    //
+SXVisible_Receiver_1_out_1 = field;
+    // 
+    // node Transmitter[1]: x = 22, y = 459, inputs = 1, label = fieldflag
+    //
+fieldflag = SXVisible_Compute_17_out_1;
+    // 
+    // node Receiver[2]: x = 502, y = 639, inputs = 1, label = fieldflag
+    //
+SXVisible_Receiver_2_out_1 = fieldflag;
+    // 
+    // node Route[1]: x = 546, y = 719, inputs = 2, outputs = 2, label = Route
+    //
+SXVisible_Route_1_out_1,
+SXVisible_Route_1_out_2 = 
+    Route(
+    SXVisible_Receiver_2_out_1,
+    SXVisible_Receiver_1_out_1
+    ) [instance: 1, cache: 1];
+    // 
+    // node Replace[2]: x = 534, y = 819, inputs = 4, label = Store the visibility flags as the "SXVisible" component in the supplied field.
+    // input[3]: visible = 0
+    // input[4]: defaulting = 0, visible = 1, type = 32, value = "SXVisible"
+    //
+SXVisible_Replace_2_out_1 = 
+    Replace(
+    SXVisible_Compute_15_out_1,
+    SXVisible_Route_1_out_1,
+    NULL,
+    "SXVisible"
+    ) [instance: 2, cache: 1];
+    // 
+    // node Mark[1]: x = 546, y = 899, inputs = 2, label = Mark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "SXVisible"
+    //
+SXVisible_Mark_1_out_1 = 
+    Mark(
+    SXVisible_Replace_2_out_1,
+    "SXVisible"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Include[1]: x = 542, y = 979, inputs = 5, label = Remove all invisble positions from the supplied field
+    // input[2]: defaulting = 0, visible = 0, type = 5, value = 0.5
+    // input[3]: defaulting = 0, visible = 0, type = 5, value = 1.5
+    // input[4]: visible = 0
+    // input[5]: visible = 0
+    //
+SXVisible_Include_1_out_1 = 
+    Include(
+    SXVisible_Mark_1_out_1,
+    0.5,
+    1.5,
+    NULL,
+    NULL
+    ) [instance: 1, cache: 1];
+    // 
+    // node Unmark[1]: x = 540, y = 1059, inputs = 2, label = Unmark
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "SXVisible"
+    //
+SXVisible_Unmark_1_out_1 = 
+    Unmark(
+    SXVisible_Include_1_out_1,
+    "SXVisible"
+    ) [instance: 1, cache: 1];
+    // 
+    // node Remove[1]: x = 539, y = 1139, inputs = 2, label = Remove
+    // input[2]: defaulting = 0, visible = 1, type = 32, value = "SXVisible"
+    //
+SXVisible_Remove_1_out_1 = 
+    Remove(
+    SXVisible_Unmark_1_out_1,
+    "SXVisible"
+    ) [instance: 1, cache: 1];
+    // 
+    // node SXDummy[2]: x = 252, y = 119, inputs = 10, label = SXDummy
+    // input[6]: visible = 1
+    //
+    SXDummy(
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    SXVisible_Input_3_out_1,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+    ) [instance: 2, cache: 1];
+    // 
+    // node Output[1]: x = 543, y = 1219, inputs = 1, label = Output
+    // parameter: position = 1, name = 'outfield', value = '(NULL)', descriptive = 1, description = 'Output field', required = 0, visible = 1
+    //
+outfield = SXVisible_Remove_1_out_1;
+    // 
+    // node Output[2]: x = 803, y = 1219, inputs = 1, label = Output
+    // parameter: position = 2, name = 'flags', value = '(NULL)', descriptive = 1, description = 'position visibility flags', required = 0, visible = 1
+    //
+flags = SXVisible_Compute_15_out_1;
+// network: end of macro body
+}
+SXVisible_Input_2_out_1 = NULL;
+SXVisible_Input_1_out_1 = NULL;
+SXVisible_Inquire_1_out_1 = NULL;
+SXVisible_Compute_1_out_1 = NULL;
+SXVisible_Compute_2_out_1 = NULL;
+SXVisible_Compute_3_out_1 = NULL;
+SXVisible_Compute_5_out_1 = NULL;
+SXVisible_Compute_6_out_1 = NULL;
+SXVisible_Compute_7_out_1 = NULL;
+SXVisible_Compute_4_out_1 = NULL;
+SXVisible_Inquire_6_out_1 = NULL;
+SXVisible_Compute_17_out_1 = NULL;
+SXVisible_Extract_2_out_1 = NULL;
+SXVisible_Input_3_out_1 = NULL;
+SXVisible_Switch_2_out_1 = NULL;
+SXVisible_Compute_8_out_1 = NULL;
+SXVisible_Compute_9_out_1 = NULL;
+SXVisible_Inquire_3_out_1 = NULL;
+SXVisible_Compute_11_out_1 = NULL;
+SXVisible_Compute_12_out_1 = NULL;
+SXVisible_Inquire_4_out_1 = NULL;
+SXVisible_Compute_13_out_1 = NULL;
+SXVisible_Compute_14_out_1 = NULL;
+SXVisible_Inquire_7_out_1 = NULL;
+SXVisible_Compute_19_out_1 = NULL;
+SXVisible_Compute_18_out_1 = NULL;
+SXVisible_Switch_3_out_1 = NULL;
+SXVisible_Compute_15_out_1 = NULL;
+SXVisible_Transmitter_2_out_1 = NULL;
+SXVisible_Receiver_1_out_1 = NULL;
+SXVisible_Transmitter_1_out_1 = NULL;
+SXVisible_Receiver_2_out_1 = NULL;
+SXVisible_Route_1_out_1 = NULL;
+SXVisible_Replace_2_out_1 = NULL;
+SXVisible_Mark_1_out_1 = NULL;
+SXVisible_Include_1_out_1 = NULL;
+SXVisible_Unmark_1_out_1 = NULL;
+SXVisible_Remove_1_out_1 = NULL;

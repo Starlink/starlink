@@ -1,0 +1,9 @@
+MODULE SXRand
+CATEGORY Realization
+DESCRIPTION create a set of random vectors
+INPUT nvec; integer or group or field;  (1); number of vectors required
+INPUT ndim [visible:0]; integer;  (1); dimensionality for each vector
+INPUT dist [visible:0]; integer;  (1); type of distribution
+INPUT a [visible:0]; scalar;  (0.0); first parameter describing the distribution
+INPUT b [visible:0]; scalar;  (1.0); second parameter describing the distribution
+OUTPUT output; vector list or group or field;  output vectors
