@@ -56,7 +56,7 @@ use Exporter;
 
 #  Names of routines and variables defined here to be exported.
 
-@EXPORT = qw/tarxf mkdirp popd pushd starpack rmrf parsetag taggable 
+@EXPORT = qw/tarxf mkdirp popd pushd chdir cwd starpack rmrf parsetag taggable 
              $incdir $srcdir $bindir $scb_tmpdir $scbindex_tmpdir $indexdir
              $mimetypes_file
              $htxserver
@@ -82,7 +82,17 @@ sub error { &main::error (@_) }
 
 #  Includes.
 
-use Cwd;
+#  By overriding the standard Perl 'chdir' with the one from the Cwd 
+#  module, the PWD environment variable is kept up to date.  We then 
+#  provide our own cwd using PWD.
+#  This is preferable to using &Cwd::cwd, because the latter gives the
+#  actual directory location instead of the location we've asked to go
+#  to; the actual one can be in some weird symlinked place that the 
+#  automounter umounts while we're not looking, which causes trouble
+#  if we try to go back there some time.
+
+use Cwd 'chdir';
+sub cwd { $ENV{'PWD'} }
 
 ########################################################################
 #  Global variables.

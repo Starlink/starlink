@@ -119,7 +119,6 @@ $| = 1;
 
 #  Required libraries.
 
-use Cwd;
 use Scb;
 use StarIndex;
 
