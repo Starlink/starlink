@@ -240,7 +240,6 @@ itcl::class gaia::Gaia {
 
       #  Permission supplied so continue with exit.
       delete object $w_
-      puts "$this exiting..."
       after idle exit
    }
 
