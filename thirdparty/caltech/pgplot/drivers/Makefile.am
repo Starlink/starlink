@@ -12,11 +12,11 @@ libpgplot_adam_drivers_la_SOURCES = star_grexec.f
 
 EXTRA_libpgplot_drivers_la_SOURCES = $(DRIVER_ROUTINES)
 libpgplot_drivers_la_LIBADD = $(BUILT_DRIVER_ROUTINES)
-libpgplot_drivers_la_DEPENDENCIES = $(BUILT_DRIVER_ROUINES)
+libpgplot_drivers_la_DEPENDENCIES = $(BUILT_DRIVER_ROUTINES)
 
 EXTRA_libpgplot_adam_drivers_la_SOURCES = $(STAR_DRIVER_ROUTINES)
 libpgplot_adam_drivers_la_LIBADD = $(STAR_BUILT_DRIVER_ROUTINES)
-libpgplot_adam_drivers_la_DEPENDENCIES = $(STAR_BUILT_DRIVER_ROUINES)
+libpgplot_adam_drivers_la_DEPENDENCIES = $(STAR_BUILT_DRIVER_ROUTINES)
 
 bin_PROGRAMS = pgxwin_server
 pgxwin_server_SOURCES = pgxwin_server.c

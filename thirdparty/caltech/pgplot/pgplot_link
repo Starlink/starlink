@@ -57,7 +57,7 @@
 
 #-
 
-      echo -lpgplot -lpng -lz `starx_link` \
+      echo -lpgplot -lpng -lz `starX_link` \
            | awk 'BEGIN{RS=" ";FS="\n"}
                   {f[i++]=$1}
                   END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
