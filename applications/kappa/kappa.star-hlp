@@ -7276,8 +7276,8 @@ MARKER = _INTEGER (Read)
 3 MAXPOS
 MAXPOS = _INTEGER (Read)
    The maximum number of positions which may be supplied before the
-   application terminates. The number must be in the range 1 to 500.
-   [500]
+   application terminates. The number must be in the range 1 to 200.
+   [200]
 3 MINPOS
 MINPOS = _INTEGER (Read)
    The minimum number of positions which may be supplied. The user
