@@ -264,13 +264,14 @@
 *    Status :
       INTEGER STATUS
 *    Function declarations :
+      INTEGER CHR_LEN
 *    Local constants :
 *    Local variables :
       CHARACTER*132 FILE
       CHARACTER*16 REC
       REAL COLTAB(3,16)
       INTEGER IFD
-      INTEGER I,N
+      INTEGER I,N,L
       LOGICAL OK
 *-
 
@@ -285,6 +286,10 @@
           ENDDO
 
           CALL USI_GET0C('FILE',FILE,STATUS)
+          IF (INDEX(FILE,'.').EQ.0) THEN
+            L=CHR_LEN(FILE)
+            FILE=FILE(:L)//'.act'
+          ENDIF
           CALL FIO_OPEN(FILE,'WRITE','LIST',0,IFD,STATUS)
           DO I=1,16
             WRITE(REC,'(3(F4.2,1X))')
