@@ -28,11 +28,11 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
    PIXTYPE      *thresht;
    PIXTYPE      threshs[NRAD];
    double       dval;
-   float        *mu_rad;
+   float        *rad;
    int          i;
 
    /*  If these measurements are required */
-   if ( FLAG(obj.mu_rad[0]) ) {
+   if ( FLAG(obj.rad[0]) ) {
  
       /*  Measurement and detection images may be same */
       if ( ! dfield ) {
@@ -41,7 +41,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
       for ( i=0; i < NRAD; i++ ) {
 
          /*  Correct for zero point of surface brightness */
-         dval = prefs.mu_rad[0] - prefs.mu_rad[1];
+         dval = prefs.rad[0] - prefs.rad[1];
          
          /*  And generate threshold intensities */
          for( i = 0; i < NRAD; i++ ) {
@@ -53,7 +53,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
             if ( threshs[i] < field->thresh ) {
                threshs[i] = BIG;
             }
-            dval += prefs.mu_rad[2]; /*  Increment to next
+            dval += prefs.rad[2]; /*  Increment to next
                                          threshold */
          }
       }
@@ -73,10 +73,10 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
           which are ignored) */
       for( pixt  = pixel + obj->firstpix; pixt >= pixel;
            pixt  = pixel + PLIST( pixt, nextpix ) ) {
-         for( i = 0, mu_rad = obj->mu_rad, thresht = threshs;
-              i < NRAD ; i++, mu_rad++, thresht++ ) {
+         for( i = 0, rad = obj->rad, thresht = threshs;
+              i < NRAD ; i++, rad++, thresht++ ) {
             if ( PLIST( pixt, value ) > *thresht && *thresht != BIG ) {
-               (*mu_rad)++;
+               (*rad)++;
             } else if ( *thresht != BIG ) {
                continue;
             }
@@ -84,9 +84,9 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
       }
 
       /*  Convert counts into radii */
-      for( i = 0, mu_rad = obj->mu_rad; i < NRAD; i++ ) {
-         *mu_rad = sqrt( *mu_rad / PI );
-         mu_rad++;
+      for( i = 0, rad = obj->rad; i < NRAD; i++ ) {
+         *rad = sqrt( *rad / PI );
+         rad++;
       }      
    }
 }

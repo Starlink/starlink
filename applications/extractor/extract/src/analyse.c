@@ -89,6 +89,7 @@ void  examineiso(picstruct *field, picstruct *dfield, objstruct *obj,
    float		*heap,*heapt,*heapj,*heapk, swap;
    PIXTYPE		pix, cdpix, tpix, peak,cdpeak, thresh,dthresh;
    static PIXTYPE	threshs[NISO];
+   static PIXTYPE	threshr[NRAD];
 
 
   if (!dfield)

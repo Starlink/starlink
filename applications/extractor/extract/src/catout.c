@@ -26,6 +26,8 @@
 *                          Stopped on-off initialisation of SKYCAT
 *                          format string. This was causing problems
 *                          under Tcl/ICL. 
+*                       16/02/00 (PWD):
+*                          Added initialisation of average radii.
 *
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 #include	<math.h>
@@ -281,6 +283,11 @@ void	updateparamflags()
   FLAG(obj.iso[0]) |= FLAG(obj2.sprob);
   for (i=0; i<NISO; i++)
     FLAG(obj.iso[0]) |= FLAG(obj.iso[i]);
+
+/* Average radii are all calculated if one is needed */
+  for ( i = 0; i < NRAD; i++ ) {
+     FLAG(obj.rad[0]) |= FLAG(obj.rad[i]);
+  }
 
   return;
   }
