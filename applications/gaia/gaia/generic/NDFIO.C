@@ -44,7 +44,6 @@
 //-
 
 #include <string.h>
-#include <stream.h>
 #include <strstream.h>
 #include <stdlib.h>
 #include <ctype.h>

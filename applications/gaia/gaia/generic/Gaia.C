@@ -148,20 +148,19 @@ extern "C" int Gaia_Init( Tcl_Interp *interp )
         return TCL_ERROR;
 
     //  Also do the package provide.
-    if (Tcl_Eval(interp, "
-global iwidgets_library iwidgets_version
-package require Tcl 8.0
-package require Tk 8.0
-package require Itcl 3.0
-package require Itk 3.0
-namespace eval ::iwidgets {
-  namespace export *
-  variable library $iwidgets_library
-  variable version $iwidgets_version
-}
-lappend auto_path \"$iwidgets_library/scripts\"
-package provide Iwidgets $iwidgets_version
-"
+    if (Tcl_Eval(interp,
+"global iwidgets_library iwidgets_version;"
+"package require Tcl 8.0;"
+"package require Tk 8.0;"
+"package require Itcl 3.0;"
+"package require Itk 3.0;"
+"namespace eval ::iwidgets {;"
+"  namespace export *;"
+"  variable library $iwidgets_library;"
+"  variable version $iwidgets_version;"
+"};"
+"lappend auto_path \"$iwidgets_library/scripts\";"
+"package provide Iwidgets $iwidgets_version;"
                  ) != TCL_OK) {
       return TCL_ERROR;
     }

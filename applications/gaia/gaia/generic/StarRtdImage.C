@@ -154,7 +154,7 @@ static const double rad_ = pi_/180.;
 //-
 static class StarRtdImageSubCmds {
 public:
-  char* name;                                        // Method name
+  char *name;                                        // Method name
   int (StarRtdImage::*fptr)(int argc, char* argv[]); // Ptr to method
   int min_args;                                      // Minimum number of args
   int max_args;                                      // Maximum number of args
@@ -2257,17 +2257,17 @@ void StarRtdImage::decodeLinear( double tr[6], double &xz, double &yz,
   //  Orientation.
   double ws = c * rb2e2 - e * rc2f2;
   double wc = b * rc2f2 + f * rb2e2;
-  double or = 0.0;
+  double wor = 0.0;
   if ( ws != 0.0 || wc != 0.0 ) {
-    or = atan2( ws, wc );
+    wor = atan2( ws, wc );
   }
 
   //  Offsets.
   double hp = p / 2.0;
   double shp = sin( hp );
   double chp = cos( hp );
-  double sor = sin( or );
-  double cor = cos( or );
+  double sor = sin( wor );
+  double cor = cos( wor );
   double det = xsc * ysc * ( chp + shp ) * ( chp - shp );
   double x0 = 0.0;
   double y0 = 0.0;
@@ -2282,7 +2282,7 @@ void StarRtdImage::decodeLinear( double tr[6], double &xz, double &yz,
   xs = xsc;
   ys = ysc;
   perp = p * R2D;
-  orient = or * R2D;
+  orient = wor * R2D;
 }
 
 //+
