@@ -94,7 +94,8 @@
 *  Frame to output GRID Frame. Simplify it.
       MAP3 = AST_SIMPLIFY( AST_CMPMAP( AST_CMPMAP( MAP1, MAP, .TRUE., 
      :                                             ' ', STATUS ),
-     :                                 MAP2, .TRUE., ' ', STATUS ) )
+     :                                 MAP2, .TRUE., ' ', STATUS ),
+     :                     STATUS )
 
 *  Use this Mapping to remap the GRID Frame in the input WCS FrameSet.
       CALL AST_REMAPFRAME( IWCS1, AST__BASE, MAP3, STATUS )
