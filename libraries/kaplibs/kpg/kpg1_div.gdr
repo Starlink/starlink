@@ -60,11 +60,14 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     MJC: Malcolm J. Currie (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     9-APR-1990 (RFWS):
 *        Original version.
+*     1991 February 26 (MJC):
+*        Fixed bug when VEC routine returns bad status.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -116,7 +119,12 @@
 *  ================================
 *  Simply divide the two data arrays.
       IF ( .NOT. VAR ) THEN
+         CALL ERR_MARK
          CALL VEC_DIV<T>( BAD, EL, A, B, C, IERR, NERR, STATUS )
+
+*  Annul the bad status due to any divide by zeroes or overflows.
+         CALL ERR_ANNUL( STATUS )
+         CALL ERR_RLSE
 
 *  Variance component present:
 *  ==========================
