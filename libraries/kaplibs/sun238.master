@@ -415,7 +415,7 @@ numerical types. The \emph{actual} routines names will not include the trailing
 \begin{htmlonly}
   \begin{rawhtml} 
     <SCRIPT LANGUAGE=JavaScript>
-       open( "./search.html" );
+       open( "./search.html", "SEARCH", "width=700,height=500" );
     </SCRIPT>
   \end{rawhtml}
 

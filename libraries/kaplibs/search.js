@@ -638,26 +638,32 @@ function displayResults(){
    var doc, i, name;
 
    doc = parent.RESULTS.document;
-   doc.writeln( '<table cellpadding="1" cellspacing="14" >' );
 
-   for( i = 0; i < matchedNames.length; i++ ){
-      name = matchedNames[i];
-      doc.writeln( '<tr><td align="left" valign="top">' );
-      doc.writeln( '<a href="'+routines[name].URL+'">'+name+':</A></TD>' );
-      doc.writeln( '<td align="left" valign="top">' );
-      doc.writeln( routines[name].purpose );
+   if( matchedNames.length == 0 ) {
+      doc.writeln( '&nbsp;<p><b><center>No routines are currently selected.</center></b><p>' );
+   } else {
+      doc.writeln( '&nbsp;<p><b><center>Currently selected routines:</center></b><p>' );
+      doc.writeln( '<table cellpadding="1" cellspacing="14" >' );
 
-      doc.write( '(&nbsp;<a href="javascript:void 1;" onMouseOver="status=\'The relevance of the routine.\';return true;" ' );
-      doc.writeln( 'onMouseOut="status=\'\';return true;">'+matchedWeights[name]+'</a>&nbsp;)' );
-
-      doc.write( '(&nbsp;<a href="javascript:parent.frames[0].removeName(\''+name+'\');" ' );
-      doc.write( 'onMouseOver="status=\'Click to remove this routine from the results list.\';return true;" ' );
-      doc.writeln( 'onMouseOut="status=\'\';return true;"><em>remove</em></a>&nbsp;)' );
-
-      doc.writeln( '</td></tr>' );
+      for( i = 0; i < matchedNames.length; i++ ){
+         name = matchedNames[i];
+         doc.writeln( '<tr><td align="left" valign="top">' );
+         doc.writeln( '<a href="'+routines[name].URL+'">'+name+':</A></TD>' );
+         doc.writeln( '<td align="left" valign="top">' );
+         doc.writeln( routines[name].purpose );
+   
+         doc.write( '(&nbsp;<a href="javascript:void 1;" onMouseOver="status=\'The relevance of the routine.\';return true;" ' );
+         doc.writeln( 'onMouseOut="status=\'\';return true;">'+matchedWeights[name]+'</a>&nbsp;)' );
+   
+         doc.write( '(&nbsp;<a href="javascript:parent.frames[0].removeName(\''+name+'\');" ' );
+         doc.write( 'onMouseOver="status=\'Click to remove this routine from the results list.\';return true;" ' );
+         doc.writeln( 'onMouseOut="status=\'\';return true;"><em>remove</em></a>&nbsp;)' );
+   
+         doc.writeln( '</td></tr>' );
+      }
+      doc.writeln( '</table>' );
    }
 
-   doc.writeln( '</table>' );
    doc.close();
 }
 
