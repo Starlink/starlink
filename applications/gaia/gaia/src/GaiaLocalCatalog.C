@@ -266,7 +266,7 @@ int GaiaLocalCatalog::convertTo( int now )
 
     //  Make sure we're ok to attempt a conversion.
     if ( ! startConvert() ) {
-       cout << "Failed to start convertTo" << endl;
+       cerr << "Failed to start convertTo" << endl;
        return 0;
     }
 
@@ -275,8 +275,8 @@ int GaiaLocalCatalog::convertTo( int now )
     sprintf( buf, "%s to %s %s %d", convertTable_, realname_,
              filename_, now );
     if ( Tcl_Eval( interp_, buf ) != TCL_OK ) {
-       cout << buf << endl;
-       cout << "command failed:" << interp_->result << endl;
+       cerr << buf << endl;
+       cerr << "command failed:" << interp_->result << endl;
        return 0;
     }
   }

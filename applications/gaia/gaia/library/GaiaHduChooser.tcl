@@ -98,7 +98,6 @@ itcl::class gaia::GaiaHduChooser {
             [list "serv_type local" "long_name $fname" "short_name \
                   $catalogue" "url $fname"]
       }
-      puts "name = $name, hdu = $hdu ($catalogue)"
       
       #  Display the catalogue.
       gaia::GaiaSearch::new_local_catalog $catalogue $itk_option(-image) \

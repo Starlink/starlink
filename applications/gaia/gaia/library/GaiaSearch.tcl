@@ -283,7 +283,6 @@ itcl::class gaia::GaiaSearch {
       }
 
       #  Create the new window.
-      puts "Creating new instance: $classname $instname $name"
       set instances_($i) \
          [$classname $instname \
              -id $id \

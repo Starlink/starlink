@@ -604,7 +604,6 @@ itcl::class gaia::GaiaApPhotom {
             blt::busy hold $w_
             update idletasks
             catch {file delete GaiaPhotomOut.Dat}
-            puts "PHOTOM: processing image: $image"
             eval $autophotom_ runwith \
                in=$image \
                infile=GaiaPhotomIn.Dat \
