@@ -654,8 +654,11 @@ ndf_bound(indf, ndimx, lbnd, ubnd, ndim, status)
   lbnd = get_mortalspace(ndimx, PACKI32); /* Dynamically allocate C array */
   ubnd = get_mortalspace(ndimx,PACKI32); /* Dynamically allocate C array */
   ndf_bound_(&indf, &ndimx, lbnd, ubnd, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, ndim);
-  unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, ndim);
+  /* Check status */
+  if (status == SAI__OK) {
+    unpack1D( (SV*)ST(2), (void *)lbnd, PACKI32, ndim);
+    unpack1D( (SV*)ST(3), (void *)ubnd, PACKI32, ndim);
+  }
  OUTPUT:
   lbnd
   ubnd
@@ -809,7 +812,9 @@ ndf_dim(indf, ndimx, dim, ndim, status)
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
   ndf_dim_(&indf, &ndimx, dim, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
 #  dim
   ndim
@@ -2188,10 +2193,13 @@ dat_get1c(loc, elx, value, el, status)
   value = malloc(elx * FCHAR);
   dat_get1c_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
 
-  /* Write to perl character array */
-  for (i = 0; i<el; i++) {
-    stringf77toC(value+i*FCHAR,FCHAR);
-    av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+  /* Check status */
+  if (status == SAI__OK) {
+    /* Write to perl character array */
+    for (i = 0; i<el; i++) {
+      stringf77toC(value+i*FCHAR,FCHAR);
+      av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+    }
   }
   free(value); /* Hose */
  OUTPUT:
@@ -2209,7 +2217,9 @@ dat_get1d(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKD);
   dat_get1d_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -2226,7 +2236,9 @@ dat_get1i(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKI32);
   dat_get1i_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -2243,7 +2255,9 @@ dat_get1r(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKF);
   dat_get1r_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -2262,10 +2276,14 @@ dat_getvc(loc, elx, value, el, status)
  CODE:
   value = malloc(elx * FCHAR);
   dat_getvc_(loc, &elx, value, &el, &status, DAT__SZLOC, FCHAR);
-  /* Write to perl character array */
-  for (i = 0; i<el; i++) {
-     stringf77toC(value+i*FCHAR,FCHAR);
-     av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+
+  /* Check status */
+  if (status == SAI__OK) {
+    /* Write to perl character array */
+    for (i = 0; i<el; i++) {
+      stringf77toC(value+i*FCHAR,FCHAR);
+      av_store( (AV*) SvRV(ST(2)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+    }
   }
   free(value); /* Hose */
  OUTPUT:
@@ -2283,7 +2301,9 @@ dat_getvd(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKD);
   dat_getvd_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -2300,7 +2320,9 @@ dat_getvi(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKI32);
   dat_getvi_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -2317,7 +2339,9 @@ dat_getvr(loc, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKF);
   dat_getvr_(loc, &elx, value, &el, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -2988,7 +3012,9 @@ dat_shape(loc, ndimx, dim, ndim, status)
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
   dat_shape_(loc, &ndimx, dim, &ndim, &status, DAT__SZLOC);
-  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
@@ -3223,10 +3249,13 @@ cmp_get1c(loc, name, elx, value, el, status)
  CODE:
   value = malloc(elx * FCHAR);
   cmp_get1c_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
-  /* Write to perl character array */
-  for (i = 0; i<el; i++) {
-     stringf77toC(value+i*FCHAR,FCHAR);
-     av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+  /* Check status */
+  if (status == SAI__OK) {
+    /* Write to perl character array */
+    for (i = 0; i<el; i++) {
+      stringf77toC(value+i*FCHAR,FCHAR);
+      av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+    }
   }
   free(value); /* Hose */
  OUTPUT:
@@ -3245,7 +3274,9 @@ cmp_get1d(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKD);
   cmp_get1d_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -3263,7 +3294,9 @@ cmp_get1i(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKI32);
   cmp_get1i_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -3281,7 +3314,9 @@ cmp_get1r(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKF);
   cmp_get1r_(loc, name, &elx, value, &el, &status, DAT__SZLOC,strlen(name));
-  unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)value, PACKF, el);
  OUTPUT:
   value
   el
@@ -3303,10 +3338,13 @@ cmp_getvc(loc, name, elx, value, el, status)
  CODE:
   value = malloc(elx * FCHAR);
   cmp_getvc_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name), FCHAR);
-  /* Write to perl character array */
-  for (i = 0; i<el; i++) {
-     stringf77toC(value+i*FCHAR,FCHAR);
-     av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+  /* Check status */
+  if (status == SAI__OK) {
+    /* Write to perl character array */
+    for (i = 0; i<el; i++) {
+      stringf77toC(value+i*FCHAR,FCHAR);
+      av_store( (AV*) SvRV(ST(3)), i, newSVpv(value+i*FCHAR,strlen(value+i*FCHAR)));
+    }
   }
   free(value); /* Hose */
  OUTPUT:
@@ -3325,7 +3363,9 @@ cmp_getvd(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKD);
   cmp_getvd_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(3), (void *)value, PACKD, el);
  OUTPUT:
   value
   el
@@ -3343,7 +3383,9 @@ cmp_getvi(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, PACKI32);
   cmp_getvi_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(3), (void *)value, PACKI32, el);
  OUTPUT:
   value
   el
@@ -3361,7 +3403,9 @@ cmp_getvr(loc, name, elx, value, el, status)
  CODE:
   value = get_mortalspace(elx, 'r');
   cmp_getvr_(loc, name, &elx, value, &el, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)value, 'r', el);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(3), (void *)value, 'r', el);
  OUTPUT:
   value
   el
@@ -3635,7 +3679,9 @@ cmp_shape(loc, name, ndimx, dim, ndim, status)
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
   cmp_shape_(loc, name, &ndimx, dim, &ndim, &status, DAT__SZLOC, strlen(name));
-  unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(3), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
@@ -3927,7 +3973,9 @@ ary_dim(iary, ndimx, dim, ndim, status)
  CODE:
   dim = get_mortalspace(ndimx, PACKI32);
   ary_dim_(&iary, &ndimx, dim, &ndim, &status);
-  unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
+  /* Check status */
+  if (status == SAI__OK)
+    unpack1D( (SV*)ST(2), (void *)dim, PACKI32, ndim);
  OUTPUT:
   dim
   ndim
