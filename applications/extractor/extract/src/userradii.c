@@ -32,7 +32,7 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
    int          i;
 
    /*  If these measurements are required */
-   /*if ( FLAG(obj.mu_rad[0]) ) {*/
+   if ( FLAG(obj.mu_rad[0]) ) {
  
       /*  Measurement and detection images may be same */
       if ( ! dfield ) {
@@ -45,31 +45,41 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
          
          /*  And generate threshold intensities */
          for( i = 0; i < NRAD; i++ ) {
-            threshs[i] = dfield->pixscale * dfield->pixscale * 
+            threshs[i] = field->pixscale * field->pixscale * 
                pow( 10.0, -0.4 * dval );
+            
+            /*  Thresholds need to be equal to at least the analysis
+                threshold to have any significance */
+            if ( threshs[i] < field->thresh ) {
+               threshs[i] = BIG;
+            }
             dval += prefs.mu_rad[2]; /*  Increment to next
-                                            threshold */
-            fprintf( stdout, "Threshold(%d) = %f\n", i, threshs[i] );
+                                         threshold */
          }
       }
 
       /*  If image intensities are photographic */
       if ( prefs.detect_type == PHOTO ) {
          for( i = 0; i < NRAD; i++ ) {
-            threshs[i] = exp( threshs[i] / field->ngamma );
-            fprintf( stdout, "Photo threshold(%d) = %f\n", i, threshs[i] );
+            if ( threshs[i] != BIG ) {
+               threshs[i] = log( threshs[i] ) * field->ngamma;
+            }
          }
       }
 
       /*  Look at all pixels in the current object, counting those
-          that lie above each of the thresholds */
-      for( pixt  = pixel + obj->firstpix; 
-           pixt >= pixel;
+          that lie above each of the thresholds, assumes thresholds
+          are sorted in increasing order (except those set to BIG,
+          which are ignored) */
+      for( pixt  = pixel + obj->firstpix; pixt >= pixel;
            pixt  = pixel + PLIST( pixt, nextpix ) ) {
-         for ( i = NRAD, mu_rad = obj->mu_rad, thresht = threshs;
-               i-- && PLIST( pixt, value ) > *thresht; 
-               mu_rad++, thresht++ ) {
-            (*mu_rad)++;
+         for( i = 0, mu_rad = obj->mu_rad, thresht = threshs;
+              i < NRAD ; i++, mu_rad++, thresht++ ) {
+            if ( PLIST( pixt, value ) > *thresht && *thresht != BIG ) {
+               (*mu_rad)++;
+            } else if ( *thresht != BIG ) {
+               continue;
+            }
          }
       }
 
@@ -78,5 +88,5 @@ void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
          *mu_rad = sqrt( *mu_rad / PI );
          mu_rad++;
       }      
-      /*}*/
+   }
 }

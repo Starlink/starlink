@@ -13,4 +13,6 @@
  *        Original version
  */
 
-extern void userradii( objstruct * );
+extern void userradii( picstruct *field, picstruct *dfield, objstruct *obj,
+                       pliststruct *pixel );
+
