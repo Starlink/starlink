@@ -89,9 +89,9 @@
 /* Structure to hold all the useful information about the tokens got from
    the lexer. */
    struct tokitem {
-      char *string;
-      char *strmat;
-      int tokval;
+      char *string;       /* The whole input string.                         */
+      char *strmat;       /* Start of the substring which matches the token. */
+      int tokval;         /* Value identifying the token.                    */
    };
 
 
