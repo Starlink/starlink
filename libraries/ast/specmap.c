@@ -69,6 +69,10 @@ f     - AST_SPECADD: Add a celestial coordinate conversion to an SpecMap
 *        Original version.
 *     14-JUL-2003 (DSB):
 *        Added checks for NAN values produced by transformation functions.
+*     17-SEP-2003 (DSB):
+*        - Improve FRTOAW accuracy by iterating.
+*        - Changed Refrac to use algorithm given in FITS-WCS paper 3
+*        version dated 21/9/03.
 *class--
 */
 
@@ -2353,38 +2357,17 @@ static double Refrac( double wavelen ){
 */
 
 /* Local Variables: */
-   double result;            /* The returned refractive index */
    double w2;                /* Wavenumber squared */
-   double d;                 /* Intermediate value */
-
-/* Initialise. */
-   result = 1.0;
 
 /* Check the global error status. */
-   if ( !astOK ) return result;
+   if ( !astOK || wavelen == 0.0 ) return 1.0;
 
-/* Find the squared wave number in units of "(per cm)**2". */
-   w2 = 1.0E-4/( wavelen * wavelen );
+/* Find the squared wave number in units of "(per um)**2". */
+   w2 = 1.0E-12/( wavelen * wavelen );
 
 /* Apply the rest of the algorithm as described in the FITS WCS 
    paper III. */
-   result = 1.0;
-   result += 6432.8E-8;
-
-   d = 1.46E10 - w2;
-   if( d != 0.0 ) {
-      result += 2.949810E6/d;
-      d = 4.1E9 - w2;
-      if( d != 0.0 ) {
-         result += 2.5540E4/d;
-      } else {
-         result = 1.0;
-      }
-   } else {
-      result = 1.0;
-   }
-
-   return result;
+   return 1.0 + 1.0E-6*( 287.6155 + 1.62887*w2 + 0.01360*w2*w2 );
 }
 
 static void SpecAdd( AstSpecMap *this, const char *cvt, const double args[] ) {
@@ -2650,6 +2633,7 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
    double f2;         /* Squared frequency */   
    double temp;       /* Intermediate value */
    int i;             /* Loop index */
+   int iter;          /* Iteration count */
    int result;        /* Returned value */
 
 /* Check inherited status. */
@@ -2843,9 +2827,25 @@ static int SystemChange( int cvt_code, int np, double *values, double *args,
          for( i = 0; i < np; i++ ) {
             pv++;
             if( *pv != AST__BAD && *pv != 0.0 ) {
+
+/* Form the vacuum wavelength. */
                temp = AST__C/( *pv );
-               *pv = temp/Refrac( temp );
-               if( isnan( *pv ) ) *pv = AST__BAD;
+
+/* The refractive index function "Refrac" requires the wavelength in air
+   as its parameter. Initially assume that the wavelength in air is equal
+   to the vacuum wavelength to get he first estimate of the wavelength in
+   air. Then use this estimate to get a better refractive index in order to
+   form a better estimate of the air wavelength, etc. Iterate in this way a
+   few times. */
+               *pv = temp;
+               for( iter = 0; iter < 3; iter++ ) {
+                  *pv = temp/Refrac( *pv );
+                  if( isnan( *pv ) ) {
+                     *pv = AST__BAD;
+                     break;
+                  }
+               }
+
             } else {
                *pv = AST__BAD;
             }
