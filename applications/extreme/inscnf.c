@@ -4,7 +4,7 @@
 *     inscnf
 *
 *  Purpose:
-*     Wrap %VAL arguments with CNF_PVAL in Fortran.
+*     Wrap %VAL arguments with CNF_PVAL in Fortran 77.
 *
 *  Usage:
 *     inscnf [ in [ out ] ] 

@@ -4,7 +4,7 @@
 *     frepint
 *
 *  Purpose:
-*     Replace INTEGER by INTEGER*8 in Fortran.
+*     Replace INTEGER by INTEGER*8 in Fortran 77.
 *
 *  Usage:
 *     frepint [ in [ out ] ] 
