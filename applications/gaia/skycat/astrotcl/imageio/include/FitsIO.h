@@ -18,6 +18,7 @@
  * Peter W. Draper 04/02/00  Changed constness of write so that
  *                           non-const member can be used within this
  *                           member. 
+ *                 15/08/00  Made write virtual so it can be overriden.
  */
 
 #include <stdio.h>
@@ -117,7 +118,7 @@ public:
     static FitsIO* read(const char* filename, int memOptions = 0);
 
     // write the data to a FITS file 
-    int write(const char *filename);
+    virtual int write(const char *filename);
 
     // compress or decompress the given file and return the new filename
     // see comments in source file for details.
