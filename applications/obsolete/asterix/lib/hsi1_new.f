@@ -152,7 +152,7 @@
       CALL DAT_NEW( HLOC, 'RECORDS', 'HIST_REC', 1, ESIZE, STATUS )
 
 *  Get time string
-      CALL HSI0_TIME( TSTR, STATUS )
+      CALL TCI_CTIME( TSTR, STATUS )
 
 *  Fill values of these objects
       CALL CMP_PUT0C( HLOC, 'CREATED', TSTR, STATUS )

@@ -140,7 +140,7 @@ C      CALL HSI1_GETVRB( HLOC, IVERB, STATUS )
         END IF
 
 *    Get date and time
-        CALL HSI0_TIME( TSTR, STATUS )
+        CALL TCI_CTIME( TSTR, STATUS )
 
 *    Get the command name
         CALL ADI_GET0C( ARGS(2), NAME, STATUS )

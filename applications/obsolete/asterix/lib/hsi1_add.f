@@ -188,7 +188,7 @@
 
 *    Get date and time and write it
         CALL DAT_NEW0C( CRLOC, 'DATE', 18, STATUS )
-        CALL HSI0_TIME( TSTR, STATUS )
+        CALL TCI_CTIME( TSTR, STATUS )
         CALL CMP_PUT0C( CRLOC, 'DATE', TSTR, STATUS )
 
 *    Write the command name
