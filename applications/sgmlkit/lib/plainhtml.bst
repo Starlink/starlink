@@ -3,6 +3,12 @@
 %% Part of bibhtml, copyright Norman Gray <norman@astro.gla.ac.uk>, April 1996.
 %% Repurposed to be part of the Starlink SGML system.
 %% $Id$
+%%
+%% Modified further by urlbst.pl, version 0.3 (marked with "% urlbst.pl")
+%% See <http://www.astro.gla.ac.uk/users/norman/distrib/urlbst/>
+%% Added webpage entry type, and url and lastchecked fields.
+%% Original headers follow...
+
 %
 % Please don't change this file - if you want to have a different layout
 % for your HTML bibliographies, make a _copy_ of this file under a 
@@ -76,9 +82,10 @@ ENTRY
     type
     volume
     year
-    url
     eprint
 %EDIT1
+    url % urlbst.pl
+    lastchecked
   }
   {}
   { label }
@@ -88,16 +95,23 @@ INTEGERS { output.state before.all mid.sentence after.sentence after.block }
 STRINGS { s t xxxmirror }
 
 % Initialise state constants, and location of nearest XXX mirror (for eprints)
+INTEGERS { bracket.state outside.brackets open.brackets within.brackets close.brackets } % urlbst.pl
 FUNCTION {init.state.consts}
-{ #0 'before.all :=
+{ #0 'outside.brackets := % urlbst.pl
+  #1 'open.brackets :=
+  #2 'within.brackets :=
+  #3 'close.brackets :=
+
+   #0 'before.all :=
   #1 'mid.sentence :=
   #2 'after.sentence :=
   #3 'after.block :=
 
-  "xxx.soton.ac.uk" 'xxxmirror :=
+  "uk.arxiv.org" 'xxxmirror :=
 }
 
-FUNCTION {output.nonnull}
+% urlbst.pl
+FUNCTION {output.nonnull.original}
 { 's :=
   output.state mid.sentence =
     { ", " * write$ }
@@ -122,6 +136,66 @@ FUNCTION {output.nonnull}
   s
 }
 
+% urlbst.pl...
+FUNCTION {output.nonnull}
+{ % Save the thing we've been asked to output
+  's :=
+  % If the bracket-state is close.brackets, then add a close-bracket to
+  % what is currently at the top of the stack, and set bracket.state
+  % to outside.brackets
+  bracket.state close.brackets =
+    { "]" *
+      outside.brackets 'bracket.state :=
+    }
+    'skip$
+  if$
+  bracket.state outside.brackets =
+    { % We're outside all brackets -- this is the normal situation.
+      % Write out what's currently at the top of the stack, using the
+      % original output.nonnull function.
+      s
+      output.nonnull.original
+    }
+    { % Still in brackets.  Add open-bracket or (continuation) comma, add the
+      % new text (in s) to the top of the stack, and move to the close-brackets
+      % state, ready for next time (unless inbrackets resets it).  If we come
+      % into this branch, then output.state is carefully undisturbed.
+      bracket.state open.brackets =
+        { " [" * }
+        { ", " * } % bracket.state will be within.brackets
+      if$ 
+      s * 
+      close.brackets 'bracket.state :=
+    }
+  if$
+}
+
+% Call this function just before adding something which should be presented in 
+% brackets.  bracket.state is handled specially within output.nonnull.
+FUNCTION {inbrackets}
+{ bracket.state close.brackets =
+    { within.brackets 'bracket.state := } % reset the state: not open nor closed
+    { open.brackets 'bracket.state := }
+  if$
+}
+
+FUNCTION {format.url}
+{ url empty$
+    { "" }
+    { "URL: <a href=" quote$ * url * quote$
+        * " ><code>" * url * "</code></a>" * }
+%    { "Available from World Wide Web: \url{" url * "}" * }
+  if$
+}
+
+FUNCTION {format.lastchecked}
+{ lastchecked empty$
+    { "" }
+    { inbrackets "cited " lastchecked * }
+  if$
+}
+%  ...% urlbst.pl
+
 FUNCTION {output}
 { duplicate$ empty$
     'pop$
@@ -142,7 +216,8 @@ FUNCTION {output.check}
 % and new.block, and all, but this was frustrated by the asynchronous output
 % mechanism (I think).
 FUNCTION {output.bibitem}
-{ newline$
+{ outside.brackets 'bracket.state := % urlbst.pl
+   newline$
   "<dt><a name=" quote$ * write$
   cite$ write$
   quote$ ">[" * cite$ * "]</a></dt>" * write$ newline$ "<dd>" write$
@@ -151,7 +226,12 @@ FUNCTION {output.bibitem}
 }
 
 FUNCTION {fin.entry}
-{ add.period$
+{ 
+  bracket.state close.brackets = % urlbst.pl
+    { "]" * }
+    'skip$
+  if$
+   add.period$
   write$
   newline$
   "</dd>" write$
@@ -674,6 +754,76 @@ FUNCTION {format.incoll.inproc.crossref}
 %  " \cite{" * crossref * "}" *
 }
 
+% urlbst.pl...
+% Output a URL.  We can't use the more normal idiom (something like
+% `format.url output'), because the `inbrackets' within
+% format.lastchecked applies to everything between calls to `output',
+% so that `format.url format.lastchecked * output' ends up with both
+% the URL and the lastchecked in brackets.
+FUNCTION {output.url}
+{ url empty$
+    'skip$ 
+    { new.block 
+      format.url output
+      format.lastchecked output 
+    }
+  if$
+}
+
+% Webpage entry type.
+% Title and url fields required;
+% author, note, year, month, and lastchecked fields optional
+% See references 
+%   ISO 690-2 http://www.nlc-bnc.ca/iso/tc46sc9/standard/690-2e.htm
+%   http://www.classroom.net/classroom/CitingNetResources.html
+%   http://neal.ctstateu.edu/history/cite.html
+%   http://www.cas.usf.edu/english/walker/mla.html
+% for citation formats for web pages.
+FUNCTION {webpage}
+{ output.bibitem
+  author empty$
+    { editor empty$
+        'skip$  % author and editor both optional
+        { format.editors output.nonnull }
+      if$
+    }
+    { editor empty$
+        { format.authors output.nonnull }
+        { "can't use both author and editor fields in " cite$ * warning$ }
+      if$
+    }
+  if$
+%  author empty$
+%    'skip$
+%    { format.authors output.nonnull }
+%  if$
+  new.block
+  format.title "title" output.check
+  inbrackets "online" output
+  new.block
+  year empty$
+    'skip$
+    { format.date "year" output.check }
+  if$
+  lastchecked empty$
+    'skip$
+    { format.lastchecked output }
+  if$
+  new.block
+  format.url "url" output.check
+  new.block
+  note output
+  fin.entry
+}
+%   ...% urlbst.pl
+
+
+% make 'null' specials
+% the stack has (link href)
+FUNCTION {make.href}
+{
+  "<a href=" quote$ * swap$ quote$ * " >" swap$ "</a>" *
+}
 FUNCTION {article}
 { output.bibitem
   format.authors "author" output.check
@@ -690,6 +840,8 @@ FUNCTION {article}
     }
   if$
   format.eprint output
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
@@ -723,6 +875,8 @@ FUNCTION {book}
   format.edition output
   format.date "year" output.check
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -736,6 +890,8 @@ FUNCTION {booklet}
   howpublished output
   address output
   format.date output
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
@@ -771,6 +927,8 @@ FUNCTION {inbook}
   format.edition output
   format.date "year" output.check
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -796,6 +954,8 @@ FUNCTION {incollection}
       format.chapter.pages output
     }
   if$
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
@@ -833,6 +993,8 @@ FUNCTION {inproceedings}
     }
   if$
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -869,6 +1031,8 @@ FUNCTION {manual}
   format.edition output
   format.date output
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -884,6 +1048,8 @@ FUNCTION {mastersthesis}
   address output
   format.date "year" output.check
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -897,6 +1063,8 @@ FUNCTION {misc}
   howpublished output
   format.date output
   format.eprint output
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
@@ -913,6 +1081,8 @@ FUNCTION {phdthesis}
   school "school" output.check
   address output
   format.date "year" output.check
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
@@ -949,6 +1119,8 @@ FUNCTION {proceedings}
     }
   if$
   new.block
+  output.url % urlbst.pl
+  new.block
   note output
   fin.entry
 }
@@ -964,6 +1136,8 @@ FUNCTION {techreport}
   address output
   format.date "year" output.check
   format.eprint output
+  new.block
+  output.url % urlbst.pl
   new.block
   note output
   fin.entry
