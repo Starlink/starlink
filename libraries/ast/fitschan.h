@@ -57,6 +57,11 @@
 *     DefB1950
 *        Use FK4 B1950 in the abscence of any other indication within a
 *        foreign FITS header? Otherwise, FK5 J2000 is used.
+*     CarLin
+*        Treat CAR projections in foreign headers as simple linear
+*        mappings from pixel to celestial coordinates? Otherwise, they are
+*        treated as celestial projections according to the conventions of
+*        the Greisen and Calabretta papers.
 *     Encoding
 *        This attribute specifies the system to use when encoding AST
 *        objects into FITS headers. A value of "Native" causes AST objects 
@@ -223,6 +228,8 @@
 *        Added Warnings attribute.
 *     4-APR-2001 (DSB):
 *        Added AllWarnings attribute.
+*     20-FEB-2002 (DSB):
+*        Added CarLin attribute.
 *-
 */
 
@@ -267,6 +274,7 @@ typedef struct AstFitsChan {
 /* Attributes specific to objects in this class. */
    int encoding;    /* System for encoding AST objects ito FITS headers */
    int defb1950;    /* Use FK4 B1950 as defaults? */
+   int carlin;      /* Use linear CAR mappings? */
    int fitsdigits;  /* No. of decmial places in formatted floating point keyword values */
    char *warnings;  /* Pointer to a string containing warning conditions */
    void *card;      /* Pointer to next FitsCard to be read */
@@ -329,6 +337,10 @@ typedef struct AstFitsChanVtab {
    int (* TestDefB1950)( AstFitsChan * );
    void (* SetDefB1950)( AstFitsChan *, int );
    void (* ClearDefB1950)( AstFitsChan * );
+   int (* GetCarLin)( AstFitsChan * );
+   int (* TestCarLin)( AstFitsChan * );
+   void (* SetCarLin)( AstFitsChan *, int );
+   void (* ClearCarLin)( AstFitsChan * );
    int (* GetNcard)( AstFitsChan * );
    int (* GetEncoding)( AstFitsChan * );
    int (* TestEncoding)( AstFitsChan * );
@@ -420,6 +432,11 @@ AstFitsChan *astLoadFitsChan_( void *, size_t, int, AstFitsChanVtab *,
    int astTestDefB1950_( AstFitsChan * );
    void astSetDefB1950_( AstFitsChan *, int );
    void astClearDefB1950_( AstFitsChan * );
+
+   int astGetCarLin_( AstFitsChan * );
+   int astTestCarLin_( AstFitsChan * );
+   void astSetCarLin_( AstFitsChan *, int );
+   void astClearCarLin_( AstFitsChan * );
 
    int astGetFitsDigits_( AstFitsChan * );
    int astTestFitsDigits_( AstFitsChan * );
@@ -574,6 +591,15 @@ astINVOKE(V,astGetDefB1950_(astCheckFitsChan(this)))
 astINVOKE(V,astSetDefB1950_(astCheckFitsChan(this),defb950))
 #define astTestDefB1950(this) \
 astINVOKE(V,astTestDefB1950_(astCheckFitsChan(this)))
+
+#define astClearCarLin(this) \
+astINVOKE(V,astClearCarLin_(astCheckFitsChan(this)))
+#define astGetCarLin(this) \
+astINVOKE(V,astGetCarLin_(astCheckFitsChan(this)))
+#define astSetCarLin(this,carln) \
+astINVOKE(V,astSetCarLin_(astCheckFitsChan(this),carln))
+#define astTestCarLin(this) \
+astINVOKE(V,astTestCarLin_(astCheckFitsChan(this)))
 
 #define astClearFitsDigits(this) \
 astINVOKE(V,astClearFitsDigits_(astCheckFitsChan(this)))

@@ -97,8 +97,9 @@ f     encodings), then write operations using AST_WRITE will
 *     FitsChan also has the following attributes:
 *
 *     - AllWarnings: A list of the available conditions
-*     - DefB1950: Use FK4 B1950 as default equatorial coordinates?
 *     - Card: Index of current FITS card in a FitsChan
+*     - CarLin: Ignore spherical rotations on CAR projections?
+*     - DefB1950: Use FK4 B1950 as default equatorial coordinates?
 *     - Encoding: System for encoding Objects as FITS headers
 *     - FitsDigits: Digits of precision for floating-point FITS values
 *     - Ncard: Number of FITS header cards in a FitsChan
@@ -376,9 +377,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Corrected equations which calculate CROTA when writing 
 *        FITS-AIPS encodings.
 *        - Corrected equations which turn a CROTA value into a CD matrix.
-*     29-NOV-2001 (DSB:
+*     29-NOV-2001 (DSB):
 *        Corrected use of "_" and "-" characters when referring to FK4-NO-E
 *        system in function SkySys.
+*     20-FEB-2001 (DSB)
+*        Added CarLin attribute.
 *class--
 */
 
@@ -697,6 +700,11 @@ static void ClearDefB1950( AstFitsChan * );
 static int GetDefB1950( AstFitsChan * );
 static int TestDefB1950( AstFitsChan * );
 static void SetDefB1950( AstFitsChan *, int );
+
+static void ClearCarLin( AstFitsChan * );
+static int GetCarLin( AstFitsChan * );
+static int TestCarLin( AstFitsChan * );
+static void SetCarLin( AstFitsChan *, int );
 
 static void ClearWarnings( AstFitsChan * );
 static const char *GetWarnings( AstFitsChan * );
@@ -2097,6 +2105,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
 /* -------- */
    } else if ( !strcmp( attrib, "defb1950" ) ) {
       astClearDefB1950( this );
+
+/* CarLin */
+/* ------ */
+   } else if ( !strcmp( attrib, "carlin" ) ) {
+      astClearCarLin( this );
 
 /* Warnings. */
 /* -------- */
@@ -8393,6 +8406,15 @@ const char *GetAttrib( AstObject *this_object, const char *attrib ) {
          result = buff;
       }
 
+/* CarLin */
+/* ------ */
+   } else if ( !strcmp( attrib, "carlin" ) ) {
+      ival = astGetCarLin( this );
+      if ( astOK ) {
+         (void) sprintf( buff, "%d", ival );
+         result = buff;
+      }
+
 /* FitsDigits. */
 /* ----------- */
    } else if ( !strcmp( attrib, "fitsdigits" ) ) {
@@ -9362,6 +9384,10 @@ static void InitVtab( AstFitsChanVtab *vtab ) {
    vtab->TestDefB1950 = TestDefB1950;
    vtab->SetDefB1950 = SetDefB1950;
    vtab->GetDefB1950 = GetDefB1950;
+   vtab->ClearCarLin = ClearCarLin;
+   vtab->TestCarLin = TestCarLin;
+   vtab->SetCarLin = SetCarLin;
+   vtab->GetCarLin = GetCarLin;
    vtab->ClearWarnings = ClearWarnings;
    vtab->TestWarnings = TestWarnings;
    vtab->SetWarnings = SetWarnings;
@@ -12373,6 +12399,13 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
         && ( nc >= len ) ) {
       astSetDefB1950( this, ival );
 
+/* CarLin */
+/* ------ */
+   } else if ( nc = 0,
+        ( 1 == astSscanf( setting, "carlin= %d %n", &ival, &nc ) )
+        && ( nc >= len ) ) {
+      astSetCarLin( this, ival );
+
 /* Warnings. */
 /* -------- */
    } else if ( nc = 0,
@@ -15121,6 +15154,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    } else if ( !strcmp( attrib, "defb1950" ) ) {
       result = astTestDefB1950( this );
 
+/* CarLin. */
+/* --------- */
+   } else if ( !strcmp( attrib, "carlin" ) ) {
+      result = astTestCarLin( this );
+
 /* Warnings. */
 /* -------- */
    } else if ( !strcmp( attrib, "warnings" ) ) {
@@ -17195,6 +17233,7 @@ static AstMapping *WcsMapping( AstFitsChan *this, FitsStore *store, char s,
    AstWcsMap    *map3;       /* Deprojection Mapping */
    AstWinMap    *map1;       /* CRPIX shift mapping */
    double *mat;              /* Pointer to data for deg->rad scaling matrix */
+   double val;               /* Keyword value */
    int i;                    /* Loop count */
 
 /* Initialise the pointer to the returned Mapping. */
@@ -17224,6 +17263,27 @@ static AstMapping *WcsMapping( AstFitsChan *this, FitsStore *store, char s,
       *prj = astGetWcsType( map3 );
       *axlon = astGetWcsAxis( map3, 0 );
       *axlat = astGetWcsAxis( map3, 1 );
+
+/* If the projection is a CAR projection, but the CarLin attribute is
+   set, then we consider the CAR projection to be a simple linear mapping
+   of pixel coords to celestial coords. Do this by replacing the WcsMap
+   with a new WcsMap with no projection. All axes will then be treated as
+   non-celestial. */
+      if( *prj == AST__CAR && astGetCarLin( this ) ) {
+         *prj = AST__WCSBAD;
+         map3 = astAnnul( map3 );
+         map3 = astWcsMap( store->naxis, AST__WCSBAD, *axlon, *axlat, "" );
+
+/* We also need to scale the CRVAL values for the celestial axes from
+   degrees to radians since this will not be done later because WcsNative
+   will consider the axes to be non-celestial. */
+         val = GetItem( &(store->crval), *axlon, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetItem( &(store->crval), *axlon, 0, s, 
+                                        val*AST__DD2R );
+         val = GetItem( &(store->crval), *axlat, 0, s, NULL, method, class );
+         if( val != AST__BAD ) SetItem( &(store->crval), *axlat, 0, s, 
+                                        val*AST__DD2R );
+      }
 
 /* Scale the longitude and latitude axes from degrees to radians. */
       mat = (double *) astMalloc( sizeof(double)*store->naxis );
@@ -17507,9 +17567,9 @@ static AstCmpMap *WcsNative( AstFitsChan *this, FitsStore *store, char s,
    axlon = astGetWcsAxis( wcsmap, 0 );
    axlat = astGetWcsAxis( wcsmap, 1 );
 
-/* If there is no longitude or latitude axis, just add on the reference
-   value to all axes. */
-   if( axlon == axlat ){
+/* If there is no longitude or latitude axis, or if we have a
+   non-celestial projection, just add on the reference value to all axes. */
+   if( axlon == axlat || astGetWcsType( wcsmap ) == AST__WCSBAD ){
       new = (AstCmpMap *) WcsAddRef( store, naxis, s, NULL, method, class );
 
 /* If there is a lon/lat axis pair, create the inperm and outperm arrays
@@ -20412,6 +20472,56 @@ astMAKE_GET(FitsChan,DefB1950,int,1,(this->defb1950 == -1 ? 1 : this->defb1950))
 astMAKE_SET(FitsChan,DefB1950,int,defb1950,( value ? 1 : 0 ))
 astMAKE_TEST(FitsChan,DefB1950,( this->defb1950 != -1 ))
 
+/* CarLin */
+/* ====== */
+/*
+*att++
+*  Name:
+*     CarLin
+
+*  Purpose:
+*     Ignore spherical rotations on CAR projections?
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Integer (boolean).
+
+*  Description:
+*     This attribute is a boolean value which specifies how FITS "CAR"
+*     (plate carree, or "Cartesian") projections should be treated when
+*     reading a FrameSet from a foreign encoded FITS header. If zero (the
+*     default), it is assumed that the CAR projection conforms to the
+*     conventions described in the (draft) FITS world coordinate system 
+*     (FITS-WCS) paper by E.W. Greisen and M. Calabretta (A & A, in 
+*     preparation). If CarLin is non-zero, then these conventions are
+*     ignored, and it is assumed that the mapping from pixel coordinates to 
+*     celestial coordinates is a simple linear transformation (hence the 
+*     attribute name "CarLin"). This is appropriate for some older FITS 
+*     data which claims to have a "CAR" projection, but which in fact do
+*     not conform to the conventions of the FITS-WCS paper. Furthermore, if
+*     CarLin is non-zero, it is assumed that CDELT and CD keywords are
+*     in units of degrees rather than radians (as required by the
+*     FITS-WCS papers).
+*
+*     The FITS-WCS paper specifies that headers which include a CAR projection 
+*     represent a linear mapping from pixel coordinates to "native spherical 
+*     coordinates", NOT celestial coordinates. An extra mapping is then
+*     required from native spherical to celestial. This mapping is a 3D
+*     rotation and so the overall Mapping from pixel to celestial coordinates 
+*     is NOT linear. See the FITS-WCS papers for further details.
+
+*  Applicability:
+*     FitsChan
+*        All FitsChans have this attribute.
+*att--
+*/
+astMAKE_CLEAR(FitsChan,CarLin,carlin,-1)
+astMAKE_GET(FitsChan,CarLin,int,1,(this->carlin == -1 ? 1 : this->carlin))
+astMAKE_SET(FitsChan,CarLin,int,carlin,( value ? 1 : 0 ))
+astMAKE_TEST(FitsChan,CarLin,( this->carlin != -1 ))
+
 /* FitsDigits. */
 /* =========== */
 /*
@@ -20895,6 +21005,12 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    set = TestDefB1950( this );
    ival = set ? GetDefB1950( this ) : astGetDefB1950( this );
    astWriteInt( channel, "DfB1950", set, 1, ival, (ival ? "Default to FK4 B1950": "Default to FK5 J2000") );
+
+/* CarLin */
+/* ------ */
+   set = TestCarLin( this );
+   ival = set ? GetCarLin( this ) : astGetCarLin( this );
+   astWriteInt( channel, "CarLin", set, 1, ival, (ival ? "Use simple linear CAR projections": "Use full FITS-WCS CAR projections") );
 
 /* Warnings. */
 /* --------- */
@@ -21652,6 +21768,7 @@ AstFitsChan *astInitFitsChan_( void *mem, size_t size, int init,
       new->card = NULL;
       new->keyseq = NULL;
       new->defb1950 = 1;
+      new->carlin = 0;
       new->fitsdigits = DBL_DIG;
       new->encoding = UNKNOWN_ENCODING;
       new->warnings = NULL;
@@ -21850,6 +21967,11 @@ AstFitsChan *astLoadFitsChan_( void *mem, size_t size, int init,
 /* -------- */
       new->defb1950 = astReadInt( channel, "dfb1950", DBL_DIG );
       if ( TestDefB1950( new ) ) SetDefB1950( new, new->defb1950 );
+
+/* CarLin */
+/* ------ */
+      new->carlin = astReadInt( channel, "carlin", DBL_DIG );
+      if ( TestCarLin( new ) ) SetCarLin( new, new->carlin );
 
 /* Warnings. */
 /* --------- */
