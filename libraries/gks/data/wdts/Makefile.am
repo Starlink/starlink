@@ -26,6 +26,18 @@ gkswdt_LDADD = ../../base/libgks_base.la
 # Create the font database from the ascii font files
 
 gks.wdt-$(RLSE): gkswdt create_wdt
+	if test -f gks.wdt-$(RLSE); then \
+	   rm gks.wdt-$(RLSE) ; \
+	else :; fi;
+	if test -f gkswdt.lst; then \
+	   rm gkswdt.lst ; \
+	else :; fi;
+	if test -f gks.wdt; then \
+	   rm gks.wdt ; \
+	else :; fi;
+	if test -f cdrive.inc; then \
+	   rm cdrive.inc ; \
+	else :; fi;
 	cat $(WDTS) > gkswdt.dat
 	./create_wdt
 	mv gks.wdt gks.wdt-$(RLSE)
