@@ -7022,6 +7022,11 @@ U java/source/splat/src/etc/ids/submilli/SiO.ids
 U java/source/splat/src/etc/ids/submilli/SiS.ids
 cvs checkout: Updating java/source/splat/src/etc/plugins
 cvs checkout: Updating java/source/splat/src/etc/testdata
+U java/source/splat/src/etc/testdata/NGC1275.txt
+U java/source/splat/src/etc/testdata/test_stand.sdf
+U java/source/splat/src/etc/testdata/test_standby2.sdf
+U java/source/splat/src/etc/testdata/test_standby3.sdf
+U java/source/splat/src/etc/testdata/test_standby4.sdf
 cvs checkout: Updating java/source/splat/src/jni
 U java/source/splat/src/jni/NDFJImpl.c
 U java/source/splat/src/jni/NDFJImplGet.h
@@ -7203,6 +7208,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/savefile.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/savestack.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/set.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/special.gif
+U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splash.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/splat2.gif
 U java/source/splat/src/main/uk/ac/starlink/splat/iface/images/stop.gif
@@ -7346,7 +7352,30 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/WaveletFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/deploy.wsdd
 cvs checkout: Updating java/source/splat/src/script
+U java/source/splat/src/script/.splat_autoloads
+U java/source/splat/src/script/BasicMaths.java
+U java/source/splat/src/script/MyLocalClass.java
+U java/source/splat/src/script/apidocs
+U java/source/splat/src/script/detached_splat
+U java/source/splat/src/script/example_plugin1.bsh
+U java/source/splat/src/script/example_plugin2.bsh
+U java/source/splat/src/script/example_plugin3.bsh
+U java/source/splat/src/script/fitgauss
+U java/source/splat/src/script/fitgauss2
+U java/source/splat/src/script/get_env.bsh
+U java/source/splat/src/script/linepositions
+U java/source/splat/src/script/maths_plugin.bsh
 U java/source/splat/src/script/runSPLAT
+U java/source/splat/src/script/setcolour
+U java/source/splat/src/script/setproperty
+U java/source/splat/src/script/splat
+U java/source/splat/src/script/splat.csh
+U java/source/splat/src/script/splatdisp
+U java/source/splat/src/script/splatdispmany
+U java/source/splat/src/script/splatsetup.csh
+U java/source/splat/src/script/splatsetup.sh
+U java/source/splat/src/script/splatsh
+U java/source/splat/src/script/zoomandcentre
 cvs checkout: Updating java/source/splat/src/testcases
 cvs checkout: Updating java/source/src
 cvs checkout: Updating java/source/src/docs
@@ -7589,11 +7618,12 @@ cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat
 U java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BasicAction.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BitsRowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/BooleanColumnRowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxMenu.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/CheckBoxStack.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnComboBoxModel.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnDialog.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnIndexSpinner.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnInfoWindow.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/ColumnsDisplay.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
@@ -7604,15 +7634,17 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/OptionsListModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ParameterWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/PlasticStarTable.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/PlotWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/QueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ResourceIcon.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RestrictedColumnComboBoxModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/RowSubset.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SizingScrollPane.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/StatsWindow.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetDialog.java
-U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetsDisplay.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SubsetWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticColumn.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticColumnQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticRowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/SyntheticSubsetQueryWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TableColumnModelAdapter.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/TableViewer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
@@ -7631,6 +7663,7 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/fits-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/help.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/intro.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/invoke.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/io.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/jdbc-write.html
@@ -7640,19 +7673,28 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/param.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/plot.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/release.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/stats.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets-win.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/subsets.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/synthetic.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/text-write.html
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/topcat.css
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/viewers.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/votable-write.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/wdc-read.html
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/help/windows.html
 cvs checkout: Updating java/source/topcat/src/resources/uk/ac/starlink/topcat/images
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/4way3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Back24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Column.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/ColumnDelete24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Copy24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Forward24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Help3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Minus1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Open24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/PageSetup24.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Plus1.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Print24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Redo24.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/Save24.gif
@@ -7665,11 +7707,13 @@ U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridoff.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/gridon.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/multiply4.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/plot0.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/query_message.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/sigma0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/spoints5.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/starlinklogo3.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tablemeta0.gif
 U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/tc3.gif
+U java/source/topcat/src/resources/uk/ac/starlink/topcat/images/venn2.gif
 cvs checkout: Updating java/source/topcat/src/script
 U java/source/topcat/src/script/topcat
 cvs checkout: Updating java/source/topcat/src/testcases
@@ -7928,6 +7972,7 @@ U java/source/util/src/main/uk/ac/starlink/util/XMLEncodeAndDecode.java
 cvs checkout: Updating java/source/util/src/script
 U java/source/util/src/script/starjava
 U java/source/util/src/script/starjava.bat
+U java/source/util/src/script/starlocation
 cvs checkout: Updating java/source/util/src/testcases
 cvs checkout: Updating java/source/util/src/testcases/uk
 cvs checkout: Updating java/source/util/src/testcases/uk/ac
