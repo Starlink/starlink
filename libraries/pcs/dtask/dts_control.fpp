@@ -118,15 +118,15 @@
       EXTERNAL CHR_LEN           ! Used length of string
       INTEGER CHR_LEN
 #if HAVE_INTRINSIC_GETCWD
-      EXTERNAL GETCWD            ! Get current working directory
+      INTRINSIC GETCWD           ! Get current working directory
       INTEGER GETCWD
 #endif
 #if HAVE_INTRINSIC_CHDIR
-      EXTERNAL CHDIR             ! Change working directory
+      INTRINSIC CHDIR            ! Change working directory
       INTEGER CHDIR
 #endif
 #if HAVE_INTRINSIC_PUTENV
-      EXTERNAL PUTENV            ! Set environment variable
+      INTRINSIC PUTENV           ! Set environment variable
       INTEGER PUTENV
 #endif
 
