@@ -1,11 +1,11 @@
-      SUBROUTINE POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
-     :                       STKID, DEBIAS, VAR, ANGROT, ANGRT, MAKEI, 
-     :                       MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
-     :                       MAKECT, CI, AI, AP, AT, AIP, AQ, AU, AV, 
-     :                       AIV, APV, ATV, AIPV, AQV, AUV, AVV, 
-     :                       STATUS )
-*+
-*  Name:
+      SUBROUTINE POL1_PLVEC( TR, EQMAP, NPIX, NROW, NPLANE, STOKE, 
+     :                       VSTOKE, STKID, DEBIAS, VAR, ANGROT, ANGRT,
+     :                       MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU,
+     :                       MAKEV, MAKECT, CI, AI, AP, AT, AIP, AQ, AU,
+     :                       AV, AIV, APV, ATV, AIPV, AQV, AUV, AVV,
+     :                       W1, W2, STATUS ) 
+*+ 
+*  Name: 
 *     POL1_PLVEC
 
 *  Purpose:
@@ -15,11 +15,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_PLVEC( TR, NPIX, NROW, NPLANE, STOKE, VSTOKE, STKID, 
-*                      DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP, 
+*     CALL POL1_PLVEC( TR, EQMAP, NPIX, NROW, NPLANE, STOKE, VSTOKE, 
+*                      STKID, DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP, 
 *                      MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
 *                      CI, AI, AP, AT, AIP, AQ, AU, AV, AIV, APV, 
-*                      ATV, AIPV, AQV, AUV, AVV, STATUS )
+*                      ATV, AIPV, AQV, AUV, AVV, W1, W2, STATUS )
 
 *  Description:
 *     This routine calculates the polarisation parameters and (if
@@ -31,6 +31,9 @@
 *        into (X,Y) values to be stored in the catalogue (if required). 
 *           X = TR( 1 ) + TR( 2 )*REAL( IPIX )  ( IPIX = 1, NPIX )
 *           Y = TR( 3 ) + TR( 4 )*REAL( IROW )  ( IROW = 1, NROW )
+*     EQMAP = INTEGER (Given)
+*        If this is not AST__NULL, then the catalogue contains RA and DEC
+*        columns, and EQMAP gives the AST Mapping from (X,Y) to (RA,DEC).
 *     NPIX = INTEGER (Given)
 *        The number of pixels per row in STOKE and VSTOKE.
 *     NROW = INTEGER (Given)
@@ -110,6 +113,10 @@
 *        An array holding the variance of AU.
 *     AVV( NPIX, NROW ) = REAL (Returned)
 *        An array holding the variance of AV.
+*     W1( NPIX, NROW ) = DOUBLE PRECISION (Returned)
+*        A work array. Only accessed if EQMAP is not AST__NULL.
+*     W2( NPIX, NROW ) = DOUBLE PRECISION (Returned)
+*        A work array. Only accessed if EQMAP is not AST__NULL.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -131,6 +138,8 @@
 *        Added Q,U and V outputs.
 *     6-APR-1999 (DSB):
 *        Added rotation of reference direction (ANGRT).
+*     17-MAY-2000 (DSB):
+*        Added EQMAP argument.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -144,9 +153,11 @@
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'PRM_PAR'          ! VAL_ constants
+      INCLUDE 'AST_PAR'          ! AST_ constants
 
 *  Arguments Given:
       REAL TR( 4 )
+      INTEGER EQMAP
       INTEGER NPIX
       INTEGER NROW 
       INTEGER NPLANE
@@ -182,6 +193,8 @@
       REAL AQV( NPIX, NROW )
       REAL AUV( NPIX, NROW )
       REAL AVV( NPIX, NROW )
+      DOUBLE PRECISION W1( NPIX, NROW )
+      DOUBLE PRECISION W2( NPIX, NROW )
 
 *  Status:
       INTEGER STATUS             ! Global status
@@ -193,8 +206,8 @@
       INTEGER JU                 ! Index of U plane in input arrays
       INTEGER JV                 ! Index of V plane in input arrays
       INTEGER NVEC               ! No. of catalogue rows written
-      INTEGER PIX                ! Pixel index
-      INTEGER ROW                ! Row index
+      INTEGER PIX                ! Array pixel index
+      INTEGER ROW                ! Array row index
       LOGICAL CIRC               ! Measure circular polarisation?
       REAL COS2D                 ! Cos( 2* change in ref direction )
       REAL EPS2                  ! Mean variance on normalised Q and U
@@ -231,10 +244,13 @@
       REAL VVIN                  ! Input V variance
       REAL VQN                   ! Rotated Q variance value
       REAL VUN                   ! Rotated U variance value
+      REAL XR                    ! X value
+      REAL YR                    ! Y value
 
 *  CAT identifiers for catalogue columns.
       INTEGER XCAT, YCAT, ICAT, PCAT, ANCAT, PICAT, VCAT, QCAT, UCAT,
-     :        DICAT, DPCAT, DANCAT, DPICAT, DVCAT, DQCAT, DUCAT
+     :        DICAT, DPCAT, DANCAT, DPICAT, DVCAT, DQCAT, DUCAT, RACAT,
+     :        DECCAT
 
 *.
 
@@ -282,6 +298,12 @@
 
          CALL CAT_TIDNT( CI, 'X', XCAT, STATUS )
          CALL CAT_TIDNT( CI, 'Y', YCAT, STATUS )
+
+         IF( EQMAP .NE. AST__NULL ) THEN
+            CALL CAT_TIDNT( CI, 'RA', RACAT, STATUS )
+            CALL CAT_TIDNT( CI, 'DEC', DECCAT, STATUS )
+         END IF
+
          CALL CAT_TIDNT( CI, 'I', ICAT, STATUS )
          CALL CAT_TIDNT( CI, 'P', PCAT, STATUS )
          CALL CAT_TIDNT( CI, 'ANG', ANCAT, STATUS )
@@ -309,6 +331,24 @@
 
          END IF
 
+*  Calling AST_TRAN2 to map the pixel co-ords into RA/DEC has a high
+*  overhead on each call. Therefore we need to do all points in a single
+*  call to AST_TRAN2. So, if requried we calculate the RA and DECs now,
+*  storing them in the supplied work arrays.
+         IF( EQMAP .NE. AST__NULL ) THEN
+
+*  Store the pixel co-ords for each vector.
+            DO ROW = 1, NROW
+               DO PIX = 1, NPIX
+                  W1( PIX, ROW ) = DBLE( TR( 1 ) + TR( 2 )*REAL( PIX ) )
+                  W2( PIX, ROW ) = DBLE( TR( 3 ) + TR( 4 )*REAL( ROW ) )
+               END DO
+            END DO
+
+*  Transform the pixel positions into RA and DECs.
+            CALL AST_TRAN2( EQMAP, NROW*NPIX, W1, W2, .TRUE., W1, W2, 
+     :                      STATUS )
+         END IF
       END IF
 
 *  First deal with plane polarisation cases...
@@ -507,11 +547,22 @@
      :                            T .NE. VAL__BADR .OR. 
      :                            IP .NE. VAL__BADR ) ) THEN
 
+*  Increment the number of rows in the catalogue.
+                  NVEC = NVEC + 1
+
 *  Store values for all the catalogue columns in the current row buffer.
-                  CALL CAT_PUT0R( XCAT, TR( 1 ) + TR( 2 )*REAL( PIX ),
-     :                            .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, TR( 3 ) + TR( 4 )*REAL( ROW ),
-     :                            .FALSE., STATUS )
+                  XR = TR( 1 ) + TR( 2 )*REAL( PIX )
+                  YR = TR( 3 ) + TR( 4 )*REAL( ROW )
+                  CALL CAT_PUT0R( XCAT, XR, .FALSE., STATUS )
+                  CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
+
+                  IF( EQMAP .NE. AST__NULL ) THEN
+                     CALL CAT_PUT0D( RACAT, W1( NPIX, NROW ), .FALSE., 
+     :                               STATUS )
+                     CALL CAT_PUT0D( DECCAT, W2( NPIX, NROW ), .FALSE., 
+     :                               STATUS )
+                  END IF
+
                   CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
                   CALL CAT_PUT0R( QCAT, QIN, ( QIN .EQ. VAL__BADR ),
@@ -584,7 +635,6 @@
 
 *  Append the current row buffer to the catalogue.
                   CALL CAT_RAPND( CI, STATUS )
-                  NVEC = NVEC + 1
 
                END IF
             END DO
@@ -725,11 +775,22 @@
      :                            T .NE. VAL__BADR .OR. 
      :                            IP .NE. VAL__BADR ) ) THEN
 
+*  Increment the number of rows in the catalogue.
+                  NVEC = NVEC + 1
+
 *  Store values for all the catalogue columns in the current row buffer.
-                  CALL CAT_PUT0R( XCAT, TR( 1 ) + TR( 2 )*REAL( PIX ),
-     :                            .FALSE., STATUS )
-                  CALL CAT_PUT0R( YCAT, TR( 3 ) + TR( 4 )*REAL( ROW ),
-     :                            .FALSE., STATUS )
+                  XR = TR( 1 ) + TR( 2 )*REAL( PIX )
+                  YR = TR( 3 ) + TR( 4 )*REAL( ROW )
+                  CALL CAT_PUT0R( XCAT, XR, .FALSE., STATUS )
+                  CALL CAT_PUT0R( YCAT, YR, .FALSE., STATUS )
+
+                  IF( EQMAP .NE. AST__NULL ) THEN
+                     CALL CAT_PUT0D( RACAT, W1( NPIX, NROW ), .FALSE., 
+     :                               STATUS )
+                     CALL CAT_PUT0D( DECCAT, W2( NPIX, NROW ), .FALSE., 
+     :                               STATUS )
+                  END IF
+
                   CALL CAT_PUT0R( ICAT,   I, ( I .EQ. VAL__BADR ), 
      :                            STATUS )
                   CALL CAT_PUT0R( VCAT, VIN, ( VIN .EQ. VAL__BADR ), 
@@ -786,7 +847,6 @@
 
 *  Append the current row buffer to the catalogue.
                   CALL CAT_RAPND( CI, STATUS )
-                  NVEC = NVEC + 1
    
                END IF
 

@@ -126,6 +126,15 @@ interface POLVEC
       helpkey     '*'
    endparameter
 
+   parameter      RADEC
+      type        _LOGICAL
+      vpath       'DEFAULT '
+      ppath       'CURRENT,DEFAULT '
+      default     NO
+      prompt      'Produce RA & DEC columns, if possible?'
+      helpkey     '*'
+   endparameter
+
    parameter      SIGMAS         
       type        _REAL
       vpath       'PROMPT,CURRENT,DEFAULT '

@@ -212,6 +212,7 @@
       INTEGER CI                 ! CAT identifier for output catalogue
       INTEGER DIM( 3 )           ! Dimensions of input Stokes cube
       INTEGER EL                 ! No. of elements in mapped arrays
+      INTEGER EQMAP              ! (X,Y)->(RA,DEC) Mapping, or AST__NULL
       INTEGER I                  ! Loop count
       INTEGER ICURR              ! Index of PIXEL Frame
       INTEGER INDF1              ! Identifier for input Stokes cube
@@ -244,6 +245,8 @@
       INTEGER IPVBIN             ! Pointers to binned input VARIANCE arrays
       INTEGER IPVIN              ! Pointers to input VARIANCE arrays
       INTEGER IPVV               ! Pointer to V variance
+      INTEGER IPW1               ! Pointer to first work array
+      INTEGER IPW2               ! Pointer to second work array
       INTEGER IWCS               ! AST FrameSet holding o/p NDFs WCS component
       INTEGER LBND( 3 )          ! Lower bounds of input NDF
       INTEGER MINPIX             ! Min. no. of good input pixels per bin
@@ -264,6 +267,7 @@
       LOGICAL MAKET              ! Angle output required?
       LOGICAL MAKEU              ! U output required?
       LOGICAL MAKEV              ! V output required?
+      LOGICAL RADEC              ! Are RA/DEC columns required?
       LOGICAL VAR                ! Output variances required?
       REAL ANGROT                ! Input ref. direction 
       REAL ANGRT                 ! Output ref. direction
@@ -274,6 +278,9 @@
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Start an AST context.
+      CALL AST_BEGIN( STATUS )
 
 *  Start an NDF context.
       CALL NDF_BEGIN
@@ -722,9 +729,13 @@
       TITLE = ' '
       CALL NDF_CGET( INDF1, 'TITLE', TITLE, STATUS ) 
 
+*  See if RA/DEC columns are to be created if possible.
+      CALL PAR_GET0L( 'RADEC', RADEC, STATUS )
+
 *  Create the catalogue.
       CALL POL1_MKCAT( 'CAT', IWCS, ( INDEX( STOKES, 'V') .NE. 0 ), 
-     :                 UNITS, VAR, ANGRT, TITLE, CI, STATUS )
+     :                 UNITS, VAR, ANGRT, TITLE, RADEC, CI, EQMAP, 
+     :                 STATUS )
 
 *  If successful, set a flag indicating that a catalogue is to be produced.
       IF ( STATUS .EQ. SAI__OK ) THEN
@@ -734,6 +745,7 @@
 *  that no catalogue need be produced.
       ELSE 
          MAKECT = .FALSE.
+         RADEC = .FALSE.
          CALL CAT_TRLSE( CI, STATUS )
          IF ( STATUS .EQ. PAR__NULL ) CALL ERR_ANNUL( STATUS )
       END IF
@@ -789,15 +801,25 @@
       TR2( 4 ) = 1.0
       TR2( 3 ) = REAL( LBND( 2 ) ) - 0.5 - TR2( 4 )
 
+*  Allocate work arrays.
+      CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW1, STATUS )
+      CALL PSX_CALLOC( NXBIN*NYBIN, '_DOUBLE', IPW2, STATUS )
+
 *  Call the routine to do the work.
-      CALL POL1_PLVEC( TR2, NXBIN, NYBIN, DIM( 3 ), %VAL( IPDBIN ), 
-     :               %VAL( IPVBIN ), STOKES, DEBIAS, VAR, ANGROT, ANGRT, 
-     :               MAKEI, MAKEP, MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV,
-     :               MAKECT, CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
-     :               %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ), 
-     :               %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ), 
-     :               %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ), 
-     :               %VAL( IPUV ), %VAL( IPVV ), STATUS )
+      CALL POL1_PLVEC( TR2, EQMAP, NXBIN, NYBIN, DIM( 3 ), 
+     :                 %VAL( IPDBIN ), %VAL( IPVBIN ), STOKES,
+     :                 DEBIAS, VAR, ANGROT, ANGRT, MAKEI, MAKEP,
+     :                 MAKET, MAKEIP, MAKEQ, MAKEU, MAKEV, MAKECT,
+     :                 CI, %VAL( IPI ), %VAL( IPP ), %VAL( IPT ),
+     :                 %VAL( IPIP ), %VAL( IPQ ), %VAL( IPU ),
+     :                 %VAL( IPV ), %VAL( IPIV ), %VAL( IPPV ),
+     :                 %VAL( IPTV ), %VAL( IPIPV ), %VAL( IPQV ),
+     :                 %VAL( IPUV ), %VAL( IPVV ), %VAL( IPW1 ), 
+     :                 %VAL( IPW2 ), STATUS )
+
+*  Free the work space.
+      CALL PSX_FREE( IPW1, STATUS )   
+      CALL PSX_FREE( IPW2, STATUS )   
 
 *  Closedown.
 *  ==========
@@ -828,6 +850,9 @@
 
 *  End the NDF context.
       CALL NDF_END( STATUS )
+
+*  End the AST context.
+      CALL AST_END( STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN

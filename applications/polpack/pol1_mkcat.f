@@ -1,5 +1,5 @@
       SUBROUTINE POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, 
-     :                       TITLE, CI, STATUS )
+     :                       TITLE, GETEQM, CI, EQMAP, STATUS )
 *+
 *  Name:
 *     POL1_MKCAT
@@ -11,8 +11,8 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, TITLE, CI, 
-*                      STATUS )
+*     CALL POL1_MKCAT( PARAM, IWCS, CIRC, UNITS, VAR, ANGROT, TITLE, 
+*                      GETEQM, CI, EQMAP, STATUS )
 
 *  Description:
 *     This routine creates a new CAT catalogue. Columns are created for the 
@@ -47,8 +47,17 @@
 *     TITLE = CHARACTER * ( * ) (Given)
 *        A title string to store as the TITLE parameter for the catalogue.
 *        No TITLE parameter is created if TITLE is blank.
+*     GETEQM = LOGICAL (Given)
+*        If TRUE, then EQMAP is returned holding the (X,Y)->(RA,DEC)
+*        Mapping, if possible. Otherwise, GETEQM is returned holding
+*        AST__NULL.
 *     CI = INTEGER (Returned)
 *        A CAT identifier for the created catalogue.
+*     EQMAP = INTEGER (Returned)
+*        An identifier for an AST Mapping describing the conversion of 
+*        (X,Y) pixel co-ordinates to RA,DEC (J2000) co-ordinates. If the
+*        supplied FrameSet (IWCS) does not allow this information to be
+*        found, or if GETEQM is .FALSE., AST__NULL is returned for EQMAP.
 *     STATUS = INTEGER (Given and Returned)
 *        The global status.
 
@@ -62,6 +71,8 @@
 *  History:
 *     26-JAN-1998 (DSB):
 *        Original version.
+*     17-MAY-2000 (DSB):
+*        Added creation of RA/DEC columns, and argument EQFS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -85,19 +96,26 @@
       LOGICAL VAR
       REAL ANGROT
       CHARACTER TITLE*(*)
+      LOGICAL GETEQM
 
 *  Arguments Returned:
       INTEGER CI
+      INTEGER EQMAP
 
 *  Status:
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
       CHARACTER NAME*250         ! Catalogue specification
+      INTEGER EQFS               ! An AST FrameSet
       INTEGER II                 ! CAT identifier for most recent part
       INTEGER FRM                ! Pointer to Base Frame
       INTEGER QI                 ! Identifier for a catalogue parameter
+      INTEGER TMPLT              ! Template Frame
+      INTEGER IFRM               ! Frame index of SKY Frame within IWCS
 *.
+
+      EQMAP = AST__NULL
 
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -129,6 +147,42 @@
      :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(2)', STATUS ), 
      :                'F7.1', AST_GETC( FRM, 'Label(2)', STATUS ), II, 
      :                STATUS )
+
+*  If we can get RA and DEC positions using the FrameSet, add RA and DEC
+*  columns.
+      IF( GETEQM ) THEN
+         CALL KPG1_ASFFR( IWCS, 'SKY', IFRM, STATUS )
+         IF( IFRM .NE. AST__NOFRAME ) THEN
+
+            TMPLT = AST_SKYFRAME( 'System=FK5,Equinox=J2000', STATUS )
+
+            EQFS = AST_FINDFRAME( IWCS, TMPLT, ' ', STATUS ) 
+  
+            CALL AST_ANNUL( TMPLT, STATUS )
+            IF( EQFS .NE. AST__NULL ) THEN
+
+*  RA .
+               CALL CAT_CNEWS( CI, 'RA', CAT__TYPED, 0, 
+     :                         'RADIANS{HOURS}', 'D16.8', 
+     :                         'Right Ascension (FK5)', II, STATUS )
+
+*  DEC .
+               CALL CAT_CNEWS( CI, 'DEC', CAT__TYPED, 0, 
+     :                         'RADIANS{DEGREES}', 'D16.8', 
+     :                         'Declination (FK5)', II, STATUS )
+
+*  Parameters EPOCH and EQUINOX.
+               CALL CAT_PPTSC( CI, 'EPOCH', AST_GETC( EQFS, 'Epoch', 
+     :                                                STATUS ),
+     :                         'Epoch of observation', II, STATUS )
+               CALL CAT_PPTSC( CI, 'EQUINOX', 'J2000', 'Epoch of '//
+     :                         'reference equinox', II, STATUS )
+               EQMAP = AST_GETMAPPING( EQFS, AST__BASE, AST__CURRENT, 
+     :                                 STATUS )
+               CALL AST_ANNUL( EQFS, STATUS )
+            END IF
+         END IF
+      END IF
 
 *  Total intensity.
       CALL CAT_CNEWS( CI, 'I', CAT__TYPER, 0, UNITS, 'G13.6', 
