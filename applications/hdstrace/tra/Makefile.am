@@ -1,8 +1,8 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libtra.a
+noinst_LTLIBRARIES = libtra.la
 
-libtra_a_SOURCES = $(F_ROUTINES)  $(G_ROUTINES:.gen=.f)
+libtra_la_SOURCES = $(F_ROUTINES)  $(G_ROUTINES:.gen=.f)
 
 
 F_ROUTINES = tra1_arstr.f tra1_puts.f tra1_trcon.f tra_locin.f \
