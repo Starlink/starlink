@@ -1,0 +1,70 @@
+*+
+*  Name:
+*     CAT1_CATS_CMN
+*  Purpose:
+*     Internal common block holdling the list of open catalogues.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block holdling the list of open catalogues.
+*
+*     In addition to their identifiers, some details are maintained for
+*     each catalogue.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     23/6/93 (ACD): Original version.
+*     13/8/93 (ACD): First stable version.
+*     9/3/94  (ACD): Changed variables to occur in the common block
+*        in order of decreasing size of data type.
+*     6/3/95  (ACD): Modified to reflect the changed names for the
+*        constants defining the array sizes.
+*     11/4/95 (ACD): Changed the name given in the 'Name:' section of
+*        the prologue to reflect Unix rather than VMS conventions.
+*     23/7/96 (ACD): Added EROW__CAT1, the expected number of rows.
+*-
+
+*
+*    Variables and arrays.
+*    ====================
+
+*
+*    Details of each catalogue
+
+      INTEGER
+     :  CIDS__CAT1(CAT__MXCAT),  ! Catalogue identifier,
+     :  BKTYP__CAT1(CAT__MXCAT), ! Back-end type for the catalogue,
+     :  MODE__CAT1(CAT__MXCAT),  ! Access mode (READ, WRITE etc),
+     :  STATE__CAT1(CAT__MXCAT), ! State (OLD or NEW),
+     :  EROW__CAT1(CAT__MXCAT),  ! Expected number of rows,
+     :  NROW__CAT1(CAT__MXCAT),  ! Number of rows,
+     :  NPCOL__CAT1(CAT__MXCAT), ! Number of physical columns,
+     :  NVCOL__CAT1(CAT__MXCAT), ! Number of virtual columns,
+     :  NIND__CAT1(CAT__MXCAT),  ! Number of indices,
+     :  NPAR__CAT1(CAT__MXCAT),  ! Number of parameters,
+     :  NSEL__CAT1(CAT__MXCAT),  ! Number of selections.
+     :  CROW__CAT1(CAT__MXCAT)   ! Current row number.
+*
+*     Flag indicating whether the initial creation of each catalogue
+*     has finished, coded as follows:
+*     .TRUE.  - creation is finished,
+*     .FALSE. - creation not finished.
+
+      LOGICAL FINSH__CAT1(CAT__MXCAT)
+
+*
+*    The total current number of open catalogues.
+
+      INTEGER NCATS__CAT1
+
+*
+*    Common block.
+*    ============
+
+      COMMON /CATS/
+     :  CIDS__CAT1,   MODE__CAT1,   STATE__CAT1,  BKTYP__CAT1, 
+     :  EROW__CAT1,   NROW__CAT1,   NPCOL__CAT1,  NVCOL__CAT1,
+     :  NIND__CAT1,   NPAR__CAT1,   NSEL__CAT1,   CROW__CAT1,
+     :  NCATS__CAT1,  FINSH__CAT1

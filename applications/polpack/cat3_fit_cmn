@@ -1,0 +1,64 @@
+*+
+*  Name:
+*     CAT3_FIT_CMN
+*  Purpose:
+*     Internal common block specific to the FITS back-end.
+*  Language:
+*     FORTRAN 77.
+*  Type of Module:
+*     INCLUDE FILE.
+*  Description:
+*     Internal common block specific to the ADC back-end.
+*  Authors:
+*     ACD: A C Davenhall (Leicester)
+*  History:
+*     26/7/93 (ACD): Original version.
+*     22/9/94 (ACD): First stable version.
+*     6/3/95  (ACD): Modified to reflect the changed names for the
+*        constants defining the array sizes.
+*     4/6/98  (ACD): Removed NFID__CAT3, the separate identifiers and
+*        count for the FITS columns.
+*-
+
+*
+*    Common block variables.
+*    ======================
+
+*
+*    Fortran unit numbers used to access the FITS file.
+
+      INTEGER
+     :  FUNT__CAT3(CAT__MXCAT)
+
+*
+*    The following variables are concerned with accessing textual
+*    information from the FITS table primary and extension header.
+
+      INTEGER
+     :  HSTAT__CAT3(CAT__MXCAT),  ! State accessing header info.
+     :  EXTN__CAT3(CAT__MXCAT),   ! Number of the table extension.
+     :  NUMKY__CAT3(CAT__MXCAT),  ! Number of keywords in the header.
+     :  CURKY__CAT3(CAT__MXCAT)   ! Current keyword in the header.
+
+*
+*    Details defining the position of and format of each field within
+*    a single record.
+
+      INTEGER
+     :  COLNO__CAT3(CAT1__MXIDS),  ! Column number.
+     :  FTYPE__CAT3(CAT1__MXIDS)   ! FITS data type.
+      LOGICAL
+     :  SFLAG__CAT3(CAT1__MXIDS)   ! Scaled column flag.
+      DOUBLE PRECISION
+     :  SCALE__CAT3(CAT1__MXIDS),  ! Scale factor.
+     :  ZERO__CAT3(CAT1__MXIDS)    ! Scale zero point.
+
+*
+*    Common blocks
+*    =============
+
+      COMMON /FITS/
+     :  SCALE__CAT3,  ZERO__CAT3,
+     :  FUNT__CAT3,   
+     :  HSTAT__CAT3,  EXTN__CAT3,   NUMKY__CAT3,  CURKY__CAT3,
+     :  COLNO__CAT3,  FTYPE__CAT3,  SFLAG__CAT3
