@@ -101,7 +101,7 @@
 *     Reset variables
 
       N_FOUND = 0
-      NAME = ''
+      NAME = ' '
       SHIFT_DX = VAL__BADR
       SHIFT_DY = VAL__BADR
       WEIGHT = VAL__BADR
