@@ -52,10 +52,13 @@
 *    History :
 *     $Id$
 *     $Log$
-*     Revision 1.2  1996/08/26 19:27:43  timj
-*     Use SCULIB_COPYX to copy data to mapped arrays.
-*     Fix bug when writing out T_COLD
+*     Revision 1.3  1996/08/26 19:31:53  timj
+*     Remove LTEMP variable (left over from BAD_PIXEL experiment)
 *
+c Revision 1.2  1996/08/26  19:27:43  timj
+c Use SCULIB_COPYX to copy data to mapped arrays.
+c Fix bug when writing out T_COLD
+c
 c Revision 1.1  1996/08/16  15:26:31  timj
 c Initial revision
 c
@@ -144,7 +147,6 @@ c
       REAL    J_THEORETICAL (N_MODEL)   ! Array of model sky data
       INTEGER LBND (MAXDIM)             ! lower bounds of array
       CHARACTER*(DAT__SZLOC) LOC1       ! Dummy locator
-      LOGICAL LTEMP                     ! Dummy logical variable
       REAL    MAX_EL                    ! Max elevation of skydip
       INTEGER MEASUREMENT               ! measurement index in DO loop
       REAL    MIN_EL                    ! Min elevation of skydip
