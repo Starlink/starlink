@@ -610,7 +610,11 @@ if (defined($CCDcat)) {
     }
 }
 unless (defined($CCDcathash)) {
-    $CCDcathash = extract_objects (\%helpers, $NDF, $maxobj, $tempDir);
+    $CCDcathash = extract_objects (\%helpers,
+				   $NDF,
+				   {maxobj => $maxobj,
+				    filtersmall => 20},
+				   $tempDir);
     defined ($CCDcathash)
       || wmessage ('fatal', "Failed to extract objects from NDF <$NDF>");
     if ($verbose) {
@@ -635,28 +639,12 @@ my $iterationsleft = 7;
 
 # The following hold the state between iterations.
 #
-# Set findofferrs and findoffminsep based on the object size
-# statistics returned from extract_objects.  Be generous in the
-# multipliers here -- the poserr returned from extract_objects is a
-# measure of only statistical error, whereas when we estimate the best
-# FINDOFF error parameter to choose, we must try to take into account the
-# distortion effects, too; the returned objsize is something like a
-# third of the visual extent of the object (see the EXTRACTOR
-# documentation), so multiply that up generously, too.  There's no
-# need to worry over-much about the details here: pragmatism rules.
-my $findofferrs =     15*$CCDcathash->{poserr};
-my $findoffminsep =   10*$CCDcathash->{objsize};
-($findoffminsep > 5*$findofferrs) || ($findoffminsep = 5*$findofferrs);
-# Other parameters
-my $findoffcomplete = 0.2;	# very tolerant -- default is 0.5
-my $lastfindofferrs = 0;	# ...and the value it had last time.
-my $findoffnmatches = 0;
-my $findoffndf =      'X';	# Ref. star pixel coordinates...
-my $findoffinfile =   $CAT;	# ...as a text file, input to FINDOFF.
-my $findofffits =     'X';	# WCS information obtained by ASTROM.
-# $findoffndf and $findofffits have dummy initial values, but though
-# $findoffinfile is obtained by converting $findoffndf, it does have a
+# $refstarndf and $astromfits have dummy initial values, but though
+# $matchinfile is obtained by converting $refstarndf, it does have a
 # valid initial value, $CAT, obtained from get_catalogue() above.
+my $refstarndf =      'X';	# Ref. star pixel coordinates...
+my $matchinfile =   $CAT;	# ...as a text file, input to match_positions.
+my $astromfits =     'X';	# WCS information obtained by ASTROM.
 
 
 
@@ -690,17 +678,6 @@ my $ntermidx = 0;	# Index into @astromnterms
 my %lastastrom;			# Hash holding the results of the last
                                 # (successful) ASTROM run.
 
-# Set the maximum displacement we allow FINDOFF to suggest.  Make
-# $findoffmaxdisp initially the length of the shorter side of the image.  This
-# doesn't have to be exact, but it's better than not specifying it at
-# all.  Successive iterations decrease this, reasonably carefully.
-my $findoffmaxdisp = (($NDFinfo->{dim1} < $NDFinfo->{dim2})
-		      ? $NDFinfo->{dim1}
-		      : $NDFinfo->{dim2});
-#my $findoffmaxdisp = 2*(($NDFinfo->{dim1} > $NDFinfo->{dim2})
-#			? $NDFinfo->{dim1}
-#			: $NDFinfo->{dim2});
-
 my $iterno = 0;
 while ($iterno < $iterationsleft) {
     wmessage ('info', "Iteration $iterno...");
@@ -709,45 +686,37 @@ while ($iterno < $iterationsleft) {
 
     my $tfile = sprintf ("%s/%02d", $tempDir, $iterno);
 
-    # Invoke FINDOFF, returning the names of the two output files.
-    # Tolerate a rather low value of complete -- FINDOFF will find
-    # fewer matches than are `really there', since it gets bedly
-    # confused by distortion.
+    # Get matches, returning the names of the two output files.
     wmessage ('info', "Matching position lists...");
     my ($ccdlist, $catlist, $matchworked)
       = match_positions ($CCDPack,
-			 $CCDcat, $findoffinfile,
-			 {error => $findofferrs,
-			  minsep => $findoffminsep,
-			  maxdisp => $findoffmaxdisp,
-			  complete => $findoffcomplete,
+			 $CCDcat,
+			 $matchinfile,
+			 { poserr => $CCDcathash->{poserr},
+			   objsize => $CCDcathash->{objsize},
+			   area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
 			 },
 			 $tfile);
 
-    if (! $matchworked) {
-	# The match didn't work.  That's most commonly because the
-	# value of error that we estimated was too low.  Try it again,
-	# using the last value which worked, if any.
-	wmessage ('info',
-		 "That match didn't work.  Trying again, with a larger error");
-	print STDERR "--- That match didn't work.  Trying again, with a larger error\n" if $verbose;
-	if ($iterno == 0) {
-	    # No previous one.
-	    $findofferrs *= 1.5; # guess
-	} else {
-	    # Use the last one (which presumably worked)
-	    $findofferrs = $lastfindofferrs;
-	}
-	($ccdlist, $catlist, $matchworked)
-	  = match_positions ($CCDPack,
-			     $CCDcat, $findoffinfile,
-			     {error => $findofferrs,
-			      minsep => $findoffminsep,
-			      maxdisp => $findoffmaxdisp,
-			      complete => $findoffcomplete,
+     if (! $matchworked) {
+ 	# The match didn't work.  That's most commonly because the
+ 	# value of error that we estimated was too low.  Try it again,
+ 	# using the last value which worked, if any.
+ 	wmessage ('info',
+ 		 "That match didn't work.  Trying again, with a larger error");
+ 	print STDERR
+	  "--- That match didn't work.  Trying again, with a larger error\n"
+	    if $verbose;
+ 	($ccdlist, $catlist, $matchworked)
+ 	  = match_positions ($CCDPack,
+ 			     $CCDcat,
+			     $matchinfile,
+			     { poserr => 2.0 * $CCDcathash->{poserr},
+			       objsize => $CCDcathash->{objsize},
+			       area => ($NDFinfo->{dim1} * $NDFinfo->{dim2})
 			     },
-			     $tfile);
-    }
+ 			     $tfile);
+     }
 
     if (! $matchworked) {
 	# Nahhh, something more substantial is wrong.  Give up.
@@ -756,30 +725,30 @@ while ($iterno < $iterationsleft) {
 	$iterationsleft = 0;	# Redundant (given `last' below), but neat.
 	last;			# JUMP OUT of the loop
     }
-    $lastfindofferrs = $findofferrs; # Keep this...
-    $findoffmaxdisp /= 2.0;	# ...and this, for next time.
 
     print STDERR "match_positions returned...\n\t$ccdlist\n\t$catlist\n"
       if $verbose;
 
 
     # Generate the ASTROM input file.  Returns hash with keys
-    # {filename}, {nmatches} and {findofferror}.
-    my $astromparams = generate_astrom ({CCDin => $ccdlist,
-					 catalogue => $catlist,
-					 findofferror => $findofferrs,
-					 helpers => \%helpers,
-					 NDFinfo => $NDFinfo,
-					 astrom => \%lastastrom,
-					 maxnterms => $astromnterms[$ntermidx],
-					 tempfn => $tfile});
+    # {filename}, {nmatches} and {samplesd}.
+    my %astromkws = ( CCDin => $ccdlist,
+		      catalogue => $catlist,
+		      helpers => \%helpers,
+		      NDFinfo => $NDFinfo,
+		      astrom => \%lastastrom,
+		      maxnterms => $astromnterms[$ntermidx],
+		      tempfn => $tfile);
+    my $astromparams = generate_astrom (\%astromkws);
     defined($astromparams) || wmessage ('fatal', "generate_astrom failed");
 
     # Display the return from generate_astrom.
     if ($verbose) {
-	printf STDERR ("generate_astrom (\n\tccdlist=%s\n\tcatlist=%s\n\tfofferr=%f\n\tastromnterms=%d\n\ttfile=%s)\n    returned:\n",
-		       $ccdlist,$catlist,$findofferrs,
-		       $astromnterms[$ntermidx],$tfile);
+	printf STDERR ("generate_astrom (\n");
+	foreach my $k (sort keys %astromkws) {
+	    printf STDERR "\t%s => %s\n", $k, $astromkws{$k};
+	}
+	print STDERR "    )\n    returned:\n";
 	foreach my $k (sort keys %$astromparams) {
 	    printf STDERR "\t%s => %s\n", $k, $astromparams->{$k};
 	}
@@ -850,22 +819,22 @@ while ($iterno < $iterationsleft) {
     $lastastrom{STATUS} || wmessage ('fatal',
 				     "ASTROM failed to make any fits at all!");
 
-    $findoffnmatches = $astromparams->{nmatches};
+    #$astromnmatches = $astromparams->{nmatches};
 
     # Store the (best of the) WCS information obtained by ASTROM.
-    $findofffits = $lastastrom{wcs};
+    $astromfits = $lastastrom{wcs};
     wmessage ('info', "ASTROM found a ".$lastastrom{nterms}."-parameter fit");
 
     # Generate the name of an NDF to receive the output from the
     # coordinate transformation.  This is to be the coordinates of the
     # catalogue objects, in the pixel domain specified by the WCS
     # information obtained by ASTROM (ie, $lastastrom{wcs}).
-    $findoffndf = "$tfile-tran";
+    $refstarndf = "$tfile-tran";
 
     # Produce the ASTTRANN argument list.  First, the astrometry...
-    my $asttrannarg = "this=$findofffits";
+    my $asttrannarg = "this=$astromfits";
     # then the input and output NDFs...
-    $asttrannarg .= " in=$CATNDF out=$findoffndf";
+    $asttrannarg .= " in=$CATNDF out=$refstarndf";
     # reverse transformation (ie, SKY to PIXEL domain) of columns 2 and 3...
     $asttrannarg .= " forward=false incols=[2,3]";
 
@@ -880,20 +849,11 @@ while ($iterno < $iterationsleft) {
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
       || wmessage ('fatal', "Error getting atools/asttrann");
 
-    #push (@TEMPFILES, "$findoffndf.sdf");
+    #push (@TEMPFILES, "$refstarndf.sdf");
 
-    # Now turn $findoffndf (the best-so-far pixel coordinates
-    # of the reference stars) into a text input file for FINDOFF.
-    $findoffinfile = ndf2txt ($findoffndf);
-    #push (@TEMPFILES, $findoffinfile);
-
-    # We want to estimate the best value of findoff:error for the next
-    # round.  Use the value returned from generate_astrom.
-    $findofferrs = $astromparams->{findofferror};
-    # However, the procedure which makes these suggestions is, I
-    # think, fundamentally flawed, so we're best ignoring any
-    # suggestions below, say, 5 pixels.
-    #($findofferrs >= 5) || ($findofferrs = 5);
+    # Now turn $refstarndf (the best-so-far pixel coordinates
+    # of the reference stars) into a text input file for match_positions.
+    $matchinfile = ndf2txt ($refstarndf);
 
     # What sort of ASTROM fit do we want to try next time?
     if ($bestfitfailed) {
@@ -914,7 +874,7 @@ while ($iterno < $iterationsleft) {
 # that same FITS information to hand (again, if requested).
 #
 # The final FITS information is in $lastastrom{wcs}, which is also in
-# $findofffits.
+# $astromfits.
 if ($insertwcs) {
     my $astcopyarg = sprintf ('this=%s result=%s', $lastastrom{wcs}, $NDF);
     wmessaage ('info',
