@@ -108,7 +108,7 @@
 
 *            create output image type data structure 
 
-              CALL NDF_PROP( LOCT, 'AXIS,QUALITY', 'OUTPIC', LOCO, STATUS )
+              CALL NDF_PROP( LOCT, 'AXIS,QUALITY', 'OUTPIC',LOCO,STATUS)
 
 *            check for error
 
