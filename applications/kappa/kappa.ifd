@@ -11229,176 +11229,94 @@ iraf! {
       }
 
       action mstats {
-         alias {msta(ts)}
+         alias {msta(ts))}
 
-         parameter inmode {
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC DEFAULT
-            prompt {File input mode}
-            default Sequential
-            help "Sequential works out a sequence from the first IMAGE name, Random asks for each name."
-          }
+         helplib {$KAPPA_HELP}
 
-         parameter pixmode {
-            type LITERAL
-            vpath PROMPT
-            ppath CURRENT DYNAMIC DEFAULT
-            prompt {Pixel mode}
-            default Box
-            help "Single is for just one pixel, Box is for a defined sub-array."
-          }
-
-         parameter inpic {
-            type IMAGE
-            access READ
-            vpath PROMPT
-            ppath GLOBAL
-            association <->GLOBAL.DATA_ARRAY
-            prompt {Image to be processed}
-            help "Give name of the IMAGE structure holding the 2-d data array to be processed."
-          }
-
-         parameter firstfile {
+         parameter comp {
             type LITERAL
             access READ
-            vpath PROMPT
-            prompt {Name of first file}
-            help "Give name of first IMAGE file in sequence to be processed. Format for sequential is namennnn, e.g. SKY0010."
-          }
+            vpath DEFAULT
+            ppath CURRENT DEFAULT
+            prompt {Component to analyse}
+            helpkey *
+            default Data
+         }
 
-         parameter numseq {
-            type _INTEGER
+         parameter in {
+            position 1
+            type NDF
             access READ
             vpath PROMPT
-            ppath DYNAMIC
-            prompt {Number of frames in sequence}
-            help "Give the number of frames in sequence (including first and last), e.g. there are 10 frames in F0011 to F0020."
-          }
+            prompt {Input NDF}
+            ppath CURRENT
+            helpkey *
+         }
 
-         parameter numran {
-            type _INTEGER
-            access READ
+         parameter out {
+            position 2
+            type NDF
+            access WRITE
             vpath PROMPT
-            ppath DYNAMIC
-            prompt {Number of random frames}
-            help "Give the number of frames to be typed in by hand, one by one."
-          }
+            ppath CURRENT
+            prompt {Output NDF}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+         }
 
-         parameter xpix {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {x pixel index of pixel}
-            help "Give the x pixel index of the single pixel to be examined."
-          }
+         parameter pos {
+            type LITERAL
+            prompt {Position at which to calculate statistics}
+            vpath PROMPT 
+            ppath CURRENT
+            helpkey *
+         }
 
-         parameter ypix {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {y pixel index of pixel}
-            help "Give the y pixel index of the single pixel to be examined."
-          }
-
-         parameter ordrst {
+         parameter single {
             type _LOGICAL
-            access READ
-            vpath DEFAULT
-            ppath DYNAMIC DEFAULT
-            prompt {Are ordered statistics required ?}
+            vpath PROMPT
+            ppath CURRENT DEFAULT
             default FALSE
-            help "If no arrays containing means and standard deviations will be created, else an array of medians is produced."
-          }
+            prompt {Statistics at a single point?}
+            helpkey *
+         }
 
-         parameter xstart {
-            type _INTEGER
-            access READ
+         parameter smode {
+            type LITERAL
             vpath PROMPT
-            ppath DYNAMIC
-            prompt {x start pixel index of sub-array}
-            help "Give the x start pixel index of the sub-array to be analysed."
-          }
+            ppath CURRENT DEFAULT
+            prompt {Type of statistics to generate}
+            default Mean
+            helpkey *
+         }
 
-         parameter ystart {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {y start pixel index of sub-array}
-            help "Give the y start pixel index of the sub-array to be analysed."
-          }
-
-         parameter xsize {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {x size of sub-array}
-            help "Give the x size of the sub-array to be analysed."
-          }
-
-         parameter ysize {
-            type _INTEGER
-            access READ
-            vpath PROMPT
-            ppath DYNAMIC
-            prompt {y size of sub-array}
-            help "Give the y size of the sub-array to be analysed."
-          }
-
-         parameter median {
-            type IMAGE
-            access WRITE
-            vpath PROMPT
-            prompt {Output array for medians}
-            help "Give the name of the IMAGE structure to hold the array of medians."
-          }
-
-         parameter omtitle {
+         parameter title {
             type LITERAL
             access READ
             vpath DEFAULT
-            default {KAPPA - Mstats - Medians}
-            prompt {Title for medians array}
-            help "Character string used as title for the IMAGE structure holding medians array."
-          }
+            prompt {Title for output NDF}
+            ppath DEFAULT
+            default {KAPPA - MSTATS}
+            helpkey *
+         }
 
-         parameter mean {
-            type IMAGE
-            access WRITE
-            vpath PROMPT
-            prompt {Output array for means}
-            help "Give the name of the IMAGE structure to hold the array of means."
-          }
+         parameter trim {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Trim output NDF to common overlap?}
+            helpkey *
+         }
 
-         parameter mtitle {
-            type LITERAL
-            access READ
-            vpath DEFAULT
-            default {KAPPA - Mstats - Means}
-            prompt {Title for means array}
-            help "Character string used as title for the IMAGE structure holding means array."
-          }
-
-         parameter stddev {
-            type IMAGE
-            access WRITE
-            vpath PROMPT
-            prompt {Output array for standard deviations}
-            help "Give the name of the IMAGE structure to hold the array of standard deviations."
-          }
-
-         parameter stitle {
-            type LITERAL
-            access READ
-            vpath DEFAULT
-            prompt {Title for standard deviation array}
-            default {KAPPA - Mstats - Stddevs}
-            help "Character string used as title for the IMAGE structure holding standard-deviation array."
-          }
+         parameter verb {
+            type _LOGICAL
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default TRUE
+            prompt {Display value of each pixel?}
+            helpkey *
+         }
 
       }
 

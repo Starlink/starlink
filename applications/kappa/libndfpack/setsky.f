@@ -214,8 +214,7 @@
 *        the previous example.  In this example however, an Orthographic 
 *        projection is forced, and the value zero is assigned to 
 *        parameter ORIENT, resulting in north being `upwards' in the image.
-*     setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s
-*            0.0d
+*     setsky virgo "!" eq(j2000.0) 1989.3 gn "12 29" "+12 30" bl 1.1s 0.0d
 *        This creates a WCS component within the two-dimensional
 *        NDF called virgo.  It is a gnomonic projection in the
 *        equatorial system at Julian epoch 2000.0.  The bottom-left
@@ -225,8 +224,7 @@
 *        The image was observed at epoch 1989.3.  At the bottom-left of
 *        the image, north is at the top, parallel to the y-axis of the
 *        image.
-*     setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc
-*       [0.5d,0.007r] 180.0d
+*     setsky map "!" galactic(1950.0) 1993.8 aitoff 90 0 cc [0.5d,0.007r] 180.0d
 *        This creates a WCS component within the two-dimensional
 *        NDF called map.  It is an Aitoff projection in the galactic
 *        system at Besselian epoch 1950.0.  The centre of the image is
@@ -235,14 +233,13 @@
 *        of 0.5 degrees by 0.007 radians.  The image was made at epoch
 *        1993.8.  At the image centre, south is at the top and is
 *        parallel to the y-axis of the image.
-*     setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d
-*       pixelref=[9.5,-11.2] IRAS90=YES
+*     setsky zodiac "!" ec 1983.4 or 10.3 -5.6 Pixel 20m 0.3d pixelref=[9.5,-11.2] IRAS90=YES
 *        This creates an IRAS90 astrometry extension within the
 *        two-dimensional NDF called zodiac.  It is an orthographic
 *        projection in the Ecliptic system at Besselian epoch 1950.0.
 *        The reference point at pixel co-ordinates (9.5,-11.2)
-*        corresponds to ecliptic longitude 10.3 degrees, latitude
-*        -5.6 degrees.  A pixel at that position is square and has
+*        corresponds to ecliptic longitude 10.3 degrees, latitude -5.6
+*        degrees.  A pixel at that position is square and has
 *        angular size of 20 arcminutes.  The image was observed at
 *        epoch 1983.4.  At the reference point the y-axis of the image
 *        points to 0.3 degrees east of north.
