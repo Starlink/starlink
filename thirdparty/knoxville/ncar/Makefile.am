@@ -2,13 +2,28 @@
 
 LN_S=@LN_S@
 
-# Build the actual library
+# Build the actual libraries
 
-lib_LTLIBRARIES = libncar.la
+lib_LTLIBRARIES = libncar.la \
+                  libncar_conrecqck.la \
+		  libncar_conrecsupr.la \
+		  libncar_dashline.la \
+		  libncar_dashsmth.la \
+		  libncar_dashsupr.la \
+		  libncar_conras.la \
+		  libncar_conpms.la
+		  
 bin_SCRIPTS = ncar_link ncar_link_adam
 
-libncar_la_SOURCES = \
-  $(F_ROUTINES) $(SEPARATE_ROUTINES) $(BLOCK_DATA) $(FPP_ROUTINES)
+libncar_la_SOURCES = $(F_ROUTINES) $(BLOCK_DATA) $(FPP_ROUTINES)
+  
+libncar_conrecqck_la_SOURCES = conrecqck.f
+libncar_conrecsupr_la_SOURCES = conrecsupr.f
+libncar_dashline_la_SOURCES = dashline.f
+libncar_dashsmth_la_SOURCES = dashsmth.f
+libncar_dashsupr_la_SOURCES = dashsupr.f
+libncar_conras_la_SOURCES = conras.f
+libncar_conpms_la_SOURCES = conpms.f
 
 # Install the data files
 staretc_DATA = ezmap.dat pwritx.dat
@@ -58,12 +73,7 @@ BLOCKDATA = conbd.f conbdn.f dashbd.f hfinit.f gridt.f isosrb.f mapbd.f \
 pwrybd.f srfabd.f threbd.f uerrbd.f utilbd.f veldat.f
 
 PRIVATE_INCLUDES = ncar.h
-
-#  List of Fortran sources to be built into objects not included in
-#  the main library? For now install inside libncar.a?
-SEPARATE_ROUTINES = \
-  conrecqck.f conrecsupr.f dashline.f dashsmth.f dashsupr.f conras.f conpms.f
-		   		  
+	  
 #  List of Fortran sources that must be edited before compilation.
 FPP_ROUTINES = mapint.fpp pwritx.fpp
 
@@ -72,7 +82,7 @@ FPP_ROUTINES = mapint.fpp pwritx.fpp
 noinst_PROGRAMS = convrt pcrbin
 
 convrt_SOURCES = $(CONVRT_ROUTINES)
-CONVERT_ROUTINES = convrt.f
+CONVRT_ROUTINES = convrt.f
 
 pcrbin_SOURCES = $(PWRITX_ROUTINES)
 PWRITX_ROUTINES = pcrbin.f
