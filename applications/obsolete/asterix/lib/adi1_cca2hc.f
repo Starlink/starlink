@@ -148,17 +148,22 @@
 *      Get length of string
           CALL ADI_CLEN( MID, CLEN, STATUS )
 
-*      Length to use
-          ULEN = MIN( MAXLEN, CLEN )
+*      ADI allows zero length strings
+          IF ( CLEN .GT. 0 ) THEN
 
-*      Create the HDS value
-          CALL DAT_NEWC( LOC, CMP, ULEN, 0, 0, STATUS )
+*        Length to use
+            ULEN = MIN( MAXLEN, CLEN )
 
-*      Read the ADI data
-          CALL ADI_GET0C( MID, VALUE(:ULEN), STATUS )
+*        Create the HDS value
+            CALL DAT_NEWC( LOC, CMP, ULEN, 0, 0, STATUS )
 
-*      Write to HDS
-          CALL CMP_PUT0C( LOC, CMP, VALUE(:ULEN), STATUS )
+*        Read the ADI data
+            CALL ADI_GET0C( MID, VALUE(:ULEN), STATUS )
+
+*        Write to HDS
+            CALL CMP_PUT0C( LOC, CMP, VALUE(:ULEN), STATUS )
+
+          END IF
 
         ELSE
 
