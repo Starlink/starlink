@@ -94,9 +94,9 @@ endif
 #   Chart
 #
 
-if ( -e @bindir@/chart/chart_startup ) then
+if ( -e @bindir@/chart/chart.csh ) then
    alias chart \
-   'source @bindir@/chart/chart_startup; @bindir@/chart/chart_params \!\!'
+   'source @bindir@/chart/chart.csh; @bindir@/chart/chart_params \!\!'
 else
    alias chart '@staretcdir@/notinst chart'
 endif
