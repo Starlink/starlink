@@ -1,5 +1,12 @@
  INTERFACE XRTHK
 
+     PARAMETER CURR
+               TYPE '_LOGICAL'
+               VPATH 'DEFAULT'
+               DEFAULT Y
+               PROMPT 'Use current directory'
+     ENDPARAMETER
+
      PARAMETER RAWDIR
                POSITION 1
                TYPE    '_CHAR'
