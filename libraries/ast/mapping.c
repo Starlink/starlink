@@ -6902,6 +6902,26 @@ c     envelope function, given by "params[1]", to the point spread function
 f     envelope function, given by PARAMS(2), to the point spread function
 *     of the input data. However, there does not seem to be any theoretical
 *     reason for this.
+*     - AST__BLOCKAVE: This scheme simply takes an average of all the
+*     pixels on the input grid in a cube centred on the interpolation
+*     point.  The number of pixels in the cube is determined by the
+c     value of the first element of the "params" array, which gives
+f     value of the first element of the PARAMS array, which gives
+*     the number of pixels in each dimension on either side of the
+c     central point.  Hence a block of (2 * params[0] + 1)^ndim_in
+f     central point.  Hence a block of (2 * PARAMS(1) + 1)**NDIM_IN
+*     pixels in the input grid will be examined to determine the
+*     value of the output pixel.  If the variance is not being used
+c     (var_in or var_out = NULL) then all valid pixels in this cube
+f     (USEVAR = .FALSE.) then all valid pixels in this cube
+*     will be averaged in to the result with equal weight.
+*     If variances are being used, then each input pixel will be 
+*     weighted proportionally to the reciprocal of its variance; any
+*     pixel without a valid variance will be discarded.  This scheme
+*     is suitable where the output grid is much coarser than the 
+*     input grid; if the ratio of pixel sizes is R then a suitable
+c     value of params[0] may be (R - 1)/2.
+f     value of PARAMS(1) may be (R - 1)/2.
 *
 c     Finally, supplying the following values for "interp" allows you
 c     to implement your own sub-pixel interpolation scheme by means of
@@ -6932,27 +6952,6 @@ f     neighbouring pixels which are to contribute to each interpolated
 f     value (in the same way as for the pre-defined interpolation
 f     schemes described above). Other elements of the PARAMS array
 f     are available to pass values to your interpolation routine.
-*
-*     - AST__BLOCKAVE: This scheme simply takes an average of all the
-*     pixels on the input grid in a cube centred on the interpolation
-*     point.  The number of pixels in the cube is determined by the
-c     value of the first element of the "params" array, which gives
-f     value of the first element of the PARAMS array, which gives
-*     the number of pixels in each dimension on either side of the
-c     central point.  Hence a block of (2 * params[0] + 1)^ndim_in
-f     central point.  Hence a block of (2 * PARAMS(1) + 1)**NDIM_IN
-*     pixels in the input grid will be examined to determine the
-*     value of the output pixel.  If the variance is not being used
-c     (var_in or var_out = NULL) then all valid pixels in this cube
-f     (USEVAR = .FALSE.) then all valid pixels in this cube
-*     will be averaged in to the result with equal weight.
-*     If variances are being used, then each input pixel will be 
-*     weighted proportionally to the reciprocal of its variance; any
-*     pixel without a valid variance will be discarded.  This scheme
-*     is suitable where the output grid is much coarser than the 
-*     input grid; if the ratio of pixel sizes is R then a suitable
-c     value of params[0] may be (R - 1)/2.
-f     value of PARAMS(1) may be (R - 1)/2.
 *
 c     - AST__UINTERP: This is a completely general scheme, in which
 c     your interpolation function has access to all of the input
