@@ -6,10 +6,30 @@
 
 # 1 Argument required: the demodulated data file
 
-# Start up Starlink just in case
+# Check if starlinkg was initialised
 
-source /star/etc/login
-source /star/etc/cshrc
+if !($?STAR_LOGIN) then
+
+# Start up Starlink (if possible)
+# note that should probably put in something that gets
+# updated during INSTALLation.
+
+  if (-e /star/etc/login) then
+    source /star/etc/login
+  else
+    echo 'Error: Starlink system not initialised'
+    exit 1
+  endif
+
+  if (-e /star/etc/cshrc) then
+    source /star/etc/cshrc
+  else
+    echo 'Error: Starlink system not initialised'
+    exit 1
+  endif
+
+endif
+
 
 # Switch off messages
 alias echo "echo > /dev/null"
@@ -39,6 +59,11 @@ else
    skydip out=$out model_out=${out}_m in=$in
 endif
 
+# Get current value of LINCOL and SYMCOL from LINPLOT so that
+# I can reset them at the end
+
+set old_lincol = `parget lincol linplot`
+set old_symcol = `parget symcol linplot`
 
 # Now display the result with linplot
 
@@ -82,7 +107,7 @@ if (-e ${out}.sdf) then
    #  XWINDOWS
 
    # Display the data first
-   linplot $out cosys=data mode=2 symcol=white device=xwindows
+   linplot $out cosys=data mode=2 symcol=green device=xwindows
 
    # Now overlay the model if necessary
 
@@ -91,6 +116,9 @@ if (-e ${out}.sdf) then
    endif
 
 endif
+
+# Reset linplot parameters
+linplot device=! ndf=! lincol=$old_lincol symcol=$old_symcol > /dev/null
 
 # Remove the intermediate files
 
