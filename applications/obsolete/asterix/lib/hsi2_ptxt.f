@@ -113,7 +113,7 @@
       OARG = ADI__NULLID
 
 *  Locate primary HDU
-      CALL ADI2_FNDHDU( ARGS(2), 'PRIMARY', .TRUE., PHDU, STATUS )
+      CALL ADI2_FNDHDU( ARGS(1), 'PRIMARY', .TRUE., PHDU, STATUS )
 
 *  Get number of lines
       CALL ADI_SIZE( ARGS(2), NLINE, STATUS )

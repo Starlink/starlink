@@ -1,4 +1,4 @@
-      SUBROUTINE ADI2_HPHIS( HDUID, HIST, STATUS )
+      SUBROUTINE ADI2_HPHIS( HDUID, HTXT, STATUS )
 *+
 *  Name:
 *     ADI2_HPHIS
@@ -10,17 +10,17 @@
 *     Starlink Fortran
 
 *  Invocation:
-*     CALL ADI2_HPHIS( HDUID, HIST, STATUS )
+*     CALL ADI2_HPHIS( HDUID, HTXT, STATUS )
 
 *  Description:
-*     Write value of keyword to specified HDU. Any existing keyword value
-*     is overwritten.
+*     Write a history string to an HDU
 
 *  Arguments:
 *     HDUID = INTEGER (given)
-*        ADI identifier of HDU object
-*     HIST = CHARACTER*(*)
-*        The history text
+*        ADI identifier of HDU cache object
+*     HTXT = CHARACTER*(*)
+*        The history text. If the first character is '@' then the text
+*        addition is an internal write and the HDU modified flag is not set
 *     STATUS = INTEGER (given and returned)
 *        The global status.
 
@@ -87,26 +87,59 @@
 
 *  Arguments Given:
       INTEGER			HDUID
-      CHARACTER*(*)		HIST
+      CHARACTER*(*)		HTXT
 
 *  Status:
       INTEGER 			STATUS             	! Global status
 
+*  External References:
+      EXTERNAL                  ADI2_MKIDX
+        CHARACTER*8             ADI2_MKIDX
+
 *  Local Variables:
-      LOGICAL			SCAND			! HDU has been scanned?
+      CHARACTER*8		NAME			! Cache object name
+
+      INTEGER			CID			! History cache object
+      INTEGER			COUNT			! History count
+      INTEGER			FC			! 1st history char
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Have keywords been scanned for this HDU
-      CALL ADI_CGET0L( HDUID, 'Scanned', SCAND, STATUS )
-      IF ( .NOT. SCAND ) THEN
-        CALL ADI2_SCAN( HDUID, STATUS )
+*  First character of history
+      IF ( HTXT(1:1) .EQ. '@' ) THEN
+        FC = 2
+      ELSE
+        FC = 1
       END IF
 
-*  Add keyword definition
-      CALL ADI2_ADDHIS( HDUID, HIST, .TRUE., STATUS )
+*  Get current history count
+      CALL ADI_CGET0I( HDUID, 'HistoryCount', COUNT, STATUS )
+
+*  Increment count
+      COUNT = COUNT + 1
+
+*  Create name
+      NAME = ADI2_MKIDX( 'HIST', COUNT )
+
+*  Create cache object
+      CALL ADI2_CFIND_CREC( HDUID, 'Crd', NAME, 'FITShistCache',
+     :                      CID, STATUS )
+
+*  Write the data
+      CALL ADI_CPUT0C( CID, 'Value', HTXT(FC:), STATUS )
+
+*  Release the cache object
+      CALL ADI_ERASE( CID, STATUS )
+
+*  Update the history count
+      CALL ADI_CPUT0I( HDUID, 'HistoryCount', COUNT, STATUS )
+
+*  Mark HDU as modified
+      IF ( FC .EQ. 1 ) THEN
+        CALL ADI_CPUT0L( HDUID, 'Modified', .TRUE., STATUS )
+      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_HPHIS', STATUS )
