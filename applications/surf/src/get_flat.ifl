@@ -1,0 +1,13 @@
+   INTERFACE GET_FLAT
+
+      PARAMETER IN
+         TYPE    'FILENAME'
+         PROMPT  'Name of input NDF containing FLATFIELD results'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         TYPE    'FILENAME'
+         PROMPT  'Name of ASCII file to contain extracted flatfield'
+      ENDPARAMETER
+
+   ENDINTERFACE

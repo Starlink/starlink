@@ -1,0 +1,105 @@
+*+  SCULIB_FREE - release virtual memory
+      SUBROUTINE SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
+*    Description :
+*     This routine frees virtual memory obtained by SCULIB_MALLOC.
+*
+*     If status is bad on entry the routine will return immediately.
+*
+*     If START_PTR is not equal to 0 then
+*
+*        The sentinel integers above and below the used piece of memory
+*        will be checked against the values they were set to by 
+*        SCULIB_MALLOC.
+*
+*        PSX_FREE will be called to free the virtual memory. If 
+*        that's successful START_PTR and END_PTR will be set to
+*        the bad value.
+*
+*        If either of the sentinel integers was corrupted then an
+*        error will be reported and bad status returned.
+*
+*     end if
+*    Invocation :
+*     CALL SCULIB_FREE (NAME, START_PTR, END_PTR, STATUS)
+*    Parameters :
+*     NAME                = CHARACTER*(*) (Given)
+*           name associated with VM
+*     START_PTR           = INTEGER (Given and returned)
+*           pointer to beginning of virtual memory
+*     END_PTR             = INTEGER (Given and returned)
+*           pointer to end of virtual memory
+*     STATUS              = INTEGER (Given and returned)
+*           global status
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     J.Lightfoot (ROE::JFL)
+*    History :
+*     $Id$
+*     18-OCT-1994: Original version.
+*    endhistory
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'PRM_PAR'                    ! for VAL__NBI
+*    Import :
+      CHARACTER*(*) NAME
+*    Import-Export :
+      INTEGER START_PTR
+      INTEGER END_PTR
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    External references :
+      REAL    VAL_ITOR                     ! conversion from integer to real
+*    Global variables :
+*    Local Constants :
+*    Local variables :
+      LOGICAL LOWER                        ! .FALSE. if lower sentinel 
+                                           ! has been corrupted
+      REAL    RTEMP                        ! scratch real
+      LOGICAL UPPER                        ! .FALSE. if upper sentinel has been
+                                           ! corrupted
+*    Internal References :
+*    Local data :
+*-
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+      IF (START_PTR .NE. 0) THEN
+
+*  check sentinel integers, calls to VAL routines are just a way of
+*  accessing the VM
+
+         RTEMP = VAL_ITOR (.FALSE., %val(START_PTR-VAL__NBI), STATUS)
+         LOWER = (INT(RTEMP) .EQ. 37)
+         RTEMP = VAL_ITOR (.FALSE., %val(END_PTR+1), STATUS)
+         UPPER = (INT(RTEMP) .EQ. 37) 
+
+*  release the memory
+
+         CALL PSX_FREE (START_PTR-VAL__NBI, STATUS)
+         START_PTR = 0
+         END _PTR = 0
+
+*  report sentinel corruption
+
+         IF (.NOT. LOWER) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC ('NAME', NAME)
+            CALL ERR_REP (' ', 'SCULIB_FREE: lower sentinel '//
+     :        'of ^NAME VM has been corrupted', STATUS)
+         END IF
+
+         IF (.NOT. UPPER) THEN
+            STATUS = SAI__ERROR
+            CALL MSG_SETC ('NAME', NAME)
+            CALL ERR_REP (' ', 'SCULIB_FREE: upper sentinel '//
+     :        'of ^NAME VM has been corrupted', STATUS)
+         END IF
+
+      END IF
+
+      END

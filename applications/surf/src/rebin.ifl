@@ -1,0 +1,63 @@
+   INTERFACE REBIN
+   
+      PARAMETER IN
+         TYPE    'FILENAME'
+         PROMPT  'Name of input file containing demodulated map data'
+      ENDPARAMETER
+
+      PARAMETER REBIN_METHOD
+         TYPE    '_CHAR'
+         PROMPT  'Rebinning method to be used'
+         DEFAULT 'BESSEL'
+      ENDPARAMETER
+
+      PARAMETER WEIGHT
+        TYPE     '_REAL'
+        PROMPT   'Weight to be assigned to input dataset'
+        DEFAULT  1.0
+      ENDPARAMETER
+
+      PARAMETER SHIFT_DX
+         TYPE    '_REAL'
+         PROMPT  'X shift to be applied to input dataset on output map (arcsec)'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER SHIFT_DY
+         TYPE    '_REAL'
+         PROMPT  'Y shift to be applied to input dataset on output map (arcsec)'
+         DEFAULT 0.0
+      ENDPARAMETER
+
+      PARAMETER OUT_OBJECT
+         TYPE    '_CHAR'
+         PROMPT  'Object name for output map'
+      ENDPARAMETER
+
+      PARAMETER OUT_COORDS
+         TYPE    '_CHAR'
+         PROMPT  'Coordinate system of output map; RB, RJ, RD or GA'
+      ENDPARAMETER
+
+      PARAMETER LONG_OUT
+         TYPE    '_CHAR'
+         PROMPT  'Longitude of of output map centre in hh (or dd) mm ss.ss format'
+      ENDPARAMETER
+
+      PARAMETER LAT_OUT
+         TYPE    '_CHAR'
+         PROMPT  'Latitude of output map centre in dd mm ss.ss format'
+      ENDPARAMETER
+
+      PARAMETER PIXSIZE_OUT
+         TYPE    '_REAL'
+         PROMPT  'Size of pixels in output map (arcsec)'
+         DEFAULT 3.0
+      ENDPARAMETER
+
+      PARAMETER OUT
+         TYPE    'FILENAME'
+         PROMPT  'Name of file to contain rebinned map'
+      ENDPARAMETER
+         
+   ENDINTERFACE

@@ -1,0 +1,13 @@
+   INTERFACE RESTORE
+
+      PARAMETER IN
+         TYPE     'FILENAME'
+         PROMPT   'Name of input file containing demodulated data'
+      ENDPARAMETER
+
+      PARAMETER OUT
+         TYPE     'FILENAME'
+         PROMPT   'Name of file to contain restored data'
+      ENDPARAMETER
+
+   ENDINTERFACE

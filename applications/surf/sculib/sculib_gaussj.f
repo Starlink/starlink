@@ -1,0 +1,163 @@
+*+  SCULIB_GAUSSJ - Numerical Recipes in Fortran routine for solution of
+*                   linear equations by Gauss-Jordan elimination
+      SUBROUTINE SCULIB_GAUSSJ (A, N, NP, B, M, MP, STATUS)
+*    Description :
+*     Linear equation solution by Gauss-Jordan elimination. A(1:N,1:N) is an
+*     input matrix stored in an array of physical dimensions NP by NP.
+*     B(1:N,1:M) is an input matrix containing the M right-hand side vectors,
+*     stored in an array of physical dimensions NP by MP. On output, 
+*     A(1:N,1:N) is replaced by its matrix inverse and B(1:N,1:M) is replaced
+*     by the corresponding set of solution vectors. Parameter NMAX is the
+*     largest anticipated value of N.
+*     Copied from GAUSSJ on p.30 of Numerical Recipes in Fortran, with 
+*     STATUS added.
+*    Invocation :
+*     CALL SCULIB_GAUSSJ (A, N, NP, B, M, MP, STATUS)
+*    Parameters :
+*     parameter[(dimensions)]=type(access)
+*           <description of parameter>
+*    Method :
+*    Deficiencies :
+*    Bugs :
+*    Authors :
+*     J.LIGHTFOOT copied from Numerical Recipes (REVAD::JFL)
+*    History :
+*     $Id$
+*     13-SEP-1993: Original copy.
+*    endhistory
+*    Type Definitions :
+      IMPLICIT NONE
+*    Global constants :
+      INCLUDE 'SAE_PAR'
+*    Import :
+      INTEGER M, MP, N, NP
+*    Import-Export :
+      REAL A (NP,NP), B (NP,MP)
+*    Export :
+*    Status :
+      INTEGER STATUS
+*    External references :
+*    Global variables :
+*    Local Constants :
+      INTEGER NMAX
+      PARAMETER (NMAX = 50)
+*    Local variables :
+      INTEGER I, ICOL, IROW, J, K, L, LL, INDXC(NMAX), INDXR(NMAX),
+     :  IPIV(NMAX)
+      REAL BIG, DUM, PIVINV
+*    Internal References :
+*    Local data :
+*-
+
+      IF (STATUS .NE. SAI__OK) RETURN
+
+*  the integer arrays IPIV, INDXR and INDXC are used for book-keeping on the
+*  pivoting
+
+      DO J = 1, N
+         IPIV (J) = 0
+      END DO
+
+*  this is the main loop over the columns to be reduced
+
+      DO I = 1, N
+
+         BIG = 0.0
+
+*  this is the outer loop of the search for a pivot element
+
+         DO J = 1, N
+
+            IF (IPIV(J) .NE. 1) THEN
+               DO K = 1, N
+                  IF (IPIV(K) .EQ. 0) THEN
+                     IF (ABS(A(J,K)) .GE. BIG) THEN
+                        BIG = ABS(A(J,K))
+                        IROW = J
+                        ICOL = K
+                     END IF
+                  ELSE IF (IPIV(K) .GT. 1) THEN
+                     STATUS = SAI__ERROR
+                     CALL ERR_REP (' ', 'SCULIB_GAUSSJ: singular '//
+     :                 'matrix', STATUS)
+                     RETURN
+                  END IF
+               END DO
+            END IF
+         END DO
+         IPIV (ICOL) = IPIV (ICOL) + 1
+
+*  we now have the pivot element, so we interchange rows if necessary to put
+*  the pivot element on the diagonal. The columns are not physically changed,
+*  only relabled: INDXC(I), the column of the Ith pivot element, is the Ith 
+*  column that is reduced, while INDXR(I) is the row in which that pivot
+*  element was originally located. If INDXR(I)#INDXC(I) there is an implied
+*  column interchange. With this form of book-keeping the solution B's will
+*  end up in the correct order, and the inverse matrix will be scrambled by
+*  columns.
+
+         IF (IROW .NE. ICOL) THEN
+            DO L = 1, N
+               DUM = A (IROW,L)
+               A (IROW,L) = A (ICOL,L)
+               A (ICOL,L) = DUM
+            END DO
+            DO L = 1, M
+               DUM = B (IROW, L)
+               B (IROW,L) = B (ICOL,L)
+               B (ICOL,L) = DUM
+            END DO
+         END IF
+
+*  we are now ready to divide the pivot row by the pivot element, located at
+*  IROW and ICOL.
+
+         INDXR (I) = IROW
+         INDXC (I) = ICOL
+         
+         IF (A(ICOL,ICOL) .EQ. 0.0) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP (' ', 'SCULIB_GAUSSJ: singular matrix', STATUS)
+            RETURN
+         END IF
+
+         PIVINV = 1.0 / A (ICOL,ICOL)
+         A (ICOL,ICOL) = 1.0
+         DO L = 1, N
+            A (ICOL,L) = A (ICOL,L) * PIVINV
+         END DO
+         DO L = 1, M
+            B (ICOL,L) = B (ICOL,L) * PIVINV
+         END DO
+         
+*  next we reduce the rows, except for the pivot one of course
+
+         DO LL = 1, N
+            IF (LL .NE. ICOL) THEN
+               DUM = A (LL,ICOL)
+               A (LL,ICOL) = 0.0
+               DO L = 1, N
+                  A (LL,L) = A (LL,L) - A (ICOL,L) * DUM
+               END DO
+               DO L = 1, M
+                  B (LL,L) = B (LL,L) - B (ICOL,L) * DUM
+               END DO
+            END IF
+         END DO
+      END DO
+
+*  it only remains to to unscramble the solution in view of the column
+*  interchanges. We do this by interchanging pairs of columns in the reverse
+*  order that the permutation was built up.
+
+      DO L = N, 1, -1
+         IF (INDXR(L) .NE. INDXC(L)) THEN
+            DO K = 1, N
+               DUM = A (K,INDXR(L))
+               A (K,INDXR(L)) = A (K,INDXC(L))
+               A (K,INDXC(L)) = DUM
+            END DO
+         END IF
+      END DO
+
+      END

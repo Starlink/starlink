@@ -1,0 +1,44 @@
+INTERFACE GET_DEMOD
+
+   PARAMETER IN
+      POSITION 1
+      PROMPT   'Name of NDF containing demodulated data'
+   ENDPARAMETER
+
+   PARAMETER BOLOMETER
+      POSITION 2
+      TYPE     '_CHAR'
+      PROMPT   'name of bolometer to be output, ALL for all of them'
+   ENDPARAMETER
+
+   PARAMETER SWITCH
+      POSITION 3
+      TYPE     '_INTEGER'
+      PROMPT   'switch to be output, 0 for all switches'
+   ENDPARAMETER
+
+   PARAMETER EXPOSURE
+      POSITION 4
+      TYPE     '_INTEGER'
+      PROMPT   'exposure to be output, 0 for all exposures'
+   ENDPARAMETER
+
+   PARAMETER INTEGRATION
+      POSITION 5
+      TYPE     '_INTEGER'
+      PROMPT   'integration to be output, 0 for all integrations'
+   ENDPARAMETER
+
+   PARAMETER MEASUREMENT
+      POSITION 6
+      TYPE     '_INTEGER'
+      PROMPT   'measurement to be output, 0 for all measurements'
+   ENDPARAMETER
+
+   PARAMETER OUT
+      POSITION 7
+      TYPE     'FILENAME'
+      PROMPT   'Name of ASCII file to contain extracted data'
+   ENDPARAMETER
+
+ENDINTERFACE

@@ -1,0 +1,46 @@
+   INTERFACE EXTINCTION
+
+      PARAMETER   IN
+         POSITION 1
+         PROMPT   'Name of NDF containing demodulated data'
+         TYPE     'FILENAME'
+      ENDPARAMETER
+
+      PARAMETER   SUB_INSTRUMENT
+         POSITION 2
+         PROMPT   'Name of sub-instrument to be extinction corrected'
+         TYPE     '_CHAR'
+      ENDPARAMETER
+
+      PARAMETER   FIRST_TAU
+         POSITION 3
+         PROMPT   'First zenith sky opacity measured'
+         TYPE     '_REAL'
+      ENDPARAMETER
+
+      PARAMETER   FIRST_LST
+         POSITION 4
+         PROMPT   'Sidereal time of first opacity measurement; hh mm ss.ss'
+         TYPE     '_CHAR'
+      ENDPARAMETER
+
+      PARAMETER   SECOND_TAU
+         POSITION 5
+         PROMPT   'Second zenith sky opacity measured'
+         TYPE     '_REAL'
+      ENDPARAMETER
+
+      PARAMETER   SECOND_LST
+         POSITION 6
+         PROMPT   'Sidereal time of second opacity measurement; hh mm ss.ss'
+         TYPE     '_CHAR'
+      ENDPARAMETER
+
+      PARAMETER   OUT
+         POSITION 7
+         PROMPT   'Name of output NDF'
+         TYPE     'FILENAME'
+      ENDPARAMETER
+
+   ENDINTERFACE
+

@@ -1,0 +1,22 @@
+   INTERFACE REDUCE_SWITCH
+
+      PARAMETER IN
+         POSITION 1
+         TYPE     'FILENAME'
+         PROMPT   'Name of input file containing demodulated data'
+      ENDPARAMETER
+
+      PARAMETER USE_CALIBRATOR
+         POSITION 2
+         TYPE     '_LOGICAL'
+         PROMPT   'Should the data be divided by the internal calibrator'
+      ENDPARAMETER
+
+      PARAMETER 'OUT'
+         POSITION 3
+         TYPE     'FILENAME'
+         PROMPT   'Name of output file to contain reduced switch data'
+      ENDPARAMETER
+
+   ENDINTERFACE
+

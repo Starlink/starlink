@@ -1,0 +1,15 @@
+   INTERFACE FLATFIELD
+
+      PARAMETER   IN
+         POSITION 1
+         PROMPT   'Name of input file'
+         TYPE     'FILENAME'
+      ENDPARAMETER
+
+      PARAMETER   OUT
+         POSITION 2
+         PROMPT   'Name of output file'
+         TYPE     'FILENAME'
+      ENDPARAMETER
+
+   ENDINTERFACE

@@ -1,0 +1,48 @@
+   INTERFACE MODIFY
+
+      PARAMETER IN
+         TYPE    'FILENAME'
+         PROMPT  'Name of input file containing demodulated map data'
+      ENDPARAMETER
+
+      PARAMETER CHANGE_INTS
+         TYPE    '_LOGICAL'
+         PROMPT  'Do you want to change which integrations are flagged'
+      ENDPARAMETER
+
+      PARAMETER BAD_INTS
+         TYPE    '_LOGICAL'
+         PROMPT  'Do you want to flag bad integrations'
+      ENDPARAMETER
+
+      PARAMETER INTEGRATIONS
+         TYPE    '_INTEGER'
+         PROMPT  'The numbers of the integrations to be flagged bad'
+      ENDPARAMETER
+
+      PARAMETER CHANGE_POINT
+         TYPE    '_LOGICAL'
+         PROMPT  'Do you want to change the pointing correction data'
+      ENDPARAMETER
+
+      PARAMETER POINT_CORR
+         TYPE    '_LOGICAL'
+         PROMPT  'Do you want to apply a pointing correction'
+      ENDPARAMETER
+
+      PARAMETER POINT_LST
+         TYPE    '_CHAR'
+         PROMPT  'The sidereal time of the pointing offset (hh mm ss.ss)'
+      ENDPARAMETER
+
+      PARAMETER POINT_DAZ
+         TYPE    '_REAL'
+         PROMPT  'The azimuth pointing correction to be added (arcsec)'
+      ENDPARAMETER
+
+      PARAMETER POINT_DEL
+         TYPE    '_REAL'
+         PROMPT  'The elevation pointing correction to be added (arcsec)'
+      ENDPARAMETER
+
+   ENDINTERFACE
