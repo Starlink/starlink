@@ -545,6 +545,7 @@
       REAL                      TRW(5), TRS(5)          ! Centroid triplet
       REAL                      TSIG(0:MAXWID)          ! Test significances
       REAL                      TSTAT(0:MAXWID)         ! Test statistic values
+      REAL			YVAL			! Signif of a width
 
       INTEGER		        APTR, DPTR, QPTR	! Diag o/p data pointers
       INTEGER                   B                       ! Best width index
@@ -634,9 +635,14 @@
 
 *      Write to file if needed
         IF ( DI_SIG_V_CRAD ) THEN
-          CALL ARR_COP1R( 1, TWID(I), %VAL(APTR+I*VAL__NBR), STATUS )
-          CALL ARR_COP1R( 1, TSIG(I), %VAL(DPTR+I*VAL__NBR), STATUS )
-          CALL ARR_COP1B( 1, QUAL__GOOD, %VAL(QPTR+I*VAL__NBUB),STATUS )
+          IF ( I .EQ. 0 ) THEN
+            YVAL = 0.0
+          ELSE
+            YVAL = PSS_CASH_SIG( TSTAT(I) - TSTAT(0) )
+          END IF
+          CALL ARR_SELEM1R( APTR, MAXWID+1, I+1, TWID(I), STATUS )
+          CALL ARR_SELEM1R( DPTR, MAXWID+1, I+1, YVAL, STATUS )
+          CALL ARR_SELEM1B( QPTR, MAXWID+1, I+1, QUAL__GOOD, STATUS )
         END IF
 
       END DO
