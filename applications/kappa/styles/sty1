@@ -1,0 +1,9 @@
+majticklen=-0.025
+minticklen=-0.015
+mintick=2
+tickall=0
+colour(ticks)=red
+width(ticks)=2
+numlabgap=0.05
+colour(border)=red
+textlab=0

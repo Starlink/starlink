@@ -1,0 +1,9 @@
+border=1
+DrawAxes=0
+DrawTitle=0
+Grid=0
+NumLab=0
+MajTickLen=0
+MinTickLen=0
+TextLab=0
+Colour(Border)=black

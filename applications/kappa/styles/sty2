@@ -1,0 +1,14 @@
+majticklen=0.03
+minticklen=0.01
+mintick=3
+tickall=0
+colour(ticks)=green
+width(ticks)=2
+border=0
+gap(1)=1000
+gap(2)=3000
+label(1)=Optical value
+label(2)=Normalized 12 micron value
+title=m31 - IRAS versus DSS
+titlegap=0
+colour(marker)=blue
