@@ -648,6 +648,10 @@ display will not."
 
    }
 
+# Create the alpha screen.
+   MakeAlpha
+   Alpha off
+
 # Load the demo files.
    LoadDemos $demodir 0
 
