@@ -28,6 +28,7 @@
 *     12 May 90 : V1.2-1 Original (RDS)
 *     28 Feb 94 : V1.7-0 Use BIT_ routines for quality manipulation (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     21 Apr 95 : V1.8-1 Use new data interface (DJA)
 *
 *    Type definitions :
 *
@@ -36,7 +37,7 @@
 *    Global constants :
 *
       INCLUDE 'SAE_PAR'
-      INCLUDE 'DAT_PAR'
+      INCLUDE 'ADI_PAR'
       INCLUDE 'QUAL_PAR'
 *
 *    Status :
@@ -54,14 +55,13 @@
       LOGICAL LQUAL                          ! Is quality present in all files ?
       INTEGER LP,AXLP
       INTEGER NDIM                           ! Number of dimensions in array
-      INTEGER DIMS(DAT__MXDIM)               ! Dimensions of data array
+      INTEGER DIMS(ADI__MXDIM)               ! Dimensions of data array
       INTEGER TNDIM                          ! Test number of dimensions
-      INTEGER TDIMS(DAT__MXDIM)              ! Test dimensions of data array
+      INTEGER TDIMS(ADI__MXDIM)              ! Test dimensions of data array
       INTEGER NFILES                         ! Number of files to be averaged
       CHARACTER*7 PARAM                      ! Filename parameter
-      CHARACTER*(DAT__SZLOC) LOC(MAXFIL)     ! Locators to input files
-      CHARACTER*(DAT__SZLOC) LOCO            ! Locator to output file
-      LOGICAL INPRIM                         ! Is input array primitive ?
+      INTEGER			IFID(MAXFIL)		! Input dataset ids
+      INTEGER			OFID			! Output dataset id
       LOGICAL OK                             ! Is data array present
       INTEGER DP(MAXFIL)                     ! Pointer to data arrays
       INTEGER VP(MAXFIL)                     ! Pointer to variance arrays
@@ -75,15 +75,14 @@
       INTEGER CPTR                           ! Pointer to dynamic workspace
       CHARACTER*3 CNUM                       ! File number character string
       INTEGER IDUM,NDUM                      ! Dummy integer
-      INTEGER IDIM(DAT__MXDIM)               ! Dummy dimensions
-      CHARACTER*(60) TYPE                    ! Type of input datafile
+      INTEGER IDIM(ADI__MXDIM)               ! Dummy dimensions
       CHARACTER*80 PATH(42)                  ! Historty records
       INTEGER NLINES                         ! Number of lines of history text
 *    Local data :
 *     <any DATA initialisations for local variables>
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'MEANDAT version 1.8-0')
+      PARAMETER (VERSION = 'MEANDAT version 1.8-1')
 *-
 
 *    Version id
@@ -96,7 +95,7 @@
       LVAR=.TRUE.
       LQUAL=.TRUE.
 *
-      DO LP=1,DAT__MXDIM
+      DO LP=1,ADI__MXDIM
          DIMS(LP)=1
          TDIMS(LP)=1
       ENDDO
@@ -117,14 +116,14 @@
          CALL CHR_ITOC(LP, CNUM, IDUM)
          PARAM='FILE'//CNUM
 *
-         CALL USI_ASSOCI(PARAM, 'READ', LOC(LP), INPRIM, STATUS)
+         CALL USI_TASSOCI( PARAM, 'READ', IFID(LP), STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
       ENDDO
 *
 * Get dimensions of data array in first file
-      CALL BDA_CHKDATA(LOC(1), OK, NDIM, DIMS, STATUS)
+      CALL BDI_CHKDATA(IFID(1), OK, NDIM, DIMS, STATUS)
 *
 * Map data array, variance and quality from all files
       DO LP=1,NFILES
@@ -132,7 +131,7 @@
          CALL MSG_SETI('FNO', LP)
 *
 *  Get data array dimensions
-         CALL BDA_CHKDATA(LOC(LP), OK, TNDIM, TDIMS, STATUS)
+         CALL BDI_CHKDATA(IFID(LP), OK, TNDIM, TDIMS, STATUS)
 *
          IF (.NOT. OK .OR. STATUS .NE. SAI__OK) THEN
             CALL MSG_PRNT('Error looking for data array ^FNO')
@@ -149,7 +148,7 @@
             ENDDO
 *
 *  Map data array
-            CALL BDA_MAPDATA(LOC(LP), 'READ', DP(LP), STATUS)
+            CALL BDI_MAPDATA(IFID(LP), 'READ', DP(LP), STATUS)
 *
             IF (STATUS .NE. SAI__OK) THEN
                CALL MSG_PRNT('Error mapping data array ^FNO')
@@ -160,31 +159,31 @@
 * Attempt to map variance from file if not already missing
          IF (LVAR) THEN
 *
-            CALL BDA_CHKVAR(LOC(LP), LVAR, NDUM, IDIM, STATUS)
+            CALL BDI_CHKVAR(IFID(LP), LVAR, NDUM, IDIM, STATUS)
 *
             IF (STATUS .NE. SAI__OK .OR. .NOT. LVAR) THEN
                CALL MSG_PRNT('Variance missing - will not be used')
                LVAR=.FALSE.
                CALL ERR_ANNUL(STATUS)
             ELSE
-               CALL BDA_MAPVAR(LOC(LP), 'READ', VP(LP), STATUS)
+               CALL BDI_MAPVAR(IFID(LP), 'READ', VP(LP), STATUS)
             ENDIF
          ENDIF
 *
 * Attempt to map quality from file if not already missing
          IF (LQUAL) THEN
 *
-            CALL BDA_CHKQUAL(LOC(LP), LQUAL, NDUM, IDIM, STATUS)
+            CALL BDI_CHKQUAL(IFID(LP), LQUAL, NDUM, IDIM, STATUS)
 *
             IF (STATUS .NE. SAI__OK .OR. .NOT. LQUAL) THEN
                CALL MSG_PRNT('Quality missing - will not be used')
                LQUAL=.FALSE.
                CALL ERR_ANNUL(STATUS)
             ELSE
-               CALL BDA_MAPQUAL(LOC(LP), 'READ', QP(LP), STATUS)
+               CALL BDI_MAPQUAL(IFID(LP), 'READ', QP(LP), STATUS)
 *
 * Attempt to get badbits value from file
-               CALL BDA_GETMASK(LOC(LP), MASK(LP), STATUS)
+               CALL BDI_GETMASK(IFID(LP), MASK(LP), STATUS)
 *
                IF (STATUS .NE. SAI__OK) THEN
                   CALL ERR_ANNUL(STATUS)
@@ -200,30 +199,28 @@
       CALL ARR_SUMDIM( NDIM, DIMS, NELS )
 
 *    Create an output file
-      CALL DAT_TYPE(LOC(1), TYPE, STATUS)
-*
-      CALL USI_ASSOCO('OUT', TYPE, LOCO, STATUS)
+      CALL USI_TASSOCO( 'OUT', 'BINDS', OFID, STATUS)
 *
       IF (STATUS .NE. SAI__OK) GOTO 999
-*
-* Copy everything from the first file into the output file
-      CALL HDX_COPY(LOC(1), LOCO, STATUS)
+
+*  Copy everything from the first file into the output file
+      CALL ADI_FCOPY( IFID(1), OFID, STATUS)
 *
 * Map the data array in the output file and zero it.
-      CALL BDA_MAPDATA(LOCO, 'UPDATE', ODP, STATUS)
+      CALL BDI_MAPDATA(OFID, 'UPDATE', ODP, STATUS)
       CALL ARR_INIT1R(0.0, NELS, %val(ODP), STATUS )
 *
 * Map the variance array if variances being used, otherwise delete any variance
 * array
       IF (LVAR) THEN
-         CALL BDA_MAPVAR(LOCO, 'UPDATE', OVP, STATUS)
+         CALL BDI_MAPVAR(OFID, 'UPDATE', OVP, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
          CALL ARR_INIT1R(0.0, NELS, %val(OVP), STATUS)
 *
       ELSE
 *
-         CALL DAT_ERASE(LOCO, 'VARIANCE', STATUS)
+         CALL BDI_DELETE( OFID, 'Variance', STATUS )
 *
          IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
 *
@@ -232,7 +229,7 @@
 * Map the quality array if quality being used, otherwise delete any quality
 * structure
       IF (LQUAL) THEN
-         CALL BDA_MAPQUAL(LOCO, 'UPDATE', OQP, STATUS)
+         CALL BDI_MAPQUAL(OFID, 'UPDATE', OQP, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
@@ -241,7 +238,7 @@
 *
       ELSE
 *
-         CALL DAT_ERASE(LOCO, 'QUALITY', STATUS)
+         CALL BDI_DELETE( OFID, 'Quality', STATUS )
 *
          IF (STATUS .NE. SAI__OK)  CALL ERR_ANNUL(STATUS)
 *
@@ -269,20 +266,19 @@
      :         %val(OQP), STATUS)
 
 *    Add standard record to new history structure
-      CALL HIST_ADD(LOCO, VERSION, STATUS)
+      CALL HSI_ADD(OFID, VERSION, STATUS)
 
 *    Put names of input datafiles used into history
       CALL USI_NAMEI(NLINES, PATH, STATUS)
-      CALL HIST_PTXT(LOCO, NLINES, PATH, STATUS)
+      CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
 *
       IF (STATUS .NE. SAI__OK) THEN
          CALL MSG_PRNT('Error adding history record in output file')
       ENDIF
 *
-999   CONTINUE
-*
-      CALL AST_CLOSE(STATUS)
-*
+ 99   CALL AST_CLOSE()
+      CALL AST_ERR( STATUS )
+
       END
 
 
