@@ -221,10 +221,10 @@ itcl::class gaia::GaiaEsp {
 	#  Pack all the components into place
 	pack $itk_component(notebook) \
 		-side top -fill both -expand 1 -pady 5 -padx 5
-	pack $itk_component(status) \
-		-side bottom -fill both -expand 1 -pady 5 -padx 5
 	pack $itk_component(actionframe) \
 		-side bottom -fill x -pady 5 -padx 5
+	pack $itk_component(status) \
+		-side bottom -fill both -expand 1 -pady 5 -padx 5
 
 	# buttons
 	pack $itk_component(run) \

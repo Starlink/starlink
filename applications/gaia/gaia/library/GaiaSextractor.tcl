@@ -1533,7 +1533,7 @@ itcl::class gaia::GaiaSextractor {
       switch -exact $flag {
          from {
             #  Set filename of filter. Check that this is a fullname,
-            #  otherwise assume a name in $SEX_DIR is being used.
+            #  otherwise assume a name in $config_dir_ is being used.
             set name [lindex $args 0]
             if { "[string index $name 0]" != "/"} {
                set values_($this,nettable) ${config_dir_}/$name
@@ -2636,7 +2636,7 @@ itcl::class gaia::GaiaSextractor {
             if { [file isdirectory "/star/bin/extractor"] }  {
                set itk_option(-sex_dir) "/star/bin/extractor"
             } else {
-               info_dialog "Cannot locate SExtractor directory. \
+               info_dialog "Cannot locate EXTRACTOR directory. \
                Define EXTRACTOR_DIR or SEX_DIR and restart."
             }
          }

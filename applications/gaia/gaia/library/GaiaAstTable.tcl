@@ -125,7 +125,8 @@ itcl::class gaia::GaiaAstTable {
              -selectmode $selectmode_ \
              -exportselection $exportselection_ \
              -headings {id ra dec x y} \
-             -width $itk_option(-width)
+             -width $itk_option(-width) \
+             -height 5
        }
        add_short_help $itk_component(table) \
           {Reference positions and their ideal/current X,Y places}

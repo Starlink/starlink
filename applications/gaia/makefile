@@ -717,7 +717,6 @@ $(GAIA_FILES): .gaia.built
 	- mkdir -p ./built ;\
 	pwd=`pwd`;\
 	(cd ./gaia; \
-	$(TAR_OUT) ../gaia.htx_tar ;\
         sed -e s#@PKG_VERS@#$(PKG_VERS)# VERSION.in >$ VERSION ;\
 	PATH=$${pwd}/built/bin:$${PATH}; export PATH; \
 	export INSTALL; unset INSTALL;\
@@ -1021,11 +1020,10 @@ install:
 	   else :; fi;\
 	done
 #
-#   Install the on-line help documentation (lives in
-#   $GAIA_DIR/gaia.htx, but this could be $STAR_HELP in future).
+#   Install the on-line help documentation, lives in $STAR_HELP/gaia.htx. 
 	if test -n "$(ONLINE_DOCS)"; then \
            pwd=`pwd`;\
-           (cd $(INSTALL_BIN);\
+           (cd $(STAR_HELP);\
            for f in $(ONLINE_DOCS) ""; do \
               if test -n "$$f"; then\
                  $(TAR_OUT) $$pwd/$${f}_tar;\
@@ -1034,9 +1032,9 @@ install:
                  touch $$f;\
               else :; fi;\
            done);\
-           HTX_PATH='$(STAR_DOCS):$(STAR_HELP):$(INSTALL_BIN)';\
+           HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
            export HTX_PATH;\
-           $(STAR_BIN)/hlink $(INSTALL_BIN);\
+           $(STAR_BIN)/hlink $(STAR_HELP);\
         fi;
 #
 #  Install the Latex documentation, giving it world read permission,
@@ -1228,13 +1226,13 @@ do_deinstall:
 #  Deinstall any on-line help documents.
 	- if test -n "$(ONLINE_DOCS)"; then \
 	   for f in $(ONLINE_DOCS) ""; do \
-	      if test -n "$$f" -a -d $(INSTALL_BIN)/$$f; then \
-	         rm -f -r $(INSTALL_BIN)/$$f;\
+	      if test -n "$$f" -a -d $(STAR_HELP)/$$f; then \
+	         rm -f -r $(STAR_HELP)/$$f;\
 	      else :; fi;\
 	   done;\
-	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP):$(INSTALL_BIN)';\
+	   HTX_PATH='$(STAR_DOCS):$(STAR_HELP)';\
 	   export HTX_PATH;\
-	   $(STAR_BIN)/hlink $(INSTALL_BIN);\
+	   $(STAR_BIN)/hlink $(STAR_HELP);\
 	fi
 #
 #  Deinstall the Latex documentation, if installed versions exist.
