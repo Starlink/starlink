@@ -32,7 +32,7 @@
 *           set of linear NDF AXIS structures.  Whenever the NDF AXIS
 *           structure contains units or a label CUNITn and CTYPEn
 *           keywords are created repsectively.
-*        o  DATE and ORIGIN cards are written.
+*        o  DATE card is written.
 *        o  A BLANK card is written using the standard bad value 
 *           corresponding to the type of the DATA array, but
 *           only if BAD pixels are present.
@@ -75,6 +75,9 @@
 *        Remove unused NBYTES
 *     1996 Nov 22 (PDRAPER):
 *        Converted for GAIA/RTD.
+*     2000 Nov 23 (PDRAPER):
+*        Removed ORIGIN card, this is now added later, if an existing
+*        one isn't found.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -466,11 +469,6 @@
 *  Record the fact that the title has been written.
          UNTFND = .TRUE.
       END IF
-
-*  Write a default ORIGIN card.
-*  ============================
-      CALL RTD1_WRFTC( 'ORIGIN', 'Starlink Project, U.K.',
-     :     'Origin of this FITS file', IPHEAD, NHEAD, AVAIL, STATUS )
 
 *  Write scale and offset cards.
 *  ===================================

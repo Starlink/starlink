@@ -62,7 +62,7 @@
 *          s found in the FITS extension are used.
 *        ORIGIN and DATE --- are created automatically.  However the
 *          former may be overriden by an ORIGIN card in the NDF
-*          extension.
+*          FITS extension.
 *        HDUCLAS1 --- "NDF"
 *        BSCALE, BZERO, BLANK and END --- are not propagated
 *          from the extension.  The first will be set for any extension.
@@ -70,7 +70,7 @@
 *          string of the BAD value for this data.
 
 *  Copyright:
-*     Copyright (C) 1998 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -92,6 +92,10 @@
 *     1998 May 15 (PDRAPER):
 *        Added NDF WCS support (moved here to make sure NDF WCS is seen
 *        before any that are present in the FITS headers).
+*     2000 Nov 23 (PDRAPER):
+*        Changed to only add the Starlink ORIGIN header, if an existing
+*        FITS header block doesn't have an ORIGIN card. Previously
+*        always overwrote with Starlink header.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -202,8 +206,7 @@
 *    OBJECT, LABEL, BUNIT --- the values held in NDF TITLE, LABEL,
 *      and UNITS respectively are used if present, otherwise any values
 *      found in the FITS extension are used.
-*    ORIGIN and DATE --- are created automatically.  However the former
-*      may be overriden by the entry in the NDF extension.
+*    DATE --- is created automatically.
 *    BLANK --- is created from the bad value (includes floating point!).
 *
       CALL RTD1_WNDFH( NDF, IPHEAD, NHEAD, AVAIL, BITPIX, CMPFND, 
@@ -240,12 +243,14 @@
 
 *  Check for presence of NDF FITS extension.
       CALL NDF_XSTAT( NDF, 'FITS', FITSPR, STATUS )
+      ORIGIN = .FALSE.
       IF ( FITSPR ) THEN
 
 *  Proceed to merge the headers in the FITS extension into the
 *  FITS-file header.  Some items should be ignored including those
 *  already set above except:
-*    ORIGIN which may be overriden by the entry in the NDF extension.
+*    Any existing ORIGIN cards are kept (the Starlink one is added
+*    otherwise). 
 *  In addition:
 *    XTENSION, BLANK and END --- are not propagated from the extension.
 *      The first will be set for any extension.  The second may be
@@ -317,15 +322,12 @@
      :               ( VALUE( 1:39 ) .EQ. 'FITS Definition document '/
      :                 /'#100 and other' ) )
 
-*  Use an intermediate variable to reduce the number of continuation
-*  lines in the test.  This tests for the Starlink ORIGIN card.
-            ORIGIN = KEYWRD .EQ. 'ORIGIN'
-*            ORIGIN = ( KEYWRD .EQ. 'ORIGIN' ) .AND. 
-*     :               ( VALUE( 2:23 ) .EQ. 'Starlink Project, U.K.' )
+*  Test for an ORIGIN card, if this present then it is kept.
+            IF ( KEYWRD .EQ. 'ORIGIN' ) ORIGIN = .TRUE.
 
 *  Do the test whether to copy the FITS extension header into the output
 *  FITS file's header.
-            IF ( MANDAT .AND. .NOT. BANNER .AND. .NOT. ORIGIN .AND.
+            IF ( MANDAT .AND. .NOT. BANNER .AND.
      :        ( KEYWRD .NE. 'DATE' ) .AND.
      :        ( KEYWRD .NE. 'BLANK' ) .AND.
      :        ( KEYWRD .NE. 'BSCALE' ) .AND.
@@ -340,7 +342,8 @@
      :        ( KEYWRD( 1:5 ) .NE. 'CUNIT' .OR. .NOT. AXUFND ) .AND.
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
      :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
-     :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) THEN
+     :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) 
+     :      THEN
 
 *  Look for a rotated axis in the FITS extension (CROTAn is present and
 *  non-zero).  If there is one, the NDF AXIS structure will contain
@@ -406,6 +409,15 @@
             END IF
          END DO      
          CALL DAT_ANNUL( FTLOC, STATUS )
+      END IF
+
+
+*  If no FITS headers or no existing ORIGIN card then add the Starlink
+*  ORIGIN card. 
+      IF ( .NOT. ORIGIN ) THEN 
+         CALL RTD1_WRFTC( 'ORIGIN', 'Starlink Project, U.K.',
+     :               'Origin of this FITS file', IPHEAD, NHEAD,
+     :               AVAIL, STATUS )
       END IF
 
   999 CONTINUE
