@@ -108,8 +108,8 @@ class PkFont {
 	    return glyphs_[0];	// dummy glyph
     }
     static void verbosity (int level) { verbosity_ = level; }
-    static void setFontPath(string fp) { fontpath_ = fp; }
-    static void setFontPath(char  *fp) { fontpath_ = fp; }
+    //static void setFontPath(string fp) { fontpath_ = fp; }
+    //static void setFontPath(char  *fp) { fontpath_ = fp; }
     static void setResolution(int res) { resolution_ = res; }
     string name() const { return name_; }
     string fontFilename() const { return path_; }
@@ -164,12 +164,13 @@ class PkFont {
     // following are in DVI units
     double quad_, word_space_, back_space_;
     PkGlyph *glyphs_[nglyphs_];
+    bool find_font (string&);
     void read_font(InputByteStream&);
     bool seen_in_doc_;		// true once the font_def command has been
     				// seen in the document, as well as the
     				// postamble
     static int verbosity_;
-    static string fontpath_;	// single string with %F in it
+    //static string fontpath_;	// single string with %F in it
     static int resolution_;
 };
 

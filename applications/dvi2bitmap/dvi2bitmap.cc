@@ -27,6 +27,19 @@ using std::exit;
 #include "Bitmap.h"
 #include "version.h"
 
+#ifdef ENABLE_KPATHSEA
+// kpathsea headers typedef a `string' type, which conflicts with C++ string
+// egcs doesn't support namespace, so hack it by defining `string' to 
+// something innocuous.  Must also define HAVE_PROTOTYPES.
+#define string kpse_string
+#define HAVE_PROTOTYPES
+extern "C" {
+#include <kpathsea/progname.h>
+}
+#undef HAVE_PROTOTYPES
+#undef string
+#endif
+
 typedef vector<string> string_list;
 
 // bitmap_info keeps together all the detailed information about the
@@ -64,21 +77,24 @@ main (int argc, char **argv)
     //PkFont::verbosity(2);
     //PkRasterdata::verbosity(2);
     //Bitmap::verbosity(2);
-    if (char *pkpath = getenv("DVI2BITMAP_PK_PATH"))
-	PkFont::setFontPath(pkpath);
 
     progname = argv[0];
+#ifdef ENABLE_KPATHSEA
+    kpse_set_program_name (argv[0], "dvi2bitmap");
+#endif
 
     for (argc--, argv++; argc>0; argc--, argv++)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
+#if 0
 	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		PkFont::setFontPath(*argv);
 		break;
+#endif
 	      case 'r':		// set resolution
 		argc--, argv++;
 		if (argc <= 0)
@@ -170,7 +186,14 @@ main (int argc, char **argv)
 		bm.ofile_pattern = *argv;
 		break;
 	      case 'V':		// display version
-		cout << version_string << '\n';
+		cout << version_string << "\nOptions:";
+#ifdef ENABLE_GIF
+		cout << " ENABLE_GIF";
+#endif
+#ifdef ENABLE_KPATHSEA
+		cout << " ENABLE_KPATHSEA";
+#endif
+		cout << '\n';
 		exit(0);	// ...and exit
 
 	      default:
@@ -207,10 +230,15 @@ main (int argc, char **argv)
 	}
 
 	all_fonts_present = true;
+#if 0
 	for (PkFont *f = dvif->firstFont();
 	     f != 0;
 	     f = dvif->nextFont())
+#endif
+	    PkFont *f = dvif->firstFont();
+	while (f)
 	{
+cout << "font " << f->name() << '\n';
 	    string unk = "unknown";
 	    if (!f->loaded())	// flag at least one missing
 		all_fonts_present = false;
@@ -228,6 +256,10 @@ main (int argc, char **argv)
 			 << (fn.length() == 0 ? unk : fn)
 			 << '\n';
 		}
+
+	    f = dvif->nextFont();
+	    cout << "next font..."
+		 << (f ? "ok" : "finished") << '\n';
 	}
 
 	if (do_process_file)

@@ -4,6 +4,7 @@
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@
 DEFS=@DEFS@
+LIBS=@LIBS@
 GIFOBJ=@GIFOBJ@
 
 
@@ -17,7 +18,7 @@ OBJS=dvi2bitmap.o DviFile.o InputByteStream.o PkFont.o Bitmap.o \
 	$(CXX) $(CXXFLAGS) $(DEFS) -c $<
 
 $(EXEC): $(OBJS)
-	$(CXX) $(OBJS) -o $@
+	$(CXX) $(OBJS) $(LIBS) -o $@
 
 DviFile.o: DviFile.cc DviFile.h InputByteStream.h PkFont.h
 
