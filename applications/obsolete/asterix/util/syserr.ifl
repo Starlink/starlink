@@ -2,7 +2,7 @@ INTERFACE SYSERR
 
    PARAMETER INP
       POSITION    1
-      TYPE        'UNIV'
+      TYPE        'LITERAL'
       PPATH       'GLOBAL'
       ASSOCIATION '<-GLOBAL.BINDS'
       PROMPT      'Input dataset'
@@ -19,7 +19,7 @@ INTERFACE SYSERR
 
    PARAMETER OUT
       POSITION    3
-      TYPE        'UNIV'
+      TYPE        'LITERAL'
       ASSOCIATION '->GLOBAL.BINDS'
       PPATH       'GLOBAL'
       PROMPT      'Output dataset'
