@@ -115,6 +115,24 @@
 *        equivalent to setting PIXFRAC=1.0. For low values of PIXFRAC the
 *        MULTI parameter must also be set correspondingly low.
 *        [0.9]
+*     PRESERVE = _LOGICAL (Read)
+*        If a TRUE value is given for this parameter (the default),
+*        then the data type of the output mosaic NDF will be derived
+*        from that of the input NDF with the highest precision, so that
+*        the input data type will be "preserved" in the output NDF.
+*        Alternatively, if a FALSE value is given, then the output NDF
+*        will be given an appropriate floating point data type.
+*
+*        When using integer input data, the former option is useful for
+*        minimising the storage space required for large mosaics, while
+*        the latter typically permits a wider output dynamic range when
+*        necessary. A wide dynamic range is particularly important if a
+*        large range of scale factor corrections are being applied (as
+*        when combining images with a wide range of exposure times).
+*
+*        If a global value has been set up for this parameter using
+*        CCDSETUP, then that value will be used.
+*        [TRUE]
 *     REF = NDF (Read)
 *        If the input NDFs being drizzled onto the output NDF are being
 *        weighted by the inverse of their mean variance (see the USEVAR
