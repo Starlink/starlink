@@ -456,19 +456,17 @@ then
 fi
 
 # Compile dtask_applic.f
-## We substitute @ORIG_AM_FCFLAGS@ with the @AM_FCFLAGS@ with which the 
-## Makefile was configured (that is, the defaults produced by ./configure),
-## rather than the $(AM_FCFLAGS) with which the Makefile builds its targets.
-## This is because the Makefile.am _changes_ AM_FCFLAGS in ways which
-## are not appropriate for these compile/link commands, since they
-## are working in a different directory, building some completely
+## We substitute in the values of @STAR_FCFLAGS@ and @STAR_LDFLAGS@ here.
+## Don't include AM_FCFLAGS, since the dtask/Makefile.am changes this
+## in ways which are not appropriate for these compile/link commands,
+## since they are working in a different directory, building some completely
 ## different application or library.
-cmpdtask="$LIBTOOL --mode=compile @FC@ $extra_mode_args @ORIG_AM_FCFLAGS@ \
+cmpdtask="$LIBTOOL --mode=compile @FC@ $extra_mode_args @STAR_FCFLAGS@ \
         -c dtask_applic.f"
 $verbose && echo $cmpdtask
 eval $cmpdtask
 
-linkcmd="$LIBTOOL --mode=link @FC@ @ORIG_AM_FCFLAGS@ $extra_mode_args \
+linkcmd="$LIBTOOL --mode=link @FC@ $extra_mode_args @STAR_LDFLAGS@ \
         -o $EXENAME \
         $linkextraflags \
         @libdir@/dtask_main.o \
