@@ -2,50 +2,25 @@ package Starlink::EMS;
 
 use strict;
 use Carp;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $AUTOLOAD);
+use vars qw($VERSION @ISA @EXPORT );
 
 require Exporter;
 require DynaLoader;
 
 @ISA = qw(Exporter DynaLoader);
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
+
+# Export the main routine
 @EXPORT = qw(
 	     ems1_get_facility_error
 );
-$VERSION = '0.01';
+$VERSION = '0.02';
 
-sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.  If a constant is not found then control is passed
-    # to the AUTOLOAD in AutoLoader.
-
-    my $constname;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    my $val = constant($constname, @_ ? $_[0] : 0);
-    if ($! != 0) {
-	if ($! =~ /Invalid/) {
-	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
-	    goto &AutoLoader::AUTOLOAD;
-	}
-	else {
-		croak "Your vendor has not defined Starlink::EMS macro $constname";
-	}
-    }
-    eval "sub $AUTOLOAD { $val }";
-    goto &$AUTOLOAD;
-}
 
 bootstrap Starlink::EMS $VERSION;
 
-# Preloaded methods go here.
-
-# Autoload methods go after =cut, and are processed by the autosplit program.
-
 1;
 __END__
-# Below is the stub of documentation for your module. You better edit it!
+
 
 =head1 NAME
 
@@ -54,16 +29,19 @@ Starlink::EMS - Perl extension for Starlink EMS library
 =head1 SYNOPSIS
 
   use Starlink::EMS;
-
+  ems1_get_facility_error($status, $facility, $ident, $text);
 
 =head1 DESCRIPTION
 
-Still needs to be added.
+This module provides a simple interface to the Starlink EMS library.
+It provides a single function for converting Starlink error status
+integers into error texts and names.
 
+The only routine exported by this module is ems1_get_facility_error.
 
 =head1 AUTHOR
 
-Tim Jenness (timj@jach.hawaii.edu)
+Tim Jenness (t.jenness@jach.hawaii.edu)
 
 =head1 SEE ALSO
 
