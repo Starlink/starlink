@@ -73,7 +73,7 @@ edit = sed \
     -e 's,@ORIG_AM_FCFLAGS\@,@AM_FCFLAGS@,g' \
     -e 's,@FCLIBS\@,$(FCLIBS),g' \
     -e 's,@C_FC_FCLINK_MAGIC\@,$(C_FC_FCLINK_MAGIC),g' \
-    -e "s,@DTASK_LINK_ADAM\@,`PATH=../subpar:$$PATH ./dtask_link_adam`,g" \
+    -e "s\#@DTASK_LINK_ADAM\@\#`PATH=../subpar:$$PATH ./dtask_link_adam`\#g" \
     -e 's,@PACKAGE_NAME\@,$(PACKAGE_NAME),g' \
     -e 's,@PACKAGE_VERSION\@,$(PACKAGE_VERSION),g' \
     -e '/^\#\#/d'
