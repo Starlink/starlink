@@ -9,7 +9,6 @@ interface IREGION
     position 2
     type '_CHAR'
     default 'NEW'
-    vpath 'DEFAULT'
     prompt 'Sub-mode'
     help 'Type HELP for a full list'
   endparameter
