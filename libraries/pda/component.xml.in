@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE component SYSTEM "componentinfo.dtd">
+<!-- @configure_input@ -->
+
+<component id="@PACKAGE@">
+  <version>@PACKAGE_VERSION@</version>
+  <path>libraries/pda</path>
+  <description>Public Domain Algorithms</description>
+  <abstract><p>Replacements of NAG routines with public domain equivalents from packages such as NETLIB and SLATEC. They have been homogenized to fit into the Starlink calling scheme.
+    </p></abstract>
+  <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
+    @STAR_DEPENDENCIES_CHILDREN@
+  </dependencies>
+  <developers>
+    <person>
+      <name>Horst Meyerdierks</name>
+      <uname>hme</uname>
+    </person>
+    <person>
+      <name>David Berry</name>
+      <uname>dsb</uname>
+    </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+    </person>
+    <person>
+      <name>Grant Privett</name>
+      <uname>gp</uname>
+    </person>
+    <person>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+    </person>
+  </developers>
+  <documentation>@STAR_DOCUMENTATION@</documentation>
+  <bugreports>@PACKAGE_BUGREPORT@</bugreports>
+  <!-- <notes><p></p></notes> -->
+</component>
