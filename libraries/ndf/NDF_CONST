@@ -65,6 +65,9 @@
 *        Increased NDF__SZCVT to 512 (from 200).
 *     31-AUG-2004 (MBT):
 *        Increased control block size limits by a factor of 4.
+*     11-MAR-2004 (DSB):
+*        Changed value of NDF__SZFID from 33 to 255 to allow for URLs being
+*        used as file identifiers.
 *     {enter_further_changes_here}
 
 *-
@@ -124,7 +127,7 @@
 *  sufficiently large value means that it is unlikely ever to need
 *  changing.
       INTEGER NDF__SZFID
-      PARAMETER ( NDF__SZFID = 33 )
+      PARAMETER ( NDF__SZFID = 255 )
 
 *  Maximum length of a string containing the name of an HDS container
 *  file (this value is somewhat arbitrary, since the maximum length of

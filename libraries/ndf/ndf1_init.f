@@ -21,6 +21,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     AJC: A. J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -56,6 +57,8 @@
 *     9-MAR-1994 (RFWS):
 *        Removed all references to the TCB - initialisation is now
 *        performed by NDF1_INTCB.
+*     20-FEB-2003 (AJC):
+*        Add initialisation of NDF_TMP
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -98,6 +101,12 @@
 *        PCB_USED( NDF__MXPCB ) = LOGICAL (Write)
 *           Whether a PCB slot has been used.
 
+      INCLUDE 'NDF_TMP'          ! NDF_ temporary files
+*        COUNT = INTEGER (Write)
+*           Count of temporary NDFs
+*        TMPLOC = CHARACTER*(DAT__SZLOC)
+*           Locator for container of temporary NDFs
+
 *  Global Data:
       DATA ACB_IDCNT / NDF__FACNO /
       DATA ACB_IDCTX / 1 /
@@ -111,6 +120,8 @@
       DATA PCB_PLCNT / NDF__FACNO /
       DATA PCB_USED / NDF__MXPCB * .FALSE. /
 
+      DATA COUNT /0/
+      DATA TMPLOC /DAT__NOLOC/
 *.
 
       END

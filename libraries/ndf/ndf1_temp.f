@@ -53,6 +53,7 @@
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (STARLINK)
+*     AJC: A. J. Chipperfield (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -64,6 +65,9 @@
 *     22-MAR-1990 (RFWS):
 *        Call HDS_TUNE to optimise the enclosing structure for temporary
 *        objects to expect a large number of components.
+*     20-FEB-2003 (AJC):
+*        Changed COUNT and TMPLOC from saved local to global (COMMON) for
+*        web services.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -79,6 +83,9 @@
       INCLUDE 'DAT_PAR'          ! DAT_ public constants
       INCLUDE 'NDF_CONST'        ! NDF_ private constants
 
+*  Global Data
+      INCLUDE 'NDF_TMP'          ! COMMON associated with Temporary files
+      
 *  Arguments Given:
       CHARACTER * ( * ) TYPE
       INTEGER NDIM
@@ -91,17 +98,9 @@
       INTEGER STATUS             ! Global status
 
 *  Local variables:
-      CHARACTER * ( DAT__SZLOC ) TMPLOC ! Locator to enclosing structure
       CHARACTER * ( DAT__SZNAM ) NAME ! Temporary object name
-      INTEGER COUNT              ! Count of objects created
       INTEGER DUMMY( 1 )         ! Dummy dimensions array
       INTEGER NCHAR              ! Number of characters formatted
-      SAVE COUNT
-      SAVE TMPLOC
-
-*  Local Data:
-      DATA COUNT / 0 /
-
 *.
 
 *  Initialise the LOC argument.

@@ -1,0 +1,49 @@
+*+
+*  Name:
+*     NDF_TMP
+
+*  Purpose:
+*     Hold information about temporary NDFs.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global variables include file.
+
+*  Description:
+*     COUNT is used to flag if no temporary objects have yet been created,
+*     indicating that a temporary container file should be created, and
+*     acts as a seed for deriving a unique object name.
+*
+*     TMPLOC is a locator for the temporary container file.
+
+*  Prior Requirements:
+*     The SAE_PAR and NDF_PAR include files should be
+*     included prior to this file, in order to define constants used
+*     here.
+
+*  Authors:
+*     AJC: A. J. Chipperfield (STARLINK)
+*     {enter_new_authors_here}
+
+*  History:
+*     20-FEB-2003 (AJC):
+*        Original, replacing use of SAVE in NDF1_TEMP for web service work.
+*     {enter_further_changes_here}
+
+*-
+      INTEGER COUNT
+      CHARACTER*(DAT__SZLOC) TMPLOC
+
+*  Non-CHARACTER data
+      COMMON /NDF1_TMP1/ COUNT
+
+*  CHARACTER data
+      COMMON /NDF1_TMP2/ TMPLOC
+
+*  Save common block contents.
+      SAVE /NDF1_TMP1/
+      SAVE /NDF1_TMP2/
+
+*.

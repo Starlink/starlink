@@ -86,6 +86,14 @@
 *        Add use of TCB_DOCVT flag to control access to foreign data files.
 *     17-JUL-2000 (DSB):
 *        Added support for foreign extension specifiers.
+*     10-OCT-2002 (AJC):
+*        Special stuff for foreign FTP extension
+*     4-JUN-2003 (AJC):
+*        Further mods to accept any URL (:// present) for NDF name. Invokes
+*        the 'conversion' command in NDF_FROM_URL
+*     7-OCT-2004 (AJC):
+*        Stylistic corrections to Alan's changes prior to inclusion in
+*        CVS repository.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -162,6 +170,7 @@
       INTEGER STATUS             ! Global status
 
 *  External References:
+      INTEGER CHR_LEN            ! Used length of string
       LOGICAL CHR_SIMLR          ! Case insensitive string comparison
       LOGICAL NDF1_ABSNT         ! Test for absent NDF or component
 
@@ -170,8 +179,9 @@
       CHARACTER * ( NDF__SZFID ) FORID  ! Foreign format file ID
       CHARACTER * ( NDF__SZFIL ) EXPFIL ! Expanded file name string
       CHARACTER * ( NDF__SZFIL ) FORFIL ! Foreign file name
-      CHARACTER * ( NDF__SZMOD ) VMODE ! Validated access mode string
+      CHARACTER * ( NDF__SZMOD ) VMODE  ! Validated access mode string
       CHARACTER * ( NDF__SZREF ) NDFNAM ! Name of associated native NDF
+      CHARACTER * 6              FEXT   ! Foreign filename extension
       INTEGER D1                 ! First character of directory field
       INTEGER D2                 ! Last character of directory field
       INTEGER F1                 ! First character of file extension
@@ -198,12 +208,13 @@
       INTEGER X2                 ! Last character of foreign extension field
       INTEGER XX1                ! First character of foreign extension field
       INTEGER XX2                ! Last character of foreign extension field
+      LOGICAL URL                ! Name is URL
       LOGICAL ACTIVE             ! NDF is already in use?
       LOGICAL CVT                ! Conversion required?
       LOGICAL FOUND              ! Input file identified?
+      LOGICAL REPORT             ! Report error if file does not exist?
 
 *.
-
 *  Set an initial null value for the IACB argument.
       IACB = 0
 
@@ -219,6 +230,7 @@
 
 *  Initialise.
       CVT = .FALSE.
+      URL = .FALSE.
 
 *  No foreign formats.
 *  ==================
@@ -235,9 +247,12 @@
 
 *  Foreign formats.
 *  ===============
-*  If there are foreign formats to be recognised, then split the NDF
-*  name into an object name and an (optional) subscript expression.
+*  If there are foreign formats to be recognised, then first check for URI's
+*  and construct an appropriate standard foreign file format, then split the 
+*  NDF name into an object name and an (optional) subscript expression.
          ELSE
+            IF( INDEX( NAME, '://' ) .GT. 0 ) URL = .TRUE.
+                
             CALL NDF1_NSPLT( NAME, .FALSE., O1, O2, S1, S2, STATUS )
             IF ( STATUS .EQ. SAI__OK ) THEN
 
@@ -274,13 +289,18 @@
 *  for instance), then annul the error and use the original name as
 *  supplied.
                CALL ERR_MARK
-               CALL NDF1_EXPFN( NAME( O1 : O2 ), .FALSE., EXPFIL, LEXP,
-     :                          FORID, STATUS )
-               LEXP = MAX( 1, LEXP )
-               IF ( STATUS .NE. SAI__OK ) THEN
-                  CALL ERR_ANNUL( STATUS )
-                  LEXP = MIN( MAX( 1, O2 - O1 + 1 ), LEN( EXPFIL ) )
-                  EXPFIL( : LEXP ) = NAME( O1 : O2 )
+               IF( URL ) THEN
+                  LEXP = MIN( MAX( 1, O2 - 01 + 1 ), LEN( EXPFIL ) )
+                  EXPFIL( :LEXP ) = NAME( O1 : O2 )
+               ELSE
+                  CALL NDF1_EXPFN( NAME( O1 : O2 ), .FALSE., EXPFIL,
+     :                             LEXP, FORID, STATUS )
+                  LEXP = MAX( 1, LEXP )
+                  IF ( STATUS .NE. SAI__OK ) THEN
+                     CALL ERR_ANNUL( STATUS )
+                     LEXP = MIN( MAX( 1, O2 - O1 + 1 ), LEN( EXPFIL ) )
+                     EXPFIL( : LEXP ) = NAME( O1 : O2 )
+                  END IF
                END IF
                CALL ERR_RLSE
 
@@ -296,7 +316,7 @@
 *  whether it identifies a foreign format file. Loop to test against
 *  each recognised foreign input format.
             IF ( STATUS .EQ. SAI__OK ) THEN
-               IF ( T1 .LE. T2 ) THEN
+               IF ( URL .OR. ( T1 .LE. T2 ) ) THEN
                   FOUND = .FALSE.
                   DO 1 IFMT = 1, FCB_NIN
 
@@ -319,11 +339,18 @@
                      TMIN = MIN( MAX( TMIN, T2 - ( F2 - F1 ) ), T1 )
 
 *  Test if the file extension field matches (be case sensitive if
-*  necessary).
-                     CALL NDF1_CMPFL( EXPFIL( TMIN : T2 ),
+*  necessary). We pretend that the a file type of ".URL" has been
+*  supplied if the expanded file looks like a URL. This is just a trick
+*  for picking up the correct conversion command.
+                     IF( URL ) THEN
+                        FEXT = '.URL'
+                     ELSE
+                        FEXT = EXPFIL( TMIN : T2 )
+                     END IF
+                     CALL NDF1_CMPFL( FEXT,
      :                                FCB_FMT( F1 : F2 ), FOUND,
      :                                STATUS )
-
+     
 *  Quit searching if a match is found or an error occurs.
                      IF ( FOUND .OR. ( STATUS .NE. SAI__OK ) ) GO TO 2
  1                CONTINUE
@@ -343,8 +370,16 @@
                      ELSE
                         CVT = .TRUE.
                         CALL ERR_MARK
+
+                        IF( URL ) THEN
+                           REPORT = .FALSE.
+                           NDFLOC = DAT__ROOT
+                        ELSE
+                           REPORT = .TRUE.
+                        END IF
+                        
                         CALL NDF1_FILEX( EXPFIL( : LEXP ), VMODE,
-     :                                   .TRUE., FOUND, STATUS )
+     :                                   REPORT, FOUND, STATUS )
 
 *  If no foreign file was found, then report contextual information.
                         IF ( STATUS .NE. SAI__OK ) THEN
@@ -384,9 +419,15 @@
 *  code be returned (now that we know the file exists and is
 *  accessible). Save the results for later use.
                         IF ( CVT ) THEN
-                           CALL NDF1_EXPFN( NAME( O1 : O2 ), .TRUE.,
-     :                                      FORFIL, LFOR, FORID,
-     :                                      STATUS )
+                           IF( URL ) THEN 
+                              FORFIL = EXPFIL
+                              LFOR = LEXP
+                              FORID = ' '
+                           ELSE
+                              CALL NDF1_EXPFN( NAME( O1 : O2 ), .TRUE.,
+     :                                         FORFIL, LFOR, FORID,
+     :                                         STATUS )
+                           END IF
                            LFOR = MAX( 1, LFOR )
                         END IF
                      END IF
@@ -583,7 +624,6 @@
 
 *  If conversion of a foreign format file is definitely required...
                ELSE
-
 *  Append any foreign extension specifier to the foreign format file spec.
                   IF( X1 .LE. X2 ) THEN
                      CALL CHR_APPND( NAME( X1 : X2 ), FORFIL, LFOR )
@@ -594,6 +634,18 @@
 *  it and will hold the converted data.
                   CALL NDF1_NTFOR( FORFIL( : LFOR ), IFMT, TCB_KEEP,
      :                             NDFLOC, NDFNAM, LNAM, STATUS )
+
+*  If we are getting an 'SDF' file (i.e. no file type) from a URL there will 
+*  be no true conversion step to produce the NDF specified by NDF1_NTFOR, so 
+*  we force NDFNAM to the name of the NDF being retrieved but preceded by 
+*  'URL'. This NDF will be affected by the KEEP tuning parameter.
+                  IF ( URL ) THEN
+                     IF( T2 .LE. T1 ) THEN
+                        NDFLOC = DAT__ROOT
+                        NDFNAM = 'URL' // EXPFIL( N1:N2 )
+                        LNAM =  N2 - N1 + 4
+                     END IF
+                  END IF
 
 *  Convert the foreign file.
                   IF ( STATUS .EQ. SAI__OK ) THEN
@@ -628,11 +680,13 @@
                            F1 = FCB_FMT1( IFMT )
                            F2 = FCB_FMT2( IFMT )
                            CALL MSG_SETC( 'FMT', FCB_FMT( F1 : F2 ) )
+
                            CALL MSG_SETC( 'FOR', FORFIL( : LFOR ) )
                            IF ( NDFLOC .NE. DAT__ROOT ) THEN
                               CALL DAT_MSG( 'NDF', NDFLOC )
                               CALL MSG_SETC( 'NDF', '.' )
                            END IF
+
                            CALL MSG_SETC( 'NDF', NDFNAM( : LNAM ) )
                            CALL ERR_REP( 'NDF1_OPFOR_CVT',
      :                          'Failed to convert the ^FMT format ' //
