@@ -129,6 +129,7 @@ dist:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 2 files to /apps/cvsbuild/java/source/jsky/bin/jsky
      [copy] Copying 4 files to /apps/cvsbuild/java/source/jsky/docs/jsky
+    [chmod] Result: -1
 
 install:
     [mkdir] Created dir: /apps/cvsbuild/star/lib/jsky
@@ -371,35 +372,12 @@ execute_mk_script:
      [exec] mk: Environment variables defined for ix86_Linux system
      [exec] make -e shared
      [exec] gcc -I. -I/stardev/local/include -I/apps/j2sdk1.4.1_02/jre/../include -I/apps/j2sdk1.4.1_02/jre/../include/linux -I/apps/cvsbuild/star/include -O -c jniast.c
+     [exec] jniast.c:31:17: ast.h: No such file or directory
      [exec] In file included from jniast.c:32:
-     [exec] jniast.h:60: parse error before `AstSpecFrame'
-     [exec] jniast.h:60: warning: no semicolon at end of struct or union
-     [exec] jniast.h:61: warning: data definition has no type or storage class
-     [exec] jniast.h:68: parse error before `}'
-     [exec] jniast.h:68: warning: data definition has no type or storage class
-     [exec] jniast.h:91: parse error before `jniastGetPointerField'
-     [exec] jniast.h:91: warning: data definition has no type or storage class
-     [exec] jniast.h:92: parse error before `AstPointer'
-     [exec] jniast.c:206: parse error before `jniastGetPointerField'
-     [exec] jniast.c: In function `jniastGetPointerField':
-     [exec] jniast.c:224: parse error before `pointer'
-     [exec] jniast.c:225: `pointer' undeclared (first use in this function)
-     [exec] jniast.c:225: (Each undeclared identifier is reported only once
-     [exec] jniast.c:225: for each function it appears in.)
-     [exec] jniast.c: At top level:
-     [exec] jniast.c:232: parse error before `AstPointer'
-     [exec] jniast.c: In function `jniastSetPointerField':
-     [exec] jniast.c:257: parse error before `old'
-     [exec] jniast.c:258: `env' undeclared (first use in this function)
-     [exec] jniast.c:259: `old' undeclared (first use in this function)
-     [exec] jniast.c:259: `object' undeclared (first use in this function)
-     [exec] jniast.c:272: `pointer' undeclared (first use in this function)
-     [exec] jniast.c: In function `jniastMakeObject':
-     [exec] jniast.c:315: parse error before `pointer'
-     [exec] jniast.c:365: `pointer' undeclared (first use in this function)
+     [exec] jniast.h:27:17: ast.h: No such file or directory
      [exec] make: *** [jniast.o] Error 1
 
 BUILD FAILED
-file:/apps/cvsbuild/java/source/jniast/build.xml:472: exec returned: 2
+file:/apps/cvsbuild/java/source/jniast/build.xml:465: exec returned: 2
 
 Total time: 1 minute 3 seconds
