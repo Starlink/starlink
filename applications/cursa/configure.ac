@@ -37,6 +37,9 @@ AC_CHECK_FUNC(socket,,
 
 dnl    Build dependencies for this package.
 STAR_DECLARE_DEPENDENCIES([build], [sae cat fio par pda ndf pgp], [link])
+dnl    cursa_link_adam depends on pgp_link_adam which is, oddly
+dnl    enough, in graphpar rather than pgp.
+STAR_DECLARE_DEPENDENCIES(build, graphpar)
 STAR_DECLARE_DEPENDENCIES(sourceset, star2html)
 
 STAR_LATEX_DOCUMENTATION([sun190 ssn76])
