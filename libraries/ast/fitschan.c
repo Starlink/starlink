@@ -496,6 +496,8 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        (avoids a segvio happening in the case of an error).
 *        - AddVersion: Do not attempt to add a Frame into the FITS header
 *        if the mapping from grid to frame is not invertable.
+*        - WorldAxes: Initialise the returned "perm" values to safe values, 
+*        and return these values if no basis vectors cen be created.
 *class--
 */
 
@@ -25745,7 +25747,7 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
 *     the input axis which is most nearly aligned with it.
 
 *  Parameters:
-*     cmap
+*     map
 *        Pointer to the Mapping from pixel coordinates to final world 
 *        coordinates.
 *     dim
@@ -25785,7 +25787,6 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
    int jmin;
    int nin;
    int nout;
-   int ok;
    int used;
 
 /* Check the status */
@@ -25798,22 +25799,31 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
    nin = astGetNin( map );  
    nout = astGetNout( map );  
 
+/* Initialise "perm". */
+   for( i = 0; i < nout; i++ ) perm[ i ] = i;
+
 /* Use FindBasisVectors to find an input position which coresponds to a
    good output position. Store it in a dynamic array pointed to by "g0". */
-   g0 = astMalloc( sizeof(double)*nin );
 
    pset1 = astPointSet( nin+1, nin, "" );
-   ptr1 = astGetPoints( pset1 );
    pset2 = astPointSet( nin+1, nout, "" );
 
-   ok = FindBasisVectors( map, nin, nout, dim, pset1, pset2 );
+   if( FindBasisVectors( map, nin, nout, dim, pset1, pset2 ) ) {
+      g0 = astMalloc( sizeof(double)*nin );
+      ptr1 = astGetPoints( pset1 );
+      if( astOK ) {
+         for( j = 0; j < nin; j++ ) g0[ j ] = ptr1[ j ][ 0 ];
+      }
 
-   if( ok && astOK ) {
-      for( j = 0; j < nin; j++ ) g0[ j ] = ptr1[ j ][ 0 ];
-   }      
+      pset1 = astAnnul( pset1 );
+      pset2 = astAnnul( pset2 );
 
-   pset1 = astAnnul( pset1 );
-   pset2 = astAnnul( pset2 );
+/* If no basis vectors found, return. */
+   } else {
+      pset1 = astAnnul( pset1 );
+      pset2 = astAnnul( pset2 );
+      return;
+   }
 
 /* Create Pointset to hold two input (pixel) points. */
    pset1 = astPointSet( 2, nin, "" );
@@ -25829,8 +25839,8 @@ static void WorldAxes( AstMapping *cmap, double *dim, int *perm ){
    tn = astMalloc( sizeof(double)*nout*nin );
    wt = astMalloc( sizeof(double)*nout*nin );
 
-/* Check that a good position was found and that the pointers can be used. */
-   if( ok && astOK ) {
+/* Check that the pointers can be used. */
+   if( astOK ) {
 
 /* Transform the grid position found above, plus a position 1 pixel away
    along all pixel axes, into world coords. Also set up "dw" to hold 
