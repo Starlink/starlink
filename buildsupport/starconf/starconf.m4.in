@@ -19,10 +19,6 @@
 # documentation, or without due consideration of the package which use
 # the earlier behaviour.  Everything else is, in principle, private
 # (not that that's going to stop folk).
-#
-# At some point in this macro, invoke _STAR[]_ECHO on STARCONF_DEFAULT_PREFIX
-# and STARCONF_DEFAULT_STARLINK, so that starconf can trace them and confirm
-# the configure.ac is configured consistently.
 AC_DEFUN([STAR_DEFAULTS],
 [#
 _star_per_package_dirs=false
@@ -70,11 +66,9 @@ done
 # tools in one component before that component has been build and
 # installed. 
 
-AC_PREFIX_DEFAULT(_STAR_ECHO([STARCONF_DEFAULT_PREFIX],
-                             [@STARCONF_DEFAULT_PREFIX@]))dnl
+AC_PREFIX_DEFAULT(@STARCONF_DEFAULT_PREFIX@)dnl
 
-test -n "$STARLINK" || STARLINK=_STAR_ECHO([STARCONF_DEFAULT_STARLINK],
-                                           [@STARCONF_DEFAULT_STARLINK@])
+test -n "$STARLINK" || STARLINK=@STARCONF_DEFAULT_STARLINK@
 
 # Handle the --with-starlink option.  If --with-starlink is present
 # with no argument (the default), we do nothing as this simply
@@ -535,12 +529,44 @@ dnl  and Fink on OSX
 tclversint=`[echo $TCL_VERSION$TCL_PATCH_LEVEL-0-0 | sed 's/\([0-9]*\)[^0-9]*\([0-9]*\)[^0-9]*\([0-9]*\).*/10000 \1* 100 \2*+ \3+p/'|dc]`
 if test $tclversint -gt $reqversint; then
     # New enough version.
+
+    # Dereference the tclsh and wish links -- the "->" _is_ standard,
+    # mandated by POSIX.
+    lslink=`ls -l $tcldir/bin/tclsh`
+    tclsh_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
+    if test -n "$tclsh_loc" -a -x "$tclsh_loc"; then
+        : OK
+    elif test -x "$tcldir/bin/tclsh"; then
+        # Odd: either .../bin/tclsh isn't a link, or it doesn't point to an
+        # executable.  But .../bin/tclsh is OK, so use that.
+        tclsh_loc="$tcldir/bin/tclsh"
+    else
+        # This really shouldn't happen, since we checked above that
+        # $d/tclsh was executable.  Still, it clearly has happened,
+        # so don't go mad.
+        echo "Warning: found Tcl libraries, but not tclsh!" >&2
+        tclsh_loc=
+    fi
+
+    # Same for wish
+    lslink=`ls -l $tcldir/bin/wish`
+    wish_loc=`expr "x$lslink" : "x.*-> *\(.*\)"`
+    if test -n "$wish_loc" -a -x "$wish_loc"; then
+        : OK
+    elif test -x "$tcldir/bin/wish"; then
+        wish_loc="$tcldir/bin/wish"
+    else
+        echo "Warning: found Tk libraries, but not wish!" >&2
+        wish_loc=
+    fi
+
     # These envs include $TCL_DBGX -- expand this out.
     eval "I=\"$TCL_INCLUDE_SPEC\"; L=\"$TCL_LIB_SPEC\""
-    echo "TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\""
+
+    echo "TCL_CFLAGS=\"$I\"; TCL_LIBS=\"$L\"; TCLSH=\"$tclsh_loc\"; WISH=\"$wish_loc\""
     status=0
 else
-    echo "Tcl/Tk versions $TCL_VERSION$TCL_PATCH_LEVEL/$TK_VERSION$TK_PATCH_LEVEL too old"
+    echo "Found Tcl/Tk $TCL_VERSION$TCL_PATCH_LEVEL/$TK_VERSION$TK_PATCH_LEVEL: older than required" >&2
     status=1
 fi
 exit $status
@@ -563,6 +589,8 @@ _STAREOF
     fi
     AC_SUBST(TCL_CFLAGS)
     AC_SUBST(TCL_LIBS)
+    AC_SUBST(TCLSH)
+    AC_SUBST(WISH)
 ])# STAR_PATH_TCLTK
 
 
@@ -979,13 +1007,6 @@ AC_DEFUN([_STAR_EXTRADIR_COMMON],
 # generated Makefile.in as the value of the Makefile variable
 # STAR_EXTRA_DIST.
 AC_DEFUN([_STAR_EXTRA_DIST], [])
-
-
-# _STAR_ECHO(name, value)
-# -----------------------
-# Private macro which echoes its second argument.  Used for tracing.
-AC_DEFUN([_STAR_ECHO],
-         [m4_ifval([$2], [$2], [AC_FATAL([$0: No second argument])])])
 
 
 # end of starconf macros
