@@ -94,6 +94,8 @@
 *  Local Variables:
       CHARACTER*(DAT__SZLOC)	LOC			! Dataset locator
 
+      INTEGER			NFILE			! # files in book
+
       LOGICAL			ISSET			! Output is a set
 *.
 
@@ -120,7 +122,7 @@
       CALL DAT_NEW( LOC, 'POSIT', 'EXTENSION', 0, 0, STATUS )
 
 *  Read number of files in structure
-      CALL ADI_CGET0I( ARGS(1), 'NFILE', NFILE, STATUS )
+      CALL ADI_CGET0I( LHS, 'NFILE', NFILE, STATUS )
       IF ( STATUS .EQ. SAI__OK ) THEN
         CALL DAT_NEW( LOC, 'BOOK', 'EXTENSION', 1, MAX(1,NFILE),
      :                STATUS )
