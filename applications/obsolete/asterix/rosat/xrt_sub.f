@@ -676,7 +676,7 @@
       REAL RP1,RP2                ! Radii to interpolate between
       INTEGER ELP,FLP             ! Fraction loop and Energy loop variables
 *    Local data :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_GETPSF_DATA'   ! Includes the data values for
+      INCLUDE 'INC_GETPSF_DATA'   ! Includes the data values for
 *                                 ! ENERGY,FRAC,TELRAD and DETRAD
 *                                 ! and the constants MAXENG and MAXFRAC
 *-

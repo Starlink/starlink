@@ -74,7 +74,7 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Global variables :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Structure definitions :
 *     <specification of FORTRAN structures>
 *    Status :
@@ -633,8 +633,8 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
+      INCLUDE 'INC_CORR'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Import :
       RECORD /CORR/ HEAD                 !Source file header info
@@ -765,8 +765,8 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
+      INCLUDE 'INC_CORR'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
@@ -912,7 +912,7 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD               !Header structure for input file
 *
@@ -1059,8 +1059,8 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_XRTSRT'
+      INCLUDE 'INC_CORR'
+      INCLUDE 'INC_XRTSRT'
       INCLUDE 'INC_XRTHEAD'
 *    Status :
       INTEGER STATUS
@@ -1192,7 +1192,7 @@ D            WRITE(3,*)EXPOS(TLP)
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'               !Quality values
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD               !Header structure for input file
 *
@@ -1408,7 +1408,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Structure definitions
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :
@@ -1530,7 +1530,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'QUAL_PAR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			IFID			! Input file id
 *    Import-Export :
@@ -2049,7 +2049,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'SAE_PAR'
       INCLUDE 'DAT_PAR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Import :
       INTEGER			IFID			! input file id
 *    Import-Export :
@@ -2157,7 +2157,7 @@ D        WRITE(*,*) RLP
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Import :
       RECORD /CORR/ HEAD                   ! Header structure
       CHARACTER*(DAT__SZLOC) ELOC          ! Locator to eff. area file
@@ -2361,7 +2361,7 @@ C
       INCLUDE 'DAT_PAR'
 *
 *    Structure definitions :
-      INCLUDE '/lsoft1/asterix/newast/rosat/rosxrt/INC_CORR'
+      INCLUDE 'INC_CORR'
 *    Status :
       INTEGER STATUS
 *    Import :
