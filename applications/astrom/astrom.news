@@ -3,7 +3,8 @@
 Recent changes:
 
   * ASTROM now reports its astrometry information additionally through
-    generated FITS WCS headers.
+    generated FITS WCS headers (this is still provisional -- see the
+    notes on this topic in the documentation, SUN/5).
 
   * There are new arguments on the command line, allowing you to request
     a summary and log files (the latter easily parseable).
