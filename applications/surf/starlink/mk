@@ -230,6 +230,8 @@
 #        Linux case added.
 #     13-JUN-1997 (TIMJ):
 #        Add support for Fortran C preprocessor
+#     02-JUL-1999 (TIMJ)
+#        Remove IRAS90 check
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -249,13 +251,6 @@
       export RANLIB
       export TAR_IN
       export TAR_OUT
-
-#  Search for IRAS90 library
-
-if [ -f /star/iras90/ira_link ]; 
-then   iras="-DHAS_IRAS90"
-else   iras=" "
-fi
 
 #  Check that the SYSTEM environment variable is defined.
       if test "$SYSTEM" = ""; then
@@ -277,7 +272,7 @@ fi
                CFLAGS='-I$(STAR_INC) -O -std1'
                FC='f77'
                FFLAGS='-O'
-               FCPPFLAGS="-D$(SYSTEM) $iras"
+               FCPPFLAGS="-D$(SYSTEM)"
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
@@ -327,7 +322,7 @@ fi
                CFLAGS='-I$(STAR_INC) -O'
                FC='f77'
                FFLAGS='-O'
-               FCPPFLAGS="-D$(SYSTEM) $iras"
+               FCPPFLAGS="-D$(SYSTEM)"
                LINK='ln -s'
                TAR_IN='tar -cvhf'
                TAR_OUT='tar -xf'
@@ -344,7 +339,7 @@ fi
                CFLAGS='-I$(STAR_INC) -O -DNO_SECNDS'
                FC='g77'
                FFLAGS='-fno-second-underscore -O'
-               FCPPFLAGS="-D$SYSTEM $iras"
+               FCPPFLAGS="-D$SYSTEM"
                LINK='ln -s'
                RANLIB='ranlib'
                TAR_IN='tar -cvhf'
