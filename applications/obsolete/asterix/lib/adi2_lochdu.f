@@ -112,25 +112,6 @@
 *  Locate the HDU
       CALL ADI2_LOCHDU1( FID, HDU, .TRUE., ID, CREATED, STATUS )
 
-*  Did we create the structure?
-      IF ( CREATED ) THEN
-
-*    Set the HDU number
-        CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
-
-        NHDU = NHDU + 1
-        CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
-        CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
-        CALL CHR_ITOC( NHDU, STR, NDIG )
-        CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), HDU, STATUS )
-
-*    Mark HDU data area as undefined
-        CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
-        CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
-        CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
-
-      END IF
-
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'ADI2_LOCHDU', STATUS )
 
@@ -245,10 +226,13 @@
 
 *  Local Variables:
       CHARACTER*40		LHDU			! Local copy of HDU
+      CHARACTER*2		STR			! NHDU in chars
 
       INTEGER			EID			! EXTENSIONS identifier
       INTEGER			HLEN			! Length of LHDU
       INTEGER			I			! Loop over LHDU
+      INTEGER			NDIG			! Chars used in STR
+      INTEGER			NHDU			! HDU number
 
       LOGICAL			THERE			! Object exists
 *.
@@ -282,8 +266,27 @@
           CREATED = .TRUE.
         END IF
         CALL ADI_FIND( EID, LHDU(:HLEN), ID, STATUS )
+
+*    Did we create the structure?
         IF ( CREATED ) THEN
+
+*      Set the HDU number
+          CALL ADI_CGET0I( FID, '.NHDU', NHDU, STATUS )
+
+          NHDU = NHDU + 1
+          CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
+          CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
+          CALL CHR_ITOC( NHDU, STR, NDIG )
+          CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), LHDU(:HLEN), STATUS )
+
+*      Mark HDU data area as undefined
+          CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
+          CALL ADI_CPUT0L( ID, '.DEF_START', .FALSE., STATUS )
+          CALL ADI_CPUT0L( ID, '.DEF_END', .FALSE., STATUS )
+
+*      Write the try extension name
           CALL ADI_CPUT0C( ID, '.EXTNAME', HDU, STATUS )
+
         END IF
 
 *  Remove temporary
