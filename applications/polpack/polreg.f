@@ -546,7 +546,8 @@
      :             SI, FIT, OEFIT, LOGFIL( : CHR_LEN( LOGFIL ) ),
      :             BADCOL, CURCOL, REFCOL, SELCOL, VIEW, PERCNT(1),
      :             PERCNT(2), NEWCM, XHAIR, XHRCOL, STHLP, 
-     :             IGRPS, SSIZE, SKYOFF, SKYPAR, STOKES, STATUS )
+     :             IGRPS, SSIZE, SKYOFF, SKYPAR, STOKES, DBEAM,
+     :             STATUS )
 
 *  The various options values may have been altered by the use of the 
 *  "Options" menu in the GUI. Write them back to the parameter file in case.

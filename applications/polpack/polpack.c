@@ -332,7 +332,8 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
                         CHARACTER(VIEW), REAL(PLO), REAL(PHI), LOGICAL(NEWCM),
                         LOGICAL(XHAIR), CHARACTER(XHRCOL), LOGICAL(STHLP),
                         INTEGER(IGRPS), INTEGER(SSIZE), LOGICAL(SKYOFF),
-                        INTEGER(SKYPAR), LOGICAL(STOKES), INTEGER(STATUS) 
+                        INTEGER(SKYPAR), LOGICAL(STOKES), LOGICAL(DBEAM),
+                        INTEGER(STATUS) 
                         TRAIL(SI) TRAIL(LOGFIL) TRAIL(BADCOL)
                         TRAIL(CURCOL) TRAIL(REFCOL) TRAIL(SELCOL)
                         TRAIL(VIEW) TRAIL(XHRCOL) ){
@@ -361,8 +362,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *        names to pass to the TCL script.
 *     IGRP3 = INTEGER (Given)
 *        The GRP identifier for the group holding the E-ray output image 
-*        names to pass to the TCL script. In single-beam mode, this should
-*        be supplied equal to IGRP2.
+*        names to pass to the TCL script. Ignored in single-beam mode.
 *     DPI = INTEGER (Given)
 *        The screen dots per inch to use. If a zero or negative value
 *        is supplied, then the TK default is used.
@@ -423,6 +423,8 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
 *     STOKES = LOGICAL (Given)
 *        Produces output Stokes parameters? (otherwise output intensity
 *        images are created).
+*     DBEAM = LOGICAL (Given)
+*        Run in dual-beam mode?
 *     STATUS = INTEGER (Given and Returned)
 *        The inherited global status.
 
@@ -466,6 +468,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    GENPTR_LOGICAL(SKYOFF)
    GENPTR_LOGICAL(STHLP)
    GENPTR_LOGICAL(STOKES)
+   GENPTR_LOGICAL(DBEAM)
    GENPTR_INTEGER(STATUS)
 
    Tcl_Interp *interp = NULL;
@@ -505,7 +508,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       name = GetName( *IGRP2, 1, STATUS );
       SetVar( interp, "stokes", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
 
-/* Otherwise, we are producing alighned output intensity images. */
+/* Otherwise, we are producing aligned output intensity images. */
    } else {
 
 /* Store the name of the O-ray output images in Tcl variable "o_list". */
@@ -515,7 +518,7 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
       }
 
 /* Do the same for the E-ray output images (if in dual-beam mode). */
-      if( *IGRP3 != *IGRP2 ) {
+      if( F77_ISTRUE(*DBEAM) ) {
          for( i = 1; i <= size && *STATUS == SAI__OK; i++ ){
             name = GetName( *IGRP3, i, STATUS );
             SetVar( interp, "e_list", name, TCL_LEAVE_ERR_MSG | TCL_LIST_ELEMENT | TCL_APPEND_VALUE, STATUS );
@@ -536,6 +539,10 @@ F77_SUBROUTINE(doplrg)( INTEGER(IGRP1), INTEGER(IGRP2), INTEGER(IGRP3),
    if ( *DPI > 0 ) { 
       SetIVar( interp, "dpi", *DPI, STATUS );
    }
+
+/* Indicate if dual or single beam mode should be used, by setting Tcl
+   variable DBEAM. */
+   SetLVar( interp, "DBEAM", DBEAM, STATUS );
 
 /* If a WWW browser is to be created at start-up define the START_HELP
    variable. */

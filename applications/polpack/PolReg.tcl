@@ -369,12 +369,8 @@
       if { [info exists e_list] } {
          set nout(E) [llength $e_list]
          set DBEAM 1
-         set DBEAM_STATE normal
-         set DBEAM_TEXT "Dual-beam"
       } {
          set DBEAM 0
-         set DBEAM_STATE disabled
-         set DBEAM_TEXT "Single-beam"
       }
 
 # Abort if the number of output images does not equal the number of input
@@ -393,6 +389,15 @@
    } {
       puts "PolReg: No name supplied for output data cube."
       exit 1
+   }
+
+# Set up convenience variables depending on DBEAM.
+   if { $DBEAM } {
+      set DBEAM_STATE normal
+      set DBEAM_TEXT "Dual-beam"
+   } {
+      set DBEAM_STATE disabled
+      set DBEAM_TEXT "Single-beam"
    }
 
 # Now get the optional list of input sky images. If any sky frames have
