@@ -1,0 +1,248 @@
+*+  ROTAS1 - rotate square section of input array into output array
+
+      SUBROUTINE ROTAS1( NUMRA, ROTSIZ, XLARGE, OFSETL, OFSETS, INDEXL,
+     :                   INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2,
+     :                   ARROUT, WORK, STATUS )
+*
+*    Description :
+*
+*     Rotates a ROTSIZ by ROTSIZ square section of ARRIN, pointed at by
+*     INDEXL and INDEXS, into ARROUT. The type of rotation is determined
+*     from NUMRA:
+*     NUMRA = 1 rotate by 90 degrees clockwise
+*           = 3 rotate by 90 deg anticlockwise, equivalent to 270 deg
+*               clockwise
+*     An immediate return will occur if STATUS has an error value.
+*
+*    Invocation :
+*
+*      CALL ROTAS1( NUMRA, ROTSIZ, XLARGE, OFSETL, OFSETS, INDEXL,
+*     :             INDEXS, IDIM1, IDIM2, ARRIN, ODIM1, ODIM2, ARROUT,
+*     :             WORK, STATUS )
+*
+*    Arguments :
+*
+*     NUMRA = INTEGER( READ )
+*         Number of right-angles through which the input data array
+*           will be rotated. This must be either 1 or 3.
+*     ROTSIZ = INTEGER( READ )
+*         Size of the square subsection for rotation.
+*     XLARGE = LOGICAL( READ )
+*         Should be .TRUE. if the first dimension of the input data
+*           array is greater than the second dimension.
+*     OFSETL = INTEGER( READ )
+*         Gives offset to position of rotated subsection in the output
+*           array along the longer dimension.
+*     OFSETS = INTEGER( READ )
+*         Gives offset to position of rotated subsection in the output
+*           array along the shorter dimension.
+*     INDEXL = INTEGER( READ )
+*         Index to subsection for rotation along longer dimension of
+*           input array.
+*     INDEXS = INTEGER( READ )
+*         Index to subsection for rotation along shorter dimension of
+*           input array.
+*     IDIM1 = INTEGER( READ )
+*         The first dimension of the input 2-d array.
+*     IDIM2 = INTEGER( READ )
+*         The second dimension of the input 2-d array.
+*     ARRIN( IDIM1, IDIM2 ) = REAL( READ )
+*         Data to be rotated.
+*     ODIM1 = INTEGER( READ )
+*         The first dimension of the output 2-d array.
+*     ODIM2 = INTEGER( READ )
+*         The second dimension of the output 2-d array.
+*     ARROUT( ODIM1, ODIM2 ) = REAL( WRITE )
+*         Will hold the rotated data.
+*     WORK( ROTSIZ, ROTSIZ ) = REAL( WRITE )
+*         Workspace to hold subsections for rotation.
+*     STATUS = INTEGER( UPDATE )
+*         This is the global status, if this variable has an error
+*           value on entry then an immediate return will occur. If the
+*           number of right-angles for rotation is not 1 or 3 then
+*           STATUS will be set to SAI__ERROR and an error reported.
+*
+*    Method :
+*
+*     If no error on entry then
+*        If number of clockwise 90 degree rotates is 1 or 3 then
+*           Transfer square subsection of input image, pointed at by
+*             INDEXL and INDEXS, into the work array
+*           Rotate the work array using subroutine ROTAS2
+*           Calculate the positon subsection should have in the output
+*             array
+*           Transfer work array to output array
+*        Else
+*           Set status and report error
+*        Endif
+*      Endif
+*
+*    Authors :
+*
+*     Dave Baines (ROE::ASOC5)
+*     Malcolm Currie RAL (UK.AC.RL.STAR::CUR)
+*
+*    History :
+*
+*     27/07/1983 : Original version                     (ROE::ASOC5)
+*     17/02/1984 : Documentation brought up to standard (ROE::ASOC5)
+*     1986 Sep  9: Renamed parameters section to arguments and tidied
+*                  (RL.STAR::CUR).
+*     1988 Jun 22: Added identification to error reporting plus an
+*                  extra status check (RL.STAR::CUR).
+*     1989 Aug  7: Passed array dimensions as separate variables
+*                  (RL.STAR::CUR).
+*
+*    Type Definitions :
+
+      IMPLICIT NONE
+
+*    Global constants :
+
+      INCLUDE 'SAE_PAR'
+
+*    Import :
+
+      INTEGER
+     :  IDIM1, IDIM2,
+     :  ODIM1, ODIM2,
+     :  NUMRA,
+     :  ROTSIZ,
+     :  INDEXL,
+     :  INDEXS,
+     :  OFSETL,
+     :  OFSETS
+
+      REAL
+     :  ARRIN( IDIM1, IDIM2 )
+
+      LOGICAL      
+     :  XLARGE
+
+*    Import-Export :
+
+      REAL
+     :  WORK( ROTSIZ, ROTSIZ )
+
+*    Export :
+
+      REAL
+     :  ARROUT( ODIM1, ODIM2 )
+
+*    Status :
+
+      INTEGER STATUS
+
+*    Local variables :
+
+      INTEGER
+     :  DELTAX,                ! Pointer to subsection in output array,
+                               ! first dimension
+     :  DELTAY,                ! Pointer to subsection in output array,
+                               ! second dimension
+     :  XIN,                   ! Index to element in input array line
+     :  YIN,                   !   "    " input array line
+     :  XOUT,                  !   "    " element in output array line
+     :  YOUT,                  !   "    " output array line
+     :  X,                     ! Index to element in subsection, first
+                               ! dimension
+     :  Y                      ! Index to element in subsection, second
+                               ! dimension
+*-
+
+*    check for error on entry
+
+      IF ( STATUS .EQ. SAI__OK ) THEN
+
+*       check for incorrect number of right angles to rotate
+
+         IF ( ( NUMRA .EQ. 1 ) .OR. ( NUMRA .EQ. 3 ) ) THEN
+
+*          transfer ROTSIZ by ROTSIZ section of the input array into
+*          workspace
+
+            IF ( XLARGE ) THEN
+               DELTAX = INDEXL - 1
+               DELTAY = INDEXS - 1
+
+            ELSE
+
+               DELTAX = INDEXS - 1
+               DELTAY = INDEXL - 1
+            END IF
+
+            DO  Y = 1, ROTSIZ
+
+*             calculate index to input array line
+
+               YIN = Y + DELTAY
+               DO X = 1, ROTSIZ
+
+*                calculate index to point in input array line
+
+                  XIN = X + DELTAX
+                  WORK( X, Y ) = ARRIN( XIN, YIN )
+               END DO
+            END DO
+
+*          perform the rotate on the workspace array
+
+            CALL ROTAS2( NUMRA, ROTSIZ, ROTSIZ, ROTSIZ, ROTSIZ, WORK,
+     :                   STATUS )
+
+            IF ( STATUS .EQ. SAI__OK ) THEN
+
+*             calculate the offsets necessary to get workspace into
+*             correct place in the output array
+
+               IF ( XLARGE ) THEN
+                  IF ( NUMRA .EQ. 3 ) THEN
+                     DELTAX = OFSETS - INDEXS
+                     DELTAY = INDEXL - 1
+
+                  ELSE
+
+                     DELTAX = INDEXS - 1
+                     DELTAY = OFSETL - INDEXL
+                  END IF
+               ELSE
+                  IF ( NUMRA .EQ. 3 ) THEN
+                     DELTAX = OFSETL - INDEXL
+                     DELTAY = INDEXS - 1
+
+                  ELSE
+
+                     DELTAX = INDEXL - 1
+                     DELTAY = OFSETS - INDEXS
+                  END IF
+               END IF
+
+*             put the rotated workspace array into the output array
+
+               DO  Y = 1, ROTSIZ
+
+*                calculate index to output array line
+
+                  YOUT = Y + DELTAY
+                  DO  X = 1, ROTSIZ
+
+*                   calculate index to point in output-array line
+
+                     XOUT = X + DELTAX
+                     ARROUT( XOUT, YOUT ) = WORK( X, Y )
+                  END DO
+               END DO
+            END IF
+         ELSE
+         
+*          here if number of right-angles for rotation is not 1 or 3
+
+            STATUS = SAI__ERROR
+            CALL MSG_SETI( 'NUMRA', NUMRA )
+            CALL ERR_REP( 'ERR_ROTAS1_NORO',
+     :        'ROTAS1: The number of rotations cannot be ^NUMRA',
+     :        STATUS )
+         END IF
+      END IF
+
+      END
