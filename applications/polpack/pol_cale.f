@@ -433,12 +433,11 @@
          ENDIF
       ENDDO
 
-* If user information is required then print out a message indicating
-* how many iterations were required for the exposure factor estimates to
-* converge.
+* Print out messages...
 
-      IF ( ILEVEL .GT. 0 ) THEN
-         CALL MSG_BLANK( STATUS )
+      IF ( ILEVEL .GT. 0 ) CALL MSG_BLANK( STATUS )
+
+      IF ( ILEVEL .GT. 1 ) THEN
          IF ( CONVERGED ) THEN
             WRITE( STRING,
      :      '( '' Convergence in '', I3, '' iterations.'' )' ) ITER
@@ -450,6 +449,28 @@
             CALL MSG_OUT( ' ', STRING, STATUS )
          ENDIF
       ENDIF
+         
+      IF ( ILEVEL .EQ. 1 ) THEN
+         IF ( CONVERGED ) THEN
+            WRITE( STRING, '( 3X, ''Image       E-factor'' )' )
+            CALL MSG_OUT( ' ', STRING, STATUS )
+            WRITE( STRING, '( 3X, ''-----       --------'' )' )
+            CALL MSG_OUT( ' ', STRING, STATUS )
+   
+            DO IPAIR = 1, NPAIR
+               WRITE( STRING, '( 3X, A10, 2X, F6.4 )' )
+     :                IMGID( IPAIR ), EEST( IPAIR )
+               CALL MSG_OUT( ' ', STRING, STATUS )
+            ENDDO
+         ELSE
+            WRITE( STRING,
+     :      '( '' *** FAILED to converge in '', I3, ''iterations '' )' )
+     :      ITER
+            CALL MSG_OUT( ' ', STRING, STATUS )
+         END IF
+      ENDIF
+
+      IF ( ILEVEL .GT. 0 ) CALL MSG_BLANK( STATUS )
          
 * Loop through the input images again to apply the left and right
 * channel sensitivity factors to the input data and put the result in

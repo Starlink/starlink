@@ -1,4 +1,10 @@
-\documentstyle[11pt,epsfig]{article}
+\documentclass[twoside,11pt]{article}
+
+% ? Specify used packages
+\usepackage{graphicx}        %  Use this one for final production.
+% \usepackage[draft]{graphicx} %  Use this one for drafting.
+% ? End of specify used packages
+
 \pagestyle{myheadings}
 
 % -----------------------------------------------------------------------------
@@ -207,8 +213,14 @@
    \end{center}
    \vspace{5mm}
 
+% ? Add picture here if required for the LaTeX version.
+   \begin{center}
+   \includegraphics[scale=0.6]{sun223_figures/map2.eps}
+   \end{center}
+% ? End of picture
+
 % ? Heading for abstract if used.
-   \vspace{10mm}
+   \vspace{5mm}
    \begin{center}
       {\Large\bf Abstract}
    \end{center}
@@ -225,6 +237,9 @@
    \begin{rawhtml} </H1> \end{rawhtml}
 
 % ? Add picture here if required.
+   \begin{center}
+   \includegraphics[scale=0.7]{sun223_figures/map2.eps}
+   \end{center}
 % ? End of picture
 
    \begin{rawhtml} <P> <I> \end{rawhtml}
@@ -629,14 +644,15 @@ Astrophysics}, ed. Z. Kopal, Academic Press, New York, London (1962),
 
 \subsubsection{Display of the Final Polarization Data}
 The final polarization parameters are usually presented graphically in
-the form of a {\em polarization map}. Each measurement is represented as
-a vector parallel to the plane of polarization. The length of the vector
-is proportional to the degree of polarization, which varies from 0\% to
-100\%. The Stokes vectors can be binned to reduce the number of vectors
-in the map to a manageable number. The map is often overlayed on a total
-intensity image or contour map of the object to emphasize any correlation
-between the visual appearance of the object and the morphology of the
-polarization map.
+the form of a {\em polarization map} (see the first page of this document
+for an example). Each measurement is represented as a vector parallel to
+the plane of polarization. The length of the vector is proportional to
+the degree of polarization, which varies from 0\% to 100\%. The Stokes
+vectors can be binned to reduce the number of vectors in the map to a
+manageable number. The map is often overlayed on a total intensity image
+or contour map of the object to emphasize any correlation between the
+visual appearance of the object and the morphology of the polarization
+map.
 
 \section{\xlabel{datareductionusingpolpack}Data Reduction Using POLPACK}
 This section gives a detailed description of the steps involved in using
@@ -712,7 +728,7 @@ package. The second command converts all FITS files with a file type of
 same file names, but a file typ of \verb+.sdf+\footnote{The double quotes
 are needed to prevent the asterisks being expanded by the shell. The
 expansion of these file templates is performed internally, within
-\verb+fits2ndf+.}. The \verb+.sdf+ files can then be given as inputs to
+fits2ndf.}. The \verb+.sdf+ files can then be given as inputs to
 any application from POLPACK, CCDPACK or KAPPA.
 
 \item You can rely on the facilities of the NDF library to perform
@@ -890,7 +906,7 @@ convert a POLPACK NDF structure back into a foreign data file.
 It is generally not necessary for users to call POLEXP explicitly. 
 
 The contents of the POLPACK extension within an NDF can be examined using
-the \xref{\verb+hdstrace+ }{sun102}{} command. For instance, to check the
+the \xref{\tt hdstrace}{sun102}{} command. For instance, to check the
 contents of the POLPACK extension in the NDF \verb+partproc.sdf+, do:
 
 \begin{myquote}
@@ -944,11 +960,31 @@ to identify the following features:
 
 A Graphical User Interface (GUI) is created for this purpose, including
 an image display area in which any of the input images may be displayed,
-and controls to select any of the above features. Once the required
-features have been supplied, POLKA commences the processing of the
-supplied data frames. This may take a significant length of time depending
-on your hardware, and the size and number of your images. A window
-displays the progress being made during this phase.
+and controls to select any of the above features (see figure
+~\ref{fig:polka}). Once the required features have been supplied, POLKA
+commences the processing of the supplied data frames. This may take a
+significant length of time depending on your hardware, and the size and
+number of your images. A window displays the progress being made during
+this phase.
+
+\begin{latexonly}
+  \begin{figure}[htpb]
+  \begin{center}
+  \includegraphics[scale=0.9]{sun223_figures/polka.eps}
+  \caption{The Graphical User Interface presented by POLKA.}
+  \label{fig:polka}
+  \end{center}
+  \end{figure}
+\end{latexonly}
+\begin{htmlonly}
+   \begin{quote}
+   \begin{figure}[bhtp]
+   \label{fig:polka}
+   \includegraphics[scale=0.9,width=8in]{sun223_figures/polka.eps}
+   \caption{The Graphical User Interface presented by POLKA.}
+   \end{figure}
+   \end{quote}
+\end{htmlonly}
 
 Once complete, a 3D cube is created in which the x-y plane corresponds to
 pixel positions within the extracted, aligned intensity images. Each
@@ -1198,7 +1234,7 @@ greyscale image, replace step \ref{STEP:DISPLAY} with:
 an extra step. This is because graphics applications such as DISPLAY,
 CONTOUR, POLPLOT, etc, produce separate output PostScript files which
 then need to be combined into a single file using the 
-\xref{\verb+psmerge+}{sun164}{} command. In step \ref{STEP:DEVICE},
+\xref{\tt psmerge}{sun164}{} command. In step \ref{STEP:DEVICE},
 specify the device as \verb+epsf_l+ (Encapsulated PostScript, landscape
 mode) instead of \verb+xwindows+. The first graphics applications to be
 run will then write its output to the file \verb+gks74.ps+, and
@@ -1215,12 +1251,14 @@ steps \ref{STEP:DISPLAY} and \ref{STEP:POLPLOT} with:
    % mv gks74.ps.1 contour.ps
    % polplot selcat noclear 
    % mv gks74.ps.1 polplot.ps
-   % psmerge contour.ps polplot.ps > total.ps
+   % psmerge polplot.ps contour.ps > total.ps
 \end{verbatim}
 \end{myquote}
 
 Note, CONTOUR produces two PostScript files (\verb+gks74.ps+ and
-\verb+gks74.ps.1+). Make sure you use \verb+gks74.ps.1+.
+\verb+gks74.ps.1+). Make sure you use \verb+gks74.ps.1+\footnote{If you are
+unsure about which PostScript file is which, don't forget that you can
+examine the individual files using {\tt ghostview}.}.
 
 The file \verb+total.ps+ then  contains the combined PostScript data
 which can be printed on a suitable printer.
@@ -1230,6 +1268,52 @@ which can be printed on a suitable printer.
 These are just a few examples of the possibilities for varying the above
 recipe. Familiarity with the parameters of the relevant KAPPA and POLPACK
 applications will suggest many more.
+
+As a final  example, the map displayed on the front of this document was
+created using the following script:
+
+\begin{myquote}
+\begin{verbatim}
+   % rm gks*.ps* total.ps
+   % gdset epsfcol_p
+   % gdclear
+   % picdef mode=cc fraction=0.55 nooutline
+   % contour nokey noaxes noborder "ndf=sm(150:221,100:190)" mode=per \
+             percentiles=\[60,70,80,90,99\]
+   % piclist picnum=1
+   % polplot noclear style=^style.dat bincat vscale=7 keyvec=10 \
+             keystyle=^keystyle.dat keypos=0.06
+   % psmerge gks74.ps.5 gks74.ps.4 > total.ps
+   % ghostview total.ps
+\end{verbatim}
+\end{myquote}
+
+The text file {\tt style.dat} specifies the style with which to draw the 
+vector map, and contains:
+
+\begin{myquote}
+\begin{verbatim}
+   colour(vec)=red
+   colour(border)=blue
+   colour(ticks)=blue
+   title=Polarization map
+   size(title)=2.5
+   textlabgap=0.07
+   titlegap=0.07
+   labelunits=0
+\end{verbatim}
+\end{myquote}
+
+The text file {\tt keystyle.dat} specifies the style with which to draw the 
+vector key, and contains:
+
+\begin{myquote}
+\begin{verbatim}
+size=1.8
+\end{verbatim}
+\end{myquote}
+
+
 
 \subsection{\xlabel{gettinghelp}Getting Help}
 Information describing all POLPACK commands is available in several forms: 
@@ -3857,7 +3941,7 @@ and \htmlref{POLIMP}{POLIMP} applications may be used to transfer these items
 to and from a set of corresponding FITS keywords (see 
 \hyperref{here}{section}{}{SEC:IMPORT}). The contents of the POLPACK
 extension within an NDF may be examined using the
-\xref{\verb+hdstrace+}{sun102}{} command.
+\xref{\tt hdstrace}{sun102}{} command.
 \begin{latexonly}
   \begin{figure}[htb]
   \begin{center}

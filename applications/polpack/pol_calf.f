@@ -393,7 +393,7 @@
          IF ( ILEVEL .GT. 0 ) THEN
             CALL MSG_BLANK( STATUS )
             WRITE( STRING,
-     :      '( '' Mean F factor,'', I3, '' estimates: '', F6.3 )' )
+     :      '( ''   Mean F factor,'', I3, '' estimates: '', F6.3 )' )
      :       NEST, F
             CALL MSG_OUT( ' ', STRING, STATUS )
          ENDIF

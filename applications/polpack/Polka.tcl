@@ -868,6 +868,12 @@
       incr i   
    }
 
+# Complete the Images menu by adding a separator, and an entry for the 
+# "Transfer" function.
+   $imagesmenu add separator
+   $imagesmenu add command -label "Transfer..." -command Transfer
+   MenuHelp $imagesmenu "Transfer..." ".  Transfer the features from the current image to a group of other images."
+
 # Pack the menu buttons.
    pack $file $edit $opts $images $effects -side left 
    pack $help -side right

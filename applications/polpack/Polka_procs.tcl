@@ -14142,3 +14142,467 @@ proc pp {a b c} {
    puts "++++++++++++++++++++++++\n"
 }
 
+
+proc Transfer {} {
+#+
+#  Name:
+#     Transfer
+#
+#  Purpose:
+#     Transfer the current features from the currently selected image to 
+#     a group of other images.
+#
+#  Arguments:
+#     None.
+#
+#  Globals:
+#     CB_COL (Read) 
+#        The colour to use for the check buttons in the dialog box.
+#     GETITEMS_EXIT (Read and Write)
+#        Used to communicate with the widgets.
+#     SAREA (Read)
+#         Should the status area be displayed?
+#     SI_LABELS (Read)
+#        A list containing the label for each status item, in the
+#        order they were defined.
+#     SI_LIST (Read and Write)
+#        A list containing integer identifiers for each status item to be
+#        displayed. These integers are indices into the SI_LABELS, SI_HELPS
+#        and SI_VARS lists.
+#     SI_ON (Write)
+#        A list containing flags indicating if each of the status items
+#        is displayed or not.
+#     SI_VARS (Read)
+#        A list containing the global variable name for each status item, 
+#        in the order they were defined.
+#     
+#  Notes:
+#    - 
+#-
+   global CB_COL
+   global IMAGES
+   global IM_TRAN
+   global POLPACK_DIR
+   global TRAN_LIST
+   global TRANSFER_EXIT
+   global IMAGE_DISP
+
+# Create the top level window for the dialogue box, and set its title.
+   set top .items
+   set topf [MakeDialog $top "Transfer features, etc" 1]
+
+# Find the length of the longest image name.
+   set maxl 0
+   foreach image $IMAGES {
+      set l [string length $image]
+      if { $l > $maxl } { set maxl $l }
+   }   
+
+# Create a frame to put the checkbuttons in.
+   set fr0 [frame $topf.fr0]
+   pack $fr0 -side top
+   SetHelp $fr0 ".  Click the buttons corresponding to the images to which the current features are to be transferred.\nAny which already have any features are indicated by a tick mark."
+
+# Create two columns within this frame.
+   set fr1 [frame $fr0.fr1]
+   set fr2 [frame $fr0.fr2]
+   pack $fr1 $fr2 -side left -anchor n -padx 4m -pady 4m
+
+# Indicate that no images have yet been selected.
+   set TRAN_LIST ""
+
+# Create a check button for each image name, place them alternately in
+# the left and right of the two frames just created.
+   set f $fr1   
+   for {set i 0} {$i < [llength $IMAGES]} {incr i} {
+      set IM_TRAN($i) 0
+      set im [lindex $IMAGES $i]
+
+# Each line in the Frame consists of a checkbutton, with an optional
+# label at the end of it. The label is only included if the image already
+# has features associated with it, and consists of a tick mark.
+# Create the frame for this line.
+      set lfrm [frame $f.f_$i]
+
+# If this image is the currently displayed image, then disable the check
+# button.
+      if { $im == $IMAGE_DISP } {
+         set state "disabled"
+      } { 
+         set state normal
+      }
+
+#  Create the checkbutton within this frame.
+      set cb($i) [checkbutton $lfrm.cb -selectcolor $CB_COL -variable IM_TRAN($i) \
+                  -highlightthickness 0 -width $maxl -anchor nw \
+                  -text "$im" -state $state -command \
+        "if { \$IM_TRAN($i) } {
+            lappend TRAN_LIST $i
+         } {
+            set j \[lsearch \$TRAN_LIST $i \]
+            if { \$j > -1 } {
+               set TRAN_LIST \[lreplace \$TRAN_LIST \$j \$j]
+            }
+         }"]
+        
+         pack $cb($i) -side left 
+
+# If the image already has features, pack a label containing a
+# tick mark to the right of the checkbutton.
+      if { [HasFea $im] } {
+         pack [label $lfrm.tk -bitmap @$POLPACK_DIR/tick.bit -foreground red] -side left
+      }
+
+# Pack the line frame.
+      pack $lfrm -side top -pady 1m -anchor nw 
+
+# Swap frames.
+      if { $f == $fr1 } {
+         set f $fr2
+      } {
+         set f $fr1
+      }
+   }
+
+# Create a frame for the buttons.
+   set fr3 [frame $topf.fr3]
+   pack $fr3 -side top -expand 1 -fill x
+
+# Create the OK and Cancel buttons.
+   set b1 [button $fr3.ok -text "OK" -command "set TRANSFER_EXIT ok"]
+   set b3 [button $fr3.cancel -text "Cancel" -command "set TRANSFER_EXIT cancel"]
+   pack $b1 $b3 -padx 1m -side left -expand 1
+   SetHelp $b1 ".  Press to close the dialog box, transferring the features from the current image to all the selected images."
+   SetHelp $b3 ".  Press to close the dialog box without making any changes to the selected images."
+
+# Create the ClearAll and SetAll and Help buttons.
+   set b4 [button $fr3.cl -text "ClearAll" -command "set TRANSFER_EXIT clear"]
+   set b5 [button $fr3.st -text "SetAll" -command "set TRANSFER_EXIT set"]
+   set b6 [button $fr3.help -text "Help" -command "set TRANSFER_EXIT help"]
+   pack $b4 $b5 $b6 -padx 1m -side left -expand 1
+   SetHelp $b4 ".  Press to clear all check buttons."
+   SetHelp $b5 ".  Press to set all check buttons."
+   SetHelp $b6 ".  Press to see more help on this window."
+
+# Ensure that closing the window from the window manager is like pressing
+# the Cancel button.
+   wm protocol $top WM_DELETE_WINDOW "set TRANSFER_EXIT cancel"
+
+# Loop until an exit button is pressed.
+   set exit 0
+   while { !$exit } {
+
+# Wait for the user to press a button.
+      tkwait variable TRANSFER_EXIT
+
+# If the cancel button was pressed, exit without doing anything.
+      if { $TRANSFER_EXIT == "cancel" } {
+         set exit 1
+
+# If the OK button was pressed, transfer all features from the current
+# image to the selected images.
+      } elseif { $TRANSFER_EXIT == "ok" } {
+
+# Tell the user what is happening.
+         set told [SetInfo "Transferring feature positions. Please wait..." 0]
+
+# Transfer the positions.
+         for {set i 0} {$i < [llength $IMAGES]} {incr i} {
+            if { $IM_TRAN($i) } { 
+               TransFea $IMAGE_DISP [lindex $IMAGES $i]
+            }
+         }
+         set exit 1
+
+# Cancel the informative text set earlier in this procedure.
+         if { $told } { SetInfo "" 0 }
+
+# If the ClearAll button was pressed, clear all the check button variables.
+      } elseif { $TRANSFER_EXIT == "clear" } {
+         for {set i 0} {$i < [llength $IMAGES]} {incr i} {
+            if { $IM_TRAN($i) } { $cb($i) invoke }
+         }
+
+# If the SetAll button was pressed, set all the check button variables.
+      } elseif { $TRANSFER_EXIT == "set" } {
+         for {set i 0} {$i < [llength $IMAGES]} {incr i} {
+            if { !$IM_TRAN($i) } { $cb($i) invoke }
+         }
+
+# If the Help button was pressed, display help.
+      } elseif { $TRANSFER_EXIT == "help" } {
+         ShowHelp "POLKA_TRANSFER_DIALOG" 
+      }
+   }
+
+# Destroy the dialog box.
+   destroy $top
+
+}
+
+
+proc HasFea {image} {
+#+
+#  Name:
+#     HasFea
+#
+#  Purpose:
+#     Returns 0 or 1 indicating if there are currently any features 
+#     associated with the supplied image.
+#
+#  Arguments:
+#     image
+#        The name of the image.
+#
+#  Globals:
+#     E_RAY_FEATURES (Read)
+#        An integer representing the "E-ray features" object type.
+#     O_RAY_FEATURES (Read)
+#        An integer representing the "O-ray features" object type.
+#-
+   global E_RAY_FEATURES 
+   global O_RAY_FEATURES 
+
+# Initialise the returned value to indicate that the image has no
+# features.
+   set ret 0
+
+# Loop round each object type...
+   foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES] {
+
+# If there are any positions in this list, return the value 1.
+      if { [NumPosn "" $image $object] > 0 } {
+         set ret 1
+         break
+      }
+   }
+
+   return $ret
+}
+
+proc TransFea {in out} {
+#+
+#  Name:
+#     TranFea
+#
+#  Purpose:
+#     Transfer all features from image $in to image $out.
+#
+#  Arguments:
+#     in 
+#        The name of the source image.
+#     out
+#        The name of the destination image.
+#
+#  Globals:
+#     E_RAY_FEATURES (Read)
+#        An integer representing the "E-ray features" object type.
+#     O_RAY_FEATURES (Read)
+#        An integer representing the "O-ray features" object type.
+#-
+   global E_RAY_FEATURES 
+   global O_RAY_FEATURES 
+   global E_RAY_MASK
+   global O_RAY_MASK
+   global E_RAY_SKY
+   global O_RAY_SKY
+   global REFIM_DISP
+   global REFOBJ_DISP
+   global OEMAP
+   global IMMAP
+   global PNTPX
+   global PNTPY
+   global PNTLBL
+
+#  See if the destination image currently has any defined features.
+   set hasfea [HasFea $out]
+
+#  If so, confirm that it is ok to replace them. Return if not.
+   if { $hasfea && ![Confirm "Replace features in image\"$out\"?"] } {
+      return
+   }
+
+# Delete any existing features, plus masks and sky areas.
+   if { $hasfea } {
+
+# Delete the OE mapping (if any) for this image.
+      if { [info exists OEMAP($out)] } {
+         unset OEMAP($out)
+      }
+
+# Delete the image mapping (if any) for this image.
+      if { [info exists IMMAP($out)] } {
+         unset IMMAP($out)
+      }
+
+# Loop round each object type...
+      foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES $O_RAY_MASK \
+                           $E_RAY_MASK $O_RAY_SKY $E_RAY_SKY] {
+
+# Continue deleting the first position in the list until there are no
+# positions left.
+         while { [NumPosn "" $out $object] > 0 } {
+            DelPosn 0 0 $out $object
+         }
+      }
+
+# If this image is the reference image, clear the reference objects.
+      if { $out == $REFIM_DISP } {ClearRef}
+
+   }
+
+# Transfer the O and E ray features, centroiding each feature position in
+# the destination image.
+   foreach object [list $O_RAY_FEATURES $E_RAY_FEATURES] {
+      GetCents $PNTPX($in,$object) $PNTPY($in,$object) $PNTLBL($in,$object) \
+               $out $object
+   }
+
+# If this image is the reference image, re-draw the reference objects.
+   if { $out == $REFIM_DISP } {DrawRef}
+}
+
+proc GetCents {px py rlabel image object} {
+#+
+#  Name:
+#     GetCent
+#
+#  Purpose:
+#     Check if supplied pixel positions can be used as features,
+#     and if so, adds the features to the list of current features.
+#     No markers are displayed or used. The image should not be the 
+#     currently displayed image.
+#
+#  Arguments:
+#     px, py
+#        A list of pixel coordinates of the initial guesses at the feature
+#        positions.
+#     rlabel
+#        A list of labels to be used for the new features. This should
+#        have the same number of elements as pc and py.
+#     image
+#        The image in which to do the centroiding.
+#     object
+#         The object type; O_RAY_FEATURES or E_RAY_FEATURES.
+#
+#  Returned Value:
+#      The number of features which could not be centroided.
+#
+#  Globals:
+#     PSF_SIZE (Read)
+#        The typical size of a feature in pixel.
+#-
+   global IMAGE_STACK
+   global PSF_SIZE
+
+# Assume no bad values.
+   set nbad 0
+
+# Take a copy of the supplied labels.
+   set rlabs $rlabel
+
+# See how many positions are to be procesed.
+   set np [llength $px]
+
+# If the positions are to be centroided, replace the supplied lists of
+# pixel coordinates with accurate coordinates.
+   if { $PSF_SIZE > 0 } {
+
+# Write out the initial pixel coordinates to a text file to be passed 
+# to POLCENT.
+      set tfile [UniqueFile]
+      set tfile_id [open $tfile w]
+
+      for {set i 0} {$i < $np} {incr i} {
+         puts $tfile_id "[lindex $px $i] [lindex $py $i]"
+      }            
+
+      close $tfile_id
+
+# Select a name for the POLCENT output text file.
+      set tofile [UniqueFile]
+
+# Calculate the box size and max shift values.
+      set isize [expr 2 * $PSF_SIZE]
+      set maxsh [expr 4 * $PSF_SIZE]
+
+# Attempt to centroid them (use the image including all the effects
+# applied by the user).
+      set imsec "[Top IMAGE_STACK($image)]"
+      if { [Obey polpack polcent "ndf=\"$imsec\" maxshift=$maxsh isize=$isize infile=$tfile outfile=$tofile"] } {
+
+# If succesful, read the accurate feature coordinates from the output
+# file. Create a Tcl list containing the X and Y values, replacing "D" 
+# exponents by "E".
+         set qx ""
+         set qy ""
+         set tofile_id [open $tofile r]
+
+         while { [gets $tofile_id line] != -1 } {
+            regsub -nocase -all D $line E line2
+            lappend qx [lindex $line2 0]
+            lappend qy [lindex $line2 1]
+         }
+
+         close $tofile_id
+
+# Count and remove any positions which could not be centroided. These
+# are flagged by polcent by returning -100000 for X and Y.
+         unset px
+         unset py
+         unset rlabs
+         for {set i 0} {$i < $np} {incr i} {
+            set ppx [lindex $qx $i]
+            if { $ppx != -100000 } {
+               set ppy [lindex $qy $i]
+               set lab [lindex $rlabel $i]
+               lappend px $ppx
+               lappend py $ppy
+               lappend rlabs $lab
+            } {
+               incr nbad
+            }
+         }
+
+#  Adjust the number of positions to exclude any which could not be
+#  centroided.
+         set np [expr $np - $nbad]
+
+# Warn the user about the bad positions.
+         if { $nbad > 1 } {
+            Message "Accurate positions could not be found for $nbad features in image \"$image\"."
+         } elseif { $nbad > 0 } {
+            Message "An accurate position could not be found for 1 feature in image \"$image\"."
+         }
+
+# If the position could not be centroided, indicate we have no good
+# positions.
+      } {
+         set px ""
+         set py ""
+         set nbad $np
+         set np 0
+      }
+   }
+
+# Loop round each good position.
+   for {set i 0} {$i < $np} {incr i} {
+
+# Get its pixel positions.
+      set ppx [lindex $px $i]
+      set ppy [lindex $py $i]
+
+# See if a feature already exists at these pixel coordinates.
+# If there is no existing feature at this position, use it.
+      if { [ FindPosn "PX PY" [list $ppx $ppy] 2 $image $object] == "" } {
+
+# Get the  label for this position.
+         set lab [lindex $rlabs $i]
+
+# Create a new position.
+         set newi [SetPosn -1 "PX PY LBL" [list $ppx $ppy $lab] $image $object ]
+      }
+   }   
+
+   return $nbad
+}

@@ -9,7 +9,7 @@
 \newcommand{\stardocsource}    {}
 \newcommand{\stardocnumber}    {}
 \newcommand{\stardocauthors}   {D.S. Berry}
-\newcommand{\stardocdate}      {28th April 1998}
+\newcommand{\stardocdate}      {19th May 1998}
 \newcommand{\stardoctitle}     {POLKA \\ [1ex]
                                 A Tool for Image Registration, Sky Subtraction,
                                 and Calculation of Stokes Parameters}
@@ -388,17 +388,25 @@ restored using the \htmlref{{\em Restore}}{POLKA_RESTORE} command. This
 facility enables execution of POLKA to be interupted and continued at a
 later time.
 
-\subsection {Single-beam Mode}
-To be written.
+\subsection {\mylabel{POLKA_SBEAM_TUT}Single-beam Mode}
+Single-beam mode is very similar to dual-beam mode. The only real
+difference is that no features, masks or sky areas related to the $E$-ray
+need be given (consequently, the controls related to the $E$ ray are
+disabled in single-beam mode). The required areas in each input frame are
+referred to as the ``$O$-ray image``. An $O$-ray mask is still required,
+since it defines the areas of each input frame to be copied to the
+corresponding output frame.
 
-\subsection {Dual-beam Mode}
+For further details, see the \htmlref{Dual-beam tutorial}{POLKA_DBEAM_TUT}.
+
+\subsection {\mylabel{POLKA_DBEAM_TUT}Dual-beam Mode}
 
 \subsubsection {Specifying the input and output images.}
 The first thing to do is to activate POLKA, specifying the input and
 output images, and the operation mode. In fact dual-beam mode is the
 default so you do not need to specify it explicitly. For instance, if you
 want to process all images in the current directory matching the wild-card 
-template {\bf m101_%}, putting the output $O$-ray intensity images
+template {\bf m101\_%}, putting the output $O$-ray intensity images
 in {\bf m101\_a\_O}, {\bf m101\_b\_O}, etc, the output $E$-ray intensity
 images in {\bf m101\_a\_E}, {\bf m101\_b\_E}, etc, and the Stokes vector
 in {\bf cube} then run POLKA as follows:
@@ -786,21 +794,40 @@ This section gives detailed descriptions of each control in the POLKA
 Graphical User Interface. The controls are divided up into groups on the
 basis of their purpose and position with the interface.
 
-xxx
-
 \subsection {\mylabel{POLKA_FILE_MENU}The {\em File} Menu}
 The {\em File} menu provides access to commands which control
 temporary interuption of POLKA,
 termination of POLKA, and the creation of the output images. They are:
 
-\subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} To be written.
+\subsubsection {\mylabel{POLKA_DUMP}{\em Dump}} 
+Creates a new text file holding all the current feature positions, masks,
+mappings, etc, for all images. You supply the name of the text file in a
+simple dialog box ( you are asked for confirmation if you specify the
+name of an existing file).
+
+The created file can be used later to restore the current conditions.
+This can be useful, for instance, if you want to interupt POLKA before
+the output data files have been created. You may then re-start POLKA
+later on, and use the \htmlref{{\em Restore}}{POLKA_RESTORE} command to
+restore the conditions which existed when the dump file was created.
+
+{\em {\center Note, you should not change the contents of the dump file.}}
 
 \subsubsection {\mylabel{POLKA_EXIT}{\em Exit}} Creates the output images by executing
 the \htmlref{{\em Save}}{POLKA_SAVE} command, and then closes down
 POLKA. The user is asked to confirm the operation once the output images
 have been saved.
 
-\subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}} To be written.
+\subsubsection {\mylabel{POLKA_RESTORE}{\em Restore}} 
+This restores features lists, masks, mappings, etc, for all images from 
+the information in a specified existing text file. The file should have
+been created using the \htmlref{{\em Dump}}{POLKA_DUMP} command. All
+current information is first cleared. 
+
+If the supplied dump file contains information for too many images (i.e.
+more than is available in the current invocation of POLKA), then the
+extra information is ignored. If there are two few images described in
+the dump file, then the extra images are left unchnaged.
 
 \subsubsection {\mylabel{POLKA_SAVE}{\em Save}} Causes the output images to be
 created, based on the current set of image feature positions and area masks. If
@@ -1086,6 +1113,13 @@ effects have previously been applied to the image using the \htmlref{{\em
 Effects}}{POLKA_EFFECTS_MENU} menu, then the displayed image will
 include these effects.
 
+There is also an entry labelled "Transfer..." which is used to transfer
+feature positions from the currently displayed image to any number of
+other images without the need to display them first. It should only be
+used when your images are already aligned (or nearly aligned). Selecting
+this item will result in the \htmlref{{\em Transfer features}}
+{POLKA_TRANSFER_DIALOG} dialog box appearing.
+
 \subsection {\mylabel{POLKA_EFFECTS_MENU}The {\em Effects} Menu}
 This menu allows several special effects to be applied to the displayed
 image. The purpose of these effects is to enable the image features to be
@@ -1111,14 +1145,65 @@ if some effects are applied to an image and then a different input image
 is selected (using the \htmlref{{\em Images}}{POLKA_IMAGES_MENU} menu), 
 the effects will still be in place when the original image is re-selected.
 
-\subsubsection {\mylabel{POLKA_ALIGN_EFFECT}{\em Align} } To be written.
-\subsubsection {\mylabel{POLKA_FILL_EFFECT}{\em Fill} } To be written.
-\subsubsection {\mylabel{POLKA_FILTER_EFFECT}{\em Filter} } To be written.
-\subsubsection {\mylabel{POLKA_FITSKY_EFFECT}{\em Fit Sky} } To be written.
-\subsubsection {\mylabel{POLKA_LOG_EFFECT}{\em Log} } To be written.
-\subsubsection {\mylabel{POLKA_MATHS_EFFECT}{\em Maths} } To be written.
-\subsubsection {\mylabel{POLKA_NEGATE_EFFECT}{\em Negate} } To be written.
-\subsubsection {\mylabel{POLKA_SMOOTH_EFFECT}{\em Smooth} } To be written.
+\subsubsection {\mylabel{POLKA_ALIGN_EFFECT}{\em Align} } 
+Re-displays the current image in alignment with another specified image.
+This can only be done if the image mappings for both images are
+available. All the positions associated with the re-aligned image are
+modified so that they refer to the coordinate frame of the second image.
+
+\subsubsection {\mylabel{POLKA_FILL_EFFECT}{\em Fill} }
+Replaces any bad pixels in the displayed image using either a constant 
+value, or a smooth surface which is continuous with the surrounding good
+data.
+
+\subsubsection {\mylabel{POLKA_FILTER_EFFECT}{\em Filter} } 
+Applies a high pass filter to the displayed image (i.e. removes any
+slowly varying background, leaving only features comparable to or smaller
+than a specified size). 
+
+\subsubsection {\mylabel{POLKA_FITSKY_EFFECT}{\em Fit Sky} } 
+Estimates the sky background in the displayed image based on the current
+sky areas or supplied sky frames, using the same method used to fit the
+sky when creating the output data files. The displayed image may be
+replaced either by the fit itself, or by the difference between the
+currently displayed image and the fit. The fit is based on the current
+options values (such as \htmlref{{\em Sky Order}}{POLKA_SKYORDER}). 
+
+\subsubsection {\mylabel{POLKA_LOG_EFFECT}{\em Log} } 
+Takes the log (base 10) of the difference between each pixel value and the
+minimum pixel value in the displayed image.
+
+\subsubsection {\mylabel{POLKA_MATHS_EFFECT}{\em Maths} } 
+Combines images on the effects stack using an arbitrary algebraic expression 
+to combine the pixel values. It is based on the \xref{MATHS}{sun95}{MATHS} 
+application from \xref{KAPPA}{sun95}{}, which should be consulted for 
+details of the syntax of the expression. Within the expression, the token IA 
+refers to the currently displayed image, IB refers to the image before
+the previous effect was applied (if any), IC refers to the image before
+that, etc. An error is reported if images do not exist for any of the
+tokens in the expression (for instance, if you include token IB when no
+previous effects have been applied). 
+
+As an example, suppose you have previously applied two other effects to
+the image, and give the expression:
+
+\begin{verbatim}
+   IA - 2.5*LOG( IB - IC )
+\end{verbatim}
+
+In this expression IA refers to the currently displayed image (including
+both effects), IB refers to the image before the second effect was
+applied, and IC refers to the image before the first effect was supplied
+(i.e. the original image).
+
+Parameter tokens (PA, PB, etc) and sub-expression tokens (FA, FB, etc) should 
+not be included in the expression.
+
+\subsubsection {\mylabel{POLKA_NEGATE_EFFECT}{\em Negate} } 
+Multiplies every pixel value in the displayed image by minus one.
+
+\subsubsection {\mylabel{POLKA_SMOOTH_EFFECT}{\em Smooth} }
+Applies Gaussian smoothing to the displayed image.
 
 \subsubsection {\mylabel{POLKA_STATS_EFFECT}{\em Stats} } 
 This effect does not produce any changes in the displayed image. Instead,
@@ -1128,10 +1213,22 @@ select an area before using this effect, by clicking and dragging across
 the image with the left mouse button. \hyperref{Go here}{See section
 }{}{POLKA_AREA_SELECTION} for further details on selecting areas.
 
-\subsubsection {\mylabel{POLKA_THRESHOLD_EFFECT}{\em Threshold} } To be written.
-\subsubsection {\mylabel{POLKA_SHOW_EFFECTS}{\em Show Effects} } To be written.
-\subsubsection {\mylabel{POLKA_UNDO_EFFECT}{\em Undo} } To be written.
-\subsubsection {\mylabel{POLKA_UNDO_ALL_EFFECTS}{\em Undo All} } To be written.
+\subsubsection {\mylabel{POLKA_THRESHOLD_EFFECT}{\em Threshold} } 
+Applies upper and lower limits to the pixel values in the displayed image.
+Out-of-bounds pixels can either be removed (i.e. set bad), or set to the 
+corresponding limit value.
+
+\subsubsection {\mylabel{POLKA_SHOW_EFFECTS}{\em Show Effects} }
+Creates a dialog box containing a list of the effects applied to the 
+currently displayed image.
+
+\subsubsection {\mylabel{POLKA_UNDO_EFFECT}{\em Undo} } 
+Removes the most recently applied effect from the currently displayed
+image.
+
+\subsubsection {\mylabel{POLKA_UNDO_ALL_EFFECTS}{\em Undo All} } 
+Removes the all effects from the currently displayed image. The original
+image as supplied by the user is then displayed.
 
 \subsection {\mylabel{POLKA_HELP_MENU}The {\em Help} Menu}
 This menu provides access to the POLKA hyper-text help information. 
@@ -1143,9 +1240,9 @@ mouse, and then pressing the left mouse button. A similar effect can be
 produced without using this option by positioning the pointer and then
 pressing the F1 button on the keyboard. The hyper-text help information
 may also be searched for specified keywords using the 
-\htmlref{{\em Search for...}{POLKA_HSEARCH} entry in the {\em Help} menu.
+\htmlref{{\em Search for...}}{POLKA_HSEARCH} entry in the {\em Help} menu.
 
-\subsubsection {\mylabel{POLKA_HSEARCH}{\em Search for...}
+\subsubsection {\mylabel{POLKA_HSEARCH}{\em Search for...}}
 This entry allows the hyper-text help information to be searched for any
 given keyword. A dialog box is created, and the user enters the word to
 be searched for into the {\em Search for:} box. If the {\em Exact
@@ -1666,7 +1763,56 @@ is currently displayed.
 \end{description}
 
 \subsection {\mylabel{POLKA_STATUS_ITEMS_DIALOG}The {\em Select status items} Dialog Box}
-To be written.
+This dialog box displays a list of all the available items of information
+which can be displayed in the \htmlref{status area}{POLKA_STATUS_AREA}.
+Against each is a check-button which will be lit up if the corresponding
+item is currently included in the list of items to be displayed. These
+check-buttons can be toggled by clicking on them, thus removing or adding
+items from the list of items to be displayed. The buttons at the bottom
+of the dialog box have the following purposes:
+
+\begin{description}
+\item [OK] - Closes the dialog box, and re-displays the status area.
+Only those items which were selected when the OK button was pressed are
+included in the re-displayed status area.
+\item [Apply] - Re-displays the status area, but does not close the
+dialog box.
+\item [Cancel] - CLoses the dialog box, ignoring any changes which have
+been made to the display list.
+\item [ClearAll] - Clears all the check-buttons (does not close the dialog box).
+\item [SetAll] - Sets all the check-buttons (does not close the dialog box).
+\item [Help] - Displays this help.
+\end{description}
+
+\subsection {\mylabel{POLKA_TRANSFER_DIALOG}The {\em Transfer features} Dialog Box}
+This dialog box may be used to copy image feature positions from one
+image to any number of other images, without the need to display each
+image. It is assumed that such images are already aligned, (or nearly
+aligned).
+
+It displays a list of the images supplied when POLKA was activated, with
+a check button against each. The user may select images by pressing the
+check buttons, or by using the {\em Setall} or {\em ClearAll} buttons at
+the bottom of the box. When the {\em OK} button is pressed, any images
+features currently defined for the displayed image (for either the $E$ or
+the $O$ ray) are copied to all the selected images, replacing any
+existing ones (a confirmation is required before replacing any existing
+features). Images which already have features defined for them are
+indicated by ticks. The check button for the currently displayed image is
+disabled.
+
+Each position within the current image is used as the initial guess for
+the position of a feature in each of the selected images. These initial
+guesses are refined by finding the centroid of the feature in the
+selected image (using the current value of the \htmlref{{\em Feature
+Size}}{POLKA_FEATURE_SIZE} option from the \htmlref{{\em Options}}
+{POLKA_OPTIONS_MENU} menu). Thus, slight mis-alignments (of the order of
+the feature size) can be tolerated.
+
+If the features are copied to an image, any masks or sky areas associated
+with the image are deleted. New ones will be created when necessary based
+on those in the currently displayed image. These default masks may be
+edited as usual if necessary.
 
 \section {\mylabel{POLKA_HOW_DO_I}How do I...}
 This section provides instructions for performing some common tasks
@@ -1752,6 +1898,13 @@ to terminate execution of POLKA without creating the output images. You
 can then re-start POLKA later, and use {\em Restore} to read the text
 file created by {\em Dump}. This puts POLKA into the state it was
 in  when the dump file was created.
+
+\subsection {\mylabel{POLKA_EDITING_POLYGONS}Use pre-aligned images}
+If your images are already in alignment (or nearly in alignment), then
+you do not need to identify feature positions, masks, etc, for every image.
+Instead, just identify features and masks within one of the images and then 
+use the \htmlref{{\em Undo}}{POLKA_TRANSFER} command in the \htmlref{{\em
+File}}{POLKA_IMAGES_MENU} menu to transfer them to the other images.
 
 \subsection {\mylabel{POLKA_EDITING_POLYGONS}Edit polygons}
 Polygons are displayed when one of the {\em mask} or {\em sky
