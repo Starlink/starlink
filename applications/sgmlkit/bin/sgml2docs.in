@@ -136,7 +136,7 @@ XMLDECL=$DTDDIR/xml.decl
 ICONTARBALL=!!pkglibdir!!/lib/icons.tar
 STYLESHEET=!!pkglibdir!!/dsssl/sl
 
-SGML_CATALOG_FILES=./CATALOG:$DTDDIR/CATALOG-override
+SGML_CATALOG_FILES=./CATALOG:$DTDDIR/CATALOG-override:$SGML_CATALOG_FILES
 export SGML_CATALOG_FILES
 
 # Binaries
