@@ -215,7 +215,7 @@ public:
    { "astsystem",     &StarRtdImage::astsystemCmd,    2, 3 },
    { "astwarnings",   &StarRtdImage::astwarningsCmd,  0, 0 },
    { "astwcs2pix",    &StarRtdImage::astwcs2pixCmd,   2, 2 },
-   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 2 },
+   { "astwrite",      &StarRtdImage::astwriteCmd,     1, 3 },
    { "blankcolor",    &StarRtdImage::blankcolorCmd,   1, 1 },
    { "colorramp",     &StarRtdImage::colorrampCmd,    0, 2 },
    { "contour",       &StarRtdImage::contourCmd,      1, 6 },
@@ -1367,6 +1367,10 @@ int StarRtdImage::astgetCmd( int argc, char *argv[] )
 //      the WCS system. It is the responsibility of the caller to
 //      ensure that a FITS channel contains the correct information.
 //
+//    Notes:
+//      The arguments are the channel number, keyword, value and
+//      comment. The comment is optional.
+//
 //    Return:
 //       TCL status and result.
 //
@@ -2092,7 +2096,7 @@ int StarRtdImage::astwriteCmd( int argc, char *argv[] )
   if ( astPtr ) {
     astShow( astPtr );
     astAnnul( astPtr );
-    if ( argc == 2 ) {
+    if ( argc >= 2 ) {
       AstFitsChan *chan = (AstFitsChan *)
         astFitsChan( NULL, &write_out, "Encoding=%s", argv[1] );
       int nwrite = astWrite( chan, newset_ );
