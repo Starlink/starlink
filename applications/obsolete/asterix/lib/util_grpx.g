@@ -166,7 +166,7 @@
 
 *  Return suitable values
       ELSE
-        NGRP = N
+        NGRP = NELM
         GDPTR = IDPTR
         IF ( VOK ) GVPTR = IVPTR
         IF ( QOK ) GQPTR = IQPTR

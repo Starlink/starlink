@@ -176,7 +176,6 @@
 
       INTEGER                	AXPTR(ADI__MXDIM)  	! Axis data ptr's
       INTEGER			GDPTR, GQPTR, GVPTR	! Grouped data
-      INTEGER			GPTR			! Grouping index array
       INTEGER                	IDPTR              	! Data array ptr
       INTEGER			IFID			! Input file identifier
       INTEGER                	IQPTR              	! Data quality ptr
@@ -191,7 +190,6 @@
       INTEGER                	WPTR               	! Weights array ptr
 
       LOGICAL                	DATAOK, VAROK      	! Various input
-      LOGICAL			GRPOK			! Grouping present?
       LOGICAL                	QUALOK, AXOK       	! objects there?
       LOGICAL                	LOOP               	! Loop with sigma rejection?
       LOGICAL			USEGRP			! Use grouping?
@@ -267,15 +265,6 @@
 
       END IF
 
-*  If grouping is present ask user whether its to be used
-      CALL BDI_CHK( IFID, 'Grouping', GRPOK, STATUS )
-      IF ( GRPOK ) THEN
-        CALL USI_GET0L( 'USEGRP', USEGRP, STATUS )
-        IF ( STATUS .NE. SAI__OK ) GOTO 99
-      ELSE
-        USEGRP = .FALSE.
-      END IF
-
 *  Find out if looping is required
       CALL USI_GET0L( 'LOOP', LOOP, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
@@ -303,28 +292,12 @@
 *  Pad extra dimensions to 7D
       CALL AR7_PAD( NDIM, DIMS, STATUS )
 
+*  If grouping is present ask user whether its to be used
+      CALL UTIL_GRPD( IFID, 'USEGRP', IDPTR, VAROK, IVPTR, QUALOK,
+     :          IQPTR, USEGRP, NGRP, GDPTR, GVPTR, GQPTR, STATUS )
+
 *  Group if required
       IF ( USEGRP ) THEN
-
-*    Map grouping array
-        CALL BDI_MAPI( IFID, 'Grouping', 'READ', GPTR, STATUS )
-
-*    Count groups
-        CALL UTIL_CNTGRP( NELM, %VAL(GPTR), NGRP, STATUS )
-
-*    Map work space
-        CALL DYN_MAPD( 1, NGRP, GDPTR, STATUS )
-        IF ( VAROK ) THEN
-          CALL DYN_MAPD( 1, NGRP, GVPTR, STATUS )
-        END IF
-        IF ( QUALOK ) THEN
-          CALL DYN_MAPL( 1, NGRP, GQPTR, STATUS )
-        END IF
-
-*    Perform grouping
-        CALL UTIL_GRPVD( NELM, %VAL(IDPTR), VAROK, %VAL(IVPTR), QUALOK,
-     :                   %VAL(IQPTR), %VAL(GPTR), NGRP, %VAL(GDPTR),
-     :                   %VAL(GVPTR), %VAL(GQPTR), STATUS )
 
 *    Do the statistics
         CALL STATISTIX_INT( USEGRP, NGRP, %VAL(GDPTR), %VAL(WPTR),
@@ -333,12 +306,8 @@
 
 *    Release grouping workspace
         CALL DYN_UNMAP( GDPTR, STATUS )
-        IF ( VAROK ) THEN
-          CALL DYN_UNMAP( GVPTR, STATUS )
-        END IF
-        IF ( QUALOK ) THEN
-          CALL DYN_UNMAP( GQPTR, STATUS )
-        END IF
+        IF ( VAROK ) CALL DYN_UNMAP( GVPTR, STATUS )
+        IF ( QUALOK ) CALL DYN_UNMAP( GQPTR, STATUS )
 
       ELSE
 
