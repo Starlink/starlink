@@ -2,7 +2,7 @@ dnl    Process this file with autoconf to produce a configure script
 AC_REVISION($Revision$)
  
 dnl    Initialisation: package name and version number
-AC_INIT(photom, 1.9-0, ussc@star.rl.ac.uk)
+AC_INIT(figaro, 5.6-3, ussc@star.rl.ac.uk)
  
 dnl    Require autoconf-2.50 at least
 AC_PREREQ(2.50)
@@ -33,7 +33,7 @@ dnl    declaration.
 AC_CONFIG_FILES(Makefile component.xml)
 
 dnl    Need to go into sub directories
-AC_CONFIG_SUBDIRS([applic appstl appsub fig fda dsa jty dta fit fla tio gen gks par ich appca appcb spext fitres work util sploop fibre graph main opt top twoutil unix])
+AC_CONFIG_SUBDIRS([appsub fig fda dsa jty dta fit fla tio gen gkd par ich appcb spext fitres work util sploop fibre graph main opt twoutil unix])
 
 dnl    This is the bit that does the actual work
 AC_OUTPUT
