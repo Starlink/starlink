@@ -144,6 +144,8 @@
 *        Use a SpecFluxFrame instead of a CmpFrame for the "what we want"
 *        Frame if the data units correspond to a known flux system and the 
 *        X axis is described by a SpecFrame.
+*     2-MAR-2005 (DSB):
+*        Correct logic for checkign for AST__BADUN errors.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -617,8 +619,12 @@
 *  will be a default 1-D Axis. We can use a FluxFrame if the units of the
 *  NDF data array can be used to describe any of the flux systems
 *  supported by the AST FluxFrame class. To test this create a new
-*  FluxFrame and set its units to the supplied data units.
+*  FluxFrame and set its units to the supplied data units. Note, the call 
+*  to AST_SETC may generate an AST__BADUN error, so check the STATUS
+*  before invoking  AST_SETC.
       FR2 = AST_FLUXFRAME( AST__BAD, AST__NULL, ' ', STATUS )
+
+      IF( STATUS .NE. SAI__OK ) GO TO 999
       CALL AST_SETC( FR2, 'Unit(1)', DUNIT, STATUS )
 
 *  Get the default System value from the FluxFrame. This will depend on
@@ -627,7 +633,6 @@
 *  error and annul it if it occurs, create a default simple Frame to
 *  use instead of the FluxFrame, and combine it with the X axis Frame
 *  into a CmpFrame. 
-      IF( STATUS .NE. SAI__OK ) GO TO 999
       TEXT = AST_GETC( FR2, 'System', STATUS )
       IF( STATUS .EQ. AST__BADUN ) THEN
          CALL ERR_ANNUL( STATUS )
