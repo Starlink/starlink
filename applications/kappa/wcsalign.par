@@ -1,0 +1,7 @@
+in,f,a,,,,"The input images"
+out,f,a,,,,"Output images"
+lbnd,struct,a,,,,"Lower pixel index bounds for output images"
+ubnd,struct,a,,,,"Upper pixel index bounds for output images"
+ref,f,a,!,,,"The reference image"
+acc,r,h,0.5,,,"Positional accuracy in pixels"
+method,s,h,"Nearest",,,"Interpolation method"

@@ -1,0 +1,6 @@
+ndf,f,a,,,,"The NDF to be modified"
+mode_,s,a,"GET",,,"Operation to perform"
+name,s,a,,,,"Attribute name"
+newval,s,a,,,,"Attribute value"
+state,b,h,y,,,""
+value,s,h," ",,,""

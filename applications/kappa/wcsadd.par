@@ -1,0 +1,6 @@
+ndf,f,a,,,,"The NDF in which to store the new Frame"
+frame,s,a,INDEF,,,"An existing co-ordinate Frame"
+domain,s,a,,,,"The Domain name for the new Frame"
+tr,struct,h,,,,"Co-efficients of a linear transformation"
+INDEF
+epoch,r,a,,,,"Epoch of observation"

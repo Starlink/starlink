@@ -1,0 +1,6 @@
+ndf,f,a,,,,"The NDF to be modified"
+like,f,a,,,,"An NDF containing WCS information"
+tr,struct,h,,,,"Co-efficients of a linear transformation"
+INDEF
+confirm,b,h,y,,,"Should replacement of any existing WCS component be confirmed?"
+ok,b,a,n,,,"Replace the existing WCS component?"
