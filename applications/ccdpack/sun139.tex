@@ -5276,6 +5276,25 @@ The CCDPACK routine descriptions are contained in the following pages.
    \sstusage{
       ccdalign
    }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         Display restrictions.
+
+      }
+
+         CCDALIGN will only work on PseudoColor X displays; this means
+         that it cannot be used on the displays of most newer Linux
+         machines as normally configured.  If an attempt is made to
+         do so, then the warning:
+\begin{quote}
+            !! Window has unsupported visual type
+\end{quote}
+         will be emitted; attempting to proceed may result in a core
+         dump.
+
+   }
 }
 
 \sstroutine{CCDCLEAR} {
@@ -9413,6 +9432,23 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       \sstitemlist{
 
          \sstitem
+         Display restrictions.
+
+      }
+
+         IDICURS will only work on PseudoColor X displays; this means
+         that it cannot be used on the displays of most newer Linux 
+         machines as normally configured.  If an attempt is made to
+         do so, then the warning:
+\begin{quote} 
+            !! Window has unsupported visual type
+\end{quote}
+         will be emitted; attempting to proceed may result in a core
+         dump.
+
+      \sstitemlist{
+
+         \sstitem
          NDF extension items.
 
       }
@@ -11844,6 +11880,23 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
        pressing the shift key at the same time increases the rate of
        scroll. The C key performs a quick re-centre, cancelling any
        zoom and scroll. The Q key aborts the routine.
+
+      \sstitemlist{
+
+         \sstitem
+         Display restrictions.
+
+      }
+
+         PAIRNDF will only work on PseudoColor X displays; this means
+         that it cannot be used on the displays of most newer Linux
+         machines as normally configured.  If an attempt is made to
+         do so, then the warning:
+\begin{quote}
+            !! Window has unsupported visual type
+\end{quote}
+         will be emitted; attempting to proceed may result in a core
+         dump.
 
       \sstitemlist{
 

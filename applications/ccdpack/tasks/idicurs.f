@@ -165,6 +165,18 @@
 *       quick re-centre, cancelling any zoom and scroll. The Q key
 *       is used to exit from the routine.
 *
+*     - Display restrictions.
+*
+*        IDICURS will only work on PseudoColor X displays; this means
+*        that it cannot be used on the displays of most newer Linux 
+*        machines as normally configured.  If an attempt is made to
+*        do so, then the warning:
+*
+*           !! Window has unsupported visual type
+*
+*        will be emitted; attempting to proceed may result in a core
+*        dump.
+*
 *     - NDF extension items. 
 *
 *       On exit the CURRENT_LIST items in the CCDPACK extensions

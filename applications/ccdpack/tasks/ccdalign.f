@@ -125,6 +125,19 @@
 *        This starts the CCDALIGN script and displays all images
 *        in a GWM xwindows window.
 
+*  Notes:
+*     - Display restrictions.
+*
+*        CCDALIGN will only work on PseudoColor X displays; this means
+*        that it cannot be used on the displays of most newer Linux 
+*        machines as normally configured.  If an attempt is made to
+*        do so, then the warning:
+*
+*           !! Window has unsupported visual type
+*
+*        will be emitted; attempting to proceed may result in a core
+*        dump.
+
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
 *     'current' value is the value assigned on the last run of the
