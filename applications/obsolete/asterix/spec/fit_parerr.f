@@ -46,6 +46,7 @@
 *     19 May 94 : Updated to handle parameter constraints (DJA)
 *     10 Mar 97 : Update NAG call F01AAF to multiple calls (RB)
 *      6 Jun 97 : Convert to PDA (RB)
+*      3 Jul 97 : Add FIT_PARERR_INT for exact matrix size (RB)
 *
 *    Type definitions :
 *
@@ -94,11 +95,9 @@
 *    Local variables :
 *
       DOUBLE PRECISION    ALPHA(NPAMAX,NPAMAX)	! Matrix of 2nd derivs (*1/2)
-      DOUBLE PRECISION    ALPHAINV(NPAMAX,NPAMAX) ! Inverse of alpha matrix
+      INTEGER             ALPHAINV              ! Inverse of alpha matrix
       DOUBLE PRECISION    LSTATDERIV		! Lower reduced statistic deriv.
       DOUBLE PRECISION    USTATDERIV		! Upper reduced statistic deriv.
-      DOUBLE PRECISION    WORK(NPAMAX)		! Workspace for PDA routine
-      DOUBLE PRECISION	  DUMMY(2)		! Workspace for PDA routine
 
       REAL                DPUP(NPAMAX)		! Actual upper param increments
       REAL                DPDOWN(NPAMAX)	! Actual lower param increments
@@ -106,13 +105,13 @@
       REAL                PSCALE(NPAMAX)	! Parameter scale factors
       REAL                UPAR(NPAMAX)		! Upper parameter arrays
 
-      INTEGER             IFAIL			! NAG failure flag
+      INTEGER             IFAIL			! PDA failure flag
       INTEGER             IPFREE(NPAMAX)	! Free parameter indices
-      INTEGER		  IWORK(NPAMAX)		! PDA workspace
-      INTEGER             J,K,L,M		! Parameter indices
+      INTEGER             J,K    		! Parameter indices
       INTEGER             JP1,JP2		! Parameter indices
       INTEGER             NPFREE		! No of free (unfrozen+unpegged params
       INTEGER             LSSCALE		! SSCALE proofed against zero value
+      INTEGER		  DIMS(2)		! Dimensions of inverse matrix
 
       LOGICAL		  LFROZEN(NPAMAX)	! Local frozen array
 *-
@@ -201,24 +200,18 @@
       END DO
 
 *    Invert alpha matrix to get parameter errors
-      IFAIL=1
+      IFAIL = 0
       IF ( NPFREE .GT. 0 ) THEN
-        DO M = 1, NPFREE
-          DO L = 1, NPFREE
-            ALPHAINV(L,M) = ALPHA(L,M)
-          END DO
-        END DO
-        CALL PDA_DGEFA( ALPHAINV, NPFREE, NPFREE, IWORK, IFAIL )
-        IF ( IFAIL .EQ. 0 ) THEN
-          CALL PDA_DGEDI( ALPHAINV, NPAMAX, NPFREE, IWORK, DUMMY,
-     :                    WORK, 1 )
-        END IF
+        DIMS(1) = NPFREE
+        DIMS(2) = NPFREE
+        CALL DYN_MAPD( 2, DIMS, ALPHAINV, STATUS )
+        CALL FIT_PARERR_INT( ALPHA, %VAL(ALPHAINV), NPFREE, IFAIL )
       END IF
       IF ( IFAIL .EQ. 0 ) THEN
 	J = 1
 	DO K = 1, NPAR
 	  IF ( K .EQ. IPFREE(J) ) THEN
-	    PARSIG(K) = PSCALE(K)*SQRT(ABS(ALPHAINV(J,J))/LSSCALE)
+	    PARSIG(K) = PSCALE(K)*SQRT(ABS(ALPHA(J,J))/LSSCALE)
 	    J = J + 1
 	  ELSE
 	    PARSIG(K) = 0.0
@@ -233,13 +226,71 @@
       ELSE
 	CALL MSG_SETI('IFAIL',IFAIL)
         STATUS = SAI__ERROR
-	CALL ERR_REP( ' ','NAG error code ^IFAIL in matrix inversion',
-     :                                                        STATUS )
+	CALL ERR_REP( ' ', 'Error in PDA_DGEDI: U(^IFAIL,^IFAIL) = 0',
+     :                STATUS )
       END IF
 
 *    Exit
  9000 IF ( STATUS .NE. SAI__OK ) THEN
         CALL AST_REXIT( 'FIT_PARERR', STATUS )
       END IF
+
+      END
+
+
+*+ FIT_PARERR_INT - Calculate inverse of matrix
+      SUBROUTINE FIT_PARERR_INT( ALPHA, INV, N, STATUS )
+*
+*  Description:
+*    PDA routines for matrix inversion required variables of the exact
+*    size to be passed, therfore an internal subroutine and the use of
+*    pointers is necessary.
+*    Returns the inverse back in ALPHA to reduce the fuss above.
+*
+*  Authors:
+*    RB: Richard Beard (ROSAT, University of Birmingham)
+*
+*  History:
+*    03 Jul 1997 : (RB)
+*      Original version
+*-
+
+* Type definitions:
+      IMPLICIT NONE
+
+* Global constants:
+      INCLUDE 'SAE_PAR'
+      INCLUDE 'FIT_PAR'
+
+*  Import/export:
+      DOUBLE PRECISION		ALPHA(NPAMAX,NPAMAX)
+      DOUBLE PRECISION		INV(N,N)
+      INTEGER			N
+      INTEGER			STATUS
+
+*  Local variables:
+      DOUBLE PRECISION		DET(2)
+      DOUBLE PRECISION		WORK(NPAMAX)
+      INTEGER			IWORK(NPAMAX)
+      INTEGER			I, J
+*.
+      IF ( STATUS .NE. SAI__OK ) RETURN
+
+      DO I = 1, N
+        DO J = 1, N
+          INV(I,J) = ALPHA(I,J)
+        END DO
+      END DO
+
+      CALL PDA_DGEFA( INV, N, N, IWORK, STATUS )
+      IF ( STATUS .EQ. 0 ) THEN
+        CALL PDA_DGEDI( INV, N, N, IWORK, DET, WORK, 1 )
+      END IF
+
+      DO I = 1, N
+        DO J = 1, N
+          ALPHA(I,J) = INV(I,J)
+        END DO
+      END DO
 
       END
