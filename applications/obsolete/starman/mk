@@ -199,6 +199,7 @@
 #     PTW: P.T.Wallace (Starlink, RAL)
 #     BLY: M.J.Bly (Starlink, RAL)
 #     AJC: A.J.Chipperfield (Starlink, RAL)
+#     TIMJ: Tim Jenness (JAC, Hawaii)
 #     {enter_new_authors_here}
 #
 #  History:
@@ -218,6 +219,8 @@
 #        Mk IVb version.
 #     21-JUN-1995 (AJC):
 #        Remove references to /star in CFLAGS.
+#     11-OCT-2004 (TIMJ):
+#        Add linux variant
 #     {enter_further_changes_here}
 #
 #  Bugs:
@@ -311,6 +314,25 @@
                TAR_OUT='tar -xf'
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
+
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+               CC='gcc'
+               CFLAGS='-I$(STAR_INC) -O'
+               FC='g77'
+               FFLAGS='-fno-second-underscore -O'
+               LINK='ln -s'
+               RANLIB='ranlib'
+               SOURCE_VARIANT='Solaris'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
 
 #  Issue a warning if SYSTEM is not recognised.
             *)
