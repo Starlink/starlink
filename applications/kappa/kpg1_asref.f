@@ -35,7 +35,7 @@
 *        been obtained and is supplied to this routine through the NAME
 *        argument.  The name or locator may come from a reference in
 *        the graphics database.
-*     NAME = CHARACTER * ( DAT__SZLOC ) (Given)
+*     NAME = CHARACTER * ( * ) (Given)
 *        The name of the potential NDF, or a locator to it.
 *     NDF = INTEGER (Returned)
 *        The identifier to the NDF.
@@ -59,6 +59,9 @@
 *        as a locator.  The GOTLOC and LOC arguments are renamed to
 *        GOTNAM and NAME to reflect this.  Used the modern-style of
 *        commenting.
+*     2-JUL-1999 (DSB):
+*        Modified so that an NDF is obtained by association if the
+*        displayed NDF cannot be accessed.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -139,12 +142,15 @@
             CALL MSG_OUT( 'REFNDF',
      :        'Using ^NDF as the input NDF.', STATUS )
 
-*  Check that the reference is an NDF.
-         ELSE IF ( STATUS .EQ. NDF__NOID ) THEN
-            CALL KPG1_HMSG( 'NAME', NAME )
-            CALL ERR_REP( 'KPG1_ASREF_REFOBJ',
-     :        'The data object referenced ^NAME is not an NDF.',
-     :        STATUS )
+*  Flush the error and then tell the user that the displayed NDF cannot 
+*  be used. Then obtain an alternative NDF by association.
+         ELSE 
+            CALL ERR_FLUSH( STATUS )
+            CALL MSG_BLANK( STATUS )
+            CALL MSG_OUT( 'KPG1_ASREF_REFOBJ', 'The displayed NDF '//
+     :                    'cannot be accessed. Please supply an '//
+     :                    'alternative NDF.', STATUS )
+            CALL NDF_ASSOC( PNNDF, MODE, NDF, STATUS )
          END IF
 
 *  Obtain the identifier of the NDF by association.

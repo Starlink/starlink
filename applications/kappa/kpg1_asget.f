@@ -197,11 +197,11 @@
 *  Begin an AST context.
       CALL AST_BEGIN( STATUS )
 
-*  Choose the NDF axes to be used by the application.
+*  Choose the NDF pixel axes to be used by the application.
 *  ==================================================
 
 *  Find whether or not there are exactly the required number of
-*  significant dimensions and which ones they are.
+*  significant dimensions in the NDF pixel array and which ones they are.
       IF ( EXACT ) THEN
          CALL KPG1_SGDIM( INDF, NDIM, SDIM, STATUS )
 
@@ -223,6 +223,9 @@
          
 *  Get a pointer to the WCS FrameSet.
       CALL KPG1_GTWCS( INDF, IWCS, STATUS )
+
+*  Remove any insignificant axes from the Current Frame.
+      CALL KPG1_ASSIG( IWCS, 3, LBND, UBND, STATUS )
 
 *  Re-map the Base (GRID) Frame by selecting the chosen axes.
 *  ==========================================================

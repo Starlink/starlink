@@ -1,9 +1,9 @@
       SUBROUTINE KPG1_LOCTW( NDIM, LBND, UBND, ARRAY, INIT, SEARCH,
-     :                         POSTIV, MXSHFT, MAXITE, TOLER, FINAL,
-     :                         STATUS )
+     :                       POSTIV, MXSHFT, MAXITE, TOLER, SEL, 
+     :                       FINAL, WORK1, STATUS )
 *+
 *  Name:
-*     KPG1_LOCTx
+*     KPG1_LOCTW
  
 *  Purpose:
 *     Locates the centroid of a blob image feature in an n-D array.
@@ -12,8 +12,8 @@
 *     Starlink Fortran 77
  
 *  Invocation:
-*     CALL KPG1_LOCTx( NDIM, LBND, UBND, ARRAY, INIT, SEARCH, POSTIV,
-*                      MXSHFT, MAXITE, TOLER, FINAL, STATUS )
+*     CALL KPG1_LOCTW( NDIM, LBND, UBND, ARRAY, INIT, SEARCH, POSTIV,
+*                      MXSHFT, MAXITE, TOLER, FINAL, SEL, WORK1, STATUS )
  
 *  Description:
 *     This routine locates the centroid of a blob feature within
@@ -22,11 +22,23 @@
 *     is a series of connected pixels above or below the value of the
 *     surrounding background.
  
-*     The routine forms marginal profiles within a search square, and
-*     then subtracts a background estimate from each profile, before
-*     finding the profile centroids.  This is repeated for a specified
-*     number of iterations, until the requested accuracy is met, or
-*     until one of several error conditions is met.
+*     The routine forms marginal profiles within a search square. A
+*     separate background estimate is subtracted from each sample in 
+*     each of the profiles, in order to ensure that he profiles have
+*     a roughly flat background. The background estimate used for each 
+*     profile sample is the lower quartile of the array values which were
+*     included in the sample. If this quartile cannot be calculated (in
+*     the case of a 1-d array, for instance, each sample will have only 
+*     1 contribution and so the quartile cannot be found), the background
+*     estimate is taken from a straight line passing through the first and
+*     last points of the profile.
+*
+*     A background value for each whole profile is then found, and the
+*     centroid of all data above this background level is found. The whole
+*     process is repeated a number of times, using the previous centroid
+*     position as the new initial guess position. Iterations continue
+*     until the maximum number of iterations is reached, or the requested 
+*     accuracy is met, or until one of several error conditions is met.
  
 *  Arguments:
 *     NDIM = INTEGER (Given)
@@ -36,7 +48,7 @@
 *        The lower bounds of the n-d array.
 *     UBND( NDIM ) = INTEGER (Given)
 *        The upper bounds of the n-d array.
-*     ARRAY( * ) = ? (Given)
+*     ARRAY( * ) = INTEGER*2 (Given)
 *        The input data array.
 *     INIT( NDIM ) = REAL (Given)
 *        The co-ordinates of the initial estimate position.
@@ -53,15 +65,19 @@
 *        iteration will be performed even if this is less than one.
 *     TOLER = REAL (Given)
 *        Accuracy required in the centroid position.
-*     FINAL( NDIM ) = REAL (Write)
+*     SEL = INTEGER (Given)
+*        The number of elements in a search box (i.e. the product of the
+*        values in SEARCH).
+*     FINAL( NDIM ) = REAL (Returned)
 *        The final co-ordinates of the centroid position.
+*     WORK1( 51, SEL, NDIM ) = REAL (Returned)
+*        A work array.
 *     STATUS  =  INTEGER (Given and Returned).
 *        Global status value
  
 *  Notes:
-*     -  There is a routine for each of the numeric data types: replace
-*     "x" in the routine name by B, D, I, R, UB, UW, or W as
-*     appropriate.
+*     -  There is a routine for each of the numeric data types: B, D, 
+*     I, R, UB, UW, and W.
 *     -  The lower and upper bounds must correspond to the dimension
 *     of the array which is passed by assumed size, and therefore the
 *     routine does not check for this.
@@ -96,51 +112,6 @@
 *     simulate a return from the recursively invoked algorithm.  To
 *     avoid branching back into the range of a DO loop, looping has to
 *     be implemented using IF and GO TO statements.
-*
-*     The algorithm operates as follows:-
-*     -  Validate the dimensions. Initialise the finished flag and the
-*     region centre to be at the initial estimated position. Constrain
-*     the search region sizes to between 3 and the maximum-allowed size,
-*     and initialise the half-box sizes. Constrain number of iterations
-*     to be positive. Initialise the number of iterations done so far.
-*     -  Loop until completed.  Increment the current iteration counter.
-*     Note the starting co-ords for this iteration. Work out the
-*     starting and finishing edges of the current search region.
-*     -  Initialise the arrays used to form the marginal profiles. Set
-*     up strides for each dimension.  Initialise a pointer into the
-*     region.
-*     -  Invoke the recursive algorithm.
-*     -  Set the pointer to the start array regions to be skipped (in
-*     front of the sub-region) in the current dimension.
-*     -  If the current dimension is 1 form the marginal profiles,
-*     otherwise invoke the algorithm again to handle the next lower
-*     dimension.
-*     -  Adjust pointer to allow for data beyond the upper bound of the
-*     region (after the sub-region) in the current dimension.
-*     -  Return from the recursive algorithm.
-*     -  For all profile bins and dimensions normalise the current y
-*     bin value with apropriate sign depending on whether data are
-*     positive or negative w.r.t. background pixels
-*     -  Estimate the background in each dimension by assigning it the
-*     lower quartile of the marginal profiles.
-*     -  Initialise the sums used for forming the centroids
-*     -  For all profile bins and dimensions scan the profiles, using
-*     all data above the estimated backgrounds to form sums for the
-*     centroids.  Increment the current values of the scanning
-*     positions.  If there are data in the current bin then sum weights
-*     and moment for each centroid. If no profile has any data---set the
-*     co-ordinates back to their starting values, report the error and
-*     exit.  Otherwise for each dimension evaluate the centroid
-*     co-ordinate.
-*     - Calculate the shift of the current position from the starting
-*     position along each dimension.  If the maximum allowable shift
-*     has been exceeded along any dimension reset the co-ordinates back
-*     to the initial values, report the error including the shifts.
-*     -  If the shift from the initial co-ordinates is acceptable
-*     evaluate the shift in position since the last iteration.  Check
-*     whether if the incremental shift is less than the accuracy
-*     tolerance.  If it is or the maximum nuber of iterations has been
-*     exceeded then exit the loop.
  
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
@@ -153,6 +124,10 @@
 *     5-JUL-1999 (DSB):
 *        Fill BUFFER with spaces before using it to avoid spurious
 *        trailing characters being displayed.
+*     12-JUL-1999 (DSB):
+*        Subtract a background from each individual profile sample in
+*        order to prevent positions drifting if there is a varying bacground 
+*        under the feature.
 *     {enter_changes_here}
  
 *  Bugs:
@@ -166,174 +141,147 @@
  
 *  Global Constants:
       INCLUDE  'SAE_PAR'       ! SSE global definitions
-      INCLUDE  'PRM_PAR'       ! Magic-value and extreme constants
+      INCLUDE  'PRM_PAR'       ! VAL__ constants
       INCLUDE  'NDF_PAR'       ! NDF constants
  
 *  Arguments Given:
-      INTEGER
-     :  NDIM,
-     :  LBND( NDIM ),
-     :  UBND( NDIM ),
-     :  SEARCH( NDIM ),
-     :  MAXITE
- 
-      INTEGER*2
-     :  ARRAY( * )
- 
-      REAL
-     :  INIT( NDIM ),
-     :  MXSHFT( NDIM ),
-     :  TOLER
- 
-      LOGICAL
-     :  POSTIV
+      INTEGER NDIM
+      INTEGER LBND( NDIM )
+      INTEGER UBND( NDIM )
+      INTEGER*2 ARRAY( * )
+      REAL INIT( NDIM )
+      INTEGER SEARCH( NDIM )
+      LOGICAL POSTIV
+      REAL MXSHFT( NDIM )
+      INTEGER MAXITE
+      REAL TOLER
+      INTEGER SEL
  
 *  Arguments Returned:
-      REAL
-     :  FINAL( NDIM )
+      REAL FINAL( NDIM )
+      REAL WORK1( 51, SEL, NDIM ) 
  
 *  Status:
       INTEGER  STATUS
  
 *  Local Constants:
-      INTEGER
-     :  SRCHMX                 ! Maximum search square/cube size allowed
+      INTEGER SRCHMX           ! Maximum search square/cube size allowed
       PARAMETER( SRCHMX  =  51 )
  
 *  Local Variables:
-      INTEGER
-     :  CURITE,                ! Current iteration counter
-     :  DIM( NDF__MXDIM ),     ! Dimensions of the array
-     :  FINISH( NDF__MXDIM ),  ! Co-ords of far edge of current search
-                               ! box
-     :  HLFSIZ( NDF__MXDIM ),  ! Half width of the search square/cube
-     :  I, J, K, L, M,         ! Counters
-     :  ID,                    ! Pointer to the start of a line segment
-                               ! within the search region
-     :  IDIM( NDF__MXDIM ),    ! Indices of an array element
-     :  MO,                    ! Offset in the marginal
-     :  NAV( SRCHMX, NDF__MXDIM ), ! Used to count additions to profiles
-     :  NC,                    ! Number of characters in list of shifts
-     :  NSAMPL( NDF__MXDIM ),  ! number of lines/columns etc. in search
-                               ! square actually used
-     :  NTH( NDF__MXDIM ),     ! Value used to determine background
-                               ! level - Nth smallest number taken
-     :  NUMITE,                ! Maximum number of iterations to be
-                               ! used, forced to be at least one
-                               ! iteration
-     :  START( NDF__MXDIM ),   ! Co-ords of edge of current search box
-     :  STRID( NDF__MXDIM ),   ! Dimension strides for search region
-     :  VO                     ! Offset in the input array
- 
-      CHARACTER * 120
-     :  BUFFER                 ! Shifts in (s1,s2,...sn) format
- 
-      REAL
-     :  AV( SRCHMX, NDF__MXDIM ), ! Used to sum profiles
-     :  BACK( NDF__MXDIM ),    ! Background values used
-     :  DAV( SRCHMX ),         ! Copy of a dimensions marginal profiles
-     :  DENOM( NDF__MXDIM ),   ! Denominator in centroid calculations
-     :  DUMMY,                 ! Dummy variable used in centroiding
-     :  LAST( NDF__MXDIM ),    ! Co-ords worked out in last iteration
-     :  NUMER( NDF__MXDIM ),   ! Numerator in centroid calculations
-     :  POSCHG,                ! Shift of current posn from previous one
-     :  POSN,                  ! Real position used in scanning
- 
-     :  STACK( SRCHMX/4 + 2 )  ! Stack used by background estimator
- 
-      LOGICAL                  ! If true:
-     :  EVAL( NDF__MXDIM ),    ! A position along a dimension can be
-                               ! evaluated
-     :  FINSHD,                ! Calculation finished
-     :  NEVAL,                 ! No position can be evaluated
-     :  SHIFT,                 ! Shift of current posn from initial one
-                               ! exceeds maximum shift allowed
-     :  SMLDIM                 ! One or more dimensions are too small
- 
- 
+      CHARACTER BUFFER*120     ! Shifts in (s1,s2,...sn) format
+      INTEGER CURITE           ! Current iteration counter
+      INTEGER DIM( NDF__MXDIM )! Dimensions of the array
+      INTEGER FINISH( NDF__MXDIM )! Co-ords of far edge of current search box
+      INTEGER FST              ! Index of first good profile sample
+      INTEGER HLFSIZ( NDF__MXDIM )! Half width of the search square/cube
+      INTEGER I                ! Counter
+      INTEGER ID               ! Pointer to the start of a line segment within the search region
+      INTEGER IDIM( NDF__MXDIM )! Indices of an array element
+      INTEGER J                ! Counter
+      INTEGER K                ! Counter
+      INTEGER L                ! Counter
+      INTEGER LST              ! Index of last good profile sample
+      INTEGER M                ! Counter
+      INTEGER MO               ! Offset in the marginal
+      INTEGER NAV( SRCHMX, NDF__MXDIM )! Used to count additions to profiles
+      INTEGER NC               ! Number of characters in list of shifts
+      INTEGER NSAMPL( NDF__MXDIM )! number of lines/columns etc. in search square actually used
+      INTEGER NTH( NDF__MXDIM )! Value used to determine background level - Nth smallest number taken
+      INTEGER NUMITE           ! Maximum number of iterations to be used  forced to be at least one iteration
+      INTEGER ORDER            ! No. of small values to find
+      INTEGER PUTAT            ! Index of next data value
+      INTEGER START( NDF__MXDIM )! Co-ords of edge of current search box
+      INTEGER STRID( NDF__MXDIM )! Dimension strides for search region
+      INTEGER VO               ! Offset in the input array
+      LOGICAL EVAL( NDF__MXDIM )! A position along a dimension can be evaluated?
+      LOGICAL FINSHD           ! Calculation finished?
+      LOGICAL NEVAL            ! No position can be evaluated?
+      LOGICAL SHIFT            ! Shift of current posn from initial one exceeds maximum shift allowed?
+      LOGICAL SMLDIM           ! One or more dimensions are too small
+      REAL AV( SRCHMX, NDF__MXDIM )! Used to sum profiles
+      REAL BACK( NDF__MXDIM )  ! Background values used
+      REAL DAV( SRCHMX )       ! Copy of a dimensions marginal profiles
+      REAL DENOM( NDF__MXDIM ) ! Denominator in centroid calculations
+      REAL DUMMY               ! Dummy variable used in centroiding
+      REAL LAST( NDF__MXDIM )  ! Co-ords worked out in last iteration
+      REAL NUMER( NDF__MXDIM ) ! Numerator in centroid calculations
+      REAL OFFSET              ! Offset of line through FST and LST
+      REAL POSCHG              ! Shift of current posn from previous one
+      REAL POSN                ! Real position used in scanning
+      REAL SLOPE               ! Slope of line through FST and LST
+      REAL STACK( SRCHMX + 2 ) ! Stack used by background estimator
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
  
 *.
- 
-*    Check the inherited status on entry.
- 
+
+*  Check the inherited status on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
  
-*    Check the dimensionality.
- 
+*  Check the dimensionality.
       IF ( NDIM .LT. 2 .AND. NDIM .GT. NDF__MXDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIM )
-         CALL ERR_REP( 'KPG1_LOCTx_INVDIM',
+         CALL ERR_REP( 'KPG1_LOCTW_INVDIM',
      :     'Unable to find centroid of array with dimensionality of '/
      :     /'^NDIM.', STATUS )
          GOTO 999
       END IF
  
-*    Compute the array dimensions.
- 
+*  Compute the array dimensions.
       SMLDIM = .FALSE.
       DO  I = 1, NDIM
          DIM( I ) = UBND( I ) - LBND( I ) + 1
          SMLDIM = SMLDIM .OR. DIM( I ) .LT. 3
       END DO
  
-*    Check that the bounds are acceptable.
- 
+*  Check that the bounds are acceptable.
       IF ( SMLDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIM )
-         CALL ERR_REP( 'KPG1_LOCTx_SMLDIM',
+         CALL ERR_REP( 'KPG1_LOCTW_SMLDIM',
      :     'Unable to find centroid of array, a dimension has less '/
      :     /'three elements.', STATUS )
          GOTO 999
       END IF
  
-*    Initialise the completion flag.
- 
+*  Initialise the completion flag.
       FINSHD = .FALSE.
  
-*    Initialise the centre of the square/cube/hypercube to be at the
-*    initial estimated position.
- 
+*  Initialise the centre of the square/cube/hypercube to be at the
+*  initial estimated position.
       DO  I = 1, NDIM
          FINAL( I ) = INIT( I )
       END DO
  
-*    Ensure that the search square size is between 3 and the maximum
-*    allowed size, and initialise the half-box size.
- 
+*  Ensure that the search square size is between 3 and the maximum
+*  allowed size, and initialise the half-box size.
       DO  I = 1, NDIM
          NSAMPL( I ) = MIN( MAX( 3, SEARCH( I ) ), SRCHMX )
          HLFSIZ( I ) = NSAMPL( I ) / 2
       END DO
  
-*    Check that at least one iteration is done.
- 
+*  Check that at least one iteration is done.
       NUMITE = MAX( 1, MAXITE )
  
-*    Initialise the number of iterations done so far, and start
-*    the main loop.
- 
+*  Initialise the number of iterations done so far, and start
+*  the main loop.
       CURITE = 0
  
       DO WHILE ( .NOT. FINSHD )
  
-*       Increment the current iteration counter.
- 
+*  Increment the current iteration counter.
          CURITE = CURITE + 1
  
-*       Record the starting co-ordinates for this iteration.
- 
+*  Record the starting co-ordinates for this iteration.
          DO  I = 1, NDIM
             LAST( I ) = FINAL( I )
          END DO
  
-*       Work out the starting edges of the current search square/cube/
-*       hypercube.
- 
+*  Work out the starting edges of the current search square/cube/hypercube.
          DO  I = 1, NDIM
             START( I ) = MIN( UBND( I ), MAX( LBND( I ),
      :                   NINT( MIN( MAX( -1.0E6, FINAL( I ) ), 1.0E6 ) )
@@ -344,11 +292,9 @@
             NSAMPL( I ) = FINISH( I ) - START( I ) + 1
          END DO
  
-*       Prepare to calculate the marginal profiles.
-*       ===========================================
-*
-*       Initialise the arrays used to form the marginal profiles.
- 
+*  Prepare to calculate the marginal profiles.
+*  ===========================================
+*  Initialise the arrays used to form the marginal profiles.
          DO  I = 1, NDIM
             DO  K = 1, NSAMPL( I )
                AV( K, I ) = 0.0
@@ -356,256 +302,286 @@
             END DO
          END DO
  
-*       Initialise the stride of dimension number 1 for the data and
-*       output array objects. (The stride for a dimension is the amount
-*       by which the vectorised array index increases when the
-*       n-dimensional array index for that dimension increases by 1.)
- 
+*  Initialise the stride of dimension number 1 for the data and
+*  output array objects. (The stride for a dimension is the amount
+*  by which the vectorised array index increases when the
+*  n-dimensional array index for that dimension increases by 1.)
          STRID( 1 ) = 1
  
-*       Calculate the stride for each remaining dimension.
- 
+*  Calculate the stride for each remaining dimension.
          DO  I = 2, NDIM
             STRID( I ) = STRID( I - 1 ) *
      :                   ( UBND( I - 1 ) - LBND( I - 1 ) + 1 )
          END DO
  
-*       Initialise the vector index within the square/cube.
- 
+*  Initialise the vector index within the square/cube.
          ID = 1
  
-*       Recursive scanning of the array dimensions begins with the
-*       highest dimension.
- 
+*  Recursive scanning of the array dimensions begins with the highest 
+*  dimension.
          I = NDIM
  
-*       Form a section via recursive invocation starting here.
-*       ======================================================
- 
-*       This is quite complicated as the section of the array under
-*       analysis has to be extracted via pseudo-recursion.  A list of
-*       vector pointers is calculated for a series of sub-sections along
-*       the first dimension, each of length given by the bounds of the
-*       section along the first dimension.
+*  Form a section via recursive invocation starting here.
+*  ======================================================
+*  This is quite complicated as the section of the array under
+*  analysis has to be extracted via pseudo-recursion.  A list of
+*  vector pointers is calculated for a series of sub-sections along
+*  the first dimension, each of length given by the bounds of the
+*  section along the first dimension.
 *
-*       Increment the pointer to the end of the region which lies
-*       before the lower bound of the sub-region being extracted (in the
-*       current dimension), and which is therefore excluded from the
-*       calculation of the marginal profiles.
+*  Increment the pointer to the end of the region which lies
+*  before the lower bound of the sub-region being extracted (in the
+*  current dimension), and which is therefore excluded from the
+*  calculation of the marginal profiles.
  
    20 CONTINUE
          ID = ID + ( START( I ) - LBND( I ) ) * STRID( I )
  
-*       This is a "DO UNTIL" loop, which starts with the current
-*       dimension set to the lower bound of the sub-region and executes
-*       until it goes beyond the upper bound.
- 
+*  This is a "DO UNTIL" loop, which starts with the current
+*  dimension set to the lower bound of the sub-region and executes
+*  until it goes beyond the upper bound.
          IDIM( I ) = START( I )
  
    30    CONTINUE
          IF ( IDIM( I ) .GT. FINISH( I ) ) GOTO 50
  
-*       The algorithm calls itself recursively here.
-*       ============================================
+*  The algorithm calls itself recursively here.
+*  ============================================
  
-*       The algorithm invokes itself recursively to process the next
-*       lower dimension.  Decrement the current dimension count and
-*       branch back to the start.
+*  The algorithm invokes itself recursively to process the next
+*  lower dimension.  Decrement the current dimension count and
+*  branch back to the start.
  
          IF ( I .GT. 1 ) THEN
             I = I - 1
             GOTO 20
          ELSE
  
-*          Form the marginal profiles.
-*          ===========================
-*
-*          Sum along the line segment marked by the pointer.
- 
+*  Form the marginal profiles.
+*  ===========================
+*  Sum along the line segment marked by the pointer.
             DO  J = START( 1 ), FINISH( 1 )
  
-*             Calculate the offset within the whole array.  The pixel
-*             is used in marginals for all dimensions.
- 
+*  Calculate the offset within the whole array.  The pixel is used in 
+*  marginals for all dimensions.
                VO = ID + J - START( 1 )
  
-*             Use IDIM to store the pixel number along the first
-*             dimension so that the offset may be calculated.
- 
+*  Use IDIM to store the pixel number along the first dimension so that 
+*  the offset may be calculated.
                IDIM( 1 ) = J
  
-*             Test for bad pixels.
- 
+*  Test for bad pixels.
                IF ( ARRAY( VO ) .NE. VAL__BADW ) THEN
  
-*                Loop for each dimension.
- 
+*  Loop for each dimension.
                   DO  M = 1, NDIM
  
-*                   Calculate the offset in the marginal profile.
- 
+*  Calculate the offset in the marginal profile.
                      MO = IDIM( M ) - START( M ) + 1
  
-*                   Now finally form the marginal profiles and count
-*                   of the contributing pixels.
- 
+*  Now finally form the marginal profiles and count of the contributing 
+*  pixels. Store the sum of the values in AV, and the separate 
+*  individual values in WORK1.
+                     PUTAT = NAV( MO, M ) + 1
+                     NAV( MO, M ) = PUTAT
+                     WORK1( PUTAT, MO, M ) = NUM_WTOR( ARRAY( VO ) )
+
                      AV( MO, M ) = AV( MO, M ) +
      :                             NUM_WTOR( ARRAY( VO ) )
-                     NAV( MO, M ) = NAV( MO, M ) + 1
-                  END DO
+
+                 END DO
+
                END IF
+
             END DO
  
-*          Update the dimension index to indicate that all of the
-*          sub-region in this dimension has now been processed.
- 
+*  Update the dimension index to indicate that all of the sub-region in 
+*  this dimension has now been processed.
             IDIM( 1 ) = FINISH( 1 )
  
-*          Move the pointer to allow for the pixels within the section
-*          along the line.
- 
+*  Move the pointer to allow for the pixels within the section along the line.
             ID = ID + FINISH( 1 ) - START( 1 ) + 1
+
          END IF
  
-*        The recursively invoked algorithm returns to this point.
-*        =======================================================
+*  The recursively invoked algorithm returns to this point.
+*  =======================================================
  
    40    CONTINUE
  
-*       The current dimension count is "popped" back to its previous
-*       value before the recursively invoked algorithm returns, so
-*       increment the dimension index and branch to continue execution
-*       of the "DO UNTIL" loop.
- 
+*  The current dimension count is "popped" back to its previous value before 
+*  the recursively invoked algorithm returns, so increment the dimension 
+*  index and branch to continue execution of the "DO UNTIL" loop.
          IDIM( I ) = IDIM( I ) + 1
          GOTO 30
  
    50    CONTINUE
  
-*       Increment pointers to the end of the data region which lies
-*       after the upper bound of the sub-region being processed (in the
-*       current dimension), and which is therefore NOT going to be
-*       included in the marginal profiles.
- 
+*  Increment pointers to the end of the data region which lies after the 
+*  upper bound of the sub-region being processed (in the current dimension), 
+*  and which is therefore NOT going to be included in the marginal profiles.
          ID = ID + ( UBND( I ) - FINISH( I ) ) * STRID( I )
  
-*       The recursively invoked algorithm returns from here.
-*       ===================================================
+*  The recursively invoked algorithm returns from here.
+*  ===================================================
  
-*       "Pop" the current dimension count and make a return from a
-*       recursive invocation of the algorithm (unless this is the top
-*       level invocation---i.e. the current dimension count is equal to
-*       NDIM---in which case all the data have been transferred, so
-*       make a final exit).
- 
+*  "Pop" the current dimension count and make a return from a recursive 
+*  invocation of the algorithm (unless this is the top level invocation---
+*  i.e. the current dimension count is equal to NDIM---in which case all 
+*  the data have been transferred, so make a final exit).
          IF ( I .GE. NDIM ) GOTO 60
          I = I + 1
          GOTO 40
  
    60    CONTINUE
  
-*       Find the means in profile bins.
-*       ===============================
+*  Find the means in profile bins.
+*  ===============================
  
-*       Evaluate the profile bins that contain at least one valid
-*       pixel. Invert the results if the blob is hole, i.e.  smaller
-*       than the background.
- 
+*  Evaluate the profile bins that contain at least one valid pixel. Invert 
+*  the results if the blob is hole, i.e.  smaller than the background.
          DO  I = 1, NDIM
+
+*  First find the slope and offset of the straight line through the
+*  first and last profile samples. This will be used as a background
+*  estimate for any profile samples which have only one contibution.
+*  Find the first sample with any data.
+            FST = 1
+            DO WHILE ( NAV( FST, I ) .EQ. 0 .AND. FST .LT. NSAMPL( I ) ) 
+               FST = FST + 1
+            END DO
+
+*  Find the last sample with any data.
+            LST = NSAMPL( I )
+            DO WHILE ( NAV( LST, I ) .EQ. 0 .AND. LST .GT. 1 ) 
+               LST = LST - 1
+            END DO
+
+*  Use background estimate of zero if no good data is available.
+            IF( FST .GE. LST ) THEN 
+               SLOPE = 0
+               OFFSET = 0
+
+*  Otherwise find the slope and offset of the straight line through the
+*  first and last good samples.
+            ELSE 
+               SLOPE = ( AV( LST, I )/REAL( NAV( LST, I ) ) - 
+     :                   AV( FST, I )/REAL( NAV( FST, I ) ) ) /
+     :                  REAL( LST - FST )
+               OFFSET = AV( FST, I )/REAL( NAV( FST, I ) ) - 
+     :                  SLOPE*REAL( FST )
+            END IF
+
+*  Now check each profile sample.
             DO  L = 1, NSAMPL( I )
  
-*             Check for nil pixels having been added to the current bin.
- 
+*  Check for nill pixels having been added to the current bin.
                IF ( NAV( L, I ) .EQ. 0 ) THEN
  
-*                In that case, make the current bin very large so that
-*                it is excluded from the quartile.
- 
+*  In that case, make the current bin very large so that it is excluded 
+*  from the quartile estimation for the whole profile.
                   AV( L, I ) = VAL__MAXR
  
+*  If we have any good data, normalise the current bin value.
                ELSE
- 
-*                Normalise the current bin value, checking POSTIV.
- 
-                  IF ( POSTIV ) THEN
-                     AV( L, I ) = AV( L, I ) / NAV( L, I )
+                  AV( L, I ) = AV( L, I ) / NAV( L, I )
+
+*  If the bin has only one valid pixel, the background estimate for the
+*  bin is taken from the straight line passing through the first and last
+*  good bins.
+                  IF( NAV( L, I ) .EQ. 1 ) THEN
+                     AV( L, I ) = AV( L, I ) - SLOPE*REAL( L ) - OFFSET
+
+*  Otherwise, find the lower (or upper if .NOT POSTIV) quartile value 
+*  contributing to this bin (returned in STACK(1) ).
                   ELSE
-                     AV( L, I )  = -AV( L, I ) / NAV( L, I )
+                     IF ( POSTIV ) THEN
+                        ORDER = NAV( L, I ) / 4
+                     ELSE
+                        ORDER = 3*NAV( L, I ) / 4
+                     END IF
+
+                     CALL KPG1_NTHMR( .FALSE., WORK1( 1, L, I ), 
+     :                               NAV( L, I ), ORDER, STACK, STATUS )
+
+*  Subtract this background estimate from the average bin value.
+                     IF( STACK( 1 ) .NE. VAL__MAXR ) THEN
+                        AV( L, I ) = AV( L, I ) - STACK( 1 )
+
+*  If the background could not be defined, use the straight line estimate.
+                     ELSE
+                        AV( L, I ) = AV( L, I ) - SLOPE*REAL( L ) - 
+     :                               OFFSET
+                     END IF
+
                   END IF
+
+*  Invert the mean, background subtracted value if we are searching for
+*  negative features.
+                  IF( .NOT. POSTIV ) AV( L, I ) = -AV( L, I )
  
                END IF
  
             END DO
+
          END DO
  
-*       Estimate the background.
-*       ========================
-*
+*  Estimate the background.
+*  ========================
          DO  I = 1, NDIM
  
-*         Find the lower quartile point in each profile as a background
-*         estimate.  First evaluate the quartile index.
- 
+*  Find the lower quartile point in each profile as a background
+*  estimate.  First evaluate the quartile index.
             NTH( I ) = MAX( NSAMPL( I ) / 4, 2 )
  
-*          Copy the marginals for the current dimension into a work
-*          array.
- 
+*  Copy the marginals for the current dimension into a work array.
             DO  J = 1, NSAMPL( I )
                DAV( J ) = AV( J, I )
             END DO
  
-*          Now get the n smallest numbers in the profile, and put
-*          the n-th smallest into BACK.
- 
+*  Now get the n smallest numbers in the profile, and put the n-th 
+*  smallest into BACK.
             CALL KPG1_NTHMR( .FALSE., DAV, NSAMPL( I ), NTH( I ),
      :                       STACK, STATUS )
             BACK( I ) = STACK( 1 )
  
-*          Check for potential errors that might cause a divde by zero
-*          later.
- 
-            IF ( BACK( I ) .EQ. VAL__BADR ) THEN
+*  Check for potential errors that might cause a divde by zero later.
+            IF ( BACK( I ) .EQ. VAL__MAXR ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'KPG1_LOCTx_UNDEFBGD',
+               CALL ERR_REP( 'KPG1_LOCTW_UNDEFBGD',
      :           'The background could not be defined in order to '/
      :           /'evaluate the centroid.', STATUS )
                GOTO 999
             END IF
+
          END DO
  
-*       Evaluate the centroids.
-*       =======================
+*  Evaluate the centroids.
+*  =======================
 *
-*       Initialise the sums used for forming the centroids.
- 
+*  Initialise the sums used for forming the centroids.
          DO  I = 1, NDIM
             NUMER( I ) = 0.0
             DENOM( I ) = 0.0
  
-*          Assume for the moment that the position cannot be evaluated.
- 
+*  Assume for the moment that the position cannot be evaluated.
             EVAL( I ) = .FALSE.
+
          END DO
  
-*       Loop for each dimension.
- 
+*  Loop for each dimension.
          DO  I = 1, NDIM
  
             POSN = REAL( START( I ) - 1 )
  
-*          Scan the profiles, using all data above the estimated
-*          backgrounds to form sums for the centroids via first-order
-*          moments.
- 
+*  Scan the profiles, using all data above the estimated backgrounds to 
+*  form sums for the centroids via first-order moments.
             DO  M = 1, NSAMPL( I )
  
-*             Increment the current values of the scanning positions.
- 
+*  Increment the current values of the scanning positions.
                POSN = POSN + 1.0
  
-*             Form sums when there are data in the current bin.
- 
+*  Form sums when there are data in the current bin.
                IF ( NAV( M, I ) .NE. 0 ) THEN
                   EVAL( I ) = .TRUE.
                   DUMMY = MAX( AV( M, I ) - BACK( I ), 0.0 )
@@ -614,11 +590,11 @@
                END IF
  
             END DO
+
          END DO
  
-*       Form the current centroid positions, checking for each
-*       profile not containing data.
- 
+*  Form the current centroid positions, checking for each profile not 
+*  containing data.
          NEVAL = .TRUE.
          DO  I = 1, NDIM
             NEVAL = NEVAL .AND. ( .NOT. EVAL( I ) )
@@ -626,10 +602,8 @@
  
          IF ( NEVAL ) THEN
  
-*          None of the profiles has any data.  Therefore set the
-*          positions back to the starting values, set an error status,
-*          and return.
- 
+*  None of the profiles has any data.  Therefore set the positions back to 
+*  the starting values, set an error status, and return.
             DO  I = 1, NDIM
                FINAL( I ) = VAL__BADR
             END DO
@@ -645,15 +619,12 @@
             DO  I = 1, NDIM
                IF ( .NOT. EVAL( I ) ) THEN
  
-*                No data in the Ith profile. Therefore set the position
-*                in the Ith dimension to be the same as the previous
-*                iteration.
- 
+*  No data in the Ith profile. Therefore set the position in the Ith 
+*  dimension to be the same as the previous iteration.
                   FINAL( I ) = LAST( I )
+
+*  There were no data above/below the background.
                ELSE IF ( DENOM( I ) .LT. VAL__EPSR ) THEN
- 
-*                There were no data above/below the background.
- 
                   STATUS = SAI__ERROR
                   CALL MSG_SETI( 'I', I )
                   IF ( POSTIV ) THEN
@@ -666,35 +637,31 @@
      :              /'in dimension ^I', STATUS )
                   FINSHD = .TRUE.
  
+ 
+*  There was data, so evaluate the first-order moment to obtain a centroid.  
+*  The '-0.5' converts from the pixel index into a co-ordinate.
                ELSE
- 
-*                There was data, so evaluate the first-order moment to
-*                obtain a centroid.  The '-0.5' converts from the pixel
-*                index into a co-ordinate.
- 
                   FINAL( I ) = NUMER( I ) / DENOM( I ) - 0.5
+
                END IF
+
             END DO
  
-*          Test the shift.
-*          ===============
+*  Test the shift.
+*  ===============
 *
-*          Compute the shift of the current position from the starting
-*          position.  Protect against no shift.
- 
+*  Compute the shift of the current position from the starting position.  
+*  Protect against no shift.
             SHIFT = .FALSE.
             DO  I = 1, NDIM
                SHIFT = ABS( FINAL( I ) - INIT( I ) ) .GT. MXSHFT( I )
      :                 .OR. SHIFT
             END DO
  
-*          Test to see if the maximum allowable shift has been exceeded.
- 
+*  Test to see if the maximum allowable shift has been exceeded.
             IF ( SHIFT ) THEN
  
-*             Form a list of the shifts in parentheses, separated by
-*             commas.
- 
+*  Form a list of the shifts in parentheses, separated by commas.
                NC = 0
                BUFFER = ' '
                CALL CHR_PUTC( '( ', BUFFER, NC )
@@ -705,26 +672,22 @@
                NC = NC - 2
                CALL CHR_PUTC( ' )', BUFFER, NC )
  
-*             Make the error report.
- 
+*  Make the error report.
                CALL MSG_SETC( 'BUFFER', BUFFER )
                STATUS = SAI__ERROR
                CALL ERR_REP( 'KPG1_LOCT_SHIFT',
      :           'Maximum allowable shift has been exceeded. '/
      :           /'Current shift is ^BUFFER pixels.', STATUS )
  
-*             In that case, reset the position back to the initial
-*             values, and return.
- 
+*  In that case, reset the position back to the initial values, and return.
                DO  I = 1, NDIM
                  FINAL( I ) = VAL__BADR
                END DO
                FINSHD = .TRUE.
  
+*  Otherwise, evaluate the shift in position since the last iteration. 
+*  Protect against no shift.
             ELSE
- 
-*             Otherwise, evaluate the shift in position since the last
-*             iteration. Protect against no shift.
  
                POSCHG = 0.0
                DO  I = 1, NDIM
@@ -732,38 +695,30 @@
                END DO
                POSCHG = SQRT( MAX( VAL__SMLR, POSCHG ) )
  
-*             Tolerance test
-*             ==============
+*  Tolerance test
+*  ==============
  
-*             Check to see if the routine can return.  First check
-*             the required accuracy tolerance criterion.
- 
+*  Check to see if the routine can return.  First check the required 
+*  accuracy tolerance criterion.
                IF ( POSCHG .LE. TOLER ) THEN
  
-*                The required tolerance has been met, therefore exit
-*                the loop.
- 
+*  The required tolerance has been met, therefore exit the loop.
                   FINSHD = .TRUE.
  
                ELSE IF ( CURITE .EQ. NUMITE ) THEN
  
-*                The requested number of iterations have been done,
-*                therefore return.
- 
+*  The requested number of iterations have been done, therefore return.
                   FINSHD = .TRUE.
  
                END IF
  
-*          Bottom of if-shift-greater-than-MXSHFT statement.
- 
+*  Bottom of if-shift-greater-than-MXSHFT statement.
             END IF
  
-*       Bottom of if-no-data-in-profiles statement.
- 
+*  Bottom of if-no-data-in-profiles statement.
          END IF
  
-*    Bottom of iteration do-loop.
- 
+*  Bottom of iteration do-loop.
       END DO
  
   999 CONTINUE
