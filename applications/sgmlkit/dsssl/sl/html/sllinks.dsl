@@ -39,7 +39,7 @@ target in mode <code/section-reference/.
     (if (and target
 	     (member (gi target) (ref-target-element-list)))
 	(make element
-	  gi: "A"
+	  gi: "a"
 	  attributes: (list (list "href" (href-to target)))
 	  ;(with-mode section-reference
 	  ;  (process-node-list target))
@@ -163,8 +163,8 @@ it produces an <funcname/error/.
 	(if xreftarget
 	    (if (car xrefurl)	; link to element by id
 		(error (car xrefurl)) ; violated policy - complain
-		(make element gi: "A"
-		      attributes: (list (list "HREF"
+		(make element gi: "a"
+		      attributes: (list (list "href"
 					      (cdr xrefurl)))
 		      (if linktext
 			  (literal linktext)
@@ -175,9 +175,9 @@ it produces an <funcname/error/.
 			    (literal ": ")
 			    (with-mode section-reference
 			      (process-node-list xreftarget))))))
-	    (make element gi: "A"	; link to whole document
+	    (make element gi: "a"	; link to whole document
 		  attributes:
-		  (list (list "HREF"
+		  (list (list "href"
 			      (let ((url (attribute-string
 					  (normalize "urlpath") docelem)))
 				(if url
@@ -252,7 +252,7 @@ it produces an <funcname/error/.
 	      (dtitle (getdocinfo 'title)))
 	  (make sequence
 	    (literal (string-append dn ", "))
-	    (make element gi: "CITE"
+	    (make element gi: "cite"
 		  (process-node-list dtitle)))))))
 
 <routine>

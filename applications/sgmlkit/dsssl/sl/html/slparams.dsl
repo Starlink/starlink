@@ -146,16 +146,16 @@ or false if none is to be produced.  See also (suppress-banner).
 <codebody>
 (define %starlink-banner%
   (make sequence
-    (make element gi: "A"
-	  attributes: '(("HREF" "http://star-www.rl.ac.uk"))
+    (make element gi: "a"
+	  attributes: '(("href" "http://star-www.rl.ac.uk"))
 	  (literal "Starlink Project"))
     (literal ": ")
-    (make element gi: "A"
-	  attributes: '(("HREF" "http://www.cclrc.ac.uk"))
+    (make element gi: "a"
+	  attributes: '(("href" "http://www.cclrc.ac.uk"))
 	  (literal "CCLRC"))
     (literal " / ")
-    (make element gi: "A"
-	  attributes: '(("HREF" "http://www.pparc.ac.uk"))
+    (make element gi: "a"
+	  attributes: '(("href" "http://www.pparc.ac.uk"))
 	  (literal "PPARC"))
     ))
 

@@ -417,10 +417,10 @@ generated HTML documents.
 (define (section-header-navigation elemnode)
   (let ((anc (chunk-ancestors elemnode)))
     (make element gi: "div" attributes: '(("class" "navbar"))
-    (make element gi: "TABLE" attributes: %nav-header-table-attr%
+    (make element gi: "table" attributes: %nav-header-table-attr%
 	  (make sequence
-	    (make element gi: "TR"
-		  (make element gi: "TD" attributes: '(("ALIGN" "LEFT"))
+	    (make element gi: "tr"
+		  (make element gi: "td" attributes: '(("align" "left"))
 			(make sequence
 			  (node-list-reduce
 			   anc ; (node-list-reduce) 10.2.2
@@ -428,8 +428,8 @@ generated HTML documents.
 			     (sosofo-append
 			      curr
 			      (make sequence
-				(make element gi: "A"
-				      attributes: (list (list "HREF"
+				(make element gi: "a"
+				      attributes: (list (list "href"
 							      (href-to el)))
 				      (with-mode section-reference
 					(process-node-list el)))
@@ -437,8 +437,8 @@ generated HTML documents.
 			   (empty-sosofo))
 			  (with-mode section-reference
 			    (process-node-list (current-node))))))
-	    (make element gi: "TR"
-		  (make element gi: "TD" attributes: '(("ALIGN" "RIGHT"))
+	    (make element gi: "tr"
+		  (make element gi: "td" attributes: '(("align" "right"))
 			(make sequence
 			  (if (nav-home? elemnode)
 			      (make sequence
@@ -447,17 +447,17 @@ generated HTML documents.
 			      (empty-sosofo))
 			  (if (nav-up? elemnode)
 			      (nav-up-link elemnode)
-			      (make element gi: "EM"
+			      (make element gi: "em"
 				    (literal "Up")))
 			  (literal " / ")
 			  (if (nav-prev? elemnode)
 			      (nav-prev-link elemnode)
-			      (make element gi: "EM"
+			      (make element gi: "em"
 				    (literal "Prev")))
 			  (literal " / ")
 			  (if (nav-next? elemnode)
 			      (nav-next-link elemnode)
-			      (make element gi: "EM"
+			      (make element gi: "em"
 				    (literal "Next")))))))))))
 
 
@@ -600,14 +600,14 @@ generated HTML documents.
 ;						      'release))
 ;		   (data (getdocinfo 'docdate))))) ; must be docdate instead
 ;    (make sequence
-;      (make element gi: "TABLE" attributes: %nav-footer-table-attr%
-;	    (make element gi: "TR"
-;		  (make element gi: "TD" attributes: '(("ALIGN"
-;							"RIGHT"))
+;      (make element gi: "table" attributes: %nav-footer-table-attr%
+;	    (make element gi: "tr"
+;		  (make element gi: "td" attributes: '(("align"
+;							"right"))
 ;			(whereami "nav-footer")
 ;			(literal "Next location..."))))
-;      (make element gi: "P" attributes: '(("ALIGN" "RIGHT"))
-;	    (make element gi: "EM"
+;      (make element gi: "p" attributes: '(("align" "right"))
+;	    (make element gi: "em"
 ;		  (process-node-list authors)
 ;		  (literal "Date: " date))))))
 
@@ -621,9 +621,9 @@ generated HTML documents.
   (if (node-list=? thisnode target)
       (literal (string-append "This node is " title))
       (make sequence
-	(make element gi: "A"
-	      attributes: (list (list "HREF" (href-to target))
-				(list "TITLE" title))
+	(make element gi: "a"
+	      attributes: (list (list "href" (href-to target))
+				(list "title" title))
 	      linktext)
 	;(literal (string-append " (" (href-to target) ")"))
 	)))
@@ -650,10 +650,10 @@ generated HTML documents.
 ;	;(make entity-ref name: "nbsp")
 ;	;(empty-sosofo)
 ;	(literal "No up element")
-;	(make element gi: "A"
+;	(make element gi: "a"
 ;	      attributes: (list
-;			   (list "HREF" (href-to up))
-;			   (list "TITLE" "Up"))
+;			   (list "href" (href-to up))
+;			   (list "title" "Up"))
 ;	      (gentext-nav-up up)))))
 
 ;; Is there a home link (say no, if we're currently the root element)
@@ -674,10 +674,10 @@ generated HTML documents.
 ;	;(make entity-ref name: "nbsp")
 ;	;(empty-sosofo)
 ;	(literal "No home element")
-;	(make element gi: "A"
+;	(make element gi: "a"
 ;	      attributes: (list
-;			   (list "HREF" (href-to home))
-;			   (list "TITLE" "Home"))
+;			   (list "href" (href-to home))
+;			   (list "title" "Home"))
 ;	      (gentext-nav-home home)))))
 
 ;; ifollow-by-gi and ipreced-by-gi return the next sibling node which
@@ -716,9 +716,9 @@ generated HTML documents.
 ;    (if (node-list-empty? next)
 ;	;(empty-sosofo)
 ;	(literal "No next element")
-;	(make element gi: "A"
-;	      attributes: (list (list "HREF" (href-to next))
-;				(list "TITLE" "Next"))
+;	(make element gi: "a"
+;	      attributes: (list (list "href" (href-to next))
+;				(list "title" "Next"))
 ;	      (gentext-nav-next next)))))
 
 ;; Is there a prev link?

@@ -265,8 +265,8 @@ specification parts.  See the DSSSL standard, sections 7.1 and 12.4.1.
   (process-children))
 ;; Make text that comes from unimplemented tags easy to spot
 ;(default
-;  (make element gi: "FONT"
-;	attributes: '(("COLOR" "RED"))
+;  (make element gi: "font"
+;	attributes: '(("color" "red"))
 ;	(make entity-ref name: "lt")
 ;	(literal (gi))
 ;	(make entity-ref name: "gt")

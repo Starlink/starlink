@@ -24,7 +24,7 @@ we're chunking or not
   (if (or (chunking?)
 	  (node-list=? (current-node) (document-element)))
       (empty-sosofo)
-      (make empty-element gi: "HR")))
+      (make empty-element gi: "hr")))
 
 <routine>
 <routinename>$html-section$

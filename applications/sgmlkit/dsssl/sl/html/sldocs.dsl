@@ -92,8 +92,8 @@ These are the document element types.
 							(current-node))))
 		     (else #f))))
       (if link
-	  (make element gi: "A"
-		attributes: (list (list "HREF" link))
+	  (make element gi: "a"
+		attributes: (list (list "href" link))
 		(literal (normalise-string (data (current-node)))))
 	  (literal (normalise-string (data (current-node)))))))
 
@@ -129,26 +129,26 @@ are shown at the top of the document.
       ;; Improve this sometime!
       (make element gi: "a" attributes: '(("name" "xref_"))
 	    (literal "."))
-      (make element gi: "TABLE"
-	    attributes: '(("WIDTH" "100%"))
+      (make element gi: "table"
+	    attributes: '(("width" "100%"))
 	    (make sequence
-	      (make element gi: "TR"
-		    (make element gi: "TD"
-			  attributes: (list (list "COLSPAN" "2")
-					    (list "ALIGN" "CENTER"))
-			  (make element gi: "H1"
+	      (make element gi: "tr"
+		    (make element gi: "td"
+			  attributes: (list (list "colspan" "2")
+					    (list "align" "center"))
+			  (make element gi: "h1"
 				tsosofo)))
 	      (if docref
-		  (make element gi: "TR"
+		  (make element gi: "tr"
 			(make sequence
-			  (make element gi: "TD"
-				attributes: (list (list "ALIGN"	"RIGHT")
-						  (list "WIDTH" "50%"))
-				(make element gi: "EM"
+			  (make element gi: "td"
+				attributes: (list (list "align"	"right")
+						  (list "width" "50%"))
+				(make element gi: "em"
 				      (literal "Document")))
-			  ;; (make element gi: "TD"
+			  ;; (make element gi: "td"
 			  ;; (literal docref))
-			  (make element gi: "TD"
+			  (make element gi: "td"
 				(make sequence
 				  (literal docref)
 				  (literal (if vers
@@ -156,13 +156,13 @@ are shown at the top of the document.
 				      ""))))
 			  ))
 		  (empty-sosofo))
-	      (make element gi: "TR"
+	      (make element gi: "tr"
 		    (make sequence
-		      (make element gi: "TD"
-			    attributes: '(("ALIGN" "RIGHT"))
-			    (make element gi: "EM"
+		      (make element gi: "td"
+			    attributes: '(("align" "right"))
+			    (make element gi: "em"
 				      (literal "Author")))
-		      (make element gi: "TD"
+		      (make element gi: "td"
 			    (node-list-reduce
 			     authors
 			     (lambda (result a)
@@ -170,22 +170,22 @@ are shown at the top of the document.
 				result
 				(make sequence
 				  (process-node-list a)
-				  (make empty-element gi: "BR"))))
+				  (make empty-element gi: "br"))))
 			     (empty-sosofo)))))
-	      (make element gi: "TR"
+	      (make element gi: "tr"
 		    (make sequence
-		      (make element gi: "TD"
-			    attributes: '(("ALIGN" "RIGHT"))
-			    (make element gi: "EM"
+		      (make element gi: "td"
+			    attributes: '(("align" "right"))
+			    (make element gi: "em"
 				      (literal "Release date")))
-		      (make element gi: "TD"
+		      (make element gi: "td"
 			      (literal reldate))))
 	      (if (and %starlink-banner% (not suppress-banner))
-		  (make element gi: "TR"
-			(make element gi: "TD"
-			      attributes: (list (list "ALIGN" "CENTER")
-						(list "COLSPAN" "2"))
-			      (make element gi: "SMALL"
+		  (make element gi: "tr"
+			(make element gi: "td"
+			      attributes: (list (list "align" "center")
+						(list "colspan" "2"))
+			      (make element gi: "small"
 				    %starlink-banner%)))
 		  (empty-sosofo))))
       (if coverimage
