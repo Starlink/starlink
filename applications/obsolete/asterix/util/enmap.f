@@ -227,7 +227,7 @@
       END IF
 
 *  Is quality present?
-      CALL BDI_CHK( IFID, QOK, 'Quality', STATUS )
+      CALL BDI_CHK( IFID, 'Quality', QOK, STATUS )
       IF ( QOK ) THEN
         CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', IQPTR,
      :                 STATUS )
