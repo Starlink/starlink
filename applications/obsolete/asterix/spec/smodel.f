@@ -67,6 +67,7 @@
 *      6 Aug 93 : V1.7-1 Added missing AST_INIT, removed direct i/o (DJA)
 *     11 Jan 94 : V1.7-2 Added traps for HMS and DMS type input (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     24 Apr 95 : V1.8-1 Updated data interfaces (DJA)
 *
 *    Type definitions :
 *
@@ -147,7 +148,7 @@
 *    Version :
 *
       CHARACTER*30 VERSION
-	PARAMETER		(VERSION = 'SMODEL Version 1.8-0')
+	PARAMETER		(VERSION = 'SMODEL Version 1.8-1')
 *-
 
 *    Announce version
@@ -161,7 +162,8 @@
       CALL USI_DEXIST('MODEL','UPDATE',FLOC,STATUS)
       IF ( STATUS .EQ. PAR__ERROR ) THEN
 	CALL ERR_ANNUL(STATUS)
-	CALL USI_ASSOCO('MODEL','FIT_MODEL',FLOC,STATUS)
+	CALL USI_TASSOCO('MODEL','FIT_MODEL',FID,STATUS)
+        CALL ADI1_GETLOC( FID, FLOC, STATUS )
 	SNEW=.TRUE.
 
       ELSE
@@ -173,6 +175,7 @@
 	  CALL ERR_REP( ' ', 'Not a fit_model data object', STATUS )
 	END IF
 	SNEW=.FALSE.
+        CALL ADI1_PUTLOC( FLOC, FID, STATUS )
 
 *      Reset model?
         CALL USI_GET0L( 'RESET', RESET, STATUS )
@@ -182,7 +185,7 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *    Declare file to user
-      CALL DISP_FILENAM(FLOC,'Input model',STATUS)
+      CALL DISP_FILENAM(FID,'Input model',STATUS)
       IF(STATUS.NE.SAI__OK) CALL ERR_FLUSH(STATUS)
 
 * Existing model file accessed
@@ -464,7 +467,7 @@
       END DO
 
 *    History file entry
-      CALL HIST_ADD( FLOC, VERSION, STATUS )
+      CALL HSI_ADD( FID, VERSION, STATUS )
 
 *    Exit
  99   CALL AST_CLOSE()
