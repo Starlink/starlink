@@ -805,16 +805,12 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 	$(TAR_IN) - $(SOURCE_FILES) \
            | compress -v > $(EXPORT)/$(PKG_NAME).tar.Z
 
+# Use the unconfigured Makefile.in here, since this target could be
+# built at a time when the directory has not been configured
 dvi2bitmap_source.tar: 
-	$(MAKE) -f Makefile dvi2bitmap.tar
+	$(MAKE) -f Makefile.in dvi2bitmap.tar
 	mv dvi2bitmap.tar $(EXPORT)/dvi2bitmap_source.tar
 
-## The CVS.current file contains a sequence of lines
-## `module-name:cvs-export-option'.  Check out each of the modules with the 
-## specified option
-#CVS.exported: CVS.release-tags
-#	eval `awk -F: '{print "cvs export", $$2, $$1, ";"}' CVS.release-tags`
-#	touch CVS.exported
 
 #  clean: Clean up the source directory.
 #  ------------------------------------
@@ -840,15 +836,6 @@ unbuild: clean
 	@ echo
 
 
-## Actually do the build of dvi2bitmap
-#dvi2bitmap: dvi2bitmap_src
-#	cd dvi2bitmap_src; CXX=$(CXX) ./configure --enable-gif
-#	cd dvi2bitmap_src; $(MAKE) -f Makefile dvi2bitmap
-#	mv dvi2bitmap_src/dvi2bitmap .
-#
-#dvi2bitmap_src: dvi2bitmap_source.tar
-#	$(TAR_OUT) dvi2bitmap_source.tar
-#	mv dvi2bitmap dvi2bitmap_src
 
 # The following rules are little subtle, since they have to work both in 
 # the distribution directory, where the sources live and are packaged up,
