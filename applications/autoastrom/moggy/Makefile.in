@@ -45,7 +45,7 @@ CXX=@CXX@
 #
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 
-LIBS=-lm @LIBS@ `ast_link` `cnf_link`
+LIBS=-lm @LIBS@ `cnf_link`
 
 RANLIB=@RANLIB@
 
