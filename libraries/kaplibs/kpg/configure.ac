@@ -18,6 +18,8 @@ AC_PROG_CC
 AC_PROG_FC
 AC_PROG_LIBTOOL
 
+AC_CHECK_HEADERS([tcl.h tk.h])
+
 dnl    Other options here, such as
 dnl STAR_CNF_COMPATIBLE_SYMBOLS
 

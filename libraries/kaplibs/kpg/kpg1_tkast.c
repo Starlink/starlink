@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include "ast.h"
 #include "f77.h"
-#include "tcl.h"
-#include "tk.h"
+#include <tcl.h>
+#include <tk.h>
 
 /*
  * The following variable is a special hack that is needed in order for
@@ -23,19 +23,19 @@ static FILE *fd = NULL;
 extern F77_SUBROUTINE(err_rep)( CHARACTER(param), CHARACTER(mess),
                                 INTEGER(STATUS) TRAIL(param) TRAIL(mess) );
 
-void Error( const char *, int * );
-char *Envir( const char *, int * );
-void SetVar( Tcl_Interp *, char *, char *, int, int * );
-const char *GetVar( Tcl_Interp *, char *, int, int * );
-void SetSVar( Tcl_Interp *, const char *, const char *, int, int * );
-void GetSVar( Tcl_Interp *, const char *, char *, int, int * );
-void SetIVar( Tcl_Interp *, const char *, int, int * );
-void SetRVar( Tcl_Interp *, const char *, float, int * );
-void SetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
-void GetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
-void GetIVar( Tcl_Interp *, const char *, int *, int * );
-void GetRVar( Tcl_Interp *, const char *, float *, int * );
-void sink( const char * );
+static void Error( const char *, int * );
+static char *Envir( const char *, int * );
+static void SetVar( Tcl_Interp *, char *, char *, int, int * );
+static const char *GetVar( Tcl_Interp *, char *, int, int * );
+static void SetSVar( Tcl_Interp *, const char *, const char *, int, int * );
+static void GetSVar( Tcl_Interp *, const char *, char *, int, int * );
+static void SetIVar( Tcl_Interp *, const char *, int, int * );
+static void SetRVar( Tcl_Interp *, const char *, float, int * );
+static void SetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
+static void GetLVar( Tcl_Interp *, const char *, LOGICAL(a), int * );
+static void GetIVar( Tcl_Interp *, const char *, int *, int * );
+static void GetRVar( Tcl_Interp *, const char *, float *, int * );
+static void sink( const char * );
 
 F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
                             INTEGER(FULL), INTEGER(STATUS) TRAIL(TITLE) ){
@@ -220,7 +220,7 @@ F77_SUBROUTINE(kpg1_tkast)( INTEGER(IAST), CHARACTER(TITLE),
 
 }
 
-void Error( const char *text, int *STATUS ) {
+static void Error( const char *text, int *STATUS ) {
 /*
 *  Name:
 *     Error
@@ -270,7 +270,7 @@ void Error( const char *text, int *STATUS ) {
    }
 }
 
-char *Envir( const char *var, int *STATUS ){
+static char *Envir( const char *var, int *STATUS ){
 /*
 *  Name:
 *     Envir
@@ -305,7 +305,7 @@ char *Envir( const char *var, int *STATUS ){
    return ret;
 }
 
-void SetVar( Tcl_Interp *interp,  char *name,  char *value, 
+static void SetVar( Tcl_Interp *interp,  char *name,  char *value, 
              int flags, int *STATUS ){
 /*
 *  Name:
@@ -336,7 +336,7 @@ void SetVar( Tcl_Interp *interp,  char *name,  char *value,
    }
 }
 
-const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STATUS ){
+static const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STATUS ){
 /*
 *  Name:
 *     GetVar
@@ -371,7 +371,7 @@ const char *GetVar( Tcl_Interp *interp,  char *name,  int flags, int *STATUS ){
 
 }
 
-void SetSVar( Tcl_Interp *interp, const char *var, const char *string, 
+static void SetSVar( Tcl_Interp *interp, const char *var, const char *string, 
                int len, int *STATUS ) {
 /*
 *  Name:
@@ -431,7 +431,7 @@ void SetSVar( Tcl_Interp *interp, const char *var, const char *string,
 
 }
 
-void GetSVar( Tcl_Interp *interp, const char *var, char *string, 
+static void GetSVar( Tcl_Interp *interp, const char *var, char *string, 
               int len, int *STATUS ) {
 /*
 *  Name:
@@ -480,7 +480,7 @@ void GetSVar( Tcl_Interp *interp, const char *var, char *string,
 
 }
 
-void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
+static void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
 /*
 *  Name:
 *     SetIVar
@@ -515,7 +515,7 @@ void SetIVar( Tcl_Interp *interp, const char *var, int val, int *STATUS ) {
 
 }
 
-void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
+static void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
 /*
 *  Name:
 *     SetRVar
@@ -549,7 +549,7 @@ void SetRVar( Tcl_Interp *interp, const char *var, float val, int *STATUS ) {
 
 }
 
-void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
+static void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     SetLVar
@@ -583,7 +583,7 @@ void SetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS 
 
 }
 
-void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
+static void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS ) {
 /*
 *  Name:
 *     GetLVar
@@ -621,7 +621,7 @@ void GetLVar( Tcl_Interp *interp, const char *var, LOGICAL(valptr), int *STATUS 
    }
 }
 
-void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) {
+static void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetRVar
@@ -663,7 +663,7 @@ void GetRVar( Tcl_Interp *interp, const char *var, float *valptr, int *STATUS ) 
    }
 }
 
-void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
+static void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
 /*
 *  Name:
 *     GetIVar
@@ -706,7 +706,7 @@ void GetIVar( Tcl_Interp *interp, const char *var, int *valptr, int *STATUS ) {
 }
 
 
-void sink( const char *text ){
+static void sink( const char *text ){
 /* Sink function for use with astChannel. */
    if( fd && text ) fprintf( fd, "%s\n", text );
 }
