@@ -43,7 +43,8 @@
 #
 #     To use this class create an object with the imagename, then use
 #     its methods to get fully qualified names (which are understood by
-#     rtdimage), slices, paths and disk file names
+#     rtdimage), slices, paths and disk file names. ADAM tasks should
+#     use the "ndfname" method.
 
 #  Invocations:
 #
@@ -71,12 +72,14 @@
 #     This object inherits no other classes.
 
 #  Authors:
-#     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     PWD: Peter Draper (STARLINK - Durham University)
 #     {enter_new_authors_here}
 
 #  History:
-#     26-AUG-1999 (PDRAPER):
+#     26-AUG-1999 (PWD):
 #        Original version.
+#     14-JUL-2000 (PWD):
+#        Added support for FITS extensions ([1] etc.).
 #     {enter_further_changes_here}
 
 #-
@@ -119,9 +122,14 @@ itcl::class gaia::GaiaImageName {
       return $slice_
    }
 
-   #  Get the FITS extension number.
+   #  Get the FITS extension.
    public method fitsext {} {
       return $fitsext_
+   }
+
+   #  Get the FITS extension number.
+   public method fitshdunum {} {
+      return $fitshdu_
    }
 
    #  Get the HDS path.
@@ -135,18 +143,28 @@ itcl::class gaia::GaiaImageName {
    }
 
    #  Get the filename as used by Starlink applications. This is the
-   #  fullname without the ".sdf".
+   #  fullname without the ".sdf". Note we need single quotes to get
+   #  any FITS extensions out to ADAM tasks. Also FITS files with
+   #  extensions use a different numbering scheme.
    public method ndfname {} {
-      if { $type_ == ".sdf" } { 
+      if { $type_ == ".sdf" } {
 	 set i1 [string first {.sdf} $fullname_]
-	 if { $i1 > -1 } { 
+	 if { $i1 > -1 } {
 	    incr i1 -1
-	    if { [regsub {.sdf} $fullname_ "" name] } { 
+	    if { [regsub {.sdf} $fullname_ "" name] } {
 	       return $name
 	    }
 	 }
-      } 
-      return $fullname_
+      }
+
+      #  Foreign format. If this is FITS with extension then need to
+      #  decrement the extension number (from Skycat HDU count). Always
+      #  return these in single quotes to protect special characters.
+      if { $fitshdu_ != 0 } { 
+         set extnum [expr $fitshdu_ -1]
+         return "'$diskfile_$slice_\[$extnum\]'"
+      }
+      return "'$fullname_'"
    }
 
    #  Check if diskfile exists, is readable and a plain file.
@@ -197,25 +215,34 @@ itcl::class gaia::GaiaImageName {
       }
    }
 
-   #  Get any FITS extension information from the image name.
+   #  Get any FITS extension information from the image name. Extract
+   #  the extension number as we need to decrement this for FITS files 
+   #  that are to be processed by CONVERT & NDF (these use 1 for the
+   #  first extension, not 2 as in Skycat).
    protected method get_fitsext_ {} {
       set i1 [string last {[} $imagename]
       set i2  [string last {]} $imagename]
       if { $i1 > -1 && $i2 > -1 } {
 	 set fitsext_ [string range $imagename $i1 $i2]
+         set fitshdu_ [string range $imagename [incr i1] [incr i2 -1]]
       } else {
 	 set fitsext_ ""
       }
    }
 
-   #  Get the file type. This is the string after the first "."
-   #  in the string after the last directory separator. If no type is
-   #  given then it defaults to ".sdf".
+   #  Get the file type. This is the string (minus any FITS extension)
+   #  after the first "."  in the string after the last directory
+   #  separator. If no type is given then it defaults to ".sdf".
    protected method get_type_ {} {
       set tail [file tail $imagename]
       set i1 [string first {.} $tail]
       if { $i1 > -1 } {
-	 set type_ [string range $tail $i1 end]
+         if { $fitsext_ != {} } { 
+            set i2 [expr [string first $fitsext_ $tail] -1]
+            set type_ [string range $tail $i1 $i2]
+         } else {
+            set type_ [string range $tail $i1 end]
+         }
       } else {
 	 set type_ ".sdf"
       }
@@ -245,7 +272,7 @@ itcl::class gaia::GaiaImageName {
       set i1 [string first $type_ $imagename]
       if { $i1 > -1 } {
 	 incr i1 -1
-	 set diskfile_ "[string range $imagename 0 $i1]$type_$fitsext_"
+	 set diskfile_ "[string range $imagename 0 $i1]$type_"
       } else {
 
 	 #  Type not in imagename, so fallback to path_.
@@ -254,7 +281,7 @@ itcl::class gaia::GaiaImageName {
 	    incr i1 -1
 	    set diskfile_ "[string range $imagename 0 $i1]$type_"
 	 } else {
-	    
+
 	    #  No type or path, so name must be complete, just remove
 	    #  slice.
 	    if { $slice_ != {} } {
@@ -267,7 +294,7 @@ itcl::class gaia::GaiaImageName {
       }
    }
 
-   #  Construct the full name from the various parts.
+   #  Construct the full name from the various parts. 
    protected method get_fullname_ {} {
       set fullname_ "$diskfile_$path_$slice_$fitsext_"
    }
@@ -285,10 +312,10 @@ itcl::class gaia::GaiaImageName {
 	    set i2 end
 	 }
 	 set path_ [string range $type_ $i1 $i2]
-	 
+
       } else {
 
-	 #  No ".sdf", so assume what looks like a file extension is a 
+	 #  No ".sdf", so assume what looks like a file extension is a
 	 #  path.
 	 if { $slice_ != {} } {
 	    set i2 [expr [string first $slice_ $type_]-1]
@@ -306,6 +333,7 @@ itcl::class gaia::GaiaImageName {
       set diskfile_ {}
       set slice_ {}
       set fitsext_ {}
+      set fitshdu_ 0
       set path_ {}
       set type_ {.sdf}
    }
@@ -334,6 +362,9 @@ itcl::class gaia::GaiaImageName {
 
    #  FITS extension specification ([int]).
    protected variable fitsext_ {}
+
+   #  HDU number of FITS extension.
+   protected variable fitshdu_ 0
 
    #  HDS path
    protected variable path_ {}

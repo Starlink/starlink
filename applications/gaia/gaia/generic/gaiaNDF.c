@@ -1,4 +1,4 @@
-/*
+/*+
  *   Name:
  *      gaiaNDF
  *
@@ -33,6 +33,7 @@
  *      12-JAN-2000
  *         Added changes for "HDU" support.
  *      {enter_changes_here}
+ *-
  */
 
 #include <stdio.h>
@@ -130,6 +131,8 @@ static void datIndex( const char *loc1, int index, char *loc2,
                       int *status );
 
 static void datClone( const char *loc1, char *loc2, int *status );
+
+static void hdsShow( const char *name, int *status );
 
 static char *errMessage( int *status );
 
@@ -320,7 +323,13 @@ int gaiaFreeNDF( int ndfid )
    }
 
    /* Free the NDF */
+   printf( "Before annul\n");
+   hdsShow( "LOCATORS", &status );
+   hdsShow( "FILES", &status );
    ndfAnnul( &ndfid, &status );
+   printf( "After annul\n");
+   hdsShow( "LOCATORS", &status );
+   hdsShow( "FILES", &status );
    if ( status != SAI__OK ) {
       emsAnnul( &status );
    }
@@ -695,6 +704,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
          emsAnnul( &status );
          datClone( tmploc, baseloc, &status );
       }
+      printf( "1\n" );
+      hdsShow( "LOCATORS", &status );
+      hdsShow( "FILES", &status );
    } else {
 
       /*  May just be a HDS container name with NDFs at this level. Need
@@ -744,6 +756,9 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
        *  No slice for plain top-level.
        */
       slice[0] = '\0';
+      printf( "2\n" );
+      hdsShow( "LOCATORS", &status );
+      hdsShow( "FILES", &status );
    }
    if ( status == SAI__OK ) {
 
@@ -776,38 +791,51 @@ int gaiaInitMNDF( const char *name, void **handle, char **error_mess )
 
          /*  Attempt to open NDF to see if it exists (could check for
              DATA_ARRAY component) */
+         printf( "2.5\n" );
+         hdsShow( "LOCATORS", &status );
+         hdsShow( "FILES", &status );
          if ( gaiaAccessNDF( ndffile, &type, &width, &height, &header, &hlen,
-                            &ndfid, &emess ) ) {
-
-            /*  Check that this isn't the base NDF by another name */
-            if ( ndfid != 0 && baseid != 0 ) {
-               ndfSame( baseid, ndfid, &same, &isect, &status );
-            } else {
-               same = 0;
-            }
-            if ( ! same ) {
-               /*  NDF exists so add its details to the list of NDFs */
-               newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
-               if ( first ) {
-                  if ( head ) {
-                     head->next = newstate;
-                  } else {
-                     head = newstate;
-                  }
-                  first = 0;
-               } else {
-                  state->next = newstate;
-               }
-               state = newstate;
-               setState( state, ndfid, path, type, width, height, header,
-                         hlen, &status );
-            }
+                             &ndfid, &emess ) ) {
+             
+             /*  Check that this isn't the base NDF by another name */
+             if ( ndfid != 0 && baseid != 0 ) {
+                 ndfSame( baseid, ndfid, &same, &isect, &status );
+             } else {
+                 same = 0;
+             }
+             if ( ! same ) {
+                 /*  NDF exists so add its details to the list of NDFs */
+                 newstate = (NDFinfo *) malloc( sizeof( NDFinfo ) );
+                 if ( first ) {
+                     if ( head ) {
+                         head->next = newstate;
+                     } else {
+                         head = newstate;
+                     }
+                     first = 0;
+                 } else {
+                     state->next = newstate;
+                 }
+                 state = newstate;
+                 setState( state, ndfid, path, type, width, height, header,
+                           hlen, &status );
+             }
          }
+         printf( "3\n" );
+         hdsShow( "LOCATORS", &status );
+         hdsShow( "FILES", &status );
+         datAnnul( newloc, &status );
+         printf( "4\n" );
+         hdsShow( "LOCATORS", &status );
+         hdsShow( "FILES", &status );
       }
 
       /*  Release locators */
       datAnnul( baseloc, &status );
       datAnnul( tmploc, &status );
+      printf( "5\n" );
+      hdsShow( "LOCATORS", &status );
+      hdsShow( "FILES", &status );
    } else {
 
       /*  Initialisation failed (no such NDF, or container file/path
@@ -1022,7 +1050,7 @@ void gaiaReleaseMNDF( const void *handle )
 {
    NDFinfo *current = (NDFinfo *) handle;
    if ( current ) {
-      for ( ; current->next; current = current->next ) {
+      for ( ; current; current = current->next ) {
          gaiaFreeNDF( current->ndfid );
 
          /*  Free the headers that remain allocated for each query */
@@ -1392,5 +1420,27 @@ static void datClone( const char *loc1, char *loc2, int *status )
 
    F77_IMPORT_LOCATOR( floc2, loc2 );
    F77_IMPORT_INTEGER( fstatus, *status );
+   return;
+}
+
+extern void F77_EXTERNAL_NAME( hds_show )(
+   CHARACTER( fname ),
+   INTEGER( fstatus )
+   TRAIL( fname ) );
+
+static void hdsShow( const char *name, int *status )
+{
+   DECLARE_CHARACTER_DYN(fname);
+   DECLARE_INTEGER(fstatus);
+
+   F77_CREATE_CHARACTER( fname, strlen( name ) );
+   F77_EXPORT_CHARACTER( name, fname, fname_length );
+   F77_EXPORT_INTEGER( *status, fstatus );
+
+   F77_CALL( hds_show )( CHARACTER_ARG( fname ),
+                         INTEGER_ARG( &fstatus )
+                         TRAIL_ARG( fname ) );
+
+   F77_FREE_CHARACTER( fname );
    return;
 }

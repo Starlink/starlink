@@ -491,7 +491,6 @@ itcl::class gaia::GaiaArd {
          }
 
          #  Get the name of the current image.
-         #set image [$itk_option(-rtdimage) cget -file]
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
@@ -505,8 +504,9 @@ itcl::class gaia::GaiaArd {
             #  And ARDSTAT on the image and file.
             blt::busy hold $w_
             update idletasks
-            $ardstat_ runwith in=$image simple=f \
-               oneline=t region=^${tmpfile_}
+            puts "image = $image"
+            $ardstat_ runwiths \
+               "in=$image simple=f oneline=t region=^${tmpfile_}"
 
          } else {
             error_dialog "No image is displayed"
@@ -592,7 +592,7 @@ itcl::class gaia::GaiaArd {
 
             #  And run ARDMASK on the image and file.
             blt::busy hold $w_
-            $ardmask_ runwith in=$image ardfile=$tmpfile_ out=$tmpimage_
+            $ardmask_ runwiths "in=$image ardfile=$tmpfile_ out=$tmpimage_"
          } else {
             error_dialog "No image is displayed"
          }
@@ -652,7 +652,7 @@ itcl::class gaia::GaiaArd {
 
               #  And run ARDMASK on the image and file.
               blt::busy hold $w_
-              $ardmask_ runwith in=$image ardfile=$tmpfile_ out=$tmpimage_
+              $ardmask_ runwiths "in=$image ardfile=$tmpfile_ out=$tmpimage_"
 	   } else {
               error_dialog "No image is displayed"
 	   }
@@ -691,7 +691,7 @@ itcl::class gaia::GaiaArd {
 
          #  And run autocrop on the image and file.
          blt::busy hold $w_
-         $autocrop_ runwith in=$image out=$tmpimage_
+         $autocrop_ runwiths "in=$image out=$tmpimage_"
       } else {
          error_dialog "No image is displayed"
       }

@@ -162,8 +162,14 @@
       END IF
 
 *  Attempt to open the NDF.
+      WRITE(*,*)'RTD_RDNDF 1:'
+      CALL HDS_SHOW( 'FILES', SAI__OK )
+      CALL HDS_SHOW( 'LOCATORS', SAI__OK )
       CALL NDF_OPEN( DAT__ROOT, NAME( :IAT ), 'READ', 'OLD', ID,
      :               PLACE, STATUS )
+      WRITE(*,*)'RTD_RDNDF 2:'
+      CALL HDS_SHOW( 'FILES', SAI__OK )
+      CALL HDS_SHOW( 'LOCATORS', SAI__OK )
       IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  Get the size of the NDF.

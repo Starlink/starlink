@@ -364,6 +364,7 @@
      :                             STATUS )
                END IF
             END IF
+            CALL DAT_ANNUL( FTLOCI, STATUS )
          END DO
 
 *  Deal with rotated axes.
@@ -400,9 +401,11 @@
                      CALL RTD1_WRCRD( FITSTR, IPHEAD, NHEAD, AVAIL, 
      :                                STATUS )
                   END IF
+                  CALL DAT_ANNUL( FTLOCI, STATUS )
                END DO
             END IF
          END DO      
+         CALL DAT_ANNUL( FTLOC, STATUS )
       END IF
 
   999 CONTINUE

@@ -451,11 +451,8 @@ int astGLine( int n, const float *x, const float *y ) {
   double *xlines;
   double *ylines;
   int npoints;
-  int have;
   int i;
   int j;
-  int need;
-  int used;
 
   if ( Interp == NULL ) {
     astError( AST__GRFER, "astGLine: Tk graphics system not initialised\n");

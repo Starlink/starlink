@@ -76,7 +76,6 @@ int gaiaAccessCat( const char *filename, int *catid, char **error_mess )
 {
   DECLARE_CHARACTER(name,132);      /* Local copy of filename (F77) */
   DECLARE_INTEGER(status);          /* Global status */
-  DECLARE_POINTER(charPtr);         /* Pointer to F77 character array */
   DECLARE_CHARACTER(state,5);       /* State of catalogue */
   DECLARE_CHARACTER(mode,5);        /* Access mode */
   char *opStr;
@@ -189,7 +188,6 @@ int gaiaReadCat( int catId, char **tabData, char **error_mess )
   char *opStr;
   char *opPtr;
   int used, i, j, errcount;
-  int need;
   char param[EMS__SZPAR];
 
   /* Access the catalogue, returning it as a tab table */

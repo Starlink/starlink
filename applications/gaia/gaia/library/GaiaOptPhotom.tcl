@@ -650,14 +650,14 @@ itcl::class gaia::GaiaOptPhotom {
                blt::busy hold $w_
                update idletasks
                catch {file delete GaiaPhotomOut.Dat}
-               eval $autophotom_ runwith \
-                  in=$image \
-                  infile=GaiaPhotomIn.Dat \
-                  outfile=GaiaPhotomOut.Dat \
-                  optima=true \
-                  skymag=$skymag_ \
-                  usemags=$ok \
-                  $more
+               $autophotom_ runwiths \
+                  "in=$image \
+                   infile=GaiaPhotomIn.Dat \
+                   outfile=GaiaPhotomOut.Dat \
+                   optima=true \
+                   skymag=$skymag_ \
+                   usemags=$ok \
+                  $more"
             } else {
                error_dialog "No image is displayed"
             }

@@ -2101,17 +2101,20 @@ itcl::class gaia::GaiaSextractor {
          #  Get name of the image we need to use for measuring. We
          #  also need the detection image, which is the displayed
          #  image by default.
-         #set image [$itk_option(-rtdimage) cget -file]
          set image [$itk_option(-rtdimage) fullname]
          if { $image != "" } {
 	    $namer_ configure -imagename $image
 	    set image [$namer_ ndfname]
+            set diskimage [$namer_ diskfile]
+
             set detect $values_($this,detname)
             if { $detect != "" && $detect != "NONE" } {
 	       $namer_ configure -imagename $detect
 	       set detect [$namer_ ndfname]
+               set diskdetect [$namer_ diskfile]
             } else {
                set detect ""
+               set diskdetect ""
             }
 
 	    #  Set the command to run when measurements are available.
@@ -2120,10 +2123,9 @@ itcl::class gaia::GaiaSextractor {
 	    }
 
             #  And run the application as required. Note NDFs cannot
-            #  be processed by native version.
-	    set ext [string tolower [$namer_ type]]
-            if { $native && ( $ext == ".fits" || $ext == ".fit" ) } {
-
+            #  be processed by native version, nor can FITS not stored 
+            #  in the primary extension.
+            if { $native && [native_ok_] } {
                busy {
                   #  Establish a control object for this foreign task,
                   #  if not already done.
@@ -2145,11 +2147,11 @@ itcl::class gaia::GaiaSextractor {
                   #  Run program, monitoring output...
                   if { $detect == "" } {
                      catch {$foreign_sex_ runwith \
-                               -c $values_($this,conpar) $image } msg
+                               -c $values_($this,conpar) $diskimage } msg
                   } else {
                      catch {$foreign_sex_ runwith \
                                -c $values_($this,conpar) \
-                               $detect,$image } msg
+                               $diskdetect,$diskimage } msg
                   }
 
                   #  Now display the catalogue overlaid on the image.
@@ -2176,9 +2178,9 @@ itcl::class gaia::GaiaSextractor {
 
                #  Run program, monitoring output...
                if { $detect == "" } {
-                  $star_sex_ runwith \
-                     config=$values_($this,conpar) image=$image \
-                     reset accept
+                  $star_sex_ runwiths \
+                     "config=$values_($this,conpar) image=$image \
+                      reset accept"
                } else {
                   $star_sex_ runwiths \
                      "config=$values_($this,conpar) \
@@ -2208,6 +2210,19 @@ itcl::class gaia::GaiaSextractor {
       regsub -all "\[\033\]" $output {} output
       regsub -all {\[1A|\[1M>} $output {} output
       return $output
+   }
+
+   #  Determine if the native version SExtractor could process the
+   #  current image. This means that the file must be fits (not a
+   #  compressed form) and must be the primary HDU.
+   protected method native_ok_ {} {
+      set ext [string tolower [$namer_ type]]
+      set hdunum [$itk_option(-rtdimage) hdu]
+      if { ( $ext == ".fit" || $ext == ".fits" ) && $hdunum <= 1 } {
+         return 1
+      } else {
+         return 0
+      }
    }
 
    #  Display a named catalogue in the local catalogue window that is
