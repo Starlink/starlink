@@ -260,9 +260,6 @@ postamble.  Useful in conjunction with the <code>-Qf</code>
 option.  If this option is present, then the program returns non-zero
 if any fonts were missing.
 
-<dt><code/-nf>
-<dd>Do process the DVI file, but switch off font generation.
-
 <dt><code>-o output</code>
 <dd>Choose the output filename pattern.  The value is a 
 `printf' formatting string, with a single <code>%d</code>
