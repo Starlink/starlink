@@ -23,29 +23,390 @@ $Id$
     (literal "Routine list"))
   (element codecollection
     (make-section-reference
-     set-prefix: (literal (number->string (child-number)) " ")
+     ;set-prefix: (literal (number->string (child-number)) " ")
+     set-prefix: (literal "")
      title: (with-mode routine-ref-get-reference
 	      (process-codecollection (attribute-string (normalize "doc")))))))
 
 
 ;; Routinelist is simple
+;(element routinelist
+;  ($latex-section$ "section"))
 (element routinelist
-  ($latex-section$ "section"))
+  (process-children))
 
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
 ;; document.  We have to do it rather more by hand, therefore.
 ;; Don't yet support the `includeonly' attribute.
 (element codecollection
+  (let* ((parent-sect (ancestor-member (current-node)
+				       '("sect" "subsect"
+					 "subsubsect" "subsubsubsect")))
+	 ;; Set this-sect-str to a pair of LaTeX sectioning commands
+	 ;; respectively one and two levels below the parent-sect, if
+	 ;; available.  The `article' sequence is section, subsection,
+	 ;; subsubsection, paragraph, subparagraph
+	 (this-sect-str
+	  (if (node-list-empty? parent-sect)
+	      (error "codecollection is not in a section!")
+	      (case (gi parent-sect)
+		(("subsubsubsect")
+		 (cons "subparagraph" "subparagraph"))
+		(("subsubsect")
+		 (cons "paragraph" "subparagraph"))
+		(("subsect")
+		 (cons "subsubsection" "paragraph"))
+		(("sect")
+		 (cons "subsection" "subsubsection"))
+		(else
+		 (error "codecollection has impossible sectioning!"))))))
   (make sequence
-    ($latex-section$ "section" children: #f) ;don't process children
-    (with-mode routine-ref
-      (process-codecollection (attribute-string (normalize "doc"))))))
+    ($latex-section$ (car this-sect-str) children: #f) ;don't process children
+    (make fi
+      data: (string-append "\\def\\routinesubsectlevel{"
+			   (cdr this-sect-str) "}"))
+    (with-mode routine-ref-sst
+      (process-codecollection (attribute-string (normalize "doc")))))))
 
 (define (process-codecollection docent)
   (let ((docelem (document-element-from-entity docent)))
       (process-node-list docelem)))
 
+; (define (process-authorlist nl)
+;   (let* ((first-author (attribute-string (normalize "id")
+; 					 (node-list-first nl)))
+; 	 (alist (node-list-filter
+; 		 (lambda (snl)
+; 		   (string=? first-author
+; 			     (attribute-string (normalize "id")
+; 					       snl)))
+; 		 nl))
+; 	 (remainder (node-list-difference nl alist)))
+;     (make sequence
+;       (process-node-list (node-list-first alist))
+;       (if (node-list-empty? remainder)
+; 	  (empty-sosofo)
+; 	  (process-authorlist remainder)))))
+
+;; Process a list consisting of all the "author" elements in the
+;; programcode document.  Split the author list into those with the
+;; same ID as the first author, and those with a different ID: call
+;; process-one-author on the first set, and call process-authorlist
+;; again on the second.
+(define (process-authorlist nl)
+  (if (node-list-empty? nl)
+      (empty-sosofo)
+      (let* ((first-author (attribute-string (normalize "id")
+					     (node-list-first nl)))
+	     (alists (let loop ((anl nl)
+				(thisaut (empty-node-list))
+				(otherauts (empty-node-list)))
+		       (if (node-list-empty? anl)
+			   (cons thisaut otherauts)
+			   (if (string=?
+				first-author
+				(attribute-string (normalize "id")
+						  (node-list-first anl)))
+			       (loop (node-list-rest anl)
+				     (node-list thisaut (node-list-first anl))
+				     otherauts)
+			       (loop (node-list-rest anl)
+				     thisaut
+				     (node-list otherauts
+						(node-list-first anl))))))))
+	(make sequence
+	  (process-one-author (car alists))
+	  (process-authorlist (cdr alists))))))
+
+;; Process a single-author node-list.  Collect the relevant
+;; information from the nodes in the list.  Use the first attribute
+;; present, and don't check or warn if the information is
+;; inconsistent.
+;;
+;; The processing here is less sophisticated than it could be, as
+;; there's no real cross-referencing between individual author
+;; elements and the aggregate information.
+(define (process-one-author nl)
+  (let ((autprops (let loop ((auts nl)
+			     (name #f)
+			     (aff #f)
+			     (email #f)
+			     (web #f))
+		    (if (or (node-list-empty? auts)
+			    (and name aff email web))
+			(list name aff email web)
+			(let ((aut (node-list-first auts)))
+			  (loop (node-list-rest auts)
+				(or name
+				    (data aut))
+				(or aff
+				    (attribute-string (normalize "affiliation")
+						      aut))
+				(or email
+				    (attribute-string (normalize "email")
+						      aut))
+				(or web
+				    (attribute-string (normalize "webpage")
+						      aut))))))))
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: `(,(string-append "?"
+					  (or (car autprops)
+					      "Mystery programmer"))))
+      (if (cadr autprops)
+	  (literal (string-append " (" (cadr autprops) ")"))
+	  (empty-sosofo))
+      (if (caddr autprops)
+	  (literal (string-append " Email: " (caddr autprops) "."))
+	  (empty-sosofo))
+      (if (cadddr autprops)
+	  (make sequence
+	    (literal " URL: ")
+	    (make command name: "Code"
+		  (literal (string-append "<" (cadddr autprops) ">"))))
+	  (empty-sosofo)))))
+
+(mode routine-ref-sst
+  (element docblock
+    (let ((allauthors (select-elements
+		       (descendants (parent (current-node)))
+		       (normalize "author"))))
+      ;; docblock always has a title element, but this is suppressed in
+      ;; this mode.  If there's _more_ than one element, then other
+      ;; docblock elements are present, so should be put into a
+      ;; description list.
+      (make sequence
+	(if (or (> (node-list-length (children (current-node))) 1)
+		(not (node-list-empty? allauthors)))
+	    (make environment name: "description"
+		  (make sequence
+		    (with-mode docblock
+		      (process-children))
+		    ;; process authors
+		    (if (node-list-empty? allauthors)
+			(empty-sosofo)
+			(make sequence
+			  (make empty-command name: "item"
+				parameters: '("?Authors"))
+			  (make fi data: "\\hbox{}\\hfil\\\\")
+			  (make environment name: "description"
+				(process-authorlist allauthors))))))
+	    (empty-sosofo)))))
+  (element routineprologue
+    (let ((kids (nl-to-pairs (children (current-node)))))
+      (make sequence
+	(make empty-command name: "clearpage")
+	(make environment name: "sstroutine"
+	      ;; takes two parameters: name and purpose
+	      (make sequence
+		(make environment brackets: '("{" "}")
+		      (let ((name (assoc (normalize "routinename") kids)))
+			(if name
+			    (process-node-list (cdr name))
+			    (literal "Unknown name!"))))
+		(make environment brackets: '("{" "}")
+		      (let ((purp (assoc (normalize "purpose") kids)))
+			(if purp
+			    (process-node-list (cdr purp))
+			    (empty-sosofo))))
+		;; environment contents -- description, etc
+		(apply sosofo-append
+		       (map (lambda (gi)
+			      (let ((gi-and-nd (assoc (normalize gi) kids)))
+				(if gi-and-nd
+				    (process-node-list (cdr gi-and-nd))
+				    (empty-sosofo))))
+			    '(;;"routinename"
+			      ;;"purpose"
+			      "moduletype"
+			      "description"
+			      "userkeywords"
+			      "softwarekeywords"
+			      "returnvalue"
+			      "argumentlist"
+			      "parameterlist"
+			      ;;"authorlist"
+			      ;;"history"
+			      "usage"
+			      "invocation"
+			      "examplelist"
+			      "implementationstatus"
+			      "bugs")))
+		;; now collect together the diytopics
+		(apply sosofo-append
+		       (map (lambda (gi-and-nd)
+			      (if (string=? (normalize (car gi-and-nd))
+					    (normalize "diytopic"))
+				  (process-node-list (cdr gi-and-nd))
+				  (empty-sosofo)))
+			    kids)))))))
+  (element routinename
+    (process-children))
+  (element name
+    (make command name: "Code"
+	  (process-children)))
+  (element othernames
+    (let* ((names (children (current-node)))
+	   (namelist (node-list-reduce
+		      names
+		      (lambda (res i)
+			(if (string=? res "")
+			    (data i)
+			    (string-append res ", " (data i))))
+		      "")))
+      (literal (string-append " (also: " namelist ")"))))
+  ;;  (element purpose
+  ;;    (make sequence
+  ;;      (make command name: "textbf"
+  ;;	    (literal "Purpose: "))
+  ;;      (process-children)))
+  (element description
+    (make environment name: "sstdescription"
+	  (process-children)))
+  (element moduletype
+    (make environment name: "sstdiytopic"
+	  parameters: '("Type of Module")
+	  (process-children)))
+  ;;(element userkeywords
+  ;;  (make environment name: "sstdiytopic"
+  ;;  parameters: '("Keywords")
+  ;;  (process-children)))
+  ;;(element softwarekeywords
+  ;;  (make environment name: "sstdiytopic"
+  ;;  parameters: '("Code group")
+  ;;	  (process-children)))
+  (element returnvalue
+    (let ((none-att (attribute-string (normalize "none")))
+	  (type-att (attribute-string (normalize "type"))))
+      (make environment name: "sstreturnedvalue"
+	    (if none-att
+		(make command name: "emph"
+		      (literal "No return value")) ;...and discard any data
+		(process-children)))))
+  (element parameterlist
+    (let ((none-att (attribute-string (normalize "none"))))
+      (make environment name: "sstparameters"
+	    (if none-att
+		(make command name: "sstsubsection"
+		      (literal "No parameters"))
+		(process-children)))))
+  (element argumentlist
+    (let ((none-att (attribute-string (normalize "none"))))
+      (make environment name: "sstarguments"
+	    (if none-att
+		(literal "No arguments")
+		(process-children)))))
+  (element parameter
+    (let* ((kids (children (current-node)))
+	   (name (select-elements kids (normalize "name")))
+	   (type (select-elements kids (normalize "type")))
+	   (desc (select-elements kids (normalize "description")))
+	   ;;(opt-att (attribute-string (normalize "optional")))
+	   (given-att (attribute-string (normalize "given")))
+	   (returned-att (attribute-string (normalize "returned"))))
+      (make sequence
+	(make command name: "sstsubsection"
+	      (make sequence
+		(process-node-list name)
+		(literal "=")
+		(process-node-list type)
+		(literal "("
+			 (cond
+			  ((and given-att returned-att)
+			   "given and returned")
+			  (given-att "given")
+			  (returned-att "returned")
+			  (else		;default is given
+			   "given"))
+			 ")")))
+	(make environment brackets: '("{" "}")
+	      (process-node-list desc)))))
+  (element examplelist
+    (make environment name: "sstexamples"
+	  (process-children)))
+  (element example
+    (make environment name: "sstexamplesubsection"
+	  (make environment name: "quote"
+		(make environment name: "small"
+		      (make environment
+			name: "verbatim"
+			recontrol: "/-/"
+			escape-tex?: #f
+			(process-children))))))
+  ;;(element example
+  ;;  (make environment name: "sstexamplesubsection"
+  ;;  (process-children)))
+  (element examplenote
+    (process-children))
+  (element usage
+    (make environment name: "sstusage"
+	  (process-children)))
+  (element invocation
+    (make environment name: "sstinvocation"
+	  (process-children)))
+  (element implementationstatus
+    (make environment name: "sstimplementationstatus"
+	  (process-children)))
+  (element bugs
+    (make environment name: "sstbugs"
+	  (process-children)))
+  (element diytopic
+    (let ((kids (children (current-node))))
+      (make sequence
+	(make environment name: "sstdiytopic"
+	      parameters: (list (data (node-list-first kids)))
+	      (process-node-list (node-list-rest kids))))))
+  )
+
+(mode docblock
+  (element title			; ignore in this mode -- title
+					; is taken care of by
+					; $latex-section$ in element
+					; codecollection
+    (empty-sosofo))
+  (element description
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: '("?Description"))
+      (process-children)))
+  (element userkeywords
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: '("?User keywords"))
+      (process-children)))
+  (element softwarekeywords
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: '("?Software category"))
+      (process-children)))
+  (element copyright
+    (make sequence
+      (make empty-command name: "item"
+	    parameters: '("?Copyright"))
+      (process-children)))
+  (element history
+    (empty-sosofo))
+  ;; Following works, it's just that I don't want to produce this output.
+;   (element history
+;     (make sequence
+;       (make empty-command name: "item"
+; 	    parameters: '("?History"))
+;       (make environment name: "description"
+; 	    (process-children))))
+;   (element change
+;     (let ((heading (string-append (attribute-string (normalize "date")
+; 						    (current-node))
+; 				  " by "
+; 				  (attribute-string (normalize "author")
+; 						    (current-node)))))
+;       (make sequence
+; 	(make empty-command name: "item"
+; 	      parameters: `(,(string-append "?" heading)))
+; 	(process-children))))
+  )
+
+;;; Simpler routine-ref mode which doesn't use SST.  Very ugly!
 (mode routine-ref
   (element codegroup
     (make sequence
@@ -169,160 +530,6 @@ $Id$
     (empty-sosofo))
   ;;(element misccode
   ;;  (empty-sosofo))
-  )
-
-(mode routine-ref-sst
-  (element routineprologue
-    (let ((kids (nl-to-pairs (children (current-node)))))
-      (make sequence
-	(make command name: "sstroutine"
-	      (let ((name (assoc (normalize "routinename") kids)))
-		(if name
-		    (process-node-list (cdr name))
-		    (literal "Unknown name!"))))
-	(make environment brackets: '("{" "}")
-	      (let ((purp (assoc (normalize "purpose") kids)))
-		(if purp
-		    (process-node-list (cdr purp))
-		    (empty-sosofo))))
-	(make environment brackets: '("{" "}")
-	      (make sequence
-		(apply sosofo-append
-		       (map (lambda (gi)
-			      (let ((gi-and-nd (assoc (normalize gi) kids)))
-				(if gi-and-nd
-				    (process-node-list (cdr gi-and-nd))
-				    (empty-sosofo))))
-			    '(;;"routinename"
-			      ;;"purpose"
-			      "moduletype"
-			      "description"
-			      "userkeywords"
-			      "softwarekeywords"
-			      "returnvalue"
-			      "argumentlist"
-			      "parameterlist"
-			      ;;"authorlist"
-			      ;;"history"
-			      "usage"
-			      "invocation"
-			      "examplelist"
-			      "implementationstatus"
-			      "bugs")))
-		; now collect together the diytopics
-		(apply sosofo-append
-		       (map (lambda (gi-and-nd)
-			      (if (string=? (normalize (car gi-and-nd))
-					    (normalize "diytopic"))
-				  (process-node-list (cdr gi-and-nd))
-				  (empty-sosofo)))
-			    kids)))))))
-  (element routinename
-    (process-children))
-  (element name
-    (make command name: "Code"
-	  (process-children)))
-  (element othernames
-    (let* ((names (children (current-node)))
-	   (namelist (node-list-reduce
-		      names
-		      (lambda (res i)
-			(if (string=? res "")
-			    (data i)
-			    (string-append res ", " (data i))))
-		      "")))
-      (literal (string-append " (also: " namelist ")"))))
-  ;;  (element purpose
-  ;;    (make sequence
-  ;;      (make command name: "textbf"
-  ;;	    (literal "Purpose: "))
-  ;;      (process-children)))
-  (element description
-    (make command name: "sstdescription"
-	  (process-children)))
-  (element moduletype
-    (make command name: "sstdiytopic"
-	  parameters: '("Type of Module")
-	  (process-children)))
-  (element userkeywords
-    (make command name: "sstdiytopic"
-	  parameters: '("Keywords")
-	  (process-children)))
-  (element softwarekeywords
-    (make command name: "sstdiytopic"
-	  parameters: '("Code group")
-	  (process-children)))
-  (element returnvalue
-    (let ((none-att (attribute-string (normalize "none")))
-	  (type-att (attribute-string (normalize "type"))))
-      (make command name: "sstreturnedvalue"
-	    (if none-att
-		(make command name: "emph"
-		      (literal "No return value")) ;...and discard any data
-		(process-children)))))
-  (element parameterlist
-    (let ((none-att (attribute-string (normalize "none"))))
-      (make command name: "sstparameters"
-	    (if none-att
-		(make command name: "sstsubsection"
-		      (literal "No parameters"))
-		(process-children)))))
-  (element argumentlist
-    (let ((none-att (attribute-string (normalize "none"))))
-      (make command name: "sstarguments"
-	    (if none-att
-		(literal "No arguments")
-		(process-children)))))
-  (element parameter
-    (let* ((kids (children (current-node)))
-	   (name (select-elements kids (normalize "name")))
-	   (type (select-elements kids (normalize "type")))
-	   (desc (select-elements kids (normalize "description")))
-	   ;;(opt-att (attribute-string (normalize "optional")))
-	   (given-att (attribute-string (normalize "given")))
-	   (returned-att (attribute-string (normalize "returned"))))
-      (make sequence
-	(make command name: "sstsubsection"
-	      (make sequence
-		(process-node-list name)
-		(literal "=")
-		(process-node-list type)
-		(literal "("
-			 (cond
-			  ((and given-att returned-att)
-			   "given and returned")
-			  (given-att "given")
-			  (returned-att "returned")
-			  (else		;default is given
-			   "given"))
-			 ")")))
-	(make environment brackets: '("{" "}")
-	      (process-node-list desc)))))
-  (element examplelist
-    (make command name: "sstexamples"
-	  (process-children)))
-  (element example
-    (make sequence
-      (make command name: "sstexamplesubsection"
-	    (process-children))))
-  (element usage
-    (make command name: "sstusage"
-	  (process-children)))
-  (element invocation
-    (make command name: "sstinvocation"
-	  (process-children)))
-  (element implementationstatus
-    (make command name: "sstimplementationstatus"
-	  (process-children)))
-  (element bugs
-    (make command name: "sstbugs"
-	  (process-children)))
-  (element diytopic
-    (let ((kids (children (current-node))))
-      (make sequence
-	(make command name: "sstdiytopic"
-	      parameters: (list (data (node-list-first kids)))
-	      (process-node-list (node-list-rest kids))))))
   )
 
 
