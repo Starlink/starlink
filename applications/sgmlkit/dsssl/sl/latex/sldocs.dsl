@@ -31,7 +31,8 @@ stdout, then generates an entity which contains the entire LaTeX file.
 		parameters: '("graphics"))
 	  (make environment name: "document"
 		(process-matching-children 'docinfo)
-		(process-matching-children 'docbody)))))
+		(process-matching-children 'docbody)
+		(make-backmatter)))))
 
 <routine>
 <description>These are the document element types.
