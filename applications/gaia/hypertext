@@ -1,0 +1,8 @@
+#!/bin/csh 
+
+#  Convert Latex SUN214 into hypertext.
+
+setenv HTX_EMAIL '<A HREF="mailto:gaia@star.rl.ac.uk">gaia@star.rl.ac.uk</A>'
+star2html sun214.tex
+tar cvf sun214.htx_tar sun214.htx
+
