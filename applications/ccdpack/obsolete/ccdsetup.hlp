@@ -403,7 +403,7 @@ Notes
      #
      #   Written by pdraper on Wed Sep  6 17:41:54 1995.
      #
-     ADC = 1  ! electrons/ADU
+     ADC = 1  ! Electrons/ADU
      RNOISE = 9.95  ! Nominal readout noise in ADUs
      EXTENT = 6, 119, 1, 128  ! Extent of useful CCD area
      BOUNDS = 1, 5, 120, 128  ! Bounds of bias strips
@@ -419,8 +419,15 @@ Notes
      LOGTO = BOTH  ! Log file information to
      LOGFILE = CCDPACK.LOG  ! Name of logfile
 
-   Note that if you are using CCDPACK Sets, you will need to use
-   a separate restoration file for each INDEX value.
+  If you are using CCDPACK Sets, then some lines of this file
+  may be of the form "setindex,keyword=value"; so this sequence:
+
+     1,RNOISE = 9.80  ! Nominal readout noise in ADUs (Set Index 1)
+     2,RNOISE = 8.65  ! Nominal readout noise in ADUs (Set Index 2)
+     3,RNOISE = 9.10  ! Nominal readout noise in ADUs (Set Index 3)
+
+  would give the different values for each member of each Set of
+  images.
 
 Behaviour_of_parameters
 
