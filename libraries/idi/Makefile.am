@@ -14,6 +14,7 @@ libidi_la_SOURCES = \
 libidi_adam_la_SOURCES = $(ADAM_F_ROUTINES) \
 	$(PRIVATE_INCLUDES)
 
+libidi_adam_la_LIBADD = libidi.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 include_MESSAGES = IDI_ERR idi_err.h
@@ -33,9 +34,9 @@ F_ROUTINES = idi.f ikndummy.f
 
 ADAM_F_ROUTINES = idi_adam.f
 
-C_ROUTINES = idiic.c idiutil.c iig.c iim.c kwm.c idienv.c idilocal.c \
-iic.c iii.c iir.c vdm.c idiextra.c idiother.c iid.c iil.c iiz.c	     \
-vdmdd.c
+C_ROUTINES = idi_gbl.c idiic.c idiutil.c iig.c iim.c kwm.c idienv.c \
+idilocal.c iic.c iii.c iir.c vdm.c idiextra.c idiother.c iid.c iil.c \
+iiz.c	vdmdd.c
 
 BUILT_SOURCES = IDI_ERR idi_err.h
 
@@ -66,7 +67,7 @@ gnsrun_idi_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTR
 
 # no variable idi_test_TASKS -- idi_test is an ATASK
 idi_test_SOURCES = idi_test.f
-idi_test_LDADD = libidi_adam.la libidi.la `ndf_link_adam` `gwm_link_adam` \
+idi_test_LDADD = libidi_adam.la `ndf_link_adam` `gwm_link_adam` \
 `gns_link_adam` `cnf_link_adam` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
 
 
