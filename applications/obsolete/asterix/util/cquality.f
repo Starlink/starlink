@@ -81,7 +81,7 @@
       REAL                   	XC(MX_PTS), YC(MX_PTS) 	! Circular centres
       REAL                   	RC(MX_PTS)             	! Circular radii
 
-      INTEGER                	AXORDER(ADI__MXDIM)     	!
+      INTEGER                	AORDER(ADI__MXDIM)     	!
       INTEGER                	TCPTR, CPTR            	! Pointer to dynamic
 							! array
       INTEGER                	DIMS(ADI__MXDIM)       ! Length of each dimension
@@ -187,8 +187,8 @@
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check axes
-      CALL BDI0_FNDAXC( OFID, 'X', AXORDER(1), STATUS )
-      CALL BDI0_FNDAXC( OFID, 'Y', AXORDER(2), STATUS )
+      CALL BDI0_FNDAXC( OFID, 'X', AORDER(1), STATUS )
+      CALL BDI0_FNDAXC( OFID, 'Y', AORDER(2), STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_ANNUL( STATUS )
         CALL MSG_PRNT( 'Axes are not recognisable as X and Y, '/
