@@ -190,7 +190,8 @@ kpg1_grlm1.f kpg1_grlm2.f kpg1_cpbdd.f kpg1_mixvr.f kpg1_expob.f \
 kpg1_expod.f kpg1_expoi.f kpg1_expor.f kpg1_expoub.f kpg1_expouw.f \
 kpg1_expow.f kpg1_logab.f kpg1_logad.f kpg1_logai.f kpg1_logar.f \
 kpg1_logaub.f kpg1_logauw.f kpg1_logaw.f kpg1_cpbdr.f kpg1_pgclr.f \
-kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f kpg1_pvers.f
+kpg1_pgcls.f kpg1_pgopn.f kpg1_asshr.f kpg1_lutky.f kpg1_pvers.f \
+kpg1_is3d.f kpg1_wtm3d.f kpg1_is3r.f kpg1_wtm3r.f kpg1_orvar.f 
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc log10.cl loge.cl exp10.cl expe.cl \
@@ -429,7 +430,9 @@ kps1_cenaub.f kps1_cenauw.f kps1_cenaw.f kps1_cenbt.f kps1_cenhd.f \
 kps1_censg.f kps1_censh.f kps1_nmplt.f kps1_mlpcp.f kps1_mlplb.f \
 kps1_mlpng.f kps1_mlpcv.f kps1_mlpml.f kps1_mlppn.f kps1_mlpfs.f \
 kps1_mlpmp.f kps1_mlpky.f kps1_mlpnd.f kps1_elmap.f kps1_pswcs.f \
-kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f
+kps1_vect.f kps1_ccmpp.f kps1_ccmqn.f kps1_zpdec.f kps1_glidd.f \
+kps1_gliwd.f kpg1_orvar.f kps1_glibr.f kps1_glibd.f kps1_glidr.f \
+kps1_gliwr.f kps1_gligt.f  
 
 # The contents of the kapview_sub.tar file:
 KAPVIEW_SUB = contour.f contover.f crelut.f cursor.f drawsig.f display.f \
