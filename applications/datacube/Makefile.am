@@ -16,4 +16,4 @@ datacube_mon_LDADD = \
 
 dist_pkgdata_DATA = datacube.news
 
-SUBDIRS = demo help subs tasks
+SUBDIRS = demo help subs tasks sc16 sun237
