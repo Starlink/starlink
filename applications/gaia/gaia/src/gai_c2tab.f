@@ -138,9 +138,10 @@
       INTEGER QI                ! Parameter identifier
       INTEGER SIZEA( 1 )        ! Size of dimension (must be 0)
       INTEGER ULEN              ! Used length of string
+      LOGICAL AREDEG            ! TRUE if world coordinates are already in degrees.
+      LOGICAL HAVSYM            ! TRUE if a symbol description is found
       LOGICAL NULFLG            ! Value is NULL
       LOGICAL PRFDSP            ! Preferential display flag
-      LOGICAL AREDEG            ! TRUE if world coordinates are already in degrees.
 
 *.
 
@@ -161,6 +162,9 @@
 
 *  World coordinates are in degrees by default.
       AREDEG = .TRUE.
+
+*  No symbol if found yet.
+      HAVSYM = .FALSE.
 
 *  Title:
 *  ======
@@ -191,6 +195,7 @@
 *  conversion into CAT (esp CAT/FITS).
          IF ( NAME .EQ. 'SYMBOL' ) THEN 
             NAME = 'symbol'
+            HAVSYM = .TRUE.
          ELSE IF ( NAME .EQ. 'SHORT_NA' ) THEN 
             NAME = 'short_name'
          ELSE IF ( NAME .EQ. 'SERV_TYP' ) THEN 
@@ -286,11 +291,21 @@
       WRITE( FI, '(A)' ) 'dec_col: '// VALUE( :ICUR )
       RACOL = RACOL + 1
       DECCOL = DECCOL + 1
-      IF ( XCOL .NE. 0 .AND. YCOL .NE. 0 ) THEN
+      IF ( XCOL .NE. -1 .AND. YCOL .NE. -1 ) THEN
          CALL CHR_ITOC( XCOL, VALUE, ICUR )
          WRITE( FI, '(A)' ) 'x_col: '// VALUE( :ICUR )
          CALL CHR_ITOC( YCOL, VALUE, ICUR )
          WRITE( FI, '(A)' ) 'y_col: '// VALUE( :ICUR )
+      END IF
+
+*  If no symbol has been found and we have some positional columns 
+*  then add a very simple symbol (a circle of size 4 pixels).
+      IF ( .NOT. HAVSYM .AND. 
+     :     ( ( XCOL .NE. -1 .AND. YCOL .NE. -1 ) .OR. 
+     :       ( RACOL .NE. -1 .AND. DECCOL .NE. -1 ) ) 
+     :   ) THEN
+         WRITE( FI, '(A)' ) 
+     :      'symbol: {} {circle {} {} {} {} {}} {4.0 {}}'
       END IF
 
 *  Now add the column names.
