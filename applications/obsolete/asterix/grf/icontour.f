@@ -112,6 +112,9 @@
             CALL GCB_CANL('SURF_FLAG',STATUS)
             I_CLEAR=.FALSE.
             I_DISP=.TRUE.
+
+            CALL GCB_CACHE(I_CACHE,STATUS)
+
           ENDIF
 
         ENDIF

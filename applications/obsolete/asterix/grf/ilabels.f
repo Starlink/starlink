@@ -63,6 +63,7 @@
 
         CALL GFX_LABELS(' ',' ',STATUS)
 
+        CALL GCB_CACHE(I_CACHE,STATUS)
 
       ENDIF
 

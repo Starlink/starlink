@@ -62,6 +62,8 @@
 
         ENDIF
 
+        CALL GCB_CACHE(I_CACHE,STATUS)
+
       ENDIF
 
       CALL USI_CLOSE()

@@ -134,6 +134,8 @@
           CALL MSG_PRNT('AST_ERR: invalid mode - ^MOD')
         ENDIF
 
+        CALL GCB_CACHE(I_CACHE,STATUS)
+
       ENDIF
 
       CALL USI_CLOSE()
