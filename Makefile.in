@@ -193,8 +193,9 @@ Makefile.dependencies:
 	  (cd buildsupport/starconf/java \
 	      && $(MAKE) GenerateDependencies.class) \
 	  && $(JAVA) -classpath buildsupport/starconf/java \
-	        GenerateDependencies componentset.xml \
-	        >Makefile.dependencies.tmp \
+	        GenerateDependencies \
+	        --makefile=Makefile.dependencies.tmp \
+		componentset.xml \
 	  && mv Makefile.dependencies.tmp $@; \
 	elif test -f $@; then \
 	  touch $@; \
