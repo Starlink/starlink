@@ -38,7 +38,7 @@ dnl   because (a) I already have a perfectly good config.h.in, and
 dnl   (b) it's carefully ordered and documented, in a way that the
 dnl   generated config.h.in isn't.  So disable that step, following
 dnl   <http://mail.gnu.org/archive/html/automake/2003-01/msg00051.html>
-AUTOHEADER="echo autoheader ignored"
+dnl AUTOHEADER="echo autoheader ignored"
 
 
 dnl   Checks for programs.
@@ -52,15 +52,13 @@ AC_LANG([C])
 
 AC_PATH_PROG(PERL, perl)
 
-dnl   Checks for header files.
-AC_CHECK_HEADERS(assert.h unistd.h fcntl.h)
-
-dnl   I don't use HAVE_STDLIB_H, but kpathsea does
-AC_CHECK_HEADERS(stdlib.h)
-
-dnl   Check if we've got sstream.  If not, we'll assume we have the older
-dnl   strstream
-AC_CHECK_HEADERS(sstream)
+dnl   Checks for header files (note unistd.h and stdlib are
+dnl   automatically checked for, and the corresponding HAVE_ macros
+dnl   defined).  Check if we've got sstream; if not, hope we have the
+dnl   older strstream.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(assert.h fcntl.h sys/stat.h sstream strstream)
+AC_HEADER_STAT
 
 dnl   Checks for library functions
 AC_CHECK_FUNCS(pipe snprintf setenv putenv)
@@ -102,7 +100,19 @@ if test -z "$host"; then
 fi
 dnl AC_CANONICAL_HOST
 case "$host" in
-  alpha*) test "$CXX" = "cxx" && AC_DEFINE(__USE_STD_IOSTREAM) ;;
+  alpha*) test "$CXX" = "cxx" && 
+  	  AC_DEFINE(__USE_STD_IOSTREAM,
+		    1,
+		    [The alpha cxx compiler currently (v6.0) needs to
+		    be invoked with __USE_STD_IOSTREAM defined, so
+		    that it uses a standards-conforming streams
+		    library.  See Digital C++ v6.0 manual, section
+		    7.1.2.  This is defined by default when the
+		    compiler is invoked with `-std strict_ansi', but
+		    that's a little harder to arrange in
+		    here. (there's probably a better way of arranging
+		    this...)])
+ 	  ;;
 esac
 
 dnl   use C++ to compile the remaining test programs
@@ -111,7 +121,10 @@ AC_LANG([C++])
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
 AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
 AC_TRY_COMPILE([#include <cstdio>],,
-  AC_DEFINE(HAVE_CSTD_INCLUDE)
+  AC_DEFINE(HAVE_CSTD_INCLUDE,
+	    1,
+	    [Define as 1 if you DO have <cstdio> headers.  Otherwise,
+	    we use <stdio.h> rather than standard <cstdio>])
   AC_MSG_RESULT(yes),
   AC_MSG_RESULT(no))
 
@@ -123,7 +136,14 @@ AC_MSG_CHECKING(whether standard functions are in namespace std)
 AC_TRY_COMPILE([#include <iostream>], [cout << "Hello\n";],
   AC_MSG_RESULT(no),
   AC_TRY_COMPILE([#include <iostream>], [using namespace std;cout<<"Hello\n";],
-    AC_DEFINE(HAVE_STD_NAMESPACE)
+    AC_DEFINE(HAVE_STD_NAMESPACE,
+	      1,
+	      [Related to HAVE_CSTD_INCLUDE: define as 1 if you have
+	      standard functions in the 'std' namespace; that is, if
+	      you need `using namespace std' in order to get to them.
+	      At present, we use this flag to decide if we need to
+	      dump everything into the global namespace; this is not
+	      as elegant as I'd like, but it'll do for now.])
     AC_MSG_RESULT(yes),
     AC_MSG_RESULT(ARGHH -- error compiling)))
 
@@ -169,7 +189,12 @@ if test -n "$extrapath"; then
   fi
   AC_CHECK_HEADER(kpathsea/pathsearch.h,
                   [AC_CHECK_LIB(kpathsea, kpse_find_file,
-                                [AC_DEFINE(ENABLE_KPATHSEA)]
+                                [AC_DEFINE(ENABLE_KPATHSEA,
+				 1,
+	[Define as 1 if you want to enable use of the kpathsea library
+	for font-searching.  The font _generation_ programs (usually)
+	use this library when they work their magic, but that's
+	entirely separate, and controlled only by ENABLE_FONT_GEN.])]
                                 EXTRALO="$EXTRALO kpathsea.lo"
                                 LIBS="$LIBS -lkpathsea"
                                 needfontfinding=0)])
@@ -177,11 +202,19 @@ fi
 
 dnl   Specify an alternative, or additional, font-finding script.
 dnl   This should be expressed as a `font-string template', as
-dnl   described in config.h
+dnl   described in the README
 AC_ARG_WITH(fontfinder,
 [  --with-fontfinder=script  Specify a script to find fonts],
   if test "$withval" != yes -a "$withval" != no; then
-    [AC_DEFINE_UNQUOTED(FONT_SEARCH_SCRIPT, "$withval")]
+    [AC_DEFINE_UNQUOTED(FONT_SEARCH_SCRIPT,
+			"$withval",
+			[Specify a command-line which searches for
+			fonts according to a specification given in
+			its argument list, and returns a single line
+			containing a found font file, or EOF if it
+			can't find anything. It's a `font-string
+			template', as described in the README.  For
+			example: 'kpsewhich %f.%dpk'])]
     needfontfinding=0
   fi)
 
@@ -197,12 +230,28 @@ if test $needfontfinding != 0 -a -n "$ac_cv_path_KPSEWHICH"; then
 fi
 
 
-dnl   --disable-texmfcnf
+dnl --disable-texmfcnf
 if test -n "$ac_cv_path_KPSEWHICH"; then
 AC_ARG_ENABLE(texmfcnf,
 [  --disable-texmfcnf      Disable setting of TEXMFCNF in environment],
   test "$enableval" = "yes" && T=`kpsewhich cnf texmf.cnf`
-  test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"),
+  if test -n "$T"; then
+    AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF,
+		       "`dirname $T`",
+		       [Set DEFAULT_TEXMFCNF to be the location of the
+		       texmf.cnf file which the kpathsea library is to
+		       use.  This will be overridden by a value of
+		       TEXMFCNF set in the program's environment at
+		       run time.  It is not necessary to set this if
+		       the program will be installed alongside the
+		       other dvi-ware (if they use kpathsea), since
+		       the kpathsea library can find its own
+		       configuration file relative to that location.
+		       This affects only the kpathsea font-searching
+		       parts of this program (and so has an effect
+		       only if ENABLE_KPATHSEA is 1), and does not
+		       affect font-generation.])
+  fi,
   T=`kpsewhich cnf texmf.cnf`
   test -n "$T" && AC_DEFINE_UNQUOTED(DEFAULT_TEXMFCNF, "`dirname $T`"))
 fi
@@ -230,7 +279,17 @@ AC_ARG_ENABLE(fontgen,
   elif test "$enableval" = "no"; then
     getFontGenTemplate=false
   else
-    AC_DEFINE_UNQUOTED(FONT_GEN_TEMPLATE, "${enableval}")
+    AC_DEFINE_UNQUOTED(FONT_GEN_TEMPLATE,
+		       "${enableval}",
+		       [Define FONT_GEN_TEMPLATE to be a command which
+		       generates fonts, and returns a single line
+		       giving the name of the generated file.  It's a
+		       `font-string template', as described in the
+		       README.  For example:
+		       '/usr/local/teTeX/bin/mktexpk --dpi %d --bdpi
+		       %b --mag %m --mfmode %M %f' or
+		       '/usr/local/teTeX/bin/MakeTeXPK %f %d %b %m
+		       %M'.  Undefine to disable.])
     getFontGenTemplate=false
   fi,
   getFontGenTemplate=true)
@@ -274,8 +333,19 @@ AC_ARG_WITH(fontgen-mode,
                           Specify mode,res for automatic font gen],
   if test "$withval" != "yes" -q "$withval" != "no"; then
     [eval `echo $withval | awk -F, '{printf "GENMODE=%s GENRES=%s",$1,$2}'`]
-    AC_DEFINE_UNQUOTED(DEFAULT_MFMODE,"$GENMODE")
-    test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,$GENRES)
+    AC_DEFINE_UNQUOTED(DEFAULT_MFMODE,
+		       "$GENMODE",
+		       [Define DEFAULT_MFMODE and DEFAULT_RESOLUTION
+		       to be the default Metafont mode and resolution
+		       which should be used when generating fonts.
+		       These two parameters must be consistent with
+		       each other. For examples, see the file
+		       modes.mf, which is either available as part of
+		       your TeX distribution, or from CTAN.  If not
+		       defined, internal defaults will be used.])
+    test -n "$GENRES" && AC_DEFINE_UNQUOTED(DEFAULT_RESOLUTION,
+					    $GENRES,
+					    [See DEFAULT_MFMODE])
   fi)
 
 
@@ -289,7 +359,22 @@ AC_ARG_ENABLE(fake-progname,
 [  --enable-fake-progname[[=prog]]
                           Have dvi2bitmap lie about its name (see full docs)],
   if test "$enableval" = "yes"
-  then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${XDVI_PATH}")
+  then AC_DEFINE_UNQUOTED(FAKE_PROGNAME,
+			  "${XDVI_PATH}",
+			  [The texmf.cnf file uses the value of
+			  variables SELFAUTO..., and sets these based
+			  on the location of the program's binary.
+			  Some (broken!) configuration files have the
+			  VARTEXFONTS variable depending on these, and
+			  this means that font generation fails unless
+			  the dvi2bitmap program is installed along
+			  with the other dvi-ware binaries.  If you
+			  have such a configuration file, and you
+			  can't or don't want to install the program
+			  with the other dvi-ware, then you can define
+			  this variable to the location of a binary
+			  that is in the `correct' place.  Has an
+			  effect only if ENABLE_KPATHSEA is 1.])
   elif test "$enableval" != "no"
   then AC_DEFINE_UNQUOTED(FAKE_PROGNAME, "${enableval}")
   fi)
@@ -321,7 +406,11 @@ if test -n "$extrapath"; then
   fi
   AC_CHECK_HEADER(png.h,
                   [AC_CHECK_LIB(png, png_libpng_ver,
-                                [AC_DEFINE(ENABLE_PNG)]
+                                [AC_DEFINE(ENABLE_PNG,
+					   1,
+					   [Define as 1 if you want to
+					   enable generation of
+					   PNGs])]
                                 EXTRALO="$EXTRALO PNGBitmap.lo"
                                 LIBS="$LIBS -lpng -lz",
                                 echo "png library not found or too old -- not including PNG support",
@@ -331,7 +420,9 @@ fi
 dnl   Specify support for GIF output
 AC_ARG_ENABLE(gif, 
 [  --enable-gif            Enable output of GIF files],
-  [AC_DEFINE(ENABLE_GIF)]
+  [AC_DEFINE(ENABLE_GIF,
+	     1,
+	     [Define as 1 if you want to enable generation of GIFs])]
   EXTRALO="$EXTRALO GIFBitmap.lo"
   )
 
@@ -339,8 +430,14 @@ AC_ARG_ENABLE(gif,
 dnl   Select path separator characters.  Specify as a pair of
 dnl   characters, first filesystem-path, then search path.  For
 dnl   example, unix would have --with-path-seps=/:
-AC_DEFINE(FSPATH_SEP,'/')
-AC_DEFINE(SRCHPATH_SEP,':')
+AC_DEFINE_UNQUOTED(FSPATH_SEP,
+		   '/',
+		   [Define filesystem path separator: '/' for unix,
+		   and '\' for DOS])
+AC_DEFINE_UNQUOTED(SRCHPATH_SEP,
+		   ':',
+		   [Define search path separator: ':' for unix,
+		   and ';' for DOS])
 AC_ARG_WITH(path-seps,
 [  --with-path-seps=cc     Specify path separators (default --with-path-seps=/:)],
   if test "$withval" != "yes" -q "$withval" != "no"; then
