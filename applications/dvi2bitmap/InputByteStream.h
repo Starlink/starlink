@@ -25,6 +25,9 @@ class InputByteStream {
     signed int getSIU(int);
     signed int getSIS(int);
     unsigned int getUIU(int);
+    // static getUIU reads from an array, rather than the file (ie,
+    // it's really nothing to do with InputByteStream, but it's here
+    // for consistency.
     static unsigned int getUIU(int, const Byte *);
     // retrieve a block from the file.  pos<0 means from end of file.
     const Byte *getBlock (int pos, unsigned int length);
@@ -34,6 +37,7 @@ class InputByteStream {
     static void verbosity (const verbosities level) { verbosity_ = level; }
  private:
     int fd_;
+    string fname_;
     size_t filesize_;
     size_t buflen_;
     Byte *buf_;			// buffer
