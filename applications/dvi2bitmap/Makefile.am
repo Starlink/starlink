@@ -1,6 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = doc test
+## Build this directory before its children (required, since test programs
+## link against ../libdvi2bitmap.la).  This results in the test programs
+## always being built, rather than at 'make check' time, but it appears
+## to be necessary in order for 'make check' and 'make dist' to include
+## the test directory.
+SUBDIRS = . doc test
 
 lib_LTLIBRARIES = libdvi2bitmap.la
 D2BHEADERS = \
