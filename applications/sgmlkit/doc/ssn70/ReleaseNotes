@@ -1,8 +1,7 @@
 <!-- -*- Mode: Text -*- -->
-<!-- 
-  Starlink SGML system, release notes
-  $Id$
--->
+<!-- Starlink SGML system, release notes
+     $Id$
+     -->
 
 <subsect id=release-0.6 export>Release Notes, version DR-0.6
 
@@ -22,9 +21,172 @@ authors.
 stylesheet does not complain in this case, but instead synthesises a
 reference to the RAL document server, as long as the public identifier
 is in the correct format.  Jade still gives a warning in this case
-(which it's not easy to turn off), but it doesn't invalidate the document.
+(which it's not easy to turn off), but it doesn't invalidate the
+document.
+
+<li>There was a minor conflict in the list of hyperlinking
+requirements.  I implemented the requirements that the `top' file in
+the <code/.htx/ directory be <code/index.html/ and that the filenames
+shouldn't include the document name.  However, having
+<code/index.html/ confuses <code/hlink/, which seems to need the file
+to be called <code/sunxxx.html/ (apart from that, <code/hlink/ appears
+to work fine, with no trace of a problem with the slightly eccentric
+format of the Jade output).  I've therefore left it with the top file
+being called <code/sunxxx.html/, so that <code/hlink/ will continue to
+work, 
+
+<li>The SGML declaration was changed in such a way that IDs within the
+document are now case-sensitive.  This could not be done without
+making all the other SGML in the application case-sensitive as well.
+This required substantial reorganisation.
 
 </ul>
+
+<subsubsect>Decisions from 1999 September 24 meeting, Durham
+
+
+<subsubsubsect>Packaging and Installation
+<p><dl compact>
+
+<dt>Multi-platform support deferred.
+<dd>No action required.
+
+<dt>Everything packaged as one lump. Norman and Martin to decide how 
+     to arrange packing details (build, installation).
+<dd><code/dvi2bitmap/ incorporated into package.
+
+<dt>Makefile to support all standard targets.
+<dd>??
+
+<dt>Do not produce document summaries when sgmlstar is installed.
+<dd>Done.
+
+<dt>No documentation processing when standard packages are installed.
+Each package has printable (optional), HTML and SGML.
+<dd>Documentation build at export time.  HTX and &latex; documentation
+included in package, but no SGML.  This is because SGML files can, in
+general, include files from elsewhere, either as simple inclusions (as
+is the case for the DTD documentation in this document), or as
+subdocument references (as is the case for any program source code
+marked up in the programcode DTD.  This makes packaging of the SGML
+source not necessarily trivial.  It can, of course, still be done if
+we feel there's a need for it, but it's not done in the case of this
+package.
+
+</dl>
+
+<subsubsubsect>Running Down Converters 
+<p><dl compact> 
+<dt>Need simple commands <code/sgml2latex/ and <code/sgml2html/
+instead of makefile, leaving no temporary files (even in the event of
+failure), and doing all necessary processing (maths, backmatter, etc).  
+<dd>Done.  Script <code/sgml2docs/ provided.  See notes above.
+
+<dt>All HTML files to go in a <code/.htx/ sub-directory;
+The document name should not be included in the HTML file names;
+The top level HTML file should be <code/index.html/;
+Need shorter names for html files;
+There should be no links within the <code/.htx/ directory.
+<dd>All done.
+
+<dt>Need a fix for line breaks within tags in <code/htx/ index file.
+<dd>??
+<dt>Findme, showme and hlink should all work.
+<dd>??
+
+</dl>
+
+<subsubsubsect>Hyperlinking
+<p><dl>
+<dt>Must be able to process documents which refer to other starlink
+documents which are not available (i.e. allow unresolved FPIs);
+Must function in the absence of some (or all) document summaries;
+In the absence of referenced documents, the URLs referring to the
+unavailable documents should produce standard HTX remote reference 
+to the document server at RAL.
+<dd>Supported, by making the error-handling code much more
+sophisticated.  See above.
+
+<dt>There should be an ID index page at the end of the HTML version,
+containing links back to referenced points within the document. Each
+page should have a link to the start of its entries in the ID index.
+<dd>??
+
+<dt>Keep open the possibility of using document summaries as an option.
+For the moment, we will not generate or distribute such summaries (but 
+we may change this later).
+<dd>Use of document summaries is still the documented way, but I've
+added a note that the public identifier can be unresolved without error.
+
+</dl>
+  
+<subsubsubsect>&latex; Output
+<p><dl>
+<dt>Everyone to pass commented &latex; output to Mark or Norman.
+<dd>Done at meeting.
+
+<dt>Table of contents: move it to the front.
+<dd>??
+
+<dt>Look-and-feel: reproduce original &latex; appearance.
+<dd>??
+
+<dt>Down-converter should have two flags (defaulting to yes) to indicate
+     if each appendix or section should start on a new page.
+<dd>??
+
+<dt>Tables: implement alignment, rules, colspan.
+<dd>??
+
+<dt>Authors should manually replace tabbing environments within &latex;
+documents before running the up-converter. The up-converter should 
+issue a warning if it finds a tabbing environment.
+<dd>??
+
+<dt>Optional inclusion of section headings in table of contents will not
+be supported.
+<dd>No action needed.
+
+<dt>Need increased sloppiness in line wrapping.
+<dd>??
+
+<dt>Verbatim text (displayed only) needs to be a bit smaller.
+<dd>??
+
+</dl>
+
+<subsubsubsect>HTML Appearance
+<p><dl>
+<dt>Look-and-feel: be guided by ease of implementation, but if possible,
+     try to reproduce the current style (for instance, do not specify a
+     background colour).
+<dd>??
+
+<dt>Navigation buttons: retain the system used by <code/latex2html/.
+<dd>??
+
+<dt>Move the abstract off the front page.
+<dd>??
+
+<dt>RAL links should be combined into the CCLRC link.
+<dd>??
+
+<dt>Down-converter should only add the standard copyright statement
+     (available from MJB).
+<dd>??
+
+<dt>Hard copy: retrieve .ps files from RAL server.
+<dd>??
+
+<dt>Section numbers: keep them in the HTML, but slim down their use in
+     the table of contents.
+<dd>??
+
+<dt>Alignment of in-line gifs and bitmaps needs to be corrected.
+<dd>Done
+
+</dl>
+
 
 <subsubsect>Outstanding issues
 
