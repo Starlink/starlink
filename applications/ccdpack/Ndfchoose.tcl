@@ -17,7 +17,7 @@
 
 #  Constructor:
 #
-#     ndfchoose pathname ?options? ndf ndf ?ndf? ...
+#     ndfchoose pathname ndf ndf ?ndf ...? ?options?
 #        An NDF chooser object is constructed in the normal way; apart
 #        from any configuration options, all arguments are existing ndf 
 #        objects which are to form the list amongst which the user can
@@ -209,7 +209,8 @@
 
 #  Construct the NDF area frames.
             itk_component add ndf$slot {
-               frame $itk_component(choosearea).ndf$slot
+               frame $itk_component(choosearea).ndf$slot \
+                  -cursor watch
             }
 
 #  Construct the viewing area frames.
@@ -268,8 +269,7 @@
          eval itk_initialize $args
 
 #  Set a binding to handle window resize events.
-         # This doesn't work yet - partly because of a bug in GWM.
-         # bind $itk_component(choosearea) <Configure> [ code $this winch ]
+         # bind $itk_interior <Configure> [ code $this winch ]
       }
 
 
@@ -429,8 +429,7 @@
                      high=[ lindex $scalevals 1 ] \
                      margin=0 \
                      style=\"drawtitle=0,tickall=1,$displaystyle\" \
-                  " "Displaying ndf [ $ndf name ]" \
-                  $itk_component(plot$index:display)
+                  "
 
 #  It may be a good idea to unmap the NDF here (although it may not).
                $ndf mapped 0
@@ -498,8 +497,10 @@
             set dims ""
             set name ""
             set val ""
+            set domain ""
             if { $isndf } { 
                set name [ $ndf name ]
+               set domain [ $ndf frameatt domain CURRENT ]
                foreach dim [ $ndf bounds ] {
                   append dims "[ lindex $dim 0 ]:[ lindex $dim 1 ] x "
                }
@@ -530,6 +531,7 @@
             set pairs {}
             lappend pairs [ list "Name" $name ]
             lappend pairs [ list "Dimensions" $dims ]
+            lappend pairs [ list "WCS frame" $domain ]
             foreach fh $showfits {
                set key [ lindex $fh 1 ]
                if { $isndf } {
@@ -640,10 +642,16 @@
             set pos "-relx 0.5 -rely 0.5 -anchor center"
          }
          set inview($slot) $item
+         set cursview [ $itk_component(view$slot) cget -cursor ]
+         set cursdescribe [ $itk_component(describe$slot) cget -cursor ]
+         $itk_component(view$slot) configure -cursor watch
+         $itk_component(describe$slot) configure -cursor watch
          eval place [ ndfplotwindow $item ] \
             -in $itk_component(view$slot) $pos
          pack [ ndfinfowindow $item ] \
             -in $itk_component(describe$slot) -anchor w
+         $itk_component(view$slot) configure -cursor $cursview
+         $itk_component(describe$slot) configure -cursor $cursdescribe
          if { [ isvalid ] } {
             $itk_component(gotpair) configure -state normal
          }
@@ -668,13 +676,16 @@
 #-----------------------------------------------------------------------
 #  This method is called if the toplevel window receives a configure
 #  event, which will happen, for instance, if it is resized.
-      #  set thisxwin [ winfo width $itk_interior ]
-      #  set thisywin [ winfo height $itk_interior ]
-      #  set vx [ expr [ lindex $viewport 0 ] + $thisxwin - $lastxwin ]
-      #  set vy [ expr [ lindex $viewport 1 ] + $thisywin - $lastywin ]
-      #  set lastxwin $thisxwin
-      #  set lastywin $thisywin
-      #  configure -viewport [ list $vx $vy ]
+#  If there is now a discrepancy bewteen the size of the container and
+#  the size of the toplevel widget itself, adjust the size of the viewport
+#  so that they match.
+         set vx [ lindex $viewport 0 ]
+         set vy [ lindex $viewport 1 ]
+         incr vx [ expr [ winfo width $itk_interior ] - \
+                        [ winfo reqwidth $itk_component(body) ] ]
+         incr vy [ expr [ winfo height $itk_interior ] - \
+                        [ winfo reqheight $itk_component(body) ] ]
+         configure -viewport [ list $vx $vy ]
       }
 
 
@@ -852,13 +863,22 @@
 #-----------------------------------------------------------------------
       public variable viewport { 400 200 } {
 #-----------------------------------------------------------------------
-#  It ought to be possible to reconfigure viewport so that all the 
-#  NDF windows get drawn at the new size.  Currently this is problematic
-#  because I can't recreate GWM items in the same place without getting
-#  an error.  If this gets sorted out though, what I'll need to do here
-#  is ensure that all the currently existing NDF display windows are
-#  undrawn.
-         # refreshplot all
+#  If the viewport size is changed, then all the windows will need to
+#  be redrawn at the right size.
+         if { $state == "active" && $viewport != $lastvp } {
+            set viewx [ expr [ lindex $viewport 0 ] / 2 ]
+            set viewy [ lindex $viewport 1 ]
+            foreach slot { A B } {
+               $itk_component(view$slot) configure \
+                   -width $viewx -height $viewy
+            }
+            for { set i 0 } { $i < $nndf } { incr i } {
+               $itk_component(image$i) configure \
+                   -width $viewx -height $viewy
+            }
+            refreshplot all
+         }
+         set lastvp $viewport
       }
 
 
@@ -871,7 +891,7 @@
 #-----------------------------------------------------------------------
       public variable displaystyle { } {
 #-----------------------------------------------------------------------
-         # refreshplot all
+         refreshplot all
       }
 
 
@@ -922,7 +942,7 @@
       private variable controls        ;# List of control panel widgets
       private variable highlight       ;# Array by ndf index of highlight state
       private variable inview          ;# Array by slot of viewed NDFs
-      private variable lastviewport { 0 0 }
+      private variable lastvp { 0 0 }  ;# Last value of viewport variable
       private variable lastxwin 0
       private variable lastywin 0
       private variable nndf            ;# Number of NDFs under chooser control
