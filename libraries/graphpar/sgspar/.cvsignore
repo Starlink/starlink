@@ -1,3 +1,5 @@
+starconf.status
+*.ifc
 sgs_test
 sgspar_test
 *.lo

@@ -1,3 +1,5 @@
+starconf.status
+*.ifc
 pgp_test
 pgppar_test
 *.lo
