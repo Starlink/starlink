@@ -26,6 +26,20 @@
 #        have been passed to it.  This method should normally be called 
 #        only after an NDF has been loaded in using loadndf.
 #
+#     addpoint vx vy ?ipoint?
+#        Adds a point at the given view coordinates to the list of
+#        marked points.  If the ipoint parameter is not given then
+#        the index of the new point will be selected in a sensible,
+#        perhaps user-selectable, fashion from unused values.
+#        The return value of this method is the index of the point plotted.
+#           - vx       -- X coordinate of new point in view coordinates
+#           - vy       -- Y coordinate of new point in view coordinates
+#           - ?ipoint? -- Index of new point
+#
+#     clearpoints
+#        Clears the contents of the marked points list, and erases all
+#        the corresponding marked points from the display.
+#
 #     deactivate
 #        After a call to this method, the user may no longer interact
 #        with the widget to add new points.
@@ -36,9 +50,22 @@
 #           - maxcanv  -- If given and non-zero, the GWM widget will not be
 #                         more than maxcanv screen pixels in either direction.
 #
+#     points
+#        Returns a list of currently marked points on the image.
+#        The returned list has one element for each marked point, each
+#        of these elements is of the form {index xpos ypos}.  Xpos and
+#        ypos are in view coordinates.
+#
 #     Ndfview also inherits all the public methods of Gwmview.
 
 #  Public Variables (Configuration Options):
+#
+#     centroiding = boolean
+#        If true, then when the user clicks on the image to add a new 
+#        point, a point will be added at the nearest centroided 
+#        position (in the event of no centroid being found, a beep
+#        will be beeped and no point will be added).  If false, the 
+#        coordinates indicated by the pointer will be used raw.
 #
 #     info = string
 #        Gives a string which will be displayed somewhere in the window
@@ -78,6 +105,10 @@
 #        Original version.
 #     5-APR-2001 (MBT):
 #        Upgraded for use with Sets.
+#     19-JUL-2001 (MBT):
+#        Added centroiding, moved position marking methods into this 
+#        widget from Gwmview (this widget gets a Markercontrol to do 
+#        the work).  Also fixed a troublesome half-pixel alignment bug.
 #-
 
 #  Inheritance.
@@ -96,6 +127,7 @@
       }
 
 #  Add more control groups.
+      addgroup markers Markers
       addgroup style WCS
       addgroup cutoff Cutoff
 
@@ -119,6 +151,20 @@
             -value { 6 94 } \
             -valuevar percentiles
       }
+      itk_component add centroid {
+         checkcontrol $panel.centroid \
+            -label "Centroid" \
+            -value 0 \
+            -valuevar centroiding \
+            -balloonstr "Points will be auto-centroided"
+      }
+      itk_component add marklist {
+         markercontrol $panel.marklist \
+            -canvas $canvas \
+            -view2canvcmd [ code $this view2canv ] \
+            -value "" \
+            -valuevar markstyle
+      } 
       itk_component add abort {
          buttoncontrol $panel.abort \
             -text "Abort" \
@@ -148,6 +194,8 @@
       addcontrol $itk_component(wcsframe) style
       addcontrol $itk_component(dstyle) style
       addcontrol $itk_component(percut) cutoff
+      addcontrol $itk_component(centroid) markers
+      addcontrol $itk_component(marklist) markers
       addcontrol $itk_component(abort) action
 
 #  Switch the positions of the Abort and Exit buttons.
@@ -170,6 +218,9 @@
          pack $win -in $row2 -side left -fill x -expand 1
       }
 
+#  Set component aliases.
+      set marklist $itk_component(marklist)
+
 #  Do requested configuration.
       eval itk_initialize $args
    }
@@ -183,18 +234,30 @@
       public method addpoint { vx vy { ipoint "" } } {
 #-----------------------------------------------------------------------
 
-#  Invoke inherited addpoint method to add the point to the list and draw it.
-         set ipoint [ chain  $vx $vy $ipoint ]
+#  Invoke addpoint method of the marker control widget to add the point 
+#  to the list and draw it.
+         set ipoint [ $marklist addpoint $vx $vy $ipoint ]
       
-#  Set the canvas tag to use for this point.
-         set tag mark$ipoint
-
 #  Add a binding to remove the point from the canvas.
-         $canvas bind $tag <Button-3> [ code $this removepoint $ipoint ]
+         set tag [ $marklist gettag $ipoint ]
+         $canvas bind $tag <Button-3> [ code $marklist removepoint $ipoint ]
 
 #  Return index of added point.
          return $ipoint
       }
+
+#-----------------------------------------------------------------------
+      public method clearpoints {} {
+#-----------------------------------------------------------------------
+         $marklist clearpoints
+      }
+
+#-----------------------------------------------------------------------
+      public method points {} {
+#-----------------------------------------------------------------------
+         return [ $marklist points ]
+      }
+
 
 
 #-----------------------------------------------------------------------
@@ -247,10 +310,10 @@
             set y2 [ lindex [ lindex $bounds 1 ] 1 ]
             set infodata(b) "\[$x1:$x2,$y1:$y2\]"
             set infodata(p) "[ expr $x2 - $x1 + 1 ] x [ expr $y2 - $y1 + 1 ]"
-            set xlo [ expr $x1 - 0.5 ]
-            set xhi [ expr $x2 + 0.5 ]
-            set ylo [ expr $y1 - 0.5 ]
-            set yhi [ expr $y2 + 0.5 ]
+            set xlo [ expr $x1 - 1 ]
+            set xhi [ expr $x2 ]
+            set ylo [ expr $y1 - 1 ]
+            set yhi [ expr $y2 ]
          } else {
             set viewframe CCD_SET
             set infodata(b) ""
@@ -423,7 +486,7 @@
                           $wcsframe [ join $options "," ]
 
 #  Draw any points which have already been selected onto the new display.
-         refreshpoints
+         $marklist refreshpoints
 
 #  Call any inherited 'display' method.
          chain
@@ -438,14 +501,31 @@
 #-----------------------------------------------------------------------
 #  Add a point to the list of marked points, and draw it.
 
-#  Get the coordinates of the point in NDF coordinates.
+#  Get the coordinates of the point in view coordinates.
          set viewpos [ canv2view [ $canvas canvasx $x ] \
                                  [ $canvas canvasy $y ] ]
          set vx [ lindex $viewpos 0 ]
          set vy [ lindex $viewpos 1 ]
 
-#  Add the point to the points list and draw it.
-         addpoint $vx $vy
+#  If required, try to centroid it.
+         if { $centroiding } {
+            if { [ catch { $ndfset centroid $vx $vy $viewframe $zoom } \
+                         accpos ] } {
+
+#  Centroiding failed - beep and take no further action.
+               bell
+            } else {
+
+#  Centroiding succeeded - add the point.
+               set avx [ lindex $accpos 0 ]
+               set avy [ lindex $accpos 1 ]
+               addpoint $avx $avy
+            }
+
+#  No centroiding required - add the point at the coordinates indicated.
+         } else {
+            addpoint $vx $vy
+         }
       }
 
 
@@ -512,6 +592,18 @@
 
 
 #-----------------------------------------------------------------------
+      public variable markstyle {} {
+#-----------------------------------------------------------------------
+      }
+
+
+#-----------------------------------------------------------------------
+      public variable centroiding { 0 } {
+#-----------------------------------------------------------------------
+      }
+
+
+#-----------------------------------------------------------------------
       public variable info "%n (%p)" {
 #-----------------------------------------------------------------------
          if { $status == "active" && $info != "" } {
@@ -551,6 +643,7 @@
       private variable displayed       ;# Array holding latest state of plot
       private variable fullname ""     ;# Full name of NDF or ndfset
       private variable infodata        ;# Array holding substitution string vals
+      private variable marklist ""     ;# Marklist control widget
       private variable ndfset ""       ;# Tcl ndfset object
       private variable shortname ""    ;# Short name of NDF
       private variable viewframe PIXEL ;# View coordinate frame designator
@@ -580,7 +673,6 @@
    proc ndfview { pathname args } {
       uplevel Ndfview $pathname $args
    }
-
 
 
 # $Id$
