@@ -44,7 +44,10 @@
 *-
 
 *    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) THEN
+        BR_K2 = 0.0D0
+        RETURN
+      END IF
 
 *    Different from last time?
       IF ( A .NE. LAST_A ) THEN

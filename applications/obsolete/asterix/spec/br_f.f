@@ -22,7 +22,10 @@
 *-
 
 *    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) THEN
+        BR_F = 0.0D0
+        RETURN
+      END IF
 
       IF(A.LT.75.)THEN
         BR_F = 1.0D0/(4.0D0*A)+3.0D0*BR_K1(A,STATUS)/BR_K0(A,STATUS)

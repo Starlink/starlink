@@ -84,10 +84,13 @@
 *-
 
 *    Check status
-      IF ( STATUS .NE. SAI__OK ) RETURN
+      IF ( STATUS .NE. SAI__OK ) THEN
+        SPEC_BR_EMISS = 0.0D0
+        RETURN
+      END IF
 
-      A=DBLE(ENERGY/(2.0*KT))
-      T=KT/ERM
+      A = DBLE(ENERGY/(2.0*KT))
+      T = KT/ERM
 
       IF ( KT .NE. LAST_KT ) THEN
         SQ_1_T = SQRT(1.0/T)
