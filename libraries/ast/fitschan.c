@@ -2415,8 +2415,10 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          }      
          crota *= AST__DR2D;
 
+/* Use AST__BAD to indicate that CDi_j values shou;ld be produced
+   instead of CROAT/CDELT. (I am told AIPS++ can understand CD matrices) */
       } else {
-         ok = 0;
+         crota = AST__BAD;
       }
 
    } else {
@@ -2532,13 +2534,34 @@ static int AIPSPPFromStore( AstFitsChan *this, FitsStore *store,
          }
       }
 
+/* CD matrix. Multiply the row of the PC matrix by the CDELT value. */
+      if( crota == AST__BAD ) {
+
+         for( i = 0; i < naxis; i++ ) {
+            cdl = GetItem( &(store->cdelt), i, 0, s, NULL, method, class );
+            if( cdl == AST__BAD ) cdl = 1.0;
+       
+            for( j = 0; j < naxis; j++ ){
+               val = GetItem( &(store->pc), i, j, s, NULL, method, class );
+               if( val == AST__BAD ) val = ( i == j ) ? 1.0 : 0.0;
+               val *= cdl;
+
+               if( val != 0.0 ) {
+                   SetValue( this, FormatKey( "CD", i + 1, j + 1, s ), &val, 
+                             AST__FLOAT, "Transformation matrix element" );
+               }
+            }
+         }
+
 /* CROTA */
-      if( axlat != -1 ){
-         SetValue( this, FormatKey( "CROTA", axlat + 1, -1, s ), &crota, 
-                   AST__FLOAT, "Axis rotation" );
-      } else if( ( axspec == -1 && naxis > 1 ) || 
-                 ( axspec != -1 && naxis > 2 ) ) {
-         SetValue( this, "CROTA1", &crota, AST__FLOAT, "Axis rotation" );
+      } else if( crota != 0.0 ) {
+         if( axlat != -1 ){
+            SetValue( this, FormatKey( "CROTA", axlat + 1, -1, s ), &crota, 
+                      AST__FLOAT, "Axis rotation" );
+         } else if( ( axspec == -1 && naxis > 1 ) || 
+                    ( axspec != -1 && naxis > 2 ) ) {
+            SetValue( this, "CROTA1", &crota, AST__FLOAT, "Axis rotation" );
+         }
       }
 
 /* Reference equinox */
@@ -8272,7 +8295,7 @@ static int GetEncoding( AstFitsChan *this ){
 *
 *     1) Any keywords starting with "BEGAST" = Native encoding 
 *     2) Any AIPS spectral CTYPE values:
-*         Any of PCiiijjj, PCi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
+*         Any of CDi_j, PROJP, LONPOLE, LATPOLE = FITS-AIPS++ encoding:
 *         None of the above = FITS-AIPS encoding.
 *     3) Any keywords matching PCiiijjj = FITS-PC encoding
 *     4) Any keywords matching CDiiijjj = FITS-IRAF encoding
@@ -8322,8 +8345,7 @@ static int GetEncoding( AstFitsChan *this ){
 /* Otherwise, if the FitsChan contains any CTYPE keywords which have the
    peculiar form used by AIPS, then use "FITS-AIPS" or "FITS-AIPS++" encoding. */
       } else if( HasAIPSSpecAxis( this, "astGetEncoding", "AstFitsChan" ) ){
-         if( astKeyFields( this, "PC%3d%3d", 0, NULL, NULL ) ||
-             astKeyFields( this, "PC%1d_%1d", 0, NULL, NULL ) ||
+         if( astKeyFields( this, "CD%1d_%1d", 0, NULL, NULL ) ||
              astKeyFields( this, "PROJP%d", 0, NULL, NULL ) ||
              astKeyFields( this, "LONPOLE", 0, NULL, NULL ) ||
              astKeyFields( this, "LATPOLE", 0, NULL, NULL ) ) {
@@ -29213,7 +29235,7 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     - "FITS-AIPS++": Encodes coordinate system information in FITS
 *     header cards using the conventions used by the AIPS++ project.
 *     This is an extension of FITS-AIPS which includes some of the
-*     features of FITS-PC.
+*     features of FITS-IRAF and FITS-PC.
 *
 *     - "NATIVE": Encodes AST Objects in FITS header cards using a
 *     convention which is private to the AST library (but adheres to
@@ -29239,7 +29261,7 @@ f     affects the behaviour of the AST_WRITE and AST_READ routines when
 *     represents a spectral axis using the conventions of the AIPS and
 *     AIPS++ projects (e.g. "FELO-LSR", etc), then one of FITS-AIPS or 
 *     FITS-AIPS++ encoding is used. FITS-AIPS++ is used if any of the
-*     keywords PCiiijjj, PCi_j, PROJP, LONPOLE or LATPOLE are
+*     keywords CDi_j, PROJP, LONPOLE or LATPOLE are
 *     found in the FitsChan. Otherwise FITS-AIPS is used.
 *     - Otherwise, if the FitsChan contains a keyword of the form
 *     "PCiiijjj", where "i" and "j" are single digits, then
@@ -29490,9 +29512,12 @@ f     no data will be written to the FitsChan and AST_WRITE will
 
 *  The FITS-AIPS++ Encoding:
 *     The FITS-AIPS++ encoding is based on the FITS-AIPS encoding, but
-*     includes some features of the FITS-PC encoding. Specifically, any 
-*     celestial projections supported by FITS-PC may be used, including 
-*     those which require parameterisation.
+*     includes some features of the FITS-IRAF and FITS-PC encodings. 
+*     Specifically, any celestial projections supported by FITS-PC may be 
+*     used, including those which require parameterisation, and the axis
+*     rotation and scaling may be specified using CDi_j keywords. When
+*     writing a FITS header, rotation will be specified using CROTA/CDELT
+*     keywords if possible, otherwise CDi_j keywords will be used instead.
 
 *  The NATIVE Encoding:
 *     The NATIVE encoding may be used to store a description of any
