@@ -197,9 +197,9 @@ F77_SUBROUTINE(util_findfile_int)( CHARACTER(deft), CHARACTER(wspec),
         d_name = dent->d_name;
 
 #ifdef sun4_Solaris
-  d_name -= 4;
+  d_name -= 2;
   if ( getenv("DAVID") )
-    printf("Entry : |%s|\n", d_name );
+    printf("Entry : |%s|\n",d_name );
 #endif
 
         if ( !strcmp(d_name,".") ||		/* Skip these entries */
