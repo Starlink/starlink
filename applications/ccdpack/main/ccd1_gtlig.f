@@ -33,9 +33,11 @@
 *     names of the files.  All files are then opened using FIO_OPEN to
 *     test for their existence. 
 *
-*     If an extension does not exist (or the name within it) or the
-*     file cannot be opened then an error is reported and status is
-*     set.
+*     If an extension does not exist or the file cannot be opened then 
+*     an error is reported and status is set.  If NDFs is true and the
+*     CCDPACK extension exists, but no ITEM is in it, then a message is
+*     printed and status is not set.  In this case the list in question
+*     is not added to the IRH group.
 
 *  Arguments:
 *     NDFS = LOGICAL (Given)
@@ -52,7 +54,7 @@
 *        The minimum number of files which need to be opened.
 *     MAXOPN = INTEGER (Given)
 *        The maximum number of files which can be opened.
-*     NOPEN = INTEGER (Given)
+*     NOPEN = INTEGER (Returned)
 *        The number of files which were opened.
 *     FIOGR = INTEGER (Returned)
 *        An IRH group identifier for the names of the files which have
@@ -72,6 +74,7 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
@@ -85,6 +88,9 @@
 *        Changed to not return the FIO identifiers.
 *     3-MAR-1997 (PDRAPER):
 *        Removed LOC argument and associated code from IRG_NDFEX call.
+*     26-APR-1999 (MBT):
+*        Modified so that failing to find ITEM in the CCDPACK extension
+*        is no longer fatal.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -99,6 +105,7 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'DAT_PAR'          ! HDS/DAT constants
       INCLUDE 'IRG_FAC'          ! IRG/IRH constants
+      INCLUDE 'USER_ERR'         ! Private error codes
 
 *  Arguments Given:
       LOGICAL NDFS
@@ -116,10 +123,12 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      CHARACTER * ( IRH__SZNAM ) FNAME ! Filename 
+      CHARACTER * ( IRH__SZNAM ) FNAME ! Filename
+      CHARACTER * ( IRH__SZNAM ) NNAME ! NDF name
       INTEGER FD                 ! FIO file descriptor
       INTEGER I                  ! Loop variable
       INTEGER INGRP              ! Dummy IRH identifier
+      INTEGER NDF1GR             ! IRG identifier for group of all PARNAM NDFs
       INTEGER NDFID              ! NDF identfier
       INTEGER NRET               ! Number of names in group
       LOGICAL OK                 ! Flag showing extension ok
@@ -135,7 +144,7 @@
       IF ( NDFS ) THEN
 
 *  Access a list of NDF names.
-         CALL CCD1_NDFGL( PARNAM, 'UPDATE', MINOPN, MAXOPN, NDFGR,
+         CALL CCD1_NDFGL( PARNAM, 'UPDATE', MINOPN, MAXOPN, NDF1GR,
      :                    NRET, STATUS )
       ELSE
 
@@ -159,40 +168,64 @@
 *  false or start looking for the names in the NDF extensions.
       IF ( NDFS ) THEN
 
-*  Create a IRH group to contain the name strings.
+*  Initialise number of names successfully entered in the group.
+         NOPEN = 0
+
+*  Create IRH groups to contain the name strings.
          CALL IRH_NEW( 'CCDPACK:FILELIST', FIOGR, STATUS )
+         CALL IRH_NEW( 'CCDPACK:NDFLIST', NDFGR, STATUS )
 
 *  Open each NDF in turn and locate the required name.
          DO 2 I = 1, NRET
-            CALL IRG_NDFEX( NDFGR, I, NDFID, STATUS )
+            CALL IRG_NDFEX( NDF1GR, I, NDFID, STATUS )
 
-*  Get the file name.
+*  Get the NDF name and file name.
+            CALL IRH_GET( NDF1GR, I, 1, NNAME, STATUS )
             CALL CCG1_FCH0C( NDFID, ITEM, FNAME, OK ,STATUS )  
             IF ( .NOT. OK .AND. STATUS .EQ. SAI__OK ) THEN
 
-*  Cannot locate the named extension item. Set status and exit.
-               STATUS = SAI__ERROR
+*  Cannot locate the named extension item.  Report that this NDF will
+*  be ignored but take no other action.
                CALL NDF_MSG( 'NDF', NDFID )
                CALL MSG_SETC( 'ITEM', ITEM )
-               CALL ERR_REP( 'CCD1GTLISNOITEM',
-     :'  The CCDPACK extension of NDF ^NDF does not exist or does'//
-     :' not contain the item ^ITEM ', STATUS )
-               GO TO 99
-            END IF
+               CALL CCD1_MSG( ' ',
+     :'  The CCDPACK extension of NDF ^NDF does not contain'//
+     :' the item ^ITEM.', STATUS )
+               CALL NDF_MSG( 'NDF', NDFID )
+               CALL CCD1_MSG( ' ', '    NDF ^NDF will be ignored.',
+     :                        STATUS )
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+            ELSE
 
-*  Enter the file name into the new group, append to the end (0).
-            CALL IRH_PUT( FIOGR, 1, FNAME, 0, STATUS )
+*  Enter the file name and the NDF name into the new groups, appending 
+*  to the end (0).
+               CALL IRH_PUT( FIOGR, 1, FNAME, 0, STATUS )
+               CALL IRH_PUT( NDFGR, 1, NNAME, 0, STATUS )
+               NOPEN = NOPEN + 1
+            END IF
 
 *  Release the NDF.
             CALL NDF_ANNUL( NDFID, STATUS )
             IF ( STATUS .NE. SAI__OK ) GO TO 99
  2       CONTINUE
+
+*  Annul the original NDF group identifier, since it is no longer required.
+         CALL IRH_ANNUL( NDF1GR, STATUS )
+
+*  Import the returned NDF group identifier from the IRH to the IRG system.
+         CALL IRG_GIN( NDFGR, .FALSE., 'UPDATE', STATUS )
+         
+      ELSE
+
+*  If position lists are given directly, the number to consider must be 
+*  the number in PARNAM.
+         NOPEN = NRET
       END IF
 
 *  Now at stage were we have a group of names which may belong to a
 *  list of formatted files. Try to open them one by one, stop if one
 *  does not exist.
-      DO 3 I = 1, NRET
+      DO 3 I = 1, NOPEN
          CALL IRH_GET( FIOGR, I, 1, FNAME, STATUS )
 
 *  Try to open the file.
@@ -211,8 +244,17 @@
          END IF
  3    CONTINUE
 
-*  Set number of output files.
-      NOPEN = NRET
+*  Set status to a not-necessarily-fatal value if the number of files
+*  opened is not the same as the number in the original list.  This will
+*  be the case if NDFs is true and some of the files lacked an ITEM item
+*  in their CCDPACK extensions.
+      IF ( STATUS .EQ. SAI__OK .AND. NOPEN .NE. NRET ) THEN
+         STATUS = USER__003
+         CALL MSG_SETC( 'PARNAM', PARNAM )
+         CALL MSG_SETC( 'ITEM', ITEM )
+         CALL ERR_REP( 'CCD1_GTLIG_NOITEM', '  NDFs in %^PARNAM ' //
+     :' did not contain .MORE.CCDPACK.^ITEM component.', STATUS )
+      END IF
 
 *  Exit.
  99   CONTINUE
