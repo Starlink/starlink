@@ -46,7 +46,7 @@ install-data-local: dtd/manifest
 EXTRA_DIST = dsssl dtd
 
 clean: clean-am
-	for d in dtd doc/dtd2sgml doc/ssn70 misc; do \
+	for d in dtd doc/dtd2sgml doc/ssn70 misc dsssl/sl/lib; do \
 	    (cd $$d; $(MAKE) clean); \
 	done
 
@@ -73,8 +73,7 @@ SL_HTML = \
 	dsssl/sl/html/sltables.dsl
 SL_LIB = \
 	dsssl/sl/lib/dblib.dsl \
-	dsssl/sl/lib/sllib-jade-1.2.1.dsl \
-	dsssl/sl/lib/sllib-openjade-1.3.dsl
+	dsssl/sl/lib/sllib.dsl
 SL_TEXML = \
 	dsssl/sl/texml/sl.dsl \
 	dsssl/sl/texml/slback.dsl \
@@ -112,3 +111,6 @@ bin/sgml2hlp: bin/sgml2hlp.x
 
 dtd/manifest: dtd/CATALOG dtd/manifest-omit
 	cd dtd; make manifest
+
+dsssl/sl/lib/sllib.dsl:
+	cd dsssl/sl/lib; make sllib.dsl
