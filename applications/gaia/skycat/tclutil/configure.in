@@ -583,7 +583,9 @@ AC_CHECK_HEADERS(sys/statvfs.h)
 # (prototype problems in c++)
 #------------------------------------------------------------------------
 
+AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
+
 AC_MSG_CHECKING([fd_set])
 AC_TRY_COMPILE([
 #include <sys/types.h>
@@ -594,6 +596,16 @@ if test $test_ok = yes; then
 	AC_DEFINE(HAVE_SELECT_FD_SET)
 fi
 AC_MSG_RESULT($test_ok)
+
+#------------------------------------------------------------------
+# g++ doesn't include strstream.h, but uses strstream instead. Other
+# systems are the reverse and may not include strstream members in
+# std::. Life's tough.
+#-------------------------------------------------------------------
+AC_CHECK_HEADERS(strstream.h)
+AC_CHECK_HEADERS(strstream)
+
+AC_LANG_RESTORE
 
 
 #--------------------------------------------------------------------

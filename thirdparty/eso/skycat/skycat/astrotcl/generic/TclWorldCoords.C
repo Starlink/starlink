@@ -13,12 +13,22 @@
  */
 static const char* const rcsId="@(#) $Id: TclWorldCoords.C,v 1.2 1998/01/29 22:26:20 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <string.h>
 #include <stdio.h>
 #include <iostream.h>
 #include <stdlib.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "WorldCoords.hxx"
 #include "TclWorldCoords.h"
 
@@ -107,7 +117,7 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
     if (wcs.status() != 0)
 	return TCL_ERROR;
     char buf[32];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     os << wcs << ends;
     return set_result(buf);
 }
@@ -119,7 +129,7 @@ int TclWorldCoords::set_wcs_result(const WorldCoords& wcs)
 int TclWorldCoords::set_hms_result(const HMS& hms)
 {
     char buf[32];
-    std::ostrstream os(buf, sizeof(buf));
+    STRSTD::ostrstream os(buf, sizeof(buf));
     os << hms << ends;
     return set_result(buf);
 }

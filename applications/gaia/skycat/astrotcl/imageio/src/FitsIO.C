@@ -22,12 +22,22 @@
 
 static const char* const rcsId="@(#) $Id: FitsIO.C,v 1.28 1999/10/25 11:42:03 abrighto Exp $";
 
+#include "config.h"  //  From skycat util
 
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <iostream.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <math.h>
@@ -282,7 +292,7 @@ FitsIO* FitsIO::read(const char* filename, int mem_options)
 int FitsIO::cfitsio_error()
 {
     char buf[81];
-    std::ostrstream os;
+    STRSTD::ostrstream os;
     int i = 0;
     while (fits_read_errmsg(buf)) {
 	os << buf << endl;
@@ -477,7 +487,7 @@ FitsIO* FitsIO::blankImage(double ra, double dec, double equinox,
     Mem header(FITSBLOCK, 0);	// more than large enough to hold the fields below
     if (header.status() != 0) 
 	return NULL;
-    std::ostrstream os((char*)header.ptr(), header.length()); // stream will write to shared memory
+    STRSTD::ostrstream os((char*)header.ptr(), header.length()); // stream will write to shared memory
  
     // generate the fits header
     double r = radius/60.0;	// radius in degrees
@@ -786,7 +796,7 @@ int FitsIO::write(const char *filename)
  */
 int FitsIO::getFitsHeader(ostream& os) const
 {
-    std::istrstream is((char*)header_.ptr(), header_.length());
+    STRSTD::istrstream is((char*)header_.ptr(), header_.length());
     char buf[81];
     while(is.read(buf, 80)) {
 	for (int i = 0; i < 79; i++)

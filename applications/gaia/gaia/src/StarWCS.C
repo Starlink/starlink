@@ -61,11 +61,22 @@
 //        insignificant dimensions (in the base frame).
 //-
 
+#include "config.h"  //  From skycat util
+
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
+
+//  strstream will be in std:: namespace in cannot use the .h form.
+#if HAVE_STRSTREAM_H
+#include <strstream.h>
+#define STRSTD
+#else
 #include <strstream>
+#define STRSTD std
+#endif
+
 #include "error.h"
 #include "StarWCS.h"
 
@@ -1451,7 +1462,7 @@ void StarWCS::constructWarning( const char *encoding, int failed,
     char card[81];
     char *equinox;
     int nwarns = 0;
-    std::ostrstream os;
+    STRSTD::ostrstream os;
 
     //  Add the encoding message.
     if ( encoding ) {
