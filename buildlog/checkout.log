@@ -6437,6 +6437,7 @@ U java/source/jniast/src/jni/AstObject.c
 U java/source/jniast/src/jni/Channel.c
 U java/source/jniast/src/jni/CmpFrame.c
 U java/source/jniast/src/jni/CmpMap.c
+U java/source/jniast/src/jni/DSBSpecFrame.c
 U java/source/jniast/src/jni/FitsChan.c
 U java/source/jniast/src/jni/Frame.c
 U java/source/jniast/src/jni/FrameSet.c
@@ -6491,6 +6492,7 @@ U java/source/jniast/src/main/uk/ac/starlink/ast/Axis.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Channel.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/CmpFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/CmpMap.java
+U java/source/jniast/src/main/uk/ac/starlink/ast/DSBSpecFrame.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/DssMap.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/FitsChan.java
 U java/source/jniast/src/main/uk/ac/starlink/ast/Frame.java
@@ -6542,6 +6544,7 @@ U java/source/jniast/src/perl/AstException.pl
 U java/source/jniast/src/perl/AstObject.pl
 U java/source/jniast/src/perl/CmpFrame.pl
 U java/source/jniast/src/perl/CmpMap.pl
+U java/source/jniast/src/perl/DSBSpecFrame.pl
 U java/source/jniast/src/perl/FitsChan.pl
 U java/source/jniast/src/perl/Frame.pl
 U java/source/jniast/src/perl/FrameSet.pl

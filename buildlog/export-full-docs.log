@@ -1655,7 +1655,7 @@ dist:
 
 install:
 [loggedcopy] Copying 10 files to /apps/cvsbuild/starjava/lib
-[loggedcopy] Copying 73 files to /apps/cvsbuild/starjava/docs
+[loggedcopy] Copying 74 files to /apps/cvsbuild/starjava/docs
      [echo] Executing DIVA target: install
 
 prepare:
@@ -2139,4 +2139,4 @@ build:
 BUILD FAILED
 file:/apps/cvsbuild/java/source/splat/build.xml:425: Compile failed; see the compiler error output for details.
 
-Total time: 3 minutes 43 seconds
+Total time: 3 minutes 29 seconds

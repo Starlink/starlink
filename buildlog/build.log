@@ -61,7 +61,7 @@ check_packages:
 
 build_classes:
     [mkdir] Created dir: /apps/cvsbuild/java/source/jniast/build/classes
-    [javac] Compiling 50 source files to /apps/cvsbuild/java/source/jniast/build/classes
+    [javac] Compiling 51 source files to /apps/cvsbuild/java/source/jniast/build/classes
 
 unpack_jni:
 
