@@ -44,9 +44,13 @@
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
 *
-*     The REBIN task can not be fully automated since the INPUT parameters
+*     This task can not be fully automated since the INPUT parameters
 *     are reused for each dataset. Datasets are entered until a null parameter
 *     value (!) is returned for IN.
+
+*     If this task is invoked as BOLREBIN then a separate map will be made
+*     of each bolometer. The output file will contain an NDF for each 
+*     bolometer.
 
 *  Usage:
 *     rebin REBIN_METHOD OUT_COORDS PIXSIZE_OUT
@@ -59,7 +63,7 @@
 *        repeatedly until a NULL value (!) is supplied.
 *     INTEGRATIONS = _INTEGER (Read)
 *        The inegrations that should be selected from the input data. Pass
-*        zero to select all integration (ie if you have gone into this mode
+*        zero to select all integrations (ie if you have gone into this mode
 *        by mistake). This question is only asked if SELECT_INTS is true.
 *     LAT_OUT = _CHAR (Read)
 *        The latitude of the output map centre. The supplied default value
@@ -68,11 +72,12 @@
 *        The longitude of the output map centre. The supplied default value 
 *        is that of the map centre of the first map.
 *     OUT = NDF (Write)
-*        The name of the NDF that will contain the rebinned map.
+*        For REBIN this is the name of the NDF that will contain the rebinned 
+*        map. For BOLREBIN this is the name of the HDS container file.
 *     OUT_COORDS = _CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are AZimuth/elevation offsets, NAsmyth, RB (B1950), 
-*        RJ (J2000), RD (Current epoch) and GAlactic [RJ]
+*        RJ (J2000), RD (Current epoch) and GAlactic.
 *     OUT_OBJECT = _CHAR (Read)
 *        The name of the object (ie the NDF title).
 *     PIXSIZE_OUT = _REAL (Read)
@@ -100,6 +105,10 @@
 *        Rebin the maps with LINEAR weighting function in J2000 RA/Dec 
 *        coordinates. You will be asked for input datasets until a null
 *        value is given.
+*     bolrebin REBIN_METHOD=BESSEL OUT=map
+*        Rebin the maps with Bessel weighting function. Each bolometer is 
+*        rebinned separately and placed in an NDF in the output container file
+*        map.sdf. Bolometer H7 can be accessed by displaying map.h7.
 
 *  Notes: 
 *     For each file name that is entered, values for the parameters
@@ -117,10 +126,13 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.23  1997/01/11 01:43:05  timj
-*     Merge with BOLREBIN.
-*     Fix RASTER map problems (DEC_END)
+*     Revision 1.24  1997/03/06 20:07:55  timj
+*     Improve documentation
 *
+c Revision 1.23  1997/01/11  01:43:05  timj
+c Merge with BOLREBIN.
+c Fix RASTER map problems (DEC_END)
+c
 c Revision 1.22  1997/01/10  19:09:12  timj
 c Improve header documentation.
 c Set XMAX and XMIn etc before checking for max and min of data.
