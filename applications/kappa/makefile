@@ -3419,6 +3419,7 @@ kps1_rprfr.o:	 SAE_PAR PRM_PAR
 kps1_rprfub.o:	 SAE_PAR PRM_PAR
 kps1_rprfuw.o:	 SAE_PAR PRM_PAR
 kps1_rprfw.o:	 SAE_PAR PRM_PAR
+kps1_saxlk.o:	 SAE_PAR NDF_PAR
 kps1_skyf2.o:	 SAE_PAR GRP_PAR PRM_PAR
 kps1_skyf3.o:	 SAE_PAR PRM_PAR NDF_PAR IRA_PAR SFT_COM
 kps1_skyf4.o:	 SAE_PAR NDF_PAR PRM_PAR IRA_PAR
