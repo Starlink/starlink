@@ -279,6 +279,7 @@ javadoc-sources:
 
   [javadoc] Building tree for all the packages and classes...
   [javadoc] Building index for all the packages and classes...
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/index-all.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
@@ -288,10 +289,17 @@ javadoc-sources:
   [javadoc]  in the given context (e.g. a frame or an applet)."
   [javadoc] To avoid this note, change the doc comment to make this a proper first sentence, then
   [javadoc] use -breakiterator from that point forward, which will output this new sentence.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - Tag @see: malformed: "AstAxisLabels,"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
   [javadoc] "Add an array of objects to the selection."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Add an array of objects to the selection. the model should
   [javadoc]  highlight the selected objects."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
+  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  This is similar to an interface
@@ -301,6 +309,7 @@ javadoc-sources:
   [javadoc] "This class provides basic support for an instance of AppContext which 
   [javadoc]  delegates its operation to one of the basic AppContexts (usually an
   [javadoc]  AppContext or an ApplicationContext.)  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
   [javadoc] "Return a similarity metric based only on the LLR (terminal)
   [javadoc]  values of the test and reference databases:
 
@@ -315,6 +324,7 @@ javadoc-sources:
   [javadoc]  
   [javadoc]  Assumes that the two scenes are composed of the
   [javadoc]  same number of strokes in the same order."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
   [javadoc] "Array of AbstractPlotControlsModel objects that are genuine Ast
   [javadoc]  related parts (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -322,11 +332,14 @@ javadoc-sources:
   [javadoc]  related parts (i.e. can be passed to an Ast Plot as
   [javadoc]  configuration options, these are the default list and cannot be
   [javadoc]  extended)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "AstStrings is a model for all the general text elements shown in
   [javadoc]  an AST Plot (i.e. those with element name "strings"). "
+  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicStrokeRecognizer.java:49: warning - The first sentence is interpreted to be:
   [javadoc] "BasicStrokeRecognizer performs recognition on <b>completed</b> strokes by
   [javadoc]  filtering them, extracting features from them (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -334,23 +347,10 @@ javadoc-sources:
   [javadoc]  filtering them, extracting features from them (e.g. aspect
   [javadoc]  ratio), and then passing the extracted features into a classifier
   [javadoc]  that performs classification on the feature set.  "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
   [javadoc] "Used when figure is changed (i.e.<!-- -->transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Used when figure is changed (i.e.<!"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:139: warning - Tag @see: can't find accept(Object) in javax.swing.filechooser.FileFilter
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/SelectCharacters.java:50: warning - Tag @see: malformed: "InsertCharacters, SelectCharactersModel"
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: warning - Tag @see: malformed: "AstAxisLabels,"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/interactor/SelectionModel.java:47: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - Tag @see: malformed: "Plot, PlotConfig."
-  [javadoc] /apps/cvsbuild/java/source/soapserver/build/java/uk/ac/starlink/soap/AppAxisServerFactory.java:28: warning - Tag @see: malformed: "Plot, PlotConfigurator"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AppContextDelegate.java:28: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/toolbox/LLRSceneMetric.java:49: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AstStrings.java:27: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/util/build/java/uk/ac/starlink/util/gui/BasicFileFilter.java:46: warning - Tag @link: reference not found: JFileChooser
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicStrokeRecognizer.java:49: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureChangedEvent.java:36: warning - The first sentence is interpreted to be:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:85: warning - The first sentence is interpreted to be:
   [javadoc] "The timeout for single/double/triple/.."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -928,15 +928,15 @@ javadoc-sources:
   [javadoc] "The suggested gap resolution (i.e. interval between steps)."
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisLabelControls.java:49: warning - Tag @see: reference not found: AstAxisLabel
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/AxisNumLabControls.java:47: warning - Tag @see: reference not found: AstNumerLabels
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsEdges.html...
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "The suggested fraction resolution (i.e. interval between steps)."
+  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/GraphicsHints.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: Tag @see: Malformed: Plot, PlotConfig.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/FontChangedEvent.java:15: warning - @copyright is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsHints.java:20: warning - @copyright is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/uk/ac/starlink/ast/gui/PlotConfiguration.html...
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:56: Tag @see: Malformed: AstAxisLabels,
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/PlotConfiguration.java:112: warning - The first sentence is interpreted to be:
@@ -1544,4 +1544,4 @@ javadoc-sources:
   [javadoc] 578 warnings
 
 BUILD SUCCESSFUL
-Total time: 1 minute 33 seconds
+Total time: 1 minute 32 seconds

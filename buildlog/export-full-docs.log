@@ -378,10 +378,10 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:239: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/Scene.java:83: warning - Tag @see: missing #: "isConsistent(SceneElement, SceneElement)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureListener.java:35: warning - The first sentence is interpreted to be:
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] "Send when a figure is changed (i.e.&nbsp;moved or transformed)."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Send when a figure is changed (i.e."
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/uk/ac/starlink/diva/FigureStore.java:22: warning - Tag @link: reference not found: DrawFigures
   [javadoc] /apps/cvsbuild/java/source/astgui/build/java/uk/ac/starlink/ast/gui/GraphicsEdges.java:55: warning - The first sentence is interpreted to be:
   [javadoc] "The suggested fraction resolution (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
@@ -520,19 +520,19 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:306: warning - Tag @see: can't find addHoldListener(ActionListener) in diva.sketch.MultiStateInterpreter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/MultiStateInterpreter.java:316: warning - Tag @see: can't find addStrokeListener(MouseInputListener) in diva.sketch.MultiStateInterpreter
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/sketch/recognition/BasicScene.java:378: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:356: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:84: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:159: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
   [javadoc] "Return true if the supports of the two elements (i.e."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Return true if the supports of the two elements (i.e. the
   [javadoc]  sets elements that they cover) are identical."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/toolbox/LabelFigure.java:321: warning - The first sentence is interpreted to be:
   [javadoc] "Set the point at which this figure is "anchored." This
   [javadoc]  must be one of the positioning constants defined in 
   [javadoc]  javax.swing.SwingConstants."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Set the point at which this figure is "anchored." "
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graphx/GraphModel.java:356: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/AbstractGraphModel.java:84: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/graph/GraphModel.java:159: warning - Tag @see: missing #: "dispatchGraphEvent(GraphEvent)"
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/canvas/connector/Arrowhead.java:173: warning - The first sentence is interpreted to be:
   [javadoc] "Set the flag that says the arrowhead is "flipped." This means
   [javadoc]  that the arrowhead is drawn so that the apparent direction
@@ -1121,27 +1121,27 @@ javadoc-sources:
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/View.java:24: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:58: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractApplication.java:102: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
-  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/AbstractApplication.html...
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Create an abstract application that resides
   [javadoc]  in the given context (e.g. a frame or an applet)."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/AbstractView.java:19: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/BasicPage.java:17: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: setExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ExtensionFileFilter.java:242: warning - Tag @see: reference not found: isExtensionListInDescription
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageModel.java:110: warning - The first sentence is interpreted to be:
   [javadoc] Generating /apps/cvsbuild/java/source/docs/javadocs/diva/gui/MultipageModel.html...
   [javadoc] "Get the index of the given page."
   [javadoc] This sentence is different from what would be generated using -breakiterator: 
   [javadoc] "Get the index of the given page. -1 if it is not known."
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:28: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageParser.java:113: warning - Tag @see: reference not found: com.microstar.xml.XmlHandler#attribute
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultipageWriter.java:26: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/MultiWindowApplication.java:56: warning - @rating is an unknown tag.
+  [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/ViewEvent.java:20: warning - @rating is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/JShadePane.java:352: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/JTreePane.java:337: warning - @beaninfo is an unknown tag.
   [javadoc] /apps/cvsbuild/java/source/diva/build/java/diva/gui/toolbox/ListDataModel.java:26: warning - @rating is an unknown tag.
@@ -2339,4 +2339,4 @@ export-full-docs:
       [zip] Building zip: /apps/cvsbuild/export/starjava-docs.zip
 
 BUILD SUCCESSFUL
-Total time: 9 minutes 0 seconds
+Total time: 7 minutes 34 seconds

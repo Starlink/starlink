@@ -6472,7 +6472,6 @@ U java/source/jniast/src/lib/i386/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/lib/sparc
 U java/source/jniast/src/lib/sparc/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/lib/x86
-U java/source/jniast/src/lib/x86/jniast.dll
 U java/source/jniast/src/lib/x86/jniast_libs.jar
 cvs checkout: Updating java/source/jniast/src/main
 cvs checkout: Updating java/source/jniast/src/main/uk
