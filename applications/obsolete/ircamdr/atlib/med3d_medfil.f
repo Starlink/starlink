@@ -75,7 +75,7 @@
 *          test if user wants to view the raw LWORK etc ...
 	    IF( K .EQ. XPIX .AND. J .EQ. YPIX) THEN
 
-	      IF( VIEW .EQ. .TRUE.) THEN
+	      IF( VIEW ) THEN
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 
@@ -111,7 +111,7 @@
 *          test if user wants to view the sorted LWORK etc ...
 	    IF( K .EQ. XPIX .AND. J .EQ. YPIX) THEN
 
-	      IF( VIEW .EQ. .TRUE.) THEN
+	      IF( VIEW ) THEN
 
 	        CALL MSG_OUT( 'BLANK', ' ', STATUS)
 

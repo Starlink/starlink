@@ -42,7 +42,7 @@
 * look at the terminal output flag and if TRUE then print out the histogram 
 * values to the users terminal
 *
-	IF( TERMINAL_OUTPUT .EQ. .TRUE.) THEN
+	IF( TERMINAL_OUTPUT ) THEN
 
 	  DO K = 1, ODIMS1
 

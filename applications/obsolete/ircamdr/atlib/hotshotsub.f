@@ -56,7 +56,7 @@
 	END DO
 
 *      define start of blocking
-	IF( WHOLE .EQ. .TRUE.) THEN
+	IF( WHOLE ) THEN
 	  IXST = 1
 	  IYST = 1
 	  IXEN = NXI

@@ -4,6 +4,7 @@
 	implicit none
 
 *     14-JUL-1994  Changed LIB$ to CHR_ (SKL@JACH)
+*      9-AUG-2004  Should not use .EQ. for logical comparison (TIMJ@JACH)
 
       INCLUDE 'CHR_ERR'
       INCLUDE 'SAE_PAR'
@@ -66,12 +67,12 @@
 
 	else if( month .eq. 'FEB') then
 
-	  if( leap_year .eq. .true. .and. day .gt. 29) then
+	  if( leap_year  .and. day .gt. 29) then
 
 	    day = day - 29
 	    month = 'MAR'
 
-	  else if( leap_year .eq. .false. .and. day .gt. 28) then
+	  else if( .NOT. leap_year .and. day .gt. 28) then
 
 	    day = day - 28
 	    month = 'MAR'
