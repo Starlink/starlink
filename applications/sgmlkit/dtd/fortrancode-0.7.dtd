@@ -74,7 +74,8 @@
 
 <!SHORTREF	generalmap	"&#RS;*+"	startprologue.ref
 						>
-<!SHORTREF	prologuemap	"&#RS;*-"	endprologue.ref
+<!SHORTREF	prologuemap	"&#RS;*+"	startprologue.ref
+				"&#RS;*-"	endprologue.ref
 				"&#RS;*"	nullentity.ref
 				>
 <!SHORTREF	textmap		"&#RS;*-"	endprologue.ref
