@@ -138,6 +138,7 @@
 *   then it is the one required. If it is a structure, then it is
 *   the structure name required.
       CALL DAT_TYPE ( BOTLOC, HDSTYPE, STATUS )
+      PRIM = .FALSE.
       CALL DAT_PRIM ( BOTLOC, PRIM, STATUS )
 
       IF ( .NOT. PRIM ) THEN
