@@ -206,6 +206,15 @@ wmessage ('info', "$progname, v$VERSION");
 my @arglist2 = ($0);
 foreach (@ARGV) { push (@arglist2, $_); }
 
+# Install the tidy_and_shutdown routine as signal and exit handler.
+#use sigtrap 'handler', \&tidy_and_shutdown, 'normal-signals',
+#  'die', 'untrapped', 'error-signals';
+$SIG{HUP}  = \&tidy_and_shutdown; # 1
+$SIG{INT}  = \&tidy_and_shutdown; # 2, Control-C
+$SIG{PIPE} = \&tidy_and_shutdown; # 13
+$SIG{TERM} = \&tidy_and_shutdown; # 15
+END { tidy_and_shutdown ('exithandler'); }	# deletes temporary files
+
 
 # Examine the argument list and options (man Getopt::Long).  Option(s)
 # xxx* are for testing and debugging only.
@@ -357,7 +366,6 @@ my $ams = new Starlink::AMS::Init(1);
 $ams->timeout($monolithTimeout);
 $ams->messages($monolithMessages);
 
-
 # Define the CONVERT environment variables.
 #
 # We don't actually have to start anything up here.  CONVERT setup
@@ -381,23 +389,28 @@ $ENV{NDF_TEMP_FITS} = 'temp_fits_^name^fxscl';
 # started up here rather than in the individual subroutines.  If we
 # don't do this, we get crashes.
 #
+# Applications mentioned in %helpers may need a corresponding entry in
+# tidy_and_shutdown to shut them down cleanly on exit.  Also, since
+# that subroutine terminates monoliths by undefining the corresponding
+# element in %helpers, this should be the _only_ reference to the monolith.
+
 # Start up KAPPA
-my $Kappa = new Starlink::AMS::Task
+$helpers{kappa} = new Starlink::AMS::Task
   ("kappa_mon_$$", "$ENV{KAPPA_DIR}/kappa_mon");
-$Kappa->contactw || wmessage 'fatal', "Error launching Kappa - timeout";
-$helpers{kappa} = $Kappa;
+$helpers{kappa}->contactw
+  || wmessage 'fatal', "Error launching Kappa - timeout";
 
 # ... and KAPPA's NDFPACK
-my $NDFPack = new Starlink::AMS::Task
+$helpers{ndfpack} = new Starlink::AMS::Task
   ("ndfpack_mon_$$", "$ENV{KAPPA_DIR}/ndfpack_mon");
-$NDFPack->contactw || wmessage 'fatal', "Error launching NDFPack - timeout";
-$helpers{ndfpack} = $NDFPack;
+$helpers{ndfpack}->contactw
+  || wmessage 'fatal', "Error launching NDFPack - timeout";
 
 # ... and CCDPack
-my $CCDPack = new Starlink::AMS::Task
+$helpers{ccdpack} = new Starlink::AMS::Task
   ("ccd_mon_$$", "$ENV{CCDPACK_DIR}/ccdpack_reg");
-$CCDPack->contactw || wmessage 'fatal', "Error launching CCDPack - timeout";
-$helpers{ccdpack} = $CCDPack;
+$helpers{ccdpack}->contactw
+  || wmessage 'fatal', "Error launching CCDPack - timeout";
 
 # ... and SExtractor
 #
@@ -405,17 +418,16 @@ $helpers{ccdpack} = $CCDPack;
 # put output in the place pointed to by the AUTOASTROMTEMPCATALOGUE
 # environment variable.
 $ENV{AUTOASTROMTEMPCATALOGUE} = "$tempDir/extractor-temp";
-#push (@TEMPFILES, $ENV{AUTOASTROMTEMPCATALOGUE});
-my $extractor = new Starlink::AMS::Task
+$helpers{extractor} = new Starlink::AMS::Task
   ("extractor_mon_$$", "$ENV{EXTRACTOR_DIR}/extractor");
-$extractor->contactw  || wmessage 'fatal', "Error launching extractor -- timeout";
-$helpers{extractor} = $extractor;
+$helpers{extractor}->contactw
+  || wmessage 'fatal', "Error launching extractor -- timeout";
 
 # ... and ATOOLS
-my $atools = new Starlink::AMS::Task
+$helpers{atools} = new Starlink::AMS::Task
   ("atools_mon_$$", "$ENV{ATOOLS_DIR}/atools_mon");
-$atools->contactw || wmessage 'fatal', "Error launching atools -- timeout";
-$helpers{atools} = $atools;
+$helpers{atools}->contactw
+  || wmessage 'fatal', "Error launching atools -- timeout";
 
 wmessage ('info', "Monoliths OK");
 
@@ -635,9 +647,10 @@ if ($dumpstatefile) {
 
 
 
-# Start up the moggy slave.
-my $moggy = Moggy->new($esocatname, $skycatconfig, $moggylocation);
-$helpers{moggy} = $moggy;
+# Start up the moggy slave.  As with the monoliths above, if
+# tidy_and_shutdown is to work properly, the element $helpers{moggy}
+# should be the _only_ reference to the moggy object.
+$helpers{moggy} = Moggy->new($esocatname, $skycatconfig, $moggylocation);
 #$moggy = Moggy->new ('dummy@home',
 #		     'file:///home/norman/s/src/autoastrom/w/autoastrom/moggy/t/local.config');
 #$moggy->debug('moggy cataloguehandler');
@@ -650,7 +663,7 @@ $helpers{moggy} = $moggy;
 # get_catalogue returns a reference to an array of (references to)
 # hashes, containing {id}, {x}, {y}, {ra}, {dec} and possibly {mag}.
 wmessage ('info', "Obtaining catalogue from $esocatname...");
-my $CAT = get_catalogue ($moggy, %$NDFinfo, $maxobj, $tempDir);
+my $CAT = get_catalogue ($helpers{moggy}, %$NDFinfo, $maxobj, $tempDir);
 
 defined($CAT)
   || wmessage ('fatal', "Catalogue query failed");
@@ -949,7 +962,7 @@ while ($iterno < $iterationsleft) {
 	    print STDERR "\t$e\n";
 	}
     }
-    my $status = $atools->obeyw ("asttrann", $asttrannarg);
+    my $status = $helpers{atools}->obeyw ("asttrann", $asttrannarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
       || wmessage ('fatal', "Error getting atools/asttrann");
 
@@ -998,7 +1011,7 @@ if ($insertwcs) {
     printf STDERR ("Inserting WCS information from %s into %s\n\tastcopyarg=%s\n",
 		   $lastastrom{wcs}, $NDF, $astcopyarg)
       if ($verbose);
-    my $status = $atools->obeyw("astcopy", $astcopyarg);
+    my $status = $helpers{atools}->obeyw("astcopy", $astcopyarg);
     ($status == &Starlink::ADAM::DTASK__ACTCOMPLETE)
       || wmessage ('fatal', "insertwcs: error calling ATOOLS");
 } else {
@@ -1020,17 +1033,97 @@ if (defined($retainwcs)) {
 }
 
 
-# Get rid of all the temporary files we've accumulated.
 if ($keeptemps) {
+    # Deleting is done in tidy_and_shutdown
     wmessage ('info', "Retaining temporary files in directory $tempDir");
     print STDERR "Retaining temporary files in directory $tempDir\n"
       if $verbose;
-} else {
-    print STDERR "Deleting temporary directory $tempDir\n" if $verbose;
-    system "rm -Rf $tempDir";
 }
-
 
 exit 0;
 
 
+# Tidy-up routine, used as signal and exit handler
+sub tidy_and_shutdown {
+    #my $sig = shift;
+    #print "Received signal $sig\n";
+
+    # Shut down applications mentioned in %helpers, and exit.  This
+    # isn't necessary for the exit handler, since the AMS system is
+    # run down gracefully when Perl exits normally, but it seems
+    # neater to keep the tidyup functions together.
+    #
+    # This works, in the sense that, with this signal handler, you can
+    # issue ^C and not leave defunct monolith processes hanging
+    # around, but it doesn't appear to do it very neatly, and it
+    # leaves error messages on stderr reporting problems shutting down
+    # the message relay.  I don't understand why it's happening like this,
+    # (or why I don't seem to be able to get any output from this
+    # routine (it's not guaranteed from a signal handler, but it
+    # _should_ work)), but I'm happy enough that it works.
+
+    # Shutting down the monoliths can cause broken-pipe errors, so
+    # ignore these.
+    local $SIG{PIPE} = 'IGNORE';
+
+    # XXX No, the following isn't necessary, and probably best handled
+    # by $ams->shutdown().
+    #
+    # We test whether something needs shut down by its presence in
+    # %helpers, so it should undef() tested entries when it's done.
+#    if (%helpers) {
+#	# Shut down ADAM monoliths.  There is no `terminate' method in
+#	# Starlink::AMS::Task, but objects are destroyed when the last
+#	# reference to them is removed.  Therefore simply undefining
+#	# the %helpers hash entries should cause them to go.  And moggy?
+#	foreach my $h (qw( kappa ndfpack ccdpack extractor atools)) {
+#	    if (defined($helpers{$h})) {
+#		print "Helper $h: pid=", $helpers{$h}->pid->{pid}, "\n";
+#		undef $helpers{$h};
+#		print "Undefined helpers{$h}\n";
+#	    }
+##	    undef $helpers{$h} if defined($helpers{$h});
+##	    print  "Undefined helpers{$h}\n" if $verbose;
+#	}
+#    }
+
+#     if (defined($ams)) {
+# 	# If the shutdown of $ams causes any further signals, we would
+# 	# be in trouble.  So ignore all signals while we're doing
+# 	# this.  Also, undefine $ams _before_ calling shutdown()
+# 	# (using temporary $tempams), so that we don't come back into
+# 	# this block if or when the handler is called again within
+# 	# shutdown().  Since we're ignoring all the signals which are
+# 	# assigned to this handler, I would have thought this would
+# 	# happen only when we call exit() (this handler is also the
+# 	# exit handler), but it does!  I think there's some
+# 	# asynchronicity here which I'm not fully aware of, which
+# 	# means that this apparent belt-and-braces is required (it's
+# 	# probably appropriately paranoid behaviour for a signal
+# 	# handler, anyway).
+# 	#
+# 	# Unfortunately, I can't seem to get rid of the message
+# 	# `MESSYS__NONEXIST: non-existent path pointer'
+# 	print STDERR "Shutting down ams\n";
+# 	local $SIG{HUP}  = 'IGNORE';
+# 	local $SIG{INT}  = 'IGNORE';
+# 	local $SIG{PIPE} = 'IGNORE';
+# 	local $SIG{TERM} = 'IGNORE';
+# 	my $tempams = $ams;
+# 	undef ($ams);
+# 	$tempams->stdout(\*STDERR); # make sure all messages go to stderr
+# 	$tempams->stderr(\*STDERR); # make sure all messages go to stderr
+# 	$tempams->errors(0);	# suppress monolith errors
+# 	$tempams->messages(0);	# suppress monolith messages
+# 	$tempams->shutdown();
+# 	undef($tempams);	# destroy it
+#     }
+
+    # Get rid of all the temporary files we've accumulated.
+    if (! $keeptemps && -d $tempDir && -w $tempDir) {
+	print STDERR "Getting rid of temporary files\n";
+	system "rm -Rf $tempDir";
+    }
+
+    exit 0;
+}
