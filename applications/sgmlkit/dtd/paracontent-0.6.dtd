@@ -407,7 +407,7 @@
      -->
 <!NOTATION URL 
 	PUBLIC '-//IETF/RFC1738//NOTATION Uniform Resource Locator//EN'
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//IETF/RFC1738//NOTATION%20Uniform%20Resource%20Locator//EN"
+	"http://sunsite.org.uk/rfc/rfc1738.txt"
 	>
 
 <!ELEMENT webref %MXX; (%simpletext;)*>

@@ -28,6 +28,6 @@
 <!ENTITY % XML.Variant 'INCLUDE'>
 <!ENTITY % Starlink.general
 	PUBLIC "-//Starlink//DTD Starlink General 0.6//EN"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//DTD%20Starlink%20General%200.6//EN"
+	"starlink-0.6.dtd"
 	>
 %Starlink.general;

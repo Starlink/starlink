@@ -53,17 +53,7 @@
 <!-- XML requires that all external entities have a SYSTEM identifier.
      All public IDs in this file which are not protected by a
      Full.SGML.Only marked section, should therefore have suitable
-     system identifiers.  The script add-sysids.sed can add these.
-
-     That script searches for public identifiers, followed by a string
-     on the next line (delimited by " or ').  It replaces that next
-     line with a URL which points to a catalogue server, and which
-     contains an HTTP-escaped and normalised version of the public
-     identifier.  
-
-     The public identifier must be on a single line, and the string
-     must be on the immediately following line.  That line is replaced
-     completely, so it mustn't have anything else on the line.
+     system identifiers.  These must MATCH the entries in the catalog file.
      -->
 
 
@@ -190,7 +180,7 @@
 ]]>
 <!ENTITY % notations-subset 
 	PUBLIC "-//Starlink//ELEMENTS Starlink Notation Declarations//EN"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Notation%20Declarations//EN"
+	"notations.text"
 	>
 %notations-subset;
 
@@ -319,7 +309,7 @@
 ]]>
 <!ENTITY starlink.decl 
 	PUBLIC "-//Starlink//TEXT Starlink Declaration//EN"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//TEXT%20Starlink%20Declaration//EN"
+	"starlink.decl"
 	>
 
 
@@ -367,12 +357,12 @@
 <!-- Finally, the XML versions -->
 <!ENTITY % ISOents
 	PUBLIC	"ISO 8879:1986//ENTITIES Added Latin 1//EN//Unicode"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/ISO%208879:1986//ENTITIES%20Added%20Latin%201//EN//Unicode"
+	"ISOent/xml/iso-lat1.ent"
 	>
 <!-- Most of these `additional' entities are selections from the ISO set. -->
 <!ENTITY % Additional.Char.Ents
 	PUBLIC "-//Starlink//ENTITIES Additional entities//EN//Unicode"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ENTITIES%20Additional%20entities//EN//Unicode"
+	"entities-unicode.ent"
 	>
 
 %Additional.Char.Ents;
@@ -469,7 +459,7 @@
 ]]>
 <!ENTITY % paragraph.elements 
 	PUBLIC "-//Starlink//ELEMENTS Starlink Paragraph Elements 0.6//EN"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//Starlink//ELEMENTS%20Starlink%20Paragraph%20Elements%200.6//EN"
+	"paracontent-0.6.dtd"
 	>
 %paragraph.elements;
 
@@ -946,7 +936,7 @@
 ]]>
 <!ENTITY % calstbls 
 	PUBLIC "-//OASIS//DTD XML Exchange Table Model 19990315//EN"
-	"http://goedel.astro.gla.ac.uk/catalogue/public/-//OASIS//DTD%20XML%20Exchange%20Table%20Model%2019990315//EN"
+	"oasis-exchange-table-xml.dtd"
 	>
 %calstbls;
 
