@@ -109,29 +109,58 @@
 *        then the value specified there will be used. Otherwise, the
 *        default is 'BOTH'.
 *        [BOTH]
-*     PERCENTILES(2) = _REAL (Read)
-*        Percentile scale used when displaying images. See the 
-*        KAPPA command DISPLAY for more. The two values should be
-*        in the range 0 to 100.
+*     MAXCANV = INTEGER (Read and Write)
+*        A dimension in pixels for the maximum X or Y dimension of the
+*        region in which the NDF is displayed.  Note this is the
+*        scrolled region, and may be much bigger than the sizes given
+*        by WINX and WINY, which limit the size of the window on the
+*        X display.  It can be overridden during operation by zooming
+*        in and out using the GUI controls, but it is intended to
+*        limit the size for the case when ZOOM is large (perhaps
+*        because the last image was quite small) and a large image
+*        is going to be displayed, which otherwise might lead to
+*        the program attempting to display an enormous viewing region.
+*        If set to zero, then no limit is in effect.
+*        [1280]
+*     PERCENTILES( 2 ) = _DOUBLE (Read)
+*        The low and high percentiles of the data range to use when
+*        displaying the images; any pixels with a value lower than
+*        the first value will have the same colour, and any with a value
+*        higher than the second will have the same colour.  Must be in
+*        the range 0 <= PERCENTILES( 1 ) <= PERCENTILES( 2 ) <= 100.
 *        [2,98]
 *     PRINTCMD = _CHAR (Read)
 *        A command that will print the file "snapshot.ps". This file
 *        is the result of printing a hardcopy of the image display
 *        device. 
 *        [lpr snapshot.ps]
+*     WINX = INTEGER (Read and Write)
+*        The width in pixels of the window to display the image and
+*        associated controls in.  If the image is larger than the area
+*        allocated for display, it can be scrolled around within the
+*        window.  The window can be resized in the normal way using
+*        the window manager while the program is running.
+*        [200]
+*     WINY = INTEGER (Read and Write)
+*        The height in pixels of the window to display the image and
+*        associated controls in.  If the image is larger than the area
+*        allocated for display, it can be scrolled around within the
+*        window.  The window can be resized in the normal way using
+*        the window manager while the program is running.
+*        [300]
+*     ZOOM = DOUBLE (Read and Write)
+*        A factor giving the initial level to zoom in to the image
+*        displayed, that is the number of screen pixels to use for one
+*        image pixel.  It will be rounded to one of the values
+*        ... 3, 2, 1, 1/2, 1/3 ....  The zoom can be changed
+*        interactively from within the program.  The initial value
+*        may be limited by MAXCANV.
+*        [1]
 
 *  Examples:
 *     ccdalign device=xw
 *        This starts the CCDALIGN script and displays all images
 *        in a GWM xwindows window.
-
-*  Notes:
-*     - Display restrictions.
-*
-*        CCDALIGN will only work on PseudoColor X displays; this means
-*        that it cannot be used on the displays of most newer Linux 
-*        machines as normally configured.  Attempting to do so may 
-*        result in a core dump.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
@@ -152,6 +181,8 @@
 *     The DEVICE parameter also has a global association. This is not
 *     controlled by the usual CCDPACK mechanisms, instead it works in
 *     co-operation with KAPPA (SUN/95) image display/control routines.
+
+*     Note - test it with NDFs in different directories.
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK - Durham University)
@@ -179,6 +210,8 @@
 *        platform-dependent parameter-related problems, with the normal
 *        routine CCD1_NGLIS.  Turned out to be an NDG bug, but it's
 *        cleaner this way anyway.
+*     11-OCT-2000 (MBT):
+*        Rewrote using Tcl instead of IDI.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -193,6 +226,8 @@
       INCLUDE 'SAE_PAR'         ! Standard SAE constants
       INCLUDE 'MSG_PAR'         ! Message system constants
       INCLUDE 'FIO_ERR'         ! FIO error codes
+      INCLUDE 'FIO_PAR'         ! FIO system constants
+      INCLUDE 'GRP_PAR'         ! Standard GRP system constants
       INCLUDE 'PSX_ERR'         ! PSX error codes
 
 *  Arguments Given
@@ -208,6 +243,10 @@
 *  Local Constants:
       INTEGER TIMOUT
       PARAMETER ( TIMOUT = 30 ) ! Timeout when loading tasks
+      INTEGER MAXPOS
+      PARAMETER ( MAXPOS = 99 ) ! Maximum number of positions in list
+      INTEGER MAXGRP
+      PARAMETER ( MAXGRP = 20 ) ! Maximum number of NDF groups for alignment
 
 *  External References:
       EXTERNAL CHR_LEN
@@ -218,36 +257,51 @@
       CHARACTER * ( 256 ) CMD   ! Command string
       CHARACTER * ( 30 ) DEVICE ! The display device
       CHARACTER * ( 30 ) HDEV   ! Hardcopy device
-      CHARACTER * ( 30 ) NAMLST ! File name list
       CHARACTER * ( 5 ) NULL    ! Parameter NULL symbol
       CHARACTER * ( 30 ) PERC   ! Percentiles as string
+      CHARACTER * ( 30 ) LISTID ! Identifier in filename for list
       CHARACTER * ( MSG__SZMSG ) NDFNAM ! Name of NDF
       CHARACTER * ( MSG__SZMSG ) REFNAM ! Name of reference NDF
+      CHARACTER * ( FIO__SZFNM ) FNAME ! Name of position list file
+      CHARACTER * ( FIO__SZFNM ) NAMLST ! File name list
       CHARACTER * ( 30 ) CCDREG ! Message system name for ccdpack_reg
-      CHARACTER * ( 30 ) CCDRES ! Message system name for ccdpack_res
       CHARACTER * ( 30 ) KAPVIE ! Message system name for kapview_mon
+      CHARACTER * ( GRP__SZNAM ) NDFNMS( MAXGRP ) ! Names of lead NDFs in groups
       INTEGER CCDGID            ! Id for CCDPACK_REG monolith
       INTEGER CCDRID            ! Id for CCDPACK_RES monolith
-      INTEGER DEVID             ! IDI Id for graphics device
       INTEGER FD                ! File identifier
       INTEGER FDOUT             ! File identifier
       INTEGER FITTYP            ! Transformation type
       INTEGER GRPOFF            ! Offset in NDF list group
       INTEGER I                 ! Loop variable
+      INTEGER IGROUP            ! Index of the current group
+      INTEGER INDEX( MAXPOS )   ! Identifiers for points in position list
+      INTEGER IPIND             ! Pointer to identifiers for list positions
+      INTEGER IPXPOS            ! Pointer to X coordinates of list positions
+      INTEGER IPYPOS            ! Pointer to Y coordinates of list positions
       INTEGER KAPVID            ! Id for Kappa view monolith
+      INTEGER LENG              ! Returned length of string
+      INTEGER MAXCNV            ! Initial maximum dimension of display region
       INTEGER NDFLEN            ! length of NDF name
       INTEGER NGROUP            ! Number of file groups
+      INTEGER NGNDF             ! Number of NDFs in a group
       INTEGER NL                ! Length of NULL string
-      INTEGER NNDF              ! Number of NDFs in a group
-      INTEGER NVAL              ! Dummy
+      INTEGER NNDF              ! Number of NDFs passed to GUI script
+      INTEGER NPOINT( MAXGRP )  ! Number of positions marked for each NDF
+c     INTEGER NVAL              ! Dummy
       INTEGER OPLEN             ! String length
-      INTEGER REFLEN            ! length of reference NDF name
+      INTEGER REFLEN            ! Length of reference NDF name
+      INTEGER REFPOS            ! Position of the reference NDF in the list
+      INTEGER WINDIM( 2 )       ! Window dimensions for display
       LOGICAL CONT              ! Continue processing
       LOGICAL EXISTS            ! File exists
       LOGICAL HAVREF            ! Have a reference NDF
       LOGICAL HCOPY             ! Print hardcopy
       LOGICAL OK                ! OK to loop
-      REAL PERCEN( 2 )          ! The display percentiles
+      DOUBLE PRECISION PERCNT( 2 ) ! The display percentiles
+      DOUBLE PRECISION XPOS( MAXPOS ) ! X coordinates of positions in list
+      DOUBLE PRECISION YPOS( MAXPOS ) ! Y coordinates of positions in list
+      DOUBLE PRECISION ZOOM     ! Zoom factor for display
 
 *.
 
@@ -261,46 +315,6 @@
       CCDGID = -1
       KAPVID = -1
 
-*  Startup any monoliths that we need to use.
-*  CCDPACK_RES (note hard-coded monolith).
-      CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
-      CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_res'
-      CCDRES = 'ccdpack_res'//PID
-      CCDRID = SLV_LOADW( CCDRES, CMD, .TRUE., TIMOUT, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'FAILED',
-     :'Sorry cannot proceed. Failed to load monolith '//
-     :'$CCDPACK_DIR/ccdpack_res', STATUS )
-         GO TO 99
-      END IF
-
-*  CCDPACK_REG
-      CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
-      CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
-      CCDREG = 'ccdpack_reg'//PID
-      CCDGID = SLV_LOADW( CCDREG, CMD, .TRUE., TIMOUT, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'FAILED',
-     :      'Sorry cannot proceed. Failed to load monolith '//
-     :      '$CCDPACK_DIR/ccdpack_reg', STATUS )
-         GO TO 99
-      END IF
-
-*  KAPVIEW_MON
-      CALL PSX_GETENV( 'KAPPA_DIR', CMD, STATUS )
-      CMD = CMD( :CHR_LEN( CMD ) )//'/kapview_mon'
-      KAPVIE = 'kapview_mon'//PID
-      KAPVID = SLV_LOADW( KAPVIE, CMD, .TRUE., TIMOUT, STATUS )
-      IF ( STATUS .NE. SAI__OK ) THEN
-         STATUS = SAI__ERROR
-         CALL ERR_REP( 'FAILED',
-     :'Sorry cannot proceed. Failed to load monolith '//
-     :'$KAPPA_DIR/kapview_mon', STATUS )
-         GO TO 99
-      END IF
-
 *  Start the application and introduce ourselves.
       CALL CCD1_START( 'CCDALIGN', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -309,24 +323,14 @@
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Get the display device.
-      CALL MSG_BLANK( STATUS )
-      CALL MSG_OUT( ' ',
-     :     '  Give the name of an image display device', STATUS )
-      CALL MSG_BLANK( STATUS )
-
-*  The following dummy open of IDI using the given device is intended
-*  to force IDI to complain if we are running on an unsupported visual.
-*  However, it seems to cause obscure problems on Sun and Alpha 
-*  platforms, so I've removed it.  Since this task is close to being
-*  retired, I don't want to spend a lot of time fathoming what's up
-*  to make what is essentially a cosmetic fix.
-c     CALL IDI_ASSOC( 'DEVICE', 'READ', DEVID, STATUS )
-c     CALL IDI_ANNUL( DEVID, STATUS )
-
-      CALL PAR_GET0C( 'DEVICE', DEVICE, STATUS )
-      CMD = 'DEVICE='//DEVICE
-      CALL SLV_OBEYW( KAPVIE, 'idset', CMD, ' ', STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+c     CALL MSG_BLANK( STATUS )
+c     CALL MSG_OUT( ' ',
+c    :     '  Give the name of an image display device', STATUS )
+c     CALL MSG_BLANK( STATUS )
+c     CALL PAR_GET0C( 'DEVICE', DEVICE, STATUS )
+c     CMD = 'DEVICE='//DEVICE
+c     CALL SLV_OBEYW( KAPVIE, 'idset', CMD, ' ', STATUS )
+c     IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Get a percentile range for displaying the images. Note we store these
 *  as a string as KAPPA display tries to set up defaults and we
@@ -337,11 +341,11 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
      :     'displaying images?',
      :             STATUS )
       CALL MSG_BLANK( STATUS )
-      CALL PAR_GET1R( 'PERCENTILES', 2, PERCEN, NVAL, STATUS )
-      CALL MSG_SETR( 'LOW', PERCEN( 1 ) )
-      CALL MSG_SETR( 'HIGH', PERCEN( 2 ) )
-      CALL MSG_LOAD( ' ', '[^LOW,^HIGH]', PERC, OPLEN, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      CALL PAR_EXACD( 'PERCENTILES', 2, PERCNT, STATUS )
+c     CALL MSG_SETR( 'LOW', PERCEN( 1 ) )
+c     CALL MSG_SETR( 'HIGH', PERCEN( 2 ) )
+c     CALL MSG_LOAD( ' ', '[^LOW,^HIGH]', PERC, OPLEN, STATUS )
+c     IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Write a message indicating that the user should return lists of
 *  all the NDFs to process. Each group contains NDFs which have not
@@ -368,20 +372,30 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
 
 *  Get a list of NDFs from the user which constitute this group.
          CALL PAR_CANCL( 'IN', STATUS )
-         CALL CCD1_NGLIS( 'IN', NAMLST, 100, .TRUE., NNDF, STATUS )
+         CALL CCD1_NGLIS( 'IN', NAMLST, 100, .TRUE., NGNDF, STATUS )
 
 *  Bump the group number if the user gave some NDF names this time.
          IF ( STATUS .EQ. SAI__OK ) THEN
-            IF ( NNDF .GT. 0 ) THEN
+            IF ( NGNDF .GT. 0 ) THEN
                NGROUP = NGROUP + 1
             ELSE
+               OK = .FALSE.
+            END IF
+
+*  Check if we have reached the limit of number of groups we can handle.
+            IF ( NGROUP .EQ. MAXGRP .AND. OK ) THEN
+               CALL CCD1_MSG( ' ', ' ', STATUS )
+               CALL CCD1_MSG( ' ', 
+     :         ' The maximum number of groups has been entered.', 
+     :                        STATUS )
+               CALL CCD1_MSG( ' ', ' ', STATUS )
                OK = .FALSE.
             END IF
 
 *  Trap the condition when no groups have been given.
             IF ( NGROUP .EQ. 1 ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'NOGROUPS', 'No groups of NDFs where given'
+               CALL ERR_REP( 'NOGROUPS', 'No groups of NDFs were given'
      :                     ,STATUS )
                GO TO 99
             END IF
@@ -401,164 +415,295 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
       CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
       CALL MSG_BLANK( STATUS )
       CALL PAR_CANCL( 'IN', STATUS )
-      CALL CCD1_NGLIS( 'IN', 'ccdalign_ref.list', 100, .TRUE., NNDF,
+      CALL CCD1_NGLIS( 'IN', 'ccdalign_ref.list', 100, .TRUE., NGNDF,
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
-      HAVREF = ( NNDF .GT. 0 )
+      HAVREF = ( NGNDF .GT. 0 )
 
 *  Now display the reference image or the very first NDF.
-      IF ( HAVREF ) THEN
-         CALL CCD1_OPFIO( 'ccdalign_ref.list', 'READ', 'LIST', 0,
-     :                    FD, STATUS )
-      ELSE
-         CALL CCD1_OPFIO( 'ccdalign_ndf1.list', 'READ', 'LIST', 0,
-     :               FD, STATUS )
-      END IF
-      CALL FIO_READ( FD, REFNAM, REFLEN, STATUS )
-      CALL FIO_CLOSE( FD, STATUS )
-      CALL CCD1_OPLOG( STATUS )
-      CALL CCD1_MSG( ' ', ' ', STATUS )
-      CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
-      CALL CCD1_MSG( ' ', '  Using reference NDF ^REFNDF', STATUS )
-      CALL CCD1_MSG( ' ', ' ', STATUS )
+c     IF ( HAVREF ) THEN
+c        CALL CCD1_OPFIO( 'ccdalign_ref.list', 'READ', 'LIST', 0,
+c    :                    FD, STATUS )
+c     ELSE
+c        CALL CCD1_OPFIO( 'ccdalign_ndf1.list', 'READ', 'LIST', 0,
+c    :               FD, STATUS )
+c     END IF
+c     CALL FIO_READ( FD, REFNAM, REFLEN, STATUS )
+c     CALL FIO_CLOSE( FD, STATUS )
+c     CALL CCD1_OPLOG( STATUS )
+c     CALL CCD1_MSG( ' ', ' ', STATUS )
+c     CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
+c     CALL CCD1_MSG( ' ', '  Using reference NDF ^REFNDF', STATUS )
+c     CALL CCD1_MSG( ' ', ' ', STATUS )
 
 *  Display this NDF.
-      CALL MSG_BLANK( STATUS )
-      CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
-      CALL MSG_OUT( ' ', '  Displaying NDF ^REFNDF', STATUS )
-      CALL MSG_BLANK( STATUS )
-      CMD = 'in='//REFNAM( :REFLEN )//' '//
-     :      'mode=percentiles '//
-     :      'percentiles='//PERC//' accept'
-      CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+c     CALL MSG_BLANK( STATUS )
+c     CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
+c     CALL MSG_OUT( ' ', '  Displaying NDF ^REFNDF', STATUS )
+c     CALL MSG_BLANK( STATUS )
+c     CMD = 'in='//REFNAM( :REFLEN )//' '//
+c    :      'mode=percentiles '//
+c    :      'percentiles='//PERC//' accept'
+c     CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
+c     IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Now use the cursor routine to read the image feature positions.
-      CALL MSG_BLANK( STATUS )
-      LINE = 'Use the cursor to mark the image features. Remember '//
-     :       'the order as this is important for later '//
-     :       'identifications.'
-      CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-      CALL MSG_BLANK( STATUS )
+c     CALL MSG_BLANK( STATUS )
+c     LINE = 'Use the cursor to mark the image features. Remember '//
+c    :       'the order as this is important for later '//
+c    :       'identifications.'
+c     CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
+c     CALL MSG_BLANK( STATUS )
 
 *  Activate the cursor routine. If this is the first NDF of the first group
 *  then use all the NDF names of this group as the IN parameter. This will
 *  associate this position list with all the NDFs.
-      IF ( HAVREF ) THEN
-         CMD = 'in='//REFNAM( :REFLEN)//' '//
-     :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
-      ELSE
-         CMD = 'in=^ccdalign_ndf1.list'//' '//
-     :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
-      END IF
-      CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
+c     IF ( HAVREF ) THEN
+c        CMD = 'in='//REFNAM( :REFLEN)//' '//
+c    :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
+c     ELSE
+c        CMD = 'in=^ccdalign_ndf1.list'//' '//
+c    :         'outlist='//REFNAM( :REFLEN)//'.fea accept reset'
+c     END IF
+c     CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
 
 *  Now plot the identifiers of the image features.
-      CMD = 'inlist='//REFNAM( :REFLEN)//'.fea '//
-     :      'mtype=-1 '//
-     :      'palnum=3 '//
-     :      'ndfnames=false accept'
-      CALL SLV_OBEYW( CCDREG, 'plotlist', CMD, ' ', STATUS )
+c     CMD = 'inlist='//REFNAM( :REFLEN)//'.fea '//
+c    :      'mtype=-1 '//
+c    :      'palnum=3 '//
+c    :      'ndfnames=false accept'
+c     CALL SLV_OBEYW( CCDREG, 'plotlist', CMD, ' ', STATUS )
 
 *  See if user wants a hardcopy of the display.
-      CALL PAR_GET0L( 'HARDCOPY', HCOPY, STATUS )
-      IF ( STATUS .NE. SAI__OK ) GO TO 99
+c     CALL PAR_GET0L( 'HARDCOPY', HCOPY, STATUS )
+c     IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Do the hardcopy if asked.
-      IF ( HCOPY ) THEN
-         CALL MSG_BLANK( STATUS )
-         CALL MSG_OUT( ' ',
-     :        '  Give the name of a device that can be printed to.',
-     :                 STATUS )
-         CALL MSG_BLANK( STATUS )
-         CALL PAR_GET0C( 'HARDDEV', HDEV, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+c     IF ( HCOPY ) THEN
+c        CALL MSG_BLANK( STATUS )
+c        CALL MSG_OUT( ' ',
+c    :        '  Give the name of a device that can be printed to.',
+c    :                 STATUS )
+c        CALL MSG_BLANK( STATUS )
+c        CALL PAR_GET0C( 'HARDDEV', HDEV, STATUS )
+c        IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Get a snapshot.
-         CALL MSG_OUT( ' ',
-     :'  Capturing snapshot of display... Select portion of interest',
-     :                 STATUS )
-         INQUIRE( FILE='snapshot.ps', EXIST=EXISTS )
-         IF ( EXISTS ) THEN
-            CMD = 'rm snapshot.ps'
-            CALL CCD1_EXEC( CMD, STATUS )
-         END IF
-         CMD = 'odevice='//HDEV( :CHR_LEN(HDEV) )//';snapshot.ps '//
-     :         'whole=false '//
-     :         'negative=true accept'
-         CALL SLV_OBEYW( KAPVIE, 'snapshot', CMD, ' ', STATUS )
+c        CALL MSG_OUT( ' ',
+c    :'  Capturing snapshot of display... Select portion of interest',
+c    :                 STATUS )
+c        INQUIRE( FILE='snapshot.ps', EXIST=EXISTS )
+c        IF ( EXISTS ) THEN
+c           CMD = 'rm snapshot.ps'
+c           CALL CCD1_EXEC( CMD, STATUS )
+c        END IF
+c        CMD = 'odevice='//HDEV( :CHR_LEN(HDEV) )//';snapshot.ps '//
+c    :         'whole=false '//
+c    :         'negative=true accept'
+c        CALL SLV_OBEYW( KAPVIE, 'snapshot', CMD, ' ', STATUS )
 
 *  Need to print the output.
- 2       CONTINUE
-         CALL PAR_GET0C( 'PRINTCMD', CMD, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
-         IF ( CMD .EQ. ' ' ) THEN
-            CMD = 'lpr snapshot.ps'
-         END IF
-         IF ( INDEX( CMD, 'snapshot.ps' ) .EQ. 0 ) THEN 
-            CALL MSG_OUT( ' ', 
-     :'   You must give a command that will print the file snapshot.ps', 
-     :                    STATUS )
-            CALL PAR_CANCL( 'PRINTCMD', STATUS )
-            GO TO 2
-         END IF
-         CALL CCD1_EXEC( CMD, STATUS )
-      END IF
+c2       CONTINUE
+c        CALL PAR_GET0C( 'PRINTCMD', CMD, STATUS )
+c        IF ( STATUS .NE. SAI__OK ) GO TO 99
+c        IF ( CMD .EQ. ' ' ) THEN
+c           CMD = 'lpr snapshot.ps'
+c        END IF
+c        IF ( INDEX( CMD, 'snapshot.ps' ) .EQ. 0 ) THEN 
+c           CALL MSG_OUT( ' ', 
+c    :'   You must give a command that will print the file snapshot.ps', 
+c    :                    STATUS )
+c           CALL PAR_CANCL( 'PRINTCMD', STATUS )
+c           GO TO 2
+c        END IF
+c        CALL CCD1_EXEC( CMD, STATUS )
+c     END IF
 
-*  Set the number of NDF groups we need to process.
-      IF ( HAVREF ) THEN 
-         GRPOFF = 1
-      ELSE
-         GRPOFF = 2
-      END IF
-
-*  Introduction to next stage
-      CALL MSG_BLANK( STATUS )
-      LINE = 
-     :'Now the first member of each NDF group or each NDF will be '//
-     :'displayed. You will then be given the opportunity to use the '//
-     :'cursor to mark the image features which correspond to those '//
-     :'which you marked on the first (reference) NDF. The order in '//
-     :'which you identify the image features must be the same. If an '//
-     :'image feature does not exist mark a position off the frame. '//
-     :'You may extend the complete set of positions by indicating '//
-     :'image features after the last one in the reference set.'
-      CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
-      CALL MSG_BLANK( STATUS )
-
-*  Have used the first NDF group as reference set. Set start from next group.
- 3    CONTINUE
-      IF ( GRPOFF .NE. NGROUP .AND. STATUS .EQ. SAI__OK ) THEN 
-
-*  Extract the name of the first member of this group.
-         CALL MSG_SETI( 'NGROUP', GRPOFF ) 
-         CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
+*  Get the names of the NDFs to be displayed (one from each group).
+      DO 3 I = 1, NGROUP - 1
+         CALL MSG_SETI( 'IGROUP', I ) 
+         CALL MSG_LOAD( ' ', 'ccdalign_ndf^IGROUP.list', NAMLST,
      :                  OPLEN, STATUS )
          CALL CCD1_OPFIO( NAMLST, 'READ', 'LIST', 0, FD, STATUS )
-         CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
+         CALL FIO_READ( FD, NDFNMS( I ), NDFLEN, STATUS )
          CALL FIO_CLOSE( FD, STATUS )
+ 3    CONTINUE        
+
+*  Get the name of the reference NDF if there is one.
+      IF ( HAVREF ) THEN
+         CALL CCD1_OPFIO( 'ccdalign_ref.list', 'READ', 'LIST', 0,
+     :                    FD, STATUS )
+         CALL FIO_READ( FD, REFNAM, REFLEN, STATUS )
+         CALL FIO_CLOSE( FD, STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         CALL MSG_SETC( 'REFNDF', REFNAM( :REFLEN ) )
+         CALL CCD1_MSG( ' ', '  Using reference NDF ^REFNDF', STATUS )
+         CALL CCD1_MSG( ' ', ' ', STATUS )
+         NDFNMS( NGROUP ) = REFNAM
+         REFPOS = NGROUP
+         NNDF = NGROUP
+      ELSE
+         REFPOS = 1
+         NNDF = NGROUP - 1
+      END IF
+
+*  Get values of display preferences from parameter system.
+      CALL PAR_GET0D( 'ZOOM', ZOOM, STATUS )
+      CALL PAR_GET0I( 'MAXCANV', MAXCNV, STATUS )
+      CALL PAR_GET0I( 'WINX', WINDIM( 1 ), STATUS )
+      CALL PAR_GET0I( 'WINY', WINDIM( 2 ), STATUS )
+
+*  Allocate memory for coordinates of position lists.
+      CALL CCD1_MALL( MAXPOS * NNDF, '_INTEGER', IPIND, STATUS )
+      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPXPOS, STATUS )
+      CALL CCD1_MALL( MAXPOS * NNDF, '_DOUBLE', IPYPOS, STATUS )
+
+*  Call the routine which will do the graphical user interaction to
+*  obtain the position lists for each group of NDFs.
+      CALL CCD1_ALGN( NDFNMS, NNDF, REFPOS, MAXPOS, PERCNT, ZOOM, 
+     :                MAXCNV, WINDIM, NPOINT, %VAL( IPXPOS ),
+     :                %VAL( IPYPOS ), %VAL( IPIND ), STATUS )
+
+*  Write display preference parameters back to the parameter system.
+      IF ( STATUS .NE. SAI__OK ) GO TO 99
+      CALL PAR_PUT0D( 'ZOOM', ZOOM, STATUS )
+      CALL PAR_PUT0I( 'MAXCANV', MAXCNV, STATUS )
+      CALL PAR_PUT0I( 'WINX', WINDIM( 1 ), STATUS )
+      CALL PAR_PUT0I( 'WINY', WINDIM( 2 ), STATUS )
+      CALL PAR_PUT1D( 'PERCENTILES', PERCNT, 2, STATUS )
+
+*  Start up monliths which are used later in this task.
+*  CCDPACK_REG
+      CALL PSX_GETENV( 'CCDPACK_DIR', CMD, STATUS )
+      CMD = CMD( :CHR_LEN( CMD ) )//'/ccdpack_reg'
+      CCDREG = 'ccdpack_reg'//PID
+      CCDGID = SLV_LOADW( CCDREG, CMD, .TRUE., TIMOUT, STATUS )
+      IF ( STATUS .NE. SAI__OK ) THEN
+         STATUS = SAI__ERROR
+         CALL ERR_REP( 'FAILED',
+     :      'Sorry cannot proceed. Failed to load monolith '//
+     :      '$CCDPACK_DIR/ccdpack_reg', STATUS )
+         GO TO 99
+      END IF
+
+*  KAPVIEW_MON
+c     CALL PSX_GETENV( 'KAPPA_DIR', CMD, STATUS )
+c     CMD = CMD( :CHR_LEN( CMD ) )//'/kapview_mon'
+c     KAPVIE = 'kapview_mon'//PID
+c     KAPVID = SLV_LOADW( KAPVIE, CMD, .TRUE., TIMOUT, STATUS )
+c     IF ( STATUS .NE. SAI__OK ) THEN
+c        STATUS = SAI__ERROR
+c        CALL ERR_REP( 'FAILED',
+c    :'Sorry cannot proceed. Failed to load monolith '//
+c    :'$KAPPA_DIR/kapview_mon', STATUS )
+c        GO TO 99
+c     END IF
+
+*  Now write the position lists corresponding to the marked images, 
+*  and associate the appropriate NDFs with those lists.
+      DO I = 1, NNDF
+
+*  Get the name of the position list file and of the file containing all
+*  the NDFs in this group.
+         IF ( HAVREF .AND. I .EQ. NNDF ) THEN
+            CALL MSG_SETC( 'LISTID', 'ref' )
+            CALL MSG_LOAD( ' ', '^LISTID', LISTID, LENG, STATUS )
+         ELSE
+            CALL MSG_SETI( 'LISTID', I )
+            CALL MSG_LOAD( ' ', 'ndf^LISTID', LISTID, LENG, STATUS )
+         END IF
+         FNAME = 'ccdalign_' // LISTID( :LENG ) // '.fea'
+         NAMLST = 'ccdalign_' // LISTID( :LENG ) // '.list'
+
+*  Open the position list file.
+         CALL CCD1_OPFIO( FNAME, 'WRITE', 'LIST', 0, FD, STATUS )
+
+*  Write a header.
+         CALL CCD1_FIOHD( FD, 'Output from CCDALIGN', STATUS )
+
+*  Copy the data for this position list into workspace arrays so that it
+*  can be accessed.
+         CALL CCG1_COPSI( MAXPOS * ( I - 1 ) + 1, %VAL( IPIND ), 
+     :                    NPOINT( I ), 1, INDEX, STATUS )
+         CALL CCG1_COPSD( MAXPOS * ( I - 1 ) + 1, %VAL( IPXPOS ),
+     :                    NPOINT( I ), 1, XPOS, STATUS )
+         CALL CCG1_COPSD( MAXPOS * ( I - 1 ) + 1, %VAL( IPYPOS ),
+     :                    NPOINT( I ), 1, YPOS, STATUS )
+
+*  Write all the points in the position list to the file.
+         CALL CCD1_WRIXY( FD, INDEX, XPOS, YPOS, NPOINT( I ), LINE, 
+     :                    1024, STATUS )
+
+*  Close the position list file.
+         CALL FIO_CLOSE( FD, STATUS )
+
+*  Associate the position list file with all the NDFs in this group.
+         CMD = 'logto=n ' //
+     :         'mode=alist ' //
+     :         'in=^' // NAMLST( :CHR_LEN( NAMLST ) ) // ' ' //
+     :         'inlist=' // FNAME( :CHR_LEN( FNAME ) ) // ' accept'
+         CALL SLV_OBEYW( CCDREG, 'ccdedit', CMD, ' ', STATUS )
+      END DO
+
+*  Release memory used for position lists.
+      CALL CCD1_MFREE( IPYPOS, STATUS )
+      CALL CCD1_MFREE( IPXPOS, STATUS )
+      CALL CCD1_MFREE( IPIND, STATUS )
+
+*  Set the number of NDF groups we need to process.
+c     IF ( HAVREF ) THEN 
+c        GRPOFF = 1
+c     ELSE
+c        GRPOFF = 2
+c     END IF
+
+*  Introduction to next stage
+c     CALL MSG_BLANK( STATUS )
+c     LINE = 
+c    :'Now the first member of each NDF group or each NDF will be '//
+c    :'displayed. You will then be given the opportunity to use the '//
+c    :'cursor to mark the image features which correspond to those '//
+c    :'which you marked on the first (reference) NDF. The order in '//
+c    :'which you identify the image features must be the same. If an '//
+c    :'image feature does not exist mark a position off the frame. '//
+c    :'You may extend the complete set of positions by indicating '//
+c    :'image features after the last one in the reference set.'
+c     CALL CCD1_WRTPA( LINE, 72, 3, .FALSE., STATUS )
+c     CALL MSG_BLANK( STATUS )
+
+*  Have used the first NDF group as reference set. Set start from next group.
+c3    CONTINUE
+c     IF ( GRPOFF .NE. NGROUP .AND. STATUS .EQ. SAI__OK ) THEN 
+
+*  Extract the name of the first member of this group.
+c        CALL MSG_SETI( 'NGROUP', GRPOFF ) 
+c        CALL MSG_LOAD( ' ', 'ccdalign_ndf^NGROUP.list', NAMLST,
+c    :                  OPLEN, STATUS )
+c        CALL CCD1_OPFIO( NAMLST, 'READ', 'LIST', 0, FD, STATUS )
+c        CALL FIO_READ( FD, NDFNAM, NDFLEN, STATUS )
+c        CALL FIO_CLOSE( FD, STATUS )
          
 *  Display this NDF. Note we need to reset the monolith parameters
 *  as display centre & x/ymagn are not updated.
-         CALL MSG_SETC( 'NDFNAM', NDFNAM( :NDFLEN ) )
-         CALL CCD1_MSG( ' ',  '  Displaying NDF ^NDFNAM', STATUS )
-         CALL MSG_BLANK( STATUS )
-         CMD = 'in='//NDFNAM( :NDFLEN )//' '//
-     :         'mode=percentiles '//
-     :         'percentiles='//PERC//' accept'
-         CALL SLV_RESET( KAPVIE, STATUS )
-         CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
+c        CALL MSG_SETC( 'NDFNAM', NDFNAM( :NDFLEN ) )
+c        CALL CCD1_MSG( ' ',  '  Displaying NDF ^NDFNAM', STATUS )
+c        CALL MSG_BLANK( STATUS )
+c        CMD = 'in='//NDFNAM( :NDFLEN )//' '//
+c    :         'mode=percentiles '//
+c    :         'percentiles='//PERC//' accept'
+c        CALL SLV_RESET( KAPVIE, STATUS )
+c        CALL SLV_OBEYW( KAPVIE, 'display', CMD, ' ', STATUS )
 
 *  Activate the cursor routine. Use all the NDF names of this group as the IN
 *  parameter. This will associate this position list with all the NDFs.
-         CMD = 'outlist = '//NDFNAM( :NDFLEN )//'.fea '//
-     :         'in='//NDFNAM( :NDFLEN )//' accept reset'
-         CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
+c        CMD = 'outlist = '//NDFNAM( :NDFLEN )//'.fea '//
+c    :         'in='//NDFNAM( :NDFLEN )//' accept reset'
+c        CALL SLV_OBEYW( CCDREG, 'idicurs', CMD, ' ', STATUS )
 
 *  Increment offset for next group.
-         GRPOFF = GRPOFF + 1
-         GO TO 3
-      END IF
+c        GRPOFF = GRPOFF + 1
+c        GO TO 3
+c     END IF
 
 *  Now centroid all the image feature positions to get accurate ones.
       CALL MSG_BLANK( STATUS )
@@ -692,13 +837,17 @@ c     CALL IDI_ANNUL( DEVID, STATUS )
 *  If an error occurred, then report a contextual message.
  99   CONTINUE
 
+*  Free any memory which somehow has not been freed already.
+      CALL CCD1_MFREE( -1, STATUS )
+
 *  Stop any detached processes.
       IF ( CCDRID .GT. 0 ) CALL SLV_KILLW( CCDRID, STATUS )
       IF ( CCDGID .GT. 0 ) CALL SLV_KILLW( CCDGID, STATUS )
-      IF ( KAPVID .GT. 0 ) CALL SLV_KILLW( KAPVID, STATUS )
+c     IF ( KAPVID .GT. 0 ) CALL SLV_KILLW( KAPVID, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
           CALL ERR_REP( 'CCDALIGN_ERR',
      :                  'CCDALIGN: failed to align CCD frames.',
      :                  STATUS )
       END IF
       END
+* $Id$
