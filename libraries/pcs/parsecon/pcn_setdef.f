@@ -40,6 +40,8 @@
 *                  Mark and release error context - annul on '(', ')'
 *                  and '!' (RLVAD::AJC)
 *     24.03.1993:  Add DAT_PAR for SUBPAR_CMN
+*     01.02.2004:  Checked in to CVS repository cvs.starlink.ac.uk.  See there
+*                  for all future changes (norman@astro.gla.ac.uk)
 *    endhistory
 *    Type Definitions :
       IMPLICIT NONE
@@ -114,7 +116,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF1',
      :         'PARSECON: Exceeded storage for STRUCTURE defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__CHAR ) THEN
@@ -133,7 +135,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF2',
      :         'PARSECON: Exceeded storage for CHARACTER defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__REAL ) THEN
@@ -149,7 +151,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF3',
      :         'PARSECON: Exceeded storage for REAL defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__DOUBLE ) THEN
@@ -165,7 +167,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF4',
      :         'PARSECON: Exceeded storage for DOUBLE defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__INTEGER ) THEN
@@ -181,7 +183,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF5',
      :         'PARSECON: Exceeded storage for INTEGER defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ELSE IF ( DECTYPE .EQ. SUBPAR__LOGICAL ) THEN
@@ -197,7 +199,7 @@
                STATUS = PARSE__NOMEM
                CALL EMS_REP ( 'PCN_SETDEF6',
      :         'PARSECON: Exceeded storage for LOGICAL defaults',
-     :          STRUCTURE )
+     :          STATUS )
             ENDIF
 
          ENDIF
