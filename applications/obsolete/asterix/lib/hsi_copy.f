@@ -112,7 +112,7 @@
 *  Invoke the CopyHistory method
       IARG(1) = IFID
       IARG(2) = OFID
-      CALL ADI_EXEC( 'CopyHistory', 2, ARGS, OARG, STATUS )
+      CALL ADI_EXEC( 'CopyHistory', 2, IARG, OARG, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'HSI_COPY', STATUS )

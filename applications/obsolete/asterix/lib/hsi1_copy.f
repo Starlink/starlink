@@ -120,14 +120,14 @@
       OARG = ADI__NULLID
 
 *  Extract first locator
-      CALL ADI2_GETLOC( ARGS(1), ILOC, STATUS )
+      CALL ADI1_GETLOC( ARGS(1), ILOC, STATUS )
 
 *  History exists?
       CALL DAT_THERE( ILOC, 'HISTORY', THERE, STATUS )
       IF ( THERE ) THEN
 
 *    Extract output locator
-        CALL ADI2_GETLOC( ARGS(2), OLOC, STATUS )
+        CALL ADI1_GETLOC( ARGS(2), OLOC, STATUS )
 
 *    Delete existing history in output
         CALL DAT_THERE( OLOC, 'HISTORY', THERE, STATUS )
