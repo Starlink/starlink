@@ -74,6 +74,9 @@
 #     {enter_further_changes_here}
 
 #  Bugs:
+#      - on OSF/1 under some circumstances this fails. A work
+#      around is appended to this file. I suspect that the real
+#      problem lies elsewhere.
 #     {note_any_bugs_here}
 
 #-
@@ -157,3 +160,4 @@ done | for file in `cat`; do
           }
        }' types="${types}" - | sort -u 
 
+echo > /dev/null "Fix for OSF pipe bug? `printenv`"
