@@ -1,7 +1,7 @@
       SUBROUTINE SURF_MON (STATUS)
 *+
 *  Name:
-*     REDS
+*     SURF
 
 *  Purpose:
 *     main routine for SCUBA offline data reduction package
@@ -10,7 +10,7 @@
 *     ADAM A-task
  
 *  Invocation:
-*     CALL REDS( STATUS )
+*     CALL SURF( STATUS )
  
 *  Arguments:
 *     STATUS = INTEGER (Given and Returned)
@@ -31,6 +31,9 @@
 *     25-FEB-1993: Original version
 *     12-JAN-1995: Ported to UNIX, changed to 'new style'
 *     $Log$
+*     Revision 1.21  1997/06/13 00:41:44  timj
+*     Change all subroutines to SURF_
+*
 *     Revision 1.20  1997/06/12 23:36:21  timj
 *     Comment out CROSSTALK
 *
@@ -119,94 +122,94 @@ c
 
 *      IF (NAME .EQ. 'CROSSTALK') THEN
 
-*         CALL REDS_CROSSTALK (STATUS)
+*         CALL SURF_CROSSTALK (STATUS)
 
       IF (NAME .EQ. 'BOLREBIN') THEN
 
-         CALL REDS_REBIN (NAME, STATUS)
+         CALL SURF_REBIN (NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_DATA') THEN
 
-         CALL REDS_CHGDATA (STATUS)
+         CALL SURF_CHGDATA (STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_FLAT') THEN
 
-         CALL REDS_CHGFLAT (STATUS)
+         CALL SURF_CHGFLAT (STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_POINTING') THEN
 
-         CALL REDS_CHGPNT (STATUS)
+         CALL SURF_CHGPNT (STATUS)
 
       ELSE IF (NAME .EQ. 'CHANGE_QUALITY') THEN
 
-         CALL REDS_CHGQUAL (STATUS)
+         CALL SURF_CHGQUAL (STATUS)
 
       ELSE IF (NAME .EQ. 'EXTINCTION') THEN
 
-         CALL REDS_EXTINCTION (STATUS)
+         CALL SURF_EXTINCTION (STATUS)
 
       ELSE IF (NAME .EQ. 'EXTRACT_DATA') THEN
 
-         CALL REDS_REBIN (NAME, STATUS)
+         CALL SURF_REBIN (NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'FLATFIELD') THEN
 
-         CALL REDS_FLATFIELD (STATUS)
+         CALL SURF_FLATFIELD (STATUS)
 
 *      ELSE IF (NAME .EQ. 'GET_DEMOD') THEN
 
-*         CALL REDS_GET_DEMOD (STATUS)
+*         CALL SURF_GET_DEMOD (STATUS)
 
 *      ELSE IF (NAME .EQ. 'GET_FLAT') THEN
 
-*         CALL REDS_GET_FLAT (STATUS)
+*         CALL SURF_GET_FLAT (STATUS)
 
       ELSE IF (NAME .EQ. 'INTREBIN') THEN
 
-         CALL REDS_REBIN (NAME, STATUS)
+         CALL SURF_REBIN (NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'SCUPHOT') THEN
 
-         CALL REDS_SCUPHOT (STATUS)
+         CALL SURF_SCUPHOT (STATUS)
 
       ELSE IF (NAME .EQ. 'REBIN') THEN
 
-         CALL REDS_REBIN (NAME, STATUS)
+         CALL SURF_REBIN (NAME, STATUS)
 
       ELSE IF (NAME .EQ. 'REDUCE_SWITCH') THEN
 
-         CALL REDS_REDUCE_SWITCH (STATUS)
+         CALL SURF_REDUCE_SWITCH (STATUS)
       ELSE IF (NAME .EQ. 'REMSKY') THEN
 
-         CALL REDS_REMSKY (STATUS)
+         CALL SURF_REMSKY (STATUS)
 
       ELSE IF (NAME .EQ. 'RESTORE') THEN
 
-         CALL REDS_RESTORE (STATUS)
+         CALL SURF_RESTORE (STATUS)
 
       ELSE IF (NAME .EQ. 'SKYDIP') THEN
 
-         CALL REDS_SKYDIP (STATUS)
+         CALL SURF_SKYDIP (STATUS)
 
       ELSE IF (NAME .EQ. 'SCAN_RLB') THEN
 
-         CALL REDS_SCAN_RLB (STATUS)
+         CALL SURF_SCAN_RLB (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUCAT') THEN
 
-         CALL REDS_SCUCAT (STATUS)
+         CALL SURF_SCUCAT (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUOVER') THEN
 
-         CALL REDS_SCUOVER (STATUS)
+         CALL SURF_SCUOVER (STATUS)
 
       ELSE IF (NAME .EQ. 'SCUHELP') THEN
 
-         CALL SCUHELP (STATUS)
+         CALL SURF_SCUHELP (STATUS)
 
       ELSE
          CALL MSG_SETC('TAS', NAME)
-         CALL MSG_OUT(' ','^TAS is not present in the monolith',
+         CALL MSG_OUT(' ','^TAS is not present in the SURF monolith',
      :        STATUS)
 
       END IF
