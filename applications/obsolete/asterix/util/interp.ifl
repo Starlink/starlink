@@ -1,7 +1,6 @@
 	INTERFACE INTERP
 
 	    PARAMETER OVER
-		POSITION 	1
 		TYPE 		'_LOGICAL'
 		PROMPT  	'Overwrite Input datafile (Y/N) ?'
                 PPATH           'DEFAULT'
@@ -10,7 +9,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER INP
-		POSITION 	2
+		POSITION 	1
 		TYPE 		'UNIV'
 		PROMPT  	'Input datafile'
                 PPATH           'GLOBAL,CURRENT'
@@ -20,7 +19,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER OUT
-		POSITION 	3
+		POSITION 	2
 		TYPE 		'UNIV'
 		PROMPT  	'Output datafile'
                 PPATH           'CURRENT'
@@ -30,7 +29,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER APP_DIM
-		POSITION 	4
+		POSITION 	3
 		TYPE 		'_INTEGER'
 		PROMPT  	'Dimension to be interpolated '
 		VPATH		'PROMPT'
@@ -38,7 +37,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER LOWER
-		POSITION 	5
+		POSITION 	4
 		TYPE 		'_REAL'
 		PROMPT  	'Lower bound for this parameter '
 		VPATH		'PROMPT'
@@ -46,7 +45,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER UPPER
-		POSITION 	6
+		POSITION 	5
 		TYPE 		'_REAL'
 		PROMPT  	'Upper bound for this parameter '
 		VPATH		'PROMPT'
@@ -54,7 +53,7 @@
 	    ENDPARAMETER
 
 	    PARAMETER KWIDTH
-		POSITION 	7
+		POSITION 	6
 		TYPE 		'_INTEGER'
 		PROMPT  	'Number of bins between knots'
 		VPATH		'PROMPT'
