@@ -2,7 +2,7 @@
 
     PARAMETER INP
        POSITION 1
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        PPATH 'GLOBAL'
        ASSOCIATION '<-GLOBAL.BINDS'
        PROMPT 'Input object'
@@ -11,7 +11,7 @@
 
     PARAMETER OUT
        POSITION 2
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        ASSOCIATION '->GLOBAL.BINDS'
        PROMPT 'Output dataset'
        HELP 'Input dataset with axes re-ordered'
