@@ -104,6 +104,10 @@ $arg{'module'}  ||= shift @args;
 $arg{'package'} ||= shift @args;
 $arg{'package'} ||= '';
 
+#  Open index file, tied to index hash %locate.
+
+   tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
+
 #  Main processing: either pull out requested module, or present a form.
 
 if ($arg{'module'}) {
@@ -111,7 +115,7 @@ if ($arg{'module'}) {
 }
 else {
    if ($cgi) {
-      query_form;
+      query_form uc ($arg{'package'});
    }
    else {
       $0 =~ s%.*/%%;
@@ -133,53 +137,140 @@ sub query_form {
 
 #  CGI output of the program when no arguments have been specified.
 
+#  Arguments.
+
+   $package = shift;
+
 #  Read file listing packages and (probably) tasks.
 
+   my $pack;
    open TASKS, $taskfile or error "Couldn't open $taskfile";
    while (<TASKS>) {
-      ($package, @tasks) = split;
-      $package =~ s/:?$//;
-      @{$tasks{$package}} = @tasks;
+      ($pack, @tasks) = split;
+      $pack =~ s/:?$//;
+      @{$tasks{$pack}} = @tasks;
    }
    close TASKS;
    @packages = sort keys %tasks;
+
+#  Print form header.
 
    header $self;
    hprint "
       <h1>$self: Starlink Source Code Browser</h1>
       <form method=GET action='$self'>
-          Name of source module:
-          <input name=module size=24 value=''>
-          <br>
-          Name of package (optional):
-          <font size=-1>
-          <select name=package>
-          <option value='' selected>Any
    ";
-   for $package (@packages) {
-      print "<option value=$package>$package\n";
+
+#  Print query box for module.
+
+   hprint "
+      Name of source module:
+      <input name=module size=24 value=''>
+      <br>
+   ";
+
+#  Print query box for package.
+
+   my $selected = $package ? '' : 'selected';
+   hprint "
+      Name of package (optional):
+      <font size=-1>
+      <select name=package>
+      <option value='' $selected> Any
+   ";
+   for $pack (@packages) {
+      $selected = $pack eq $package ? 'selected' : '';
+      print "<option value=$pack $selected>$pack\n";
    }
    print "</select></font>\n";
+
+#  Print submission button and form footer.
+
    hprint "
-          <br>
-          <input type=submit value='Retrieve'>
+      <br>
+      <input type=submit value='Retrieve'>
       </form>
       <hr>
    ";
 
-   foreach $package (@packages) {
-      print "<h3>$package</h3>\n";
-      foreach $task (@{$tasks{$package}}) {
-         print "<a href='$scb?$task&$package#$task'>$task</a>\n";
+   if ($package) {
+
+#     Give some indication of contents of package.
+
+      print "<h2>$package</h2>\n";
+
+
+      my @tasks = @{$tasks{$package}};
+
+      if (@tasks) {
+
+#        Print list of (maybe) tasks for selected package.
+
+         hprint "
+            <h3>Tasks</h3>
+            The following appear to be tasks within package $package:
+            <br>
+         ";
+         foreach $task (sort @tasks) {
+            print "<a href='$scb?$task&$package#$task'>$task</a>\n";
+         }
+         print "<hr>\n";
+      }
+
+#     Go through list of modules, picking ones from the selected package
+#     only, and grouping them by prefix.
+
+      my (%modules, $mod, $loc, $tail);
+      while (($mod, $locs) = each %locate) {
+         foreach $loc (split ' ', $locs) {
+            if ($loc =~ /^$package#/io) {
+               $mod =~ /^([^_]*_)/;
+               $prefix = $1 || '';
+               push @{$modules{$prefix}}, $mod;
+            }
+         }
+      }
+
+      if (%modules) {
+
+#        Print list of all modules in package.
+
+         hprint "
+            <h3>Modules</h3>
+            The following modules (C and Fortran functions, subroutines
+            and include files) from the package $package are indexed:<br>
+         ";
+         print "<dl>\n";
+         my ($prefix, $r_mods);
+         foreach $prefix (sort keys %modules) {
+            print "<dt> $prefix <br>\n<dd>\n";
+            foreach $mod (sort @{$modules{$prefix}}) {
+               print "<a href='$scb?$mod&$package#$mod'>$mod</a>\n";
+            }
+         }
+         print "</dl>\n<hr>\n";
+      }
+            
+      unless (%modules || @tasks) {
+
+#        This shouldn't really happen.
+
+         hprint "
+            Apparently there are no indexed modules for the package $package.
+         "; 
+      }
+
+   }
+   else {
+
+#     Print list of all packages.
+
+      foreach $pack (@packages) {
+         print "<a href='$scb?module=&package=$pack'>$pack</a></br>\n";
       }
    }
-   print "<hr>\n";
-   hprint "
-      This list of tasks is generated automatically and is probably
-      not comprehensive.  Just because a task does not appear on this
-      list does not mean it doesn't exist.
-   ";
    footer;
+
 }
    
 
@@ -195,10 +286,6 @@ sub get_module {
 
    $module = shift;
    $package = shift;
-
-#  Open index file, tied to index hash %locate.
-
-   tie %locate, SDBM_File, $indexfile, O_RDONLY, 0644;
 
 #  Set up scratch directory.
 
