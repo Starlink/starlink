@@ -18,7 +18,7 @@ convert_idl_la_LIBADD = $(LIBADD) `ndf_link`
 ## We want to dlopen this library (can we not depend on other shareables?).
 convert_idl_la_LDFLAGS = -module
 
-PRIVATE_INCLUDES = badvals.h export.h hds.h
+PRIVATE_INCLUDES = export.h hds.h
 
 C_ROUTINES = read_ndf.c write_ndf.c probe_ndf.c crehds.c hds2idl.c \
  idlstructdef.c idlstructarrdef.c idlstructfill.c idlprimfill.c \

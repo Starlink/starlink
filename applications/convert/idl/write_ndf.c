@@ -86,8 +86,7 @@
 *        ndfMap
 *        ndfSbad
 *     PRIMDAT
-*        prm_par.h  (Actually a private file badvals.h is used as prm_par.h
-*                    doesn't exist.)
+*        prm_par.h
 *     
 *     {name_of_facility_or_package}:
 *        {routine_used}...
@@ -111,6 +110,7 @@
 
 *  Authors:
 *     AJC: A.J.Chipperfield (Starlink, RAL)
+*     TIMJ: Tim Jenness (JAC, Hawaii)
 *     {enter_new_authors_here}
 
 *  History:
@@ -120,6 +120,8 @@
 *        Tidy.
 *     14-FEB-2002 (AJC):
 *        IDL has re-defined IDL_STRING - use updated header file export.h
+*     10-JUL-2004 (TIMJ):
+*        Really use prm_par.h
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -130,7 +132,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "badvals.h"
+#include "prm_par.h"
 #include "sae_par.h"
 #include "dat_par.h"
 #include "ndf.h"
