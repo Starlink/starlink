@@ -321,7 +321,7 @@ SHLIB_LD_LIBS=$TCL_SHLIB_LD_LIBS
 
 # Library file(s) to include in tclsh and other base applications
 # in order to provide facilities needed by DLOBJ above.
-DL_LIBS=$TCL_DL_LIBS
+DL_LIBS=$TCL_DL_LIBS $TCL_LIBS
 
 # Flags to pass to the compiler when linking object files into
 # an executable tclsh or tcltest binary.
@@ -517,6 +517,7 @@ AC_CHECK_LIB(socket, main, [LIBS="$LIBS -lsocket"])
 AC_CHECK_LIB(resolv, main, [LIBS="$LIBS -lresolv"])
 AC_CHECK_LIB(w, main, [LIBS="$LIBS -lw"])
 AC_CHECK_LIB(dl, main, [LIBS="$LIBS -ldl"])
+LIBS="$LIBS $TCL_LIBS"
 
 # -----------------------------------------------------------------------
 # 	Check if we need (or can use) socket (sys/socket.h) prototypes
