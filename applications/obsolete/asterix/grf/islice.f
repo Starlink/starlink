@@ -132,7 +132,7 @@
         IF (I_UNITS_1D(L:L).NE.'S'.AND.I_UNITS_1D(L:L).NE.'s') THEN
           L=L+1
         ENDIF
-        I_UNITS_1D(L:)='\u2\d'
+        I_UNITS_1D(L:)=CHAR(92)//'u2'//CHAR(92)//'d'
         I_TITLE_1D='Projected slice'
         CALL ARR_REG1R(I_XBASE_1D,I_XSCALE_1D,I_N_1D,%VAL(I_APTR_1D),
      :                                                          STATUS)

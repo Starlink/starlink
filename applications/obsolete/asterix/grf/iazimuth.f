@@ -107,7 +107,7 @@
         UNITFACT = ABS( I_XSCALE * I_YSCALE )
 *
 *  Set units to be per whatever the axis units were squared
-        I_UNITS_1D = I_UNITS(1:CHR_LEN(I_UNITS)) // ' \ (' //
+        I_UNITS_1D = I_UNITS(1:CHR_LEN(I_UNITS)) // ' / (' //
      &        I_XYUNITS(1:CHR_LEN(I_XYUNITS)) //' squared)'
 *
         CALL MSG_SETC('UNIT', I_UNITS_1D)

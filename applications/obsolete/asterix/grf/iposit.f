@@ -330,7 +330,7 @@
 *  check for continuation character
               L=CHR_LEN(TEXT)
               LC=TEXT(L:L)
-              IF (LC.EQ.'~'.OR.LC.EQ.'-'.OR.LC.EQ.'\') THEN
+              IF (LC.EQ.'~'.OR.LC.EQ.'-'.OR.LC.EQ.CHAR(92)) THEN
                 REPEAT=.TRUE.
                 L=CHR_LEN(TEXT(:L-1))
               ELSE
@@ -641,7 +641,7 @@
         L=CHR_LEN(TEXT)
         C=TEXT(L:L)
 *  ignore continuation character
-        IF (C.EQ.'~'.OR.C.EQ.'-'.OR.C.EQ.'\') THEN
+        IF (C.EQ.'~'.OR.C.EQ.'-'.OR.C.EQ.CHAR(92)) THEN
           L=L-1
         ENDIF
 

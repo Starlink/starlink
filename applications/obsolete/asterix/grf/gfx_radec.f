@@ -23,6 +23,7 @@
       REAL DEGTOMIN,SECTOMIN
       PARAMETER (DEGTOMIN=60.0,SECTOMIN=1.0/60.0)
 *    Local variables :
+      CHARACTER*1 ESC,U,D
       CHARACTER RALBL*25,DECLBL*25
       CHARACTER*20 XOPT,YOPT
       DOUBLE PRECISION DECRAD
@@ -213,6 +214,11 @@
             CALL PGSCI(COL)
           ENDIF
 
+*  fix for linux as it doesn't like backslash in string litorals
+          ESC=CHAR(92)
+          U=CHAR(92)//'u'
+          D=CHAR(92)//'d'
+
 *  x-axis numbers
           IF (RA1.GT.RA2) THEN
             POS=RA2+XTICK-MOD(RA2,XTICK)
@@ -222,9 +228,10 @@
               SS=NINT(MOD(POS*60.0,60.0))
               IF (XSEC) THEN
                 WRITE(RALBL,'(I2,A,I2.2,A,I2.2)',IOSTAT=DUMMY)
-     :                HH,'\uh\d',MM,'\um\d',SS
+     :                HH,U//'h'//D,MM,U//'m'//D,SS
               ELSE
-                WRITE(RALBL,'(I2,A,I2.2)',IOSTAT=DUMMY) HH,'\uh\d',MM
+                WRITE(RALBL,'(I2,A,I2.2)',IOSTAT=DUMMY)
+     :                               HH,U//'h'//D,MM
               ENDIF
               RELPOS=(RA1-POS)/RARAN
               CALL PGMTEXT('B',1.3,RELPOS,0.5,RALBL)
@@ -260,10 +267,11 @@
             SS=ABS(NINT(MOD(POS*60.0,60.0)))
             IF (YSEC) THEN
               WRITE(DECLBL,'(SP,I3,A,SS,I2.2,A,I2.2,A)',IOSTAT=DUMMY)
-     :                        DD,'\(718)',MM,'\(716)',SS,'\(717)'
+     :                                DD,ESC//'(718)',MM,ESC//'(716)',
+     :                                                 SS,ESC//'(717)'
             ELSE
               WRITE(DECLBL,'(SP,I3,A,SS,I2.2,A)',IOSTAT=DUMMY)
-     :                        DD,'\(718)',MM,'\(716)'
+     :                        DD,ESC//'(718)',MM,ESC//'(716)'
             ENDIF
             RELPOS=(POS-DEC1)/DECRAN
             IF (INDEX(YOPT,'V').GT.0) THEN
