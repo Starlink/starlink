@@ -1,43 +1,87 @@
-<!--
-  DTD for documenting DTDs
+<!-- DTD for documenting DTDs
 
-  This provides descriptive text for the elements
-  See dtd2sgml.dsl.
+     This provides descriptive text for the elements
+     See dtd2sgml.dsl.
 
-  $Id$
--->
+     $Id$
+     -->
 
-<!element dtddescription - o (element+)>
-<!element element - o (p+, attribute*)>
-<!element attribute - o (p+)>
-<!element p - o (#pcdata | elemref | example | code | em)+>
-<!element elemref - o empty>
-<!element (example|code|em) - - (#pcdata)>
+<!ELEMENT dtddescription - O (dtdsummary,(element+))>
+<!ELEMENT element - O (p+, attribute*)>
+<!ELEMENT attribute - O (p+)>
+<!ELEMENT p - O (#PCDATA | elemref | example | code | em)+>
+<!ELEMENT elemref - O EMPTY>
+<!ELEMENT (example|code|em) - - (#PCDATA)>
 
-<!attlist dtddescription
+<!-- The output of script dtd2sgml.pl consists of a representation of
+     a DTD's structure, marked up using the following elements.  That
+     output should be suitable for direct inclusion in an instance of
+     this DTD.
+     -->
+<!ELEMENT dtdsummary      - - (dtdelement+)>
+<!ELEMENT dtdelement	  - - (dtdparents, dtdcontent, dtdattribute*)>
+<!ELEMENT dtdparents	  - - (dtdelemref*)>
+<!ELEMENT dtdcontent	  - - (dtdcontentmodel, dtdcontenttree?)>
+<!ELEMENT dtdcontentmodel - - (#PCDATA | dtdelemref)*>
+<!ELEMENT dtdcontenttree  - - (#PCDATA)>
+<!ELEMENT dtdattribute	  - - (#PCDATA)>
+<!ELEMENT dtdelemref	  - O EMPTY>
+
+<!ATTLIST dtddescription
 	docelem		-- Name of the document element of the DTD
 			   this describes.  This must match the
 			   document element of the dtdelementlist
 			   document which invokes this.  --
-		cdata #required
-    >
-<!attlist element
+		CDATA #REQUIRED
+	>
+<!ATTLIST element
 	gi		-- GI of this element --
-		id #required
-    >
-<!attlist attribute
+		ID #REQUIRED
+	>
+<!ATTLIST attribute
 	name		-- attribute name --
-		cdata #required
-    >
-<!attlist elemref
+		CDATA #REQUIRED
+	>
+<!ATTLIST elemref
 	gi		-- GI of element we're referring to --
-		idref #required
+		IDREF #REQUIRED
+	dtd		-- entity referring to the DTD which we're
+			   cross-referencing.  At present, this is
+			   rather informal: it's just a CDATA entity which
+			   is used to name the target top-level element. --
+		ENTITY #IMPLIED
 	self		-- if present, then we're referring to the same
 			   element we're documenting.  Format the element name
 			   as usual, but don't include any sort of link. --
-		(self)	#implied
-    >
+		(self)	#IMPLIED
+	>
 
-<!entity amp cdata '&'>
-<!entity lt  cdata '<'>
-<!entity gt  cdata '>'>
+<!-- dtdsummary element attributes -->
+<!ATTLIST dtdsummary
+	sysid 		-- sysid of summarised DTD --
+		CDATA
+		#REQUIRED
+	top		-- name of document-element --
+		CDATA
+		#REQUIRED
+	>
+<!ATTLIST dtdelement 
+	gi		-- GI of this element --
+		NAME #REQUIRED
+	id		-- ID which refers to this element --
+		ID #REQUIRED
+	>
+<!ATTLIST dtdattribute 
+	name CDATA #REQUIRED
+	default CDATA #REQUIRED
+	type CDATA #IMPLIED
+	>
+<!ATTLIST dtdelemref
+	id		-- reference to dtdelement element --
+		IDREF #REQUIRED
+	>
+
+
+<!ENTITY amp CDATA '&'>
+<!ENTITY lt  CDATA '<'>
+<!ENTITY gt  CDATA '>'>
