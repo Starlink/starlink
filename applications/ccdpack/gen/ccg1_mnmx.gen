@@ -35,11 +35,16 @@
 
 *  Authors:
 *     PDRAPER: Peter Draper (STARLINK)
+*     MBT: Mark Taylor (STARLINK)
 *     {enter_new_authors_here}
 
 *  History:
 *     4-NOV-1992 (PDRAPER):
 *        {changes}
+*     15-MAR-1999 (MBT):
+*        Modified to use correct numeric intercomparison (PRIMDAT not 
+*        just fortran relational operators, the latter fail for unsigned
+*        types).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -73,6 +78,12 @@
       INTEGER NGOOD              ! Number of non-BAD values in array
       <TYPE> DUMMY               ! Local storage.
 
+*  Internal References:
+      INCLUDE 'NUM_DEC_CVT'      ! PRIMDAT generic declarations
+      INCLUDE 'NUM_DEC_<T>'      ! PRIMDAT declarations for type <COMM>
+      INCLUDE 'NUM_DEF_CVT'      ! PRIMDAT generic definitions
+      INCLUDE 'NUM_DEF_<T>'      ! PRIMDAT definitions for type <COMM>
+
 *.
 
 *  Check inherited global status.
@@ -94,8 +105,8 @@
             DO 1 I = 1, NPIX
                DUMMY = ARRAY( I )
                IF ( DUMMY .NE. VAL__BAD<T> ) THEN 
-                  IF ( DUMMY .LT. <T>MIN ) <T>MIN = DUMMY
-                  IF ( DUMMY .GT. <T>MAX ) <T>MAX = DUMMY
+                  IF ( NUM_LT<T>( DUMMY, <T>MIN ) ) <T>MIN = DUMMY
+                  IF ( NUM_GT<T>( DUMMY, <T>MAX ) ) <T>MAX = DUMMY
                   NGOOD = NGOOD + 1
                END IF
  1          CONTINUE
@@ -114,8 +125,8 @@
 *  Simple case just located the minimum and maximum values.
             DO 2 I = 1, NPIX
                DUMMY = ARRAY( I )
-               IF ( DUMMY .LT. <T>MIN ) <T>MIN = DUMMY
-               IF ( DUMMY .GT. <T>MAX ) <T>MAX = DUMMY
+               IF ( NUM_LT<T>( DUMMY, <T>MIN ) ) <T>MIN = DUMMY
+               IF ( NUM_GT<T>( DUMMY, <T>MAX ) ) <T>MAX = DUMMY
  2          CONTINUE
          END IF
       ELSE
