@@ -16,7 +16,7 @@ proc cred4Sky {taskname} {
     set bottop [frame $frame.bot]
     pack $midtop $bottop -in $frame
 
-    set l1 [checkbutton $midtop.l1 -text "Add Observations into Pairs" -variable Cred4Widgets(ADD_IN_PAIRS)]
+    set l1 [checkbutton $midtop.l1 -text "Add ROs in Pairs" -variable Cred4Widgets(ADD_IN_PAIRS)]
     set l2 [label $midtop.l2 -text " "]
     set fi [radiobutton $midtop.fi -text "Errors from Int" -variable Cred4Widgets(ERRORS) -value "FROM_INT" -width 15]
     set fo [radiobutton $midtop.fo -text "Errors from Obs" -variable Cred4Widgets(ERRORS) -value "FROM_OBS" -width 15]
@@ -36,7 +36,7 @@ proc cred4Sky {taskname} {
 
     set l3 [label $bottop.l3 -text "Sky Weighting Factor"]
     set Cred4Widgets(SKYWT) [entry $bottop.sk -width 15]
-    set vw [checkbutton $bottop.l2 -text "Variance Weighting" -variable Cred4Widgets(VARWT)]
+    set vw [checkbutton $bottop.l2 -text "Variance Weight" -variable Cred4Widgets(VARWT)]
     set l4 [label $bottop.l4 -text " "]
     pack $vw $l4 -in $bottop -side left 
     pack $Cred4Widgets(SKYWT) $l3 -in $bottop -side right 

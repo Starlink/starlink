@@ -12,10 +12,6 @@ proc buildP4Widgets2 w {
     global P4Widgets
     global cgs4drHtml
 
-# Create some widget options just for the plotting window
-    set optRoot *[string range $w 1 end]
-    option add $optRoot*Radiobutton.width 15
-
 # Create the gwm widget with scroll bars
     global gwm
     set gwm [gwm_gwmWithScroll $w.frame -gwmname $env(PID)xwin]
@@ -30,10 +26,10 @@ proc buildP4Widgets2 w {
     pack [label $w.bottom.fill -text "Portable-CGS4DR" -relief sunken -border 2] -fill both -padx 3 -pady 3 -side left -expand y
 
 # Create the command buttons
-    button $w.buttons.colours -text Colours -padx 10 -command "gwm_colourDialog $w.col $gwm $w.buttons.colours"
-    button $w.buttons.clear -text Clear -padx 10 -command "$gwm clear"
-    button $w.buttons.print -text Print -padx 10 -command "gwm_printDialog $w.pr $gwm $w.buttons.print"
-    checkbutton $w.buttons.crosshair -text Crosshair -padx 10 -variable P4Widgets(CROSSHAIR) -command crossHair
+    button $w.buttons.colours -text Colours -padx 5 -command "gwm_colourDialog $w.col $gwm $w.buttons.colours"
+    button $w.buttons.clear -text Clear -padx 5 -command "$gwm clear"
+    button $w.buttons.print -text Print -padx 5 -command "gwm_printDialog $w.pr $gwm $w.buttons.print"
+    checkbutton $w.buttons.crosshair -text Crosshair -padx 5 -variable P4Widgets(CROSSHAIR) -command crossHair
 
 # Bind them to help text
     bind $w.buttons.clear <Button-3> "cgs4drHelpDialog .helpDialog $cgs4drHtml/p4GwmBox2.html"
@@ -43,11 +39,12 @@ proc buildP4Widgets2 w {
 
 # Pack the buttons into the frame
     pack $w.buttons.clear $w.buttons.colours $w.buttons.print $w.buttons.crosshair -side left -expand y -padx 5 -pady 5
+    #pack $w.buttons.clear $w.buttons.colours $w.buttons.print $w.buttons.crosshair -side left -expand y
 
 # Pack the gwm widget's frame into the top level widget. This is done last
 # so that when the top level is resized it is the gwm widget that gets
 # resized to fit rather than the frame containing the buttons.
-    pack $w.frame.gwm -in $w.frame
+    pack $w.frame.gwm -in $w.frame -expand yes -fill both
     return $w.frame
 }
 

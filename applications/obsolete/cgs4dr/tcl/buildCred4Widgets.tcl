@@ -54,30 +54,27 @@ proc buildCred4Widgets w {
     set tbf [frame $bottomFrame.tbf]
     set mbf [frame $bottomFrame.mbf]
     set bbf [frame $bottomFrame.bbf]
-    #set bbf2 [frame $bottomFrame.bbf2]
-    pack $tbf $mbf $bbf -in $bottomFrame -side top
+    pack $tbf $mbf $bbf -in $bottomFrame -side top -expand yes -fill both
 
     set Cred4Widgets(SETUP) [button $tbf.as -text "Setup"]
     set Cred4Widgets(DISPLAY) [button $tbf.di -text "Display"]
     set Cred4Widgets(CONFIGS) [button $tbf.dr -text "Configs"]
     set Cred4Widgets(DRMASKS) [button $tbf.dm -text "Masks"]
-    pack $Cred4Widgets(SETUP) $Cred4Widgets(DISPLAY) $Cred4Widgets(CONFIGS) $Cred4Widgets(DRMASKS) -in $tbf -expand yes -side left 
+    pack $Cred4Widgets(SETUP) $Cred4Widgets(DISPLAY) $Cred4Widgets(CONFIGS) $Cred4Widgets(DRMASKS) \
+      -in $tbf -expand yes -fill both -side left 
 
     set Cred4Widgets(BIAS) [button $mbf.as -text "Bias"]
     set Cred4Widgets(DARK) [button $mbf.di -text "Dark"]
     set Cred4Widgets(FLAT) [button $mbf.dr -text "Flat"]
     set Cred4Widgets(CALIB) [button $mbf.dm -text "Calibration"]
-    pack $Cred4Widgets(BIAS) $Cred4Widgets(DARK) $Cred4Widgets(FLAT) $Cred4Widgets(CALIB) -in $mbf -expand yes -side left 
+    pack $Cred4Widgets(BIAS) $Cred4Widgets(DARK) $Cred4Widgets(FLAT) $Cred4Widgets(CALIB) \
+      -in $mbf -expand yes -fill both -side left 
 
     set Cred4Widgets(STANDARD) [button $bbf.as -text "Standard"]
     set Cred4Widgets(SKY) [button $bbf.di -text "Sky"]
     set Cred4Widgets(POLYSKY) [button $bbf.dr -text "Polysky"]
     set Cred4Widgets(EXTRACT) [button $bbf.dm -text "Extract"]
-    pack $Cred4Widgets(STANDARD) $Cred4Widgets(SKY) $Cred4Widgets(POLYSKY) $Cred4Widgets(EXTRACT) -in $bbf -expand yes -side left 
-
-    #set Cred4Widgets(ASTPARAMS) [button $bbf2.apa -text "Astro Params"]
-    #set Cred4Widgets(REDPARAMS) [button $bbf2.rpa -text "Reduction Params"]
-    #pack $Cred4Widgets(ASTPARAMS) $Cred4Widgets(REDPARAMS) -in $bbf2 -expand yes -side left 
-
+    pack $Cred4Widgets(STANDARD) $Cred4Widgets(SKY) $Cred4Widgets(POLYSKY) $Cred4Widgets(EXTRACT) \
+      -in $bbf -expand yes -fill both -side left 
     return $mainFrame
 }
