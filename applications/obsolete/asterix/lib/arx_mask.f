@@ -13,15 +13,13 @@
       INCLUDE 'DAT_PAR'
       INCLUDE 'PAR_ERR'
       INCLUDE 'GRP_PAR'
-      INCLUDE 'PRM_PAR'
-      INCLUDE 'FIO_ERR'
 *    Global Variables :
 *    Import :
       INTEGER ID
       INTEGER DIMS(2)
       REAL BASE(2)
       REAL SCALE(2)
-      CHARACTER*(*)(2) UNITS
+      CHARACTER*(*) UNITS(2)
 *    Import-Export :
 *    Export :
       INTEGER MASK(*)
