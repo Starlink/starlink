@@ -108,7 +108,8 @@
 
 (element dtdcontentmodel
   (make element gi: "p"
-	(process-children)))
+	(make element gi: "code"
+	      (process-children))))
 
 (element dtdcontenttree
   (make element gi: "p"
