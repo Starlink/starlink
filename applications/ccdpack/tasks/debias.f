@@ -729,6 +729,7 @@
       LOGICAL SETSAT             ! Whether to set saturated values (to SATVAL)
       LOGICAL USEEXT             ! Get CCD parameters from extensions
       LOGICAL USESET             ! Whether to use Set header information
+      LOGICAL VALID              ! Whether NDF identifier is valid
       LOGICAL ZEROED             ! Whether or not input bias master has been zeroed
       LOGICAL ZEROCK             ! Whether or not to check bias master is processed as specified by ZEROED
       REAL FRAC                  ! Fractional numeric error count
@@ -1514,6 +1515,10 @@
 *  Tidying up section.
 ************************************************************************
 999   CONTINUE
+
+*  Release workspace NDF if it is still active.
+      CALL NDF_VALID( IDWRK, VALID, STATUS )
+      IF ( VALID ) CALL NDF_ANNUL( IDWRK, STATUS )
 
 *  Release all NDF left accessed - unmap everything etc.
       CALL NDF_END( STATUS )
