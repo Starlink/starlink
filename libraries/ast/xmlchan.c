@@ -1,4 +1,5 @@
 /*
+*class++
 *  Name:
 *     XmlChan
 
