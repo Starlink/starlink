@@ -533,6 +533,9 @@
 
       IFAIL = 0
 
+      PEQK = 0.0D0
+      PLEK = 0.0D0
+      PGTK = 0.0D0
       IF (L .LE. 0.0D0) THEN
         IFAIL = 1
       ELSE IF (K .LT. 0) THEN
@@ -542,7 +545,6 @@
       ELSE
         K1 = K
         PEQK = EXP(-L) * (L ** K1) / PDA_GAMMA(DBLE(K1+1))
-        PLEK = 0.0D0
         DO I = 0, K
           I1 = I
           PLEK = PLEK + (EXP(-L) * (L ** I1) / PDA_GAMMA(DBLE(I1+1)))
