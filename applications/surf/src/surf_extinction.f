@@ -191,6 +191,7 @@
       INTEGER          DIM (MAXDIM)     ! the dimensions of an array
       INTEGER          DIMX (MAXDIM)    ! expected dimensions of an array
       LOGICAL          EXTINCTION       ! .TRUE. if EXTINCTION has been run
+      REAL             FAST_AXIS(SCUBA__MAX_SUB) ! Fast axis angles for POL
       CHARACTER*20     FIRST_LST        ! sidereal time at which FIRST_TAU
                                         ! measured
       DOUBLE PRECISION FIRST_LST_RAD    ! FIRST_LST in radians
@@ -306,6 +307,7 @@
                                         ! locator to SCUBA extension in output
                                         ! file
       INTEGER          OUT_QUALITY_PTR  ! pointer to quality array in output 
+      CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC ! Locator to REDS extension
       INTEGER          OUT_VARIANCE_PTR ! pointer to variance array in output
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                         ! azimuth pointing corrections (arcsec)
@@ -338,6 +340,7 @@
                                         ! wavelengths of observation
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       REAL             TAUZ             ! Tau read from FITS header
+      LOGICAL          THERE            ! Is an extension there?
       INTEGER          UBND (MAXDIM)    ! upper bounds of array
       DOUBLE PRECISION UT1              ! UT1 of start of observation expressed
                                         ! as modified Julian day
@@ -472,6 +475,10 @@
      :     MJD1, STATUS)
          CALL SCULIB_GET_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 'MJD2',
      :     MJD2, STATUS)
+      ELSE
+         LAT2_RAD = 0.0D0
+         LONG2_RAD = 0.0D0
+         MJD2 = 0.0D0
       END IF
 
       IF ((CENTRE_COORDS .NE. 'AZ')  .AND.
@@ -931,6 +938,41 @@
      :  'N_BOLS', N_BOL_OUT, STATUS)
       CALL DAT_PUT1C (OUT_FITSX_LOC, N_FITS, FITS, STATUS)
 
+*     For a polarimetry observation we need to change the
+*     .REDS.FAST_AXIS array to include a single value to reflect
+*     the single sub-instrument. This is only required if the
+*     .REDS.FAST_AXIS array exists (since REMIP can be run before
+*     or after EXTINCTION)
+
+*     First need to get the REDS extension locator
+      CALL NDF_XSTAT(OUTNDF, 'REDS', THERE, STATUS)
+
+      IF (THERE) THEN
+         CALL NDF_XLOC(OUTNDF, 'REDS', 'UPDATE', OUT_REDSX_LOC, 
+     :        STATUS)
+
+*     Is the fast_Axis array there
+         CALL DAT_THERE(OUT_REDSX_LOC,'FAST_AXIS', THERE, STATUS)
+
+         IF (THERE) THEN
+*     Read the array
+         CALL CMP_GET1R(OUT_REDSX_LOC, 'FAST_AXIS', SCUBA__MAX_SUB, 
+     :        FAST_AXIS, ITEMP, STATUS)
+
+*     Delete the component
+         CALL DAT_ERASE(OUT_REDSX_LOC, 'FAST_AXIS', STATUS)
+
+*     Annul the locator
+         CALL DAT_ANNUL(OUT_REDSX_LOC, STATUS)
+
+*     Write the single value
+         CALL NDF_XPT0R(FAST_AXIS(SUB_POINTER), OUTNDF, 'REDS',
+     :        'FAST_AXIS', STATUS)
+         END IF
+
+      END IF
+
+
 *  for a PHOTOM observation recalculate the PHOT_BB array for the bolometers
 *  in the selected sub-instrument
 
@@ -962,7 +1004,7 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
-         CALL SCULIB_PROCESS_BOLS(.TRUE., .FALSE., N_BEAM, N_BOL_OUT,
+         CALL SURFLIB_PROCESS_BOLS(TSKNAME, N_BEAM, N_BOL_OUT,
      :        N_POS, 1, N_SWITCHES, N_EXPOSURES, 
      :        N_INTEGRATIONS, N_MEASUREMENTS, 
      :        1, N_EXPOSURES, 1, N_INTEGRATIONS, 1, N_MEASUREMENTS,
@@ -974,13 +1016,14 @@
      :        RA_CENTRE, DEC_CENTRE,
      :        %VAL(IN_RA1_PTR), %VAL(IN_RA2_PTR), 
      :        %VAL(IN_DEC1_PTR), %VAL(IN_DEC2_PTR), UT1, UT1,
-     :        0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0, 0.0D0,
+     :        MJD1, LONG_RAD, LAT_RAD, MJD2, LONG2_RAD, LAT2_RAD,
      :        LOCAL_COORDS, DBLE(MAP_X), DBLE(MAP_Y),
      :        0, POINT_LST, POINT_DAZ, POINT_DEL,
      :        SCUBA__NUM_CHAN, SCUBA__NUM_ADC,OUT_BOL_ADC,OUT_BOL_CHAN,
      :        BOL_DU3, BOL_DU4, .FALSE., FIRST_LST_RAD, SECOND_LST_RAD,
      :        FIRST_TAU, SECOND_TAU, BOL_RA, BOL_DEC,
      :        %VAL(OUT_DATA_PTR), %VAL(OUT_VARIANCE_PTR), .FALSE., 0,
+     :        0,0,
      :        STATUS)
 
 
