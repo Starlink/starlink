@@ -2714,6 +2714,147 @@ package kappa {
 
    executable kapview_mon {
 
+      action comcomp {
+
+         alias {colcomp}
+
+         helplib {$KAPPA_HELP}
+
+         parameter badcol {
+            type LITERAL
+            vpath CURRENT DEFAULT
+            prompt {Colour of bad pixels}
+            ppath CURRENT DEFAULT
+            default MIN
+            helpkey *
+          }
+
+         parameter device {
+            position 6
+            ptype DEVICE
+            vpath GLOBAL PROMPT
+            prompt {Name of display device}
+            ppath GLOBAL CURRENT
+            association <-GLOBAL.IMAGE_DISPLAY
+            helpkey *
+          }
+
+         parameter inr {
+            position 1
+            type NDF
+            prompt {The red NDF}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ing {
+            position 2
+            type NDF
+            prompt {The green NDF}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter inb {
+            position 3
+            type NDF
+            prompt {The blue NDF}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter out {
+            position 4
+            type NDF
+            prompt {The output NDF containing an image of colour indices}
+            association ->GLOBAL.DATA_ARRAY
+            helpkey *
+          }
+
+         parameter lut {
+            position 5
+            type NDF
+            prompt {The output NDF containing the colour table}
+            association ->GLOBAL.LUT
+            helpkey *
+          }
+
+         parameter percentiles {
+            type _REAL
+            prompt {Percentiles for default scaling}
+            ppath CURRENT DEFAULT
+            default 5 95
+            helpkey *
+            size *
+          }
+
+         parameter ppm {
+            type FILENAME
+            access READ
+            vpath DEFAULT
+            prompt {Filename to store output PPM image}
+            ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+         parameter rlow {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to zero red intensity}
+            helpkey *
+          }
+
+         parameter rhigh {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to full red intensity}
+            helpkey *
+          }
+
+         parameter glow {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to zero green intensity}
+            helpkey *
+          }
+
+         parameter ghigh {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to full green intensity}
+            helpkey *
+          }
+
+         parameter blow {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to zero blue intensity}
+            helpkey *
+          }
+
+         parameter bhigh {
+            type _REAL
+            ppath DYNAMIC
+            vpath DEFAULT
+            default !
+            prompt {NDF data value corresponding to full blue intensity}
+            helpkey *
+          }
+
+      }
+
+
       action contour {
          alias {contou(r)}
 
