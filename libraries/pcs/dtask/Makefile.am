@@ -96,9 +96,13 @@ ilink: Makefile $(srcdir)/ilink.in
 	mv ilink.tmp ilink
 
 $(srcdir)/alink.in: $(srcdir)/ailink.in.m4
-	$(M4) -DSCRIPTNAME=alink $(srcdir)/ailink.in.m4 >$@
+	rm -f $@ alink.in.tmp
+	$(M4) -DSCRIPTNAME=alink $(srcdir)/ailink.in.m4 >alink.in.tmp \
+	    && mv alink.in.tmp $@
 $(srcdir)/ilink.in: $(srcdir)/ailink.in.m4
-	$(M4) -DSCRIPTNAME=ilink $(srcdir)/ailink.in.m4 >$@
+	rm -f $@ ilink.in.tmp
+	$(M4) -DSCRIPTNAME=ilink $(srcdir)/ailink.in.m4 >ilink.in.tmp \
+	    && mv ilink.in.tmp $@
 # The installed dtask_libtool is just the libtool we configured for our.
 # own use -- it's specific to this configuration, not this directory.
 dtask_libtool: libtool
