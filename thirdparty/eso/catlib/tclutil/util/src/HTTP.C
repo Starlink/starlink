@@ -1,6 +1,6 @@
  /*
  * E.S.O. - VLT project/ESO Archive 
- * $Id: HTTP.C,v 1.17 2001/08/27 10:11:33 abrighto Exp $
+ * $Id: HTTP.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $
  *
  * HTTP.C - method definitions for class HTTP
  *          (based on code from DSS:HTTP.c by Miguell Albrecht)
@@ -12,7 +12,7 @@
  * Allan Brighton  26 Sep 95  Created
  * Peter W. Draper 16 Jun 98  Added support for web proxy servers.
  */
-static const char* const rcsId="@(#) $Id: HTTP.C,v 1.17 2001/08/27 10:11:33 abrighto Exp $";
+static const char* const rcsId="@(#) $Id: HTTP.C,v 1.1.1.1 2001/08/29 13:46:16 norman Exp $";
 
 
 #include <stdio.h>
@@ -1101,7 +1101,7 @@ void HTTP::checkProxy( const char *host )
             //  host. Note need a copy of variable as strtok modifies it.
             char *ptr = getenv( "http_noproxy" );
             if ( ptr != NULL ) {
-                char *hostdomain = strchr(host, '.');
+                const char *hostdomain = strchr(host, '.');
                 if (hostdomain != NULL) {
                     hostdomain++;
 		    // make a copy of the http_noproxy string for strtok
