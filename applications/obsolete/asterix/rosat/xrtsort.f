@@ -630,8 +630,8 @@
         DO LOOP2=1,SRT.NTIME
           IF ( SRT.MIN_T(LOOP2) .LT. HEAD.TEND(LOOP) .AND.
      :          SRT.MAX_T(LOOP2) .GT. HEAD.TSTART(LOOP)) THEN
-            EXPO_TIM = EXPO_TIM + MIN(HEAD.TEND(LOOP), SRT.MAX_T(LOOP2))
-     :                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2))
+            EXPO_TIM = EXPO_TIM + (MIN(HEAD.TEND(LOOP), SRT.MAX_T(LOOP2))
+     :                    - MAX (HEAD.TSTART(LOOP), SRT.MIN_T(LOOP2)))
           ENDIF
         ENDDO
       ENDDO
@@ -1967,8 +1967,8 @@ c        SRT.ELBMAX=Y_HWIDTH
       CALL USI_DEF0I('YDSTART', HEAD.YDSTART, STATUS)
       CALL USI_DEF0I('YDEND', HEAD.YDEND, STATUS)
 *
-      CALL CHR_RTOC(HEAD.TSTART(1), C1, K1)
-      CALL CHR_RTOC(HEAD.TEND(HEAD.NTRANGE), C2, K2)
+      CALL CHR_DTOC(HEAD.TSTART(1), C1, K1)
+      CALL CHR_DTOC(HEAD.TEND(HEAD.NTRANGE), C2, K2)
       TIMSTRING = C1(1:K1) // ':' // C2(1:K2)
 *
       CALL USI_DEF0C('TIMRANGE', TIMSTRING, STATUS)
@@ -2831,11 +2831,12 @@ C????            SRT.ELBMAX = SRT.ELBMAX * SRT.MAX_X / X_HWIDTH
       CHARACTER*20 EXT                            ! File extension name
       CHARACTER*80 DNAME                    ! Names of files
       REAL STBAD(MAXBAD), ENBAD(MAXBAD)           ! Bad time periods
-      REAL XWIDTH,YWIDTH,TWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      REAL XWIDTH,YWIDTH,EWIDTH,PWIDTH     ! Binwidth of each axis
+      DOUBLE PRECISION TWIDTH
       REAL BXWIDTH,BYWIDTH                        ! Binwidth in backgnd box
       REAL XDWID,YDWID                            ! Width of detector axes
       REAL ELAWID,ELBWID                          ! Binwidth of elliptic axes
-      REAL T1,T2                                  ! Lower and upper limits of
+      DOUBLE PRECISION T1,T2                                  ! Lower and upper limits of
 *                                                 ! a time bin
       INTEGER NBAD                                ! Number of bad time ranges
       INTEGER TLP,LP1,LP2,LP3,LP4,LP6,LP7,INLP,LP
@@ -3132,7 +3133,8 @@ C         IF (STATUS .NE. SAI__OK) GOTO 999
       LOGICAL QCHECK                    ! Check quality of each event
       INTEGER MAXBAD,NBAD               ! Dimension & NUMBER of bad arrays
       REAL STBAD(MAXBAD),ENBAD(MAXBAD)  ! Start & End times of bad data
-      REAL XWIDTH,YWIDTH,TWIDTH,PWIDTH,EWIDTH     ! Bin widths of axes
+      REAL XWIDTH,YWIDTH,PWIDTH,EWIDTH     ! Bin widths of axes
+      DOUBLE PRECISION TWIDTH
       REAL XDWID,YDWID                  ! Bin widths of detector axes
       REAL BXWIDTH, BYWIDTH             ! Width of bckgnd im pixels
       INTEGER NRBIN                     ! Number of output radial bins
