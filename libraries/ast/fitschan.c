@@ -416,6 +416,7 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *          "TAN with projection terms" is no longer a standard FITS
 *          projection. It is now represented using the AST-specific TPN
 *          projection (until such time as FITS-WCS paper IV is finished).
+*        - Remove trailing "Z" from DATE-OBS values created by astWrite.
 *class--
 */
 
@@ -1516,7 +1517,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format. */
+   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
          slaCaldj( 99, 1, 1, &mjd99, &jj );
          if( val < mjd99 ) {
             slaDjcal( 0, val, iymdf, &jj );
@@ -1525,7 +1526,7 @@ static int AIPSFromStore( AstFitsChan *this, FitsStore *store,
          } else {
             slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
             slaDd2tf( 3, fd, sign, ihmsf );
-            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3dZ",
+            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                      iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                      ihmsf[2], ihmsf[3] ); 
          }
@@ -3122,7 +3123,7 @@ static double DateObs( const char *dateobs ) {
 *  Description:
 *     Extracts the date and time fields from the supplied string and converts 
 *     them into a modified Julian Date. Supports both old "dd/mm/yy"
-*     format, and the new "ccyy-mm-ddThh:mm:ss[.sss...]Z" format.
+*     format, and the new "ccyy-mm-ddThh:mm:ss[.sss...]" format.
 
 *  Parameters:
 *     dateobs
@@ -9859,7 +9860,7 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
 
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format. */
+   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
       slaCaldj( 99, 1, 1, &mjd99, &jj );
       if( val < mjd99 ) {
 
@@ -9871,7 +9872,7 @@ static int IRAFFromStore( AstFitsChan *this, FitsStore *store,
 
          slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
          slaDd2tf( 3, fd, sign, ihmsf );
-         sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3dZ",
+         sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                   iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                   ihmsf[2], ihmsf[3] ); 
       }
@@ -11626,7 +11627,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
 
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format. */
+   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
             slaCaldj( 99, 1, 1, &mjd99, &jj );
             if( val < mjd99 ) {
                slaDjcal( 0, val, iymdf, &jj );
@@ -11636,7 +11637,7 @@ static int PCFromStore( AstFitsChan *this, FitsStore *store,
             } else {
                slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
                slaDd2tf( 3, fd, sign, ihmsf );
-               sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3dZ",
+               sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                         iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                         ihmsf[2], ihmsf[3] ); 
             }
@@ -17177,7 +17178,7 @@ static int WCSFromStore( AstFitsChan *this, FitsStore *store,
 
 /* The format used for the DATE-OBS keyword depends on the value of the
    keyword. For DATE-OBS < 1999.0, use the old "dd/mm/yy" format.
-   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]Z" format. */
+   Otherwise, use the new "ccyy-mm-ddThh:mm:ss[.ssss]" format. */
          slaCaldj( 99, 1, 1, &mjd99, &jj );
          if( val < mjd99 ) {
    
@@ -17189,7 +17190,7 @@ static int WCSFromStore( AstFitsChan *this, FitsStore *store,
    
             slaDjcl( val, iymdf, iymdf+1, iymdf+2, &fd, &jj );
             slaDd2tf( 3, fd, sign, ihmsf );
-            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3dZ",
+            sprintf( combuf, "%4.4d-%2.2d-%2.2dT%2.2d:%2.2d:%2.2d.%3.3d",
                      iymdf[0], iymdf[1], iymdf[2], ihmsf[0], ihmsf[1],
                      ihmsf[2], ihmsf[3] ); 
          }
