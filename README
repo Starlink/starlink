@@ -100,6 +100,14 @@ specific component, the instructions are slightly different.
       % make
       % make install-manifest
 
+ - After a `cvs update' in a component, it is possible that some
+   generated files will be out of date (if configure.ac or Makefile.am
+   had been updated).  Any required updating is generally handled
+   automatically by makefile rules, but if you wish to guarantee that
+   everything is up to date, then you can give the command
+   `autoreconf'.  This does no harm in any case, since it does
+   nothing if it is not required.
+
 
 
 See SSN/78 (in docs/ssn78) for more details on building Starlink classic
