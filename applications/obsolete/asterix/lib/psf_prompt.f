@@ -33,6 +33,10 @@
       INCLUDE 'PSF_PAR'
       INCLUDE 'PAR_PAR'
 *
+*    Global variables :
+*
+      INCLUDE 'PSF_CMN'
+*
 *    Import :
 *
       LOGICAL                   USEDEFAULT              ! Use default psf
