@@ -93,3 +93,8 @@ New changes: 2.3-2
     coordinate systems
 
     SExtractor toolbox increment and decrement arrows right way around.
+
+    Automatic NDF history recording should be working again.
+
+    NDFs stored with container files are now allowed (useful for SCUBA 
+    data).
