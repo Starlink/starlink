@@ -633,7 +633,7 @@ Indexing support.
            (cons (car l) (loop (cdr l)))))))
 
 ;; *reduce-one-index-entry*: node-list-reduce procedure.
-;; Make a list of index entry pairs.  Each pair has (key . ref-sosofo)
+;; Make a list of index entry pairs.  Each pair has (key . '(ref-sosofo))
 (define (*reduce-one-index-entry* result n)
   (let ((key (trim-data n)))
     (if (= (string-length key) 0)       ; user error, but don't fail
@@ -642,12 +642,12 @@ Indexing support.
                ;; index key
                (*index-string-to-key* key n)
                ;; reference -- an "a" element
-               (make element gi: "a"
-                     attributes: `(("href" ,(href-to n)))
-                     (make-section-reference
-                      target: (ancestor-member
-                               n
-                               (section-element-list)))))
+               (list (make element gi: "a"
+                           attributes: `(("href" ,(href-to n)))
+                           (make-section-reference
+                            target: (ancestor-member
+                                     n
+                                     (section-element-list))))))
               result))))
 
 ;; The same, but from a list of sub*section nodes which have an
@@ -660,9 +660,9 @@ Indexing support.
                ;; index key
                (*index-string-to-key* (attribute-string "indexkey" nd) nd)
                ;; reference -- an "a" element
-               (make element gi: "a"
-                     attributes: `(("href" ,(href-to nd)))
-                     (make-section-reference target: nd))))
+               (list (make element gi: "a"
+                           attributes: `(("href" ,(href-to nd)))
+                           (make-section-reference target: nd)))))
             (*index-entry-from-section* (cdr sectionlist)))))
 
 ;; Test ordering of two index lists.
@@ -702,9 +702,9 @@ Indexing support.
                -1
                +1)))))
 
-;; Collapses an input index list (a list of (key . sosofo) pairs) by,
-;; at present, simply appending the sosofos of those entries which have
-;; string-identical keys (according to *idx-different-text*).
+;; Collapses an input index list (a list of (key . '(sosofo)) pairs) by,
+;; at present, simply appending the (list of) sosofos of those entries
+;; which have string-identical keys (according to *idx-different-text*).
 (define (*collapse-index* full-list)
   (if (null? full-list)
       '()                               ; an error, probably
@@ -719,9 +719,8 @@ Indexing support.
                (let ((next (car rest))
                      (rrest (cdr rest)))
                  (*collapse-index* (cons (cons (car first)
-                                               (sosofo-append (cdr first)
-                                                              (literal ", ")
-                                                              (cdr next)))
+                                               (append (cdr first)
+                                                       (cdr next)))
                                          rrest))))))))
 
 ;; Evaluates to a sosofo comprising the formatted index entries
@@ -741,8 +740,13 @@ Indexing support.
                                     "/"
                                     (strs-to-str (cdr strs))))))
                             (literal ": ")
-                            (make element gi: "em"
-                                  (cdr idxpair))))
+                            (make element gi: "ul"
+                                  (apply sosofo-append
+                                         (map (lambda (s)
+                                                (make element gi: "li"
+                                                      (make element gi: "em"
+                                                            s)))
+                                              (cdr idxpair))))))
                     (*collapse-index*
                      (sort-list (append
                                  ;; list of sections with indexkey attributes
