@@ -1,0 +1,13 @@
+*+
+*  Purpose:
+*     Define the common block used by CONVERT routines that write
+*     FITS or FITS-like headers.
+*
+*-
+
+*  Global Variables:
+      INTEGER FFUNIT             ! Fortran logical-unit number of the
+                                 ! FITS file
+
+      COMMON /COF_COM/ FFUNIT
+
