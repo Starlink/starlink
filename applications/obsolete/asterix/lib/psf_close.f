@@ -70,6 +70,7 @@
 
 *    System is now shut down
       PSFINIT = .FALSE.
+      PSFLIBINIT = .FALSE.
 
 *    Tidy up
       IF ( STATUS .NE. SAI__OK ) THEN
