@@ -281,6 +281,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.12  2001/02/22 03:12:27  timj
+*     Trap AZ centre coords for clock error correction
+*
 *     Revision 1.11  2001/02/22 02:49:35  timj
 *     Don't reverse the sign of DATA when using SCUBA2MEM
 *
@@ -673,10 +676,20 @@
 
             END IF
 
-*     Now get the clock error
-            CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
-     :           LST_STRT, CLOCK_ERR, DTEMP, STATUS )
-            
+*     Now get the clock error - ignore this if centre coords
+*     is AZ since we are then not tracking and we can therfore
+*     not determine the error from the headers
+*     Alternative to this is to make SCULIB_CALC_CLOCKERR 
+*     ignore AZ or check status and flush
+            IF (CENTRE_COORDS .EQ. 'AZ') THEN
+               CALL MSG_OUTIF(MSG__NORM, ' ', 'PROCESS_BOLS: '//
+     :              'Clock error can not be determined when '//
+     :              'centre coords is set to AZ', STATUS)
+            ELSE
+               CALL SCULIB_CALC_CLOCKERR( N_FITS, FITS, RA_CEN, 
+     :              LST_STRT, CLOCK_ERR, DTEMP, STATUS )
+            END IF
+
          END DO
 
 *     If the correction is greater than 20 seconds and less than 
