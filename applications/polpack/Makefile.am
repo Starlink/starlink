@@ -27,9 +27,6 @@ F_ROUTINES = $(CCDPACK_F_ROUTINES) \
              $(POLPACK_F_ROUTINES) $(POLSUB_F_ROUTINES) \
              $(POLPACK_MONO_SOURCE) 
 
-#  Polpack f files for which there are no corresponding iraf .par files.
-POLPACK_F3_ROUTINES = polhelp.f
-
 #  All other polpack .f files.
 POLPACK_F1_ROUTINES = polbin.f polcal.f polcent.f polexp.f polexpx.f \
 polext.f polhelp.f polimage.f polimp.f polimpx.f polka.f polplot.f \
@@ -38,7 +35,7 @@ polwrtcl.f polzconv.f
 
 #  polpack routines for which the atask action name can be derived from the 
 #  the f file name by remving the .f file suffix.
-POLPACK_F_ROUTINES = $(POLPACK_F1_ROUTINES) $(POLPACK_F3_ROUTINES)
+POLPACK_F_ROUTINES = $(POLPACK_F1_ROUTINES) 
 
 
 MONO_SOURCE = $(POLPACK_MONO_SOURCE) 
