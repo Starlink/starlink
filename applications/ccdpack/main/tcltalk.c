@@ -493,7 +493,7 @@
       if ( *status != SAI__OK ) return;
 
 /* Construct the command to execute. */
-      sprintf( buffer, "set %s %f", name, value );
+      sprintf( buffer, "set %s %g", name, value );
 
 /* Execute the command in the Tcl interpreter. */
       (void) ccdTclEval( cinterp, buffer, status );
