@@ -10,7 +10,7 @@ Starlink::AST::Begin();
 # Unit map
 
 my $unitmap = new Starlink::AST::UnitMap(2, "");
-isa_ok($unitmap, "AstUnitMapPtr");
+isa_ok($unitmap, "Starlink::AST::UnitMap");
 
 $unitmap->Show();
 

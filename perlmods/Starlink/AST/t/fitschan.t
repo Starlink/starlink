@@ -26,7 +26,7 @@ is ( $fchan->Get( "Ncard" ), 38, "Number of cards in FitsChan" );
 
 # Get FrameSet
 my $wcsinfo = $fchan->Read();
-isa_ok( $wcsinfo, "AstFrameSetPtr" );
+isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 # Mappings
 # --------

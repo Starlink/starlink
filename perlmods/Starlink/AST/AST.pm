@@ -209,7 +209,6 @@ use base qw/ Starlink::AST::Channel /;
 package Starlink::AST::XmlChan;
 use base qw/ Starlink::AST::Channel /;
 
-
 # Exception handling
 
 package Starlink::AST::Status;
@@ -229,7 +228,7 @@ sub ThrowError {
 
 # All the inheritance stuff
 
-package AstObjectPtr;
+package Starlink::AST;
 
 # Looks like AST is smart enough to figure out whether we want to SetC(),
 # SetD() or SetI() all on its own, ditto for GetC(), GetD() or GetI(). We
@@ -287,14 +286,14 @@ sub Copy {
   return bless $new, ref($self);
 }
 
-package AstAxisPtr;
-use base qw/ AstObjectPtr /;
+package Starlink::AST::Axis;
+use base qw/ Starlink::AST /;
 
-package AstSkyAxisPtr;
-use base qw/ AstAxisPtr /;
+package Starlink::AST::SkyAxis;
+use base qw/ Starlink::AST::Axis /;
 
-package AstChannelPtr;
-use base qw/ AstObjectPtr /;
+package Starlink::AST::Channel;
+use base qw/ Starlink::AST  /;
 
 # Need to rebless objects obtained from an astRead into the
 # correct class rather than generic variant.
@@ -304,91 +303,91 @@ sub Read {
   my $new = $self->_Read();
   return if !defined $new;
   my $ast_class = $new->GetC( "Class" );
-  my $perl_class = "Ast" . $ast_class . "Ptr";
+  my $perl_class = "Starlink::AST::" . $ast_class;
   return bless $new, $perl_class;
 }
 
 
-package AstFitsChanPtr;
-use base qw/ AstChannelPtr /;
+package Starlink::AST::FitsChan;
+use base qw/ Starlink::AST::Channel /;
 
-package AstXmlChanPtr;
-use base qw/ AstChannelPtr /;
+package Starlink::AST::XmlChan;
+use base qw/ Starlink::AST::Channel /;
 
-package AstMappingPtr;
-use base qw/ AstObjectPtr /;
+package Starlink::AST::Mapping;
+use base qw/ Starlink::AST /;
 
-package AstCmpMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::CmpMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstDssMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::DssMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstLutMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::LutMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstGrismMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::GrismMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstIntraMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::IntraMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstMathMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::MathMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstMatrixMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::MatrixMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstPcdMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::PcdMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstPermMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::PermMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstPolyMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::PolyMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstShiftMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::ShiftMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstSlaMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::SlaMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstSphMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::SphMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstSpecMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::SpecMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstUnitMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::UnitMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstWcsMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::WcsMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstWinMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::WinMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstZoomMapPtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::ZoomMap;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstFramePtr;
-use base qw/ AstMappingPtr /;
+package Starlink::AST::Frame;
+use base qw/ Starlink::AST::Mapping /;
 
-package AstFrameSetPtr;
-use base qw/ AstFramePtr /;
+package Starlink::AST::FrameSet;
+use base qw/ Starlink::AST::Frame /;
 
-package AstPlotPtr;
-use base qw/ AstFrameSetPtr /;
+package Starlink::AST::Plot;
+use base qw/ Starlink::AST::FrameSet /;
 
-package AstCmpFramePtr;
-use base qw/ AstFramePtr /;
+package Starlink::AST::CmpFrame;
+use base qw/ Starlink::AST::Frame /;
 
-package AstSkyFramePtr;
-use base qw/ AstFramePtr /;
+package Starlink::AST::SkyFrame;
+use base qw/ Starlink::AST::Frame /;
 
-package AstSpecFramePtr;
-use base qw/ AstFramePtr /;
+package Starlink::AST::SpecFrame;
+use base qw/ Starlink::AST::Frame /;
 
 
 

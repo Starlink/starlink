@@ -82,6 +82,7 @@ typedef void AstXmlChan;
 
 /* Helper functions */
 #include "arrays.h"
+#include "astTypemap.h"
 
 char ** pack1Dchar( AV * avref ) {
   int i;
@@ -105,6 +106,7 @@ char ** pack1Dchar( AV * avref ) {
   }
   return outarr;
 }
+
 
 /* Exception handler callback */
 
@@ -268,6 +270,7 @@ MODULE = Starlink::AST     PACKAGE = Starlink::AST
 BOOT:
           MUTEX_INIT(&AST_mutex);
           ErrBuff = newAV();
+          Perl_astGrfInit();
           
 double
 AST__BAD()
@@ -280,7 +283,6 @@ AST__BAD()
  OUTPUT:
   RETVAL
           
-
 MODULE = Starlink::AST     PACKAGE = Starlink::AST PREFIX = ast
 
 
@@ -310,8 +312,10 @@ ast_OK()
  OUTPUT:
   RETVAL
 
+# Can be called as class method or function
+
 int
-astVersion()
+astVersion( ... )
  CODE:
 #if ( AST_MAJOR_VERS >= 2 )
   ASTCALL(
@@ -471,7 +475,7 @@ _new( class, hash )
 
 MODULE = Starlink::AST  PACKAGE = Starlink::AST::FitsChan
 
-# Note that FitsChan inherits from AstChannelPtr
+# Note that FitsChan inherits from Starlink::AST::Channel
 
 AstFitsChan *
 _new( class, hash )
@@ -953,7 +957,7 @@ new( class, ncoord, zoom, options )
   RETVAL
 
 
-MODULE = Starlink::AST   PACKAGE = AstObjectPtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST PREFIX = ast
 
 void
 astClear( this, attrib )
@@ -1127,30 +1131,13 @@ astTest( this, attrib )
  OUTPUT:
   RETVAL
 
-# This duplicates the Starlink::AST::Version method.
-# Maybe a bad idea
-
-int
-astVersion(class)
-  AstObject * class
- CODE:
-#if (AST_MAJOR_VERS >= 2)
-  ASTCALL(
-   RETVAL = astVersion;
-  )
-#else
-   Perl_croak(aTHX_ "astVersion: Please upgrade to AST V2.x or greater");
-#endif
- OUTPUT:
-  RETVAL
-
 # Use annul as automatic destructor
 # For automatic destructor we do not want to throw an exception
 # on error. So do not use ASTCALL. Do a manual printf to stderr and continue.
 
 void
-astDESTROY( this )
-  AstObject * this
+astDESTROY( obj )
+  SV * obj
  PREINIT:
   int my_xsstatus_val = 0;
   int *my_xsstatus = &my_xsstatus_val;
@@ -1163,7 +1150,14 @@ astDESTROY( this )
   AV* local_err;
   char * s = CopFILE( PL_curcop );
   STRLEN msglen;
+  IV mytmp;
+  AstObject * this;
  CODE:
+  /* DESTROY always inserts stub code for INT2PTR not what is in the typemap */
+  /* Do it manually */
+  mytmp = extractAstIntPointer( obj );
+  this = INT2PTR( AstObject *, mytmp );
+
   MUTEX_LOCK(&AST_mutex);
   My_astClearErrMsg();
   old_ast_status = astWatch( my_xsstatus );
@@ -1186,7 +1180,7 @@ astDESTROY( this )
   }
 
 
-MODULE = Starlink::AST   PACKAGE = AstFramePtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Frame PREFIX = ast
 
 
 double
@@ -1548,7 +1542,7 @@ astUnformat( this, axis, string )
   RETVAL
 
 
-MODULE = Starlink::AST   PACKAGE = AstFrameSetPtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::FrameSet PREFIX = ast
 
 void
 astAddFrame( this, iframe, map, frame)
@@ -1604,7 +1598,7 @@ astRemoveFrame( this, iframe )
    astRemoveFrame( this, iframe );
   )
 
-MODULE = Starlink::AST   PACKAGE = AstMappingPtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Mapping PREFIX = ast
 
 # Return the new mappings and booleans as a list
 # Do this later since it requires subversion of the typemap
@@ -1736,7 +1730,7 @@ astTran2( this, xin, yin, forward )
 
 
 
-MODULE = Starlink::AST   PACKAGE = AstChannelPtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Channel PREFIX = ast
 
 AstObject *
 ast_Read( channel )
@@ -1759,7 +1753,7 @@ astWrite( channel, object )
  OUTPUT:
   RETVAL
 
-MODULE = Starlink::AST   PACKAGE = AstFitsChanPtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::FitsChan PREFIX = ast
 
 void
 astPutFits( this, card, overwrite )
@@ -1798,7 +1792,7 @@ astFindFits( this, name, card, inc )
   RETVAL 
   card
 
-MODULE = Starlink::AST   PACKAGE = AstSpecFramePtr PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::SpecFrame PREFIX = ast
 
 void
 astSetRefPos( this, frm, lon, lat)
@@ -1835,7 +1829,7 @@ astGetRefPos( this, frm )
   XPUSHs(sv_2mortal(newSVnv(lat)));
 #endif 
 
-MODULE = Starlink::AST   PACKAGE = AstSlaMapPtr PREFIX = astSla
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::SlaMap PREFIX = astSla
 
 void
 astSlaAdd( this, cvt, args )
@@ -1850,7 +1844,7 @@ astSlaAdd( this, cvt, args )
    astSlaAdd( this, cvt, cargs );
   )
 
-MODULE = Starlink::AST   PACKAGE = AstSpecMapPtr PREFIX = astSpec
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::SpecMap PREFIX = astSpec
 
 void
 astSpecAdd( this, cvt, args )
@@ -1869,7 +1863,7 @@ astSpecAdd( this, cvt, args )
   )
 #endif
 
-MODULE = Starlink::AST   PACKAGE = AstPlotPtr  PREFIX = ast
+MODULE = Starlink::AST   PACKAGE = Starlink::AST::Plot  PREFIX = ast
 
 void
 astBorder( this )

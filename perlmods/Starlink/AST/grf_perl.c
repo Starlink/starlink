@@ -58,18 +58,22 @@ static HV * GraphCB;
 /* Function Prototypes */
 /* =================== */
 static void Report( const char * );
-void initGrf();
+void Perl_astGrfInit();
 
 /* Function definitions */
 /* ==================== */
 
 /* This function creates the hash necessary to store the
    graphics callbacks. Should be called from the BOOT section */
-void initGrf () {
+void Perl_astGrfInit () {
   GraphCB  = newHV();
 }
 
+/* This function allows a XS routine to store something in our hash */
 
+void Perl_astGrfSet ( AstPlot * plot, char * type, CV * callback  ) {
+
+}
 
 
 int astGFlush( void ){

@@ -15,7 +15,7 @@ $fchan->Clear( "Card" );
 
 # Get FrameSet
 my $wcsinfo = $fchan->Read();
-isa_ok( $wcsinfo, "AstFrameSetPtr" );
+isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
 
 my ( $offset, @p1, @p2 );
 my $point1 = \@p1;

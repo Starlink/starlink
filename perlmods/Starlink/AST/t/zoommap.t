@@ -10,7 +10,7 @@ Starlink::AST::Begin();
 # Zoom map
 
 my $zoommap = new Starlink::AST::ZoomMap(2,5, "");
-isa_ok($zoommap, "AstZoomMapPtr");
+isa_ok($zoommap, "Starlink::AST::ZoomMap");
 
 $zoommap->Show();
 

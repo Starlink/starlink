@@ -16,7 +16,8 @@ $fchan->Clear( "Card" );
 
 # Get FrameSet
 my $wcsinfo = $fchan->Read();
-isa_ok( $wcsinfo, "AstFrameSetPtr" );
+isa_ok( $wcsinfo, "Starlink::AST::FrameSet" );
+
 
 # define some arrays (and references) to hold out inital coordinates
 my ( @x, @y );

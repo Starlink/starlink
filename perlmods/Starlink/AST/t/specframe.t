@@ -6,7 +6,7 @@ use Test::More tests => 9;
 require_ok("Starlink::AST");
 
 my $specframe = new Starlink::AST::SpecFrame('');
-isa_ok($specframe, "AstSpecFramePtr");
+isa_ok($specframe, "Starlink::AST::SpecFrame");
 
 is( $specframe->GetC("Title"), 'Wavelength', "Default Title attribute of SpecFrame");
 is( $specframe->GetC("System"), 'WAVE', "Default System attribute of SpecFrame");
