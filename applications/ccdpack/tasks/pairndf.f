@@ -470,8 +470,8 @@
 
 *  Call the routine which does all the user interaction and obtains a
 *  list of pairings with associated offsets.
-      CALL CCD1_PNDF( NDFGR, PERCNT, COUNT, ZOOM, MAXCNV, WINDIM, 
-     :                PRVDIM, MSTYLE, NODES, NMAT, XOFF, YOFF, 
+      CALL CCD1_PNDF( NDFGR, PERCNT, ZOOM, MAXCNV, WINDIM, PRVDIM,
+     :                MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF,
      :                IPX1, IPY1, IPX2, IPY2, STATUS )
 
 *=======================================================================

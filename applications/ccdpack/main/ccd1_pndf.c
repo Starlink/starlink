@@ -10,9 +10,9 @@
    void *ccdMall( char *type, int size, int *status );
 
    F77_SUBROUTINE(ccd1_pndf)( INTEGER(ndfgid), DOUBLE_ARRAY(percnt), 
-                              INTEGER(count), DOUBLE(zoom), 
-                              INTEGER(maxcnv), INTEGER_ARRAY(windim),
-                              INTEGER_ARRAY(prvdim), CHARACTER(mstyle),
+                              DOUBLE(zoom), INTEGER(maxcnv), 
+                              INTEGER_ARRAY(windim), INTEGER_ARRAY(prvdim),
+                              CHARACTER(mstyle), INTEGER(count), 
                               INTEGER_ARRAY(nodes), INTEGER_ARRAY(nmat),
                               DOUBLE_ARRAY(xoff), DOUBLE_ARRAY(yoff),
                               POINTER_ARRAY(ipx1), POINTER_ARRAY(ipy1),
@@ -31,8 +31,8 @@
 *     ANSI C.
 
 *  Invocation:
-*     CALL CCD1_PNDF( NDFGID, PERCNT, COUNT, ZOOM, MAXCNV, WINDIM, 
-*                     PRVDIM, MSTYLE, NODES, NMAT, XOFF, YOFF, IPX1, 
+*     CALL CCD1_PNDF( NDFGID, PERCNT, ZOOM, MAXCNV, WINDIM, PRVDIM,
+*                     MSTYLE, COUNT, NODES, NMAT, XOFF, YOFF, IPX1, 
 *                     IPY1, IPX2, IPY2, STATUS )
 
 *  Description:
@@ -47,8 +47,6 @@
 *     PERCNT( 2 ) = DOUBLE PRECISION (Given)
 *        Lower and higher percentiles to use in displaying the images.
 *        They should satisfy 0 <= PERCNT( 0 ) <= PERCNT( 1 ) <= 100.
-*     COUNT = INTEGER (Given)
-*        Number of pairings made by the user.
 *     ZOOM = DOUBLE PRECISION (Given and Returned)
 *        The zoom factor for the initial display.  May be limited by MAXCNV.
 *     MAXCNV = INTEGER (Given and Returned)
@@ -60,6 +58,8 @@
 *        chooser widget.
 *     MSTYLE = CHARACTER * ( * ) (Given and Returned)
 *        A string indicating how markers are to be plotted on the image.
+*     COUNT = INTEGER (Returned)
+*        Number of pairings made by the user.
 *     NODES( 2, * ) = INTEGER (Returned)
 *        For each pairing made, this array contains the indices of the 
 *        NDFs which form the pair.  The index of the first NDF in the
