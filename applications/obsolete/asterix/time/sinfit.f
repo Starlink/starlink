@@ -39,7 +39,7 @@
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     20 Apr 95 : V1.8-1 Updated data interface. Phase object written to
 *                        separate dataset (DJA)
-*
+*     12 Dec 1995 V2.0-0 ADI port (DJA)
 *    Type Definitions :
 *
       IMPLICIT NONE
@@ -59,10 +59,11 @@
       CHARACTER*80           TEXT(5)       ! For history record
       CHARACTER*80           TITLE         ! of data file.
 
-      REAL                   BASEFREQ      ! Base freq.
-      REAL                   FCHNG         ! The frequency at which SINFIT_PGRAM changes algorithm.
-      REAL                   FREQSTEP      ! Freq.step
-      REAL                   NPOWER        ! Noise power
+      REAL                   	BASEFREQ      		! Base freq.
+      REAL                   	FCHNG         		! The frequency at which SINFIT_PGRAM changes algorithm.
+      REAL                   	FREQSTEP      		! Freq.step
+      REAL                   	NPOWER        		! Noise power
+      REAL			SPARR(2)		! Spaced array data
 
       INTEGER                AXPTR         ! Pointer to input axis(1)
       INTEGER                DATPTR        ! Pointer to input data
@@ -87,7 +88,6 @@
       INTEGER			PFID			! Phase spectrum id
 
       LOGICAL                AXOK          ! AXIS(1) OK
-      LOGICAL                BAD           ! Bad quality points?
       LOGICAL                OK
       LOGICAL                PHASE         ! Create a PHASE_SPECRUM too?
       LOGICAL                PRIM          ! Used to test for primitive
@@ -97,112 +97,101 @@
 *    Version id :
 *
       CHARACTER*21		VERSION
-        PARAMETER           	( VERSION = 'SINFIT Version 1.8-1' )
+        PARAMETER           	( VERSION = 'SINFIT Version 2.0-0' )
 *-
 
-*    Check status.
+*  Check status.
       IF (STATUS .NE. SAI__OK) RETURN
 
-*    Version ID.
+*  Version ID.
       CALL MSG_PRNT(VERSION)
 
-*    Initialize ASTERIX
+*  Initialize ASTERIX
       CALL AST_INIT()
 
-*    Obtain data object name.
-      CALL USI_TASSOCI( 'INP', '*', 'READ', IFID, STATUS )
+*  Obtain data object name.
+      CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
 
-*    Create output dataset
-      CALL USI_TASSOCO( 'OUT', 'POWER_SPECTRUM', OFID, STATUS )
+*  Create output dataset
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
 
-*    Map input data.
-      CALL BDI_PRIM( IFID, PRIM, STATUS )
-      CALL BDI_CHKDATA( IFID, OK, NDIMS, LDIM, STATUS )
-
+*  Map input data.
+      CALL ADI_DERVD( IFID, 'Array', PRIM, STATUS )
+      CALL BDI_CHK( IFID, 'Data', OK, STATUS )
+      CALL BDI_GETSHP( IFID, ADI__MXDIM, LDIM, NDIMS, STATUS )
       IF (OK) THEN
-         CALL BDI_MAPDATA(IFID, 'READ', DATPTR, STATUS)
-         CALL ARR_SUMDIM( NDIMS, LDIM, NDATA, STATUS )
+        CALL BDI_MAPR( IFID, 'Data', 'READ', DATPTR, STATUS )
+        CALL ARR_SUMDIM( NDIMS, LDIM, NDATA, STATUS )
       ELSE
-         STATUS = SAI__ERROR
-         CALL ERR_REP( ' ', 'FATAL ERROR: Unable to find suitable data'/
+        STATUS = SAI__ERROR
+        CALL ERR_REP( ' ', 'FATAL ERROR: Unable to find suitable data'/
      :                                          /' component.', STATUS )
       END IF
       IF (STATUS .NE. SAI__OK) GOTO 99
-
-      IF (NDIMS .NE. 1) THEN
-         CALL MSG_PRNT('WARNING: Data is not one-dimensional')
+      IF ( NDIMS .NE. 1 ) THEN
+        CALL MSG_PRNT('WARNING: Data is not one-dimensional')
       END IF
 
-      IF (.NOT. PRIM .AND. NDIMS .EQ. 1) THEN
-*      Map axis data
-        CALL BDI_CHKAXIS (IFID, 1, AXOK, STATUS)
-
-      ELSE
-        AXOK = .FALSE.
-
-      END IF
-
+*  Axis data present?
+      CALL BDI_AXCHK( IFID, 1, 'Data', AXOK, STATUS )
       IF ( AXOK ) THEN
-         CALL BDI_MAPAXVAL (IFID, 'READ', 1, AXPTR, STATUS)
+        CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', AXPTR, STATUS)
 
       ELSE
-         CALL MSG_PRNT('WARNING: Axis data invalid'//
+        CALL MSG_PRNT('WARNING: Axis data invalid'//
      :                         ' - proceeding assuming regular spacing')
 
-         CALL DYN_MAPR (1, NDATA, AXPTR, STATUS)
-         CALL ARR_REG1R (1, 1, NDATA, %VAL(AXPTR), STATUS )
+        CALL DYN_MAPR (1, NDATA, AXPTR, STATUS)
+        CALL ARR_REG1R( 1.0, 1.0, NDATA, %VAL(AXPTR), STATUS )
 
       END IF
 
-*    Map VARIANCE if present
-      CALL BDI_CHKVAR (IFID, VAROK, NDIMS, LDIM, STATUS)
-      IF (VAROK) THEN
-         CALL BDI_MAPVAR (IFID, 'READ', VARPTR, STATUS)
+*  Map VARIANCE if present
+      CALL BDI_CHK( IFID, 'Variance', VAROK, STATUS )
+      IF ( VAROK ) THEN
+        CALL BDI_MAPR( IFID, 'Variance', 'READ', VARPTR, STATUS )
       END IF
 
-*    User information
+*  User information
       CALL MSG_SETI ('NDAT', NDATA)
       CALL MSG_PRNT('^NDAT data points entered')
 
       IF ( AXOK ) THEN
-         CALL BDI_GETAXUNITS (IFID, 1, TUNITS, STATUS)
+        CALL BDI_AXGET0C( IFID, 1, 'Units', TUNITS, STATUS )
 
-         IF (CHR_LEN(TUNITS) .GT. 0) THEN
-            CALL MSG_SETC ('TUNITS', TUNITS)
-            CALL MSG_PRNT('The time units are ^TUNITS')
+        IF ( TUNITS .GT. ' ' ) THEN
+          CALL MSG_SETC ('TUNITS', TUNITS)
+          CALL MSG_PRNT('The time units are ^TUNITS')
 
-         ELSE
-            CALL MSG_PRNT('No time units specified in input file')
+        ELSE
+          CALL MSG_PRNT('No time units specified in input file')
 
-         END IF
+        END IF
       END IF
 
-*    Map QUALITY as a logical.
-      BAD = .FALSE.
-      CALL BDI_CHKQUAL (IFID, QUALOK, NDIMS, LDIM, STATUS)
-
+*  Map QUALITY as a logical.
+      CALL BDI_CHK( IFID, 'Quality', QUALOK, STATUS )
       IF ( QUALOK ) THEN
-         CALL BDI_MAPLQUAL (IFID, 'READ', BAD, QPTR, STATUS)
-
-         IF ( BAD ) THEN
-            CALL ARR_NBAD( NDATA, %VAL(QPTR), NBAD, STATUS )
-            CALL MSG_SETI( 'NBAD', NBAD )
-            CALL MSG_PRNT( 'There are ^NBAD bad quality points'/
+        CALL BDI_MAPL( IFID, 'LogicalQuality', 'READ', QPTR, STATUS )
+        CALL ARR_NBAD( NDATA, %VAL(QPTR), NBAD, STATUS )
+        IF ( NBAD .GT. 0 ) THEN
+          CALL MSG_SETI( 'NBAD', NBAD )
+          CALL MSG_PRNT( 'There are ^NBAD bad quality points'/
      :                                         /' in the data' )
-         ELSE
-            CALL BDI_UNMAPLQUAL (IFID, STATUS)
-            QUALOK = .FALSE.
-         END IF
+        ELSE
+          CALL BDI_UNMAP( IFID, 'LogicalQuality', QPTR, STATUS )
+          QUALOK = .FALSE.
+        END IF
 
       END IF
 
-*    User input.
+*  User input.
       CALL USI_GET0R( 'BASE', BASEFREQ, STATUS )
       CALL USI_GET0R( 'INC', FREQSTEP, STATUS )
       CALL USI_GET0I( 'NUM', NFREQ, STATUS )
 
-*    Phase output dataset
-      CALL USI_TASSOCO( 'PHASE', 'PHASE_SPECTRUM', PFID, STATUS )
+*  Phase output dataset
+      CALL USI_CREAT( 'PHASE', ADI__NULLID, PFID, STATUS )
       IF ( STATUS .EQ. PAR__NULL ) THEN
         CALL ERR_ANNUL( STATUS )
         PHASE = .FALSE.
@@ -212,64 +201,63 @@
         GOTO 99
       END IF
 
-*    Create dynamic arrays
+*  Create dynamic arrays
       CALL DYN_MAPR( 1, NFREQ, COSPTR, STATUS )
       CALL DYN_MAPR( 1, NFREQ, SINPTR, STATUS )
       CALL DYN_MAPR( 1, NFREQ, WORKPTR, STATUS )
-
-*    Check status.
       IF (STATUS .NE. SAI__OK) GOTO 99
 
-*    Create components in output dataset
-      CALL BDI_CREDATA (OFID, 1, NFREQ,        STATUS)
-      CALL BDI_MAPDATA (OFID, 'WRITE', PWRPTR, STATUS)
+*  Create interface to output
+      CALL BDI_LINK( 'PowerSpectrum', 1, NFREQ, 'REAL', OFID, STATUS )
 
-      CALL BDI_PUTAXVAL   (OFID, 1, BASEFREQ, FREQSTEP, NFREQ, STATUS)
-      CALL BDI_PUTAXLABEL (OFID, 1, 'Frequency', STATUS)
+*  Create components in output dataset
+      CALL BDI_MAPR( OFID, 'Data', 'WRITE', PWRPTR, STATUS )
+      SPARR(1) = BASEFREQ
+      SPARR(2) = FREQSTEP
+      CALL BDI_AXPUT1R( OFID, 1, 'SpacedData', 2, SPARR, STATUS )
+      CALL BDI_AXPUT0C( OFID, 1, 'Label', 'Frequency', STATUS )
 
-      CALL BDI_PUTLABEL (OFID, 'Power', STATUS)
+      CALL BDI_PUT0C( OFID, 'Label', 'Power', STATUS )
 
-      IF (.NOT. PRIM) THEN
-        CALL BDI_GETUNITS (IFID, DUNITS, STATUS)
-
-        IF (CHR_LEN(DUNITS) .GT. 0) THEN
-           DUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
-           CALL BDI_PUTUNITS (OFID, DUNITS, STATUS)
-
-        END IF
-
-        IF (CHR_LEN(TUNITS) .GT. 0) THEN
-          TUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
-          CALL BDI_PUTAXUNITS (OFID, 1, TUNITS, STATUS)
-
-        END IF
-        CALL BDI_GETTITLE (IFID,  TITLE, STATUS)
-        CALL BDI_PUTTITLE (OFID, TITLE, STATUS)
-
+*  Copy data units
+      CALL BDI_GET0C( IFID, 'Units', DUNITS, STATUS )
+      IF ( DUNITS .GT. ' ' ) THEN
+        DUNITS = '('//DUNITS(1:CHR_LEN(DUNITS))//')**2'
+        CALL BDI_PUT0C( OFID, 'Units', DUNITS, STATUS )
       END IF
 
-      CALL BDI_CREVAR (OFID, 1, NFREQ,        STATUS)
-      CALL BDI_MAPVAR (OFID, 'WRITE', VAROUT, STATUS)
+      IF ( TUNITS .GT. ' ' ) THEN
+        TUNITS = '('//TUNITS(1:CHR_LEN(TUNITS))//')**-1'
+        CALL BDI_PUT0C( OFID, 1, 'Units', TUNITS, STATUS )
+      END IF
+
+*  Copy title
+      CALL BDI_COPY( IFID, 'Title', OFID, ' ', STATUS )
+
+*  Create output variance
+      CALL BDI_MAPR( OFID, 'Variance', 'WRITE', VAROUT, STATUS )
 
 *  Copy ancillary stuff
-      CALL BDI_COPMORE( IFID, OFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf', OFID, STATUS )
 
 *  Create phase spectrum?
       IF ( PHASE ) THEN
 
-        CALL BDI_CREDATA  (PFID, 1, NFREQ,        STATUS)
-        CALL BDI_MAPDATA  (PFID, 'WRITE', PHAPTR, STATUS)
-        CALL BDI_PUTLABEL (PFID, 'Phase',         STATUS)
-        CALL BDI_PUTUNITS (PFID, 'radians',       STATUS)
+        CALL BDI_LINK( 'PhaseSpectrum', 1, NFREQ, 'REAL', PFID, STATUS )
+        CALL BDI_MAPR( PFID, 'Data', 'WRITE', PHAPTR, STATUS )
+        CALL BDI_PUT0C( PFID, 'Label', 'Phase', STATUS )
+        CALL BDI_PUT0C( PFID, 'Units', 'radians', STATUS )
 
-        CALL BDI_PUTAXVAL (PFID, 1, BASEFREQ, FREQSTEP, NFREQ, STATUS)
-
-        IF (CHR_LEN(TUNITS) .GT. 0) THEN
-          CALL BDI_PUTAXTEXT( OFID, 1, 'Frequency', TUNITS, STATUS)
+        SPARR(1) = BASEFREQ
+        SPARR(2) = FREQSTEP
+        CALL BDI_AXPUT1R( PFID, 1, 'SpacedData', 2, SPARR, STATUS )
+        CALL BDI_AXPUT0C( PFID, 1, 'Label', 'Frequency', STATUS )
+        IF ( TUNITS .GT. ' ' ) THEN
+          CALL BDI_AXPUT0C( OFID, 1, 'Units', TUNITS, STATUS )
         END IF
 
 *    Copy ancillary stuff
-        CALL BDI_COPMORE( IFID, PFID, STATUS )
+        CALL UDI_COPANC( IFID, 'grf', PFID, STATUS )
         CALL HSI_COPY( IFID, PFID, STATUS )
         CALL HSI_ADD( PFID, VERSION, STATUS )
 
@@ -306,10 +294,10 @@
 
       END IF
 
-*    Copy history
+*  Copy history
       CALL HSI_COPY( IFID, OFID, STATUS )
 
-*    Add new history component
+*  Add new history component
       CALL HSI_ADD( OFID, VERSION, STATUS )
 
       TEXT(1) = 'Input {INP}'
@@ -326,7 +314,7 @@
       CALL USI_TEXT( I, TEXT, NLINES, STATUS )
       CALL HSI_PTXT( OFID, NLINES, TEXT, STATUS )
 
-*   Exit
+*  Exit
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
