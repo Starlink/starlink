@@ -211,12 +211,20 @@ PREDIST='#'
 AC_SUBST(PREDIST)
 
 # And immediately use it, by asserting that starconf.status must not
-# be distributed.  This calls is (a) true, but also (b) necessary,
+# be distributed.  This is (a) true, but also (b) necessary,
 # since it guarantees that we do make the predist-or-not test at some
 # point.  If we don't do this, and the user doesn't call
 # STAR_PREDIST_SOURCES themself (possibly implicitly in STAR_MESSGEN),
 # then important targets might be commented out by mistake.
 STAR_PREDIST_SOURCES(starconf.status)
+
+# Default $prefix.  This is done by the standard autoconf configure, but at
+# a slightly later stage than this.  Doing it here, as part of STAR_[]DEFAULTS
+# means that the defaulted value of $prefix can be used within the body of
+# the configure.ac, for example to pass it to a ./configure in a subdirectory.
+test "x$prefix" = xNONE && prefix=$ac_default_prefix
+# Let make expand exec_prefix.
+test "x$exec_prefix" = xNONE && exec_prefix='${prefix}'
 ])# STAR_DEFAULTS
 
 
