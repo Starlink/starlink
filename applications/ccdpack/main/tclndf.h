@@ -66,8 +66,8 @@
 */
    typedef struct {
       int *data;                /* Array of integers corresponding to data */
-      double loval;             /* Lower scale value plotarray uses */
-      double hival;             /* Upper scale value plotarray uses */
+      double loperc;            /* Lower percentile value plotarray uses */
+      double hiperc;            /* Upper percentile value plotarray uses */
       double zoom;              /* Size scaling factor of array */
       int xdim;                 /* Number of elements in first dimension */
       int ydim;                 /* Number of elements in second dimension */
@@ -195,6 +195,8 @@
 /* Prototypes for various auxiliary functions. */
    int newNdf( Tcl_Interp *interp, Tcl_Obj *ndfnameobj, Ndf **ndf );
    void forgetNdf( Ndf *ndf );
+   void getpercentiles( Ndf1 *ndf1, int nperc, double *percs, double *values,
+                        int *status );
    int tclmemok( Tcl_Interp *interp, void *ptr );
    int dcompare( const void *a, const void *b );
    void domapdata( Ndf1 *ndf1, int *status );
@@ -204,7 +206,7 @@
                  double *ubox, int *status );
    Tcl_ObjCmdProc ndfdisplay;
    int *getpixbloc( NdfOrNdfset *ndfset, int iframes[], double zoom, 
-                    double loval, double hival, int locolour, int hicolour,
+                    double loperc, double hiperc, int locolour, int hicolour,
                     int badcolour, int *status );
    int NdfGetNdfFromObj( Tcl_Interp *interp, Tcl_Obj *obj,
                          NdfOrNdfset **ndfset );
