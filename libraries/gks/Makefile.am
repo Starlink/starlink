@@ -16,7 +16,8 @@ bin_SCRIPTS = gks_link gks1_link_adam
 lib_LTLIBRARIES = libgks.la
 
 libgks_la_SOURCES = 
-libgks_la_LIBADD = base/libgks_base.la call/libgks_call.la
+libgks_la_LIBADD = base/libgks_base.la call/libgks_call.la \
+drivers/libgks_drivers.la
 
 include_HEADERS = $(PUBLIC_INCLUDES)
 
@@ -24,6 +25,5 @@ include_HEADERS = $(PUBLIC_INCLUDES)
 #  part of the package and may be required by users of it
 
 PUBLIC_INCLUDES = GKS_ERR
-
 
 BUILT_SOURCES = GKS_ERR
