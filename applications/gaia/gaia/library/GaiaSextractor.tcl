@@ -76,6 +76,8 @@ itcl::class gaia::GaiaSextractor {
    #  Constructor:
    #  ------------
    constructor {args} {
+      global auto_path
+      puts "auto_path = $auto_path"
 
       #  Evaluate any options.
       eval itk_initialize $args

@@ -39,11 +39,12 @@ global ::env ::tcl_version
 #  Withdraw the . window as this cannot be controlled as a metawidget.
 wm withdraw .
 
-#  Set the auto_load path for all the GAIA source TCL files.
+#  Set the auto_load path for all the GAIA source TCL files. Note GAIA
+#  goes first so we can override files from anywhere else.
 set gaia_library $env(GAIA_DIR)
-set rtd_library $env(RTD_LIBRARY)
-set skycat_library $env(SKYCAT_LIBRARY)
-lappend auto_path $gaia_library $skycat_library $rtd_library
+set auto_path [concat $gaia_library $auto_path]
+#set rtd_library $env(RTD_LIBRARY)
+#set skycat_library $env(SKYCAT_LIBRARY)
 
 #  Add blt library to auto_path.
 if {[info exists env(BLT_LIBRARY)]} {
@@ -105,7 +106,6 @@ incr argc 2
 set env(NATIVE_GAIA) 1
 
 #  Start up the main window.
-source $gaia_library/LabelEntryScale.tcl
 gaia::Gaia::startGaia
 
 #----------------------------------------------
@@ -118,15 +118,15 @@ gaia::Gaia::startGaia
 #     }
 #     proc profile_off {args} {
 #        global tmp
-#        if { [.l cget -text] != "profiling off" } { 
+#        if { [.l cget -text] != "profiling off" } {
 #           profile off tmp
 #        }
-#        if { [info exists tmp] } { 
+#        if { [info exists tmp] } {
 #           eval profrep tmp $args
 #        }
 #        .l configure -text "profiling off"
 #     }
-  
+
 #     button .a -command {blt::bltdebug 100} -text {Debug on}
 #     button .b -command {profile_on} -text {profile on}
 #     button .c -command {profile_on -commands} -text {profile on (commands)}
@@ -135,8 +135,8 @@ gaia::Gaia::startGaia
 #     button .f -command {profile_off cpu} -text {profile off (cpu)}
 #     button .g -command {profile_off real} -text {profile off (real)}
 #     button .h -command {profile_off calls} -text {profile off (calls)}
-  
+
 #     label .l -text "profiling off" -relief raised
 #     pack .a .b .c .d .e .f .g .h .l -fill x
 #     after idle [wm deiconify .]
-#  }   
+#  }
