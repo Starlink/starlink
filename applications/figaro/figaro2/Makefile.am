@@ -30,11 +30,11 @@ figaro2_LDADD = $(LDADD) \
 ../fig/libfig.la \
 ../fda/libfda.la \
 ../jty/libjty.la \
-../fit/libfit.la \
-../tio/libtio.la \
-../gen/libgen.la \
+../fit/libfigfit.la \
+../tio/libfigtio.la \
+../gen/libfiggen.la \
 ../gkd/libgkd.la \
 ../par/libfigpar.la \
-../ich/libich.la \
-`pda_link` `pgplot_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
+../ich/libfigich.la \
+`pda_link` `pgplot_link_adam` `agp_link_adam` `grp_link_adam` `ndf_link_adam` `fio_link_adam`
 
