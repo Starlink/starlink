@@ -615,6 +615,9 @@
 *  Abort label, cleanup after this.
  99   CONTINUE
 
+*  Close IRH/IRG
+      CALL IRH_CLOSE( STATUS )
+
 *  Free any allocated dynamic memory.
       CALL CCD1_MFREE( -1, STATUS )
 
