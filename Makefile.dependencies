@@ -1633,6 +1633,37 @@ $(MANIFEST)/trn: \
 	cd libraries/trn \
 	  && $(MAKE_CPT)
 
+$(MANIFEST)/tsp: \
+		$(MANIFEST)/agi \
+		$(MANIFEST)/ary \
+		$(MANIFEST)/ast \
+		$(MANIFEST)/chr \
+		$(MANIFEST)/cnf \
+		$(MANIFEST)/ems \
+		$(MANIFEST)/figaro \
+		$(MANIFEST)/fio \
+		$(MANIFEST)/gks \
+		$(MANIFEST)/gns \
+		$(MANIFEST)/grp \
+		$(MANIFEST)/gwm \
+		$(MANIFEST)/hds \
+		$(MANIFEST)/hlp \
+		$(MANIFEST)/idi \
+		$(MANIFEST)/mers \
+		$(MANIFEST)/ndf \
+		$(MANIFEST)/one \
+		$(MANIFEST)/par \
+		$(MANIFEST)/pcs \
+		$(MANIFEST)/pda \
+		$(MANIFEST)/prm \
+		$(MANIFEST)/psx \
+		$(MANIFEST)/sae \
+		$(MANIFEST)/sla \
+		$(MANIFEST)/star2html \
+		$(MANIFEST)/starx
+	cd applications/kappa \
+	  && $(MAKE_CPT)
+
 $(MANIFEST)/xdisplay: \
 		$(MANIFEST)/star2html
 	cd applications/xdisplay \
