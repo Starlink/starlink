@@ -194,11 +194,12 @@
 
 *      Good point?
         IF ( QOK ) GOOD = QUAL(I)
-        IF ( GOOD .AND. (PRED(I).GT.0.0) .AND. (DATA(I).GT.0.0) ) THEN
-
 	if ( i.le.10 ) then
-	print *,'Point ',i,' data = ',data(i), ', pred = ',pred(i)
+	print *,'Point ',i,' good = ',good,
+     :               ' data = ',data(i), ', pred = ',pred(i)
 	end if
+
+        IF ( GOOD .AND. (PRED(I).GT.0.0) .AND. (DATA(I).GT.0.0) ) THEN
 
 *        Get log of predicted data, and the expectation value of the predicted
 *        data factorial
