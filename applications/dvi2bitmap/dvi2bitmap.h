@@ -6,6 +6,7 @@
 #include <string>
 
 typedef unsigned char Byte;
+const char path_separator = '/';
 
 class DviError {
  public:
