@@ -107,11 +107,10 @@
 
       INTEGER			CACHEID			! File cache object
       INTEGER			ITID			! Invented item id
-      INTEGER			NDIM, DIMS(DAT__MXDIM)	! Model object dims
+      INTEGER			NDIM, DIMS(ADI__MXDIM)	! Model object dims
       INTEGER			WBPTR			! Write back address
 
       LOGICAL			OK			! Data is valid?
-      LOGICAL			STRUC			! Object is structure
 *.
 
 *  Check inherited global status.
@@ -138,14 +137,14 @@
           CALL ADI_NEW0( 'BinDSAxis', OARG, STATUS )
 
 *      Copy each component of the axis structure
-          CALL ADI1_CCH2AC( CLOC, 'LABEL', OARG, 'Label', STATUS )
-          CALL ADI1_CCH2AC( CLOC, 'UNITS', OARG, 'Units', STATUS )
-          CALL ADI1_CCH2AL( CLOC, 'NORMALISED', OARG,
-     :                      'Normalised', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'DATA_ARRAY', OARG, 'Data', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'WIDTH', OARG, 'Width', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'LOWIDTH', OARG, 'LoWidth', STATUS )
-          CALL ADI1_CCH2AT( CLOC, 'HIWIDTH', OARG, 'HiWidth', STATUS )
+c          CALL ADI1_CCH2AC( CLOC, 'LABEL', OARG, 'Label', STATUS )
+c          CALL ADI1_CCH2AC( CLOC, 'UNITS', OARG, 'Units', STATUS )
+c          CALL ADI1_CCH2AL( CLOC, 'NORMALISED', OARG,
+c     :                      'Normalised', STATUS )
+c          CALL ADI1_CCH2AT( CLOC, 'DATA_ARRAY', OARG, 'Data', STATUS )
+c          CALL ADI1_CCH2AT( CLOC, 'WIDTH', OARG, 'Width', STATUS )
+c          CALL ADI1_CCH2AT( CLOC, 'LOWIDTH', OARG, 'LoWidth', STATUS )
+c          CALL ADI1_CCH2AT( CLOC, 'HIWIDTH', OARG, 'HiWidth', STATUS )
 
 *    Just locate the data in the cache object
         ELSE
