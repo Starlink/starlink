@@ -168,6 +168,16 @@
 *        gaussian fit to the data histogram will be used to estimate the
 *        background value.
 *        [TRUE]
+*     COUNTS = _INTEGER (Write)
+*        On exit this parameter contains a list of the number of objects
+*        detected in each input image. This may be useful in scripts
+*        where the values can be accessed using the KAPPA (SUN/95) PARGET
+*        command.
+*     OVERRIDE = _LOGICAL (Read)
+*        If TRUE then it is not a fatal error to detect no objects on an 
+*        image. This is case the output list of positions will not be
+*        written and the value in the COUNTS parameter will be set to 0.
+*        [FALSE]
 
 *  Examples:
 *     findobj in='*' minpix=10 outlist='*.find'
@@ -186,38 +196,37 @@
 
 *  Notes:
 *     - Threshold estimation.
-
-*       FINDOBJ is optimised to determine a reliable detection
-*       threshold and is not concerned with the accurate 
-*       determination of the background value on a frame (as it 
-*       performs no photometric measurements). For this reason the 
-*       histogram which it uses to determine the background value is 
-*       made in such a way that it is usually very well sampled 
-*       (probably oversampled, for most other purposes). FINDOBJ 
-*       should not be used in a manner for which it is not suited 
-*       without understanding how if differs from other more 
-*       specialized routines.
+*
+*       FINDOBJ is optimised to determine a reliable detection threshold
+*       and is not concerned with the accurate determination of the
+*       background value on a frame (as it performs no photometric
+*       measurements). For this reason the histogram which it uses to
+*       determine the background value is made in such a way that it is
+*       usually very well sampled (probably oversampled, for most other
+*       purposes). FINDOBJ should not be used in a manner for which it
+*       is not suited without understanding how if differs from other
+*       more specialized routines.
 *
 *     - Histogram formation and gaussian fitting. 
 *
-*       The histogram used by FINDOBJ is formed by (if necessary) 
+*       The histogram used by FINDOBJ is formed by (if necessary)
 *       re-binning until the BINFRAC criterion is met, it is expected
-*       that this will always result in a well sampled histogram. The 
-*       background value is the mode of this histogram and is not 
+*       that this will always result in a well sampled histogram. The
+*       background value is the mode of this histogram and is not
 *       refined during the gaussian fitting. The gaussian fitting just
-*       estimates the standard deviation of the background and uses a 
-*       fixed peak value and position (the mode of the histogram) and 
-*       iterates rejecting bins whose counts fall below 20 percent of 
-*       the peak value, stopping when either 3 iterations have been 
-*       performed or the standard deviation does not change by more
-*       than one bin width in data values.
+*       estimates the standard deviation of the background and uses a
+*       fixed peak value and position (the mode of the histogram) and
+*       iterates rejecting bins whose counts fall below 20 percent of
+*       the peak value, stopping when either 3 iterations have been
+*       performed or the standard deviation does not change by more than
+*       one bin width in data values.
 *
 *     - NDF extension items. 
 *
 *       On exit the CURRENT_LIST items in the CCDPACK extensions
-*       (.MORE.CCDPACK) of the input NDFs are set to the names of the 
+*       (.MORE.CCDPACK) of the input NDFs are set to the names of the
 *       appropriate output lists. These items will be used by other
-*       CCDPACK position list processing routines to automatically 
+*       CCDPACK position list processing routines to automatically
 *       access the lists.
 *
 *     - Output position list format.
@@ -236,6 +245,7 @@
 *       the use of commas or spaces.
 
 *  Behaviour of parameters:
+*
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -244,11 +254,11 @@
 *        - THRESH  -- dynamic value
 *
 *     Retaining parameter values has the advantage of allowing you to
-*     define the default behaviour of the application but does mean
-*     that additional care needs to be taken when re-using the
-*     application after a break of sometime. The intrinsic default
-*     behaviour of the application may be restored by using the RESET
-*     keyword on the command line.
+*     define the default behaviour of the application but does mean that
+*     additional care needs to be taken when re-using the application
+*     after a break of sometime. The intrinsic default behaviour of the
+*     application may be restored by using the RESET keyword on the
+*     command line.
 *
 *     Certain parameters (LOGTO and LOGFILE) have global values. These
 *     global values will always take precedence, except when an
@@ -280,6 +290,10 @@
 *        are above the threshold.
 *     3-MAR-1997 (PDRAPER):
 *        Removed top-level locator control (foreign data access upgrades).
+*     12-NOV-1998 (PDRAPER):
+*        Changed to write the output parameter COUNTS and to add the
+*        ability to continue after not finding objects on a frame (added
+*        for ORAC-DR)
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -306,61 +320,57 @@
       LOGICAL FIO_TEST           ! Checks general fio error conditions
 
 *  Local Variables:
-      CHARACTER * ( CCD1__BLEN ) LINE ! Character buffer for writing
-                                      ! results
+      CHARACTER * ( CCD1__BLEN ) LINE ! Character buffer for writing results
       CHARACTER * ( FIO__SZFNM ) FNAME ! Position list file name
       CHARACTER * ( NDF__SZTYP ) ITYPE ! Input data type
-      DOUBLE PRECISION BINPER    ! Percent of count in one bin (please)
-      DOUBLE PRECISION NSIGMA    ! Number of sigmas above background
-      DOUBLE PRECISION PERCEN    ! Percentile of threshold
-      DOUBLE PRECISION SD        ! Background standard deviation
-      DOUBLE PRECISION THRESH    ! Detection threshold
-      DOUBLE PRECISION TR( 6 )   ! Linear tranformations coefficients
-      DOUBLE PRECISION WIDTH     ! Width of histogram bin
-      DOUBLE PRECISION ZERO      ! Zero point of histogram bins
-      INTEGER EL                 ! Number of pixels in input NDF
-      INTEGER FDOUT              ! FIO system file descriptor
-      INTEGER FIOGRP             ! Output file names group
-      INTEGER IDIN               ! Input NDF identifier
-      INTEGER INDEX              ! Loop counter
-      INTEGER IPCON              ! Number of contributions
-      INTEGER IPGRP              ! Pointer to pixel groups 
-      INTEGER IPHIST             ! Pointer to histogram array
-      INTEGER IPIN               ! Pointer to input data array
-      INTEGER IPINT              ! Pointer to pixel intensities
-      INTEGER IPMIN              ! Pointer to mean intensities
-      INTEGER IPSUM1             ! Centroid sums
-      INTEGER IPSUM2             ! Centroid sums
-      INTEGER IPX                ! Pointer to pixel positions
-      INTEGER IPXC               ! X centroid positions
-      INTEGER IPY                ! Pointer to pixel positions
-      INTEGER IPYC               ! Y centroid positions
-      INTEGER LBND( 2 )          ! NDF lower pixel bounds
-      INTEGER MINBIN             ! Minimum number of counts in one bin
-      INTEGER MINPIX             ! Minimum number of pixels in group
-      INTEGER MODE               ! Bin with maximum count
-      INTEGER NABOVE             ! Number of pixels above threshold
-      INTEGER NBIN               ! Number of histogram bins used.
-      INTEGER NDFGRP             ! Input NDF Group identifier
-      INTEGER NDIM               ! Dimensionality of NDF
-      INTEGER NEED               ! Number of bins required for
-                                 ! oversampling
-      INTEGER NNDF               ! Number of input NDFs
-      INTEGER NOBJ               ! Number of images found
-      INTEGER NOUT               ! Number of output positions
-      INTEGER NRET               ! Number of returns
-      INTEGER OVSAMP             ! Oversampling factor
-      INTEGER PEAK               ! Number of counts in peak bin
-      INTEGER UBND( 2 )          ! NDF upper bounds
-      INTEGER XDIM               ! First dimension of input NDF
-      INTEGER YDIM               ! Second dimension of input NDF
-      LOGICAL AUTOTH             ! True if user will allow
-                                 ! auto-thresholding
-      LOGICAL BAD                ! Whether BAD pixels are present 
-      LOGICAL TOUCH              ! Whether pixels group can touch the
-                                 ! edges of the array or not
-      LOGICAL USEPER             ! Whether to use percentiles to
-                                 ! estimates threshold
+      DOUBLE PRECISION BINPER   ! Percent of count in one bin (please)
+      DOUBLE PRECISION NSIGMA   ! Number of sigmas above background
+      DOUBLE PRECISION PERCEN   ! Percentile of threshold
+      DOUBLE PRECISION SD       ! Background standard deviation
+      DOUBLE PRECISION THRESH   ! Detection threshold
+      DOUBLE PRECISION TR( 6 )  ! Linear tranformations coefficients
+      DOUBLE PRECISION WIDTH    ! Width of histogram bin
+      DOUBLE PRECISION ZERO     ! Zero point of histogram bins
+      INTEGER EL                ! Number of pixels in input NDF
+      INTEGER FDOUT             ! FIO system file descriptor
+      INTEGER FIOGRP            ! Output file names group
+      INTEGER IDIN              ! Input NDF identifier
+      INTEGER INDEX             ! Loop counter
+      INTEGER IPCON             ! Number of contributions
+      INTEGER IPGRP             ! Pointer to pixel groups 
+      INTEGER IPHIST            ! Pointer to histogram array
+      INTEGER IPIN              ! Pointer to input data array
+      INTEGER IPINT             ! Pointer to pixel intensities
+      INTEGER IPMIN             ! Pointer to mean intensities
+      INTEGER IPSUM1            ! Centroid sums
+      INTEGER IPSUM2            ! Centroid sums
+      INTEGER IPX               ! Pointer to pixel positions
+      INTEGER IPXC              ! X centroid positions
+      INTEGER IPY               ! Pointer to pixel positions
+      INTEGER IPYC              ! Y centroid positions
+      INTEGER LBND( 2 )         ! NDF lower pixel bounds
+      INTEGER MINBIN            ! Minimum number of counts in one bin
+      INTEGER MINPIX            ! Minimum number of pixels in group
+      INTEGER MODE              ! Bin with maximum count
+      INTEGER NABOVE            ! Number of pixels above threshold
+      INTEGER NBIN              ! Number of histogram bins used.
+      INTEGER NDFGRP            ! Input NDF Group identifier
+      INTEGER NDIM              ! Dimensionality of NDF
+      INTEGER NEED              ! Number of bins required for oversampling
+      INTEGER NNDF              ! Number of input NDFs
+      INTEGER NOBJ( CCD1__MXNDF ) ! Number of objects found in each image
+      INTEGER NOUT              ! Number of output positions
+      INTEGER NRET              ! Number of returns
+      INTEGER OVSAMP            ! Oversampling factor
+      INTEGER PEAK              ! Number of counts in peak bin
+      INTEGER UBND( 2 )         ! NDF upper bounds
+      INTEGER XDIM              ! First dimension of input NDF
+      INTEGER YDIM              ! Second dimension of input NDF
+      LOGICAL AUTOTH            ! True if user will allow auto-thresholding
+      LOGICAL BAD               ! Whether BAD pixels are present 
+      LOGICAL TOUCH             ! Whether pixels group can touch the edges of the array or not
+      LOGICAL USEPER            ! Whether to use percentiles to estimates threshold
+      LOGICAL OVERRD            ! Whether to continue if no objects are detected or not
 
 *.
 
@@ -381,10 +391,16 @@
 *  Find out if the user wants to specify the threshold which is
 *  used on each loop.
       CALL PAR_GET0L( 'AUTOTHRESH', AUTOTH, STATUS )
+
+*  Find out if the user wants to continue after errors which amount to
+*  no objects being detected.
+      CALL PAR_GET0L( 'OVERRIDE', OVERRD, STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
 
 *  Process each of the NDFs in turn.
+      CALL ERR_MARK
       DO 1 INDEX = 1, NNDF
+         NOBJ( INDEX ) = 0
 
 *  Access the NDF.
          CALL IRG_NDFEX( NDFGRP, INDEX, IDIN, STATUS )
@@ -415,7 +431,7 @@
 *  Map in Data component and determine if BAD pixels are present.
          CALL NDF_MAP( IDIN, 'Data', ITYPE, 'READ', IPIN, EL, STATUS )
          CALL NDF_BAD( IDIN, 'Data', .FALSE., BAD, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *======================================================================
 *  Histogram formation and threshold estimation section.
@@ -461,7 +477,7 @@
          CALL CCD1_MKHIS( ITYPE, IPIN, EL, BAD, MINBIN, NEED,
      :                    %VAL( IPHIST ), MODE, PEAK, NBIN, ZERO, WIDTH,
      :                    STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Report on final histogram parameters.
          CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -552,7 +568,7 @@
 
 *  Release histogram workspace.
          CALL CCD1_MFREE( IPHIST, STATUS )
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+         IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *=======================================================================
 *  End of threshold estimation section.
@@ -592,31 +608,35 @@
             CALL CCD1_MALL( NABOVE, '_INTEGER', IPY, STATUS )
             CALL CCD1_MALL( NABOVE, '_DOUBLE', IPINT, STATUS )
             CALL CCD1_MALL( NABOVE, '_INTEGER', IPGRP, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GO TO 99
+            IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Determine the connectivity of images above the threshold.
             CALL CCD1_DCON( ITYPE, IPIN, XDIM, YDIM, BAD, THRESH, TOUCH,
      :                      %VAL( IPX ), %VAL( IPY ), %VAL( IPINT ),
-     :                      %VAL( IPGRP ), NOBJ, NABOVE, STATUS )
+     :                      %VAL( IPGRP ), NOBJ( INDEX ), NABOVE, 
+     :                      STATUS )
 
 *  Get workspace for the centroiding results
-            IF ( NOBJ .GT. 0 ) THEN
-               CALL CCD1_MALL( NOBJ, '_DOUBLE', IPXC, STATUS )
-               CALL CCD1_MALL( NOBJ, '_DOUBLE', IPYC, STATUS )
-               CALL CCD1_MALL( NOBJ, '_DOUBLE', IPMIN, STATUS )
-               CALL CCD1_MALL( NOBJ, '_DOUBLE', IPSUM1, STATUS )
-               CALL CCD1_MALL( NOBJ, '_DOUBLE', IPSUM2, STATUS )
-               CALL CCD1_MALL( NOBJ, '_INTEGER', IPCON, STATUS )
-               IF ( STATUS .NE. SAI__OK ) GO TO 99
+            IF ( NOBJ( INDEX ) .GT. 0 ) THEN
+               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPXC, STATUS )
+               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPYC, STATUS )
+               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPMIN, STATUS )
+               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPSUM1, 
+     :                         STATUS )
+               CALL CCD1_MALL( NOBJ( INDEX ), '_DOUBLE', IPSUM2, 
+     :                         STATUS )
+               CALL CCD1_MALL( NOBJ( INDEX ), '_INTEGER', IPCON, 
+     :                         STATUS )
+               IF ( STATUS .NE. SAI__OK ) GO TO 98
                
 *  Now form the centroids.
                CALL CCD1_DCEN( NABOVE, %VAL( IPX ), %VAL( IPY ),
-     :                         %VAL( IPINT ), %VAL( IPGRP ), NOBJ, 
-     :                         MINPIX, %VAL( IPSUM1 ), 
+     :                         %VAL( IPINT ), %VAL( IPGRP ), 
+     :                         NOBJ( INDEX ), MINPIX, %VAL( IPSUM1 ), 
      :                         %VAL( IPSUM2 ), %VAL( IPCON ), 
      :                         %VAL( IPXC ), %VAL( IPYC ),
      :                         %VAL( IPMIN), NOUT, STATUS )
-               IF ( STATUS .NE. SAI__OK ) GO TO 99
+               IF ( STATUS .NE. SAI__OK ) GO TO 98
 
 *  Inform the user about the number of features located.
                CALL CCD1_MSG( ' ', ' ', STATUS )
@@ -693,20 +713,41 @@
 *  Write terminator for Processing NDF: message.
          CALL CCD1_MSG( ' ', '  ---',STATUS )
  
-*  Trap cyclic errors.
-         IF ( STATUS .NE. SAI__OK ) GO TO 99
+*  Trap cyclic errors, or continue if asked.
+ 98      CONTINUE
+         IF ( OVERRD .AND. STATUS .NE. SAI__OK ) THEN 
+
+*  Override on errors. Make sure that we record no objects as being
+*  found. Note that the output object list cannot be created if an error
+*  occurred. This should always remain the case in changes to the coding
+*  above. The error is reported for informational purposes.
+            NOBJ( INDEX ) = 0
+            CALL ERR_REP( ' ', 
+     :      '  Warning - Failed to detect any objects', STATUS )
+            CALL ERR_FLUSH( STATUS )
+         END IF
+         IF ( STATUS .NE. SAI__OK ) THEN 
+            CALL ERR_RLSE
+            GO TO 99
+         END IF
  1    CONTINUE
+      CALL ERR_RLSE
 
 *  Successful scan for image features. Now write a list of the output
 *  positions list names.
       IF ( STATUS .EQ. SAI__OK ) THEN 
-         CALL CCD1_LNAM( 'NAMELIST', 1, NNDF,
-     :   '# FINDOBJ - output position lists', FIOGRP, .TRUE., STATUS )
+         CALL CCD1_LNAMM( 'NAMELIST', 1, NNDF,
+     :   '# FINDOBJ - output position lists', FIOGRP, NOBJ, .TRUE., 
+     :                   STATUS )
          IF ( STATUS .NE. SAI__OK ) THEN
             CALL ERR_ANNUL( STATUS )
             CALL CCD1_MSG( ' ', '  No namelist written ', STATUS )
          END IF
       END IF
+
+*  Write an output parameter showing how many objects where found for
+*  each image.
+      CALL PAR_PUT1I( 'COUNTS', NNDF, NOBJ, STATUS )
 
 *  Exit on error label.
  99   CONTINUE

@@ -574,7 +574,7 @@ SUBSRC = ccd1_acmsk.f ccd1_adds.f ccd1_adkey.f ccd1_aldif.f \
  ccd1_gtmsk.f ccd1_gtsec.f ccd1_hisp.f ccd1_hvcon.f \
  ccd1_hvusr.f ccd1_inser.f ccd1_iscom.f ccd1_itra.f \
  ccd1_lasto.f ccd1_lastw.f ccd1_lcc.f ccd1_lext.f \
- ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_locs2.f \
+ ccd1_linv.f ccd1_lmap.f ccd1_lnam.f ccd1_lnamm.f ccd1_locs2.f \
  ccd1_locs3.f ccd1_ltest.f ccd1_ltrcm.f ccd1_lxyt.f \
  ccd1_lxyt2.f ccd1_lxyt3.f ccd1_mall.f ccd1_maskd.f \
  ccd1_match.f ccd1_mean.f ccd1_mfree.f ccd1_mkbc.f \
@@ -2208,6 +2208,7 @@ ccd1_lext.o: SAE_PAR
 ccd1_linv.o: SAE_PAR
 ccd1_lmap.o: SAE_PAR
 ccd1_lnam.o: FIO_PAR IRH_PAR SAE_PAR
+ccd1_lnamm.o: FIO_PAR IRH_PAR SAE_PAR
 ccd1_locs2.o: SAE_PAR
 ccd1_locs3.o: SAE_PAR
 ccd1_lsfun1.o: CCD1_FITCM SAE_PAR

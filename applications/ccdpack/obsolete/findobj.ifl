@@ -168,5 +168,22 @@ interface FINDOBJ
       helpkey     '*'
    endparameter
 
+   parameter      COUNTS         #  Array of objects found
+      type        _INTEGER
+      access      WRITE
+      vpath       DEFAULT
+      default     1
+   endparameter
+
+   parameter OVERRIDE      # Whether to continue if no objects found.
+      type     _LOGICAL
+      access   READ
+      vpath    'DEFAULT '
+      ppath    'DEFAULT '
+      default  false
+      prompt   'Continue if errors occur when detecting objects'
+      helpkey  '*'
+   endparameter
+
 endinterface
 # $Id$
