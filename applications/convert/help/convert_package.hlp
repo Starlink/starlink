@@ -12,6 +12,7 @@
      DST2NDF   -- Converts a Figaro (Version 2) DST file to an NDF.
      GASP2NDF  -- Converts an image in GASP format to an NDF.
      IRAF2NDF  -- Converts an IRAF image to an NDF.
+     IRCAM2NDF -- Converts an IRCAM data file to a series of NDFs.
      NDF2ASCII -- Converts an NDF to an ASCII file.
      NDF2BDF   -- Converts an NDF to a Starlink Interim BDF file.
      NDF2DIPSO -- Converts an NDF to a DIPSO-format file.
