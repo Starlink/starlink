@@ -1,25 +1,73 @@
-*+  REDS_SCUCAT - routine to pack photometry datasets for further processing
       SUBROUTINE REDS_SCUCAT (STATUS)
-*    Description:
+*+
+*  Name:
+*     REDS_SCUCAT
+
+*  Purpose:
+*     Routine to concatenate photometry datasets for further processing
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of Module:
+*     ADAM A-task
+ 
+*  Invocation:
+*     CALL REDS_SCUCAT( STATUS )
+ 
+*  Arguments:
+*     STATUS = INTEGER (Given and Returned)
+*        The global status
+
+*  Description:
 *     This routine reads in a list of user specified files and concatenates
-*     their data, variance and quality arrays so that routines like errclip
-*     and kstest can analyse the complete set of photometry observations.
+*     their data, variance and quality arrays so that KAPPA routines like
+*     stats and kstest can analyse the complete set of photometry observations.
+*     Multiple bolometer photometry observations are reduced to one data
+*     set.
 *
-*     PARAMETERS:
-*
-*        OUT:        Output datafile
-*        IN :        Loops through NDF files appending to OUT ('end' to end)
-*
-*    Parameters:
-*     STATUS        = INTEGER (Given and returned)
+
+*  Usage:
+*     scucat [in=] [out=]
+*        This routine will copy the data from phot to test, reducing mulitple
+*        bolometers to one data point. The program will then ask for another
+*        data set.
+
+*  ADAM parameters:
+*     IN = NDF (Read)
+*        The input dataset(s). This parameter is requested for repeatedly
+*        until a NULL (!) value is given.
+*     OUT = NDF (Write)
+*        The NDF in which all the input data is stored.
+
+*  Examples:
+*     scucat in=phot out=test
+*        This routine will copy the data from phot to test, reducing mulitple
+*        bolometers to one data point. The program will then ask for another
+*        data set.
+
+*  Notes:
+*     This routine is necessary since the output file from SCUPHOT contains
+*     an NDF for each bolometer used during the photometry observation.
+
+*  Implementation status:
+*     Data, Variance and Quality arrays are copied.
+
 *    Authors:
-*     T. Jenness (JACH)
+*     TIMJ: Tim Jenness (JACH)
+*     {enter_new_authors_here}
+
 *    History:
 *     $Id$
 *     $Log$
-*     Revision 1.6  1996/10/24 21:29:09  timj
-*     Fixed GLOBAL default problem (use DUMMY PARAMETER)
+*     Revision 1.7  1996/10/30 20:23:05  timj
+*     Add modern STARLINK header.
+*     Replace SCULIB_COPY? with VEC_
+*     Annul LOC after use.
 *
+c Revision 1.6  1996/10/24  21:29:09  timj
+c Fixed GLOBAL default problem (use DUMMY PARAMETER)
+c
 c Revision 1.5  1996/10/19  00:07:04  timj
 c Use GLOBAL.sdf and DAT_ASSOC, remove FILENAME(FILE)
 c
@@ -35,68 +83,77 @@ c
 c     Revision 1.1  1996/09/18  02:02:07  timj
 c     Initial revision
 c     
-*     endhistory
+*     {enter_further_changes_here}
+
+*  Bugs:
+*     {note_any_bugs_here}
+ 
+*-
+
 *     Type definitions:
-      IMPLICIT NONE
+
+      IMPLICIT NONE              ! No implicit typing allowed
+
+
 *     Global constants:
-      INCLUDE 'SAE_PAR'
-      INCLUDE 'NDF_PAR'
-      INCLUDE 'PRM_PAR'
-      INCLUDE 'PAR_ERR'
-      INCLUDE 'DAT_PAR'
-*     Import:
-*     Import-Export:
-*     Export:
+      INCLUDE 'SAE_PAR'          ! SSE global definitions
+      INCLUDE 'NDF_PAR'          ! NDF_ public constants
+      INCLUDE 'PRM_PAR'          ! VAL__ constants
+      INCLUDE 'PAR_ERR'          ! PAR_ error codes
+      INCLUDE 'DAT_PAR'          ! Data-system constants
+
 *     Status:
       INTEGER STATUS
+
 *     External references:
-      INTEGER CHR_LEN           ! Length of string
-      LOGICAL CHR_SCOMP         ! Sort algorithm
-*     Global variables:
+      INTEGER CHR_LEN            ! Length of string
+      LOGICAL CHR_SCOMP          ! Sort algorithm
+
 *     Local constants:
-      INTEGER MAXCMP            ! Max number of bolometers in an HDS
+      INTEGER MAXCMP             ! Max number of bolometers in an HDS
       PARAMETER (MAXCMP = 20)
-      INTEGER MAX_FILE          ! Max number of files
+      INTEGER MAX_FILE           ! Max number of files
       PARAMETER (MAX_FILE = 20)
+
 *     Local variables:
-      BYTE          BADBIT      ! Bad bit mask
-      CHARACTER*15  BOL(MAXCMP) ! Name of bolometers present in NDF
-      CHARACTER*15  BOLOMETER   ! Selected bolometer
+      BYTE          BADBIT       ! Bad bit mask
+      CHARACTER*15  BOL(MAXCMP)  ! Name of bolometers present in NDF
+      CHARACTER*15  BOLOMETER    ! Selected bolometer
       CHARACTER*(MAXCMP*15) BOL_LIST ! List of all bolometers in NDF
-      INTEGER       EL          ! Number of input data points
-      INTEGER       FILE        ! File count
-      CHARACTER *20 FILENAME    ! Filename
-      INTEGER       I           ! Loop counter
-      INTEGER       IN_NDF      ! Input NDF identifier
-      INTEGER       IN_DATA_PTR ! Pointer to D array
-      INTEGER       IN_VAR_PTR  ! Pointer to V array
-      INTEGER       IN_QUAL_PTR ! Pointer to Q array
-      INTEGER       IPAR        ! Parameter ID
-      INTEGER       IPOSN       ! Position in string
-      INTEGER       ITEMP       ! Temporary integer
-      INTEGER       LBND(1)     ! Lower bound of output array
+      INTEGER       EL           ! Number of input data points
+      INTEGER       FILE         ! File count
+      CHARACTER *132 FILENAME    ! Filename
+      INTEGER       I            ! Loop counter
+      INTEGER       IERR         ! Location of error during VEC_ copy
+      INTEGER       IN_NDF       ! Input NDF identifier
+      INTEGER       IN_DATA_PTR  ! Pointer to D array
+      INTEGER       IN_VAR_PTR   ! Pointer to V array
+      INTEGER       IN_QUAL_PTR  ! Pointer to Q array
+      INTEGER       IPAR         ! Parameter ID
+      INTEGER       IPOSN        ! Position in string
+      INTEGER       ITEMP        ! Temporary integer
+      INTEGER       LBND(1)      ! Lower bound of output array
       CHARACTER*(DAT__SZLOC) LOC ! Locator to root HDS file
-      LOGICAL       LOOPING     ! Controls read loop
-      CHARACTER*10  MODE        ! Access mode for output
+      LOGICAL       LOOPING      ! Controls read loop
+      CHARACTER*10  MODE         ! Access mode for output
       CHARACTER*15  NAME(MAXCMP) ! Names of NDFs
-      INTEGER       NCOMP       ! Number of components in HDS
-      INTEGER       NDATA       ! Number of data points in input
-      CHARACTER*(DAT__SZLOC) NLOC ! Loc to  Bol NDF inside HDS file
-      INTEGER       N_PHOT      ! Number of bolometers in an HDS
-      INTEGER       OUT_NDF     ! Output NDF identifier
-      INTEGER       OUT_APTR    ! Pointer to Axis array
+      INTEGER       NCOMP        ! Number of components in HDS
+      INTEGER       NDATA        ! Number of data points in input
+      INTEGER       NERR         ! Number of errors during VEC_ copy
+      CHARACTER*(DAT__SZLOC) NLOC! Loc to  Bol NDF inside HDS file
+      INTEGER       N_PHOT       ! Number of bolometers in an HDS
+      INTEGER       OUT_NDF      ! Output NDF identifier
+      INTEGER       OUT_APTR     ! Pointer to Axis array
       INTEGER       OUT_DATA_PTR ! Pointer to D array
-      INTEGER       OUT_VAR_PTR ! Pointer to V array
+      INTEGER       OUT_VAR_PTR  ! Pointer to V array
       INTEGER       OUT_QUAL_PTR ! Pointer to Q array
       CHARACTER*(DAT__SZLOC) PLOC(MAXCMP) ! Locs to PEAK NDFs
-      LOGICAL       READING     ! Logical to control file reading
-      CHARACTER*40  TITLE       ! Title of observation
-      INTEGER       UBND(1)     ! Upper bound of output array
-      LOGICAL       USE_OUT     ! Have I opened an output file
+      LOGICAL       READING      ! Logical to control file reading
+      CHARACTER*40  TITLE        ! Title of observation
+      INTEGER       UBND(1)      ! Upper bound of output array
+      LOGICAL       USE_OUT      ! Have I opened an output file
       CHARACTER*(DAT__SZLOC) USE_LOC ! Locator to selected file
-*     Internal references:
-*     Local data:
-*     -
+*.
 
       IF (STATUS .NE. SAI__OK) RETURN
 
@@ -161,6 +218,9 @@ c
 
                   CALL DAT_ANNUL(NLOC, STATUS)
                END DO
+
+*     Finish with LOC
+               CALL DAT_ANNUL(LOC, STATUS)
             ELSE
                CALL ERR_REP(' ', 'Failed to open file', STATUS)
                CALL ERR_ANNUL(STATUS)
@@ -300,12 +360,15 @@ c
      :           OUT_VAR_PTR, ITEMP, STATUS)
 
 *     Copy all the data
-            CALL SCULIB_COPYR(EL, %VAL(IN_DATA_PTR),
-     :           %VAL(OUT_DATA_PTR + NDATA * VAL__NBR))
-            CALL SCULIB_COPYR(EL, %VAL(IN_VAR_PTR),
-     :           %VAL(OUT_VAR_PTR + NDATA * VAL__NBR))
-            CALL SCULIB_COPYB(EL, %VAL(IN_QUAL_PTR),
-     :           %VAL(OUT_QUAL_PTR + NDATA * VAL__NBUB))
+            CALL VEC_RTOR(.FALSE., EL, %VAL(IN_DATA_PTR),
+     :           %VAL(OUT_DATA_PTR + NDATA * VAL__NBR), IERR, NERR, 
+     :           STATUS)
+            CALL VEC_RTOR(.FALSE., EL, %VAL(IN_VAR_PTR),
+     :           %VAL(OUT_VAR_PTR + NDATA * VAL__NBR), IERR, NERR, 
+     :           STATUS)
+            CALL VEC_UBTOUB(.FALSE., EL, %VAL(IN_QUAL_PTR),
+     :           %VAL(OUT_QUAL_PTR + NDATA * VAL__NBUB), IERR, NERR, 
+     :           STATUS)
 
 *     Unmap the output array
             CALL NDF_UNMAP(OUT_NDF, '*', STATUS)
