@@ -171,368 +171,71 @@
         <code>Makefile.am</code> file which controls generating the
         makefile which does the work.</p>
 
-      <p>The build system is based on the GNU `autotools', autoconf,
-        automake and libtool.  We use (at the time of writing) an
-        unmodified libtool, a moderately extended autoconf, and an
-        extended and customised automake.  In <ref id="tooloverview"/>
-        there is an introduction to these tools, covering their
-        interrelationships, and basic usage.  The description below
-        explains the use of these tools as modified; see <ref
-          id="gnutools"/> for details of the differences from the
-        stock autotools.</p>
+      <p>The build system as a whole consists of a number of components:
+        <dl>
 
-<!--
-      <p>Though the autoconf program is installed without any Starlink
-        extensions, there are Starlink extensions available, through the
-        standard autoconf extension mechanism.  You don't need to worry
-        about the rather intricate details of how this works, but if
-        you're curious, or there does appear to be a problem, the gories
-        are as follows.  The macros are in a file
-        <code>starconf.m4</code>, which the <code>starconf</code>
-        program (see <ref id="starconf"/>) adds to the current
-        directory, and copies to <code>acinclude.m4</code>.  From there,
-        the macros are scooped into <code>aclocal.m4</code> by the
-        <code>aclocal</code> program, and that is what makes them
-        available to autoconf when it is run.  See <ref
-          id="autoreconf"/> for the details of how <code>aclocal</code>
-        runs.</p>
--->
+          <dt>The Starlink autotools</dt>
+          <dd>
+            <p>These consist of versions of the GNU autotools, which
+              are part of the Starlink CVS repository, and which are
+              built and installed as part of the top-level bootstrap.
+              They should be installed in <code
+                type="fspath">/star/buildsupport/bin</code>, or its
+              equivalent if you have installed a set of tools in a tree
+              other than <code>/star</code>.  Since they have been
+              extended and customised, they are essential; you cannot
+              build the Starlink collection without them.  There is an
+              introduction to the autotools in <ref id="tooloverview"/>,
+              covering their interrelationships and basic usage.</p>
 
-      <subsect id="starconf" export="export">
-        <subhead>
-          <title>Starconf, and the Starlink autoconf macros</title>
-        </subhead>
+            <p>We use (at the time of writing) an unmodified libtool,
+              a moderately extended autoconf, and an extended and
+              customised automake.  The description below explains the
+              use of these tools as modified; see <ref id="gnutools"/>
+              for details of the differences from the stock
+              autotools.</p>
 
-        <p>The build system consists of a number of components:
-          <dl>
+          </dd>
 
-            <dt>The Starlink autotools</dt>
-            <dd>
-              <p>These consist of versions of the GNU autotools, which
-                are part of the Starlink CVS repository, and which are
-                built and installed as part of the top-level bootstrap.
-                They should be installed in <code
-                  type="fspath">/star/buildsupport/bin</code>, or its
-                equivalent if you have installed a set of tools in a
-                tree other than <code>/star</code>.  Since they have
-                been extended and
-                customised, they are essential; you cannot build the
-                Starlink collection without them.  There is an
-                introduction to the autotools in <ref id="tooloverview"/>.</p>
-            </dd>
+          <dt>The Starlink autoconf macros</dt>
+          <dd>
 
-            <dt>The Starlink autoconf macros</dt>
-            <dd>
+            <p>There is an extensive set of autoconf macros which
+              support building Starlink applications.  You use these
+              as you would any of the standard autoconf macros, by
+              invoking them within the <code>configure.ac</code> file.</p>
 
-              <p>There is an extensive set of autoconf macros which
-                support building Starlink applications.  You use these
-                as you would any of the standard autoconf macros, by
-                invoking them within the <code>configure.ac</code> file.</p>
+            <p>The macros are described in detail in <ref
+                id="starconfmacros"/>.</p>
 
-              <p>The macros are described in detail in <ref
-                  id="starconfmacros"/>.</p>
+            <p>The autoconf program which is used is not itself
+              customised for Starlink use.  Instead, the macros are
+              installed using the standard autoconf
+              extension mechanism, which uses the standard file
+              <code>acinclude.m4</code> and the application
+              <em>aclocal</em>.  This is discussed in passing in <ref
+                id="tooloverview"/>, and we mention it here only to explain
+              the presence of this important file.  The
+              <code>acinclude.m4</code> file is managed by the
+              starconf application.</p>
+          </dd>
 
-<!--
-              <p>The autoconf program which is used is not itself
-                customised for Starlink use.  Instead, the macros are
-                installed using the standard autoconf
-                extension mechanism, which consists of placing
-                additional macros in a file <code>acinclude.m4</code>
-                in the build directory, and letting them be
-                incorporated by the application <em>aclocal</em>.</p>
+          <dt>starconf</dt>
+          <dd>
+            <p>This is the program which handles installing required
+              macros, and configuring your directory ready to use
+              the build system.  Associated with <em>starconf</em>
+              is the <em>starconf-validate</em> program which checks
+              that your directory is configured correctly, and the
+              program <em>./starconf.status</em>, which unpacks
+              required files, and allows you to make the link back
+              to the configuration used to build the software.  All
+              these are described in detail in <ref
+                id="starconf"/>.</p>
+          </dd>
 
-              <p>You don't have to do anything to use these, since the
-                macros are installed in your directory by the
-                <em>starconf</em> application (described below),
-                and the aclocal application is generally executed on
-                your behalf by the <em>starconf</em> application, via
-                the <em>autoreconf</em> application (<ref
-                  id="autoreconf"/>).</p>
--->
-            </dd>
-
-            <dt>starconf</dt>
-            <dd>
-              <p>This is the program which handles installing required
-                macros, and configuring your directory ready to use
-                the build system.  Associated with <em>starconf</em>
-                is the <em>starconf-validate</em> program which checks
-                that your directory is configured correctly, and the
-                program <em>./starconf.status</em>, which unpacks
-                required files, and allows you to make the link back
-                to the configuration used to build the software.  All
-                these are described in detail in <ref
-                  id="starconfdetails"/>.</p>
-            </dd>
-
-          </dl>
-        </p>
-
-        <subsubsect id='starconfdetails'>
-          <subhead>
-            <title>Starconf overview</title>
-          </subhead>
-
-          <p>The starconf application does some of the work of
-            ensuring that your build directory is correctly
-            organised.  It does the following:
-            <ul>
-              <li>
-                <p>ensures that you have a <code>./bootstrap</code>
-                  script;</p>
-              </li>
-              <li>
-                <p>ensures that your directory has a copy of the
-                  starconf autoconf macros in the file
-                  <code>starconf.m4</code>, which it unpacks and
-                  immediately copies to the file
-                  <code>acinclude.m4</code>;</p>
-              </li>
-              <li>
-                <p>checks that your <code>configure.ac</code> and
-                  <code>Makefile.am</code> files look at least
-                  plausible by checking, amongst other things, for the
-                  presence of a <code>STAR_DEFAULTS</code> invocation
-                  in the former;</p>
-              </li>
-              <li>
-                <p>creates the script <code>./starconf.status</code>
-                  (which is what does the actual work of unpacking
-                  <code>starconf.m4</code>) and configures it so that
-                  it links back to the starconf installation.</p>
-              </li>
-            </ul>
-          </p>
-
-          <p>The <code>./bootstrap</code> script is `owned' by
-            starconf, and you should not change it, since it will be
-            overritten by starconf if a newer release of starconf
-            includes an updated bootstrap script.  If you <em>do</em>
-            have some pressing reason to change it, then remove the word
-            `original' from the second line of the bootstrap file, which
-            signals to starconf that it should leave the file untouched.</p>
-
-          <p>You need to explicitly run starconf only once, when you
-            first prepare a directory for configuration.  The
-            <code>./bootstrap</code> file which this creates itself
-            runs starconf, so that each time you run the bootstrap
-            script, you run starconf also.  This has no effect unless
-            either the bootstrap script or the macro set has been
-            updated in the starconf installation, in which case starconf
-            will propagate the updates to your directory.
-            The <code>./starconf.status</code> script should be
-            checked into the repository, but its products other than
-            <code>./bootstrap</code> should not be.  The file
-            <code>starconf.m4</code> is the only other product at
-            present, but others may appear in future (see <ref
-              id="developments"/>.</p>
-
-          <p>You might on other occasions run the
-            <code>./starconf.status</code> script.  You will do this
-            firstly to query important locations, such as the location
-            of the starconf templates:
-            <verbatim>
-% ./starconf.status --show buildsupportdata
-/export3/sun/buildsupport/share
-</verbatim>
-            See <kbd>./starconf.status --show --all</kbd> or
-            <kbd>./starconf.status --help</kbd> for the list
-            of all the things which you can show in this way (though
-            be warned that this list is not yet completely stable, and
-            may yet change).</p>
-
-          <p>Some of these variables are `fixed', meaning that they
-            are fixed for a particular installation of starconf (you
-            can in principle have more than one installation of
-            starconf, and choose which one to invoke, but there is
-            unlikely any need for that).  Others are `sticky', meaning
-            that they can be changed, but the value retains its value
-            unless and until it is changed again in future.</p>
-
-          <p>The two `sticky' variables are
-            <code>STARCONF_DEFAULT_PREFIX</code> and
-            <code>STARCONF_DEFAULT_STARLINK</code>.  The first is the
-            default installation prefix of the software you are
-            building; the second is the location of a currently built Starlink
-            tree, which will be used for applications and include
-            files if they are not found under
-            <code>STARCONF_DEFAULT_PREFIX</code>.  The default for
-            each of these was set when starconf was
-            itself installed (see <kbd>./configure --help</kbd> within
-            <code>buildsupport/starconf</code>: having different
-            values for this is one 
-            possible reason why you might have more than one starconf
-            installation), but their value is typically something like
-            <code>/star</code>.   You can change either value by using
-            <code>./starconf.status</code>:
-            <verbatim>
-% ./starconf-status STARCONF_DEFAULT_PREFIX=/my/local/star
-</verbatim>
-            When you configure a particular package, you can set the
-            installation prefix with the <code>--prefix</code> option
-            to <code>./configure</code>, and you can set the location
-            of the `backup' Starlink directory by setting the
-            <code>STARLINK</code> environment variable.  In general,
-            however, we recommend that you do not adjust
-            <code>--prefix</code>, and that you leave the
-            <code>STARLINK</code> variable unset.</p>
-
-          <p>A companion to the starconf application is the
-            <em>starconf-validate</em> application.  When run, this
-            examines the current directory, checking that all required
-            files are present, and checking that you have the correct
-            files checked in to the repository.  The command
-            <kbd>starconf-validate --help</kbd> shows which files are
-            in which category.  Note that this applies only to
-            directories which are fully Starlink applications -- those
-            in the <code>libraries</code> and
-            <code>applications</code> directories; components
-            in the <code>thirdparty</code> tree, on the other hand,
-            have some starconf features such as a
-            <code>component.xml</code> file, but are not valid
-            according to <em>starconf-validate</em>; also `bundle'
-            directories such as <code>libraries/pcs</code>, which have
-            no actual code in them, are not valid in this sense.</p>
-
-          <p>There are templates available for the most important
-            starconf files.  See <ref id="templates"/>.</p>
-
-          <p>The final component of the starconf system is the file
-            <code>component.xml</code>.  This is an XML file
-            containing information about the particular component in
-            the directory.  The information in this file is redundant
-            with some of the information you specify in
-            <code>configure.ac</code>, and so the best way to ensure
-            the two are consistent is to configure
-            <code>component.xml</code> from
-            <code>configure.ac</code>.  To this end, there is a
-            template component.xml.in file in the starconf
-            `buildsupportdata' directory.  When you are preparing a
-            directory to be build with the Starlink tools, copy this
-            <code>template-component.xml.in</code> into the current
-            directory under the name <code>component.xml.in</code>,
-            and fill in those field which are not configured.  See
-            <ref id="componentxml"/> for details.  The files
-            <code>component.xml</code> and
-            <code>component.xml.in</code> should both be
-            checked in.</p>
-
-        </subsubsect>
-
-        <subsubsect id='templates'>
-          <subhead>
-            <title>File templates</title>
-          </subhead>
-
-          <p>There are three templates available as part of the
-            starconf system.  They are located in the starconf
-            `buildsupportdir': given that the starconf application
-            is in your path, you can find this location with
-            <kbd>starconf --show buildsupportdata</kbd>, and if you
-            have a <code>starconf.status</code> script in your local
-            directory, you can find this directory with
-            <kbd>./starconf.status --show buildsupportdata</kbd>.</p>
-
-          <p>The three templates present are
-            <code>template-Makefile.am</code>,
-            <code>template-configure.ac</code> and
-            <code>template-configure.xml.in</code>.</p>
-
-        </subsubsect>
-
-        <subsubsect id='componentxml'>
-          <subhead>
-            <title>The format of the component.xml file</title>
-          </subhead>
-
-          <p>The meaning of the elements in the component.xml DTD is
-            as follows.  The term `component' is used here rather
-            than `package': no great distinction is being drawn
-            here, except that the components within the CVS tree
-            might not be reflected in ultimately distributed packages.
-            <dl>
-              <dt>component/id</dt>
-              <dd>
-                <p>The ID for this component.  This must match the
-                  package name in <code>configure.ac</code>, and is
-                  the name under which the manifest file is
-                  installed.  Let this remain under the control
-                  of <code>configure.ac</code></p>
-              </dd>
-
-              <dt>version</dt>
-              <dd>
-                <p>The version number of this component.  This
-                  must match the version number in
-                  <code>configure.ac</code>.</p>
-              </dd>
-
-              <dt>path</dt>
-              <dd>
-                <p>This is the path to this package within the CVS
-                  repository, without any leading slash. Make sure
-                  this is correct, or else the top-level build will
-                  probably fail.</p>
-              </dd>
-
-              <dt>description</dt>
-              <dd>
-                <p>A brief description of the component.</p>
-              </dd>
-
-              <dt>abstract</dt>
-              <dd>
-                <p>A fuller description of the component.</p>
-              </dd>
-
-              <dt>dependencies</dt>
-              <dd>
-                <p>This is the set of component IDs which this
-                  component depends on.  This is managed by the
-                  <code>STAR_DECLARE_DEPENDENCIES</code> macros, and
-                  should not be adjusted by hand.</p>
-              </dd>
-
-              <dt>developers</dt>
-              <dd>
-                <p>This is a non-exhaustive list of those who have
-                  worked on this package.  Little use is made of
-                  this at present, but its use is likely to extend,
-                  for example to be the source of recipients for CVS
-                  commit messages.  The fields within it are
-                  <code>&lt;name&gt;</code>, which is the real name
-                  of the individual; <code>&lt;uname&gt;</code>,
-                  which is the username of the developer on the CVS
-                  system; and <code>&lt;email&gt;</code>, which is
-                  the person's email address.  The last two elements
-                  are not required.</p>
-              </dd>
-
-              <dt>documentation</dt>
-              <dd>
-                <p>A list of SUNs and the like.  At this stage the
-                  format of this element is 
-                  not completely finalised, and it is best to leave
-                  its maintenance to the
-                  <code>STAR_LATEX_DOCUMENTATION</code> macro.</p>
-              </dd>
-
-              <dt>bugreports</dt>
-              <dd>
-                <p>The email address for bug reports.</p>
-              </dd>
-
-              <dt>notes</dt>
-              <dd>
-                <p>Any other notes that might be of interest or utility.</p>
-              </dd>
-
-            </dl></p>
-
-        </subsubsect>
-
-
-      </subsect>
+        </dl>
+      </p>
 
       <subsect id="tooloverview" export="export">
         <subhead>
@@ -649,6 +352,16 @@
           <em>starconf</em> application described in <ref
             id="starconf"/>.</p>
 
+        <p>Of the applications mentioned above, automake, autoconf and
+          (usually implicitly) autoheader are run on the developer's
+          machine before or while making a distribution; thus the
+          products of these programs, <code>./configure</code>,
+          <code>config.h.in</code> and <code>Makefile.in</code>, are
+          included in the distribution, and the <code>.in</code> files
+          edited by the <code>./configure</code> script into the
+          <code>config.h</code> and <code>Makefile</code> which
+          actually control the build.</p>
+
         <p>We have elided some details here, for simplicity, and we
           could possibly have elided more, since you generally don't
           have to concern yourself with autoheader or
@@ -670,7 +383,7 @@
             Autoconf, Automake, and Libtool'</webref>, and in particular
           <webref
             url="http://sources.redhat.com/autobook/autobook/autobook_276.html"
-            >Appendix C: Generated file dependencies</webref>.</p>
+            >Appendix C of that book, `Generated file dependencies'</webref>.</p>
 
         <p>Comprehensive details of the autotools are to be found in their
           respective manuals, which are available online at
@@ -1377,6 +1090,270 @@ EXTRA_DIST = start.in $(sstsupport_DATA)
 
         </subsubsect>
       </subsect>
+
+      <subsect id="starconf" export="export">
+        <subhead>
+          <title>Starconf, and the Starlink autoconf macros</title>
+        </subhead>
+
+        <p>The starconf application does some of the work of
+          ensuring that your build directory is correctly
+          organised.  It does the following:
+          <ul>
+            <li>
+              <p>ensures that you have a <code>./bootstrap</code>
+                script;</p>
+            </li>
+            <li>
+              <p>ensures that your directory has a copy of the
+                starconf autoconf macros in the file
+                <code>starconf.m4</code>, which it unpacks and
+                immediately copies to the file
+                <code>acinclude.m4</code>;</p>
+            </li>
+            <li>
+              <p>checks that your <code>configure.ac</code> and
+                <code>Makefile.am</code> files look at least
+                plausible by checking, amongst other things, for the
+                presence of a <code>STAR_DEFAULTS</code> invocation
+                in the former;</p>
+            </li>
+            <li>
+              <p>creates the script <code>./starconf.status</code>
+                (which is what does the actual work of unpacking
+                <code>starconf.m4</code>) and configures it so that
+                it links back to the starconf installation.</p>
+            </li>
+          </ul>
+        </p>
+
+        <p>The <code>./bootstrap</code> script is `owned' by
+          starconf, and you should not change it, since it will be
+          overritten by starconf if a newer release of starconf
+          includes an updated bootstrap script.  If you <em>do</em>
+          have some pressing reason to change it, then remove the word
+          `original' from the second line of the bootstrap file, which
+          signals to starconf that it should leave the file untouched.</p>
+
+        <p>You need to explicitly run starconf only once, when you
+          first prepare a directory for configuration.  The
+          <code>./bootstrap</code> file which this creates itself
+          runs starconf, so that each time you run the bootstrap
+          script, you run starconf also.  This has no effect unless
+          either the bootstrap script or the macro set has been
+          updated in the starconf installation, in which case starconf
+          will propagate the updates to your directory.
+          The <code>./starconf.status</code> script should be
+          checked into the repository, but its products other than
+          <code>./bootstrap</code> should not be.  The file
+          <code>starconf.m4</code> is the only other product at
+          present, but others may appear in future (see <ref
+            id="developments"/>.</p>
+
+        <p>You might on other occasions run the
+          <code>./starconf.status</code> script.  You will do this
+          firstly to query important locations, such as the location
+          of the starconf templates:
+          <verbatim>
+% ./starconf.status --show buildsupportdata
+/export3/sun/buildsupport/share
+</verbatim>
+          See <kbd>./starconf.status --show --all</kbd> or
+          <kbd>./starconf.status --help</kbd> for the list
+          of all the things which you can show in this way (though
+          be warned that this list is not yet completely stable, and
+          may yet change).</p>
+
+        <p>Some of these variables are `fixed', meaning that they
+          are fixed for a particular installation of starconf (you
+          can in principle have more than one installation of
+          starconf, and choose which one to invoke, but there is
+          unlikely any need for that).  Others are `sticky', meaning
+          that they can be changed, but the value retains its value
+          unless and until it is changed again in future.</p>
+
+        <p>The two `sticky' variables are
+          <code>STARCONF_DEFAULT_PREFIX</code> and
+          <code>STARCONF_DEFAULT_STARLINK</code>.  The first is the
+          default installation prefix of the software you are
+          building; the second is the location of a currently built Starlink
+          tree, which will be used for applications and include
+          files if they are not found under
+          <code>STARCONF_DEFAULT_PREFIX</code>.  The default for
+          each of these was set when starconf was
+          itself installed (see <kbd>./configure --help</kbd> within
+          <code>buildsupport/starconf</code>: having different
+          values for this is one 
+          possible reason why you might have more than one starconf
+          installation), but their value is typically something like
+          <code>/star</code>.   You can change either value by using
+          <code>./starconf.status</code>:
+          <verbatim>
+% ./starconf-status STARCONF_DEFAULT_PREFIX=/my/local/star
+</verbatim>
+          When you configure a particular package, you can set the
+          installation prefix with the <code>--prefix</code> option
+          to <code>./configure</code>, and you can set the location
+          of the `backup' Starlink directory by setting the
+          <code>STARLINK</code> environment variable.  In general,
+          however, we recommend that you do not adjust
+          <code>--prefix</code>, and that you leave the
+          <code>STARLINK</code> variable unset.</p>
+
+        <p>A companion to the starconf application is the
+          <em>starconf-validate</em> application.  When run, this
+          examines the current directory, checking that all required
+          files are present, and checking that you have the correct
+          files checked in to the repository.  The command
+          <kbd>starconf-validate --help</kbd> shows which files are
+          in which category.  Note that this applies only to
+          directories which are fully Starlink applications -- those
+          in the <code>libraries</code> and
+          <code>applications</code> directories; components
+          in the <code>thirdparty</code> tree, on the other hand,
+          have some starconf features such as a
+          <code>component.xml</code> file, but are not valid
+          according to <em>starconf-validate</em>; also `bundle'
+          directories such as <code>libraries/pcs</code>, which have
+          no actual code in them, are not valid in this sense.</p>
+
+        <p>There are templates available for the most important
+          starconf files.  See <ref id="templates"/>.</p>
+
+        <p>The final component of the starconf system is the file
+          <code>component.xml</code>.  This is an XML file
+          containing information about the particular component in
+          the directory.  The information in this file is redundant
+          with some of the information you specify in
+          <code>configure.ac</code>, and so the best way to ensure
+          the two are consistent is to configure
+          <code>component.xml</code> from
+          <code>configure.ac</code>.  To this end, there is a
+          template component.xml.in file in the starconf
+          `buildsupportdata' directory.  When you are preparing a
+          directory to be build with the Starlink tools, copy this
+          <code>template-component.xml.in</code> into the current
+          directory under the name <code>component.xml.in</code>,
+          and fill in those field which are not configured.  See
+          <ref id="componentxml"/> for details.  The files
+          <code>component.xml</code> and
+          <code>component.xml.in</code> should both be
+          checked in.</p>
+
+        <subsubsect id='templates'>
+          <subhead>
+            <title>File templates</title>
+          </subhead>
+
+          <p>There are three templates available as part of the
+            starconf system.  They are located in the starconf
+            `buildsupportdir': given that the starconf application
+            is in your path, you can find this location with
+            <kbd>starconf --show buildsupportdata</kbd>, and if you
+            have a <code>starconf.status</code> script in your local
+            directory, you can find this directory with
+            <kbd>./starconf.status --show buildsupportdata</kbd>.</p>
+
+          <p>The three templates present are
+            <code>template-Makefile.am</code>,
+            <code>template-configure.ac</code> and
+            <code>template-configure.xml.in</code>.</p>
+
+        </subsubsect>
+
+        <subsubsect id="componentxml">
+          <subhead>
+            <title>The format of the component.xml file</title>
+          </subhead>
+
+          <p>The meaning of the elements in the component.xml DTD is
+            as follows.  The term `component' is used here rather
+            than `package': no great distinction is being drawn
+            here, except that the components within the CVS tree
+            might not be reflected in ultimately distributed packages.
+            <dl>
+              <dt>component/id</dt>
+              <dd>
+                <p>The ID for this component.  This must match the
+                  package name in <code>configure.ac</code>, and is
+                  the name under which the manifest file is
+                  installed.  Let this remain under the control
+                  of <code>configure.ac</code></p>
+              </dd>
+
+              <dt>version</dt>
+              <dd>
+                <p>The version number of this component.  This
+                  must match the version number in
+                  <code>configure.ac</code>.</p>
+              </dd>
+
+              <dt>path</dt>
+              <dd>
+                <p>This is the path to this package within the CVS
+                  repository, without any leading slash. Make sure
+                  this is correct, or else the top-level build will
+                  probably fail.</p>
+              </dd>
+
+              <dt>description</dt>
+              <dd>
+                <p>A brief description of the component.</p>
+              </dd>
+
+              <dt>abstract</dt>
+              <dd>
+                <p>A fuller description of the component.</p>
+              </dd>
+
+              <dt>dependencies</dt>
+              <dd>
+                <p>This is the set of component IDs which this
+                  component depends on.  This is managed by the
+                  <code>STAR_DECLARE_DEPENDENCIES</code> macros, and
+                  should not be adjusted by hand.</p>
+              </dd>
+
+              <dt>developers</dt>
+              <dd>
+                <p>This is a non-exhaustive list of those who have
+                  worked on this package.  Little use is made of
+                  this at present, but its use is likely to extend,
+                  for example to be the source of recipients for CVS
+                  commit messages.  The fields within it are
+                  <code>&lt;name&gt;</code>, which is the real name
+                  of the individual; <code>&lt;uname&gt;</code>,
+                  which is the username of the developer on the CVS
+                  system; and <code>&lt;email&gt;</code>, which is
+                  the person's email address.  The last two elements
+                  are not required.</p>
+              </dd>
+
+              <dt>documentation</dt>
+              <dd>
+                <p>A list of SUNs and the like.  At this stage the
+                  format of this element is 
+                  not completely finalised, and it is best to leave
+                  its maintenance to the
+                  <code>STAR_LATEX_DOCUMENTATION</code> macro.</p>
+              </dd>
+
+              <dt>bugreports</dt>
+              <dd>
+                <p>The email address for bug reports.</p>
+              </dd>
+
+              <dt>notes</dt>
+              <dd>
+                <p>Any other notes that might be of interest or utility.</p>
+              </dd>
+
+            </dl></p>
+
+        </subsubsect>
+
+      </subsect>
+
     </sect>
 
     <sect id="building" export="export">
@@ -1949,7 +1926,7 @@ sed -n \
           at least these two files mentioned here.</p>
 
         <p>Now run starconf.  As described in <ref
-            id="starconfdetails"/>, this adds some required files, and
+            id="starconf"/>, this adds some required files, and
           checks that the directory looks right.  It will look
           something like this:
 <verbatim>
@@ -2638,7 +2615,8 @@ configure.ac: installing `./missing'
                 is good practice in general, since we use extended or
                 customised versions of autoconf and automake we can
                 always control what versions of those applications are
-                being used, which possibly makes the disadvantages of
+                being used, which possibly makes the various and
+                much-discussed disadvantages of
                 this policy outweigh the advantages.  This affects the
                 discussion in <ref id="buildingcomponents"/> and the
                 overview in <ref id="tooloverview"/>.</p>
