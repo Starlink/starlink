@@ -118,12 +118,10 @@
         CHARACTER*20 COMPSPEC(MAXCOMP)	! spec for individual components
 
         LOGICAL FROZEN(NPAMAX)
-        LOGICAL IPRIM,MPRIM
         LOGICAL ACTIVE			! graphics device active
         LOGICAL SAVE			! save data to graphics dataset
         LOGICAL CHANGE			! plot mode has changed
         LOGICAL COMPLEX                 ! complex plot (>1 per page)
-        LOGICAL NEW			! new plotting session
 
         INTEGER NGOOD
         INTEGER SSCALE
@@ -146,7 +144,6 @@
         INTEGER NSET
         INTEGER NDMAX,NFMAX
         INTEGER NMAX
-        INTEGER APTR
         INTEGER NCHAN			! energy channels for model plot
         INTEGER NTERM			! number of additive terms in model
         INTEGER ITERM
@@ -159,8 +156,6 @@
 	REAL UB(NPAMAX)			! Parameter upper bounds
 	REAL LE(NPAMAX)			! Lower parameter errors
 	REAL UE(NPAMAX)			! Upper parameter errors
-        REAL D1,D2,DMIN,DMAX
-        REAL A1,A2,AMIN,AMAX
 	REAL XMIN,XMAX			! Min/max x for current p.z. (NDC)
 	REAL YMIN,YMAX			! Min/max y for current p.z. (NDC)
         REAL ELOW,EUPP			! energy bounds for model plot
