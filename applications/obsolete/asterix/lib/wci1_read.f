@@ -170,6 +170,10 @@
 *  Extract axis info
       IF ( HASPIX ) THEN
         CALL PSF_QAXES( IPSF, X_AX, Y_AX, E_AX, T_AX, STATUS )
+        IF ( (X_AX.LT.1) .AND. (Y_AX.LT.1) ) THEN
+          X_AX = 1
+          Y_AX = 2
+        END IF
         IF ( (X_AX .LT. 1) .OR. (Y_AX.LT.1) ) THEN
           CALL ADI_DERVD( FARG, 'Array', ISPRIM, STATUS )
           IF ( ISPRIM ) THEN
