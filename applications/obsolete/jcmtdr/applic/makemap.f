@@ -228,13 +228,15 @@
 
 *.
 
+*     Initialise variables
+      STATUS = SAI__OK
+
 *  Start DSA, find bad values for various type of data
 
       CALL DSA_OPEN (STATUS)
       CALL DSA_GET_FLAG_VALUE ('INT', IFLAG, STATUS)
       CALL DSA_GET_FLAG_VALUE ('FLOAT', FFLAG, STATUS)
       CALL DSA_GET_FLAG_VALUE ('DOUBLE', DFLAG, STATUS)
-
       IF (STATUS .NE. 0) THEN
          CALL PAR_WRUSER('MAKEMAP - failed to open DSA system, '//
      :      'fatal error', IGNORE)
