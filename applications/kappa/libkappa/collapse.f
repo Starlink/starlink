@@ -54,7 +54,10 @@
 *        The method to use for estimating the output pixel values.  It
 *        can be either "Mean", "WMean", "Mode" or "Median". The "WMean"
 *        method is a weighted mean in wich each data value is weighted by
-*        the reciprocal of the associated variance. ["Mean"]
+*        the reciprocal of the associated variance.  Note, using the
+*        Median option is extremely memory and CPU intensive for large
+*        data sets - use with care! If strange things happen - use Mean.
+*                                                                   ["Mean"]
 *     HIGH = LITERAL (Read)
 *        A value for the axis specified by parameter AXIS. For example,
 *        if AXIS is 3 and the current Frame of the input NDF has axes

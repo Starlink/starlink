@@ -15519,7 +15519,9 @@ default value.
          can be either {\tt "}Mean{\tt "}, {\tt "}WMean{\tt "}, {\tt "}Mode{\tt "}  or 
          {\tt "}Median{\tt "}. The {\tt "}WMean{\tt "} method is a
          weighted mean in which each data value is weighted by
-         the reciprocal of the associated variance. {\tt [{\tt "}Mean{\tt "}]}
+         the reciprocal of the associated variance. Note, using the
+         Median option is extremely memory and CPU intensive for large
+         data sets - use with care! If strange things happen - use Mean. {\tt [{\tt "}Mean{\tt "}]}
       }
       \sstsubsection{
          HIGH = LITERAL (Read)
