@@ -128,6 +128,7 @@
 *  Arguements Given:
       CHARACTER*(*)    DATA_SPEC(SCUBA__MAX_SECT)
       INTEGER          IN_NDF
+      INTEGER          MAX_FILE
       INTEGER          NSPEC
       CHARACTER*(*)    OUT_COORDS
       LOGICAL          SECPAR
@@ -147,7 +148,6 @@
       INTEGER          DATA_END
       INTEGER          DATA_PTR
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
-      INTEGER          MAX_FILE
       DOUBLE PRECISION MJD_STANDARD
       INTEGER          N_BOL
       INTEGER          N_FILE
@@ -230,7 +230,6 @@
       DOUBLE PRECISION IN_MJD2         ! modified Julian day at which object
                                        ! was at IN_LAT2,IN_LONG2 for PLANET
                                        ! centre coordinate system
-      INTEGER          IN_NDF          ! NDF index of input file
       DOUBLE PRECISION IN_RA_CEN       ! apparent RA of input file map centre
                                        ! (radians)
       INTEGER          IN_RA1_PTR      ! pointer to .SCUCD.RA1
@@ -324,7 +323,6 @@
                                           ! data-spec, 0 otherwise
       INTEGER          UBND(MAX_DIM)   ! Upper bounds of NDF section
       LOGICAL          USE_INTS        ! How to use the specified ints
-      REAL             WAVELENGTH      ! the wavelength of the map (microns)
 *.
 
       IF (STATUS .NE. SAI__OK) RETURN
