@@ -78,6 +78,9 @@
 #        with more than one dot (.sdf.Z, .sdf.gz, etc) are recognised. 
 #        Previously, the last dot was used as the start of the file type. 
 #        Now, the first dot following the last "/" is used instead.
+#     29-JAN-1998 (PDRAPER):
+#        Patched up changes to work with full and relative filenames
+#        as well as local ones.
 #     {enter_further_changes_here}
 
 #  Bugs:
@@ -150,19 +153,19 @@ done | for file in `cat`; do
           text = path[ nslash ]                    
 
 #  Find the first dot in this text. This marks the end of the base file name. 
-#  Psss on, leaving "file" blank if there is no dot, or if the base file 
+#  Pass on, leaving "file" blank if there is no dot, or if the base file 
 #  name is null.
           dot = index( text, "." )
           if ( dot > 1 ) {
 
-#  Extract the file base name, and the file type.
-             file = substr( $0, 1, dot - 1 )
-             ftype = substr( $0, dot, length( $0 ) )
+#  Extract the file type.
+             ftype = substr( text, dot, length( text ) )
 
 #  Compare the file type with each known type in turn. Leave the loop if a
 #  match is found.
              for ( i = 1; i <= nt; i++ ) {
                 if ( ftype == type[ i ] ) {
+                   file = substr( $0, 1, length( $0 ) - length( type[ i ] ) )
                    break
                 }
              }
