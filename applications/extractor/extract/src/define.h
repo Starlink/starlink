@@ -9,6 +9,7 @@
 *
 *	Contents:	global definitions.
 *
+*	Last modify:	24/09/2001
 *	Last modify:	08/02/2001
 *                       (EB):
 *                       14/07/98 (AJC)
@@ -29,7 +30,7 @@
 /*------------------------ what, who, when and where ------------------------*/
 
 #define		BANNER		"SExtractor"
-#define		VERSION		"2.2.1 (Feb  8, 2001)"
+#define		VERSION		"2.2.2 (Sep  24, 2001)"
 #define		COPYRIGHT	"Emmanuel BERTIN (bertin@iap.fr)"
 #define		WEBSITE		"http://terapix.iap.fr/sextractor"
 #define	       	MAILINGLIST	"sextractor@iap.fr"

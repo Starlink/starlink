@@ -10,7 +10,7 @@
 *
 *	Contents:	analyse(), endobject()...: measurements on detections.
 *
-*	Last modify:	12/11/99: (EB)
+*	Last modify:	24/09/2001
 *	Last modify:	09/02/00: (PWD)
 *                         Added test for BIG (i.e. missing or BAD)
 *                         values in measurement image that do not
@@ -615,6 +615,11 @@ void	endobject(picstruct *field, picstruct *dfield, picstruct *wfield,
 /*-------------------------------- Astrometry ------------------------------*/
     if (prefs.world_flag)
       computeastrom(field, obj);
+/*-- Edit min and max coordinates to follow the FITS conventions */
+    obj->xmin += 1;
+    obj->ymin += 1;
+    obj->xmax += 1;
+    obj->ymax += 1;
 
 /*-- Go through each newly identified component */
     for (j=0; j<nsub; j++)
