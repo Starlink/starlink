@@ -18,8 +18,11 @@ dnl    Include defaults for Starlink configurations
 STAR_DEFAULTS
  
 dnl    Find required versions of the programs we need for configuration
+dnl    Note we disable shared libraries by default, this is because SNX
+dnl    makes direct use of the NCAR common-blocks.
 AC_PROG_FC
 AC_PROG_FPP
+AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 
 AC_FC_OPEN_SPECIFIERS(readonly)

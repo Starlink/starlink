@@ -18,9 +18,12 @@ dnl    Need to find out whether we need this
 STAR_DEFAULTS
  
 dnl    Find required versions of the programs we need for configuration
+dnl    Note we disable shared libraries by default as these cause problems
+dnl    with SNX which shares the common-blocks.
 AC_PROG_CC
 AC_PROG_FC
 AC_PROG_FPP
+AC_DISABLE_SHARED
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
 
