@@ -1,6 +1,6 @@
 .help present Starlink ccdpack
 .nf
-Presents a list of NDFs to CCDPACK.
+Presents a list of images to CCDPACK.
 
 Usage:
 
@@ -10,22 +10,22 @@ Usage:
 Description:
 
    This routine enters reduction information into the CCDPACK
-   extensions of a list of NDFs. This information is required if an
+   extensions of a list of images. This information is required if an
    automated reduction schedule is to be produced using SCHEDULE. 
    Before using this routine you should set up the CCDPACK global
    parameters, describing the CCD characteristics, using the CCDSETUP
    application.
 
-   If the input NDFs have not already been categorised then this
+   If the input images have not already been categorised then this
    routine performs this task for the "frame types" BIAS, TARGET,
    DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and 
-   MASTER_FLASH (these are input as different groups of NDFs).
+   MASTER_FLASH (these are input as different groups of images).
 
 
    Missing exposure times for DARK and FLASH counts can be entered
    as can filter types.
 
-   This routine can also be used to check that a list of NDFs have
+   This routine can also be used to check that a list of images have
    the minimum amount of information in their CCDPACK extensions to
    allow an automated scheduling.
 
@@ -39,7 +39,7 @@ ADC = _DOUBLE (Read)
    the integration had finished. This value is required to allow
    proper estimates of the inherent noise associated with each
    readout value. CCDPACK makes these estimates and stores them
-   in the variance component of the final NDFs. Not supplying a
+   in the variance component of the final images. Not supplying a
    value for this parameter (if prompted) may be a valid response
    if variances are not to be generated.
 
@@ -48,23 +48,23 @@ ADC = _DOUBLE (Read)
    superceded if ADC=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 ADDDARK = _LOGICAL (Read)
    Whether or not to prompt for a dark exposure time for the input
-   NDFs which require one.
+   images which require one.
    [Dynamic default, TRUE if dark count frames are given, FALSE
    otherwise]
 ADDFLASH = _LOGICAL (Read)
    Whether or not to prompt for a pre-flash exposure time for the
-   input NDFs which require one.
+   input images which require one.
    [Dynamic default, TRUE if pre-flash frames are given, FALSE
    otherwise]
 BIAS = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw bias
-   data. These are the NDFs which are to used to produce a
-   "master" bias NDF. On exit these NDFs will have their FTYPE
+   A list of the names of the images which contain the raw bias
+   data. These are the images which are to used to produce a
+   "master" bias image. On exit these images will have their FTYPE
    extension item set to the value "BIAS".
    [!]
 BIASVALUE = _DOUBLE (Read)
@@ -84,29 +84,29 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    readout direction.  For example, 2,16,400,416 means that the
    bias strips are located between pixels 2 to 16 and 400 to 416
    inclusive along the readout direction. The bias strips are
-   used to either offset the master bias NDF or as an estimate of
-   the bias which is to be interpolated across the NDF in some
+   used to either offset the master bias image or as an estimate of
+   the bias which is to be interpolated across the image in some
    way (see DEBIAS). Not supplying values for this parameter may
    be a valid response if the bias frame is to be directly
    subtracted from the data without offsetting or if a single
-   constant is to be used as the bias value for the whole NDF.
+   constant is to be used as the bias value for the whole image.
 
    This parameter normally accesses the value of the related
    CCDPACK global association. This behaviour can only be
    superceded if BOUNDS=[value,...] is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 DARK = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw dark
-   count data. These are the NDFs which are to used to produce a
-   "master" dark counts NDF. On exit these NDFs will have their
+   A list of the names of the images which contain the raw dark
+   count data. These are the images which are to used to produce a
+   "master" dark counts image. On exit these images will have their
    FTYPE extension item set to the value "DARK".
    [!]
 DARKTIME = _DOUBLE (Read)
-   The time for which the data in the current NDF collected dark
+   The time for which the data in the current image collected dark
    count electrons. The dark count is basically charge which
    accumulates in the detector pixels due to thermal noise. The
    effect of dark current is to produce an additive quantity to
@@ -117,8 +117,8 @@ DARKTIME = _DOUBLE (Read)
 
    The value given does not need to be a number of seconds or
    minutes and can be ratio of some kind, as long as it is
-   consistently used for all NDFs (so if all your NDFs have the
-   same darktime then the value 1 could be used). NDFs which have
+   consistently used for all images (so if all your images have the
+   same darktime then the value 1 could be used). images which have
    no dark count should be given a DARKTIME of 0. This parameter
    is only used if ADDDARK is TRUE.
    [!]
@@ -134,7 +134,7 @@ DEFERRED = _DOUBLE (Read)
    superceded if DEFERRED=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 DIRECTION = LITERAL (Read)
@@ -149,13 +149,13 @@ DIRECTION = LITERAL (Read)
    superceded if DIRECTION=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 EXTENT( 4 ) = _INTEGER (Read)
    The extent of the useful detector area in pixel indices.  The
    extent is defined as a range in X values and a range in Y
-   values (XMIN,XMAX,YMIN,YMAX). These define a section of an NDF
+   values (XMIN,XMAX,YMIN,YMAX). These define a section of an image
    (see SUN/33). Any parts of the detector surface area outside
    of this region will not be present in the final output. This is
    useful for excluding bias strips, badly vignetted parts etc.
@@ -165,44 +165,44 @@ EXTENT( 4 ) = _INTEGER (Read)
    superceded if EXTENT=[XMIN,XMAX,YMIN,YMAX] is used on the
    command-line or if a prompt is forced (using the PROMPT
    keyword). The value of this parameter will be entered into the
-   extension of the input NDFs only if MODIFY is TRUE or the
+   extension of the input images only if MODIFY is TRUE or the
    related extension item does not exist.
    [!]
 FILTER = LITERAL (Read)
-   The filter name associated with the current NDF. The filter
+   The filter name associated with the current image. The filter
    name is stored in the extension item FILTER and is used when
    determining which flatfields should be used for which data.
-   NDFs with a frame type which is independent of the filter will
+   images with a frame type which is independent of the filter will
    not use this parameter. The filter type is a case sensitive
    string.
    [Current value]
 FLASH = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw
-   pre-flash correction data. These are the NDFs which are to
-   used to produce a "master" pre-flash correction NDF. On exit
-   these NDFs will have their FTYPE extension item set to the
+   A list of the names of the images which contain the raw
+   pre-flash correction data. These are the images which are to
+   used to produce a "master" pre-flash correction image. On exit
+   these images will have their FTYPE extension item set to the
    value "FLASH".
    [!]
 FLASHTIME  = _DOUBLE (Read)
-   The time for which the data in the current NDF was exposed to
+   The time for which the data in the current image was exposed to
    pre-flash.
 
    The value given does not need to be a number of seconds or
    minutes and can be ratio of some kind, as long as it is
-   consistently used for all NDFs (so if all your NDFs have the
-   same darktime then the value 1 could be used). NDFs which have
+   consistently used for all images (so if all your images have the
+   same darktime then the value 1 could be used). images which have
    no pre-flash should be given a FLASHTIME of 0. This parameter
    is only used if ADDFLASH is TRUE.
    [!]
 FLAT = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw
-   flatfield data. These are the NDFs which are to used to
+   A list of the names of the images which contain the raw
+   flatfield data. These are the images which are to used to
    produce "master" flatfields (one for each filter type). On
-   exit these NDFs will have their FTYPE extension item set to
+   exit these images will have their FTYPE extension item set to
    the value "FLAT".
    [!]
 FTYPE = LITERAL (Read)
-   The "frame" type of the current NDF. Each NDF is processed in
+   The "frame" type of the current image. Each image is processed in
    turn and if SIMPLE is TRUE and a frame type extension item does
    not exist then this parameter will be used to prompt for a
    value. A prompt will also be made if SIMPLE is TRUE and MODIFY
@@ -210,13 +210,13 @@ FTYPE = LITERAL (Read)
    If SIMPLE is FALSE then this parameter will not be used.
    [Current value]
 IN = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw CCD
-   data. NDFs entered using this parameter must already have the
+   A list of the names of the images which contain the raw CCD
+   data. Images entered using this parameter must already have the
    correct "frame type" information (extension item FTYPE)
    entered into their CCDPACK extensions. This parameter is only
    used if SIMPLE is TRUE.
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -280,25 +280,25 @@ MASTERS = _LOGICAL (Read)
    and MASTERFLASH).
    [FALSE]
 MODIFY = _LOGICAL (Read)
-   If the input NDFs already contain information in their CCDPACK
+   If the input images already contain information in their CCDPACK
    extensions, then this parameter controls whether this
    information will be overwritten (if a new value exists) or
    not.
    [TRUE]
 MULTIENTRY = _LOGICAL (Read)
-   Whether or not the names of the input NDFs, their frame types,
+   Whether or not the names of the input images, their frame types,
    filters and related exposure factors are all given in response
    to the IN parameter (SIMPLE must be TRUE). If this option is
    selected then the parameters FTYPE, FILTER, DARKTIME and
    FLASHTIME will be set up with these values as defaults. If
    MODIFY is TRUE then you will be given an opportunity to modify
-   them, otherwise these values will be entered into the NDF
+   them, otherwise these values will be entered into the image
    CCDPACK extensions.
 
    The input record format is five fields separated by commas. These
    are:
 
-       - 1 NDF name
+       - 1 Image name
 
        - 2 Frame type
 
@@ -336,7 +336,7 @@ MULTIENTRY = _LOGICAL (Read)
    [FALSE]
 NAMELIST = LITERAL (Read)
    The name of a file to contain a listing of the name of the
-   input NDFs. This is intended to be of use when using these
+   input images. This is intended to be of use when using these
    same names with other applications (such as SCHEDULE).
    [!]
 ONEDARKTIME = _LOGICAL (Read)
@@ -369,7 +369,7 @@ RNOISE = _DOUBLE (Read)
    This behaviour can only be superceded if RNOISE=value is used
    on the command-line or if a prompt is forced (using the
    PROMPT keyword). The value of this parameter will be entered
-   into the extension of the input NDFs only if MODIFY is TRUE or
+   into the extension of the input images only if MODIFY is TRUE or
    the related extension item does not exist.
    [!]
 SATURATION = _DOUBLE (Read)
@@ -380,21 +380,21 @@ SATURATION = _DOUBLE (Read)
    superceded if SATURATION=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 SIMPLE = _LOGICAL (Read)
-   Whether or not the input NDFs already contain "frame type"
+   Whether or not the input images already contain "frame type"
    (extension item FTYPE) information in their CCDPACK extensions
-   or not. Usually NDFs to be presented to CCDPACK do not contain
+   or not. Usually images to be presented to CCDPACK do not contain
    this information, unless it has been imported from FITS
-   information using IMPORT, or the NDFs have already been
+   information using IMPORT, or the images have already been
    presented and this pass is to modify existing extension items.
    [FALSE]
 TARGET = LITERAL (Read)
-   A list of the names of the NDFs which contain the "target"
-   data. These are the NDFs which contain the images or spectra
-   etc.  On exit these NDFs will have their FTYPE extension item
+   A list of the names of the images which contain the "target"
+   data. These are the images which contain the images or spectra
+   etc.  On exit these images will have their FTYPE extension item
    set to the value "TARGET".
    [!]
 ZEROED = _LOGICAL (Read)
@@ -407,24 +407,24 @@ ZEROED = _LOGICAL (Read)
 Examples
 
 present simple in='*' modify
-   In this example PRESENT processes all the NDFs in the current
-   directory. The NDFs should already have a valid frame type
+   In this example PRESENT processes all the images in the current
+   directory. The images should already have a valid frame type
    (such as TARGET, FLAT etc.). The any existing global variables
-   describing the detector are accessed and written into the NDF
+   describing the detector are accessed and written into the image
    extension overwriting any values which already exist.
 
 present simple=false bias='bias*' target='data*' dark=! flash=!
         flat='ff*'
-   In this example the input NDFs are organised into their
+   In this example the input images are organised into their
    respective frame types using the specially designed input
-   parameters. On exit the output NDFs will have the correct frame
+   parameters. On exit the output images will have the correct frame
    types entered into their CCDPACK extensions (provided MODIFY
    is TRUE).
 
 present modify=false simple=true in='*'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed. If any required extension or global associated items
-   are missing then they will be entered into the NDF extension.
+   are missing then they will be entered into the image extension.
    If all extension items are present then a listing of their
    values will be made.
 

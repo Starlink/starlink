@@ -1,18 +1,38 @@
-1 CCDPACK_update
+1 CCDPACK_new_version
+ 
+ In this release CCDPACK can now access foreign data files. This
+ makes it possible to wildcard lists of IRAF and FITS files, i.e.:
 
- fixed the restoration output from CCDSETUP to not jusr repeat
- the first bound twice when only two bounds are given (worked
- correctly for four bounds).
+    makemos in=*.fit out=mosaic.imh
 
- PAIRNDF has better control of reserved pens.
+ CCDPACK can now also be used from the IRAF/CL command interpreter. 
 
- The FINDOFF routine now reports when any input files have less 
- than 2 positions.
+ More minor changes include:
 
- IMPORT now works on Linux (TRN problem -- check this).
+    o  The restoration output from CCDSETUP is fixed to work
+       correctly when just recording two bias strip bounds.
 
- SCHEDULE now writes the correct comment delimeter on Linux.
+    o  The PAIRNDF application has been improved to give better 
+       control of reserved pens.
 
- REGISTER fittype=3 now works (broke in PDA port).
+    o  The FINDOFF application now reports when any input files 
+       have less than 2 positions.
 
- Peter Draper 17th February 1997, (P.W.Draper@durham).
+    o  The IMPORT application now works on Linux.
+
+    o  The SCHEDULE application now uses the correct comment  
+       delimeter on Linux.
+
+    o  The REGISTER application FITTYPE parameter now works when set
+       to 3 (shift of origin and magnification).
+  
+    o  HDS files with an object called DATA_ARRAY which are not NDFs
+       are now correctly ignored.
+
+ CCDPACK is fully described in SUN/139 and can be viewed on-line using 
+ the "showme sun139" command. The latest information about CCDPACK 
+ problems is always available at:
+
+    <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
+
+ Peter Draper 12th November 1997, (P.W.Draper@durham).

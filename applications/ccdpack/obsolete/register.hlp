@@ -41,11 +41,11 @@ Description:
    The results from REGISTER are reported via the logging system
    and then coded as TRANSFORM structures containing the final
    algebraic solutions for each input list. These structures are
-   usually stored in the CCDPACK extensions of the associated NDFs
+   usually stored in the CCDPACK extensions of the associated images
    and then used by the applications TRANLIST and TRANNDF which may
    be used to transform position lists and resample the actual
    datasets respectively. The transformation structures may also be
-   stored within a named HDS container file if no associated NDFs exist.
+   stored within a named HDS container file if no associated images exist.
 
 Parameters:
 
@@ -130,22 +130,22 @@ FULL = _LOGICAL (Read)
    performed.
    [FALSE]
 IN = LITERAL (Read)
-   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of NDF
+   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of image
    names in which to store the transformation structures is
    required. This list of names must correspond exactly to the
    order of the associated input lists. A listing of the order
    of inputs is shown before this parameter is accessed.
 
-   The NDF names may (although this is probably not advisable)
+   The image names may (although this is probably not advisable)
    be specified using wildcards, or may be specified using an
    indirection file (the indirection character is "^").
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given (and may include
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -185,14 +185,14 @@ LOGTO = LITERAL (Read)
    [BOTH]
 NDFNAMES = _LOGICAL (Read)
    This parameter specifies whether the names of the input
-   positions lists are stored in the CCDPACK extensions of NDFs.
-   If TRUE then the INLIST parameter accesses a list of NDFs
+   positions lists are stored in the CCDPACK extensions of images.
+   If TRUE then the INLIST parameter accesses a list of images
    which are used to get the associated positions lists. If FALSE
    then INLIST just accesses the position list names directly.
 
-   If the names of the lists are stored in the CCDPACK NDF
+   If the names of the lists are stored in the CCDPACK image
    extension then the final transformation structure is also
-   written to the NDF extension.
+   written to the image extension.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
@@ -210,12 +210,12 @@ PLACEIN = LITERAL (Read)
    you would like to store the final transformation structures.
    The options are:
 
-      - NDF  -- store them in NDF extensions
+      - NDF  -- store them in image extensions
 
       - FILE -- store them in a container file.
 
    If the NDF option is chosen then you will have the option of
-   supplying the NDF names via the parameter IN. If the FILE
+   supplying the image names via the parameter IN. If the FILE
    option is chosen then the name of an HDS container file should
    be given in response to the TRFILE parameter.
    [NDF]
@@ -287,12 +287,12 @@ YINV = LITERAL (Read)
 Examples
 
 register inlist='*' fittype=1
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are opened.
    A global fit between all the datasets is then performed
    which results in estimates for the offsets from the first input
-   NDF's position. The results are then coded as transform
-   structures in the CCDPACK extensions of the NDFs (under the
+   image's position. The results are then coded as transform
+   structures in the CCDPACK extensions of the images (under the
    item TRANSFORM). The transform structures are arranged so that
    the forward transformation maps current positions into the
    reference coordinate system.
@@ -302,14 +302,14 @@ register inlist='*' trtype=5
    transformations are derived for a full 6-parameter linear fit
    (which allows offset, rotation, magnification and shear).
 
-register inlist='"myndf1,myndf2"' fittype=4 refpos=2
+register inlist='"myimage1,myimage2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
-   position lists associated with the NDFs myndf1 and myndf2.
+   position lists associated with the images myimage1 and myimage2.
    The reference positions are chosen to be those associated with
-   myndf2.
+   myimage2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
-   In this example the positions lists associated with the NDFs
+   In this example the positions lists associated with the images
    one and two are said to be related by the algebraic
    expressions "pa+pb*x" and "pa+pb*y", which indicates that a
    single offset applies in both directions and a single scale
@@ -317,10 +317,10 @@ register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
    general least-squares minimization technique. Starting values
    for PA and PB can be given using the parameters PA and PB.
 
-register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
+register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
    In this example an non-linear transformation is fit between the
-   positions associated with the NDFs ndf1 and ndf2. This analysis
+   positions associated with the images image1 and image2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
    with proceeding with this transformation in a general fashion
@@ -328,13 +328,13 @@ register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
    perform image resampling.
 
 register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
-         fittype=3 placein=ndf in='"ndf1,ndf2,ndf3"'
+         fittype=3 placein=ndf in='"image1,image2,image3"'
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) and have to be specified by name
+   with images (ndfnames=false) and have to be specified by name
    (no wildcards allowed). Since the position lists are not
-   associated with NDFs there is no natural home for the
+   associated with images there is no natural home for the
    transform structures. In this example it has been decided to
-   place the transforms in NDFs anyway. PLACEIN could also be
+   place the transforms in images anyway. PLACEIN could also be
    given as "file" in which case the transform structures are
    written to a container file, under the items TRN_1, TRN_2 ...
 
@@ -377,11 +377,11 @@ Notes
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be used for registration.
 
-  On exit an item "TRANSFORM" will be added to any input NDFs.
+  On exit an item "TRANSFORM" will be added to any input images.
   This contains the registration information as a TRANSFORM
   structure and may be inspected using the ADAM utility TRACE
   (SUN/102).

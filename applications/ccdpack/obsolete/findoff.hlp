@@ -48,10 +48,10 @@ FAST = _LOGICAL (Read)
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given in response (and may
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given in response (and may
    include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -107,11 +107,11 @@ NAMELIST = LITERAL (Read)
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
    routine (say REGISTER), if the associating position lists with
-   NDFs option is not being used.
+   images option is not being used.
    [FINDOFF.LIS]
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST". The names will be present in the
    extension if the positions were located using a CCDPACK
    application (such as FINDOBJ). Using this facility allows the
@@ -125,13 +125,13 @@ OUTLIST = FILENAME (Write)
    A list of names specifying the result files. These contain
    labelled positions which can be used in registration.
    The names of the lists may use modifications of the
-   input names (NDF names if available otherwise the names of the
+   input names (image names if available otherwise the names of the
    position lists). So if you want to call the output lists
-   the same name as the input NDFs except to add a type use.
+   the same name as the input images except to add a type use.
 
       OUTLIST > *.find
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".find" to ".off"
    in this case) use
 
@@ -153,7 +153,7 @@ USECOMP = LOGICAL (Read)
 Examples
 
 findoff inlist='*' error=1 outlist='*.off'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are used. The
    matched positions are named *.off. The method used is to try
    the FAST algorithm, switching to SLOW if FAST fails. The
@@ -210,7 +210,7 @@ Notes
 
   If NDFNAMEs is TRUE then the names of the input position lists
   will be gotten from the item "CURRENT_LIST" of the CCDPACK
-  extension of the input NDFs. On exit this item will be updated
+  extension of the input images. On exit this item will be updated
   to contain the name of the appropriate output lists.
 
 Notes_on_Algorithms

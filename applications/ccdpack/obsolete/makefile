@@ -489,9 +489,8 @@ CONFIG_SCRIPTS = EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
 #  IRAF files that go into this directory (like the help databases).
 #  All these files will be installed with read permissions.
 
-IRAF_SCRIPTS = ccdexercise.cl ccdpack.cl use_globals.cl \
-               $(MONOLITHS:=.tcl) ccdpack.hd ccdpack.men \
-               _ccdpack.hd root.hd
+IRAF_SCRIPTS = ccdexercise.cl use_globals.cl $(MONOLITHS:=.tcl) \
+               ccdpack.hd ccdpack.men _ccdpack.hd root.hd
 
 #  Startup script.  This is the file that must be executed (sourced)
 #  by a user of this package in order to define appropriate aliases
@@ -499,6 +498,7 @@ IRAF_SCRIPTS = ccdexercise.cl ccdpack.cl use_globals.cl \
 #  scripts as it is edited by the installation procedure.
 
 STARTUP_SCRIPT = $(PKG_NAME).csh
+IRAF_STARTUP_SCRIPT = $(PKG_NAME).cl
 
 #  Link script.  This script does not form part of the package but is
 #  required for building it.  It will not be installed.
@@ -797,9 +797,9 @@ HAVE_NAG = 0
 
 BUILT_FILES = $(LINK_SCRIPT1) $(LINK_SCRIPT2) \
  $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MONOLITHS) $(IFC_FILES) \
- $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) $(HELPTASK) \
- $(PLATFORM_TCLBINARIES) $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) \
- helpdb.mip
+ $(HELP_FILES) $(ICL_SCRIPT) $(STARTUP_SCRIPT) \
+ $(IRAF_STARTUP_SCRIPT) $(HELPTASK) $(PLATFORM_TCLBINARIES) \
+ $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -932,7 +932,7 @@ $(HELPSRC) : $(HELPTASK).tar
 	@ if test -f $@; then :;\
 	  else echo $@ is not in the tar file; exit 1; fi
 
-$(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
+$(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip: $(PKG_NAME)_iraf.tar
 	$(TAR_OUT) $(PKG_NAME)_iraf.tar $@
 	@ if test -f $@; then :;\
 	   else echo $@ is not in the tar file; exit 1; fi
@@ -1048,11 +1048,12 @@ $(DATA_FILES):
 	chmod 644 $(DATA_FILES)
 
 $(PKG_NAME)_iraf.tar:
-	co $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP)
+	co $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) $(IRAF_PAR) $(IRAF_HELP)
 	cp $(HOME)/ccdpack/documents/helpdb.mip ./
-	   $(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_SCRIPTS) $(IRAF_PAR) \
-	   $(IRAF_HELP) helpdb.mip
-	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
+	   $(TAR_IN) $(PKG_NAME)_iraf.tar $(IRAF_STARTUP_SCRIPT) \
+	   $(IRAF_SCRIPTS) $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
+	@- $(RM) $(IRAF_SCRIPTS) $(IRAF_STARTUP_SCRIPT) \
+	   $(IRAF_PAR) $(IRAF_HELP) helpdb.mip
 
 #  Rules for extracting platform specific source files from the source
 #  archive.
@@ -1594,6 +1595,12 @@ install:
 #
 #   Install the IRAF files. Thes go into INSTALL_IRAF_BIN and
 #   INSTALL_IRAF_DOC.
+	if test -n "$(IRAF_STARTUP_SCRIPT)"; then \
+	   sed -e s#INSTALL_IRAF_BIN#$(INSTALL_IRAF_BIN)# \
+	       -e s#PKG_VERS#$(PKG_VERS)# \
+	      $(IRAF_STARTUP_SCRIPT) >$(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT) ;\
+	   chmod 755 $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT) ;\
+	else :; fi
 	for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
            if test -n "$$f"; then \
               $(CP) $$f $(INSTALL_IRAF_BIN);\
@@ -1797,12 +1804,12 @@ do_deinstall:
 	      $(RM) $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
 	done
-	for f in $(NAGTASKS) ""; do \
+	- for f in $(NAGTASKS) ""; do \
 	   if test -n "$$f"; then \
 	      $(RM) $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
 	done
-	for f in $(SCRTASKS) ""; do \
+	- for f in $(SCRTASKS) ""; do \
 	   if test -n "$$f"; then \
 	      $(RM) $(INSTALL_BIN)/$$f ;\
 	   else :; fi;\
@@ -1820,6 +1827,12 @@ do_deinstall:
 #
 #   Deinstall the IRAF files. These are in INSTALL_IRAF_BIN and
 #   INSTALL_IRAF_DOC.
+	- if test -n "$(IRAF_STARTUP_SCRIPT)"; then \
+           if test -f $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT); then\
+              $(RM) $(INSTALL_IRAF_BIN)/$(IRAF_STARTUP_SCRIPT);\
+           else :; fi ;\
+           $(MAKE) $(IRAF_STARTUP_SCRIPT);\
+	else :; fi
 	- for f in $(IRAF_SCRIPTS) $(IRAF_PAR) helpdb.mip ""; do \
 	   if test -n "$$f" -a -f $(INSTALL_IRAF_BIN)/$$f; then \
 	      $(RM) $$f;\
@@ -1836,18 +1849,12 @@ do_deinstall:
 	done
 #
 #   And remove the various links setup to work from this directory.
-	(cd $(INSTALL_IRAF_BIN); \
+	- (cd $(INSTALL_IRAF_BIN); \
 	 for f in $(MONOLITHS) ""; do \
 	    if test -n "$$f"; then \
-	       if test -f $$f; then \
 	          $(RM) $$f;\
-               else :; fi;\
-	       if test -f $${f}.ifc; then \
 	          $(RM) $${f}.ifc;\
-               else :; fi;\
-	       if test -f $${f}.e; then \
 	          $(RM) $${f}.e;\
-               else :; fi;\
 	    else :; fi;\
 	 done)
 #

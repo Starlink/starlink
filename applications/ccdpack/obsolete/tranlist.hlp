@@ -36,21 +36,21 @@ INEXT = _LOGICAL (Read)
    If NDFNAMES is TRUE and the transformation is to be specified
    using a TRANSFORM structure (TRTYPE="STRUCT") then this
    parameter controls whether or not the structure should be
-   located in the CCDPACK extensions of the NDFs.
+   located in the CCDPACK extensions of the images.
 
    If this option is chosen then the transform structure in EACH
-   NDF will be applied to the associated position list. So for
-   instance if you have a set of registered NDFs and positions
+   image will be applied to the associated position list. So for
+   instance if you have a set of registered images and positions
    these may be transformed all at once to and from the reference
    coordinate system.
    [TRUE]
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
-   the associated NDFs. If NDFNAMES is TRUE the names of the
+   the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of
-   the NDFs (in the CCDPACK extension item CURRENT_LIST) and the
-   names of the NDFs themselves should be given in response (and
+   the images (in the CCDPACK extension item CURRENT_LIST) and the
+   names of the images themselves should be given in response (and
    may include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -96,7 +96,7 @@ NAMELIST = _FILENAME
    [TRANLIST.LIS]
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST". The names will be present in the
    extension if the positions were located using a CCDPACK
    application (such as FINDOBJ). Using this facility allows the
@@ -108,14 +108,14 @@ NDFNAMES = _LOGICAL (Read)
    [TRUE]
 OUTLIST = FILENAME (Write)
    A list of names specifying the result files. The names of the
-   lists may use modifications of the input names (NDF names if
+   lists may use modifications of the input names (image names if
    available otherwise the names of the position lists). So if
    you want to call the output lists the same name as the input
-   NDFs except to add a type use.
+   images except to add a type use.
 
       OUTLIST > *.FIND
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".CENT" to ".TRAN"
    in this case) use
 
@@ -172,7 +172,7 @@ TRTYPE = LITERAL (Read)
    by REGISTER or CCDEDIT) is to be applied to the data. In this
    case the name of the object containing the structure should
    be supplied (this may be picked up automatically through the
-   association of an NDF and a position list) and whether to use
+   association of an image and a position list) and whether to use
    the forward or inverse mappings.
    [COEFF]
 TR( 6 ) = _DOUBLE (Read)
@@ -218,20 +218,20 @@ Examples
 
 tranlist inlist='*' outlist='*.tran' trtype=struct inext=true
          forward=false
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are opened.
-   The transform structures in the NDFs are used to transform the
+   The transform structures in the images are used to transform the
    associated positions using the inverse mappings. The output
-   lists are called ndf_name.tran and are associated with the
-   NDFs.
+   lists are called image_name.tran and are associated with the
+   images.
 
 tranlist inlist='*_reduced' outlist='*.off' trtype=coeff
          tr='[10,1,0,20,0,1]'
-   In this example the position lists associated with the NDFs
+   In this example the position lists associated with the images
    *_reduced are transformed using the linear fit coefficients
    [10,1,0,20,0,1] resulting in a shift of all the positions in
    these lists of +10 in X and +20 in Y. The output lists are
-   called ndf_name.off and are now associated with the NDFs.
+   called image_name.off and are now associated with the images.
 
 tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
          tr='[0,0.707,-0.707,0,0.707,0.707]'
@@ -242,11 +242,11 @@ tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
 tranlist inlist=here outlist=reflected.dat trtype=express
          xfor=-x yfor=-y
    In this example a transformation expression is used to reflect
-   the positions stored in the list associated with NDF here
+   the positions stored in the list associated with image here
    about the X and Y axes. A similar effect could be achieved
    with trtype=coeff and tr=[0,-1,0,0,0,-1].
 
-tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
+tranlist inlist=image_with_list outlist='*.tran' trtype=express
          xfor='(fx*(1d0+pa*(fx*fx+fy*fy)))*ps+px'
          yfor='(fy*(1d0+pa*(fx*fx+fy*fy)))*ps+py'
          fx='(x-px)/ps' fy='(y-py)/ps'
@@ -254,7 +254,7 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
          py=Y-centre-value ps=scale_factor
    In this example a general transformation (which is of the type
    used when applying pin cushion distortions) is applied to the
-   position list associated with the NDF ndf_with_list. The
+   position list associated with the image image_with_list. The
    transformation is parameterised with an offset and scale
    (converts pixel coordinates to one projection radius units)
    applied to the input coordinates and a pincushion distortion
@@ -263,11 +263,11 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
 tranlist ndfnames=false inlist='"list1,list2,list3"'
          outlist='"outlist1,outlist2,outlist3"' namelist=newfiles
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) And have to be specified by name
+   with images (ndfnames=false) And have to be specified by name
    (no wildcards allowed). The output lists are also specified in
    this fashion, but, the same effect could have been achieved
    with outlist=out* as the input list names are now used as as
-   modifiers for the output list names (the NDF names are always
+   modifiers for the output list names (the image names are always
    used when they are available -- see previous examples). The
    names of the output lists are written to the file newfiles,
    this could be used to specify the names of these files to
@@ -310,13 +310,13 @@ Notes
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be transformed. On exit this item will be updated to
   reference the name of the transformed list of positions.
 
   This application may also access the item "TRANSFORM" from
-  the NDF extensions if NDFNAMES and INEXT are TRUE and
+  the image extensions if NDFNAMES and INEXT are TRUE and
   TRTYPE="STRUCT".
 
 - In this application data following the third column are copied

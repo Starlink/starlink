@@ -84,16 +84,16 @@
  
      CALCOR: Performs dark or flash count corrections.
  
-     CCDALIGN: Determines general inter-NDF transformations.
+     CCDALIGN: Determines general inter-image transformations.
 
      CCDCLEAR: Clears global parameters.
 
-     CCDEDIT: Edits the CCDPACK extensions of NDFs.
+     CCDEDIT: Edits the CCDPACK extensions of images.
 
      CCDFORK: Creates a script for executing CCDPACK commands in 
               a background process.
 
-     CCDNDFAC: Accesses a list of NDFs, writing their names to a file.
+     CCDNDFAC: Accesses a list of images, writing their names to a file.
 
      CCDNOTE: Adds a note to the log file.
 
@@ -101,39 +101,39 @@
 
      CCDSHOW: Displays the current values of any CCDPACK global parameters. 
 
-     DEBIAS: Debiasses lists of NDFs either by bias NDF subtraction 
+     DEBIAS: Debiasses lists of images either by bias subtraction 
              or by interpolation -- applies bad data masks --
              extracts a subset of the data area -- produces variances --
              applies saturation values.
 
-     FINDCENT: Centroids NDF image features.
+     FINDCENT: Centroids image features.
 
-     FINDOBJ: Locates and centroids NDF image features.
+     FINDOBJ: Locates and centroids image features.
 
      FINDOFF: Performs pattern-matching between position lists related 
               by simple offsets.
 
-     FLATCOR: Performs the flatfield correction on a list of NDFs.
+     FLATCOR: Performs the flatfield correction on a list of images.
 
      IDICURS: Reads co-ordinates from an X display (allows zooming 
               and panning).
 
-     IMPORT: Imports FITS information into NDFs.
+     IMPORT: Imports FITS information into CCDPACK extensions.
 
-     MAKEBIAS: Produces a bias calibration NDF.
+     MAKEBIAS: Produces a bias calibration image.
 
-     MAKECAL: Produces calibration NDFs for flash or dark counts.
+     MAKECAL: Produces calibration images for flash or dark counts.
 
-     MAKEFLAT: Produces a flatfield NDF.
+     MAKEFLAT: Produces a flatfield image.
 
-     MAKEMOS: Makes NDF mosaics by combining and (optionally) normalising.
+     MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     PAIRNDF: Displays and manipulates NDF pairs to allow easy registration 
+     PAIRNDF: Displays and manipulates image pairs to allow easy registration 
               (offsets only).
 
      PLOTLIST: Draws position markers on a graphics display.
 
-     PRESENT: Presents a list of NDFs to CCDPACK.
+     PRESENT: Presents a list of images to CCDPACK.
 
      REDUCE: Automatic CCD data reduction facility (command-line version).
 
@@ -143,47 +143,40 @@
 
      TRANLIST: Transforms lists of positions.
 
-     TRANNDF: Transforms (resamples) NDFs.
+     TRANNDF: Transforms (resamples) images.
 
      XREDUCE: Starts the automated CCD data reduction GUI.
 
 1 Changes_this_release
 
- CCDPACK is now available under Linux. Four bug fixes and a minor feature
- change have also been made:
+ In this release CCDPACK can now access foreign data files. This
+ makes it possible to wildcard lists of IRAF and FITS files, i.e.:
 
-   The logic of the flag that controls how saturated pixels are
-   marked in the xreduce GUI was reversed. This is now works as
-   described.
+    makemos in=*.fit out=mosaic.imh
 
-   The control of window stacking in xreduce has been improved. 
-   Menus should appear much faster than before.
+ CCDPACK can now also be used from the IRAF/CL command interpreter. 
 
-   A bug in the memory handling in FINDOFF has been fixed. This 
-   resulted in the occasional crash or peculiar behaviour.
+ More minor changes include:
 
-   A bug in CCDEDIT related to the classification of type 2 linear
-   transforms has been corrected. This was causing a crash when
-   TR(6) was set to zero.
+    o  The restoration output from CCDSETUP is fixed to work
+       correctly when just recording two bias strip bounds.
 
-   A new parameter CLEAN has been added to the MAKEFLAT routine.
-   Setting this flag to FALSE disables the phase that attempts to
-   detect spurious pixels. The default for this parameter is TRUE.
+    o  The PAIRNDF application has been improved to give better 
+       control of reserved pens.
 
-   All NAG source code has been eliminated. This was necessary
-   for CCDPACK to appear on Linux based systems. This effects the
-   following routines:
-      MAKEBIAS, MAKECAL, MAKEFLAT, MAKEMOS, DEBIAS, FINDOFF, 
-      REGISTER and CCDGENERATE.
+    o  The FINDOFF application now reports when any input files 
+       have less than 2 positions.
 
-   The most significant changes have been made to the MAKEMOS routine.
-   Consequently the old routine is still available, for now, and can be 
-   executed by using the command:
-   
-      nagmakemos
+    o  The IMPORT application now works on Linux.
 
-   If you need to use this routine please contact the maintainer of 
-   this package. 
+    o  The SCHEDULE application now uses the correct comment  
+       delimeter on Linux.
+
+    o  The REGISTER application FITTYPE parameter now works when set
+       to 3 (shift of origin and magnification).
+  
+    o  HDS files with an object called DATA_ARRAY which are not NDFs
+       are now correctly ignored.
 
  CCDPACK is fully described in SUN/139 and can be viewed on-line using 
  the "showme sun139" command. The latest information about CCDPACK 
@@ -192,8 +185,8 @@
     <URL: http://star-www.dur.ac.uk/~pdraper/ccdpack>
 
 1 CALCOR
-Subtracts a scaled dark or flash calibration NDF from a series of
-NDFs.
+Subtracts a scaled dark or flash calibration image from a series of
+images.
 
 Usage:
 
@@ -202,7 +195,7 @@ Usage:
 Description:
 
    CALCOR subtracts dark or flash calibration data from a series of
-   bias-corrected NDFs. The calibration data are multiplied by a
+   bias-corrected images. The calibration data are multiplied by a
    constant before subtraction, so that calibration data which have
    been normalised to counts per unit of time per pixel, can be
    scaled to the "exposure" times suitable for correcting the input
@@ -216,15 +209,15 @@ Description:
 For information on individual parameters, select from the list below:
 3 CAL
 CAL = LITERAL (Read)
-   Name of the NDF containing the calibration data, this would
+   Name of the image containing the calibration data, this would
    normally be the output from MAKECAL. The data should be
    normalised to one exposure unit. It is expected that the
-   calibration NDF contains dark or flash exposure CCD data
+   calibration image contains dark or flash exposure CCD data
    which have been bias corrected.
 
    The name of this file may be specified using indirection
    through a file.
-   [Global calibration NDF]
+   [Global calibration image]
 3 EXPOSE
 EXPOSE = LITERAL (Read)
    A list of (comma separated) values specifying the numbers by
@@ -235,31 +228,31 @@ EXPOSE = LITERAL (Read)
    normalised to reflect the number of counts per second of time,
    then this is the number of seconds of flash exposure or the
    number of seconds duration between readouts, if it is a dark
-   counts NDF.  If the calibration NDF has been produced so
+   counts image.  If the calibration image has been produced so
    that the correct levels are already present, then these values
    should be returned as one. A quick method of specifying that
-   all the NDFs have the same "exposure" factors is to return a
-   single value, this will then be used for all input NDFs.
+   all the images have the same "exposure" factors is to return a
+   single value, this will then be used for all input images.
 
-   The given values must be in the same order as the input NDFs.
+   The given values must be in the same order as the input images.
    Indirection through an ASCII file may be used.  If more than
    one line is required to enter the information then a
    continuation line may be requested by adding "-" to the end of
    the last value.
 3 IN
 IN = LITERAL (Read)
-   Names of the NDFs to be processed. The calibration data will be
-   scaled and subtracted from these.  The NDF names should be
+   Names of the images to be processed. The calibration data will be
+   scaled and subtracted from these.  The image names should be
    separated by commas and may include wildcards.
 
    NOTE the use of wildcards with this program is NOT recommended
-   unless the input NDFs all have the same calibration exposure
-   factors. The processing order of any wildcarded NDFs cannot
+   unless the input images all have the same calibration exposure
+   factors. The processing order of any wildcarded images cannot
    be guaranteed.
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-   or not. Deleting the input NDFs has the advantage of saving
+   Whether to keep (i.e. not delete) the input images (parameter IN)
+   or not. Deleting the input images has the advantage of saving
    disk space, but should probably only be used if this program
    is part of a sequence of commands and the intermediary data
    produced by it are not important.
@@ -303,20 +296,20 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 OUT
 OUT = LITERAL (Read)
-   Names of the output NDFs. These may be specified as list of
+   Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
    as a single modification element (of the input names).
    The simplest modification element is the asterisk "*" which
-   means call each of the output NDFs the same name as the
-   corresponding input NDFs. So,
+   means call each of the output images the same name as the
+   corresponding input images. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names.
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names.
 
    Other types of modification can also occur, such as,
       OUT > tmp_*
-   which means call the output NDFs the same as the input NDFs but
+   which means call the output images the same as the input images but
    put tmp_ in front of the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUT > tmp_*|debias|flattened|
@@ -324,8 +317,8 @@ OUT = LITERAL (Read)
    output names tmp_*.
 
    NOTE the use of wildcards with this program is not recommended
-   unless the input NDFs all have the same calibration exposure
-   factors. The order of processing of any wildcarded NDFs cannot
+   unless the input images all have the same calibration exposure
+   factors. The order of processing of any wildcarded images cannot
    be guaranteed.
 3 PRESERVE
 PRESERVE = _LOGICAL (Read)
@@ -359,13 +352,13 @@ SETSAT = _LOGICAL (Read)
    [FALSE]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDFs.
+   Title for the output images.
    [Output from CALCOR].
 2 Examples
 calcor frame1 frame2 calibration 250
    This example runs CALCOR in its most basic mode. The input data
-   in NDF frame1 has the data in NDF calibration subtracted, after
-   multiplying by 250. The resultant data is written to NDF
+   in image frame1 has the data in image calibration subtracted, after
+   multiplying by 250. The resultant data is written to image
    frame2. Note that if saturation values have been applied to the
    data in frame1 within CCDPACK, then this will be handled
    automatically. The output data will be of the same type as the
@@ -373,12 +366,12 @@ calcor frame1 frame2 calibration 250
 
 calcor in=^frames.dat out='*_darksub' cal=dark_master 
        expose=^dark_exposures
-   In this example a list of NDFs are sequentially processed. The
-   list of NDF names is stored in the file frames.dat. The output
-   NDFs are named after the corresponding input NDF with the
+   In this example a list of images are sequentially processed. The
+   list of image names is stored in the file frames.dat. The output
+   images are named after the corresponding input image with the
    characters _darksub appended. The dark times for each input
    frame are read from the file dark_exposures. This is the
-   recommended method for processing lists of input NDFs.
+   recommended method for processing lists of input images.
 
 calcor l1551_f11 l1551_f11_ds dark_master 1.0 preserve=false
        logto=both logfile=l1551_darkcor.log
@@ -387,14 +380,14 @@ calcor l1551_f11 l1551_f11_ds dark_master 1.0 preserve=false
    except that the output data type is now _REAL or _DOUBLE,
    depending on the precision required to process the data. The
    calibration correction data are assumed to have the right
-   exposure factor. The output NDF is given the title
+   exposure factor. The output image is given the title
    "dark_corrected_data" and the parameters used by CALCOR are
    stored in the logfile l1551_darkcor.log.
 
 calcor in=ngc4151r_f1 cal=flash_master out=ngc4151r_f1_dc
        expose=310.0 setsat saturation=32767
    In this example a saturation value external to CCDPACK has
-   been applied to the input NDF. This is indicated by setting
+   been applied to the input image. This is indicated by setting
    SETSAT TRUE and by supplying the saturation value. Values
    which are greater than or equal to the saturation value are
    left unmodified by the calibration frame subtraction. This may
@@ -455,7 +448,7 @@ PDRAPER: Peter Draper (STARLINK)
    - Supports processing of all non-complex numeric types.
      BAD pixels are processed as are all NDF components.
 1 CCDALIGN
-Interactive procedure to aid the alignment of NDFs.
+Interactive procedure to aid the alignment of images.
 
 Usage:
 
@@ -463,20 +456,20 @@ Usage:
 
 Description:
 
-   This procedure aids the registration of NDFs which are not
+   This procedure aids the registration of images which are not
    related by simple offsets (see FINDOFF and PAIRNDF if they are).
-   It also has the capability of dealing with groups of NDFs which
+   It also has the capability of dealing with groups of images which
    are almost registered (frames which have not been moved on the
    sky) saving effort in re-identification of image features.
 
-   The basic method used is to access groups of NDFs (or a series
-   of single NDFs if all are moved between exposures) and an
-   optional reference NDF. The first NDF of the first group or the
-   reference NDF is then displayed and a cursor application is used
+   The basic method used is to access groups of images (or a series
+   of single images if all are moved between exposures) and an
+   optional reference image. The first image of the first group or the
+   reference image is then displayed and a cursor application is used
    to record the positions of centroidable image features. The
-   first NDFs of all the other groups are then displayed and you
+   first images of all the other groups are then displayed and you
    are invited to identify the image features in the order which
-   corresponds to that used for the reference NDF. Missing image
+   corresponds to that used for the reference image. Missing image
    features are identified as off the currently displayed image (so
    the centroid routine will fail to find them). The reference set
    of image features may be extended by identification after the
@@ -485,16 +478,16 @@ Description:
    After centroiding you are then given the option to stop. If
    you decide to then you will have labelled position lists to use
    in the other CCDPACK routines (the labelled positions will be
-   called NDF_NAME.acc). If you chose the option to continue then
-   a full registration of the NDFs will be attempted. This may only
+   called IMAGE_NAME.acc). If you chose the option to continue then
+   a full registration of the images will be attempted. This may only
    be performed for "linear" transformations.
 
    After choosing a transformation type the procedure will then go on
-   to calculate a transformation set between all the NDFs, this is
+   to calculate a transformation set between all the images, this is
    then used (with the extended reference set from REGISTER) to
    approximate the position of all possible image features, these are
-   then located by centroiding and a final registration of all NDFs
-   is performed. The resultant NDFs then have associated lists of
+   then located by centroiding and a final registration of all images
+   is performed. The resultant images then have associated lists of
    labelled positions and TRANSFORM structures which may be used to
    transform other position lists or when resampling the data.
 2 Parameters
@@ -624,7 +617,7 @@ PDRAPER: Peter Draper (STARLINK)
     Increased size of NAME buffer to DAT__SZNAM. This removes the
     possibility of comparing non-existent elements.
 1 CCDEDIT
-Edits CCDPACK NDF extensions.
+Edits CCDPACK image extensions.
 
 Usage:
 
@@ -633,7 +626,7 @@ Usage:
 Description:
 
    This routine provides the ability to edit the contents the
-   CCDPACK extensions of a list of NDFs. The following modes
+   CCDPACK extensions of a list of images. The following modes
    of operation are available:
 
      -    associate position list(s)
@@ -645,10 +638,10 @@ Description:
      -    invert a transform structure.
 
    The associate list facility allows the names of position lists to
-   be added to NDF extensions, these lists are then accessed when the
-   NDF names are given in response to an INLIST prompt (provided the
+   be added to image extensions, these lists are then accessed when the
+   image names are given in response to an INLIST prompt (provided the
    application NDFNAMES parameter is TRUE). This option also allows a
-   single position list to be associated with a range of NDFs.
+   single position list to be associated with a range of images.
 
    Erase extension items is a safe way of deleting primitives and
    structures from an NDF CCDPACK extension and removes the need to
@@ -737,17 +730,17 @@ FITTYPE = _INTEGER (Read)
    transformation (see the CLASS parameter).
    [5]
 3 IN
-IN = NDF (Read)
-   A list specifying the names of the NDFs whose CCDPACK
-   extensions are to be modified. The NDF names should be
+IN = image (Read)
+   A list specifying the names of the images whose CCDPACK
+   extensions are to be modified. The image names should be
    separated by commas and may include wildcards.
 3 INLIST
 INLIST = LITERAL (Read)
    A list specifying one or more position list names (only used
    if MODE = "ALIST" ). If a single name is given then this
-   position list will be associated with all the input NDFs. If
+   position list will be associated with all the input images. If
    a list of names is given then there should be as many names
-   as input NDFs. The order of the input NDF names is shown so
+   as input images. The order of the input image names is shown so
    that the correct correspondence may be achieved.
 
    Position list names may NOT include wildcards. So a comma
@@ -797,7 +790,7 @@ MODE = LITERAL (Read)
 
       - INVERT
 
-   The "ALIST" option "associates" a position list(s) with NDFs
+   The "ALIST" option "associates" a position list(s) with images
    (this sets the "CURRENT_LIST" item).  This is useful when
    importing position lists generated externally to CCDPACK.
 
@@ -805,7 +798,7 @@ MODE = LITERAL (Read)
    Two possible items are "CURRENT_LIST" and "TRANSFORM".
 
    The "TRANSFORM" option allows the generation or import of
-   transforms into NDF extensions. Transforms from other NDFs
+   transforms into image extensions. Transforms from other images
    may be copied. Linear transforms may be generated from the (6)
    coefficients. General transforms may be specified by
    algebraic-like expressions containing the functions allowed by
@@ -814,7 +807,7 @@ MODE = LITERAL (Read)
    CLASSIFY and CLASS) and the examples section.
 
    The "INVERT" option inverts the sense of transformations in
-   the NDFs.
+   the images.
    [ALIST]
 3 NAME
 NAME = LITERAL (Read)
@@ -844,7 +837,7 @@ PA-PZ = _DOUBLE (Read)
 TRANSFORM = TRN (Read)
    If TRTYPE="STRUCT" is chosen then this parameter is used to
    access the HDS object which contains a transform structure
-   to copy into the input NDFs. The standard place to store a
+   to copy into the input images. The standard place to store a
    transform structure (in CCDPACK) is
 
        - NDF_NAME.MORE.CCDPACK.TRANSFORM
@@ -875,7 +868,7 @@ TRTYPE = LITERAL (Read)
    supplied in the order PA,PB,PC,PD,PE,PF.
 
    If "STRUCT" is chosen then an existing transformation structure
-   will be copied into the extensions of the NDFs. Note that
+   will be copied into the extensions of the images. Note that
    no checking of the transform's validity will be made.
 
    If "EXPRES" is chosen then the transformation will be specified
@@ -970,34 +963,34 @@ YINV = LITERAL (Read)
 2 Examples
 ccdedit mode=alist in='*' inlist=reference_set
    This example shows how to "associate" a single position list
-   called reference_set with all the NDFs in the current
+   called reference_set with all the images in the current
    directory.
 
-ccdedit mode=alist in='"ndf1,ndf2,ndf3"'
+ccdedit mode=alist in='"image1,image2,image3"'
         inlist='"pos1.dat,pos2.dat,pos3.dat"'
-   In this example the NDF ndf1 is associated with pos1.dat, the
-   NDF ndf2 with pos2.dat and the NDF ndf3 with pos3.dat.
+   In this example the image image1 is associated with pos1.dat, the
+   image image2 with pos2.dat and the image image3 with pos3.dat.
 
-ccdedit mode=erase in=ndf_with_bad_transform name=transform
+ccdedit mode=erase in=image_with_bad_transform name=transform
    In this example the TRANSFORM structure in the CCDPACK
-   extension of the NDF ndf_with_bad_transform is removed.
+   extension of the image image_with_bad_transform is removed.
 
 ccdedit mode=invert in='*'
-   In this example all the NDFs in the current directory have
+   In this example all the images in the current directory have
    their transforms inverted.
 
-ccdedit mode=transform trtype=coeff in=shift_this_ndf
+ccdedit mode=transform trtype=coeff in=shift_this_image
         tr='[10.25,1,0,-101.1,0,1]' fittype=1
-   In this example the NDF shift_this_ndf has a transform
+   In this example the image shift_this_image has a transform
    structure written into its CCDPACK extension which specifies a
    shift of 10.25 in X and a negative shift of 101.1 in Y.
    The shift is specified using the appropriate linear
    transformation coefficients [XSHIFT,1,0,YSHIFT,0,1] and is
    correctly classified as a fittype of 1.
 
-ccdedit mode=transform trtype=coeff in=rotate_this_ndf
+ccdedit mode=transform trtype=coeff in=rotate_this_image
         tr='[0,0.965926,-0.258819,0,0.258819,0.965926]' fittype=2
-   In this example the NDF rotate_this_ndf has a transform
+   In this example the image rotate_this_image has a transform
    structure written into its CCDPACK extension which specifies a
    rotation by 15 degrees about the [0,0] position. The rotation
    is specified using the appropriate linear transformation
@@ -1006,12 +999,12 @@ ccdedit mode=transform trtype=coeff in=rotate_this_ndf
 ccdedit mode=transform trtype=struct in=need_transform
         transform=trn.more.ccdpack.transform
    In this example the transformation structure
-   trn.more.ccdpack.transform is copied to the NDF need_transform.
+   trn.more.ccdpack.transform is copied to the image need_transform.
 
 ccdedit mode=transform trtype=expres in=map2gls
         xfor='"xx=x*cosd(y)"' yfor='"yy=y"' xinv='"x=xx/cosd(yy)"'
         yinv='"y=yy"'
-   In this example the transform structure to be added to NDF
+   In this example the transform structure to be added to image
    map2gls is defined as an algebraic expression. The mapping used
    is a Sanson-Flamstead sinusoidal with X and Y in degrees.
 
@@ -1022,7 +1015,7 @@ ccdedit mode=transform trtype=express in=map2merc
         yinv='"2d0*(atand(exp(y*pi/180d0)))-90d0"'
         pa=89.9999d0
    In this example a Mercator-like transform structure is added to
-   the NDF map2merc. The arguments to TAND are limited to the
+   the image map2merc. The arguments to TAND are limited to the
    range +/- 89.9999D) to stop blow-up. The parameter PI is
    defaulted to 3.14159265359D0.
 2 Notes
@@ -1031,8 +1024,8 @@ ccdedit mode=transform trtype=express in=map2merc
    structure .MORE.CCDPACK.
 
 - When using the MODE=ALIST option the item CURRENT_LIST in the
-  CCDPACK extension of the input NDFs is set to the name of the
-  input list(s). Such NDF items may be used by other CCDPACK
+  CCDPACK extension of the input images is set to the name of the
+  input list(s). Such image items may be used by other CCDPACK
   position list processing routines to automatically access
   these lists.
 
@@ -1132,7 +1125,7 @@ PDRAPER: Peter Draper (STARLINK)
  12-AUG-1993 (PDRAPER):
     Changed to test for ccdpack definition.
 1 CCDNDFAC
-Accesses a list of NDFs and writes their names to a file.
+Accesses a list of images and writes their names to a file.
 
 Usage:
 
@@ -1140,12 +1133,12 @@ Usage:
 
 Description:
 
-   This routine accesses a list of NDFs and writes their names to a
+   This routine accesses a list of images and writes their names to a
    text file. It is intended to be used as an aid to producing
-   procedures which require the facilities of NDF list access used
+   procedures which require the facilities of image list access used
    in CCDPACK. For this reason the usual application introductory
-   message is suppressed. The names of the NDFs may be written
-   out to the terminal as an aid to memory. If no NDFs are accessed
+   message is suppressed. The names of the images may be written
+   out to the terminal as an aid to memory. If no images are accessed
    then the output file will not be created, testing for the
    existence of this file is a platform independent way of
    determining if the invocation has been successful.
@@ -1153,8 +1146,8 @@ Description:
 For information on individual parameters, select from the list below:
 3 ECHO
 ECHO = _LOGICAL (Read)
-   If TRUE then the names of the NDFs will be written to the
-   terminal unless there is only one input NDF.
+   If TRUE then the names of the images will be written to the
+   terminal unless there is only one input image.
    [TRUE]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
@@ -1189,29 +1182,29 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names. The NDF names should be separated by commas 
+   A list of image names. The image names should be separated by commas 
    and may include wildcards.
    [!]
 3 MAXNDF
 MAXNDF = _INTEGER (Read)
-   The maximum number of NDFs which should be accessed. If a null
+   The maximum number of images which should be accessed. If a null
    return "!" is given for this parameter then the normal CCDPACK
    limit will be applied.
    [!]
 3 NAMELIST
 NAMELIST = LITERAL (Read)
    The name of the output file to contain the names of the
-   accessed NDFs.
+   accessed images.
    [CCDNDFAC.LIS]
 2 Examples
-ccdndfac ndf_name_list true
-   In this example the list of NDF names is written to
-   ndf_name_list and the NDF names are echoed to the terminal. No
-   constraint is placed on the number of NDFs accessed (other than
+ccdndfac image_name_list true
+   In this example the list of image names is written to
+   image_name_list and the image names are echoed to the terminal. No
+   constraint is placed on the number of images accessed (other than
    the normal CCDPACK limit).
 
-ccdndfac ndf_name true maxndf=1
-   In this example only a single NDF name is accessed. The name is
+ccdndfac image_name true maxndf=1
+   In this example only a single image name is accessed. The name is
    not echoed to the terminal (even though echo is set TRUE).
 2 Behaviour_of_parameters
    All parameters retain their current value as default. The
@@ -1358,7 +1351,7 @@ ADC = _DOUBLE (Read and Write)
    required to allow proper estimates of the inherent noise
    associated with each readout value. CCDPACK makes these
    estimates and stores them in the variance component of the
-   final NDFs. Not supplying a value for this parameter may be a
+   final images. Not supplying a value for this parameter may be a
    valid response if variances are not to be generated by DEBIAS.
    [!]
 3 BOUNDS
@@ -1396,7 +1389,7 @@ DIRECTION = LITERAL (Read and Write)
 EXTENT( 4 ) = _INTEGER (Read and Write)
    The extent of the useful CCD area in pixel indices (see notes).
    The extent is defined as a range in X values and a range in Y
-   values (XMIN,XMAX,YMIN,YMAX). These define a section of an NDF
+   values (XMIN,XMAX,YMIN,YMAX). These define a section of an image
    (SUN/33). Any parts of the CCD outside of this area will not
    be present in the final output. This is useful for excluding
    bias strips, badly vignetted parts etc.
@@ -1440,10 +1433,10 @@ MASK = LITERAL (Read and Write)
    columns, hot spots etc.). You can supply this information in
    two basic forms.
 
-     - By giving the name of an NDF that has the areas which are
+     - By giving the name of an image that has the areas which are
        to be masked set BAD or to a suitable quality value
        (see DEBIAS). This can be achieved by displaying a typical
-       NDF using KAPPA, getting logs of the positions of an outline
+       image using KAPPA, getting logs of the positions of an outline
        enclosing the BAD area and using the KAPPA application
        SEGMENT, by using the ZAPLIN facility or by using the ARDGEN
        application together with ARDMASK (but see the next option
@@ -1466,26 +1459,26 @@ MASK = LITERAL (Read and Write)
 NDFNAMES = _LOGICAL (Read and Write)
    The value of this parameter controls whether or not position
    list processing applications are expected to find the names of
-   lists via association with NDFs or not.
+   lists via association with images or not.
 
    When position lists (which are just text files of positions
    with either an index, an X and a Y value, or or just X and Y
    values) are used the option exists to associate them with a
-   particular NDF. This is achieved by entering the name of the
-   position list file into an NDF's CCDPACK extension under the
-   item "CURRENT_LIST". Associating position lists with NDFs has
+   particular image. This is achieved by entering the name of the
+   position list file into an image's CCDPACK extension under the
+   item "CURRENT_LIST". Associating position lists with images has
    the advantage of allowing wildcards to be used for the input
    names and makes sure that positions are always used in the
    correct context (this is particularly useful when determining
-   inter-NDF transformations).
+   inter-image transformations).
    [TRUE]
 3 PRESERVE
 PRESERVE = _LOGICAL (Read and Write)
    The value of this parameter controls whether or not processed
-   NDF data arrays retain their input data types. If it is set
+   image data arrays retain their input data types. If it is set
    TRUE then CCDPACK applications will return and process any
    data in the input type. If it is set FALSE then the
-   applications will output an NDF whose type is determined by
+   applications will output an image whose type is determined by
    which data type was considered necessary to allow processing
    of the input data. This will usually mean an output type of
    _REAL (all types not _INTEGER or _DOUBLE) or _DOUBLE (when
@@ -1557,7 +1550,7 @@ SAVEFILE = FILENAME (Read)
 - Pixel indices. The bounds supplied to DEBIAS should be given as
   pixel indices. These usually start at 1,1 for the pixel at the
   lower left-hand corner of the data array component (this may
-  be not true if the NDFs have been sectioned, in which case the
+  be not true if the images have been sectioned, in which case the
   lower left hand pixel will have pixel indices equal to the data
   component origin values). Pixel indices are different from
   pixel coordinates in that they are non-continuous, i.e. can
@@ -1595,7 +1588,7 @@ SAVEFILE = FILENAME (Read)
      SETSAT = FALSE ! Set saturated pixels to saturation value
      PRESERVE = TRUE  ! Preserve data types
      GENVAR = TRUE  ! Generate data variances
-     NDFNAMES = TRUE  ! Position lists associated with NDFs
+     NDFNAMES = TRUE  ! Position lists associated with images
      LOGTO = BOTH  ! Log file information to
      LOGFILE = CCDPACK.LOG  ! Name of logfile
 2 Behaviour_of_parameters
@@ -1707,7 +1700,7 @@ Description:
 
    The debiassing section operates in two basic modes -- with and
    without a bias frame. If a bias frame is supplied then it is
-   subtracted from the data arrays of the input NDFs. The subtraction
+   subtracted from the data arrays of the input images. The subtraction
    can either be direct, or by offsetting the values of the bias by
    the mean value in the bias-strip region(s). When determining
    the mean in the bias strips a function of the distance from the
@@ -1732,7 +1725,7 @@ Description:
    this by assuming Poissonian statistics for the bias-subtracted
    data, together with a contribution for the readout noise. The
    masking of bad data areas is achieved using the transfer of
-   quality information from an NDF, or by using an ASCII Regions
+   quality information from an image, or by using an ASCII Regions
    Definition (ARD) file. The expansion of the data values into
    counts and the extraction of the useful area of the CCD are also
    performed.
@@ -1751,7 +1744,7 @@ ADC = _DOUBLE (Read)
    [1.0]
 3 BADBITS
 BADBITS = _INTEGER (Read)
-   If the first input NDF has no quality component, and you have
+   If the first input image has no quality component, and you have
    specified the SETBAD= FALSE option, you will be requested to
    supply a value for BADBITS (SUN/33).  The default for this
    is 1. BADBITS is a byte value and hence can only be in the
@@ -1759,12 +1752,12 @@ BADBITS = _INTEGER (Read)
    [1]
 3 BIAS
 BIAS = LITERAL (Read)
-   Name of the NDF which contains the bias calibration data. This
+   Name of the image which contains the bias calibration data. This
    parameter may be specified as ! in which case either a
    constant or values derived from the bias strip(s) are used.
    The name of this file may be specified using indirection
    through an ASCII file. The offered default is either the last
-   used master bias name or (if one exists) the name of the NDF
+   used master bias name or (if one exists) the name of the image
    produced by the last run of MAKEBIAS.
    [Global master bias or !]
 3 BOUNDS
@@ -1774,8 +1767,8 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    horizontal or vertical directions. The direction is controlled
    by the DIRECTION parameter. The bounds must be supplied in
    pairs. Pixel indices are the actual number of pixels, starting
-   at 1,1 at the lower left hand corner of the NDF data array,
-   which includes any origin offsets within the input NDFs.
+   at 1,1 at the lower left hand corner of the image data array,
+   which includes any origin offsets within the input images.
 
    If global values for these bounds have been set using
    CCDSETUP then those values will be used.
@@ -1868,7 +1861,7 @@ GENVAR = _LOGICAL (Read)
 3 GETBIAS
 GETBIAS = _LOGICAL (Read)
    This parameter controls whether or not an attempt is to be made
-   to access a master bias NDF.
+   to access a master bias image.
    [TRUE]
 3 GETMASK
 GETMASK = _LOGICAL (Read)
@@ -1877,18 +1870,18 @@ GETMASK = _LOGICAL (Read)
    [TRUE]
 3 IN
 IN = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw CCD
+   A list of the names of the images which contain the raw CCD
    data. Note that at present the input data must have a common
    processing mode, i.e. use the same bias frame, have the same
    ADC factor, readout noise etc. These values are represented
    by the parameter values of the task.
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-   or not. Deleting the input NDFs has the advantage of saving
+   Whether to keep (i.e. not delete) the input images (parameter IN)
+   or not. Deleting the input images has the advantage of saving
    disk space, but should probably only be used if this program
    is part of a sequence of commands and the intermediary data
    produced by it are not important.
@@ -1933,14 +1926,14 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 MASK
 MASK = LITERAL (Read)
-   The name of an NDF or ASCII Regions Definition (ARD) file.
+   The name of an image or ASCII Regions Definition (ARD) file.
 
-   If an NDF is given then any regions of BAD values (set through
+   If an image is given then any regions of BAD values (set through
    explicit BAD values or by BADBITS in the quality component)
-   will be transferred to the output NDF.
+   will be transferred to the output image.
 
    If an ARD file is given then its regions will be interpreted
-   and transferred to the output NDF. ARD is described in its own
+   and transferred to the output image. ARD is described in its own
    section.
 
    The regions whose quality is to be set are probably hot spots,
@@ -1972,20 +1965,20 @@ OFFSET = _LOGICAL (Read)
    [TRUE]
 3 OUT
 OUT = LITERAL (Write)
-   Names of the output NDFs. These may be specified as list of
+   Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
    as a single modification element (of the input names). The
    simplest modification element is the asterisk "*" which means
-   call each of the output NDFs the same name as the
-   corresponding input NDFs. So,
+   call each of the output images the same name as the
+   corresponding input images. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names.
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names.
 
    Other types of modification can also occur, such as,
       OUT > tmp_*
-   which means call the output NDFs the same as the input NDFs but
+   which means call the output images the same as the input images but
    put tmp_ in front of the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUT > tmp_*|debias|flattened|
@@ -1993,7 +1986,7 @@ OUT = LITERAL (Write)
    output names tmp_*.
 3 PRESERVE
 PRESERVE = _LOGICAL (Read)
-   If TRUE then the data type of the input NDFs are used for
+   If TRUE then the data type of the input images are used for
    processing and are preserved on exit from this routine. If
    FALSE then a suitable floating point type will be chosen for
    the output type and the processing will be performed using
@@ -2034,12 +2027,12 @@ SATURATION = _DOUBLE (Read)
 3 SETBAD
 SETBAD = _LOGICAL (Read)
    If TRUE then the quality information will be transferred
-   from the MASK NDF to the output NDFs in the form of BAD
+   from the MASK image to the output images in the form of BAD
    ("flagged") values in the data component. This is the usual
    method of indicating the presence of pixels with no value. If
    FALSE then the quality information will be transferred into
    the quality component, all output quality pixels will have
-   their BADBITS set. (Note that if the input NDF already has a
+   their BADBITS set. (Note that if the input image already has a
    quality component the BADBITS will be set by a logical OR of
    the current bits with the BADBITS value).
    [TRUE]
@@ -2066,13 +2059,13 @@ SMODE = LITERAL (Read)
    [CONSTANT]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDF.
+   Title for the output image.
    [Output from DEBIAS]
 3 USECON
 USECON = _LOGICAL (Read)
    If TRUE then you can supply an estimate for the bias
    contribution (parameter ZERO). This value is then subtracted
-   from the input NDF. Only use this option if you do not have
+   from the input image. Only use this option if you do not have
    any bias frames or bias strips and you have good reason to
    believe that the value you are supplying is accurate enough
    for your purposes.
@@ -2081,11 +2074,11 @@ USECON = _LOGICAL (Read)
 USEEXT = _LOGICAL (Read)
    If TRUE then certain of the parameters of this program will not
    be used and the required values will be obtained from the
-   CCDPACK extensions of the input NDFs instead. This method can
-   only be used if the NDFs have been "imported" using the
+   CCDPACK extensions of the input images instead. This method can
+   only be used if the images have been "imported" using the
    programs PRESENT or IMPORT. Typically it is used when
    processing using CCDPACK's "automated" methods (in this case
-   the input NDFs should contain all the information necessary to
+   the input images should contain all the information necessary to
    process them).
 
    The parameters that this effects are:
@@ -2114,22 +2107,22 @@ WMODE = LITERAL (Read)
 3 ZERO
 ZERO = _DOUBLE (Read)
    If USECON=TRUE then this value is subtracted from the input
-   NDF.
+   image.
 2 Examples
 debias r1 r1b bias '[2,10,400,415]' adc=1.1 rnoise=8
-   This example debiasses the data array in NDF r1 writing the
-   result to NDF r1b. It uses the data component of NDF BIAS as
+   This example debiasses the data array in image r1 writing the
+   result to image r1b. It uses the data component of image bias as
    the bias estimator. The bias is offset by the mean value found
    within the ranges 2-10 and 400-415 pixels along the X axis.
    The data in the bias strips are smoothed by a box filter and
    weighted linearly from the edges inwards. The output variance
    is produced by a combination of the Poisson statistics (using
    an ADC value of 1.1) and readout noise (value 8), together
-   with the variance of the bias NDF (if present).
+   with the variance of the bias image (if present).
 
 debias in=r1 out=r2 bounds='[2,10,401,416]' adc=2.5 rnoise=10
-   This example debiasses the NDF r1 data component writing the
-   result to the NDF r2. The bias is estimated by an interpolation
+   This example debiasses the image r1 data component writing the
+   result to the image r2. The bias is estimated by an interpolation
    of a constant for each data row. The constant is the result of
    a linearly weighted average of the bias strip data which has
    been box filtered.
@@ -2137,8 +2130,8 @@ debias in=r1 out=r2 bounds='[2,10,401,416]' adc=2.5 rnoise=10
 debias in=r1 out=r2 bounds='[2,10,401,416]' smode=linear adc=5
        fmode=plane direct=y wmode=exp cmode=sigma rnoise=10
        nsigma=4
-   This example debiasses the NDF r1 data component writing the
-   result to the NDF r2. The bias is estimated by the fitting of a
+   This example debiasses the image r1 data component writing the
+   result to the image r2. The bias is estimated by the fitting of a
    plane to the data in the bias strips. The bias-strip data are
    first sigma clipped at a level RNOISE*NSIGMA. The fit is
    performed with weighting based on a exponential fall off
@@ -2147,18 +2140,18 @@ debias in=r1 out=r2 bounds='[2,10,401,416]' smode=linear adc=5
 
 debias in='*' out='*_debias' bounds='[3,16,912,940]' adc=1 rnoise=4
        bias=bias/master_bias
-   In this example all the NDFs in the current directory are
-   debiassed. The names of the output NDFs are as those of the
-   corresponding input NDFs, except that they are trailed by the
+   In this example all the images in the current directory are
+   debiassed. The names of the output images are as those of the
+   corresponding input images, except that they are trailed by the
    "_debias" string.
 2 Notes
-- If the input NDFs have variance components and no variances
+- If the input images have variance components and no variances
   are to be generated then they are processed.
 
 - Pixel indices. The bounds supplied to DEBIAS should be given as
   pixel indices. These usually start at 1,1 for the pixel at the
   lower left-hand corner of the data-array component (this may
-  not be true if the NDFs have been sectioned, in which case the
+  not be true if the images have been sectioned, in which case the
   lower left hand pixel will have pixel indices equal to the data
   component origin values). Pixel indices are different from
   pixel coordinates in that they are non-continuous, i.e. can
@@ -2239,7 +2232,7 @@ debias in='*' out='*_debias' bounds='[3,16,912,940]' adc=1 rnoise=4
 
    If the parameter USEEXT is TRUE then the following parameters
    are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
-   SATURATION and ZERO. Values are obtained from the input NDF
+   SATURATION and ZERO. Values are obtained from the input image
    extensions instead.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
@@ -2284,22 +2277,22 @@ Usage:
 Description:
 
    This routine determines the centroids of image features located
-   in the data components of a list of NDFs. It is useful for
+   in the data components of a list of images. It is useful for
    locating accurate values for the positions of stars given hand
    selected positions. It can also be used for centroiding any
    sufficiently peaked image features.
 
-   The initial positions associated with each NDF are given in
+   The initial positions associated with each image are given in
    formatted files whose names are determined either using the
-   CCDPACK NDF extension item CURRENT_LIST (which is maintained by
+   CCDPACK image extension item CURRENT_LIST (which is maintained by
    list processing CCDPACK applications) or from an explicit list of
    names.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 IN
 IN = LITERAL (Read)
-   The names of the NDFs whose data components contain image
-   features which are to be centroided.  The NDF names should be
+   The names of the images whose data components contain image
+   features which are to be centroided.  The image names should be
    separated by commas and may include wildcards.
 3 INLIST
 INLIST = LITERAL (Read)
@@ -2309,20 +2302,19 @@ INLIST = LITERAL (Read)
    the notes section.
 
    The names of the input lists may use modifications of the
-   input NDF names, so for instance if the position lists are
-   stored in files with the same name as the input NDFs but with
+   input image names, so for instance if the position lists are
+   stored in files with the same name as the input images but with
    a file type of ".dat" instead of ".sdf" then use
 
       INLIST > *.dat
 
-   (.sdf is always removed from NDF names). If the input list
-   names are a modification of the NDF names say with a trailing
-   type of "_initial.positions". Then a response of
+   If the input list names are a modification of the image names say 
+   with a trailing type of "_initial.positions". Then a response of
 
       INLIST > *_initial.positions
 
    will access the correct files. Names may also use substitution
-   elements, say the NDF names are *_data and the position lists
+   elements, say the image names are *_data and the position lists
    are *_pos.dat, then a response like
 
        INLIST > *|data|pos.dat|
@@ -2330,9 +2322,9 @@ INLIST = LITERAL (Read)
    may be used. If a naming scheme has not been used then an
    explicit list of names should be returned (wildcards cannot be
    used to specify list names). These names should be given in
-   the same order as the input NDF names and may use indirection
+   the same order as the input image names and may use indirection
    elements as well as names separated by commas. A listing of
-   the input NDF name order (after any wildcard expansions etc.
+   the input image name order (after any wildcard expansions etc.
    have been made) is shown to make sure that the order is
    correct.
 3 ISIZE
@@ -2393,7 +2385,7 @@ NAMELIST = LITERAL (Read)
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
    input position lists are stored in the CCDPACK extension item
-   "CURRENT_LIST" of the input NDFs. The names will be present
+   "CURRENT_LIST" of the input images. The names will be present
    in the extension if the positions were located using a CCDPACK
    application (such as IDICURS). Using this facility allows the
    transparent propagation of position lists through processing
@@ -2410,9 +2402,9 @@ POSITIVE = _LOGICAL (Read)
 3 OUTLIST
 OUTLIST = FILENAME (Write)
    A list of names specifying the centroid result files. The
-   names of the lists may use modifications of the input NDF
+   names of the lists may use modifications of the input image
    names.  So if you want to call the output lists the same name
-   as the input NDFs except to add a type use.
+   as the input images except to add a type use.
 
       OUTLIST > *.cent
 
@@ -2433,21 +2425,21 @@ TOLER = _DOUBLE (Read)
    [0.05]
 2 Examples
 findcent in='*' outlist='*.cent'
-   In this example all the NDFs in the current directory are
-   processed. It is assumed that the NDFs are associated with
+   In this example all the images in the current directory are
+   processed. It is assumed that the images are associated with
    positions lists of inaccurate positions (via the item
-   CURRENT_LIST in the NDF CCDPACK extensions). These position
-   lists are accessed and centroided with the appropriate NDFs.
+   CURRENT_LIST in the image CCDPACK extensions). These position
+   lists are accessed and centroided with the appropriate images.
    On exit the new lists are named *.cent and are associated with
-   the NDFs (instead of the original "input" lists).
+   the images (instead of the original "input" lists).
 
-findcent ndfnames=false in='"ndf1,ndf2,ndf3"'
-         inlist='"ndf1.pos,ndf2.pos,ndf3.pos"' outlist='*.acc'
+findcent ndfnames=false in='"image1,image2,image3"'
+         inlist='"image1.pos,image2.pos,image3.pos"' outlist='*.acc'
          namelist=new_position_lists
    In this example the position list names are not previously
-   associated with the NDFs and must have their names given
-   explicitly (and in the same order as the NDF names). The
-   output lists are called the same names as the input NDFs except
+   associated with the images and must have their names given
+   explicitly (and in the same order as the image names). The
+   output lists are called the same names as the input images except
    with the extension .acc. The names of the output lists are
    written into the file new_position_lists which can be used to
    pass these names onto another application using indirection
@@ -2490,7 +2482,7 @@ findcent ndfnames=false in='"ndf1,ndf2,ndf3"'
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be centroided. On exit this item will be updated to
   reference the name of the centroided list of positions.
@@ -2535,7 +2527,7 @@ Usage:
 
 Description:
 
-   This routine processes a list of NDFs, locating and centroiding
+   This routine processes a list of images, locating and centroiding
    image features (such as stars) which have groups of connected
    pixels above threshold values.
 
@@ -2552,8 +2544,8 @@ For information on individual parameters, select from the list below:
 3 AUTOTHRESH
 AUTOTHRESH = _LOGICAL (Read)
    If this parameter is TRUE then a threshold determined by
-   this routine for each of the NDFs will be used. If FALSE then
-   you will be prompted for a threshold value for each NDF.
+   this routine for each of the images will be used. If FALSE then
+   you will be prompted for a threshold value for each image.
    [TRUE]
 3 BINFRAC
 BINFRAC = _DOUBLE (Read)
@@ -2567,8 +2559,8 @@ BINFRAC = _DOUBLE (Read)
    [2.5]
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names which contain the data components to be
-   scanned for image features.  The NDF names should be separated
+   A list of image names which contain the data components to be
+   scanned for image features.  The image names should be separated
    by commas and may include wildcards.
 3 LOGFILE
 LOGFILE = FILENAME (Read)
@@ -2628,26 +2620,25 @@ OUTLIST = LITERAL (Read)
 
    These may be specified as list of comma separated names,
    using indirection if required, OR, as a single modification
-   element (of the input NDF names). The simplest modification
+   element (of the input image names). The simplest modification
    element is the asterisk "*" which means call each of the
-   output lists the same name as the corresponding input NDFs
-   (but without the ".sdf" extension).
+   output lists the same name as the corresponding input images
    So,
       IN > *
       OUTLIST > *
-   signifies that all the NDFs in the current directory should be
+   signifies that all the images in the current directory should be
    used and the output lists should have the same names.
 
    Other types of modification can also occur, such as,
       OUTLIST > *_objs.dat
-   which means call the position lists the same as the input NDFs
+   which means call the position lists the same as the input images
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUTLIST > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input NDFs are used then is it
+   If wildcarded names for the input images are used then is it
    recommended that wildcards are also used for the position list
    names (the order of input names is not guaranteed).
 
@@ -2679,14 +2670,14 @@ THRESH = _DOUBLE (Read)
    features.  Connected pixel groups above this threshold form
    image features. This parameter is only used if the AUTOTHRESH
    parameter is set FALSE. In this case a value may be supplied
-   for each NDF which is being processed.
+   for each image which is being processed.
    [Dynamic default]
 3 TOUCH
 TOUCH = _LOGICAL (Read)
    If TRUE then pixel groups may contact the edges of the data
    array. Contact is defined as any pixel in the connected group
    of pixels being on the first or last column or row of the
-   actual data array (not including any NDF origin information).
+   actual data array (not including any image origin information).
    Setting this FALSE decreases the probability of incomplete
    pixel groups being centroided which would result in inaccurate
    positions.
@@ -2700,16 +2691,16 @@ USEPER = _LOGICAL (Read)
    [TRUE]
 2 Examples
 findobj in='*' minpix=10 outlist='*.find'
-   In this example FINDOBJ processes all the NDFs in the current
+   In this example FINDOBJ processes all the images in the current
    directory locating objects with connected pixel groups which
    have more than 9 pixels above the threshold.
 
-findobj '"ndf1,ndf2,ndf10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
+findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
         useper=false nsigma=3
    In this example FINDOBJ estimates the threshold using the mode
    value in the histogram of data values as an estimate of the
    background and the fit of a gaussian to this to estimate the
-   background standard deviation. The threshold used for each NDF
+   background standard deviation. The threshold used for each image
    is then 3 times the standard deviation above the estimated
    background.
 2 Notes
@@ -2743,7 +2734,7 @@ findobj '"ndf1,ndf2,ndf10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the names of the
+  (.MORE.CCDPACK) of the input images are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.
@@ -2852,10 +2843,10 @@ FAST = _LOGICAL (Read)
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given in response (and may
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given in response (and may
    include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -2916,12 +2907,12 @@ NAMELIST = LITERAL (Read)
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
    routine (say REGISTER), if the associating position lists with
-   NDFs option is not being used.
+   images option is not being used.
    [FINDOFF.LIS]
 3 NDFNAMES
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST". The names will be present in the
    extension if the positions were located using a CCDPACK
    application (such as FINDOBJ). Using this facility allows the
@@ -2936,13 +2927,13 @@ OUTLIST = FILENAME (Write)
    A list of names specifying the result files. These contain
    labelled positions which can be used in registration.
    The names of the lists may use modifications of the
-   input names (NDF names if available otherwise the names of the
+   input names (image names if available otherwise the names of the
    position lists). So if you want to call the output lists
-   the same name as the input NDFs except to add a type use.
+   the same name as the input images except to add a type use.
 
       OUTLIST > *.find
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".find" to ".off"
    in this case) use
 
@@ -2963,7 +2954,7 @@ USECOMP = LOGICAL (Read)
    [TRUE]
 2 Examples
 findoff inlist='*' error=1 outlist='*.off'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are used. The
    matched positions are named *.off. The method used is to try
    the FAST algorithm, switching to SLOW if FAST fails. The
@@ -3018,7 +3009,7 @@ findoff error=0.002 minsep=0.008
 
   If NDFNAMEs is TRUE then the names of the input position lists
   will be gotten from the item "CURRENT_LIST" of the CCDPACK
-  extension of the input NDFs. On exit this item will be updated
+  extension of the input images. On exit this item will be updated
   to contain the name of the appropriate output lists.
 2 Notes_on_Algorithms
    The pattern-matching process uses two algorithms, one which
@@ -3102,7 +3093,7 @@ PDRAPER: Peter Draper (STARLINK)
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
 1 FLATCOR
-Divides a series of NDFs by a flatfield
+Divides a series of images by a flatfield
 
 Usage:
 
@@ -3110,7 +3101,7 @@ Usage:
 
 Description:
 
-   This routine applies a flat field correction to a series of NDFs.
+   This routine applies a flat field correction to a series of images.
    If the input data have been saturated using a saturation value
    (instead of using BAD pixel flagging) then the saturation values
    may be protected from modification.
@@ -3118,7 +3109,7 @@ Description:
 For information on individual parameters, select from the list below:
 3 FLAT
 FLAT = LITERAL (Read)
-   Name of the NDF which contains the normalised (mean of one)
+   Name of the image which contains the normalised (mean of one)
    flatfield data. This should have been produced by a program
    such as MAKEFLAT. The data should have a floating point HDS
    data type (_REAL or _DOUBLE).
@@ -3127,13 +3118,13 @@ FLAT = LITERAL (Read)
    [Global flatfield]
 3 IN
 IN = LITERAL (Read)
-   Names of the NDFs containing the data which are to have the
-   flatfield correction applied.  The NDF names should be
+   Names of the images containing the data which are to have the
+   flatfield correction applied.  The image names should be
    separated by commas and may include wildcards.
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-   or not. Deleting the input NDFs has the advantage of saving
+   Whether to keep (i.e. not delete) the input images (parameter IN)
+   or not. Deleting the input images has the advantage of saving
    disk space, but should probably only be used if this program
    is part of a sequence of commands and the intermediary data
    produced by it are not important.
@@ -3177,21 +3168,21 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 OUT
 OUT = LITERAL (Write)
-   Names of the output NDFs. These may be specified as list of
+   Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, or,
    as a single modification element (of the input names).
    The simplest modification element is the asterisk "*" which
-   means each of the output NDFs the same name as the
-   corresponding NDFs files. So,
+   means each of the output images the same name as the
+   corresponding images files. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names.
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names.
 
    Other types of modification can also
    occur, such as,
       OUT > tmp_*
-   which means call the output NDFs the same as the input NDFs but
+   which means call the output images the same as the input images but
    put tmp_ in front of the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUT > tmp_*|debias|flattened|
@@ -3230,13 +3221,13 @@ PRESERVE = _LOGICAL (Read)
    [TRUE]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDFs.
+   Title for the output images.
    [Output from FLATCOR]
 2 Examples
 flatcor frame1 frame1_f flatr
-   In this example the data in NDF frame1 are corrected for the
-   flatfield response stored in NDF flatr. The result of dividing
-   FRAME1 by flatr is written to NDF frame1_f. If a saturation
+   In this example the data in image frame1 are corrected for the
+   flatfield response stored in image flatr. The result of dividing
+   FRAME1 by flatr is written to image frame1_f. If a saturation
    value has been applied to the data in frame1 then this will be
    automatically accommodated by FLATCOR providing the saturation
    has been applied within CCDPACK.
@@ -3247,9 +3238,9 @@ flatcor n4151r1 n4151r1f flatfield setsat=true saturation=32767
    information has been supplied.
 
 flatcor in='*' out='*_flattened' flat=master_flatr
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    processed. The resultant data are written to files with the
-   same name as the corresponding input NDFs, but with the
+   same name as the corresponding input images, but with the
    characters "_flattened" appended to the filename.
 2 Notes
 - If any of the input data have had their saturation values set by
@@ -3335,16 +3326,16 @@ DEVICE = DEVICE (Read)
    [Current-image display device]
 3 IN
 IN = LITERAL (Read)
-   The names of a list of NDFs which are to be "associated" with
-   the output position list. Associating a list with an NDF means
+   The names of a list of images which are to be "associated" with
+   the output position list. Associating a list with an image means
    that the item "CURRENT_LIST" in its CCDPACK extension will be
-   set to the name of the list. In future applications the NDF
+   set to the name of the list. In future applications the image
    name may then be used instead of the list name (any derived
-   lists will then be associated with the NDF instead), this is
+   lists will then be associated with the image instead), this is
    the usual method in CCDPACK.
 
-   The names of the NDFs may be given as "!" in which case none
-   will be associated, otherwise the NDF names should be as a list
+   The names of the images may be given as "!" in which case none
+   will be associated, otherwise the image names should be as a list
    separated by commas and may include wildcards.
    [!]
 3 KEEPLUT
@@ -3425,11 +3416,11 @@ idicurs device=xw outlist=objects.dat memory=1
 
 idicurs outlist=group_positions in='*'
    In this example an output position list group_positions is
-   associated with all the NDFs in the current directory. This
-   method could be useful if all the NDFs are not moved
+   associated with all the images in the current directory. This
+   method could be useful if all the images are not moved
    significantly with respect to one another. This one list then
-   supplies initial positions for objects in all these NDFs (using
-   the centroid routine FINDCENT would then give each NDF an
+   supplies initial positions for objects in all these images (using
+   the centroid routine FINDCENT would then give each image an
    accurate position list from these initial positions).
 
 idicurs scroll arrows
@@ -3465,7 +3456,7 @@ idicurs scroll arrows
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the name of the
+  (.MORE.CCDPACK) of the input images are set to the name of the
   output list. These items will be used by other CCDPACK position
   list processing routines to automatically access the list.
 2 Behaviour_of_parameters
@@ -3508,7 +3499,7 @@ PDRAPER: Peter Draper (STARLINK - Durham University)
  9-OCT-1995 (PDRAPER):
     Updated for CCDPACK 2.0.
 1 IMPORT
-Imports FITS information into NDFs
+Imports FITS information into images
 
 Usage:
 
@@ -3517,7 +3508,7 @@ Usage:
 Description:
 
    This routine imports FITS information into the CCDPACK extension
-   of a list of NDFs. FITS information (probably provided by the
+   of a list of images. FITS information (probably provided by the
    instrument/telescope control systems) can be used to specify
    certain parameters which are required by CCDPACK to perform
    "automated" reductions. These might cover such items as the type
@@ -3533,8 +3524,8 @@ Description:
 For information on individual parameters, select from the list below:
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names which contain the raw bias frame data.
-   The NDF names should be separated by commas and may include wildcards.
+   A list of image names which contain the raw bias frame data.
+   The image names should be separated by commas and may include wildcards.
 3 LOGFILE
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -3569,7 +3560,7 @@ LOGTO = LITERAL (Read)
 3 NAMELIST
 NAMELIST = LITERAL (Read)
    The name of a file to contain a listing of the name of the
-   input NDFs. This is intended to be of use when using these
+   input images. This is intended to be of use when using these
    same names with other applications (such as SCHEDULE).
    [!]
 3 TABLE
@@ -3581,12 +3572,12 @@ TABLE = LITERAL (Read)
    ['import.tab']
 2 Examples
 import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
-   This example shows all the NDFs in the current directory being
+   This example shows all the images in the current directory being
    processed using the import control table $CCDPACK_DIR/WHTSKY.DAT.
 2 Table_Format
    The import control (translation) table is an ordinary text file
    which contains instructions on how to transfer FITS information
-   from the FITS extension to the CCDPACK extension of an NDF.
+   from the FITS extension to the CCDPACK extension of an image.
    "Translation" is required since no standard interpretation of
    FITS keywords can be made and because the items which may be
    required can be compounds of single FITS keyword values.
@@ -3644,12 +3635,26 @@ import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
    In this way import tables could actually be used to set all the
    required values in the CCDPACK extension (but see PRESENT also).
 
-   Characters strings cannot be manipulated by functions so a single
-   special format for translating their values is provided. The name
-   of the destination extension item and (optionally) its type are
-   given as usual followed by a FITS-keyword which contains the
-   string to be translated. This is then followed by statements which
-   translate an "input" string into an "output" string. I.e.
+   Characters strings cannot be manipulated by functions so two 
+   special formats for translating their values are provided. 
+   The first form allows for the concatenation of keywords and
+   the second the translation from a known word to another
+   (which is usually one of the CCDPACK special names). The
+   concatenation form looks like:
+
+      _CHAR         FILTER
+      _CHAR         HWP
+      FILTER        _CHAR          FILTER//HWP
+
+   Which results in the FILTER extension item being set to the 
+   concatenation of the values of the FITS keywords FILTER and
+   HWP (you can concatentate more than two values).
+
+   In the second special form the name of the destination extension 
+   item and (optionally) its type are given as usual followed by a 
+   FITS-keyword which contains the string to be translated. This is 
+   then followed by statements which translate an "input" string 
+   into an "output" string. I.e.
 
       FITS1 = Ext1 FITS2 = Ext2 FITS3 = Ext3 ... FITSn = Extn
 
@@ -3674,7 +3679,7 @@ import in='*' table=$CCDPACK_DIR/WHTSKY.DAT
    placed anywhere and should start with the characters "#" or "!".
    Continuation onto a new line is indicated by use of "-".
 2 CCDPACK_extension_items
-   The CCDPACK extension of an NDF may contain the following items.
+   The CCDPACK extension of an image may contain the following items.
    The names and types of the extension items are those as used in
    import tables. More complete descriptions of the items can be
    found with the applications that use these values.
@@ -3728,13 +3733,13 @@ Usage:
 
 Description:
 
-   This routine processes a series of bias frames (stored in NDFs),
-   so as to produce a single "master bias" frame in which the noise
-   levels are reduced. This master bias frame can then be used to
-   de-bias other CCD frames (using DEBIAS). Using the given readout
-   noise an, optional, variance component may be produced for the
-   output data. The use of a variance component allows the effects
-   of noise in bias subtraction to be properly monitored.
+   This routine processes a series of bias frames, so as to produce 
+   a single "master bias" frame in which the noise levels are reduced. 
+   This master bias frame can then be used to de-bias other CCD frames 
+   (using DEBIAS). Using the given readout noise an, optional, variance 
+   component may be produced for the output data. The use of a variance 
+   component allows the effects of noise in bias subtraction to be 
+   properly monitored.
 
    MAKEBIAS also performs other functions during processing, such as
    estimating the readout noise (which it displays for comparison
@@ -3759,7 +3764,7 @@ GENVAR = _LOGICAL (Read)
    readout noise will be generated. If FALSE then no variance
    component will be generated. If a variance component is not
    generated then any future estimates of variance made using the
-   output NDF will be underestimates, however, disk space savings
+   output image will be underestimates, however, disk space savings
    can be made using this option, if future error analyses are
    not important. If this parameter is set FALSE then a readout
    noise estimate will not be requested.
@@ -3769,13 +3774,13 @@ GENVAR = _LOGICAL (Read)
    [FALSE]
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names which contain the raw bias frame data.
-   The NDF names should be separated by commas and may include wildcards.
+   A list of image names which contain the raw bias frame data.
+   The image names should be separated by commas and may include wildcards.
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs or not.
-   Deleting the input NDFs has the advantage of saving disk
-   space, but since the NDFs input to this routine are raw data
+   Whether to keep (i.e. not delete) the input images or not.
+   Deleting the input images has the advantage of saving disk
+   space, but since the images input to this routine are raw data
    files (rather than processed intermediary files) they should be
    always be keep unless space considerations are at a very high
    premium.
@@ -3820,14 +3825,14 @@ MAX = _REAL (Read)
    If METHOD = "THRESH" then this value defines the upper limit
    for values which can be used when combining data. Note that the
    value used for this parameter will not be corrected for zero
-   pointing. Hence if the output NDF is to be zeroed then the
+   pointing. Hence if the output image is to be zeroed then the
    maximum value should be a offset from zero (say some positive
    number 2 or 3 sigmas large). This could be used as a form of
    sigma clipping if no variances are to be generated.
 3 METHOD
 METHOD = LITERAL (Read)
    The method to be used to combine the data components of
-   the input NDFs. This may be set to any unique abbreviation of
+   the input images. This may be set to any unique abbreviation of
    the following:
 
       -  MEAN      -- Mean of the input data values
@@ -3857,7 +3862,7 @@ MIN = _REAL (Read)
    If METHOD = "THRESH" then this value defines the lower limit
    for values which can be used when combining the data. Note that
    the value used for this parameter will not be corrected for zero
-   pointing. Hence if the output NDF is to be zeroed then the
+   pointing. Hence if the output image is to be zeroed then the
    minimum value should be a offset from zero (say some negative
    number 2 or 3 sigmas large). This could be used as a form of
    sigma clipping if no variances are to be generated.
@@ -3873,7 +3878,7 @@ NITER = _INTEGER (Read)
    [7]
 3 OUT
 OUT = LITERAL (Read)
-   Name of the output NDF. This has the master bias frame and
+   Name of the output image. This has the master bias frame and
    the estimated variances. This name may be specified using
    indirection through a file.
 3 PRESERVE
@@ -3902,7 +3907,7 @@ RNOISE = _DOUBLE (Read)
    The value of this parameter may not be used if the USEEXT
    parameter is TRUE and will not be used if GENVAR is FALSE
    (i.e. no variances are being generated). If USEEXT is TRUE
-   then readout noise values will be extracted from the NDFs
+   then readout noise values will be extracted from the images
    CCDPACK extensions. Only if a suitable value is not present
    will the value associated with this parameter be used.
 
@@ -3918,14 +3923,14 @@ SIGMAS = _REAL (Read)
    [4]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDF
+   Title for the output image
    [Output from MAKEBIAS].
 3 USEEXT
 USEEXT = _LOGICAL (Read)
    If TRUE then the parameter RNOISE of this program will not
    be used and the required values will be obtained from the
-   CCDPACK extensions of the input NDFs instead. This method can
-   only be used if the NDFs have been "imported" using the
+   CCDPACK extensions of the input images instead. This method can
+   only be used if the images have been "imported" using the
    programs PRESENT or IMPORT. Typically it is used when
    processing using CCDPACK's "automated" methods.
 
@@ -3945,19 +3950,19 @@ ZERO = _LOGICAL (Read)
    [TRUE]
 2 Examples
 makebias in='"b1,b2,b3,b4,b5"' method=median out=mbias rnoise=10
-   This forms a master bias from the data components of the NDFs
+   This forms a master bias from the data components of the images
    b1-b5. The combination mode chosen is the median. The output
-   NDF is mbias whose variance has values based on a readout
+   image is mbias whose variance has values based on a readout
    noise of 10 data units. Note the quotes when entering a comma
    separated list on the command line.
 
 makebias in=^bias_frames.lis out=master_bias
-   In this example the list of NDFs is read from the file
+   In this example the list of images is read from the file
    bias_frames.lis. This file may contain indirection to other files
    up to a depth of 7.
 
 makebias in='*' out=master_bias
-   In this example all the NDFs in the directory are used.
+   In this example all the images in the directory are used.
 2 Notes
 - If a variance component is present it will not be propagated.
 2 Behaviour_of_parameters
@@ -3987,7 +3992,7 @@ makebias in='*' out=master_bias
    CCDCLEAR commands.
 
    The parameter RNOISE will not be used if the USEEXT parameter is
-   set TRUE. In this case values will be obtained from the input NDFs
+   set TRUE. In this case values will be obtained from the input images
    CCDPACK extensions.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
@@ -4029,7 +4034,7 @@ PDRAPER: Peter Draper (STARLINK)
      floating values.  The UNITS, AXIS, TITLE and QUALITY components
      are correctly propagated. Any input variances are ignored.
 1 MAKECAL
-Produces a dark or pre-flash calibration NDF.
+Produces a dark or pre-flash calibration image.
 
 Usage:
 
@@ -4041,10 +4046,10 @@ Usage:
 Description:
 
    This routine performs the combination of a series of dark count
-   or pre-flash exposure frames. The input NDFs should have been
+   or pre-flash exposure frames. The input images should have been
    bias subtracted. The input data are divided by the exposure
    factors before combination into a calibration "master", giving an
-   output NDF whose data represent one unit of the given exposure
+   output image whose data represent one unit of the given exposure
    time per pixel. Thus the calibration frame should be multiplied
    by the appropriate factor before subtracting from other frames
    (i.e. by the dark time or the flash-exposure time). This can be
@@ -4064,11 +4069,11 @@ ALPHA = _REAL (Read)
 3 EXPOSE
 EXPOSE = LITERAL (Read)
    Either:
-   An exact number of exposure factors for the input NDFs. The
-   values must be in the same order as the input NDFs.
+   An exact number of exposure factors for the input images. The
+   values must be in the same order as the input images.
 
    Or:
-   A single value which applies to all the input NDFs.
+   A single value which applies to all the input images.
 
    Indirection through an ASCII file may be used to specify these
    values. If more than one line is required at prompt time then
@@ -4078,18 +4083,18 @@ EXPOSE = LITERAL (Read)
    This parameter will not be used if USEEXT is set TRUE.
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names which contain the calibration data. The
-   NDF names should be separated by commas and may include
+   A list of image names which contain the calibration data. The
+   image names should be separated by commas and may include
    wildcards.
 
    NOTE the use of wildcards with this program is not recommended
-   unless the input NDFs all have the same calibration exposure
-   factors. The order of processing of any wildcarded NDFs cannot
+   unless the input images all have the same calibration exposure
+   factors. The order of processing of any wildcarded images cannot
    be guaranteed.
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs or
-   not. Deleting the input NDFs has the advantage of saving disk
+   Whether to keep (i.e. not delete) the input images or
+   not. Deleting the input images has the advantage of saving disk
    space, but should probably only be used if this program is part
    of a sequence of commands and the intermediary data used by
    it are not important.
@@ -4139,7 +4144,7 @@ MAX = _REAL (Read)
 3 METHOD
 METHOD = LITERAL (Read)
    The method to be used to combine the data components of
-   the input NDFs. This may be set to any unique abbreviation of
+   the input images. This may be set to any unique abbreviation of
    the following:
 
       -  MEAN      -- Mean of the input data values
@@ -4183,8 +4188,8 @@ NITER = _INTEGER (Read)
    [7]
 3 OUT
 OUT = LITERAL (Write)
-   Name of the output NDF to contain the calibration data.
-   Note this NDF will have a type of at least _REAL.
+   Name of the output image to contain the calibration data.
+   Note this image will have a type of at least _REAL.
 3 SIGMAS
 SIGMAS = _REAL (Read)
    Number of standard deviations to reject data at. Used for
@@ -4195,21 +4200,21 @@ SIGMAS = _REAL (Read)
    [4.0]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDF.
+   Title for the output image.
    [Output from MAKECAL]
 3 TYPE
 TYPE = LITERAL (Read)
    The frame types of the input data. This should be a recognised
    name "FLASH", "DARK" or "NONE". The value of this parameter
-   affects the output NDF frame type which will be set to
+   affects the output image frame type which will be set to
    "MASTER_FLASH" or "MASTER_DARK" or "MASTER_?".
    [NONE]
 3 USEEXT
 USEEXT = _LOGICAL (Read)
    If TRUE then the EXPOSE parameter of this program will not
    be used and the required values will be obtained from the
-   CCDPACK extensions of the input NDFs instead. This method can
-   only be used if the NDFs have been "imported" using the
+   CCDPACK extensions of the input images instead. This method can
+   only be used if the images have been "imported" using the
    programs PRESENT or IMPORT. Typically it is used when
    processing using CCDPACK's "automated" methods.
 
@@ -4219,19 +4224,19 @@ USEEXT = _LOGICAL (Read)
 2 Examples
 makecal in='"f1,f2,f3,f4"' expose='"100,200,300,400"' method=median
         out=master_flash
-   This example forms a flash calibration NDF from the data in
-   NDFs f1,f2,f3 and f4. The data are divided by the relative
+   This example forms a flash calibration image from the data in
+   images f1,f2,f3 and f4. The data are divided by the relative
    exposure factors before combination. The combination method
    used is the (weighted) median, the resultant data are written
-   to the NDF master_flash.
+   to the image master_flash.
 
 makecal '"d1,d2,d3,d4"' 1 master_dark trimmed alpha=0.2
    This example produces a dark-count-calibration frame from the
-   data in NDFs d1,d2,d3 and d4. The exposure factors are given
+   data in images d1,d2,d3 and d4. The exposure factors are given
    as 1 which probably indicates that the dark-exposure times in
    these datasets are exactly right to correct any subsequent
    data frames. The combination mode used is the trimmed mean with
-   trimming fraction 0.2 and the output data are written to NDF
+   trimming fraction 0.2 and the output data are written to image
    master_dark.
 
 makecal ^flash_frames ^flash_exposures flash_master
@@ -4239,11 +4244,11 @@ makecal ^flash_frames ^flash_exposures flash_master
    the program by indirection through an ASCII file
    flash_frames.dat, the corresponding exposure times are passed
    from the file flash_exposures.dat. This is probably the only
-   safe method for entering NDFs to this routine other than as in
+   safe method for entering images to this routine other than as in
    the above examples. Using wildcards for the file
    specifications will mean that the exposures cannot be
    associated correctly. Thus wildcards should not be used except
-   when the input NDFs have the same exposure times.
+   when the input images have the same exposure times.
 2 Behaviour_of_parameters
    Most parameters retain their current value as default. The
    "current" value is the value assigned on the last run of the
@@ -4269,7 +4274,7 @@ makecal ^flash_frames ^flash_exposures flash_master
 
    The parameter EXPOSE will not be used if the USEEXT parameter is
    set TRUE. In this case the necessary values will be extracted from
-   the CCDPACK extensions of the input NDFs.
+   the CCDPACK extensions of the input images.
 2 Authors
 PDRAPER: Peter Draper (STARLINK)
 2 History
@@ -4302,7 +4307,7 @@ PDRAPER: Peter Draper (STARLINK)
      processing, assuming that the input data have a normal
      distribution.
 1 MAKEFLAT
-Produces a flatfield calibration NDF.
+Produces a flatfield calibration image.
 
 Usage:
 
@@ -4362,7 +4367,7 @@ GAMMA = _REAL (Read)
    [3.0]
 3 IN
 IN = LITERAL (Read)
-   A list NDF names. These contain the flatfield data.  The NDF
+   A list image names. These contain the flatfield data.  The image
    names should be separated by commas and may include wildcards.
 3 ITER
 ITER = _INTEGER (Read)
@@ -4370,8 +4375,8 @@ ITER = _INTEGER (Read)
    [3]
 3 KEEPIN
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs or
-   not. Deleting the input NDFs has the advantage of saving disk
+   Whether to keep (i.e. not delete) the input images or
+   not. Deleting the input images has the advantage of saving disk
    space, but should probably only be used if this program is part
    of a sequence of commands and the intermediary data used by
    it are not important.
@@ -4419,7 +4424,7 @@ MAX = _REAL (Read)
 3 METHOD
 METHOD = LITERAL (Read)
    The method to be used to combine the data components of
-   the input NDFs. This may be set to any unique abbreviation of
+   the input images. This may be set to any unique abbreviation of
    the following:
 
       -  MEAN      -- Mean of the input data values
@@ -4461,8 +4466,8 @@ NITER = _INTEGER (Read)
    [7]
 3 OUT
 OUT = LITERAL (Write)
-   Name of an NDF to contain the output flatfield data. Note this
-   NDF will have a precision of at least _REAL. This name may be
+   Name of an image to contain the output flatfield data. Note this
+   image will have a precision of at least _REAL. This name may be
    specified using indirection through a file.
 3 SIGMAS
 SIGMAS = _REAL (Read)
@@ -4474,28 +4479,28 @@ SIGMAS = _REAL (Read)
    [4.0]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output NDF.
+   Title for the output image.
    [Output from MAKEFLAT]
 2 Examples
 makeflat in='"f1,f2,f3,f4,f5"' method=median out=mflat
-   This forms a master flat field from NDFs f1 to f5. The input
+   This forms a master flat field from images f1 to f5. The input
    data are first cleaned using the default values for the GAMMA
    and ITER parameters. The combination mode chosen is the
-   median.  The output NDF is mflat. Note the quotes when
+   median.  The output image is mflat. Note the quotes when
    entering a comma separated list on the command line.
 
 makeflat in=^flat_frames.lis out=master_flat
-   In this example the list of NDFs is read from the file
+   In this example the list of images is read from the file
    flat_frames.lis. This file may contain indirection to other files
    up to a depth of 7.
 
 makeflat in='flatr/*' out='flatr/master_flat' gamma=2.5 iter=5
-   In this example all the NDFs in the subdirectory bias/ are
+   In this example all the images in the subdirectory bias/ are
    used. The input data are severely cleaned using a noise cut
    of 2.5 standard deviations (current) and 5 iterations. Such
    severe cleaning is only recommended when many input frames
    are given, if this is not the case then BAD areas may be seen
-   in the output NDF.
+   in the output image.
 makeflat in='ff*' out=master_flat gamma=10 iter=1
    In this example all the frames "ff*" are combined into a master
    flatfield. Defect rejection is still performed but with 
@@ -4554,7 +4559,7 @@ PDRAPER: Peter Draper (STARLINK)
      distribution.
 1 MAKEMOS
 Make a mosaic by combining and (optionally) normalising a set of
-NDFs.
+images.
 
 Usage:
 
@@ -4562,17 +4567,17 @@ Usage:
 
 Description:
 
-   This is a comprehensive application for combining a set of NDFs
+   This is a comprehensive application for combining a set of images
    (normally representing overlapping coverage of an object) into a
    single mosaic. It addresses the problems of (a) combining a
-   sequence of separate data sets into a single NDF and (b)
-   optionally normalising each NDF so that they match each other in
-   regions where they overlap. Mutual alignment of the separate NDFs
+   sequence of separate data sets into a single image and (b)
+   optionally normalising each image so that they match each other in
+   regions where they overlap. Mutual alignment of the separate images
    is not performed by this application and must be addressed
-   beforehand (although NDFs may be aligned to the nearest pixel
+   beforehand (although images may be aligned to the nearest pixel
    simply by shifting their pixel origin).
 
-   MAKEMOS registers the set of NDFs supplied by matching their
+   MAKEMOS registers the set of images supplied by matching their
    pixel indices and then forms a mosaic by combining the separate
    input pixel values at each location using a nominated
    data-combination method (by default, it takes the median).  The
@@ -4580,7 +4585,7 @@ Description:
    input data, with any output data pixels which do not receive
    values from the input being set to the "bad" pixel value.
    Account is taken of variance information associated with the
-   input NDFs, and all calculations are optimally weighted to
+   input images, and all calculations are optimally weighted to
    minimise the output noise. Output variance estimates for the
    final mosaic may also be produced.
 
@@ -4589,16 +4594,16 @@ Description:
    this is often not the case, since data frequently have differing
    effective exposure times and background levels which give
    discontinuities in the final mosaic. Thus, MAKEMOS also addresses
-   the problem of normalising the input NDFs to make them mutually
+   the problem of normalising the input images to make them mutually
    consistent. It does this by optionally applying optimised
    multiplicative and/or additive corrections (termed scale-factor
-   and zero-point corrections) to each NDF before forming the
+   and zero-point corrections) to each image before forming the
    mosaic.  These optimised corrections are determined by
-   inter-comparing the input NDFs in pairs, using the regions where
+   inter-comparing the input images in pairs, using the regions where
    they overlap to determine the relative scale-factor and/or
    zero-point difference between each pair.  A self-consistent set
    of corrections is then found which, when applied to each input
-   NDF, will best eliminate these observed differences and give a
+   image, will best eliminate these observed differences and give a
    smooth mosaic.
 2 Parameters
 For information on individual parameters, select from the list below:
@@ -4614,14 +4619,14 @@ ALPHA = _REAL (Read)
 3 CMPVAR
 CMPVAR = _LOGICAL (Read)
    This parameter controls the use of statistical error
-   (variance) information contained in the input NDFs when they
+   (variance) information contained in the input images when they
    are inter-compared in pairs to derive scale-factor or
    zero-point corrections. It is only used if either SCALE or
-   ZERO is set to TRUE and if two or more of the input NDFs
-   contain variance information (a "reference NDF" also counts,
+   ZERO is set to TRUE and if two or more of the input images
+   contain variance information (a "reference image" also counts,
    if supplied). In this case, if CMPVAR is set to TRUE, then
    variance information is used to correctly weight the input
-   data whenever a pair of input NDFs are inter-compared and both
+   data whenever a pair of input images are inter-compared and both
    have variance information available.
 
    The default behaviour is to use variance information during
@@ -4629,37 +4634,37 @@ CMPVAR = _LOGICAL (Read)
    FALSE, which sometimes gives faster execution without greatly
    affecting the result (also see the "Algorithms Used" section).
    However, if input data with similar values have widely
-   differing variance values within the same input NDF, then use
+   differing variance values within the same input image, then use
    of input variance information is recommended (this could
-   happen, for instance, if an input NDF is the result of a
+   happen, for instance, if an input image is the result of a
    previous mosaic-ing process).
    [TRUE]
 3 GENVAR
 GENVAR = _LOGICAL (Read)
-   If GENVAR is set to TRUE and all the input NDFs supplied
+   If GENVAR is set to TRUE and all the input images supplied
    contain statistical error (variance) information, then
    variance information will also be calculated for the output
-   mosaic NDF, provided that USEVAR is also TRUE. Otherwise,
-   if GENVAR is set to FALSE (or if any input NDF does not
+   mosaic image, provided that USEVAR is also TRUE. Otherwise,
+   if GENVAR is set to FALSE (or if any input image does not
    contain variance information), then no output variance values
    will be generated.  This parameter is only used if all the
-   input NDFs contain variance information.
+   input images contain variance information.
    [TRUE]
 3 IN
 IN = LITERAL (Read and [optionally] Write)
-   A list of the names of the input NDFs which are to be combined
-   into a mosaic. The NDF names should be separated by commas
+   A list of the names of the input images which are to be combined
+   into a mosaic. The image names should be separated by commas
    and may include wildcards.
 
-   The input NDFs are normally accessed only for reading.
+   The input images are normally accessed only for reading.
    However, if the MODIFY parameter is set to TRUE (and
    scale-factor or zero-point corrections are being calculated)
-   then each of the "input" NDFs will be modified by applying the
+   then each of the "input" images will be modified by applying the
    calculated corrections.
 3 LISTIN
 LISTIN = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then the names of all the NDFs supplied as input will be
+   then the names of all the images supplied as input will be
    listed (and will be recorded in the logfile if this is
    enabled).  Otherwise, this listing will be omitted.
    [TRUE]
@@ -4702,11 +4707,11 @@ MAX = _REAL (Read)
 3 MAXIT
 MAXIT = _INTEGER (Read)
    This parameter specifies the maximum number of iterations to
-   be used when inter-comparing pairs of input NDF data arrays to
+   be used when inter-comparing pairs of input image data arrays to
    determine their relative scale-factor and/or zero-point. It is
    only used if (a) both the SCALE and ZERO parameters have been
    set to TRUE, or (b) SCALE has been set to TRUE and statistical
-   error (variance) information obtained from the input NDFs is
+   error (variance) information obtained from the input images is
    being used to weight the data during the inter-comparison. In
    other cases the inter-comparison operation is not iterative.
 
@@ -4718,7 +4723,7 @@ MAXIT = _INTEGER (Read)
    [20]
 3 METHOD
 METHOD = LITERAL (Read)
-   The method to be used to combine the input NDFs' data values
+   The method to be used to combine the input images' data values
    to form the output mosaic. This may be set to any unique
    abbreviation of the following:
 
@@ -4752,16 +4757,16 @@ MIN = _REAL (Read)
    [Minimum real value]
 3 MODIFY
 MODIFY = _LOGICAL (Read)
-   By default, the NDFs supplied via the IN parameter are
-   regarded as "input" NDFs and will not be modified. However, if
+   By default, the images supplied via the IN parameter are
+   regarded as "input" images and will not be modified. However, if
    scale-factor or zero-point corrections are being calculated
    (see the SCALE and ZERO parameters), then giving a TRUE value
-   for MODIFY indicates that these NDFs are themselves to be
+   for MODIFY indicates that these images are themselves to be
    modified by applying the calculated corrections before the
    output mosaic is formed.
 
    This facility provides a means of applying corrections to
-   individual NDFs (e.g. to mutually normalise them) without
+   individual images (e.g. to mutually normalise them) without
    necessarily also combining them into a mosaic. It may also be
    useful if several invocations of MAKEMOS are to be made with
    different parameter settings; by specifying MODIFY=TRUE for
@@ -4771,7 +4776,7 @@ MODIFY = _LOGICAL (Read)
 
    WARNING: Caution should be exercised if setting MODIFY to
    TRUE, as information about the uncorrected data values of the
-   "input" NDFs will not be retained.
+   "input" images will not be retained.
    [FALSE]
 3 NITER
 NITER = _REAL (Read)
@@ -4781,20 +4786,20 @@ NITER = _REAL (Read)
 3 OPTOV
 OPTOV = _INTEGER (Read)
    This parameter specifies the "optimum number of overlaps"
-   which an NDF should have with its neighbours and controls the
+   which an image should have with its neighbours and controls the
    number of inter-comparisons made between pairs of overlapping
-   NDFs when determining scale-factor or zero-point corrections
+   images when determining scale-factor or zero-point corrections
    (see the SCALE and ZERO parameters).
 
    The need for this parameter arises because when multiple input
-   NDFs are supplied there may be a large number of potential
+   images are supplied there may be a large number of potential
    pair-wise overlaps between them.  To prevent them all being
    used, which may take far longer than is justified, this set of
    potential overlaps is reduced by elimination, starting with
    the smallest ones (as measured by the number of overlapping
    pixels) and continuing until no more overlaps can be removed
-   without reducing the number of overlaps of any NDF below the
-   value given for OPTOV.  In practice, this means that each NDF
+   without reducing the number of overlaps of any image below the
+   value given for OPTOV.  In practice, this means that each image
    will end up with about (although not exactly) OPTOV overlaps
    with its neighbours, with the largest overlaps being
    preferred.
@@ -4803,10 +4808,10 @@ OPTOV = _INTEGER (Read)
    number of overlaps, it is not guaranteed always to result in a
    set of overlaps which allow the optimum set of corrections to
    be calculated. In practice, problems from this cause are
-   unlikely unless unusual patterns of NDF overlap are involved,
+   unlikely unless unusual patterns of image overlap are involved,
    but they may be solved by increasing the value of OVOPT and/or
    constructing the required mosaic in pieces by running MAKEMOS
-   several times on different sets of input NDFs.
+   several times on different sets of input images.
 
    In some cases, reducing the value of OVOPT may reduce the
    number of inter-comparisons made, and hence reduce the
@@ -4817,19 +4822,19 @@ OPTOV = _INTEGER (Read)
    This parameter is only used if SCALE or ZERO is set to TRUE.
    [3]
 3 OUT
-OUT = NDF (Write)
-   Name of the NDF to contain the output mosaic. This is normally
-   mandatory. However, if the "input" NDFs are being modified (by
+OUT = image (Write)
+   Name of the image to contain the output mosaic. This is normally
+   mandatory. However, if the "input" images are being modified (by
    setting the MODIFY parameter to TRUE), then it may optionally
    be omitted by supplying a null value (!). In this case, no
    output mosaic will be formed.
 3 PRESERVE
 PRESERVE = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then the data type of the output mosaic NDF will be derived
-   from that of the input NDF with the highest precision, so that
-   the input data type will be "preserved" in the output NDF.
-   Alternatively, if a FALSE value is given, then the output NDF
+   then the data type of the output mosaic image will be derived
+   from that of the input image with the highest precision, so that
+   the input data type will be "preserved" in the output image.
+   Alternatively, if a FALSE value is given, then the output image
    will be given an appropriate floating point data type.
 
    When using integer input data, the former option is useful for
@@ -4843,34 +4848,34 @@ PRESERVE = _LOGICAL (Read)
    CCDSETUP, then that value will be used.
    [TRUE]
 3 REF
-REF = NDF (Read)
+REF = image (Read)
    If scale-factor and/or zero-point corrections are being
    applied (see the SCALE and ZERO parameters) then, by default,
    these are normalised so that the median corrections are unity
-   and zero respectively. However, if an NDF is given via the REF
+   and zero respectively. However, if an image is given via the REF
    parameter (so as to over-ride its default null value), then
    scale-factor and zero-point corrections will instead be
    adjusted so that the corrected data are normalised to the
-   "reference NDF" supplied.
+   "reference image" supplied.
 
    This provides a means of retaining the calibration of a set of
    data, even when corrections are being applied, by nominating a
-   reference NDF which is to remain unchanged. It also allows the
+   reference image which is to remain unchanged. It also allows the
    output mosaic to be normalised to any externally-calibrated
-   NDF with which it overlaps, and hence allows a calibration to
+   image with which it overlaps, and hence allows a calibration to
    be transferred from one set of data to another.
 
-   If the NDF supplied via the REF parameter is one of those
+   If the image supplied via the REF parameter is one of those
    supplied as input via the IN parameter, then this serves to
-   identify which of the input NDFs should be used as a
+   identify which of the input images should be used as a
    reference, to which the others will be adjusted. In this case,
    the scale-factor and/or zero-point corrections applied to the
-   nominated input NDF will be set to one and zero, and the
+   nominated input image will be set to one and zero, and the
    corrections for the others will be adjusted accordingly.
 
-   Alternatively, if the reference NDF does not appear as one of
-   the input NDFs, then it will be included as an additional set
-   of data in the inter-comparisons made between overlapping NDFs
+   Alternatively, if the reference image does not appear as one of
+   the input images, then it will be included as an additional set
+   of data in the inter-comparisons made between overlapping images
    and will be used to normalise the corrections obtained (so
    that the output mosaic is normalised to it). However, it will
    not itself contribute to the output mosaic in this case.
@@ -4887,7 +4892,7 @@ SCALE = _LOGICAL (Read)
    differ.
 
    If SCALE is set to TRUE, then MAKEMOS will inter-compare the
-   NDFs supplied as input and will estimate the relative
+   images supplied as input and will estimate the relative
    scale-factor between selected pairs of input data arrays where
    they overlap.  From this information, a global set of
    multiplicative corrections will be derived which make the
@@ -4908,7 +4913,7 @@ SIGMAS = _REAL (Read)
 3 SKYSUP
 SKYSUP = _REAL (Read)
    A positive "sky noise suppression factor" used to control the
-   effects of sky noise when pairs of input NDFs are
+   effects of sky noise when pairs of input images are
    inter-compared to determine their relative scale-factor. It is
    intended to prevent the resulting scale-factor estimate being
    biased by the many similar values present in the "sky
@@ -4921,7 +4926,7 @@ SKYSUP = _REAL (Read)
    A SKYSUP value of unity can often be effective, but a value
    set by the approximate ratio of sky pixels to useful object
    pixels (i.e. those containing non-sky signal) in a "typical"
-   NDF overlap region will usually be better. The precise value
+   image overlap region will usually be better. The precise value
    is not critical. A value of zero disables the sky noise
    suppression algorithm completely. The default value for SKYSUP
    is 10**(n/2.0), where n is the number of significant
@@ -4933,26 +4938,26 @@ SKYSUP = _REAL (Read)
    [10**(n/2.0)]
 3 TITLE
 TITLE = LITERAL (Read)
-   Title for the output mosaic NDF. [Output from MAKEMOS]
+   Title for the output mosaic image. [Output from MAKEMOS]
 3 TOLS
 TOLS = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
-   when inter-comparing pairs of input NDF data arrays to
+   when inter-comparing pairs of input image data arrays to
    determine their relative scale-factor. It is only used if the
    inter-comparison is to be performed iteratively, which will be
    the case if (a) both the SCALE and ZERO parameters have been
    set to TRUE, or (b) SCALE has been set to TRUE and statistical
-   error (variance) information obtained from the input NDFs is
+   error (variance) information obtained from the input images is
    being used to weight the data during the inter-comparison.
 
    The value given for TOLS specifies the tolerable fractional
    error in the estimation of the relative scale-factor between
-   any pair of input NDFs. This value must be positive.
+   any pair of input images. This value must be positive.
    [0.001]
 3 TOLZ
 TOLZ = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
-   when inter-comparing pairs of input NDF data arrays to
+   when inter-comparing pairs of input image data arrays to
    determine their relative zero-points. It is only used if the
    inter-comparison is to be performed iteratively, which will be
    the case if both the SCALE and ZERO parameters have been set
@@ -4960,20 +4965,20 @@ TOLZ = _REAL (Read)
 
    The value given for TOLZ specifies the tolerable absolute
    error in the estimation of the relative zero-point between any
-   pair of input NDFs whose relative scale-factor is unity. If
+   pair of input images whose relative scale-factor is unity. If
    the relative scale-factor is also being estimated, then the
    value used is multiplied by this relative scale-factor
-   estimate (which reflects the fact that an NDF with a larger
+   estimate (which reflects the fact that an image with a larger
    data range can tolerate a larger error in estimating its
    zero-point). The TOLS value supplied must be positive.
    [0.05]
 3 USEVAR
 USEVAR = _LOGICAL (Read)
    The value of this parameter specifies whether statistical
-   error (variance) information contained in the input NDFs
+   error (variance) information contained in the input images
    should be used to weight the input data when they are combined
    to produce the output mosaic. This parameter is only used if
-   all the input NDFs contain variance information, in which case
+   all the input images contain variance information, in which case
    the default behaviour is to use this information to correctly
    weight the data values being combined. If output variances are
    to be generated (specified by the GENVAR parameter) then this
@@ -4981,28 +4986,28 @@ USEVAR = _LOGICAL (Read)
 
    If insufficient input variance information is available, or if
    USEVAR is set to FALSE, then weights are instead derived from
-   the scale-factor corrections applied to each NDF (see the
+   the scale-factor corrections applied to each image (see the
    WEIGHTS parameter for details); unit weight is used if no
    scale-factor corrections are being applied. Alternatively,
-   explicit weights may be given for each input NDF via the
+   explicit weights may be given for each input image via the
    WEIGHTS parameter.
    [TRUE]
 3 WEIGHTS
 WEIGHTS( ) = _REAL (Read)
    A set of positive weighting factors to be used to weight the
-   input NDFs when they are combined. If this parameter is used,
-   then one value should be given for each input NDF and the
-   values should be supplied in the same order as the input NDFs.
+   input images when they are combined. If this parameter is used,
+   then one value should be given for each input image and the
+   values should be supplied in the same order as the input images.
    If a null (!) value is given (the default) then a set of
    weights will be generated internally - these will normally all
    be unity unless scale-factor corrections are being applied
    (see the SCALE parameter), in which case the reciprocal of the
-   scale factor correction for each input NDF is used as its
+   scale factor correction for each input image is used as its
    weight. This corresponds to the assumption that variance is
-   proportional to data value in each input NDF.
+   proportional to data value in each input image.
 
    This parameter is only used if the USEVAR parameter is set to
-   FALSE or if one or more of the input NDFs does not contain
+   FALSE or if one or more of the input images does not contain
    variance information. Otherwise, the input variance values are
    used to weight the input data when they are combined.
    [!]
@@ -5018,7 +5023,7 @@ ZERO = _LOGICAL (Read)
    differ.
 
    If ZERO is set to TRUE, then MAKEMOS will inter-compare the
-   NDFs supplied as input and will estimate the relative
+   images supplied as input and will estimate the relative
    zero-point difference between selected pairs of input data
    arrays where they overlap.  From this information, a global
    set of additive corrections will be derived which make the
@@ -5032,14 +5037,14 @@ ZERO = _LOGICAL (Read)
    [FALSE]
 2 Examples
 makemos '*' mymos
-   Combines the set of NDFs matching the wild-card "*" into a
+   Combines the set of images matching the wild-card "*" into a
    single mosaic called mymos. By default, no normalisation
    corrections are applied to the input data, which are combined
-   by taking the median in regions where several input NDFs
+   by taking the median in regions where several input images
    overlap.
 
 makemos in='"a,b,c,d"' out=combined zero
-   Combines the four overlapping input NDFs a, b, c and d into a
+   Combines the four overlapping input images a, b, c and d into a
    single mosaic called combined. Optimised zero-point
    corrections are derived and applied to the data before
    combining them so as to make them as mutually consistent as
@@ -5047,7 +5052,7 @@ makemos in='"a,b,c,d"' out=combined zero
    the output mosaic.
 
 makemos '"a,b,c,d"' out=combined scale
-   Combines the four NDFs a, b, c and d as above, but makes
+   Combines the four images a, b, c and d as above, but makes
    optimised corrections to the scale factor of each (i.e.
    multiplies each by an appropriate constant) before they are
    combined. This would be appropriate if, for instance, the
@@ -5055,7 +5060,7 @@ makemos '"a,b,c,d"' out=combined scale
    times and had subsequently had their sky background removed.
 
 makemos in='frame*' out=result scale zero
-   Combines the set of input NDFs matching the wild-card "frame*"
+   Combines the set of input images matching the wild-card "frame*"
    into a single mosaic called result. Optimised scale factor and
    zero point corrections are applied before combining the data.
    This would be appropriate if, for instance, the input data had
@@ -5065,9 +5070,9 @@ makemos in='frame*' out=result scale zero
 makemos in='frame*' out=result scale zero modify
    This is identical to the previous example, except that in
    addition to forming the output result, the MODIFY parameter
-   causes all the input NDFs to be modified using the same
+   causes all the input images to be modified using the same
    optimised corrections as are applied when forming the mosaic,
-   thus mutually normalising all the separate NDFs.  Note that
+   thus mutually normalising all the separate images.  Note that
    this feature should be used with care, as information about
    the original normalisation of the input data will be lost.
    When MODIFY is specified, a null value "!" may be given for
@@ -5075,24 +5080,24 @@ makemos in='frame*' out=result scale zero modify
    required.
 
 makemos '"a,b,c,d"' result scale zero ref=b
-   This example merges the four input NDFs a, b, c and d into a
+   This example merges the four input images a, b, c and d into a
    mosaic called result. In calculating the optimised scale
    factor and zero point corrections to apply, b is regarded as a
-   "reference NDF" and the other NDFs are normalised to it. This
+   "reference image" and the other images are normalised to it. This
    means that if b has previously been calibrated, then the
    output mosaic will inherit this calibration.
 
 makemos '"a,b,c,d"' result scale zero ref=e
    This example is identical to that above, except that the
-   "reference NDF" e is not one of the input NDFs and will not
+   "reference image" e is not one of the input images and will not
    form part of the output mosaic. Nevertheless, the scale factor
    and zero point corrections applied will be such that all the
-   input NDFs are normalised to it (the reference NDF must
-   overlap with at least one of the input NDFs). Thus, if e has
+   input images are normalised to it (the reference image must
+   overlap with at least one of the input images). Thus, if e has
    been calibrated, this calibration will be transferred to the
    output mosaic (note that if MODIFY is specified, then the
    calibration could also be transferred to each of the input
-   NDFs).
+   images).
 
 makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
    This example illustrates some of the less commonly used
@@ -5108,11 +5113,11 @@ makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
 2 Algorithms_Used
    Some of the algorithms used by MAKEMOS require a little
    explanation.  The first of these is used to inter-compare
-   overlapping regions of the input NDFs to determine their relative
+   overlapping regions of the input images to determine their relative
    scale-factor and zero-point difference (in the most general
    case). In effect, this algorithm has to fit a straight line to a
    scatter plot representing the pixel values in the two overlapping
-   NDFs.
+   images.
 
    Rather than use a conventional least-squares fit for this
    purpose, which would be sensitive to spurious data, a fit based
@@ -5141,10 +5146,10 @@ makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
 
    The second stage of normalisation involves a global optimisation
    process which seeks to determine the best corrections to be
-   applied to each input NDF. The algorithm which performs this task
+   applied to each input image. The algorithm which performs this task
    makes a guess at the best corrections to apply and then
    calculates the scale-factor and/or zero-point differences which
-   would remain between each pair of overlapping NDFs if they were
+   would remain between each pair of overlapping images if they were
    corrected in this way. These corrections are then adjusted until
    the weighted sum of squares of the remaining differences is
    minimised. The weights used in this process are derived from
@@ -5154,7 +5159,7 @@ makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
    individual overlaps may be small and contain inadequate
    information on their own.
 
-   The algorithm used for combining the separate input NDFs into a
+   The algorithm used for combining the separate input images into a
    mosaic requires no special explanation, except to note that it is
    designed to operate on large mosaics without making excessive
    demands on system resources such as memory. It does this by
@@ -5216,7 +5221,7 @@ PDRAPER: Peter Draper (STARLINK)
 2 Implementation_Status
    - MAKEMOS supports "bad" pixel values and all non-complex data
      types, with arithmetic being performed using the appropriate
-     floating point type. It can process NDFs with any number of
+     floating point type. It can process images with any number of
      dimensions. The DATA, TITLE and VARIANCE components of an NDF
      are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
      and UNITS components and all extensions being propagated from
@@ -5233,7 +5238,7 @@ Usage:
 
 Description:
 
-   This routine accepts a list of NDFs which may be aligned using
+   This routine accepts a list of images which may be aligned using
    simple offsets. In a first interactive section pairs of images
    may be selected from a palette of images (which are drawn down
    the side of the display). Passing on to a second section the
@@ -5253,10 +5258,10 @@ Description:
    to ensure completeness is enforced by insisting that each pair,
    except for the first, contains one previously paired image).
    When this is complete a global merger of the all the positions
-   for each NDF takes place. This results in the output of one list
-   of uniquely labelled positions for each NDF. These position lists
+   for each image takes place. This results in the output of one list
+   of uniquely labelled positions for each image. These position lists
    can then be used in a routine such as REGISTER to produce the
-   actual transformation between the NDFs.
+   actual transformation between the images.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 DEVICE
@@ -5272,7 +5277,7 @@ FILLFRAC = _DOUBLE (Read)
    [0.55]
 3 IN
 IN = LITERAL (Read)
-   A list of NDF names whose data are to be transformed. The NDF
+   A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
 3 KEEPLUT
 KEEPLUT = _LOGICAL (Read)
@@ -5316,7 +5321,7 @@ LOGTO = LITERAL (Read)
 MAKEBIG = _LOGICAL (Read)
    If TRUE then images will be scaled to fit into the whole of
    the FILLFRAC area. If FALSE then scaling will never exceed
-   one device pixel per NDF pixel. This latter option decreases
+   one device pixel per image pixel. This latter option decreases
    the time needed to process images from the display palette
    into the scratch region.
    [TRUE]
@@ -5337,7 +5342,7 @@ NAMELIST = LITERAL (Read)
    generated using the expression given to the OUTLIST parameter.
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
-   routine, if the associating position lists with NDFs option is
+   routine, if the associating position lists with images option is
    not being used.
    [PAIRNDF.LIS]
 3 OUTLIST
@@ -5349,24 +5354,23 @@ OUTLIST = LITERAL (Read)
    using indirection if required, OR, as a single modification
    element (of the input names). The simplest modification
    element is the asterisk "*" which means call each of the
-   output lists the same name as the corresponding input NDFs (but
-   without the ".SDF" extension).
+   output lists the same name as the corresponding input images.
    So,
       IN > *
       OUTLIST > *
-   signifies that all the NDFs in the current directory should be
+   signifies that all the images in the current directory should be
    used and the output lists should have the same names.
 
    Other types of modification can also occur, such as,
       OUTLIST > *_objs.dat
-   which means call the position lists the same as the input NDFs
+   which means call the position lists the same as the input images
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
       outlist > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input NDFs are used then is it
+   If wildcarded names for the input images are used then is it
    recommended that wildcards are also used for the position list
    names as the correspondence between these may be confusing.
    [*.DAT]
@@ -5392,8 +5396,8 @@ THICK = _INTEGER (Read)
 2 Examples
 pairndf '*'  '*.dat' xw '[1,99]'
   In this routine the positional nature of the parameters is
-  shown. All the NDFs in the current directory are displayed.
-  Their output positions lists have the same name as the NDFs
+  shown. All the images in the current directory are displayed.
+  Their output positions lists have the same name as the images
   except that they have a file type of .dat. The images are 
   displayed using the percentile limits 1,99 which shows bright 
   detail well.
@@ -5470,7 +5474,7 @@ pairndf fillfrac=0.75 keeplut palfrac=0.15
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the names of the
+  (.MORE.CCDPACK) of the input images are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.
@@ -5550,10 +5554,10 @@ DEVICE = DEVICE (Write)
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
-   the associated NDFs. If NDFNAMES is TRUE the names of the
+   the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of
-   the NDFs (in the CCDPACK extension item CURRENT_LIST) and the
-   names of the NDFs themselves should be given (and may include
+   the images (in the CCDPACK extension item CURRENT_LIST) and the
+   names of the images themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -5614,7 +5618,7 @@ MTYPE = _INTEGER (Read)
 3 NDFNAMES
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST".
 
    If a global value for this parameter has been set using
@@ -5659,7 +5663,7 @@ THICK = _INTEGER (Read)
    [1]
 2 Examples
 plotlist inlist='*'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated lists of positions are plotted
    onto the current display device.
 
@@ -5668,7 +5672,7 @@ plotlist ndfnames=false inlist=one_list.dat
    its position are plotted on the current display device.
 
 plotlist in='aligned_*' mtype=-1 palnum=4 msize=1 thick=3
-   In this example the NDFs aligned_* have their associated
+   In this example the images aligned_* have their associated
    position lists accessed and the positions are plotted on the
    current display device. The pen colour used is blue. The
    text is drawn at a relative size of 1 (the normal default  is
@@ -5707,7 +5711,7 @@ plotlist in='aligned_*' mtype=-1 palnum=4 msize=1 thick=3
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be plotted.
 2 Behaviour_of_parameters
@@ -5738,7 +5742,7 @@ PDRAPER: Peter Draper (STARLINK)
  6-OCT-1995 (PDRAPER):
     Updated for CCDPACK version 2.0.
 1 PRESENT
-Presents a list of NDFs to CCDPACK.
+Presents a list of images to CCDPACK.
 
 Usage:
 
@@ -5748,22 +5752,22 @@ Usage:
 Description:
 
    This routine enters reduction information into the CCDPACK
-   extensions of a list of NDFs. This information is required if an
+   extensions of a list of images. This information is required if an
    automated reduction schedule is to be produced using SCHEDULE. 
    Before using this routine you should set up the CCDPACK global
    parameters, describing the CCD characteristics, using the CCDSETUP
    application.
 
-   If the input NDFs have not already been categorised then this
+   If the input images have not already been categorised then this
    routine performs this task for the "frame types" BIAS, TARGET,
    DARK, FLASH, FLAT, MASTER_BIAS, MASTER_FLAT, MASTER_DARK and 
-   MASTER_FLASH (these are input as different groups of NDFs).
+   MASTER_FLASH (these are input as different groups of images).
 
 
    Missing exposure times for DARK and FLASH counts can be entered
    as can filter types.
 
-   This routine can also be used to check that a list of NDFs have
+   This routine can also be used to check that a list of images have
    the minimum amount of information in their CCDPACK extensions to
    allow an automated scheduling.
 2 Parameters
@@ -5777,7 +5781,7 @@ ADC = _DOUBLE (Read)
    the integration had finished. This value is required to allow
    proper estimates of the inherent noise associated with each
    readout value. CCDPACK makes these estimates and stores them
-   in the variance component of the final NDFs. Not supplying a
+   in the variance component of the final images. Not supplying a
    value for this parameter (if prompted) may be a valid response
    if variances are not to be generated.
 
@@ -5786,26 +5790,26 @@ ADC = _DOUBLE (Read)
    superceded if ADC=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 3 ADDDARK
 ADDDARK = _LOGICAL (Read)
    Whether or not to prompt for a dark exposure time for the input
-   NDFs which require one.
+   images which require one.
    [Dynamic default, TRUE if dark count frames are given, FALSE
    otherwise]
 3 ADDFLASH
 ADDFLASH = _LOGICAL (Read)
    Whether or not to prompt for a pre-flash exposure time for the
-   input NDFs which require one.
+   input images which require one.
    [Dynamic default, TRUE if pre-flash frames are given, FALSE
    otherwise]
 3 BIAS
 BIAS = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw bias
-   data. These are the NDFs which are to used to produce a
-   "master" bias NDF. On exit these NDFs will have their FTYPE
+   A list of the names of the images which contain the raw bias
+   data. These are the images which are to used to produce a
+   "master" bias image. On exit these images will have their FTYPE
    extension item set to the value "BIAS".
    [!]
 3 BIASVALUE
@@ -5827,31 +5831,31 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    readout direction.  For example, 2,16,400,416 means that the
    bias strips are located between pixels 2 to 16 and 400 to 416
    inclusive along the readout direction. The bias strips are
-   used to either offset the master bias NDF or as an estimate of
-   the bias which is to be interpolated across the NDF in some
+   used to either offset the master bias image or as an estimate of
+   the bias which is to be interpolated across the image in some
    way (see DEBIAS). Not supplying values for this parameter may
    be a valid response if the bias frame is to be directly
    subtracted from the data without offsetting or if a single
-   constant is to be used as the bias value for the whole NDF.
+   constant is to be used as the bias value for the whole image.
 
    This parameter normally accesses the value of the related
    CCDPACK global association. This behaviour can only be
    superceded if BOUNDS=[value,...] is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 3 DARK
 DARK = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw dark
-   count data. These are the NDFs which are to used to produce a
-   "master" dark counts NDF. On exit these NDFs will have their
+   A list of the names of the images which contain the raw dark
+   count data. These are the images which are to used to produce a
+   "master" dark counts image. On exit these images will have their
    FTYPE extension item set to the value "DARK".
    [!]
 3 DARKTIME
 DARKTIME = _DOUBLE (Read)
-   The time for which the data in the current NDF collected dark
+   The time for which the data in the current image collected dark
    count electrons. The dark count is basically charge which
    accumulates in the detector pixels due to thermal noise. The
    effect of dark current is to produce an additive quantity to
@@ -5862,8 +5866,8 @@ DARKTIME = _DOUBLE (Read)
 
    The value given does not need to be a number of seconds or
    minutes and can be ratio of some kind, as long as it is
-   consistently used for all NDFs (so if all your NDFs have the
-   same darktime then the value 1 could be used). NDFs which have
+   consistently used for all images (so if all your images have the
+   same darktime then the value 1 could be used). images which have
    no dark count should be given a DARKTIME of 0. This parameter
    is only used if ADDDARK is TRUE.
    [!]
@@ -5880,7 +5884,7 @@ DEFERRED = _DOUBLE (Read)
    superceded if DEFERRED=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 3 DIRECTION
@@ -5896,14 +5900,14 @@ DIRECTION = LITERAL (Read)
    superceded if DIRECTION=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 3 EXTENT
 EXTENT( 4 ) = _INTEGER (Read)
    The extent of the useful detector area in pixel indices.  The
    extent is defined as a range in X values and a range in Y
-   values (XMIN,XMAX,YMIN,YMAX). These define a section of an NDF
+   values (XMIN,XMAX,YMIN,YMAX). These define a section of an image
    (see SUN/33). Any parts of the detector surface area outside
    of this region will not be present in the final output. This is
    useful for excluding bias strips, badly vignetted parts etc.
@@ -5913,49 +5917,49 @@ EXTENT( 4 ) = _INTEGER (Read)
    superceded if EXTENT=[XMIN,XMAX,YMIN,YMAX] is used on the
    command-line or if a prompt is forced (using the PROMPT
    keyword). The value of this parameter will be entered into the
-   extension of the input NDFs only if MODIFY is TRUE or the
+   extension of the input images only if MODIFY is TRUE or the
    related extension item does not exist.
    [!]
 3 FILTER
 FILTER = LITERAL (Read)
-   The filter name associated with the current NDF. The filter
+   The filter name associated with the current image. The filter
    name is stored in the extension item FILTER and is used when
    determining which flatfields should be used for which data.
-   NDFs with a frame type which is independent of the filter will
+   images with a frame type which is independent of the filter will
    not use this parameter. The filter type is a case sensitive
    string.
    [Current value]
 3 FLASH
 FLASH = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw
-   pre-flash correction data. These are the NDFs which are to
-   used to produce a "master" pre-flash correction NDF. On exit
-   these NDFs will have their FTYPE extension item set to the
+   A list of the names of the images which contain the raw
+   pre-flash correction data. These are the images which are to
+   used to produce a "master" pre-flash correction image. On exit
+   these images will have their FTYPE extension item set to the
    value "FLASH".
    [!]
 3 FLASHTIME
 FLASHTIME  = _DOUBLE (Read)
-   The time for which the data in the current NDF was exposed to
+   The time for which the data in the current image was exposed to
    pre-flash.
 
    The value given does not need to be a number of seconds or
    minutes and can be ratio of some kind, as long as it is
-   consistently used for all NDFs (so if all your NDFs have the
-   same darktime then the value 1 could be used). NDFs which have
+   consistently used for all images (so if all your images have the
+   same darktime then the value 1 could be used). images which have
    no pre-flash should be given a FLASHTIME of 0. This parameter
    is only used if ADDFLASH is TRUE.
    [!]
 3 FLAT
 FLAT = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw
-   flatfield data. These are the NDFs which are to used to
+   A list of the names of the images which contain the raw
+   flatfield data. These are the images which are to used to
    produce "master" flatfields (one for each filter type). On
-   exit these NDFs will have their FTYPE extension item set to
+   exit these images will have their FTYPE extension item set to
    the value "FLAT".
    [!]
 3 FTYPE
 FTYPE = LITERAL (Read)
-   The "frame" type of the current NDF. Each NDF is processed in
+   The "frame" type of the current image. Each image is processed in
    turn and if SIMPLE is TRUE and a frame type extension item does
    not exist then this parameter will be used to prompt for a
    value. A prompt will also be made if SIMPLE is TRUE and MODIFY
@@ -5964,13 +5968,13 @@ FTYPE = LITERAL (Read)
    [Current value]
 3 IN
 IN = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw CCD
-   data. NDFs entered using this parameter must already have the
+   A list of the names of the images which contain the raw CCD
+   data. images entered using this parameter must already have the
    correct "frame type" information (extension item FTYPE)
    entered into their CCDPACK extensions. This parameter is only
    used if SIMPLE is TRUE.
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 3 LOGFILE
 LOGFILE = FILENAME (Read)
@@ -6042,26 +6046,26 @@ MASTERS = _LOGICAL (Read)
    [FALSE]
 3 MODIFY
 MODIFY = _LOGICAL (Read)
-   If the input NDFs already contain information in their CCDPACK
+   If the input images already contain information in their CCDPACK
    extensions, then this parameter controls whether this
    information will be overwritten (if a new value exists) or
    not.
    [TRUE]
 3 MULTIENTRY
 MULTIENTRY = _LOGICAL (Read)
-   Whether or not the names of the input NDFs, their frame types,
+   Whether or not the names of the input images, their frame types,
    filters and related exposure factors are all given in response
    to the IN parameter (SIMPLE must be TRUE). If this option is
    selected then the parameters FTYPE, FILTER, DARKTIME and
    FLASHTIME will be set up with these values as defaults. If
    MODIFY is TRUE then you will be given an opportunity to modify
-   them, otherwise these values will be entered into the NDF
+   them, otherwise these values will be entered into the image
    CCDPACK extensions.
 
    The input record format is five fields separated by commas. These
    are:
 
-       - 1 NDF name
+       - 1 Image name
 
        - 2 Frame type
 
@@ -6100,7 +6104,7 @@ MULTIENTRY = _LOGICAL (Read)
 3 NAMELIST
 NAMELIST = LITERAL (Read)
    The name of a file to contain a listing of the name of the
-   input NDFs. This is intended to be of use when using these
+   input images. This is intended to be of use when using these
    same names with other applications (such as SCHEDULE).
    [!]
 3 ONEDARKTIME
@@ -6137,7 +6141,7 @@ RNOISE = _DOUBLE (Read)
    This behaviour can only be superceded if RNOISE=value is used
    on the command-line or if a prompt is forced (using the
    PROMPT keyword). The value of this parameter will be entered
-   into the extension of the input NDFs only if MODIFY is TRUE or
+   into the extension of the input images only if MODIFY is TRUE or
    the related extension item does not exist.
    [!]
 3 SATURATION
@@ -6149,23 +6153,23 @@ SATURATION = _DOUBLE (Read)
    superceded if SATURATION=value is used on the command-line
    or if a prompt is forced (using the PROMPT keyword). The
    value of this parameter will be entered into the extension of
-   the input NDFs only if MODIFY is TRUE or the related extension
+   the input images only if MODIFY is TRUE or the related extension
    item does not exist.
    [!]
 3 SIMPLE
 SIMPLE = _LOGICAL (Read)
-   Whether or not the input NDFs already contain "frame type"
+   Whether or not the input images already contain "frame type"
    (extension item FTYPE) information in their CCDPACK extensions
-   or not. Usually NDFs to be presented to CCDPACK do not contain
+   or not. Usually images to be presented to CCDPACK do not contain
    this information, unless it has been imported from FITS
-   information using IMPORT, or the NDFs have already been
+   information using IMPORT, or the images have already been
    presented and this pass is to modify existing extension items.
    [FALSE]
 3 TARGET
 TARGET = LITERAL (Read)
-   A list of the names of the NDFs which contain the "target"
-   data. These are the NDFs which contain the images or spectra
-   etc.  On exit these NDFs will have their FTYPE extension item
+   A list of the names of the images which contain the "target"
+   data. These are the images which contain the images or spectra
+   etc.  On exit these images will have their FTYPE extension item
    set to the value "TARGET".
    [!]
 3 ZEROED 
@@ -6177,24 +6181,24 @@ ZEROED = _LOGICAL (Read)
    [FALSE]
 2 Examples
 present simple in='*' modify
-   In this example PRESENT processes all the NDFs in the current
-   directory. The NDFs should already have a valid frame type
+   In this example PRESENT processes all the images in the current
+   directory. The images should already have a valid frame type
    (such as TARGET, FLAT etc.). The any existing global variables
-   describing the detector are accessed and written into the NDF
+   describing the detector are accessed and written into the image
    extension overwriting any values which already exist.
 
 present simple=false bias='bias*' target='data*' dark=! flash=!
         flat='ff*'
-   In this example the input NDFs are organised into their
+   In this example the input images are organised into their
    respective frame types using the specially designed input
-   parameters. On exit the output NDFs will have the correct frame
+   parameters. On exit the output images will have the correct frame
    types entered into their CCDPACK extensions (provided MODIFY
    is TRUE).
 
 present modify=false simple=true in='*'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed. If any required extension or global associated items
-   are missing then they will be entered into the NDF extension.
+   are missing then they will be entered into the image extension.
    If all extension items are present then a listing of their
    values will be made.
 
@@ -6307,11 +6311,11 @@ Description:
    The results from REGISTER are reported via the logging system
    and then coded as TRANSFORM structures containing the final
    algebraic solutions for each input list. These structures are
-   usually stored in the CCDPACK extensions of the associated NDFs
+   usually stored in the CCDPACK extensions of the associated images
    and then used by the applications TRANLIST and TRANNDF which may
    be used to transform position lists and resample the actual
    datasets respectively. The transformation structures may also be
-   stored within a named HDS container file if no associated NDFs exist.
+   stored within a named HDS container file if no associated images exist.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 CLASS
@@ -6401,23 +6405,23 @@ FULL = _LOGICAL (Read)
    [FALSE]
 3 IN
 IN = LITERAL (Read)
-   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of NDF
+   If NDFNAMES is FALSE and PLACEIN is "NDF" then a list of image
    names in which to store the transformation structures is
    required. This list of names must correspond exactly to the
    order of the associated input lists. A listing of the order
    of inputs is shown before this parameter is accessed.
 
-   The NDF names may (although this is probably not advisable)
+   The image names may (although this is probably not advisable)
    be specified using wildcards, or may be specified using an
    indirection file (the indirection character is "^").
 3 INLIST
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists
    which contain the positions and, if NDFNAMES is TRUE, the names
-   of the associated NDFs. If NDFNAMES is TRUE the names of the
+   of the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of the
-   NDFs (in the CCDPACK extension item CURRENT_LIST) and the names
-   of the NDFs themselves should be given (and may include
+   images (in the CCDPACK extension item CURRENT_LIST) and the names
+   of the images themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -6460,14 +6464,14 @@ LOGTO = LITERAL (Read)
 3 NDFNAMES
 NDFNAMES = _LOGICAL (Read)
    This parameter specifies whether the names of the input
-   positions lists are stored in the CCDPACK extensions of NDFs.
-   If TRUE then the INLIST parameter accesses a list of NDFs
+   positions lists are stored in the CCDPACK extensions of images.
+   If TRUE then the INLIST parameter accesses a list of images
    which are used to get the associated positions lists. If FALSE
    then INLIST just accesses the position list names directly.
 
-   If the names of the lists are stored in the CCDPACK NDF
+   If the names of the lists are stored in the CCDPACK image
    extension then the final transformation structure is also
-   written to the NDF extension.
+   written to the image extension.
 
    If a global value for this parameter has been set using
    CCDSETUP then that value will be used.
@@ -6487,12 +6491,12 @@ PLACEIN = LITERAL (Read)
    you would like to store the final transformation structures.
    The options are:
 
-      - NDF  -- store them in NDF extensions
+      - NDF  -- store them in image extensions
 
       - FILE -- store them in a container file.
 
-   If the NDF option is chosen then you will have the option of
-   supplying the NDF names via the parameter IN. If the FILE
+   If the image option is chosen then you will have the option of
+   supplying the image names via the parameter IN. If the FILE
    option is chosen then the name of an HDS container file should
    be given in response to the TRFILE parameter.
    [NDF]
@@ -6569,12 +6573,12 @@ YINV = LITERAL (Read)
    offset and scale.
 2 Examples
 register inlist='*' fittype=1
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are opened.
    A global fit between all the datasets is then performed
    which results in estimates for the offsets from the first input
-   NDF's position. The results are then coded as transform
-   structures in the CCDPACK extensions of the NDFs (under the
+   image's position. The results are then coded as transform
+   structures in the CCDPACK extensions of the images (under the
    item TRANSFORM). The transform structures are arranged so that
    the forward transformation maps current positions into the
    reference coordinate system.
@@ -6584,14 +6588,14 @@ register inlist='*' trtype=5
    transformations are derived for a full 6-parameter linear fit
    (which allows offset, rotation, magnification and shear).
 
-register inlist='"myndf1,myndf2"' fittype=4 refpos=2
+register inlist='"myimage1,myimage2"' fittype=4 refpos=2
    In this example a solid body fit is performed between the
-   position lists associated with the NDFs myndf1 and myndf2.
+   position lists associated with the images myimage1 and myimage2.
    The reference positions are chosen to be those associated with
-   myndf2.
+   myimage2.
 
 register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
-   In this example the positions lists associated with the NDFs
+   In this example the positions lists associated with the images
    one and two are said to be related by the algebraic
    expressions "pa+pb*x" and "pa+pb*y", which indicates that a
    single offset applies in both directions and a single scale
@@ -6599,10 +6603,10 @@ register inlist='"one,two"' fittype=6 xfor='pa+pb*x' yfor='pa+pb*y'
    general least-squares minimization technique. Starting values
    for PA and PB can be given using the parameters PA and PB.
 
-register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
+register inlist='"image1,image2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
          yfor='pe+pf*x+pg*y+ph*x*y'
    In this example an non-linear transformation is fit between the
-   positions associated with the NDFs ndf1 and ndf2. This analysis
+   positions associated with the images image1 and image2. This analysis
    may help in determining whether a 6-parameter fit is good
    enough, or if you just want to transform positions. A problem
    with proceeding with this transformation in a general fashion
@@ -6610,13 +6614,13 @@ register inlist='"ndf1,ndf2"' fittype=6 xfor='pa+pb*x+pc*y+pd*x*y'
    perform image resampling.
 
 register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
-         fittype=3 placein=ndf in='"ndf1,ndf2,ndf3"'
+         fittype=3 placein=ndf in='"image1,image2,image3"'
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) and have to be specified by name
+   with images (ndfnames=false) and have to be specified by name
    (no wildcards allowed). Since the position lists are not
-   associated with NDFs there is no natural home for the
+   associated with images there is no natural home for the
    transform structures. In this example it has been decided to
-   place the transforms in NDFs anyway. PLACEIN could also be
+   place the transforms in images anyway. PLACEIN could also be
    given as "file" in which case the transform structures are
    written to a container file, under the items TRN_1, TRN_2 ...
 2 Notes
@@ -6657,11 +6661,11 @@ register ndfnames=false inlist='"list1.acc,list2.acc,list3.acc"'
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be used for registration.
 
-  On exit an item "TRANSFORM" will be added to any input NDFs.
+  On exit an item "TRANSFORM" will be added to any input images.
   This contains the registration information as a TRANSFORM
   structure and may be inspected using the ADAM utility TRACE
   (SUN/102).
@@ -6705,7 +6709,7 @@ Usage:
 
 Description:
 
-   This routine accepts a list of input NDFs and uses the information
+   This routine accepts a list of input images and uses the information
    in their CCDPACK extensions to schedule a reduction. The schedule
    is produced as a command script which may be executed immediately
    or retained for execution using the standard CCDPACK facilities
@@ -6723,8 +6727,8 @@ Description:
       5) production of master flatfields (one for each filter type)
       6) correction of data for flatfield response
 
-   The stages which are preformed for each NDF depend on the type of
-   NDF (TARGET, FLAT, BIAS, DARK etc.) and any processing which has
+   The stages which are preformed for each image depend on the type of
+   image (TARGET, FLAT, BIAS, DARK etc.) and any processing which has
    already taken place. For instance if calibration masters of any
    type already exist then they will be used in preference to the
    production of any new masters. If all the TARGET frames have
@@ -6738,20 +6742,20 @@ Description:
    are also available.
 
    Before you can use this routine you must make sure that all the
-   necessary information is entered into the NDF extensions. You can
+   necessary information is entered into the image extensions. You can
    do this using the routines IMPORT or CCDSETUP and PRESENT or any
    combination of these which give the desired effect.
 2 Parameters
 For information on individual parameters, select from the list below:
 3 DARKEXT
 DARKEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    CALCOR when performing dark count correction. This makes the
    parameter
 
       OUT=*"darkext"
 
-   form the names of the NDFs output from CALCOR.
+   form the names of the images output from CALCOR.
    [-dk]
 3 DEBIAS
 DEBIAS = _INTEGER (Read)
@@ -6775,12 +6779,12 @@ DEBIAS = _INTEGER (Read)
    determined by the INTERP parameter.
 3 DEBIASEXT
 DEBIASEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    DEBIAS. This makes the parameter
 
       OUT=*"debiasext"
 
-   form the names of the NDFs output from DEBIAS.
+   form the names of the images output from DEBIAS.
    [-db]
 3 EXECUTE
 EXECUTE = _LOGICAL (Read)
@@ -6799,33 +6803,33 @@ EXELOGFILE = LITERAL (Read)
    [SCHEDULE.LOG]
 3 FLASHEXT
 FLASHEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    CALCOR when performing pre-flash correction. This makes the
    parameter
 
       OUT=*"flashext"
 
-   form the names of the NDFs output from CALCOR.
+   form the names of the images output from CALCOR.
    [-dk]
 3 FLATEXT
 FLATEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    FLATCOR. This makes the parameter
 
       OUT=*"flatext"
 
-   form the names of the NDFs output from FLATCOR.
+   form the names of the images output from FLATCOR.
    [-flt]
 3 IN
 IN = LITERAL (Given)
-   A list of the names of the NDFs which contain the data to be
-   reduced. All NDFs must already have the correct "frame type"
+   A list of the names of the images which contain the data to be
+   reduced. All images must already have the correct "frame type"
    information (extension item FTYPE) entered into their CCDPACK
    extensions. Together with any other relevant information (such
    as filter type, position of the bias strips, useful area etc.,
    see IMPORT and/or PRESENT).
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 3 INTERP
 INTERP = _INTEGER (Read)
@@ -6834,9 +6838,9 @@ INTERP = _INTEGER (Read)
    performed. The possible returns are:
 
       1 = fit a constant for each row/column
-      2 = fit a single value for whole NDF
+      2 = fit a single value for whole image
       3 = fit a line to each row/column
-      4 = fit a plane to whole NDF
+      4 = fit a plane to whole image
 
    The possible options given the input information about the
    presence of bias strips are shown before the value of this
@@ -6887,23 +6891,23 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 MASTERBIAS
 MASTERBIAS = LITERAL (Read)
-   The name which will be given to a master bias NDF if one is
+   The name which will be given to a master bias image if one is
    created.
    [MASTER_BIAS]
 3 MASTERDARK
 MASTERDARK = LITERAL (Read)
-   The name which will be given to a master dark NDF if one is
+   The name which will be given to a master dark image if one is
    created.
    [MASTER_DARK]
 3 MASTERFLASH
 MASTERFLASH = LITERAL (Read)
-   The name which will be given to a master flash NDF if one is
+   The name which will be given to a master flash image if one is
    created.
    [MASTER_FLASH]
 3 MASTERFLAT
 MASTERFLAT = LITERAL (Read)
    The prefix of the name which will be given to any master flat
-   NDFs which are created. The filter name will be appended to
+   images which are created. The filter name will be appended to
    this.
    [MASTER_FLAT]
 3 SCRIPT
@@ -6921,18 +6925,18 @@ SPACESAVE = LITERAL (Read)
    used or not. It can take one of the values, "NONE", "SOME" or
    "LOTS".
 
-      "NONE" indicates that no NDFs should be deleted.
-      "SOME" indicates that all intermediate NDFs should be
+      "NONE" indicates that no images should be deleted.
+      "SOME" indicates that all intermediate images should be
              deleted. This occurs after they are processed.
-      "LOTS" indicates that all processed NDFs should be deleted.
-             In this case all intermediary NDFs and the original
-             NDFs are deleted when processed.
+      "LOTS" indicates that all processed images should be deleted.
+             In this case all intermediary images and the original
+             images are deleted when processed.
 
-   Intermediary NDFs are deleted by the CCDPACK applications when
+   Intermediary images are deleted by the CCDPACK applications when
    they are finished processing then. So for instance in the case
-   of FLATCOR each NDF is deleted in turn, so the additional disk
-   space required is one NDF. Using "SOME" preserves the original
-   NDFs. Calibration masters are never deleted.
+   of FLATCOR each image is deleted in turn, so the additional disk
+   space required is one image. Using "SOME" preserves the original
+   images. Calibration masters are never deleted.
    [NONE]
 3 STYPE
 STYPE = LITERAL (Read)
@@ -6945,7 +6949,7 @@ STYPE = LITERAL (Read)
    [CSH]
 2 Examples
 schedule '*' ccdreduce csh debias=1
-   This example processes all the NDFs in the current directory
+   This example processes all the images in the current directory
    producing a script file called ccdreduce.csh which is suitable
    for executing from the C-shell. The debiassing method chosen is
    to use a zeroed master bias which is offset to the bias strip
@@ -6962,8 +6966,8 @@ schedule '*' tryinterp debias=3 interp=3
 
 schedule spacesave=lots
    In this example the command script will be written so that all
-   intermediary NDFs (those produced by the various applications)
-   and the original raw NDFs, will be deleted as and when they are
+   intermediary images (those produced by the various applications)
+   and the original raw images, will be deleted as and when they are
    processed.
 schedule 'data*' irflats debias=4
    In this example the frames 'data*' are scheduled for reduction.
@@ -7029,11 +7033,11 @@ INEXT = _LOGICAL (Read)
    If NDFNAMES is TRUE and the transformation is to be specified
    using a TRANSFORM structure (TRTYPE="STRUCT") then this
    parameter controls whether or not the structure should be
-   located in the CCDPACK extensions of the NDFs.
+   located in the CCDPACK extensions of the images.
 
    If this option is chosen then the transform structure in EACH
-   NDF will be applied to the associated position list. So for
-   instance if you have a set of registered NDFs and positions
+   image will be applied to the associated position list. So for
+   instance if you have a set of registered images and positions
    these may be transformed all at once to and from the reference
    coordinate system.
    [TRUE]
@@ -7041,10 +7045,10 @@ INEXT = _LOGICAL (Read)
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
-   the associated NDFs. If NDFNAMES is TRUE the names of the
+   the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of
-   the NDFs (in the CCDPACK extension item CURRENT_LIST) and the
-   names of the NDFs themselves should be given in response (and
+   the images (in the CCDPACK extension item CURRENT_LIST) and the
+   names of the images themselves should be given in response (and
    may include wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -7094,7 +7098,7 @@ NAMELIST = _FILENAME
 3 NDFNAMES
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST". The names will be present in the
    extension if the positions were located using a CCDPACK
    application (such as FINDOBJ). Using this facility allows the
@@ -7107,14 +7111,14 @@ NDFNAMES = _LOGICAL (Read)
 3 OUTLIST
 OUTLIST = FILENAME (Write)
    A list of names specifying the result files. The names of the
-   lists may use modifications of the input names (NDF names if
+   lists may use modifications of the input names (image names if
    available otherwise the names of the position lists). So if
    you want to call the output lists the same name as the input
-   NDFs except to add a type use.
+   images except to add a type use.
 
       OUTLIST > *.FIND
 
-   If no NDF names are given (NDFNAMES is FALSE) then if you want
+   If no image names are given (NDFNAMES is FALSE) then if you want
    to change the extension of the files (from ".CENT" to ".TRAN"
    in this case) use
 
@@ -7173,7 +7177,7 @@ TRTYPE = LITERAL (Read)
    by REGISTER or CCDEDIT) is to be applied to the data. In this
    case the name of the object containing the structure should
    be supplied (this may be picked up automatically through the
-   association of an NDF and a position list) and whether to use
+   association of an image and a position list) and whether to use
    the forward or inverse mappings.
    [COEFF]
 3 TR
@@ -7221,20 +7225,20 @@ YFOR = LITERAL (Read)
 2 Examples
 tranlist inlist='*' outlist='*.tran' trtype=struct inext=true
          forward=false
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated position lists are opened.
-   The transform structures in the NDFs are used to transform the
+   The transform structures in the images are used to transform the
    associated positions using the inverse mappings. The output
-   lists are called ndf_name.tran and are associated with the
-   NDFs.
+   lists are called image_name.tran and are associated with the
+   images.
 
 tranlist inlist='*_reduced' outlist='*.off' trtype=coeff
          tr='[10,1,0,20,0,1]'
-   In this example the position lists associated with the NDFs
+   In this example the position lists associated with the images
    *_reduced are transformed using the linear fit coefficients
    [10,1,0,20,0,1] resulting in a shift of all the positions in
    these lists of +10 in X and +20 in Y. The output lists are
-   called ndf_name.off and are now associated with the NDFs.
+   called image_name.off and are now associated with the images.
 
 tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
          tr='[0,0.707,-0.707,0,0.707,0.707]'
@@ -7245,11 +7249,11 @@ tranlist inlist='*_resam' outlist='*.rot' trtype=coeff
 tranlist inlist=here outlist=reflected.dat trtype=express
          xfor=-x yfor=-y
    In this example a transformation expression is used to reflect
-   the positions stored in the list associated with NDF here
+   the positions stored in the list associated with image here
    about the X and Y axes. A similar effect could be achieved
    with trtype=coeff and tr=[0,-1,0,0,0,-1].
 
-tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
+tranlist inlist=image_with_list outlist='*.tran' trtype=express
          xfor='(fx*(1d0+pa*(fx*fx+fy*fy)))*ps+px'
          yfor='(fy*(1d0+pa*(fx*fx+fy*fy)))*ps+py'
          fx='(x-px)/ps' fy='(y-py)/ps'
@@ -7257,7 +7261,7 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
          py=Y-centre-value ps=scale_factor
    In this example a general transformation (which is of the type
    used when applying pin cushion distortions) is applied to the
-   position list associated with the NDF ndf_with_list. The
+   position list associated with the image image_with_list. The
    transformation is parameterised with an offset and scale
    (converts pixel coordinates to one projection radius units)
    applied to the input coordinates and a pincushion distortion
@@ -7266,11 +7270,11 @@ tranlist inlist=ndf_with_list outlist='*.tran' trtype=express
 tranlist ndfnames=false inlist='"list1,list2,list3"'
          outlist='"outlist1,outlist2,outlist3"' namelist=newfiles
    In this example the input position lists are not associated
-   with NDFs (ndfnames=false) And have to be specified by name
+   with images (ndfnames=false) And have to be specified by name
    (no wildcards allowed). The output lists are also specified in
    this fashion, but, the same effect could have been achieved
    with outlist=out* as the input list names are now used as as
-   modifiers for the output list names (the NDF names are always
+   modifiers for the output list names (the image names are always
    used when they are available -- see previous examples). The
    names of the output lists are written to the file newfiles,
    this could be used to specify the names of these files to
@@ -7311,13 +7315,13 @@ tranlist ndfnames=false inlist='"list1,list2,list3"'
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be transformed. On exit this item will be updated to
   reference the name of the transformed list of positions.
 
   This application may also access the item "TRANSFORM" from
-  the NDF extensions if NDFNAMES and INEXT are TRUE and
+  the image extensions if NDFNAMES and INEXT are TRUE and
   TRTYPE="STRUCT".
 
 - In this application data following the third column are copied
@@ -7350,9 +7354,9 @@ PDRAPER: Peter Draper (STARLINK)
 
  2-AUG-1995 (PDRAPER):
     Fixed so that correct transformation is compiled when getting
-    transform information from an external file (worked ok for NDFs).
+    transform information from an external file (worked ok for images).
 1 TRANNDF
-Transforms a list of NDFs by resampling.
+Transforms a list of images by resampling.
 
 Usage:
 
@@ -7361,15 +7365,15 @@ Usage:
 Description:
 
    This application performs the arbitrary transformation of a list
-   of NDFs using transform structures created by routines such as
-   REGISTER and CCDEDIT. The output NDFs are calculated by resampling
-   the data of the input NDFs. Output array elements are set to the
+   of images using transform structures created by routines such as
+   REGISTER and CCDEDIT. The output images are calculated by resampling
+   the data of the input images. Output array elements are set to the
    bad value if their inverse-transformed coordinates lie outside the
-   corresponding input NDF's coordinate limits.
+   corresponding input image's coordinate limits.
 
-   NDFs processed within CCDPACK may be resampled using the
-   appropriate transformation structures located within the NDF's
-   extensions. Using these facilities allows many NDFs to be aligned
+   Images processed within CCDPACK may be resampled using the
+   appropriate transformation structures located within the image's
+   extensions. Using these facilities allows many images to be aligned
    with one invocation.
 2 Parameters
 For information on individual parameters, select from the list below:
@@ -7380,26 +7384,26 @@ CONSERVE = _LOGICAL (Read)
    conserves flux.  If CONSERVE is FALSE, there is no
    normalisation.  [TRUE]
 3 IN
-IN = NDF (Read)
-   A list of NDF names whose data are to be transformed. The NDF
+IN = image (Read)
+   A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
 3 INEXT
 INEXT = _LOGICAL (Read)
    If TRUE then the transformation which is to be applied to the
-   NDF is stored in the NDF's CCDPACK extension
+   image is stored in the image's CCDPACK extension
    (.MORE.CCDPACK.TRANSFORM). If FALSE then a transformation
    structure must be supplied via the parameter TRANSFORM. This
-   transformation is then applied to the list of NDFs.  [TRUE]
+   transformation is then applied to the list of images.  [TRUE]
 3 LBOUND
 LBOUND() = _INTEGER (Read)
    If SHAPE is "SPECIFY" then this parameter specifies the lower
-   pixel-index bounds of all the output NDFs. The number of
+   pixel-index bounds of all the output images. The number of
    values should equal the maximum number of dimensions of the
-   input NDFs. The suggested defaults are the lower bounds
-   generated by the SHAPE="AUTO" option for the first NDF. These
+   input images. The suggested defaults are the lower bounds
+   generated by the SHAPE="AUTO" option for the first image. These
    bounds are probably small enough to ensure that all the
-   transformed data (of the first NDF) will appear in the output
-   NDF.
+   transformed data (of the first image) will appear in the output
+   image.
    [Dynamic default]
 3 LOGFILE
 LOGFILE = FILENAME (Read)
@@ -7434,25 +7438,25 @@ LOGTO = LITERAL (Read)
    [BOTH]
 3 METHOD
 METHOD = LITERAL (Read)
-   The interpolation method used to resample the input NDF data
+   The interpolation method used to resample the input image data
    arrays. Permitted values are "NEAREST" for nearest-neighbour,
    and "LININT" for linear interpolation.
    [NEAREST]
 3 OUT
 OUT = LITERAL (Write)
-   Names of the output -- transformed -- NDFs. These may be
+   Names of the output -- transformed -- images. These may be
    specified as list of comma separated names, using indirection
    if required, or, as a single modification element (of the
    input names). The simplest modification element is the
-   asterisk "*" which means call each of the output NDFs the same
-   name as the corresponding input NDFs. So,
+   asterisk "*" which means call each of the output images the same
+   name as the corresponding input images. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names. Other
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names. Other
    types of modification can also be used, such as,
       OUT > *-TRN
-   which means call the output NDFs the same as the input NDFs
+   which means call the output images the same as the input images
    but add -TRN to the end of the names. Replacement of a
    specified string with another in the output file names can
    also be used,
@@ -7462,20 +7466,20 @@ OUT = LITERAL (Write)
 3 SHAPE
 SHAPE = LITERAL (Read)
    The method to be used to determine the SHAPE of the output
-   NDFs. Can take one of the values "AUTO", "SAME", "SPECIFY".
+   images. Can take one of the values "AUTO", "SAME", "SPECIFY".
    With the meanings.
 
       - AUTO    -- automatically determine the bounds of the
-                   output NDFs such that all of the input data
+                   output images such that all of the input data
                    appears. This is achieved by transforming test
                    points along the current bounds so assumes
                    that the transformation will behave reasonably.
 
-      - SAME    -- set the output NDF bounds to those of the
-                   corresponding input NDFs.
+      - SAME    -- set the output image bounds to those of the
+                   corresponding input images.
 
       - SPECIFY -- you will specify a single set of bounds for
-                   all the output NDFs. (See the LBOUND and UBOUND
+                   all the output images. (See the LBOUND and UBOUND
                    parameters.)
    [AUTO]
 3 TRANSFORM
@@ -7486,24 +7490,24 @@ TRANSFORM = TRN (Read)
    TRANSFORM structure called MAPPING in the HDS file DISTORT.
    Normally the object name is TRANSFORM.  The structure must
    contain both the forward and inverse mappings. This transform
-   if supplied acts on all the input NDFs.
+   if supplied acts on all the input images.
 3 UBOUND
 UBOUND() = _INTEGER (Read)
    If SHAPE is "SPECIFY" then this parameter specifies the upper
-   pixel-index bounds of all the output NDFs. The number of
+   pixel-index bounds of all the output images. The number of
    values should equal the maximum number of dimensions of the
-   input NDFs. The suggested defaults are the upper bounds
-   generated by the SHAPE="AUTO" option for the first NDF. These
+   input images. The suggested defaults are the upper bounds
+   generated by the SHAPE="AUTO" option for the first image. These
    bounds are probably large enough to ensure that all the
-   transformed data (of the first NDF) will appear in the output
-   NDF.
+   transformed data (of the first image) will appear in the output
+   image.
    [Dynamic default]
 2 Examples
 tranndf * *-trn reset
-   This transforms all the NDFs in the current directory if
+   This transforms all the images in the current directory if
    they contain suitable transformation structures in their
    extensions. It uses nearest-neighbour resampling and conserves
-   the flux levels. The output NDFs are of a size such that all
+   the flux levels. The output images are of a size such that all
    the input pixels have contributed.
 
 tranndf curved straight linint shape=same
@@ -7512,9 +7516,9 @@ tranndf curved straight linint shape=same
 
 tranndf a119* *s inext=false transform=proj.merc shape=bounds
         lbound=[1,-20] ubound=[256,172]
-   This transforms the NDFs called a119*, using the transformation
-   merc in the HDS file called proj, into NDFs called a119*s.
-   It uses nearest-neighbour resampling.  All the output NDFs
+   This transforms the images called a119*, using the transformation
+   merc in the HDS file called proj, into images called a119*s.
+   It uses nearest-neighbour resampling.  All the output images
    have size 256 x 192 pixels and origin (1,-20).
 2 Notes
 - This application is a restricted form of the KAPPA routine
@@ -7553,7 +7557,7 @@ PDRAPER: Peter Draper (STARLINK)
     Original version.
 
  18-JUN-1993 (PDRAPER):
-    Changed for use in CCDPACK pipe-line - Lists of NDFs,
+    Changed for use in CCDPACK pipe-line - Lists of images,
     information logging etc. Restricted functionality to that which
     is used by CCDPACK (no axes information).
 
@@ -7572,15 +7576,15 @@ PDRAPER: Peter Draper (STARLINK)
       -  AXES, LABEL, UNITS, HISTORY, and extensions are merely
          propagated.
 
-      -  QUALITY is not derived from the input NDF for a linearly
-         interpolated NDF. The DATA and VARIANCE arrays are
+      -  QUALITY is not derived from the input image for a linearly
+         interpolated image. The DATA and VARIANCE arrays are
          resampled.
 
    -  Bad pixels, including automatic quality masking, are supported.
 
    -  All non-complex numeric data types are supported.
 
-   -  There can be an arbitrary number of NDF dimensions.
+   -  There can be an arbitrary number of image dimensions.
 1 XREDUCE
 Starts the automated CCD data reduction GUI.
 
@@ -7714,19 +7718,19 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  Comments are allowed in position lists using the character "#".
  In-line and whole-line comments are allowed.
 
- Usually position lists are "associated" with NDFs. What is means is
+ Usually position lists are "associated" with images. What is means is
  that when a position list is created a record of its name is kept
- in the extension of the NDF. It is then usual to refer to the NDF
+ in the extension of the image. It is then usual to refer to the image
  instead of the position list when the position list is to be
  accessed. Applications which create new position lists (from old
- ones) associate the new position lists with the appropriate NDF.
+ ones) associate the new position lists with the appropriate image.
  Using this method avoids any confusion about the relationship of
- position lists and NDFs, which is vital when determining the
- registration of many NDFs at one go. It also allows the use of
- the wildcarding properties of NDF names when accessing position
+ position lists and images, which is vital when determining the
+ registration of many images at one go. It also allows the use of
+ the wildcarding properties of image names when accessing position
  lists.
 
- Position lists may be associated with NDFs using the CCDEDIT
+ Position lists may be associated with images using the CCDEDIT
  routine. It is also possible to disable associations using the
  NDFNAMES global parameter (CCDSETUP).
 
@@ -7746,34 +7750,35 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  one name, or if given in response to a prompt. When using the C-shell
  it is necessary to protect the "" so that the final string passed to
  the application still contains these (so a suitable response would be
- '"ndf1,ndf2"').
+ '"image1,image2"').
 
 2 Input wildcards
- The names of NDFs given to CCDPACK routines may include wildcard
- specifications such as
+ The names of images given to CCDPACK routines may include wildcard
+ specifications such as:
 
       *,?,[a-z]
 
  all of which have usual meanings, i.e. any number of characters and a
-  single character, a range of characters etc.
- The simplest return would then be
+ single character, a range of characters etc.
+ The simplest return would then be:
 
       IN > *
 
- and all the NDFs in the current directory would be accessed. Other
- possibilities include specifications such as.
+ and all the images in the current directory would be accessed. Other
+ possibilities include specifications such as:
 
-      IN > bias/*            (all NDFs in the bias/ subdirectory)
+      IN > bias/*            (all images in the bias/ subdirectory)
 
-      IN > rdata/*,bdata/*   (all NDFs in the rdata/ and bdata/  
+      IN > rdata/*,bdata/*   (all images in the rdata/ and bdata/  
                               subdirectories)                    
-      IN > ffr*              (all NDFs whose names begin with ffr)
+      IN > ffr*              (all images whose names begin with ffr)
                                                            
-      IN > NGC2261_?         (all NDFs whose names begin with NGC2261_
+      IN > NGC2261_?         (all images whose names begin with NGC2261_
                               followed by one extra character)
 
- The names of NDFs given to programs (except for XREDUCE) should not 
- include the .sdf file extension.
+ If you are processing foreign data formats (i.e. non-NDF ones) then
+ you can also wildcard these files, which may or may not include the 
+ file extension.
 
 2 Indirection
  Names can also be stored in ordinary text files. Indirection through a
@@ -7781,7 +7786,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
 
       ^ 
 
- The names may include wildcards (for NDFs) and other indirections (up to
+ The names may include wildcards (for images) and other indirections (up to
  7 deep). A typical response might be:
 
       IN > ^rflatfields.lis
@@ -7794,7 +7799,7 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
       rflats/*
 
  Indirection can be mixed with other specifications in response to a
- prompt (or on the command line) i.e.
+ prompt (or on the command line) i.e.:
 
       IN > *,^otherframes,elsewhere/r*
 
@@ -7805,50 +7810,50 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  All output names may be created from wildcards and/or formed through
  indirection. However, this is not as flexible as the input scheme,
  and wildcards and indirection cannot be mixed. An example of an
- output specification is
+ output specification is:
 
       OUT > *
 
- This means call all the output NDFs the same as the input NDFs and put
+ This means call all the output images the same as the input images and put
  them in the same directory. Not necessarily what you want to do.
 
       OUT > *_debias
 
- This means call all the output NDFs the same name as the associated
- input NDFs, but append the string `_debias' to the names. A
+ This means call all the output images the same name as the associated
+ input images, but append the string `_debias' to the names. A
  third option using wildcard methods is to replace the occurrences of a
- particular string within the input names with a new string, e.g.
+ particular string within the input names with a new string, e.g.:
 
       OUT > *|debias|flattened|
 
- This will end with the NDF names having the string `debias'
+ This will end with the image names having the string `debias'
  replaced with `flattened'. Indirection files follow the usual
  rules --- but if a wildcard is used in the file this must be the only
  entry --- and of course explicit names can be always be given for the
- output NDFs in response to a prompt or on the command line.
+ output images in response to a prompt or on the command line.
 
- When NDF names include the directories too, only the NDF name itself may
- be modified. NDF names always exclude the `.sdf' file type
- extension. Changing the directory of the output NDFs (which otherwise
- will always be the same as the input NDFs) is achieved by commands
- like
+ When image names include the directories too, only the image name
+ itself may be modified. Image names always exclude the `.sdf' file type
+ extension (or whatever your foreign data format extension is). Changing 
+ the directory of the output images (which otherwise will always be the 
+ same as the input images) is achieved by commands like:
 
       IN > /temp/auser/raw/*_ccd
       OUT > /home/auser/pro/*|_ccd|-pr|
 
- Which in this case will take all the NDFs `*\_ccd' from one directory
- and create new NDFs in the second directory replacing any occurrences
- of the string `_ccd' with `-pr'. (Remember the `*' in NDF output
- expressions represents only the names of the input NDFs not the
+ Which in this case will take all the images `*\_ccd' from one directory
+ and create new images in the second directory replacing any occurrences
+ of the string `_ccd' with `-pr'. (Remember the `*' in image output
+ expressions represents only the names of the input images not the
  directory or any other information, these are only used if no
- `preferences' are shown in the output expression. To keep NDFs from
- other directories in the current directory use commands like
+ `preferences' are shown in the output expression. To keep images from
+ other directories in the current directory use commands like:
 
       IN > elsewhere/*
       OUT > ./*
 
- In general the same rules apply for non-NDF output names (such as
- when position list access routines are not using NDFs to supply the
+ In general the same rules apply for non-image output names (such as
+ when position list access routines are not using images to supply the
  name of the appropriate file), the only real difference is that when
  dealing with file names the complete name will be used (including the
  file type and directory information) and any substitutions must take
@@ -7893,14 +7898,14 @@ PDRAPER: P.W. Draper (STARLINK, Durham University)
  
  % ccdnote '"Example of typical CCDPACK reduction sequence"'
 
-     Make the calibration bias NDF. RESET any previous parameter
+     Make the calibration bias image. RESET any previous parameter
      values back to their defaults (important in case of any
      previously latched parameters).
      ---
 
  % makebias in='bias/*' out=bias/master_bias method=median reset accept
 
-     DEBIAS all the NDFs. Note using a calibration bias NDF and 
+     DEBIAS all the images. Note using a calibration bias image and 
      normalising to the bias strip.
      ---
 

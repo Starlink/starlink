@@ -71,6 +71,8 @@
 *  History:
 *     4-MAR-1997 (PDRAPER):
 *        Original version, heavily based on KAPPA:FITSIMP.
+*     12-NOV-1997 (PDRAPER):
+*        Modified to switch off NDF conversion.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -125,6 +127,7 @@
       INTEGER NTOK              ! Number of tokens on line
       INTEGER PNTR( 1 )         ! Pointer to mapped FITS headers
       INTEGER TRNI( 2 )         ! TRANSFORM workspace
+      INTEGER DOCVT             ! Current NDF foreign conversion status
       LOGICAL FOUND             ! Was a value found?
       LOGICAL LVAL              ! Logical FITS value
       LOGICAL SEETRN            ! TRANSFORM keywords are located 
@@ -136,6 +139,13 @@
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*  Tune NDF to not convert the input data from a foreign format. This
+*  routine should always be passed an NDF and conversion on release
+*  of the NDF isn't desirable. Note we store the current state of DOCVT
+*  and restore it on exit.
+      CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS )
+      CALL NDF_TUNE( 0, 'DOCVT', STATUS )
 
 *  Obtain the NDF to be updated.
       CALL NDF_ASSOC( 'IN', 'UPDATE', IDIN, STATUS )
@@ -390,6 +400,9 @@
       CALL DAT_ANNUL( LOC, STATUS )
       CALL NDF_ANNUL( IDIN, STATUS )
       
+*  Restore the NDF tuning parameter.
+      CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS )
+
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
          CALL ERR_REP( 'CCDIMP_ERR',

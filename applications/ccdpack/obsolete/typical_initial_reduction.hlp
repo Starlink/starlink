@@ -37,14 +37,14 @@
  
  % ccdnote '"Example of typical CCDPACK reduction sequence"'
 
-     Make the calibration bias NDF. RESET any previous parameter
+     Make the calibration bias image. RESET any previous parameter
      values back to their defaults (important in case of any
      previously latched parameters).
      ---
 
  % makebias in='bias/*' out=bias/master_bias method=median reset accept
 
-     DEBIAS all the NDFs. Note using a calibration bias NDF and 
+     DEBIAS all the images. Note using a calibration bias image and 
      normalising to the bias strip.
      ---
 

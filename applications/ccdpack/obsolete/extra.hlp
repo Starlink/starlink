@@ -43,24 +43,24 @@
 
  The main CCDPACK routines are.
 
-    MAKEBIAS - produces a bias calibration NDF
+    MAKEBIAS - produces a bias calibration image
 
-    DEBIAS   - debiases NDFs either by bias calibration NDF 
+    DEBIAS   - debiases images either by bias calibration image
                subtraction or by interpolation, applies bad data 
                masks, extracts a subset of the data area, produces 
                variances applies saturation values
 
-    MAKECAL  - produces calibration NDFs for flash or dark counts
+    MAKECAL  - produces calibration images for flash or dark counts
 
     CALCOR   - performs dark or flash count corrections
 
-    MAKEFLAT - produces a calibration flatfield NDF
+    MAKEFLAT - produces a calibration flatfield image
 
     FLATCOR  - performs the flatfield correction
 
-    FINDCENT - centroids NDF image features
+    FINDCENT - centroids image features
 
-    FINDOBJ  - locates and centroids NDF image features
+    FINDOBJ  - locates and centroids image features
 
     FINDOFF  - matches unlabelled position lists which are related 
                by a simple offset.
@@ -68,10 +68,10 @@
     IDICURS  - reads co-ordinates from a graphics device (allows
                zooming and panning)
 
-    MAKEMOS  - makes NDF mosaics by combining and (optionally) 
+    MAKEMOS  - makes image mosaics by combining and (optionally) 
                normalising
 
-    PAIRNDF  - displays and manipulates NDF pairs to allow easy
+    PAIRNDF  - displays and manipulates image pairs to allow easy
                registration (offsets only)
 
     PLOTLIST - draws position markers on graphics displays
@@ -80,9 +80,9 @@
 
     TRANLIST - transforms lists of positions
 
-    TRANNDF  - transforms (resamples) NDFs
+    TRANNDF  - transforms (resamples) images
 
-    CCDALIGN - determines general inter-NDF transformations
+    CCDALIGN - determines general inter-image transformations
 
  Routines which support the function of the main tasks are.
 
@@ -106,73 +106,10 @@
     LISTLOG  - lists the contents of a logfile. The output may be
                written to a printable file (VMS only)
 
-    CCDEDIT  - edits the CCDPACK extensions of NDFs
+    CCDEDIT  - edits the CCDPACK extensions of images
 
-    CCDNDFAC - accesses a list of NDFs, writing their names to a file
+    CCDNDFAC - accesses a list of images, writing their names to a file
     
-
-1 VMS_Typical_Initial_Reduction
-
- The following text displays the input to a typical initial reduction
- sequence, performed using the CCDPACK DCL atasks. Note the sequence
- of operations.
-
- $! set up atask symbols etc.
- $!
- $ CCDPACK
- $!
- $! Clear any previous global parameters.
- $!
- $ CCDCLEAR \
- $!
- $! Now set up the new global parameters. Set the bounds of the bias 
- $! strip, the nominal readout noise value (in ADUs), the nominal 
- $! Analogue to Digital Conversion (ADC) factor, the readout 
- $! direction (along the X dimension). Set the useful extent of the 
- $! CCD area, initialise the logfile system to write to the terminal
- $! and to echo to the logfile. Set PRESERVE to keep the input data 
- $! type.
- $!
- $ CCDSETUP BOUNDS=[323,349] RNOISE=10 ADC=1 DIRECTION=X -
-            EXTENT=[4,318,3,510] LOGTO=BOTH LOGFILE=CCDPACK.LOG 
-            PRESERVE=TRUE RESET \
- $!
- $! Add some notes about this run. --- The commands after this point
- $! could be entered into file and used as the input to CCDBATCH, 
- $! whose output could then be submitted to a batch queue.
- $!
- $ CCDNOTE "Example of typical CCDPACK reduction sequence" \
- $!
- $! Make the calibration bias NDF. RESET any previous parameter 
- $! values back to their defaults (important in case of any 
- $! previously latched parameters).
- $!
- $ MAKEBIAS IN=[.BIAS]* OUT=[.BIAS]MASTER_BIAS METHOD=MEDIAN RESET \
- $!
- $! DEBIAS all the NDFs. Note using a calibration bias NDF and 
- $! normalising to the bias strip.
- $!
- $ DEBIAS IN="[.FLATR]*,[.FLATB]*,[.BDATA]*,[.RDATA]*" -
-          OUT=*_DEBIAS MASK=[.MASK]MASK BIAS=[.BIAS]MASTER_BIAS 
-          RESET \
- $!
- $! Create the calibration flat fields
- $!
- $ MAKEFLAT IN=[.FLATR]*_DEBIAS OUT=[.FLATR]MASTER_FLAT RESET \
- $ MAKEFLAT IN=[.FLATB]*_DEBIAS OUT=[.FLATB]MASTER_FLAT RESET \
- $!
- $! Flat field the appropriate frames.
- $!
- $ FLATCOR IN=[.RDATA]*_DEBIAS OUT=[.RDATA]*/DEBIAS/FLATTENED/ -
-           FLAT=[.FLATR]MASTER_FLAT RESET \
- $ FLATCOR IN=[.BDATA]*_DEBIAS OUT=[.BDATA]*/DEBIAS/FLATTENED/ -
-           FLAT=[.FLATB]MASTER_FLAT RESET \
- $!
- If dark counts or pre-flash frames need processing, then they should
- be debiassed and made into calibration masters using MAKECAL. The
- calibration frame should then be (appropriately) subtracted from all 
- frames before producing the flatfields and performing flatfield
- correction.
 
 1 Unix_Typical_Initial_Reduction
 
@@ -208,13 +145,13 @@
  #
  % ccdnote '"Example of typical CCDPACK reduction sequence"'
  #
- # Make the calibration bias NDF. RESET any previous parameter values
+ # Make the calibration bias image. RESET any previous parameter values
  # back to their defaults (important in case of any previously latched
  # parameters).
  #
  % makebias in='bias/*' out=bias/master_bias method=median reset accept
  #
- # DEBIAS all the NDFs. Note using a calibration bias NDF and 
+ # DEBIAS all the images. Note using a calibration bias image and 
  # normalising to the bias strip.
  #
  % debias in='"flatr/*,flatb/*,bdata/*,rdata/*"' out='*_debias' \
@@ -239,43 +176,6 @@
  frames before producing the flatfields and performing flatfield
  correction.
 
-1 Changes_this_release
-
- - CCDPACK is now at version 1.0 and has undergone a major 
- functionality enhancement. Support is now provided for the 
- registration and mosaicing of NDFs. The new applications are:
-
-    - FINDCENT -- centroids NDF image features
-
-    - FINDOBJ  -- locates and centroids NDF image features
-
-    - FINDOFF  -- matches unlabelled position lists which are related by a
-                  simple offset.
-
-    - IDICURS  -- reads co-ordinates from a graphics device (allows 
-                  zooming and panning)
-
-    - MAKEMOS  -- makes NDF mosaics by combining and (optionally) 
-                  normalising
-
-     - PAIRNDF  -- displays and manipulates NDF pairs to allow easy
-                  registration (offsets only)
-
-    - PLOTLIST -- draws position markers on graphics displays
-
-    - REGISTER -- determines transformations between many lists of 
-                  positions
-
-    - TRANLIST -- transforms lists of positions
-
-    - TRANNDF  -- transforms (resamples) NDFs
-
-    - CCDALIGN -- helps determine general inter-NDF transformations
-
-    - CCDEDIT  -- edits the CCDPACK extensions of NDFs
-
-    - CCDNDFAC -- accesses a list of NDFs, writing their names to a file
-
  -  Highlights.
  Using a combination of these routines (FINDOBJ, FINDOFF, REGISTER,
  TRANNDF and MAKEMOS) it is possible to register, align, normalise
@@ -284,19 +184,19 @@
 
  Two interactive applications are provided for user controlled
  registration, CCDALIGN and PAIRNDF. PAIRNDF is a specialist application
- which eases the selection of objects in (many) NDFs which are simply
+ which eases the selection of objects in (many) images which are simply
  translated from each other (this removes the requirement to
  pre-select the labelling of the objects on every frame). CCDALIGN is
  a general purpose procedure for aligning single or multiple groups of
- NDFs.
+ images.
 
- TRANNDF resamples NDFs. The transformations may be arbitrary if
+ TRANNDF resamples images. The transformations may be arbitrary if
  entered using the CCDEDIT facility. General transformations using
  algebraic expressions are supported by REGISTER, TRANLIST, CCDEDIT
  and TRANNDF.
 
  MAKEMOS is a comprehensive application for producing a mosaic from a
- list of aligned NDFs. It also provides very robust normalisation
+ list of aligned images. It also provides very robust normalisation
  methods for data with varying exposures and/or sky transparencies.
 
 1 Position_lists
@@ -325,127 +225,20 @@
  Comments are allowed in position lists using the character "#".
  In-line and whole-line comments are allowed.
 
- Usually position lists are "associated" with NDFs. What is means is
+ Usually position lists are "associated" with images. What is means is
  that when a position list is created a record of its name is kept
- in the extension of the NDF. It is then usual to refer to the NDF
+ in the extension of the image. It is then usual to refer to the image
  instead of the position list when the position list is to be
  accessed. Applications which create new position lists (from old
- ones) associate the new position lists with the appropriate NDF.
+ ones) associate the new position lists with the appropriate image.
  Using this method avoids any confusion about the relationship of
- position lists and NDFs, which is vital when determining the
- registration of many NDFs at one go. It also allows the use of
- the wildcarding properties of NDF names when accessing position
+ position lists and images, which is vital when determining the
+ registration of many images at one go. It also allows the use of
+ the wildcarding properties of image names when accessing position
  lists.
 
- Position lists may be associated with NDFs using the CCDEDIT
+ Position lists may be associated with images using the CCDEDIT
  routine. It is also possible to disable associations using the
  NDFNAMES global parameter (CCDSETUP).
-
-1 Accessing_lists_of_NDFs_etc.
-
- Perhaps the most noticeable of CCDPACK's "features" is its ability to
- accept, and process, lists of NDF names and other associated parameters,
- such as exposure times and position list names (see topic Position lists).
- A list of these "names" can be supplied in response to one prompt, or can 
- be supplied on successive lines using the continuation character "-" 
- to force a re-prompt for more specifications. A list of names consists of 
- a series of character strings separated by commas. Note that the list 
- itself is really a string not a vector and should be enclosed in quotes 
- ( " " if using DCL or C shell, ` ` or " " if using ICL) if given on the
- command line, not square brackets as a vector quantity would. The quotes
- are not necessary if the list consists of only one name, or if given in
- response to a prompt.
-
- - Input wildcards
- The names of NDFs given to CCDPACK routines may include wildcard
- specifications. On VMS wildcards as given to the directory command may
- be used e.g.:
-    
-    *,%, and [...]
-
- On UNIX wildcards as used by the "ls" command may be used, e.g.:
-
-    *,?,[a-z]
-
- all of which have usual meanings, i.e. any number of characters and a
- single character, for *,% and *,?. The simplest return would then be
-
-    IN > *
-
- and all the NDFs in the current directory would be accessed. Other
- possibilities include specifications such as (UNIX examples shown in
- {}):
-
-      IN > [.BIAS]*             (all NDFs in the BIAS subdirectory)
-    { IN > bias/* }             
-
-      IN > [.RDATA]*,[.BDATA]*  (all NDFs in the RDATA and BDATA
-    { IN > rdata/*,bdata/* }     subdirectories)
-
-      IN > FFR*                 (all NDFs whose names begin with FFR)
-    { IN > ffr* }
-
-      IN > NGC2261_%            (all NDFs whose names begin with 
-    { IN > NGC2261_? }           NGC2261_, followed by one extra 
-
- - Indirection
- The names can also be supplied using ordinary text files containing
- lists of allowed specifications. Indirection through a text file is
- indicated by the character ^.
-
- The names may include wildcards (for NDFs) and other indirections (up to
- 7 deep). A typical response might be:
-
-    IN > ^RFLATFIELDS.LIS
-
- the RFLATFIELDS.LIS file would contain something like:
-
-    FFR1
-    FFR4
-    FFR10
-    [.RFLATS]*
-
- Indirection can be mixed with other specifications in response to a
- prompt (or on the command line) i.e.
-
-      IN > *,^otherframes,[.elsewhere]r*
-    { IN > *,^otherframes,elsewhere/r* }
-     
-   
- etc.
-
- - Output names
- All output names may be created from wildcards and/or formed through 
- indirection. However, this is not as flexible as the input scheme, 
- and wildcards and indirection cannot be mixed. An example of an
- output specification is
-
-    OUT > *
-
- This means call all the output NDFs the same as the input NDFs (a higher
- version .SDF file will be created on VMS, an error will result on UNIX
- which has no version numbers). Another possibility would be
-
-    OUT > *_DEBIAS
-
- This means call all the output NDFs the same name as the associated
- input NDFs, but append the string "_DEBIAS" to the names. A third
- option using wildcard methods is to replace the occurrences of a
- particular string within the input names with a new string, e.g.
-
-     OUT > *_DEBIAS/DEBIAS/FLATTENED/
-
- This will end with the NDF names having the string "DEBIAS" replaced
- with "FLATTENED". Note that substitution is case sensitive on UNIX.
- Indirection files follow the usual rules --- but remember that if a 
- wildcard is used in the file this must be the only
- entry --- and of course explicit names can be always be given for the
- output NDFs in response to a prompt or on the command line.
-
- The same rules apply for non-NDF output names (such as when position
- lists access routines are not using NDFs to supply the name of the
- appropriate file), the only real difference is that when dealing with
- file names the complete name will be used (including the file type)
- and any substitutions must take this into account.
 
 ! $Id$

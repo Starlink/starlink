@@ -8,7 +8,7 @@ Usage:
 
 Description:
 
-   This routine accepts a list of NDFs which may be aligned using
+   This routine accepts a list of images which may be aligned using
    simple offsets. In a first interactive section pairs of images
    may be selected from a palette of images (which are drawn down
    the side of the display). Passing on to a second section the
@@ -28,10 +28,10 @@ Description:
    to ensure completeness is enforced by insisting that each pair,
    except for the first, contains one previously paired image).
    When this is complete a global merger of the all the positions
-   for each NDF takes place. This results in the output of one list
-   of uniquely labelled positions for each NDF. These position lists
+   for each image takes place. This results in the output of one list
+   of uniquely labelled positions for each image. These position lists
    can then be used in a routine such as REGISTER to produce the
-   actual transformation between the NDFs.
+   actual transformation between the images.
 
 Parameters:
 
@@ -45,7 +45,7 @@ FILLFRAC = _DOUBLE (Read)
    range 0.05 to 0.95.
    [0.55]
 IN = LITERAL (Read)
-   A list of NDF names whose data are to be transformed. The NDF
+   A list of image names whose data are to be transformed. The image
    names should be separated by commas and may include wildcards.
 KEEPLUT = _LOGICAL (Read)
    Whether to retain the current device look-up-table. If FALSE
@@ -85,7 +85,7 @@ LOGTO = LITERAL (Read)
 MAKEBIG = _LOGICAL (Read)
    If TRUE then images will be scaled to fit into the whole of
    the FILLFRAC area. If FALSE then scaling will never exceed
-   one device pixel per NDF pixel. This latter option decreases
+   one device pixel per image pixel. This latter option decreases
    the time needed to process images from the display palette
    into the scratch region.
    [TRUE]
@@ -103,7 +103,7 @@ NAMELIST = LITERAL (Read)
    generated using the expression given to the OUTLIST parameter.
    This file may be used in an indirection expression to input
    all the position lists output from this routine into another
-   routine, if the associating position lists with NDFs option is
+   routine, if the associating position lists with images option is
    not being used.
    [PAIRNDF.LIS]
 OUTLIST = LITERAL (Read)
@@ -114,24 +114,23 @@ OUTLIST = LITERAL (Read)
    using indirection if required, OR, as a single modification
    element (of the input names). The simplest modification
    element is the asterisk "*" which means call each of the
-   output lists the same name as the corresponding input NDFs (but
-   without the ".SDF" extension).
-   So,
+   output lists the same name as the corresponding input images.
+   So:
       IN > *
       OUTLIST > *
-   signifies that all the NDFs in the current directory should be
+   signifies that all the images in the current directory should be
    used and the output lists should have the same names.
 
    Other types of modification can also occur, such as,
       OUTLIST > *_objs.dat
-   which means call the position lists the same as the input NDFs
+   which means call the position lists the same as the input images
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
       outlist > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input NDFs are used then is it
+   If wildcarded names for the input images are used then is it
    recommended that wildcards are also used for the position list
    names as the correspondence between these may be confusing.
    [*.DAT]
@@ -156,8 +155,8 @@ Examples
 
 pairndf '*'  '*.dat' xw '[1,99]'
   In this routine the positional nature of the parameters is
-  shown. All the NDFs in the current directory are displayed.
-  Their output positions lists have the same name as the NDFs
+  shown. All the images in the current directory are displayed.
+  Their output positions lists have the same name as the images
   except that they have a file type of .dat. The images are 
   displayed using the percentile limits 1,99 which shows bright 
   detail well.
@@ -236,7 +235,7 @@ Notes
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the names of the
+  (.MORE.CCDPACK) of the input images are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.

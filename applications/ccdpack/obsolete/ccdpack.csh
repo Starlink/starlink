@@ -161,8 +161,8 @@
       else
          setenv NDF_XTN CCDPACK
       endif
-      setenv NDF_IMP_CCDPACK '$CCDPACK_DIR/ccdimp.csh ^ndf'
-      setenv NDF_EXP_CCDPACK '$CCDPACK_DIR/ccdexp.csh ^ndf'
+      setenv NDF_IMP_CCDPACK '$CCDPACK_DIR/ccdimp ^ndf'
+      setenv NDF_EXP_CCDPACK '$CCDPACK_DIR/ccdexp ^ndf'
 
 #
 #   Show that the CCDPACK commands are now available.

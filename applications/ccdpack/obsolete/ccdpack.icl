@@ -73,10 +73,27 @@ defhelp   tranlist      $CCDPACK_HELP
 defhelp   tranndf       $CCDPACK_HELP
 defhelp   xreduce       $CCDPACK_HELP
 defstring ccdhelp       help ccdpack
+
+{ Setup conversion of header information for when using foreign data
+{ access.
+hidden proc ccdpack_xtn_set
+   ndf_xtn = getenv("NDF_XTN")
+   xtn_index = index( ndf_xtn, "CCDPACK" )
+   if xtn_index=0
+      if ndf_xtn = ""
+         setenv NDF_XTN "CCDPACK"
+      else
+         setenv NDF_XTN (ndf_xtn)",CCDPACK"
+      end if
+   end if
+   setenv NDF_IMP_CCDPACK "$CCDPACK_DIR/ccdimp ^ndf"
+   setenv NDF_EXP_CCDPACK "$CCDPACK_DIR/ccdexp ^ndf"
+end proc
+ccdpack_xtn_set
+
 {
 { Print welcome message
 {
-
 print " "
 print "   CCDPACK commands are now available - (version PKG_VERS)"
 print " "

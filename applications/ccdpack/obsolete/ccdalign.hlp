@@ -1,6 +1,6 @@
 .help ccdalign Starlink ccdpack
 .nf
-Interactive procedure to aid the alignment of NDFs.
+Interactive procedure to aid the alignment of images.
 
 Usage:
 
@@ -8,20 +8,20 @@ Usage:
 
 Description:
 
-   This procedure aids the registration of NDFs which are not
+   This procedure aids the registration of images which are not
    related by simple offsets (see FINDOFF and PAIRNDF if they are).
-   It also has the capability of dealing with groups of NDFs which
+   It also has the capability of dealing with groups of images which
    are almost registered (frames which have not been moved on the
    sky) saving effort in re-identification of image features.
 
-   The basic method used is to access groups of NDFs (or a series
-   of single NDFs if all are moved between exposures) and an
-   optional reference NDF. The first NDF of the first group or the
-   reference NDF is then displayed and a cursor application is used
+   The basic method used is to access groups of images (or a series
+   of single images if all are moved between exposures) and an
+   optional reference image. The first image of the first group or the
+   reference image is then displayed and a cursor application is used
    to record the positions of centroidable image features. The
-   first NDFs of all the other groups are then displayed and you
+   first images of all the other groups are then displayed and you
    are invited to identify the image features in the order which
-   corresponds to that used for the reference NDF. Missing image
+   corresponds to that used for the reference image. Missing image
    features are identified as off the currently displayed image (so
    the centroid routine will fail to find them). The reference set
    of image features may be extended by identification after the
@@ -30,16 +30,16 @@ Description:
    After centroiding you are then given the option to stop. If
    you decide to then you will have labelled position lists to use
    in the other CCDPACK routines (the labelled positions will be
-   called NDF_NAME.acc). If you chose the option to continue then
-   a full registration of the NDFs will be attempted. This may only
+   called IMAGE_NAME.acc). If you chose the option to continue then
+   a full registration of the images will be attempted. This may only
    be performed for "linear" transformations.
 
    After choosing a transformation type the procedure will then go on
-   to calculate a transformation set between all the NDFs, this is
+   to calculate a transformation set between all the images, this is
    then used (with the extended reference set from REGISTER) to
    approximate the position of all possible image features, these are
-   then located by centroiding and a final registration of all NDFs
-   is performed. The resultant NDFs then have associated lists of
+   then located by centroiding and a final registration of all images
+   is performed. The resultant images then have associated lists of
    labelled positions and TRANSFORM structures which may be used to
    transform other position lists or when resampling the data.
 

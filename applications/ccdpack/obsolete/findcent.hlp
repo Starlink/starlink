@@ -9,22 +9,22 @@ Usage:
 Description:
 
    This routine determines the centroids of image features located
-   in the data components of a list of NDFs. It is useful for
+   in the data components of a list of images. It is useful for
    locating accurate values for the positions of stars given hand
    selected positions. It can also be used for centroiding any
    sufficiently peaked image features.
 
-   The initial positions associated with each NDF are given in
+   The initial positions associated with each image are given in
    formatted files whose names are determined either using the
-   CCDPACK NDF extension item CURRENT_LIST (which is maintained by
+   CCDPACK image extension item CURRENT_LIST (which is maintained by
    list processing CCDPACK applications) or from an explicit list of
    names.
 
 Parameters:
 
 IN = LITERAL (Read)
-   The names of the NDFs whose data components contain image
-   features which are to be centroided.  The NDF names should be
+   The names of the images whose data components contain image
+   features which are to be centroided.  The image names should be
    separated by commas and may include wildcards.
 INLIST = LITERAL (Read)
    If NDFNAMES is FALSE then this parameter will be used to
@@ -33,20 +33,20 @@ INLIST = LITERAL (Read)
    the notes section.
 
    The names of the input lists may use modifications of the
-   input NDF names, so for instance if the position lists are
-   stored in files with the same name as the input NDFs but with
-   a file type of ".dat" instead of ".sdf" then use
+   input image names, so for instance if the position lists are
+   stored in files with the same name as the input images but with
+   a file type of ".dat" instead of ".sdf" then use:
 
       INLIST > *.dat
 
-   (.sdf is always removed from NDF names). If the input list
-   names are a modification of the NDF names say with a trailing
+   If the input list
+   names are a modification of the image names say with a trailing
    type of "_initial.positions". Then a response of
 
       INLIST > *_initial.positions
 
    will access the correct files. Names may also use substitution
-   elements, say the NDF names are *_data and the position lists
+   elements, say the image names are *_data and the position lists
    are *_pos.dat, then a response like
 
        INLIST > *|data|pos.dat|
@@ -54,9 +54,9 @@ INLIST = LITERAL (Read)
    may be used. If a naming scheme has not been used then an
    explicit list of names should be returned (wildcards cannot be
    used to specify list names). These names should be given in
-   the same order as the input NDF names and may use indirection
+   the same order as the input image names and may use indirection
    elements as well as names separated by commas. A listing of
-   the input NDF name order (after any wildcard expansions etc.
+   the input image name order (after any wildcard expansions etc.
    have been made) is shown to make sure that the order is
    correct.
 ISIZE = _INTEGER (Read)
@@ -110,7 +110,7 @@ NAMELIST = LITERAL (Read)
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
    input position lists are stored in the CCDPACK extension item
-   "CURRENT_LIST" of the input NDFs. The names will be present
+   "CURRENT_LIST" of the input images. The names will be present
    in the extension if the positions were located using a CCDPACK
    application (such as IDICURS). Using this facility allows the
    transparent propagation of position lists through processing
@@ -125,9 +125,9 @@ POSITIVE = _LOGICAL (Read)
    [TRUE]
 OUTLIST = FILENAME (Write)
    A list of names specifying the centroid result files. The
-   names of the lists may use modifications of the input NDF
+   names of the lists may use modifications of the input image
    names.  So if you want to call the output lists the same name
-   as the input NDFs except to add a type use.
+   as the input images except to add a type use.
 
       OUTLIST > *.cent
 
@@ -149,21 +149,21 @@ TOLER = _DOUBLE (Read)
 Examples
 
 findcent in='*' outlist='*.cent'
-   In this example all the NDFs in the current directory are
-   processed. It is assumed that the NDFs are associated with
+   In this example all the images in the current directory are
+   processed. It is assumed that the images are associated with
    positions lists of inaccurate positions (via the item
-   CURRENT_LIST in the NDF CCDPACK extensions). These position
-   lists are accessed and centroided with the appropriate NDFs.
+   CURRENT_LIST in the image CCDPACK extensions). These position
+   lists are accessed and centroided with the appropriate images.
    On exit the new lists are named *.cent and are associated with
-   the NDFs (instead of the original "input" lists).
+   the images (instead of the original "input" lists).
 
-findcent ndfnames=false in='"ndf1,ndf2,ndf3"'
-         inlist='"ndf1.pos,ndf2.pos,ndf3.pos"' outlist='*.acc'
+findcent ndfnames=false in='"image1,image2,image3"'
+         inlist='"image1.pos,image2.pos,image3.pos"' outlist='*.acc'
          namelist=new_position_lists
    In this example the position list names are not previously
-   associated with the NDFs and must have their names given
-   explicitly (and in the same order as the NDF names). The
-   output lists are called the same names as the input NDFs except
+   associated with the images and must have their names given
+   explicitly (and in the same order as the image names). The
+   output lists are called the same names as the input images except
    with the extension .acc. The names of the output lists are
    written into the file new_position_lists which can be used to
    pass these names onto another application using indirection
@@ -208,7 +208,7 @@ Notes
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be centroided. On exit this item will be updated to
   reference the name of the centroided list of positions.

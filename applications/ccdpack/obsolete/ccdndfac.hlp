@@ -1,6 +1,6 @@
 .help ccdndfac Starlink ccdpack
 .nf
-Accesses a list of NDFs and writes their names to a file.
+Accesses a list of images and writes their names to a file.
 
 Usage:
 
@@ -8,12 +8,12 @@ Usage:
 
 Description:
 
-   This routine accesses a list of NDFs and writes their names to a
+   This routine accesses a list of images and writes their names to a
    text file. It is intended to be used as an aid to producing
-   procedures which require the facilities of NDF list access used
+   procedures which require the facilities of image list access used
    in CCDPACK. For this reason the usual application introductory
-   message is suppressed. The names of the NDFs may be written
-   out to the terminal as an aid to memory. If no NDFs are accessed
+   message is suppressed. The names of the images may be written
+   out to the terminal as an aid to memory. If no images are accessed
    then the output file will not be created, testing for the
    existence of this file is a platform independent way of
    determining if the invocation has been successful.
@@ -21,8 +21,8 @@ Description:
 Parameters:
 
 ECHO = _LOGICAL (Read)
-   If TRUE then the names of the NDFs will be written to the
-   terminal unless there is only one input NDF.
+   If TRUE then the names of the images will be written to the
+   terminal unless there is only one input image.
    [TRUE]
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -54,29 +54,29 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 IN = LITERAL (Read)
-   A list of NDF names. The NDF names should be separated by commas 
+   A list of image names. The image names should be separated by commas 
    and may include wildcards.
    [!]
 MAXNDF = _INTEGER (Read)
-   The maximum number of NDFs which should be accessed. If a null
+   The maximum number of images which should be accessed. If a null
    return "!" is given for this parameter then the normal CCDPACK
    limit will be applied.
    [!]
 NAMELIST = LITERAL (Read)
    The name of the output file to contain the names of the
-   accessed NDFs.
+   accessed images.
    [CCDNDFAC.LIS]
 
 Examples
 
-ccdndfac ndf_name_list true
-   In this example the list of NDF names is written to
-   ndf_name_list and the NDF names are echoed to the terminal. No
-   constraint is placed on the number of NDFs accessed (other than
+ccdndfac image_name_list true
+   In this example the list of image names is written to
+   image_name_list and the image names are echoed to the terminal. No
+   constraint is placed on the number of images accessed (other than
    the normal CCDPACK limit).
 
-ccdndfac ndf_name true maxndf=1
-   In this example only a single NDF name is accessed. The name is
+ccdndfac image_name true maxndf=1
+   In this example only a single image name is accessed. The name is
    not echoed to the terminal (even though echo is set TRUE).
 
 Behaviour_of_parameters

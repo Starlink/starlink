@@ -1,7 +1,7 @@
 .help makemos Starlink ccdpack
 .nf
 Make a mosaic by combining and (optionally) normalising a set of
-NDFs.
+images.
 
 Usage:
 
@@ -9,17 +9,17 @@ Usage:
 
 Description:
 
-   This is a comprehensive application for combining a set of NDFs
+   This is a comprehensive application for combining a set of images
    (normally representing overlapping coverage of an object) into a
    single mosaic. It addresses the problems of (a) combining a
-   sequence of separate data sets into a single NDF and (b)
-   optionally normalising each NDF so that they match each other in
-   regions where they overlap. Mutual alignment of the separate NDFs
+   sequence of separate data sets into a single image and (b)
+   optionally normalising each image so that they match each other in
+   regions where they overlap. Mutual alignment of the separate images
    is not performed by this application and must be addressed
-   beforehand (although NDFs may be aligned to the nearest pixel
+   beforehand (although images may be aligned to the nearest pixel
    simply by shifting their pixel origin).
 
-   MAKEMOS registers the set of NDFs supplied by matching their
+   MAKEMOS registers the set of images supplied by matching their
    pixel indices and then forms a mosaic by combining the separate
    input pixel values at each location using a nominated
    data-combination method (by default, it takes the median).  The
@@ -27,7 +27,7 @@ Description:
    input data, with any output data pixels which do not receive
    values from the input being set to the "bad" pixel value.
    Account is taken of variance information associated with the
-   input NDFs, and all calculations are optimally weighted to
+   input images, and all calculations are optimally weighted to
    minimise the output noise. Output variance estimates for the
    final mosaic may also be produced.
 
@@ -36,16 +36,16 @@ Description:
    this is often not the case, since data frequently have differing
    effective exposure times and background levels which give
    discontinuities in the final mosaic. Thus, MAKEMOS also addresses
-   the problem of normalising the input NDFs to make them mutually
+   the problem of normalising the input images to make them mutually
    consistent. It does this by optionally applying optimised
    multiplicative and/or additive corrections (termed scale-factor
-   and zero-point corrections) to each NDF before forming the
+   and zero-point corrections) to each image before forming the
    mosaic.  These optimised corrections are determined by
-   inter-comparing the input NDFs in pairs, using the regions where
+   inter-comparing the input images in pairs, using the regions where
    they overlap to determine the relative scale-factor and/or
    zero-point difference between each pair.  A self-consistent set
    of corrections is then found which, when applied to each input
-   NDF, will best eliminate these observed differences and give a
+   image, will best eliminate these observed differences and give a
    smooth mosaic.
 
 Parameters:
@@ -60,14 +60,14 @@ ALPHA = _REAL (Read)
    [0.2]
 CMPVAR = _LOGICAL (Read)
    This parameter controls the use of statistical error
-   (variance) information contained in the input NDFs when they
+   (variance) information contained in the input images when they
    are inter-compared in pairs to derive scale-factor or
    zero-point corrections. It is only used if either SCALE or
-   ZERO is set to TRUE and if two or more of the input NDFs
-   contain variance information (a "reference NDF" also counts,
+   ZERO is set to TRUE and if two or more of the input images
+   contain variance information (a "reference image" also counts,
    if supplied). In this case, if CMPVAR is set to TRUE, then
    variance information is used to correctly weight the input
-   data whenever a pair of input NDFs are inter-compared and both
+   data whenever a pair of input images are inter-compared and both
    have variance information available.
 
    The default behaviour is to use variance information during
@@ -75,34 +75,34 @@ CMPVAR = _LOGICAL (Read)
    FALSE, which sometimes gives faster execution without greatly
    affecting the result (also see the "Algorithms Used" section).
    However, if input data with similar values have widely
-   differing variance values within the same input NDF, then use
+   differing variance values within the same input image, then use
    of input variance information is recommended (this could
-   happen, for instance, if an input NDF is the result of a
+   happen, for instance, if an input image is the result of a
    previous mosaic-ing process).
    [TRUE]
 GENVAR = _LOGICAL (Read)
-   If GENVAR is set to TRUE and all the input NDFs supplied
+   If GENVAR is set to TRUE and all the input images supplied
    contain statistical error (variance) information, then
    variance information will also be calculated for the output
-   mosaic NDF, provided that USEVAR is also TRUE. Otherwise,
-   if GENVAR is set to FALSE (or if any input NDF does not
+   mosaic image, provided that USEVAR is also TRUE. Otherwise,
+   if GENVAR is set to FALSE (or if any input image does not
    contain variance information), then no output variance values
    will be generated.  This parameter is only used if all the
-   input NDFs contain variance information.
+   input images contain variance information.
    [TRUE]
 IN = LITERAL (Read and [optionally] Write)
-   A list of the names of the input NDFs which are to be combined
-   into a mosaic. The NDF names should be separated by commas
+   A list of the names of the input images which are to be combined
+   into a mosaic. The image names should be separated by commas
    and may include wildcards.
 
-   The input NDFs are normally accessed only for reading.
+   The input images are normally accessed only for reading.
    However, if the MODIFY parameter is set to TRUE (and
    scale-factor or zero-point corrections are being calculated)
-   then each of the "input" NDFs will be modified by applying the
+   then each of the "input" images will be modified by applying the
    calculated corrections.
 LISTIN = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then the names of all the NDFs supplied as input will be
+   then the names of all the images supplied as input will be
    listed (and will be recorded in the logfile if this is
    enabled).  Otherwise, this listing will be omitted.
    [TRUE]
@@ -141,11 +141,11 @@ MAX = _REAL (Read)
    selected (see the METHOD parameter). [Maximum real value]
 MAXIT = _INTEGER (Read)
    This parameter specifies the maximum number of iterations to
-   be used when inter-comparing pairs of input NDF data arrays to
+   be used when inter-comparing pairs of input image data arrays to
    determine their relative scale-factor and/or zero-point. It is
    only used if (a) both the SCALE and ZERO parameters have been
    set to TRUE, or (b) SCALE has been set to TRUE and statistical
-   error (variance) information obtained from the input NDFs is
+   error (variance) information obtained from the input images is
    being used to weight the data during the inter-comparison. In
    other cases the inter-comparison operation is not iterative.
 
@@ -156,7 +156,7 @@ MAXIT = _INTEGER (Read)
    must be at least one.
    [20]
 METHOD = LITERAL (Read)
-   The method to be used to combine the input NDFs' data values
+   The method to be used to combine the input images' data values
    to form the output mosaic. This may be set to any unique
    abbreviation of the following:
 
@@ -188,16 +188,16 @@ MIN = _REAL (Read)
    selected (see the METHOD parameter).
    [Minimum real value]
 MODIFY = _LOGICAL (Read)
-   By default, the NDFs supplied via the IN parameter are
-   regarded as "input" NDFs and will not be modified. However, if
+   By default, the images supplied via the IN parameter are
+   regarded as "input" images and will not be modified. However, if
    scale-factor or zero-point corrections are being calculated
    (see the SCALE and ZERO parameters), then giving a TRUE value
-   for MODIFY indicates that these NDFs are themselves to be
+   for MODIFY indicates that these images are themselves to be
    modified by applying the calculated corrections before the
    output mosaic is formed.
 
    This facility provides a means of applying corrections to
-   individual NDFs (e.g. to mutually normalise them) without
+   individual images (e.g. to mutually normalise them) without
    necessarily also combining them into a mosaic. It may also be
    useful if several invocations of MAKEMOS are to be made with
    different parameter settings; by specifying MODIFY=TRUE for
@@ -207,7 +207,7 @@ MODIFY = _LOGICAL (Read)
 
    WARNING: Caution should be exercised if setting MODIFY to
    TRUE, as information about the uncorrected data values of the
-   "input" NDFs will not be retained.
+   "input" images will not be retained.
    [FALSE]
 NITER = _REAL (Read)
    Maximum number of refining iterations used if the "mode" data
@@ -215,20 +215,20 @@ NITER = _REAL (Read)
    [7]
 OPTOV = _INTEGER (Read)
    This parameter specifies the "optimum number of overlaps"
-   which an NDF should have with its neighbours and controls the
+   which an image should have with its neighbours and controls the
    number of inter-comparisons made between pairs of overlapping
-   NDFs when determining scale-factor or zero-point corrections
+   images when determining scale-factor or zero-point corrections
    (see the SCALE and ZERO parameters).
 
    The need for this parameter arises because when multiple input
-   NDFs are supplied there may be a large number of potential
+   images are supplied there may be a large number of potential
    pair-wise overlaps between them.  To prevent them all being
    used, which may take far longer than is justified, this set of
    potential overlaps is reduced by elimination, starting with
    the smallest ones (as measured by the number of overlapping
    pixels) and continuing until no more overlaps can be removed
-   without reducing the number of overlaps of any NDF below the
-   value given for OPTOV.  In practice, this means that each NDF
+   without reducing the number of overlaps of any image below the
+   value given for OPTOV.  In practice, this means that each image
    will end up with about (although not exactly) OPTOV overlaps
    with its neighbours, with the largest overlaps being
    preferred.
@@ -237,10 +237,10 @@ OPTOV = _INTEGER (Read)
    number of overlaps, it is not guaranteed always to result in a
    set of overlaps which allow the optimum set of corrections to
    be calculated. In practice, problems from this cause are
-   unlikely unless unusual patterns of NDF overlap are involved,
+   unlikely unless unusual patterns of image overlap are involved,
    but they may be solved by increasing the value of OVOPT and/or
    constructing the required mosaic in pieces by running MAKEMOS
-   several times on different sets of input NDFs.
+   several times on different sets of input images.
 
    In some cases, reducing the value of OVOPT may reduce the
    number of inter-comparisons made, and hence reduce the
@@ -250,18 +250,18 @@ OPTOV = _INTEGER (Read)
 
    This parameter is only used if SCALE or ZERO is set to TRUE.
    [3]
-OUT = NDF (Write)
-   Name of the NDF to contain the output mosaic. This is normally
-   mandatory. However, if the "input" NDFs are being modified (by
+OUT = image (Write)
+   Name of the image to contain the output mosaic. This is normally
+   mandatory. However, if the "input" images are being modified (by
    setting the MODIFY parameter to TRUE), then it may optionally
    be omitted by supplying a null value (!). In this case, no
    output mosaic will be formed.
 PRESERVE = _LOGICAL (Read)
    If a TRUE value is given for this parameter (the default),
-   then the data type of the output mosaic NDF will be derived
-   from that of the input NDF with the highest precision, so that
-   the input data type will be "preserved" in the output NDF.
-   Alternatively, if a FALSE value is given, then the output NDF
+   then the data type of the output mosaic image will be derived
+   from that of the input image with the highest precision, so that
+   the input data type will be "preserved" in the output image.
+   Alternatively, if a FALSE value is given, then the output image
    will be given an appropriate floating point data type.
 
    When using integer input data, the former option is useful for
@@ -274,34 +274,34 @@ PRESERVE = _LOGICAL (Read)
    If a global value has been set up for this parameter using
    CCDSETUP, then that value will be used.
    [TRUE]
-REF = NDF (Read)
+REF = image (Read)
    If scale-factor and/or zero-point corrections are being
    applied (see the SCALE and ZERO parameters) then, by default,
    these are normalised so that the median corrections are unity
-   and zero respectively. However, if an NDF is given via the REF
+   and zero respectively. However, if an image is given via the REF
    parameter (so as to over-ride its default null value), then
    scale-factor and zero-point corrections will instead be
    adjusted so that the corrected data are normalised to the
-   "reference NDF" supplied.
+   "reference image" supplied.
 
    This provides a means of retaining the calibration of a set of
    data, even when corrections are being applied, by nominating a
-   reference NDF which is to remain unchanged. It also allows the
+   reference image which is to remain unchanged. It also allows the
    output mosaic to be normalised to any externally-calibrated
-   NDF with which it overlaps, and hence allows a calibration to
+   image with which it overlaps, and hence allows a calibration to
    be transferred from one set of data to another.
 
-   If the NDF supplied via the REF parameter is one of those
+   If the image supplied via the REF parameter is one of those
    supplied as input via the IN parameter, then this serves to
-   identify which of the input NDFs should be used as a
+   identify which of the input images should be used as a
    reference, to which the others will be adjusted. In this case,
    the scale-factor and/or zero-point corrections applied to the
-   nominated input NDF will be set to one and zero, and the
+   nominated input image will be set to one and zero, and the
    corrections for the others will be adjusted accordingly.
 
-   Alternatively, if the reference NDF does not appear as one of
-   the input NDFs, then it will be included as an additional set
-   of data in the inter-comparisons made between overlapping NDFs
+   Alternatively, if the reference image does not appear as one of
+   the input images, then it will be included as an additional set
+   of data in the inter-comparisons made between overlapping images
    and will be used to normalise the corrections obtained (so
    that the output mosaic is normalised to it). However, it will
    not itself contribute to the output mosaic in this case.
@@ -317,7 +317,7 @@ SCALE = _LOGICAL (Read)
    differ.
 
    If SCALE is set to TRUE, then MAKEMOS will inter-compare the
-   NDFs supplied as input and will estimate the relative
+   images supplied as input and will estimate the relative
    scale-factor between selected pairs of input data arrays where
    they overlap.  From this information, a global set of
    multiplicative corrections will be derived which make the
@@ -336,7 +336,7 @@ SIGMAS = _REAL (Read)
    the METHOD parameter). This value must be positive. [4.0]
 SKYSUP = _REAL (Read)
    A positive "sky noise suppression factor" used to control the
-   effects of sky noise when pairs of input NDFs are
+   effects of sky noise when pairs of input images are
    inter-compared to determine their relative scale-factor. It is
    intended to prevent the resulting scale-factor estimate being
    biased by the many similar values present in the "sky
@@ -349,7 +349,7 @@ SKYSUP = _REAL (Read)
    A SKYSUP value of unity can often be effective, but a value
    set by the approximate ratio of sky pixels to useful object
    pixels (i.e. those containing non-sky signal) in a "typical"
-   NDF overlap region will usually be better. The precise value
+   image overlap region will usually be better. The precise value
    is not critical. A value of zero disables the sky noise
    suppression algorithm completely. The default value for SKYSUP
    is 10**(n/2.0), where n is the number of significant
@@ -360,24 +360,24 @@ SKYSUP = _REAL (Read)
    fields).
    [10**(n/2.0)]
 TITLE = LITERAL (Read)
-   Title for the output mosaic NDF. [Output from MAKEMOS]
+   Title for the output mosaic image. [Output from MAKEMOS]
 TOLS = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
-   when inter-comparing pairs of input NDF data arrays to
+   when inter-comparing pairs of input image data arrays to
    determine their relative scale-factor. It is only used if the
    inter-comparison is to be performed iteratively, which will be
    the case if (a) both the SCALE and ZERO parameters have been
    set to TRUE, or (b) SCALE has been set to TRUE and statistical
-   error (variance) information obtained from the input NDFs is
+   error (variance) information obtained from the input images is
    being used to weight the data during the inter-comparison.
 
    The value given for TOLS specifies the tolerable fractional
    error in the estimation of the relative scale-factor between
-   any pair of input NDFs. This value must be positive.
+   any pair of input images. This value must be positive.
    [0.001]
 TOLZ = _REAL (Read)
    This parameter defines the accuracy tolerance to be achieved
-   when inter-comparing pairs of input NDF data arrays to
+   when inter-comparing pairs of input image data arrays to
    determine their relative zero-points. It is only used if the
    inter-comparison is to be performed iteratively, which will be
    the case if both the SCALE and ZERO parameters have been set
@@ -385,19 +385,19 @@ TOLZ = _REAL (Read)
 
    The value given for TOLZ specifies the tolerable absolute
    error in the estimation of the relative zero-point between any
-   pair of input NDFs whose relative scale-factor is unity. If
+   pair of input images whose relative scale-factor is unity. If
    the relative scale-factor is also being estimated, then the
    value used is multiplied by this relative scale-factor
-   estimate (which reflects the fact that an NDF with a larger
+   estimate (which reflects the fact that an image with a larger
    data range can tolerate a larger error in estimating its
    zero-point). The TOLS value supplied must be positive.
    [0.05]
 USEVAR = _LOGICAL (Read)
    The value of this parameter specifies whether statistical
-   error (variance) information contained in the input NDFs
+   error (variance) information contained in the input images
    should be used to weight the input data when they are combined
    to produce the output mosaic. This parameter is only used if
-   all the input NDFs contain variance information, in which case
+   all the input images contain variance information, in which case
    the default behaviour is to use this information to correctly
    weight the data values being combined. If output variances are
    to be generated (specified by the GENVAR parameter) then this
@@ -405,27 +405,27 @@ USEVAR = _LOGICAL (Read)
 
    If insufficient input variance information is available, or if
    USEVAR is set to FALSE, then weights are instead derived from
-   the scale-factor corrections applied to each NDF (see the
+   the scale-factor corrections applied to each image (see the
    WEIGHTS parameter for details); unit weight is used if no
    scale-factor corrections are being applied. Alternatively,
-   explicit weights may be given for each input NDF via the
+   explicit weights may be given for each input image via the
    WEIGHTS parameter.
    [TRUE]
 WEIGHTS( ) = _REAL (Read)
    A set of positive weighting factors to be used to weight the
-   input NDFs when they are combined. If this parameter is used,
-   then one value should be given for each input NDF and the
-   values should be supplied in the same order as the input NDFs.
+   input images when they are combined. If this parameter is used,
+   then one value should be given for each input image and the
+   values should be supplied in the same order as the input images.
    If a null (!) value is given (the default) then a set of
    weights will be generated internally - these will normally all
    be unity unless scale-factor corrections are being applied
    (see the SCALE parameter), in which case the reciprocal of the
-   scale factor correction for each input NDF is used as its
+   scale factor correction for each input image is used as its
    weight. This corresponds to the assumption that variance is
-   proportional to data value in each input NDF.
+   proportional to data value in each input image.
 
    This parameter is only used if the USEVAR parameter is set to
-   FALSE or if one or more of the input NDFs does not contain
+   FALSE or if one or more of the input images does not contain
    variance information. Otherwise, the input variance values are
    used to weight the input data when they are combined.
    [!]
@@ -440,7 +440,7 @@ ZERO = _LOGICAL (Read)
    differ.
 
    If ZERO is set to TRUE, then MAKEMOS will inter-compare the
-   NDFs supplied as input and will estimate the relative
+   images supplied as input and will estimate the relative
    zero-point difference between selected pairs of input data
    arrays where they overlap.  From this information, a global
    set of additive corrections will be derived which make the
@@ -456,14 +456,14 @@ ZERO = _LOGICAL (Read)
 Examples
 
 makemos '*' mymos
-   Combines the set of NDFs matching the wild-card "*" into a
+   Combines the set of images matching the wild-card "*" into a
    single mosaic called mymos. By default, no normalisation
    corrections are applied to the input data, which are combined
-   by taking the median in regions where several input NDFs
+   by taking the median in regions where several input images
    overlap.
 
 makemos in='"a,b,c,d"' out=combined zero
-   Combines the four overlapping input NDFs a, b, c and d into a
+   Combines the four overlapping input images a, b, c and d into a
    single mosaic called combined. Optimised zero-point
    corrections are derived and applied to the data before
    combining them so as to make them as mutually consistent as
@@ -471,7 +471,7 @@ makemos in='"a,b,c,d"' out=combined zero
    the output mosaic.
 
 makemos '"a,b,c,d"' out=combined scale
-   Combines the four NDFs a, b, c and d as above, but makes
+   Combines the four images a, b, c and d as above, but makes
    optimised corrections to the scale factor of each (i.e.
    multiplies each by an appropriate constant) before they are
    combined. This would be appropriate if, for instance, the
@@ -479,7 +479,7 @@ makemos '"a,b,c,d"' out=combined scale
    times and had subsequently had their sky background removed.
 
 makemos in='frame*' out=result scale zero
-   Combines the set of input NDFs matching the wild-card "frame*"
+   Combines the set of input images matching the wild-card "frame*"
    into a single mosaic called result. Optimised scale factor and
    zero point corrections are applied before combining the data.
    This would be appropriate if, for instance, the input data had
@@ -489,9 +489,9 @@ makemos in='frame*' out=result scale zero
 makemos in='frame*' out=result scale zero modify
    This is identical to the previous example, except that in
    addition to forming the output result, the MODIFY parameter
-   causes all the input NDFs to be modified using the same
+   causes all the input images to be modified using the same
    optimised corrections as are applied when forming the mosaic,
-   thus mutually normalising all the separate NDFs.  Note that
+   thus mutually normalising all the separate images.  Note that
    this feature should be used with care, as information about
    the original normalisation of the input data will be lost.
    When MODIFY is specified, a null value "!" may be given for
@@ -499,24 +499,24 @@ makemos in='frame*' out=result scale zero modify
    required.
 
 makemos '"a,b,c,d"' result scale zero ref=b
-   This example merges the four input NDFs a, b, c and d into a
+   This example merges the four input images a, b, c and d into a
    mosaic called result. In calculating the optimised scale
    factor and zero point corrections to apply, b is regarded as a
-   "reference NDF" and the other NDFs are normalised to it. This
+   "reference image" and the other images are normalised to it. This
    means that if b has previously been calibrated, then the
    output mosaic will inherit this calibration.
 
 makemos '"a,b,c,d"' result scale zero ref=e
    This example is identical to that above, except that the
-   "reference NDF" e is not one of the input NDFs and will not
+   "reference image" e is not one of the input images and will not
    form part of the output mosaic. Nevertheless, the scale factor
    and zero point corrections applied will be such that all the
-   input NDFs are normalised to it (the reference NDF must
-   overlap with at least one of the input NDFs). Thus, if e has
+   input images are normalised to it (the reference image must
+   overlap with at least one of the input images). Thus, if e has
    been calibrated, this calibration will be transferred to the
    output mosaic (note that if MODIFY is specified, then the
    calibration could also be transferred to each of the input
-   NDFs).
+   images).
 
 makemos 'frame*' mosaic nopreserve nogenvar method=minmax skysup=0
    This example illustrates some of the less commonly used
@@ -534,11 +534,11 @@ Algorithms_Used
 
    Some of the algorithms used by MAKEMOS require a little
    explanation.  The first of these is used to inter-compare
-   overlapping regions of the input NDFs to determine their relative
+   overlapping regions of the input images to determine their relative
    scale-factor and zero-point difference (in the most general
    case). In effect, this algorithm has to fit a straight line to a
    scatter plot representing the pixel values in the two overlapping
-   NDFs.
+   images.
 
    Rather than use a conventional least-squares fit for this
    purpose, which would be sensitive to spurious data, a fit based
@@ -567,10 +567,10 @@ Algorithms_Used
 
    The second stage of normalisation involves a global optimisation
    process which seeks to determine the best corrections to be
-   applied to each input NDF. The algorithm which performs this task
+   applied to each input image. The algorithm which performs this task
    makes a guess at the best corrections to apply and then
    calculates the scale-factor and/or zero-point differences which
-   would remain between each pair of overlapping NDFs if they were
+   would remain between each pair of overlapping images if they were
    corrected in this way. These corrections are then adjusted until
    the weighted sum of squares of the remaining differences is
    minimised. The weights used in this process are derived from
@@ -580,7 +580,7 @@ Algorithms_Used
    individual overlaps may be small and contain inadequate
    information on their own.
 
-   The algorithm used for combining the separate input NDFs into a
+   The algorithm used for combining the separate input images into a
    mosaic requires no special explanation, except to note that it is
    designed to operate on large mosaics without making excessive
    demands on system resources such as memory. It does this by
@@ -652,12 +652,12 @@ Implementation_Status
 
    - MAKEMOS supports "bad" pixel values and all non-complex data
      types, with arithmetic being performed using the appropriate
-     floating point type. It can process NDFs with any number of
+     floating point type. It can process images with any number of
      dimensions. The DATA, TITLE and VARIANCE components of an NDF
      are directly supported, with the AXIS, HISTORY, LABEL, QUALITY
      and UNITS components and all extensions being propagated from
      the first input NDF supplied (note that AXIS values, if
      present, will normally be extrapolated as a result of
      propagation to the output mosaic, which will typically have a
-     larger extent than any of the input NDFs).
+     larger extent than any of the input images).
 .endhelp

@@ -15,7 +15,7 @@ Description:
 
    The debiassing section operates in two basic modes -- with and
    without a bias frame. If a bias frame is supplied then it is
-   subtracted from the data arrays of the input NDFs. The subtraction
+   subtracted from the data arrays of the input images. The subtraction
    can either be direct, or by offsetting the values of the bias by
    the mean value in the bias-strip region(s). When determining
    the mean in the bias strips a function of the distance from the
@@ -40,7 +40,7 @@ Description:
    this by assuming Poissonian statistics for the bias-subtracted
    data, together with a contribution for the readout noise. The
    masking of bad data areas is achieved using the transfer of
-   quality information from an NDF, or by using an ASCII Regions
+   quality information from an image, or by using an ASCII Regions
    Definition (ARD) file. The expansion of the data values into
    counts and the extraction of the useful area of the CCD are also
    performed.
@@ -58,19 +58,19 @@ ADC = _DOUBLE (Read)
    CCDSETUP then this will be used.
    [1.0]
 BADBITS = _INTEGER (Read)
-   If the first input NDF has no quality component, and you have
+   If the first input image has no quality component, and you have
    specified the SETBAD= FALSE option, you will be requested to
    supply a value for BADBITS (SUN/33).  The default for this
    is 1. BADBITS is a byte value and hence can only be in the
    range 0-255.
    [1]
 BIAS = LITERAL (Read)
-   Name of the NDF which contains the bias calibration data. This
+   Name of the image which contains the bias calibration data. This
    parameter may be specified as ! in which case either a
    constant or values derived from the bias strip(s) are used.
    The name of this file may be specified using indirection
    through an ASCII file. The offered default is either the last
-   used master bias name or (if one exists) the name of the NDF
+   used master bias name or (if one exists) the name of the image
    produced by the last run of MAKEBIAS.
    [Global master bias or !]
 BOUNDS( 2 or 4 ) = _INTEGER (Read)
@@ -79,8 +79,8 @@ BOUNDS( 2 or 4 ) = _INTEGER (Read)
    horizontal or vertical directions. The direction is controlled
    by the DIRECTION parameter. The bounds must be supplied in
    pairs. Pixel indices are the actual number of pixels, starting
-   at 1,1 at the lower left hand corner of the NDF data array,
-   which includes any origin offsets within the input NDFs.
+   at 1,1 at the lower left hand corner of the image data array,
+   which includes any origin offsets within the input images.
 
    If global values for these bounds have been set using
    CCDSETUP then those values will be used.
@@ -164,24 +164,24 @@ GENVAR = _LOGICAL (Read)
    [FALSE]
 GETBIAS = _LOGICAL (Read)
    This parameter controls whether or not an attempt is to be made
-   to access a master bias NDF.
+   to access a master bias image.
    [TRUE]
 GETMASK = _LOGICAL (Read)
    This parameter controls whether or not an attempt is to be made
    to access a defect mask using the parameter MASK.
    [TRUE]
 IN = LITERAL (Read)
-   A list of the names of the NDFs which contain the raw CCD
+   A list of the names of the images which contain the raw CCD
    data. Note that at present the input data must have a common
    processing mode, i.e. use the same bias frame, have the same
    ADC factor, readout noise etc. These values are represented
    by the parameter values of the task.
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-   or not. Deleting the input NDFs has the advantage of saving
+   Whether to keep (i.e. not delete) the input images (parameter IN)
+   or not. Deleting the input images has the advantage of saving
    disk space, but should probably only be used if this program
    is part of a sequence of commands and the intermediary data
    produced by it are not important.
@@ -223,14 +223,14 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 MASK = LITERAL (Read)
-   The name of an NDF or ASCII Regions Definition (ARD) file.
+   The name of an image or ASCII Regions Definition (ARD) file.
 
-   If an NDF is given then any regions of BAD values (set through
+   If an image is given then any regions of BAD values (set through
    explicit BAD values or by BADBITS in the quality component)
-   will be transferred to the output NDF.
+   will be transferred to the output image.
 
    If an ARD file is given then its regions will be interpreted
-   and transferred to the output NDF. ARD is described in its own
+   and transferred to the output image. ARD is described in its own
    section.
 
    The regions whose quality is to be set are probably hot spots,
@@ -259,27 +259,27 @@ OFFSET = _LOGICAL (Read)
    been previously zeroed.
    [TRUE]
 OUT = LITERAL (Write)
-   Names of the output NDFs. These may be specified as list of
+   Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
    as a single modification element (of the input names). The
    simplest modification element is the asterisk "*" which means
-   call each of the output NDFs the same name as the
-   corresponding input NDFs. So,
+   call each of the output images the same name as the
+   corresponding input images. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names.
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names.
 
    Other types of modification can also occur, such as,
       OUT > tmp_*
-   which means call the output NDFs the same as the input NDFs but
+   which means call the output images the same as the input images but
    put tmp_ in front of the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUT > tmp_*|debias|flattened|
    this replaces the string debias with flattened in any of the
    output names tmp_*.
 PRESERVE = _LOGICAL (Read)
-   If TRUE then the data type of the input NDFs are used for
+   If TRUE then the data type of the input images are used for
    processing and are preserved on exit from this routine. If
    FALSE then a suitable floating point type will be chosen for
    the output type and the processing will be performed using
@@ -316,12 +316,12 @@ SATURATION = _DOUBLE (Read)
    [1.0D6]
 SETBAD = _LOGICAL (Read)
    If TRUE then the quality information will be transferred
-   from the MASK NDF to the output NDFs in the form of BAD
+   from the MASK image to the output images in the form of BAD
    ("flagged") values in the data component. This is the usual
    method of indicating the presence of pixels with no value. If
    FALSE then the quality information will be transferred into
    the quality component, all output quality pixels will have
-   their BADBITS set. (Note that if the input NDF already has a
+   their BADBITS set. (Note that if the input image already has a
    quality component the BADBITS will be set by a logical OR of
    the current bits with the BADBITS value).
    [TRUE]
@@ -345,12 +345,12 @@ SMODE = LITERAL (Read)
    data.
    [CONSTANT]
 TITLE = LITERAL (Read)
-   Title for the output NDF.
+   Title for the output image.
    [Output from DEBIAS]
 USECON = _LOGICAL (Read)
    If TRUE then you can supply an estimate for the bias
    contribution (parameter ZERO). This value is then subtracted
-   from the input NDF. Only use this option if you do not have
+   from the input image. Only use this option if you do not have
    any bias frames or bias strips and you have good reason to
    believe that the value you are supplying is accurate enough
    for your purposes.
@@ -358,11 +358,11 @@ USECON = _LOGICAL (Read)
 USEEXT = _LOGICAL (Read)
    If TRUE then certain of the parameters of this program will not
    be used and the required values will be obtained from the
-   CCDPACK extensions of the input NDFs instead. This method can
-   only be used if the NDFs have been "imported" using the
+   CCDPACK extensions of the input images instead. This method can
+   only be used if the images have been "imported" using the
    programs PRESENT or IMPORT. Typically it is used when
    processing using CCDPACK's "automated" methods (in this case
-   the input NDFs should contain all the information necessary to
+   the input images should contain all the information necessary to
    process them).
 
    The parameters that this effects are:
@@ -389,24 +389,24 @@ WMODE = LITERAL (Read)
    [LINEAR]
 ZERO = _DOUBLE (Read)
    If USECON=TRUE then this value is subtracted from the input
-   NDF.
+   image.
 
 Examples
 
 debias r1 r1b bias '[2,10,400,415]' adc=1.1 rnoise=8
-   This example debiasses the data array in NDF r1 writing the
-   result to NDF r1b. It uses the data component of NDF BIAS as
+   This example debiasses the data array in image r1 writing the
+   result to image r1b. It uses the data component of image BIAS as
    the bias estimator. The bias is offset by the mean value found
    within the ranges 2-10 and 400-415 pixels along the X axis.
    The data in the bias strips are smoothed by a box filter and
    weighted linearly from the edges inwards. The output variance
    is produced by a combination of the Poisson statistics (using
    an ADC value of 1.1) and readout noise (value 8), together
-   with the variance of the bias NDF (if present).
+   with the variance of the bias image (if present).
 
 debias in=r1 out=r2 bounds='[2,10,401,416]' adc=2.5 rnoise=10
-   This example debiasses the NDF r1 data component writing the
-   result to the NDF r2. The bias is estimated by an interpolation
+   This example debiasses the image r1 data component writing the
+   result to the image r2. The bias is estimated by an interpolation
    of a constant for each data row. The constant is the result of
    a linearly weighted average of the bias strip data which has
    been box filtered.
@@ -414,8 +414,8 @@ debias in=r1 out=r2 bounds='[2,10,401,416]' adc=2.5 rnoise=10
 debias in=r1 out=r2 bounds='[2,10,401,416]' smode=linear adc=5
        fmode=plane direct=y wmode=exp cmode=sigma rnoise=10
        nsigma=4
-   This example debiasses the NDF r1 data component writing the
-   result to the NDF r2. The bias is estimated by the fitting of a
+   This example debiasses the image r1 data component writing the
+   result to the image r2. The bias is estimated by the fitting of a
    plane to the data in the bias strips. The bias-strip data are
    first sigma clipped at a level RNOISE*NSIGMA. The fit is
    performed with weighting based on a exponential fall off
@@ -424,20 +424,20 @@ debias in=r1 out=r2 bounds='[2,10,401,416]' smode=linear adc=5
 
 debias in='*' out='*_debias' bounds='[3,16,912,940]' adc=1 rnoise=4
        bias=bias/master_bias
-   In this example all the NDFs in the current directory are
-   debiassed. The names of the output NDFs are as those of the
-   corresponding input NDFs, except that they are trailed by the
+   In this example all the images in the current directory are
+   debiassed. The names of the output images are as those of the
+   corresponding input images, except that they are trailed by the
    "_debias" string.
 
 Notes
 
-- If the input NDFs have variance components and no variances
+- If the input images have variance components and no variances
   are to be generated then they are processed.
 
 - Pixel indices. The bounds supplied to DEBIAS should be given as
   pixel indices. These usually start at 1,1 for the pixel at the
   lower left-hand corner of the data-array component (this may
-  not be true if the NDFs have been sectioned, in which case the
+  not be true if the images have been sectioned, in which case the
   lower left hand pixel will have pixel indices equal to the data
   component origin values). Pixel indices are different from
   pixel coordinates in that they are non-continuous, i.e. can
@@ -522,7 +522,7 @@ Behaviour_of_parameters
 
    If the parameter USEEXT is TRUE then the following parameters
    are not used: ADC, BOUNDS, DEFERRED, DIRECTION, EXTENT, RNOISE,
-   SATURATION and ZERO. Values are obtained from the input NDF
+   SATURATION and ZERO. Values are obtained from the input image
    extensions instead.
 
 Authors

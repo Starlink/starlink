@@ -30,16 +30,16 @@ DEVICE = DEVICE (Read)
    The name of the image display device.
    [Current-image display device]
 IN = LITERAL (Read)
-   The names of a list of NDFs which are to be "associated" with
-   the output position list. Associating a list with an NDF means
+   The names of a list of images which are to be "associated" with
+   the output position list. Associating a list with an image means
    that the item "CURRENT_LIST" in its CCDPACK extension will be
-   set to the name of the list. In future applications the NDF
+   set to the name of the list. In future applications the image
    name may then be used instead of the list name (any derived
-   lists will then be associated with the NDF instead), this is
+   lists will then be associated with the image instead), this is
    the usual method in CCDPACK.
 
-   The names of the NDFs may be given as "!" in which case none
-   will be associated, otherwise the NDF names should be as a list
+   The names of the images may be given as "!" in which case none
+   will be associated, otherwise the image names should be as a list
    separated by commas and may include wildcards.
    [!]
 KEEPLUT = _LOGICAL (Read)
@@ -114,11 +114,11 @@ idicurs device=xw outlist=objects.dat memory=1
 
 idicurs outlist=group_positions in='*'
    In this example an output position list group_positions is
-   associated with all the NDFs in the current directory. This
-   method could be useful if all the NDFs are not moved
+   associated with all the images in the current directory. This
+   method could be useful if all the images are not moved
    significantly with respect to one another. This one list then
-   supplies initial positions for objects in all these NDFs (using
-   the centroid routine FINDCENT would then give each NDF an
+   supplies initial positions for objects in all these images (using
+   the centroid routine FINDCENT would then give each image an
    accurate position list from these initial positions).
 
 idicurs scroll arrows
@@ -153,10 +153,10 @@ Notes
   quick re-centre, cancelling any zoom and scroll. The Q key
   is used to exit from the routine.
 
-- NDF extension items.
+- Image extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the name of the
+  (.MORE.CCDPACK) of the input images are set to the name of the
   output list. These items will be used by other CCDPACK position
   list processing routines to automatically access the list.
 

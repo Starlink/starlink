@@ -1,6 +1,6 @@
 .help ccdedit Starlink ccdpack
 .nf
-Edits CCDPACK NDF extensions.
+Edits CCDPACK image extensions.
 
 Usage:
 
@@ -9,7 +9,7 @@ Usage:
 Description:
 
    This routine provides the ability to edit the contents the
-   CCDPACK extensions of a list of NDFs. The following modes
+   CCDPACK extensions of a list of images. The following modes
    of operation are available:
 
      -    associate position list(s)
@@ -21,13 +21,13 @@ Description:
      -    invert a transform structure.
 
    The associate list facility allows the names of position lists to
-   be added to NDF extensions, these lists are then accessed when the
-   NDF names are given in response to an INLIST prompt (provided the
+   be added to image extensions, these lists are then accessed when the
+   image names are given in response to an INLIST prompt (provided the
    application NDFNAMES parameter is TRUE). This option also allows a
-   single position list to be associated with a range of NDFs.
+   single position list to be associated with a range of images.
 
    Erase extension items is a safe way of deleting primitives and
-   structures from an NDF CCDPACK extension and removes the need to
+   structures from an image CCDPACK extension and removes the need to
    remember the exact object name and path.
 
    Add transform allows arbitrary transform structures to be added.
@@ -109,16 +109,16 @@ FITTYPE = _INTEGER (Read)
    The value of this parameter is used to classify the
    transformation (see the CLASS parameter).
    [5]
-IN = NDF (Read)
-   A list specifying the names of the NDFs whose CCDPACK
-   extensions are to be modified. The NDF names should be
+IN = image (Read)
+   A list specifying the names of the images whose CCDPACK
+   extensions are to be modified. The image names should be
    separated by commas and may include wildcards.
 INLIST = LITERAL (Read)
    A list specifying one or more position list names (only used
    if MODE = "ALIST" ). If a single name is given then this
-   position list will be associated with all the input NDFs. If
+   position list will be associated with all the input images. If
    a list of names is given then there should be as many names
-   as input NDFs. The order of the input NDF names is shown so
+   as input images. The order of the input image names is shown so
    that the correct correspondence may be achieved.
 
    Position list names may NOT include wildcards. So a comma
@@ -165,7 +165,7 @@ MODE = LITERAL (Read)
 
       - INVERT
 
-   The "ALIST" option "associates" a position list(s) with NDFs
+   The "ALIST" option "associates" a position list(s) with images
    (this sets the "CURRENT_LIST" item).  This is useful when
    importing position lists generated externally to CCDPACK.
 
@@ -173,7 +173,7 @@ MODE = LITERAL (Read)
    Two possible items are "CURRENT_LIST" and "TRANSFORM".
 
    The "TRANSFORM" option allows the generation or import of
-   transforms into NDF extensions. Transforms from other NDFs
+   transforms into image extensions. Transforms from other images
    may be copied. Linear transforms may be generated from the (6)
    coefficients. General transforms may be specified by
    algebraic-like expressions containing the functions allowed by
@@ -182,11 +182,11 @@ MODE = LITERAL (Read)
    CLASSIFY and CLASS) and the examples section.
 
    The "INVERT" option inverts the sense of transformations in
-   the NDFs.
+   the images.
    [ALIST]
 NAME = LITERAL (Read)
    If MODE = "ERASE" is chosen then the value of this parameter
-   names the CCDPACK extension item of the input NDFs which is to
+   names the CCDPACK extension item of the input images which is to
    be erased. Typical items are "CURRENT_LIST" and "TRANSFORM".
 PA-PZ = _DOUBLE (Read)
    These parameters supply the values of constants used in the
@@ -209,7 +209,7 @@ PA-PZ = _DOUBLE (Read)
 TRANSFORM = TRN (Read)
    If TRTYPE="STRUCT" is chosen then this parameter is used to
    access the HDS object which contains a transform structure
-   to copy into the input NDFs. The standard place to store a
+   to copy into the input images. The standard place to store a
    transform structure (in CCDPACK) is
 
        - NDF_NAME.MORE.CCDPACK.TRANSFORM
@@ -238,7 +238,7 @@ TRTYPE = LITERAL (Read)
    supplied in the order PA,PB,PC,PD,PE,PF.
 
    If "STRUCT" is chosen then an existing transformation structure
-   will be copied into the extensions of the NDFs. Note that
+   will be copied into the extensions of the images. Note that
    no checking of the transform's validity will be made.
 
    If "EXPRES" is chosen then the transformation will be specified
@@ -331,34 +331,34 @@ Examples
 
 ccdedit mode=alist in='*' inlist=reference_set
    This example shows how to "associate" a single position list
-   called reference_set with all the NDFs in the current
+   called reference_set with all the images in the current
    directory.
 
-ccdedit mode=alist in='"ndf1,ndf2,ndf3"'
+ccdedit mode=alist in='"image1,image2,image3"'
         inlist='"pos1.dat,pos2.dat,pos3.dat"'
-   In this example the NDF ndf1 is associated with pos1.dat, the
-   NDF ndf2 with pos2.dat and the NDF ndf3 with pos3.dat.
+   In this example the image image1 is associated with pos1.dat, the
+   image image2 with pos2.dat and the image image3 with pos3.dat.
 
-ccdedit mode=erase in=ndf_with_bad_transform name=transform
+ccdedit mode=erase in=image_with_bad_transform name=transform
    In this example the TRANSFORM structure in the CCDPACK
-   extension of the NDF ndf_with_bad_transform is removed.
+   extension of the image image_with_bad_transform is removed.
 
 ccdedit mode=invert in='*'
-   In this example all the NDFs in the current directory have
+   In this example all the images in the current directory have
    their transforms inverted.
 
-ccdedit mode=transform trtype=coeff in=shift_this_ndf
+ccdedit mode=transform trtype=coeff in=shift_this_image
         tr='[10.25,1,0,-101.1,0,1]' fittype=1
-   In this example the NDF shift_this_ndf has a transform
+   In this example the image shift_this_image has a transform
    structure written into its CCDPACK extension which specifies a
    shift of 10.25 in X and a negative shift of 101.1 in Y.
    The shift is specified using the appropriate linear
    transformation coefficients [XSHIFT,1,0,YSHIFT,0,1] and is
    correctly classified as a fittype of 1.
 
-ccdedit mode=transform trtype=coeff in=rotate_this_ndf
+ccdedit mode=transform trtype=coeff in=rotate_this_image
         tr='[0,0.965926,-0.258819,0,0.258819,0.965926]' fittype=2
-   In this example the NDF rotate_this_ndf has a transform
+   In this example the image rotate_this_image has a transform
    structure written into its CCDPACK extension which specifies a
    rotation by 15 degrees about the [0,0] position. The rotation
    is specified using the appropriate linear transformation
@@ -367,12 +367,12 @@ ccdedit mode=transform trtype=coeff in=rotate_this_ndf
 ccdedit mode=transform trtype=struct in=need_transform
         transform=trn.more.ccdpack.transform
    In this example the transformation structure
-   trn.more.ccdpack.transform is copied to the NDF need_transform.
+   trn.more.ccdpack.transform is copied to the image need_transform.
 
 ccdedit mode=transform trtype=expres in=map2gls
         xfor='"xx=x*cosd(y)"' yfor='"yy=y"' xinv='"x=xx/cosd(yy)"'
         yinv='"y=yy"'
-   In this example the transform structure to be added to NDF
+   In this example the transform structure to be added to image
    map2gls is defined as an algebraic expression. The mapping used
    is a Sanson-Flamstead sinusoidal with X and Y in degrees.
 
@@ -383,7 +383,7 @@ ccdedit mode=transform trtype=express in=map2merc
         yinv='"2d0*(atand(exp(y*pi/180d0)))-90d0"'
         pa=89.9999d0
    In this example a Mercator-like transform structure is added to
-   the NDF map2merc. The arguments to TAND are limited to the
+   the image map2merc. The arguments to TAND are limited to the
    range +/- 89.9999D) to stop blow-up. The parameter PI is
    defaulted to 3.14159265359D0.
 
@@ -394,8 +394,8 @@ Notes
    structure .MORE.CCDPACK.
 
 - When using the MODE=ALIST option the item CURRENT_LIST in the
-  CCDPACK extension of the input NDFs is set to the name of the
-  input list(s). Such NDF items may be used by other CCDPACK
+  CCDPACK extension of the input images is set to the name of the
+  input list(s). Such image items may be used by other CCDPACK
   position list processing routines to automatically access
   these lists.
 

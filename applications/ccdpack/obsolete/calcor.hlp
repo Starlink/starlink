@@ -1,7 +1,7 @@
 .help calcor Starlink ccdpack
 .nf
-Subtracts a scaled dark or flash calibration NDF from a series of
-NDFs.
+Subtracts a scaled dark or flash calibration image from a series of
+images.
 
 Usage:
 
@@ -10,7 +10,7 @@ Usage:
 Description:
 
    CALCOR subtracts dark or flash calibration data from a series of
-   bias-corrected NDFs. The calibration data are multiplied by a
+   bias-corrected images. The calibration data are multiplied by a
    constant before subtraction, so that calibration data which have
    been normalised to counts per unit of time per pixel, can be
    scaled to the "exposure" times suitable for correcting the input
@@ -24,15 +24,15 @@ Description:
 Parameters:
 
 CAL = LITERAL (Read)
-   Name of the NDF containing the calibration data, this would
+   Name of the image containing the calibration data, this would
    normally be the output from MAKECAL. The data should be
    normalised to one exposure unit. It is expected that the
-   calibration NDF contains dark or flash exposure CCD data
+   calibration image contains dark or flash exposure CCD data
    which have been bias corrected.
 
    The name of this file may be specified using indirection
    through a file.
-   [Global calibration NDF]
+   [Global calibration image]
 EXPOSE = LITERAL (Read)
    A list of (comma separated) values specifying the numbers by
    which the calibration data need to be multiplied before
@@ -42,29 +42,29 @@ EXPOSE = LITERAL (Read)
    normalised to reflect the number of counts per second of time,
    then this is the number of seconds of flash exposure or the
    number of seconds duration between readouts, if it is a dark
-   counts NDF.  If the calibration NDF has been produced so
+   counts image.  If the calibration image has been produced so
    that the correct levels are already present, then these values
    should be returned as one. A quick method of specifying that
-   all the NDFs have the same "exposure" factors is to return a
-   single value, this will then be used for all input NDFs.
+   all the images have the same "exposure" factors is to return a
+   single value, this will then be used for all input images.
 
-   The given values must be in the same order as the input NDFs.
+   The given values must be in the same order as the input images.
    Indirection through an ASCII file may be used.  If more than
    one line is required to enter the information then a
    continuation line may be requested by adding "-" to the end of
    the last value.
 IN = LITERAL (Read)
-   Names of the NDFs to be processed. The calibration data will be
-   scaled and subtracted from these.  The NDF names should be
+   Names of the images to be processed. The calibration data will be
+   scaled and subtracted from these.  The image names should be
    separated by commas and may include wildcards.
 
    NOTE the use of wildcards with this program is NOT recommended
-   unless the input NDFs all have the same calibration exposure
-   factors. The processing order of any wildcarded NDFs cannot
+   unless the input images all have the same calibration exposure
+   factors. The processing order of any wildcarded images cannot
    be guaranteed.
 KEEPIN = _LOGICAL (Read)
-   Whether to keep (i.e. not delete) the input NDFs (parameter IN)
-   or not. Deleting the input NDFs has the advantage of saving
+   Whether to keep (i.e. not delete) the input images (parameter IN)
+   or not. Deleting the input images has the advantage of saving
    disk space, but should probably only be used if this program
    is part of a sequence of commands and the intermediary data
    produced by it are not important.
@@ -105,20 +105,20 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 OUT = LITERAL (Read)
-   Names of the output NDFs. These may be specified as list of
+   Names of the output images. These may be specified as list of
    comma separated names, using indirection if required, OR,
    as a single modification element (of the input names).
    The simplest modification element is the asterisk "*" which
-   means call each of the output NDFs the same name as the
-   corresponding input NDFs. So,
+   means call each of the output images the same name as the
+   corresponding input images. So,
       IN > *
       OUT > *
-   signifies that all the NDFs in the current directory should be
-   used and the output NDFs should have the same names.
+   signifies that all the images in the current directory should be
+   used and the output images should have the same names.
 
    Other types of modification can also occur, such as,
       OUT > tmp_*
-   which means call the output NDFs the same as the input NDFs but
+   which means call the output images the same as the input images but
    put tmp_ in front of the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUT > tmp_*|debias|flattened|
@@ -126,8 +126,8 @@ OUT = LITERAL (Read)
    output names tmp_*.
 
    NOTE the use of wildcards with this program is not recommended
-   unless the input NDFs all have the same calibration exposure
-   factors. The order of processing of any wildcarded NDFs cannot
+   unless the input images all have the same calibration exposure
+   factors. The order of processing of any wildcarded images cannot
    be guaranteed.
 PRESERVE = _LOGICAL (Read)
    If the input data type is to be preserved and used for
@@ -157,15 +157,15 @@ SETSAT = _LOGICAL (Read)
    (i.e. in groups with the same properties -- see notes).
    [FALSE]
 TITLE = LITERAL (Read)
-   Title for the output NDFs.
+   Title for the output images.
    [Output from CALCOR].
 
 Examples
 
 calcor frame1 frame2 calibration 250
    This example runs CALCOR in its most basic mode. The input data
-   in NDF frame1 has the data in NDF calibration subtracted, after
-   multiplying by 250. The resultant data is written to NDF
+   in image frame1 has the data in image calibration subtracted, after
+   multiplying by 250. The resultant data is written to image
    frame2. Note that if saturation values have been applied to the
    data in frame1 within CCDPACK, then this will be handled
    automatically. The output data will be of the same type as the
@@ -173,12 +173,12 @@ calcor frame1 frame2 calibration 250
 
 calcor in=^frames.dat out='*_darksub' cal=dark_master 
        expose=^dark_exposures
-   In this example a list of NDFs are sequentially processed. The
-   list of NDF names is stored in the file frames.dat. The output
-   NDFs are named after the corresponding input NDF with the
+   In this example a list of images are sequentially processed. The
+   list of image names is stored in the file frames.dat. The output
+   images are named after the corresponding input image with the
    characters _darksub appended. The dark times for each input
    frame are read from the file dark_exposures. This is the
-   recommended method for processing lists of input NDFs.
+   recommended method for processing lists of input images.
 
 calcor l1551_f11 l1551_f11_ds dark_master 1.0 preserve=false
        logto=both logfile=l1551_darkcor.log
@@ -187,14 +187,14 @@ calcor l1551_f11 l1551_f11_ds dark_master 1.0 preserve=false
    except that the output data type is now _REAL or _DOUBLE,
    depending on the precision required to process the data. The
    calibration correction data are assumed to have the right
-   exposure factor. The output NDF is given the title
+   exposure factor. The output image is given the title
    "dark_corrected_data" and the parameters used by CALCOR are
    stored in the logfile l1551_darkcor.log.
 
 calcor in=ngc4151r_f1 cal=flash_master out=ngc4151r_f1_dc
        expose=310.0 setsat saturation=32767
    In this example a saturation value external to CCDPACK has
-   been applied to the input NDF. This is indicated by setting
+   been applied to the input image. This is indicated by setting
    SETSAT TRUE and by supplying the saturation value. Values
    which are greater than or equal to the saturation value are
    left unmodified by the calibration frame subtraction. This may

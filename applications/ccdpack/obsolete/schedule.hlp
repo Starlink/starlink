@@ -8,7 +8,7 @@ Usage:
 
 Description:
 
-   This routine accepts a list of input NDFs and uses the information
+   This routine accepts a list of input images and uses the information
    in their CCDPACK extensions to schedule a reduction. The schedule
    is produced as a command script which may be executed immediately
    or retained for execution using the standard CCDPACK facilities
@@ -26,8 +26,8 @@ Description:
       5) production of master flatfields (one for each filter type)
       6) correction of data for flatfield response
 
-   The stages which are preformed for each NDF depend on the type of
-   NDF (TARGET, FLAT, BIAS, DARK etc.) and any processing which has
+   The stages which are preformed for each image depend on the type of
+   image (TARGET, FLAT, BIAS, DARK etc.) and any processing which has
    already taken place. For instance if calibration masters of any
    type already exist then they will be used in preference to the
    production of any new masters. If all the TARGET frames have
@@ -41,20 +41,20 @@ Description:
    are also available.
 
    Before you can use this routine you must make sure that all the
-   necessary information is entered into the NDF extensions. You can
+   necessary information is entered into the image extensions. You can
    do this using the routines IMPORT or CCDSETUP and PRESENT or any
    combination of these which give the desired effect.
 
 Parameters:
 
 DARKEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    CALCOR when performing dark count correction. This makes the
    parameter
 
       OUT=*"darkext"
 
-   form the names of the NDFs output from CALCOR.
+   form the names of the images output from CALCOR.
    [-dk]
 DEBIAS = _INTEGER (Read)
    The form of debiassing that should be used. This is an integer
@@ -76,12 +76,12 @@ DEBIAS = _INTEGER (Read)
    If the interpolation option is selected then the method is
    determined by the INTERP parameter.
 DEBIASEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    DEBIAS. This makes the parameter
 
       OUT=*"debiasext"
 
-   form the names of the NDFs output from DEBIAS.
+   form the names of the images output from DEBIAS.
    [-db]
 EXECUTE = _LOGICAL (Read)
    Whether to execute the output command script immediately or not.
@@ -97,31 +97,31 @@ EXELOGFILE = LITERAL (Read)
    redirected to this file.
    [SCHEDULE.LOG]
 FLASHEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    CALCOR when performing pre-flash correction. This makes the
    parameter
 
       OUT=*"flashext"
 
-   form the names of the NDFs output from CALCOR.
+   form the names of the images output from CALCOR.
    [-dk]
 FLATEXT = LITERAL (Read)
-   The extension which added to the names of any NDFs processed by
+   The extension which added to the names of any images processed by
    FLATCOR. This makes the parameter
 
       OUT=*"flatext"
 
-   form the names of the NDFs output from FLATCOR.
+   form the names of the images output from FLATCOR.
    [-flt]
 IN = LITERAL (Given)
-   A list of the names of the NDFs which contain the data to be
-   reduced. All NDFs must already have the correct "frame type"
+   A list of the names of the images which contain the data to be
+   reduced. All images must already have the correct "frame type"
    information (extension item FTYPE) entered into their CCDPACK
    extensions. Together with any other relevant information (such
    as filter type, position of the bias strips, useful area etc.,
    see IMPORT and/or PRESENT).
 
-   The NDF names should be separated by commas and may include
+   The image names should be separated by commas and may include
    wildcards.
 INTERP = _INTEGER (Read)
    If the interpolation method is chosen using the DEBIAS parameter
@@ -129,9 +129,9 @@ INTERP = _INTEGER (Read)
    performed. The possible returns are:
 
       1 = fit a constant for each row/column
-      2 = fit a single value for whole NDF
+      2 = fit a single value for whole image
       3 = fit a line to each row/column
-      4 = fit a plane to whole NDF
+      4 = fit a plane to whole image
 
    The possible options given the input information about the
    presence of bias strips are shown before the value of this
@@ -178,20 +178,20 @@ LOGTO = LITERAL (Read)
    default is "BOTH".
    [BOTH]
 MASTERBIAS = LITERAL (Read)
-   The name which will be given to a master bias NDF if one is
+   The name which will be given to a master bias image if one is
    created.
    [MASTER_BIAS]
 MASTERDARK = LITERAL (Read)
-   The name which will be given to a master dark NDF if one is
+   The name which will be given to a master dark image if one is
    created.
    [MASTER_DARK]
 MASTERFLASH = LITERAL (Read)
-   The name which will be given to a master flash NDF if one is
+   The name which will be given to a master flash image if one is
    created.
    [MASTER_FLASH]
 MASTERFLAT = LITERAL (Read)
    The prefix of the name which will be given to any master flat
-   NDFs which are created. The filter name will be appended to
+   images which are created. The filter name will be appended to
    this.
    [MASTER_FLAT]
 SCRIPT = LITERAL (Read)
@@ -207,18 +207,18 @@ SPACESAVE = LITERAL (Read)
    used or not. It can take one of the values, "NONE", "SOME" or
    "LOTS".
 
-      "NONE" indicates that no NDFs should be deleted.
-      "SOME" indicates that all intermediate NDFs should be
+      "NONE" indicates that no images should be deleted.
+      "SOME" indicates that all intermediate images should be
              deleted. This occurs after they are processed.
-      "LOTS" indicates that all processed NDFs should be deleted.
-             In this case all intermediary NDFs and the original
-             NDFs are deleted when processed.
+      "LOTS" indicates that all processed images should be deleted.
+             In this case all intermediary images and the original
+             images are deleted when processed.
 
-   Intermediary NDFs are deleted by the CCDPACK applications when
+   Intermediary images are deleted by the CCDPACK applications when
    they are finished processing then. So for instance in the case
-   of FLATCOR each NDF is deleted in turn, so the additional disk
-   space required is one NDF. Using "SOME" preserves the original
-   NDFs. Calibration masters are never deleted.
+   of FLATCOR each image is deleted in turn, so the additional disk
+   space required is one image. Using "SOME" preserves the original
+   images. Calibration masters are never deleted.
    [NONE]
 STYPE = LITERAL (Read)
    The type of CCDPACK command procedure to be produced. This
@@ -232,7 +232,7 @@ STYPE = LITERAL (Read)
 Examples
 
 schedule '*' ccdreduce csh debias=1
-   This example processes all the NDFs in the current directory
+   This example processes all the images in the current directory
    producing a script file called ccdreduce.csh which is suitable
    for executing from the C-shell. The debiassing method chosen is
    to use a zeroed master bias which is offset to the bias strip
@@ -249,8 +249,8 @@ schedule '*' tryinterp debias=3 interp=3
 
 schedule spacesave=lots
    In this example the command script will be written so that all
-   intermediary NDFs (those produced by the various applications)
-   and the original raw NDFs, will be deleted as and when they are
+   intermediary images (those produced by the various applications)
+   and the original raw images, will be deleted as and when they are
    processed.
 schedule 'data*' irflats debias=4
    In this example the frames 'data*' are scheduled for reduction.

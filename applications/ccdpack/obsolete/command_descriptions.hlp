@@ -2,16 +2,16 @@
 .nf
      CALCOR: Performs dark or flash count corrections.
  
-     CCDALIGN: Determines general inter-NDF transformations.
+     CCDALIGN: Determines general inter-image transformations.
 
      CCDCLEAR: Clears global parameters.
 
-     CCDEDIT: Edits the CCDPACK extensions of NDFs.
+     CCDEDIT: Edits the CCDPACK extensions of images.
 
      CCDFORK: Creates a script for executing CCDPACK commands in 
               a background process.
 
-     CCDNDFAC: Accesses a list of NDFs, writing their names to a file.
+     CCDNDFAC: Accesses a list of images, writing their names to a file.
 
      CCDNOTE: Adds a note to the log file.
 
@@ -19,39 +19,39 @@
 
      CCDSHOW: Displays the current values of any CCDPACK global parameters. 
 
-     DEBIAS: Debiasses lists of NDFs either by bias NDF subtraction 
+     DEBIAS: Debiasses lists of images either by bias image subtraction 
              or by interpolation -- applies bad data masks --
              extracts a subset of the data area -- produces variances --
              applies saturation values.
 
-     FINDCENT: Centroids NDF image features.
+     FINDCENT: Centroids image features.
 
-     FINDOBJ: Locates and centroids NDF image features.
+     FINDOBJ: Locates and centroids image features.
 
      FINDOFF: Performs pattern-matching between position lists related 
               by simple offsets.
 
-     FLATCOR: Performs the flatfield correction on a list of NDFs.
+     FLATCOR: Performs the flatfield correction on a list of images.
 
      IDICURS: Reads co-ordinates from an X display (allows zooming 
               and panning).
 
-     IMPORT: Imports FITS information into NDFs.
+     IMPORT: Imports FITS information into CCDPACK extensions.
 
-     MAKEBIAS: Produces a bias calibration NDF.
+     MAKEBIAS: Produces a bias calibration image.
 
-     MAKECAL: Produces calibration NDFs for flash or dark counts.
+     MAKECAL: Produces calibration images for flash or dark counts.
 
-     MAKEFLAT: Produces a flatfield NDF.
+     MAKEFLAT: Produces a flatfield image.
 
-     MAKEMOS: Makes NDF mosaics by combining and (optionally) normalising.
+     MAKEMOS: Makes image mosaics by combining and (optionally) normalising.
 
-     PAIRNDF: Displays and manipulates NDF pairs to allow easy registration 
+     PAIRNDF: Displays and manipulates image pairs to allow easy registration 
               (offsets only).
 
      PLOTLIST: Draws position markers on a graphics display.
 
-     PRESENT: Presents a list of NDFs to CCDPACK.
+     PRESENT: Presents a list of images to CCDPACK.
 
      REDUCE: Automatic CCD data reduction facility (command-line version).
 
@@ -61,7 +61,7 @@
 
      TRANLIST: Transforms lists of positions.
 
-     TRANNDF: Transforms (resamples) NDFs.
+     TRANNDF: Transforms (resamples) images.
 
      XREDUCE: Starts the automated CCD data reduction GUI.
 

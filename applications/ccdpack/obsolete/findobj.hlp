@@ -8,7 +8,7 @@ Usage:
 
 Description:
 
-   This routine processes a list of NDFs, locating and centroiding
+   This routine processes a list of images, locating and centroiding
    image features (such as stars) which have groups of connected
    pixels above threshold values.
 
@@ -25,8 +25,8 @@ Parameters:
 
 AUTOTHRESH = _LOGICAL (Read)
    If this parameter is TRUE then a threshold determined by
-   this routine for each of the NDFs will be used. If FALSE then
-   you will be prompted for a threshold value for each NDF.
+   this routine for each of the images will be used. If FALSE then
+   you will be prompted for a threshold value for each image.
    [TRUE]
 BINFRAC = _DOUBLE (Read)
    The minimum fraction of the image area (expressed as a
@@ -38,8 +38,8 @@ BINFRAC = _DOUBLE (Read)
    accuracy.
    [2.5]
 IN = LITERAL (Read)
-   A list of NDF names which contain the data components to be
-   scanned for image features.  The NDF names should be separated
+   A list of image names which contain the data components to be
+   scanned for image features.  The image names should be separated
    by commas and may include wildcards.
 LOGFILE = FILENAME (Read)
    Name of the CCDPACK logfile.  If a null (!) value is given for
@@ -93,26 +93,25 @@ OUTLIST = LITERAL (Read)
 
    These may be specified as list of comma separated names,
    using indirection if required, OR, as a single modification
-   element (of the input NDF names). The simplest modification
+   element (of the input image names). The simplest modification
    element is the asterisk "*" which means call each of the
-   output lists the same name as the corresponding input NDFs
-   (but without the ".sdf" extension).
+   output lists the same name as the corresponding input images.
    So,
       IN > *
       OUTLIST > *
-   signifies that all the NDFs in the current directory should be
+   signifies that all the images in the current directory should be
    used and the output lists should have the same names.
 
    Other types of modification can also occur, such as,
       OUTLIST > *_objs.dat
-   which means call the position lists the same as the input NDFs
+   which means call the position lists the same as the input images
    but put "_objs.dat" after the names. Replacement of a specified
    string with another in the output file names can also be used,
       OUTLIST > *|_debias|_images.dat|
    this replaces the string "_debias" with "_images.dat" in any
    of the output names.
 
-   If wildcarded names for the input NDFs are used then is it
+   If wildcarded names for the input images are used then is it
    recommended that wildcards are also used for the position list
    names (the order of input names is not guaranteed).
 
@@ -141,13 +140,13 @@ THRESH = _DOUBLE (Read)
    features.  Connected pixel groups above this threshold form
    image features. This parameter is only used if the AUTOTHRESH
    parameter is set FALSE. In this case a value may be supplied
-   for each NDF which is being processed.
+   for each image which is being processed.
    [Dynamic default]
 TOUCH = _LOGICAL (Read)
    If TRUE then pixel groups may contact the edges of the data
    array. Contact is defined as any pixel in the connected group
    of pixels being on the first or last column or row of the
-   actual data array (not including any NDF origin information).
+   actual data array (not including any image origin information).
    Setting this FALSE decreases the probability of incomplete
    pixel groups being centroided which would result in inaccurate
    positions.
@@ -162,16 +161,16 @@ USEPER = _LOGICAL (Read)
 Examples
 
 findobj in='*' minpix=10 outlist='*.find'
-   In this example FINDOBJ processes all the NDFs in the current
+   In this example FINDOBJ processes all the images in the current
    directory locating objects with connected pixel groups which
    have more than 9 pixels above the threshold.
 
-findobj '"ndf1,ndf2,ndf10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
+findobj '"image1,image2,image10"' 6 '"obj1.dat,obj2.dat,obj3.dat"'
         useper=false nsigma=3
    In this example FINDOBJ estimates the threshold using the mode
    value in the histogram of data values as an estimate of the
    background and the fit of a gaussian to this to estimate the
-   background standard deviation. The threshold used for each NDF
+   background standard deviation. The threshold used for each image
    is then 3 times the standard deviation above the estimated
    background.
 
@@ -207,7 +206,7 @@ Notes
 - NDF extension items.
 
   On exit the CURRENT_LIST items in the CCDPACK extensions
-  (.MORE.CCDPACK) of the input NDFs are set to the names of the
+  (.MORE.CCDPACK) of the input images are set to the names of the
   appropriate output lists. These items will be used by other
   CCDPACK position list processing routines to automatically
   access the lists.

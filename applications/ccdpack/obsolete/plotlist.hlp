@@ -27,10 +27,10 @@ DEVICE = DEVICE (Write)
 INLIST = LITERAL (Read)
    This parameter is used to access the names of the lists which
    contain the positions and, if NDFNAMES is TRUE, the names of
-   the associated NDFs. If NDFNAMES is TRUE the names of the
+   the associated images. If NDFNAMES is TRUE the names of the
    position lists are assumed to be stored in the extension of
-   the NDFs (in the CCDPACK extension item CURRENT_LIST) and the
-   names of the NDFs themselves should be given (and may include
+   the images (in the CCDPACK extension item CURRENT_LIST) and the
+   names of the images themselves should be given (and may include
    wildcards).
 
    If NDFNAMES is FALSE then the actual names of the position
@@ -86,7 +86,7 @@ MTYPE = _INTEGER (Read)
    [2]
 NDFNAMES = _LOGICAL (Read)
    If TRUE then the routine will assume that the names of the
-   position lists are stored in the NDF CCDPACK extensions under
+   position lists are stored in the image CCDPACK extensions under
    the item "CURRENT_LIST".
 
    If a global value for this parameter has been set using
@@ -131,7 +131,7 @@ THICK = _INTEGER (Read)
 Examples
 
 plotlist inlist='*'
-   In this example all the NDFs in the current directory are
+   In this example all the images in the current directory are
    accessed and their associated lists of positions are plotted
    onto the current display device.
 
@@ -140,7 +140,7 @@ plotlist ndfnames=false inlist=one_list.dat
    its position are plotted on the current display device.
 
 plotlist in='aligned_*' mtype=-1 palnum=4 msize=1 thick=3
-   In this example the NDFs aligned_* have their associated
+   In this example the images aligned_* have their associated
    position lists accessed and the positions are plotted on the
    current display device. The pen colour used is blue. The
    text is drawn at a relative size of 1 (the normal default  is
@@ -181,7 +181,7 @@ Notes
 - NDF extension items.
 
   If NDFNAMES is TRUE then the item "CURRENT_LIST" of the
-  .MORE.CCDPACK structure of the input NDFs will be located
+  .MORE.CCDPACK structure of the input images will be located
   and assumed to contain the names of the lists whose positions
   are to be plotted.
 

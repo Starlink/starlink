@@ -75,6 +75,8 @@
 *  History:
 *     5-MAR-1997 (PDRAPER):
 *        Original version.
+*     12-NOV-1997 (PDRAPER):
+*        Modified to switch off NDF format conversion.
 *     {enter_any_changes_here}
 
 *  Bugs:
@@ -126,6 +128,7 @@
       INTEGER NC                ! Number of characters
       INTEGER NDFID             ! NDF identifer
       INTEGER NTOK              ! Number of tokens on line
+      INTEGER DOCVT             ! Current foreign data conversion state
       LOGICAL LVAL              ! Logical FITS value
       LOGICAL SKIP              ! Skip over rest
       REAL RVAL                 ! Real FITS value
@@ -134,6 +137,12 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*  Tune NDF to not convert the input data from a foreign format. This
+*  routine should always be passed an NDF and conversion on release
+*  of the NDF isn't desirable. Note we store the current state of DOCVT
+*  and restore it on exit.
+      CALL NDF_GTUNE( 'DOCVT', DOCVT, STATUS )
+      CALL NDF_TUNE( 0, 'DOCVT', STATUS )
 
 *  Open the NDF, so we can modify the extension.
       CALL HDR_MOD( 'IN', STATUS )
@@ -204,7 +213,7 @@
                   IF ( STATUS .NE. SAI__OK ) CALL ERR_ANNUL( STATUS )
                   CALL ERR_RLSE
                   IF ( TRANS .NE. '<unknown>' ) THEN
-                     
+
 *  Determine the range of keywords and break string down into
 *  bits.
                      KEYWRD = LINE( I1( 3 ) : I2( 3 ) )
@@ -228,7 +237,7 @@
                            I3 = I4 + 1
                            I4 = MIN( I4 + FITLEN, CCD1__SZTRN )
                         ELSE
-                           
+
 *  No more parts to store, so stop.
                            GO TO 3
                         END IF
@@ -345,6 +354,9 @@
       IF ( STATUS .EQ. FIO__EOF ) CALL ERR_ANNUL( STATUS )
       CALL FIO_CLOSE( FD, STATUS )
       CALL IMG_FREE( 'IN', STATUS )
+
+*  Restore the NDF tuning parameter.
+      CALL NDF_TUNE( DOCVT, 'DOCVT', STATUS )
 
 *  If an error occurred, then report a contextual message.
       IF ( STATUS .NE. SAI__OK ) THEN
