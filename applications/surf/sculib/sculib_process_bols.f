@@ -251,6 +251,9 @@
 *     1997 March 20 (TIMJ)
 *        Extract from main tasks
 *     $Log$
+*     Revision 1.14  1998/05/05 21:27:41  timj
+*     Only call sculib_fix_scan_v10 when using RJ centre
+*
 *     Revision 1.13  1998/04/27 20:57:07  timj
 *     Fix bug in CHOP_PA calculation (relevant for SCULIB_ADD_CHOP). Also ensure
 *     that LO chopping is RJ for SCAN/MAP.
@@ -682,8 +685,12 @@
 *     If we are at version 1.0 of SCUCD we need to correct these
 *     header values so long as this  is not a moving source
 *     or we have an RD centre. RD centre should work anyway.
+*     Only appears to be a problem with RJ data (at least 
+*     we can only correct RJ data and the problem was never 
+*     noticed with RB scan data)
 
                      IF (SCUCD_VERSION .EQ. 1.0
+     :                    .AND. CENTRE_COORDS .EQ. 'RJ'
      :                    .AND. CENTRE_COORDS .NE. 'RD'
      :                    .AND. CENTRE_COORDS .NE. 'PLANET') THEN
 
