@@ -119,8 +119,15 @@
 *     SHIFT_DY = REAL (Read)
 *        The pointing shift (in Y) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinate frame.
+*     SIZE( 2 ) = INTEGER (Read)
+*        This parameter sets the size of the output grid in pixels. The default
+*        values are the minimum dimensions required to display the entirety
+*        of the mapped area.
 *     WEIGHT = REAL (Read)
 *        The relative weight that should be assigned to each dataset.
+*     WEIGHTS = LOGICAL (Read)
+*        Governs whether the convolution weights array will be stored.
+*        The default is false (ie do not store the weights array)
 
 *  Examples:
 *     rebin REBIN_METHOD=LINEAR OUT_COORDS=RJ
@@ -168,7 +175,8 @@
 *     are stored in a WEIGHTS NDF in the REDS extension of the output 
 *     data. For spline rebinning each point is equivalent to the number
 *     of integrations added into the final data point. For weight function
-*     regridding the situation is more complicated.
+*     regridding the situation is more complicated. The weights array is
+*     not stored if the WEIGHTS parameter is false.
 
 *  Implementation Status:
 *     This code deals with REBIN, INTREBIN, BOLREBIN, EXTRACT_DATA and
@@ -186,6 +194,11 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.45  1998/01/23 02:03:20  timj
+*     Optionally store the WEIGHTS array (use WEIGHTS parameter).
+*     Add the TIMES array (optional).
+*     Use MALLOC for the output grid instead of NDF_MAP.
+*
 *     Revision 1.44  1998/01/22 02:06:28  timj
 *     Allow the size of the output grid to be modified
 *
@@ -408,6 +421,8 @@ c
                                        ! in units of hours rather than degrees
       INTEGER          I               ! DO loop index
       INTEGER          IERR            ! For VEC copies
+      INTEGER          IJ_PTR_END      ! End of scratch pointer
+      INTEGER          IJ_PTR          ! Scratch pointer
       CHARACTER*80     IN              ! input filename and data-spec
       LOGICAL          INTREBIN        ! Am I rebinning ints separately?
       INTEGER          INT_LIST(MAX_FILE, SCUBA__MAX_INT + 1)
@@ -454,6 +469,7 @@ c
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs
                                        ! of all
                                        ! measured positions are calculated
+      INTEGER          NDF_PTR         ! Pointer to mapped NDF array
       INTEGER          NERR            ! For VEC copies
       INTEGER          NFILES          ! Number of files in INTREBIN/REBIN
       INTEGER          NPARS           ! Number of dummy pars
@@ -462,12 +478,14 @@ c
                                        ! files
       INTEGER          N_FILE_LOOPS    ! Number of loops for INTREBIN/REBIN
       INTEGER          N_INTS(MAX_FILE)! Number of integrations per input file
+      INTEGER          N_PIXELS        ! Number of pixels in output map
       INTEGER          N_POS (MAX_FILE)! number of positions measured in input
                                        ! files
       INTEGER          N_PTS (MAX_FILE)! Number of bols * positions
       CHARACTER*40     OBJECT(MAX_FILE)! name of object
       CHARACTER*(132)  OUT             ! Output file name
       CHARACTER*40     OUT_COORDS      ! coordinate system of output map
+      INTEGER          OUT_DATA_END    ! End of output data
       INTEGER          OUT_DATA_PTR    ! pointer to output map data array
       DOUBLE PRECISION OUT_DEC_CEN     ! apparent Dec of output map centre
                                        ! (radians)
@@ -478,6 +496,7 @@ c
                                        ! (radians)
       INTEGER          OUT_NDF         ! NDF index of output file
       REAL             OUT_PIXEL       ! size of pixels in output map (radians)
+      INTEGER          OUT_QUALITY_END ! End of quality array
       INTEGER          OUT_QUALITY_PTR ! pointer to output map quality array
       DOUBLE PRECISION OUT_RA_CEN      ! apparent RA of output map centre
                                        ! (radians)
@@ -486,9 +505,11 @@ c
       CHARACTER*(DAT__SZLOC) OUT_REDSX_LOC
                                        ! locator to REDS extension in output
       CHARACTER * (132)OUT_TITLE       ! Title of output NDF
+      INTEGER          OUT_VARIANCE_END! End of pointer to output map variance
       INTEGER          OUT_VARIANCE_PTR! pointer to output map variance array
       INTEGER          OUT_WEIGHT_NDF  ! NDF identifier for weight array
-      INTEGER          OUT_WEIGHT_PTR  ! Pointer to mapped weights array
+      INTEGER          OUT_WEIGHT_END  ! Pointer to end weights array
+      INTEGER          OUT_WEIGHT_PTR  ! Pointer to weights array
       REAL             PARS(3)         ! Dummy array of parameter values
       CHARACTER * (PAR__SZNAM) PARAM   ! Name of input parameter
       INTEGER          PLACE           ! Place holder for output NDF
@@ -517,6 +538,7 @@ c
       CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       CHARACTER*15     SUTDATE         ! date of first observation
       CHARACTER*15     SUTSTART        ! UT of start of first observation
+      LOGICAL          TIMES           ! Store the TIMES array
       INTEGER          TOT(MAX_FILE)   ! Number of integrations per input file
       INTEGER          TOTAL_BOLS      ! Number of bolometers
       INTEGER          UBND (MAX_DIM)  ! pixel indices of top right corner
@@ -526,6 +548,7 @@ c
       REAL             WAVELENGTH      ! the wavelength of the map (microns)
       REAL             WEIGHT (MAX_FILE)
                                        ! weights assigned to each input file
+      LOGICAL          WEIGHTS         ! Store the weights array
       INTEGER          WEIGHTSIZE      ! Radius of weighting function
       REAL             WTFN (WTFNRAD * WTFNRAD * WTFNRES * WTFNRES + 1)
                                        ! Weighting function
@@ -1304,6 +1327,8 @@ c
                J_CENTRE = INT(MAP_SIZE(2) / 2)
             END IF
 
+            N_PIXELS = MAP_SIZE(1) * MAP_SIZE(2)
+
 *     Now that the size of the map is determined we have to work out whether
 *     we are rebinning all integrations into one image (REBIN/BOLREBIN) or 
 *     into separate images (INTREBIN).
@@ -1392,36 +1417,6 @@ c
      :                    OUT_NDF, STATUS)
                   END IF
 
-                  CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
-     :                 OUT_QUALITY_PTR, ITEMP, STATUS)
-                  CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE/ZERO', 
-     :                 OUT_DATA_PTR, ITEMP, STATUS)
-                  CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
-     :                 'WRITE/ZERO', OUT_VARIANCE_PTR, ITEMP, STATUS)
-
-*     Also create and map associated NDF of weights for each pixel
-*     as an NDF in the REDS extension
-
-                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
-     :                 0, 0, OUT_REDSX_LOC, STATUS)
-
-                  CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE, 
-     :                 STATUS) 
-                  CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
-     :                 OUT_WEIGHT_NDF, STATUS)
-                  CALL DAT_ANNUL(OUT_REDSX_LOC, STATUS)
-
-                  CALL NDF_MAP (OUT_WEIGHT_NDF, 'DATA', '_REAL', 
-     :                 'WRITE/ZERO', OUT_WEIGHT_PTR, ITEMP, STATUS)
-
-*     Fill Quality array with bad data
-
-                  IF (STATUS .EQ. SAI__OK) THEN
-                     CALL SCULIB_CFILLB (MAP_SIZE(1) * MAP_SIZE(2), 
-     :                    BADBIT, 
-     :                    %val(OUT_QUALITY_PTR))
-                  END IF
-
 *     There will be bad pixels in the output map.
 
                   CALL NDF_SBAD (.TRUE., OUT_NDF, 'Data,Variance', 
@@ -1430,6 +1425,31 @@ c
 
 *     Create HISTORY
                   CALL NDF_HCRE(OUT_NDF, STATUS)
+
+
+*     Get memory for the output grid
+                  CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
+     :                 OUT_DATA_PTR, OUT_DATA_END, STATUS)
+                  CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
+     :                 OUT_VARIANCE_PTR, OUT_VARIANCE_END, STATUS)
+                  CALL SCULIB_MALLOC(N_PIXELS * VAL__NBUB,
+     :                 OUT_QUALITY_PTR, OUT_QUALITY_END, STATUS)
+
+*     Fill arrays with bad data and zeroes
+
+                  IF (STATUS .EQ. SAI__OK) THEN
+                     CALL SCULIB_CFILLB (N_PIXELS, BADBIT,
+     :                    %val(OUT_QUALITY_PTR))
+                     CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
+     :                    %VAL(OUT_DATA_PTR))
+                     CALL SCULIB_CFILLR(N_PIXELS, 0.0, 
+     :                    %VAL(OUT_VARIANCE_PTR))
+                  END IF
+
+
+*     Get some memory for the weights array
+                  CALL SCULIB_MALLOC(N_PIXELS * VAL__NBR,
+     :                 OUT_WEIGHT_PTR, OUT_WEIGHT_END, STATUS)
 
 *     Now time for regrid
                   IF ((METHOD .EQ. 'BESSEL') .OR. 
@@ -1452,7 +1472,7 @@ c
                      ELSE IF (METHOD .EQ. 'SPLINE2') THEN
                         SPMETHOD = 'SURFIT'
                         CALL PAR_DEF0R('SFACTOR',
-     :                       MAP_SIZE(1)*MAP_SIZE(2) / 2.0,
+     :                       N_PIXELS / 2.0,
      :                       STATUS)
                         CALL PAR_GET0R('SFACTOR', SFACTOR, STATUS)
                      ELSE 
@@ -1482,6 +1502,36 @@ c
                      END IF
                   END IF
 
+*     Copy the data to the output NDF
+                  CALL NDF_MAP (OUT_NDF, 'DATA', '_REAL', 'WRITE', 
+     :                 NDF_PTR, ITEMP, STATUS)
+                  CALL VEC_RTOR(.FALSE., N_PIXELS,
+     :                 %VAL(OUT_DATA_PTR), %VAL(NDF_PTR), IERR,
+     :                 NERR, STATUS)
+                  CALL NDF_UNMAP(OUT_NDF, 'DATA', STATUS)
+
+                  CALL NDF_MAP (OUT_NDF, 'VARIANCE', '_REAL', 
+     :                 'WRITE', NDF_PTR, ITEMP, STATUS)
+                  CALL VEC_RTOR(.FALSE., N_PIXELS,
+     :                 %VAL(OUT_VARIANCE_PTR), %VAL(NDF_PTR), IERR,
+     :                 NERR, STATUS)
+                  CALL NDF_UNMAP(OUT_NDF, 'VARIANCE', STATUS)
+
+                  CALL NDF_MAP (OUT_NDF, 'QUALITY', '_UBYTE', 'WRITE',
+     :                 NDF_PTR, ITEMP, STATUS)
+                  CALL VEC_UBTOUB(.FALSE., N_PIXELS,
+     :                 %VAL(OUT_QUALITY_PTR), %VAL(NDF_PTR), IERR,
+     :                 NERR, STATUS)
+                  CALL NDF_UNMAP(OUT_NDF, 'QUALITY', STATUS)
+
+*     Free the memory for the output grid
+                  CALL SCULIB_FREE('OUT_DATA', OUT_DATA_PTR,
+     :                 OUT_DATA_END, STATUS)
+                  CALL SCULIB_FREE('OUT_VARIANCE', OUT_VARIANCE_PTR,
+     :                 OUT_VARIANCE_END, STATUS)
+                  CALL SCULIB_FREE('OUT_VARIANCE', OUT_QUALITY_PTR,
+     :                 OUT_QUALITY_END, STATUS)
+
 *     and a title
 
                   OUT_TITLE = SOBJECT
@@ -1498,6 +1548,100 @@ c
      :                 OUT_LONG, OUT_LAT, OUT_PIXEL, I_CENTRE, J_CENTRE, 
      :                 MAP_SIZE(1), MAP_SIZE(2), WAVELENGTH, STATUS )
                   
+
+*     Create a REDS extension
+                  CALL NDF_XNEW (OUT_NDF, 'REDS', 'SURF_EXTENSION',
+     :                 0, 0, OUT_REDSX_LOC, STATUS)
+
+                  CALL PAR_GET0L('WEIGHTS', WEIGHTS, STATUS)
+
+*     Also create and map associated NDF of weights for each pixel
+*     as an NDF in the REDS extension if requested.
+
+                  IF (WEIGHTS) THEN
+
+                     CALL NDF_PLACE (OUT_REDSX_LOC, 'WEIGHTS', PLACE, 
+     :                    STATUS) 
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+     :                    OUT_WEIGHT_NDF, STATUS)
+                     
+                     CALL NDF_MAP (OUT_WEIGHT_NDF, 'DATA', '_REAL', 
+     :                    'WRITE/ZERO', NDF_PTR, ITEMP, STATUS)
+
+*     Copy the weights into the output NDF
+
+                     CALL VEC_RTOR(.FALSE., N_PIXELS,
+     :                    %VAL(OUT_WEIGHT_PTR), %VAL(NDF_PTR), IERR,
+     :                    NERR, STATUS)
+
+*     Unmap the weights NDF
+                     CALL NDF_UNMAP(OUT_WEIGHT_NDF, '*', STATUS)
+                     CALL NDF_ANNUL(OUT_WEIGHT_NDF, STATUS)
+
+
+*     Free the weights array
+                     CALL SCULIB_FREE('WEIGHTS', OUT_WEIGHT_PTR,
+     :                    OUT_WEIGHT_END, STATUS)
+                  END IF
+
+*     Now store the TIMEs array if required
+                  CALL PAR_GET0L('TIMES', TIMES, STATUS)
+
+                  IF (TIMES) THEN
+*     Already have a REDS extension so...
+
+                     CALL NDF_PLACE (OUT_REDSX_LOC, 'TIMES', PLACE, 
+     :                    STATUS) 
+                     CALL NDF_NEW('_REAL', 2, LBND, UBND, PLACE, 
+     :                    OUT_WEIGHT_NDF, STATUS)
+
+*     Map the data
+                     CALL NDF_MAP(OUT_WEIGHT_NDF, 'DATA', '_INTEGER', 
+     :                 'WRITE/ZERO', NDF_PTR, ITEMP, STATUS)
+
+                     CALL SCULIB_MALLOC((N_PIXELS * VAL__NBUB),
+     :                    OUT_QUALITY_PTR, OUT_QUALITY_END,
+     :                    STATUS)
+
+*     Fill the quality array with zeroes
+                     BADB = 0
+                     IF (STATUS .EQ. SAI__OK) THEN
+                        CALL SCULIB_CFILLB (N_PIXELS, BADB,
+     :                       %val(OUT_QUALITY_PTR))
+                     END IF
+
+                     DO I = 1, FILE
+                        CALL SCULIB_MALLOC(( 2 * N_PTS(I) * VAL__NBI),
+     :                       IJ_PTR, IJ_PTR_END, STATUS)
+
+                        CALL SURFLIB_CALC_IJPOS(N_PTS(I), 
+     :                       DBLE(OUT_PIXEL), I_CENTRE, J_CENTRE,
+     :                       %VAL(ABOL_RA_PTR(I)),%VAL(ABOL_DEC_PTR(I)), 
+     :                       %VAL(IJ_PTR), STATUS)
+
+                        CALL SURFLIB_HISTOGRAM_GRID(N_PTS(I),
+     :                       MAP_SIZE(1), MAP_SIZE(2), .TRUE.,
+     :                       %VAL(ABOL_DATA_PTR(I)),
+     :                       %VAL(OUT_QUALITY_PTR), BADB, 
+     :                       %VAL(IJ_PTR), %VAL(NDF_PTR), ITEMP,
+     :                       ITEMP, ITEMP, STATUS)
+
+                        CALL SCULIB_FREE('IJs',IJ_PTR, IJ_PTR_END,
+     :                       STATUS)
+                     END DO
+
+*     Free everything
+                     CALL SCULIB_FREE('DummyQual', OUT_QUALITY_PTR,
+     :                    OUT_QUALITY_END, STATUS)
+                     CALL NDF_UNMAP(OUT_WEIGHT_NDF, 'DATA', STATUS)
+                     CALL NDF_ANNUL(OUT_WEIGHT_NDF, STATUS)
+
+                  END IF
+
+*     Annul the output NDF and locator
+                  CALL DAT_ANNUL(OUT_REDSX_LOC, STATUS)
+                  CALL NDF_ANNUL(OUT_NDF, STATUS)
+
 *     Tidy up each loop
 
                   IF (BOLREBIN) THEN
@@ -1513,8 +1657,6 @@ c
                      END DO
                   END IF
 
-                  CALL NDF_ANNUL(OUT_WEIGHT_NDF, STATUS)
-                  CALL NDF_ANNUL(OUT_NDF, STATUS)
 
                END DO
             END DO
