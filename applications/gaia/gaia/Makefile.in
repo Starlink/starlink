@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------
 
 # run make in these sub directories
-SUBDIRS      = colormaps bitmaps src mktclapp
+SUBDIRS      = colormaps bitmaps src mktclapp gaia.htx library
 
 # root of source tree
 SRC_ROOT     = @SRC_ROOT@
