@@ -49,9 +49,21 @@ foreach my $a (@cpts) {
     my ($x0, $y0, $sx,$sy,$sigma,$theta)
       = decompose_transform ($b->[0], $b->[1], $b->[2],
 			     $b->[3], $b->[4], $b->[5]);
-    printf STDOUT ("(%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f) -> (%5.2f,%5.2f,%6.2f,%6.2f,%4.0f,%4.0f)\n",
-		   $b->[0], $b->[1], $b->[2], $b->[3], $b->[4], $b->[5],
-		   $x0, $y0, $sx, $sy, $sigma, $theta);
+     printf STDOUT ("(%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f) -> (%5.2f,%5.2f,%6.2f,%6.2f,%4.0f,%4.0f)\n",
+                    pzero($b->[0]), pzero($b->[1]), pzero($b->[2]),
+                    pzero($b->[3]), pzero($b->[4]), pzero($b->[5]),
+                    pzero($x0), pzero($y0), pzero($sx),
+                    pzero($sy), pzero($sigma), pzero($theta));
+}
+
+# print zeros as positive zeros always
+sub pzero {
+    my $t = shift;
+    if ($t == 0.0) {
+        return 0.0;
+    } else {
+        return $t;
+    }
 }
 
 sub make_cpts {
