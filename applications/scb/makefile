@@ -851,14 +851,16 @@ do_test:
 #  The test proper is to build a small index in a temporary directory from
 #  a small source archive supplied with this package, and to extract files
 #  from that index. 
-	$(PERL5) -e 'require 5;'
-	SCB_INDEX=/usr/tmp/scb_test; \
-        export SCB_INDEX; \
-        echo SCB_INDEX: $$SCB_INDEX; \
-        rm -rf $$SCB_INDEX; \
-        mkdir $$SCB_INDEX; \
-        echo "scbindex.pl:  Indexing scb_test.tar"; \
-        echo " "; \
+	$(PERL5) -e 'require 5;' && \
+	SCB_INDEX=/usr/tmp/scb_test && \
+        SCB_BROWSER_TMP=$$SCB_INDEX/browser_tmp && \
+        SCB_INDEXER_TMP=$$SCB_INDEX/indexer_tmp && \
+        export SCB_INDEX SCB_BROWSER_TMP SCB_INDEXER_TMP && \
+        echo SCB_INDEX: $$SCB_INDEX && \
+        rm -rf $$SCB_INDEX && \
+        mkdir $$SCB_INDEX $$SCB_BROWSER_TMP $$SCB_INDEXER_TMP && \
+        echo "scbindex.pl:  Indexing scb_test.tar" && \
+        echo " " && \
         $(INSTALL_BIN)/scbindex.pl scb_test.tar && \
         echo " " && \
         echo "scb.pl:  Extracting fortran file" && \
@@ -866,7 +868,7 @@ do_test:
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw_  type=func >/dev/null && \
         $(INSTALL_BIN)/scb.pl -html -exact scb_hw   type=func >/dev/null && \
         $(INSTALL_BIN)/scb.pl -html -exact Makefile type=file >/dev/null && \
-        echo "Test successful"; echo " ";
+        echo "Test successful"; echo " " && \
 	SCB_INDEX=/usr/tmp/scb_test; rm -rf $$SCB_INDEX
 #
 #  Note the test has been run.
