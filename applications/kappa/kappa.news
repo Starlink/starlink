@@ -1,46 +1,15 @@
-1 KAPPA_Version_0.16
+1 KAPPA_Version_1.0
 
-   A new release of KAPPA (V0.16) has been made. The changes are
+   A new release of KAPPA (V1.0) has been made. The changes are
    described fully in sun95.
 
-   - A new command called LUTWARM has been added. It loads a colour 
-   table which goes from black to white, passing through warm shades 
-   of yellow and brown, as popularised by GAIA. 
+   - The following obsolete commands have been removed from KAPPA -
+   alternatives are indicate in SUN/95:
 
-   - A new command called PERMAXES has been added. It permutes the axes
-   of an NDF. This rearranges the pixel values within the NDF and also
-   rearranges the AXIS stuctures and WCS FrameSet so that they refer to
-   the correct pixel axes.
+   GREYPLOT.
 
-   - THRESH may now be used to replace data between specified
-   thresholds as well as outside specified thresholds, by setting 
-   the lower threshold greater than the upper threshold.
+   Many of these commands have been archived in a new package called
+   KAPRH in order to satisfy any occasional need that may occur for them
+   (see SUN/xxx):
 
-   - A bug has been fixed in PSF which caused the output NDF holding 
-   the model PSF be filled with zeros.
 
-   - It is now possible to use CONTOUR to draw "pseudo-contours" which
-   outline regions of the data array chosen in ways other than than by
-   simple data thresholding. Setting MODE to "Good" will produce a
-   curve which encloses all the good pixel values. Setting MODE to
-   "Bounds" will produce a curve which traces the edges of the array. 
-
-   - A new command call OUTLINE has been added which draws the outline of
-   an NDF over an existing plot. It is a synonym for "contour mode=bounds".
-
-   - The TextBackColour plotting attribute, which allows the background
-   colour for text to be selected (or set transparent) has been documented 
-   in SUN/95.
-
-   - A bug has been fixed which could cause catalogues stored in a
-   "Small Text List" format (i.e. with a file type of ".txt") to be 
-   unreadable as a KAPPA positions list.
-
-   - A bug has been fixed in FILLBAD which caused the MEMORY=YES option
-   to produce incorrect results. 
-
-   - WCSATTRIB now reports an error if an attempt is made to change
-   attribute values in any of the Frames which are managed internally by
-   the NDF library (that is, Frames with Domains PIXEL, AXIS and GRID).
-   The exception to this is that the Domain attribute itself may be
-   changed, thereby adding a new Frame to the WCS component. 

@@ -168,10 +168,6 @@
          ELSE IF ( NAME .EQ. 'GDSTATE' ) THEN
             CALL GDSTATE( STATUS )
 
-*  Produces a greyscale plot of a 2-d NDF.
-         ELSE IF ( NAME .EQ. 'GREYPLOT' ) THEN
-            CALL GREYPLOT ( STATUS )
-
 *  Draws a perspective plot of a two-dimensional NDF.
 *         ELSE IF ( NAME .EQ. 'HIDE' ) THEN
 *            CALL HIDE ( STATUS )

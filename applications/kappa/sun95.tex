@@ -11,12 +11,12 @@
 % ? Document identification
 \newcommand{\stardoccategory}  {Starlink User Note}
 \newcommand{\stardocinitials}  {SUN}
-\newcommand{\stardocsource}    {sun95.16}
-\newcommand{\stardocnumber}    {95.16}
+\newcommand{\stardocsource}    {sun95.17}
+\newcommand{\stardocnumber}    {95.17}
 \newcommand{\stardocauthors}   {Malcolm J. Currie \& David S. Berry}
-\newcommand{\stardocdate}      {15 March 2001}
+\newcommand{\stardocdate}      {22 May 2001}
 \newcommand{\stardoctitle}     {KAPPA --- Kernel Application Package}
-\newcommand{\stardocversion}   {0.16}
+\newcommand{\stardocversion}   {1.0}
 \newcommand{\stardocmanual}    {User's Guide}
 % ? End of document identification
 % -----------------------------------------------------------------------------
@@ -23028,480 +23028,6 @@ plot (101k).
    }
 }
 \sstroutine{
-   GREYPLOT
-}{
-   Produces a greyscale plot of a 1-d or 2-d NDF
-}{
-   \sstdescription{
-
-\vspace{5mm}
-\begin{quote}
-\begin{center}
-\emph{ Note, this application will be withdrawn at the next release of
-KAPPA. Use ``DISPLAY KEY=YES'' instead.} 
-\end{center}
-\end{quote}
-\vspace{5mm}
-
-      This application produce a greyscale plot of a 1- or
-      2-dimensional NDF, especially for a hardcopy device.  The image
-      is usually the data array, but may also be the variance or
-      quality.  The plot appears in the current graphics-database
-      picture.
-
-      The greyscale plot resides within optional, annotated and
-      enumerated axes. An optional key may be drawn to the right of the
-      greyscale plot comprising a title and grey blocks annotated with
-      the corresponding array value.  There are a number of scaling
-      methods to map array values to grey levels in the plot.
-
-      The time to output to hardcopy devices can be quite lengthy
-      and generally depends on the size of the greyscale plot.
-      Therefore, there are parameters for controlling the size of
-      the plot.
-   }
-   \sstusage{
-      greyplot in [comp] key [device] mode [pxsize] [pysize] [out]
-        \newline\hspace*{1.5em}
-        $\left\{ {\begin{tabular}{l}
-                    white=? black=? \\  
-                    percentiles=? \\
-                    sigmas=? 
-                  \end{tabular} }
-        \right.$
-        \newline\hspace*{1.9em}
-        \makebox[0mm][c]{\small mode}
-   }
-   \sstparameters{
-      \sstsubsection{
-         ABSLAB  =  LITERAL (Read)
-      }{
-         Label for the plot abscissa, in which NCAR fancy founts
-         may be embedded when FONT = {\tt "}NCAR{\tt "}.  This parameter is only
-         used when the axes option is selected.  If axis information is
-         present the suggested default is the NDF{\tt '}s axis label followed
-         by the units, in parentheses.  If an error occurs obtaining
-         the label the suggested default is {\tt "}X{\tt "}. {\tt []}
-      }
-      \sstsubsection{
-         AXES = \_LOGICAL (Read)
-      }{
-         TRUE if annotated axes are to be drawn around the displayed
-         image.  The annotations are either the data co-ordinates from
-         the NDF axis components, provided these are present and linear
-         and COSYS = {\tt "}Data{\tt "}; otherwise pixel co-ordinates are used.
-         {\tt [FALSE]}
-      }
-      \sstsubsection{
-         BADCOL = LITERAL (Read)
-      }{
-         The grey level to give a bad pixel in the display.  There are
-         a number of options described below.
-
-           {\tt "}MAX{\tt "}       - Black
-           {\tt "}MIN{\tt "}       - White
-           An integer  - The actual {\tt '}colour{\tt '} index.  It is constrained
-                         to be between 0 and the maximum colour index
-                         available on the device, and so gives a shade
-                         of grey.  0 gives the background colour.
-           A named     - Uses the named `colour{\tt '} from the palette, and
-           `colour{\tt '}      if it is not present, the nearest colour from
-                         the palette is selected.  The palette contains
-                         grey levels at percentages from black to white,
-                         \emph{e.g.} GREY50 is midway between black and white.
-
-         If this application is run on a device that supports colour
-         it is possible to mark the bad pixels in colour on the
-         greyscale provided BADCOL is an integer between 0 and 15, or
-         a named colour.  The bad pixels will remain unaltered if the
-         lookup table is manipulated.  The suggested default is the
-         current value. [The current value, but equals {\tt "}MIN{\tt "} if there
-         is no current value.]
-      }
-      \sstsubsection{
-         BLACK = \_DOUBLE (Read)
-      }{
-         The array value that scales to the black in the greyscale
-         colour table.  All smaller array values appear black when
-         BLACK is less than WHITE, otherwise all array values
-         smaller than BLACK appear white.  The dynamic default is the
-         minimum data value.   There is an efficiency gain when both
-         BLACK and WHITE are given on the command line, because the
-         extreme values need not be computed.  (Scale mode)
-      }
-      \sstsubsection{
-         COMP = LITERAL (Read)
-      }{
-         The NDF component to be displayed.  It may be {\tt "}Data{\tt "},
-         {\tt "}Quality{\tt "}, {\tt "}Variance{\tt "}, or {\tt "}Error{\tt "} (where {\tt "}Error{\tt "} is the
-         alternative to {\tt "}Variance{\tt "} and causes the square root of the
-         variance values to be displayed).  If {\tt "}Quality{\tt "} is specified,
-         then the quality values are treated as numerical values (in
-         the range 0 to 255). {\tt [{\tt "}Data{\tt "}]}
-      }
-      \sstsubsection{
-         COSYS = LITERAL (Read)
-      }{
-         The co-ordinate system to be used.  This can be either {\tt "}World{\tt "}
-         or {\tt "}Data{\tt "}.  {\tt "}World{\tt "} makes pixel co-ordinates to appear on axes.
-         If COSYS = {\tt "}Data{\tt "} the NDF{\tt '}s axis information is used to
-         annotate axes.  {\tt [Current co-ordinate system]}
-      }
-      \sstsubsection{
-         DEVICE = DEVICE (Read)
-      }{
-         The name of the graphics device used to display the image.
-         The device must be in one of the following GNS categories:
-         IMAGE\_DISPLAY, IMAGE\_OVERLAY, MATRIX\_PRINTER, or WINDOW, and
-         have at least 24 greyscale intensities.
-         {\tt [Current image-display device]}
-      }
-      \sstsubsection{
-         FILL = \_LOGICAL (Read)
-      }{
-         The greyscale plot normally has square pixels, in other words
-         a length along each axis corresponds to the same number of
-         pixels.  However, for images with markedly different
-         dimensions, such as two-dimensional spectra, this default
-         behaviour may not be suitable or give the clearest plot.  When
-         FILL is TRUE, the square-pixel constraint is relaxed and the
-         greyscale plot is the largest possible within the current
-         picture.  When FILL is FALSE, the pixels are square.  The
-         suggested default is the current value.  {\tt [FALSE]}
-      }
-      \sstsubsection{
-         FONT = LITERAL (Read)
-      }{
-         The fount to be used for the line graphics.  It can be either
-         {\tt "}NCAR{\tt "} for the NCAR fancy characters and {\tt "}GKS{\tt "} for the standard
-         GKS san-serif fount.   The former is intended for hardcopy
-         publication-quality plots, since it is relatively slow; the
-         latter is intended for normal interactive graphics requiring
-         rapid plotting, and it is clearer on small plots. The
-         suggested default is the current value. {\tt [{\tt "}GKS{\tt "}]}
-      }
-      \sstsubsection{
-         FULL = \_LOGICAL (Read)
-      }{
-         If TRUE, the whole greyscale lookup table for the device is
-         used including the normally reserved pens.  Thus all but two
-         of the available intensities participate in the greyscale,
-         which improves the photographic quality of the image.  The
-         remaining pens are for the background, and for the key and
-         axes.  This option is only available for devices that reset
-         their `colour{\tt '} tables when the device is opened, such as
-         Laserprinters. (This restriction prevents problems on devices
-         that retain their {\tt "}colour tables{\tt "}, where using the normally
-         reserved pens would mean that either part of the greyscale
-         would be emphemeral---departing when the application
-         completes if the reserved pens are stored and reinstated on
-         completion, or earlier plots drawn by other applications would
-         be altered.)
-
-         If FULL = FALSE, only non-reserved intensities will form the
-         greyscale.  If a null (!) value is supplied, the value used is
-         TRUE when the non-reserved pens is less than 32, and FALSE
-         otherwise.  (This figure was chosen because it is roughly the
-         number of grey levels at which the eye will clearly detect the
-         quantisation in a complex scene.) {\tt [!]}
-      }
-      \sstsubsection{
-         IN = NDF (Read)
-      }{
-         Input NDF data structure containing the image to be displayed.
-      }
-      \sstsubsection{
-         KEY = \_LOGICAL (Read)
-      }{
-         A key of the greyscale versus pixel value and title is to be
-         produced when this is TRUE. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         MAJTIC( 2 ) = \_REAL (Read)
-      }{
-         The parameter controlling the numbers of major tick marks
-         for the x and y axes.  (Number used is between MAJTIC$+$2 and
-         5$*$MAJTIC/2$+$4.)   A negative value for an axis makes the
-         graphics package decide an appropriate value.  This parameter
-         is only used when the axes option is selected. {\tt [3.,3.]}
-      }
-      \sstsubsection{
-         MINTIC( 2 ) = \_REAL (Read)
-      }{
-         The number of minor tick marks between each major tick mark
-         for the x and y axes.  A negative value forces the graphics
-         package to compute appropriate values.   This parameter is
-         only used when the axes option is selected. {\tt [-1.,-1.]}
-      }
-      \sstsubsection{
-         MODE = LITERAL (Read)
-      }{
-         The type of scaling to be applied to the array.  There are a
-         number of options described below.
-           {\tt "}Faint{\tt "}       - The image is scaled from the mean minus one
-                           standard deviation to the mean plus seven
-                           standard deviations.  The scaling values are
-                           reported so that the faster Scale mode may be
-                           utilised later.
-           {\tt "}Flash{\tt "}       - The image is flashed onto the screen without
-                           any scaling at all.  This is the fastest
-                           option.  Since there is no longer a
-                           one-to-one mapping between data values and
-                           grey levels this scaling mode is not
-                           available with a key.
-           {\tt "}Percentiles{\tt "} - The image is scaled between the values
-                           corresponding to two percentiles.  The
-                           scaling values are reported so that the
-                           faster Scale mode may be utilised later.
-           {\tt "}Range{\tt "}       - The image is scaled between the minimum and
-                           maximum data values.
-           {\tt "}Scale{\tt "}       - You define the upper and lower limits
-                           between which the image is to be scaled.  The
-                           application reports the maximum and the
-                           minimum values for reference and makes these
-                           defaults respectively.
-           {\tt "}Sigmas{\tt "}      - The image is scaled between two standard-
-                           deviation limits.  The scaling values used
-                           are reported so that the faster Scale mode
-                           may be utilised later.
-      }
-      \sstsubsection{
-         NUMBIN  =  \_INTEGER (Read)
-      }{
-         The number of histogram bins used to compute percentiles for
-         scaling. (Percentiles mode) {\tt [2048]}
-      }
-      \sstsubsection{
-         ORDLAB  =  LITERAL (Read)
-      }{
-         Label for the plot ordinate, in which NCAR fancy founts
-         may be embedded when FONT = {\tt "}NCAR{\tt "}.   This parameter is only
-         used when the axes option is selected.  If axis information is
-         present the suggested default is the NDF{\tt '}s axis label followed
-         by the units, in parentheses.  If an error occurs obtaining
-         the label the suggested default is {\tt "}Y{\tt "}. {\tt []}
-      }
-      \sstsubsection{
-         OUT = NDF (Write)
-      }{
-         The scaled NDF that is displayed; it also does not have
-         values that equal the reserved portion of the colour table.
-         The output NDF is intended to be used as the input data in
-         conjunction with SCALE=FALSE.  It will be vertically
-         inverted with respect to the input array because of GKS
-         convention.  If it has a null value (!) no output NDF will be
-         created.  This parameter is ignored when SCALE=FALSE. {\tt [!]}
-      }
-      \sstsubsection{
-         OUTTIC = \_LOGICAL (Read)
-      }{
-         True if the axis tick marks are to appear on the outside of
-         the axes instead of inside.   This parameter is only used
-         when the axes option is selected. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         PERCENTILES( 2 ) = \_REAL (Read)
-      }{
-         The percentiles that define the scaling limits. For example,
-         {\tt [75,25]} would scale between the quartile values. (Percentile
-         mode)
-      }
-      \sstsubsection{
-         PLTITL = LITERAL (Read)
-      }{
-         The title of the plot.  Up to about 25 characters can be
-         accommodated when there are no axes, and about 40 otherwise.
-         NCAR fancy founts may be embedded (cf. SUN/90) when FONT =
-         {\tt "}NCAR{\tt "}.  This parameter is only used when either the axes or
-         key option is selected. {\tt [The NDF title]}
-      }
-      \sstsubsection{
-         PXSIZE = \_REAL (Read)
-      }{
-         The length (x axis) of the plot in metres.  [Maximum that can
-         fit in the current picture whilst preserving square pixels.]
-      }
-      \sstsubsection{
-         PYSIZE = \_REAL (Read)
-      }{
-         The length (y axis) of the plot in metres.  [Maximum that can
-         fit in the current picture whilst preserving square pixels.]
-      }
-      \sstsubsection{
-         REDUCT = \_REAL (Read)
-      }{
-         The reduction factor of the array, and must be in the range
-         1/MAX(NX,NY)--1.0, where NX and NY are the number of pixels
-         in the image along the x and y directions.  Since the output
-         to the hardcopy device may be long, the size of the image
-         with respect to the key can be reduced by lowering REDUCT.
-         The spooling time goes approximately proportional to the
-         square of REDUCT.  1.0 means the array fills the plotting zone.
-         {\tt [1.0]}
-      }
-      \sstsubsection{
-         SCAHIGH = \_DOUBLE (Write)
-      }{
-         The array value scaled to white in the greyscale display.
-         In Flash mode or when there is no scaling the colour index of
-         white is used.  The current display linear-scaling maximum is
-         set to this value.
-      }
-      \sstsubsection{
-         SCALE = \_LOGICAL (Read)
-      }{
-         If TRUE the input array is scaled according to the value of
-         parameter MODE.  If it is FALSE, MODE is ignored, and the input
-         array is displayed as is.  There is no scaling, inversion
-         or avoidance of annotation pens.  SCALE=FALSE is intended to
-         be used with arrays previously scaled by this or similar
-         applications which have already performed the scaling,
-         inversion and exclusion.  It provides the quickest method of
-         image display within this application. {\tt [TRUE]}
-      }
-      \sstsubsection{
-         SCALOW = \_DOUBLE (Write)
-      }{
-         The array value scaled to black in the greyscale display.
-         In Flash mode or when there is no scaling the colour index of
-         black is used.  The current display linear-scaling minimum is
-         set to this value.
-      }
-      \sstsubsection{
-         SIGMAS( 2 ) = \_REAL (Read)
-      }{
-         The standard-deviation bounds that define the scaling limits.
-         To obtain values either side of the mean both a negative and
-         a positive value are required.  Thus {\tt [-2,3]} would scale
-         between the mean minus two and the mean plus three standard
-         deviations.  {\tt [3,-2]} would give the negative of that. (Sigmas
-         mode).
-      }
-      \sstsubsection{
-         THICK = \_REAL (Read)
-      }{
-         The thickness of the axes and annotations in the plot, where
-         1.0 is the normal thickness.  It should be between 0.5 and 5.
-         This feature is only available on some devices.   This
-         parameter is only used when the axes option is selected. {\tt [1.0]}
-      }
-      \sstsubsection{
-         WHITE = \_DOUBLE (Read)
-      }{
-         The array value that scales to white in the greyscale
-         colour table.  All larger array values appear white when
-         WHITE is greater than BLACK, otherwise all array values
-         larger than WHITE appear black.  The dynamic default is the
-         maximum data value.   There is an efficiency gain when both
-         BLACK and WHITE are given on the command line, because the
-         extreme values need not be computed.  (Scale mode)
-      }
-   }
-   \sstexamples{
-      \sstexamplesubsection{
-         greyplot sdor key mode=sc black=1 white=5.2
-      }{
-         Makes a greyscale display of the data component of the NDF
-         called sdor on the current image-display device, scaling
-         between 1 and 5.2.  Values up to 1.0 in the data array will
-         appear black in the plot, and values larger than 5.2 will be
-         white.  Intermediate values will a grey level determined by
-         linear interpolation.  A key is drawn to the right of the
-         greyscale.
-      }
-      \sstexamplesubsection{
-         greyplot in=sdor nokey mode=p percentiles=[10,90] badcol={\tt "}Black{\tt "}
-      }{
-         This makes a greyscale plot of the NDF called sdor on the
-         current image-display device. The scaling is between the 10 and
-         90 per cent percentiles of the image.  No key is drawn.  Bad
-         data appear black in the plot.
-      }
-      \sstexamplesubsection{
-         greyplot mode=fa axes out=video cosys=d $\backslash$
-      }{
-         Displays a greyscale of the current NDF data component with
-         annotated axes on the current image-display device.  The axes
-         take the axis labels and title from the NDF, and are annotated
-         in data co-ordinates.  The scaling is between the -1 and $+$7
-         standard deviations of the image around its mean.  A key is
-         drawn.  The scaled data are stored in an NDF called video.
-      }
-      \sstexamplesubsection{
-         greyplot video noscale $\backslash$
-      }{
-         Displays the data component of the NDF called video (created
-         in the previous example) without scaling within the current
-         picture on the current image-display device.
-      }
-      \sstexamplesubsection{
-         greyplot cgs4k v key mode=ra device=canon\_l
-      }{
-         Makes a greyscale display of the variance component of NDF
-         cgs4k on the Canon\_l device, scaling between the minimum and
-         maximum variance values.
-      }
-   }
-   \sstnotes{
-      \sstitemlist{
-
-         \sstitem
-         The application stores a number of pictures in the graphics
-         database in the following order: a FRAME of the specified size
-         containing the title, annotated axes, and the image area
-         (provided AXES is TRUE), whose world co-ordinates are in pixels;
-         a DATA picture with world co-ordinates in units of data pixels;
-         and a KEY.  The DATA picture also may have double-precision data
-         co-ordinates derived from the NDF axis component provided these
-         are linear and different from pixel co-ordinates; the data
-         co-ordinates are stored via a linear transformation.  The NDF
-         associated with the plot is stored by reference with the DATA
-         picture.  On exit the current database picture for the chosen
-         device reverts to the input picture.
-
-         \sstitem
-         When axes are requested the axis annotations are defined by
-         their lower and upper bounds, \emph{i.e.} a regular array is assumed.
-         The bounds are in pixel or data co-ordinates.
-
-         \sstitem
-         The data type of the output NDF depends on the number of colour
-         indices: \_UBYTE for no more than 256, \_UWORD for 257 to 65535,
-         and \_INTEGER otherwise.   The output NDF will not contain any
-         extensions, UNITS, QUALITY, and VARIANCE; but LABEL, TITLE, and
-         AXIS information are propagated from the input NDF.  The output
-         NDF does not become the new current data array.  It is a Simple
-         NDF (because the bad-pixel flag is set to false in order to
-         access the maximum grey level), therefore only NDF-compliant
-         applications can process it.
-      }
-   }
-   \sstdiytopic{
-      Related Applications
-   }{
-      KAPPA: DISPLAY; Figaro: IGREY, IMAGE; SPECDRE: MOVIE.
-   }
-   \sstimplementationstatus{
-      \sstitemlist{
-
-         \sstitem
-         This routine correctly processes the AXIS, DATA, QUALITY,
-         VARIANCE, LABEL, TITLE, WCS and UNITS components of the input NDF.
-
-         \sstitem
-         Processing of bad pixels and automatic quality masking are
-         supported.
-
-         \sstitem
-         This application will handle data in all numeric types, though
-         type conversion to integer will occur for unsigned byte and word
-         images.  However, when there is no scaling only integer data will
-         not be type converted, but this is not expensive for the expected
-         byte-type data.
-      }
-   }
-}
-\sstroutine{
    HISCOM
 }{
    Adds commentary to the history of an NDF
@@ -45969,7 +45495,7 @@ name is defined.
 
 \end{itemize}
 
-\section{\xlabel{se_changes}Release Notes---V0.15-9}
+\section{Release Notes---V0.15-9}
 
 More applications have been changed to enable them to make use
 of the NDF WCS component, which stores descriptions of world
@@ -46262,7 +45788,7 @@ The following applications have been modified:
 
 \end{description}
 
-\section{\xlabel{se_changes}Release Notes---V0.16\label{se:changes}}
+\section{Release Notes---V0.16}
 
 \begin{itemize}
 
@@ -46342,6 +45868,24 @@ The following new commands have been added:
        within the NDF and also rearranges the AXIS stuctures and WCS 
        FrameSet so that they refer to the correct pixel axes.
 \end{description}
+
+\section{\xlabel{se_changes}Release Notes---V1.0\label{se:changes}}
+
+\subsection{Removed Commands}
+The following obsolete commands have been removed from KAPPA -
+alternatives are indicate below. Many of these commands have been
+archived in a new package called KAPRH in order to satisfy any occasional
+need that may occur for them (see SUN/xxx).
+\begin{description}
+\item [GREYPLOT] Use \htmlref{DISPLAY}{DISPLAY} instead setting parameter
+KEY to ``Y''.
+\end{description}
+
+\subsection{Modified Commands}
+
+
+
+
 
 \begin{latexonly}
 \newpage
