@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, YKEY, KDATA, 
-     :                       UNITS, JUST, STATUS )
+      SUBROUTINE POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, 
+     :                       KDATA, UNITS, JUST, STATUS )
 *+
 *  Name:
 *     POL1_VECKY
@@ -11,7 +11,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, YKEY, KDATA, UNITS, 
+*     CALL POL1_VECKY( PARKEY, IPLOT, VSCALE, AHSIZM, KEYOFF, KDATA, UNITS, 
 *                      JUST, STATUS )
 
 *  Description:
@@ -38,9 +38,9 @@
 *        The size of the arrowhead to be drawn at the end of the
 *        vector, in metres.  If a value of zero is supplied, no arrow
 *        head is drawn.
-*     YKEY = REAL (Given)
-*        The Y world coordinate at which the top of the key is to be
-*        placed.
+*     KEYOFF = REAL (Given)
+*        The fractional offset to the top of the key, where 0 and 1 are the
+*        bottom and top of the key picture.
 *     KDATA = REAL (Given)
 *        The data value corresponding to the key vector which is to be
 *        drawn.  A lower value may be selected by the routine.
@@ -100,7 +100,7 @@
       REAL VSCALE
       REAL AHSIZM
       REAL KDATA
-      REAL YKEY
+      REAL KEYOFF
       CHARACTER * ( * ) UNITS
       CHARACTER * ( * ) JUST
 
@@ -171,7 +171,8 @@
          GO TO 999
       END IF
 
-*  Get the extent of the current picture in world coordinates, and metres.
+*  Set the PGPLOT viewport and window to match the current AGI picture,
+*  and get the extent of the window in world coordinates, and metres.
       CALL KPG1_GDQPC( X1, X2, Y1, Y2, XM, YM, STATUS )
 
 *  Format the vector scale value (data units per centimetre), using the Plot's 
@@ -277,10 +278,12 @@
 *  Get the PGPLOT character height being used in world coordinates.
       CALL PGQCS( 4, XCH, HGT )
 
+*  Set the Y world co-ordinate at the top of the key.
+      YC = Y1 + KEYOFF*( Y2 - Y1 ) 
+
 *  Produce text describing the vector scale in words.  Left justify
 *  to allow room for the text to spill over the XWIDTH fraction.
       XL = X1 + 0.01 * ( X2 - X1 )
-      YC = YKEY 
       CALL PGTEXT( XL, YC - 0.5*HGT, 'Vector scale:' )
 
       YC = YC - 2.0 * HGT
@@ -307,10 +310,10 @@
       RADIUS = MIN( 0.1 * KEYLEN, ( X2 - X1 ) * CIRAD )
 
       IF ( JUST .EQ. 'START' ) THEN
-         CALL KPG1_VECT( XL + 0.5 * KEYLEN + RADIUS, YC, 'CENTRE',
+         CALL POL1_VECT( XL + 0.5 * KEYLEN + RADIUS, YC, 'CENTRE',
      :                   KEYLEN, -90.0 * DTOR, AHSIZE, STATUS )
       ELSE
-         CALL KPG1_VECT( XL + 0.5 * KEYLEN, YC, 'CENTRE', KEYLEN,
+         CALL POL1_VECT( XL + 0.5 * KEYLEN, YC, 'CENTRE', KEYLEN,
      :                   -90.0 * DTOR, AHSIZE, STATUS )
       END IF
 

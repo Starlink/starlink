@@ -408,7 +408,6 @@
       REAL XM                    ! DATA zone x size in metres
       REAL Y1                    ! Lower y w.c. bound of picture
       REAL Y2                    ! Upper y w.c. bound of picture
-      REAL YKEY                  ! Vertical position at top of DATA picture
       REAL YM                    ! DATA zone y size in metres
 
 *  Local Data:
@@ -705,7 +704,7 @@
 
 *  Start up the graphics system, creating a KEY picture.
          CALL KPG1_PLOT( IWCS, 'UNKNOWN', 'POLPACK_POLPLOT', ' ', 
-     :                   MARGIN, 1, 'KEY', 'R', 0.25, ASPECT, DOMAIN, 
+     :                   MARGIN, 1, 'KEY', 'R', 0.75, ASPECT, DOMAIN, 
      :                   BOX, IPICD, IPICF, IPICK, IPLOT, NFRM, ALIGN, 
      :                   STATUS )
 
@@ -808,13 +807,13 @@
 
 *  Report an error if there is insufficient room within the current
 *  picture for the key.
-            IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP( 'POLPLOT_3', 'There is insufficient '//
-     :                       'room in the current picture for a key.', 
-     :                       STATUS )
-               GO TO 999
-            END IF
+         IF( IPICK .EQ. -1 .AND. STATUS .EQ. SAI__OK ) THEN
+            STATUS = SAI__ERROR
+            CALL ERR_REP( 'POLPLOT_3', 'There is insufficient '//
+     :                    'room in the current picture for a key.', 
+     :                    STATUS )
+            GO TO 999
+         END IF
 
 *  If no value was supplied for the vertical position of the KEY using 
 *  parameter KEYPOS, find the value which puts the top of the key level 
@@ -849,10 +848,6 @@
 
          IF( STATUS .NE. SAI__OK ) GO TO 999
 
-*  Find the corresponding world Y value in the key picture.
-         CALL PGQWIN( X1, X2, Y1, Y2 )
-         YKEY = Y1 + KEYOFF*( Y2 - Y1 ) 
-
 *  Ensure that previous synonyms are cleared.
          CALL KPG1_ASPSY( ' ', ' ', STATUS )
 
@@ -867,7 +862,7 @@
      :                    STATUS )
 
 *  Now produce the key.
-         CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, YKEY,
+         CALL POL1_VECKY( 'KEYVEC', IPLOTK, VSCALE, AHSIZM, KEYOFF,
      :                    ABS( TYPDAT ), UNITS1, JUST, STATUS )
 
       END IF
