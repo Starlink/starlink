@@ -26,6 +26,11 @@
 *        Original version.
 *     10-FEB-2004 (DSB):
 *        Added debug conditional code to keep track of memory leaks.
+*     15-JUL-2004 (DSB):
+*        In astUnitMapper: if no Mapping can be found from input to
+*        output units (e.g. because fo the less than perfect simplication
+*        algorithm in SimplifyTree), try finding a Mapping from output to 
+*        input units and inverting the result.
 */
 
 /* Module Macros. */
@@ -4282,10 +4287,12 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    UnitNode *intemp;
    UnitNode *inv;         
    UnitNode *labtree;
+   UnitNode *newtest;
    UnitNode *out_tree;
    UnitNode *outtemp;
    UnitNode *src;
    UnitNode *testtree;
+   UnitNode *tmp;         
    UnitNode *totaltree;
    UnitNode *totlabtree;
    const char *c;
@@ -4293,6 +4300,7 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    int i;
    int nc;             
    int nunits;
+   int ipass;
 
 /* Initialise */
    result = NULL;
@@ -4353,11 +4361,26 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
       LocateUnits( in_tree, &units, &nunits );
       LocateUnits( out_tree, &units, &nunits );
 
+/* Due to the simple nature of the simplification process in SimplifyTree,
+   the following alogorithm sometimes fails to find a Mapping form input
+   to output units, but can find a Mapping from output to input units.
+   In this latter case, we can get the required Mapping from input to
+   output  simply by inverting the Mapign from output to input. So try
+   first with the units in the original order. If this fails to find a
+   Mapping, try again with the units swapped, and note that the final
+   Mapping should be inverted before being used. */
+      for( ipass = 0; ipass < 2; ipass++ ){
+         if( ipass = 1 ) {
+            tmp = in_tree;            
+            in_tree = out_tree;            
+            out_tree = tmp;
+         }
+
 /* We are going to create a new tree of UnitNodes in which the head node
    corresponds to the requested output units, and which has a single
    non-constant leaf node corresponding to the input units. Initialise a 
    pointer to this new tree to indicate that it has not yet been created. */
-      testtree = NULL;
+         testtree = NULL;
 
 /* Loop round each basic unit used in the definition of either the input
    or the output units (i.e. the elements of the array created above by
@@ -4370,15 +4393,15 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    previous pass (in other words, all the test trees must be equivalent). 
    We break out of the loop (and return a NULL Mapping) as soon as we find 
    a test tree which differs from the previous test tree. */
-      for( i = 0; i < nunits; i++ ) {
+         for( i = 0; i < nunits; i++ ) {
 
 /* Create copies of the trees describing the input and output units, in which 
    all units other than the current unit are set to a constant value of 1. 
    This is done by replacing OP_LDVAR nodes (i.e. nodes which "load" the
    value of a named basic unit) by OP_LDCON nodes (i.e. nodes which load
    a specified constant value) in the tree copy. */
-         intemp = FixUnits( in_tree, units[ i ] );         
-         outtemp = FixUnits( out_tree, units[ i ] );         
+            intemp = FixUnits( in_tree, units[ i ] );         
+            outtemp = FixUnits( out_tree, units[ i ] );         
 
 /* Simplify these trees. An important side-effect of this simplification
    is that trees are "standardised" which allows them to be compared for
@@ -4391,8 +4414,8 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    As a consequence of this standardisation, the "simplification" performed 
    by SimplifyTree can sometimes actually make the tree more complicated 
    (in terms of the number of nodes in the tree). */
-         SimplifyTree( &intemp, 1 );
-         SimplifyTree( &outtemp, 1 );
+            SimplifyTree( &intemp, 1 );
+            SimplifyTree( &outtemp, 1 );
 
 /* If either of the simplified trees does not depend on the current unit,
    then the node at the head of the simplified tree will have a constant
@@ -4404,19 +4427,19 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    instance if converting from "m.s.Hz" to "km" and the current unit
    is "s", then the "s.Hz" term will cause the "s" units to cancel out). In 
    this case ignore this basic unit and pass on to the next. */
-         if( outtemp->con != AST__BAD && intemp->con != AST__BAD ) {
+            if( outtemp->con != AST__BAD && intemp->con != AST__BAD ) {
 
 /* If just one simplified tree is constant, then the two units cannot
    match since one depends on the current basic unit and the other does 
    not. Free any test tree from previous passes and break out of the loop. */
-         } else if( outtemp->con != AST__BAD || intemp->con != AST__BAD ) {
-            testtree = FreeTree( testtree );
-            break;
+            } else if( outtemp->con != AST__BAD || intemp->con != AST__BAD ) {
+               testtree = FreeTree( testtree );
+               break;
 
 /* If neither simplified tree is constant, both depend on the current
    basic unit and so we can continue to see if their dependencies are
    equivalent. */
-         } else {
+            } else {
 
 /* We are going to create a new tree which is the inverse of the above
    simplified "intemp" tree. That is, the new tree will have a head node
@@ -4426,57 +4449,79 @@ AstMapping *astUnitMapper_( const char *in, const char *out,
    inverted successfully, this root node becomes part of the inverted tree, 
    and so does not need to be freed explicitly (it will be freed when the 
    inverted tree is freed). */
-            src = NewNode( NULL, OP_LDVAR );
-            if( astOK ) src->name = astStore( NULL, "input_units", 12 );
+               src = NewNode( NULL, OP_LDVAR );
+               if( astOK ) src->name = astStore( NULL, "input_units", 12 );
 
 /* Now produce the inverted input tree. If the tree cannot be inverted, a
    null pointer is returned. Check for this. Otherwise a pointer to the
    UnitNode at the head of the inverted tree is returned. */
-            inv = InvertTree( intemp, src );
-            if( inv ) {
+               inv = InvertTree( intemp, src );
+               if( inv ) {
 
 /* Concatenate this tree (which goes from "input units" to "current unit") 
    with the simplified output tree (which goes from "current unit" to 
    "output units"), to get a new tree which goes from input units to output
    units. */
-               totaltree = ConcatTree( inv, outtemp );
+                  totaltree = ConcatTree( inv, outtemp );
 
 /* Simplify this tree. */
-               SimplifyTree( &totaltree, 1 );
+                  SimplifyTree( &totaltree, 1 );
 
 /* Compare this simplified tree with the tree produced for the previous
    unit (if any). If they differ, we cannot map between the supplied
    units so annul the test tree and break out of the loop. If this is the
    first unit to be tested, use the total tree as the test tree for the
    next unit. */
-               if( testtree ) {
-                  if( CmpTree( totaltree, testtree, 0 ) ) testtree = FreeTree( testtree );
-                  totaltree = FreeTree( totaltree );
-                  if( !testtree ) break;
-               } else {
-                  testtree = totaltree;
+                  if( testtree ) {
+                     if( CmpTree( totaltree, testtree, 0 ) ) testtree = FreeTree( testtree );
+                     totaltree = FreeTree( totaltree );
+                     if( !testtree ) break;
+                  } else {
+                     testtree = totaltree;
+                  }
                }
-            }
 
 /* If the input tree was inverted, free the inverted tree. */
-            if( inv ) {
-               inv = FreeTree( inv );
+               if( inv ) {
+                  inv = FreeTree( inv );
 
 /* If the input tree could not be inverted, we cannot convert between input 
    and output units. Free the node which was created to be the root of the 
    inverted tree (and which has consequently not been incorporated into the
    inverted tree), free any testtree and break out of the loop. */
-            } else {
-               src = FreeTree( src );
-               testtree = FreeTree( testtree );
-               break;
+               } else {
+                  src = FreeTree( src );
+                  testtree = FreeTree( testtree );
+                  break;
+               }
             }
-         }
 
 /* Free the other trees. */
-         intemp = FreeTree( intemp );
-         outtemp = FreeTree( outtemp );
+            intemp = FreeTree( intemp );
+            outtemp = FreeTree( outtemp );
 
+         }
+
+/* If all the basic units used by either of the supplied system of units 
+   produced the same test tree, leave the "swap in and out units" loop. */
+         if( testtree ) break;
+
+      }
+
+/* If the input and output units have been swapped, swap them back to
+   their original order, and invert the test tree (if there is one). */
+      if( ipass > 0 ) {
+         tmp = in_tree;            
+         in_tree = out_tree;            
+         out_tree = tmp;
+         if( testtree ) {
+            src = NewNode( NULL, OP_LDVAR );
+            if( astOK ) src->name = astStore( NULL, "input_units", 12 );
+            newtest = InvertTree( testtree, src );
+            FreeTree( testtree );
+            testtree = newtest;
+            if( !newtest ) src = FreeTree( src );
+         } 
       }
 
 /* If all the basic units used by either of the supplied system of units 
@@ -4684,7 +4729,7 @@ static const char *OpName( Oper op ) {
 }
 
 static const char *OpSym( UnitNode *node ) {
-   char buff[ 100 ];
+   static char buff[ 100 ];
    const char *sym;
 
    if( node->con != AST__BAD ) {
