@@ -1,5 +1,5 @@
 # Starlink M4 macros for autoconf
-# This file is part of starconf version @PACKAGE_VERSION@
+# original starconf.m4, installed by starconf @PACKAGE_VERSION@, rnum=@PACKAGE_VERSIONINT@
 # DO NOT EDIT: it may be overwritten when starconf is next run
 
 
