@@ -119,6 +119,7 @@
         DO IL=1,NL
           CALL ARX_GET(ARDID,IL,TEXT,STATUS)
           CALL CHR_UCASE(TEXT)
+          CALL CHR_RMBLK(TEXT)
 	print *,text
         call flush(6)
           NCIRC=NCIRC+STR_OCCUR('CIRCLE',TEXT)
@@ -164,6 +165,7 @@
           C1=1
           DO IL=1,NL
             CALL ARX_GET(ARDID,IL,TEXT(C1:),STATUS)
+            CALL CHR_RMBLK(TEXT(C1:))
             C1=CHR_LEN(TEXT)+1
           ENDDO
           C1=INDEX(TEXT,'(')
@@ -187,6 +189,7 @@
           C1=1
           DO IL=1,NL
             CALL ARX_GET(ARDID,IL,TEXT(C1:),STATUS)
+            CALL CHR_RMBLK(TEXT(C1:))
             C1=CHR_LEN(TEXT)+1
           ENDDO
           C1=INDEX(TEXT,'(')
@@ -213,6 +216,7 @@
           C1=1
           DO IL=1,NL
             CALL ARX_GET(ARDID,IL,TEXT(C1:),STATUS)
+            CALL CHR_RMBLK(TEXT(C1:))
             C1=CHR_LEN(TEXT)+1
           ENDDO
           C1=INDEX(TEXT,'(')
