@@ -96,15 +96,13 @@
          CALL CHR_APPND( AST_GETC( FRM, 'SYSTEM', STATUS ), TEXT, IAT )
 
          IF( AST_TEST( FRM, 'EQUINOX', STATUS ) ) THEN
-            CALL CHR_APPND( AST_GETC( FRM, 'EQUINOX=', STATUS ), TEXT, 
-     :                      IAT )
+            CALL CHR_APPND( ',EQUINOX=', TEXT, IAT )
             CALL CHR_APPND( AST_GETC( FRM, 'EQUINOX', STATUS ), TEXT, 
      :                      IAT )
          END IF
 
          IF( AST_TEST( FRM, 'EPOCH', STATUS ) ) THEN
-            CALL CHR_APPND( AST_GETC( FRM, 'EPOCH=', STATUS ), TEXT, 
-     :                      IAT )
+            CALL CHR_APPND( ',EPOCH=', TEXT, IAT )
             CALL CHR_APPND( AST_GETC( FRM, 'EPOCH', STATUS ), TEXT, 
      :                      IAT )
          END IF
