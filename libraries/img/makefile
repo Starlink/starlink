@@ -414,7 +414,7 @@ PKG_NUM = 1599
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 1.2-2
+PKG_VERS = 1.3-1
 
 #  Library version number.
 #

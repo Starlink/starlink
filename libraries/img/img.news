@@ -2,18 +2,14 @@
 
   This is a minor release of IMG. 
 
-  The documentation has been updated to reinforce the fact that NDF
-  identifiers obtained using IMG_INDF are not released by any IMG
-  calls (you must do this for yourself using NDF_ANNUL). 
+  A bug that returned all images as the same size, even from different
+  calls to IMG_IN, has been fixed.
 
-  A new routine HDR_COPY that copys sources of header information
-  between images has been added.
-
-  Previously it was possible that records after the END card could
-  contain NULL characters. These are now set BLANK.
+  FITS character strings may now be free-format (i.e. the terminating
+  quote may be before the 20th column of a header card).
 
   IMG is fully described in SUN/160, which you can view on-line with
   the "showme sun160" command.
 
-  Peter W. Draper 24-OCT-2000 (img@star.rl.ac.uk).
+  Peter W. Draper 04-MAR-2003 (img@star.rl.ac.uk).
 

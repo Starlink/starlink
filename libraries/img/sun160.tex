@@ -14,13 +14,13 @@
 \newcommand{\stardocinitials}  {SUN}
 \newcommand{\stardocsource}    {sun\stardocnumber}
 \newcommand{\stardoccopyright} 
-{Copyright \copyright\ 2000 Council for the Central Laboratory of the Research Councils}
+{Copyright \copyright\ 2000-2003 Council for the Central Laboratory of the Research Councils}
 
 % Variable part - replace [xxx] as appropriate.
-\newcommand{\stardocnumber}    {160.5}
+\newcommand{\stardocnumber}    {160.6}
 \newcommand{\stardocauthors}   {P.W. Draper \\
                                 R.F. Warren-Smith}
-\newcommand{\stardocdate}      {24 October 2000}
+\newcommand{\stardocdate}      {3 March 2003}
 \newcommand{\stardoctitle}     {IMG \\ [1ex]
                                 Simple Image Data Access}
 \newcommand{\stardocversion}   {Version 1.3}
@@ -700,7 +700,7 @@ case). You should consider this subroutine as a replacement for the
 file that normally has a \myverb{PROGRAM} statement in it.
 
 % 2
-\item The call to \htmlref{\myverb{IMG\_IN}}{IMG_INnx} gets the input
+\item The call to \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_} gets the input
 image. The image is associated with the ``parameter'' \myverb{'IN'}
 which usually means that you will be prompted for the name of an image
 data-file.  The subroutine then returns the size of the image --
@@ -827,7 +827,7 @@ create a new image and then write values to it:
 \mynote
 \begin{enumnotes}
 %1
-\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx} creates the new image dataset
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_} creates the new image dataset
 (usually prompting you for a name). The image size in this example is
 416~$\times$~578 pixels.
 
@@ -886,7 +886,7 @@ exists\latexonly{ (see \S\ref{USINGIMG})}.
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{IMG\_OUT}}{IMG_OUTx} creates a new output image
+\item The call to \htmlref{\myverb{IMG\_OUT}}{IMG_OUT_x_} creates a new output image
 associated with the parameter \myverb{'OUT'} by copying the one
 associated with the parameter \myverb{'IN'}. It returns a pointer
 \myverb{IPOUT} for the output image data.
@@ -920,7 +920,7 @@ header item from an image associated with the parameter \myverb{'IN'}:
       CALL HDR_IN( 'IN', ' ', 'OBSERVER', 1, VALUE, ISTAT )
 \end{verbatim}
 \end{code}
-The call to \htmlref{\myverb{HDR\_IN}}{HDR_INx} specifies the image by using its
+The call to \htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} specifies the image by using its
 parameter name -- \myverb{'IN'} (argument 1). If you have not
 previously accessed this image you will probably be prompted for its
 file name at this point.
@@ -957,12 +957,12 @@ header item to an image associated with the parameter \myverb{'OUT'}:
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{HDR\_OUT}}{HDR_OUTx} specifies the image by using its
+\item The call to \htmlref{\myverb{HDR\_OUT}}{HDR_OUT_x_} specifies the image by using its
 parameter name -- \myverb{'OUT'} (argument 1). If you have not
 previously accessed this image you will probably be prompted for its
 file name at this point. If you have already accessed the image then
 it should be either an output image or one accessed for modification,
-as you cannot write items to images accessed by \htmlref{\myverb{IMG\_IN}}{IMG_INnx}.
+as you cannot write items to images accessed by \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}.
 
 The 2nd, blank argument, indicates that an ``ordinary'' FITS header
 item is to be written.
@@ -1005,7 +1005,7 @@ shows you how to create a temporary image for this purpose:
 \end{code}
 \mynote
 \begin{enumnotes}
-\item The call to \htmlref{\myverb{IMG\_TMP}}{IMG_TMPnx} creates a temporary image of
+\item The call to \htmlref{\myverb{IMG\_TMP}}{IMG_TMP_n__x_} creates a temporary image of
 the size you specify (in this case the same size as the input image).
 You will {\em not} be prompted for a file name for a temporary image,
 and {\em no } entry is needed for it in the program's interface file.
@@ -1029,7 +1029,7 @@ dimension sizes. The following illustrates the possibilities:
 \end{code}
 Note how the number of dimensions is specified by appending a number
 to the routine name, and how \myverb{IMG\_IN2} is just a synonym for
-\htmlref{\myverb{IMG\_IN}}{IMG_INnx} (2 dimensions are assumed if you do not say
+\htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_} (2 dimensions are assumed if you do not say
 otherwise).
 
 As well as accessing input images, there are equivalent routines for
@@ -1088,7 +1088,7 @@ so among the possibilities are the calls:
 \item Access an image using \myverb{INTEGER}.
 
 \item Access an image using \myverb{REAL}. Note that
-this is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_INnx}, since it also gets a 2-D
+this is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, since it also gets a 2-D
 \myverb{REAL} image.
 \end{enumnotes}
 
@@ -1152,7 +1152,7 @@ PRECISION}.
 \item This call creates a new 3-D data cube with the word (Fortran
 \myverb{INTEGER*2}) data type.
 
-\item This call is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_INnx}, since it gets a 2-D
+\item This call is a synonym for \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, since it gets a 2-D
 \myverb{REAL} image.
 \end{enumnotes}
 
@@ -1217,7 +1217,7 @@ which should now be an array of size 3.
 % 2
 \item
 The image \myverb{'RAW'} is copied to a new file. This also copies any
-header information, so is usually preferred to using \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx}.
+header information, so is usually preferred to using \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_}.
 
 % 3
 \item
@@ -1259,7 +1259,7 @@ subroutine call. Some possibilities are:
 \mynote
 \begin{enumnotes}
 % 1
-\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEWnx} creates two new images with size
+\item The call to \htmlref{\myverb{IMG\_NEW}}{IMG_NEW_n__x_} creates two new images with size
 1024~$\times$~1024. The variable \myverb{IP} should be declared as
 an \myverb{INTEGER} array of size 2.
 
@@ -1440,7 +1440,7 @@ Character code & Fortran-77 data type      &  Description      \\
 Since all header item values can be converted to a character
 representation, this is the safest method to access an item of unknown
 type (which is why it is the method used by the ordinary
-\htmlref{\myverb{HDR\_IN}}{HDR_INx} subroutine). Some of the possible calls are:
+\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} subroutine). Some of the possible calls are:
 \begin{code}
 \begin{verbatim}
      CALL HDR_INR( 'IN', ' ', 'BSCALE', 1, BSCALE, ISTAT )    [1]
@@ -1542,7 +1542,7 @@ item source are not known.
 
 % 3
 \item
-\htmlref{\myverb{HDR\_IN}}{HDR_INx} returns the value of the header item as a
+\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} returns the value of the header item as a
 character string.
 
 % 4
@@ -1558,9 +1558,9 @@ Strictly, this is limited to the keywords \myverb{COMMENT},
 construct multi-line descriptions of the contents or history of a FITS
 file. To handle this, various of the HDR subroutines are ``FITS
 occurrence aware''. For instance, the fourth argument of the
-\htmlref{\myverb{HDR\_IN}}{HDR_INx} subroutine specifies the
+\htmlref{\myverb{HDR\_IN}}{HDR_IN_x_} subroutine specifies the
 occurrence of the item to be read, and
-\htmlref{\myverb{HDR\_OUT}}{HDR_OUTx} will append (rather than
+\htmlref{\myverb{HDR\_OUT}}{HDR_OUT_x_} will append (rather than
 overwriting) items with these special names.
 
 FITS items can also have a comment associated with them (to be read by
@@ -3652,23 +3652,32 @@ This version introduces and documents the C interface.
 
 In this release several bugs in the Linux version of IMG have been
 corrected. These affected the release of headers when using the
-\htmlref{IMG\_CANCL}{IMG\_CANCL} routine and counting of header items by 
-\htmlref{HDR\_NUMB}{HDR\_NUMB}. A new routine has also been added --
-\htmlref{IMG\_NAME}{IMG\_NAME}. This returns the name of the 
-image data file for use when producing logfile information etc.
+\htmlref{\myverb{IMG\_CANCL}}{IMG\_CANCL} routine and counting of
+header items by \htmlref{\myverb{HDR\_NUMB}}{HDR\_NUMB}. A new routine
+has also been added -- \htmlref{\myverb{IMG\_NAME}}{IMG\_NAME}. This
+returns the name of the image data file for use when producing logfile
+information etc.
 
-\section{Changes this release (1.3)}
+\section{Changes in release (1.3)}
 The documentation has been updated to reinforce the fact that NDF
-identifiers obtained using \htmlref{IMG\_INDF}{IMG\_INDF} are not
+identifiers obtained using \htmlref{\myverb{IMG\_INDF}}{IMG\_INDF} are not
 released by any IMG calls (you must do this for yourself using
-NDF\_ANNUL). 
+\myverb{NDF\_ANNUL}). 
 
 A new routine for copying sources of header information
-(\htmlref{HDR\_COPY}{HDR\_COPY}) has been added. 
+(\htmlref{\myverb{HDR\_COPY}}{HDR\_COPY}) has been added. 
 
 A bug in the FITS header writer that added NULL characters after the
 END card has been corrected. This should have only affected output
 FITS headers that contained some initially empty cards.
+
+\section{Changes in this release (1.3-1)}
+
+A bug that returned all images as the same size, even from different
+calls to \htmlref{\myverb{IMG\_IN}}{IMG_IN_n__x_}, has been fixed.
+
+FITS character strings may now be free-format (i.e.\ 
+the terminating quote may be before the 20th column of a header card).
 
 \end{document}
 % $Id$
