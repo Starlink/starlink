@@ -8966,6 +8966,8 @@ cvs checkout: Updating java/source/topcat/src/main/uk
 cvs checkout: Updating java/source/topcat/src/main/uk/ac
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat
+U java/source/topcat/src/main/uk/ac/starlink/topcat/ActivationQueryWindow.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/Activator.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/AuxWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BasicAction.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/BitsRowSubset.java
@@ -8984,6 +8986,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/CustomComboBoxRenderer.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/Driver.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/HelpWindow.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/InverseRowSubset.java
+U java/source/topcat/src/main/uk/ac/starlink/topcat/JELActivator.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELRowReader.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/JELUtils.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/LoadQueryWindow.java
@@ -9019,6 +9022,7 @@ U java/source/topcat/src/main/uk/ac/starlink/topcat/UpDownButton.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/ViewerTableModel.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/WindowAction.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/func
+U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Activation.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Angles.java
 U java/source/topcat/src/main/uk/ac/starlink/topcat/func/Miscellaneous.java
 cvs checkout: Updating java/source/topcat/src/main/uk/ac/starlink/topcat/join
