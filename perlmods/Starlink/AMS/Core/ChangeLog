@@ -1,3 +1,9 @@
+2000-01-31  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* Core.pm (adamtask_message): Pass around reference to array
+	rather than string joined with :: -- was causing problems on the
+	split.
+
 1999-04-21  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* Core.pm (adamtask_init): Fix -w with RELAY_NAME

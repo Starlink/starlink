@@ -108,7 +108,7 @@ $TIMEOUT = 30;
  
 Exporter::export_tags('Func');
  
-$VERSION = '1.00';
+$VERSION = '1.01';
 
 
 ############# Subroutines #############################
@@ -212,7 +212,7 @@ sub adamtask_init {
 # adamtask_message
 #
 #   Routine to process incoming messages
-#    Arguments: message
+#    Arguments: Reference to array of messages
 #   Routine does not read from the PIPE. It relies on another process
 #   to pass the text from the pipe to this routine
 # Returns immediately if status (arg 7) is not SAI__OK
@@ -226,7 +226,7 @@ sub adamtask_message {
   my ($command, $path, $messid);
 
   # Split the message on the separator
-  my @message = split(/::/, $message);
+  my @message = @$message;
 
   $command = $message[0];
   $path    = $message[3];
@@ -513,12 +513,11 @@ sub adamtask_sendw {
     # Note that the timeout must be given in milliseconds
 
     @reply = adam_getreply(1000 * $TIMEOUT, $returns[0], $returns[1]);
-    $reply = join("::",@reply);
     
     # Now need to acknowledge the message if it is a paramreq or something
     # Send the reply off to a generic subroutine
 
-    ($status, $response) = adamtask_message($reply);
+    ($status, $response) = adamtask_message(\@reply);
 
     last if ($status != &Starlink::ADAM::SAI__OK);
 
