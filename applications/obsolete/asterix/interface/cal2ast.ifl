@@ -1,0 +1,24 @@
+interface CAL2AST
+  parameter INP
+    position 1
+    type '_CHAR'
+    ppath 'CURRENT'
+    prompt 'CALDB file'
+    help 'Enter a file name from the CALDB database'
+  endparameter
+
+  parameter OUT
+    position 2
+    type 'LITERAL'
+    ppath 'CURRENT'
+    prompt 'ASTERIX file'
+    help 'Enter a file name for the ASTERIX database'
+  endparameter
+
+  parameter FILTER
+    type '_CHAR'
+    ppath 'CURRENT'
+    prompt 'Filter file'
+    help 'Enter the filter file name from the CALDB database'
+  endparameter
+endinterface
