@@ -1,6 +1,11 @@
 # Process this file with autoconf to generate the Makefile
 # @configure_input@
 
+# MANIFEST and prefix must match the value defaulted in starconf.
+# FIXME: tie these together, and link with starconf values.
+prefix=@prefix@
+MANIFEST=$(prefix)/manifests
+
 # Keep the following in alphabetical order
 ALL_TARGETS = \
 	$(MANIFEST)/adam \
@@ -32,42 +37,62 @@ ALL_TARGETS = \
 	$(MANIFEST)/subpar \
 	$(MANIFEST)/task
 
-# Targets which are used when bootstrapping.
-# Keep these in alphabetical order.
-BUILDSUPPORT_TARGETS = \
-	$(MANIFEST)/autoconf \
-	$(MANIFEST)/automake \
-	$(MANIFEST)/libtool \
-	$(MANIFEST)/starconf
+# Targets present in tree, but excluded from list
+#   adamnet -- obsolete
+
+# The other important target is `buildsupport', the dependencies of
+# which are defined in the Makefile.dependencies which is included below.
+
 
 SUBDIRS = @subdirs@
 @SET_MAKE@
 
 RECURSIVE_TARGETS = clean maintainer-clean
 
-# Targets present in tree, but excluded from list
-#   adamnet -- obsolete
-
 
 # Java support: need a java runtime
 JAVA=@JAVA@
 
-# MANIFEST and prefix must match the value defaulted in starconf.
-# FIXME: tie these together, and link with starconf values.
-prefix=@prefix@
-MANIFEST=$(prefix)/manifests
-
 
 
 all: $(ALL_TARGETS)
-buildsupport: $(BUILDSUPPORT_TARGETS)
 
-# FIXME: this depends on the xt jar being handy; either check this in or,
-# better, write a 10-line Java application under buildsupport to replace it,
-# using the XSLT support (JAXP) present in Java 1.4+.
+### FIXME: this depends on the xt jar being handy; either check this in or,
+### better, write a 10-line Java application under buildsupport to replace it,
+### using the XSLT support (JAXP) present in Java 1.4+.
+##Makefile.dependencies: componentset.xml
+##	$(JAVA) com.jclark.xsl.sax.Driver \
+##		$< buildsupport/starconf/make-dependencies.xslt $@
+
+# The Makefile dependencies are built using a Java program.  This
+# isn't installed (it should be -- see the comments in
+# buildsupport/starconf/Makefile.am) so we have to hack it.  Ugly: FIXME.
+#
+# Avoid doing anything if the variable JAVA is null -- this is true if
+# we're using this file unconfigured during bootstrap (see ./bootstrap
+# for the relevant gymnastics).
+#
+# At the same time, create a set of dependencies for componentset.xml.
+# These won't _necessarily_ be up-to-date, but they'll only be
+# inaccurate if we (rarely) add a new component, so they're good
+# enough for their purpose.  componentset.xml doesn't really depend on
+# configure.ac, but it's a useful and plausible dummy to end the list with.
 Makefile.dependencies: componentset.xml
-	$(JAVA) com.jclark.xsl.sax.Driver \
-		$< buildsupport/starconf/make-dependencies.xslt $@
+	if test -f buildsupport/starconf/java/GenerateDependencies.class;then \
+		:; \
+	    else \
+		cd buildsupport/starconf/java && \
+		    $(MAKE) GenerateDependencies.class; \
+	    fi
+	if test -n "$(JAVA)"; then \
+	    $(JAVA) -classpath buildsupport/starconf/java \
+		GenerateDependencies componentset.xml >$@ \
+	    && echo "componentset.xml: \\" >>$@ \
+	    && find . -name component.xml | sed 's/\(.*\)/		\1 \\/' >>$@ \
+	    && echo "		configure.ac" >>$@; \
+	else \
+	    :; \
+	fi
 
 componentset.xml:
 	echo '<!DOCTYPE componentset SYSTEM "componentinfo.dtd">' >$@
@@ -80,6 +105,8 @@ componentset.xml:
 # Makefile.dependencies expresses all the dependencies between components.
 # It expects the current file to define variable MANIFEST to be the directory
 # which holds the manifest files, typically /star/manifests
+#
+# This include file also contains the TARGET buildsupport
 include Makefile.dependencies
 
 $(RECURSIVE_TARGETS):
