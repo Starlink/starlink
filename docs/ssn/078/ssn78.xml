@@ -5010,7 +5010,9 @@ AC_SUBST(STAR_MANIFEST_DIR)
             C compiler flags necessary to compile with Tcl,
             <code>TCL_LIBS</code> to the required library flags, and
             variable <code>TCLSH</code> to the full path of the
-            matching <code>tclsh</code> executable; if Tk is
+            matching <code>tclsh</code> executable
+            and <code>TCL_VERSION</code> to the <code>major.minor</code>
+            version number; if Tk is
             requested, it similarly sets <code>TK_CFLAGS</code>,
             <code>TK_LIBS</code> and <code>WISH</code>.  Define the
             cpp variable <code>TCL_MISSING</code> to 1 if the required
