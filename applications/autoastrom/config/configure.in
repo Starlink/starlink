@@ -11,6 +11,22 @@ AC_CONFIG_AUX_DIR(config)
 dnl   Run configure in the moggy subdirectory, too.
 AC_CONFIG_SUBDIRS(moggy)
 
+dnl   Search for Perl.  We want to find Starlink perl.
+AC_PATH_PROG(STARPERL, perl, perl, /stardev/Perl/bin:/star/Perl/bin:$PATH)
+
+dnl No need to bother with the SYSTEM environment variable -- since
+dnl   this is Starlink software, it should be set in the environment already.
+dnl dnl   What type of host are we on?  Use this to set the SYSTEM
+dnl dnl   environment variable to one of the standard Starlink strings.
+dnl AC_SUBST(STARLINKSYSTEM)
+dnl AC_CANONICAL_HOST
+dnl case "$host" in
+dnl   alpha*)		STARLINKSYSTEM=alpha_OSF1	;;
+dnl   ix86*|i486*|i686*)	STARLINKSYSTEM=ix86_Linux	;;
+dnl   sparc*)		STARLINKSYSTEM=sun4_Solaris	;;
+dnl   *)			STARLINKSYSTEM=""		;;
+dnl esac
+
 
 dnl   That's all, at present
 AC_OUTPUT(Makefile t/Makefile)
