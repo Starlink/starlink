@@ -100,7 +100,9 @@
 	      CALL FIT_INSGET_CCHECK( NAX, %VAL(AXPTR), NCB-1,
      :                                %VAL(RCPTR), STATUS )
 
-*      Release the axis
+*      Release the axis and spec array
+              CALL ADI_CUNMAP( INSTR.R_ID, 'ChannelSpec',
+     :                          RCPTR, STATUS )
 	      CALL BDI_UNMAPAXVAL( ID, 1, STATUS )
 
             END IF
