@@ -797,7 +797,7 @@ iraf! {
          parameter result {
             position 4
             type LITERAL
-            prompt {Name of file in which to store thePcdMap}
+            prompt {Name of file in which to store the PcdMap}
             ppath DYNAMIC CURRENT
             association ->GLOBAL.AST_OBJECT
             helpkey *
@@ -807,7 +807,71 @@ iraf! {
             position 2
             type _DOUBLE
             prompt {Input coordinate value for first LUT entry}
+            ppath CURRENT 
+            helpkey *
+          }
+
+      }
+
+      action astwinmap {
+         helplib {$ATOOLS_HELP}
+
+          parameter ina {
+            position 2
+            type _DOUBLE
+            prompt {Coords of corner A in input coordinate system}
+            ppath CURRENT
+            helpkey *
+          }
+
+          parameter inb {
+            position 3
+            type _DOUBLE
+            prompt {Coords of corner B in input coordinate system}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter ncoord {
+            position 1
+            type     _INTEGER 
+            prompt   {The number of coordinates for the WinMap}
+            ppath    CURRENT DEFAULT
+            default  2
+            helpkey  *
+          }
+
+         parameter options {
+            position 6
+            type LITERAL
+            prompt {Options for the WinMap}
             ppath CURRENT DEFAULT
+            default !
+            helpkey *
+          }
+
+          parameter outa {
+            position 4
+            type _DOUBLE
+            prompt {Coords of corner A in output coordinate system}
+            ppath CURRENT
+            helpkey *
+          }
+
+           parameter outb {
+            position 5
+            type _DOUBLE
+            prompt {Coords of corner B in output coordinate system}
+            ppath CURRENT
+            helpkey *
+          }
+
+         parameter result {
+            position 7
+            type LITERAL
+            prompt {Name of file in which to store the WinMap}
+            ppath DYNAMIC CURRENT
+            association ->GLOBAL.AST_OBJECT
             helpkey *
           }
 
