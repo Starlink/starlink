@@ -269,6 +269,26 @@
                echo "mk: Environment variables defined for $SYSTEM system"
                ;;
 
+#  PC systems:
+#  ==========
+#  Intel PC running Linux.
+#  ----------------------
+            ix86_Linux)
+               AR_IN='ar r'
+               CC='gcc'
+               CFLAGS='-Dlinux -O -fPIC -I$(BASE)/include -I$(STAR_INC) -O'
+               FC='g77'
+               FFLAGS='-fno-second-underscore -O -I/home/timj/data/tmp/star/cvsbuild/include'
+               LINK='ln -s'
+               DX_LIBS='-L$(BASE)/lib_linux -L/usr/X11R6/lib -lDX -lm -ll -lX11 -ldl -lGL -lGLU'
+               LINK_TEST='-L'
+               RANLIB='ranlib'
+               TAR_IN='tar -cvhf'
+               TAR_OUT='tar -xf'
+               echo "mk: Environment variables defined for $SYSTEM system"
+               ;;
+
+
 #  Issue a warning if SYSTEM is not recognised.
             *)
                SOURCE_VARIANT='unknown'
