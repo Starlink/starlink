@@ -3,23 +3,23 @@
 *+
 *  Name:
 *     KPG1_CMAVx
- 
+
 *  Purpose:
 *     Compresses an n-dimensional array by averaging in `rectangular'
 *     boxes.
- 
+
 *  Language:
 *     Starlink Fortran 77
- 
+
 *  Invocation:
 *     CALL KPG1_CMAVx( NDIM, DIMS, INARR, COMPRS, NLIM, OUTARR,
 *                      SUM, NUM, STATUS )
- 
+
 *  Description:
 *     This routine compresses an n-dimensional array by integer factors
 *     along each dimension by averaging the array values in a
 *     rectangular box.
- 
+
 *  Arguments:
 *     NDIM = INTEGER (Given)
 *        The dimensionality of the n-dimensional array.  It must be
@@ -48,7 +48,7 @@
 *        input box. This should have size at least equal to DIMS( 1 ).
 *     STATUS  =  INTEGER (Given and Returned).
 *        Global status value
- 
+
 *  Notes:
 *     -  There is a routine for the following numeric data types:
 *     replace "x" in the routine name by D or R as appropriate.  The
@@ -56,7 +56,7 @@
 *     data type specified.
 *     -  There is no protection against overflows when the absolute data
 *     values are very large.
- 
+
 *  Algorithm:
 *     The n-dimensional boxes are derived from a recursive treatment of
 *     the problem of traversing an arbitrary number of array dimensions
@@ -73,7 +73,7 @@
 *              end
 *           end
 *        end
- 
+
 *     where DIMS( I ) is dimension of the region used to calculate the
 *     marginal profiles, and IDIM is the index along the dimension.  A
 *     call of LOOP( NDIM ) then performs the entire formation of the
@@ -113,55 +113,58 @@
 *        index.  The output element is bad when the number of
 *        contributing input elements fails to exceed the minimum-number
 *        criterion.
- 
+
 *  Authors:
 *     MJC: Malcolm J. Currie  (STARLINK)
 *     DSB: David S. Berry (STARLINK)
 *     {enter_new_authors_here}
- 
+
 *  History:
 *     1991 November 25 (MJC):
 *        Original version.
 *     11-JUN-1998 (DSB):
-*        Corrected the initialisation of the edges of the first summation 
-*        box so that it works for cases where NDIM > 2.
-*     {enter_changes_here}
- 
+*        Corrected the initialisation of the edges of the first
+*        summation box so that it works for cases where NDIM > 2.
+*     1998 October 20 (MJC):
+*        Protect against accessing COMPRS elements with index > 2, when
+*        NDIM is <3.
+*     {enter_further_changes_here}
+
 *  Bugs:
 *     {note_bugs_here}
- 
+
 *-
- 
+
 *  Type Definitions:
       IMPLICIT  NONE             ! no implicit typing allowed
- 
+
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! SSE global definitions
       INCLUDE 'PRM_PAR'          ! Magic-value and extreme constants
       INCLUDE 'NDF_PAR'          ! NDF constants
- 
+
 *  Arguments Given:
       INTEGER NDIM
       INTEGER DIMS( NDIM )
       REAL INARR( * )
       INTEGER COMPRS( NDIM )
       INTEGER NLIM
- 
+
 *  Arguments Returned:
       REAL OUTARR( * )
       REAL SUM( * )
       INTEGER NUM( * )
- 
+
 *  Status:
       INTEGER STATUS
- 
+
 *  Local Variables:
       INTEGER EDIMS( NDF__MXDIM ) ! Effective dimensions of input array
       INTEGER EL                 ! Number of elements in output array
       LOGICAL END                ! New box has been found or there are
                                  ! no more boxes to sum
       INTEGER FINISH( NDF__MXDIM ) ! Indices of far edge of current
-                                 ! search box
+                                 ! search box 
       INTEGER I                  ! Counter
       INTEGER ID                 ! Pointer to the start of a line
                                  ! segment within the search region
@@ -177,16 +180,16 @@
                                  ! box
       INTEGER STRID( NDF__MXDIM ) ! Dimension strides for search region
       INTEGER VO                 ! Offset in the input array
- 
+
 *  Internal References:
       INCLUDE 'NUM_DEC_CVT'      ! NUM declarations for conversions
       INCLUDE 'NUM_DEF_CVT'      ! NUM definitions for conversions
- 
+
 *.
- 
+
 *  Check the inherited status on entry.
       IF ( STATUS .NE. SAI__OK ) RETURN
- 
+
 *  Check the dimensionality.
       IF ( NDIM .LT. 2 .OR. NDIM .GT. NDF__MXDIM ) THEN
          STATUS = SAI__ERROR
@@ -196,7 +199,7 @@
      :     /'dimensionality of ^NDIM. (Programming error.)', STATUS )
          GOTO 999
       END IF
- 
+
 *  Validate the compressions factors, checking them all before exiting
 *  if an error is encountered.
       DO I = 1, NDIM
@@ -220,7 +223,7 @@
          END IF
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 999
- 
+
 *  Compute the output array's dimensions and total number of pixels.
 *  Also find the effective dimensions of the input arrays and the
 *  number of pixels in the averaging box.
@@ -232,10 +235,10 @@
          EDIMS( I ) = ODIMS( I ) * COMPRS( I )
          NUMBOX = NUMBOX * COMPRS( I )
       END DO
- 
+
 *  Constrain the limiting number of good values.
       NVAL = MIN( MAX( 1, NLIM ), NUMBOX )
- 
+
 *  Work out the starting edges of the current square/cube/hypercube to
 *  sum.
       START( 1 ) = 1
@@ -244,81 +247,83 @@
       START( 2 ) = 1 - COMPRS( 2 )
       FINISH( 2 ) = 0
 
-      DO  I = 3, NDIM
-         START( I ) = 1
-         FINISH( I ) = COMPRS( I )
-      END DO
- 
+      IF ( NDIM .GT. 2 ) THEN
+         DO I = 3, NDIM
+            START( I ) = 1
+            FINISH( I ) = COMPRS( I )
+         END DO
+      END IF
+
 *  Compute the strides.
 *  ====================
- 
+
 *  Initialise the stride of dimension number 1 for the data and output
 *  array objects. (The stride for a dimension is the amount by which
 *  the vectorised array index increases when the n-dimensional array
 *  index for that dimension increases by 1.)
       STRID( 1 ) = 1
- 
+
 *  Calculate the stride for each remaining dimension.
        DO  I = 2, NDIM
          STRID( I ) = STRID( I - 1 ) * DIMS( I - 1 )
       END DO
- 
+
 *  Loop for every output pixel.
 *  ============================
       K = 0
       DO WHILE ( K .LT. EL )
- 
+
 *  Increment the summation box through the array.
 *  ==============================================
- 
+
 *  Initialise the vector index within the square/cube/hypercube.
          ID = 1
- 
+
          END = .FALSE.
          J = 2
          DO WHILE ( .NOT. END )
- 
+
 *  Shift the box along the current dimension.
             START( J ) = START( J ) + COMPRS( J )
             FINISH( J ) = FINISH( J ) + COMPRS( J )
- 
+
 *  Has it gone beyond the current dimension?
             IF ( FINISH( J ) .GT. DIMS( J ) ) THEN
- 
+
 *  It has therefore go to the next higher dimension.  There must be one
 *  since there are output elements to be computed.
                J = J + 1
- 
+
 *  Reset the lower dimension's box back to its start position.
                START( J - 1 ) = 1
                FINISH( J - 1 ) = COMPRS( J - 1 )
             ELSE
- 
+
 *  The next box has been located successfully so exit the loop.
                END = .TRUE.
             END IF
          END DO
- 
+
 *  Prepare to form the sums.
 *  =========================
 *
 *  It would be straightforward to extract each box in turn and sum
 *  within it in.  However, some efficiency gain is achieved if all bins
 *  along the first dimension are extracted together.
- 
+
 *  Initialise the arrays used to form the sums.
          DO  I = 1, EDIMS( 1 )
             SUM( I ) = 0.0E0
             NUM( I ) =  0
          END DO
- 
+
 *  Recursive scanning of the array dimensions begins with the highest
 *  dimension.
          I = NDIM
- 
+
 *  Form a section via recursive invocation starting here.
 *  ======================================================
- 
+
 *  This is quite complicated as the section of the array under analysis
 *  has to be extracted via pseudo-recursion.  A list of vector pointers
 *  is calculated for a series of sub-sections along the first
@@ -331,18 +336,18 @@
 *  the marginal profiles.
    20 CONTINUE
          ID = ID + ( START( I ) - 1 ) * STRID( I )
- 
+
 *  This is a "DO UNTIL" loop, which starts with the current dimension
 *  set to the lower bound of the sub-region and executes until it goes
 *  beyond the upper bound.
          IDIM( I ) = START( I )
- 
+
    30    CONTINUE
          IF ( IDIM( I ) .GT. FINISH( I ) ) GOTO 50
- 
+
 *  The algorithm calls itself recursively here.
 *  ============================================
- 
+
 *  The algorithm invokes itself recursively to process the next lower
 *  dimension.  Decrement the current dimension count and branch back to
 *  the start.
@@ -350,65 +355,65 @@
             I = I - 1
             GOTO 20
          ELSE
- 
+
 *  Form the sums within each bin along the output line.
 *  ====================================================
 *
 *  Sum along the line segment marked by the pointer.
             DO  J = START( 1 ), FINISH( 1 )
- 
+
 *  Calculate the offset within the whole array.  The pixel is used in
 *  marginals for all dimensions.
                VO = ID + J - START( 1 )
- 
+
 *  Use IDIM to store the pixel number along the first dimension so that
 *  the offset may be calculated.
                IDIM( 1 ) = J
- 
+
 *  Test for bad pixels.
                IF ( INARR( VO ) .NE. VAL__BADR ) THEN
- 
+
 *  Determine in which bin within the output line of data the input
 *  value should be inserted.
                   M = ( J - 1 ) / COMPRS( 1 ) + 1
- 
+
 *  Add the current element within the box to the running total.
                   SUM( M ) = SUM( M ) + INARR( VO )
                   NUM( M ) = NUM( M ) + 1
                END IF
             END DO
- 
+
 *  Update the dimension index to indicate that all of the sub-region in
 *  this dimension has now been processed.
             IDIM( 1 ) = FINISH( 1 )
- 
+
 *  Move the pointer to allow for the pixels within the section along
 *  the line.
             ID = ID + FINISH( 1 ) - START( 1 ) + 1
          END IF
- 
+
 *  The recursively invoked algorithm returns to this point.
 *  =======================================================
    40    CONTINUE
- 
+
 *  The current dimension count is "popped" back to its previous value
 *  before the recursively invoked algorithm returns, so increment the
 *  dimension index and branch to continue execution of the "DO UNTIL"
 *  loop.
          IDIM( I ) = IDIM( I ) + 1
          GOTO 30
- 
+
    50    CONTINUE
- 
+
 *  Increment pointers to the end of the data region which lies after
 *  the upper bound of the sub-region being processed (in the current
 *  dimension), and which is therefore NOT going to be included in the
 *  marginal profiles.
          ID = ID + ( DIMS( I ) - FINISH( I ) ) * STRID( I )
- 
+
 *  The recursively invoked algorithm returns from here.
 *  ===================================================
- 
+
 *  "Pop" the current dimension count and make a return from a recursive
 *  invocation of the algorithm (unless this is the top level
 *  invocation---i.e. the current dimension count is equal to NDIM---in
@@ -417,16 +422,16 @@
          IF ( I .GE. NDIM ) GOTO 60
          I = I + 1
          GOTO 40
- 
+
    60    CONTINUE
- 
+
 *  Find the average value in each output element.
 *  =============================================
          DO  J = 1, ODIMS( 1 )
- 
+
 *  Increment the output pixel index.
             K = K + 1
- 
+
 *  If there were too few elements in the summation, set the output
 *  element to be bad.  Otherwise find the unweighted average.
             IF ( NUM( J ) .LT. NVAL ) THEN
@@ -435,10 +440,10 @@
                OUTARR( K ) = SUM( J ) / NUM_ITOR( NUM( J ) )
             END IF
          END DO
- 
+
 *  Bottom of pixel iteration do-loop.
       END DO
- 
+
   999 CONTINUE
- 
+
       END
