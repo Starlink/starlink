@@ -13,6 +13,7 @@ proc buildP4Widgets1 w {
     global cgs4drBitmaps
     global cgs4drHtml
     set mainFrame [frame $w.frame]
+    pack $mainFrame -fill both -expand yes
 
 # Data set name entry.
     set frame [frame $mainFrame.df]
