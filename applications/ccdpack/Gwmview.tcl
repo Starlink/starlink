@@ -394,7 +394,7 @@ class Gwmview {
 #  Get the position of the origin in canvas coordinates.
          set corigin [ view2canv $xorigin [ expr $yorigin + $ysize ] ]
 
-#  Create the canvas item itself.
+#  Create the GWM item itself.
          $canvas create gwm \
             [ lindex $corigin 0 ] [ lindex $corigin 1 ] \
             -name $name \
@@ -619,7 +619,7 @@ class Gwmview {
 #  item, the scrolledcanvas iwidget, or the canvas widget itself.
 #  I've tried some other things (reading scrollbar position, writing
 #  an empty string) but they don't seem to do the trick.  Jeez.
-         puts ""
+           puts ""
       }
 
 
