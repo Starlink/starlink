@@ -120,18 +120,19 @@
         PARAMETER		( VERSION = 'MEANDAT Version V2.0-0' )
 
 *  Local Variables:
-      LOGICAL LVAR                           ! Are variances present in all file
-      LOGICAL LQUAL                          ! Is quality present in all files ?
       INTEGER LP,AXLP
       INTEGER NDIM                           ! Number of dimensions in array
       INTEGER DIMS(ADI__MXDIM)               ! Dimensions of data array
       INTEGER TNDIM                          ! Test number of dimensions
       INTEGER TDIMS(ADI__MXDIM)              ! Test dimensions of data array
       INTEGER NFILES                         ! Number of files to be averaged
-      CHARACTER*7 PARAM                      ! Filename parameter
       INTEGER			IFID(MAXFIL)		! Input dataset ids
       INTEGER			OFID			! Output dataset id
-      LOGICAL OK                             ! Is data array present
+
+      LOGICAL 			LVAR                    ! Are variances present in all file
+      LOGICAL 			LQUAL                   ! Is quality present in all files ?
+      LOGICAL 			OK                      ! Is data array present
+
       INTEGER DP(MAXFIL)                     ! Pointer to data arrays
       INTEGER VP(MAXFIL)                     ! Pointer to variance arrays
       INTEGER QP(MAXFIL)                     ! Pointer to quality arrays
@@ -141,7 +142,6 @@
       INTEGER NELS                           ! Total number of elements in array
       LOGICAL AVERAGE                        ! Average the files or sum ?
       INTEGER CPTR                           ! Pointer to dynamic workspace
-      CHARACTER*3 CNUM                       ! File number character string
       CHARACTER*80 PATH(42)                  ! Historty records
       INTEGER NLINES                         ! Number of lines of history text
 *.
@@ -299,16 +299,16 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
       CALL ARR_INIT1R( 0.0, NELS, %val(CPTR), STATUS )
 
 *  Average these files
-      CALL MEANDAT_AVERAGE(MAXFIL, NFILES, LVAR, LQUAL, MASK, AVERAGE,
-     :         NELS, DP, VP, QP, %val(CPTR), %val(ODP), %val(OVP),
-     :         %val(OQP), STATUS)
+      CALL MEANDAT_AVERAGE( NFILES, LVAR, LQUAL, AVERAGE, NELS, DP,
+     :                      VP, QP, %VAL(CPTR), %VAL(ODP), %VAL(OVP),
+     :                      %VAL(OQP), STATUS)
 
 *  Add standard record to new history structure
-      CALL HSI_ADD(OFID, VERSION, STATUS)
+      CALL HSI_ADD( OFID, VERSION, STATUS )
 
 *  Put names of input datafiles used into history
-      CALL USI_NAMEI(NLINES, PATH, STATUS)
-      CALL HSI_PTXT(OFID, NLINES, PATH, STATUS)
+      CALL USI_NAMEI( NLINES, PATH, STATUS )
+      CALL HSI_PTXT( OFID, NLINES, PATH, STATUS )
 
 *  Tidy up
  99   CALL AST_CLOSE()
@@ -318,7 +318,7 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
 
 
 *+  MEANDAT_AVERAGE - Averages several datafiles
-      SUBROUTINE MEANDAT_AVERAGE(MAXFIL, NFILES, LVAR, LQUAL,
+      SUBROUTINE MEANDAT_AVERAGE( NFILES, LVAR, LQUAL,
      :                     AVERAGE, NELS, DP, VP, QP, WTSUM, ODATA,
      :                     OVAR, OQUAL, STATUS)
 *    Description :
@@ -349,15 +349,14 @@ c        CALL BDI_DELETE( OFID, 'Quality', STATUS )
 *
 *    Import :
 *
-      INTEGER MAXFIL                     ! Maximum number of files to average
       INTEGER NFILES                     ! Number of files being averaged
       LOGICAL LVAR                       ! Use variances ?
       LOGICAL LQUAL                      ! Use quality ?
       LOGICAL AVERAGE                    ! Average files or leave as sum ?
       INTEGER NELS                       ! Array length
-      INTEGER DP(MAXFIL)                 ! Pointers to data arrays
-      INTEGER VP(MAXFIL)                 ! Pointers to variance arrays
-      INTEGER QP(MAXFIL)                 ! Pointers to quality arrays
+      INTEGER DP(*)                 ! Pointers to data arrays
+      INTEGER VP(*)                 ! Pointers to variance arrays
+      INTEGER QP(*)                 ! Pointers to quality arrays
 *    Import-Export :
       REAL WTSUM(NELS)                   ! Number to normalise output bins
 *    Export :
