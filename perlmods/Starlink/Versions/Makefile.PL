@@ -7,6 +7,7 @@ WriteMakefile(
     'PREREQ_PM' => { 'File::Spec' => 0,
 	'Starlink::Config' => 0,
 	},
+    'EXE_FILES' => [ qw/ starversion / ],
     'VERSION_FROM' => 'Versions.pm', # finds $VERSION
     'dist'      => {'COMPRESS'=>'gzip -9f', 'SUFFIX' => 'gz',
                     'ZIP'=>'/usr/bin/zip','ZIPFLAGS'=>'-rl'},
