@@ -74,6 +74,12 @@
 #        the preferred expansion name is "m.sdf").
 #     15-DEC-1997 (DSB):
 #        Renamed as ndg_wild for inclusion in POLPACK.
+#     9-JAN-1998 (DSB):
+#        The awk command which finds the file with the given name and 
+#        highest priority file type has been modified so that file types 
+#        with more than one dot (.sdf.Z, .sdf.gz, etc) are recognised. 
+#        Previously, the last dot was used as the start of the file type. 
+#        Now, the first dot following the last "/" is used instead.
 #     {enter_further_changes_here}
 
 #  Bugs:
