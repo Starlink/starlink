@@ -174,7 +174,19 @@ main (int argc, char **argv)
 		show_font_list = 2;
 		break;
 	      case 'n':		// don't actually process the DVI file
-		do_process_file = false; // ...just the pre/postamble
+		switch (*++*argv)
+		{
+		  case '\0':
+		    do_process_file = false; // ...just the pre/postamble
+		    PkFont::setMakeFonts (false);
+		    break;
+		  case 'f':
+		    PkFont::setMakeFonts (false);
+		    break;
+		  default:
+		    Usage();
+		    break;
+		}
 		break;
 	      case 'P':		// process the bitmap...
 		while (*++*argv != '\0')
@@ -210,14 +222,22 @@ main (int argc, char **argv)
 		bm.ofile_pattern = *argv;
 		break;
 	      case 'V':		// display version
-		cout << version_string << "\nOptions:";
+		cout << version_string << "\nOptions:\n";
 #ifdef ENABLE_GIF
-		cout << " ENABLE_GIF";
+		cout << "ENABLE_GIF\n";
 #endif
 #ifdef ENABLE_KPATHSEA
-		cout << " ENABLE_KPATHSEA";
+		cout << "ENABLE_KPATHSEA\n";
 #endif
-		cout << '\n';
+#ifdef MKTEXPK
+		cout << "MKTEXPK=" << MKTEXPK << '\n';
+#endif
+#ifdef MAKETEXPK
+		cout << "MAKETEXPK=" << MAKETEXPK << '\n';
+#endif
+#ifdef DEFAULT_TEXMFCNF
+		cout << "DEFAULT_TEXMFCNF=" << DEFAULT_TEXMFCNF << '\n';
+#endif
 		exit(0);	// ...and exit
 
 	      default:
@@ -278,7 +298,7 @@ main (int argc, char **argv)
 			cout << "% ";
 		    // write out font name, dpi, base-dpi, mag and MF mode
 		    cout << f->name() << ' '
-			 << f->dpiScaled() << ' '
+			 << f->dpiBase() << ' '
 			 << f->dpi() << ' '
 			 << magmag
 			 << " localfont";
@@ -566,10 +586,10 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cerr << "Usage: " << progname << " [-lLnqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
+    cerr << "Usage: " << progname << " [-lLqQV] [-b(h|w) size] [-f PKpath ] [-r resolution]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm"
 #if ENABLE_GIF
 	 << "|gif"
 #endif
-	 << "]\n\tdvifile" << '\n';
+	 << "] [-n[f]]\n\tdvifile" << '\n';
     exit (1);
 }
