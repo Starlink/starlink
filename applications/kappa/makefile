@@ -862,7 +862,7 @@ GRF_C_ROUTINES = grf_kappa.c
 #  Define the set of all interface files.
 
 IFL_FILES = $(KAPPA_IFL_FILES) $(KAPVIEW_IFL_FILES) $(NDFPACK_IFL_FILES) \
-            $(MEM_IFL) $(MONO_IFL)
+            $(MEM_IFL) 
 
 #  Define the interface files required for compilation.
 
@@ -1021,7 +1021,7 @@ BUILT_FILES = $(PUBLIC_SCRIPTS) $(OBJECT_LIBRARIES) $(MEMTASKS) \
               $(IRAF_OUTPAR_FILES) $(IRAF_PAR_FILES) $(IRAF_HELP_FILES) \
               $(IRAF_AUX_SCRIPTS) $(IRAF_AUX_PARFILES) \
               $(IRAF_DEMO) $(IRAF_DATA) $(STYLE_FILES) $(DEMO_FILES) \
-              $(GRF_OBJECT_FILES)
+              $(GRF_OBJECT_FILES) $(MONO_IFL)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -1173,7 +1173,7 @@ $(NDFPACK_F_ROUTINES) :
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
 
-$(IFL_FILES) :
+$(IFL_FILES) $(MONO_IFL):
 	$(TAR_OUT) $(PKG_NAME)_ifls.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in the tar file; exit 1; fi
@@ -1345,7 +1345,7 @@ $(NDFPACK_MON) : $(NDFPACK_MONO_SOURCE:.f=.o) $(OBJECT_LIBRARIES) grf_kappa.o ls
 
 #  List of the interface files to be built and rules for compiling them.
 
-IFC_FILES = $(IFL_FILES:.ifl=.ifc) 
+IFC_FILES = $(IFL_FILES:.ifl=.ifc) $(MONO_IFL:.ifl=.ifc) 
 #
 .ifl.ifc:
 	$(STAR_BIN)/compifl $< 
@@ -1609,6 +1609,17 @@ install:
 #
 #  Install the interface files, giving them world-read permission.
 	for f in $(IFC_FILES) ""; do \
+           if test -n "$$f"; then \
+              cp -p $$f $(INSTALL_BIN);\
+              chmod 644 $(INSTALL_BIN)/$$f;\
+              rm -f $$f;\
+              $(LINK) $(INSTALL_BIN)/$$f $$f;\
+           else :; fi;\
+        done
+#
+#  Install the monolith interface source files, giving them world-read 
+#  permission.
+	for f in $(MONO_IFL) ""; do \
            if test -n "$$f"; then \
               cp -p $$f $(INSTALL_BIN);\
               chmod 644 $(INSTALL_BIN)/$$f;\
@@ -1948,6 +1959,15 @@ do_deinstall:
 #
 #  Deinstall the interface files, if installed versions exist.
 	- for f in $(IFC_FILES) ""; do \
+           if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
+              rm -f $$f;\
+              cp -p $(INSTALL_BIN)/$$f .;\
+              rm -f $(INSTALL_BIN)/$$f;\
+           else :; fi;\
+        done
+#
+#  Deinstall the monolith interface source files, if installed versions exist.
+	- for f in $(MONO_IFL) ""; do \
            if test -n "$$f" -a -f $(INSTALL_BIN)/$$f; then \
               rm -f $$f;\
               cp -p $(INSTALL_BIN)/$$f .;\
@@ -2433,7 +2453,7 @@ ndfpack_sub.tar:
 	$(TAR_IN) ndfpack_sub.tar $(NDFPACK_F_ROUTINES)
 
 $(PKG_NAME)_ifls.tar:
-	$(TAR_IN) $(PKG_NAME)_ifls.tar $(IFL_FILES)
+	$(TAR_IN) $(PKG_NAME)_ifls.tar $(IFL_FILES) $(MONO_IFL)
 
 $(PKG_NAME)_data_alpha_OSF1.tar:
 	$(TAR_IN) $(PKG_NAME)_data_alpha_OSF1.tar $(DATA_FILES)
