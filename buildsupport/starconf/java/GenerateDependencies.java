@@ -69,6 +69,10 @@ public class GenerateDependencies {
             "# and that file should define the variable MANIFEST",
             "# to point to the directory which contains the collection",
             "# of manifest files, typically /star/manifests.",
+            "#",
+            "# If the environment variable BUILDSUPPORT_PREFIX is defined",
+            "# then the buildsupport tools will be REconfigured when they",
+            "# are built; if not, they must be configured already.",
             "",
             "",
         };
@@ -105,13 +109,13 @@ public class GenerateDependencies {
                 System.out.print(" \\\n\t\t$(MANIFEST)/" + dep.packName());
             }
             System.out.println();
-            System.out.print("\tcd " + c.componentPath());
+            System.out.println("\tcd " + c.componentPath() + " \\");
             if (c.getBuildsupport() != Component.BUILDSUPPORT_NO) {
-                System.out.print(" \\\n\t\t&& ./configure --prefix=$${BUILDSUPPORT_PREFIX=/star/buildsupport} >configure-output.log");
+                System.out.println("\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $t >configure-output.log; echo $t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\");
                 if (c.getBuildsupport() == Component.BUILDSUPPORT_AUTO)
                     allbuildsupport.add(c);
             }
-            System.out.println(" \\\n\t\t&& make>make.log && make install-manifest>>make.log");
+            System.out.println("\t    && make>make.log && make install-manifest>>make.log");
             System.out.println();
         }
 
