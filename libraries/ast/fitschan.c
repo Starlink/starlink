@@ -340,6 +340,11 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        associated with each Frame read from a secondary axis description,
 *        so that they can be given the same letter when they are written
 *        out to a new FITS file.
+*     10-AUG-2001 (DSB):
+*        Corrected function value returned by SkySys to be 1 unless an
+*        error occurs. This error resulted in CAR headers being produced
+*        by astWrite with CRVAL and CD values till in radians rather than 
+*        degrees.
 *class--
 */
 
@@ -12587,12 +12592,11 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
    int latax;               /* Index of latitude axis in SkyFrame */
    int lonax;               /* Index of longitude axis in SkyFrame */
 
+/* Check the status. */
+   if( !astOK ) return 0;
 
 /* Initialise */
-   ret = 0;
-
-/* Check the status. */
-   if( !astOK ) return ret;
+   ret = 1;
 
 /* Get the equinox, epoch of observation, and system of the SkyFrame. */
    eq = astGetEquinox( skyfrm );               
