@@ -678,8 +678,8 @@
       DMAX = 0.0
       DMIN = 0.0 
       HINIT = .TRUE.
-      CALL POL1_HIST( NIN, %VAL( IPMAG ), 0.9, NBIN, HIST, DMIN, DMAX, 
-     :                HINIT, TYPDAT, STATUS )
+      CALL POL1_HIST( NIN, %VAL( IPMAG ), 0.9, NBIN, .TRUE., HIST, 
+     :                DMIN, DMAX, HINIT, TYPDAT, STATUS )
 
       IF( TYPDAT .EQ. VAL__BADR .AND. STATUS .EQ. SAI__OK ) THEN
          STATUS = SAI__ERROR

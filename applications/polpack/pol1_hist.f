@@ -1,5 +1,5 @@
-      SUBROUTINE POL1_HIST( EL, DATA, FRAC, NBIN, HIST, DMIN, DMAX, 
-     :                      INIT, VALUE, STATUS )
+      SUBROUTINE POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST, 
+     :                      DMIN, DMAX, INIT, VALUE, STATUS )
 *+
 *  Name:
 *     POL1_HIST
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_HIST( EL, DATA, FRAC, NBIN, HIST, DMIN, DMAX, INIT, 
+*     CALL POL1_HIST( EL, DATA, FRAC, NBIN, EXZERO, HIST, DMIN, DMAX, INIT, 
 *                     VALUE, STATUS )
 
 *  Description:
@@ -32,6 +32,8 @@
 *        the returned VALUE. In the range 0.0 to 1.0.
 *     NBIN = INTEGER (Given)
 *        The number of bins in the histogram array.
+*     EXZERO = LOGICAL (Given)
+*        If .TRUE. all zero values are excluded from the histogram.
 *     HIST( NBIN ) = REAL (Given and Returned)
 *        The histogram array. It is assumed to contain a valid histogram on
 *        entry if INIT is supplied .FALSE. The sum of all histogram values
@@ -68,6 +70,8 @@
 *  History:
 *     17-FEB-1999 (DSB):
 *        Original version.
+*     11-AUG-2000 (DSB):
+*        Added EXZERO.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -87,6 +91,7 @@
       REAL DATA( EL )
       REAL FRAC
       INTEGER NBIN
+      LOGICAL EXZERO
 
 *  Arguments Given and Returned:
       REAL HIST( NBIN )
@@ -126,7 +131,8 @@
 *  Check every good data value.
          DO I = 1, EL
             D = DATA( I )
-            IF( D .NE. VAL__BADR ) THEN        
+            IF( D .NE. VAL__BADR .AND. (
+     :          D .NE. ZERO .OR. .NOT. EXZERO ) ) THEN        
 
 *  Update the limits.
                DMIN = MIN( DMIN, D )
@@ -165,7 +171,8 @@
 *  Bin each good data value.
             DO I = 1, EL
                D = DATA( I )
-               IF( D .NE. VAL__BADR ) THEN        
+               IF( D .NE. VAL__BADR .AND. (
+     :             D .NE. ZERO .OR. .NOT. EXZERO ) ) THEN        
                   IBIN = INT( ( D - DMIN )/DELTA ) + 1
                   IF( IBIN .GE. 1 .AND. IBIN .LE. NBIN ) THEN
                      HIST( IBIN ) = HIST( IBIN ) + 1.0

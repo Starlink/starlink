@@ -1,6 +1,6 @@
 1 POLPACK
 
- Version 2.1-4 of POLPACK (an applications package for processing imaging 
+ Version 2.1-5 of POLPACK (an applications package for processing imaging 
  polarimetry data) is now available. It is fully documented in SUN/223.
  The main changes since V2.0-14 are:
 
@@ -23,3 +23,10 @@
       DEC columns to be added to the output catalogues, so long as suitable 
       WCS information is available.
 
+   o  POLPLOT now allows the key to be placed inside the vector map by
+      giving a negative value for the KEYPOS parameter. The text included
+      in the key can be specified using the Title attribute of parameter
+      KEYSTYLE.
+
+   o  The default vector scaling used by POLPLOT has been improved in
+      cases where debiassing causes many zero length vectors to be present.
