@@ -1,9 +1,10 @@
 This set of reply codes is closely modelled on the SMTP reply system,
-as described in RFC 821.  However, it doesn't use the multiline
-replies for the two commands -- CONF and SEARCH produce -- which
-produce more than one line of response.  In each of these cases,
-however, a single status line is sent first, and the subsequent
-responses are due to be sent only if that was an OK status.
+as described in RFC 821 (see, eg,
+<http://www.freesoft.org/CIE/RFC/821/29.htm>).  However, it doesn't
+use the multiline replies for the two commands -- CONF and SEARCH
+produce -- which produce more than one line of response.  In each of
+these cases, however, a single status line is sent first, and the
+subsequent responses are due to be sent only if that was an OK status.
 
 That is, each command results in one response line, in two cases
 followed by further data.
@@ -67,6 +68,7 @@ CONF
          Like the message says, the configuration file appears on stdout.
   e: 551 Unspecified problem obtaining configuration     
      501 Wrong number or type of parameters
+     505 Unimplemented
   f: 450 Can't connect to server, or otherwise can't generate config file
 
 COORD1 <int> <int> <float> <int> <int> <float> <float>?

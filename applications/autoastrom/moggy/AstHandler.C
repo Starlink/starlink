@@ -225,15 +225,15 @@ bool AstHandler::transToSky (const double xpix, const double ypix,
 
 
 
-bool AstHandler::transFromSky (double radeg, double decdeg,
+bool AstHandler::transFromSky (const double radeg, const double decdeg,
 			       double& xpix, double& ypix)
 {
     // Transform RA and Dec coordinates from decimal degrees to
     // radians -- no need to worry about normalisation, since AST
     // takes care of everything.
-    radeg  /= DegreesPerRadian;
-    decdeg /= DegreesPerRadian;
-    astTran2 (astmap_, 1, &radeg, &decdeg, 0, &xpix, &ypix);
+    double lradeg  = radeg/DegreesPerRadian;
+    double ldecdeg = decdeg/DegreesPerRadian;
+    astTran2 (astmap_, 1, &lradeg, &ldecdeg, 0, &xpix, &ypix);
     if (verbosity_ > normal)
 	cerr << "AstHandler::transFromSky: (" << radeg << ',' << decdeg
 	     << ")rad = (" << xpix << ',' << ypix << ')' << endl;

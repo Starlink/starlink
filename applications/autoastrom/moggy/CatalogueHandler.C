@@ -10,12 +10,16 @@
 #endif
 
 #if HAVE_SETENV
+#if DECLARE_SETENV  /* function present, but not declared in stdlib.h */
+extern "C" int setenv(const char *name, const char *value, int overwrite);
+#else
 #if HAVE_CSTD_INCLUDE
 #include <cstdlib>		// for setenv
 #else
 #include <stdlib.h>
-#endif
-#endif
+#endif /* HAVE_CSTD_INCLUDE */
+#endif /* DECLARE_SETENV */
+#endif /* HAVE_SETENV */
 
 #include "stringstream.h"
 
@@ -60,11 +64,34 @@ int CatalogueHandler::doSearch ()
 
     int rowsreturned = 0;
 
-    int magcol = mag_col();
+    // Set the sort column(s).
+    vector<int>* magcols = mag_cols();
+    const char **sortcols = 0;	// zero means don't sort
+    if (magcols != 0)
+    {
+	// I'm rather uncertain about this -- the documentation and the
+	// AstroQuery.h header seem divergent.  Where they differ,
+	// this follows the header, and comments there.
+	int nmagcols = magcols->size();
+	sortcols = new const char*[nmagcols];
+	char **colnames = cat_->colNames();
+	for (int i=0; i<nmagcols; i++)
+	    sortcols[i] = colnames[magcols->at(i)];
+
+	if (verbosity_ > normal)
+	{
+	    cerr << "CatalogueHandler::doSearch: sortcols("
+		 << nmagcols << ") =";
+	    for (int i=0; i<nmagcols; i++)
+		cerr << ' ' << magcols->at(i) << '=' << sortcols[i];
+	    cerr << endl;
+	}
+    }
 
     if (searchType_ == RADIUSSEARCH || searchType_ == RADIUSPOINTSEARCH)
     {
 	AstroQuery q;
+	cerr << "doSearch: radial search" << endl;
 
 	if (searchType_ == RADIUSSEARCH)
 	    if (isValid_(RADIUS))
@@ -86,14 +113,9 @@ int CatalogueHandler::doSearch ()
 	q.maxRows(nrows_);
 
 	// Set the sort column.
-	if (magcol >= 0)
+	if (sortcols != 0)
 	{
-	    // I'm rather uncertain about this -- the documentation and the
-	    // AstroQuery.h header are divergent.  This follows the
-	    // header and comments in there.
-	    const char *sortcols = cat_->colName(magcol);
-	    q.sort(1, const_cast<char **>(&sortcols));
-	    // sortOrder: >=0 means increasing -- see AstroQuery.h
+	    q.sort (magcols->size(), const_cast<char **>(sortcols));
 	    q.sortOrder (+1);
 	}
 
@@ -115,19 +137,23 @@ int CatalogueHandler::doSearch ()
 	q.maxRows(nrows_);
 
 	// Set the sort column.
-	if (magcol >= 0)
+	if (sortcols != 0)
 	{
-	    const char *sortcols = cat_->colName(magcol);
-	    q.sort(1, const_cast<char **>(&sortcols));
+	    q.sort (magcols->size(), const_cast<char **>(sortcols));
 	    q.sortOrder (+1);
 	}
-
 	rowsreturned = cat_->query(q, 0, queryResult_);
 	setValid_(RESULT);
     }
     else
 	// can't do those searches, yet
 	return -1;
+
+    // Tidy away the sortcols and magcols arrays
+    if (sortcols != 0)
+	delete[] (sortcols);
+    if (magcols != 0)
+	delete (magcols);
 
     return rowsreturned;
 }
@@ -143,55 +169,6 @@ CatalogueHandler::const_iterator CatalogueHandler::begin()
     else
 	return const_iterator(this);
 }
-
-#if 0
-string& CatalogueHandler::const_iterator::operator*()
-    throw (MoggyException)
-{
-    parent_->checkQueryStatus_();
-    if (idx_ < 0 || idx_ >= parent_->queryResult_.numRows())
-    {
-	SSTREAM sb;
-	sb << "iterator out of bounds in *: " << idx_ << '/'
-	   << parent_->queryResult_.numRows();
-	throw MoggyException (SS_STRING(sb));
-    }
-
-    SSTREAM sb;
-    if (parent_->returnCols_ == 0)
-	for (int i=0; i<parent_->queryResult_.numCols(); i++)
-	{
-	    if (i > 0)
-		sb << iterSeparator_;
-	    char *value;
-	    if (parent_->queryResult_.get(idx_, i, value))
-		throw MoggyException ("can't get line of query result");
-	    sb << value;
-	}
-    else
-    {
-	for (int i=0; parent_->returnCols_[i] >= 0; i++)
-	{
-	    if (i > 0)
-		sb << iterSeparator_;
-	    char *value;
-	    if (parent_->queryResult_.get(idx_,
-					  parent_->returnCols_[i],
-					  value))
-	    {
-		SSTREAM errmsg;
-		errmsg << "can't get column " << i << " of query result"
-		       << ends;
-		throw MoggyException (SS_STRING(errmsg));
-	    }
-	    sb << value;
-	}
-    }
-					 
-    iterLine_ = SS_STRING(sb);
-    return iterLine_;
-}
-#endif
 
 const CatalogueHandler::CatalogueRow
 	CatalogueHandler::const_iterator::operator*()
@@ -292,8 +269,7 @@ bool CatalogueHandler::setPos (int num,
 	    cerr << "CatalogueHandler::setPos(" << num << "): ("
 		 << radeg << ", " << decdeg << " [" << equinox_ << "]) -->"
 		 << endl
-		 << "    "
-		 << pos_[posindex] << " = ("
+		 << "    = ("
 		 << pos_[posindex].ra().val()*15
 		 << " , "
 		 << pos_[posindex].dec().val()
@@ -332,8 +308,7 @@ bool CatalogueHandler::setPos (int num,
 		 << rah << ',' << ramin << ',' << rasec << ", "
 		 << degh << ',' << degmin << ',' << degsec
 		 << " [" << equinox_ << "]) --> " << endl
-		 << "    "
-		 << pos_[posindex] << " = ("
+		 << "    = ("
 		 << pos_[posindex].ra().val()*15
 		 << " , "
 		 << pos_[posindex].dec().val()
@@ -418,59 +393,6 @@ bool CatalogueHandler::setConfig (string URL)
 #endif
 }
 
-// setResultCols: this could (fairly easily, with
-// Util::tokeniseString) be made more sophisticated, and take a list
-// of column names as argument.
-//
-// This function was deleted (after CatalogueHandler.C,v 1.3) -- if
-// you want to select which columns are returned to the user, do it in 
-// the caller, using the ra(), dec() functions.
-bool CatalogueHandler::setResultCols (string cols)
-{
-    throw MoggyException ("Can't select columns using setResultCols");
-}
-
-string CatalogueHandler::getPos (int num) const throw (MoggyException)
-{
-    string retval;
-    if (num < 1 || num > 2)
-	throw MoggyException
-	    ("CatalogueHandler::getPos got out-of-range argument");
-
-    if (isValid_(num == 1 ? POS1 : POS2))
-    {
-	SSTREAM outline;
-	outline << pos_[num-1];
-	retval = SS_STRING(outline);
-    }
-    else
-	retval = "<UNSPECIFIED>";
-    return retval;
-}
-
-string CatalogueHandler::getSearchtype () const
-{
-    string retval;
-    if (isValid_(SEARCHTYPE))
-	switch (searchType_)
-	{
-	  case BOXSEARCH:
-	    retval = "BOX";
-	    break;
-	  case RADIUSSEARCH:
-	    retval = "RADIUS";
-	    break;
-	  case RADIUSPOINTSEARCH:
-	    retval = "RADIUS2";
-	    break;
-	  default:
-	    retval = "<UNSPECIFIED>";
-	    break;
-	}
-    else
-	retval = "<UNSPECIFIED>";
-    return retval;
-}
 
 bool CatalogueHandler::setCatname (string name)
 {
@@ -483,22 +405,6 @@ bool CatalogueHandler::setCatname (string name)
 	{
 	    setValid_(CATNAME);
 
-	    if (verbosity_ > normal)
-	    {
-		cerr << "CatalogueHandler::setCatname: "
-		     << " longName=" << cat_->longName()
-		     << " searchCols=" << cat_->searchCols()
-		     << " sortCols=" << cat_->sortCols()
-		     << " sortOrder=" << cat_->sortOrder()
-		     << " showCols=" << cat_->showCols()
-		     << " id_col=" << cat_->id_col()
-		     << " ra_col=" << cat_->ra_col()
-		     << " dec_col=" << cat_->dec_col()
-		     << " x_col=" << cat_->x_col()
-		     << " y_col=" << cat_->y_col()
-		     << " equinox=" << cat_->equinox()
-		     << endl;
- 	    }
 	    return true;
 	}
 	else
@@ -511,15 +417,6 @@ bool CatalogueHandler::setCatname (string name)
     }
 }
 
-string CatalogueHandler::getConfig () const
-{
-    char *conf = getenv ("CATLIB_CONFIG");
-    if (conf == 0)
-	return "";
-    else
-	return conf;
-}
-
 vector<string> CatalogueHandler::getColnames () const
 {
     vector<string> colnames;
@@ -527,57 +424,60 @@ vector<string> CatalogueHandler::getColnames () const
     if (isValid_(CATNAME))
 	for (int i=0; i<cat_->numCols(); i++)
 	    colnames.push_back(cat_->colName(i));
-    // if RESULT isn't valid, then a vecetor of length zero will be returned
+    // if RESULT isn't valid, then a vector of length zero will be returned
 
     return colnames;
 }
 
-void CatalogueHandler::printStatus (ostream& o, string lineend)
+vector<int>* CatalogueHandler::mag_cols()
+    const
+    throw (MoggyException)
 {
-    if (isValid_(CATNAME))
-	o << "NAME " << catname_ << lineend;
-    if (isValid_(POS1))
-	o << "COORD1 " << getPos(1) << lineend;
-    if (isValid_(POS2))
-	o << "COORD2 " << getPos(2) << lineend;
-    if (isValid_(RADIUS))
-	o << "RADIUS " << radius_ << lineend;
-    if (isValid_(SEARCHTYPE))
-	o << "SEARCH " << getSearchtype() << lineend;
-    if (isValid_(NROWS))
-	o << "NROW " << nrows_ << lineend;
-    string conf = getConfig();
-    if (conf.length() > 0)
-	o << "CATCONFIG " << conf << lineend;
+    if (! isValid_(CATNAME))
+	throw MoggyException ("mag_col() out of order");
 
-    return;
+    vector<int>* colnums = new vector<int>(0);
+    // Start with zero elements, so that push_back, below, is the only
+    // thing adding elements to the vector.
+
+    // Try to find out which columns are magnitude columns.  There can
+    // be more than one of these, since there can be, for example, a
+    // r_mag and a b_mag column.
+    //
+    // There's no standardisation mentioned in the documentation, so
+    // the best we can do, I think, is search through the list of
+    // column titles finding those which include a substring `mag'.
+    for (int col=0; col<cat_->numCols(); col++)
+    {
+	string ucol(cat_->colName(col));
+	Util::uppercaseString(ucol);
+	if (ucol.find("MAG") != string::npos)
+	    colnums->push_back(col);
+    }
+    if (verbosity_ > normal)
+    {
+	cerr << "CatalogueHandler::mag_cols: "
+	     << colnums->size() << " mag cols=";
+	for (vector<int>::const_iterator p = colnums->begin();
+	     p != colnums->end();
+	     p++)
+	    cerr << ' ' << *p;
+	cerr << endl;
+    }
+    return colnums;
 }
 
 int CatalogueHandler::mag_col()
     const
     throw (MoggyException)
 {
-    static int magcol = -2;	// -2 means uninitialised
-
-    if (! isValid_(CATNAME))
-	throw MoggyException ("mag_col() out of order");
+    static int magcol = -2;	// -2 uninitialised, -1 no mag col
 
     if (magcol < -1)		// uninitialised
     {
-	// Try to find out which column is the magnitude column.
-	// There's no standardisation mentioned in the documentation, so
-	// the best we can do, I think, is search through the list of
-	// column titles until we find one which include a substring `mag'.
-	for (magcol=0; magcol<cat_->numCols(); magcol++)
-	{
-	    string ucol(cat_->colName(magcol));
-	    Util::uppercaseString(ucol);
-	    if (ucol.find("MAG") != string::npos)
-		break;
-	}
-	if (magcol >= cat_->numCols())
-	    // not found
-	    magcol = -1;
+	vector<int>* allmagcols = mag_cols();
+	magcol = allmagcols->at(0);
+	delete (allmagcols);
     }
     return magcol;
 }

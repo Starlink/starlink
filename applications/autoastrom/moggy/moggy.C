@@ -33,20 +33,27 @@ static const char RCSID[] =
 
 
 #include <iostream>
+using std::ostream;		// ????
 #include <string>
 #include <fstream>
 #include <assert.h>
 
-#if HAVE_CSTD_INCLUDE
 #if HAVE_SETENV
-#include <cstdlib>		// for setenv
-#endif
-#include <ctime>
-//using std::exit;
+#if DECLARE_SETENV
+/* (un)setenv is present, but not declared in stdlib.h */
+extern "C" void unsetenv(const char *name);
 #else
-#if HAVE_SETENV
+#if HAVE_CSTD_INCLUDE
+#include <cstdlib>		/* for setenv */
+#else
 #include <stdlib.h>
-#endif
+#endif /* HAVE_CSTD_INCLUDE */
+#endif /* DECLARE_SETENV */
+#endif /* HAVE_SETENV */
+
+#if HAVE_CSTD_INCLUDE
+#include <ctime>
+#else
 #include <time.h>
 #endif
 
@@ -66,7 +73,10 @@ const string crlf = "\r\n";
 
 verbosities verbosity = normal;
 
+#if 0
+// Omitted -- see routine below for explanation
 void dumpCatalogue (ostream& o);
+#endif
 string processCommand (CommandParse *t, istream& cin, bool& keepGoing);
 string processAstCommand (vector<string>& arglist, istream&, AstHandler*& ast)
     throw (MoggyException);
@@ -279,11 +289,15 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
       case CommandParse::CONF:
 	if (arglist.size() == 1)
 	{
+	    response = "505 CONF unimplemented";
+#if 0
+	    // Omitted -- see dumpCatalogue() below for explanation
 	    cout << "210 Configuration file follows, "
 		"terminated by <CRLF>.<CRLF>" << crlf;
 	    dumpCatalogue (cout);
 	    cout << '.' << crlf;
 	    response = "";
+#endif
 	}
 	else
 	    response = "501 Unexpected parameter";
@@ -464,82 +478,6 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 		throw MoggyException ("Impossible value for coordsok");
 		break;
 	    }
-
-#if 0
-	    if (ast != 0)
-	    {
-		if (ast->inputSkyFrame())
-		else
-		{
-		    // There must be two parameters
-		    if (arglist.size() == 3)
-		    {
-			bool convok;
-			double x, y;
-			convok = Util::stringToDouble (arglist[1], x);
-			if (convok)
-			    convok = Util::stringToDouble (arglist[2], y);
-
-			if (convok)
-			{
-			    // Convert to Sky coordinates
-			}
-			else
-			    response = "501 Error parsing parameters";
-		    }
-		    else
-			response = "501 Wrong number of parameters";
-		}
-	    }
-	    else
-		// Input Sky coordinates -- no AST information.
-		// There must be either three or four or seven or
-		// eight parameters given, either RA and Dec in
-		// decimal degrees, or RA and Dec in H:M:S, D:M:S,
-		// followed by an optional equinox.
-		if (arglist.size() == 3 || arglist.size() == 4)
-		{
-		    bool convok;
-		    equinox = 2000; // default
-
-		    convok = Util::stringToDouble (arglist[1], radouble);
-		    if (convok)
-			convok = Util::stringToDouble (arglist[2], decdouble);
-		    if (convok && arglist.size() == 4)
-			convok = Util::stringToDouble (arglist[2], equinox);
-
-		    if (convok)
-			coordsok = 2;
-		    else
-			response = "501 Error parsing parameters";
-		}
-		else if (arglist.size() == 7 || arglist.size() == 8)
-		{
-		    bool convok;
-		    equinox = 2000; // default
-
-		    convok = Util::stringToInteger (arglist[1], rah);
-		    if (convok)
-			convok = Util::stringToInteger (arglist[2], ramin);
-		    if (convok)
-			convok = Util::stringToDouble  (arglist[3], rasec);
-		    if (convok)
-			convok = Util::stringToInteger (arglist[4], decdeg);
-		    if (convok)
-			convok = Util::stringToInteger (arglist[5], decmin);
-		    if (convok)
-			convok = Util::stringToDouble  (arglist[6], decsec);
-		    if (convok && arglist.size() == 8)
-			convok = Util::stringToDouble  (arglist[7], equinox);
-
-		    if (convok)
-			coordsok = 1;
-		    else
-			response = "501 Error parsing parameters";
-		}
-		else
-		    response = "501 Wrong number of parameters";
-#endif
 	}
 
 	break;
@@ -756,12 +694,7 @@ string processCommand (CommandParse *cmd, istream& instream, bool& keepGoing)
 
       case CommandParse::STATUS:
 	if (arglist.size() == 1)
-	{
-	    cout << "210 Status follows, terminated by <CRLF>.<CRLF>"
-		 << crlf;
-	    cat.printStatus (cout, crlf);
-	    response = ".";
-	}
+	    response = "505 STATUS unimplemented";
 	else
 	    response = "501 Syntax error";
 	break;
@@ -932,6 +865,13 @@ string processAstCommand (vector<string>& arglist,
 }
 
 
+// Dump the current catalogue.
+//
+#if 0
+// This is omitted, at present.  It does work, but the `o << *e'
+// generates a link error on Tru64 Unix.  I don't know whether this is
+// my fault or Tru64's, but since this routine isn't essential,
+// there's no point in sweating over it just now.
 void dumpCatalogue (ostream& o)
 {
     const time_t nowsecs = time(NULL);
@@ -961,6 +901,7 @@ void dumpCatalogue (ostream& o)
 
     return;
 }
+#endif
 
 void Usage ()
 {

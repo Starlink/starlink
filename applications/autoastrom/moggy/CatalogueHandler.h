@@ -67,8 +67,6 @@ class CatalogueHandler {
        rows from a search which has some other problem? */
     int doSearch () throw (MoggyException);
 
-    void printStatus (ostream& o, string lineend);
-
     static void verbosity (const verbosities level) { verbosity_ = level; }
 
     class CatalogueRow {
@@ -97,7 +95,7 @@ class CatalogueHandler {
 				   variables */
     CatalogueRow* getrow (int n) { return new CatalogueRow (*this, n); }
     /* Return the list of column names in the retrieved catalogue */
-    vector<string> CatalogueHandler::getColnames () const;
+    vector<string> getColnames () const;
 
     /* typedef string* iterator; */
     class const_iterator {
@@ -147,6 +145,7 @@ class CatalogueHandler {
 	return cat_->dec_col();
     }
     int mag_col() const throw (MoggyException);
+    vector<int>* mag_cols () const throw (MoggyException);
     bool has_id() const { return id_col() >= 0; }
     bool has_ra() const { return ra_col() >= 0; }
     bool has_dec() const { return dec_col() >= 0; }
@@ -154,20 +153,6 @@ class CatalogueHandler {
 
 
  private:
-    /* The following inspector methods possibly aren't needed, and
-       they pretty definitely don't need to be public.
-       These get methods format results for readability, not
-       parseability, and will indicate that parameters are unset by
-       generating a suggestive text rather than failing. */
-    string getPos (int num) const throw (MoggyException);
-    double getRadius () const { return (isValid_(RADIUS) ? radius_ : 0.0); }
-    string getSearchtype () const;
-    string getCatname () const {
-	return (isValid_ (CATNAME) ? catname_ : static_cast<string>("<UNSET>"));
-    }
-    int getNrows () const { return (isValid_ (NROWS) ? nrows_ : 0); }
-    string getConfig () const;
-
 
     enum
     {

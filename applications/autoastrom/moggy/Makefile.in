@@ -13,15 +13,15 @@
 # Don't make any provision for the Starlink directories, or the
 # ast_link and cnf_link commands, _not_ being there -- we have
 # established in the configure script that /star, or something like
-# it, is present.
+# it, is present.  That script adds the appropriate Starlink
+# directories to CPPFLAGS and LIBS.
 #
-SLASHSTAR=@SLASHSTAR@
 DEFS=@DEFS@
-CPPFLAGS=@CPPFLAGS@ -I$(MYCATLIB)/include -I$(SLASHSTAR)/include
+CPPFLAGS=@CPPFLAGS@ -I$(MYCATLIB)/include
 CXX=@CXX@
 CXXFLAGS=@CXXFLAGS@ $(CPPFLAGS) $(DEFS)
 #CXXFLAGS=-g -Wall @CXXFLAGS@ $(CPPFLAGS) $(DEFS)
-LIBS=-lm @LIBS@ -L$(MYCATLIB)/lib -lskycat -L$(SLASHSTAR)/lib `ast_link` `cnf_link`
+LIBS=-lm @LIBS@ -L$(MYCATLIB)/lib -lskycat `ast_link` `cnf_link`
 
 # CATLIBDIR is the directory that SkyCat is temporarily installed
 # it.  This is not the directory we link against -- see the

@@ -37,7 +37,13 @@
 #define HAVE_MAP 0
 
 /* Define as 1 if we have function setenv() (and if we have, we assume
-   we have function unsetenv(), too)... */
+   we have function unsetenv(), too)... On Tru64, even though setenv
+   is present in the library, it appears not to be properly
+   declared in stdlib.h (it's bracketed off by an `#ifdef
+   AES_SOURCE', which isn't documented anywhere obvious): check for
+   this situation, and define DECLARE_SETENV if we're going to have
+   to include our own setenv definition. */
 #define HAVE_SETENV 0
+#define DECLARE_SETENV 0
 
 #endif /* CONFIG_H_LOADED */
