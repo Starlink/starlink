@@ -1383,7 +1383,7 @@ package iras90 {
             type FILENAME
             vpath {DEFAULT }
             ppath DEFAULT
-            default {$IRAS90_DIR/NEWSPFARCH}
+            default {$IRAS90_DIR/newspfarch}
             prompt {Name of SDF version of SPFARCH file}
             helpkey *
           }
@@ -2309,7 +2309,7 @@ package iras90 {
             vpath DEFAULT
             ppath DEFAULT
             prompt {NDF containing point source templates:}
-            default {$IRAS90_DIR/PROFILES}
+            default {$IRAS90_DIR/profiles}
             helpkey *
           }
 
@@ -5543,7 +5543,15 @@ package iras90 {
 
    }
 
-    icl {defhelp iras90 $IRAS90_HELP 0}
+   icl {defhelp iras90 $IRAS90_HELP 0}
+
+   command pscont {
+       obey { source $IRAS90_DIR/pscont }
+   }
+
+   command ffield {
+       obey { $IRAS90_DIR/ffield }
+   }
 
    display {
 
