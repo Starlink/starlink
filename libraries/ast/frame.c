@@ -6084,7 +6084,8 @@ c     into account. The default value is zero, which preserves the
 f     into account. The default value is .FALSE., which preserves the
 *     behaviour of older versions of AST.
 *
-*     If the ActiveUnit flag of the template Frame is zero, then the
+c     If the ActiveUnit flag of the template Frame is zero, then the
+f     If the ActiveUnit flag of the template Frame is .FALSE., then the
 *     Mapping will ignore any difference in the Unit attributes of
 *     corresponding template and target axes. In this mode, the Unit 
 *     attributes are purely descriptive commentary for the benefit of
@@ -6092,7 +6093,8 @@ f     into account. The default value is .FALSE., which preserves the
 *     This is the behaviour which all Frames had in older version of AST,
 *     prior to the introduction of this attribute.
 *
-*     If the ActiveUnit flag of the template Frame is non-zero, then the
+c     If the ActiveUnit flag of the template Frame is non-zero, then the
+f     If the ActiveUnit flag of the template Frame is .TRUE., then the
 *     Mapping from template to target will take account of any difference 
 *     in the axis Unit attributes, where-ever possible. For instance, if
 *     corresponding target and template axes have Unit strings of "km" and 
