@@ -414,10 +414,35 @@ sub adamtask_sendw {
   # adam_send.
 
   my (@returns) = eval $command;
+  
+  # We had an error sending the command
+  if ($@ ne "" || $returns[2] != &Starlink::ADAM::SAI__OK) {
 
-  return if ($@ ne "");
+    # Note that I should return a status here.
+    # If we are doing a GET I have to return two values
+    my $get = 0;
+    $get = 1 if ($command =~ /,\"GET\",|,\"CONTROL\",/);
 
-  return if $returns[2] != &Starlink::ADAM::SAI__OK;
+    # Set bad status
+    my $badstatus = &Starlink::ADAM::SAI__ERROR;
+    if ($@ ne "") {
+      carp "$@";
+      $badstatus = &Starlink::ADAM::SAI__ERROR;
+    } else {
+      $badstatus = $returns[2];
+    }
+
+    # Print error to standard error
+    my ($fac, $ident, $text) = adam_appendstatus($badstatus);
+    print $ERRHAND "!! $fac"."__$ident: $text\n" unless $err_hide;
+    # Now actually return it
+    if ($get) {
+      return (undef, $badstatus);
+    } else {
+      return $badstatus;
+    }
+
+  }
 
   # Now I need to wait for a message to come back (should be actstart)
   # From the task that I just contacted.
