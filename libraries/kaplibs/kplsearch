@@ -218,7 +218,7 @@ proc search {test words} {
 
 #  If no matching routines were found, say so.
    if { $names == "" } {
-      set result "No matching KALIB routines found."
+      set result "No matching KAPLIBS routines found."
    } else {
 
 #  Set up an associative array of routine names index by position in the
