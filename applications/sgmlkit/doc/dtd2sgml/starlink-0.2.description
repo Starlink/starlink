@@ -205,7 +205,7 @@ number has not (yet?) been assigned by the Starlink librarian.
   <!entity otherdoc public "-//Starlink//DOCUMENT Summary SUN/123//EN" subdoc>
 ]>
 ...
-<p>See also the document <docxref doc=otherdoc>
+<p>See also <docxref doc=otherdoc>
 ]]></example>
 
 <attribute name='doc'>
@@ -215,9 +215,11 @@ which references another document.
 <attribute name='loc'>
 <p>Indicates a location within a document.  The value of the loc
 attribute is an ID reference within the target document.
+<!--
 <attribute name='text'>
 <p>If present, the attribute's data is used to form the link text,
 rather than generating it based on the target.
+-->
 
 <element gi='draftnote'>
 <p>A note to be included in the text of the document.  It'll be
@@ -432,15 +434,13 @@ the link target.  Any element which has an ID attribute may be linked
 to.  A small subtlety is that the link is to a complete <em/element/ of the
 document, rather than a <em/point/ of the document.
 <example>
-See also <ref id=other.ref> for more details.
+See also &lt;ref id=other.ref> for more details.
 </example>
 <attribute name='id'>
 <p>The ID of the element to link to.
-<!--
 <attribute name='text'>
 <p>If present, the attribute's data is used to form the link text,
 rather than generating it based on the target.
--->
 
 <element gi='routinelist'>
 <p>This element introduces the <elemref gi=codecollection> elements
