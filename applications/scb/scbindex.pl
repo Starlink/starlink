@@ -1111,7 +1111,7 @@ sub tidyup {
 #  Sync StarIndex objects to disk.
 
    foreach $iname (@indexes) {
-      $index{$iname}->finish();
+      $index{$iname}->finish() if (ref ($index{$iname}) eq 'StarIndex');
    }
 
 #  Remove any straggling temporary files.
