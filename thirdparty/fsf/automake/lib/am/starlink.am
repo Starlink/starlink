@@ -62,7 +62,7 @@ install-manifest.xml: all-am
 	  echo "<manifest component='$(PACKAGE_NAME)'>"         >>$@ ; \
 	  echo "<version>$(PACKAGE_VERSION)</version>"          >>$@ ; \
 	  echo "<files>"                                        >>$@ ; \
-	  find $$STG -type f | sed "s,^$$STG,$(prefix),"        >>$@ ; \
+	  find $$STG -type f -o -type l | sed "s,^$$STG,$(prefix)," >>$@ ; \
 	  echo "</files>"                                       >>$@ ; \
 	  echo "</manifest>"                                    >>$@ ; \
 	  $(mkdir_p) $(DESTDIR)$(prefix) ; \
