@@ -209,7 +209,7 @@ kps1_stpa.gen kps1_thgt.gen kps1_prmx.gen kps1_apad.gen kps1_ardm.gen \
 kps1_lapl.gen kps1_med.gen kps1_mmv.gen kps1_rs1.gen
 
 # Non-generic source files needed for kapsub_sub.tar :
-KAPSUB_NONGEN = cnthlt.f curre.f ftsize.f ftsizt.f gethlp.f getv2.f \
+KAPSUB_NONGEN = cnthlt.f curre.f ftsize.f ftsizt.f getv2.f \
 hstdsp.f hstlo.f hstrep.f imlst.f inhi.f inpol.f inre.f inva.f \
 kps1_agnst.f kps1_agnls.f kps1_agncp.f kps1_agndw.f kps1_agnch.f \
 kps1_agnms.f kps1_agnwc.f kps1_agncm.f kps1_agndl.f kps1_agndr.f \

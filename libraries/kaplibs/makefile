@@ -402,7 +402,7 @@ PKG_NUM = 1522
 #  be incremented for other minor changes (bug fixes, etc.) which do
 #  not merit documentation changes.
 
-PKG_VERS = 2.2
+PKG_VERS = 2.3
 
 #  Library version number.
 #
@@ -537,7 +537,7 @@ KPG_F_ROUTINES = bad2db.f bad2dd.f bad2di.f bad2dr.f bad2dub.f \
 bad2duw.f bad2dw.f bttn3.f chvalb.f chvali.f chvall.f chvalr.f \
 chvalw.f copad.f copai.f copar.f copy1d.f copy2d.f copy3d.f cpsecr.f \
 creout.f curpts.f dimlst.f drebar.f dynclr.f elnmbi.f elnmbr.f \
-exparr.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_asfix.f \
+exparr.f gethlp.f gthlpi.f icmmm.f inset.f kpg1_abset.f kpg1_agatc.f kpg1_asfix.f \
 kpg1_agfnd.f kpg1_agref.f kpg1_ainbd.f kpg1_ainbr.f kpg1_aindd.f \
 kpg1_aindr.f kpg1_akerd.f kpg1_akerr.f kpg1_antso.f kpg1_arcog.f \
 kpg1_arcol.f kpg1_asagd.f kpg1_ascrv.f kpg1_asdis.f kpg1_asdsv.f \
@@ -1747,6 +1747,7 @@ fts1_wkeyl.o:	 SAE_PAR
 fts1_wkeyr.o:	 SAE_PAR
 grf_kaplibs.o:   grf.h
 gthlpi.o:	 SAE_PAR HLPCMD
+gethlp.o:	 SAE_PAR HLPCMD
 icmmm.o:	 SAE_PAR PRM_PAR
 inset.o:	 SAE_PAR
 irq1_add.o: DAT_PAR IRQ_ERR IRQ_PAR SAE_PAR

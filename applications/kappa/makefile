@@ -588,7 +588,7 @@ ccg1_umd1d.f ccg1_umr1r.f ccg1_umd3d.f ccg1_umr3r.f
 
 KAPSUB_C_ROUTINES = kps1_luted.c
 
-KAPSUB_F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f gethlp.f \
+KAPSUB_F_ROUTINES = cnthlt.f curre.f ftsize.f ftsizt.f \
 getv2.f hstdsp.f hstlo.f hstrep.f imlst.f inhi.f inpol.f inre.f inva.f \
 lsfun1.f \
 kps1_agnch.f kps1_agncm.f kps1_agncp.f kps1_agndl.f kps1_agndr.f \
@@ -2367,7 +2367,6 @@ gdclear.o:	SAE_PAR
 gdnames.o:	SAE_PAR
 gdset.o:	SAE_PAR
 gdstate.o:	SAE_PAR DAT_PAR AST_PAR
-gethlp.o:	SAE_PAR HLPCMD
 getv2.o:	SAE_PAR
 glitch.o:	SAE_PAR NDF_PAR SUBPAR_PAR PAR_ERR AST_PAR
 globals.o:	SAE_PAR DAT_PAR DAT_ERR
