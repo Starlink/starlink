@@ -13,6 +13,8 @@ dnl    STARCONF_DEFAULT_PREFIX', and sed'ding the result into the
 dnl    ./configure script which autoconf generates.
 AC_PREFIX_DEFAULT(%%PREFIX%%)
 
+dnl    If no java can be found, set this to the magic (and obviously failed)
+dnl    value NOJAVA.  This is tested for in Makefile.in
 AC_PATH_PROG([JAVA], [java], [NOJAVA])
 AC_ARG_VAR([JAVA], [Location of java runtime])
 

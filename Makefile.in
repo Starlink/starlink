@@ -111,9 +111,9 @@ world: $(ALL_TARGETS)
 # top level will fail because one or other of the dependencies of
 # componentset.xml is missing.
 #
-# The test of whether $(JAVA) is zero-length is important.  An edited
+# The test of whether $(JAVA) is NOJAVA is important.  An edited
 # version of this file is used by the ./bootstrap script, in which the
-# JAVA variable is empty (since the directory may not have been
+# JAVA variable is set to NOJAVA (since the directory may not have been
 # configured yet); we must not fail in this case, nor may we attempt
 # to make GenerateDependencies.class.  In this case simply do nothing,
 # because the Makefile.dependencies file can be assumed to be up-to-date.
@@ -134,7 +134,7 @@ world: $(ALL_TARGETS)
 # might make more sense, therefore, to amalgamate these two rules into
 # one
 Makefile.dependencies: componentset.xml
-	if test -n "$(JAVA)" -a -f buildsupport/starconf/java/Makefile; then \
+	if test $(JAVA) != NOJAVA -a -f buildsupport/starconf/java/Makefile; then \
 	    (cd buildsupport/starconf/java \
 	        && $(MAKE) GenerateDependencies.class) \
 	    && $(JAVA) -classpath buildsupport/starconf/java \

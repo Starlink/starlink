@@ -155,7 +155,7 @@ test -d $STARCONF_DEFAULT_PREFIX/bin || \
 # unconfigured, below.
 tempmakefile=Makefile.tmp
 rm -f $tempmakefile
-sed -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
+sed -e 's/@JAVA@/NOJAVA/' -e 's/@[a-zA-Z0-9_]*@/#DUMMY/' Makefile.in >$tempmakefile
 
 # Now invoke 'make buildsupport', using this temporary makefile, and
 # setting environment variables appropriately.  These variables have
