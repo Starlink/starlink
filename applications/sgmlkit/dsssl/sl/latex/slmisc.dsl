@@ -173,7 +173,12 @@ to need explanation or elaboration.
 				       (parent (current-node)))))
     (make sequence
       (make command name: "DTitem"
-	    (process-children))
+	    (make sequence
+	      (if (attribute-string (normalize "id"))
+		  (make command name: "label"
+			(literal (gen-label)))
+		  (empty-sosofo))
+	      (process-children)))
       (if is-compact?
 	  (empty-sosofo)
 	  (make fi data: "\\hfill\\\\")))))
@@ -192,7 +197,29 @@ to need explanation or elaboration.
 (element li
   (make sequence
     (make empty-command name: "item")
+    (if (attribute-string (normalize "id"))
+	(make command name: "label"
+	      (literal (gen-label)))
+	(empty-sosofo))
     (process-children)))
+
+(mode section-reference
+  (element dt
+    (make sequence
+      (literal "in section ")
+      (make-section-reference
+       target: (ancestor-member (current-node)
+				(section-element-list)))))
+  (element li
+    (if (string=? (gi (parent (current-node)))
+		  (normalize "ol"))
+	(make command name: "ref"
+	      (literal (gen-label)))
+	(make sequence
+	  (literal "in section ")
+	  (make-section-reference
+	   target: (ancestor-member (current-node)
+				    (section-element-list)))))))
 
 ;;; Paragraphing
 

@@ -63,6 +63,11 @@ immediately resolve the indirection.
 	    (error (string-append
 		    "Can't find element with ID " target-id))))))
 
+(define (gen-label #!optional (nd (current-node)))
+  (if (attribute-string (normalize "id") nd)
+      (string-append (gi nd) (attribute-string (normalize "id") nd))
+      (error "Can't generate references to unlabelled elements")))
+
 <routine>
 <description>The <code>docxref</> element has a required attribute
 giving the document which is to be referred to, and an optional
