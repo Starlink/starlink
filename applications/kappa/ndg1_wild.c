@@ -68,8 +68,8 @@
  *        Shortridge. Changes from the original are that this is now
  *        NDF foreign file format specific and is no longer general
  *        about the file types it can handle.
- *     15-DEC-1997: David S. Berry (STARLINK)
- *        Renamed as NDG1_WILD for inclusion in POLPACK.
+ *     7-OCT-1998: David S. Berry (STARLINK)
+ *        POLPACK version copied for inclusion in KAPPA.
  *+
  */
 
@@ -368,7 +368,7 @@ F77_INTEGER_FUNCTION(ndg1_ewild)( POINTER(Context) )
 static char *get_irg_wild ()
 
   /*  Local procedure to locate a copy of irg_wild. This is looked
-   *  for in POLPACK_DIR and then somewhere on the PATH. An general
+   *  for in KAPPA_DIR and then somewhere on the PATH. An general
    *  version of NDG would only look on the PATH.
    */
 {
@@ -389,7 +389,7 @@ static char *get_irg_wild ()
      *  Look for environment variable.
      *
      */
-    dir = getenv( "POLPACK_DIR" );
+    dir = getenv( "KAPPA_DIR" );
     if ( dir ) {
       strcpy( irg_wild, dir );
       strcat( irg_wild, "/" );
