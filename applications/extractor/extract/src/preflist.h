@@ -10,7 +10,13 @@
 *	Contents:	Keywords for the configuration file.
 *
 *	Last modify:	24/01/2003
-*
+*                       15/03/2004 (PWD): re-created from old prefs.h file
+*                                   during 2.3 merge:
+*                           - 27/11/98 (PWD):
+*                             Removed ".fits" as default output file
+*                             extension.
+*                           - 15/02/00 (PWD):
+*                             Added RAD_TYPE, RAD_THRESH.
 *%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 */
 
@@ -95,6 +101,10 @@ pkeystruct key[] =
   {"MEMORY_BUFSIZE", P_INT, &prefs.mem_bufsize, 8, 65534},
   {"MEMORY_OBJSTACK", P_INT, &prefs.clean_stacksize, 16,65536},
   {"MEMORY_PIXSTACK", P_INT, &prefs.mem_pixstack, 1000, 10000000},
+  {"RAD_THRESH", P_FLOATLIST, prefs.rad, 0,0, -BIG, BIG,
+   {""}, 0, 3, &prefs.nrad, 1},
+  {"RAD_TYPE", P_KEY, &prefs.rad_type, 0, 0, 0.0, 0.0,
+   {"SB","INT",""}, 0, 1, &prefs.nrad_type, 1},
   {"PARAMETERS_NAME", P_STRING, prefs.param_name},
   {"PHOT_APERTURES", P_FLOATLIST, prefs.apert, 0,0, 0.0,2*MAXPICSIZE,
    {""}, 1, MAXNAPER, &prefs.naper},
@@ -149,7 +159,7 @@ char *default_prefs[] =
 "#------------------------------- Extraction ----------------------------------",
 " ",
 "DETECT_TYPE     CCD             # \"CCD\" or \"PHOTO\"",
-"FLAG_IMAGE      flag.fits       # filename for an input FLAG-image",
+"FLAG_IMAGE      flag            # filename for an input FLAG-image",
 "DETECT_MINAREA  5               # minimum number of pixels above threshold",
 "DETECT_THRESH   1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2",
 "ANALYSIS_THRESH 1.5             # <sigmas> or <threshold>,<ZP> in mag.arcsec-2",
@@ -197,7 +207,7 @@ char *default_prefs[] =
 "                                # \"MINIBACKGROUND\", \"-BACKGROUND\", \"OBJECTS\",",
 "                                # \"-OBJECTS\", \"SEGMENTATION\", \"APERTURES\",",
 "                                # or \"FILTERED\"",
-"CHECKIMAGE_NAME check.fits      # Filename for the check-image",
+"CHECKIMAGE_NAME check           # Filename for the check-image",
 " ",
 "#--------------------- Memory (change with caution!) -------------------------",
 " ",
@@ -217,11 +227,11 @@ char *default_prefs[] =
 "*BACK_FILTTHRESH      0.0",
 "*BACK_TYPE            AUTO",
 "*BACK_VALUE           0.0",
-"*CHECKIMAGE_NAME      check.fits",
+"*CHECKIMAGE_NAME      check",
 "*CHECKIMAGE_TYPE      NONE",
 "*FILTER_THRESH        ",
 "*FITS_UNSIGNED        N",
-"*FLAG_IMAGE           flag.fits",
+"*FLAG_IMAGE           flag",
 "*FLAG_TYPE            OR",
 "*INTERP_MAXXLAG       16",
 "*INTERP_MAXYLAG       16",
@@ -235,7 +245,7 @@ char *default_prefs[] =
 "*SOM_NAME             default.som",
 "*THRESH_TYPE          RELATIVE",
 "*WEIGHT_GAIN          Y",
-"*WEIGHT_IMAGE         weight.fits",
+"*WEIGHT_IMAGE         weight",
 "*WEIGHT_TYPE          NONE",
 "*WEIGHT_THRESH        ",
 ""
