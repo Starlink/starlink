@@ -47,7 +47,7 @@ for p in $starpath; do
     if test -x $pp; then
         AC_MSG_CHECKING(whether $pp can load autoastrom)
         if $pp -e 'use lib ".."; use autoastrom; exit 0;'; then
-            AC_DEFINE(PERLPATH, $pp)
+            PERLPATH=$pp
             AC_MSG_RESULT(ok)
             break
         else
@@ -55,9 +55,11 @@ for p in $starpath; do
         fi
     fi
 done
-if test -n "$PERLPATH"; then
+if test -z "$PERLPATH"; then
     AC_MSG_ERROR([Can't find a suitable Perl in $starpath])
 fi
+echo PERLPATH=$PERLPATH
+AC_SUBST(PERLPATH)
 
 dnl   Similarly, check for uncompress and gzip programs
 AC_PATH_PROG(PROGUNCOMPRESS, uncompress)
