@@ -341,6 +341,9 @@
 *     status = int *
 *        The global status.
 *-
+*/
+
+/* Local variables. */
       char *ccddir;
 
 /* Check the inherited status. */
