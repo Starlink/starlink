@@ -367,7 +367,7 @@ build:
     [javac] Compiling 179 source files to /apps/cvsbuild/java/source/splat/build/classes
     [javac] Note: Some input files use or override a deprecated API.
     [javac] Note: Recompile with -deprecation for details.
-     [copy] Copying 71 files to /apps/cvsbuild/java/source/splat/build/classes
+     [copy] Copying 72 files to /apps/cvsbuild/java/source/splat/build/classes
     [mkdir] Created dir: /apps/cvsbuild/java/source/splat/lib/splat
      [copy] Copying 11 files to /apps/cvsbuild/java/source/splat/lib/splat
 
@@ -510,4 +510,4 @@ execute_mk_script:
      [exec] g77: temp/*.o: No such file or directory
 
 BUILD SUCCESSFUL
-Total time: 1 minute 22 seconds
+Total time: 1 minute 25 seconds

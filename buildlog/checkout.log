@@ -9557,6 +9557,7 @@ U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtGenerator.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/VoigtInterp.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/WaveletFilter.java
 U java/source/splat/src/main/uk/ac/starlink/splat/util/deploy.wsdd
+U java/source/splat/src/main/uk/ac/starlink/splat/util/splat.version
 cvs checkout: Updating java/source/splat/src/main/uk/ac/starlink/splat/vo
 U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQuery.java
 U java/source/splat/src/main/uk/ac/starlink/splat/vo/SSAQueryBrowser.java
