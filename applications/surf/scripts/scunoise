@@ -30,8 +30,9 @@
 #       DD/MM/YY: INIT  Comments
 #       --------- ----  --------
 #        $Log$
-#        Revision 1.18  2002/03/22 01:47:51  timj
-#        support bgcolor
+#        Revision 1.19  2002/08/02 01:19:54  frossie
+#        Look at /jmctdata at the summit
+#        Also chaned to look at scuba1 rather than scuba2
 #
 #        Revision 1.17  2002/03/22 01:09:38  timj
 #        - work around bug in Tk 800.024
@@ -299,13 +300,13 @@ sub set_disks {
   push(@disk,File::Spec->curdir);
   if ($domain eq "jach" || $domain eq "Hilo") {
     push(@disk,"/net/luu/scubadata");
-    push(@disk,"/net/ieie/jcmtarchive");
-    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+#    push(@disk,"/net/ieie/jcmtarchive");
+    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
 #    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
   } elsif ($domain eq "jcmt") {
-    push(@disk,"/net/ieie/jcmtarchive");
-    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
-#    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
+    push(@disk,"/jcmtdata/raw/scuba");
+#    push(@disk,"/net/mwtsrv/disk\$scuba2/scuba/observe");
+    push(@disk,"/net/mwtsrv/disk\$scuba1/scuba/observe");
     push(@disk,"/net/luu/scubadata");
   } elsif ($^O eq 'MSWin32') {
     push(@disk, "\\\\Ola\\scuba-data\\");
@@ -344,7 +345,6 @@ sub obsdir_panel {
     $OM = $OP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
-		       -background => $bbg,
 		       -foreground => 'Indianred',
 		       -height     => 4,
 		       -width      => 30,
@@ -392,7 +392,6 @@ sub obsdir_panel {
     my $OT = $OP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
-		       -background => $bbg,
 		       -foreground => 'midnightblue',
                        -height     => 5,
                        -width      => 30,
@@ -652,7 +651,6 @@ sub control_panel {
     my $CT = $CP->Text(
 		       -wrap       => 'word',
 		       -relief     => 'flat',
-		       -background => $bbg,
 		       -foreground => 'midnightblue',
                        -height     => 3,
                        -width      => 30,
