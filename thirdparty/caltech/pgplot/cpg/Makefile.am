@@ -7,13 +7,9 @@ pgbind_SOURCES = $(PGBIND_ROUTINES)
 PGBIND_ROUTINES = pgbind.c
 
 # Use the pgbind program to generate the source files cpgplot.c and cpgplot.h
-# we don't mention the .h file at all as a target because it should appear as
-# well as the .c file when pgbind is run, if it didn't already exist.
 
 C_WRAPPERS = cpgplot.c
-
 PUBLIC_INCLUDES = cpgplot.h
-
 
 cpgplot.c: pgbind
 	grep -h '^C%' ../src/pg*.f > ./pgbind_prototypes
@@ -33,5 +29,5 @@ TESTS = cpgdemo
 check_PROGRAMS = cpgdemo
 cpgdemo_SOURCES = $(DEMO_ROUTINES)
 DEMO_ROUTINES = cpgdemo.c
-cpgdemo_LDADD = libcpgplot.la
+cpgdemo_LDADD = libcpgplot.la ../src/libpgplot_base.la
 
