@@ -1,43 +1,43 @@
 /*+
- * Name:
- *    ctag-y.y
- *
- * Type of module:
- *    yacc grammar
- *
- * Purpose:
- *    Specify minimal grammar of C source.
- *
- * Description:
- *    This grammar specification provides enough understanding of C source
- *    code, as tokenized by the corresponding lexical analyser, to be
- *    able to identify and tag function definitions and invocations.
- *
- *    It is impossible to do a proper parse of the C, since we don't
- *    walk the include files so that we can't know about what identifiers
- *    have been typedef'd and what preprocessor substitutions should be
- *    made.  We therefore deliberately use a very basic model of how 
- *    the C fits together.  In most (the large majority of) cases this 
- *    should be adequate to spot the function definitions and 
- *    invocations.
- *
- *    Note that comments and preprocessor directives are dealt with 
- *    by the lexical analyser, so that we can pretend here as far as
- *    the token stream is concerned that they do not exist.
- *
- *    The yylval values returned by the lexical analyser are all pointers
- *    to char, which must be output in order.  These contain, as well
- *    as the text of the tokens in question, all intervening whitespace,
- *    comments, preprocessor directives etc.
- *
- * Authors:
- *    MBT: Mark Taylor (STARLINK)
- *
- * History:
- *    23-NOV-1999 (MBT):
- *       Initial version.
- *-
- */
+*  Name:
+*     ctag-y.y
+* 
+*  Type of module:
+*     yacc grammar
+* 
+*  Purpose:
+*     Specify minimal grammar of C source.
+* 
+*  Description:
+*     This grammar specification provides enough understanding of C source
+*     code, as tokenized by the corresponding lexical analyser, to be
+*     able to identify and tag function definitions and invocations.
+* 
+*     It is impossible to do a proper parse of the C, since we don't
+*     walk the include files so that we can't know about what identifiers
+*     have been typedef'd and what preprocessor substitutions should be
+*     made.  We therefore deliberately use a very basic model of how 
+*     the C fits together.  In most (the large majority of) cases this 
+*     should be adequate to spot the function definitions and 
+*     invocations.
+* 
+*     Note that comments and preprocessor directives are dealt with 
+*     by the lexical analyser, so that we can pretend here as far as
+*     the token stream is concerned that they do not exist.
+* 
+*     The yylval values returned by the lexical analyser are all pointers
+*     to char, which must be output in order.  These contain, as well
+*     as the text of the tokens in question, all intervening whitespace,
+*     comments, preprocessor directives etc.
+* 
+*  Authors:
+*     MBT: Mark Taylor (STARLINK)
+* 
+*  History:
+*     23-NOV-1999 (MBT):
+*        Initial version.
+*-
+*/
 
 
 
@@ -51,7 +51,7 @@
 
 %token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
 
-%token F77_FUNCTION_NAME F77_SUBROUTINE_NAME F77_EXTERNAL_NAME FUNC_NAME
+%token F77_FUNCTION F77_SUBROUTINE F77_EXTERNAL F77_CALL FUNC_NAME
 %token TRAILER
 
 %start file
@@ -73,18 +73,18 @@ external_definition
 	;
 
 unit
-	: f77_macro_name '(' identifier ')' '(' nonexecutable_code ')' 
+	: f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' 
 	  function_body
-		{ $$ = scat( 8, $1, $2, anchor( "name", $3 ), 
+		{ $$ = scat( 8, $1, $2, anchor( "name", $3, 1 ), 
 		             $4, $5, $6, $7, $8 ); }
-	| f77_macro_name '(' identifier ')' '(' nonexecutable_code ')' ';'
+	| f77_define_macro '(' identifier ')' '(' nonexecutable_code ')' ';'
 		{ $$ = scat( 8, $1, $2, $3, $4, $5, $6, $7, $8 ); }
 	| FUNC_NAME '(' nonexecutable_code ')' function_body
-		{ $$ = scat( 5, anchor( "name", $1 ), $2, $3, $4, $5 ); }
+		{ $$ = scat( 5, anchor( "name", $1, 0 ), $2, $3, $4, $5 ); }
 	| FUNC_NAME '(' nonexecutable_code ')' ';'
 		{ $$ = scat( 5, $1, $2, $3, $4, $5 ); }
 	| FUNC_NAME '(' ')' function_body
-		{ $$ = scat( 4, anchor( "name", $1 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, anchor( "name", $1, 0 ), $2, $3, $4 ); }
 	| FUNC_NAME '(' ')' ';'
 		{ $$ = scat( 4, $1, $2, $3, $4 ); }
 	| declaration_word
@@ -144,7 +144,7 @@ nonexecutable_item
 	: declaration_word
 		{ $$ = $1; }
 	| FUNC_NAME '(' nonexecutable_code ')'
-		{ $$ = scat( 4, anchor( "href", $1 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, anchor( "href", $1, 0 ), $2, $3, $4 ); }
 	| ';'
 	;
 
@@ -156,12 +156,12 @@ executable_code
 	;
 
 executable_item
-	: f77_macro_name '(' identifier ')' 
-		{ $$ = scat( 4, $1, $2, anchor( "href", $3 ), $4 ); }
+	: F77_CALL '(' identifier ')' 
+		{ $$ = scat( 4, $1, $2, anchor( "href", $3, 1 ), $4 ); }
 	| FUNC_NAME '(' executable_code ')'
-		{ $$ = scat( 4, anchor( "href", $1 ), $2, $3, $4 ); }
+		{ $$ = scat( 4, anchor( "href", $1, 0 ), $2, $3, $4 ); }
 	| FUNC_NAME '(' ')'
-		{ $$ = scat( 3, anchor( "href", $1 ), $2, $3 ); }
+		{ $$ = scat( 3, anchor( "href", $1, 0 ), $2, $3 ); }
 	| reserved
 		{ $$ = $1; }
 	| identifier
@@ -180,10 +180,10 @@ executable_item
 		{ $$ = $1; }
 	;
 
-f77_macro_name
-	: F77_FUNCTION_NAME	{ $$ = $1; }
-	| F77_SUBROUTINE_NAME	{ $$ = $1; }
-	| F77_EXTERNAL_NAME	{ $$ = $1; }
+f77_define_macro
+	: F77_FUNCTION		{ $$ = $1; }
+	| F77_SUBROUTINE	{ $$ = $1; }
+	| F77_EXTERNAL		{ $$ = $1; }
 	;
 
 otherchar
@@ -270,31 +270,31 @@ extern int column;
 
    char *snew( char *str ) {
 /*+
- * Name:
- *    snew
- *
- * Invocation:
- *    string = snew( str );
- *
- * Purpose:
- *    Copy a string into malloc'd space.
- *
- * Arguments:
- *    str = char *
- *       The string to be copied (must end with '\0').
- *
- * Return Value:
- *    string = char *
- *       A string with the same contents as str, but in a newly malloc'd
- *       location.
- *
- * Description:
- *    This routine just mallocs some space and copies the given string
- *    into it.  The purpose of this is so that the resulting pointer 
- *    can be passed to routines which assume their arguments have been
- *    malloc'd and may be free'd.
- *-
- */
+*  Name:
+*     snew
+* 
+*  Invocation:
+*     string = snew( str );
+* 
+*  Purpose:
+*     Copy a string into malloc'd space.
+* 
+*  Arguments:
+*     str = char *
+*        The string to be copied (must end with '\0').
+* 
+*  Return Value:
+*     string = char *
+*        A string with the same contents as str, but in a newly malloc'd
+*        location.
+* 
+*  Description:
+*     This routine just mallocs some space and copies the given string
+*     into it.  The purpose of this is so that the resulting pointer 
+*     can be passed to routines which assume their arguments have been
+*     malloc'd and may be free'd.
+*-
+*/
       char *string;
 
       string = malloc( strlen( str ) + 1 );
@@ -305,38 +305,38 @@ extern int column;
  
    char *scat( int n, ... ) {
 /*+
- * Name:
- *    scat
- *
- * Invocation:
- *    string = scat( n, ... )
- *
- * Purpose:
- *    Concatenate a list of strings.
- *
- * Arguments:
- *    n = int
- *       The number of strings to be concatenated.
- *    sp1, sp2, ... = char *
- *       The other arguments are all strings, and there are n of them.
- *       free() is called on each of them, so they must have been malloc'd
- *       at some time in the past, and must not be used subsequent to
- *       passing to this function.
- *
- * Return value:
- *    string = char *
- *       The return value is a string containing the concatenation of
- *       all the strings supplied.  It is obtained using malloc, so
- *       should be free'd at some time in the future.
- *
- * Description:
- *    This routine returns a newly malloc'd string which is the concatenation
- *    of all the strings supplied to it as arguments.  Each of those arguments
- *    gets free'd by this routine, so they must have been malloc'd (probably
- *    by this routine) in the past, and must not be referred to again after
- *    calling this routine.
- *-
- */
+*  Name:
+*     scat
+* 
+*  Invocation:
+*     string = scat( n, ... )
+* 
+*  Purpose:
+*     Concatenate a list of strings.
+* 
+*  Arguments:
+*     n = int
+*        The number of strings to be concatenated.
+*     sp1, sp2, ... = char *
+*        The other arguments are all strings, and there are n of them.
+*        free() is called on each of them, so they must have been malloc'd
+*        at some time in the past, and must not be used subsequent to
+*        passing to this function.
+* 
+*  Return value:
+*     string = char *
+*        The return value is a string containing the concatenation of
+*        all the strings supplied.  It is obtained using malloc, so
+*        should be free'd at some time in the future.
+* 
+*  Description:
+*     This routine returns a newly malloc'd string which is the concatenation
+*     of all the strings supplied to it as arguments.  Each of those arguments
+*     gets free'd by this routine, so they must have been malloc'd (probably
+*     by this routine) in the past, and must not be referred to again after
+*     calling this routine.
+*-
+*/
 
 /* Local variables. */
       va_list ap;
@@ -371,52 +371,55 @@ extern int column;
    }
    
 
-   char *anchor( char *attrib, char *fname ) {
+   char *anchor( char *attrib, char *fname, int f77flag ) {
 /*+
- * Name:
- *    anchor
- *
- * Invocation:
- *    string = anchor( attrib, fname )
- *
- * Purpose:
- *    Generates an HTML-like anchor tag around a string.
- *
- * Arguments:
- *    attrib = const char *
- *       Gives the name of the attribute to be set to fname.  The sensible
- *       values would be "href" and "name".
- *    fname = char *
- *       Gives the string to be used both as the contents of the tag,
- *       and of the value of the attribute of the A tag.  This will be
- *       free'd by the routine, so must previously have been malloc'd.
- *       The argument may consist of any amount of text, but only the
- *       identifier right at the end will be used as the attribute value
- *       and tagged text.  Any leading text will be output preceding
- *       the tag.
- *
- * Return Value:
- *    Text tagged with an SGML A tag, such that if fname points to text
- *    "leading text identifier" then the returned value will be 
- *    "leading text<a attrib='identifier'>identifier</a>".
- *    This is malloc'd by this routine so should subsequently be free'd.
- *
- * Description:
- *    This routine generates an SGML tag surrounding the text given
- *    by the fname argument.  The value of the attribute named by the
- *    attrib argument is also fname.  The valid part of fname is supposed
- *    to start at the first character and go on for as long as it 
- *    constitutes a valid C identifier.  Any trailing characters are
- *    appended after the tag, but don't form part of the tagged text or
- *    attribute value.  The memory used by fname is free'd by this routine.
- *-
- */
+*  Name:
+*     anchor
+* 
+*  Invocation:
+*     string = anchor( attrib, fname, f77flag )
+* 
+*  Purpose:
+*     Generates an HTML-like anchor tag around a string.
+* 
+*  Arguments:
+*     attrib = const char *
+*        Gives the name of the attribute to be set to fname.  The sensible
+*        values would be "href" and "name".
+*     fname = char *
+*        Gives the string to be used both as the contents of the tag,
+*        and of the value of the attribute of the A tag.  This will be
+*        free'd by the routine, so must previously have been malloc'd.
+*        The argument may consist of any amount of text, but only the
+*        identifier right at the end will be used as the attribute value
+*        and tagged text.  Any leading text will be output preceding
+*        the tag.
+*     f77flag = int
+*        If nonzero, then a '_' is appended to the attribute value.  This
+*        is appropriate if it represents a fortran routine.
+* 
+*  Return Value:
+*     Text tagged with an SGML A tag, such that if fname points to text
+*     "leading text identifier" then the returned value will be 
+*     "leading text<a attrib='identifier'>identifier</a>".
+*     This is malloc'd by this routine so should subsequently be free'd.
+* 
+*  Description:
+*     This routine generates an SGML tag surrounding the text given
+*     by the fname argument.  The value of the attribute named by the
+*     attrib argument is also fname.  The valid part of fname is supposed
+*     to start at the first character and go on for as long as it 
+*     constitutes a valid C identifier.  Any trailing characters are
+*     appended after the tag, but don't form part of the tagged text or
+*     attribute value.  The memory used by fname is free'd by this routine.
+*-
+*/
 
 /* Local variables. */
       char *string, *vname, *fend;
       
 /* Find the start of the identifier itself, which is assumed to be right
- * at the end of the string. */
+   at the end of the string. */
       fend = fname + strlen( fname );
       for ( vname = fend - 1; vname >= fname; vname-- ) {
          if ( ! isalnum( *vname ) && *vname != '_' )
@@ -427,14 +430,16 @@ extern int column;
 
 /* Work out how much space the output string requires and allocate it. */
       string = malloc( strlen( attrib ) + strlen( fname ) + strlen( vname ) 
-                       + 12 );
+                       + ( f77flag ? 13 : 12 ) );
 
 /* Write the whole input text into the output string. */
       strcpy( string, fname );
 
 /* Overwrite the bare vname at the end with the tag. */
       sprintf( string + (int) (vname - fname), 
-               "<a %s='%s'>%s</a>", attrib, vname, vname );
+               ( f77flag ? "<a %s='%s_'>%s</a>"
+                         : "<a %s='%s'>%s</a>" ), 
+               attrib, vname, vname );
 
 /* Free up the fname string. */
       free( fname );

@@ -55,6 +55,7 @@ IDENT			{L}({L}|{D})*
 
 void count();
 void comment();
+void cpluspluscomm();
 void cpp();
 void ecount();
 void define();
@@ -71,8 +72,8 @@ void munch();
 ^#define{S}/{IDENT}{S}\(	{ define(); }
 ^#				{ cpp(); }
 
-
 {S}"/*"				{ comment(); }
+{S}"//"				{ cpluspluscomm(); }
 
 {S}"auto"			{ count(); return(AUTO); }
 {S}"break"			{ count(); return(BREAK); }
@@ -112,9 +113,10 @@ void munch();
 {S}"switch"/{S}\(		{ count(); return(SWITCH); }
 {S}"while"/{S}\(		{ count(); return(WHILE); }
 
-{S}F77_SUBROUTINE/{S}\(		{ count(); return(F77_SUBROUTINE_NAME); }
-{S}F77_[A-Z]+_FUNCTION/{S}\(	{ count(); return(F77_FUNCTION_NAME); }
-{S}F77_EXTERNAL_NAME/{S}\(	{ count(); return(F77_EXTERNAL_NAME); }
+{S}F77_SUBROUTINE/{S}\(		{ count(); return(F77_SUBROUTINE); }
+{S}F77_[A-Z]+_FUNCTION/{S}\(	{ count(); return(F77_FUNCTION); }
+{S}F77_EXTERNAL_NAME/{S}\(	{ count(); return(F77_EXTERNAL); }
+{S}F77_CALL/{S}\(		{ count(); return(F77_CALL); }
 
 {S}{IDENT}/{S}\(		{ count(); return(FUNC_NAME); }
 {S}{IDENT}			{ count(); return(IDENTIFIER); }
@@ -349,17 +351,6 @@ extern int yyleng;
    }
       
 
-   void cpprest() {
-      char c, cl;
-      c = '\0';
-      while ( c != '\n' || cl == '\\' ) {
-         cl = c;
-         c = input();
-         cappend( c );
-      }
-   }
-
-
    void comment() {
 /*
 *+
@@ -372,9 +363,44 @@ extern int yyleng;
 */
       char c, cl;
       sappend( yytext );
-      cpprest();
+      c = ' ';
+      while ( c && ( cl != '*' || c != '/' ) ) {
+         cl = c;
+         c = input();
+         cappend( c );
+      }
+   }
+
+
+   void cpluspluscomm() {
+/*
+*+
+*  Name:
+*     cpluspluscomm
+*
+*  Purpose:
+*     Store C++ style comment in preval.
+*-
+*/
+      char c;
+      sappend( yytext );
+      while( ( c = input() ) && c != '\n' )
+         cappend( c );
+      cappend( c );
    }
          
+
+   void cpprest() {
+      char c, cl;
+      c = ' ';
+      while ( c && ( c != '\n' || cl == '\\' ) ) {
+         cl = c;
+         c = input();
+         cappend( c );
+      }
+   }
+
+
 
    void cpp() {
 /*
@@ -452,14 +478,14 @@ extern int yyleng;
 
 /* Add definiendum, remembering where it starts and finishes. */
       p1 = preleng;
-      while ( ( c = input() ) && isalnum( c ) || c == '_' )
+      while ( ( c = input() ) && ( isalnum( c ) || c == '_' ) )
          cappend( c );
       p2 = preleng;
 
 /* Add end of tag. */
       sappend( "'>" );
 
-/* Copy definiendum to after the start tag too.
+/* Copy definiendum to after the start tag too. */
       for ( i = p1; i < p2; i++ )
          cappend( preval[ i ] );
 
