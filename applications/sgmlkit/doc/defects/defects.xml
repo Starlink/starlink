@@ -369,9 +369,23 @@ single minus sign doesn't drop to the bottom of the line.</p>
 images, and the fact that DVI files contain no notion of baselines --
 they're just collections of characters at random points on the page.
 That means it's probably not that easy to fix.</p>
-<p>How much of a problem is this?  If folk are in the habit of writing
-minus signs alone within maths mode, then I think they should be told
-to stoppit, since, apart from anything else, the spacing would be wrong.</p>
+<p>This has actually been fixed to some extent, since dvi2bitmap now
+has a strut special, which the img-eqlist.pl script uses to create the
+`correct' amount of space round maths.  It's still not properly fixed,
+however, since there's a tricky unresolved issue about what alignment
+the generated HTML &lt;img&gt; tag should give the maths image.  This
+alignment, and the size of the generated bitmap, interact messily.</p>
+</defect>
+
+<defect status="closed" originator="Norman/Mark" date='12-Jun-2000'>
+<title>HTML: Spacing of \scriptstyle maths is wrong</title>
+<p>Spacing in \scriptstyle in generated maths bitmaps is wrong.  If you write
+$x^{123}$ or ${\scriptstyle \cos x}$, the `123' and the `cos' are
+strung out from each other.</p>
+<resolution status="noproblem" author="Norman" date="12-Jun-2000">
+<p>This is actually a dvi2bitmap defect, and it'll be resolved when
+it's resolved there.</p>
+</resolution>
 </defect>
 
 </defectgroup>
