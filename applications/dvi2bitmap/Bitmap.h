@@ -16,13 +16,15 @@ class Bitmap {
     void crop ();
     void blur ();
     void setTransparent(const bool sw) { transparent_ = sw; }
+    void scaleDown (const int factor);
+    bool empty () const { return (bbL >= bbR || bbT >= bbB); }
     static debug (const int level) { debug_ = level; }
 
  private:
     // pointer to bitmap.  Pixel (x,y) is at B[y*W + x];
     Byte *B;
     // width and height of bitmap
-    const int W, H;
+    int W, H;
     // bounding box - 
     // bbL and bbT are the leftmost and topmost blackened pixels,
     // bbR and bbB are one more than the rightmost and lowest blackened pixels

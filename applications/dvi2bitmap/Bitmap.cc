@@ -9,6 +9,14 @@
 
 int Bitmap::debug_ = 0;
 
+
+// Indecision: Within scaleDown, it seems sensible to average the
+// pixel values over the complete factor*factor square, even when
+// we've strayed out of the bounding box.  However, this sometimes makes
+// the edges of images look too faint.  If SCALEDOWN_COMPLETE_AVERAGE is 1,
+// then go for consistency, rather than this fudge.
+#define SCALEDOWN_COMPLETE_AVERAGE 1
+
 // Coordinates on the bitmap run from 0 to W-1, and 0 to H-1,
 // with point (0,0) in the top left corner.
 Bitmap::Bitmap (int w, int h, int bpp=1)
@@ -120,13 +128,14 @@ void Bitmap::crop ()
 
 void Bitmap::blur ()
 {
-    if (bbL >= bbR || bbT >= bbB) // nothing there - nothing to do
+    if (empty())		// nothing there - nothing to do
 	return;			// ...silently
 
     Byte *newB = new Byte[W*H];
     memset ((void*)newB, 0, W*H);
 
     int newbpp = (bpp_ < 2 ? 2 : bpp_);
+    int new_max_colour = (1<<newbpp) - 1;
     double scale = (double)((1<<newbpp) - 1)/(double)max_colour_;
     // Blur leaving a 1-pixel margin, to avoid edge effects.  Do edge later.
     // This could be made more efficient, but it doesn't really matter just now
@@ -149,8 +158,101 @@ void Bitmap::blur ()
 				   + 0.5);
     delete[] B;
     bpp_ = newbpp;
-    max_colour_ = (1<<bpp_) - 1;
+    max_colour_ = new_max_colour;
     B = newB;
+}
+
+void Bitmap::scaleDown (const int factor)
+{
+    if (factor <= 1 || factor > 8) // shome mistake, shurely
+	throw BitmapError ("out-of-range scale factor - must be in 2..8");
+
+    if (empty())		// nothing there - nothing to do
+	// Should we instead silently decrease the size of the bitmap?
+	// No - this is surely an error on the user's part.
+	throw BitmapError ("attempt to scale an empty bitmap");
+
+    // Create a new bitmap which is smaller than the original by the
+    // given factor.  
+    // The original bounding box
+    // may not have been an exact multiple of the target one.  
+    // Take careful account of the `extra' rows and columns on the
+    // right/bottom.
+
+    int newW = (W+(factor-1))/factor;
+    int newH = (H+(factor-1))/factor;
+    int newbbL = bbL/factor;
+    // complete_bbR is the rightward boundary of the `complete' pixels
+    int complete_bbR = newbbL + (bbR-bbL)/factor;
+    // newbbR is the rightward boundary, taking into account the extra
+    // pixels which don't completely fill the rightmost target pixel.
+    int newbbR = newbbL + (bbR-bbL+(factor-1))/factor;
+    int newbbT = bbT/factor;
+    int complete_bbB = newbbT + (bbB-bbT)/factor;
+    int newbbB = newbbT + (bbB-bbT+(factor-1))/factor;
+    // rem_cols is the number of columns in the (notionally cropped)
+    // original bitmap which contribute to the last column of the scaled
+    // bitmap, or 0 if the original width is exactly divisible by factor.
+    // If rem_cols>0, then newbbR==complete_bbR+1; else newbbR==complete_bbR.
+    int rem_cols = (bbR-bbL)%factor;
+    int rem_rows = (bbB-bbT)%factor;
+
+    // make sure there are at least 6 bits-per-pixel, to accomodate 64
+    // (=8*8) levels of grey.  This is crude, but acceptable as a first-go
+    // heuristic
+    int newbpp = (bpp_ < 6 ? 6 : bpp_);
+    int new_max_colour = (1<<newbpp) - 1;
+#if SCALEDOWN_COMPLETE_AVERAGE
+    double scale = (double)new_max_colour/(double)(factor*factor);
+#endif
+
+    Byte *newB = new Byte[newW*newH];
+    memset ((void*)newB, 0, newW*newH);
+
+    // We stay within the region
+    //   (bbL/factor*factor) <= x < bbR
+    //   (bbT/factor*factor) <= y < bbB
+    // and hence do not stray outside the original bitmap,
+    // since bbL and bbT>=0.
+    for (int row1=newbbT; row1<newbbB; row1++)
+    {
+	int rowspan = (row1 < complete_bbB ? factor : rem_rows);
+	for (int col1=newbbL; col1<newbbR; col1++)
+	{
+	    int tot = 0;
+	    int x=col1*factor;
+	    int y=row1*factor;
+	    int count = 0;
+	    int colspan = (col1 < complete_bbR ? factor : rem_cols);
+	    for (int row2=y; row2<y+rowspan; row2++)
+		for (int col2=x; col2<x+colspan; col2++)
+		{
+#if !SCALEDOWN_COMPLETE_AVERAGE
+		    count++;
+#endif
+		    tot += B[row2*W+col2];
+		}
+#if SCALEDOWN_COMPLETE_AVERAGE
+	    newB[row1*newW+col1] = static_cast<Byte>(tot*scale);
+#else
+	    newB[row1*newW+col1]
+		= static_cast<Byte>(tot*new_max_colour/(double)count);
+#endif
+	}
+    }
+
+    delete[] B;
+    B = newB;
+    W = newW;
+    H = newH;
+    bbL = newbbL;
+    bbR = newbbR;
+    bbT = newbbT;
+    bbB = newbbB;
+    if (cropped_)
+	crop();			// re-crop
+    bpp_ = newbpp;
+    max_colour_ = new_max_colour;
 }
 
 void Bitmap::write (const string filename, const string format)
@@ -160,7 +262,7 @@ void Bitmap::write (const string filename, const string format)
     int hsize = (cropped_ ? cropR-cropL : W);
     int vsize = (cropped_ ? cropB-cropT : H);
     BitmapImage *bi = BitmapImage::newBitmapImage(format, hsize, vsize, bpp_);
-    cerr << "format.."<<bi->fileExtension()<<'\n';
+    //cerr << "format.."<<bi->fileExtension()<<'\n';
     if (cropped_)
 	for (int row=cropT; row<cropB; row++)
 	    bi->setBitmapRow(&B[row*W+cropL]);
@@ -174,7 +276,7 @@ void Bitmap::write (const string filename, const string format)
 	int extlen = fileext.length();
 	if (outfilename.substr(outfilename.length()-extlen, extlen) != fileext)
 	    outfilename += '.' + fileext;
-	cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
+	//cerr << "file extension="<<fileext<<": new file="<<outfilename<<'\n';
     }
     bi->write (outfilename);
     delete bi;

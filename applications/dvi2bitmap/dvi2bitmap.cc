@@ -32,6 +32,7 @@ main (int argc, char **argv)
     int show_font_list = 0;
     bool blur_bitmap = false;
     bool make_transparent = true;
+    int bitmap_scale_factor = 1;
     string ofile_pattern = "";
     string ofile_type = "";
 
@@ -51,33 +52,33 @@ main (int argc, char **argv)
 	if (**argv == '-')
 	    switch (*++*argv)
 	    {
-	      case 'f':
+	      case 'f':		// set PK font path
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		PkFont::setFontPath(*argv);
 		break;
-	      case 'r':
+	      case 'r':		// set resolution
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		resolution = atoi (*argv);
 		break;
-	      case 'm':
+	      case 'm':		// set magnification
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		magmag = atof (*argv);
 		break;
-	      case 'g':		// debugging
+	      case 'g':		// debugging...
 		for (++*argv; **argv != '\0'; ++*argv)
 		    switch (**argv)
 		    {
-		      case 'd':
+		      case 'd':	// debug DVI file
 			DviFile::debug(2);	break;
-		      case 'p':
+		      case 'p':	// debug PK file
 			PkFont::debug(2);	break;
-		      case 'r':
+		      case 'r':	// debug rasterdata parsing
 			PkRasterdata::debug(2);	break;
 		      default:
 			Usage();
@@ -89,14 +90,14 @@ main (int argc, char **argv)
 	      case 'L':		// show all fonts
 		show_font_list = 2;
 		break;
-	      case 'P':		// process the bitmap
+	      case 'P':		// process the bitmap...
 		while (*++*argv != '\0')
 		    switch (**argv)
 		    {
-		      case 'b':
+		      case 'b':	// blur bitmap
 			blur_bitmap = !blur_bitmap;
 			break;
-		      case 't':
+		      case 't':	// make bitmap transparent
 			make_transparent = !make_transparent;
 			break;
 		      default:
@@ -104,19 +105,25 @@ main (int argc, char **argv)
 			break;
 		    }
 		break;
-	      case 't':
+	      case 's':		// scale down
+		argc--, argv++;
+		if (argc <= 0)
+		    Usage();
+		bitmap_scale_factor = atoi (*argv);
+		break;
+	      case 't':		// set output file type
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		ofile_type = *argv;
 		break;
-	      case 'o':
+	      case 'o':		// set output filename pattern
 		argc--, argv++;
 		if (argc <= 0)
 		    Usage();
 		ofile_pattern = *argv;
 		break;
-	      case 'v':		// version
+	      case 'V':		// display version
 		cout << version_string << '\n';
 		break;
 	      default:
@@ -139,8 +146,6 @@ main (int argc, char **argv)
 	cout << "Can't make output filename pattern from " << dviname << '\n';
 	std::exit(0);
     }
-    else
-	cout << "ofile_pattern="<<ofile_pattern<<'\n';
 
     try
     {
@@ -183,18 +188,26 @@ main (int argc, char **argv)
 		else
 		{
 		    pagenum++;
-		    bitmap->crop();
-		    if (blur_bitmap)
-			bitmap->blur();
-		    if (make_transparent)
-			bitmap->setTransparent(true);
-		    if (output_filename.length() == 0)
+		    if (bitmap->empty())
+			cerr << "Warning: page " << pagenum
+			     << " empty: nothing written\n";
+		    else
 		    {
-			char fn[100];
-			sprintf (fn, ofile_pattern.c_str(), pagenum);
-			output_filename = fn;
+			bitmap->crop();
+			if (blur_bitmap)
+			    bitmap->blur();
+			if (make_transparent)
+			    bitmap->setTransparent(true);
+			if (bitmap_scale_factor != 1)
+			    bitmap->scaleDown (bitmap_scale_factor);
+			if (output_filename.length() == 0)
+			{
+			    char fn[100];
+			    sprintf (fn, ofile_pattern.c_str(), pagenum);
+			    output_filename = fn;
+			}
+			bitmap->write (output_filename, ofile_type);
 		    }
-		    bitmap->write (output_filename, ofile_type);
 		    output_filename = "";
 
 		    delete bitmap;
@@ -325,6 +338,6 @@ string_list *tokenise_string (string str)
 
 void Usage (void)
 {
-    cout << "Usage: " << progname << " [-f PKpath ] [-r resolution] [-g[dpr]]\n\t[-lLv] [-P[bt]] [-o outfile-pattern] [-m magmag ]\n\t\n\t[-t gif]\n\tdvifile" << '\n';
+    cout << "Usage: " << progname << " [-lLV] [-f PKpath ] [-r resolution] [-g[dpr]]\n\t[-P[bt]] [-s scale-factor] [-o outfile-pattern] [-m magmag ]\n\t[-t xbm|gif]\n\tdvifile" << '\n';
     exit (1);
 }
