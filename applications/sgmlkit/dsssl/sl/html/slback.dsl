@@ -401,25 +401,29 @@ by BibTeX.
   (let* ((kids (select-by-class (descendants (getdocbody)) 'element))
 	 (citations (select-elements kids (normalize "citation")))
 	 ;(bibelement (select-elements kids (normalize "bibliography")))
-	 (bibname (attribute-string (normalize "bibliography")
-				    (getdocbody 'backmatter)))
+	 (bm (getdocbody 'backmatter))
+	 (bibname (and bm
+		       (attribute-string (normalize "bibliography")
+					 bm)))
 	 )
-    (if (node-list-empty? citations)
-	(empty-sosofo)
-	(make entity system-id: (string-append (root-file-name)
-					       ".htmlbib.aux")
-	      (make fi data: "\\relax
+    (if bibname
+	(if (node-list-empty? citations)
+	    (empty-sosofo)
+	    (make entity system-id: (string-append (root-file-name)
+						   ".htmlbib.aux")
+		  (make fi data: "\\relax
 ")
-	      (process-node-list citations)
-	      (if bibname
-		  (make fi data: (string-append "\\bibdata{" bibname "}
+		  (process-node-list citations)
+		  (if bibname
+		      (make fi data: (string-append "\\bibdata{" bibname "}
 \\bibstyle{plainhtml}
 "))
-		  (error "Citations but no BIBLIOGRAPHY in document"))
-	      ;(if (node-list-empty? bibelement)
-		;  (error "Citations but no BIBLIOGRAPHY in document")
-		;  (process-node-list bibelement))
-	      ))))
+		      (error "Citations but no BIBLIOGRAPHY in document"))
+		  ;;(if (node-list-empty? bibelement)
+		  ;;  (error "Citations but no BIBLIOGRAPHY in document")
+		  ;;  (process-node-list bibelement))
+	      ))
+	(error "No backmatter in document, or bibliography not specified"))))
 
 (element citation
   (make fi data: (string-append "\\citation{" (trim-data (current-node)) "}
