@@ -1,10 +1,48 @@
-*  REDS_SYS include file containing some handy SCUBA definitions
+*+
+*  Name:
+*     SURF_PAR
+
+*  Purpose:
+*     Global parameters for SURF (SCUBA) software
+
+*  Language:
+*     Starlink Fortran 77
+ 
+*  Type of module:
+*     Global constants include file.
+ 
+*  Description:
+*     This file contains the definitions of the global constants
+*     in required by SURF.
+
+*  Authors:
+*     Tim Jenness (TIMJ: timj@jach.hawaii.edu)
+*     John Lightfoot (JFL: jfl@roe.ac.uk)
+
+*  History:
+*     $Log$
+*     Revision 1.4  1997/09/03 18:25:19  timj
+*     Add SUFFIX_OPTIONS and tidy a little. Add a proper header.
+*
+*     {Enter new history here}
+
+*-
+
+*     The name of the software package. Used for messages.
+
+      CHARACTER * 10 PACKAGE                ! Name of SCUBA package
+      PARAMETER (PACKAGE = 'SURF')
+
+*     Convenient numeric definitions
 
       DOUBLE PRECISION PI
       PARAMETER (PI = 3.14159265359D0)
 
       DOUBLE PRECISION R2AS                 ! radians to arcsec conversion
       PARAMETER (R2AS = 206264.806247D0)
+
+
+*     Parameters controlling the observation limits
 
       INTEGER SCUBA__MAX_BEAM               ! max number of bolometers that
       PARAMETER (SCUBA__MAX_BEAM = 3)       ! in an single sub-instrument that
@@ -27,8 +65,7 @@
       INTEGER SCUBA__MAX_JIGGLE             ! max number of offsets in pattern
       PARAMETER (SCUBA__MAX_JIGGLE = 512)
 
-      INTEGER SCUBA__MAX_POINT              ! max number of pointing corrections
-      PARAMETER (SCUBA__MAX_POINT = 20)
+*     Parameters governing the instrument itself
 
       INTEGER SCUBA__MAX_SUB                ! max number of sub-instruments
       PARAMETER (SCUBA__MAX_SUB = 5)        
@@ -39,14 +76,29 @@
       INTEGER SCUBA__NUM_CHAN               ! number of channels per A/D card
       PARAMETER (SCUBA__NUM_CHAN = 16)
 
+
+*     General limits imposed by SURF on certain arrays
+
+      INTEGER SCUBA__MAX_POINT              ! max number of pointing corrections
+      PARAMETER (SCUBA__MAX_POINT = 20)
+
       INTEGER SCUBA__MAX_FITS               ! max number of FITS items in file
       PARAMETER (SCUBA__MAX_FITS = 200)
 
       INTEGER SCUBA__MAX_SECT               ! max number of SCUBA sections
       PARAMETER (SCUBA__MAX_SECT = 10)      ! that can be specified
 
-      CHARACTER * 10 PACKAGE                ! Name of SCUBA package
-      PARAMETER (PACKAGE = 'SURF')
-
       INTEGER SCUBA__N_TEMPS            ! Number of temperatures per reading
       PARAMETER (SCUBA__N_TEMPS = 3)    ! for SKYDIP: AMBIENT, SKY, COLD
+
+*     Parameters dealing with automatic selection of a SUFFIX for
+*     the output file
+
+*     Name of the environment variable associated with this system
+      CHARACTER * 10 SUFFIX_ENV
+      PARAMETER (SUFFIX_ENV = 'SCUBA_SUFFIX')
+
+*     Different types of SUFFIX available.
+
+      CHARACTER * 10 SUFFIX_OPTIONS      
+      DATA SUFFIX_OPTIONS / 'LONG', SHORT' /
