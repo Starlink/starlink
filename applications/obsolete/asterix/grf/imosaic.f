@@ -335,7 +335,7 @@ c                              ! spacecraft co-ordinates.
 
 *      Test if within acceptable range
         IF ( (NUMBER .LT. 2) .OR. (NUMBER .GT. MXFRAM) ) THEN
-          CALL MSG_SETC('MXFRAM', MXFRAM)
+          CALL MSG_SETI('MXFRAM', MXFRAM)
           CALL MSG_PRNT('Number of frames must be between 2 and '/
      :                                                /'^MXFRAM' )
           CALL PAR_CANCL('NUMBER',STATUS)
