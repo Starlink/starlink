@@ -594,8 +594,8 @@ int main (int argc, char **argv)
 			// write out font name, dpi, base-dpi, mag and MF mode
 			cout << f->name() << ' '
 			     << f->dpiBase() << ' '
-			     << f->dpi() << ' '
-			     << magmag
+			     << f->dpiScaled() << ' '
+			     << f->magnification()
 			     << " localfont";
 			if (f->loaded())
 			{
