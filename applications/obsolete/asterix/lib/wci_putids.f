@@ -124,7 +124,7 @@
       IARG(4) = SYSID
 
 *  Simply invoke the WriteWCS method
-      CALL ADI_EXEC( 'WriteWCS', 4, ID, RESID, STATUS )
+      CALL ADI_EXEC( 'WriteWCS', 4, IARG, RESID, STATUS )
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'WCI_PUTIDS', STATUS )
