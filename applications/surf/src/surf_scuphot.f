@@ -119,6 +119,10 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.10  1997/03/31 19:46:28  timj
+*     Add SCULIB_GET_JIGGLE
+*     Change PACKAGE and TSKNAME to variables.
+*
 *     Revision 1.9  1997/03/21 01:12:12  timj
 *     Use SCULIB_GET_DEM_PNTR
 *     Write FITS to output NDFs.
@@ -174,6 +178,8 @@ c
       PARAMETER (MAX_DIM = 4)
       BYTE        OUTBAD               ! Output bad pixel mask
       PARAMETER (OUTBAD = 1)
+      CHARACTER * 10 TSKNAME           ! Name of task
+      PARAMETER (TSKNAME = 'SCUPHOT')
 
 *    Local variables :
       CHARACTER*10     ANALYSIS        ! analysis mode
@@ -226,7 +232,6 @@ c
       CHARACTER*(DAT__SZLOC) IN_FITSX_LOC
                                        ! locator to FITS extension in input
                                        ! file
-      CHARACTER*(DAT__SZLOC) IN_LOC    ! locator of item in input file
       INTEGER          IN_OFFSET       ! offset in input array
       INTEGER          IN_NDF          ! NDF index of input file
       INTEGER          IN_Q_PTR        ! pointer to input quality array
@@ -420,7 +425,8 @@ c
       IF (ITEMP .GT. SCUBA__MAX_FITS) THEN
          IF (STATUS .EQ. SAI__OK) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUPHOT: input file '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: input file '//
      :        'contains too many FITS items', STATUS)
          END IF
       END IF
@@ -474,7 +480,8 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             IF (OBSERVING_MODE .NE. 'PHOTOM') THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: the file '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the file '//
      :           'does not contain data from a PHOTOM observation',
      :           STATUS)
             END IF
@@ -483,20 +490,24 @@ c
          IF (STATUS .EQ. SAI__OK) THEN
             IF (.NOT. REDUCE_SWITCH) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'REDUCE_SWITCH application has not been run '//
      :           'on the input file', STATUS)
             END IF
 
             IF (.NOT. EXTINCTION) THEN
-               CALL MSG_OUT (' ', 'REDS_SCUPHOT: Warning the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_OUT (' ', '^TASK: Warning the '//
      :              'input data has not been corrected for extinction',
      :              STATUS)
             END IF
 
             IF (PHOTOM) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: the '//
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL MSG_SETC('TASK', TSKNAME)
+               CALL ERR_REP (' ', '^TASK: the '//
      :           'PHOTOM application has already been run on '//
      :           'the input file', STATUS)
             END IF
@@ -507,7 +518,8 @@ c
 
       CALL MSG_SETC ('OBJECT', OBJECT)
       CALL MSG_SETI ('RUN', RUN_NUMBER)
-      CALL MSG_OUT (' ', 'REDS: run ^RUN was a PHOTOM observation '//
+      CALL MSG_SETC('PKG', PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: run ^RUN was a PHOTOM observation '//
      :  'of ^OBJECT', STATUS)
 
 *  get the sub-instrument and filter used 
@@ -584,7 +596,8 @@ c
             CALL MSG_SETI ('DIM1', DIM(1))
             CALL MSG_SETI ('DIM2', DIM(2))
             CALL MSG_SETI ('DIM3', DIM(3))
-            CALL ERR_REP (' ', 'REDS_SCUPHOT: data array '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: data array '//
      :        'has bad dimensions (^NDIM) ^DIM1, ^DIM2, ^DIM3', STATUS)
          END IF
       END IF
@@ -605,7 +618,8 @@ c
       CALL MSG_SETI ('N_I', N_INTEGRATIONS)
       CALL MSG_SETI ('N_M', N_MEASUREMENTS)
 
-      CALL MSG_OUT (' ', 'REDS: file contains data for ^N_E '//
+      CALL MSG_SETC('PKG', PACKAGE)
+      CALL MSG_OUT (' ', '^PKG: file contains data for ^N_E '//
      :  'exposure(s) in ^N_I integrations(s) in ^N_M '//
      :  'measurement(s)', STATUS)
 
@@ -622,121 +636,79 @@ c
 
 *  get the channel and ADC numbers of the bolometers used
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_CHAN', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_CHAN, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_CHAN', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_CHAN, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUPHOT: dimension '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension '//
      :        'of .SCUBA.BOL_CHAN does not match main data array',
      :        STATUS)
          END IF
       END IF
 
-      CALL DAT_FIND (IN_SCUBAX_LOC, 'BOL_ADC', IN_LOC, STATUS)
-      CALL DAT_GET1I (IN_LOC, SCUBA__NUM_CHAN * SCUBA__NUM_ADC,
-     :  BOL_ADC, ITEMP, STATUS)
-      CALL DAT_ANNUL (IN_LOC, STATUS)
+      CALL CMP_GET1I (IN_SCUBAX_LOC, 'BOL_ADC', 
+     :     SCUBA__NUM_CHAN * SCUBA__NUM_ADC, BOL_ADC, ITEMP, STATUS)
 
       IF (STATUS .EQ. SAI__OK) THEN
          IF (ITEMP .NE. N_BOLS) THEN
             STATUS = SAI__ERROR
-            CALL ERR_REP (' ', 'REDS_SCUPHOT: dimension '//
+            CALL MSG_SETC('TASK', TSKNAME)
+            CALL ERR_REP (' ', '^TASK: dimension '//
      :        'of .SCUBA.BOL_ADC does not match main data array',
      :        STATUS)
          END IF
       END IF
 
-*  now read in data specific to the sample mode of the observation
+*  Now read in the jiggle pattern itself
 
-      IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'JIGL_CNT', JIGGLE_COUNT, STATUS)
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'J_REPEAT', JIGGLE_REPEAT, STATUS)
-         CALL SCULIB_GET_FITS_I (SCUBA__MAX_FITS, N_FITS, FITS, 
-     :     'J_PER_S', JIGGLE_P_SWITCH, STATUS)
-
-*  the jiggle pattern itself
-
-         CALL DAT_FIND (IN_SCUCDX_LOC, 'JIGL_X', IN_LOC, STATUS)
-         CALL DAT_GET1R (IN_LOC, SCUBA__MAX_JIGGLE, JIGGLE_X, ITEMP, 
-     :     STATUS)
-         CALL DAT_ANNUL (IN_LOC, STATUS)
-
-         IF (ITEMP .NE. JIGGLE_COUNT) THEN
-            IF (STATUS .EQ. SAI__OK) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: mismatch between '//
-     :           'JIGGLE_COUNT and number of X jiggle offsets read',
-     :           STATUS)
-            END IF
-         END IF
-
-         CALL DAT_FIND (IN_SCUCDX_LOC, 'JIGL_Y', IN_LOC, STATUS)
-         CALL DAT_GET1R (IN_LOC, SCUBA__MAX_JIGGLE, JIGGLE_Y, ITEMP, 
-     :     STATUS)
-         CALL DAT_ANNUL (IN_LOC, STATUS)
-
-         IF (ITEMP .NE. JIGGLE_COUNT) THEN
-            IF (STATUS .EQ. SAI__OK) THEN
-               STATUS = SAI__ERROR
-               CALL ERR_REP (' ', 'REDS_SCUPHOT: mismatch between '//
-     :           'JIGGLE_COUNT and number of Y jiggle offsets read',
-     :           STATUS)
-            END IF
-         END IF
-
-*  the jiggle coordinate system and its rotation
-
-	 CALL SCULIB_GET_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_CRDS', SAMPLE_COORDS, STATUS)
-         CALL SCULIB_GET_FITS_R (SCUBA__MAX_FITS, N_FITS, FITS,
-     :     'SAM_PA', SAMPLE_PA, STATUS)
+      CALL SCULIB_GET_JIGGLE(IN_SCUCDX_LOC, SCUBA__MAX_JIGGLE,
+     :     N_FITS, FITS, JIGGLE_COUNT, JIGGLE_REPEAT, 
+     :     JIGGLE_P_SWITCH, SAMPLE_PA, SAMPLE_COORDS, JIGGLE_X,
+     :     JIGGLE_Y, STATUS)
 
 *  find out if the jiggle pattern corresponds to a rectangular grid
 
-	 IF (STATUS .EQ. SAI__OK) THEN
-	    LBND (1) = 1
-	    LBND (2) = 1
+      IF (STATUS .EQ. SAI__OK) THEN
+         LBND (1) = 1
+         LBND (2) = 1
 
-            CALL SCULIB_CALC_GRID (JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
+         CALL SCULIB_CALC_GRID (JIGGLE_COUNT, JIGGLE_X, JIGGLE_Y,
      :        XMIN, XMAX, XSPACE, UBND(1), YMIN, YMAX, YSPACE, 
      :        UBND(2), IPOS, JPOS, STATUS)
+         
+         IF ((STATUS .NE. SAI__OK) .OR.
+     :        (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
+            CALL ERR_ANNUL (STATUS)
 
-	    IF ((STATUS .NE. SAI__OK) .OR.
-     :          (ABS(XSPACE/YSPACE - 1.0) .GT. 0.001)) THEN
-	       CALL ERR_ANNUL (STATUS)
-
-	       N_OBSDIM = 1
-	       UBND (1) = JIGGLE_COUNT
-               UBND(2) = 1
+            N_OBSDIM = 1
+            UBND (1) = JIGGLE_COUNT
+            UBND(2) = 1
 *     Reset jiggle positions for unpack_jiggle_separates
-               DO I = 1, JIGGLE_COUNT
-                  IPOS(I) = I
-                  JPOS(I) = 1
-               END DO
+            DO I = 1, JIGGLE_COUNT
+               IPOS(I) = I
+               JPOS(I) = 1
+            END DO
 
-	       CALL MSG_OUT (' ', 'REDS: the jiggle pattern does '//
+            CALL MSG_SETC('PKG', PACKAGE)
+            CALL MSG_OUT (' ', '^PKG: the jiggle pattern does '//
      :           'not fit a rectangular mesh, no images will be '//
      :           'stored', STATUS)
-	    ELSE
+         ELSE
 
 *  construct axes for 2D map
 
-	       N_OBSDIM = 2
-
-	       DO I = 1, UBND (1)
-		  JIGGLE_2D_A1 (I) = XMIN + REAL (I-1) * XSPACE
-               END DO
-	       DO I = 1, UBND (2)
-		  JIGGLE_2D_A2 (I) = YMIN + REAL (I-1) * YSPACE
-               END DO
+            N_OBSDIM = 2
             
-	    END IF
+            DO I = 1, UBND (1)
+               JIGGLE_2D_A1 (I) = XMIN + REAL (I-1) * XSPACE
+            END DO
+            DO I = 1, UBND (2)
+               JIGGLE_2D_A2 (I) = YMIN + REAL (I-1) * YSPACE
+            END DO
+            
          END IF
       END IF
 
