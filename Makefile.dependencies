@@ -116,6 +116,7 @@ $(MANIFEST)/ary: \
 	    && make>make.log && make install>>make.log
 
 $(MANIFEST)/ast: \
+		$(MANIFEST)/htx \
 		$(MANIFEST)/messgen \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/sst \
@@ -275,7 +276,6 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
 		$(MANIFEST)/idi \
-		$(MANIFEST)/ifd \
 		$(MANIFEST)/img \
 		$(MANIFEST)/itcl \
 		$(MANIFEST)/lex \
@@ -284,7 +284,6 @@ $(MANIFEST)/ccdpack: \
 		$(MANIFEST)/messys \
 		$(MANIFEST)/misc \
 		$(MANIFEST)/msp \
-		$(MANIFEST)/nbs \
 		$(MANIFEST)/ndf \
 		$(MANIFEST)/ndg \
 		$(MANIFEST)/one \
@@ -1273,6 +1272,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/gwm \
 		$(MANIFEST)/hds \
 		$(MANIFEST)/hlp \
+		$(MANIFEST)/htx \
 		$(MANIFEST)/idi \
 		$(MANIFEST)/lex \
 		$(MANIFEST)/mag \
@@ -1290,6 +1290,7 @@ $(MANIFEST)/kaplibs: \
 		$(MANIFEST)/sgs \
 		$(MANIFEST)/sla \
 		$(MANIFEST)/snx \
+		$(MANIFEST)/sst \
 		$(MANIFEST)/star2html \
 		$(MANIFEST)/starx \
 		$(MANIFEST)/string \
