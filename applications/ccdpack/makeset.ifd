@@ -53,6 +53,16 @@
             helpkey *
          }
 
+         parameter mode {
+            type LITERAL
+            access READ
+            vpath CURRENT DEFAULT
+            ppath CURRENT DEFAULT
+            default LIST
+            prompt {Set header write mode (LIST,CONTAINER or ERASE)}
+            helpkey *
+         }
+
          parameter setsize {
             type _INTEGER
             access READ
@@ -62,12 +72,12 @@
             helpkey *
          }
 
-         parameter erase {
+         parameter addwcs {
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
+            vpath PROMPT
             ppath CURRENT DEFAULT
-            prompt {Erase all Set information instead of writing it?}
+            prompt {Add a CCD_SET aligned coordinate frame?}
             default FALSE
             helpkey *
          }
