@@ -153,6 +153,32 @@
 #  Set the approximate pixel size of the NDF.
          configure -pixelsize [ $ndf pixelsize Pixel ]
 
+#  If the displayed size is smaller than the size of the scrolledcanvas
+#  widget (but not necessarily than the canvas itself), enlarge it 
+#  until it takes up the available space.
+#  The only(?) way to do this is to deiconify it first, otherwise the wm
+#  does not know how large the canvas is going to be.  This may be 
+#  disadvantageous if we wanted to keep it hidden.  I don't know how to
+#  get round that.
+         set enlarge 0
+         wm deiconify $itk_interior
+         update idletasks
+         set canvwin [ $canvas component canvas ]
+         set xcanv [ winfo width $canvwin ]
+         set ycanv [ winfo height $canvwin ]
+         while { 1 } {
+            set z [ zoominc $zoom [ expr $enlarge + 1 ] ]
+            set xsize [ expr $xdim * $z * $pixelsize ]
+            set ysize [ expr $ydim * $z * $pixelsize ]
+            if { $xsize <= $xcanv && $ysize <= $ycanv } {
+               incr enlarge 1
+               if { [ zoominc $zoom [ expr $enlarge + 1 ] ] <= $z } { break }
+            } else {
+               break
+            }
+         }
+         set zoom [ zoominc $zoom $enlarge ]
+
 #  If the displayed size is going to exceed the specified maximum canvas
 #  size restriction, then iteratively shrink the zoomfactor until it fits.
          set shrink 0
