@@ -162,7 +162,7 @@ D      PRINT *, 'File B has : ',NUMSCAN(2)
       CALL MDATA_READ( MFILE, NUMSCAN, ALLSCANS, %VAL(TJOFFPTR), 
      +     %VAL(TJIDXPTR), %VAL(TJNQUADPTR), %VAL(TJCHANNPTR), 
      +     %VAL(TJVLSRPTR), %VAL(TJFREQPTR), %VAL(TJFINCPTR),
-     +     %VAL(TJRADECPTR), IFAIL )
+     +     %VAL(TJRADECPTR), IFAIL, STATUS )
 
 
 * Free up memory
@@ -195,7 +195,7 @@ D      PRINT *, 'File B has : ',NUMSCAN(2)
 
 
       SUBROUTINE MDATA_READ( MFILE, NUMSCAN, N, TJOFFS, TJIDX, TJNQUAD,
-     +     TJCHANN, TJVLSR, TJFREQ, TJFINC, TJRADEC, IFAIL )
+     +     TJCHANN, TJVLSR, TJFREQ, TJFINC, TJRADEC, IFAIL, STATUS )
 *+
 *  Name:
 *     MDATA_READ
@@ -245,6 +245,7 @@ D      PRINT *, 'File B has : ',NUMSCAN(2)
 C      INTEGER IFAIL              ! Specx error status
 * Adjustable arrays
       INTEGER IFAIL              ! Specx error status
+      INTEGER STATUS             ! Starlink status
       REAL*8  TJIDX(N)           ! Index array
       INTEGER TJNQUAD(N)         ! Number of quadrants
       INTEGER TJCHANN(N)         ! Number of channels
@@ -256,7 +257,6 @@ C      INTEGER IFAIL              ! Specx error status
 
 
 * Local variables
-      INTEGER STATUS             ! Starlink status
       INTEGER I, J
       INTEGER FFINC( NQMAX )     ! Frequency increment
       INTEGER FOUND              ! Number of spectra to merge (not inc deleted spectra)
