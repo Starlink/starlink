@@ -10,7 +10,7 @@ INTERFACE MEANDAT
                HELP    'Enter 2 or more'
             ENDPARAMETER
 
-	    PARAMETER FILE1
+	    PARAMETER INP1
                POSITION 2
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -20,7 +20,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE2
+	    PARAMETER INP2
                POSITION 3
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -29,7 +29,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE3
+	    PARAMETER INP3
                POSITION 4
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -38,7 +38,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE4
+	    PARAMETER INP4
                POSITION 5
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -47,7 +47,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE5
+	    PARAMETER INP5
                POSITION 6
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -56,7 +56,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE6
+	    PARAMETER INP6
                POSITION 7
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -65,7 +65,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE7
+	    PARAMETER INP7
                POSITION 8
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -74,7 +74,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE8
+	    PARAMETER INP8
                POSITION 9
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -83,7 +83,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE9
+	    PARAMETER INP9
                POSITION 10
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -92,7 +92,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE10
+	    PARAMETER INP10
                POSITION 11
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -101,7 +101,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE11
+	    PARAMETER INP11
                POSITION 12
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -110,7 +110,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE12
+	    PARAMETER INP12
                POSITION 13
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -119,7 +119,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE13
+	    PARAMETER INP13
                POSITION 14
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -128,7 +128,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE14
+	    PARAMETER INP14
                POSITION 15
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -137,7 +137,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE15
+	    PARAMETER INP15
                POSITION 16
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -146,7 +146,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE16
+	    PARAMETER INP16
                POSITION 17
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -155,7 +155,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE17
+	    PARAMETER INP17
                POSITION 18
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -164,7 +164,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE18
+	    PARAMETER INP18
                POSITION 19
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -173,7 +173,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE19
+	    PARAMETER INP19
                POSITION 20
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
@@ -182,7 +182,7 @@ INTERFACE MEANDAT
                HELP    'Dont include the .SDF extension'
             ENDPARAMETER
 
-	    PARAMETER FILE20
+	    PARAMETER INP20
                POSITION 21
                TYPE    'LITERAL'
                PROMPT  'Enter filename'
