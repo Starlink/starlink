@@ -1368,6 +1368,32 @@ package kappa {
             helpkey *
           }
       }
+
+      action remqual {
+
+         helplib {$KAPPA_HELP}
+
+         parameter ndf {
+            position 1
+            type NDF
+            access UPDATE
+            ppath GLOBAL
+            association <-GLOBAL.DATA_ARRAY
+            prompt {NDFs from which to remove quality information}
+            helpkey *
+          }
+
+         parameter qnames {
+            position 2
+            type LITERAL
+            access UPDATE
+            vpath PROMPT
+            ppath CURRENT
+            prompt {Quality names to be removed}
+            helpkey *
+          }
+
+      }
       
       action setaxis {
          alias {seta(xis)}

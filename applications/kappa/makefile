@@ -687,7 +687,7 @@ setext.f setlabel.f setnorm.f setorigin.f \
 setsky.f settitle.f settype.f \
 setunits.f setvar.f \
 wcsadd.f wcsattrib.f wcscopy.f wcsframe.f wcsremove.f wcsshow.f \
-chain.f reshape.f showqual.f setqual.f qualtobad.f
+chain.f reshape.f showqual.f setqual.f remqual.f qualtobad.f
 
 MONO_SOURCE = $(KAPPA_MONO_SOURCE) $(KAPVIEW_MONO_SOURCE) \
               $(NDFPACK_MONO_SOURCE)
@@ -2840,6 +2840,7 @@ regrid.o:	 SAE_PAR NDF_PAR PRM_PAR AST_PAR PAR_ERR
 rotate.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_ERR
 scatter.o:	 SAE_PAR NDF_PAR PRM_PAR
 segment.o:	 SAE_PAR NDF_PAR PRM_PAR PAR_PAR PAR_ERR AST_PAR
+remqual.o:       SAE_PAR DAT_PAR IRQ_PAR IRQ_ERR NDF_PAR
 qualtobad.o:     SAE_PAR DAT_PAR IRQ_PAR IRQ_ERR NDF_PAR
 setqual.o:       SAE_PAR DAT_PAR PRM_PAR PAR_ERR NDF_PAR GRP_PAR IRQ_PAR IRQ_ERR
 showqual.o:      SAE_PAR DAT_PAR NDF_PAR GRP_PAR IRQ_PAR IRQ_ERR

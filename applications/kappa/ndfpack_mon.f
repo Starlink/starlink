@@ -199,6 +199,10 @@
          ELSE IF ( NAME .EQ. 'RESHAPE' ) THEN
             CALL RESHAPE ( STATUS )
 
+*  Removes named qualities from an NDF.
+         ELSE IF ( NAME .EQ. 'REMQUAL' ) THEN
+            CALL REMQUAL( STATUS )
+
 *  Sets values for an axis array component within an NDF data
 *  structure.
          ELSE IF ( NAME .EQ. 'SETAXIS' ) THEN

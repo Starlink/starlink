@@ -34446,6 +34446,57 @@ Click \htmladdnormallink{here}{psf_exam.gif} to see an example plot
    }
 }
 \sstroutine{
+   REMQUAL
+}{
+   Remove specified quality definitions from an NDF
+}{
+   \sstdescription{
+      This routine removes selected quality name definitions from an
+      NDF (see task SETQUAL).  All quality names information may
+      be removed by specifying a quality name of {\tt "}ANY{\tt "}.
+   }
+   \sstusage{
+      remqual ndf qnames
+   }
+   \sstparameters{
+      \sstsubsection{
+         NDF = NDF (Update)
+      }{
+         The NDF to be modified.
+      }
+      \sstsubsection{
+         QNAMES = LITERAL (Read)
+      }{
+         A group of up to 10 quality names to be removed from the input
+         NDF. The group may be supplied as a comma separated list, or
+         within a text file (in which case the name of the text file should
+         be given, preceded by a {\tt "}$\wedge${\tt "} character.) If more than 10 names are
+         supplied, only the first 10 are used. If any of the supplied
+         quality names are not defined in the NDF, then warning
+         messages are given but the application continues to remove any
+         other specified quality names. If the string ANY is specified,
+         then all defined quality names are removed. If no defined
+         quality names remain, the structure used to store quality name
+         information is deleted. This feature can be used to get rid of
+         corrupted quality name information.
+      }
+   }
+   \sstdiytopic{
+      Related Applications
+   }{
+      KAPPA: QUALTOBAD, SHOWQUAL, SETQUAL.
+   }
+
+   \sstexamples{
+      \sstexamplesubsection{
+         remqual {\tt "}m51$*${\tt "} any
+      }{
+         This example will remove all defined quality names from all
+         NDFs with names starting with the string {\tt "}m51{\tt "}.
+      }
+   }
+}
+\sstroutine{
    RESHAPE
 }{
    Reshapes an NDF, treating its arrays as vectors

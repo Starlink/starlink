@@ -49,6 +49,9 @@
 *        This example will remove all defined quality names from all
 *        NDFs with names starting with the string "m51".
 
+*  Related Applications
+*     KAPPA: QUALTOBAD, SHOWQUAL, SETQUAL.
+
 *  Authors:
 *     DSB: David Berry (STARLINK)
 *     {enter_new_authors_here}
