@@ -15,6 +15,10 @@ environment-independent.
 
 Main Changes in this Version
 ----------------------------
+o  Addition of a new FITS encoding, "FITS-CLASS", which uses the
+conventions of the CLASS package (see
+http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html).
+
 o Addition of a new class classed DSBSpecFrame. This is a 
 sub-class of SpecFrame which can be used to describe spectral axes
 associated with dual sideband spectral data.

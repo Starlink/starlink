@@ -24,7 +24,7 @@ f+
 \newcommand{\stardocnumber}    {210.17}
 f-
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {9th August 2004}
+\newcommand{\stardocdate}      {9th September 2004}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -20503,6 +20503,13 @@ associated with dual sideband spectral data.
 \item The FitsChan class will now read headers which use the old ``-GLS''
 projection code, converting them to the corresponding modern ``-SFL'' code,
 provided that the celestial axes are not rotated.
+
+\item The FitsChan class has a new Encoding, ``FITS-CLASS'', which allows
+the reading and writing of FITS headers using the conventions of the CLASS 
+package - see 
+\htmladdnormallink{
+http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}{
+http://www.iram.fr/IRAMFR/GILDAS/doc/html/class-html/class.html}).
 
 \end{enumerate}
 
