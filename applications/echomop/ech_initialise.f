@@ -137,6 +137,20 @@
      :   'Submenu_7'
      :   /
 
+*   The array OPTION_MODULE consists of a list of action names or
+*   special values.  The index is the `echmenu' menu number, so that
+*   this array is what maps menu selections to operations.  If the array
+*   value is not a special value, then echomop.f (around line 814) calls
+*   ech_echomop_option with the array value as argument.  That
+*   subroutine consists (more or less) of a big if statement, which performs
+*   the action; the subroutines it uses to do this typically, but
+*   not necessarily, have the same name as the action.  If the array
+*   value starts `Submenu_', then echomop.f (line 747) searches through
+*   array SUBMENU_OPTIONS above for an entry with the same name, then
+*   performs each of the subsequent actions (up to the next entry
+*   starting `Submenu_') via calls to ech_echomop_option.  The other
+*   special values, such as `ECHOMOP_Per_Order' or `ECHOMOP_$Command',
+*   are handled specially in echomop.f (line 695).
       DATA OPTION_MODULE
      :   /
      :   ' ',                      ! 0
