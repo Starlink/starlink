@@ -158,8 +158,8 @@
       END IF
 
 *  Store mapping details
-      CALL ADI2_STOMAP( PSID, CACHEID, 'dyn', PTR, ENDIM, EDIMS, 0, 0,
-     :                  UTIL_PLOC(ADI2_ARYWB), TYPE, MODE, STATUS )
+      CALL ADI2_STOMAP( PSID, CACHEID, 'dyn', 0, PTR, ENDIM, EDIMS, 0,
+     :                  0, UTIL_PLOC(ADI2_ARYWB), TYPE, MODE, STATUS )
 
 *  Unless the the mode is read the data is potentially modified
       IF ( MODE(1:1) .NE. 'R' ) THEN
