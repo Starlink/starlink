@@ -24,6 +24,7 @@
 #  Authors:
 #     DLT: D L Terrett (Starlink, RAL)
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (Starlink, Bristol)
 #     {enter_new_authors_here}
 
 #  History:
@@ -37,6 +38,8 @@
 #        Modified to show a message when an existing browser is
 #        found (which is not started here). This is meant to 
 #        drawn the users attention in case the browser is iconified.
+#     22-JUL-2003 (MBT):
+#        Added the ability to use Mozilla.
 #     {enter_further_changes_here}
 
 #  Copyright:
@@ -55,8 +58,8 @@
       if { ! [info exists CCDbrowser] } { 
          set CCDbrowser netscape
       }
-      switch -glob $CCDbrowser {
-	 *[Mm]osaic* {
+      switch -regexp $CCDbrowser {
+	 [Mm]osaic {
 
 #  Use Mosaic. This relies on the remote-command mechanisms prior to CCI.
 	    set mosaicpid 0
@@ -86,7 +89,7 @@
             }
 	 }
 
-	 *[Nn]etscape* {
+	 [Nn]etscape|[Mm]ozilla {
 	       
 #  Use Mozilla. This uses the NCAPIs methods as of netscape 1.1b1.
 #  Attempt to make browser goto the required page. If this fails then the 

@@ -21,7 +21,7 @@
 
 #  Arguments:
 #     $1 = string
-#        Command to start browser. This is optional and defaults to "Mosaic".
+#        Command to start browser. This is optional and defaults to "Netscape".
 
 #  Environment Variables:
 #     If the variable HTX_BROWSER is set then this will be used as the
@@ -41,6 +41,8 @@
 #        Added information output (bit mysterious before this).
 #     9-OCT-1995 (PDRAPER):
 #        Now used by CCDPACK.
+#     22-JUL-2003 (MBT):
+#        Fixed to work with Mozilla, and have a go with other browsers.
 #     {enter_changes_here}
 # -
 
@@ -54,7 +56,7 @@
 
 #  Provide a default hypertext browser.
       if test "${HTX_BROWSER}" = "" && test "${1}" = "" ; then
-         HTX_BROWSER='Mosaic'
+         HTX_BROWSER='Netscape'
       else
           if test "${1}" != ""; then
              HTX_BROWSER="${1}"
@@ -65,9 +67,9 @@
 #  Handle each browser.
       case "${HTX_BROWSER}" in
 
-#  Netscape.
-#  --------
-      *[Nn]etscape*)
+#  Netscape/Mozilla.
+#  ----------------
+      *[Nn]etscape*|*[Mm]ozilla*)
 
 #  Ensure that the DISPLAY environmant variable is defined.
          if test "${DISPLAY}" = ""; then
@@ -79,12 +81,12 @@
 #  the required file.
          ( ${HTX_BROWSER} 1>/dev/null 2>/dev/null \
                         -noraise -remote "openURL(${URL})" &&
-           echo "Loaded the ${PKG} document into an existing Netscape browser"
+           echo "Loaded the ${PKG} document into an existing browser"
          ) || (
 
 #  If the attempt to use an existing browser failed, then start a new one.
            ${HTX_BROWSER} 1>/dev/null 2>/dev/null "${URL}" &
-           echo "Loading the ${PKG} document into a new Netscape browser"
+           echo "Loading the ${PKG} document into a new browser"
          )
          ;;
 
@@ -158,11 +160,10 @@
          fi
          ;;
 
-        #  If the browser was not recognised, then output an error message.
+        #  If the browser was not recognised, just try to start it up
+        #  in a naive way.
       *)
-         echo >&2 \
-"The ${HTX_BROWSER} hypertext browser is not recognised"
-         exit 1
+         ${HTX_BROWSER} "${URL}" &
       esac
 
 #  End of script

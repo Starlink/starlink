@@ -44,6 +44,8 @@
 #        Upgraded for Tcl8.
 #     4-JUL-2001 (MBT):
 #        Upgraded for use with Sets.
+#     22-JUL-2003 (MBT):
+#        Added option to use Mozilla.
 #     {enter_changes_here}
 
 #-
@@ -102,7 +104,7 @@
       set CCDbrowser $env(HTX_BROWSER)
    } else {
       set CCDbrowser {}
-      foreach browser {netscape Netscape Mosaic mosaic} {
+      foreach browser {netscape Netscape Mosaic mosaic mozilla Mozilla} {
          foreach directory [split $env(PATH) ":" ] {
             if { [ file executable ${directory}/${browser} ] } {
                set CCDbrowser $browser
