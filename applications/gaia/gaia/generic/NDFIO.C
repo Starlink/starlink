@@ -42,6 +42,10 @@
 //     18-JUN-1999 (PDRAPER):
 //        Now frees PSX_MALLOC'd memory using cnf_free. Using plain
 //        free no longer works (64 bit pointers & FORTRAN).
+//     29-OCT-1999 (PDRAPER):
+//        Now use hgeti to access unsigned short value. The hgeti2 
+//        routine is changed to truncate values into the range of
+//        signed word.
 //     {enter_changes_here}
 
 //-
@@ -228,18 +232,21 @@ int NDFIO::get(const char* keyword, double& val) const {
     set_header_length();
     return length ? ! hgetr8(ptr, keyword, &val) : 1;
 }
+
 int NDFIO::get(const char* keyword, float& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
     set_header_length();
     return length ? ! hgetr4(ptr, keyword, &val) : 1;
 }
+
 int NDFIO::get(const char* keyword, int& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
     set_header_length();
     return length ? ! hgeti4(ptr, keyword, &val) : 1;
 }
+
 int NDFIO::get(const char* keyword, long& val) const {
     if (sizeof(int) != sizeof(long))
 	return error("NDFIO: long int size not supported");
@@ -248,6 +255,7 @@ int NDFIO::get(const char* keyword, long& val) const {
     set_header_length();
     return length ? ! hgeti4(ptr, keyword, (int*)&val) : 1;
 }
+
 int NDFIO::get(const char* keyword, unsigned char& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
@@ -260,17 +268,19 @@ int NDFIO::get(const char* keyword, unsigned char& val) const {
     val = (unsigned char) tmp;
     return 0;
 }
+
 int NDFIO::get(const char* keyword, short& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
     set_header_length();
     return length ? ! hgeti2(ptr, keyword, &val) : 1;
 }
+
 int NDFIO::get(const char* keyword, unsigned short& val) const {
     int length = header_.length();
     char* ptr = (char*)header_.ptr();
     set_header_length();
-    return length ? ! hgeti2(ptr, keyword, (short*)&val) : 1;
+    return length ? ! hgeti4(ptr, keyword, (int *)&val) : 1;
 }
 
 /*
