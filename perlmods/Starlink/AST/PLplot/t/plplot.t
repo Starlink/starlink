@@ -9,7 +9,7 @@ BEGIN {
    plan skip_all => "Graphics::PLplot module not installed.";
    exit;
  } else {
-   plan tests => 5;
+   plan tests => 9;
  }  
  Graphics::PLplot->import(qw/ :all /);
  
