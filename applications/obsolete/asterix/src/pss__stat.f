@@ -195,6 +195,10 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Unused variables
+      PSS_PPIX = 0
+      PVAL = 0.0
+
 *    Standard statistic loop entry
       INCLUDE 'PSS_STAT_BIT1'
 
@@ -346,6 +350,12 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Unused variables
+      PSS_PPIX = 0
+      PSS_CONVERGED = .FALSE.
+      PVAL = 0.0
+      NITER = 0
+
 *    Rescale map wanted?
       DOMAP = ( ( GR_PASS .EQ. 1 ) .AND. DI_RESC_MAP )
       IF ( DOMAP ) THEN
@@ -496,6 +506,12 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Unused variables
+      PSS_PPIX = 0
+      PSS_CONVERGED = .FALSE
+      PVAL = 0.0
+      NITER = 0
+
 *    Rescale map wanted?
       DOMAP = ( ( GR_PASS .EQ. 1 ) .AND. DI_RESC_MAP )
       IF ( DOMAP ) THEN
@@ -619,6 +635,10 @@
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
 
+*    Unused variables
+      PSS_PPIX = 0
+      PVAL = 0.0
+
 *    Standard statistic loop entry
       INCLUDE 'PSS_STAT_BIT1'
 
@@ -733,6 +753,10 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Unused variables
+      PSS_PPIX = 0
+      PVAL = 0.0
 
 *    Standard statistic loop entry
       INCLUDE 'PSS_STAT_BIT1'
@@ -858,6 +882,12 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Unused variables
+      PSS_PPIX = 0
+      PVAL = 0.0
+      PSS_CONVERGED = .FALSE.
+      NITER = 0
 
 *    Set background rescale
       S_BSCALE(BOX) = 1.0
@@ -1415,11 +1445,16 @@
 *
       REAL                     ASUM                    !
       REAL                     CORR, VARIANCE          ! Gaussian stat & variance
-      REAL                     FLUX                    ! Optimum flux
+c     REAL                     FLUX                    ! Optimum flux
 *-
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Unused variables
+      PSS_PPIX = 0
+      PSS_CONVERGED = .FALSE.
+      NITER = 0
 
 *    Standard statistic loop entry
       INCLUDE 'PSS_STAT_BIT1'
@@ -1517,6 +1552,11 @@
 
 *    Check status
       IF ( STATUS .NE. SAI__OK ) RETURN
+
+*    Unused variables
+      PSS_PPIX = 0
+      PSS_CONVERGED = .FALSE.
+      NITER = 0
 
 *    Standard statistic loop entry
       INCLUDE 'PSS_STAT_BIT1'
