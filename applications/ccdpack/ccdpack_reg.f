@@ -36,6 +36,8 @@
 *        Added new task WCSREG.
 *     18-MAY-1999 (MBT):
 *        Added new task WCSEDIT.
+*     21-SEP-1999 (MBT):
+*        Added new task DRIZZLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -78,6 +80,9 @@
 
       ELSE IF ( ACTION .EQ. 'CCDEDIT' ) THEN
          CALL CCDEDIT( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'DRIZZLE' ) THEN
+         CALL DRIZZLE( STATUS )
 
       ELSE IF ( ACTION .EQ. 'FINDCENT' ) THEN
          CALL FINDCENT( STATUS )
