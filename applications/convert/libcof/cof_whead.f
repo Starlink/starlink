@@ -49,7 +49,7 @@
 *          values.
 *        BITPIX, NAXIS, NAXISn --- are derived directly from the NDF
 *          data array;
-*        CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn --- are derived from
+*        CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from
 *          the NDF axis structures if possible.  If no linear NDF axis
 *          structures are present, the values in the NDF FITS extension
 *          are copied.  If any are non-linear, all FITS axis
@@ -97,6 +97,9 @@
 *        Added checks not to propagate the FITSIO banner and Starlink
 *        ORIGIN card in the NDF's FITS extension to the output FITS
 *        file.
+*     1996 September 16 (MJC):
+*        Corrected usage of CTYPEn (was CRTYPEn) and introduced CUNITn
+*        for axis units.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -193,7 +196,7 @@
 *    SIMPLE, EXTEND, PCOUNT, GCOUNT --- all take their default values.
 *    BITPIX, NAXIS, NAXISn --- are derived directly from the NDF data
 *      array;
-*    CRVALn, CDELTn, CRPIXn, CRTYPEn, CTYPEn --- are derived from the
+*    CRVALn, CDELTn, CRPIXn, CTYPEn, CUNITn --- are derived from the
 *      NDF axis structures if possible.  If no linear NDF axis
 *      structures are present, the values in the NDF FITS extension are
 *      copied.  If any are non-linear, all FITS axis information is
@@ -286,11 +289,11 @@
             VALUE = FITSTR( 11:SZFITS )
 
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn, and possibly CDELTn, CRVALn, CRPIXn, CRTYPEn, CTYPEn, OBJECT,
-*  LABEL, BUNITS, DATE, BLANK, HDUCLASn, and END as described above.
-*  Note CROTAn are also excluded.  To avoid duplicate FITSIO banners
-*  these are also omitted, as they are written when FITSIO creates the
-*  primary headers.
+*  NAXISn, and possibly CDELTn, CRVALn, CRPIXn, CRTYPEn, CTYPEn,
+*  CUNITn, OBJECT, LABEL, BUNITS, DATE, BLANK, HDUCLASn, and END as
+*  described above.  Note CROTAn are also excluded.  To avoid duplicate
+*  FITSIO banners these are also omitted, as they are written when
+*  FITSIO creates the primary headers.
 *
 *  Use an intermediate variable to reduce the number of continuation
 *  lines in the test.  This combines tests for the mandatory headers.
@@ -332,7 +335,8 @@
      :        ( KEYWRD( 1:5 ) .NE. 'CRVAL' .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:5 ) .NE. 'CRPIX' .OR. .NOT. AXIFND ) .AND.
      :        ( KEYWRD( 1:6 ) .NE. 'CRTYPE' .OR. .NOT. AXLFND ) .AND.
-     :        ( KEYWRD( 1:5 ) .NE. 'CTYPE' .OR. .NOT. AXUFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CTYPE' .OR. .NOT. AXLFND ) .AND.
+     :        ( KEYWRD( 1:5 ) .NE. 'CUNIT' .OR. .NOT. AXUFND ) .AND.
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
      :        ( KEYWRD .NE. 'BUNITS' .OR. .NOT. UNTFND ) .AND.
      :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) THEN
