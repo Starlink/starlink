@@ -7470,8 +7470,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                   }
                   break;
 
-/* sinc(pi*x) * cos(k*pi*x) interpolation. */
-/* --------------------------------------- */
+/* sinc(pi*x)*cos(k*pi*x) interpolation. */
+/* ------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCCOS:
                   kernel = SincCos;
@@ -7492,8 +7492,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                  (int) ceil( MaxD( 1.0, params[ 1 ] ) ) );
                   break;
 
-/* sinc(pi*x) * exp(-k*x*x) interpolation. */
-/* --------------------------------------- */
+/* sinc(pi*x)*exp(-k*x*x) interpolation. */
+/* ------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCGAUSS:
                   kernel = SincGauss;
@@ -7515,8 +7515,8 @@ static int ResampleSection( AstMapping *this, const double *linear_fit,
                                                                 lpar[ 0 ] ) );
                   break;
 
-/* sinc(pi*x) * sinc(k*pi*x) interpolation. */
-/* ---------------------------------------- */
+/* sinc(pi*x)*sinc(k*pi*x) interpolation. */
+/* -------------------------------------- */
 /* Assign the kernel function. */
                case AST__SINCSINC:
                   kernel = SincSinc;
