@@ -690,11 +690,10 @@ sub get_dates ($$$) {
 # proffered bounds of the NDF.  Return the name of a file which is
 # suitable for input into FINDOFF. 
 #
-# We will also want to call this with explicitly specified sky
-# position and search size (for the case where the original NDF has no
-# WCS information, and it has to be supplied on the command line).
-# This should be easy if we supply the NDFinforef with ra, dec and
-# radius fields.
+# The generated file has the columns
+#
+#     int-id, X, Y, ra/deg, dec/deg, int-id, mag
+#    
 sub get_catalogue ($\%$$) {
     my ($cat, $NDFinforef, $maxobj, $tempdir) = @_;
 
@@ -738,14 +737,6 @@ sub get_catalogue ($\%$$) {
     $cat->query()
       || wmessage ('fatal', "Can't make catalogue query ("
 		   . $cat->current_statusmessage() . ")");
-
-#    $cat->status_ok()
-#      || confess "Can't set catalogue parameters ("
-#	. $cat->current_statusmessage() . ")\n";
-#
-#    $cat->query()
-#      || confess "Can't make catalogue query ("
-#	. $cat->current_statusmessage() . ")\n";
 
     printf STDERR ("get_catalogue: box(%f,%f)..(%f,%f) %d points\n",
 		   $cat->point()->[0], $cat->point()->[1],
@@ -963,7 +954,7 @@ sub match_positions_findoff ($$$$$) {
 # We want to assemble entries consisting of
 #
 #    ASTROM:        ra      dec  0.0 0.0 J2000  * ident1/ident2
-#                   x-pos1  ypos-1  
+#                   x-pos1  y-pos1  
 #
 # for each of the pairs for which lineid1=lineid2.
 #
@@ -984,7 +975,8 @@ sub generate_astrom ($) {
 
     foreach my $k ('CCDin', 'catalogue', 'helpers', 'NDFinfo', 'tempfn') {
 	defined($par->{$k})
-	  || confess "bad call to generate_astrom: parameter $k not specified\n";
+	  || wmessage ('error',
+		       "bad call to generate_astrom: parameter $k not specified\n");
     }
 
     my $tempfn = $par->{tempfn};
@@ -999,7 +991,7 @@ sub generate_astrom ($) {
     # should be identical, being a continuous sequence of integers,
     # starting with 1, so check this on input.
     open (IN, "<$par->{CCDin}")
-      || confess "Can't open file $par-{CCDin} to read\n";
+      || wmessage ('error', "Can't open file $par-{CCDin} to read\n");
     my $lineno = 0;
     my $line;
     my @CCDarray = ();
