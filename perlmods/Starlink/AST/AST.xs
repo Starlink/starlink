@@ -1818,24 +1818,24 @@ astBorder( this )
   )
 
 void
-astBoundingBox( this, lbnd, ubnd )
+astBoundingBox( this )
   AstPlot * this
-  AV* lbnd
-  AV* ubnd
  PREINIT:
-  int len;
-  float * clbnd;
-  float * cubnd;
- CODE:
-  len = av_len( lbnd ) + 1;
-  if ( len != 2 ) Perl_croak( aTHX_ "lbnd must contain 2 elements" );
-  len = av_len( ubnd ) + 1;
-  if ( len != 2 ) Perl_croak( aTHX_ "ubnd must contain 2 elements" );
-  clbnd = pack1D(newRV_noinc((SV*)lbnd), 'f');
-  cubnd = pack1D(newRV_noinc((SV*)ubnd), 'f');
+  float clbnd[2];
+  float cubnd[2];
+  AV* lbnd;
+  AV* ubnd;
+ PPCODE:
   ASTCALL (
    astBoundingBox( this, clbnd, cubnd );
   )
+  lbnd = newAV();
+  unpack1D( newRV_noinc((SV*) lbnd), clbnd, 'f', 2 );
+  ubnd = newAV();
+  unpack1D( newRV_noinc((SV*) ubnd), cubnd, 'f', 2 );
+  XPUSHs(newRV_noinc((SV*)lbnd ));
+  XPUSHs(newRV_noinc((SV*)ubnd ));
+
 
 void
 astClip( this, iframe, lbnd, ubnd )
