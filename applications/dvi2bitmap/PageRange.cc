@@ -13,7 +13,7 @@ verbosities PageRange::verbosity_ = normal;
 
 PageRange::PageRange()
     : useCounts_(true), useCountNo_(0),
-      rangeType_(unset), first_(0), last_(0)
+      first_(0), last_(0), rangeType_(unset)
 {
 }
 
@@ -100,7 +100,7 @@ bool PageRange::addSpec (const char *type, const char *spec)
 		rangeType_ = ranges;
 
 	    char *endp;
-	    long p1, p2;
+	    long p1=0, p2;
 	    endp = const_cast<char*>(spec);
 	    char lastsep = ',';
 	    while (*endp != '\0' && parseOK)
