@@ -156,14 +156,14 @@ END
 !!!- tmp1.sum
 !!!+ tmp1.log
 FIT   1
-INFO RESIDUAL      1         0.252         0.121         0.279
-INFO RESIDUAL      2        -0.213        -0.080         0.227
-INFO RESIDUAL      3        -0.113        -0.140         0.180
-INFO RESIDUAL      4         0.345         0.528         0.631
-INFO RESIDUAL      5         0.678        -0.796         1.045
-INFO RESIDUAL      6         0.008         0.223         0.224
-INFO RESIDUAL      7        -0.581         0.437         0.727
-INFO RESIDUAL      8        -0.377        -0.294         0.478
+RESIDUAL      1         0.252         0.121         0.279
+RESIDUAL      2        -0.213        -0.080         0.227
+RESIDUAL      3        -0.113        -0.140         0.180
+RESIDUAL      4         0.345         0.528         0.631
+RESIDUAL      5         0.678        -0.796         1.045
+RESIDUAL      6         0.008         0.223         0.224
+RESIDUAL      7        -0.581         0.437         0.727
+RESIDUAL      8        -0.377        -0.294         0.478
 RESULT     nstars                    8 # no. ref stars
 RESULT       xrms             0.383879 # arcsec
 RESULT       yrms             0.400109 # arcsec
@@ -179,14 +179,14 @@ RESULT        wcs tmp1-fits01.fits # FITS-WCS output file
 STATUS OK
 ENDFIT
 FIT   2
-INFO RESIDUAL      1         0.136         0.019         0.137
-INFO RESIDUAL      2        -0.255        -0.269         0.370
-INFO RESIDUAL      3        -0.279        -0.114         0.301
-INFO RESIDUAL      4         0.408         0.375         0.554
-INFO RESIDUAL      5         0.173        -0.216         0.276
-INFO RESIDUAL      6         0.126         0.194         0.232
-INFO RESIDUAL      7        -0.441         0.512         0.676
-INFO RESIDUAL      8         0.132        -0.502         0.519
+RESIDUAL      1         0.136         0.019         0.137
+RESIDUAL      2        -0.255        -0.269         0.370
+RESIDUAL      3        -0.279        -0.114         0.301
+RESIDUAL      4         0.408         0.375         0.554
+RESIDUAL      5         0.173        -0.216         0.276
+RESIDUAL      6         0.126         0.194         0.232
+RESIDUAL      7        -0.441         0.512         0.676
+RESIDUAL      8         0.132        -0.502         0.519
 RESULT     nstars                    8 # no. ref stars
 RESULT       xrms             0.270439 # arcsec
 RESULT       yrms             0.320953 # arcsec
@@ -456,15 +456,15 @@ END
 !!!- tmp2.sum
 !!!+ tmp2.log
 FIT   1
-INFO RESIDUAL      1       -36.544       -35.940        51.255
-INFO RESIDUAL      2       -36.218         0.278        36.219
-INFO RESIDUAL      3       -35.891        36.495        51.186
-INFO RESIDUAL      4        -0.280       -36.213        36.214
-INFO RESIDUAL      5         0.000         0.004         0.004
-INFO RESIDUAL      6         0.280        36.222        36.223
-INFO RESIDUAL      7        35.984       -36.500        51.255
-INFO RESIDUAL      8        36.217        -0.282        36.218
-INFO RESIDUAL      9        36.451        35.935        51.186
+RESIDUAL      1       -36.544       -35.940        51.255
+RESIDUAL      2       -36.218         0.278        36.219
+RESIDUAL      3       -35.891        36.495        51.186
+RESIDUAL      4        -0.280       -36.213        36.214
+RESIDUAL      5         0.000         0.004         0.004
+RESIDUAL      6         0.280        36.222        36.223
+RESIDUAL      7        35.984       -36.500        51.255
+RESIDUAL      8        36.217        -0.282        36.218
+RESIDUAL      9        36.451        35.935        51.186
 RESULT     nstars                    9 # no. ref stars
 RESULT       xrms            29.572319 # arcsec
 RESULT       yrms            29.572303 # arcsec
@@ -482,15 +482,15 @@ ENDFIT
 FIT   2
 WARNING 003 sla_SVD warning  5
 WARNING 003 sla_SVD warning  5
-INFO RESIDUAL      1        -0.046        -0.002         0.047
-INFO RESIDUAL      2         0.000        -0.002         0.002
-INFO RESIDUAL      3         0.047        -0.002         0.047
-INFO RESIDUAL      4         0.000         0.004         0.004
-INFO RESIDUAL      5         0.000         0.004         0.004
-INFO RESIDUAL      6         0.000         0.004         0.004
-INFO RESIDUAL      7         0.047        -0.002         0.047
-INFO RESIDUAL      8         0.000        -0.002         0.002
-INFO RESIDUAL      9        -0.046        -0.002         0.047
+RESIDUAL      1        -0.046        -0.002         0.047
+RESIDUAL      2         0.000        -0.002         0.002
+RESIDUAL      3         0.047        -0.002         0.047
+RESIDUAL      4         0.000         0.004         0.004
+RESIDUAL      5         0.000         0.004         0.004
+RESIDUAL      6         0.000         0.004         0.004
+RESIDUAL      7         0.047        -0.002         0.047
+RESIDUAL      8         0.000        -0.002         0.002
+RESIDUAL      9        -0.046        -0.002         0.047
 RESULT     nstars                    9 # no. ref stars
 RESULT       xrms             0.031071 # arcsec
 RESULT       yrms             0.003028 # arcsec
