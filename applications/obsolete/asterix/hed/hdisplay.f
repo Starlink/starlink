@@ -64,6 +64,7 @@
       INTEGER			OCH			! Output channel id
       INTEGER RANGES(2,DAT__MXDIM)         ! Ranges to be output
       INTEGER WIDTH                        ! User supplied width
+      INTEGER OBJID
 
       LOGICAL OBJOK                        ! Whether valid data object
 *
@@ -80,7 +81,8 @@
       CALL AST_INIT()
 
 *    Get locator to data object and validate it
-      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
+      CALL ADI!_GETLOC( OBJID, OBJLOC, STATUS )
       CALL HDISPLAY_VALIDOBJ( OBJLOC, OBJOK, STATUS )
 
 *    If OK so far carry on

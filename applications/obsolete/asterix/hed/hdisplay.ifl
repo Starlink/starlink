@@ -1,6 +1,6 @@
  INTERFACE HDISPLAY              
     PARAMETER INP                
-       TYPE 'UNIV'               
+       TYPE 'LITERAL'
        POSITION 1                
        PPATH 'GLOBAL'       
        PROMPT 'Object name'

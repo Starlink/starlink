@@ -1,7 +1,7 @@
 INTERFACE HCOPY
 
     PARAMETER INP
-       TYPE 'UNIV'
+       TYPE 'LITERAL'
        position 1
        prompt 'Object to copy'
        help 'Full specification of input object eg. file.next.object'

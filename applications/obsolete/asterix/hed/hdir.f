@@ -49,6 +49,7 @@
       CHARACTER*(DAT__SZLOC) 	OBJLOC            	! Data object locator
       INTEGER			OCH			! Output channel id
       INTEGER 			OUTWIDTH                ! Output page width
+      INTEGER                   OBJID
 *
 *    Version id :
 *
@@ -63,7 +64,8 @@
       CALL AST_INIT()
 
 *    Get parameter values
-      CALL USI_DASSOC( 'INP', 'READ', OBJLOC, STATUS )
+      CALL USI_ASSOC( 'INP', '*', 'READ', OBJID, STATUS )
+      CALL ADI1_GETLOC( OBJID, OBJLOC, STATUS )
 
 *    Connect output device
       CALL AIO_ASSOCO( 'DEV', 'LIST', OCH, OUTWIDTH, STATUS )
