@@ -1,5 +1,5 @@
       SUBROUTINE KPS1_DISCL( INDF, SDIMS, MCOMP, LP, UP, BPCI, WPLBND, 
-     :                       WPUBND, IP, NX, NY, STATUS )
+     :                       WPUBND, IP, NX, NY, DLO, DHI, STATUS )
 *+
 *  Name:
 *     KPS1_DISCL
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL KPS1_DISCL( INDF, SDIMS, MCOMP, LP, UP, BPCI, WPLBND, WPUBND, 
-*                      IP, NX, NY, STATUS )
+*                      IP, NX, NY, DLO, DHI, STATUS )
 
 *  Description:
 *     If the number of pixels in the supplied image is much larger than 
@@ -64,10 +64,16 @@
 *       The number of columns in the returned array of colour indices.
 *    NY = INTEGER (Returned)
 *       The number of rows in the returned array of colour indices.
+*    DLO = DOUBLE PRECISION (Returned)
+*       Lower data limit used for scaling the array
+*    DHI = DOUBLE PRECISION (Returned)
+*       Upper data limit used for scaling the array
+*    STATUS = INTEGER (Given and Returned)
+*       The global status value.
 
 *  Notes:
 *    -  The following parameter names are hard-wired into this routine: 
-*    MODE, SIGMAS, LOW, HIGH, PERCENTILES, NUMBIN, SCALOW, SCAHIGH.
+*    MODE, SIGMAS, LOW, HIGH, PERCENTILES, NUMBIN.
 *    -  The PGPLOT viewport on entry must correspond to the DATA picture
 *    in which the image is to be displayed. 
 
@@ -80,7 +86,9 @@
 *        Original version, based on the V0.12 display.f by MJC.
 *     18-MAY-1999 (DSB):
 *        Use separate compression factors for the two axes.
-
+*     18-OCT-1999 (DSB):
+*        Added arguments DLO and DHI, and moved assignment to output
+*        parameters SCALOW and SCAHIGH into display.f.
 *-
 
 *  Type Definitions:
@@ -109,6 +117,8 @@
       INTEGER IP
       INTEGER NX
       INTEGER NY
+      DOUBLE PRECISION DLO
+      DOUBLE PRECISION DHI
 
 *  Status:
       INTEGER STATUS
@@ -132,8 +142,6 @@
       CHARACTER DTYPE*( NDF__SZFTP )! Type of the image after processing (not used)
       CHARACTER ITYPE*( NDF__SZTYP )! Processing type of the image
       CHARACTER MODE*72             ! Manner in which the array is to be scaled
-      DOUBLE PRECISION DHI     ! Upper limit used for scaling the array
-      DOUBLE PRECISION DLO     ! Lower   "     "   "     "     "    "
       DOUBLE PRECISION DMAXV   ! Minimum value in the array
       DOUBLE PRECISION DMINV   ! Maximum value in the array
       INTEGER ACTHIG           ! The HIGH parameter state
@@ -941,39 +949,36 @@
 
       END IF
 
-*  Store the scaling values.
+*  Return the scaling values.
 *  =========================
 
 *  There is no scaling in flash mode.
       IF ( MODE( 1:2 ) .NE. 'FL' ) THEN
 
-*  Select appropriate calls depending on the implementation
-*  type.
+*  Convert the limits to double precision.
          IF ( ITYPE .EQ. '_REAL' ) THEN
-            CALL PAR_PUT0D( 'SCALOW', DBLE( RLO ), STATUS )
-            CALL PAR_PUT0D( 'SCAHIGH', DBLE( RHI ), STATUS )
+            DLO = DBLE( RLO )
+            DHI = DBLE( RHI )
 
          ELSE IF ( ITYPE .EQ. '_DOUBLE' ) THEN
-            CALL PAR_PUT0D( 'SCALOW', DLO, STATUS )
-            CALL PAR_PUT0D( 'SCAHIGH', DHI, STATUS )
-
+      
          ELSE IF ( ITYPE .EQ. '_INTEGER' ) THEN
-            CALL PAR_PUT0D( 'SCALOW', DBLE( ILO ), STATUS )
-            CALL PAR_PUT0D( 'SCAHIGH', DBLE( IHI ), STATUS )
+            DLO = DBLE( ILO )
+            DHI = DBLE( IHI )
 
          ELSE IF ( ITYPE .EQ. '_WORD' ) THEN
-            CALL PAR_PUT0D( 'SCALOW', NUM_WTOD( WLO ), STATUS )
-            CALL PAR_PUT0D( 'SCAHIGH', NUM_WTOD( WHI ), STATUS )
+            DLO = NUM_WTOD( WLO )
+            DHI = NUM_WTOD( WHI )
 
          ELSE IF ( ITYPE .EQ. '_BYTE' ) THEN
-            CALL PAR_PUT0D( 'SCALOW', NUM_BTOD( BLO ), STATUS )
-            CALL PAR_PUT0D( 'SCAHIGH', NUM_BTOD( BHI ), STATUS )
+            DLO = NUM_BTOD( BLO )
+            DHI = NUM_BTOD( BHI )
          END IF
 
 *  Use the pen limits for flash mode.
       ELSE
-         CALL PAR_PUT0D( 'SCALOW', DBLE( LP ), STATUS )
-         CALL PAR_PUT0D( 'SCAHIGH', DBLE( UP ), STATUS )
+         DLO = DBLE( LP )
+         DHI = DBLE( UP )
       END IF
 
  999  CONTINUE

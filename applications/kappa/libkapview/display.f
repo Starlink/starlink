@@ -20,7 +20,9 @@
 *     on the current image-display device. The minimum and maximum data
 *     values to be displayed can be selected in several ways (see
 *     parameter MODE). Data values outside these limits are displayed
-*     with the colour of the nearest limit.
+*     with the colour of the nearest limit. A colour ramp showing the 
+*     relationship between colour and data value can be displayed (see
+*     parameter KEY).
 *
 *     Annotated axes or a simple border can be drawn around the image (see 
 *     parameters AXES and BORDER). The appearance of these may be controlled 
@@ -144,6 +146,46 @@
 *        (Scale mode)
 *     IN = NDF (Read)
 *        The input NDF structure containing the data to be displayed.
+*     KEY = _LOGICAL (Read)
+*        TRUE if a key to the colour table is to be produced to the right
+*        of the display. This takes the form of a colour ramp, annotated
+*        with data value. The appearance of this key can be controlled using
+*        parameter KEYSTYLE, and its horizontal position can be controlled 
+*        using parameter KEYPOS. If the key is required in a different
+*        location, set KEY=NO and use application LUTVIEW after
+*        displaying the image. [TRUE]
+*     KEYPOS = _REAL (Read)
+*        A value giving the gap between the right hand edge of the display
+*        and the left hand edge of the key (0.0 for no gap, 1.0 for the 
+*        largest gap). If a key is produced, then the right hand margin 
+*        specified by parameter MARGIN is ignored. [current value]
+*     KEYSTYLE = GROUP (Read)
+*        A group of attribute settings describing the plotting style to use 
+*        for the key (see parameter KEY). 
+*
+*        A comma-separated list of strings should be given in which each
+*        string is either an attribute setting, or the name of a text file
+*        preceded by an up-arrow character "^". Such text files should
+*        contain further comma-separated lists which will be read and 
+*        interpreted in the same manner. Attribute settings are applied in 
+*        the order in which they occur within the list, with later settings
+*        over-riding any earlier settings given for the same attribute.
+*
+*        Each individual attribute setting should be of the form:
+*
+*           <name>=<value>
+*        
+*        where <name> is the name of a plotting attribute, and <value> is
+*        the value to assign to the attribute. Default values will be
+*        used for any unspecified attributes. All attributes will be
+*        defaulted if a null value (!) is supplied. See section "Plotting
+*        Attributes" in SUN/95 for a description of the available
+*        attributes. Any unrecognised attributes are ignored (no error is
+*        reported). 
+*
+*        Axis 1 is always the "data value" axis. So for instance, to set 
+*        the label for the data value axis, assign a value to "Label(1)" 
+*        in the supplied style. [current value] 
 *     LOW = _DOUBLE (Read)
 *        The data value corresponding to the lowest pen in the colour 
 *        table.  All smaller data values are set to the lowest colour
@@ -466,6 +508,8 @@
 *        Radical changes to use AST and PGPLOT.
 *     3-SEP-1999 (DSB):
 *        Added NULL argument to KPG1_GTPOS call.
+*     18-OCT-1999 (DSB):
+*        Added parameters KEY, KEYPOS and KEYSTYLE.
 *     {enter_further_changes_here}
 
 *  Bugs:
