@@ -990,11 +990,9 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 		$(EXPORT)/$(PKG_NAME).tar.Z
 
 # Make the source tarball, making sure that the source directories
-# are properly clean first.  When cleaning out moggy, check that
-# there is indeed a Makefile (there won't be, if the directory is
-# already clean).  Also ensure that the moggy configure script is
-# present (this isn't a repository source file, but it is a source
-# file for this purpose).
+# are properly clean first (we ought to be doing this from a CVS-exported
+# copy of the source rather than a working directory, so this _should_ 
+# be a no-op).
 #
 # It looks as if this should depend on `$(PUBLIC_SCRIPTS) astrom moggy
 # misc', but it shouldn't, since astrom and moggy in turn depend on
@@ -1002,11 +1000,11 @@ $(EXPORT)/$(PKG_NAME).tar.Z: $(SOURCE_FILES)
 # this is a target which is invoked only during bundling for
 # distribution, we can tolerate this missing dependency, and simply
 # remember to delete autoastrom_source.tar when it's no longer needed.
-$(PKG_NAME)_source.tar:
+$(PKG_NAME)_source.tar: unbuild
 	cd astrom && ./mk unbuild
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
 	cd moggy && make -f Makefile.in configure
-	cd catlib && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd catlib && if test -f Makefile; then make distclean; fi
 	test ! -f $(PKG_NAME)_source.tar || $(RMF) $(PKG_NAME)_source.tar
 	$(TAR_IN) $(PKG_NAME)_source.tar $(PUBLIC_SCRIPTS) astrom moggy misc catlib
 
@@ -1036,10 +1034,13 @@ clean:
 #  unconfigured Makefile will fail to clean out the SkyCat directories
 #  (if the directory hasn't been configured, then there's probably not
 #  much to clean out, in fact).
+#
+#  Within catlib, Makefile.in doesn't handle distclean well.  Since, if 
+#  there's no Makefile, distclean is probably redundant, just miss it out.
 unbuild: clean
 	cd astrom && ./mk unbuild
 	cd moggy && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
-	cd catlib && if test -f Makefile; then make distclean; else make -f Makefile.in distclean; fi
+	cd catlib && if test -f Makefile; then make distclean; fi
 	cd doc && make unbuild
 	@- $(RMF) $(BUILT_FILES) $(DATE_STAMP) .BUILT 1>/dev/null 2>/dev/null
 	@ echo '*** Built files removed'
