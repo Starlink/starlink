@@ -11,6 +11,7 @@
 *      25 Aug 94: V1.7-2 REGION option added (RJV)
 *      16 Sep 94: V1.7-3 data min/max updated (RJV)
 *      30 Sep 94: V1.7-4 slight rationalisation (RJV)
+*       5 Jan 95: V1.8-0 new ARD (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -27,7 +28,7 @@
       CHARACTER*10 MODE
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'IEXCLUDE Version 1.7-4')
+      PARAMETER (VERSION = 'IEXCLUDE Version 1.8-0')
 *-
       CALL USI_INIT()
 
@@ -632,6 +633,7 @@
 *     15 Mar 92 : V1.6-0  Original (DJA)
 *     10 Sep 92 : V1.7-0  ARD file option added (DJA)
 *     28 Jan 93 : incorporated into IEXCLUDE (RJV)
+*      5 Jan 95 : new ARD (RJV)
 *    Type Definitions :
 *
       IMPLICIT NONE
@@ -665,7 +667,7 @@
 *
 *    Local variables :
 *
-      CHARACTER*80        ARDFILE                    ! ARD file name
+      CHARACTER*132       ARDFILE                    ! ARD file name
       CHARACTER           CH                         ! Cursor character
       CHARACTER*132       TEXT                       ! O/p line for ARD file
 
@@ -682,6 +684,7 @@
       INTEGER             IV                         ! Loop over vertices
       INTEGER             NVERTEX                    ! # of vertices
       INTEGER             TLEN                       ! Length of TEXT?
+      INTEGER             GRPID                      ! group id
 
       LOGICAL             FLAG
       LOGICAL             DAT                        ! change data
@@ -716,25 +719,12 @@
 *      ARD file mode
         CALL USI_GET0L('ARD',ARD,STATUS)
         IF (ARD) THEN
-          CALL USI_GET0C( 'FILE', ARDFILE, STATUS )
-          INQUIRE(FILE=ARDFILE,EXIST=EXIST)
-          IF (EXIST) THEN
+
 *        Open for APPEND access?
-            CALL USI_GET0L( 'APPEND', APPEND, STATUS )
-            IF ( STATUS .NE. SAI__OK ) GOTO 99
-          ELSE
-            APPEND=.FALSE.
-          ENDIF
-*        Open the ARD file
-          IF ( APPEND ) THEN
-            CALL FIO_OPEN( ARDFILE, 'APPEND', 'LIST', 0, AFD, STATUS )
-          ELSE
-            CALL FIO_OPEN( ARDFILE, 'WRITE', 'LIST', 0, AFD, STATUS )
-          ENDIF
-          IF ( STATUS .NE. SAI__OK ) THEN
-            CALL MSG_PRNT( 'AST_ERR: Error opening ARD file' )
-            GOTO 99
-          ENDIF
+          CALL USI_GET0L( 'APPEND', APPEND, STATUS )
+
+*        Open group for storing AD text
+          CALL ARX_OPEN('WRITE',GRPID,STATUS)
 
         ENDIF
 
@@ -753,9 +743,6 @@
 *      Write start of composite record if outside and ARD modes
         IF ( ARD .AND. OUTSIDE ) THEN
 
-*        Begin ARD composite
-          CALL FIO_WRITE( AFD, 'COMPOSITE', STATUS )
-
 *        Get extrema of imag
           CALL IMG_PIXTOWORLD( 1, 1, XMIN, YMIN, STATUS )
           CALL IMG_PIXTOWORLD( I_NX, I_NY, XMAX, YMAX, STATUS )
@@ -765,8 +752,9 @@
           CALL MSG_SETR( 'XHI', XMAX )
           CALL MSG_SETR( 'YLO', YMIN )
           CALL MSG_SETR( 'YHI', YMAX )
-          CALL MSG_MAKE( '  BOX ^XLO ^YLO ^XHI ^YHI', TEXT, TLEN )
-          CALL FIO_WRITE( AFD, TEXT(:TLEN), STATUS )
+          CALL MSG_MAKE( '  BOX( ^XLO , ^YLO , ^XHI , ^YHI )',
+     :                                             TEXT, TLEN )
+          CALL ARX_PUT(GRPID,0,TEXT(:LEN),STATUS)
 
         END IF
 
@@ -781,9 +769,9 @@
 
 *        Create description
             IF ( OUTSIDE ) THEN
-              TEXT = '  .AND. .NOT. POLYGON'
+              TEXT = '  .AND. .NOT. POLYGON('
             ELSE
-              TEXT = 'POLYGON'
+              TEXT = 'POLYGON('
             ENDIF
             TLEN = CHR_LEN(TEXT)
 
@@ -791,18 +779,17 @@
             DO IV = 1, NVERTEX
               CALL MSG_SETR( 'X', XVERT(IV) )
               CALL MSG_SETR( 'Y', YVERT(IV) )
-              CALL MSG_MAKE( TEXT(:TLEN)//' ^X ^Y', TEXT, TLEN )
+              CALL MSG_MAKE( TEXT(:TLEN)//' ^X , ^Y ,', TEXT, TLEN )
               IF ( (TLEN .GT. 65) .AND. (IV.LT.NVERTEX) ) THEN
-                TEXT = TEXT(:TLEN)//' -'
-                TLEN = TLEN + 2
-                CALL FIO_WRITE( AFD, TEXT(:TLEN), STATUS )
+                CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
                 TEXT = ' '
                 TLEN = 1
               ENDIF
             ENDDO
 
 *        Write remaining polygon descriptor line
-            CALL FIO_WRITE( AFD, TEXT(:TLEN), STATUS )
+            TEXT(TLEN:TLEN)=')'
+            CALL ARX_PUT(GRPID,0,TEXT(:TLEN),STATUS)
 
           ENDIF
 
@@ -865,13 +852,15 @@
 *      Terminate ARD file processing if necessary
         IF ( ARD ) THEN
 
-*        In outside mode, write end of composite section
-          IF ( OUTSIDE ) THEN
-            CALL FIO_WRITE( AFD, 'END COMPOSITE', STATUS )
-          END IF
 
-*        Close the ARD file
-          CALL FIO_CLOSE( AFD, STATUS )
+*        Write ARD text to file and close group
+          IF (APPEND) THEN
+            CALL ARX_APPEND('FILE',GRPID,STATUS)
+          ELSE
+            CALL ARX_WRITE('FILE',GRPID,STATUS)
+          ENDIF
+
+          CALL ARX_CLOSE(GRPID,STATUS)
 
         END IF
 
