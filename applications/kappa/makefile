@@ -1693,9 +1693,9 @@ install:
 #  Note that some special applications have to be `renamed' to avoid C
 #  run-time library clashes.  To save listing the tasks more than once
 #  the same operation must be applied to their .par files too.
-	$(LINK) ./kap_div.par $(INSTALL_BIN)/div.par
-	$(LINK) ./kap_log10.par $(INSTALL_BIN)/log10.par
-	$(LINK) ./kap_pow.par $(INSTALL_BIN)/pow.par
+	$(LINK) $(INSTALL_IRAF)/kap_div.par $(INSTALL_IRAF)/div.par
+	$(LINK) $(INSTALL_IRAF)/kap_log10.par $(INSTALL_IRAF)/log10.par
+	$(LINK) $(INSTALL_IRAF)/kap_pow.par $(INSTALL_IRAF)/pow.par
 #
 #  Install the IRAF-special interface files giving them world read permission.
 #  Leave the original in position.
