@@ -191,7 +191,7 @@
 *
 *        Each individual attribute setting should be of the form:
 *
-**          <name>=<value>
+*           <name>=<value>
 *        
 *        where <name> is the name of a plotting attribute, and <value> is
 *        the value to assign to the attribute. Default values will be
