@@ -5,6 +5,10 @@
   Changes since v4.0-14
   ---------------------
 
+   - When REGISTER is used with NDFNAMES=FALSE and PLACEIN=SINGLE, a new
+     NDF will be created using the WCSFILE parameter if one does not
+     already exist.
+
    - In TRANNDF a bug in which flux conservation was lost when using
      flipped images has been fixed.
 
