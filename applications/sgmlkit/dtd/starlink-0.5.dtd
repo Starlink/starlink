@@ -303,6 +303,7 @@
   separate shortref for emdash.  This way, we could switch between
   endash and emdash by changing this declaration. -->
 <!shortref textabbrevsmap	"--"	endash
+				"_"	underscore
 				"~"	nbsp>
 <!usemap textabbrevsmap (p | px)>
 <!-- ...but suspend it where it's liable to cause trouble (thanks Mark!) -->
