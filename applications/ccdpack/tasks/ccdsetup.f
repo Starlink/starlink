@@ -312,6 +312,9 @@
 *     8-SEP-1995 (PDRAPER):
 *        Updated help for MASK (change to official ARD). Added help
 *        for V2.0 parameters.
+*     7-JUL-1997 (PDRAPER):
+*        Modified to output a NULL symbol message according to 
+*        environment (INDEF for IRAF).
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -337,10 +340,11 @@
       EXTERNAL CHR_LEN           ! blanks
 
 *  Local Variables:
-      CHARACTER * ( 8 ) LOGTO    ! Were logfile information goes to
+      CHARACTER * ( 8 ) LOGTO    ! Where logfile information goes to
       CHARACTER * ( FIO__SZFNM ) LOGNAM ! Logfile name
       CHARACTER LINE * ( CCD1__BLEN ) ! Line buffer for reading restoration files
       CHARACTER MSKNAM * ( MSG__SZMSG ) ! Name of mask file or ARD expression
+      CHARACTER * ( 5 ) NULL     ! System NULL expression
       DOUBLE PRECISION ADC       ! ADC factor
       DOUBLE PRECISION DEFER     ! Deferred charge value
       DOUBLE PRECISION RNOISE    ! Readout noise
@@ -391,10 +395,12 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  First remind users of useful options.
+      CALL CCD1_SETEX( NULL, IAT, STATUS )
       CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( ' ', '  Type "?" for help on any prompt.', STATUS )
-      CALL MSG_OUT( ' ', '  Type "!" if you do not want to set a '//
-     :                   'parameter.', STATUS )
+      LINE = '  Type "'//NULL(:IAT)//'" if you do not want to set a '//
+     :       'parameter.'
+      CALL MSG_OUT( ' ', LINE, STATUS )
       CALL MSG_BLANK( STATUS )
 
 *  None of the restoration files is open.

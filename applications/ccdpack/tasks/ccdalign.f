@@ -228,17 +228,8 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Find out the environment we're running under. If it's IRAF then
-*  INDEF is used instead of ! as a NULL symbol. To test this we
-*  use the existence of the "ccdpackdir$" variable.
-      CALL PSX_GETENV( 'ccdpackdir', CMD, STATUS )
-      IF ( STATUS .EQ. PSX__NOENV ) THEN 
-         CALL ERR_ANNUL( STATUS )
-         NULL = '!'
-         NL = 1
-      ELSE
-         NULL = 'INDEF'
-         NL = 5
-      END IF
+*  INDEF is used instead of ! as a NULL symbol. 
+      CALL CCD1_SETEX( NULL, NL, STATUS )
       CCDRID = -1
       CCDGID = -1
       KAPVID = -1
