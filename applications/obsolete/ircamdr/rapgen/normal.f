@@ -79,10 +79,12 @@
 
 *    External function
 
-      REAL G05CAF                 ! NAG routine
+      REAL PDA_RAND
+      EXTERNAL PDA_RAND
 
 *    Local variables :
 
+      INTEGER TICKS, SEED         ! Random number seed
 
       REAL
      :     X, Y,                  ! dummy argument for nag routine
@@ -99,6 +101,11 @@
          RETURN
       ENDIF
 
+*    initialise the random number generator seed using system clock
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
+
 
 *    initialise logical flag
       FINISHED  =  .FALSE.
@@ -107,13 +114,13 @@
       DO WHILE( .NOT. FINISHED )
 
 *       generate two uncorrelated random numbers between -1 and 1
-          X  = G05CAF( X )
+          X  = PDA_RAND( X )
          RA  =  -1.0 + 2.0*X
-          X  = G05CAF( X )
+          X  = PDA_RAND( X )
          RA  =  -1.0 + 2.0*X
-          Y  = G05CAF( Y )
+          Y  = PDA_RAND( Y )
          RB  =  -1.0 + 2.0*Y
-          Y  = G05CAF( Y )
+          Y  = PDA_RAND( Y )
          RB  =  -1.0 + 2.0*Y
 
 *       get another from these that will lie between 0 and 2

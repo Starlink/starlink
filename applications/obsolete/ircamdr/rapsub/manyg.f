@@ -46,6 +46,7 @@
 *                  removed SEED as no longer required;
 *                  channged arguments to input DIMS separately so that
 *                  routine will still compile  (SKL@JACH)
+*     12-AUG-2004  Now use PDA for random numbers (TIMJ@JACH)
 *
 *    Type definitions :
 
@@ -94,7 +95,8 @@
 
 * External function
 
-      REAL G05CAF                 ! NAG random number generator
+      REAL PDA_RAND
+      EXTERNAL PDA_RAND
 
 *    Local variables :
 
@@ -109,7 +111,8 @@
      :    CURRBAD,                ! number of pixels currently set bad
      :    NUMBAD,                 ! number required to be set bad
      :    COLPOS,                 ! random bad column position
-     :    I, J, K, L, N           ! general array counters
+     :    I, J, K, L, N,          ! general array counters
+     :    SEED, TICKS             ! For random number seed
 
       INTEGER
      :    BOX,                    ! half size of box round each star 
@@ -181,11 +184,12 @@
          ENDDO
       ENDDO
 
-*    initialise the random number generator seed. Use the NAG routines
-*    G05CCF which used real_time to initialise the seed
+*    initialise the random number generator seed using system clock
 
-      CALL G05CCF
-	PRINT *, 'after g05ccf'
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
+	PRINT *, 'after pda_rnsed'
 
 *    loop round the requested number of stars generating a random
 *    x,y position and a peak intensity. Then create a Gaussian star
@@ -194,14 +198,14 @@
 	PRINT *, n
 
 *       get a random, non-integral x,y position
-         VALUE  =  G05CAF(X)
+         VALUE  =  PDA_RAND(X)
          XPOS   =  VALUE * IDIMS1
-         VALUE  =  G05CAF(X)
+         VALUE  =  PDA_RAND(X)
          YPOS   =  VALUE * IDIMS2
 
 *       now get a random peak intensity within the specified range,
 *       and according to the specified radial distribution
-         VALUE  =  G05CAF(X)
+         VALUE  =  PDA_RAND(X)
 
 *       force the distribution string to upper case before checking it
          CALL UPCASE( DISTRIB, DISTRIB, STATUS )
@@ -310,10 +314,10 @@
 
 *          using the RAN function again, get a random bad pixel position,
 *          making sure it is in the image
-            VALUE  =  G05CAF(X)
+            VALUE  =  PDA_RAND(X)
             XBAD   =  NINT( VALUE * IDIMS1 )
             IF( XBAD .EQ. 0 ) XBAD = 1
-            VALUE  =  G05CAF(X)
+            VALUE  =  PDA_RAND(X)
             YBAD   =  NINT( VALUE * IDIMS2 )
             IF( YBAD .EQ. 0 ) YBAD = 1
 
@@ -334,7 +338,7 @@
       IF( BADCOL ) THEN
 
 *       get a random column that is in the image
-         VALUE   =  G05CAF(X)
+         VALUE   =  PDA_RAND(X)
          COLPOS  =  NINT( VALUE * IDIMS1 )
          IF( COLPOS .EQ. 0 ) COLPOS = 1 
 

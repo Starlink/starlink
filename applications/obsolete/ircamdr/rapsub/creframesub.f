@@ -76,7 +76,8 @@
 
 *    External functions
 
-      REAL G05CAF               ! NAG random number generator
+      REAL PDA_RAND
+      EXTERNAL PDA_RAND
 
 *    Local variables :
  
@@ -87,7 +88,7 @@
      :    DATA                  ! dummy variable for temporary data storage
 
       INTEGER
-     :    IFAIL,               ! NAG status
+     :    TICKS, SEED,         ! Random number seed
      :    I, J                 ! counters
 
 *-
@@ -96,17 +97,17 @@
          RETURN
       ENDIF
 
-*    initialise random number generator seed : use the NAG routine
-*    G05CCF which uses the real time clock to initialise the seed
-
-      CALL G05CCF
+*    initialise the random number generator seed using system clock
+      CALL PSX_TIME( TICKS, STATUS )
+      SEED = ( TICKS / 4 ) * 4 + 1
+      CALL PDA_RNSED( SEED )
 
 *    check for TYPED and fill array accordingly
       IF( TYPED .EQ. 'RR' ) THEN            
                                           ! random between 1 and 0
          DO  J  =  1, DIMS2
             DO  I  =  1, DIMS1
-               VALUE = G05CAF( X )
+               VALUE = PDA_RAND( X )
                ARRAY( I, J ) = VALUE
             END DO
          END DO
@@ -115,7 +116,7 @@
                                           ! random between limits
          DO  J  =  1, DIMS2 
             DO  I  =  1, DIMS1 
-               VALUE = G05CAF( X )
+               VALUE = PDA_RAND( X )
                VALUE  =  ( VALUE * ( HIGH - LOW ) ) + LOW
                ARRAY( I, J ) = VALUE
             END DO

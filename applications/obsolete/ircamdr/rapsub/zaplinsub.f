@@ -86,6 +86,7 @@
      :      STARTM,         ! START minus 1
      :      FINISHP,        ! FINISH plus 1
      :      I, J, II, JJ    ! general counter variables
+      INTEGER TICKS, SEED ! Random seed
 
       REAL
      :      DIFF,     ! intensity difference between START and FINISH
@@ -117,7 +118,12 @@
 *    if noise is to be added then initialise the seed value
 
       IF( NOISE ) THEN
-         CALL G05CCF
+
+*    initialise the random number generator seed using system clock
+         CALL PSX_TIME( TICKS, STATUS )
+         SEED = ( TICKS / 4 ) * 4 + 1
+         CALL PDA_RNSED( SEED )
+
       ENDIF
 
 *    now see whether it is rows or columns to be modified
