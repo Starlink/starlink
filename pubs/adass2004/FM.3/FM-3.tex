@@ -106,7 +106,7 @@
 \author{Mark B.\ Taylor}
 \affil{Starlink,
        Bristol University,
-       H.\ H.\ Wills Physics Laboratory,
+       H.~H.~Wills Physics Laboratory,
        Tyndall Avenue,
        Bristol}
 
@@ -212,26 +212,20 @@ and deserialization performed by pluggable format-specific I/O handlers.
 This means that the programmer seees a high-level abstraction of a table
 which is easy to work with, and also that support for new data 
 formats can be added easily.
-A corollary is that conversion between any of the supported 
-formats is trivial.  Supplied handlers provide support for 
+Supplied handlers provide support for 
 VOTables, FITS table extensions, relational databases via SQL 
 and plain text tables, amongst others.
 The VOTable handler, which has VOTable-specific as well as generic 
 table features, is believed to be the only existing library 
 capable of reading or writing all the defined VOTable 
-serialization formats (TABLEDATA, FITS, BINARY).
+serialization formats ({\sc TABLEDATA}, {\sc FITS}, {\sc BINARY}).
 
 TOPCAT, based on STIL, is a user-friendly graphical program for 
 viewing, analysis and modification of tables.
 It has facilities for plotting, cross matching, row selection, 
 sorting and metadata manipulation.
 Synthetic columns can be created and row selections made using a 
-powerful and extensible algabraic expression language.
-
-A description of how STIL can be used to read or write VOTables 
-or other tables in third party applications is given. 
-TOPCAT's analysis, matching and editing facilities were demonstrated;  
-this paper summarises a few of these capabilities.
+powerful and extensible algebraic expression language.
 \end{abstract}
 
 %-----------------------------------------------------------------------
@@ -255,24 +249,28 @@ this paper summarises a few of these capabilities.
 
 \section{Introduction}
 
-Tables are common in astronomy, and are becoming a particularly
+Tables are common in astronomy, and are a
 prominent feature of the data produced, transmitted and consumed by
 human and software elements of the Virtual Observatory.
-The fact that the VOTable format is one of the first standards to become
-an IVOA recommendation bears witness to this observation.
+The fact that the VOTable format is one of the first standards to become an 
+\htmladdnormallinkfoot{IVOA 
+  recommendation}{http://www.ivoa.net/Documents/latest/VOT.html}
+bears witness to this observation.
 A common example of astronomical tabular data is an object catalogue, 
 but other examples, such as event lists, are important too.
 This paper describes STIL, a library for generic I/O and processing of
 tables, and TOPCAT, a graphical user application built on top of STIL.
+Both of these products are open source 
+(released under the Gnu Public Licence) and pure Java (J2SE1.4),
+which makes them highly portable and easy to deploy.
+They were developed for the Starlink Project.
 
 \section{STIL}
 
 The \htmladdnormallinkfoot{Starlink Tables Infrastructure Library
                    (STIL)}{http://www.starlink.ac.uk/stil/} 
 is a generic I/O
-and processing library for tabular data.  It is open source (released
-under the Gnu Public Licence) and written in pure Java (J2SE1.4),
-making it highly portable and easy to deploy.
+and processing library for tabular data.
 Central to STIL is a relatively simple model of what a table is, namely
 a data structure which has
 \begin{itemize}
@@ -293,30 +291,35 @@ when manipulating tables within STIL.
 STIL has no native external data format, but a number of pluggable
 input and output handlers.  Input handlers perform the job of 
 deserializing tables from external storage and turning them into 
-StarTables, while output handlers peform the opposite task of taking
+StarTables, while output handlers perform the opposite task of taking
 a StarTable and serializing it to external storage.
 Since these I/O handlers are separate from the core processing code,
 it is easy to change their implementation and add new ones 
-without application code being aware of the fact.
+without affecting application code.
 In this way the application programmer does not need to know or
 care whether the table he is manipulating has been obtained from
 a VOTable, FITS HDU, comma-separated value file, or an SQL query
 on a relational database.  Moreover, new handlers can be plugged
 in at runtime, so that an existing application based on STIL can 
-be reconfigured at run-time to read and write new table storage 
-formats without any modifications to the code (in practice this
-can be done using Java system properties).  This way of working
+be reconfigured to read and write new table storage 
+formats without any modifications to the code.
+This way of working
 resembles the way that Java's JDBC database communication layer works.
 A schematic diagram of this architecture is given in Figure~\ref{FM3-fig-1}.
 \begin{figure}
+\epsscale{0.8}
 \plotone{FM-3_1.eps}
 \caption{Schematic of STIL architecture.} \label{FM3-fig-1}
 \end{figure}
+
 Among the I/O handlers supplied are ones which can read/write 
 the VOTable format, 
 FITS BINTABLE and TABLE extensions, 
 relational databases, 
 and a number of text-based formats.
+A corollary of this architecture is that conversion between any of the
+supported formats is trivial, and STIL comes with a simple
+command-line utility {\tt tablecopy} which performs this task.
 
 As well as I/O, STIL provides a number of facilities for manipulation 
 of tables including ways to add, remove and rearrange columns and rows,
@@ -327,15 +330,18 @@ and somewhat experimental.
 
 Care has been taken to make the I/O and processing facilities scalable
 throughout STIL; the aim in particular is that it should be possible 
-to process a table with arbitrarily many rows in a finite amount of memory.  
+to process a table with an umlimited number of rows 
+in a limited amount of memory.  
 The {\tt StarTable} interface provides both sequential and random
-methods of data access for different processing modes; 
+methods of data access for different processing requirements; 
 in the former limited memory use can be achieved
 by streaming the data a row at a time, and in the latter by
 caching the cell data in a temporary disk file.
 
 STIL is fully documented; the public classes have comprehensive javadocs,
-and a user document, SUN/252, which contains examples and overview
+and a user document, 
+\htmladdnormallink{SUN/252}{http://www.starlink.ac.uk/stil/sun252/}, 
+which contains examples and overview
 documentation is available in HTML and PDF formats.
 
 \subsection{STIL for VOTables}
@@ -347,9 +353,10 @@ a few comments on this handler in particular.
 
 The STIL VOTable parser is, as far as we know, the only one
 which fully supports the VOTable standard.
-Although other available parsers can read the pure-XML TABLEDATA variant
-of the format, no others can read the FITS and BINARY variants.
-For reasons of bandwidth and CPU efficiency, TABLEDATA is inappropriate
+Although other available parsers can read the pure-XML {\sc TABLEDATA} 
+variant of the format, no others can read the {\sc FITS} and {\sc BINARY} 
+variants.
+For reasons of bandwidth and CPU efficiency, {\sc TABLEDATA} is inappropriate
 for encoding very large amounts of data, so this ability is of
 considerable significance.  As well as reading,
 STIL also makes it easy to write VOTables in any of the three variants.
@@ -357,13 +364,114 @@ STIL also makes it easy to write VOTables in any of the three variants.
 By use of custom stream-based (SAX) parsing, it is also able to
 provide a hierarchical in-memory view (DOM) of the structure of a 
 VOTable document even when very large tables are involved without
-the customary disadvantage of heavy memory usage.  This capability
-and how it is achieved are explained in more detail in the documentation.
+the customary disadvantage of heavy memory usage.
 
 
 \section{TOPCAT}
 
 \htmladdnormallinkfoot{TOPCAT}{http://www.starlink.ac.uk/topcat/}
+is a graphical user application for viewing, analysis and editing
+of tables.  Being based on STIL it can read and write multiple
+table formats, and is extensible to new ones in the same way.
+It is not in practice able to cope with tables of unlimited size,
+but is happy to manipulate fairly large ones; on a normal desktop
+machine tables of order $10^6$ rows $\times$ $10^2$ columns can be 
+processed easily.
+The program can be deployed in a number of ways, including as a WebStart 
+application or from a single local jar file.
+Comprehensive user documentation is available either in PDF or HTML
+form, or from within the program's context-sensitive help browser.
+
+The program offers many ways to view and manipulate the data and metadata
+of tables.  Some of the actions it permits are:
+\begin{itemize}
+\item View/edit table data in a scrollable browser
+\item View/edit table and column metadata
+\item Re-order, hide and unhide existing columns
+\item Insert algebraically-defined `synthetic' columns
+\item Sort the rows
+\item Define row subsets (selections of the rows) in various ways, 
+      including graphically and algebraically
+\item Plot columns against each other, distinguishing different row subsets
+\item Calculate statistics on each column for some or all rows
+\item Perform cross-matching between tables or within a table
+\item Concatenate the rows of existing tables to create new ones
+\end{itemize}
+Some, though by no means all, of the key capabilities are 
+described in more detail in the remaining sections.
+
+\subsection{Plotting}
+
+The Plot Window displays a scatter-plot of values from one of a table's
+columns against those of another.  The columns can be selected 
+interactively, and logarithmic or reversed axes may be selected if
+desired.  It is easy to zoom in and out to focus on regions of interest
+in the plot.  If multiple row subsets have been defined, they will be
+plotted with different symbols, and the user can select which subsets are 
+displayed and control the kinds of plotting symbols that are used.  
+New subsets can be defined by marking them out by 
+indicating a rectangular region or drawing an arbitrary shape or shapes
+with the mouse.
+The plot currently in view can be exported at any time to Postscript or
+GIF format.
+
+\subsection{Joining Tables}
+
+TOPCAT provides flexible and efficient facilities for cross-matching,
+either between two or more tables, or internally to a single one.
+A number of match criteria are possible; the most common one is
+a maximum angular separation between two (RA,Dec) points on the
+celestial sphere, but also available are criteria based on 
+field equivalence, isotropic or anisotropic Cartesian separation
+in one, two or more dimensions, and combinations of these.
+In most cases, the speed of the match algorithm
+scales as $O(N \log N)$, where $N$ is the total number of rows
+involved.
+
+It is also possible to concatenate two tables ``head-to-toe'' by
+specifying the correspondence of columns between them.
+
+\subsection{Algebraic Expressions}
+
+A powerful feature of TOPCAT is the ability to create new columns 
+or specify row subsets algebraically.  In both cases the user 
+enters a textual expression in which the names or identifiers of
+table columns serve as variable names; this expression 
+can be evaluated for each row with each column identifier evaluating
+to that column's entry in the row.  The expression thus defines a
+new `synthetic' column, and if this has a boolean value it can be
+taken to define a row subset (if it evaluates true for a given row,
+that row is taken to be included).
+
+The expression syntax is powerful and extensible; expressions are
+actually written in the Java language and compiled directly.
+This means that the full power of a programming language can be
+used to define operations.  A number of functions such as arithmetic,
+trigonometric and string manipulations are initially available,
+but this can be augmented by the user by writing Java
+classes which define new functions and making them known to the program
+at run time.  Despite this flexibility, it is in many cases easy for
+the non-specialist to specify algebraic expressions; 
+for instance to create a new column which contains the average
+of columns named {\sc rmag} and {\sc bmag}, it is only necessary to enter the
+expression ``{\tt (RMAG+BMAG)*0.5}''.
+
+\subsection{Activation Actions}
+
+Facilities exist in TOPCAT to focus on a particular row of a table,
+which can be useful for instance if it is an outlier in some sense.
+If you click on the row in the table browser, the corresponding point
+becomes highlighted in the plot window, and vice versa.
+It is also possible to cause other actions to take place when a row
+is ``activatted'' in this way; one possibility is to make a request to a
+cutout server to retrieve an image of the sky region around
+the selected row.  There are pre-packaged facilities to query 
+servers for 2MASS quick-look, SDSS or DSS cutouts, but it is possible
+to configure almost any action (defined by user-supplied classes)
+to occur on such activations.
+
+
+
 
 
 %-----------------------------------------------------------------------
