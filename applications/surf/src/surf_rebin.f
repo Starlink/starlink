@@ -13,7 +13,7 @@
 *     ADAM A-task
 
 *  Invocation:
-*     CALL REDS_WTFN_REBIN (METHOD, STATUS)
+*     CALL REDS_REBIN (TSKNAME, STATUS)
 
 *  Arguments:
 *     TSKNAME = CHARACTER * () (Given)
@@ -24,33 +24,30 @@
 
 *  Description:
 *     This routine rebins the demodulated data from SCUBA MAP observations
-*     onto a rectangular mesh by convolving it with a weighting function.
-*     Currently linear and bessel weighting function are supported.
-*
+*     onto a rectangular mesh by a variety of methods.
+*     Currently convolution by weighting functions and splines are 
+*     supported.
+*     - Weighting functions:
+*     Currently linear and bessel weighting functions are supported.
 *     The width of the Bessel function is such that it should preserve all
 *     spatial information obtained by the telescope at the wavelength of
 *     observation, but suppress higher spatial frequencies. To minimise edge
 *     effects the Bessel function is truncated at a radius of 10 half-widths
 *     from the centre, and apodized over its outer third by a cosine function.
-*     A linear weighting function is also available which works out
-*     to one half-width - this has the advantage that it is much faster to
-*     process and is much less susceptible to edge effects. 
-*
 *     Viewed in frequency space the method consists of Fourier transforming 
 *     the input dataset(s), multiplying the transform by a cylindrical top-hat
 *     (the F.T. of the Bessel function), then transforming back into image
 *     space.
+*     A linear weighting function is also available which works out
+*     to one half-width - this has the advantage that it is much faster to
+*     process and is much less susceptible to edge effects. 
 *
+*     -Splines:
 *     Additionally, spline interpolation and smoothing routines are also
 *     available. Note that the spline routines work on each integration
 *     in turn, whereas the weighting function routines work on all the input
-*     data in one go.
-
-*     The relative weights associated with each point in the output map
-*     are stored in a WEIGHTS NDF in the REDS extension of the output 
-*     data. For spline rebinning each point is equivalent to the number
-*     of integrations added into the final data point. For weight function
-*     regridding the situation is more complicated.
+*     data in one go. At present the spline routines are experimental and
+*     comments are welcomed.
 
 *     If this task is invoked as BOLREBIN then a separate map will be made
 *     of each bolometer. The output file will contain an NDF for each 
@@ -62,13 +59,9 @@
 
 
 *  Usage:
-*     rebin REBIN_METHOD OUT_COORDS PIXSIZE_OUT
+*     rebin
 
 *  ADAM parameters:
-*     REF = NDF (Read)
-*        The name of the first NDF to be rebinned. The name may also be the
-*        name of an ASCII text file containing NDF and parameter values.
-*        See the notes. REF can be a SCUBA section.
 *     IN = NDF (Read)
 *        The name of the input file to be rebinned. This parameter is requested
 *        repeatedly until a NULL value (!) is supplied. LOOP must be TRUE.
@@ -85,7 +78,8 @@
 *        if noloop.
 *     OUT = NDF (Write)
 *        For REBIN this is the name of the NDF that will contain the rebinned 
-*        map. For BOLREBIN this is the name of the HDS container file.
+*        map. For BOLREBIN or INTREBIN this is the name of the HDS container 
+*        file.
 *     OUT_COORDS = _CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
 *        systems are:
@@ -96,6 +90,8 @@
 *        - RJ:  RA/Dec (J2000)
 *        - RD:  RA/Dec (epoch of observation)
 *        - GA:  Galactic coordinates (J2000)
+*
+*        For RD current epoch is taken from the first input file.
 *     OUT_OBJECT = _CHAR (Read)
 *        The name of the object (ie the NDF title).
 *     PIXSIZE_OUT = _REAL (Read)
@@ -108,8 +104,13 @@
 *        - SPLINE1: Interpolating spline (PDA_IDBVIP)
 *        - SPLINE2: Smoothing spline (PDA_SURFIT)
 *        - SPLINE3: Interpolating spline (PDA_IDSFFT)
+*
 *        Please refer to the PDA documentation (SUN/194) for more information
 *        on the spline fitting algorithms.
+*     REF = NDF (Read)
+*        The name of the first NDF to be rebinned. The name may also be the
+*        name of an ASCII text file containing NDF and parameter values.
+*        See the notes. REF can be a SCUBA section.
 *     SHIFT_DX = _REAL (Read)
 *        The pointing shift (in X) to be applied that would bring the
 *        maps in line. This is a shift in the output coordinte frame.
@@ -132,20 +133,30 @@
 *        Rebin the maps with Bessel weighting function. Each bolometer is 
 *        rebinned separately and placed in an NDF in the output container file
 *        map.sdf. Bolometer H7 can be accessed by displaying map.h7.
+*     intrebin noloop IN=test.bat
+*        Rebin the files specified in test.bat but storing each integration
+*        in a separate NDF (named I1, I2 etc).
 
 *  Notes: 
 *     For each file name that is entered, values for the parameters
-*     SELECT_INTS, WEIGHT, SHIFT_DX and SHIFT_DY are requested.
+*     WEIGHT, SHIFT_DX and SHIFT_DY are requested.
 *     - The application can read in up to 100 separate input datasets. 
 *     - The output map will be large enough to include all data points.
 *     - Spline regridding may have problems with SCAN/MAP (since integrations
 *     contain lots of overlapping data points).
-*     - The REF and IN parameters accept ASCII text files as input. These
+*     - SCUBA sections can be given along with any input NDF
+*     - The relative weights associated with each point in the output map
+*     are stored in a WEIGHTS NDF in the REDS extension of the output 
+*     data. For spline rebinning each point is equivalent to the number
+*     of integrations added into the final data point. For weight function
+*     regridding the situation is more complicated.
+
+*     The REF and IN parameters accept ASCII text files as input. These
 *     text files may contain comments (signified by a #), NDF names,
 *     values for the parameters WEIGHT, SHIFT_DX, SHIFT_DY and USE_SECTION,
 *     and names of other ASCII files. There is one data file per line.
 *     An example entry is:
-*
+*    
 *         file1{b5}   1.0   0.5   0.0  YES
 *         # This is file2
 *         file2       0.9   0.0   0.0  # No section needed
@@ -153,7 +164,9 @@
 *     Note that the parameters are position dependent and are not necessary.
 *     Missing parameters are requested. This means it is not possible to
 *     specify SHIFT_DX (position 3) without specifying the WEIGHT.
-*     Also note that SCUBA sections can be specified with any input NDF.
+*     If the file has the .txt extension the NDF system will attempt to
+*     convert it to NDF format before processing -- this is probably not
+*     what you want.
 
 
 *  Authors :
@@ -164,6 +177,9 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
+*     Revision 1.34  1997/06/05 22:50:41  timj
+*     Initialise pointers
+*
 *     Revision 1.33  1997/05/22 01:12:36  timj
 *     Merge with REDS_REBIN.
 *     Support weights in EXTRACT_DATA.
@@ -648,7 +664,14 @@ c
      :           STATUS)
 
 *     Check error return
-            IF (STATUS .NE. SAI__OK) THEN
+
+            IF (STATUS .EQ. PAR__ABORT) THEN
+*     If the status is ABORT then I should not annul the status
+*     but should exit loop gracefully
+
+               READING = .FALSE.
+
+            ELSE IF (STATUS .NE. SAI__OK) THEN
                IF (FILE .GT. MAX_FILE) READING = .FALSE.
                CALL MSG_SETC('TASK', TSKNAME)
                CALL ERR_REP(' ','^TASK: Error occured whilst '//
@@ -958,6 +981,15 @@ c
                DO I = 1, FILE
 
                   N_PTS(I) = N_POS(I)
+*     Initialise pointers
+                  ABOL_DATA_PTR(I) = 0
+                  ABOL_DATA_END(I) = 0
+                  ABOL_VAR_PTR(I) = 0
+                  ABOL_VAR_END(I) = 0
+                  ABOL_RA_PTR(I) = 0
+                  ABOL_RA_END(I) = 0
+                  ABOL_DEC_END(I) = 0
+
 *     Extract EACHBOL from each file
 *     Need IN_DATA_PTR, BOL_RA_PTR and BOL_DEC_PTR
 *     Get the memory

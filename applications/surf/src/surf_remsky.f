@@ -514,6 +514,13 @@
          END IF
 
          IF (DOCLIP) THEN
+*  Initalise Pointers
+            IF (STATUS .EQ. SAI__OK) THEN
+               BOL_PTR = 0
+               BOL_END = 0
+               BOL_QPTR = 0
+               BOL_QPTR_END = 0
+            END IF
 
 *  Grab some scratch data
             CALL SCULIB_MALLOC(N_POS * VAL__NBR, BOL_PTR,
