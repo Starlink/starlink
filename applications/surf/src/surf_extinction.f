@@ -197,6 +197,7 @@
       REAL             FIRST_TAU        ! zenith sky opacity at FIRST_LST
       CHARACTER*80     FITS (SCUBA__MAX_FITS)
                                         ! array of FITS keyword lines
+      CHARACTER*132    FNAME            ! Input filename
       INTEGER          I                ! DO loop variable
       INTEGER          INDF             ! NDF identifier of input file
       INTEGER          IN_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -285,6 +286,7 @@
       CHARACTER*30     OBJECT           ! name of object observed
       CHARACTER*15     OBSERVING_MODE   ! type of observation
       INTEGER          OUTNDF           ! NDF identifier of output file
+      CHARACTER*132    OUTFILE          ! Output filename
       INTEGER          OUT_BOL_ADC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
                                         ! A/D numbers of bolometers in output
                                         ! file
@@ -333,9 +335,14 @@
                                         ! instruments observed
       CHARACTER*15     SUB_REQUIRED     ! sub-instrument required for reduction
                                         ! wavelengths of observation
+      CHARACTER * (10) SUFFIX_STRINGS(SCUBA__N_SUFFIX) ! Suffix for OUT
       INTEGER          UBND (MAXDIM)    ! upper bounds of array
       DOUBLE PRECISION UT1              ! UT1 of start of observation expressed
                                         ! as modified Julian day
+      REAL             WAVE             ! Wavelength of sub inst
+
+*  Local Data:
+      DATA SUFFIX_STRINGS /'_ext_','x'/
 
 *.
 
@@ -349,6 +356,10 @@
       CALL NDF_BEGIN
 
       CALL NDF_ASSOC ('IN', 'READ', INDF, STATUS)
+
+*     Get the name of the filename associated with 'IN'
+
+      CALL SCULIB_GET_FILENAME('IN', FNAME, STATUS)
 
 * Read in badbit mask
       CALL NDF_BB(INDF, BADBIT, STATUS)
@@ -663,7 +674,7 @@
 *  find and report the sub instruments used and filters for this observation
 
       CALL SCULIB_GET_SUB_INST(PACKAGE, N_FITS, FITS, 'SUB_INSTRUMENT',
-     :     N_SUB, SUB_POINTER, RTEMP, SUB_REQUIRED, STEMP, STATUS)
+     :     N_SUB, SUB_POINTER, WAVE, SUB_REQUIRED, STEMP, STATUS)
 
 *  for a PHOTOM observation read the PHOT_BB array and check its dimensions
 
@@ -774,6 +785,22 @@
 *     Now create a section of the required size
 
       CALL NDF_SECT(INDF, NDIM, LBND, UBND, SECNDF, STATUS)
+
+*     Generate a default name for the output file
+      CALL SCULIB_CONSTRUCT_OUT(FNAME, SUFFIX_ENV, SCUBA__N_SUFFIX,
+     :     SUFFIX_OPTIONS, SUFFIX_STRINGS, OUTFILE, STATUS)
+
+*     For extinction we need to append something to identify
+*     the sub-instrument. For now I will just append the wavelength
+
+      CALL CHR_RTOC(WAVE, STEMP, ITEMP)
+
+      ITEMP = CHR_LEN(OUTFILE)
+      CALL CHR_APPND(STEMP, OUTFILE, ITEMP)
+
+*     set the default
+      CALL PAR_DEF0C('OUT', OUTFILE, STATUS)
+
 
 *     And propogate the section to the output (including the axes)
 
