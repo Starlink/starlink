@@ -23,6 +23,7 @@
    
 #  Authors:
 #     PDRAPER: Peter Draper (STARLINK - Durham University)
+#     MBT: Mark Taylor (STARLINK)
 #     {enter_new_authors_here}
    
 #  History:
@@ -35,6 +36,8 @@
 #     29-AUG-1995 (PDRAPER):
 #        Changed to use .ccdpack in the current directory as the
 #        default. 
+#     3-JUL-2001 (MBT):
+#        Modified the arguments of CCDGetFileName.
 #     {enter_further_changes_here}
    
 #-
@@ -54,7 +57,7 @@
          set oldfilt "*"
       }
       set CCDimportfilter ".*"
-      CCDGetFileName $topwin "Restore state from file"
+      CCDGetFileName $topwin "Restore state from file" 0
       if { $CCDimportexists } {
 
 #  Source the file in the global scope.

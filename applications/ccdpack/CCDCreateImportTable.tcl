@@ -161,6 +161,8 @@
 #        of Fitstable when import table read in.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Modified the arguments of CCDGetFileName.
 #     {enter_changes_here}
 
 #-
@@ -296,7 +298,7 @@
           } else {
              set importfile {}
           }
-          CCDGetFileName $Topwin.refndf \"Select reference frame\"
+          CCDGetFileName $Topwin.refndf \"Select reference frame\" 1
           if { \$CCDimportexists } {
              set rndf \[CCDFileToNDFName \"\$CCDimportfile\" \]
              $Refndf clear 0 end
@@ -315,7 +317,7 @@
           global CCDimportfilter
           global ict_modified
           set CCDimportfilter \"*.DAT\"
-          CCDGetFileName $Topwin.restore {Read import table file}
+          CCDGetFileName $Topwin.restore {Read import table file} 0
           if { \$CCDimportexists } {
              CCDRestoreFromImportFile \$CCDimportfile $Fitstable $Transtable
              set ict_modified 0

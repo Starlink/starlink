@@ -45,6 +45,8 @@
 #        Converted to new coding style.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Modified the arguments of CCDGetFileName.
 #     {enter_further_changes_here}
 
 #-
@@ -85,7 +87,7 @@
 
 #  Add command to Options menu to select from existing files.
       $Menu addcommand {Options} {Select from existing files...} \
-         "CCDGetFileName $Top.getfile \"Select from existing files\"
+         "CCDGetFileName $Top.getfile \"Select from existing files\" 0
              if { \$CCDimportexists } {
                 $Name clear 0 end
                 $Name insert 0 \$CCDimportfile

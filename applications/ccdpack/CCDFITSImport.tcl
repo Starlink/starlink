@@ -44,6 +44,8 @@
 #        Recoded to new standards.
 #     16-MAY-2000 (MBT):
 #        Upgraded for Tcl8.
+#     3-JUL-2001 (MBT):
+#        Modified the arguments of CCDGetFileName.
 #     {enter_changes_here}
 
 #-
@@ -138,7 +140,7 @@
 	  global CCDimportfilter 
           set CCDimportexists 0
 	  set CCDimportfilter \"*.DAT\"
-          CCDGetFileName $Topwin.getnames {Select import control table}
+          CCDGetFileName $Topwin.getnames {Select import control table} 0
           if { \$CCDimportexists } {
              $Table clear 0 end
              $Table insert end \$CCDimportfile
