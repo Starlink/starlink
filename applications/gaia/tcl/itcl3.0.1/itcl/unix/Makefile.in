@@ -29,6 +29,7 @@ VERSION = @ITCL_VERSION@
 
 prefix =	@prefix@
 exec_prefix =	@exec_prefix@
+EXEEXT=@EXEEXT@
 
 # The following definition can be set to non-null for special systems
 # like AFS with replication.  It allows the pathnames used for installation
