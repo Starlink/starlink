@@ -48,7 +48,7 @@
       INTEGER STATUS             ! Global status
 
 *  Local Variables:
-      REAL JNTER
+      REAL INTER
       INTEGER I, J
 
 *.
@@ -56,13 +56,13 @@
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-      JNTER  = 1.0 / REAL ( NLINES - 1 )
+      INTER  = 1.0 / REAL ( NCOLS - 1 )
       DO  J  =  1, NLINES
          DO  I  =  1, NCOLS
             IMAGE( I, J ) = IMAGE( I, J ) 
-     :                      * ( 0.5 + ( JNTER * REAL ( J - 1 ) ) )
+     :                      * ( 0.5 + ( INTER * REAL ( I - 1 ) ) )
          END DO
       END DO
 
       END
-* $Id: ccdb1_flmul.f,v 1.2 1998/06/15 15:19:54 mbt Exp $
+* $Id: ccdb1_flmul.f,v 1.3 1998/06/17 10:24:20 mbt Exp mbt $
