@@ -964,8 +964,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
     bool initialisedInch = false;
     bool skipPage = false;
 
-    while (! end_of_file)
-    {
+    while (! end_of_file) {
 	if (skipPage)
 	    ev = dvif->getEndOfPage();
 	else
@@ -1177,7 +1176,7 @@ void process_dvi_file (DviFile *dvif, bitmap_info& b, int fileResolution,
 		 = dynamic_cast<DviFilePostamble*>(ev))
 	    end_of_file = true;
 
-	delete ev;
+	ev->release();
     }
 
     if (verbosity > quiet)

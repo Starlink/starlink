@@ -193,6 +193,11 @@ DviFileEvent *DviFile::getEndOfPage()
  * <p>The events which can be returned are all of the subclasses of
  * {@link DviFileEvent}, qv.
  *
+ * <p>When you are finished with the returned event, you should
+ * release it by a call to the event's {@link DviFileEvent#release
+ * release} method, after which
+ * you should make no further reference to it.
+ *
  * @return the next event from the DVI file, or zero if
  * <code>eof()</code> is true
  */
@@ -1130,6 +1135,31 @@ void DviFile::process_preamble(DviFilePreamble* p)
 	     << " device_units=" << device_units
 	     << "=>max_drift_=" << max_drift_
 	     << endl;
+}
+
+/**
+ * Release this event.  Client code which has been given an event by
+ * {@link DviFile#getEvent} should call this method on that event when
+ * it has no further use for it.  This releases or reclaims all
+ * resources associated with it.  This <em>may</em> call <code>delete</code> on
+ * the associated object, so the client code should assume that it has
+ * done so, and make no further reference to the object.
+ */
+void DviFileEvent::release()
+{
+    releaseEvent(this);
+}
+
+/**
+ * Really release the given event.  This is called by {@link #release}
+ * to do the work of releasing the object.  In future, we may make
+ * this cleverer, and allow it to release the event back into a pool
+ *
+ * @param event the event to be released
+ */
+void DviFileEvent::releaseEvent(DviFileEvent *event)
+{
+    delete event;
 }
 
 void DviFileEvent::debug ()

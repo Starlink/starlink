@@ -221,7 +221,7 @@ int main (int argc, char **argv)
 		end_of_file = true;
 	    }
 	
-	    delete ev;
+	    ev->release();
 	}
     } catch (DviError& e) {
 	cerr << "Error processing DVI file " << dviname 

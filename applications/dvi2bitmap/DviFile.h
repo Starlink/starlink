@@ -502,6 +502,11 @@ private:
  * calling the {@link DviFile#getEvent} method on
  * <code>DviFile</code>.
  *
+ * <p>The design here is likely to be adjusted in future releases of
+ * this library.  Although it is possible now, you should avoid
+ * constructing any of the subtypes <code>DviFileEvent</code>
+ * yourself, but use only those returned to you by {@link DviFile#getEvent}.
+ *
  * <p>The documentation here concentrates on how the methods and
  * variables here relate to the underlying quantities obtained from
  * the DVI file.  For fuller information on these, see the DVI standard.
@@ -531,6 +536,8 @@ class DviFileEvent {
      */
     const unsigned char opcode() const { return opcode_; }
 
+    void release();
+
  protected:
     /**
      * Creates a new event.
@@ -546,6 +553,8 @@ class DviFileEvent {
     const unsigned char opcode_;
     DviFile *dviFile_;
     const eventTypes type_;
+
+    static void releaseEvent(DviFileEvent *e);
 };
 class DviFileSetChar : public DviFileEvent {
  public:
