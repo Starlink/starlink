@@ -1,8 +1,11 @@
 import org.w3c.dom.*;
+import java.io.PrintStream;
 import java.util.Iterator;
-import java.util.Set;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 
 /**
@@ -11,17 +14,33 @@ import java.util.Stack;
  *
  * <p>Usage:
  * <pre>
- * java GenerateDependencies componentset.xml >Makefile.dependencies
+ * java GenerateDependencies --makefile=Makefile.dependencies componentset.xml
  * </pre>
  * <p>The input XML file must conform to the
  * <code>componentinfo.dtd</code> DTD, with a top-level element of
  * <code>&lt;componentset&gt;</code>.
+ *
+ * <p>All options:
+ * <dl>
+ * <dt><code>--buildsequence=filename</code>
+ * <dd>Writes a file which lists all the non-obsolete,
+ * non-buildsupport, components, in a sequence which respects the
+ * dependencies read from the input file.
+ * <dt><code>--makefile[=filename]</code>
+ * <dd>Names the output makefile.  If no argument is given, or if the
+ * argument is "-", the makefile is written to stduot.
+ * <dt><code>--verbose</code>
+ * <dd>Turn on chattering.
+ * </dl>
+ * <p>At least one of <code>--makefile</code> or
+ * <code>--buildsequence</code> must be specified.
  *
  * @author Norman Gray
  */
 public class GenerateDependencies {
 
     private static boolean verbose = false;
+    private static boolean testMode = false;
 
     /**
      * Global status, returned at end, and incremented internally on errors.
@@ -29,17 +48,55 @@ public class GenerateDependencies {
     private static int globalStatus = 0;
 
     public static void main (String[] args) {
-        boolean testMode = false;
         String xmlinput = null;
+        PrintStream makefileStream = null;
+        PrintStream buildSequenceStream = null;
+        Pattern optionPattern = Pattern.compile("^--([a-z]*)(=(.*))?");
 
         for (int i=0; i<args.length; i++) {
-            if (args[i].startsWith("--")) {
-                if (args[i].equals("--test"))
+            java.util.regex.Matcher m = optionPattern.matcher(args[i]);
+            if (m.matches()) {
+                String opt = m.group(1);
+                if (opt.equals("buildsequence")) {
+                    String fn = m.group(3);
+                    if (fn == null || fn.length() == 0)
+                        // no argument
+                        Usage();
+                    try {
+                        buildSequenceStream = new PrintStream
+                                (new java.io.FileOutputStream(fn));
+                        if (verbose)
+                            System.err.println("Build sequence written to "
+                                               + fn);
+                    } catch (java.io.FileNotFoundException e) {
+                        System.err.println("Can't create file: " + e);
+                        Usage();
+                    }
+                } else if (opt.equals("makefile")) {
+                    String makefileName = m.group(3);
+                    if (makefileName == null
+                        || makefileName.length()==0
+                        || makefileName.equals("-")) {
+                        makefileStream = System.out;
+                    } else {
+                        try {
+                            makefileStream = new PrintStream
+                                (new java.io.FileOutputStream(makefileName));
+                            if (verbose)
+                                System.err.println("Makefile written to "
+                                                   + makefileName);
+                        } catch (java.io.FileNotFoundException e) {
+                            System.err.println("Can't create file: " + e);
+                            Usage();
+                        }
+                    }
+                } else if (opt.equals("test")) {
                     testMode = true;
-                else if (args[i].equals("--verbose"))
+                } else if (opt.equals("verbose")) {
                     verbose = true;
-                else
+                } else {
                     Usage();
+                }
             } else {
                 if (xmlinput != null)
                     Usage();
@@ -49,6 +106,9 @@ public class GenerateDependencies {
         }
 
         if (xmlinput == null)
+            Usage();
+
+        if (makefileStream == null && buildSequenceStream == null)
             Usage();
 
         try {
@@ -84,6 +144,41 @@ public class GenerateDependencies {
         // <link> dependencies if the <dependencies> element has
         // buildincludeslink="yes"
 
+        if (makefileStream != null)
+            makeMakefile(makefileStream);
+
+        if (buildSequenceStream != null) {
+            List buildSequence = makeBuildSequence();
+            for (Iterator li = buildSequence.iterator(); li.hasNext(); ) {
+                buildSequenceStream.println((Component)li.next());
+            }
+        }
+
+        System.exit(globalStatus);
+    }
+
+    private static void Usage() {
+        System.err.println("GenerateDependencies [--test] [--verbose] [--makefile[=filename]] [--buildsequence=filename] xml-file");
+        System.exit(1);
+    }
+
+    /**
+     * Display a set's contents.  Mostly, but not entirely, a debugging
+     * method.
+     */
+    private static String showSet(Set s) {
+        StringBuffer sb = new StringBuffer("{");
+        if (s == null)
+            sb.append(" <null>");
+        else
+            for (Iterator si=s.iterator(); si.hasNext(); )
+                sb.append(' ').append(si.next().toString());
+        sb.append(" }");
+        return sb.toString();
+    }
+
+    private static void makeMakefile(PrintStream makefile) {
+
         String manifestString = "$(MANIFEST)/";
         String newlineString = " \\\n\t\t";
         String makeBuildsupportString = "\t    && if test -n \"$$BUILDSUPPORT_PREFIX\"; then \\\n\t        ./configure --prefix=$$BUILDSUPPORT_PREFIX \\\n\t            >configure-output.log; \\\n\t    elif test ! -f Makefile; then \\\n\t        { t=\"Directory unconfigured but BUILDSUPPORT_PREFIX undefined\";\\\n\t          echo $$t >configure-output.log; echo $$t >&2; \\\n\t          exit 1; }; \\\n\t    else \\\n\t        echo \"No configuration necessary\" >configure-output.log; \\\n\t    fi \\";
@@ -116,7 +211,7 @@ public class GenerateDependencies {
                 "",
             };
             for (int i=0; i<banner.length; i++)
-                System.out.println(banner[i]);
+                makefile.println(banner[i]);
         }
 
         java.util.List allbuildsupport = new java.util.LinkedList();
@@ -130,7 +225,7 @@ public class GenerateDependencies {
                         ("Circularity detected in sourceset dependencies of "
                          + c.getName());
                 if (testMode)
-                    System.out.println("Component " + c
+                    makefile.println("Component " + c
                                        + ": circular sourceset dependencies");
                 else
                     globalStatus++;
@@ -143,7 +238,7 @@ public class GenerateDependencies {
                         ("Circularity detected in build dependencies of "
                          + c.getName());
                 if (testMode)
-                    System.out.println("Component " + c
+                    makefile.println("Component " + c
                                        + ": circular build dependencies");
                 else
                     globalStatus++;
@@ -165,25 +260,25 @@ public class GenerateDependencies {
 
             // Comments before the target
             if (componentType == "confdep")
-                System.out.println("# Component " + c
+                makefile.println("# Component " + c
                  + " is a configure dependency, so is configurable in place.");
             if (componentType == "buildsupport")
-                System.out.println("# Component " + c 
+                makefile.println("# Component " + c 
                                    + " is a buildsupport component");
             Set confdeps = c.getCompleteDependencies(Dependency.CONFIGURE);
             if (confdeps != null && confdeps.size() > 0) {
-                System.out.println("# Component " + c
+                makefile.println("# Component " + c
                                  + " has configure dependencies on "
                                  + showSet(confdeps) + ",");
-                System.out.println("# which must be built before this component is configured.");
+                makefile.println("# which must be built before this component is configured.");
             }
             if (c.getStatus() == Component.STATUS_OBSOLETE) {
-                System.out.println("# Component " + c
+                makefile.println("# Component " + c
                                    + " is OBSOLETE -- do not build");
             }
 
             // Emit the target
-            System.out.print(manifestString + c.getName() + ':');
+            makefile.print(manifestString + c.getName() + ':');
 
 
             // Emit the list of dependencies
@@ -194,7 +289,7 @@ public class GenerateDependencies {
                 // and don't emit a dependency of a component on itself
                 // (which is possible but harmless, and confuses make).
                 if (cpt != lastComponent && cpt != c) {
-                    System.out.print(newlineString + manifestString + cpt);
+                    makefile.print(newlineString + manifestString + cpt);
                     lastComponent = cpt;
                 }
 
@@ -204,18 +299,18 @@ public class GenerateDependencies {
                                        + cpt.getName());
                 }
             }
-            System.out.println();
+            makefile.println();
 
             // Emit the rule
-            System.out.println(cdString + c.componentPath() + " \\");
+            makefile.println(cdString + c.componentPath() + " \\");
             if (componentType == "buildsupport") {
-                System.out.println(makeBuildsupportString);
+                makefile.println(makeBuildsupportString);
                 allbuildsupport.add(c);
             } else if (componentType == "confdep") {
-                System.out.println(runConfigureString);
+                makefile.println(runConfigureString);
             }
-            System.out.println(makeString);
-            System.out.println();
+            makefile.println(makeString);
+            makefile.println();
         }
 
         // Add all of the buildsupport tools to either autoBuildsupport or
@@ -232,58 +327,90 @@ public class GenerateDependencies {
                     .append(manifestString)
                     .append(c.getName());
         }
-        System.out.println();
-        System.out.println("# Buildsupport tools -- building and cleaning");
-        System.out.println("BUILDSUPPORT_MANIFESTS ="
+        makefile.println();
+        makefile.println("# Buildsupport tools -- building and cleaning");
+        makefile.println("BUILDSUPPORT_MANIFESTS ="
                            + autoBuildsupport.toString());
-        System.out.println("EXTRA_BUILDSUPPORT_MANIFESTS ="
+        makefile.println("EXTRA_BUILDSUPPORT_MANIFESTS ="
                            + nonautoBuildsupport.toString());
-        System.out.println();
-        System.out.println("buildsupport: $(BUILDSUPPORT_MANIFESTS)");
-        System.out.println("clean-buildsupport:");
-        System.out.println("\trm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)");
+        makefile.println();
+        makefile.println("buildsupport: $(BUILDSUPPORT_MANIFESTS)");
+        makefile.println("clean-buildsupport:");
+        makefile.println("\trm -f $(BUILDSUPPORT_MANIFESTS) $(EXTRA_BUILDSUPPORT_MANIFESTS)");
 
         // Emit the list of configure dependencies, if any
         Set confdeps = Dependency.getConfigureDependencies();
-        System.out.println();
+        makefile.println();
         if (confdeps.isEmpty()) {
-            System.out.println("# No configure dependencies");
-            System.out.println("configure-deps:");
-            System.out.println
+            makefile.println("# No configure dependencies");
+            makefile.println("configure-deps:");
+            makefile.println
                     ("\techo \"There are no configure dependencies\"");
         } else {
-            System.out.println("# Configuration dependencies");
-            System.out.println("# Run 'make configure-deps' to make these components before ./configure");
-            System.out.print("configure-deps:");
+            makefile.println("# Configuration dependencies");
+            makefile.println("# Run 'make configure-deps' to make these components before ./configure");
+            makefile.print("configure-deps:");
             for (Iterator cdi=confdeps.iterator(); cdi.hasNext(); ) {
                 Component c = (Component)cdi.next();
-                System.out.print(newlineString + manifestString + c);
+                makefile.print(newlineString + manifestString + c);
             }
-            System.out.println();
+            makefile.println();
         }
-
-        System.exit(globalStatus);
     }
-
-    private static void Usage() {
-        System.err.println("GenerateDependencies [--test] [--verbose] xml-file");
-        System.exit(1);
+    
+    /**
+     * Creates a list of all the dependencies in an order which
+     * respects the dependencies.  That is, each (Component) element
+     * in the list comes after each of the components upon which it
+     * depends.
+     *
+     * @param dependencies a Set of Dependency objects
+     * @return a List of Components, in (one possible) build order
+     */
+    private static List makeBuildSequence() {
+        List buildSeq = new java.util.ArrayList();
+        Set seenCpts = new java.util.HashSet();
+        
+        for (Iterator cpts=Component.allComponents(); cpts.hasNext(); ) {
+            Component cpt = (Component)cpts.next();
+            pseudoMake(cpt, buildSeq, seenCpts);
+        }
+        return buildSeq;
     }
 
     /**
-     * Display a set's contents.  Mostly, but not entirely, a debugging
-     * method.
+     * Does a `make' on the given component, adding it to the list of
+     * `make' components.  This imitates the action of make in
+     * following through the chain of dependencies, but the only
+     * actual action is to add the component to the build-sequence
+     * list.
+     *
+     * @param cpt the Component to make
+     * @param buildSeq the build sequence as a list, edited in place
+     * (not very Functional!)
+     * @param seenCpts the set of components already traversed by
+     * this method
      */
-    private static String showSet(Set s) {
-        StringBuffer sb = new StringBuffer("{");
-        if (s == null)
-            sb.append(" <null>");
-        else
-            for (Iterator si=s.iterator(); si.hasNext(); )
-                sb.append(' ').append(si.next().toString());
-        sb.append(" }");
-        return sb.toString();
+    private static void pseudoMake(Component cpt,
+                                   List buildSeq,
+                                   Set seenCpts) {
+        if (seenCpts.contains(cpt))
+            return;
+        seenCpts.add(cpt);
+
+        if (cpt.getStatus() == Component.STATUS_OBSOLETE
+            || cpt.getBuildsupport() != Component.BUILDSUPPORT_NO)
+            return;
+
+        Set deps = cpt.getDeps(Dependency.SOURCESET);
+        deps.addAll(cpt.getDeps(Dependency.BUILD));
+        for (Iterator i = deps.iterator(); i.hasNext(); ) {
+            Component depcpt = ((Dependency)i.next()).component();
+            pseudoMake(depcpt, buildSeq, seenCpts);
+        }
+        buildSeq.add(cpt);
     }
+        
 
     /**
      * Represents a single component.
@@ -910,4 +1037,3 @@ public class GenerateDependencies {
         }
     }
 }
-
