@@ -8,9 +8,9 @@
 This window is designed for fitting an astrometric calibration to your
 image. To use it you need to go through several stages:
 
-    1) Obtain reference positions (e.g.) from a catalogue.
+    1) Obtain reference positions (e.g.) from a catalogue or DSS image.
 
-    2) Position these over the corresponding image features.
+    2) Accurately position these over the corresponding image features.
 
     3) Perform a fit from sky to image coordinates.
 
@@ -25,11 +25,24 @@ See below for more about these stages.
    =============================
 
 You can get reference position information from many sources
-(consulting your coworkers about how they get such information is
+(consulting your co-workers about how they get such information is
 often a good start), but the most easily available in GAIA is from the
 Guide Star Catalogue (GSC) and US Naval Catalogue (USNO) which you can
 query using the "Catalogues..." item under the "Data-Servers" menu on
 the main window.
+
+Reference positions can also be copied from DSS or other
+pre-calibrated images.
+
+
+   --- Copying positions from a DSS or pre-calibrated image.
+
+   Press the "Transfer" button. This will create a new dialog window
+   in which you can pick an object in the DSS image and then pick the
+   same object in the current image. Do this until you've got a
+   reasonable set, accept the positions and this will update the
+   reference positions used in this window. Press the "Fit/Test"
+   button and you'll have an approximate calibration.
 
 
    --- Copying positions from a catalogue window.
@@ -39,19 +52,12 @@ the main window.
    button. This creates a dialog window from which you need to select
    the catalogue you're interested in.
 
-   Note to use this feature you'll need to know the approximate centre
-   and size of your image (in arcminutes). One strategy to make things
-   even easier is to use this information (or perhaps just the name of
-   your object) to retrieve a Digital Sky Survey (DSS) image (see the
-   item "Image Servers..." under the "Data-Servers" menu in main
-   window). This can be used to display the catalogue positions and help
-   you identify which image features they correspond to (note that you
-   can "Grab" catalogues from other windows, and to display a second
-   image you need open the "File" menu in the main window and select
-   the "New Window" item). You can also use such an image to generate
-   your own reference positions (if the GSC or USNO catalogues do not
-   have many positions in your field).
-
+   Note to successfully overlay reference positions, your image will
+   need an approximate calibration. Do this using the method outlined
+   above for DSS images, or use the "Type in known calibration"
+   toolbox.
+ 
+  
    --- Modifying a reference position.
 
    All the reference positions are listed in rows the reference

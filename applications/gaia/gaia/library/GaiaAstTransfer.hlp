@@ -1,0 +1,29 @@
+
+	     Transfer reference positions between images
+	     ===========================================
+
+   How to use this window:
+   =======================
+
+This window is designed for transferring reference positions from one
+image to another. To use it you need to go through several stages:
+
+    1) Display the reference image with RA/Dec calibration in a new window.
+
+    2) Select it in the "RA/Dec image:" menu.
+
+    3) Select the reference data in the table that you want to
+      "update".
+
+    4) Press "Update X-Y" and select an object on the image you want
+       to calibrate.
+
+    5) Press "Update RA-Dec" and select the same object on the
+       reference image.
+
+This should result in a entry which has accurate RA/Dec coordinates
+and the associated X-Y position on your uncalibrated image. Now press
+"Add-row" to generate a new blank entry, select it and repeat the
+procedure. When you've added enough reference points press "Accept" to 
+transfer then into the originating toolbox, in which you can do the
+actual calibration.
