@@ -1,0 +1,99 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (VSD 1994-FEB-01)
+------------------------------------------------------------------------
+
+                        Command: INPUT
+
+BRIEF DESCRIPTION: Loads data from ASCII files on disk into data 
+slots. The input files may contain up to 20 columns; there is no
+restriction on the number of rows. Data is stored and processed within
+PERIOD using a slot system. A data slot is simply an array holding one
+dataset. The maximum number of data slots which can be handled at any
+one time is 40. In order to load the first slot with a single dataset,
+you should reply 1,1 to PROMPT1. Similarly, if you wish to load slots 4
+through to 9 with 6 datasets, you should reply 4,9 to PROMPT1. Note
+that slots can be overwritten. Once the slot numbers are specified, the
+number of columns in the input files are determined and the user is
+then prompted for which columns refer to the x-axis, y-axis and the
+y-axis errors (optional). If, for example, you are inputting radial
+velocity data, the x-axis should be the heliocentric Julian dates, the
+y-axis should be the corresponding radial velocity values, and if you
+wish errors to be taken into account, the y-axis errors should be the
+errors on the radial velocity measurements. These errors are used (or
+handled) by all options in the main PERIOD menu, but the only
+periodicity-finding option in the PERIOD_PERIOD sub-menu which actually
+uses the errors on data points is CHISQ. The remaining five techniques
+(CLEAN, FT, PDM, SCARGLE, STRING) ignore errorbars if they are present.
+Note also that the input file MUST contain x-axis values which are in
+ascending order, otherwise INPUT will report a warning and either sort
+the data (if requested to do so) or abort the input.
+
+PROMPT1: Enter first and last slots for input (0,0 to quit)
+TYPE   : INTEGER
+OPTIONS: Any pair of integers between 0 and 40
+DEFAULT: None
+PURPOSE: Determines the location of the input data 
+
+PROMPT2: Enter name of data file (<CR> to quit)
+TYPE   : CHARACTER*72
+OPTIONS: Any valid VMS filename
+DEFAULT: Quit INPUT and return to menu
+PURPOSE: Specifies name of input ASCII file on disk
+
+PROMPT3: Enter number of column containing X data
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and 20
+DEFAULT: None
+PURPOSE: Specifies which column in the input file corresponds
+         to the x-axis data. Data must be in ascending order
+
+PROMPT4: Enter number of column containing Y data
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and 20
+DEFAULT: None
+PURPOSE: Specifies which column in the input file corresponds
+         to the y-axis data
+
+PROMPT5: Are there errors on the Y axis data ? [Y]
+TYPE   : CHARACTER*1
+OPTIONS: Y or N
+DEFAULT: Y
+PURPOSE: Gives the user the option of including errors on the
+         y-axis data points
+
+PROMPT6: Enter number of column containing Y data errors
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and 20
+DEFAULT: None
+PURPOSE: Specifies which column in the input file corresponds
+         to the y-axis errors
+
+PROMPT7: Does this agree with the data file ? [Y]
+TYPE   : CHARACTER*1
+OPTIONS: Y or N
+DEFAULT: Y
+PURPOSE: Allows speedy loading of data into PERIOD by
+         accepting default column assignments; column 1
+         = x-axis, column 2 = y-axis and column 3 = 
+         y-axis errors
+
+PROMPT8: Is this an ANTARES file output by RUBY ? [Y]
+TYPE   : CHARACTER*1
+OPTIONS: Y or N
+DEFAULT: Y
+PURPOSE: For specialist users. INPUT has reason to believe
+         that the file has been output by ANTARES (the radial 
+         velocity routines of the RUBY data reduction/analysis 
+         package written by Keith Horne). If true, INPUT has 
+         the capability of loading the radial velocities and 
+         HJDs directly from the ANTARES file
+
+PROMPT9: Would you like to sort the data ? [N]
+TYPE   : CHARACTER*1
+OPTIONS: Y or N
+DEFAULT: N
+PURPOSE: INPUT has found x-axis data which is not in ascending
+         order. INPUT will either sort the data or abort the
+         input, depending on the response to this prompt.
+------------------------------------------------------------------------

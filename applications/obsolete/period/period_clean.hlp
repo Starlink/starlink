@@ -1,0 +1,38 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (VSD 1994-FEB-01)
+------------------------------------------------------------------------
+
+                        Command: CLEAN
+
+BRIEF DESCRIPTION: The CLEAN algorithm was originally developed for use
+in aperture synthesis and was only relatively recently applied to one-
+dimensional data. The algorithm, which is particularly useful for
+unequally-spaced data, basically deconvolves the spectral window from 
+the discrete Fourier power spectrum (or dirty spectrum). This produces 
+a CLEANed spectrum, which is largely free of the many effects of 
+spectral leakage. In order to prevent small errors from destabilizing
+the CLEAN procedure, the user is prompted for two parameters -- the 
+loop gain and the number of iterations. Briefly, with each iteration, 
+some fraction (governed by the loop gain) of the window function is 
+removed from the dirty spectrum. For convergence, the loop gain must
+lie between 0 and 2, typical values being between 0.1 and 1. Values
+at the bottom of this range require more iterations, but should 
+provide more stability. Hence, the number of iterations should be 
+large if the loop gain is small, typical values lying between 1 and 
+100. Note that an increase in the number of cleans produces a less 
+noisy spectrum but, in general, the amplitude of the peaks is 
+decreased, sometimes by a substantial amount.
+
+PROMPT1: Enter number of CLEAN iterations
+TYPE   : INTEGER
+OPTIONS: Any positive integer
+DEFAULT: None
+PURPOSE: Specifies the number of clean iterations
+
+PROMPT2: Enter loop gain
+TYPE   : REAL
+OPTIONS: Any real number between 0.0 and 2.0
+DEFAULT: None
+PURPOSE: Specifies the gain per CLEAN iteration
+------------------------------------------------------------------------

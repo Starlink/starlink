@@ -1,0 +1,46 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (VSD 1993-NOV-15)
+------------------------------------------------------------------------
+
+                        Command: PDM
+
+BRIEF DESCRIPTION: The phase dispersion minimization (PDM) technique is 
+simply an automated version of the classical method of distinguishing
+between possible periods, in which the period producing the least
+observational scatter about the mean light curve (or, for example,
+radial velocity curve) is chosen. This technique is well suited to 
+cases in which only a few observations are available over a limited 
+period of time, especially if the light curve is highly non-sinusoidal.
+The data is first folded on a series of trial frequencies. For each 
+trial frequency, the full phase interval (0,1) is divided into a 
+user-specified number of bins. The width of each bin is also specified 
+by the user, such that a point need not be picked (if a bin width
+narrower than the bin spacing is selected) or a point can belong to more 
+than one bin (if a bin width wider than the bin spacing is selected). 
+The variance of each of these bins (or samples) is then calculated. This 
+gives a measure of the scatter around the mean light curve defined by 
+the means of the data in each sample. The PDM statistic can then be 
+calculated by dividing the overall variance of all the samples by the 
+variance of the original (unbinned) dataset. This process is then 
+repeated for the next trial frequency. Note that windowed data cannot be 
+passed to this option since its variance is zero. If the trial period is 
+not a true period, then the overall sample variance will be 
+approximately equal to the variance of the original dataset (ie. the PDM 
+statistic will be approximately equal to 1). If the trial period is a 
+correct period, the PDM statistic will reach a local minimum compared 
+with neighbouring periods, hopefully near zero. 
+
+PROMPT1: Enter number of bins
+TYPE   : INTEGER
+OPTIONS: Any integer greater than 2
+DEFAULT: None
+PURPOSE: Specifies the number of bins the folded data is to
+         split up into
+
+PROMPT2: Enter width of each bin
+TYPE   : REAL
+OPTIONS: Any real number between 0.0 and 1.0
+DEFAULT: None
+PURPOSE: Specifies the width of each bin
+------------------------------------------------------------------------

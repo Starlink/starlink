@@ -1,0 +1,34 @@
+1 PERIOD 5.0-2
+ Fixes a bug in the sine fitting subroutine, apparent with the CHISQ command
+
+ Fixes a bug which caused OGIP to crash
+  
+1 PERIOD - Time-series analysis package
+                                                       Expires: ????.??.??
+
+ The PERIOD time-series analysis package has been updated.
+
+ PERIOD 5.0 is a major release that supercedes version 4.2, and is
+ available under Solaris, Tru64 Unix and Linux.
+
+ This is a Double Precision implementation of PERIOD, which has been
+ reconfigured to utilise dynamic array allocation/deallocation for the
+ majority of its input, output and work arrays.
+
+ Some potential for problems associated with array-bounds violation 
+ within version 4.2, identified during the source-code preparation for
+ 5.0, have been avoided with the exact calculation within PERIOD 5.0 of
+ storage required by its various processing elements. The ability to
+ handle data loads of varying magnitude, with efficient use of memory
+ for storage, should adequately compensate for any marginal overhead
+ imposed by array-size calculations and the attendant memory management.
+
+ Overall, the 'look and feel' of PERIOD remains fundamentally the same.
+
+ Error messages and help text have been revised in line with the
+ implementation of dynamic array allocation; the document SUN/167 has
+ been updated accordingly. A Hypertext version is available
+ (`showme sun167' or `findme period').
+
+ Please report any problems to ussc@star.rl.ac.uk
+

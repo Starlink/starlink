@@ -1,0 +1,22 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (VSD 1994-FEB-01)
+------------------------------------------------------------------------
+
+                        Command: CHISQ
+
+BRIEF DESCRIPTION: This is a straight-forward technique where the input
+data is folded on a series of trial periods. At each trial period, the
+data is fitted with a sine curve. The resulting reduced-chi**2 values 
+are plotted as a function of trial frequency and the minima in the plot 
+suggest the most likely periods. This method is ideally suited to the 
+study of radial velocity data or any other sinusoidal variations. Note
+that windowed data cannot be processed by this option since no sine fit
+is possible.
+
+PROMPT1: Not applicable
+TYPE   : Not applicable
+OPTIONS: Not applicable
+DEFAULT: Not applicable
+PURPOSE: Not applicable
+------------------------------------------------------------------------

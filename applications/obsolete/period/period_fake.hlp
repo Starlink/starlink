@@ -1,0 +1,68 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (VSD 1993-MAR-17)
+------------------------------------------------------------------------
+
+                        Command: FAKE
+
+BRIEF DESCRIPTION: Creates fake data with which to test PERIOD. Two 
+options are catered for: periodic data or chaotic data. The periodic 
+data are created by summing a user-specified number of sine curves 
+of the form:
+Y = GAMMA + (AMPLITUDE * SIN( ((2.0*PI)/PERIOD) * (X - ZEROPT) )).
+The chaotic data are created using a simple logistic equation of 
+the form: 
+Xn+1 = LAMBDA * Xn * (1-Xn)
+
+PROMPT1: Enter first and last slots for output (0,0 to quit)
+TYPE   : INTEGER
+OPTIONS: Any pair of integers between 0 and 40
+DEFAULT: None
+PURPOSE: Determines the location of the fake data
+
+PROMPT2: [P]eriodic or [C]haotic data ? [P]
+TYPE   : CHARACTER*1
+OPTIONS: P or C
+DEFAULT: P
+PURPOSE: Determines whether fake data is to be periodic or chaotic
+
+PROMPT3: Enter number of sine curves
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and 20
+DEFAULT: None
+PURPOSE: Determines number of sine functions in fake data
+         (if the P option is specified)
+
+PROMPT4: Enter number of data points
+TYPE   : INTEGER
+OPTIONS: Any positive integer
+DEFAULT: None
+PURPOSE: Determines number of points in fake data
+
+PROMPT5: Enter range of data points
+TYPE   : REAL
+OPTIONS: Any pair of real numbers
+DEFAULT: None
+PURPOSE: Determines range over which fake data is calculated
+
+PROMPT6: Enter period, semi-amplitude, zero point and gamma
+TYPE   : REAL
+OPTIONS: Any 4 real numbers (the value of period must be greater than 0)
+DEFAULT: None
+PURPOSE: Determines the PERIOD, AMPLITUDE, ZEROPT and GAMMA parameters
+         of the sine curve (if the P option is specified)
+
+PROMPT7: Enter LAMBDA
+TYPE   : REAL
+OPTIONS: Any real number between 0.0 and 4.0
+DEFAULT: None
+PURPOSE: Specifies the LAMBDA parameter in the logistic equation
+         (if the C option is specified)
+
+PROMPT8: Enter initial value
+TYPE   : REAL
+OPTIONS: Any real number
+DEFAULT: None
+PURPOSE: Specifies the initial value of Xn in the logistic equation
+         (if the C option is specified)
+------------------------------------------------------------------------

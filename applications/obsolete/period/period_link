@@ -1,0 +1,58 @@
+
+#  N.B. the previous line should be blank.
+#+
+#  Name:
+#     period_link
+
+#  Purpose:
+#     Generate linker (ld) arguments for linking PERIOD binary.
+
+#  Type of Module:
+#     Shell script.
+
+#  Description:
+#     This script should be invoked by those building non-ADAM applications
+#     which use PERIOD in order to generate the correct arguments for the 
+#     compiler (or ld) command. The arguments generated are written to 
+#     the standard output.
+
+#  Invocation:
+#     The script is normally invoked as part of a makefile command to
+#     create a monolith in Satrlink standard makefiles, thus:
+#
+#         $(ELINK) $(EXE_OBJECT) -o $(EXECUTABLE) $(OBJECT_LIBRARIES) \
+#             -L$(STAR_LIB) `./period_link`
+
+#  Copyright:
+#     Copyright (C) 1995 Rutherford Appleton Laboratory
+
+#  Authors:
+#     RFWS: R.F. Warren-Smith (STARLINK, RAL)
+#     BLY:  M.J. Bly (Starlink, RAL)
+#     {enter_new_authors_here}
+
+#  History:
+#     7-JUL-1993 (RFWS):
+#        Original version.
+#     21-JUN-1995 (RFWS):
+#        Added new awk script to permit larger numbers of libraries.
+#     22-JUN-1995 (BLY):
+#        Generic version.
+#     10-JUL-1995 (BLY):
+#        Version for PERIOD.
+#     04-DEC-1998 (BLY):
+#        Modified for Starlink-PGPLOT.  For Native-PGPLOT , change
+#           pgp_link to pgplot_link.
+#     {enter_further_changes_here}
+
+#  Bugs:
+#     {note_any_bugs_here}
+
+#-
+
+      echo `psx_link` `fitsio_link` `pgp_link` \
+           | awk 'BEGIN{RS=" ";FS="\n"}
+                  {f[i++]=$1}
+                  END{for(;i--;)if(!w[f[i]]++)l=f[i]" "l;print l}'
+
+#  End of script.

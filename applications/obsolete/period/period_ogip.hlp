@@ -1,0 +1,105 @@
+
+------------------------------------------------------------------------
+                        PERIOD ON-LINE HELP            (GJP 1995-SEP-25)
+------------------------------------------------------------------------
+
+                        Command: OGIP
+
+BRIEF DESCRIPTION: Loads data from OGIP FITS files on disk into data 
+slots. There is no restriction on the number of rows or extensions in
+the input files. Data is stored and processed within PERIOD using the
+slot system. 
+
+After specifying the name of the file to be read (PROMPT1), you must 
+specify which of its extensions is to be read (PROMPT2). A list
+of column headings is then displayed and you can select which
+file columns should correspond to the X, Y and Y error parts of
+the slot (PROMPTS3/4/5 repectively).
+
+You are then asked to select the slot in which the data will be placed.
+A data slot is simply an array holding one dataset. The maximum number 
+of data slots which can be handled at any one time is 40.(PROMPT6) 
+
+In order to load the first slot with a single dataset, you should 
+reply 1,1 to PROMPT1. Similarly, if you wish to load slots 4 through 
+to 9 with 6 datasets, you should reply 4,9 to PROMPT1. Note that 
+slots can be overwritten. Once the slot numbers are specified, the 
+number of columns in the input files are determined and the user is 
+then prompted for which columns refer to the x-axis, y-axis and the 
+y-axis errors (optional). 
+
+It should be remembered that if, for example, you are inputting radial 
+velocity data, the x-axis should be the heliocentric Julian dates, the 
+y-axis should be the corresponding radial velocity values, and if you 
+wish errors to be taken into account, the y-axis errors should be the 
+errors on the radial velocity measurements. These errors are used 
+(or handled) by all options in the main PERIOD menu, but the only 
+periodicity-finding option in the PERIOD_PERIOD sub-menu which
+actually uses the errors on data points is CHISQ. The remaining five 
+techniques (CLEAN, FT, PDM, SCARGLE, STRING) ignore errorbars if they 
+are present. 
+
+Note also that the input file MUST contain x-axis values which are in 
+ascending order, otherwise OGIP will report a warning and either sort 
+the data (if requested to do so - PROMPT8) or abort the input.
+
+Finally, you will be asked if you want to read more data from the same 
+file (PROMPT7).
+
+
+PROMPT1: Enter name of OGIP FITS file (<CR> to quit)  
+TYPE   : CHARACTER*72
+OPTIONS: Any valid UNIX OGIP FITS file 
+DEFAULT: Quit OGIP and return to menu
+PURPOSE: Specifies name of input OGIP FITS file on disk 
+
+PROMPT2: Enter the extension number to be considered (0 to quit) 
+TYPE   : INTEGER 
+OPTIONS: A number between 1 and the number of OGIP extensions 
+         identified
+DEFAULT: Quit OGIP and return to menu
+PURPOSE: Specifies name of input ASCII file on disk
+
+PROMPT3: Enter the TTYPE column number to be read as X (0 to quit)
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and the number of columns identified
+DEFAULT: Quit OGIP and return to menu
+PURPOSE: Specifies which column in the input file corresponds
+         to the x-axis data. Data must be in ascending order
+
+PROMPT4: Enter the TTYPE column number to be read as Y (0 to quit)
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and the number of columns identified
+DEFAULT: Quit OGIP and return to menu
+PURPOSE: Specifies which column in the input file corresponds
+         to the y-axis data
+
+PROMPT5: Enter the TTYPE column number to be read as Y errors 
+         (0 to ignore)
+TYPE   : INTEGER
+OPTIONS: Any integer between 1 and the number of columns identified
+DEFAULT: None
+PURPOSE: Specifies which column in the input file corresponds
+         to the y-axis errors
+
+PROMPT6: Enter the slot number into which the data should be read 
+         (0 to quit) 
+TYPE   : INTEGER
+OPTIONS: Any slot number from 1 to 40
+DEFAULT: Quit OGIP and return to menu
+PURPOSE: Allows selection of the slot required
+
+PROMPT7: Would you like to read the file again ? [N] 
+TYPE   : CHARACTER*72
+OPTIONS: Y or N
+DEFAULT: Y
+PURPOSE: Allows you to read further data from the same file
+          
+PROMPT8: Would you like to sort the data ? [N]
+TYPE   : CHARACTER*1
+OPTIONS: Y or N
+DEFAULT: N
+PURPOSE: OGIP has found x-axis data which is not in ascending
+         order. OGIP will either sort the data or abort the
+         input, depending on the response to this prompt.
+------------------------------------------------------------------------
