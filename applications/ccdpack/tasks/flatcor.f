@@ -20,10 +20,10 @@
 *        The global status.
 
 *  Description:
-*    This routine applies a flat field correction to a series of images.
-*    If any of the input data have been flagged as saturated using a
-*    saturation value (instead of being marked as BAD) then the
-*    saturation values may be protected from modification.
+*     This routine applies a flat field correction to a series of images.
+*     If any of the input data have been flagged as saturated using a
+*     saturation value (instead of being marked as BAD) then the
+*     saturation values may be protected from modification.
 
 *  Usage:
 *     flatcor in out flat

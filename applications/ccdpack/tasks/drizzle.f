@@ -357,7 +357,7 @@
 *     {enter_new_authors_here}
 
 *  History:
-*      7-APR-1999 (AA):
+*     7-APR-1999 (AA):
 *        Original version, based on TRANNDF and MAKEMOS
 *     10-JUL-1999 (AA):
 *        Heavily revised version

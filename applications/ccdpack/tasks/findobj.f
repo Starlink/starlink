@@ -197,58 +197,57 @@
 *  Notes:
 *     - Threshold estimation.
 *
-*       FINDOBJ is optimised to determine a reliable detection threshold
-*       and is not concerned with the accurate determination of the
-*       background value on a frame (as it performs no photometric
-*       measurements). For this reason the histogram which it uses to
-*       determine the background value is made in such a way that it is
-*       usually very well sampled (probably oversampled, for most other
-*       purposes). FINDOBJ should not be used in a manner for which it
-*       is not suited without understanding how if differs from other
-*       more specialized routines.
+*        FINDOBJ is optimised to determine a reliable detection threshold
+*        and is not concerned with the accurate determination of the
+*        background value on a frame (as it performs no photometric
+*        measurements). For this reason the histogram which it uses to
+*        determine the background value is made in such a way that it is
+*        usually very well sampled (probably oversampled, for most other
+*        purposes). FINDOBJ should not be used in a manner for which it
+*        is not suited without understanding how if differs from other
+*        more specialized routines.
 *
 *     - Histogram formation and gaussian fitting. 
 *
-*       The histogram used by FINDOBJ is formed by (if necessary)
-*       re-binning until the BINFRAC criterion is met, it is expected
-*       that this will always result in a well sampled histogram. The
-*       background value is the mode of this histogram and is not
-*       refined during the gaussian fitting. The gaussian fitting just
-*       estimates the standard deviation of the background and uses a
-*       fixed peak value and position (the mode of the histogram) and
-*       iterates rejecting bins whose counts fall below 20 percent of
-*       the peak value, stopping when either 3 iterations have been
-*       performed or the standard deviation does not change by more than
-*       one bin width in data values.
+*        The histogram used by FINDOBJ is formed by (if necessary)
+*        re-binning until the BINFRAC criterion is met, it is expected
+*        that this will always result in a well sampled histogram. The
+*        background value is the mode of this histogram and is not
+*        refined during the gaussian fitting. The gaussian fitting just
+*        estimates the standard deviation of the background and uses a
+*        fixed peak value and position (the mode of the histogram) and
+*        iterates rejecting bins whose counts fall below 20 percent of
+*        the peak value, stopping when either 3 iterations have been
+*        performed or the standard deviation does not change by more than
+*        one bin width in data values.
 *
 *     - NDF extension items. 
 *
-*       On exit the CURRENT_LIST items in the CCDPACK extensions
-*       (.MORE.CCDPACK) of the input NDFs are set to the names of the
-*       appropriate output lists. These items will be used by other
-*       CCDPACK position list processing routines to automatically
-*       access the lists.
+*        On exit the CURRENT_LIST items in the CCDPACK extensions
+*        (.MORE.CCDPACK) of the input NDFs are set to the names of the
+*        appropriate output lists. These items will be used by other
+*        CCDPACK position list processing routines to automatically
+*        access the lists.
 *
 *     - Output position list format.
 *
-*       CCDPACK format - Position lists in CCDPACK are formatted files
-*       whose first three columns are interpreted as the following.
+*        CCDPACK format - Position lists in CCDPACK are formatted files
+*        whose first three columns are interpreted as the following.
 *
 *          - Column 1: an integer identifier
 *          - Column 2: the X position
 *          - Column 3: the Y position
 *
-*       The column one value must be an integer and is used to identify
-*       positions which may have different locations but are to be
-*       considered as the same point. Comments may be included in the
-*       file using the characters # and !. Columns may be separated by
-*       the use of commas or spaces.
+*        The column one value must be an integer and is used to identify
+*        positions which may have different locations but are to be
+*        considered as the same point. Comments may be included in the
+*        file using the characters # and !. Columns may be separated by
+*        the use of commas or spaces.
 *
-*       In all cases the coordinates in position lists are pixel 
-*       coordinates.
+*        In all cases the coordinates in position lists are pixel 
+*        coordinates.
 
 *  Behaviour of parameters:
-*
 *     Most parameters retain their current value as default. The
 *     "current" value is the value assigned on the last run of the
 *     application. If the application has not been run then the
@@ -270,9 +269,9 @@
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 
 *  Implementation Status:
-*     - This routine correctly processes the DATA and QUALITY components
-*       of an NDF data structure. Bad pixels and all non-complex numeric
-*       data types can be handled.
+*     -  This routine correctly processes the DATA and QUALITY components
+*        of an NDF data structure. Bad pixels and all non-complex numeric
+*        data types can be handled.
 
 *  Implementation Deficiencies:
 *     -  There is no support positions other than in pixel coordinates.

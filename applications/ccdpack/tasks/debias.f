@@ -445,43 +445,43 @@
 *        "_debias" string.
 
 *  ASCII_region_definition files:
-*      DEBIAS allows regions which are to be defined as having poor
-*      quality (either by setting the appropriate pixels BAD or by
-*      setting part of the quality component) to be described within an
-*      ordinary text file using the ARD (ASCII Region Definition)
-*      language. The ARD language is based on a set of keywords that
-*      identify simple shapes. Some of the regions which can be defined
-*      are:
+*     DEBIAS allows regions which are to be defined as having poor
+*     quality (either by setting the appropriate pixels BAD or by
+*     setting part of the quality component) to be described within an
+*     ordinary text file using the ARD (ASCII Region Definition)
+*     language. The ARD language is based on a set of keywords that
+*     identify simple shapes. Some of the regions which can be defined
+*     are:
 *
-*         - BOX
-*         - CIRCLE
-*         - COLUMN
-*         - ELLIPSE
-*         - LINE
-*         - PIXEL
-*         - POLYGON
-*         - RECT
-*         - ROTBOX
-*         - ROW
+*        - BOX
+*        - CIRCLE
+*        - COLUMN
+*        - ELLIPSE
+*        - LINE
+*        - PIXEL
+*        - POLYGON
+*        - RECT
+*        - ROTBOX
+*        - ROW
 *
-*      ARD descriptions can be created using the KAPPA application
-*      ARDGEN, or you can of course create your own by hand. An example
-*      of the contents of an ARD file follows.
+*     ARD descriptions can be created using the KAPPA application
+*     ARDGEN, or you can of course create your own by hand. An example
+*     of the contents of an ARD file follows.
 *
-*         #
-*         # ARD description file for bad regions of my CCD.
+*        #
+*        # ARD description file for bad regions of my CCD.
 *
-*         COLUMN( 41, 177, 212 )        # Three bad columns
-*         PIXEL( 201, 143, 153, 167 )   # Two Bad pixels
-*         BOX( 188, 313, 5, 5 )         # One Hot spot centred at 188,313
-*         ELLIPSE( 99, 120, 21.2, 5.4, 45.0 )
+*        COLUMN( 41, 177, 212 )        # Three bad columns
+*        PIXEL( 201, 143, 153, 167 )   # Two Bad pixels
+*        BOX( 188, 313, 5, 5 )         # One Hot spot centred at 188,313
+*        ELLIPSE( 99, 120, 21.2, 5.4, 45.0 )
 *
-*         # Polygons defining badly vignetted corners
-*         POLYGON( 2.2, 96.4, 12.1, 81.5, 26.9, 63.7, 47.7, 41.9,
-*                  61.5, 24.1, 84.3, 0.0 , 0.0, 0.0 )
-*         POLYGON( 6.2, 294.3, 27.9, 321.0, 52.6, 348.7, 74.4, 371.5,
-*                  80.0, 384.0, 0.0, 384.0 )
-*         #
+*        # Polygons defining badly vignetted corners
+*        POLYGON( 2.2, 96.4, 12.1, 81.5, 26.9, 63.7, 47.7, 41.9,
+*                 61.5, 24.1, 84.3, 0.0 , 0.0, 0.0 )
+*        POLYGON( 6.2, 294.3, 27.9, 321.0, 52.6, 348.7, 74.4, 371.5,
+*                 80.0, 384.0, 0.0, 384.0 )
+*        #
 
 *  Implementation Status:
 *     - This task supports all components of an NDF. If requested
