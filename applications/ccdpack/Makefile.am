@@ -112,10 +112,8 @@ CONFIG_SCR = DATASEC.DAT EEV3QUICK.DAT EEV3STANDARD.DAT EEV5QUICK.DAT \
  INTWIDEFLAT.DAT  INTWIDESKY.DAT  WHT2000FLAT.DAT  WHT2000SKY.DAT \
  INT-WFC.ast ccdpack_style.def
 
-TCL_SCR = \
- raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl pairndf.tcl idicurs.tcl \
- ccdwishrc \
- mkindex.tcl
+TCL_SCR = raisehack.tcl taskrun.tcl tasksetup.tcl ccdalign.tcl \
+ pairndf.tcl idicurs.tcl ccdwishrc mkindex.tcl
 
 ITCL_SCR = CCDAnimateBitmap.tcl CCDBindings.tcl CCDContextHelp.tcl \
  CCDCopyListbox.tcl CCDCreateImportTable.tcl CCDCreateListofNames.tcl \
