@@ -992,6 +992,8 @@
 
 #  If we haven't done this before, build the FITS selection window.
          if { [ array names itk_component fits_dialog ] == "" } {
+
+#  Construct the dialog box.
             itk_component add fits_dialog {
                iwidgets::dialog $itk_component(showfits).d \
                   -modality application \
@@ -1003,6 +1005,8 @@
                  -command [ code $itk_component(fits_dialog) deactivate 0 ]
             $itk_component(fits_dialog) hide Help
             $itk_component(fits_dialog) hide Apply
+
+#  Add the main scrolledlistbox to hold the FITS headers.
             set geom 80x[ min [ llength $allfits ] 20 ]
             itk_component add fits_listbox {
                iwidgets::scrolledlistbox \
@@ -1010,12 +1014,32 @@
                   -visibleitems $geom \
                   -selectmode multiple \
                   -hscrollmode none \
-                  -vscrollmode dynamic
-            } {
-               rename -textfont -fitsfont fitsFont Font
-            }
+                  -vscrollmode dynamic \
+                  -textfont fixed
+            } 
             eval $itk_component(fits_listbox) insert end $allfits
             pack $itk_component(fits_listbox) -fill x
+
+#  Add some help text.
+            set helptext [ join {
+               "This window displays the FITS headers of one of the images "
+               "(the first one).\n"
+               "\n"
+               "Select any header card(s) of interest by clicking on them.\n"
+               "They can be deselected by clicking again.\n"
+               "\n"
+               "The selected headers will then be displayed below each "
+               "image in the chooser window."
+            } "" ]
+            itk_component add fits_help {
+               label \
+                  [ $itk_component(fits_dialog) childsite].help \
+                  -justify left \
+                  -text $helptext
+            }
+            pack $itk_component(fits_help) -anchor w
+
+#  Post the window.
             $itk_component(fits_dialog) center $itk_component(showfits)
          }
 
@@ -1187,7 +1211,6 @@
       keep -background -cursor -foreground
    }
    option add *Ndfchoose.font "helvetica -12 normal" widgetDefault
-   option add *Ndfchoose.fitsFont fixed widgetDefault
 
    itk::usual Gwm {
       keep -background -cursor -foreground
