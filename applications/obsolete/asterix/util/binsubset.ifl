@@ -1,7 +1,7 @@
 Interface BINSUBSET
    Parameter INP
       position    1
-      type        'UNIV'
+      type        'LITERAL'
       ppath       'GLOBAL'
       association '<-GLOBAL.BINDS'
       prompt      'Input dataset'
@@ -10,7 +10,7 @@ Interface BINSUBSET
 
    Parameter OUT
       position    2
-      type        'UNIV'
+      type        'LITERAL'
       association '->GLOBAL.BINDS'
       prompt      'Output dataset'
       help        'Will produce a binned dataset'
