@@ -459,9 +459,10 @@ CTG_PRIVATE_INCLUDES = ctg_const
 LPG_PRIVATE_INCLUDES = lpg_com lpg_const
 FTS_PRIVATE_INCLUDES = fts_par
 KPG_PRIVATE_INCLUDES = kpg_ast kpg_par hlpcmd ctm_par ctm_com
+GRF_PRIVATE_INCLUDES = grf.h
 PRIVATE_INCLUDES = $(IRA_PRIVATE_INCLUDES) $(CTG_PRIVATE_INCLUDES) \
                    $(LPG_PRIVATE_INCLUDES) $(FTS_PRIVATE_INCLUDES) \
-                   $(KPG_PRIVATE_INCLUDES) 
+                   $(KPG_PRIVATE_INCLUDES) $(GRF_PRIVATE_INCLUDES) 
 
 #  List of external include files.  These are files which are required
 #  in order to build the package but form part of other, externally
@@ -658,9 +659,10 @@ IRA_C_ROUTINES =
 CTG_C_ROUTINES = ctg1_wild.c ctg1_rm.c 
 LPG_C_ROUTINES = lpg1_rm.c lpg1_sleep.c
 FTS_C_ROUTINES = fts1_findf.c fts1_rnand.c fts1_rnanr.c
-KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c 
+KPG_C_ROUTINES = kpg1_trmsz.c kpg1_ieeer.c kpg1_ieeed.c kpg1_tkast.c \
+GRF_C_ROUTINES = grf_kaplibs.c
 C_ROUTINES = $(IRA_C_ROUTINES) $(CTG_C_ROUTINES) $(LPG_C_ROUTINES) \
-             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) 
+             $(FTS_C_ROUTINES) $(KPG_C_ROUTINES) $(GRF_C_ROUTINES) 
 
 #  The facility error file.
 
@@ -700,7 +702,7 @@ LICENCE = $(PACK_NAME)_CONDITIONS
 #  file).
 
 BUILT_FILES = $(PUBLIC_SCRIPTS) $(PUBLIC_INCLUDES) $(OBJECT_LIBRARIES) \
-$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS)
+$(SHAREABLE_LIBRARIES) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_OBJECT_FILES)
 
 #  List of links used to access include files during compilation.  This
 #  should comprise all the external include files and any other include
@@ -808,7 +810,8 @@ $(AIF_F_ROUTINES):
 	@ if test -f $@; then :;\
            else echo $@ is not in aif_source.tar; exit 1; fi
 
-$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS):
+$(GEN_PUBLIC_SCRIPTS) $(STARTUP_SCRIPT) $(FAC_ERRS) $(GRF_C_ROUTINES) \
+$(GRF_PRIVATE_INCLUDES):
 	$(TAR_OUT) $(PKG_NAME)_source.tar $@
 	@ if test -f $@; then :;\
            else echo $@ is not in $(PKG_NAME)_source.tar; exit 1; fi
@@ -842,6 +845,8 @@ CTG_OBJECT_FILES = $(CTG_F_ROUTINES:.f=.o) \
 
 KPG_OBJECT_FILES = $(KPG_F_ROUTINES:.f=.o) \
                   $(KPG_PLATFORM_F:.f=.o) $(KPG_C_ROUTINES:.c=.o)
+
+GRF_OBJECT_FILES = $(GRF_C_ROUTINES:.c=.o)
 
 LPG_OBJECT_FILES = $(LPG_F_ROUTINES:.f=.o) \
                   $(LPG_PLATFORM_F:.f=.o) $(LPG_C_ROUTINES:.c=.o)
@@ -1658,6 +1663,7 @@ fts1_wkeyd.o:	 SAE_PAR
 fts1_wkeyi.o:	 SAE_PAR
 fts1_wkeyl.o:	 SAE_PAR
 fts1_wkeyr.o:	 SAE_PAR
+grf_kaplibs.o:   grf.h
 gthlpi.o:	 SAE_PAR HLPCMD
 icmmm.o:	 SAE_PAR PRM_PAR
 inset.o:	 SAE_PAR

@@ -10,7 +10,7 @@ TAR_FILES_A = kaplibs_source ira_source aif_source fts_source kpg_source
 
 # The contents of the ira_source.tar file:
 KAPLIBS_SOURCE = kaplibs_link_adam kaplibs_dev fac_1522_err kplsearch \
-kaplibs_test.f kaplibs_test.ifl
+kaplibs_test.f kaplibs_test.ifl grf.h grf_kaplibs.c
 
 # The source RCS files needed to create the kpg_source.tar file:
 KPG_SOURCES = $(KPG_NONGEN) $(KPG_GEN) kpg_ast kpg_par hlpcmd ctm_par \
