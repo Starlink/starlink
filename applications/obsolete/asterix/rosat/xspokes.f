@@ -27,6 +27,7 @@
 *      15-Jun-94: (v1.7-2)Takes a list (or file) of times to select the mean
 *                 roll angle on. 0 roll is now valid.
 *      20-Jun-94: (v1.7-3)workaround for bug in CHR_RTOC (uses DTOC)
+*       2 Feb 95: v1.8-0  upgrade to new ARD (RJV)
 *    Type definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -49,9 +50,10 @@
       RECORD /XRT_HEAD/ HEAD          ! Header structure for subsequent use
       CHARACTER CH
       CHARACTER MODE                    ! Operation mode C or I
-      CHARACTER*80 SFILE
-      CHARACTER*80 ATTFIL               ! Attitude file
-      CHARACTER*100 ROOTNAME            ! rootname of datafiles
+      CHARACTER*80 TEXT
+      CHARACTER*132 SFILE
+      CHARACTER*132 ATTFIL               ! Attitude file
+      CHARACTER*132 ROOTNAME            ! rootname of datafiles
       CHARACTER*20 EXT                  ! Extension name
       CHARACTER*20 ROLL                 ! column name
       CHARACTER*20 TIME                 ! column name
@@ -78,12 +80,16 @@
       INTEGER NVALS                     ! number of time/roll values
       INTEGER SUNIT                     ! Logical unit of ARD file
       INTEGER LP
+      INTEGER L
+      INTEGER ARDID
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION = 'XSPOKES Version 1.7-2')
+      PARAMETER (VERSION = 'XSPOKES Version 1.8-0')
 *-
       CALL AST_INIT()
       CALL MSG_PRNT(VERSION)
+
+      CALL ARX_OPEN('WRITE',ARDID,STATUS)
 *
 *     Enquire whether a new ARD file is to be created
       CALL USI_GET0L('NEW', LNEW, STATUS)
@@ -93,13 +99,12 @@
       IF (STATUS .NE. SAI__OK) GOTO 999
 *
 *
-      CALL FIO_GUNIT(SUNIT, STATUS)
 *
 *     Open the spatial file - get filename from the user
       IF (LNEW) THEN
-         OPEN(SUNIT, FILE=SFILE, STATUS='UNKNOWN')
+         CALL FIO_OPEN(SFILE,'WRITE','LIST',0,SUNIT,STATUS)
       ELSE
-         OPEN(SUNIT, FILE=SFILE, ACCESS='APPEND', STATUS='UNKNOWN')
+         CALL FIO_OPEN(SFILE,'APPEND','LIST',0,SUNIT,STATUS)
       ENDIF
 
       IF (STATUS .NE. SAI__OK) THEN
@@ -107,9 +112,6 @@
          GOTO 999
       ENDIF
 *
-*     Write in the units of the file. Assumes the user hasn't jiggered
-*     around with the axis units
-      IF (LNEW) WRITE(SUNIT,*)' UNITS = DEGREES '
 *
 *     see if user wants to define the pixels interactively
       CALL USI_GET0C('MODE', MODE, STATUS)
@@ -135,18 +137,20 @@
 *
 *     If ouside to be set bad
       IF (LOUT) THEN
+         XC=0.0
+         YC=0.0
 *
 *        Get the radius of the circle from the parameter system
          CALL USI_GET0R('TRAD', TRAD, STATUS)
 *
          IF (STATUS .NE. SAI__OK) GOTO 999
 *
-*        Write the composite structure for the outer region into
-*        the ARD file, use a box of width 2.134.
-         WRITE(SUNIT,*)' COMPOSITE EDGE'
-         WRITE(SUNIT,*)'   BOX ',XC, YC, 2.134, 2.134
-         WRITE(SUNIT,*)'   .AND. .NOT. CIRCLE ',XC,YC,TRAD
-         WRITE(SUNIT,*)' END COMPOSITE'
+*        Write the outer region into ARD description
+         TEXT=' .NOT.(CIRCLE( 0.0 , 0.0 ,'
+         L=CHR_LEN(TEXT)
+         CALL MSG_SETR('R',TRAD)
+         CALL MSG_MAKE(TEXT(:L)//' ^R ))',TEXT,L)
+         CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
 *
 *        Draw limiting circle on the plot
          IF (LPLOT) CALL XRT_CIRCLE(XC,YC,TRAD,STATUS)
@@ -269,8 +273,28 @@
       ENDIF
 *
 * Write in the annulus description
-      CALL ARD_ANNULUS(SUNIT, .TRUE., XC, YC, OUTRAD, XC, YC,
-     &                              INNRAD)
+      TEXT=' (CIRCLE( '
+      L=CHR_LEN(TEXT)
+
+      CALL MSG_SETR('XC',XC)
+      CALL MSG_SETR('YC',YC)
+      CALL MSG_SETR('RAD',OUTRAD)
+      CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD )',TEXT,L)
+
+      CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
+
+
+      TEXT='     .AND..NOT.CIRCLE('
+      L=CHR_LEN(TEXT)
+
+      CALL MSG_SETR('XC',XC)
+      CALL MSG_SETR('YC',YC)
+      CALL MSG_SETR('RAD',INNRAD)
+      CALL MSG_MAKE(TEXT(:L)//' ^XC , ^YC , ^RAD ))',TEXT,L)
+
+      CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
+
+
 *
 *  set the length and width of the spokes in degrees. NB: this does assume that
 *  the image axes are degrees.
@@ -311,17 +335,34 @@
             CALL PGDRAW(XSP(1),YSP(1))
          ENDIF
 *
-*  Write the spoke description into the ARD FILE
-         CALL ARD_POLYGON(SUNIT, .TRUE., 4, XSP, YSP)
+*  Write the spoke description into the ARD text
+         TEXT=' POLYGON('
+         L=CHR_LEN(TEXT)
+         CALL MSG_SETR('X1',XSP(1))
+         CALL MSG_SETR('Y1',YSP(1))
+         CALL MSG_SETR('X2',XSP(2))
+         CALL MSG_SETR('Y2',YSP(2))
+         CALL MSG_MAKE(TEXT(:L)//' ^X1 , ^Y1 , ^X2 , ^Y2 ,',TEXT,L)
+         CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
+         TEXT=' '
+         L=9
+         CALL MSG_SETR('X3',XSP(3))
+         CALL MSG_SETR('Y3',YSP(3))
+         CALL MSG_SETR('X4',XSP(4))
+         CALL MSG_SETR('Y4',YSP(4))
+         CALL MSG_MAKE(TEXT(:L)//' ^X3 , ^Y3 , ^X4 , ^Y4 )',TEXT,L)
+         CALL ARX_PUT(ARDID,0,TEXT(:L),STATUS)
 *
 *  Calculate the angle of the next spoke to south
          THETA = THETA + PI/4.
 *
       ENDDO
 *
-*  Close ARD file
-      CLOSE(UNIT=SUNIT)
-      CALL FIO_PUNIT(SUNIT, STATUS)
+*  Write out ARD text and close file
+      CALL ARX_WRITEF(ARDID,SUNIT,STATUS)
+      CALL ARX_CLOSE(ARDID,STATUS)
+      CALL FIO_CLOSE(SUNIT,STATUS)
+
       IF (MODE .EQ. 'C') CALL HDS_CLOSE(ALOC, STATUS)
 *
 999   CONTINUE
