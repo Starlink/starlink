@@ -35,9 +35,8 @@ char *s;
 }
 
 static double
-constant(name, arg)
+constant(name)
 char *name;
-int arg;
 {
     errno = 0;
     switch (*name) {
@@ -93,9 +92,9 @@ MODULE = Starlink::NBS		PACKAGE = Starlink::NBS
 
 
 double
-constant(name,arg)
+constant(name)
 	char *		name
-	int		arg
+
 
 # Tune all the noticeboard (!)
 

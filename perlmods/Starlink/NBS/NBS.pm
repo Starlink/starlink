@@ -77,7 +77,7 @@ sub AUTOLOAD {
     # Note that the default autoloader expects integer argument
     # if @_ contains something (this can be @_ from the calling routine!)
     # Since these routines only expect a single argument just pass a 0.
-    my $val = constant($constname, 0);
+    my $val = constant($constname);
     if ($! != 0) {
 	if ($! =~ /Invalid/) {
 	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
@@ -104,7 +104,7 @@ Starlink::NBS - Perl extension for accessing NBS noticeboards
 =head1 SYNOPSIS
 
   use Starlink::NBS;
-  
+
   $nbs_name = "p57321_plotnb";
 
   $nbs = new Starlink::NBS($nbs_name);
