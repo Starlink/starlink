@@ -1,22 +1,66 @@
+## REDUCE_SWITCH - Reduces the switches in a SCUBA observations
+
+#+
+#  Name:
+#     REDUCE_SWITCH.IFL
+
+#  Type of Module:
+#     ADAM A-task parameter interface.
+ 
+#  Authors:
+#     JFL:  John Lightfoot (ROE)
+#     TIMJ: Tim Jenness (JACH)
+
+#  History:
+#     1995 (JFL)
+#	 Original Version
+#     1996 August (TIMJ)
+#	 Add DESPIKE_LEVEL
+#     1996 October (TIMJ)
+#        Add GLOBAL associations
+#     1996 November 1 (TIMJ)
+#        Add header and HELPLIB
+#     {enter_further_changes_here}
+
+#-
+
    INTERFACE REDUCE_SWITCH
+
+      HELPLIB 'SCUBA_HELP:'
 
       PARAMETER IN
          POSITION 1
          TYPE     'FILENAME'
          PROMPT   'Name of input file containing demodulated data'
+	 HELPKEY  '*'
       ENDPARAMETER
+
 
       PARAMETER USE_CALIBRATOR
          POSITION 2
          TYPE     '_LOGICAL'
+	 DEFAULT 'YES'
          PROMPT   'Should the data be divided by the internal calibrator'
+	 HELPKEY  '*'
       ENDPARAMETER
 
+      PARAMETER SPIKE_LEVEL
+	 POSITION 3
+	 TYPE '_INTEGER'
+	 DEFAULT 0
+ 	 PROMPT   'De-spike level'
+	 HELPKEY  '*'
+      ENDPARAMETER
+
+
       PARAMETER 'OUT'
-         POSITION 3
+         POSITION 4
          TYPE     'FILENAME'
+	 ACCESS   'WRITE'
+	 VPATH    'PROMPT'
+	 ASSOCIATION '->GLOBAL.DATA_ARRAY'
          PROMPT   'Name of output file to contain reduced switch data'
+	 HELPKEY  '*'
       ENDPARAMETER
 
    ENDINTERFACE
-
