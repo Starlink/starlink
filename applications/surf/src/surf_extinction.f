@@ -34,17 +34,17 @@
 *     then the value closest in time will be used.
 
 *  Usage:
-*     extinction [IN] [SUB_INSTRUMENT=] [FIRST_TAU=] [FIRST_LST=]
-*                [SECOND_TAU=] [SECOND_LST=]
+*     extinction IN SUB_INSTRUMENT FIRST_TAU FIRST_LST SECOND_TAU 
+*                SECOND_LST OUT
 
 *  ADAM Parameters:
-*     IN = NDF (Read)
-*        The name of the input file containing demodulated SCUBA data.
 *     FIRST_LST = _CHAR (Read)
 *        The local sidereal time at which FIRST_TAU was
 *        the zenith sky opacity, in hh mm ss.ss format.
 *     FIRST_TAU = _REAL (Read)
 *        The zenith sky opacity before the observation.
+*     IN = NDF (Read)
+*        The name of the input file containing demodulated SCUBA data.
 *     OUT = NDF (Write)
 *        The name of the output file to contain the
 *        extinction corrected data for the specified
@@ -58,7 +58,7 @@
 *        The name of the sub-instrument whose data are to
 *        be selected from the input file and extinction
 *        corrected. Permitted values are SHORT, LONG,
-*        P1100, P1300 and P2000. This paramter is only used if more than
+*        P1100, P1300 and P2000. This parameter is only used if more than
 *        one sub-instrument is present in the file.
 
 *  Algorithm:
@@ -113,10 +113,6 @@
 *     sky opacity.
 *       Lastly, the IN and OUT files are closed.
 
-*  Implementation status:
-*     Data, Variance and Quality arrays are copied. 
-*     Bad pixels are recognised.
-
 *  Authors:
 *     JFL: John Lightfoot (jfl@roe.ac.uk)
 *     TIMJ: Tim Jenness (timj@jach.hawaii.edu)
@@ -153,6 +149,9 @@
       PARAMETER (MAXDIM = 4)
 
 *    Local variables :
+      DOUBLE PRECISION ARRAY_DEC_CENTRE ! apparent declination of array centre
+                                        ! (radians)
+      DOUBLE PRECISION ARRAY_RA_CENTRE  ! apparent RA of array centre (radians)
       BYTE             BADBIT           ! Bad bit mask
       INTEGER          BEAM             ! beam number in DO loop
       DOUBLE PRECISION BOL_DEC (SCUBA__NUM_CHAN * SCUBA__NUM_ADC)
@@ -176,8 +175,8 @@
       INTEGER          DATA_OFFSET      ! offset of a datum in an array
       DOUBLE PRECISION DEC_CENTRE       ! apparent declination of map centre
                                         ! (radians)
-      REAL             DEC_START        ! Dec offset of scan start (arcsec)
-      REAL             DEC_END          ! Dec offset of scan end (arcsec)
+      REAL             DEC_START        ! apparent dec of scan start (radians)
+      REAL             DEC_END          ! apparent dec of scan end (radians)
       INTEGER          DIM (MAXDIM)     ! the dimensions of an array
       INTEGER          DIMX (MAXDIM)    ! expected dimensions of an array
       DOUBLE PRECISION DTEMP            ! scratch double
@@ -333,8 +332,8 @@
                                         ! LST of pointing corrections (radians)
       INTEGER          POSITION         ! Position in array
       DOUBLE PRECISION RA_CENTRE        ! apparent RA of map centre (radians)
-      REAL             RA_START         ! RA offset of scan start (arcsec)
-      REAL             RA_END           ! RA offset of scan end (arcsec)
+      REAL             RA_START         ! apparent RA of scan start (radians)
+      REAL             RA_END           ! apparent RA of scan end (radians)
       LOGICAL          REDUCE_SWITCH    ! .TRUE. if REDUCE_SWITCH has been run
       DOUBLE PRECISION ROTATION         ! angle between apparent north and 
                                         ! north of input coord system (radians,
@@ -1399,6 +1398,13 @@
                      CALL VEC_RTOR (.FALSE., 1, %val(IN_DEC2_PTR +
      :                    DATA_OFFSET * VAL__NBR), DEC_END,
      :                    IERR, NERR, STATUS)
+
+*  convert to radians
+
+                     RA_START = RA_START * REAL(PI) / 12.0
+                     RA_END = RA_END * REAL(PI) / 12.0
+                     DEC_START = DEC_START * REAL(PI) / 180.0
+                     DEC_END = DEC_END * REAL(PI) / 180.0
                   END IF
 
 *  find where the exposure starts and finishes in the data array
@@ -1434,6 +1440,8 @@
 *  work out the offset at which the measurement was made in arcsec
 
                      IF (SAMPLE_MODE .EQ. 'JIGGLE') THEN
+                        ARRAY_RA_CENTRE = RA_CENTRE
+                        ARRAY_DEC_CENTRE = DEC_CENTRE
 
                         IF (JIGGLE_REPEAT .EQ. 1) THEN
                            JIGGLE = (EXPOSURE - 1) *
@@ -1445,15 +1453,28 @@
                         END IF
                         OFFSET_X = JIGGLE_X (JIGGLE)
                         OFFSET_Y = JIGGLE_Y (JIGGLE)
-                        OFFSET_COORDS = SAMPLE_COORDS
+
+                        IF (SAMPLE_COORDS .EQ. 'NA') THEN
+                           OFFSET_COORDS = 'NA'
+                        ELSE IF (SAMPLE_COORDS .EQ. 'AZ') THEN
+                           OFFSET_COORDS = 'AZ'
+                        ELSE
+                           OFFSET_COORDS = 'RD'
+                        END IF
 
                      ELSE IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+                        ARRAY_RA_CENTRE = DBLE (RA_START) + 
+     :                    DBLE (RA_END - RA_START) * 
+     :                    DBLE (I - EXP_START) /
+     :                    DBLE (EXP_END - EXP_START)
+                        ARRAY_DEC_CENTRE = DBLE (DEC_START) +
+     :                    DBLE (DEC_END - DEC_START) *
+     :                    DBLE (I - EXP_START) /
+     :                    DBLE (EXP_END - EXP_START)
 
-*                        OFFSET_X = RA_START + RA_VEL * 
-*     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
-*                        OFFSET_Y = DEC_START + DEC_VEL *
-*     :                    (REAL (I - EXP_START) + 0.5) * EXP_TIME
                         OFFSET_COORDS = 'RD'
+                        OFFSET_X = 0.0
+                        OFFSET_Y = 0.0
                      END IF
 
 *  now call a routine to work out the apparent RA,Dec of the measured
@@ -1461,8 +1482,9 @@
 
                      N_POINT = 0
   
-                     CALL SCULIB_CALC_BOL_COORDS ('RA', RA_CENTRE, 
-     :                 DEC_CENTRE, LST, LAT_OBS, OFFSET_COORDS,
+                     CALL SCULIB_CALC_BOL_COORDS ('RA', 
+     :                 ARRAY_RA_CENTRE, ARRAY_DEC_CENTRE,
+     :                 LST, LAT_OBS, OFFSET_COORDS,
      :                 OFFSET_X, OFFSET_Y, ROTATION, N_POINT,
      :                 SCUBA__MAX_POINT, POINT_LST, POINT_DAZ, 
      :                 POINT_DEL, SCUBA__NUM_CHAN, SCUBA__NUM_ADC,
@@ -1497,35 +1519,40 @@
          CALL NDF_ACPUT ('Bolometer', OUTNDF, 'LABEL', 1, STATUS)
          CALL NDF_AUNMP (OUTNDF, 'CENTRE', 1, STATUS)
 
-         CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
+         IF (SAMPLE_MODE .NE. 'RASTER') THEN
+            CALL NDF_AMAP (OUTNDF, 'CENTRE', 2, '_REAL', 'WRITE',
      :        OUT_A_PTR, ITEMP, STATUS)
-         IF (STATUS .EQ. SAI__OK) THEN
-
-            POSITION = 0
+            IF (STATUS .EQ. SAI__OK) THEN
+               POSITION = 0
 
 *     For aborted datasets need to be careful so must use N_POS
 *     and not just N_INTEGRATIONS
 
-            NINTS = N_POS / JIGGLE_COUNT
-            IF (NINTS * JIGGLE_COUNT .LT. N_POS) NINTS = NINTS + 1
+               NINTS = N_POS / JIGGLE_COUNT
+               IF (NINTS * JIGGLE_COUNT .LT. N_POS) THEN
+                  NINTS = NINTS + 1
+               END IF
             
-            DO I = 1, NINTS
+               DO I = 1, NINTS
+                  NJIGGLE = MOD (N_POS - (I-1) * JIGGLE_COUNT, 
+     :              JIGGLE_COUNT)
+                  IF (NJIGGLE .EQ. 0) THEN
+                     NJIGGLE = JIGGLE_COUNT
+                  END IF
 
-               NJIGGLE = MOD(N_POS - (I-1) * JIGGLE_COUNT, JIGGLE_COUNT)
-               IF (NJIGGLE .EQ. 0) NJIGGLE = JIGGLE_COUNT
-
-               DO J = 1, NJIGGLE
-                  RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
-                  CALL SCULIB_CFILLR(1,RTEMP,
+                  DO J = 1, NJIGGLE
+                     RTEMP = REAL(I)+ (REAL(J-1)/REAL(JIGGLE_COUNT))
+                     CALL SCULIB_CFILLR(1,RTEMP,
      :                 %VAL(OUT_A_PTR+(POSITION*VAL__NBR)))
-                  POSITION = POSITION + 1
+                     POSITION = POSITION + 1
+                  END DO
                END DO
-            END DO
-            
+
+            END IF  
+
+            CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
+            CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
          END IF
-         CALL NDF_ACPUT ('Integration', OUTNDF, 'LABEL', 2, STATUS)
-         
-         CALL NDF_AUNMP (OUTNDF, 'CENTRE', 2, STATUS)
 
 * and a title
 
@@ -1542,6 +1569,12 @@
 
       CALL ARY_ANNUL (IN_DEM_PNTR_ARY, STATUS)
       CALL ARY_ANNUL (IN_LST_STRT_ARY, STATUS)
+      IF (SAMPLE_MODE .EQ. 'RASTER') THEN
+         CALL ARY_ANNUL (IN_RA1_ARY, STATUS)
+         CALL ARY_ANNUL (IN_RA2_ARY, STATUS)
+         CALL ARY_ANNUL (IN_DEC1_ARY, STATUS)
+         CALL ARY_ANNUL (IN_DEC2_ARY, STATUS)
+      END IF
 
       CALL DAT_ANNUL (IN_FITSX_LOC, STATUS)
       CALL DAT_ANNUL (IN_SCUBAX_LOC, STATUS)
