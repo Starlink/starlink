@@ -23,7 +23,6 @@ interface IPOSIT
     help 'Number in current list'
   endparameter
   parameter FRAME
-    position 1
     type '_INTEGER'
     default 1
     prompt 'Coordinate frame'
