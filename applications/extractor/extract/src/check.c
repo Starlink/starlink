@@ -227,8 +227,10 @@ checkstruct	*initcheck(picstruct *field, char *filename,
      error(EXIT_FAILURE, "*Error* Invalid check_type in ", "initcheck()!");
   }         
 
-/* Propagate the original header */
-     ndfCput( field->ident, check->ndf, "TITLE", &status );
+/* Propagate the original NDF title, if available. */
+  if ( field->ident[0] != '\0' ) {
+    ndfCput( field->ident, check->ndf, "TITLE", &status );
+  }
 
 /* Now map and initialise appropriately */
   check->pix = NULL;
@@ -284,6 +286,8 @@ checkstruct	*initcheck(picstruct *field, char *filename,
   default:
      error(EXIT_FAILURE, "*Error* Invalid check_type in ", "initcheck()!");
   }
+  if ( status != SAI__OK )
+    error(EXIT_FAILURE, "*Error*: Creating check image ", check->filename);
 
   return check;
   }

@@ -521,6 +521,8 @@ float	backguess(backstruct *bkg, float *mean, float *sigma)
   histo = bkg->histo;
   hcut = nlevelsm1 = bkg->nlevels-1;
   lcut = 0;
+  sum = mea = sig = 0.0;
+  lowsum = highsum = 0;
 
   sig = 10.0*nlevelsm1;
   sig1 = 1.0;
