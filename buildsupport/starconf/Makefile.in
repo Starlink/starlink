@@ -42,7 +42,7 @@ DIST_COMMON = $(am__configure_deps) $(srcdir)/../../install-sh \
 	$(srcdir)/Makefile.starconf.in \
 	$(srcdir)/bootstrap.installed.in \
 	$(srcdir)/starconf-validate.in $(srcdir)/starconf.m4.in \
-	$(top_srcdir)/configure
+	$(top_srcdir)/configure $(top_srcdir)/java/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -51,7 +51,7 @@ am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno configure.status.lineno
 mkinstalldirs = $(SHELL) $(top_srcdir)/../../mkinstalldirs
 CONFIG_CLEAN_FILES = starconf.m4 Makefile.starconf bootstrap.installed \
-	starconf-validate
+	java/Makefile starconf-validate
 am__installdirs = $(DESTDIR)$(bindir) $(DESTDIR)$(datadir)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -87,6 +87,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
+JAVAC = @JAVAC@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
 LN_S = @LN_S@
@@ -207,6 +208,8 @@ Makefile.starconf: $(top_builddir)/config.status $(srcdir)/Makefile.starconf.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 bootstrap.installed: $(top_builddir)/config.status $(srcdir)/bootstrap.installed.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
+java/Makefile: $(top_builddir)/config.status $(top_srcdir)/java/Makefile.in
+	cd $(top_builddir) && $(SHELL) ./config.status $@
 starconf-validate: $(top_builddir)/config.status $(srcdir)/starconf-validate.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-binSCRIPTS: $(bin_SCRIPTS)
@@ -284,7 +287,7 @@ install-manifest: install-manifest.xml
 distdir: $(DISTFILES)
 	$(am__remove_distdir)
 	mkdir $(distdir)
-	$(mkdir_p) $(distdir)/. $(distdir)/../..
+	$(mkdir_p) $(distdir)/. $(distdir)/../.. $(distdir)/java
 	@srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's|.|.|g'`; \
 	list='$(DISTFILES)'; for file in $$list; do \
