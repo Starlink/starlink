@@ -1323,8 +1323,8 @@
       REAL YDEC				! No of decades allowed in range of
       PARAMETER (YDEC=3.1)		! data
 *    Local variables :
-      INTEGER CBPTR,ESPTR
-      INTEGER NACT
+      INTEGER CBPTR,ESPTR,CIPTR,EIPTR,RPTR
+      INTEGER NACT,NRESP
       LOGICAL CBOUNDS
 *-
 
