@@ -110,16 +110,27 @@ PSTOPNM=$(LIBDIR)/pstopnm-s
 	$(JADE) -t latex -iLaTeX.entities -iOnly.paper $(JADEFLAGS) \
 		-d $(STYLESHEET)/latex/sl.dsl#latex $< > $@
 
-# The back-matter stamp
-%.back.stamp: %.sgml
+# The HTML back-matter stamp.
+# Filenames must match those in .../html/slback.dsl
+%.htmlback.stamp: %.sgml
 	$(JADE) -t sgml -d $(STYLESHEET)/html/slback.dsl#back.main $< > $@
 	ROOT=`awk -F: '{print $$1}' $@`; \
-	if [ -r $$ROOT.bibliography.aux ]; then \
+	if [ -r $$ROOT.htmlbib.aux ]; then \
 		BSTINPUTS=$(LIBDIR) \
-		bibtex $$ROOT.bibliography; \
+		bibtex $$ROOT.htmlbib; \
 		sed -f $(LIBDIR)/postprocess-bbl.sed \
-			$$ROOT.bibliography.bbl > t.bbl; \
-		mv t.bbl $$ROOT.bibliography.bbl; \
+			$$ROOT.htmlbib.bbl > t.bbl; \
+		mv t.bbl $$ROOT.htmlbib.bbl; \
+	fi
+
+# The LaTeX backmatter stamp.
+# Filenames must match those in .../latex/slback.dsl
+%.latexback.stamp: %.sgml
+	$(JADE) -t sgml -d $(STYLESHEET)/latex/slback.dsl#back.main $< > $@
+	ROOT=`awk -F: '{print $$1}' $@`; \
+	if [ -r $$ROOT.latexbib.aux ]; then \
+		BSTINPUTS=$(LIBDIR) \
+		bibtex $$ROOT.latexbib; \
 	fi
 
 %.ps: %.dvi
