@@ -376,6 +376,9 @@ f     - AST_PUTFITS: Store a FITS header card in a FitsChan
 *        - Corrected equations which calculate CROTA when writing 
 *        FITS-AIPS encodings.
 *        - Corrected equations which turn a CROTA value into a CD matrix.
+*     29-NOV-2001 (DSB:
+*        Corrected use of "_" and "-" characters when referring to FK4-NO-E
+*        system in function SkySys.
 *class--
 */
 
@@ -13008,11 +13011,11 @@ static int SkySys( AstSkyFrame *skyfrm, int wcstype, FitsStore *store,
       isys = RADEC;
       SetItemC( &(store->radesys), 0, s, "FK4" );
       
-   } else if( !Ustrcmp( sys, "FK4_NO_E") ){
+   } else if( !Ustrcmp( sys, "FK4_NO_E") || !Ustrcmp( sys, "FK4-NO-E") ){
       eq = slaEpb( eq );
       radesys = FK4NOE;
       isys = RADEC;
-      SetItemC( &(store->radesys), 0, s, "FK4_NO_E" );
+      SetItemC( &(store->radesys), 0, s, "FK4-NO-E" );
 
    } else if( !Ustrcmp( sys, "FK5" ) ){
       eq = slaEpj( eq );
@@ -16643,7 +16646,7 @@ static AstFrame *WcsFrame( AstFitsChan *this, FitsStore *store, char s, int prj,
             skyframe = astSkyFrame( "System=FK4" );
 
          } else if( radesys == FK4NOE ){
-            skyframe = astSkyFrame( "System=FK4_NO_E" );
+            skyframe = astSkyFrame( "System=FK4-NO-E" );
 
          } else if( radesys == FK5 ){
             skyframe = astSkyFrame( "System=FK5" );
