@@ -187,6 +187,14 @@
 \renewcommand{\dgs}{degrees} 
 \end{htmlonly}
 
+\newcommand{\dash}{--}
+\begin{htmlonly}
+\renewcommand{\dash}{-}
+\end{htmlonly}
+\newcommand{\STARURL}{http://star-www.rl.ac.uk}
+\newcommand{\IRAFURL}{http://star-www.rl.ac.uk/iraf/web/iraf-homepage.html}
+\newcommand{\STORE}{http://star-www.rl.ac.uk/cgi-bin/storetop}
+
 % ? End of document specific commands
 % -----------------------------------------------------------------------------
 %  Title Page.
@@ -833,7 +841,7 @@ command:
 
 This command must be issued before attempting to use any POLPACK
 applications. POLPACK is also available from the \xref{ICL}{sg5}{}
-\latexonly{(see SG/5)} command language.
+\latexonly{(see SG/5)} command language, and the IRAF CL.
 
 \subsection{\label{SEC:IMPORT}Importing Header Information}
 POLPACK needs to know certain items of header information about each of
@@ -1654,10 +1662,10 @@ unexpected behaviour is encountered while using POLPACK:
 
 \begin{description}
 
-\item [``\texttt{Command not found.}''] - Have you started up POLPACK
+\item [``\texttt{Command not found}''] - Have you started up POLPACK
 as described \hyperref{here}{in section }{}{SEC:START}?
 
-\item [``POLIMP will not accept my IRAF/FITS/etc data files.''] - Have
+\item [``POLIMP will not accept my IRAF/FITS/etc data files''] - Have
 you started up the CONVERT package has described \hyperref{here}{in section }
 {}{SEC:CONVERT}?
 
@@ -1674,7 +1682,128 @@ run from ICL, you may get messages on start-up and exit about errors
 reading from sockets. These are currently being investigated, but appear
 not to prevent POLKA functioning correctly.
 
+\item [``No browser appears when I try to use hypertext help in POLKA''] -
+The scheme used to activate the hypertext browser may not work for all
+combinations of browsers and operating systems. You may be able to get
+round this by specifying a different browser using the HTX\_BROWSER
+environment variable. For instance, some revisions of \texttt{netscape V4}
+fail to appear using POLKA under Digital UNIX V4. If you have a copy of 
+\texttt{netscape V3} you could use it instead by setting HTX\_BROWSER to
+its path:
+
+\begin{myquote}
+\begin{verbatim}
+% setenv HTX_BROWSER /usr/local/bin/netscape.v3
+\end{verbatim}
+\end{myquote}
+
+replacing the example path with the correct path for your machine.
+
+\item [``POLKA always requires NEWCOLMAP to be set true''] - POLKA
+requires its own private colour table if there are other colour-greedy
+applications running when POLKA tries to create the image display area.
+The \texttt{netscape} hypertext browser is a common example. Shutting down
+such applications before running POLKA should get round the problem. 
+
+Note, if the parameter STARTHELP has a true value when running POLKA, then
+a hypertext browser will be created automatically \emph{before} the image
+display area is created. If this causes the ``NEWCOLMAP'' problem, then
+disable the automatic creation of the hypertext browser by setting
+STARTHELP to a false value when running POLKA:
+
+\begin{myquote}
+\begin{verbatim}
+% polka starthelp=no
+\end{verbatim}
+\end{myquote}
+
+This need only be done once. Subsequent invocations of POLKA will use the
+same value for STARTHELP until a new value is specified on the command
+line. If necessary, you can still access the hypertext help using the
+\texttt{Help} menu button at the top right corner of the POLKA interface.
+
 \end{description}
+
+\section{Running POLPACK from the IRAF CL}
+POLPACK is written for the \xref{Starlink software environment}{sg5}{},
+but may also be run from the \htmladdnormallink{IRAF}{\IRAFURL} CL,
+reading and writing IRAF \texttt{.imh} image files using the `on-the-fly'
+data-conversion facilities described \hyperref{here} {in section }{}
+{SEC:CONVERT}.
+
+Assuming that all the \htmlref{required software}{required_software}
+has been installed in the \xref{recommended way}{sun217}
+{installing_the_starlink_software} and IRAF initialised as usual, the 
+POLPACK may be loaded at the cl prompt by:
+
+\begin{myquote} 
+\begin{verbatim}
+cl> polpack
+\end{verbatim} 
+\end{myquote}
+
+the menu of commands will be displayed as for normal IRAF packages and
+applications are invoked and help obtained in the normal way. However,
+the IRAF Cl is not the Starlink software environment, and you will find
+some differences in the way POLPACK behaves when run from the two
+environments (other than the obvious ones like the way parameters are
+prompted for). These include:
+
+\begin{itemize}
+
+\item The \htmlref{POLHELP}{POLHELP} command is not available. Use the
+IRAF help system instead.
+
+\item In transforming data from NDF to IRAF format, some information may
+be lost. In particular, any VARIANCE component in an NDF will be lost and
+so variance estimates will not be made by POLPACK. Also, bad pixels
+within NDFs will be replaced by the value zero when converted to IRAF
+format.
+
+\item Some of the Starlink packages which you may be used to using with
+POLPACK may not be available under IRAF. For instance, at the moment the
+\xref{CURSA}{sun190}{} package which can be used to manipulate catalogues of
+polarization vectors is not available under IRAF.
+
+\end{itemize}
+
+The experienced IRAF user will also detected some differences between the
+way POLPACK runs under CL and the way standard IRAF packages run under CL
+\dash\ in the area of graphics for instance. Some general guidance on running
+Starlink applications from IRAF CL is given in \xref{SUN/217}{sun217}{}.
+A description, intended for programmers, of the way Starlink packages are
+set up for use with IRAF, and some technical detail about how the system
+works is in \xref{SSN/35}{ssn35}{}.
+
+\subsection{Required Software}
+To run POLPACK applications from IRAF CL you will require the following
+Starlink software items in addition to POLPACK:
+
+\begin{description}
+
+\item[\xref{IRAFSTAR}{ssn35}{}] The IRAF/Starlink inter-operability 
+infrastructure.
+
+\item[\xref{TCLSYS}{sun200}{}] The Starlink distribution of 
+\htmladdnormallink{Tcl}{\TCLURL} and associated items. 
+
+\item[\xref{STARTCL}{sun186}{}] Starlink extensions to Tcl \dash\ including
+the TCL/GWM Xdisplay Widget.
+
+\item[RUNTIME] Miscellaneous items of software required by most applications
+at runtime.
+
+\item[\xref{CONVERT}{sun55}{}] The data-conversion software required if the 
+automatic data-conversion facilities are to be used.
+
+\item[\xref{HTX}{sun188}{}] Document cross-referencing software required during 
+installation of Starlink software.
+
+\end{description}
+
+More details on this, including how to obtain and install the software are in
+\xref{SUN/217}{sun217}{installing_the_starlink_software}
+\latexonly{ Appendix A}.
 
 \section{Acknowledging this Software}
 Please acknowledge the use of this software in any publications arising
@@ -2788,7 +2917,7 @@ for NDF applications.
       descriptions below are the initial default values.
    }
    \sstusage{
-      polka in out\_s [skyframes]
+      polka in out\_s 
    }
    \sstparameters{
       \sstsubsection{
@@ -2878,14 +3007,6 @@ for NDF applications.
          from the GUI\texttt{'}s \texttt{"}Options\texttt{"} menu. [!]
       }
       \sstsubsection{
-         MODE = LITERAL (Read)
-      }{
-         The type of polarization being measured; Linear or Circular. This
-         parameter is only accessed if an output cube holding Stokes
-         parameters is being created (\emph{i.e.} if OUT\_S is not given a null (!)
-         value). [Linear]
-      }
-      \sstsubsection{
          NEWCOLMAP = \_LOGICAL (Read)
       }{
          If a TRUE value is supplied for NEWCOLMAP, then the GUI will use
@@ -2958,6 +3079,14 @@ for NDF applications.
          The percentiles that define the scaling limits for the displayed
          images. For example, [25,75] would scale between the quartile
          values. [5,95]
+      }
+      \sstsubsection{
+         PMODE = LITERAL (Read)
+      }{
+         The type of polarization being measured; Linear or Circular. This
+         parameter is only accessed if an output cube holding Stokes
+         parameters is being created (\emph{i.e.} if OUT\_S is not given a null (!)
+         value). [Linear]
       }
       \sstsubsection{
          POL = \_LOGICAL (Read)
