@@ -277,6 +277,8 @@
 *    Number of trial positions for energy profiling
       IF ( PSF_CONSTANT ) THEN
         NIPOS = 1
+        MAXOFF = 1.5*MATH__DTOR
+
       ELSE
         NIPOS = 3
 
@@ -296,7 +298,6 @@
       DO IPOS = 1, NIPOS
 
 *      Choose image position
-        X0 = MAXOFF*FLOAT(IPOS-1)/REAL(NIPOS)
         PSF_PPR(IPOS) = SQRT(X0*X0+Y0*Y0)
 
 *      Get profile
@@ -307,6 +308,9 @@
         DO ILEV = 1, NPSFLEV
           PSF_PIXL(ILEV,IPOS) = PSF_PIXL(ILEV,IPOS)/ABS(AX_DR(1))
         END DO
+
+*      Next radius
+        X0 = X0 + MAXOFF/REAL(NIPOS)
 
       END DO
       IF ( STATUS .NE. SAI__OK ) GOTO 99
