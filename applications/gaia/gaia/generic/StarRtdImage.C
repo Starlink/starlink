@@ -423,7 +423,7 @@ ImageData* StarRtdImage::getStarImage(const char* filename,
 
   //  ALLAN: fileSuffix(filename) might return "fits.Z" or "fits.gz"
   //  for a compressed FITS file. 
-  char* p = strchr( filename, '.' );
+  char* p = (char *) strchr( filename, '.' );
   int isfits = 1;
   if ( p && ! strstr( p, ".fit" ) ) {
       isfits = 0;
