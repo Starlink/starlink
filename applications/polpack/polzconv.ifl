@@ -58,14 +58,14 @@ interface POLZCONV
 
    parameter      ZAXVAL
       type        'LITERAL'
-      prompt      'The Z axis value to plot'
+      prompt      'The Z axis value to convert'
       ppath       'CURRENT'
       helpkey     '*'
    endparameter
 
    parameter      ZCOLVAL
       type        'LITERAL'
-      prompt      'The Z column value to plot'
+      prompt      'The Z column value to convert'
       vpath       'DEFAULT'
       ppath       'DEFAULT'
       default     !
