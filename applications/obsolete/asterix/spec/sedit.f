@@ -40,6 +40,7 @@
 *      2 Aug 94 : V1.7-4 Allow Asterix list notation for parameter
 *                        selection. (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
+*     14 Dec 94 : V1.8-1 Display ties (DJA)
 *
 *    Type Definitions :
 *
@@ -89,7 +90,7 @@
 *    Version :
 *
       CHARACTER*30         	VERSION            	! Version id
-        PARAMETER               ( VERSION = 'SEDIT Version 1.8-0' )
+        PARAMETER               ( VERSION = 'SEDIT Version 1.8-1' )
 *-
 
 *    Check status
@@ -733,6 +734,9 @@
       INTEGER NMCOMP				! No of pmodels in cmodel
       INTEGER I,J,K                             ! Counters
       INTEGER IL                                ! Current line number
+      INTEGER NTIE				! Tied parameters
+      INTEGER TSTART(MAXTIE)
+      INTEGER TGROUP(NPAMAX)
 
       LOGICAL ETHERE				! Errors there
       LOGICAL FROZEN				! .TRUE. if parameter frozen
@@ -777,6 +781,9 @@
      :                                           //'object', STATUS )
         GOTO 99
       END IF
+
+*    Get ties if present
+      CALL FIT_MODGET_TIES( FLOC, NTIE, TSTART, TGROUP, STATUS )
 
 *    Step through model components :
       PARTOT=0
@@ -829,7 +836,11 @@
                FROZ='   '
             END IF
             IF ( ETHERE ) FROZ = 'E'//FROZ(2:3)
-
+            IF ( (NTIE.GT.0) .AND. (TGROUP(J).GT.0) ) THEN
+              IF ( J .NE. TSTART(TGROUP(J)) ) THEN
+                FROZ(2:2) = 'C'
+              END IF
+            END IF
 	    K=CHR_LEN(UNITS)
             WRITE( VSTR, '('//PFMT//',4X,'//PFMT//',A4,'//PFMT//')' )
      :                                            VAL, LOW, ' -> ', HI
