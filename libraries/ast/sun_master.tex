@@ -1109,6 +1109,738 @@ Plots and how to produce graphical output, see \secref{ss:plots}. Also
 see the Plot entry in \appref{ss:classdescriptions}.
 
 \cleardoublepage
+%\include{howto}
+%docstatus howto:
+\section{How To\ldots}
+
+For those of you with a plane to catch, this section provides some
+instant templates and recipes for performing the most
+commonly-required operations using AST, but without going into
+detail. The examples given (sort of) follow on from each other, so you
+should be able to construct a variety of programs by piecing them
+together.
+
+If any of this material has you completely baffled, then you may want
+to read the introduction to AST programming concepts in
+\secref{ss:primer} first. Otherwise, references to more detailed
+reading are given after each example, just in case they don't quite do
+what you want.
+
+\subsection{\ldots Structure an AST Program}
+
+An AST program normally has the following structure:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+/* Include the interface to the AST library. */
+#include "ast.h"
+
+/* Main program (or could be any function). */
+main () {
+   <normal C declarations and statements>
+
+/* Enclose the parts which use AST between the astBegin and astEnd macros. */
+   astBegin;
+   <C statements which use AST>
+   astEnd;
+
+   <maybe more C statements>
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+*  Include the interface to the AST library.
+      INCLUDE 'AST_PAR'
+
+*  Declare an integer status variable.
+      INTEGER STATUS
+      <maybe other declarations>
+
+*  Initialise the status to zero.
+      STATUS = 0
+      <maybe some Fortran statements>
+
+*  Enclose the parts which use AST between AST_BEGIN and AST_END calls.
+      CALL AST_BEGIN( STATUS )
+      <Fortran statements which use AST>
+      CALL AST_END( STATUS )
+
+      <maybe more Fortran statements>
+      END
+\end{verbatim}
+\normalsize
+f-
+
+c+
+The use of astBegin and astEnd is optional, but has the effect of
+tidying up after you have finished using AST, so is normally
+recommended. For more details of this, see \secref{ss:contexts}. For
+details of how to access the ``ast.h'' header file, see
+\secref{ss:accessingheaderfile} and the description of the
+``ast\_dev'' command in \appref{ss:commanddescriptions}.
+c-
+f+
+The use of AST\_BEGIN and AST\_END is optional, but has the effect of
+tidying up after you have finished using AST, so is normally
+recommended. For more details of this, see \secref{ss:contexts}. For
+details of how to access the AST\_PAR include file, see
+\secref{ss:accessingheaderfile} and the description of the
+``ast\_dev'' command in \appref{ss:commanddescriptions}.
+f-
+
+\subsection{\ldots Build an AST Program}
+
+Before building any AST program, you may want to issue the UNIX command:
+
+\begin{quote}
+\small
+\begin{verbatim}
+ast_dev
+\end{verbatim}
+\normalsize
+\end{quote}
+
+which will set up links to the AST include files in your current
+directory.  Then, to build a simple AST program that doesn't use
+graphics, use:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+cc program.c -L/star/lib `ast_link` -o program
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\begin{quote}
+\small
+\begin{verbatim}
+f77 program.f -L/star/lib `ast_link` -o program
+\end{verbatim}
+\normalsize
+\end{quote}
+f-
+
+To build a program which uses PGPLOT for graphics, use:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+cc program.c -L/star/lib `ast_link -pgplot` -o program
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\begin{quote}
+\small
+\begin{verbatim}
+f77 program.f -L/star/lib `ast_link -pgplot` -o program
+\end{verbatim}
+\normalsize
+\end{quote}
+f-
+
+c+
+For more details about accessing the ``ast.h'' header file, see
+\secref{ss:accessingheaderfile} and the description of the
+``ast\_dev'' command in \appref{ss:commanddescriptions}.  For more
+details about linking programs, see \secref{ss:linking} and the
+description of the ``ast\_link'' command in
+\appref{ss:commanddescriptions}.
+c-
+f+
+For more details about accessing AST include files, see
+\secref{ss:accessingheaderfile} and the description of the
+``ast\_dev'' command in \appref{ss:commanddescriptions}.  For more
+details about linking programs, see \secref{ss:linking} and the
+description of the ``ast\_link'' command in
+\appref{ss:commanddescriptions}.
+f-
+
+\subsection{\label{ss:howtoreadwcs}\ldots Read a WCS Calibration from a Dataset}
+
+c+
+Precisely how you extract World Coordinate System (WCS) information
+from a dataset obviously depends on what type of dataset it
+is. Usually, however, you should be able to obtain a set of FITS
+header cards which contain the WCS information (and probably much more
+besides). Suppose that ``cards'' is a pointer to an array of strings
+containing a complete set of FITS header cards and ``ncard'' is the
+number of cards. Then proceed as follows:
+c-
+f+
+Precisely how you extract World Coordinate System (WCS) information
+from a dataset obviously depends on what type of dataset it
+is. Usually, however, you should be able to obtain a set of FITS
+header cards which contain the WCS information (and probably much more
+besides). Suppose that CARDS is an array of character strings
+containing a complete set of FITS header cards and NCARD is the number
+of cards. Then proceed as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+AstFitsChan *fitschan;
+AstFrameSet *wcsinfo;
+char *cards[ MAXCARD ];
+int icard, ncard;
+
+...
+
+/* Create a FitsChan and fill it with FITS header cards. */
+fitschan = astFitsChan( NULL, NULL, "" );
+for ( icard = 0; icard < ncard; icard++ ) astPutFits( fitschan, cards[ icard ], 0 );
+
+/* Rewind the FitsChan and read WCS information from it. */
+astClear( fitschan, "Card" );
+wcsinfo = astRead( fitschan );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER FITSCHAN, ICARD, NCARD, WCSINFO
+      CHARACTER * ( 80 ) CARDS( NCARD )
+
+      ...
+
+*  Create a FitsChan and fill it with FITS header cards.
+      FITSCHAN = AST_FITSCHAN( AST_NULL, AST_NULL, ' ', STATUS )
+      DO 1 ICARD = 1, NCARD
+         CALL AST_PUTFITS( FITSCHAN, CARDS( ICARD ), .FALSE., STATUS )
+ 1    CONTINUE
+
+*  Rewind the FitsChan and read WCS information from it.
+      CALL AST_CLEAR( FITSCHAN, 'Card', STATUS )
+      WCSINFO = AST_READ( FITSCHAN, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+f+
+(Some datasets which do not easily yield FITS headers may require a
+different approach. In the case of the Starlink NDF data format, for
+example, the above recipe should be replaced by a single call to the
+routine \xref{NDF\_GTWCS}{sun33}{NDF_GTWCS}---see
+\xref{SUN/33}{sun33}{}).
+f-
+
+c+
+The result should be a pointer, ``wcsinfo'', to a Frameset which
+contains the WCS information. This pointer can now be used to perform
+many useful tasks, some of which are illustrated in the following
+recipes.
+c-
+f+
+The result should be a pointer, WCSINFO, to a Frameset which contains
+the WCS information. This pointer can now be used to perform many
+useful tasks, some of which are illustrated in the following recipes.
+f-
+
+For more details about reading WCS information from datasets, see
+\secref{ss:identifyingfitsencoding} and
+\secref{ss:readingforeignfits}. For a more general description of
+FitsChans and their use with FITS header cards, see
+\secref{ss:nativefits} and \secref{ss:foreignfits}. For more details
+about FrameSets, see \secref{ss:framesets} and \secref{ss:fshigher}.
+
+\subsection{\ldots Validate WCS Information}
+
+Once you have read WCS information from a dataset, as in
+\secref{ss:howtoreadwcs}, you may wish to check that you have been
+successful. The following will detect and classify the things that
+might possibly go wrong:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include <string.h>
+
+...
+
+if ( !astOK ) {
+   <an error occurred (a message will have been issued)>
+} else if ( wcsinfo == AST__NULL ) {
+   <there was no WCS information present>
+} else if ( strcmp( astGetC( wcsinfo, "Class" ), "FrameSet" ) ) {
+   <something unexpected was read (i.e. not a FrameSet)>
+} else {
+   <WCS information was read OK>
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      IF ( STATUS .NE. 0 ) THEN
+         <an error occurred (a message will have been issued)>
+      ELSE IF ( WCSINFO .EQ. AST__NULL ) THEN
+         <there was no WCS information present>
+      ELSE IF ( AST_GETC( WCSINFO, 'Class', STATUS ) .NE. 'FrameSet' ) THEN
+         <something unexpected was read (i.e. not a FrameSet)>
+      ELSE
+         <WCS information was read OK>
+      END IF
+\end{verbatim}
+\normalsize
+f-
+
+c+
+For more information about detecting errors in AST functions, see
+\secref{ss:errordetection}. For details of how to validate input data
+read by AST, see \secref{ss:validatinginput} and
+\secref{ss:readingforeignfits}.
+c-
+f+
+For more information about detecting errors in AST routines, see
+\secref{ss:errordetection}. For details of how to validate input data
+read by AST, see \secref{ss:validatinginput} and
+\secref{ss:readingforeignfits}.
+f-
+
+\subsection{\ldots Display AST Data}
+
+If you have a pointer to any AST Object, you can display the data
+stored in that Object in textual form as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astShow( wcsinfo );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SHOW( WCSINFO, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+Here, we have used a pointer to the FrameSet which we read earlier
+(\secref{ss:howtoreadwcs}).  The result is written to the program's
+standard output stream. This can be very useful during debugging.
+
+c+
+For more details about using astShow, see
+\secref{ss:displayingobjects}. For information about interpreting the
+output, also see \secref{ss:textualoutputformat}.
+c-
+f+
+For more details about using AST\_SHOW, see
+\secref{ss:displayingobjects}. For information about interpreting the
+output, also see \secref{ss:textualoutputformat}.
+f-
+
+\subsection{\label{ss:howtotransform}\ldots Convert Between Pixel and World Coordinates}
+
+You may use a pointer to a FrameSet, such as we read in
+\secref{ss:howtoreadwcs}, to transform a set of points between the
+pixel coordinates of an image and the associated world coordinates. If
+you are working in two dimensions, proceed as follows:
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+double xpixel[ N ], ypixel[ N ];
+double xworld[ N ], yworld[ N ];
+
+...
+
+astTran2( wcsinfo, N, xpixel, ypixel, 1, xworld, yworld );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      INTEGER N
+      DOUBLE PRECISION XPIXEL( N ), YPIXEL( N )
+      DOUBLE PRECISION XWORLD( N ), YWORLD( N )
+
+      ...
+
+      CALL AST_TRAN2( WCSINFO, N, XPIXEL, YPIXEL, .TRUE.,
+     :                            XWORLD, YWORLD, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, N is the number of points to be transformed, ``xpixel'' and
+``ypixel'' hold the pixel coordinates, and ``xworld'' and ``yworld''
+receive the returned world coordinates.\footnote{By pixel coordinates,
+we mean a coordinate system in which the first pixel in the image is
+centred on (1,1) and each pixel is a unit square.  Note that the world
+coordinates will not necessarily be celestial coordinates, but if they
+are, then they will be in radians.}  To transform in the opposite
+direction, interchange the two pairs of arrays (so that the world
+coordinates are given as input) and change the fifth argument of
+astTran2 to zero.
+c-
+f+
+Here, N is the number of points to be transformed, XPIXEL and YPIXEL
+hold the pixel coordinates, and XWORLD and YWORLD receive the returned
+world coordinates.\footnote{By pixel coordinates, we mean a coordinate
+system in which the first pixel in the image is centred on (1,1) and
+each pixel is a unit square.  Note that the world coordinates will not
+necessarily be celestial coordinates, but if they are, then they will
+be in radians.}  To transform in the opposite direction, interchange
+the two pairs of arrays (so that the world coordinates are given as
+input) and change the fifth argument of AST\_TRAN2 to .FALSE..
+f-
+
+c+
+To transform points in one dimension, use astTran1. In any other
+number of dimensions (or if the number of dimensions is initially
+unknown), use astTranN or astTranP. These functions are described in
+\appref{ss:functiondescriptions}.
+c-
+f+
+To transform points in one dimension, use AST\_TRAN1. In any other
+number of dimensions (or if the number of dimensions is initially
+unknown), use AST\_TRANN. These routines are described in
+\appref{ss:functiondescriptions}.
+f-
+
+For more information about transforming coordinates, see
+\secref{ss:transforming} and \secref{ss:framesetasmapping}. For
+details of how to handle missing coordinates, see
+\secref{ss:badcoordinates}.
+
+\subsection{\label{ss:howtoformatcoordinates}\ldots Format Coordinates for Display}
+
+c+
+Once you have converted pixel coordinates into world coordinates, you
+may want to format them as text before displaying them. Typically,
+this would convert from (say) radians into something more
+comprehensible. Using the FrameSet pointer ``wcsinfo'' obtained in
+\secref{ss:howtoreadwcs} and a pair of world coordonates ``xw'' and
+``yw'' ({\em{e.g.}}\ see \secref{ss:howtotransform}), you could
+proceed as follows:
+c-
+f+
+Once you have converted pixel coordinates into world coordinates, you
+may want to format them as text before displaying them. Typically,
+this would convert from (say) radians into something more
+comprehensible. Using the FrameSet pointer WCSINFO obtained in
+\secref{ss:howtoreadwcs} and a pair of world coordonates XW and YW
+({\em{e.g.}}\ see \secref{ss:howtotransform}), you could proceed as
+follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include <stdio.h>
+const char *xtext, *ytext;
+double xw, yw;
+
+...
+
+xtext = astFormat( wcsinfo, 1, xw );
+ytext = astFormat( wcsinfo, 2, yw );
+
+(void) printf( "Position = %s, %s\n", xtext, ytext );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CHARACTER * ( 20 ) XTEXT, YTEXT
+      DOUBLE PRECISION XW, YW
+
+      ...
+
+      XTEXT = AST_FORMAT( WCSINFO, 1, XW )
+      YTEXT = AST_FORMAT( WCSINFO, 2, YW )
+
+      WRITE ( *, 99 ) XTEXT, YTEXT
+ 99   FORMAT( 'Position = ', A, ', ', A )
+\end{verbatim}
+\normalsize
+f-
+
+c+
+Here, the second argument to astFormat is the axis number.
+c-
+f+
+Here, the second argument to AST\_FORMAT is the axis number.
+f-
+
+With celestial coordinates, this will usually result in sexagesimal
+notation, such as ``12:34:56.7''. However, the same method may be
+applied to any type of coordinates and appropriate formatting will be
+employed.
+
+For more information about formatting coordinate values and how to
+control the style of formatting used, see
+\secref{ss:formattingaxisvalues} and
+\secref{ss:formattingskyaxisvalues}. If necessary, also see
+\secref{ss:normalising} for details of how to ``normalise'' a set of
+coordinates so that they lie within the standard range ({\em{e.g.}}\ 0
+to 24 hours for right ascension and $\pm 90^\circ$ for
+declination).
+
+\subsection{\ldots Display Coordinates as they are Transformed}
+
+c+
+In addition to formatting coordinates as part of a program's output,
+you may also want to examine coordinate values while debugging your
+program. To save time, you can ``eavesdrop'' on the coordinate values
+being processed every time they are transformed. For example, when
+using the FrameSet pointer ``wcsinfo'' obtained in
+\secref{ss:howtoreadwcs} to transform coordinates
+(\secref{ss:howtotransform}), you could inspect the coordinate values
+as follows:
+c-
+f+
+In addition to formatting coordinates as part of a program's output,
+you may also want to examine coordinate values while debugging your
+program. To save time, you can ``eavesdrop'' on the coordinate values
+being processed every time they are transformed. For example, when
+using the FrameSet pointer WCSINFO obtained in
+\secref{ss:howtoreadwcs} to transform coordinates
+(\secref{ss:howtotransform}), you could inspect the coordinate values
+as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+astSet( wcsinfo, "Report=1" );
+astTran2( wcsinfo, N, xpixel, ypixel, 1, xworld, yworld );
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CALL AST_SET( WCSINFO, 'Report=1', STATUS )
+      CALL AST_TRAN2( WCSINFO, N, XPIXEL, YPIXEL, .TRUE.,
+     :                            XWORLD, YWORLD, STATUS )
+\end{verbatim}
+\normalsize
+f-
+
+By setting the FrameSet's Report attribute to 1, coordinate
+transformations are automatically displayed on the program's standard
+output stream, appropriately formatted, for example:
+
+\begin{quote}
+\begin{verbatim}
+(42.1087, 20.2717) --> (2:06:03.0, 34:22:39)
+(43.0197, 21.1705) --> (2:08:20.6, 35:31:24)
+(43.9295, 22.0716) --> (2:10:38.1, 36:40:09)
+(44.8382, 22.9753) --> (2:12:55.6, 37:48:55)
+(45.7459, 23.8814) --> (2:15:13.1, 38:57:40)
+(46.6528, 24.7901) --> (2:17:30.6, 40:06:25)
+(47.5589, 25.7013) --> (2:19:48.1, 41:15:11)
+(48.4644, 26.6149) --> (2:22:05.6, 42:23:56)
+(49.3695, 27.5311) --> (2:24:23.1, 43:32:41)
+(50.2742, 28.4499) --> (2:26:40.6, 44:41:27)
+\end{verbatim}
+\end{quote}
+
+For a complete discription of the Report attribute, see its entry in
+\appref{ss:attributedescriptions}.  For further details of how to set
+and enquire attribute values, see \secref{ss:settingattributes} and
+\secref{ss:gettingattributes}.
+
+\subsection{\ldots Read Coordinates Entered by a User}
+
+In addition to writing out coordinate values generated by your program
+(\secref{ss:howtoformatcoordinates}), you may also need to accept
+coordinates entered by a user, or perhaps read from a file. In this
+case, you will probably want to allow ``free-format'' input, so that
+the user has some flexibility in the format that can be used. You will
+probably also want to detect any typing errors.
+
+c+
+Let's assume that you want to read a number of lines of text, each
+containing the world coordinates of a single point, and to split each
+line into individual numerical coordinate values. Using the FrameSet
+pointer ``wcsinfo'' obtained earlier (\secref{ss:howtoreadwcs}), you
+could proceed as follows:
+c-
+f+
+Let's assume that you want to read a number of lines of text, each
+containing the world coordinates of a single point, and to split each
+line into individual numerical coordinate values. Using the FrameSet
+pointer WCSINFO obtained earlier (\secref{ss:howtoreadwcs}), you could
+proceed as follows:
+f-
+
+c+
+\begin{quote}
+\small
+\begin{verbatim}
+#include <stdio.h>
+char *t;
+char text[ MAXCHARS + 2 ];
+double coord[ 10 ];
+int iaxis, n, naxes;
+
+...
+
+/* Obtain the number of coordinate axes (if not already known). */
+naxes = astGetI( wcsinfo, "Naxes" );
+
+/* Loop to read each line of input text, in this case from the
+   standard input stream (your programming environment will probably
+   provide a better way of reading text than this). Set the pointer
+   "t" to the start of each line read. */
+while ( t = fgets( text, MAXCHARS + 2, stdin ) ) {
+
+/* Attempt to read a coordinate for each axis. */
+   for ( iaxis = 1; iaxis <= naxes; iaxis++ ) {
+      n = astUnformat( wcsinfo, iaxis, t, &coord[ iaxis - 1 ] );
+
+/* If nothing was read and this is not the first axis or the
+   end-of-string, try stepping over a separator and reading again. */
+   if ( !n && ( iaxis > 1 ) && *t )
+      n = astUnformat( wcsinfo, iaxis, ++t, &coord[ iaxis - 1 ] );
+
+/* Quit if nothing was read, otherwise move on to the next coordinate. */
+      if ( !n ) break;
+      t += n;
+   }
+
+/* Test for the possible errors that may occur... */
+
+/* Error detected by AST (a message will have been issued). */
+   if ( !astOK ) {
+      break;
+
+/* Error in input data at character t[n]. */
+   } else if ( *t || !n ) {
+      <handle the error, or report your own message here>
+      break;
+
+   } else {
+      <coordinates were read OK>
+   }
+}
+\end{verbatim}
+\normalsize
+\end{quote}
+c-
+f+
+\small
+\begin{verbatim}
+      CHARACTER TEXT * ( 80 )
+      DOUBLE PRECISION COORD( 10 )
+      INTEGER IAXIS, N, NAXES, T
+
+      ...
+
+*  Obtain the number of coordinate axes (if not already known).
+      NAXES = AST_GETI( WCSINFO, 'Naxes', STATUS )
+
+*  Loop to read each line of input text, in this case from the
+*  standard input channel (your programming environment will probably
+*  provide a better way of reading text than this). Set the index T to
+*  the start of each line read.
+ 2    CONTINUE
+      READ( *, '(A)', END=99 ) TEXT
+      T = 1
+
+*  Attempt to read a coordinate for each axis.
+      DO 3 IAXIS = 1, NAXES
+         N = AST_UNFORMAT( WCSINFO, IAXIS, TEXT( T : ), COORD( IAXIS ),
+     :                     STATUS )
+
+*  If nothing was read and this is not the first axis and the end of
+*  the text has not been reached, try stepping over a separator and
+*  reading again.
+         IF ( ( N .EQ. 0 ) .AND. ( IAXIS .GT. 1 ) .AND.
+     :        ( T .LT. LEN( STRING ) ) ) THEN
+            T = T + 1
+            N = AST_UNFORMAT( WCSINFO, IAXIS, TEXT( T : ),
+                              COORD( IAXIS ), STATUS )
+         END IF
+
+*  Quit if nothing was read, otherwise move on to the next coordinate.
+         IF ( N .EQ. 0 ) GO TO 4
+         T = T + N
+ 3    CONTINUE
+ 4    CONTINUE
+
+*  Test for the possible errors that may occur...
+
+*  Error detected by AST (a message will have been issued).
+      IF ( STATUS .NE. 0 ) THEN
+         GO TO 99
+
+*  Error in input data at character TEXT( T + N : T + N ).
+      ELSE IF ( ( T .LT. LEN( STRING ) ) .OR. ( N .EQ. 0 ) ) THEN
+         <handle the error, or report your own message here>
+         GO TO 99
+
+      ELSE
+         <coordinates were read OK>
+      END IF
+
+*  Return to read the next input line.
+      GO TO 2
+ 99   CONTINUE
+\end{verbatim}
+\normalsize
+f-
+
+This algorithm has the advantage of accepting free-format input in
+whatever style is appropriate for the world coordinates in use (under
+the control of the FrameSet whose pointer you provide). For example,
+wavelength values might be read as floating point numbers
+({\em{e.g.}}\ ``1.047'' or ``4787''), whereas celestial positions
+could be given in sexagesimal format ({\em{e.g.}}\ ``12:34:56'' or
+``12~34.5'') and would be converted into radians. Individual
+coordinate values may be separated by white space and/or any
+non-ambiguous separator character, such as a comma.
+
+c+
+For more information on reading coordinate values using the
+astUnformat function, see \secref{ss:unformattingaxisvalues}. For
+details of how sexagesimal formats are handled, and the forms of input
+that may be used for celestial coordinates, see
+\secref{ss:unformattingskyaxisvalues}.
+c-
+f+
+For more information on reading coordinate values using the
+AST\_UNFORMAT routine, see \secref{ss:unformattingaxisvalues}. For
+details of how sexagesimal formats are handled, and the forms of input
+that may be used for for celestial coordinates, see
+\secref{ss:unformattingskyaxisvalues}.
+f-
+
+\cleardoublepage
 %\include{primer}
 %docstatus primer:           I(cf),      F(cf)
 \section{\label{ss:primer}An AST Object Primer}
