@@ -4304,10 +4304,16 @@ $(RECURSIVE_TARGETS):
 M componentset.xml
 M Makefile.dependencies
 </verbatim>
+          The <code>Makefile.dependencies</code> file is generated
+          using a Java program, so you must have a JDK in your
+          path before starting this procedure
           (you might possibly need to run <kbd>./configure
           --no-recursion</kbd> to bring the <code>Makefile</code>
           there up to date with respect to <code>Makefile.in</code>).
-          Double-check both <code>Makefile.dependencies</code> and
+          Alternatively, you can invoke make with
+          <kbd>make JAVA=/path/to/jdk Makefile.dependencies</kbd>.</p>
+
+        <p>Double-check both <code>Makefile.dependencies</code> and
           <code>componentset.xml</code>, using <kbd>cvs diff
           &lt;file&gt;</kbd>: ensure that the right material has
           been added before re-committing these two files.  If this
