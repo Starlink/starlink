@@ -14,7 +14,10 @@ Traces an HDS file
   </dependencies>
   <developers>
     <person>
-      <name>Malcolm Currie</name>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

@@ -17,13 +17,18 @@
   <developers>
     <person>
       <name>Peter M Allan</name>
-      <uname>NONE</uname>
       <email>P.M.Allan@rl.ac.uk</email>
     </person>
     <person>
       <name>Alan J Chipperfield</name>
       <uname>ajc</uname>
       <email>A.J.Chipperfield@rl.ac.uk</email>
+    </person>
+    <person>
+      <name>Malcolm J Currie</name>
+      <uname>mjc</uname>
+      <email>mjc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

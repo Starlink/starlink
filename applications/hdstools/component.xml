@@ -16,11 +16,16 @@ package but have now been modified to run as normal Starlink tasks.
   </dependencies>
   <developers>
     <person>
-      <uname>ajc</uname>
       <name>A. J. Chipperfield</name>
+      <uname>ajc</uname>
       <email>ussc@star.rl.ac.uk</email>
     </person>
-  </developers>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>  </developers>
   <documentation> sun245</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->

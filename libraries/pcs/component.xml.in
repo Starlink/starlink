@@ -165,6 +165,20 @@
       <uname>ajc</uname>
       <email>a.j.chipperfield@rl.ac.uk</email>
     </person>
+
+    <!-- I'll take this, since I've worked on it last, but we should
+         probably have more than one -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
+      <name>USSC</name>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>

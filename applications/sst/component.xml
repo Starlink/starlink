@@ -30,6 +30,12 @@
     <person>
       <name>R. F. Warren-Smith</name>
     </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+      <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun110</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>

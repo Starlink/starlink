@@ -37,6 +37,12 @@
     <person>
       <name>M. D. Lawden</name>
     </person>
+    <person>
+      <name>Brian McIlwrath</name>
+      <uname>bkm</uname>
+      <email>B.K.McIlwrath@rl.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>

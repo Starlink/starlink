@@ -24,6 +24,12 @@
     <person>
       <name>Alan J Chipperfield</name>
     </person>
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation> sun39</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>

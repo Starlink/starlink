@@ -30,6 +30,7 @@
       <name>Norman Gray</name>
       <uname>nxg</uname>
       <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>

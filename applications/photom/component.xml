@@ -13,16 +13,15 @@
   <dependencies >
     <build>pcs</build><build>ard</build><build>fio</build><build>grp</build><build>ndf</build><build>agi</build><build>sgs</build><build>pgp</build><build>gns</build><build>gks</build><sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun45</documentation> -->
+  <documentation> sun45</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

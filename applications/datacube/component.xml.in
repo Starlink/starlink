@@ -18,6 +18,7 @@ cube manipulation. </p></abstract>
       <name>Alasdair Allan</name>
       <uname>aa</uname>
       <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

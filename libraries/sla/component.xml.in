@@ -19,6 +19,7 @@
       <name>Patrick Wallace</name>
       <uname>ptw</uname>
       <email>ptw@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

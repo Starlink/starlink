@@ -22,6 +22,7 @@ and the ability to query on-line (WWW) catalogues.
       <name>Peter W. Draper</name>
       <uname>pwd</uname>
       <email>p.w.draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

@@ -25,6 +25,7 @@
       <name>Peter Draper</name>
       <uname>pwd</uname>
       <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun199</documentation>

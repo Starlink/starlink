@@ -30,6 +30,12 @@
     <person>
       <name>R. F. Warren-Smith</name>
     </person>
+    <person>
+      <name>Peter Draper</name>
+      <uname>pwd</uname>
+      <email>P.W.Draper@durham.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>

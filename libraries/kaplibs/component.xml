@@ -20,6 +20,7 @@ independently of KAPPA.</p></abstract>
       <name>D.S. Berry</name>
       <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation> sun238</documentation>

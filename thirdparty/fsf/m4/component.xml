@@ -15,6 +15,15 @@
   <path>thirdparty/fsf/m4</path>
   <description>GNU m4</description>
   <dependencies/>
+  <developers>
+    <!-- Many, but locally to Starlink... -->
+    <person>
+      <name>Norman Gray</name>
+      <uname>nxg</uname>
+      <email>norman@astro.gla.ac.uk</email>
+      <role>owner</role>
+    </person>
+  </developers>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>Imported from distributed m4-1.4.tar.gz by nxg,
     on 2004-03-07</p></notes>

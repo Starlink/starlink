@@ -10,15 +10,16 @@
   <dependencies >
     <build>tcl</build><build>tk</build>
   </dependencies>
-  <!--
   <developers>
+    <!-- Tcl is maintained by Scriptics, but this part of the tree
+         is maintained by... -->
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
   <!-- <documentation></documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->

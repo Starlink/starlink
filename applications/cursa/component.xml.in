@@ -31,6 +31,8 @@ on-line catalogues via the Internet.
     <person>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation>@STAR_DOCUMENTATION@</documentation>

@@ -31,15 +31,14 @@
   <dependencies >
     <sourceset>star2html</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Mark Taylor</name>
       <uname>mbt</uname>
       <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
   <!-- <documentation> sun188</documentation> -->
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->

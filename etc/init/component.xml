@@ -15,7 +15,9 @@
   </dependencies>
   <developers>
     <person>
-      <name>Martin Bly</name>
+      <name>USSC</name>
+      <email>ussc@star.rl.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <!-- <documentation></documentation> -->

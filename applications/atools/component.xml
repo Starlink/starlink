@@ -18,9 +18,10 @@ high-level interface to the AST library.
   </dependencies>
   <developers>
     <person>
-      <uname>dsb</uname>
       <name>David S. Berry</name>
+      <uname>dsb</uname>
       <email>dsb@ast.man.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
   <documentation></documentation>

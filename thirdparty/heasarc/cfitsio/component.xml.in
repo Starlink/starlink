@@ -17,13 +17,11 @@ Pence for giving his permission for CFITSIO to be released on Starlink.
   <dependencies @STAR_DEPENDENCIES_ATTRIBUTES@>
     @STAR_DEPENDENCIES_CHILDREN@
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>William Pence</name>
     </person>
   </developers>
-  -->
   <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->

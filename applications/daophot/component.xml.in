@@ -21,9 +21,14 @@
     <person><name>Peter Stetson</name><role>Original author</role></person>
     <person><name>Nicholas Eaton</name></person>
     <person><name>Grant Privett</name></person>
-    <person><name>Mark Taylor</name></person>
+    <person>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>m.b.taylor@bristol.ac.uk</email>
+      <role>owner</role>
+    </person>
   </developers>
-  <!-- <documentation>@STAR_DOCUMENTATION@</documentation> -->
+  <documentation>@STAR_DOCUMENTATION@</documentation>
   <bugreports>@PACKAGE_BUGREPORT@</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>

@@ -13,15 +13,14 @@ astronomical catalogues and similar tabular datasets.
   <dependencies >
     <build>ast</build><build>sae</build><build>par</build><build>prm</build><link>cfitsio</link><link>par</link><link>mers</link><link>sla</link><link>chr</link><link>ast</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
-      <name></name>
-      <uname></uname>
-      <email></email>
+      <name>Mark Taylor</name>
+      <uname>mbt</uname>
+      <email>M.B.Taylor@bristol.ac.uk</email>
+      <role>owner</role>
     </person>
   </developers>
-  -->
   <documentation> sun181</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <notes><p>

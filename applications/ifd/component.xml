@@ -18,6 +18,12 @@
   </dependencies>
   <developers>
     <person>
+      <name>Alasdair Allan</name>
+      <uname>aa</uname>
+      <email>aa@astro.ex.ac.uk</email>
+      <role>owner</role>
+    </person>
+    <person>
       <name>Alan Chipperfield</name>
     </person>
   </developers>

@@ -10,15 +10,13 @@
   <dependencies >
     <build>cnf</build><build>gwm</build><link>ems</link><link>gwm</link><link>starx</link><sourceset>star2html</sourceset><sourceset>messgen</sourceset>
   </dependencies>
-  <!--
   <developers>
     <person>
       <name>Dave L Terrett</name>
       <uname>dlt</uname>
     </person>
   </developers>
-  -->
-  <!-- <documentation> sun83</documentation> -->
+  <documentation> sun83</documentation>
   <bugreports>ussc@star.rl.ac.uk</bugreports>
   <!-- <notes><p></p></notes> -->
 </component>
