@@ -107,6 +107,8 @@ f     - AST_TRANN: Transform N-dimensional coordinates
 *        method.
 *     10-JUL-2003 (DSB):
 *        Added method astRate.
+*     2-SEP-2004 (DSB):
+*        Free resources before leaving astRate.
 *class--
 */
 
@@ -7184,6 +7186,9 @@ static double Rate( AstMapping *this, double *at, int ax1, int ax2, double *d2 )
          }
       }
    }
+
+/* Free resources */
+   FunPN( NULL, NULL, -2, 0, 0, NULL, NULL );
 
 /* Return the result. */
    return ret;
