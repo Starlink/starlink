@@ -24,7 +24,7 @@
 *     The keywords are:
 *        o  NAXIS, and NAXISn are derived from the dimensions of 
 *           the NDF data array.
-*        o  For an NDF whose origin is not 1 along each axis, LBOUNDn
+*        o  For an NDF whose origin is not the default LBOUNDn
 *           cards are written. (These are not part of the standard.)
 *        o  The OBJECT, LABEL, and BUNIT keywords are derived from
 *           the TITLE, LABEL, and UNITS NDF components.

@@ -53,14 +53,13 @@
 *        ORIGIN and DATE --- are created automatically.  However the
 *          former may be overriden by an ORIGIN card in the NDF
 *          FITS extension.
-*        HDUCLAS1 --- "NDF"
 *        BSCALE, BZERO, BLANK and END --- are not propagated
 *          from the extension.  The first will be set for any extension.
 *          BSCALE and BZERO are 1 and 0.  BLANK is set to a character
 *          string of the BAD value for this data.
 
 *  Copyright:
-*     Copyright (C) 1998-2000 Central Laboratory of the Research Councils
+*     Copyright (C) 1998-2001 Central Laboratory of the Research Councils
 
 *  Authors:
 *     MJC: Malcolm J. Currie (STARLINK)
@@ -91,6 +90,11 @@
 *        exists. The FITS headers still override this by precedence in the
 *        header list. Removed axis encoding, this is passed with the NDF
 *        WCS.
+*     2001 Apr 26 (PWD):
+*        LBOUND cards are no longer imported from the existing header
+*        (these are written as part of the standard headers). Removed
+*        HDUCLAS cards are these are not needed and can cause problems
+*        with saved images that are converted to FITS.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -198,15 +202,6 @@
      :                 STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 999
 
-*  Write classification and naming headers.
-*  ========================================
-      CALL RTD1_WRFTC( 'HDUCLAS1', 'NDF', 'Starlink NDF '/
-     :     /'(hierarchical n-dim format)', IPHEAD, NHEAD, AVAIL, 
-     :     STATUS )
-
-      CALL RTD1_WRFTC( 'HDUCLAS2', 'DATA', 'Array component subclass',
-     :     IPHEAD, NHEAD, AVAIL, STATUS )
-
 *  Write the NDF identifier into the header (this is only a temporary
 *  FITS structure so this shouldn't have any other effects).
       CALL RTD1_WRFTI( 'NDFID', NDF, 'NDF identifier (volatile)', 
@@ -271,7 +266,7 @@
             VALUE = FITSTR( 11:SZFITS )
 
 *  Leave out SIMPLE, XTENSION, BITPIX, EXTEND, PCOUNT, GCOUNT, NAXIS,
-*  NAXISn and possibly, OBJECT, LABEL, BUNIT, DATE, BLANK, HDUCLASn, and
+*  NAXISn and possibly, OBJECT, LABEL, BUNIT, DATE, BLANK, and
 *  END as described above. To avoid duplicate FITSIO banners these are
 *  also omitted, as they are written when FITSIO creates the primary
 *  headers.  * Use an intermediate variable to reduce the number of
@@ -308,10 +303,10 @@
      :        ( KEYWRD .NE. 'BSCALE' ) .AND.
      :        ( KEYWRD .NE. 'BZERO' ) .AND.
      :        ( KEYWRD .NE. 'EXTNAME' ) .AND.
-     :        ( KEYWRD( 1:7 ) .NE. 'HDUCLAS' ) .AND.
      :        ( KEYWRD .NE. 'LABEL' .OR. .NOT. LABFND ) .AND.
      :        ( KEYWRD .NE. 'BUNIT' .OR. .NOT. UNTFND ) .AND.
-     :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) ) 
+     :        ( KEYWRD .NE. 'OBJECT' .OR. .NOT. TITFND ) .AND.
+     :        ( KEYWRD( 1:6 ) .NE. 'LBOUND' ) ) THEN 
      :      THEN
 
 *  Write the header card, replacing any non-printing characters
