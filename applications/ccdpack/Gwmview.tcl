@@ -187,12 +187,9 @@ class Gwmview {
 #           - vx       -- X coordinate in Gwmview viewer coordinates
 #           - vy       -- Y coordinate in Gwmview viewer coordinates
 #
-#     Gwmview also inherits all the public methods of itk::Toplevel.
+#     Gwmview also inherits all the public methods of Ccdtop.
  
 #  Public variables (configuration options):
-#
-#     geometry = string
-#        This gives the geometry in the normal X11 format.
 #
 #     lutable = list
 #        This is a one or two element list giving the configuration of
@@ -212,31 +209,6 @@ class Gwmview {
 #        in view coordinates.  This variable controls the actual size 
 #        in screen pixels of the GWM created by the makegwm method.
 #
-#     state = string
-#        A value which gives the state of the object.  It may have the
-#        following values:
-#           inactive:  
-#              The viewer will not attempt to reflect changes in its 
-#              configuration on the display.
-#           active:
-#              The viewer will attempt to reflect changes in its 
-#              configuration on the display.
-#           done:
-#              The viewer's work is done (e.g. the exit button has 
-#              been pressed).
-#
-#        Only the values 'active' and 'inactive' may be written into this 
-#        variable from outside.  This variable may be tracked from 
-#        outside the class (for instance if a trace is to be run on it) 
-#        using the 'watchstate' public variable.
-#
-#     watchstate = string
-#        This gives a name of a variable in the caller's context which 
-#        will be kept up to date with the state of this object, i.e.
-#        it will have the same value as the object's $state public 
-#        variable.  It is useful to configure this so that the variable
-#        can be traced to watch for changes in state.
-#
 #     zoom = real
 #        A factor giving the number of screen pixels to an NDF pixel.
 #
@@ -244,18 +216,8 @@ class Gwmview {
 #        A factor converting from view coordinates to Gwm coordinates
 #        (differs from zoom by a factor of pixelsize).
 #
-#     Gwmview also inherits all the public variables of itk::Toplevel
+#     Gwmview also inherits all the public variables of Ccdtop.
  
-#  Public procedures:
-#
-#     max num ...
-#        Gives the maximum of all the (numeric) arguments supplied.
-#        Just here because it's useful.
-#
-#     mim num ...
-#        Gives the minimum of all the (numeric) arguments supplied.
-#        Just here because it's useful.
-
 #  Notes:
 #     The canvas on which the GWM item is displayed can be accessed
 #     by using its widget name, which is held in the public variable
@@ -272,7 +234,7 @@ class Gwmview {
 #-
 
 #  Inheritance.
-      inherit itk::Toplevel
+      inherit Ccdtop
 
 
 ########################################################################
@@ -280,39 +242,37 @@ class Gwmview {
 ########################################################################
       constructor { args } {
 
-#  Add buttons in a panel.
-         itk_component add panel {
-            frame $itk_interior.buttons
-         }
+#  Add buttons to the control panel.
+         set panel [ panel ]
          itk_component add zoom {
-            zoomcontrol $itk_component(panel).zoom \
+            zoomcontrol $panel.zoom \
                -min 0.05 \
                -max 8 \
                -value 1 \
                -valuevar zoom
          }
-         lappend controls $itk_component(zoom)
+         addcontrol $itk_component(zoom)
          itk_component add marknum {
-            marknumcontrol $itk_component(panel).marknum
+            marknumcontrol $panel.marknum
          }
-         lappend controls $itk_component(marknum)
+         addcontrol $itk_component(marknum)
          itk_component add exit {
-            button $itk_component(panel).exit \
+            button $panel.exit \
                -text "Done" \
                -command [ code $this deactivate ]
          }
-         lappend controls $itk_component(exit)
+         addcontrol $itk_component(exit)
 
       #  itk_component add colour {
       #     button $itk_component(panel).colour \
       #        -text "Colours" -command "$this docolours"
       #  }
 
-         eval pack $controls -side left
 
 #  Add the frame to hold the actual GWM viewing window.
+         set interior [ Ccdtop::childsite ]
          itk_component add viewarea {
-            frame $itk_interior.viewarea -relief groove -borderwidth 2
+            frame $interior.viewarea -relief groove -borderwidth 2
          }
          itk_component add canvas {
             iwidgets::scrolledcanvas $itk_component(viewarea).canvas
@@ -321,23 +281,21 @@ class Gwmview {
             rename -textbackground \
                    -canvasbackground canvasBackground Background
          }
-
          pack $itk_component(canvas) -fill both -expand 1
          set canvas $itk_component(canvas)
 
 #  Add info panel.
          itk_component add info {
-            label $itk_interior.info -relief groove
+            label $interior.info -relief groove
          }
 
 #  Add childsite panel.
-         itk_component add childsite {
-            frame $itk_interior.childsite
+         itk_component add gwmchildsite {
+            frame $interior.gwmchildsite
          }
 
 #  Pack widgets into the hull.
-         pack $itk_component(panel) -side bottom -fill none -expand 0
-         pack $itk_component(childsite) -side bottom -fill x -expand 0
+         pack $itk_component(gwmchildsite) -side bottom -fill x -expand 0
          pack $itk_component(info) -side bottom -fill x -expand 0
          pack $itk_component(viewarea) -side bottom -fill both -expand 1
 
@@ -345,19 +303,7 @@ class Gwmview {
          markertype 2 red 10
 
 #  Do requested configuration.
-         wm withdraw $itk_interior
          eval itk_initialize $args
-         wm deiconify $itk_interior
-
-#  Set binding to handle window resize events.
-         bind $itk_interior <Configure> [ code $this winch ]
-
-#  Arrange for geometry constraints to be met.
-         update idletasks
-         set wnow [ winfo width $itk_interior ]
-         set hnow [ winfo height $itk_interior ]
-         wm minsize $itk_interior $wnow [ min $hnow $wnow ]
-         configure -geometry $geometry
       }
 
 
@@ -683,31 +629,7 @@ class Gwmview {
 #-----------------------------------------------------------------------
       public method childsite { } {
 #-----------------------------------------------------------------------
-         return $itk_component(childsite)
-      }
-
-
-########################################################################
-#  Public procedures.
-########################################################################
-
-#-----------------------------------------------------------------------
-      public proc max { num args } {
-#-----------------------------------------------------------------------
-         foreach x $args {
-            if { $x > $num } { set num $x }
-         }
-         return $num
-      }
-
-
-#-----------------------------------------------------------------------
-      public proc min { num args } {
-#-----------------------------------------------------------------------
-         foreach x $args {
-            if { $x < $num } { set num $x }
-         }
-         return $num
+         return $itk_component(gwmchildsite)
       }
 
 
@@ -746,16 +668,6 @@ class Gwmview {
       }
 
 
-#-----------------------------------------------------------------------
-      private method winch { } {
-#-----------------------------------------------------------------------
-#  This method is called if the toplevel window receives a configure
-#  event, which will happen, for instance, if it is resized.
-         configure -geometry [ winfo geometry $itk_interior ]
-      }
-
-
-
 ########################################################################
 #  Public variables.
 ########################################################################
@@ -782,34 +694,10 @@ class Gwmview {
 
 
 #-----------------------------------------------------------------------
-      public variable watchstate "" {
-#-----------------------------------------------------------------------
-         set watchlevel [expr [info level] - 1]
-         upvar #$watchlevel $watchstate wstate
-         set wstate $state
-      }
-
-
-#-----------------------------------------------------------------------
       public variable state inactive {
 #-----------------------------------------------------------------------
-         if { $state == "inactive" || $state == "active" || $state == "done" } {
-            if { $watchstate != "" } {
-               upvar #$watchlevel $watchstate wstate
-               set wstate $state
-            }
-         } else {
-            error "Invalid value \"$state\" for state"
-         }
          if { $state == "active" } {
             display
-            foreach c $controls {
-               $c configure -state normal
-            }
-         } elseif { $state == "inactive" || $state == "done" } {
-            foreach c $controls {
-               $c configure -state disabled
-            }
          }
       }
 
@@ -828,13 +716,6 @@ class Gwmview {
             taskrun lutable \
                "coltab=$table mapping=$maptype device=$device reset"
          }
-      }
-
-
-#-----------------------------------------------------------------------
-      public variable geometry "" {
-#-----------------------------------------------------------------------
-         wm geometry $itk_interior $geometry
       }
 
 
@@ -862,7 +743,6 @@ class Gwmview {
 
 #  Instance Variables.
       private variable canvas          ;# Name of the canvas widget
-      private variable controls        ;# List of control widgets in panel
       private variable gwmdims {0 0}   ;# Dimensions of the GWM item
       private variable gwmorigin {0 0} ;# View coordinate origin of GWM item
       private variable gwmname ""      ;# Name of the GWM item
@@ -871,7 +751,6 @@ class Gwmview {
       private variable markitem ""     ;# Code for drawing a marker
       private variable marksize ""     ;# Approx size in pixels of a marker
       private variable points {}       ;# List of points {index x y tags}
-      private variable watchlevel 0    ;# Call stack level of calling code
 
    }
 
