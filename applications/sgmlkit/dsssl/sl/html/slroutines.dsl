@@ -155,13 +155,6 @@ $Id$
 		      "argumentlist" "parameterlist" "authorlist" "history"
 		      "usage" "invocation" "examplelist" "notelist"
 		      "implementationstatus" "bugs"))))))
-;  ;; Process the codeprologue elements.  Code here relies on the
-;  ;; elements being in the `correct' order, and would have to be
-;  ;; changed if we adopt an unordered content model (ampersand connectors)
-;  (element routineprologue
-;    (make sequence
-;      (make empty-element gi: "hr")
-;      (process-children)))
   (element routinename
     (make sequence
       (make element gi: "h3"
