@@ -1,5 +1,5 @@
 *+  PSF_PROMPT - Handles the 'PSF' parameter for the PSF system
-      SUBROUTINE PSF_PROMPT( USEDEFAULT, DEFAULT, SLOT, STATUS )
+      SUBROUTINE PSF_PROMPT( USEDEFAULT, DEFAULT, PSID, STATUS )
 *
 *    Description :
 *
@@ -25,6 +25,8 @@
 *        Added channel spectrum model option
 *     23 Feb 1994 (DJA):
 *        Doesn't display options if PSF parameter set
+*      8 May 1996 (DJA):
+*        Store everything in PSID which replaces old slot
 *
 *    Type definitions :
 *
@@ -34,17 +36,12 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
-      INCLUDE 'PAR_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
 *
 *    Import :
 *
       LOGICAL                   USEDEFAULT              ! Use default psf
       CHARACTER*(*)             DEFAULT                 ! The default psf
-      INTEGER                   SLOT                    ! Psf slot
+      INTEGER                   PSID                    ! Psf slot
 *
 *    Status :
 *
@@ -80,7 +77,7 @@
         CALL CHR_FANDL( UPSF, BEG, END )
 
 *    Parse model
-	CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
+	CALL PSF_MODEL_PARSE( UPSF(BEG:END), PSID, STATUS )
 
       ELSE
 
@@ -116,7 +113,7 @@
         ELSE
 
 *      Parse model
-	  CALL PSF_MODEL_PARSE( UPSF(BEG:END), SLOT, STATUS )
+	  CALL PSF_MODEL_PARSE( UPSF(BEG:END), PSID, STATUS )
 
         END IF
 
@@ -130,7 +127,7 @@
 
 
 *+  PSF_MODEL_PARSE - Parse a psf model specification
-      SUBROUTINE PSF_MODEL_PARSE( STR, SLOT, STATUS )
+      SUBROUTINE PSF_MODEL_PARSE( STR, PSID, STATUS )
 *
 *    Description :
 *
@@ -165,15 +162,11 @@
 *
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
-*
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
-*
+<*
 *    Import :
 *
       CHARACTER*(*)            STR                     ! The model spec
-      INTEGER                  SLOT                    ! Psf slot
+      INTEGER                  PSID                    ! Psf slot
 *
 *    Status :
 *
@@ -193,7 +186,8 @@
       INTEGER                  S_B, S_E                ! Spatial bit
       INTEGER                  SP_B, SP_E              ! Spectral bit
 
-      LOGICAL                  AT_END                  ! End of parse?
+      LOGICAL                   AT_END                  ! End of parse?
+      LOGICAL			EMOK			! Modelling ok?
 *-
 
 *    Check status
@@ -205,11 +199,11 @@
 
 *      Channel spectrum option
 	IF ( (STR(1:1).EQ.'C') .OR. (STR(1:1).EQ.'c') ) THEN
-	  EM_MODE(SLOT) = PSF_E_CHANNEL
+	  MODE = PSF_E_CHANNEL
 
 *      Energy model
 	ELSE
-	  EM_MODE(SLOT) = PSF_E_MODEL
+	  MODE = PSF_E_MODEL
 
 	END IF
 
@@ -265,7 +259,7 @@
 	END IF
 
 *      Parse the spatial bit to check for errors
-	CALL PSF_PAR_SPATIAL( STR(S_B:S_E), SLOT, STATUS )
+	CALL PSF_PAR_SPATIAL( STR(S_B:S_E), PSID, STATUS )
 	IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *      IC now points to first non-blank after end of spatial model
@@ -339,7 +333,7 @@
 	END IF
 
 *      Analyse the spectrum
-        CALL PSF_PAR_ANSPEC( STR(SP_B:SP_E), NBIN, SLOT, STATUS )
+        CALL PSF_PAR_ANSPEC( STR(SP_B:SP_E), NBIN, PSID, STATUS )
         IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL MSG_SETC( 'REASON', 'Error reading channel spectrum' )
 	  GOTO 99
@@ -351,22 +345,25 @@
 	  CALL MSG_SETC( 'REASON', 'Expected )' )
 	  GOTO 99
 	END IF
+        EMOK = (STATUS.EQ.SAI__OK)
 
-	EM_OK(SLOT) = (STATUS.EQ.SAI__OK)
-
-*    No spectral component
+*  No spectral component
       ELSE
 
-*      No energy model
-	EM_MODE(SLOT) = PSF_E_NONE
-	EM_OK(SLOT) = .FALSE.
+*    No energy model
+	MODE = PSF_E_NONE
+	EMOK = .FALSE.
 
-*      Parse spatial psf
-	CALL PSF_PAR_SPATIAL( STR, SLOT, STATUS )
+*    Parse spatial psf
+	CALL PSF_PAR_SPATIAL( STR, PSID, STATUS )
 
       END IF
 
-*    Set model flag if ok
+*  Store energy model settings
+      CALL ADI_CPUT0L( PSID, 'IsEnergyModel', EMOK, STATUS )
+      CALL ADI_CPUT0L( PSID, 'NemMode', MODE, STATUS )
+
+*  Set model flag if ok
  99   IF ( STATUS .NE. SAI__OK ) THEN
 	CALL MSG_PRNT( '! ^REASON in psf energy model specification' )
 	CALL AST_REXIT( 'PSF_MODEL_PARSE', STATUS )
@@ -376,7 +373,7 @@
 
 
 *+  PSF_PAR_ANSPEC - Analyse a model
-      SUBROUTINE PSF_PAR_ANSPEC( SPEC, NBIN, SLOT, STATUS )
+      SUBROUTINE PSF_PAR_ANSPEC( SPEC, NBIN, PSID, STATUS )
 *
 *    Description :
 *
@@ -406,7 +403,7 @@
 *    Import :
 *
       CHARACTER*(*)            SPEC                    ! The channel spectrum
-      INTEGER                  SLOT                    ! Psf slot
+      INTEGER                  PSID                    ! Psf slot
       INTEGER                  NBIN                    ! # channel bins
 *
 *    Status :
@@ -467,13 +464,14 @@
       END IF
 
 *  Map space for channel bounds
-      EM_NBIN(SLOT) = NBIN
-      CALL DYN_MAPI( 1, NBIN, EM_CBPTR(SLOT), STATUS )
+      CALL ADI_CPUT0I( PSID, 'NemBin', NBIN, STATUS )
+      CALL DYN_MAPI( 1, NBIN, CBPTR, STATUS )
+      CALL ADI_CPUT0I( PSID, 'NemBnds', CBPTR, STATUS )
 
 *  Determine model bin centres
       CALL PSF_PAR_ANSPEC_INT( NSBIN, %VAL(APTR), %VAL(WPTR),
      :                         %VAL(DPTR), QOK, %VAL(QPTR), NBIN,
-     :                         %VAL(EM_CBPTR(SLOT)), STATUS )
+     :                         %VAL(CBPTR), STATUS )
 
 *  Close spectrum
       CALL ADI_FCLOSE( SFID, STATUS )
@@ -611,7 +609,7 @@
 
 
 *+  PSF_PAR_SPATIAL - Parse a psf spatial model specification
-      SUBROUTINE PSF_PAR_SPATIAL( STR, SLOT, STATUS )
+      SUBROUTINE PSF_PAR_SPATIAL( STR, PSID, STATUS )
 *
 *    Description :
 *
@@ -641,14 +639,10 @@
       INCLUDE 'SAE_PAR'
       INCLUDE 'PSF_PAR'
 *
-*    Global variables :
-*
-      INCLUDE 'PSF_CMN'
-*
 *    Import :
 *
       CHARACTER*(*)            STR                     ! The model spec
-      INTEGER                  SLOT                    ! Psf slot
+      INTEGER                  PSID			! Psf  slot
 *
 *    Status :
 *
@@ -656,18 +650,24 @@
 *
 *    Function definitions :
 *
-      LOGICAL                  CHR_ISALF, CHR_SIMLR
+      LOGICAL                   CHR_ISALF, CHR_SIMLR
 *
 *    Local variables :
 *
-      CHARACTER*40             RSN
+      CHARACTER*40              RSN
       CHARACTER*15		TAG
 
-      INTEGER                  BEG, IC                 ! Character pointer
-      INTEGER                  IR                      ! Loop over r bins
-      INTEGER                  N1, N2                  ! More pointers
+      REAL			DR, DX, DY		! Model bin sizes
+      REAL			RUP(PGRID_MAXR)
 
-      LOGICAL                  MORE                    ! More numbers?
+      INTEGER                   BEG, IC                 ! Character pointer
+      INTEGER                   IR                      ! Loop over r bins
+      INTEGER                   N1, N2                  ! More pointers
+      INTEGER			NA, NR			! Model sizes
+      INTEGER			SMTYPE			! Model type
+
+      LOGICAL                   MORE                    ! More numbers?
+      LOGICAL			PREG			! Regular polar model?
 *-
 
 *    Check status
@@ -675,17 +675,17 @@
 
 *    Which model is being parsed
       IF ( CHR_SIMLR(STR(1:5),'POLAR') ) THEN
-	SM_TYPE(SLOT) = PSF_PGRID
+	SMTYPE = PSF_PGRID
+        PREG = .FALSE.
 
       ELSE IF ( CHR_SIMLR(STR(1:4),'RECT') ) THEN
-	SM_TYPE(SLOT) = PSF_RGRID
+	SMTYPE = PSF_RGRID
 
 *    Simple psf
       ELSE
 
 *      Look for named psf
 	CALL PSF_CHKLIBRTN( STR, TAG, STATUS )
-        P_MODEL(SLOT) = .FALSE.
 
 *      Report error if PSF not found
 	IF ( STATUS .NE. SAI__OK ) THEN
@@ -694,7 +694,7 @@
 	  CALL ERR_ANNUL( STATUS )
 	  GOTO 59
         ELSE
-          CALL ADI_CPUT0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
+          CALL ADI_CPUT0C( PSID, 'Tag', TAG, STATUS )
           GOTO 99
 	END IF
 
@@ -722,7 +722,7 @@
         CALL MSG_SETC( 'REASON', RSN )
 	GOTO 99
       ELSE
-        CALL ADI_CPUT0C( P_PSID(SLOT), 'Tag', TAG, STATUS )
+        CALL ADI_CPUT0C( PSID, 'Tag', TAG, STATUS )
       END IF
 
 *  Locate comma
@@ -736,7 +736,7 @@
 *    Radial/x-axis specification
       CALL CHR_FIWS( STR, IC, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
-	IF ( SM_TYPE(SLOT) .EQ. PSF_PGRID ) THEN
+	IF ( SMTYPE .EQ. PSF_PGRID ) THEN
 	  CALL MSG_SETC( 'REASON', 'Missing radial bin specification')
 	ELSE
 	  CALL MSG_SETC( 'REASON', 'Missing x axis bin specification')
@@ -750,11 +750,12 @@
 	IC = IC + 1
       END DO
       IC = IC - 1
-      IF ( SM_TYPE(SLOT) .EQ. PSF_PGRID ) THEN
+      IF ( SMTYPE .EQ. PSF_PGRID ) THEN
 	IF ( INDEX( STR(BEG:IC), ':' ) .EQ. 0 ) THEN
-	  CALL CHR_CTOR( STR(BEG:IC), SM_P_DR(SLOT), STATUS )
+	  CALL CHR_CTOR( STR(BEG:IC), DR, STATUS )
 	  IF ( STATUS .EQ. SAI__OK ) THEN
-	    SM_P_REG(SLOT) = .TRUE.
+            CALL ADI_CPUT0L( PSID, 'ModelReg', .TRUE., STATUS )
+            PREG = .TRUE.
 	  ELSE
 	    CALL MSG_SETC( 'REASON', 'Invalid radial bin '/
      :                                   /'specification' )
@@ -779,7 +780,7 @@
 
 *          Get radius
 	    IR = IR + 1
-	    CALL CHR_CTOR( STR(N1:N2-1), SM_P_RUP(IR,SLOT), STATUS )
+	    CALL CHR_CTOR( STR(N1:N2-1), RUP(IR), STATUS )
 	    IF ( STATUS .NE. SAI__OK ) THEN
 	      CALL MSG_SETC( 'REASON', 'Invalid radial bin '/
      :                                     /'specification' )
@@ -788,7 +789,7 @@
 
 *          Radii must increase
 	    IF ( IR .GT. 1 ) THEN
-	      IF ( SM_P_RUP(IR,SLOT) .LE. SM_P_RUP(IR-1,SLOT) ) THEN
+	      IF ( RUP(IR) .LE. RUP(IR-1) ) THEN
 		STATUS = SAI__ERROR
 		CALL MSG_SETC( 'REASON', 'Radial bin boundaries '/
      :                                          /'must increase' )
@@ -809,29 +810,29 @@
 
 *        Tidy up the radial bin values. First insert a zero at the
 *        beginning if needed
-	  IF ( SM_P_RUP(1,SLOT) .NE. 0.0 ) THEN
-	    SM_P_NR(SLOT) = IR + 1
-	    DO IR = SM_P_NR(SLOT)-1, 1, -1
-	      SM_P_RUP(IR+1,SLOT) = SM_P_RUP(IR,SLOT)
+	  IF ( RUP(1) .NE. 0.0 ) THEN
+	    NR = IR + 1
+	    DO IR = NR-1, 1, -1
+	      RUP(IR+1) = RUP(IR)
 	    END DO
-	    SM_P_RUP(1,SLOT) = 0.0
+	    RUP(1) = 0.0
 	  ELSE
-	    SM_P_NR(SLOT) = IR
+	    NR = IR
 	  END IF
 
 *        Now terminate with a large radius (~ infinity)
-	  SM_P_NR(SLOT) = SM_P_NR(SLOT) + 1
-	  SM_P_RUP(SM_P_NR(SLOT),SLOT) = 1.0E10
+	  NR = NR + 1
+	  RUP(NR) = 1.0E10
 
 *        Finally, square all the radii
-          CALL ARR_SQR1R( SM_P_RUP(1,SLOT), SM_P_NR(SLOT), STATUS )
+          CALL ARR_SQR1R( RUP, NR, STATUS )
 
 	END IF
-	SM_P_NA(SLOT) = 1
+	NA = 1
 
       ELSE
-	CALL CHR_CTOR( STR(BEG:IC), SM_R_DX(SLOT), STATUS )
-	SM_R_DY(SLOT) = SM_R_DX(SLOT)
+	CALL CHR_CTOR( STR(BEG:IC), DX, STATUS )
+        DY = DX
 
       END IF
 
@@ -851,31 +852,46 @@
 	IC = IC + 1
       END DO
       IC = IC - 1
-      IF ( SM_TYPE(SLOT) .EQ. PSF_PGRID ) THEN
-	CALL CHR_CTOI( STR(BEG:IC), SM_P_NA(SLOT), STATUS )
+      IF ( SMTYPE .EQ. PSF_PGRID ) THEN
+	CALL CHR_CTOI( STR(BEG:IC), NA, STATUS )
 	IF ( STATUS .NE. SAI__OK ) THEN
 	  CALL MSG_SETC( 'REASON', 'Invalid azimuthal bin '/
      :                                    /'specification' )
 	  GOTO 99
 	END IF
       ELSE
-	CALL CHR_CTOR( STR(BEG:IC), SM_R_DY(SLOT), STATUS )
+	CALL CHR_CTOR( STR(BEG:IC), DY, STATUS )
       END IF
       IC = IC + 1
 
-*    Get bracket
+*  Get bracket
  59   IF ( STR(IC:IC) .NE. ')' ) THEN
 	CALL MSG_SETC( 'REASON', 'Right bracket expected' )
 	STATUS = SAI__ERROR
       END IF
 
-*    Model ok?
- 89   P_MODEL(SLOT) = ( STATUS .EQ. SAI__OK )
+*  Model ok?
+ 89   CALL ADI_CPUT0L( PSID, 'IsModel', (STATUS.EQ.SAI__OK),
+     :                 STATUS )
+      CALL ADI_CPUT0I( PSID, 'ModelType', SMTYPE, STATUS )
+      IF ( SMTYPE .EQ. PSF_PGRID ) THEN
+        CALL ADI_CPUT0I( PSID, 'ModelNr', NR, STATUS )
+        CALL ADI_CPUT0I( PSID, 'ModelNaz', NA, STATUS )
+        CALL ADI_CPUT0I( PSID, 'ModelReg', PREG, STATUS )
+        IF ( PREG ) THEN
+          CALL ADI_CPUT0R( PSID, 'ModelDr', DR, STATUS )
+        ELSE
+          CALL ADI_CPUT1R( PSID, 'ModelRup', NR, RUP, STATUS )
+        END IF
+      ELSE
+        CALL ADI_CPUT0R( PSID, 'ModelDx', DX, STATUS )
+        CALL ADI_CPUT0R( PSID, 'ModelDy', DY, STATUS )
+      END IF
 
-*    Set model flag if ok
+*  Set model flag if ok
  99   IF ( STATUS .NE. SAI__OK ) THEN
 	CALL MSG_PRNT( '! ^REASON in model specification' )
-	CALL ERR_REP( ' ', '...from PSF_MODEL_PARSE', STATUS )
+	CALL AST_REXIT( 'PSF_MODEL_PARSE', STATUS )
       END IF
 
       END
