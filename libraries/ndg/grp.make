@@ -30,7 +30,7 @@ ndg1_wild.c
 OTHER_UNIX_SOURCES = ndg_dev ndg_link ndg_link_adam ndg_test.f 
 
 #  Documentation files.
-DOCUMENTATION = ndg.news sun2.tex
+DOCUMENTATION = ndg.news sun2.tex sun2.htx_tar
 
 #  All files which need to be extracted from the RCS repository in order to 
 #  make a UNIX release ( binary files are excluded since they are not
