@@ -129,8 +129,6 @@
       INTEGER            INBINS                 ! Number of input bins/ period.
       INTEGER            USED                   ! # history text lines
 
-      BYTE               MASK                   ! Quality mask
-
       LOGICAL            LVAR                   ! Is variance present ?
       LOGICAL            BOK                    ! BASE_TAI present
       LOGICAL            WEIGHT
@@ -138,7 +136,7 @@
 *    Version id
 *
       CHARACTER*30		VERSION
-        PARAMETER       	( VERSION = 'FOLDLOTS Version 1.8-0' )
+        PARAMETER       	( VERSION = 'FOLDLOTS Version 2.0-0' )
 *-
 
 *  Check status.
@@ -156,25 +154,25 @@
 
 *  Map axis widths. NB: this routine sets axis widths assuming bin
 *  boundaries are equidistant between bins if widths are missing
-      CALL BDI_MAPAXWID( IFID, 'READ', 1, TWPNTR, STATUS )
+      CALL BDI_AXMAPR( IFID, 1, 'Width', 'READ', TWPNTR, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Create a folded data object.
-      CALL USI_TASSOCO( 'FOLD_OBJ', 'FOLDED_SERIES', FFID, STATUS )
+      CALL USI_CREAT( 'FOLD_OBJ', ADI__NULLID, FFID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  Create an object for the chi-squared array.
-      CALL USI_TASSOCO( 'CHI_OBJ', 'DISTRIBUTION', CFID, STATUS )
+      CALL USI_CREAT( 'CHI_OBJ', ADI__NULLID, CFID, STATUS )
       IF (STATUS .NE. SAI__OK) GOTO 99
 
 *  If AXIS(1) UNITS are defined, then display them.
       UNITS = 'Units'
-      CALL BDI_GETAXUNITS( IFID, 1, UNITS, STATUS )
+      CALL BDI_AXGET0C( IFID, 1, 'UNITS', UNITS, STATUS )
       CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_PRNT( 'TIME UNITS are ^UNITS' )
 
 *  Find the axis array range
-      CALL BDI_MAPAXVAL( IFID, 'READ', 1, DELPTR, STATUS)
+      CALL BDI_AXMAPR( IFID, 1, 'Data', 'READ', DELPTR, STATUS )
       IF ( STATUS .NE. SAI__OK ) THEN
         CALL MSG_PRNT('Error accessing axis array')
         GOTO 99
@@ -244,19 +242,15 @@ C          NBINS = INBINS
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Map workspace
-      CALL DYN_MAPR(1,NBINS,WPTR,STATUS)
+      CALL DYN_MAPR( 1, NBINS, WPTR, STATUS )
 
 *  Set up and map components in output object - folded data
-      CALL BDI_CREDATA(FFID,1,NBINS,STATUS)
-      CALL BDI_CREVAR(FFID,1,NBINS,STATUS)
-      CALL BDI_CREAXES(FFID,1,STATUS)
-      CALL BDI_CREAXVAL(FFID,1,.FALSE.,NBINS,STATUS)
-      CALL BDI_CREQUAL(FFID,1,NBINS,STATUS)
-      CALL BDI_MAPDATA(FFID,'WRITE',FDPTR,STATUS)
-      CALL BDI_MAPVAR(FFID,'WRITE',FVPTR,STATUS)
-      CALL BDI_MAPAXVAL(FFID,'WRITE',1,FXPTR,STATUS)
-      CALL BDI_MAPQUAL(FFID,'WRITE',FQPTR,STATUS)
-      CALL BDI_PUTMASK(FFID,MASK,STATUS)
+      CALL BDI_LINK( 'BinDS', 1, NBINS, 'REAL', FFID, STATUS )
+      CALL BDI_MAPR( FFID, 'Data', 'WRITE', FDPTR, STATUS )
+      CALL BDI_MAPR( FFID, 'Variance', 'WRITE', FVPTR, STATUS )
+      CALL BDI_AXMAPR( FFID, 1, 'Data', 'WRITE', FXPTR, STATUS )
+      CALL BDI_MAPUB( FFID, 'Quality', 'WRITE', FQPTR, STATUS )
+      CALL BDI_PUT0UB( FFID, 'QualityMask', QUAL__MASK, STATUS )
       IF ( STATUS.NE.SAI__OK ) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
@@ -269,16 +263,13 @@ C          NBINS = INBINS
       CALL ARR_INIT1B(QUAL__GOOD,NELM2,%VAL(FQPTR),STATUS)
 
 *  Set up and map components in output object - chi-sq vs. period  data
-      CALL BDI_CREDATA(CFID,1,NPER,STATUS)
-      CALL BDI_CREAXES(CFID,1,STATUS)
-      CALL BDI_CREAXVAL(CFID,1,.FALSE.,NPER,STATUS)
-      CALL BDI_CREQUAL(CFID,1,NPER,STATUS)
-      CALL BDI_MAPDATA(CFID,'WRITE',CDPTR,STATUS)
-      CALL BDI_MAPAXVAL(CFID,'WRITE',1,CXPTR,STATUS)
-      CALL BDI_MAPQUAL(CFID,'WRITE',CQPTR,STATUS)
-      CALL BDI_PUTMASK(CFID,MASK,STATUS)
+      CALL BDI_LINK( 'BinDS', 1, NPER, 'REAL', CFID, STATUS )
+      CALL BDI_MAPR( CFID, 'Data', 'WRITE', CDPTR, STATUS )
+      CALL BDI_AXMAPR( CFID, 1, 'Data', 'WRITE', CXPTR, STATUS )
+      CALL BDI_MAPUB( CFID, 'Quality', 'WRITE', CQPTR, STATUS )
+      CALL BDI_PUT0UB( CFID, 'QualityMask', QUAL__MASK, STATUS )
       IF ( STATUS.NE.SAI__OK ) THEN
-         CALL ERR_FLUSH(STATUS)
+        CALL ERR_FLUSH(STATUS)
       END IF
 
 *  Set output quality to GOOD (as all bad data has been excluded)
@@ -286,8 +277,8 @@ C          NBINS = INBINS
       CALL ARR_INIT1B( QUAL__GOOD, NELM2, %VAL(CQPTR), STATUS )
 
 *  Copy other info from input to output files
-      CALL BDI_COPMORE( IFID, FFID, STATUS )
-      CALL BDI_COPMORE( IFID, CFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf', FFID, STATUS )
+      CALL UDI_COPANC( IFID, 'grf', CFID, STATUS )
 
 *  Fold the data
       IF ( WEIGHT ) THEN
@@ -319,8 +310,8 @@ C          NBINS = INBINS
 *       contains this highest value.
 
       IF ( IERR .NE. 0 ) THEN
-          CALL MSG_SETI( 'IERR', IERR )
-          CALL MSG_PRNT( 'Bad phase bin - IERR = ^IERR' )
+        CALL MSG_SETI( 'IERR', IERR )
+        CALL MSG_PRNT( 'Bad phase bin - IERR = ^IERR' )
       END IF
 
 *  Put phase bin boundaries into an array
@@ -334,19 +325,19 @@ C          NBINS = INBINS
       CALL AUI_PUT0R( FFID, 'CHISQUARED', CHISQ, STATUS )
       CALL AUI_PUT0I( FFID, 'DEG_OF_FREEDOM', NDOF, STATUS )
 
-      CALL BDI_COPTEXT( IFID, FFID, STATUS )
-      CALL BDI_COPTEXT( IFID, CFID, STATUS )
-      CALL BDI_PUTLABEL( CFID, 'Chi-squared', STATUS )
-      CALL BDI_PUTUNITS( CFID, ' ', STATUS )
+      CALL BDI_COPY( IFID, 'Title,Label,Units', FFID, ' ', STATUS )
+      CALL BDI_COPY( IFID, 'Title', CFID, ' ', STATUS )
+      CALL BDI_PUT0C( CFID, 'Label', 'Chi-squared', STATUS )
       IF (STATUS .NE. SAI__OK) THEN
          CALL ERR_FLUSH(STATUS)
       END IF
-      CALL BDI_PUTAXLABEL(FFID,1,'Phase',STATUS)
-      CALL BDI_PUTAXNORM(FFID,1,.TRUE.,STATUS)
-      CALL BDI_PUTAXTEXT(CFID,1,'Period','seconds',STATUS)
-      CALL BDI_PUTAXNORM(CFID,1,.TRUE.,STATUS)
+      CALL BDI_AXPUT0L( FFID, 1, 'Normalised', .TRUE., STATUS )
+      CALL BDI_AXPUT0L( FFID, 2, 'Normalised', .TRUE., STATUS )
+      CALL BDI_AXPUT0C( FFID, 1,'Label', 'Phase', STATUS )
+      CALL BDI_AXPUTAXTEXT( CFID, 1,'Label', 'Period', STATUS )
+      CALL BDI_AXPUTAXTEXT( CFID, 1,'Units', 'seconds', STATUS )
 
-*    Add history records
+*  Add history records
       CALL HSI_COPY( IFID, FFID, STATUS )
       CALL HSI_ADD( FFID, VERSION, STATUS )
       CALL HSI_COPY( IFID, CFID, STATUS )
@@ -384,19 +375,14 @@ C          NBINS = INBINS
       CALL USI_TEXT( 6, HTXT, USED, STATUS )
       CALL HSI_PTXT(CFID,USED,HTXT,STATUS)
 
-*    Output maximum CHISQ & best PERIOD values to user
+*  Output maximum CHISQ & best PERIOD values to user
       CALL MSG_SETR( 'PERIOD', PERIOD )
       CALL MSG_SETC( 'UNITS', UNITS )
       CALL MSG_PRNT( 'Best fit period = ^PERIOD ^UNITS')
       CALL MSG_SETR( 'CHISQ', CHISQ )
       CALL MSG_PRNT( 'Chi-sq value of best fit to mean = ^CHISQ')
 
-*    Release datasets
-      CALL BDI_RELEASE( IFID, STATUS )
-      CALL BDI_RELEASE( FFID, STATUS )
-      CALL BDI_RELEASE( CFID, STATUS )
-
-*   Tidy up
+*  Tidy up
  99   CALL AST_CLOSE()
       CALL AST_ERR( STATUS )
 
