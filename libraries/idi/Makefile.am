@@ -38,7 +38,7 @@ BUILT_SOURCES = IDI_ERR idi_err.h
 
 noinst_PROGRAMS = dctprep
 dctprep_SOURCES = dctprep.c
-dctprep_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11
+dctprep_LDADD = libidi.la `gwm_link` `gns_link` `cnf_link` $(X_LIBS) $(X_EXTRA_LIBS) $(X_PRE_LIBS) -lX11 @FCLIBS@
 
 xworks.dat: xworks.dct dctprep
 	echo y | IDI_DIR=./ IDI_XDT=xworks ./dctprep
