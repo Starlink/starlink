@@ -3344,11 +3344,14 @@ sub handle_man_pages
 }
 
 # Handle DATA variables.
+# Starlink: the prefixes star{docs,etc,help} are additions here, and must
+# match the similar directories defined in buildsupport/starconf/starconf.m4.in
 sub handle_data
 {
     &am_install_var ('-noextra', '-candist', 'data', 'DATA',
-		     'data', 'sysconf', 'sharedstate', 'localstate',
-		     'pkgdata', 'lisp', 'noinst', 'check');
+                     'data', 'sysconf', 'sharedstate', 'localstate',
+                     'pkgdata', 'lisp', 'noinst', 'check',
+                     'stardocs', 'staretc', 'starhelp' );
 }
 
 # Handle TAGS.
@@ -4649,27 +4652,6 @@ sub handle_starlink
                                                 );
             }
       }          
-
-    # Handle the installation of Starlink docs/help/etc directories.
-    #
-    # An automake `primary' is `the piece which tells automake what is
-    # being built', and the prefixes are `used to decide where the
-    # built objects should be installed'.
-    #
-    # We expect to find variables such as docs_STARDATA produced by
-    # configure.ac (actually by starconf.m4).  Although these look
-    # like primaries and we're using them like primaries, they should
-    # not be specified like primaries in any Makefile.am, and they are
-    # not otherwise documented either in the Starlink-automake or in
-    # the starconf documentation.
-    am_install_var ('data', 'STARDATA',
-                    'stardocs', 'starhelp', 'staretc');
-
-    # The above installs those directories using $(INSTALL_STARDATA),
-    # so define that now
-    &define_variable ('INSTALL_STARDATA',
-                      '$(INSTALL_DATA)',
-                      INTERNAL);
 
     # Do we need to compile .ifl files?
     # $starlink_seen_features{compifl} was possibly set in
