@@ -35,7 +35,7 @@ f     The CmpFrame class does not define any new routines beyond those
 *     which are applicable to all Frames.
 
 *  Copyright:
-*     <COPYRIGHT_STATEMENT>
+*     Copyright (C) 2001 Central Laboratory of the Research Councils
 
 *  Authors:
 *     RFWS: R.F. Warren-Smith (Starlink)
@@ -63,7 +63,9 @@ f     The CmpFrame class does not define any new routines beyond those
 *        match. Otherwise, null pointers are created (for zero axes),
 *        resulting in a seg vio.
 *     21-JUN-2001 (DSB):
-*        Added astAngle, astOffset2.
+*        Added astAngle.
+*     7-SEP-2001 (DSB):
+*        Added astResolve.
 
 *class--
 */
@@ -454,6 +456,7 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are extended by this class. */
 static const char *(* parent_getdomain)( AstFrame * );
 static const char *(* parent_gettitle)( AstFrame * );
+static double (* parent_angle)( AstFrame *, const double[], const double[], const double[] );
 
 /* Pointer to axis index array accessed by "qsort". */
 static int *qsort_axes;
@@ -484,7 +487,6 @@ static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
-static double Offset2( AstFrame *, const double[2], double, double, double[2] );
 static int GenAxisSelection( int, int, int [] );
 static int GetDirection( AstFrame *, int );
 static int GetMaxAxes( AstFrame * );
@@ -521,6 +523,7 @@ static void PartitionSelection( int, const int [], const int [], int, int, int [
 static void PermAxes( AstFrame *, const int[] );
 static void PrimaryFrame( AstFrame *, int, AstFrame **, int * );
 static void RenumberAxes( int, int [] );
+static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void SetAxis( AstFrame *, int, AstAxis * );
 static void SetDirection( AstFrame *, int, int );
 static void SetFormat( AstFrame *, int, const char * );
@@ -839,9 +842,9 @@ static double Angle( AstFrame *this_frame, const double a[],
 *     inherited from the Frame class).
 
 *  Description:
-*     This function reports an error if called since it is not possible to 
-*     finds the angle at point B between the line joining points A and B, 
-*     and the line joining points C and B, in the context of a CmpFrame.
+*     This function finds the angle at point B between the line joining 
+*     points A and B, and the line joining points C and B, in the context 
+*     of a CmpFrame.
 
 *  Parameters:
 *     this
@@ -857,20 +860,100 @@ static double Angle( AstFrame *this_frame, const double a[],
 *        containing the coordinates of the third point.
 
 *  Returned Value:
-*     AST__BAD.
+*     The required angle, or AST__BAD if the angle is undefined.
 
 */
 
-/* Check the global error status. */
-   if ( !astOK ) return AST__BAD;
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   AstFrame *pframe;             /* Pointer to the primary Frame for an axis */
+   const int *perm;              /* Pointer to axis permutation array */
+   double *pa;                   /* Permuted coordinates for point a */
+   double *pb;                   /* Permuted coordinates for point b */
+   double *pc;                   /* Permuted coordinates for point c */
+   double ang1;                  /* Angle between input points in frame1 */
+   double ang2;                  /* Angle between input points in frame2 */
+   double result;                /* Required angle */
+   int axis;                     /* Loop counter for axes */
+   int iscart;                   /* Is the CmpFrame a Cartesian system? */
+   int naxes1;                   /* Number of axes in frame1 */
+   int naxes;                    /* Total number of axes in CmpFrame */
+   int paxis;                    /* Axis index within primary Frame */
 
-/* Report an error. */
-   astError( AST__BDOBJ, "astAngle: Invalid attempt to use the astAngle "
-             "method with a %s (possible programming error).", 
-             astGetClass( this_frame ) );
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Obtain the number of axes in the CmpFrame. */
+   naxes = astGetNaxes( this );
+
+/* See if all axes within the CmpFrame belong to a simple Frame, in which 
+   case we assume that the CmpFrame describes a Cartesian coordinate system. */
+   iscart = 1;
+   for( axis = 0; axis < naxes; axis++ ){
+      PrimaryFrame( this_frame, axis, &pframe, &paxis );
+      if( strcmp( astGetClass( pframe ), "Frame" ) ) {
+         iscart = 0;
+         break;
+      }
+   }
+
+/* If the CmpFrame describes a Cartesian coordinate system, we can use the 
+   Angle method from the parent Frame class. */
+   if( iscart ) {
+      result = (*parent_angle)( this_frame, a, b, c ); 
+
+/* If the CmpFrame is not Cartesian... */
+   } else {
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. */
+      perm = astGetPerm( this );
+
+/* Get workspace. */
+      pa = (double *) astMalloc( sizeof(double)*naxes );
+      pb = (double *) astMalloc( sizeof(double)*naxes );
+      pc = (double *) astMalloc( sizeof(double)*naxes );
+
+/* If OK, apply the axis permutation array to obtain the coordinates in the 
+   required order. */
+      if( astOK ) {
+         for( axis = 0; axis < naxes; axis++ ) {
+            pa[ perm[ axis ] ] = a[ axis ];
+            pb[ perm[ axis ] ] = b[ axis ];
+            pc[ perm[ axis ] ] = c[ axis ];
+         }
+
+/* Obtain the number of axes in the first component Frame. */
+         naxes1 = astGetNaxes( this->frame1 );
+
+/* Project the two input points into the two component Frames and
+   determine the angle between the points in each Frame. */
+         ang1 = astAngle( this->frame1, pa, pb, pc ); 
+         ang2 = astAngle( this->frame2, pa + naxes1, pb + naxes1, 
+                          pc + naxes1 ); 
+
+/* The required angle is defined if one and only one of the two component
+   frames gives a defined angle between the two points. */
+         if( ang1 == AST__BAD ) {
+            result = ang2;
+         } else if( ang2 == AST__BAD ) {
+            result = ang1;
+         }
+      }
+
+/* Free the workspace */
+      pa = (double *) astFree( (void *) pa );
+      pb = (double *) astFree( (void *) pb );
+      pc = (double *) astFree( (void *) pc );
+   }
 
 /* Return the result. */
-   return AST__BAD;
+   return result;
 }
 
 static void ClearMaxAxes( AstFrame *this_frame ) {
@@ -1972,8 +2055,12 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
 
    parent_getdomain = frame->GetDomain;
    frame->GetDomain = GetDomain;
+
    parent_gettitle = frame->GetTitle;
    frame->GetTitle = GetTitle;
+
+   parent_angle = frame->Angle;
+   frame->Angle = Angle;
 
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
@@ -2003,6 +2090,7 @@ static void InitVtab( AstCmpFrameVtab *vtab ) {
    frame->Offset = Offset;
    frame->PermAxes = PermAxes;
    frame->PrimaryFrame = PrimaryFrame;
+   frame->Resolve = Resolve;
    frame->SetAxis = SetAxis;
    frame->SetDirection = SetDirection;
    frame->SetFormat = SetFormat;
@@ -2437,70 +2525,6 @@ static void Norm( AstFrame *this_frame, double value[] ) {
 
 /* Free the memory used for the permuted coordinates. */
    v = astFree( v );
-}
-
-static double Offset2( AstFrame *this_frame, const double point1[2],
-                       double angle, double offset, double point2[2] ) {
-/*
-*  Name:
-*     Offset2
-
-*  Purpose:
-*     Calculate an offset along a geodesic curve at a given bearing.
-
-*  Type:
-*     Private function.
-
-*  Synopsis:
-*     #include "cmpframe.h"
-*     double Offset2( AstFrame *this_frame, const double point1[2],
-*                     double angle, double offset, double point2[2] )
-
-*  Class Membership:
-*     CmpFrame member function (over-rides the astOffset2 method
-*     inherited from the Frame class).
-
-*  Description:
-*     This function reports an error if called since it is not possible to
-*     find the coordinate values of a point which is offset a specified 
-*     distance along the geodesic curve within a CmpFrame.
-
-*  Parameters:
-*     this
-*        Pointer to the CmpFrame.
-*     point1
-*        An array of double, with one element for each SkyFrame axis.
-*        This should contain the coordinates of the point marking the
-*        start of the geodesic curve.
-*     angle
-*        The angle (in radians) from north, to the direction of the required 
-*        position, as seen from the starting position. Positive rotation is 
-*        in the sense of rotation from north to east.
-*     offset
-*        The required offset from the first point along the geodesic
-*        curve, in radians. If this is positive, it will be towards
-*        the given bearing. If it is negative, it will be in the
-*        opposite direction. 
-*     point2
-*        An array of double, with one element for each SkyFrame axis
-*        in which the coordinates of the required point will be
-*        returned.
-
-*  Returned Value:
-*     AST__BAD
-
-*/
-
-/* Check the global error status. */
-   if ( !astOK ) return AST__BAD;
-
-/* Report an error. */
-   astError( AST__BDOBJ, "astOffset2: Invalid attempt to use the astOffset2 "
-             "method with a %s (possible programming error).", 
-             astGetClass( this_frame ) );
-
-/* Return the result. */
-   return AST__BAD;
 }
 
 static void Offset( AstFrame *this_frame, const double point1[],
@@ -3824,6 +3848,209 @@ static void RenumberAxes( int naxes, int axes[] ) {
 
 /* Free the workspace array. */
    work = astFree( work );
+}
+
+static void Resolve( AstFrame *this_frame, const double point1[], 
+                     const double point2[], const double point3[],
+                     double point4[], double *d1, double *d2 ){
+/*
+*  Name:
+*     Resolve
+
+*  Purpose:
+*     Resolve a vector into two orthogonal components
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "cmpframe.h"
+*     void Resolve( AstFrame *this, const double point1[], 
+*                   const double point2[], const double point3[],
+*                   double point4[], double *d1, double *d2 );
+
+*  Class Membership:
+*     CmpFrame member function (over-rides the astOffset method
+*     inherited from the Frame class).
+
+*  Description:
+*     This function resolves a vector into two perpendicular components.
+*     The vector from point 1 to point 2 is used as the basis vector.
+*     The vector from point 1 to point 3 is resolved into components 
+*     parallel and perpendicular to this basis vector. The lengths of the 
+*     two components are returned, together with the position of closest 
+*     aproach of the basis vector to point 3.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     point1
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the start of the basis vector,
+*        and of the vector to be resolved.
+*     point2
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the basis vector.
+*     point3
+*        An array of double, with one element for each Frame axis
+*        (Naxes attribute). This marks the end of the vector to be
+*        resolved.
+*     point4
+*        An array of double, with one element for each Frame axis
+*        in which the coordinates of the point of closest approach of the
+*        basis vector to point 3 will be returned.
+*     d1
+*        The address of a location at which to return the distance from
+*        point 1 to point 4 (that is, the length of the component parallel 
+*        to the basis vector). Positive values are in the same sense as 
+*        movement from point 1 to point 2.
+*     d2
+*        The address of a location at which to return the distance from
+*        point 4 to point 3 (that is, the length of the component
+*        perpendicular to the basis vector). Positive values are to the
+*        right of the basis vector when moving from point 1 to point 2.
+
+*  Notes:
+*     - Each vector used in this function is the path of
+*     shortest distance between two points, as defined by the
+*     astDistance function.
+*     - This function will return "bad" coordinate values (AST__BAD)
+*     if any of the input coordinates has this value, or if the required
+*     output values are undefined.
+*--
+*/
+
+/* Local Variables: */
+   AstCmpFrame *this;            /* Pointer to the CmpFrame structure */
+   const int *perm;              /* Pointer to axis permutation array */
+   double *p1;                   /* Permuted coordinates for point1 */
+   double *p2;                   /* Permuted coordinates for point2 */
+   double *p3;                   /* Permuted coordinates for point3 */
+   double *p4;                   /* Permuted coordinates for point4 */
+   double d1a;                   /* Parallel distance in frame1 */
+   double d1b;                   /* Parallel distance in frame2 */
+   double d2a;                   /* Perpendicular distance in frame1 */
+   double d2b;                   /* Perpendicular distance in frame2 */
+   double d;                     /* Total length of basis vector */
+   double da;                    /* Length of basis vector in frame1 */
+   double db;                    /* Length of basis vector in frame2 */
+   int axis;                     /* Loop counter for axes */
+   int bad;                      /* Set bad output coordinates? */
+   int naxes1;                   /* Number of axes in frame1 */
+   int naxes;                    /* Total number of axes in CmpFrame */
+
+/* Check the global error status. */
+   *d1 = AST__BAD;
+   *d2 = AST__BAD;
+   if ( !astOK ) return;
+
+/* Obtain a pointer to the CmpFrame structure. */
+   this = (AstCmpFrame *) this_frame;
+
+/* Obtain the number of axes in the CmpFrame. */
+   naxes = astGetNaxes( this );
+
+/* Obtain a pointer to the CmpFrame's axis permutation array. */
+   perm = astGetPerm( this );
+
+/* Allocate workspace. */
+   p1 = astMalloc( sizeof( double ) * (size_t) naxes );
+   p2 = astMalloc( sizeof( double ) * (size_t) naxes );
+   p3 = astMalloc( sizeof( double ) * (size_t) naxes );
+   p4 = astMalloc( sizeof( double ) * (size_t) naxes );
+   
+/* Initialise a flag to indicate whether "bad" coordinates should be
+   returned. */
+   bad = 0;
+
+/* Check that all the coordinates of both input points are OK. If not,
+   set the "bad" flag and quit checking. */
+   if ( astOK ) {
+      for ( axis = 0; axis < naxes; axis++ ) {
+         if ( ( point1[ axis ] == AST__BAD ) ||
+              ( point2[ axis ] == AST__BAD ) ||
+              ( point3[ axis ] == AST__BAD ) ) {
+            bad = 1;
+            break;
+
+/* If the coordinates are OK, apply the axis permutation array to
+   obtain them in the required order. */
+         } else {
+            p1[ perm[ axis ] ] = point1[ axis ];
+            p2[ perm[ axis ] ] = point2[ axis ];
+            p3[ perm[ axis ] ] = point3[ axis ];
+         }
+      }
+   }
+
+/* If OK, obtain the number of axes in the first component Frame. */
+   if ( astOK && !bad ) {
+      naxes1 = astGetNaxes( this->frame1 );
+
+/* Find the projection of the required parallel distance into each of the
+   two Frames. */
+      astResolve( this->frame1, p1, p2, p3, p4, &d1a, &d2a );
+      astResolve( this->frame2, p1 + naxes1, p2 + naxes1, p3 + naxes1, 
+                  p4 + naxes1, &d1b, &d2b );
+
+/* Project the first two input points into the two component Frames and
+   determine the length of the basis vector in each Frame. */
+      da = astDistance( this->frame1, p1, p2 );
+      db = astDistance( this->frame2, p1 + naxes1, p2 + naxes1 );
+
+/* Check that the returned distances are not bad. */
+      if ( astOK ) bad = ( bad || ( da == AST__BAD ) || ( db == AST__BAD ) );
+
+/* We can tolerate a bad parallel distance within a sub-Frame if the
+   basis vector has zero length in the sub-Frame, because the bad
+   parallel distance will have zero weight in the calculation. Set such
+   bad parallel distanced arbitrarily to zero. */
+      if( d1a == AST__BAD && da == 0.0 ) d1a = 0.0;
+      if( d1b == AST__BAD && db == 0.0 ) d1b = 0.0;
+
+/* Check that the final parallel distances are not bad. */
+      if ( astOK ) bad = ( bad || ( d1a == AST__BAD ) || ( d1b == AST__BAD ) );
+
+   }
+
+/* If OK, calculate the total distance between the two points. */
+   if ( astOK && !bad ) {
+      d = sqrt( da * da + db * db );
+
+/* If the points are co-incident, then set the "bad" flag. */
+      if ( d == 0.0 ) {
+         bad = 1;
+
+/* If the points are not co-incident, combine the parallel distances for
+   the individual Frames into a single parallel distance for the entire
+   CmpFrame. */
+      } else {
+         *d1 = ( da*d1a + db*d1b )/d;
+
+/*  Offset this distance away from point 1 towards point 2 to get point 4. */
+         astOffset( this, point1, point2, *d1, point4 );
+
+/* Now find the perpendicular distance (the distance between point4 and
+   point3). */
+         *d2 = astDistance( this, point4, point3 );
+
+      }
+   }
+
+/* Free the workspace arrays. */
+   p1 = astFree( p1 );
+   p2 = astFree( p2 );
+   p3 = astFree( p3 );
+   p4 = astFree( p4 );
+
+/* If no error has occurred, but bad coordinates must be returned,
+   then set these in the output array. */
+   if ( astOK && bad ) {
+      *d1 = AST__BAD;
+      *d2 = AST__BAD;
+      for ( axis = 0; axis < naxes; axis++ ) point4[ axis ] = AST__BAD;
+   }
+
 }
 
 static void SetAxis( AstFrame *this_frame, int axis, AstAxis *newaxis ) {

@@ -87,6 +87,8 @@ f     The SkyFrame class does not define any new routines beyond those
 *        Added astAngle and astOffset2.
 *     4-SEP-2001 (DSB):
 *        Added NegLon attribute, and astResolve method.
+*     9-SEP-2001 (DSB):
+*        Added astBear method.
 *class--
 */
 
@@ -192,6 +194,7 @@ static const char *GetTitle( AstFrame * );
 static const char *GetUnit( AstFrame *, int );
 static const char *SystemString( AstSkySystemType );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
+static double Bear( AstFrame *, const double[], const double[] );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
 static double GetEpoch( AstSkyFrame * );
@@ -350,6 +353,97 @@ static double Angle( AstFrame *this_frame, const double a[],
 /* Find the difference, folded into the range +/- PI. */
                result = slaDrange( angc - anga );
             }
+         }
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static double Bear( AstFrame *this_frame, const double a[], const double b[] ) {
+/*
+*  Name:
+*     Bear
+
+*  Purpose:
+*     Calculate the bearing (position angle) of one point seen from another.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     double Bear( AstFrame *this_frame, const double a[], const double b[] )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the astBear method inherited from 
+*     the Frame class).
+
+*  Description:
+*     This function finds the position angle of point B seen from point A.
+
+*  Parameters:
+*     this
+*        Pointer to the SkyFrame.
+*     a 
+*        An array of double, with one element for each SkyFrame axis,
+*        containing the coordinates of the first point.
+*     b 
+*        An array of double, with one element for each SkyFrame axis,
+*        containing the coordinates of the second point.
+
+*  Returned Value:
+*     The position angle in radians, in the range zero to 2.PI. This is
+*     the angle from north to the line joining the two points, measured
+*     positive through east.
+
+*  Notes:
+*     - This function will return a "bad" result value (AST__BAD) if
+*     any of the input coordinates has this value.
+*     - A "bad" value will also be returned if points A and B are
+*     co-incident.
+*     - A "bad" value will also be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*/
+
+   AstSkyFrame *this;            /* Pointer to SkyFrame structure */
+   const int *perm;              /* Axis permutation array */
+   double aa[ 2 ];               /* Permuted a coordinates */
+   double bb[ 2 ];               /* Permuted b coordinates */
+   double result;                /* Value to return */
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Obtain a pointer to the SkyFrame structure. */
+   this = (AstSkyFrame *) this_frame;
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+   perm = astGetPerm( this );
+   if ( astOK ) {
+
+/* Check that all supplied coordinates are OK. */
+      if ( ( a[ 0 ] != AST__BAD ) && ( a[ 1 ] != AST__BAD ) &&
+           ( b[ 0 ] != AST__BAD ) && ( b[ 1 ] != AST__BAD ) ) {
+
+/* Apply the axis permutation array to obtain the coordinates of the
+   three points in the required (longitude,latitude) order. */
+         aa[ perm[ 0 ] ] = a[ 0 ];
+         aa[ perm[ 1 ] ] = a[ 1 ];
+         bb[ perm[ 0 ] ] = b[ 0 ];
+         bb[ perm[ 1 ] ] = b[ 1 ];
+
+/* Check that A and B are not co-incident. */
+         if( aa[ 0 ] != bb[ 0 ] || aa[ 1 ] != bb[ 1 ] ) {
+
+/* Find the angle, folded into the range 0 to 2.PI */
+            result = slaDranrm( slaDbear( aa[ 0 ], aa[ 1 ], bb[ 0 ], bb[
+1 ] ) );
          }
       }
    }
@@ -2260,6 +2354,7 @@ static void InitVtab( AstSkyFrameVtab *vtab ) {
 /* Store replacement pointers for methods which will be over-ridden by new
    member functions implemented here. */
    frame->Angle = Angle;
+   frame->Bear = Bear;
    frame->Distance = Distance;
    frame->Norm = Norm;
    frame->Resolve = Resolve;

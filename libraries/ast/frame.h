@@ -217,6 +217,8 @@
 *           Calculate the distance between two axis values
 *        astAxOffset
 *           Calculate an offset along an axis
+*        astBear 
+*           Calculate the position angle of one point seen from another.
 *        astConvert
 *           Determine how to convert between two coordinate systems.
 *        astDistance
@@ -447,6 +449,8 @@
 *        Added astAxDistance and astAxOffset.
 *     4-SEP-2001 (DSB):
 *        Added astResolve.
+*     9-SEP-2001 (DSB):
+*        Added astBear.
 *-
 */
 
@@ -571,6 +575,7 @@ typedef struct AstFrameVtab {
    void (* ClearUnit)( AstFrame *, int );
    void (* Norm)( AstFrame *, double[] );
    void (* Offset)( AstFrame *, const double[], const double[], double, double[] );
+   double (* Bear)( AstFrame *, const double[2], const double[2] );
    double (* Offset2)( AstFrame *, const double[2], double, double, double[2] );
    void (* Overlay)( AstFrame *, const int *, AstFrame * );
    void (* PermAxes)( AstFrame *, const int[] );
@@ -641,6 +646,7 @@ double astDistance_( AstFrame *, const double[], const double[] );
 void astNorm_( AstFrame *, double[] );
 double astAxDistance_( AstFrame *, int, double, double );
 double astAxOffset_( AstFrame *, int, double, double );
+double astBear_( AstFrame *, const double[2], const double[2] );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
 void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
@@ -783,6 +789,8 @@ astINVOKE(V,astAxDistance_(astCheckFrame(this),axis,v1,v2))
 astINVOKE(V,astAxOffset_(astCheckFrame(this),axis,v1,dist))
 #define astOffset(this,point1,point2,offset,point3) \
 astINVOKE(V,astOffset_(astCheckFrame(this),point1,point2,offset,point3))
+#define astBear(this,a,b) \
+astINVOKE(V,astBear_(astCheckFrame(this),a,b))
 #define astOffset2(this,point1,angle,offset,point2) \
 astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2))
 #define astResolve(this,point1,point2,point3,point4,d1,d2) \

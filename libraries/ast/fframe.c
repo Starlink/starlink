@@ -17,6 +17,7 @@
 *     AST_ANGLE
 *     AST_AXDISTANCE
 *     AST_AXOFFSET
+*     AST_BEAR
 *     AST_CONVERT
 *     AST_DISTANCE
 *     AST_FORMAT
@@ -48,8 +49,8 @@
 *        Added AST_ANGLE and AST_OFFSET2.
 *     29-AUG-2001 (DSB):
 *        Added AST_AXDISTANCE and AST_AXOFFSET.
-*     4-SEP-2001 (DSB):
-*        Added AST_RESOLVE.
+*     9-SEP-2001 (DSB):
+*        Added AST_RESOLVE and AST_BEAR.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -102,6 +103,22 @@ F77_DOUBLE_FUNCTION(ast_angle)( INTEGER(THIS),
    astAt( "AST_ANGLE", NULL, 0 );
    astWatchSTATUS(
       RESULT = astAngle( astI2P( *THIS ), A, B, C );
+   )
+   return RESULT;
+}
+
+F77_DOUBLE_FUNCTION(ast_bear)( INTEGER(THIS),
+                               DOUBLE_ARRAY(A),
+                               DOUBLE_ARRAY(B),
+                               INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_DOUBLE_ARRAY(A)
+   GENPTR_DOUBLE_ARRAY(B)
+   F77_DOUBLE_TYPE(RESULT);
+
+   astAt( "AST_BEAR", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astBear( astI2P( *THIS ), A, B );
    )
    return RESULT;
 }
