@@ -100,7 +100,7 @@
 
 *  Arguments Returned:
       <TYPE>			VALUE
-      CHARACTER*72		CMNT			! Keyword comment
+      CHARACTER*80		CMNT			! Keyword comment
 
 *  Status:
       INTEGER 			STATUS             	! Global status

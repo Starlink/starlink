@@ -113,7 +113,7 @@
       INTEGER 			STATUS             	! Global status
 
 *  Local Variables:
-      CHARACTER*72		CMNT2
+      CHARACTER*80		CMNT2
 
       INTEGER			HID			! HDU identifier
 
