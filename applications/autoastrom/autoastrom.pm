@@ -691,7 +691,8 @@ sub match_positions ($$$$$) {
 sub generate_astrom ($) {
     my $par = shift;
 
-    foreach my $k qw{CCDin catalogue findofferror helpers NDFinfo tempfn} {
+    foreach my $k ('CCDin', 'catalogue', 'findofferror', 'helpers',
+		   'NDFinfo', 'tempfn') {
 	defined($par->{$k})
 	  || croak "bad call to generate_astrom: parameter $k not specified\n";
     }
@@ -1466,7 +1467,7 @@ sub get_temp_files () {
 }
 
 # Convert year,month,day (noon) to Julian Day number.
-sub ymd2jd {
+sub ymd2jd ($$$) {
     # Use the standard formula to convert Gregorian dates to Julian
     # Day numbers
     use integer;
