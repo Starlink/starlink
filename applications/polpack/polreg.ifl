@@ -219,8 +219,8 @@ interface POLREG
       access   UPDATE
       vpath    'CURRENT,DEFAULT'
       ppath    'CURRENT,DEFAULT'
-      default  1
-      prompt   'No. of fitting parameters per axis for each sky surface'
+      default  0
+      prompt   'Order of polynomial sky fit on each axis'
       helpkey  '*'
    endparameter
 

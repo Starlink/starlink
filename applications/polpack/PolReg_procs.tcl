@@ -2378,6 +2378,7 @@ proc DrawGwm {} {
 # Combine the transformed image with the required section identifier.
    append data $SECTION_REQ
 
+
 # Get a string describing the pixel coordinates to put at at the centre
 # of the display. This is just the centre of the supplied section. Report
 # an error if the centre cannot be found.
@@ -2389,30 +2390,42 @@ proc DrawGwm {} {
       set cy [lindex $centre 1]
       set centre "\[$cx,$cy\]"
    
-# Display the image section centred correctly. The centre and
-# magnification have to be specified because there seems to be some 
-# problem with application using dynamic defaults for parameters (the
-# current values seem to get used instead). Do not abort if the Display
-# fails since this could be caused by the percentiles selection resulting
-# in all pixels being scaled the same (eg if phi == plo ). In this
-# case the user may want to adjust the percentiles and try again. If the
-# scaling is locked, use the high and low data limits from the previous
-# display.
+# Decide on the scaling to use. Check for the user having locked the
+# scaling. If the data range being very low, use "flash" mode (otherwise
+# DISPLAY will report an error), otherwise use the specified percentiles.
       if { $LOCK_SCALE && [info exists SCALOW] } {
          set pars "mode=scale low=$SCALOW high=$SCAHIGH"
+
       } {
-         set pars "mode=perc percentiles=\[$PLO_REQ,$PHI_REQ\]"
+         if { [Obey kappa stats "ndf=$data"] } {
+            regsub -nocase D [GetParam kappa stats:mean] E mean
+            regsub -nocase D [GetParam kappa stats:sigma] E sigma
+
+            if { $sigma == 0.0 || (
+                 $mean != 0.0 && [expr $sigma/$mean] < 1.0E-4
+                 ) } {
+               set pars "mode=flash"
+               regsub -nocase D [GetParam kappa stats:minimum] E scalow
+               regsub -nocase D [GetParam kappa stats:maximum] E scahigh
+            } {
+               set pars "mode=perc percentiles=\[$PLO_REQ,$PHI_REQ\]"
+            }
+         }
       }
 
+# Display the image section centred correctly. 
       if { [Obey kapview display "in=\"$data\" $pars badcol=0 device=$DEVICE \
                                   cosys=world xmagn=! ymagn=! centre=$centre" ] } {
 
 # Indicate that the image has been displayed.
          set ok 1
 
-# Get the used scaling limits (replace D exponents with E).
-         regsub -nocase D [GetParam kapview display:scalow] E scalow
-         regsub -nocase D [GetParam kapview display:scahigh] E scahigh
+# Get the used scaling limits (replace D exponents with E). If the data
+# range was too small to display, use the values established earlier.
+         if { $pars != "mode=flash" } {
+            regsub -nocase D [GetParam kapview display:scalow] E scalow
+            regsub -nocase D [GetParam kapview display:scahigh] E scahigh
+         }
          set SCALOW [format "%.5g" $scalow]
          set SCAHIGH [format "%.5g" $scahigh]
 
@@ -3434,6 +3447,11 @@ proc Effects {im effect nodisp} {
    global SCAHIGH
    global SCALOW
    global SKYOFF
+   global SKYOP
+   global SKY_METHOD
+   global SKY_FRAME
+   global SKYIMS
+   global SKYPAR
    global SSIZE
    global THRBAD
    global THRHI 
@@ -3775,9 +3793,10 @@ proc Effects {im effect nodisp} {
          }
    
 #---------------------------------------------------------------
-# Sky subtraction - Estimate the sky background based on the current sky
-# areas or supplied sky frames, and subtract it from the displayed image.
-      } elseif { $effect == "Sky Subtraction" } {
+# Fit Sky - Estimate the sky background in the displayed image based on 
+# the current sky areas or supplied sky frames, and optionally subtract 
+# it from the displayed image.
+      } elseif { $effect == "Fit Sky" } {
 
          if { !$SKYOFF } {
             Message "Sky subtraction is currently disabled. Select the \"Remove Sky\" item in the \"Options\" menu to enable it."
@@ -3786,13 +3805,42 @@ proc Effects {im effect nodisp} {
             set ok 0
 
          } {
-            set file [SkySub $image $im]
-            if { $file == "" } {
-               set update 0
-               set desc ""
-               set ok 0
-            } {
-               set desc "Sky subtraction"
+
+# Describe the parameter used to get the type of output image required.
+            set types(SKYOP) "_CHOICE"
+            set labels(SKYOP) "Required image: "
+            set limits(SKYOP) [list "Fitted sky" "Difference between fitted sky and displayed image"]
+
+# Set a default value for the image type.
+            if { ![info exists SKYOP] } {
+               set SKYOP "Fitted sky"
+            }
+   
+# Get a value from the user for the image type.
+            if { [GetPars SKYOP types labels limits "Enter Fit Sky Parameters" \
+                          "POLREG_FITSKY_EFFECT" \
+                          ". Enter the parameters needed to perform the selected effect."] } {
+
+               if { $SKY_METHOD == $SKY_FRAME } {
+                  set desc "Fit Sky (sky frame \"$SKYIMS($im)\""
+               } {
+                  set desc "Fit Sky (order $SKYPAR"
+               }
+
+               if { $SKYOP == "Fitted sky" } {
+                  set sub 0
+                  append desc " - fit returned)"
+               } {
+                  append desc " - sky corrected data returned)"
+                  set sub 1
+               }
+   
+               set file [SkySub $image $im $sub]
+               if { $file == "" } {
+                  set update 0
+                  set desc ""
+                  set ok 0
+               }
             }
          }
 
@@ -6982,7 +7030,7 @@ proc LoadOptions {} {
      set SKYPAR $ATASK_SKYPAR
      set ATASK 1
    } {
-     set SKYPAR 1
+     set SKYPAR 0
    }
 
    if { [info exists ATASK_PLO] } {
@@ -9090,8 +9138,8 @@ proc Save {} {
             GetSec $imsec image section
 
 # Do the sky subtraction.
-            set image2 [SkySub $imsec $image $selab $setick(O) $setick(E) \
-                                             $sslab $sstick(O) $sstick(E) ]
+            set image2 [SkySub $imsec $image 1 $selab $setick(O) $setick(E) \
+                                               $sslab $sstick(O) $sstick(E) ]
             if { $image2 == "" } {
                set ok 0
                break
@@ -10736,6 +10784,9 @@ proc SkyOff {} {
 #        supplied object frames. 
 #    SKYOFF (Read)
 #        Should a sky background be subtracted?
+#    SKYPAR (Read)
+#        The order of the polynomial fit to use on each axis when
+#        fitting a sky surface.
 #    SKYTEXT (Write)
 #        The text to appear in the status area describing the current sky
 #        subtraction method.
@@ -10755,6 +10806,7 @@ proc SkyOff {} {
 #        The sky subtraction method to use; $SKY_AREA or $SKY_FRAME. 
 #-
    global CUROBJ_REQ
+   global DBEAM
    global E_RAY_SKY
    global IMAGE_DISP
    global NONE
@@ -10765,11 +10817,19 @@ proc SkyOff {} {
    global REFOBJ_REQ
    global SKYIMS    
    global SKYOFF   
+   global SKYPAR
    global SKYTEXT
    global SKYTEXT2
    global SKY_AREA
    global SKY_FRAME
    global SKY_METHOD
+
+# Get a list of the relevant sky areas.
+   if { $DBEAM } {
+      set skys [list $O_RAY_SKY $E_RAY_SKY]
+   } {
+      set skys $O_RAY_SKY
+   }
 
 # If sky subtraction is switched on...
    if { $SKYOFF } {
@@ -10787,7 +10847,7 @@ proc SkyOff {} {
       }
 
 # Enable or disable all the sky buttons.
-      foreach obj "$O_RAY_SKY $E_RAY_SKY" {
+      foreach obj $skys {
          $RB_CUR($obj) configure -state $state
          $RB_REF($obj) configure -state $state
       }
@@ -10799,25 +10859,23 @@ proc SkyOff {} {
       set SKYTEXT "(disabled)"
       set SKYTEXT2 "(disabled)"
 
+# Do each sky area.
+      foreach obj $skys {
+
 # If the current object is a sky area, change it to "O Ray features".
-      if { $CUROBJ_REQ == $E_RAY_SKY || $CUROBJ_REQ == $O_RAY_SKY } {
-         $RB_CUR($O_RAY_FEATURES) invoke         
-      }
+         if { $CUROBJ_REQ == $obj } { $RB_CUR($O_RAY_FEATURES) invoke }
 
 # If the reference object is a sky area, change it to "None".
-      if { $REFOBJ_REQ == $E_RAY_SKY || $REFOBJ_REQ == $O_RAY_SKY } {
-         $RB_REF($NONE) invoke         
-      }
+         if { $REFOBJ_REQ == $obj } { $RB_REF($NONE) invoke }
 
 # Disable all the sky buttons.
-      foreach obj "$O_RAY_SKY $E_RAY_SKY" {
          $RB_CUR($obj) configure -state disabled
          $RB_REF($obj) configure -state disabled
       }
    }
 }
 
-proc SkySub {data image args} {
+proc SkySub {data image sub args} {
 #+
 #  Name:
 #     SkySub
@@ -10833,6 +10891,14 @@ proc SkySub {data image args} {
 #     image
 #        The name of the user supplied image from which the supplied data
 #        is derived.
+#     sub 
+#        If non-zero then the returned image is the difference between
+#        the supplied data and the estimated sky background. Otherwise,
+#        the returned data is the estimated sky background.
+#     args
+#        Any extra arguments should be the paths to the label widgets
+#        within the "Save" progress dialog box which refer to sky
+#        subtraction. See procedure "Save".
 #
 #  Returned Value:
 #     The name of the file containing sky subtracted data, or blank if
@@ -10858,6 +10924,9 @@ proc SkySub {data image args} {
 #     SKYOFF (Read)
 #        Should sky subtraction be performed? If not, then the input image
 #        name is returned unchanged.
+#     SKYPAR (Read)
+#        The order of the polynomial to use on each axis when
+#        fitting a sky surface.
 #     SKY_AREA (Read)
 #        One of the integer values which may be assigned to SKY_METHOD:
 #        indicates that sky background is to be performed by fitting
@@ -10880,6 +10949,7 @@ proc SkySub {data image args} {
    global PSF_SIZE
    global SKYIMS
    global SKYOFF
+   global SKYPAR
    global SKY_AREA
    global SKY_FRAME
    global SKY_METHOD
@@ -10983,21 +11053,12 @@ proc SkySub {data image args} {
             break
          }
 
-# Fit a surface to the data within the sky areas. If 3 or fewer fitting
-# parameters are being used, use a polynomial surface otherwise use a spline
-# surface, converting the number of free parameters to the number of
-# interior knots.
+# Fit a surface to the data within the sky areas. 
          set fit($ray) [UniqueFile]
-         if { $SKYPAR < 4 } {
-            set pars "fittype=poly order=$SKYPAR"
-         } {
-            set pars "fittype=spline knots=[expr $SKYPAR - 3]"
-         }
-
 
 #------------ Temporary bit; SURFIT will eventually be in task kappa ---------
 
-         if { ![Obey surfit surfit "in=$sky out=$fit($ray) evaluate=all $pars"] } {
+         if { ![Obey surfit surfit "in=$sky out=$fit($ray) evaluate=all fittype=poly order=$SKYPAR"] } {
             set ok 0
             break
          }
@@ -11044,9 +11105,13 @@ proc SkySub {data image args} {
 
 # Subtract the sky image from the supplied data.
       if { $ok } {
-         set ssimage [UniqueFile]
-         if { ![Obey kappa sub "in1=$data in2=$sky out=$ssimage"] } {
-            set ok 0
+         if { $sub } {
+            set ssimage [UniqueFile]
+            if { ![Obey kappa sub "in1=$data in2=$sky out=$ssimage"] } {
+               set ok 0
+            }
+         } {
+            set ssimage $sky
          }
       }
 

@@ -534,7 +534,7 @@
    MenuHelp $filemenu "Quit        " ".  Quit the application, thowing away the current image registration information."
 
 # Add menu items to the Effects menu.
-   foreach effect [list Align Fill Filter Log Maths Negate "Sky Subtraction" Smooth Threshold] {
+   foreach effect [list Align Fill Filter "Fit Sky" Log Maths Negate Smooth Threshold] {
       $EFFECTSMENU add command -label $effect -command "Effects \$IMAGE_DISP \"$effect\" 0"
    }
    $EFFECTSMENU add separator
@@ -548,7 +548,7 @@
    MenuHelp $EFFECTSMENU "Log"       ".  Take the logarithm (base 10) of the currently displayed image (the minimum value in the image is first subtracted from the image to remove negative values)."
    MenuHelp $EFFECTSMENU "Maths"     ".  Apply an arbitrary algebraic expression to one or more of the previously displayed images."
    MenuHelp $EFFECTSMENU "Negate"    ".  Multiply the currently displayed image by -1.0."
-   MenuHelp $EFFECTSMENU "Sky Subtraction" ".  Estimate the sky background based on the current sky areas or supplied sky frames, and subtract it from the displayed image."
+   MenuHelp $EFFECTSMENU "Fit Sky"   ".  Estimate the sky background based on the current sky areas or supplied sky frames, and optionally subtract it from the displayed image."
    MenuHelp $EFFECTSMENU "Smooth"    ".  Apply Gaussian smoothing to the displayed image."
    MenuHelp $EFFECTSMENU "Threshold" ".  Remove values outside a given range from the displayed image."
    MenuHelp $EFFECTSMENU "Undo"      ".  Undo the most recent effect for the currently diplayed image."
@@ -576,7 +576,7 @@
    $OPTSMENU add cascade -label "Feature Size" -menu $OPTSMENU.psf
    $OPTSMENU add cascade -label "Interpolation method" -menu $OPTSMENU.meth
    $OPTSMENU add cascade -label "Mapping Types" -menu $OPTSMENU.map
-   $OPTSMENU add cascade -label "Sky" -menu $OPTSMENU.sky -state $skystate
+   $OPTSMENU add cascade -label "Sky Order" -menu $OPTSMENU.sky -state $skystate 
    $OPTSMENU add command -label "Status Items..." -command GetItems
    $OPTSMENU add cascade -label "View" -menu $OPTSMENU.view
    $OPTSMENU add separator
@@ -591,7 +591,7 @@
    MenuHelp $OPTSMENU "Feature Size"    ".  The typical size of star-like features in the image (in pixels). This is used by the algorithm which locates accurate feature positions. A value of zero results in the raw position being used."
    MenuHelp $OPTSMENU "Interpolation method" ".  The interpolation method to use when finding pixel values in the input images."
    MenuHelp $OPTSMENU "Mapping Types"   ".  The type of mapping to use when aligning images, or when aligning the O and E rays."
-   MenuHelp $OPTSMENU "Sky"             ".  The number of fitting parameters used on each axis when fitting sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
+   MenuHelp $OPTSMENU "Sky Order"       ".  The order of the polynomial fit used on each axis when fitting sky surfaces. A value of 0 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
    MenuHelp $OPTSMENU "Status Items..."      ".  Select which items of information to display in the status area."
    MenuHelp $OPTSMENU "View"            ".  The section to be displayed when a new image is selected from the \"Images\" menu."
    MenuHelp $OPTSMENU "Display Status Area"  ".  Toggle the display of status information underneath the displayed image."
@@ -640,12 +640,12 @@
 
 # Add items to the "Sky" sub-menu.
    set skymenu [menu $OPTSMENU.sky]
-   for {set i 1} {$i < 15} {incr i} {
+   for {set i 0} {$i < 15} {incr i} {
       $skymenu add radiobutton -label " $i " -variable SKYPAR \
-              -selectcolor $RB_COL -value $i 
+              -selectcolor $RB_COL -value $i -command SkyOff
    }
 
-   SetHelp $skymenu ".  The number of fitting parameters used on each axis when fitting sky surfaces. A value of 1 produces a constant sky surface. Larger values allow more flexibility in the fitted surfaces."
+   SetHelp $skymenu ".  The order of the polynomial fit used on each axis when fitting sky surfaces. Larger values allow more flexibility in the fitted surfaces."
 
 # Add items to the "Mapping Types" sub-menu.
    set mapmenu [menu $OPTSMENU.map]
@@ -1062,7 +1062,7 @@
    StatusItem FITTYPE      "Image mappings: "        "The type of mapping being used to align images.\n(To change the mapping type, use the \"Options\" menu.)" 34
    StatusItem VIEW         "Image view: "            "What section of the image will be displayed when a new image is selected using the \"Images\" menu?\n(To change the value use the \"Options\" menu.)" 9
    StatusItem OEFITTYPE    "O-E mappings: "          "The type of mapping being used to align the O and E rays.\n(To change the mapping type, use the \"Options\" menu.)" 34
-   StatusItem SKYTEXT2     "Sky fit parameters: "    "The number of fitting parameters used on each axis when fitting a sky surface.\n(To change the value, use the \"Options\" menu.)" 10
+   StatusItem SKYTEXT2     "Sky fit order: "         "The order of the polynomial used on each axis when fitting a sky surface.\n(To change the value, use the \"Options\" menu.)" 16
    StatusItem INTERP       "Interpolation method: "  "The interpolation method to use when sampling the input images.\n(To change the method, use the \"Options\" menu.)" 20
    StatusItem SKYTEXT      "Sky estimated in:"       "The image in which the sky background will be determined. This will either be one of the supplied sky frames, or the displayed image (if no sky frames were supplied)." $maxsfwid
 

@@ -189,14 +189,12 @@
 *        the supplied object frames. [!]
 *     SKYPAR = _INTEGER (Update)
 *        If no sky frames are supplied using parameter SKYFRAMES, then
-*        the sky in each output image will be fitted using a polynomial or
-*        bi-cubic spline surface. The number of free parameters on each 
-*        axis of these surfaces is given by this parameter (SKYPAR). A
-*        value of 1 will result in a flat surface (i.e. a constant value) 
-*        being used, 2 will result in a quadratic surface, and 3 in a cubic 
-*        surface. Values of 4 and higher will result in a bi-cubic spline 
-*        being used with the specified number of knots. The supplied value 
-*        must be in the range 1 to 14. [1]
+*        the sky in each output image will be fitted using a polynomial 
+*        surface. The order of the fit on each axis is given by this 
+*        parameter (SKYPAR). A value of 0 will result in a flat surface 
+*        (i.e. a constant value) being used, 1 will result in a linear 
+*        surface, 2 in a quadratic surface, etc. The supplied value 
+*        must be in the range 0 to 14. [0]
 *     SKYOFF = _LOGICAL (Update)
 *        If a true value is supplied, then the sky background is removed
 *        from each output image. Otherwise, no sky background is removed.
@@ -335,7 +333,7 @@
      :        PSF,               ! Size of feature to search for
      :        SIZE,              ! Total size of the object frame group
      :        SIZEO,             ! Total size of the output group (=SIZE)
-     :        SKYPAR,            ! No. of fitting parameters on each axis of a sky surface
+     :        SKYPAR,            ! Order of polynomial fit on each axis of a sky surface
      :        SSIZE              ! Total size of the sky frame group
       LOGICAL 
      :        AGAIN,             ! Get a list of sky frames again?
@@ -452,11 +450,11 @@
       CALL PAR_GET0I( 'PSFSIZE', PSF, STATUS )
       IF ( PSF .LT. 0 ) PSF = 0
 
-*  Get the number of fitting parameters along each axis of a sky surface.
+*  Get the order of the polynomial fit along each axis of a sky surface.
       IF ( SSIZE .LT. 0 ) THEN
-         CALL PAR_GDR0I( 'SKYPAR', 1, 1, 14, .FALSE., SKYPAR, STATUS )
+         CALL PAR_GDR0I( 'SKYPAR', 0, 0, 14, .FALSE., SKYPAR, STATUS )
       ELSE
-         SKYPAR = 1
+         SKYPAR = 0
       END IF
 
 *  Get the dots per inch to assume for the screen. A null valu means
