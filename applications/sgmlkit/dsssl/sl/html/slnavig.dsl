@@ -358,108 +358,214 @@ list their children.  It does not supply any header.
 					   (children start-element)
 					   'element)
 					  (section-element-list))))
-    (if (or (node-list-empty? subsects)
-	    (<= depth 0))
+    (if (or (node-list-empty? subsects) (<= depth 0))
 	(empty-sosofo)
 	(make element gi: "ul"
-	      (sosofo-append
-	       (node-list-reduce
-		subsects
-		(lambda (last el)
-		  (sosofo-append
-		   last
-		   (make element gi: "li"
-                         (with-mode html-contents (process-node-list el))
-			 (make-contents el (- depth 1)))))
-		(empty-sosofo))
-	       (if (and include-backmatter-contents
-			(hasbackmatter?))
-		   (make-contents-backmatter)
-		   (empty-sosofo)))))))
+	   (node-list-reduce
+              subsects
+              (lambda (last el)
+                 (sosofo-append
+                    last
+                    (make element gi: "li"
+                       (with-mode html-contents (process-node-list el))
+                       (make-contents el (- depth 1)))))
+              (empty-sosofo))
+           (if (and include-backmatter-contents (hasbackmatter?))
+               (make-contents-backmatter)
+               (empty-sosofo))))))
 
+<routine>
+<routinename>has-contents?
+<description>Finds out whether the contents which would be made by
+the <funcname/make-contents/ routine is non-empty.
+<returnvalue type=boolean>#f if <funcname/make-contents/ would 
+return an empty sosofo, and #t otherwise.
+<argumentlist>
+<parameter optional default='(current-node)'>start-element
+  <type>singleton-node-list
+  <description>Node we want the contents of.  All the children of this
+  node which are members of <funcname/section-element-list/ will be
+  listed.
+<parameter optional default=1>depth
+  <type>integer
+  <description>Maximum number of levels of TOC we want.  Zero means
+  return immediately.
+<codebody>
+(define (has-contents? #!optional
+                       (start-element (current-node))
+                       (depth 1))
+   (let ((subsects (node-list-filter-by-gi (select-by-class
+                                           (children start-element)
+                                           'element)
+                                          (section-element-list))))
+      (not (or (node-list-empty? subsects) (<= depth 0)))))
+
+<routine>
+<routinename>navlink
+<description>Generates a navigation hyperlink (i.e. HTML A element).
+<argumentlist>
+<parameter>target
+   <type>singleton-node-list
+   <description>The node to which the link is to be made.
+<parameter>relation
+   <type>string
+   <description>The name of the relation which target bears to the current 
+   node.  This is used as the text of a text link, or as the key for 
+   finding an image using the <funcname/file-href/ routine.
+<parameter>link-type
+   <type>string
+   <description>Either "title" or "gif" according to the kind of link 
+   you want.
+<codebody>
+(define (navlink target relation link-type)
+   (if (node-list-empty? target)
+       (case link-type 
+          (("gif") 
+              (make sequence 
+                 (make empty-element gi: "img"
+                             attributes: (list 
+                       (list "src" (file-href (string-append relation ".off")))
+                       (list "border" "0")
+                       (list "alt" (string-append relation " (absent)"))))
+                 (literal " ")))
+          (("title") 
+              (empty-sosofo)))
+       (case link-type
+          (("gif")
+             (make sequence
+                (make element gi: "a"
+                      attributes: (list (list "href"  
+                                              (href-to target reffrag: #f)))
+                    (make empty-element gi: "img"
+                                attributes: 
+                            (list (list "src" (file-href relation))
+                                  (list "border" "0")
+                                  (list "alt" relation))))
+                (literal " ")))
+          (("title")
+             (make sequence
+                (make element gi: "b" 
+                   (literal (string-append relation ": ")))
+                (make element gi: "a"
+                      attributes: (list (list "href" 
+                                              (href-to target reffrag: #f)))
+                   (with-mode section-reference (process-node-list target)))
+                (make empty-element gi: "br"))))))
 
 <routine>
 <description>
 Various functions to provide the links which navigate between the various
 generated HTML documents.  
 <codebody>
-(define (header-navigation nd)
-  (make sequence
-    ($html-body-start$)
-    (cond ((node-list=? nd (document-element))
-	   (root-header-navigation nd))
-	  ((member (gi nd) (section-element-list))
-	   (section-header-navigation nd))
-	  (else (empty-sosofo)))
-    ($html-body-content-start$)))
 
-(define (footer-navigation nd)
-  (make sequence
-    ($html-body-content-end$)
-    ;(whereami "footer-navigation" "P" nd)
-    (cond ((node-list=? nd (document-element))
-	   (root-footer-navigation nd))
-	  ((member (gi nd) (section-element-list))
-	   (section-footer-navigation nd))
-	  (else (empty-sosofo)))
-    (nav-footer nd)
-    ($html-body-end$)))
 
-(define (root-header-navigation elemnode)
-  (empty-sosofo))
+;; This forms a nodelist containing all the nodes which are chunks.
+;; This list is used to find the forward and backward links relative
+;; to the current one.  
+;;
+;; There would be (significant?) efficiency gains
+;; in evaluating it once only rather than every time it is referenced
+;; but I'm not immeidiately sure how to do this since it needs a
+;; node in the document grove to find the document body node (i.e.
+;; you can't evaluate (getdocbody) in the context of a top-level binding.
+(define (chunk-subtree nl)
+  (node-list-map 
+    (lambda (snl) (node-list snl (chunk-subtree (chunk-children snl))))
+    nl))
+(define (doc-chunk-sequence)
+  (chunk-subtree (getdocbody)))
 
-;; This is like (ancestors), except that we list only ancestors which
-;; are present in (chunk-element-list) or DOCBODY
-(define (chunk-ancestors nl)
-  (node-list-filter-by-gi (ancestors nl) (append (chunk-element-list)
-						 (list (normalize "docbody")))))
 
-(define (section-header-navigation elemnode)
-  (let ((anc (chunk-ancestors elemnode)))
-    (make element gi: "div" attributes: '(("class" "navbar"))
-    (make element gi: "table" attributes: %nav-header-table-attr%
-	  (make sequence
-	    (make element gi: "tr"
-		  (make element gi: "td" attributes: '(("align" "left"))
-			(make sequence
-			  (node-list-reduce
-			   anc ; (node-list-reduce) 10.2.2
-			   (lambda (curr el)
-			     (sosofo-append
-			      curr
-			      (make sequence
-				(make element gi: "a"
-				      attributes: (list (list "href"
-							      (href-to el)))
-				      (with-mode section-reference
-					(process-node-list el)))
-				(literal " / "))))
-			   (empty-sosofo))
-			  (with-mode section-reference
-			    (process-node-list (current-node))))))
-	    (make element gi: "tr"
-		  (make element gi: "td" attributes: '(("align" "right"))
-			(make sequence
-			  (if (nav-home? elemnode)
-			      (make sequence
-				(nav-home-link elemnode)
-				(literal " / "))
-			      (empty-sosofo))
-			  (if (nav-up? elemnode)
-			      (nav-up-link elemnode)
-			      (make element gi: "em"
-				    (literal "Up")))
-			  (literal " / ")
-			  (if (nav-prev? elemnode)
-			      (nav-prev-link elemnode)
-			      (make element gi: "em"
-				    (literal "Prev")))
-			  (literal " / ")
-			  (if (nav-next? elemnode)
-			      (nav-next-link elemnode)
-			      (make element gi: "em"
-				    (literal "Next")))))))))))
+(define (nav-up-element elemnode)
+  (parent elemnode))
+(define (nav-up? elemnode)
+  (not (or (node-list-empty? (nav-up-element elemnode))
+           (node-list=? (nav-up-element elemnode) (document-element)))))
 
+(define (nav-forward-element elemnode)
+  (let loop ((rest (doc-chunk-sequence)))
+     (cond ((node-list-empty? rest)
+            (empty-node-list))
+           ((node-list=? (node-list-first rest) elemnode) 
+            (node-list-first (node-list-rest rest)))
+           (else
+            (loop (node-list-rest rest))))))
+(define (nav-forward? elemnode)
+  (not (node-list-empty? (nav-forward-element elemnode))))
+
+(define (nav-backward-element elemnode)
+  (let loop ((rest (node-list-reverse (doc-chunk-sequence))))
+     (cond ((node-list-empty? rest)
+            (empty-node-list))
+           ((node-list=? (node-list-first rest) elemnode)
+            (node-list-first (node-list-rest rest)))
+           (else
+            (loop (node-list-rest rest))))))
+(define (nav-backward? elemnode)
+   (not (node-list-empty? (nav-backward-element elemnode))))
+
+(define (idindex-link elemnode)
+   (let* ((in-sect (ancestor-member elemnode (list (normalize "sect"))))
+          (sect-id (and in-sect (attribute-string (normalize "id") in-sect))))
+      (make element gi: "a"
+            attributes: (list (list "href" 
+                                    (string-append (idindex-sys-id)
+                                                   "#"
+                                                   (if sect-id
+                                                       (string-append
+                                                           "xref__IDINDEX_"
+                                                           sect-id)
+                                                       (idindex-frag-id)))))
+            (literal "[ID index]"))))
+
+;; Generates a standard navigation bar.
+(define (navbar nd)
+   (make sequence 
+      (make empty-element gi: "hr")
+      (navlink (nav-forward-element nd) "Next" "gif")
+      (navlink (nav-up-element nd) "Up" "gif")
+      (navlink (nav-backward-element nd) "Previous" "gif")
+      (navlink (document-element nd) "Contents" "gif")
+      (make empty-element gi: "br")
+      (navlink (nav-forward-element nd) "Next" "title")
+      (navlink (nav-up-element nd) "Up" "title")
+      (navlink (nav-backward-element nd) "Previous" "title")
+      (idindex-link nd)
+      (make empty-element gi: "hr")))
+
+
+(define (header-navigation nd) 
+    (if (node-list=? nd (document-element))
+        (root-header-navigation nd)
+        (nav-header nd)))
+(define (footer-navigation nd) 
+    (if (node-list=? nd (document-element))
+        (root-footer-navigation nd)
+        (nav-footer nd)))
+
+(define (nav-header elemnode)
+   (navbar elemnode))
+
+(define (nav-footer elemnode)
+   (make sequence 
+      (if (has-contents?)
+          (sosofo-append (make empty-element gi: "hr") (make-contents))
+          (empty-sosofo))
+      (navbar elemnode)
+      (make element gi: "address"
+         (make element gi: "i"
+            (process-node-list (getdocinfo 'title))
+            (make empty-element gi: "br")
+            (literal (getdocnumber (current-node) 'asString))
+            (make empty-element gi: "br")
+            (getdocauthors)
+            (make empty-element gi: "br")
+            (literal (getdocdate))
+            (make empty-element gi: "br")))))
+         
+
+(define (root-header-navigation nd)
+        (empty-sosofo))
 
 ;; We're producing the footer for the root element (SUN or MUD, or
 ;; whatever).  This doesn't have any element of (chunk-element-list)
@@ -472,321 +578,9 @@ generated HTML documents.
 (define (root-footer-navigation elemnode)
   (if (chunking?)
       (make sequence
-	(make element gi: "h3"
-	      (literal "Contents"))
-	(make-contents (getdocbody) 4 #t))
+         (make element gi: "h2"
+           (literal "Contents"))
+         (make-contents (getdocbody) 4 #t))
       (empty-sosofo)))
 
-;(define (section-footer-navigation elemnode)
-;  (let ((subsects (chunk-children elemnode)))
-;    (make-subcontents subsects)))
-(define (section-footer-navigation elemnode)
-  (empty-sosofo))
-
-;; Return a pair consisting of ("Legend" . (node-list with
-;; the `next' chunk to go to))
-(define (onwards #!optional (elemnode (current-node)))
-  (let* ((subsects (chunk-children elemnode))
-	 ;; If this is the root element, and we _are_ chunking, then
-	 ;; return a list of the children of the root element.
-	 ;; Otherwise, return an empty-node-list
-	 ;; (this is because (chunk-children) doesn't find sections from within
-	 ;; the root element, and so needs a special case).
-	 (root-subsects (if (and (chunking?)
-				 (node-list=? elemnode
-					      (document-element)))
-			    (chunk-children (select-elements
-					     (children elemnode)
-					     (normalize "docbody")))
-			    (empty-node-list))))
-    (cond ((not (node-list-empty? root-subsects))
-	   (cons "Begin" (node-list-first root-subsects)))
-	  ((not (node-list-empty? subsects))
-					; first of any children
-	   (cons "Next down" (node-list-first subsects)))
-	  ((nav-next? elemnode)	; next at this level
-	   (cons "Next" (nav-next-element elemnode)))
-	  ((not (node-list-empty?
-		 (nav-next-element
-		  (nav-up-element elemnode))))
-	   (cons "Next up" (nav-next-element
-			    (nav-up-element elemnode))))
-	  ;; Don't go UP - when there's no longer a `next up', 
-	  ;; then we've got to the end of the trail.
-	  (else (cons "End" (empty-node-list))))))
-
-(define (nav-footer elemnode)
-  (let* ((authors (children (getdocinfo 'authorlist)))
-	 (rel (document-release-info))
-	 (subsects (chunk-children elemnode))
-	 (nextchunk (onwards)))
-    (make element gi: "div" attributes: '(("class" "navbar")
-					  ("align" "right"))
-      (make element gi: "table" attributes: %nav-footer-table-attr%
-	    (make sequence
-	      (if (node-list-empty? subsects)
-		  (empty-sosofo)
-		  (make element gi: "tr"
-			(make element gi: "td"
-			      (make sequence
-				(make element gi: "h4"
-				      (literal "Contents"))
-				(make-contents))
-			      )))
-	      (make element gi: "tr"
-		    (make element gi: "td" attributes: '(("align" "right"))
-			;(whereami "nav-footer")
-			;(literal (car nextchunk))
-			(if (node-list-empty? (cdr nextchunk))
-			    (literal "END")
-			    (make sequence
-			      (make element gi: "em"
-				    (literal (string-append (car nextchunk)
-							    ": ")))
-			      (make element gi: "a"
-				    attributes: (list
-						 (list "href"
-						       (href-to (cdr nextchunk))))
-				    (with-mode section-reference
-				      (process-node-list (cdr nextchunk))))))
-			))
-	      (if (hasidindex?)
-		  (make element gi: "tr"
-			(make element gi: "td" attributes: '(("align" "right"))
-			      (let* ((in-sect (ancestor-member
-					       (current-node)
-					       (list (normalize "sect"))))
-				     (sect-id (and in-sect
-						   (attribute-string
-						    (normalize "id")
-						    in-sect))))
-				(make element gi: "a"
-				      attributes:
-				      (list
-				       (list
-					"href" (string-append
-						(idindex-sys-id)
-						"#"
-						(if sect-id
-						    (string-append
-						     "xref__IDINDEX_" sect-id)
-						    (idindex-frag-id)))))
-				      (make element gi: "small"
-					    (literal "ID index"))))))
-		  (empty-sosofo))))
-      (make element gi: "address"
-	    (make element gi: "em"
-		  (make sequence
-		    (node-list-reduce authors
-				      (lambda (result a)
-					(sosofo-append
-					 result
-					 (make sequence
-					   (process-node-list a)
-					   (make empty-element gi: "br"))))
-				      (empty-sosofo))
-		    (literal (format-date (car rel)))
-		    )))
-      )))
-
-
-
-;(define (nav-footer elemnode)
-;  (let* ((authors (getdocinfo 'authorlist))
-;	 (hist (getdocinfo 'history))
-;	 (date (if hist			; HISTORY element present
-;		   (attribute-string "date"
-;				     (select-elements (descendants hist)
-;						      'release))
-;		   (data (getdocinfo 'docdate))))) ; must be docdate instead
-;    (make sequence
-;      (make element gi: "table" attributes: %nav-footer-table-attr%
-;	    (make element gi: "tr"
-;		  (make element gi: "td" attributes: '(("align"
-;							"right"))
-;			(whereami "nav-footer")
-;			(literal "Next location..."))))
-;      (make element gi: "p" attributes: '(("align" "right"))
-;	    (make element gi: "em"
-;		  (process-node-list authors)
-;		  (literal "Date: " date))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;; Navigation macros.  These navigate around the document, giving
-;; parents, siblings, and so on
-
-;; General navigation link, which nav-{up,home,next,prev}-link use
-(define (nav-gen-link thisnode target title linktext)
-  (if (node-list=? thisnode target)
-      (literal (string-append "This node is " title))
-      (make sequence
-	(make element gi: "a"
-	      attributes: (list (list "href" (href-to target))
-				(list "title" title))
-	      linktext)
-	;(literal (string-append " (" (href-to target) ")"))
-	)))
-
-;; Is there an Up definable?
-(define (nav-up? elemnode)
-  (let ((up (parent elemnode)))
-    (if (or (node-list-empty? up)
-	    (node-list=? up (document-element)))
-	#f
-	#t)))
-(define (nav-up-element elemnode)
-  (parent elemnode))
-
-(define (nav-up-link elemnode)
-  (let ((up (parent elemnode)))
-    (nav-gen-link elemnode up "Up" (gentext-nav-up up))))
-
-;; Returns a sosofo with the up link (or empty-sosofo if none)
-;(define (nav-up-link elemnode)
-;  (let ((up (parent elemnode)))
-;    (if (or (node-list-empty? up)
-;	    (node-list=? up (document-element)))
-;	;(make entity-ref name: "nbsp")
-;	;(empty-sosofo)
-;	(literal "No up element")
-;	(make element gi: "a"
-;	      attributes: (list
-;			   (list "href" (href-to up))
-;			   (list "title" "Up"))
-;	      (gentext-nav-up up)))))
-
-;; Is there a home link (say no, if we're currently the root element)
-(define (nav-home? elemnode)
-  (not (node-list=? elemnode (document-element))))
-
-(define (nav-home elemnode)
-  (document-element))
-
-(define (nav-home-link elemnode)
-  (let ((home (nav-home elemnode)))
-    (nav-gen-link elemnode home "Home" (gentext-nav-home home))))
-
-;;; make the home link (or empty-sosofo if none)
-;(define (nav-home-link elemnode)
-;  (let ((home (nav-home elemnode)))
-;    (if (node-list=? elemnode home)
-;	;(make entity-ref name: "nbsp")
-;	;(empty-sosofo)
-;	(literal "No home element")
-;	(make element gi: "a"
-;	      attributes: (list
-;			   (list "href" (href-to home))
-;			   (list "title" "Home"))
-;	      (gentext-nav-home home)))))
-
-;; ifollow-by-gi and ipreced-by-gi return the next sibling node which
-;; is in the list gilist, which need not be the same as the next
-;; sibling (though it probably will be, in the present case)
-(define (ifollow-by-gi nd gilist)
-  (let loop ((next (ifollow nd)))
-    (if (node-list-empty? next)
-	(empty-node-list)
-	(if (member (gi next) gilist)
-	    next
-	    (loop (ifollow next))))))
-
-(define (ipreced-by-gi nd gilist)
-  (let loop ((prev (ipreced nd)))
-    (if (node-list-empty? prev)
-	(empty-node-list)
-	(if (member (gi prev) gilist)
-	    prev
-	    (loop (ipreced prev))))))
-
-;; Is there a next link?
-(define (nav-next-element elemnode)
-  (ifollow-by-gi elemnode (chunk-element-list)))
-
-(define (nav-next? elemnode)
-  (not (node-list-empty? (nav-next-element elemnode))))
-
-(define (nav-next-link elemnode)
-  (let ((next (nav-next-element elemnode)))
-    (nav-gen-link elemnode next "Next" (gentext-nav-next next))))
-
-;;; return sosofo for 'next' link (or empty-sosofo if none)
-;(define (nav-next-link elemnode)
-;  (let ((next (ifollow-by-gi elemnode (chunk-element-list))))
-;    (if (node-list-empty? next)
-;	;(empty-sosofo)
-;	(literal "No next element")
-;	(make element gi: "a"
-;	      attributes: (list (list "href" (href-to next))
-;				(list "title" "Next"))
-;	      (gentext-nav-next next)))))
-
-;; Is there a prev link?
-(define (nav-prev-element elemnode)
-  (ipreced-by-gi elemnode (chunk-element-list)))
-(define (nav-prev? elemnode)
-  (not (node-list-empty? (nav-prev-element elemnode))))
-
-(define (nav-prev-link elemnode)
-  (let ((prev (nav-prev-element elemnode)))
-    (nav-gen-link elemnode prev "Prev" (gentext-nav-prev prev))))
-
-
-<routine>
-<description>
-The following functions are miscellaneous odds-and-ends, some of which I'm
-not sure if I still use!
-<codebody>
-;;; Debugging routine -- simply telltales the current GI
-(define (whereami str #!optional (gitype "P") (nd (current-node)))
-  (make element gi: gitype
-	  (literal (string-append
-		    str ": "
-		    (gi nd)))))
-
-
-;; I don't know what this `skipping' stuff is, but I've changed the
-;; list to just "sect" rather than "sect1"
-;; (I _think_ the `skipping' is that if a section starts with a
-;; subsection, then the two are put on the same page, but you'd have
-;; to burrow through the DocBook stylesheet to confirm that).
-(define (chunk-skip-first-element-list)
-  (list (normalize "sect")))
-
-(define (subset testlist memberlist)
-  ;; Returns #t if all the elements of testlist are also elements of memberlist
-  (let loop ((l testlist))
-    (if (null? l)
-	#t
-	(if (not (member (car l) memberlist))
-	    #f
-	    (loop (cdr l))))))
-
-(define (nodelist-to-gilist nodelist) 
-  (let loop ((nl nodelist) (gilist '()))
-    (if (node-list-empty? nl)
-	gilist
-	(loop (node-list-rest nl) (append gilist (list (gi (node-list-first nl))))))))
-
-(define (is-first-element nd)
-  (equal? (child-number nd) 1))
-
-;; Return an id for the element, either the element's ID if it has one, 
-;; or one obtained from (generate-anchor).
-;; Don't want this any more (partly because I've discarded (generate-anchor)
-;; However, I might want to resurrect the more complicated version below, 
-;; when and if I want to refer to titles (which don't have IDs in the General
-;; DTD.
-;(define (element-id #!optional (nd (current-node)))
-;    (if (attribute-string (normalize "id") nd)
-;	(attribute-string (normalize "id") nd)
-;	(generate-anchor nd)))
-;(define (element-id #!optional (nd (current-node)))
-;  ;; IDs of TITLEs are the IDs of the PARENTs
-;  (let ((elem (if (equal? (gi nd) (normalize "title"))
-;		  (parent nd)
-;		  nd)))
-;    (if (attribute-string (normalize "id") elem)
-;	(attribute-string (normalize "id") elem)
-;	(generate-anchor elem))))
 
