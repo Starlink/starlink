@@ -7325,7 +7325,7 @@ U java/source/table/src/main/uk/ac/starlink/table/UnknownTableFormatException.ja
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfo.java
 U java/source/table/src/main/uk/ac/starlink/table/ValueInfoMapGroup.java
 U java/source/table/src/main/uk/ac/starlink/table/WrapperRowSequence.java
-U java/source/table/src/main/uk/ac/starlink/table/WrapperTable.java
+U java/source/table/src/main/uk/ac/starlink/table/WrapperStarTable.java
 U java/source/table/src/main/uk/ac/starlink/table/package.html
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/gui
 U java/source/table/src/main/uk/ac/starlink/table/gui/LabelledComponentStack.java
@@ -7355,6 +7355,7 @@ U java/source/table/src/main/uk/ac/starlink/table/jdbc/TerminalAuthenticator.jav
 cvs checkout: Updating java/source/table/src/main/uk/ac/starlink/table/view
 U java/source/table/src/main/uk/ac/starlink/table/view/AuxWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ColumnInfoWindow.java
+U java/source/table/src/main/uk/ac/starlink/table/view/ExtendedStarTableModel.java
 U java/source/table/src/main/uk/ac/starlink/table/view/MirageHandler.java
 U java/source/table/src/main/uk/ac/starlink/table/view/ParameterWindow.java
 U java/source/table/src/main/uk/ac/starlink/table/view/PlotWindow.java
