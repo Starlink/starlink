@@ -199,6 +199,7 @@
 #  then select fields and scale by image size.
             rm -f ccdtest_obj.dat
             sed -e'/^ *#/d' -e'/^ *$/d' ccdbig_obj.dat  \
+          | head -$objects
           | sort -n -k 3 \
           | awk 'NR <= '$objects' { print NR, $2*'$field_pixels', $3*'$field_pixels', $4*0.1, $5 }' \
           > ccdtest_obj.dat
@@ -631,4 +632,4 @@
 #  Exit label
      EXIT:
      exit
-# $Id: ccdbig,v 1.23 1998/07/06 14:22:08 mbt Exp $
+# $Id: ccdbig,v 1.24 1998/07/07 11:05:18 mbt Exp $
