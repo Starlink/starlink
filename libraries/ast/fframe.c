@@ -15,13 +15,14 @@
 
 *  Routines Defined:
 *     AST_ANGLE
+*     AST_AXANGLE
 *     AST_AXDISTANCE
 *     AST_AXOFFSET
-*     AST_AXANGLE
 *     AST_CONVERT
 *     AST_DISTANCE
 *     AST_FORMAT
 *     AST_FRAME
+*     AST_GETACTIVEUNIT
 *     AST_ISAFRAME
 *     AST_NORM
 *     AST_OFFSET
@@ -29,7 +30,8 @@
 *     AST_PERMAXES
 *     AST_PICKAXES
 *     AST_RESOLVE
-*     AST_UNFORMAT
+*     AST_SETACTIVEUNIT
+*     AST_UNFORMAT         
 
 *  Copyright:
 *     <COPYRIGHT_STATEMENT>
@@ -53,6 +55,8 @@
 *        Added AST_RESOLVE and AST_BEAR.
 *     21-SEP-2001 (DSB):
 *        Replaced AST_BEAR by AST_AXANGLE.
+*     17-DEC-2002 (DSB):
+*        Added AST_GETACTIVEUNIT and AST_SETACTIVEUNIT.
 */
 
 /* Define the astFORTRAN77 macro which prevents error messages from
@@ -272,6 +276,30 @@ F77_LOGICAL_FUNCTION(ast_isaframe)( INTEGER(THIS),
       RESULT = astIsAFrame( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
    )
    return RESULT;
+}
+
+F77_LOGICAL_FUNCTION(ast_getactiveunit)( INTEGER(THIS),
+                                         INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   F77_LOGICAL_TYPE(RESULT);
+
+   astAt( "AST_GETACTIVEUNIT", NULL, 0 );
+   astWatchSTATUS(
+      RESULT = astGetActiveUnit( astI2P( *THIS ) ) ? F77_TRUE : F77_FALSE;
+   )
+   return RESULT;
+}
+
+F77_SUBROUTINE(ast_setactiveunit)( INTEGER(THIS),
+                                   LOGICAL(VALUE),
+                                   INTEGER(STATUS) ) {
+   GENPTR_INTEGER(THIS)
+   GENPTR_LOGICAL(VALUE)
+
+   astAt( "AST_SETACTIVEUNIT", NULL, 0 );
+   astWatchSTATUS(
+      astSetActiveUnit( astI2P( *THIS ), F77_ISTRUE( *VALUE ) ? 1 : 0 );   
+   )
 }
 
 F77_SUBROUTINE(ast_norm)( INTEGER(THIS),

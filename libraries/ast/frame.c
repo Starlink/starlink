@@ -34,10 +34,12 @@ f     AST_FRAME
 *     In addition to those attributes common to all Mappings, every
 *     Frame also has the following attributes:
 *
+*     - AlignSystem: Coordinate system used to align Frames
 *     - Bottom(axis): Lowest axis value to display
 *     - Digits/Digits(axis): Number of digits of precision
 *     - Direction(axis): Display axis in conventional direction?
 *     - Domain: Coordinate system domain
+*     - Epoch: Epoch of observation
 *     - Format(axis): Format specification for axis values
 *     - Label(axis): Axis label
 *     - MatchEnd: Match trailing axes?
@@ -47,6 +49,7 @@ f     AST_FRAME
 *     - Permute: Permute axis order?
 *     - PreserveAxes: Preserve axes?
 *     - Symbol(axis): Axis symbol
+*     - System: Coordinate system used to describe the domain
 *     - Title: Frame title
 *     - Top(axis): Highest axis value to display
 *     - Unit(axis): Axis physical units
@@ -58,28 +61,32 @@ f     In addition to those routines applicable to all Mappings, the
 f     following routines may also be applied to all Frames:
 *
 c     - astAngle: Calculate the angle subtended by two points at a third point
-c     - astAxAngle: Find the angle from an axis, to a line through two points.
+c     - astAxAngle: Find the angle from an axis, to a line through two points
 c     - astAxDistance: Calculate the distance between two axis values
 c     - astAxOffset: Calculate an offset along an axis
 c     - astConvert: Determine how to convert between two coordinate systems
 c     - astDistance: Calculate the distance between two points in a Frame
 c     - astFindFrame: Find a coordinate system with specified characteristics
 c     - astFormat: Format a coordinate value for a Frame axis
+c     - astGetActiveUnit: Determines how the Unit attribute will be used
 c     - astNorm: Normalise a set of Frame coordinates
 c     - astOffset: Calculate an offset along a geodesic curve
 c     - astOffset2: Calculate an offset along a geodesic curve in a 2D Frame
 c     - astPermAxes: Permute the order of a Frame's axes
 c     - astPickAxes: Create a new Frame by picking axes from an existing one
 c     - astResolve: Resolve a vector into two orthogonal components
+c     - astSetActiveUnit: Specify how the Unit attribute should be used
 c     - astUnformat: Read a formatted coordinate value for a Frame axis
+c     - AST_ACTIVEUNIT: Specify how the Unit attribute should be used
 f     - AST_ANGLE: Find the angle subtended by two points at a third point
-f     - AST_AXANGLE: Find the angle from an axis, to a line through two points.
+f     - AST_AXANGLE: Find the angle from an axis, to a line through two points
 f     - AST_AXDISTANCE: Calculate the distance between two axis values
 f     - AST_AXOFFSET: Calculate an offset along an axis
 f     - AST_CONVERT: Determine how to convert between two coordinate systems
 f     - AST_DISTANCE: Calculate the distance between two points in a Frame
 f     - AST_FINDFRAME: Find a coordinate system with specified characteristics
 f     - AST_FORMAT: Format a coordinate value for a Frame axis
+f     - AST_GETACTIVEUNIT: Determines how the Unit attribute will be used
 f     - AST_NORM: Normalise a set of Frame coordinates
 f     - AST_OFFSET: Calculate an offset along a geodesic curve
 f     - AST_OFFSET2: Calculate an offset along a geodesic curve in a 2D Frame
@@ -141,6 +148,15 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 *        Replaced astBear with astAxAngle.
 *     10-OCT-2002 (DSB):
 *        Added Top and Bottom.
+*     15-NOV-2002 (DSB):
+*        Moved the System and Epoch attributes from the SkyFrame class to 
+*        this class. Added virtual method astValidateSystem, astSystemString,
+*        astSystemCode. Added attribute AlignSystem.
+*     17-DEC-2002 (DSB):
+*        Added the GetActiveUnit, TestActiveUnit and SetActiveUnit functions.
+*     8-JAN-2003 (DSB):
+*        Changed private InitVtab method to protected astInitFrameVtab
+*        method.
 *class--
 */
 
@@ -155,6 +171,10 @@ f     - AST_UNFORMAT: Read a formatted coordinate value for a Frame axis
 #define LABEL_BUFF_LEN 100       /* Max length of default axis Label string */
 #define SYMBOL_BUFF_LEN 50       /* Max length of default axis Symbol string */
 #define TITLE_BUFF_LEN 100       /* Max length of default title string */
+
+/* Define the first and last acceptable System values. */
+#define FIRST_SYSTEM AST__CART
+#define LAST_SYSTEM AST__CART
 
 /* Define macros to implement methods for accessing axis attributes. */
 /*
@@ -539,7 +559,10 @@ int astTest##attribute##_( AstFrame *this, int axis ) { \
 #include "axis.h"                /* Coordinate Axis */
 #include "channel.h"             /* I/O channels */
 #include "frame.h"               /* Interface definition for this class */
+#include "frameset.h"            /* Collections of Frames */
+#include "cmpframe.h"            /* Compound Frames */
 #include "slalib.h"              /* SLALIB library interface */
+#include "unit.h"                /* Units identification and mapping */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -615,6 +638,25 @@ static int TestBottom( AstFrame *, int );
 static void ClearBottom( AstFrame *, int );
 static void SetBottom( AstFrame *, int, double );
 
+static AstSystemType GetSystem( AstFrame * );
+static int TestSystem( AstFrame * );
+static void ClearSystem( AstFrame * );
+static void SetSystem( AstFrame *, AstSystemType );
+
+static AstSystemType GetAlignSystem( AstFrame * );
+static int TestAlignSystem( AstFrame * );
+static void ClearAlignSystem( AstFrame * );
+static void SetAlignSystem( AstFrame *, AstSystemType );
+
+static double GetEpoch( AstFrame * );
+static int TestEpoch( AstFrame * );
+static void ClearEpoch( AstFrame * );
+static void SetEpoch( AstFrame *, double );
+
+static int GetActiveUnit( AstFrame * );
+static int TestActiveUnit( AstFrame * );
+static void SetActiveUnit( AstFrame *, int );
+
 static int GetMatchEnd( AstFrame * );
 static int GetMaxAxes( AstFrame * );
 static int GetMinAxes( AstFrame * );
@@ -641,6 +683,9 @@ static int TestTitle( AstFrame * );
 static int TestUnit( AstFrame *, int );
 static int Unformat( AstFrame *, int, const char *, double * );
 static int ValidateAxis( AstFrame *, int, const char * );
+static AstSystemType ValidateSystem( AstFrame *, AstSystemType, const char * );
+static AstSystemType SystemCode( AstFrame *, const char * );
+static const char *SystemString( AstFrame *, AstSystemType );
 static void AddUnderscores( char * );
 static void CheckPerm( AstFrame *, const int *, const char * );
 static void ClearAttrib( AstObject *, const char * );
@@ -660,7 +705,6 @@ static void ClearUnit( AstFrame *, int );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
-static void InitVtab( AstFrameVtab * );
 static void Norm( AstFrame *, double[] );
 static void Offset( AstFrame *, const double[], const double[], double, double[] );
 static void Overlay( AstFrame *, const int *, AstFrame * );
@@ -683,6 +727,7 @@ static void SetPreserveAxes( AstFrame *, int );
 static void SetSymbol( AstFrame *, int, const char * );
 static void SetTitle( AstFrame *, const char * );
 static void SetUnit( AstFrame *, int, const char * );
+static void NewUnit( AstAxis *, const char *, const char *, const char *, const char * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 
 /* Member functions. */
@@ -1539,6 +1584,11 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       astClearDirection( this, axis - 1 );
 
+/* Epoch. */
+/* ------ */
+   } else if ( !strcmp( attrib, "epoch" ) ) {
+      astClearEpoch( this );
+
 /* Top(axis). */
 /* ---------- */
    } else if ( nc = 0,
@@ -1604,6 +1654,16 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       astClearSymbol( this, axis - 1 );
 
+/* System. */
+/* ------- */
+   } else if ( !strcmp( attrib, "system" ) ) {
+      astClearSystem( this );
+
+/* AlignSystem. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "alignsystem" ) ) {
+      astClearAlignSystem( this );
+
 /* Title. */
 /* ------ */
    } else if ( !strcmp( attrib, "title" ) ) {
@@ -1656,6 +1716,73 @@ static void ClearAttrib( AstObject *this_object, const char *attrib ) {
    } else {
       (*parent_clearattrib)( this_object, attrib );
    }
+}
+
+static void ClearUnit( AstFrame *this, int axis ) {
+/*
+*  Name:
+*     ClearUnit
+
+*  Purpose:
+*     Clear the Unit attribute of a Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void ClearUnit( AstFrame *this, int axis )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function clears the Unit value for an axis of a Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which the Unit value is to 
+*        be cleared.
+*     unit
+*        The new value to be set.
+
+*  Returned Value:
+*     void.
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   const char *units;            /* Pointer to units string */
+   char *old_units;              /* Pointer to copy of original units */
+   
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Validate the axis index and obtain a pointer to the required Axis. */
+   (void) astValidateAxis( this, axis, "astSetUnit" );
+   ax = astGetAxis( this, axis );
+
+/* Save a copy of the old units. */
+   units = astGetAxisUnit( ax );
+   old_units = astStore( NULL, units, strlen( units ) + 1 );
+
+/* Clear the Axis Unit attribute value, and then get a pointer to the
+   new default Units string. */
+   astClearAxisUnit( ax );
+   units = astGetUnit( this, axis );
+
+/* The new unit may require the Label and/or Symbol to be changed, but
+   only if the Frames ActiveUnit flag is set. */
+   if( astGetActiveUnit( this ) ) NewUnit( ax, old_units, units,
+                                           "astSetUnit", astGetClass( this ) );
+
+/* Free resources. */
+   old_units = astFree( old_units );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
 }
 
 static int ConsistentMaxAxes( AstFrame *this, int value ) {
@@ -2053,6 +2180,11 @@ f        will be set by AST_CONVERT to indicate which of their Frames was
 *        used by enquiring the Domain attribute of either base Frame.
 
 *  Notes:
+*     -  The Mapping represented by the returned FrameSet results in
+*     alignment taking place in the coordinate system specified by the 
+c     AlignSystem attribute of the "to" Frame. See the description of the
+f     AlignSystem attribute of the TO Frame. See the description of the
+*     AlignSystem attribute for further details.
 *     - When aligning (say) two images, which have been calibrated by
 *     attaching FrameSets to them, it is usually necessary to convert
 *     between the base Frames (representing "native" pixel
@@ -2814,6 +2946,11 @@ c        (e.g. with astPermAxes).
 f        (e.g. with AST_PERMAXES).
 
 *  Notes:
+*     -  The Mapping represented by the returned FrameSet results in
+*     alignment taking place in the coordinate system specified by the 
+c     AlignSystem attribute of the "template" Frame. See the description
+f     AlignSystem attribute of the TEMPLATE Frame. See the description
+*     of the AlignSystem attribute for further details.
 *     - Beware of setting the Domain attribute of the template and then
 c     using a "domainlist" string which does not include the template's domain
 f     using a DOMAINLIST string which does not include the template's domain
@@ -2970,6 +3107,84 @@ f     DOMAINLIST string provides an alternative way of restricting the
 
 /* Return the result. */
    return result;
+}
+
+const char *astFmtDecimalYr_( double year, int digits ) {
+/*
+*+
+*  Name:
+*     astFmtDecimalYr
+
+*  Purpose:
+*     Format an epoch expressed in years as a decimal string.
+
+*  Type:
+*     Protected function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     const char *astFmtDecimalYr( double year, int digits )
+
+*  Class Membership:
+*     Frame member function.
+
+*  Description:
+*     This function formats an epoch expressed in years as a decimal string
+*     and returns a pointer to the result. It is intended for formatting 
+*     Frame Epoch values, etc, for display.
+
+*  Parameters:
+*     year
+*        The epoch to be formatted.
+*     digits
+*        The number of digits of precision required.
+
+*  Returned Value:
+*     Pointer to a null terminated string containing the formatted value.
+
+*  Notes:
+*     - The result string is stored in static memory and may be
+*     over-written by a subsequent invocation of this function.
+*     - A NULL pointer is returned if this function is invoked with
+*     the global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Constants: */
+#define BUFF_LEN 50              /* Max characters in result string */
+
+/* Local Variables: */
+   const char *result;           /* Pointer value to return */
+   int nc;                       /* Number of characters in buffer */
+   static char buff[ BUFF_LEN + 1 ]; /* Buffer for result string */
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Limit the precision to what is meaningful. */
+   digits = ( digits > DBL_DIG ) ? DBL_DIG : digits;
+
+/* Format the year value. Use "g" format to avoid buffer overflow and
+   to get useful diagnostic output if a silly value is given. */
+   nc = sprintf( buff, "%#.*g", digits, year );
+
+/* Set the result value. */
+   result = buff;
+
+/* Loop to remove redundant zeros from the end of the result. */
+   while ( buff[ --nc ] == '0' ) buff[ nc ] = '\0';
+
+/* If the last character is now a decimal point, put back one zero. */
+   if ( buff[ nc ] == '.' ) {
+      buff[ ++nc ] = '0';
+      buff[ ++nc ] = '\0';
+   }
+
+/* Return the result. */
+   return buff;
+
+/* Undefine macros local to this function. */
+#undef BUFF_LEN
 }
 
 static const char *Format( AstFrame *this, int axis, double value ) {
@@ -3140,6 +3355,74 @@ static double Gap( AstFrame *this, int axis, double gap, int *ntick ) {
    return result;
 }
 
+static int GetActiveUnit( AstFrame *this ){
+/*
+*++
+*  Name:
+c     astGetActiveUnit
+f     AST_GETACTIVEUNIT
+
+*  Purpose:
+*     Determines how the Unit attribute will be used.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     int astGetActiveUnit( AstFrame *this )
+f     RESULT = AST_GETACTIVEUNIT( THIS, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     returns the current value of the ActiveUnit flag for a Frame. See 
+c     the description of the astSetActiveUnit function
+f     the description of the AST_SETACTIVEUNIT routine
+*     for a description of the ActiveUnit flag.
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Returned Value:
+c     astGetActiveUnit
+f     AST_GETACTIVEUNIT = LOGICAL
+*        The current value of the ActiveUnit flag.
+
+*  Notes:
+c     - A zero value will be returned if this function is
+c     invoked with the AST error status set, or if it should fail for
+f     - A value of .FALSE. will be returned if this function is
+f     invoked with STATUS set to an error value, or if it should fail for
+*     any reason.
+*--
+*/
+
+/* Local Variables: */
+   int result;         /* The returned value */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Get the value from the Frame. If it has not yet been assigned a value 
+   return the value zero. */
+   result = this->active_unit;
+   if( result == -INT_MAX ) result = 0;
+
+/* Return the result. */
+   return result;
+}
+
 static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /*
 *  Name:
@@ -3195,9 +3478,11 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *this;               /* Pointer to the Frame structure */
+   AstSystemType system;         /* System code */
    char *axis_attrib;            /* Pointer to axis attribute name */
    const char *result;           /* Pointer value to return */
    double dval;                  /* Double attibute value */
+   double epoch;                 /* Epoch attribute value (as MJD) */
    int axis;                     /* Frame axis number */
    int axis_nc;                  /* No. characters in axis attribute name */
    int digits;                   /* Digits attribute value */
@@ -3271,6 +3556,18 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
       if ( astOK ) {
          (void) sprintf( buff, "%d", direction );
          result = buff;
+      }
+
+/* Epoch. */
+/* ------ */
+   } else if ( !strcmp( attrib, "epoch" ) ) {
+      epoch = astGetEpoch( this );
+      if ( astOK ) {
+
+/* Format the Epoch as decimal years. Use a Besselian epoch if it will
+   be less than 1984.0, otherwise use a Julian epoch. */
+         result = astFmtDecimalYr( ( epoch < slaEpj2d( 1984.0 ) ) ?
+                                   slaEpb( epoch ) : slaEpj( epoch ), DBL_DIG );
       }
 
 /* Top(axis). */
@@ -3374,6 +3671,40 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astGetSymbol( this, axis - 1 );
+
+/* AlignSystem. */
+/* ------------ */
+/* Obtain the AlignSystem code and convert to a string. */
+   } else if ( !strcmp( attrib, "alignsystem" ) ) {
+      system = astGetAlignSystem( this );
+      if ( astOK ) {
+         result = astSystemString( this, system );
+
+/* Report an error if the value was not recognised. */
+         if ( !result ) {
+            astError( AST__SCSIN,
+                     "astGetAttrib(%s): Corrupt %s contains invalid "
+                     "AlignSystem identification code (%d).",
+                     astGetClass( this ), astGetClass( this ), (int) system );
+         }   
+      }
+
+/* System. */
+/* ------- */
+/* Obtain the System code and convert to a string. */
+   } else if ( !strcmp( attrib, "system" ) ) {
+      system = astGetSystem( this );
+      if ( astOK ) {
+         result = astSystemString( this, system );
+
+/* Report an error if the value was not recognised. */
+         if ( !result ) {
+            astError( AST__SCSIN,
+                     "astGetAttrib(%s): Corrupt %s contains invalid "
+                     "System identification code (%d).",
+                     astGetClass( this ), astGetClass( this ), (int) system );
+         }   
+      }
 
 /* Title. */
 /* ------ */
@@ -3739,23 +4070,24 @@ static const int *GetPerm( AstFrame *this ) {
    return this->perm;
 }
 
-static void InitVtab( AstFrameVtab *vtab ) {
+void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
 /*
+*+
 *  Name:
-*     InitVtab
+*     astInitFrameVtab
 
 *  Purpose:
 *     Initialise a virtual function table for a Frame.
 
 *  Type:
-*     Private function.
+*     Protected function.
 
 *  Synopsis:
 *     #include "frame.h"
-*     void InitVtab( AstFrameVtab *vtab )
+*     void astInitFrameVtab( AstFrameVtab *vtab, const char *name )
 
 *  Class Membership:
-*     Frame member function.
+*     Frame vtab initialiser.
 
 *  Description:
 *     This function initialises the component of a virtual function
@@ -3764,7 +4096,14 @@ static void InitVtab( AstFrameVtab *vtab ) {
 *  Parameters:
 *     vtab
 *        Pointer to the virtual function table. The components used by
-*        all ancestral classes should already have been initialised.
+*        all ancestral classes will be initialised if they have not already
+*        been initialised.
+*     name
+*        Pointer to a constant null-terminated character string which contains
+*        the name of the class to which the virtual function table belongs (it 
+*        is this pointer value that will subsequently be returned by the Object
+*        astClass function).
+*-
 */
 
 /* Local Variables: */
@@ -3773,6 +4112,10 @@ static void InitVtab( AstFrameVtab *vtab ) {
 
 /* Check the local error status. */
    if ( !astOK ) return;
+
+/* Initialize the component of the virtual function table used by the
+   parent class. */
+   astInitMappingVtab( (AstMappingVtab *) vtab, name );
 
 /* Store a unique "magic" value in the virtual function table. This
    will be used (by astIsAFrame ) to determine if an object belongs
@@ -3865,6 +4208,23 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->Unformat = Unformat;
    vtab->ValidateAxis = ValidateAxis;
    vtab->ValidateAxisSelection = ValidateAxisSelection;
+   vtab->ValidateSystem = ValidateSystem;
+   vtab->SystemString = SystemString;
+   vtab->SystemCode = SystemCode;
+
+   vtab->TestActiveUnit = TestActiveUnit;
+   vtab->GetActiveUnit = GetActiveUnit;
+   vtab->SetActiveUnit = SetActiveUnit;
+
+   vtab->ClearSystem = ClearSystem;
+   vtab->GetSystem = GetSystem;
+   vtab->SetSystem = SetSystem;
+   vtab->TestSystem = TestSystem;
+
+   vtab->ClearAlignSystem = ClearAlignSystem;
+   vtab->GetAlignSystem = GetAlignSystem;
+   vtab->SetAlignSystem = SetAlignSystem;
+   vtab->TestAlignSystem = TestAlignSystem;
 
    vtab->ClearTop = ClearTop;
    vtab->GetTop = GetTop;
@@ -3876,7 +4236,10 @@ static void InitVtab( AstFrameVtab *vtab ) {
    vtab->SetBottom = SetBottom;
    vtab->TestBottom = TestBottom;
 
-
+   vtab->ClearEpoch = ClearEpoch;
+   vtab->GetEpoch = GetEpoch;
+   vtab->SetEpoch = SetEpoch;
+   vtab->TestEpoch = TestEpoch;
 
 /* Save the inherited pointers to methods that will be extended, and
    replace them with pointers to the new member functions. */
@@ -4172,6 +4535,126 @@ static int Match( AstFrame *template, AstFrame *target,
 
 /* Return the result. */
    return match;
+}
+
+static void NewUnit( AstAxis *ax, const char *old_units, const char *new_units,
+                     const char *method, const char *class ) {
+/*
+*  Name:
+*     NewUnit
+
+*  Purpose:
+*     Modify an Axis Label and Symbol to reflect a new Unit value.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void NewUnit( AstAxis *ax, const char *old_units, const char *new_units, 
+*                   const char *method, const char *class )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function modifies the Label and Symbol attributes of an Axis 
+*     to reflect a new Unit value. This function should only be called if
+*     the ActiveUnit flag of the parent Frame is non-zero (this is not
+*     checked within this function).
+*
+*     If the axis has a set label, then we may be able to modify it to 
+*     correctly describe the axis in the supplied new units. For instance,
+*     if the original units were "Hz", the original label was "frequency",
+*     and the new units are "log(Hz)", then the label is modified to become
+*     "log( frequency )". 
+*
+*     The Axis Format attribute is cleared if the supplied units are
+*     different to the old units (because any set format is probably not
+*     going to be appropriate for a new system of units.
+
+*  Parameters:
+*     ax
+*        Pointer to the Axis.
+*     old_units
+*        The original units value.
+*     new_units
+*        The new units value.
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis selection. This method name is used
+*        solely for constructing error messages.
+*     class
+*        Pointer to a constant null-terminated character string
+*        containing the name of the class upon which this function
+*        was invoked. This is used solely for constructing error messages.
+
+*  Returned Value:
+*     void.
+*/
+
+/* Local Variables: */
+   AstMapping *map;              /* Pointer to units Mapping */
+   char *new_lab;                /* Pointer to new axis label */
+   char *new_sym;                /* Pointer to new axis symbol */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check that the axis label is set. We relay on sub-classes to return
+   appropriate default labels if the label is not set. */
+   if( astTestAxisLabel( ax ) ) {
+      
+/* See if it is possible to map the old units into the new units. 
+   If it is, then a Mapping is returned together with an appropriately 
+   modified label. */
+      map = astUnitMapper( old_units, new_units, astGetAxisLabel( ax ), 
+                           &new_lab );
+
+/* If succesfull, annul the Mapping (which we do not need), and store the
+   modified label in the Axis, finally freeing the memory used to hold
+   the modified label. */
+      if( map ) {
+         map = astAnnul( map );
+         if( new_lab ) {
+            astSetAxisLabel( ax, new_lab );
+            new_lab = astFree( new_lab );
+         }
+
+/* Report an error if no Mapping could be found from the old units to the
+   new units. */
+      } else if( astOK ) {
+         astError( AST__BADUN, "%s(%s): Cannot convert between "
+                   "existing axis units '%s' and new axis units '%s'.", 
+                    method, class, old_units, new_units );
+      }
+
+   }
+
+/* Do the same for the axis symbol. */
+   if( astTestAxisSymbol( ax ) ) {
+      map = astUnitMapper( old_units, new_units, astGetAxisSymbol( ax ), 
+                           &new_sym );
+      if( map ) {
+         map = astAnnul( map );
+         if( new_lab ) {
+            astSetAxisSymbol( ax, new_lab );
+            new_lab = astFree( new_lab );
+         }
+      } else if( astOK ) {
+         astError( AST__BADUN, "%s(%s): Cannot convert between "
+                   "existing axis units '%s' and new axis units '%s'.", 
+                    method, class, old_units, new_units );
+      }
+   }
+
+/* If succesful, clear the axis format if the new and old units are
+   different. */
+   if( astOK ) {
+      if( strcmp( old_units, new_units ) ) astClearAxisFormat( ax );
+   }
+
 }
 
 static void Norm( AstFrame *this, double value[] ) {
@@ -4598,7 +5081,10 @@ static void Overlay( AstFrame *template, const int *template_axes,
 /* Use the macro to transfer each Frame attribute in turn. */
    OVERLAY(Digits);
    OVERLAY(Domain);
+   OVERLAY(Epoch);
    OVERLAY(Title);
+   OVERLAY(System);
+   OVERLAY(AlignSystem);
 
 /* Now transfer attributes associated with individual axes. Obtain the number
    of axes in the template and result Frames. */
@@ -4896,6 +5382,406 @@ static void PrimaryFrame( AstFrame *this, int axis1,
    if ( astOK ) *axis2 = axis1;
 }
 
+double astReadDateTime_( const char *value ) {
+/*
+*+
+*  Name:
+*     astReadDateTime
+
+*  Purpose:
+*     Read a date/time string.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     double astReadDateTime( const char *value )
+
+*  Class Membership:
+*     Frame member function.
+
+*  Description:
+*     This function reads a date/time string in a variety of formats and
+*     returns the resulting time as a Modified Julian Date. If the string
+*     cannot be interpreted as a date/time or contains invalid values, an
+*     error is reported.
+
+*  Parameters:
+*     value
+*        Pointer to a null terminated string containing the value to be read.
+
+*  Returned Value:
+*     The time as a Modified Julian date.
+
+*  Date/Time Formats:
+*     The date/time formats supported by this function are listed below. These
+*     are interpreted in a case-insensitive manner and the function is
+*     generally flexible about the presence of additional white space and the
+*     use of alternative field delimiters.
+*
+*     Besselian Epoch
+*        Expressed in decimal years, with or without decimal places
+*        ("B1950" or "B1976.13", for example).
+*     Julian Epoch
+*        Expressed in decimal years, with or without decimal places
+*        ("J2000" or "J2100.9", for example).
+*     Year
+*        Decimal years, with or without decimal places ("1996.8" for example).
+*        Such values are interpreted as a Besselian epoch (see above) if less
+*        than 1984.0 and as a Julian epoch otherwise.
+*     Julian Date
+*        With or without decimal places ("JD 2454321.9" for example).
+*     Modified Julian Date
+*        With or without decimal places ("MJD 54321.4" for example).
+*     Gregorian Calendar Date
+*        With the month expressed as an integer or 3-character
+*        abbreviation, and with optional decimal places to represent a
+*        fraction of a day ("1996-10-2" or "1996-Oct-2.6" for
+*        example). If no fractional part of a day is given, the time
+*        refers to the start of the day (zero hours).
+*     Gregorian Date and Time
+*        Any calendar date (as above) but with a fraction of a day expressed
+*        as hours, minutes and seconds ("1996-Oct-2 12:13:56.985" for example).
+
+*  Notes:
+*     -  The date/time value is interpreted as a calendar date and time, not
+*     linked to any particular time system. Thus, interpretation of hours,
+*     minutes and seconds is done in the obvious manner assuming 86400 seconds
+*     in a day. No allowance for is made, for instance, for leap seconds or for
+*     the varying length of a second in some time systems.
+*     -  A value of AST__BAD is returned if this function is invoked with the
+*     global error status set or if it should fail for any reason.
+*-
+*/
+
+/* Local Vaiables: */
+   char cmonth[ 4 ];             /* Buffer for name of month */
+   char sep1[ 2 ];               /* Year/month separator string */
+   char sep2[ 2 ];               /* Month/day separator string */
+   char sep3[ 2 ];               /* Hour/minute separator string */
+   char sep4[ 2 ];               /* Minute/second separator string */
+   const char *v;                /* Pointer into value string */
+   double day;                   /* Day number plus fraction of whole day */
+   double epoch;                 /* Epoch stored as decimal years */
+   double hms;                   /* Hours, min & sec as fraction of a day */
+   double jd;                    /* Julian Date */
+   double mjd;                   /* Modified Julian Date */
+   double result;                /* Result to be returned */
+   double sec;                   /* Seconds and fractions of a second */
+   int hour;                     /* Number of hours */
+   int iday;                     /* Number of whole days */
+   int l;                        /* Length of string remaining */
+   int len;                      /* Length of string */
+   int match;                    /* Date/time string has correct form? */
+   int minute;                   /* Number of minutes */
+   int month;                    /* Number of months */
+   int nc;                       /* Number of characters read from string */
+   int stat;                     /* Status return from SLALIB functions */
+   int year;                     /* Number of years */
+
+/* Check the global error status. */
+   if ( !astOK ) return AST__BAD;
+
+/* Initialise. */
+   result = AST__BAD;
+
+/* Obtain the length of the input string. */
+   len = (int) strlen( value );
+
+/* Attempt to read the string using each recognised format in turn. */
+
+/* Besselian epoch in decimal years (e.g. "B1950.0"). */
+/* ================================================== */
+   if ( nc = 0,
+        ( 1 == astSscanf( value, " %*1[Bb] %lf %n", &epoch, &nc ) )
+        && ( nc >= len ) ) {
+
+/* Convert to Modified Julian Date. */
+      result = slaEpb2d( epoch );
+
+/* Julian epoch in decimal years (e.g. "J2000.0"). */
+/* =============================================== */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( value, " %*1[Jj] %lf %n", &epoch, &nc ) )
+               && ( nc >= len ) ) {
+
+/* Convert to Modified Julian Date. */
+      result = slaEpj2d( epoch );
+
+/* Decimal years (e.g. "1976.2"). */
+/* ============================== */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( value, " %lf %n", &epoch, &nc ) )
+               && ( nc >= len ) ) {
+
+/* Convert to Modified Julian Date, treating the epoch as Julian or Besselian
+   depending on whether it is 1984.0 or later. */
+      result = ( epoch < 1984.0 ) ? slaEpb2d( epoch ) : slaEpj2d( epoch );
+
+/* Modified Julian Date (e.g. "MJD 54321.0"). */
+/* ============================================ */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( value, " %*1[Mm] %*1[Jj] %*1[Dd] %lf %n",
+                              &mjd, &nc ) ) && ( nc >= len ) ) {
+
+/* Use the result directly. */
+      result = mjd;
+
+/* Julian Date (e.g. "JD 2454321.5"). */
+/* ==================================== */
+   } else if ( nc = 0,
+               ( 1 == astSscanf( value, " %*1[Jj] %*1[Dd] %lf %n",
+                              &jd, &nc ) ) && ( nc >= len ) ) {
+
+/* Convert to Modified Julian Date. */
+      result = jd - 2400000.5;
+
+/* Gregorian calendar date (e.g. "1996-10-2" or "1996-Oct-2"). */
+/* =========================================================== */
+/* This format also allows day fractions expressed as decimal days, e.g:
+
+      "1996-Oct-2.5001"
+
+   or as hours, minutes and seconds, e.g:
+
+      "1996-Oct-2 12:14:30.52"
+
+   Various alternative field delimiters are also allowed. */
+   } else {
+
+/* Note that the method used to parse this format relies heavily on
+   conditional execution controlled by "&&" and "||" operators. Initialise
+   the variables used. */
+      v = value;
+      l = len;
+      *cmonth = '\0';
+      year = month = iday = hour = minute = 0;
+      day = sec = 0.0;
+
+/* Identify the year and month. */
+/* ---------------------------- */
+/* Try to match an initial " 1996 - 10 -" or " 1996 10 " or similar. */
+      match =
+         ( nc = 0, ( 4 == astSscanf( v, " %d %1[:/-] %2d %1[:/-]%n",
+                                  &year, sep1, &month, sep2, &nc ) ) );
+      match = match ||
+         ( nc = 0, ( 4 == astSscanf( v, " %d%1[ ] %2d%1[ ]%n",
+                                  &year, sep1, &month, sep2, &nc ) ) );
+
+/* If that failed, allow " 1996 - Oct -" or " 1996 Oct " or similar. */
+      match = match ||
+         ( nc = 0, ( 4 == astSscanf( v,
+                                  " %d %1[:/-] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                  "abcdefghijklmnopqrstuvwxyz] %1[:/-]%n",
+                                  &year, sep1, cmonth, sep2, &nc ) ) );
+      match = match ||
+         ( nc = 0, ( 4 == astSscanf( v,
+                                  " %d%1[ ] %3[ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                  "abcdefghijklmnopqrstuvwxyz]%1[ ]%n",
+                                  &year, sep1, cmonth, sep2, &nc ) ) );
+
+/* Alternative field separators are permitted above, but ensure that
+   they are both the same. */
+      match = match && ( *sep1 == *sep2 );
+
+/* Identify the day and fraction of day. */
+/*-------------------------------------- */
+/* If the above matched correctly, modify the string pointer "v" to
+   the next character to be interpreted and decrement the remaining
+   string length. */
+      if ( match ) {
+         v += nc;
+         l -= nc;
+
+/* We now try to match the following characters but without reading
+   any values.  This is done to ensure the string has the correct form
+   (e.g. exclude "-" signs and exponents in numbers, which are
+   otherwise hard to detect). */
+
+/* Try to match " 12.3456 " or similar. */
+         match =
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789].%*[0123456789] %n",
+                                     &nc ) )
+                      && ( nc == l ) );
+
+/* If that failed, then try to match " 12. " or similar. */
+         match = match ||
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
+                      && ( nc == l ) );
+
+/* If that also failed, then try to match just " 12 " or similar. */
+         match = match ||
+            ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
+                      && ( nc == l ) );
+
+/* If any of the above patterns matched, now read the data (the day number)
+   as a double value. */
+         if ( match ) {
+            match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &day, &nc ) )
+                              && ( nc == l ) );
+
+/* If none of the above matched, then look to see if the day fraction has been
+   given in hours, minutes and seconds by trying to match " 12 03 : 45 :" or
+   " 12 13 45 " or similar. */
+         } else {
+            match =
+               ( nc = 0, ( 5 == astSscanf( v,
+                                        " %2d%*1[ ] %2d %1[:/-] %2d %1[:/-]%n",
+                                        &iday, &hour, sep3, &minute, sep4,
+                                        &nc ) ) );
+            match = match ||
+               ( nc = 0, ( 5 == astSscanf( v, " %2d%*1[ ] %2d%1[ ] %2d%1[ ]%n",
+                                        &iday, &hour, sep3, &minute, sep4,
+                                        &nc ) ) );
+
+/* Alternative field separators are permitted above, but ensure that
+   they are both the same. */
+            match = match && ( *sep3 == *sep4 );
+
+/* If the day number was read as an integer, convert it to double. */
+            if ( match ) day = (double) iday;
+
+/* Identify the seconds field. */
+/* --------------------------- */
+/* If hours and minutes fields have been matched, now look for the
+   final seconds (and fractions of seconds) field. This is similar to
+   the day/fraction field (see earlier) in that we first check that it
+   has the correct form before reading its value. */
+
+/* Adjust the string pointer and remaining string length. */
+            if ( match ) {
+               v += nc;
+               l -= nc;
+
+/* Try to match " 12.3456 " or similar. */
+               match =
+                  ( nc = 0, ( 0 == astSscanf( v,
+                                          " %*2[0123456789].%*[0123456789] %n",
+                                           &nc ) )
+                            && ( nc == l ) );
+
+/* If that failed, then try to match " 12. " or similar. */
+               match = match ||
+                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789]. %n", &nc ) )
+                            && ( nc == l ) );
+
+/* If that also failed, then try to match just " 12 " or similar. */
+               match = match ||
+                  ( nc = 0, ( 0 == astSscanf( v, " %*2[0123456789] %n", &nc ) )
+                            && ( nc == l ) );
+
+/* If any of the above patterns matched, now read the data (the number of
+   seconds) as a double value. */
+               if ( match ) {
+                  match = ( nc = 0, ( 1 == astSscanf( v, " %lf %n", &sec, &nc ) )
+                                    && ( nc == l ) );
+               }
+            }
+         }
+      }
+
+/* Interpret the values that were read. */
+/* ------------------------------------ */
+/* We execute this if all of the above text matching was successful,
+   transferred the required number of data values, and consumed the
+   entire input string. */
+      if ( match ) {
+
+/* See if the month was given as a character string (e.g. "Oct") instead of
+   a number. If so, define local variables for use in converting it. */
+         if ( *cmonth ) {
+            char lcmonth[ 4 ];      /* Lower case copy of month string */
+            const char *ptr;        /* Pointer result from look up */
+            const char *table =     /* Month look up table */
+                       "jan feb mar apr may jun jul aug sep oct nov dec";
+            int i;                  /* Loop counter for characters */
+
+/* Convert the month string to lower case. */
+            for ( i = 0; cmonth[ i ]; i++ ) {
+               lcmonth[ i ] = tolower( cmonth[ i ] );
+            }
+            lcmonth[ i ] = '\0';
+
+/* Look the month up in the table of months and generate the required month
+   number. */
+            if ( ( ptr = strstr( table, lcmonth ) ) ) {
+               month = 1 + ( ptr - table ) / 4;
+
+/* If the lookup failed, report an error. */
+   	    } else {
+               astError( AST__DTERR, "Month value \"%s\" is invalid.",
+                         cmonth );
+            }
+         }
+
+/* If OK, extract the integral day number and convert years, months and days
+   to a Modified Julian Date. */
+         if ( astOK ) {
+            iday = (int) day;
+            slaCaldj( year, month, iday, &mjd, &stat );
+
+/* Examine the return status from the conversion and report an appropriate
+   error if necessary. */
+            switch ( stat ) {
+            case 1:
+               astError( AST__DTERR, "Year value (%d) is invalid.", year );
+               break;
+            case 2:
+               astError( AST__DTERR, "Month value (%d) is invalid.", month );
+               break;
+            case 3:
+               astError( AST__DTERR, "Day value (%.*g) is invalid.", DBL_DIG,
+                         day );
+               break;
+
+/* If conversion to MJD was successful, add any fractional part of a day to the
+   result. */
+            default:
+               mjd += ( day - (double) iday );
+
+/* Convert hours, minutes and seconds to a fraction of a day (this will give
+   zero if none of these quantities was supplied). */
+               slaDtf2d( hour, minute, sec, &hms, &stat );
+
+/* Examine the return status from the conversion and report an appropriate
+   error if necessary. */
+               switch ( stat ) {
+               case 1:
+                  astError( AST__DTERR, "Hour value (%d) is invalid.", hour );
+                  break;
+               case 2:
+                  astError( AST__DTERR, "Minute value (%d) is invalid.",
+                            minute );
+                  break;
+               case 3:
+                  astError( AST__DTERR, "Seconds value (%.*g) is invalid.",
+                            DBL_DIG, sec );
+                  break;
+
+/* Add the fraction of a day derived from hours, minutes and seconds fields to
+   the result. */
+               default:
+                  mjd += hms;
+                  break;
+               }
+               break;
+            }
+
+/* Return the result, if no error occurred. */
+            if ( astOK ) result = mjd;
+         }
+
+/* If none of the supported date/time formats matched, then report an error. */
+      } else {
+         astError( AST__DTERR, "Date/time does not have the correct form." );
+      }
+   }
+
+/* Return the result. */
+   return result;
+}
+
 static void ReportPoints( AstMapping *this_mapping, int forward,
                           AstPointSet *in_points, AstPointSet *out_points ) {
 /*
@@ -5155,6 +6041,118 @@ f     AST_DISTANCE function.
 
 }
 
+static void SetActiveUnit( AstFrame *this, int value ){
+/*
+*++
+*  Name:
+c     astSetActiveUnit
+f     AST_SETACTIVEUNIT
+
+*  Purpose:
+*     Specify how the Unit attribute should be used.
+
+*  Type:
+*     Public virtual function.
+
+*  Synopsis:
+c     #include "frame.h"
+c     void astSetActiveUnit( AstFrame *this, int value )
+f     CALL AST_SETACTIVEUNIT( THIS, VALUE, STATUS )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+c     This function 
+f     This routine 
+*     sets the current value of the ActiveUnit flag for a Frame, which 
+*     controls how the Frame
+c     behaves when it is used (by astFindFrame) as a template to match
+f     behaves when it is used (by AST_FINDFRAME) as a template to match
+*     another (target) Frame. It determines if the Mapping between the 
+*     template and target Frames should take differences in axis units
+c     into account. The default value is zero, which preserves the
+f     into account. The default value is .FALSE., which preserves the
+*     behaviour of older versions of AST.
+*
+*     If the ActiveUnit flag of the template Frame is zero, then the
+*     Mapping will ignore any difference in the Unit attributes of
+*     corresponding template and target axes. In this mode, the Unit 
+*     attributes are purely descriptive commentary for the benefit of
+*     human readers and do not influence the Mappings between Frames.
+*     This is the behaviour which all Frames had in older version of AST,
+*     prior to the introduction of this attribute.
+*
+*     If the ActiveUnit flag of the template Frame is non-zero, then the
+*     Mapping from template to target will take account of any difference 
+*     in the axis Unit attributes, where-ever possible. For instance, if
+*     corresponding target and template axes have Unit strings of "km" and 
+*     "m", then the FrameSet class will use a ZoomMap to connect them
+*     which introduces a scaling of 1000. If no Mapping can be found
+*     between the corresponding units string, then an error is reported.
+*     In this mode, it is assumed that values of the Unit attribute conform 
+*     to the syntax for units strings described in the FITS WCS Paper I
+*     "Representations of world coordinates in FITS" (Greisen & Calabretta). 
+*     Particularly, any of the named unit symbols, functions, operators or
+*     standard multiplier prefixes listed within that paper can be used within 
+*     a units string. A units string may contain symbols for unit which are
+*     not listed in the FITS paper, but transformation to any other units 
+*     will then not be possible (except to units which depend only on the 
+*     same unknown units - thus "flops" can be transformed to "Mflops"
+*     even though "flops" is not a standard FITS unit symbol).
+*
+c     If the ActiveUnit flag is non-zero, setting a new Unit value for an 
+f     If the ActiveUnit flag is .TRUE., setting a new Unit value for an 
+*     axis may also change its Label and Symbol attributes. For instance, if 
+*     an axis has Unit "Hz" and Label "frequency", then changing its Unit to
+*     "log(Hz)" will change its Label to "log( frequency )". In addition,
+*     the Axis Format attribute will be cleared when-ever a new value 
+*     is assigned to the Unit attribute.
+*
+c     Note, if a non-zero value is set for the ActiveUnit flag, then changing a
+*     Note, if a .TRUE. value is set for the ActiveUnit flag, then changing a 
+*     Unit value for the current Frame within a FrameSet will result in the 
+*     Frame being re-mapped (that is, the Mappings which define the 
+*     relationships between Frames within the FrameSet will be modified to 
+*     take into account the change in Units). 
+
+*  Parameters:
+c     this
+f     THIS = INTEGER (Given)
+*        Pointer to the Frame.
+c     value
+f     VALUE = LOGICAL (Given)
+*        The new value to use.
+f     STATUS = INTEGER (Given and Returned)
+f        The global status.
+
+*  Applicability:
+*     SpecFrame
+c        The ActiveUnit flag for a SpecFrame is always 1 (any value
+c        supplied using this function is ignored).
+f        The ActiveUnit flag for a SpecFrame is always .TRUE. (any value
+f        supplied using this routine is ignored).
+
+*  Notes:
+*     - The ActiveUnit flag resembles a Frame attribute, except that it
+*     cannot be tested or cleared, and it cannot be accessed using the 
+c     generic astGet<X> and astSet<X> functions.
+f     generic AST_GET<X> and AST_SET<X> routines.
+c     - The astGetActiveUnit function can be used to retrieve the current
+f     - The AST_GETACTIVEUNIT routine can be used to retrieve the current
+*     value of the ActiveUnit flag.
+
+*--
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Store a value of 1 for the Frame component if the supplied value is
+   non-zero. */
+   this->active_unit = ( value ) ? 1 : 0;
+}
+
 static void SetAttrib( AstObject *this_object, const char *setting ) {
 /*
 *  Name:
@@ -5203,14 +6201,17 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
 /* Local Vaiables: */
    AstAxis *ax;                  /* Pointer to Axis */
    AstFrame *this;               /* Pointer to the Frame structure */
+   AstSystemType system_code;    /* System code */
    char *axis_setting;           /* Pointer to axis attribute setting string */
    double dval;                  /* Double attibute value */
+   double mjd;                   /* Epoch as a Modified Julian Date */
    int axis;                     /* Index for the Frame axis */
    int axis_nc;                  /* No. characters in axis attribute name */
    int axis_value;               /* Offset of value to be assigned to axis */
    int digits;                   /* Number of digits of precision */
    int direction;                /* Axis direction flag */
    int domain;                   /* Offset of Domain string */
+   int epoch;                    /* Offset of Epoch string */
    int format;                   /* Offset of axis Format string */
    int label;                    /* Offset of axis Label string */
    int len;                      /* Length of setting string */
@@ -5221,6 +6222,7 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
    int permute;                  /* Permute axes in order to match? */
    int preserve_axes;            /* Preserve matched target axes? */
    int symbol;                   /* Offset of axis Symbol string */
+   int system;                   /* Offset of System string */
    int title;                    /* Offset of Title string */
    int unit;                     /* Offset of axis Unit string */
 
@@ -5268,6 +6270,24 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                               &axis, &direction, &nc ) )
                && ( nc >= len ) ) {
       astSetDirection( this, axis - 1, direction );
+
+/* Epoch. */
+/* ------ */
+   } else if ( nc = 0,
+        ( 0 == astSscanf( setting, "epoch=%n%*[^\n]%n", &epoch, &nc ) )
+        && ( nc >= len ) ) {
+
+/* Convert the Epoch value to a Modified Julian Date before use. */
+      mjd = astReadDateTime( setting + epoch );
+      if ( astOK ) {
+         astSetEpoch( this, mjd );
+
+/* Report contextual information if the conversion failed. */
+      } else {
+         astError( AST__ATTIN, "astSetAttrib(%s): Invalid epoch value "
+                   "\"%s\" given for coordinate system.",
+                   astGetClass( this ), setting + epoch );
+      }
 
 /* Top(axis). */
 /* ---------- */
@@ -5352,6 +6372,42 @@ static void SetAttrib( AstObject *this_object, const char *setting ) {
                && ( nc >= len ) ) {
       astSetSymbol( this, axis - 1, setting + symbol );
 
+/* AlignSystem. */
+/* ------------ */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "alignsystem= %n%*s %n", &system, &nc ) )
+               && ( nc >= len ) ) {
+
+/* Convert the string to a System code before use. */
+      system_code = astSystemCode( this, system + setting );
+      if ( system_code != AST__BADSYSTEM ) {
+         astSetAlignSystem( this, system_code );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN,
+                   "astSetAttrib(%s): Invalid AlignSystem description \"%s\".",
+                   astGetClass( this ), system + setting );
+      }
+   
+/* System. */
+/* ------- */
+   } else if ( nc = 0,
+               ( 0 == astSscanf( setting, "system= %n%*s %n", &system, &nc ) )
+               && ( nc >= len ) ) {
+
+/* Convert the string to a System code before use. */
+      system_code = astSystemCode( this, system + setting );
+      if ( system_code != AST__BADSYSTEM ) {
+         astSetSystem( this, system_code );
+
+/* Report an error if the string value wasn't recognised. */
+      } else {
+         astError( AST__ATTIN,
+                   "astSetAttrib(%s): Invalid System description \"%s\".",
+                   astGetClass( this ), system + setting );
+      }
+   
 /* Title. */
 /* ------ */
    } else if ( nc = 0,
@@ -5476,6 +6532,62 @@ static void SetAxis( AstFrame *this, int axis, AstAxis *newaxis ) {
    }
 }
 
+static void SetUnit( AstFrame *this, int axis, const char *unit ) {
+/*
+*  Name:
+*     SetUnit
+
+*  Purpose:
+*     Set a value for the Unit attribute of a Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void SetUnit( AstFrame *this, int axis, const char *unit )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function sets the Unit value for a Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The number of the axis (zero-based) for which the Unit value is to 
+*        be set.
+*     unit
+*        The new value to be set.
+
+*  Returned Value:
+*     void.
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Validate the axis index and obtain a pointer to the required Axis. */
+   (void) astValidateAxis( this, axis, "astSetUnit" );
+   ax = astGetAxis( this, axis );
+
+/* The new unit may require the Label and/or Symbol to be changed, but
+   only if the Frames ActiveUnit flag is set. */
+   if( astGetActiveUnit( this ) ) NewUnit( ax, astGetAxisUnit( ax ), unit, 
+                                           "astSetUnit", astGetClass( this ) );
+
+/* Set the Axis Unit attribute value. */
+   astSetAxisUnit( ax, unit );
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+}
+
 static int SubFrame( AstFrame *target, AstFrame *template,
                      int result_naxes, const int *target_axes,
                      const int *template_axes, AstMapping **map,
@@ -5584,6 +6696,9 @@ static int SubFrame( AstFrame *target, AstFrame *template,
 /* Local Variables: */
    AstAxis *newaxis;             /* Pointer to new Axis object */
    AstFrame *tempframe;          /* Pointer to temporary Frame */
+   AstMapping *aumap;            /* A units Mapping for a single axis */
+   AstMapping *numap;            /* The new total units Mapping */
+   AstMapping *umap;             /* The total units Mapping */
    int *inperm;                  /* Pointer to permutation array */
    int *outperm;                 /* Pointer to permutation array */
    int match;                    /* Coordinate conversion possible? */
@@ -5591,6 +6706,7 @@ static int SubFrame( AstFrame *target, AstFrame *template,
    int target_axis;              /* Target Frame axis index */
    int target_naxes;             /* Number of target Frame axes */
    int unit;                     /* Unit Mapping appropriate? */
+   int uunit;                    /* Is the "umap" Mapping a UnitMap? */
 
 /* Initialise the returned values. */
    *map = NULL;
@@ -5708,9 +6824,77 @@ static int SubFrame( AstFrame *target, AstFrame *template,
                                               "" );
          }
 
-/* Note that coordinate conversion is possible (this will always be the case
-   here unless an error occurs). */
+/* Note that coordinate conversion is possible. */
          match = 1;
+
+/* If the ActiveUnit flag in the template Frame is non-zero, we now 
+   modify the Mapping to take account of any differences in the Units 
+   attributes of the target and results Frames. */
+         if( template && astGetActiveUnit( template ) ) {
+
+/* Loop round the axes of the results Frame, accumulating a parallel CmpMap  
+   ("umap") in which each Mapping is the 1-D Mapping which transforms the 
+   Units of the corresponding target axis into the Units of the results 
+   axis. */
+            umap = NULL;
+            uunit = 1;
+            for( result_axis = 0; result_axis < result_naxes; result_axis++ ) { 
+
+/* Find the index of the corresponding target axis. */
+               if( unit ) {
+                  target_axis = result_axis;
+               } else {
+                  target_axis = outperm[ result_axis ];
+               }               
+
+/* Get the Unit string for both axes, and attempt to find a Mapping which
+   transforms values in the target units into the corresponding value in the
+   results units. If this results axis does not have a corresponding
+   target axis, then indicate that no units mapping can be found. */
+               if( target_axis > -1 ) {
+                  aumap = astUnitMapper( astGetUnit( target, target_axis ),
+                                         astGetUnit( *result, result_axis ),
+                                         NULL, NULL );
+               } else {
+                  aumap = NULL;
+               }
+
+/* If no Mapping could be found, annull the Mapping and leave the loop. 
+   Otherwise, see if the Mapping is a UnitMap. If not, set a flag to indicate 
+   that we have at least one non-unit map. */
+               if( !aumap ) {
+                  if( umap ) umap = astAnnul( umap );
+                  match = 0;
+                  break;
+               } else {
+                  if( !astIsAUnitMap( aumap ) ) uunit = 0;
+               }
+
+/* Add this Mapping into the parallel CmpMap. */
+               if( umap ) {
+                  numap = (AstMapping *) astCmpMap( umap, aumap, 0, "" );
+                  umap = astAnnul( umap );
+                  aumap = astAnnul( aumap );
+                  umap = numap;
+               } else {
+                  umap = aumap;
+               }
+            }
+
+/* If the resulting CmpMap is not just a UnitMap, add it in series with
+   the current results mapping, and then simplify it. */
+            if( !uunit && umap ) {
+               numap = (AstMapping *) astCmpMap( *map, umap, 1, "" );
+               astAnnul( *map );
+               *map = numap;
+            }
+
+/* Annul the CmpMap containing the units Mappings. */
+            if( umap ) umap = astAnnul( umap );
+
+/* If the units could not bve matched annul the returned mapping. */
+            if( !match && *map ) *map = astAnnul( *map );
+         }
       }
    }
 
@@ -5728,6 +6912,187 @@ static int SubFrame( AstFrame *target, AstFrame *template,
 
 /* Return the result. */
    return match;
+}
+
+static AstSystemType SystemCode( AstFrame *this, const char *system ) {
+/*
+*+
+*  Name:
+*     astSystemCode
+
+*  Purpose:
+*     Convert a string into a coordinate system type code.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstSystemType SystemCode( AstFrame *this, const char *system ) 
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function converts a string used for the external description of 
+*     a coordinate system into a Frame coordinate system type code (System 
+*     attribute value). It is the inverse of the astSystemString function.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        Pointer to a constant null-terminated string containing the
+*        external description of the coordinate system.
+
+*  Returned Value:
+*     The System type code.
+
+*  Notes:
+*     - A value of AST__BADSYSTEM is returned if the coordinate system 
+*     description was not recognised. This does not produce an error.
+*     - A value of AST__BADSYSTEM is also returned if this function
+*     is invoked with the global error status set or if it should fail
+*     for any reason.
+*-
+*/
+
+/* Local Variables: */
+   AstSystemType result;      /* Result value to return */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Match the "system" string against each possibility and assign the
+   result. The basic Frame class only supports a single system
+   "Cartesian". */
+   if ( astChrMatch( "Cartesian", system ) ) {
+      result = AST__CART;
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static const char *SystemString( AstFrame *this, AstSystemType system ) {
+/*
+*+
+*  Name:
+*     astSystemString
+
+*  Purpose:
+*     Convert a coordinate system type code into a string.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     const char *astSystemString( AstFrame *this, AstSystemType system ) 
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function converts a Frame coordinate system type code
+*     (System attribute value) into a string suitable for use as an
+*     external representation of the coordinate system type.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The coordinate system type code.
+
+*  Returned Value:
+*     Pointer to a constant null-terminated string containing the
+*     textual equivalent of the type code supplied.
+
+*  Notes:
+*     - A NULL pointer value is returned if the coordinate system
+*     code was not recognised. This does not produce an error.
+*     - A NULL pointer value is also returned if this function is
+*     invoked with the global error status set or if it should fail
+*     for any reason.
+*-
+*/
+
+/* Local Variables: */
+   const char *result;        /* Pointer value to return */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Match the "system" value against each possibility and convert to a
+   string pointer. (Where possible, return the same string as would be
+   used in the FITS WCS representation of the coordinate system). A basic
+   Frame only allows a single System value, "Cartesian". */
+   switch ( system ) {
+   case AST__CART:
+      result = "Cartesian";
+      break;
+   }
+
+/* Return the result pointer. */
+   return result;
+
+}
+
+static int TestActiveUnit( AstFrame *this ){
+/*
+*+
+*  Name:
+*     astTestActiveUnit
+
+*  Purpose:
+*     Determines if the ActiveUnit flag is set.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astTestActiveUnit( AstFrame *this )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function tests the current value of the ActiveUnit flag for a 
+*     Frame. See the description of the astSetActiveUnit function for a 
+*     description of the ActiveUnit flag.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+
+*  Returned Value:
+*     Non-zero if the flag has been set. Zero otherwise.
+
+*  Notes:
+*     - A zero value will be returned if this function is
+*     invoked with the AST error status set, or if it should fail for
+*     any reason.
+*--
+*/
+
+/* Local Variables: */
+   int result;         /* The returned value */
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Return the result. */
+   return ( this->active_unit != -INT_MAX );
 }
 
 static int TestAttrib( AstObject *this_object, const char *attrib ) {
@@ -5821,6 +7186,11 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                && ( nc >= len ) ) {
       result = astTestDirection( this, axis - 1 );
 
+/* Epoch. */
+/* ------ */
+   } else if ( !strcmp( attrib, "epoch" ) ) {
+      result = astTestEpoch( this );
+
 /* Bottom(axis). */
 /* ------------- */
    } else if ( nc = 0,
@@ -5885,6 +7255,16 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
                ( 1 == astSscanf( attrib, "symbol(%d)%n", &axis, &nc ) )
                && ( nc >= len ) ) {
       result = astTestSymbol( this, axis - 1 );
+
+/* AlignSystem. */
+/* ------------ */
+   } else if ( !strcmp( attrib, "alignsystem" ) ) {
+      result = astTestAlignSystem( this );
+
+/* System. */
+/* ------- */
+   } else if ( !strcmp( attrib, "system" ) ) {
+      result = astTestSystem( this );
 
 /* Title. */
 /* ------ */
@@ -6134,8 +7514,8 @@ static int Unformat( AstFrame *this, int axis, const char *string,
          astSetStatus( status );
 
 /* Report a contextual error message containing the axis label. */
-         astError( status, "astUnformat(%s): Unable to read \"%s\" value.",
-                   astGetClass( this ), label );
+         astError( status, "%s(%s): Unable to read \"%s\" value.",
+                   "astUnformat", astGetClass( this ), label );
       }
    }
 
@@ -6364,6 +7744,76 @@ static void ValidateAxisSelection( AstFrame *this, int naxes, const int *axes,
    }
 }
 
+static int ValidateSystem( AstFrame *this, AstSystemType system, const char *method ) {
+/*
+*+
+*  Name:
+*     astValidateSystem
+
+*  Purpose:
+*     Validate a value for a Frame's System attribute.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astValidateSystem( AstFrame *this, AstSystemType system, 
+*                            const char *method )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function checks the validity of the supplied system value.
+*     If the value is valid, it is returned unchanged. Otherwise, an
+*     error is reported and a value of AST__BADSYSTEM is returned.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     system
+*        The system value to be checked. 
+*     method
+*        Pointer to a constant null-terminated character string
+*        containing the name of the method that invoked this function
+*        to validate an axis index. This method name is used solely
+*        for constructing error messages.
+
+*  Returned Value:
+*     The validated system value.
+
+*  Notes:
+*     - A value of AST_BADSYSTEM will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstSystemType result;              /* Validated system value */
+
+/* Initialise. */
+   result = AST__BADSYSTEM;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* If the value is out of bounds, report an error. */
+   if ( system < FIRST_SYSTEM || system > LAST_SYSTEM ) {
+         astError( AST__AXIIN, "%s(%s): Bad value (%d) given for the System "
+                   "attribute of a %s.", method, astGetClass( this ),
+                   (int) system, astGetClass( this ) );
+
+/* Otherwise, return the supplied value. */
+   } else {
+      result = system;
+   }
+
+/* Return the result. */
+   return result;
+}
+
 /* Functions which access class attributes. */
 /* ---------------------------------------- */
 /* Implement member functions to access the attributes associated with
@@ -6424,6 +7874,128 @@ MAKE_CLEAR(Direction)
 MAKE_GET(Direction,int,0,0,0)
 MAKE_SET(Direction,int)
 MAKE_TEST(Direction)
+
+/*
+*att++
+*  Name:
+*     Epoch
+
+*  Purpose:
+*     Epoch of observation.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     Floating point.
+
+*  Description:
+*     This attribute is used to qualify the coordinate systems described by 
+*     a Frame, by giving the moment in time when the coordinates are known 
+*     to be correct. Often, this will be the date of observation, and is 
+*     important in cases where coordinates systems move with respect to each 
+*     other over the course of time.
+*
+*     The Epoch attribute is stored as a Modified Julian Date, but
+*     when setting its value it may be given in a variety of
+*     formats. See the "Input Formats" section (below) for details.
+
+*  Input Formats:
+*     The formats accepted when setting an Epoch value are listed
+*     below. They are all case-insensitive and are generally tolerant
+*     of extra white space and alternative field delimiters:
+*
+*     - Besselian Epoch: Expressed in decimal years, with or without
+*     decimal places ("B1950" or "B1976.13" for example).
+*
+*     - Julian Epoch: Expressed in decimal years, with or without
+*     decimal places ("J2000" or "J2100.9" for example).
+*
+*     - Year: Decimal years, with or without decimal places ("1996.8"
+*     for example).  Such values are interpreted as a Besselian epoch
+*     (see above) if less than 1984.0 and as a Julian epoch otherwise.
+*
+*     - Julian Date: With or without decimal places ("JD 2454321.9" for
+*     example).
+*
+*     - Modified Julian Date: With or without decimal places
+*     ("MJD 54321.4" for example).
+*
+*     - Gregorian Calendar Date: With the month expressed either as an
+*     integer or a 3-character abbreviation, and with optional decimal
+*     places to represent a fraction of a day ("1996-10-2" or
+*     "1996-Oct-2.6" for example). If no fractional part of a day is
+*     given, the time refers to the start of the day (zero hours).
+*
+*     - Gregorian Date and Time: Any calendar date (as above) but with
+*     a fraction of a day expressed as hours, minutes and seconds
+*     ("1996-Oct-2 12:13:56.985" for example).
+
+*  Output Format:
+*     When enquiring Epoch values, the format used is the "Year"
+*     format described under "Input Formats". This is a value in
+*     decimal years which will be a Besselian epoch if less than
+*     1984.0 and a Julian epoch otherwise.  By omitting any character
+*     prefix, this format allows the Epoch value to be obtained as
+*     either a character string or a floating point value.
+
+*  Applicability:
+*     Frame
+*        All Frames have this attribute. The basic Frame class provides 
+*        a default of J2000.0 (Julian) but makes no use of the Epoch value.
+*        This is because the Frame class does not distinguish between
+*        different Cartesian coordinate systems (see the System attribute).
+*     CmpFrame
+*        The default Epoch value for a CmpFrame is selected as follows;
+*        if the Epoch attribute has been set in the first component Frame 
+*        then the Epoch value from the first component Frame is used as
+*        the default for the CmpFrame. Otherwise, if the Epoch attribute has 
+*        been set in the second component Frame then the Epoch value from the 
+*        second component Frame is used as the default for the CmpFrame. 
+*        Otherwise, the default Epoch value from the first component
+*        Frame is used as the default for the CmpFrame. 
+*     FrameSet
+*        The Epoch attribute of a FrameSet is the same as that of its current 
+*        Frame (as specified by the Current attribute). 
+*     SkyFrame
+*        The coordinates of sources within a SkyFrame can changed with time
+*        for various reasons, including: (i) changing aberration of light
+*        caused by the observer's velocity (e.g. due to the Earth's motion 
+*        around the Sun), (ii) changing gravitational deflection by the Sun 
+*        due to changes in the observer's position with time, (iii) fictitious 
+*        motion due to rotation of non-inertial coordinate systems (e.g. the 
+*        old FK4 system), and (iv) proper motion of the source itself (although
+*        this last effect is not handled by the SkyFrame class because it
+*        affects individual sources rather than the coordinate system as
+*        a whole).
+*
+*        The default Epoch value in a SkyFrame is B1950.0 (Besselian) for the 
+*        old FK4-based coordinate systems (see the System attribute) and
+*        J2000.0 (Julian) for all others.
+*
+*        Care must be taken to distinguish the Epoch value, which relates to 
+*        motion (or apparent motion) of the source, from the superficially 
+*        similar Equinox value. The latter is used to qualify a coordinate 
+*        system which is itself in motion in a (notionally) predictable way 
+*        as a result of being referred to a slowly moving reference plane 
+*        (e.g. the equator). 
+*
+*        See the description of the System attribute for details of which 
+*        qualifying attributes apply to each celestial coordinate system.
+*att--
+*/
+/* Clear the Epoch value by setting it to AST__BAD. */
+astMAKE_CLEAR(Frame,Epoch,epoch,AST__BAD)
+
+/* Provide a default value of J2000.0 setting. */
+astMAKE_GET(Frame,Epoch,double,AST__BAD,(
+           ( this->epoch != AST__BAD ) ? this->epoch : slaEpj2d( 2000.0 )))
+
+/* Allow any Epoch value to be set. */
+astMAKE_SET(Frame,Epoch,double,epoch,value)
+
+/* An Epoch value is set if it is not equal to AST__BAD. */
+astMAKE_TEST(Frame,Epoch,( this->epoch != AST__BAD ))
 
 /*
 *att++
@@ -6770,7 +8342,9 @@ MAKE_TEST(Symbol)
 *  Description:
 *     This attribute contains a textual representation of the physical
 *     units used to represent coordinate values on a particular axis
-*     of a Frame.
+c     of a Frame. The astSetActiveUnit function controls how the Unit values
+f     of a Frame. The AST_SETACTIVEUNIT routine controls how the Unit values
+*     are used.
 
 *  Applicability:
 *     Frame
@@ -6780,6 +8354,10 @@ MAKE_TEST(Symbol)
 *        "hh:mm:ss.sss") to describe the character string returned by
 c        the astFormat function when formatting coordinate values.
 f        the AST_FORMAT function when formatting coordinate values.
+*     SpecFrame
+*        The SpecFrame class re-defines the default Unit value so that it
+*        is appropriate for the current System value. See the System
+*        attribute for details.
 *     FrameSet
 *        The Unit attribute of a FrameSet axis is the same as that of
 *        its current Frame (as specified by the Current attribute).
@@ -6792,9 +8370,7 @@ f        the AST_FORMAT function when formatting coordinate values.
 */
 /* This simply provides an interface to the Axis methods for accessing
    the Unit string. */
-MAKE_CLEAR(Unit)
 MAKE_GET(Unit,const char *,NULL,0,0)
-MAKE_SET(Unit,const char *)
 MAKE_TEST(Unit)
 
 /* Implement member functions to access the attributes associated with
@@ -7212,6 +8788,218 @@ astMAKE_TEST(Frame,PreserveAxes,( this->preserve_axes != -INT_MAX ))
 /*
 *att++
 *  Name:
+*     AlignSystem
+
+*  Purpose:
+*     Coordinate system in which to align the Frame.
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     This attribute controls how a Frame behaves when it is used (by
+c     astFindFrame or astConvert) as a template to match another (target)
+f     AST_FINDFRAME or AST_CONVERT) as a template to match another (target)
+*     Frame. It identifies the coordinate system in which the two Frames
+*     will be aligned by the match. 
+*
+*     The values which may be assigned to this attribute, and its default
+*     value, depend on the class of Frame and are described in the
+*     "Applicability" section below. In general, the AlignSystem attribute 
+*     will accept any of the values which may be assigned to the System 
+*     attribute.
+*
+*     The Mapping returned by AST_FINDFRAME or AST_CONVERT will use the
+*     coordinate system specified by the AlignSystem attribute as an 
+*     intermediate coordinate system. The total returned Mapping will first 
+*     map positions from the first Frame into this intermediate coordinate 
+*     system, using the attributes of the first Frame. It will then map 
+*     these positions from the intermediate coordinate system into the 
+*     second Frame, using the attributes of the second Frame. 
+
+*  Applicability:
+*     Frame
+*        The AlignSystem attribute for a basic Frame always equals "Cartesian",
+*        and may not be altered. 
+*     CmpFrame
+*        The AlignSystem attribute for a CmpFrame always equals "Compound",
+*        and may not be altered.
+*     FrameSet
+*        The AlignSystem attribute of a FrameSet is the same as that of its
+*        current Frame (as specified by the Current attribute).
+*     SkyFrame
+*        The default AlignSystem attribute for a SkyFrame is "FK5".
+*     SpecFrame
+*        The default AlignSystem attribute for a SpecFrame is "Wave"
+*        (wavelength).
+
+*att--
+*/
+/* Clear the AlignSystem value by setting it to AST__BADSYSTEM. */
+astMAKE_CLEAR(Frame,AlignSystem,alignsystem,AST__BADSYSTEM)
+
+/* Provide a default AlignSystem of AST__CART. */
+astMAKE_GET(Frame,AlignSystem,AstSystemType,AST__BADSYSTEM,(
+            ( this->alignsystem == AST__BADSYSTEM ) ? AST__CART : this->alignsystem ) )
+
+/* Validate the AlignSystem value being set and retain the original if the
+   supplied value is not recognized. */
+astMAKE_SET(Frame,AlignSystem,AstSystemType,alignsystem,(
+           (astValidateSystem( this, value, "astSetAlignSystem" ) != AST__BADSYSTEM) ?
+            value : this->alignsystem ))
+
+/* The AlignSystem value is set if it is not AST__BADSYSTEM. */
+astMAKE_TEST(Frame,AlignSystem,( this->alignsystem != AST__BADSYSTEM ))
+
+/*
+*att++
+*  Name:
+*     System
+
+*  Purpose:
+*     Coordinate system used to describe positions within the domain
+
+*  Type:
+*     Public attribute.
+
+*  Synopsis:
+*     String.
+
+*  Description:
+*     In general it is possible for positions within a given physical
+*     domain to be described using one of several different coordinate
+*     systems. For instance, the SkyFrame class can use galactic
+*     coordinates, equatorial coordinates, etc, to describe positions on
+*     the sky. As another example, the SpecFrame class can use frequency,
+*     wavelength, velocity, etc, to describe a position within an
+*     electromagnetic spectrum. The System attribute identifies the particular
+*     coordinate system represented by a Frame. Each class of Frame
+*     defines a set of acceptable values for this attribute, as listed
+*     below (all are case insensitive). Where more than one alternative
+*     System value is shown, the first of will be returned when an
+*     enquiry is made.
+
+*  Applicability:
+*     Frame
+*        The System attribute for a basic Frame always equals "Cartesian",
+*        and may not be altered.
+*     CmpFrame
+*        The System attribute for a CmpFrame always equals "Compound",
+*        and may not be altered. In addition, the CmpFrame class allows
+*        the System attribute to be referenced for a component Frame by
+*        including the index of an axis within the required component 
+*        Frame. For instance, "System(3)" refers to the System attribute 
+*        of the component Frame which includes axis 3 of the CmpFrame.
+*     FrameSet
+*        The System attribute of a FrameSet is the same as that of its
+*        current Frame (as specified by the Current attribute).
+*     SkyFrame
+*        The SkyFrame class supports the following System values and 
+*        associated celestial coordinate systems:
+*
+*        - "FK4": The old FK4 (barycentric) equatorial coordinate system,
+*        which should be qualified by an Equinox value. The underlying
+*        model on which this is based is non-inertial and rotates slowly
+*        with time, so for accurate work FK4 coordinate systems should
+*        also be qualified by an Epoch value.
+*   
+*        - "FK4-NO-E" or "FK4_NO_E": The old FK4 (barycentric) equatorial
+*        system but without the "E-terms of aberration" (e.g. some radio
+*        catalogues). This coordinate system should also be qualified by
+*        both an Equinox and an Epoch value.
+*   
+*        - "FK5" or "EQUATORIAL": The modern FK5 (barycentric) equatorial
+*        coordinate system. This should be qualified by an Equinox value.
+*   
+*        - "GAPPT", "GEOCENTRIC" or "APPARENT": The geocentric apparent
+*        equatorial coordinate system, which gives the apparent positions
+*        of sources relative to the true plane of the Earth's equator and
+*        the equinox (the coordinate origin) at a time specified by the
+*        qualifying Epoch value. (Note that no Equinox is needed to
+*        qualify this coordinate system because no model "mean equinox"
+*        is involved.)  These coordinates give the apparent right
+*        ascension and declination of a source for a specified date of
+*        observation, and therefore form an approximate basis for
+*        pointing a telescope. Note, however, that they are applicable to
+*        a fictitious observer at the Earth's centre, and therefore
+*        ignore such effects as atmospheric refraction and the (normally
+*        much smaller) aberration of light due to the rotational velocity
+*        of the Earth's surface.  Geocentric apparent coordinates are
+*        derived from the standard FK5 (J2000.0) barycentric coordinates
+*        by taking account of the gravitational deflection of light by
+*        the Sun (usually small), the aberration of light caused by the
+*        motion of the Earth's centre with respect to the barycentre
+*        (larger), and the precession and nutation of the Earth's spin
+*        axis (normally larger still).
+*   
+*        - "ECLIPTIC": Ecliptic coordinates (IAU 1980), referred to the
+*        ecliptic and mean equinox specified by the qualifying Equinox
+*        value.
+*   
+*        - "GALACTIC": Galactic coordinates (IAU 1958).
+*   
+*        - "SUPERGALACTIC": De Vaucouleurs Supergalactic coordinates.
+*   
+*        - "UNKNOWN": Any other general spherical coordinate system. No
+*        Mapping can be created between a pair of SkyFrames if either of the
+*        SkyFrames has System set to "Unknown".
+*
+*        Currently, the default System value is "FK5". However, this
+*        default may change in future as new astrometric standards
+*        evolve. The intention is to track the most modern appropriate
+*        standard. For this reason, you should use the default only if
+*        this is what you intend (and can tolerate any associated slight
+*        change in future). If you intend to use the FK5 system
+*        indefinitely, then you should specify it explicitly.
+*     SpecFrame
+*        The SpecFrame class supports the following System values and 
+*        associated spectral coordinate systems (the default is "WAVE" -
+*        wavelength):
+*
+*        - "FREQ": Frequency (Hz)
+*        - "ENER" or "ENERGY": Energy (J)
+*        - "WAVN" or "WAVENUM": Wave-number (1/m)
+*        - "WAVE" or "WAVELEN": Vacuum wave-length (m)
+*        - "AWAV" or "AIRWAVE": Wave-length in air (m)
+*        - "VRAD" or "VRADIO": Radio velocity (m/s)
+*        - "VOPT" or "VOPTICAL": Optical velocity (m/s)
+*        - "ZOPT" or "REDSHIFT": Reshift (dimensionless)
+*        - "BETA": Beta factor (dimensionless)
+*        - "VELO" or "VREL": Relativistic velocity (m/s)
+*
+*        The default value for the Unit attribute for each system is shown
+*        in parentheses. Note that the default value for the ActiveUnit flag 
+c        is non-zero 
+f        is .TRUE. 
+*        for a SpecFrame, meaning that changes to the Unit attribute for
+*        a SpecFrame will result in the SpecFrame being re-mapped within
+*        its enclosing FrameSet in order to reflect the change in units
+c        (see astSetActiveUnit function for further information).
+f        (see AST_SETACTIVEUNIT routine for further information).
+*att--
+*/
+/* Clear the System value by setting it to AST__BADSYSTEM. */
+astMAKE_CLEAR(Frame,System,system,AST__BADSYSTEM)
+
+/* Provide a default coordinate system of AST__CART. */
+astMAKE_GET(Frame,System,AstSystemType,AST__BADSYSTEM,(
+            ( this->system == AST__BADSYSTEM ) ? AST__CART : this->system ) )
+
+/* Validate the System value being set and retain the original if the
+   supplied value is not recognized. */
+astMAKE_SET(Frame,System,AstSystemType,system,(
+           (astValidateSystem( this, value, "astSetSystem" ) != AST__BADSYSTEM) ?
+            value : this->system ))
+
+/* The System value is set if it is not AST__BADSYSTEM. */
+astMAKE_TEST(Frame,System,( this->system != AST__BADSYSTEM ))
+
+/*
+*att++
+*  Name:
 *     Title
 
 *  Purpose:
@@ -7449,18 +9237,23 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
 
 /* Local Variables: */
    AstAxis *ax;                  /* Pointer to Axis */
+   AstFrame *cfrm;               /* Pointer to FrameSet's current Frame */
    AstFrame *this;               /* Pointer to the Frame structure */
+   AstSystemType system;         /* System code */
    char comment[ COMMENT_LEN + 1 ]; /* Buffer for comment strings */
    char key[ KEY_LEN + 1 ];      /* Buffer for keywords */
    const char *sval;             /* Pointer to string value */
+   const char *lab;              /* Pointer to unit label */
    const int *perm;              /* Pointer to axis permutation array */
    double dval;                  /* Double attibute value */
    int *invperm;                 /* Pointer to inverse permutation array */
    int axis;                     /* Loop counter for Frame axes */
+   int bessyr;                   /* Format as Besselian years (else Julian) */
    int digits_set;               /* Digits set explicitly for any axis? */
    int full;                     /* Full attribute value */
    int full_set;                 /* Full attribute set? */
    int helpful;                  /* Helpful to show value even if not set? */
+   int isFrame;                  /* Is this a simple Frame? */
    int ival;                     /* Integer value */
    int naxes;                    /* Number of Frame axes */
    int set;                      /* Attribute value set? */
@@ -7476,6 +9269,21 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
    by a derived class). */
    naxes = astGetNaxes( this );
    perm = astGetPerm( this );
+
+/* Some default attribute values are not helpful for a simple Frame. Note
+   if this is a simple Frame, or if it is a FrameSet with a simple Frame
+   as its current Frame., or if it is a CmpFrame. */
+   if( !strcmp( astGetClass( this ), "Frame" ) ) {
+      isFrame = 1;
+   } else if( astIsAFrameSet( this ) ) {
+      cfrm = astGetFrame( (AstFrameSet *) this, AST__CURRENT );
+      isFrame = !strcmp( astGetClass( cfrm ), "Frame" );
+      cfrm = astAnnul( cfrm );      
+   } else if( astIsACmpFrame( this ) ) {
+      isFrame = 1;
+   } else {
+      isFrame = 0;
+   }
 
 /* Allocate memory to hold an inverse axis permutation array and
    generate this array from the forward permutation values. This will
@@ -7529,6 +9337,18 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       astWriteString( channel, "Domain", set, helpful, sval,
                       "Coordinate system domain" );
 
+/* Epoch. */
+/* ------ */
+      set = TestEpoch( this );
+      dval = set ? GetEpoch( this ) : astGetEpoch( this );
+
+/* Convert MJD to Besselian or Julian years, depending on the value. */
+      bessyr = ( dval < slaEpj2d( 1984.0 ) );
+      dval = bessyr ? slaEpb( dval ) : slaEpj( dval );
+      astWriteDouble( channel, "Epoch", set, !isFrame, dval,
+                      bessyr ? "Besselian epoch of observation" :
+                               "Julian epoch of observation" );
+
 /* Label. */
 /* ------ */
 /* This, and some other, attributes are stored internally by the
@@ -7563,16 +9383,86 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
          astWriteString( channel, key, 0, 0, sval, comment );
       }
 
+/* System. */
+/* ------- */
+      set = TestSystem( this );
+      system = set ? GetSystem( this ) : astGetSystem( this );
+
+/* If set, convert explicitly to a string for the external representation. */
+      if ( set ) {
+         if ( astOK ) {
+            sval = astSystemString( this, system );
+
+/* Report an error if the System value was not recognised. */
+            if ( !sval ) {
+               astError( AST__SCSIN,
+                        "astWrite(%s): Corrupt %s contains invalid "
+                        "System identification code (%d).",
+                        astGetClass( channel ), astGetClass( this ),
+                        (int) system );
+            }
+         }
+
+/* If not set, use astGetAttrib which returns a string value using
+   (possibly over-ridden) methods. */
+      } else {
+         sval = astGetAttrib( this_object, "system" );
+      }
+
+/* Write out the value. */
+      astWriteString( channel, "System", set, !isFrame, sval,
+                      "Coordinate system type" );
+
+/* AlignSystem. */
+/* ------------ */
+      set = TestAlignSystem( this );
+      system = set ? GetAlignSystem( this ) : astGetAlignSystem( this );
+
+/* If set, convert explicitly to a string for the external representation. */
+      if ( set ) {
+         if ( astOK ) {
+            sval = astSystemString( this, system );
+
+/* Report an error if the AlignSystem value was not recognised. */
+            if ( !sval ) {
+               astError( AST__SCSIN,
+                        "astWrite(%s): Corrupt %s contains invalid "
+                        "AlignSystem identification code (%d).",
+                        astGetClass( channel ), astGetClass( this ),
+                        (int) system );
+            }
+         }
+
+/* If not set, use astGetAttrib which returns a string value using
+   (possibly over-ridden) methods. */
+      } else {
+         sval = astGetAttrib( this_object, "alignsystem" );
+      }
+
+/* Write out the value. */
+      astWriteString( channel, "AlSys", set, 0, sval,
+                      "Alignment coordinate system" );
+
 /* Unit. */
 /* ----- */
 /* There is a Unit value for each axis. */
       for ( axis = 0; axis < naxes; axis++ ) {
          sval = astGetUnit( this, invperm[ axis ] );
 
+/* Get any label associated with the unit string. */
+         lab = astUnitLabel( sval );
+
+/* Construct a comment including the above label (but only if it is not
+   the same as the unit string) . */
+         if( lab && strcmp( lab, sval ) ) {
+            (void) sprintf( comment, "Units for axis %d (%s)", axis + 1, lab );
+         } else {
+            (void) sprintf( comment, "Units for axis %d", axis + 1 );
+         }
+
 /* Show the Unit value if it is not blank. */
          helpful = ( sval && *sval );
          (void) sprintf( key, "Uni%d", axis + 1 );
-         (void) sprintf( comment, "Units for axis %d", axis + 1 );
          astWriteString( channel, key, 0, helpful, sval, comment );
       }
 
@@ -7703,6 +9593,15 @@ static void Dump( AstObject *this_object, AstChannel *channel ) {
       astWriteInt( channel, "MchEnd", set, 0, ival,
                    ival ? "Match final target axes" :
                           "Match initial target axes" );
+
+/* ActiveUnit. */
+/* ----------- */
+      if( astTestActiveUnit( this ) ) {
+         ival = astGetActiveUnit( this );
+         astWriteInt( channel, "ActUnt", 1, 0, ival,
+                      ival ? "Unit strings affects alignment" :
+                             "Unit strings do not affect alignment" );
+      }
 
 /* Axis permutation array. */
 /* ----------------------- */
@@ -7931,6 +9830,9 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
 /* Check the global status. */
    if ( !astOK ) return NULL;
 
+/* If necessary, initialise the virtual function table. */
+   if ( init ) astInitFrameVtab( vtab, name );
+
 /* Initialise. */
    new = NULL;
 
@@ -7946,13 +9848,10 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
    to provide values for these that are equal to the number of Frame
    axes). */
    } else {
-      new = (AstFrame *) astInitMapping( mem, size, init,
+      new = (AstFrame *) astInitMapping( mem, size, 0,
                                          (AstMappingVtab *) vtab, name,
                                          0, 0, 1, 1 );
 
-/* If necessary, initialise the virtual function table. */
-/* ---------------------------------------------------- */
-      if ( init ) InitVtab( vtab );
       if ( astOK ) {
 
 /* Initialise the Frame data. */
@@ -7963,12 +9862,15 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
 /* Initialise all attributes to their "undefined" values. */
          new->digits = -INT_MAX;
          new->domain = NULL;
+         new->epoch = AST__BAD;
          new->match_end = -INT_MAX;
          new->max_axes = -INT_MAX;
          new->min_axes = -INT_MAX;
          new->permute = -INT_MAX;
          new->preserve_axes = -INT_MAX;
          new->title = NULL;
+         new->system = AST__BADSYSTEM;
+         new->alignsystem = AST__BADSYSTEM;
 
 /* Allocate memory to store pointers to the Frame's Axis objects and to store
    its axis permutation array. */
@@ -8002,7 +9904,7 @@ AstFrame *astInitFrame_( void *mem, size_t size, int init,
    return new;
 }
 
-AstFrame *astLoadFrame_( void *mem, size_t size, int init,
+AstFrame *astLoadFrame_( void *mem, size_t size,
                          AstFrameVtab *vtab, const char *name,
                          AstChannel *channel ) {
 /*
@@ -8018,7 +9920,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
 
 *  Synopsis:
 *     #include "frame.h"
-*     AstFrame *astLoadFrame_( void *mem, size_t size, int init,
+*     AstFrame *astLoadFrame( void *mem, size_t size,
 *                              AstFrameVtab *vtab, const char *name,
 *                              AstChannel *channel )
 
@@ -8035,6 +9937,7 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
 *     If the "init" flag is set, it also initialises the contents of a
 *     virtual function table for a Frame at the start of the memory
 *     passed via the "vtab" parameter.
+
 
 *  Parameters:
 *     mem
@@ -8053,14 +9956,6 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
 *
 *        If the "vtab" parameter is NULL, the "size" value is ignored
 *        and sizeof(AstFrame) is used instead.
-*     init
-*        A boolean flag indicating if the Frame's virtual function
-*        table is to be initialised. If this value is non-zero, the
-*        virtual function table will be initialised by this function.
-*
-*        If the "vtab" parameter is NULL, the "init" value is ignored
-*        and the (static) virtual function table initialisation flag
-*        for the Frame class is used instead.
 *     vtab
 *        Pointer to the start of the virtual function table to be
 *        associated with the new Frame. If this is NULL, a pointer to
@@ -8108,26 +10003,23 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
    passed to the parent class loader (and its parent, etc.). */
    if ( !vtab ) {
       size = sizeof( AstFrame );
-      init = !class_init;
       vtab = &class_vtab;
       name = "Frame";
+
+/* If required, initialise the virtual function table for this class. */
+      if ( !class_init ) {
+         astInitFrameVtab( vtab, name );
+         class_init = 1;
+      }
    }
 
 /* Invoke the parent class loader to load data for all the ancestral
    classes of the current one, returning a pointer to the resulting
    partly-built Frame. */
-   new = astLoadMapping( mem, size, init, (AstMappingVtab *) vtab, name,
+   new = astLoadMapping( mem, size, (AstMappingVtab *) vtab, name,
                          channel );
 
-/* If required, initialise the part of the virtual function table used
-   by this class. */
-   if ( init ) InitVtab( vtab );
-
-/* Note if we have successfully initialised the (static) virtual
-   function table owned by this class (so that this is done only
-   once). */
    if ( astOK ) {
-      if ( ( vtab == &class_vtab ) && init ) class_init = 1;
 
 /* Read input data. */
 /* ================ */
@@ -8269,6 +10161,15 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
 /* ------- */
          new->domain = astReadString( channel, "domain", NULL );
 
+/* Epoch. */
+/* ------ */
+/* Interpret this as Besselian or Julian depending on its value. */
+         new->epoch = astReadDouble( channel, "epoch", AST__BAD );
+         if ( TestEpoch( new ) ) {
+            SetEpoch( new, ( new->epoch < 1984.0 ) ? slaEpb2d( new->epoch ) :
+                                                     slaEpj2d( new->epoch ) );
+         }
+
 /* Digits. */
 /* ------- */
 /* This is the value that applies to the Frame as a whole. */
@@ -8301,6 +10202,57 @@ AstFrame *astLoadFrame_( void *mem, size_t size, int init,
 /* --------- */
          new->match_end = astReadInt( channel, "mchend", -INT_MAX );
          if ( TestMatchEnd( new ) ) SetMatchEnd( new, new->match_end );
+
+/* ActiveUnit. */
+/* ----------- */
+         new->active_unit = astReadInt( channel, "actunt", -INT_MAX );
+         if ( TestActiveUnit( new ) ) SetActiveUnit( new, new->active_unit );
+
+/* System. */
+/* ------- */
+/* Set the default and read the external representation as a string. */
+         new->system = AST__BADSYSTEM;
+         sval = astReadString( channel, "system", NULL );
+
+/* If a value was read, convert from a string to a System code. */
+         if ( sval ) {
+            if ( astOK ) {
+               new->system = astSystemCode( new, sval );
+
+/* Report an error if the value wasn't recognised. */
+               if ( new->system == AST__BADSYSTEM ) {
+                  astError( AST__ATTIN,
+                            "astRead(%s): Invalid System description "
+                            "\"%s\".", astGetClass( channel ), sval );
+               }
+            }
+
+/* Free the string value. */
+            sval = astFree( sval );
+         }
+
+/* AlignSystem. */
+/* ------------ */
+/* Set the default and read the external representation as a string. */
+         new->alignsystem = AST__BADSYSTEM;
+         sval = astReadString( channel, "alsys", NULL );
+
+/* If a value was read, convert from a string to a System code. */
+         if ( sval ) {
+            if ( astOK ) {
+               new->alignsystem = astSystemCode( new, sval );
+
+/* Report an error if the value wasn't recognised. */
+               if ( new->alignsystem == AST__BADSYSTEM ) {
+                  astError( AST__ATTIN,
+                            "astRead(%s): Invalid AlignSystem description "
+                            "\"%s\".", astGetClass( channel ), sval );
+               }
+            }
+
+/* Free the string value. */
+            sval = astFree( sval );
+         }
       }
 
 /* If an error occurred, clean up by deleting the new Frame. */
@@ -8348,6 +10300,18 @@ double astAngle_( AstFrame *this, const double a[], const double b[],
                   const double c[] ) {
    if ( !astOK ) return AST__BAD;
    return (**astMEMBER(this,Frame,Angle))( this, a, b, c );
+}
+int astGetActiveUnit_( AstFrame *this ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,GetActiveUnit))( this );
+}
+int astTestActiveUnit_( AstFrame *this ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,TestActiveUnit))( this );
+}
+void astSetActiveUnit_( AstFrame *this, int value ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,SetActiveUnit))( this, value );
 }
 double astDistance_( AstFrame *this,
                      const double point1[], const double point2[] ) {
@@ -8443,6 +10407,14 @@ void astSetAxis_( AstFrame *this, int axis, AstAxis *newaxis ) {
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,SetAxis))( this, axis, newaxis );
 }
+void astSetUnit_( AstFrame *this, int axis, const char *value ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,SetUnit))( this, axis, value );
+}
+void astClearUnit_( AstFrame *this, int axis ) {
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,ClearUnit))( this, axis );
+}
 int astSubFrame_( AstFrame *target, AstFrame *template, int result_naxes,
                   const int *target_axes, const int *template_axes,
                   AstMapping **map, AstFrame **result ) {
@@ -8465,6 +10437,18 @@ void astValidateAxisSelection_( AstFrame *this, int naxes, const int *axes,
    if ( !astOK ) return;
    (**astMEMBER(this,Frame,ValidateAxisSelection))( this, naxes, axes,
                                                     method );
+}
+AstSystemType astValidateSystem_( AstFrame *this, AstSystemType system, const char *method ) {
+   if ( !astOK ) return AST__BADSYSTEM;
+   return (**astMEMBER(this,Frame,ValidateSystem))( this, system, method );
+}
+AstSystemType astSystemCode_( AstFrame *this, const char *system ) {
+   if ( !astOK ) return AST__BADSYSTEM;
+   return (**astMEMBER(this,Frame,SystemCode))( this, system );
+}
+const char *astSystemString_( AstFrame *this, AstSystemType system ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Frame,SystemString))( this, system );
 }
 
 /* Special public interface functions. */

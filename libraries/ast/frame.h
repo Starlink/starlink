@@ -37,6 +37,9 @@
 *        Frame axes.
 
 *  New Attributes Defined:
+*     AlignSystem (string)
+*        This attribute takes a value to identify the coordinate system
+*        in which the Frame should be aligned with other Frames.
 *     Digits [or Digits(axis)] (integer)
 *        Specifies how many digits of precision are required by
 *        default when a coordinate value for a Frame is formatted
@@ -60,6 +63,10 @@
 *        should be reversed (as would often be done for an
 *        astronomical magnitude or a right ascension axis, for
 *        example).
+*     Epoch (double)
+*        This value is used to qualify coordinate systems by
+*        giving the moment in time when the coordinates are known to
+*        be correct. Often, this will be the date of observation.
 *     Format(axis) (string)
 *        Specifies the format to be used to display coordinate values
 *        for each Frame axis (i.e. to convert them from binary to
@@ -175,6 +182,9 @@
 *        if necessary so that the final string does not exceed 15
 *        characters). If no Domain value has been set, "x" is used as
 *        the <Domain> value in constructing this default string.
+*     System (string)
+*        This attribute takes a value to identify the coordinate system
+*        used to describe positions within the domain of the Frame.
 *     Title (string)
 *        Specifies a string to be used as a title on (e.g.) graphs to
 *        describe the coordinate system which the Frame
@@ -270,6 +280,8 @@
 *           Clear the PreserveAxes attribute for a Frame.
 *        astClearSymbol
 *           Clear the Symbol attribute for a Frame axis.
+*        astClearSystem
+*           Clear the value of the System attribute for a Frame.
 *        astClearTitle
 *           Clear the Title attribute for a Frame.
 *        astClearUnit
@@ -306,6 +318,8 @@
 *           Get the value of the PreserveAxes attribute for a Frame.
 *        astGetSymbol
 *           Get a pointer to the Symbol attribute for a Frame axis.
+*        astGetSystem
+*           Get the value of the System attribute for a Frame.
 *        astGetTitle
 *           Get a pointer to the Title attribute for a Frame.
 *        astGetUnit
@@ -340,6 +354,8 @@
 *           Set the value of the PreserveAxes attribute for a Frame.
 *        astSetSymbol
 *           Set the value of the Symbol attribute for a Frame axis.
+*        astSetSystem
+*           Set the value of the System attribute for a Frame.
 *        astSetTitle
 *           Set the value of the Title attribute for a Frame.
 *        astSetUnit
@@ -379,6 +395,9 @@
 *        astTestSymbol
 *           Test whether a value has been set for the Symbol attribute of a
 *           Frame axis.
+*        astTestSystem
+*           Test whether a value has been set for the System attribute of a
+*           Frame.
 *        astTestTitle
 *           Test whether a value has been set for the Title attribute of a
 *           Frame.
@@ -389,6 +408,12 @@
 *           Validate and permute a Frame's axis index.
 *        astValidateAxisSelection
 *           Check that a set of axes selected from a Frame is valid.
+*        astValidateSystem
+*           Validate a Frame's System attribute.
+*        astSystemString
+*           Return a string representation of a System code.
+*        astSystemCode
+*           Return a code for a string representation of a System value
 
 *  Other Class Functions:
 *     Public:
@@ -402,11 +427,18 @@
 *           Validate class membership.
 *        astInitFrame
 *           Initialise a Frame.
+*        astInitFrameVtab
+*           Initialise the virtual function table for the Frame class.
 *        astLoadFrame
 *           Load a Frame.
 
 *  Macros:
-*     None.
+*     Public:
+*        None.
+
+*     Protected:
+*        AST__BADSYSTEM
+*           A "bad" (undefined) value for the System attribute.
 
 *  Type Definitions:
 *     Public:
@@ -416,6 +448,8 @@
 *     Protected:
 *        AstFrameVtab
 *           Frame virtual function table type.
+*        AstSystemType
+*           Enumerated type used for the System attribute.
 
 *  Feature Test Macros:
 *     astCLASS
@@ -453,6 +487,11 @@
 *        Added astBear.
 *     21-SEP-2001 (DSB):
 *        Replace astBear with astAxAngle.
+*     15-NOV-2002 (DSB):
+*        Moved System and Epoch attributes from SkyFrame into this class.
+*        Added AlignSystem attribute.
+*     8-JAN-2003 (DSB):
+*        Added protected astInitFrameVtab method.
 *-
 */
 
@@ -472,8 +511,23 @@
 /* --------------- */
 #include <stddef.h>
 
+/* Macros. */
+/* ------- */
+#if defined(astCLASS)            /* Protected */
+
+/* A bad value for the System attribute. */
+#define AST__BADSYSTEM -1
+
+/* The legal System values recognized by this class of Frame. */
+#define AST__CART 0
+
+#endif
+
 /* Type Definitions. */
 /* ================= */
+/* Integer type used to store the System attribute values. */
+typedef int AstSystemType;
+
 /* Frame structure. */
 /* ------------------- */
 /* This structure contains all information that is unique to each object in
@@ -487,14 +541,18 @@ typedef struct AstFrame {
    AstAxis **axis;               /* Pointer to array of Axis objects */
    char *domain;                 /* Pointer to Domain string */
    char *title;                  /* Pointer to Title string */
+   double epoch;                 /* Epoch as Modified Julian Date */
    int *perm;                    /* Pointer to axis permutation array */
    int digits;                   /* Default digits of precision */
    int match_end;                /* Match final axes of target? */
+   int active_unit;              /* Use Unit when aligning Frames? */
    int max_axes;                 /* Minimum no. axes matched */
    int min_axes;                 /* Max. no. axes matched */
    int naxes;                    /* Number of axes */
    int permute;                  /* Permute axes in order to match? */
    int preserve_axes;            /* Preserve target axes? */
+   AstSystemType system;         /* Code identifying coordinate system */
+   AstSystemType alignsystem;    /* Code for Alignment coordinate system */
 } AstFrame;
 
 /* Virtual function table. */
@@ -558,6 +616,9 @@ typedef struct AstFrameVtab {
    int (* TestUnit)( AstFrame *, int );
    int (* Unformat)( AstFrame *, int, const char *, double * );
    int (* ValidateAxis)( AstFrame *, int, const char * );
+   AstSystemType (* ValidateSystem)( AstFrame *, AstSystemType, const char * );
+   AstSystemType (* SystemCode)( AstFrame *, const char * );
+   const char *(* SystemString)( AstFrame *, AstSystemType );
    struct AstFrameSet *(* Convert)( AstFrame *, AstFrame *, const char * );
    struct AstFrameSet *(* ConvertX)( AstFrame *, AstFrame *, const char * );
    struct AstFrameSet *(* FindFrame)( AstFrame *, AstFrame *, const char * );
@@ -610,6 +671,25 @@ typedef struct AstFrameVtab {
    void (* ClearBottom)( AstFrame *, int );
    void (* SetBottom)( AstFrame *, int, double );
 
+   AstSystemType (* GetSystem)( AstFrame * );
+   int (* TestSystem)( AstFrame * );
+   void (* ClearSystem)( AstFrame * );
+   void (* SetSystem)( AstFrame *, AstSystemType );
+
+   AstSystemType (* GetAlignSystem)( AstFrame * );
+   int (* TestAlignSystem)( AstFrame * );
+   void (* ClearAlignSystem)( AstFrame * );
+   void (* SetAlignSystem)( AstFrame *, AstSystemType );
+
+   double (* GetEpoch)( AstFrame * );
+   int (* TestEpoch)( AstFrame * );
+   void (* ClearEpoch)( AstFrame * );
+   void (* SetEpoch)( AstFrame *, double );
+
+   int (* TestActiveUnit)( AstFrame * );
+   int (* GetActiveUnit)( AstFrame * );
+   void (* SetActiveUnit)( AstFrame *, int );
+
 } AstFrameVtab;
 #endif
 
@@ -645,8 +725,11 @@ AstFrame *astFrameId_( int, const char *, ... );
 AstFrame *astInitFrame_( void *, size_t, int, AstFrameVtab *, const char *,
                          int );
 
+/* Vtab initialiser. */
+void astInitFrameVtab_( AstFrameVtab *, const char * );
+
 /* Loader. */
-AstFrame *astLoadFrame_( void *, size_t, int, AstFrameVtab *,
+AstFrame *astLoadFrame_( void *, size_t, AstFrameVtab *,
                          const char *, AstChannel *channel );
 #endif
 
@@ -663,6 +746,8 @@ double astAxAngle_( AstFrame *, const double[2], const double[2], int );
 double astOffset2_( AstFrame *, const double[2], double, double, double[2] );
 void astOffset_( AstFrame *, const double[], const double[], double, double[] );
 void astResolve_( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
+int astGetActiveUnit_( AstFrame * );
+void astSetActiveUnit_( AstFrame *, int );
 
 #if defined(astCLASS)            /* Protected */
 AstFrame *astPickAxes_( AstFrame *, int, const int[], AstMapping ** );
@@ -712,6 +797,9 @@ int astTestSymbol_( AstFrame *, int );
 int astTestTitle_( AstFrame * );
 int astTestUnit_( AstFrame *, int );
 int astValidateAxis_( AstFrame *, int, const char * );
+AstSystemType astValidateSystem_( AstFrame *, AstSystemType, const char * );
+AstSystemType astSystemCode_( AstFrame *, const char * );
+const char *astSystemString_( AstFrame *, AstSystemType );
 void astCheckPerm_( AstFrame *, const int *, const char * );
 void astClearDigits_( AstFrame * );
 void astClearDirection_( AstFrame *, int );
@@ -743,6 +831,8 @@ void astSetSymbol_( AstFrame *, int, const char * );
 void astSetTitle_( AstFrame *, const char * );
 void astSetUnit_( AstFrame *, int, const char * );
 void astValidateAxisSelection_( AstFrame *, int, const int *, const char * );
+double astReadDateTime_( const char * );
+const char *astFmtDecimalYr_( double, int);
 
 double astGetTop_( AstFrame *, int );
 int astTestTop_( AstFrame *, int );
@@ -754,6 +844,22 @@ int astTestBottom_( AstFrame *, int );
 void astClearBottom_( AstFrame *, int );
 void astSetBottom_( AstFrame *, int, double );
 
+AstSystemType astGetSystem_( AstFrame * );
+int astTestSystem_( AstFrame * );
+void astClearSystem_( AstFrame * );
+void astSetSystem_( AstFrame *, AstSystemType );
+
+AstSystemType astGetAlignSystem_( AstFrame * );
+int astTestAlignSystem_( AstFrame * );
+void astClearAlignSystem_( AstFrame * );
+void astSetAlignSystem_( AstFrame *, AstSystemType );
+
+double astGetEpoch_( AstFrame * );
+int astTestEpoch_( AstFrame * );
+void astClearEpoch_( AstFrame * );
+void astSetEpoch_( AstFrame *, double );
+
+int astTestActiveUnit_( AstFrame * );
 #endif
 
 /* Function interfaces. */
@@ -787,9 +893,11 @@ void astSetBottom_( AstFrame *, int, double );
 #define astInitFrame(mem,size,init,vtab,name,naxes) \
 astINVOKE(O,astInitFrame_(mem,size,init,vtab,name,naxes))
 
+/* Vtab Initialiser. */
+#define astInitFrameVtab(vtab,name) astINVOKE(V,astInitFrameVtab_(vtab,name))
 /* Loader. */
-#define astLoadFrame(mem,size,init,vtab,name,channel) \
-astINVOKE(O,astLoadFrame_(mem,size,init,vtab,name,astCheckChannel(channel)))
+#define astLoadFrame(mem,size,vtab,name,channel) \
+astINVOKE(O,astLoadFrame_(mem,size,vtab,name,astCheckChannel(channel)))
 #endif
 
 /* Interfaces to public member functions. */
@@ -819,6 +927,10 @@ astINVOKE(V,astAxAngle_(astCheckFrame(this),a,b,axis))
 astINVOKE(V,astOffset2_(astCheckFrame(this),point1,angle,offset,point2))
 #define astResolve(this,point1,point2,point3,point4,d1,d2) \
 astINVOKE(V,astResolve_(astCheckFrame(this),point1,point2,point3,point4,d1,d2))
+#define astGetActiveUnit(this) \
+astINVOKE(V,astGetActiveUnit_(astCheckFrame(this)))
+#define astSetActiveUnit(this,value) \
+astINVOKE(V,astSetActiveUnit_(astCheckFrame(this),value))
 
 #if defined(astCLASS)            /* Protected */
 #define astFormat(this,axis,value) \
@@ -974,6 +1086,16 @@ astINVOKE(V,astValidateAxis_(astCheckFrame(this),axis,method))
 #define astValidateAxisSelection(this,naxes,axes,method) \
 astINVOKE(V,astValidateAxisSelection_(astCheckFrame(this),naxes,axes,method))
 
+#define astFmtDecimalYr astFmtDecimalYr_
+#define astReadDateTime astReadDateTime_
+
+#define astValidateSystem(this,system,method) \
+astINVOKE(V,astValidateSystem_(astCheckFrame(this),system,method))
+#define astSystemString(this,system) \
+astINVOKE(V,astSystemString_(astCheckFrame(this),system))
+#define astSystemCode(this,system) \
+astINVOKE(V,astSystemCode_(astCheckFrame(this),system))
+
 #define astClearTop(this,axis) \
 astINVOKE(V,astClearTop_(astCheckFrame(this),axis))
 #define astGetTop(this,axis) \
@@ -991,6 +1113,36 @@ astINVOKE(V,astGetBottom_(astCheckFrame(this),axis))
 astINVOKE(V,astSetBottom_(astCheckFrame(this),axis,value))
 #define astTestBottom(this,axis) \
 astINVOKE(V,astTestBottom_(astCheckFrame(this),axis))
+
+#define astClearSystem(this) \
+astINVOKE(V,astClearSystem_(astCheckFrame(this)))
+#define astGetSystem(this) \
+astINVOKE(V,astGetSystem_(astCheckFrame(this)))
+#define astSetSystem(this,value) \
+astINVOKE(V,astSetSystem_(astCheckFrame(this),value))
+#define astTestSystem(this) \
+astINVOKE(V,astTestSystem_(astCheckFrame(this)))
+
+#define astClearAlignSystem(this) \
+astINVOKE(V,astClearAlignSystem_(astCheckFrame(this)))
+#define astGetAlignSystem(this) \
+astINVOKE(V,astGetAlignSystem_(astCheckFrame(this)))
+#define astSetAlignSystem(this,value) \
+astINVOKE(V,astSetAlignSystem_(astCheckFrame(this),value))
+#define astTestAlignSystem(this) \
+astINVOKE(V,astTestAlignSystem_(astCheckFrame(this)))
+
+#define astClearEpoch(this) \
+astINVOKE(V,astClearEpoch_(astCheckFrame(this)))
+#define astGetEpoch(this) \
+astINVOKE(V,astGetEpoch_(astCheckFrame(this)))
+#define astSetEpoch(this,value) \
+astINVOKE(V,astSetEpoch_(astCheckFrame(this),value))
+#define astTestEpoch(this) \
+astINVOKE(V,astTestEpoch_(astCheckFrame(this)))
+
+#define astTestActiveUnit(this) \
+astINVOKE(V,astTestActiveUnit_(astCheckFrame(this)))
 
 #endif
 #endif
