@@ -69,6 +69,9 @@
 *     $Id$
 *     18-JUN-1996: Original version.
 *     $Log$
+*     Revision 1.11  1997/07/03 19:05:40  timj
+*     Propogate axes to output
+*
 *     Revision 1.10  1997/06/12 23:49:12  timj
 *     Doc updates
 *     Use SURF_PAR and change name
@@ -382,7 +385,7 @@ c
 
 *  OK, propagate the input ndf to the output
 
-      CALL NDF_PROP (IN_NDF, 'DATA,QUALITY,VARIANCE', 'OUT',
+      CALL NDF_PROP (IN_NDF, 'Units,Axis,DATA,QUALITY,VARIANCE', 'OUT',
      :  OUT_NDF, STATUS)
 
 *  map the output data arrays (map QUALITY first so that it doesnt
@@ -411,6 +414,10 @@ c
      :     BOL_CHAN, BOL_ADC, SCUBA__NUM_CHAN, SCUBA__NUM_ADC, 
      :     BOL_CALB, BOL_QUAL, STATUS)
       END IF
+
+*  Add a title
+
+      CALL NDF_CPUT('Flatfielded', OUT_NDF, 'LAB', STATUS)
 
 *  annul locators and array identifiers and close the file
 
