@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libwork.la
+noinst_LTLIBRARIES = libwork.la
 
 libwork_la_SOURCES = \
         $(PRIVATE_INCLUDES) \

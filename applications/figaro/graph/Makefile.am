@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libgraph.la
+noinst_LTLIBRARIES = libgraph.la
 
 libgraph_la_SOURCES = \
      $(PRIVATE_INCLUDES) \

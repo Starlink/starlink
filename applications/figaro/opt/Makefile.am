@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libopt.la
+noinst_LTLIBRARIES = libopt.la
 
 libopt_la_SOURCES = \
      $(C_ROUTINES) \

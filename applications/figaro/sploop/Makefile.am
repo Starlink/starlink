@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libsploop.la
+noinst_LTLIBRARIES = libsploop.la
 
 libsploop_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \

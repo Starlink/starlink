@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libtio.la
+noinst_LTLIBRARIES = libtio.la
 
 libtio_la_SOURCES = \
 	$(F_ROUTINES)

@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libutil.la
+noinst_LTLIBRARIES = libutil.la
 
 libutil_la_SOURCES = $(F_ROUTINES)
 

@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libfibre.la
+noinst_LTLIBRARIES = libfibre.la
 
 libfibre_la_SOURCES = \
      $(F_ROUTINES) 

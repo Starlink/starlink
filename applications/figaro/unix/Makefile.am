@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libunix.la
+noinst_LTLIBRARIES = libunix.la
 
 libunix_la_SOURCES = $(C_ROUTINES) $(F_ROUTINES) 
 

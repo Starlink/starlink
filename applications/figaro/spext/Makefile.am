@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libspext.la
+noinst_LTLIBRARIES = libspext.la
 
 libspext_la_SOURCES = \
 	$(F_ROUTINES)

@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libfit.la
+noinst_LTLIBRARIES = libfit.la
 
 libfit_la_SOURCES = \
      $(PRIVATE_INCLUDES) \

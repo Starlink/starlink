@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libgkd.la
+noinst_LTLIBRARIES = libgkd.la
 
 libgkd_la_SOURCES = $(F_ROUTINES) 
 

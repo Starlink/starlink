@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libfigpar.la
+noinst_LTLIBRARIES = libfigpar.la
 
 libfigpar_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \

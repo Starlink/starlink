@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libfla.la
+noinst_LTLIBRARIES = libfla.la
 
 libfla_la_SOURCES = $(F_ROUTINES) 
 

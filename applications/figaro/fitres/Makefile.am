@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libfitres.la
+noinst_LTLIBRARIES = libfitres.la
 
 libfitres_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \

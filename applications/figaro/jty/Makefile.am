@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-lib_LTLIBRARIES = libjty.la
+noinst_LTLIBRARIES = libjty.la
 
 libjty_la_SOURCES = \
 	$(PRIVATE_INCLUDES) \

@@ -3,7 +3,7 @@
 # Use common set of include files.
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libmain.la
+noinst_LTLIBRARIES = libmain.la
 
 libmain_la_SOURCES = \
      $(F_ROUTINES) 

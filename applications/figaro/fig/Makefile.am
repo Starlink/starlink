@@ -2,9 +2,9 @@
 
 AM_FCFLAGS = -I../include
 
-lib_LTLIBRARIES = libfig.la
+noinst_LTLIBRARIES = libfig.la
 
-libfig_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) 
+libfig_la_SOURCES = $(F_ROUTINES) $(FPP_ROUTINES) $(APPSTL_ROUTINES)
 
 F_ROUTINES = \
 fig_2nd_low.f fig_abrows.f fig_bfft.f fig_c06chk.f fig_c06tst.f \
@@ -22,5 +22,10 @@ fig_shift.f fig_tf_head.f fig_tform.f fig_tformd.f fig_vertical.f \
 fig_verticalq.f fig_wavest.f fig_wavset.f fig_wcheck.f fig_wfill.f \
 fig_wfilld.f fig_wxyfit.f fig_xfit.f fig_xtract.f fig_xvalue.f \
 fig_xyfit.f fig_ytract.f fig_zaprays.f fig_zaprow.f
+
+# These used to be in the APPSTL library
+APPSTL_ROUTINES = fig_hdsdig.f fig_gvrdod.f fig_gvrdor.f \
+fig_qlbadd.f fig_qlbadr.f
+
 
 FPP_ROUTINES = fig_dfits.fpp
