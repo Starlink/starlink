@@ -21,11 +21,11 @@ Figure 15.3: The Graphics Window Manager Print Dialogue Box</CENTER>
  <dt><strong>Description: </strong> 
   <dd> Prints the display surface
  <dt><strong>Script(s): </strong> 
-  <dd> gwm_printDialog
+  <dd> printDialog
  <dt><strong>Dialogue Box Parameter(s): </strong> 
-  <dd> Format - radiobuttons tailoring the output format.
-  <dd> Background Colour - radiobuttons tailoring the output colour.
-  <dd> Filename - entry widget for filename to contain output. 
+  <dd> Output Format - radiobuttons tailoring the output format.
+  <dd> Background - radiobuttons tailoring the output colour.
+  <dd> Output Options - radiobuttons tailoring the output destination.
  <dt><strong>Mouse Button(s): </strong> 
   <dd> MB1 - Unused
   <dd> MB2 - Unused
@@ -33,6 +33,8 @@ Figure 15.3: The Graphics Window Manager Print Dialogue Box</CENTER>
  <dt><strong>Note(s): </strong>
   <dd> The GWM widget does not support dynamic defaults.
   <dd> The mouse buttons may be re-mapped by the application(s).
+  <dd> If output device is `printer', a filename must also be specified
+       before spooling.
 </dir>
 <!-- END
 <P><HR><P>
