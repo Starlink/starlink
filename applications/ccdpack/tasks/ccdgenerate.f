@@ -404,14 +404,14 @@
       IF ( CNTNR ) THEN
          CALL HDS_NEW( BASDAT, 'DATA', 'NDF_CONTAINER', 0, 0, LOCDAT,
      :                 STATUS )
-         BASDAT = 'D'
+         BASDAT = 'I'
          IF ( .NOT. REDUCE ) THEN
-            CALL HDS_NEW( BASFF, 'FF', 'NDF_CONTAINER', 0, 0, LOCFF,
-     :                    STATUS )
-            BASFF = 'F'
             CALL HDS_NEW( BASBIA, 'BIAS', 'NDF_CONTAINER', 0, 0, LOCBIA,
      :                    STATUS )
-            BASBIA = 'B'
+            BASBIA = 'I'
+            CALL HDS_NEW( BASFF, 'FF', 'NDF_CONTAINER', 0, 0, LOCFF,
+     :                    STATUS )
+            BASFF = 'I'
          END IF
       END IF
 
