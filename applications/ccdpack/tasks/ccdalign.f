@@ -130,13 +130,8 @@
 *
 *        CCDALIGN will only work on PseudoColor X displays; this means
 *        that it cannot be used on the displays of most newer Linux 
-*        machines as normally configured.  If an attempt is made to
-*        do so, then the warning:
-*
-*           !! Window has unsupported visual type
-*
-*        will be emitted; attempting to proceed may result in a core
-*        dump.
+*        machines as normally configured.  Attempting to do so may 
+*        result in a core dump.
 
 *  Behaviour of parameters:
 *     All parameters retain their current value as default. The
@@ -176,6 +171,11 @@
 *     19-MAY-2000 (MBT):
 *        Added a call to IDI_ASSOC to ensure that no attempt is made to
 *        use an unsupported visual.
+*     25-AUG-2000 (MBT):
+*        Removed the above IDI_ASSOC call since it causes obscure
+*        problems on alpha_osf1 and sun4_solaris.
+*        Also replaced some code which used CCD1_SETPA to call CCDNDFAC
+*        by code using SLV_OBEYW instead.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -304,15 +304,21 @@
      :     '  An interactive aid for aligning groups of NDFs.', STATUS )
       CALL CCD1_MSG( ' ', ' ', STATUS )
 
-*  Get the display device, and do a dummy open of IDI using this device.
-*  This is a hack to enable IDI to spot whether we are running on an
-*  unsupported visual.
+*  Get the display device.
       CALL MSG_BLANK( STATUS )
       CALL MSG_OUT( ' ',
      :     '  Give the name of an image display device', STATUS )
       CALL MSG_BLANK( STATUS )
-      CALL IDI_ASSOC( 'DEVICE', 'READ', DEVID, STATUS )
-      CALL IDI_ANNUL( DEVID, STATUS )
+
+*  The following dummy open of IDI using the given device is intended
+*  to force IDI to complain if we are running on an unsupported visual.
+*  However, it seems to cause obscure problems on Sun and Alpha 
+*  platforms, so I've removed it.  Since this task is close to being
+*  retired, I don't want to spend a lot of time fathoming what's up
+*  to make what is essentially a cosmetic fix.
+c     CALL IDI_ASSOC( 'DEVICE', 'READ', DEVID, STATUS )
+c     CALL IDI_ANNUL( DEVID, STATUS )
+
       CALL PAR_GET0C( 'DEVICE', DEVICE, STATUS )
       CMD = 'DEVICE='//DEVICE
       CALL SLV_OBEYW( KAPVIE, 'idset', CMD, ' ', STATUS )
@@ -363,16 +369,16 @@
             CMD = 'rm '//NAMLST
             CALL CCD1_EXEC( CMD, STATUS )
          END IF
-C         CMD = 'namelist='//NAMLST//' '//
-C     :         'echo=true '//
-C     :         'maxndf=100 reset prompt'
-C         CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
-         CALL CCD1_SETPA( 'NAMELIST', NAMLST, STATUS )
-         CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
-         CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
-         CALL CCDNDFAC( STATUS )
-         CALL PAR_CANCL( 'IN', STATUS )
-         CALL PAR_CANCL( 'NAMELIST', STATUS )
+         CMD = 'namelist='//NAMLST//' '//
+     :         'echo=true '//
+     :         'maxndf=100 reset prompt'
+         CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
+c        CALL CCD1_SETPA( 'NAMELIST', NAMLST, STATUS )
+c        CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
+c        CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
+c        CALL CCDNDFAC( STATUS )
+c        CALL PAR_CANCL( 'IN', STATUS )
+c        CALL PAR_CANCL( 'NAMELIST', STATUS )
          IF ( STATUS .EQ. SAI__OK ) THEN
 
 *  See if the file was created. If so we have some more NDFs and
@@ -412,16 +418,16 @@ C         CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
       IF ( EXISTS ) THEN
          CALL CCD1_EXEC( 'rm ccdalign_ref.list', STATUS )
       END IF
-C      CMD = 'namelist=ccdalign_ref.list '//
-C     :      'echo=true '//
-C     :      'maxndf=100 reset'
-C      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
-      CALL CCD1_SETPA( 'NAMELIST', 'ccdalign_ref.list', STATUS )
-      CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
-      CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
-      CALL CCDNDFAC( STATUS )
-      CALL PAR_CANCL( 'IN', STATUS )
-      CALL PAR_CANCL( 'NAMELIST', STATUS )
+      CMD = 'namelist=ccdalign_ref.list '//
+     :      'echo=true '//
+     :      'maxndf=100 reset'
+      CALL SLV_OBEYW( CCDRES, 'ccdndfac', CMD, 'IN<IN', STATUS )
+c     CALL CCD1_SETPA( 'NAMELIST', 'ccdalign_ref.list', STATUS )
+c     CALL CCD1_SETPA( 'ECHO', 'TRUE', STATUS )
+c     CALL CCD1_SETPA( 'MAXNDF', '100', STATUS )
+c     CALL CCDNDFAC( STATUS )
+c     CALL PAR_CANCL( 'IN', STATUS )
+c     CALL PAR_CANCL( 'NAMELIST', STATUS )
       IF ( STATUS .NE. SAI__OK ) GO TO 99
       INQUIRE( FILE = 'ccdalign_ref.list', EXIST = EXISTS )
       IF ( EXISTS ) THEN
