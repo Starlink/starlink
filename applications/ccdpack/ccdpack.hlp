@@ -238,6 +238,11 @@
 
      - REGISTER: output to screen has changed slightly for readability.
 
+2 CCDPACK_release_v3.0-1
+
+  Changes between v3.0-0b and v3.0-1 comprise only non-user-visible
+  code modifications and minor documentation bugfixes.
+
 1 ASTEXP
 Exports coordinate system information from images to an AST file
 

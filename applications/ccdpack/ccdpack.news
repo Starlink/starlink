@@ -1,6 +1,6 @@
-1 CCDPACK_major_update
+1 CCDPACK_major_update_v3.0-0b
 
-  This is a major update to CCDPACK.
+  This version, is a major update to CCDPACK.
 
   * CCDPACK has been revised to be aware of, and use, the World Coordinate
     System (WCS) components of NDFs - see SUN/95 and SUN/210.  This has 
@@ -79,4 +79,9 @@
 
      - REGISTER: output to screen has changed slightly for readability.
 
+
+2 CCDPACK_release_v3.0-1
+
+  Changes between v3.0-0b and v3.0-1 comprise only non-user-visible
+  code modifications and minor documentation bugfixes.
 
