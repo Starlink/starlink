@@ -277,7 +277,8 @@
           CALL ADI_CPUT0I( FID, '.NHDU', NHDU, STATUS )
           CALL ADI_CPUT0I( ID, '.IHDU', NHDU, STATUS )
           CALL CHR_ITOC( NHDU, STR, NDIG )
-          CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), LHDU(:HLEN), STATUS )
+          CALL ADI_CPUT0C( FID, '.HDU_'//STR(:NDIG), LHDU(:HLEN),
+     :                     STATUS )
 
 *      Mark HDU data area as undefined
           CALL ADI_CPUT0L( ID, '.CREATED', .FALSE., STATUS )
