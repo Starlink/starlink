@@ -104,9 +104,9 @@
 *  Local Variables:
       CHARACTER*200		FILE, PATH		! HDS trace info
 
+      INTEGER			FSTAT			! I/o status code
       INTEGER			IHDU			! HDU number
       INTEGER			LUN			! Logical unit number
-      INTEGER			NLEV			! Levels of structure
 *.
 
 *  Check inherited global status.
@@ -116,7 +116,7 @@
       CALL ADI2_GETLUN( ARGS(1), LUN, STATUS )
 
 *  Filename from logical unit
-      INQUIRE( UNIT=LUN, FILENAME=FILE, IOSTAT=FSTAT )
+      INQUIRE( UNIT=LUN, FULLNAME=FILE, IOSTAT=FSTAT )
 
 *  Report error if that failed
       IF ( FSTAT .NE. 0 ) THEN
