@@ -52,7 +52,7 @@ PRIVATE_INCLUDES = helpic comic
 
 #  Rule for building the demonstration library.
 demo.shl: demo.hlp crehlp
-	$(LINK) demo.hlp fort.1
+	$(LN_S) demo.hlp fort.1
 	./crehlp
 	rm fort.1
 	mv fort.2 demo.shl
