@@ -101,11 +101,15 @@
 *     $Id$
 *     16-JUL-1995: Original version.
 *     $Log$
-*     Revision 1.12  1996/10/30 00:30:41  timj
-*     Added GLOBAL default for IN parameter.
-*     Fixed bug (segmentation fault) when error occurs before NDF_STATE.
-*     Replace calls to SCULIB_COPY? with VEC_?TO?
+*     Revision 1.13  1996/11/01 00:19:49  timj
+*     Add default for OUT_OBJECT.
+*     Add RD to IRAS90 output and pass current EPOCH to FITS header.
 *
+c Revision 1.12  1996/10/30  00:30:41  timj
+c Added GLOBAL default for IN parameter.
+c Fixed bug (segmentation fault) when error occurs before NDF_STATE.
+c Replace calls to SCULIB_COPY? with VEC_?TO?
+c
 *  endhistory
 
 *  Bugs:
@@ -186,6 +190,7 @@
       CHARACTER*10     CTYPE2          ! Coordinate type of output FITS
       INTEGER          DATA_OFFSET     ! offset within data array
       CHARACTER*12     DATEOBS         ! Date of map obs
+      INTEGER          DAYMON(12)      ! Days in each month
       REAL             DEC_START       ! Dec offset of scan start (arcsec)
       REAL             DEC_VEL         ! Dec velocity of scan (arcsec/sec)
       INTEGER          DIM (MAX_DIM)   ! array dimensions
@@ -321,6 +326,7 @@
       INTEGER          MEASUREMENT     ! measurement index in DO loop
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
                                        ! measured positions are calculated
+      INTEGER          NDAYS           ! Number of days in year
       INTEGER          NDIM            ! the number of dimensions in an array
       INTEGER          NERR            ! Number of errors from VEC_
       INTEGER          NP              ! size of P array in call to IRA_CREAT
@@ -391,6 +397,7 @@
       INTEGER          REGRID1_END     ! pointer to end of REGRID1_PTR space
       INTEGER          REGRID1_PTR     ! pointer to scratch array used by
                                        ! SCULIB_BESSEL_REGRID_1
+      REAL             RDEPOCH         ! Epoch of observation
       REAL             RTEMP           ! scratch real
       INTEGER          RUN_NUMBER      ! run number of input file
       CHARACTER*15     SAMPLE_COORDS   ! coordinate system of sample offsets
@@ -408,6 +415,7 @@
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
       CHARACTER*1      SIGN            ! + or -
+      CHARACTER*40     SOBJECT         ! name of first object
       LOGICAL          STATE           ! Is an NDF component there or not
       CHARACTER*80     STEMP           ! scratch string
       CHARACTER*15     SUB_INSTRUMENT  ! the sub-instrument used to make the
@@ -435,6 +443,9 @@
                                        ! Weighting function
       CHARACTER* 20    XLAB            ! X label for output map
       CHARACTER* 20    YLAB            ! Y label for output map
+
+* Local data
+      DATA DAYMON/31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31/
       
 * Some extra which wont be in the final release...
       REAL T0, T1
@@ -818,6 +829,15 @@
 
             IF (FILE .EQ. 1) THEN
                MJD_STANDARD = IN_UT1 
+               SOBJECT = OBJECT        ! Store first object name
+
+* Work out the epoch of RD maps
+               DO I = 1, IM - 1
+                  NDAYS = NDAYS + DAYMON(I)
+               END DO
+               NDAYS = NDAYS + ID
+               RDEPOCH = REAL(IY) + (REAL(NDAYS)/365.0)! This is roughly correct
+
             END IF
 
 *  search for pointing correction structure in the REDS extension, if there
@@ -1627,6 +1647,7 @@
 
 *  get a title for the output map
 
+      CALL PAR_DEF0C ('OUT_OBJECT', SOBJECT, STATUS)
       CALL PAR_GET0C ('OUT_OBJECT', OBJECT, STATUS)
 
 *  get the output coordinate system and set the default centre of the
@@ -1957,7 +1978,16 @@
          RADECSYS  = 'FK5'
          CTYPE1 = 'RA---TAN'
          CTYPE2 = 'DEC--TAN'
-      ELSE IF (OUT_COORDS .EQ. 'EQ') THEN
+      ELSE IF (OUT_COORDS .EQ. 'RD') THEN
+         SCS = 'EQUATORIAL(J'
+         CALL CHR_RTOC(RDEPOCH, STEMP, ITEMP)
+         CALL CHR_APPND(STEMP, SCS, CHR_LEN(SCS))
+         CALL CHR_APPND(')', SCS, CHR_LEN(SCS))
+         OUT_EPOCH = RDEPOCH
+         RADECSYS  = 'FK5'
+         CTYPE1 = 'RA---TAN'
+         CTYPE2 = 'DEC--TAN'
+      ELSE IF (OUT_COORDS .EQ. 'EQ') THEN   ! We dont use EQ...
          SCS = 'ECLIPTIC(2000.0)'
          OUT_EPOCH = 2000.D0
          RADECSYS  = 'GAPPT'
