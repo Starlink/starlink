@@ -156,7 +156,9 @@ to be C<../dates> rather than C<../../dates>.
 
 The following functions are available:
 
-=head2 starversion
+=over 4
+
+=item B<starversion>
 
 Given a Starlink application name returns the major, minor and
 patchlevel version numbers.
@@ -183,7 +185,7 @@ sub starversion {
   }
 }
 
-=head2 starversion_string
+=item B<starversion_string>
 
 Returns the version string rather than the individual components.
 
@@ -200,7 +202,7 @@ sub starversion_string {
 }
 
 
-=head2 starversion_major
+=item B<starversion_major>
 
 Returns the major version number. Returns C<undef> if a version
 can not be determined.
@@ -214,7 +216,7 @@ sub starversion_major {
   return $version{ MAJOR };
 }
 
-=head2 starversion_minor
+=item B<starversion_minor>
 
 Returns the minor version number. Returns C<undef> if a version
 can not be determined.
@@ -228,7 +230,7 @@ sub starversion_minor {
   return $version{ MINOR };
 }
 
-=head2 starversion_patchlevel
+=item B<starversion_patchlevel>
 
 Returns the patchlevel number. Returns C<undef> if a version
 can not be determined.
@@ -242,7 +244,7 @@ sub starversion_patchlevel {
   return $version{ PATCHLEVEL };
 }
 
-=head2 starversion_cmp
+=item B<starversion_cmp>
 
 Can be used to compare the version number of a package with a supplied
 version number. Returns -1 if the supplied version is greater than
@@ -276,7 +278,7 @@ sub starversion_cmp ($$) {
   return undef unless defined $cmaj;
 
   # Essentially a switch
-  
+
   # Compare major version
   return -1 if $cmaj > $version{MAJOR};
   return 1 if $cmaj < $version{MAJOR};
@@ -293,7 +295,7 @@ sub starversion_cmp ($$) {
   return 0;
 }
 
-=head2 starversion_lt
+=item B<starversion_lt>
 
 Test whether the version of the installed package is less than 
 a supplied version number. In other words, whether the installed
@@ -322,7 +324,7 @@ sub starversion_lt ($$) {
   return 0;
 }
 
-=head2 starversion_eq
+=item B<starversion_eq>
 
 Test whether the version of the installed package is equal to 
 a supplied version number. In other words, whether the installed
@@ -351,7 +353,7 @@ sub starversion_eq ($$) {
   return 0;
 }
 
-=head2 starversion_gt
+=item B<starversion_gt>
 
 Test whether the version of the installed package is greater than 
 a supplied version number. In other words, whether the installed
@@ -380,6 +382,7 @@ sub starversion_gt ($$) {
   return 0;
 }
 
+=back
 
 =begin __PRIVATE__
 
@@ -388,7 +391,9 @@ sub starversion_gt ($$) {
 This section describes the internal functions. They are 
 not part of the published interface.
 
-=head2 _get_app_dir
+=over 4
+
+=item B<_get_app_dir>
 
 Given a Starlink application name, returns the directory
 where the application resides. 
@@ -412,7 +417,7 @@ sub _get_app_dir ($) {
   return ( exists $ENV{$env} ? $ENV{$env} : undef);
 }
 
-=head2 _get_app_datestamp_dir
+=item B<_get_app_datestamp_dir>
 
 Return the location of the date stamp directory, given a Starlink
 application name.
@@ -444,7 +449,7 @@ sub _get_app_datestamp_dir ($) {
   return undef;
 }
 
-=head2 _get_standard_datestamp_dir
+=item B<_get_standard_datestamp_dir>
 
 Return the standard location of the date stamp directory.
 This will use the location of the actual Starlink system (as 
@@ -463,7 +468,7 @@ sub _get_standard_datestamp_dir () {
 }
 
 
-=head2 _get_datestamp_file
+=item B<_get_datestamp_file>
 
 Return the datestamp file associated with the supplied application
 and directory.
@@ -487,7 +492,7 @@ sub _get_datestamp_file ($$) {
 }
 
 
-=head2 _parse_version_string
+=item B<_parse_version_string>
 
 Given a string of the form C<Vm.n-p> (or C<Vm.n.p>) return the
 major version, minor version and patchlevel.
@@ -519,7 +524,7 @@ sub _parse_version_string ($) {
   }
 }
 
-=head2 _read_datestamp_file
+=item B<_read_datestamp_file>
 
 Given a datestamp file, return the major, minor and pathlevel
 numbers from it.
@@ -556,7 +561,7 @@ sub _read_datestamp_file ($) {
 }
 
 
-=head2 _get_version_from_datestamp
+=item B<_get_version_from_datestamp>
 
 Retrieve a version number from a datestamp file.
 
@@ -588,7 +593,7 @@ sub _get_version_from_datestamp ($$) {
   return &_read_datestamp_file($file);
 }
 
-=head2 _get_version_from_appdir
+=item B<_get_version_from_appdir>
 
 Attempt to retrieve a version number from the C<version.dat>
 file in the application directory.
@@ -621,7 +626,7 @@ sub _get_version_from_appdir ($) {
   return (@version);
 }
 
-=head2 _get_version
+=item B<_get_version>
 
 Retrieve the version number using a variety of techniques.
 
@@ -683,6 +688,8 @@ sub _get_version ($) {
   return (defined $version[0] ? %{ $CACHE{ $app } } : () );
 }
 
+
+=back
 
 =end __PRIVATE__
 
