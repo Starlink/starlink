@@ -51,20 +51,21 @@ esac
 dnl   Do we have (standard) <cname> for C libraries, or just <name.h>?
 AC_MSG_CHECKING(whether compiler has <cname> instead of just <name.h>)
 AC_TRY_COMPILE([#include <cstdio>],,
-  AC_MSG_RESULT(yes),
-  AC_DEFINE(NO_CSTD_INCLUDE) AC_MSG_RESULT(no))
+  AC_DEFINE(HAVE_CSTD_INCLUDE) AC_MSG_RESULT(yes),
+  AC_MSG_RESULT(no))
 
 dnl  AC_CHECK_HEADER(cat/AstroCatalog.h,AC_DEFINE(ENABLE_CAT))
 dnl   Specify (or at least check) the location of the cat library.
 dnl
 dnl   This had better work, since the program depends absolutely on
-dnl   the presence of this library.
+dnl   the presence of this library.  The option --without-cat works,
+dnl   in the sense that support for the library is not compiled in,
+dnl   but the program as a whole doesn't work in that case, so it's
+dnl   pretty pointless.
 dnl
 AC_SUBST(CATOBJ)
 AC_ARG_WITH(cat,
-[  --without-cat      Do not use the skycat library
-  --with-cat[=path]  Use skycat giving optional path to library],
-  echo "withval=$withval"
+[  --with-cat[=path]       Use skycat, giving optional path to library],
   if test "$withval" = "yes"
   then
     AC_CHECK_HEADER(cat/AstroCatalog.h,
@@ -91,4 +92,4 @@ AC_ARG_WITH(cat,
       LIBS="$LIBS -lcat")))
 
 
-AC_OUTPUT(Makefile)
+AC_OUTPUT(Makefile test/Makefile)
