@@ -77,7 +77,8 @@ F_ROUTINES =   cat1_dceqp.f  cat1_tidnt.f  cat5_wrpar.f               \
  cat1_crtel.f  cat1_snkta.f  cat5_staet.f                \
  cat1_crtid.f  cat1_srcta.f  cat5_stcae.f  cat_egt0f.f   \
  cat1_crtsl.f  cat1_stdir.f  cat5_stnul.f  cat_egt0t.f   \
- cat1_cxfmt.f  cat1_tcnvt.f  cat5_wrcol.f  cat_eidnt.f
+ cat1_cxfmt.f  cat1_tcnvt.f  cat5_wrcol.f  cat_eidnt.f \
+ cat1_fioer.f  cat_gcolc.f   cat_gcold.f   cat_gcolr.f
 
 ADAM_F_ROUTINES = cat_assoc.f cat_creat.f cat_exist.f
 

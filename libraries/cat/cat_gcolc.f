@@ -1,7 +1,7 @@
-      SUBROUTINE POL1_GCOLC( CI, GI, FROW, NROW, VALS, STATUS )
+      SUBROUTINE CAT_GCOLC( CI, GI, FROW, NROW, VALS, STATUS )
 *+
 *  Name:
-*     POL1_GCOLC
+*     CAT_GCOLC
 
 *  Purpose:
 *     Read multiple values for a single column from a catalogue.
@@ -10,20 +10,11 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_GCOLC( CI, GI, FROW, NROW, VALS, STATUS )
+*     CALL CAT_GCOLC( CI, GI, FROW, NROW, VALS, STATUS )
 
 *  Description:
 *     This routine reads multiple values for a single column from a 
 *     catalogue. 
-*
-*     Most POLPACK catalogues are in FITS binary table format. However the
-*     current version of the CAT library (7.1) provides facilities only yo
-*     access a single element of a FITS table at a time. This is very
-*     inefficient when reading large tables. For this reason we here use
-*     special code to read FITS tables, rather than using CAT. This code
-*     requires access to CAT common blocks and so is not ideal! This code
-*     should be done away with when CAT provides access to more than one
-*     element at once.
 
 *  Arguments:
 *     CI = INTEGER (Given)
@@ -49,6 +40,9 @@
 *  History:
 *     8-SEP-2000 (DSB):
 *        Original version.
+*     1-JUL-2004 (DSB):
+*        Imported from polpack to avoid the need for polpack to access
+*        CAT internal common blocks.
 *     {enter_changes_here}
 
 *  Bugs:
@@ -122,7 +116,7 @@
 *  warnings.  
          IF ( FSTAT .GT. FITSOK ) THEN
             CALL MSG_SETI( 'I', ICOL )
-            CALL POL1_FIOER( FSTAT, 'POL1_GCOLC_ERR1', 'FTGCVS',
+            CALL CAT_FIOER( FSTAT, 'CAT_GCOLC_ERR1', 'FTGCVS',
      :                       'Error writing the values for column ^I.',
      :                       STATUS )
          END IF
