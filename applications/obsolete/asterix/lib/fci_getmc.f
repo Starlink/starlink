@@ -70,6 +70,9 @@
 *  History:
 *     7 Mar 1996 (DJA):
 *        Original version.
+*    28 May 1998 (ELD):
+*        MCTRL now logical, true for genetic algorithm
+*
 *     {enter_changes_here}
 
 *  Bugs:
@@ -101,6 +104,8 @@
 
       INTEGER			NITMAX			! Max # iterations
       INTEGER			NUP			! Update this often
+
+      LOGICAL                   GENETIC
 *.
 
 *  Check inherited global status.
@@ -110,14 +115,16 @@
       IF ( .NOT. AST_QPKGI( FCI__PKG ) ) CALL FCI0_INIT( STATUS )
 
 *  User is supplying a minimisation control file?
-      CALL USI_ASSOC( 'MCTRL', 'MinimisationControl', 'UPDATE',
-     :                CTRLID, STATUS )
+*      CALL USI_ASSOC( 'MCTRL', 'MinControl', 'UPDATE',
+*     :                CTRLID, STATUS )
+
+      CALL USI_GET0L( 'MCTRL', GENETIC, STATUS )
 
 *  Trap user null response
-      IF ( STATUS .EQ. PAR__NULL ) THEN
+*      IF ( STATUS .EQ. PAR__NULL ) THEN
 
 *    Clear status
-        CALL ERR_ANNUL( STATUS )
+*        CALL ERR_ANNUL( STATUS )
 
 *    Get parameters describing CURFIT control algorithm
         CALL USI_GET0I( 'MAX', NITMAX, STATUS )
@@ -133,9 +140,9 @@
         END IF
 
 *    Create control for CURFIT algorithm
-        CALL FCI_CURFMC( NITMAX, NUP, MINSLO, CTRLID, STATUS )
+        CALL FCI_CURFMC( NITMAX, NUP, MINSLO, GENETIC, CTRLID, STATUS )
 
-      END IF
+*      END IF
 
 *  Report any errors
       IF ( STATUS .NE. SAI__OK ) CALL AST_REXIT( 'FCI_GETMC', STATUS )

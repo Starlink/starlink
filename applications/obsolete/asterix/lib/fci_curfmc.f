@@ -1,4 +1,5 @@
-      SUBROUTINE FCI_CURFMC( NITMAX, NUP, MINSLO, CTRLID, STATUS )
+      SUBROUTINE FCI_CURFMC( NITMAX, NUP, MINSLO, GENETIC,
+     :                                CTRLID, STATUS )
 *+
 *  Name:
 *     FCI_CURFMC
@@ -75,6 +76,8 @@
 *  History:
 *     24 Apr 1996 (DJA):
 *        Original version.
+*     28 May 1998 (ELD):
+*	 Set style to GENALG for genetic fitting
 *     {enter_changes_here}
 
 *  Bugs:
@@ -92,6 +95,7 @@
 *  Arguments Given:
       INTEGER			NITMAX, NUP
       REAL			MINSLO
+      LOGICAL                   GENETIC
 
 *  Arguments Returned:
       INTEGER			CTRLID
@@ -112,6 +116,8 @@
 
 *  Create control for CURFIT algorithm
       CALL ADI_NEW0( 'CurfitControl', CTRLID, STATUS )
+
+      IF (GENETIC) CALL ADI_CPUT0C( CTRLID, 'Style', 'GENALG', STATUS )
 
 *  Write control data
       CALL ADI_CPUT0I( CTRLID, 'MaxIt', NITMAX, STATUS )
