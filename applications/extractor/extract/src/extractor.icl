@@ -40,7 +40,7 @@ defstring extractorhelp help extractor
 {  Now do the same with alternative names.
 {  eg:  define {pkg}_command $EXTRACTOR_DIR/extractor_mon command
 
-define extractor $EXTRACTOR_DIR/extractor
+define extract $EXTRACTOR_DIR/extractor
 
 {
 {  Tell the user that EXTRACTOR commands are now available.

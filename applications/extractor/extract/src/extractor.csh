@@ -64,15 +64,14 @@ setenv EXTRACTOR_HELP INSTALL_HELP/extractor
 #
 #  Locate the installed binaries, scripts etc.
 
-#setenv EXTRACTOR_DIR INSTALL_BIN
-setenv EXTRACTOR_CONFIG INSTALL_BIN/config
+setenv EXTRACTOR_CONFIG $EXTRACTOR_DIR/config
 
 #
 #  Define symbols for the applications and scripts.
 #  ===============================================
 
 # eg:  alias command ${EXTRACTOR_BIN}/command
-alias extract INSTALL_BIN/extractor
+alias extract '$EXTRACTOR_DIR/extractor'
 
 #
 #  Now do the same with alternative names.
