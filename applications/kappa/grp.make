@@ -151,7 +151,7 @@ kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
 kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_zones.f \
 kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f ncropn.f normal.f \
 nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f irg1_wild.c \
-kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f
+kpg1_trmsz.c ctm_xcols.f kpg1_gtcol.f kpg1_asprp.f
 
 # The contents of the kappa_iraf.tar file:
 KAPPA_IRAF = doc fitsexist.cl fitsval.cl fitswrite.cl kappa.cl lutbgyrw.cl \

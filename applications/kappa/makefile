@@ -632,7 +632,7 @@ kpg1_unz2d.f kpg1_unz2r.f \
 kpg1_vasvb.f kpg1_vasvd.f kpg1_vasvi.f kpg1_vasvr.f kpg1_vasvub.f \
 kpg1_vasvuw.f kpg1_vasvw.f kpg1_vec2n.f kpg1_vect.f kpg1_wmodb.f \
 kpg1_wmodd.f kpg1_wmodi.f kpg1_wmodr.f kpg1_wmodub.f kpg1_wmoduw.f \
-kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f \
+kpg1_wmodw.f kpg1_xyd2w.f kpg1_xyzwd.f kpg1_xyzwr.f kpg1_asprp.f \
 kpg1_zones.f kpg1_zopic.f ld2ar.f logarr.f ncraxs.f ncrbck.f \
 ncropn.f normal.f nxtnam.f powarr.f pthlpo.f sread.f zero1d.f zero2d.f
 
@@ -2545,6 +2545,7 @@ kpg1_akerd.o:      SAE_PAR PRM_PAR
 kpg1_akerr.o:      SAE_PAR PRM_PAR
 kpg1_antso.o:      SAE_PAR
 kpg1_arcol.o:      SAE_PAR CHR_ERR
+kpg1_asprp.o:      SAE_PAR AST_PAR NDF_PAR
 kpg1_asref.o:      SAE_PAR DAT_PAR NDF_PAR PAR_PAR
 kpg1_avlut.o:      SAE_PAR
 kpg1_axano.o:      SAE_PAR
