@@ -148,7 +148,7 @@
 
 *  Get files
       CALL USI_ASSOC( 'INP', 'BinDS|Array', 'READ', IFID, STATUS )
-      CALL USI_CREAT( OUT', ADI__NULLID, OFID, STATUS )
+      CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       IF ( STATUS .NE. SAI__OK ) GOTO 99
 
 *  Check data
