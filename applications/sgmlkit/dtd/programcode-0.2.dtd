@@ -204,7 +204,7 @@
 <!element title		- o (#pcdata)>
 <!element description	- o (p+)
 				-- longer discursive description -->
-<!element returnvalue	- o (%para.content;)
+<!element returnvalue	- o (%para.content | p+)
 				-- If there's no return value, there
 				   needn't be any explanatory text -->
 <!element argumentlist	o o (parameter*)>
