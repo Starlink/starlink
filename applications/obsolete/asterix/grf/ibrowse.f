@@ -19,6 +19,7 @@
 *     1 Sep 94 : V1.2-8 Positioning error fixed (RJV)
 *    25 aug 95 : V1.8-0 GUI interface (RJV)
 *    11 Jan 96 : V1.8-1 TSM removed (RJV)
+*     2 May 96 : V2.0-0 GUI interface improved (RJV)
 *    Type Definitions :
       IMPLICIT NONE
 *    Global constants :
@@ -47,7 +48,7 @@
       INCLUDE 'IMG_CMN'
 *    Version :
       CHARACTER*30 VERSION
-      PARAMETER (VERSION='IBROWSE Version 1.8-0')
+      PARAMETER (VERSION='IBROWSE Version 2.0-0')
 *-
 
       CALL MSG_PRNT(VERSION)
@@ -574,7 +575,11 @@
         XSCALE=(XW2-XW1)/(XP2-XP1)
         YSCALE=(YW2-YW1)/(YP2-YP1)
 
-        FLAG=0
+        FLAG=1
+*  wait for signal to start browsing
+        DO WHILE (FLAG.NE.0)
+          CALL NBS_GET_VALUE(FID,0,VAL__NBI,FLAG,NB,STATUS)
+        ENDDO
         DO WHILE (FLAG.EQ.0)
 
 *  get current display option
