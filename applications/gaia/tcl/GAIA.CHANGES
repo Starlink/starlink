@@ -10,4 +10,6 @@ works.
 iwidgets3.0.0: updates to notebook.itk, calendar.itk and pane.itk. 
 Several occurances of the bug "set $variable $value".
 
+blt: fudged Darwin support (powerpc-like). If this fails again need
+to re-autoconf the whole release.
 
