@@ -1,2 +1,4 @@
           gaia - GAIA -- Graphical Astronomy and Image Analysis Tool
       gaiadisp - Display an image in GAIA
+      gaiacut - Apply intensity cuts
+      gaiapercent - Apply percentile intensity cuts

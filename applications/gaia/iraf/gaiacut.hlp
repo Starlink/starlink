@@ -1,0 +1,13 @@
+.help gaiacut Starlink gaia
+.nf
+
+Apply a intensity cuts to an image displayed in GAIA
+
+Usage:
+   gaiacut plane lowcut highcut
+
+Description:
+
+   This command will apply intensity cuts to an image in GAIA. 
+
+.endhelp

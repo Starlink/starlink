@@ -2,5 +2,8 @@
 
 $doc = "./doc/"
 
-gaia        hlp = doc$gaia.hlp, src = gaia.f
-gaiadisp        hlp = doc$gaiadisp.hlp, src = gaiadisp.f
+gaia           hlp = doc$gaia.hlp, src = gaia.f
+gaiadisp       hlp = doc$gaiadisp.hlp, src = gaiadisp.cl
+gaiacut        hlp = doc$gaiacut.hlp, src = gaiacut.cl
+gaiapercent    hlp = doc$gaiapercent.hlp, src = gaiapercent.cl
+gaiadispandcut hlp = doc$gaiadispandcut.hlp, src = gaiadistandcut.cl
