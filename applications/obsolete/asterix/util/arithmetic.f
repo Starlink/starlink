@@ -68,6 +68,8 @@
 *                        routines and QUAL__ constants (DJA)
 *     24 Nov 94 : V1.8-0 Now use USI for user interface (DJA)
 *     12 Jan 95 : V1.8-1 Use new data interfaces (DJA)
+*      8 Aug 95 : V1.8-2 Create quality in 1st input in overwrite mode if
+*                        it exists in input2 (DJA)
 *
 *    Type Definitions :
 *
@@ -150,7 +152,7 @@
 *    Local data :
 *
       CHARACTER*30            VERSION
-         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-1')
+         PARAMETER            (VERSION = 'ARITHMETIC Version 1.8-2')
 *-
 
 *    Version id
@@ -323,6 +325,12 @@
         END IF
       ELSE IF ( IN2_VOK ) THEN
         CALL BDI_MAPVAR( FID2, 'READ', IN2_VPTR, STATUS )
+      END IF
+
+*    Variance can be calculated but not available in 1st input
+      IF ( OVER .AND. IN2_VOK .AND. .NOT. IN1_VOK ) THEN
+        CALL BDI_CREVAR( FID1, IN1_NDIM, IN1_DIMS, STATUS )
+        CALL BDI_MAPVAR( FID1, 'WRITE', IN1_VPTR, STATUS )
       END IF
 
 *    Create components in output dataset
