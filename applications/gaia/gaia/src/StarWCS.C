@@ -42,6 +42,8 @@
 //        reversal.
 //    13-JAN-1999 (PWD):
 //        Merged in Allan's changes (see history above).
+//    19-NOV-1999 (PWD):
+//        Added test for sky coordinates and members to query this.
 //-
 
 #include <string.h>
@@ -76,8 +78,8 @@ StarWCS::StarWCS(const char* header)
     raIndex_(1),
     decIndex_(2),
     xSecPix_(0.0),
-    ySecPix_(0.0)
-
+    ySecPix_(0.0),
+    issky_(1)
 {
   equinoxStr_[0] = '\0';
 
@@ -166,20 +168,25 @@ StarWCS::StarWCS(const char* header)
           print_error( "Failed to read a 2D World Coordinate System from FITS headers");
         } else {
 
-          // Set the equinox value and string.
-          setEquinox();
+          // See if WCS is a celestial system.
+          setCelestial();
+          if ( issky_ ) {
 
-          // Finally work out which axes are longitude and which are
-          // latitude (might be a better way to do this, note we leave
-          // at defaults if neither is a time axis).
-          int astime2 = astGetI( wcs_, "astime(2)" );
-          if ( astime2 ) {
-            raIndex_  = 2;
-            decIndex_ = 1;
+            // Set the equinox value and string.
+            setEquinox();
+
+            // Finally work out which axes are longitude and which are
+            // latitude (might be a better way to do this, note we leave
+            // at defaults if neither is a time axis).
+            int astime2 = astGetI( wcs_, "astime(2)" );
+            if ( astime2 ) {
+              raIndex_  = 2;
+              decIndex_ = 1;
+            }
+            
+            // Note the number of arcsecs per pixel for later access.
+            setSecPix();
           }
-
-	  // note the number of arcsecs per pixel for later access
-	  setSecPix();
         }
       }
     }
@@ -1065,23 +1072,6 @@ int StarWCS::shift(double ra, double dec, double equinox)
   return 0;
 }
 
-
-//+
-//  Return if the current WCS is a celestial coordinate system.
-//-
-int StarWCS::skyWcs()
-{
-  if ( !isWcs() ) {
-    return 0;
-  }
-
-  AstFrameSet *frame = (AstFrameSet*) astGetFrame( wcs_, AST__CURRENT );
-  int issky = astIsASkyFrame( frame );
-  frame = (AstFrameSet *) astAnnul( frame );
-  return issky;
-}
-
-
 //
 //  Return the distance between two positions in world coordinates,
 //  assuming input units are correct and no conversions are required.
@@ -1105,5 +1095,15 @@ double StarWCS::plaindist(double x0, double y0, double x1, double y1) const
     return 0.0;
   }
   return dist;
+}
+
+//
+//  Check the WCS to see if current coordinates are a celestial
+//  coordinate system.
+//
+void StarWCS::setCelestial() {
+  AstFrame *frame = (AstFrame *) astGetFrame( wcs_, AST__CURRENT );
+  issky_ = astIsASkyFrame( frame );
+  frame = (AstFrame *) astAnnul( frame );
 }
 

@@ -59,6 +59,9 @@ protected:
   //  Set the xSecPix_ and ySecPix_ values (arcsecs per pixel).
   void setSecPix();
 
+  //  Record if WCS is celestial
+  void setCelestial();
+
   //  Width and height of the image in pixels.
   int nxpix_;
   int nypix_;
@@ -76,9 +79,11 @@ protected:
   int raIndex_;
   int decIndex_;
 
-  // number of arcsecs per pixel.
+  //  Number of arcsecs per pixel.
   double xSecPix_, ySecPix_;
 
+  //  Is WCS celestial?
+  int issky_;
 public:
 
   //  Constructor (derived classes call this)
@@ -94,7 +99,7 @@ public:
   int isWcs() const {return (wcs_ && astIsAObject( wcs_ ));}
 
   //  Return 1 if WCS is a celestial coordinate system.
-  int skyWcs();
+  int isCelestial() {return issky_;}
 
   //  Return the world coordinates string for the given ximage coords
   char* pix2wcs(double x, double y, char* buf, int bufsz, int hms_flag = 1) const;

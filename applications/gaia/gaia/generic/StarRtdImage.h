@@ -300,7 +300,9 @@ protected:
   // Copy constructor -- not defined.
   StarRtdImage( const StarRtdImage&) ;
 
+  // Return true if there is an image and it has a celestial
+  // coordinate system.
+  int isCelestial();
 };
-
 
 #endif // StarRtdImage

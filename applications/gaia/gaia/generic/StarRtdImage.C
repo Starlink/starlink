@@ -113,10 +113,10 @@
 //     15-OCT-1999 (PWD):
 //        Added changes to astsystem to select a pixel coordinate system.
 //     178-NOV-1999 (PWD):
-//        Changed dumpCmd to attempt to write a native encoding of the 
+//        Changed dumpCmd to attempt to write a native encoding of the
 //        WCS, if the default encoding isn't Native (this happens -
 //        sometimes - when the channel contains a known WCS that is
-//        illegal?). 
+//        illegal?).
 //-
 
 #include <string.h>
@@ -591,14 +591,21 @@ StarWCS* StarRtdImage::getStarWCSPtr(ImageData* image)
   if (!image) {
     image = image_;
   }
-  WCSRep* p = image->wcs().rep();
+  WCSRep *p = image->wcs().rep();
   if (p && strcmp(p->classname(), "StarWCS") == 0) {
-    return (StarWCS*)p;
+    return (StarWCS *) p;
   }
   error("internal error: expected class StarWCS, not ", p->classname());
   return NULL;
 }
 
+//+
+// Return if coordinate system is celestial.
+//-
+int StarRtdImage::isCelestial() {
+  StarWCS* wcsp = getStarWCSPtr();
+  return wcsp->isCelestial();
+}
 
 //+
 // Dump the displayed image to a file. This overrides the method used
@@ -2530,7 +2537,7 @@ int StarRtdImage::astbootstatsCmd( int argc, char *argv[] )
 //       The first value is the source of the WCS to modify and
 //       should be image or local (as in astassign and astrefine).
 //
-//       If system is set to "pixel" then a pixel coordinate system is 
+//       If system is set to "pixel" then a pixel coordinate system is
 //       used, rather than sky coordinates.
 //-
 int StarRtdImage::astsystemCmd( int argc, char *argv[] )
@@ -2586,7 +2593,7 @@ int StarRtdImage::astsystemCmd( int argc, char *argv[] )
     newfrm = (AstFrame *) makeGridWCS( );
   }
   if ( !astOK ) {
-    
+
     // If any of the above failed, then report the error.
     return error ( "failed to establish new system coordinates system");
   } else {
@@ -3142,7 +3149,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
   cx = x;
   cy = y;
 
-  if ( isWcs() && plot_wcs() ) {
+  if ( isCelestial() && plot_wcs() ) {
 
     //  Get center and radius in deg 2000.
     if (convertCoords(0, cx, cy, *xy_units, 'd') != TCL_OK
@@ -3178,7 +3185,7 @@ int StarRtdImage::get_compass(double x, double y, const char* xy_units,
     }
   }
   else {
-    //  Not using world coords, go right to canvas coords.
+    //  Not using world coords, go straight to canvas coords.
     if (convertCoords(0, cx, cy, *xy_units, 'c') != TCL_OK
         || convertCoords(1, rx, ry, *radius_units, 'c') != TCL_OK) {
       return TCL_ERROR;
@@ -3946,7 +3953,7 @@ int StarRtdImage::gbandCmd( int argc, char *argv[] )
   StarWCS *wcsp = (StarWCS *) NULL;
   if ( isWcs() ) {
     StarWCS* wcsp = getStarWCSPtr();
-    if ( wcsp->skyWcs() ) {
+    if ( wcsp->isCelestial() ) {
       return RtdImage::mbandCmd( argc, argv );
     }
   }
