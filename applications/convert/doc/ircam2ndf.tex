@@ -27,7 +27,7 @@
                            with the chopped image of the sky.
             \end{itemize}
          Note that at the time of writing chopping has not been
-         implemented for IRCAM.  For practical purposes CONFIG={\tt "STARE"}
+         implemented for IRCAM.  For practical purposes CONFIG=\dqt{STARE}
          should be used.  The suggested default is the current value.
          {\tt ["STARE"]}
       }
@@ -35,9 +35,9 @@
          FMTCNV = \_LOGICAL (Read)
       }{
          This specifies whether or not format conversion may occur.
-         If FMTCNV is false, the data type of the data array in the NDF
+         If FMTCNV is {\tt FALSE}, the data type of the data array in the NDF
          will be the same as that in the IRCAM file, and there is no
-         scale factor and offset applied.  If FMTCNV is true, whenever
+         scale factor and offset applied.  If FMTCNV is {\tt TRUE}, whenever
          the IRCAM observation has non-null scale and offset values,
          the observation data array will be converted to type \_REAL in
          the NDF, and the scale and offset applied to the input data
@@ -61,7 +61,7 @@
          observations 4,6,7,8,9,12,14,15,16.  (Note that the brackets
          are required to distinguish this array of characters from a
          single string including commas.  The brackets are unnecessary
-         when there only one item.)
+         when there is only one item.)
 
          If you wish to extract all the observations enter the wildcard
          {\tt $*$}.  {\tt 5-$*$} will read from 5 to the last observation.  The
@@ -80,24 +80,25 @@
       \sstexamplesubsection{
          ircam2ndf ircam\_27aug89\_1cl rhooph obs=$*$
       }{
-         This converts the IRCAM data file called ircam\_27aug89\_1cl into
-         a series of NDFs called rhooph1, rhooph2 {\it etc.}\  There is no
-         format conversion applied.
+         This converts the IRCAM data file called {\tt ircam\_27aug89\_1cl} into
+         a series of NDFs called rhooph1, rhooph2 {\it etc.}\  
+         There is no format conversion applied.
       }
       \sstexamplesubsection{
          ircam2ndf ircam\_27aug89\_1cl rhooph [32,34-36] fmtcnv
       }{
          This converts four observations in the IRCAM data file called
-         ircam\_27aug89\_1cl into NDFs called rhooph32, rhooph34,
-         rhooph35, rhooph36.  The scale and offset are applied.
+         {\tt ircam\_27aug89\_1cl} into NDFs called rhooph32, 
+         rhooph34, rhooph35, rhooph36.  The scale and offset
+         are applied.
       }
       \sstexamplesubsection{
          ircam2ndf in=ircam\_04nov90\_1c config="KTC" obs=5 prefix=bias
       }{
          This converts the fifth observation in the IRCAM data file
-         called ircam\_04nov90\_1c into an NDF called bias5 containing
-         the electronic pedestal in its data array.  There is no format
-         conversion applied.
+         called {\tt ircam\_04nov90\_1c.sdf} into an NDF called bias5
+         containing the electronic pedestal in its data array.  There is no 
+         format conversion applied.
       }
    }
    \sstnotes{
@@ -131,7 +132,7 @@
       .GENERAL.INSTRUMENT.PLATE\_SCALE 
           becomes the increment between the axis centres, with co-ordinate
           (0.0,0.0) located at the image centre.  The NDF axis units both
-          become {\tt "}arcseconds{\tt "}. } & \\
+          become {\tt "arcseconds"}. } & \\
       & & & \\
       .GENERAL               & $\Rightarrow$ &  .MORE.IRCAM.GENERAL & \\
       .GENERAL.x             & $\Rightarrow$ &  .MORE.IRCAM.GENERAL.x & \\
@@ -185,3 +186,4 @@
       }
    }
 }
+

@@ -36,11 +36,11 @@
 *        The NDF component to be copied.  It may be "Data", "Quality"
 *        or "Variance". ["Data"]
 *     FITS = _LOGICAL (Read)
-*        If true, any FITS extension is written to start of the output
+*        If TRUE, any FITS extension is written to start of the output
 *        file, unless there is no extension whereupon a minimal FITS
 *        header is written to the text file. [FALSE]
 *     FIXED = _LOGICAL (Read)
-*        If true, the output file allocates a fixed number of
+*        If TRUE, the output file allocates a fixed number of
 *        characters per data value.  The number of characters chosen is
 *        the minimum that prevents any loss of precision, and hence is
 *        dependent on the data type of the NDF array.  When FIXED is
@@ -51,27 +51,23 @@
 *        NDF if one exists, otherwise it is the current value.
 *     NOPEREC = _INTEGER (Read)
 *        The number of data values per record of the output file, when
-*        FIXED is TRUE.  The size of the output buffer imposes a maximum
-*        number value for NOPEREC; it is 32766/(n+1), where n is the
-*        maximum number bytes needed for the NDF's data type.  NOPEREC
-*        must also be positive.  The suggested default is the current
-*        value, or 8 when there is not one.
+*        FIXED is TRUE.  It should be positive on UNIX platforms.
+*        The suggested default is the current value, or 8 when there
+*        is not one.
 *     OUT = FILENAME (Write)
 *        Name of the output formatted Fortran file.  The file will
 *        normally have variable-length records when there is a header,
-*        but always fixed-length records when there is no header.  On
-*        VMS platforms a default file extension of ".DAT" is appended
-*        when parameter OUT contains no file extension.
+*        but always fixed-length records when there is no header.
 *     RECLEN = _INTEGER (Read)
 *        The maximum record length in bytes of the output file.  This
-*        must be between 32 and 32766 (the upper limit being set by the
-*        size of the output buffer).  The lower limit is further
-*        increased to 80 when there is a FITS header to be copied.  It
-*        is only used when FIXED is FALSE and will default to the
-*        current value, or 512 if there is no current value.  When
-*        FIXED is TRUE the application creates data records whose
+*        must be greater than 31 on UNIX systems.  The lower limit is
+*        further increased to 80 when there is a FITS header to be
+*        copied.  It is only used when FIXED is FALSE and will default
+*        to the current value, or 512 if there is no current value.
+*        When FIXED is TRUE the application creates data records whose
 *        length is the product of the number of bytes per value plus
-*        one (for the space), times the number of values per record. []
+*        one (for the space), times the number of values per record.
+*        []
 
 *  Examples:
 *     ndf2ascii cluster cluster.dat

@@ -25,14 +25,14 @@
       \sstsubsection{
          FITS = \_LOGICAL (Read)
       }{
-         If true, any FITS extension is written to start of the output
+         If {\tt TRUE}, any FITS extension is written to start of the output
          file, unless there is no extension whereupon a minimal FITS
          header is written to the ASCII file. {\tt [FALSE]}
       }
       \sstsubsection{
          FIXED = \_LOGICAL (Read)
       }{
-         If true, the output file allocates a fixed number of
+         If {\tt TRUE}, the output file allocates a fixed number of
          characters per data value.  The number of characters chosen is
          the minimum that prevents any loss of precision, and hence is
          dependent on the data type of the NDF array.  When FIXED is
@@ -49,34 +49,29 @@
          NOPEREC = \_INTEGER (Read)
       }{
          The number of data values per record of the output file, when
-         FIXED is {\tt TRUE}.  The size of the output buffer imposes a maximum
-         number value for NOPEREC; it is $32766/(n+1)$, where $n$ is the
-         maximum number bytes needed for the NDF's data type.  NOPEREC
-         must also be positive.  The suggested default is the current
-         value, or 8 when there is not one.
+         FIXED is {\tt TRUE}.  It should be positive on UNIX platforms.
+         The suggested default is the
+         current value, or 8 when there is not one.
       }
       \sstsubsection{
          OUT = FILENAME (Write)
       }{
          Name of the output formatted Fortran file.  The file will
          normally have variable-length records when there is a header,
-         but always fixed-length records when there is no header.   On
-         VMS platforms a default file extension of {\tt ".DAT"} is appended
-         when parameter OUT contains no file extension.
+         but always fixed-length records when there is no header.
       }
       \sstsubsection{
          RECLEN = \_INTEGER (Read)
       }{
          The maximum record length in bytes of the output file.  This
-         must be between 32 and 32766 (the upper limit being set by the
-         size of the output buffer).  The lower limit is further
-         increased to 80 when there is a FITS header to be copied.  It
-         is only used when FIXED is {\tt FALSE} and will default to the
-         current value, or 512 if there is no current value.  When
-         FIXED is {\tt TRUE} the application creates data records whose
-         length is the product of the number of bytes per value plus
-         one (for the space), times the number of values per record.
-         {\tt []}
+         must be greater than 31 on
+         UNIX systems.  The lower limit is further increased to 80 when
+         there is a FITS header to be copied.  It is only used when
+         FIXED is {\tt FALSE} and will default to the current value, or 512
+         if there is no current value.  When FIXED is {\tt TRUE} the
+         application creates data records whose length is the product
+         of the number of bytes per value plus one (for the space),
+         times the number of values per record.  {\tt []}
       }
    }
    \sstexamples{
@@ -84,33 +79,33 @@
          ndf2ascii cluster cluster.dat
       }{
          This copies the data array of the NDF called cluster to a text
-         file called cluster.dat.  The maximum recordlength of
-         cluster.dat is 512 bytes, and the data values are packed into
+         file called {\tt cluster.dat}.  The maximum recordlength of
+         {\tt cluster.dat} is 512 bytes, and the data values are packed into
          these records as efficiently as possible.
       }
       \sstexamplesubsection{
          ndf2ascii cluster cluster.dat v
       }{
          This copies the variance of the NDF called cluster to a
-         text file called cluster.dat.  The maximum recordlength of
-         cluster.dat is 512 bytes, and the variance values are packed
+         text file called {\tt cluster.dat}.  The maximum recordlength of
+         {\tt cluster.dat} is 512 bytes, and the variance values are packed
          into these records as efficiently as possible.
       }
       \sstexamplesubsection{
          ndf2ascii cluster cluster.dat fixed noperec=12
       }{
          This copies the data array of the NDF called cluster to a
-         text file called cluster.dat.  There are twelve data values
-         per record in cluster.dat.
+         text file called {\tt cluster.dat}.  There are twelve data values
+         per record in {\tt cluster.dat}.
       }
       \sstexamplesubsection{
          ndf2ascii out=ndf234.dat fits reclen=128 in=@234
       }{
          This copies the data array of the NDF called 234 to a
-         text file called ndf234.dat.  The maximum recordlength of
-         ndf234.dat is 128 bytes, and the data values are packed into
+         text file called {\tt ndf234.dat}.  The maximum recordlength of
+         {\tt ndf234.dat} is 128 bytes, and the data values are packed into
          these records as efficiently as possible.  If there is a FITS
-         extension, it is copied to ndf234.dat with substitution of
+         extension, it is copied to {\tt ndf234.dat} with substitution of
          certain keywords, otherwise a minimal FITS header is produced.
       }
    }
@@ -152,8 +147,8 @@
                (Similarly for AXIS(2) structures {\it etc.}) FITS does not have
                a standard method of storing axis widths and variances, so these
                NDF components will not be propagated to the header.
-               Non-linear axis data arrays cannot be represented by CRVAL$n$
-               and CDELT$n$, and must be ignored.
+               Non-linear axis data arrays cannot be represented by CRVAL{\em{n}}
+               and CDELT{\em{n}}, and must be ignored.
 
             \sstitem
                If the input NDF contains TITLE, LABEL or UNITS components
@@ -167,17 +162,17 @@
                \begin{itemize}
                \item BITPIX is derived from the type of the NDF data array,
                and so it is not copied from the NDF FITS extension.
-               \item NAXIS, and NAXIS$n$ are derived from the dimensions of the
+               \item NAXIS, and NAXIS{\em{n}} are derived from the dimensions of the
                NDF data array as described above, so these items are not
                copied from the NDF FITS extension.
                \item The TITLE, LABEL, and BUNITS descriptors are only copied
                if no TITLE, LABEL, and UNITS NDF components respectively
                have already been copied into these headers.
-               \item The CDELT$n$, CRVAL$n$, CTYPE$n$, and CRTYPE$n$ descriptors
+               \item The CDELT{\em{n}}, CRVAL{\em{n}}, CTYPE{\em{n}}, and CRTYPE{\em{n}} descriptors
                in the FITS extension are only copied if the input NDF
                contained no linear axis structures.
                \item The standard order of the FITS keywords is preserved,
-               thus BITPIX, NAXIS and AXIS$n$ appear immediately after the
+               thus BITPIX, NAXIS and AXIS{\em{n}} appear immediately after the
                first card image, which should be SIMPLE.
                \item BSCALE and BZERO in a FITS extension are copied when
                BITPIX is positive, {\it i.e.} the array is not floating-point.
@@ -202,7 +197,7 @@
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: ASCII2NDF; KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
+      \CONVERT: ASCII2NDF; \KAPPA: TRANDAT; SPECDRE: ASCIN and ASCOUT.
    }
    \sstimplementationstatus{
       \sstitemlist{
@@ -213,3 +208,4 @@
       }
    }
 }
+

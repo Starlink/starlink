@@ -41,10 +41,9 @@ It must be two dimensional.
 -  The GASP image is written to the NDF's data array.  The data
 array has type _WORD.  No other NDF components are created.
 
--  If the header file is corrupted, the user must remove the
-offending ".hdr" file or specify the shape of the GASP image on
-the command line, otherwise the application will continually
-abort.
+-  If the header file is corrupted, you must remove the offending
+".hdr" file or specify the shape of the GASP image on the command
+line, otherwise the application will continually abort.
 2 Related_Applications
    CONVERT: NDF2GASP.
 2 References

@@ -43,9 +43,9 @@
 *        ["STARE"]
 *     FMTCNV = _LOGICAL (Read)
 *        This specifies whether or not format conversion may occur.
-*        If FMTCNV is false, the data type of the data array in the NDF
+*        If FMTCNV is FALSE, the data type of the data array in the NDF
 *        will be the same as that in the IRCAM file, and there is no
-*        scale factor and offset applied.  If FMTCNV is true, whenever
+*        scale factor and offset applied.  If FMTCNV is TRUE, whenever
 *        the IRCAM observation has non-null scale and offset values,
 *        the observation data array will be converted to type _REAL in
 *        the NDF, and the scale and offset applied to the input data
@@ -63,7 +63,7 @@
 *        observations 4,6,7,8,9,12,14,15,16.  (Note that the brackets
 *        are required to distinguish this array of characters from a
 *        single string including commas.  The brackets are unnecessary
-*        when there only one item.)
+*        when there is only one item.)
 *
 *        If you wish to extract all the observations enter the wildcard
 *        *.  5-* will read from 5 to the last observation.  The

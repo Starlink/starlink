@@ -16,7 +16,7 @@
          IN = LITERAL (Read)
       }{
          A character string containing the name of GASP file to convert.
-         The extension should not be given, since {\tt "}.dat{\tt "} is assumed.
+         The extension should not be given, since {\tt ".dat"} is assumed.
       }
       \sstsubsection{
          OUT = NDF (Write)
@@ -37,15 +37,15 @@
       \sstexamplesubsection{
          gasp2ndf m31\_gasp m31
       }{
-         Convert a GASP file called m31\_gasp.dat into an NDF called m31.
-         The dimensions of the image are taken from the header file
-         m31\_gasp.hdr.
+         Convert a GASP file called {\tt m31\_gasp.dat} into an NDF called
+         m31.  The dimensions of the image are taken from the header file
+         {\tt m31\_gasp.hdr}.
       }
       \sstexamplesubsection{
          gasp2ndf n1068 ngc1068 shape=[256,512]
       }{
-         Take the pixel values in the GASP file n1068.dat and create
-         the NDF ngc1068 with dimensions 256 columns by 512 rows.
+         Take the pixel values in the GASP file {\tt n1068.dat} and create
+         the NDF {\tt ngc1068} with dimensions 256 columns by 512 rows.
       }
    }
    \sstnotes{
@@ -60,15 +60,15 @@
          array has type \_WORD. No other NDF components are created.
 
          \sstitem
-         If the header file is corrupted, the user must remove the
-         offending {\tt "}.hdr{\tt "} file or specify the shape of the GASP image on the
+         If the header file is corrupted, you must remove the offending
+         {\tt ".hdr"} file or specify the shape of the GASP image on the
          command line, otherwise the application will continually abort.
       }
    }
    \sstdiytopic{
       Related Applications
    }{
-      CONVERT: NDF2GASP.
+      \CONVERT: NDF2GASP.
    }
    \sstdiytopic{
       References
@@ -76,3 +76,4 @@
       GASP documentation (MUD/66).
    }
 }
+

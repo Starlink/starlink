@@ -53,10 +53,9 @@
 *     It must be two dimensional.
 *     -  The GASP image is written to the NDF's data array.  The data
 *     array has type _WORD.  No other NDF components are created.
-*     -  If the header file is corrupted, the user must remove the
-*     offending ".hdr" file or specify the shape of the GASP image on
-*     the command line, otherwise the application will continually
-*     abort.
+*     -  If the header file is corrupted, you must remove the offending
+*     ".hdr" file or specify the shape of the GASP image on the command
+*     line, otherwise the application will continually abort.
 
 *  Related Applications:
 *     CONVERT: NDF2GASP.
@@ -204,7 +203,7 @@
 *  and abort.
             IF ( IOVAL .NE. 0 ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_FIOER( 'MESSAGE', IOVAL )
+               CALL ERR_FIOER( 'IOVAL', IOVAL )
                CALL MSG_SETC( 'HDRFIL', HDRFIL )
                CALL ERR_REP( 'GASP2NDF_FILEREAD',
      :           'GASP2NDF: Error reading the header file ^HDRFIL. '/
