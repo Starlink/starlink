@@ -2,7 +2,7 @@
 
   AST.xs
 
-  Copyright (C) 2004 Tim Jenness. All Rights Reserved.
+  Copyright (C) 2004-2005 Tim Jenness. All Rights Reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License as published by the Free Software
@@ -562,6 +562,7 @@ new( class, naxes, options )
   ASTCALL(
    RETVAL = astFrame( naxes, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -576,6 +577,7 @@ new( class, frame, options )
   ASTCALL(
    RETVAL = astFrameSet( frame, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -591,6 +593,7 @@ new( class, frame1, frame2, options )
   ASTCALL(
    RETVAL = astCmpFrame( frame1, frame2, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -609,6 +612,7 @@ new( class, specval, specfrm, options )
   ASTCALL(
    RETVAL = astFluxFrame( specval, specfrm, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -628,6 +632,7 @@ new( class, frame1, frame2, options )
   ASTCALL(
    RETVAL = astSpecFluxFrame( frame1, frame2, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -645,6 +650,7 @@ new( class, map1, map2, series, options )
   ASTCALL(
    RETVAL = astCmpMap( map1, map2, series, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -742,6 +748,7 @@ _new( class, sourcefunc, sinkfunc, options )
   } else {
      Perl_croak(aTHX_ "Channel of class %s not recognized.", class );
   }
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -759,6 +766,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astGrismMap( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -776,6 +784,7 @@ new( class, name, nin, nout, options )
   ASTCALL(
    RETVAL = astIntraMap( name, nin, nout, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -797,6 +806,7 @@ new( class, lut, start, inc, options )
   ASTCALL(
    RETVAL = astLutMap( nlut, clut, start, inc, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -824,6 +834,7 @@ new( class, nin, nout, fwd, inv, options )
   cinv = pack1Dchar( inv );
   RETVAL = astMathMap( nin, nout, nfwd, (const char **)cfwd, 
                        ninv, (const char**)cinv, options );
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -858,6 +869,7 @@ new( class, nin, nout, matrix, options )
   ASTCALL(
    RETVAL = astMatrixMap( nin, nout, form, cmatrix, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -884,6 +896,7 @@ _new( class, frame, graphbox, basebox, options )
   ASTCALL(
     RETVAL = astPlot( frame, cgraphbox, cbasebox, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -907,6 +920,7 @@ new( class, disco, pcdcen, options )
   ASTCALL(
    RETVAL = astPcdMap( disco, cpcdcen, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -951,6 +965,7 @@ new( class, inperm, outperm, constant, options )
   ASTCALL(
    RETVAL = astPermMap(nin, cinperm, nout, coutperm, cconstant, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -984,6 +999,7 @@ new( class, shift, options )
   ASTCALL(
    RETVAL = astShiftMap( ncoord, cshift, options);
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -998,6 +1014,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astSkyFrame( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1014,6 +1031,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astSpecFrame( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -1031,6 +1049,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astDSBSpecFrame( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -1047,6 +1066,7 @@ new( class, flags, options )
   ASTCALL(
    RETVAL = astSlaMap( flags, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1060,6 +1080,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astSphMap( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1078,6 +1099,7 @@ new( class, nin, flags, options )
   ASTCALL(
    RETVAL = astSpecMap( nin, flags, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -1098,6 +1120,7 @@ new( class, map1, map2, options )
   ASTCALL(
    RETVAL = astTranMap( map1, map2, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -1113,6 +1136,7 @@ new( class, ncoord, options )
   ASTCALL(
    RETVAL = astUnitMap( ncoord, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1130,6 +1154,7 @@ new( class, ncoord, type, lonax, latax, options )
   ASTCALL(
    RETVAL = astWcsMap( ncoord, type, lonax, latax,options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1151,6 +1176,7 @@ new( class, ina, inb, outa, outb, options )
                       pack1D(newRV_noinc((SV*)inb),'d'),
                       pack1D(newRV_noinc((SV*)outa),'d'),
                       pack1D(newRV_noinc((SV*)outb),'d'),options );
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1166,6 +1192,7 @@ new( class, ncoord, zoom, options )
   ASTCALL(
    RETVAL = astZoomMap( ncoord, zoom, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1203,6 +1230,7 @@ ast_Clone( this )
   ASTCALL(
    RETVAL = astClone( this );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1213,6 +1241,7 @@ ast_Copy( this )
   ASTCALL(
    RETVAL = astCopy( this );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -1418,6 +1447,7 @@ new( class, options )
   ASTCALL(
    RETVAL = astKeyMap( options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2054,6 +2084,7 @@ astConvert( from, to, domainlist )
   ASTCALL(
    RETVAL = astConvert( from, to, domainlist );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2095,6 +2126,7 @@ astFindFrame( this, template, domainlist )
   ASTCALL(
    RETVAL = astFindFrame( this, template, domainlist );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2275,6 +2307,7 @@ astPickAxes( this, axes )
   ASTCALL(
    RETVAL = astPickAxes( this, naxes, aa, NULL);
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2380,6 +2413,7 @@ astGetFrame( this, iframe )
   ASTCALL(
    RETVAL = astGetFrame( this, iframe );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2392,6 +2426,7 @@ astGetMapping( this, iframe1, iframe2 )
   ASTCALL(
    RETVAL = astGetMapping( this, iframe1, iframe2 );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2536,6 +2571,7 @@ astSimplify( this )
   ASTCALL(
    RETVAL = astSimplify( this );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2635,6 +2671,7 @@ new( class, map, ax1, ax2, options )
   ASTCALL(
     RETVAL = astRateMap( map, ax1, ax2, options );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2648,6 +2685,7 @@ ast_Read( channel )
   ASTCALL(
    RETVAL = astRead( channel );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
  OUTPUT:
   RETVAL
 
@@ -2674,6 +2712,7 @@ astGetRegionFrame( this )
   ASTCALL(
     RETVAL = astGetRegionFrame( this );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2690,6 +2729,7 @@ astMapRegion( this, map, frame )
   ASTCALL(
     RETVAL = astMapRegion( this, map, frame );
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2819,6 +2859,7 @@ new( class, frame, form, centre, point1, point2, unc, options)
   ASTCALL(
      RETVAL = astEllipse( frame, form, ccentre, cpoint1, cpoint2, unc, options);
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2852,6 +2893,7 @@ new( frame, form, point1, point2, unc, options )
    ASTCALL(
      RETVAL = astBox( frame, form, cpoint1, cpoint2, unc, options);
    )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL
@@ -2892,6 +2934,7 @@ new( frame, form, centre, point, unc, options )
   ASTCALL(
      RETVAL = astCircle( frame, form, ccentre, cpoint, unc, options);
   )
+  if ( RETVAL == AST__NULL ) XSRETURN_UNDEF;
 #endif
  OUTPUT:
   RETVAL

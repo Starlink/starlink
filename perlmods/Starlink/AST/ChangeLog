@@ -3,6 +3,10 @@
 	* Tk/Tk.pm: Extensive rewrite. Now mostly works and is consistent
 	with the PGPLOT equivalent. Tk can not support rotated text.
 
+2005-02-04  Tim Jenness  <timj@jach.hawaii.edu>
+
+	* AST.xs: Fix return value when methods return null Ast objects.
+
 2005-02-03  Tim Jenness  <timj@jach.hawaii.edu>
 
 	* AST.xs: Fix Channel and XmlChan source functions. Sometimes the
