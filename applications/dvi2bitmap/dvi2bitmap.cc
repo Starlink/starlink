@@ -42,17 +42,15 @@ static const char RCSID[] =
 #include <string>
 
 #ifdef HAVE_CSTD_INCLUDE
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
-#include <cassert>
-#include <cctype>
+#  include <cstdio>
+#  include <cstdlib>
+#  include <cstdarg>
+#  include <cassert>
 #else
-#include <stdio.h>		// for vsprintf
-#include <stdlib.h>
-#include <stdarg.h>
-#include <assert.h>
-#include <ctype.h>
+#  include <stdio.h>		// for vsprintf
+#  include <stdlib.h>
+#  include <stdarg.h>
+#  include <assert.h>
 #endif
 
 #include <bitset>
@@ -1481,6 +1479,11 @@ bool process_special (DviFile *dvif, string specialString,
     return stringOK;
 }
 
+/* The C++ <cstdio> definition does _not_ list snprintf as one of
+ * the members, though it is listed in the definition of <stdio.h>
+ * in the C standard.  So different compilers seem to have different
+ * ideas of where it should be.
+ */
 #if HAVE_SNPRINTF
 #  if SNPRINTF_NAMESPACE == 3
 #    define SNPRINTF std::snprintf
@@ -1489,6 +1492,7 @@ bool process_special (DviFile *dvif, string specialString,
 #  elif SNPRINTF_NAMESPACE == 1
 #    define SNPRINTF snprintf
 #  else
+/* this case shouldn't really happen! */
 #    define SNPRINTF snprintf
      extern "C" int snprintf(char *, int, const char*, ...);
 #  endif
@@ -1504,11 +1508,6 @@ string substitute_ofn_pattern(string pattern, int pagenum)
     if (buf == 0)
 	buf = new char[buflen];
 
-    /* The C++ <cstdio> definition does _not_ list snprintf as one of
-     * the members, though it is listed in the definition of <stdio.h>
-     * in the C standard.  So different compilers seem to have different
-     * ideas of where it should be.
-     */
 #if HAVE_SNPRINTF
     int wanted = SNPRINTF(buf, buflen, pattern.c_str(), pagenum);
     if (wanted >= buflen) {
