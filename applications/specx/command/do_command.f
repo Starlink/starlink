@@ -77,6 +77,8 @@
 *        Add , to some FORMAT statements
 *        Additional LOGDUM argument for DASMERGE
 *        Declare EXTERNAL MERGE
+*      3 Mar 2002 (timj)
+*        Add SET-DATA-DIRECTORY
 C-----------------------------------------------------------------------
 
       LOGICAL FUNCTION DO_COMMAND (PROCEDURE, COMMAND, IFAIL)
@@ -347,6 +349,13 @@ C------------------
 
        ELSE IF (COMMAND.EQ.'SET-GSD-FILENAME') THEN
          CALL SET_GSD_FILENAME (IFAIL)
+
+C------------------
+C  SET-DATA-DIRECTORY
+C------------------
+
+       ELSE IF (COMMAND.EQ.'SET-DATA-DIRECTORY') THEN
+         CALL SET_DATADIR (IFAIL)
 
 C------------------
 C  INDEX-GSD-FILES

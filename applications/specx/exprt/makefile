@@ -38,7 +38,8 @@ index_gsd.f open_fits.f rd_gsd_ras.f rdfitsspec.f \
 read_gsd.f sgsdclose.f sgsdlist.f sgsdlocate.f \
 sgsdopen.f sgsdreopen.f sgsdv4data.f sgsdv4header.f \
 sgsdv51data.f sgsdv52data.f sgsdv5data.f \
-sgsdv5header.f wrfitscube.f wrfitsmap.f wrfitsspec.f write_gildas.f
+sgsdv5header.f wrfitscube.f wrfitsmap.f wrfitsspec.f write_gildas.f \
+set_datadir.f
 
 
 CSOURCES = bswap.c wbswap.c
@@ -47,7 +48,7 @@ CSOURCES = bswap.c wbswap.c
 # They will be deleted by make clean (they are soft links).
 EXTERNAL_INCLUDES = \
    STAKPAR FLAGCOMM STACKCOMM PLOT2D PROTOTYPE MAPHD MAPS CUBE \
-   DOPPLER SPECX_FITS SPECX_PARS
+   DOPPLER SPECX_FITS SPECX_PARS SAE_PAR PSX_ERR
 
 # These are the actual private include files that are archived.
 # Upper case versions are removed with 'make clean'
@@ -107,6 +108,9 @@ GSD_FILE.INC:   gsd_file.inc;          $(LINK) $? $@
 GSD_INDEX.INC:  gsd_index.inc;         $(LINK) $? $@
 GSD_VAR.INC:    gsd_var.inc;           $(LINK) $? $@
 
+SAE_PAR:        $(STAR_INC)/sae_par;       $(LINK) $? $@
+PSX_ERR:	$(STAR_INC)/psx_err;       $(LINK) $? $@
+
 #  Include file dependencies.
 #  ==========================
 
@@ -141,3 +145,5 @@ sgsdv5data.o:    STAKPAR STACKCOMM FLAGCOMM SPECX_PARS \
                    GSD_INDEX.INC GSD_FILE.INC GSD_VAR.INC
 sgsdv5header.o:  FLAGCOMM STACKCOMM GSD_INDEX.INC GSD_FILE.INC GSD_VAR.INC
 rd_gsd_ras.o:    FLAGCOMM STACKCOMM STAKPAR GSD_VAR.INC GSD_FILE.INC
+set_datadir.o:   SAE_PAR PSX_ERR
+

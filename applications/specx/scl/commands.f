@@ -3,6 +3,8 @@
 *        Added CONVERT-VAX-FILE as COMMS(23).
 *     30 Dec 1993 (rp)
 *        Moved CONVERT-VAX-FILE to end (out of SCL block of commands)
+*     03 March 1993 (timj)
+*        Add SET-DATA-DIRECTORY
 C-----------------------------------------------------------------------------
 
       BLOCK DATA COMMANDS
@@ -11,7 +13,7 @@ C   Sets up values of command strings
 
       INCLUDE 'COMMAND_TABLE'
 
-      DATA NFUNC/177/
+      DATA NFUNC/178/
       DATA (COMMS(I),I=1,10) /
      &                        'IF',
      &                        'ELSEIF',
@@ -202,7 +204,8 @@ C   Sets up values of command strings
      &			      'READ-GSD-RASTER',
      &                        'DAS-MERGE',
      &                        'MERGE-FILES',
-     &                         3*' '/
+     &                        'SET-DATA-DIRECTORY',
+     &                         2*' '/
 
 C  Rest of symbol table
 
