@@ -13,6 +13,8 @@
 # PARTICULAR PURPOSE.
 
 @SET_MAKE@
+
+# Automake boilerplate required by starconf
 SHELL = @SHELL@
 
 srcdir = @srcdir@
@@ -68,6 +70,7 @@ PATH_SEPARATOR = @PATH_SEPARATOR@
 AMTAR = @AMTAR@
 AS = @AS@
 AWK = @AWK@
+BUILT_SOURCES = @BUILT_SOURCES@
 CC = @CC@
 DEPDIR = @DEPDIR@
 DLLTOOL = @DLLTOOL@
@@ -78,16 +81,20 @@ EXTRA_DIST = @EXTRA_DIST@
 INSTALL_STRIP_PROGRAM = @INSTALL_STRIP_PROGRAM@
 LIBTOOL = @LIBTOOL@
 LN_S = @LN_S@
-MANIFESTS = @MANIFESTS@
 OBJDUMP = @OBJDUMP@
 PACKAGE = @PACKAGE@
+PACKAGE_VERSION = @PACKAGE_VERSION@
 RANLIB = @RANLIB@
 STARLINK = @STARLINK@
 STAR_BUILD_DEPENDENCIES = @STAR_BUILD_DEPENDENCIES@
 STAR_DOCUMENTATION = @STAR_DOCUMENTATION@
+STAR_HELPDIR = @STAR_HELPDIR@
+STAR_MANIFESTDIR = @STAR_MANIFESTDIR@
 STAR_USE_DEPENDENCIES = @STAR_USE_DEPENDENCIES@
 STRIP = @STRIP@
 VERSION = @VERSION@
+_STAR_INSTALL_DATA_HOOK = @_STAR_INSTALL_DATA_HOOK@
+_STAR_INSTALL_DATA_LOCAL = @_STAR_INSTALL_DATA_LOCAL@
 am__include = @am__include@
 am__quote = @am__quote@
 install_sh = @install_sh@
@@ -99,7 +106,6 @@ cremsg_SOURCES = cremsg.c
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_HEADER = config.h
 CONFIG_CLEAN_FILES = component.xml install-with-manifest
 bin_PROGRAMS = messgen$(EXEEXT) cremsg$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
@@ -116,7 +122,7 @@ messgen_DEPENDENCIES =
 messgen_LDFLAGS =
 
 DEFS = @DEFS@
-DEFAULT_INCLUDES =  -I. -I$(srcdir) -I.
+DEFAULT_INCLUDES =  -I. -I$(srcdir)
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
@@ -133,12 +139,12 @@ LINK = $(LIBTOOL) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 CFLAGS = @CFLAGS@
 DIST_SOURCES = $(cremsg_SOURCES) $(messgen_SOURCES)
 DIST_COMMON = Makefile.am Makefile.in acinclude.m4 aclocal.m4 \
-	component.xml.in config.guess config.h.in config.sub configure \
-	configure.ac depcomp install-sh install-with-manifest.in \
-	ltmain.sh missing mkinstalldirs
+	component.xml.in config.guess config.sub configure configure.ac \
+	depcomp install-sh install-with-manifest.in ltmain.sh missing \
+	mkinstalldirs
 SOURCES = $(cremsg_SOURCES) $(messgen_SOURCES)
 
-all: config.h
+all: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
@@ -146,7 +152,7 @@ all: config.h
 
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
  configure.lineno
-$(srcdir)/Makefile.in:  Makefile.am  $(top_srcdir)/configure.ac $(ACLOCAL_M4)
+$(srcdir)/Makefile.in:  Makefile.am $(srcdir)/Makefile.starconf $(top_srcdir)/configure.ac $(ACLOCAL_M4)
 	cd $(top_srcdir) && \
 	  $(AUTOMAKE) --foreign  Makefile
 Makefile:  $(srcdir)/Makefile.in  $(top_builddir)/config.status
@@ -159,23 +165,6 @@ $(srcdir)/configure:  $(srcdir)/configure.ac $(ACLOCAL_M4) $(CONFIGURE_DEPENDENC
 
 $(ACLOCAL_M4):  configure.ac acinclude.m4
 	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
-
-config.h: stamp-h1
-	@if test ! -f $@; then \
-	  rm -f stamp-h1; \
-	  $(MAKE) stamp-h1; \
-	else :; fi
-
-stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status config.h
-
-$(srcdir)/config.h.in:  $(top_srcdir)/configure.ac $(ACLOCAL_M4) 
-	cd $(top_srcdir) && $(AUTOHEADER)
-	touch $(srcdir)/config.h.in
-
-distclean-hdr:
-	-rm -f config.h stamp-h1
 component.xml: $(top_builddir)/config.status component.xml.in
 	cd $(top_builddir) && $(SHELL) ./config.status $@
 install-with-manifest: $(top_builddir)/config.status install-with-manifest.in
@@ -271,11 +260,11 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	       END { for (i in files) print i; }'`; \
 	mkid -fID $$unique
 
-TAGS:  $(HEADERS) $(SOURCES) config.h.in $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	list='$(SOURCES) $(HEADERS) config.h.in $(LISP) $(TAGS_FILES)'; \
+	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
 	  done | \
@@ -383,7 +372,7 @@ distcleancheck: distclean
 	       exit 1; } >&2
 check-am: all-am
 check: check-am
-all-am: Makefile $(PROGRAMS) config.h
+all-am: Makefile $(PROGRAMS)
 
 installdirs:
 	$(mkinstalldirs) $(DESTDIR)$(bindir)
@@ -412,6 +401,7 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
 clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
@@ -419,8 +409,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libtool mostlyclean-am
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 distclean-am: clean-am distclean-compile distclean-depend \
-	distclean-generic distclean-hdr distclean-libtool \
-	distclean-tags
+	distclean-generic distclean-libtool distclean-tags
 
 dvi: dvi-am
 
@@ -430,7 +419,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-data-local
+	@$(NORMAL_INSTALL)
+	$(MAKE) $(AM_MAKEFLAGS) install-data-hook
 
 install-exec-am: install-binPROGRAMS
 
@@ -455,9 +446,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 .PHONY: GTAGS all all-am check check-am clean clean-binPROGRAMS \
 	clean-generic clean-libtool dist dist-all dist-gzip distcheck \
 	distclean distclean-compile distclean-depend distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags distcleancheck \
-	distdir dvi dvi-am info info-am install install-am \
-	install-binPROGRAMS install-data install-data-am install-exec \
+	distclean-libtool distclean-tags distcleancheck distdir dvi \
+	dvi-am info info-am install install-am install-binPROGRAMS \
+	install-data install-data-am install-data-local install-exec \
 	install-exec-am install-info install-info-am install-man \
 	install-strip installcheck installcheck-am installdirs \
 	maintainer-clean maintainer-clean-generic mostlyclean \
@@ -465,6 +456,9 @@ uninstall-am: uninstall-binPROGRAMS uninstall-info-am
 	tags uninstall uninstall-am uninstall-binPROGRAMS \
 	uninstall-info-am
 
+
+install-data-local: $(_STAR_INSTALL_DATA_LOCAL)
+install-data-hook:  $(_STAR_INSTALL_DATA_HOOK)
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
