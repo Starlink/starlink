@@ -1,9 +1,9 @@
-      SUBROUTINE KPG_$LOCT<T>( NDIM, LBND, UBND, ARRAY, INIT, SEARCH,
+      SUBROUTINE KPG1_LOCT<T>( NDIM, LBND, UBND, ARRAY, INIT, SEARCH,
      :                         POSTIV, MXSHFT, MAXITE, TOLER, FINAL,
      :                         STATUS )
 *+
 *  Name:
-*     KPG_$LOCTx
+*     KPG1_LOCTx
 
 *  Purpose:
 *     Locates the centroid of a blob image feature in an n-D array.
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL KPG_$LOCTx( NDIM, LBND, UBND, ARRAY, INIT, SEARCH, POSTIV,
+*     CALL KPG1_LOCTx( NDIM, LBND, UBND, ARRAY, INIT, SEARCH, POSTIV,
 *                      MXSHFT, MAXITE, TOLER, FINAL, STATUS )
 
 *  Description:
@@ -262,7 +262,7 @@
       IF ( NDIM .LT. 2 .AND. NDIM .GT. NDF__MXDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIM )
-         CALL ERR_REP( 'KPG_$LOCTx_INVDIM',
+         CALL ERR_REP( 'KPG1_LOCTx_INVDIM',
      :     'Unable to find centroid of array with dimensionality of '/
      :     /'^NDIM.', STATUS )
          GOTO 999
@@ -281,7 +281,7 @@
       IF ( SMLDIM ) THEN
          STATUS = SAI__ERROR
          CALL MSG_SETI( 'NDIM', NDIM )
-         CALL ERR_REP( 'KPG_$LOCTx_SMLDIM',
+         CALL ERR_REP( 'KPG1_LOCTx_SMLDIM',
      :     'Unable to find centroid of array, a dimension has less '/
      :     /'three elements.', STATUS )
          GOTO 999
@@ -554,7 +554,7 @@
 *          Now get the n smallest numbers in the profile, and put
 *          the n-th smallest into BACK.
 
-            CALL KPG_$NTHMR( .FALSE., DAV, NSAMPL( I ), NTH( I ),
+            CALL KPG1_NTHMR( .FALSE., DAV, NSAMPL( I ), NTH( I ),
      :                       STACK, STATUS )
             BACK( I ) = STACK( 1 )
 
@@ -563,7 +563,7 @@
 
             IF ( BACK( I ) .EQ. VAL__BADR ) THEN
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'KPG_$LOCTx_UNDEFBGD',
+               CALL ERR_REP( 'KPG1_LOCTx_UNDEFBGD',
      :           'The background could not be defined in order to '/
      :           /'evaluate the centroid.', STATUS )
                GOTO 999
@@ -631,7 +631,7 @@
             END DO
 
             STATUS = SAI__ERROR
-            CALL ERR_REP( 'KPG_$LOCT_NODATA',
+            CALL ERR_REP( 'KPG1_LOCT_NODATA',
      :        'Unable to compute a centroid because the array is all '/
      :        /'bad.', STATUS )
             FINSHD = .TRUE.
@@ -704,7 +704,7 @@
 
                CALL MSG_SETC( 'BUFFER', BUFFER )
                STATUS = SAI__ERROR
-               CALL ERR_REP( 'KPG_$LOCT_SHIFT',
+               CALL ERR_REP( 'KPG1_LOCT_SHIFT',
      :           'Maximum allowable shift has been exceeded. '/
      :           /'Current shift is ^BUFFER pixels.', STATUS )
 
