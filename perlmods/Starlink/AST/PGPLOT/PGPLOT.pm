@@ -57,7 +57,7 @@ sub _GLine {
    my $x = shift;
    my $y = shift;
    
-   if( scalar(@$x) > 1 && scalar(@$y) ) {
+   if( scalar(@$x) > 1 && scalar(@$x) == scalar(@$y) ) {
       pgline( scalar(@$x), $x, $y );
    }   
    return 1;
@@ -78,7 +78,7 @@ sub _GMark {
    my $y = shift;
    my $type = shift;
 
-   if( scalar(@$x) > 1 && scalar(@$y) ) {
+   if( scalar(@$x) >= 1 && scalar(@$x) == scalar(@$y) ) {
       pgpt( scalar(@$x), $x, $y, $type );
    }
    return 1;
