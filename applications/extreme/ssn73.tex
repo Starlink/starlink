@@ -378,16 +378,37 @@ the output will be identical to the input.  Hence a pipeline like
 will show up any differences the utility has made.
 
 The utility should be pretty robust, but it may be possible to
-confuse it with some illegal/deprecated things like `\\r' or `\\t' 
-characters, or using columns 73--80 for comments.  If it believes
+confuse it with some illegal/deprecated things like 
+`\verb+\r+' or `\verb+\t+' 
+characters, using columns 73--80 for comments, or splitting the string
+`\%VAL' between source lines.  If it believes
 that it might have got into serious trouble (that is, that it may
 have corrupted the meaning of the source code), then {\tt inscnf}
 will write a warning on standard error, or terminate with error
 status, or both.
 
-A script, {\tt do\_inscnf}, gives an example of applying the filter
+A shell script, {\tt do\_inscnf}, gives an example of applying the filter
 to all the Fortran files in a directory.  This can be used as is,
-or taken as an example.
+or taken as an example.  It defines the location of the input and
+output files, writes a log file of changes made and writes messages 
+to standard error for files which may have generated problems.
+Only files which have been modified are written to the output directory.
+It also performs some crude checks of its own on the input and output
+files to see if it looks like erroneous changes have been made:
+\begin{itemize}
+\item 
+It checks to see if an input file apparently contains any invocations
+of {\tt \%VAL} and {\tt CNF\_PVAL}, and guesses whether {\tt inscnf} 
+should have made any changes.
+\item
+Where {\tt inscnf} has made changes it performs a crude comparison of
+the input and output files to see if they look the same apart from
+insertion of {\tt CNF\_PVAL} invocations.
+\end{itemize}
+If either of these checks produces a surprising result it writes a 
+message to standard error; this does not mean that {\tt inscnf} has
+made an error, but it is probably worth checking this by hand.
+
 
 
 
@@ -396,3 +417,5 @@ or taken as an example.
 
 % ? End of main text
 \end{document}
+
+% $Id$
