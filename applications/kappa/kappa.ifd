@@ -1847,7 +1847,6 @@ package kappa {
          helplib {$KAPPA_HELP}
 
          parameter ardfile {
-            position 1
             type FILENAME
             access READ
             vpath PROMPT

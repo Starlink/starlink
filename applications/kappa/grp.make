@@ -230,7 +230,7 @@ kps1_glibd.f kps1_gaups.f kps1_heqpr.f kps1_heqpd.f kps1_icblu.f \
 kps1_ks2tr.f kps1_kspro.f kps1_lucsm.f kps1_lucou.f kps1_lucim.f \
 kps1_look2.f kps1_luccp.f kps1_lshpl.f kps1_lshct.f kps1_lshcp.f \
 kps1_lshfm.f kps1_lplnm.f kps1_lpllm.f kps1_lplfs.f kps1_ltaba.f \
-kps1_lucdt.f kps1_look1.f kps1_look.f kps1_lmkst.f kps1_lucfp.f \
+kps1_lucdt.f kps1_luted.c kps1_look1.f kps1_look.f kps1_lmkst.f kps1_lucfp.f \
 kps1_lucy.f kps1_luccs.f kps1_lmkpc.f kps1_mthcr.f kps1_mthcd.f \
 kps1_mss.f kps1_mspad.f kps1_msa.f kps1_mlppn.f kps1_mlpnd.f kps1_mlpmp.f \
 kps1_mlpml.f kps1_mlpky.f kps1_mlpfs.f kps1_mlpcv.f kps1_mlpcp.f \
