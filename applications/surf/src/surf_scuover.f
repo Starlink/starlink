@@ -35,9 +35,6 @@
 *     scuover
 
 *  ADAM parameters:
-*     COL = LITERAL (Read)
-*        Colour of overlay (by name or number). The previous value is used
-*        by default.
 *     DEVICE = DEVICE (Read)
 *        The graphics device on which the bolometers are to be drawn.
 *        The global default (set with Kappa GDSET) will be used unless
@@ -63,11 +60,16 @@
 *     NAME = LOGICAL (Read)
 *        Label with bolometer name if true, else bolometer number. The default
 *        is true.
+*     STYLE = LITERAL (Read)
+*        Plotting style to be used for the bolometers. The relevant key
+*        to use for adjusting the plotting style is 'bolometer'. This
+*        is a synonym for curve and can be abbreviated to 'bol'. The most
+*        useful attribute to change is the colour.
 
 *  Examples:
 *     scuover
 *        The bolometer names will be overlaid using the default colour.
-*     scuover col=red noname
+*     scuover style='colour(bol)=red' noname
 *        This command will overlay bolometer numbers over the image in red.
 *     scuover integration=2
 *        Overlay the bolometer positions at the start of the second
@@ -97,6 +99,9 @@
 
 *  History:
 *     $Log$
+*     Revision 1.15  2000/06/03 03:14:45  timj
+*     Replace SGS with AST/PGPLOT
+*
 *     Revision 1.14  1999/08/03 20:01:42  timj
 *     Add copyright message to header.
 *     Minor fixes to header style.
@@ -135,8 +140,6 @@
 *  Local Constants:
       INTEGER     MAX_DIM              ! max number of dims in array
       PARAMETER (MAX_DIM = 4)
-      INTEGER MPEN                     ! SGS pen number used to draw graphics
-      PARAMETER ( MPEN = 3 )
       REAL AR                          ! A `normal' text aspect ratio
       PARAMETER ( AR = 0.66667 )
       CHARACTER * 7 TSKNAME            ! SCUOVER name
@@ -145,7 +148,9 @@
 *  Local variables:
       LOGICAL          ABORTED         ! .TRUE. if an observation has been
                                        ! aborted
-      REAL AR0                         ! Text aspect ratio on entry
+      LOGICAL          ALIGN           ! were the two frames aligned
+      DOUBLE PRECISION ATTRS( 20 )     ! PGPLOT graphics attributes on entry
+      INTEGER          AX2GRMAP        ! Mapping between AXIS and GRAPHICS frm
       CHARACTER*(1)    B1              ! Name of bolometer (1 char)
       CHARACTER*(2)    B2              ! Name of bolometer (2 char)
       CHARACTER*(3)    BOL             ! Name of bolometer
@@ -163,7 +168,7 @@
                                        ! pointer to scratch space holding
                                        ! apparent Dec / y offset positions of
                                        ! measured points in input file (radians)
-      REAL             BOL_DIST        ! Separation of bols
+      DOUBLE PRECISION BOL_DIST        ! Separation of bols
       REAL             BOL_DIST_WORLD  ! Separation of bols in WORLD coords
       REAL             BOL_DU3 (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! dU3 Nasmyth coord of bolometers
@@ -178,11 +183,12 @@
                                        ! measured points in input file (radians)
       CHARACTER*20     BOL_TYPE (SCUBA__NUM_CHAN, SCUBA__NUM_ADC)
                                        ! bolometer types
-      INTEGER          CI              ! Colour index required for graphics
-      INTEGER          COLI            ! Original colour index of current pen
+      DOUBLE PRECISION BOX             ! Dummy for KPG1_PLOT
       LOGICAL          DEVCAN          ! The device parameter is to be cancelled?
       INTEGER          DIM (MAX_DIM)   ! array dimensions
       DOUBLE PRECISION DTEMP           ! Temp double
+      DOUBLE PRECISION DXTEMP          ! Temp double for X coord
+      DOUBLE PRECISION DYTEMP          ! Temp double for Y coord
       INTEGER          END_EXP         ! Last exposure
       INTEGER          END_INT         ! Last integration
       INTEGER          END_MEAS        ! Last measurement
@@ -195,13 +201,14 @@
                                        ! array of FITS keywords
       LOGICAL          FLATFIELD       ! .TRUE. if the FLATFIELD application
                                        ! has been run on the input file
+      INTEGER          FSET            ! AST_FRAMESET object for 2D AXIS frame
       LOGICAL          GOTLOC          ! A locator to the NDF has been
                                        ! obtained?
       LOGICAL          GOTNAM          ! A reference name of the NDF has been
                                        ! obtained?
       REAL             HGT             ! Height for key text
-      REAL             HT0             ! Text height on entry
       INTEGER          I               ! DO loop index
+      INTEGER          IAXFRM          ! Index of AXIS domain in AST frameset
       INTEGER          IERR            ! Position of error from VEC_
       CHARACTER*15     IN_CENTRE_COORDS! coord system of telescope centre in
                                        ! an input file
@@ -245,10 +252,15 @@
                                        ! file
       DOUBLE PRECISION IN_UT1          ! UT1 at start of an input observation,
                                        ! expressed as modified Julian day
+      DOUBLE PRECISION INXPOS( 2 )     ! X positions of test bolometer
+      DOUBLE PRECISION INYPOS( 2 )     ! Y positions of test bolometer
+      INTEGER          IPIC            ! AGI idents from KPG1_PLOT [not used]
+      INTEGER          IPICD           ! AGI ident of new DATA picture
+      INTEGER          IPICF           ! AGI ident of new FRAME picture
+      INTEGER          IPLOT           ! AST pointer to new plot
       INTEGER          ITEMP           ! scratch integer
       INTEGER          IWCS            ! AST FrameSet
       INTEGER          IWCSNEW         ! New AST FrameSet
-      INTEGER          IWKID           ! GKS workstation identifier
       INTEGER          JIGGLE_COUNT    ! number of jiggles in pattern
       INTEGER          JIGGLE_P_SWITCH ! number of jiggles per switch
       INTEGER          JIGGLE_REPEAT   ! number of times jiggle pattern is
@@ -258,22 +270,19 @@
       REAL             JIGGLE_Y (SCUBA__MAX_JIGGLE)
                                        ! y jiggle offsets (arcsec)
       DOUBLE PRECISION LAT_OBS         ! Latitude of observatory
-      INTEGER          LNTYPE          ! Line type to be used
-      INTEGER          LNTYPI          ! Initial line type for current SGS pen
       CHARACTER * ( DAT__SZLOC ) LOCI  ! Locator for input data structure
-      REAL             LWIDTH          ! The width of the current SGS pen
       CHARACTER*(15)   LOCAL_COORDS    ! Coordinate system of MAP_X and MAP_Y
       REAL             MAP_X           ! x offset of map centre from telescope
                                        ! centre (radians)
       REAL             MAP_Y           ! y offset of map centre from telescope
                                        ! centre (radians)
+      REAL             MARGIN( 4 )     ! Dummy for KPG1_PLOT call
       DOUBLE PRECISION MJD_STANDARD    ! date for which apparent RA,Decs of all
                                        ! measured positions are calculated
       INTEGER          NDIM            ! the number of dimensions in an array
       INTEGER          NDF             ! NDF id of input image
       INTEGER          NERR            ! Number of errors from VEC_
-      INTEGER          NF              ! Font number
-      INTEGER          NPR             ! Text precision
+      INTEGER          NFRM            ! AXIS frame number
       INTEGER          NREC            ! number of history records in input file
       INTEGER          N_BOL           ! number of bolometers measured in input
                                        ! files
@@ -303,9 +312,6 @@
                                        ! (radians)
       DOUBLE PRECISION OUT_ROTATION    ! angle between apparent N and N of
                                        ! output coord system (radians)
-      INTEGER PEN                      ! Current SGS pen
-      INTEGER PICID                    ! Input picture identifier
-      INTEGER PICIDI                   ! Data image picture identifier 
       REAL             POINT_DAZ (SCUBA__MAX_POINT)
                                        ! azimuth pointing corrections (radians)
       REAL             POINT_DEL (SCUBA__MAX_POINT)
@@ -326,27 +332,20 @@
       REAL             SAMPLE_PA       ! position angle of sample x axis
                                        ! relative to x axis of SAMPLE_COORDS
                                        ! system
-      LOGICAL SETPLR                   ! Polyline representation to be reset?
       REAL             SHIFT_DX
                                        ! x shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
       REAL             SHIFT_DY
                                        ! y shift to be applied to component map
                                        ! in OUTPUT_COORDS frame (radians)
-      REAL SP0                         ! Space between characters on entry
       CHARACTER*80     STATE           ! 'state' of SCUCD at the end of
                                        ! the observation
       INTEGER          START_EXP       ! First exposure
       INTEGER          START_INT       ! First integration
       INTEGER          START_MEAS      ! First measurement
       CHARACTER*80     STEMP           ! scratch string
-      CHARACTER * ( 2 ) TXJ0           ! Text justification on entry
-      REAL XTEMP(2)                    ! X pos of first two bols
-      REAL XU0                         ! X comp. of text up-vector on entry
-      REAL YTEMP(2)                    ! Y pos of first two bols
-      REAL YU0                         ! Y comp. of text up-vector on entry
-      INTEGER ZONEO                    ! SGS zone of the displayed image
-      INTEGER ZONEOV                   ! SGS zone of the input picture
+      DOUBLE PRECISION XTEMP(2)        ! X pos of first two bols
+      DOUBLE PRECISION YTEMP(2)        ! Y pos of first two bols
 
 *.
 
@@ -362,27 +361,34 @@
 *     Set the MSG output level (for use with MSG_OUTIF)
       CALL MSG_IFGET('MSG_FILTER', STATUS)
 
-*     Obtain an SGS zone for the last DATA picture.
-*     =============================================
-      
-*     Associate graphics device and start database activity.  Update access
-*     is used so that line can be drawn without destroying the existing
-*     plot.
-      CALL AGS_ASSOC( 'DEVICE', 'UPDATE', ' ', PICID, ZONEOV, STATUS )
-      
-*     Find the last DATA picture.
-      CALL KPG1_AGFND( 'DATA', PICIDI, STATUS )
-      
-*     Obtain the SGS zone identifier for the current DATA picture.
-      CALL AGS_NZONE( ZONEO, STATUS )
-      
-*     Report the name, comment, and label, if one exists, for the current
-*     picture.
-      CALL KPG1_AGATC( STATUS )
+*     Begin an AST Context.
+      CALL AST_BEGIN( STATUS )
+
+*     Begin an NDF context.
+      CALL NDF_BEGIN
+
+*     Get the AST plot
+*     ================
+
+*     Create a frameset with a AXIS domain
+*     that we can use for alignment purposes
+      FSET = AST_FRAMESET( AST_FRAME( 2, 'Domain=AXIS', STATUS ),
+     :     ' ', STATUS)
+
+*     Open the graphics device and workstation. An error is reported if no
+*     existing DATA picture can be found. An AST Plot is returned which
+*     can be used to draw in the existing Plot.
+      MARGIN(1) = 0
+      MARGIN(2) = 0
+      MARGIN(3) = 0
+      MARGIN(4) = 0
+      CALL KPG1_PLOT( FSET, 'OLD', 'SURF_SCUOVER',
+     :     ' ', MARGIN, 0, ' ', ' ', 0.0, 1.0, 'PIXEL', BOX,
+     :     IPICD, IPICF, IPIC, IPLOT, NFRM, ALIGN, STATUS)
 
 *     Obtain a reference to the NDF.
 *     ==============================
-      CALL KPG1_AGREF( PICIDI, 'READ', GOTNAM, REFNAM, STATUS )
+      CALL KPG1_AGREF( IPICD, 'READ', GOTNAM, REFNAM, STATUS )
       
 *     See whether the reference is a name or locator.  The latter should
 *     be phased out, but there may be some old databases and software in
@@ -398,8 +404,8 @@
 
 *     Obtain the NDF.
 *     ===============
-      
-*     Begin an NDF context.
+
+*     Begin an NDF context
       CALL NDF_BEGIN
       
 *     Obtain the NDF.  If the name is given on the command line it will be
@@ -934,98 +940,101 @@
 
       IF (STATUS .EQ. SAI__OK) THEN
 
+*     Find the frame associated with the AXIS domain
+*     ==============================================
+
+         CALL KPG1_ASFFR( IPLOT, 'AXIS', IAXFRM, STATUS)
+
+*     Set up a mapping between this frame and the GRAPHICS frame
+*     This will allow us to translate bolometer positions to
+*     graphics coordinates
+         AX2GRMAP = AST_GETMAPPING( IPLOT, IAXFRM, AST__BASE, STATUS )
+
 *     Get information on line style and colour.
 *     =========================================
-         
-*     Inquire the workstation identifier for GKS inquiries.
-         CALL SGS_ICURW( IWKID )
-         SETPLR = .FALSE.
-         
-*     Obtain the colour index for the desired colour of the lines.
-*     Do not restrict the colours to the palette.
-         CALL KPG1_IVCI( 'DEVICE', 'COL', .FALSE., CI, STATUS )
-         
-*     Can now start plotting these on the graph     
 
-*     Inquire the current colour index of this pen (it will be restored
-*     after all plotting is complete).
-         CALL GQPLR( IWKID, MPEN, GSET, IERR, LNTYPI, LWIDTH, COLI )
+*     Set up Bolometer as a synonym for curve
+         CALL KPG1_ASPSY( '(BOL*OMETER)', '(CURVES)', STATUS )
+
+*     Set the plotting style.
+         CALL KPG1_ASSET( 'SURF_SCUOVER', 'STYLE', IPLOT, STATUS )
+
+*     Set the appearance of lines drawn using PGPLOT so that they mimic 
+*     curves produced using astCurves.
+         CALL KPG1_PGSTY( IPLOT, 'CURVES', .TRUE., ATTRS, STATUS )
 
 *     Calculate the distance between bolometers. If we only have one
 *     bolometer just assume a distance of 24 arcsec (a random number)
 
          IF (N_BOL .LE. 1) THEN
 
-            BOL_DIST = 15.0
+            BOL_DIST = 15.0D0
 
          ELSE
          
 *     Need to find half distance between bolometers
-            CALL VEC_DTOR(.FALSE., 2, %val(BOL_RA_PTR),
+            CALL VEC_DTOD(.TRUE., 2, %val(BOL_RA_PTR),
      :           XTEMP, IERR, NERR, STATUS)
-            CALL VEC_DTOR(.FALSE., 2, %val(BOL_DEC_PTR),
+            CALL VEC_DTOD(.TRUE., 2, %val(BOL_DEC_PTR),
      :           YTEMP, IERR, NERR, STATUS)
          
             BOL_DIST = SQRT((XTEMP(2)-XTEMP(1))**2 +
      :           (YTEMP(2)-YTEMP(1))**2)
-            BOL_DIST = BOL_DIST * REAL(R2AS) * 0.5
+            BOL_DIST = BOL_DIST * R2AS * 0.5D0
 
          END IF
 
 *     Now calculate (half) this distance in World coordinates
 *     (I am assuming dx=dy for simplicity)
 
-         CALL AGI_TDTOW(PICIDI, 1, 0., 0., XTEMP(1), YTEMP(1), STATUS)
-         CALL AGI_TDTOW(PICIDI, 1, 0., BOL_DIST,XTEMP(2), YTEMP(2), 
-     :        STATUS)
+         INXPOS(1) = 0.0D0
+         INYPOS(1) = 0.0D0
+         INXPOS(2) = 0.0D0
+         INYPOS(2) = BOL_DIST
+         CALL AST_TRAN2( AX2GRMAP, 2, INXPOS, INYPOS, .TRUE.,
+     :        XTEMP, YTEMP, STATUS)
 
-         BOL_DIST_WORLD = ABS(YTEMP(2) - YTEMP(1))
+         BOL_DIST_WORLD = REAL(ABS(YTEMP(2) - YTEMP(1)))
 
-*     Text attributes
+*     Now that we have converted bolometer separation to world coordinates 
+*     for textht, we need to calculate the required size relative to
+*     the default PGPLOT TEXT HEIGHT. This is because the standard
+*     font size is defined a 1/40 the height of the view surface!!!!
+*     Luckily, there is a Kappa routine that emulates SGS_SHTX :-)
 
-         LNTYPE = 1
-         LWIDTH = 1
+*     This is the height of the text in graphics coordinates
+*     We want the text to be readable but still fit inside the
+*     circles
+         HGT = 0.85 * BOL_DIST_WORLD
 
-*     Get the current text attributes.
-         CALL SGS_ITXA( NF, NPR, HT0, AR0, XU0, YU0, SP0, TXJ0 )
-
-         CALL SGS_SARTX( AR )
-         CALL SGS_SUPTX( 0.0, 1.0 )
-         CALL SGS_STXJ( 'CC' )
-         CALL SGS_SSPTX( 0.0 )
-
-*     Convert bolometer separation to world coordinates for textht
-         HGT = 0.55 * BOL_DIST_WORLD
-         CALL SGS_SHTX (HGT)
-
-*     Store the new colour index and line style for this pen.
-         CALL GSPLR( IWKID, MPEN, LNTYPE, LWIDTH, CI )
-         SETPLR = .TRUE.
-         
-*     See if a GKS error has occurred.
-         CALL GKS_GSTAT( STATUS )
-         
-*     Inquire the current SGS pen, and then select the pen used to draw
-*     markers.
-         CALL SGS_IPEN( PEN )
-         CALL SGS_SPEN( MPEN )
+*     Now scale by the view surface
+         CALL KPG1_PGSHT( HGT, STATUS )
 
 *     Which type of label do we want
          CALL PAR_GET0L('NAME', BOLNAME, STATUS)
          
+*     Set the Fill-Area mode to outline so we can see the text
+*     in the circles
+         CALL PGSFS( 2 )
+
 *     Loop through all bolometers
          DO I = 1, N_BOL
 
-            CALL VEC_DTOR(.FALSE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
-     :           RTEMP, IERR, NERR, STATUS)
-            CALL VEC_DTOR(.FALSE., 1, %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
-     :           RDTEMP, IERR, NERR, STATUS)
+            CALL VEC_DTOD(.TRUE., 1, %val(BOL_RA_PTR+(I-1)*VAL__NBD), 
+     :           DXTEMP, IERR, NERR, STATUS)
+            CALL VEC_DTOD(.TRUE., 1, %val(BOL_DEC_PTR+(I-1)*VAL__NBD),
+     :           DYTEMP, IERR, NERR, STATUS)
 
-            RTEMP = RTEMP * REAL(R2AS)
-            RDTEMP = RDTEMP * REAL(R2AS)
+            DXTEMP = DXTEMP * R2AS
+            DYTEMP = DYTEMP * R2AS
 
 *     Transform to world coordinates
-            CALL AGI_TDTOW(PICIDI, 1, RTEMP, RDTEMP,RTEMP,RDTEMP,STATUS)
+*     It is probably better to do this outside the loop since
+*     AST_TRAN2 can convert many coordinates at once
+            CALL AST_TRAN2( AX2GRMAP, 1, DXTEMP, DYTEMP, 
+     :           .TRUE., DXTEMP, DYTEMP, STATUS)
+            RTEMP = SNGL( DXTEMP )
+            RDTEMP = SNGL( DYTEMP )
 
 *     Convert to proper bol name if necessary
             IF (BOLNAME) THEN
@@ -1035,37 +1044,53 @@
             END IF
 
 *     Now plot on map (Need to call 3 times depending on length of string)
+*     Need to offset the Y value by half the character height so that it
+*     can be centred in Y as well as centre justified in X
+*     Divide by 2.5 since 2.0 seems to add too much of a correction
             ITEMP = CHR_LEN(BOL)
-            IF (ITEMP .EQ. 1) THEN
-               B1 = BOL
-               CALL SGS_TX(RTEMP, RDTEMP, B1)
-            ELSE IF (ITEMP .EQ. 2) THEN
-               B2 = BOL
-               CALL SGS_TX(RTEMP, RDTEMP, B2)
-            ELSE
-               CALL SGS_TX(RTEMP, RDTEMP, BOL)
-            END IF
+*            IF (ITEMP .EQ. 1) THEN
+*               B1 = BOL
+*               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, B1)
+*            ELSE IF (ITEMP .EQ. 2) THEN
+*               B2 = BOL
+*               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, B2)
+*            ELSE
+               CALL PGPTXT(RTEMP, RDTEMP - (HGT/2.5), 0.0, 0.5, BOL)
+*            END IF
 
-            CALL SGS_CIRCL(RTEMP, RDTEMP, BOL_DIST_WORLD * 0.85)
+*     Plot the circle using PGPLOT directly
+            CALL PGCIRC( RTEMP, RDTEMP, BOL_DIST_WORLD * 0.85 )
+
          END DO
 
-*     If necessary, re-instate the original colour index for the marker
-*     pen, and reinstate the original pen.
-         CALL SGS_SPEN( PEN )
-         IF ( SETPLR ) CALL GSPLR( IWKID, MPEN, LNTYPI, LWIDTH, COLI )
 
       END IF
 
-* Free
+*     Ensure that the previous synonyms are cleared
+         CALL KPG1_ASPSY( ' ', ' ', STATUS )
+
+*     Free memory
 
       CALL SCULIB_FREE ('BOL_RA', BOL_RA_PTR, BOL_RA_END, STATUS)
       CALL SCULIB_FREE ('BOL_DEC', BOL_DEC_PTR, BOL_DEC_END, STATUS)
  
  980  CONTINUE
 
-*  Need to tidy up the graphics database before exiting.
-      CALL AGS_DEASS( 'DEVICE', DEVCAN, STATUS )
+*  Tidy up the locators.
+      IF( GOTLOC ) CALL REF_ANNUL( LOCI, STATUS )
+      CALL DAT_VALID( LOCI, GOTLOC, STATUS )
+      IF( GOTLOC ) CALL DAT_ANNUL( LOCI, STATUS )
 
+*  Shutdown PGPLOT and the graphics database.
+      CALL KPG1_PGCLS( 'DEVICE', .FALSE., STATUS )
+
+*  End the NDF context.
+      CALL NDF_END( STATUS )
+
+*  End the AST Context.
+      CALL AST_END( STATUS )
+
+*  End the error context
       CALL ERR_END(STATUS)
  
       END
