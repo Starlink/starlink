@@ -2,7 +2,7 @@
  The CONVERT package contains some of the numerous format-conversion
  routines which are necessary to translate data files to and from the
  Starlink standard n-Dimensional-data format--the NDF---described in
- SUN/33 and SGP/38.
+ SUN/33 and SGP/38.  CONVERT commands are available from ICL and DCL.
 
  The commands available are:
 
