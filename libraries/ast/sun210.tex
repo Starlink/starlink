@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {210.9}
 \newcommand{\stardocauthors}   {R.F. Warren-Smith \& D.S. Berry}
-\newcommand{\stardocdate}      {4th April 2001}
+\newcommand{\stardocdate}      {14th June 2001}
 \newcommand{\stardoctitle}     {AST\\
                                 A Library for Handling\\
                                 World Coordinate Systems\\
@@ -9383,6 +9383,48 @@ It will draw both linear and curvilinear axes and grids, as required
 by the particular Plot. The appearance of the output can be modified
 in a wide variety of ways by setting various Plot attributes.
 
+\subsection{\label{ss:choosingagraphicspackage}Choosing a Graphics Package}
+The \htmlref{Plot}{Plot} class itself does not include any code for actually drawing on a
+graphics device. Instead, it requires a set of functions to be provided
+which it uses to draw the required graphics. These include functions
+to draw a straight line, draw a text string, \emph{etc}. You may choose
+to provide functions from your favorite graphics package, or you can even
+write your own! To accomodate variations in the calling interfaces of
+different graphics packages, AST defines a standard interface for these
+routines. If this interface differs from the interface provided by your
+graphics package (which in general it will), then you must write a set of
+\emph{wrapper functions}, which provide the interface expected by AST but
+which then call functions from your graphics package to provide the
+required functionality. AST comes with wrapper functions suitable for
+the PGPLOT graphics package (see \xref{SUN/15}{sun15}{}).
+
+There are two ways of indicating which wrapper functions are to be used by 
+the Plot class:
+\begin{enumerate}
+
+\item A file containing C functions with pre-defined names can be written
+and linked with the application using options of the \htmlref{ast\_link}{ast_link} command.
+(see \secref{ss:howtobuild} and \appref{ss:commanddescriptions}). AST is
+distributed with such a file (called {\tt grf\_pgplot.c}) which calls PGPLOT 
+functions to implement the required functionality. This file can be used
+as a template for writing your own.
+Currently, it is not possible to write such ``grf modules'' in Fortran.
+If you want to use wrapper functions written in Fortran, then you must 
+use the AST_SETGRFFUN method as described below.
+
+\item The 
+AST_SETGRFFUN
+method of the Plot class can be used to ``register''
+wrapper functions at run-time. This allows an application to switch
+between graphics systems if required. Graphics functions registered in
+this way do not need to have the pre-defined names used in the link-time
+method described above.
+
+\end{enumerate}
+
+For details of the interfaces of the wrapper routines, see 
+the reference documentation for the AST_SETGRFFUN method.
+
 \cleardoublepage
 \section{Compiling and Linking Software that Uses AST}
 
@@ -12558,13 +12600,87 @@ Object            - Base class for all AST Objects
    }
 }
 \sstroutine{
-   AST\_GRFFUN\sstlabel{AST_GRFFUN}
+   AST\_GRFPOP\sstlabel{AST_GRFPOP}
 }{
-   Register a graphics routine for use by the Plot class
+   Restore previously saved graphics functions used by a Plot
+}{
+   \sstdescription{
+      The \htmlref{AST\_GRFPUSH}{AST_GRFPUSH} and AST\_GRFPOP functions are intended for situations
+      where it is necessary to make temporary changes to the graphics
+      functions used by the \htmlref{Plot}{Plot}. The current functions should first be
+      saved by calling AST\_GRFPUSH. New functions should then be registered
+      using \htmlref{AST\_GRFSET}{AST_GRFSET}. The required graphics should then be produced.
+      Finally, AST\_GRFPOP should be called to restore the original graphics
+      functions.
+   }
+   \sstinvocation{
+      CALL AST\_GRFPOP( THIS STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Plot.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+   \sstnotes{
+      \sstitemlist{
+
+         \sstitem
+         This routine returns without action if there are no snapshots to
+         restore. No error is reported in this case.
+      }
+   }
+}
+\sstroutine{
+   AST\_GRFPUSH\sstlabel{AST_GRFPUSH}
+}{
+   Save the current graphics functions used by a Plot
+}{
+   \sstdescription{
+      This routine takes a snapshot of the graphics functions which are
+      currently registered with the supplied \htmlref{Plot}{Plot}, and saves the snapshot
+      on a first-in-last-out stack within the Plot. The snapshot can be
+      restored later using function
+      \htmlref{AST\_GRFPOP}{AST_GRFPOP}.
+
+      The AST\_GRFPUSH and AST\_GRFPOP functions are intended for situations
+      where it is necessary to make temporary changes to the graphics
+      functions used by the Plot. The current functions should first be
+      saved by calling AST\_GRFPUSH. New functions should then be registered
+      using \htmlref{AST\_GRFSET}{AST_GRFSET}. The required graphics should then be produced.
+      Finally, AST\_GRFPOP should be called to restore the original graphics
+      functions.
+   }
+   \sstinvocation{
+      CALL AST\_GRFPUSH( THIS STATUS )
+   }
+   \sstarguments{
+      \sstsubsection{
+         THIS = INTEGER (Given)
+      }{
+         Pointer to the Plot.
+      }
+      \sstsubsection{
+         STATUS = INTEGER (Given and Returned)
+      }{
+         The global status.
+      }
+   }
+}
+\sstroutine{
+   AST\_GRFSET\sstlabel{AST_GRFSET}
+}{
+   Register a graphics routine for use by a Plot
 }{
    \sstdescription{
       This routine can be used to select the underlying graphics
-      routines to be used when the \htmlref{Plot}{Plot} class produces graphical output.
+      routines to be used when the supplied \htmlref{Plot}{Plot} produces graphical output.
       If this routine is not called prior to producing graphical
       output, then the underlying graphics routines selected at
       link-time (using the \htmlref{ast\_link}{ast_link} command) will be used. To use
@@ -12575,7 +12691,7 @@ Object            - Base class for all AST Objects
       attribute is given a non-zero value.
    }
    \sstinvocation{
-      CALL AST\_GRFFUN( THIS, NAME, FUN, STATUS )
+      CALL AST\_GRFSET( THIS, NAME, FUN, STATUS )
    }
    \sstarguments{
       \sstsubsection{
@@ -12587,10 +12703,10 @@ Object            - Base class for all AST Objects
          NAME = CHARACTER $*$ ( $*$ ) (Given)
       }{
          A name indicating the graphics routine to be replaced.
-         Eight graphics routines are used in total by the
+         Six graphics routines are used in total by the
          Plot class, and any combination of them may be supplied by calling
          this routine once for each routine to be replaced. If any of the
-         eight graphics routines are not replaced in this way, the
+         six graphics routines are not replaced in this way, the
          corresponding routines in the graphics interface selected at
          link-time (using the ast\_link command) are used. The allowed
          names are:
@@ -12601,9 +12717,6 @@ Object            - Base class for all AST Objects
             Attr -  Enquire or set a graphics attribute value
 
             \sstitem
-            AxScale - Get the axis scales
-
-            \sstitem
             Flush - Flush all pending graphics to the output device
 
             \sstitem
@@ -12611,9 +12724,6 @@ Object            - Base class for all AST Objects
 
             \sstitem
             Mark -  Draw a set of markers
-
-            \sstitem
-            Qch - Get the character height in world coordinates
 
             \sstitem
             Text - Draw a character string
@@ -12626,19 +12736,15 @@ Object            - Base class for all AST Objects
          required for each, see the sections below.
       }
       \sstsubsection{
-         fun
-      }{
-      }
-      \sstsubsection{
          FUN = INTEGER FUNCTION (Given)
       }{
          The name of the routine to be used to provide the
-         functionality indicated by parameter name (the name
+         functionality indicated by parameter NAME (the name
          should also appear in a Fortran EXTERNAL statement in the
-         routine which invokes AST\_GRFFUN).
+         routine which invokes AST\_GRFSET).
 
          Once a routine has been provided, the {\tt{"}}null{\tt{"}} routine AST\_NULL can
-         be supplied in a subsequent call to astGrfFun to reset the routine
+         be supplied in a subsequent call to astGrfSet to reset the routine
          to the corresponding routine in the graphics interface selected at
          link-time. AST\_NULL is defined in the AST\_PAR include file.
       }
@@ -12671,21 +12777,11 @@ Object            - Base class for all AST Objects
          \sstitem
          ATT = INTEGER (Given) - An integer identifying the required attribute.
            The following symbolic values are defined in GRF\_PAR:
-
-         \sstitem
-           GRF\_\_STYLE  - Line style.
-
-         \sstitem
-           GRF\_\_WIDTH  - Line width.
-
-         \sstitem
-           GRF\_\_SIZE   - Character and marker size scale factor.
-
-         \sstitem
-           GRF\_\_FONT   - Character font.
-
-         \sstitem
-           GRF\_\_COLOUR - Colour index.
+           GRF\_\_STYLE (Line style),
+           GRF\_\_WIDTH (Line width),
+           GRF\_\_SIZE (Character and marker size scale factor),
+           GRF\_\_FONT (Character font),
+           GRF\_\_COLOUR (Colour index).
 
          \sstitem
          VAL = DOUBLE PRECISION (Given) -
@@ -12697,51 +12793,11 @@ Object            - Base class for all AST Objects
 
          \sstitem
          PRIM = INTEGER (Given) -
-            The sort of graphics primitive to be drawn with the new attribute.
-            Identified by the following values defined in GRF\_PAR:
-
-         \sstitem
-            GRF\_\_LINE
-
-         \sstitem
-            GRF\_\_MARK
-
-         \sstitem
-            GRF\_\_TEXT
-      }
-   }
-   \sstdiytopic{
-      AxScale
-   }{
-      The {\tt{"}}AxScale{\tt{"}} function returns two values (one for each axis) which
-      scale increments on the corresponding axis into a {\tt{"}}normal{\tt{"}} coordinate
-      system in which:
-      \sstitemlist{
-
-         \sstitem
-         The axes have equal scale in terms of (for instance) millimetres
-           per unit distance.
-
-         \sstitem
-         X values increase from left to right.
-
-         \sstitem
-         Y values increase from bottom to top.
-         It requires the following interface:
-
-      }
-      int AxScale( float $*$alpha, float $*$beta )
-      INTEGER FUNCTION AXSCALE( ALPHA, BETA )
-
-      \sstitemlist{
-
-         \sstitem
-         ALPHA = REAL (Returned) - Returned holding the scale for the
-            X axis (i.e. Xnorm = alpha$*$Xworld).
-
-         \sstitem
-         BETA = REAL (Returned) - Returned holding the scale for the
-            Y axis (i.e. Ynorm = beta$*$Yworld).
+           The sort of graphics primitive to be drawn with the new attribute.
+           Identified by the following values defined in GRF\_PAR:
+           GRF\_\_LINE,
+           GRF\_\_MARK,
+           GRF\_\_TEXT.
       }
    }
    \sstdiytopic{
@@ -12795,28 +12851,6 @@ Object            - Base class for all AST Objects
          \sstitem
          TYPE = INTEGER (Given) - An integer which can be used to indicate
            the type of marker symbol required.
-      }
-   }
-   \sstdiytopic{
-      Qch
-   }{
-      The {\tt{"}}Qch{\tt{"}} function returns the heights of characters drawn vertically
-      and horizontally. It requires the following interface:
-
-      int Qch( float $*$chv, float $*$chh )
-      int QCH( CHV, CHH )
-
-      \sstitemlist{
-
-         \sstitem
-         CHV = REAL (Returned) - Returned holding the height of
-            characters drawn with a vertical baseline. This will be an
-            increment along the X axis, in X axis units.
-
-         \sstitem
-         CHH = REAL (Returned) - Returned holding the height of
-            characters drawn with a horizontal baseline. This will be an
-            increment along the Y axis, in Y axis units.
       }
    }
    \sstdiytopic{
@@ -20036,13 +20070,13 @@ Object            - Base class for all AST Objects
 \sstroutine{
    Grf\sstlabel{Grf}
 }{
-   Use Grf routines registered through AST\_GRFFUN?
+   Use Grf routines registered through AST\_GRFSET?
 }{
    \sstdescription{
       This attribute selects the routines which are used to draw graphics by
       the \htmlref{Plot}{Plot} class. If it is zero, then the routines in the graphics
       interface selected at link-time are used (see the \htmlref{ast\_link}{ast_link} script).
-      Otherwise, routines registered using \htmlref{AST\_GRFFUN}{AST_GRFFUN} are used. In this
+      Otherwise, routines registered using \htmlref{AST\_GRFSET}{AST_GRFSET} are used. In this
       case, if a routine is needed which has not been registered,
       then the routine in the graphics interface selected at link-time is
       used.
@@ -23751,6 +23785,15 @@ Object            - Base class for all AST Objects
          AST\_CURVE: Draw a geodesic curve
 
          \sstitem
+         \htmlref{AST\_GRFPOP}{AST_GRFPOP}: Retrieve previously saved graphics functions
+
+         \sstitem
+         \htmlref{AST\_GRFPUSH}{AST_GRFPUSH}: Save the current graphics functions
+
+         \sstitem
+         \htmlref{AST\_GRFSET}{AST_GRFSET}: Register a graphics routine for use by the Plot class
+
+         \sstitem
          AST\_GRID: Draw a set of labelled coordinate axes
 
          \sstitem
@@ -24809,12 +24852,10 @@ AST\_\_GLS type has been retained as an alias for AST\_\_SFL.
 
 \end{enumerate}
 
-\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
-Introduced in V1.6}
+\subsection{Changes Introduced in V1.6}
 
 The following describes the most significant changes which have
-occurred in the AST library between versions V1.5 and V1.6 (the
-current version):
+occurred in the AST library between versions V1.5 and V1.6:
 
 \begin{enumerate}
 
@@ -24890,6 +24931,30 @@ its value is transferred to the new Object when a copy is made.
 \item A bug has been fixed which could prevent complex CmpFrames
 behaving correctly (for instance, resulting in the failure of attempts 
 to find a \htmlref{Mapping}{Mapping} between a \htmlref{CmpFrame}{CmpFrame} and itself).
+
+\end{enumerate}
+
+\subsection{\xlabel{changes}\xlabel{list_of_most_recent_changes}Changes
+Introduced in V1.7}
+
+The following describes the most significant changes which have
+occurred in the AST library between versions V1.6 and V1.7 (the
+current version):
+
+\begin{enumerate}
+
+\item The \htmlref{Plot}{Plot} class has a new method called 
+AST_SETGRFFUN 
+which allows the underlying primitive graphics functions to be selected
+at run-time. Previously, the functions used by the Plot class to produce
+graphics could only be selected at link-time, using the options of the
+\htmlref{ast\_link}{ast_link} command. The new Plot method allows an application to over-ride
+the functions established at link-time, by specifying alternative
+primitive graphics routines.
+
+\item A bug has been fixed in the Plot class which could result in axis
+labels being drawn on inappropriate edges of the plotting box when using
+``interior'' labelling.
 
 \end{enumerate}
 
