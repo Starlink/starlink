@@ -80,14 +80,14 @@
       set newfiles "$moveto[$filterent get]"
 
 #  Look for directories. These do not use the file filter.
-      foreach name [lsort [glob -nocomplain "$moveto*" ] ] {
+      foreach name [lsort -dictionary [glob -nocomplain "$moveto*" ] ] {
          if { [file isdirectory $name] } { 
             $dirbox insert end $name
          }
       } 
 
 #  Now for normal file which do need the file filter.
-      foreach filename [lsort [glob -nocomplain $newfiles ] ] {
+      foreach filename [lsort -dictionary [glob -nocomplain $newfiles ] ] {
          if { ! [file isdirectory $filename] } { 
 
 #  In general use the filename as it is, but in the case where we are

@@ -58,7 +58,7 @@
       if { [info exists CCDdetectorcache] } {
          foreach dir $CCDdetectorcache {
             if { [file isdirectory $dir] } {
-               set files [glob -nocomplain "$dir/*.DAT"]
+               set files [lsort -dictionary [glob -nocomplain "$dir/*.DAT"]]
                if { $files != "" } {
                   foreach file $files {
 		     set f [open $file r]
