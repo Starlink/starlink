@@ -1,0 +1,40 @@
+*+
+*  Name:
+*     CUB1_PAR
+
+*  Purpose:
+*     Define DATACUBE system parameter constants.
+
+*  Language:
+*     Starlink Fortran 77
+
+*  Type of Module:
+*     Global constants include file.
+
+*  Description:
+*     This file defines the size of any DATACUBE global constants.
+
+*  Authors:
+*     AALLAN: Alasdair Allan (STARLINK, Keele University)
+*     {enter_new_authors_here}
+
+*  History:
+*     05-JUN-2000 (AALLAN):
+*        Original version.
+
+*  Bugs:
+*     {note_any_bugs_here}
+
+*-
+
+*  Global constants:
+
+*  Maximum number of PIXELS along an NDF AXIS
+      INTEGER CUB1__MXPIX
+      PARAMETER(CUB1__MXPIX = 4096)
+
+*  Package version.
+      CHARACTER*(32) VERS
+      PARAMETER(VERS = '(DATACUBE version 1.0)')
+
+*  End.

@@ -1,0 +1,69 @@
+#+
+#  Name:
+#     DATACUBE_HELP.IFL
+
+#  Type of module:
+#     ADAM A-task parameter interface.
+
+#  Author:
+#     MJC: Malcolm J. Currie (STARLINK)
+#     PDRAPER: Peter Draper (STARLINK)
+#     AALLAN: Alasdair Allan (STARLINK, Keele University)
+#     {enter_new_authors_here}
+
+#  History:
+#     1986 November 14 (MJC):
+#	 Original version.
+#     1992 August 19 (MJC):
+#     	 Added prologue, and access to help library.
+#     1993 January 5 (PDRAPER):
+#        Rename CCDHELP.
+#     06-NOV-1996 (PDRAPER):
+#     	 Rename PHOTOMHELP.
+#     04-SEP-2000 (AALLAN):
+#        Rename DATACUBE_HELP
+#     {enter_further_changes_here}
+
+#-
+
+
+interface DATACUBE_HELP
+
+   parameter      TOPIC
+      position    1
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help topic'
+      default     '         '
+   endparameter
+
+   parameter      SUBTOPIC
+      position    2
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBTOPIC
+      position    3
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubtopic'
+      default     '         '
+   endparameter
+
+   parameter      SUBSUBSUBTOPIC
+      position    4
+      type        'LITERAL'
+      access      'READ'
+      vpath       'DEFAULT'
+      prompt      'Help subsubsubtopic'
+      default     '         '
+   endparameter
+
+endinterface
+
