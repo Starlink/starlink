@@ -950,6 +950,8 @@
             C = CHAR( ICHAR('1') + ISRC - I_BGM_TSRC )
             CALL NBS_FIND_ITEM( I_NBID, 'BG_SRC'//C, ITEMID, STATUS )
             CALL NBS_PUT_CVALUE( ITEMID, 0, SSTR, STATUS )
+	print *,isrc,sstr,status
+	call flush(6)
 
           END DO
 
