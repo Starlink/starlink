@@ -1,7 +1,7 @@
       SUBROUTINE POL1_PKAXS( NDIM, GI, CONST, IWCS, STATUS )
 *+
 *  Name:
-*     POL1_GTCTA
+*     POL1_PKAXS
 
 *  Purpose:
 *     Pick the required axes to display.
@@ -80,7 +80,9 @@
       CHARACTER DOM*255          ! Domain for Base Frame
       CHARACTER NAME*(CAT__SZCMP)! Axis name
       DOUBLE PRECISION CON( NDF__MXDIM )! Good constants
-      INTEGER BFRM               ! Pointer to a Frame
+      DOUBLE PRECISION TEST( 1, NDF__MXDIM )! A test point
+      INTEGER BFRM               ! Pointer to base Frame
+      INTEGER CFRM               ! Pointer to current Frame
       INTEGER IAT                ! No. of characters in string
       INTEGER IBASE              ! Original Base Frame index
       INTEGER ICURR              ! Original Current Frame index
@@ -94,9 +96,6 @@
       INTEGER OUTPRM( NDF__MXDIM )! Output axis permutation
       INTEGER PMAP               ! Pointer to PermMap
 *.
-
-*  Initialise.
-      IWCS = AST__NULL
 
 *  Check the inherited status. 
       IF ( STATUS .NE. SAI__OK ) RETURN
@@ -169,6 +168,50 @@
          END DO
 
          CALL AST_SETC( BFRM, 'DOMAIN', DOM( : IAT ), STATUS )
+      END IF
+
+*  Now modify the Current Frame so that it also has 2 axes.
+      CFRM = AST_GETFRAME( IWCS, AST__CURRENT, STATUS )
+      IF( AST_GETI( CFRM, 'NAXES', STATUS ) .EQ. NDIM ) THEN 
+
+*  Transform a point from the 2D Base Frame to the nD Current Frame.
+         TEST( 1, 1 ) = 0.0D0
+         TEST( 1, 2 ) = 0.0D0
+         CALL AST_TRANN( IWCS, 1, 2, 1, TEST, .TRUE., NDIM, 1, TEST, 
+     :                   STATUS ) 
+
+*  Set up the information required to create a PermMap which goes from
+*  the NDIM-dimensional current Frame found above, to a new Frame 
+*  containing only the axes with indices equal to the indices of the chosen
+*  base Frame axes.
+         NREQ = 0
+         NCON = 0
+         DO J = 1, NDIM
+            IF( CONST( J ) .EQ. AST__BAD ) THEN
+               NREQ = NREQ + 1
+               OUTPRM( NREQ ) = J
+               INPRM( J ) = NREQ
+            ELSE
+               NCON = NCON + 1
+               INPRM( J ) = -NCON
+               CON( NCON ) = TEST( 1, J )
+            END IF
+         END DO
+
+*  Create the PermMap.
+         PMAP = AST_PERMMAP( NDIM, INPRM, NREQ, OUTPRM, CON, ' ', 
+     :                       STATUS )
+
+*  Create a new Current Frame by picking the required axes from the 
+*  original Current Frame.
+         NFRM = AST_PICKAXES( CFRM, NREQ, OUTPRM, MAP, STATUS ) 
+
+*  Set the domain of the original Base Frame to POLNDCURRENT.
+         CALL AST_SETC( CFRM, 'DOMAIN', 'POLNDCURRENT', STATUS )
+
+*  Add this new Frame into the FrameSet.
+         CALL AST_ADDFRAME( IWCS, AST__CURRENT, PMAP, NFRM, STATUS ) 
+
       END IF
 
 *  Export the pointer from the current AST context.

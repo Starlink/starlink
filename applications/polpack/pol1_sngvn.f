@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW,
-     :                       DEZERO, DIM3, STOKES, LBND, UBND, WORK, 
-     :                       TVAR, VEST, WORK2, ZERO, STATUS )
+     :                       DEZERO, DIMST, STOKES, NDIMI, LBNDI, UBNDI, 
+     :                       WORK, TVAR, VEST, WORK2, ZERO, STATUS )
 *+
 *  Name:
 *     POL1_SNGVN
@@ -13,8 +13,8 @@
 
 *  Invocation:
 *     CALL POL1_SNGVN( NNDF, IGRP, ILEVEL, T, PHI, EPS, EL, HW, DEZERO,
-*                      DIM3, STOKES, LBND, UBND, WORK, TVAR, VEST,
-*                      WORK2, ZERO, STATUS )
+*                      DIMST, STOKES, NDIMI, LBNDI, UBNDI, WORK, TVAR, 
+*                      VEST, WORK2, ZERO, STATUS )
 
 *  Description:
 *     This routine estimates the input variances. The supplied Stokes
@@ -53,14 +53,16 @@
 *        The full size used is 2*HW + 1.
 *     DEZERO = LOGICAL (Given)
 *        Perform zero point corrections?
-*     DIM3 = INTEGER (Given)
+*     DIMST = INTEGER (Given)
 *        Number of planes in STOKES.
-*     STOKES( EL, DIM3 ) = REAL (Given)
+*     STOKES( EL, DIMST ) = REAL (Given)
 *        Current (smoothed) Stokes vectors.
-*     LBND( 3 ) = INTEGER (Given)
-*        Lower pixel index bounds of output NDF.
-*     UBND( 3 ) = INTEGER (Given)
-*        Upper pixel index bounds of output NDF.
+*     NDIMI = INTEGER (Given)
+*        No. of dimensions in the input NDF section.
+*     LBNDI( NDIMI ) = INTEGER (Given)
+*        Lower pixel index bounds of input NDF section.
+*     UBNDI( NDIMI ) = INTEGER (Given)
+*        Upper pixel index bounds of input NDF section.
 *     WORK( EL ) = REAL (Given and Returned)
 *        A work array.
 *     TVAR( NNDF ) = REAL (Given and Returned)
@@ -110,10 +112,11 @@
       INTEGER EL
       INTEGER HW
       LOGICAL DEZERO 
-      INTEGER DIM3
-      REAL STOKES( EL, DIM3 )
-      INTEGER LBND( 3 )
-      INTEGER UBND( 3 )
+      INTEGER DIMST
+      REAL STOKES( EL, DIMST )
+      INTEGER NDIMI
+      INTEGER LBNDI( NDIMI )
+      INTEGER UBNDI( NDIMI )
 
 *  Arguments Given and Returned:
       REAL WORK( EL )
@@ -156,7 +159,7 @@
          CALL NDG_NDFAS( IGRP, I, 'READ', INDF, STATUS )
 
 *  Get a section from it which matches the output NDF.
-         CALL NDF_SECT( INDF, 2, LBND, UBND, INDFS, STATUS ) 
+         CALL NDF_SECT( INDF, NDIMI, LBNDI, UBNDI, INDFS, STATUS ) 
 
 *  Map the data array.
          CALL NDF_MAP( INDFS, 'DATA', '_REAL', 'READ', IPDIN, NEL, 
@@ -166,7 +169,7 @@
 *  returns the mean squared residual (i.e. the mean variance) in the 
 *  current NDF.
          CALL POL1_SNGVA( EL, %VAL( IPDIN ), T( I ), PHI( I ), EPS( I ), 
-     :                    DIM3, STOKES, WORK, VEST, TVAR( I ), WORK2, 
+     :                    DIMST, STOKES, WORK, VEST, TVAR( I ), WORK2, 
      :                    DEZERO, ZERO( I ), STATUS )
 
 *  End the NDF context.
@@ -188,8 +191,8 @@
          END DO
 
 *  Store the sizes of the first two dimensions.
-         NX = UBND( 1 ) - LBND( 1 ) + 1
-         NY = UBND( 2 ) - LBND( 2 ) + 1
+         NX = UBNDI( 1 ) - LBNDI( 1 ) + 1
+         NY = UBNDI( 2 ) - LBNDI( 2 ) + 1
 
 *  Get work space needed to do the smoothing in POL1_BLOCR.
          CALL PSX_CALLOC( NX, '_DOUBLE', IPW1, STATUS )

@@ -1,4 +1,4 @@
-      SUBROUTINE POL1_SNGVA( EL, DIN, T, PHI, EPS, DIM3, STOKES, SUM1, 
+      SUBROUTINE POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1, 
      :                       SUM2, TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *+
@@ -12,7 +12,7 @@
 *     Starlink Fortran 77
 
 *  Invocation:
-*     CALL POL1_SNGVA( EL, DIN, T, PHI, EPS, DIM3, STOKES, SUM1, SUM2, 
+*     CALL POL1_SNGVA( EL, DIN, T, PHI, EPS, DIMST, STOKES, SUM1, SUM2, 
 *                      TVAR, WORK, DEZERO, ZERO, STATUS )
 
 *  Description:
@@ -38,9 +38,9 @@
 *        The analyser angle for the current NDF. In radians.
 *     EPS = REAL (Given)
 *        The analyser efficiency factor for the current NDF.
-*     DIM3 = INTEGER (Given)
+*     DIMST = INTEGER (Given)
 *        No. of planes in STOKES.
-*     STOKES( EL, DIM3 ) = REAL (Given)
+*     STOKES( EL, DIMST ) = REAL (Given)
 *        The current (smoothed) estimate of the Stokes parameters.
 *        multiple of the standard deviation.
 *     SUM1( EL ) = REAL (Given and Returned)
@@ -92,8 +92,8 @@
       REAL T
       REAL PHI
       REAL EPS
-      INTEGER DIM3
-      REAL STOKES( EL, DIM3 )
+      INTEGER DIMST
+      REAL STOKES( EL, DIMST )
       LOGICAL DEZERO
 
 *  Arguments Given and Returned:

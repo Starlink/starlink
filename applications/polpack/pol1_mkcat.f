@@ -16,9 +16,9 @@
 
 *  Description:
 *     This routine creates a new CAT catalogue. Columns are created for the 
-*     grid coordinates (X and Y), Stokes parameters (I, Q and U), percentage  
-*     polarisation, polarised intensity, and polarisation angle (in
-*     degrees). 
+*     grid coordinates (X, Y and optionally Z), Stokes parameters (I, (Q,U) 
+*     or (V) ), percentage  polarisation, polarised intensity, and 
+*     polarisation angle (in degrees). 
 *
 *     Columns for the standard deviation associated with each (except pixel 
 *     coordinates) are also produced. For circular polarisation, the Q and 
@@ -29,10 +29,10 @@
 *        The parameter through which the name of the new catalogue should
 *        be obtained.
 *     IWCS = INTEGER (Given)
-*        A FrameSet to define the names to give to the X and Y columns.
-*        On exit, a Frame with Domain POLANAL is added to the FrameSet.
-*        The first axis in this Frame defines the reference direction in 
-*        the catalogue.
+*        A FrameSet to define the names to give to the X, Y and Z columns.
+*        The Base Frame is the 2D (or 3D) PIXEL Frame. On exit, a Frame with 
+*        Domain POLANAL is added to the FrameSet. The first axis in this 
+*        Frame defines the reference direction in the catalogue.
 *     CIRC = LOGICAL (Given)
 *        Set this to .TRUE. if circular polarisation is being measured.
 *     UNITS = CHARACTER * ( * ) (Given)
@@ -48,14 +48,14 @@
 *        A title string to store as the TITLE parameter for the catalogue.
 *        No TITLE parameter is created if TITLE is blank.
 *     GETEQM = LOGICAL (Given)
-*        If TRUE, then EQMAP is returned holding the (X,Y)->(RA,DEC)
+*        If TRUE, then EQMAP is returned holding the ( X,Y(,Z) )->(RA,DEC)
 *        Mapping, if possible. Otherwise, GETEQM is returned holding
 *        AST__NULL.
 *     CI = INTEGER (Returned)
 *        A CAT identifier for the created catalogue.
 *     EQMAP = INTEGER (Returned)
 *        An identifier for an AST Mapping describing the conversion of 
-*        (X,Y) pixel co-ordinates to RA,DEC (J2000) co-ordinates. If the
+*        (X,Y(,Z)) pixel co-ordinates to RA,DEC (J2000) co-ordinates. If the
 *        supplied FrameSet (IWCS) does not allow this information to be
 *        found, or if GETEQM is .FALSE., AST__NULL is returned for EQMAP.
 *     STATUS = INTEGER (Given and Returned)
@@ -73,6 +73,8 @@
 *        Original version.
 *     17-MAY-2000 (DSB):
 *        Added creation of RA/DEC columns, and argument EQFS.
+*     2-FEB- 2001 (DSB):
+*        Added support for 4D Stokes cubes.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -110,6 +112,7 @@
       INTEGER EQFS               ! An AST FrameSet
       INTEGER II                 ! CAT identifier for most recent part
       INTEGER FRM                ! Pointer to Base Frame
+      INTEGER NAX                ! No. of PIXEL axes
       INTEGER QI                 ! Identifier for a catalogue parameter
       INTEGER TMPLT              ! Template Frame
       INTEGER IFRM               ! Frame index of SKY Frame within IWCS
@@ -120,9 +123,12 @@
 *  Check the inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
 
-*  Get the Symbols, etc, used to refer to axes 1 and 2 of the Base Frame in the 
-*  supplied FrameSet.
+*  Get the Symbols, etc, used to refer to axes 1, 2 and 3 of the Base Frame 
+*  in the supplied FrameSet.
       FRM = AST_GETFRAME( IWCS, AST__BASE, STATUS )
+
+*  Find the number of axes.
+      NAX = AST_GETI( FRM, 'NAXES', STATUS )
 
 *  Create the catalogue.
       CALL CTG_CREA1( PARAM, CI, NAME, STATUS )
@@ -147,6 +153,14 @@
      :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(2)', STATUS ), 
      :                'F7.1', AST_GETC( FRM, 'Label(2)', STATUS ), II, 
      :                STATUS )
+
+*  Pixel Z coordinate (if present).
+      IF( NAX .EQ. 3 ) THEN
+         CALL POL1_CNEWS( CI, 'Z', .TRUE.,
+     :                CAT__TYPER, 0, AST_GETC( FRM, 'Unit(3)', STATUS ), 
+     :                'F7.1', AST_GETC( FRM, 'Label(3)', STATUS ), II, 
+     :                STATUS )
+      END IF
 
 *  If we can get RA and DEC positions using the FrameSet, add RA and DEC
 *  columns.

@@ -16,6 +16,8 @@
 #     	 Original version.
 #     12-APR-1999 (DSB):
 #        Added SHAPE.
+#     7-FEB-2001 (DSB):
+#        Added COLZ.
 #     {enter_further_changes_here}
 
 #-
@@ -26,8 +28,7 @@ interface POLIMAGE
 
    parameter      BOX          
       type        '_REAL'
-      vpath       'CURRENT,DEFAULT'
-      ppath       'DEFAULT'
+      ppath       'CURRENT,DEFAULT'
       default     1.0
       prompt      'Bin size'
       helpkey     '*'
@@ -68,6 +69,16 @@ interface POLIMAGE
       vpath       'DEFAULT'
       default     'Y'
       prompt      'Name of catalogue column holding Y positions'
+      helpkey     '*'
+   endparameter
+
+   parameter      COLZ
+      position    8
+      type        LITERAL
+      ppath       'DYNAMIC,DEFAULT'
+      vpath       'DYNAMIC,DEFAULT'
+      default     !
+      prompt      'Name of catalogue column holding Z positions'
       helpkey     '*'
    endparameter
 

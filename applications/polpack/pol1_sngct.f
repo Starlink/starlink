@@ -1,6 +1,6 @@
       SUBROUTINE POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI,
-     :                       EPS, ZERO, DIM3, STOKES, NSIGMA, TVAR, TOL, 
-     :                       DEZERO, CONV, NREJ, DOUT, STATUS )
+     :                       EPS, ZERO, DIMST, STOKES, NSIGMA, TVAR, 
+     :                       TOL, DEZERO, CONV, NREJ, DOUT, STATUS )
 *+
 *  Name:
 *     POL1_SNGCT
@@ -13,7 +13,7 @@
 
 *  Invocation:
 *     CALL POL1_SNGCT( INDF, ILEVEL, ITER, NEL, DIN, VIN, T, PHI, EPS, 
-*                      ZERO, DIM3, STOKES, NSIGMA, TVAR, TOL, DEZERO, 
+*                      ZERO, DIMST, STOKES, NSIGMA, TVAR, TOL, DEZERO, 
 *                      CONV, NREJ, DOUT, STATUS )
 
 *  Description:
@@ -46,9 +46,9 @@
 *        The zero point correction for the input NDF. This value should 
 *        be addedonto the data values read from the NDF before using the 
 *        data values.
-*     DIM3 = INTEGER (Given)
+*     DIMST = INTEGER (Given)
 *        No. of planes in STOKES.
-*     STOKES( NEL, DIM3 ) = REAL (Given)
+*     STOKES( NEL, DIMST ) = REAL (Given)
 *        The current (smoothed) estimate of the Stokes parameters.
 *     NSIGMA = REAL (Given)
 *        The rejection threshold for aberrant points, expressed as a
@@ -112,8 +112,8 @@
       REAL PHI
       REAL EPS
       REAL ZERO
-      INTEGER DIM3
-      REAL STOKES( NEL, DIM3 )
+      INTEGER DIMST
+      REAL STOKES( NEL, DIMST )
       REAL NSIGMA
       REAL TVAR
       INTEGER TOL

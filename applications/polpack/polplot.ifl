@@ -243,10 +243,19 @@ interface POLPLOT
       helpkey     '*'
    endparameter
 
-   parameter      Z
+   parameter      ZAXVAL
       type        'LITERAL'
-      prompt      'The Z value to plot'
+      prompt      'The Z axis value to plot'
       ppath       'CURRENT'
+      helpkey     '*'
+   endparameter
+
+   parameter      ZCOLVAL
+      type        'LITERAL'
+      prompt      'The Z column value to plot'
+      vpath       'DEFAULT'
+      ppath       'DEFAULT'
+      default     !
       helpkey     '*'
    endparameter
 

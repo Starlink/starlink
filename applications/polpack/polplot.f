@@ -23,7 +23,10 @@
 *     This application plots vectors defined by the values contained
 *     within four columns in a catalogue. These columns give the magnitude
 *     and orientation of each vector, and the position of each vector (see
-*     parameters COLMAG, COLANG, COLX and COLY).
+*     parameters COLMAG, COLANG, COLX and COLY). If the catalogue has a
+*     third axis (spectral channel for instance), then only vectors with
+*     a specified value on the third axis will be plotted (see parameter 
+*     ZAXVAL).
 *
 *     The plot is produced within the current graphics database picture,
 *     and may be aligned with an existing DATA picture if the existing
@@ -103,6 +106,13 @@
 *        displayed if a non-existent column name is given. See the "Notes" 
 *        section below for further details of how these positions are 
 *        interpreted. [Y]
+*     COLZ = LITERAL (Read)
+*        The name of the catalogue column which gives the position of each
+*        vector along a third axis. A list of available column names is 
+*        displayed if a non-existent column name is given. A null (!)
+*        value should be supplied if no third axis is to be used. The dynamic
+*        default is 'Z' if the catalogue contains a Z column, and null
+*        (!) otherwise. See also parameter ZAXVAL. []
 *     DEVICE = DEVICE (Read)
 *        The plotting device. [Current graphics device]
 *     EPOCH = _DOUBLE (Read)
@@ -269,7 +279,33 @@
 *        The scale to be used for the vectors.  The supplied value
 *        should give the data value corresponding to a vector length of
 *        one centimetre.  []
-
+*     ZAXVAL = LITERAL (Read)
+*        Specifies the Z axis value for the vectors to be displayed. The
+*        given value should be in the current coordinate Frame of the
+*        supplied catalogue (see parameter COLZ). For instance, if the 
+*        current coordinate Frame contains a calibrated wavelength axis,
+*        the value should be given in the units specified in that frame 
+*        (anstroms, nanometres, etc.). If the wavelength axis has not been 
+*        calibrated, the value will probably need to be supplied in units
+*        of pixels. Entering a colon (":") for the parameter will result in 
+*        a description of the current coordinate Frame being shown. This may 
+*        help to determine the units in which a value is expected. The
+*        value actually used is the closest available value within the 
+*        catalogue. This value is displayed on the screen and included in
+*        the default plot title. The ZAXVAL parameter is only accessed if a
+*        null (!) value is supplied for parameter ZCOLVAL. See also
+*        parameter COLZ.
+*     ZCOLVAL = _REAL (Read)
+*        Specifies the Z column value for the vectors to be displayed.
+*        The given value should be in the same coordinate system as the
+*        values stored in the Z column of the catalogue (usually pixels).
+*        This parameter provides an alternative to the ZAXVAL parameter. 
+*        Use the ZCOLVAL parameter to specify the Z value in pixels, and 
+*        the ZAXVAL parameter to specify the Z value in Hertz, angstroms,
+*        nanometres, etc (if the Z axis has been calibrated). If a null
+*        value is supplied for ZCOLVAL, then ZAXVAL is used to determine 
+*        the Z value to display. [!]
+*        
 *  Examples:
 *     polplot poltab 
 *        Produces a vector map on the current graphics device with
@@ -421,7 +457,9 @@
       CHARACTER TITLE*80         ! Title from input catalogue
       CHARACTER UNITS1*( CUNITS )! Units of the data
       CHARACTER UNITS2*( CUNITS )! Units of the data
-      CHARACTER ZTEXT*30         ! Text giving Z value
+      CHARACTER ZTEXT*80         ! Text giving Z value
+      CHARACTER ZBTEXT*80        ! Text giving base Frame Z value
+      CHARACTER ZCTEXT*80        ! Text giving current Frame Z value
       DOUBLE PRECISION ATTRS( 20 )! Saved graphics attributes
       DOUBLE PRECISION BOX( 4 )  ! Bounds of used region of (X,Y) axes
       DOUBLE PRECISION CONST( 3 )! Constant axis values
@@ -592,9 +630,9 @@
       CALL PSX_CALLOC( NVEC, '_DOUBLE', IPY2, STATUS )
 
       IF( GOTZ ) THEN 
-         CALL PSX_CALLOC( NVEC, '_DOUBLE', IPZ, STATUS )
+         CALL PSX_CALLOC( NVEC, '_REAL', IPZ, STATUS )
       ELSE
-         IPZ = IPX
+         IPZ = IPMAG
       END IF
 
 *  Check the pointers can be used.
@@ -605,7 +643,7 @@
       CALL POL1_CPCTR( CI, GIANG, NVEC, %VAL( IPANG ), NGANG, STATUS )
       CALL POL1_CPCTD( CI, GIS( 1 ), NVEC, %VAL( IPX ), NGX, STATUS )
       CALL POL1_CPCTD( CI, GIS( 2 ), NVEC, %VAL( IPY ), NGY, STATUS )
-      IF( GOTZ ) CALL POL1_CPCTD( CI, GIS( 3 ), NVEC, %VAL( IPZ ), NGZ, 
+      IF( GOTZ ) CALL POL1_CPCTR( CI, GIS( 3 ), NVEC, %VAL( IPZ ), NGZ, 
      :                            STATUS )
 
 *  Check the global status.
@@ -650,7 +688,7 @@
 
 *  If required, get the Z column value to use. Only vectors with this
 *  value of Z are displayed.
-      IF( GOTZ ) THEN
+      IF( GOTZ .AND. STATUS .EQ. SAI__OK ) THEN
 
 *  Get the name of the Z column.
          CALL CAT_TIQAC( GIS( 3 ), 'NAME', NAME, STATUS )
@@ -660,8 +698,8 @@
          CALL KPG1_ASSPL( IWCS, 3, MAPS, STATUS )
 
 *  Find the max and min Z values in the Z column.
-         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, SZLO, 
-     :                    MAXPOS, MINPOS, STATUS )
+         CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, 
+     :                    SZLO, MAXPOS, MINPOS, STATUS )
 
 *  If there is only a single Z value available, use it.
          IF( SZHI .LE. SZLO ) THEN
@@ -669,75 +707,121 @@
             ZCURR = .TRUE.
 
 *  Otherwise, allow the user to choose a Z value.
-         ELSE
+         ELSE IF( STATUS .EQ. SAI__OK ) THEN 
+
+*  First see if the user wants to give the Z value in pixels.
+            CALL PAR_GET0D( 'ZCOLVAL', Z, STATUS )
+
+*  If so, indicate that a base frame Z value has been given.
+            IF( STATUS .EQ. SAI__OK ) THEN 
+               ZCURR = .FALSE.
+
+*  Otherwise, annul the error and get a current Frame Z value.                
+            ELSE IF( STATUS .EQ. PAR__NULL ) THEN 
+               CALL ERR_ANNUL( STATUS )
+
+*  Find the max and min Z values in the Z column.
+               CALL KPG1_MXMNR( .TRUE., NVEC, %VAL( IPZ ), NBAD, SZHI, 
+     :                          SZLO, MAXPOS, MINPOS, STATUS )
+
+*  If there is only a single Z value available, use it.
+               IF( SZHI .LE. SZLO ) THEN
+                  ZUSE = SZLO
+                  ZCURR = .TRUE.
+
+*  Otherwise, allow the user to choose a Z value.
+               ELSE
 
 *  Get the required Z value in the current Frame.
-            CALL KPG1_GTAXV( 'Z', 1, .TRUE., IWCS, 3, Z, NVAL, STATUS )
+                  CALL KPG1_GTAXV( 'ZAXVAL', 1, .TRUE., IWCS, 3, Z, 
+     :                             NVAL, STATUS )
 
 *  Use the third Mapping to transform the current Frame Z value into a
 *  base Frame Z value.
-            CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
+                  CALL AST_TRAN1( MAPS( 3 ), 1, Z, .FALSE., Z, STATUS )
 
 *  If the result was undefined, we need to get the Z value again, this
 *  time in the base Frame.
-            IF( Z .EQ. AST__BAD ) THEN
-               ZCURR = .FALSE.
-               CALL PAR_GET0C( 'Z', ZTEXT, STATUS )
- 
-               CALL MSG_BLANK( STATUS )
-               CALL MSG_SETC( 'NAME', NAME )
-               CALL MSG_SETC( 'Z', ZTEXT )
-               CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied value for '//
-     :                    'the Z parameter (^Z) could not be '//
-     :                    'converted into a value for the ^NAME '//
-     :                    'column in the catalogue. Please supply '//
-     :                    'a new value for the Z parameter in the '//
-     :                    'same coordinate system as the values in '//
-     :                    'the ^NAME column:', STATUS )
+                  IF( Z .EQ. AST__BAD ) THEN
+                     ZCURR = .FALSE.
+                     CALL PAR_GET0C( 'ZAXVAL', ZTEXT, STATUS )
+    
+                     CALL MSG_BLANK( STATUS )
+                     CALL MSG_SETC( 'NAME', NAME )
+                     CALL MSG_SETC( 'Z', ZTEXT )
+                     CALL MSG_OUT( 'POLPLOT_MSG1', 'The supplied '//
+     :                    'value for the ZAXVAL parameter (^Z) could '//
+     :                    'not be converted into a value for the '//
+     :                    '^NAME column in the catalogue. Please '//
+     :                    'supply a value for the ZCOLVAL parameter '//
+     :                    'in the same coordinate system as the '//
+     :                    'values in the ^NAME column:', STATUS )
 
-               CALL PAR_CANCL( 'Z', STATUS )
-               CALL PAR_GET0D( 'Z', Z, STATUS )
-            ELSE
-               ZCURR = .TRUE.
+                     CALL PAR_CANCL( 'ZCOLVAL', STATUS )
+                     CALL PAR_GET0D( 'ZCOLVAL', Z, STATUS )
+                  ELSE
+                     ZCURR = .TRUE.
+                  END IF
+
+               END IF
+
             END IF
 
 *  Find the closest available value to the requested Z value.
             CALL POL1_FCLOS( NVEC, %VAL( IPZ ), REAL( Z ), ZUSE, 
      :                       STATUS )
-
          END IF
 
-*  If required, transform this value into the current Frame, and format it. If 
-*  this is not possible, use the Base Frame value.
-         ZTEXT = ' '
-         IAT = 1
+*  Produce some text describing the Z value. If possible, this includes
+*  both the current Frame and the Base Frame values, the order being
+*  chosen on the basis of whether a current or base Frame value was supplied
+*  by the user.
+         ZBTEXT = ' '
+         IAT = 0
+         CALL CHR_APPND( NAME, ZBTEXT, IAT )
+         CALL CHR_APPND( ' =', ZBTEXT, IAT )
+         IAT = IAT + 1
+         CALL CHR_PUTR( ZUSE, ZBTEXT, IAT )
 
-         IF( ZCURR ) THEN 
-            CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
-     :                      STATUS )
+         CALL AST_TRAN1( MAPS( 3 ), 1, DBLE( ZUSE ), .TRUE., Z, 
+     :                   STATUS )
 
-            IF( Z .NE. AST__BAD ) THEN 
-               CALL CHR_APPND( AST_GETC( IWCS, 'SYMBOL(3)', STATUS ),
-     :                         ZTEXT, IAT )
-               CALL CHR_APPND( ' =', ZTEXT, IAT )
-               IAT = IAT + 1
-               CALL CHR_APPND( AST_FORMAT( IWCS, 3, Z, STATUS ), ZTEXT,
-     :                         IAT )
-            ELSE
-               CALL CHR_APPND( NAME, ZTEXT, IAT )
-               CALL CHR_APPND( ' =', ZTEXT, IAT )
-               IAT = IAT + 1
-               CALL CHR_PUTR( ZUSE, ZTEXT, IAT )
-            END IF
-
-         ELSE
-            CALL CHR_APPND( NAME, ZTEXT, IAT )
-            CALL CHR_APPND( ' =', ZTEXT, IAT )
+         ZCTEXT = ' '
+         IAT = 0
+         IF( Z .NE. AST__BAD ) THEN 
+            CALL CHR_APPND( AST_GETC( IWCS, 'SYMBOL(3)', STATUS ),
+     :                      ZCTEXT, IAT )
+            CALL CHR_APPND( ' =', ZCTEXT, IAT )
             IAT = IAT + 1
-            CALL CHR_PUTR( ZUSE, ZTEXT, IAT )
+            CALL CHR_APPND( AST_FORMAT( IWCS, 3, Z, STATUS ), ZCTEXT,
+     :                      IAT )
+            IAT = IAT + 1
+            CALL CHR_APPND( AST_GETC( IWCS, 'UNIT(3)', STATUS ),
+     :                      ZCTEXT, IAT )
+         END IF
+
+         ZTEXT = ' '
+         IAT = 0
+         IF( ZCURR ) THEN
+            IF( ZCTEXT .NE. ' ' ) THEN             
+               CALL CHR_APPND( ZCTEXT, ZTEXT, IAT )
+               CALL CHR_APPND( ' (', ZTEXT, IAT )
+               CALL CHR_APPND( ZBTEXT, ZTEXT, IAT )
+               CALL CHR_APPND( ')', ZTEXT, IAT )
+            ELSE               
+               ZTEXT = ZBTEXT 
+            END IF
+         ELSE
+            CALL CHR_APPND( ZBTEXT, ZTEXT, IAT )
+            IF( ZCTEXT .NE. ' ' ) THEN             
+               CALL CHR_APPND( ' (', ZTEXT, IAT )
+               CALL CHR_APPND( ZCTEXT, ZTEXT, IAT )
+               CALL CHR_APPND( ')', ZTEXT, IAT )
+            END IF
          END IF
 
 *  Display the Z value being used.
+         CALL MSG_BLANK( STATUS )
          CALL MSG_SETC( 'Z', ZTEXT )
          CALL MSG_OUT( 'POLPLOT_MSG', '  Using ^Z', STATUS )
 
@@ -835,7 +919,7 @@
 
 *  Remove any positions outside these bounds. This also shuffles bad 
 *  positions to the end, and counts the number of good positions.
-      CALL POL1_RMBND( NVEC, BLO, BHI, Z, %VAL( IPZ ), %VAL( IPMAG ), 
+      CALL POL1_RMBND( NVEC, BLO, BHI, ZUSE, %VAL( IPZ ), %VAL( IPMAG ), 
      :                 %VAL( IPANG ), %VAL( IPX ), %VAL( IPY ), NIN, 
      :                 STATUS )
 
@@ -1015,10 +1099,9 @@
          CALL CAT_TIQAC( GTTL, 'VALUE', TITLE, STATUS )
          CALL CAT_TRLSE( GTTL, STATUS )
          IAT = CHR_LEN( TITLE )
-         CALL CHR_APPND( ' (', TITLE, IAT )
-         CALL CHR_APPND( ZTEXT, TITLE, IAT )
+         CALL CHR_APPND( ':', TITLE, IAT )
          IAT = IAT + 1
-         CALL CHR_APPND( ')', TITLE, IAT )
+         CALL CHR_APPND( ZTEXT, TITLE, IAT )
       ELSE
          TITLE = ZTEXT
          CALL ERR_ANNUL( STATUS )

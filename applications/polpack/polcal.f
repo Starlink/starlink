@@ -21,9 +21,9 @@
 *        The global status.
 
 *  Description:
-*     This application converts a set of 2D intensity images into a
-*     3D data cube holding a Stokes vector at every pixel in the area
-*     covered by the supplied intensity images.
+*     This application converts a set of 2D (or 3D) arrays holding analysed
+*     intensity, into a 3D (or 4D) data cube holding a Stokes vector at 
+*     every pixel in the supplied intensity arrays. 
 *
 *     Either dual or single beam data can be processed, with an
 *     appropriate algorithm being used in each case. There is also an
@@ -33,11 +33,19 @@
 *     All the input images should be aligned pixel-for-pixel, and should
 *     have had the sky background removed. O and E ray images in
 *     dual-beam data should have been extracted into separate images. 
+*     If the input arrays are 3D, the first two pixels axes must be the 
+*     spatial axes, and all planes within each input cube must be spatially 
+*     aligned. Corresponding 2D planes within 3D input cubes are processed
+*     independantly of each other, using the same algorithm used for 2D
+*     input images.
 *
-*     The output consists of a 3D cube containing values of I, Q and U
-*     in planes 1, 2 and 3. Currently, circular polarimetry can only be 
-*     performed by the dual-beam algorithm, in which case the output cube 
-*     contains only 2 planes holding I and V values (see parameter PMODE). 
+*     The final axis in the output array corresponds to Stokes parameter
+*     and has bounds 1:3 (this will be axis 3 if the inputs are 2D or axis 
+*     4 if the inputs are 3D). Axis values 1, 2 and 3 correspond to I, Q
+*     and U respectively. Currently, circular polarimetry can only be 
+*     performed by the dual-beam algorithm, in which case the final axis of
+*     the output has bounds 1:2, corresponding to I and V values (see 
+*     parameter PMODE). 
 
 *  Usage:
 *     polcal in out
@@ -87,11 +95,11 @@
 *        3 produces additional details about each individual input image in
 *        single beam mode. [1]
 *     IN = NDF (Update)
-*        A group specifying the names of the input intensity images. This
-*        may take the form of a comma separated list, or any of the other 
-*        forms described in the help on "Group Expressions". Read access
-*        only is required unless the SETVAR parameter is assigned a TRUE
-*        value.
+*        A group specifying the names of the input intensity images or
+*        cubes. This may take the form of a comma separated list, or any of 
+*        the other forms described in the help on "Group Expressions". Read 
+*        access only is required unless the SETVAR parameter is assigned a 
+*        TRUE value.
 *     MAXIT = _INTEGER (Read)
 *        This parameter is only accessed by both single and dual-beam 
 *        algorithm, but is used slightly differently in each case. 
@@ -137,11 +145,12 @@
 *        deviations, then it will not be included in the next calculation
 *        of I, Q and U. [3.0]
 *     OUT = NDF (Read)
-*        The name of the output 3D cube holding the Stokes parameters.
+*        The name of the output 3D or 4D cube holding the Stokes parameters.
 *        The x-y plane of this cube covers the overlap region of the 
-*        supplied intensity images (but see parameter TRIMBAD). Plane 1 
-*        contains the total intensity. The other planes contain either Q 
-*        and U, or V, depending on the value of parameter PMODE.
+*        supplied intensity images (but see parameter TRIMBAD). Pixel 1
+*        on the final axis contains the total intensity. The others
+*        contain either Q and U, or V, depending on the value of parameter
+*        PMODE.
 *     PMODE = LITERAL (Read)
 *        This parameter is only accessed by the dual-beam algorithm. It
 *        gives the mode of operation; CIRCULAR for measuring circular 
@@ -206,7 +215,7 @@
 *        variances. In this case, a larger value of SMBOX (say 9) may be
 *        necessary. [3]
 *     TITLE = LITERAL (Read)
-*        A title for the output cube. [Output from POLCAL]
+*        A title for the output NDF. [Output from POLCAL]
 *     TOLR = _INTEGER (Read)
 *        This parameter is only accessed by the single-beam algorithm. It
 *        specifies the convergence criterion for the iterative process
@@ -446,6 +455,8 @@
 *        Added single beam mode.
 *     16-AUG-2000 (DSB):
 *        The TRIMBAD parameter added.
+*     2-FEB-2001 (DSB):
+*        Prologue changed to include reference to 3D input arrays.
 *     {enter_changes_here}
 
 *  Bugs:

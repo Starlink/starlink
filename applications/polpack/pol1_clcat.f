@@ -47,6 +47,8 @@
 *        Reinstate the GRID Frame in the catalogue, to facilitiate
 *        alignment with systems that do not know about PIXEL co-ords 
 *        (eg GAIA).
+*     7-FEB-2001 (DSB):
+*        Add support for 3D data.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -83,16 +85,19 @@
 *  FrameSet.
          LWCS = AST_COPY( IWCS, STATUS ) 
 
-*  Routine POL1_MKCAT creates the X and Y catalogue columns with names
-*  X and Y. Applications which access the WCS information in the
+*  Routine POL1_MKCAT creates the X, Y (and Z) catalogue columns with names
+*  X, Y (and Z). Applications which access the WCS information in the
 *  catalogue use the routine POL1_GTCTA to look for a Frame spanned by 
 *  axes with Symbol attributes equal to the catalogue column names. In
-*  order for this to succeed, we ensure that he symbols on axes 1 and 2
-*  of the Base Frame correspond to the names of the catalogue columns (i.e.
-*  "X" and "Y").
+*  order for this to succeed, we ensure that he symbols on axes 1, 2 (and
+*  3) of the Base Frame correspond to the names of the catalogue columns 
+*  (i.e. "X", "Y" (and "Z") ).
          FRM = AST_GETFRAME( LWCS, AST__BASE, STATUS )
          CALL AST_SETC( FRM, 'Symbol(1)', 'X', STATUS )
          CALL AST_SETC( FRM, 'Symbol(2)', 'Y', STATUS )
+         IF( AST_GETI( FRM, 'NAXES', STATUS ) .EQ. 3 ) THEN
+            CALL AST_SETC( FRM, 'Symbol(3)', 'Z', STATUS )
+         END IF
          CALL AST_ANNUL( FRM, STATUS )
 
 *  Add a header to the textual information.

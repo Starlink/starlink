@@ -39,7 +39,7 @@
 *        The Z value which a vector must have to be included in the
 *        returned list. If this is VAL__BADR, no check on the Z value is
 *        performed.
-*     Z( NIN ) = DOUBLE PRECISION (Given)
+*     Z( NIN ) = REAL (Given)
 *        The array of Z values.
 *     MAG( NIN ) = REAL (Given and Returned)
 *        The array of magnitude values.
@@ -85,7 +85,7 @@
       REAL BLO( 2 )
       REAL BHI( 2 )
       REAL USEZ
-      DOUBLE PRECISION Z( NIN )
+      REAL Z( NIN )
 
 *  Arguments Given and Returned:
       REAL MAG( NIN )
@@ -107,7 +107,7 @@
       DOUBLE PRECISION XHI       ! Upper X bound
       DOUBLE PRECISION YLO       ! Lower Y bound
       DOUBLE PRECISION YHI       ! Upper Y bound
-      DOUBLE PRECISION ZZ        ! Required Z value
+      REAL ZZ                    ! Required Z value
       INTEGER I                  ! Index count
 *.
 
@@ -122,7 +122,7 @@
 
 *  First handle cases where a Z value has been supplied.
       IF( USEZ .NE. VAL__BADR ) THEN 
-         ZZ  = DBLE( USEZ )
+         ZZ  = USEZ
 
 *  Set any bad or out-of-bounds points bad (in all arrays).
          DO I = 1, NIN
