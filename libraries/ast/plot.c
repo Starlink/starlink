@@ -1286,12 +1286,16 @@ static int Compared( const void *, const void * );
 static int CountGood( int, double * );
 static int Cross( float, float, float, float, float, float, float, float );
 static int CvBrk( AstPlot *, int, double *, double *, double * );
+#if 0
+/* ENABLE-ESCAPE - Add the following prototype when escape sequences
+   are enabled. */
 static int DrawText( AstPlot *, int, const char *, float, float, const char *, float, float, const char *, const char * );
+#endif
 static int EdgeCrossings( AstPlot *, int, int, double, double *, double **, const char *, const char * );
 static int EdgeLabels( AstPlot *, int, TickInfo **, CurveData **, const char *, const char * );
 static int FindMajTicks( AstFrame *, int, double, double , double *, int, double *, double ** );
 static int FullForm( const char *, const char *, const char *, const char *, const char * );
-static int FindStrin( int, const char *[], const char *, const char *, const char *, const char * );
+static int FindString( int, const char *[], const char *, const char *, const char *, const char * );
 static int GVec( AstPlot *, AstMapping *, double *, int, double, AstPointSet **, AstPointSet **, double *, double *, double *, double *, int *, const char *, const char *);
 static int GrText( AstPlot *, int, const char *, int, int, float, float, float, float, float *, float *, const char *, const char * );
 static int Inside( int, float *, float *, float, float);
@@ -3924,10 +3928,7 @@ static int BoxText( AstPlot *this, int esc, const char *text, float x, float y,
 
 /* Local Variables: */
    char lj[3];          /* Local version of justification string. */
-   float dx;            /* Incrment in x */
-   float dy;            /* Incrment in y */
    int bbclip;          /* GrText to return bounding box of "normal" text? */
-   int i;               /* Corner index */
    int ret;             /* Returned status */
 
 /* Check the global error status. */
@@ -4478,7 +4479,7 @@ static TickInfo **CleanGrid( TickInfo **grid ){
 
 /* Release each of the TickInfo structures in turn (if they exist). */
    for( i = 0; i < 2; i++ ){
-      if( info = grid[ i ] ){
+      if( ( info = grid[ i ] ) ){
 
 /* Release the memory holding major tick mark values. */
          (void) astFree( (void *) info->ticks );
@@ -6935,6 +6936,9 @@ static CurveData **DrawGrid( AstPlot *this, TickInfo **grid, int drawgrid,
 
 }
 
+#if 0
+/* ENABLE-ESCAPE - Add the following function when escape sequences
+   are enabled. */
 static int DrawText( AstPlot *this, int esc, const char *text, float x, float y, 
                      const char *just, float upx, float upy, const char *method, 
                      const char *class ){
@@ -7138,6 +7142,7 @@ static int DrawText( AstPlot *this, int esc, const char *text, float x, float y,
    return ret;
 
 }
+#endif
 
 static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid, 
                        double *labelat, double *gap, const char *method, 
@@ -7226,7 +7231,6 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    double **ptr3;         /* Pointer to clipped graphics data */
    double *a;             /* Pointer to next current axis value */
    double *b;             /* Pointer to next other axis value */
-   double *cross;         /* Pointer to crossings information */
    double *value;         /* Current tick value */
    double *x;             /* Pointer to next X value */
    double *xc;            /* Pointer to next clipped X value */
@@ -7265,12 +7269,10 @@ static void DrawTicks( AstPlot *this, TickInfo **grid, int drawgrid,
    int edge;              /* Index of edge being ticked */
    int first;             /* Is this the first tick to be drawn? */
    int i;                 /* Minor tick mark index */
-   int j;                 /* Crossing index */
    int major;             /* Are major tick marks required? */
    int minhi;             /* Highest minor tick mark index */
    int minlo;             /* Lowest minor tick mark index */
    int minor;             /* Are minor tick marks required? */
-   int ncross;            /* No. of crossings of tick value and edge */
    int nedge;             /* No. of edges to be ticked for each axis */
    int nel;               /* Actual number of tick marks to draw */
    int ntot;              /* Maximum number of tick marks */
@@ -7781,7 +7783,6 @@ static int EdgeLabels( AstPlot *this, int ink, TickInfo **grid,
    int edge;              /* The edge to be labelled */
    int edgeax;            /* Index of axis parallel to the labelled edge */
    int edgelabs;          /* Can edge labels be produced? */
-   int ilab;              /* Label index */
    int naxlab;            /* Number of edge labels */
    int near;              /* Draw a label on the near edge? */
    int nedge[2];          /* No. of edge labels for each axis */
@@ -8863,11 +8864,8 @@ static int FindMajTicks( AstFrame *frame, int axis, double refval,
    double f;          /* The nearest acceptable tick mark index */
    double val[ 2 ];   /* Axis values to be normalised */
    int i;             /* Index of current axis value */
-   int j;             /* Index of comparison axis value */
    int k;             /* Tick mark index */
-   int khi;           /* Highest tick mark index */
    int klast;         /* Index of the previous tick mark */
-   int klo;           /* Lowest tick mark index */
    int nticks;        /* Number of major tick marks used */
 
 /* Initialise the returned pointer. */
@@ -9484,7 +9482,6 @@ static const char *GetAttrib( AstObject *this_object, const char *attrib ) {
    char label[21];               /* Graphics item label */
    double dval;                  /* Double attribute value */
    int axis;                     /* Axis number */
-   int id;                       /* Plot object id */
    int ival;                     /* Int attribute value */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by sscanf */
@@ -10048,7 +10045,6 @@ static double GetTicks( AstPlot *this, int axis, double *cen, double gap,
 /* Local Variables: */
    int i;                    /* Axis index */
    int j;                    /* Position index */
-   int k;                    /* Tick mark index */
    double *p;                /* Pointer to next axis value */
    double cen0;              /* Supplied value of cen */
    double frac;              /* Fraction of plot area holding good coords */
@@ -11490,15 +11486,9 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
    double a;            
    double b;            
    double bot;          /* Fractional height to bottom of bounding box */
-   double dx1;          /* X increment from corner 0 of the bounding box to corner 1 */
-   double dx3;          /* X increment from corner 0 of the bounding box to corner 3 */
-   double dy1;          /* Y increment from corner 0 of the bounding box to corner 1 */
-   double dy3;          /* Y increment from corner 0 of the bounding box to corner 3 */
    double h;		/* Height of plotted text */
    double hd;		/* Height from text base-line to box bottom. */
    double hu;		/* Height from text base-line to box top. */
-   double l1;           /* Up-increment from corner 0 of the bounding box to corner 1 */
-   double l3;           /* Up-increment from corner 0 of the bounding box to corner 3 */
    double l;		/* Length of supplied up-vector */
    double ncolour;      /* Colour attribute value on entry */
    double nfont;        /* Font attribute value on entry */
@@ -11507,7 +11497,6 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
    double nstyle;       /* Style attribute value on entry */
    double nwidth;       /* Width attribute value on entry */
    double off;          /* Fractional height to baseline */
-   double ssize;        /* Fractional height of characters */
    double test;         /* Height from base-line to corner i */
    double top;          /* Fractional height to top of bounding box */
    double tw;           /* Total width of bounding box */
@@ -11526,7 +11515,6 @@ static int GrText( AstPlot *this, int esc, const char *text, int ink,
    float beta;          /* Scale factor for Y axis */
    float chh;		/* Size in world coords of a horizontal character */
    float chv;		/* Size in world coords of a vertical character */
-   float ratio;         /* Ratio of world axis scales (DY = ratio*DX) */
    float txbn[ 4 ];     /* X at corners of sub-string bounding box */
    float tybn[ 4 ];     /* Y at corners of sub-string bounding box */
    float xr;            /* World X value at sub-string reference point */
@@ -12788,9 +12776,7 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    LabelList *ll;         /* Pointer to next label to be plotted */
    TickInfo *info;        /* Pointer to the TickInfo for the current axis */
    char just_buf[3];      /* Buffer to hold a justification string */
-   const char *atext;     /* Pointer to abbreviated label text */
    const char *just;      /* Justification string */
-   const char *ptext;     /* Pointer to previous unabbreviated label */
    const char *text;      /* Pointer to label text */
    double *used;          /* Pointer to list of used label values */
    double *value;         /* Current tick value */
@@ -12800,32 +12786,21 @@ static void Labels( AstPlot *this, TickInfo **grid, CurveData **cdata,
    double dy;             /* Text base-line Y component */
    double gx;             /* Reference position graphics X coord. */
    double gy;             /* Reference position graphics Y coord. */
-   double maxlen;         /* Length of longest curve */
    double mindim;         /* Shortest dimension of plotting area */
-   double next_val;       /* Previous tick value */
    double offx;           /* X component of offset vector */
    double offy;           /* Y component of offset vector */
-   double prev_val;       /* Previous tick value */
    double sin45;          /* Sine of 45 degrees */
    double txtgap;         /* Absolute gap between labels and edges */
    double upx;            /* Text up-vector X component */
    double upy;            /* Text up-vector Y component */
    double val[ 2 ];       /* Normalised physical coordinates */
-   double zerolen;        /* Length of curve for other axis = 0.0 */
    float *box;            /* Pointer to array of label bounding boxes */
-   float *vxbrk;          /* X component of unit vector at current break */
-   float *vybrk;          /* Y component of unit vector at current break */
-   float *xbrk;           /* X coord. of current break */
-   float *ybrk;           /* Y coord. of current break */
    int axis;              /* Current axis index */
-   int brk;               /* Current break index */
-   int flag2;             /* Flag indicating which way the up-vector points */
    int flag;              /* Flag indicating which way the base-vector points */
    int iused;             /* Index into list of used axis values */
    int last;              /* The index of the last tick to use */
    int nlab;              /* The number of labels to be plotted */
    int nused;             /* Number of used axis values */
-   int overlap;           /* Does the label overlap any other labels? */
    int t0;                /* Index of central tick */
    int tick;              /* Current tick index */
    int tinc;              /* Increment between ticks */
@@ -13342,9 +13317,6 @@ static double **MakeGrid( AstPlot *this, AstMapping *map, int dim, double xlo,
    double **ptr2;    /* Pointers to physical axis values */
    int size;         /* No. of points in the grid */
 
-   float x, y;
-   int i;
-
 /* Initialise the returned pointers. */
    *pset1 = NULL;
    *pset2 = NULL;
@@ -13475,7 +13447,6 @@ static void Map1( int n, double *dist, double *x, double *y,
    static double axorig;             /* Physical axis value at start of curve */
    static int nl = 0;                /* No. of points in pset1 and pset2 */
    int i, j;                         /* Loop counts */
-   int ok;                           /* Was point unchanged by normalisation? */
    double axval;                     /* Axis origin value */
    double *p;                        /* Pointer to next value */
 
@@ -14265,7 +14236,6 @@ static int Overlap( AstPlot *this, int esc, const char *text, float x,
    static int nbox = 0;   /* Number of boxes stored in "work" */
    int ret;               /* Does the new label overlap a previous label? */
    int i;                 /* Box index */
-   int j;                 /* Corner index */
    float *cx;             /* Pointer to next corner's X value */
    float *cy;             /* Pointer to next corner's Y value */
    float xbn[ 4 ];        /* X coords at corners of new label's bounding box */
@@ -14413,12 +14383,8 @@ static void PlotLabels( AstPlot *this, AstFrame *frame, int axis,
    char *ctext;              /* Pointer to comparison label text */
    char *text;               /* Pointer to label text */
    const char *atext;        /* Pointer to abbreviated label text */
-   char *fld[ MAXFLD ];      /* Pointers to field starts */
    int esc;                  /* Interpret escape sequences? */
    int i;                    /* Label index */
-   int jf;                   /* Field index */
-   int nc[ MAXFLD ];         /* Length of each field */
-   int nf;                   /* Number of fields found in the label */
    int nz;                   /* Number of trailing zeros in this label */
    int nzmax;                /* Max. number of trailing zeros */
    int root;                 /* Index of unabbreviated label */
@@ -15180,7 +15146,6 @@ static int TestAttrib( AstObject *this_object, const char *attrib ) {
    AstPlot *this;                /* Pointer to the Plot structure */
    char label[21];               /* Graphics item label */
    int axis;                     /* Axis number */
-   int id;                       /* Plot object id */
    int len;                      /* Length of attrib string */
    int nc;                       /* No. characters read by sscanf */
    int result;                   /* Result value to return */
@@ -15540,7 +15505,6 @@ f     - If the plotting position is clipped (see AST_CLIP), then no
    char *ltext;            /* Local copy of "text" excluding trailing spaces */
    double **ptr2;          /* Pointer to graphics positions */
    int axis;               /* Axis index */
-   int i;                  /* Loop count */
    int naxes;              /* No. of axes in the base Frame */
    int ncoord;             /* No. of axes in the current Frame */
    int ulen;               /* Length of "text" excluding trailing spaces */
@@ -15699,9 +15663,6 @@ static void TextLabels( AstPlot *this, int edgeticks, int dounits[2],
    double mindim;          /* Minimum dimension of plotting area */
    double xrange;          /* Width of plotting area */
    double yrange;          /* Height of plotting area */
-   float bit;              /* A small increment in the bounds */
-   float max;              /* Max. coord value at a bounding box corner */
-   float min;              /* Min. coord value at a bounding box corner */
    float txtgap;           /* Gap between bounding box and text string */
    float upx;              /* X component of text up-vector */
    float upy;              /* Y component of text up-vector */
@@ -16205,7 +16166,6 @@ static TickInfo *TickMarks( AstPlot *this, int axis, double *cen, double *gap,
    TickInfo *ret;      /* Pointer to the returned structure. */
    char **labels;      /* Pointer to list of formatted labels */
    char **new;         /* Pointer to list of shortened formatted labels */
-   char *c;            /* Pointer to next label character */
    const char *fmt;    /* Format string actually used */
    const char *old_format; /* Original Format string */
    double *ticks;      /* Pointer to major tick mark values */
@@ -16572,7 +16532,6 @@ static void TraceBorder( double **ptr1, double **ptr2, int dim, int *edge,
    int bad;           /* Is the current cell corner bad? */
    int ca;            /* Index of corner at anticlockwise end of edge */
    int cb;            /* Index of corner at clockwise end of edge */
-   int dir;           /* Direction index */
    int ed0;           /* Edge of the starting cell crossed by the boundary */
    int ed;            /* Edge through which curve leaves current cell */
    int i0;            /* Column index of starting cell */
@@ -17018,7 +16977,6 @@ static AstPointSet *Trans( AstPlot *this, AstMapping *mapping, AstPointSet *in,
    double *work;                 /* Pointer to array holding an o/p position */
    double axval;                 /* Axis value in clipping frame */
    double lbnd;                  /* Lower bound on current clipping axis */
-   double tmp;                   /* Swap storage */
    double ubnd;                  /* Upper bound on current clipping axis */
    int axin;                     /* Is the axis value within the allowed range? */
    int clip_norm;                /* Normalise the clipping positions? */
@@ -18221,7 +18179,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
 */
 
 /* Local Variables: */
-   AstCmpMap *map;              /* Mapping which scales and shifts */
    AstPlot *new;                /* Pointer to new Plot */
    AstFrame *baseframe;         /* Pointer to base frame */
    AstFrame *graphicsframe;     /* Pointer to graphics frame */
@@ -18233,7 +18190,6 @@ AstPlot *astInitPlot_( void *mem, size_t size, int init, AstPlotVtab *vtab,
    int axis;                    /* Axis index, 0 or 1 */
    int bi;                      /* Index of base frame */
    int ci;                      /* Index of current frame */
-   int gi;                      /* Index of graphics frame */
    int id;                      /* Plot object id */
    int naxes;                   /* No. of axes in frame */
 
