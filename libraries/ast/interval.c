@@ -735,7 +735,7 @@ static AstInterval *MergeInterval( AstInterval *this, AstRegion *reg ) {
 
 *  Description:
 *     This function attempts to combine the supplied Regions together
-*     into an Interval of higher dimensiomality. This is only possible if
+*     into an Interval of higher dimensionality. This is only possible if
 *     "reg" is a Box, a NullRegion or an Interval. Otherwise a NULL pointer 
 *     is returned without error.
 
@@ -1250,10 +1250,8 @@ static int Overlap( AstRegion *this, AstRegion *that ){
                for( ic = 0; ic < nc; ic++ ) {
 
 /* Get the widths of the two uncertainty boxes on this axis. */
-                  err_this = astAxDistance( frm, ic + 1, lbndu_this[ ic ],
-                                            ubndu_this[ ic ] );
-                  err_that = astAxDistance( frm, ic + 1, lbndu_that[ ic ],
-                                            ubndu_that[ ic ] );
+                  err_this = ubndu_this[ ic ] - lbndu_this[ ic ];
+                  err_that = ubndu_that[ ic ] - lbndu_that[ ic ];
 
 /* Add this together in quadrature to get the tolerance for two values on
    the current axis to be considered equal. */
@@ -2062,7 +2060,6 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
                   new = (AstRegion *) astInterval( cfrm, slbnd, subnd, unc, "" );
                   if( unc ) unc = astAnnul( unc );
                   simpler = 1;
-      
                }
       
 /* Free resources */

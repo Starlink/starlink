@@ -16,7 +16,22 @@ f     AST_POLYGON
 *     are connected together by geodesic curves within the encapsulated Frame.
 *     For instance, if the encapsulated Frame is a simple Frame then the
 *     geodesics will be straight lines, but if the Frame is a SkyFrame then 
-*     the geodesics will be great circles.
+*     the geodesics will be great circles. Note, the vertices must be
+*     supplied in an order such that the inside of the polygon is to the
+*     left of the boundary as the vertices are traversed. Supplying them
+*     in the reverse order will effectively negate the polygon.
+*
+*     Within a SkyFrame, neighbouring vertices are always joined using the 
+*     shortest path. Thus if an edge of 180 degrees or more in length is
+*     required, it should be split into section each of which is less
+*     than 180 degrees. The closed path joining all the vertices in order
+*     will divide the celestial sphere into two disjoint regions. The
+*     inside of the polygon is the region which is circled in an
+*     anti-clockwise manner (when viewed from the outside of the celestial
+*     sphere) when moving through the list of vertices in the order in
+*     which they were supplied when the Polygon was created (i.e. the
+*     inside is to the left of the boundary when moving through the
+*     vertices in the order supplied).
 
 *  Inheritance:
 *     The Polygon class inherits from the Region class.
@@ -121,9 +136,99 @@ static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * )
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static void Cache( AstPolygon * );
+static void Copy( const AstObject *, AstObject * );
+static void Delete( AstObject * );
 
 /* Member functions. */
 /* ================= */
+static void Cache( AstPolygon *this ){
+/*
+*  Name:
+*     Cache
+
+*  Purpose:
+*     Calculate intermediate values and cache them in the Polygon structure.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "polygon.h"
+*     void Cache( AstPolygon *this )
+
+*  Class Membership:
+*     Polygon member function 
+
+*  Description:
+*     This function uses the PointSet stored in the parent Region to calculate 
+*     some intermediate values which are useful in other methods. These
+*     values are stored within the Polygon structure.
+
+*  Parameters:
+*     this
+*        Pointer to the Polygon.
+
+*/
+
+/* Local Variables: */
+   AstFrame *frm;       /* Pointer to base Frame in Polygon */
+   double **ptr;        /* Pointer to data in the encapsulated PointSet */
+   double d;            /* Length of first edge */
+   double end[2];       /* Start position for edge */
+   double start[2];     /* Start position for edge */
+   int i;               /* Axis index */
+   int nv;              /* Number of vertices in Polygon */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get a pointer to the base Frame. */
+   frm = astGetFrame( ((AstRegion *) this)->frameset, AST__BASE );
+
+/* Get the number of vertices. */
+   nv = astGetNpoint( ((AstRegion *) this)->points );
+
+/* Get pointers to the coordinate data in the parent Region structure. */
+   ptr = astGetPoints( ((AstRegion *) this)->points );
+
+/* Free any existing edge information in the Polygon structure. */
+   if( this->edges ) {
+      for( i = 0; i < nv; i++ ) {
+         this->edges[ i ] = astFree( this->edges[ i ] );
+      }
+
+/* Allocate memory to store new edge information if necessary. */
+   } else {
+      this->edges = astMalloc( sizeof( AstLineDef *)*(size_t) nv );
+   }
+
+/* Check pointers can be used safely. */
+   if( this->edges ) {
+
+/* Create and store a description of each edge. */
+      start[ 0 ] = ptr[ 0 ][ nv - 1];
+      start[ 1 ] = ptr[ 1 ][ nv - 1];
+      for( i = 0; i < nv; i++ ) {
+         end[ 0 ] = ptr[ 0 ][ i ];
+         end[ 1 ] = ptr[ 1 ][ i ];
+         this->edges[ i ] = astLineDef( frm, start, end );
+         start[ 0 ] = end[ 0 ];
+         start[ 1 ] = end[ 1 ];
+      }     
+
+/* Find a point which is just inside the Polygon. This is 1.0E-6 of the
+   length of the first edge away from the mid point of the first edge 
+   (on the inside). We assume that no other edge will be closer than 
+   this to the mid point of the first edge. */
+      d = this->edges[0]->length;
+      astLineOffset( frm,this->edges[0], 0.5*d, 1.0E-6*d, this->in );
+   }
+
+/* Free resources */
+   frm = astAnnul( frm );
+}
+
 void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name ) {
 /*
 *+
@@ -200,9 +305,11 @@ void astInitPolygonVtab_(  AstPolygonVtab *vtab, const char *name ) {
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
 
-/* Declare class dump function. There are no Copy or Delete functions for
-   this class. */
+/* Declare the copy constructor, destructor and class dump
+   functions. */
    astSetDump( vtab, Dump, "Polygon", "Polygonal region" );
+   astSetDelete( vtab, Delete );
+   astSetCopy( vtab, Copy );
 }
 
 
@@ -254,7 +361,8 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
    AstPolygon *this;             /* Pointer to Polygon structure */
    double **ptr;                 /* Pointer to PointSet data */
    double *p;                    /* Pointer to next axis value */
-   double d;                     /* Axis offset from refernce value */
+   double d;                     /* Axis offset from reference value */
+   double dinc;                  /* Axis offset from previous value */
    double p0;                    /* Reference axis value */
    int ic;                       /* Axis index */
    int ip;                       /* Point index */
@@ -288,22 +396,25 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /* We first find the max and min axis offsets from the first point. We
    used astAxDistance to cater for the possbility that the Frame may be a
    SkyFrame and thus have circular redundancy. */
-            p = ptr[ ic ] + 1;
-            p0 = p[ -1 ];
             this->lbnd[ ic ] = 0.0;
             this->ubnd[ ic ] = 0.0;
+
+            p = ptr[ ic ] + 1;
+            p0 = p[ -1 ];
+            d = 0.0;
             for( ip = 1; ip < np; ip++, p++ ) {
-               d = astAxDistance( frm, ic + 1, p0, *p );        
-               if( d != AST__BAD ) {   
+               dinc = astAxDistance( frm, ic + 1, p0, *p );        
+               if( dinc != AST__BAD ) {   
+                  d += dinc;
                   if( d < this->lbnd[ ic ] ) this->lbnd[ ic ] = d;
                   if( d > this->ubnd[ ic ] ) this->ubnd[ ic ] = d;
                }
+               p0 = *p;
             }
 
 /* Now convert these offsets to actual axis values. */
-            this->lbnd[ ic ] = p0 + this->lbnd[ ic ];
-            this->ubnd[ ic ] = p0 + this->ubnd[ ic ];
-
+            this->lbnd[ ic ] += ptr[ ic ][ 0 ];
+            this->ubnd[ ic ] += ptr[ ic ][ 0 ];
          }
       }
 
@@ -1017,26 +1128,22 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Local Variables: */
    AstFrame *frm;                /* Pointer to base Frame in FrameSet */
+   AstLineDef *a;                /* Line from inside point to test point */
+   AstLineDef *b;                /* Polygon edge */
    AstPointSet *in_base;         /* PointSet holding base Frame input positions*/
    AstPointSet *result;          /* Pointer to output PointSet */
    AstPolygon *this;             /* Pointer to Polygon */
    double **ptr_in;              /* Pointer to input base Frame coordinate data */
    double **ptr_out;             /* Pointer to output current Frame coordinate data */
-   double **vptr;                /* Pointer to vertex data */
    double *px;                   /* Pointer to array of first axis values */
    double *py;                   /* Pointer to array of second axis values */
-   double ang;                   /* Angle subtended by current edge at test point */
-   double end[ 2 ];              /* End of current edge */
-   double lbnd[ 2 ];             /* Lower bounds of base Frame bounding box */
    double p[ 2 ];                /* Current test position */
-   double start[ 2 ];            /* Start of current edge */
-   double sum;                   /* Sum of all angles subtended at test point */
-   double ubnd[ 2 ];             /* Upper bounds of base Frame bounding box */
    int closed;                   /* Is the boundary part of the Region? */
    int i;                        /* Edge index */
    int icoord;                   /* Coordinate index */
    int in_region;                /* Is the point inside the Region? */
    int ncoord_out;               /* No. of current Frame axes */
+   int ncross;                   /* Number of crossings */
    int neg;                      /* Has the Region been negated? */
    int npoint;                   /* No. of input points */
    int nv;                       /* No. of vertices */
@@ -1078,19 +1185,14 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
    in_base = astRegTransform( this, in, 0, NULL, &frm );
    ptr_in = astGetPoints( in_base );
 
-/* Get the number of vertices in the polygon, and get pointers to the
-   vertex data. */
+/* Get the number of vertices in the polygon. */
    nv = astGetNpoint( ((AstRegion *) this)->points );
-   vptr = astGetPoints( ((AstRegion *) this)->points );
 
 /* See if the boundary is part of the Region. */
    closed = astGetClosed( this );
 
 /* See if the Region has been negated. */
    neg = astGetNegated( this );
-
-/* Get the base Frame bounding box. */
-   astRegBaseBox( this, lbnd, ubnd );
 
 /* Perform coordinate arithmetic. */
 /* ------------------------------ */
@@ -1109,74 +1211,44 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 /* Otherwise, we first determine if the point is inside, outside, or on, 
    the Polygon boundary. Initialially it is unknown. */
          } else {
+
+/* Create a definition of the line from a point which is inside the
+   polygon to the supplied point. This is a structure which includes
+   cached intermediate information which can be used to speed up
+   subsequent calculations. */
+            p[ 0 ] = *px;
+            p[ 1 ] = *py;
+            a = astLineDef( frm, this->in, p );
+
+/* We now dtermine the number of times this line crosses the polygon
+   boundary. Initialise the number of crossings to zero. */
+            ncross = 0;
             pos = UNKNOWN;
 
-/* If the point is outside the bounding box it is definitely outside the 
-   Polygon boundary. */
-            if( *px < lbnd[ 0 ] || *px > ubnd[ 0 ] ||
-                *py < lbnd[ 1 ] || *py > ubnd[ 1 ] ) {
-               pos = OUT;
+/* Loop rouind all edges of the polygon. */
+            for( i = 0; i < nv; i++ ) {
+               b = this->edges[ i ];
 
-/* If the point is at one of the vertices, then it is on the Polygon boundary. */
-            } else {
-               for( i = 0; i < nv; i++ ) {
-                  if( EQUAL( *px, vptr[ 0 ][ i ] ) &&
-                      EQUAL( *py, vptr[ 1 ][ i ] ) ) {
-                     pos = ON;
-                     break;
-                  }
-               }
+/* If this point is on the current edge, then we need do no more checks
+   since we know it is either inside or outside the polygon (depending on
+   whether the polygon is closed or not). */
+               if( astLineContains( frm, b, 0, p ) ) {
+                  pos = ON;
+                  break;
 
-/* If the position of the point is still unknown, we find the sum of the
-   signed angles subtended by each polygon edge at the point. This will be 
-   close to 2.PI for points inside the polygon, and zero for points outside 
-   the boundary. If the point is exactly on an edge, then the edge will
-   subtend PI. */
-               if( pos == UNKNOWN ) {
-                  p[ 0 ] = *px;
-                  p[ 1 ] = *py;
-                  sum = 0.0;
-
-/* Loop round each edge of the polygon. Edge "i" starts at vertex "i-1"
-   and ends at vertex "i". Edge zero starts at vertex "nv-1" and ends at
-   vertex zero. */
-                  start[ 0 ] = vptr[ 0 ][ nv - 1 ];
-                  start[ 1 ] = vptr[ 1 ][ nv - 1 ];
-                  for( i = 0; i < nv; i++ ) {
-                     end[ 0 ] = vptr[ 0 ][ i ];
-                     end[ 1 ] = vptr[ 1 ][ i ];
-
-/* Find the angle subtended by this edge. */
-                     ang = astAngle( frm, start, p, end );
-
-/* If it is exactly 180 degrees, then the point is on the edge,so we can
-   forget the other edges. */
-                     if( EQUAL( fabs( ang ), AST__DPI ) ) {
-                        pos = ON;
-                        break;
-
-/* Otherwise, if good, add it to the running sum. */
-                     } else if( ang != AST__BAD ) {
-                        sum += ang;
-                     }
-
-/* The end of the current edge becomes the start of the next. */
-                     start[ 0 ] = end[ 0 ];
-                     start[ 1 ] = end[ 1 ];
-                  }
-
-/* Determine whether the point is in, on our outside the polygon
-   boundary. */
-                  if( pos == UNKNOWN ) {
-                     sum = fabs( sum );
-                     if( sum < AST__DPI ) {
-                        pos = OUT;
-                     } else {
-                        pos = IN;
-                     }
-                  }
+/* Otherwise, see if the two lines cross within their extent. If so,
+   increment the number of crossings. */
+               } else if( astLineCrossing( frm, b, a, NULL ) ) {
+                  ncross++;
                }
             }
+
+/* Free resources */
+            a = astFree( a );
+
+/* If the position is not on the boundary, it is inside the boundary if
+   the number of crossings is even, and outside otherwise. */
+            if( pos == UNKNOWN ) pos = ( ncross % 2 == 0 )? IN : OUT;
 
 /* Whether the point is in the Region depends on whether the point is
    inside the polygon boundary, whether the Polygon has been negated, and
@@ -1234,11 +1306,98 @@ static AstPointSet *Transform( AstMapping *this_mapping, AstPointSet *in,
 
 /* Copy constructor. */
 /* ----------------- */
-/* (none needed for this class) */
+static void Copy( const AstObject *objin, AstObject *objout ) {
+/*
+*  Name:
+*     Copy
+
+*  Purpose:
+*     Copy constructor for Polygon objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Copy( const AstObject *objin, AstObject *objout )
+
+*  Description:
+*     This function implements the copy constructor for Polygon objects.
+
+*  Parameters:
+*     objin
+*        Pointer to the object to be copied.
+*     objout
+*        Pointer to the object being constructed.
+
+*  Notes:
+*     -  This constructor makes a deep copy.
+*/
+
+/* Local Variables: */
+   AstPolygon *in;                /* Pointer to input Polygon */
+   AstPolygon *out;               /* Pointer to output Polygon  */
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Obtain pointers to the input and output Polygons. */
+   in = (AstPolygon *) objin;
+   out = (AstPolygon *) objout;
+
+/* For safety, first clear any references to the input memory from
+   the output Polygon. */
+   out->edges = NULL;
+
+/* Set up the intermediate data in the copy */
+   Cache( out );
+}
+
 
 /* Destructor. */
 /* ----------- */
-/* (none needed for this class) */
+static void Delete( AstObject *obj ) {
+/*
+*  Name:
+*     Delete
+
+*  Purpose:
+*     Destructor for Polygon objects.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     void Delete( AstObject *obj )
+
+*  Description:
+*     This function implements the destructor for Polygon objects.
+
+*  Parameters:
+*     obj
+*        Pointer to the object to be deleted.
+
+*  Notes:
+*     This function attempts to execute even if the global error status is
+*     set.
+*/
+
+/* Local Variables: */
+   AstPolygon *this;                 /* Pointer to Polygon */
+   int i;                            /* Index of vertex */
+   int nv;                           /* Number of vertices */
+
+/* Obtain a pointer to the Polygon structure. */
+   this = (AstPolygon *) obj;
+
+/* Annul all resources. */
+   if( this->edges ) {
+      nv = astGetNpoint( ((AstRegion *) this)->points );
+      for( i = 0; i < nv; i++ ) {
+         this->edges[ i ] = astFree( this->edges[ i ] );
+      }
+      this->edges = astFree( this->edges );
+   }
+}
 
 /* Dump function. */
 /* -------------- */
@@ -1336,7 +1495,22 @@ f     RESULT = AST_POLYGON( FRAME, NPNT, DIM, POINTS, UNC, OPTIONS, STATUS )
 *     are connected together by geodesic curves within the encapsulated Frame.
 *     For instance, if the encapsulated Frame is a simple Frame then the
 *     geodesics will be straight lines, but if the Frame is a SkyFrame then 
-*     the geodesics will be great circles. 
+*     the geodesics will be great circles. Note, the vertices must be
+*     supplied in an order such that the inside of the polygon is to the
+*     left of the boundary as the vertices are traversed. Supplying them
+*     in the reverse order will effectively negate the polygon.
+*
+*     Within a SkyFrame, neighbouring vertices are always joined using the 
+*     shortest path. Thus if an edge of 180 degrees or more in length is
+*     required, it should be split into section each of which is less
+*     than 180 degrees. The closed path joining all the vertices in order
+*     will divide the celestial sphere into two disjoint regions. The
+*     inside of the polygon is the region which is circled in an
+*     anti-clockwise manner (when viewed from the outside of the celestial
+*     sphere) when moving through the list of vertices in the order in
+*     which they were supplied when the Polygon was created (i.e. the
+*     inside is to the left of the boundary when moving through the
+*     vertices in the order supplied).
 
 *  Parameters:
 c     frame
@@ -1707,6 +1881,8 @@ AstPolygon *astInitPolygon_( void *mem, size_t size, int init, AstPolygonVtab *v
          new->ubnd[ 0 ] = AST__BAD;
          new->lbnd[ 1 ] = AST__BAD;
          new->ubnd[ 1 ] = AST__BAD;
+         new->edges = NULL;
+         Cache( new );
 
 /* If an error occurred, clean up by deleting the new Polygon. */
          if ( !astOK ) new = astDelete( new );
@@ -1850,6 +2026,8 @@ AstPolygon *astLoadPolygon_( void *mem, size_t size, AstPolygonVtab *vtab,
       new->ubnd[ 0 ] = AST__BAD;
       new->lbnd[ 1 ] = AST__BAD;
       new->ubnd[ 1 ] = AST__BAD;
+      new->edges = NULL;
+      Cache( new );
 
 /* If an error occurred, clean up by deleting the new Polygon. */
       if ( !astOK ) new = astDelete( new );

@@ -42,7 +42,7 @@
       call ast_begin( status )
 
       frm1 = ast_skyframe( ' ', status )
-      frm2 = ast_specframe( 'Unit=Ang', status )
+      frm2 = ast_specframe( 'Unit=Angstrom', status )
       frm3 = ast_cmpframe( frm1, frm2, ' ', status )
 
       lbnd( 1 ) = AST__BAD     
@@ -695,16 +695,16 @@
       p2(1) = 0.01  
       unc = ast_circle( frm, 1, p1, p2, AST__NULL, ' ', status )
 
-      p(1,1) = 0.0
-      p(1,2) = 0.0
-      p(2,1) = 1.0
-      p(2,2) = 0.5*pi
+      p(5,1) = 0.0
+      p(5,2) = 0.0
+      p(4,1) = 1.0
+      p(4,2) = 0.5*pi
       p(3,1) = 0.5*pi
       p(3,2) = 0.25*pi
-      p(4,1) = 0.25*pi
-      p(4,2) = 0.0
-      p(5,1) = 0.25*pi
-      p(5,2) = 0.25*pi
+      p(2,1) = 0.25*pi
+      p(2,2) = 0.0
+      p(1,1) = 0.25*pi
+      p(1,2) = 0.25*pi
 
       pol1 = ast_polygon( frm, 5, 5, p, unc, 'closed=0', status )
 
@@ -1091,7 +1091,7 @@
 
 
 
-      frm2 = ast_specframe( 'Unit=Angs', status )
+      frm2 = ast_specframe( 'Unit=Angstrom', status )
       p1( 1 ) = 1000.0
       p2( 1 ) = 1100.0
       box2 = ast_box( frm2, 0, p1, p2, AST__NULL, ' ', status )
@@ -1427,7 +1427,7 @@ C
 
       p1( 1 ) = 0.13089969  ! RA at centre = 0h30m 
       p1( 2 ) = 0.17453293  ! Dec at centre = 10d
-      p2( 1 ) = 6.1522856   ! RA at corner = 23h30m
+      p2( 1 ) = -0.13089971 ! RA at corner = 23h30m
       p2( 2 ) = -0.17453293 ! Dec at corner = -10d
 
       box1 = ast_box( fs, 0, p1, p2, AST__NULL, ' ', status )
@@ -1869,6 +1869,7 @@ C
       xin( 2 ) = 1.05  
       xin( 3 ) = 1.1
       call ast_tran1( reg, 3, xin, .true., xout, status )
+
       if( xout( 1 ) .ne. 1.0 ) then
          call stopit( status, 'PointList: Error 1' )
       else if( xout( 2 ) .ne. AST__BAD ) then
@@ -3295,7 +3296,7 @@ C
       p2(2) = 1.0E-4
       r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
 
-      f2 = ast_specframe( 'Unit=A', status )
+      f2 = ast_specframe( 'Unit=Angstrom', status )
       lbnd( 1 ) = 5000.0
       ubnd( 1 ) = 6000.0
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )
@@ -3385,7 +3386,7 @@ C
       p2(2) = 1.0E-4
       r1 = ast_box( f1, 0, p1, p2, AST__NULL, ' ', status )
 
-      f2 = ast_specframe( 'System=Wavelen,Unit=angstrom', status )
+      f2 = ast_specframe( 'System=Wavelen,Unit=Angstrom', status )
       lbnd( 1 ) = 5000.0
       ubnd( 1 ) = AST__BAD;
       r2 = ast_interval( f2, lbnd, ubnd, AST__NULL, ' ', status )

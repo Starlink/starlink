@@ -755,6 +755,10 @@ static const char *SystemString( AstFrame *, AstSystemType );
 static void CheckPerm( AstFrame *, const int *, const char * );
 static void Resolve( AstFrame *, const double [], const double [], const double [], double [], double *, double * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
+static int LineContains( AstFrame *, AstLineDef *, int, double * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
 
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
@@ -4570,6 +4574,10 @@ void astInitFrameSetVtab_(  AstFrameSetVtab *vtab, const char *name ) {
    frame->ValidateAxis = ValidateAxis;
    frame->ValidateAxisSelection = ValidateAxisSelection;
    frame->ValidateSystem = ValidateSystem;
+   frame->LineDef = LineDef;
+   frame->LineContains = LineContains;
+   frame->LineCrossing = LineCrossing;
+   frame->LineOffset = LineOffset;
 
    frame->GetActiveUnit = GetActiveUnit;
    frame->SetActiveUnit = SetActiveUnit;
@@ -4624,7 +4632,7 @@ static int IsUnitFrame( AstFrame *this_frame ){
 *     int IsUnitFrame( AstFrame *this )
 
 *  Class Membership:
-*     Region member function (over-rides the protected astIsUnitFrame
+*     FrameSet member function (over-rides the protected astIsUnitFrame
 *     method inherited from the Frame class).
 
 *  Description:
@@ -4671,6 +4679,276 @@ static int IsUnitFrame( AstFrame *this_frame ){
 
 /* Return the result. */
    return result;
+}
+
+static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point ) {
+/*
+*  Name:
+*     LineContains
+
+*  Purpose:
+*     Determine if a line contains a point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astLineContains
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the supplied point is on the supplied
+*     line within the supplied Frame.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l
+*        Pointer to the structure defining the line. 
+*     def
+*        Should be set non-zero if the "point" array was created by a
+*        call to astLineCrossing (in which case it may contain extra
+*        information following the axis values),and zero otherwise.
+*     point
+*        Point to an array containing the axis values of the point to be 
+*        tested, possibly followed by extra cached information (see "def").
+
+*  Returned Value:
+*     A non-zero value is returned if the line contains the point. 
+
+*  Notes:
+*     - The pointer supplied for "l" should have been created using the 
+*     astLineDef method. These structures contained cached information about 
+*     the lines which improve the efficiency of this method when many 
+*     repeated calls are made. An error will be reported if the structure 
+*     does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result =0;
+
+/* Obtain a pointer to the FrameSet's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( (AstFrameSet *) this_frame, AST__CURRENT );
+   result = astLineContains( fr, l, def, point );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2, 
+                         double **cross ) {
+/*
+*  Name:
+*     LineCrossing
+
+*  Purpose:
+*     Determine if two lines cross.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+*                       double **cross )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astLineCrossing
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the two suplied line segments cross,
+*     and if so returns the axis values at the point where they cross.
+*     A flag is also returned indicating if the crossing point occurs
+*     within the length of both line segments, or outside one or both of
+*     the line segments.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l1
+*        Pointer to the structure defining the first line. 
+*     l2
+*        Pointer to the structure defining the second line. 
+*     cross
+*        Pointer to a location at which to put a pointer to a dynamically
+*        alocated array containing the axis values at the crossing. If
+*        NULL is supplied no such array is returned. Otherwise, the returned 
+*        array should be freed using astFree when no longer needed. If the 
+*        lines are parallel (i.e. do not cross) then AST__BAD is returned for 
+*        all axis values. Note usable axis values are returned even if the 
+*        lines cross outside the segment defined by the start and end points 
+*        of the lines. The order of axes in the returned array will take
+*        account of the current axis permutation array if appropriate. Note, 
+*        sub-classes such as SkyFrame may append extra values to the end
+*        of the basic frame axis values. A NULL pointer is returned if an
+*        error occurs.
+
+*  Returned Value:
+*     A non-zero value is returned if the lines cross at a point which is
+*     within the [start,end) segment of both lines. If the crossing point
+*     is outside this segment on either line, or if the lines are parallel,
+*     zero is returned. Note, the start point is considered to be inside
+*     the length of the segment, but the end point is outside.
+
+*  Notes:
+*     - The pointers supplied for "l1" and "l2" should have been created
+*     using the astLineDef method. These structures contained cached
+*     information about the lines which improve the efficiency of this method
+*     when many repeated calls are made. An error will be reported if
+*     either structure does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result =0;
+
+/* Obtain a pointer to the FrameSet's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( (AstFrameSet *) this_frame, AST__CURRENT );
+   result = astLineCrossing( fr, l1, l2, cross );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static AstLineDef *LineDef( AstFrame *this_frame, const double start[2], 
+                            const double end[2] ) {
+/*
+*  Name:
+*     LineDef
+
+*  Purpose:
+*     Creates a structure describing a line segment in a 2D Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frameset.h"
+*     AstLineDef *LineDef( AstFrame *this, const double start[2], 
+*                             const double end[2] ) 
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astLineDef
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function creates a structure containing information describing a
+*     given line segment within the supplied 2D Frame. This may include
+*     information which allows other methods such as astLineCrossing to
+*     function more efficiently. Thus the returned structure acts as a
+*     cache to store intermediate values used by these other methods.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame. Must have 2 axes.
+*     start
+*        An array of 2 doubles marking the start of the line segment.
+*     end
+*        An array of 2 doubles marking the end of the line segment.
+
+*  Returned Value:
+*     Pointer to the memory structure containing the description of the
+*     line. This structure should be freed using astFree when no longer
+*     needed. A NULL pointer is returned (without error) if any of the
+*     supplied axis values are AST__BAD.
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstLineDef *result;           /* Returned value */
+
+/* Initialise */
+   result = NULL;
+
+/* Obtain a pointer to the FrameSet's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( (AstFrameSet *) this_frame, AST__CURRENT );
+   result = astLineDef( fr, start, end );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par, 
+                        double prp, double point[2] ){
+/*
+*  Name:
+*     LineOffset
+
+*  Purpose:
+*     Find a position close to a line.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+*                      double prp, double point[2] )
+
+*  Class Membership:
+*     FrameSet member function (over-rides the protected astLineOffset
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a position formed by moving a given distance along
+*     the supplied line, and then a given distance away from the supplied line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     line
+*        Pointer to the structure defining the line. 
+*     par
+*        The distance to move along the line from the start towards the end.
+*     prp
+*        The distance to move at right angles to the line. Positive
+*        values result in movement to the left of the line, as seen from
+*        the outside when moving from start towards the end.
+
+*  Notes:
+*     - The pointer supplied for "line" should have been created using the 
+*     astLineDef method. This structure contains cached information about the 
+*     line which improves the efficiency of this method when many repeated 
+*     calls are made. An error will be reported if the structure does not 
+*     refer to the Frame specified by "this".
+*/
+
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+
+/* Obtain a pointer to the FrameSet's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( (AstFrameSet *) this_frame, AST__CURRENT );
+   astLineOffset( fr, line, par, prp, point );
+   fr = astAnnul( fr );
 }
 
 static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
@@ -6047,7 +6325,7 @@ static AstPointSet *ResolvePoints( AstFrame *this_frame, const double point1[],
 *     Private function.
 
 *  Synopsis:
-*     #include "frame.h"
+*     #include "frameset.h"
 *     AstPointSet *astResolvePoints( AstFrame *this, const double point1[], 
 *                                    const double point2[], AstPointSet *in,
 *                                    AstPointSet *out )

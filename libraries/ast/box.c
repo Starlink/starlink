@@ -86,6 +86,11 @@ static int class_init = 0;       /* Virtual function table initialised? */
 /* Pointers to parent class methods which are extended by this class. */
 static AstPointSet *(* parent_transform)( AstMapping *, AstPointSet *, int, AstPointSet * );
 static AstMapping *(* parent_simplify)( AstMapping * );
+static void (* parent_setnegated)( AstRegion *, int );
+static void (* parent_setclosed)( AstRegion *, int );
+static void (* parent_clearnegated)( AstRegion * );
+static void (* parent_clearclosed)( AstRegion * );
+static void (* parent_setunc)( AstRegion *, AstRegion * );
 
 /* External Interface Function Prototypes. */
 /* ======================================= */
@@ -96,22 +101,116 @@ AstBox *astBoxId_( void *, int, const double[], const double[], void *, const ch
 
 /* Prototypes for Private Member Functions. */
 /* ======================================== */
+static AstBox *BestBox( AstFrame *, AstPointSet *, AstRegion * );
 static AstMapping *Simplify( AstMapping * );
 static AstPointSet *RegBaseGrid( AstRegion * );
 static AstPointSet *RegBaseMesh( AstRegion * );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
-static AstBox *BestBox( AstPointSet *, AstRegion * );
 static double *RegCentre( AstRegion *this, double *, double **, int, int );
+static double SetShrink( AstBox *, double );
 static int MakeGrid( int, double **, int, double *, double *, int, int, double );
 static int RegPins( AstRegion *, AstPointSet *, AstRegion *, int ** );
-static void Cache( AstBox * );
+static void Cache( AstBox *, int );
+static void ClearClosed( AstRegion * );
+static void ClearNegated( AstRegion * );
 static void Copy( const AstObject *, AstObject * );
 static void Delete( AstObject * );
 static void Dump( AstObject *, AstChannel * );
 static void RegBaseBox( AstRegion *this, double *, double * );
+static void SetClosed( AstRegion *, int );
+static void SetNegated( AstRegion *, int );
+static void SetUnc( AstRegion *, AstRegion * );
 
 /* Member functions. */
 /* ================= */
+
+static void ClearClosed( AstRegion *this ){
+/*
+*  Name:
+*     ClearClosed
+
+*  Purpose:
+*     Clear the Closed attribute of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void ClearClosed( AstRegion *this )
+
+*  Class Membership:
+*     Box member function (over-rides the protected astClearClosed
+*     method inherited from the Region class).
+
+*  Description:
+*     This function clears the Closed attribute of the supplied Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+
+/* Local Variables: */
+   int old;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the original attribute value */
+   old = astGetClosed( this );
+
+/* Invoke the clear method inherited from the parent Region class */
+   (*parent_clearclosed)( this );
+
+/* If the new value is not the same as the old value, inidcatethat we
+   need to re-calculate the cached information in the Box. */
+   if( astGetClosed( this ) != old ) ((AstBox *)this)->stale = 1;
+}
+
+static void ClearNegated( AstRegion *this ){
+/*
+*  Name:
+*     ClearNegated
+
+*  Purpose:
+*     Clear the Negated attribute of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void ClearNegated( AstRegion *this )
+
+*  Class Membership:
+*     Box member function (over-rides the protected astClearNegated
+*     method inherited from the Region class).
+
+*  Description:
+*     This function clears the Negated attribute of the supplied Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*/
+
+/* Local Variables: */
+   int old;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the original attribute value */
+   old = astGetNegated( this );
+
+/* Invoke the clear method inherited from the parent Region class */
+   (*parent_clearnegated)( this );
+
+/* If the new value is not the same as the old value, inidcatethat we
+   need to re-calculate the cached information in the Box. */
+   if( astGetNegated( this ) != old ) ((AstBox *)this)->stale = 1;
+}
 
 void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
 /*
@@ -182,6 +281,21 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
    parent_simplify = mapping->Simplify;
    mapping->Simplify = Simplify;
 
+   parent_setnegated = region->SetNegated;
+   region->SetNegated = SetNegated;
+
+   parent_setunc = region->SetUnc;
+   region->SetUnc = SetUnc;
+
+   parent_setclosed = region->SetClosed;
+   region->SetClosed = SetClosed;
+
+   parent_clearnegated = region->ClearNegated;
+   region->ClearNegated = ClearNegated;
+
+   parent_clearclosed = region->ClearClosed;
+   region->ClearClosed = ClearClosed;
+
 /* Store replacement pointers for methods which will be over-ridden by
    new member functions implemented here. */
    region->RegBaseGrid = RegBaseGrid;
@@ -197,7 +311,7 @@ void astInitBoxVtab_(  AstBoxVtab *vtab, const char *name ) {
    astSetDump( vtab, Dump, "Box", "Axis intervals" );
 }
 
-static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
+static AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc ){
 /*
 *  Name:
 *     BestBox
@@ -210,7 +324,7 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
 
 *  Synopsis:
 *     #include "box.h"
-*     AstBox *BestBox( AstPointSet *mesh, AstRegion *unc )
+*     AstBox *BestBox( AstFrame *frm, AstPointSet *mesh, AstRegion *unc )
 
 *  Class Membership:
 *     Box member function 
@@ -219,6 +333,8 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
 *     This function finds the best fitting Box through a given mesh of points.
 
 *  Parameters:
+*     frm
+*        Defines the geometry of the axes.
 *     mesh
 *        Pointer to a PointSet holding the mesh of points. They are
 *        assumed to be in the Frame represented by "unc".
@@ -257,6 +373,9 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
    double sxu2;
    double sxu;
    double ub;
+   double p0;
+   double d;
+   double dinc;
    int ic;
    int ip;
    int nc;
@@ -287,24 +406,31 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
 /* Check pointers can be used safely */
    if( astOK ) {
 
-/* Get the bounding box of the uncertainty region, and find its
-   dimensions. */
+/* Get the bounding box of the uncertainty region. */
       astRegCurBox( unc, lbnd, ubnd ); 
 
 /* We fit the box one axis at a time. */
       for( ic = 0; ic < nc; ic++ ) {
 
-/* Find the upper and lower limits of the bounding box of the supplied
-   mesh on this axis. */
-         lb = DBL_MAX;
-         ub = DBL_MIN;
-         p = ptr[ ic ];
-         for( ip = 0; ip < np; ip++, p++ ) {
-            if( *p != AST__BAD ) {
-               if( *p > ub ) ub = *p;
-               if( *p < lb ) lb = *p;
+/* Find the upper and lower limits of the supplied mesh on this axis. */
+         lb = 0.0;
+         ub = 0.0;
+         p = ptr[ ic ] + 1;
+         p0 = p[ -1 ];
+         d = 0.0;
+         for( ip = 1; ip < np; ip++, p++ ) {
+            dinc = astAxDistance( frm, ic + 1, p0, *p );        
+            if( dinc != AST__BAD ) {   
+               d += dinc;
+               if( d < lb ) lb = d;
+               if( d > ub ) ub = d;
             }
+            p0 = *p;
          }
+
+/* Now convert these relative offsets to actual axis values. */
+         lb += ptr[ ic ][ 0 ];
+         ub += ptr[ ic ][ 0 ];
 
 /* Now scan the list of axis values again, looking for values which are
    "close to" either lower or upper bound. These will be the points which
@@ -329,11 +455,11 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
          p = ptr[ ic ];
          for( ip = 0; ip < np; ip++, p++ ) {
             if( *p != AST__BAD ) {
-               if( fabs( *p - lb ) <= lim ) {
+               if( fabs( astAxDistance( frm, ic + 1, *p, lb ) ) <= lim ) {
                   sxl += *p;
                   sxl2 += (*p)*(*p);
                   nxl++;
-               } else if( fabs( *p - ub ) <= lim ) {
+               } else if( fabs( astAxDistance( frm, ic + 1, *p, ub ) ) <= lim ) {
                   sxu += *p;
                   sxu2 += (*p)*(*p);
                   nxu++;
@@ -378,10 +504,10 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
          p = ptr[ ic ];
          for( ip = 0; ip < np; ip++, p++ ) {
             if( *p != AST__BAD ) {
-               if( fabs( *p - lb ) <= liml ) {
+               if( fabs( astAxDistance( frm, ic + 1, *p, lb ) ) <= liml ) {
                   sxl += *p;
                   nxl++;
-               } else if( fabs( *p - ub ) <= limu ) {
+               } else if( fabs( astAxDistance( frm, ic + 1, *p, ub ) ) <= limu ) {
                   sxu += *p;
                   nxu++;
                }
@@ -408,7 +534,6 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
 
 /* Create the returned Box. */
       result = astBox( unc, 1, blbnd, bubnd, unc, "" );
-      
    }
 
 /* Free resources */
@@ -424,7 +549,7 @@ static AstBox *BestBox( AstPointSet *mesh, AstRegion *unc ){
    return result;
 }
 
-static void Cache( AstBox *this ){
+static void Cache( AstBox *this, int lohi ){
 /*
 *  Name:
 *     Cache
@@ -437,7 +562,7 @@ static void Cache( AstBox *this ){
 
 *  Synopsis:
 *     #include "box.h"
-*     void Cache( AstRegion *this )
+*     void Cache( AstRegion *this, int lohi )
 
 *  Class Membership:
 *     Box member function 
@@ -450,62 +575,134 @@ static void Cache( AstBox *this ){
 *  Parameters:
 *     this
 *        Pointer to the Box.
+*     lohi
+*        Are the lo and hi arrays to be used?
 
 */
 
 /* Local Variables: */
-   AstFrame *frm;
    AstPointSet *pset;
+   AstRegion *unc;  
    double **ptr;
    double *centre;
    double *extent;
+   double *hi;
+   double *lbnd_unc;
+   double *lo;
+   double *shextent;
+   double *ubnd_unc;
+   double wid;
    int i;
    int nc;
 
-/* Check the global error status. */
-   if ( !astOK ) return;
+/* Check the global error status. Also return if the currently cached
+   information is usable. */
+   if ( !astOK || !this->stale ) return;
 
-/* Get a pointer to the base Frame and the number of base axes. */
-   frm = astGetFrame( ((AstRegion *)this)->frameset, AST__BASE );
-   nc = astGetNaxes( frm );
+/* Get the number of base Frame axes. */
+   nc = astGetNin( ((AstRegion *)this)->frameset );
 
 /* Allocate memory to store the half-width of the box on each axis. */
    extent = (double *) astMalloc( sizeof( double )*(size_t) nc );   
 
+/* Allocate memory to store the half-width of the box on each axis,
+   taking account of the current shrink factor stored in this->shrink. */
+   shextent = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+
 /* Allocate memory to store the centre of the box on each axis. */
    centre = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+
+/* Allocate memory to store the high and low bounds taking account of the
+   shrink factor. */
+   hi = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+   lo = (double *) astMalloc( sizeof( double )*(size_t) nc );   
+
+/* Memory to store the uncertainty bounding box */
+   lbnd_unc = astMalloc( sizeof( double)*(size_t) nc );
+   ubnd_unc = astMalloc( sizeof( double)*(size_t) nc );
 
 /* Get pointers to the coordinate data in the parent Region structure. */
    pset = ((AstRegion *) this)->points;
    ptr = astGetPoints( pset );
 
 /* Check pointers can be used safely. */
-   if( astOK ) {
+   if( ptr ) {
 
 /* Calculate the half-width and store in the above array. Also store the
-   centre. */
+   centre and the shrunk half-widths, and the shrunk lower and upper bounds. */
       for( i = 0; i < nc; i++ ) {
          centre[ i ] = ptr[ i ][ 0 ];
-         extent[ i ] = fabs( astAxDistance( frm, i + 1, centre[ i ], 
-                                            ptr[ i ][ 1 ] ) );
+         extent[ i ] = fabs( ptr[ i ][ 1 ] - centre[ i ] );
+         shextent[ i ] = extent[ i ]*this->shrink;
+         lo[ i ] = centre[ i ] - shextent[ i ];
+         hi[ i ] = centre[ i ] + shextent[ i ];
       }
 
-/* Store the pointers to these arrays in the Box structure. */
+/* Store the pointers to these arrays in the Box structure, and indicate
+   the information is usable. */
       if( astOK ) {
-        astFree( this->extent );
-        astFree( this->centre );
-        this->extent = extent;
-        this->centre = centre;
+         astFree( this->extent );
+         astFree( this->centre );
+         astFree( this->shextent );
+         astFree( this->lo );
+         astFree( this->hi );
+         this->extent = extent;
+         this->centre = centre;
+         this->shextent = shextent;
+         this->lo = lo;
+         this->hi = hi;
+         this->stale = 0;
+         extent = NULL;
+         centre = NULL;
+         shextent = NULL;
+         lo = NULL;
+         hi = NULL;
       }
 
-/* Initialise a factor used to shrink the Box temporarily. */
-      this->shrink = 1.0;
+/* If lo and hi values arre to be used, ensure they are expanded to at
+   least the width of an uncertainty box. */
+      if( lohi ) {
 
+/* If we are dealing with an unnegated closed Box or a negated open
+   Box, ensure that the box does not have zero width on any axis. We do
+   this by ensuring that the shrunk extent on all axes is at least half the 
+   width  of the bounding box of the uncertainty Region. */
+         if(  astGetNegated( this ) != astGetClosed( this ) ) {
+
+/* Get the bounding box of the uncertainty Region in the base Frame of
+   the supplied Box. */
+            unc = astGetUnc( this, AST__BASE );
+            astRegCurBox( unc, lbnd_unc, ubnd_unc );
+
+/* Ensure the shrunk extents are at least half the width of the uncertainty 
+   bounding box. */
+            for ( i = 0; i < nc; i++ ) {
+               wid = 0.5*( ubnd_unc[ i ] - lbnd_unc[ i ] );
+               if( this->shextent[ i ] < wid ) {
+                  this->shextent[ i ] = wid;
+                  this->lo[ i ] = this->centre[ i ] - wid;
+                  this->hi[ i ] = this->centre[ i ] + wid;
+               }
+            }
+
+/* Free resources. */
+            unc = astAnnul( unc );
+         }
+      }
    }
 
-   if( !astOK ) extent = astFree( extent );
-   if( !astOK ) centre = astFree( centre );
-   frm = astAnnul( frm );
+/* Annul the memory allocated above if an error occurred. */
+   if( !astOK ) {
+      extent = astFree( extent );
+      centre = astFree( centre );
+      shextent = astFree( shextent );
+      lo = astFree( lo );
+      hi = astFree( hi );
+   }
+
+/* Free other resources */
+   lbnd_unc = astFree( lbnd_unc );
+   ubnd_unc = astFree( ubnd_unc );
 
 }
 
@@ -692,6 +889,9 @@ static void RegBaseBox( AstRegion *this_region, double *lbnd, double *ubnd ){
 /* Get a pointer to the Box structure */
    this = (AstBox *) this_region;
 
+/* Ensure cached information is up to date. */
+   Cache( this, 0 );
+
 /* Get the number of base Frame axes in the Region. */
    nc = astGetNin( this_region->frameset );
 
@@ -842,7 +1042,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
          for( i = 1; i <= m; i++ ) {
 
 /* Shrink the Box temporarily. */
-            ((AstBox *) this)->shrink = (shrink0*i)/m;
+            SetShrink( (AstBox *) this, (shrink0*i)/m );
 
 /* Set the new MeshSize. */
             npp = k1;
@@ -867,7 +1067,7 @@ static AstPointSet *RegBaseGrid( AstRegion *this ){
          }
 
 /* Unshrink the Box. */
-         ((AstBox *) this)->shrink = shrink0;
+         SetShrink( (AstBox *) this, shrink0 );
 
 /* Reinstate the original MeshSize. */
          astSetMeshSize( this, np );
@@ -1320,8 +1520,10 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
 
 /* If the centre coords are to be returned, return either a copy of the 
    base Frame centre coords, or transform the base Frame centre coords
-   into the current Frame. */
+   into the current Frame. First ensure cached information (which
+   includes the centre coords) is up to date. */
    if( !ptr && !cen ) {
+      Cache( this, 0 );
       if( ifrm == AST__CURRENT ) {
          result = astRegTranPoint( this_region, this->centre, 1, 1 );
       } else {
@@ -1352,30 +1554,31 @@ static double *RegCentre( AstRegion *this_region, double *cen, double **ptr,
                tmp = astFree( tmp );
             }
 
-/* ... and change the coords in the parent Region structure and the cached 
-   coords in the Box structure. */
+/* ... and change the coords in the parent Region structure. */
             for( ic = 0; ic < ncb; ic++ ) {
                delta = bc[ ic ] - rptr[ ic ][ 0 ];
                rptr[ ic ][ 0 ] += delta;
                rptr[ ic ][ 1 ] += delta;
-               this->centre[ ic ] += delta;
             }
 
 /* If the centre position was supplied in the base Frame, use the
    supplied "cen" or "ptr" pointer directly to change the coords in the 
-   parent Region structure and the cached coords in the Box structure. */
+   parent Region structure. */
          } else {
             for( ic = 0; ic < ncb; ic++ ) {
                delta = cen ? cen[ ic ] : ptr[ ic ][ index ];
                delta -= rptr[ ic ][ 0 ];
                rptr[ ic ][ 0 ] += delta;
                rptr[ ic ][ 1 ] += delta;
-               this->centre[ ic ] += delta;
             }
          }
 
-/* Any base Frame mesh is now no good, so annul it. */
+/* Indicate the cached info in the Box structure is out of date. */
+         this->stale = 1;
+
+/* Any base Frame mesh or grid is now no good, so annul it. */
          if( this_region->basemesh ) this_region->basemesh = astAnnul( this_region->basemesh );
+         if( this_region->basegrid ) this_region->basegrid = astAnnul( this_region->basegrid );
 
       }
    }
@@ -1472,6 +1675,9 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
 
 /* Get a pointer to the Box structure. */
    this = (AstBox *) this_region;
+
+/* Ensure cached information is up to date. */
+   Cache( this, 0 );
 
 /* Get the number of base Frame axes in the Box, and check the supplied 
    PointSet has the same number of axis values per point. */
@@ -1631,6 +1837,205 @@ static int RegPins( AstRegion *this_region, AstPointSet *pset, AstRegion *unc,
    return result;
 }
 
+static void SetClosed( AstRegion *this, int value ){
+/*
+*  Name:
+*     SetClosed
+
+*  Purpose:
+*     Set a value for the Closed attribute of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void SetClosed( AstRegion *this, int value )
+
+*  Class Membership:
+*     Box member function (over-rides the protected astSetClosed
+*     method inherited from the Region class).
+
+*  Description:
+*     This function sets a new value for the Closed attribute of a Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     value
+*        The new attribute value.
+*/
+
+/* Local Variables: */
+   int old;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the original attribute value */
+   old = astGetClosed( this );
+
+/* Invoke the set method inherited from the parent Region class */
+   (*parent_setclosed)( this, value );
+
+/* If the new value is not the same as the old value, indicate that we
+   need to re-calculate the cached information in the Box. */
+   if( value != old ) ((AstBox *)this)->stale = 1;
+}
+
+static void SetNegated( AstRegion *this, int value ){
+/*
+*  Name:
+*     SetNegated
+
+*  Purpose:
+*     Set a value for the Negated attribute of a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void SetNegated( AstRegion *this, int value )
+
+*  Class Membership:
+*     Box member function (over-rides the protected astSetNegated
+*     method inherited from the Region class).
+
+*  Description:
+*     This function sets a new value for the Negated attribute of a Region.
+
+*  Parameters:
+*     this
+*        Pointer to the Region.
+*     value
+*        The new attribute value.
+*/
+
+/* Local Variables: */
+   int old;
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Get the original attribute value */
+   old = astGetNegated( this );
+
+/* Invoke the set method inherited from the parent Region class */
+   (*parent_setnegated)( this, value );
+
+/* If the new value is not the same as the old value, indicate that we
+   need to re-calculate the cached information in the Box. */
+   if( value != old ) ((AstBox *)this)->stale = 1;
+}
+
+static double SetShrink( AstBox *this, double shrink ){
+/*
+*  Name:
+*     SetShrink
+
+*  Purpose:
+*     Store a new temporary shrink factor for a Box.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     double SetShrink( AstBox *this, double shrink );
+
+*  Class Membership:
+*     Box method 
+
+*  Description:
+*     Boxes can be shrunk from their original size by calling this function. 
+*     The original shrink factor is 1.0. This function should be used for 
+*     assigning new values to since it also re-calculates Cahced information
+*     which depends on the current shrink factor.
+
+*  Parameters:
+*     this
+*        Pointer to the Box.
+*     shrink
+*        The new Shrink factor.
+
+*  Returned Value:
+*     The original shrink factor.
+
+*/
+
+/* Local Variables: */
+   double result;
+
+/* Check the inherited status. */
+   if( !astOK ) return 1.0;
+
+/* Store the orignal shrink factor. */
+   result = this->shrink;
+
+/* Set the new value. */
+   this->shrink = shrink;
+
+/* If the new value is not the same as the old value, indicate that we
+   need to re-calculate the cached information in the Box. */
+   if( result != shrink ) this->stale = 1;
+
+/* Return the original value */
+   return result;
+}
+
+static void SetUnc( AstRegion *this, AstRegion *unc ){
+/*
+*  Name:
+*     SetUnc
+
+*  Purpose:
+*     Store uncertainty information in a Region.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "box.h"
+*     void SetUnc( AstRegion *this, AstRegion *unc )
+
+*  Class Membership:
+*     Box method (over-rides the astSetUnc method inherited from the 
+*     Region class).
+
+*  Description:
+*     Each Region (of any class) can have an "uncertainty" which specifies 
+*     the uncertainties associated with the boundary of the Region. This
+*     information is supplied in the form of a second Region. The uncertainty 
+*     in any point on the boundary of a Region is found by shifting the 
+*     associated "uncertainty" Region so that it is centred at the boundary 
+*     point being considered. The area covered by the shifted uncertainty 
+*     Region then represents the uncertainty in the boundary position. 
+*     The uncertainty is assumed to be the same for all points.
+*
+*     The uncertainty is usually specified when the Region is created, but
+*     this function allows it to be changed at any time. 
+
+*  Parameters:
+*     this
+*        Pointer to the Region which is to be assigned a new uncertainty.
+*     unc
+*        Pointer to the new uncertainty Region. This must be either a Box, 
+*        a Circle or an Ellipse. A deep copy of the supplied Region will be 
+*        taken, so subsequent changes to the uncertainty Region using the 
+*        supplied pointer will have no effect on the Region "this".
+*/
+
+/* Check the inherited status. */
+   if( !astOK ) return;
+
+/* Invoke the astSetUnc method inherited from the parent Region class. */
+   (*parent_setunc)( this, unc );
+
+/* Indicate that we need to re-calculate the cached information in the Box. */
+   ((AstBox *)this)->stale = 1;
+}
+
 static AstMapping *Simplify( AstMapping *this_mapping ) {
 /*
 *  Name:
@@ -1739,6 +2144,9 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
 
 /* Get a pointer to the Box structure. */
       newbox = (AstBox *) new;
+
+/* Ensure cached information is up to date. */
+      Cache( newbox, 0 );
 
 /* Get the number of inputs and outputs for the PermMap */
       nin = astGetNin( map );
@@ -1893,6 +2301,9 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    bounds on the box boundary. */
    } else if( !astIsAUnitMap( map ) ){
 
+/* Get pointer to current Frame. */
+      frm = astGetFrame( new->frameset, AST__CURRENT );
+
 /* Get a mesh of points covering the Box in its current Frame. */
       mesh = astRegMesh( new );
 
@@ -1902,7 +2313,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
  
 /* Find the best fitting box (defined in the current Frame) through these 
    points */
-      newbox = BestBox( mesh, unc );
+      newbox = BestBox( frm, mesh, unc );
 
 /* See if all points within this mesh fall on the boundary of the best
    fitting Box, to within the uncertainty of the Region. */
@@ -1918,15 +2329,13 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    2-dimensional Boxes. */
       } else if( astGetNin( map ) == 2 && astGetNout( map ) == 2 ) {
 
-/* Get pointer to current Frame. */
-         frm = astGetFrame( new->frameset, AST__CURRENT );
-
 /* Create a PointSet holding the base Frame axis values at the four
    corners of the Box. */
          ps1 = astPointSet( 4, 2, "" );
          ptr1 = astGetPoints( ps1 );
          if( astOK ) {
             box = (AstBox *) new;
+            Cache( box, 0 );
 
             ptr1[ 0 ][ 0 ] = box->centre[ 0 ] + box->extent[ 0 ];
             ptr1[ 1 ][ 0 ] = box->centre[ 1 ] + box->extent[ 1 ];
@@ -1967,11 +2376,11 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             newpoly = astAnnul( newpoly );
          }
 
-         frm = astAnnul( frm );
          ps1 = astAnnul( ps1 );
          ps2 = astAnnul( ps2 );
       }
 
+      frm = astAnnul( frm );
       mesh = astAnnul( mesh );
       unc = astAnnul( unc );
       newbox = astAnnul( newbox );
@@ -2060,15 +2469,9 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    AstPointSet *pset_tmp;        /* Pointer to PointSet holding base Frame positions*/
    AstPointSet *result;          /* Pointer to output PointSet */
    AstRegion *reg;               /* Pointer to Region */
-   AstRegion *unc;               /* Uncertainty Region */
    double **ptr_out;             /* Pointer to output coordinate data */
    double **ptr_tmp;             /* Pointer to base Frame coordinate data */
-   double *lbnd_unc;             /* Lower bounds of uncertainty Region */
-   double *ubnd_unc;             /* Upper bounds of uncertainty Region */
-   double *extent;               /* Modified box extents */
    double axval;                 /* Input axis value */
-   double d;                     /* Offset from box centre to supplied pos. */
-   double wid;                   /* Half width of uncertainy Region */
    int closed;                   /* Is the boundary part of the Region? */
    int coord;                    /* Zero-based index for coordinates */
    int ncoord_out;               /* No. of coordinates per output point */
@@ -2119,43 +2522,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
 /* See if the Box is negated */
    neg = astGetNegated( reg );
 
-/* If we are dealing with an unnegated closed Box or a negated open
-   Box, ensure that the box does not have zero width on any axis. We do
-   this by ensuring that the extent on all axes is at least half the width 
-   of the bounding box of the uncertainty Region. First allocate memory
-   for the modified base Frame axis extents. */
-   extent = astMalloc( sizeof( double )*(size_t) ncoord_tmp );
-   if( astOK ) {
-      if( neg != closed ) {
-
-/* Get the bounding box of the uncertainty Region in the base Frame of
-   the Box. */
-         unc = astGetUnc( reg, AST__BASE );
-         lbnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-         ubnd_unc = astMalloc( sizeof( double)*(size_t) ncoord_tmp );
-         astRegCurBox( unc, lbnd_unc, ubnd_unc );
-
-/* Ensure the extents are at least half the width of the uncertainty bounding 
-   box. */
-         for ( coord = 0; coord < ncoord_tmp; coord++ ) {
-            extent[ coord ] = box->extent[ coord ]*box->shrink;
-            wid = 0.5*( ubnd_unc[ coord ] - lbnd_unc[ coord ] );
-            if( extent[ coord ] < wid ) extent[ coord ] = wid;
-         }
-
-/* Free resources. */
-         lbnd_unc = astFree( lbnd_unc );
-         ubnd_unc = astFree( ubnd_unc );
-         unc = astAnnul( unc );
-
-/* For negated closed Boxes and unnegated open Boxes, use the extents
-   without modification. */
-      } else {
-         for ( coord = 0; coord < ncoord_tmp; coord++ ) {
-            extent[ coord ] = box->extent[ coord ]*box->shrink;
-         }
-      }
-   }
+/* Ensire the cached information is up to date. */
+   Cache( box, 1 );
 
 /* Perform coordinate arithmetic. */
 /* ------------------------------ */
@@ -2182,29 +2550,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                if( axval == AST__BAD ) {
                   break;
 
-/* Otherwise check the current axis value. */
-               } else {
-
-/* Get the distance along the current axis from the current point to the
-   box centre. */
-                  d = astAxDistance( frm, coord + 1, box->centre[ coord ], 
-                                     axval );
-
-/* If the distance is bad, the point is definitely not in the Region. */
-                  if( d == AST__BAD ) {
-                     break;
-
-/* Do the appropriate check on the distance, depending on whether the
+/* Otherwise check the current axis value, depending on whether the
    boundary is included in the Region or not. Break as soon as an axis
    value is found which is outside the box limits (i.e. in the Region). */
-                  } else {
-                     if( closed ) {
-                        if( fabs( d ) >= extent[ coord ] ) ok = 1;
-                     } else {
-                        if( fabs( d ) > extent[ coord ] ) ok = 1;
-                     }
-                     if( ok ) break;
-                  }
+               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ], 
+                                    axval, !closed ) ) {
+                  ok = 1;
+                  break;
                }
             }
 
@@ -2216,8 +2568,8 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
             }
          }
 
-/* For un-negated boxes, a position is in the region if *all*
-   axes are "close" to the box centre. */
+/* For un-negated boxes, a position is in the region if *all* axes are "close"
+   to the box centre. */
       } else {
 
 /* Loop round each point */
@@ -2236,30 +2588,13 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
                   ok = 0;
                   break;
 
-/* Otherwise check the current axis value. */
-               } else {
-
-/* Get the distance along the current axis from the current point to the
-   box centre. */
-                  d = astAxDistance( frm, coord + 1, box->centre[ coord ],
-                                     axval );
-
-/* If the distance is bad, the point is not in the Region. */
-                  if( d == AST__BAD ) {
-                     ok = 0;
-
-/* Do the appropriate check on the distance, depending on whether the
-   boundary is included in the Region or not. */
-                  } else {
-                     if( closed ) {
-                        if( fabs( d ) > extent[ coord ] ) ok = 0;
-                     } else {
-                        if( fabs( d ) >= extent[ coord ] ) ok = 0;
-                     }
-                  }
-
-/* Break if we now know that the point is not in the Region. */
-                  if( !ok ) break;
+/* Otherwise check the current axis value, depending on whether the
+   boundary is included in the Region or not. Break as soon as an axis
+   value is found which is outside the box limits (i.e. outside the Region). */
+               } else if( !astAxIn( frm, coord, box->lo[ coord ], box->hi[ coord ], 
+                                    axval, closed ) ) {
+                  ok = 0;
+                  break;
                }
             }
 
@@ -2274,7 +2609,6 @@ static AstPointSet *Transform( AstMapping *this, AstPointSet *in,
    }
 
 /* Free resources */
-   extent = astFree( extent );
    pset_tmp = astAnnul( pset_tmp );
    frm = astAnnul( frm );
 
@@ -2336,13 +2670,22 @@ static void Copy( const AstObject *objin, AstObject *objout ) {
 /* For safety, first clear any references to the input memory from
    the output Box. */
    out->extent = NULL;
+   out->shextent = NULL;
    out->centre = NULL;
+   out->lo = NULL;
+   out->hi = NULL;
 
 /* Copy dynamic memory contents */
    nax = astGetNin( ((AstRegion *) in)->frameset );
    out->extent = astStore( NULL, in->extent, 
                            sizeof( double )*(size_t)nax );
    out->centre = astStore( NULL, in->centre, 
+                           sizeof( double )*(size_t)nax );
+   out->shextent = astStore( NULL, in->shextent, 
+                           sizeof( double )*(size_t)nax );
+   out->lo = astStore( NULL, in->lo, 
+                           sizeof( double )*(size_t)nax );
+   out->hi = astStore( NULL, in->hi, 
                            sizeof( double )*(size_t)nax );
 }
 
@@ -2384,6 +2727,9 @@ static void Delete( AstObject *obj ) {
 /* Annul all resources. */
    this->extent = astFree( this->extent );
    this->centre = astFree( this->centre );
+   this->shextent = astFree( this->shextent );
+   this->lo = astFree( this->lo );
+   this->hi = astFree( this->hi );
 }
 
 /* Dump function. */
@@ -2801,7 +3147,6 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
    AstBox *new;              /* Pointer to new Box */
    AstPointSet *pset;        /* PointSet to pass to Region initialiser */
    double **ptr;             /* Pointer to coords data in pset */
-   double axlen;             /* The box size on one axis */
    int i;                    /* axis index */
    int nc;                   /* No. of axes */
 
@@ -2840,12 +3185,7 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 /* If two corners were supplied, find and store the centre. */
    if( form == 1 ) {
       for( i = 0; i < nc; i++ ) {
-         axlen = astAxDistance( frame, i + 1, point1[ i ], point2[ i ] );
-         ptr[ i ][ 0 ] = astAxOffset( frame, i + 1, point1[ i ], 0.5*axlen );
-         if( ptr[ i ][ 0 ] == AST__BAD ) {
-            astError( AST__BADIN, "astInitBox(%s): The value of axis %d is "
-                     "undefined at the centre of the box.", name, i + 1 );
-         }
+         ptr[ i ][ 0 ] = 0.5*( point1[ i ] + point2[ i ] );
       }
    }
 
@@ -2861,7 +3201,13 @@ AstBox *astInitBox_( void *mem, size_t size, int init, AstBoxVtab *vtab,
 
 /* Initialise the Box data. */
 /* ------------------------ */
-         Cache( new );
+         new->shrink = 1.0;
+         new->extent = NULL;  
+         new->shextent = NULL;
+         new->centre = NULL;  
+         new->lo = NULL;      
+         new->hi = NULL;      
+         new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
          if ( !astOK ) new = astDelete( new );
@@ -2998,8 +3344,14 @@ AstBox *astLoadBox_( void *mem, size_t size, AstBoxVtab *vtab,
 /* There are no values to read. */
 /* ---------------------------- */
 
-/* Cache intermediate results in the Box structure */
-      Cache( new );
+/* Initialise Box data */
+      new->shrink = 1.0;
+      new->extent = NULL;  
+      new->shextent = NULL;
+      new->centre = NULL;  
+      new->lo = NULL;      
+      new->hi = NULL;      
+      new->stale = 1;
 
 /* If an error occurred, clean up by deleting the new Box. */
       if ( !astOK ) new = astDelete( new );

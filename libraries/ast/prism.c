@@ -1807,6 +1807,7 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    AstMapping *nmap2;            /* Reg2->current Mapping */
    AstMapping *result;           /* Result pointer to return */
    AstPrism *new;                /* New Prism */
+   AstPrism *cpr;                /* Component Prism */
    AstRegion *new2;              /* New Interval or Box */
    AstRegion *newreg1;           /* Reg1 mapped into current Frame */
    AstRegion *newreg2;           /* Reg2 mapped into current Frame */
@@ -1938,11 +1939,27 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
    we can replace the Prism by a single Interval defined within a CmpFrame.
    Attempt to do this. If succesful, attempt to simplify the new Region
    and use it in place of the original. */
-   new2 = astMergeInterval( new->region2, new->region1 );
-   if( new2 ) {
-      astAnnul( new );
-      new = astSimplify( new2 );
-      new2 = astAnnul( new2 );
+   if( new ) {
+      new2 = astMergeInterval( new->region2, new->region1 );
+      if( new2 ) {
+         astAnnul( new );
+         new = astSimplify( new2 );
+         new2 = astAnnul( new2 );
+
+/* If not succesful, see if the first component Region is a Prism. If so
+   we can merge the two extrusion Regions into a single Interval. */
+      } else if( astIsAPrism( new->region1 ) ) {
+         cpr = ( AstPrism *) ( new->region1 );
+         newreg1 = cpr->region1;
+         newreg2 = astMergeInterval( new->region2, cpr->region2 );
+         if( newreg2 ) {
+            new2 = (AstRegion *) astPrism( newreg1, newreg2, "" );
+            astAnnul( new );
+            new = astSimplify( new2 );
+            new2 = astAnnul( new2 );
+         }
+         newreg2 = astAnnul( newreg2 );
+      }      
    }
 
 /* Now invoke the parent Simplify method inherited from the Region class. 

@@ -144,6 +144,7 @@ static double AxisDistance( AstAxis *, double, double );
 static double AxisGap( AstAxis *, double, int * );
 static double AxisOffset( AstAxis *, double, double );
 static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
+static int AxisIn( AstAxis *, double, double, double, int );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisDigits( AstAxis * );
 static int GetAxisDirection( AstAxis * );
@@ -831,6 +832,62 @@ static double AxisGap( AstAxis *this, double gap, int *ntick ) {
    return result;
 }
 
+static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed ){
+/*
+*  Name:
+*     astAxisIn
+
+*  Purpose:
+*     Test if an axis value lies within a given interval.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "axis.h"
+*     int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
+
+*  Class Membership:
+*     Axis member function.
+
+*  Description:
+*     This function returns non-zero if a given axis values lies within a
+*     given axis interval.
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     lo
+*        The lower axis limit of the interval.
+*     hi
+*        The upper axis limit of the interval.
+*     val
+*        The axis value to be tested.
+*     closed
+*        If non-zero, then the lo and hi axis values are themselves
+*        considered to be within the interval. Otherwise they are outside.
+
+*  Returned Value:
+*     Non-zero if the test value is inside the interval. 
+
+*  Class Applicability:
+*     Axis
+*        Uses simple Euclidean test
+*     SkyAxis
+*        All angles which are numerically between "lo" and "hi" are within 
+*        the interval. Angle outside this range are also within the interval 
+*        if they can be brought into the range by addition or subtraction
+*        of a multiple of 2.PI.
+*/
+
+/* For speed, omit the astOK check since no pointers are being used. */
+   if( closed ) {
+      return ( lo <= val && val <= hi );
+   } else {
+      return ( lo < val && val < hi );
+   }
+}
+
 static void AxisNorm( AstAxis *this, double *value ) {
 /*
 *+
@@ -1387,6 +1444,7 @@ void astInitAxisVtab_(  AstAxisVtab *vtab, const char *name ) {
    vtab->AxisDistance = AxisDistance;
    vtab->AxisOffset = AxisOffset;
    vtab->AxisGap = AxisGap;
+   vtab->AxisIn = AxisIn;
    vtab->AxisNorm = AxisNorm;
    vtab->AxisOverlay = AxisOverlay;
    vtab->AxisUnformat = AxisUnformat;
@@ -2755,8 +2813,11 @@ int astAxisUnformat_( AstAxis *this, const char *string, double *value ) {
 int astAxisFields_( AstAxis *this, const char *fmt, const char *str, 
                     int maxfld, char **fields, int *nc, double *val ) {
    if ( !astOK ) return 0;
-   return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld,
-fields, nc, val );
+   return (**astMEMBER(this,Axis,AxisFields))( this, fmt, str, maxfld, fields, nc, val );
+}
+int astAxisIn_( AstAxis *this, double lo, double hi, double val, int closed ){
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Axis,AxisIn))( this, lo, hi, val, closed );
 }
 
 

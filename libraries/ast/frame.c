@@ -627,6 +627,7 @@ static AstFrameSet *Convert( AstFrame *, AstFrame *, const char * );
 static AstFrameSet *ConvertX( AstFrame *, AstFrame *, const char * );
 static AstFrameSet *FindFrame( AstFrame *, AstFrame *, const char * );
 static AstPointSet *ResolvePoints( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
 static AstPointSet *Transform( AstMapping *, AstPointSet *, int, AstPointSet * );
 static char *CleanDomain( char * );
 static const char *Abbrev( AstFrame *, int, const char *, const char *, const char * );
@@ -642,6 +643,7 @@ static const int *GetPerm( AstFrame * );
 static double Angle( AstFrame *, const double[], const double[], const double[] );
 static double AxDistance( AstFrame *, int, double, double );
 static double AxOffset( AstFrame *, int, double, double );
+static int AxIn( AstFrame *, int, double, double, double, int );
 static double AxAngle( AstFrame *, const double[], const double[], int );
 static double Distance( AstFrame *, const double[], const double[] );
 static double Gap( AstFrame *, int, double, int * );
@@ -654,6 +656,9 @@ static int Equal( AstObject *, AstObject * );
 static int Fields( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
 static int GetDigits( AstFrame * );
 static int GetDirection( AstFrame *, int );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
+static int LineContains( AstFrame *, AstLineDef *, int, double * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
 
 static double GetTop( AstFrame *, int );
 static int TestTop( AstFrame *, int );
@@ -1295,6 +1300,79 @@ f     invoked with STATUS set to an error value, or if it should fail for
 /* Return the result. */
    return result;
 
+}
+
+static int AxIn( AstFrame *this, int axis, double lo, double hi, double val,
+                 int closed ){
+/*
+*+
+*  Name:
+*     astAxIn
+
+*  Purpose:
+*     Test if an axis value lies within a given interval.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astAxIn( AstFrame *this, int axis, double lo, double hi, double val,
+*                  int closed )
+
+*  Class Membership:
+*     Frame member function.
+
+*  Description:
+*     This function returns non-zero if a given axis values lies within a
+*     given axis interval.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     axis
+*        The index of the axis. The first axis has index 0.
+*     lo
+*        The lower axis limit of the interval.
+*     hi
+*        The upper axis limit of the interval.
+*     val
+*        The axis value to be tested.
+*     closed
+*        If non-zero, then the lo and hi axis values are themselves
+*        considered to be within the interval. Otherwise they are outside.
+
+*  Returned Value:
+*     Non-zero if the test value is inside the interval. 
+
+*  Class Applicability:
+*     Frame
+*        Uses simple Euclidean test
+*     SkyFrame
+*        All angles which are numerically between "lo" and "hi" are within 
+*        the interval. Angle outside this range are also within the interval 
+*        if they can be brought into the range by addition or subtraction
+*        of a multiple of 2.PI.
+*-
+*/
+
+/* Local Variables: */
+   AstAxis *ax;                  /* Pointer to Axis object */
+   int result;                   /* Returned value */
+
+/* For speed, omit the astOK check and axis validation (since this is
+   protected code, AST should get it right). Obtain a pointer to the 
+   required Axis. */
+   ax = astGetAxis( this, axis );
+
+/* Use the AxisIn method associated with the Axis. */
+   result = ax ? astAxisIn( ax, lo, hi, val, closed ) : 0;
+
+/* Annul the Axis pointer. */
+   ax = astAnnul( ax );
+
+/* Return the result. */
+   return result;
 }
 
 static double AxOffset( AstFrame *this, int axis, double v1, double dist ) {
@@ -4612,11 +4690,16 @@ void astInitFrameVtab_(  AstFrameVtab *vtab, const char *name ) {
    vtab->Norm = Norm;
    vtab->AxDistance = AxDistance;
    vtab->AxOffset = AxOffset;
+   vtab->AxIn = AxIn;
    vtab->AxAngle = AxAngle;
    vtab->Offset = Offset;
    vtab->Offset2 = Offset2;
    vtab->Resolve = Resolve;
    vtab->ResolvePoints = ResolvePoints;
+   vtab->LineDef = LineDef;
+   vtab->LineContains = LineContains;
+   vtab->LineCrossing = LineCrossing;
+   vtab->LineOffset = LineOffset;
    vtab->Overlay = Overlay;
    vtab->PermAxes = PermAxes;
    vtab->PickAxes = PickAxes;
@@ -4757,6 +4840,417 @@ static int IsUnitFrame( AstFrame *this ){
 
 /* The base Frame class is always equivalent to a UnitMap. */
    return 1;
+}
+
+static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point ) {
+/*
+*+
+*  Name:
+*     astLineContains
+
+*  Purpose:
+*     Determine if a line contains a point.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astLineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function determines if the supplied point is on the supplied
+*     line within the supplied Frame. The start point of the line is 
+*     considered to be within the line, but the end point is not. The tests 
+*     are that the point of closest approach of the line to the point should 
+*     be between the start and end, and that the distance from the point to 
+*     the point of closest aproach should be less than 1.0E-7 of the length 
+*     of the line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l
+*        Pointer to the structure defining the line. 
+*     def
+*        Should be set non-zero if the "point" array was created by a
+*        call to astLineCrossing (in which case it may contain extra
+*        information following the axis values),and zero otherwise.
+*     point
+*        Point to an array containing the axis values of the point to be 
+*        tested, possibly followed by extra cached information (see "def").
+
+*  Returned Value:
+*     A non-zero value is returned if the line contains the point. 
+
+*  Notes:
+*     - The pointer supplied for "l" should have been created using the 
+*     astLineDef method. These structures contained cached information about 
+*     the lines which improve the efficiency of this method when many 
+*     repeated calls are made. An error will be reported if the structure 
+*     does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   int result;                
+   double dx, dy, p;
+
+/* Initialise. */
+   result = 0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check that the line refers to the supplied Frame. */
+   if( l->frame != this ) {
+      astError( AST__INTER, "astLineContains(%s): The supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+/* If the point is good, find the offsets from the start of the line. */
+   } else if( point[ 0 ] != AST__BAD && point[ 1 ] != AST__BAD ) {
+      dx = point[ 0 ] - l->start[ 0 ];
+      dy = point[ 1 ] - l->start[ 1 ];
+
+/* Check the nearest point on the line is between the start and end.
+   Exclude the end point. */
+      p = dx*l->dir[ 0 ] + dy*l->dir[ 1 ];
+      if( p >= 0.0 && p < l->length ) {
+
+/* Check the distance from the point to the nearest point on the line is not 
+   further than 1.0E-7 of the length of the line. */
+         if( fabs( dx*l->q[ 0 ] + dy*l->q[ 1 ] ) <= 1.0E-7*l->length ) {
+            result = 1;
+         }
+      }
+   }
+
+/* Return zero if an error occurred. */
+   if( !astOK ) result = 0;
+
+/* Return a pointer to the output structure. */
+   return result;
+}
+
+static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+                         double **cross ) {
+/*
+*+
+*  Name:
+*     astLineCrossing
+
+*  Purpose:
+*     Determine if two lines cross.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     int astLineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+*                          double **cross ) 
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function determines if the two suplied line segments cross,
+*     and if so returns the axis values at the point where they cross.
+*     A flag is also returned indicating if the crossing point occurs
+*     within the length of both line segments, or outside one or both of
+*     the line segments.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l1
+*        Pointer to the structure defining the first line. 
+*     l2
+*        Pointer to the structure defining the second line. 
+*     cross
+*        Pointer to a location at which to put a pointer to a dynamically
+*        alocated array containing the axis values at the crossing. If
+*        NULL is supplied no such array is returned. Otherwise, the returned 
+*        array should be freed using astFree when no longer needed. If the 
+*        lines are parallel (i.e. do not cross) then AST__BAD is returned for 
+*        all axis values. Note usable axis values are returned even if the 
+*        lines cross outside the segment defined by the start and end points 
+*        of the lines. The order of axes in the returned array will take
+*        account of the current axis permutation array if appropriate. Note, 
+*        sub-classes such as SkyFrame may append extra values to the end
+*        of the basic frame axis values. A NULL pointer is returned if an
+*        error occurs.
+
+*  Returned Value:
+*     A non-zero value is returned if the lines cross at a point which is
+*     within the [start,end) segment of both lines. If the crossing point
+*     is outside this segment on either line, or if the lines are parallel,
+*     zero is returned. Note, the start point is considered to be inside
+*     the length of the segment, but the end point is outside.
+
+*  Notes:
+*     - The pointers supplied for "l1" and "l2" should have been created
+*     using the astLineDef method. These structures contained cached
+*     information about the lines which improve the efficiency of this method
+*     when many repeated calls are made. An error will be reported if
+*     either structure does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   double *crossing;          /* Returned array */
+   double den;                /* Denominator */
+   double dx;                 /* Offset in start X values */
+   double dy;                 /* Offset in start Y values */
+   double t1;                 /* Distance from start of line 1 to crossing */
+   double t2;                 /* Distance from start of line 2 to crossing */
+   int result;                /* Returned value */
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Initialise. */
+   result = 0;
+   crossing = astMalloc( sizeof(double)*2 );
+   
+/* Check that both lines refer to the supplied Frame. */
+   if( l1->frame != this ) {
+      astError( AST__INTER, "astLineCrossing(%s): First supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+   } else if( l2->frame != this ) {
+      astError( AST__INTER, "astLineCrossing(%s): Second supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+   } else if( crossing ){
+
+/* Each of the lines can be represented as "p = start + t.v" where start is
+   the start position, v is the unit vector pointing from start to end,
+   and t is the scalar distance from the start position. So to find the
+   intersection put "start1 + t1.v1 = start2 + t2.v2" and solve for t1
+   and t2. */
+      den = (l1->dir[ 0 ])*(l2->dir[ 1 ]) - (l2->dir[ 0 ])*(l1->dir[ 1 ]);
+      if( den != 0.0 ) {
+         dx = l2->start[ 0 ] - l1->start[ 0 ];
+         dy = l2->start[ 1 ] - l1->start[ 1 ];
+         t1 = ( l2->dir[ 1 ]*dx + l2->dir[ 0 ]*dy )/den;
+         t2 = ( l1->dir[ 1 ]*dx + l1->dir[ 0 ]*dy )/den;
+
+/* Store the crossing point, using the smaller t value to redue error. */
+         if( fabs( t1 ) < fabs( t2 ) ) {
+            crossing[ 0 ] = l1->start[ 0 ] + t1*l1->dir[ 0 ];
+            crossing[ 1 ] = l1->start[ 1 ] + t1*l1->dir[ 1 ];
+         } else {
+            crossing[ 0 ] = l2->start[ 0 ] + t2*l2->dir[ 0 ];
+            crossing[ 1 ] = l2->start[ 1 ] + t2*l2->dir[ 1 ];
+         } 
+
+/* See if the intersection iw within the length of both lines (excluding
+   the end points). */
+         if( t1 >= 0.0 && t1 < l1->length &&
+             t2 >= 0.0 && t2 < l2->length ) result = 1;
+
+      } else {
+         crossing[ 0 ] = AST__BAD;
+         crossing[ 1 ] = AST__BAD;
+      }
+   }
+
+/* Return zero if an error occurred. */
+   if( !astOK ) {
+      crossing = astFree( crossing );
+      result = 0;
+   }
+
+/* Return the crossing pointer. */
+   if( cross ) {
+      *cross = crossing;
+   } else if( crossing ){
+      crossing = astFree( crossing );
+   }
+
+/* Return a pointer to the output structure. */
+   return result;
+}
+
+static AstLineDef *LineDef( AstFrame *this, const double start[2], 
+                            const double end[2] ) {
+/*
+*+
+*  Name:
+*     astLineDef
+
+*  Purpose:
+*     Creates a structure describing a line segment in a 2D Frame.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     AstLineDef *astLineDef( AstFrame *this, const double start[2], 
+*                             const double end[2] ) 
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function creates a structure containing information describing a
+*     given line segment within the supplied 2D Frame. This may include
+*     information which allows other methods such as astLineCrossing to
+*     function more efficiently. Thus the returned structure acts as a
+*     cache to store intermediate values used by these other methods.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame. Must have 2 axes.
+*     start
+*        An array of 2 doubles marking the start of the line segment.
+*     end
+*        An array of 2 doubles marking the end of the line segment.
+
+*  Returned Value:
+*     Pointer to the memory structure containing the description of the
+*     line. This structure should be freed using astFree when no longer
+*     needed. A NULL pointer is returned (without error) if any of the
+*     supplied axis values are AST__BAD.
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*-
+*/
+
+/* Local Variables: */
+   AstLineDef *result;           /* Pointer to output structure */
+
+/* Initialise. */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check the Frame has 2 axes. */
+   if( astGetNaxes( this ) != 2 ) {
+      astError( AST__INTER, "astLineDef(%s): The supplied %s is not 2 "
+                "dimensional (internal AST proramming error).",
+                 astGetClass( this ) );
+   } 
+
+/* Check the axis values are good */
+   if( start[ 0 ] != AST__BAD && start[ 1 ] != AST__BAD && 
+       end[ 0 ] != AST__BAD && end[ 1 ] != AST__BAD ) {
+
+/* Allocate memory for the returned structure. */
+      result = astMalloc( sizeof( AstLineDef ) );
+      if( result ) {
+
+/* Store the supplied axis values in the returned structure. */
+         result->start[ 0 ] = start[ 0 ];
+         result->start[ 1 ] = start[ 1 ];
+         result->end[ 0 ] = end[ 0 ];
+         result->end[ 1 ] = end[ 1 ];
+
+/* Store the length of the line segment. */
+         result->length = astDistance( this, start, end );
+
+/* Store a unit vector pointing from the start to the end. */
+         if( result->length > 0.0 ) {
+            result->dir[ 0 ] = ( end[ 0 ] - start[ 0 ] )/result->length;
+            result->dir[ 1 ] = ( end[ 1 ] - start[ 1 ] )/result->length;
+         } else {
+            result->dir[ 0 ] = 1.0;
+            result->dir[ 1 ] = 0.0;
+         } 
+
+/* Store a unit vector perpendicular to the line, such that the vector
+   points to the left when moving from the start to the end of the line. */
+         result->q[ 0 ] = -result->dir[ 1 ];
+         result->q[ 1 ] = result->dir[ 0 ];
+
+/* Store a pointer to the defining Frame. */
+         result->frame = this;
+      }
+   }
+
+/* Free the returned pointer if an error occurred. */
+   if( !astOK ) result = astFree( result );
+
+/* Return a pointer to the output structure. */
+   return result;
+}
+
+static void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+                        double prp, double point[2] ){
+/*
+*+
+*  Name:
+*     astLineOffset
+
+*  Purpose:
+*     Find a position close to a line.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "frame.h"
+*     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+*                      double prp, double point[2] )
+
+*  Class Membership:
+*     Frame method.
+
+*  Description:
+*     This function returns a position formed by moving a given distance along
+*     the supplied line, and then a given distance away from the supplied line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     line
+*        Pointer to the structure defining the line. 
+*     par
+*        The distance to move along the line from the start towards the end.
+*     prp
+*        The distance to move at right angles to the line. Positive
+*        values result in movement to the left of the line, as seen from
+*        the outside when moving from start towards the end.
+
+*  Notes:
+*     - The pointer supplied for "line" should have been created using the 
+*     astLineDef method. This structure contains cached information about the 
+*     line which improves the efficiency of this method when many repeated 
+*     calls are made. An error will be reported if the structure does not 
+*     refer to the Frame specified by "this".
+*-
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check that the line refers to the supplied Frame. */
+   if( line->frame != this ) {
+      astError( AST__INTER, "astLineOffset(%s): The supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+/* This implementation uses simple flat geometry. */
+   } else {
+      point[ 0 ] = line->start[ 0 ] + par*line->dir[ 0 ] + prp*line->q[ 0 ];
+      point[ 1 ] = line->start[ 1 ] + par*line->dir[ 1 ] + prp*line->q[ 1 ];
+   }
 }
 
 static int *MapSplit( AstMapping *this_map, int nin, int *in, AstMapping **map ){
@@ -11486,6 +11980,25 @@ AstPointSet *astResolvePoints_( AstFrame *this, const double point1[],
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,ResolvePoints))( this, point1, point2, in, out );
 }
+AstLineDef *astLineDef_( AstFrame *this, const double start[2], 
+                             const double end[2] ) {
+   if ( !astOK ) return NULL;
+   return (**astMEMBER(this,Frame,LineDef))( this, start, end );
+}
+int astLineCrossing_( AstFrame *this, AstLineDef *l1, AstLineDef *l2,
+                      double **cross ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,LineCrossing))( this, l1, l2, cross );
+}
+void astLineOffset_( AstFrame *this, AstLineDef *line, double par, double prp, 
+                     double point[2] ){
+   if ( !astOK ) return;
+   (**astMEMBER(this,Frame,LineOffset))( this, line, par, prp, point );
+}
+int astLineContains_( AstFrame *this, AstLineDef *l, int def, double *point ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,LineContains))( this, l, def, point );
+}
 AstFrameSet *astConvert_( AstFrame *from, AstFrame *to,
                           const char *domainlist ) {
    if ( !astOK ) return NULL;
@@ -11653,6 +12166,11 @@ AstSystemType astSystemCode_( AstFrame *this, const char *system ) {
 const char *astSystemString_( AstFrame *this, AstSystemType system ) {
    if ( !astOK ) return NULL;
    return (**astMEMBER(this,Frame,SystemString))( this, system );
+}
+int astAxIn_( AstFrame *this, int axis, double lo, double hi, double val, 
+              int closed ) {
+   if ( !astOK ) return 0;
+   return (**astMEMBER(this,Frame,AxIn))( this, axis, lo, hi, val, closed );
 }
 
 /* Special public interface functions. */

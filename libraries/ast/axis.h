@@ -280,6 +280,7 @@ typedef struct AstAxisVtab {
    double (* AxisGap)( AstAxis *, double, int * );
    double (* AxisDistance)( AstAxis *, double, double );
    double (* AxisOffset)( AstAxis *, double, double );
+   int (* AxisIn)( AstAxis *, double, double, double, int );
    int (* AxisFields)( AstAxis *, const char *, const char *, int, char **, int *, double * );
    int (* AxisUnformat)( AstAxis *, const char *, double * );
    int (* GetAxisDigits)( AstAxis * );
@@ -365,6 +366,7 @@ int astGetAxisDirection_( AstAxis * );
 int astTestAxisDigits_( AstAxis * );
 int astTestAxisDirection_( AstAxis * );
 int astAxisFields_( AstAxis *, const char *, const char *, int, char **, int *, double * );
+int astAxisIn_( AstAxis *, double, double, double, int );
 int astTestAxisFormat_( AstAxis * );
 int astTestAxisLabel_( AstAxis * );
 int astTestAxisSymbol_( AstAxis * );
@@ -453,6 +455,8 @@ astINVOKE(V,astAxisAbbrev_(astCheckAxis(this),fmt,str1,str2))
 astINVOKE(V,astAxisGap_(astCheckAxis(this),gap,ntick))
 #define astAxisFields(this,fmt,str,maxfld,fields,nc,val) \
 astINVOKE(V,astAxisFields_(astCheckAxis(this),fmt,str,maxfld,fields,nc,val))
+#define astAxisIn(this,lo,hi,val,closed) \
+astINVOKE(V,astAxisIn_(astCheckAxis(this),lo,hi,val,closed))
 #define astAxisDistance(this,v1,v2) \
 astINVOKE(V,astAxisDistance_(astCheckAxis(this),v1,v2))
 #define astAxisOffset(this,v1,dist) \

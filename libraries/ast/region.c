@@ -125,8 +125,6 @@ f     - AST_SETUNC: Associate a new uncertainty with a Region
 *class--
 
 *  Implementation Notes:
-*     - Internal and external bounding boxes need to be maintained: These can
-*     speed up the evaluation of whether a point is inside or outside a region.
 *     - All sub-classes must over-ride the following abstract methods declared 
 *     in this class: astRegBaseBox, astRegBaseMesh, astRegPins, astRegCentre. 
 *     They must also extend the astTransform method. In addition they should 
@@ -809,6 +807,10 @@ static void Resolve( AstFrame *, const double [], const double [], const double 
 static void SetAxis( AstFrame *, int, AstAxis * );
 static void ValidateAxisSelection( AstFrame *, int, const int *, const char * );
 static void SetRegFS( AstRegion *, AstFrame * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
+static int LineContains( AstFrame *, AstLineDef *, int, double * );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
 
 static int GetBounded( AstRegion * );
 static AstRegion *GetDefUnc( AstRegion * );
@@ -1383,7 +1385,6 @@ static AstPointSet *BndBaseMesh( AstRegion *this, double *lbnd, double *ubnd ){
 *     encapsulated FrameSet. If the boundary of the supplied Region does
 *     not intersect the supplied box, then a PointSet containing a single 
 *     bad point is returned.
-
 
 *  Parameters:
 *     this
@@ -2788,7 +2789,6 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    AstRegion *result;         /* Returned pointer */
    double *lbnd;              /* Ptr. to array holding axis lower bounds */
    double *ubnd;              /* Ptr. to array holding axis upper bounds */
-   double axlen;              /* Total length of bounding box on one axis */
    int i;                     /* Axis index */
    int nax;                   /* Number of base Frame axes */
 
@@ -2813,9 +2813,8 @@ static AstRegion *GetDefUnc( AstRegion *this ) {
    if( astOK ) {
 
       for( i = 0; i < nax; i++ ) {
-         axlen = astAxDistance( bfrm, i + 1, lbnd[ i ], ubnd[ i ] );
+         ubnd[ i ] = 0.5E-6*(  ubnd[ i ] - lbnd[ i ] );
          lbnd[ i ] = 0.0;
-         ubnd[ i ] = 0.5E-6*axlen;
       }
 
       result = (AstRegion *) astBox( bfrm, 0, lbnd, ubnd, NULL, "" );
@@ -3618,6 +3617,10 @@ void astInitRegionVtab_(  AstRegionVtab *vtab, const char *name ) {
    frame->ValidateAxis = ValidateAxis;
    frame->ValidateAxisSelection = ValidateAxisSelection;
    frame->ValidateSystem = ValidateSystem;
+   frame->LineDef = LineDef;
+   frame->LineContains = LineContains;
+   frame->LineCrossing = LineCrossing;
+   frame->LineOffset = LineOffset;
 
    frame->GetActiveUnit = GetActiveUnit;
    frame->SetActiveUnit = SetActiveUnit;
@@ -3696,6 +3699,281 @@ static int IsUnitFrame( AstFrame *this ){
 
 /* The Region class is never equivalent to a UnitMap. */
    return 0;
+}
+
+static int LineContains( AstFrame *this_frame, AstLineDef *l, int def, double *point ) {
+/*
+*  Name:
+*     LineContains
+
+*  Purpose:
+*     Determine if a line contains a point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astLineContains
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the supplied point is on the supplied
+*     line within the supplied Frame. The start point of the line is 
+*     considered to be within the line, but the end point is not. The tests 
+*     are that the point of closest approach of the line to the point should 
+*     be between the start and end, and that the distance from the point to 
+*     the point of closest aproach should be less than 1.0E-7 of the length 
+*     of the line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l
+*        Pointer to the structure defining the line. 
+*     def
+*        Should be set non-zero if the "point" array was created by a
+*        call to astLineCrossing (in which case it may contain extra
+*        information following the axis values),and zero otherwise.
+*     point
+*        Point to an array containing the axis values of the point to be 
+*        tested, possibly followed by extra cached information (see "def").
+
+*  Returned Value:
+*     A non-zero value is returned if the line contains the point. 
+
+*  Notes:
+*     - The pointer supplied for "l" should have been created using the 
+*     astLineDef method. These structures contained cached information about 
+*     the lines which improve the efficiency of this method when many 
+*     repeated calls are made. An error will be reported if the structure 
+*     does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result =0;
+
+/* Obtain a pointer to the Region's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
+   result = astLineContains( fr, l, def, point );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static int LineCrossing( AstFrame *this_frame, AstLineDef *l1, AstLineDef *l2, 
+                         double **cross ) {
+/*
+*  Name:
+*     LineCrossing
+
+*  Purpose:
+*     Determine if two lines cross.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+*                       double **cross ) 
+
+*  Class Membership:
+*     Region member function (over-rides the protected astLineCrossing
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the two suplied line segments cross,
+*     and if so returns the axis values at the point where they cross.
+*     A flag is also returned indicating if the crossing point occurs
+*     within the length of both line segments, or outside one or both of
+*     the line segments.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l1
+*        Pointer to the structure defining the first line. 
+*     l2
+*        Pointer to the structure defining the second line. 
+*     cross
+*        Pointer to a location at which to put a pointer to a dynamically
+*        alocated array containing the axis values at the crossing. If
+*        NULL is supplied no such array is returned. Otherwise, the returned 
+*        array should be freed using astFree when no longer needed. If the 
+*        lines are parallel (i.e. do not cross) then AST__BAD is returned for 
+*        all axis values. Note usable axis values are returned even if the 
+*        lines cross outside the segment defined by the start and end points 
+*        of the lines. The order of axes in the returned array will take
+*        account of the current axis permutation array if appropriate. Note, 
+*        sub-classes such as SkyFrame may append extra values to the end
+*        of the basic frame axis values. A NULL pointer is returned if an
+*        error occurs.
+
+*  Returned Value:
+*     A non-zero value is returned if the lines cross at a point which is
+*     within the [start,end) segment of both lines. If the crossing point
+*     is outside this segment on either line, or if the lines are parallel,
+*     zero is returned. Note, the start point is considered to be inside
+*     the length of the segment, but the end point is outside.
+
+*  Notes:
+*     - The pointers supplied for "l1" and "l2" should have been created
+*     using the astLineDef method. These structures contained cached
+*     information about the lines which improve the efficiency of this method
+*     when many repeated calls are made. An error will be reported if
+*     either structure does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result =0;
+
+/* Obtain a pointer to the Region's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
+   result = astLineCrossing( fr, l1, l2, cross );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static AstLineDef *LineDef( AstFrame *this_frame, const double start[2], 
+                            const double end[2] ) {
+/*
+*  Name:
+*     LineDef
+
+*  Purpose:
+*     Creates a structure describing a line segment in a 2D Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     AstLineDef *LineDef( AstFrame *this, const double start[2], 
+*                             const double end[2] ) 
+
+*  Class Membership:
+*     Region member function (over-rides the protected astLineDef
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function creates a structure containing information describing a
+*     given line segment within the supplied 2D Frame. This may include
+*     information which allows other methods such as astLineCrossing to
+*     function more efficiently. Thus the returned structure acts as a
+*     cache to store intermediate values used by these other methods.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame. Must have 2 axes.
+*     start
+*        An array of 2 doubles marking the start of the line segment.
+*     end
+*        An array of 2 doubles marking the end of the line segment.
+
+*  Returned Value:
+*     Pointer to the memory structure containing the description of the
+*     line. This structure should be freed using astFree when no longer
+*     needed. A NULL pointer is returned (without error) if any of the
+*     supplied axis values are AST__BAD.
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+   AstLineDef *result;           /* Returned value */
+
+/* Initialise */
+   result = NULL;
+
+/* Obtain a pointer to the Region's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
+   result = astLineDef( fr, start, end );
+   fr = astAnnul( fr );
+
+/* Return the result. */
+   return result;
+}
+
+static void LineOffset( AstFrame *this_frame, AstLineDef *line, double par, 
+                        double prp, double point[2] ){
+/*
+*  Name:
+*     LineOffset
+
+*  Purpose:
+*     Find a position close to a line.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "region.h"
+*     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+*                      double prp, double point[2] )
+
+*  Class Membership:
+*     Region member function (over-rides the protected astLineOffset
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a position formed by moving a given distance along
+*     the supplied line, and then a given distance away from the supplied line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     line
+*        Pointer to the structure defining the line. 
+*     par
+*        The distance to move along the line from the start towards the end.
+*     prp
+*        The distance to move at right angles to the line. Positive
+*        values result in movement to the left of the line, as seen from
+*        the outside when moving from start towards the end.
+
+*  Notes:
+*     - The pointer supplied for "line" should have been created using the 
+*     astLineDef method. This structure contains cached information about the 
+*     line which improves the efficiency of this method when many repeated 
+*     calls are made. An error will be reported if the structure does not 
+*     refer to the Frame specified by "this".
+*/
+
+
+/* Local Variables: */
+   AstFrame *fr;                 /* Pointer to current Frame */
+
+/* Obtain a pointer to the Region's current Frame and then invoke the
+   method. Annul the Frame pointer afterwards. */
+   fr = astGetFrame( ((AstRegion *) this_frame)->frameset, AST__CURRENT );
+   astLineOffset( fr, line, par, prp, point );
+   fr = astAnnul( fr );
 }
 
 static AstRegion *MapRegion( AstRegion *this, AstMapping *map,
@@ -4216,7 +4494,6 @@ static int Mask##X( AstRegion *this, AstMapping *map, int inside, int ndim, \
 MAKE_MASK(LD,long double)
 #endif
 MAKE_MASK(D,double)
-MAKE_MASK(F,float)
 MAKE_MASK(L,long int)
 MAKE_MASK(UL,unsigned long int)
 MAKE_MASK(I,int)
@@ -4225,9 +4502,12 @@ MAKE_MASK(S,short int)
 MAKE_MASK(US,unsigned short int)
 MAKE_MASK(B,signed char)
 MAKE_MASK(UB,unsigned char)
+MAKE_MASK(F,float)
 
 /* Undefine the macro. */
 #undef MAKE_MASK
+
+
 
 static int Match( AstFrame *this_frame, AstFrame *target,
                   int **template_axes, int **target_axes,
@@ -7044,8 +7324,8 @@ static AstMapping *Simplify( AstMapping *this_mapping ) {
             for( ic = 0; ic < naxb; ic++ ) {
 
 /* Get the width of the two bounding boxes on this axis. */
-               w1 = astAxDistance( bfrm, ic + 1, s1_lbnd[ ic ], s1_ubnd[ ic ] );
-               w2 = astAxDistance( bfrm, ic + 1, s2_lbnd[ ic ], s2_ubnd[ ic ] );
+               w1 = s1_ubnd[ ic ] - s1_lbnd[ ic ];
+               w2 = s2_ubnd[ ic ] - s2_lbnd[ ic ];
 
 /* If these differ by more than 0.1% then we determine that the simplified
    uncertainty Region varies in size across the bounding box of "this", and

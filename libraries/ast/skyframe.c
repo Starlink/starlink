@@ -524,6 +524,7 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include "sphmap.h"              /* Cartesian<->Spherical transformations */
 #include "skyframe.h"            /* Interface definition for this class */
 #include "slalib.h"              /* SLALIB library interface */
+#include "slalib.h"              /* SLALIB library interface */
 
 /* Error code definitions. */
 /* ----------------------- */
@@ -539,6 +540,26 @@ int astTest##attr##_( AstSkyFrame *this, int axis ) { \
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+/* Type Definitions. */
+/* ================= */
+
+/* Cached Line structure. */
+/* ---------------------- */
+/* This structure contains information describing a line segment within a
+   SkyFrame. It differs from the AstLineDef defined in frame.h because
+   positions are represented by 3D (x,y,z) cartesian coords rather than
+   2D (long,lat) coords. */
+
+typedef struct SkyLineDef {
+   AstFrame *frame;            /* Pointer to Frame in which the line is defined */
+   double length;              /* Line length */
+   double start[3];            /* Unit vector defining start of line */
+   double end[3];              /* Unit vector defining end of line */
+   double dir[3];              /* Unit vector defining line direction */
+   double q[3];                /* Unit vector perpendicular to line */
+} SkyLineDef;
+
 
 /* Module Variables. */
 /* ================= */
@@ -647,6 +668,11 @@ static void SetNegLon( AstSkyFrame *, int );
 static void SetProjection( AstSkyFrame *, const char * );
 static void Shapp( double, double *, double *, double, double * );
 static void Shcal( double, double, double, double *, double * );
+static AstLineDef *LineDef( AstFrame *, const double[2], const double[2] );
+static int LineCrossing( AstFrame *, AstLineDef *, AstLineDef *, double ** );
+static int LineContains( AstFrame *, AstLineDef *, int, double * );
+static int LineIncludes( SkyLineDef *, double[3] );
+static void LineOffset( AstFrame *, AstLineDef *, double, double, double[2] );
 
 static double GetSkyRef( AstSkyFrame *, int );
 static int TestSkyRef( AstSkyFrame *, int );
@@ -3188,6 +3214,10 @@ void astInitSkyFrameVtab_(  AstSkyFrameVtab *vtab, const char *name ) {
    frame->ValidateSystem = ValidateSystem;
    frame->SystemString = SystemString;
    frame->SystemCode = SystemCode;
+   frame->LineDef = LineDef;
+   frame->LineContains = LineContains;
+   frame->LineCrossing = LineCrossing;
+   frame->LineOffset = LineOffset;
 
 /* Store pointers to inherited methods that will be invoked explicitly
    by this class. */
@@ -3263,6 +3293,540 @@ static int IsEquatorial( AstSystemType system ) {
 
 /* Return the result. */
    return result;
+}
+
+static int LineContains( AstFrame *this, AstLineDef *l, int def, double *point ) {
+/*
+*  Name:
+*     LineContains
+
+*  Purpose:
+*     Determine if a line contains a point.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int LineContains( AstFrame *this, AstLineDef *l, int def, double *point )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astLineContains
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the supplied point is on the supplied
+*     line within the supplied Frame. The start point of the line is 
+*     considered to be within the line, but the end point is not. The tests 
+*     are that the point of closest approach of the line to the point should 
+*     be between the start and end, and that the distance from the point to 
+*     the point of closest aproach should be less than 1.0E-7 of the length 
+*     of the line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l
+*        Pointer to the structure defining the line. 
+*     def
+*        Should be set non-zero if the "point" array was created by a
+*        call to astLineCrossing (in which case it may contain extra
+*        information following the axis values),and zero otherwise.
+*     point
+*        Point to an array containing the axis values of the point to be 
+*        tested, possibly followed by extra cached information (see "def").
+
+*  Returned Value:
+*     A non-zero value is returned if the line contains the point. 
+
+*  Notes:
+*     - The pointer supplied for "l" should have been created using the 
+*     astLineDef method. These structures contained cached information about 
+*     the lines which improve the efficiency of this method when many 
+*     repeated calls are made. An error will be reported if the structure 
+*     does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*-
+*/
+
+/* Local Variables: */
+   SkyLineDef *sl;               /* SkyLine information */
+   const int *perm;              /* Pointer to axis permutation array */
+   double *b;                    /* Pointer to Cartesian coords array */
+   double bb[3];                 /* Buffer for Cartesian coords */
+   double p1[2];                 /* Buffer for Spherical coords */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result =0;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Check that the line refers to the supplied Frame. */
+   if( l->frame != this ) {
+      astError( AST__INTER, "astLineContains(%s): The supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+/* Check the axis values are good */
+   } else if( point[ 0 ] != AST__BAD && point[ 1 ] != AST__BAD ){
+
+/* Get a pointer to an array holding the corresponding Cartesian coords. */
+      if( def ) {
+         b = point + 2;
+
+      } else {
+         perm = astGetPerm( this );
+         if ( perm ) {
+            p1[ perm[ 0 ] ] = point[ 0 ];
+            p1[ perm[ 1 ] ] = point[ 1 ];
+            slaDcs2c( p1[ 0 ], p1[ 1 ], bb );
+            b = bb;
+         } else {
+            b = NULL;
+         }
+      }
+
+/* Recast the supplied AstLineDef into a SkyLineDef to get the different
+   structure (we know from the above check on the Frame that it is safe to
+   do this). */
+      sl = (SkyLineDef *) l;
+
+/* Check that the point of closest approach of the line to the point is
+   within the limits of the line. */
+      if( LineIncludes( sl, b ) ){
+
+/* Check that the point is 90 degrees away from the pole of the great
+   circle containing the line. */
+        if( fabs( slaDvdv( sl->dir, b ) ) <= 1.0E-7*sl->length ) result = 1;
+     }
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+                         double **cross ) {
+/*
+*  Name:
+*     LineCrossing
+
+*  Purpose:
+*     Determine if two lines cross.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int LineCrossing( AstFrame *this, AstLineDef *l1, AstLineDef *l2, 
+*                       double **cross ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astLineCrossing
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function determines if the two suplied line segments cross,
+*     and if so returns the axis values at the point where they cross.
+*     A flag is also returned indicating if the crossing point occurs
+*     within the length of both line segments, or outside one or both of
+*     the line segments.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     l1
+*        Pointer to the structure defining the first line. 
+*     l2
+*        Pointer to the structure defining the second line. 
+*     cross
+*        Pointer to a location at which to put a pointer to a dynamically
+*        alocated array containing the axis values at the crossing. If
+*        NULL is supplied no such array is returned. Otherwise, the returned 
+*        array should be freed using astFree when no longer needed. If the 
+*        lines are parallel (i.e. do not cross) then AST__BAD is returned for 
+*        all axis values. Note usable axis values are returned even if the 
+*        lines cross outside the segment defined by the start and end points 
+*        of the lines. The order of axes in the returned array will take
+*        account of the current axis permutation array if appropriate. Note, 
+*        sub-classes such as SkyFrame may append extra values to the end
+*        of the basic frame axis values. A NULL pointer is returned if an
+*        error occurs.
+
+*  Returned Value:
+*     A non-zero value is returned if the lines cross at a point which is
+*     within the [start,end) segment of both lines. If the crossing point
+*     is outside this segment on either line, or if the lines are parallel,
+*     zero is returned. Note, the start point is considered to be inside
+*     the length of the segment, but the end point is outside.
+
+*  Notes:
+*     - The pointers supplied for "l1" and "l2" should have been created
+*     using the astLineDef method. These structures contained cached
+*     information about the lines which improve the efficiency of this method
+*     when many repeated calls are made. An error will be reported if
+*     either structure does not refer to the Frame specified by "this".
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Local Variables: */
+   SkyLineDef *sl1;              /* SkyLine information for line 1 */
+   SkyLineDef *sl2;              /* SkyLine information for line 2 */
+   const int *perm;              /* Pointer to axis permutation array */
+   double *crossing;             /* Pointer to returned array */
+   double *b;                    /* Pointer to Cartesian coords */
+   double len;                   /* Vector length */
+   double p[ 2 ];                /* Temporary (lon,lat) pair */
+   double temp[ 3 ];             /* Temporary vector */
+   int result;                   /* Returned value */
+
+/* Initialise */
+   result = 0;
+   if( cross ) *cross = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return result;
+
+/* Allocate returned array (2 elements for the lon and lat values, plus 3
+   for the corresponding (x,y,z) coords). */
+   crossing = astMalloc( sizeof(double)*5 );
+
+/* Check that both lines refer to the supplied Frame. */
+   if( l1->frame != this ) {
+      astError( AST__INTER, "astLineCrossing(%s): First supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+   } else if( l2->frame != this ) {
+      astError( AST__INTER, "astLineCrossing(%s): Second supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+/* Recast the supplied AstLineDefs into a SkyLineDefs to get the different
+   structure (we know from the above check on the Frame that it is safe to
+   do this). */
+   } else if( crossing ){
+      sl1 = (SkyLineDef *) l1;
+      sl2 = (SkyLineDef *) l2;
+
+/* Point of intersection of the two great circles is perpendicular to the
+   pole vectors of both great circles. Put the Cartesian coords in elements
+   2 to 4 of the returned array. */
+      slaDvxv( sl1->dir, sl2->dir, temp );
+      b = crossing + 2;
+      slaDvn( temp, b, &len );
+
+/* See if this point is within the length of both arcs. If so return it. */
+      if( LineIncludes( sl2, b ) && LineIncludes( sl1, b ) ) {
+         result = 1;
+
+/* If not, see if the negated b vector is within the length of both arcs.
+   If so return it. Otherwise, we return zero. */
+      } else {
+         b[ 0 ] *= -1.0;
+         b[ 1 ] *= -1.0;
+         b[ 2 ] *= -1.0;
+         if( LineIncludes( sl2, b ) && LineIncludes( sl1, b ) ) result = 1;
+      }
+
+/* Store the spherical coords in elements 0 and 1 of the returned array. */
+      slaDcc2s( b, p, p + 1 );
+
+/* Permute the spherical axis value into the order used by the SkyFrame. */
+      perm = astGetPerm( this );
+      if( perm ){
+         crossing[ 0 ] = p[ perm[ 0 ] ];
+         crossing[ 1 ] = p[ perm[ 1 ] ];
+      }
+   }
+
+/* If an error occurred, return 0. */
+   if( !astOK ) {
+      result = 0;
+      crossing = astFree( crossing );
+   }
+
+/* Return the array */
+   if( cross ) {
+      *cross = crossing;
+   } else {
+      crossing = astFree( crossing );
+   }
+
+/* Return the result. */
+   return result;
+}
+
+static AstLineDef *LineDef( AstFrame *this, const double start[2], 
+                            const double end[2] ) {
+/*
+*  Name:
+*     LineDef
+
+*  Purpose:
+*     Creates a structure describing a line segment in a 2D Frame.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     AstLineDef *LineDef( AstFrame *this, const double start[2], 
+*                          const double end[2] ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astLineDef
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function creates a structure containing information describing a
+*     given line segment within the supplied 2D Frame. This may include
+*     information which allows other methods such as astLineCrossing to
+*     function more efficiently. Thus the returned structure acts as a
+*     cache to store intermediate values used by these other methods.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame. Must have 2 axes.
+*     start
+*        An array of 2 doubles marking the start of the line segment.
+*     end
+*        An array of 2 doubles marking the end of the line segment.
+
+*  Returned Value:
+*     Pointer to the memory structure containing the description of the
+*     line. This structure should be freed using astFree when no longer
+*     needed. A NULL pointer is returned (without error) if any of the
+*     supplied axis values are AST__BAD.
+
+*  Notes:
+*     - A null pointer will be returned if this function is invoked
+*     with the global error status set, or if it should fail for any
+*     reason.
+*/
+
+/* Local Variables: */
+   SkyLineDef *result;           /* Returned value */
+   const int *perm;              /* Axis permutation array */
+   double len;                   /* Permuted point1 coordinates */
+   double p1[ 2 ];               /* Permuted point1 coordinates */
+   double p2[ 2 ];               /* Permuted point2 coordinates */
+   double temp[3];               /* Cartesian coords at offset position */
+   
+/* Initialise */
+   result = NULL;
+
+/* Check the global error status. */
+   if ( !astOK ) return NULL;
+
+/* Check the axis values are good */
+   if( start[ 0 ] != AST__BAD && start[ 1 ] != AST__BAD && 
+       end[ 0 ] != AST__BAD && end[ 1 ] != AST__BAD ) {
+
+/* Allocate memory for the returned structure. */
+      result = astMalloc( sizeof( SkyLineDef ) );
+
+/* Obtain a pointer to the SkyFrame's axis permutation array. */
+      perm = astGetPerm( this );
+      if ( perm ) {
+
+/* Apply the axis permutation array to obtain the coordinates of the two 
+   input points in the required (longitude,latitude) order. */
+         p1[ perm[ 0 ] ] = start[ 0 ];
+         p1[ perm[ 1 ] ] = start[ 1 ];
+         p2[ perm[ 0 ] ] = end[ 0 ];
+         p2[ perm[ 1 ] ] = end[ 1 ];
+
+/* Convert each point into a 3-vector of unit length and store in the
+   returned structure. */
+         slaDcs2c( p1[ 0 ], p1[ 1 ], result->start );
+         slaDcs2c( p2[ 0 ], p2[ 1 ], result->end );
+
+/* Calculate the great circle distance between the points in radians and
+   store in the result structure. */
+         result->length = acos( slaDvdv( result->start, result->end ) );
+
+/* Find a unit vector representing the pole of the system in which the
+   equator is given by the great circle. This is such that going the
+   short way from the start to the end, the pole is to the left of the 
+   line. If the line has zero length, or 180 degrees length, the pole is
+   undefined, so we use an arbitrary value. */
+         if( result->length == 0.0 || result->length > pi - 5.0E-11 ) {
+            slaDcs2c( p1[ 0 ] + 0.01, p1[ 1 ] + 0.01, temp );
+            slaDvxv( result->start, temp, result->q );
+         } else {
+            slaDvxv( result->start, result->end, result->q );
+         }
+         slaDvn( result->q, result->dir, &len );
+
+/* Also store a point which is 90 degrees along the great circle from the
+   start. */
+         slaDvxv( result->dir, result->start, result->q );
+
+/* Store a pointer to the defining SkyFrame. */
+         result->frame = this;
+      }
+   }
+
+/* Free the returned pointer if an error occurred. */
+   if( !astOK ) result = astFree( result );
+
+/* Return a pointer to the output structure. */
+   return (AstLineDef *) result;
+}
+
+static int LineIncludes( SkyLineDef *l, double point[3] ) {
+/*
+*  Name:
+*     LineIncludes
+
+*  Purpose:
+*     Determine if a line includes a point which is known to be in the
+*     great circle.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     int LineIncludes( SkyLineDef *l, double point[3] ) 
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astLineIncludes
+*     method inherited from the Frame class).
+
+*  Description:
+*     The supplied point is assumed to be a point on the great circle of 
+*     which the supplied line is a segment. This function returns true if 
+*     "point" is within the bounds of the segment (the end point of the
+*     line is assumed * not to be part of the segment).
+
+*  Parameters:
+*     l
+*        Pointer to the structure defining the line. 
+*     point
+*        An array holding the Cartesian coords of the point to be tested.
+
+*  Returned Value:
+*     A non-zero value is returned if the line includes the point. 
+
+*  Notes:
+*     - Zero will be returned if this function is invoked with the global 
+*     error status set, or if it should fail for any reason.
+*/
+
+/* Check the global error status. */
+   if ( !astOK ) return 0;
+
+/* Get the unsigned distance of the point from the start of the line in
+   the range 0 - 180 degs. Check it is less than the line length. Then
+   check that the point is not more than 90 degs away from the quarter 
+   point. */
+   return ( acos( slaDvdv( l->start, point ) ) < l->length && 
+            slaDvdv( l->q, point ) >= 0.0 );
+}
+
+static void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+                        double prp, double point[2] ){
+/*
+*  Name:
+*     LineOffset
+
+*  Purpose:
+*     Find a position close to a line.
+
+*  Type:
+*     Private function.
+
+*  Synopsis:
+*     #include "skyframe.h"
+*     void LineOffset( AstFrame *this, AstLineDef *line, double par, 
+*                      double prp, double point[2] )
+
+*  Class Membership:
+*     SkyFrame member function (over-rides the protected astLineOffset
+*     method inherited from the Frame class).
+
+*  Description:
+*     This function returns a position formed by moving a given distance along
+*     the supplied line, and then a given distance away from the supplied line.
+
+*  Parameters:
+*     this
+*        Pointer to the Frame.
+*     line
+*        Pointer to the structure defining the line. 
+*     par
+*        The distance to move along the line from the start towards the end.
+*     prp
+*        The distance to move at right angles to the line. Positive
+*        values result in movement to the left of the line, as seen from
+*        the outside when moving from start towards the end.
+
+*  Notes:
+*     - The pointer supplied for "line" should have been created using the 
+*     astLineDef method. This structure contains cached information about the 
+*     line which improves the efficiency of this method when many repeated 
+*     calls are made. An error will be reported if the structure does not 
+*     refer to the Frame specified by "this".
+*-
+*/
+
+/* Local Variables; */
+    SkyLineDef *sl;
+    const int *perm;
+    double c;
+    double nx;
+    double ny;
+    double nz;
+    double p[2];
+    double s;
+    double v[3];
+
+/* Check the global error status. */
+   if ( !astOK ) return;
+
+/* Check that the line refers to the supplied Frame. */
+   if( line->frame != this ) {
+      astError( AST__INTER, "astLineOffset(%s): The supplied line does "
+                "not relate to the supplied %s (AST internal programming "
+                "error).", astGetClass( this ), astGetClass( this ) );
+
+/* This implementation uses spherical geometry. */
+   } else {
+
+/* Get a pointer to the SkyLineDef structure. */ 
+       sl = (SkyLineDef *) line;
+
+/* Move a distance par from start to end. */
+       c = cos( par );
+       s = sin( par );
+       nx = c * sl->start[ 0 ] + s * sl->q[ 0 ];
+       ny = c * sl->start[ 1 ] + s * sl->q[ 1 ];
+       nz = c * sl->start[ 2 ] + s * sl->q[ 2 ];
+
+/* Move a distance prp from this point towards the pole point. */
+       c = cos( prp );
+       s = sin( prp );
+       v[ 0 ] = c * nx + s * sl->dir[ 0 ];
+       v[ 1 ] = c * ny + s * sl->dir[ 1 ];
+       v[ 2 ] = c * nz + s * sl->dir[ 2 ];
+
+/* Convert to lon/lat */
+      slaDcc2s( v, p, p + 1 );
+
+/* Permute the spherical axis value into the order used by the SkyFrame. */
+      perm = astGetPerm( this );
+      if( perm ){
+         point[ 0 ] = p[ perm[ 0 ] ];
+         point[ 1 ] = p[ perm[ 1 ] ];
+      }
+   }
 }
 
 static int MakeSkyMapping( AstSkyFrame *target, AstSkyFrame *result,

@@ -173,6 +173,7 @@ static double AxisOffset( AstAxis *, double, double );
 static double DHmsGap( const char *, int, double, int * );
 static double GetAxisTop( AstAxis * );
 static double GetAxisBottom( AstAxis * );
+static int AxisIn( AstAxis *, double, double, double, int );
 static int AxisFields( AstAxis *, const char *, const char *, int, char **, int *, double * );
 static int AxisUnformat( AstAxis *, const char *, double * );
 static int GetAxisAsTime( AstSkyAxis * );
@@ -819,6 +820,88 @@ static double AxisGap( AstAxis *this_axis, double gap, int *ntick ) {
 
 /* Return the result. */
    return result;
+}
+
+static int AxisIn( AstAxis *this, double lo, double hi, double val, int closed ){
+/*
+*  Name:
+*     AxisIn
+
+*  Purpose:
+*     Test if an axis value lies within a given interval.
+
+*  Type:
+*     Protected virtual function.
+
+*  Synopsis:
+*     #include "skyaxis.h"
+*     int AxisIn( AstAxis *this, double lo, double hi, double val, int closed )
+
+*  Class Membership:
+*     SkyAxis member function (over-rides the astAxisIn method inherited
+*     from the Axis class).
+
+*  Description:
+*     This function returns non-zero if a given axis values lies within a
+*     given axis interval.
+*
+*     The SkyAxis implementation of this method treats the supplied
+*     numerical values as non-cyclic (e.g. lo=10, hi = 350 implies that 
+*     val = 180 is inside and zero is outside: lo = 10, hi = 400 would imply 
+*     that all angles are inside: lo = -10, hi = 10 would imply that 180 is 
+*     outside and zero is inside). But when testing a supplied value, adding
+*     or subtracting multiples of 2.PI from the supplied value will make no 
+*     difference to whether the point is inside or outside).
+
+*  Parameters:
+*     this
+*        Pointer to the Axis.
+*     lo
+*        The lower axis limit of the interval.
+*     hi
+*        The upper axis limit of the interval.
+*     val
+*        The axis value to be tested.
+*     closed
+*        If non-zero, then the lo and hi axis values are themselves
+*        considered to be within the interval. Otherwise they are outside.
+
+*  Returned Value:
+*     Non-zero if the test value is inside the interval. 
+
+*/
+
+/* For speed, omit the astOK check since no pointers are being used. */
+
+/* Deal with closed intervals. */
+   if( closed ) {
+
+/* If the supplied value is greater than the upper limit, subtract 2.PI until 
+   it is not. */
+      while( val > hi ) val -= 2*pi;
+
+/* If the value is now less than the lower limit, add 2.PI until it is not. */
+      while( val < lo ) val += 2*pi;
+
+/* The axis value is in the range if its numerical value is less than or
+   equal to the end value. */
+      return ( val <= hi );
+
+/* Now deal with open intervals. */
+   } else {
+
+/* If the supplied value is greater than or equal to the upper limit, subtract 
+   2.PI until it is not. */
+      while( val >= hi ) val -= 2*pi;
+
+/* If the value is now less than or equal to the lower limit, add 2.PI until 
+   it is not. */
+      while( val <= lo ) val += 2*pi;
+
+/* The axis value is in the range if its numerical value is less than the
+   end value. */
+      return ( val < hi );
+   }
 }
 
 static void AxisNorm( AstAxis *this_axis, double *value ) {
@@ -2779,6 +2862,7 @@ void astInitSkyAxisVtab_(  AstSkyAxisVtab *vtab, const char *name ) {
    axis->AxisFields = AxisFields;
    axis->AxisFormat = AxisFormat;
    axis->AxisGap = AxisGap;
+   axis->AxisIn = AxisIn;
    axis->AxisDistance = AxisDistance;
    axis->AxisOffset = AxisOffset;
    axis->AxisNorm = AxisNorm;

@@ -49,6 +49,7 @@
 /* ============== */
 /* Interface definitions. */
 /* ---------------------- */
+#include "frame.h"               /* Coordinate systems */
 #include "region.h"              /* Coordinate regions (parent class) */
 
 #if defined(astCLASS)            /* Protected */
@@ -73,9 +74,10 @@ typedef struct AstPolygon {
    AstRegion region;          /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
+   double in[2];              /* A point which is inside the polygon */
    double lbnd[2];            /* Lower axis limits of bounding box */
    double ubnd[2];            /* Upper axis limits of bounding box */
-
+   AstLineDef **edges;        /* Cached description of edges */
 } AstPolygon;
 
 /* Virtual function table. */

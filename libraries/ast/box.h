@@ -73,10 +73,13 @@ typedef struct AstBox {
    AstRegion region;             /* Parent class structure */
 
 /* Attributes specific to objects in this class. */
-   double *extent;               /* Axis half-widths */
+   double *extent;               /* Original axis half-widths */
+   double *shextent;             /* Shrunk axis half-widths */
    double *centre;               /* Box centre coords */
    double shrink;                /* Temporary shrink factor */
-
+   double *lo;                   /* Shrunk low limits */
+   double *hi;                   /* Shrunk high limits */
+   int stale;                    /* Is other info out of date? */
 } AstBox;
 
 /* Virtual function table. */

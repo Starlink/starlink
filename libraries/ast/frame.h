@@ -569,6 +569,22 @@ typedef struct AstFrame {
    AstSystemType alignsystem;    /* Code for Alignment coordinate system */
 } AstFrame;
 
+/* Cached Line structure. */
+/* ---------------------- */
+/* This structure contains information describing a line segment within a
+   2D Frame. It is used by other classes to store intermediate cached values
+   relating to the line in order to speed up repeated operations on the
+   line. */
+
+typedef struct AstLineDef {
+   AstFrame *frame;            /* Pointer to Frame in which the line is defined */
+   double length;              /* Line length */
+   double start[2];            /* Frame axis values at line start */
+   double end[2];              /* Frame axis values at line end */
+   double dir[2];              /* Unit vector defining line direction */
+   double q[2];                /* Unit vector perpendicular to line */
+} AstLineDef;
+
 /* Virtual function table. */
 /* ----------------------- */
 /* The virtual function table makes a forward reference to the
@@ -591,6 +607,7 @@ typedef struct AstFrameVtab {
 /* Properties (e.g. methods) specific to this class. */
    AstAxis *(* GetAxis)( AstFrame *, int );
    AstFrame *(* PickAxes)( AstFrame *, int, const int[], AstMapping ** );
+   AstLineDef *(* LineDef)( AstFrame *, const double[2], const double[2] );
    AstPointSet *(* ResolvePoints)( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
    const char *(* Abbrev)( AstFrame *, int, const char *, const char *, const char * );
    const char *(* Format)( AstFrame *, int, double );
@@ -607,6 +624,7 @@ typedef struct AstFrameVtab {
    int (* Fields)( AstFrame *, int, const char *, const char *, int, char **, int *, double * );
    double (* AxDistance)( AstFrame *, int, double, double );
    double (* AxOffset)( AstFrame *, int, double, double );
+   int (* AxIn)( AstFrame *, int, double, double, double, int );
    int (* GetDigits)( AstFrame * );
    int (* GetDirection)( AstFrame *, int );
    int (* GetMatchEnd)( AstFrame * );
@@ -616,6 +634,8 @@ typedef struct AstFrameVtab {
    int (* GetPermute)( AstFrame * );
    int (* GetPreserveAxes)( AstFrame * );
    int (* IsUnitFrame)( AstFrame * );
+   int (* LineCrossing)( AstFrame *, AstLineDef *, AstLineDef *, double ** );
+   int (* LineContains)( AstFrame *, AstLineDef *, int, double * );
    int (* Match)( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
    int (* SubFrame)( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
    int (* TestDigits)( AstFrame * );
@@ -676,6 +696,7 @@ typedef struct AstFrameVtab {
    void (* SetTitle)( AstFrame *, const char * );
    void (* SetUnit)( AstFrame *, int, const char * );
    void (* ValidateAxisSelection)( AstFrame *, int, const int *, const char * );
+   void (* LineOffset)( AstFrame *, AstLineDef *, double, double, double[2] );
 
    double (* GetTop)( AstFrame *, int );
    int (* TestTop)( AstFrame *, int );
@@ -707,6 +728,8 @@ typedef struct AstFrameVtab {
    void (* SetActiveUnit)( AstFrame *, int );
 
 } AstFrameVtab;
+
+
 #endif
 
 /* More include files. */
@@ -778,8 +801,10 @@ void astPermAxesId_( AstFrame *, const int[] );
 #endif
 
 #if defined(astCLASS)            /* Protected */
+int astAxIn_( AstFrame *, int, double, double, double, int );
 AstAxis * astGetAxis_( AstFrame *, int );
 AstFrameSet *astConvertX_( AstFrame *, AstFrame *, const char * );
+AstLineDef *astLineDef_( AstFrame *, const double[2], const double[2] );
 AstPointSet *astResolvePoints_( AstFrame *, const double [], const double [], AstPointSet *, AstPointSet * );
 const char *astAbbrev_( AstFrame *, int, const char *, const char *, const char * );
 const char *astGetDomain_( AstFrame * );
@@ -800,6 +825,8 @@ int astGetNaxes_( AstFrame * );
 int astGetPermute_( AstFrame * );
 int astGetPreserveAxes_( AstFrame * );
 int astIsUnitFrame_( AstFrame * );
+int astLineCrossing_( AstFrame *, AstLineDef *, AstLineDef *, double **);
+int astLineContains_( AstFrame *, AstLineDef *, int, double * );
 int astMatch_( AstFrame *, AstFrame *, int **, int **, AstMapping **, AstFrame ** );
 int astSubFrame_( AstFrame *, AstFrame *, int, const int *, const int *, AstMapping **, AstFrame ** );
 int astTestDigits_( AstFrame * );
@@ -852,6 +879,7 @@ void astSetUnit_( AstFrame *, int, const char * );
 void astValidateAxisSelection_( AstFrame *, int, const int *, const char * );
 double astReadDateTime_( const char * );
 const char *astFmtDecimalYr_( double, int);
+void astLineOffset_( AstFrame *, AstLineDef *, double, double, double[2] );
 
 double astGetTop_( AstFrame *, int );
 int astTestTop_( AstFrame *, int );
@@ -972,6 +1000,8 @@ astINVOKE(V,astUnformatId_(astCheckFrame(this),axis,string,value))
 #endif
 
 #if defined(astCLASS)            /* Protected */
+#define astAxIn(this,axis,lo,hi,val,closed) \
+astINVOKE(V,astAxIn_(astCheckFrame(this),axis,lo,hi,val,closed))
 #define astAbbrev(this,axis,fmt,str1,str2) \
 astINVOKE(V,astAbbrev_(astCheckFrame(this),axis,fmt,str1,str2))
 #define astFields(this,axis,fmt,str,maxfld,fields,nc,val) \
@@ -980,6 +1010,14 @@ astINVOKE(V,astFields_(astCheckFrame(this),axis,fmt,str,maxfld,fields,nc,val))
 astINVOKE(V,astCheckPerm_(astCheckFrame(this),perm,method))
 #define astResolvePoints(this,p1,p2,in,out) \
 astINVOKE(O,astResolvePoints_(astCheckFrame(this),p1,p2,astCheckPointSet(in),((out)?astCheckPointSet(out):NULL)))
+#define astLineDef(this,p1,p2) \
+astINVOKE(V,astLineDef_(astCheckFrame(this),p1,p2))
+#define astLineOffset(this,line,par,prp,point) \
+astINVOKE(V,astLineOffset_(astCheckFrame(this),line,par,prp,point))
+#define astLineCrossing(this,l1,l2,cross) \
+astINVOKE(V,astLineCrossing_(astCheckFrame(this),l1,l2,cross))
+#define astLineContains(this,l,def,point) \
+astINVOKE(V,astLineContains_(astCheckFrame(this),l,def,point))
 #define astClearDigits(this) \
 astINVOKE(V,astClearDigits_(astCheckFrame(this)))
 #define astClearDirection(this,axis) \
