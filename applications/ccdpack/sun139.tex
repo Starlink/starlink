@@ -18,7 +18,7 @@
 % Variable part - replace [xxx] as appropriate.
 \newcommand{\stardocnumber}    {139.11}
 \newcommand{\stardocauthors}   {Peter W. Draper, Mark Taylor, Alasdair Allan}
-\newcommand{\stardocdate}      {27 January 1999}
+\newcommand{\stardocdate}      {15 November 1999}
 \newcommand{\stardoctitle}     {CCDPACK}
 \newcommand{\stardoconeline}   {CCD data reduction package}
 \newcommand{\stardocversion}   {Version 3.0}
@@ -4491,8 +4491,8 @@ The CCDPACK routine descriptions are contained in the following pages.
    \sstexamples{
       \sstexamplesubsection{
          astexp reg\_data$*$ camera.ast idtype=fitsid fitsid=CHIPNUM
-      }{
              outdomain=camera
+      }{
          This will save the information about the relative positioning
          of the images {\tt '}reg\_data$*${\tt '} to the file {\tt '}camera.ast{\tt '}, calling the
          alignment domain {\tt '}CAMERA{\tt '}.  The file {\tt '}camera.ast{\tt '} can later be
@@ -4508,8 +4508,8 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          astexp {\tt "}im1,im2,im3{\tt "} astfile=camera.ast baseframe=axis
-      }{
              title={\tt "}Focal plane alignment{\tt "} accept
+      }{
          In this case the OUTDOMAIN parameter takes its default value
          of {\tt '}CCD\_EXPORT{\tt '}, but mappings are between the Current
          coordinates of the input images and their {\tt '}AXIS{\tt '} coordinates.
@@ -4526,8 +4526,8 @@ The CCDPACK routine descriptions are contained in the following pages.
       }
       \sstexamplesubsection{
          astexp {\tt "}r10595[2345]{\tt "} wfc.ast outdomain=wfc
-      }{
              idtype=fitsid fitsid=CHIPNAME fitsrot=ROTSKYPA
+      }{
          This exports the alignment information from the four named
          images to a file wfc.ast.  The CHIPNAME FITS header identifies
          the source CCD for each, and the ROTSKYPA FITS header gives
@@ -4549,24 +4549,26 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          The AST file consists of the following, in order:
 
-            $<$global modifiers$>$
-            (blank line)
-            $<$frameset 1$>$
-            $<$frameset 1 modifiers$>$
-            (blank line)
-            $<$frameset 2$>$
-            $<$frameset 2 modifiers$>$
-            (blank line)
-              ...
-            (end of file)
+          \begin{myquote}
+            $<$global modifiers$>$  \\
+            (blank line)  \\
+            $<$frameset 1$>$  \\
+            $<$frameset 1 modifiers$>$  \\
+            (blank line)  \\
+            $<$frameset 2$>$  \\
+            $<$frameset 2 modifiers$>$  \\
+            (blank line)  \\
+              ...  \\
+            (end of file)  \\
+         \end{myquote}
 
          Characters after a {\tt '}\#{\tt '} character are normally ignored.  The
          constituent parts are composed as follows:
 
-         Blank line:
+         {\bf Blank line:} \\
             A single blank line, which may contain spaces but no comments.
 
-         Frameset:
+         {\bf Frameset:} \\
             The framesets are written in AST native format, as explained
             in SUN/210.
 
@@ -4586,7 +4588,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstitemlist{
 
          \sstitem
-               {\tt "}FITSID KEY VALUE{\tt "}
+               {\tt "}FITSID KEY VALUE{\tt "} ---
                      This will match an image if the first FITS header card
                      with the keyword KEY has the value VALUE.  If the
                      value is of type CHARACTER it must be in single
@@ -4595,19 +4597,19 @@ The CCDPACK routine descriptions are contained in the following pages.
                      hierarchical keywords.
 
          \sstitem
-               {\tt "}INDEX N{\tt "}
+               {\tt "}INDEX N{\tt "} ---
                      This associates a frameset with an integer N.
                      Usually N will take the values 1,2,3,... for the
                      framesets in the file.  Typically the N{\tt '}th image in a
                      list will match the one with an ID of {\tt "}INDEX N{\tt "}.
 
       }
-         Modifiers:
+            {\bf Modifiers:} \\
             Modifiers describe additional modifications to be made
             to the framesets on import.  They are of the form
-
+            \begin{myquote}
                USE keyword arguments
-
+            \end{myquote}
             Currently the only modifier defined is FITSROT, which
             defines the name of a FITS header which specifies how
             many degrees to rotate the image before use.  This
@@ -4823,24 +4825,26 @@ The CCDPACK routine descriptions are contained in the following pages.
 
          The AST file consists of the following, in order:
 
-            $<$global modifiers$>$
-            (blank line)
-            $<$frameset 1$>$
-            $<$frameset 1 modifiers$>$
-            (blank line)
-            $<$frameset 2$>$
-            $<$frameset 2 modifiers$>$
-            (blank line)
-              ...
-            (end of file)
+         \begin{myquote}
+            $<$global modifiers$>$ \\
+            (blank line) \\
+            $<$frameset 1$>$ \\
+            $<$frameset 1 modifiers$>$ \\
+            (blank line) \\
+            $<$frameset 2$>$ \\
+            $<$frameset 2 modifiers$>$ \\
+            (blank line) \\
+              ... \\
+            (end of file) \\
+         \end{myquote}
 
          Characters after a {\tt '}\#{\tt '} character are normally ignored.  The
          constituent parts are composed as follows:
 
-         Blank line:
+         {\bf Blank line:} \\
             A single blank line, which may contain spaces but no comments.
 
-         Frameset:
+         {\bf Frameset:} \\
             The framesets are written in AST native format, as explained
             in \xref{SUN/210}{sun210}{}.
 
@@ -4860,7 +4864,7 @@ The CCDPACK routine descriptions are contained in the following pages.
       \sstitemlist{
 
          \sstitem
-               {\tt "}FITSID KEY VALUE{\tt "}
+               {\tt "}FITSID KEY VALUE{\tt "} ---
                      This will match an image if the first FITS header card
                      with the keyword KEY has the value VALUE.  If the
                      value is of type CHARACTER it must be in single
@@ -4869,19 +4873,19 @@ The CCDPACK routine descriptions are contained in the following pages.
                      hierarchical keywords.
 
          \sstitem
-               {\tt "}INDEX N{\tt "}
+               {\tt "}INDEX N{\tt "} ---
                      This associates a frameset with an integer N.
                      Usually N will take the values 1,2,3,... for the
                      framesets in the file.  Typically the N{\tt '}th image in a
                      list will match the one with an ID of {\tt "}INDEX N{\tt "}.
 
       }
-         Modifiers:
+         {\bf Modifiers:} \\
             Modifiers describe additional modifications to be made
             to the framesets on import.  They are of the form
-
+            \begin{myquote}
                USE keyword arguments
-
+            \end{myquote}
             Currently the only modifier defined is FITSROT, which
             defines the name of a FITS header which specifies how
             many degrees to rotate the image before use.  This
@@ -8787,8 +8791,8 @@ yinv=\qs{\qt{2d0$*$(atand(exp(y$*$pi/180d0)))-90d0}} \\
       }
       \sstexamplesubsection{
          findoff inlist={\tt '}data$*${\tt '} outlist={\tt '}$*$.off{\tt '} restrict minmatch=2
-      }{
               maxdisp=20 minsep=30
+      }{
          In this example the images are sparsely populated, and a pair
          will be considered to match if as few as two matching objects
          can be found.  The images have been initially aligned in their
@@ -13235,8 +13239,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          register inlist={\tt '}{\tt "}image1,image2{\tt "}{\tt '} fittype=6 xfor={\tt '}pa$+$pb$*$x$+$pc$*$y$+$pd$*$x$*$y{\tt '}
-      }{
                yfor={\tt '}pe$+$pf$*$x$+$pg$*$y$+$ph$*$x$*$y{\tt '}
+      }{
          In this example a non-linear transformation is fit between the
          positions associated with the images image1 and image2. This analysis
          may help in determining whether a 6-parameter fit is good
@@ -13249,8 +13253,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          register ndfnames=false inlist={\tt '}{\tt "}list1.acc,list2.acc,list3.acc{\tt "}{\tt '}
-      }{
                fittype=3 placein=each in={\tt '}{\tt "}image1,image2,image3{\tt "}{\tt '}
+      }{
          In this example the input position lists are not associated
          with images (ndfnames=false) and have to be specified by name
          (no wildcards allowed). Since the position lists are not
@@ -14531,8 +14535,6 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       assignment is made on the command line.  Global values may be set
       and reset using the \xroutine{CCDSETUP} and \xroutine{CCDCLEAR} commands.
    }
-\newpage
-
    \sstimplementationstatus{
       \sstitemlist{
 
@@ -14859,8 +14861,8 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          wcsedit {\tt "}first,second{\tt "} mode=add frame=GRID maptype=pincushion
-      }{
               coeffs=[-6.8e-8,0,0] domain=NEW
+      }{
          A new coordinate system, called {\tt '}NEW{\tt '}, is added to the images
          first  and second.  It is connected to the previously
          existing GRID domain by a pincushion distortion mapping
@@ -14888,9 +14890,9 @@ TIMES.FLASH \> \_DOUBLE \> Pre-flash time.
       }
       \sstexamplesubsection{
          wcsedit frm mode=add frame=pixel maptype=math simpif simpfi
-      }{
               forexp=[{\tt "}r=sqrt(x$*$x$+$y$*$y){\tt "},{\tt "}theta=atan2(y,x){\tt "}]
               invexp=[x=r$*$cos(theta),y=r$*$sin(theta)]
+      }{
          Adds a frame giving a polar coordinate view of the PIXEL frame.
       }
    }
@@ -15251,24 +15253,24 @@ In the first place,
 the object matching methods appear to work just the same as
 before (i.e.\ a CCDPACK script which used to perform registration,
 resampling and combination should still do so),
-although by default the routines are now storing coordinate 
+although the routines are now storing coordinate 
 system information in a different way.
-Furthermore, all the TRANSFORM
-functionality is still available, 
-and can be used for backward compatibility
+Furthermore, all the programs retain their ability to read transformation
+information written as TRANSFORM structures,
+for backward compatibility
 with files which have already been partially processed by CCDPACK.
 
 The applications 
 \routine{FINDOFF}, \routine{REGISTER}, \routine{TRANLIST}, and 
 \routine{TRANNDF} 
-by default read and write coordinate system
+write and (by default) read coordinate system
 information using coordinate systems attached to images, but retain options
-which allow them to use the old TRANSFORM structures on request.
+which allow them to read the old TRANSFORM structures on request.
 
 All the things which can be done using TRANSFORM structures
 however can be as well or better done with attached coordinate systems,
 and the ability of CCDPACK programs
-to read and write TRANSFORM structures may be
+to read TRANSFORM structures may be
 withdrawn altogether in a future release.
 
 
@@ -15331,67 +15333,6 @@ required property is not apparent (CCDPACK produces classifications for
 linear transformations).
 
 
-\subsection{\xlabel{generaltransforms}General nonlinear transformations
-\label{general_transforms}}
-
-Using the TRANSFORM-based methods, CCDPACK can fit and use more
-general transformations than those which can currently be encoded in 
-the newer attached coordinate system method.
-The fitting of general transformations by \routine{REGISTER} 
-is restricted to {\em two} datasets at a time.
-General transformations are based on `algebraic-like' expressions
-that you must define.
-An example of such a transformation is the Sanson-Flamstead
-sinusoidal:
-\begin{myquote}
-\begin{verbatim}
-XX = X * COS(Y)
-YY = Y
-X  = XX / COS(YY)
-Y  = YY
-\end{verbatim}
-\end{myquote}
-where \text{X} and \text{Y} are the present coordinates and
-\text{XX} and \text{YY} are the new coordinates.
-This is the FORTRAN related form that is used by the package
-\xref{TRANSFORM SUN/61}{sun61}{}.
-
-When fitting a general transform it is necessary to parameterise the
-formulation, the object of the exercise being to determine good values
-for the parameters.
-An obvious way to use this ability is to test the hypothesis that a
-linear transformation is not good enough to register
-datasets accurately.
-To do this you might use the forward transform expression:
-\begin{myquote}
-\begin{verbatim}
-XX = PA + PB * X + PC * Y + PD * X * X + PE * Y * Y
-YY = PF + PG * X + PH * Y + PI * X * X + PJ * Y * Y
-\end{verbatim}
-\end{myquote}
-The best values of the parameters \text{PA-PJ} can then be determined.
-General expressions are always given in this form with coordinates
-\text{(X,Y)} and \text{(XX,YY)}, parameters \text{PA-PZ}.
-Sub-expressions are also supported using the tokens \text{FA-FZ}, these
-should be used when complex repeated strings (which may include
-\text{PA-PZ} references) occur e.g.:
-\begin{myquote}
-\begin{verbatim}
-XX = PA * ASIND( FA / PA ) * X / FA
-YY = PA * ASIND( FA / PA ) * Y / FA
-X  = PA * SIND( FB / PA ) * XX / FB
-Y  = PA * SIND( FB / PA ) * YY / FB
-FA = SQRT( X * X + Y * Y )
-FB = SQRT( XX * XX + YY * YY )
-\end{verbatim}
-\end{myquote}
-which is a form of perspective projection.
-
-Transformations which are already known (as must be the case if no
-objects are present in the data) may be entered directly into the images
-(by-passing \xroutine{REGISTER}) using the \xroutine{CCDEDIT} command.
-
-
 \subsection{Transforming\xlabel{transformingpositions} position lists}
 
 As explained in
@@ -15402,7 +15343,7 @@ explicit transformation of positions in the list is usually not necessary,
 since the CCDPACK programs which use the lists will transform them
 into the Current coordinate system automatically.
 
-When using the old TRANSFORM-based methods however this can be required,
+When dealing with the old TRANSFORM-based methods however this can be required,
 and it may occasionally be wanted when using the new coordinate system
 methods, for instance for examination of image coordinates by
 a human or a program other than a CCDPACK one, or if 
@@ -15947,7 +15888,8 @@ This is a major update to CCDPACK.
        \item \xroutine{FINDOFF} --   new parameters 
           \text{maxdisp}, \text{restrict}, \text{usewcs}
        \item \xroutine{REGISTER} --  new parameters 
-          \text{outdomain}, \text{outformat}
+          \text{outdomain}, \text{simpfi}, \text{simpif}, \text{usewcs},
+          \text{wcsfile}
        \item \xroutine{TRANLIST} --  new parameters 
           \text{framein}, \text{epochin}, \text{frameout}, 
           \text{epochout}, \text{wcsfile}
