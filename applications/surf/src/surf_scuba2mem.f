@@ -4,7 +4,7 @@
 *     SCUBA2MEM
 
 *  Purpose:
-*     Convert SCUBA data to a form usable by SCUBA DBMEM
+*     Calculate bolometer positions as tangent plane offsets
 
 *  Language:
 *     Starlink Fortran 77
@@ -21,9 +21,11 @@
  
 *  Description:
 *     This routine reads in SCUBA demodulated data and writes it
-*     out with tangent plane offsets to an NDF in a form that is understandable
-*     by the SCUBA implementation of DBMEM. All beam positions are calculated
-*     and stored.
+*     out along with the positions of the bolometers on the sky
+*     for each sample. The positions of the
+*     chop beams can be requested as well as the positions of the tracking
+*     centre. Returns tangent plane offsets from the map centre in arcseconds.
+*     Additionally, the LST of each sample is stored as axis information.
 
 *  Usage:
 *     scuba2mem in out
@@ -46,7 +48,8 @@
 *     MSG_FILTER = CHAR (Read)
 *         Message filter level. Default is NORM.
 *     OUT = NDF (Write)
-*         This file contains the data in a format usable by SCUBA DBMEM.
+*         This parameter specifies the name of the output file to be used
+*         to store the positional information.
 *         The file format is described below.
 *     OUT_COORDS = CHAR (Read)
 *        The coordinate system of the output map. Available coordinate
@@ -58,24 +61,25 @@
 *        - RJ:  RA/Dec (J2000)
 *        - RD:  RA/Dec (epoch of observation)
 *        - GA:  Galactic coordinates (J2000)
-*
-*        For RD current epoch is taken from the first input file.
-*     SHIFT= REAL(2) (Read)
+*     SHIFT = REAL( 2 ) (Read)
 *        The pointing shift [X,Y] to be applied that would bring the
 *        map into the correct position. 
 *        This is a shift in the output coordinate frame. CHANGE_POINTING
 *        should be used to add Az/El pointing offsets.
 
 *  Examples:
-*     scuba2mem out_coords=RJ o34_lon_ext o34_mem
+*     scuba2mem out_coords=GA o34_lon_ext o34_mem nbeams=1 \\
+*        Calculate the coordinates of all bolometer positions
+*        in tangent plane offsets from the GA map centre.
+*     scuba2mem o34_lon_ext nbeams=3 \\
+*        Calculate all chop positions for o34_lon_ext. Use RJ coordinates.
 
 *  Notes:
-*     Can be used on JIGGLE and SCAN data.
-
-*  TODO:
-*     - Support 2 and 3 pos chopping
-*         Will have to check what actually happens with 3 pos chop
-*     - Probably does not work with 2/3 bol chopping
+*     - Can be used on JIGGLE and SCAN data.
+*     - The coordinates of the selected output frame are written
+*       to the output FITS extension in keywords OUT_CRDS, OUTLONG and 
+*       OUTLAT. The full FITS header of the observation itself is still
+*       available.
 
 *  Format of output file:
 *     SCUBA DBMEM requires the data, positions of every beam and the
@@ -101,6 +105,10 @@
  
 *  History:
 *     $Log$
+*     Revision 1.8  1999/07/14 19:22:11  timj
+*     Write output coordinate information to FITS header.
+*     Tidy up documentation header.
+*
 *     Revision 1.7  1999/07/14 04:52:36  timj
 *     Allow shift of coordinate output frame.
 *     Support GRP multiple input files.
@@ -224,6 +232,9 @@
       INTEGER OUT_A_PTR                 ! Pointer to axis
       INTEGER OUT_DATA_PTR              ! Pointer
       DOUBLE PRECISION OUT_DEC_CEN      ! Declination of output map centre
+      CHARACTER*(DAT__SZLOC) OUT_FITSX_LOC
+                                        ! locator of FITS extension in output
+                                        ! file
       DOUBLE PRECISION OUT_LAT          ! longitude of output map centre 
                                         ! (radians)
       DOUBLE PRECISION OUT_LONG         ! longitude of output map centre
@@ -274,8 +285,6 @@
 *     Read in the group members 
       CALL GRP_GROUP('IN', GRP__NOID, IGRP, NMEMBERS, ADDED,
      :     FLAG, STATUS)
-
-      print *,'nmembers: ',NMEMBERS, ADDED
 
 *     Read the coordinate frame of the output data
       CALL PAR_CHOIC('OUT_COORDS','RJ','AZ,NA,RB,RJ,GA,RD,PL',.TRUE.,
@@ -362,9 +371,13 @@
          CALL SCULIB_SPLIT_FILE_SPEC(INSTRING, SCUBA__MAX_SECT, FNAME, 
      :        NSPEC, DATA_SPEC, USE_SECTION, STATUS)
 
-         CALL MSG_SETC('FILE', FNAME)
-         CALL MSG_OUTIF(MSG__NORM, ' ','Processing file ^FILE',
-     :        STATUS)
+*     If we are processing multiple input files, list each one
+*     as we go.
+         IF (NMEMBERS .GT. 1) THEN
+            CALL MSG_SETC('FILE', FNAME)
+            CALL MSG_OUTIF(MSG__NORM, ' ','Processing file ^FILE',
+     :           STATUS)
+         END IF
 
 *     Open the input file
          CALL NDF_FIND (DAT__ROOT, FNAME, IN_NDF, STATUS) 
@@ -390,7 +403,6 @@
 
 *     Number of points per beam
          N_PTS = N_POS * N_BOL
-
 
 *     Cancel the SHIFT parameter if this is not the first time around
          IF (GRP .GT. 1) CALL PAR_CANCL('SHIFT', STATUS)
@@ -537,6 +549,39 @@
      :           IERR, NERR, STATUS)
 
          END DO
+
+*     Unmap the data array
+         CALL NDF_UNMAP( OUTNDF, '*', STATUS )
+
+*     Add some keywords to the FITS header to specify the
+*     output coordinate system
+
+         CALL SCULIB_PUT_FITS_C (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :        'OUT_CRDS', OUT_COORDS, 
+     :        'coordinate system of tangent plane offsets', STATUS)
+
+*       No long and lat for NA/AZ/PL frames
+         IF ( OUT_COORDS.NE.'NA' .AND.OUT_COORDS.NE.'AZ'
+     :      .AND. OUT_COORDS .NE.'PL') THEN
+
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS,
+     :           'OUTLONG', OUT_LONG, 
+     :           'centre longitude of output offsets (radians)', 
+     :           STATUS)
+            CALL SCULIB_PUT_FITS_D (SCUBA__MAX_FITS, N_FITS, FITS, 
+     :           'OUTLAT', OUT_LAT, 
+     :           'centre latitude of output offsets (radians)', 
+     :           STATUS)
+
+         END IF
+
+*     write out the FITS extension (deleting the old one first)
+
+      CALL NDF_XDEL(OUTNDF, 'FITS', STATUS)
+      CALL NDF_XNEW(OUTNDF, 'FITS', '_CHAR*80', 1, N_FITS, 
+     :     OUT_FITSX_LOC, STATUS)
+      CALL DAT_PUT1C(OUT_FITSX_LOC, N_FITS, FITS, STATUS)
+      CALL DAT_ANNUL(OUT_FITSX_LOC, STATUS)
 
 *     Set up the axes
 *     Axis 1: Bolometer number
