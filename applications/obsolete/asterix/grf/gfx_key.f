@@ -320,11 +320,12 @@
 *    Local variables :
       CHARACTER*16 SCALING
       REAL CMIN,CMAX,CRAN
-      REAL X(5)/0.0,1.0,1.0,0.0,0.0/
+      REAL X(5)
       REAL Y(5)
       INTEGER CYCLES
       INTEGER J
       LOGICAL OK
+      DATA X/0.0,1.0,1.0,0.0,0.0/
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN
@@ -523,7 +524,7 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
 *    Functions :
 *    Local variables :
       CHARACTER*12 LBL
-      REAL ASTEP(10)/1.0,2.0,5.0,10.0,20.0,30.0,60.0,120.0,300.0,600.0/
+      REAL ASTEP(10)
       REAL AUNIT
       REAL XRANGE,YRANGE
       REAL XSCALE,YSCALE
@@ -533,6 +534,7 @@ C     :                           G_BOUNDS(1,J),G_BOUNDS(2,J))
       INTEGER FONT,BOLD
       INTEGER L,I
       LOGICAL OK
+      DATA ASTEP/1.0,2.0,5.0,10.0,20.0,30.0,60.0,120.0,300.0,600.0/
 *-
 
       IF (STATUS.EQ.SAI__OK) THEN

@@ -156,8 +156,6 @@
 *        Create quality in 1st input in overwrite mode if it exists in 2nd
 *     11 Dec 1995 V2.0-0 (DJA):
 *        ADI port
-*     23 Feb 1996 V2.0-1 (DJA):
-*        Fixed bug if 1st input primitive
 *     {enter_changes_here}
 
 *  Bugs:
@@ -189,7 +187,7 @@
         PARAMETER		( ICLS = 'BinDS|Array|Scalar' )
 
       CHARACTER*30		VERSION
-        PARAMETER		( VERSION = 'ARITHMETIC Version V2.0-1' )
+        PARAMETER		( VERSION = 'ARITHMETIC Version V2.0-0' )
 
 *  Local Variables:
       CHARACTER              	OPER             	! Operation
@@ -261,7 +259,7 @@
         CALL MSG_PRNT( 'First input file will be overwritten' )
         CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
       ELSE
-        CALL USI_ASSOC( 'INP1', ICLS, 'READ', FID1, STATUS )
+        CALL USI_ASSOC( 'INP1', ICLS, 'UPDATE', FID1, STATUS )
       END IF
       CALL USI_ASSOC( 'INP2', ICLS, 'READ', FID2, STATUS )
 
@@ -277,7 +275,7 @@
       ELSE
         CALL USI_CREAT( 'OUT', ADI__NULLID, OFID, STATUS )
       END IF
-      OUT_PRIM = (IN1_PRIM.AND.IN2_PRIM)
+      OUT_PRIM = IN1_PRIM
 
 *  See if errors wanted for primitive input
       IF ( IN1_PRIM .OR. IN2_PRIM ) THEN
@@ -702,7 +700,9 @@
         LOGICAL I1QOK,I2QOK
         BYTE I1Q(*),I2Q(*)
 *    Export :
-	BYTE OQ(*)		! data quality array
+        BYTE OQ(*)		! data quality array
+*    Functions :
+        BYTE BIT_ORUB
 *    Local variables :
 	INTEGER I
 *-
@@ -713,7 +713,7 @@
         IF (I1QOK.AND.I2QOK) THEN
 
           DO I=1,N
-            OQ(I)=(I1Q(I).OR.I2Q(I))
+            OQ(I)=BIT_ORUB(I1Q(I),I2Q(I))
           END DO
 
         ELSEIF (I1QOK) THEN

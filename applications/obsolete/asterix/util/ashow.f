@@ -198,27 +198,27 @@
         CALL ADI_FTRACE( IFID, NLEV, PATH, FILE, STATUS )
 
 *    Mission strings?
-        IF ( IAND( ITEMC, IC_MIS ) .NE. 0 ) THEN
+        IF ( AND( ITEMC, IC_MIS ) .NE. 0 ) THEN
           CALL ASHOW_MIS( IFID, OCH, STATUS )
         END IF
 
 *    Timing
-        IF ( IAND( ITEMC, IC_TIM ) .NE. 0 ) THEN
+        IF ( AND( ITEMC, IC_TIM ) .NE. 0 ) THEN
           CALL ASHOW_TIM( IFID, OCH, STATUS )
         END IF
 
 *    World coordinates?
-        IF ( IAND( ITEMC, IC_WCS ) .NE. 0 ) THEN
+        IF ( AND( ITEMC, IC_WCS ) .NE. 0 ) THEN
           CALL ASHOW_WCS( IFID, OCH, STATUS )
         END IF
 
 *    File links
-        IF ( IAND( ITEMC, IC_LNK ) .NE. 0 ) THEN
+        IF ( AND( ITEMC, IC_LNK ) .NE. 0 ) THEN
           CALL ASHOW_LNK( IFID, OCH, STATUS )
         END IF
 
 *    Dataset selection
-        IF ( IAND( ITEMC, IC_SEL ) .NE. 0 ) THEN
+        IF ( AND( ITEMC, IC_SEL ) .NE. 0 ) THEN
           CALL ASHOW_SEL( IFID, OCH, STATUS )
         END IF
 
