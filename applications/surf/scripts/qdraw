@@ -23,6 +23,8 @@ if (defined $ENV{"KAPPA_DIR"}) {
 
 # Global status
 $status = &NDF::SAI__OK;
+$good = &NDF::SAI__OK;
+
 
 ########################################################################
 # Read the command line parameters
@@ -53,22 +55,28 @@ if ($#ndfs > -1) {
     # Remove trailing sdf
     $ndf =~ s/\.sdf$//;
 
-    # Get root name (allow sections)
-    ($roothds, $junk) = split(/\.|\(/,$ndf);
- 
-    (-e "$roothds.sdf" | -e $ENV{'DATADIR'}."/$roothds.sdf") &&
-      do {      
-	print "NDF is $ndf\n";
-	$usethis = $ndf;
-	last;
-      };
+    # Check that files exists simply by doing an ndf_find
+    # and checking for good status.
+
+    err_begin($status);
+    ndf_find(&NDF::DAT__ROOT, $ndf, $indf, $status);
+
+    if ($status == $good) {
+      print "Using the NDF $ndf...\n";
+      $usethis = $ndf;
+      ndf_annul($indf, $status);
+      last;
+    } else {
+      err_annul($status);
+    }
+    err_end($status);
   }
  
   undef $ndf;
   if (defined $usethis) {
     $ndf = $usethis;
   } else {
-    print "No files were found named ",join(" ",@ndfs),"\n";
+    print "No NDFs were found named: ",join(" ",@ndfs),"\n";
     exit;
   }
 } else {
@@ -77,7 +85,8 @@ if ($#ndfs > -1) {
 }
 
 
-
+# Exit is status if bad
+&bad_status if ($status != $good);
 
 ##########################################################################
 
@@ -108,6 +117,9 @@ $nsig = $params{NSIGMA} if (defined $params{NSIGMA});
 $max = $mean + ($nsig * $sigma);
 $min = $mean - ($nsig * $sigma);
 
+# Exit is status if bad
+&bad_status if ($status != $good);
+
 # Run linplot
 
 @parlist = ('DEVICE','MODE','ERRBAR','PLTTITL','COMP','LINCOL','SYMCOL',
@@ -128,6 +140,10 @@ die "LINPLOT finished abnormally...stopping (status = $exstat)\n"
 # Find out the device name (in case GDSET has not been run)
 ($device) = par_get("device", "linplot", \$status);
 
+# Exit is status if bad
+
+&bad_status if ($status != $good);
+
 # Run drawsig and draw line at 3 sigma
 
 @parlist = ('SIGCOL','LINESTYLE','AXIS','COMP');
@@ -143,6 +159,15 @@ $exstat =
   unless ($noline);
 die "DRAWSIG finished abnormally...stopping (status = $exstat)\n"
   if ($exstat != 0 && $noline);
+
+exit;
+
+# This is what happens if status is bad and I want to die
+
+sub bad_status {
+  err_flush($status);
+  die "Exiting with bad status\n";
+}
 
 
 __END__
@@ -190,13 +215,6 @@ __END__
 *    SURF: SCUCAT, SCUPHOT;
 *    KAPPA: STATS, LINPLOT, DRAWSIG
 
-*  Implementation Status:
-*    The output of STATS is not displayed therefore no error message is
-*    reported if STATS can not access the NDF (usually because the NDF has
-*    been specified incorrectly). If qdraw freezes without printing any
-*    output this is usually because STATS is waiting for input. You can
-*    check if the NDF has been specified correctly  by running it through 
-*    STATS outside of qdraw and examining the output.
 *-
 
 
