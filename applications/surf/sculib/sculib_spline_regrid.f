@@ -104,6 +104,7 @@
       INCLUDE 'PRM_PAR'          ! VAL__ constants
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'MSG_PAR'          ! MSG_ constants
+      INCLUDE 'CNF_PAR'          ! For CNF_PVAL function
  
 *  Arguments Given:
       INTEGER N_MAPS
@@ -225,7 +226,8 @@
 
 *     Fill NCOADD with 0
       IF (STATUS .EQ. SAI__OK) THEN
-         CALL SCULIB_CFILLI(NX_OUT*NY_OUT, 0, %VAL(NCOADD_PTR))
+         CALL SCULIB_CFILLI(NX_OUT*NY_OUT, 0, 
+     :                      %VAL(CNF_PVAL(NCOADD_PTR)))
       END IF
 
 *     The output grid is fixed for each integration (the extent of the entire
@@ -251,7 +253,7 @@
       DO J = 1,  NY_OUT
 
          CALL VEC_RTOR(.FALSE., 1, REAL(J - J_CENTRE) * PXSIZE,
-     :        %VAL(YIY_PTR + (J-1) * VAL__NBR), IERR, NERR, 
+     :        %VAL(CNF_PVAL(YIY_PTR) + (J-1) * VAL__NBR), IERR, NERR,
      :        STATUS)
 
          DO I = 1, NX_OUT
@@ -260,12 +262,14 @@
 
 *       Y axis
             CALL VEC_RTOR(.FALSE., 1, REAL(J - J_CENTRE) * PXSIZE,
-     :           %VAL(YI_PTR + DATA_OFFSET * VAL__NBR), IERR, NERR, 
+     :           %VAL(CNF_PVAL(YI_PTR) + DATA_OFFSET * VAL__NBR), 
+     :           IERR, NERR,
      :           STATUS)
 
 *       X axis
             CALL VEC_RTOR(.FALSE., 1, REAL(I_CENTRE - I) * PXSIZE,
-     :           %VAL(XI_PTR + DATA_OFFSET * VAL__NBR), IERR, NERR, 
+     :           %VAL(CNF_PVAL(XI_PTR) + DATA_OFFSET * VAL__NBR), 
+     :           IERR, NERR,
      :           STATUS)
 
          END DO
@@ -310,13 +314,16 @@
 
                DATA_OFFSET = (INT_START - 1) * N_BOLS(NMAP)
                
-               CALL SCULIB_COPY_GOOD(TOT_PTS, %VAL(DATA_PTR(NMAP) + 
-     :              DATA_OFFSET * VAL__NBR), 
-     :              %VAL(VAR_PTR(NMAP) + DATA_OFFSET * VAL__NBR),
-     :              %VAL(XPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD),
-     :              %VAL(YPOS_PTR(NMAP) + DATA_OFFSET * VAL__NBD),NGOOD,
-     :              %VAL(GOOD_DATA_PTR), %VAL(GOOD_VAR_PTR), 
-     :              %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR), STATUS)
+               CALL SCULIB_COPY_GOOD(TOT_PTS, 
+     :                               %VAL(CNF_PVAL(DATA_PTR(NMAP)) +
+     :              DATA_OFFSET * VAL__NBR),
+     :   %VAL(CNF_PVAL(VAR_PTR(NMAP)) + DATA_OFFSET * VAL__NBR),
+     :   %VAL(CNF_PVAL(XPOS_PTR(NMAP)) + DATA_OFFSET * VAL__NBD),
+     :   %VAL(CNF_PVAL(YPOS_PTR(NMAP)) + DATA_OFFSET * VAL__NBD),NGOOD,
+     :              %VAL(CNF_PVAL(GOOD_DATA_PTR)), 
+     :              %VAL(CNF_PVAL(GOOD_VAR_PTR)),
+     :              %VAL(CNF_PVAL(GOOD_X_PTR)), 
+     :              %VAL(CNF_PVAL(GOOD_Y_PTR)), STATUS)
                
             ELSE
                
@@ -346,9 +353,11 @@
 *     that are too far from an input grid (cf sculib_wtfn_regrid_1.f)
 
                CALL SCULIB_SPLINE_REGRID_1 (DIAMETER, WAVELENGTH, 
-     :              %val(GOOD_DATA_PTR), %VAL(GOOD_X_PTR), 
-     :              %VAL(GOOD_Y_PTR), NGOOD, PXSIZE, NX_OUT, 
-     :              NY_OUT, I_CENTRE, J_CENTRE, %VAL(INT_QUALITY_PTR), 
+     :              %val(cnf_pval(GOOD_DATA_PTR)), 
+     :              %VAL(CNF_PVAL(GOOD_X_PTR)),
+     :              %VAL(CNF_PVAL(GOOD_Y_PTR)), NGOOD, PXSIZE, NX_OUT,
+     :              NY_OUT, I_CENTRE, J_CENTRE, 
+     :              %VAL(CNF_PVAL(INT_QUALITY_PTR)),
      :              STATUS)
 
 *     Now perform the spline interpolation using your favourite routine
@@ -358,26 +367,33 @@
                   IF (METHOD .EQ. 'IDBVIP') THEN
 
                      CALL SCULIB_SPLINE_PDA_IDBVIP(NGOOD, 
-     :                    %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR),
-     :                    %VAL(GOOD_DATA_PTR),
-     :                    NX_OUT * NY_OUT, %VAL(XI_PTR),
-     :                    %VAL(YI_PTR), %VAL(OUT_PTR), STATUS)
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+     :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
+     :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)),
+     :                    NX_OUT * NY_OUT, %VAL(CNF_PVAL(XI_PTR)),
+     :                    %VAL(CNF_PVAL(YI_PTR)), 
+     :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
 
                   ELSE IF (METHOD .EQ. 'IDSFFT') THEN
 
                      CALL SCULIB_SPLINE_PDA_IDSFFT(NGOOD, 
-     :                    %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR), 
-     :                    %VAL(GOOD_DATA_PTR), NX_OUT,
-     :                    NY_OUT, %VAL(XI_PTR), %VAL(YIY_PTR), 
-     :                    %VAL(OUT_PTR), STATUS)
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+     :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
+     :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)), NX_OUT,
+     :                    NY_OUT, %VAL(CNF_PVAL(XI_PTR)), 
+     :                    %VAL(CNF_PVAL(YIY_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
 
                   ELSE IF (METHOD .EQ. 'SURFIT') THEN
 
                      CALL SCULIB_SPLINE_PDA_SURFIT(NGOOD, SFACTOR, 
-     :                    %VAL(GOOD_X_PTR), %VAL(GOOD_Y_PTR), 
-     :                    %VAL(GOOD_DATA_PTR), %VAL(GOOD_VAR_PTR), 
-     :                    NX_OUT, NY_OUT, %VAL(XI_PTR), %VAL(YIY_PTR), 
-     :                    %VAL(OUT_PTR), STATUS)
+     :                    %VAL(CNF_PVAL(GOOD_X_PTR)), 
+     :                    %VAL(CNF_PVAL(GOOD_Y_PTR)),
+     :                    %VAL(CNF_PVAL(GOOD_DATA_PTR)), 
+     :                    %VAL(CNF_PVAL(GOOD_VAR_PTR)),
+     :                    NX_OUT, NY_OUT, %VAL(CNF_PVAL(XI_PTR)), 
+     :                    %VAL(CNF_PVAL(YIY_PTR)),
+     :                    %VAL(CNF_PVAL(OUT_PTR)), STATUS)
                      
                   END IF
 
@@ -398,8 +414,9 @@
 *     the coadd are good] and scaling by weight of the input data set.
 
                      CALL SCULIB_COADD_MAPS(NX_OUT * NY_OUT, 
-     :                    %VAL(OUT_PTR), %VAL(INT_QUALITY_PTR), 
-     :                    WEIGHT(NMAP), %VAL(NCOADD_PTR),
+     :                    %VAL(CNF_PVAL(OUT_PTR)), 
+     :                    %VAL(CNF_PVAL(INT_QUALITY_PTR)),
+     :                    WEIGHT(NMAP), %VAL(CNF_PVAL(NCOADD_PTR)),
      :                    OUT_DATA, OUT_VARIANCE, OUT_QUALITY, 
      :                    OUT_WEIGHT, STATUS)
 

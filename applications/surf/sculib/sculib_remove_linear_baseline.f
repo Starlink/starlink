@@ -159,6 +159,7 @@
 
 *     Local References:
       INCLUDE 'NDF_FUNC'
+      INCLUDE 'CNF_PAR'
 
 *.
 
@@ -280,7 +281,7 @@
 *     the point is good from above check.
                                  CALL VEC_RTOD(.FALSE., 1, 
      :                                IN_DATA(BOL,POS), 
-     :                                %VAL(FITDATA_PTR + 
+     :                                %VAL(CNF_PVAL(FITDATA_PTR) +
      :                                COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
@@ -295,14 +296,15 @@
 
                                  CALL VEC_RTOD(.FALSE., 1, 
      :                                WEIGHT,
-     :                                %VAL(WEIGHT_PTR + 
+     :                                %VAL(CNF_PVAL(WEIGHT_PTR) +
      :                                COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
 
                                  CALL VEC_ITOD(.FALSE., 1, 
      :                                POS - SCAN_START + 1, 
-     :                                %VAL(X_PTR + COUNT * VAL__NBD),
+     :                                
+     :   %VAL(CNF_PVAL(X_PTR) + COUNT * VAL__NBD),
      :                                IERR, NERR, STATUS)
 
                                  COUNT = COUNT + 1
@@ -328,10 +330,13 @@
                            EPS = 0.0D0
                            IFAIL = 0
 
-                           CALL PDA_DPOLFT (COUNT, %VAL(X_PTR), 
-     :                          %VAL(FITDATA_PTR), %VAL(WEIGHT_PTR), 
+                           CALL PDA_DPOLFT (COUNT, 
+     :                                      %VAL(CNF_PVAL(X_PTR)),
+     :                          %VAL(CNF_PVAL(FITDATA_PTR)), 
+     :                          %VAL(CNF_PVAL(WEIGHT_PTR)),
      :                          MAXDEG, NDEG, EPS, 
-     :                          %VAL(R_PTR), IFAIL, %VAL(A_PTR), STATUS)
+     :                          %VAL(CNF_PVAL(R_PTR)), IFAIL, 
+     :                          %VAL(CNF_PVAL(A_PTR)), STATUS)
                            
                            IF (IFAIL .EQ. 1) THEN
 
@@ -343,7 +348,8 @@
                                     XPOS = DBLE(POS - SCAN_START + 1)
                                  
                                     CALL PDA_DP1VLU(NDEG, NDER, XPOS,
-     :                                   YFIT, YP, %VAL(A_PTR), STATUS)
+     :                                   YFIT, YP, 
+     :                                   %VAL(CNF_PVAL(A_PTR)), STATUS)
 
 *     Simply remove this value (write out even if quality is bad)
 *     if that is required else just store the fit

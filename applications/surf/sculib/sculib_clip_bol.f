@@ -49,6 +49,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.10  2004/09/01 00:52:22  timj
+*     use CNF_PVAL
+*
 *     Revision 1.9  1999/08/06 02:24:39  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -123,6 +126,7 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
+      INCLUDE 'CNF_PAR'
 
 *.
 
@@ -136,7 +140,8 @@
 *  Find the statistics (Mean and standard deviation
 
       CALL SCULIB_STATR(N_POS, REAL(N_SIGMA), SCUDATA, SCUQUAL, BADBIT, 
-     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, %val(SPNTR), STATUS)
+     :     NGOOD, MEAN, MEDIAN, SUM, SUMSQ, STDEV, 
+     :     %VAL(CNF_PVAL(SPNTR)), STATUS)
 
 *     Free memory
 

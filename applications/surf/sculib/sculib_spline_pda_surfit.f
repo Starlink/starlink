@@ -70,6 +70,7 @@
       INCLUDE 'MSG_PAR'                          ! MSG__ constants
       INCLUDE 'SAE_PAR'                          ! Standard SAE constants
       INCLUDE 'PRM_PAR'                          ! VAL__ constants
+      INCLUDE 'CNF_PAR'                          ! For CNF_PVAL function
 
 *  Arguments Given:
       INTEGER NDP
@@ -184,7 +185,7 @@
             WEIGHT = 1.0 / SQRT(VARIANCE_IN(I))
          END IF
 
-         CALL VEC_RTOR(.FALSE., 1, WEIGHT, %VAL(WEIGHT_PTR + 
+         CALL VEC_RTOR(.FALSE., 1, WEIGHT, %VAL(CNF_PVAL(WEIGHT_PTR) +
      :        (I-1) * VAL__NBR), IERR, NERR, STATUS)
 
       END DO
@@ -246,10 +247,13 @@
 
 *     Call the fitting routine
 
-      CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN, DATA_IN, %VAL(WEIGHT_PTR),
+      CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN, DATA_IN, 
+     :                %VAL(CNF_PVAL(WEIGHT_PTR)),
      :     XB, XE, YB, YE, KX, KY, S, NXEST, NYEST, NMAX, EPS, NX, 
-     :     %VAL(TX_PTR), NY, %VAL(TY_PTR), %VAL(C_PTR), FP, 
-     :     %VAL(WRK1_PTR), LWRK1, %VAL(WRK2_PTR), LWRK2, %VAL(IWRK_PTR),
+     :     %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)), 
+     :     %VAL(CNF_PVAL(C_PTR)), FP,
+     :     %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)), 
+     :     LWRK2, %VAL(CNF_PVAL(IWRK_PTR)),
      :     KWRK, IER)
 
 
@@ -272,11 +276,14 @@
       IF (IER .EQ. -2 .AND. STATUS .EQ. SAI__OK) THEN
          RTEMP = FP / 2.0
          IOPT = 0
-         CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN,DATA_IN,%VAL(WEIGHT_PTR),
+         CALL PDA_SURFIT(IOPT, NDP, X_IN, Y_IN,DATA_IN,
+     :                   %VAL(CNF_PVAL(WEIGHT_PTR)),
      :        XB, XE, YB, YE, KX, KY, RTEMP, NXEST, NYEST, NMAX, EPS,NX, 
-     :        %VAL(TX_PTR), NY, %VAL(TY_PTR), %VAL(C_PTR), FP, 
-     :        %VAL(WRK1_PTR), LWRK1, %VAL(WRK2_PTR), LWRK2, 
-     :        %VAL(IWRK_PTR), KWRK, IER)
+     :        %VAL(CNF_PVAL(TX_PTR)), NY, %VAL(CNF_PVAL(TY_PTR)), 
+     :        %VAL(CNF_PVAL(C_PTR)), FP,
+     :        %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, %VAL(CNF_PVAL(WRK2_PTR)), 
+     :        LWRK2,
+     :        %VAL(CNF_PVAL(IWRK_PTR)), KWRK, IER)
 
          IF (IER .GT. 0) THEN
             IF (IER .EQ. 2 .OR. IER .EQ. 3) THEN
@@ -343,9 +350,12 @@
          END IF
 
 *     Calculate the output data
-         CALL PDA_BISPEV(%VAL(TX_PTR), NX, %VAL(TY_PTR), NY, 
-     :        %VAL(C_PTR), KX, KY, X_OUT, NX_OUT, Y_OUT, NY_OUT, 
-     :        %VAL(DATA_PTR), %VAL(WRK1_PTR), LWRK1, %VAL(IWRK_PTR), 
+         CALL PDA_BISPEV(%VAL(CNF_PVAL(TX_PTR)), NX, 
+     :                   %VAL(CNF_PVAL(TY_PTR)), NY,
+     :        %VAL(CNF_PVAL(C_PTR)), 
+     :        KX, KY, X_OUT, NX_OUT, Y_OUT, NY_OUT,
+     :        %VAL(CNF_PVAL(DATA_PTR)), %VAL(CNF_PVAL(WRK1_PTR)), LWRK1, 
+     :        %VAL(CNF_PVAL(IWRK_PTR)),
      :        KWRK, IER)
 
          IF (IER .NE. 0) THEN
@@ -362,8 +372,8 @@
                
                   DATA_OFFSET = (J-1) + (I-1) * NY_OUT
 
-                  CALL VEC_RTOR(.FALSE., 1, %VAL(DATA_PTR + 
-     :                 DATA_OFFSET * VAL__NBR), 
+                  CALL VEC_RTOR(.FALSE., 1, %VAL(CNF_PVAL(DATA_PTR) +
+     :                 DATA_OFFSET * VAL__NBR),
      :                 DATA_OUT(NX_OUT + 1 - I, J), IERR, NERR, STATUS)
                END DO
             END DO

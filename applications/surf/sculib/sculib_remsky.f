@@ -60,6 +60,9 @@
 *     1996 November 17 (TIMJ):
 *       Original version
 *     $Log$
+*     Revision 1.8  2004/09/01 00:52:23  timj
+*     use CNF_PVAL
+*
 *     Revision 1.7  1999/08/06 02:24:48  timj
 *     Tweak headers for use with PROLAT.
 *
@@ -146,6 +149,7 @@
 
 *    External functions:
       INCLUDE 'NDF_FUNC'
+      INCLUDE 'CNF_PAR'
 *.
 
 
@@ -239,7 +243,7 @@
 
 *     Store the level
                CALL VEC_DTOR(.FALSE., 1, BACKGROUND,
-     :              %VAL(SKY_PTR + (NLOOPS * VAL__NBR)), IERR,
+     :              %VAL(CNF_PVAL(SKY_PTR) + (NLOOPS * VAL__NBR)), IERR,
      :              NERR, STATUS)
                NLOOPS = NLOOPS + 1
                      
@@ -266,15 +270,16 @@
      :     STATUS)
       IF (STATUS .EQ. SAI__OK) THEN
          BTEMP = 0
-         CALL SCULIB_CFILLB(NLOOPS, BTEMP, %VAL(DQ_PTR))
+         CALL SCULIB_CFILLB(NLOOPS, BTEMP, %VAL(CNF_PVAL(DQ_PTR)))
       END IF
       CALL SCULIB_MALLOC(NLOOPS * VAL__NBR, QS_PTR, QS_PTR_END,
      :     STATUS)
       LCLIP = -1.0
 
-      CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(SKY_PTR), %VAL(DQ_PTR), 
+      CALL SCULIB_STATR(NLOOPS, LCLIP, %VAL(CNF_PVAL(SKY_PTR)), 
+     :                  %VAL(CNF_PVAL(DQ_PTR)),
      :     BADBIT, GOOD, MEAN_LEVEL, MEDIAN, SUM, SUMSQ, STDEV, 
-     :     %VAL(QS_PTR), STATUS)
+     :     %VAL(CNF_PVAL(QS_PTR)), STATUS)
 
 
 *     Free the memory
