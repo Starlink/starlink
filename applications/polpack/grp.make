@@ -64,7 +64,7 @@ UNIX_RELEASE =  $(UNIX_SOURCE) $(UNIX_OTHERS) $(FIGS)
 
 #  The contents of polpack.tar.
 UNIX_TOTAL = polka.htx_tar ndg_source.tar polpack_source.tar \
-$(UNIX_OTHERS) sun223_figures
+$(UNIX_OTHERS) sun223.htx_tar sun223_figures
 
 #  Target for use by the grp command.
 $(action)
