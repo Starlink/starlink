@@ -6,22 +6,22 @@
 #     [incr Tcl] class
 
 #  Purpose:
-#     Extends the RtdImageSpectrum class to add the ability to 
-#     save the spectrum to a file. 
+#     Extends the RtdImageSpectrum class to add the ability to
+#     save the spectrum to a file.
 
 #  Description:
-#     This class extends RtdImageSpectrum so that the currently 
+#     This class extends RtdImageSpectrum so that the currently
 #     selected line across the line can be extracted and stored
-#     as an image. It does this by adding an extra button 
-#     to the lower toolbar which initiates a fileselection dialog. 
+#     as an image. It does this by adding an extra button
+#     to the lower toolbar which initiates a fileselection dialog.
 #     It then uses the foreign image command writeslice to extract the
-#     line of data. 
+#     line of data.
 
 #  Invocations:
 #
 #        GaiaImageSpectrum object_name [configuration options]
 #
-#     This creates an instance of a GaiaImageSpectrum object. 
+#     This creates an instance of a GaiaImageSpectrum object.
 #     The return is the name of the object.
 #
 #        object_name configure -configuration_options value
@@ -46,7 +46,7 @@
 #     at the bottom of the display. It adds the "save as..." option.
 
 #  Notes:
-#     Originally this routine used the FIGARO application SLICE, but 
+#     Originally this routine used the FIGARO application SLICE, but
 #     has been changed to use an internal routine instead. This is
 #     because SLICE cannot deal with the situation when axes are
 #     monotonically decreasing (which is pretty fundermental
@@ -62,7 +62,7 @@
 #     {enter_new_authors_here}
 
 #  Copyright:
-#     Copyright (C) 1997 Central Laboratory of the Research Councils
+#     Copyright (C) 1997-1999 Central Laboratory of the Research Councils
 
 #  History:
 #     16-JUL-1997 (PDRAPER):
@@ -82,94 +82,118 @@ itcl::class gaia::GaiaImageSpectrum {
 
    #  Constructor: create a new instance of this class. Note we need
    #  to force the base constructor to be invoked first
-   constructor {args} { 
-      eval RtdImageSpectrum::constructor $args
+   constructor {args} {
+      eval rtd::RtdImageSpectrum::constructor $args
    } {
       eval itk_initialize $args
    }
- 
+
    #  Destructor - clean up when deleted.
    destructor {
-   }
-   
-   #  Make the graph subwindow. Override to get control of ranging.
-   method make_graph {} {
-      # Note: make the graph in the global namespace for now so that
-      # the old blt utils (features.tcl) still work. Shouldn't be needed
-      # with blt-2.0 or later...
-      set cmd \
-         [list blt::graph $w_.graph \
-             -width 5i \
-             -height 3i \
-             -borderwidth 3 \
-             -relief groove \
-             -title "Pixel Values"]
-      itk_component add graph {
-         set graph_ [uplevel "#0" $cmd]
-      } {
+      global ::tcl_version _
+      if {$tcl_version >= 8.0} {
+         blt::vector destroy $vVector_ $iVector_ $xVector_ $yVector_
       }
+      #  Trap RtdImageSpectrum destructor as vector names do not seem
+      #  available at that scope.
+      catch {rtd::RtdImageSpectrum::destructor}
+   }
+
+   #  Make the graph subwindow. Override to get control of ranging and
+   #  add a widget to display the data value (so we get X,Y and data value of
+   #  position in the image).
+   method make_graph {} {
+      global ::tcl_version
+
+      #  Add the graph
+      itk_component add graph {
+	  blt::graph $w_.graph \
+	      -width 5i \
+	      -height 3i \
+	      -borderwidth 3 \
+	      -relief groove \
+	      -title "Pixel Values"
+      } {}
+      set graph_ $itk_component(graph)
       pack $itk_component(graph) \
          -fill both -expand 1 -padx 1m -pady 1m
 
       add_short_help $itk_component(graph) \
          {Graph: plot image pixel values along line, {bitmap dragb1} = zoom, {bitmap b2} = restore}
-
-      $graph_ legend config -mapped 0
+      #  Set axes labels.
       $graph_ yaxis configure -title {}
       $graph_ xaxis configure -title {Distance along slice}
-      
-      global $graph_.iVector $graph_.vVector $graph_.xVector $graph_.yVector
-      if { ![info exists $graph_.xVector] &&  
-           ![info exists $graph_.yVector] &&
-           ![info exists $graph_.iVector] &&
-           ![info exists $graph_.vVector] 
-        } {
 
-         #  Execute this command at the global level. This is
-         #  necessary to make sure that the vector command goes away
-         #  with the variable.
-         uplevel #0 "blt::vector $graph_.xVector $graph_.yVector \
-                                 $graph_.iVector $graph_.vVector"
+      #  blt2.4f vector names ust start with a letter, no dots...
+      #  someone also changed the default symbol to circle. Why?
+      regsub -all {\.} v$graph_.xVector _ xVector_
+      regsub -all {\.} v$graph_.yVector _ yVector_
+      regsub -all {\.} v$graph_.iVector _ iVector_
+      regsub -all {\.} v$graph_.vVector _ vVector_
+
+      if {$tcl_version >= 8.0} {
+         $graph_ legend config -hide 1
+         if { ! [info exists $xVector_] && ! [info exists $yVector_] &&
+              ! [info exists $iVector_] && ! [info exists $vVector_] } {
+            blt::vector create $vVector_ $iVector_
+            blt::vector create $xVector_ $yVector_
+         }
+         set symbol {}
+      } else {
+         $graph_ legend config -mapped 0
+         if { ! [info exists $xVector_] && ! [info exists $yVector_] &&
+              ! [info exists $iVector_] && ! [info exists $vVector_] } {
+            uplevel #0 "blt::vector $xVector_ $yVector_ $vVector_ $iVector_"
+         }
+         set symbol none
       }
-      $graph_ element create elem -xdata $graph_.iVector -ydata $graph_.vVector
+      $graph_ element create elem -xdata $iVector_ -ydata $vVector_ -symbol $symbol
 
       # plot the distribution of pixel values
       notify_cmd
 
       # add BLT features
-      Blt_ZoomStack $graph_
-      Blt_ActiveLegend $graph_
-      Blt_Crosshairs $graph_
-      Blt_ClosestPoint $graph_
+      ::Blt_ZoomStack $graph_
+      ::Blt_ActiveLegend $graph_
+      ::Blt_Crosshairs $graph_
+      ::Blt_ClosestPoint $graph_
       bind bltCrosshairs <Any-Motion> [code $this dispXY %x %y]
+
+      # Tk frame for X,Y positions.
       itk_component add fpos {
          frame $w_.fpos -relief flat
       }
+
+      # Tk label for X position.
       itk_component add xpos {
          label $itk_component(fpos).xpos -width 15 -anchor w
       }
-      itk_component add ypos {
-         label $itk_component(fpos).ypos -width 15 -anchor w
+
+      # Tk label for Y position.
+      itk_component add yval {
+         label $itk_component(fpos).yval -width 15 -anchor w
       }
+
+      # Tk frame for Value positions.
       itk_component add val {
          label $itk_component(fpos).val -width 15 -anchor w
       }
-      pack $itk_component(xpos) $itk_component(ypos) \
-	      $itk_component(val) -fill x -expand 1 -side left
+      pack $itk_component(xpos) $itk_component(yval) \
+         $itk_component(val) -fill x -expand 1 -side left
       pack $itk_component(fpos) -fill none -expand 0
    }
-   
+
    #  Create an NDF or text file with the slice contents.
-   method save_as {} {   
+   method save_as {} {
 
       #  Get the coordinates of the line endpoints.
       lassign [$canvas_ coords $itk_option(-line_id)] x0 y0 x1 y1
 
-      #  Replot the distribution of pixel values to get the number 
+      #  Replot the distribution of pixel values to get the number
       #  of pixels we want.
       set numValues [$image_ slice $graph_ elem $x0 $y0 $x1 $y1 canvas \
-                        $graph_.iVector $graph_.vVector\
-			$graph_.xVector $graph_.yVector]
+                        $iVector_ $vVector_ \
+			$xVector_ $yVector_ ]
 
       #  Get the pixel indices of the end-points.
       $image_ convert coords $x0 $y0 canvas xs ys image
@@ -183,7 +207,7 @@ itcl::class gaia::GaiaImageSpectrum {
          if { [file extension $image] == ".sdf" } {
             set image "[file rootname $image]${slice}"
          }
-         
+
          #  Get a name for the slice.
          set slice [filename_dialog "." "*.sdf" $w_]
          if { [file extension $slice] == ".sdf" } {
@@ -202,8 +226,8 @@ itcl::class gaia::GaiaImageSpectrum {
    private method unlock_ {} {
       blt::busy release $w_
    }
-   
-   
+
+
    #  Make the button frame at the bottom of the window.
    method make_buttons {} {
       set b [frame $w_.buttons -borderwidth 2 -relief groove]
@@ -217,21 +241,21 @@ itcl::class gaia::GaiaImageSpectrum {
    # This method is called whenever the spectrum line is moved, resized
    # or deleted or when the image changed and the graph should be updated.
    # It updates the graph to show the image values along the line.
-   
+
    method notify_cmd {{op update}} {
       if {"$op" == "delete"} {
          destroy $w_
          return 0
       }
       lassign [$canvas_ coords $itk_option(-line_id)] x0 y0 x1 y1
-      
+
       # plot the distribution of pixel values
-      global $graph_.iVector $graph_.vVector $graph_.xVector $graph_.yVector
       if {[catch {set numValues_ [$image_ slice $graph_ elem \
-	      $x0 $y0 $x1 $y1 canvas $graph_.iVector \
-	      $graph_.vVector $graph_.xVector \
-	      $graph_.yVector]}]} {
-	  return 0
+                                     $x0 $y0 $x1 $y1 canvas \
+                                     $iVector_ $vVector_ \
+                                     $xVector_ $yVector_ ]} msg ]} {
+         error_dialog "$msg"
+         return 0
       }
       $graph_ xaxis configure -max $numValues_
       return 0
@@ -239,12 +263,11 @@ itcl::class gaia::GaiaImageSpectrum {
 
    #  Display x, y values at cursor position.
    method dispXY {x y} {
-      
+
       #  Update crosshair position.
       $graph_ crosshairs configure -position @$x,$y
 
       #  Now update the readout.
-      global $graph_.vVector
       set ret 0
       if { ![$graph_ element closest $x $y "" -interpolate 1 -halo 10000]} {
          return
@@ -255,19 +278,16 @@ itcl::class gaia::GaiaImageSpectrum {
          return
       }
       catch {
-         set value [$graph_.vVector range $index $index]
-         set x [$graph_.xVector range $index $index]
-         set y [$graph_.yVector range $index $index]
+         set value [$vVector_ range $index $index]
+         set x [$xVector_ range $index $index]
+         set y [$yVector_ range $index $index]
          $itk_component(xpos) config -text "X: $x"
-         $itk_component(ypos) config -text "Y: $y"
+         $itk_component(yval) config -text "Y: $y"
          $itk_component(val) config -text "Value: $value"
       }
    }
 
-   #  Protected variables.
-   protected variable figslice_ {}
-   protected variable pixel2axis_ {}
-   protected variable maxCoord_ 0
-   protected variable minCoord_ 0
-
+   #  BLT vectors.
+   protected variable vVector_ {}
+   protected variable iVector_ {}
 }
