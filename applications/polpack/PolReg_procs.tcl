@@ -8984,16 +8984,17 @@ proc Save {} {
                      }
                   }
 
-# The input image name. This is only stored if the PLATE component does
-# not already exist. 
-                  if { ![Extension $outim PLATE _CHAR "" old_plate] } { 
+# The image identifier. This is only assigned a value if the IMGID component 
+# does not already exist. In this case, the name of the input image is
+# used.
+                  if { ![Extension $outim IMGID _CHAR "" old_plate] } { 
                      set ok 0 
                      break
                   }
 
                   if { $old_plate == "" } {
                      set plate [file tail $image]
-                     if { ![Extension $outim PLATE _CHAR $plate ""] } { 
+                     if { ![Extension $outim IMGID _CHAR $plate ""] } { 
                         set ok 0 
                         break
                      }

@@ -247,11 +247,11 @@
 *     contains. This will be either "O" or "E". This is only written in
 *     dual-beam mode (see parameter DUALBEAM).
 *
-*     PLATE (_CHAR): The name of the input image from which the output image
-*     was derived. This does not include a directory path. If the input 
-*     image already contains a POLPACK extension with a PLATE value, then
-*     the PLATE value is copied unchanged to the corresponding output
-*     images.
+*     IMGID (_CHAR): An identifier for the input image from which the
+*     output image was derived. If the input image already contains a
+*     POLPACK extension with a IMGID value, then the IMGID value is copied
+*     unchanged to the corresponding output images. Otherwise, the name of
+*     the input image (without a directoty path) is used.
 
 *  Authors:
 *     DSB: David Berry (STARLINK)
