@@ -24,13 +24,24 @@ $Id$
   (element codecollection
     (make-section-reference
      set-prefix: (literal (number->string (child-number)) " ")
-     title: (with-mode routine-ref-get-reference
-	      (process-codecollection (attribute-string (normalize "doc"))))))
+     title: (literal "CodeCollection")
+     ))
+  (element codegroup
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
+  (element routine
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
+  (element programcode
+    (with-mode routine-ref-get-reference
+      (process-node-list (current-node))))
   )
 
 
 ;; Routinelist is simple
-(element routinelist ($html-section$ (process-children)))
+(element routinelist
+  (make element gi: "ul"
+	(process-children)))
 
 ;; Supporting the codecollection chunking/sectioning isn't as easy as with
 ;; the other such elements, because it doesn't have any children in this
@@ -39,9 +50,19 @@ $Id$
 (element codecollection
   (let ((docent (attribute-string (normalize "doc"))))
     (if docent
-	($html-section$ (with-mode routine-ref
-			  (process-codecollection docent)))
+	(with-mode routine-ref
+	  (process-codecollection docent))
 	(error "codecollection: missing required doc attribute"))))
+
+(mode html-contents
+  (element codecollection
+    (let ((docent (attribute-string (normalize "doc"))))
+      (if docent
+	  (make element gi: "a"
+		attributes: `(("href" , (href-to (current-node))))
+		(with-mode routine-ref-get-reference
+		  (process-codecollection docent)))
+	  (error "codecollection: missing required doc attribute")))))
 
 (define (process-codecollection docent)
   (if docent
@@ -50,8 +71,14 @@ $Id$
 		(node-list-empty? de))
 	    (error (string-append "Couldn't get document element from doc "
 				  docent))
-	    (process-node-list de)))
-      (empty-sosofo)))
+	    (make sequence
+	      (make element gi: "li"
+		    (make element gi: "a"
+			  attributes: `(("href" , (href-to de)))
+			  (with-mode routine-ref-get-reference
+			    (process-node-list de))))
+	      (process-programcode de (current-node)))))
+      (error "No docent in process-codecollection")))
 
 ;; Process a list consisting of all the "author" elements in the
 ;; programcode document.  Split the author list into those with the
@@ -146,48 +173,84 @@ $Id$
 				      (literal ">")))))
 		      (empty-sosofo)))))))
 
+;; The following are essentially equivalent to (process-node-list),
+;; with an argument of a list of programcode, codegroup and routines.
+;; However, they have an extra uplink parameter so that, when they are
+;; called from process-codecollection, it can provide a link back to itself.
+(define (process-programcode docelem #!optional (uplink #f))
+  (let ((kids (children docelem)))
+    (html-document (literal "Programcode document")
+		   (make sequence
+		     (process-node-list (select-elements kids 'docblock))
+		     ;(process-matching-children 'docblock)
+		     (make element gi: "ul"
+			   ;(process-codegroup-list (select-elements kids 'codegroup) uplink)
+			   ;(process-routine-list (select-elements kids 'routine) uplink)))
+			   (process-node-list (select-elements kids 'codegroup))
+			   (process-node-list (select-elements kids 'routine))
+			   ))
+		   force-chunk?: #t
+		   system-id: (html-file target_nd: docelem)
+		   uplink: uplink)))
+
 (mode routine-ref
-  (element programcode
-    (process-children))
+
+  ;; programcode element is dealt with `manually', in process-programcode
+
   (element docblock
-    ;; Only prepare an authorlist for the top-level docblock, and not
-    ;; for the docblock elements in codegroups, for example.
-    (if (string=? (gi (parent (current-node)))
-		  (normalize "programcode"))
-	(let ((allauthors (select-elements
-			   (descendants (parent (current-node)))
-			   (normalize "author"))))
-	  ;; docblock always has a title element, but this is suppressed in
-	  ;; this mode.  If there's _more_ than one element, then other
-	  ;; docblock elements are present, so should be put into a
-	  ;; description list.
-	  (make sequence
-	    (if (or (> (node-list-length (children (current-node))) 1)
-		    (not (node-list-empty? allauthors)))
-		(make element gi: "dl"
-		      (make sequence
-			(with-mode docblock
-			  (process-children))
-			;; process authors
-			(if (node-list-empty? allauthors)
-			    (empty-sosofo)
-			    (make sequence
-			      (make element gi: "dt"
-				    (make element gi: "strong"
-					  (literal "Authors")))
-			      (make element gi: "dd"
-				    (make element gi: "dl"
-					  (process-authorlist allauthors)))))))
-		(empty-sosofo))))
-	(empty-sosofo)))
-  (element codegroup
+    ;; docblock always has a title element, but this is suppressed in
+    ;; this mode, because we want to treat it specially (inside the h1
+    ;; element).  If there's _more_ than one element, then other
+    ;; docblock elements are present, so should be put into a
+    ;; description list.
     (make sequence
-      (make empty-element gi: "hr")
-      (make element gi: "h2"
-	    (literal "Code group: ")
+      (make element gi: "h1"
 	    (with-mode routine-ref-get-reference
-	      (process-children)))
-      (process-children)))
+	      (process-node-list (current-node))))
+      (let ((allauthors (if (string=? (gi (parent (current-node)))
+				      (normalize "programcode"))
+			    ;; Only prepare an authorlist for the top-level
+			    ;; docblock, and not for the docblock elements in
+			    ;; codegroups, for example.
+			    (select-elements
+			     (descendants (parent (current-node)))
+			     (normalize "author"))
+			    (empty-node-list))))
+	(if (or (> (node-list-length (children (current-node))) 1)
+		(not (node-list-empty? allauthors)))
+	    (make element gi: "dl"
+		  (make sequence
+		    (with-mode docblock
+		      (process-children))
+		    ;; process any authors
+		    (if (node-list-empty? allauthors)
+			(empty-sosofo)
+			(make sequence
+			  (make element gi: "dt"
+				(make element gi: "strong"
+				      (literal "Authors")))
+			  (make element gi: "dd"
+				(make element gi: "dl"
+				      (process-authorlist allauthors)))))))
+	    (empty-sosofo)))))
+
+  (element codegroup
+    (let* ((db (select-elements (children (current-node)) 'docblock))
+	   (title (select-elements (children db) 'title)))
+      (make sequence
+	(make element gi: "li"
+	      (make element gi: "a"
+		    attributes: `(("href" ,(href-to (current-node))))
+		    (make sequence
+		      (literal "Code group: ")
+		      (with-mode routine-ref-get-reference
+			(process-node-list (current-node))))))
+	(html-document (literal (data title))
+		       (make sequence
+			 (process-node-list db)
+			 (make element gi: "ul"
+			       (process-matching-children 'routine)))))))
+
   (element codereference
     (let ((ref-docelem (document-element-from-entity
 			(attribute-string (normalize "doc")))))
@@ -203,6 +266,7 @@ $Id$
 		      (with-mode routine-ref-get-reference
 			(process-node-list ref-docelem)))))
 	(process-children))))
+
   (element title
     (make element gi: "h1"
 	  (process-children)))
@@ -222,49 +286,11 @@ $Id$
     (let ((id (attribute-string (normalize "id"))))
       (make element gi: "li"
 	    (make element gi: "a"
-		  attributes: `(("href" , (string-append "#AUTHOR_" id)))
+		  attributes: `(("href" , (href-to
+					   (document-element)
+					   force-frag: (string-append "#AUTHOR_" id))))
 		  (process-children)))))
-;   (element author
-;     (let ((affil (attribute-string (normalize "affiliation")))
-; 	  (id (attribute-string (normalize "id")))
-; 	  (kids (children (current-node)))
-; 	  (link (or (attribute-string (normalize "webpage"))
-; 		    (and (attribute-string (normalize "email"))
-; 			 (string-append "mailto:"
-; 					(attribute-string (normalize
-; 							   "email")))))))
-;       (make element gi: "li"
-; 	    (let ((attlist
-; 		   (if link
-; 		       (list (list "name" (string-append "AUTHOR_" id))
-; 			     (list "href" link))
-; 		       (list (list "name" (string-append "AUTHOR_" id))))))
-; 	      (make element gi: "a"
-; 		    attributes: attlist
-; 		    (process-node-list (node-list-first kids))))
-; 	    (process-node-list (node-list-rest kids))
-; 	    (if affil
-; 		(literal (string-append " (" affil ")"))
-; 		(empty-sosofo)))))
-;   (element authorref
-;     (let* ((aut-id (attribute-string (normalize "id")))
-; 	   (aut-el (and aut-id
-; 			(element-with-id aut-id)))
-; 	   (note (attribute-string (normalize "note"))))
-;       (if (and (not (node-list-empty? aut-el))
-; 	       (string=? (gi aut-el) (normalize "author")))
-; 	  (make element gi: "li"
-; 		(make element gi: "a"
-; 		      attributes: (list (list "href"
-; 					      (string-append "#AUTHOR_"
-; 							     aut-id)))
-; 		      (make sequence
-; 			(with-mode routine-ref-get-reference
-; 			  (process-node-list aut-el))
-; 			(if note
-; 			    (literal (string-append " (" note ")"))
-; 			    (empty-sosofo)))))
-; 	  (error (string-append "ID " aut-id " is not an AUTHOR element")))))
+
   (element authornote
     (make sequence
       (literal "[ ")
@@ -302,57 +328,55 @@ $Id$
 	      (process-children)))))
   (element routineprologue
     (let ((kids (nl-to-pairs (children (current-node)))))
-      (make sequence
-	(apply sosofo-append
-	       (map (lambda (thisgi)
-		      (let ((gi-and-nd (assoc (normalize thisgi) kids)))
-			(if gi-and-nd	; there is an element with this gi
-			    (if (string=? (normalize thisgi)
-					  (normalize "diytopic"))
-				;; process multiple diytopics all together
-				(node-list-reduce
-				 (children (current-node))
-				 (lambda (result i)
-				   (if (string=? (gi i) (normalize "diytopic"))
-				       (sosofo-append result
-						      (process-node-list i))
-				       result))
-				 (empty-sosofo))
-				;; else just process this node
-				(process-node-list (cdr gi-and-nd)))
-			    (empty-sosofo))))
-		    %display-programcode-elements%))
-	;; now collect together all the diytopics
-	;;(apply sosofo-append
-	;;       (map (lambda (gi-and-nd)
-	;;	      (if (string=? (normalize (car gi-and-nd))
-	;;			    (normalize "diytopic"))
-	;;		  (process-node-list (cdr gi-and-nd))
-	;;		  (empty-sosofo)))
-	;;	    kids))
-	)))
+      (apply sosofo-append
+	     (map (lambda (thisgi)
+		    (let ((gi-and-nd (assoc (normalize thisgi) kids)))
+		      (if gi-and-nd	; there is an element with this gi
+			  (if (string=? (normalize thisgi)
+					(normalize "diytopic"))
+			      ;; process multiple diytopics all together
+			      (node-list-reduce
+			       (children (current-node))
+			       (lambda (result i)
+				 (if (string=? (gi i) (normalize "diytopic"))
+				     (sosofo-append result
+						    (process-node-list i))
+				     result))
+			       (empty-sosofo))
+			      ;; else just process this node
+			      (process-node-list (cdr gi-and-nd)))
+			  (empty-sosofo))))
+		  %display-programcode-elements%))))
+
   (element routine
     (let* ((rp (select-elements (children (current-node)) 'routineprologue))
-	   (rn (and (not (node-list-empty? rp))
-		    (select-elements (children rp) 'routinename))))
+	   (rnm (and (not (node-list-empty? rp))
+		     (select-elements (children rp) 'routinename)))
+	   (purp (and (not (node-list-empty? rp))
+		      (select-elements (children rp) 'purpose)))
+	   (title (if (node-list-empty? rnm)
+			 (literal "Anonymous routine")
+			 (with-mode routine-ref-get-reference
+			   (process-node-list rp)))))
       (make sequence
-	(make empty-element gi: "hr")
-	(make element gi: "h2"
-	      (make element gi: "a"
-		    attributes: `(("name" ,(href-to (current-node)
-						    frag-only: #t)))
-		    (if (node-list-empty? rn)
-			(literal "Anonymous routine")
-			(with-mode routine-ref-get-reference
-			  (process-node-list rp)))))
-	(make element gi: "dl"
-	      (process-children)))))
-;  (element routinename
-;    (make sequence
-;      (make empty-element gi: "hr")
-;      (make element gi: "h3"
-;	    attributes: '(("align" "center"))
-;	    (process-children))))
+	(make element gi: "li"
+	      (make sequence
+		(make element gi: "a"
+		      attributes: `(("href" ,(href-to (current-node))))
+		      title)
+		(if (node-list-empty? purp)
+		    (empty-sosofo)
+		    (literal (string-append " - " (data purp))))))
+	(html-document title
+		     (make sequence
+		       (make element gi: "h1"
+			     title)
+		       (make element gi: "dl"
+			     (process-node-list rp)))
+		     ;force-chunk?: #t
+		     )
+	)))
+
   (element routinename
     (empty-sosofo))			; discard, in this mode.  See
 					; mode routine-ref-get-reference  
@@ -556,6 +580,8 @@ $Id$
   (default (empty-sosofo))
   (element programcode
     (process-matching-children 'docblock))
+  (element codegroup
+    (process-matching-children 'docblock))
   (element docblock
     (process-matching-children 'title))
   (element title
@@ -569,17 +595,24 @@ $Id$
 	      (empty-sosofo)))))
   (element name
     (process-children))
+  (element routine
+    (process-matching-children 'routineprologue))
+;   (element routineprologue
+;     (let* ((kids (children (current-node)))
+; 	   (rn (select-elements kids 'routinename))
+; 	   (rp (select-elements kids 'purpose)))
+;       (if (node-list-empty? rn)
+; 	  (literal "Anonymous routine")
+; 	  (sosofo-append (process-node-list rn)
+; 			 (if (node-list-empty? rp)
+; 			     (empty-sosofo)
+; 			     (literal (string-append " - "
+; 						     (data rp))))))))
   (element routineprologue
-    (let* ((kids (children (current-node)))
-	   (rn (select-elements kids 'routinename))
-	   (rp (select-elements kids 'purpose)))
+    (let ((rn (select-elements (children (current-node)) 'routinename)))
       (if (node-list-empty? rn)
 	  (literal "Anonymous routine")
-	  (sosofo-append (process-node-list rn)
-			 (if (node-list-empty? rp)
-			     (empty-sosofo)
-			     (literal (string-append " - "
-						     (data rp))))))))
+	  (process-node-list rn))))
   (element routinename
     (process-children)))
 
@@ -592,25 +625,29 @@ $Id$
   (element description
     (make sequence
       (make element gi: "dt"
-	    (literal "Description"))
+	    (make element gi: "strong"
+		  (literal "Description")))
       (make element gi: "dd"
 	    (process-children))))
   (element userkeywords
     (make sequence
       (make element gi: "dt"
-	    (literal "User keywords"))
+	    (make element gi: "strong"
+		  (literal "User keywords")))
       (make element gi: "dd"
 	    (process-children))))
   (element softwarekeywords
     (make sequence
       (make element gi: "dt"
-	    (literal "Software category"))
+	    (make element gi: "strong"
+		  (literal "Software category")))
       (make element gi: "dd"
 	    (process-children))))
   (element copyright
     (make sequence
       (make element gi: "dt"
-	    (literal "Copyright"))
+	    (make element gi: "strong"
+		  (literal "Copyright")))
       (make element gi: "dd"
 	    (process-children))))
   (element history
@@ -639,16 +676,30 @@ $Id$
 ; 	(process-children))))
   )
 
-;(define (href-to-fragid-routine)
-;  (let ((id (or (attribute-string (normalize "id"))
-;		(select-elements (children (current-node)) 'routineprologue))))
-;    (string-append "_R")))
-;; Define a href-to function.  Note that this will generate a fragid
-;; which is unique in the target file, but which wouldn't be unique
-;; document-wide.  That doesn't matter in this application, because
-;; routinelists are _always_ in separate files.
-(define (href-to-fragid-routine nd)
-  (string-append "_R" (number->string (element-number nd))))
+
+(define (html-file-routine #!optional (nd (current-node)))
+  (string-append (html-file-programcode nd)
+		 (chunk-path nd)))
+
+(define (html-file-codegroup #!optional (nd (current-node)))
+  (string-append (html-file-programcode nd)
+		 (chunk-path nd)))
+
+;; Construct a programcode filename, using only information within the
+;; document.  In the absence of any hash function, and with no way of
+;; converting characters to integers to construct one, just do
+;; something based on the number of children, and the number of
+;; characters in the title.
+(define (html-file-programcode #!optional (nd (current-node)))
+  (let* ((de (document-element nd))
+	 (db (select-elements (children de) 'docblock))
+	 (ti (select-elements (children db) 'title)))
+    (string-append (root-file-name de)
+		   "-P-"
+		   (number->string (node-list-length (children de)))
+		   "-"
+		   (number->string (string-length (data ti))))))
+
 
 (element coderef
   (let* ((cc (node-list-or-false
@@ -675,3 +726,4 @@ $Id$
 			      (attribute-string (normalize "collection"))
 			      " or routine "
 			      (attribute-string (normalize "id")))))))
+

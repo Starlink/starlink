@@ -396,11 +396,14 @@ is in effect.
 	(normalize "subsubsect")
 	(normalize "subsubsubsect")
 	(normalize "appendices")
-	(normalize "routinelist")
-	(normalize "codecollection")
+	;(normalize "routinelist")
+	;(normalize "codecollection")
 	;(normalize "backmatter")
 	;(normalize "notecontents")
 	;(normalize "bibliography")
+	;(normalize "programcode")	;in programcode DTD
+	(normalize "codegroup")
+	(normalize "routine")
 	))
 
 <routine>

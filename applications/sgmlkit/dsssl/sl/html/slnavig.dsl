@@ -24,12 +24,16 @@ DocBook stylesheet.
 -->
 
 <routine>
+<routinename>chunk-element-list
 <description>
 <p>List of element types which should be broken into chunks.
-Because of the way that section-footer-navigation finds its
-subsections, I think there should be no `missing levels' in the set
-of elements.  Ie, ("sect" "subsubsect") would be bad, since
-"subsect" is missing.
+Because of the way that section-footer-navigation, and nav-next-chunk,
+for example, find their subsections, there should be no `missing
+levels' in the set of elements.  Ie, ("sect" "subsubsect") would be
+bad, since "subsect" is missing.  That is, (chunk-parent) should
+generally be equal to (parent).  The cases where this isn't true (ie,
+abstract, and the boundary between codecollection and programcode)
+are dealt with separately.
 
 <p>There are two constraints on the elements in this list.  (1) no
 elements appear which are in the documentsummary DTD but not in the
@@ -47,8 +51,11 @@ must be a subset of the return value of <funcname>section-element-list</>.
 	(normalize "subsubsect")
 	;(normalize "subsubsubsect")
 	(normalize "appendices")
-	(normalize "routinelist")
-	(normalize "codecollection")
+	;(normalize "routinelist")
+	;(normalize "codecollection")
+	(normalize "programcode")	;in programcode DTD
+	(normalize "codegroup")
+	(normalize "routine")
 	))
 
 <routine>
@@ -103,7 +110,15 @@ elements on the way to the current chunk
 		       (cons (normalize "subsubsubsect") "d")
 		       (cons (normalize "appendices") "x")
 		       (cons (normalize "routinelist") "r")
-		       (cons (normalize "codecollection") "f")))
+		       (cons (normalize "codecollection") "f")
+		       (cons (normalize "codegroup") "G")
+		       (cons (normalize "routine") "R")
+		       ;; the programcode number will always be one,
+		       ;; but we do nonetheless need this here, since
+		       ;; programcode is in chunk-element-list (so
+		       ;; that nav-next-element and friends work).
+		       (cons (normalize "programcode") "P")
+		       ))
 	 (nd-gi-map (assoc (gi nd) gi-map)))
     (if nd-gi-map
 	(cdr nd-gi-map)
@@ -163,6 +178,12 @@ Returns the filename of the html file that contains the given node.
   (let* ((nd (chunk-parent target_nd))
 	 (base (cond (uniq
 		      (string-append (root-file-name target_nd) "-" uniq))
+		     ((string=? (gi target_nd) "routine")
+		      (html-file-routine target_nd))
+		     ((string=? (gi target_nd) "programcode")
+		      (html-file-programcode target_nd))
+		     ((string=? (gi target_nd) "codegroup")
+		      (html-file-codegroup target_nd))
 		     ((member (gi nd) (section-element-list))
 		      (main-html-base nd))
 		     ((node-list-empty? nd)
@@ -269,16 +290,29 @@ in <funcname>section-element-list</>.
      (make-html-contents-line))
   (element appendices
      (make-html-contents-line))
+  ; routinelist and codecollection contents in slroutines.dsl
   (element routinelist
      (make-html-contents-line))
-  (element codecollection
-     (make-html-contents-line))
+  ;(element codecollection
+  ;   (make-html-contents-line))
   (element title
      (with-mode section-reference (process-node-list (current-node))))
   (element docbody
      (with-mode section-reference (process-node-list (current-node))))
   (element subhead
      (with-mode section-reference (process-node-list (current-node))))
+  (element programcode
+    (make element gi: "a"
+	  attributes: `(("href" ,(href-to (current-node))))
+	  (with-mode routine-ref-get-reference (process-node-list (current-node)))))
+  (element codegroup
+    (make element gi: "a"
+	  attributes: `(("href" ,(href-to (current-node))))
+	  (with-mode routine-ref-get-reference (process-node-list (current-node)))))
+  (element routine
+    (make element gi: "a"
+	  attributes: `(("href" , (href-to (current-node))))
+	  (with-mode routine-ref-get-reference (process-node-list (current-node)))))
   )
 
 
@@ -310,25 +344,24 @@ element.
                       ((equal? el-gi (normalize "routinelist")) #f)
                       ((equal? el-gi (normalize "codecollection")) "1")
                       (else #f))))
-    (sosofo-append
-       (make element gi: "a" 
-             attributes: `(("href" ,(href-to (current-node))))
-         (if fmt-type
-            (literal 
-               (format-number (child-number (current-node)) fmt-type) ". ")
-            (empty-sosofo))
-         (cond 
+     (make element gi: "a" 
+	   attributes: `(("href" ,(href-to (current-node))))
+	   (if fmt-type
+	       (literal 
+		(format-number (child-number (current-node)) fmt-type) ". ")
+	       (empty-sosofo))
+	   (cond 
             (seclev (process-first-descendant (normalize "title")))
             ((equal? el-gi (normalize "appendices")) 
-                (literal "Appendices"))
+	     (literal "Appendices"))
             ((equal? el-gi (normalize "routinelist"))
-                (literal "Routine list"))
+	     (literal "Routine list"))
             ((equal? el-gi (normalize "abstract"))
-                (literal "Abstract"))
+	     (literal "Abstract"))
             ((equal? el-gi (normalize "codecollection"))
-                (with-mode routine-ref-get-reference
-                   (process-codecollection 
-                      (attribute-string (normalize "doc"))))))))))
+	     (with-mode routine-ref-get-reference
+	       (process-codecollection 
+		(attribute-string (normalize "doc")))))))))
 
 
 <routine>
@@ -344,7 +377,8 @@ list their children.  It does not supply any header.
   <type>singleton-node-list
   <description>Node we want the contents of.  All the children of this
   node which are members of <funcname>section-element-list</> will be
-  listed.
+  listed.  If this is passed as false -- which can happen if this is
+  called within the programcode DTD -- then do nothing, without error.
 <parameter optional default=1>depth
   <type>integer
   <description>Maximum number of levels of TOC we want.  Zero means
@@ -357,10 +391,12 @@ list their children.  It does not supply any header.
 		       (start-element (current-node))
 		       (depth 1)
 		       (include-backmatter-contents #f))
-  (let ((subsects (node-list-filter-by-gi (select-by-class
-					   (children start-element)
-					   'element)
-					  (section-element-list))))
+  (let ((subsects (if start-element
+		      (node-list-filter-by-gi (select-by-class
+					       (children start-element)
+					       'element)
+					      (section-element-list))
+		      (empty-node-list))))
     (if (or (node-list-empty? subsects) (<= depth 0))
 	(empty-sosofo)
 	(make element gi: "ul"
@@ -490,12 +526,12 @@ generated HTML documents.
 ;; but I'm not immeidiately sure how to do this since it needs a
 ;; node in the document grove to find the document body node (i.e.
 ;; you can't evaluate (getdocbody) in the context of a top-level binding.
-(define (chunk-subtree nl)
-  (node-list-map 
-    (lambda (snl) (node-list snl (chunk-subtree (chunk-children snl))))
-    nl))
-(define (doc-chunk-sequence)
-  (chunk-subtree (getdocbody)))
+;(define (chunk-subtree nl)
+;  (node-list-map 
+;    (lambda (snl) (node-list snl (chunk-subtree (chunk-children snl))))
+;    nl))
+;(define (doc-chunk-sequence)
+;  (chunk-subtree (getdocbody)))
 
 
 (define (nav-up-element elemnode)
@@ -504,25 +540,73 @@ generated HTML documents.
   (not (or (node-list-empty? (nav-up-element elemnode))
            (node-list=? (nav-up-element elemnode) (document-element)))))
 
-(define (nav-forward-element elemnode)
-  (let loop ((rest (doc-chunk-sequence)))
-     (cond ((node-list-empty? rest)
-            (empty-node-list))
-           ((node-list=? (node-list-first rest) elemnode) 
-            (node-list-first (node-list-rest rest)))
-           (else
-            (loop (node-list-rest rest))))))
+;; Get the next chunk at the same level.  This relies on the majority
+;; of the elements in chunk-element-list being direct children of one
+;; another, so that (chunk-parent)=(parent).  There are a couple of
+;; cases where this isn't true, such as with the abstract (I think),
+;; and generally with the front-page processing, which are dealt with
+;; separately and explicitly, so this should fail gracefully where
+;; this assumption isn't true.
+(define (nav-next-chunk nd)
+  (let loop ((sibs (chunk-children (parent nd)))) ;all siblings
+    (cond ((node-list-empty? sibs)
+	   (empty-node-list))		;no siblings: chunk-parent != parent
+	  ((node-list=? (node-list-first sibs) nd)
+	   (node-list-first (node-list-rest sibs)))
+	  (else
+	   (loop (node-list-rest sibs))))))
+
+;; Find the next element.  This is the first child, if any;
+;; failing that, it is the nav-next-chunk; failing that, the
+;; nav-forward-element of the parent, ignoring children.
+(define (nav-forward-element nd
+			     #!key (nokids #f))
+  (let ((kids (if nokids (empty-node-list) (chunk-children nd))))
+    (if (node-list-empty? kids)
+	(let ((nchunk (nav-next-chunk nd)))
+	  (if (node-list-empty? nchunk)
+	      (let ((mum (parent nd)))	;no later siblings
+		(if (node-list-empty? mum)
+		    (empty-node-list)		;no next element anywhere
+		    (nav-forward-element mum nokids: #t)))
+	      nchunk))
+	(node-list-first kids))))
+;; Obsolete nav-forward-element, which relies on
+;; doc-chunk-sequence (which is otherwise unused)
+;(define (nav-forward-element elemnode)
+;  (let loop ((rest (doc-chunk-sequence)))
+;     (cond ((node-list-empty? rest)
+;            (empty-node-list))
+;           ((node-list=? (node-list-first rest) elemnode) 
+;            (node-list-first (node-list-rest rest)))
+;           (else
+;            (loop (node-list-rest rest))))))
 (define (nav-forward? elemnode)
   (not (node-list-empty? (nav-forward-element elemnode))))
 
-(define (nav-backward-element elemnode)
-  (let loop ((rest (node-list-reverse (doc-chunk-sequence))))
-     (cond ((node-list-empty? rest)
-            (empty-node-list))
-           ((node-list=? (node-list-first rest) elemnode)
-            (node-list-first (node-list-rest rest)))
-           (else
-            (loop (node-list-rest rest))))))
+(define (nav-last-chunk snl)
+  (let loop ((last (empty-node-list))
+	     (sibs (chunk-children (parent snl)))) ;all siblings
+    (cond ((node-list-empty? sibs)
+	   (empty-node-list))		;no siblings: chunk-parent != parent
+	  ((node-list=? (node-list-first sibs) snl)
+	   last)
+	  (else
+	   (loop (node-list-first sibs)
+		 (node-list-rest sibs))))))
+(define (nav-backward-element nd)
+  (let ((nchunk (nav-last-chunk nd)))
+    (if (node-list-empty? nchunk)
+	(parent nd)			;nice and simple
+	nchunk)))
+;(define (nav-backward-element elemnode)
+;  (let loop ((rest (node-list-reverse (doc-chunk-sequence))))
+;     (cond ((node-list-empty? rest)
+;            (empty-node-list))
+;           ((node-list=? (node-list-first rest) elemnode)
+;            (node-list-first (node-list-rest rest)))
+;           (else
+;            (loop (node-list-rest rest))))))
 (define (nav-backward? elemnode)
    (not (node-list-empty? (nav-backward-element elemnode))))
 
@@ -541,49 +625,61 @@ generated HTML documents.
             (literal "[ID index]"))))
 
 ;; Generates a standard navigation bar.
-(define (navbar nd)
+(define (navbar nd #!key (uplink #f))
    (make sequence 
       (make empty-element gi: "hr")
       (navlink (nav-forward-element nd) "Next" "gif")
-      (navlink (nav-up-element nd) "Up" "gif")
+      (navlink (if uplink uplink (nav-up-element nd)) "Up" "gif")
       (navlink (nav-backward-element nd) "Previous" "gif")
       (navlink (document-element nd) "Contents" "gif")
       (make empty-element gi: "br")
       (navlink (nav-forward-element nd) "Next" "title")
-      (navlink (nav-up-element nd) "Up" "title")
+      (navlink (if uplink uplink (nav-up-element nd)) "Up" "title")
       (navlink (nav-backward-element nd) "Previous" "title")
       (idindex-link nd)
       (make empty-element gi: "hr")))
 
 
-(define (header-navigation nd) 
-    (if (node-list=? nd (document-element))
+(define (header-navigation nd #!key (uplink #f))
+    (if (and (node-list=? nd (document-element))
+	     (not uplink))
         (root-header-navigation nd)
-        (nav-header nd)))
-(define (footer-navigation nd) 
-    (if (node-list=? nd (document-element))
+        (nav-header nd
+		    uplink: uplink)))
+(define (footer-navigation nd #!key (uplink #f)) 
+    (if (and (node-list=? nd (document-element))
+	     (not uplink))
         (root-footer-navigation nd)
-        (nav-footer nd)))
+        (nav-footer nd
+		    uplink: uplink)))
 
-(define (nav-header elemnode)
-   (navbar elemnode))
+(define (nav-header elemnode #!key (uplink #f))
+   (navbar elemnode
+	   uplink: uplink))
 
-(define (nav-footer elemnode)
+(define (nav-footer elemnode #!key (uplink #f))
    (make sequence 
       (if (has-chunk-contents?)
           (sosofo-append (make empty-element gi: "hr") (make-contents))
           (empty-sosofo))
-      (navbar elemnode)
-      (make element gi: "address"
-         (make element gi: "i"
-            (process-node-list (getdocinfo 'title))
-            (make empty-element gi: "br")
-            (literal (getdocnumber (current-node) 'asString))
-            (make empty-element gi: "br")
-            (getdocauthors)
-            (make empty-element gi: "br")
-            (literal (getdocdate))
-            (make empty-element gi: "br")))))
+      (navbar elemnode
+	      uplink: uplink)
+      ;; Make the footer only if the document has a title.  This is
+      ;; really a test of whether we're in an instance of the General
+      ;; DTD, or of the programcode DTD.
+      (if (and (getdocinfo 'title)
+	       (not uplink))
+	  (make element gi: "address"
+		(make element gi: "i"
+		      (process-node-list (getdocinfo 'title))
+		      (make empty-element gi: "br")
+		      (literal (getdocnumber (current-node) 'asString))
+		      (make empty-element gi: "br")
+		      (getdocauthors)
+		      (make empty-element gi: "br")
+		      (literal (getdocdate))
+		      (make empty-element gi: "br")))
+	  (empty-sosofo))))
          
 
 (define (root-header-navigation nd)

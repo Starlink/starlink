@@ -61,7 +61,8 @@ depending on whether the element is to be chunked.
 <codebody>
 (define (html-document title-sosofo body-sosofo #!key (system-id #f)
 						      (force-chunk? #f)
-						      (navbars? #t))
+						      (navbars? #t)
+						      (uplink #f))
   (let* ((is-de? (node-list=? (current-node) (document-element)))
 	 (doc-sosofo 
 	  (if (or force-chunk? (chunk?) is-de?)
@@ -72,11 +73,13 @@ depending on whether the element is to be chunked.
 		    (make element gi: "body" 
 			  attributes: %body-attr%
 			  (if navbars?
-			      (header-navigation (current-node))
+			      (header-navigation (current-node)
+						 uplink: uplink)
 			      (empty-sosofo))
 			  body-sosofo
 			  (if navbars?
-			      (footer-navigation (current-node))
+			      (footer-navigation (current-node)
+						 uplink: uplink)
 			      (empty-sosofo))
 			  ))
 	      body-sosofo)))
@@ -95,7 +98,7 @@ depending on whether the element is to be chunked.
 					    ;sysid (and we haven't
 					    ;turned off chunking)
 		)
-	    (make entity system-id: (or system-id (html-file))
+	    (make entity system-id: (debug (or system-id (html-file)))
 	      (make document-type
 		name: "html"
 		public-id: %html-pubid%)
@@ -160,11 +163,11 @@ returns <code>#f</>.
 	       "xref_")
 	      ((equal? (gi target) (normalize "abstract"))
 	       "xref_abstract")
+	      ;((equal? (gi target) (normalize "routine"))
+	      ; (href-to-fragid-routine target))
 	      ((member (gi target) (section-element-list))
 	       (string-append "_ID" 
 			      (number->string (all-element-number target))))
-	      ((equal? (gi target) (normalize "routine"))
-	       (href-to-fragid-routine target))
 	      ((equal? (gi target) (normalize "mlabel"))
 	       (href-to-fragid-mlabel target))
 	      (else #f)))
@@ -212,7 +215,9 @@ A hook function to add additional tags to the HEAD of your HTML files
 			      (list "content" %stylesheet-version%)))
 
       (with-mode make-html-author-links
-	(process-node-list (getdocinfo 'authorlist)))
+	(if (getdocinfo 'authorlist)
+	    (process-node-list (getdocinfo 'authorlist))
+	    (empty-sosofo)))
 
       ;; Add the LINK REL=PREVIOUS tag
       (if (node-list-empty? prev)
