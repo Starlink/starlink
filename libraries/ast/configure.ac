@@ -24,8 +24,6 @@ STAR_DEFAULTS
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_LIBTOOL
-dnl          AC_PROG_FC
-STAR_FC_LIBRARY_LDFLAGS
 AC_PROG_LN_S
 
 #   Find an absolute path to the Perl binary, augmenting the path with the
