@@ -83,17 +83,17 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'EDI_CMN'                                 ! EDI common block
-*       EDI_INIT = LOGICAL (given)
-*         EDI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID, LID
 
 *  Status:
       INTEGER 			STATUS             	! Global status
+
+*  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
 
 *  Local Variables:
       INTEGER			ARGS(3)			! Method arguments
@@ -104,7 +104,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. EDI_INIT ) CALL EDI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( EDI__PKG ) ) CALL EDI0_INIT( STATUS )
 
 *  Check derivation of ID
       CALL EDI0_CHKDER( ID, STATUS )

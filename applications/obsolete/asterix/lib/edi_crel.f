@@ -103,11 +103,7 @@
 
 *  Global Constants:
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
-
-*  Global Variables:
-      INCLUDE 'EDI_CMN'                                 ! EDI common block
-*       EDI_INIT = LOGICAL (given)
-*         EDI class definitions loaded?
+      INCLUDE 'AST_PKG'
 
 *  Arguments Given:
       INTEGER			ID, NDIM, DIMS(*)
@@ -122,9 +118,10 @@
       INTEGER 			STATUS             	! Global status
 
 *  External References:
+      LOGICAL			AST_QPKGI
+        EXTERNAL		AST_QPKGI
       EXTERNAL			CHR_LEN
         INTEGER			CHR_LEN
-      EXTERNAL			EDI0_BLK		! Ensures inclusion
 
 *  Local Variables:
       CHARACTER*20		LTYPE			! Validated type
@@ -134,7 +131,7 @@
       IF ( STATUS .NE. SAI__OK ) RETURN
 
 *  Check initialised
-      IF ( .NOT. EDI_INIT ) CALL EDI0_INIT( STATUS )
+      IF ( .NOT. AST_QPKGI( EDI__PKG ) ) CALL EDI0_INIT( STATUS )
 
 *  Create new list object
       CALL ADI_NEW0( 'EventList', LID, STATUS )

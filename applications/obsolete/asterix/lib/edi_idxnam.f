@@ -87,11 +87,6 @@
       INCLUDE 'SAE_PAR'          ! Standard SAE constants
       INCLUDE 'ADI_PAR'
 
-*  Global Variables:
-      INCLUDE 'EDI_CMN'                                 ! EDI common block
-*       EDI_INIT = LOGICAL (given)
-*         EDI class definitions loaded?
-
 *  Arguments Given:
       INTEGER			ID
       CHARACTER*(*)		NAME
@@ -102,18 +97,12 @@
 *  Status:
       INTEGER 			STATUS             	! Global status
 
-*  External References:
-      EXTERNAL			EDI0_BLK		! Ensures inclusion
-
 *  Local Variables:
       INTEGER			LCID			! List container
 *.
 
 *  Check inherited global status.
       IF ( STATUS .NE. SAI__OK ) RETURN
-
-*  Check initialised
-      IF ( .NOT. EDI_INIT ) CALL EDI0_INIT( STATUS )
 
 *  Check correct object
       CALL EDI0_CHKDER( ID, STATUS )
