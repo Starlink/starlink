@@ -190,14 +190,6 @@
          ELSE IF ( NAME .EQ. 'MLINPLOT' ) THEN
             CALL MLINPLOT ( STATUS )
 
-*  Clears an image-overlay device.
-         ELSE IF ( NAME .EQ. 'OVCLEAR' ) THEN
-            CALL OVCLEAR ( STATUS )
-
-*  Selects a current image-display overlay.
-         ELSE IF ( NAME .EQ. 'OVSET' ) THEN
-            CALL OVSET ( STATUS )
-
 *  Loads the default palette to a colour table.
          ELSE IF ( NAME .EQ. 'PALDEF' ) THEN
             CALL PALDEF( STATUS )

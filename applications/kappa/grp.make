@@ -62,8 +62,8 @@ linplot.par logar.par loge.par look.par lucy.par lutable.par \
 lutread.par lutsave.par lutview.par \
 makesurface.par manic.par maths.par median.par mem2d.par mlinplot.par \
 ardplot.par mstats.par mult.par native.par ndfcopy.par ndftrace.par \
-noglobals.par nomagic.par normalize.par numb.par outset.par ovclear.par \
-ovset.par paldef.par palentry.par palread.par palsave.par parget.par \
+noglobals.par nomagic.par normalize.par numb.par outset.par\
+paldef.par palentry.par palread.par palsave.par parget.par \
 paste.par piccur.par picdef.par picempty.par picentire.par picgrid.par \
 picin.par piclabel.par piclist.par picsel.par pictrans.par picvis.par \
 picxy.par pixdupe.par psf.par rift.par rotate.par segment.par \
@@ -105,7 +105,7 @@ lutsave.hlp lutspec.hlp lutview.hlp lutzebra.hlp \
 makesurface.hlp manic.hlp maths.hlp median.hlp mem2d.hlp mlinplot.hlp \
 mstats.hlp mult.hlp native.hlp ndfcopy.hlp ndftrace.hlp \
 ndf_history.hlp ndf_sections.hlp noglobals.hlp nomagic.hlp normalize.hlp \
-numb.hlp outset.hlp pow.hlp ovclear.hlp ovset.hlp paldef.hlp palentry.hlp \
+numb.hlp outset.hlp pow.hlp paldef.hlp palentry.hlp \
 palread.hlp palsave.hlp parameters.hlp parget.hlp paste.hlp picbase.hlp \
 piccur.hlp picdata.hlp picdef.hlp picempty.hlp picentire.hlp picframe.hlp \
 picgrid.hlp picin.hlp piclabel.hlp piclast.hlp piclist.hlp picsel.hlp \
@@ -150,8 +150,8 @@ wiener.ifl zaplin.ifl contour.ifl cursor.ifl \
 drawsig.ifl lutedit.ifl display.ifl elprof.ifl gdclear.ifl gdnames.ifl gdset.ifl \
 gdstate.ifl \
 ardplot.ifl linplot.ifl lutable.ifl \
-lutsave.ifl lutview.ifl mlinplot.ifl ovclear.ifl \
-ovset.ifl paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
+lutsave.ifl lutview.ifl mlinplot.ifl \
+paldef.ifl palentry.ifl palread.ifl palsave.ifl piccur.ifl \
 picdef.ifl picempty.ifl picentire.ifl picin.ifl piclabel.ifl piclist.ifl \
 picsel.ifl pictrans.ifl picvis.ifl vecplot.ifl \
 axconv.ifl axlabel.ifl axunits.ifl erase.ifl fitsdin.ifl fitsexp.ifl \
@@ -280,7 +280,7 @@ KAPVIEW_SUB = ardplot.f contour.f cursor.f drawsig.f display.f \
 elprof.f gdclear.f gdnames.f gdset.f gdstate.f \
 linplot.f lutable.f lutedit.f \
 lutsave.f lutview.f mlinplot.f \
-ovclear.f ovset.f paldef.f palentry.f palread.f palsave.f piccur.f \
+paldef.f palentry.f palread.f palsave.f piccur.f \
 picdef.f picempty.f picentire.f picin.f piclabel.f piclist.f picsel.f \
 pictrans.f picvis.f scatter.f vecplot.f colcomp.f
 

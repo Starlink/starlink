@@ -517,7 +517,7 @@ cursor.f drawsig.f display.f elprof.f \
 gdclear.f gdnames.f gdset.f gdstate.f \
 linplot.f lutable.f \
 lutsave.f lutview.f lutedit.f \
-mlinplot.f ovclear.f ovset.f paldef.f palentry.f \
+mlinplot.f paldef.f palentry.f \
 palread.f palsave.f piccur.f picdef.f \
 picempty.f picentire.f picin.f piclabel.f \
 piclist.f picsel.f pictrans.f picvis.f \
@@ -2772,8 +2772,6 @@ numb.o:	 SAE_PAR PAR_ERR NDF_PAR PRM_PAR NUM_DEC_CVT NUM_DEF_CVT
 opus.o:	 ME_COM C1_COM
 otstsb.o:	 SAE_PAR
 outset.o:	 SAE_PAR DAT_PAR PAR_ERR PRM_PAR
-ovclear.o:	 SAE_PAR
-ovset.o:	 SAE_PAR CTM_PAR
 paldef.o:	 SAE_PAR CTM_PAR
 palentry.o:	 SAE_PAR CTM_PAR
 palread.o:	 SAE_PAR CTM_PAR
