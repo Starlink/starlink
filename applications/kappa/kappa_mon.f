@@ -92,7 +92,7 @@
 *  Define the current application name for history. The package version
 *  number gets substituted in here when the KAPPA release source tar file 
 *  is contructed.
-      CALL NDF_HAPPN( NAME // ' (KAPPA 0.14)', STATUS )
+      CALL NDF_HAPPN( NAME // ' (KAPPA PKG_VERS)', STATUS )
 
 *  See if NDF names should be reported when looping.
       CALL KPG1_ENVDF( 'KAPPA_REPORT_NAMES', VERB, STATUS )
