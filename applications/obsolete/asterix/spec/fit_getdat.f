@@ -199,7 +199,6 @@
 
 	CHARACTER*(DAT__SZLOC) LOC	! Component locator
 	CHARACTER*(DAT__SZLOC) DCLOC(NDSMAX)	! Data container file locators
-	CHARACTER*(DAT__SZLOC) CLOC	! Temporary component locator
 	CHARACTER*(DAT__SZNAM) NAME	! Object name
 	CHARACTER*(DAT__SZTYP) TYPE	! Object type
 	CHARACTER*100 FILE		! File name for HDS_TRACE
@@ -212,7 +211,6 @@
 	LOGICAL SPECSET(NDSCMAX)	! Container is a SPECTRAL_SET?
 	LOGICAL QUAL			! Data quality info available?
 	LOGICAL BAD			! Bad points present?
-	LOGICAL GOOD			! Good points present?
 	LOGICAL LIKSTAT			! Likelihood fitting?
 	LOGICAL CHISTAT			! Chi-squared fitting?
 	LOGICAL BG			! B/g data file found?
@@ -247,7 +245,6 @@
 	INTEGER LDIM(2)			! Lower bound for array slice
 	INTEGER UDIM(2)			! Upper bound for array slice
 	INTEGER NGDAT			! No of good data in dataset
-	INTEGER NACT			! No of values accessed
 	INTEGER NCH			! No of characters in string
 	INTEGER DETNO(NDSCMAX)		! No of detectors selected from set
 	INTEGER DETSEL(NDETMAX,NDSCMAX)	! Detectors selected from set
