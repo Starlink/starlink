@@ -83,6 +83,8 @@ fi
 
 AC_PROG_RANLIB
 
+OPTIONAL_OBJECTS=
+
 dnl Checks for ANSI stdlib.h.
 AC_CHECK_HEADERS(stdlib.h string.h math.h limits.h ,ANSI_HEADER=yes,ANSI_HEADER=no)dnl
 
@@ -260,7 +262,8 @@ AC_SUBST(FC)dnl
 AC_SUBST(LIBPRE)dnl
 AC_SUBST(SHLIB_LD)dnl
 AC_SUBST(SHLIB_SUFFIX)dnl
-AC_SUBST(F77_WRAPPERS)
+AC_SUBST(F77_WRAPPERS)dnl
+AC_SUBST(OPTIONAL_OBJECTS)dnl
 
 # ================= test for the unix ftruncate function ================
 
@@ -298,8 +301,15 @@ AC_MSG_RESULT("yes")
 # check is System V IPC is supported on this machine
 # -------------------------------------------------------------------------
 
+AC_CHECK_HEADERS([sys/types.h sys/ipc.h])
+
 AC_MSG_CHECKING("whether system V style IPC services are supported")
-AC_TRY_LINK([#include <sys/ipc.h>
+AC_TRY_LINK([#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#  include <sys/ipc.h>
+#endif
 #include <sys/shm.h>
 #include <sys/sem.h>
 ], [
@@ -310,6 +320,7 @@ semget(0, 0, 0);
 ], [
 AC_DEFINE(HAVE_SHMEM_SERVICES)
 my_shmem=\${SOURCES_SHMEM}
+OPTIONAL_OBJECTS="$OPTIONAL_OBJECTS drvrsmem.o"
 AC_MSG_RESULT("yes")
 ], AC_MSG_RESULT("no") )
 
@@ -336,7 +347,12 @@ AC_MSG_RESULT("yes")
 
 AC_MSG_CHECKING("do we have union semun defined")
 AC_TRY_COMPILE(
-[#include <sys/ipc.h>
+[#if HAVE_SYS_TYPES_H
+#  include <sys/types.h>
+#endif
+#if HAVE_SYS_IPC_H
+#  include <sys/ipc.h>
+#endif
 #include <sys/shm.h>
 #include <sys/sem.h>
 ], [

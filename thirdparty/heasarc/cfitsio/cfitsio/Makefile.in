@@ -8,6 +8,9 @@
 #       NASA GSFC
 #       Oct 1996
 #
+# 28-Jul-05 : (norman@astro.gla.ac.uk) re-added conditional drvrsmem.c
+#             (in @OPTIONAL_OBJECTS@), since some ranlibs (eg, OSX) object
+#             to an object file containing no exported symbols.
 # 25-Jan-01 : removed conditional drvrsmem.c compilation because this
 #             is now handled within the source file itself.
 # 09-Mar-98 : modified to conditionally compile drvrsmem.c. Also
@@ -40,7 +43,7 @@ SHLIB_SUFFIX =	@SHLIB_SUFFIX@
 
 
 CORE_SOURCES = 	buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
-		drvrnet.c drvrsmem.c editcol.c edithdu.c eval_l.c eval_y.c \
+		drvrnet.c editcol.c edithdu.c eval_l.c eval_y.c \
 		eval_f.c fitscore.c getcol.c getcolb.c getcold.c getcole.c \
 		getcoli.c getcolj.c getcolk.c getcoll.c getcols.c getcolsb.c \
 		getcoluk.c getcolui.c getcoluj.c getkey.c group.c grparser.c \
@@ -51,9 +54,12 @@ CORE_SOURCES = 	buffers.c cfileio.c checksum.c compress.c drvrfile.c drvrmem.c \
 		swapproc.c wcssub.c wcsutil.c imcompress.c quantize.c ricecomp.c \
 		pliocomp.c
 
+# drvrsmem.o may get built here
+OPTIONAL_OBJECTS = @OPTIONAL_OBJECTS@
+
 SOURCES = ${CORE_SOURCES} @F77_WRAPPERS@
 
-OBJECTS = 	${SOURCES:.c=.o}
+OBJECTS = 	${SOURCES:.c=.o} ${OPTIONAL_OBJECTS}
 
 CORE_OBJECTS = 	${CORE_SOURCES:.c=.o}
 
