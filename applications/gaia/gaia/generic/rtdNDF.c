@@ -331,98 +331,14 @@ int rtdCopyNDF( int ndfid, void **data, const char* component,
    /* Get the type of the NDF component. */
    emsMark();
    ndfBegin();
-
    ndfType( ndfid, component, dtype, NDF__SZTYP+1, &status );
+   
+   /*  Trap _DOUBLE and really map _REAL */
+   if ( strncmp( dtype, "_DOUBLE", 7 ) == 0 ) {
+      strcpy( dtype, "_REAL" );
+   }
    ndfMap( ndfid, component, dtype, "READ", ptr, &el, &status ); 
    *data = ptr[0];
-   ndfEnd( &status );
-   return 1;
-
-   /*  Determine the number of chunks needed to copy the data. */
-   ndfNchnk( ndfid, MXPIX, &nchunk, &status );
-
-   /*  Using the appropriate data type, access the NDF chunks and copy
-    *  data.
-    */
-   if ( strncmp( dtype, "_DOUBLE", 8 ) == 0 ){
-
-      /*  Double type not available, so use float, check for values that
-          cannot be represented and set bad */
-      double *fromPtr;
-      float *toPtr = *data;
-      double hi = FLT_MAX;
-      double lo = -FLT_MAX;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (double *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            if ( *fromPtr <= hi && *fromPtr > lo ) {
-               *toPtr++ = (float)*fromPtr++;
-            } else {
-               *toPtr++ = -FLT_MAX;
-            }
-         }
-      }
-   } else if ( strncmp( dtype, "_REAL", 5 ) == 0 ) {
-      float *fromPtr;
-      float *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
-   } else if ( strncmp( dtype, "_INTEGER", 9 ) == 0 ) {
-      int *fromPtr;
-      int *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
-   } else if ( strncmp( dtype, "_WORD", 5 ) == 0 ||
-               strncmp( dtype, "_UWORD", 6 ) == 0 ) {
-      unsigned short *fromPtr;
-      unsigned short *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned short *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
-   } else if ( strncmp( dtype, "_BYTE", 5 ) == 0 ) {
-      unsigned char *fromPtr;
-      unsigned char *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned char *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = *fromPtr++;
-         }
-      }
-   } else if ( strncmp( dtype, "_UBYTE", 6 ) == 0 ) {
-
-      /*  Cannot represent this type, so mapping is to short */
-      unsigned char *fromPtr;
-      unsigned short *toPtr = *data;
-      for ( i = 1; i <= nchunk; i++ ) {
-         ndfChunk( ndfid, MXPIX, i, &chunkid, &status );
-         ndfMap( chunkid, component, dtype, "READ", ptr, &el, &status );
-         fromPtr = (unsigned char *) ptr[0];
-         for( j = 0; j < el; j++ ) {
-            *toPtr++ = (unsigned short) *fromPtr++;
-         }
-      }
-   }
 
    /* If an error occurred return an error message */
    if ( status != SAI__OK ) {
