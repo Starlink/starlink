@@ -120,6 +120,11 @@
 
         END IF
 
+*  Response exists for non-binned dataset
+      ELSE IF ( STATUS .EQ. SAI__OK ) THEN
+        FOUND = .TRUE.
+
+*  Duff status
       ELSE IF ( STATUS .NE. SAI__OK ) THEN
         CALL ERR_FLUSH( STATUS )
         CALL MSG_PRNT( 'WARNING : Energy response not found, '/
