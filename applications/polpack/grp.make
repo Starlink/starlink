@@ -45,7 +45,7 @@ kpg1_odloc.f kpg1_odprs.f kpg1_odset.f kpg1_odthr.f kpg1_odtrn.f \
 kpg1_pgsht.f kpg1_pgsty.f kpg1_plcip.f kpg1_plot.f kpg1_prnth.f \
 kpg1_rcatw.f kpg1_rdast.f kpg1_seteq.f kpg1_short.f kpg1_vect.f \
 kpg1_wcatw.f kpg1_wrast.f kpg1_wread.f kpg1_wwrt.f kpg_ast kpg_par \
-kps1_vecky.f polplot.f polplot.ifl
+kps1_vecky.f polplot.f polplot.ifl pol1_vecpl.f
 
 # The other files which need to be extracted from the source code
 # repository and which end up in polpack.tar.
