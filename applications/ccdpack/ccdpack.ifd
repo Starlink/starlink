@@ -108,6 +108,7 @@ package ccdpack {
       source tranndf.ifd
       source astimp.ifd
       source astexp.ifd
+      source wcsedit.ifd
       source wcsreg.ifd
    }
 

@@ -34,6 +34,8 @@
 *        Added new tasks ASTIMP and ASTEXP.
 *     15-APR-1999 (MBT):
 *        Added new task WCSREG.
+*     18-MAY-1999 (MBT):
+*        Added new task WCSEDIT.
 *     {enter_further_changes_here}
 
 *  Bugs:
@@ -106,6 +108,9 @@
 
       ELSE IF ( ACTION .EQ. 'TRANNDF' ) THEN 
          CALL TRANNDF( STATUS )
+
+      ELSE IF ( ACTION .EQ. 'WCSEDIT' ) THEN
+         CALL WCSEDIT( STATUS )
 
       ELSE IF ( ACTION .EQ. 'WCSREG' ) THEN
          CALL WCSREG( STATUS )
