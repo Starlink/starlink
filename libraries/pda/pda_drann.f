@@ -13,8 +13,8 @@
 *
 *  Usage:     R = DRNOR()
 
-      DOUBLE PRECISION FUNCTION PDA_DRNOR()
-C***BEGIN PROLOGUE  PDA_DRNOR
+      DOUBLE PRECISION FUNCTION PDA_DRANN()
+C***BEGIN PROLOGUE  PDA_DRANN
 C***DATE WRITTEN   810915 (YYMMDD)
 C***REVISION DATE  870419 (YYMMDD)
 C***CATEGORY NO.  L6A14
@@ -34,25 +34,25 @@ C                D. KAHANER, C. MOLER, S. NASH
 C                PRENTICE HALL, 1988
 C   USE
 C       FIRST TIME....
-C                   Z = PDA_DSTART(ISEED)
+C                   Z = PDA_DRANS(ISEED)
 C                     HERE ISEED IS ANY  N O N - Z E R O  INTEGER.
 C                     THIS CAUSES INITIALIZATION OF THE PROGRAM.
-C                     PDA_DSTART RETURNS A DOUBLE PRECISION ECHO OF ISEED.
+C                     PDA_DRANS RETURNS A DOUBLE PRECISION ECHO OF ISEED.
 C
 C       SUBSEQUENT TIMES...
-C                   Z = PDA_DRNOR()
+C                   Z = PDA_DRANN()
 C                     CAUSES THE NEXT DOUBLE PRECISION RANDOM NUMBER
 C                           TO BE RETURNED AS Z.
 C
 C.....................................................................
 C                 TYPICAL USAGE
 C
-C                    DOUBLE PRECISION PDA_DSTART,PDA_DRNOR,Z
+C                    DOUBLE PRECISION PDA_DRANS,PDA_DRANN,Z
 C                    INTEGER ISEED,I
 C                    ISEED = 305
-C                    Z = PDA_DSTART(ISEED)
+C                    Z = PDA_DRANS(ISEED)
 C                    DO 1 I = 1,10
-C                       Z = PDA_DRNOR()
+C                       Z = PDA_DRANN()
 C                       WRITE(*,'(1X,D20.15)') Z
 C                 1  CONTINUE
 C                    END
@@ -63,8 +63,8 @@ C                 METHOD FOR SAMPLING FROM DECREASING OR
 C                 SYMMETRIC UNIMODAL DENSITY FUNCTIONS",
 C                 PUBLISHED IN SIAM J SISC, JUNE 1984.
 C***ROUTINES CALLED  (NONE)
-C***END PROLOGUE  PDA_DRNOR
-      DOUBLE PRECISION AA,B,C,C1,C2,PC,X,Y,XN,V(65),PDA_DSTART,U(17),
+C***END PROLOGUE  PDA_DRANN
+      DOUBLE PRECISION AA,B,C,C1,C2,PC,X,Y,XN,V(65),PDA_DRANS,U(17),
      *S,T,UN,VNI
       INTEGER J,IA,IB,IC,II,JJ,ID,III,JJJ,L
       SAVE U,II,JJ
@@ -168,7 +168,7 @@ C         WITH SEED 305.
 C
       DATA II,JJ / 17, 5 /
 C
-C***FIRST EXECUTABLE STATEMENT  PDA_DRNOR
+C***FIRST EXECUTABLE STATEMENT  PDA_DRANN
 C
 C FAST PART...
 C
@@ -188,11 +188,11 @@ C           VNI IS UNIFORM ON [-1,1)
 C        INT(UN(II)*128) IN RANGE [0,127],  J IS IN RANGE [1,64]
       J = MOD(INT(U(II)*128),64)+1
 C        PICK SIGN AS VNI IS POSITIVE OR NEGATIVE
-      PDA_DRNOR = VNI*V(J+1)
-      IF(ABS(PDA_DRNOR).LE.V(J))RETURN
+      PDA_DRANN = VNI*V(J+1)
+      IF(ABS(PDA_DRANN).LE.V(J))RETURN
 C
 C SLOW PART; AA IS A*F(0)
-      X = (ABS(PDA_DRNOR)-V(J))/(V(J+1)-V(J))
+      X = (ABS(PDA_DRANN)-V(J))/(V(J+1)-V(J))
 C          Y IS UNIFORM ON [0,1)
       Y = U(II)-U(JJ)
       IF(Y.LT.0.0D0) Y = Y+1.
@@ -206,7 +206,7 @@ C
       IF(S.GT.C2)GO TO 11
       IF(S.LE.C1)RETURN
       IF(Y.GT.C-AA*EXP(-.5D0*(B-B*X)**2))GO TO 11
-      IF(EXP(-.5D0*V(J+1)**2)+Y*PC/V(J+1).LE.EXP(-.5D0*PDA_DRNOR**2))
+      IF(EXP(-.5D0*V(J+1)**2)+Y*PC/V(J+1).LE.EXP(-.5D0*PDA_DRANN**2))
      *RETURN
 C
 C TAIL PART; .36010157... IS 1.0D0/XN
@@ -229,14 +229,14 @@ C       Y IS UNIFORM ON [0,1)
       JJ = JJ-1
       IF(JJ.EQ.0)JJ = 17
       IF( -2.0D0*LOG(Y).LE.X**2 )GO TO 22
-      PDA_DRNOR = SIGN(XN-X,PDA_DRNOR)
+      PDA_DRANN = SIGN(XN-X,PDA_DRANN)
       RETURN
-   11 PDA_DRNOR = SIGN(B-B*X,PDA_DRNOR)
+   11 PDA_DRANN = SIGN(B-B*X,PDA_DRANN)
       RETURN
 C
 C
 C  FILL
-      ENTRY PDA_DSTART(ISEED)
+      ENTRY PDA_DRANS(ISEED)
       IF(ISEED.NE.0) THEN
 C
 C          SET UP ...
@@ -265,7 +265,7 @@ C                   IN DOUBLE PRECISION.
     2     U(III) = S
       ENDIF
 C       RETURN FLOATING ECHO OF ISEED
-      PDA_DSTART=ISEED
+      PDA_DRANS=ISEED
       RETURN
       END
 
