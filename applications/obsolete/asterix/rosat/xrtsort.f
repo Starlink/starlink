@@ -139,7 +139,8 @@
          GOTO 999
       END IF
 
-      CALL MSG_PRNT('XRTSORT : Using FITS file : '// SRT_ROOTNAME)
+      SRT_ROOTNAME = FITSDIR(1:CHR_LEN(FITSDIR))//'/'//SRT_ROOTNAME
+      CALL MSG_PRNT('XRTSORT : Using FITS file : '//SRT_ROOTNAME)
 
 *  Open the FITS file
       CALL FIO_GUNIT(IUNIT, STATUS)
