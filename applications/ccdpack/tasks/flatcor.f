@@ -144,6 +144,9 @@
 *        to match a FLAT file with no Set header, so USESET can safely
 *        be set true (the default) when the input files contain no 
 *        Set header information.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 
 *  Examples:
@@ -192,7 +195,7 @@
 *     The intrinsic default behaviour of the application may be
 *     restored by using the RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO, LOGFILE, PRESERVE and FLAT) have
+*     Certain parameters (LOGTO, LOGFILE, PRESERVE, FLAT and USESET) have
 *     global values. These global values will always take precedence,
 *     except when an assignment is made on the command line.  In general
 *     global values may be set and reset using the CCDSETUP and

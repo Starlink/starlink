@@ -220,6 +220,9 @@
 *        input files are combined together to form the master bias,
 *        so USESET can usually be safely set to TRUE (the default).
 *        [TRUE]
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *     ZERO = _LOGICAL (Read)
 *        Flag indicating whether the output master bias is to have a
 *        mean value of zero or not. If TRUE the input data components
@@ -273,8 +276,8 @@
 *     The intrinsic default behaviour of the application may be
 *     restored by using the RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE)
-*     have global values. These global values will always take
+*     Certain parameters (LOGTO, LOGFILE, RNOISE, GENVAR, PRESERVE and
+*     USESET) have global values. These global values will always take
 *     precedence, except when an assignment is made on the command line.
 *     Global values may be set and reset using the CCDSETUP and
 *     CCDCLEAR commands.

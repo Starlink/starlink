@@ -243,6 +243,9 @@
 *        If the input NDFs have no Set headers, or if they have no
 *        CCD_SET frame in their WCS components, the setting of USESET
 *        will make no difference.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 *     WINX = _INTEGER (Read and Write)
 *        The initial width in pixels of the aligner window, which contains
@@ -329,8 +332,8 @@
 *     default behaviour of the application may be restored by using the
 *     RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO and LOGFILE) have global values. These
-*     global values will always take precedence, except when an
+*     Certain parameters (LOGTO, LOGFILE and USESET) have global values.
+*     These global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *

@@ -176,6 +176,9 @@
 *        If no Set header information is present in the input files, 
 *        then calibration is done on all the input files together,
 *        so USESET can usually be safely set to TRUE (the default).
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 *     TYPE = LITERAL (Read)
 *        The frame types of the input data. This should be a recognised
@@ -248,8 +251,8 @@
 *     The intrinsic default behaviour of the application may be
 *     restored by using the RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO and LOGFILE) have global values. These
-*     global values will always take precedence, except when an
+*     Certain parameters (LOGTO, LOGFILE and USESET) have global values. 
+*     These global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
 *

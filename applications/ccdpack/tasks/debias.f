@@ -414,6 +414,9 @@
 *        header is considered to match a master bias file with
 *        no Set header, so USESET can safely be set true (the default)
 *        when the input files contain no Set header information.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 *     WMODE = LITERAL (Read)
 *        The weighting method which is to be used when deriving means
@@ -551,7 +554,7 @@
 *
 *     Certain parameters (ADC, BIAS, BOUNDS, DEFERRED, DIRECTION,
 *     EXTENT, GENVAR, LOGFILE, LOGTO, MASK, PRESERVE, RNOISE, SATURATE,
-*     SATURATION and SETSAT) have global values. These global values
+*     SATURATION, SETSAT and USESET) have global values. These global values
 *     will always take precedence, except when an assignment is made on
 *     the command line.  In general global values may be set and reset
 *     using the CCDSETUP and CCDCLEAR commands, however, the BIAS

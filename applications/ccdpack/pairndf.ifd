@@ -106,9 +106,10 @@
                           # Whether to use CCDPACK Set header info
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
             prompt {Group NDFs by Set Name attribute?}
+            association <-global.ccdpack_useset
             default TRUE
             helpkey *
          }

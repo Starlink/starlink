@@ -83,8 +83,9 @@
          parameter useset {
             type _LOGICAL
             access READ
-            vpath PROMPT
-            ppath CURRENT DEFAULT
+            vpath GLOBAL PROMPT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useset
             default TRUE
             prompt {Should Set information (CCD_SET frames) take precedence?}
             helpkey *

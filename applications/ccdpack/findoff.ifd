@@ -164,8 +164,9 @@
          parameter useset {
             type _LOGICAL
             access READ
-            vpath CURRENT DEFAULT
-            ppath CURRENT DEFAULT
+            vpath GLOBAL CURRENT DEFAULT
+            ppath GLOBAL CURRENT DEFAULT
+            association <-global.ccdpack_useset
             default TRUE
             prompt {Group lists by Set membership?}
             helpkey *

@@ -176,6 +176,9 @@
 *        same Set Name attribute, the connection will be made in
 *        CCD_SET frame.  If no CCD_SET frames are present, this
 *        parameter has no effect.
+*
+*        If a global value for this parameter has been set using 
+*        CCDSETUP then that value will be used.
 *        [TRUE]
 
 *  Examples:
@@ -234,7 +237,7 @@
 *     default behaviour of the application may be restored by using the
 *     RESET keyword on the command line.
 *
-*     Certain parameters (LOGTO and LOGFILE) have global values.
+*     Certain parameters (LOGTO, LOGFILE and USESET) have global values.
 *     These global values will always take precedence, except when an
 *     assignment is made on the command line.  Global values may be set
 *     and reset using the CCDSETUP and CCDCLEAR commands.
